@@ -14,16 +14,19 @@
 #include "imc.h"
 #include "optimizer.h"
 
+/* HEADERIZER TARGET: compilers/imcc/cfg.h */
 
+/* HEADERIZER BEGIN: static */
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
 static void bb_findadd_edge(Parrot_Interp, IMC_Unit *, Basic_block*, SymReg*);
-static void mark_loop(Parrot_Interp, IMC_Unit *, Edge*);
+static void mark_loop(Parrot_Interp, IMC_Unit *, const Edge*);
 static void init_basic_blocks(IMC_Unit *);
-static void analyse_life_symbol(Parrot_Interp, IMC_Unit *, SymReg*);
+static void analyse_life_symbol(Parrot_Interp, const IMC_Unit *, SymReg*);
 static void analyse_life_block(Parrot_Interp, Basic_block*, SymReg*);
 static void bb_add_edge(IMC_Unit *, Basic_block*, Basic_block*);
 static void bb_remove_edge(IMC_Unit *, Edge*);
 static Basic_block* make_basic_block(Interp *, IMC_Unit *, Instruction*);
+/* HEADERIZER END: static */
 
 /* Code: */
 
@@ -57,18 +60,19 @@ check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
 }
 
 void
-find_basic_blocks(Parrot_Interp interp, IMC_Unit * unit, int first)
+find_basic_blocks(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/, int first)
 {
     Basic_block *bb;
     Instruction *ins;
-    SymHash *hsh = &unit->hash;
-    SymReg * r;
+    const SymHash * const hsh = &unit->hash;
     int nu = 0;
     int i;
 
     IMCC_info(interp, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
+
     for (i = 0; i < hsh->size; i++) {
+        SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             if (r && (r->type & VTADDRESS)) {
                 r->last_ins = NULL;
@@ -87,7 +91,7 @@ find_basic_blocks(Parrot_Interp interp, IMC_Unit * unit, int first)
 
     bb = make_basic_block(interp, unit, ins);
     if (ins->type & ITBRANCH) {
-        SymReg * addr = get_branch_reg(bb->end);
+        SymReg * const addr = get_branch_reg(bb->end);
         if (addr)
             addr->last_ins = ins;
     }
@@ -128,7 +132,7 @@ find_basic_blocks(Parrot_Interp interp, IMC_Unit * unit, int first)
         /* a branch is the end of a basic block
          * so start a new one with the next instruction */
         if (ins->type & ITBRANCH) {
-            SymReg * addr = get_branch_reg(bb->end);
+            SymReg * const addr = get_branch_reg(bb->end);
 
             if (addr)
                 addr->last_ins = ins;
@@ -175,7 +179,7 @@ bb_check_set_addr(Parrot_Interp interp, IMC_Unit * unit,
 /* Once the basic blocks have been computed, build_cfg computes
    the dependencies between them. */
 void
-build_cfg(Parrot_Interp interp, IMC_Unit * unit)
+build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 {
     int i, j, changes;
     SymReg * addr;
@@ -335,7 +339,8 @@ bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
 
 
 int
-blocks_are_connected(Basic_block *from, Basic_block *to)
+blocks_are_connected(const Basic_block *from /*NN*/, const Basic_block *to /*NN*/)
+    /* WARN_UNUSED */
 {
     Edge *pred;
     for (pred = to->pred_list; pred != NULL; pred=pred->pred_next) {
@@ -347,7 +352,7 @@ blocks_are_connected(Basic_block *from, Basic_block *to)
 
 
 static void
-bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
+bb_add_edge(IMC_Unit *unit /*NN*/, Basic_block *from /*NN*/, Basic_block *to /*NN*/)
 {
     Edge *e;
     if (blocks_are_connected(from, to))
@@ -357,7 +362,7 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
        on the predecessors of 'from', it won't be on the successors
        of 'to'. */
 
-    e = mem_sys_allocate(sizeof (Edge));
+    e = mem_sys_allocate(sizeof(*e));
 
     e->succ_next = from->succ_list;
     e->from = from;
@@ -378,14 +383,14 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
 }
 
 static void
-bb_remove_edge(IMC_Unit * unit, Edge * edge)
+bb_remove_edge(IMC_Unit *unit /*NN*/, Edge *edge /*NN*/)
 {
-    Edge *prev;
-
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
     }
     else {
+        Edge *prev;
+
         for (prev = edge->from->succ_list; prev; prev = prev->succ_next) {
             if (prev->succ_next == edge) {
                 prev->succ_next = edge->succ_next;
@@ -397,6 +402,8 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
         edge->to->pred_list = edge->pred_next;
     }
     else {
+        Edge *prev;
+
         for (prev = edge->to->pred_list; prev; prev = prev->pred_next) {
             if (prev->pred_next == edge) {
                 prev->pred_next = edge->pred_next;
@@ -409,6 +416,7 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
         free(edge);
     }
     else {
+        Edge *prev;
         for (prev = unit->edge_list; prev; prev = prev->next) {
             if (prev->next == edge) {
                 prev->next = edge->next;
@@ -419,11 +427,12 @@ bb_remove_edge(IMC_Unit * unit, Edge * edge)
 }
 
 static void
-free_edge(IMC_Unit * unit)
+free_edge(IMC_Unit *unit /*NN*/)
 {
-    Edge *e, *next;
+    Edge *e;
+
     for (e = unit->edge_list; e;) {
-        next = e->next;
+        Edge * const next = e->next;
         free(e);
         e = next;
     }
@@ -431,20 +440,23 @@ free_edge(IMC_Unit * unit)
 }
 
 int
-edge_count(IMC_Unit * unit)
+edge_count(const struct _IMC_Unit *unit /*NN*/)
+    /* WARN_UNUSED */
 {
     Edge *e;
-    int i;
-    for (i=0, e = unit->edge_list; e; e = e->next, i++)
-        {}
+    int i = 0;
+
+    for (e = unit->edge_list; e; e = e->next++) {
+        i++;
+    }
     return i;
 }
 
 void
-life_analysis(Parrot_Interp interp, IMC_Unit * unit)
+life_analysis(Interp *interp /*NN*/, const struct _IMC_Unit *unit /*NN*/)
 {
     int i;
-    SymReg** reglist = unit->reglist;
+    SymReg** const reglist = unit->reglist;
 
     IMCC_info(interp, 2, "life_analysis\n");
     for (i = 0; i < unit->n_symbols; i++)
@@ -452,7 +464,7 @@ life_analysis(Parrot_Interp interp, IMC_Unit * unit)
 }
 
 static void
-analyse_life_symbol(Parrot_Interp interp, IMC_Unit * unit, SymReg* r)
+analyse_life_symbol(Parrot_Interp interp, const struct _IMC_Unit *unit /*NN*/, SymReg* r)
 {
     int i;
 
@@ -508,7 +520,7 @@ analyse_life_symbol(Parrot_Interp interp, IMC_Unit * unit, SymReg* r)
 }
 
 void
-free_life_info(IMC_Unit * unit, SymReg *r)
+free_life_info(const struct _IMC_Unit *unit /*NN*/, SymReg *r /*NN*/)
 {
     int i;
 #if IMC_TRACE_HIGH
@@ -619,7 +631,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
     Basic_block *pred;
     Life_range *l;
 
-    l = r->life_info[bb->index];
+    l = r->life_info[bb->index]; /* XXX Will never get used */
     /* l->last_ins = bb->end; XXX:leo why? */
 
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
@@ -677,7 +689,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
  */
 
 void
-compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
+compute_dominators(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 {
 #define USE_BFS 0
 
@@ -688,11 +700,10 @@ compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
     int *q;
     Set *visited;
 #endif
-    int n, b, runner, wrong;
-    Edge *edge;
+    int b, runner, wrong;
     Set** dominators;
 
-    n = unit->n_basic_blocks;
+    const int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
     dominators = unit->dominators = malloc(sizeof (Set*) * n);
     unit->idoms = malloc(sizeof (int) * n);
@@ -717,6 +728,7 @@ compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
     cur=0;
 
     while (cur < len) {
+        Edge *edge;
         for (edge = unit->bb_list[q[cur]]->succ_list;
                 edge; edge = edge->succ_next) {
             succ_index = edge->to->index;
@@ -738,6 +750,7 @@ compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
         /* TODO: This 'for' should be a breadth-first search for speed */
         for (i = 1; i < n; i++) {
             Set *s = set_copy(dominators[i]);
+            Edge *edge;
 
             for (edge=unit->bb_list[i]->pred_list;
                     edge; edge=edge->pred_next) {
@@ -794,15 +807,14 @@ compute_dominators(Parrot_Interp interp, IMC_Unit * unit)
  * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
  */
 void
-compute_dominance_frontiers(Parrot_Interp interp, IMC_Unit * unit)
+compute_dominance_frontiers(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 {
-    int i, n, b, runner;
-    Edge *edge;
-    Set** dominance_frontiers;
+    int i, b;
 
-    n = unit->n_basic_blocks;
+    const int n = unit->n_basic_blocks;
+    Set ** const dominance_frontiers = unit->dominance_frontiers = malloc(sizeof (Set*) * n);
+
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
-    dominance_frontiers = unit->dominance_frontiers = malloc(sizeof (Set*) * n);
 
     dominance_frontiers[0] = set_make(n);
     for (i = 1; i < n; i++) {
@@ -811,13 +823,13 @@ compute_dominance_frontiers(Parrot_Interp interp, IMC_Unit * unit)
 
     /* for all nodes, b */
     for (b = 1; b < n; b++) {
-        edge = unit->bb_list[b]->pred_list;
+        Edge *edge = unit->bb_list[b]->pred_list;
         /* if the number of predecessors of b >= 2 */
         if (edge && edge->pred_next) {
             /* for all predecessors, p, of b */
             for (; edge; edge = edge->pred_next) {
                 /* runner = p */
-                runner = edge->from->index;
+                int runner = edge->from->index;
                 /* while runner != idoms[b] */
                 while (runner >= 0 && runner != unit->idoms[b]) {
                     /* add b to runner's dominance frontier set */
@@ -837,7 +849,7 @@ compute_dominance_frontiers(Parrot_Interp interp, IMC_Unit * unit)
 }
 
 static void
-free_dominators(IMC_Unit * unit)
+free_dominators(IMC_Unit *unit /*NN*/)
 {
     int i;
 
@@ -932,19 +944,18 @@ sort_loops(Parrot_Interp interp, IMC_Unit * unit)
  */
 
 void
-find_loops(Parrot_Interp interp, IMC_Unit * unit)
+find_loops(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 {
-    int i, succ_index;
-    Set* dom;
-    Edge* edge;
+    int i;
 
     IMCC_info(interp, 2, "find_loops\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        dom = unit->dominators[i];
+        const Set * const dom = unit->dominators[i];
+        const Edge *edge;
 
         for (edge=unit->bb_list[i]->succ_list;
                 edge != NULL; edge=edge->succ_next) {
-            succ_index = edge->to->index;
+            const int succ_index = edge->to->index;
 
             if (set_contains(dom, succ_index)) {
                 mark_loop(interp, unit, edge);
@@ -964,7 +975,8 @@ find_loops(Parrot_Interp interp, IMC_Unit * unit)
  * always transfers control directly to the header.
  */
 int
-natural_preheader(IMC_Unit * unit, Loop_info* loop_info)
+natural_preheader(const struct _IMC_Unit *unit /*NN*/, const Loop_info* loop_info /*NN*/)
+    /* WARN_UNUSED */
 {
     int preheader = -1;
     Edge* edge;
@@ -991,7 +1003,7 @@ natural_preheader(IMC_Unit * unit, Loop_info* loop_info)
 /* Increases the loop_depth of all the nodes in a loop */
 
 static void
-mark_loop(Parrot_Interp interp, IMC_Unit * unit, Edge* e)
+mark_loop(Parrot_Interp interp, IMC_Unit * unit, const Edge* e)
 {
     Set* loop;
     Set* exits;
@@ -1086,13 +1098,12 @@ free_loops(IMC_Unit * unit)
 }
 
 void
-search_predecessors_not_in(Basic_block *node, Set* s)
+search_predecessors_not_in(Basic_block *node /*NN*/, Set* s)
 {
    Edge *edge;
-   Basic_block *pred;
 
    for (edge = node->pred_list; edge != NULL; edge = edge->pred_next) {
-        pred = edge->from;
+        Basic_block * const pred = edge->from;
 
         if (! set_contains(s, pred->index)) {
            set_add(s, pred->index);
@@ -1105,7 +1116,7 @@ search_predecessors_not_in(Basic_block *node, Set* s)
 /*** Utility functions ***/
 
 static void
-init_basic_blocks(IMC_Unit * unit)
+init_basic_blocks(IMC_Unit * unit /*NN*/)
 {
     if (unit->bb_list != NULL)
         clear_basic_blocks(unit);
@@ -1117,7 +1128,7 @@ init_basic_blocks(IMC_Unit * unit)
 }
 
 void
-clear_basic_blocks(IMC_Unit * unit)
+clear_basic_blocks(struct _IMC_Unit *unit /*NN*/)
 {
     int i;
     if (unit->bb_list) {
@@ -1165,11 +1176,11 @@ make_basic_block(Interp *interp, IMC_Unit * unit, Instruction* ins)
 }
 
 Life_range *
-make_life_range(SymReg *r, int idx)
+make_life_range(SymReg *r /*NN*/, int idx)
+    /* MALLOC, WARN_UNUSED */
 {
-   Life_range *l;
+   Life_range * const l = mem_sys_allocate_zeroed(sizeof(*l));
 
-   l = mem_sys_allocate_zeroed(sizeof (Life_range));
    r->life_info[idx] = l;
    return l;
 }

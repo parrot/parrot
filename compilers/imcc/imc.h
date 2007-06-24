@@ -183,7 +183,7 @@ int imcc_vfprintf( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 Instruction * iNEW( Interp *interp,
-    struct _IMC_Unit *unit,
+    IMC_Unit *unit,
     SymReg *r0,
     char *type,
     SymReg *init,

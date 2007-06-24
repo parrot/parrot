@@ -1988,6 +1988,7 @@ HEADERIZER_O_FILES = \
     src/tsq.o \
     src/utils.o \
     src/vtables.o \
+    compilers/imcc/cfg.o \
     compilers/imcc/debug.o \
     compilers/imcc/imc.o \
     compilers/imcc/imcparser.o \
