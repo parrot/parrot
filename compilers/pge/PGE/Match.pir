@@ -290,11 +290,27 @@ Returns the portion of the target string matched by this object.
 .end
 
 
+=item C<get_scalar()>
+
+Returns the scalar value of this match -- the "result object"
+if there is one, otherwise the substring matched by this match
+object.
+
+=cut
+
+.sub 'get_scalar' :method
+    .local pmc obj
+    obj = getattribute self, '$!result'
+    if null obj goto scalar_text
+    .return (obj)
+  scalar_text:
+    .return self.'text'()
+.end
+
+
 =item C<result_object([pmc obj])>
 
-Returns or sets the "result object" for the match object.  If no
-result object has been explicitly set (by an embedded closure),
-return the substring that was matched by this match object.
+Returns or sets the "result object" for the match object.  
 
 =cut
 
@@ -303,13 +319,10 @@ return the substring that was matched by this match object.
     .param int has_obj         :opt_flag
     if has_obj == 0 goto get
     setattribute self, '$!result', obj
-  get:
-    obj = getattribute self, '$!result'
-    if null obj goto result_text
+    if null obj goto get
     .return (obj)
-  result_text:
-    $S0 = self.'text'()
-    .return ($S0)
+  get:
+    .return self.'get_scalar'()
 .end
 
 
