@@ -1,6 +1,7 @@
 #!./parrot -G
 # Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
+# vi: ft=pir
 
 =head1 NAME
 
@@ -866,6 +867,6 @@ Column 6, if present, contains a description of what is being tested.
 Note that while our job would be easier if we could use regular expressions
 in here, but we want to avoid any dependency on the thing we're testing.
 
-Need to add in test ids, to avoid the precarious line numbering.
+Need to add in test IDs, to avoid the precarious line numbering.
 
 =cut
