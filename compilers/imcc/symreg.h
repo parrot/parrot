@@ -110,7 +110,7 @@ struct _IMC_Unit;
 /* HEADERIZER BEGIN: compilers/imcc/symreg.c */
 
 SymReg * _find_sym( Interp *interp,
-    Namespace *nspace,
+    const Namespace *nspace /*NULLOK*/,
     SymHash *hsh /*NN*/,
     const char *name /*NN*/ )
         __attribute__nonnull__(3)
@@ -132,7 +132,7 @@ SymReg * _mk_const( SymHash *hsh /*NN*/, char *name /*NN*/, int t )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-char * _mk_fullname( Namespace *ns /*NULLOK*/, const char *name /*NN*/ )
+char * _mk_fullname( const Namespace *ns /*NULLOK*/, const char *name /*NN*/ )
         __attribute__nonnull__(2);
 
 SymReg * _mk_symreg( SymHash* hsh /*NN*/, char *name /*NN*/, int t )
@@ -210,7 +210,9 @@ SymReg * link_keys( Interp *interp /*NN*/,
     int force )
         __attribute__nonnull__(1);
 
-SymReg * mk_address( Interp *interp, char * name, int uniq );
+SymReg * mk_address( Interp *interp /*NN*/, char *name, int uniq )
+        __attribute__nonnull__(1);
+
 SymReg * mk_const( Interp *interp /*NN*/, char * name, int t )
         __attribute__nonnull__(1);
 
@@ -249,7 +251,9 @@ SymReg * mk_pcc_sub( Interp *interp /*NN*/, char *name /*NN*/, int proto )
 SymReg * mk_sub_address( Interp *interp /*NN*/, char *name )
         __attribute__nonnull__(1);
 
-SymReg * mk_sub_label( Interp *interp, char * name );
+SymReg * mk_sub_label( Interp *interp /*NN*/, char *name )
+        __attribute__nonnull__(1);
+
 SymReg * mk_symreg( Interp *interp /*NN*/, char *name /*NN*/, int t )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

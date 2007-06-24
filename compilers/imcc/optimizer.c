@@ -146,8 +146,6 @@ optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
     return any;
 }
 
-#define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
-
 /*
  * Get negated form of operator. If no negated form is known, return 0.
  */
@@ -188,7 +186,7 @@ get_neg_op(const char *op /*NN*/, int *n /*NN*/)
  *
  */
 static int
-if_branch(Interp *interp, IMC_Unit *unit)
+if_branch(Interp *interp /*NN*/, IMC_Unit *unit)
 {
     Instruction *ins, *last;
     int reg, changed = 0;
@@ -202,12 +200,12 @@ if_branch(Interp *interp, IMC_Unit *unit)
                 (ins->type & IF_goto) &&        /* branch L2*/
                 !strcmp(ins->op, "branch") &&
                 (reg = get_branch_regno(last)) >= 0) {
-            SymReg * br_dest = last->r[reg];
+            SymReg * const br_dest = last->r[reg];
             if (ins->next &&
                     (ins->next->type & ITLABEL) &&    /* L1 */
                     ins->next->r[0] == br_dest) {
                 const char * neg_op;
-                SymReg * go = get_branch_reg(ins);
+                SymReg * const go = get_branch_reg(ins);
                 int args;
 
                 IMCC_debug(interp, DEBUG_OPT1,"if_branch %s ... %s\n",

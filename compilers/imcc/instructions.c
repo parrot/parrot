@@ -97,8 +97,6 @@ _mk_instruction(const char *op /*NN*/, const char *fmt /*NN*/, int n,
 static int r_special[5];
 static int w_special[1+4*3];
 
-#define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
-
 void
 imcc_init_tables(Interp *interp /*NN*/)
 {

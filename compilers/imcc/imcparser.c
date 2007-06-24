@@ -584,7 +584,8 @@ mk_sub_address_fromc(Interp *interp, char * name)
 static SymReg *
 mk_sub_address_u(Interp *interp, char * name)
 {
-    SymReg *r = mk_sub_address(interp, name);
+    SymReg * const r = mk_sub_address(interp, name);
+
     r->type |= VT_ENCODED;
     return r;
 }
@@ -606,11 +607,12 @@ IMCC_itcall_sub(Interp* interp /*NN*/, SymReg* sub)
 }
 
 static void
-begin_return_or_yield(Interp *interp, int yield)
+begin_return_or_yield(Interp *interp /*NN*/, int yield)
 {
-    Instruction *i, *ins;
+    Instruction * const ins = IMCC_INFO(interp)->cur_unit->instructions;
+    Instruction *i;
     char name[128];
-    ins = IMCC_INFO(interp)->cur_unit->instructions;
+
     if (!ins || !ins->r[0] || !(ins->r[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, E_SyntaxError,
                     "yield or return directive outside pcc subroutine\n");
@@ -625,7 +627,7 @@ begin_return_or_yield(Interp *interp, int yield)
 }
 
 static void
-set_lexical(Interp *interp, SymReg *r, char *name)
+set_lexical(Interp *interp /*NN*/, SymReg *r /*NN*/, char *name)
 {
     SymReg *n;
     r->usage |= U_LEXICAL;
@@ -642,10 +644,10 @@ set_lexical(Interp *interp, SymReg *r, char *name)
 
 
 static void
-add_pcc_named_arg(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
+add_pcc_named_arg(Interp *interp /*NN*/, SymReg *cur_call /*NN*/, char *name, SymReg *value)
 {
-    SymReg *r;
-    r = mk_const(interp, name, 'S');
+    SymReg * const r = mk_const(interp, name, 'S');
+
     r->type |= VT_NAMED;
     add_pcc_arg(cur_call, r);
     add_pcc_arg(cur_call, value);
@@ -655,8 +657,8 @@ add_pcc_named_arg(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
 static void
 add_pcc_named_result(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
 {
-    SymReg *r;
-    r = mk_const(interp, name, 'S');
+    SymReg * const r = mk_const(interp, name, 'S');
+
     r->type |= VT_NAMED;
     add_pcc_result(cur_call, r);
     add_pcc_result(cur_call, value);
@@ -666,8 +668,8 @@ add_pcc_named_result(Interp *interp, SymReg *cur_call, char *name, SymReg *value
 static void
 add_pcc_named_param(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
 {
-    SymReg *r;
-    r = mk_const(interp, name, 'S');
+    SymReg *r = mk_const(interp, name, 'S');
+
     r->type |= VT_NAMED;
     add_pcc_param(cur_call, r);
     add_pcc_param(cur_call, value);
@@ -676,15 +678,15 @@ add_pcc_named_param(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
 static void
 add_pcc_named_return(Interp *interp, SymReg *cur_call, char *name, SymReg *value)
 {
-    SymReg *r;
-    r = mk_const(interp, name, 'S');
+    SymReg * const r = mk_const(interp, name, 'S');
+
     r->type |= VT_NAMED;
     add_pcc_return(cur_call, r);
     add_pcc_return(cur_call, value);
 }
 
 static void
-adv_named_set(Interp *interp, char *name) {
+adv_named_set(Interp *interp /*NN*/, char *name) {
     if (IMCC_INFO(interp)->adv_named_id) {
         IMCC_fataly(interp, E_SyntaxError,
                     "Named parameter with more than one name.\n");

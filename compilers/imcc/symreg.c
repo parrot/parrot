@@ -54,10 +54,11 @@ pop_namespace(char *name /*NULLOK*/)
 
 /* Gets a symbol from the hash */
 static SymReg *
-_get_sym_typed(SymHash *hsh /*NN*/, const char *name /*NN*/, int t)
+_get_sym_typed(const SymHash *hsh /*NN*/, const char *name /*NN*/, int t)
 {
-    SymReg * p;
     const int i = hash_str(name) % hsh->size;
+    SymReg * p;
+
     for (p = hsh->data[i]; p; p = p->next) {
         if (!strcmp(name, p->name) && t == p->set)
             return p;
@@ -266,7 +267,7 @@ mk_pasm_reg(Interp *interp /*NN*/, char *name)
 }
 
 char *
-_mk_fullname(Namespace *ns /*NULLOK*/, const char *name /*NN*/)
+_mk_fullname(const Namespace *ns /*NULLOK*/, const char *name /*NN*/)
 {
     char * result;
 
@@ -478,7 +479,7 @@ _mk_address(Interp *interp /*NN*/, SymHash *hsh /*NN*/, char *name /*NN*/, int u
 
 /* Eventually make mk_address static */
 SymReg *
-mk_address(Interp *interp, char * name, int uniq)
+mk_address(Interp *interp /*NN*/, char *name, int uniq)
 {
     SymHash * const h = *name == '_' ? &IMCC_INFO(interp)->ghash : &IMCC_INFO(interp)->cur_unit->hash;
     SymReg * const s = _mk_address(interp, h, name, uniq);
@@ -493,7 +494,7 @@ mk_address(Interp *interp, char * name, int uniq)
  * Label gets a fixup entry.
  */
 SymReg *
-mk_sub_label(Interp *interp, char * name)
+mk_sub_label(Interp *interp /*NN*/, char *name)
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_uniq_sub);
@@ -772,7 +773,7 @@ get_sym(Interp *interp /*NN*/, const char *name /*NN*/)
 
 /* find a symbol hash or ghash */
 SymReg *
-_find_sym(Interp *interp, Namespace *nspace, SymHash *hsh /*NN*/,
+_find_sym(Interp *interp, const Namespace *nspace /*NULLOK*/, SymHash *hsh /*NN*/,
         const char *name /*NN*/)
 {
     Namespace * ns;
@@ -868,9 +869,8 @@ clear_globals(Interp *interp /*NN*/)
 {
     SymHash * const hsh = &IMCC_INFO(interp)->ghash;
 
-    if (!hsh->data)
-        return;
-    clear_sym_hash(hsh);
+    if (hsh->data)
+        clear_sym_hash(hsh);
 }
 
 

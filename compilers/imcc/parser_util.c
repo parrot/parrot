@@ -1036,7 +1036,7 @@ try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, const char *name,
 
     UNUSED(interp);
     UNUSED(unit);
-    for (i = 0; i < sizeof (br_pairs)/sizeof (br_pairs[0]); i++) {
+    for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         if (strcmp(name, br_pairs[i].op) == 0) {
             to_swap =  br_pairs[i].to_swap;
             if (r[to_swap + 1]->set == 'P')
