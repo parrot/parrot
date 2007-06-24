@@ -62,6 +62,7 @@ if ( grep { /^--files$/ } @ARGV ) {
 }
 
 exit unless @files;
+print STDERR $ENV{TEST_PROG_ARGS};
 runtests(@files);
 
 # Local Variables:

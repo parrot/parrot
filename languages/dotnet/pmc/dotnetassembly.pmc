@@ -1224,7 +1224,7 @@ static PMC* make_class_pmc(Interp *INTERP, PMC *self, struct dotnet_assembly *as
         type->str_namespace = string_from_cstring(INTERP,
             ass->strings + pos_namespace, 0);
         type->str_fullname = string_concat(INTERP, type->str_namespace,
-            string_from_cstring(INTERP, ".", 0), 0);
+            string_from_literal(INTERP, "."), 0);
         type->str_fullname = string_concat(INTERP, type->str_fullname,
             type->str_name, 0);
     }
@@ -1775,23 +1775,23 @@ pmclass DotNetAssembly dynpmc group dotnet {
         if (pass)
         {
             dynclass_DotNetClassMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetClassMetadata", 0));
+                string_from_literal(INTERP, "DotNetClassMetadata"));
             dynclass_DotNetMethodMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetMethodMetadata", 0));
+                string_from_literal(INTERP, "DotNetMethodMetadata"));
             dynclass_DotNetFieldMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetFieldMetadata", 0));
+                string_from_literal(INTERP, "DotNetFieldMetadata"));
             dynclass_DotNetParamMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetParamMetadata", 0));
+                string_from_literal(INTERP, "DotNetParamMetadata"));
             dynclass_DotNetBytecode = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetBytecode", 0));
+                string_from_literal(INTERP, "DotNetBytecode"));
             dynclass_DotNetEH = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetEH", 0));
+                string_from_literal(INTERP, "DotNetEH"));
             dynclass_DotNetTypeRefMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetTypeRefMetadata", 0));
+                string_from_literal(INTERP, "DotNetTypeRefMetadata"));
             dynclass_DotNetMemberRefMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetMemberRefMetadata", 0));
+                string_from_literal(INTERP, "DotNetMemberRefMetadata"));
             dynclass_DotNetAssemblyRefMetadata = pmc_type(INTERP,
-                string_from_cstring(INTERP, "DotNetAssemblyRef", 0));
+                string_from_literal(INTERP, "DotNetAssemblyRef"));
         }
     }
 
