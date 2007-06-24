@@ -15,9 +15,7 @@ and then invokes POST::Compiler on the resulting POST tree.
 .namespace [ 'PAST::Compiler' ]
 
 .sub '__onload' :load :init
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-
-    $P99 = subclass 'HLLCompiler', 'PAST::Compiler'
+    $P99 = subclass 'PCT::HLLCompiler', 'PAST::Compiler'
     $P0 = new 'PAST::Compiler'
     $P0.'language'('PAST')
     .return ()
@@ -42,7 +40,6 @@ to executable code (but not executed).
     postbuilder = postgrammar.'apply'(past)
     post = postbuilder.'get'('root')
     .return (post)
-
 .end
 
 =back

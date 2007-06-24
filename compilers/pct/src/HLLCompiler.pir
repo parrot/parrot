@@ -1,6 +1,6 @@
 =head1 NAME
 
-HLLCompiler - base class for compiler objects
+PCT::HLLCompiler - base class for compiler objects
 
 =head1 DESCRIPTION
 
@@ -14,8 +14,9 @@ running compilers from a command line.
 .namespace
 
 .sub '__onload' :load :init
-    $P0 = newclass [ 'HLLCompiler' ]
+    $P0 = newclass [ 'PCT::HLLCompiler' ]
     addattribute $P0, '$parsegrammar'
+    addattribute $P0, '$parseactions'
     addattribute $P0, '$astgrammar'
     addattribute $P0, '$ostgrammar'
     addattribute $P0, '@stages'
@@ -38,7 +39,7 @@ by C<attrname> based on C<has_value>.
 
 =cut
 
-.namespace [ 'HLLCompiler' ]
+.namespace [ 'PCT::HLLCompiler' ]
 
 .include 'cclass.pasm'
 
@@ -81,6 +82,10 @@ C<compreg> opcode.
 
 Accessor for the C<parsegrammar> attribute.
 
+=item parseactions([string actions])
+
+Accessor for the C<parseactions> attribute.
+
 =item astgrammar([string grammar])
 
 Accessor for the C<astgrammar> attribute.
@@ -95,6 +100,13 @@ Accessor for the 'ostgrammar' attribute.
     .param string value        :optional
     .param int has_value       :opt_flag
     .return self.'attr'('$parsegrammar', value, has_value)
+.end
+
+
+.sub 'parseactions' :method
+    .param string value        :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('$parseactions', value, has_value)
 .end
 
 
@@ -273,8 +285,15 @@ to any options and return the resulting parse tree.
     unless null top goto have_top                      # FIXME: deprecated
     top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
   have_top:                                            # FIXME: deprecated
+    .local pmc parseactions
+    null parseactions
+    $S0 = self.'parseactions'()
+    unless $S0 goto have_parseactions
+    $I0 = find_type $S0
+    parseactions = new $I0
+  have_parseactions:
     .local pmc match
-    match = top(source, 'grammar' => parsegrammar_name)
+    match = top(source, 'grammar' => parsegrammar_name, 'action' => parseactions)
     unless match goto err_failedparse
     .return (match)
 
@@ -300,6 +319,13 @@ resulting ast.
 .sub 'past' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
+    .local pmc ast
+    ast = source
+    $I0 = isa ast, 'PAST::Node'
+    if $I0 goto return_ast
+    ast = source.'get_scalar'()
+    $I0 = isa ast, 'PAST::Node'
+    if $I0 goto return_ast
     .local string astgrammar_name
     .local pmc astgrammar, astbuilder
     astgrammar_name = self.'astgrammar'()
@@ -308,6 +334,8 @@ resulting ast.
     astgrammar = new $I0
     astbuilder = astgrammar.'apply'(source)
     .return astbuilder.'get'('past')
+  return_ast:
+    .return (ast)
 
   err_no_astgrammar:
     $P0 = new .Exception
@@ -405,7 +433,6 @@ specifies the encoding to use for the input (e.g., "utf8").
     '_dumper'($P0, target)
     goto interactive_loop
   target_pir:
-    say $P0
     goto interactive_loop
   interactive_trap:
     get_results '(0,0)', $P0, $S0
@@ -611,6 +638,7 @@ resulting ost.
     $P0 = compreg 'PAST'
     .return $P0.'compile'(source, adverbs :flat :named)
 .end
+
 
 .sub 'pir' :method
     .param pmc source

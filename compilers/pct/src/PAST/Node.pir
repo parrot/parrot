@@ -97,22 +97,23 @@ And returns the node.
 .end
 
 
-=item new(class, [child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
+=item new([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
 
-Create a new PAST node of type C<class> initialized with the given
+Create a new PAST node of initialized with the given
 children and attributes.  Returns the newly created node.
 
 =cut
 
 .sub 'new' :method
-    .param string class
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    $I0 = find_type class
-    $P0 = new $I0
-    $P0.'init'(children :flat, 'node'=>self, adverbs :flat :named)
-    .return ($P0)
+    $S0 = typeof self                                      # FIXME
+    $P0 = new .String                                      # FIXME
+    $P0 = $S0                                              # FIXME
+    $P1 = new $P0                                          # FIXME
+    $P1.'init'(children :flat, 'node'=>self, adverbs :flat :named)
+    .return ($P1)
 .end
 
 
@@ -140,7 +141,9 @@ array of children.  Returns the newly created PAST node.
     .param string class
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
-    $P0 = self.'new'(class, children :flat, adverbs :flat :named)
+    $I0 = find_type class
+    $P0 = new $I0
+    $P0.'init'(children :flat, adverbs :flat :named)
     push self, $P0
     .return ($P0)
 .end

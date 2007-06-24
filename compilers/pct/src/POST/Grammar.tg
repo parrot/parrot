@@ -6,7 +6,8 @@ transform root (PAST::Block) :language('PIR') {
     $I0 = isa post, 'POST::Sub'
     if $I0 goto end
     $S0 = post.'unique'('__anon_')
-    post = post.'new'('POST::Sub', post, 'name'=>$S0)
+    $P0 = getclass 'POST::Sub'
+    post = $P0.'new'(post, 'name'=>$S0)
   end:
     .return (post)
 }
@@ -55,7 +56,8 @@ transform post (PAST::Block) :language('PIR') {
   end:
     set_hll_global ['POST'], '$?SUB', outerpost
     if blocktype != 'immediate' goto blocktype_end
-    post = post.'new'('POST::Op', post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
+    $P0 = getclass 'POST::Op'
+    post = $P0.'new'(post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
   blocktype_end:
     .return (post)
 }
@@ -220,9 +222,10 @@ transform if (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $P0 = getclass 'POST::Label'
+    thenlabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = $P0.'new'('result'=>$S0)
 
     exprpost = tree.'get'('post', exprpast)
     ops.'push'(exprpost)
@@ -268,9 +271,10 @@ transform while (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $P0 = getclass 'POST::Label'
+    looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = $P0.'new'('result'=>$S0)
 
     ##   determine if we need an 'if' or an 'unless' on
     ##   the conditional (while => if, until => unless)
@@ -306,9 +310,10 @@ transform for (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    looplabel = ops.'new'('POST::Label', 'result'=>$S0)
+    $P0 = getclass 'POST::Label'
+    looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
-    endlabel = ops.'new'('POST::Label', 'result'=>$S0)
+    endlabel = $P0.'new'('result'=>$S0)
 
     .local pmc collpast, collpost
     collpast = node[0] 
@@ -353,11 +358,13 @@ transform try (PAST::Op) :language('PIR') {
     .local pmc trypast, trypost, post, traplabel, endlabel
     trypast = node[0]
     trypost = tree.'get'('post', trypast)
-    post = trypost.'new'('POST::Ops', 'node'=>node, 'result'=>trypost)
+    $P0 = getclass 'POST::Ops'
+    post = $P0.'new'('node'=>node, 'result'=>trypost)
     $S0 = node.'unique'('trap_')
-    traplabel = post.'new'('POST::Label', 'result'=>$S0)
+    $P0 = getclass 'POST::Label'
+    traplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
-    endlabel = post.'new'('POST::Label', 'result'=>$S0)
+    endlabel = $P0.'new'('result'=>$S0)
     post.'push_pirop'('push_eh', traplabel)
     post.'push'(trypost)
     post.'push_pirop'('clear_eh')
@@ -380,8 +387,9 @@ transform xor (PAST::Op) :language('PIR') {
     ops.'init'('node'=>node)
 
     .local pmc endlabel, falselabel
-    falselabel = ops.'new'('POST::Label', 'name'=>'xor_false')
-    endlabel = ops.'new'('POST::Label', 'name'=>'xor_end')
+    $P0 = getclass 'POST::Label'
+    falselabel = $P0.'new'('name'=>'xor_false')
+    endlabel = $P0.'new'('name'=>'xor_end')
 
     .local pmc iter, apast, apost, i, t, u
     i = ops.unique('$I')
@@ -403,7 +411,8 @@ transform xor (PAST::Op) :language('PIR') {
     ops.'push_pirop'('if', i, falselabel)
     unless iter goto last_child
     .local pmc s
-    s = ops.'new'('POST::Label', 'name'=>'xor_skip')
+    $P0 = new 'POST::Label'
+    s = $P0.'new'('name'=>'xor_skip')
     ops.'push_pirop'('if', t, s)
     ops.'push_pirop'('set', ops, bpost)
     ops.'push_pirop'('set', t, u)
@@ -427,7 +436,8 @@ transform bind (PAST::Op) :language('PIR') {
     lpast = node[0]
     lpast.'bindvalue'(rpost)
     lpost = tree.'get'('bind', lpast)
-    post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node)
+    $P0 = getclass 'POST::Ops'
+    post = $P0.'new'(rpost, lpost, 'node'=>node)
     .return (post)
 }
 
@@ -438,8 +448,10 @@ transform assign (PAST::Op) :language('PIR') {
     rpost = tree.'get'('post', rpast)
     lpast = node[0]
     lpost = tree.'get'('post', lpast)
-    post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node, 'result'=>lpost)
-    alabel = post.'new'('POST::Label', 'name'=>'assign_')
+    $P0 = getclass 'POST::Ops'
+    post = $P0.'new'(rpost, lpost, 'node'=>node, 'result'=>lpost)
+    $P0 = getclass 'POST::Label'
+    alabel = $P0.'new'('name'=>'assign_')
     post.'push_pirop'('eq_addr', lpost, rpost, alabel)
     post.'push_pirop'('morph', lpost, '.Undef')
     post.'push_pirop'('assign', lpost, rpost)
@@ -467,7 +479,8 @@ transform chain (PAST::Op) :language('PIR') {
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
     cpast = pop clist
-    endlabel = ops.'new'('POST::Label', 'name'=>'chain_end_')
+    $P0 = getclass 'POST::Label'
+    endlabel = $P0.'new'('name'=>'chain_end_')
     apast = cpast[0]
     apost = tree.'get'('post', apast)
     ops.'push'(apost)
@@ -583,7 +596,8 @@ transform bind (PAST::Var) :language('PIR') {
   keyed:
     .local pmc post, keypost
     keypost = tree.'get'('keypost', node)
-    post = keypost.'new'('POST::Op', keypost, 'node'=>node, 'pirop'=>'set', 'result'=>bindvalue)
+    $P0 = getclass 'POST::Op'
+    post = $P0.'new'(keypost, 'node'=>node, 'pirop'=>'set', 'result'=>bindvalue)
     post.'arglist'(keypost, bindvalue)
     .return (post)
 }
@@ -606,8 +620,10 @@ transform vivipost (PAST::Var) :language('PIR') {
 transform post (PAST::Var) :language('PIR') {
     .local pmc vivipost, vivilabel, post
     vivipost = tree.'get'('vivipost', node)
-    post = vivipost.'new'('POST::Ops', 'node'=>node, 'result'=>vivipost)
-    vivilabel = post.'new'('POST::Label', 'name'=>'vivify_')
+    $P0 = getclass 'POST::Ops'
+    post = $P0.'new'('node'=>node, 'result'=>vivipost)
+    $P0 = getclass 'POST::Label'
+    vivilabel = $P0.'new'('name'=>'vivify_')
 
     .local string scope, name, fetchop, storeop
     scope = node.'scope'()

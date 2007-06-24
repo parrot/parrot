@@ -14,9 +14,7 @@ either PIR or executable bytecode.
 .namespace [ 'POST::Compiler' ]
 
 .sub '__onload' :load :init
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-
-    $P99 = subclass 'HLLCompiler', 'POST::Compiler'
+    $P99 = subclass 'PCT::HLLCompiler', 'POST::Compiler'
     $P0 = new 'POST::Compiler'
     $P0.'language'('POST')
     .return ()

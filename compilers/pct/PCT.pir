@@ -9,15 +9,19 @@ compiling programs into Parrot.
 
 =cut
 
-.include 'PAST/Node.pir'
+.include 'src/Grammar.pir'
 
-.include 'PAST/Compiler.pir'
+.include 'src/HLLCompiler.pir'
 
-.include 'POST/Node.pir'
+.include 'src/PAST/Node.pir'
 
-.include 'POST/Grammar_gen.pir'
+.include 'src/PAST/Compiler.pir'
 
-.include 'POST/Compiler.pir'
+.include 'src/POST/Node.pir'
+
+.include 'src/POST/Grammar_gen.pir'
+
+.include 'src/POST/Compiler.pir'
 
 =head1 AUTHOR
 
