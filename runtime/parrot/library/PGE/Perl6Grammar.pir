@@ -293,7 +293,7 @@ the output to the correct output file.
         .param pmc mob
         .param pmc adverbs :named :slurpy
         $P0 = get_hll_global ["%0"], "$optable"
-        .return $P0.'parse'(mob, adverbs :named :flat)
+        .return $P0.'parse'(mob, 'rulename'=>"%1", adverbs :named :flat)
       .end
       END
   with_rulepir:

@@ -234,6 +234,15 @@ Adds (or replaces) a syntactic category's defaults.
     adverbs = new .Hash
   with_adverbs:
 
+    .local pmc action
+    action = adverbs['action']
+    .local string rulename
+    rulename = adverbs['rulename']
+    unless rulename goto have_rulename
+    $I0 = can action, rulename
+    if $I0 goto have_rulename
+    rulename = ''
+  have_rulename:
     ##   see if we have a 'stop' adverb.  If so, then it is either
     ##   a string to be matched directly or a sub(rule) to be called 
     ##   to check for a match.
@@ -489,6 +498,11 @@ Adds (or replaces) a syntactic category's defaults.
     push $P0, $P1
     $P1 = $P2
   reduce_saveterm:
+    unless rulename goto reduce_saveterm_1
+    ($P0 :optional, $I0 :opt_flag) = action.rulename($P1, 'reduce')
+    unless $I0 goto reduce_saveterm_1
+    $P1.'result_object'($P0)
+  reduce_saveterm_1:
     push termstack, $P1
   reduce_end:
     ret
@@ -516,7 +530,7 @@ Adds (or replaces) a syntactic category's defaults.
     $I0 += pos
     mob['KEY'] = key
     mpos = $I0
-    oper = $P0(mob)
+    oper = $P0(mob, 'action'=>action)
     delete mob['KEY']
     $P0 = oper.from()
     $P0 = pos
@@ -538,9 +552,9 @@ Adds (or replaces) a syntactic category's defaults.
     ##   if the termstack is empty, fail the match
     ##   if the term is an invalid term, fail the match
     $I0 = elements termstack
-    if $I0 < 1 goto end_2
+    if $I0 < 1 goto end_all
     $P0 = pop termstack
-    unless $P0 goto end_2
+    unless $P0 goto end_all
     mob["expr"] = $P0
     mpos = wspos
     if wspos > 0 goto end_2
@@ -557,6 +571,11 @@ Adds (or replaces) a syntactic category's defaults.
     $I0 = isa $P0, 'PGE::Match'
     if $I0 goto end_1a
   end_2:
+    unless rulename goto end_all
+    ($P0 :optional, $I0 :opt_flag) = action.rulename(mob, 'end')
+    unless $I0 goto end_all
+    mob.'result_object'($P0)
+  end_all:
     .return (mob)
 
   err_ternary:
