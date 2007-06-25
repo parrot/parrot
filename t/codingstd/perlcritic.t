@@ -13,6 +13,7 @@ use File::Spec;
 use Test::More;
 use Parrot::Config qw{%PConfig};
 use Parrot::Distribution;
+use Getopt::Long;
 
 BEGIN {
     eval { require Perl::Critic };
@@ -27,37 +28,23 @@ BEGIN {
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
-my ( @files, %policies, $list_policies, $list_files, $all_policies );
+my ( %policies, $list_policies, $list_files, $all_policies, $input_policy );
 
-while (@ARGV) {
-    my $arg = $ARGV[0];
-    if ( $arg eq '--' ) {
-        shift @ARGV;    # discard
-        last;
-    }
-    if ( $arg eq '--list' ) {
-        $list_policies = 1;
-        shift @ARGV;    # discard
-    }
-    elsif ( $arg eq '--listfiles' ) {
-        $list_files = 1;
-        shift @ARGV;    #discard
-    }
-    elsif ( $arg eq '--allpolicies' ) {
-        $all_policies = 1;
-        shift @ARGV;    #discard
-    }
-    elsif ( $arg =~ /^--(.*)/ ) {
-        $policies{$1} = 1;
-        shift @ARGV;    # discard
-    }
-    else {
-        last;
-    }
+GetOptions( "list" => \$list_policies,
+            "listfiles" => \$list_files,
+            "allpolicies" => \$all_policies,
+            "policy=s" => \$input_policy,
+        );
+
+# if we we're given a policy, set it to the policies hash
+# this still doesn't implement passing options to policies though...
+if ( $input_policy ) {
+    $policies{$input_policy} = 1;
 }
 
 # get the files to check
 my $DIST = Parrot::Distribution->new();
+my @files;
 if ( !@ARGV ) {
 
     # XXX We should skip any files that are copied wholesale
@@ -237,7 +224,7 @@ By default, this script will validate the specified files against a default
 set of policies. To run the test for a B<specific> Rule, specify it on the
 command line before any other files, as:
 
- perl t/codingstd/perlcritic.t --TestingAndDebugging::RequireUseWarnings
+ perl t/codingstd/perlcritic.t --policy=TestingAndDebugging::RequireUseWarnings
 
 This will, for example, use B<only> that policy (see L<Perl::Critic> for
 more information on policies) when examining files from the manifest.
