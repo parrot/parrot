@@ -714,7 +714,7 @@ do_sprintf:
                         /* This is the terminating condition of the surrounding
                          * loop, so...
                          */
-                        PANIC("We can't be here");
+                        PANIC(interp, "We can't be here");
                     }
                 }
             }

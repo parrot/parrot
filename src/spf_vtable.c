@@ -96,7 +96,7 @@ getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
             return VTABLE_get_integer(interp, pmc);
         }
     default:
-        PANIC("Invalid int type!");
+        PANIC(interp, "Invalid int type!");
         return 0;
     }
 }
@@ -146,7 +146,7 @@ getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
             return (UINTVAL)VTABLE_get_integer(interp, pmc);
         }
     default:
-        PANIC("Invalid uint type!");
+        PANIC(interp, "Invalid uint type!");
         return 0;
     }
 }

@@ -398,7 +398,7 @@ thread_func(void *arg)
 
     if (interp != interpreter_array[tid]) {
         UNLOCK(interpreter_array_mutex);
-        PANIC("thread finished: interpreter mismatch");
+        PANIC(interp, "thread finished: interpreter mismatch");
     }
     if (interp->thread_data->state & THREAD_STATE_DETACHED) {
         interpreter_array[tid] = NULL;

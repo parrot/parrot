@@ -303,7 +303,7 @@ affected register - handle with care.
 
 inline op setp_ind(in INT, invar PMC) :base_ref {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC("Out of bound register access");
+        PANIC(interp, "Out of bound register access");
     REG_PMC($1) = $2;
     goto NEXT();
 }
@@ -318,7 +318,7 @@ affected register - handle with care.
 
 inline op setn_ind(in INT, in NUM) :base_ref {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC("Out of bound register access");
+        PANIC(interp, "Out of bound register access");
     REG_NUM($1) = $2;
     goto NEXT();
 }
@@ -333,7 +333,7 @@ affected register - handle with care.
 
 inline op sets_ind(in INT, in STR) :base_ref {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC("Out of bound register access");
+        PANIC(interp, "Out of bound register access");
     REG_STR($1) = $2;
     goto NEXT();
 }
@@ -348,7 +348,7 @@ affected register - handle with care.
 
 inline op seti_ind(in INT, in INT) :base_ref {
     if ($1 < 0 || $1 >= NUM_REGISTERS)
-        PANIC("Out of bound register access");
+        PANIC(interp, "Out of bound register access");
     REG_INT($1) = $2;
     goto NEXT();
 }

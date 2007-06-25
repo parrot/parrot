@@ -166,7 +166,7 @@ get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
          * Parrot_(classname)_class_init to init_world, or you forgot
          * to run 'make realclean' after adding a new PMC class.
          */
-        PANIC("Null vtable used");
+        PANIC(interp, "Null vtable used");
     }
 
     /* we only have one global Env object, living in the interp */

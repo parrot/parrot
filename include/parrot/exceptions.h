@@ -155,7 +155,9 @@ PARROT_API void do_exception( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__noreturn__;
 
-PARROT_API void free_internal_exception( Interp *interp );
+PARROT_API void free_internal_exception( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PARROT_API size_t handle_exception( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
@@ -207,9 +209,10 @@ PARROT_API opcode_t * rethrow_exception( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API opcode_t * throw_exception( Interp *interp,
+PARROT_API opcode_t * throw_exception( Interp *interp /*NN*/,
     PMC *exception,
-    void *dest );
+    void *dest )
+        __attribute__nonnull__(1);
 
 void destroy_exception_list( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
@@ -230,8 +233,7 @@ void rethrow_c_exception( Interp *interp /*NN*/ )
 
 /* HEADERIZER END: src/exceptions.c */
 
-#define PANIC(message)\
-        do_panic(interp, message, __FILE__, __LINE__)
+#define PANIC(interp, message) do_panic(interp, message, __FILE__, __LINE__)
 
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */

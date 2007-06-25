@@ -247,7 +247,7 @@ gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
         mem_internal_allocate_typed(Small_Object_Arena);
 
     if (!new_arena)
-        PANIC("Out of arena memory");
+        PANIC(interp, "Out of arena memory");
 
     size = pool->object_size * pool->objects_per_alloc;
 

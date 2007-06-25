@@ -149,7 +149,7 @@ void
 push_exception(Interp *interp /*NN*/, PMC *handler /*NN*/)
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
-        PANIC("Tried to set_eh a non Exception_Handler");
+        PANIC(interp, "Tried to set_eh a non Exception_Handler");
     stack_push(interp, &interp->dynamic_env, handler,
                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
@@ -371,7 +371,7 @@ Throw the exception.
 
 PARROT_API
 opcode_t *
-throw_exception(Interp *interp, PMC *exception, void *dest)
+throw_exception(Interp *interp /*NN*/, PMC *exception, void *dest)
 {
     opcode_t *address;
 
@@ -406,7 +406,7 @@ rethrow_exception(Interp *interp /*NN*/, PMC *exception /*NN*/)
     opcode_t *address;
 
     if (exception->vtable->base_type != enum_class_Exception)
-        PANIC("Illegal rethrow");
+        PANIC(interp, "Illegal rethrow");
     handler = find_exception_handler(interp, exception);
     address = VTABLE_invoke(interp, handler, exception);
     /* return the address of the handler */
@@ -573,7 +573,7 @@ Place internal exception buffer back on the free list.
 
 PARROT_API
 void
-free_internal_exception(Interp *interp)
+free_internal_exception(Interp *interp /*NN*/)
 {
     Parrot_exception * const e = interp->exceptions;
     interp->exceptions = e->prev;

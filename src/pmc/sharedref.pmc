@@ -144,7 +144,7 @@ or at least a detection if the referred PMC is already destroyed.
         if (PObj_active_destroy_TEST(ref))
             VTABLE_destroy(INTERP, ref);
         if (PMC_sync(SELF)->owner != INTERP)
-            PANIC("SharedRef destroyed by wrong interpreter");
+            PANIC(INTERP, "SharedRef destroyed by wrong interpreter");
         SUPER();
     }
 }

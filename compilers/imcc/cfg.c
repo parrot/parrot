@@ -1153,7 +1153,7 @@ make_basic_block(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, Instruction* ins 
     Basic_block * const bb = mem_sys_allocate(sizeof (Basic_block));
 
     if (ins == NULL) {
-        PANIC("make_basic_block: called with NULL argument\n");
+        PANIC(interp, "make_basic_block: called with NULL argument\n");
     }
 
     bb->start = ins;

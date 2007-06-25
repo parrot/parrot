@@ -226,7 +226,7 @@ init_events_first(Interp *interp)
      * we could use pthread_once for that too
      */
     if (event_queue)
-        PANIC("event queue already exists - missing parent_interp?");
+        PANIC(interp, "event queue already exists - missing parent_interp?");
     /*
      * create event queue
      */

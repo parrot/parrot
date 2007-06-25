@@ -39,7 +39,7 @@ Returns a C string for the name of C<*pmc>.
 */
 
 static const char *
-caller(Interp *interp, PMC * pmc)
+caller(Interp *interp, PMC *pmc /*NULLOK*/)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
     VTABLE_name(interp, pmc)->strstart : "(null)";
@@ -58,7 +58,7 @@ all unimplemented messages.
 */
 
 static void
-cant_do_method(Interp *interp, PMC * pmc, const char *methname)
+cant_do_method(Interp *interp, PMC *pmc /*NULLOK*/, const char *methname)
 {
     real_exception(interp, NULL, ILL_INHERIT,
                        "%s() not implemented in class '%s'", methname,
@@ -104,7 +104,7 @@ check_set_std_props(Interp *interp, PMC *pmc, STRING *key, PMC *value)
         string_from_cstring(interp, "_ro", 3))) {
 #endif
         /* pmc should set/clear readonly */
-        INTVAL on = VTABLE_get_bool(interp, value);
+        const INTVAL on = VTABLE_get_bool(interp, value);
         /* morph to Const/normal class or readonly class */
         /* XXX warn when this fails? */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
@@ -138,8 +138,7 @@ Set pending standard properties in C<prop_hash>.
 static void
 propagate_std_props(Interp *interp, PMC *self, PMC *prop_hash) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
-        PMC *pmc_true;
-        pmc_true = pmc_new(interp, enum_class_Integer);
+        PMC * const pmc_true = pmc_new(interp, enum_class_Integer);
         PMC_int_val(pmc_true) = 1;
         VTABLE_set_pmc_keyed_str(interp, prop_hash,
             string_from_cstring(interp, "_ro", 3), pmc_true);
@@ -309,7 +308,7 @@ calls init().
 
     PMC* instantiate(PMC* sig) {
         INTVAL type = SELF->vtable->base_type;
-        PMC* ret = pmc_new_noinit(INTERP, type);
+        PMC* const ret = pmc_new_noinit(INTERP, type);
         VTABLE_init(INTERP, ret);
         return ret;
     }
@@ -325,7 +324,7 @@ Panics with a "no custom mark routine defined" error message.
 */
 
     void mark() {
-        PANIC("custom_mark flag set but no custom mark routine defined");
+        PANIC(INTERP, "custom_mark flag set but no custom mark routine defined");
     }
 
 /*

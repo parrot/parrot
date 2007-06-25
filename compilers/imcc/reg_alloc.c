@@ -568,7 +568,7 @@ interferes(Interp *interp, IMC_Unit *unit /*NN*/, SymReg *r0 /*NN*/, SymReg *r1 
     /* Now: */
 
     if (r0->life_info == NULL || r1->life_info == NULL) {
-        PANIC("interferes: INTERNAL ERROR: Life range is NULL\n");
+        PANIC(interp, "interferes: INTERNAL ERROR: Life range is NULL\n");
     }
 
     for (i=0; i < unit->n_basic_blocks; i++) {
