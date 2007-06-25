@@ -127,9 +127,11 @@ Parrot_version(Interp *interp)
     }
     printf("Copyright (C) 2001-2007, The Perl Foundation.\n\
 \n\
-Parrot may be copied only under the terms of either the Artistic License or the\
+Parrot is distributed under the terms of the Artistic License 2.0.\
 \n\
-GNU General Public License, which may be found in the Parrot source kit.\n\
+For more details, see the full text of the license in the file LICENSE,\
+\n\
+which may be found in the Parrot source kit.\n\
 \n\
 This program is distributed in the hope that it will be useful,\n\
 but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
@@ -201,7 +203,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     extern int yydebug;
     if (*argc == 1) {
         usage(stderr);
-        exit(1);
+        exit(0);
     }
     run_pbc = 1;
 
