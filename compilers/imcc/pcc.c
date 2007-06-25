@@ -153,7 +153,6 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit *unit /*NN*/, Instruction *ins /*N
     int          nargs;
     SymReg      *sub = ins->r[0];
     SymReg      *regs[2];
-    Instruction *tmp;
 
     /*
      * if this sub isa method, unshift 'self' as first param
@@ -196,6 +195,7 @@ expand_pcc_sub(Parrot_Interp interp, IMC_Unit *unit /*NN*/, Instruction *ins /*N
             /* was adding rets multiple times... */
             strcmp(unit->last_ins->op, "returncc")
        ) {
+        Instruction *tmp;
         if (sub->pcc_sub->pragma & P_MAIN) {
             tmp = INS(interp, unit, "end", NULL, regs, 0, 0, 0);
         }
@@ -313,7 +313,7 @@ pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
 }
 
 static Instruction *
-move_regs(Parrot_Interp interp, IMC_Unit * unit,
+move_regs(Interp *interp /*NN*/, IMC_Unit * unit,
         Instruction *ins, int n, SymReg **dest, SymReg **src)
 {
     unsigned char *move_list;

@@ -36,7 +36,7 @@ static Basic_block* make_basic_block(Interp *, IMC_Unit *, Instruction*);
 #define INVOKE_SUB_OTHER 4
 
 static int
-check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
+check_invoke_type(Interp *interp /*NN*/, const IMC_Unit * unit, const Instruction *ins /*NN*/)
 {
     /*
      * 1) pcc sub call or yield
@@ -54,7 +54,7 @@ check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
         return INVOKE_SUB_RET;
     /* 4) other usage */
 
-    IMCC_INFO(interp)->dont_optimize = 1;  /* too complex, to follow */
+    IMCC_INFO(interp)->dont_optimize = 1;  /* too complex to follow */
     IMCC_INFO(interp)->optimizer_level &= ~OPT_PASM;
     return INVOKE_SUB_OTHER;
 }
@@ -139,7 +139,7 @@ find_basic_blocks(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/, int firs
             /*
              * ignore set_addr - no new basic block
              */
-            if (!strcmp(ins->op, "set_addr"))
+            if (strcmp(ins->op, "set_addr") == 0)
                 continue;
             if (ins->next)
                 bb = make_basic_block(interp, unit, ins->next);
@@ -157,22 +157,23 @@ static void
 bb_check_set_addr(Parrot_Interp interp, IMC_Unit * unit,
         Basic_block *bb, SymReg *label)
 {
-    Instruction *ins;
-    for (ins = unit->instructions; ins; ins = ins->next) {
-             if (ins->opnum == PARROT_OP_set_addr_p_ic &&
-                    !strcmp(label->name, ins->r[1]->name)) {
-                IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
-                        ins->r[1]->name);
+    const Instruction *ins;
 
-                /*
-                 * connect this block with first and last block
-                 */
-                bb_add_edge(unit, unit->bb_list[0], bb);
-                bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
-                /* and mark the instruction as being kind of a branch */
-                bb->start->type |= ITADDR;
-                break;
-            }
+    for (ins = unit->instructions; ins; ins = ins->next) {
+        if ((ins->opnum == PARROT_OP_set_addr_p_ic) &&
+                (strcmp(label->name, ins->r[1]->name) == 0)) {
+            IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
+                    ins->r[1]->name);
+
+            /*
+             * connect this block with first and last block
+             */
+            bb_add_edge(unit, unit->bb_list[0], bb);
+            bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
+            /* and mark the instruction as being kind of a branch */
+            bb->start->type |= ITADDR;
+            break;
+        }
     }
 }
 
@@ -181,7 +182,7 @@ bb_check_set_addr(Parrot_Interp interp, IMC_Unit * unit,
 void
 build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 {
-    int i, j, changes;
+    int i, changes;
     SymReg * addr;
     Basic_block *last = NULL, *bb;
     Edge *pred;
@@ -201,13 +202,13 @@ build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
         addr = get_branch_reg(bb->end);
         if (addr)
             bb_findadd_edge(interp, unit, bb, addr);
-        else if (!strcmp(bb->start->op, "invoke") ||
-                !strcmp(bb->start->op, "invokecc")) {
+        else if ((strcmp(bb->start->op, "invoke") == 0) ||
+                (strcmp(bb->start->op, "invokecc") == 0)) {
             if (check_invoke_type(interp, unit, bb->start) ==
                     INVOKE_SUB_LOOP)
                 bb_add_edge(unit, bb, unit->bb_list[0]);
         }
-        if (!strcmp(bb->end->op, "ret")) {
+        if (strcmp(bb->end->op, "ret") == 0) {
             Instruction * sub;
             IMCC_debug(interp, DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
@@ -219,9 +220,12 @@ build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
              * s. #25948
              */
             if (!bb->pred_list) {
+                int j;
+
                 for (j = i; j < unit->n_basic_blocks; j++) {
-                    Basic_block * b_bsr = unit->bb_list[j];
-                    if (!strcmp(b_bsr->end->op, "bsr")) {
+                    Basic_block * const b_bsr = unit->bb_list[j];
+
+                    if (strcmp(b_bsr->end->op, "bsr") == 0) {
                         addr = get_branch_reg(b_bsr->end);
                         if (addr)
                             bb_findadd_edge(interp, unit, b_bsr, addr);
@@ -232,14 +236,13 @@ build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
 
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
-                SymReg *r;
-                if (!strcmp(pred->from->end->op, "bsr")) {
-
-                    r = pred->from->end->r[0];
+                if (strcmp(pred->from->end->op, "bsr") == 0) {
+                    SymReg * const r = pred->from->end->r[0];
+                    int j;
 
                     sub = pred->to->start;
                     if ((sub->type & ITLABEL) &&
-                            (!strcmp(sub->r[0]->name, r->name)))
+                            (strcmp(sub->r[0]->name, r->name) == 0))
                         found = 1;
 invok:
                     j = pred->from->index;
@@ -249,13 +252,11 @@ invok:
                                 "\tcalled from bb %d '%I'\n",
                                 j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
-                            if (!strcmp(sub->op, "saveall"))
-                                if (!(sub->type & ITSAVES)) {
+                            if (strcmp(sub->op, "saveall") == 0)
+                                if (!(sub->type & ITSAVES))
                                     break;
-                                }
-                            unit->bb_list[sub->bbindex]->
-                                flag |= BB_IS_SUB;
-                            if (!strcmp(sub->op, "restoreall")) {
+                            unit->bb_list[sub->bbindex]->flag |= BB_IS_SUB;
+                            if (strcmp(sub->op, "restoreall") == 0) {
                                 sub->type |= ITSAVES;
                                 saves = 1;
                             }
@@ -268,7 +269,7 @@ invok:
                                    saves ? "yes" : "no");
                     }
                 }
-                else if (!strcmp(pred->from->end->op, "invoke")) {
+                else if (strcmp(pred->from->end->op, "invoke") == 0) {
                     found = 1;
                     sub = pred->to->start;
                     goto invok;
@@ -313,7 +314,7 @@ bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
                 Basic_block *from, SymReg *label)
 {
     Instruction *ins;
-    SymReg *r = find_sym(interp, label->name);
+    const SymReg * const r = find_sym(interp, label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(unit, from,
@@ -325,7 +326,7 @@ bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
          *     set_addr ins
          */
         for (ins = from->end; ins; ins = ins->prev) {
-            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr") &&
+            if ((ins->type & ITBRANCH) && (strcmp(ins->op, "set_addr") == 0) &&
                     ins->r[1]->first_ins) {
                 bb_add_edge(unit, from, unit->
                                 bb_list[ins->r[1]->first_ins->bbindex]);
@@ -342,10 +343,12 @@ int
 blocks_are_connected(const Basic_block *from /*NN*/, const Basic_block *to /*NN*/)
     /* WARN_UNUSED */
 {
-    Edge *pred;
-    for (pred = to->pred_list; pred != NULL; pred=pred->pred_next) {
+    const Edge *pred = to->pred_list;
+
+    while (pred) {
         if (pred->from == from)
             return 1; /*already linked*/
+        pred = pred->pred_next;
     }
     return 0;
 }
@@ -1098,7 +1101,7 @@ free_loops(IMC_Unit * unit)
 }
 
 void
-search_predecessors_not_in(Basic_block *node /*NN*/, Set* s)
+search_predecessors_not_in(const Basic_block *node /*NN*/, Set* s)
 {
    Edge *edge;
 
@@ -1116,7 +1119,7 @@ search_predecessors_not_in(Basic_block *node /*NN*/, Set* s)
 /*** Utility functions ***/
 
 static void
-init_basic_blocks(IMC_Unit * unit /*NN*/)
+init_basic_blocks(IMC_Unit *unit /*NN*/)
 {
     if (unit->bb_list != NULL)
         clear_basic_blocks(unit);
@@ -1144,16 +1147,14 @@ clear_basic_blocks(struct _IMC_Unit *unit /*NN*/)
 }
 
 static Basic_block*
-make_basic_block(Interp *interp, IMC_Unit * unit, Instruction* ins)
+make_basic_block(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, Instruction* ins /*NN*/)
 {
-    Basic_block *bb;
     int n;
+    Basic_block * const bb = mem_sys_allocate(sizeof (Basic_block));
 
     if (ins == NULL) {
         PANIC("make_basic_block: called with NULL argument\n");
     }
-
-    bb = mem_sys_allocate(sizeof (Basic_block));
 
     bb->start = ins;
     bb->end = ins;
@@ -1161,7 +1162,8 @@ make_basic_block(Interp *interp, IMC_Unit * unit, Instruction* ins)
     bb->pred_list = NULL;
     bb->succ_list = NULL;
     n = unit->n_basic_blocks;
-    ins->bbindex = bb->index = n;
+    ins->bbindex = n;
+    bb->index = n;
     bb->loop_depth = 0;
     if (n == unit->bb_list_size) {
         unit->bb_list_size *= 2;

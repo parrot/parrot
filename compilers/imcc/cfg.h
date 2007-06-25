@@ -105,7 +105,7 @@ int natural_preheader(
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-void search_predecessors_not_in( Basic_block *node /*NN*/, Set* s )
+void search_predecessors_not_in( const Basic_block *node /*NN*/, Set* s )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */
