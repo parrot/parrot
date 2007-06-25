@@ -297,8 +297,8 @@ sub run_command {
     local *OLDERR if $err;
 
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles 
-    open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles 
+    open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles
+    open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles
 
     open STDOUT, ">", "$out" or die "Can't redirect stdout to $out" if $out;
     open STDERR, ">$err" or die "Can't redirect stderr to $err" if $err;
@@ -472,7 +472,7 @@ sub generate_languages_functions {
 
                     my $test_prog = join ' && ', @test_prog;
                     $self->{builder}->diag( "'$test_prog' failed with exit code $exit_code." );
-             
+
                     return 0;
                 }
 
