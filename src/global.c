@@ -23,7 +23,7 @@ tdb
 #include "parrot/parrot.h"
 #include "global.str"
 
-/* HEADER: none */ /* XXX It's really include/parrot/global.h, but not yet */
+/* HEADERIZER TARGET: none */ /* XXX It's really include/parrot/global.h, but not yet */
 
 #define DEBUG_GLOBAL 0
 

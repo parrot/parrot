@@ -17,7 +17,7 @@ This is used by C<parrot>.
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
 
-/* HEADER: include/parrot/longopt.h */
+/* HEADERIZER TARGET: include/parrot/longopt.h */
 
 static int longopt_get_longopt(Parrot_Interp, int argc, char* argv[],
                                const struct longopt_opt_decl options[],

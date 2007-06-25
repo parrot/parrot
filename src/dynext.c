@@ -15,7 +15,7 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
-/* HEADER: include/parrot/dynext.h */
+/* HEADERIZER TARGET: include/parrot/dynext.h */
 
 /* _PARROTLIB is now the default */
 /*#define _PARROTLIB not working: "make testr" */

@@ -20,7 +20,7 @@ setup function to initialize the memory pools.
 #include "parrot/parrot.h"
 #include "parrot/memory.h"
 
-/* HEADER: include/parrot/memory.h */
+/* HEADERIZER TARGET: include/parrot/memory.h */
 
 /* for PANIC */
 #define interp NULL

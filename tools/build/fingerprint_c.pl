@@ -48,7 +48,7 @@ print << "EOF";
 #include <string.h>
 #include "parrot/packfile.h"
 
-/* HEADER: include/parrot/packfile.h */
+/* HEADERIZER TARGET: include/parrot/packfile.h */
 
 EOF
 

@@ -21,7 +21,7 @@ Open mmaps the file.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 static ParrotIO *
 PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,

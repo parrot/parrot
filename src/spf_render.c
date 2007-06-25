@@ -22,7 +22,7 @@ and its utility functions.
 #include "spf_render.str"
 #include <assert.h>
 
-/* HEADER: include/parrot/misc.h */
+/* HEADERIZER TARGET: include/parrot/misc.h */
 
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.

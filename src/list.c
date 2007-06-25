@@ -181,7 +181,7 @@ Also all array usage depends on list.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/list.h */
+/* HEADERIZER TARGET: include/parrot/list.h */
 
 /* internals */
 static List_chunk *allocate_chunk(Interp *interp, List *list,

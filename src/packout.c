@@ -18,7 +18,7 @@ src/packout.c - Functions for writing out packfiles
 #include "parrot/packfile.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/packfile.h */
+/* HEADERIZER TARGET: include/parrot/packfile.h */
 
 /***************************************
 Determine the size of the buffer needed in order to pack the PackFile into a

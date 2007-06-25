@@ -19,7 +19,7 @@ appropriate arguments and return the value returned.
 #include <parrot/parrot.h>
 #include "io_private.h"
 
-/* HEADER: src/io/io_private.h */
+/* HEADERIZER TARGET: src/io/io_private.h */
 
 /*
 

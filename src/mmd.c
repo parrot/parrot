@@ -43,7 +43,7 @@ not highest type in table.
 #include "mmd.str"
 #include <assert.h>
 
-/* HEADER: include/parrot/mmd.h */
+/* HEADERIZER TARGET: include/parrot/mmd.h */
 
 #define MMD_DEBUG 0
 

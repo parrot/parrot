@@ -29,7 +29,7 @@ Define the internal interpreter exceptions.
 #include "parrot/parrot.h"
 #include "parrot/exceptions.h"
 
-/* HEADER: include/parrot/exceptions.h */
+/* HEADERIZER TARGET: include/parrot/exceptions.h */
 
 #include <stdarg.h>
 

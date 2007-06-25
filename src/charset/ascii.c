@@ -19,7 +19,7 @@ charset functionality for similar charsets like iso-8859-1.
 #include "ascii.h"
 #include <assert.h>
 
-/* HEADER: src/charset/ascii.h */
+/* HEADERIZER TARGET: src/charset/ascii.h */
 
 #ifdef EXCEPTION
 #  undef EXCEPTION

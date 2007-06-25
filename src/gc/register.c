@@ -26,7 +26,7 @@ to the previous values and the allocated register memory is discarded.
 #include "parrot/parrot.h"
 #include "parrot/register.h"
 
-/* HEADER: include/parrot/register.h */
+/* HEADERIZER TARGET: include/parrot/register.h */
 
 /*
  * Context and register frame layout

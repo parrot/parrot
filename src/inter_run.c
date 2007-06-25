@@ -23,7 +23,7 @@ Various functions that call the run loop.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADER: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
 
 /*
 

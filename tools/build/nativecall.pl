@@ -290,7 +290,7 @@ sub print_head {
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 /*
  * if the architecture can build some or all of these signatures

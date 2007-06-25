@@ -57,7 +57,7 @@ can.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 
-/* HEADER: include/parrot/extend.h */
+/* HEADERIZER TARGET: include/parrot/extend.h */
 
 /*
 

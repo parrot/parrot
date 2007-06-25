@@ -106,7 +106,7 @@ END_C
 
     print {$OUT} <<"END_C";
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 /* This isn't strictly true, but the headerizer should not bother */
 
 void Parrot_register_core_pmcs(Interp *interp, PMC* registry);

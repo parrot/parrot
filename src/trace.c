@@ -21,7 +21,7 @@ src/test_main.c
 #include "trace.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADER: src/trace.h */
+/* HEADERIZER TARGET: src/trace.h */
 
 /*
 

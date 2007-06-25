@@ -16,7 +16,7 @@ Handles getting of various headers, and pool creation.
 #include "parrot/headers.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/headers.h */
+/* HEADERIZER TARGET: include/parrot/headers.h */
 
 #ifndef GC_IS_MALLOC
 #  define PMC_HEADERS_PER_ALLOC 512

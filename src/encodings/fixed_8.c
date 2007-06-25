@@ -15,7 +15,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 #include "parrot/parrot.h"
 #include "fixed_8.h"
 
-/* HEADER: src/encodings/fixed_8.h */
+/* HEADERIZER TARGET: src/encodings/fixed_8.h */
 
 static UINTVAL get_codepoint(Interp *interp, const STRING *source_string, UINTVAL offset);
 static void set_codepoint(Interp *interp, STRING *source_string, UINTVAL offset, UINTVAL codepoint);

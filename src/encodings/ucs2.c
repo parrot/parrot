@@ -17,7 +17,7 @@ UCS-2 encoding with the help of the ICU library.
 #include "parrot/parrot.h"
 #include "../unicode.h"
 
-/* HEADER: src/encodings/ucs2.h */
+/* HEADERIZER TARGET: src/encodings/ucs2.h */
 
 #include "ucs2.h"
 

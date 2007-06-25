@@ -20,7 +20,7 @@ called by C<Parrot_exit()> when the interpreter exits.
 #include <stdlib.h>
 #include "parrot/parrot.h"
 
-/* HEADER: include/parrot/exit.h */
+/* HEADERIZER TARGET: include/parrot/exit.h */
 
 /*
 

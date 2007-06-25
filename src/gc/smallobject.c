@@ -18,7 +18,7 @@ Handles the accessing of small object pools (header pools).
 #include "parrot/smallobject.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/smallobject.h */
+/* HEADERIZER TARGET: include/parrot/smallobject.h */
 
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1

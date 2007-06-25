@@ -21,7 +21,7 @@ dispatches these to one or all interpreters.
 #include "parrot/events.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/events.h */
+/* HEADERIZER TARGET: include/parrot/events.h */
 
 /*
  * event debugging stuff - turn it off before running tests

@@ -21,7 +21,7 @@ Capture output to a string PMC.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 static size_t
 PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf);

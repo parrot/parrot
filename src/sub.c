@@ -17,7 +17,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADER: include/parrot/sub.h */
+/* HEADERIZER TARGET: include/parrot/sub.h */
 
 /*
 

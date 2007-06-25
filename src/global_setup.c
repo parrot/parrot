@@ -29,7 +29,7 @@ void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
 
-/* HEADER: include/parrot/global_setup.h */
+/* HEADERIZER TARGET: include/parrot/global_setup.h */
 
 /*
 

@@ -23,7 +23,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "parrot/parrot.h"
 #include "inter_misc.str"
 
-/* HEADER: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
 
 /*
 

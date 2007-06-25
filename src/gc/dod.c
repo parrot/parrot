@@ -25,7 +25,7 @@ There's also a verbose mode for garbage collection.
 #include "parrot/dod.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/dod.h */
+/* HEADERIZER TARGET: include/parrot/dod.h */
 
 /* Set this to 1 to see if unanchored objects are found in system areas.
  * Please note: these objects might be bogus

@@ -31,7 +31,7 @@ TODO:
 #include "parrot/oplib/ops.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/pic.h */
+/* HEADERIZER TARGET: include/parrot/pic.h */
 
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cgp.h"

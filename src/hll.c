@@ -58,7 +58,7 @@ the context.  If no type is registered, returns C<core_type>.
 #include "parrot/dynext.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/hll.h */
+/* HEADERIZER TARGET: include/parrot/hll.h */
 
 enum {
     e_HLL_name,

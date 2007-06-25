@@ -24,7 +24,7 @@ Remember you read something about it in F<docs/infant.dev>?
 
 #include "parrot/parrot.h"
 
-/* HEADER: include/parrot/dod.h */
+/* HEADERIZER TARGET: include/parrot/dod.h */
 
 #ifdef __ia64__
 

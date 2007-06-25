@@ -19,7 +19,7 @@ F<include/parrot/datatypes.h>.
 
 #include "parrot/parrot.h"
 
-/* HEADER: include/parrot/datatypes.h */
+/* HEADERIZER TARGET: include/parrot/datatypes.h */
 
 /*
 

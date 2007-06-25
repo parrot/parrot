@@ -25,7 +25,7 @@ These are Parrot's generic charset handling functions
 #include "charset/iso-8859-1.h"
 #include "charset/unicode.h"
 
-/* HEADER: include/parrot/charset.h */
+/* HEADERIZER TARGET: include/parrot/charset.h */
 
 CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;

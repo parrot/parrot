@@ -28,7 +28,7 @@ C<opcode_t> units.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/packfile.h */
+/* HEADERIZER TARGET: include/parrot/packfile.h */
 
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0

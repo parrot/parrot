@@ -112,7 +112,7 @@ A chained list of headers used e.g. for the IGP list.
 #include "parrot/dod.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/dod.h */
+/* HEADERIZER TARGET: include/parrot/dod.h */
 
 #if PARROT_GC_GMS
 

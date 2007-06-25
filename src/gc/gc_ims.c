@@ -337,7 +337,7 @@ a sleep opcode.
 #include "parrot/dod.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/dod.h */
+/* HEADERIZER TARGET: include/parrot/dod.h */
 
 /*
  * size of one arena

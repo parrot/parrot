@@ -28,7 +28,7 @@ src/exec.c - Generate an object file
 #include "exec_save.h"
 #include "parrot/compiler.h"
 
-/* HEADER: include/parrot/exec.h */
+/* HEADERIZER TARGET: include/parrot/exec.h */
 
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);

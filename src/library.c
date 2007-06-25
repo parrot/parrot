@@ -19,7 +19,7 @@ This file contains a C function to access Parrot's bytecode library functions.
 #include <assert.h>
 #include "library.str"
 
-/* HEADER: include/parrot/library.h */
+/* HEADERIZER TARGET: include/parrot/library.h */
 
 /*
 

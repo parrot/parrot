@@ -19,7 +19,7 @@ where each chunk has room for one entry.
 #include "parrot/stacks.h"
 #include <assert.h>
 
-/* HEADER: include/parrot/stacks.h */
+/* HEADERIZER TARGET: include/parrot/stacks.h */
 
 /*
 

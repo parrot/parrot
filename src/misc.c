@@ -42,7 +42,7 @@ the type for the format.
 
 #include "parrot/parrot.h"
 
-/* HEADER: include/parrot/misc.h */
+/* HEADERIZER TARGET: include/parrot/misc.h */
 
 /*
 

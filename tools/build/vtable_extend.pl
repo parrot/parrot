@@ -120,7 +120,7 @@ can.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 
-/* HEADER: none */ /* XXX Ideally the headerizer can run on this file as well. */
+/* HEADERIZER TARGET: none */ /* XXX Ideally the headerizer can run on this file as well. */
 
 EOF
 

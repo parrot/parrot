@@ -28,7 +28,7 @@ src/resources.c - Allocate and deallocate tracked resources
 typedef void (*compact_f) (Interp *, Memory_Pool *);
 static char * aligned_mem(const Buffer *buffer, char *mem);
 
-/* HEADER: include/parrot/resources.h */
+/* HEADERIZER TARGET: include/parrot/resources.h */
 
 /*
 

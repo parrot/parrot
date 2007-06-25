@@ -13,7 +13,7 @@
  *  References:
  */
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 
 #ifndef PARROT_CHARSET_TABLES_H_GUARD

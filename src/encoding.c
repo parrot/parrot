@@ -15,7 +15,7 @@ These are parrot's generic encoding handling functions
 #define PARROT_NO_EXTERN_ENCODING_PTRS
 #include "parrot/parrot.h"
 
-/* HEADER: include/parrot/encoding.h */
+/* HEADERIZER TARGET: include/parrot/encoding.h */
 
 ENCODING *Parrot_default_encoding_ptr;
 ENCODING *Parrot_fixed_8_encoding_ptr;

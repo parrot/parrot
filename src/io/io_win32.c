@@ -29,7 +29,7 @@ Win32 System Programming, 2nd Edition.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 #ifdef PIO_OS_WIN32
 

@@ -50,7 +50,7 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/dynext.h"
 
 
-/* HEADER: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
 
 void Parrot_setup_event_func_ptrs(Parrot_Interp interp);
 

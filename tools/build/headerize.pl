@@ -32,7 +32,7 @@ on the command line.
 
 =head1 NOTES
 
-* the .c files MUST have a /* HEADER: foo/bar.h */ directive in them
+* the .c files MUST have a /* HEADERIZER TARGET: foo/bar.h */ directive in them
 
 * Support for multiple .c files pointing at the same .h file
 
@@ -297,7 +297,7 @@ sub main {
         print "=== $cfile ===\n";
 
         die "can't find HEADER directive in '$cfile'"
-            unless $source =~ m#/\*\s+HEADER(?:IZER TARGET)?:\s+([^*]+?)\s+\*/#s;
+            unless $source =~ m#/\*\s+HEADERIZER TARGET:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
         next if $hfile eq 'none';
         die "'$hfile' not found (referenced from '$cfile')" unless -f $hfile;

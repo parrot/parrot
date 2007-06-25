@@ -76,7 +76,7 @@ lookup of the cache has to be done in the opcode itself.
 
 */
 
-/* HEADER: include/parrot/pic.h */
+/* HEADERIZER TARGET: include/parrot/pic.h */
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>

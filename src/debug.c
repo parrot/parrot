@@ -36,7 +36,7 @@ void
 IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...);
 
 
-/* HEADER: include/parrot/debug.h */
+/* HEADERIZER TARGET: include/parrot/debug.h */
 
 static const char* GDB_P(Interp *interp, const char *s);
 

@@ -25,7 +25,7 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
-/* HEADER: include/parrot/inter_call.h */
+/* HEADERIZER TARGET: include/parrot/inter_call.h */
 
 /* Make sure we don't conflict with any other MAX() macros defined elsewhere */
 #define PARROT_MAX(a,b) (((a)) > (b) ? (a) : (b))

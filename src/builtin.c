@@ -19,7 +19,7 @@ src/builtin.c - Builtin Methods
 #include "builtin.str"
 #include <assert.h>
 
-/* HEADER: include/parrot/builtin.h */
+/* HEADERIZER TARGET: include/parrot/builtin.h */
 
 
 typedef struct _builtin {

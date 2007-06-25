@@ -25,7 +25,7 @@ Win32), this is I<buffered> IO, out of necessity.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADER: none */
+/* HEADERIZER TARGET: none */
 
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd); /* XXX Use a declaration in a header file */
 

@@ -17,7 +17,7 @@ This file implements the charset functions for unicode data
 #include "ascii.h"
 #include "tables.h"
 
-/* HEADER: src/charset/unicode.h */
+/* HEADERIZER TARGET: src/charset/unicode.h */
 
 #ifdef EXCEPTION
 #  undef EXCEPTION

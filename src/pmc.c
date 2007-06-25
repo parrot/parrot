@@ -16,7 +16,7 @@ src/pmc.c - The base vtable calling functions
 #include <assert.h>
 #include "pmc.str"
 
-/* HEADER: include/parrot/pmc.h */
+/* HEADERIZER TARGET: include/parrot/pmc.h */
 
 static PMC* get_new_pmc_header(Interp*, INTVAL base_type, UINTVAL flags);
 

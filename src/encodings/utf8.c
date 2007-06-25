@@ -18,7 +18,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 #include "../unicode.h"
 #include "utf8.h"
 
-/* HEADER: src/encodings/utf8.h */
+/* HEADERIZER TARGET: src/encodings/utf8.h */
 
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")
 
