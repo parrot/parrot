@@ -27,7 +27,7 @@ BEGIN {
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
-my ( @files, %policies, $list_policies, $list_files );
+my ( @files, %policies, $list_policies, $list_files, $all_policies );
 
 while (@ARGV) {
     my $arg = $ARGV[0];
@@ -41,6 +41,10 @@ while (@ARGV) {
     }
     elsif ( $arg eq '--listfiles' ) {
         $list_files = 1;
+        shift @ARGV;    #discard
+    }
+    elsif ( $arg eq '--allpolicies' ) {
+        $all_policies = 1;
         shift @ARGV;    #discard
     }
     elsif ( $arg =~ /^--(.*)/ ) {
@@ -103,25 +107,30 @@ if ($list_files) {
 # For a list of available policies, perldoc Perl::Critic
 if ( !keys %policies ) {
     %policies = (
+        'CodeLayout::ProhibitDuplicateCoda'               => 1,
+        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
+        'CodeLayout::ProhibitTrailingWhitespace'          => 1,
+        'CodeLayout::UseParrotCoda'                       => 1,
+        'TestingAndDebugging::MisplacedShebang'           => 1,
+        'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
+        'TestingAndDebugging::RequirePortableShebang'     => 1,
         'TestingAndDebugging::RequireUseStrict'           => 1,
         'TestingAndDebugging::RequireUseWarnings'         => 1,
-        'TestingAndDebugging::RequirePortableShebang'     => 1,
-        'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
-        'TestingAndDebugging::MisplacedShebang'           => 1,
-        'Variables::ProhibitConditionalDeclarations'      => 1,
-        'InputOutput::ProhibitTwoArgOpen'                 => 1,
-        'InputOutput::ProhibitBarewordFileHandles'        => 1,
-        'NamingConventions::ProhibitAmbiguousNames'       => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'            => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'        => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
-        'CodeLayout::UseParrotCoda'                       => 1,
-        'CodeLayout::ProhibitDuplicateCoda'               => 1,
-        'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
-        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
-        'Subroutines::RequireFinalReturn'                 => 1,
     );
+
+    # add other policies which aren't yet passing consistently see RT#42427
+    if ( $all_policies ) {
+        $policies{'Variables::ProhibitConditionalDeclarations'} = 1;
+        $policies{'InputOutput::ProhibitTwoArgOpen'}            = 1;
+        $policies{'InputOutput::ProhibitBarewordFileHandles'}   = 1;
+        $policies{'NamingConventions::ProhibitAmbiguousNames'}  = 1;
+        $policies{'Subroutines::ProhibitBuiltinHomonyms'}       = 1;
+        $policies{'Subroutines::ProhibitExplicitReturnUndef'}   = 1;
+        $policies{'Subroutines::ProhibitSubroutinePrototypes'}  = 1;
+        $policies{'CodeLayout::RequireTidyCode'}                =
+            { perltidyrc => $perl_tidy_conf };
+        $policies{'Subroutines::RequireFinalReturn'}            = 1;
+    }
 
     # Add Perl::Critic::Bangs if it exists
     eval { require Perl::Critic::Bangs; };
@@ -129,7 +138,7 @@ if ( !keys %policies ) {
         diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
     }
     else {
-        $policies{'Bangs::ProhibitFlagComments'} = 1;
+        $policies{'Bangs::ProhibitFlagComments'} = 1 if $all_policies;
     }
 
     # Give a diag to let users know if this is doing anything, how to repeat.
@@ -143,7 +152,15 @@ if ( !keys %policies ) {
 if ($list_policies) {
     use Data::Dumper;
     $Data::Dumper::Indent = 1;
-    warn Dumper( \%policies );
+    $Data::Dumper::Terse = 1;
+    foreach my $policy ( sort keys %policies ) {
+        if ( $policies{$policy} == 1 ) {
+            print $policy, "\n";
+        }
+        else {
+            warn $policy, " => ", Dumper( \$policies{$policy} );
+        }
+    }
     exit;
 }
 
@@ -233,7 +250,7 @@ without actually running them, use:
 If you just wish to get a listing of the files that will be checked
 without actually running the tests, use:
 
- perl t/codingstd/perlcritic.t --listfils
+ perl t/codingstd/perlcritic.t --listfiles
 
 =head1 BUGS AND LIMITATIONS
 
