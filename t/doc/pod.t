@@ -18,7 +18,7 @@ t/doc/pod.t - Pod document syntax tests
 
 Tests the Pod syntax for all files listed in F<MANIFEST> and
 F<MANIFEST.generated> that appear to contain Pod markup. If any files
-contain invalid pod markup, they are reported in the test output.
+contain invalid POD markup, they are reported in the test output.
 Use C<podchecker> to ferret out individual issues.
 
 =cut
@@ -61,7 +61,7 @@ if (@ARGV) {
     @files = @ARGV;
 }
 else {
-    diag "finding files with pod, this may take a minute.";
+    diag "finding files with POD, this may take a minute.";
     @files = ( keys(%$manifest), keys(%$manifest_gen) );
 }
 
@@ -73,6 +73,9 @@ foreach my $file (@files) {
 
     # skip missing MANIFEST.generated files
     next unless -e $file;
+
+    # Skip the book, because it uses extended O'Reilly-specific POD
+    next if $file =~ m{parrot/docs/book/};
 
     # skip files without POD
     next unless Pod::Find::contains_pod( $file, 0 );
