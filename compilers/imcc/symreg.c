@@ -776,7 +776,7 @@ SymReg *
 _find_sym(Interp *interp, const Namespace *nspace /*NULLOK*/, SymHash *hsh /*NN*/,
         const char *name /*NN*/)
 {
-    Namespace * ns;
+    const Namespace * ns;
     SymReg *p;
 
     for (ns = nspace; ns; ns = ns->parent) {
