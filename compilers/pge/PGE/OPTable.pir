@@ -235,12 +235,14 @@ Adds (or replaces) a syntactic category's defaults.
   with_adverbs:
 
     .local pmc action
-    action = adverbs['action']
     .local string rulename
+    action = adverbs['action']
+    if null action goto no_rulename
     rulename = adverbs['rulename']
     unless rulename goto have_rulename
     $I0 = can action, rulename
     if $I0 goto have_rulename
+  no_rulename:
     rulename = ''
   have_rulename:
     ##   see if we have a 'stop' adverb.  If so, then it is either
