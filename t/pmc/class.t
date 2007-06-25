@@ -144,23 +144,24 @@ OUT
 # L<PDD15/Class PMC API/=item attributes>
 pir_output_is( <<'CODE', <<'OUT', 'attributes' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, attribs
+    .local int test_val
     new class, .Class
-    $P1 = class.'attributes'()
-    $I0 = isa $P1, 'Hash'
-    if $I0 goto ok_1
+    attribs = class.'attributes'()
+    test_val = isa attribs, 'Hash'
+    if test_val goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - attributes() returns a Hash'
 
-    $I0 = $P1
-    if $I0 == 0 goto ok_2
+    test_val = attribs
+    if test_val == 0 goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - New Class PMC has no attributes'
 
     push_eh ok_3
-    $P1 = class.'attributes'( 'foo' )
+    attribs = class.'attributes'( 'foo' )
     clear_eh
 
     print 'not '
@@ -179,7 +180,8 @@ OUT
 # L<PDD15/Class PMC API/=item add_attribute>
 pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, attribs
+    .local int test_val
     new class, .Class
 
     push_eh ok_1
@@ -191,17 +193,17 @@ pir_output_is( <<'CODE', <<'OUT', 'add_attribute' );
     say 'ok 1 - add_attribute() with no args fails'
 
     class.'add_attribute'( 'foo' )
-    $P1 = class.'attributes'()
-    $I0 = $P1
-    if $I0 == 1 goto ok_2
+    attribs = class.'attributes'()
+    test_val = attribs
+    if test_val == 1 goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - add_attribute() with valid single arg adds an attribute'
 
     class.'add_attribute'( 'bar', 'Integer' )
-    $P1 = class.'attributes'()
-    $I0 = $P1
-    if $I0 == 2 goto ok_3
+    attribs = class.'attributes'()
+    test_val = attribs
+    if test_val == 2 goto ok_3
     print 'not '
   ok_3:
     say 'ok 3 - add_attribute() with valid args adds an attribute'
@@ -229,22 +231,22 @@ OUT
 # L<PDD15/Class PMC API>
 pir_output_is( <<'CODE', <<'OUT', 'set_attr/get_attr VTABLE methods' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, class_instance, attrib_in, attrib_out
     new class, .Class
     class.'name'("Test")
     class.'add_attribute'("foo")
     say 'ok 1 - created a class with two attributes'
 
-    $P1 = class.'new'()
+    class_instance = class.'new'()
     say 'ok 2 - instantiated the class'
 
-    $P2 = new Integer
-    $P2 = 42
-    setattribute $P1, "foo", $P2
+    attrib_in = new Integer
+    attrib_in = 42
+    setattribute class_instance, "foo", attrib_in
     say 'ok 3 - set an attribute'
 
-    $P3 = getattribute $P1, "foo"
-    print $P3
+    attrib_out = getattribute class_instance, "foo"
+    print attrib_out
     print "\n"
     say 'ok 4 - got an attribute'
 .end
@@ -260,7 +262,8 @@ OUT
 # L<PDD15/Class PMC API/=item add_method>
 pir_output_is( <<'CODE', <<'OUT', 'add_method', todo => 'not yet implemented' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, attribs, meth_to_add, test_attr_val
+    .local int test_val
     new class, .Class
 
     push_eh ok_1
@@ -281,29 +284,31 @@ pir_output_is( <<'CODE', <<'OUT', 'add_method', todo => 'not yet implemented' );
 
     # note this test depends on 'add_attribute'/'attributes'
     class.'add_attribute'( 'foo', 'String' )
-    $P1 = class.'attributes'()
-    $P1['foo'] = 'bar'
+    attribs = class.'attributes'()
+    attribs['foo'] = 'bar'
 
-    .const .Sub $P99 = 'foo'
+    .const .Sub meth_to_add = 'foo'
 
-    class.'add_method'( 'foo', $P99 )
-    $P1 = class.'methods'()
-    $I0 = $P1
-    if $I0 != 1 goto nok_3
-    $I0 = exists $P1['foo']
-    if $I0 != 1 goto nok_3
-    $I0 = defined $P1['foo']
-    $P2 = $P1['foo']
-    $I0 = isa $P2, 'Sub'
-    if $I0 != 1 goto nok_3
+    class.'add_method'( 'foo', meth_to_add )
+    attribs = class.'methods'()
+    test_val = attribs
+    if test_val != 1 goto nok_3
+    test_val = exists attribs['foo']
+    if test_val != 1 goto nok_3
+    test_val = defined attribs['foo']
+    test_attr_val = attribs['foo']
+    test_val = isa test_attr_val, 'Sub'
+    if test_val != 1 goto nok_3
     goto ok_3
   nok_3:
     print 'not '
   ok_3:
     say 'ok 3 - add_method() with valid args adds a method'
 
-    $S0 = class.'foo'()
-    if $S0 == 'bar' goto ok_4
+    .local string test_string_val
+
+    test_string_val = class.'foo'()
+    if test_string_val == 'bar' goto ok_4
     print 'not '
   ok_4:
     say 'ok 4 - invoking method added to class works'
@@ -334,11 +339,12 @@ OUT
 # L<PDD15/Class PMC API/=item parents>
 pir_output_is( <<'CODE', <<'OUT', 'parents' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, parents
+    .local int isa_parent
     new class, .Class
-    $P1 = class.'parents'()
-    $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
-    if $I0 goto ok_1
+    parents = class.'parents'()
+    isa_parent = isa parents, 'ResizablePMCArray'  ## XXX really?
+    if isa_parent goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - parents() returns a ResizablePMCArray'
@@ -357,11 +363,12 @@ OUT
 # L<PDD15/Class PMC API/=item roles>
 pir_output_is( <<'CODE', <<'OUT', 'roles' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, array
+    .local int is_array
     new class, .Class
-    $P1 = class.'roles'()
-    $I0 = isa $P1, 'ResizablePMCArray'  ## XXX really?
-    if $I0 goto ok_1
+    array = class.'roles'()
+    is_array = isa array, 'ResizablePMCArray'  ## XXX really?
+    if is_array goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - roles() returns a ResizablePMCArray'
@@ -378,27 +385,29 @@ OUT
 # L<PDD15/Class PMC API/=item inspect>
 pir_output_is( <<'CODE', <<'OUT', 'inspect PCCMETHOD' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, result
+    .local int test_val
+
     class = new 'Class'
     class.name('foo')
     class.add_attribute('a')
 
-    $P1 = class.inspect()
+    result = class.inspect()
     print "ok 1 - inspect with no args called\n"
 
-    $I0 = elements $P1
-    if $I0 == 6 goto ok_2
+    test_val = elements result
+    if test_val == 6 goto ok_2
     print "not "
 ok_2:
     print "ok 2 - returned hash had correct number of elements\n"
 
-    $P1 = class.inspect('name')
-    say $P1
+    result = class.inspect('name')
+    say result
     print "ok 3 - inspect('name')\n"
 
-    $P1 = class.inspect('attributes')
-    $I0 = elements $P1
-    if $I0 == 1 goto ok_4
+    result = class.inspect('attributes')
+    test_val = elements result
+    if test_val == 1 goto ok_4
     print "not "
 ok_4:
     print "ok 4 - inspect('attributes')\n"
@@ -413,37 +422,40 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'clone' );
 .sub 'test' :main
-    .local pmc class
-    class = new 'Hash'
-    class['name'] = 'Monkey'
-    $P1 = new 'Class', class
-    $P1.add_attribute('banana')
-    $P2 = $P1.'new'()
+    .local pmc attrs, class, class_instance, test_pmc
+    .local string test_name
+    .local int test_val
+
+    attrs = new 'Hash'
+    attrs['name'] = 'Monkey'
+    class = new 'Class', attrs
+    class.add_attribute('banana')
+    class_instance = class.'new'()
     print "ok 1 - created class Monkey and instantiated it\n"
 
-    $P3 = clone $P1
+    class_instance = clone class
     print "ok 2 - cloned class Monkey\n"
 
-    $S1 = $P3.'inspect'('name')
-    if $S1 == "" goto ok_3
+    test_name = class_instance.'inspect'('name')
+    if test_name == "" goto ok_3
     print "not "
 ok_3:
     print "ok 3 - name is empty\n"
 
-    $P4 = $P3.'inspect'('namespace')
-    if null $P4 goto ok_4
+    test_pmc = class_instance.'inspect'('namespace')
+    if null test_pmc goto ok_4
     print "not "
 ok_4:
     print "ok 4 - namespace is null\n"
 
-    $P4 = $P3.'inspect'('attributes')
-    $I0 = elements $P4
-    if $I0 == 1 goto ok_5
+    test_pmc = class_instance.'inspect'('attributes')
+    test_val = elements test_pmc
+    if test_val == 1 goto ok_5
     print "not "
 ok_5:
     print "ok 5 - attribute survived cloning\n"
 
-    $P3.add_attribute('jungle')
+    class_instance.add_attribute('jungle')
     print "ok 6 - can modify cloned class\n"
 .end
 CODE
@@ -457,40 +469,43 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'clone_pmc' );
 .sub 'test' :main
-    .local pmc class
+    .local pmc class, class_instance, monkey, mandrill, test_ns
+    .local string test_string_val
+    .local int num_elems
+
     class = new 'Hash'
     class['name'] = 'Monkey'
-    $P1 = new 'Class', class
-    $P1.add_attribute('banana')
-    $P2 = $P1.'new'()
+    class_instance = new 'Class', class
+    class_instance.add_attribute('banana')
+    monkey = class_instance.'new'()
     print "ok 1 - created class Monkey and instantiated it\n"
 
     class = new 'Hash'
     class['name'] = 'Mandrill'
-    $P3 = clone $P1, class
+    mandrill = clone class_instance, class
     print "ok 2 - cloned class Monkey with Hash argument\n"
 
-    $S1 = $P3.'inspect'('name')
-    if $S1 == "Mandrill" goto ok_3
+    test_string_val = mandrill.'inspect'('name')
+    if test_string_val == "Mandrill" goto ok_3
     print "not "
 ok_3:
     print "ok 3 - name is new one set in the Hash\n"
 
-    $P4 = $P3.'inspect'('namespace')
-    $S1 = $P4
-    if $S1 == 'Mandrill' goto ok_4
+    test_ns = mandrill.'inspect'('namespace')
+    test_string_val = test_ns
+    if test_string_val == 'Mandrill' goto ok_4
     print "not "
 ok_4:
     print "ok 4 - namespace is Mandrill too\n"
 
-    $P4 = $P3.'inspect'('attributes')
-    $I0 = elements $P4
-    if $I0 == 1 goto ok_5
+    test_ns = mandrill.'inspect'('attributes')
+    num_elems = elements test_ns
+    if num_elems == 1 goto ok_5
     print "not "
 ok_5:
     print "ok 5 - attribute survived cloning\n"
 
-    $P3.add_attribute('jungle')
+    mandrill.add_attribute('jungle')
     print "ok 6 - can modify cloned class\n"
 .end
 CODE
@@ -504,40 +519,43 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'new with initialization hash' );
 .sub 'test' :main
-    .local pmc class
-    class = new 'Hash'
+    .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance
+    .local pmc attr_val, result
+    init_hash = new 'Hash'
 
     # We'll have some attributes...
-    $P1 = new 'ResizablePMCArray'
-    $P1[0] = 'x'
-    $P1[1] = 'y'
-    class['attributes'] = $P1
+    attrs = new 'ResizablePMCArray'
+    attrs[0] = 'x'
+    attrs[1] = 'y'
+    init_hash['attributes'] = attrs
 
     # And a method.
-    $P1 = new 'Hash'
-    $P2 = find_global 'add'
-    $P1['add'] = $P2
-    class['methods'] = $P1
+    methods = new 'Hash'
+    meth_to_add = find_global 'add'
+    methods['add'] = meth_to_add
+    init_hash['methods'] = methods
 
-    $P1 = new 'Class', class
+    class = new 'Class', init_hash
     print "ok 1 - created new class with attributes and methods supplied\n"
 
     # Instantiate and try setting each attribute.
-    $P2 = $P1.'new'()
-    $P3 = new 'Integer'
-    $P3 = 37
-    setattribute $P2, 'x', $P3
+    class_instance = class.'new'()
+    attr_val = new 'Integer'
+    attr_val = 37
+    setattribute class_instance, 'x', attr_val
     print "ok 2 - set first attribute\n"
-    $P3 = new 'Integer'
-    $P3 = 5
-    setattribute $P2, 'y', $P3
+    attr_val = new 'Integer'
+    attr_val = 5
+    setattribute class_instance, 'y', attr_val
     print "ok 3 - set second attribute\n"
 
     # Call method.
-    $P3 = $P2.add()
-    print $P3
+    result = class_instance.add()
+    print result
     print "\nok 4 - called method\n"
 .end
+
+
 .sub add :method
     $P0 = getattribute self, "x"
     $P1 = getattribute self, "y"
@@ -567,9 +585,10 @@ pir_output_is( <<'CODE', <<'OUT', 'isa()' );
 .sub 'test_isa'
     .param pmc    obj
     .param string class
+    .local int isa_class
 
-    $I0 = obj.'isa'( class )
-    if $I0 goto is_class
+    isa_class = obj.'isa'( class )
+    if isa_class goto is_class
     print "Not a "
     print class
     print "\n"
@@ -625,9 +644,10 @@ pir_output_is( <<'CODE', <<'OUT', 'does()' );
 .sub 'test_does'
     .param pmc    obj
     .param string role_name
+    .local int does_a_role
 
-    $I0 = obj.'does'( role_name )
-    if $I0 goto does_role
+    does_a_role = obj.'does'( role_name )
+    if does_a_role goto does_role
     print "Doesn't "
     print role_name
     print "\n"
