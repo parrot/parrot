@@ -437,8 +437,11 @@ create_class_pmc(Interp *interp /*NN*/, INTVAL type)
          */
         Small_Object_Pool * const ext_pool =
             interp->arena_base->pmc_ext_pool;
-        if (PMC_sync(_class))
+        if (PMC_sync(_class)) {
+            MUTEX_DESTROY(PMC_sync(_class)->pmc_lock);
             mem_internal_free(PMC_sync(_class));
+            PMC_sync(_class) = NULL;
+        }
         ext_pool->add_free_object(interp, ext_pool, _class->pmc_ext);
     }
     _class->pmc_ext = NULL;

@@ -1179,8 +1179,8 @@ mmd_search_classes(Interp *interp /*NN*/, STRING *meth, PMC *arg_tuple,
 static INTVAL
 distance_cmp(Interp *interp /*NULLOK*/, INTVAL a, INTVAL b)
 {
-    short da = (short)a & 0xffff;
-    short db = (short)b & 0xffff;
+    short da = (short)(a & 0xffff);
+    short db = (short)(b & 0xffff);
     /* sort first by distance */
     if (da > db)
         return 1;
