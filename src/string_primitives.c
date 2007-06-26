@@ -30,15 +30,10 @@ API.
 
 /*
 
-=over 4
-
-=item C<void
-string_set_data_directory(const char *dir)>
+FUNCDOC: string_set_data_directory
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
-
-=back
 
 */
 
