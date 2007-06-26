@@ -226,10 +226,11 @@ static void list_append( Interp *interp /*NN*/,
 static void list_dump( const List *list /*NN*/, INTVAL type )
         __attribute__nonnull__(1);
 
-static void * list_item( Interp *interp,
+static void * list_item( Interp *interp /*NN*/,
     List *list /*NN*/,
     int type,
     INTVAL idx )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void list_set( Interp *interp /*NN*/,
@@ -266,27 +267,6 @@ static void split_chunk( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
-
-
-/* internals */
-static List_chunk *allocate_chunk(Interp *interp, List *list,
-        UINTVAL items, UINTVAL size);
-static UINTVAL rebuild_chunk_list(Interp *interp, List *list);
-static List_chunk *alloc_next_size(Interp *interp, List *list,
-        int where, UINTVAL idx);
-static List_chunk *add_chunk(Interp *interp, List *list,
-        int where, UINTVAL idx);
-static List_chunk *get_chunk(Interp *interp, List *list, UINTVAL *idx);
-static void split_chunk(Interp *interp, List *list,
-        List_chunk *chunk, UINTVAL idx);
-static void list_set(Interp *interp, List *list, void *item, INTVAL type,
-                     INTVAL idx);
-static void *list_item(Interp *interp, List *list, int type, INTVAL idx);
-static void list_append(Interp *interp, List *list, void *item,
-        int type, UINTVAL idx);
-#ifdef LIST_DEBUG
-static void list_dump(List *list, INTVAL type);
-#endif
 
 #define chunk_list_size(list) \
                 (PObj_buflen(&list->chunk_list) / sizeof (List_chunk *))
@@ -1112,7 +1092,7 @@ Get the pointer to the item of type C<type> in the chunk at C<idx>.
 */
 
 static void *
-list_item(Interp *interp, List *list /*NN*/, int type, INTVAL idx)
+list_item(Interp *interp /*NN*/, List *list /*NN*/, int type, INTVAL idx)
 {
     List_chunk * const chunk = get_chunk(interp, list, (UINTVAL *)&idx);
     /* if this is a sparse chunk return -1, the caller may decide to return 0
@@ -1193,7 +1173,7 @@ Returns a new list of type C<type>.
 PARROT_API
 List *
 list_new(Interp *interp, INTVAL type)
-    /*WARN_UNUSED*/
+    /* MALLOC, WARN_UNUSED */
 {
     List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
 

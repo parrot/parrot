@@ -126,6 +126,7 @@ PARROT_API void list_mark( Interp *interp /*NN*/, List *list /*NN*/ )
         __attribute__nonnull__(2);
 
 PARROT_API List * list_new( Interp *interp, INTVAL type )
+        __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API List * list_new_init( Interp *interp /*NN*/,
