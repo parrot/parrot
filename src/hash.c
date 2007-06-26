@@ -65,7 +65,10 @@ static void init_hash( Interp *interp,
     hash_hash_key_fn keyhash )
         __attribute__nonnull__(2);
 
-static int int_compare( Parrot_Interp interp, const void *a, const void *b );
+static int int_compare( Interp *interp, const void *a, const void *b )
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
 static size_t key_hash_cstring( Interp *interp,
     const void *value /*NN*/,
     size_t seed )
@@ -192,15 +195,9 @@ Custom C<compare> function.
 
 */
 
-/*
-
-FUNCDOC:
-Custom C<compare> function.
-
-*/
-
 static int
-int_compare(Parrot_Interp interp, const void *a, const void *b)
+int_compare(Interp *interp, const void *a, const void *b)
+    /* PURE, WARN_UNUSED */
 {
     UNUSED(interp);
     return a != b;
