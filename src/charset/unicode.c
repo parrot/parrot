@@ -19,6 +19,63 @@ This file implements the charset functions for unicode data
 
 /* HEADERIZER TARGET: src/charset/unicode.h */
 
+/* HEADERIZER BEGIN: static */
+
+static INTVAL compare( Interp *interp, const STRING *lhs, const STRING *rhs );
+static STRING* compose( Interp *interp, STRING *src );
+static size_t compute_hash( Interp *interp, const STRING *src, size_t seed );
+static INTVAL cs_rindex( Interp *interp,
+    STRING *source_string,
+    STRING *search_string,
+    UINTVAL offset );
+
+static STRING* decompose( Interp *interp, STRING *src );
+static void downcase( Interp *interp, STRING *src );
+static void downcase_first( Interp *interp, STRING *source_string );
+static INTVAL find_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static INTVAL find_not_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_graphemes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_graphemes_inplace( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *dest_string );
+
+static INTVAL is_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string,
+    UINTVAL offset );
+
+static void set_graphemes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL replace_count,
+    STRING *insert_string );
+
+static STRING * string_from_codepoint( Interp *interp, UINTVAL codepoint );
+static void titlecase( Interp *interp, STRING *src );
+static void titlecase_first( Interp *interp, STRING *source_string );
+static STRING* to_charset( Interp *interp, STRING *src, STRING *dest );
+static int u_iscclass( Interp *interp, UINTVAL codepoint, INTVAL flags );
+static void upcase( Interp *interp, STRING *src );
+static void upcase_first( Interp *interp, STRING *source_string );
+static UINTVAL validate( Interp *interp, STRING *src );
+/* HEADERIZER END: static */
+
 #ifdef EXCEPTION
 #  undef EXCEPTION
 #endif

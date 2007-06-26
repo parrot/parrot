@@ -18,6 +18,63 @@ This file implements the charset functions for iso-8859-1 data
 
 /* HEADERIZER TARGET: src/charset/iso-8859-1.h */
 
+/* HEADERIZER BEGIN: static */
+
+static STRING* compose( Interp *interp, STRING *src );
+static STRING* decompose( Interp *interp, STRING *src );
+static void downcase( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void downcase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static INTVAL find_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static INTVAL find_not_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string /*NN*/,
+    UINTVAL offset,
+    UINTVAL count )
+        __attribute__nonnull__(3);
+
+static INTVAL is_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(3);
+
+static void set_graphemes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL replace_count,
+    STRING *insert_string );
+
+static STRING * string_from_codepoint( Interp *interp, UINTVAL codepoint );
+static void titlecase( Interp *interp, STRING *source_string );
+static void titlecase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static STRING * to_charset( Interp *interp, STRING *src, STRING *dest );
+static STRING * to_latin1( Interp *interp, STRING *src /*NN*/, STRING *dest )
+        __attribute__nonnull__(2);
+
+static STRING * to_unicode( Interp *interp,
+    STRING *src,
+    STRING *dest /*NULLOK*/ );
+
+static void upcase( Interp *interp, STRING *source_string );
+static void upcase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static UINTVAL validate( Interp *interp, STRING *src /*NN*/ )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
 #ifdef EXCEPTION
 #  undef EXCEPTION
 #endif

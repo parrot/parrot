@@ -25,8 +25,6 @@ These are Parrot's generic charset handling functions
 #include "charset/iso-8859-1.h"
 #include "charset/unicode.h"
 
-/* HEADERIZER TARGET: include/parrot/charset.h */
-
 CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;
 CHARSET *Parrot_default_charset_ptr;
@@ -56,12 +54,25 @@ typedef struct All_charsets {
 
 static All_charsets *all_charsets;
 
+/* HEADERIZER TARGET: include/parrot/charset.h */
+
+/* HEADERIZER BEGIN: static */
+
+static INTVAL register_charset( Interp *interp,
+    const char *charsetname /*NN*/,
+    CHARSET *charset /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void register_static_converters( Interp *interp );
+/* HEADERIZER END: static */
 
 PARROT_API
 CHARSET *
 Parrot_new_charset(Interp *interp)
     /* MALLOC, WARN_UNUSED */
 {
+    UNUSED(interp);
     return mem_allocate_typed(CHARSET);
 }
 

@@ -19,8 +19,6 @@ charset functionality for similar charsets like iso-8859-1.
 #include "ascii.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: src/charset/ascii.h */
-
 #ifdef EXCEPTION
 #  undef EXCEPTION
 #endif
@@ -33,6 +31,81 @@ charset functionality for similar charsets like iso-8859-1.
     real_exception(interp, NULL, err, str)
 
 #include "tables.h"
+
+/* HEADERIZER TARGET: src/charset/ascii.h */
+
+/* HEADERIZER BEGIN: static */
+
+static STRING* compose( Interp *interp, STRING *src /*NULLOK*/ );
+static STRING* decompose( Interp *interp, STRING *src /*NULLOK*/ );
+static void downcase( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void downcase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static INTVAL find_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string /*NN*/,
+    UINTVAL offset,
+    UINTVAL count )
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+static INTVAL find_not_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string /*NN*/,
+    UINTVAL offset,
+    UINTVAL count )
+        __attribute__nonnull__(3);
+
+static INTVAL is_cclass( Interp *interp,
+    INTVAL flags,
+    STRING *source_string /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+static void set_graphemes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL replace_count,
+    STRING *insert_string );
+
+static STRING * string_from_codepoint( Interp *interp, UINTVAL codepoint )
+        __attribute__warn_unused_result__;
+
+static void titlecase( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void titlecase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static STRING * to_ascii( Interp *interp,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(2);
+
+static STRING * to_charset( Interp *interp,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(2);
+
+static STRING * to_unicode( Interp *interp,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(2);
+
+static void upcase( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void upcase_first( Interp *interp, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(2);
+
+static UINTVAL validate( Interp *interp, STRING *src )
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: static */
 
 STRING *
 ascii_get_graphemes(Interp *interp, STRING *source_string,
