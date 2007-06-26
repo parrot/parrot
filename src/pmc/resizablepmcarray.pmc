@@ -688,7 +688,7 @@ everything via the VTABLE api.
         if (offset < 0)
             offset += length;
         if (offset < 0)
-            internal_exception(OUT_OF_BOUNDS, "illegal splice offset\n");
+            real_exception(INTERP, NULL, OUT_OF_BOUNDS, "illegal splice offset\n");
 
         /* shrink the array */
         if (shift < 0) {

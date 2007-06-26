@@ -92,14 +92,14 @@ next_range:
                 /* last range "start .." */
                 RVal_int(range->end) = VTABLE_elements(interp, agg) - 1;
                 if (PMC_data(key))
-                    internal_exception(1, "Illegal range after start..");
+                    real_exception(interp, NULL, 1, "Illegal range after start..");
             }
             else {
                 /* must have end in next key */
                 key = PMC_data_typed(key, PMC *);
 
                 if (!key)
-                    internal_exception(1, "no end range specified");
+                    real_exception(interp, NULL, 1, "no end range specified");
 
                 RVal_int(range->end) = key_integer(interp, key);
             }
@@ -122,7 +122,7 @@ range_end:
     }
     else {
         if (PObj_get_FLAGS(key) & KEY_inf_slice_FLAG) {
-            internal_exception(1,
+            real_exception(interp, NULL, 1,
                                "unlimited slice range for hash "
                                "not implemented");
         }
@@ -145,7 +145,7 @@ range_end:
             key = PMC_data_typed(key, PMC *);
 
             if (!key)
-                internal_exception(1, "no end range specified");
+                real_exception(interp, NULL, 1, "no end range specified");
 
             RVal_str(range->end) = key_string(interp, key);
         }

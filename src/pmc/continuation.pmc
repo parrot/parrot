@@ -292,10 +292,10 @@ destination to continue execution.
             Stack_Entry_t *e;
 
             if (! interp->dynamic_env)
-                internal_exception(1, "Control stack damaged");
+                real_exception(interp, NULL, 1, "Control stack damaged");
             e = stack_entry(interp, interp->dynamic_env, 0);
             if (! e)
-                internal_exception(1, "Control stack damaged");
+                real_exception(interp, NULL, 1, "Control stack damaged");
             if (e->entry_type == STACK_ENTRY_ACTION) {
                 /*
                  * Disable automatic cleanup routine execution in stack_pop so
