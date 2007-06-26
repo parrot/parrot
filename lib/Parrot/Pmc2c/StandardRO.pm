@@ -61,7 +61,7 @@ EOC
     else {
         $cout = <<"EOC";
 $decl {
-    internal_exception(WRITE_TO_CONSTCLASS,
+    real_exception(interp, NULL, WRITE_TO_CONSTCLASS,
             "$meth() in read-only instance of $classname");
 EOC
         $cout .= "    $ret\n" if $ret;

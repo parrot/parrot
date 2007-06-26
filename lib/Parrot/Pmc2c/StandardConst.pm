@@ -38,14 +38,14 @@ EOC
     if ( $meth eq 'morph' ) {
         $cout .= <<EOC;
     if (1 || Parrot_is_const_pmc(interp, pmc))
-        internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
+        real_exception(interp, NULL, WRITE_TO_CONSTCLASS, "$meth() in $classname");
     else
         Parrot_${parentname}_$meth(interp, pmc, type);
 EOC
     }
     else {
         $cout .= <<EOC;
-        internal_exception(WRITE_TO_CONSTCLASS, "$meth() in $classname");
+        real_exception(interp, NULL, WRITE_TO_CONSTCLASS, "$meth() in $classname");
 EOC
         $cout .= "    $ret\n" if $ret;
     }
