@@ -49,6 +49,17 @@ strings.
 
 /* HEADERIZER TARGET: include/parrot/string_funcs.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void make_writable( Interp *interp,
+    STRING **s /*NN*/,
+    const size_t len,
+    parrot_string_representation_t representation )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
+
 /*
 
 FUNCDOC: Parrot_unmake_COW

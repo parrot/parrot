@@ -23,6 +23,14 @@ src/test_main.c
 
 /* HEADERIZER TARGET: src/trace.h */
 
+/* HEADERIZER BEGIN: static */
+
+static STRING* trace_class_name( Interp *interp, PMC* pmc /*NN*/ )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
+
 /*
 
 FUNCDOC: trace_pmc_dump

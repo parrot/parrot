@@ -27,6 +27,114 @@ subroutines.
 
 /* HEADERIZER TARGET: include/parrot/inter_call.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void check_for_opt_flag( call_state *st /*NN*/, int has_arg )
+        __attribute__nonnull__(1);
+
+static void check_named( Interp *interp /*NN*/,
+    call_state *st /*NN*/,
+    const char *action /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void clone_key_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void commit_last_arg( Interp *interp,
+    int index,
+    int cur,
+    opcode_t *n_regs_used,
+    int seen_arrow,
+    PMC **sigs,
+    opcode_t **indexes,
+    parrot_context_t *ctx,
+    PMC *pmc,
+    va_list *list );
+
+static void convert_arg_from_int( Interp *interp /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void convert_arg_from_num( Interp *interp /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void convert_arg_from_pmc( Interp *interp /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void convert_arg_from_str( Interp *interp /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int fetch_arg_op( Interp *interp /*NN*/, call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int fetch_arg_sig( Interp *interp /*NN*/, call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void init_call_stats( call_state *st /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void init_first_dest_named( Interp *interp /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int locate_named_named( Interp *interp /*NN*/, call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void next_arg_sig( call_state_item *st /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void null_val( int sig, call_state *st /*NN*/ )
+        __attribute__nonnull__(2);
+
+static int set_retval_util( Interp *interp /*NN*/,
+    const char *sig,
+    parrot_context_t *ctx /*NN*/,
+    call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static void start_flatten( Interp *interp /*NN*/,
+    call_state *st /*NN*/,
+    PMC *p_arg )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void store_arg( call_state *st /*NN*/, INTVAL idx )
+        __attribute__nonnull__(1);
+
+static int store_current_arg( call_state *st /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void too_few( Interp *interp,
+    const call_state *st /*NN*/,
+    const char *action /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void too_many( Interp *interp,
+    const call_state *st /*NN*/,
+    const char *action /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
+
 /* Make sure we don't conflict with any other MAX() macros defined elsewhere */
 #define PARROT_MAX(a,b) (((a)) > (b) ? (a) : (b))
 

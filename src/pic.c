@@ -76,7 +76,6 @@ lookup of the cache has to be done in the opcode itself.
 
 */
 
-/* HEADERIZER TARGET: include/parrot/pic.h */
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include <assert.h>
@@ -94,6 +93,7 @@ lookup of the cache has to be done in the opcode itself.
 /* needs a Makefile dependency */
 /* #include "pmc/pmc_integer.h" */
 
+/* XXX Define this in a header file */
 extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
@@ -103,6 +103,59 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
  */
 
 #define ENABLE_INLINING 0
+
+/* HEADERIZER TARGET: include/parrot/pic.h */
+
+/* HEADERIZER BEGIN: static */
+
+static int is_pic_func( Interp *interp,
+    void **pc,
+    Parrot_MIC *mic,
+    int core_type );
+
+static int is_pic_param( Interp *interp,
+    void **pc,
+    Parrot_MIC* const mic,
+    opcode_t op );
+
+static void parrot_pic_move( Interp* interp, Parrot_MIC *mic );
+static int pass_int( Interp *interp,
+    PMC *sig,
+    char *src_base,
+    void **src,
+    char *dest_base,
+    void **dest );
+
+static int pass_mixed( Interp *interp,
+    PMC *sig,
+    char *src_base,
+    void **src,
+    char *dest_base,
+    void **dest );
+
+static int pass_num( Interp *interp,
+    PMC *sig,
+    char *src_base,
+    void **src,
+    char *dest_base,
+    void **dest );
+
+static int pass_pmc( Interp *interp,
+    PMC *sig,
+    char *src_base,
+    void **src,
+    char *dest_base,
+    void **dest );
+
+static int pass_str( Interp *interp,
+    PMC *sig,
+    char *src_base,
+    void **src,
+    char *dest_base,
+    void **dest );
+
+/* HEADERIZER END: static */
+
 
 /*
 

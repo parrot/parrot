@@ -26,6 +26,11 @@ Remember you read something about it in F<docs/infant.dev>?
 
 /* HEADERIZER TARGET: include/parrot/dod.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void trace_system_stack( Interp *interp );
+/* HEADERIZER END: static */
+
 #ifdef __ia64__
 
 #  include <ucontext.h>

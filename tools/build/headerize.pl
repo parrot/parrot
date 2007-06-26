@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use Carp qw( confess );
 
 =head1 NAME
 
@@ -148,7 +149,7 @@ sub function_components_from_declaration {
             or die "Bad parms in $proto";
     }
 
-    my $is_static;
+    my $is_static = 0;
     $is_static = $2 if $returntype =~ s/^((static)\s+)?//i;
 
     # No inline in the header file
@@ -203,7 +204,7 @@ sub attrs_from_funcflags {
             push( @attrs, '__attribute__malloc__' );
         }
         else {
-            die qq{Unknown function flag "$funcflags" -> "$opt"\n};
+            confess( qq{Unknown function flag "$funcflags" -> "$opt"\n} );
         }
     }
 
@@ -221,6 +222,7 @@ sub make_function_decls {
 
         my $decl = sprintf( "%s %s(", $ret_type, $funcname );
         $decl = "PARROT_API $decl" if $parrot_api;
+        $decl = "static $decl" if $is_static;
 
         my @attrs = attrs_from_args( @args );
         push( @attrs, attrs_from_funcflags( $funcflags ) );
@@ -285,13 +287,14 @@ sub main {
         for my $decl (@decls) {
             my @components = function_components_from_declaration($decl);
             push( @{ $cfiles{$hfile}->{$cfile} }, [@components] );
-            push( @{ $cfiles_with_statics{ $cfile } }, $components[3] ) if $components[0];
+            push( @{ $cfiles_with_statics{ $cfile } }, [@components] ) if $components[0];
             ++$nfuncs;
         }
     }    # for @cfiles
     my $nfiles = scalar keys %cfiles;
     print "$nfuncs funcs in $nfiles C files\n";
 
+    # Update all the .h files
     for my $hfile ( sort keys %cfiles ) {
         my $cfiles = $cfiles{$hfile};
 
@@ -301,10 +304,21 @@ sub main {
             my @funcs = @{$cfiles->{$cfile}};
             @funcs = grep { not $_->[0] } @funcs; # skip statics
             $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
-        }    # for %cfiles
+        }
 
         write_file( $hfile, $header );
-    }    # for %files
+    }
+
+    # Update all the .c files in place
+    for my $cfile ( sort keys %cfiles_with_statics ) {
+        my @funcs = @{$cfiles_with_statics{ $cfile }};
+        @funcs = grep { $_->[0] } @funcs; # statics only
+
+        my $source = read_file( $cfile );
+        $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
+
+        write_file( $cfile, $source );
+    }
 
     return;
 }
@@ -334,6 +348,11 @@ sub replace_headerized_declarations {
     my $cfile = shift;
     my $hfile = shift;
     my @funcs = @_;
+
+    # Allow a way to not headerize statics
+    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
+        return $source_code;
+    }
 
     @funcs = sort api_first_then_alpha @funcs;
 

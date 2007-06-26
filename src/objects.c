@@ -23,10 +23,52 @@ Handles class and object manipulation.
 
 /* HEADERIZER TARGET: include/parrot/objects.h */
 
-static void parrot_class_register(Interp *interp, PMC *name,
-        PMC *new_class, PMC *parent, PMC *mro);
+/* HEADERIZER BEGIN: static */
 
-static void invalidate_type_caches(Interp *interp, UINTVAL type);
+static INTVAL attr_str_2_num( Interp *interp, PMC *object, STRING *attr );
+static PMC* C3_merge( Interp *interp, PMC *merge_list );
+static PMC* class_mro_merge( Interp *interp, PMC *seqs );
+static PMC* create_class_mro( Interp *interp, PMC *_class );
+static void create_deleg_pmc_vtable( Interp *interp,
+    PMC *_class,
+    PMC *class_name,
+    int full );
+
+static void debug_trace_find_meth( Interp *interp,
+    PMC *_class,
+    STRING *name,
+    PMC *sub );
+
+static void do_initcall( Interp *interp, PMC* _class, PMC *object, PMC *init );
+static void fail_if_exist( Interp *interp, PMC *name );
+static PMC * find_method_direct_1( Interp *interp,
+    PMC *_class,
+    STRING *method_name );
+
+static PMC* find_vtable_meth_ns( Interp *interp,
+    PMC *ns,
+    INTVAL vtable_index );
+
+static PMC* get_init_meth( Interp *interp,
+    PMC *_class,
+    STRING *prop_str,
+    STRING **meth_str /*NN*/ )
+        __attribute__nonnull__(4);
+
+static void instantiate_object( Interp *interp, PMC *object, PMC *init );
+static void invalidate_all_caches( Interp *interp );
+static void invalidate_type_caches( Interp *interp, UINTVAL type );
+static PMC* not_empty( Interp *interp, PMC *seqs );
+static void parrot_class_register( Interp *interp,
+    PMC *name,
+    PMC *new_class,
+    PMC *parent,
+    PMC *mro );
+
+static void rebuild_attrib_stuff( Interp *interp, PMC *_class );
+static INTVAL register_type( Interp *interp, PMC *name );
+/* HEADERIZER END: static */
+
 
 /*
 

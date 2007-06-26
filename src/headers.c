@@ -18,6 +18,41 @@ Handles getting of various headers, and pool creation.
 
 /* HEADERIZER TARGET: include/parrot/headers.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void fix_pmc_syncs( Interp *dest_interp,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void free_pool( Interp *interp, Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void * get_free_buffer( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+static PMC_EXT * new_pmc_ext( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+static int sweep_cb_buf( Interp *interp /*NN*/,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg )
+        __attribute__nonnull__(1);
+
+static int sweep_cb_pmc( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/,
+    int flag,
+    void *arg )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
+
 #ifndef GC_IS_MALLOC
 #  define PMC_HEADERS_PER_ALLOC 512
 #  define BUFFER_HEADERS_PER_ALLOC 256

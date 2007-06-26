@@ -24,6 +24,26 @@ and its utility functions.
 
 /* HEADERIZER TARGET: include/parrot/misc.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void gen_sprintf_call( char *out, SpfInfo info /*NN*/, int thingy )
+        __attribute__nonnull__(2);
+
+static STRING * handle_flags( Interp *interp,
+    SpfInfo info,
+    STRING *str,
+    INTVAL is_int_type,
+    STRING* prefix );
+
+static STRING* str_append_w_flags( Interp *interp,
+    STRING* dest,
+    SpfInfo info,
+    STRING* src,
+    STRING *prefix );
+
+/* HEADERIZER END: static */
+
+
 /* Per Dan's orders, we will not use sprintf if snprintf isn't
  * around for us.
  */

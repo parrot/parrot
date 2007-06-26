@@ -33,6 +33,34 @@ TODO:
 
 /* HEADERIZER TARGET: include/parrot/pic.h */
 
+/* HEADERIZER BEGIN: static */
+
+static int args_match_params( Interp *interp,
+    const PMC *sig_args,
+    PackFile_ByteCode *seg,
+    opcode_t *start );
+
+static int call_is_safe( Interp *interp, PMC *sub, opcode_t **set_args );
+static int jit_can_compile_sub( Interp *interp, PMC *sub );
+static int ops_jittable( Interp *interp,
+    PMC *sub,
+    const PMC *sig_results,
+    PackFile_ByteCode *seg,
+    opcode_t *pc,
+    opcode_t *end,
+    int *flags );
+
+static opcode_t * pic_test_func( Interp *interp,
+    INTVAL *sig_bits,
+    void **args );
+
+static int returns_match_results( Interp *interp,
+    const PMC *sig_ret,
+    const PMC *sig_result );
+
+/* HEADERIZER END: static */
+
+
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif

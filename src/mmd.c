@@ -45,6 +45,102 @@ not highest type in table.
 
 /* HEADERIZER TARGET: include/parrot/mmd.h */
 
+/* HEADERIZER BEGIN: static */
+
+static INTVAL distance_cmp( Interp *interp /*NULLOK*/, INTVAL a, INTVAL b );
+static void dump_mmd( Interp *interp /*NN*/, INTVAL function )
+        __attribute__nonnull__(1);
+
+static funcptr_t get_mmd_dispatcher( Interp *interp /*NN*/,
+    PMC *left,
+    PMC *right,
+    INTVAL function,
+    int *is_pmc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(5);
+
+static PMC* mmd_arg_tuple_func( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static PMC* mmd_arg_tuple_inline( Interp *interp /*NN*/,
+    STRING *signature /*NN*/,
+    va_list args )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mmd_create_builtin_multi_meth( Interp *interp,
+    PMC *ns,
+    INTVAL type,
+    const MMD_init *entry /*NN*/ )
+        __attribute__nonnull__(4);
+
+static void mmd_create_builtin_multi_meth_2( Interp *interp,
+    PMC *ns,
+    INTVAL func_nr,
+    INTVAL type,
+    INTVAL right,
+    funcptr_t func_ptr );
+
+static PMC * mmd_create_builtin_multi_stub( Interp *interp,
+    PMC* ns,
+    INTVAL func_nr );
+
+static PMC* mmd_cvt_to_types( Interp* interp, PMC *multi_sig );
+static PMC * mmd_deref( Interp *interp, INTVAL function, PMC *value /*NN*/ )
+        __attribute__nonnull__(3);
+
+static UINTVAL mmd_distance( Interp *interp, PMC *pmc /*NN*/, PMC *arg_tuple )
+        __attribute__nonnull__(2);
+
+static void mmd_ensure_writable( Interp *interp,
+    INTVAL function,
+    PMC *pmc /*NULLOK*/ );
+
+static void mmd_expand_x( Interp *interp /*NN*/,
+    INTVAL func_nr,
+    INTVAL new_x )
+        __attribute__nonnull__(1);
+
+static void mmd_expand_y( Interp *interp /*NN*/,
+    INTVAL func_nr,
+    INTVAL new_y )
+        __attribute__nonnull__(1);
+
+static PMC* mmd_get_ns( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int mmd_is_hidden( Interp *interp, PMC *multi, PMC *cl );
+static PMC* mmd_make_ns( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int mmd_maybe_candidate( Interp *interp,
+    PMC *pmc,
+    PMC *arg_tuple,
+    PMC *cl );
+
+static void mmd_search_builtin( Interp *interp,
+    STRING *meth,
+    PMC *arg_tuple,
+    PMC *cl );
+
+static void mmd_search_classes( Interp *interp /*NN*/,
+    STRING *meth,
+    PMC *arg_tuple,
+    PMC *cl,
+    INTVAL start_at_parent )
+        __attribute__nonnull__(1);
+
+static int mmd_search_cur_namespace( Interp *interp,
+    STRING *meth,
+    PMC *arg_tuple,
+    PMC *cl );
+
+static PMC* mmd_search_default( Interp *interp, STRING *meth, PMC *arg_tuple );
+static PMC* mmd_search_scopes( Interp *interp, STRING *meth, PMC *arg_tuple );
+static void mmd_sort_candidates( Interp *interp, PMC *arg_tuple, PMC *cl );
+/* HEADERIZER END: static */
+
+
 #define MMD_DEBUG 0
 
 static void mmd_create_builtin_multi_meth_2(Interp *, PMC *ns,

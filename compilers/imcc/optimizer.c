@@ -110,13 +110,17 @@ static int is_invariant(
     IMC_Unit * unit,
     Instruction *ins );
 
-static int loop_one( Interp *interp, IMC_Unit * unit, int bnr );
+static int loop_one( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int bnr )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int loop_optimization( Interp *interp, IMC_Unit * unit );
 static int max_loop_depth( IMC_Unit * unit );
 static int move_ins_out( Interp *interp,
-    IMC_Unit * unit,
+    IMC_Unit *unit /*NN*/,
     Instruction **ins,
-    Basic_block *bb );
+    Basic_block *bb )
+        __attribute__nonnull__(2);
 
 static int strength_reduce( Interp *interp, IMC_Unit * unit );
 static int unused_label( Interp *interp, IMC_Unit * unit );

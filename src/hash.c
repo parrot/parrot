@@ -34,6 +34,59 @@ don't apply.
 
 /* HEADERIZER TARGET: include/parrot/hash.h */
 
+/* HEADERIZER BEGIN: static */
+
+static int cstring_compare(
+    Parrot_Interp interp,
+    const char *a /*NN*/,
+    const char *b /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void expand_hash( Interp *interp, Hash *hash /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void hash_freeze( Interp *interp,
+    const Hash * const hash,
+    visit_info* info /*NN*/ )
+        __attribute__nonnull__(3);
+
+static void hash_thaw( Interp *interp,
+    Hash *hash /*NN*/,
+    visit_info* info /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void init_hash( Interp *interp,
+    Hash *hash /*NN*/,
+    PARROT_DATA_TYPES val_type,
+    Hash_key_type hkey_type,
+    hash_comp_fn compare,
+    hash_hash_key_fn keyhash )
+        __attribute__nonnull__(2);
+
+static int int_compare( Parrot_Interp interp, const void *a, const void *b );
+static size_t key_hash_cstring( Interp *interp,
+    const void *value /*NN*/,
+    size_t seed )
+        __attribute__nonnull__(2);
+
+static size_t key_hash_int( Interp *interp, void *value, size_t seed );
+static size_t key_hash_pointer( Interp *interp, void *value, size_t seed );
+static size_t key_hash_STRING( Interp *interp /*NN*/,
+    STRING *value /*NN*/,
+    size_t seed )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int STRING_compare(
+    Parrot_Interp interp,
+    const void *search_key,
+    const void *bucket_key );
+
+/* HEADERIZER END: static */
+
+
 
 /*
 

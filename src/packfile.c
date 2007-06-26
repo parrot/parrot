@@ -27,6 +27,202 @@ structure of the frozen bytecode.
 
 /* HEADERIZER TARGET: include/parrot/packfile.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void byte_code_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static PackFile_Segment * byte_code_new( Interp *interp,
+    PackFile *pf,
+    const char *name,
+    int add );
+
+static void const_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static PackFile_Segment * const_new( Interp *interp,
+    PackFile *pf,
+    const char *name,
+    int add );
+
+static PackFile_Segment * create_seg( Interp *interp,
+    PackFile_Directory *dir /*NN*/,
+    pack_file_types t,
+    const char *name /*NN*/,
+    const char *file_name /*NN*/,
+    int add )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+static void default_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void default_dump( Interp *interp /*NN*/,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static opcode_t * default_pack( Interp *interp,
+    const PackFile_Segment *self /*NN*/,
+    opcode_t *dest /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static size_t default_packed_size( Interp *interp,
+    const PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static opcode_t * default_unpack( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    opcode_t *cursor )
+        __attribute__nonnull__(2);
+
+static void directory_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void directory_dump( Interp *interp /*NN*/,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PackFile_Segment * directory_new( Interp *interp,
+    PackFile *pf,
+    const char *name,
+    int add );
+
+static opcode_t * directory_pack( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static size_t directory_packed_size( Interp *interp,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static opcode_t * directory_unpack( Interp *interp,
+    PackFile_Segment *segp /*NN*/,
+    opcode_t *cursor )
+        __attribute__nonnull__(2);
+
+static PMC* do_1_sub_pragma( Interp *interp /*NN*/,
+    PMC *sub_pmc /*NN*/,
+    int action )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL find_const_iter( Interp *interp /*NN*/,
+    PackFile_Segment *seg /*NN*/,
+    void *user_data )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PackFile_Constant ** find_constants( Interp *interp /*NN*/,
+    PackFile_ConstTable *ct /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PackFile_FixupEntry * find_fixup(
+    PackFile_FixupTable *ft /*NN*/,
+    INTVAL type,
+    const char *name /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static INTVAL find_fixup_iter( Interp *interp,
+    PackFile_Segment *seg /*NN*/,
+    void *user_data )
+        __attribute__nonnull__(2);
+
+static void fixup_destroy( Interp *interp, PackFile_Segment *self );
+static PackFile_Segment * fixup_new( Interp *interp,
+    PackFile *pf,
+    const char *name,
+    int add );
+
+static opcode_t * fixup_pack( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static size_t fixup_packed_size( Interp *interp,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static opcode_t * fixup_unpack( Interp *interp /*NN*/,
+    PackFile_Segment *seg /*NN*/,
+    opcode_t *cursor )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void make_code_pointers( PackFile_Segment *seg /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void mark_1_seg( Interp *interp /*NN*/,
+    PackFile_ConstTable *ct /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PackFile * PackFile_append_pbc( Interp *interp /*NN*/,
+    const char *filename /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+static void PackFile_set_header( PackFile *self /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void pf_debug_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void pf_debug_dump( Interp *interp /*NN*/,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PackFile_Segment * pf_debug_new( Interp *interp,
+    PackFile *pf,
+    const char *name,
+    int add );
+
+static opcode_t * pf_debug_pack( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static size_t pf_debug_packed_size( Interp *interp,
+    PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(2);
+
+static opcode_t * pf_debug_unpack( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    opcode_t *cursor )
+        __attribute__nonnull__(2);
+
+static INTVAL pf_register_standard_funcs( Interp *interp, PackFile *pf );
+static PMC* run_sub( Interp *interp /*NN*/, PMC *sub_pmc )
+        __attribute__nonnull__(1);
+
+static void segment_init( Interp *interp,
+    PackFile_Segment *self /*NN*/,
+    PackFile *pf,
+    const char *name /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
+
+static void sort_segs( Interp *interp, PackFile_Directory *dir /*NN*/ )
+        __attribute__nonnull__(2);
+
+static int sub_pragma( Interp *interp /*NN*/,
+    int action,
+    const PMC *sub_pmc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
+
 #include <assert.h>
 
 #define TRACE_PACKFILE 0

@@ -60,6 +60,15 @@ the context.  If no type is registered, returns C<core_type>.
 
 /* HEADERIZER TARGET: include/parrot/hll.h */
 
+/* HEADERIZER BEGIN: static */
+
+static PMC* new_hll_entry( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static STRING* string_as_const_string( Interp* interp, STRING *src );
+/* HEADERIZER END: static */
+
+
 enum {
     e_HLL_name,
     e_HLL_lib,

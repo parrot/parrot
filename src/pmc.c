@@ -18,7 +18,18 @@ src/pmc.c - The base vtable calling functions
 
 /* HEADERIZER TARGET: include/parrot/pmc.h */
 
-static PMC* get_new_pmc_header(Interp*, INTVAL base_type, UINTVAL flags);
+/* HEADERIZER BEGIN: static */
+
+static PMC* create_class_pmc( Interp *interp /*NN*/, INTVAL type )
+        __attribute__nonnull__(1);
+
+static PMC* get_new_pmc_header( Interp *interp /*NN*/,
+    INTVAL base_type,
+    UINTVAL flags )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: static */
 
 
 PMC * PMCNULL;

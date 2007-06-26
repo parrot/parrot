@@ -21,9 +21,17 @@ This is only used by the PBC dumper C<pdump>.
 
 /* HEADERIZER TARGET: include/parrot/packfile.h */
 
-static void
-PackFile_Constant_dump(Interp *interp /*NN*/, PackFile_ConstTable *ct /*NN*/,
-                       PackFile_Constant *self /*NN*/);
+/* HEADERIZER BEGIN: static */
+
+static void PackFile_Constant_dump( Interp *interp /*NN*/,
+    PackFile_ConstTable *ct /*NN*/,
+    PackFile_Constant *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
 
 /*
 

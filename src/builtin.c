@@ -19,8 +19,6 @@ src/builtin.c - Builtin Methods
 #include "builtin.str"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/builtin.h */
-
 
 typedef struct _builtin {
     const char *c_name;         /* short name 'cos' */
@@ -79,6 +77,21 @@ static Builtins builtins[] = {
      * Please keep this list sorted
      */
 };
+
+/* HEADERIZER TARGET: include/parrot/builtin.h */
+
+/* HEADERIZER BEGIN: static */
+
+static int check_builtin_sig( size_t i, const char *sig /*NN*/, int pass )
+        __attribute__nonnull__(2);
+
+static int find_builtin( const char *func /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int find_builtin_s( Interp *interp, STRING *func /*NN*/ )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
 
 /*
 

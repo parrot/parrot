@@ -31,6 +31,23 @@ Define the internal interpreter exceptions.
 
 /* HEADERIZER TARGET: include/parrot/exceptions.h */
 
+/* HEADERIZER BEGIN: static */
+
+static opcode_t * create_exception( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static size_t dest2offset( Interp *interp /*NN*/,
+    const opcode_t *dest /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+static PMC * find_exception_handler( Interp *interp /*NN*/, PMC *exception )
+        __attribute__nonnull__(1);
+
+static void run_cleanup_action( Interp *interp, Stack_Entry_t *e );
+/* HEADERIZER END: static */
+
 #include <stdarg.h>
 
 /*

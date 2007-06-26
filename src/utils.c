@@ -19,6 +19,7 @@ Opcode helper functions that don't really fit elsewhere.
 #include "parrot/parrot.h"
 
 /* HEADERIZER TARGET: include/parrot/misc.h */
+/* HEADERIZER NONE: static */
 
 /* Parrot_register_move companion functions i and data */
 typedef struct parrot_prm_context {

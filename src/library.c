@@ -21,6 +21,56 @@ This file contains a C function to access Parrot's bytecode library functions.
 
 /* HEADERIZER TARGET: include/parrot/library.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void cnv_to_win32_filesep( STRING *path /*NN*/ )
+        __attribute__nonnull__(1);
+
+static PMC* get_search_paths( Interp *interp /*NN*/, enum_lib_paths which )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+static int is_abs_path( const STRING *file /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+static STRING* path_append( Interp *interp /*NN*/,
+    STRING *l_path /*NN*/,
+    STRING *r_path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static STRING* path_concat( Interp *interp /*NN*/,
+    STRING *l_path /*NN*/,
+    STRING *r_path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static STRING* path_finalize( Interp *interp /*NN*/, STRING *path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static STRING* path_guarantee_trailing_separator( Interp *interp /*NN*/,
+    STRING *path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static STRING* try_bytecode_extensions( Interp *interp /*NN*/,
+    STRING* path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+static STRING* try_load_path( Interp *interp /*NN*/, STRING* path /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: static */
+
+
 /*
 
 FUNCDOC: parrot_init_library_paths

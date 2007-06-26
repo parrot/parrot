@@ -38,7 +38,31 @@ IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...);
 
 /* HEADERIZER TARGET: include/parrot/debug.h */
 
-static const char* GDB_P(Interp *interp, const char *s);
+/* HEADERIZER BEGIN: static */
+
+static void dump_string( Interp *interp, const STRING *s /*NULLOK*/ );
+static int GDB_B( Interp *interp, char *s );
+static const char* GDB_P( Interp *interp, const char *s /*NN*/ )
+        __attribute__nonnull__(2);
+
+static char const * nextarg( char const *command /*NN*/ )
+        __attribute__nonnull__(1);
+
+static const char * parse_command( const char *command, unsigned long *cmdP );
+static const char * parse_int( const char *str, int *intP );
+static const char* parse_key( Interp *interp, const char *str, PMC **keyP );
+static const char * parse_string( Interp *interp,
+    const char *str,
+    STRING **strP );
+
+static const char * skip_command( const char *str /*NN*/ )
+        __attribute__nonnull__(1);
+
+static const char * skip_ws( const char *str /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
 
 /*
 
@@ -2551,7 +2575,8 @@ PDB_backtrace(Interp *interp)
  */
 
 static const char*
-GDB_P(Interp *interp, const char *s /*NN*/) {
+GDB_P(Interp *interp, const char *s /*NN*/)
+{
     int t, n;
     switch (*s) {
         case 'I': t = REGNO_INT; break;

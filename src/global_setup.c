@@ -31,6 +31,14 @@ static unsigned int parrot_config_size_stored = 0;
 
 /* HEADERIZER TARGET: include/parrot/global_setup.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void parrot_set_config_hash_interpreter( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
+
 /*
 
 FUNCDOC: Parrot_set_config_hash_internal

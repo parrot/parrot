@@ -30,6 +30,21 @@ C<opcode_t> units.
 
 /* HEADERIZER TARGET: include/parrot/packfile.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void cvt_num12_num8( unsigned char *dest, const unsigned char *src );
+static void cvt_num12_num8_be( unsigned char *dest, const unsigned char *src );
+static void cvt_num12_num8_le( unsigned char *dest, unsigned char *src );
+static opcode_t fetch_op_be_4( unsigned char *b );
+static opcode_t fetch_op_be_8( unsigned char *b );
+static opcode_t fetch_op_le_4( unsigned char *b );
+static opcode_t fetch_op_le_8( unsigned char *b );
+static opcode_t fetch_op_mixed_be( unsigned char *b );
+static opcode_t fetch_op_mixed_le( unsigned char *b );
+static opcode_t fetch_op_test( unsigned char *b );
+/* HEADERIZER END: static */
+
+
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 

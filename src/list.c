@@ -183,6 +183,91 @@ Also all array usage depends on list.
 
 /* HEADERIZER TARGET: include/parrot/list.h */
 
+/* HEADERIZER BEGIN: static */
+
+static List_chunk * add_chunk( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    int where,
+    UINTVAL idx )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static List_chunk * alloc_next_size( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    int where,
+    UINTVAL idx )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static List_chunk * allocate_chunk( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    UINTVAL items,
+    UINTVAL size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
+static List_chunk * get_chunk( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    UINTVAL *idx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void list_append( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    void *item,
+    int type,
+    UINTVAL idx )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void list_dump( const List *list /*NN*/, INTVAL type )
+        __attribute__nonnull__(1);
+
+static void * list_item( Interp *interp,
+    List *list /*NN*/,
+    int type,
+    INTVAL idx )
+        __attribute__nonnull__(2);
+
+static void list_set( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    void *item,
+    INTVAL type,
+    INTVAL idx )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static UINTVAL rebuild_chunk_list( Interp *interp /*NN*/, List *list /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void rebuild_chunk_ptrs( List *list /*NN*/, int cut )
+        __attribute__nonnull__(1);
+
+static void rebuild_fix_ends( List *list /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void rebuild_other( Interp *interp /*NN*/, List *list /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void rebuild_sparse( List *list /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void split_chunk( Interp *interp /*NN*/,
+    List *list /*NN*/,
+    List_chunk *chunk /*NN*/,
+    UINTVAL ix )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
+
 /* internals */
 static List_chunk *allocate_chunk(Interp *interp, List *list,
         UINTVAL items, UINTVAL size);

@@ -17,6 +17,44 @@ src/dynext.c - Dynamic extensions to Parrot
 
 /* HEADERIZER TARGET: include/parrot/dynext.h */
 
+/* HEADERIZER BEGIN: static */
+
+static STRING * get_path( Interp *interp /*NN*/,
+    STRING *lib,
+    void **handle /*NN*/,
+    STRING *wo_ext,
+    STRING *ext )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static PMC* is_loaded( Interp *interp /*NN*/, STRING *path )
+        __attribute__nonnull__(1);
+
+static PMC * make_string_pmc( Interp *interp /*NN*/, STRING *string )
+        __attribute__nonnull__(1);
+
+static PMC * run_init_lib( Interp *interp,
+    void *handle,
+    STRING *lib_name /*NN*/,
+    STRING *wo_ext )
+        __attribute__nonnull__(3);
+
+static void set_cstring_prop(
+    Parrot_Interp interp,
+    PMC *lib_pmc,
+    const char *what /*NN*/,
+    STRING *name )
+        __attribute__nonnull__(3);
+
+static void store_lib_pmc(
+    Parrot_Interp interp,
+    PMC* lib_pmc,
+    STRING *path,
+    STRING *type,
+    STRING *lib_name );
+
+/* HEADERIZER END: static */
+
 /* _PARROTLIB is now the default */
 /*#define _PARROTLIB not working: "make testr" */
 
