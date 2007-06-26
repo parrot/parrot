@@ -73,22 +73,6 @@ main();
 
 =cut
 
-sub open_file {
-    my $direction = shift;
-    my $filename  = shift;
-
-    my %actions = (
-        '<'  => 'Reading',
-        '>'  => 'Writing',
-        '>>' => 'Appending',
-    );
-
-    my $action = $actions{$direction} or die "Invalid direction '$direction'";
-    print "$action $filename\n" if $opt{verbose};
-    open my $fh, $direction, $filename or die "$action $filename: $!\n";
-    return $fh;
-}
-
 sub extract_functions {
     my $text = shift;
 
@@ -164,16 +148,15 @@ sub function_components {
             or die "Bad parms in $proto";
     }
 
-    my $static;
-    $returntype =~ s/^((static)\s+)?//i;
-    $static = $2 || '';
+    my $is_static;
+    $is_static = $2 if $returntype =~ s/^((static)\s+)?//i;
 
     # No inline in the header file
     $returntype =~ s/^PARROT_INLINE\s+//;
 
-    die "Impossible to have both static and PARROT_API" if $parrot_api && $static;
+    die "Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
 
-    return [ $parrot_api, $static, $returntype, $funcname, $funcflags, @parms ];
+    return [ $parrot_api, $is_static, $returntype, $funcname, $funcflags, @parms ];
 }
 
 sub attrs_from_args {
@@ -232,8 +215,8 @@ sub make_function_decls {
 
     my @decls;
     foreach my $func ( @funcs ) {
-        my ($parrot_api, $static, $ret_type, $funcname, $funcflags, @args) = @{$func};
-        next if $static;
+        my ($parrot_api, $is_static, $ret_type, $funcname, $funcflags, @args) = @{$func};
+        next if $is_static;
 
         my $multiline = 0;
 
@@ -276,7 +259,7 @@ sub main {
     my $nfuncs = 0;
     my %ofiles = map {($_,1)} @ARGV;
     my @ofiles = sort keys %ofiles;
-    my %files;
+    my %cfiles;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
@@ -290,9 +273,7 @@ sub main {
 
         my $sourcefile = -f $pmcfile ? $pmcfile : $cfile;
 
-        my $fh = open_file( '<', $cfile );
-        my $source = do { local $/; <$fh> };
-        close $fh;
+        my $source = read_file( $cfile );
 
         die "can't find HEADER directive in '$cfile'"
             unless $source =~ m#/\*\s+HEADERIZER TARGET:\s+([^*]+?)\s+\*/#s;
@@ -303,31 +284,46 @@ sub main {
         my @funcs = extract_functions($source);
 
         for my $func (@funcs) {
-            push( @{ $files{$hfile}->{$cfile} }, function_components($func) );
+            push( @{ $cfiles{$hfile}->{$cfile} }, function_components($func) );
             ++$nfuncs;
         }
     }    # for @cfiles
-    my $nfiles = scalar keys %files;
-    print "$nfuncs funcs in $nfiles files\n";
+    my $nfiles = scalar keys %cfiles;
+    print "$nfuncs funcs in $nfiles C files\n";
 
-    for my $hfile ( sort keys %files ) {
-        my $cfiles = $files{$hfile};
+    for my $hfile ( sort keys %cfiles ) {
+        my $cfiles = $cfiles{$hfile};
 
-        open my $FILE, '<', $hfile or die "couldn't read '$hfile': $!";
-        my $header = do { local $/ = undef; <$FILE> };    # slurp
-        close $FILE;
+        my $header = read_file( $hfile );
 
         for my $cfile ( sort keys %{$cfiles} ) {
             $header = replace_headerized_declarations( $header, $cfile, $hfile, $cfiles->{$cfile} );
         }    # for %cfiles
 
-        open $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
-        print {$FILE} $header;
-        close $FILE;
-        print "Wrote '$hfile'\n";
+        write_file( $hfile, $header );
     }    # for %files
 
     return;
+}
+
+sub read_file {
+    my $filename = shift;
+
+    open my $fh, '<', $filename or die "couldn't read '$filename': $!";
+    my $text = do { local $/ = undef; <$fh> };
+    close $fh;
+
+    return $text;
+}
+
+sub write_file {
+    my $filename = shift;
+    my $text = shift;
+
+    open my $fh, '>', $filename or die "couldn't write '$filename': $!";
+    print {$fh} $text;
+    close $fh;
+    print "Wrote '$filename'\n";
 }
 
 sub replace_headerized_declarations {
