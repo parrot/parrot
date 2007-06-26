@@ -292,7 +292,7 @@ L<http://rakudo.org/parrot/>
 
 Remove link to old wiki page (dead since 2004.)
 
-Add irc.perl.ong IRC server.
+Add irc.perl.org IRC server.
 
 =item Revision 0.1 - 27 July 2002
 
