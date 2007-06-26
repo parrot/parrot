@@ -28,6 +28,21 @@ to the previous values and the allocated register memory is discarded.
 
 /* HEADERIZER TARGET: include/parrot/register.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void clear_regs( Interp *interp /*NN*/, parrot_context_t *ctx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void init_context( Interp *interp /*NN*/,
+    parrot_context_t *ctx /*NN*/,
+    const parrot_context_t *old /*NULLOK*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
+
 /*
  * Context and register frame layout
  *

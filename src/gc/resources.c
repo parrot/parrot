@@ -26,9 +26,51 @@ src/resources.c - Allocate and deallocate tracked resources
 #define POOL_SIZE 65536 * 2
 
 typedef void (*compact_f) (Interp *, Memory_Pool *);
-static char * aligned_mem(const Buffer *buffer, char *mem);
 
 /* HEADERIZER TARGET: include/parrot/resources.h */
+
+/* HEADERIZER BEGIN: static */
+
+static char * aligned_mem( const Buffer *buffer /*NN*/, char *mem )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
+static size_t aligned_size( const Buffer *buffer /*NN*/, size_t len )
+        __attribute__nonnull__(1)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+static size_t aligned_string_size( size_t len );
+static void * alloc_new_block( Interp *interp,
+    size_t size,
+    Memory_Pool *pool,
+    const char *why );
+
+static const char* buffer_location( Interp *interp, const PObj *b );
+static void compact_pool( Interp *interp /*NN*/, Memory_Pool *pool /*(NN*/ )
+        __attribute__nonnull__(1);
+
+static void debug_print_buf( Interp *interp, const PObj *b /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void * mem_allocate( Interp *interp /*NN*/,
+    size_t size,
+    Memory_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
+
+static void merge_pools(
+    Memory_Pool *dest /*NN*/,
+    Memory_Pool *source /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static Memory_Pool * new_memory_pool( size_t min_block, compact_f compact )
+        __attribute__warn_unused_result__;
+
+/* HEADERIZER END: static */
+
 
 /*
 

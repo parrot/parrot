@@ -112,9 +112,121 @@ A chained list of headers used e.g. for the IGP list.
 #include "parrot/dod.h"
 #include <assert.h>
 
+#if PARROT_GC_GMS
+
+typedef struct Gc_gms_private {
+    UINTVAL current_gen_no;             /* the nursery generation number */
+} Gc_gms_private;
+
 /* HEADERIZER TARGET: include/parrot/dod.h */
 
-#if PARROT_GC_GMS
+/* HEADERIZER BEGIN: static */
+
+static int end_cycle_cb( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static void gc_gms_add_free_object( Interp *interp,
+    Small_Object_Pool *pool,
+    void *to_add );
+
+static void gc_gms_alloc_objects( Interp *interp, Small_Object_Pool *pool );
+static void gc_gms_chain_objects( Interp *interp,
+    Small_Object_Pool *pool,
+    Small_Object_Arena *new_arena,
+    size_t real_size );
+
+static void gc_gms_clear_hdr_list( Interp *interp, Gc_gms_hdr_list *l );
+static void gc_gms_clear_igp( Interp *interp, Gc_gms_gen *gen );
+static Gc_gms_gen * gc_gms_create_gen( Interp *interp,
+    Small_Object_Pool *pool,
+    size_t gen_no );
+
+static void gc_gms_end_cycle( Interp *interp );
+static Gc_gms_gen * gc_gms_find_gen( Interp *interp,
+    Gc_gms_hdr *h /*NN*/,
+    UINTVAL gen_no )
+        __attribute__nonnull__(2);
+
+static void * gc_gms_get_free_object( Interp *interp,
+    Small_Object_Pool *pool );
+
+static void gc_gms_init_gen( Interp *interp, Small_Object_Pool *pool );
+static void gc_gms_init_mark( Interp *interp );
+static void gc_gms_merge_gen( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    Gc_gms_plan *plan );
+
+static void gc_gms_more_objects( Interp *interp, Small_Object_Pool *pool );
+static void gc_gms_pool_init( Interp *interp, Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void gc_gms_promote( Interp *interp,
+    Gc_gms_hdr *h /*NN*/,
+    UINTVAL gen_no )
+        __attribute__nonnull__(2);
+
+static void gc_gms_set_gen( Interp *interp );
+static void gc_gms_setto_black( Interp *interp, Gc_gms_hdr *h, int priority );
+static void gc_gms_setto_gray( Interp *interp, Gc_gms_hdr *h, int priority );
+static void gc_gms_store_hdr_list( Interp *interp,
+    Gc_gms_hdr_list *l /*NN*/,
+    Gc_gms_hdr *h )
+        __attribute__nonnull__(2);
+
+static void gc_gms_store_igp( Interp *interp, Gc_gms_hdr *h /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void gc_gms_sweep( Interp *interp );
+static int gc_gms_trace_children( Interp *interp );
+static int gc_gms_trace_root( Interp *interp, int trace_stack );
+static void gc_gms_use_gen( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    Gc_gms_plan *plan );
+
+static void gms_debug_verify( Interp *interp,
+    Small_Object_Pool *pool,
+    const char *action );
+
+static int init_mark_cb( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static void parrot_gc_gms_deinit( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_gms_run( Interp *interp, int flags );
+static int set_gen_cb( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static int sweep_cb_buf( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static int sweep_cb_pmc( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static int trace_children_cb( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+static int trace_igp_cb( Interp *interp,
+    Small_Object_Pool *pool,
+    int flag,
+    void *arg );
+
+/* HEADERIZER END: static */
+
 
 /*
  * XXX
@@ -167,27 +279,9 @@ A chained list of headers used e.g. for the IGP list.
  */
 #  define GC_GMS_DEBUG 0
 
-typedef struct Gc_gms_private {
-    UINTVAL current_gen_no;             /* the nursery generation number */
-} Gc_gms_private;
-
 #  define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
 #  define POOL_MAX_BYTES 65536*128
 
-/*
- * static forward defs
- */
-static void gc_gms_add_free_object(Interp *,
-        Small_Object_Pool *pool, void *to_add);
-static void * gc_gms_get_free_object(Interp *, Small_Object_Pool *);
-static void gc_gms_alloc_objects(Interp *, Small_Object_Pool *);
-static void gc_gms_more_objects(Interp *, Small_Object_Pool *);
-static void gc_gms_init_gen(Interp *, Small_Object_Pool *);
-static void parrot_gc_gms_run(Interp *, int flags);
-#  if GC_GMS_DEBUG
-static void gms_debug_verify(Interp *, Small_Object_Pool *pool,
-        const char *action);
-#  endif
 /*
 
 =back

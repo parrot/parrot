@@ -27,6 +27,30 @@ There's also a verbose mode for garbage collection.
 
 /* HEADERIZER TARGET: include/parrot/dod.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void clear_live_bits( Interp *interp /*NULLOK*/,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(2);
+
+static size_t find_common_mask( size_t val1, size_t val2 );
+static void mark_special( Interp *interp /*NN*/, PMC *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int sweep_cb( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/,
+    int flag,
+    void *arg )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int trace_active_PMCs( Interp *interp /*NN*/, int trace_stack )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
+
 /* Set this to 1 to see if unanchored objects are found in system areas.
  * Please note: these objects might be bogus
  */
