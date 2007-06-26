@@ -178,10 +178,12 @@ my @coding_std_tests = map { "t/codingstd/$_" } qw(
     cppcomments.t 
     cuddled_else.t 
     gmt_utc.t
+    perlcritic.t
     pir_code_coda.t
     tabs.t 
     trailing_space.t
 );
+
 push @default_tests, @coding_std_tests
     if -e "$Bin/../DEVELOPING";
 
