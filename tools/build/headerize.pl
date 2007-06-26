@@ -73,7 +73,7 @@ main();
 
 =cut
 
-sub extract_functions {
+sub extract_function_declarations {
     my $text = shift;
 
     $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
@@ -122,7 +122,7 @@ sub extract_functions {
     return @funcs;
 }
 
-sub function_components {
+sub function_components_from_declaration {
     my $proto = shift;
 
     my @lines = split( /\n/, $proto );
@@ -156,7 +156,7 @@ sub function_components {
 
     die "Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
 
-    return [ $parrot_api, $is_static, $returntype, $funcname, $funcflags, @parms ];
+    return ( $is_static, $parrot_api, $returntype, $funcname, $funcflags, @parms );
 }
 
 sub attrs_from_args {
@@ -215,8 +215,7 @@ sub make_function_decls {
 
     my @decls;
     foreach my $func ( @funcs ) {
-        my ($parrot_api, $is_static, $ret_type, $funcname, $funcflags, @args) = @{$func};
-        next if $is_static;
+        my ($is_static, $parrot_api, $ret_type, $funcname, $funcflags, @args) = @{$func};
 
         my $multiline = 0;
 
@@ -260,6 +259,7 @@ sub main {
     my %ofiles = map {($_,1)} @ARGV;
     my @ofiles = sort keys %ofiles;
     my %cfiles;
+    my %cfiles_with_statics;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
     for my $ofile (@ofiles) {
@@ -281,10 +281,11 @@ sub main {
         next if $hfile eq 'none';
         die "'$hfile' not found (referenced from '$cfile')" unless -f $hfile;
 
-        my @funcs = extract_functions($source);
-
-        for my $func (@funcs) {
-            push( @{ $cfiles{$hfile}->{$cfile} }, function_components($func) );
+        my @decls = extract_function_declarations($source);
+        for my $decl (@decls) {
+            my @components = function_components_from_declaration($decl);
+            push( @{ $cfiles{$hfile}->{$cfile} }, [@components] );
+            push( @{ $cfiles_with_statics{ $cfile } }, $components[3] ) if $components[0];
             ++$nfuncs;
         }
     }    # for @cfiles
@@ -297,7 +298,9 @@ sub main {
         my $header = read_file( $hfile );
 
         for my $cfile ( sort keys %{$cfiles} ) {
-            $header = replace_headerized_declarations( $header, $cfile, $hfile, $cfiles->{$cfile} );
+            my @funcs = @{$cfiles->{$cfile}};
+            @funcs = grep { not $_->[0] } @funcs; # skip statics
+            $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
         }    # for %cfiles
 
         write_file( $hfile, $header );
@@ -330,9 +333,9 @@ sub replace_headerized_declarations {
     my $source_code = shift;
     my $cfile = shift;
     my $hfile = shift;
-    my $funcs = shift;
+    my @funcs = @_;
 
-    my @funcs = sort api_first_then_alpha @{$funcs};
+    @funcs = sort api_first_then_alpha @funcs;
 
     my @function_decls = make_function_decls( @funcs );
 
@@ -347,7 +350,7 @@ sub replace_headerized_declarations {
 
 sub api_first_then_alpha {
     return
-        ( ($b->[0]||0) <=> ($a->[0]||0) )
+        ( ($b->[1]||0) <=> ($a->[1]||0) )
             ||
         ( lc $a->[3] cmp lc $b->[3] )
     ;
