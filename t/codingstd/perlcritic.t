@@ -28,12 +28,15 @@ BEGIN {
 
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
-my ( %policies, $list_policies, $list_files, $all_policies, $input_policy );
+my %policies;
+my ( $list_policies, $list_files, $all_policies, $input_policy );
+my $policy_group = "default";
 
 GetOptions( "list" => \$list_policies,
             "listfiles" => \$list_files,
             "allpolicies" => \$all_policies,
             "policy=s" => \$input_policy,
+            "group=s" => \$policy_group,  # all, default, extra
         );
 
 # if we we're given a policy, set it to the policies hash
@@ -93,9 +96,10 @@ if ($list_files) {
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
 if ( !keys %policies ) {
-    %policies = (
+    my %default_policies = (
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
-        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
+        'CodeLayout::ProhibitHardTabs'                    =>
+            { allow_leading_tabs => 0 },
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
         'CodeLayout::UseParrotCoda'                       => 1,
         'TestingAndDebugging::MisplacedShebang'           => 1,
@@ -106,18 +110,18 @@ if ( !keys %policies ) {
     );
 
     # add other policies which aren't yet passing consistently see RT#42427
-    if ( $all_policies ) {
-        $policies{'Variables::ProhibitConditionalDeclarations'} = 1;
-        $policies{'InputOutput::ProhibitTwoArgOpen'}            = 1;
-        $policies{'InputOutput::ProhibitBarewordFileHandles'}   = 1;
-        $policies{'NamingConventions::ProhibitAmbiguousNames'}  = 1;
-        $policies{'Subroutines::ProhibitBuiltinHomonyms'}       = 1;
-        $policies{'Subroutines::ProhibitExplicitReturnUndef'}   = 1;
-        $policies{'Subroutines::ProhibitSubroutinePrototypes'}  = 1;
-        $policies{'CodeLayout::RequireTidyCode'}                =
-            { perltidyrc => $perl_tidy_conf };
-        $policies{'Subroutines::RequireFinalReturn'}            = 1;
-    }
+    my %extra_policies = (
+        'Variables::ProhibitConditionalDeclarations' => 1,
+        'InputOutput::ProhibitTwoArgOpen'            => 1,
+        'InputOutput::ProhibitBarewordFileHandles'   => 1,
+        'NamingConventions::ProhibitAmbiguousNames'  => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
+        'CodeLayout::RequireTidyCode'                =>
+            { perltidyrc => $perl_tidy_conf },
+        'Subroutines::RequireFinalReturn'            => 1,
+    );
 
     # Add Perl::Critic::Bangs if it exists
     eval { require Perl::Critic::Bangs; };
@@ -125,7 +129,7 @@ if ( !keys %policies ) {
         diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
     }
     else {
-        $policies{'Bangs::ProhibitFlagComments'} = 1 if $all_policies;
+        $extra_policies{'Bangs::ProhibitFlagComments'} = 1;
     }
 
     # Give a diag to let users know if this is doing anything, how to repeat.
@@ -134,6 +138,19 @@ if ( !keys %policies ) {
         diag "Using $perl_tidy_conf for Perl::Tidy settings";
     }
 
+    # decide which policy group to use
+    if ( $policy_group eq "default" ) {
+        %policies = %default_policies;
+    }
+    elsif ( $policy_group eq "extra" ) {
+        %policies = %extra_policies;
+    }
+    elsif ( $policy_group eq "all" ) {
+        %policies = ( %default_policies, %extra_policies );
+    }
+    else {
+        warn "Unknown policy group, using 'default' policy group";
+    }
 }
 
 if ($list_policies) {
