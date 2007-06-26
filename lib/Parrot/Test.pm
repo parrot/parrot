@@ -300,8 +300,9 @@ sub run_command {
     open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles
     open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles
 
-    open STDOUT, ">", "$out" or die "Can't redirect stdout to $out" if $out;
-    open STDERR, ">$err" or die "Can't redirect stderr to $err" if $err;
+    open STDOUT, '>', $out or die "Can't redirect stdout to $out" if $out;
+    # See 'Obscure Open Tricks' in perlopentut
+    open STDERR, ">$err"  or die "Can't redirect stderr to $err"     if $err;  ## no critic InputOutput::ProhibitTwoArgOpen
 
     # If $command isn't already an arrayref (because of a multi-command
     # test), make it so now so the code below can treat everybody the
