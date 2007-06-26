@@ -1881,7 +1881,7 @@ byte_code_destroy(Interp *interp, PackFile_Segment *self /*NN*/)
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
-    parrot_PIC_destroy(interp, byte_code);
+    parrot_PIC_destroy(byte_code);
     if (byte_code->prederef.code) {
         Parrot_free_memalign(byte_code->prederef.code);
         byte_code->prederef.code = NULL;

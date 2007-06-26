@@ -108,74 +108,90 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 /* HEADERIZER BEGIN: static */
 
-static int is_pic_func( Interp *interp,
-    void **pc,
-    Parrot_MIC *mic,
-    int core_type );
+static int is_pic_func( Interp *interp /*NN*/,
+    void **pc /*NN*/,
+    Parrot_MIC *mic /*NN*/,
+    int core_type )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static int is_pic_param( Interp *interp,
-    void **pc,
-    Parrot_MIC* const mic,
-    opcode_t op );
+static int is_pic_param( Interp *interp /*NN*/,
+    void **pc /*NN*/,
+    Parrot_MIC* const mic /*NN*/,
+    opcode_t op )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static void parrot_pic_move( Interp* interp, Parrot_MIC *mic );
+static void parrot_pic_move( Interp* interp /*NN*/, Parrot_MIC *mic /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int pass_int( Interp *interp,
-    PMC *sig,
+    PMC *sig /*NN*/,
     char *src_base,
     void **src,
     char *dest_base,
-    void **dest );
+    void **dest /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(6);
 
 static int pass_mixed( Interp *interp,
-    PMC *sig,
+    PMC *sig /*NN*/,
     char *src_base,
     void **src,
     char *dest_base,
-    void **dest );
+    void **dest )
+        __attribute__nonnull__(2);
 
 static int pass_num( Interp *interp,
-    PMC *sig,
+    PMC *sig /*NN*/,
     char *src_base,
     void **src,
     char *dest_base,
-    void **dest );
+    void **dest /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(6);
 
 static int pass_pmc( Interp *interp,
-    PMC *sig,
+    PMC *sig /*NN*/,
     char *src_base,
     void **src,
     char *dest_base,
-    void **dest );
+    void **dest /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(6);
 
 static int pass_str( Interp *interp,
-    PMC *sig,
+    PMC *sig /*NN*/,
     char *src_base,
     void **src,
     char *dest_base,
-    void **dest );
+    void **dest /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(6);
 
 /* HEADERIZER END: static */
 
 
 /*
 
-=item C<void parrot_PIC_alloc_store(Interp *, PackFile_ByteCode *, size_t n);>
+FUNCDOC: parrot_PIC_alloc_store
 
 Initialize the PIC storage for the given code segment with the capacitiy of
 holding at least C<n> MIC entries. The PIC_store itself, room for C<n> MICs and
 some space for PICs is allocated as one piece. MICs are returned from the start
 of usable memory, PICs from the rear.
 
-=item C<void parrot_PIC_destroy(Interp *, PackFile_ByteCode *);>
+FUNCDOC: parrot_PIC_destroy
 
 Free memory for the PIC storage.
-
-=cut
 
 */
 
 void
-parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode *cs /*NN*/, size_t n)
+parrot_PIC_alloc_store(struct PackFile_ByteCode *cs /*NN*/, size_t n)
 {
     size_t size, poly;
     Parrot_PIC_store *store;
@@ -202,11 +218,11 @@ parrot_PIC_alloc_store(Interp *interp, struct PackFile_ByteCode *cs /*NN*/, size
 }
 
 void
-parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode *cs /*NN*/)
+parrot_PIC_destroy(struct PackFile_ByteCode *cs /*NN*/)
 {
-    Parrot_PIC_store *store;
+    Parrot_PIC_store *store = cs->pic_store;
 
-    for (store = cs->pic_store; store;) {
+    while (store) {
         Parrot_PIC_store * const prev = store->prev;
         mem_sys_free(store);
         store = prev;
@@ -216,14 +232,15 @@ parrot_PIC_destroy(Interp *interp, struct PackFile_ByteCode *cs /*NN*/)
 
 /*
 
-=item C<int parrot_PIC_op_is_cached(Interp *, int op_code);>
+FUNCDOC: parrot_PIC_op_is_cached
 
 Return true, if the opcode needs a PIC slot.
 
 */
 
 int
-parrot_PIC_op_is_cached(Interp *interp, int op_code)
+parrot_PIC_op_is_cached(int op_code)
+    /* CONST, WARN_UNUSED */
 {
     switch (op_code) {
         case PARROT_OP_infix_ic_p_p:
@@ -234,6 +251,7 @@ parrot_PIC_op_is_cached(Interp *interp, int op_code)
     }
     return 0;
 }
+
 /*
 
 =item C<Parrot_MIC* parrot_PIC_alloc_mic(Interp*, size_t n);>
@@ -248,7 +266,7 @@ bytecode segement.
 */
 
 Parrot_MIC*
-parrot_PIC_alloc_mic(Interp *interp, size_t n)
+parrot_PIC_alloc_mic(const Interp *interp /*NN*/, size_t n)
 {
     Parrot_PIC_store * const store = interp->code->pic_store;
     assert(n < store->n_mics);
@@ -256,7 +274,7 @@ parrot_PIC_alloc_mic(Interp *interp, size_t n)
 }
 
 Parrot_PIC*
-parrot_PIC_alloc_pic(Interp *interp)
+parrot_PIC_alloc_pic(Interp *interp /*NN*/)
 {
     Parrot_PIC_store *store = interp->code->pic_store;
     Parrot_PIC_store *new_store;
@@ -304,10 +322,12 @@ parrot_pic_opcode(Interp *interp, INTVAL op)
 }
 
 static int
-pass_int(Interp *interp, PMC *sig, char *src_base, void **src,
-        char *dest_base, void **dest)
+pass_int(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
+        char *dest_base, void **dest /*NN*/)
 {
-    int i, n = SIG_ELEMS(sig);
+    int n = SIG_ELEMS(sig);
+    int i;
+
     for (i = 2 ; n; ++i, --n) {
         const INTVAL arg = *(INTVAL *)(src_base + ((opcode_t*)src)[i]);
         *(INTVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -316,10 +336,12 @@ pass_int(Interp *interp, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_num(Interp *interp, PMC *sig, char *src_base, void **src,
-        char *dest_base, void **dest)
+pass_num(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
+        char *dest_base, void **dest /*NN*/)
 {
-    int i, n = SIG_ELEMS(sig);
+    int n = SIG_ELEMS(sig);
+    int i;
+
     for (i = 2 ; n; ++i, --n) {
         const FLOATVAL arg = *(FLOATVAL *)(src_base + ((opcode_t*)src)[i]);
         *(FLOATVAL *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -328,10 +350,12 @@ pass_num(Interp *interp, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_str(Interp *interp, PMC *sig, char *src_base, void **src,
-        char *dest_base, void **dest)
+pass_str(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
+        char *dest_base, void **dest /*NN*/)
 {
-    int i, n = SIG_ELEMS(sig);
+    int n = SIG_ELEMS(sig);
+    int i;
+
     for (i = 2 ; n; ++i, --n) {
         STRING * const arg = *(STRING* *)(src_base + ((opcode_t*)src)[i]);
         *(STRING* *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -340,10 +364,12 @@ pass_str(Interp *interp, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_pmc(Interp *interp, PMC *sig, char *src_base, void **src,
-        char *dest_base, void **dest)
+pass_pmc(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
+        char *dest_base, void **dest /*NN*/)
 {
-    int i, n = SIG_ELEMS(sig);
+    int n = SIG_ELEMS(sig);
+    int i;
+
     for (i = 2 ; n; ++i, --n) {
         PMC * const arg = *(PMC* *)(src_base + ((opcode_t*)src)[i]);
         *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= arg;
@@ -352,7 +378,7 @@ pass_pmc(Interp *interp, PMC *sig, char *src_base, void **src,
 }
 
 static int
-pass_mixed(Interp *interp, PMC *sig, char *src_base, void **src,
+pass_mixed(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
         char *dest_base, void **dest)
 {
     PMC* argP;
@@ -411,8 +437,9 @@ pass_mixed(Interp *interp, PMC *sig, char *src_base, void **src,
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
 int
-parrot_pic_check_sig(Interp *interp, const PMC *sig1 /*NN*/,
-        const PMC *sig2 /*NN*/, int *type /*NN*/)
+parrot_pic_check_sig(const PMC *sig1 /*NN*/, const PMC *sig2 /*NN*/,
+        int *type /*NN*/)
+    /* WARN_UNUSED */
 {
     int i, n, t0, t1, t2;
     t0 = 0; /* silence compiler uninit warning */
@@ -454,7 +481,7 @@ parrot_pic_check_sig(Interp *interp, const PMC *sig1 /*NN*/,
 }
 
 static int
-is_pic_param(Interp *interp, void **pc, Parrot_MIC* const mic, opcode_t op)
+is_pic_param(Interp *interp /*NN*/, void **pc /*NN*/, Parrot_MIC* const mic /*NN*/, opcode_t op)
 {
     PMC *sig2;
     int n, type;
@@ -480,7 +507,7 @@ is_pic_param(Interp *interp, void **pc, Parrot_MIC* const mic, opcode_t op)
         const INTVAL const_nr = args[1];
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
-        n = parrot_pic_check_sig(interp, sig1, sig2, &type);
+        n = parrot_pic_check_sig(sig1, sig2, &type);
         if (n == -1)
             return 0;
     }
@@ -519,7 +546,7 @@ is_pic_param(Interp *interp, void **pc, Parrot_MIC* const mic, opcode_t op)
 
 
 static int
-is_pic_func(Interp *interp, void **pc, Parrot_MIC *mic, int core_type)
+is_pic_func(Interp *interp /*NN*/, void **pc /*NN*/, Parrot_MIC *mic /*NN*/, int core_type)
 {
     /*
      * if we have these opcodes
@@ -594,7 +621,7 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
     opcode_t * const cur_opcode = (opcode_t*)pc_pred;
     Parrot_MIC *mic = NULL;
 
-    if (parrot_PIC_op_is_cached(interp, op)) {
+    if (parrot_PIC_op_is_cached(op)) {
         const PackFile_ByteCode * const cs = interp->code;
         size_t n = cur_opcode - (opcode_t*)cs->prederef.code;
         /*
@@ -654,7 +681,7 @@ parrot_PIC_prederef(Interp *interp, opcode_t op, void **pc_pred, int core)
 }
 
 static void
-parrot_pic_move(Interp* interp, Parrot_MIC *mic)
+parrot_pic_move(Interp* interp /*NN*/, Parrot_MIC *mic /*NN*/)
 {
     /*
      * MIC slot is empty - use it

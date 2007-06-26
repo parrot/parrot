@@ -1501,7 +1501,7 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
         op = (opcode_t)ins->opnum;
 
         /* add PIC idx */
-        if (parrot_PIC_op_is_cached(interp, op)) {
+        if (parrot_PIC_op_is_cached(op)) {
             const size_t offs = pc - interp->code->base.data;
             /*
              * for pic_idx fitting into a short, we could

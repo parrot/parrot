@@ -149,7 +149,7 @@ args_match_params(Interp *interp, const PMC *sig_args, PackFile_ByteCode *seg,
     /* verify that we actually can pass arguments */
     ASSERT_SIG_PMC(sig_params);
 
-    n = parrot_pic_check_sig(interp, sig_args, sig_params, &type);
+    n = parrot_pic_check_sig(sig_args, sig_params, &type);
 
     /* arg count mismatch */
     if (n == -1)
@@ -175,7 +175,7 @@ static int
 returns_match_results(Interp *interp, const PMC *sig_ret, const PMC *sig_result)
 {
     int type;
-    const int n = parrot_pic_check_sig(interp, sig_ret, sig_result, &type);
+    const int n = parrot_pic_check_sig(sig_ret, sig_result, &type);
 
     /* arg count mismatch */
     if (n == -1)

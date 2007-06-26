@@ -72,23 +72,26 @@ typedef int (*arg_pass_f)(Interp *, PMC *sig,
 
 /* HEADERIZER BEGIN: src/pic.c */
 
-Parrot_MIC* parrot_PIC_alloc_mic( Interp *interp, size_t n );
-Parrot_PIC* parrot_PIC_alloc_pic( Interp *interp );
-void parrot_PIC_alloc_store( Interp *interp,
-    struct PackFile_ByteCode *cs /*NN*/,
-    size_t n )
-        __attribute__nonnull__(2);
+Parrot_MIC* parrot_PIC_alloc_mic( const Interp *interp /*NN*/, size_t n )
+        __attribute__nonnull__(1);
 
-int parrot_pic_check_sig( Interp *interp,
+Parrot_PIC* parrot_PIC_alloc_pic( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void parrot_PIC_alloc_store( struct PackFile_ByteCode *cs /*NN*/, size_t n )
+        __attribute__nonnull__(1);
+
+int parrot_pic_check_sig(
     const PMC *sig1 /*NN*/,
     const PMC *sig2 /*NN*/,
     int *type /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__warn_unused_result__;
 
-void parrot_PIC_destroy( Interp *interp, struct PackFile_ByteCode *cs /*NN*/ )
-        __attribute__nonnull__(2);
+void parrot_PIC_destroy( struct PackFile_ByteCode *cs /*NN*/ )
+        __attribute__nonnull__(1);
 
 void parrot_pic_find_infix_v_pp( Interp *interp,
     PMC *left /*NN*/,
@@ -100,7 +103,10 @@ void parrot_pic_find_infix_v_pp( Interp *interp,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-int parrot_PIC_op_is_cached( Interp *interp, int op_code );
+int parrot_PIC_op_is_cached( int op_code )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
 void * parrot_pic_opcode( Interp *interp, INTVAL op );
 void parrot_PIC_prederef( Interp *interp,
     opcode_t op,
