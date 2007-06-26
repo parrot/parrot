@@ -34,18 +34,23 @@ Define the internal interpreter exceptions.
 /* HEADERIZER BEGIN: static */
 
 static opcode_t * create_exception( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
 
 static size_t dest2offset( Interp *interp /*NN*/,
     const opcode_t *dest /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__pure__
         __attribute__warn_unused_result__;
 
 static PMC * find_exception_handler( Interp *interp /*NN*/, PMC *exception )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
 
-static void run_cleanup_action( Interp *interp, Stack_Entry_t *e );
+static void run_cleanup_action( Interp *interp, Stack_Entry_t *e /*NN*/ )
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 
 #include <stdarg.h>
@@ -172,7 +177,7 @@ push_exception(Interp *interp /*NN*/, PMC *handler /*NN*/)
 }
 
 static void
-run_cleanup_action(Interp *interp, Stack_Entry_t *e)
+run_cleanup_action(Interp *interp, Stack_Entry_t *e /*NN*/)
 {
     /*
      * this is called during normal stack_pop of the control
@@ -231,6 +236,7 @@ Find the exception handler for C<exception>.
 
 static PMC *
 find_exception_handler(Interp *interp /*NN*/, PMC *exception)
+    /* WARN_UNUSED */
 {
     char *m;
     int exit_status, print_location;
@@ -391,6 +397,7 @@ opcode_t *
 throw_exception(Interp *interp /*NN*/, PMC *exception, void *dest)
 {
     opcode_t *address;
+    UNUSED(dest);
 
     PMC * const handler = find_exception_handler(interp, exception);
     if (!handler)
@@ -473,7 +480,7 @@ after an exception had occurred.
 
 static size_t
 dest2offset(Interp *interp /*NN*/, const opcode_t *dest /*NN*/)
-    /* WARN_UNUSED */
+    /* PURE, WARN_UNUSED */
 {
     size_t offset;
     /* translate an absolute location in byte_code to an offset
@@ -501,6 +508,7 @@ Create an exception.
 
 static opcode_t *
 create_exception(Interp *interp /*NN*/)
+    /* WARN_UNUSED */
 {
     PMC *exception;     /* exception object */
     opcode_t *dest;     /* absolute address of handler */
