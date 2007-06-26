@@ -257,9 +257,9 @@ ops_jittable(Interp *interp, PMC *sub, const PMC *sig_results,
         /* special opcodes which are handled, but not marked as JITtable */
         int i;
 
-        const int op = *pc;
+        const int               op      = *pc;
         const op_info_t * const op_info = interp->op_info_table + op;
-        const int n = op_info->op_count;
+        int                     n       = op_info->op_count;
 
         switch (op) {
             case PARROT_OP_returncc:
@@ -342,7 +342,7 @@ parrot_pic_is_safe_to_jit(Interp *interp /*NN*/, PMC *sub /*NN*/,
     start = base + PMC_sub(sub)->start_offs;
     end   = base + PMC_sub(sub)->end_offs;
 
-    if (!args_match_params(interp, sig_args, PMC_sub(sub)->seg, start))
+    if (!args_match_params(sig_args, PMC_sub(sub)->seg, start))
         return 0;
 
     /*
