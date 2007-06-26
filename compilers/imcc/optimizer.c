@@ -66,21 +66,65 @@
 /* buggy - turned off */
 #define  DO_LOOP_OPTIMIZATION 0
 
-static int strength_reduce(Interp *interp, IMC_Unit *);
-static int if_branch(Interp *, IMC_Unit *);
+/* HEADERIZER BEGIN: static */
 
-static int branch_branch(Interp *interp, IMC_Unit *);
-static int branch_reorg(Interp *interp, IMC_Unit *);
-static int unused_label(Interp *interp, IMC_Unit *);
-static int dead_code_remove(Interp *interp, IMC_Unit *);
-static int branch_cond_loop(Interp *interp, IMC_Unit *);
+static int _is_ins_save(
+    IMC_Unit * unit,
+    Instruction *check_ins,
+    SymReg *r,
+    int what );
 
-static int constant_propagation(Interp *interp, IMC_Unit *);
-static int used_once(Interp *, IMC_Unit *);
+static int branch_branch( Interp *interp, IMC_Unit * unit /*NN*/ )
+        __attribute__nonnull__(2);
+
+static int branch_cond_loop( Interp *interp, IMC_Unit * unit );
+static int branch_cond_loop_swap( Interp *interp,
+    IMC_Unit *unit,
+    Instruction *branch,
+    Instruction *start,
+    Instruction *cond );
+
+static int branch_reorg( Interp *interp, IMC_Unit * unit );
+static int check_clone(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins );
+
+static int clone_remove( Parrot_Interp interp, IMC_Unit * unit );
+static int constant_propagation( Interp *interp, IMC_Unit * unit );
+static int dead_code_remove( Interp *interp, IMC_Unit * unit );
+static int eval_ins( Interp *interp, char *op, size_t ops, SymReg **r );
+static Basic_block * find_outer( IMC_Unit * unit, Basic_block * blk );
+static int if_branch( Interp *interp /*NN*/, IMC_Unit *unit )
+        __attribute__nonnull__(1);
+
+static int is_ins_save(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins,
+    SymReg *r,
+    int what );
+
+static int is_invariant(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins );
+
+static int loop_one( Interp *interp, IMC_Unit * unit, int bnr );
+static int loop_optimization( Interp *interp, IMC_Unit * unit );
+static int max_loop_depth( IMC_Unit * unit );
+static int move_ins_out( Interp *interp,
+    IMC_Unit * unit,
+    Instruction **ins,
+    Basic_block *bb );
+
+static int strength_reduce( Interp *interp, IMC_Unit * unit );
+static int unused_label( Interp *interp, IMC_Unit * unit );
+static int used_once( Parrot_Interp interp, IMC_Unit * unit );
+/* HEADERIZER END: static */
 #if DO_LOOP_OPTIMIZATION
 static int loop_optimization(Interp *, IMC_Unit *);
 #endif
-static int clone_remove(Interp *, IMC_Unit *);
 
 /*
  * Handles optimizations occuring before the construction of the CFG.
@@ -1431,7 +1475,7 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(Interp *interp, IMC_Unit * unit,
+move_ins_out(Interp *interp, IMC_Unit *unit /*NN*/,
                      Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
@@ -1473,9 +1517,9 @@ move_ins_out(Interp *interp, IMC_Unit * unit,
 }
 
 static int
-loop_one(Interp *interp, IMC_Unit * unit, int bnr)
+loop_one(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int bnr)
 {
-    Basic_block *bb = unit->bb_list[bnr];
+    Basic_block * const bb = unit->bb_list[bnr];
     Instruction *ins;
     int changed = 0;
 

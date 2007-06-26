@@ -14,7 +14,12 @@
 /* HEADERIZER TARGET: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
-static void imc_free_unit(Parrot_Interp interp, IMC_Unit * unit);
+
+static void imc_free_unit( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static IMC_Unit * imc_new_unit( IMC_Unit_Type t );
 /* HEADERIZER END: static */
 
 #define COMPILE_IMMEDIATE 1

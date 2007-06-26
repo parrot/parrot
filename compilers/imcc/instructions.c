@@ -32,9 +32,18 @@ int n_comp_units;
 /* HEADERIZER TARGET: compilers/imcc/instructions.h */
 
 /* HEADERIZER BEGIN: static */
-static int e_file_open(Interp *, void *);
-static int e_file_close(Interp *, void *);
-static int e_file_emit(Interp *, void *param, IMC_Unit *, const Instruction *);
+
+static int e_file_close( Interp *interp /*NN*/, void *param )
+        __attribute__nonnull__(1);
+
+static int e_file_emit( Interp *interp /*NN*/,
+    void *param,
+    IMC_Unit *unit,
+    const Instruction *ins /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
+
+static int e_file_open( Interp *interp, void *param );
 /* HEADERIZER END: static */
 
 const char types[] = "INPS";

@@ -30,8 +30,47 @@
 /* HEADERIZER TARGET: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
-static const char *try_rev_cmp(Parrot_Interp, IMC_Unit *unit, const char *name,
-                               SymReg **r);
+
+static int change_op( Interp *interp,
+    IMC_Unit *unit,
+    SymReg **r,
+    int num,
+    int emit );
+
+static void * imcc_compile_file(
+    Parrot_Interp interp,
+    const char *fullname,
+    STRING **error_message );
+
+static int is_infix( const char *name, int n, SymReg **r /*NN*/ )
+        __attribute__nonnull__(3);
+
+static Instruction * maybe_builtin( Interp *interp,
+    IMC_Unit *unit,
+    const char *name /*NN*/,
+    SymReg **r,
+    int n )
+        __attribute__nonnull__(3);
+
+static char * to_infix( Interp *interp,
+    const char *name,
+    SymReg **r,
+    int *n,
+    int mmd_op );
+
+static const char * try_rev_cmp(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    const char *name,
+    SymReg ** r );
+
+static Instruction * var_arg_ins( Interp *interp,
+    IMC_Unit * unit,
+    const char *name,
+    SymReg **r,
+    int n,
+    int emit );
+
 /* HEADERIZER END: static */
 
 /*

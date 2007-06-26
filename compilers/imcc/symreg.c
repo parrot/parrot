@@ -16,6 +16,31 @@
 
 /* HEADERIZER TARGET: compilers/imcc/symreg.h */
 
+/* HEADERIZER BEGIN: static */
+
+static SymReg * _get_sym_typed(
+    const SymHash *hsh /*NN*/,
+    const char *name /*NN*/,
+    int t )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static char * add_ns( Interp *interp, char *name /*NN*/ )
+        __attribute__nonnull__(2);
+
+static SymReg* mk_pmc_const_2( Interp *interp /*NN*/,
+    IMC_Unit *unit,
+    SymReg *left /*NN*/,
+    SymReg *rhs /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static void resize_symhash( SymHash *hsh /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
 void
 push_namespace(char * name)
 {

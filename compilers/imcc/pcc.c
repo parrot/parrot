@@ -16,6 +16,56 @@
 
 /* HEADERIZER TARGET: compilers/imcc/imc.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void insert_tail_call(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins,
+    SymReg *sub,
+    SymReg *meth );
+
+static Instruction * insINS(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins,
+    char *name,
+    SymReg **regs,
+    int n );
+
+static Instruction * move_regs( Interp *interp /*NN*/,
+    IMC_Unit * unit,
+    Instruction *ins,
+    int n,
+    SymReg **dest,
+    SymReg **src )
+        __attribute__nonnull__(1);
+
+static Instruction* pcc_get_args(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins,
+    char *op_name,
+    int n,
+    SymReg **args,
+    int *arg_flags );
+
+static int pcc_reg_mov( Interp *interp,
+    unsigned char d,
+    unsigned char s,
+    void *vinfo );
+
+static int recursive_tail_call(
+    Parrot_Interp interp,
+    IMC_Unit * unit,
+    Instruction *ins,
+    SymReg *sub );
+
+static void unshift_self( SymReg *sub /*NN*/, SymReg *obj )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
 /*
  * Utility instruction routine. Creates and inserts an instruction
  * into the current block in one call.

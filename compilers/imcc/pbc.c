@@ -69,9 +69,94 @@ static struct globals {
 
 
 /* HEADERIZER BEGIN: static */
-static int add_const_str(Interp *, const SymReg *r);
 
-static opcode_t build_key(Interp *interp, SymReg *reg);
+static void add_1_const( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int add_const_key( Interp *interp,
+    opcode_t key[],
+    int size,
+    char *s_key );
+
+static int add_const_num( Interp *interp /*NN*/, const char *buf )
+        __attribute__nonnull__(1);
+
+static int add_const_pmc_sub( Interp *interp, SymReg *r, int offs, int end );
+static int add_const_str( Interp *interp /*NN*/, const SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static opcode_t build_key( Interp *interp /*NN*/, SymReg *key_reg /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void constant_folding( Interp *interp, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(2);
+
+static PMC* create_lexinfo( Interp *interp,
+    IMC_Unit *unit,
+    PMC *sub,
+    int need_lex );
+
+static subs_t * find_global_label(
+    const char *name /*NN*/,
+    const subs_t *sym /*NN*/,
+    int *pc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static PMC* find_outer( Interp *interp, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void fixup_globals( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int get_codesize( Interp *interp /*NN*/,
+    IMC_Unit *unit /*NN*/,
+    int *src_lines /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static int get_old_size( Interp *interp /*NN*/, int *ins_line /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void imcc_globals_destroy( Interp *interp, int ex, void *param );
+static void make_new_sub( IMC_Unit *unit );
+static void make_pmc_const( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PMC* mk_multi_sig( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int old_blocks( void )
+        __attribute__warn_unused_result__;
+
+static const char * slice_deb( int bits )
+        __attribute__const__
+        __attribute__warn_unused_result__;
+
+static void store_fixup( Interp *interp,
+    SymReg *r /*NN*/,
+    int pc,
+    int offset )
+        __attribute__nonnull__(2);
+
+static void store_key_const( const char *str /*NN*/, int idx )
+        __attribute__nonnull__(1);
+
+static void store_sub_size( size_t size, size_t ins_line );
+static void verify_signature( Interp *interp /*NN*/,
+    const Instruction *ins /*NN*/,
+    opcode_t *pc )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 
 static void

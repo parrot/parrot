@@ -22,22 +22,81 @@
 /* HEADERIZER TARGET: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
-static void make_stat(IMC_Unit *, int *sets, int *cols);
-static void imc_stat_init(IMC_Unit *);
-static void print_stat(Parrot_Interp, IMC_Unit *);
-static void build_reglist(Parrot_Interp, IMC_Unit * unit);
-static void rebuild_reglist(IMC_Unit * unit);
-static void build_interference_graph(Parrot_Interp, IMC_Unit *);
-static void compute_du_chain(IMC_Unit * unit);
-static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
-static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
-static void map_colors(IMC_Unit *, int x, unsigned int * graph,
-                       char colors[], int typ, int);
-static int try_allocate(Parrot_Interp, IMC_Unit *);
-static void allocate_lexicals(Parrot_Interp, IMC_Unit *);
-static void vanilla_reg_alloc(Parrot_Interp, IMC_Unit *);
-static void allocate_non_volatile(Parrot_Interp, IMC_Unit *);
 
+static void allocate_lexicals( Parrot_Interp interp, IMC_Unit *unit );
+static void allocate_non_volatile( Parrot_Interp interp, IMC_Unit *unit );
+static void allocate_uniq( Parrot_Interp interp, IMC_Unit *unit, int usage );
+static void build_interference_graph( Interp *interp /*NN*/,
+    IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void build_reglist( Parrot_Interp interp, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void compute_du_chain( IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void compute_one_du_chain( SymReg *r /*NN*/, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int first_avail( IMC_Unit *unit, int reg_set, Set **avail );
+static unsigned int* ig_allocate( int N );
+static int ig_find_color(
+    const IMC_Unit *unit /*NN*/,
+    const char *avail /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static unsigned int* ig_get_word(
+    int i,
+    int j,
+    int N,
+    unsigned int* graph,
+    int* bit_ofs );
+
+static void ig_set( int i, int j, int N, unsigned int* graph );
+static void imc_stat_init( IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int interferes( Interp *interp,
+    IMC_Unit *unit /*NN*/,
+    SymReg *r0 /*NN*/,
+    SymReg *r1 /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static void make_stat(
+    IMC_Unit *unit /*NN*/,
+    int *sets /*NULLOK*/,
+    int *cols /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+static void map_colors(
+    IMC_Unit* unit,
+    int x,
+    unsigned int *graph,
+    char avail[],
+    int typ,
+    int already_allocated );
+
+static void print_stat( Interp *interp /*N*/, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(2);
+
+static void rebuild_reglist( IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int reg_sort_f( const void *a, const void *b );
+static void sort_reglist( IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int try_allocate( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void vanilla_reg_alloc( Parrot_Interp interp, IMC_Unit *unit );
 /* HEADERIZER END: static */
 
 static unsigned int*
