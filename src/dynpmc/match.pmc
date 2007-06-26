@@ -30,7 +30,7 @@ extern int MatchRange_type_id;
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
-        internal_exception(OUT_OF_BOUNDS,
+        real_exception(interpreter, NULL, OUT_OF_BOUNDS,
         "Cannot use NULL key for Match!");
         return NULL;
     }
@@ -47,7 +47,7 @@ static STRING* match_range(Interp* interp, PMC* self, PMC* range)
 
     b = parrot_hash_get_bucket(interp, hash, input_key);
     if (!b) {
-        internal_exception(1, "Match: input string not set");
+        real_exception(interp, NULL, 1, "Match: input string not set");
         return NULL;
     }
 
@@ -215,7 +215,7 @@ has not completed yet.
 
         b = parrot_hash_get_bucket(INTERP, hash, input_key);
         if (!b) {
-            internal_exception(1,
+            real_exception(INTERP, NULL, 1,
                                "Match: cannot get status of incomplete match");
             return 0;
         }

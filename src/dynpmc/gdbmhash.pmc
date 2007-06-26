@@ -61,7 +61,7 @@ Returns a Parrot string for C<*key>.
 static STRING* make_hash_key(Interp* interp, PMC * key)
 {
     if (key == NULL) {
-        internal_exception(OUT_OF_BOUNDS, "Hash: Cannot use NULL key");
+        real_exception(interp, NULL, OUT_OF_BOUNDS, "Hash: Cannot use NULL key");
         return NULL;
     }
     return key_string(interp, key);
