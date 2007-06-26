@@ -30,11 +30,15 @@ API.
 
 /*
 
+=over 4
+
 =item C<void
 string_set_data_directory(const char *dir)>
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
+
+=back
 
 */
 
