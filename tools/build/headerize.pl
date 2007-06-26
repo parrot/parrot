@@ -294,8 +294,6 @@ sub main {
         my $source = do { local $/; <$fh> };
         close $fh;
 
-        print "=== $cfile ===\n";
-
         die "can't find HEADER directive in '$cfile'"
             unless $source =~ m#/\*\s+HEADERIZER TARGET:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
@@ -320,25 +318,35 @@ sub main {
         close $FILE;
 
         for my $cfile ( sort keys %{$cfiles} ) {
-            my $funcs = $cfiles->{$cfile};
-            my @funcs = sort api_first_then_alpha @{$funcs};
-
-            my @function_decls = make_function_decls( @funcs );
-
-            my $function_decls = join( "\n", @function_decls );
-            my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-            my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
-            $header =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
-                or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
+            $header = replace_headerized_declarations( $header, $cfile, $hfile, $cfiles->{$cfile} );
         }    # for %cfiles
 
         open $FILE, '>', $hfile or die "couldn't write '$hfile': $!";
-        print $FILE $header;
+        print {$FILE} $header;
         close $FILE;
         print "Wrote '$hfile'\n";
     }    # for %files
 
     return;
+}
+
+sub replace_headerized_declarations {
+    my $source_code = shift;
+    my $cfile = shift;
+    my $hfile = shift;
+    my $funcs = shift;
+
+    my @funcs = sort api_first_then_alpha @{$funcs};
+
+    my @function_decls = make_function_decls( @funcs );
+
+    my $function_decls = join( "\n", @function_decls );
+    my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
+    my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+    $source_code =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
+        or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
+
+    return $source_code;
 }
 
 sub api_first_then_alpha {
@@ -348,6 +356,50 @@ sub api_first_then_alpha {
         ( lc $a->[3] cmp lc $b->[3] )
     ;
 }
+
+=head1 NAME
+
+headerizer.pl
+
+=head1 SYNOPSIS
+
+  $ tools/build/headerize.pl [object files]
+
+Generates C function declarations based on the function definitions in
+the C source code.
+
+=head1 DIRECTIVES
+
+The headerizer works off of directives in the source and header files.
+
+One source file's public declarations can only go into one header file.
+However, one header file can have declarations from multiple source files.
+In other words, headers-to-source is one-to-many.
+
+=over 4
+
+=item HEADERIZER BEGIN: F<source-filename> / HEADERIZER END: F<source-filename>
+
+Marks the beginning and end of a block of declarations in a header file.
+
+    # In file foo.h
+    /* HEADERIZER BEGIN: src/foo.c */
+    /* HEADERIZER END: src/foo.c */
+
+    /* HEADERIZER BEGIN: src/bar.c */
+    /* HEADERIZER END: src/bar.c */
+
+=item HEADERIZER TARGET: F<header-filename>
+
+Tells the headerizer where the declarations for the functions should go
+
+    # In file foo.c
+    /* HEADERIZER TARGET: foo.h */
+
+    # In file bar.c
+    /* HEADERIZER TARGET: foo.h */
+
+=cut
 
 # Local Variables:
 #   mode: cperl
