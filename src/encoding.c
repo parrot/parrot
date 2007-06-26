@@ -17,6 +17,17 @@ These are parrot's generic encoding handling functions
 
 /* HEADERIZER TARGET: include/parrot/encoding.h */
 
+/* HEADERIZER BEGIN: static */
+
+static INTVAL register_encoding( Interp *interp /*NN*/,
+    const char *encodingname /*NN*/,
+    ENCODING *encoding /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
 ENCODING *Parrot_default_encoding_ptr;
 ENCODING *Parrot_fixed_8_encoding_ptr;
 ENCODING *Parrot_utf8_encoding_ptr;

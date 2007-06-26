@@ -19,6 +19,79 @@ UTF-16 encoding with the help of the ICU library.
 
 /* HEADERIZER TARGET: src/encodings/utf16.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void become_encoding( Interp *interp, STRING *src );
+static UINTVAL bytes( Interp *interp, STRING *src );
+static UINTVAL codepoints( Interp *interp, STRING *src );
+static UINTVAL get_byte( Interp *interp,
+    const STRING *src /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(2);
+
+static STRING * get_bytes( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_bytes_inplace( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *return_string );
+
+static UINTVAL get_codepoint( Interp *interp,
+    const STRING *src,
+    UINTVAL offset );
+
+static STRING * get_codepoints( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_codepoints_inplace( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *return_string );
+
+static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
+static void set_byte( Interp *interp,
+    const STRING *src,
+    UINTVAL offset,
+    UINTVAL byte );
+
+static void set_bytes( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_bytes );
+
+static void set_codepoint( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL codepoint );
+
+static void set_codepoints( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_codepoints );
+
+static STRING * to_encoding( Interp *interp,
+    STRING *src /*NN*/,
+    STRING *dest )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
+static UINTVAL utf16_decode_and_advance( Interp *interp, String_iter *i );
+static void utf16_encode_and_advance( Interp *interp,
+    String_iter *i,
+    UINTVAL c );
+
+static void utf16_set_position( Interp *interp, String_iter *i, UINTVAL n );
+/* HEADERIZER END: static */
+
 #include "utf16.h"
 
 #if PARROT_HAS_ICU

@@ -20,6 +20,76 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 /* HEADERIZER TARGET: src/encodings/utf8.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void become_encoding( Interp *interp, STRING *src );
+static UINTVAL bytes( Interp *interp, STRING *src );
+static UINTVAL codepoints( Interp *interp, STRING *src );
+static UINTVAL get_byte( Interp *interp, const STRING *src, UINTVAL offset );
+static STRING * get_bytes( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_bytes_inplace( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *return_string );
+
+static UINTVAL get_codepoint( Interp *interp,
+    const STRING *src,
+    UINTVAL offset );
+
+static STRING * get_codepoints( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_codepoints_inplace( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *return_string );
+
+static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
+static void set_byte( Interp *interp,
+    const STRING *src,
+    UINTVAL offset,
+    UINTVAL byte );
+
+static void set_bytes( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_bytes );
+
+static void set_codepoint( Interp *interp,
+    STRING *src /*NN*/,
+    UINTVAL offset,
+    UINTVAL codepoint )
+        __attribute__nonnull__(2);
+
+static void set_codepoints( Interp *interp,
+    STRING *src,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_codepoints );
+
+static STRING * to_encoding( Interp *interp, STRING *src, STRING *dest );
+static UINTVAL utf8_characters( const utf8_t *ptr, UINTVAL byte_len );
+static UINTVAL utf8_decode( const utf8_t *ptr );
+static UINTVAL utf8_decode_and_advance( Interp *interp, String_iter *i );
+static void * utf8_encode( void *ptr, UINTVAL c );
+static void utf8_encode_and_advance( Interp *interp,
+    String_iter *i,
+    UINTVAL c );
+
+static void utf8_set_position( Interp *interp, String_iter *i, UINTVAL pos );
+static const void * utf8_skip_backward( const void *ptr, UINTVAL n );
+static const void * utf8_skip_forward( const void *ptr, UINTVAL n );
+/* HEADERIZER END: static */
+
 #define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")
 
 const char Parrot_utf8skip[256] = {

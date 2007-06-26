@@ -17,6 +17,74 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 
 /* HEADERIZER TARGET: src/encodings/fixed_8.h */
 
+/* HEADERIZER BEGIN: static */
+
+static void become_encoding( Interp *interp, STRING *source_string );
+static UINTVAL bytes( Interp *interp, STRING *source_string );
+static UINTVAL codepoints( Interp *interp, STRING *source_string );
+static UINTVAL fixed8_get_next( Interp *interp, String_iter *iter );
+static void fixed8_set_next( Interp *interp, String_iter *iter, UINTVAL c );
+static void fixed8_set_position( Interp *interp,
+    String_iter *iter,
+    UINTVAL pos );
+
+static UINTVAL get_byte( Interp *interp,
+    const STRING *source_string,
+    UINTVAL offset );
+
+static STRING * get_bytes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_bytes_inplace( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *return_string );
+
+static UINTVAL get_codepoint( Interp *interp,
+    const STRING *source_string /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(2);
+
+static STRING * get_codepoints( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count );
+
+static STRING * get_codepoints_inplace( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *dest_string );
+
+static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
+static void set_byte( Interp *interp,
+    const STRING *source_string,
+    UINTVAL offset,
+    UINTVAL byte );
+
+static void set_bytes( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_bytes );
+
+static void set_codepoint( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL codepoint );
+
+static void set_codepoints( Interp *interp,
+    STRING *source_string,
+    UINTVAL offset,
+    UINTVAL count,
+    STRING *new_codepoints );
+
+static STRING * to_encoding( Interp *interp, STRING *src, STRING *dest );
+/* HEADERIZER END: static */
+
 static UINTVAL get_codepoint(Interp *interp, const STRING *source_string, UINTVAL offset);
 static void set_codepoint(Interp *interp, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
 static UINTVAL get_byte(Interp *interp, const STRING *source_string, UINTVAL offset);
