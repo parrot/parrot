@@ -128,8 +128,8 @@ PARROT_API INTVAL Parrot_register_encoding( Interp *interp /*NN*/,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void parrot_deinit_encodings( Interp *interp );
-void parrot_init_encodings_2( Interp *interp );
+void parrot_deinit_encodings( void );
+void parrot_init_encodings_2( void );
 /* HEADERIZER END: src/encoding.c */
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \

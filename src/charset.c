@@ -80,9 +80,10 @@ PARROT_API
 void
 Parrot_charsets_encodings_deinit(Interp *interp)
 {
-    int i, n;
+    const int n = all_charsets->n_charsets;
+    int i;
+    UNUSED(interp);
 
-    n = all_charsets->n_charsets;
     for (i = 0; i < n; ++i) {
         if (all_charsets->set[i].n_converters)
             mem_sys_free(all_charsets->set[i].to_converters);
@@ -91,7 +92,7 @@ Parrot_charsets_encodings_deinit(Interp *interp)
     mem_sys_free(all_charsets->set);
     mem_sys_free(all_charsets);
     all_charsets = NULL;
-    parrot_deinit_encodings(interp);
+    parrot_deinit_encodings();
 }
 
 PARROT_API
@@ -295,7 +296,7 @@ Parrot_charsets_encodings_init(Interp *interp /*NN*/)
     /*
      * now encoding strings don't have a charset yet - set default
      */
-    parrot_init_encodings_2(interp);
+    parrot_init_encodings_2();
     /*
      * now install charset converters
      */

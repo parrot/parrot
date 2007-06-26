@@ -47,7 +47,7 @@ typedef struct All_encodings {
 static All_encodings *all_encodings;
 
 void
-parrot_init_encodings_2(Interp *interp)
+parrot_init_encodings_2(void)
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -58,7 +58,7 @@ parrot_init_encodings_2(Interp *interp)
 }
 
 void
-parrot_deinit_encodings(Interp *interp)
+parrot_deinit_encodings(void)
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -76,6 +76,8 @@ ENCODING *
 Parrot_new_encoding(Interp *interp)
     /* MALLOC, WARN_UNUSED */
 {
+    UNUSED(interp);
+
     return mem_allocate_typed(ENCODING);
 }
 
@@ -86,6 +88,7 @@ Parrot_find_encoding(Interp *interp, const char *encodingname /*NN*/)
 {
     const int n = all_encodings->n_encodings;
     int i;
+    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (strcmp(all_encodings->enc[i].encoding->name, encodingname) == 0) {
@@ -147,6 +150,7 @@ Parrot_encoding_number_of_str(Interp *interp, STRING *src /*NN*/)
 {
     const int n = all_encodings->n_encodings;
     int i;
+    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (src->encoding == all_encodings->enc[i].encoding)
@@ -160,6 +164,8 @@ STRING*
 Parrot_encoding_name(Interp *interp, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].name;
@@ -170,6 +176,8 @@ ENCODING*
 Parrot_get_encoding(Interp *interp, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding;
@@ -251,6 +259,8 @@ INTVAL
 Parrot_make_default_encoding(Interp *interp, const char *encodingname,
         ENCODING *encoding /*NN*/)
 {
+    UNUSED(interp);
+
     Parrot_default_encoding_ptr = encoding;
     return 1;
 }
@@ -259,6 +269,8 @@ PARROT_API
 ENCODING *
 Parrot_default_encoding(Interp *interp)
 {
+    UNUSED(interp);
+
     return Parrot_default_encoding_ptr;
 }
 
@@ -267,6 +279,12 @@ encoding_converter_t
 Parrot_find_encoding_converter(Interp *interp, ENCODING *lhs,
         ENCODING *rhs)
 {
+    UNUSED(interp);
+    UNUSED(lhs);
+    UNUSED(rhs);
+
+    /* XXX Apparently unwritten */
+
     return NULL;
 }
 
