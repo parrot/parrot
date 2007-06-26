@@ -29,15 +29,15 @@ BEGIN {
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
 my %policies;
-my ( $list_policies, $list_files, $all_policies, $input_policy );
-my $policy_group = "default";
+my ( $list_policies_flag, $list_files_flag, $all_policies_flag, $input_policy );
+my $policy_group = 'default';
 
-GetOptions( "list" => \$list_policies,
-            "listfiles" => \$list_files,
-            "allpolicies" => \$all_policies,
-            "policy=s" => \$input_policy,
-            "group=s" => \$policy_group,  # all, default, extra
-        );
+GetOptions(
+    'list'           => \$list_policies_flag,
+    'listfiles'      => \$list_files_flag,
+    'policy=s'       => \$input_policy,
+    'group=s'        => \$policy_group,  # all, default, extra
+);
 
 # if we we're given a policy, set it to the policies hash
 # this still doesn't implement passing options to policies though...
@@ -85,11 +85,12 @@ else {
     }
 }
 
-if ($list_files) {
+if ($list_files_flag) {
     print "Files to be tested by perlcritic:\n";
     for my $file (@files) {
         print $file, "\n";
     }
+
     exit;
 }
 
@@ -139,13 +140,13 @@ if ( !keys %policies ) {
     }
 
     # decide which policy group to use
-    if ( $policy_group eq "default" ) {
+    if ( $policy_group eq 'default' ) {
         %policies = %default_policies;
     }
-    elsif ( $policy_group eq "extra" ) {
+    elsif ( $policy_group eq 'extra' ) {
         %policies = %extra_policies;
     }
-    elsif ( $policy_group eq "all" ) {
+    elsif ( $policy_group eq 'all' ) {
         %policies = ( %default_policies, %extra_policies );
     }
     else {
@@ -153,7 +154,7 @@ if ( !keys %policies ) {
     }
 }
 
-if ($list_policies) {
+if ($list_policies_flag) {
     use Data::Dumper;
     $Data::Dumper::Indent = 1;
     $Data::Dumper::Terse = 1;
@@ -229,6 +230,12 @@ t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
 =head1 SYNOPSIS
 
  % prove t/codingstd/perlcritic.t
+
+ % perl --policy=TestingAndDebugging::RequireUseWarnings t/codingstd/perlcritic.t
+
+ % perl --group=all t/codingstd/perlcritic.t
+
+ % perl --group=extra t/codingstd/perlcritic.t
 
 =head1 DESCRIPTION
 
