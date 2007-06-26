@@ -21,7 +21,8 @@ src/pmc.c - The base vtable calling functions
 /* HEADERIZER BEGIN: static */
 
 static PMC* create_class_pmc( Interp *interp /*NN*/, INTVAL type )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
 
 static PMC* get_new_pmc_header( Interp *interp /*NN*/,
     INTVAL base_type,
@@ -190,7 +191,7 @@ get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
          *
          * - singletons are created in the constant pmc pool
          */
-        pmc = (PMC *)(vtable->get_pointer)(interp, NULL);
+        PMC *pmc = (PMC *)(vtable->get_pointer)(interp, NULL);
         /* LOCK */
         if (!pmc) {
             pmc = new_pmc_header(interp, PObj_constant_FLAG);
@@ -412,6 +413,7 @@ pmc_type_p(Interp* interp /*NN*/, PMC *name /*NN*/)
 
 static PMC*
 create_class_pmc(Interp *interp /*NN*/, INTVAL type)
+    /* WARN_UNUSED */
 {
     /*
      * class interface - a PMC is its own class
@@ -530,17 +532,12 @@ PARROT_API
 void
 dod_register_pmc(Interp* interp /*NN*/, PMC* pmc)
 {
-    PMC *registry;
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_DOD(interp);
 
-    if (!interp->DOD_registry) {
-        registry = interp->DOD_registry =
-            pmc_new(interp, enum_class_AddrRegistry);
-    }
-    else
-        registry = interp->DOD_registry;
-    VTABLE_set_pmc_keyed(interp, registry, pmc, PMCNULL);
+    if (!interp->DOD_registry)
+        interp->DOD_registry = pmc_new(interp, enum_class_AddrRegistry);
+    VTABLE_set_pmc_keyed(interp, interp->DOD_registry, pmc, PMCNULL);
     Parrot_unblock_DOD(interp);
 
 }
