@@ -572,6 +572,8 @@ Parrot_byte_index(Interp *interp, const STRING *base /*NN*/,
     const INTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
 
+    UNUSED(interp);
+
     for (current_offset = start_offset; current_offset <= max_possible_offset;
             current_offset++) {
         const char * const base_start = (char *)base->strstart + current_offset;
