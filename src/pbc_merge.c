@@ -570,9 +570,11 @@ pbc_merge_ctpointers(Interp *interp, pbc_merge_input **inputs,
     int        cur_input = 0;
     int        cur_arg;
 
+    UNUSED(pf);
+    UNUSED(ct);
+
     /* Loop over the ops in the merged bytecode. */
-    while (cur_op < (opcode_t)bc->base.size)
-    {
+    while (cur_op < (opcode_t)bc->base.size) {
         /* Keep track of the current input file. */
         if (cur_input + 1 < num_inputs &&
             cur_op >= inputs[cur_input + 1]->code_start)
