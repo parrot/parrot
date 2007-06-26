@@ -381,7 +381,7 @@ headerizer.pl
 
 =head1 SYNOPSIS
 
-  $ tools/build/headerize.pl [object files]
+  $ tools/build/headerizer.pl [object files]
 
 Generates C function declarations based on the function definitions in
 the C source code.
