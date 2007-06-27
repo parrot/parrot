@@ -29,20 +29,27 @@ BEGIN {
 my $perl_tidy_conf = 'tools/util/perltidy.conf';
 
 my %policies;
-my ( $list_policies_flag, $list_files_flag, $all_policies_flag, $input_policy );
+my ( $list_policies_flag, $list_files_flag, @input_policies );
 my $policy_group = 'default';
 
 GetOptions(
     'list'           => \$list_policies_flag,
     'listfiles'      => \$list_files_flag,
-    'policy=s'       => \$input_policy,
+    'policy=s'       => \@input_policies,
     'group=s'        => \$policy_group,  # all, default, extra
 );
 
-# if we we're given a policy, set it to the policies hash
+# if we we're given a policy (or policies), set it to the policies hash
 # this still doesn't implement passing options to policies though...
-if ( $input_policy ) {
-    $policies{$input_policy} = 1;
+# i.e. need to be able to handle --policy=foo=>{'bar'=>baz}
+if ( @input_policies ) {
+    foreach my $input_policy ( @input_policies ) {
+        # now split on commas if that's been used as well
+        my @sub_policies = split(/,/, $input_policy);
+        foreach my $sub_policy ( @sub_policies ) {
+            $policies{$sub_policy} = 1;
+        }
+    }
 }
 
 # get the files to check
@@ -253,6 +260,14 @@ command line before any other files, as:
 This will, for example, use B<only> that policy (see L<Perl::Critic> for
 more information on policies) when examining files from the manifest.
 
+Multiple policies can be specified either by separating the individual
+policies with a comma:
+
+ --policy=foo,bar
+
+and/or by specifying the C<--policy> argument multiple times on the command
+line.
+
 If you just wish to get a listing of the polices that will be checked
 without actually running them, use:
 
@@ -262,6 +277,11 @@ If you just wish to get a listing of the files that will be checked
 without actually running the tests, use:
 
  perl t/codingstd/perlcritic.t --listfiles
+
+Not all policies are analysed by default.  To process the extra policies,
+use the C<--group=extra> argument.  To process all policies use:
+
+ perl t/codingstd/perlcritic.t --group=all
 
 =head1 BUGS AND LIMITATIONS
 
