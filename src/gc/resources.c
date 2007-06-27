@@ -47,8 +47,9 @@ static void * alloc_new_block( Interp *interp,
     const char *why );
 
 static const char* buffer_location( Interp *interp, const PObj *b );
-static void compact_pool( Interp *interp /*NN*/, Memory_Pool *pool /*(NN*/ )
-        __attribute__nonnull__(1);
+static void compact_pool( Interp *interp /*NN*/, Memory_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void debug_print_buf( Interp *interp, const PObj *b /*NN*/ )
         __attribute__nonnull__(2);
@@ -260,7 +261,7 @@ Compact the buffer pool.
 */
 
 static void
-compact_pool(Interp *interp /*NN*/, Memory_Pool *pool /*(NN*/)
+compact_pool(Interp *interp /*NN*/, Memory_Pool *pool /*NN*/)
 {
     INTVAL        j;
     UINTVAL       object_size;
