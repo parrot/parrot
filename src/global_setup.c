@@ -48,6 +48,7 @@ will be used in subsequently created Interpreters
 
 */
 
+PARROT_API
 void
 Parrot_set_config_hash_internal(const unsigned char* parrot_config /*NN*/,
                                  unsigned int parrot_config_size)

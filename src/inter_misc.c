@@ -39,6 +39,7 @@ class C<type>.
 */
 void Parrot_NCI_nci_make_raw_nci(Interp *interp, PMC *method, void *func);
 
+PARROT_API
 void
 register_nci_method(Parrot_Interp interp, const int type, void *func,
                     const char *name, const char *proto)
@@ -65,6 +66,7 @@ register_nci_method(Parrot_Interp interp, const int type, void *func,
             method_name, method);
 }
 
+PARROT_API
 void
 register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func,
         const char *name)
@@ -100,7 +102,9 @@ Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
 */
 
-void Parrot_mark_method_writes(Parrot_Interp interp,
+PARROT_API
+void
+Parrot_mark_method_writes(Parrot_Interp interp,
                                int type, const char *name) {
     STRING *const str_name = const_string(interp, name);
     PMC *const pmc_true = pmc_new(interp, enum_class_Integer);
@@ -113,17 +117,15 @@ void Parrot_mark_method_writes(Parrot_Interp interp,
 
 /*
 
-=item C<void
-Parrot_compreg(Parrot_Interp interp, STRING *type,
-               Parrot_compiler_func_t func);>
+FUNCDOC: Parrot_compreg
 
 Register a parser/compiler function.
 
-=cut
-
 */
 
-void Parrot_compreg(Parrot_Interp interp, STRING *type,
+PARROT_API
+void
+Parrot_compreg(Parrot_Interp interp, STRING *type,
                     Parrot_compiler_func_t func)
 {
     PMC *hash, *nci;
@@ -147,16 +149,13 @@ void Parrot_compreg(Parrot_Interp interp, STRING *type,
 
 /*
 
-=item C<PMC *
-Parrot_compile_string(Parrot_Interp interp, STRING *type,
-                      char *code, STRING **error)>
+FUNCDOC: Parrot_compile_string
 
 Compile code string.
 
-=cut
-
 */
 
+PARROT_API
 PMC *
 Parrot_compile_string(Parrot_Interp interp, STRING *type,
                       char *code, STRING **error)
@@ -177,16 +176,13 @@ Parrot_compile_string(Parrot_Interp interp, STRING *type,
 
 /*
 
-=item C<void
-Parrot_compile_file(Parrot_Interp interp, const char *fullname,
-                    STRING **error)>
+FUNCDOC: Parrot_compile_file
 
 Compile code file.
 
-=cut
-
 */
 
+PARROT_API
 void *
 Parrot_compile_file(Parrot_Interp interp, char *fullname,
                     STRING **error)
@@ -228,8 +224,9 @@ interpreter.
 
 */
 
+PARROT_API
 INTVAL
-interpinfo(Interp *interp, INTVAL what)
+interpinfo(Interp *interp /*NN*/, INTVAL what)
 {
     INTVAL ret = 0;
     int j;
@@ -301,6 +298,7 @@ interpinfo(Interp *interp, INTVAL what)
     return ret;
 }
 
+PARROT_API
 PMC*
 interpinfo_p(Interp *interp, INTVAL what)
 {
@@ -326,6 +324,7 @@ interpinfo_p(Interp *interp, INTVAL what)
     return PMCNULL;
 }
 
+PARROT_API
 STRING*
 interpinfo_s(Interp *interp, INTVAL what)
 {

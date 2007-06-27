@@ -87,6 +87,7 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 
 void Parrot_really_destroy(Interp *, int exit_code, void *);
 
+PARROT_API
 Parrot_Interp
 make_interpreter(Interp *parent /*NULLOK*/, INTVAL flags)
 {

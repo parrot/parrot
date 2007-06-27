@@ -42,6 +42,7 @@ Create a callback function according to pdd16.
 
 */
 
+PARROT_API
 PMC*
 Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
         STRING *cb_signature)
@@ -348,12 +349,14 @@ NCI callback functions. See pdd16.
 
 */
 
+PARROT_API
 void
 Parrot_callback_C(char *external_data, PMC *user_data)
 {
     verify_CD(external_data, user_data);
 }
 
+PARROT_API
 void
 Parrot_callback_D(PMC *user_data, char *external_data)
 {

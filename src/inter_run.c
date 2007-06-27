@@ -124,6 +124,7 @@ is an invocable C<Sub> PMC.
 
 */
 
+PARROT_API
 parrot_context_t *
 Parrot_runops_fromc(Interp *interp /*NN*/, PMC *sub)
 {
@@ -275,6 +276,7 @@ didn't return properly.
 
 */
 
+PARROT_API
 void *
 Parrot_run_meth_fromc(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth)
@@ -293,6 +295,7 @@ Parrot_run_meth_fromc(Parrot_Interp interp,
     return set_retval(interp, 0, ctx);
 }
 
+PARROT_API
 PMC *
 Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)
@@ -306,6 +309,7 @@ Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
     return (PMC *)set_retval(interp, *sig, ctx);
 }
 
+PARROT_API
 void *
 Parrot_runops_fromc_args_event(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)
@@ -337,6 +341,7 @@ Parrot_runops_fromc_args_event(Parrot_Interp interp, PMC *sub,
     return retval;
 }
 
+PARROT_API
 INTVAL
 Parrot_runops_fromc_args_reti(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)
@@ -350,6 +355,7 @@ Parrot_runops_fromc_args_reti(Parrot_Interp interp, PMC *sub,
     return set_retval_i(interp, *sig, ctx);
 }
 
+PARROT_API
 FLOATVAL
 Parrot_runops_fromc_args_retf(Parrot_Interp interp, PMC *sub,
         const char *sig, ...)
@@ -363,6 +369,7 @@ Parrot_runops_fromc_args_retf(Parrot_Interp interp, PMC *sub,
     return set_retval_f(interp, *sig, ctx);
 }
 
+PARROT_API
 void*
 Parrot_run_meth_fromc_args(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
@@ -376,6 +383,7 @@ Parrot_run_meth_fromc_args(Parrot_Interp interp,
     return set_retval(interp, *sig, ctx);
 }
 
+PARROT_API
 INTVAL
 Parrot_run_meth_fromc_args_reti(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
@@ -389,6 +397,7 @@ Parrot_run_meth_fromc_args_reti(Parrot_Interp interp,
     return set_retval_i(interp, *sig, ctx);
 }
 
+PARROT_API
 FLOATVAL
 Parrot_run_meth_fromc_args_retf(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, ...)
@@ -402,6 +411,7 @@ Parrot_run_meth_fromc_args_retf(Parrot_Interp interp,
     return set_retval_f(interp, *sig, ctx);
 }
 
+PARROT_API
 void *
 Parrot_runops_fromc_arglist(Parrot_Interp interp, PMC *sub,
         const char *sig, va_list args)
@@ -412,6 +422,7 @@ Parrot_runops_fromc_arglist(Parrot_Interp interp, PMC *sub,
     return set_retval(interp, *sig, ctx);
 }
 
+PARROT_API
 INTVAL
 Parrot_runops_fromc_arglist_reti(Parrot_Interp interp, PMC *sub,
         const char *sig, va_list args)
@@ -422,6 +433,7 @@ Parrot_runops_fromc_arglist_reti(Parrot_Interp interp, PMC *sub,
     return set_retval_i(interp, *sig, ctx);
 }
 
+PARROT_API
 FLOATVAL
 Parrot_runops_fromc_arglist_retf(Parrot_Interp interp, PMC *sub,
         const char *sig, va_list args)
@@ -432,6 +444,7 @@ Parrot_runops_fromc_arglist_retf(Parrot_Interp interp, PMC *sub,
     return set_retval_f(interp, *sig, ctx);
 }
 
+PARROT_API
 void*
 Parrot_run_meth_fromc_arglist(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
@@ -442,6 +455,7 @@ Parrot_run_meth_fromc_arglist(Parrot_Interp interp,
     return set_retval(interp, *sig, ctx);
 }
 
+PARROT_API
 INTVAL
 Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
@@ -452,6 +466,7 @@ Parrot_run_meth_fromc_arglist_reti(Parrot_Interp interp,
     return set_retval_i(interp, *sig, ctx);
 }
 
+PARROT_API
 FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interp,
         PMC *sub, PMC *obj, STRING *meth, const char *sig, va_list args)
