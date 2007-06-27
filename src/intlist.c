@@ -298,6 +298,10 @@ intlist_dump(FILE *fp, IntList *list /*NN*/, int verbose)
 {
 #ifdef LIST_DEBUG
     list_dump(fp, (List *)list, verbose);
+#else
+    UNUSED(fp);
+    UNUSED(list);
+    UNUSED(verbose);
 #endif
 }
 
