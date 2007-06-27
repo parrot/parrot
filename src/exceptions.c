@@ -397,9 +397,10 @@ opcode_t *
 throw_exception(Interp *interp /*NN*/, PMC *exception, void *dest)
 {
     opcode_t *address;
+    PMC * const handler = find_exception_handler(interp, exception);
+
     UNUSED(dest);
 
-    PMC * const handler = find_exception_handler(interp, exception);
     if (!handler)
         return NULL;
     /* put the handler aka continuation ctx in the interpreter */
