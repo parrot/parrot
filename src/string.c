@@ -167,8 +167,10 @@ using the one passed in and returns it.
 
 PARROT_API
 STRING*
-Parrot_reuse_COW_reference(Interp *interp /*NULLOK*/, STRING *s /*NULLOK*/, STRING *d /*NN*/)
+Parrot_reuse_COW_reference(Interp *interp, STRING *s /*NULLOK*/, STRING *d /*NN*/)
 {
+    UNUSED(interp);
+
     if (s == NULL) {
         return NULL;
     }
@@ -295,9 +297,11 @@ is how many bytes can be appended onto strstart.
 
 PARROT_API
 UINTVAL
-string_capacity(Interp *interp /*NULLOK*/, const STRING *s /*NN*/)
-    /*PURE,WARN_UNUSED*/
+string_capacity(Interp *interp, const STRING *s /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
+    UNUSED(interp);
+
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
 }
@@ -352,6 +356,8 @@ string_rep_compatible(Interp *interp,
                        const STRING *b /*NN*/,
                        ENCODING **e /*NN*/)
 {
+    UNUSED(interp);
+
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
         return a->charset;
@@ -673,6 +679,8 @@ UINTVAL
 string_length(Interp *interp, const STRING *s /*NULLOK*/)
     /*PURE,WARN_UNUSED*/
 {
+    UNUSED(interp);
+
     return s ? s->strlen : 0;
 }
 
@@ -843,6 +851,8 @@ PARROT_API
 INTVAL
 string_max_bytes(Interp *interp, const STRING *s /*NN*/, INTVAL nchars)
 {
+    UNUSED(interp);
+
     assert(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
 }
@@ -1755,8 +1765,9 @@ PARROT_API
 INTVAL
 string_to_int(Interp *interp, const STRING *s /*NULLOK*/)
 {
-#if 1
     INTVAL i = 0;
+
+    UNUSED(interp);
 
     if (s) {
         const char *start = s->strstart;
@@ -1794,9 +1805,6 @@ string_to_int(Interp *interp, const STRING *s /*NULLOK*/)
     }
 
     return i;
-#else
-    return (INTVAL) string_to_num(interp, s);
-#endif
 }
 
 /*
@@ -1887,6 +1895,8 @@ string_to_cstring(Interp *interp, const STRING *s /* NULLOK */)
     /* MALLOC, WARN_UNUSED */
 {
     char *p;
+    UNUSED(interp);
+
     /*
      * TODO always provide a NUL at end of strings
      *      ICU needs this too for a lot of string functions
@@ -2356,7 +2366,7 @@ string_titlecase_inplace(Interp *interp, STRING *s /*NULLOK*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: string_increment
 Perl5ish increment the string. Currently single char only.
 
 */
@@ -2383,7 +2393,7 @@ string_increment(Interp *interp /*NN*/, const STRING *s /*NULLOK*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_string_cstring
 Returns a C string from a Parrot string.  Both sides are treated
 as constants -- i.e. do not resize the result.
 
@@ -2394,6 +2404,8 @@ const char *
 Parrot_string_cstring(Interp *interp, const STRING *str /*NN*/)
     /* PURE, WARN_UNUSED */
 {
+    UNUSED(interp);
+
     /* TODO handle NUL and friends */
     return str->strstart;
 }
@@ -2401,7 +2413,7 @@ Parrot_string_cstring(Interp *interp, const STRING *str /*NN*/)
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_string_is_cclass
 Returns 1 if the codepoint of string C<s> at given offset is in the given
 character class C<flags>. See also F<include/parrot/cclass.h> for possible
 character classes. Returns 0 otherwise, or if the string is empty or NULL.

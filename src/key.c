@@ -139,6 +139,8 @@ PARROT_API
 void
 key_set_integer(Interp *interp, PMC *key /*NN*/, INTVAL value)
 {
+    UNUSED(interp);
+
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
     PMC_int_val(key) = value;
@@ -158,6 +160,8 @@ void
 key_set_register(Interp *interp, PMC *key /*NN*/, INTVAL value,
                  INTVAL flag)
 {
+    UNUSED(interp);
+
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
     PMC_int_val(key) = value;
@@ -176,6 +180,8 @@ PARROT_API
 void
 key_set_number(Interp *interp, PMC *key /*NN*/, FLOATVAL value)
 {
+    UNUSED(interp);
+
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
     PMC_num_val(key) = value;
@@ -194,6 +200,8 @@ PARROT_API
 void
 key_set_string(Interp *interp, PMC *key /*NN*/, STRING *value)
 {
+    UNUSED(interp);
+
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
     PMC_str_val(key) = value;
@@ -212,6 +220,8 @@ PARROT_API
 void
 key_set_pmc(Interp *interp, PMC *key /*NN*/, PMC *value)
 {
+    UNUSED(interp);
+
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     /*
@@ -235,6 +245,8 @@ PARROT_API
 INTVAL
 key_type(Interp *interp, const PMC *key /*NN*/)
 {
+    UNUSED(interp);
+
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
 
@@ -345,6 +357,8 @@ PARROT_API
 PMC *
 key_next(Interp *interp, PMC *key /*NN*/)
 {
+    UNUSED(interp);
+
     if (!key->pmc_ext)
         return NULL;
     return (PMC *)PMC_data(key);
@@ -367,6 +381,7 @@ PMC *
 key_append(Interp *interp, PMC *key1 /*NN*/, PMC *key2 /*NN*/)
 {
     PMC *tail = key1;
+    UNUSED(interp);
 
     while (PMC_data(tail)) {
         tail = (PMC *)PMC_data(tail);
@@ -461,8 +476,6 @@ F<include/parrot/key.h>.
 =head1 HISTORY
 
 Initial version by Jeff G. on 2001.12.05.
-
-=cut
 
 */
 

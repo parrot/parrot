@@ -499,6 +499,8 @@ Parrot_find_name_op(Interp *interp /*NN*/, STRING *name, void *next)
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
     PMC *g, *lex_pad;
 
+    UNUSED(next);
+
     g = PMCNULL;
 
     lex_pad = Parrot_find_pad(interp, name, ctx);
@@ -527,8 +529,8 @@ Parrot_find_name_op(Interp *interp /*NN*/, STRING *name, void *next)
 static PMC *
 get_namespace_pmc(Parrot_Interp interp, PMC *sub)
 {
-    PMC *nsname = PMC_sub(sub)->namespace_name;
-    PMC *nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
+    PMC * const nsname = PMC_sub(sub)->namespace_name;
+    PMC * const nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
 
     /* If we have a NULL, return the HLL namespace */
     if (PMC_IS_NULL(nsname))

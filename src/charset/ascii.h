@@ -62,13 +62,17 @@ STRING * ascii_get_graphemes_inplace( Interp *interp,
     STRING *dest_string )
         __attribute__warn_unused_result__;
 
-STRING * charset_cvt_ascii_to_binary( Interp *interp,
-    STRING *src,
-    STRING *dest );
+STRING * charset_cvt_ascii_to_binary( Interp *interp /*NN*/,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-STRING * charset_cvt_ascii_to_iso_8859_1( Interp *interp,
-    STRING *src,
-    STRING *dest );
+STRING * charset_cvt_ascii_to_iso_8859_1( Interp *interp /*NN*/,
+    STRING *src /*NN*/,
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 INTVAL mixed_cs_index( Interp *interp,
     STRING *src /*NN*/,
