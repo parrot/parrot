@@ -419,7 +419,7 @@ op instantiate(out PMC) {
           _class = REG_PMC(arg_op[2]);
           break;
       default:
-          internal_exception(UNIMPLEMENTED,
+          real_exception(interp, NULL, UNIMPLEMENTED,
                   "uninplement class argument in instantiate");
           _class = NULL; /* just for cc */
           break;

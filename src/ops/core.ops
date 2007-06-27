@@ -188,7 +188,7 @@ inline op branch_cs (in STR) :base_loop,check_event {
     PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interp,
             enum_fixup_label, label);
     if (!fe)
-        internal_exception(1, "branch_cs: fixup for '%s' not found", label);
+        real_exception(interp, NULL, 1, "branch_cs: fixup for '%s' not found", label);
     else {
         interp->resume_offset = fe->offset;
         Parrot_switch_to_cs(interp, fe->seg, 1);

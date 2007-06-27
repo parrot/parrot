@@ -436,7 +436,7 @@ errors settings. See B<errorson>.
 
 op find_name(out PMC, in STR) {
     if (!$2)
-        internal_exception(1, "Tried to find null name");
+        real_exception(interp, NULL, 1, "Tried to find null name");
 
     $1 = Parrot_find_name_op(interp, $2, expr NEXT());
     goto NEXT();
