@@ -88,7 +88,7 @@ Creates and returns a copy of the array.
 
     PMC* clone() {
         INTVAL size;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         if (!PMC_data(SELF))
             return dest;
@@ -138,7 +138,7 @@ size set by C<set_integer_native>.
 
 */
     INTVAL get_bool() {
-        INTVAL size = SELF.elements();
+        const INTVAL size = SELF.elements();
         return (INTVAL)(size != 0);
     }
 
@@ -182,7 +182,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
+        PMC * const tempPMC = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_integer(INTERP, tempPMC);
     }
 
@@ -198,7 +198,7 @@ Returns the integer value of the element at index C<*key>.
 
     INTVAL get_integer_keyed(PMC* key) {
         /* simple int keys only */
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_integer_keyed_int(k);
     }
 
@@ -229,7 +229,7 @@ Returns the floating-point value of the element at index C<*key>.
 */
 
     FLOATVAL get_number_keyed(PMC* key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_number_keyed_int(k);
     }
 
@@ -264,7 +264,7 @@ Returns the Parrot string value of the element at index C<*key>.
 */
 
     STRING* get_string_keyed(PMC* key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_string_keyed_int(k);
     }
 
@@ -280,11 +280,9 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        PMC *ret;
-        STRING *val;
+        PMC * const ret = pmc_new(INTERP, enum_class_String);
+        STRING * const val = DYNSELF.get_string_keyed_int(key);
 
-        ret = pmc_new(INTERP, enum_class_String);
-        val = DYNSELF.get_string_keyed_int(key);
         VTABLE_set_string_native(INTERP, ret, val);
         return ret;
     }
@@ -300,7 +298,7 @@ Returns the PMC value of the element at index C<*key>.
 */
 
     PMC* get_pmc_keyed(PMC* key) {
-        INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_pmc_keyed_int(k);
     }
 
@@ -336,10 +334,9 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC *ret;
+        PMC * const ret = pmc_new(INTERP, enum_class_String);
         STRING *val;
 
-        ret = pmc_new(INTERP, enum_class_String);
         VTABLE_set_integer_native(INTERP, ret, value);
         val = VTABLE_get_string(INTERP, ret);
         DYNSELF.set_string_keyed_int(key, val);
@@ -356,8 +353,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed(PMC *key, INTVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_integer_keyed_int(k, value);
     }
 
@@ -373,10 +369,9 @@ C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC *ret;
+        PMC * const ret = pmc_new(INTERP, enum_class_String);
         STRING *val;
 
-        ret = pmc_new(INTERP, enum_class_String);
         VTABLE_set_number_native(INTERP, ret, value);
         val = VTABLE_get_string(INTERP, ret);
         DYNSELF.set_string_keyed_int(key, val);
@@ -394,8 +389,7 @@ C<value>.
 */
 
     void set_number_keyed(PMC *key, FLOATVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
 
@@ -432,8 +426,7 @@ C<value>.
 */
 
     void set_string_keyed(PMC *key, STRING* value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_string_keyed_int(k, value);
     }
 
@@ -448,9 +441,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC* src) {
-        STRING *temp;
-
-        temp = VTABLE_get_string(INTERP, src);
+        STRING * const temp = VTABLE_get_string(INTERP, src);
         DYNSELF.set_string_keyed_int(key, temp);
     }
 
@@ -466,8 +457,7 @@ C<value>.
 */
 
     void set_pmc_keyed(PMC *key, PMC* value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        const INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
@@ -487,12 +477,11 @@ Used to archive the string.
 
 */
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        INTVAL i, n;
-        STRING **data;
+        IMAGE_IO * const io = info->image_io;
+        STRING ** const data = (STRING**)PMC_data(SELF);
+        const INTVAL n = PMC_int_val(SELF);
+        INTVAL i;
 
-        data = (STRING**)PMC_data(SELF);
-        n = PMC_int_val(SELF);
         io->vtable->push_integer(INTERP, io, n);
         for (i = 0; i < n; ++i) {
             io->vtable->push_string(INTERP, io, data[i]);
@@ -509,12 +498,13 @@ Used to unarchive the string.
 
 */
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        INTVAL i, n;
-        STRING **data;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL i, n;
+            STRING **data;
+
             DYNSELF.init();
 
             n    = io->vtable->shift_integer(INTERP, io);
