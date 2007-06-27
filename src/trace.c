@@ -25,8 +25,9 @@ src/test_main.c
 
 /* HEADERIZER BEGIN: static */
 
-static STRING* trace_class_name( Interp *interp, PMC* pmc /*NN*/ )
-        __attribute__nonnull__(2);
+static STRING* trace_class_name( const PMC* pmc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
 
 /* HEADERIZER END: static */
 
@@ -40,7 +41,8 @@ Prints a PMC to C<stderr>.
 */
 
 static STRING*
-trace_class_name(Interp *interp, PMC* pmc /*NN*/)
+trace_class_name(const PMC* pmc /*NN*/)
+    /* WARN_UNUSED */
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {
@@ -55,7 +57,7 @@ trace_class_name(Interp *interp, PMC* pmc /*NN*/)
 }
 
 void
-trace_pmc_dump(Interp *interp /*NN*/, PMC* pmc /*NN*/)
+trace_pmc_dump(Interp *interp /*NN*/, PMC *pmc /*NN*/)
 {
     Interp * const debugger = interp->debugger;
 
@@ -75,7 +77,7 @@ trace_pmc_dump(Interp *interp /*NN*/, PMC* pmc /*NN*/)
         PIO_eprintf(debugger, "**************** PMC is on free list *****\n");
     }
     if (pmc->vtable->pmc_class == pmc) {
-        STRING * const name = trace_class_name(interp, pmc);
+        STRING * const name = trace_class_name(pmc);
         PIO_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_String) {
@@ -104,12 +106,12 @@ trace_pmc_dump(Interp *interp /*NN*/, PMC* pmc /*NN*/)
                 pmc, PMC_int_val(pmc));
     }
     else if (pmc->vtable->base_type == enum_class_BigInt) {
-        STRING *s = VTABLE_get_string(interp, pmc);
+        STRING * const s = VTABLE_get_string(interp, pmc);
         PIO_eprintf(debugger, "BigInt=PMC(%#p: %Ss)",
                 pmc, s);
     }
     else if (pmc->vtable->base_type == enum_class_Complex) {
-        STRING *s = VTABLE_get_string(interp, pmc);
+        STRING * const s = VTABLE_get_string(interp, pmc);
         PIO_eprintf(debugger, "Complex=PMC(%#p: %Ss)",
                 pmc, s);
     }
@@ -220,7 +222,7 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(Interp *interp /*NN*/, const opcode_t *code_start, const opcode_t *pc /*NN*/)
+trace_op_dump(Interp *interp /*NN*/, const opcode_t *code_start /*NN*/, const opcode_t *pc /*NN*/)
 {
     INTVAL s, n;
     int more = 0, var_args;
@@ -418,8 +420,8 @@ checking.
 */
 
 void
-trace_op(Interp *interp, const opcode_t *code_start,
-         const opcode_t *code_end, const opcode_t *pc /*NULLOK*/)
+trace_op(Interp *interp, const opcode_t *code_start /*NN*/,
+         const opcode_t *code_end /*NN*/, const opcode_t *pc /*NULLOK*/)
 {
     if (!pc) {
         return;

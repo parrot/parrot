@@ -152,8 +152,15 @@ PARROT_API PMC * Parrot_single_subclass( Interp *interp,
 PARROT_API STRING* readable_name( Interp *interp, PMC *name /*NN*/ )
         __attribute__nonnull__(2);
 
-void destroy_object_cache( Interp *interp );
-void mark_object_cache( Interp *interp );
+void destroy_object_cache( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void init_object_cache( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+void mark_object_cache( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PMC * Parrot_class_lookup_p( Interp *interp, PMC *class_name );
 /* HEADERIZER END: src/objects.c */
 

@@ -29,10 +29,11 @@ static INTVAL attr_str_2_num( Interp *interp, PMC *object, STRING *attr );
 static PMC* C3_merge( Interp *interp, PMC *merge_list );
 static PMC* class_mro_merge( Interp *interp, PMC *seqs );
 static PMC* create_class_mro( Interp *interp, PMC *_class );
-static void create_deleg_pmc_vtable( Interp *interp,
-    PMC *_class,
-    PMC *class_name,
-    int full );
+static void create_deleg_pmc_vtable( Interp *interp /*NN*/,
+    PMC *_class /*NN*/,
+    int full )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void debug_trace_find_meth( Interp *interp,
     PMC *_class,
@@ -319,7 +320,7 @@ on the existence of the method for this class.
 */
 
 static void
-create_deleg_pmc_vtable(Interp *interp, PMC *_class, PMC *class_name, int full)
+create_deleg_pmc_vtable(Interp *interp /*NN*/, PMC *_class /*NN*/, int full)
 {
     int         i;
     const char *meth;
@@ -503,7 +504,7 @@ Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name /*NULLOK*/)
          * then create a vtable derived from ParrotObject and
          * deleg_pmc - the ParrotObject vtable is already built
          */
-        create_deleg_pmc_vtable(interp, child_class, name, 1);
+        create_deleg_pmc_vtable(interp, child_class, 1);
     }
     else {
         /*
@@ -524,7 +525,7 @@ Parrot_single_subclass(Interp *interp, PMC *base_class, PMC *name /*NULLOK*/)
             }
         }
         if (any_pmc_parent)
-            create_deleg_pmc_vtable(interp, child_class, name, 0);
+            create_deleg_pmc_vtable(interp, child_class, 0);
     }
 
     return child_class;
@@ -1101,7 +1102,7 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
         VTABLE_set_string_native(interp, class_name,
             VTABLE_name(interp, _class));
 
-        create_deleg_pmc_vtable(interp, _class, class_name, 1);
+        create_deleg_pmc_vtable(interp, _class, 1);
     }
     else if (!PObj_is_class_TEST(parent)) {
         internal_exception(1, "Parent isn't a ParrotClass");
@@ -1124,7 +1125,12 @@ This currently does nothing but return C<PMCNULL>.
 
 PARROT_API
 PMC *
-Parrot_remove_parent(Interp *interp, PMC *removed_class, PMC *existing_class) {
+Parrot_remove_parent(Interp *interp, PMC *removed_class, PMC *existing_class)
+{
+    UNUSED(interp);
+    UNUSED(removed_class);
+    UNUSED(existing_class);
+
     return PMCNULL;
 }
 
@@ -1138,7 +1144,8 @@ This currently does nothing but return C<PMCNULL>.
 PARROT_API
 PMC *
 Parrot_multi_subclass(Interp *interp, PMC *base_class_array,
-    STRING *child_class_name) {
+    STRING *child_class_name)
+{
     return PMCNULL;
 }
 
@@ -1182,24 +1189,30 @@ Currently it does nothing but return C<PMCNULL>.
 
 PARROT_API
 PMC *
-Parrot_new_method_cache(Interp *interp) {
+Parrot_new_method_cache(Interp *interp)
+{
+    UNUSED(interp);
+
     return PMCNULL;
 }
 
 static PMC* find_method_direct_1(Interp*, PMC *, STRING*);
 
 void
-mark_object_cache(Interp *interp) {
+mark_object_cache(Interp *interp /*NN*/)
+{
+    UNUSED(interp);
 }
 
 void
-init_object_cache(Interp *interp) {
+init_object_cache(Interp *interp /*NN*/)
+{
     Caches * const mc = interp->caches = mem_allocate_zeroed_typed(Caches);
     mc->idx = NULL;
 }
 
 void
-destroy_object_cache(Interp *interp)
+destroy_object_cache(Interp *interp /*NN*/)
 {
     UINTVAL i;
     Caches * const mc = interp->caches;
@@ -1715,6 +1728,10 @@ PMC *
 Parrot_find_class_constructor(Interp *interp, STRING *_class,
                                    INTVAL classtoken)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+
     return PMCNULL;
 }
 
@@ -1723,6 +1740,10 @@ PMC *
 Parrot_find_class_destructor(Interp *interp, STRING *_class,
                                   INTVAL classtoken)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+
     return PMCNULL;
 }
 
@@ -1731,6 +1752,10 @@ PMC *
 Parrot_find_class_fallback(Interp *interp, STRING *_class,
                                 INTVAL classtoken)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+
     return PMCNULL;
 }
 
@@ -1739,6 +1764,10 @@ void
 Parrot_set_class_constructor(Interp *interp, STRING *_class,
                                   INTVAL classtoken, STRING *method)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+    UNUSED(method);
 }
 
 PARROT_API
@@ -1746,6 +1775,10 @@ void
 Parrot_set_class_destructor(Interp *interp, STRING *_class,
                                  INTVAL classtoken, STRING *method)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+    UNUSED(method);
 }
 
 PARROT_API
@@ -1753,6 +1786,10 @@ void
 Parrot_set_class_fallback(Interp *interp, STRING *_class,
                                INTVAL classtoken, STRING *method)
 {
+    UNUSED(interp);
+    UNUSED(_class);
+    UNUSED(classtoken);
+    UNUSED(method);
 }
 
 
