@@ -12,10 +12,6 @@ Various functions that call the run loop.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 
@@ -23,24 +19,33 @@ Various functions that call the run loop.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER TARGET: include/parrot/interpreter.h */
 
-/*
+/* HEADERIZER BEGIN: static */
 
-=item C<void
-runops(Interp *interp, size_t offset)>
+static parrot_context_t * runops_args(
+    Parrot_Interp interp,
+    PMC *sub,
+    PMC *obj,
+    STRING *meth,
+    const char* sig,
+    va_list ap );
 
-Run parrot ops. Set exception handler and/or resume after exception.
-
-=cut
-
-*/
+/* HEADERIZER END: static */
 
 #define STACKED_EXCEPTIONS 1
 /* #define RUNLOOP_TRACE 1 */
 
 static int
 runloop_id_counter = 0;          /* for synthesizing runloop ids. */
+
+/*
+
+FUNCDOC: runops
+
+Run parrot ops. Set exception handler and/or resume after exception.
+
+*/
 
 void
 runops(Interp *interp /*NN*/, size_t offs)
@@ -113,14 +118,11 @@ runops(Interp *interp /*NN*/, size_t offs)
 
 /*
 
-=item C<parrot_context_t *
-Parrot_runops_fromc(Parrot_Interp interp, PMC *sub)>
+FUNCDOC: Parrot_runops_fromc
 
 Runs the Parrot ops, called from C code. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
 is an invocable C<Sub> PMC.
-
-=cut
 
 */
 
@@ -207,8 +209,7 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
 
 /*
 
-=item C<void *
-Parrot_run_meth_fromc(Parrot_Interp, PMC *sub, PMC *obj, STRING *meth)>
+FUNCDOC: Parrot_run_meth_fromc
 
 Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -216,41 +217,23 @@ is an invocable C<Sub> PMC.
 
 If registers a PMC return values, it is returned.
 
-=cut
+=over 4
 
-*/
+=item Parrot_runops_fromc_args
 
+=item Parrot_runops_fromc_args_reti
 
+=item Parrot_runops_fromc_args_retf
 
-/*
+=item Parrot_runops_fromc_arglist
 
-=item C<PMC *
-Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
-        const char *sig, ...)>
+=item Parrot_run_meth_fromc_args
 
-=item C<INTVAL
-Parrot_runops_fromc_args_reti(Parrot_Interp interp, PMC *sub,
-        const char *sig, ...)>
+=item Parrot_run_meth_fromc_args_reti
 
-=item C<FLOATVAL
-Parrot_runops_fromc_args_retf(Parrot_Interp interp, PMC *sub,
-        const char *sig, ...)>
+=item Parrot_run_meth_fromc_args_retf
 
-=item C<void *
-Parrot_runops_fromc_arglist(Parrot_Interp interp, PMC *sub,
-        const char *sig, va_list args)>
-
-=item C<void *
-Parrot_run_meth_fromc_args(Parrot_Interp interp, PMC *sub,
-        PMC* obj, STRING* meth, const char *sig, ...)>
-
-=item C<INTVAL
-Parrot_run_meth_fromc_args_reti(Parrot_Interp interp, PMC *sub,
-        PMC* obj, STRING* meth, const char *sig, ...)>
-
-=item C<FLOATVAL
-Parrot_run_meth_fromc_args_retf(Parrot_Interp interp, PMC *sub,
-        PMC* obj, STRING* meth, const char *sig, ...)>
+=back
 
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to the signature. The C<sub> argument is an
@@ -263,16 +246,6 @@ Signatures are similar to NCI:
     N ... NUMVAL
     S ... STRING*
     P ... PMC*
-
-=item C<void *
-Parrot_runops_fromc_args_event(Parrot_Interp interp, PMC *sub,
-        const char *sig, ...)>
-
-Run code from within event handlers. This variant deals with some reentrency
-issues. It also should do sanity checks, if e.g. the handler subroutine
-didn't return properly.
-
-=cut
 
 */
 
@@ -308,6 +281,16 @@ Parrot_runops_fromc_args(Parrot_Interp interp, PMC *sub,
     va_end(args);
     return (PMC *)set_retval(interp, *sig, ctx);
 }
+
+/*
+
+FUNCDOC: Parrot_runops_fromc_args_event
+
+Run code from within event handlers. This variant deals with some reentrency
+issues. It also should do sanity checks, if e.g. the handler subroutine
+didn't return properly.
+
+*/
 
 PARROT_API
 void *
@@ -479,13 +462,9 @@ Parrot_run_meth_fromc_arglist_retf(Parrot_Interp interp,
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/interpreter.c>.
-
-=cut
 
 */
 
