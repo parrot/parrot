@@ -102,6 +102,7 @@ Parrot_find_charset(Interp *interp, const char *charsetname /*NN*/)
 {
     int i;
     const int n = all_charsets->n_charsets;
+    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0) {
@@ -116,6 +117,9 @@ CHARSET *
 Parrot_load_charset(Interp *interp, const char *charsetname /*NN*/)
     /* WARN_UNUSED, NORETURN */
 {
+    UNUSED(interp);
+    UNUSED(charsetname);
+
     internal_exception(UNIMPLEMENTED, "Can't load charsets yet");
     return NULL;
 }
@@ -159,6 +163,8 @@ Parrot_charset_number_of_str(Interp *interp, STRING *src /*NN*/)
     int i;
     const int n = all_charsets->n_charsets;
 
+    UNUSED(interp);
+
     for (i = 0; i < n; ++i) {
         if (src->charset == all_charsets->set[i].charset)
             return i;
@@ -171,6 +177,8 @@ STRING*
 Parrot_charset_name(Interp *interp, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].name;
@@ -181,6 +189,8 @@ CHARSET*
 Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset;
@@ -191,6 +201,8 @@ const char *
 Parrot_charset_c_name(Interp *interp, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset->name;
@@ -308,6 +320,9 @@ INTVAL
 Parrot_make_default_charset(Interp *interp, const char *charsetname,
         CHARSET *charset /*NN*/)
 {
+    UNUSED(interp);
+    UNUSED(charsetname);
+
     Parrot_default_charset_ptr = charset;
     return 1;
 }
@@ -317,6 +332,8 @@ CHARSET *
 Parrot_default_charset(Interp *interp)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     return Parrot_default_charset_ptr;
 }
 
@@ -328,6 +345,8 @@ Parrot_find_charset_converter(Interp *interp, CHARSET *lhs /*NN*/, CHARSET *rhs 
 {
     int i;
     const int n = all_charsets->n_charsets;
+
+    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
@@ -351,6 +370,8 @@ Parrot_register_charset_converter(Interp *interp,
 {
     const int n = all_charsets->n_charsets;
     int i;
+
+    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
