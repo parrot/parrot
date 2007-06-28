@@ -432,7 +432,6 @@ docs/pdds/pdd_template.pod                                  [main]doc
 docs/pmc.pod                                                [main]doc
 docs/pmc/array.pod                                          [main]doc
 docs/pmc/documentation.pod                                  [main]doc
-docs/pmc/iterator.pod                                       [main]doc
 docs/pmc/struct.pod                                         [main]doc
 docs/pmc/subs.pod                                           [main]doc
 docs/pmc2c.pod                                              [main]doc

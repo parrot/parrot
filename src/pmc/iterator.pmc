@@ -8,9 +8,52 @@ src/pmc/iterator.pmc - Iterator PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Iterator base class
+These are the vtable functions for the Iterator base class. Iterators are
+used in combination with other classes(mainly aggregates) to visit all entries
+in that aggregate.
 
-=head2 Methods
+=head1 SYNOPSIS
+
+=head2 default usage
+
+    .local pmc iterator, array, entry
+    iterator = new .Iterator, array
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    entry = shift iterator     # get an entry
+    ... 
+    goto iter_loop
+  iter_end:
+
+The C<new> can alteratively be written as:
+
+  iterator = iter array
+
+=head2 iterate from the end, for arrays
+
+    .local pmc iterator, array, entry
+    iterator = new .Iterator, array
+    iterator = .ITERATE_FROM_END
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    entry = pop iterator     # get an entry
+    ... 
+    goto iter_loop
+  iter_end:
+
+=head2 iterate over a hash
+
+    .local pmc iterator, hash, key, entry
+    iterator = new .Iterator, hash
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    key = shift iterator       # get the key..
+    entry = hash[key]
+    ...
+    goto iter_loop
+  iter_end:
+
+=head1 Methods
 
 =over 4
 
