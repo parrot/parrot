@@ -189,6 +189,8 @@ parrot_gc_context(Interp *interp /*NN*/)
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
         sizeof (struct parrot_regs_t);
     /* TODO */
+#else
+    UNUSED(interp);
 #endif
 }
 

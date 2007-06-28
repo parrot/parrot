@@ -188,6 +188,8 @@ const char *
 Parrot_encoding_c_name(Interp *interp, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
+    UNUSED(interp);
+
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding->name;

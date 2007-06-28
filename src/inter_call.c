@@ -32,12 +32,9 @@ subroutines.
 static void check_for_opt_flag( call_state *st /*NN*/, int has_arg )
         __attribute__nonnull__(1);
 
-static void check_named( Interp *interp /*NN*/,
-    call_state *st /*NN*/,
-    const char *action /*NN*/ )
+static void check_named( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void clone_key_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
@@ -101,10 +98,11 @@ static void null_val( int sig, call_state *st /*NN*/ )
         __attribute__nonnull__(2);
 
 static int set_retval_util( Interp *interp /*NN*/,
-    const char *sig,
+    const char *sig /*NN*/,
     parrot_context_t *ctx /*NN*/,
     call_state *st /*NN*/ )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -838,15 +836,25 @@ null_val(int sig, call_state *st /*NN*/)
     }
 }
 
-/* check_named makes sure that all required named args are set and that
- * all optional args and flags are set to null and false if not present.
- * a  named arg takes the form of
- * STRING* name, [INPS] actual_arg,
- * or
- * STRING* name, [INPS] actual_arg, int opt_arg_flag
- */
+/*
+
+FUNCDOC: check_named
+
+Makes sure that all required named args are set and that all optional
+args and flags are set to null and false if not present.
+
+A named arg takes the form of
+
+    STRING* name, [INPS] actual_arg,
+
+or
+
+    STRING* name, [INPS] actual_arg, int opt_arg_flag
+
+*/
+
 static void
-check_named(Interp *interp /*NN*/, call_state *st /*NN*/, const char *action /*NN*/)
+check_named(Interp *interp /*NN*/, call_state *st /*NN*/)
 {
     int i;
     int n_named = -1;
@@ -1090,7 +1098,7 @@ Parrot_process_args(Interp *interp /*NN*/, call_state *st /*NN*/, arg_pass_t par
         st->name = NULL;
     }
 
-    check_named(interp, st, action);
+    check_named(interp, st);
     /* we may or may not have registered this pmc */
     dod_unregister_pmc(interp, dest->slurp);
 }
@@ -1127,10 +1135,7 @@ Parrot_convert_arg(Interp *interp /*NN*/, call_state *st /*NN*/)
 
 /*
 
-=item C<opcode_t * parrot_pass_args(Interp *,
-          parrot_context_t *src_ctx, parrot_context_t *dest_ctx,
-          opcode_t *src_index, optcode_t *dest_index, arg_pass_t param_or_result)>
-
+FUNCDOC: parrot_pass_args
 
 Main argument passing routine.
 
@@ -1142,8 +1147,6 @@ context. C<dst_seg> has the constants of the destination.
 C<what> is either C<PARROT_OP_get_params_pc> or C<PARROT_OP_get_results_pc>.
 With the former arguments are passed from the caller into a subroutine,
 the latter handles return values and yields.
-
-=cut
 
 */
 
@@ -1180,13 +1183,10 @@ parrot_pass_args(Interp *interp /*NN*/, parrot_context_t *src_ctx /*NN*/, parrot
 
 /*
 
-=item C<opcode_t *parrot_pass_args_fromc(Interp *, const char *sig,
-INTVAL src_n, opcode_t *dest, parrot_context_t * ctxp, va_list ap)>
+FUNCDOC: parrot_pass_args_fromc
 
 Pass arguments from C code with given signature to a Parrot Sub.
 Prerequsits are like above.
-
-=cut
 
 */
 
@@ -1203,7 +1203,7 @@ parrot_pass_args_fromc(Interp *interp /*NN*/, const char *sig,
 }
 
 static int
-set_retval_util(Interp *interp /*NN*/, const char *sig, parrot_context_t *ctx /*NN*/,
+set_retval_util(Interp *interp /*NN*/, const char *sig /*NN*/, parrot_context_t *ctx /*NN*/,
         call_state *st /*NN*/)
 {
     opcode_t * const src_pc = interp->current_returns;

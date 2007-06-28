@@ -40,7 +40,7 @@ PARROT_API STRING * Parrot_make_COW_reference( Interp *interp /*NN*/,
     STRING *s /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-PARROT_API STRING* Parrot_reuse_COW_reference( Interp *interp /*NULLOK*/,
+PARROT_API STRING* Parrot_reuse_COW_reference( Interp *interp,
     STRING *s /*NULLOK*/,
     STRING *d /*NN*/ )
         __attribute__nonnull__(3);
@@ -115,8 +115,7 @@ PARROT_API INTVAL string_bool( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-PARROT_API UINTVAL string_capacity( Interp *interp /*NULLOK*/,
-    const STRING *s /*NN*/ )
+PARROT_API UINTVAL string_capacity( Interp *interp, const STRING *s /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;

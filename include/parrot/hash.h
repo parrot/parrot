@@ -137,13 +137,13 @@ PARROT_API void parrot_new_pointer_hash( Interp *interp, Hash **hptr /*NN*/ )
 void parrot_chash_destroy( Interp *interp, Hash *hash /*NN*/ )
         __attribute__nonnull__(2);
 
-void parrot_new_hash_x( Interp *interp,
+void parrot_new_hash_x(
     Hash **hptr /*NN*/,
     PARROT_DATA_TYPES val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 void parrot_new_pmc_hash_x( Interp *interp,
     PMC *container /*NN*/,

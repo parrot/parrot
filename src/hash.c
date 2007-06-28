@@ -57,13 +57,13 @@ static void hash_thaw( Interp *interp,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void init_hash( Interp *interp,
+static void init_hash(
     Hash *hash /*NN*/,
     PARROT_DATA_TYPES val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 static int int_compare( Interp *interp, const void *a, const void *b )
         __attribute__pure__
@@ -133,6 +133,7 @@ Compares the two pointers, returning 0 if they are identical
 
 static int
 pointer_compare(Parrot_Interp interp, const void * const a, const void * const b) {
+    UNUSED(interp);
     return a != b;
 }
 
@@ -145,6 +146,7 @@ Returns a hashvalue for a pointer.
 
 static size_t
 key_hash_pointer(Interp *interp, void *value, size_t seed) {
+    UNUSED(interp);
     return ((size_t) value) ^ seed;
 }
 
@@ -153,6 +155,8 @@ key_hash_cstring(Interp *interp, const void *value /*NN*/, size_t seed)
 {
     register size_t h = seed;
     const unsigned char * p = (const unsigned char *) value;
+    UNUSED(interp);
+
     while (*p) {
         h += h << 5;
         h += *p++;
@@ -216,6 +220,8 @@ PARROT_API
 void
 parrot_dump_hash(Interp *interp, const Hash *hash)
 {
+    UNUSED(interp);
+    UNUSED(hash);
 }
 
 /*
@@ -506,7 +512,9 @@ PARROT_API
 void
 parrot_new_hash(Interp *interp, Hash **hptr)
 {
-    parrot_new_hash_x(interp, hptr,
+    UNUSED(interp);
+
+    parrot_new_hash_x(hptr,
             enum_type_PMC,
             Hash_key_type_STRING,
             STRING_compare,     /* STRING compare */
@@ -541,7 +549,8 @@ PARROT_API
 void
 parrot_new_cstring_hash(Interp *interp, Hash **hptr)
 {
-    parrot_new_hash_x(interp, hptr,
+    UNUSED(interp);
+    parrot_new_hash_x(hptr,
             enum_type_PMC,
             Hash_key_type_cstring,
             (hash_comp_fn)cstring_compare,     /* cstring compare */
@@ -549,7 +558,7 @@ parrot_new_cstring_hash(Interp *interp, Hash **hptr)
 }
 
 static void
-init_hash(Interp *interp, Hash *hash /*NN*/,
+init_hash(Hash *hash /*NN*/,
         PARROT_DATA_TYPES val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
@@ -641,7 +650,7 @@ marked properly.
 */
 
 void
-parrot_new_hash_x(Interp *interp, Hash **hptr /*NN*/,
+parrot_new_hash_x(Hash **hptr /*NN*/,
         PARROT_DATA_TYPES val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
@@ -649,8 +658,7 @@ parrot_new_hash_x(Interp *interp, Hash **hptr /*NN*/,
     Hash * const hash = mem_allocate_typed(Hash);
     hash->container = NULL;
     *hptr = hash;
-    init_hash(interp, hash, val_type, hkey_type,
-            compare, keyhash);
+    init_hash(hash, val_type, hkey_type, compare, keyhash);
 }
 
 /*
@@ -669,10 +677,12 @@ parrot_new_pmc_hash_x(Interp *interp, PMC *container /*NN*/,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
     Hash * const hash = mem_allocate_typed(Hash);
+
+    UNUSED(interp);
+
     PMC_struct_val(container) = hash;
     hash->container = container;
-    init_hash(interp, hash, val_type, hkey_type,
-            compare, keyhash);
+    init_hash(hash, val_type, hkey_type, compare, keyhash);
 }
 
 /*
@@ -686,7 +696,9 @@ PARROT_API
 void
 parrot_new_pointer_hash(Interp *interp, Hash **hptr /*NN*/)
 {
-    parrot_new_hash_x(interp, hptr, enum_type_ptr, Hash_key_type_ptr,
+    UNUSED(interp);
+
+    parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr,
                         pointer_compare, key_hash_pointer);
 }
 
@@ -756,6 +768,9 @@ parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC *key /*NN*/)
      */
     /* locate initial */
     const INTVAL size = (INTVAL)N_BUCKETS(hash->mask + 1);
+
+    UNUSED(interp);
+
     if (bi == INITBucketIndex) {
         i = 0;
         PMC_data(key) = NULL;
@@ -937,7 +952,7 @@ parrot_hash_clone(Interp *interp, Hash *hash /*NN*/, Hash **dest)
 {
     UINTVAL i;
 
-    parrot_new_hash_x(interp, dest, hash->entry_type,
+    parrot_new_hash_x(dest, hash->entry_type,
             hash->key_type, hash->compare, hash->hash_val);
 
     for (i = 0; i <= hash->mask; i++) {
