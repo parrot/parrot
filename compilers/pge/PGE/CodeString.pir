@@ -48,7 +48,7 @@ Initializes the C<CodeString> class.
     $P0 = getclass 'String'
     $P1 = subclass $P0, 'PGE::CodeString'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 10
     set_global "$!serno", $P0
     .return ()

@@ -37,7 +37,7 @@
   analyze:
     .local pmc exp, pad
     exp = match['expr']
-    pad = new .Hash
+    pad = new 'Hash'
     pad['subpats'] = 0
     exp = exp.'p5analyze'(pad)
     .return exp.'compile'(adverbs :flat :named)
@@ -108,7 +108,7 @@
     .param string message
     $P0 = getattribute mob, '$.pos'
     $P0 = pos
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = 'p5regex parse error: '
     $S0 .= message
     $S0 .= ' at offset '

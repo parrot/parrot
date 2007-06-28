@@ -180,13 +180,13 @@ tree as a PIR code object that can be compiled.
     $I0 = index expstr, 'ustack'
     if $I0 < 0 goto code_body_1
     code.emit("          .local pmc ustack :unique_reg")
-    code.emit("          ustack = new .ResizablePMCArray")
+    code.emit("          ustack = new 'ResizablePMCArray'")
   code_body_1:
     ##   generate the gpad only if we need it
     $I0 = index expstr, 'gpad'
     if $I0 < 0 goto code_body_2
     code.emit("          .local pmc gpad :unique_reg")
-    code.emit("          gpad = new .ResizablePMCArray")
+    code.emit("          gpad = new 'ResizablePMCArray'")
   code_body_2:
     ##   set the captscope if we need it
     $I0 = index expstr, 'captscope'
@@ -295,7 +295,7 @@ tree as a PIR code object that can be compiled.
     captgen.emit(<<"        CODE", cname, label)
           $I0 = defined captscope[%0]
           if $I0 goto %1_cgen
-          $P0 = new .ResizablePMCArray
+          $P0 = new 'ResizablePMCArray'
           captscope[%0] = $P0
           bsr %1_cgen
           delete captscope[%0]
@@ -413,7 +413,7 @@ tree as a PIR code object that can be compiled.
     .local pmc iter, exp
     code.emit('        %0: # concat', label)
     $P0 = self.get_array()
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
     exp = shift iter
     $S0 = code.unique('R')
   iter_loop:

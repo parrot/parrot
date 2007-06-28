@@ -34,12 +34,12 @@ PGE::OPTable - PGE operator precedence table and parser
 .sub '__onload' :load
     .local pmc base
     .local pmc sctable
-    $P0 = getclass "Hash"
+    $P0 = getclass 'Hash'
     base = subclass $P0, 'PGE::OPTable'
     addattribute base, '%!key'
     addattribute base, '%!klen'
     addattribute base, '&!ws'
-    sctable = new .Hash
+    sctable = new 'Hash'
     set_global '%!sctable', sctable
 
     'sctable'('term:', 'syncat'=>PGE_OPTABLE_TERM, 'expect'=>0x0201)
@@ -65,7 +65,7 @@ Adds (or replaces) a syntactic category's defaults.
     .local pmc sctable
     sctable = get_global '%!sctable'
     unless null adverbs goto with_adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
   with_adverbs:
     sctable[name] = adverbs
     .return (adverbs)
@@ -75,8 +75,8 @@ Adds (or replaces) a syntactic category's defaults.
 .sub "init" :vtable :method
     .local pmc tokentable, keytable, klentable
     tokentable = self
-    keytable = new .Hash
-    klentable = new .Hash
+    keytable = new 'Hash'
+    klentable = new 'Hash'
     setattribute self, "PGE::OPTable\x0%!key", keytable
     setattribute self, "PGE::OPTable\x0%!klen", klentable
 .end
@@ -100,7 +100,7 @@ Adds (or replaces) a syntactic category's defaults.
     token = clone token
     goto with_token
   token_hash:
-    token = new .Hash
+    token = new 'Hash'
   with_token:
     token['name'] = name
 
@@ -111,7 +111,7 @@ Adds (or replaces) a syntactic category's defaults.
     if $I0 goto end
     tokentable[name] = token
 
-    $P0 = new .Iterator, args
+    $P0 = new 'Iterator', args
   args_loop:
     unless $P0 goto args_end
     $P1 = shift $P0
@@ -189,7 +189,7 @@ Adds (or replaces) a syntactic category's defaults.
     $P0 = keytable[key]
     $I0 = does $P0, 'array'
     if $I0 goto add_key_array_2
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     push $P1, $P0
     push $P1, token
     keytable[key] = $P1
@@ -231,7 +231,7 @@ Adds (or replaces) a syntactic category's defaults.
     klentable = getattribute self, "PGE::OPTable\x0%!klen"
 
     unless null adverbs goto with_adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
   with_adverbs:
 
     .local pmc action
@@ -281,9 +281,9 @@ Adds (or replaces) a syntactic category's defaults.
   with_tighter:
 
     ws = getattribute self, "PGE::OPTable\x0&!ws"
-    tokenstack = new .ResizablePMCArray
-    operstack = new .ResizablePMCArray
-    termstack = new .ResizablePMCArray
+    tokenstack = new 'ResizablePMCArray'
+    operstack = new 'ResizablePMCArray'
+    termstack = new 'ResizablePMCArray'
 
     newfrom = get_hll_global ["PGE::Match"], "newfrom"
     $P0 = getclass 'PGE::Match'
@@ -343,7 +343,7 @@ Adds (or replaces) a syntactic category's defaults.
     if oper goto oper_found
     goto key_next
   key_array:
-    iter = new .Iterator, token
+    iter = new 'Iterator', token
   key_array_1:
     unless iter goto key_next
     token = shift iter

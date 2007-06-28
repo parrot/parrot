@@ -26,7 +26,7 @@ or the resulting PIR code (target='PIR').
     .param pmc adverbs         :slurpy :named
 
     unless null adverbs goto set_adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
 
   set_adverbs:
     $I0 = exists adverbs['grammar']
@@ -110,7 +110,7 @@ or the resulting PIR code (target='PIR').
     .local pmc exp, pad
     exp = match['expr']
     pad = clone adverbs
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     pad['lexscope'] = $P0
     exp = exp.'perl6exp'(pad)
     if null exp goto err_null
@@ -252,7 +252,7 @@ needed for compiling regexes.
     optable.newtok('close:}',  'precedence'=>'<', 'nows'=>1)
 
     .local pmc esclist
-    esclist = new .Hash
+    esclist = new 'Hash'
     set_global '%esclist', esclist
     esclist['e'] = "\e"
     esclist['f'] = "\f"
@@ -264,13 +264,13 @@ needed for compiling regexes.
     # See http://www.unicode.org/Public/UNIDATA/PropList.txt for above
 
     # Create and store closure preprocessors in %closure_pp
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     set_hll_global ['PGE::Perl6Regex'], '%closure_pp', $P0
     $P1 = get_hll_global ['PGE::Perl6Regex'], 'PIR_closure'
     $P0["PIR"] = $P1
 
     # Create an array for holding stop tokens
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     set_hll_global ['PGE::Perl6Regex'], '@!stopstack', $P0
 
     $P0 = get_global 'compile_perl6regex'
@@ -1083,7 +1083,7 @@ Parse a modifier.
     .param string message
     $P0 = getattribute mob, '$.pos'
     $P0 = pos
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = 'perl6regex parse error: '
     $S0 .= message
     $S0 .= ' at offset '
@@ -1259,7 +1259,7 @@ Parse a modifier.
     subpats = pad['subpats']
     pad['subpats'] = 0
     pad['isarray'] = 0
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     pad['lexscope'] = $P0
     exp = self[0]
     exp = exp.'perl6exp'(pad)
@@ -1360,8 +1360,8 @@ Parse a modifier.
 
     .local pmc lexscope, savescope, iter
     lexscope = pad['lexscope']
-    savescope = new .Hash
-    iter = new .Iterator, lexscope
+    savescope = new 'Hash'
+    iter = new 'Iterator', lexscope
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter

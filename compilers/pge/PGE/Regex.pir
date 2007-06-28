@@ -17,7 +17,7 @@ a number of built-in rules.
 .sub '__onload' :load
     .local pmc base
     $P0 = subclass 'PGE::Match', 'PGE::Grammar'
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     set_global '%!cache', $P0
     .return ()
 .end
