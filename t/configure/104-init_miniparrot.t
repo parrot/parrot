@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 104-init_miniparrot.t 19391 2007-06-28 18:28:49Z jkeenan $
+# $Id$
 # 104-init_miniparrot.t
 
 use strict;
@@ -26,7 +26,7 @@ my $args = process_options( {
     argv            => [ q{--miniparrot} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id: 104-init_miniparrot.t 19391 2007-06-28 18:28:49Z jkeenan $',
+    svnid           => '$Id$',
 } );
 
 my $conf = Parrot::Configure->new;

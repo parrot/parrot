@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 106-init_headers.t 19411 2007-06-28 20:04:46Z jkeenan $
+# $Id$
 # 106-init_headers.t
 
 use strict;

@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 101-init_manifest.01.t 19303 2007-06-25 03:38:10Z jkeenan $
+# $Id$
 # 101-init_manifest.01.t
 
 use strict;
@@ -25,7 +25,7 @@ my $args = process_options( {
     argv            => [ q{--nomanicheck} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id: 101-init_manifest.01.t 19303 2007-06-25 03:38:10Z jkeenan $',
+    svnid           => '$Id$',
 } );
 
 my $conf = Parrot::Configure->new;
