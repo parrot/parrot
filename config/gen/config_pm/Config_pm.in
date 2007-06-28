@@ -16,6 +16,6 @@ use strict;
 
 use vars qw(%PConfig);
 
-<<HERE>>
+<<PCONFIG>>
 
 1;
