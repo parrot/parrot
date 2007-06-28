@@ -60,8 +60,7 @@ sub new {
         $self->new_group(
             'Legal', '',
             $self->new_item(
-                'The licences under which Parrot is distributed.', 'LICENSES/Artistic',
-                'LICENSES/gpl.txt'
+                'The licence under which Parrot is distributed.', 'LICENSE'
             ),
         ),
         $self->new_group(
