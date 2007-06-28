@@ -2566,7 +2566,7 @@ store:
                 break;
 
             default:
-                internal_exception(1,
+                real_exception(interp, NULL, 1,
                         "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
                         op_info->types[i - 1], i, nvtable);
                 break;
@@ -2622,7 +2622,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                     REG_OFFS_NUM(p1));
             break;
         default:
-            internal_exception(1, "jit_vtable1r: ill LHS");
+            real_exception(interp, NULL, 1, "jit_vtable1r: ill LHS");
             break;
     }
 }
@@ -2784,8 +2784,9 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     assert(op_info->types[0] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
     i2 = *(jit_info->cur_op + 2);
-    if (i2 <= 0 || i2 >= interp->n_vtable_max)
-        internal_exception(1, "Illegal PMC enum (%d) in new", i2);
+    if (i2 <= 0 || i2 >= interp->n_vtable_max) {
+        real_exception(interp, NULL, 1, "Illegal PMC enum (%d) in new", i2);
+    }
     /* get interpreter */
     Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_ECX);
     /* push pmc enum and interpreter */
@@ -3069,7 +3070,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp *interp,
             }
             break;
         default:
-            internal_exception(1, "set_returns_jit - unknown typ");
+            real_exception(interp, NULL, 1, "set_returns_jit - unknown typ");
             break;
     }
 }
@@ -3091,7 +3092,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
 
     if (!recursive) {
         /* create args array */
-        internal_exception(1, "set_args_jit - can't do that yet ");
+        real_exception(interp, NULL, 1, "set_args_jit - can't do that yet ");
     }
 
     constants = CONTEXT(interp->ctx)->constants;
@@ -3175,7 +3176,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
                         &CONST(2 + i)->u.number);
                 break;
             default:
-                internal_exception(1, "set_args_jit - unknown type");
+                real_exception(interp, NULL, 1, "set_args_jit - unknown type");
                 break;
         }
     }
@@ -3246,7 +3247,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, Interp *interp)
                     (long)fixup_ptr - 4;
                 break;
             default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                real_exception(interp, NULL, JIT_ERROR, "Unknown fixup type:%d\n",
                     fixup->type);
             break;
         }
