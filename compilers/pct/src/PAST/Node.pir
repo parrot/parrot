@@ -31,7 +31,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'PAST::Block'
     $P0 = subclass base, 'PAST::VarList'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 10
     set_hll_global ['PAST::Node'], '$!serno', $P0
 
@@ -75,7 +75,7 @@ And returns the node.
     .param pmc adverbs         :slurpy :named
 
     .local pmc iter
-    iter = new .Iterator, children
+    iter = new 'Iterator', children
   children_loop:
     unless iter goto children_end
     $P0 = shift iter
@@ -83,7 +83,7 @@ And returns the node.
     goto children_loop
   children_end:
 
-    iter = new .Iterator, adverbs
+    iter = new 'Iterator', adverbs
   adverbs_loop:
     unless iter goto adverbs_end
     $S0 = shift iter
@@ -109,7 +109,7 @@ children and attributes.  Returns the newly created node.
     .param pmc adverbs         :slurpy :named
 
     $S0 = typeof self                                      # FIXME
-    $P0 = new .String                                      # FIXME
+    $P0 = new 'String'                                     # FIXME
     $P0 = $S0                                              # FIXME
     $P1 = new $P0                                          # FIXME
     $P1.'init'(children :flat, 'node'=>self, adverbs :flat :named)
@@ -159,7 +159,7 @@ children.
 .sub 'iterator' :method
     .local pmc iter
     $P0 = self.'get_array'()
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
     iter = 0
     .return (iter)
 .end
@@ -208,7 +208,7 @@ the invocant's value of C<attrname> to C<value>.  Returns the
     if has_value goto setattr
     value = self[attrname]
     unless null value goto getattr
-    value = new .Undef
+    value = new 'Undef'
   getattr:
     .return (value)
   setattr:
@@ -308,8 +308,8 @@ node.
 =item vtype([value])
 
 Get/set the type of the value (as a Parrot class identifier).
-For example, a string value might use C<.String>, or an
-integer might use a language-specific C<['MyInt']> class.
+For example, a string value might use C<'String'>, or an
+integer might use a language-specific C<'MyInt'> class.
 
 =cut
 
@@ -556,7 +556,7 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 Get/set the return type for this operation.  Some operations
 require creation of a temporary value to receive the result
 value, the C<returns> attribute identifies the type of the
-result (default is C<.Undef> if not set).
+result (default is C<'Undef'> if not set).
 
 =cut
 

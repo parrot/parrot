@@ -22,7 +22,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'POST::Label'
 
     .local pmc pirtable
-    pirtable = new .Hash
+    pirtable = new 'Hash'
     pirtable['add'] = '%tP+'
     pirtable['sub'] = '%tP+'
     pirtable['mul'] = '%tP+'
@@ -361,7 +361,7 @@ C<POST::Sub> nodes represent PIR subroutines.
     compname = self.'compiler'()
     name = self.'name'()
     .local pmc adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
     adverbs['target'] = 'pir'
     adverbs['name'] = name
     adverbs['grammar'] = ''
