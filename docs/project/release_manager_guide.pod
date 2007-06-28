@@ -130,6 +130,8 @@ Make sure everything works:
  $ perl Configure.pl
  $ make world
  $ make fulltest
+ $ make docs
+ $ make html
 
 =item 7.
 
