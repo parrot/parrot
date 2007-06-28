@@ -257,7 +257,7 @@ stack_push(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
             UVal_ptr(entry->entry) = thing;
             break;
         default:
-            internal_exception(ERROR_BAD_STACK_TYPE,
+            real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                     "Invalid Stack_Entry_type!");
             break;
     }
@@ -279,7 +279,7 @@ stack_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
-        internal_exception(ERROR_BAD_STACK_TYPE,
+        real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                            "Wrong type on top of stack!\n");
     }
 
@@ -314,7 +314,7 @@ stack_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/,
         *(void **)where    = UVal_ptr(entry->entry);
         break;
     default:
-        internal_exception(ERROR_BAD_STACK_TYPE,
+        real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                            "Wrong type on top of stack!\n");
         break;
     }
@@ -405,8 +405,9 @@ Parrot_dump_dynamic_environment(Interp *interp /*NN*/,
 
     while (dynamic_env->prev != dynamic_env) {
         const Stack_Entry_t * const e = stack_entry(interp, dynamic_env, 0);
-        if (! e)
-            internal_exception(1, "Control stack damaged");
+        if (! e) {
+            real_exception(interp, NULL, 1, "Control stack damaged");
+        }
 
         PIO_eprintf(interp, "[%4d:  chunk %p entry %p "
                                  "type %d cleanup %p]\n",

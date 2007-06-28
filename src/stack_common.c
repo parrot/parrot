@@ -125,7 +125,7 @@ stack_prepare_pop(Interp *interp, Stack_Chunk_t **stack_p /*NN*/)
      * the first entry (initial top) refers to itself
      */
     if (chunk == chunk->prev) {
-        internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!",
+        real_exception(interp, NULL, ERROR_STACK_EMPTY, "No entries on %sStack!",
                 chunk->name);
     }
     *stack_p = chunk->prev;

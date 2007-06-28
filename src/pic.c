@@ -426,7 +426,7 @@ pass_mixed(Interp *interp, PMC *sig /*NN*/, char *src_base, void **src,
                 *(PMC* *)(dest_base + ((opcode_t*)dest)[i])= argP;
                 break;
             default:
-                internal_exception(1, "bogus signature 0x%x", bits);
+                real_exception(interp, NULL, 1, "bogus signature 0x%x", bits);
                 break;
         }
     }

@@ -254,7 +254,7 @@ parrot_mark_hash(Interp *interp, Hash *hash /*NN*/)
 
         while (bucket) {
             if (++found > hash->entries)
-                internal_exception(1,
+                real_exception(interp, NULL, 1,
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)hash->entries);
             if (mark_key)
@@ -303,7 +303,7 @@ hash_thaw(Interp *interp, Hash *hash /*NN*/, visit_info* info /*NN*/)
                 }
                 break;
             default:
-                internal_exception(1, "unimplemented key type");
+                real_exception(interp, NULL, 1, "unimplemented key type");
                 b = NULL;
                 break;
         }
@@ -316,7 +316,7 @@ hash_thaw(Interp *interp, Hash *hash /*NN*/, visit_info* info /*NN*/)
                 b->value = (void*)io->vtable->shift_integer(interp, io);
                 break;
             default:
-                internal_exception(1, "unimplemented value type");
+                real_exception(interp, NULL, 1, "unimplemented value type");
                 break;
         }
     }
@@ -340,7 +340,7 @@ hash_freeze(Interp *interp, const Hash * const hash, visit_info* info /*NN*/)
                     io->vtable->push_integer(interp, io, (INTVAL)b->key);
                     break;
                 default:
-                    internal_exception(1, "unimplemented key type");
+                    real_exception(interp, NULL, 1, "unimplemented key type");
                     b = NULL;
                     break;
             }
@@ -352,7 +352,7 @@ hash_freeze(Interp *interp, const Hash * const hash, visit_info* info /*NN*/)
                     io->vtable->push_integer(interp, io, (INTVAL)b->value);
                     break;
                 default:
-                    internal_exception(1, "unimplemented value type");
+                    real_exception(interp, NULL, 1, "unimplemented value type");
                     break;
             }
             b = b->next;
@@ -376,7 +376,7 @@ parrot_hash_visit(Interp *interp, Hash *hash, void *pinfo /*NN*/)
             hash_freeze(interp, hash, info);
             break;
         default:
-            internal_exception(1, "unimplemented visit mode");
+            real_exception(interp, NULL, 1, "unimplemented visit mode");
             break;
     }
 }
@@ -742,7 +742,7 @@ parrot_hash_size(Interp *interp, const Hash *hash /*NN*/)
 
     if (hash)
         return hash->entries;
-    internal_exception(1, "parrot_hash_size asked to check a NULL hash\n");
+    real_exception(interp, NULL, 1, "parrot_hash_size asked to check a NULL hash\n");
     return 0;
 }
 
@@ -977,7 +977,7 @@ parrot_hash_clone(Interp *interp, Hash *hash /*NN*/, Hash **dest)
                 break;
 
             default:
-                internal_exception(-1, "hash corruption: type = %d\n",
+                real_exception(interp, NULL, -1, "hash corruption: type = %d\n",
                                    hash->entry_type);
                 valtmp = NULL; /* avoid warning */
             };

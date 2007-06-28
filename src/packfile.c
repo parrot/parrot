@@ -553,9 +553,10 @@ do_sub_pragmas(Interp *interp /*NN*/, PackFile_ByteCode *self /*NN*/,
                 const opcode_t ci = ft->fixups[i]->offset;
                 PMC *sub_pmc;
 
-                if (ci < 0 || ci >= ct->const_count)
-                    internal_exception(1,
+                if (ci < 0 || ci >= ct->const_count) {
+                    real_exception(interp, NULL, 1,
                             "Illegal fixup offset (%d) in enum_fixup_sub");
+                }
                 sub_pmc = ct->constants[ci]->u.key;
                 PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
                 if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
@@ -2068,9 +2069,10 @@ pf_debug_unpack(Interp *interp, PackFile_Segment *self /*NN*/, opcode_t *cursor)
     code_name[str_len - 3] = 0;
     code = (PackFile_ByteCode *)PackFile_find_segment(interp,
             self->dir, code_name, 0);
-    if (!code || code->base.type != PF_BYTEC_SEG)
-        internal_exception(1, "Code '%s' not found for debug segment '%s'\n",
+    if (!code || code->base.type != PF_BYTEC_SEG) {
+        real_exception(interp, NULL, 1, "Code '%s' not found for debug segment '%s'\n",
                 code_name, self->name);
+    }
     code->debugs = debug;
     debug->code = code;
     free(code_name);
@@ -2337,7 +2339,7 @@ Parrot_switch_to_cs_by_nr(Interp *interp /*NN*/, opcode_t seg)
             n++;
         }
     }
-    internal_exception(1, "Segment number %d not found\n", (int) seg);
+    real_exception(interp, NULL, 1, "Segment number %d not found\n", (int) seg);
 }
 
 /*
@@ -2355,7 +2357,7 @@ Parrot_switch_to_cs(Interp *interp /*NN*/, PackFile_ByteCode *new_cs /*NN*/, int
     PackFile_ByteCode * const cur_cs = interp->code;
 
     if (!new_cs) {
-        internal_exception(NO_PREV_CS, "No code segment to switch to\n");
+        real_exception(interp, NULL, NO_PREV_CS, "No code segment to switch to\n");
     }
     /* compiling source code uses this function too,
      * which gives misleading trace messages
@@ -2581,7 +2583,7 @@ fixup_packed_size(Interp *interp, PackFile_Segment *self /*NN*/)
             case enum_fixup_none:
                 break;
             default:
-                internal_exception(1, "Unknown fixup type\n");
+                real_exception(interp, NULL, 1, "Unknown fixup type\n");
                 return 0;
         }
     }
@@ -2616,7 +2618,7 @@ fixup_pack(Interp *interp, PackFile_Segment *self /*NN*/, opcode_t *cursor /*NN*
             case enum_fixup_none:
                 break;
             default:
-                internal_exception(1, "Unknown fixup type\n");
+                real_exception(interp, NULL, 1, "Unknown fixup type\n");
                 return 0;
         }
     }

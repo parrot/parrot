@@ -340,7 +340,7 @@ trace_op_dump(Interp *interp /*NN*/, const opcode_t *code_start /*NN*/, const op
                     more = 1;
                     break;
                 default:
-                    internal_exception(1, "unhandled type in trace");
+                    real_exception(interp, NULL, 1, "unhandled type in trace");
                     break;
             }
         }

@@ -821,7 +821,7 @@ thaw_pmc(Parrot_Interp interp, visit_info *info,
     else {                       /* type follows */
         info->last_type = *type = io->vtable->shift_integer(interp, io);
         if (*type <= 0)
-            internal_exception(1, "Unknown PMC type to thaw %d", (int) *type);
+            real_exception(interp, NULL, 1, "Unknown PMC type to thaw %d", (int) *type);
         if (*type >= interp->n_vtable_max ||
             !interp->vtables[*type]) {
             /* that ought to be a class */
@@ -859,7 +859,7 @@ do_action(Parrot_Interp interp, PMC *pmc, visit_info *info,
                 info->visit_action = pmc->vtable->freeze;
             break;
         default:
-            internal_exception(1, "Illegal action %ld", (long)info->what);
+            real_exception(interp, NULL, 1, "Illegal action %ld", (long)info->what);
             break;
     }
 }
@@ -890,7 +890,7 @@ thaw_create_pmc(Parrot_Interp interp, const visit_info *info,
             break;
         default:
             pmc = NULL;
-            internal_exception(1, "Illegal visit_next type");
+            real_exception(interp, NULL, 1, "Illegal visit_next type");
             break;
     }
     return pmc;
@@ -1025,7 +1025,7 @@ id_from_pmc(Parrot_Interp interp, PMC* pmc)
         id += arena->total_objects;
     }
 
-    internal_exception(1, "Couldn't find PMC in arenas");
+    real_exception(interp, NULL, 1, "Couldn't find PMC in arenas");
     return -1;
 }
 
@@ -1166,7 +1166,7 @@ visit_next_for_GC(Parrot_Interp interp, PMC* pmc, visit_info* info)
     UINTVAL id;
     const int seen = next_for_GC_seen(interp, pmc, info, &id);
 
-    internal_exception(1, "todo convert to depth first");
+    real_exception(interp, NULL, 1, "todo convert to depth first");
     do_action(interp, pmc, info, seen, id);
     /*
      * TODO probe for class methods that override the default.

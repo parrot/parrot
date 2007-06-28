@@ -143,7 +143,7 @@ runops_trace_core(Interp *interp, opcode_t *pc)
     trace_op(interp, code_start, code_end, pc);
     while (pc) {
         if (pc < code_start || pc >= code_end) {
-            internal_exception(1,
+            real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
         }
         CONTEXT(interp->ctx)->current_pc = pc;
@@ -176,7 +176,7 @@ runops_slow_core(Interp *interp, opcode_t *pc)
     }
     while (pc) {
         if (pc < code_start || pc >= code_end) {
-            internal_exception(1,
+            real_exception(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
         }
         CONTEXT(interp->ctx)->current_pc = pc;

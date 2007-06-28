@@ -675,7 +675,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
             if (offset > 4095) {
-                internal_exception(JIT_ERROR,
+                real_exception(interp, NULL, JIT_ERROR,
                                    "integer load register %d generates offset %d, larger than 4095\n",
                            val, offset);
             }
@@ -696,7 +696,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                                                        hwreg);
             break;
         default:
-            internal_exception(JIT_ERROR,
+            real_exception(interp, NULL, JIT_ERROR,
                                "Unsupported op parameter type %d in jit_int_load\n",
                                op_type);
     }
@@ -719,7 +719,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
             offset = ((char *)&interp->int_reg.registers[val])
                 - (char *)interp;
             if (offset > 4095) {
-                internal_exception(JIT_ERROR,
+                real_exception(interp, NULL, JIT_ERROR,
                                    "integer store register %d generates offset %d, larger than 4095\n",
                            val, offset);
             }
@@ -735,7 +735,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 
         case PARROT_ARG_N:
         default:
-            internal_exception(JIT_ERROR,
+            real_exception(interp, NULL, JIT_ERROR,
                             "Unsupported op parameter type %d in jit_int_store\n",
                                op_type);
     }
@@ -877,7 +877,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 break;
             }
             default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                real_exception(interp, NULL, JIT_ERROR, "Unknown fixup type:%d\n",
                                    fixup->type);
                 break;
         }

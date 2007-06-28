@@ -984,7 +984,7 @@ mmd_arg_tuple_inline(Interp *interp /*NN*/, STRING *signature /*NN*/, va_list ar
                         i, type);
                 break;
             default:
-                internal_exception(1,
+                real_exception(interp, NULL, 1,
                         "Unknown signature type %d in mmd_arg_tuple", type);
                 break;
         }
@@ -1064,7 +1064,7 @@ mmd_arg_tuple_func(Interp *interp /*NN*/)
                 VTABLE_push_integer(interp, arg_tuple, type);
                 break;
             default:
-                internal_exception(1,
+                real_exception(interp, NULL, 1,
                         "Unknown signature type %d in mmd_arg_tuple", type);
                 break;
         }
@@ -1152,7 +1152,7 @@ mmd_search_classes(Interp *interp /*NN*/, STRING *meth, PMC *arg_tuple,
     type1 = VTABLE_get_integer_keyed_int(interp, arg_tuple, 0);
     if (type1 < 0) {
         return;
-        internal_exception(1, "unimplemented native MMD type");
+        real_exception(interp, NULL, 1, "unimplemented native MMD type");
         /* TODO create some class namespace */
     }
     else {

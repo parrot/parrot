@@ -292,7 +292,7 @@ interpinfo(Interp *interp /*NN*/, INTVAL what)
             ret = arena_base->num_extended_PMCs;
             break;
         default:        /* or a warning only? */
-            internal_exception(UNIMPLEMENTED,
+            real_exception(interp, NULL, UNIMPLEMENTED,
                     "illegal argument in interpinfo");
     }
     return ret;
@@ -318,7 +318,7 @@ interpinfo_p(Interp *interp, INTVAL what)
         case CURRENT_LEXPAD:
             return CONTEXT(interp->ctx)->lex_pad;
         default:        /* or a warning only? */
-            internal_exception(UNIMPLEMENTED,
+            real_exception(interp, NULL, UNIMPLEMENTED,
                     "illegal argument in interpinfo");
     }
     return PMCNULL;
@@ -359,7 +359,7 @@ interpinfo_s(Interp *interp, INTVAL what)
             return fullname;
 
         default:        /* or a warning only? */
-            internal_exception(UNIMPLEMENTED,
+            real_exception(interp, NULL, UNIMPLEMENTED,
                     "illegal argument in interpinfo");
     }
     return NULL;

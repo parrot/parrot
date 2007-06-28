@@ -101,7 +101,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
 
     if (!conv || icuError != U_ZERO_ERROR) {
         /* unknown encoding??? */
-        internal_exception(ICU_ERROR,
+        real_exception(interp, NULL, ICU_ERROR,
                 "string_fill_from_buffer: ICU error from ucnv_open()");
 
     }
@@ -135,11 +135,11 @@ string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
 
     if (icuError != U_ZERO_ERROR) {
         /* handle error */
-        internal_exception(ICU_ERROR,
+        real_exception(interp, NULL, ICU_ERROR,
                 "string_fill_from_buffer: ICU error from ucnv_toUnicode()");
     }
 
-    internal_exception(UNIMPLEMENTED, "Can't do unicode yet");
+    real_exception(interp, NULL, UNIMPLEMENTED, "Can't do unicode yet");
 
     /* temporary; need to promote to rep 4 if has non-BMP characters*/
     s->bufused = (char *)target - (char *)s->strstart;
@@ -151,7 +151,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
     UNUSED(encoding_name);
     UNUSED(s);
 
-    internal_exception(ICU_ERROR,
+    real_exception(interp, NULL, ICU_ERROR,
         "string_fill_from_buffer: parrot compiled without ICU support");
 #endif
 }
@@ -203,16 +203,16 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        internal_exception(UNIMPLEMENTED,
+                        real_exception(interp, NULL, UNIMPLEMENTED,
                                 "Illegal escape sequence inside {}");
                     }
                 }
                 if (*offset == len)
-                    internal_exception(UNIMPLEMENTED,
+                    real_exception(interp, NULL, UNIMPLEMENTED,
                             "Illegal escape sequence no '}'");
             }
             else {
-                internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
+                real_exception(interp, NULL, UNIMPLEMENTED, "Illegal escape sequence in");
             }
             ++*offset;
             if (*offset < len) {
@@ -242,7 +242,7 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                 workchar = codepoint - 'A' + 1;
             }
             else {
-                internal_exception(UNIMPLEMENTED, "Illegal escape sequence");
+                real_exception(interp, NULL, UNIMPLEMENTED, "Illegal escape sequence");
             }
             ++*offset;
             return workchar;
@@ -262,12 +262,12 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        internal_exception(UNIMPLEMENTED,
+                        real_exception(interp, NULL, UNIMPLEMENTED,
                                 "Illegal escape sequence in uxxx escape");
                     }
                 }
                 else {
-                    internal_exception(UNIMPLEMENTED,
+                    real_exception(interp, NULL, UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
                 ++*offset;
@@ -289,12 +289,12 @@ string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        internal_exception(UNIMPLEMENTED,
+                        real_exception(interp, NULL, UNIMPLEMENTED,
                                 "Illegal escape sequence in Uxxx escape");
                     }
                 }
                 else {
-                    internal_exception(UNIMPLEMENTED,
+                    real_exception(interp, NULL, UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
                 ++*offset;

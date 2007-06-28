@@ -122,7 +122,7 @@ key_new_pmc(Interp *interp /*NN*/, PMC *value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
-    internal_exception(1, "this is broken - see slice.pmc");
+    real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
     PMC_pmc_val(key) = value;
 
     return key;
@@ -228,7 +228,7 @@ key_set_pmc(Interp *interp, PMC *key /*NN*/, PMC *value)
      * XXX leo
      * what for is this indirection?
      */
-    internal_exception(1, "this is broken - see slice.pmc");
+    real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
     PMC_pmc_val(key) = value;
 
     return;
@@ -296,7 +296,7 @@ key_number(Interp *interp, PMC *key /*NN*/)
         return VTABLE_get_number(interp, reg);
         }
     default:
-        internal_exception(INVALID_OPERATION, "Key not a number!\n");
+        real_exception(interp, NULL, INVALID_OPERATION, "Key not a number!\n");
         return 0;
     }
 }

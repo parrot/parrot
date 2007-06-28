@@ -1083,7 +1083,7 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
     PMC *current_parent_array;
 
     if (!PObj_is_class_TEST(_class))
-        internal_exception(1, "Class isn't a ParrotClass");
+        real_exception(interp, NULL, 1, "Class isn't a ParrotClass");
 
     if (!PObj_is_class_TEST(parent) && parent == parent->vtable->pmc_class) {
         /* Permit inserting non-classes so at least thaw'ing classes
@@ -1093,7 +1093,7 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
         PMC *class_name;
 
         if (CLASS_ATTRIB_COUNT(_class) != 0)
-            internal_exception(1, "Subclassing built-in type too late");
+            real_exception(interp, NULL, 1, "Subclassing built-in type too late");
 
         Parrot_add_attribute(interp, _class, CONST_STRING(interp, "__value"));
 
@@ -1105,7 +1105,7 @@ Parrot_add_parent(Interp *interp, PMC *_class, PMC *parent)
         create_deleg_pmc_vtable(interp, _class, 1);
     }
     else if (!PObj_is_class_TEST(parent)) {
-        internal_exception(1, "Parent isn't a ParrotClass");
+        real_exception(interp, NULL, 1, "Parent isn't a ParrotClass");
     }
 
     current_parent_array = get_attrib_num(PMC_data(_class), PCD_PARENTS);
@@ -1528,7 +1528,7 @@ Parrot_add_attribute(Interp *interp, PMC* _class, STRING* attr)
     /* TODO escape NUL char */
     if (VTABLE_exists_keyed_str(interp, attr_hash, full_attr_name)) {
         char * const c_error = string_to_cstring(interp, full_attr_name);
-        internal_exception(1, "Attribute '%s' already exists", c_error);
+        real_exception(interp, NULL, 1, "Attribute '%s' already exists", c_error);
         string_cstring_free(c_error);
     }
 
@@ -1579,7 +1579,7 @@ attr_str_2_num(Interp *interp, PMC *object, STRING *attr)
     int         idx, length;
 
     if (!PObj_is_object_TEST(object))
-        internal_exception(INTERNAL_NOT_IMPLEMENTED,
+        real_exception(interp, NULL, INTERNAL_NOT_IMPLEMENTED,
                 "Can't set non-core object attribs yet");
 
     _class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);

@@ -144,8 +144,9 @@ Parrot_runops_fromc(Interp *interp /*NN*/, PMC *sub)
      * Passing a dummy true destination copies registers
      */
     dest = VTABLE_invoke(interp, sub, (void*) 1);
-    if (!dest)
-        internal_exception(1, "Subroutine returned a NULL address");
+    if (!dest) {
+        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
+    }
     ctx = CONTEXT(interp->ctx);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
@@ -169,8 +170,9 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, NULL);
-    if (!dest)
-        internal_exception(1, "Subroutine returned a NULL address");
+    if (!dest) {
+        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
+    }
     if (PMC_IS_NULL(obj)) {
         /* skip over the return type */
         sig_p = sig + 1;
@@ -181,8 +183,9 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
     }
     else  {
         const size_t len = strlen(sig);
-        if (len > 8)
-            internal_exception(1, "too many arguments in runops_args");
+        if (len > 8) {
+            real_exception(interp, NULL, 1, "too many arguments in runops_args");
+        }
         new_sig[0] = 'O';
         strcpy(new_sig + 1, sig + 1);
         sig_p = new_sig;
@@ -260,8 +263,9 @@ Parrot_run_meth_fromc(Parrot_Interp interp,
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, (void*)1);
-    if (!dest)
-        internal_exception(1, "Subroutine returned a NULL address");
+    if (!dest) {
+        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
+    }
     ctx = CONTEXT(interp->ctx);
     offset = dest - interp->code->base.data;
     runops(interp, offset);

@@ -875,7 +875,7 @@ get_chunk(Interp *interp /*NN*/, List *list /*NN*/, UINTVAL *idx /*NN*/)
             return chunk;
         *idx -= chunk->items;
     }
-    internal_exception(INTERNAL_PANIC, "list structure chaos!\n");
+    real_exception(interp, NULL, INTERNAL_PANIC, "list structure chaos!\n");
 #endif
 
 
@@ -942,9 +942,9 @@ get_chunk(Interp *interp /*NN*/, List *list /*NN*/, UINTVAL *idx /*NN*/)
             chunk = chunk->next;
             continue;
         }
-        internal_exception(INTERNAL_PANIC, "list structure chaos #1!\n");
+        real_exception(interp, NULL, INTERNAL_PANIC, "list structure chaos #1!\n");
     }
-    internal_exception(INTERNAL_PANIC, "list structure chaos #2!\n");
+    real_exception(interp, NULL, INTERNAL_PANIC, "list structure chaos #2!\n");
     return 0;
 }
 
@@ -1078,7 +1078,7 @@ list_set(Interp *interp /*NN*/, List *list /*NN*/, void *item, INTVAL type, INTV
         ((STRING **) PObj_bufstart(&chunk->data))[idx] = (STRING *)item;
         break;
     default:
-        internal_exception(1, "Unknown list entry type\n");
+        real_exception(interp, NULL, 1, "Unknown list entry type\n");
         break;
     }
 }
@@ -1134,7 +1134,7 @@ list_item(Interp *interp /*NN*/, List *list /*NN*/, int type, INTVAL idx)
         return (void *)&((STRING **) PObj_bufstart(&chunk->data))[idx];
         break;
     default:
-        internal_exception(1, "Unknown list entry type\n");
+        real_exception(interp, NULL, 1, "Unknown list entry type\n");
         break;
     }
     return 0;
@@ -1202,7 +1202,7 @@ list_new(Interp *interp, INTVAL type)
         list->item_size = sizeof (STRING *);
         break;
     default:
-        internal_exception(1, "Unknown list type\n");
+        real_exception(interp, NULL, 1, "Unknown list type\n");
         break;
     }
     return list;
@@ -1251,11 +1251,13 @@ list_new_init(Interp *interp /*NN*/, INTVAL type, PMC *init /*NN*/)
     PMC * user_array, *multi_key;
     INTVAL i, len, size, item_size, items_per_chunk;
 
-    if (!init->vtable)
-        internal_exception(1, "Illegal initializer for init\n");
+    if (!init->vtable) {
+        real_exception(interp, NULL, 1, "Illegal initializer for init\n");
+    }
     len = VTABLE_elements(interp, init);
-    if (len & 1)
-        internal_exception(1, "Illegal initializer for init: odd elements\n");
+    if (len & 1) {
+        real_exception(interp, NULL, 1, "Illegal initializer for init: odd elements\n");
+    }
 
     size = item_size = items_per_chunk = 0;
     multi_key = NULL;
@@ -1283,8 +1285,9 @@ list_new_init(Interp *interp /*NN*/, INTVAL type, PMC *init /*NN*/)
     }
     list = list_new(interp, type);
     if (list->item_type == enum_type_sized) { /* override item_size */
-        if (!item_size)
-            internal_exception(1, "No item_size for type_sized list\n");
+        if (!item_size) {
+            real_exception(interp, NULL, 1, "No item_size for type_sized list\n");
+        }
         list->item_size = item_size;
         list->items_per_chunk =
             items_per_chunk
@@ -1858,14 +1861,15 @@ list_splice(Interp *interp /*NN*/, List *list /*NN*/, List *value_list /*NULLOK*
     const int type = list->item_type;
     INTVAL i, j;
 
-    if (value_list && type != value_list->item_type)
-        internal_exception(1, "Item type mismatch in splice\n");
+    if (value_list && type != value_list->item_type) {
+        real_exception(interp, NULL, 1, "Item type mismatch in splice\n");
+    }
 
     /* start from end */
     if (offset < 0)
         offset += length;
     if (offset < 0)
-        internal_exception(OUT_OF_BOUNDS, "illegal splice offset\n");
+        real_exception(interp, NULL, OUT_OF_BOUNDS, "illegal splice offset\n");
     /* "leave that many elements off the end of the array" */
     if (count < 0)
         count += length - offset + 1;

@@ -66,7 +66,7 @@ Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
     sig_str = cb_signature->strstart;
 
     if (strlen(sig_str) != 3) {
-        internal_exception(1, "unhandled signature '%s' in make_cb",
+        real_exception(interp, NULL, 1, "unhandled signature '%s' in make_cb",
               cb_signature->strstart);
     }
 
@@ -81,7 +81,7 @@ Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
             type = 'C';
         }
         else {
-            internal_exception(1, "unhandled signature '%s' in make_cb",
+            real_exception(interp, NULL, 1, "unhandled signature '%s' in make_cb",
                     cb_signature->strstart);
         }
     }
@@ -330,7 +330,7 @@ case_I:
             param = string_from_cstring(interp, external_data, 0);
             break;
         default:
-            internal_exception(1, "unhandled signature char '%c' in run_cb",
+            real_exception(interp, NULL, 1, "unhandled signature char '%c' in run_cb",
                                *p);
     }
     pasm_sig[3] = '\0';

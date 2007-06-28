@@ -502,7 +502,7 @@ Parrot_fetch_arg(Interp *interp /*NN*/, call_state *st /*NN*/)
             return fetch_arg_sig(interp, st);
     }
 
-    internal_exception(1, "invalid call state mode");
+    real_exception(interp, NULL, 1, "invalid call state mode");
     return 0;
 }
 

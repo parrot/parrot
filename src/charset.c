@@ -120,7 +120,7 @@ Parrot_load_charset(Interp *interp, const char *charsetname /*NN*/)
     UNUSED(interp);
     UNUSED(charsetname);
 
-    internal_exception(UNIMPLEMENTED, "Can't load charsets yet");
+    real_exception(interp, NULL, UNIMPLEMENTED, "Can't load charsets yet");
     return NULL;
 }
 

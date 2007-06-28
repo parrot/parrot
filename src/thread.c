@@ -194,7 +194,7 @@ PMC *pt_shared_fixup(Parrot_Interp interp, PMC *pmc) {
 
         if (type_num == enum_type_undef) {
             UNLOCK_INTERPRETER(master);
-            internal_exception(1, "pt_shared_fixup: unsharable type");
+            real_exception(interp, NULL, 1, "pt_shared_fixup: unsharable type");
             return PMCNULL;
         }
 
@@ -1152,7 +1152,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
      */
     state = interp->thread_data->state;
     UNLOCK(interpreter_array_mutex);
-    internal_exception(1, "join: illegal thread state %d tid %d",
+    real_exception(interp, NULL, 1, "join: illegal thread state %d tid %d",
             state, tid);
     return NULL;
 }

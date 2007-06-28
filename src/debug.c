@@ -1702,7 +1702,7 @@ PDB_disassemble_op(Interp *interp, char *dest, int space,
             dest[size++] = ']';
             break;
         default:
-            internal_exception(1, "Unknown opcode type");
+            real_exception(interp, NULL, 1, "Unknown opcode type");
         }
 
         if (j != info->op_count - 1)
