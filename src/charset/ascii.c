@@ -385,7 +385,7 @@ ascii_cs_rindex(Interp *interp, STRING *source_string /*NN*/,
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
-        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
+        real_exception(interp, NULL, UNIMPLEMENTED, "Cross-charset index not supported");
     }
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);

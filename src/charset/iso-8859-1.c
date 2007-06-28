@@ -153,7 +153,7 @@ to_unicode(Interp *interp, STRING *src, STRING *dest /*NULLOK*/)
         return dest;
     }
     else {
-        internal_exception(UNIMPLEMENTED,
+        real_exception(interp, NULL, UNIMPLEMENTED,
                 "to_unicode inplace for iso-8859-1 not implemented");
     }
     return NULL;
@@ -184,7 +184,7 @@ compose(Interp *interp, STRING *src)
 static STRING*
 decompose(Interp *interp, STRING *src)
 {
-    internal_exception(UNIMPLEMENTED,
+    real_exception(interp, NULL, UNIMPLEMENTED,
             "decompose for iso-8859-1 not implemented");
     return NULL;
 }

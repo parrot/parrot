@@ -94,7 +94,7 @@ to_charset(Interp *interp, STRING *src, STRING *dest)
                     src->charset, Parrot_binary_charset_ptr))) {
          return conversion_func(interp, src, dest);
     }
-    internal_exception(UNIMPLEMENTED, "to_charset for binary not implemented");
+    real_exception(interp, NULL, UNIMPLEMENTED, "to_charset for binary not implemented");
     return NULL;
 }
 
