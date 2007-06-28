@@ -612,7 +612,7 @@ sort_registers(Interp *interp,
         opcode_t * code_start)
 {
     Parrot_jit_optimizer_t *optimizer;
-    Parrot_jit_optimizer_section_ptr cur_section, next, prev;
+    Parrot_jit_optimizer_section_ptr cur_section, next;
     int i, any, k, typ, code_type;
     int max_count, max_i = 0;
     int to_map[] = { 0, 0, 0, 0 };
@@ -682,7 +682,6 @@ sort_registers(Interp *interp,
             ru[typ].registers_used = k;
         }
         next = cur_section->next;
-        prev = cur_section;
         /* duplicate usage to all sections of block */
         while (next && next->block == cur_section->block) {
             Parrot_jit_register_usage_t *nru = next->ru;
@@ -693,7 +692,6 @@ sort_registers(Interp *interp,
                 }
                 nru[typ].registers_used = ru[typ].registers_used;
             }
-            prev = next;
             next = next->next;
         }
         /* Move to the next section */
