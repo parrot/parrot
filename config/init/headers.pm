@@ -7,7 +7,8 @@ config/init/headers.pm - Nongenerated Headers
 
 =head1 DESCRIPTION
 
-Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
+Uses C<ExtUtils::Manifest> to find the C header files that are 
+distributed with Parrot.
 
 =cut
 
@@ -21,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(maniread);
 
-our $description = 'Determining nongenerated header files';
+our $description = 'Finding header files distributed with Parrot';
 our @args;
 
 sub runstep {
