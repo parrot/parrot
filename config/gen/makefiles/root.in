@@ -103,6 +103,8 @@ LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
 LD         = @ld@
 LDFLAGS    = @ldflags@ @ld_debug@
 
+CONFIGURE  = $(PERL) Configure.pl
+
 LINT = lint
 LINTFLAGS = \
     -b \
@@ -752,6 +754,9 @@ world : all parrot_utils
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
+
+Makefile : config/gen/makefiles/root.in
+	$(CONFIGURE) --step=gen::makefiles --target=Makefile
 
 flags_dummy :
 	@echo "Compiling with:"
