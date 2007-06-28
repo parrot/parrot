@@ -10,7 +10,7 @@ no_arg:
 	new P0, .Hash
 	new P1, .Undef
 
-	<<HERE>>
+	<<PCONFIG>>
 
 	if I11, is_install
 	set S1, "<<PWD>>"
