@@ -514,7 +514,7 @@ ret_string:
         size_t got;
         /* exception if we're unbuffered */
         if (io->b.size == 0)
-            internal_exception(PIO_ERROR, "Can't peek at unbuffered PIO");
+            real_exception(interp, NULL, PIO_ERROR, "Can't peek at unbuffered PIO");
 
         got = PIO_buf_fill_readbuf(interp, l, io, b);
         len = (len < got) ? len : got;

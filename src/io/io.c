@@ -219,7 +219,7 @@ PIO_init(Interp *interp /*NN*/)
         /* memsub system is up and running: */
         /* Init IO stacks and handles for interp instance.  */
         if (PIO_init_stacks(interp) != 0) {
-            internal_exception(PIO_ERROR, "PIO init stacks failed.");
+            real_exception(interp, NULL, PIO_ERROR, "PIO init stacks failed.");
         }
 
         /*
@@ -246,11 +246,11 @@ PIO_init(Interp *interp /*NN*/)
 
     interp->piodata = mem_allocate_typed(ParrotIOData);
     if (interp->piodata == NULL)
-        internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
+        real_exception(interp, NULL, PIO_ERROR, "PIO alloc piodata failure.");
     interp->piodata->default_stack = NULL;
     interp->piodata->table = mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof(ParrotIO *));
     if (interp->piodata->table == NULL)
-        internal_exception(PIO_ERROR, "PIO alloc table failure.");
+        real_exception(interp, NULL, PIO_ERROR, "PIO alloc table failure.");
 
 }
 
@@ -380,7 +380,7 @@ PIO_init_stacks(Interp *interp)
                  * see also #36677
                 char buf[1024];
                 sprintf(buf, "Parrot IO: Failed init layer(%s).\n", p->name);
-                internal_exception(PIO_ERROR, buf);
+                real_exception(interp, NULL, PIO_ERROR, buf);
                 */
                 ;
             }

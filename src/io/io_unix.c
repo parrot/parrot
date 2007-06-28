@@ -274,7 +274,7 @@ PIO_unix_async(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
         return fcntl(io->fd, F_SETFL, rflags);
     }
 #    else
-    internal_exception(PIO_NOT_IMPLEMENTED, "Async support not available");
+    real_exception(interp, NULL, PIO_NOT_IMPLEMENTED, "Async support not available");
 #    endif
     return -1;
 }
@@ -1115,7 +1115,7 @@ PIO_unix_pipe(Interp *interp, ParrotIOLayer *l, const char *cmd, int flags)
 
     perror("fork");
 #  else
-    internal_exception(UNIMPLEMENTED, "pipe() unimplemented");
+    real_exception(interp, NULL, UNIMPLEMENTED, "pipe() unimplemented");
 #  endif
     return NULL;
 }

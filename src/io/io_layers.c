@@ -173,8 +173,9 @@ PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *ls)
     ParrotIOLayer * newlayer;
 
     string_cstring_free(cls);
-    if (!l)
-        internal_exception(1, "Layer not found");
+    if (!l) {
+        real_exception(interp, NULL, 1, "Layer not found");
+    }
 
     /* make private copy */
     newlayer = PIO_base_new_layer(l);
