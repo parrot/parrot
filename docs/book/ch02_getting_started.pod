@@ -96,8 +96,52 @@ code for Parrot classes (PMCs, which you'll read more about in
 A<CHP-9>Chapter 9). The F<examples/> directory contains some example
 Parrot assembler code, as well as benchmarks.
 
-For instructions on building Parrot, see A<CHP-9-SECT-1>"Getting
-Started" in Chapter 9.
+=head1 Building Parrot
+
+Z<CHP-9-SECT-1>
+
+X<Parrot;source code>
+The first step before you start playing with PASM code is to get a
+copy of the source code and compile it. There is some information on
+this in A<CHP-2-SECT-2.2.1>"Use the source" in Chapter 2. For more
+information and updates, see U<http://www.parrotcode.org> and the
+documentation in the distributed code.
+
+The basic steps are:N<Not all operating systems have F<make>. Check
+the documentation for instructions for systems that aren't
+Unix-based.>
+
+  $ perl Configure.pl
+  $ make
+  $ make test
+
+X<PASM (Parrot assembly language);compiling>
+Once you've compiled Parrot, create a small test file in the main
+F<parrot> directory.  We'll call it F<fjord.pasm>.
+
+  print "He's pining for the fjords.\n"
+  end
+
+X<.pasm files>
+I<.pasm> is the standard extension for Parrot assembly language source
+files. Now you can run this file with:
+
+  $ ./parrot fjord.pasm
+
+And watch the result of the program execution. Instead of executing
+the program immediately, you could also compile it to bytecode:
+
+  $ ./parrot --output fjord.pbc fjord.pasm
+
+You specify the name of the output bytecode file with the C<--output>
+(or C<-o>) switch.  I<.pbc> is the standard extension for Parrot
+bytecode. To execute the compiled bytecode, run it through the
+F<parrot> interpreter:
+
+  $ ./parrot fjord.pbc
+
+That's all there is to it.
+
 
 =head3 Patch submission
 
