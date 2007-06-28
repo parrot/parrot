@@ -39,7 +39,7 @@ of its corresponding C<TclString> PMC, resulting in the more complicated:
 
     void class_init() {
       if (pass) {
-	dynpmc_TclString = Parrot_PMC_typenum(INTERP,"TclString");
+	dynpmc_TclString = Parrot_PMC_typenum(interp,"TclString");
       }
     }
   }

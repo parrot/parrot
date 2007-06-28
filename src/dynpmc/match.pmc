@@ -27,14 +27,14 @@ anyone who reads this to hurl. Violently.
 
 extern int MatchRange_type_id;
 
-static STRING* make_hash_key(Interp* interpreter, PMC * key)
+static STRING* make_hash_key(Interp* interp, PMC * key)
 {
     if (key == NULL) {
-        real_exception(interpreter, NULL, OUT_OF_BOUNDS,
+        real_exception(interp, NULL, OUT_OF_BOUNDS,
         "Cannot use NULL key for Match!");
         return NULL;
     }
-    return key_string(interpreter, key);
+    return key_string(interp, key);
 }
 
 static STRING* match_range(Interp* interp, PMC* self, PMC* range)
@@ -114,13 +114,13 @@ needs to be done once.
 
     STRING* get_string_keyed_str(STRING* key) {
         Hash* hash = (Hash*) PMC_struct_val(SELF);
-        HashBucket *b = parrot_hash_get_bucket(INTERP, hash, key);
+        HashBucket *b = parrot_hash_get_bucket(interp, hash, key);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
-            /* return VTABLE_get_string(INTERP, undef); */
+            /* return VTABLE_get_string(interp, undef); */
             return NULL;
         }
-        return fetch_string(INTERP, SELF, (PMC*) b->value);
+        return fetch_string(interp, SELF, (PMC*) b->value);
     }
 
 /*
@@ -146,22 +146,22 @@ Returns the string value for the element at C<*key>.
                 /* BUG! This will iterate through the input string as
                  * well as all of the real values. */
                 if (hash->key_type == Hash_key_type_int) {
-                    INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
-                    return string_from_int(INTERP, i);
+                    INTVAL i = (INTVAL)parrot_hash_get_idx(interp, hash, key);
+                    return string_from_int(interp, i);
                 }
-                return parrot_hash_get_idx(INTERP, hash, key);
+                return parrot_hash_get_idx(interp, hash, key);
             default:
-                keystr = make_hash_key(INTERP, key);
+                keystr = make_hash_key(interp, key);
         }
-        b = parrot_hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(interp, hash, keystr);
         if (b == NULL) {
             return SELF.get_string_keyed_str(keystr);
         }
-        nextkey = key_next(INTERP, key);
+        nextkey = key_next(interp, key);
         valpmc = b->value;
         if (!nextkey)
-            return fetch_string(INTERP, SELF, valpmc);
-        return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
+            return fetch_string(interp, SELF, valpmc);
+        return VTABLE_get_string_keyed(interp, valpmc, nextkey);
     }
 
     INTVAL get_integer_keyed(PMC* key) {
@@ -177,25 +177,25 @@ Returns the string value for the element at C<*key>.
                  * check if we really have Hash_key_type_int
                  */
                 if (hash->key_type == Hash_key_type_int) {
-                    return (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
+                    return (INTVAL)parrot_hash_get_idx(interp, hash, key);
                 }
                 else {
-                    STRING *s = parrot_hash_get_idx(INTERP, hash, key);
-                    return string_to_int(INTERP, s);
+                    STRING *s = parrot_hash_get_idx(interp, hash, key);
+                    return string_to_int(interp, s);
                 }
             default:
-                keystr = make_hash_key(INTERP, key);
+                keystr = make_hash_key(interp, key);
         }
-        b = parrot_hash_get_bucket(INTERP, hash, keystr);
+        b = parrot_hash_get_bucket(interp, hash, keystr);
         if (b == NULL) {
             /* XXX Warning: use of uninitialized value */
             return 0;
         }
-        nextkey = key_next(INTERP, key);
+        nextkey = key_next(interp, key);
         valpmc = b->value;
         if (!nextkey)
-            return fetch_integer(INTERP, SELF, valpmc);
-        return VTABLE_get_integer_keyed(INTERP, valpmc, nextkey);
+            return fetch_integer(interp, SELF, valpmc);
+        return VTABLE_get_integer_keyed(interp, valpmc, nextkey);
     }
 
 /*
@@ -209,18 +209,18 @@ has not completed yet.
 
 */
     INTVAL get_bool() {
-        STRING* input_key = const_string(INTERP, "!RESULT");
+        STRING* input_key = const_string(interp, "!RESULT");
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b;
 
-        b = parrot_hash_get_bucket(INTERP, hash, input_key);
+        b = parrot_hash_get_bucket(interp, hash, input_key);
         if (!b) {
-            real_exception(INTERP, NULL, 1,
+            real_exception(interp, NULL, 1,
                                "Match: cannot get status of incomplete match");
             return 0;
         }
 
-        return VTABLE_get_integer(INTERP, (PMC*) b->value);
+        return VTABLE_get_integer(interp, (PMC*) b->value);
     }
 }
 

@@ -89,8 +89,8 @@ So we do a bit of cheating here, and load it during class initialization.
         if (pass) {
 #ifdef WIN32
             /* XXX: What if libgdbm.so cannot be loaded */
-            /* Parrot_load_lib(INTERP, slib, NULL); */
-            STRING *slib = string_from_literal(INTERP, "gdbm3");
+            /* Parrot_load_lib(interp, slib, NULL); */
+            STRING *slib = string_from_literal(interp, "gdbm3");
 #endif
         }
     }
@@ -118,7 +118,7 @@ Open a or create a new dbm file.
 */
 
     void set_string_native(STRING* value) {
-        char *c_db_name      = string_to_cstring(INTERP, value);
+        char *c_db_name      = string_to_cstring(interp, value);
         GDBM_FILE dbf        = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
         string_cstring_free(c_db_name);
@@ -198,7 +198,7 @@ Returns true if the hash size is not zero.
 
         if (!key) return;
         if (!dbf) return;
-        keystr = make_hash_key(INTERP, key);
+        keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
@@ -227,13 +227,13 @@ Returns the string value for the element at C<*key>.
 
         if (!key) return NULL;
         if (!dbf) return NULL;
-        keystr = make_hash_key(INTERP, key);
+        keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
         val_gdbm = gdbm_fetch(dbf, key_gdbm);
 
-        val = string_from_cstring(INTERP, val_gdbm.dptr, val_gdbm.dsize);
+        val = string_from_cstring(interp, val_gdbm.dptr, val_gdbm.dsize);
         free(val_gdbm.dptr);
 
         return val;
@@ -253,7 +253,7 @@ Convert C<value> to a string and set the string for the C<key>.
     void set_pmc_keyed(PMC* key, PMC* value) {
         STRING *temp;
 
-        temp = VTABLE_get_string(INTERP, value);
+        temp = VTABLE_get_string(interp, value);
         DYNSELF.set_string_keyed(key, temp);
     }
 
@@ -269,9 +269,9 @@ Returns the PMC value for the element at C<*key>.
 
     PMC* get_pmc_keyed(PMC* key) {
         STRING * ret_string = DYNSELF.get_string_keyed(key);
-        PMC *ret_pmc = pmc_new(INTERP, enum_class_String);
+        PMC *ret_pmc = pmc_new(interp, enum_class_String);
 
-        VTABLE_set_string_native(INTERP, ret_pmc, ret_string);
+        VTABLE_set_string_native(interp, ret_pmc, ret_string);
 
         return ret_pmc;
     }
@@ -289,8 +289,8 @@ Convert C<value> to a string and set the string for the C<key>.
     void set_integer_keyed(PMC* key, INTVAL value) {
         PMC *temp;
 
-        temp = pmc_new(INTERP, enum_class_String);
-        VTABLE_set_integer_native(INTERP, temp, value);
+        temp = pmc_new(interp, enum_class_String);
+        VTABLE_set_integer_native(interp, temp, value);
         DYNSELF.set_pmc_keyed(key, temp);
     }
 
@@ -308,8 +308,8 @@ Convert C<value> to a string and set the string for the C<key>.
     void set_number_keyed(PMC* key, FLOATVAL value) {
         PMC *temp;
 
-        temp = pmc_new(INTERP, enum_class_String);
-        VTABLE_set_number_native(INTERP, temp, value);
+        temp = pmc_new(interp, enum_class_String);
+        VTABLE_set_number_native(interp, temp, value);
         DYNSELF.set_pmc_keyed(key, temp);
     }
 
@@ -330,7 +330,7 @@ Returns whether a key C<*key> exists in the hash.
 
         if (!key) return 0;
         if (!dbf) return 0;
-        keystr = make_hash_key(INTERP, key);
+        keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
@@ -355,7 +355,7 @@ Deletes the element associated with C<*key>.
 
         if (!key) return;
         if (!dbf) return;
-        keystr = make_hash_key(INTERP, key);
+        keystr = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;

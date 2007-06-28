@@ -24,7 +24,7 @@ lexicals at runtime.
 pmclass DynLexPad dynpmc does lexpad need_ext {
 
     void init() {
-        real_exception(INTERP, NULL, INVALID_OPERATION,
+        real_exception(interp, NULL, INVALID_OPERATION,
                 "don't create me like this");
     }
 
@@ -71,25 +71,25 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 */
     void init_pmc(PMC* lexinfo) {
-        if (VTABLE_elements(INTERP, lexinfo)) {
+        if (VTABLE_elements(interp, lexinfo)) {
             PMC_pmc_val(SELF) =
-                pmc_new_init(INTERP, enum_class_LexPad, lexinfo);
+                pmc_new_init(interp, enum_class_LexPad, lexinfo);
         }
         else
             PMC_pmc_val(SELF) = NULL;
-        parrot_new_pmc_hash(INTERP, SELF);
+        parrot_new_pmc_hash(interp, SELF);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
     void set_pointer(void* ctx) {
         PMC *std_pad = PMC_pmc_val(SELF);
         if (std_pad)
-            VTABLE_set_pointer(INTERP, std_pad, ctx);
+            VTABLE_set_pointer(interp, std_pad, ctx);
     }
 
     void destroy() {
         if (PMC_struct_val(SELF)) {
-            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(interp, (Hash*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -106,18 +106,18 @@ Marks the lexpad hash as live.
     void mark() {
         PMC *std_pad = PMC_pmc_val(SELF);
         if (std_pad)
-            pobject_lives(INTERP, (PObj *)std_pad);
+            pobject_lives(interp, (PObj *)std_pad);
         if (PMC_struct_val(SELF))
-            parrot_mark_hash(INTERP, PMC_struct_val(SELF));
+            parrot_mark_hash(interp, PMC_struct_val(SELF));
     }
 
     PMC* get_pmc_keyed_str(STRING* name) {
-        HashBucket *b = parrot_hash_get_bucket(INTERP,
+        HashBucket *b = parrot_hash_get_bucket(interp,
             (Hash*) PMC_struct_val(SELF), name);
         if (!b) {
             PMC *std_pad = PMC_pmc_val(SELF);
             if (std_pad)
-                return VTABLE_get_pmc_keyed_str(INTERP, std_pad, name);
+                return VTABLE_get_pmc_keyed_str(interp, std_pad, name);
             return PMCNULL;
         }
         return b->value;
@@ -125,34 +125,34 @@ Marks the lexpad hash as live.
 
     INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
-        if (parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), name))
+        if (parrot_hash_get_bucket(interp, (Hash*) PMC_struct_val(SELF), name))
             return 1;
         std_pad = PMC_pmc_val(SELF);
         if (std_pad)
-            return VTABLE_exists_keyed_str(INTERP, std_pad, name);
+            return VTABLE_exists_keyed_str(interp, std_pad, name);
         return 0;
     }
 
     INTVAL exists_keyed(PMC* name) {
-        STRING *s = key_string(INTERP, name);
+        STRING *s = key_string(interp, name);
         return SELF.exists_keyed_str(s);
     }
 
     PMC* get_pmc_keyed(PMC* name) {
-        STRING *s = key_string(INTERP, name);
+        STRING *s = key_string(interp, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
     void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *std_pad = PMC_pmc_val(SELF);
-        if (std_pad && VTABLE_exists_keyed_str(INTERP, std_pad, name)) {
-            VTABLE_set_pmc_keyed_str(INTERP, std_pad, name, value);
+        if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name)) {
+            VTABLE_set_pmc_keyed_str(interp, std_pad, name, value);
         }
-        parrot_hash_put(INTERP, PMC_struct_val(SELF), name, value);
+        parrot_hash_put(interp, PMC_struct_val(SELF), name, value);
     }
 
     void set_pmc_keyed(PMC* name, PMC* value) {
-        STRING *s = key_string(INTERP, name);
+        STRING *s = key_string(interp, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 

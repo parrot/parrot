@@ -133,7 +133,7 @@ Creates an identical copy of the matchrange number.
     }
 
     PMC* clone() {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* dest = pmc_new_noinit(interp, SELF->vtable->base_type);
         PObj_active_destroy_SET(dest);
         RANGE_START(dest) = RANGE_START(SELF);
         RANGE_END(dest) = RANGE_END(SELF);
@@ -175,11 +175,11 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 */
 
     INTVAL get_integer_keyed(PMC* key) {
-        if (key_type(INTERP, key) == KEY_integer_FLAG) {
+        if (key_type(interp, key) == KEY_integer_FLAG) {
             return SELF.get_integer_keyed_int(PMC_int_val(key));
         }
         else {
-            STRING* s = VTABLE_get_string(INTERP, key);
+            STRING* s = VTABLE_get_string(interp, key);
             return DYNSELF.get_integer_keyed_str(s);
         }
     }
@@ -189,19 +189,19 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     FLOATVAL get_number_keyed(PMC* key) {
-        STRING* s = VTABLE_get_string(INTERP, key);
+        STRING* s = VTABLE_get_string(interp, key);
         return DYNSELF.get_number_keyed_str(s);
     }
 
     FLOATVAL get_number_keyed_str(STRING* key) {
-        INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
+        INTVAL *num = matchrange_locate_keyed_int(interp, SELF, key);
         if (num)
             return *num;
         return 0.0;
     }
 
     PMC* get_pmc_keyed(PMC* key) {
-        STRING* s = VTABLE_get_string(INTERP, key);
+        STRING* s = VTABLE_get_string(interp, key);
         return DYNSELF.get_pmc_keyed_str(s);
     }
 
@@ -209,9 +209,9 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         PMC *ret;
         FLOATVAL val;
 
-        ret = pmc_new(INTERP, enum_class_Float);
+        ret = pmc_new(interp, enum_class_Float);
         val = DYNSELF.get_number_keyed_str(key);
-        VTABLE_set_number_native(INTERP, ret, val);
+        VTABLE_set_number_native(interp, ret, val);
         return ret;
     }
 
@@ -237,7 +237,7 @@ Set start or end depending on key
             case 1:
                 return RANGE_END(SELF);
             default:
-                real_exception(INTERP, NULL, 1, "MatchRange: key must be 0 or 1");
+                real_exception(interp, NULL, 1, "MatchRange: key must be 0 or 1");
         }
         return -2;
     }
@@ -251,7 +251,7 @@ Set start or end depending on key
                 RANGE_END(SELF) = v;
                 break;
             default:
-                real_exception(INTERP, NULL, 1, "MatchRange: key must be 0 or 1");
+                real_exception(interp, NULL, 1, "MatchRange: key must be 0 or 1");
         }
     }
 /*
@@ -273,7 +273,7 @@ for the same input string, but I won't worry about that for now.
             RANGE_END(SELF) = RANGE_END(value);
         }
         else {
-            real_exception(INTERP, NULL, 1, "MatchRange: cannot set from pmc");
+            real_exception(interp, NULL, 1, "MatchRange: cannot set from pmc");
         }
     }
 
@@ -302,17 +302,17 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
 */
 
     void set_integer_keyed(PMC* key, INTVAL value) {
-        if (key_type(INTERP, key) == KEY_integer_FLAG) {
+        if (key_type(interp, key) == KEY_integer_FLAG) {
             SELF.set_integer_keyed_int(PMC_int_val(key), value);
         }
         else {
-            STRING* s = VTABLE_get_string(INTERP, key);
+            STRING* s = VTABLE_get_string(interp, key);
             DYNSELF.set_integer_keyed_str(s, value);
         }
     }
 
     void set_integer_keyed_str(STRING* key, INTVAL value) {
-        INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
+        INTVAL *num = matchrange_locate_keyed_int(interp, SELF, key);
         if (num)
             *num = value;
     }
@@ -330,12 +330,12 @@ C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
     }
 
     void set_pmc_keyed(PMC* key, PMC* value) {
-        INTVAL f = VTABLE_get_integer(INTERP, value);
+        INTVAL f = VTABLE_get_integer(interp, value);
         DYNSELF.set_integer_keyed(key, f);
     }
 
     void set_pmc_keyed_str(STRING* key, PMC* value) {
-        INTVAL f = VTABLE_get_integer(INTERP, value);
+        INTVAL f = VTABLE_get_integer(interp, value);
         DYNSELF.set_integer_keyed_str(key, f);
     }
 
@@ -355,18 +355,18 @@ result in C<dest>.
 */
 
     PMC* add(PMC* value, PMC* dest) {
-        INTVAL v = VTABLE_get_integer(INTERP, dest);
+        INTVAL v = VTABLE_get_integer(interp, dest);
         return SELF.add_int(v, dest);
     }
 
     PMC* add_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(INTERP, dest, MatchRange_type_id);
+            VTABLE_morph(interp, dest, MatchRange_type_id);
         else
-            dest = pmc_new(INTERP,  MatchRange_type_id);
+            dest = pmc_new(interp,  MatchRange_type_id);
         if (RANGE_END(SELF) == -2) {
             if (RANGE_START(SELF) == -2) {
-                real_exception(INTERP, NULL, 1,
+                real_exception(interp, NULL, 1,
                     "MatchRange: cannot add to nonexistent range");
                 return NULL;
             }
@@ -396,15 +396,15 @@ the result in C<dest>.
 */
 
     PMC* subtract(PMC* value, PMC* dest) {
-        INTVAL v = VTABLE_get_integer(INTERP, dest);
+        INTVAL v = VTABLE_get_integer(interp, dest);
         return SELF.subtract_int(v, dest);
     }
 
     PMC* subtract_int(INTVAL value, PMC* dest) {
         if (dest)
-            VTABLE_morph(INTERP, dest, MatchRange_type_id);
+            VTABLE_morph(interp, dest, MatchRange_type_id);
         else
-            dest = pmc_new(INTERP,  MatchRange_type_id);
+            dest = pmc_new(interp,  MatchRange_type_id);
         RANGE_END(dest) = RANGE_END(SELF) - value;
         if (RANGE_END(dest) <= -2 || RANGE_END(dest) < RANGE_START(dest) - 1)
             RANGE_END(dest) = -2;
