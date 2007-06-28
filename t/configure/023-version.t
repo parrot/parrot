@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 24-version.t
+# $Id: 023-version.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 023-version.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
@@ -30,12 +30,17 @@ my $errstr;
     # Case 5:  Valid version number
     make_VERSION_file(q{0.4.11});
     my ($pv, @pv);
-    @pv = Parrot::BuildUtil::parrot_version();
     $pv = Parrot::BuildUtil::parrot_version();
+    @pv = Parrot::BuildUtil::parrot_version();
+    is($pv, q{0.4.11}, "Correct version number returned in scalar context");
     is_deeply(\@pv, [ 0, 4, 11 ],
         "Correct version number returned in scalar context");
-    is($pv, q{0.4.11}, "Correct version number returned in scalar context");
 
+    $pv = Parrot::BuildUtil::parrot_version();
+    @pv = Parrot::BuildUtil::parrot_version();
+    is($pv, q{0.4.11}, "Correct version number returned in scalar context");
+    is_deeply(\@pv, [ 0, 4, 11 ],
+        "Correct version number returned in scalar context");
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
 
@@ -45,11 +50,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-24-version.t - test C<Parrot::BuildUtil::parrot_version()>
+023-version.t - test C<Parrot::BuildUtil::parrot_version()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/24-version.t
+    % prove t/configure/023-version.t
 
 =head1 DESCRIPTION
 

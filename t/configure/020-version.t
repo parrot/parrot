@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 20-version.t
+# $Id: 020-version.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 020-version.t
 
 use strict;
 use warnings;
@@ -43,11 +43,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-20-version.t - test C<Parrot::BuildUtil::parrot_version()>
+020-version.t - test C<Parrot::BuildUtil::parrot_version()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/20-version.t
+    % prove t/configure/020-version.t
 
 =head1 DESCRIPTION
 

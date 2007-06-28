@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 23-version.t
+# $Id: 021-version.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 021-version.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 11;
 use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
@@ -27,34 +27,27 @@ my $errstr;
 
     require Parrot::BuildUtil;
 
-    # Case 5:  Valid version number
-    make_VERSION_file(q{0.4.11});
-    my ($pv, @pv);
-    $pv = Parrot::BuildUtil::parrot_version();
-    @pv = Parrot::BuildUtil::parrot_version();
-    is($pv, q{0.4.11}, "Correct version number returned in scalar context");
-    is_deeply(\@pv, [ 0, 4, 11 ],
-        "Correct version number returned in scalar context");
+    # Case 3:  VERSION file with >4-element version number
+    make_VERSION_file(q{0.4.11.7.5});
+    eval {
+        my $pv = Parrot::BuildUtil::parrot_version();
+    };
+    like($@, qr/Too many components to VERSION file contents/,
+        "Correctly detected too many components in version number");
 
-    $pv = Parrot::BuildUtil::parrot_version();
-    @pv = Parrot::BuildUtil::parrot_version();
-    is($pv, q{0.4.11}, "Correct version number returned in scalar context");
-    is_deeply(\@pv, [ 0, 4, 11 ],
-        "Correct version number returned in scalar context");
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
-
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-23-version.t - test C<Parrot::BuildUtil::parrot_version()>
+021-version.t - test C<Parrot::BuildUtil::parrot_version()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/23-version.t
+    % prove t/configure/021-version.t
 
 =head1 DESCRIPTION
 

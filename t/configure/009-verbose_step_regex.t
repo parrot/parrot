@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 07-verbose_two.t
+# $Id: 009-verbose_step_regex.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 009-verbose_step_regex.t
 
 use strict;
 use warnings;
@@ -22,10 +22,10 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [ q{--verbose=2} ],
+    argv            => [ q{--verbose-step=foobar} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 009-verbose_step_regex.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -69,7 +69,7 @@ my ($tie, @lines);
 ok($rv, "runsteps successfully ran $step");
 my $bigmsg = join q{}, @lines;
 like($bigmsg,
-    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
+    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*undef/s,
     "Got message expected upon running $step");
 
 pass("Completed all tests in $0");
@@ -78,22 +78,19 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-07-verbose_two.t - test bad step failure case in Parrot::Configure
+009-verbose_step_regex.t - test bad step failure case in Parrot::Configure
 
 =head1 SYNOPSIS
 
-    % prove t/configure/07-verbose_two.t
+    % prove t/configure/009-verbose_step_regex.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file examine what happens when you configure with the
-<--verbose> option set to C<2>.
-
-(Since I am testing with only the first step, C<init::manifest>, and since that
-step has nothing to say when C<--verbose=1>, I have to advance to
-C<--verbose=2>.)
+<--verbose-step> option set to match the description associated with step
+C<init::manifest>.
 
 =head1 AUTHOR
 

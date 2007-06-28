@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 10-verbose_step_number_not_called.t
+# $Id: 007-verbose_two.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 007-verbose_two.t
 
 use strict;
 use warnings;
@@ -22,10 +22,10 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [ q{--verbose-step=2} ],
+    argv            => [ q{--verbose=2} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 007-verbose_two.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -69,7 +69,7 @@ my ($tie, @lines);
 ok($rv, "runsteps successfully ran $step");
 my $bigmsg = join q{}, @lines;
 like($bigmsg,
-    qr/$description\.\.\..*done\.(?!\s+Setting Configuration Data)/s,
+    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
     "Got message expected upon running $step");
 
 pass("Completed all tests in $0");
@@ -78,19 +78,22 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-10-verbose_step_number_not_called.t - test bad step failure case in Parrot::Configure
+007-verbose_two.t - test bad step failure case in Parrot::Configure
 
 =head1 SYNOPSIS
 
-    % prove t/configure/10-verbose_step_number_not_called.t
+    % prove t/configure/007-verbose_two.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file examine what happens when you configure with the
-<--verbose-step> option set to a number that does not correspond to the
-sequence position of the associated step.
+<--verbose> option set to C<2>.
+
+(Since I am testing with only the first step, C<init::manifest>, and since that
+step has nothing to say when C<--verbose=1>, I have to advance to
+C<--verbose=2>.)
 
 =head1 AUTHOR
 

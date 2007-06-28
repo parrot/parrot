@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 14-params.t
+# $Id: 013-die.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 013-die.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More qw(no_plan); # tests => 14;
 use Carp;
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
 use Parrot::BuildUtil;
@@ -25,7 +25,7 @@ my $args = process_options( {
     argv            => [ ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 013-die.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -33,14 +33,11 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
 
-my $step = q{init::delta};
-my $description = 'Determining if your computer does delta';
-my @params = qw| delta phi beta kappa |;
-my $paramstr = join q{ }, @params;
+my $step = q{init::gamma};
+my $description = 'Determining if your computer does gamma';
 
-$conf->add_step( $step, @params );
+$conf->add_steps( $step );
 my @confsteps = @{$conf->steps};
-
 isnt(scalar @confsteps, 0,
     "Parrot::Configure object 'steps' key holds non-empty array reference");
 is(scalar @confsteps, 1,
@@ -62,38 +59,42 @@ is($conf->options->{c}->{debugging}, 1,
     "command-line option '--debugging' has been stored in object");
 
 my $rv;
-my ($tie, @lines);
+my ($tie, @lines, $errstr);
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    $rv = $conf->runsteps;
+    local $SIG{__WARN__} = \&_capture;
+    eval { $rv = $conf->runsteps; };
     @lines = $tie->READLINE;
 }
-ok($rv, "runsteps successfully ran $step");
 my $bigmsg = join q{}, @lines;
 like($bigmsg,
-    qr/$description\.\.\..*$paramstr.*done\./s,
+    qr/$description/s,
     "Got message expected upon running $step");
+like($errstr,
+    qr/step $step died during execution: Dying gamma just to see what happens/,
+    "Got expected error message");
 
 pass("Completed all tests in $0");
+
+sub _capture { $errstr = $_[0];}
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-14-params.t - test what happens when a step is registered with parameters
+013-die.t - test what happens when a configuration step dies during execution
 
 =head1 SYNOPSIS
 
-    % prove t/configure/14-params.t
+    % prove t/configure/013-die.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you register a configuration
-step with parameter.  (This feature does not appear to be in current (April
-16, 2007) use.)
+The tests in this file examine what happens when your configuration step dies
+during execution.
 
 =head1 AUTHOR
 

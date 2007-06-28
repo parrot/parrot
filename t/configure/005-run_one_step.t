@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 09-verbose_step_regex.t
+# $Id: 005-run_one_step.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 005-run_one_step.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 23;
 use Carp;
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
 use Parrot::BuildUtil;
@@ -22,16 +22,34 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [ q{--verbose-step=foobar} ],
+    argv            => [],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 005-run_one_step.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
+
+my $newconf = Parrot::Configure->new;
+ok(defined $newconf, "Parrot::Configure->new() returned okay");
+is($conf, $newconf, "Parrot::Configure object is a singleton");
+
+# Since these tests peek into the Parrot::Configure object, they will break if
+# the structure of that object changes.  We retain them for now to delineate
+# our progress in testing the object.
+foreach my $k (qw| steps options data |) {
+    ok(defined $conf->$k, "Parrot::Configure object has $k key");
+}
+is(ref($conf->steps), q{ARRAY},
+    "Parrot::Configure object 'steps' key is array reference");
+is(scalar @{$conf->steps}, 0,
+    "Parrot::Configure object 'steps' key holds empty array reference");
+foreach my $k (qw| options data |) {
+    isa_ok($conf->$k, "Parrot::Configure::Data");
+}
 
 my $step = q{init::foobar};
 my $description = 'Determining if your computer does foobar';
@@ -59,17 +77,15 @@ is($conf->options->{c}->{debugging}, 1,
     "command-line option '--debugging' has been stored in object");
 
 my $rv;
-my ($tie, @lines);
+my ($tie, $msg);
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     $rv = $conf->runsteps;
-    @lines = $tie->READLINE;
+    $msg = $tie->READLINE;
 }
 ok($rv, "runsteps successfully ran $step");
-my $bigmsg = join q{}, @lines;
-like($bigmsg,
-    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*undef/s,
+like($msg, qr/$description/,
     "Got message expected upon running $step");
 
 pass("Completed all tests in $0");
@@ -78,19 +94,19 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-09-verbose_step_regex.t - test bad step failure case in Parrot::Configure
+005-run_one_step.t - test Parrot::Configure by running one step
 
 =head1 SYNOPSIS
 
-    % prove t/configure/09-verbose_step_regex.t
+    % prove t/configure/005-run_one_step.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you configure with the
-<--verbose-step> option set to match the description associated with step
-C<init::manifest>.
+The tests in this file test those Parrot::Configure methods regularly called
+by F<Configure.pl> up to C<Parrot::Configure::runsteps()> but providing only
+one step instead of the regular full set.
 
 =head1 AUTHOR
 

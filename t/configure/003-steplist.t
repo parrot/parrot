@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 03-steplist.t
+# $Id: 003-steplist.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 003-steplist.t
 
 use strict;
 use warnings;
@@ -26,11 +26,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-03-steplist.t - test Parrot::Configure::Step::List
+003-steplist.t - test Parrot::Configure::Step::List
 
 =head1 SYNOPSIS
 
-    % prove t/configure/03-steplist.t
+    % prove t/configure/003-steplist.t
 
 =head1 DESCRIPTION
 

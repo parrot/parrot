@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 08-verbose_step_number.t
+# $Id: 015-no_return.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 015-no_return.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Carp;
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
 use Parrot::BuildUtil;
@@ -22,10 +22,10 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [ q{--verbose-step=1} ],
+    argv            => [ ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 015-no_return.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -33,8 +33,8 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
 
-my $step = q{init::foobar};
-my $description = 'Determining if your computer does foobar';
+my $step = q{init::epsilon};
+my $description = 'Determining if your computer does epsilon';
 
 $conf->add_steps( $step );
 my @confsteps = @{$conf->steps};
@@ -59,37 +59,43 @@ is($conf->options->{c}->{debugging}, 1,
     "command-line option '--debugging' has been stored in object");
 
 my $rv;
-my ($tie, @lines);
+my ($tie, @lines, $errstr);
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
+    local $SIG{__WARN__} = \&_capture;
     $rv = $conf->runsteps;
     @lines = $tie->READLINE;
 }
 ok($rv, "runsteps successfully ran $step");
 my $bigmsg = join q{}, @lines;
 like($bigmsg,
-    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*undef/s,
+    qr/$description/s,
     "Got message expected upon running $step");
+like($errstr,
+    qr/step $step failed:\s*no result returned/s,
+    "Got error message expected when config module did not return object");
 
 pass("Completed all tests in $0");
+
+sub _capture { $errstr = $_[0];}
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-08-verbose_step_number.t - test bad step failure case in Parrot::Configure
+015-no_return.t - see what happens when configuration step does not return object
 
 =head1 SYNOPSIS
 
-    % prove t/configure/08-verbose_step_number.t
+    % prove t/configure/015-no_return.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you configure with the
-<--verbose-step> option set to C<1>.
+The tests in this file examine what happens when your configuration step
+module fails to return the object and does not have an explicit C<return>.
 
 =head1 AUTHOR
 

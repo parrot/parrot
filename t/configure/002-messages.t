@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 02-messages.t
+# $Id: 002-messages.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 002-messages.t
 
 use strict;
 use warnings;
@@ -61,11 +61,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-02-messages.t - test Parrot::Configure::Messages
+002-messages.t - test Parrot::Configure::Messages
 
 =head1 SYNOPSIS
 
-    % prove t/configure/components/02-messages.t
+    % prove t/configure/components/002-messages.t
 
 =head1 DESCRIPTION
 

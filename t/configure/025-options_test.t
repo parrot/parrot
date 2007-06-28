@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 25-options_test.t
+# $Id: 025-options_test.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 025-options_test.t
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ use_ok("Parrot::Configure::Options::Test");
 my ($args, $opttest);
 
 my $parrot_version = '0.4.10';
-my $svnid          = '$Id$';
+my $svnid          = '$Id: 025-options_test.t 19028 2007-06-16 00:24:34Z jkeenan $';
 $args = process_options(
     {
         argv            => [ q{--test} ],
@@ -96,11 +96,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-25-options_test.t - test Parrot::Configure::Options::Test
+025-options_test.t - test Parrot::Configure::Options::Test
 
 =head1 SYNOPSIS
 
-    % prove t/configure/25-options_test.t
+    % prove t/configure/025-options_test.t
 
 =head1 DESCRIPTION
 

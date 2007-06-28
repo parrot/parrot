@@ -1,18 +1,17 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 21-version.t
+# $Id: 019-version.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 019-version.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
-use lib qw( . lib ../lib ../../lib t/configure/testlib );
-use_ok( 'Make_VERSION_File', qw| make_VERSION_file |);
+use lib qw( . lib ../lib ../../lib );
 
 my $cwd = cwd();
 my $errstr;
@@ -27,27 +26,25 @@ my $errstr;
 
     require Parrot::BuildUtil;
 
-    # Case 3:  VERSION file with >4-element version number
-    make_VERSION_file(q{0.4.11.7.5});
-    eval {
-        my $pv = Parrot::BuildUtil::parrot_version();
-    };
-    like($@, qr/Too many components to VERSION file contents/,
-        "Correctly detected too many components in version number");
+    # Case 1:  No VERSION file
+    eval { my $pv = Parrot::BuildUtil::parrot_version(); };
+    like($@, qr/Could not open VERSION file!/,
+        "Absence of VERSION file correctly detected");
 
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-21-version.t - test C<Parrot::BuildUtil::parrot_version()>
+019-version.t - test C<Parrot::BuildUtil::parrot_version()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/21-version.t
+    % prove t/configure/019-version.t
 
 =head1 DESCRIPTION
 

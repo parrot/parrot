@@ -1,14 +1,14 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 06-bad_step.t
+# $Id: 016-no_return_but_result.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 016-no_return_but_result.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More qw(no_plan); # tests => 15;
 use Carp;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( . lib ../lib ../../lib t/configure/testlib );
 use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -22,10 +22,10 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [],
+    argv            => [ ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 016-no_return_but_result.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -33,10 +33,10 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
 
-my $badstep = q{bad::step};
-my $badsteppath = q{bad/step.pm};
+my $step = q{init::epsilon};
+my $description = 'Determining if your computer does epsilon';
 
-$conf->add_steps( $badstep );
+$conf->add_steps( $step );
 my @confsteps = @{$conf->steps};
 isnt(scalar @confsteps, 0,
     "Parrot::Configure object 'steps' key holds non-empty array reference");
@@ -47,7 +47,7 @@ foreach my $k (@confsteps) {
     $nontaskcount++ unless $k->isa("Parrot::Configure::Task");
 }
 is($nontaskcount, 0, "Each step is a Parrot::Configure::Task object");
-is($confsteps[0]->step, $badstep,
+is($confsteps[0]->step, $step,
     "'step' element of Parrot::Configure::Task struct identified");
 is(ref($confsteps[0]->params), 'ARRAY',
     "'params' element of Parrot::Configure::Task struct is array ref");
@@ -59,28 +59,45 @@ is($conf->options->{c}->{debugging}, 1,
     "command-line option '--debugging' has been stored in object");
 
 my $rv;
-eval { $rv = $conf->runsteps; };
-like($@, qr/Can't locate $badsteppath in \@INC/,  #'
-    "Got expected die message when runsteps() called with nonexistent step");
+my ($tie, @lines, $errstr);
+#{
+#    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+#        or croak "Unable to tie";
+##    local $SIG{__WARN__} = \&_capture;
+#    $rv = $conf->runsteps;
+#    @lines = $tie->READLINE;
+#}
+#ok($rv, "runsteps successfully ran $step");
+#my $bigmsg = join q{}, @lines;
+#like($bigmsg,
+#    qr/$description/s,
+#    "Got message expected upon running $step");
+#like($errstr,
+#    qr/step $step failed:\s*Hello world/s,
+#    "Got error message expected when config module did not return object");
 
 pass("Completed all tests in $0");
+
+sub _capture { $errstr = $_[0];}
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-06-bad_step.t - test bad step failure case in Parrot::Configure
+016-no_return_but_result.t - see what happens when configuration step returns
+something other than object but has a defined result method
 
 =head1 SYNOPSIS
 
-    % prove t/configure/06-bad_step.t
+    % prove t/configure/016-no_return_but_result.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you attempt to do a
-C<runsteps> on a non-existent step.
+The tests in this file examine what happens when your configuration step
+module returns something other than the object but has some other defined
+result method.
 
 =head1 AUTHOR
 

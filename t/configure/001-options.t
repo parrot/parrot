@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 01-options.t
+# $Id: 001-options.t 19272 2007-06-22 23:32:03Z jkeenan $
+# 001-options.t
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ foreach my $m (@possible_methods) {
 ok( !$invalid, "No invalid methods described in POD" );
 
 my $parrot_version = '0.4.10';
-my $svnid          = '$Id$';
+my $svnid          = '$Id: 001-options.t 19272 2007-06-22 23:32:03Z jkeenan $';
 my ($args);
 $args = process_options(
     {
@@ -146,7 +146,7 @@ eval {
 };
 like(
     $@,
-    qr/^Invalid option "$badoption"/,
+    qr/^Invalid option.*$badoption/,
     "process_options() failed due to bad option '$badoption'"
 );
 
@@ -251,11 +251,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-01-options.t - test Parrot::Configure::Options
+001-options.t - test Parrot::Configure::Options
 
 =head1 SYNOPSIS
 
-    % prove t/configure/01-options.t
+    % prove t/configure/001-options.t
 
 =head1 DESCRIPTION
 

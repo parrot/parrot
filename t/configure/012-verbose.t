@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 11-no_description.t
+# $Id: 012-verbose.t 19028 2007-06-16 00:24:34Z jkeenan $
+# 012-verbose.t
 
 use strict;
 use warnings;
@@ -22,10 +22,10 @@ $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
-    argv            => [ ],
+    argv            => [ q{--verbose} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 012-verbose.t 19028 2007-06-16 00:24:34Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -33,8 +33,8 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok(defined $conf, "Parrot::Configure->new() returned okay");
 
-my $step = q{init::alpha};
-my $description = q{};
+my $step = q{init::beta};
+my $description = 'Determining if your computer does beta';
 
 $conf->add_steps( $step );
 my @confsteps = @{$conf->steps};
@@ -69,7 +69,7 @@ my ($tie, @lines);
 ok($rv, "runsteps successfully ran $step");
 my $bigmsg = join q{}, @lines;
 like($bigmsg,
-    qr/$description\.\.\..*done./s,
+    qr/$description\.\.\..*beta is verbose.*You've got beta.*done\./s, #'
     "Got message expected upon running $step");
 
 pass("Completed all tests in $0");
@@ -78,18 +78,18 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-11-no_description.t - test what happens when a configuration step has no C<$description> defined
+012-verbose.t - test the C<--verbose> command-line argument
 
 =head1 SYNOPSIS
 
-    % prove t/configure/11-no_description.t
+    % prove t/configure/012-verbose.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when your configuration step fails
-to define C<$description>.
+The tests in this file examine what happens when you configure with
+C<--verbose>.
 
 =head1 AUTHOR
 
