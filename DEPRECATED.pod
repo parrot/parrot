@@ -77,11 +77,19 @@ gradually change the old.
 
 =over 4
 
-=item PMC Class name IDs [#41237]
+=item PMC Class name IDs
 
-... will require a dot in front
+Instead of:
 
-  $P0 = new Integer               => $P0 = new .Integer
+  $P0 = new Integer
+
+or 
+
+  $P0 = new .Integer # better, but ...
+
+we are moving to use:
+
+  $P0 = new 'Integer'
 
 =item Assignment syntax with opcodes [#36283]
 
