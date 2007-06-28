@@ -52,6 +52,7 @@ sub runstep {
 
     while (<$IN>) {
         s/<<PCONFIG>>/$conf->data->dump()/e;
+        s/<<PCONFIGTEMP>>/$conf->data->dump_temp()/e;
         print {$OUT} $_;
     }
 

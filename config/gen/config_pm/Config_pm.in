@@ -13,9 +13,12 @@ is used by F<lib/Parrot/Config.pm>.
 package Parrot::Config::Generated;
 
 use strict;
+use vars qw(%PConfig %PConfig_Temp);
 
-use vars qw(%PConfig);
 
 <<PCONFIG>>
+
+<<PCONFIGTEMP>>
+
 
 1;

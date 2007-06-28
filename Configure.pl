@@ -345,6 +345,8 @@ $conf->options->set(%args);
 if ( exists $args{step} ) {
     # from Parrot::Configure::Data
     $conf->data()->slurp();
+    $conf->data()->slurp_temp()
+        if $args{step} =~ /gen::makefiles/;
     # from Parrot::Configure
     $conf->runstep( $args{step} );
     print "\n";

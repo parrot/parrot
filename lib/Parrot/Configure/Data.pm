@@ -177,12 +177,41 @@ Accepts no arguments.
 
 sub slurp() {
     my $self = shift;
-    my $res  = eval "no strict; use Parrot::Config; \\%PConfig";
+    my $res  = eval <<EVAL_CONFIG;
+no strict;
+use Parrot::Config;
+\\%PConfig;
+EVAL_CONFIG
 
     if ( not defined $res ) {
         die "You cannot use --step until you have completed the full configure process\n";
     }
     $self->{c} = $res;
+}
+
+
+=item C<slurp_temp()>
+
+Slurps in L<Parrot::Config> temporary data from previous configure.
+Only to be used when running C<gen::makefiles> plugin.
+
+Accepts no arguments.
+
+=cut
+
+sub slurp_temp() {
+    my $self = shift;
+    my $res  = eval <<EVAL_CONFIG_TEMP;
+no strict;
+use Parrot::Config;
+\\%PConfig_Temp;
+EVAL_CONFIG_TEMP
+
+    if ( not defined $res ) {
+        die "You cannot use --step until you have completed the full configure process\n";
+    }
+    $self->{c}{$_} = $res->{$_}
+        for CORE::keys %$res;
 }
 
 =item C<dump()>
@@ -220,11 +249,48 @@ Accepts no arguments and returns a string.
     }
 }
 
+=item C<dump_temp()>
+
+Provides a L<Data::Dumper> serialized string of the objects key/value pairs
+suitable for being C<eval>ed.  The variable name of the structure is
+C<PConfig_Temp>.
+
+Accepts no arguments and returns a string.
+
+=cut
+
+# Data::Dumper supports Sortkeys since 2.12
+# older versions will work but obviously not sorted
+{
+    my $dd_version;
+    if ( $Data::Dumper::VERSION =~ /([\d.]+)/ ) {
+        $dd_version = $1;
+    }
+    else {
+        $dd_version = $Data::Dumper::VERSION;
+    }
+
+    if ( $dd_version >= 2.12 ) {
+        *dump_temp = sub {
+            my $self = shift;
+            Data::Dumper->new( [ $self->{c_temp} ], ['*PConfig_Temp'] )->Sortkeys(1)->Dump();
+        };
+    }
+    else {
+        *dump_temp = sub {
+            my $self = shift;
+            Data::Dumper->new( [ $self->{c_temp} ], ['*PConfig_Temp'] )->Dump();
+        };
+    }
+}
+
 =item C<clean()>
 
-Deletes keys matching C</^TEMP_/>.  Keys using this naming convention are
-intended to be used only temporally, e.g.  as file lists for Makefile
-generation.
+Deletes keys matching C</^TEMP_/> from the internal config store,
+and copies them to a special store for temporary keys.
+Keys using this naming convention are intended to be used only temporally,
+e.g.  as file lists for Makefile generation.
+Temporary keys are used B<only> to regenerate makefiles after configuration.
 
 Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 
@@ -233,7 +299,8 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 sub clean {
     my $self = shift;
 
-    delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{ $self->{c} };
+    $self->{c_temp}{$_} = delete $self->{c}{$_}
+        for grep { /^TEMP_/ } CORE::keys %{ $self->{c} };
 
     return $self;
 }

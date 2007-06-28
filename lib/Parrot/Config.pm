@@ -25,13 +25,14 @@ if ($@) {
 
 use Exporter;
 
-use vars qw(@ISA @EXPORT %PConfig);
+use vars qw(@ISA @EXPORT %PConfig %PConfig_Temp);
 
 @ISA = qw(Exporter);
 
-@EXPORT = qw(%PConfig);
+@EXPORT = qw(%PConfig %PConfig_Temp);
 
-%PConfig = %Parrot::Config::Generated::PConfig;
+%PConfig      = %Parrot::Config::Generated::PConfig;
+%PConfig_Temp = %Parrot::Config::Generated::PConfig_Temp;
 
 1;
 
