@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 002-messages.t 19028 2007-06-16 00:24:34Z jkeenan $
+# $Id$
 # 002-messages.t
 
 use strict;

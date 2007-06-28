@@ -21,7 +21,7 @@ in that aggregate.
   iter_loop:
     unless iterator, iter_end  # while (more values)
     entry = shift iterator     # get an entry
-    ... 
+    ...
     goto iter_loop
   iter_end:
 
@@ -37,7 +37,7 @@ The C<new> can alteratively be written as:
   iter_loop:
     unless iterator, iter_end  # while (more values)
     entry = pop iterator     # get an entry
-    ... 
+    ...
     goto iter_loop
   iter_end:
 

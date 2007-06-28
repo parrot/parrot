@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 025-options_test.t 19028 2007-06-16 00:24:34Z jkeenan $
+# $Id$
 # 025-options_test.t
 
 use strict;
@@ -22,7 +22,7 @@ use_ok("Parrot::Configure::Options::Test");
 my ($args, $opttest);
 
 my $parrot_version = '0.4.10';
-my $svnid          = '$Id: 025-options_test.t 19028 2007-06-16 00:24:34Z jkeenan $';
+my $svnid          = '$Id$';
 $args = process_options(
     {
         argv            => [ q{--test} ],

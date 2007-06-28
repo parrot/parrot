@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 009-verbose_step_regex.t 19028 2007-06-16 00:24:34Z jkeenan $
+# $Id$
 # 009-verbose_step_regex.t
 
 use strict;
@@ -25,7 +25,7 @@ my $args = process_options( {
     argv            => [ q{--verbose-step=foobar} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id: 009-verbose_step_regex.t 19028 2007-06-16 00:24:34Z jkeenan $',
+    svnid           => '$Id$',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
