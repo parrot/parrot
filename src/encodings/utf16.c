@@ -99,7 +99,7 @@ static void utf16_set_position( Interp *interp, String_iter *i, UINTVAL n );
 #  include <unicode/ustring.h>
 #endif
 
-#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf16")
+#define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl utf16")
 
 
 static void iter_init(Interp *, const STRING *src, String_iter *iter);
@@ -239,7 +239,7 @@ get_byte(Interp *interp, const STRING *src /*NN*/, UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
-/*        internal_exception(0,
+/*        real_exception(interp, NULL, 0,
                 "get_byte past the end of the buffer (%i of %i)",
                 offset, src->bufused);*/
         return 0;
@@ -253,7 +253,7 @@ set_byte(Interp *interp, const STRING *src,
 {
     unsigned char *contents;
     if (offset >= src->bufused) {
-        internal_exception(0, "set_byte past the end of the buffer");
+        real_exception(interp, NULL, 0, "set_byte past the end of the buffer");
     }
     contents = (unsigned char *)src->strstart;
     contents[offset] = (unsigned char)byte;

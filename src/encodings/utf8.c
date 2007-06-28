@@ -90,7 +90,7 @@ static const void * utf8_skip_backward( const void *ptr, UINTVAL n );
 static const void * utf8_skip_forward( const void *ptr, UINTVAL n );
 /* HEADERIZER END: static */
 
-#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")
+#define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl utf8")
 
 const char Parrot_utf8skip[256] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
@@ -284,17 +284,17 @@ utf8_decode_and_advance(Interp *interp, String_iter *i)
         for (len--; len; len--) {
             u8ptr++;
             if (!UTF8_IS_CONTINUATION(*u8ptr)) {
-                internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+                real_exception(interp, NULL, MALFORMED_UTF8, "Malformed UTF-8 string\n");
             }
             c = UTF8_ACCUMULATE(c, *u8ptr);
         }
 
         if (UNICODE_IS_SURROGATE(c)) {
-            internal_exception(MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
+            real_exception(interp, NULL, MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
         }
     }
     else if (!UNICODE_IS_INVARIANT(c)) {
-        internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+        real_exception(interp, NULL, MALFORMED_UTF8, "Malformed UTF-8 string\n");
     }
     else {
         i->bytepos++;
@@ -441,7 +441,7 @@ get_byte(Interp *interp, const STRING *src, UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
-/*        internal_exception(0,
+/*        real_exception(interp, NULL, 0,
                 "get_byte past the end of the buffer (%i of %i)",
                 offset, src->bufused);*/
         return 0;
@@ -455,7 +455,7 @@ set_byte(Interp *interp, const STRING *src,
 {
     unsigned char *contents;
     if (offset >= src->bufused) {
-        internal_exception(0, "set_byte past the end of the buffer");
+        real_exception(interp, NULL, 0, "set_byte past the end of the buffer");
     }
     contents = (unsigned char *)src->strstart;
     contents[offset] = (unsigned char)byte;

@@ -98,7 +98,7 @@ static void become_encoding(Interp *interp, STRING *source_string);
 static UINTVAL codepoints(Interp *interp, STRING *source_string);
 static UINTVAL bytes(Interp *interp, STRING *source_string);
 
-#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl fixed_8")
+#define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl fixed_8")
 
 static STRING *
 to_encoding(Interp *interp, STRING *src, STRING *dest)
@@ -129,7 +129,7 @@ get_byte(Interp *interp, const STRING *source_string, UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)source_string->strstart;
     if (offset >= source_string->bufused) {
-/*        internal_exception(0,
+/*        real_exception(interp, NULL, 0,
                 "get_byte past the end of the buffer (%i of %i)",
                 offset, source_string->bufused);*/
         return 0;
@@ -143,7 +143,7 @@ set_byte(Interp *interp, const STRING *source_string,
 {
     unsigned char *contents;
     if (offset >= source_string->bufused) {
-        internal_exception(0, "set_byte past the end of the buffer");
+        real_exception(interp, NULL, 0, "set_byte past the end of the buffer");
     }
     contents = (unsigned char *)source_string->strstart;
     contents[offset] = (unsigned char)byte;

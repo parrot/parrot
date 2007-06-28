@@ -89,7 +89,7 @@ static void ucs2_set_position( Interp *interp, String_iter *i, UINTVAL n );
 #  include <unicode/ustring.h>
 #endif
 
-#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl ucs2")
+#define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl ucs2")
 
 
 static void iter_init(Interp *, const STRING *src, String_iter *iter);
