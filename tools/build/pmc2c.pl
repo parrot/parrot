@@ -63,6 +63,7 @@ if ( $action{gen_c} ) {
 }
 
 __END__
+
 =head1 NAME
 
 tools/build/pmc2c.pl - PMC definition to C compiler
@@ -116,7 +117,6 @@ Increase verbose level
 
 Omit source line info
 
-
 =item C<--include=/path/to/pmc>
 
 Specify include path where to find PMCs.
@@ -129,6 +129,7 @@ after libname and will initialize all PMCs in the library.
 
 =back
 
+=cut
 
 # Local Variables:
 #   mode: cperl
