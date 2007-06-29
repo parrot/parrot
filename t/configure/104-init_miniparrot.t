@@ -48,7 +48,7 @@ ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
 
-is($conf->data->get('miniparrot'), undef, 
+is($conf->data->get('miniparrot'), undef,
     "miniparrot is not yet enabled");
 is($conf->data->get('jitarchname'), undef,
     "jitarchname undef as expected");
@@ -76,7 +76,7 @@ ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
 
-ok($conf->data->get('miniparrot'), 
+ok($conf->data->get('miniparrot'),
     "miniparrot is enabled");
 is($conf->data->get('jitarchname'), 'nojit',
     "jitarchname as expected");
@@ -86,7 +86,7 @@ is($conf->data->get('jitcpu'), 'I386',
     "jitcpu as expected");
 is($conf->data->get('jitosname'), 'nojit',
     "jitosname as expected");
-ok(! $conf->data->get('jitcapable'), 
+ok(! $conf->data->get('jitcapable'),
     "jitcapable as expected");
 
 pass("Completed all tests in $0");
