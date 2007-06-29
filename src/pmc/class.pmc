@@ -238,6 +238,7 @@ init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info) {
         STRING *new_name;
         PMC    *new_namespace;
         PMC    *name_arg = VTABLE_get_pmc_keyed_str(interp, info, name_str);
+        VTABLE *new_vtable;
 
         /* If we were passed a namespace PMC, set the namespace attribute
          * directly. Otherwise, lookup or create the appropriate namespace. */
@@ -267,9 +268,10 @@ init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info) {
         type_num = register_type(interp, name_arg);
 
         /* Link the type number with the class's vtable. */
-        self->vtable->base_type   = type_num;
-        interp->vtables[type_num] = self->vtable;
-        interp->vtables[type_num]->pmc_class = self;
+        new_vtable = Parrot_clone_vtable(interp, self->vtable);
+        new_vtable->base_type     = type_num;
+        new_vtable->pmc_class     = self;
+        interp->vtables[type_num] = new_vtable;
     }
 
     /* If we were attached to a namespace and are now attached to a new one,
