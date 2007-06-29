@@ -205,7 +205,7 @@ FINDENTERN:
     }
 
     print <<END_C;
-static opcode_t* run_compiled(Interp *interpreter,
+static opcode_t* run_compiled(Interp *interp,
                               opcode_t *cur_opcode, opcode_t *start_code);
 
 #include "parrot/embed.h"
@@ -231,7 +231,7 @@ END_C
 int
 main(int argc, char **argv) {
     int dummy_var;
-    Interp   *interpreter;
+    Interp   *interp;
     PackFile *pf;
     INTVAL i;
     PMC *userargv;
@@ -245,39 +245,39 @@ main(int argc, char **argv) {
     /* TODO make also a shared variant of PackFile_new */
     pf          = PackFile_new(0);
 
-    if( !PackFile_unpack(interpreter, pf, (opcode_t *)program_code,
+    if( !PackFile_unpack(interp, pf, (opcode_t *)program_code,
                             sizeof(program_code)) ) {
         printf( "Can't unpack.\n" );
         return 1;
     }
-    Parrot_loadbc(interpreter, pf);
+    Parrot_loadbc(interp, pf);
 
     /* setup P0, stolen from embed.c */
-    userargv = pmc_new(interpreter, enum_class_PerlArray);
+    userargv = pmc_new(interp, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
     interpreter->pmc_reg.registers[0] = userargv;
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
-        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
+        STRING *arg = string_make(interp, argv[i], strlen(argv[i]),
                                   0, PObj_external_FLAG, 0);
 
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
-        userargv->vtable->push_string(interpreter, userargv, arg);
+        userargv->vtable->push_string(interp, userargv, arg);
     }
 
-    runops(interpreter, 0);
+    runops(interp, 0);
 /*
-    run_compiled(interpreter, (opcode_t *)program_code,
-                              (opcode_t *)program_code);
+    run_compiled(interp, (opcode_t *)program_code,
+                         (opcode_t *)program_code);
     */
     exit(0);
 }
 
-static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode,
+static opcode_t* run_compiled(Interp *interp, opcode_t *cur_opcode,
                                                    opcode_t *start_code) {
 
 switch_label:
