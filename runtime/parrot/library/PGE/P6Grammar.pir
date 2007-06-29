@@ -172,9 +172,9 @@ the output to the correct output file.
     $S0 = initpir.unique('onload_')
     initpir.emit(<<'        CODE', namespace, $S0)
           ## namespace %0
-          $I0 = find_type '%0'
-          if $I0 != 0 goto %1
+          push_eh %1
           $P0 = subclass 'PGE::Grammar', '%0'
+          clear_eh
         %1:
         CODE
   ns_optable:

@@ -180,9 +180,9 @@ the output to the correct output file.
     $S0 = initpir.unique('onload_')
     initpir.emit(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
-          $I0 = find_type '%0'
-          if $I0 != 0 goto %2
+          push_eh %2
           $P0 = subclass '%1', '%0'
+          clear_eh
         %2:
         CODE
   ns_optable:
