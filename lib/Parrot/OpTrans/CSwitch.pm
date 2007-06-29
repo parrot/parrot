@@ -203,7 +203,7 @@ sub run_core_finish {
                 *(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
                 continue;
             }
-            internal_exception(1, "illegal opcode in switch core\\n");
+            real_exception(interp, NULL, 1, "illegal opcode in switch core\\n");
             break;
         } /* switch */
 END_C
