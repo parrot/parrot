@@ -304,8 +304,7 @@ resulting ast.
     .local pmc astgrammar, astbuilder
     astgrammar_name = self.'astgrammar'()
     unless astgrammar_name goto err_no_astgrammar
-    $I0 = find_type astgrammar_name
-    astgrammar = new $I0
+    astgrammar = new astgrammar_name
     astbuilder = astgrammar.'apply'(source)
     .return astbuilder.'get'('past')
 
@@ -602,8 +601,7 @@ resulting ost.
     .local pmc ostgrammar, ostbuilder
     ostgrammar_name = self.'ostgrammar'()
     unless ostgrammar_name goto default_ostgrammar
-    $I0 = find_type ostgrammar_name
-    ostgrammar = new $I0
+    ostgrammar = new ostgrammar_name
     ostbuilder = ostgrammar.'apply'(source)
     .return ostbuilder.'get'('post')
 
