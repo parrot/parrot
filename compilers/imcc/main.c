@@ -609,6 +609,9 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     yyscanner   = IMCC_INFO(interp)->yyscanner;
     output_file = interp->output_file;
 
+    if (!interp->lo_var_ptr)
+        interp->lo_var_ptr = (void *)&obj_file;
+
     /* Read in the source and determine whether it's Parrot bytecode,
        PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
        any of these, then we assume that it is PIR. */
