@@ -344,10 +344,7 @@ loop_end:
     libloader = compiler(code)
     libloader()
 
-
-    $I0 = find_type grammarname
-    new_grammar = new $I0
-
+    new_grammar = new grammarname
     .return (new_grammar)
 .end
 
@@ -411,16 +408,13 @@ loop_end:
     code .= "\n\n"
     code .= ".sub '__onload' :load :init\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
-    code .= "    $I0 = find_type '"
-    code .= type
-    code .= "'\n"
-    code .= "    if $I0 != 0 goto class_loaded\n"
-
+    code .= "    push_eh class_loaded\n"
     code .= "    $P1 = subclass '"
     code .= inherit
     code .= "', '"
     code .= type
     code .= "'\n"
+    code .= "    clear_eh\n"
     code .= "  class_loaded:\n"
     code .= "\n.end\n\n"
     .return (code)
