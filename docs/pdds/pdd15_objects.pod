@@ -896,8 +896,12 @@ put it in $P1.
 =item setattribute
 
   setattribute $P1, $S2, $P3
+  setattribute $P1, $P2, $S3, $P4
 
-Set the attribute of object $P1 with the fully qualified name $S2 to $P3
+Set the attribute of object $P1 with the attribute name $S2 to $P3. To set an
+attribute for a parent class that has the same name as an attribute in the
+child class, pass an optional class object or namespace key $P2 for the parent
+class.
 
 =item callmethod
 
