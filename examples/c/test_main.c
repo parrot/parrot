@@ -25,10 +25,10 @@ still clean, Parrot embedding.
 #include <stdlib.h>
 #include <string.h>
 
-#define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
-#define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
+#define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2);
+#define unsetopt(flag) Parrot_setflag(interp, flag, 0)
 
-char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
+char *parseflags(Parrot_Interp interp, int *argc, char **argv[]);
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
@@ -69,35 +69,35 @@ Loads the file and runs the code.
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     char *filename;
     Parrot_PackFile pf;
 
-    interpreter = Parrot_new(NULL);
-    if (!interpreter) {
+    interp = Parrot_new(NULL);
+    if (!interp) {
         return 1;
     }
 
-    filename = parseflags(interpreter, &argc, &argv);
+    filename = parseflags(interp, &argc, &argv);
 
-    pf = Parrot_readbc(interpreter, filename);
+    pf = Parrot_readbc(interp, filename);
 
     if (!pf) {
         return 1;
     }
 
-    Parrot_loadbc(interpreter, pf);
-    Parrot_runcode(interpreter, argc, argv);
-    Parrot_destroy(interpreter);
+    Parrot_loadbc(interp, pf);
+    Parrot_runcode(interp, argc, argv);
+    Parrot_destroy(interp);
 
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
     return 0;
 }
 
 /*
 
 =item C<char *
-parseflags(Parrot_Interp interpreter, int *argc, char **argv[])>
+parseflags(Parrot_Interp interp, int *argc, char **argv[])>
 
 Parses the command-line.
 
@@ -106,7 +106,7 @@ Parses the command-line.
 */
 
 char *
-parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
+parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
 
@@ -123,10 +123,10 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     setopt(PARROT_CGOTO_FLAG);
 #endif
 
-    while (longopt_get(interpreter, *argc, *argv, options, &opt)) {
+    while (longopt_get(interp, *argc, *argv, options, &opt)) {
         if (opt.opt_id == -1) {
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
-            Parrot_exit(interpreter, 1);
+            Parrot_exit(interp, 1);
         }
 
         switch (opt.opt_id) {
@@ -164,7 +164,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             version();
             break;
         case 'w':
-            Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
+            Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
             break;
 
         case '.':  /* Give Windows Parrot hackers an opportunity to
@@ -173,7 +173,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             break;
         case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
-            Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
+            Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                         "PARROT_GC_DEBUG is set but the binary was "
                         "compiled with DISABLE_GC_DEBUG.");
 #endif
@@ -237,7 +237,7 @@ usage(void)
             cgoto_info
     );
 
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
 }
 
 /*
@@ -268,7 +268,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
 the GNU General Public License or the Artistic License for more details.\n\n");
 
-    Parrot_exit(interpreter, 0);
+    Parrot_exit(interp, 0);
 }
 
 /*

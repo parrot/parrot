@@ -39,7 +39,7 @@ struct Reg {
     PMC *pmc_reg;
 };
 
-#define REG_INT(x) interpreter->bp[x].int_reg
+#define REG_INT(x) interp->bp[x].int_reg
 
 #if defined(PREDEREF_CORE)
 #  define IREG(x)   (_reg_base + pc[x])
@@ -48,7 +48,7 @@ struct Reg {
 #else
 #  define IREG(x)   REG_INT(pc[x])
 #  define ICONST(x) pc[x]
-#  define SCONST(x) interpreter->code->const_table[pc[x]]
+#  define SCONST(x) interp->code->const_table[pc[x]]
 #endif
 
 struct pf {
@@ -95,21 +95,21 @@ typedef enum { OPCODES } opcodes;
 #  ifdef TRACE
 #    define ENDRUN \
 static void \
-run(Interp *interpreter, opcode_t *pc) \
+run(Interp *interp, opcode_t *pc) \
 { \
     while (pc) { \
-        printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
-                interpreter->op_info[*pc]); \
-        pc = interpreter->op_func[*pc](pc, interpreter); \
+        printf("PC %2d %s\n", pc - interp->code->byte_code, \
+                interp->op_info[*pc]); \
+        pc = interp->op_func[*pc](pc, interp); \
     } \
 }
 #  else
 #    define ENDRUN \
 static void \
-run(Interp *interpreter, opcode_t *pc) \
+run(Interp *interp, opcode_t *pc) \
 { \
     while (pc) { \
-        pc = interpreter->op_func[*pc](pc, interpreter); \
+        pc = interp->op_func[*pc](pc, interp); \
     } \
 }
 #  endif
@@ -118,7 +118,7 @@ run(Interp *interpreter, opcode_t *pc) \
 #  define ENDDISPATCH
 #  define CASE(function) \
 static opcode_t * \
-function(opcode_t *pc, Interp *interpreter) \
+function(opcode_t *pc, Interp *interp) \
 { \
 
 #  define NEXT return pc; }
@@ -131,13 +131,13 @@ function(opcode_t *pc, Interp *interpreter) \
 #  if defined(SWITCH_CORE)
 
 static void
-run(Interp *interpreter, opcode_t *pc)
+run(Interp *interp, opcode_t *pc)
 {
 #    ifdef TRACE
 #      define DISPATCH  \
     for (;;) { \
-        printf("PC %2d %s\n", pc - interpreter->code->byte_code, \
-                interpreter->op_info[*pc]); \
+        printf("PC %2d %s\n", pc - interp->code->byte_code, \
+                interp->op_info[*pc]); \
         switch (*pc) {
 #    else
 #      define DISPATCH \
@@ -154,7 +154,7 @@ run(Interp *interpreter, opcode_t *pc)
 #  else  /* CGOTO */
 
 static void
-run(Interp *interpreter, opcode_t *pc)
+run(Interp *interp, opcode_t *pc)
 {
 #    define OP(x)          &&lOP_##x
     static  void *labels[] = { OPCODES };
@@ -206,25 +206,25 @@ ENDRUN
 
 #ifdef FUNC_CORE
 #  define DEF_OP(op) \
-    interpreter->op_func[OP_ ## op] = op; \
-    interpreter->op_info[OP_ ## op] = #op
+    interp->op_func[OP_ ## op] = op; \
+    interp->op_info[OP_ ## op] = #op
 #else
 #  define DEF_OP(op) \
-    interpreter->op_info[OP_ ## op] = #op
+    interp->op_info[OP_ ## op] = #op
 #endif
 
 static void
-init(Interp *interpreter, opcode_t *prog)
+init(Interp *interp, opcode_t *prog)
 {
     /*
      * create 1 register frame
      */
-    interpreter->bp = calloc(NUM_REGISTERS, sizeof (struct Reg));
+    interp->bp = calloc(NUM_REGISTERS, sizeof (struct Reg));
     /*
      * and some space for opcodes
      */
-    interpreter->op_func = malloc(OP_MAX * sizeof (void*));
-    interpreter->op_info = malloc(OP_MAX * sizeof (char*));
+    interp->op_func = malloc(OP_MAX * sizeof (void*));
+    interp->op_info = malloc(OP_MAX * sizeof (char*));
     /*
      * define opcode function and opcode info
      */
@@ -238,18 +238,18 @@ init(Interp *interpreter, opcode_t *prog)
     /*
      * the "packfile"
      */
-    interpreter->code = malloc(sizeof (struct pf));
-    interpreter->code->byte_code = prog;
+    interp->code = malloc(sizeof (struct pf));
+    interp->code->byte_code = prog;
 
     /*
      * create a simplified constant table
      */
 #define N_CONSTS 4
-    interpreter->code->const_table = malloc(N_CONSTS * sizeof (char*));
-    interpreter->code->const_table[0] = "\n";
-    interpreter->code->const_table[1] = "done\n";
-    interpreter->code->const_table[2] = "error\n";
-    interpreter->code->const_table[3] = "usage: ./nanoparrot mops\n";
+    interp->code->const_table = malloc(N_CONSTS * sizeof (char*));
+    interp->code->const_table[0] = "\n";
+    interp->code->const_table[1] = "done\n";
+    interp->code->const_table[2] = "error\n";
+    interp->code->const_table[3] = "usage: ./nanoparrot mops\n";
 }
 
 int
@@ -278,15 +278,15 @@ main(int argc, char *argv[]) {
           OP_print_sc, 3,       /* L1: print "usage...\n" */
           OP_end                /* end */
         };
-    Interp *interpreter = malloc(sizeof (Interp));
+    Interp *interp = malloc(sizeof (Interp));
 
     prog = usage;
     if (argc > 1) {
         if (strcmp(argv[1], "mops") == 0)
             prog = mops;
     }
-    init(interpreter, prog);
-    run(interpreter, prog);
+    init(interp, prog);
+    run(interp, prog);
     return 0;
 }
 
