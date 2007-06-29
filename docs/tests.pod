@@ -108,20 +108,20 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
     int main(int argc, char* argv[]) {
-        Parrot_Interp interpreter;
+        Parrot_Interp interp;
         interpreter = Parrot_new(NULL);
 
         if (!interpreter)
             return 1;
 
-        Parrot_run_native(interpreter, the_test);
+        Parrot_run_native(interp, the_test);
         printf("done\n");
     fflush(stdout);
         return 0;
     }
 
     static opcode_t*
-    the_test(Parrot_Interp interpreter,
+    the_test(Parrot_Interp interp,
         opcode_t *cur_op, opcode_t *start)
     {
         /* Your test goes here. */
