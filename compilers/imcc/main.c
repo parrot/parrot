@@ -352,7 +352,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             default:
-                internal_exception(1, "main: Invalid flag '%s' used."
+                real_exception(interp, NULL, 1, "main: Invalid flag '%s' used."
                         "\n\nhelp: parrot -h\n", (*argv)[0]);
         }
     }
