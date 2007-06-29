@@ -972,6 +972,17 @@ currently selected namespace. Passing in a namespace object looks for the class
 in that namespace object. A key looks for the class in the namespace identified
 by the multilevel key relative to the currently selected HLL.
 
+=item new
+
+  $P1 = new $S2
+  $P1 = new $S2, $P3
+  $P1 = new $P2
+  $P1 = new $P2, $P3
+
+Create a new object from the class named by $S2 or $P2 (a string PMC, namespace
+key, or class object), and put the PMC for it in $P1. You may optionally pass a
+hash of initialization parameters for the class in $P3.
+
 =item addparent
 
   addparent $P1, $P2
