@@ -24,7 +24,7 @@ These are the vtable functions for the APL Vector class.
 #include "parrot/parrot.h"
 
 INTVAL
-size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
+size_of_shape(Interp *interp, PMC* self, PMC* shape)
 {
     INTVAL retval;
     INTVAL dimension;
@@ -33,14 +33,14 @@ size_of_shape(Interp *interpreter, PMC* self, PMC* shape)
 
     if (!shape || PMC_IS_NULL(shape)) {
         /* not set, so a simple 1D */
-        return VTABLE_get_integer(interpreter, self);
+        return VTABLE_get_integer(interp, self);
     }
 
     retval = 1;
-    dimension = VTABLE_get_integer(interpreter, shape);
+    dimension = VTABLE_get_integer(interp, shape);
     for (pos = 0; pos < dimension; pos++)
     {
-        length = VTABLE_get_integer_keyed_int(interpreter, shape, pos);
+        length = VTABLE_get_integer_keyed_int(interp, shape, pos);
         retval *= length;
     }
     return retval;
