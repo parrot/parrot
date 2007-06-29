@@ -242,7 +242,7 @@ init_events_first(Interp *interp)
      * s. p6i: "event.c - of signals and pipes"
      */
     if (pipe(pipe_fds))
-        real_exception(interp, NULL, 1, "Couldn't create message pipe");
+        internal_exception(1, "Couldn't create message pipe");
 #endif
     /*
      * now set some sig handlers before any thread is started, so
@@ -550,7 +550,6 @@ Broadcast an event.
 void
 Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
 {
-    Interp *interp;
     parrot_event * const event = (parrot_event *)entry->data;
 
     switch (event->type) {
@@ -572,6 +571,8 @@ Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
             switch (event->u.signal) {
                 case SIGHUP:
                 case SIGINT:
+                    {
+                    Interp *interp;
                     if (n_interpreters) {
                         size_t i;
                         LOCK(interpreter_array_mutex);
@@ -587,6 +588,7 @@ Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
                     interp = interpreter_array[0];
                     Parrot_schedule_interp_qentry(interp, entry);
                     edebug((stderr, "deliver SIGINT to 0\n"));
+                    }
                     break;
                 default:
                     mem_sys_free(entry);
@@ -596,7 +598,7 @@ Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
         default:
             mem_sys_free(entry);
             mem_sys_free(event);
-            real_exception(interp, NULL, 1, "Unknown event to broadcast");
+            internal_exception(1, "Unknown event to broadcast");
             break;
     }
 }
@@ -820,7 +822,7 @@ Parrot_event_add_io_event(Interp *interp,
     buf.ev      = event;
 #ifndef WIN32
     if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
-        real_exception(interp, NULL, 1, "msg pipe write failed");
+        internal_exception(1, "msg pipe write failed");
 #endif
 }
 
