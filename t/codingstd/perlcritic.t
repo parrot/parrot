@@ -110,6 +110,7 @@ if ( !keys %policies ) {
             { allow_leading_tabs => 0 },
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
         'CodeLayout::UseParrotCoda'                       => 1,
+        'InputOutput::ProhibitBarewordFileHandles'        => 1,
         'TestingAndDebugging::MisplacedShebang'           => 1,
         'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
         'TestingAndDebugging::RequirePortableShebang'     => 1,
@@ -121,7 +122,6 @@ if ( !keys %policies ) {
     my %extra_policies = (
         'Variables::ProhibitConditionalDeclarations' => 1,
         'InputOutput::ProhibitTwoArgOpen'            => 1,
-        'InputOutput::ProhibitBarewordFileHandles'   => 1,
         'NamingConventions::ProhibitAmbiguousNames'  => 1,
         'Subroutines::ProhibitBuiltinHomonyms'       => 1,
         'Subroutines::ProhibitExplicitReturnUndef'   => 1,
