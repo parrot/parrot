@@ -386,7 +386,7 @@ Run a GC cycle or allocate new objects for the given pool.
 static void
 gc_gms_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
 {
-    internal_exception(1, "gms abuse");
+    real_exception(interp, NULL, 1, "gms abuse");
 }
 
 
@@ -642,7 +642,7 @@ gc_gms_find_gen(Interp *interp, Gc_gms_hdr *h /*NN*/, UINTVAL gen_no)
      *
      * TODO insert generation
      */
-    internal_exception(1, "generation %d not found for hdr %p",
+    real_exception(interp, NULL, 1, "generation %d not found for hdr %p",
             gen_no, h);
     return NULL;
 }
