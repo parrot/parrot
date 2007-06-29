@@ -37,9 +37,9 @@ type information.
 
 =item B<new>(out PMC, in INT, invar PMC)
 
-=item B<new>(out PMC, inconst STR)
+=item B<new>(out PMC, in STR)
 
-=item B<new>(out PMC, inconst STR, invar PMC)
+=item B<new>(out PMC, in STR, invar PMC)
 
 =item B<new>(out PMC, inconst PMC)
 
@@ -83,7 +83,7 @@ op new(out PMC, in INT, in PMC) {
   goto NEXT();
 }
 
-op new(out PMC, inconst STR) {
+op new(out PMC, in STR) {
     STRING *_class = $2;
     INTVAL type = pmc_type(interp, _class);
     if (!type)
@@ -95,7 +95,7 @@ op new(out PMC, inconst STR) {
   goto NEXT();
 }
 
-op new(out PMC, inconst STR, in PMC) {
+op new(out PMC, in STR, in PMC) {
     STRING *_class = $2;
     INTVAL type = pmc_type(interp, _class);
     if (!type)

@@ -1236,3 +1236,6 @@ stm_commit_ic                  1205
 stm_wait_ic                    1206
 stm_abort                      1207
 stm_depth_i                    1208
+new_p_s                        1209
+new_p_s_p                      1210
+new_p_s_pc                     1211
