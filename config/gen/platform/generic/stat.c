@@ -3,19 +3,19 @@
  */
 
 PMC *
-Parrot_stat_file(Interp* interpreter, STRING *filename)
+Parrot_stat_file(Interp* interp, STRING *filename)
 {
     return NULL;
 }
 
 PMC *
-Parrot_stat_info_pmc(Interp* interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_pmc(Interp* interp, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
 
 static INTVAL
-stat_common(Interp *interpreter, struct stat *statbuf,
+stat_common(Interp *interp, struct stat *statbuf,
         INTVAL thing, int status)
 {
     INTVAL result = -1;
@@ -24,7 +24,7 @@ stat_common(Interp *interpreter, struct stat *statbuf,
         return status == 0;
     if (status == -1) {
         const char *err = strerror(errno);
-        real_exception(interpreter, NULL, E_IOError,
+        real_exception(interp, NULL, E_IOError,
                 "stat failed: %s", err);
     }
 
@@ -86,40 +86,40 @@ stat_common(Interp *interpreter, struct stat *statbuf,
 }
 
 INTVAL
-Parrot_stat_info_intval(Interp* interpreter, STRING *file, INTVAL thing)
+Parrot_stat_info_intval(Interp* interp, STRING *file, INTVAL thing)
 {
     struct stat statbuf;
     char *filename;
     int status;
 
     /* Get the name of the file as something we can use */
-    filename = string_to_cstring(interpreter, file);
+    filename = string_to_cstring(interp, file);
 
     /* Everything needs the result of stat, so just go do it */
     status = stat(filename, &statbuf);
     string_cstring_free(filename);
-    return stat_common(interpreter, &statbuf, thing, status);
+    return stat_common(interp, &statbuf, thing, status);
 }
 
 INTVAL
-Parrot_fstat_info_intval(Interp* interpreter, INTVAL file, INTVAL thing)
+Parrot_fstat_info_intval(Interp* interp, INTVAL file, INTVAL thing)
 {
     struct stat statbuf;
     int status;
 
     /* Everything needs the result of stat, so just go do it */
     status = fstat(file, &statbuf);
-    return stat_common(interpreter, &statbuf, thing, status);
+    return stat_common(interp, &statbuf, thing, status);
 }
 
 FLOATVAL
-Parrot_stat_info_floatval(Interp* interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_floatval(Interp* interp, STRING *filename, INTVAL thing)
 {
     return -1;
 }
 
 STRING *
-Parrot_stat_info_string(Interp* interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_string(Interp* interp, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
