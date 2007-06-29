@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -182,6 +182,28 @@ CODE
 /100
 Cannot add attribute to non-class
 current instr\.: 'main'/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'new_p_s works with string register arg' );
+.sub main :main
+#    $P0 = newpdd15class "Foo"
+    $P0 = newclass "Foo"
+    addattribute $P0, 'foo'
+
+    $S0 = "Foo"
+    $P1 = new $S0
+
+    $P2 = new 'Integer'
+    $P2 = 100
+    setattribute $P1, 'foo', $P2
+    getattribute $P2, $P1, 'foo'
+
+    print $P2
+    print "\n"
+
+.end
+CODE
+100
 OUT
 
 # Local Variables:
