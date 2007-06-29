@@ -17,7 +17,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command)
     child = fork();
     /* Did we fail? */
     if (-1 == child) {
-        internal_exception(NOSPAWN, "Can't spawn child process");
+        real_exception(interpreter, NULL, NOSPAWN, "Can't spawn child process");
     }
     /* Are we the parent or child? */
     if (child) {
@@ -47,12 +47,12 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
     pid_t child;
     int len = VTABLE_elements(interpreter, cmdargs);
     if (len == 0) {
-        internal_exception(NOSPAWN, "Empty argument array for execvp");
+        real_exception(interpreter, NULL, NOSPAWN, "Empty argument array for execvp");
     }
     child = fork();
     /* Did we fail? */
     if (-1 == child) {
-        internal_exception(NOSPAWN, "Can't spawn child process");
+        real_exception(interpreter, NULL, NOSPAWN, "Can't spawn child process");
     }
     /* Are we the parent or child? */
     if (child) {
@@ -96,7 +96,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command) {
             string_to_cstring(interpreter, command), (void *)NULL);
     /* if we get here, something's horribly wrong... */
     if (status) {
-        internal_exception(NOSPAWN, "Exec failed, code %i", status);
+        real_exception(interpreter, NULL, NOSPAWN, "Exec failed, code %i", status);
     }
 }
 

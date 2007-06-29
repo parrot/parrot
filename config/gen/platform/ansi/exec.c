@@ -17,7 +17,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
 }
 
 void Parrot_Exec_OS_Comman(Parrot_Interp interpreter, STRING *command) {
-  internal_exception(NOSPAWN, "Exec not implemented");
+  real_exception(interpreter, NULL, NOSPAWN, "Exec not implemented");
 }
 
 /*
