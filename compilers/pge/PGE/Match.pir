@@ -65,9 +65,7 @@ the current position of C<mob>.
     from = getattribute mob, '$.pos'
     from = clone from
   new_me:
-    $I0 = find_type grammar
-    if $I0 == 0 goto err_grammar
-    me = new $I0
+    me = new grammar
     setattribute me, '$.target', target
     setattribute me, '$.from', from
     pos = new 'Integer'
@@ -78,15 +76,6 @@ the current position of C<mob>.
     from = fromd
   end:
     .return (me, target, from, pos)
-  err_grammar:
-    .local pmc ex
-    .local string message
-    ex = new 'Exception'
-    message = "Class '"
-    message .= grammar
-    message .= "' not found"
-    ex['_message'] = message
-    throw ex
 .end
 
 =back
@@ -184,9 +173,7 @@ is set or implied.
 
     ##   create the new match object
     .local pmc mob, mfrom, mpos
-    $I0 = find_type grammar
-    if $I0 == 0 goto err_grammar
-    mob = new $I0
+    mob = new grammar
     setattribute mob, '$.target', target
     mfrom = new 'Integer'
     mfrom = pos
@@ -196,16 +183,6 @@ is set or implied.
     setattribute mob, '$.pos', mpos
 
     .return (mob, pos, target, mfrom, mpos, iscont)
-
-  err_grammar:
-    .local pmc ex
-    .local string message
-    ex = new 'Exception'
-    message = "Class '"
-    message .= grammar
-    message .= "' not found"
-    ex['_message'] = message
-    throw ex
 .end
 
 
