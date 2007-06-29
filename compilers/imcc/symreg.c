@@ -122,7 +122,7 @@ _mk_symreg(SymHash* hsh /*NN*/, char *name /*NN*/, int t)
 
     r->set        = t;
     r->type       = VTREG;
-    r->name       = str_dup(name);
+    r->name       = name;
     r->color      = -1;
     r->want_regno = -1;
 
