@@ -7,7 +7,7 @@ config/init/headers.pm - Nongenerated Headers
 
 =head1 DESCRIPTION
 
-Uses C<ExtUtils::Manifest> to find the C header files that are 
+Uses C<ExtUtils::Manifest> to find the C header files that are
 distributed with Parrot.
 
 =cut
