@@ -36,7 +36,7 @@ typedef struct siva {
 
 static PMC* intret;
 /*
-STRING * parrot_hash_get_idx(Interp *interpreter, Hash *hash, PMC * key);
+STRING * parrot_hash_get_idx(Interp *interp, Hash *hash, PMC * key);
 */
 static PMC* undef_pmc;
 
@@ -49,7 +49,7 @@ static PMC* undef_pmc;
 
 /*
 
-=item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>
+=item C<static STRING* make_hash_key(Interp *interp, PMC *key)>
 
 Returns a Parrot string for C<*key>.
 
@@ -57,20 +57,20 @@ Returns a Parrot string for C<*key>.
 
 */
 
-static STRING* make_hash_key(Interp* interpreter, PMC * key)
+static STRING* make_hash_key(Interp* interp, PMC * key)
 {
     if (key == NULL) {
         internal_exception(OUT_OF_BOUNDS,
         "Cannot use NULL key for PerlHash!\n");
         return NULL;
     }
-    return key_string(interpreter, key);
+    return key_string(interp, key);
 }
 
 /*
  same routine in array.pmc should be global
 
-=item C<static PMC* undef(Interp* interpreter)>
+=item C<static PMC* undef(Interp* interp)>
 
 Returns a C<PerlUndef> PMC.
 
@@ -78,9 +78,9 @@ Returns a C<PerlUndef> PMC.
 
 */
 
-static PMC* undef(Interp* interpreter)
+static PMC* undef(Interp* interp)
 {
-    return pmc_new(interpreter, enum_class_Undef);
+    return pmc_new(interp, enum_class_Undef);
 }
 
 /*
@@ -402,7 +402,7 @@ pmclass PugsCapture extends PugsAny
         keystr = make_hash_key(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            val = pmc_new(interpreter, enum_class_String);
+            val = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(INTERP, val, value);
             siva_hash_create_if_void(INTERP, SELF);
             parrot_hash_put(INTERP, siva_hash(SELF), keystr, val);
@@ -429,7 +429,7 @@ pmclass PugsCapture extends PugsAny
                 /* called from iterator with an integer idx in key */
                 if (hash->key_type == Hash_key_type_int) {
                     INTVAL i = (INTVAL)parrot_hash_get_idx(INTERP, hash, key);
-                    return string_from_int(interpreter, i);
+                    return string_from_int(interp, i);
                 }
                 return parrot_hash_get_idx(INTERP, hash, key);
             default:
