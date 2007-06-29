@@ -14,6 +14,8 @@ running compilers from a command line.
 .namespace
 
 .sub '__onload' :load :init
+    load_bytecode 'Parrot/Exception.pbc'
+
     $P0 = newclass [ 'HLLCompiler' ]
     addattribute $P0, '$parsegrammar'
     addattribute $P0, '$astgrammar'
@@ -270,8 +272,12 @@ to any options and return the resulting parse tree.
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
     top = get_hll_global parsegrammar_name, 'TOP'
-    unless null top goto have_top                      # FIXME: deprecated
+    unless null top goto have_top                   
     top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
+    unless null top goto have_top                      # FIXME: deprecated
+    $P0 = getclass 'Exception'
+    $P1 = $P0.'new'('Cannot find rule "TOP" in ', parsegrammar_name)
+    throw $P1
   have_top:                                            # FIXME: deprecated
     .local pmc match
     match = top(source, 'grammar' => parsegrammar_name)
