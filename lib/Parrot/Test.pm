@@ -387,11 +387,11 @@ sub write_code_to_file {
 sub slurp_file {
     my ($file_name) = @_;
 
-    open( SLURP, '<', $file_name ) or die "open '$file_name': $!";
+    open( my $SLURP, '<', $file_name ) or die "open '$file_name': $!";
     local $/ = undef;
-    my $file = <SLURP> . '';
+    my $file = <$SLURP> . '';
     $file =~ s/\cM\cJ/\n/g;
-    close SLURP;
+    close $SLURP;
 
     return $file;
 }
