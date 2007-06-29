@@ -40,6 +40,16 @@ More platforms also means more compilers.  Maybe your DEC compiler
 is more picky than gcc, and spews more warnings.  Good!  More
 opportunities for cleaning!
 
+=head3 icc
+
+C<icc> is the Intel C/C++ Compiler and is available for free for
+non-commercial use.  To use C<icc> to build parrot, use the following
+arguments to C<Configure.pl>:
+
+  perl Configure.pl --cc=icc --link=icc --ld=icc
+
+(courtesy of Steve Peters, C<steve at fisharerojo dot org>).
+
 =head2 Compiler pickiness
 
 Use as many compiler warnings as we possibly can.  The more warnings
