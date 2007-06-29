@@ -81,10 +81,9 @@ according to the C<target> adverb.
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
   make_grammar:
-    if grammar == '' goto end
-    $I0 = find_type grammar
-    if $I0 > 0 goto end
+    push_eh end
     $P0 = subclass 'PGE::Grammar', grammar
+    clear_eh
   end:
     .return ($P1)
 
