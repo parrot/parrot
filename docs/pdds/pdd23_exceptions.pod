@@ -213,8 +213,8 @@ provide at least this interface as well.
 =item B<PMC *get_message()>
 
 Get an exception's human-readable self-description.  Note that the type of the
-returned PMC may not be C<String>, but you should still be able to stringify
-and print it.
+returned PMC isn't required to be C<String>, but you should still be able 
+to stringify and print it.
 
 =item B<PMC *get_payload()>
 
