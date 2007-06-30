@@ -1987,6 +1987,7 @@ HEADERIZER_O_FILES = \
     src/packfile.o \
     src/packfile/pf_items.o \
     src/packout.o \
+    src/pbc_merge.o \
     src/pic_jit.o \
     src/pic.o \
     src/pmc.o \
