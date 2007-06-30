@@ -1716,11 +1716,16 @@ lint : $(PARROT)
 
 ANDYLINTFLAGS = \
 	-a \
-	-aa \
 	-c \
+	-e \
 	-h \
 	-n \
+	-p \
 	-r \
+	-u \
+	-z \
+	-F \
+	-V \
 
 andylint : $(PARROT)
 	rm -f *.ln
