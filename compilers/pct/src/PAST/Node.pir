@@ -141,8 +141,7 @@ array of children.  Returns the newly created PAST node.
     .param string class
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
-    $I0 = find_type class
-    $P0 = new $I0
+    $P0 = new class
     $P0.'init'(children :flat, adverbs :flat :named)
     push self, $P0
     .return ($P0)
