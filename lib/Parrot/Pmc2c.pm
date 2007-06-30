@@ -285,60 +285,42 @@ sub init {
     }
 }
 
-=item C<decl($classname, $method, $for_header)>
+=item C<decl($classname, $method, $for_header, $unused)>
 
 Returns the C code for the PMC method declaration. C<$for_header>
 indicates whether the code is for a header or implementation file.
+C<$unused> indicates if the args should be all unsued.
 
 =cut
 
 sub decl {
-    my ( $self, $classname, $method, $for_header ) = @_;
+    my ( $self, $classname, $method, $for_header, $unused ) = @_;
 
     my $ret     = $method->{type};
     my $meth    = $method->{meth};
     my $args    = $method->{parameters};
     my $variant = $self->{variant} || "";
-    $args = ", $args" if $args =~ /\S/;
-    my ( $export, $extern, $newl, $semi, $interp, $pmc );
-    if ($for_header) {
-        $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
-        $extern = "extern ";
-        $newl   = " ";
-        $semi   = ";";
-        $interp = $pmc = "";
+
+    my $funcname = "Parrot_${classname}${variant}_$meth";
+
+    my @args = ( 'PMC *pmc' );
+    push( @args, split( /\s*,\s*/, $args ) ) if $args =~ /\S+/;
+    @args = map { "SHIM($_)" } @args if $unused;
+    unshift( @args, 'Interp *interp' );
+    my $arg_list = join( ', ', @args );
+
+    if ( $for_header ) {
+        my $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
+        return <<"EOC";
+$export extern $ret $funcname($arg_list);
+EOC
     }
     else {
-        $export = "";
-        $extern = "";
-        $newl   = "\n";
-        $semi   = "";
-        $interp = 'interp';
-        $pmc    = ' pmc';
-    }
-    return <<"EOC";
-$export$extern$ret${newl}Parrot_${classname}${variant}_$meth(Interp *$interp, PMC*$pmc$args)$semi
+        return <<"EOC";
+$ret
+$funcname($arg_list)
 EOC
-}
-
-=item C<all_args_unused( $method )>
-
-Returns the C code for indicating that all arguments are unused, so we
-don't get compiler errors.
-
-=cut
-
-sub all_args_unused {
-    my $self = shift;
-    my $method = shift;
-
-    my @args = split( /\s*,\s*/, $method->{parameters} );
-    for my $arg ( @args ) {
-        $arg =~ s/.*\b(\w+)$/$1/;
     }
-    @args = ( 'interp', 'pmc', @args );
-
-    return join( "\n", map { "    UNUSED($_);" } @args );
 }
 
 =item C<includes()>
@@ -366,7 +348,7 @@ EOC
         my $name = lc $self->{class};
         $cout .= qq{#include "$name.str"\n};
     }
-    "$cout\n";
+    return "$cout\n";
 }
 
 =item C<full_arguments($args)>

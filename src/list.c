@@ -1483,10 +1483,9 @@ Returns the length of the list.
 
 PARROT_API
 INTVAL
-list_length(Interp *interp, const List *list /*NN*/)
+list_length(SHIM_INTERP, const List *list /*NN*/)
     /* PURE, WARN_UNUSED */
 {
-    UNUSED(interp);
     return list->length;
 }
 

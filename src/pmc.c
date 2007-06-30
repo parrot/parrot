@@ -70,12 +70,10 @@ type.
 PARROT_API
 PMC*
 pmc_reuse(Interp *interp /*NN*/, PMC *pmc /*NN*/, INTVAL new_type,
-          UINTVAL flags)
+          SHIM(UINTVAL flags))
 {
     INTVAL has_ext, new_flags;
     VTABLE *new_vtable;
-
-    UNUSED(flags);
 
     if (pmc->vtable->base_type == new_type)
         return pmc;

@@ -14,11 +14,10 @@
 
 PARROT_API
 void
-IMCC_fatal(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
+IMCC_fatal(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
     /* NORETURN */
 {
     va_list ap;
-    UNUSED(code);
 
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
@@ -28,11 +27,10 @@ IMCC_fatal(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
 
 PARROT_API
 void
-IMCC_fataly(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
+IMCC_fataly(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
     /* NORETURN */
 {
     va_list ap;
-    UNUSED(code);
 
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);

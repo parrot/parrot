@@ -36,8 +36,7 @@ don't apply.
 
 /* HEADERIZER BEGIN: static */
 
-static int cstring_compare(
-    Parrot_Interp interp,
+static int cstring_compare( Interp *interp,
     const char *a /*NN*/,
     const char *b /*NN*/ )
         __attribute__nonnull__(2)
@@ -81,6 +80,10 @@ static size_t key_hash_STRING( Interp *interp /*NN*/,
     size_t seed )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static int pointer_compare( Interp *interp,
+    const void * const a,
+    const void * const b );
 
 static int STRING_compare(
     Parrot_Interp interp,
@@ -132,8 +135,8 @@ Compares the two pointers, returning 0 if they are identical
 */
 
 static int
-pointer_compare(Parrot_Interp interp, const void * const a, const void * const b) {
-    UNUSED(interp);
+pointer_compare(SHIM_INTERP, const void * const a, const void * const b)
+{
     return a != b;
 }
 
@@ -145,17 +148,16 @@ Returns a hashvalue for a pointer.
 */
 
 static size_t
-key_hash_pointer(Interp *interp, void *value, size_t seed) {
-    UNUSED(interp);
+key_hash_pointer(SHIM_INTERP, void *value, size_t seed)
+{
     return ((size_t) value) ^ seed;
 }
 
 static size_t
-key_hash_cstring(Interp *interp, const void *value /*NN*/, size_t seed)
+key_hash_cstring(SHIM_INTERP, const void *value /*NN*/, size_t seed)
 {
     register size_t h = seed;
     const unsigned char * p = (const unsigned char *) value;
-    UNUSED(interp);
 
     while (*p) {
         h += h << 5;
@@ -172,9 +174,8 @@ C string versions of the C<key_hash> and C<compare> functions.
 */
 
 static int
-cstring_compare(Parrot_Interp interp, const char *a /*NN*/, const char *b /*NN*/)
+cstring_compare(SHIM_INTERP, const char *a /*NN*/, const char *b /*NN*/)
 {
-    UNUSED(interp);
     return strcmp(a, b);
 }
 
@@ -186,9 +187,8 @@ Custom C<key_hash> function.
 */
 
 static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)
+key_hash_int(SHIM_INTERP, void *value, size_t seed)
 {
-    UNUSED(interp);
     return (size_t)value ^ seed;
 }
 
@@ -200,10 +200,9 @@ Custom C<compare> function.
 */
 
 static int
-int_compare(Interp *interp, const void *a, const void *b)
+int_compare(SHIM_INTERP, const void *a, const void *b)
     /* PURE, WARN_UNUSED */
 {
-    UNUSED(interp);
     return a != b;
 }
 
@@ -218,10 +217,8 @@ Print out the hash in human-readable form.  Except it's empty.
 
 PARROT_API
 void
-parrot_dump_hash(Interp *interp, const Hash *hash)
+parrot_dump_hash(SHIM_INTERP, SHIM(const Hash *hash))
 {
-    UNUSED(interp);
-    UNUSED(hash);
 }
 
 /*
@@ -510,10 +507,8 @@ Returns a new Parrot STRING hash in C<hptr>.
 
 PARROT_API
 void
-parrot_new_hash(Interp *interp, Hash **hptr)
+parrot_new_hash(SHIM_INTERP, Hash **hptr)
 {
-    UNUSED(interp);
-
     parrot_new_hash_x(hptr,
             enum_type_PMC,
             Hash_key_type_STRING,

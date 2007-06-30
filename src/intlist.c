@@ -187,10 +187,9 @@ Returns the length of the list.
 */
 
 INTVAL
-intlist_length(Interp *interp, const IntList *list /*NN*/)
+intlist_length(SHIM_INTERP, const IntList *list /*NN*/)
     /* PURE, WARN_UNUSED */
 {
-    UNUSED(interp);
     return ((const List *)list)->length;
 }
 

@@ -1863,10 +1863,11 @@ C<pf> and C<add> are ignored.
 */
 
 static PackFile_Segment *
-byte_code_new(Interp *interp, PackFile *pf, const char *name, int add)
+byte_code_new(SHIM_INTERP, PackFile *pf, const char *name, int add)
 {
-    PackFile_ByteCode *byte_code    = mem_allocate_typed(PackFile_ByteCode);
+    PackFile_ByteCode * const byte_code = mem_allocate_typed(PackFile_ByteCode);
 
+    /* XXX: Any reason a simple memset here won't do? */
     byte_code->base.dir             = NULL;
     byte_code->prederef.code        = NULL;
     byte_code->prederef.branches    = NULL;
@@ -1924,6 +1925,7 @@ pf_debug_new(Interp *interp, PackFile *pf, const char *name, int add)
 {
     PackFile_Debug * const debug = mem_allocate_typed(PackFile_Debug);
 
+    /* XXX: Any reason a simple memset here won't do? */
     debug->code                  = NULL;
     debug->mappings              = mem_allocate_typed(PackFile_DebugMapping *);
     debug->mappings[0]           = NULL;
@@ -2634,12 +2636,11 @@ Returns a new C<PackFile_FixupTable> segment.
 */
 
 static PackFile_Segment *
-fixup_new(Interp *interp, PackFile *pf, const char *name, int add)
+fixup_new(SHIM_INTERP, PackFile *pf, const char *name, int add)
 {
     PackFile_FixupTable * const fixup = mem_allocate_typed(PackFile_FixupTable);
 
-    UNUSED(interp);
-
+    /* XXX Any reason a simple memset() here won't do? */
     fixup->fixup_count                = 0;
     fixup->fixups                     = NULL;
 
@@ -2979,11 +2980,10 @@ This is only here so we can make a new one and then do an unpack.
 
 PARROT_API
 PackFile_Constant *
-PackFile_Constant_new(Interp *interp)
+PackFile_Constant_new(SHIM_INTERP)
 {
     PackFile_Constant * const self =
         mem_allocate_zeroed_typed(PackFile_Constant);
-    UNUSED(interp);
 
     self->type = PFC_NONE;
 

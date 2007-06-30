@@ -413,15 +413,13 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)
 
 PARROT_API
 PMC *
-Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, PMC *initializer)
+Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, SHIM(PMC *initializer))
 {
     void * handle;
     PMC *lib_pmc;
     STRING *path;
     STRING *lib_name, *wo_ext, *ext;    /* library stem without path
                                          * or extension.  */
-
-    UNUSED(initializer);
     /* Find the pure library name, without path or extension.  */
     /*
      * TODO move the class_count_mutex here

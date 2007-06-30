@@ -1490,7 +1490,6 @@ move_ins_out(Interp *interp, IMC_Unit *unit /*NN*/,
 #  ifdef MOVE_INS_1_BL
     pred = find_outer(unit, bb);
 #  else
-    UNUSED(bb);
     pred = unit->bb_list[0];
 #  endif
     if (!pred) {

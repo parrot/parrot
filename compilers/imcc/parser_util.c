@@ -58,8 +58,7 @@ static char * to_infix( Interp *interp,
     int *n,
     int mmd_op );
 
-static const char * try_rev_cmp(
-    Parrot_Interp interp,
+static const char * try_rev_cmp( Interp *interp,
     IMC_Unit * unit,
     const char *name,
     SymReg ** r );
@@ -210,7 +209,7 @@ check_op(Interp *interp /*NN*/, char *fullname /*NN*/,
 }
 
 static Instruction *
-maybe_builtin(Interp *interp, IMC_Unit *unit, const char *name /*NN*/,
+maybe_builtin(Interp *interp, SHIM(IMC_Unit *unit), const char *name /*NN*/,
         SymReg **r, int n)
 {
     Instruction *ins;
@@ -220,7 +219,6 @@ maybe_builtin(Interp *interp, IMC_Unit *unit, const char *name /*NN*/,
     int first_arg, is_void;
 
     assert(n < 15);
-    UNUSED(unit);
     for (i = 0; i < n; ++i) {
         sig[i] = r[i]->set;
         rr[i] = r[i];
@@ -233,11 +231,11 @@ maybe_builtin(Interp *interp, IMC_Unit *unit, const char *name /*NN*/,
      * create a method see imcc.y target = sub_call
      * cos Px, Py  => Px = Py.cos()
      */
-    is_class_meth = Parrot_builtin_is_class_method(interp, bi);
-    is_void = Parrot_builtin_is_void(interp, bi);
-    meth = mk_sub_address(interp, str_dup(name));
+    is_class_meth = Parrot_builtin_is_class_method(bi);
+    is_void = Parrot_builtin_is_void(bi);
+    meth = mk_sub_address(interp, str_dup(name)); /* XXX Memory leak on name! */
     if (is_class_meth) {    /* ParrotIO.open() */
-        const char * const ns = Parrot_builtin_get_c_namespace(interp, bi);
+        const char * const ns = Parrot_builtin_get_c_namespace(bi);
         SymReg * const ns_sym = mk_const(interp, str_dup(ns), 'S');
 
         ins = IMCC_create_itcall_label(interp);
@@ -1056,7 +1054,7 @@ try_find_op(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
 }
 
 static const char *
-try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, const char *name,
+try_rev_cmp(SHIM_INTERP, SHIM(IMC_Unit * unit), const char *name,
         SymReg ** r)
 {
     static struct br_pairs {
@@ -1070,14 +1068,12 @@ try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, const char *name,
         { "isge", "isle", 1 },
     };
     unsigned int i;
-    int to_swap;
-    SymReg *t;
 
-    UNUSED(interp);
-    UNUSED(unit);
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         if (strcmp(name, br_pairs[i].op) == 0) {
-            to_swap =  br_pairs[i].to_swap;
+            const int to_swap =  br_pairs[i].to_swap;
+            SymReg *t;
+
             if (r[to_swap + 1]->set == 'P')
                 return NULL;
             t = r[to_swap];
@@ -1091,7 +1087,7 @@ try_rev_cmp(Parrot_Interp interp, IMC_Unit * unit, const char *name,
 
 Instruction *
 multi_keyed(Interp *interp, IMC_Unit * unit, char *name,
-            SymReg ** r, int nr, int keyvec, int emit)
+            SymReg ** r, int nr, int keyvec, SHIM(int emit))
 {
     int i, keyf, kv, n;
     char buf[16];
@@ -1099,8 +1095,6 @@ multi_keyed(Interp *interp, IMC_Unit * unit, char *name,
     SymReg *preg[3];    /* px,py,pz */
     SymReg *nreg[3];
     Instruction *ins = 0;
-
-    UNUSED(emit);
 
     /* count keys in keyvec */
     kv = keyvec;

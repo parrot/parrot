@@ -22,9 +22,6 @@ setup function to initialize the memory pools.
 
 /* HEADERIZER TARGET: include/parrot/memory.h */
 
-/* for PANIC */
-#define interp NULL
-
 /*
 
 FUNCDOC: mem_sys_allocate
@@ -43,7 +40,7 @@ mem_sys_allocate(size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-        PANIC(interp, "Out of mem");
+        PANIC(NULL, "Out of mem");
     return ptr;
 }
 
@@ -55,9 +52,12 @@ mem__internal_allocate(size_t size, const char *file, int line)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
             size, ptr, file, line);
+#else
+    UNUSED(file);
+    UNUSED(line);
 #endif
     if (!ptr)
-        PANIC(interp, "Out of mem");
+        PANIC(NULL, "Out of mem");
     return ptr;
 }
 
@@ -79,7 +79,7 @@ mem_sys_allocate_zeroed(size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr && size)
-        PANIC(interp, "Out of mem");
+        PANIC(NULL, "Out of mem");
     return ptr;
 }
 
@@ -91,9 +91,12 @@ mem__internal_allocate_zeroed(size_t size, const char *file, int line)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
             size, ptr, file, line);
+#else
+    UNUSED(file);
+    UNUSED(line);
 #endif
     if (!ptr && size)
-        PANIC(interp, "Out of mem");
+        PANIC(NULL, "Out of mem");
     return ptr;
 }
 
@@ -119,7 +122,7 @@ mem__sys_realloc(void *from /*NULLOK*/, size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-         PANIC(interp, "Out of mem");
+         PANIC(NULL, "Out of mem");
     return ptr;
 }
 
@@ -146,7 +149,7 @@ mem__sys_realloc_zeroed(void *from /*NULLOK*/, size_t size, size_t old_size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-         PANIC(interp, "Out of mem");
+         PANIC(NULL, "Out of mem");
 
     if (size > old_size)
         memset((char*)ptr + old_size, 0, size - old_size);
@@ -165,12 +168,14 @@ mem__internal_realloc(void *from /*NN*/, size_t size,
             from, size, file, line);
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
             size, ptr, file, line);
+#else
+    UNUSED(file);
+    UNUSED(line);
 #endif
     if (!ptr)
-        PANIC(interp, "Out of mem");
+        PANIC(NULL, "Out of mem");
     return ptr;
 }
-#undef interp
 
 /*
 

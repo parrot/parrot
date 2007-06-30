@@ -78,11 +78,8 @@ PIO_string_register_layer(void)
 }
 
 static size_t
-PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
+PIO_string_read(SHIM(Interp *interp), ParrotIOLayer *l, SHIM(ParrotIO *io), STRING **buf)
 {
-    UNUSED(io);
-    UNUSED(interp);
-
     if (l->self == 0)
         return 0;
 
@@ -93,12 +90,11 @@ PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf)
 }
 
 static size_t
-PIO_string_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s)
+PIO_string_write(Interp *interp, ParrotIOLayer *l, SHIM(ParrotIO *io), STRING *s)
 {
-    STRING *old_string = (STRING *)l->self;
-    UNUSED(io);
+    STRING * const old_string = (STRING *)l->self;
 
-    if (old_string == 0) {
+    if (!old_string) {
         l->self = s;
         return s->strlen;
     }

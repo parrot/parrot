@@ -169,10 +169,8 @@ using the one passed in and returns it.
 
 PARROT_API
 STRING*
-Parrot_reuse_COW_reference(Interp *interp, STRING *s /*NULLOK*/, STRING *d /*NN*/)
+Parrot_reuse_COW_reference(SHIM_INTERP, STRING *s /*NULLOK*/, STRING *d /*NN*/)
 {
-    UNUSED(interp);
-
     if (s == NULL) {
         return NULL;
     }
@@ -299,11 +297,9 @@ is how many bytes can be appended onto strstart.
 
 PARROT_API
 UINTVAL
-string_capacity(Interp *interp, const STRING *s /*NN*/)
+string_capacity(SHIM_INTERP, const STRING *s /*NN*/)
     /* PURE, WARN_UNUSED */
 {
-    UNUSED(interp);
-
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
 }
@@ -353,13 +349,11 @@ Returs NULL, if no compatible string representation can be found.
 
 PARROT_API
 CHARSET *
-string_rep_compatible(Interp *interp,
+string_rep_compatible(SHIM_INTERP,
                        const STRING *a /*NN*/,
                        const STRING *b /*NN*/,
                        ENCODING **e /*NN*/)
 {
-    UNUSED(interp);
-
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
         return a->charset;
@@ -674,11 +668,9 @@ Returns the number of characters in the specified Parrot string.
 
 PARROT_API
 UINTVAL
-string_length(Interp *interp, const STRING *s /*NULLOK*/)
+string_length(SHIM_INTERP, const STRING *s /*NULLOK*/)
     /*PURE,WARN_UNUSED*/
 {
-    UNUSED(interp);
-
     return s ? s->strlen : 0;
 }
 
@@ -847,10 +839,8 @@ of characters in the specified Parrot string's representation.
 
 PARROT_API
 INTVAL
-string_max_bytes(Interp *interp, const STRING *s /*NN*/, INTVAL nchars)
+string_max_bytes(SHIM_INTERP, const STRING *s /*NN*/, INTVAL nchars)
 {
-    UNUSED(interp);
-
     assert(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
 }
@@ -1260,8 +1250,6 @@ INTVAL
 string_equal(Interp *interp, const STRING *s1 /*NULLOK*/, const STRING *s2 /*NULLOK*/)
     /* WARN_UNUSED */
 {
-    UNUSED(interp);
-
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
     }
@@ -1770,11 +1758,9 @@ number, rounding towards zero.
 
 PARROT_API
 INTVAL
-string_to_int(Interp *interp, const STRING *s /*NULLOK*/)
+string_to_int(SHIM_INTERP, const STRING *s /*NULLOK*/)
 {
     INTVAL i = 0;
-
-    UNUSED(interp);
 
     if (s) {
         const char         *start = s->strstart;
@@ -1902,11 +1888,10 @@ result in a memory leak.
 
 PARROT_API
 char *
-string_to_cstring(Interp *interp, const STRING *s /* NULLOK */)
+string_to_cstring(SHIM_INTERP, const STRING *s /* NULLOK */)
     /* MALLOC, WARN_UNUSED */
 {
     char *p;
-    UNUSED(interp);
 
     /*
      * TODO always provide a NUL at end of strings
@@ -2449,11 +2434,9 @@ as constants -- i.e. do not resize the result.
 
 PARROT_API
 const char *
-Parrot_string_cstring(Interp *interp, const STRING *str /*NN*/)
+Parrot_string_cstring(SHIM_INTERP, const STRING *str /*NN*/)
     /* PURE, WARN_UNUSED */
 {
-    UNUSED(interp);
-
     /* TODO handle NUL and friends */
     return str->strstart;
 }

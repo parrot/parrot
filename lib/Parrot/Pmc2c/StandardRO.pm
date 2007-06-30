@@ -40,7 +40,6 @@ sub body {
     my ( $self, $method, $line, $out_name ) = @_;
 
     my $meth       = $method->{meth};
-    my $decl       = $self->decl( $self->{class}, $method, 0 );
     my $classname  = $self->{class};
     my $parentname = $self->{parentname};
     my $ret        = gen_ret($method);
@@ -48,10 +47,11 @@ sub body {
 
     if ( $meth eq 'find_method' ) {
         my $real_findmethod = 'Parrot_' . $self->{super}{find_method} . '_find_method';
+        my $decl = $self->decl( $self->{class}, $method, 0, 0 );
         $cout = <<"EOC";
 $decl
 {
-    PMC *const method = $real_findmethod(interp, pmc, method_name);
+    PMC * const method = $real_findmethod(interp, pmc, method_name);
     if (!PMC_IS_NULL(VTABLE_getprop(interp, method, const_string(interp, "write"))))
         return PMCNULL;
     else
@@ -60,12 +60,10 @@ $decl
 EOC
     }
     else {
-        my $unused = $self->all_args_unused( $method );
+        my $decl = $self->decl( $self->{class}, $method, 0, 1 );
         $cout = <<"EOC";
 $decl
 {
-$unused
-
     real_exception(interp, NULL, WRITE_TO_CONSTCLASS,
             "$meth() in read-only instance of $classname");
 EOC

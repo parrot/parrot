@@ -29,9 +29,8 @@ There's also a verbose mode for garbage collection.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_live_bits( Interp *interp /*NULLOK*/,
-    Small_Object_Pool *pool /*NN*/ )
-        __attribute__nonnull__(2);
+static void clear_live_bits( Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1);
 
 static size_t find_common_mask( size_t val1, size_t val2 );
 static void mark_special( Interp *interp /*NN*/, PMC *obj /*NN*/ )
@@ -817,9 +816,8 @@ Run through all PMC arenas and clear live bits.
 
 */
 
-/* interp is unused and can be removed */
 static void
-clear_live_bits(Interp *interp /*NULLOK*/, Small_Object_Pool *pool /*NN*/)
+clear_live_bits(Small_Object_Pool *pool /*NN*/)
 {
     Small_Object_Arena *arena;
     const UINTVAL       object_size = pool->object_size;
@@ -841,7 +839,7 @@ void
 Parrot_dod_clear_live_bits(Interp *interp /*NN*/)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
-    clear_live_bits(interp, pool);
+    clear_live_bits(pool);
 }
 
 /*
@@ -976,8 +974,7 @@ Parrot_dod_ms_run(Interp *interp /*NN*/, int flags)
     if (flags & DOD_finish_FLAG) {
         /* XXX */
         Parrot_dod_clear_live_bits(interp);
-        clear_live_bits(interp,
-            interp->arena_base->constant_pmc_pool);
+        clear_live_bits(interp->arena_base->constant_pmc_pool);
 
         Parrot_dod_sweep(interp, interp->arena_base->pmc_pool);
         Parrot_dod_sweep(interp, interp->arena_base->constant_pmc_pool);

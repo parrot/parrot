@@ -18,8 +18,7 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void analyse_life_block(
-    Parrot_Interp interp,
+static void analyse_life_block( Interp *interp,
     Basic_block* bb /*NN*/,
     SymReg* r /*NN*/ )
         __attribute__nonnull__(2)
@@ -604,13 +603,12 @@ free_life_info(const struct _IMC_Unit *unit /*NN*/, SymReg *r /*NN*/)
  */
 
 static void
-analyse_life_block(Parrot_Interp interp, Basic_block* bb /*NN*/, SymReg* r /*NN*/)
+analyse_life_block(Interp *interp, Basic_block* bb /*NN*/, SymReg* r /*NN*/)
 {
     Instruction* ins, *special;
     Life_range* l;
     int is_alias;
 
-    UNUSED(interp);
     l = make_life_range(r, bb->index);
 
     special = NULL;

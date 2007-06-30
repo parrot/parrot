@@ -494,12 +494,10 @@ anywhere, return PMCNULL.
 
 PARROT_API
 PMC *
-Parrot_find_name_op(Interp *interp /*NN*/, STRING *name, void *next)
+Parrot_find_name_op(Interp *interp /*NN*/, STRING *name, SHIM(void *next))
 {
     parrot_context_t * const ctx = CONTEXT(interp->ctx);
     PMC *g, *lex_pad;
-
-    UNUSED(next);
 
     g = PMCNULL;
 

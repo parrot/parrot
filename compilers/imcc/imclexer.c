@@ -5605,7 +5605,7 @@ find_macro(Interp *interp, const char *name)
 }
 
 static int
-expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
+expand_macro (SHIM(YYSTYPE *valp), void *interp, const char *name, void *yyscanner)
 {
     int c;
     struct macro_frame_t *frame;
@@ -5617,8 +5617,6 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name, void *yyscanner)
     char *s;
     int len;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-
-    UNUSED(valp);
 
     expansion = find_macro_param(interp, name);
     if (expansion) {
@@ -5853,7 +5851,6 @@ IMCC_print_inc(Interp *interp)
     struct macro_frame_t *f;
     const char *old;
 
-    UNUSED(interp);
     if (IMCC_INFO(interp)->frames && IMCC_INFO(interp)->frames->is_macro)
         fprintf(stderr, "\n\tin macro '.%s' line %d\n",
                 IMCC_INFO(interp)->frames->s.file, IMCC_INFO(interp)->line);

@@ -160,22 +160,17 @@ static void verify_signature( Interp *interp /*NN*/,
 /* HEADERIZER END: static */
 
 static void
-imcc_globals_destroy(Interp *interp, int ex, void *param)
+imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 {
     cs_t   *cs, *prev_cs;
-    subs_t *s,  *prev_s;
-
-    UNUSED(ex);
-    UNUSED(param);
-    UNUSED(interp);
 
     cs = globals.cs;
 
     while (cs) {
-        s = cs->subs;
+        subs_t *s = cs->subs;
 
         while (s) {
-            prev_s = s->prev;
+            subs_t * const prev_s = s->prev;
             clear_sym_hash(&s->fixup);
             mem_sys_free(s);
             s      = prev_s;
@@ -191,12 +186,9 @@ imcc_globals_destroy(Interp *interp, int ex, void *param)
 }
 
 int
-e_pbc_open(Interp *interp, void *param)
+e_pbc_open(Interp *interp, SHIM(void *param))
 {
     cs_t *cs;
-
-    /* make a new code segment */
-    UNUSED(param);
 
     /* register cleanup code */
     if (!globals.cs)
@@ -735,8 +727,6 @@ find_outer(Interp *interp, IMC_Unit *unit /*NN*/)
     PMC    *current;
     STRING *cur_name;
 
-    UNUSED(interp);
-
     if (!unit->outer)
         return NULL;
 
@@ -1109,7 +1099,6 @@ IMCC_int_from_reg(Interp *interp, const SymReg *r /*NN*/)
 {
     INTVAL i;
 
-    UNUSED(interp);
     errno = 0;
 
     if (r->type & VT_CONSTP)
@@ -1259,11 +1248,8 @@ constant_folding(Interp *interp, IMC_Unit *unit /*NN*/)
 }
 
 int
-e_pbc_new_sub(Interp *interp, void *param, IMC_Unit *unit /*NN*/)
+e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), IMC_Unit *unit /*NN*/)
 {
-    UNUSED(param);
-    UNUSED(interp);
-
     if (!unit->instructions)
         return 0;
 
@@ -1274,12 +1260,10 @@ e_pbc_new_sub(Interp *interp, void *param, IMC_Unit *unit /*NN*/)
 }
 
 int
-e_pbc_end_sub(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/)
+e_pbc_end_sub(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/)
 {
     Instruction *ins;
     int          pragma;
-
-    UNUSED(param);
 
     if (!unit->instructions)
         return 0;
@@ -1378,7 +1362,7 @@ verify_signature(Interp *interp /*NN*/, const Instruction *ins /*NN*/, opcode_t 
 
 /* now let the fun begin, actually emit code for one ins */
 int
-e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Instruction *ins /*NN*/)
+e_pbc_emit(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/, const Instruction *ins /*NN*/)
 {
     int        op, i;
     int        ok = 0;
@@ -1394,8 +1378,6 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
 #if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "e_pbc_emit\n");
 #endif
-
-    UNUSED(param);
 
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
@@ -1598,9 +1580,8 @@ e_pbc_emit(Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/, const Inst
 }
 
 int
-e_pbc_close(Interp *interp /*NN*/, void *param)
+e_pbc_close(Interp *interp /*NN*/, SHIM(void *param))
 {
-    UNUSED(param);
     fixup_globals(interp);
 
     return 0;

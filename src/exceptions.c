@@ -394,12 +394,10 @@ Throw the exception.
 
 PARROT_API
 opcode_t *
-throw_exception(Interp *interp /*NN*/, PMC *exception, void *dest)
+throw_exception(Interp *interp /*NN*/, PMC *exception, SHIM(void *dest))
 {
     opcode_t *address;
     PMC * const handler = find_exception_handler(interp, exception);
-
-    UNUSED(dest);
 
     if (!handler)
         return NULL;

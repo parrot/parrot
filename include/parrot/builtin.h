@@ -17,9 +17,9 @@
 
 /* HEADERIZER BEGIN: src/builtin.c */
 
-const char * Parrot_builtin_get_c_namespace( Interp *interp, int bi );
-int Parrot_builtin_is_class_method( Interp *interp, int bi );
-int Parrot_builtin_is_void( Interp *interp, int bi );
+const char * Parrot_builtin_get_c_namespace( int bi );
+int Parrot_builtin_is_class_method( int bi );
+int Parrot_builtin_is_void( int bi );
 PMC* Parrot_find_builtin( Interp *interp, STRING *func /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -34,15 +34,6 @@ int Parrot_is_builtin( Interp *interp,
         __attribute__warn_unused_result__;
 
 /* HEADERIZER END: src/builtin.c */
-
-void Parrot_init_builtins(Interp *interp);
-int  Parrot_is_builtin(Interp *interp, const char *func, const char *sig)
-        __attribute__nonnull__(2);
-PMC* Parrot_find_builtin(Interp *interp, STRING *func)
-        __attribute__nonnull__(2);
-const char * Parrot_builtin_get_c_namespace(Interp *interp, int bi);
-int Parrot_builtin_is_class_method(Interp *interp, int bi);
-int Parrot_builtin_is_void(Interp *interp, int bi);
 
 #endif /* PARROT_BUILTIN_H_GUARD */
 

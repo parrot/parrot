@@ -380,9 +380,8 @@ C<Parrot_char_is_digit()> returns false.
 
 PARROT_API
 UINTVAL
-Parrot_char_digit_value(Interp *interp, UINTVAL character)
+Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 {
-    UNUSED(interp);
 #if PARROT_HAS_ICU
     return u_charDigitValue(character);
 #else

@@ -96,7 +96,7 @@ static int try_allocate( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void vanilla_reg_alloc( Parrot_Interp interp, IMC_Unit *unit );
+static void vanilla_reg_alloc( Interp *interp, IMC_Unit *unit );
 /* HEADERIZER END: static */
 
 static unsigned int*
@@ -837,7 +837,7 @@ allocate_uniq(Parrot_Interp interp, IMC_Unit *unit, int usage)
 }
 
 static void
-vanilla_reg_alloc(Parrot_Interp interp, IMC_Unit *unit)
+vanilla_reg_alloc(SHIM_INTERP, IMC_Unit *unit)
 {
     char type[] = "INSP";
     int i, j, reg_set, first_reg;
@@ -845,7 +845,6 @@ vanilla_reg_alloc(Parrot_Interp interp, IMC_Unit *unit)
     SymHash *hsh;
     Set *avail;
 
-    UNUSED(interp);
     hsh = &unit->hash;
 
     /* Clear the pre-assigned colors. */

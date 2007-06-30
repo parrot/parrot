@@ -139,12 +139,11 @@ imc_open_unit(Interp *interp /*NN*/, IMC_Unit_Type t)
 void
 imc_close_unit(Interp *interp, IMC_Unit *unit /*NULLOK*/)
 {
-    UNUSED(interp);
-    if (unit) {
 #if COMPILE_IMMEDIATE
+    if (unit) {
         imc_compile_unit(interp, unit);
-#endif
     }
+#endif
     IMCC_INFO(interp)->cur_unit = NULL;
 }
 

@@ -588,15 +588,13 @@ tm_to_array(Parrot_Interp interp, const struct tm *tm /*NN*/)
 
 PARROT_API
 INTVAL
-Parrot_byte_index(Interp *interp, const STRING *base /*NN*/,
+Parrot_byte_index(SHIM_INTERP, const STRING *base /*NN*/,
         const STRING *search /*NN*/, UINTVAL start_offset)
 {
     const INTVAL searchlen = search->strlen;
     const char * const search_start = search->strstart;
     const INTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
-
-    UNUSED(interp);
 
     for (current_offset = start_offset; current_offset <= max_possible_offset;
             current_offset++) {
@@ -611,7 +609,7 @@ Parrot_byte_index(Interp *interp, const STRING *base /*NN*/,
 
 PARROT_API
 INTVAL
-Parrot_byte_rindex(Interp *interp, const STRING *base /*NN*/,
+Parrot_byte_rindex(SHIM_INTERP, const STRING *base /*NN*/,
         const STRING *search /*NN*/, UINTVAL start_offset)
     /* WARN_UNUSED */
 {
@@ -619,8 +617,6 @@ Parrot_byte_rindex(Interp *interp, const STRING *base /*NN*/,
     const char * const search_start = search->strstart;
     UINTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
-
-    UNUSED(interp);
 
     if (start_offset && start_offset < max_possible_offset) {
         max_possible_offset = start_offset;

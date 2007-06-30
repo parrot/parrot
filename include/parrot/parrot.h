@@ -240,11 +240,22 @@ typedef void (*funcptr_t)(void);
 #  define O_BINARY 0
 #endif /* O_BINARY */
 
-/* define a macro to acknowledge an unused argument, and silence a "helpful"
-   compiler warning. gcc will emit a warning on an empty if body unless {} is
-   used to make an empty block.  */
-#define UNUSED(a) if (a) {}
 
+/* Shim arguments are arguments that must be included in your function,
+ * but serve no purpose inside.  Mark them with the SHIM() macro so that
+ * the compiler and/or lint know that it's OK it's unused.  Shim arguments
+ * get "_unused" added to them so that you can't accidentally use them
+ * without removing the shim designation.
+ */
+#define SHIM(a) a##_unused __attribute__unused__
+
+/* One of the most common shim arguments is the interpreter itself, so it
+ * gets its own macro.
+ */
+#define SHIM_INTERP Interp *interp_unused __attribute__unused__
+
+/* UNUSED() is the old way we handled shim arguments */
+#define UNUSED(a) if (0) (void)(a);
 
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d,s)    assert(d);assert(s);*(d)=*(s);

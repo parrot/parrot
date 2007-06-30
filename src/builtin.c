@@ -262,25 +262,22 @@ Parrot_find_builtin(Interp *interp, STRING *func /*NN*/)
 }
 
 const char *
-Parrot_builtin_get_c_namespace(Interp *interp, int bi)
+Parrot_builtin_get_c_namespace(int bi)
 {
-    UNUSED(interp);
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].c_ns;
 }
 
 int
-Parrot_builtin_is_class_method(Interp *interp, int bi)
+Parrot_builtin_is_class_method(int bi)
 {
-    UNUSED(interp);
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[2] != 'O';
 }
 
 int
-Parrot_builtin_is_void(Interp *interp, int bi)
+Parrot_builtin_is_void(int bi)
 {
-    UNUSED(interp);
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[0] == 'v';
 }

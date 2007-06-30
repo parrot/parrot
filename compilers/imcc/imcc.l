@@ -1181,7 +1181,6 @@ IMCC_print_inc(Interp *interp)
     struct macro_frame_t *f;
     const char *old;
 
-    UNUSED(interp);
     if (IMCC_INFO(interp)->frames && IMCC_INFO(interp)->frames->is_macro)
         fprintf(stderr, "\n\tin macro '.%s' line %d\n",
                 IMCC_INFO(interp)->frames->s.file, IMCC_INFO(interp)->line);

@@ -294,11 +294,8 @@ Note that C<exit_code> is ignored.
 */
 
 void
-Parrot_really_destroy(Interp *interp, int exit_code, void *arg)
+Parrot_really_destroy(Interp *interp, SHIM(int exit_code), SHIM(void *arg))
 {
-    UNUSED(exit_code);
-    UNUSED(arg);
-
     /*
      * wait for threads to complete if needed
      */

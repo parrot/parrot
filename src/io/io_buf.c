@@ -768,11 +768,8 @@ The buffer layer's C<Tell> function.
 */
 
 static PIOOFF_T
-PIO_buf_tell(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+PIO_buf_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
 {
-    UNUSED(interp);
-    UNUSED(layer)
-
     return io->fpos;
 }
 
