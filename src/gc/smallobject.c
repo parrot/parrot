@@ -24,8 +24,9 @@ Handles the accessing of small object pools (header pools).
 
 static void gc_ms_add_free_object( Interp *interp,
     Small_Object_Pool *pool /*NN*/,
-    void *to_add )
-        __attribute__nonnull__(2);
+    void *to_add /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_ms_alloc_objects( Interp *interp /*NN*/,
     Small_Object_Pool *pool /*NN*/ )
@@ -147,10 +148,9 @@ Add an unused object back to the free pool for later reuse.
 */
 
 static void
-gc_ms_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/,
-                      void   *to_add)
+gc_ms_add_free_object(SHIM_INTERP, Small_Object_Pool *pool /*NN*/,
+                      void *to_add /*NN*/)
 {
-    UNUSED(interp);
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
 }
@@ -342,10 +342,8 @@ gc_pmc_ext_pool_init(Small_Object_Pool *pool /*NN*/)
 }
 
 static void
-gc_ms_pool_init(Interp *interp, Small_Object_Pool *pool /*NN*/)
+gc_ms_pool_init(SHIM_INTERP, Small_Object_Pool *pool /*NN*/)
 {
-    UNUSED(interp);
-
     pool->add_free_object = gc_ms_add_free_object;
     pool->get_free_object = gc_ms_get_free_object;
     pool->alloc_objects   = gc_ms_alloc_objects;
