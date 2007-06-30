@@ -288,6 +288,14 @@ many more.
 Valgrind (L<http://valgrind.org/>) is a profiler/debugger most notable
 for the way it magically monitors memory accesses and management.
 
+To run parrot under Valgrind, the following argument set should be helpful:
+
+  valgrind --num-callers=500 \
+     --leak-check=full --leak-resolution=high --show-reachable=yes \
+     parrot --leak-test
+
+(adapted from a post to C<parrot-porters> by chromatic).
+
 =head2 IMCC cleanup
 
 From #parrot:
