@@ -355,7 +355,7 @@ PARROT_API void PackFile_FixupTable_new_entry( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL PackFile_funcs_register( Interp *interp /*NULLOK*/,
+PARROT_API INTVAL PackFile_funcs_register( Interp *interp,
     PackFile *pf /*NN*/,
     UINTVAL type,
     PackFile_funcs funcs )
