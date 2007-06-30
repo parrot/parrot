@@ -661,12 +661,11 @@ free_pool(Small_Object_Pool *pool /*NN*/)
 }
 
 static int
-sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, int flag,
+sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, SHIM(int flag),
         void *arg)
 {
 #ifdef GC_IS_MALLOC
     const int pass = (int)(INTVAL)arg;
-    UNUSED(flag);
 
     if (pass == 0)
         clear_cow(interp, pool, 1);
@@ -675,7 +674,6 @@ sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, int flag,
     else
 #endif
     {
-        UNUSED(flag);
         UNUSED(arg);
 
         Parrot_dod_sweep(interp, pool);

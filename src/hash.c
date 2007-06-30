@@ -542,9 +542,8 @@ Returns a new C string hash in C<hptr>.
 
 PARROT_API
 void
-parrot_new_cstring_hash(Interp *interp, Hash **hptr)
+parrot_new_cstring_hash(SHIM_INTERP, Hash **hptr)
 {
-    UNUSED(interp);
     parrot_new_hash_x(hptr,
             enum_type_PMC,
             Hash_key_type_cstring,
@@ -600,10 +599,8 @@ init_hash(Hash *hash /*NN*/,
 
 PARROT_API
 void
-parrot_hash_destroy(Interp *interp, Hash *hash /*NN*/)
+parrot_hash_destroy(SHIM_INTERP, Hash *hash /*NN*/)
 {
-    UNUSED(interp);
-
     mem_sys_free(hash->bs);
     mem_sys_free(hash);
 }
@@ -612,7 +609,6 @@ void
 parrot_chash_destroy(Interp *interp, Hash *hash /*NN*/)
 {
     UINTVAL i;
-    UNUSED(interp);
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *bucket = hash->bi[i];
@@ -666,14 +662,12 @@ in PMC_struct_val(container).
 */
 
 void
-parrot_new_pmc_hash_x(Interp *interp, PMC *container /*NN*/,
+parrot_new_pmc_hash_x(SHIM_INTERP, PMC *container /*NN*/,
         PARROT_DATA_TYPES val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
     Hash * const hash = mem_allocate_typed(Hash);
-
-    UNUSED(interp);
 
     PMC_struct_val(container) = hash;
     hash->container = container;
@@ -689,10 +683,8 @@ Create a new HASH with void * keys and values.
 
 PARROT_API
 void
-parrot_new_pointer_hash(Interp *interp, Hash **hptr /*NN*/)
+parrot_new_pointer_hash(SHIM_INTERP, Hash **hptr /*NN*/)
 {
-    UNUSED(interp);
-
     parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr,
                         pointer_compare, key_hash_pointer);
 }
@@ -730,11 +722,9 @@ Return the number of used entries in the hash.
 
 PARROT_API
 INTVAL
-parrot_hash_size(Interp *interp, const Hash *hash /*NN*/)
+parrot_hash_size(Interp *interp, const Hash *hash /*NULLOK*/)
     /*PURE, WARN_UNUSED*/
 {
-    UNUSED(interp);
-
     if (hash)
         return hash->entries;
     real_exception(interp, NULL, 1, "parrot_hash_size asked to check a NULL hash\n");
@@ -750,7 +740,7 @@ Called by iterator.
 
 PARROT_API
 void *
-parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC *key /*NN*/)
+parrot_hash_get_idx(SHIM_INTERP, const Hash *hash, PMC *key /*NN*/)
     /* PURE, WARN_UNUSED */
 {
     INTVAL i = PMC_int_val(key);
@@ -763,8 +753,6 @@ parrot_hash_get_idx(Interp *interp, const Hash *hash, PMC *key /*NN*/)
      */
     /* locate initial */
     const INTVAL size = (INTVAL)N_BUCKETS(hash->mask + 1);
-
-    UNUSED(interp);
 
     if (bi == INITBucketIndex) {
         i = 0;
@@ -807,6 +795,7 @@ parrot_hash_get_bucket(Interp *interp, const Hash *hash, void *key)
 {
     const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket    *bucket  = hash->bi[hashval & hash->mask];
+
     while (bucket) {
         /* store hash_val or not */
         if ((hash->compare)(interp, key, bucket->key) == 0)

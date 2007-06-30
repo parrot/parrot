@@ -1087,7 +1087,7 @@ try_rev_cmp(SHIM_INTERP, SHIM(IMC_Unit * unit), const char *name,
 
 Instruction *
 multi_keyed(Interp *interp, IMC_Unit * unit, char *name,
-            SymReg ** r, int nr, int keyvec, SHIM(int emit))
+            SymReg ** r, int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;
     char buf[16];
@@ -1105,6 +1105,7 @@ multi_keyed(Interp *interp, IMC_Unit * unit, char *name,
         return 0;
     /* XXX what to do, if we don't emit instruction? */
     assert(emit);
+    UNUSED(emit);
     /* OP  _p_k    _p_k_p_k =>
      * set      py, p_k
      * set      pz,     p_k

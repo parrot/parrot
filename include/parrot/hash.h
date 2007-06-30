@@ -114,8 +114,8 @@ PARROT_API HashBucket* parrot_hash_put( Interp *interp,
     void *value )
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL parrot_hash_size( Interp *interp, const Hash *hash /*NN*/ )
-        __attribute__nonnull__(2)
+PARROT_API INTVAL parrot_hash_size( Interp *interp,
+    const Hash *hash /*NULLOK*/ )
         __attribute__pure__
         __attribute__warn_unused_result__;
 

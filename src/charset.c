@@ -69,20 +69,18 @@ static void register_static_converters( Interp *interp );
 
 PARROT_API
 CHARSET *
-Parrot_new_charset(Interp *interp)
+Parrot_new_charset(SHIM_INTERP)
     /* MALLOC, WARN_UNUSED */
 {
-    UNUSED(interp);
     return mem_allocate_typed(CHARSET);
 }
 
 PARROT_API
 void
-Parrot_charsets_encodings_deinit(Interp *interp)
+Parrot_charsets_encodings_deinit(SHIM_INTERP)
 {
     const int n = all_charsets->n_charsets;
     int i;
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (all_charsets->set[i].n_converters)
@@ -97,12 +95,11 @@ Parrot_charsets_encodings_deinit(Interp *interp)
 
 PARROT_API
 CHARSET *
-Parrot_find_charset(Interp *interp, const char *charsetname /*NN*/)
+Parrot_find_charset(SHIM_INTERP, const char *charsetname /*NN*/)
     /* WARN_UNUSED */
 {
     int i;
     const int n = all_charsets->n_charsets;
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (strcmp(all_charsets->set[i].charset->name, charsetname) == 0) {
@@ -157,13 +154,11 @@ Return the number of the charset of the given string or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_charset_number_of_str(Interp *interp, STRING *src /*NN*/)
+Parrot_charset_number_of_str(SHIM_INTERP, STRING *src /*NN*/)
     /* WARN_UNUSED */
 {
     int i;
     const int n = all_charsets->n_charsets;
-
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (src->charset == all_charsets->set[i].charset)
@@ -174,11 +169,9 @@ Parrot_charset_number_of_str(Interp *interp, STRING *src /*NN*/)
 
 PARROT_API
 STRING*
-Parrot_charset_name(Interp *interp, INTVAL number_of_charset)
+Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
-    UNUSED(interp);
-
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].name;
@@ -186,11 +179,9 @@ Parrot_charset_name(Interp *interp, INTVAL number_of_charset)
 
 PARROT_API
 CHARSET*
-Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
+Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
-    UNUSED(interp);
-
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset;
@@ -198,11 +189,9 @@ Parrot_get_charset(Interp *interp, INTVAL number_of_charset)
 
 PARROT_API
 const char *
-Parrot_charset_c_name(Interp *interp, INTVAL number_of_charset)
+Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
     /* WARN_UNUSED */
 {
-    UNUSED(interp);
-
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
     return all_charsets->set[number_of_charset].charset->name;
@@ -317,36 +306,29 @@ Parrot_charsets_encodings_init(Interp *interp /*NN*/)
 
 PARROT_API
 INTVAL
-Parrot_make_default_charset(Interp *interp, const char *charsetname,
+Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
         CHARSET *charset /*NN*/)
 {
-    UNUSED(interp);
-    UNUSED(charsetname);
-
     Parrot_default_charset_ptr = charset;
     return 1;
 }
 
 PARROT_API
 CHARSET *
-Parrot_default_charset(Interp *interp)
+Parrot_default_charset(SHIM_INTERP)
     /* WARN_UNUSED */
 {
-    UNUSED(interp);
-
     return Parrot_default_charset_ptr;
 }
 
 
 PARROT_API
 charset_converter_t
-Parrot_find_charset_converter(Interp *interp, CHARSET *lhs /*NN*/, CHARSET *rhs /*NN*/)
+Parrot_find_charset_converter(SHIM_INTERP, CHARSET *lhs /*NN*/, CHARSET *rhs /*NN*/)
     /* WARN_UNUSED */
 {
     int i;
     const int n = all_charsets->n_charsets;
-
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
@@ -365,13 +347,11 @@ Parrot_find_charset_converter(Interp *interp, CHARSET *lhs /*NN*/, CHARSET *rhs 
 
 PARROT_API
 void
-Parrot_register_charset_converter(Interp *interp,
+Parrot_register_charset_converter(SHIM_INTERP,
         CHARSET *lhs /*NN*/, CHARSET *rhs /*NN*/, charset_converter_t func /*NN*/)
 {
     const int n = all_charsets->n_charsets;
     int i;
-
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
