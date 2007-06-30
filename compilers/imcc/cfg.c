@@ -546,9 +546,7 @@ analyse_life_symbol(Parrot_Interp interp, const struct _IMC_Unit *unit /*NN*/, S
 
     for (i=0; i < unit->n_basic_blocks; i++) {
         if (r->life_info[i]->flags & LF_use) {
-            Instruction *ins, *prev;
-
-            ins = unit->bb_list[i]->start;
+            const Instruction * const ins = unit->bb_list[i]->start;
 
             /*
              * if the previous instruction (the last of the previous block)
@@ -556,7 +554,8 @@ analyse_life_symbol(Parrot_Interp interp, const struct _IMC_Unit *unit /*NN*/, S
              * allocation in the non-volatile register range
              */
             if (ins->prev) {
-                prev = ins->prev;
+                const Instruction * const prev = ins->prev;
+
                 if ((prev->type & (ITPCCSUB|ITPCCYIELD)) &&
                         prev->opnum != PARROT_OP_tailcall_p)
                     r->usage |= U_NON_VOLATILE;
