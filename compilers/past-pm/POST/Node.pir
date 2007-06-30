@@ -318,6 +318,11 @@ C<POST::Sub> nodes represent PIR subroutines.
     pragma = self.'pragma'()
     .local pmc code
     code = new 'PGE::CodeString'
+    .local string namespace
+    namespace = self.'namespace'()
+    unless namespace goto have_namespace
+    code.'emit'("\n.namespace [ '%0' ]", namespace)
+  have_namespace:
     code.'emit'("\n.sub %0 %1 %2", name, outer, pragma)
     $P0 = self.'paramcode'()
     code .= $P0
@@ -432,6 +437,29 @@ Get/set
     .return self.'attr'('blocktype', value, has_value)
 .end
 
+
+=item namespace([name])
+
+Get/set the namespace for this sub.  If called to retrieve the namespace,
+use any outer namespace if it exists.
+
+=cut
+
+.sub 'namespace' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .local string namespace
+    namespace = self.'attr'('namespace', value, has_value)
+    if namespace goto end
+    if has_value goto end
+    .local pmc outer
+    outer = self.'outer'()
+    if null outer goto end
+    unless outer goto end
+    namespace = outer.'namespace'()
+  end:
+    .return (namespace)
+.end
 
 =item paramcode([paramcode])
 

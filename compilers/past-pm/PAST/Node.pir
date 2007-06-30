@@ -645,6 +645,20 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 .end
 
 
+=item namespace([STRING type])
+
+Set the namespace for this block.  If no namespace is given,
+then this block will inherit the namespace of any outer block.
+
+=cut
+
+.sub 'namespace' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('namespace', value, has_value)
+.end
+
+
 =item symtable([value])
 
 Get/set the symbol table for the block.  In the current implementation,
