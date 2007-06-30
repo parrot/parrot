@@ -11,7 +11,7 @@ use Config;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs      = $conf->options->get('libs') ? 
+    my $libs      = $conf->options->get('libs') ?
         $conf->options->get('libs') : $conf->data->get('libs');
     my $cflags    = $conf->options->get('ccflags') ?
         $conf->options->get('ccflags') : $conf->data->get('ccflags');
