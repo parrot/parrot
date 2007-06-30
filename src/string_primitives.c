@@ -106,7 +106,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
 
     }
 
-    target = s->strstart;
+    target = (UChar *)s->strstart;
     /* buflen may be larger than what we asked for,
      * so take advantage of the space
      */
