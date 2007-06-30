@@ -11,10 +11,14 @@ use Config;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs      = $conf->data->get('libs');
-    my $cflags    = $conf->data->get('ccflags');
-    my $cc        = $conf->data->get('cc');
-    my $linkflags = $conf->data->get('linkflags');
+    my $libs      = $conf->options->get('libs') ? 
+        $conf->options->get('libs') : $conf->data->get('libs');
+    my $cflags    = $conf->options->get('ccflags') ?
+        $conf->options->get('ccflags') : $conf->data->get('ccflags');
+    my $cc        = $conf->options->get('cc') ?
+        $conf->options->get('cc') : $conf->data->get('cc');
+    my $linkflags = $conf->options->get('linkflags') ?
+        $conf->options->get('linkflags') : $conf->data->get('linkflags');
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
@@ -26,7 +30,6 @@ sub runstep {
     my $cc_shared      = $conf->data->get('cc_shared');
 
     if ( $cc =~ /icc/ ) {
-
         # Intel C++ compiler has the same name as its C compiler
         $link = 'icc';
 
