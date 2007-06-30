@@ -23,14 +23,24 @@ Open mmaps the file.
 
 /* HEADERIZER TARGET: none */
 
-static ParrotIO *
-PIO_mmap_open(Interp *interp, ParrotIOLayer *layer,
-               const char *path, INTVAL flags);
-static size_t
-PIO_mmap_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
-              STRING **buf);
-static INTVAL
-PIO_mmap_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io);
+/* HEADERIZER BEGIN: static */
+
+static INTVAL PIO_mmap_close( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static ParrotIO * PIO_mmap_open( Interp *interp,
+    ParrotIOLayer *layer,
+    const char *path,
+    INTVAL flags );
+
+static size_t PIO_mmap_read( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+/* HEADERIZER END: static */
+
 
 static const ParrotIOLayerAPI pio_mmap_layer_api = {
     PIO_null_init,

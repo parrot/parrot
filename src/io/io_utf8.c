@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -11,15 +11,7 @@ src/io/io_utf8.c - IO Layer for UTF8
 Convert output to utf8. Convert input to Parrot's internal string
 representation.
 
-*/
-
-/*
-
 =head2 utf8 layer functions
-
-=over 4
-
-=cut
 
 */
 
@@ -29,12 +21,20 @@ representation.
 
 /* HEADERIZER TARGET: none */
 
-static size_t
-PIO_utf8_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s);
+/* HEADERIZER BEGIN: static */
 
-static size_t
-PIO_utf8_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
-              STRING **buf);
+static size_t PIO_utf8_read( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+static size_t PIO_utf8_write( Interp *interp,
+    ParrotIOLayer *l /*NN*/,
+    ParrotIO *io,
+    STRING *s )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
 
 static const ParrotIOLayerAPI pio_utf8_layer_api = {
     PIO_null_init,
@@ -89,11 +89,11 @@ static size_t
 PIO_utf8_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
               STRING **buf)
 {
-    size_t len;
     STRING *s, *s2;
     String_iter iter;
 
-    len = PIO_read_down(interp, layer->down, io, buf);
+    size_t len = PIO_read_down(interp, layer->down, io, buf);
+
     s = *buf;
     s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
@@ -130,7 +130,7 @@ ok:
 }
 
 static size_t
-PIO_utf8_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s)
+PIO_utf8_write(Interp *interp, ParrotIOLayer *l /*NN*/, ParrotIO *io, STRING *s)
 {
     STRING *dest;
 
@@ -144,8 +144,6 @@ PIO_utf8_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/io/io_passdown.c>,
@@ -156,8 +154,6 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by Leo.
-
-=cut
 
 */
 

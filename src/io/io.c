@@ -130,11 +130,10 @@ Currently C<iotype> is unused.
 
 PARROT_API
 ParrotIO *
-PIO_new(Interp *interp, INTVAL iotype, INTVAL flags, INTVAL mode)
+PIO_new(Interp *interp, SHIM(INTVAL iotype), INTVAL flags, INTVAL mode)
     /* WARN_UNUSED */
 {
     ParrotIO * const new_io = (ParrotIO *)mem_sys_allocate(sizeof (ParrotIO));
-    UNUSED(iotype);
 
     new_io->fpos = new_io->lpos = piooffsetzero;
     new_io->flags = flags;
@@ -159,10 +158,9 @@ the pointers from the PMC.
 
 PARROT_API
 void
-PIO_destroy(Interp *interp, PMC *pmc /*NN*/)
+PIO_destroy(SHIM_INTERP, PMC *pmc /*NN*/)
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-    UNUSED(interp);
 
     if (!io)
         return;
@@ -313,9 +311,8 @@ IO system destructor, called on destruction of the last interpreter.
 
 PARROT_API
 void
-PIO_internal_shutdown(Interp *interp)
+PIO_internal_shutdown(SHIM_INTERP)
 {
-    UNUSED(interp);
     mem_sys_free(pio_registered_layers);
     pio_registered_layers = NULL;
 }
@@ -411,10 +408,8 @@ This default implementation does nothing and returns C<0>.
 
 PARROT_API
 INTVAL
-PIO_base_init(Interp *interp, ParrotIOLayer *l)
+PIO_base_init(SHIM_INTERP, SHIM(ParrotIOLayer *l))
 {
-    UNUSED(interp);
-    UNUSED(l);
     return 0;
 }
 
@@ -758,7 +753,7 @@ STRING *
 PIO_reads(Interp *interp, PMC *pmc /*NN*/, size_t len)
     /* WARN_UNUSED */
 {
-    STRING *res = NULL;
+    STRING *res;
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
 
@@ -770,8 +765,10 @@ PIO_reads(Interp *interp, PMC *pmc /*NN*/, size_t len)
         res->charset = Parrot_iso_8859_1_charset_ptr;   /* XXX binary */
         res->encoding = Parrot_fixed_8_encoding_ptr;
     }
-    else
+    else {
+        res = NULL;
         res = PIO_make_io_string(interp, &res, len);
+    }
 
     res->bufused = len;
     PIO_read_down(interp, l, io, &res);
@@ -883,12 +880,10 @@ position is C<EOF>.
 
 PARROT_API
 INTVAL
-PIO_eof(Interp *interp, PMC *pmc /*NN*/)
+PIO_eof(SHIM_INTERP, PMC *pmc /*NN*/)
     /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-
-    UNUSED(interp);
 
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
@@ -1042,12 +1037,10 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
 PARROT_API
 PIOHANDLE
-PIO_getfd(Interp *interp, PMC *pmc /*NN*/)
+PIO_getfd(SHIM_INTERP, PMC *pmc /*NN*/)
     /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-
-    UNUSED(interp);
 
     if (io) {
         return io->fd;
@@ -1373,12 +1366,10 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 
 PARROT_API
 INTVAL
-PIO_isatty(Interp *interp, PMC *pmc /*NN*/)
+PIO_isatty(SHIM_INTERP, PMC *pmc /*NN*/)
     /* WARN_UNUSED */
 {
     ParrotIO * const io = (ParrotIO *)PMC_data(pmc);
-
-    UNUSED(interp);
 
     if (!io)
         return 0;

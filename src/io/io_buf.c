@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -23,6 +23,73 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 #include <assert.h>
 
 /* HEADERIZER TARGET: none */
+/* HEADERIZER BEGIN: static */
+
+static INTVAL PIO_buf_close( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static ParrotIO * PIO_buf_fdopen( Interp *interp,
+    ParrotIOLayer *layer,
+    PIOHANDLE fd,
+    INTVAL flags );
+
+static size_t PIO_buf_fill_readbuf( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    ParrotIOBuf *b );
+
+static INTVAL PIO_buf_flush( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static INTVAL PIO_buf_init( Interp *interp, ParrotIOLayer *layer );
+static ParrotIO * PIO_buf_open( Interp *interp,
+    ParrotIOLayer *layer,
+    const char *path,
+    INTVAL flags );
+
+static size_t PIO_buf_peek( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+static size_t PIO_buf_read( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+static size_t PIO_buf_readline( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+static PIOOFF_T PIO_buf_seek( Interp *interp,
+    ParrotIOLayer *l,
+    ParrotIO *io,
+    PIOOFF_T offset,
+    INTVAL whence );
+
+static INTVAL PIO_buf_setbuf( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    size_t bufsize );
+
+static INTVAL PIO_buf_setlinebuf( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static PIOOFF_T PIO_buf_tell( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io /*NN*/ )
+        __attribute__nonnull__(3);
+
+static size_t PIO_buf_write( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING *s );
+
+/* HEADERIZER END: static */
 
 /* Defined at bottom */
 extern const ParrotIOLayerAPI pio_buf_layer_api;
@@ -34,35 +101,6 @@ ParrotIOLayer pio_buf_layer = {
     &pio_buf_layer_api,
     0, 0
 };
-
-/*
- * Currently keeping layer prototypes local to each layer
- * file.
- */
-
-static INTVAL    PIO_buf_init(Interp *interp, ParrotIOLayer *l);
-static ParrotIO *PIO_buf_open(Interp *interp, ParrotIOLayer *l,
-                              const char *path, INTVAL flags);
-static INTVAL    PIO_buf_setbuf(Interp *interp, ParrotIOLayer *l,
-                                ParrotIO *io, size_t bufsize);
-static INTVAL    PIO_buf_setlinebuf(Interp *interp, ParrotIOLayer *l, ParrotIO *io);
-static ParrotIO *PIO_buf_fdopen(Interp *interp, ParrotIOLayer *l,
-                                PIOHANDLE fd, INTVAL flags);
-static INTVAL    PIO_buf_close(Interp *interp, ParrotIOLayer *l, ParrotIO *io);
-static INTVAL    PIO_buf_flush(Interp *interp, ParrotIOLayer *l, ParrotIO *io);
-static size_t    PIO_buf_read(Interp *interp, ParrotIOLayer *l,
-                              ParrotIO *io, STRING **);
-static size_t    PIO_buf_write(Interp *interp, ParrotIOLayer *l,
-                               ParrotIO *io, STRING *s);
-static size_t    PIO_buf_peek(Interp *interp, ParrotIOLayer *l,
-                              ParrotIO *io, STRING **);
-static PIOOFF_T  PIO_buf_seek(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
-                              PIOOFF_T offset, INTVAL whence);
-static PIOOFF_T  PIO_buf_tell(Interp *interp, ParrotIOLayer *l, ParrotIO *io);
-static size_t    PIO_buf_fill_readbuf(Interp *interp, ParrotIOLayer *l,
-                                      ParrotIO *io, ParrotIOBuf *b);
-static size_t    PIO_buf_readline(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
-                                  STRING **);
 
 
 /* XXX: This is not portable */

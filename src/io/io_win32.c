@@ -29,9 +29,92 @@ Win32 System Programming, 2nd Edition.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADERIZER TARGET: none */
-
 #ifdef PIO_OS_WIN32
+
+/* HEADERIZER TARGET: none */
+/* HEADERIZER BEGIN: static */
+
+static INTVAL flags_to_win32(
+    INTVAL flags,
+    DWORD * fdwAccess,
+    DWORD * fdwShareMode,
+    DWORD * fdwCreate );
+
+static ParrotIO * PIO_win32_accept( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static INTVAL PIO_win32_bind( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING *l );
+
+static INTVAL PIO_win32_close( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static INTVAL PIO_win32_connect( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING *r );
+
+static ParrotIO * PIO_win32_fdopen( Interp *interp,
+    ParrotIOLayer *layer,
+    PIOHANDLE fd,
+    INTVAL flags );
+
+static INTVAL PIO_win32_flush( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io );
+
+static INTVAL PIO_win32_init( Interp *interp, ParrotIOLayer *layer );
+static INTVAL PIO_win32_listen( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    INTVAL backlog );
+
+static ParrotIO * PIO_win32_open( Interp *interp,
+    ParrotIOLayer *layer,
+    const char *spath,
+    INTVAL flags );
+
+static size_t PIO_win32_read( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING **buf );
+
+static INTVAL PIO_win32_recv( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO * io,
+    STRING **s );
+
+static PIOOFF_T PIO_win32_seek( Interp *interp,
+    ParrotIOLayer *l,
+    ParrotIO *io,
+    PIOOFF_T off,
+    INTVAL whence );
+
+static INTVAL PIO_win32_send( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO * io,
+    STRING *s );
+
+static ParrotIO * PIO_win32_socket( Interp *interp,
+    ParrotIOLayer *layer,
+    int fam,
+    int type,
+    int proto );
+
+static PIOOFF_T PIO_win32_tell( Interp *interp,
+    ParrotIOLayer *l,
+    ParrotIO *io );
+
+static size_t PIO_win32_write( Interp *interp,
+    ParrotIOLayer *layer,
+    ParrotIO *io,
+    STRING *s );
+
+/* HEADERIZER END: static */
 
 #  include <tchar.h>
 
@@ -46,27 +129,6 @@ ParrotIOLayer pio_win32_layer = {
     0, 0
 };
 
-
-/*
- * Currently keeping layer prototypes local to each layer
- * file.
- */
-
-static INTVAL    PIO_win32_init(Interp *interp, ParrotIOLayer *layer);
-static ParrotIO *PIO_win32_open(Interp *interp, ParrotIOLayer *layer,
-                                const char *spath, INTVAL flags);
-static ParrotIO *PIO_win32_fdopen(Interp *interp, ParrotIOLayer *layer,
-                                  PIOHANDLE fd, INTVAL flags);
-static INTVAL PIO_win32_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io);
-static INTVAL PIO_win32_flush(Interp *interp, ParrotIOLayer *layer, ParrotIO *io);
-static size_t    PIO_win32_read(Interp *interp, ParrotIOLayer *layer,
-                                ParrotIO *io, STRING **);
-static size_t    PIO_win32_write(Interp *interp, ParrotIOLayer *layer,
-                                 ParrotIO *io, STRING *);
-static PIOOFF_T  PIO_win32_seek(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
-                                PIOOFF_T off, INTVAL whence);
-static PIOOFF_T  PIO_win32_tell(Interp *interp, ParrotIOLayer *l, ParrotIO *io);
-static INTVAL    PIO_win32_isatty(PIOHANDLE fd);
 
 /*
 

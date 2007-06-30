@@ -24,6 +24,17 @@ tdb
 #include "global.str"
 
 /* HEADERIZER TARGET: none */ /* XXX It's really include/parrot/global.h, but not yet */
+/* HEADERIZER BEGIN: static */
+
+static PMC * get_namespace_pmc( Parrot_Interp interp, PMC *sub );
+static PMC * internal_ns_keyed( Interp *interp,
+    PMC *base_ns,
+    PMC *pmc_key,
+    STRING *str_key /*NULLOK*/,
+    int flags );
+
+static void store_sub_in_multi( Parrot_Interp interp, PMC *sub, PMC *ns );
+/* HEADERIZER END: static */
 
 #define DEBUG_GLOBAL 0
 

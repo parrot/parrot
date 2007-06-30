@@ -23,10 +23,19 @@ Capture output to a string PMC.
 
 /* HEADERIZER TARGET: none */
 
-static size_t
-PIO_string_read(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING **buf);
-static size_t
-PIO_string_write(Interp *interp, ParrotIOLayer *l, ParrotIO *io, STRING *s);
+/* HEADERIZER BEGIN: static */
+
+static size_t PIO_string_read( Interp *interp,
+    ParrotIOLayer *l,
+    ParrotIO *io,
+    STRING **buf );
+
+static size_t PIO_string_write( Interp *interp,
+    ParrotIOLayer *l,
+    ParrotIO *io,
+    STRING *s );
+
+/* HEADERIZER END: static */
 
 static const ParrotIOLayerAPI pio_string_layer_api = {
     PIO_null_init,

@@ -1946,7 +1946,6 @@ HEADERIZER_O_FILES = \
     src/builtin.o \
     src/byteorder.o \
     src/charset.o \
-    src/core_pmcs.o \
     src/cpu_dep.o \
     src/datatypes.o \
     src/debug.o \

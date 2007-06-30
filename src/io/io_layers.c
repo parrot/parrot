@@ -153,12 +153,11 @@ PIO_push_layer(Interp *interp, PMC *pmc /*NULLOK*/, ParrotIOLayer *layer /*NULLO
 
 PARROT_API
 ParrotIOLayer *
-PIO_get_layer(Interp *interp, const char *name /*NN*/)
+PIO_get_layer(SHIM_INTERP, const char *name /*NN*/)
     /* WARN_UNUSED */
 {
     ParrotIOLayer **t;
 
-    UNUSED(interp);
     for (t = pio_registered_layers; *t; ++t)
         if (strcmp(name, (*t)->name) == 0)
             return *t;
