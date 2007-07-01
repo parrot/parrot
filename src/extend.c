@@ -1068,11 +1068,9 @@ Replaces the vtable of the PMC.
 
 PARROT_API
 void
-Parrot_PMC_set_vtable(Parrot_Interp interp /*NN*/,
+Parrot_PMC_set_vtable(SHIM(Parrot_Interp interp),
         Parrot_PMC pmc, Parrot_VTABLE vtable)
 {
-    UNUSED(interp);
-
     pmc->vtable = vtable;
 }
 

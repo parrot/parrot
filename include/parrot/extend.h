@@ -343,10 +343,9 @@ PARROT_API void Parrot_PMC_set_string_intkey(
         __attribute__nonnull__(1);
 
 PARROT_API void Parrot_PMC_set_vtable(
-    Parrot_Interp interp /*NN*/,
+    Parrot_Interp interp,
     Parrot_PMC pmc,
-    Parrot_VTABLE vtable )
-        __attribute__nonnull__(1);
+    Parrot_VTABLE vtable );
 
 PARROT_API Parrot_Int Parrot_PMC_typenum(
     Parrot_Interp interp /*NN*/,

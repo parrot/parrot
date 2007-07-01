@@ -25,10 +25,22 @@ Handles class and object manipulation.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL attr_str_2_num( Interp *interp, PMC *object, STRING *attr );
-static PMC* C3_merge( Interp *interp, PMC *merge_list );
-static PMC* class_mro_merge( Interp *interp, PMC *seqs );
-static PMC* create_class_mro( Interp *interp, PMC *_class );
+static INTVAL attr_str_2_num( Interp *interp /*NN*/,
+    PMC *object,
+    STRING *attr )
+        __attribute__nonnull__(1);
+
+static PMC* C3_merge( Interp *interp /*NN*/, PMC *merge_list /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PMC* class_mro_merge( Interp *interp /*NN*/, PMC *seqs )
+        __attribute__nonnull__(1);
+
+static PMC* create_class_mro( Interp *interp /*NN*/, PMC *_class /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void create_deleg_pmc_vtable( Interp *interp /*NN*/,
     PMC *_class /*NN*/,
     int full )
@@ -41,33 +53,57 @@ static void debug_trace_find_meth( Interp *interp,
     PMC *sub );
 
 static void do_initcall( Interp *interp, PMC* _class, PMC *object, PMC *init );
-static void fail_if_exist( Interp *interp, PMC *name );
+static void fail_if_exist( Interp *interp /*NN*/, PMC *name )
+        __attribute__nonnull__(1);
+
 static PMC * find_method_direct_1( Interp *interp,
-    PMC *_class,
-    STRING *method_name );
+    PMC *_class /*NN*/,
+    STRING *method_name )
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 static PMC* find_vtable_meth_ns( Interp *interp,
     PMC *ns,
-    INTVAL vtable_index );
+    INTVAL vtable_index )
+        __attribute__warn_unused_result__;
 
 static PMC* get_init_meth( Interp *interp,
     PMC *_class,
     STRING *prop_str,
     STRING **meth_str /*NN*/ )
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__warn_unused_result__;
 
-static void instantiate_object( Interp *interp, PMC *object, PMC *init );
-static void invalidate_all_caches( Interp *interp );
-static void invalidate_type_caches( Interp *interp, UINTVAL type );
-static PMC* not_empty( Interp *interp, PMC *seqs );
+static void instantiate_object( Interp *interp,
+    PMC *object /*NN*/,
+    PMC *init )
+        __attribute__nonnull__(2);
+
+static void invalidate_all_caches( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void invalidate_type_caches( Interp *interp /*NN*/, UINTVAL type )
+        __attribute__nonnull__(1);
+
+static PMC* not_empty( Interp *interp /*NN*/, PMC *seqs )
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
+
 static void parrot_class_register( Interp *interp,
     PMC *name,
     PMC *new_class,
-    PMC *parent,
+    PMC *parent /*NULLOK*/,
     PMC *mro );
 
-static void rebuild_attrib_stuff( Interp *interp, PMC *_class );
-static INTVAL register_type( Interp *interp, PMC *name );
+static void rebuild_attrib_stuff( Interp *interp /*NN*/, PMC *_class /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL register_type( Interp *interp /*NN*/, PMC *name /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
+
 /* HEADERIZER END: static */
 
 
@@ -119,6 +155,7 @@ Return Sub PMC if a method with the vtable name exists in ns
 
 static PMC*
 find_vtable_meth_ns(Interp *interp, PMC *ns, INTVAL vtable_index)
+    /* WARN_UNUSED */
 {
     return VTABLE_get_pmc_keyed_int(interp, ns, vtable_index);
 }
@@ -212,7 +249,7 @@ XXX uses global class registry
 */
 
 static void
-fail_if_exist(Interp *interp, PMC *name)
+fail_if_exist(Interp *interp /*NN*/, PMC *name)
 {
     INTVAL      type;
 
@@ -242,7 +279,7 @@ fail_if_exist(Interp *interp, PMC *name)
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
 static void
-rebuild_attrib_stuff(Interp *interp, PMC *_class)
+rebuild_attrib_stuff(Interp *interp /*NN*/, PMC *_class /*NN*/)
 {
     INTVAL    attr_count, cur_offset, n_class, n_mro, offset;
     PMC      *attr_offset_hash, *mro, *attribs;
@@ -623,7 +660,8 @@ Parrot_class_lookup_p(Interp *interp, PMC *class_name)
 }
 
 static INTVAL
-register_type(Interp *interp, PMC *name)
+register_type(Interp *interp /*NN*/, PMC *name /*NN*/)
+    /* WARN_UNUSED */
 {
     INTVAL type;
     PMC   *classname_hash, *item;
@@ -661,11 +699,11 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 
 static void
 parrot_class_register(Interp *interp, PMC *name,
-        PMC *new_class, PMC *parent, PMC *mro)
+        PMC *new_class, PMC *parent /*NULLOK*/, PMC *mro)
 {
     VTABLE *new_vtable, *parent_vtable;
     PMC    *vtable_pmc, *ns, *top;
-    INTVAL  new_type = register_type(interp, name);
+    const INTVAL new_type = register_type(interp, name);
 
     /* Build a new vtable for this class
      * The child class PMC gets the vtable of its parent class or
@@ -766,6 +804,7 @@ parrot_class_register(Interp *interp, PMC *name,
 
 static PMC*
 get_init_meth(Interp *interp, PMC *_class, STRING *prop_str, STRING **meth_str /*NN*/)
+    /* WARN_UNUSED */
 {
     STRING     *meth;
     HashBucket *b;
@@ -801,7 +840,6 @@ static void
 do_initcall(Interp *interp, PMC* _class, PMC *object, PMC *init)
 {
     PMC * const classsearch_array = _class->vtable->mro;
-    PMC        *parent_class;
     INTVAL      i, nparents;
 
     /*
@@ -832,8 +870,8 @@ do_initcall(Interp *interp, PMC* _class, PMC *object, PMC *init)
     nparents = VTABLE_elements(interp, classsearch_array);
 
     for (i = nparents - 1; i >= 0; --i) {
-        parent_class = VTABLE_get_pmc_keyed_int(interp,
-                classsearch_array, i);
+        PMC * const parent_class =
+            VTABLE_get_pmc_keyed_int(interp, classsearch_array, i);
         /* if it's a PMC, we put one PMC of that type into
          * the attribute slot #0 and call init() on that PMC
          */
@@ -905,8 +943,6 @@ information to describe the layout of the object and makes the object.
 
 */
 
-static void instantiate_object(Interp*, PMC *object, PMC *init);
-
 PARROT_API
 void
 Parrot_instantiate_object_init(Interp *interp, PMC *object, PMC *init)
@@ -922,7 +958,7 @@ Parrot_instantiate_object(Interp *interp, PMC *object)
 }
 
 static void
-instantiate_object(Interp *interp, PMC *object, PMC *init)
+instantiate_object(Interp *interp, PMC *object /*NN*/, PMC *init)
 {
     SLOTTYPE *new_object_array;
     INTVAL    attrib_count, i;
@@ -974,7 +1010,8 @@ L<http://pugs.blogs.com/pugs/2005/07/day_165_r5671_j.html>
 
 /* create a list if non-empty lists */
 static PMC*
-not_empty(Interp *interp, PMC *seqs)
+not_empty(Interp *interp /*NN*/, PMC *seqs)
+    /* WARN_UNUSED */
 {
     INTVAL i;
     PMC * const nseqs = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -991,7 +1028,7 @@ not_empty(Interp *interp, PMC *seqs)
 
 /* merge the list if lists */
 static PMC*
-class_mro_merge(Interp *interp, PMC *seqs)
+class_mro_merge(Interp *interp /*NN*/, PMC *seqs)
 {
     /* silence compiler uninit warning */
     PMC *cand = NULL;
@@ -1045,7 +1082,7 @@ class_mro_merge(Interp *interp, PMC *seqs)
 
 /* create C3 MRO */
 static PMC*
-create_class_mro(Interp *interp, PMC *_class)
+create_class_mro(Interp *interp /*NN*/, PMC *_class /*NN*/)
 {
     PMC   *lparents, *bases;
     INTVAL i;
@@ -1144,6 +1181,10 @@ PMC *
 Parrot_multi_subclass(Interp *interp, PMC *base_class_array,
     STRING *child_class_name)
 {
+    UNUSED(interp);
+    UNUSED(base_class_array);
+    UNUSED(child_class_name);
+
     return PMCNULL;
 }
 
@@ -1229,7 +1270,7 @@ destroy_object_cache(Interp *interp /*NN*/)
 #define TBL_SIZE (1 + TBL_SIZE_MASK)
 
 static void
-invalidate_type_caches(Interp *interp, UINTVAL type)
+invalidate_type_caches(Interp *interp /*NN*/, UINTVAL type)
 {
     Caches * const mc = interp->caches;
     INTVAL i;
@@ -1255,7 +1296,7 @@ invalidate_type_caches(Interp *interp, UINTVAL type)
 }
 
 static void
-invalidate_all_caches(Interp *interp)
+invalidate_all_caches(Interp *interp /*NN*/)
 {
     UINTVAL i;
     for (i = 1; i < (UINTVAL)interp->n_vtable_max; ++i)
@@ -1272,9 +1313,11 @@ all classes are invalidated.
 
 PARROT_API
 void
-Parrot_invalidate_method_cache(Interp *interp, STRING *_class, STRING *meth)
+Parrot_invalidate_method_cache(Interp *interp /*NN*/, STRING *_class, STRING *meth)
 {
     INTVAL type;
+
+    UNUSED(meth);
 
     /* during interp creation and NCI registration the class_hash
      * isn't yet up */
@@ -1453,8 +1496,9 @@ debug_trace_find_meth(Interp *interp, PMC *_class, STRING *name, PMC *sub)
 #endif
 
 static PMC *
-find_method_direct_1(Interp *interp, PMC *_class,
+find_method_direct_1(Interp *interp, PMC *_class /*NN*/,
                               STRING *method_name)
+    /* WARN_UNUSED */
 {
     INTVAL i;
 
@@ -1487,6 +1531,9 @@ next instance of this method.
 PARROT_API
 void
 Parrot_note_method_offset(Interp *interp, UINTVAL offset, PMC *method) {
+    UNUSED(interp);
+    UNUSED(offset);
+    UNUSED(method);
 }
 
 /*
@@ -1568,7 +1615,7 @@ Parrot_get_attrib_by_num(Interp *interp, PMC *object, INTVAL attrib)
 }
 
 static INTVAL
-attr_str_2_num(Interp *interp, PMC *object, STRING *attr)
+attr_str_2_num(Interp *interp /*NN*/, PMC *object, STRING *attr)
 {
     PMC        *_class, *attr_hash;
     SLOTTYPE   *class_array;
@@ -1796,7 +1843,7 @@ Parrot_set_class_fallback(Interp *interp, STRING *_class,
 /* ************************************************************************ */
 
 static PMC*
-C3_merge(Interp *interp, PMC *merge_list)
+C3_merge(Interp *interp /*NN*/, PMC *merge_list /*NN*/)
 {
     PMC *result    = pmc_new(interp, enum_class_ResizablePMCArray);
     const int list_count = VTABLE_elements(interp, merge_list);
@@ -1807,11 +1854,11 @@ C3_merge(Interp *interp, PMC *merge_list)
     /* Try and find something appropriate to add to the MRO - basically, the
      * first list head that is not in the tail of all the other lists. */
     for (i = 0; i < list_count; i++) {
-        PMC *cand_list, *cand_class;
-        int reject, j;
+        PMC * const cand_list = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
 
-        reject    = 0;
-        cand_list = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
+        PMC *cand_class;
+        int reject = 0;
+        int j;
 
         if (VTABLE_elements(interp, cand_list) == 0)
             continue;
@@ -1823,11 +1870,9 @@ C3_merge(Interp *interp, PMC *merge_list)
             /* Skip the current list. */
             if (j != i) {
                 /* Is it in the tail? If so, reject. */
-                PMC *check_list;
-                int  check_length, k;
-
-                check_list   = VTABLE_get_pmc_keyed_int(interp, merge_list, j);
-                check_length = VTABLE_elements(interp, check_list);
+                PMC * const check_list = VTABLE_get_pmc_keyed_int(interp, merge_list, j);
+                const int check_length = VTABLE_elements(interp, check_list);
+                int k;
 
                 for (k = 1; k < check_length; k++) {
                     if (VTABLE_get_pmc_keyed_int(interp, check_list, k) ==
@@ -1909,8 +1954,7 @@ Parrot_ComputeMRO_C3(Interp *interp, PMC *_class)
 
     parent_count = VTABLE_elements(interp, immediate_parents);
 
-    if (parent_count == 0)
-    {
+    if (parent_count == 0) {
         /* No parents - MRO just contains this class. */
         result = pmc_new(interp, enum_class_ResizablePMCArray);
         VTABLE_push_pmc(interp, result, _class);
@@ -1998,14 +2042,11 @@ Parrot_ComposeRole(Interp *interp, PMC *role,
     methods_iter         = VTABLE_get_iter(interp, methods);
 
     while (VTABLE_get_bool(interp, methods_iter)) {
-        /* Get current method and its name. */
-        int     excluded;
-
         STRING * const method_name = VTABLE_shift_string(interp, methods_iter);
         PMC * const    cur_method  = VTABLE_get_pmc_keyed_str(interp, methods, method_name);
 
         /* Need to find the name we'll check for a conflict on. */
-        excluded = 0;
+        int excluded = 0;
 
         /* Check if it's in the exclude list. */
         if (got_exclude) {

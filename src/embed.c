@@ -490,11 +490,12 @@ Sort function for profile data. Sorts by time.
 static int
 prof_sort_f(const void *a /*NN*/, const void *b /*NN*/)
 {
-    const ProfData *pa = (const ProfData *) a;
-    const ProfData *pb = (const ProfData *) b;
-    if (pa->time < pb->time)
+    const FLOATVAL timea = ((const ProfData *)a)->time;
+    const FLOATVAL timeb = ((const ProfData *)b)->time;
+
+    if (timea < timeb)
         return 1;
-    if (pa->time > pb->time)
+    if (timea > timeb)
         return -1;
     return 0;
 }
@@ -565,7 +566,7 @@ Prints out a profile listing.
 */
 
 static void
-print_profile(Parrot_Interp interp /*NN*/, int status, void *p)
+print_profile(Parrot_Interp interp /*NN*/, SHIM(int status), SHIM(void *p))
 {
     RunProfile * const profile = interp->profile;
 
@@ -638,7 +639,7 @@ Prints GC info.
 */
 
 static void
-print_debug(Parrot_Interp interp /*NN*/, int status, void *p)
+print_debug(Interp *interp /*NN*/, SHIM(int status), SHIM(void *p))
 {
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give the souls brave enough to activate debugging an earful

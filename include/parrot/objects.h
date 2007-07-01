@@ -93,9 +93,10 @@ PARROT_API void Parrot_instantiate_object_init( Interp *interp,
     PMC *object,
     PMC *init );
 
-PARROT_API void Parrot_invalidate_method_cache( Interp *interp,
+PARROT_API void Parrot_invalidate_method_cache( Interp *interp /*NN*/,
     STRING *_class,
-    STRING *meth );
+    STRING *meth )
+        __attribute__nonnull__(1);
 
 PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
         __attribute__warn_unused_result__
