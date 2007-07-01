@@ -10,14 +10,69 @@ our @EXPORT_OK = qw(
 );
 
 sub get_valid_options {
-    return qw(ask bindir cage cc ccflags ccwarn cgoto cxx datadir
-        debugging define exec-prefix execcapable floatval gc help icu-config
-        icudatadir icuheaders icushared includedir infodir inline intval
-        jitcapable languages ld ldflags lex libdir libexecdir libs link linkflags
-        localstatedir m maintainer mandir miniparrot nomanicheck oldincludedir
-        opcode ops optimize parrot_is_shared pmc prefix profile sbindir
-        sharedstatedir step sysconfdir target test verbose verbose-step version
-        without-gdbm without-gmp without-icu yacc);
+    return qw(
+        ask
+        bindir
+        cage
+        cc
+        ccflags
+        ccwarn
+        cgoto
+        cxx
+        datadir
+        debugging
+        define
+        exec-prefix
+        execcapable
+        floatval
+        gc
+        help
+        icu-config
+        icudatadir
+        icuheaders
+        icushared
+        includedir
+        infodir
+        inline
+        intval
+        jitcapable
+        languages
+        ld
+        ldflags
+        lex
+        libdir
+        libexecdir
+        libs
+        link
+        linkflags
+        localstatedir
+        m
+        maintainer
+        mandir
+        miniparrot
+        nomanicheck
+        oldincludedir
+        opcode
+        ops
+        optimize
+        parrot_is_shared
+        pmc
+        prefix
+        profile
+        sbindir
+        sharedstatedir
+        step
+        sysconfdir
+        target
+        test
+        verbose
+        verbose-step
+        version
+        without-gdbm
+        without-gmp
+        without-icu
+        yacc
+    );
 }
 
 sub process_options {
