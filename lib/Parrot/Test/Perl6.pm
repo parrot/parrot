@@ -133,7 +133,7 @@ sub _generate_functions {
 
             ## tell Test::Builder if the test is marked TODO
             my $call_pkg = $b->exported_to() || '';
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}
+            local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};
 
             ## run Test::Builder's test on actual vs. expected output

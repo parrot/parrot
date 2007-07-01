@@ -293,16 +293,21 @@ sub run_command {
         $err = "&STDOUT";
     }
 
-    local *OLDOUT if $out;
-    local *OLDERR if $err;
+    if ( $out ) {
+      local *OLDOUT;
+      # Save the old filehandles; we must not let them get closed.
+      open OLDOUT, '>&STDOUT' or die "Can't save     stdout";  ## no critic InputOutput::ProhibitBarewordFileHandles
+      open STDOUT, '>', $out or die "Can't redirect stdout to $out";
+    }
 
-    # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles
-    open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles
+    if ( $err ) {
+      local *OLDERR;
+      # Save the old filehandles; we must not let them get closed.
+      open OLDERR, '>&STDERR' or die "Can't save     stderr";  ## no critic InputOutput::ProhibitBarewordFileHandles
 
-    open STDOUT, '>', $out or die "Can't redirect stdout to $out" if $out;
-    # See 'Obscure Open Tricks' in perlopentut
-    open STDERR, ">$err"  or die "Can't redirect stderr to $err"     if $err;  ## no critic InputOutput::ProhibitTwoArgOpen
+      # See 'Obscure Open Tricks' in perlopentut
+      open STDERR, ">$err"  or die "Can't redirect stderr to $err";  ## no critic InputOutput::ProhibitTwoArgOpen
+    }
 
     # If $command isn't already an arrayref (because of a multi-command
     # test), make it so now so the code below can treat everybody the
@@ -440,7 +445,7 @@ sub generate_languages_functions {
 
             no strict 'refs';
 
-            local *{ $call_pkg . '::TODO' } = \$options{todo}
+            local *{ $call_pkg . '::TODO' } = \$options{todo}  ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $options{todo};
 
             my $count = $self->{builder}->current_test() + 1;
@@ -686,7 +691,7 @@ sub _generate_functions {
             my $call_pkg = $builder->exported_to() || '';
 
             no strict 'refs';
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}
+            local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};
 
             if ($func =~ /_error_/) {
@@ -776,7 +781,7 @@ sub _generate_functions {
             # set a TODO for Test::Builder to find
             my $call_pkg = $builder->exported_to() || '';
 
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}
+            local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};
 
             my $pass = $builder->$meth( $real_output, $expected, $desc );

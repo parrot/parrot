@@ -127,7 +127,7 @@ sub import {
     local $Test::Harness::Switches = '';
 
     no warnings 'redefine';
-    local *Test::Harness::Straps::_INC2PERL5LIB = sub { @INC }
+    local *Test::Harness::Straps::_INC2PERL5LIB = sub { @INC }  ## no critic Variables::ProhibitConditionalDeclarations
         if $options{compiler};
 
     runtests(@files);
