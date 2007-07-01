@@ -29,8 +29,8 @@
 	     "NOT" "NULL" "PACKAGE-NAME" "PRINT" "PROGN" "QUOTE" "READ"
 	     "READ-DELIMITED-LIST" "RPLACA" "RPLACD" "SETQ" "SYMBOL-FUNCTION"
 	     "SYMBOL-NAME" "SYMBOL-PACKAGE" "TYPE-OF" "VALUES"
-	     "IN-PACKAGE"
- 
+	     "IN-PACKAGE" 
+	     
 	     ;; Miscellaneous symbols
 	     "*GENSYM-COUNTER*" "*MACROEXPAND-HOOK*" "*PACKAGE*" "*READ-EVAL*"
 	     "*READTABLE*" "*STANDARD-INPUT*" "*STANDARD-OUTPUT*" "BASE-CHAR"
@@ -38,22 +38,22 @@
 	     "STRING" "SYMBOL" "T")
 
 ;; Set the current package to SYSTEM so we don't have to prefix symbols.
-;;     (cl:setq *package* (sys:%find-package "SYSTEM"))
-(sys:%use-package (sys:%find-package "SYSTEM") (sys:%find-package "COMMON-LISP"))
+(cl:setq *package* (sys:%find-package "SYSTEM"))
+(%use-package (%find-package "SYSTEM") (%find-package "COMMON-LISP"))
 
 ;; Create a hash table used to store all the dispatching macros.
-(cl:setq *dispatching-macros* (sys:%make-hash-table))
+(setq *dispatching-macros* (%make-hash-table))
 
 ;; #'xxx macro. See CLtL section 2.4.8.2 for details.
-(sys:%set-hash *dispatching-macros*
+(%set-hash *dispatching-macros*
 	  "'"
 	  (function
 	   (lambda (stream char)
 	     (list 'function (read stream)))))
 
 ;; #.xxx macro. See CLtL section 2.4.8.6 for details.
-(cl:setq *read-eval* t)
-(sys:%set-hash *dispatching-macros*
+(setq *read-eval* t)
+(%set-hash *dispatching-macros*
 	  "."
 	  (function
 	   (lambda (stream char)
@@ -62,21 +62,21 @@
 	       (error "reader-error" "*READ-EVAL* is NIL")))))
 
 ;; #< macro. See CLtL section 2.4.8.20 for details.
-(sys:%set-hash *dispatching-macros*
+(%set-hash *dispatching-macros*
 	  "<"
 	  (function
 	   (lambda (stream char)
 	     (error "reader-error" "#< is invalid syntax"))))
 
 ;; ##<Space> macro. See CLtL section 2.4.8.21 for details.
-(sys:%set-hash *dispatching-macros*
+(%set-hash *dispatching-macros*
 	  " "
 	  (function
 	   (lambda (stream char)
 	     (error "reader-error" "#| | is invalid syntax"))))
 
 ;; #) macro. See CLtL section 2.4.8.22 for details.
-(sys:%set-hash *dispatching-macros*
+(%set-hash *dispatching-macros*
 	  ")"
 	  (function
 	   (lambda (stream char)
@@ -99,8 +99,9 @@
 (sys:%make-package "COMMON-LISP-USER")
 (sys:%alias-package (sys:%find-package "COMMON-LISP-USER") "CL-USER")
 
-;;        (cl:setq *package* (sys:%find-package "CL-USER"))
+(cl:setq *package* (sys:%find-package "CL-USER"))
 (sys:%use-package (sys:%find-package "CL-USER")
                   (sys:%find-package "COMMON-LISP"))
 
-;        (in-package "COMMON-LISP-USER")
+; (in-package "COMMON-LISP-USER")
+(cl:setq *package* (sys:%find-package "CL"))
