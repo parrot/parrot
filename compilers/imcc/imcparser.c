@@ -377,11 +377,12 @@ static Instruction* func_ins(
     Parrot_Interp interp,
     IMC_Unit *unit,
     SymReg *lhs,
-    char *op,
+    const char *op,
     SymReg ** r,
     int n,
     int keyv,
-    int emit );
+    int emit )
+        __attribute__warn_unused_result__;
 
 static Instruction * iINDEXFETCH( Interp *interp,
     IMC_Unit * unit,
@@ -407,22 +408,24 @@ static Instruction * iSUBROUTINE( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static Instruction * MK_I( Interp *interp,
+static Instruction * MK_I( Interp *interp /*NN*/,
     IMC_Unit * unit,
     const char *fmt /*NN*/,
     int n,
     ... )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static Instruction* mk_pmc_const(
-    Parrot_Interp interp,
+static Instruction* mk_pmc_const( Interp *interp /*NN*/,
     IMC_Unit *unit,
     const char *type /*NN*/,
     SymReg *left /*NN*/,
     char *constant /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        __attribute__warn_unused_result__;
 
 static SymReg * mk_sub_address_fromc( Interp *interp, char * name );
 static SymReg * mk_sub_address_u( Interp *interp, char * name );
@@ -462,7 +465,7 @@ static void set_lexical( Interp *interp /*NN*/, SymReg *r /*NN*/, char *name )
  *        code.
  */
 static Instruction *
-MK_I(Interp *interp, IMC_Unit * unit, const char *fmt /*NN*/, int n, ...)
+MK_I(Interp *interp /*NN*/, IMC_Unit * unit, const char *fmt /*NN*/, int n, ...)
 {
     char opname[64];
     char *p;
@@ -475,7 +478,7 @@ MK_I(Interp *interp, IMC_Unit * unit, const char *fmt /*NN*/, int n, ...)
         *p++ = *q++;
     *p = 0;
     if (!*q)
-        fmt = 0;
+        fmt = NULL;
     else
         fmt = ++q;
 #if OPDEBUG
@@ -492,14 +495,15 @@ MK_I(Interp *interp, IMC_Unit * unit, const char *fmt /*NN*/, int n, ...)
 }
 
 static Instruction*
-mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
+mk_pmc_const(Interp *interp /*NN*/, IMC_Unit *unit,
              const char *type /*NN*/, SymReg *left /*NN*/, char *constant /*NN*/)
+    /* WARN_UNUSED */
 {
     const int type_enum = atoi(type);
     SymReg *rhs;
     SymReg *r[2];
     char *name;
-    int len, ascii;
+    int ascii;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
@@ -514,7 +518,7 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     ascii = (*constant == '\'' || *constant == '"' );
     if (ascii) {
         /* strip delimiters */
-        len = strlen(constant);
+        const size_t len = strlen(constant);
         name = (char *)mem_sys_allocate(len);
         constant[len - 1] = '\0';
         strcpy(name, constant + 1);
@@ -541,8 +545,9 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
 }
 
 static Instruction*
-func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, char *op,
+func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, const char *op,
          SymReg ** r, int n, int keyv, int emit)
+    /* WARN_UNUSED */
 {
     int i;
     /* shift regs up by 1 */

@@ -31,19 +31,26 @@
 
 /* HEADERIZER BEGIN: static */
 
-static int change_op( Interp *interp,
+static int change_op( Interp *interp /*NN*/,
     IMC_Unit *unit,
-    SymReg **r,
+    SymReg **r /*NN*/,
     int num,
-    int emit );
+    int emit )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
-static void * imcc_compile_file(
-    Parrot_Interp interp,
-    const char *fullname,
-    STRING **error_message );
-
-static int is_infix( const char *name, int n, SymReg **r /*NN*/ )
+static void * imcc_compile_file( Interp *interp /*NN*/,
+    const char *fullname /*NN*/,
+    STRING **error_message /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+static int is_infix( const char *name /*NN*/, int n, SymReg **r /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
 static Instruction * maybe_builtin( Interp *interp /*NN*/,
     IMC_Unit *unit,
@@ -53,23 +60,32 @@ static Instruction * maybe_builtin( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static char * to_infix( Interp *interp,
-    const char *name,
-    SymReg **r,
-    int *n,
-    int mmd_op );
+static const char * to_infix( Interp *interp /*NN*/,
+    const char *name /*NN*/,
+    SymReg **r /*NN*/,
+    int *n /*NN*/,
+    int mmd_op )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__warn_unused_result__;
 
 static const char * try_rev_cmp( Interp *interp,
     IMC_Unit * unit,
     const char *name,
     SymReg ** r );
 
-static Instruction * var_arg_ins( Interp *interp,
+static Instruction * var_arg_ins( Interp *interp /*NN*/,
     IMC_Unit * unit,
-    const char *name,
-    SymReg **r,
+    const char *name /*NN*/,
+    SymReg **r /*NN*/,
     int n,
-    int emit );
+    int emit )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__warn_unused_result__;
 
 /* HEADERIZER END: static */
 
@@ -281,11 +297,12 @@ is_op(Interp *interp /*NN*/, const char *name)
 }
 
 /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
-static char *
-to_infix(Interp *interp, const char *name, SymReg **r, int *n, int mmd_op)
+static const char *
+to_infix(Interp *interp /*NN*/, const char *name /*NN*/, SymReg **r /*NN*/,
+        int *n /*NN*/, int mmd_op)
+    /* WARN_UNUSED */
 {
     SymReg *mmd;
-    char buf[10];
     int is_n;
 
     assert(*n >= 2);
@@ -293,17 +310,16 @@ to_infix(Interp *interp, const char *name, SymReg **r, int *n, int mmd_op)
         (name[0] == 'n' && name[1] == '_') ||
         (mmd_op == MMD_LOR || mmd_op == MMD_LAND || mmd_op == MMD_LXOR);
     if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
+        char buf[10];
         sprintf(buf, "%d", mmd_op + 1);  /* XXX */
         mmd = mk_const(interp, str_dup(buf), 'I');
     }
     else {
+        char buf[10];
         int i;
         for (i = *n; i > 0; --i)
             r[i] = r[i - 1];
-        if (*n == 2)
-            sprintf(buf, "%d", mmd_op + 1);  /* XXX */
-        else
-            sprintf(buf, "%d", mmd_op);  /* XXX */
+        sprintf(buf, "%d", *n == 2 ? (mmd_op + 1) : mmd_op);  /* XXX */
         mmd = mk_const(interp, str_dup(buf), 'I');
         (*n)++;
     }
@@ -315,7 +331,8 @@ to_infix(Interp *interp, const char *name, SymReg **r, int *n, int mmd_op)
 }
 
 static int
-is_infix(const char *name, int n, SymReg **r /*NN*/)
+is_infix(const char *name /*NN*/, int n, SymReg **r /*NN*/)
+    /* WARN_UNUSED */
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
@@ -377,8 +394,9 @@ is_infix(const char *name, int n, SymReg **r /*NN*/)
 }
 
 static Instruction *
-var_arg_ins(Interp *interp, IMC_Unit * unit, const char *name,
-        SymReg **r, int n, int emit)
+var_arg_ins(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
+        SymReg **r /*NN*/, int n, int emit)
+    /* WARN_UNUSED */
 {
     int op;
     Instruction *ins;
@@ -412,7 +430,7 @@ var_arg_ins(Interp *interp, IMC_Unit * unit, const char *name,
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(Interp *interp, IMC_Unit * unit, const char *name,
+INS(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
         const char *fmt, SymReg **r, int n, int keyvec, int emit)
 {
     char fullname[64];
@@ -424,10 +442,10 @@ INS(Interp *interp, IMC_Unit * unit, const char *name,
     char format[128], buf[10];
     int len;
 
-    if (!strcmp(name, "set_args") ||
-        !strcmp(name, "get_results") ||
-        !strcmp(name, "get_params") ||
-        !strcmp(name, "set_returns")) {
+    if ((strcmp(name, "set_args") == 0) ||
+        (strcmp(name, "get_results") == 0) ||
+        (strcmp(name, "get_params") == 0) ||
+        (strcmp(name, "set_returns") == 0)) {
         return var_arg_ins(interp, unit, name, r, n, emit);
     }
     if ((op = is_infix(name, n, r)) >= 0) {
@@ -435,11 +453,11 @@ INS(Interp *interp, IMC_Unit * unit, const char *name,
         name = to_infix(interp, name, r, &n, op);
     }
     else if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS) &&
-            (!strcmp(name, "abs")
-             || !strcmp(name, "neg")
-             || !strcmp(name, "not")
-             || !strcmp(name, "bnot")
-             || !strcmp(name, "bnots"))) {
+            ((strcmp(name, "abs") == 0) ||
+             (strcmp(name, "neg") == 0) ||
+             (strcmp(name, "not") == 0) ||
+             (strcmp(name, "bnot") == 0) ||
+             (strcmp(name, "bnots") == 0))) {
         strcpy(buf, "n_");
         strcat(buf, name);
         name = buf;
@@ -456,7 +474,7 @@ INS(Interp *interp, IMC_Unit * unit, const char *name,
     if (op < 0)         /* maybe we got a fullname */
         op = interp->op_lib->op_code(name, 1);
     if (op < 0) {         /* still wrong, try reverse compare */
-        const char *n_name = try_rev_cmp(interp, unit, name, r);
+        const char * const n_name = try_rev_cmp(interp, unit, name, r);
         if (n_name) {
             DECL_CONST_CAST;
             name = const_cast(n_name);
@@ -617,19 +635,20 @@ extern void* yy_scan_string(const char *);
 
 PARROT_API
 int
-do_yylex_init(Interp* interp, yyscan_t* yyscanner)
+do_yylex_init(Interp* interp, yyscan_t* yyscanner /*NN*/)
 {
     int retval;
     retval = yylex_init(yyscanner);
     /* This way we can get the interpreter via yyscanner */
-    if (!retval) yyset_extra(interp, *yyscanner);
+    if (!retval)
+        yyset_extra(interp, *yyscanner);
 
     return retval;
 }
 
 PMC *
-imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
-             STRING **error_message)
+imcc_compile(Interp *interp /*NN*/, const char *s /*NN*/, int pasm_file,
+             STRING **error_message /*NN*/)
 {
     /* imcc always compiles to interp->code
      * save old cs, make new
@@ -664,7 +683,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
     IMCC_INFO(interp)->cur_namespace = NULL;
     /* spit out the sourcefile */
     if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
-        FILE *fp = fopen(name, "w");
+        FILE * const fp = fopen(name, "w");
         if (fp) {
             fputs(s, fp);
             fclose(fp);
@@ -735,7 +754,7 @@ imcc_compile(Parrot_Interp interp, const char *s, int pasm_file,
  * function can go away in future.
  */
 PMC *
-imcc_compile_pasm(Parrot_Interp interp, const char *s)
+imcc_compile_pasm(Interp *interp /*NN*/, const char *s /*NN*/)
 {
     STRING *error_message;
     return imcc_compile(interp, s, 1, &error_message);
@@ -746,36 +765,34 @@ imcc_compile_pasm(Parrot_Interp interp, const char *s)
  * function can go away in future.
  */
 PMC *
-imcc_compile_pir(Parrot_Interp interp, const char *s)
+imcc_compile_pir(Interp *interp /*NN*/, const char *s /*NN*/)
 {
     STRING *error_message;
     return imcc_compile(interp, s, 0, &error_message);
 }
 
 PMC *
-IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
-                   STRING **error_message)
+IMCC_compile_pir_s(Interp *interp /*NN*/, const char *s /*NN*/,
+                   STRING **error_message /*NN*/)
 {
     return imcc_compile(interp, s, 0, error_message);
 }
 
 PMC *
-IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
-                    STRING **error_message)
+IMCC_compile_pasm_s(Interp *interp /*NN*/, const char *s /*NN*/,
+                    STRING **error_message /*NN*/)
 {
     return imcc_compile(interp, s, 1, error_message);
 }
 
 PMC *
-imcc_compile_pasm_ex(Parrot_Interp interp, const char *s)
+imcc_compile_pasm_ex(Interp *interp /*NN*/, const char *s /*NN*/)
 {
     STRING *error_message;
-    PMC    *sub;
-    char   *error_str;
 
-    sub = imcc_compile(interp, s, 1, &error_message);
+    PMC * const sub = imcc_compile(interp, s, 1, &error_message);
     if (sub == NULL ) {
-        error_str = string_to_cstring(interp, error_message);
+        char * const error_str = string_to_cstring(interp, error_message);
         real_exception(interp, NULL, E_Exception, error_str);
         string_cstring_free(error_str);
     }
@@ -783,15 +800,13 @@ imcc_compile_pasm_ex(Parrot_Interp interp, const char *s)
 }
 
 PMC *
-imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
+imcc_compile_pir_ex(Interp *interp /*NN*/, const char *s /*NN*/)
 {
     STRING *error_message;
-    PMC    *sub;
-    char   *error_str;
 
-    sub = imcc_compile(interp, s, 0, &error_message);
+    PMC * const sub = imcc_compile(interp, s, 0, &error_message);
     if (sub == NULL) {
-        error_str = string_to_cstring(interp, error_message);
+        char * const  error_str = string_to_cstring(interp, error_message);
         real_exception(interp, NULL, E_Exception, error_str);
         string_cstring_free(error_str);
     }
@@ -802,8 +817,8 @@ imcc_compile_pir_ex(Parrot_Interp interp, const char *s)
  * Compile a file by filename (can be either PASM or IMCC code)
  */
 static void *
-imcc_compile_file(Parrot_Interp interp, const char *fullname,
-                   STRING **error_message)
+imcc_compile_file(Interp *interp /*NN*/, const char *fullname /*NN*/,
+                   STRING **error_message /*NN*/)
 {
     PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
     char *ext;
@@ -880,12 +895,10 @@ imcc_compile_file(Parrot_Interp interp, const char *fullname,
     imc_cleanup(interp, NULL);
     fclose(fp);
 
-    if (!IMCC_INFO(interp)->error_code) {
+    if (!IMCC_INFO(interp)->error_code)
         cs = interp->code;
-    }
-    else {
+    else
         *error_message = IMCC_INFO(interp)->error_message;
-    }
 
     if (cs_save)
         (void)Parrot_switch_to_cs(interp, cs_save, 0);
@@ -902,15 +915,15 @@ imcc_compile_file(Parrot_Interp interp, const char *fullname,
  * function can go away in future.
  */
 void *
-IMCC_compile_file(Parrot_Interp interp, const char *s)
+IMCC_compile_file(Interp *interp /*NN*/, const char *s /*NN*/)
 {
     STRING *error_message;
     return imcc_compile_file(interp, s, &error_message);
 }
 
 void *
-IMCC_compile_file_s(Parrot_Interp interp, const char *s,
-                   STRING **error_message)
+IMCC_compile_file_s(Interp *interp /*NN*/, const char *s /*NN*/,
+                   STRING **error_message /*NN*/)
 {
     return imcc_compile_file(interp, s , error_message);
 }
@@ -929,37 +942,39 @@ register_compilers(Interp *interp /*NN*/)
 }
 
 static int
-change_op(Interp *interp, IMC_Unit *unit, SymReg **r, int num, int emit)
+change_op(Interp *interp /*NN*/, IMC_Unit *unit, SymReg **r /*NN*/, int num, int emit)
+    /* WARN_UNUSED */
 {
     int changed = 0;
-    SymReg *s, *c;
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
-        c = r[num];
+        SymReg *c = r[num];
+        SymReg *s;
         if (c->type & VT_CONSTP)
             c = c->reg;
         s = mk_const(interp, str_dup(c->name), 'N');
         r[num] = s;
         changed = 1;
     }
-    else if (emit) {
-        /* emit
-         *   set $N0, Iy
-         *   op  Nx, $N0
-         * or
-         *   op  Nx, ..., $N0
-         */
-        SymReg *rr[2];
+    else
+        if (emit) {
+            /* emit
+            *   set $N0, Iy
+            *   op  Nx, $N0
+            * or
+            *   op  Nx, ..., $N0
+            */
+            SymReg *rr[2];
 
-        rr[0] = mk_temp_reg(interp, 'N');
-        rr[1] = r[num];
-        INS(interp, unit, "set", NULL, rr, 2, 0, 1);
-        r[num] = rr[0];
-        changed = 1;
-        /* need to allocate the temp - run reg_alloc */
-        IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
-    }
+            rr[0] = mk_temp_reg(interp, 'N');
+            rr[1] = r[num];
+            INS(interp, unit, "set", NULL, rr, 2, 0, 1);
+            r[num] = rr[0];
+            changed = 1;
+            /* need to allocate the temp - run reg_alloc */
+            IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
+        }
     return changed;
 }
 
@@ -975,6 +990,7 @@ change_op(Interp *interp, IMC_Unit *unit, SymReg **r, int num, int emit)
 int
 try_find_op(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
         SymReg ** r, int n, int keyvec, int emit)
+    /* WARN_UNUSED */
 {
     char fullname[64];
     int changed = 0;
@@ -1022,7 +1038,7 @@ try_find_op(Interp *interp /*NN*/, IMC_Unit * unit, const char *name /*NN*/,
     }
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I') {
-            SymReg *r1 = r[1];
+            const SymReg * const r1 = r[1];
             changed |= change_op(interp, unit, r, 1, emit);
             /* op Nx, Iy, Iy: reuse generated temp Nz */
             if (r[2]->set == 'I' && r[2]->type != VTADDRESS &&

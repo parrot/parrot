@@ -574,14 +574,12 @@ string_make(Interp *interp /*NN*/, const char *buffer /*NULLOK*/,
     ENCODING *encoding;
     CHARSET *charset;
 
-    if (!charset_name) {
+    if (!charset_name)
         charset_name = "ascii";
-    }
     charset = Parrot_find_charset(interp, charset_name);
-    if (!charset) {
+    if (!charset)
         real_exception(interp, NULL, UNIMPLEMENTED,
                 "Can't make '%s' charset strings", charset_name);
-    }
     encoding = charset->preferred_encoding;
     return string_make_direct(interp, buffer, len,
             encoding, charset, flags);

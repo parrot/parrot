@@ -118,7 +118,8 @@ static int get_codesize( Interp *interp /*NN*/,
     int *src_lines /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
 static int get_old_size( Interp *interp /*NN*/, int *ins_line /*NN*/ )
         __attribute__nonnull__(1)
@@ -363,6 +364,7 @@ store_key_const(const char *str /*NN*/, int idx)
  * return size in ops */
 static int
 get_codesize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int *src_lines /*NN*/)
+    /* WARN_UNUSED */
 {
     Instruction *ins;
     int          code_size;

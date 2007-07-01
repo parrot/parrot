@@ -21,10 +21,51 @@
 #include "pbc.h"
 #include "parser.h"
 
+/* HEADERIZER TARGET: none */
+
+/* HEADERIZER BEGIN: static */
+
+static void do_pre_process( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void help( void );
+static void help_debug( void );
+static void imcc_get_optimization_description(
+    const Interp *interp /*NN*/,
+    int opt_level,
+    char *opt_desc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static void imcc_run_pbc( Interp *interp,
+    int obj_file,
+    const char *output_file,
+    int argc,
+    char * argv[] );
+
+static void imcc_write_pbc( Interp *interp /*NN*/,
+    const char *output_file /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int is_all_hex_digits( const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+static void Parrot_version( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void usage( FILE* fp /*NN*/ )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
+
 static int load_pbc, run_pbc, write_pbc, pre_process_only, pasm_file;
 
 static void
-usage(FILE* fp)
+usage(FILE* fp /*NN*/)
 {
     fprintf(fp,
             "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
@@ -110,7 +151,7 @@ help(void)
 
 
 static void
-Parrot_version(Interp *interp)
+Parrot_version(Interp *interp /*NN*/)
 {
     int rev = PARROT_REVISION;
     printf("This is parrot version " PARROT_VERSION);
@@ -186,7 +227,8 @@ static struct longopt_opt_decl options[] = {
 };
 
 static int
-is_all_hex_digits(const char *s)
+is_all_hex_digits(const char *s /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     for (; *s; s++)
         if (!isxdigit(*s))
@@ -380,13 +422,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 }
 
 static void
-do_pre_process(Parrot_Interp interp)
+do_pre_process(Interp *interp /*NN*/)
 {
     int       c;
     YYSTYPE   val;
-    yyscan_t  yyscanner;
 
-    yyscanner   = IMCC_INFO(interp)->yyscanner;
+    const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     IMCC_push_parser_state(interp);
     while ((c = yylex(&val, yyscanner, interp))) {
@@ -493,7 +534,7 @@ do_pre_process(Parrot_Interp interp)
 }
 
 static void
-imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, char *opt_desc)
+imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, char *opt_desc /*NN*/)
 {
     int i = 0;
 
@@ -519,9 +560,9 @@ imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, ch
 }
 
 int
-imcc_initialize(Interp *interp)
+imcc_initialize(Interp *interp /*NN*/)
 {
-    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
+    const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     do_yylex_init(interp, &yyscanner);
 
@@ -572,7 +613,7 @@ imcc_run_pbc(Interp *interp, int obj_file, const char *output_file,
 }
 
 static void
-imcc_write_pbc(Interp *interp, const char *output_file)
+imcc_write_pbc(Interp *interp /*NN*/, const char *output_file /*NN*/)
 {
     size_t    size;
     opcode_t *packed;
@@ -600,14 +641,11 @@ imcc_write_pbc(Interp *interp, const char *output_file)
 }
 
 int
-imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
+imcc_run(Interp *interp /*NN*/, const char *sourcefile, int argc, char * argv[])
 {
     int              obj_file;
-    const char      *output_file;
-    yyscan_t         yyscanner;
-
-    yyscanner   = IMCC_INFO(interp)->yyscanner;
-    output_file = interp->output_file;
+    yyscan_t        yyscanner   = IMCC_INFO(interp)->yyscanner;
+    const char * const output_file = interp->output_file;
 
     if (!interp->lo_var_ptr)
         interp->lo_var_ptr = (void *)&obj_file;
@@ -618,13 +656,13 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
     if (!sourcefile || !*sourcefile) {
         IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
     }
-    else if (!strcmp(sourcefile, "-")) {
+    else if (strcmp(sourcefile, "-") == 0) {
         imc_yyin_set(stdin, yyscanner);
     }
     else {
         const char * const ext = strrchr(sourcefile, '.');
 
-        if (ext && strcmp(ext, ".pbc") == 0) {
+        if (ext && (strcmp(ext, ".pbc") == 0)) {
             load_pbc  = 1;
             write_pbc = 0;
         }
@@ -722,7 +760,7 @@ imcc_run(Interp *interp, const char *sourcefile, int argc, char * argv[])
             imc_compile_all_units(interp);
         }
         IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-            char *error_str = string_to_cstring(interp,
+            char * const error_str = string_to_cstring(interp,
                     IMCC_INFO(interp)->error_message);
 
             IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;

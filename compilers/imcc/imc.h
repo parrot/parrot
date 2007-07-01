@@ -124,7 +124,9 @@ Instruction * INS_LABEL( Interp *interp /*NN*/,
 
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 
-PARROT_API int do_yylex_init( Interp* interp, yyscan_t* yyscanner );
+PARROT_API int do_yylex_init( Interp* interp, yyscan_t* yyscanner /*NN*/ )
+        __attribute__nonnull__(2);
+
 PARROT_API void imcc_destroy( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
@@ -140,31 +142,54 @@ int check_op( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PMC * imcc_compile(
-    Parrot_Interp interp,
-    const char *s,
+PMC * imcc_compile( Interp *interp /*NN*/,
+    const char *s /*NN*/,
     int pasm_file,
-    STRING **error_message );
+    STRING **error_message /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
-void * IMCC_compile_file( Parrot_Interp interp, const char *s );
-void * IMCC_compile_file_s(
-    Parrot_Interp interp,
-    const char *s,
-    STRING **error_message );
+void * IMCC_compile_file( Interp *interp /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-PMC * imcc_compile_pasm( Parrot_Interp interp, const char *s );
-PMC * imcc_compile_pasm_ex( Parrot_Interp interp, const char *s );
-PMC * IMCC_compile_pasm_s(
-    Parrot_Interp interp,
-    const char *s,
-    STRING **error_message );
+void * IMCC_compile_file_s( Interp *interp /*NN*/,
+    const char *s /*NN*/,
+    STRING **error_message /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-PMC * imcc_compile_pir( Parrot_Interp interp, const char *s );
-PMC * imcc_compile_pir_ex( Parrot_Interp interp, const char *s );
-PMC * IMCC_compile_pir_s(
-    Parrot_Interp interp,
-    const char *s,
-    STRING **error_message );
+PMC * imcc_compile_pasm( Interp *interp /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PMC * imcc_compile_pasm_ex( Interp *interp /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PMC * IMCC_compile_pasm_s( Interp *interp /*NN*/,
+    const char *s /*NN*/,
+    STRING **error_message /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PMC * imcc_compile_pir( Interp *interp /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PMC * imcc_compile_pir_ex( Interp *interp /*NN*/, const char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PMC * IMCC_compile_pir_s( Interp *interp /*NN*/,
+    const char *s /*NN*/,
+    STRING **error_message /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 int imcc_fprintf( Interp *interp /*NN*/,
     FILE *fd /*NN*/,
@@ -189,14 +214,16 @@ Instruction * iNEW( Interp *interp,
     SymReg *init,
     int emit );
 
-Instruction * INS( Interp *interp,
+Instruction * INS( Interp *interp /*NN*/,
     IMC_Unit * unit,
-    const char *name,
+    const char *name /*NN*/,
     const char *fmt,
     SymReg **r,
     int n,
     int keyvec,
-    int emit );
+    int emit )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 int is_op( Interp *interp /*NN*/, const char *name )
         __attribute__nonnull__(1);
@@ -238,7 +265,8 @@ int try_find_op( Interp *interp /*NN*/,
     int keyvec,
     int emit )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__warn_unused_result__;
 
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
