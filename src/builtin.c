@@ -83,13 +83,16 @@ static Builtins builtins[] = {
 /* HEADERIZER BEGIN: static */
 
 static int check_builtin_sig( size_t i, const char *sig /*NN*/, int pass )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 static int find_builtin( const char *func /*NN*/ )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__warn_unused_result__;
 
 static int find_builtin_s( Interp *interp, STRING *func /*NN*/ )
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__warn_unused_result__;
 
 /* HEADERIZER END: static */
 
@@ -130,16 +133,9 @@ Parrot_init_builtins(Interp *interp /*NN*/)
     }
 }
 
-static int find_builtin(const char *func)
-    __attribute__nonnull__(1);
-static int find_builtin_s(Interp *interp, STRING *func)
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2);
-static int check_builtin_sig(size_t i, const char *sig, int pass)
-    __attribute__nonnull__(2);
-
 static int
 find_builtin(const char *func /*NN*/)
+    /* WARN_UNUSED */
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
@@ -167,6 +163,7 @@ find_builtin(const char *func /*NN*/)
 
 static int
 find_builtin_s(Interp *interp, STRING *func /*NN*/)
+    /* WARN_UNUSED */
 {
     int low  = 0;
     int high = N_BUILTINS - 1;
@@ -188,6 +185,7 @@ find_builtin_s(Interp *interp, STRING *func /*NN*/)
 
 static int
 check_builtin_sig(size_t i, const char *sig /*NN*/, int pass)
+    /* WARN_UNUSED */
 {
     const Builtins * const b = builtins + i;
     const char *p;
@@ -219,7 +217,7 @@ check_builtin_sig(size_t i, const char *sig /*NN*/, int pass)
 }
 
 int
-Parrot_is_builtin(Interp *interp, const char *func /*NN*/, const char *sig)
+Parrot_is_builtin(const char *func /*NN*/, const char *sig /*NULLOK*/)
     /* WARN_UNUSED */
 {
     int bi, i, pass;
@@ -263,6 +261,7 @@ Parrot_find_builtin(Interp *interp, STRING *func /*NN*/)
 
 const char *
 Parrot_builtin_get_c_namespace(int bi)
+    /* CONST, WARN_UNUSED */
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].c_ns;
@@ -270,6 +269,7 @@ Parrot_builtin_get_c_namespace(int bi)
 
 int
 Parrot_builtin_is_class_method(int bi)
+    /* CONST, WARN_UNUSED */
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[2] != 'O';
@@ -277,6 +277,7 @@ Parrot_builtin_is_class_method(int bi)
 
 int
 Parrot_builtin_is_void(int bi)
+    /* CONST, WARN_UNUSED */
 {
     assert(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[0] == 'v';

@@ -45,11 +45,12 @@ static void * imcc_compile_file(
 static int is_infix( const char *name, int n, SymReg **r /*NN*/ )
         __attribute__nonnull__(3);
 
-static Instruction * maybe_builtin( Interp *interp,
+static Instruction * maybe_builtin( Interp *interp /*NN*/,
     IMC_Unit *unit,
     const char *name /*NN*/,
     SymReg **r,
     int n )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static char * to_infix( Interp *interp,
@@ -209,7 +210,7 @@ check_op(Interp *interp /*NN*/, char *fullname /*NN*/,
 }
 
 static Instruction *
-maybe_builtin(Interp *interp, SHIM(IMC_Unit *unit), const char *name /*NN*/,
+maybe_builtin(Interp *interp /*NN*/, SHIM(IMC_Unit *unit), const char *name /*NN*/,
         SymReg **r, int n)
 {
     Instruction *ins;
@@ -224,7 +225,7 @@ maybe_builtin(Interp *interp, SHIM(IMC_Unit *unit), const char *name /*NN*/,
         rr[i] = r[i];
     }
     sig[i] = '\0';
-    bi = Parrot_is_builtin(interp, name, sig);
+    bi = Parrot_is_builtin(name, sig);
     if (bi < 0)
         return NULL;
     /*
@@ -267,7 +268,7 @@ maybe_builtin(Interp *interp, SHIM(IMC_Unit *unit), const char *name /*NN*/,
  * Is instruction a parrot opcode?
  */
 int
-is_op(Interp *interp, const char *name)
+is_op(Interp *interp /*NN*/, const char *name)
 {
     int (*op_lookup)(const char *, int full) =
         interp->op_lib->op_code;
@@ -276,7 +277,7 @@ is_op(Interp *interp, const char *name)
         || ((name[0] == 'n' && name[1] == '_')
                 && (op_lookup(name + 2, 0) >= 0
                    || op_lookup(name + 2, 1) >= 0))
-        || Parrot_is_builtin(interp, name, NULL) >= 0;
+        || Parrot_is_builtin(name, NULL) >= 0;
 }
 
 /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */

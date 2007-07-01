@@ -385,7 +385,7 @@ In unknown info is requested then -1 is returned.
 */
 
 INTVAL
-sysinfo_i(Parrot_Interp interp, INTVAL info_wanted)
+sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 {
     switch (info_wanted) {
     case PARROT_INTSIZE:

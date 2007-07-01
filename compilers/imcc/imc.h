@@ -198,7 +198,9 @@ Instruction * INS( Interp *interp,
     int keyvec,
     int emit );
 
-int is_op( Interp *interp, const char *name );
+int is_op( Interp *interp /*NN*/, const char *name )
+        __attribute__nonnull__(1);
+
 Instruction * multi_keyed( Interp *interp,
     IMC_Unit * unit,
     char *name,

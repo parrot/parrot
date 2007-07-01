@@ -489,11 +489,11 @@ PARROT_API void Parrot_destroy(Interp *);
 
 /* HEADERIZER BEGIN: src/inter_run.c */
 
-PARROT_API void * Parrot_run_meth_fromc(
-    Parrot_Interp interp,
+PARROT_API void * Parrot_run_meth_fromc( Interp *interp /*NN*/,
     PMC *sub,
     PMC *obj,
-    STRING *meth );
+    STRING *meth )
+        __attribute__nonnull__(1);
 
 PARROT_API void* Parrot_run_meth_fromc_arglist(
     Parrot_Interp interp,

@@ -167,6 +167,8 @@ runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
     const char *sig_p;
     parrot_context_t * const old_ctx = CONTEXT(interp->ctx);
 
+    UNUSED(meth); /* Maybe can be removed? */
+
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, NULL);
@@ -254,18 +256,19 @@ Signatures are similar to NCI:
 
 PARROT_API
 void *
-Parrot_run_meth_fromc(Parrot_Interp interp,
+Parrot_run_meth_fromc(Interp *interp /*NN*/,
         PMC *sub, PMC *obj, STRING *meth)
 {
     parrot_context_t *ctx;
     opcode_t offset, *dest;
 
+    UNUSED(meth); /* Maybe we can remove? */
+
     interp->current_cont = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, (void*)1);
-    if (!dest) {
+    if (!dest)
         real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    }
     ctx = CONTEXT(interp->ctx);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
