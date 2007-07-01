@@ -203,7 +203,7 @@ Destroys the closure.  This is necessary in order to reclaim the context.
         struct Parrot_sub * sub = PMC_sub(SELF);
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(INTERP, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
-            fprintf(stderr, "[destroy closure %p, context %p, refs=%d]\n",
+            fprintf(stderr, "[destroy closure %p, context %p with %d refs]\n",
                     (void *)SELF, (void *)sub->outer_ctx,
                     (sub->outer_ctx ? sub->outer_ctx->ref_count : 0));
         }
