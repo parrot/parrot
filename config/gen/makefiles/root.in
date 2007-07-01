@@ -1975,6 +1975,7 @@ HEADERIZER_O_FILES = \
     src/hll.o \
     src/inter_call.o \
     src/inter_run.o \
+    src/interpreter.o \
     src/intlist.o \
     src/key.o \
     src/library.o \
