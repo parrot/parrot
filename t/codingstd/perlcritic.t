@@ -116,11 +116,11 @@ if ( !keys %policies ) {
         'TestingAndDebugging::RequirePortableShebang'     => 1,
         'TestingAndDebugging::RequireUseStrict'           => 1,
         'TestingAndDebugging::RequireUseWarnings'         => 1,
+        'Variables::ProhibitConditionalDeclarations'      => 1,
     );
 
     # add other policies which aren't yet passing consistently see RT#42427
     my %extra_policies = (
-        'Variables::ProhibitConditionalDeclarations' => 1,
         'InputOutput::ProhibitTwoArgOpen'            => 1,
         'NamingConventions::ProhibitAmbiguousNames'  => 1,
         'Subroutines::ProhibitBuiltinHomonyms'       => 1,
