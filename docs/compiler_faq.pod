@@ -395,7 +395,7 @@ property of the class PMC:
 
 =head2 How do I instantiate a class?
 
-You can do so either with an integer type id:
+You can do so either with an integer type identifier:
 
     $I0 = find_type 'Dog'
     new $P0, $I0    # creates a Dog object and stores it in register $P0
