@@ -84,6 +84,8 @@
 
 ; (setq *macroexpand-hook* #'(lambda (fn form env)
 ; 		              (apply fn (list form env))))
+(setq *macroexpand-hook* ( function(lambda (fn form env)
+		              (apply fn (list form env)))))
 
 ;; Create the KEYWORD package.
 (sys:%make-package "KEYWORD")
