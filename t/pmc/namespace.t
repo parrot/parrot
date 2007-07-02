@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 62;
 use Parrot::Config;
 
 =head1 NAME
@@ -1689,6 +1689,33 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'overriding find_method()' );
 CODE
 /Finding method/
 OUTPUT
+
+pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT#39978" );
+.sub main :main
+     $P0 = new .String
+     $P0 = "Ook...BANG!\n"
+     set_root_global [ "DUMMY"; "X"; "Y" ], "Explosion", $P0
+
+     $P1 = new .Integer
+     $P1 = 0
+     set_root_global [ "DUMMY"; "X"; "Y" ], "T0", $P0
+
+     .local pmc dummy_x_y_ns, iter
+     dummy_x_y_ns = get_root_namespace [ "DUMMY"; "X"; "Y" ]
+     iter = new .Iterator, dummy_x_y_ns
+loop:
+     unless iter goto loop_end
+     $S0 = shift iter
+     print $S0
+     print "\n"
+     goto loop
+loop_end:
+
+.end
+CODE
+Explosion
+T0
+OUT
 
 # Local Variables:
 #   mode: cperl

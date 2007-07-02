@@ -1,56 +1,59 @@
 # $Id$
 
+=head1 NAME
+
+system.pir - implementation specific package SYSTEM
+
+=head1 DESCRIPTION
+
+Use in bootstrapping.
+
+=cut
+
 .sub _init_system
-  .local pmc function
-  .local pmc package
-  .local pmc symbol
-  .local pmc value
 
-  .PACKAGE(package, "SYSTEM")
+    .local pmc function
+    .local pmc package
+    .local pmc symbol
+    .local pmc value, reader_macros
 
-   store_global "PACKAGES", "SYSTEM", package
-   store_global "PACKAGES", "SYS", package
+    .PACKAGE(package, "SYSTEM")
 
-  .HASH(value)
+     store_global "PACKAGES", "SYSTEM", package
+     store_global "PACKAGES", "SYS",    package
 
-  # VALID_IN_PARROT_0_2_0  .FUNCTION(function, _left_paren_macro )
+    .HASH(reader_macros)
+
     .FUNCTION(function, "_left_paren_macro" )
-    value["("] = function
+    reader_macros["("] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _right_paren_macro)
     .FUNCTION(function, "_right_paren_macro" )
-    value[")"] = function
+    reader_macros[")"] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _single_quote_macro)
     .FUNCTION(function, "_single_quote_macro" )
-    value["'"] = function
+    reader_macros["'"] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _semicolon_macro)
     .FUNCTION(function, "_semicolon_macro" )
-    value[";"] = function
+    reader_macros[";"] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _double_quote_macro)
     .FUNCTION(function, "_double_quote_macro" )
-    value['"'] = function
+    reader_macros['"'] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _backquote_macro)
     .FUNCTION(function, "_backquote_macro" )
-    value["`"] = function
+    reader_macros["`"] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _comma_macro)
     .FUNCTION(function, "_comma_macro" )
-    value[","] = function
+    reader_macros[","] = function
 
-  # VALID_IN_PARROT_0_2_0 .FUNCTION(function, _sharpsign_macro)
     .FUNCTION(function, "_sharpsign_macro" )
-    value["#"] = function
+    reader_macros["#"] = function
 
-  .DEFVAR(symbol, package, "*READER-MACROS*", value)
+    .DEFVAR(symbol, package, "*READER-MACROS*", reader_macros)
 
-  .NIL(value)
-  .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE*", value)
+    .NIL(value)
+    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE*", value)
 
-  .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", value)
+    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", value)
 
   # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", _get_object_attr)
   .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", "_get_object_attr")
@@ -203,8 +206,44 @@ DONE:
   .return(retv)
 .end
 
+
+.sub _find_package
+  .param pmc args
+
+  .local string pkgname_str
+  .local pmc pkgname
+  .local pmc retv
+
+  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+
+  .CAR(pkgname, args)
+  .ASSERT_TYPE(pkgname, "string")
+
+   pkgname_str = pkgname
+   upcase pkgname_str
+
+   push_eh PACKAGE_NOT_FOUND
+   retv = find_global "PACKAGES", pkgname_str
+   if_null retv, PACKAGE_NOT_FOUND
+   clear_eh
+
+   goto DONE
+
+PACKAGE_NOT_FOUND:
+  .ERROR_1("internal", "there is no package with the name \"%s\"", pkgname)
+   goto DONE
+
+ERROR_NARGS:
+  .ERROR_0("program-error", "wrong number of arguments to %FIND-PACKAGE")
+   goto DONE
+
+DONE:
+  .return(retv)
+.end
+
 .sub _alias_package
   .param pmc args
+
   .local string pkgnames
   .local pmc package
   .local pmc pkgname
