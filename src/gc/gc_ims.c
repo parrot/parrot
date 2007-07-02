@@ -327,10 +327,6 @@ a sleep opcode.
 
 =head1 FUNCTIONS
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -347,26 +343,48 @@ static int collect_cb( Interp *interp,
     void *arg );
 
 static void gc_ims_add_free_object( Interp *interp,
-    Small_Object_Pool *pool,
-    void *to_add );
+    Small_Object_Pool *pool /*NN*/,
+    void *to_add )
+        __attribute__nonnull__(2);
 
-static void gc_ims_alloc_objects( Interp *interp, Small_Object_Pool *pool );
-static void * gc_ims_get_free_object( Interp *interp,
-    Small_Object_Pool *pool );
+static void gc_ims_alloc_objects( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void gc_ims_pool_init( Interp *interp, Small_Object_Pool *pool );
+static void * gc_ims_get_free_object( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void gc_ims_pool_init( Interp *interp, Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(2);
+
 static int parrot_gc_ims_collect( Interp* interp, int check_only );
-static int parrot_gc_ims_collect( Interp* interp, int check_only );
-static void parrot_gc_ims_deinit( Interp* interp );
-static void parrot_gc_ims_mark( Interp* interp );
-static void parrot_gc_ims_reinit( Interp* interp );
-static void parrot_gc_ims_run( Interp *interp, int flags );
-static void parrot_gc_ims_run_increment( Interp* interp );
-static void parrot_gc_ims_sweep( Interp* interp );
-static int sweep_cb( Interp *interp,
-    Small_Object_Pool *pool,
+static void parrot_gc_ims_deinit( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_ims_mark( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_ims_reinit( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_ims_run( Interp *interp /*NN*/, int flags )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_ims_run_increment( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static void parrot_gc_ims_sweep( Interp* interp /*NN*/ )
+        __attribute__nonnull__(1);
+
+static int sweep_cb( Interp *interp /*NN*/,
+    Small_Object_Pool *pool /*NN*/,
     int flag,
-    void *arg );
+    void *arg )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -440,32 +458,29 @@ static void parrot_gc_ims_run(Interp *interp, int flags);
 
 /*
 
-=item C<static void gc_ims_add_free_object(Interp *interp,
-        Small_Object_Pool *pool, void *to_add)>
+FUNCDOC: gc_ims_add_free_object
 
 Add object C<to_add> to the free_list in the given pool.
 C<pool->num_free_objects> has to be updated by the caller.
 
-=item C<static void *
-gc_ims_get_free_object(Interp *, Small_Object_Pool *pool)>
+FUNCDOC: gc_ims_get_free_object
 
 Get a new object off the free_list in the given pool.
 
-=item C<static void
-gc_ims_alloc_objects(Interp *, Small_Object_Pool *pool)>
+FUNCDOC: gc_ims_alloc_objects
 
 Allocate new objects for the given pool.
-
-=cut
 
 */
 
 static void
-gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
+gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/, void *to_add)
 {
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
-#if ! DISABLE_GC_DEBUG
+#if DISABLE_GC_DEBUG
+    UNUSED(interp);
+#else
     if (GC_DEBUG(interp)) {
         if (pool == interp->arena_base->pmc_pool) {
             PMC * const p = (PMC *)to_add;
@@ -477,14 +492,12 @@ gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool, void *to_add)
 
 
 static void *
-gc_ims_get_free_object(Interp *interp, Small_Object_Pool *pool)
+gc_ims_get_free_object(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
     PObj *ptr;
-    Arenas *arena_base;
-    Gc_ims_private *g_ims;
+    Arenas * const arena_base    = interp->arena_base;
+    Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
 
-    arena_base = interp->arena_base;
-    g_ims      = (Gc_ims_private *)arena_base->gc_private;
     if (++g_ims->allocations >= g_ims->alloc_trigger) {
         g_ims->allocations = 0;
         parrot_gc_ims_run_increment(interp);
@@ -505,7 +518,7 @@ gc_ims_get_free_object(Interp *interp, Small_Object_Pool *pool)
 }
 
 static void
-gc_ims_alloc_objects(Interp *interp, Small_Object_Pool *pool)
+gc_ims_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 {
     Small_Object_Arena *new_arena;
     size_t size;
@@ -526,7 +539,7 @@ gc_ims_alloc_objects(Interp *interp, Small_Object_Pool *pool)
 }
 
 static void
-gc_ims_pool_init(Interp *interp, Small_Object_Pool *pool)
+gc_ims_pool_init(SHIM_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     pool->add_free_object = gc_ims_add_free_object;
     pool->get_free_object = gc_ims_get_free_object;
@@ -535,7 +548,7 @@ gc_ims_pool_init(Interp *interp, Small_Object_Pool *pool)
 }
 
 static void
-parrot_gc_ims_deinit(Interp* interp)
+parrot_gc_ims_deinit(Interp* interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -545,14 +558,12 @@ parrot_gc_ims_deinit(Interp* interp)
 
 /*
 
-=item C<void Parrot_gc_ims_init(Interp* interp)>
+FUNCDOC: Parrot_gc_ims_init
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
 for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_objects_fn>, and
 C<more_objects_fn>.
-
-=cut
 
 */
 
@@ -578,16 +589,14 @@ Parrot_gc_ims_init(Interp* interp /*NN*/)
 
 /*
 
-=item C<static void parrot_gc_ims_reinit(Interp*)>
+FUNCDOC: parrot_gc_ims_reinit
 
 Reinitialize the collector for the next collection cycle.
-
-=cut
 
 */
 
 static void
-parrot_gc_ims_reinit(Interp* interp)
+parrot_gc_ims_reinit(Interp* interp /*NN*/)
 {
     Gc_ims_private *g_ims;
     Arenas * const arena_base = interp->arena_base;
@@ -607,19 +616,17 @@ parrot_gc_ims_reinit(Interp* interp)
 
 /*
 
-=item C<static void parrot_gc_ims_mark(Interp*)>
+FUNCDOC: parrot_gc_ims_mark
 
 Mark a bunch of children.
 
 The work depends on item counts with and without a next_for_GC field.
 The former are marked immediately, only the latter need real work here.
 
-=cut
-
 */
 
 static void
-parrot_gc_ims_mark(Interp* interp)
+parrot_gc_ims_mark(Interp* interp /*NN*/)
 {
     size_t todo;
     double work_factor;
@@ -650,17 +657,16 @@ parrot_gc_ims_mark(Interp* interp)
 
 /*
 
-=item C<static void parrot_gc_ims_sweep(Interp*)>
+FUNCDOC: parrot_gc_ims_sweep
 
 Free unused objects in all header pools.
-TODO split work per pool.
 
-=cut
+TODO split work per pool.
 
 */
 
 static int
-sweep_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
+sweep_cb(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag, void *arg)
 {
     int * const n_obj = (int *) arg;
 
@@ -672,7 +678,7 @@ sweep_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 }
 
 static void
-parrot_gc_ims_sweep(Interp* interp)
+parrot_gc_ims_sweep(Interp* interp /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
     Gc_ims_private *g_ims;
@@ -706,23 +712,14 @@ parrot_gc_ims_sweep(Interp* interp)
 
 /*
 
-=item C<static void parrot_gc_ims_collect(Interp*)>
+FUNCDOC: parrot_gc_ims_collect
 
 Run the copying collector in memory pools, if it could yield some free
 memory.
 
-=cut
-
 */
-#if GC_IS_MALLOC
-static int
-parrot_gc_ims_collect(Interp* interp, int check_only)
-{
-    return 0;
-}
 
-#else
-
+#if !GC_IS_MALLOC
 static int
 collect_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
 {
@@ -758,10 +755,15 @@ collect_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
     }
     return 0;
 }
+#endif
 
 static int
 parrot_gc_ims_collect(Interp* interp, int check_only)
 {
+#if GC_IS_MALLOC
+    UNUSED(interp);
+    UNUSED(check_only);
+#else
     Arenas * const arena_base = interp->arena_base;
     Gc_ims_private *g_ims;
     int ret;
@@ -778,23 +780,21 @@ parrot_gc_ims_collect(Interp* interp, int check_only)
     if (interp->profile)
         Parrot_dod_profile_end(interp, PARROT_PROF_GC);
     g_ims->state = GC_IMS_FINISHED;
+#endif
     return 0;
 }
-#endif
 
 /*
 
-=item C<static void parrot_gc_ims_run_increment(Interp* interp)>
+FUNCDOC: parrot_gc_ims_run_increment
 
 Run one increment of collection. This function is triggered by object
 allocation.
 
-=cut
-
 */
 
 static void
-parrot_gc_ims_run_increment(Interp* interp)
+parrot_gc_ims_run_increment(Interp* interp /*NN*/)
 {
     Arenas * const arena_base    = interp->arena_base;
     Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
@@ -858,20 +858,17 @@ parrot_gc_ims_run_increment(Interp* interp)
 
 /*
 
-=item C<void
-parrot_gc_ims_run(Interp *interp, int flags)>
+FUNCDOC: parrot_gc_ims_run
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
   DOD_lazy_FLAG   ... timely destruction
   DOD_finish_FLAG ... run until live bits are clear
 
-=cut
-
 */
 
 static void
-parrot_gc_ims_run(Interp *interp, int flags)
+parrot_gc_ims_run(Interp *interp /*NN*/, int flags)
 {
     int lazy;
     Arenas * const arena_base    = interp->arena_base;
@@ -950,13 +947,11 @@ parrot_gc_ims_run(Interp *interp, int flags)
 
 /*
 
-=item C<void Parrot_dod_ims_wb(Interp*, PMC *agg, PMC *new)>
+FUNCDOC: Parrot_dod_ims_wb
 
 Write barrier called by the DOD_WRITE_BARRIER macro. Always when storing
 a white object into a black aggregate, either the object must
 be greyed or the aggregate must be rescanned - by greying it.
-
-=cut
 
 */
 
@@ -979,8 +974,6 @@ Parrot_dod_ims_wb(Interp* interp, PMC *agg, PMC *_new)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
@@ -988,8 +981,6 @@ F<src/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
 =head1 HISTORY
 
 Initial version by leo (2004.08.12 - 2004.08.15)
-
-=cut
 
 */
 
