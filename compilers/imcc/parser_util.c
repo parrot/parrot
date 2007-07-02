@@ -637,8 +637,7 @@ PARROT_API
 int
 do_yylex_init(Interp* interp, yyscan_t* yyscanner /*NN*/)
 {
-    int retval;
-    retval = yylex_init(yyscanner);
+    const int retval = yylex_init(yyscanner);
     /* This way we can get the interpreter via yyscanner */
     if (!retval)
         yyset_extra(interp, *yyscanner);
@@ -656,7 +655,6 @@ imcc_compile(Interp *interp /*NN*/, const char *s /*NN*/, int pasm_file,
     char name[64];
     PackFile_ByteCode *old_cs, *new_cs;
     PMC *sub=NULL;
-    Parrot_sub *sub_data;
     struct _imc_info_t *imc_info = NULL;
     struct parser_state_t *next;
     DECL_CONST_CAST;
@@ -712,6 +710,8 @@ imcc_compile(Interp *interp /*NN*/, const char *s /*NN*/, int pasm_file,
     IMCC_pop_parser_state(interp, yyscanner);
 
     if (!IMCC_INFO(interp)->error_code) {
+        Parrot_sub *sub_data;
+
         sub = pmc_new(interp, enum_class_Eval);
         PackFile_fixup_subs(interp, PBC_MAIN, sub);
         if (old_cs) {
@@ -820,8 +820,9 @@ static void *
 imcc_compile_file(Interp *interp /*NN*/, const char *fullname /*NN*/,
                    STRING **error_message /*NN*/)
 {
-    PackFile_ByteCode *cs_save = interp->code, *cs=NULL;
-    char *ext;
+    PackFile_ByteCode * const cs_save = interp->code;
+    PackFile_ByteCode *cs=NULL;
+    const char *ext;
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
     STRING *fs;

@@ -562,7 +562,7 @@ imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, ch
 int
 imcc_initialize(Interp *interp /*NN*/)
 {
-    const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
+    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     do_yylex_init(interp, &yyscanner);
 
