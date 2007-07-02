@@ -504,6 +504,8 @@ PARROT_API
 void
 Parrot_set_context_threshold(Interp *interp, struct Parrot_Context *ctxp)
 {
+    UNUSED(interp);
+    UNUSED(ctxp);
     /* nothing to do */
 }
 

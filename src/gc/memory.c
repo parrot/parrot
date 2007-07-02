@@ -201,6 +201,9 @@ mem__internal_free(void *from, const char *file /*NN*/, int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
+#else
+    UNUSED(file);
+    UNUSED(line);
 #endif
     free(from);
 }
