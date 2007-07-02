@@ -13,10 +13,6 @@ debugger, and the C<debug> ops.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include <assert.h>
@@ -48,12 +44,26 @@ static const char* GDB_P( Interp *interp, const char *s /*NN*/ )
 static char const * nextarg( char const *command /*NN*/ )
         __attribute__nonnull__(1);
 
-static const char * parse_command( const char *command, unsigned long *cmdP );
+static const char * parse_command(
+    const char *command /*NN*/,
+    unsigned long *cmdP /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static const char * parse_int( const char *str, int *intP );
-static const char* parse_key( Interp *interp, const char *str, PMC **keyP );
-static const char * parse_string( Interp *interp,
-    const char *str,
-    STRING **strP );
+static const char* parse_key( Interp *interp /*NN*/,
+    const char *str /*NN*/,
+    PMC **keyP /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static const char * parse_string( Interp *interp /*NN*/,
+    const char *str /*NN*/,
+    STRING **strP /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static const char * skip_command( const char *str /*NN*/ )
         __attribute__nonnull__(1);
@@ -137,12 +147,10 @@ skip_command(const char *str /*NN*/)
 
 /*
 
-=item C<static const char* parse_int(const char *str, int *intP)>
+FUNCDOC: parse_int
 
 Parse an C<int> out of a string and return a pointer to just after the C<int>.
 The output parameter C<intP> contains the parsed value.
-
-=cut
 
 */
 
@@ -158,19 +166,16 @@ parse_int(const char *str, int *intP)
 
 /*
 
-=item C<static const char*
-parse_string(Interp *interp, const char *str, STRING **strP)>
+FUNCDOC: parse_string
 
 Parse a double-quoted string out of a C string and return a pointer to
 just after the string. The parsed string is converted to a Parrot
 C<STRING> and placed in the output parameter C<strP>.
 
-=cut
-
 */
 
 static const char *
-parse_string(Interp *interp, const char *str, STRING **strP)
+parse_string(Interp *interp /*NN*/, const char *str /*NN*/, STRING **strP /*NN*/)
 {
     const char *string_start;
 
@@ -204,18 +209,15 @@ parse_string(Interp *interp, const char *str, STRING **strP)
 
 /*
 
-=item C<static const char*
-parse_key(Interp *interp, const char *str, PMC **keyP)>
+FUNCDOC: parse_key
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
 
-=cut
-
 */
 
 static const char*
-parse_key(Interp *interp, const char *str, PMC **keyP)
+parse_key(Interp *interp /*NN*/, const char *str /*NN*/, PMC **keyP /*NN*/)
 {
     /* clear output parameter */
     *keyP = NULL;
@@ -254,18 +256,15 @@ parse_key(Interp *interp, const char *str, PMC **keyP)
 
 /*
 
-=item C<static const char *
-parse_command(const char *command, unsigned long *cmdP)>
+FUNCDOC: parse_command
 
 Convert the command at the beginning of a string into a numeric value
 that can be used as a switch key for fast lookup.
 
-=cut
-
 */
 
 static const char *
-parse_command(const char *command, unsigned long *cmdP)
+parse_command(const char *command /*NN*/, unsigned long *cmdP /*NN*/)
 {
     int           i;
     unsigned long c = 0;
@@ -526,19 +525,16 @@ PDB_run_command(Interp *interp /*NN*/, const char *command /*NN*/)
 
 /*
 
-=item C<void
-PDB_next(Interp *interp, const char *command)>
+FUNCDOC: PDB_next
 
 Execute the next N operation(s).
 
 Inits the program if needed, runs the next N >= 1 operations and stops.
 
-=cut
-
 */
 
 void
-PDB_next(Interp *interp, const char *command)
+PDB_next(Interp *interp /*NN*/, const char *command /*NULLOK*/)
 {
     unsigned long  n   = 1;
     PDB_t  * const pdb = interp->pdb;
@@ -573,17 +569,14 @@ PDB_next(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_trace(Interp *interp, const char *command)>
+FUNCDOC: PDB_trace
 
 Execute the next N operations; if no number is specified, it defaults to 1.
-
-=cut
 
 */
 
 void
-PDB_trace(Interp *interp, const char *command)
+PDB_trace(Interp *interp /*NN*/, const char *command /*NULLOK*/)
 {
     unsigned long  n   = 1;
     PDB_t *  const pdb = interp->pdb;
@@ -622,17 +615,14 @@ PDB_trace(Interp *interp, const char *command)
 
 /*
 
-=item C<PDB_condition_t *
-PDB_cond(Interp *interp, const char *command)>
+FUNCDOC: PDB_cond
 
 Analyzes a condition from the user input.
-
-=cut
 
 */
 
 PDB_condition_t *
-PDB_cond(Interp *interp, const char *command)
+PDB_cond(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     PDB_condition_t *condition;
     int              i, reg_number;
@@ -815,22 +805,19 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
 
 /*
 
-=item C<void
-PDB_watchpoint(Interp *interp, const char *command)>
+FUNCDOC: PDB_watchpoint
 
 Set a watchpoint.
-
-=cut
 
 */
 
 void
-PDB_watchpoint(Interp *interp, const char *command)
+PDB_watchpoint(Interp *interp /*NN*/, const char *command /*NN*/)
 {
-    PDB_t           *pdb = interp->pdb;
-    PDB_condition_t *condition;
+    PDB_t           * const pdb = interp->pdb;
+    PDB_condition_t * const condition = PDB_cond(interp, command);
 
-    if (!(condition = PDB_cond(interp, command)))
+    if (!condition)
         return;
 
     /* Add it to the head of the list */
@@ -842,19 +829,16 @@ PDB_watchpoint(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_set_break(Interp *interp, const char *command)>
+FUNCDOC: PDB_set_break
 
 Set a break point, the source code file must be loaded.
-
-=cut
 
 */
 
 void
-PDB_set_break(Interp *interp, const char *command)
+PDB_set_break(Interp *interp /*NN*/, const char *command /*NULL*/)
 {
-    PDB_t            *pdb      = interp->pdb;
+    PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak = NULL;
     PDB_breakpoint_t *sbreak;
     PDB_condition_t  *condition;
@@ -948,12 +932,9 @@ PDB_set_break(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_init(Interp *interp, const char *command)>
+FUNCDOC: PDB_init
 
 Init the program.
-
-=cut
 
 */
 
@@ -974,24 +955,21 @@ PDB_init(Interp *interp, SHIM(const char *command))
 
 /*
 
-=item C<void
-PDB_continue(Interp *interp, const char *command)>
+FUNCDOC: PDB_continue
 
 Continue running the program. If a number is specified, skip that many
 breakpoints.
 
-=cut
-
 */
 
 void
-PDB_continue(Interp *interp, const char *command)
+PDB_continue(Interp *interp /*NN*/, const char *command /*NULLOK*/)
 {
     PDB_t *pdb = interp->pdb;
-    long   ln;
 
     /* Skip any breakpoint? */
     if (command && *command) {
+        long ln;
         if (!pdb->breakpoint) {
             PIO_eprintf(interp, "No breakpoints to skip\n");
             return;
@@ -1009,26 +987,20 @@ PDB_continue(Interp *interp, const char *command)
 
 /*
 
-=item C<PDB_breakpoint_t *
 PDB_find_breakpoint(Interp *interp, const char *command)>
 
 Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
 exist or if no breakpoint was specified.
 
-=cut
-
 */
 
 PDB_breakpoint_t *
-PDB_find_breakpoint(Interp *interp, const char *command)
+PDB_find_breakpoint(Interp *interp /*NN*/, const char *command /*NN*/)
 {
-    PDB_breakpoint_t *breakpoint;
-    long              n;
-
     command = nextarg(command);
     if (isdigit((int) *command)) {
-        n          = atol(command);
-        breakpoint = interp->pdb->breakpoint;
+        const long n = atol(command);
+        PDB_breakpoint_t *breakpoint = interp->pdb->breakpoint;
 
         while (breakpoint && breakpoint->id != n)
             breakpoint = breakpoint->next;
@@ -1053,19 +1025,16 @@ PDB_find_breakpoint(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_disable_breakpoint(Interp *interp, const char *command)>
+FUNCDOC: PDB_disable_breakpoint
 
 Disable a breakpoint; it can be reenabled with the enable command.
-
-=cut
 
 */
 
 void
 PDB_disable_breakpoint(Interp *interp, const char *command)
 {
-    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     /* if the breakpoint exists, disable it. */
     if (breakpoint)
@@ -1074,20 +1043,17 @@ PDB_disable_breakpoint(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_enable_breakpoint(Interp *interp, const char *command)>
+FUNCDOC: PDB_enable_breakpoint
 
 Reenable a disabled breakpoint; if the breakpoint was not disabled, has
 no effect.
-
-=cut
 
 */
 
 void
 PDB_enable_breakpoint(Interp *interp, const char *command)
 {
-    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     /* if the breakpoint exists, and it was disabled, enable it. */
     if (breakpoint && breakpoint->skip == -1)
@@ -1096,23 +1062,19 @@ PDB_enable_breakpoint(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_delete_breakpoint(Interp *interp, const char *command)>
+FUNCDOC: PDB_delete_breakpoint
 
 Delete a breakpoint.
-
-=cut
 
 */
 
 void
 PDB_delete_breakpoint(Interp *interp, const char *command)
 {
-    PDB_line_t       *line;
-    PDB_breakpoint_t *breakpoint = PDB_find_breakpoint(interp, command);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     if (breakpoint) {
-        line = interp->pdb->file->line;
+        PDB_line_t *line = interp->pdb->file->line;
 
         while (line->opcode != breakpoint->pc)
             line = line->next;
@@ -1190,12 +1152,9 @@ PDB_skip_breakpoint(Interp *interp /*NN*/, long i)
 
 /*
 
-=item C<char
-PDB_program_end(Interp *interp)>
+FUNCDOC: PDB_program_end
 
 End the program.
-
-=cut
 
 */
 
@@ -1213,23 +1172,17 @@ PDB_program_end(Interp *interp /*NN*/)
 
 /*
 
-=item C<char
-PDB_check_condition(Interp *interp, PDB_condition_t *condition)>
+FUNCDOC: PDB_check_condition
 
 Returns true if the condition was met.
-
-=cut
 
 */
 
 char
 PDB_check_condition(Interp *interp, PDB_condition_t *condition /*NN*/)
 {
-    INTVAL   i,  j;
-    FLOATVAL k,  l;
-    STRING  *m, *n;
-
     if (condition->type & PDB_cond_int) {
+        INTVAL   i,  j;
         /*
          * TODO verify register is in range
          */
@@ -1251,6 +1204,8 @@ PDB_check_condition(Interp *interp, PDB_condition_t *condition /*NN*/)
         return 0;
     }
     else if (condition->type & PDB_cond_num) {
+        FLOATVAL k,  l;
+
         k = REG_NUM(condition->reg);
 
         if (condition->type & PDB_cond_const)
@@ -1269,6 +1224,8 @@ PDB_check_condition(Interp *interp, PDB_condition_t *condition /*NN*/)
         return 0;
     }
     else if (condition->type & PDB_cond_str) {
+        STRING  *m, *n;
+
         m = REG_STR(condition->reg);
 
         if (condition->type & PDB_cond_const)
@@ -1360,11 +1317,9 @@ PDB_break(Interp *interp /*NN*/)
 
 /*
 
-=item C<char * PDB_escape(const char *string, INTVAL length)>
+FUNCDOC: PDB_escape
 
 Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
-
-=cut
 
 */
 
@@ -1426,11 +1381,9 @@ PDB_escape(const char *string, INTVAL length)
 
 /*
 
-=item C<int PDB_unescape(char *string)>
+FUNCDOC: PDB_unescape
 
 Do inplace unescape of C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
-
-=cut
 
 */
 
@@ -1444,7 +1397,7 @@ PDB_unescape(char *string)
 
         if (*string == '\\') {
             char *fill;
-            char i;
+            int i;
 
             switch (string[1]) {
                 case 'n':
@@ -1480,14 +1433,9 @@ PDB_unescape(char *string)
 
 /*
 
-=item C<size_t
-PDB_disassemble_op(Interp *interp, char *dest, int space,
-                   op_info_t *info, opcode_t *op,
-                   PDB_file_t *file, opcode_t *code_start, int full_name)>
+FUNCDOC: PDB_disassemble_op
 
 Disassembles C<op>.
-
-=cut
 
 */
 
@@ -1704,17 +1652,14 @@ PDB_disassemble_op(Interp *interp, char *dest, int space,
 
 /*
 
-=item C<void
-PDB_disassemble(Interp *interp, const char *command)>
+FUNCDOC: PDB_disassemble
 
 Disassemble the bytecode.
-
-=cut
 
 */
 
 void
-PDB_disassemble(Interp *interp, const char *command)
+PDB_disassemble(Interp *interp, SHIM(const char *command))
 {
     PDB_t       *pdb = interp->pdb;
     PDB_file_t  *pfile;
@@ -1803,19 +1748,17 @@ PDB_disassemble(Interp *interp, const char *command)
 
 /*
 
-=item C<long
-PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)>
+FUNCDOC: PDB_add_label
 
 Add a label to the label list.
-
-=cut
 
 */
 
 long
 PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 {
-    PDB_label_t *_new, *label = file->label;
+    PDB_label_t *_new;
+    PDB_label_t *label = file->label;
 
     /* See if there is already a label at this line */
     while (label) {
@@ -1847,16 +1790,14 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 
 /*
 
-=item C<void PDB_free_file(Interp *interp)>
+FUNCDOC: PDB_free_file
 
 Frees any allocated source files.
-
-=cut
 
 */
 
 void
-PDB_free_file(Interp *interp)
+PDB_free_file(Interp *interp /*NN*/)
 {
     PDB_file_t  *nfile,  *file = interp->pdb->file;
     PDB_line_t  *nline,  *line;
@@ -1899,12 +1840,9 @@ PDB_free_file(Interp *interp)
 
 /*
 
-=item C<void
-PDB_load_source(Interp *interp, const char *command)>
+FUNCDOC: PDB_load_source
 
 Load a source code file.
-
-=cut
 
 */
 
@@ -1984,7 +1922,7 @@ PDB_load_source(Interp *interp, const char *command)
 
 /*
 
-=item C<char PDB_hasinstruction(char *c)>
+FUNCDOC: PDB_hasinstruction(char *c)>
 
 Return true if the line has an instruction.
 
@@ -1999,12 +1937,10 @@ that instruction and check that is the correct one.
 
 =back
 
-=cut
-
 */
 
 char
-PDB_hasinstruction(char *c)
+PDB_hasinstruction(const char *c)
 {
     char h = 0;
 
@@ -2028,12 +1964,9 @@ PDB_hasinstruction(char *c)
 
 /*
 
-=item C<void
-PDB_list(Interp *interp, const char *command)>
+FUNCDOC: PDB_list
 
 Show lines from the source code file.
-
-=cut
 
 */
 
@@ -2110,12 +2043,9 @@ PDB_list(Interp *interp, const char *command)
 
 /*
 
-=item C<void
-PDB_eval(Interp *interp, const char *command)>
+FUNCDOC: PDB_eval
 
 C<eval>s an instruction.
-
-=cut
 
 */
 
@@ -2131,8 +2061,7 @@ PDB_eval(Interp *interp, const char *command)
 
 /*
 
-=item C<opcode_t *
-PDB_compile(Interp *interp, const char *command)>
+FUNCDOC: PDB_compile
 
 Compiles instructions with the PASM compiler.
 
@@ -2140,8 +2069,6 @@ Appends an C<end> op.
 
 This may be called from C<PDB_eval> above or from the compile opcode
 which generates a malloced string.
-
-=cut
 
 */
 
@@ -2167,12 +2094,9 @@ PDB_compile(Interp *interp, const char *command)
 
 /*
 
-=item C<int
-PDB_extend_const_table(Interp *interp)>
+FUNCDOC: PDB_extend_const_table
 
 Extend the constant table.
-
-=cut
 
 */
 
@@ -2223,12 +2147,9 @@ dump_string(Interp *interp, const STRING *s /*NULLOK*/)
 
 /*
 
-=item C<void
-PDB_print_user_stack(Interp *interp, const char *command)>
+FUNCDOC: PDB_print_user_stack
 
 Print an entry from the user stack.
-
-=cut
 
 */
 
@@ -2294,16 +2215,14 @@ PDB_print(Interp *interp /*NN*/, const char *command /*NN*/)
 
 /*
 
-=item C<void PDB_info(Interp *interp)>
+FUNCDOC: PDB_info
 
 Print the interpreter info.
-
-=cut
 
 */
 
 void
-PDB_info(Interp *interp)
+PDB_info(Interp *interp /*NN*/)
 {
     PIO_eprintf(interp, "Total memory allocated = %ld\n",
             interpinfo(interp, TOTAL_MEM_ALLOC));
@@ -2335,18 +2254,15 @@ PDB_info(Interp *interp)
 
 /*
 
-=item C<void
-PDB_help(Interp *interp, const char *command)>
+FUNCDOC: PDB_help
 
 Print the help text. "Help" with no arguments prints a list of commands.
 "Help xxx" prints information on command xxx.
 
-=cut
-
 */
 
 void
-PDB_help(Interp *interp, const char *command)
+PDB_help(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     unsigned long c;
     const char   *temp = command;
@@ -2482,12 +2398,9 @@ Type \"help\" followed by a command name for full documentation.\n\n");
 
 /*
 
-=item C<void
-PDB_backtrace(Interp *interp)>
+FUNCDOC: PDB_backtrace
 
 Prints a backtrace of the interp's call chain.
-
-=cut
 
 */
 
@@ -2656,8 +2569,6 @@ GDB_B(Interp *interp, char *s) {
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/debug.h>, F<src/pdb.c> and F<ops/debug.ops>.
@@ -2682,8 +2593,6 @@ Debug commands are mostly run inside the C<debugger>. User code
 runs of course in the C<debugee>.
 
 =back
-
-=cut
 
 */
 
