@@ -167,15 +167,28 @@ typedef struct PDB {
 
 /* HEADERIZER BEGIN: src/debug.c */
 
-long PDB_add_label( PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset );
-void PDB_backtrace( Interp *interp );
+long PDB_add_label(
+    PDB_file_t *file /*NN*/,
+    opcode_t *cur_opcode /*NN*/,
+    opcode_t offset )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void PDB_backtrace( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 char PDB_break( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-char PDB_check_condition( Interp *interp, PDB_condition_t *condition /*NN*/ )
+char PDB_check_condition( Interp *interp /*NN*/,
+    PDB_condition_t *condition /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-opcode_t * PDB_compile( Interp *interp, const char *command );
+opcode_t * PDB_compile( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PDB_condition_t * PDB_cond( Interp *interp /*NN*/,
     const char *command /*NN*/ )
         __attribute__nonnull__(1)
@@ -184,26 +197,51 @@ PDB_condition_t * PDB_cond( Interp *interp /*NN*/,
 void PDB_continue( Interp *interp /*NN*/, const char *command /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-void PDB_delete_breakpoint( Interp *interp, const char *command );
+void PDB_delete_breakpoint( Interp *interp /*NN*/,
+    const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void PDB_delete_condition( Interp *interp,
     PDB_breakpoint_t *breakpoint /*NN*/ )
         __attribute__nonnull__(2);
 
-void PDB_disable_breakpoint( Interp *interp, const char *command );
-void PDB_disassemble( Interp *interp, const char *command );
-size_t PDB_disassemble_op( Interp *interp,
-    char *dest,
-    int space,
-    op_info_t *info,
-    opcode_t *op,
-    PDB_file_t *file,
-    opcode_t *code_start,
-    int full_name );
+void PDB_disable_breakpoint( Interp *interp /*NN*/,
+    const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void PDB_enable_breakpoint( Interp *interp, const char *command );
-char * PDB_escape( const char *string, INTVAL length );
-void PDB_eval( Interp *interp, const char *command );
-int PDB_extend_const_table( Interp *interp );
+void PDB_disassemble( Interp *interp /*NN*/, const char *command )
+        __attribute__nonnull__(1);
+
+size_t PDB_disassemble_op( Interp *interp /*NN*/,
+    char *dest /*NN*/,
+    int space,
+    op_info_t *info /*NN*/,
+    opcode_t *op /*NN*/,
+    PDB_file_t *file /*NULLOK*/,
+    opcode_t *code_start /*NULLOK*/,
+    int full_name )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+void PDB_enable_breakpoint( Interp *interp /*NN*/,
+    const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+char * PDB_escape( const char *string /*NN*/, INTVAL length )
+        __attribute__nonnull__(1);
+
+void PDB_eval( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int PDB_extend_const_table( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 PDB_breakpoint_t * PDB_find_breakpoint( Interp *interp /*NN*/,
     const char *command /*NN*/ )
         __attribute__nonnull__(1)
@@ -215,7 +253,9 @@ void PDB_free_file( Interp *interp /*NN*/ )
 void PDB_get_command( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-char PDB_hasinstruction( const char *c );
+char PDB_hasinstruction( const char *c )
+        __attribute__warn_unused_result__;
+
 void PDB_help( Interp *interp /*NN*/, const char *command /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -224,8 +264,14 @@ void PDB_info( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
 void PDB_init( Interp *interp, const char *command );
-void PDB_list( Interp *interp, const char *command );
-void PDB_load_source( Interp *interp, const char *command );
+void PDB_list( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void PDB_load_source( Interp *interp /*NN*/, const char *command /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void PDB_next( Interp *interp /*NN*/, const char *command /*NULLOK*/ )
         __attribute__nonnull__(1);
 

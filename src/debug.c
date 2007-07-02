@@ -36,8 +36,13 @@ IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...);
 
 /* HEADERIZER BEGIN: static */
 
-static void dump_string( Interp *interp, const STRING *s /*NULLOK*/ );
-static int GDB_B( Interp *interp, char *s );
+static void dump_string( Interp *interp /*NN*/, const STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(1);
+
+static int GDB_B( Interp *interp /*NN*/, char *s /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static const char* GDB_P( Interp *interp, const char *s /*NN*/ )
         __attribute__nonnull__(2);
 
@@ -50,7 +55,10 @@ static const char * parse_command(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static const char * parse_int( const char *str, int *intP );
+static const char * parse_int( const char *str /*NN*/, int *intP /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static const char* parse_key( Interp *interp /*NN*/,
     const char *str /*NN*/,
     PMC **keyP /*NN*/ )
@@ -155,7 +163,7 @@ The output parameter C<intP> contains the parsed value.
 */
 
 static const char *
-parse_int(const char *str, int *intP)
+parse_int(const char *str /*NN*/, int *intP /*NN*/)
 {
     char *end;
 
@@ -1032,7 +1040,7 @@ Disable a breakpoint; it can be reenabled with the enable command.
 */
 
 void
-PDB_disable_breakpoint(Interp *interp, const char *command)
+PDB_disable_breakpoint(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1051,7 +1059,7 @@ no effect.
 */
 
 void
-PDB_enable_breakpoint(Interp *interp, const char *command)
+PDB_enable_breakpoint(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1069,7 +1077,7 @@ Delete a breakpoint.
 */
 
 void
-PDB_delete_breakpoint(Interp *interp, const char *command)
+PDB_delete_breakpoint(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1179,7 +1187,7 @@ Returns true if the condition was met.
 */
 
 char
-PDB_check_condition(Interp *interp, PDB_condition_t *condition /*NN*/)
+PDB_check_condition(Interp *interp /*NN*/, PDB_condition_t *condition /*NN*/)
 {
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
@@ -1324,7 +1332,7 @@ Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 */
 
 char *
-PDB_escape(const char *string, INTVAL length)
+PDB_escape(const char *string /*NN*/, INTVAL length)
 {
     const char *end;
     char       *_new, *fill;
@@ -1440,16 +1448,15 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(Interp *interp, char *dest, int space,
-                   op_info_t *info, opcode_t *op,
-                   PDB_file_t *file, opcode_t *code_start, int full_name)
+PDB_disassemble_op(Interp *interp /*NN*/, char *dest /*NN*/, int space,
+                   op_info_t *info /*NN*/, opcode_t *op /*NN*/,
+                   PDB_file_t *file /*NULLOK*/, opcode_t *code_start /*NULLOK*/, int full_name)
 {
-    const char *p;
     int         j;
     int         size = 0;
 
     /* Write the opcode name */
-    p     = full_name ? info->full_name : info->name;
+    const char * const p = full_name ? info->full_name : info->name;
     strcpy(dest, p);
     size += strlen(p);
 
@@ -1535,8 +1542,8 @@ PDB_disassemble_op(Interp *interp, char *dest, int space,
             if (interp->code->const_table->constants[op[j]]->
                     u.string->strlen)
             {
-                char *escaped;
-                escaped = PDB_escape(interp->code->const_table->
+                char * const escaped =
+                    PDB_escape(interp->code->const_table->
                            constants[op[j]]->u.string->strstart,
                            interp->code->const_table->
                            constants[op[j]]->u.string->strlen);
@@ -1659,7 +1666,7 @@ Disassemble the bytecode.
 */
 
 void
-PDB_disassemble(Interp *interp, SHIM(const char *command))
+PDB_disassemble(Interp *interp /*NN*/, SHIM(const char *command))
 {
     PDB_t       *pdb = interp->pdb;
     PDB_file_t  *pfile;
@@ -1755,7 +1762,7 @@ Add a label to the label list.
 */
 
 long
-PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
+PDB_add_label(PDB_file_t *file /*NN*/, opcode_t *cur_opcode /*NN*/, opcode_t offset)
 {
     PDB_label_t *_new;
     PDB_label_t *label = file->label;
@@ -1799,16 +1806,16 @@ Frees any allocated source files.
 void
 PDB_free_file(Interp *interp /*NN*/)
 {
-    PDB_file_t  *nfile,  *file = interp->pdb->file;
-    PDB_line_t  *nline,  *line;
-    PDB_label_t *nlabel, *label;
+    PDB_file_t *file = interp->pdb->file;
 
     while (file) {
         /* Free all of the allocated line structures */
-        line = file->line;
+        PDB_line_t *line = file->line;
+        PDB_label_t *label;
+        PDB_file_t  *nfile;
 
         while (line) {
-            nline = line->next;
+            PDB_line_t * const nline = line->next;
             mem_sys_free(line);
             line  = nline;
         }
@@ -1817,7 +1824,8 @@ PDB_free_file(Interp *interp /*NN*/)
         label = file->label;
 
         while (label) {
-            nlabel = label->next;
+            PDB_label_t * const nlabel = label->next;
+
             mem_sys_free(label);
             label  = nlabel;
         }
@@ -1847,7 +1855,7 @@ Load a source code file.
 */
 
 void
-PDB_load_source(Interp *interp, const char *command)
+PDB_load_source(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     FILE          *file;
     char           f[255];
@@ -1922,7 +1930,7 @@ PDB_load_source(Interp *interp, const char *command)
 
 /*
 
-FUNCDOC: PDB_hasinstruction(char *c)>
+FUNCDOC: PDB_hasinstruction
 
 Return true if the line has an instruction.
 
@@ -1941,6 +1949,7 @@ that instruction and check that is the correct one.
 
 char
 PDB_hasinstruction(const char *c)
+    /* WARN_UNUSED */
 {
     char h = 0;
 
@@ -1971,7 +1980,7 @@ Show lines from the source code file.
 */
 
 void
-PDB_list(Interp *interp, const char *command)
+PDB_list(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     char          *c;
     long           line_number;
@@ -2050,7 +2059,7 @@ C<eval>s an instruction.
 */
 
 void
-PDB_eval(Interp *interp, const char *command)
+PDB_eval(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     /* This code is almost certainly wrong. The Parrot debugger needs love. */
     opcode_t *run = PDB_compile(interp, command);
@@ -2073,7 +2082,7 @@ which generates a malloced string.
 */
 
 opcode_t *
-PDB_compile(Interp *interp, const char *command)
+PDB_compile(Interp *interp /*NN*/, const char *command /*NN*/)
 {
     STRING     *buf;
     const char *end      = "\nend\n";
@@ -2101,7 +2110,7 @@ Extend the constant table.
 */
 
 int
-PDB_extend_const_table(Interp *interp)
+PDB_extend_const_table(Interp *interp /*NN*/)
 {
     int k = ++interp->code->const_table->const_count;
 
@@ -2131,7 +2140,7 @@ and the string itself.
 */
 
 static void
-dump_string(Interp *interp, const STRING *s /*NULLOK*/)
+dump_string(Interp *interp /*NN*/, const STRING *s /*NULLOK*/)
 {
     if (!s)
         return;
@@ -2158,7 +2167,7 @@ PDB_print_user_stack(Interp *interp, const char *command)
 {
     Stack_Entry_t *entry;
     long           depth = 0;
-    Stack_Chunk_t *chunk = CONTEXT(interp->ctx)->user_stack;
+    Stack_Chunk_t * const chunk = CONTEXT(interp->ctx)->user_stack;
 
     command = nextarg(command);
     if (*command)
@@ -2405,7 +2414,7 @@ Prints a backtrace of the interp's call chain.
 */
 
 void
-PDB_backtrace(Interp *interp)
+PDB_backtrace(Interp *interp /*NN*/)
 {
     STRING           *str;
     PMC              *old       = PMCNULL;
@@ -2523,7 +2532,7 @@ static PDB_breakpoint_t *gdb_bps;
  *
  */
 static int
-GDB_B(Interp *interp, char *s) {
+GDB_B(Interp *interp /*NN*/, char *s /*NN*/) {
     int               nr;
     opcode_t         *pc;
     PDB_breakpoint_t *bp, *newbreak;
