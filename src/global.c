@@ -23,7 +23,7 @@ tdb
 #include "parrot/parrot.h"
 #include "global.str"
 
-/* HEADERIZER TARGET: none */ /* XXX It's really include/parrot/global.h, but not yet */
+/* HEADERIZER HFILE: none */ /* XXX It's really include/parrot/global.h, but not yet */
 /* HEADERIZER BEGIN: static */
 
 static PMC * get_namespace_pmc( Parrot_Interp interp, PMC *sub );

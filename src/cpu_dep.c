@@ -24,7 +24,7 @@ Remember you read something about it in F<docs/infant.dev>?
 
 #include "parrot/parrot.h"
 
-/* HEADERIZER TARGET: include/parrot/dod.h */
+/* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
 

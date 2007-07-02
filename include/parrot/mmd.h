@@ -184,11 +184,6 @@ void mmd_dispatch_v_pi( Interp *interp /*NN*/,
 
 /* HEADERIZER END: src/mmd.c */
 
-/*
- * in src/objects.c :
- */
-PARROT_API const char* Parrot_MMD_method_name(Interp* i, INTVAL idx);
-PARROT_API INTVAL Parrot_MMD_method_idx(Interp *interp, const char *name);
 
 #endif /* PARROT_MMD_H_GUARD */
 

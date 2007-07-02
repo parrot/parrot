@@ -60,7 +60,7 @@ my $header = <<"HEADER";
  *  References:
  */
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 HEADER
 

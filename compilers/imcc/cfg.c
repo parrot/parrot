@@ -14,7 +14,7 @@
 #include "imc.h"
 #include "optimizer.h"
 
-/* HEADERIZER TARGET: compilers/imcc/cfg.h */
+/* HEADERIZER HFILE: compilers/imcc/cfg.h */
 
 /* HEADERIZER BEGIN: static */
 

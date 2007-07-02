@@ -11,7 +11,7 @@
 #include "pbc.h"
 #include "optimizer.h"
 
-/* HEADERIZER TARGET: compilers/imcc/optimizer.h */
+/* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 
 
 /*

@@ -132,7 +132,7 @@ Of course, a check for valid pointers could be added here.
 
 #include "parrot/parrot.h"
 
-/* HEADERIZER TARGET: include/parrot/intlist.h */
+/* HEADERIZER HFILE: include/parrot/intlist.h */
 
 /*
 

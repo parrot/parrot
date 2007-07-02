@@ -25,7 +25,7 @@ structure of the frozen bytecode.
 #include "parrot/packfile.h"
 #include "jit.h"
 
-/* HEADERIZER TARGET: include/parrot/packfile.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
 

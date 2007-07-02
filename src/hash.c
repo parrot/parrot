@@ -32,7 +32,7 @@ don't apply.
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                              (n) * sizeof (HashBucket *))
 
-/* HEADERIZER TARGET: include/parrot/hash.h */
+/* HEADERIZER HFILE: include/parrot/hash.h */
 
 /* HEADERIZER BEGIN: static */
 

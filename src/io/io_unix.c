@@ -39,7 +39,7 @@ ParrotIOLayer pio_unix_layer = {
     0, 0
 };
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 

@@ -15,7 +15,7 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
-/* HEADERIZER TARGET: include/parrot/dynext.h */
+/* HEADERIZER HFILE: include/parrot/dynext.h */
 
 /* HEADERIZER BEGIN: static */
 

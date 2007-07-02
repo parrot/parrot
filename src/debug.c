@@ -36,7 +36,7 @@ void
 IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...);
 
 
-/* HEADERIZER TARGET: include/parrot/debug.h */
+/* HEADERIZER HFILE: include/parrot/debug.h */
 
 /* HEADERIZER BEGIN: static */
 

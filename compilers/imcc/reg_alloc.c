@@ -19,7 +19,7 @@
 #include "imc.h"
 #include "optimizer.h"
 
-/* HEADERIZER TARGET: compilers/imcc/imc.h */
+/* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
 

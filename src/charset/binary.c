@@ -20,7 +20,7 @@ This file implements the charset functions for binary data
 #include "ascii.h"
 #include "binary.h"
 
-/* HEADERIZER TARGET: src/charset/binary.h */
+/* HEADERIZER HFILE: src/charset/binary.h */
 
 /* HEADERIZER BEGIN: static */
 

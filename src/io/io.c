@@ -30,7 +30,7 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 #include <stdarg.h>
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/io.h */
+/* HEADERIZER HFILE: include/parrot/io.h */
 
 /* This is list of valid layers */
 ParrotIOLayer **pio_registered_layers = NULL;

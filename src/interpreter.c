@@ -46,7 +46,7 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/dynext.h"
 
 
-/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER HFILE: none */ /* XXX Needs to get done at the same time as the other interpreter files */
 
 /* HEADERIZER BEGIN: static */
 

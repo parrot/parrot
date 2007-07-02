@@ -181,7 +181,7 @@ Also all array usage depends on list.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/list.h */
+/* HEADERIZER HFILE: include/parrot/list.h */
 
 /* HEADERIZER BEGIN: static */
 

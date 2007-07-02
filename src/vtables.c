@@ -15,7 +15,7 @@ src/vtables.c - Functions to build and manipulate vtables
 #include "parrot/parrot.h"
 #include "parrot/vtables.h"
 
-/* HEADERIZER TARGET: include/parrot/vtables.h */
+/* HEADERIZER HFILE: include/parrot/vtables.h */
 
 /*
 

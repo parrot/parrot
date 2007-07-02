@@ -31,7 +31,7 @@ TODO:
 #include "parrot/oplib/ops.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/pic.h */
+/* HEADERIZER HFILE: include/parrot/pic.h */
 
 /* HEADERIZER BEGIN: static */
 

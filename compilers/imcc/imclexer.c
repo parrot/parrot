@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* end standard C headers. */
 

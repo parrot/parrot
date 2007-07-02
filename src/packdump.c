@@ -19,7 +19,7 @@ This is only used by the PBC dumper C<pdump>.
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 
-/* HEADERIZER TARGET: include/parrot/packfile.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
 

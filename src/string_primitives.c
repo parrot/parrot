@@ -15,7 +15,7 @@ API.
 
 */
 
-/* HEADERIZER TARGET: include/parrot/string_funcs.h */
+/* HEADERIZER HFILE: include/parrot/string_funcs.h */
 
 #include "parrot/parrot.h"
 #if PARROT_HAS_ICU

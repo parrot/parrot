@@ -28,7 +28,7 @@ will be copied to the new instance.
 #include "parrot/io.h"
 #include "io_private.h"
 
-/* HEADERIZER TARGET: include/parrot/io.h */
+/* HEADERIZER HFILE: include/parrot/io.h */
 
 PARROT_API
 ParrotIOLayer *

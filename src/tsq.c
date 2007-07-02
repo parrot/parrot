@@ -15,7 +15,7 @@ src/tsq.c - Thread-safe queues
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/tsq.h */
+/* HEADERIZER HFILE: include/parrot/tsq.h */
 
 /*
 

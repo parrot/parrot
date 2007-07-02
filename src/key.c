@@ -17,7 +17,7 @@ The base vtable calling functions.
 #include "parrot/parrot.h"
 #include "parrot/key.h"
 
-/* HEADERIZER TARGET: include/parrot/key.h */
+/* HEADERIZER HFILE: include/parrot/key.h */
 
 /*
 

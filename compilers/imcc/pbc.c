@@ -7,7 +7,7 @@
 #include "pbc.h"
 #include "parrot/packfile.h"
 
-/* HEADERIZER TARGET: compilers/imcc/pbc.h */
+/* HEADERIZER HFILE: compilers/imcc/pbc.h */
 
 /*
  * pbc.c

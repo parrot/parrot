@@ -21,7 +21,7 @@ Capture output to a string PMC.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 

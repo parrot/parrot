@@ -14,7 +14,7 @@
 /* Globals: */
 /* Code: */
 
-/* HEADERIZER TARGET: compilers/imcc/symreg.h */
+/* HEADERIZER HFILE: compilers/imcc/symreg.h */
 
 /* HEADERIZER BEGIN: static */
 

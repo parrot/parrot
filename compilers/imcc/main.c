@@ -21,7 +21,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 

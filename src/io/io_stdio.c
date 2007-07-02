@@ -25,7 +25,7 @@ Win32), this is I<buffered> IO, out of necessity.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
 static const char * flags_to_stdio( INTVAL flags )

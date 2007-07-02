@@ -34,7 +34,7 @@ typedef struct parrot_prm_context {
     void *info;
 } parrot_prm_context;
 
-/* HEADERIZER TARGET: include/parrot/misc.h */
+/* HEADERIZER HFILE: include/parrot/misc.h */
 /* HEADERIZER BEGIN: static */
 
 static FLOATVAL _drand48( void );

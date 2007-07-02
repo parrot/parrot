@@ -25,7 +25,7 @@ There's also a verbose mode for garbage collection.
 #include "parrot/dod.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/dod.h */
+/* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
 

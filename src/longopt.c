@@ -17,7 +17,7 @@ This is used by C<parrot>.
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
 
-/* HEADERIZER TARGET: include/parrot/longopt.h */
+/* HEADERIZER HFILE: include/parrot/longopt.h */
 
 /* HEADERIZER BEGIN: static */
 

@@ -31,7 +31,7 @@ Win32 System Programming, 2nd Edition.
 
 #ifdef PIO_OS_WIN32
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
 static INTVAL flags_to_win32(

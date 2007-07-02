@@ -25,7 +25,7 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
 
-/* HEADERIZER TARGET: include/parrot/inter_call.h */
+/* HEADERIZER HFILE: include/parrot/inter_call.h */
 
 /* HEADERIZER BEGIN: static */
 

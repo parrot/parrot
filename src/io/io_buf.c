@@ -22,7 +22,7 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 #include "io_private.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
 static INTVAL PIO_buf_close( Interp *interp,

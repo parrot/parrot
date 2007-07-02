@@ -118,7 +118,7 @@ typedef struct Gc_gms_private {
     UINTVAL current_gen_no;             /* the nursery generation number */
 } Gc_gms_private;
 
-/* HEADERIZER TARGET: include/parrot/dod.h */
+/* HEADERIZER HFILE: include/parrot/dod.h */
 
 /* HEADERIZER BEGIN: static */
 

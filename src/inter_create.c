@@ -24,7 +24,7 @@ Create or destroy a Parrot interpreter
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 
-/* HEADERIZER TARGET: none */ /* XXX Headerize this at the same time as the other interpreter files */
+/* HEADERIZER HFILE: none */ /* XXX Headerize this at the same time as the other interpreter files */
 
 #if EXEC_CAPABLE
 Interp interpre;

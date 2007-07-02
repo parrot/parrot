@@ -78,7 +78,7 @@ static Builtins builtins[] = {
      */
 };
 
-/* HEADERIZER TARGET: include/parrot/builtin.h */
+/* HEADERIZER HFILE: include/parrot/builtin.h */
 
 /* HEADERIZER BEGIN: static */
 

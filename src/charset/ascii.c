@@ -32,7 +32,7 @@ charset functionality for similar charsets like iso-8859-1.
 
 #include "tables.h"
 
-/* HEADERIZER TARGET: src/charset/ascii.h */
+/* HEADERIZER HFILE: src/charset/ascii.h */
 
 /* HEADERIZER BEGIN: static */
 

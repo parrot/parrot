@@ -2,7 +2,7 @@
 #include "imc.h"
 #include "sets.h"
 
-/* HEADERIZER TARGET: compilers/imcc/sets.h */
+/* HEADERIZER HFILE: compilers/imcc/sets.h */
 
 /* XXX */
 #define fatal(e, s1, s2) do { \

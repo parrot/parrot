@@ -48,7 +48,7 @@ typedef struct pbc_merge_input {
                              one. */
 } pbc_merge_input;
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 

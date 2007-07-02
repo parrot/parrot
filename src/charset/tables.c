@@ -13,7 +13,7 @@
  *  References:
  */
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 
 #include "tables.h"

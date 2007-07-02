@@ -33,7 +33,7 @@ on the command line.
 
 =head1 NOTES
 
-* the .c files MUST have a /* HEADERIZER TARGET: foo/bar.h */ directive in them
+* the .c files MUST have a /* HEADERIZER HFILE: foo/bar.h */ directive in them
 
 * Support for multiple .c files pointing at the same .h file
 
@@ -287,8 +287,8 @@ sub main {
 
         my $source = read_file( $cfile );
 
-        die "can't find HEADERIZER TARGET directive in '$cfile'"
-            unless $source =~ m#/\*\s+HEADERIZER TARGET:\s+([^*]+?)\s+\*/#s;
+        die "can't find HEADERIZER HFILE directive in '$cfile'"
+            unless $source =~ m#/\*\s+HEADERIZER HFILE:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
 
         if ( ($hfile ne 'none') && (not -f $hfile) ) {
@@ -419,15 +419,15 @@ Marks the beginning and end of a block of declarations in a header file.
     /* HEADERIZER BEGIN: src/bar.c */
     /* HEADERIZER END: src/bar.c */
 
-=item HEADERIZER TARGET: F<header-filename>
+=item HEADERIZER HFILE: F<header-filename>
 
 Tells the headerizer where the declarations for the functions should go
 
     # In file foo.c
-    /* HEADERIZER TARGET: foo.h */
+    /* HEADERIZER HFILE: foo.h */
 
     # In file bar.c
-    /* HEADERIZER TARGET: foo.h */
+    /* HEADERIZER HFILE: foo.h */
 
 =cut
 

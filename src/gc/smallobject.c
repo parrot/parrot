@@ -18,7 +18,7 @@ Handles the accessing of small object pools (header pools).
 #include "parrot/smallobject.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/smallobject.h */
+/* HEADERIZER HFILE: include/parrot/smallobject.h */
 
 /* HEADERIZER BEGIN: static */
 

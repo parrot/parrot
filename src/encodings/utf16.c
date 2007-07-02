@@ -17,7 +17,7 @@ UTF-16 encoding with the help of the ICU library.
 #include "parrot/parrot.h"
 #include "../unicode.h"
 
-/* HEADERIZER TARGET: src/encodings/utf16.h */
+/* HEADERIZER HFILE: src/encodings/utf16.h */
 
 /* HEADERIZER BEGIN: static */
 

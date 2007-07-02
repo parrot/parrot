@@ -21,7 +21,7 @@ dispatches these to one or all interpreters.
 #include "parrot/events.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/events.h */
+/* HEADERIZER HFILE: include/parrot/events.h */
 /* HEADERIZER NONE: static */
 
 /*

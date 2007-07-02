@@ -47,7 +47,7 @@ strings.
     assert(s->charset); \
     assert(!PObj_on_free_list_TEST(s))
 
-/* HEADERIZER TARGET: include/parrot/string_funcs.h */
+/* HEADERIZER HFILE: include/parrot/string_funcs.h */
 
 /* HEADERIZER BEGIN: static */
 

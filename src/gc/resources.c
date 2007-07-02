@@ -27,7 +27,7 @@ src/resources.c - Allocate and deallocate tracked resources
 
 typedef void (*compact_f) (Interp *, Memory_Pool *);
 
-/* HEADERIZER TARGET: include/parrot/resources.h */
+/* HEADERIZER HFILE: include/parrot/resources.h */
 
 /* HEADERIZER BEGIN: static */
 

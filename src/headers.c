@@ -16,7 +16,7 @@ Handles getting of various headers, and pool creation.
 #include "parrot/headers.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/headers.h */
+/* HEADERIZER HFILE: include/parrot/headers.h */
 
 /* HEADERIZER BEGIN: static */
 

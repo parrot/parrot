@@ -29,7 +29,7 @@ the C-library.
 #include "inter_cb.str"
 
 
-/* HEADERIZER TARGET: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER HFILE: none */ /* XXX Needs to get done at the same time as the other interpreter files */
 
 /*
 

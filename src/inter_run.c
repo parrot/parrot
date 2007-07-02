@@ -19,7 +19,7 @@ Various functions that call the run loop.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADERIZER TARGET: include/parrot/interpreter.h */
+/* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: static */
 

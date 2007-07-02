@@ -29,7 +29,7 @@ static Instruction * last_ins;
 int n_comp_units;
 #endif
 
-/* HEADERIZER TARGET: compilers/imcc/instructions.h */
+/* HEADERIZER HFILE: compilers/imcc/instructions.h */
 
 /* HEADERIZER BEGIN: static */
 

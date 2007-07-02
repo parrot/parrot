@@ -58,7 +58,7 @@ the context.  If no type is registered, returns C<core_type>.
 #include "parrot/dynext.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/hll.h */
+/* HEADERIZER HFILE: include/parrot/hll.h */
 
 /* HEADERIZER BEGIN: static */
 

@@ -22,7 +22,7 @@ and its utility functions.
 #include "spf_render.str"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/misc.h */
+/* HEADERIZER HFILE: include/parrot/misc.h */
 
 /* HEADERIZER BEGIN: static */
 

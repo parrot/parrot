@@ -104,7 +104,7 @@ extern void Parrot_Integer_i_subtract_Integer(Interp* , PMC* pmc, PMC* value);
 
 #define ENABLE_INLINING 0
 
-/* HEADERIZER TARGET: include/parrot/pic.h */
+/* HEADERIZER HFILE: include/parrot/pic.h */
 
 /* HEADERIZER BEGIN: static */
 

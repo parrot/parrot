@@ -28,7 +28,7 @@ C<opcode_t> units.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* HEADERIZER TARGET: include/parrot/packfile.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 
 /* HEADERIZER BEGIN: static */
 

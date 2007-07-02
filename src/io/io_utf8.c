@@ -19,7 +19,7 @@ representation.
 #include "io_private.h"
 #include "../unicode.h"
 
-/* HEADERIZER TARGET: none */
+/* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 

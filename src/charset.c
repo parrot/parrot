@@ -54,7 +54,7 @@ typedef struct All_charsets {
 
 static All_charsets *all_charsets;
 
-/* HEADERIZER TARGET: include/parrot/charset.h */
+/* HEADERIZER HFILE: include/parrot/charset.h */
 
 /* HEADERIZER BEGIN: static */
 

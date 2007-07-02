@@ -21,7 +21,7 @@ Handles class and object manipulation.
 
 #include "objects.str"
 
-/* HEADERIZER TARGET: include/parrot/objects.h */
+/* HEADERIZER HFILE: include/parrot/objects.h */
 
 /* HEADERIZER BEGIN: static */
 
@@ -413,8 +413,6 @@ create_deleg_pmc_vtable(Interp *interp /*NN*/, PMC *_class /*NN*/, int full)
     }
 }
 
-
-/* HEADERIZER TARGET: include/parrot/mmd.h */
 
 /*
 

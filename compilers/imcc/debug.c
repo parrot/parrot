@@ -10,7 +10,7 @@
 
 #include "imc.h"
 
-/* HEADERIZER TARGET: compilers/imcc/debug.h */
+/* HEADERIZER HFILE: compilers/imcc/debug.h */
 
 PARROT_API
 void

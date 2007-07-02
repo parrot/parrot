@@ -15,7 +15,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 #include "parrot/parrot.h"
 #include "fixed_8.h"
 
-/* HEADERIZER TARGET: src/encodings/fixed_8.h */
+/* HEADERIZER HFILE: src/encodings/fixed_8.h */
 
 /* HEADERIZER BEGIN: static */
 
