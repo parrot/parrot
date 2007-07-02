@@ -122,7 +122,7 @@ pmclass DotNetSignature dynpmc group dotnet {
             sig->cur_pos++;
         }
 
-        /* Is it a 2 byte interger (top bits 10)? */
+        /* Is it a 2 byte integer (top bits 10)? */
         else if ((b1 & 0x80) != 0 && (b1 & 0x40) == 0)
         {
             /* Check we can read 2 bytes. */
