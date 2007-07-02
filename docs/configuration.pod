@@ -69,9 +69,9 @@ I<generation step>. Generation steps should be in the F<config/gen> folder.
 
 Generation steps usually do not output anything under normal circumstances.
 
-Templates for to be generated files usually have the extension '.in'.  There is
-variable substitutes and funny macros like 'CONDITIONED_LINE' and
-INVERSE_CONDITIONED_LINE'.
+Templates for files to be generated usually have the extension F<.in>.  There
+are variable substitutes and funny macros like 'CONDITIONED_LINE' and
+'INVERSE_CONDITIONED_LINE'.
 
 =head2 Prompt or Probe?
 
@@ -149,10 +149,10 @@ this method.
 =item L<runstep>
 
 This method is called to actually execute the step.  The global
-L<Parrot::Configure> is passed is as the first parameter.  The return value is
+L<Parrot::Configure> is passed in as the first parameter.  The return value is
 undefined.
 
-I<XXX> In the near future the return value of this method will be signifigant
+I<XXX> In the near future the return value of this method will be significant
 and there will be a means of passing additional parameters.
 
 =back
