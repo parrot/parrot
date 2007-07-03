@@ -41,14 +41,12 @@
 #define Parrot_is_blocked_GC(interp) \
         ((interp)->arena_base->GC_block_level)
 
-enum {
-    DOD_trace_stack_FLAG = 1 << 0,      /* trace system areads and stack */
-    DOD_trace_normal     = 1 << 0,      /* the same */
-    DOD_lazy_FLAG        = 1 << 1,      /* timely destruction run */
-    DOD_finish_FLAG      = 1 << 2,      /* run async past sweep */
-    DOD_no_trace_volatile_roots = 1 << 3  /* trace all but volatile root
-                                             set, i.e. registers */
-};
+#define DOD_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areads and stack */
+#define DOD_trace_normal        (UINTVAL)(1 << 0)   /* the same */
+#define DOD_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
+#define DOD_finish_FLAG         (UINTVAL)(1 << 2)   /* run async past sweep */
+#define DOD_no_trace_volatile_roots (UINTVAL)(1 << 3)
+            /* trace all but volatile root set, i.e. registers */
 
 /* HEADERIZER BEGIN: src/gc/dod.c */
 
