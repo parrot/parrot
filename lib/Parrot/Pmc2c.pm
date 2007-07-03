@@ -48,7 +48,7 @@ C<$opt> is a hash reference.
 =cut
 
 my %special_class_name =
-    map { ( $_, 1 ) } qw( STMRef Ref default Null delegate SharedRef deleg_pmc );
+    map { ( $_, 1 ) } qw( STMRef Ref default Null delegate SharedRef deleg_pmc Object );
 
 sub new {
     my ( $this, $self, $options ) = @_;
@@ -1249,6 +1249,7 @@ require Parrot::Pmc2c::Standard;
 require Parrot::Pmc2c::StandardConst;
 require Parrot::Pmc2c::StandardRO;
 require Parrot::Pmc2c::StmRef;
+require Parrot::Pmc2c::Object;
 
 1;
 

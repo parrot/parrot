@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -170,7 +170,7 @@ ok 3 - added Hash's PMCProxy as a parent of the PDD15 class
 ok 4 - instantiated the class
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'can call non-vtable methods of the PMC' );
+pir_output_is( <<'CODE', <<'OUT', 'can call and override non-vtable methods of the PMC' );
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"
@@ -206,6 +206,54 @@ ok 4 - instantiated the class
 ok 5 - called the add_attribute method of the PMC parent
 No, you can't add a role!
 ok 6 - overridden add_role method called
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'can call and override vtable methods of the PMC' );
+.sub 'test' :main
+    $P0 = new 'Class'
+    print "ok 1 - created a PDD15 class\n"
+    
+    $P1 = get_class 'Class'
+    print "ok 2 - got the PMCProxy for Class\n"
+    
+    addparent $P0, $P1
+    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+
+    # We will override the add_role vtable method.
+    $P2 = find_global 'no_add_role'
+    $P0.'add_method'('add_role', $P2, 'vtable' => 1)
+    print "ok 4 - overridden a vtable method\n"
+
+    $P2 = $P0.'new'()
+    print "ok 5 - instantiated the class\n"
+
+    addattribute $P2, 'foo'
+    print "ok 6 - called the add_attribute v-table method of the PMC parent\n"
+
+    $P3 = inspect $P2, "attributes"
+    $I0 = elements $P3
+    if $I0 == 1 goto ok_7
+    print "not "
+ok_7:
+    print "ok 7 - the attribute was actually added\n"
+
+    $P3 = new 'Role'
+    addrole $P2, $P3
+    print "ok 8 - overridden add_role v-table method called\n"
+.end
+.sub no_add_role
+    print "No, you can't add a role by v-table either!\n"
+.end
+CODE
+ok 1 - created a PDD15 class
+ok 2 - got the PMCProxy for Class
+ok 3 - added Class's PMCProxy as a parent of the PDD15 class
+ok 4 - overridden a vtable method
+ok 5 - instantiated the class
+ok 6 - called the add_attribute v-table method of the PMC parent
+ok 7 - the attribute was actually added
+No, you can't add a role by v-table either!
+ok 8 - overridden add_role v-table method called
 OUT
 
 # Local Variables:
