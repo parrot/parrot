@@ -77,6 +77,7 @@ All PMCs have the form:
     struct PMC {
         pobj_t obj;
         VTABLE *vtable;
+        PMC *real_self;
  #if ! PMC_DATA_IN_EXT
         DPOINTER *data;
  #endif
@@ -120,6 +121,15 @@ C<vtable> holds a pointer to the B<vtable> associated with the PMC. This points
 to a set of functions, with interfaces described in
 L<Vtable Functions> that implement the basic behaviour of the PMC
 (i.e. how it behaves under addition, subtraction, cloning etc.)
+
+{{ PROPOSED:
+C<real_self> holds a pointer to the PMC that dynamically dispatched method
+calls should be made on. Normally this will be a pointer directly back to the
+PMC itself. However, in the case that the PMC has been subclassed by a non-PMC
+it will hold a pointer to the real object. This is so DYNSELF.method() style
+calls will dispatch correctly, calling any methods and/or v-table methods that
+have been overridden in PIR.
+}}
 
 C<data> (if present) holds a pointer to any additional data associated  with
 the PMC. This may be NULL.
@@ -1023,6 +1033,60 @@ generate methods on the fly?]
 
 {{ Address the problem of high-level objects inheriting from low-level PMCs,
 and any structural changes to low-level PMCs that might require. }}
+
+{{ PROPOSED:
+
+High-level objects, as specified in PDD15, need to be able to inherit from
+PMCs. This is achieved through the combination of a C<PMCProxy> PMC and
+delegation.
+
+For PDD15 objects, there is a corresponding instance of the C<Class> PMC. For
+a PMC, however, the class definition is written in C and compiled away. There
+needs to be something that can be placed in the parents list for a PDD15
+class. That something is the C<PMCProxy> PMC. Like a PDD15 class, it is
+attached to the namespace that a PMC is attached to, provides introspection
+facilities and can sit in an inheritance hierarchy.
+
+Therefore, subclassing a PMC looks, at a PIR level, like subclassing a high
+level class.
+
+  $P0 = get_class 'Hash'
+  $P1 = new 'Class'
+  addparent $P1, $P0     # The new class inherits from the Hash PMC
+
+PMCs store state in a very different way to PDD15 objects. When a method
+inherited from a PMC is called on a PDD15 object, that method needs to get
+a chunk of state that it can use as it wishes. Further to this, if multiple
+PMCs are inherited from, they may use the state in different ways. Users of
+Parrot at a PIR level should not have to care about such issues.
+
+Therefore, when a PDD15 object is instantiated and it inherits from PMCs, an
+instance of each of the PMCs that it inherits from is also created. These are
+stored at the end of the object's attributes store.
+
+When a method is called on an object whose class has PMC parents, the call is
+delegated up to each of the PMC parents, in MRO order. The invocant must be
+the appropriate PMC instance from the object's attribute store. For v-table
+calls, this is just a case of passing the correct thing. For other methods
+that are located by C<find_method>, a C<Bound_NCI> PMC is used to ensure that
+the method from the PMC is invoked with the correct instance, so it has access
+to the correct state.
+
+When a PMC calls a method on itself, it may have been overridden in a high
+level class. Therefore dynamic dispatches of method calls need to be done with
+the vtable of the high level class, not the vtable of the PMC itself.
+
+For PMCs that are instantiated and not overridden, the C<real_self> pointer in
+the PMC structure is a reference to the PMC instance itself. If, however, it
+is just acting to provide the state a PMC needs but is not the real instance,
+this pointer will point to the instance of the high level class (an instance
+of the C<Object> PMC). Method dispatches using C<DYNSELF> will always go
+through this mechanism.
+
+Attribute access is, like method access, delegated upwards. Since attribute
+lookup is a vtable method, the down case is covered by the previous paragraph.
+
+}}
 
 If a low-level PMC expects to be overridden by high-level classes (which means
 all the core low-level PMC types), it must respect a standard interface. It
