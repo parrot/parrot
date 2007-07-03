@@ -1992,6 +1992,7 @@ HEADERIZER_O_FILES = \
     src/pic_jit.o \
     src/pic.o \
     src/pmc.o \
+    src/pmc_freeze.o \
     src/spf_render.o \
     src/stack_common.o \
     src/stacks.o \

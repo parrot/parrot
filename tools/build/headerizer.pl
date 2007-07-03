@@ -129,8 +129,14 @@ sub function_components_from_declaration {
     my @lines = split( /\n/, $proto );
     chomp @lines;
     my $parrot_api;
+    my $parrot_inline;
     if ( $lines[0] eq 'PARROT_API' ) {
         $parrot_api = 1;
+        shift @lines;
+    }
+
+    if ( $lines[0] eq 'PARROT_INLINE' ) {
+        $parrot_inline = 1;
         shift @lines;
     }
 
@@ -145,6 +151,8 @@ sub function_components_from_declaration {
     $parms = $2;
     my $funcflags = $4;
 
+    die "Can't have both PARROT_API and PARROT_INLINE on $funcname\n" if $parrot_inline && $parrot_api;
+
     my @parms = split( /\s*,\s*/, $parms );
     for (@parms) {
         s/SHIM_INTERP/SHIM(Interp *interp)/;
@@ -156,12 +164,9 @@ sub function_components_from_declaration {
     my $is_static = 0;
     $is_static = $2 if $returntype =~ s/^((static)\s+)?//i;
 
-    # No inline in the header file
-    $returntype =~ s/^PARROT_INLINE\s+//;
-
     die "Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
 
-    return ( $is_static, $parrot_api, $returntype, $funcname, $funcflags, @parms );
+    return ( $is_static, $parrot_inline, $parrot_api, $returntype, $funcname, $funcflags, @parms );
 }
 
 sub attrs_from_args {
@@ -220,13 +225,15 @@ sub make_function_decls {
 
     my @decls;
     foreach my $func ( @funcs ) {
-        my ($is_static, $parrot_api, $ret_type, $funcname, $funcflags, @args) = @{$func};
+        my ($is_static, $parrot_inline, $parrot_api, $ret_type, $funcname, $funcflags, @args) = @{$func};
 
         my $multiline = 0;
 
         my $decl = sprintf( "%s %s(", $ret_type, $funcname );
         $decl = "PARROT_API $decl" if $parrot_api;
         $decl = "static $decl" if $is_static;
+
+        $decl = "PARROT_INLINE $decl" if $parrot_inline;
 
         my @attrs = attrs_from_args( @args );
         push( @attrs, attrs_from_funcflags( $funcflags ) );
@@ -381,9 +388,9 @@ sub replace_headerized_declarations {
 
 sub api_first_then_alpha {
     return
-        ( ($b->[1]||0) <=> ($a->[1]||0) )
+        ( ($b->[2]||0) <=> ($a->[2]||0) )
             ||
-        ( lc $a->[3] cmp lc $b->[3] )
+        ( lc $a->[4] cmp lc $b->[4] )
     ;
 }
 
