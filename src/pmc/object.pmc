@@ -181,11 +181,53 @@ Queries this object's class to find the method with the given name.
 
 */
     PMC* find_method(STRING *name) {
+        Parrot_Object * const obj = PARROT_OBJECT(SELF);
+        Parrot_Class * const _class = PARROT_CLASS(obj->_class);
         PMC *method;
 
-        Parrot_PCCINVOKE(interp, PARROT_OBJECT(SELF)->_class,
-            string_from_cstring(interp, "find_method", 11), "S->P", name,
-            &method);
+        /* Walk and search. One day, we'll use the cache first. */
+        int num_classes = VTABLE_elements(interp, _class->all_parents);
+        int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
+        int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
+        int i;
+        for (i = 0; i < num_classes; i++) {
+            /* Get the class. */
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            
+            /* If it's from this universe or the class doesn't inherit from
+             * anything outside of it... */
+            if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
+                const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
+                if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
+                    /* Found it! */
+                    method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
+                    break;
+                }
+            }
+            else {
+                /* Delegate the lookup to the class. */
+                PMC *del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
+                    alien_parents_pos);
+                method = VTABLE_find_method(interp, del_class, name);
+                
+                if (!PMC_IS_NULL(method)) {
+                    /* Found it. However, if we just hand this back and it's
+                     * an NCI and we call it, we will get the wrong invocant
+                     * passed. Therefore, we need to close the NCI and make it
+                     * into a BoundNCI. */
+                    if (method->vtable->base_type == enum_class_NCI) {
+                        method = VTABLE_clone(interp, method);
+                        method->vtable = interp->vtables[enum_class_Bound_NCI];
+                        VTABLE_set_pmc(interp, method, del_class);
+                    }
+
+                    /* Found a method, so we're done. */
+                    break;
+                }
+                
+                alien_parents_pos++;
+            }
+        }
 
         return method;
     }

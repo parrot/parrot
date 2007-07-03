@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -168,6 +168,44 @@ ok 1 - created a PDD15 class
 ok 2 - got the PMCProxy for Hash
 ok 3 - added Hash's PMCProxy as a parent of the PDD15 class
 ok 4 - instantiated the class
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'can call non-vtable methods of the PMC' );
+.sub 'test' :main
+    $P0 = new 'Class'
+    print "ok 1 - created a PDD15 class\n"
+    
+    $P1 = get_class 'Class'
+    print "ok 2 - got the PMCProxy for Class\n"
+    
+    addparent $P0, $P1
+    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+
+    # We'll override the add_role method.
+    $P2 = find_global 'no_add_role'
+    $P0.'add_method'('add_role', $P2)
+
+    $P2 = $P0.'new'()
+    print "ok 4 - instantiated the class\n"
+
+    $P2.'add_attribute'('foo')
+    print "ok 5 - called the add_attribute method of the PMC parent\n"
+
+    $P3 = new 'Role'
+    $P2.'add_role'($P3)
+    print "ok 6 - overridden add_role method called\n"
+.end
+.sub no_add_role
+    print "No, you can't add a role!\n"
+.end
+CODE
+ok 1 - created a PDD15 class
+ok 2 - got the PMCProxy for Class
+ok 3 - added Class's PMCProxy as a parent of the PDD15 class
+ok 4 - instantiated the class
+ok 5 - called the add_attribute method of the PMC parent
+No, you can't add a role!
+ok 6 - overridden add_role method called
 OUT
 
 # Local Variables:
