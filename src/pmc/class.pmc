@@ -84,6 +84,7 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 
 */
 
+#define PARROT_IN_OBJECTS_C /* To get the vtable.h imports we want. */
 #include "parrot/parrot.h"
 #include "pmc_namespace.h"
 #include "classobject.h"
@@ -1151,9 +1152,37 @@ C<add_method> vtable method.
 =cut
 
 */
-    PCCMETHOD void add_method(STRING *name, PMC *sub)
+    PCCMETHOD void add_method(STRING *name, PMC *sub,
+                              int vtable :optional :named["vtable"],
+                              int got_vtable :opt_flag,
+                              int anon :optional :named["anon"],
+                              int got_anon :opt_flag)
     {
-        VTABLE_add_method(interp, SELF, name, sub);
+        Parrot_Class  *_class    = PARROT_CLASS(SELF);
+
+        /* If it's a vtable method... */
+        if (got_vtable) {
+            /* Check name is a valid vtable method name. */
+            char *c_name = string_to_cstring(interp, name);
+            int found = 0;
+            int i;
+            for (i = PARROT_VTABLE_LOW; i < NUM_VTABLE_FUNCTIONS; i++) {
+                if (strcmp(c_name, Parrot_vtable_slot_names[i] + 2) == 0) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found)
+                real_exception(interp, NULL, METH_NOT_FOUND,
+                    "'%S' is not a valid v-table method name.", name);  
+
+            /* Add it to vtable methods list. */
+            VTABLE_set_pmc_keyed_str(interp, _class->vtable_methods, name, sub);
+        }
+
+        /* Provided it's not anonymous, add it to the methods list. */
+        if (!got_anon)
+            VTABLE_add_method(interp, SELF, name, sub);
     }
 
 /*
