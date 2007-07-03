@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -254,6 +254,45 @@ ok 6 - called the add_attribute v-table method of the PMC parent
 ok 7 - the attribute was actually added
 No, you can't add a role by v-table either!
 ok 8 - overridden add_role v-table method called
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'DYNSELF in a PMC will call methods overridden in high level classes' );
+.sub 'test' :main
+    $P0 = new 'Class'
+    print "ok 1 - created a PDD15 class\n"
+    
+    $P1 = get_class 'Class'
+    print "ok 2 - got the PMCProxy for Class\n"
+    
+    addparent $P0, $P1
+    print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
+
+    # We will override the inspect_str vtable method.
+    $P2 = find_global 'always42'
+    $P0.'add_method'('inspect_str', $P2, 'vtable' => 1)
+    print "ok 4 - overridden inspect_str method\n"
+
+    $P2 = $P0.'new'()
+    print "ok 5 - instantiated the class\n"
+
+    $P3 = $P2.inspect('methods')
+    print $P3
+    print "\nok 6 - Called non-overridden method, which called overridden vtable method\n"
+.end
+.sub always42 :method
+    .param string what
+    $P0 = new 'Integer'
+    $P0 = 42
+    .return($P0)
+.end
+CODE
+ok 1 - created a PDD15 class
+ok 2 - got the PMCProxy for Class
+ok 3 - added Class's PMCProxy as a parent of the PDD15 class
+ok 4 - overridden inspect_str method
+ok 5 - instantiated the class
+42
+ok 6 - Called non-overridden method, which called overridden vtable method
 OUT
 
 # Local Variables:

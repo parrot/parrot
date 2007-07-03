@@ -141,6 +141,7 @@ struct parrot_string_t {
 struct PMC {
     pobj_t obj;
     VTABLE *vtable;
+    PMC *real_self;
 #if ! PMC_DATA_IN_EXT
     DPOINTER *data;
 #endif /* ! PMC_DATA_IN_EXT */

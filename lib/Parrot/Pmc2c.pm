@@ -434,7 +434,7 @@ sub rewrite_nci_method {
     s/\bDYNSELF\b           # Macro: DYNSELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
-     /"pmc->vtable->$1(" . full_arguments($2) . ')'/xeg;
+     /"pmc->real_self->vtable->$1(" . full_arguments($2, 'pmc->real_self') . ')'/xeg;
 
     # Rewrite SELF.other_method(args...)
     s/\bSELF\b              # Macro SELF

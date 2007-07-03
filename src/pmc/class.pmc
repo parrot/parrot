@@ -1081,6 +1081,9 @@ parameter list.
 
                     (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
 
+                    /* Associate it with this class as the real self. */
+                    parent_ins->real_self = obj;
+
                     /* ...and tack on end of the attribute store (after all the
                      * slots for attributes). */
                     position = VTABLE_elements(interp, obj_guts->attrib_store);
@@ -1104,7 +1107,7 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD void attributes() {
-        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF,
+        PMC *ret_attrib_metadata = DYNSELF.inspect_str(
             CONST_STRING(interp, "attributes"));
 
         PCCRETURN(PMC *ret_attrib_metadata);
@@ -1121,9 +1124,8 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 */
     PCCMETHOD void add_attribute(STRING *attribute_name,
             PMC* attribute_type :optional, int got_type :opt_flag) {
-
-        VTABLE_add_attribute(interp, SELF, attribute_name,
-            got_type ? attribute_type : PMCNULL);
+        PMC *type = got_type ? attribute_type : PMCNULL;
+        DYNSELF.add_attribute(attribute_name, type);
     }
 
 /*
@@ -1136,8 +1138,7 @@ Return a hash where the keys are method names and the values are methods.
 
 */
     PCCMETHOD void methods() {
-        PMC *ret_methods = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "methods"));
+        PMC *ret_methods = DYNSELF.inspect_str(CONST_STRING(interp, "methods"));
 
         PCCRETURN(PMC *ret_methods);
     }
@@ -1182,7 +1183,7 @@ C<add_method> vtable method.
 
         /* Provided it's not anonymous, add it to the methods list. */
         if (!got_anon)
-            VTABLE_add_method(interp, SELF, name, sub);
+            DYNSELF.add_method(name, sub);
     }
 
 /*
@@ -1234,8 +1235,7 @@ Return the parents array PMC.
 
 */
     PCCMETHOD void parents() {
-        PMC *ret_parents = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "parents"));
+        PMC *ret_parents = DYNSELF.inspect_str(CONST_STRING(interp, "parents"));
 
         PCCRETURN(PMC *ret_parents);
     }
@@ -1250,7 +1250,7 @@ Adds the supplied PMC to the list of parents for the class.
 
 */
     PCCMETHOD void add_parent(PMC *parent) {
-        VTABLE_add_parent(interp, SELF, parent);
+        DYNSELF.add_parent(parent);
     }
 
 /*
@@ -1263,8 +1263,7 @@ Return the roles array PMC.
 
 */
     PCCMETHOD void roles() {
-        PMC *ret_roles = VTABLE_inspect_str(interp, SELF,
-            CONST_STRING(interp, "roles"));
+        PMC *ret_roles = DYNSELF.inspect_str(CONST_STRING(interp, "roles"));
 
         PCCRETURN(PMC *ret_roles);
     }
@@ -1328,9 +1327,9 @@ parameter is supplied, a particular item of introspection data.
 
         /* Just delegate to the appropriate vtable method. */
         if (got_what)
-            found = VTABLE_inspect_str(interp, SELF, what);
+            found = DYNSELF.inspect_str(what);
         else
-            found = VTABLE_inspect(interp, SELF);
+            found = DYNSELF.inspect();
 
         PCCRETURN(PMC *found);
     }
@@ -1346,7 +1345,7 @@ C<class_name>, false otherwise.
 
 */
     PCCMETHOD void isa(STRING *class_name) {
-        INTVAL isa = VTABLE_isa(interp, SELF, class_name);
+        INTVAL isa = DYNSELF.isa(class_name);
 
         PCCRETURN(INTVAL isa);
     }
