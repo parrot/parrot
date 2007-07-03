@@ -25,7 +25,11 @@ UTF-8 (L<http://www.utf-8.com/>).
 static void become_encoding( Interp *interp, STRING *src );
 static UINTVAL bytes( Interp *interp, STRING *src );
 static UINTVAL codepoints( Interp *interp, STRING *src );
-static UINTVAL get_byte( Interp *interp, const STRING *src, UINTVAL offset );
+static UINTVAL get_byte( Interp *interp,
+    const STRING *src /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(2);
+
 static STRING * get_bytes( Interp *interp,
     STRING *src,
     UINTVAL offset,
@@ -38,8 +42,9 @@ static STRING * get_bytes_inplace( Interp *interp,
     STRING *return_string );
 
 static UINTVAL get_codepoint( Interp *interp,
-    const STRING *src,
-    UINTVAL offset );
+    const STRING *src /*NN*/,
+    UINTVAL offset )
+        __attribute__nonnull__(2);
 
 static STRING * get_codepoints( Interp *interp,
     STRING *src,
@@ -53,10 +58,12 @@ static STRING * get_codepoints_inplace( Interp *interp,
     STRING *return_string );
 
 static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
-static void set_byte( Interp *interp,
-    const STRING *src,
+static void set_byte( Interp *interp /*NN*/,
+    const STRING *src /*NN*/,
     UINTVAL offset,
-    UINTVAL byte );
+    UINTVAL byte )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_bytes( Interp *interp,
     STRING *src,
@@ -76,18 +83,41 @@ static void set_codepoints( Interp *interp,
     UINTVAL count,
     STRING *new_codepoints );
 
-static STRING * to_encoding( Interp *interp, STRING *src, STRING *dest );
-static UINTVAL utf8_characters( const utf8_t *ptr, UINTVAL byte_len );
-static UINTVAL utf8_decode( const utf8_t *ptr );
-static UINTVAL utf8_decode_and_advance( Interp *interp, String_iter *i );
-static void * utf8_encode( void *ptr, UINTVAL c );
-static void utf8_encode_and_advance( Interp *interp,
-    String_iter *i,
-    UINTVAL c );
+static STRING * to_encoding( Interp *interp /*NN*/,
+    STRING *src /*NN*/,
+    STRING *dest )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void utf8_set_position( Interp *interp, String_iter *i, UINTVAL pos );
-static const void * utf8_skip_backward( const void *ptr, UINTVAL n );
-static const void * utf8_skip_forward( const void *ptr, UINTVAL n );
+static UINTVAL utf8_characters( const utf8_t *ptr /*NN*/, UINTVAL byte_len )
+        __attribute__nonnull__(1);
+
+static UINTVAL utf8_decode( const utf8_t *ptr );
+static UINTVAL utf8_decode_and_advance( Interp *interp /*NN*/,
+    String_iter *i /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void * utf8_encode( void *ptr /*NN*/, UINTVAL c )
+        __attribute__nonnull__(1);
+
+static void utf8_encode_and_advance( Interp *interp /*NN*/,
+    String_iter *i /*NN*/,
+    UINTVAL c )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void utf8_set_position( Interp *interp,
+    String_iter *i /*NN*/,
+    UINTVAL pos )
+        __attribute__nonnull__(2);
+
+static const void * utf8_skip_backward( const void *ptr /*NN*/, UINTVAL n )
+        __attribute__nonnull__(1);
+
+static const void * utf8_skip_forward( const void *ptr /*NN*/, UINTVAL n )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 #define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl utf8")
@@ -126,7 +156,7 @@ Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
 */
 
 static UINTVAL
-utf8_characters(const utf8_t *ptr, UINTVAL byte_len)
+utf8_characters(const utf8_t *ptr /*NN*/, UINTVAL byte_len)
 {
     const utf8_t *u8ptr = ptr;
     const utf8_t *u8end = u8ptr + byte_len;
@@ -191,7 +221,7 @@ Returns the UTF-8 encoding of integer C<c>.
 */
 
 static void *
-utf8_encode(void *ptr, UINTVAL c)
+utf8_encode(void *ptr /*NN*/, UINTVAL c)
 {
     utf8_t *u8ptr = (utf8_t *)ptr;
     UINTVAL len = UNISKIP(c);
@@ -221,7 +251,7 @@ Moves C<ptr> C<n> characters forward.
 */
 
 static const void *
-utf8_skip_forward(const void *ptr, UINTVAL n)
+utf8_skip_forward(const void *ptr /*NN*/, UINTVAL n)
 {
     const utf8_t *u8ptr = (const utf8_t *)ptr;
 
@@ -241,7 +271,7 @@ Moves C<ptr> C<n> characters back.
 */
 
 static const void *
-utf8_skip_backward(const void *ptr, UINTVAL n)
+utf8_skip_backward(const void *ptr /*NN*/, UINTVAL n)
 {
     const utf8_t *u8ptr = (const utf8_t *)ptr;
 
@@ -271,7 +301,7 @@ function.
 */
 
 static UINTVAL
-utf8_decode_and_advance(Interp *interp, String_iter *i)
+utf8_decode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/)
 {
     const utf8_t *u8ptr = (utf8_t *)((char *)i->str->strstart + i->bytepos);
     UINTVAL c = *u8ptr;
@@ -305,13 +335,12 @@ utf8_decode_and_advance(Interp *interp, String_iter *i)
 }
 
 static void
-utf8_encode_and_advance(Interp *interp, String_iter *i, UINTVAL c)
+utf8_encode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/, UINTVAL c)
 {
-    const STRING *s = i->str;
-    unsigned char *new_pos, *pos;
+    const STRING * const s = i->str;
+    unsigned char * const pos = (unsigned char *)s->strstart + i->bytepos;
+    unsigned char * const new_pos = (unsigned char *)utf8_encode(pos, c);
 
-    pos = (unsigned char *)s->strstart + i->bytepos;
-    new_pos = (unsigned char *)utf8_encode(pos, c);
     i->bytepos += (new_pos - pos);
     /* XXX possible buffer overrun exception? */
     assert(i->bytepos <= PObj_buflen(s));
@@ -329,9 +358,9 @@ function.
 
 /* XXX Should use quickest direction */
 static void
-utf8_set_position(Interp *interp, String_iter *i, UINTVAL pos)
+utf8_set_position(SHIM_INTERP, String_iter *i /*NN*/, UINTVAL pos)
 {
-    const utf8_t *u8ptr = (utf8_t *)i->str->strstart;
+    const utf8_t *u8ptr = (const utf8_t *)i->str->strstart;
 
     i->charpos = pos;
     while (pos-- > 0) {
@@ -342,7 +371,7 @@ utf8_set_position(Interp *interp, String_iter *i, UINTVAL pos)
 
 
 static STRING *
-to_encoding(Interp *interp, STRING *src, STRING *dest)
+to_encoding(Interp *interp /*NN*/, STRING *src /*NN*/, STRING *dest)
 {
     STRING *result;
     String_iter src_iter;
@@ -417,14 +446,14 @@ to_encoding(Interp *interp, STRING *src, STRING *dest)
 }
 
 static UINTVAL
-get_codepoint(Interp *interp, const STRING *src, UINTVAL offset)
+get_codepoint(SHIM_INTERP, const STRING *src /*NN*/, UINTVAL offset)
 {
     const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
     return utf8_decode(start);
 }
 
 static void
-set_codepoint(Interp *interp, STRING *src /*NN*/,
+set_codepoint(SHIM_INTERP, STRING *src /*NN*/,
         UINTVAL offset, UINTVAL codepoint)
 {
     const void *start;
@@ -437,7 +466,7 @@ set_codepoint(Interp *interp, STRING *src /*NN*/,
 }
 
 static UINTVAL
-get_byte(Interp *interp, const STRING *src, UINTVAL offset)
+get_byte(SHIM_INTERP, const STRING *src /*NN*/, UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
@@ -450,7 +479,7 @@ get_byte(Interp *interp, const STRING *src, UINTVAL offset)
 }
 
 static void
-set_byte(Interp *interp, const STRING *src,
+set_byte(Interp *interp /*NN*/, const STRING *src /*NN*/,
         UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;

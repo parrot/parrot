@@ -254,7 +254,9 @@ typedef void (*funcptr_t)(void);
  */
 #define SHIM_INTERP Interp *interp_unused __attribute__unused__
 
-/* UNUSED() is the old way we handled shim arguments */
+/* UNUSED() is the old way we handled shim arguments Should still be
+   used in cases where the argument should, at some point be used.
+ */
 #define UNUSED(a) if (0) (void)(a);
 
 /* Hide our struct copying behind macros */
