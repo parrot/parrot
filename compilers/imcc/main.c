@@ -168,16 +168,11 @@ Parrot_version(Interp *interp /*NN*/)
     }
     printf("Copyright (C) 2001-2007, The Perl Foundation.\n\
 \n\
-Parrot is distributed under the terms of the Artistic License 2.0.\
+This code is distributed under the terms of the Artistic License 2.0.\
 \n\
-For more details, see the full text of the license in the file LICENSE,\
+For more details, see the full text of the license in the LICENSE file\
 \n\
-which may be found in the Parrot source kit.\n\
-\n\
-This program is distributed in the hope that it will be useful,\n\
-but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either\n\
-the GNU General Public License or the Artistic License for more details.\n\n");
+included in the Parrot source tree.\n\n");
 
     Parrot_exit(interp, 0);
 }
