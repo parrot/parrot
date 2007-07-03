@@ -58,7 +58,7 @@ sub body {
     $ret_type = "_retf" if $ret_sig eq 'N';
 
     my $sig = $ret_sig;
-    my @types = map { my @x = split /\s+/; $x[0] } split /\s*,\s*/, $parameters;
+    my @types = grep { $_ } map { my @x = split /\s+/; $x[0] } split /\s*,\s*/, $parameters;
     foreach (@types) {
         $sig .= ctype_to_sigchar($_);
     }
