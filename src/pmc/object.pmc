@@ -193,7 +193,7 @@ Queries this object's class to find the method with the given name.
         for (i = 0; i < num_classes; i++) {
             /* Get the class. */
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-            
+
             /* If it's from this universe or the class doesn't inherit from
              * anything outside of it... */
             if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
@@ -209,7 +209,7 @@ Queries this object's class to find the method with the given name.
                 PMC *del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
                     alien_parents_pos);
                 method = VTABLE_find_method(interp, del_class, name);
-                
+
                 if (!PMC_IS_NULL(method)) {
                     /* Found it. However, if we just hand this back and it's
                      * an NCI and we call it, we will get the wrong invocant
@@ -224,7 +224,7 @@ Queries this object's class to find the method with the given name.
                     /* Found a method, so we're done. */
                     break;
                 }
-                
+
                 alien_parents_pos++;
             }
         }
