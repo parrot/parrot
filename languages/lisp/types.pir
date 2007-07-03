@@ -418,12 +418,12 @@ DONE:
 .end
 
 .sub _get_name :method
-  .local pmc retv
 
-   # VALID_IN_PARROT_0_2_0 getattribute retv, self, "LispPackage\0name"
-   retv = getattribute self, "name"
+    .local pmc retv
 
-  .return(retv)
+     retv = getattribute self, "name"
+
+     .return(retv)
 .end
 
 .sub _set_name :method

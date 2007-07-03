@@ -89,18 +89,17 @@ Create a new package with name N, placing the result in P.
 =cut
 
 .macro PACKAGE (P,N)
-  .sym string _ucname
-  .sym pmc _packagesp
-  .sym pmc _name
+    .sym string _ucname
+    .sym pmc _packagesp
+    .sym pmc _name
 
-  .P = new "LispPackage"
+    .P = new "LispPackage"
 
-   _ucname = .N
-  upcase _ucname, _ucname
-  .STRING(_name, _ucname)
+    _ucname = .N
+    upcase _ucname, _ucname
+    .STRING(_name, _ucname)
 
-  # VALID_IN_PARROT_0_2_0 setattribute .P, "LispPackage\0name", _name
-  setattribute .P, "name", _name
+    setattribute .P, "name", _name
 .endm
 
 =head1 .FUNCTION(F,L)

@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-lisp/t/system.t - tests function in SYSTEM
+lisp/t/system.t - tests functions in SYSTEM
 
 =head1 DESCRIPTION
 
-Functions defined in system.pir.
+Implementations specific functions.
 
 =cut
 
@@ -30,7 +30,12 @@ my @test_cases = (
       },
       q{Haus},
       q{hash-table},
-      todo => 'setf not here yet'
+      todo => 'setf not implemented yet'
+    ],
+    [ q{ ( print (sys:%package-name (sys:%find-package "common-lisp")))
+      },
+      q{COMMON-LISP},
+      q{package-name},
     ],
 );
 

@@ -799,7 +799,8 @@ DONE:
 
 .sub _print                     # This is just a temporary stand-in - it
   .param pmc args               # doesn't have near enough the amount of
-  .local string strval          # functionality required.
+                                # functionality required.
+  .local string strval          
   .local pmc retv
   .local pmc obj
 
