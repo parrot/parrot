@@ -1084,7 +1084,7 @@ parameter list.
                      * slots for attributes). */
                     position = VTABLE_elements(interp, obj_guts->attrib_store);
                     VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
-                        position, class_check);
+                        position, parent_ins);
                 }
             }
         }
