@@ -120,7 +120,7 @@ Creates and returns a clone of the NCI.
          * ManagedStruct or Buffer?
          */
         PMC_data(ret) = PMC_data(SELF);
-        PObj_get_FLAGS(ret) |= (PObj_get_FLAGS(SELF) & 0x3);
+        PObj_get_FLAGS(ret) |= (PObj_get_FLAGS(SELF) & 0x7);
         return ret;
     }
 
