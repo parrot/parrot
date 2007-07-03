@@ -84,3 +84,9 @@ precompiled_ok:
 bad_file: # not even the original exists..
   tcl_error 'bad file, no donut' 
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
