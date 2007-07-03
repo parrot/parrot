@@ -1015,8 +1015,8 @@ A negative offset is allowed to replace from the end.
 
 PARROT_API
 STRING *
-string_replace(Interp *interp /*NN*/, STRING *src /*NULLOK*/,
-    INTVAL offset, INTVAL length, STRING *rep /*NULLOK*/, STRING **d /*NULLOK*/)
+string_replace(Interp *interp /*NN*/, STRING *src /*NN*/,
+    INTVAL offset, INTVAL length, STRING *rep /*NN*/, STRING **d /*NULLOK*/)
 {
     STRING *dest = NULL;
     UINTVAL start_byte, end_byte;
@@ -1029,8 +1029,6 @@ string_replace(Interp *interp /*NN*/, STRING *src /*NULLOK*/,
 
     /* special case */
     if (d == NULL &&
-            src &&
-            rep &&
             src->encoding == Parrot_fixed_8_encoding_ptr &&
             rep->encoding == Parrot_fixed_8_encoding_ptr &&
             offset >= 0 &&

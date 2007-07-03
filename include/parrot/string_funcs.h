@@ -277,12 +277,14 @@ PARROT_API STRING * string_repeat( Interp *interp,
         __attribute__nonnull__(2);
 
 PARROT_API STRING * string_replace( Interp *interp /*NN*/,
-    STRING *src /*NULLOK*/,
+    STRING *src /*NN*/,
     INTVAL offset,
     INTVAL length,
-    STRING *rep /*NULLOK*/,
+    STRING *rep /*NN*/,
     STRING **d /*NULLOK*/ )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 PARROT_API STRING * string_set( Interp *interp /*NN*/,
     STRING *dest /*NULLOK*/,
