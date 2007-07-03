@@ -47,8 +47,7 @@ extract:
   $S0 = substr str, pos, $I1
   
   # add it to the list
-  $I1 = find_type 'TclConst'
-  $P0 = new $I1
+  $P0 = new 'TclConst'
   $P0 = $S0
   push retval, $P0
   

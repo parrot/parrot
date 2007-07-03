@@ -24,9 +24,8 @@ read a line from a channel
   .local pmc io
   io = __channel(channelID)
 
-  $I0 = find_type 'TCPStream'
-  $I1 = typeof io
-  if $I0 == $I1 goto stream
+  $S0 = typeof io
+  if $S0 == 'TCPStream' goto stream
 
   $S0 = readline io
   .return($S0)
