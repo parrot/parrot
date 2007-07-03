@@ -11,65 +11,15 @@
   argc = elements argv
   if argc != 1 goto bad_args
 
-  .local string chunk, filename, contents
-  .local int type
-  .local pmc retval, handle
+  .local string filename
+  filename = shift argv
 
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
-
-  .local pmc ns
-  $P0 = getinterp
-  ns  = $P0['namespace'; 1]
-
-file:
-  filename = argv[0]
-  handle   = open filename, '<'
-
-  $I0 = typeof handle
-  if $I0 == .Undef goto badfile
-  contents = ''
- 
-loop:
-  read chunk, handle, 2048
-  if chunk == '' goto gotfile
-  contents = contents . chunk
-  goto loop
-
-gotfile:
-  .local int len
-  len = length contents
- 
-  # perform the backslash-newline substitution
-  $I0 = -1
-backslash_loop:
-  inc $I0
-  if $I0 >= len goto execute
-  $I1 = ord contents, $I0
-  if $I1 != 92 goto backslash_loop # \\
-  inc $I0
-  $I2 = $I0
-  $I1 = ord contents, $I2
-  if $I1 == 10 goto space # \n
-  if $I1 == 13 goto space # \r
-  goto backslash_loop
-space:
-  inc $I2
-  if $I0 >= len goto execute
-  $I1 = is_cclass .CCLASS_WHITESPACE, contents, $I2
-  if $I1 == 0 goto not_space
-  goto space
-not_space:
-  dec $I0
-  $I1 = $I2 - $I0
-  substr contents, $I0, $I1, ' '
-  dec $I1
-  len -= $I1
-  goto backslash_loop
+   .local pmc __precompiled
+   __precompiled = get_root_global [ '_tcl' ], 'check_precompiled'
 
 execute:
-  $P2 = __script(contents, 'ns'=>ns)
-  .return $P2()
+  $P1 = __precompiled(filename)
+  .return $P1()
 
 badfile:
   $S0 = "couldn't read file \""

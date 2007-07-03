@@ -56,6 +56,7 @@ $(C_BUILTIN)/cd.pir \
 $(C_BUILTIN)/expr.pir \
 $(C_BUILTIN)/list.pir \
 $(C_BUILTIN)/return.pir \
+runtime/hacks.pir \
 runtime/conversions.pir \
 runtime/list_to_string.pir \
 runtime/string_to_list.pir \
@@ -128,10 +129,10 @@ runtime/tcllib.pbc: $(PARROT) runtime/tcllib.pir runtime/builtins.pir $(CLASSES)
 	$(PARROT) --output=runtime/tcllib.pbc runtime/tcllib.pir
 
 tclsh: $(PARROT) tcl.pbc
-	$(PARROT) --gc-debug tcl.pbc
+	$(PARROT) -G tcl.pbc
 
-test:	tcl.pbc
-	prove -r t
+test: tcl.pbc
+	$(PERL) t/harness
 
 # Can only run a few of these cleanly with test_more at the moment.
 # eventually, as the list of commented out tests is smaller, just

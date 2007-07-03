@@ -372,10 +372,17 @@ Given a chunk of tcl code, return a subroutine.
     .param int    pir_only :named('pir_only') :optional
     .param pmc    ns       :named('ns')       :optional
     .param int    has_ns   :opt_flag
+    .param int    bsnl     :named('bsnl')     :optional
+    .param int    has_bsnl :opt_flag
 
     .local pmc parse
     .local pmc match
 
+    unless has_bsnl goto end_preamble
+    unless bsnl     goto end_preamble
+    code = 'backslash_newline_subst'( code )
+
+end_preamble:
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'program'
     match = parse(code, 'pos'=>0, 'grammar'=>'TclExpr::Grammar')
 
@@ -623,6 +630,49 @@ bad_level:
   $S0 = 'bad level "' . $S0
   $S0 = $S0 . '"'
   tcl_error $S0
+.end
+
+=head2 _Tcl::backslash_newline_subst
+
+Given a string of tcl code, perform the backslash/newline subsitution.
+
+=cut
+
+.sub 'backslash_newline_subst'
+  .param string contents
+
+  .local int len
+  len = length contents
+ 
+  # perform the backslash-newline substitution
+  $I0 = -1
+backslash_loop:
+  inc $I0
+  if $I0 >= len goto done
+  $I1 = ord contents, $I0
+  if $I1 != 92 goto backslash_loop # \\
+  inc $I0
+  $I2 = $I0
+  $I1 = ord contents, $I2
+  if $I1 == 10 goto space # \n
+  if $I1 == 13 goto space # \r
+  goto backslash_loop
+space:
+  inc $I2
+  if $I0 >= len goto done
+  $I1 = is_cclass .CCLASS_WHITESPACE, contents, $I2
+  if $I1 == 0 goto not_space
+  goto space
+not_space:
+  dec $I0
+  $I1 = $I2 - $I0
+  substr contents, $I0, $I1, ' '
+  dec $I1
+  len -= $I1
+  goto backslash_loop
+
+done:
+  .return (contents)
 .end
 
 # Local Variables:

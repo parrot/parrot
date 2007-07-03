@@ -35,7 +35,7 @@
   load_bytecode 'languages/tcl/runtime/tcllib.pbc'
 
   .local pmc retval
-  .local string mode,chunk,contents,filename
+  .local string mode,contents,filename
   .local int argc,retcode
   argc = argv
 
@@ -106,7 +106,7 @@ input_loop_continue2:
   level = 2
   goto input_loop
 
-open_file: 
+open_file:
   tcl_interactive = 0
  
   .local pmc get_options
@@ -124,66 +124,24 @@ open_file:
   execute = defined opt['e']
   if execute goto oneliner
  
-  .local pmc handle
-  .local string chunk,contents
 file:
   filename = shift argv
-  $S1='<'
-  handle = open filename, $S1
-  $I0 = typeof handle
-  if $I0 == .Undef goto badfile
-  contents = ''
+  .local pmc parrotIO
+  .local string contents
+  parrotIO = getclass 'ParrotIO'
+  contents = parrotIO.'slurp'(filename)
 
-loop:
-  read chunk, handle, 1024
-  if chunk == '' goto gotfile
-  contents = contents . chunk
-  goto loop
-
-gotfile:
-  .local int len
-  len = length contents
-
-  # perform the backslash-newline substitution
-  .include 'cclass.pasm'
-  $I0 = -1
-backslash_loop:
-  inc $I0
-  if $I0 >= len goto execute_code
-  $I1 = ord contents, $I0
-  if $I1 != 92 goto backslash_loop # \\
-  inc $I0
-  $I2 = $I0
-  $I1 = ord contents, $I2
-  if $I1 == 10 goto space # \n
-  if $I1 == 13 goto space # \r
-  goto backslash_loop
-space:
-  inc $I2
-  if $I0 >= len goto execute_code
-  $I1 = is_cclass .CCLASS_WHITESPACE, contents, $I2
-  if $I1 == 0 goto not_space
-  goto space
-not_space:
-  dec $I0
-  $I1 = $I2 - $I0
-  substr contents, $I0, $I1, ' '
-  dec $I1
-  len -= $I1
-  goto backslash_loop
-
-execute_code:
   .set_tcl_argv()
   unless dump_only goto run_file  
   push_eh file_error
-    ($S0,$I0) = __script(contents, 'pir_only'=>1)
+    ($S0,$I0) = __script(contents, 'pir_only'=>1, 'bsnl'=>1)
   clear_eh
   print $S0
   goto done
 
 run_file:
   push_eh file_error
-    $P2 = __script(contents)
+    $P2 = __script(contents, 'bsnl' => 1)
     $P2()
   clear_eh
   goto done
