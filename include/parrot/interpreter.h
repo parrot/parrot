@@ -284,7 +284,7 @@ typedef struct _context_mem {
     char *threshold;                /* continuation threshold */
     struct _context_mem *prev;      /* previous allocated area */
 #else
-    void **free_list;               /* per size free slots */
+    void **free_list;               /* array of free-lists, per size free slots */
     int n_free_slots;               /* amount of allocated */
 #endif
 
@@ -313,7 +313,7 @@ struct parrot_interp_t {
     size_t     op_count;                      /* The number of ops */
     op_info_t *op_info_table;                 /* Opcode info table (name, nargs, arg types) */
 
-    op_func_t *op_func_table;                 /* opcode dispatch table (functios, labels,
+    op_func_t *op_func_table;                 /* opcode dispatch table (functions, labels,
                                                * or nothing (e.g. switched core), which
                                                * the interpreter is currently running */
     op_func_t *evc_func_table;                /* opcode dispatch for event checking */

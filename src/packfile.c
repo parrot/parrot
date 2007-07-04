@@ -794,7 +794,7 @@ PackFile_map_segments(Interp *interp, PackFile_Directory *dir /*NN*/,
 FUNCDOC: PackFile_add_segment
 
 Adds the Segment C<seg> to the directory C<dir> The PackFile becomes the
-owner of the segment; that means its getting destroyed, when the
+owner of the segment; that means it's getting destroyed, when the
 packfile gets destroyed.
 
 */
