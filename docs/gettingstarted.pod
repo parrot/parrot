@@ -280,7 +280,7 @@ L<http://www.parrotcode.org/resources>
 
 Located at:
 
-L<http://rakudo.org/parrot/>
+L<http://www.perlfoundation.org/parrot/>
 
 =back
 
