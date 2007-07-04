@@ -12,45 +12,29 @@ Use in bootstrapping.
 
 .sub _init_system
 
-    .local pmc function
     .local pmc package
-    .local pmc symbol
-    .local pmc value, reader_macros
 
     .PACKAGE(package, "SYSTEM")
 
      store_global "PACKAGES", "SYSTEM", package
      store_global "PACKAGES", "SYS",    package
 
-    .HASH(reader_macros)
+    # strange things, removing one of these lines breaks things in r19582
+    .local pmc f111
+    .local pmc r111
+    .local pmc r112
+    .local pmc r113
+    .local pmc r114
+    .local pmc r115
+    .local pmc r116
+    .local pmc r117
+    .local pmc r118
 
-    .FUNCTION(function, "_left_paren_macro" )
-    reader_macros["("] = function
+    _init_reader_macros( package )
 
-    .FUNCTION(function, "_right_paren_macro" )
-    reader_macros[")"] = function
-
-    .FUNCTION(function, "_single_quote_macro" )
-    reader_macros["'"] = function
-
-    .FUNCTION(function, "_semicolon_macro" )
-    reader_macros[";"] = function
-
-    .FUNCTION(function, "_double_quote_macro" )
-    reader_macros['"'] = function
-
-    .FUNCTION(function, "_backquote_macro" )
-    reader_macros["`"] = function
-
-    .FUNCTION(function, "_comma_macro" )
-    reader_macros[","] = function
-
-    .FUNCTION(function, "_sharpsign_macro" )
-    reader_macros["#"] = function
-
-    .DEFVAR(symbol, package, "*READER-MACROS*", reader_macros)
-
+    .local pmc symbol, value
     .NIL(value)
+
     .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE*", value)
 
     .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", value)
@@ -91,6 +75,44 @@ Use in bootstrapping.
     .DEFUN(symbol, package, "ERROR", "_raise_error")
     
     .DEFUN(symbol, package, "LOAD", "_load")
+
+    .return(1)
+.end
+
+
+.sub _init_reader_macros
+
+    .param pmc package
+
+    .local pmc function, reader_macros
+    .HASH(reader_macros)
+
+    .FUNCTION(function, "_left_paren_macro" )
+    reader_macros["("] = function
+
+    .FUNCTION(function, "_right_paren_macro" )
+    reader_macros[")"] = function
+
+    .FUNCTION(function, "_single_quote_macro" )
+    reader_macros["'"] = function
+
+    .FUNCTION(function, "_semicolon_macro" )
+    reader_macros[";"] = function
+
+    .FUNCTION(function, "_double_quote_macro" )
+    reader_macros['"'] = function
+
+    .FUNCTION(function, "_backquote_macro" )
+    reader_macros["`"] = function
+
+    .FUNCTION(function, "_comma_macro" )
+    reader_macros[","] = function
+
+    .FUNCTION(function, "_sharpsign_macro" )
+    reader_macros["#"] = function
+
+    .local pmc symbol
+    .DEFVAR(symbol, package, "*READER-MACROS*", reader_macros)
 
     .return(1)
 .end
