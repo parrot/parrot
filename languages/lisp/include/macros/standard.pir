@@ -91,14 +91,14 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro DEFVAR (S,P,N,V)
-  .sym pmc _specialp
+    .sym pmc _specialp
 
-  .TRUE(_specialp)
+    .TRUE(_specialp)
 
-  .S = .P._intern_symbol(.N)
-  .S._set_value(.V)
-  .S._set_package(.P)
-  .S._set_special(_specialp)
+    .S = .P._intern_symbol(.N)
+    .S._set_value(.V)
+    .S._set_package(.P)
+    .S._set_special(_specialp)
 .endm
 
 # Local Variables:

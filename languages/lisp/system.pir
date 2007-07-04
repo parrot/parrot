@@ -32,44 +32,28 @@ Use in bootstrapping.
 
     _init_reader_macros( package )
 
-    .local pmc symbol, value
-    .NIL(value)
+    .local pmc symbol, nil
+    .NIL(nil)
 
-    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE*", value)
+    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE*",      nil)      # not used yet
+    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", nil)      # not used yet
 
-    .DEFVAR(symbol, package, "*INSIDE-BACKQUOTE-LIST*", value)
-
-    .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE", "_get_object_attr")
-
-    .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE", "_set_object_attr")
-
-    .DEFUN(symbol, package, "%MAKE-HASH-TABLE", "_make_hash")
-
-    .DEFUN(symbol, package, "%SET-HASH", "_set_hash")
-
-    .DEFUN(symbol, package, "%GET-HASH", "_get_hash")
-
-    .DEFUN(symbol, package, "%ALIAS-PACKAGE", "_alias_package")
-
-    .DEFUN(symbol, package, "%FIND-PACKAGE", "_find_package")
-
-    .DEFUN(symbol, package, "%PACKAGE-NAME", "_package_name")
-
-    .DEFUN(symbol, package, "%MAKE-PACKAGE", "_make_package")
-
-    .DEFUN(symbol, package, "%USE-PACKAGE", "_use_package")
-
-    .DEFUN(symbol, package, "%EXPORT", "_export")
-
-    .DEFUN(symbol, package, "%OPEN-FILE", "_open_file")
-
-    .DEFUN(symbol, package, "%PEEK", "_peek")
-
-    .DEFUN(symbol, package, "%CLOSE", "_close")
-
-    .DEFUN(symbol, package, "%STRING-EQUAL", "_string_equal")
-
-    .DEFUN(symbol, package, "%MAKE-MACRO", "_make_macro")
+    .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE",  "_get_object_attr")
+    .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE",  "_set_object_attr")
+    .DEFUN(symbol, package, "%MAKE-HASH-TABLE",       "_make_hash")
+    .DEFUN(symbol, package, "%SET-HASH",              "_set_hash")
+    .DEFUN(symbol, package, "%GET-HASH",              "_get_hash")
+    .DEFUN(symbol, package, "%ALIAS-PACKAGE",         "_alias_package")
+    .DEFUN(symbol, package, "%FIND-PACKAGE",          "_find_package")
+    .DEFUN(symbol, package, "%PACKAGE-NAME",          "_package_name")
+    .DEFUN(symbol, package, "%MAKE-PACKAGE",          "_make_package")
+    .DEFUN(symbol, package, "%USE-PACKAGE",           "_use_package")
+    .DEFUN(symbol, package, "%EXPORT",                "_export")
+    .DEFUN(symbol, package, "%OPEN-FILE",             "_open_file")
+    .DEFUN(symbol, package, "%PEEK",                  "_peek")
+    .DEFUN(symbol, package, "%CLOSE",                 "_close")
+    .DEFUN(symbol, package, "%STRING-EQUAL",          "_string_equal")
+    .DEFUN(symbol, package, "%MAKE-MACRO",            "_make_macro")
 
     # XXX - THESE SHOULD BE REMOVED AND CONVERTED TO PROPER LISP FUNCTIONS
     .DEFUN(symbol, package, "ERROR", "_raise_error")
@@ -481,86 +465,77 @@ DONE:
 .end
 
 .sub _get_object_attr
-  .param pmc args
+    .param pmc args
 
-  .local string attr
-  # VALID_IN_PARROT_0_2_0 .local string objt
-  .local pmc symbol
-  # VALID_IN_PARROT_0_2_0 .local pmc objstr
-  .local pmc attrib
-  .local pmc retv
+    .ASSERT_LENGTH(args,3,ERROR_NARGS)
 
-  .ASSERT_LENGTH(args,3,ERROR_NARGS)
+    .local pmc symbol
+    .CAR(symbol,args)
 
-  .CAR(symbol,args)
-   # VALID_IN_PARROT_0_2_0 .SECOND(objstr,args)
-  .THIRD(attrib,args)
+    .local pmc obj_type
+    .SECOND(obj_type,args)
+    .ASSERT_TYPE(obj_type, "string")
+    # TODO: check type of symbol
 
-  .NIL(retv)
+    .local pmc attr_name
+    .THIRD(attr_name,args)
+    .ASSERT_TYPE(attr_name, "string")
+    .local string attr_name_str
+    attr_name_str = attr_name
 
-   # VALID_IN_PARROT_0_2_0 .ASSERT_TYPE(objstr, "string")
-  .ASSERT_TYPE(attrib, "string")
-
-   attr = attrib
-   # VALID_IN_PARROT_0_2_0 objt = objstr
-
-   # VALID_IN_PARROT_0_2_0 concat objt, objt, "\0"
-   # VALID_IN_PARROT_0_2_0 concat attr, objt, attr
-
-   retv = getattribute symbol, attr
-   if_null retv, NO_VALUE
-   goto DONE
+    .local pmc retv
+    retv = getattribute symbol, attr_name_str
+    if_null retv, NO_VALUE
+    goto DONE
 
 NO_VALUE:
-  .NIL(retv)
-  goto DONE
+    .NIL(retv)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error","wrong number of arguments to %GET-OBJECT-ATTRIBUTE")
-   goto DONE
+    .ERROR_0("program-error","wrong number of arguments to %GET-OBJECT-ATTRIBUTE")
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _set_object_attr
-  .param pmc args
-  .local string attr
-  # VALID_IN_PARROT_0_2_0 .local string objt
-  .local pmc symbol
-  # VALID_IN_PARROT_0_2_0 .local pmc objstr
-  .local pmc attrib
-  .local pmc value
+    .param pmc args
 
-  .ASSERT_LENGTH(args,4,ERROR_NARGS)
+    .ASSERT_LENGTH(args,4,ERROR_NARGS)
 
-  .CAR(symbol,args)
-  # VALID_IN_PARROT_0_2_0 .SECOND(objstr,args)
-  .THIRD(attrib,args)
-  .FOURTH(value,args)
+    .local pmc symbol
+    .CAR(symbol,args)
 
-  # VALID_IN_PARROT_0_2_0 .ASSERT_TYPE(objstr, "string")
-  .ASSERT_TYPE(attrib, "string")
+    .local pmc obj_type
+    .SECOND(obj_type,args)
+    .ASSERT_TYPE(obj_type, "string")
+    # TODO: check type of symbol
 
-   attr = attrib
-   # VALID_IN_PARROT_0_2_0 objt = objstr
+    .local pmc attr_name
+    .THIRD(attr_name,args)
+    .ASSERT_TYPE(attr_name, "string")
+    .local string attr_name_str
+    attr_name_str = attr_name
 
-   # VALID_IN_PARROT_0_2_0 concat objt, objt, "\0"
-   # VALID_IN_PARROT_0_2_0 concat attr, objt, attr
+    .local pmc value
+    .FOURTH(value,args)
 
-   setattribute symbol, attr, value
-   goto DONE
+     setattribute symbol, attr_name_str, value
+     goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error","wrong number of arguments to %SET-SYMBOL-ATTRIBUTE")
-   goto DONE
+    .ERROR_0("program-error","wrong number of arguments to %SET-SYMBOL-ATTRIBUTE")
+    goto DONE
 
 DONE:
-  .return(value)
+    .return(value)
 .end
 
 .sub _open_file
   .param pmc args
+
   .local string modes
   .local string names
   .local pmc stream

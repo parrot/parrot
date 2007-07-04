@@ -803,12 +803,12 @@ DONE:
 .end
 
 .sub _set_value :method
-  .param pmc value
+    .param pmc value
 
-   # VALID_IN_PARROT_0_2_0 setattribute self, "LispSymbol\0value", value
-   setattribute self, "value", value
+     # VALID_IN_PARROT_0_2_0 setattribute self, "LispSymbol\0value", value
+     setattribute self, "value", value
 
-  .return(value)
+    .return(value)
 .end
 
 .sub __get_string :method

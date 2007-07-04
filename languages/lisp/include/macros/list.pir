@@ -25,7 +25,9 @@ Puts the car of A into R.  A is assumed to be a valid list.
 
 .macro CAR (R,A)
   .NULL(.A, .$IS_NULL)
+
   .R = .A[0]
+
   goto .$DONE
 
 .local $IS_NULL:
