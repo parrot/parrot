@@ -1,6 +1,4 @@
-#ifndef S_SPLINT_S
-#  include <ctype.h>
-#endif
+#include <ctype.h>
 #include <string.h>
 #include "bcg.h"
 #include "bcg_private.h"

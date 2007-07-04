@@ -47,9 +47,7 @@ in C<char>s or C<int>s?
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#ifndef S_SPLINT_S
-#  include <ctype.h>
-#endif
+#include <ctype.h>
 #include <string.h>
 #include <assert.h>
 
