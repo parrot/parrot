@@ -6,13 +6,10 @@
 
 #if defined(PARROT_HAS_HEADER_SIGNAL) && defined(PARROT_HAS_HEADER_SYSTYPES)
 #  include <signal.h>
-#  ifndef S_SPLINT_S
-#    include <sys/types.h>
-#  endif
+#  include <sys/types.h>
 #  define dumpcore() raise(SIGQUIT)
 #endif
 
-#ifndef S_SPLINT_S
 #ifdef PARROT_HAS_HEADER_SIGNAL
 #  undef Parrot_set_sighandler
 #  ifdef PARROT_HAS___SIGHANDLER_T
@@ -22,7 +19,6 @@
 #  endif
 
     Parrot_sighandler_t Parrot_set_sighandler(int s, Parrot_sighandler_t f);
-#endif
 #endif
 
 #endif /* PARROT_PLATFORM_GENERIC_SIGNAL_H_GUARD */
