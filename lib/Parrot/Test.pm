@@ -293,8 +293,8 @@ sub run_command {
         $err = "&STDOUT";
     }
 
-    local *OLDOUT if $out;
-    local *OLDERR if $err;
+    local *OLDOUT if $out;  ## no critic Variables::ProhibitConditionalDeclarations
+    local *OLDERR if $err;  ## no critic Variables::ProhibitConditionalDeclarations
 
     # Save the old filehandles; we must not let them get closed.
     open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles
