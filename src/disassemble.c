@@ -24,9 +24,7 @@ F<src/debug.c>.
 #include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef S_SPLINT_S
-#  include <ctype.h>
-#endif
+#include <ctype.h>
 
 static void do_dis(Parrot_Interp);
 
