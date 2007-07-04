@@ -359,7 +359,7 @@ sub genfile {
                 $line =~ s{\$ \( addprefix \s+ ([^,]+) \s* , \s* ([^)]+) \)}{
                 my ($prefix,$list) = ($1, $2);
                 join (' ',
-                    map { $_ = $prefix . $_, $_ }
+                    map { $_ = $prefix . $_ }
                         split(' ', $list)
                 )
             }egx
