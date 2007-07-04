@@ -283,6 +283,7 @@ sub run_core_func_start {
     opcode_t *cur_opcode = cur_op;
 #endif
 
+#ifndef S_SPLINT_S
     static void *const l_ops_addr[] = {
 END_C
 }
@@ -316,7 +317,7 @@ Returns the C code following the run core function.
 sub run_core_finish {
     my ( $self, $base ) = @_;
 
-    return "\n} /* " . $self->core_prefix . "$base */\n\n";
+    return "\n#endif /* S_SPLINT_S */\n} /* " . $self->core_prefix . "$base */\n\n";
 }
 
 =item C<init_func_init1($base)>
