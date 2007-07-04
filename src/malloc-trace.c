@@ -5,7 +5,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#ifndef S_SPLINT_S
+#  include <unistd.h>
+#endif
 #include <fcntl.h>
 #include <string.h>
 #include <sys/time.h>

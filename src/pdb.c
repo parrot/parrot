@@ -105,7 +105,9 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
+#ifndef S_SPLINT_S
+#  include <ctype.h>
+#endif
 #include "../compilers/imcc/imc.h"
 #include "../compilers/imcc/parser.h"
 #include "parrot/embed.h"

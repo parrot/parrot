@@ -308,7 +308,9 @@ static int cpuinfo (int whole, unsigned long*kernel, unsigned long*user);
 #if __STD_C
 #  include <stddef.h>   /* for size_t */
 #else
-#  include <sys/types.h>
+#  ifndef S_SPLINT_S
+#    include <sys/types.h>
+#  endif
 #endif
 
 #ifdef __cplusplus
@@ -320,7 +322,9 @@ extern "C" {
 /* #define  LACKS_UNISTD_H */
 
 #ifndef LACKS_UNISTD_H
-#  include <unistd.h>
+#  ifndef S_SPLINT_S
+#    include <unistd.h>
+#  endif
 #endif
 
 /* define LACKS_SYS_PARAM_H if your system does not have a <sys/param.h>. */
@@ -773,7 +777,9 @@ extern Void_t*     sbrk();
 #ifndef malloc_getpagesize
 
 #  ifndef LACKS_UNISTD_H
-#    include <unistd.h>
+#    ifndef S_SPLINT_S
+#      include <unistd.h>
+#    endif
 #  endif
 
 #  ifdef _SC_PAGESIZE         /* some SVR4 systems omit an underscore */

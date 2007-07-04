@@ -24,7 +24,9 @@ API.
 #  include <unicode/uchar.h>
 #  include <unicode/ustring.h>
 #else
-#  include <ctype.h>
+#  ifndef S_SPLINT_S
+#    include <ctype.h>
+#  endif
 #endif
 #include <assert.h>
 
