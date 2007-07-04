@@ -9,7 +9,9 @@
 #endif
 
 #ifdef PARROT_HAS_HEADER_UNISTD
-#  include <unistd.h>
+#  ifndef S_SPLINT_S
+#    include <unistd.h>
+#  endif
 #  ifdef _POSIX_PRIORITY_SCHEDULING
 #    define YIELD sched_yield()
 #  endif

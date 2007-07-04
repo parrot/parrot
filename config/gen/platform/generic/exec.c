@@ -7,7 +7,9 @@
  * returning the return value of the process
  *
  */
-#include <sys/types.h>
+#ifndef S_SPLINT_S
+#  include <sys/types.h>
+#endif
 #include <sys/wait.h>
 
 INTVAL
