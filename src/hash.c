@@ -722,7 +722,7 @@ Return the number of used entries in the hash.
 
 PARROT_API
 INTVAL
-parrot_hash_size(Interp *interp, const Hash *hash /*NULLOK*/)
+parrot_hash_size(Interp *interp, const Hash *hash /*NN*/)
     /*PURE, WARN_UNUSED*/
 {
     if (hash)
