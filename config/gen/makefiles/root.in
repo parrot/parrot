@@ -135,7 +135,7 @@ SPLINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
     +distinctinternalnames +evalorder +fielduse +forcehints -globs \
     +imptype +includenest 8 +incondefs +incondefslib +linelen 9999 \
     +longintegral +macroassign +macroempty +macroredef +matchanyintegral \
-    +nestedextern +noeffect +readonlystrings +realcompare +shadow -type \
+    +nestedextern +noeffect +readonlystrings -realcompare +shadow -type \
     -isoreserved
 
 # slightly weaker, more realistic variant.
