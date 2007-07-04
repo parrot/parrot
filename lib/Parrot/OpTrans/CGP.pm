@@ -139,7 +139,6 @@ sub run_core_func_start {
     char * _reg_base;
 #endif
 
-#ifndef S_SPLINT_S
     static void *const l_ops_addr[] = {
 END_C
 }
