@@ -34,9 +34,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
-#ifndef S_SPLINT_S
-#  include <ctype.h>
-#endif
+#include <ctype.h>
 
 /* Other headers, where available */
 
@@ -51,9 +49,7 @@
 */
 
 #ifdef PARROT_HAS_HEADER_SYSTYPES
-#  ifndef S_SPLINT_S
-#    include <sys/types.h>
-#  endif
+#  include <sys/types.h>
 #endif /* PARROT_HAS_HEADER_SYSTYPES */
 
 #ifdef PARROT_HAS_HEADER_SYSSOCKET
@@ -65,15 +61,11 @@
 #endif /* PARROT_HAS_HEADER_NETINETIN */
 
 #ifdef PARROT_HAS_HEADER_ARPAINET
-#  ifndef S_SPLINT_S
-#    include <arpa/inet.h>
-#  endif
+#  include <arpa/inet.h>
 #endif /* PARROT_HAS_HEADER_ARPAINET */
 
 #ifdef PARROT_HAS_HEADER_UNISTD
-#  ifndef S_SPLINT_S
-#    include <unistd.h>
-#  endif
+#  include <unistd.h>
 #endif /* PARROT_HAS_HEADER_UNISTD */
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
