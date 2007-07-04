@@ -109,8 +109,12 @@ if ( !keys %policies ) {
         'CodeLayout::ProhibitHardTabs'                    =>
             { allow_leading_tabs => 0 },
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
+        'CodeLayout::RequireTidyCode'                     =>
+            { perltidyrc => $perl_tidy_conf },
         'CodeLayout::UseParrotCoda'                       => 1,
         'InputOutput::ProhibitBarewordFileHandles'        => 1,
+        'InputOutput::ProhibitTwoArgOpen'                 => 1,
+        'Subroutines::ProhibitExplicitReturnUndef'        => 1,
         'TestingAndDebugging::MisplacedShebang'           => 1,
         'TestingAndDebugging::ProhibitShebangWarningsArg' => 1,
         'TestingAndDebugging::RequirePortableShebang'     => 1,
@@ -121,13 +125,9 @@ if ( !keys %policies ) {
 
     # add other policies which aren't yet passing consistently see RT#42427
     my %extra_policies = (
-        'InputOutput::ProhibitTwoArgOpen'            => 1,
         'NamingConventions::ProhibitAmbiguousNames'  => 1,
         'Subroutines::ProhibitBuiltinHomonyms'       => 1,
-        'Subroutines::ProhibitExplicitReturnUndef'   => 1,
         'Subroutines::ProhibitSubroutinePrototypes'  => 1,
-        'CodeLayout::RequireTidyCode'                =>
-            { perltidyrc => $perl_tidy_conf },
         'Subroutines::RequireFinalReturn'            => 1,
     );
 
