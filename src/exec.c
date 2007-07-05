@@ -126,16 +126,16 @@ C<< obj->data_size[N] >>.
 */
 
 static void
-add_data_member(Parrot_exec_objfile_t *obj /*NN*/, void *src, size_t len)
+add_data_member(Parrot_exec_objfile_t *obj /*NN*/, void *src /*NULLOK*/, size_t len)
 {
     char *cp;
-    int *nds, i = 0;
 
     if (obj->data.size == 0) {
         obj->data.code = (char *)mem_sys_allocate(len);
         obj->data_size = (int *)mem_sys_allocate(sizeof (int));
     }
     else {
+        int *nds;
         obj->data.code = (char *)mem_sys_realloc(obj->data.code,
                                                  obj->data.size + len);
         nds = (int *)mem_sys_realloc(obj->data_size, (obj->data_count + 2) *
