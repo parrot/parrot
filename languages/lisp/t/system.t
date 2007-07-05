@@ -82,6 +82,28 @@ my @test_cases = (
       q{COMMON-LISP},
       q{package-name},
     ],
+    [ q{ ( print ( null (sys:%find-package "common-lisp")))
+      },
+      q{NIL},
+      q{null of find-package "common-lisp"},
+    ],
+    [ q{ ( print ( null (sys:%find-package "un-common-lisp")))
+      },
+      q{T},
+      q{null of find-package "uncommon-lisp"},
+    ],
+    [ q{( sys:%alias-package (sys:%find-package "common-lisp") "un-common-lisp")
+        ( print ( null ( sys:%find-package "un-common-lisp")) )
+      },
+      q{NIL},
+      q{null of find-package "uncommon-lisp" after alias-package},
+    ],
+    [ q{( sys:%alias-package (sys:%find-package "common-lisp") "un-common-lisp")
+        ( print ( sys:%package-name ( sys:%find-package "un-common-lisp")) )
+      },
+      q{COMMON-LISP},
+      q{package-name of find-package "uncommon-lisp" after alias-package},
+    ],
 );
 
 Test::More::plan( tests => scalar @test_cases );

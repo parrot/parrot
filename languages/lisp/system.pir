@@ -148,7 +148,7 @@ DONE:
     .ASSERT_TYPE(key, "string")
 
     .local string key_str
-     key_str = key                                      # Convert the key to a string
+    key_str = key                                      # Convert the key to a string
     .local pmc val
     val = hash[key_str]
 
@@ -169,22 +169,21 @@ DONE:
 .end
 
 .sub _package_name
-  .param pmc args
+    .param pmc args
+    .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-  .local pmc pkg, pkgname
+    .local pmc pkg
+    .CAR(pkg, args)
+    .ASSERT_TYPE(pkg, "package")
 
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+    .local pmc pkgname
+    pkgname = pkg._get_name()
 
-  .CAR(pkg, args)
-  .ASSERT_TYPE(pkg, "package")
-
-   pkgname = pkg._get_name()
-
-   goto DONE
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to SYS:%PACKAGE-NAME")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to SYS:%PACKAGE-NAME")
+    goto DONE
 
 DONE:
   .return(pkgname)
@@ -192,98 +191,92 @@ DONE:
 
 
 .sub _find_package
-  .param pmc args
+    .param pmc args
+    .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-  .local string pkgname_str
-  .local pmc pkgname
-  .local pmc retv
+    .local pmc pkgname
+    .CAR(pkgname, args)
+    .ASSERT_TYPE(pkgname, "string")
 
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+     .local string pkgname_str
+     pkgname_str = pkgname
+     upcase pkgname_str
 
-  .CAR(pkgname, args)
-  .ASSERT_TYPE(pkgname, "string")
+     push_eh PACKAGE_NOT_FOUND
+     .local pmc retv
+     retv = find_global "PACKAGES", pkgname_str
+     if_null retv, PACKAGE_NOT_FOUND
+     clear_eh
 
-   pkgname_str = pkgname
-   upcase pkgname_str
-
-   push_eh PACKAGE_NOT_FOUND
-   retv = find_global "PACKAGES", pkgname_str
-   if_null retv, PACKAGE_NOT_FOUND
-   clear_eh
-
-   goto DONE
+     goto DONE
 
 PACKAGE_NOT_FOUND:
-  .ERROR_1("internal", "there is no package with the name \"%s\"", pkgname)
-   goto DONE
+     .NIL(retv)
+     goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %FIND-PACKAGE")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %FIND-PACKAGE")
+     goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _alias_package
-  .param pmc args
+    .param pmc args
+    .ASSERT_LENGTH(args, 2, ERROR_NARGS)
 
-  .local string pkgnames
-  .local pmc package
-  .local pmc pkgname
-  .local pmc retv
+    .local pmc package
+    .CAR(package, args)
+    .ASSERT_TYPE(package, "package")
 
-  .ASSERT_LENGTH(args, 2, ERROR_NARGS)
+    .local pmc pkgname
+    .SECOND(pkgname, args)
+    .ASSERT_TYPE(pkgname, "string")
 
-  .CAR(package, args)
-  .ASSERT_TYPE(package, "package")
+    .local string pkgname_str
+    pkgname_str = pkgname
+    upcase pkgname_str
 
-  .SECOND(pkgname, args)
-  .ASSERT_TYPE(pkgname, "string")
+    store_global "PACKAGES", pkgname_str, package
 
-   pkgnames = pkgname
-
-   store_global "PACKAGES", pkgnames, package
-
-  .TRUE(retv)
-   goto DONE
+    .local pmc retv
+    .TRUE(retv)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %ALIAS-PACKAGE")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %ALIAS-PACKAGE")
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _make_package
-  .param pmc args
-  .local string pkgnames
-  .local pmc packages
-  .local pmc package
-  .local pmc pkgname
-  .local pmc symbol
+    .param pmc args
+    .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+    .local pmc pkgname
+    .CAR(pkgname, args)
+    .ASSERT_TYPE(pkgname, "string")
 
-  .CAR(pkgname, args)
-  .ASSERT_TYPE(pkgname, "string")
+    .local pmc package
+    .PACKAGE(package, pkgname)
 
-  .PACKAGE(package, pkgname)
+    .local string pkgname_str
+    pkgname_str = pkgname
+    upcase pkgname_str
 
-   pkgnames = pkgname
-   upcase pkgnames, pkgnames
+    store_global "PACKAGES", pkgname_str, package
 
-   store_global "PACKAGES", pkgnames, package
-
-   goto DONE
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %MAKE-PACKAGE")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %MAKE-PACKAGE")
+    goto DONE
 
 DONE:
-  .return(package)
+    .return(package)
 .end
 
 .sub _use_package
@@ -469,7 +462,6 @@ DONE:
 
 .sub _get_object_attr
     .param pmc args
-
     .ASSERT_LENGTH(args,3,ERROR_NARGS)
 
     .local pmc symbol
@@ -505,7 +497,6 @@ DONE:
 
 .sub _set_object_attr
     .param pmc args
-
     .ASSERT_LENGTH(args,4,ERROR_NARGS)
 
     .local pmc symbol
