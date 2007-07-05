@@ -202,94 +202,89 @@ typedef struct PMC_EXT {
 #define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize
 #define PMC_union(pmc)        (pmc)->obj.u
 
+#define POBJ_FLAG(n) ((UINTVAL)1 << (n))
 /* PObj flags */
 typedef enum PObj_enum {
     /* This first 8 flags may be used privately by a Parrot Object.
-     * It is suggested that you alias these within an individual
-     * class's header file
+     * You should alias these within an individual class's header file.
      */
-    PObj_private0_FLAG = 1 << 0,
-    PObj_private1_FLAG = 1 << 1,
-    PObj_private2_FLAG = 1 << 2,
-    PObj_private3_FLAG = 1 << 3,
-    PObj_private4_FLAG = 1 << 4,
-    PObj_private5_FLAG = 1 << 5,
-    PObj_private6_FLAG = 1 << 6,
-    PObj_private7_FLAG = 1 << 7,
+    PObj_private0_FLAG          = POBJ_FLAG(0),
+    PObj_private1_FLAG          = POBJ_FLAG(1),
+    PObj_private2_FLAG          = POBJ_FLAG(2),
+    PObj_private3_FLAG          = POBJ_FLAG(3),
+    PObj_private4_FLAG          = POBJ_FLAG(4),
+    PObj_private5_FLAG          = POBJ_FLAG(5),
+    PObj_private6_FLAG          = POBJ_FLAG(6),
+    PObj_private7_FLAG          = POBJ_FLAG(7),
 
-    /* Object specification FLAGs */
-
+/* Object specification FLAGs */
     /* PObj is a string */
-    PObj_is_string_FLAG = 1 << 8,
+    PObj_is_string_FLAG         = POBJ_FLAG(8),
     /* PObj is a PMC */
-    PObj_is_PMC_FLAG = 1 << 9,
+    PObj_is_PMC_FLAG            = POBJ_FLAG(9),
     /* the PMC has a PMC_EXT structure appended */
-    PObj_is_PMC_EXT_FLAG = 1 << 10,
+    PObj_is_PMC_EXT_FLAG        = POBJ_FLAG(10),
     /* the PMC is a shared PMC */
-    PObj_is_PMC_shared_FLAG = 1 << 11,
-
+    PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11), /* Same as PObj_is_shared_FLAG */
     /* PObj is otherwise shared */
-    PObj_is_shared_FLAG = 1 << 11,
+    PObj_is_shared_FLAG         = POBJ_FLAG(11), /* Same as PObj_is_PMC_shared_FLAG */
 
-    /* Memory management FLAGs */
-
+/* Memory management FLAGs */
     /* This is a constant--don't kill it! */
-    PObj_constant_FLAG = 1 << 12,
+    PObj_constant_FLAG          = POBJ_FLAG(12),
     /* Marks the contents as coming from a non-Parrot source */
-    PObj_external_FLAG = 1 << 13,
+    PObj_external_FLAG          = POBJ_FLAG(13),
     /* the Buffer is aligned to BUFFER_ALIGNMENT boundaries */
-    PObj_aligned_FLAG = 1 << 14,
+    PObj_aligned_FLAG           = POBJ_FLAG(14),
     /* Mark the buffer as pointing to system memory */
-    PObj_sysmem_FLAG = 1 << 15,
+    PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
-    /* PObj usage FLAGs, COW & GC */
-
+/* PObj usage FLAGs, COW & GC */
     /* Mark the contents as Copy on write */
-    PObj_COW_FLAG = 1 << 16,
+    PObj_COW_FLAG               = POBJ_FLAG(16),
     /* the Buffer may have COW copies */
-    PObj_is_COWable_FLAG = 1 << 17,
+    PObj_is_COWable_FLAG        = POBJ_FLAG(17),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    b_PObj_live_FLAG = 1 << 18,
+    b_PObj_live_FLAG            = POBJ_FLAG(18),
     /* Mark the object as on the free list */
-    b_PObj_on_free_list_FLAG = 1 << 19,
+    b_PObj_on_free_list_FLAG    = POBJ_FLAG(19),
 
-    /* DOD/GC FLAGS */
-
+/* DOD/GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
-    PObj_custom_mark_FLAG = 1 << 20,
+    PObj_custom_mark_FLAG       = POBJ_FLAG(20),
     /* Mark the buffer as needing GC */
-    PObj_custom_GC_FLAG = 1 << 21,
+    PObj_custom_GC_FLAG         = POBJ_FLAG(21),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_active_destroy_FLAG = 1 << 22,
+    PObj_active_destroy_FLAG    = POBJ_FLAG(22),
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG = 1 << 23,
+    PObj_report_FLAG            = POBJ_FLAG(23),
 
-    /* PMC specific FLAGs */
-
+/* PMC specific FLAGs */
     /* Set to true if the PMC data pointer points to a malloced
      * array of PObjs
      */
-    PObj_data_is_PMC_array_FLAG = 1 << 24,
+    PObj_data_is_PMC_array_FLAG = POBJ_FLAG(24),
     /* call object finalizer */
-    PObj_need_finalize_FLAG = 1 << 25,
+    PObj_need_finalize_FLAG     = POBJ_FLAG(25),
     /* a PMC that needs special handling in DOD, i.e one that has either:
      * - metadata
      * - data_is_PMC_array_FLAG
      * - custom_mark_FLAG
      */
-    b_PObj_is_special_PMC_FLAG = 1 << 26,
+    b_PObj_is_special_PMC_FLAG  = POBJ_FLAG(26),
 
     /* true if this is connected by some route to a needs_early_DOD object */
-    PObj_high_priority_DOD_FLAG = 1 << 27,
-    PObj_needs_early_DOD_FLAG = (1 << 27 | 1 << 28),
+    PObj_high_priority_DOD_FLAG = POBJ_FLAG(27),
+    PObj_needs_early_DOD_FLAG   = (POBJ_FLAG(27) | POBJ_FLAG(28)),
 
     /* True if the PMC is a class */
-    PObj_is_class_FLAG = 1 << 29,
+    PObj_is_class_FLAG          = POBJ_FLAG(29),
     /* True if the PMC is a parrot object */
-    PObj_is_object_FLAG = 1 << 30
+    PObj_is_object_FLAG         = POBJ_FLAG(30),
 
 } PObj_flags;
+#undef POBJ_FLAG
 
 /*
  * flag access macros:
