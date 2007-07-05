@@ -227,15 +227,7 @@ Accepts no arguments and returns a string.
 # Data::Dumper supports Sortkeys since 2.12
 # older versions will work but obviously not sorted
 {
-    my $dd_version;
-    if ( $Data::Dumper::VERSION =~ /([\d.]+)/ ) {
-        $dd_version = $1;
-    }
-    else {
-        $dd_version = $Data::Dumper::VERSION;
-    }
-
-    if ( $dd_version >= 2.12 ) {
+    if ( defined eval { Data::Dumper->can('Sortkeys') } ) {
         *dump = sub {
             my $self = shift;
             Data::Dumper->new( [ $self->{c} ], ['*PConfig'] )->Sortkeys(1)->Dump();
@@ -262,15 +254,8 @@ Accepts no arguments and returns a string.
 # Data::Dumper supports Sortkeys since 2.12
 # older versions will work but obviously not sorted
 {
-    my $dd_version;
-    if ( $Data::Dumper::VERSION =~ /([\d.]+)/ ) {
-        $dd_version = $1;
-    }
-    else {
-        $dd_version = $Data::Dumper::VERSION;
-    }
 
-    if ( $dd_version >= 2.12 ) {
+    if ( defined eval { Data::Dumper->can( 'Sortkeys' ) } ) {
         *dump_temp = sub {
             my $self = shift;
             Data::Dumper->new( [ $self->{c_temp} ], ['*PConfig_Temp'] )->Sortkeys(1)->Dump();
