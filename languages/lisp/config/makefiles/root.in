@@ -7,6 +7,21 @@ PARROT = ../../parrot@exe@
 
 all: build
 
+# This is a listing of all targets, that are meant to be called by users
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all:               'lisp.pbc'"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  help:              Print this help message."
+	@echo ""
+	@echo "  test:              Run the test suite."
+	@echo ""
+	@echo "  clean:             Cleaning up."
+	@echo ""
+
 test: build
 	$(PERL) -Ilib -I../../lib t/harness
 
