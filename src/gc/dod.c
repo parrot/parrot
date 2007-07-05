@@ -567,7 +567,6 @@ Parrot_dod_sweep(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
     UINTVAL object_size   = pool->object_size;
 
     Small_Object_Arena *cur_arena;
-    size_t              nm;
 #if REDUCE_ARENAS
     UINTVAL free_arenas = 0, old_total_used = 0;
 #endif
@@ -591,7 +590,7 @@ Parrot_dod_sweep(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = (Buffer *)cur_arena->start_objects;
 
-        for (i = nm = 0; i < cur_arena->used; i++) {
+        for (i = 0; i < cur_arena->used; i++) {
             if (PObj_on_free_list_TEST(b))
                 ; /* if it's on free list, do nothing */
             else if (PObj_live_TEST(b)) {
