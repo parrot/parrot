@@ -115,7 +115,7 @@ static Instruction*
 pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         char *op_name, int n, SymReg **args, int *arg_flags)
 {
-    int i, l, flags;
+    int i, flags;
     char buf[1024], s[16];
     SymReg ** const regs  = (SymReg **)mem_sys_allocate((n + 1) * sizeof (SymReg *));
 
@@ -153,7 +153,6 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         sprintf(s, "0x%x", flags);
         if (i < n - 1)
             strcat(s, ",");
-        l = strlen(s);
         strcat(buf, s);         /* XXX check avail len */
     } /* n params */
 

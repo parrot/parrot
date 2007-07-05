@@ -139,7 +139,6 @@ iNEW(Interp *interp, IMC_Unit *unit, SymReg *r0,
     }
     else
         nargs = 2;
-    i = nargs;
     return INS(interp, unit, "new", fmt, regs, nargs,0, emit);
 }
 
