@@ -23,8 +23,14 @@ UTF-8 (L<http://www.utf-8.com/>).
 /* HEADERIZER BEGIN: static */
 
 static void become_encoding( Interp *interp, STRING *src );
-static UINTVAL bytes( Interp *interp, STRING *src );
-static UINTVAL codepoints( Interp *interp, STRING *src );
+static UINTVAL bytes( Interp *interp, STRING *src /*NN*/ )
+        __attribute__nonnull__(2)
+        __attribute__pure__
+        __attribute__warn_unused_result__;
+
+static UINTVAL codepoints( Interp *interp, STRING *src /*NN*/ )
+        __attribute__nonnull__(2);
+
 static UINTVAL get_byte( Interp *interp,
     const STRING *src /*NN*/,
     UINTVAL offset )
@@ -57,7 +63,11 @@ static STRING * get_codepoints_inplace( Interp *interp,
     UINTVAL count,
     STRING *return_string );
 
-static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
+static void iter_init( Interp *interp,
+    const STRING *src,
+    String_iter *iter /*NN*/ )
+        __attribute__nonnull__(3);
+
 static void set_byte( Interp *interp /*NN*/,
     const STRING *src /*NN*/,
     UINTVAL offset,
@@ -144,8 +154,6 @@ const char Parrot_utf8skip[256] = {
 #if 0
 typedef unsigned char utf8_t;
 #endif
-
-static void iter_init(Interp *, const STRING *src, String_iter *iter);
 
 /*
 
@@ -496,8 +504,7 @@ get_codepoints(Interp *interp, STRING *src,
 {
     String_iter iter;
     UINTVAL start;
-    STRING *return_string = Parrot_make_COW_reference(interp,
-            src);
+    STRING * const return_string = Parrot_make_COW_reference(interp, src);
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
     start = iter.bytepos;
@@ -551,6 +558,9 @@ get_bytes_inplace(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     UNIMPL;
+    UNUSED(interp);
+    UNUSED(src);
+    UNUSED(return_string);
     return NULL;
 }
 
@@ -558,6 +568,9 @@ static void
 set_codepoints(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
+    UNUSED(interp);
+    UNUSED(src);
+    UNUSED(new_codepoints);
     UNIMPL;
 }
 
@@ -565,6 +578,9 @@ static void
 set_bytes(Interp *interp, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
+    UNUSED(interp);
+    UNUSED(src);
+    UNUSED(new_bytes);
     UNIMPL;
 }
 
@@ -573,12 +589,14 @@ set_bytes(Interp *interp, STRING *src,
 static void
 become_encoding(Interp *interp, STRING *src)
 {
+    UNUSED(interp);
+    UNUSED(src);
     UNIMPL;
 }
 
 
 static UINTVAL
-codepoints(Interp *interp, STRING *src)
+codepoints(Interp *interp, STRING *src /*NN*/)
 {
     String_iter iter;
     /*
@@ -592,13 +610,14 @@ codepoints(Interp *interp, STRING *src)
 }
 
 static UINTVAL
-bytes(Interp *interp, STRING *src)
+bytes(SHIM_INTERP, STRING *src /*NN*/)
+    /* PURE, WARN_UNUSED */
 {
     return src->bufused;
 }
 
 static void
-iter_init(Interp *interp, const STRING *src, String_iter *iter)
+iter_init(SHIM_INTERP, const STRING *src, String_iter *iter /*NN*/)
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;
