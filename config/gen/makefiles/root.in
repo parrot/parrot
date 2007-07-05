@@ -105,8 +105,8 @@ LDFLAGS    = @ldflags@ @ld_debug@
 
 CONFIGURE  = $(PERL) Configure.pl
 
-LINT = lint
-LINTFLAGS = \
+SUNLINT = lint
+SUNLINTFLAGS = \
     -b \
     -n \
     -p \
@@ -1709,12 +1709,13 @@ status :
 patch :
 	svn diff
 
+lint : sunlint
 
-lint : $(PARROT)
+sunlint : $(PARROT)
 	rm -f *.ln
-	$(LINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(LINTFLAGS) src/*.c
+	$(SUNLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SUNLINTFLAGS) src/*.c
 
-ANDYLINTFLAGS = \
+BSDLINTFLAGS = \
 	-a \
 	-c \
 	-e \
@@ -1727,9 +1728,9 @@ ANDYLINTFLAGS = \
 	-F \
 	-V \
 
-andylint : $(PARROT)
+bsdlint : $(PARROT)
 	rm -f *.ln
-	$(LINT) $(CC_INC) "-Isrc/pmc" $(ANDYLINTFLAGS) \
+	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) \
 		compilers/imcc/cfg.c \
 		compilers/imcc/debug.c \
 		compilers/imcc/imc.c \
