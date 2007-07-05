@@ -40,19 +40,24 @@ Use in bootstrapping.
 
     .DEFUN(symbol, package, "%GET-OBJECT-ATTRIBUTE",  "_get_object_attr")
     .DEFUN(symbol, package, "%SET-OBJECT-ATTRIBUTE",  "_set_object_attr")
-    .DEFUN(symbol, package, "%MAKE-HASH-TABLE",       "_make_hash")
+
+    .DEFUN(symbol, package, "%MAKE-HASH-TABLE",       "_make_hash_table")
     .DEFUN(symbol, package, "%SET-HASH",              "_set_hash")
     .DEFUN(symbol, package, "%GET-HASH",              "_get_hash")
+
     .DEFUN(symbol, package, "%ALIAS-PACKAGE",         "_alias_package")
     .DEFUN(symbol, package, "%FIND-PACKAGE",          "_find_package")
     .DEFUN(symbol, package, "%PACKAGE-NAME",          "_package_name")
     .DEFUN(symbol, package, "%MAKE-PACKAGE",          "_make_package")
     .DEFUN(symbol, package, "%USE-PACKAGE",           "_use_package")
     .DEFUN(symbol, package, "%EXPORT",                "_export")
+
     .DEFUN(symbol, package, "%OPEN-FILE",             "_open_file")
     .DEFUN(symbol, package, "%PEEK",                  "_peek")
     .DEFUN(symbol, package, "%CLOSE",                 "_close")
+
     .DEFUN(symbol, package, "%STRING-EQUAL",          "_string_equal")
+
     .DEFUN(symbol, package, "%MAKE-MACRO",            "_make_macro")
 
     # XXX - THESE SHOULD BE REMOVED AND CONVERTED TO PROPER LISP FUNCTIONS
@@ -102,66 +107,65 @@ Use in bootstrapping.
 .end
 
 .sub _set_hash
-  .param pmc args
-  .local string keys
-  .local pmc hash
-  .local pmc key
-  .local pmc val
+    .param pmc args
+    .ASSERT_LENGTH(args,3,ERROR_NARGS)
 
-  .ASSERT_LENGTH(args,3,ERROR_NARGS)
+    .local pmc hash
+    .CAR(hash,args)
+    .ASSERT_TYPE(hash, "hash")
 
-  .CAR(hash,args)
-  .SECOND(key,args)
-  .THIRD(val,args)
+    .local pmc key
+    .SECOND(key,args)
+    .ASSERT_TYPE(key, "string")
 
-  .ASSERT_TYPE(hash, "hash")
-  .ASSERT_TYPE(key, "string")
+    .local pmc val
+    .THIRD(val,args)
 
-   keys = key
-   hash[keys] = val
+    .local string key_str
+    key_str = key
+    hash[key_str] = val
 
-   goto DONE
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %SET-HASH")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %SET-HASH")
+    goto DONE
 
 DONE:
-  .return(val)
+    .return(val)
 .end
 
 .sub _get_hash
-  .param pmc args
-  .local string keys
-  .local pmc hash
-  .local pmc key
-  .local pmc val
+    .param pmc args
+    .ASSERT_LENGTH(args,2,ERROR_NARGS)
 
-  .ASSERT_LENGTH(args,2,ERROR_NARGS)
+    .local pmc hash
+    .CAR(hash,args)
+    .ASSERT_TYPE(hash, "hash")
 
-  .CAR(hash,args)
-  .SECOND(key,args)
+    .local pmc key
+    .SECOND(key,args)
+    .ASSERT_TYPE(key, "string")
 
-  .ASSERT_TYPE(hash, "hash")
-  .ASSERT_TYPE(key, "string")
+    .local string key_str
+     key_str = key                                      # Convert the key to a string
+    .local pmc val
+    val = hash[key_str]
 
-   keys = key                                      # Convert the key to a string
-   val = hash[keys]
+    if_null val, NO_VALUE_SET
 
-   if_null val, NO_VALUE_SET
-
-   goto DONE
+    goto DONE
 
 NO_VALUE_SET:
-  .NIL(val)
-   goto DONE
+    .NIL(val)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %GET-HASH")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %GET-HASH")
+    goto DONE
 
 DONE:
-  .return(val)
+    .return(val)
 .end
 
 .sub _package_name
@@ -364,21 +368,20 @@ DONE:
   .return(retv)
 .end
 
-.sub _make_hash
-  .param pmc args
-  .local pmc retv
+.sub _make_hash_table
+    .param pmc args
+    .ASSERT_LENGTH(args,0,ERROR_NARGS)
 
-  .ASSERT_LENGTH(args,0,ERROR_NARGS)
-
-  .HASH(retv)
-   goto DONE
+    .local pmc retv
+    .HASH(retv)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to %MAKE-HASH")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to %MAKE-HASH-TABLE")
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _raise_error

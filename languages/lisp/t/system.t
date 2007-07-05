@@ -56,6 +56,19 @@ my @test_cases = (
       q{1},
       q{get-object-attribute value},
     ],
+    [ q{  ( sys:%set-object-attribute '*gensym-counter* "LispSymbol" "value" (* 42 2) )
+          ( print (sys:%get-object-attribute '*gensym-counter* "LispSymbol" "value"))
+      },
+      q{84},
+      q{get-object-attribute value},
+    ],
+    [ q{ (setq english_to_german (sys:%make-hash-table))
+         (sys:%set-hash english_to_german "House" "Haus")
+         ( print (sys:%get-hash english_to_german "House" ))
+      },
+      q{Haus},
+      q{make-hash-table set-hash get-hash},
+    ],
     [ q{ (setq english_to_german (sys:%make-hash-table))
          (setf (sys:%get-hash "House" table) "Haus")
          ( print (sys:%get-hash "House" table))
