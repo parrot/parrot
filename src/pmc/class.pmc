@@ -1175,7 +1175,7 @@ C<add_method> vtable method.
             }
             if (!found)
                 real_exception(interp, NULL, METH_NOT_FOUND,
-                    "'%S' is not a valid v-table method name.", name);  
+                    "'%S' is not a valid v-table method name.", name);
 
             /* Add it to vtable methods list. */
             VTABLE_set_pmc_keyed_str(interp, _class->vtable_methods, name, sub);
