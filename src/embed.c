@@ -280,7 +280,7 @@ Parrot_readbc(Parrot_Interp interp, const char *fullname /*NULLOK*/)
         program_size = 0;
     }
     else {
-        STRING *fs = string_make(interp, fullname,
+        STRING * const fs = string_make(interp, fullname,
                 strlen(fullname), NULL, 0);
         if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
             PIO_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
@@ -656,7 +656,6 @@ set_current_sub(Parrot_Interp interp /*NN*/)
     opcode_t i, ci;
     Parrot_sub *sub;
     PMC *sub_pmc;
-    opcode_t *code_start;
     size_t offs;
 
     PackFile_ByteCode * const cur_cs = interp->code;
@@ -676,7 +675,6 @@ set_current_sub(Parrot_Interp interp /*NN*/)
                 sub = PMC_sub(sub_pmc);
                 if (sub->seg != cur_cs)
                     continue;
-                code_start = (opcode_t*) sub->seg->base.data;
                 offs = sub->start_offs;
                 if (offs == interp->resume_offset) {
                     CONTEXT(interp->ctx)->current_sub = sub_pmc;
@@ -867,10 +865,8 @@ Parrot_disassemble(Parrot_Interp interp /*NN*/)
          * num_mappings, op_code_seq_num,
          * interp->code->debugs->mappings[curr_mapping]->offset); */
 
-        if (debugs && curr_mapping < num_mappings)
-        {
-            if ( op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset)
-            {
+        if (debugs && curr_mapping < num_mappings) {
+            if ( op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
                 int filename_const_offset = interp->code->debugs->mappings[curr_mapping]->u.filename;
                 PIO_printf(interp, "Current Source Filename %Ss\n", interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
