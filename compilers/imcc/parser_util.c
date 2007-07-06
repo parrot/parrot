@@ -1215,14 +1215,11 @@ imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/,
     int len;
     const char *cp;
     const char *fmt;
-    int ch, n;
-    int _int;
-    double _double;
-    Instruction  *_ins;
-    char *_string;
     char buf[128];
 
     for (len = 0, fmt = format ; ; ) {
+        int ch, n;
+
         for (n = 0, cp = fmt; (ch = *fmt) && ch != '%'; fmt++)
             n++;
         /* print prev string */
@@ -1261,10 +1258,12 @@ imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/,
             case 'X':
             case 'p':
             case 'c':
-                _int = va_arg(ap, int);
+                {
+                const int _int = va_arg(ap, int);
                 memcpy(buf, cp, n = (fmt - cp));
                 buf[n] = '\0';
                 len += fprintf(fd, buf, _int);
+                }
                 break;
             case 'e':
             case 'E':
@@ -1272,23 +1271,29 @@ imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/,
             case 'F':
             case 'g':
             case 'G':
-                _double = va_arg(ap, double);
+                {
+                const double _double = va_arg(ap, double);
                 memcpy(buf, cp, n = (fmt - cp));
                 buf[n] = '\0';
                 len += fprintf(fd, buf, _double);
+                }
                 break;
             case 's':
-                _string = va_arg(ap, char *);
+                {
+                const char * const _string = va_arg(ap, char *);
                 memcpy(buf, cp, n = (fmt - cp));
                 assert(n<128);
                 buf[n] = '\0';
                 len += fprintf(fd, buf, _string);
+                }
                 break;
             /* this is the reason for the whole mess */
             case 'I':
-                _ins = va_arg(ap, Instruction *);
+                {
+                Instruction * const _ins = va_arg(ap, Instruction *);
                 len += fprintf(fd, "%s ", _ins->op);
                 len += ins_print(interp, fd, _ins);
+                }
                 break;
         }
     }
