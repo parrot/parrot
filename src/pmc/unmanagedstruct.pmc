@@ -123,7 +123,7 @@ static char *
 char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)
 {
     size_t offs, count, size, max;
-    PMC *next, *init, *outer_init;
+    PMC *next, *init;
     int ix;
     char *p;
 
@@ -141,7 +141,7 @@ char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)
         count = key_integer(interp, next);
     else
         count = 1;
-    outer_init = init = PMC_pmc_val(pmc);
+    init = PMC_pmc_val(pmc);
     max = (size_t) VTABLE_get_integer_keyed_int(interp, init, ix + 1);
 #ifdef STRUCT_DEBUG
     PIO_eprintf(interp, " count = %d ix = %d max = %d\n",
