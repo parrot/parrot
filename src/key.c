@@ -285,7 +285,7 @@ key_number(Interp *interp, PMC *key /*NN*/)
         }
     default:
         real_exception(interp, NULL, INVALID_OPERATION, "Key not a number!\n");
-        return 0;
+        return (FLOATVAL)0;
     }
 }
 
