@@ -480,8 +480,7 @@ Creates a subclass, optionally with a given C<name>.
         }
         else {
             PMC *naming_hash = pmc_new(interp, enum_class_Hash);
-            VTABLE_set_pmc_keyed_str(interp, naming_hash,
-                CONST_STRING(interp, "name"), name);
+            VTABLE_set_pmc_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
             child_class      = pmc_new_init(interp, enum_class_Class,
                 naming_hash);
         }
@@ -606,12 +605,10 @@ Returns an error if an attribute of C<name> already exists.
                 string_to_cstring(interp, name));
 
         /* Set name and type. */
-        VTABLE_set_string_keyed_str(interp, new_attribute,
-            CONST_STRING(interp, "name"), name);
+        VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
 
         if (!PMC_IS_NULL(type))
-            VTABLE_set_pmc_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "type"), type);
+            VTABLE_set_pmc_keyed_str(interp, new_attribute, CONST_STRING(interp, "type"), type);
 
         /* Enter the attribute in the attributes array. */
         VTABLE_set_pmc_keyed_str(interp, _class->attrib_metadata, name,
@@ -930,8 +927,7 @@ Sets the name of the class, and updates the namespace accoringly.
              * init_class_from_hash - saves some code duplication. */
             PMC *naming_hash = pmc_new(interp, enum_class_Hash);
 
-            VTABLE_set_string_keyed_str(interp, naming_hash,
-                CONST_STRING(interp, "name"), name);
+            VTABLE_set_string_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
             init_class_from_hash(interp, SELF, naming_hash);
         }
 
