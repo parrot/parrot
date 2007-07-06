@@ -38,12 +38,9 @@ sub runstep {
 
         # suppress sprintf warnings that don't apply
         $cflags .= ' -wd269';
-        if ( $ld_share_flags !~ /-fPIC/ ) {
-            $ld_share_flags .= ' -fPIC';
-        }
-        if ( $cc_shared !~ /-fPIC/ ) {
-            $cc_shared .= ' -fPIC';
-        }
+
+        $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
+        $cc_shared .= ' -fPIC';
     }
     elsif ( $cc =~ /suncc/ ) {
         $link = 'sunCC';
