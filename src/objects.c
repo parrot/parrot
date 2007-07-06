@@ -173,7 +173,7 @@ PMC*
 Parrot_find_vtable_meth(Interp *interp, PMC *pmc /*NN*/, STRING *meth)
 {
     INTVAL i, n;
-    PMC   *ns, *mro, *self_class;
+    PMC   *ns, *mro;
     PMC   *_class       = pmc;
 
     /* Get index in Parrot_vtable_slot_names[]. */
@@ -184,7 +184,7 @@ Parrot_find_vtable_meth(Interp *interp, PMC *pmc /*NN*/, STRING *meth)
 
     /* Get class. */
     if (PObj_is_object_TEST(pmc))
-        _class = self_class = GET_CLASS(PMC_data_typed(pmc, Buffer), pmc);
+        _class = GET_CLASS(PMC_data_typed(pmc, Buffer), pmc);
 
     /* Get MRO and iterate over it to find method with a matching
        vtable index or double-underscored name. */
