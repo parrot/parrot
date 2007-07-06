@@ -124,11 +124,7 @@ make_local_args_copy(Parrot_Interp interp, Parrot_Interp old_interp, PMC *args)
     VTABLE_set_integer_native(interp, ret_val, old_size);
 
     for (i = 0; i < old_size; ++i) {
-        PMC *copy, *orig;
-
-        orig = VTABLE_get_pmc_keyed_int(old_interp, args, i);
-
-        copy = make_local_copy(interp, old_interp,
+        PMC * const copy = make_local_copy(interp, old_interp,
                 VTABLE_get_pmc_keyed_int(old_interp, args, i));
 
         VTABLE_set_pmc_keyed_int(interp, ret_val, i, copy);
