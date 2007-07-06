@@ -116,12 +116,14 @@ void
 Parrot_init_builtins(Interp *interp /*NN*/)
 {
     size_t i;
-    char buffer[128];
 
-    buffer[0] = buffer[1] = '_';
     for (i = 0; i < N_BUILTINS; ++i) {
         /* XXX mangle yes or no */
 #ifdef MANGLE_BUILTINS
+        char buffer[128];
+
+        buffer[0] = '_';
+        buffer[1] = '_';
         strcpy(buffer + 2, builtins[i].c_name);
         builtins[i].meth_name = const_string(interp, buffer);
 #else
