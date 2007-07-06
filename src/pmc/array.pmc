@@ -387,7 +387,7 @@ Returns the float value of the element at index C<key>.
         PMC* box;
 
         if (!key)
-            return 0;
+            return (FLOATVAL)0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL)
