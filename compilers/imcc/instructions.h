@@ -42,29 +42,31 @@ typedef struct _Instruction {
  * int flags_w
  * int flags_jump
  */
+#define INSTRUCTION_BIT(n) ((UINTVAL)1 << (n))
 typedef enum {
     /* Indicate how the instruction affects each of the registers */
-    IF_r0_read  = (1 << 0),
-    IF_r1_read  = (1 << 1),
-    IF_r2_read  = (1 << 2),
-    IF_r3_read  = (1 << 3),
+    IF_r0_read      = INSTRUCTION_BIT(0),
+    IF_r1_read      = INSTRUCTION_BIT(1),
+    IF_r2_read      = INSTRUCTION_BIT(2),
+    IF_r3_read      = INSTRUCTION_BIT(3),
     /* .... */
-    IF_r0_write = (1 << 16),
-    IF_r1_write = (1 << 17),
-    IF_r2_write = (1 << 18),
-    IF_r3_write = (1 << 19),
+    IF_r0_write     = INSTRUCTION_BIT(16),
+    IF_r1_write     = INSTRUCTION_BIT(17),
+    IF_r2_write     = INSTRUCTION_BIT(18),
+    IF_r3_write     = INSTRUCTION_BIT(19),
     /* .... */
-    IF_binary  = (IF_r0_write|IF_r1_read|IF_r2_read), /* templ for binary op */
-    IF_unary   = (IF_r0_write|IF_r1_read),           /* templ for unary  op */
-    IF_inplace = (IF_r0_write|IF_r0_read),    /* templ for inplace unary  op */
+    IF_binary       = (IF_r0_write|IF_r1_read|IF_r2_read), /* templ for binary op */
+    IF_unary        = (IF_r0_write|IF_r1_read),           /* templ for unary  op */
+    IF_inplace      = (IF_r0_write|IF_r0_read),    /* templ for inplace unary  op */
     /* the branch flags are the low 16 bits of type
      * for upper 16 see ITXX above */
-    IF_r0_branch  = (1 << 0),
-    IF_r1_branch  = (1 << 1),
-    IF_r2_branch  = (1 << 2),
-    IF_r3_branch  = (1 << 3),
-    IF_goto =       (1 << 15)
+    IF_r0_branch    = INSTRUCTION_BIT(0),
+    IF_r1_branch    = INSTRUCTION_BIT(1),
+    IF_r2_branch    = INSTRUCTION_BIT(2),
+    IF_r3_branch    = INSTRUCTION_BIT(3),
+    IF_goto         = INSTRUCTION_BIT(15)
 } Instruction_Flags;
+#undef INSTRUCTION_BIT
 
 
 /* Forward decl */

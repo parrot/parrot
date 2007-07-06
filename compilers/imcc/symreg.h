@@ -3,28 +3,30 @@
 
 /* types */
 
+#define VARTYPE_BIT(n) ((UINTVAL)1 << (n))
 enum VARTYPE {              /* variable type can be */
-    VTCONST     = 1 << 0,   /* constant */
-    VTREG       = 1 << 1,   /* register */
-    VTIDENTIFIER= 1 << 2,   /* identifier */
-    VTADDRESS   = 1 << 3,   /* address */
-    VTREGKEY    = 1 << 4,   /* parrot [key;key..], including registers */
-    VTPASM      = 1 << 5,   /* parrot register, colored from .emit */
-    VT_CONSTP   = 1 << 6,   /* pointer to constant value */
-    VT_PCC_SUB  = 1 << 7,   /* PCC subroutine call */
-    VT_FLAT     = 1 << 8,   /* var :flat */
-    VT_OPTIONAL = 1 << 9,   /* var :optional */
+    VTCONST         = VARTYPE_BIT(0),   /* constant */
+    VTREG           = VARTYPE_BIT(1),   /* register */
+    VTIDENTIFIER    = VARTYPE_BIT(2),   /* identifier */
+    VTADDRESS       = VARTYPE_BIT(3),   /* address */
+    VTREGKEY        = VARTYPE_BIT(4),   /* parrot [key;key..]), including registers */
+    VTPASM          = VARTYPE_BIT(5),   /* parrot register), colored from .emit */
+    VT_CONSTP       = VARTYPE_BIT(6),   /* pointer to constant value */
+    VT_PCC_SUB      = VARTYPE_BIT(7),   /* PCC subroutine call */
+    VT_FLAT         = VARTYPE_BIT(8),   /* var :flat */
+    VT_OPTIONAL     = VARTYPE_BIT(9),   /* var :optional */
     /* include/parrot/packfile.h */
-    VT_START_SLICE = PF_VT_START_SLICE ,   /* x .. y slice range */
-    VT_END_SLICE   = PF_VT_END_SLICE   ,
-    VT_START_ZERO  = PF_VT_START_ZERO  ,   /* .. y 0..start */
-    VT_END_INF     = PF_VT_END_INF     ,   /* x..  start..inf */
-    VT_SLICE_BITS  = PF_VT_SLICE_BITS,
-    VT_ENCODED   = 1 << 16,     /* unicode string constant */
-    VT_OPT_FLAG  = 1 << 17, /* var :opt_flag */
-    VT_NAMED     = 1 << 18, /* var :named(name) */
-    VT_UNIQUE_REG = 1 << 19
+    VT_START_SLICE  = PF_VT_START_SLICE,/* x .. y slice range */
+    VT_END_SLICE    = PF_VT_END_SLICE,
+    VT_START_ZERO   = PF_VT_START_ZERO, /* .. y 0..start */
+    VT_END_INF      = PF_VT_END_INF,    /* x..  start..inf */
+    VT_SLICE_BITS   = PF_VT_SLICE_BITS,
+    VT_ENCODED      = VARTYPE_BIT(16),  /* unicode string constant */
+    VT_OPT_FLAG     = VARTYPE_BIT(17),  /* var :opt_flag */
+    VT_NAMED        = VARTYPE_BIT(18),  /* var :named(name) */
+    VT_UNIQUE_REG   = VARTYPE_BIT(19)
 };
+#undef VARTYPE_BIT
 
 /* this VARTYPE needs register allocation and such */
 #define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
