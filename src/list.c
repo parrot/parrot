@@ -1111,31 +1111,22 @@ list_item(Interp *interp /*NN*/, List *list /*NN*/, int type, INTVAL idx)
     case enum_type_sized:
         return (void *)&((char *)
                          PObj_bufstart(&chunk->data))[idx * list->item_size];
-        break;
     case enum_type_char:
         return (void *)&((char *) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_short:
         return (void *)&((short *) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_int:
         return (void *)&((int *) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_INTVAL:
         return (void *)&((INTVAL *) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_FLOATVAL:
         return (void *)&((FLOATVAL *) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_PMC:
         return (void *)&((PMC **) PObj_bufstart(&chunk->data))[idx];
-        break;
     case enum_type_STRING:
         return (void *)&((STRING **) PObj_bufstart(&chunk->data))[idx];
-        break;
     default:
         real_exception(interp, NULL, 1, "Unknown list entry type\n");
-        break;
     }
     return 0;
 
@@ -1172,7 +1163,7 @@ Returns a new list of type C<type>.
 
 PARROT_API
 List *
-list_new(Interp *interp, INTVAL type)
+list_new(Interp *interp /*NN*/, PARROT_DATA_TYPES type)
     /* MALLOC, WARN_UNUSED */
 {
     List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
