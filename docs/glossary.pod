@@ -207,7 +207,7 @@ See also L<"PIR">.
 =head2 JAPH
 
 In the Parrot context a JAPH is a small script that prints the string "Just
-another Parrot Hacker\".
+another Parrot Hacker\n".
 
 =head2 MRO
 
