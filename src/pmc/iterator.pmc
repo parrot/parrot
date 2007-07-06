@@ -140,7 +140,7 @@ Make a clone of the iterator.
 
     PMC* clone() {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC *res = pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
+        PMC * const res = pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
         PMC_struct_val(res) = VTABLE_clone(interp, key);
         return res;
     }
@@ -465,8 +465,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 
 */
     opcode_t* invoke(void *next) {
-        PMC *agg, *key, *res;
-        INTVAL ires;
+        PMC *agg;
 
         if (REG_INT(3) == 1) {       /* iterator constructor */
             PMC *iter, *arg = REG_PMC(5);
@@ -484,20 +483,23 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
                     "Iterator: invoke 2 args");
 
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
-        key        = (PMC *)PMC_struct_val(SELF);
         agg        = (PMC *)PMC_pmc_val(SELF);
 
         switch (agg->vtable->base_type) {
             case enum_class_IntList:
-                ires       = DYNSELF.shift_integer();
+                {
+                const INTVAL ires = DYNSELF.shift_integer();
                 REG_INT(1) = 1;
                 REG_INT(5) = ires;
                 return (opcode_t *)next;
+                }
             default:
-                res        = DYNSELF.shift_pmc();
+                {
+                PMC * const res = DYNSELF.shift_pmc();
                 REG_INT(3) = 1;
                 REG_PMC(5) = res;
                 return (opcode_t *)next;
+                }
         }
 
         return NULL;
