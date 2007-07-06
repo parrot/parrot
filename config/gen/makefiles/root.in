@@ -1721,6 +1721,8 @@ SUNLINTFLAGS = \
     \
     -erroff=E_FUNC_ARG_UNUSED \
     -erroff=E_STMT_NOT_REACHED \
+    -erroff=E_NOP_IF_STMT \
+    -erroff=E_NOP_ELSE_STMT \
     -erroff=E_CASE_FALLTHRU \
 
 sunlint :

@@ -378,7 +378,8 @@ static PMC *force_sharing(Interp *interp, PMC *pmc) {
  * are all valid.
  */
 static int
-get_read_valid_depth(Interp *interp, STM_tx_log *log) {
+get_read_valid_depth(Interp *interp, STM_tx_log *log /*NN*/)
+{
     int i;
     int validp    = 1;
     int cur_depth = 1;
@@ -395,6 +396,7 @@ get_read_valid_depth(Interp *interp, STM_tx_log *log) {
         else
             last_read = get_sublog(log, cur_depth + 1)->first_read - 1;
 
+        /* XXX last_read is never used again.  Should it be in the condition for the for loop? */
         for (i = current->first_read; i <= log->last_read; ++i) {
             void *found_version;
 
