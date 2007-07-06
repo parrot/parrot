@@ -33,16 +33,16 @@ is( substr( $help_message, 0, 23 ), 'parrot [Options] <file>', 'Start of help me
 ok( index( $help_message, '-t --trace [flags]' ) > 0, 'help for --trace' );
 
 # setup PIR files for tests below
-my $first  = create_pir_file('first');
-my $second = create_pir_file('second');
+my $first_pir_file  = create_pir_file('first');
+my $second_pir_file = create_pir_file('second');
 
 # executing a PIR file
-is( `"$PARROT" "$first"`,  "first\n",  'running first.pir' );
-is( `"$PARROT" "$second"`, "second\n", 'running second.pir' );
+is( `"$PARROT" "$first_pir_file"`,  "first\n",  'running first.pir' );
+is( `"$PARROT" "$second_pir_file"`, "second\n", 'running second.pir' );
 
 # Ignore further arguments
-is( `"$PARROT" "$first" "$second"`, "first\n", 'ignore a pir-file' );
-is( `"$PARROT" "$first" "asdf"`,    "first\n", 'ignore nonsense' );
+is( `"$PARROT" "$first_pir_file" "$second_pir_file"`, "first\n", 'ignore a pir-file' );
+is( `"$PARROT" "$first_pir_file" "asdf"`,    "first\n", 'ignore nonsense' );
 
 # redirect STDERR to avoid warnings
 my $redir = '2>' . File::Spec->devnull;
@@ -50,31 +50,31 @@ my $redir = '2>' . File::Spec->devnull;
 # --pre-process-only
 # This is just sanity testing
 # Coredumps after the output has been written are ignored
-is( `"$PARROT" -E "$first" $redir`, <<'END_EXPECTED', 'option -E' );
+is( `"$PARROT" -E "$first_pir_file" $redir`, <<'END_EXPECTED', 'option -E' );
 .sub main :main
 print "first\n" 
 .end
 END_EXPECTED
 
-is( `"$PARROT" --pre-process-only "$first" $redir`, <<'END_EXPECTED', 'option --pre-process-only' );
+is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`, <<'END_EXPECTED', 'option --pre-process-only' );
 .sub main :main
 print "first\n" 
 .end
 END_EXPECTED
 
 # Test the trace option
-is( `"$PARROT" -t "$first" $redir`, "first\n", 'option -t' );
+is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
 TODO:
 {
     local $TODO = '--trace behaves not like -t';
-    is( `"$PARROT" --trace "$first" $redir`, "first\n", 'option --trace' );
+    is( `"$PARROT" --trace "$first_pir_file" $redir`, "first\n", 'option --trace' );
 }
-is( `"$PARROT" -t "$first" "$second" $redir`,      "second\n", 'option -t with flags' );
-is( `"$PARROT" --trace "$first" "$second" $redir`, "second\n", 'option --trace with flags' );
+is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`,      "second\n", 'option -t with flags' );
+is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`, "second\n", 'option --trace with flags' );
 
 # clean up temporary files
-unlink $first;
-unlink $second;
+unlink $first_pir_file;
+unlink $second_pir_file;
 
 sub create_pir_file {
     my $word = shift;
