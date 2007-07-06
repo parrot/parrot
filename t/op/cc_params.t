@@ -101,7 +101,6 @@ package TemplateData;
 
 sub new { bless {} => shift; }
 sub addkey { my $self = shift; $self->{$_} = '' for @_ }
-sub keys { sort keys %{ +shift } }
 
 sub create_args {
     my $self = shift;
