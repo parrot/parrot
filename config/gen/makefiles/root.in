@@ -1699,48 +1699,42 @@ lint : sunlint
 
 SUNLINT = lint
 
+SUNLINTOPTS = \
+	-p \
+	\
+	-Ncheck=%all \
+	-Nlevel=4 \
+	\
+	-errchk=%all \
+	-errhdr=%all \
+	-errtags \
+	-errchk=no%longptr64 \
+	-errfmt=simple
+
 # See http://docs.sun.com/source/806-3567/lint.html for flags
-SUNLINTFLAGS = \
-    -F \
-    -p \
-    \
-    -Ncheck=%all \
-    -Nlevel=4 \
-    \
-    -errchk=%all \
-    -errhdr=%all \
-    -errtags \
-    -errchk=no%longptr64 \
-    -errfmt=simple \
-    -erroff=E_BAD_PTR_CAST \
-    -erroff=E_BAD_PTR_CAST_ALIGN \
-    -erroff=E_LABEL_NOT_USED \
-    -erroff=E_CONSTANT_CONDITION \
-    -erroff=E_ARGUMENT_CONVERT \
-    -erroff=E_INCL_NUSD \
-    \
-    -erroff=E_FUNC_ARG_UNUSED \
-    -erroff=E_STMT_NOT_REACHED \
-    -erroff=E_NOP_IF_STMT \
-    -erroff=E_NOP_ELSE_STMT \
-    -erroff=E_CASE_FALLTHRU \
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_BAD_PTR_CAST		# pointer casts may be troublesome
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_BAD_PTR_CAST_ALIGN
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_LABEL_NOT_USED		# Unused label
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_CONSTANT_CONDITION	# Constant condition
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_ARGUMENT_CONVERT
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INCL_NUSD		# An #include file was unused
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INDISTING_FROM_TRUNC	# Identifier will be ambiguous if truncated
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_MCR_NODIFF		# Macros differ between source files
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INIT_DOES_NOT_FIT	# initializer does not fit or is out of range: 0xf0e69739
+
+# These we'd like to drop
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_FUNC_ARG_UNUSED		# Unused function argument
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_STMT_NOT_REACHED	# Unreachable statement
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_NOP_IF_STMT		# if() has a no-op
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_NOP_ELSE_STMT		# else has a no-op
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_CASE_FALLTHRU		# case fallthru
+SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_STATIC_UNUSED		# Static function not used
 
 sunlint :
 	rm -f *.ln
-	$(SUNLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SUNLINTFLAGS) $(LINTABLE_CFILES)
+	$(SUNLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
 
-BSDLINTFLAGS = \
-	-a \
-	-c \
-	-e \
-	-h \
-	-n \
-	-p \
-	-r \
-	-u \
-	-z \
-	-F \
-	-V \
+BSDLINTFLAGS = -a -c -e -h -n -p -r -u -z -F -V
 
 bsdlint : $(PARROT)
 	rm -f *.ln
