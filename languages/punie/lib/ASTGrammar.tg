@@ -503,6 +503,8 @@ transform term (expr) :language('PIR') {
       shift $S2, $P0             # get key for next entry
       # skip 'type' keys added by the operator precedence parser
       if $S2 == 'type' goto iter_loop 
+      # skip 'top' keys added by the operator precedence parser
+      if $S2 == 'top' goto iter_loop 
       $P2 = $P0[$S2]      # get entry at current key
       $S2 = concat 'PunieGrammar::', $S2
       $P3 = tree.get('past', $P2, $S2)

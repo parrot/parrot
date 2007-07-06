@@ -540,6 +540,7 @@ Adds (or replaces) a syntactic category's defaults.
     $P0 = token["name"]
     $P0 = clone $P0
     oper['type'] = $P0
+    oper['top'] = token
   token_match_end:
     ret
 
