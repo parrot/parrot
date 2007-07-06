@@ -322,13 +322,13 @@ strings in place.
     }
 
     void i_bitwise_ors(PMC* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_or(INTERP, s, v, &s));
     }
 
     void i_bitwise_ors_str(STRING* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_or(INTERP, s, value, &s));
     }
 
@@ -353,13 +353,13 @@ strings in place.
 
 
     void i_bitwise_ands(PMC* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_and(INTERP, s, v, &s));
     }
 
     void i_bitwise_ands_str(STRING* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_and(INTERP, s, value, &s));
     }
 
@@ -383,13 +383,13 @@ strings in place.
     }
 
     void i_bitwise_xors(PMC* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
         DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, v, &s));
     }
 
     void i_bitwise_xors_str(STRING* value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         DYNSELF.set_string_native(string_bitwise_xor(INTERP, s, value, &s));
     }
 
@@ -403,7 +403,7 @@ strings in place.
     }
 
     void i_bitwise_nots() {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *s = VTABLE_get_string(INTERP, SELF);
         VTABLE_set_string_native(
             INTERP, SELF, string_bitwise_not(INTERP, s, &s));
     }
