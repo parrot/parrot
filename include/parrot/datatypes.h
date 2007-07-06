@@ -66,7 +66,7 @@ typedef enum {
     enum_type_sized,            /* arbitrary size type for list_new */
     enum_last_type              /* + one */
 
-} PARROT_DATA_TYPES;
+} PARROT_DATA_TYPE;
 
 /* &end_gen */
 struct _data_types {

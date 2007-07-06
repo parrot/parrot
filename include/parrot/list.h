@@ -34,7 +34,7 @@ typedef struct List {
     UINTVAL length;             /* number of items in list */
     UINTVAL start;              /* offset, where array[0] is */
     PMC * container;            /* the Array PMC */
-    int item_type;              /* item type */
+    PARROT_DATA_TYPE item_type; /* item type */
     int item_size;              /* item size */
     int items_per_chunk;        /* override defaults */
     UINTVAL cap;                /* list capacity in items */
@@ -125,13 +125,13 @@ PARROT_API void list_mark( Interp *interp /*NN*/, List *list /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API List * list_new( Interp *interp /*NN*/, PARROT_DATA_TYPES type )
+PARROT_API List * list_new( Interp *interp /*NN*/, PARROT_DATA_TYPE type )
         __attribute__nonnull__(1)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API List * list_new_init( Interp *interp /*NN*/,
-    INTVAL type,
+    PARROT_DATA_TYPE type,
     PMC *init /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)

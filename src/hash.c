@@ -60,7 +60,7 @@ static void hash_thaw( Interp *interp,
 
 static void init_hash(
     Hash *hash /*NN*/,
-    PARROT_DATA_TYPES val_type,
+    PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
@@ -556,7 +556,7 @@ parrot_new_cstring_hash(SHIM_INTERP, Hash **hptr)
 
 static void
 init_hash(Hash *hash /*NN*/,
-        PARROT_DATA_TYPES val_type,
+        PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
@@ -645,7 +645,7 @@ marked properly.
 
 void
 parrot_new_hash_x(Hash **hptr /*NN*/,
-        PARROT_DATA_TYPES val_type,
+        PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
@@ -666,7 +666,7 @@ in PMC_struct_val(container).
 
 void
 parrot_new_pmc_hash_x(SHIM_INTERP, PMC *container /*NN*/,
-        PARROT_DATA_TYPES val_type,
+        PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {

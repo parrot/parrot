@@ -1163,7 +1163,7 @@ Returns a new list of type C<type>.
 
 PARROT_API
 List *
-list_new(Interp *interp /*NN*/, PARROT_DATA_TYPES type)
+list_new(Interp *interp /*NN*/, PARROT_DATA_TYPE type)
     /* MALLOC, WARN_UNUSED */
 {
     List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
@@ -1235,7 +1235,7 @@ these values is stored in user_data, where the keys are explicit.
 
 PARROT_API
 List *
-list_new_init(Interp *interp /*NN*/, INTVAL type, PMC *init /*NN*/)
+list_new_init(Interp *interp /*NN*/, PARROT_DATA_TYPE type, PMC *init /*NN*/)
     /* WARN_UNUSED */
 {
     List *list;

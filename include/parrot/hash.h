@@ -64,7 +64,7 @@ typedef struct _hash {
     UINTVAL mask;               /* alloced - 1 */
     PMC *container;             /* e.g. the PerlHash PMC */
     Hash_key_type key_type;     /* cstring, ascii-string, utf8-string */
-    PARROT_DATA_TYPES entry_type;   /* type of value */
+    PARROT_DATA_TYPE entry_type;/* type of value */
     size_t seed;                /* randomizes the hash_key generation
                                    updated for each new hash */
     hash_comp_fn   compare;     /* compare two keys, 0 = equal */
@@ -158,7 +158,7 @@ void parrot_chash_destroy( Interp *interp, Hash *hash /*NN*/ )
 
 void parrot_new_hash_x(
     Hash **hptr /*NN*/,
-    PARROT_DATA_TYPES val_type,
+    PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
@@ -166,7 +166,7 @@ void parrot_new_hash_x(
 
 void parrot_new_pmc_hash_x( Interp *interp,
     PMC *container /*NN*/,
-    PARROT_DATA_TYPES val_type,
+    PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
     hash_hash_key_fn keyhash )
