@@ -1701,21 +1701,27 @@ SUNLINT = lint
 
 # See http://docs.sun.com/source/806-3567/lint.html for flags
 SUNLINTFLAGS = \
-    -b \
-    -c \
     -F \
-    -n \
     -p \
+    \
     -Ncheck=%all \
     -Nlevel=4 \
-    -errchk=parentheses \
+    \
+    -errchk=%all \
     -errhdr=%all \
     -errtags \
+    -errchk=no%longptr64 \
+    -errfmt=simple \
     -erroff=E_BAD_PTR_CAST \
     -erroff=E_BAD_PTR_CAST_ALIGN \
     -erroff=E_LABEL_NOT_USED \
     -erroff=E_CONSTANT_CONDITION \
     -erroff=E_ARGUMENT_CONVERT \
+    -erroff=E_INCL_NUSD \
+    \
+    -erroff=E_FUNC_ARG_UNUSED \
+    -erroff=E_STMT_NOT_REACHED \
+    -erroff=E_CASE_FALLTHRU \
 
 sunlint :
 	rm -f *.ln

@@ -115,7 +115,7 @@ Parrot_fstat_info_intval(Interp* interp, INTVAL file, INTVAL thing)
 FLOATVAL
 Parrot_stat_info_floatval(Interp* interp, STRING *filename, INTVAL thing)
 {
-    return -1;
+    return (FLOATVAL)-1;
 }
 
 STRING *
