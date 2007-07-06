@@ -116,7 +116,7 @@ iNEW(Interp *interp, IMC_Unit *unit, SymReg *r0,
     char fmt[256];
     SymReg *regs[3];
     SymReg *pmc;
-    int i, nargs;
+    int nargs;
     const int pmc_num = pmc_type(interp,
             string_from_cstring(interp, *type == '.' ?type+1:type, 0));
 
