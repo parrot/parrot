@@ -36,10 +36,6 @@ typedef struct _Caches {
     /* PMC **hash */            /* for non-constant keys */
 } Caches;
 
-void init_object_cache(Parrot_Interp interp);
-void mark_object_cache(Parrot_Interp);
-void destroy_object_cache(Parrot_Interp);
-
 #endif   /* PARROT_CACHES_H_GUARD */
 
 /*

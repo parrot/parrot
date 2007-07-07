@@ -66,10 +66,6 @@ STRING * parrot_split_path_ext( Interp* interp /*NN*/,
 
 /* HEADERIZER END: src/library.c */
 
-
-STRING * parrot_split_path_ext(Interp* , STRING *in,
-        STRING **wo_ext, STRING **ext);
-
 #endif /* PARROT_LIBRARY_H_GUARD */
 
 /*

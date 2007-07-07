@@ -28,7 +28,9 @@ Remember you read something about it in F<docs/infant.dev>?
 
 /* HEADERIZER BEGIN: static */
 
-static void trace_system_stack( Interp *interp );
+static void trace_system_stack( Interp *interp /*NN*/ )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 #ifdef __ia64__
@@ -38,8 +40,6 @@ extern void *flush_reg_store(void);
 #  define BACKING_STORE_BASE 0x80000fff80000000
 
 #endif
-
-static void trace_system_stack(Interp *interp);
 
 /*
 
@@ -108,9 +108,9 @@ Traces the memory block starting at C<< interp->lo_var_ptr >>.
 */
 
 static void
-trace_system_stack(Interp *interp)
+trace_system_stack(Interp *interp /*NN*/)
 {
-    size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
+    const size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
 
     trace_mem_block(interp, (size_t)lo_var_ptr,
             (size_t)&lo_var_ptr);

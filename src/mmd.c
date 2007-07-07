@@ -137,9 +137,6 @@ static void mmd_sort_candidates( Interp *interp, PMC *arg_tuple, PMC *cl );
 
 #define MMD_DEBUG 0
 
-static void mmd_create_builtin_multi_meth_2(Interp *, PMC *ns,
-        INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr);
-
 #ifndef NDEBUG
 static void
 dump_mmd(Interp *interp /*NN*/, INTVAL function)

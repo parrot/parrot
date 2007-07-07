@@ -1233,8 +1233,6 @@ Parrot_new_method_cache(Interp *interp)
     return PMCNULL;
 }
 
-static PMC* find_method_direct_1(Interp*, PMC *, STRING*);
-
 void
 mark_object_cache(Interp *interp /*NN*/)
 {

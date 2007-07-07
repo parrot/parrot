@@ -453,8 +453,6 @@ typedef struct Gc_ims_private {
     size_t      n_extended_PMCs;/* PMCs found during mark_special */
 } Gc_ims_private;
 
-static void parrot_gc_ims_run_increment(Interp*);
-static void parrot_gc_ims_run(Interp *interp, int flags);
 
 /*
 

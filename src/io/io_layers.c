@@ -32,7 +32,7 @@ will be copied to the new instance.
 
 PARROT_API
 ParrotIOLayer *
-PIO_base_new_layer(ParrotIOLayer *proto)
+PIO_base_new_layer(ParrotIOLayer *proto /*NULLOK*/)
 {
     ParrotIOLayer * const new_layer = mem_allocate_typed(ParrotIOLayer);
 
@@ -247,7 +247,7 @@ PIO_pop_layer(Interp *interp, PMC *pmc /*NULLOK*/)
 }
 
 STRING *
-PIO_pop_layer_str(Interp *interp, PMC *pmc)
+PIO_pop_layer_str(Interp *interp /*NN*/, PMC *pmc /*NN*/)
 {
     ParrotIOLayer * const layer = PIO_pop_layer(interp, pmc);
     STRING * const ls = string_make(interp, layer->name,

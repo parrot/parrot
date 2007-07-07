@@ -381,9 +381,6 @@ ParrotIOLayer * PIO_utf8_register_layer(void);
 ParrotIOLayer * PIO_mmap_register_layer(void);
 ParrotIOLayer * PIO_string_register_layer(void);
 
-void PIO_push_layer_str(Interp *interp, PMC *pmc, STRING *ls);
-STRING* PIO_pop_layer_str(Interp *interp, PMC *pmc);
-
 /* Parrot_Socklen_t is used in POSIX accept call */
 #if PARROT_HAS_SOCKLEN_T
 typedef socklen_t Parrot_Socklen_t;

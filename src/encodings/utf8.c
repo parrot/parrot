@@ -99,8 +99,10 @@ static STRING * to_encoding( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_characters( Interp *interp, const utf8_t *ptr /*NN*/, UINTVAL byte_len )
-        __attribute__nonnull__(1);
+static UINTVAL utf8_characters( Interp *interp,
+    const utf8_t *ptr /*NN*/,
+    UINTVAL byte_len )
+        __attribute__nonnull__(2);
 
 static UINTVAL utf8_decode( Interp *interp, const utf8_t *ptr );
 static UINTVAL utf8_decode_and_advance( Interp *interp /*NN*/,
@@ -109,7 +111,7 @@ static UINTVAL utf8_decode_and_advance( Interp *interp /*NN*/,
         __attribute__nonnull__(2);
 
 static void * utf8_encode( Interp *interp, void *ptr /*NN*/, UINTVAL c )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(2);
 
 static void utf8_encode_and_advance( Interp *interp /*NN*/,
     String_iter *i /*NN*/,

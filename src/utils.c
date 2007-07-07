@@ -60,10 +60,6 @@ static void rec_climb_back_and_mark(
 
 /* HEADERIZER END: static */
 
-static void rec_climb_back_and_mark(int regindex, parrot_prm_context* c);
-static void process_cycle_without_exit(int regindex, parrot_prm_context* c);
-static void move_reg(int from, int dest, parrot_prm_context* c);
-
 /*
 
 FUNCDOC: intval_mod

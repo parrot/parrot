@@ -57,7 +57,11 @@ static void dynop_register_xx( Interp *interp /*NN*/,
     oplib_init_f init_func )
         __attribute__nonnull__(1);
 
-static oplib_init_f get_op_lib_init( Interp *interp, int core_op, int which, PMC *lib );
+static oplib_init_f get_op_lib_init( Interp *interp,
+    int core_op,
+    int which,
+    PMC *lib );
+
 static void init_prederef( Interp *interp /*NN*/, int which )
         __attribute__nonnull__(1);
 

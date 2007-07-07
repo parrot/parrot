@@ -204,18 +204,6 @@ PMC * Parrot_class_lookup_p( Interp *interp, PMC *class_name );
 #  define GET_CLASS(arr, obj) \
        obj->vtable->pmc_class
 
-
-/* ************************************************************************ */
-/* ********* BELOW HERE IS NEW PPD15 IMPLEMENTATION RELATED STUFF ********* */
-/* ************************************************************************ */
-
-PARROT_API PMC* Parrot_ComputeMRO_C3(Interp *interp, PMC *_class);
-
-PARROT_API void Parrot_ComposeRole(Interp *interp, PMC *role,
-                                   PMC *without, int got_without,
-                                   PMC *alias, int got_alias,
-                                   PMC *methods_hash, PMC *roles_list);
-
 #endif /* PARROT_OBJECTS_H_GUARD */
 
 /*

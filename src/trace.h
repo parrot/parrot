@@ -41,10 +41,6 @@ void trace_pmc_dump( Interp *interp /*NN*/, PMC *pmc /*NN*/ )
 
 /* HEADERIZER END: src/trace.c */
 
-
-void trace_op(Interp *interp, const opcode_t * code_start,
-              const opcode_t * code_end, const opcode_t * pc);
-
 #endif /* PARROT_TRACE_H_GUARD */
 
 

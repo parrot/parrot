@@ -238,8 +238,6 @@ Get a header.
 
 */
 
-static PMC_EXT * new_pmc_ext(Parrot_Interp);
-
 PMC *
 new_pmc_header(Interp *interp /*NN*/, UINTVAL flags)
     /* WARN_UNUSED */

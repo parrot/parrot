@@ -351,7 +351,9 @@ PIOOFF_T PIO_make_offset_pmc( Interp *interp, PMC *pmc );
 /* HEADERIZER BEGIN: src/io/io_layers.c */
 
 PARROT_API void PIO_base_delete_layer( ParrotIOLayer *layer /*NULLOK*/ );
-PARROT_API ParrotIOLayer * PIO_base_new_layer( ParrotIOLayer *proto );
+PARROT_API ParrotIOLayer * PIO_base_new_layer(
+    ParrotIOLayer *proto /*NULLOK*/ );
+
 PARROT_API ParrotIOLayer * PIO_copy_stack( ParrotIOLayer *stack /*NULLOK*/ );
 PARROT_API ParrotIOLayer * PIO_get_layer( Interp *interp,
     const char *name /*NN*/ )
@@ -365,7 +367,10 @@ PARROT_API INTVAL PIO_push_layer( Interp *interp,
     PMC *pmc /*NULLOK*/,
     ParrotIOLayer *layer /*NULLOK*/ );
 
-STRING * PIO_pop_layer_str( Interp *interp, PMC *pmc );
+STRING * PIO_pop_layer_str( Interp *interp /*NN*/, PMC *pmc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void PIO_push_layer_str( Interp *interp, PMC *pmc, STRING *ls );
 /* HEADERIZER END: src/io/io_layers.c */
 

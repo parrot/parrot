@@ -422,25 +422,6 @@ PARROT_API STRING* uint_to_str( Interp *interp /*NN*/,
         __attribute__warn_unused_result__;
 
 /* HEADERIZER END: src/string.c */
-/* HEADERIZER BEGIN: src/string_primitives.c */
-
-PARROT_API UINTVAL Parrot_char_digit_value( Interp *interp,
-    UINTVAL character );
-
-PARROT_API void string_fill_from_buffer( Interp *interp,
-    const void *buffer /*NN*/,
-    UINTVAL len,
-    const char *encoding_name,
-    STRING *s /*NULLOK*/ )
-        __attribute__nonnull__(2);
-
-PARROT_API void string_set_data_directory( Interp *interp, const char *dir );
-PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
-    UINTVAL *offset /*NN*/,
-    STRING *string )
-        __attribute__nonnull__(2);
-
-/* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

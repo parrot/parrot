@@ -93,24 +93,6 @@ QUEUE_ENTRY * wait_for_entry( QUEUE *queue /*NN*/ )
 
 /* HEADERIZER END: src/tsq.c */
 
-QUEUE_ENTRY *pop_entry(QUEUE *);
-QUEUE_ENTRY *nosync_pop_entry(QUEUE *queue);
-QUEUE_ENTRY *peek_entry(QUEUE *);
-QUEUE_ENTRY *wait_for_entry(QUEUE *);
-void push_entry(QUEUE *, QUEUE_ENTRY *);
-void unshift_entry(QUEUE *, QUEUE_ENTRY *);
-void nosync_insert_entry(QUEUE *, QUEUE_ENTRY *);
-void insert_entry(QUEUE *, QUEUE_ENTRY *);
-void queue_lock(QUEUE *);
-void queue_unlock(QUEUE *);
-void queue_signal(QUEUE *);
-void queue_broadcast(QUEUE *);
-void queue_wait(QUEUE *);
-void queue_timedwait(QUEUE *, struct timespec*);
-QUEUE* queue_init(UINTVAL prio);
-void queue_destroy(QUEUE *);
-
-
 #endif /* PARROT_TSQ_H_GUARD */
 
 /*

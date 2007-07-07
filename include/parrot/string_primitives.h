@@ -15,21 +15,25 @@
 
 #ifdef PARROT_IN_CORE
 
-/* Set the directory where ICU finds its data files (encodings,
-   locales, etc.) */
-PARROT_API void string_set_data_directory(Interp *interp, const char *dir);
+/* HEADERIZER BEGIN: src/string_primitives.c */
 
-/* Convert from any supported encoding, into our internal format */
-PARROT_API void string_fill_from_buffer(Interp *interp,
-        const void *buffer, UINTVAL len, const char *encoding_name, STRING *s);
+PARROT_API UINTVAL Parrot_char_digit_value( Interp *interp,
+    UINTVAL character );
 
-/* Utility method which knows how to uwind a single escape sequence */
-typedef Parrot_UInt2 (*Parrot_unescape_cb)(Parrot_Int4 offset, void *context);
-PARROT_API Parrot_UInt4
-string_unescape_one(Interp *interp, UINTVAL *offset, STRING *string);
+PARROT_API void string_fill_from_buffer( Interp *interp,
+    const void *buffer /*NN*/,
+    UINTVAL len,
+    const char *encoding_name,
+    STRING *s /*NULLOK*/ )
+        __attribute__nonnull__(2);
 
-PARROT_API UINTVAL
-Parrot_char_digit_value(Interp *interp, UINTVAL character);
+PARROT_API void string_set_data_directory( Interp *interp, const char *dir );
+PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
+    UINTVAL *offset /*NN*/,
+    STRING *string )
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/string_primitives.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_PRIMITIVES_H_GUARD */

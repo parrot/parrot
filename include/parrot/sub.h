@@ -201,7 +201,7 @@ typedef struct Parrot_Context_info {
     STRING* nsname;
     STRING* fullname;
     int pc;
-    char *file;
+    const char *file;
     int line;
     opcode_t *address;
 } Parrot_Context_info;
@@ -262,8 +262,6 @@ PMC* Parrot_find_pad( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/sub.c */
-
-PARROT_API PMC* parrot_new_closure(Interp*, PMC*);
 
 #endif /* PARROT_SUB_H_GUARD */
 
