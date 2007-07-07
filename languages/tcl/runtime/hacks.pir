@@ -1,5 +1,5 @@
 #
-# Hacks - these functions exist only to speed up repeated [source]ing of 
+# Hacks - these functions exist only to speed up repeated [source]ing of
 #         a .tcl file;
 #
 
@@ -9,12 +9,12 @@
 
 .sub 'dump_bytecode'
   .param pmc    invokable
-  .param string filename 
+  .param string filename
 
   .local string frozen_code
   .local pmc filehandle
   frozen_code = freeze invokable
-  filehandle = open filename, '>' 
+  filehandle = open filename, '>'
   print filehandle, frozen_code
   close filehandle
 .end
@@ -57,7 +57,7 @@
 
   OS = new 'OS'
   push_eh no_precompiled
-    stat_prec = OS.'stat'(precompiled_filename) 
+    stat_prec = OS.'stat'(precompiled_filename)
   clear_eh
 
   # Is the precompiled version new enough?
@@ -82,7 +82,7 @@ precompiled_ok:
   .return read_bytecode(precompiled_filename)
 
 bad_file: # not even the original exists..
-  tcl_error 'bad file, no donut' 
+  tcl_error 'bad file, no donut'
 .end
 
 # Local Variables:
