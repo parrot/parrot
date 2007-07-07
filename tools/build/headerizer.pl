@@ -106,6 +106,9 @@ sub extract_function_declarations {
     # Ignore magic function name YY_DECL
     @funcs = grep !/YY_DECL/, @funcs;
 
+    # Ignore anything with magic words HEADERIZER SKIP
+    @funcs = grep !m{/\*\s*HEADERIZER SKIP\s*\*/}, @funcs;
+
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
 

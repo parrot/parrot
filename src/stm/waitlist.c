@@ -297,6 +297,51 @@ Parrot_STM_waitlist_destroy_thread(Parrot_Interp interp) {
     mem_sys_free(thr);
 }
 
+static STM_tx_log *
+Parrot_STM_tx_log_alloc(Interp *interp /*NN*/, size_t size)
+{
+    int                i;
+    STM_tx_log * const log       = (STM_tx_log *)mem_sys_allocate_zeroed(size);
+    interp->thread_data->stm_log = log;
+
+    /* initialize the various fields of the transaction log */
+
+    for (i = 0; i < STM_MAX_TX_DEPTH; ++i) {
+        PARROT_ATOMIC_INT_INIT(log->inner[i].status);
+        PARROT_ATOMIC_INT_INIT(log->inner[i].wait_length);
+        PARROT_ATOMIC_INT_SET(log->inner[i].status, STM_STATUS_INVALID);
+        assert((PTR2UINTVAL(&log->inner[i]) & 1) == 0);
+    }
+
+    log->inner[0].first_read  =  0;
+    log->inner[0].first_write =  0;
+
+    log->writes               = (STM_write_record *)mem_sys_allocate(
+        sizeof (STM_write_record) * STM_START_RECORDS);
+    log->reads                = (STM_read_record *)mem_sys_allocate(
+        sizeof (STM_read_record) * STM_START_RECORDS);
+    log->writes_alloced       = STM_START_RECORDS;
+    log->reads_alloced        = STM_START_RECORDS;
+
+    log->last_read            = -1;
+    log->last_write           = -1;
+    log->depth                =  0;
+
+    return log;
+}
+
+STM_tx_log *
+Parrot_STM_tx_log_get(Interp *interp /*NN*/)
+{
+    STM_tx_log *log = interp->thread_data->stm_log;
+
+    if (!log)
+        log = Parrot_STM_tx_log_alloc(interp, sizeof(*log));
+
+    assert(log->depth >= 0);
+    return log;
+}
+
 /*
  * Local variables:
  *   c-file-style: "parrot"
