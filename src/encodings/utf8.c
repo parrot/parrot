@@ -99,16 +99,16 @@ static STRING * to_encoding( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_characters( const utf8_t *ptr /*NN*/, UINTVAL byte_len )
+static UINTVAL utf8_characters( Interp *interp, const utf8_t *ptr /*NN*/, UINTVAL byte_len )
         __attribute__nonnull__(1);
 
-static UINTVAL utf8_decode( const utf8_t *ptr );
+static UINTVAL utf8_decode( Interp *interp, const utf8_t *ptr );
 static UINTVAL utf8_decode_and_advance( Interp *interp /*NN*/,
     String_iter *i /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * utf8_encode( void *ptr /*NN*/, UINTVAL c )
+static void * utf8_encode( Interp *interp, void *ptr /*NN*/, UINTVAL c )
         __attribute__nonnull__(1);
 
 static void utf8_encode_and_advance( Interp *interp /*NN*/,
@@ -164,7 +164,7 @@ Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
 */
 
 static UINTVAL
-utf8_characters(const utf8_t *ptr /*NN*/, UINTVAL byte_len)
+utf8_characters(Interp *interp, const utf8_t *ptr /*NN*/, UINTVAL byte_len)
 {
     const utf8_t *u8ptr = ptr;
     const utf8_t *u8end = u8ptr + byte_len;
@@ -176,7 +176,7 @@ utf8_characters(const utf8_t *ptr /*NN*/, UINTVAL byte_len)
     }
 
     if (u8ptr > u8end) {
-        internal_exception(MALFORMED_UTF8, "Unaligned end in UTF-8 string\n");
+        real_exception(interp, NULL, MALFORMED_UTF8, "Unaligned end in UTF-8 string\n");
     }
 
     return characters;
@@ -191,7 +191,7 @@ Returns the integer for the UTF-8 character found at C<*ptr>.
 */
 
 static UINTVAL
-utf8_decode(const utf8_t *ptr)
+utf8_decode(Interp *interp, const utf8_t *ptr)
 {
     const utf8_t *u8ptr = ptr;
     UINTVAL c = *u8ptr;
@@ -204,17 +204,17 @@ utf8_decode(const utf8_t *ptr)
         for (count = 1; count < len; count++) {
             u8ptr++;
             if (!UTF8_IS_CONTINUATION(*u8ptr)) {
-                internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+                real_exception(interp, NULL, MALFORMED_UTF8, "Malformed UTF-8 string\n");
             }
             c = UTF8_ACCUMULATE(c, *u8ptr);
         }
 
         if (UNICODE_IS_SURROGATE(c)) {
-            internal_exception(MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
+            real_exception(interp, NULL, MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
         }
     }
     else if (!UNICODE_IS_INVARIANT(c)) {
-        internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+        real_exception(interp, NULL, MALFORMED_UTF8, "Malformed UTF-8 string\n");
     }
 
     return c;
@@ -229,14 +229,14 @@ Returns the UTF-8 encoding of integer C<c>.
 */
 
 static void *
-utf8_encode(void *ptr /*NN*/, UINTVAL c)
+utf8_encode(Interp *interp, void *ptr /*NN*/, UINTVAL c)
 {
     utf8_t *u8ptr = (utf8_t *)ptr;
     UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
-        internal_exception(INVALID_CHARACTER,
+        real_exception(interp, NULL, INVALID_CHARACTER,
                            "Invalid character for UTF-8 encoding\n");
     }
 
@@ -347,7 +347,7 @@ utf8_encode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/, UINTVAL c)
 {
     const STRING * const s = i->str;
     unsigned char * const pos = (unsigned char *)s->strstart + i->bytepos;
-    unsigned char * const new_pos = (unsigned char *)utf8_encode(pos, c);
+    unsigned char * const new_pos = (unsigned char *)utf8_encode(interp, pos, c);
 
     i->bytepos += (new_pos - pos);
     /* XXX possible buffer overrun exception? */
@@ -440,7 +440,7 @@ to_encoding(Interp *interp /*NN*/, STRING *src /*NN*/, STRING *dest)
             }
 
             pos = p + dest_pos;
-            new_pos = (unsigned char *)utf8_encode(pos, c);
+            new_pos = (unsigned char *)utf8_encode(interp, pos, c);
             dest_pos += (new_pos - pos);
         }
         result->bufused = dest_pos;
@@ -454,14 +454,14 @@ to_encoding(Interp *interp /*NN*/, STRING *src /*NN*/, STRING *dest)
 }
 
 static UINTVAL
-get_codepoint(SHIM_INTERP, const STRING *src /*NN*/, UINTVAL offset)
+get_codepoint(Interp *interp, const STRING *src /*NN*/, UINTVAL offset)
 {
     const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
-    return utf8_decode(start);
+    return utf8_decode(interp, start);
 }
 
 static void
-set_codepoint(SHIM_INTERP, STRING *src /*NN*/,
+set_codepoint(Interp *interp, STRING *src /*NN*/,
         UINTVAL offset, UINTVAL codepoint)
 {
     const void *start;
@@ -470,7 +470,7 @@ set_codepoint(SHIM_INTERP, STRING *src /*NN*/,
 
     start = utf8_skip_forward(src->strstart, offset);
     p = const_cast(start);
-    utf8_encode(p, codepoint);
+    utf8_encode(interp, p, codepoint);
 }
 
 static UINTVAL

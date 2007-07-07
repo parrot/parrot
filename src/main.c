@@ -45,8 +45,9 @@ main(int argc, char * argv[])
     Parrot_set_config_hash();
 
     interp     = Parrot_new(NULL);
-    if (!imcc_initialize(interp))
-        internal_exception(1, "Could not initialize IMCC\n");
+    if (!imcc_initialize(interp)) {
+        real_exception(interp, NULL, 1, "Could not initialize IMCC\n");
+    }
 
     /* We parse the arguments, but first store away the name of the Parrot
        executable, since parsing destroys that and we want to make it

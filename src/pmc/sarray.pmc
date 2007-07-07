@@ -178,7 +178,7 @@ ret_pmc(Interp* interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE HashEntry *
-shift_entry(PMC *self)>
+shift_entry(Interp *interp, PMC *self)>
 
 Removes and returns the first element from the array.
 
@@ -187,15 +187,16 @@ Removes and returns the first element from the array.
 */
 
 static PARROT_INLINE HashEntry *
-shift_entry(PMC *self)
+shift_entry(Interp *interp, PMC *self)
 {
     HashEntry * const e = (HashEntry *) PMC_data(self);
     HashEntry *ret;
     INTVAL start_index = UVal_int(e[0].val);
     const INTVAL end_index   = UVal_int(e[1].val);
 
-    if (start_index >= end_index)
-        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
+    if (start_index >= end_index) {
+        real_exception(interp, NULL, OUT_OF_BOUNDS, "SArray index out of bounds!");
+    }
 
     ret = (HashEntry *) PMC_data(self) + (2 + start_index++);
 
@@ -207,7 +208,7 @@ shift_entry(PMC *self)
 /*
 
 =item C<static PARROT_INLINE HashEntry *
-get_entry(PMC *self, INTVAL key)>
+get_entry(Interp *interp, PMC *self, INTVAL key)>
 
 Returns the element for index C<key>.
 
@@ -216,7 +217,7 @@ Returns the element for index C<key>.
 */
 
 static PARROT_INLINE HashEntry*
-get_entry(PMC *self, INTVAL key)
+get_entry(Interp *interp, PMC *self, INTVAL key)
 {
     HashEntry *e = (HashEntry *) PMC_data(self);
     const INTVAL start_index = UVal_int(e[0].val);
@@ -226,8 +227,9 @@ get_entry(PMC *self, INTVAL key)
         key += end_index;
     }
     key += start_index;   /* lower bound if already shifted */
-    if (key < start_index || key >= end_index)
-        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
+    if (key < start_index || key >= end_index) {
+        real_exception(interp, NULL, OUT_OF_BOUNDS, "SArray index out of bounds!");
+    }
     e = (HashEntry *) PMC_data(self) + (2 + key);
     return e;
 }
@@ -429,7 +431,7 @@ Returns the type of the element at index C<key>.
 */
 
     INTVAL type_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(SELF, key);
+        HashEntry *e = get_entry(INTERP, SELF, key);
         return e->type;
     }
 
@@ -444,7 +446,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(SELF, key);
+        HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_int(INTERP, e);
     }
 
@@ -475,7 +477,7 @@ Removes the first element from the array and returns its integer value.
 */
 
     INTVAL shift_integer() {
-        HashEntry *ret = shift_entry(SELF);
+        HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_int(INTERP, ret);
     }
 
@@ -490,7 +492,7 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(SELF, key);
+        HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_num(INTERP, e);
     }
 
@@ -521,7 +523,7 @@ value.
 */
 
     FLOATVAL shift_float() {
-        HashEntry *ret = shift_entry(SELF);
+        HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_num(INTERP, ret);
     }
 
@@ -536,7 +538,7 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     STRING* get_string_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(SELF, key);
+        HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_string(INTERP, e);
     }
 
@@ -567,7 +569,7 @@ value.
 */
 
     STRING* shift_string() {
-        HashEntry *ret = shift_entry(SELF);
+        HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_string(INTERP, ret);
     }
 
@@ -582,7 +584,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(SELF, key);
+        HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_pmc(INTERP, e);
     }
 
@@ -612,7 +614,7 @@ Removes the first element from the array and returns its PMC value.
 */
 
     PMC* shift_pmc() {
-        HashEntry *ret = shift_entry(SELF);
+        HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_pmc(INTERP, ret);
     }
 

@@ -339,8 +339,9 @@ Destroys the queue, raising an exception if it is not empty.
 void
 queue_destroy(QUEUE *queue /*NN*/)
 {
-    if (peek_entry(queue))
+    if (peek_entry(queue)) {
         internal_exception(1, "Queue not empty on destroy");
+    }
     COND_DESTROY(queue->queue_condition);
     MUTEX_DESTROY(queue->queue_mutex);
     mem_sys_free(queue);

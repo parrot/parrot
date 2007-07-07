@@ -32,7 +32,7 @@ There's also a verbose mode for garbage collection.
 static void clear_live_bits( Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1);
 
-static size_t find_common_mask( size_t val1, size_t val2 );
+static size_t find_common_mask( Interp *interp, size_t val1, size_t val2 );
 static void mark_special( Interp *interp /*NN*/, PMC *obj /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -60,7 +60,7 @@ static int trace_active_PMCs( Interp *interp /*NN*/, int trace_stack )
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
-static size_t find_common_mask(size_t val1, size_t val2)
+static size_t find_common_mask(Interp *interp, size_t val1, size_t val2)
     __attribute__const__
     __attribute__warn_unused_result__;
 
@@ -724,7 +724,7 @@ Find a mask covering the longest common bit-prefix of C<val1> and C<val2>.
 */
 
 static size_t
-find_common_mask(size_t val1, size_t val2)
+find_common_mask(Interp *interp, size_t val1, size_t val2)
 {
     int       i;
     const int bound = sizeof (size_t) * 8;
@@ -745,7 +745,7 @@ find_common_mask(size_t val1, size_t val2)
         return 0;
     }
 
-    internal_exception(INTERP_ERROR,
+    real_exception(interp, NULL, INTERP_ERROR,
             "Unexpected condition in find_common_mask()!\n");
 
     return 0;
@@ -771,7 +771,8 @@ trace_mem_block(Interp *interp /*NN*/, size_t lo_var_ptr, size_t hi_var_ptr)
     const size_t pmc_max    = get_max_pmc_address(interp);
 
     const size_t mask       =
-        find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
+        find_common_mask(interp,
+                         buffer_min < pmc_min ? buffer_min : pmc_min,
                          buffer_max > pmc_max ? buffer_max : pmc_max);
 
     if (!lo_var_ptr || !hi_var_ptr)

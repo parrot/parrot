@@ -204,7 +204,7 @@ char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)
 /*
 
 =item C<static INTVAL
-ret_int(const char *p, int type)>
+ret_int(Interp *interp, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as an C<INTVAL>.
 
@@ -216,11 +216,11 @@ we need some more configure support for type sizes.
 */
 
 static INTVAL
-ret_int(const char *p, int type)
+ret_int(Interp *interp, const char *p, int type)
     __attribute__nonnull__(1);
 
 static INTVAL
-ret_int(const char *p, int type)
+ret_int(Interp *interp, const char *p, int type)
 {
     switch (type) {
         case enum_type_INTVAL:
@@ -259,7 +259,7 @@ ret_int(const char *p, int type)
         case enum_type_uchar:
             return *p;
         default:
-            internal_exception(1, "returning unhandled int type in struct");
+            real_exception(interp, NULL, 1, "returning unhandled int type in struct");
     }
     return -1;
 }
@@ -267,7 +267,7 @@ ret_int(const char *p, int type)
 /*
 
 =item C<static FLOATVAL
-ret_float(const char *p, int type)>
+ret_float(Interp *interp, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 
@@ -276,11 +276,11 @@ Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 */
 
 static FLOATVAL
-ret_float(const char *p, int type)
+ret_float(Interp *interp, const char *p, int type)
     __attribute__nonnull__(1);
 
 static FLOATVAL
-ret_float(const char *p, int type)
+ret_float(Interp *interp, const char *p, int type)
 {
     switch (type) {
         case enum_type_FLOATVAL:
@@ -290,7 +290,7 @@ ret_float(const char *p, int type)
         case enum_type_double:
             return (FLOATVAL) *(const double*) p;
         default:
-            internal_exception(1, "returning unhandled float type in struct");
+            real_exception(interp, NULL, 1, "returning unhandled float type in struct");
     }
     return -1.0;
 }
@@ -392,14 +392,14 @@ ret_pmc(Interp *interp, PMC* pmc, char *p, int type, INTVAL idx)
 /*
 
 =item C<static void
-set_int(char *p, int type, INTVAL value)>
+set_int(Interp *interp, char *p, int type, INTVAL value)>
 
 =cut
 
 */
 
 static void
-set_int(char *p, int type, INTVAL value)
+set_int(Interp *interp, char *p, int type, INTVAL value)
 {
     switch (type) {
         case enum_type_uint8:
@@ -420,7 +420,7 @@ set_int(char *p, int type, INTVAL value)
             *(short*)p = (short)value;
             break;
         default:
-            internal_exception(1, "setting unhandled int type in struct");
+            real_exception(interp, NULL, 1, "setting unhandled int type in struct");
             break;
     }
 }
@@ -428,7 +428,7 @@ set_int(char *p, int type, INTVAL value)
 /*
 
 =item C<static void
-set_float(char *p, int type, FLOATVAL value)>
+set_float(Interp *interp, char *p, int type, FLOATVAL value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<value>.
@@ -438,7 +438,7 @@ C<value>.
 */
 
 static void
-set_float(char *p, int type, FLOATVAL value)
+set_float(Interp *interp, char *p, int type, FLOATVAL value)
 {
     switch (type) {
         case enum_type_FLOATVAL:
@@ -451,7 +451,7 @@ set_float(char *p, int type, FLOATVAL value)
             *(double*) p = (double) value;
             break;
         default:
-            internal_exception(1, "setting unhandled float type in struct");
+            real_exception(interp, NULL, 1, "setting unhandled float type in struct");
             break;
     }
 }
@@ -459,7 +459,7 @@ set_float(char *p, int type, FLOATVAL value)
 /*
 
 =item C<static void
-set_string(char *p, int type, STRING *value)>
+set_string(Interp *interp, char *p, int type, STRING *value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<*value>.
@@ -469,7 +469,7 @@ C<*value>.
 */
 
 static void
-set_string(char *p, int type, STRING* value)
+set_string(Interp *interp, char *p, int type, STRING* value)
 {
     char *cstr;
     switch (type) {
@@ -481,7 +481,7 @@ set_string(char *p, int type, STRING* value)
             *(char **) p = cstr;
             break;
         default:
-            internal_exception(1, "setting unhandled string type in struct (%d)", type);
+            real_exception(interp, NULL, 1, "setting unhandled string type in struct (%d)", type);
             break;
     }
 }
@@ -767,7 +767,7 @@ Returns the integer value at index C<ix>.
     INTVAL get_integer_keyed_int(INTVAL ix) {
         int type;
         char *p = char_offset_int(INTERP, pmc, ix, &type);
-        return ret_int(p, type);
+        return ret_int(INTERP, p, type);
     }
 
 /*
@@ -783,7 +783,7 @@ Returns the integer value associated with C<*key>.
     INTVAL get_integer_keyed(PMC* key) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
-        return ret_int(p, type);
+        return ret_int(INTERP, p, type);
     }
 
 /*
@@ -799,7 +799,7 @@ Returns the floating-point value at index C<ix>.
     FLOATVAL get_number_keyed_int(INTVAL key) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
-        return ret_float(p, type);
+        return ret_float(INTERP, p, type);
     }
 
 /*
@@ -815,7 +815,7 @@ Returns the floating-point value associated with C<*key>.
     FLOATVAL get_number_keyed(PMC* key) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
-        return ret_float(p, type);
+        return ret_float(INTERP, p, type);
     }
 
 /*
@@ -924,7 +924,7 @@ Sets the value of the element at index C<ix> to C<value>.
     void set_integer_keyed_int(INTVAL ix, INTVAL value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, ix, &type);
-        set_int(p, type, value);
+        set_int(INTERP, p, type, value);
     }
 
 /*
@@ -942,7 +942,7 @@ May cause segfaults if value is out of bounds.
     void set_integer_keyed(PMC* key, INTVAL value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
-        set_int(p, type, value);
+        set_int(INTERP, p, type, value);
     }
 
 /*
@@ -958,7 +958,7 @@ Sets the value of the element at index C<ix> to C<value>.
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
-        set_float(p, type, value);
+        set_float(INTERP, p, type, value);
     }
 
 /*
@@ -974,7 +974,7 @@ Sets the value of the element associated with key C<*key> to C<value>.
     void set_number_keyed(PMC *key, FLOATVAL value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
-        set_float(p, type, value);
+        set_float(INTERP, p, type, value);
     }
 
 /*
@@ -990,7 +990,7 @@ Sets the value of the element at index C<key> to C<*value>.
     void set_string_keyed_int(INTVAL key, STRING* value) {
         int type;
         char *p = char_offset_int(INTERP, pmc, key, &type);
-        set_string(p, type, value);
+        set_string(INTERP, p, type, value);
     }
 
 /*
@@ -1006,7 +1006,7 @@ Sets the value of the element associated with key C<*key> to C<*value>.
     void set_string_keyed(PMC *key, STRING* value) {
         int type;
         char *p = char_offset_key(INTERP, pmc, key, &type);
-        set_string(p, type, value);
+        set_string(INTERP, p, type, value);
     }
 
 }

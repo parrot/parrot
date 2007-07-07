@@ -441,7 +441,7 @@ Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, SHIM(PMC *initial
     path = get_path(interp, lib, &handle, wo_ext, ext);
     if (!path || !handle) {
         /*
-         * XXX internal_exception? return PMCNULL?
+         * XXX real_exception? return PMCNULL?
          * PMC Undef seems convenient, because it can be queried with get_bool()
          */
         return pmc_new(interp, enum_class_Undef);

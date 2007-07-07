@@ -17,7 +17,7 @@
 
 /* Set the directory where ICU finds its data files (encodings,
    locales, etc.) */
-PARROT_API void string_set_data_directory(const char *dir);
+PARROT_API void string_set_data_directory(Interp *interp, const char *dir);
 
 /* Convert from any supported encoding, into our internal format */
 PARROT_API void string_fill_from_buffer(Interp *interp,

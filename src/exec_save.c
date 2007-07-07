@@ -35,7 +35,7 @@ static void save_struct(FILE *fp, void *sp, size_t size);
 /*
 
 =item C<void
-Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)>
+Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)>
 
 Save the C<Parrot_exec_objfile_t> to C<file>.
 
@@ -44,7 +44,7 @@ Save the C<Parrot_exec_objfile_t> to C<file>.
 */
 
 void
-Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;
@@ -88,7 +88,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 rellocation.r_extern = 1;
                 break;
             default:
-                internal_exception(EXEC_ERROR,
+                real_exception(interp, NULL, EXEC_ERROR,
                     "Unknown text rellocation type: %d\n",
                         obj->text_rellocation_table[i].type);
                 break;
@@ -117,7 +117,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 symlst.n_type = N_EXT;
                 break;
             default:
-                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                real_exception(interp, NULL, EXEC_ERROR, "Unknown symbol type: %d\n",
                     obj->symbol_table[i].type);
                 break;
         }
@@ -187,7 +187,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  define NSECTIONS     8
 
 void
-Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
 {
     Elf32_Ehdr header;
     Elf32_Shdr sechdr;
@@ -319,7 +319,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                             R_386_32);
                 break;
             default:
-                internal_exception(EXEC_ERROR,
+                real_exception(interp, NULL, EXEC_ERROR,
                     "Unknown text rellocation type: %d\n",
                         obj->text_rellocation_table[i].type);
                 break;
@@ -361,7 +361,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                         obj->text_rellocation_table[i].offset - 4])) << 16;
                 break;
             default:
-                internal_exception(EXEC_ERROR,
+                real_exception(interp, NULL, EXEC_ERROR,
                     "Unknown text rellocation type: %d\n",
                         obj->text_rellocation_table[i].type);
                 break;
@@ -385,7 +385,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                             R_ARM_ABS32);
                 break;
             default:
-                internal_exception(EXEC_ERROR,
+                real_exception(interp, NULL, EXEC_ERROR,
                     "Unknown text rellocation type: %d\n",
                         obj->text_rellocation_table[i].type);
                 break;
@@ -438,7 +438,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 symlst.st_info = ELF32_ST_INFO(STB_GLOBAL, STT_NOTYPE);
                 break;
             default:
-                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                real_exception(interp, NULL, EXEC_ERROR, "Unknown symbol type: %d\n",
                     obj->symbol_table[i].type);
                 break;
         }
@@ -582,7 +582,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  define SYMTAB     DATA_RELOC + (obj->data_rellocation_count * 0xA)
 
 void
-Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;
@@ -649,7 +649,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 save_short(fp, 0x06);
                 break;
             default:
-                internal_exception(EXEC_ERROR,
+                real_exception(interp, NULL, EXEC_ERROR,
                     "Unknown text rellocation type: %d\n",
                         obj->text_rellocation_table[i].type);
                 break;
@@ -678,7 +678,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 save_short(fp, 0x20);
                 break;
             default:
-                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                real_exception(interp, NULL, EXEC_ERROR, "Unknown symbol type: %d\n",
                     obj->symbol_table[i].type);
                 break;
         }

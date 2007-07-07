@@ -690,7 +690,7 @@ Parrot_STM_commit(Interp *interp /*NN*/)
     STM_TRACE("commit");
 
     if (log->depth == 0) {
-        internal_exception(1, "stm_commit without transaction\n");
+        real_exception(interp, NULL, 1, "stm_commit without transaction\n");
         return 0;
     }
 
@@ -738,7 +738,7 @@ Parrot_STM_abort(Interp *interp /*NN*/)
     STM_TRACE_SAFE("abort");
 
     if (log->depth == 0) {
-        internal_exception(1, "stm_abort without transaction\n");
+        real_exception(interp, NULL, 1, "stm_abort without transaction\n");
         return;
     }
 
@@ -1362,7 +1362,7 @@ Parrot_STM_begin_update(Interp *interp /*NN*/, Parrot_STM_PMC_handle handle)
     STM_tx_log * const  log = Parrot_STM_tx_log_get(interp);
 
     if (log->depth == 0) {
-        internal_exception(1, "STM_begin_update outside transaction");
+        real_exception(interp, NULL, 1, "STM_begin_update outside transaction");
         return PMCNULL;
     }
 
@@ -1388,7 +1388,7 @@ Parrot_STM_write(Interp *interp /*NN*/, Parrot_STM_PMC_handle handle, PMC* new_v
 
     if (log->depth == 0) {
         /* error for now */
-        internal_exception(1, "STM_write outside transaction");
+        real_exception(interp, NULL, 1, "STM_write outside transaction");
         return;
     }
 
@@ -1459,7 +1459,7 @@ Parrot_STM_replay_extracted(Interp *interp /*NN*/, void *saved_log_data)
     log   = Parrot_STM_tx_log_get(interp);
 
     if (log->depth == 0)
-        internal_exception(1, "replay_extracted outside of transaction");
+        real_exception(interp, NULL, 1, "replay_extracted outside of transaction");
 
     sublog = get_sublog(log, log->depth);
     start  = log->last_read;

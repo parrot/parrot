@@ -57,7 +57,7 @@ static void dynop_register_xx( Interp *interp /*NN*/,
     oplib_init_f init_func )
         __attribute__nonnull__(1);
 
-static oplib_init_f get_op_lib_init( int core_op, int which, PMC *lib );
+static oplib_init_f get_op_lib_init( Interp *interp, int core_op, int which, PMC *lib );
 static void init_prederef( Interp *interp /*NN*/, int which )
         __attribute__nonnull__(1);
 
@@ -308,7 +308,7 @@ C<ParrotLibrary> PMC.
 */
 
 static oplib_init_f
-get_op_lib_init(int core_op, int which, PMC *lib)
+get_op_lib_init(Interp *interp, int core_op, int which, PMC *lib)
 {
     if (core_op) {
         oplib_init_f init_func;
@@ -334,7 +334,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
                 break;
             default:
                 init_func = NULL;
-                internal_exception(1, "Couldn't find init_func for core %d", which);
+                real_exception(interp, NULL, 1, "Couldn't find init_func for core %d", which);
                 break;
         }
         return init_func;
@@ -353,7 +353,7 @@ C<< interp->op_lib >> = prederefed oplib.
 static void
 load_prederef(Interp *interp /*NN*/, int which)
 {
-    const oplib_init_f init_func = get_op_lib_init(1, which, NULL);
+    const oplib_init_f init_func = get_op_lib_init(interp, 1, which, NULL);
     int (*get_op)(const char * name, int full);
 
     get_op = interp->op_lib->op_code;
@@ -808,7 +808,7 @@ void
 Parrot_setup_event_func_ptrs(Parrot_Interp interp)
 {
     const size_t n = interp->op_count;
-    const oplib_init_f init_func = get_op_lib_init(1, interp->run_core, NULL);
+    const oplib_init_f init_func = get_op_lib_init(interp, 1, interp->run_core, NULL);
     op_lib_t * const lib = init_func(1);
     /*
      * remember op_func_table
@@ -869,7 +869,7 @@ dynop_register(Parrot_Interp interp, PMC* lib_pmc)
         interp->all_op_libs = (op_lib_t **)mem_sys_realloc(interp->all_op_libs,
                 sizeof (op_lib_t *) * (interp->n_libs + 1));
 
-    init_func = get_op_lib_init(0, 0, lib_pmc);
+    init_func = get_op_lib_init(interp, 0, 0, lib_pmc);
     lib = init_func(1);
 
     interp->all_op_libs[interp->n_libs++] = lib;
@@ -1017,7 +1017,7 @@ dynop_register_xx(Interp *interp /*NN*/,
     if (0 /*lib_variant */) {
         size_t i;
 
-        new_init_func = get_op_lib_init(0, 0, lib_variant);
+        new_init_func = get_op_lib_init(interp, 0, 0, lib_variant);
         new_lib = new_init_func(1);
         for (i = n_old; i < n_tot; ++i)
             ops_addr[i] = (new_lib->op_func_table)[i - n_old];
@@ -1069,7 +1069,7 @@ Tell the interpreter's running core about the new function table.
 static void
 notify_func_table(Interp *interp /*NN*/, op_func_t* table /*NN*/, int on)
 {
-    const oplib_init_f init_func = get_op_lib_init(1, interp->run_core, NULL);
+    const oplib_init_f init_func = get_op_lib_init(interp, 1, interp->run_core, NULL);
 
     init_func((long) table);
     switch (interp->run_core) {

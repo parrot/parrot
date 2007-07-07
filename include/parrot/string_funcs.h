@@ -434,7 +434,7 @@ PARROT_API void string_fill_from_buffer( Interp *interp,
     STRING *s /*NULLOK*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void string_set_data_directory( const char *dir );
+PARROT_API void string_set_data_directory( Interp *interp, const char *dir );
 PARROT_API Parrot_UInt4 string_unescape_one( Interp *interp,
     UINTVAL *offset /*NN*/,
     STRING *string )

@@ -113,7 +113,7 @@ Parrot_exec(Interp *interp, opcode_t *pc,
     offset_fixup(obj);
     output = interp->output_file ?
         interp->output_file : "exec_output.o";
-    Parrot_exec_save(obj, output);
+    Parrot_exec_save(interp, obj, output);
 }
 
 /*

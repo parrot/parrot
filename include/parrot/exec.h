@@ -106,7 +106,7 @@ int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol, int s
     __attribute__nonnull__(1)
     __attribute__nonnull__(2);
 
-void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
+void Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file);
 
 void Parrot_exec_emit_mov_mr(Interp *interp, char *mem, int reg);
 void Parrot_exec_emit_mov_mr_n(Interp *interp, char *mem, int reg);
