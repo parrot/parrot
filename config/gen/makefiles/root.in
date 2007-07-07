@@ -1693,7 +1693,7 @@ status :
 patch :
 	svn diff
 
-LINTABLE_CFILES = `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+LINTABLE_CFILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.c/g@PQ@`
 
 lint : sunlint
 
