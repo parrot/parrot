@@ -1699,36 +1699,39 @@ lint : sunlint
 
 SUNLINT = lint
 
+# This target does sneaky magic to get the $(NOTE) fields to work.  It's
+# doing replaces in $(NOTE), which is empty, of strings that will never match.
+NOTE =
+SUNLINT_HUSH_OPTS = \
+	$(NOTE:% Errors that will never be silenced, and we must always hush =%)\
+	-erroff=E_ARGUMENT_CONVERT	$(NOTE:% implicit integer-to-long conversion =%) \
+	-erroff=E_BAD_PTR_CAST		$(NOTE:% pointer casts may be troublesome =%) \
+	-erroff=E_BAD_PTR_CAST_ALIGN	$(NOTE:% alignment problems with cast =%) \
+	-erroff=E_LABEL_NOT_USED	$(NOTE:% Unused label =%) \
+	-erroff=E_CONSTANT_CONDITION	$(NOTE:% Constant condition =%) \
+	-erroff=E_INCL_NUSD		$(NOTE:% An include file was unused =%) \
+	-erroff=E_INDISTING_FROM_TRUNC	$(NOTE:% Identifier will be ambiguous if truncated =%) \
+	-erroff=E_MCR_NODIFF		$(NOTE:% Macros differ between source files =%) \
+	-erroff=E_INIT_DOES_NOT_FIT	$(NOTE:% initializer does not fit or is out of range+ 0xf0e69739 =%) \
+	\
+	$(NOTE:% Things to drop some day =%) \
+	-erroff=E_FUNC_ARG_UNUSED	$(NOTE:% Unused function argument =%) \
+	-erroff=E_STMT_NOT_REACHED	$(NOTE:% Unreachable statement =%) \
+	-erroff=E_NOP_IF_STMT		$(NOTE:% if has a no-op =%) \
+	-erroff=E_NOP_ELSE_STMT		$(NOTE:% else has a no-op =%) \
+	-erroff=E_CASE_FALLTHRU		$(NOTE:% case fallthru =%) \
+	-erroff=E_STATIC_UNUSED		$(NOTE:% Static function not used =%) \
+
 SUNLINTOPTS = \
 	-p \
-	\
 	-Ncheck=%all \
 	-Nlevel=4 \
-	\
 	-errchk=%all \
 	-errhdr=%all \
 	-errtags \
 	-errchk=no%longptr64 \
-	-errfmt=simple
-
-# See http://docs.sun.com/source/806-3567/lint.html for flags
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_BAD_PTR_CAST		# pointer casts may be troublesome
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_BAD_PTR_CAST_ALIGN
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_LABEL_NOT_USED		# Unused label
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_CONSTANT_CONDITION	# Constant condition
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_ARGUMENT_CONVERT
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INCL_NUSD		# An #include file was unused
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INDISTING_FROM_TRUNC	# Identifier will be ambiguous if truncated
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_MCR_NODIFF		# Macros differ between source files
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_INIT_DOES_NOT_FIT	# initializer does not fit or is out of range: 0xf0e69739
-
-# These we'd like to drop
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_FUNC_ARG_UNUSED		# Unused function argument
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_STMT_NOT_REACHED	# Unreachable statement
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_NOP_IF_STMT		# if() has a no-op
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_NOP_ELSE_STMT		# else has a no-op
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_CASE_FALLTHRU		# case fallthru
-SUNLINTOPTS := $(SUNLINTOPTS) -erroff=E_STATIC_UNUSED		# Static function not used
+	-errfmt=simple \
+	$(SUNLINT_HUSH_OPTS) \
 
 sunlint :
 	rm -f *.ln
