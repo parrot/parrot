@@ -185,7 +185,7 @@ pobject_lives(Interp *interp /*NN*/, PObj *obj /*NN*/)
     if (PObj_is_PMC_TEST(obj)) {
         PMC * const p = (PMC*)obj;
         if (p->real_self != p)
-            pobject_lives(interp, p->real_self);
+            pobject_lives(interp, (PObj *)p->real_self);
     }
 
     /* if object is a PMC and contains buffers or PMCs, then attach

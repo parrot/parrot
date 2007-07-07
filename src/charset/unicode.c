@@ -146,21 +146,21 @@ compose(Interp *interp, STRING *src)
     dest = string_make_direct(interp, NULL, src_len * sizeof (UChar),
             src->encoding, src->charset, 0);
     err = U_ZERO_ERROR;
-    dest_len = unorm_normalize(src->strstart, src_len,
+    dest_len = unorm_normalize((UChar *)src->strstart, src_len,
             UNORM_DEFAULT,      /* default is NFC */
             0,                  /* options 0 default - no specific icu
                                  * version */
-            dest->strstart, dest_len,
+            (UChar *)dest->strstart, dest_len,
             &err);
     dest->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, dest, dest->bufused);
-        dest_len = unorm_normalize(src->strstart, src_len,
+        dest_len = unorm_normalize((UChar *)src->strstart, src_len,
                 UNORM_DEFAULT,      /* default is NFC */
                 0,                  /* options 0 default - no specific
                                      * icu version */
-                dest->strstart, dest_len,
+                (UChar *)dest->strstart, dest_len,
                 &err);
         assert(U_SUCCESS(err));
         dest->bufused = dest_len * sizeof (UChar);
@@ -224,7 +224,7 @@ upcase(Interp *interp, STRING *src)
      *  TODO downcase, titlecase
      */
     needed = u_strToUpper(NULL, 0,
-            src->strstart, src_len,
+            (UChar *)src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
     if (needed > dest_len) {
@@ -232,8 +232,8 @@ upcase(Interp *interp, STRING *src)
         dest_len = needed;
     }
     err = U_ZERO_ERROR;
-    dest_len = u_strToUpper(src->strstart, dest_len,
-            src->strstart, src_len,
+    dest_len = u_strToUpper((UChar *)src->strstart, dest_len,
+            (UChar *)src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
     assert(U_SUCCESS(err));
@@ -277,16 +277,16 @@ u_strToLower(UChar *dest, int32_t destCapacity,
      */
     err = U_ZERO_ERROR;
     src_len = src->bufused / sizeof (UChar);
-    dest_len = u_strToLower(src->strstart, src_len,
-            src->strstart, src_len,
+    dest_len = u_strToLower((UChar *)src->strstart, src_len,
+            (UChar *)src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
     src->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, src, src->bufused);
-        dest_len = u_strToLower(src->strstart, dest_len,
-                src->strstart, src_len,
+        dest_len = u_strToLower((UChar *)src->strstart, dest_len,
+                (UChar *)src->strstart, src_len,
                 NULL,       /* locale = default */
                 &err);
         assert(U_SUCCESS(err));
@@ -324,8 +324,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
      */
     err = U_ZERO_ERROR;
     src_len = src->bufused / sizeof (UChar);
-    dest_len = u_strToTitle(src->strstart, src_len,
-            src->strstart, src_len,
+    dest_len = u_strToTitle((UChar *)src->strstart, src_len,
+            (UChar *)src->strstart, src_len,
             NULL,       /* default titleiter */
             NULL,       /* locale = default */
             &err);
@@ -333,8 +333,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
         Parrot_reallocate_string(interp, src, src->bufused);
-        dest_len = u_strToTitle(src->strstart, dest_len,
-                src->strstart, src_len,
+        dest_len = u_strToTitle((UChar *)src->strstart, dest_len,
+                (UChar *)src->strstart, src_len,
                 NULL, NULL,
                 &err);
         assert(U_SUCCESS(err));
