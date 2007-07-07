@@ -74,28 +74,28 @@ $decl {
     Parrot_Class * const _class = PARROT_CLASS(obj->_class);
 
     /* Walk and search for the vtable method. */
-    int num_classes = VTABLE_elements(interp, _class->all_parents);
-    int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
-    int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
+    const int num_classes = VTABLE_elements(interp, _class->all_parents);
+    const int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
+    const int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
     int i;
     for (i = 0; i < num_classes; i++) {
         /* Get the class. */
         PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-        
+
         /* If it's from this universe or the class doesn't inherit from
          * anything outside of it... */
         if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
             if (VTABLE_exists_keyed_str(interp, class_info->vtable_methods, string_from_literal(interp, "$meth"))) {
                 /* Found it; call. */
-                PMC *meth = VTABLE_get_pmc_keyed_str(interp,
+                PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
                     class_info->vtable_methods, string_from_literal(interp, "$meth"));
                 ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, string_from_literal(interp, "$meth"), "$sig"$arg);
             }
         }
         else {
             /* Get the PMC instance and call the vtable method on that. */
-            PMC *del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
+            PMC * const del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
                 alien_parents_pos);
             ${return}VTABLE_$meth(interp, del_class$arg);
         }
