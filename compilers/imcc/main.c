@@ -550,7 +550,7 @@ imcc_get_optimization_description(const Interp *interp /*NN*/, int opt_level, ch
     if (interp->run_core & PARROT_SWITCH_CORE)
         opt_desc[i++] = 't';
 
-    opt_desc[i++] = '\0';
+    opt_desc[i] = '\0';
     return;
 }
 
