@@ -106,10 +106,10 @@ operations, with tracing and bounds checking enabled.
 #define  code_end   (interp->code->base.data + \
         interp->code->base.size)
 static opcode_t *
-runops_trace_core(Interp *interp, opcode_t *pc)
+runops_trace_core(Interp *interp /*NN*/, opcode_t *pc)
 {
     static size_t dod, gc;
-    Arenas *arena_base = interp->arena_base;
+    Arenas * const arena_base = interp->arena_base;
     Interp *debugger;
     PMC* pio;
 
@@ -165,7 +165,7 @@ runops_trace_core(Interp *interp, opcode_t *pc)
 }
 
 opcode_t *
-runops_slow_core(Interp *interp, opcode_t *pc)
+runops_slow_core(Interp *interp /*NN*/, opcode_t *pc)
 {
 
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
@@ -182,7 +182,6 @@ runops_slow_core(Interp *interp, opcode_t *pc)
         CONTEXT(interp->ctx)->current_pc = pc;
 
         DO_OP(pc, interp);
-
     }
 #undef code_start
 #undef code_end

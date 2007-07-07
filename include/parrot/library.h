@@ -58,9 +58,11 @@ void parrot_init_library_paths( Interp *interp /*NN*/ )
 
 STRING * parrot_split_path_ext( Interp* interp /*NN*/,
     STRING *in,
-    STRING **wo_ext,
-    STRING **ext )
-        __attribute__nonnull__(1);
+    STRING **wo_ext /*NN*/,
+    STRING **ext /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: src/library.c */
 

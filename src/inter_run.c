@@ -23,13 +23,13 @@ Various functions that call the run loop.
 
 /* HEADERIZER BEGIN: static */
 
-static parrot_context_t * runops_args(
-    Parrot_Interp interp,
+static parrot_context_t * runops_args( Interp *interp /*NN*/,
     PMC *sub,
     PMC *obj,
     STRING *meth,
     const char* sig,
-    va_list ap );
+    va_list ap )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -155,7 +155,7 @@ Parrot_runops_fromc(Interp *interp /*NN*/, PMC *sub)
 
 
 static parrot_context_t *
-runops_args(Parrot_Interp interp, PMC *sub, PMC *obj,
+runops_args(Interp *interp /*NN*/, PMC *sub, PMC *obj,
         STRING *meth, const char* sig, va_list ap)
 {
     opcode_t offset, *dest;

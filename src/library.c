@@ -552,7 +552,7 @@ extension and C<ext> to the extension or NULL.
 
 STRING *
 parrot_split_path_ext(Interp* interp /*NN*/, STRING *in,
-        STRING **wo_ext, STRING **ext)
+        STRING **wo_ext /*NN*/, STRING **ext /*NN*/)
 {
     STRING * const slash1 = CONST_STRING(interp, "/");
     STRING * const slash2 = CONST_STRING(interp, "\\");

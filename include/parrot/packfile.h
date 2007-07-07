@@ -435,7 +435,11 @@ PARROT_API STRING * Parrot_debug_pc_to_filename( Interp *interp,
 PARROT_API void Parrot_destroy_constants( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_load_bytecode( Interp *interp, STRING *file_str );
+PARROT_API void Parrot_load_bytecode( Interp *interp /*NN*/,
+    STRING *file_str /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_API PackFile_Debug * Parrot_new_debug_seg( Interp *interp,
     PackFile_ByteCode *cs /*NN*/,
     size_t size )

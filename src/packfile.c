@@ -200,8 +200,9 @@ static opcode_t * pf_debug_unpack( Interp *interp,
         __attribute__nonnull__(2);
 
 static INTVAL pf_register_standard_funcs( Interp *interp, PackFile *pf );
-static PMC* run_sub( Interp *interp /*NN*/, PMC *sub_pmc )
-        __attribute__nonnull__(1);
+static PMC* run_sub( Interp *interp /*NN*/, PMC *sub_pmc /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void segment_init(
     PackFile_Segment *self /*NN*/,
@@ -355,7 +356,7 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 */
 
 static PMC*
-run_sub(Interp *interp /*NN*/, PMC *sub_pmc)
+run_sub(Interp *interp /*NN*/, PMC *sub_pmc /*NN*/)
 {
     const INTVAL old = interp->run_core;
     PMC *retval;
@@ -3269,7 +3270,7 @@ void * IMCC_compile_file(Parrot_Interp interp, const char *s);
 
 PARROT_API
 void
-Parrot_load_bytecode(Interp *interp, STRING *file_str)
+Parrot_load_bytecode(Interp *interp /*NN*/, STRING *file_str /*NN*/)
 {
     char *filename;
     STRING *wo_ext, *ext, *pbc, *path;

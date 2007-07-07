@@ -145,9 +145,8 @@ reaches 0, delete the entry.
 */
 
     void set_pmc_keyed(PMC* key, PMC* value) {
-        Hash * hash = (Hash *)PMC_struct_val(SELF);
-        HashBucket *b;
-        b = parrot_hash_get_bucket(INTERP, hash, key);
+        Hash * const hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b)
             LVALUE_CAST(char *, b->value) ++;
         else

@@ -690,7 +690,7 @@ evaluation of opcode continues.
 */
 
 void
-runops_int(Interp *interp, size_t offset)
+runops_int(Interp *interp /*NN*/, size_t offset)
 {
     int lo_var_ptr;
     opcode_t *(*core) (Interp *, opcode_t *) =
@@ -714,7 +714,7 @@ runops_int(Interp *interp, size_t offset)
     interp->resume_flag |= RESUME_RESTART;
 
     while (interp->resume_flag & RESUME_RESTART) {
-        opcode_t *pc = (opcode_t *)
+        opcode_t * const pc = (opcode_t *)
             interp->code->base.data + interp->resume_offset;
 
         interp->resume_offset = 0;
