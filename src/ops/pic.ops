@@ -2,7 +2,7 @@
 ** pic.ops
 */
 
-#define DEPRECATED internal_exception(UNIMPLEMENTED, "you shouldn't see this")
+#define DEPRECATED real_exception(interp, NULL, UNIMPLEMENTED, "you shouldn't see this")
 
 #include "parrot/oplib/ops.h"
 
