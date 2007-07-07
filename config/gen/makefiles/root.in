@@ -1713,6 +1713,7 @@ SUNLINT_HUSH_OPTS = \
 	-erroff=E_INDISTING_FROM_TRUNC	$(NOTE:% Identifier will be ambiguous if truncated =%) \
 	-erroff=E_MCR_NODIFF		$(NOTE:% Macros differ between source files =%) \
 	-erroff=E_INIT_DOES_NOT_FIT	$(NOTE:% initializer does not fit or is out of range+ 0xf0e69739 =%) \
+	-erroff=E_NONPORT_SBITWISE_OP   $(NOTE:% bitwise operations on signed values not portable =%) \
 	\
 	$(NOTE:% Things to drop some day =%) \
 	-erroff=E_FUNC_ARG_UNUSED	$(NOTE:% Unused function argument =%) \
@@ -1722,12 +1723,17 @@ SUNLINT_HUSH_OPTS = \
 	-erroff=E_CASE_FALLTHRU		$(NOTE:% case fallthru =%) \
 	-erroff=E_STATIC_UNUSED		$(NOTE:% Static function not used =%) \
 
+SUNLINT_OPTS_FOR_THE_FUTURE = -b -m -Xc
+
+# Lint options at: http://docs.sun.com/app/docs/doc/819-5265/6n7c29cli?a=view
 SUNLINTOPTS = \
+	-b \
 	-p \
+	-fd \
 	-Ncheck=%all \
 	-Nlevel=4 \
 	-errchk=%all \
-	-errhdr=%all \
+	-errhdr=%user \
 	-errtags \
 	-errchk=no%longptr64 \
 	-errfmt=simple \
