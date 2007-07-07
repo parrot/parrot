@@ -290,7 +290,7 @@ Parrot_init_arg_sig(Interp *interp, parrot_context_t *ctx, const char *sig /*NN*
         st->n = strlen(sig);
         /* initialize st->sig */
         if (st->n)
-          next_arg_sig(st);
+            next_arg_sig(st);
     }
     return st->n > 0;
 }
