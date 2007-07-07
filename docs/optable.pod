@@ -114,7 +114,7 @@ followed by equals sign. e.g. '22='
 
 C<is tighter> takes a B<previously> defined operator name as its single
 argument.  The argument operator's precedence level plus 1 is then used as the
-precedence level for the current operator that C<is tiger> is modifying.
+precedence level for the current operator that C<is tighter> is modifying.
 
 =item - is looser(PREVIOUSLY_DEFINED_OPERATOR_NAME)
 
