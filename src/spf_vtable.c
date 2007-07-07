@@ -13,10 +13,6 @@ retrieve arguments.
 
 =head2 Var args Functions
 
-=over 4
-
-=cut
-
 */
 
 #define IN_SPF_SYSTEM
@@ -26,22 +22,97 @@ retrieve arguments.
 #include <stdarg.h>
 #include "spf_vtable.str"
 
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+
+static STRING * getchr_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static STRING * getchr_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static HUGEFLOATVAL getfloat_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static HUGEFLOATVAL getfloat_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static HUGEINTVAL getint_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static HUGEINTVAL getint_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static void * getptr_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static void * getptr_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static STRING * getstring_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static STRING * getstring_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static UHUGEINTVAL getuint_pmc( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+static UHUGEINTVAL getuint_va( Interp *interp /*NN*/,
+    INTVAL size,
+    SPRINTF_OBJ *obj /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+/* HEADERIZER END: static */
+
 /*
 
-=item C<static STRING *
-getchr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getchr_va
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
 
 C<size> is unused.
 
-=cut
-
 */
 
 static STRING *
-getchr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getchr_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -53,8 +124,7 @@ getchr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static HUGEINTVAL
-getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getint_va
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -62,12 +132,10 @@ Parrot C<STRING>.
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the integer.
 
-=cut
-
 */
 
 static HUGEINTVAL
-getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getint_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -103,8 +171,7 @@ getint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static UHUGEINTVAL
-getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getuint_va
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
@@ -112,12 +179,10 @@ as a Parrot C<STRING>.
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the integer.
 
-=cut
-
 */
 
 static UHUGEINTVAL
-getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getuint_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -153,8 +218,7 @@ getuint_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static HUGEFLOATVAL
-getfloat_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getfloat_va
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
@@ -162,12 +226,10 @@ returns it as a Parrot C<STRING>.
 C<size> is an C<enum spf_type_t> value which indicates the storage type of
 the number.
 
-=cut
-
 */
 
 static HUGEFLOATVAL
-getfloat_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -202,8 +264,7 @@ getfloat_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static STRING *
-getstring_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getstring_va
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -211,12 +272,10 @@ Parrot C<STRING>.
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the string.
 
-=cut
-
 */
 
 static STRING *
-getstring_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getstring_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -253,19 +312,16 @@ getstring_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static void *
-getptr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getptr_va
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
 C<size> is unused.
 
-=cut
-
 */
 
 static void *
-getptr_va(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getptr_va(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     va_list * const arg = (va_list *)(obj->data);
 
@@ -279,24 +335,17 @@ SPRINTF_OBJ va_core = {
 
 /*
 
-=back
-
 =head2 PMC Functions
 
-=over 4
-
-=item C<static STRING *
-getchr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getchr_pmc
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static STRING *
-getchr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getchr_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -311,18 +360,15 @@ getchr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static HUGEINTVAL
-getint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getint_pmc
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static HUGEINTVAL
-getint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getint_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     HUGEINTVAL ret;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -349,18 +395,15 @@ getint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static UHUGEINTVAL
-getuint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getuint_pmc
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static UHUGEINTVAL
-getuint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getuint_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     UHUGEINTVAL ret;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -386,18 +429,15 @@ getuint_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static HUGEFLOATVAL
-getfloat_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getfloat_pmc
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static HUGEFLOATVAL
-getfloat_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     HUGEFLOATVAL ret;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -421,18 +461,15 @@ getfloat_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static STRING *
-getstring_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getstring_pmc
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static STRING *
-getstring_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getstring_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     STRING *s;
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
@@ -446,18 +483,15 @@ getstring_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
 
 /*
 
-=item C<static void *
-getptr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)>
+FUNCDOC: getptr_pmc
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.
 
-=cut
-
 */
 
 static void *
-getptr_pmc(Interp *interp, INTVAL size, SPRINTF_OBJ *obj)
+getptr_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
 {
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
@@ -474,8 +508,6 @@ SPRINTF_OBJ pmc_core = {
 };
 
 /*
-
-=back
 
 =head1 SEE ALSO
 
@@ -498,8 +530,6 @@ In the future, it may be deemed desirable to similarly vtable-ize
 appending things to the string, allowing for faster C<PIO_printf()> &c,
 as well as a version that writes directly to a C string. However, at
 this point neither of those is needed.
-
-=cut
 
 */
 
