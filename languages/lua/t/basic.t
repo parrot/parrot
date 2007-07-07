@@ -108,6 +108,9 @@ CODE
 7.0880180586677
 OUTPUT
 
+# clean up lib1.lua
+unlink('../lib1.lua') if ( -f '../lib1.lua' );
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (no file)' );
 dofile("no_file.lua")
 CODE
@@ -124,6 +127,9 @@ dofile('foo.lua')
 CODE
 /\?/
 OUTPUT
+
+# clean up foo.lua
+unlink('../foo.lua') if ( -f '../foo.lua' );
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'function getfenv' );
 local function f () end
@@ -203,6 +209,9 @@ nil
 ok
 OUTPUT
 
+# clean up foo.lua
+unlink('../foo.lua') if ( -f '../foo.lua' );
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (no file)' );
 f, msg = loadfile("no_file.lua")
 print(f, msg)
@@ -221,6 +230,9 @@ print(f, msg)
 CODE
 /nil\t.*\?/
 OUTPUT
+
+# clean up foo.lua
+unlink('../foo.lua') if ( -f '../foo.lua' );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );
 f = loadstring("i = i + 1")
@@ -640,6 +652,9 @@ print(r, m)
 CODE
 false	not a back trace
 OUTPUT
+
+# clean up temporary files
+map { unlink("../tmp1.$_") if ( -f "../tmp1.$_" ) } qw(lua pbc pir);
 
 # Local Variables:
 #   mode: cperl

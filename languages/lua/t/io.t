@@ -149,6 +149,7 @@ assert(f == io.output(f))
 CODE
 /^file \((0[Xx])?[0-9A-Fa-f]+\)/
 OUTPUT
+unlink('../output.new') if ( -f '../output.new' );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read *l', params => "< file.txt"  );
 print(io.read("*l"))
@@ -179,6 +180,8 @@ CODE
 15000000000000
 1000001
 OUTPUT
+# clean up number.txt
+unlink('../number.txt') if ( -f '../number.txt' );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines filename' );
 for line in io.lines("file.txt") do
@@ -358,6 +361,8 @@ CODE
 true
 OUTPUT
 }
+# clean up file.txt
+unlink('../file.txt') if ( -f '../file.txt' );
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'file:write closed' );
 f = io.open("file.out", "w")
@@ -391,6 +396,8 @@ end
 closing file for you.
 OUTPUT
 }
+# clean up file.out
+unlink('../file.out') if ( -f '../file.out' );
 
 # Local Variables:
 #   mode: cperl

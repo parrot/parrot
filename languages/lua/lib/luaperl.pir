@@ -129,11 +129,13 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     if pir goto L1
     $P0 = getclass 'ParrotIO'
     $S0 = $P0.'slurp'(out)
+    unlink(out)  # cleaning up the temporary file
     .local pmc ex
     ex = new .Exception
     ex['_message'] = $S0
     throw ex
   L1:
+    unlink(out)  # cleaning up the temporary file
     .local pmc pir_comp
     pir_comp = compreg 'PIR'
     $P0 = pir_comp(pir)

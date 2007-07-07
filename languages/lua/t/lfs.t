@@ -207,6 +207,8 @@ CODE
 /^[^:]+: [^:]+:\d+: lock: closed file\nstack traceback:\n/
 OUT
 
+# clean up file.txt
+unlink('../file.txt') if ( -f '../file.txt' );
 
 # Local Variables:
 #   mode: cperl

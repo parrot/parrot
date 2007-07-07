@@ -92,6 +92,9 @@ CODE
 0	1
 OUTPUT
 
+# clean up complex.lua
+unlink('../complex.lua') if ( -f '../complex.lua' );
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (no module)' );
 require "no_module"
 CODE
@@ -108,6 +111,9 @@ require "foo"
 CODE
 /[^:]+: error loading module 'foo' from file '.*foo.lua':\n/
 OUTPUT
+
+# clean up foo.lua
+unlink('../foo.lua') if ( -f '../foo.lua' );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & package.preload' );
 foo = {}
@@ -138,6 +144,9 @@ CODE
 foo
 OUTPUT
 }
+
+# clean up foo.lua
+unlink('../foo.lua') if ( -f '../foo.lua' );
 
 unlink('../complex.lua') if ( -f '../complex.lua' );
 open $X, '>', '../complex.lua';
@@ -181,6 +190,9 @@ print(complex.i.r, complex.i.i)
 CODE
 0	1
 OUTPUT
+
+# clean up complex.lua
+unlink('../complex.lua') if ( -f '../complex.lua' );
 
 SKIP:
 {
@@ -232,6 +244,10 @@ CODE
 3.14
 OUTPUT
 }
+
+# clean up mod_foo.pbc and/or mod_foo.pir if necessary
+unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
+unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.loaded' );
 t = {}
@@ -305,6 +321,9 @@ m.print("hello")
 CODE
 hello
 OUTPUT
+
+# clean up temporary files
+map { unlink("../tmp1.$_") if ( -f "../tmp1.$_" ) } qw(lua pbc pir);
 
 # Local Variables:
 #   mode: cperl
