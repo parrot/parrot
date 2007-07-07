@@ -382,10 +382,10 @@ getint_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
     case SIZE_SHORT:
         ret = (short)ret;
         break;
-        /* case SIZE_REG: ret=(HUGEINTVAL)(int)ret; */
-        break;
+        /* case SIZE_REG: ret=(HUGEINTVAL)(int)ret; break; */
     case SIZE_LONG:
         ret = (long)ret;
+        break;
     default:
         /* nothing */ ;
     }
@@ -420,6 +420,7 @@ getuint_pmc(Interp *interp /*NN*/, INTVAL size, SPRINTF_OBJ *obj /*NN*/)
         /* case SIZE_REG: * ret=(UHUGEINTVAL)(unsigned int)ret; * break; */
     case SIZE_LONG:
         ret = (unsigned long)ret;
+        break;
     default:
         /* nothing */ ;
     }
