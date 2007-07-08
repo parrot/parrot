@@ -66,15 +66,20 @@ sub body {
     # Do we have a return value?
     my $return = $method->{type} =~ /void/ ? '' : 'return ';
 
-    # add a wee hack here to get parrot compiling with gcc again (the weird
-    # thing is that the following line doesn't even generate a warning with icc)
+    # work out what the null return should be so that we can quieten the "no
+    # return from non-void function" warnings.
+    # unfortunately, the general case:
     #my $null_return = "($method->{type})NULL";
+    # doesn't work with gcc (it builds and tests without even a warning with 
+    # icc), so we add a workaround for the null return from a FLOATVAL
+    # function
     my $null_return;
-    if ($method->{type} =~ /void/) {
-        $null_return = '';
+    if ($method->{type} =~ /void|PMC|INTVAL|STRING|opcode_t/) {
+        $null_return = "return ($method->{type})NULL;";
     }
-    elsif ($method->{type} =~ /PMC/) {
-        $null_return = 'return (PMC *)NULL;';
+    # workaround for gcc because the general case doesn't work there
+    elsif ($method->{type} =~ /FLOATVAL/) {
+        $null_return = 'return (FLOATVAL) 0;';
     }
     else {
         $null_return = '';
