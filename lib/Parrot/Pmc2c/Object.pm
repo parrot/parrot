@@ -74,7 +74,7 @@ sub body {
         $null_return = '';
     }
     elsif ($method->{type} =~ /PMC/) {
-        $null_return = 'return (PMC *)NULL';
+        $null_return = 'return (PMC *)NULL;';
     }
     else {
         $null_return = '';
@@ -114,7 +114,7 @@ $decl {
             ${return}VTABLE_$meth(interp, del_class$arg);
         }
     }
-    $null_return;
+    $null_return
 }
 EOC
 }
