@@ -127,6 +127,9 @@ sub runstep {
                 . " -Wdisabled-optimization -mno-accumulate-outgoing-args"
                 . " -Wno-shadow",
 
+            3.4 => " -Wextra -Wdeclaration-after-statement"
+                . " -Wold-style-definition -Wbad-function-cast",
+
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
             # We shouldn't be using __packed__, but I doubt -Wpacked will harm
