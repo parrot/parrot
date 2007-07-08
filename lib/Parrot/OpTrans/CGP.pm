@@ -91,7 +91,7 @@ sub goto_address {
         return "if ($addr == 0)
           return 0;
    _reg_base = (char*)interp->ctx.bp.regs_i;
-   goto **(cur_opcode = opcode_to_prederef(interp, $addr))";
+   goto *(void *)(cur_opcode = opcode_to_prederef(interp, $addr))";
     }
 }
 
@@ -105,7 +105,7 @@ relevant C code.
 sub goto_offset {
     my ( $self, $offset ) = @_;
 
-    return "goto **(cur_opcode += $offset)";
+    return "goto *(void *)(cur_opcode += $offset)";
 }
 
 =item C<goto_pop()>
@@ -118,7 +118,7 @@ code.
 sub goto_pop {
     my ($self) = @_;
 
-    return "goto **(cur_opcode = opcode_to_prederef(interp,
+    return "goto *(void *)(cur_opcode = opcode_to_prederef(interp,
         (opcode_t*)pop_dest(interp)))";
 }
 
