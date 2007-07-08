@@ -65,6 +65,7 @@ sub body {
 
     # Do we have a return value?
     my $return = $method->{type} =~ /void/ ? '' : 'return ';
+    my $null_return = "($method->{type})NULL";
 
     my $l = $self->line_directive( $line + 1, "\L$self->{class}.c" );
     return <<EOC;
@@ -100,6 +101,7 @@ $decl {
             ${return}VTABLE_$meth(interp, del_class$arg);
         }
     }
+    return $null_return;
 }
 EOC
 }
