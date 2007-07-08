@@ -583,7 +583,7 @@ sub _print_goto_opcode {
         print $fh <<END_C;
 #ifdef __GNUC__
 # ifdef I386
-    else if (cur_opcode == (void **) 1)
+    else if (cur_opcode == (opcode_t *)(void **) 1)
     __asm__ ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
 # endif
 #endif
