@@ -27,11 +27,12 @@ increment operator. In Python, on the other hand, you'd get a runtime error.
 
 =item *
 
-To be perfectly honest, this is a slightly flawed example, since it's unlikely
-that there will be a distinct "Python scalar" PMC class.  The Python compiler
-could well type-inference variables such that C<a> would be a C<PythonString>
-and C<b> would be a C<PythonNumber>.  But the point remains - incrementing a
-C<PythonString> is very different from incrementing a C<PerlScalar>.
+To be perfectly honest, this is a slightly flawed example, since it's
+unlikely that there will be a distinct "Python scalar" PMC class.  The
+Python compiler could well infer variables by their type such that C<a>
+would be a C<PythonString> and C<b> would be a C<PythonNumber>.  But the
+point remains - incrementing a C<PythonString> is very different from
+incrementing a C<PerlScalar>.
 
 =back
 
