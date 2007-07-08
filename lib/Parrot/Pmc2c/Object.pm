@@ -70,7 +70,7 @@ sub body {
     # return from non-void function" warnings.
     # unfortunately, the general case:
     #my $null_return = "($method->{type})NULL";
-    # doesn't work with gcc (it builds and tests without even a warning with 
+    # doesn't work with gcc (it builds and tests without even a warning with
     # icc), so we add a workaround for the null return from a FLOATVAL
     # function
     my $null_return;
