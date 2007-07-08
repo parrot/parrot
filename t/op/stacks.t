@@ -448,15 +448,14 @@ starting
 done
 OUTPUT
 
-pasm_error_output_is( <<CODE, <<OUTPUT, "entrytype, beyond stack depth" );
+pasm_error_output_like( <<CODE, <<OUTPUT, "entrytype, beyond stack depth" );
         save    12
         print   "ready\\n"
         entrytype       I0, 1
         print   "done\\n"
         end
 CODE
-ready
-Stack Depth wrong
+/ready\nStack Depth wrong/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "depth op" );
