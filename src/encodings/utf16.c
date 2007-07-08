@@ -160,7 +160,7 @@ to_encoding(Interp *interp, STRING *src /*NN*/, STRING *dest)
     }
     else {
         Parrot_reallocate_string(interp, dest, sizeof (UChar) * src_len);
-        p = dest->strstart;
+        p = (UChar *)dest->strstart;
     }
     if (src->charset == Parrot_iso_8859_1_charset_ptr ||
             src->charset == Parrot_ascii_charset_ptr) {
@@ -182,7 +182,7 @@ to_encoding(Interp *interp, STRING *src /*NN*/, STRING *dest)
                 result->bufused = dest_len * sizeof (UChar);
                 Parrot_reallocate_string(interp, dest,
                                          sizeof (UChar) * dest_len);
-                p = dest->strstart;
+                p = (UChar *)dest->strstart;
             }
             u_strFromUTF8(p, dest_len,
                     &dest_len, src->strstart, src->bufused, &err);
