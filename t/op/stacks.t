@@ -294,7 +294,7 @@ CODE
 43
 OUTPUT
 
-pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
+pasm_error_output_like( <<"CODE", <<'OUTPUT', 'rotate up by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -302,10 +302,10 @@ pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate up by more than stack size')
     rotate_up 3
     end
 CODE
-Stack too shallow!
+/Stack too shallow!/
 OUTPUT
 
-pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
+pasm_error_output_like( <<"CODE", <<'OUTPUT', 'rotate down by more than stack size');
     set I0, 1
     save I0
     set I0, 2
@@ -313,7 +313,7 @@ pasm_error_output_is( <<"CODE", <<'OUTPUT', 'rotate down by more than stack size
     rotate_up -3
     end
 CODE
-Stack too shallow!
+/Stack too shallow!/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'save/savec for strings' );

@@ -181,7 +181,7 @@ rotate_entries(Interp *interp,
         depth = num_entries - 1;
 
         if (stack_height(interp, stack) < (size_t)num_entries) {
-            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!");
+            real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
 
         temp = *stack_entry(interp, stack, depth);
@@ -197,7 +197,7 @@ rotate_entries(Interp *interp,
         Stack_Entry_t temp;
 
         if (stack_height(interp, stack) < (size_t)num_entries) {
-            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!");
+            real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
         temp = *stack_entry(interp, stack, 0);
         for (i = 0; i < depth; i++) {
