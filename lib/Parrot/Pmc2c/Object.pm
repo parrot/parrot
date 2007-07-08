@@ -65,7 +65,20 @@ sub body {
 
     # Do we have a return value?
     my $return = $method->{type} =~ /void/ ? '' : 'return ';
-    my $null_return = "($method->{type})NULL";
+
+    # add a wee hack here to get parrot compiling with gcc again (the weird
+    # thing is that the following line doesn't even generate a warning with icc)
+    #my $null_return = "($method->{type})NULL";
+    my $null_return;
+    if ($method->{type} =~ /void/) {
+        $null_return = '';
+    }
+    elsif ($method->{type} =~ /PMC/) {
+        $null_return = 'return (PMC *)NULL';
+    }
+    else {
+        $null_return = '';
+    }
 
     my $l = $self->line_directive( $line + 1, "\L$self->{class}.c" );
     return <<EOC;
@@ -101,7 +114,7 @@ $decl {
             ${return}VTABLE_$meth(interp, del_class$arg);
         }
     }
-    return $null_return;
+    $null_return;
 }
 EOC
 }
