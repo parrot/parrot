@@ -303,11 +303,9 @@ Unarchives the code.
         STRING *packed;
         size_t i;
         PackFile_Segment *seg;
-        struct Parrot_sub * sub;
 
         packed = io->vtable->shift_string(INTERP, io);
         SUPER(info);
-        sub = PMC_sub(SELF);
         pf = PackFile_new(INTERP, 0);
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))
