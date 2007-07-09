@@ -21,7 +21,7 @@ A basic class to hold defined attribute grammar rules.
     addattribute base, "type"   # node type that this rule applies to
     addattribute base, "name"   # name of attribute being defined
     addattribute base, "parent" # where the attribute is applied
-			        # (current node or child node)
+                                # (current node or child node)
     addattribute base, "action" # a compiled subroutine
     addattribute base, "line"   # line number in the grammar source file
     .return ()
