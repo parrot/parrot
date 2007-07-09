@@ -8,14 +8,12 @@
  * for now use signal based functions
  */
 
-#  ifndef S_SPLINT_S
 Parrot_sighandler_t
 Parrot_set_sighandler(int signum, Parrot_sighandler_t handler)
 {
     return signal(signum, handler);
 }
-#  endif
-#endif
+#endif /* PARROT_HAS_HEADER_SIGNAL */
 
 /*
  * Local variables:
