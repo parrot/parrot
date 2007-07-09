@@ -1163,10 +1163,6 @@ Look up symbol $3 in library $2. We assume that this is actually a
 variable address rather than a function address, and build an
 UnManagedStruct PMC and stick the address into its data pointer.
 
-=item B<compile>(out PMC, invar PMC, in STR)
-
-Don't use compile -- just invoke the compiler.
-
 =item B<compreg>(out PMC, in STR)
 
 Get a compiler for source type $2.
@@ -1230,11 +1226,6 @@ op dlvar (out PMC, invar PMC, in STR) {
         $1 = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data($1) = p;
     }
-    goto NEXT();
-}
-
-inline op compile(out PMC, invar PMC, in STR) {
-    real_exception(interp, NULL, 1, "don't use compile - just invoke the compiler");
     goto NEXT();
 }
 
