@@ -306,7 +306,7 @@ If a file contains plain text rather than POD it may be directly linked to.
 sub is_docs_link {
     my $self = shift;
 
-    # TODO - This needs more thought. I'm trying to work out which files
+    # RT#43681 - This needs more thought. I'm trying to work out which files
     # it's sensible to link directly to. Suffixes other than txt are a
     # problem (for me at least) because the browser thinks it should
     # download the file.
@@ -398,7 +398,7 @@ sub short_description {
             $desc =~ s/\s+$//os;
 
             # Remove any POD.
-            # TODO - Decide whether we want to do this or convert
+            # RT#43683 - Decide whether we want to do this or convert
             # to HTML in the documentation item.
             $desc =~ s/[CFL]<([^>]+)>/$1/osg;
 
@@ -406,7 +406,7 @@ sub short_description {
         }
     }
 
-    # TODO - The abstract section above was added later. The two searches
+    # RT#43687 - The abstract section above was added later. The two searches
     # could be combined.
 
     return $self->title;
