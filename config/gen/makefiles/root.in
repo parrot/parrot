@@ -105,66 +105,6 @@ LDFLAGS    = @ldflags@ @ld_debug@
 
 CONFIGURE  = $(PERL) Configure.pl
 
-# E_FUNC_ARG_UNUSED: Because of the interpreter getting passed around.  I need to add lint protection
-# on the Interp, and then we can turn it back on.
-
-
-SPLINT     = splint
-# note: +distinctinternalnames with +externalnamelen at 8 characters
-#       (the ANSI standard) is not going to fly for us.
-SPLINTFLAGS  = \
-	-weak \
-	\
-	-abstract \
-	+aliasunique \
-	-ansireserved \
-	+ansireserved \
-	+ansireservedinternal \
-	+assignexpose \
-	-bitwisesigned \
-	+bitwisesigned \
-	+boolcompare \
-	+booltype BOOLVAL \
-	+casebreak \
-	-castfcnptr \
-	-charint \
-	+continuecomment \
-	+controlnestdepth 15 \
-	+cppnames \
-	+declundef \
-	+distinctinternalnames \
-	+evalorder \
-	+fielduse \
-	+forcehints \
-	-globs \
-	+imptype \
-	-includenest \
-	+incondefs \
-	+incondefslib \
-	-isoreserved \
-	-isoreservedinternal \
-	+linelen 9999 \
-	+longintegral \
-	+macroassign \
-	+macroempty \
-	+macroredef \
-	+matchanyintegral \
-	+nestedextern \
-	+noeffect \
-	+posixstrictlib \
-	+readonlystrings \
-	-realcompare \
-	-retvalother \
-	+shadow \
-	+showscan \
-	+showsummary \
-	-skipposixheaders \
-	-type \
-
-# added to splint target to simplify experimentation,
-# ex: make SPLINTOPTS='-posixstrictlib +posixlib' splint
-SPLINTOPTS   =
-
 INNO_SETUP = iscc
 
 JIT_BUILD_TOOL = $(BUILD_TOOLS_DIR)/jit2c.pl
@@ -1783,9 +1723,66 @@ bsdlint : $(PARROT)
 	rm -f *.ln
 	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) $(LINTABLE_CFILES)
 
+SPLINT = splint
+SPLINTFLAGS  = \
+	-weak \
+	\
+	-abstract \
+	+aliasunique \
+	-ansireserved \
+	+ansireservedinternal \
+	+assignexpose \
+	-bitwisesigned \
+	+boolcompare \
+	+booltype BOOLVAL \
+	+casebreak \
+	-castfcnptr \
+	-charint \
+	+continuecomment \
+	+controlnestdepth 15 \
+	+cppnames \
+	+declundef \
+	-distinctinternalnames \
+	+evalorder \
+	+fielduse \
+	+forcehints \
+	-globs \
+	+imptype \
+	-includenest \
+	+incondefs \
+	+incondefslib \
+	-isoreserved \
+	-isoreservedinternal \
+	+linelen 9999 \
+	+longintegral \
+	+macroassign \
+	+macroempty \
+	+macroredef \
+	+matchanyintegral \
+	+nestedextern \
+	+noeffect \
+	+posixstrictlib \
+	-predboolothers \
+	+readonlystrings \
+	-realcompare \
+	-retvalother \
+	+shadow \
+	+showscan \
+	+showsummary \
+	-skipposixheaders \
+	-type \
+
+# Other options we'd like to add back
+# -includedepth 8 : Let's investigate why we do so many includes.
+# --initallelements : Right now, the *.ops files don't initialize all values of the arrays
+
+# added to splint target to simplify experimentation,
+# ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
+SPLINTFLAGS_TEST   =
+
 splint : $(PARROT)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTOPTS) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTOPTS) $(IMCC_DIR)/main.c
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
 ###############################################################################
 #
