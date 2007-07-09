@@ -75,7 +75,7 @@ foreach my $file (@files) {
     next unless -e $file;
 
     # Skip the book, because it uses extended O'Reilly-specific POD
-    next if $file =~ m{parrot/docs/book/};
+    next if $file =~ m{docs/book/};
 
     # skip files without POD
     next unless Pod::Find::contains_pod( $file, 0 );
