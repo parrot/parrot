@@ -112,16 +112,54 @@ CONFIGURE  = $(PERL) Configure.pl
 SPLINT     = splint
 # note: +distinctinternalnames with +externalnamelen at 8 characters
 #       (the ANSI standard) is not going to fly for us.
-SPLINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
-    +aliasunique +ansireserved +ansireservedinternal +assignexpose \
-    +bitwisesigned +boolcompare +booltype BOOLVAL +casebreak -castfcnptr \
-    -charint +continuecomment +controlnestdepth 15 +cppnames +declundef \
-    +distinctinternalnames +evalorder +fielduse +forcehints -globs \
-    +imptype +includenest 8 +incondefs +incondefslib +linelen 9999 \
-    +longintegral +macroassign +macroempty +macroredef +matchanyintegral \
-    +nestedextern +noeffect +readonlystrings -realcompare +shadow -type \
-    -isoreserved -isoreservedinternal -ansireserved -retvalother \
-    -bitwisesigned -skipposixheaders
+SPLINTFLAGS  = \
+	-weak \
+	\
+	-abstract \
+	+aliasunique \
+	-ansireserved \
+	+ansireserved \
+	+ansireservedinternal \
+	+assignexpose \
+	-bitwisesigned \
+	+bitwisesigned \
+	+boolcompare \
+	+booltype BOOLVAL \
+	+casebreak \
+	-castfcnptr \
+	-charint \
+	+continuecomment \
+	+controlnestdepth 15 \
+	+cppnames \
+	+declundef \
+	+distinctinternalnames \
+	+evalorder \
+	+fielduse \
+	+forcehints \
+	-globs \
+	+imptype \
+	-includenest \
+	+incondefs \
+	+incondefslib \
+	-isoreserved \
+	-isoreservedinternal \
+	+linelen 9999 \
+	+longintegral \
+	+macroassign \
+	+macroempty \
+	+macroredef \
+	+matchanyintegral \
+	+nestedextern \
+	+noeffect \
+	+posixstrictlib \
+	+readonlystrings \
+	-realcompare \
+	-retvalother \
+	+shadow \
+	+showscan \
+	+showsummary \
+	-skipposixheaders \
+	-type \
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTOPTS='-posixstrictlib +posixlib' splint
