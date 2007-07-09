@@ -231,7 +231,7 @@ sub _runstep {
 
     my $step = $step_name->new;
 
-    # XXX This works. but is probably not a good design.
+    # RT#43675 This works. but is probably not a good design.
     # Using $step->description() would be nicer
     my $description = $step->description();
     $description = "" unless defined $description;
@@ -250,7 +250,7 @@ sub _runstep {
         }
     }
 
-    # XXX cc_build uses this verbose setting, why?
+    # RT#43673 cc_build uses this verbose setting, why?
     $self->data->set( verbose => $verbose ) if $n > 2;
 
     print "\n", $description, '...';
