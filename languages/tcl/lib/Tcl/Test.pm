@@ -12,7 +12,10 @@ sub import {
     my $test   = File::Spec->abs2rel( File::Spec->rel2abs($0), $tcl );
 
     chdir $tcl;
-    exec $parrot, "tcl.pbc", $test;
+    if (!exists $ENV{TEST_PROG_ARGS}) {
+      $ENV{TEST_PROG_ARGS} = '-G'; # XXX mask a parrot GC bug.
+    }
+    exec $parrot, $ENV{TEST_PROG_ARGS}, 'tcl.pbc', $test;
 }
 1;
 

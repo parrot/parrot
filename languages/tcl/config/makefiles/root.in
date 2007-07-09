@@ -132,7 +132,7 @@ tclsh: $(PARROT) tcl.pbc
 	$(PARROT) -G tcl.pbc
 
 test: tcl.pbc
-	$(PERL) t/harness
+	prove -r t
 
 # Can only run a few of these cleanly with test_more at the moment.
 # eventually, as the list of commented out tests is smaller, just
@@ -323,7 +323,8 @@ $(GENERATED_INLINES) \
 "$(OPSDIR)/*.ilk" \
 "$(OPSDIR)/*.lib" \
 "$(OPSDIR)/*.pdb" \
-"$(TCL_LIB)/*.pir"
+"$(TCL_LIB)/*.pir" \
+lib/*.pre_c
 
 # that last line should be cleaned up for x-platform.
 
