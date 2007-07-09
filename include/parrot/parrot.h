@@ -247,12 +247,12 @@ typedef void (*funcptr_t)(void);
  * get "_unused" added to them so that you can't accidentally use them
  * without removing the shim designation.
  */
-#define SHIM(a) a##_unused __attribute__unused__
+#define SHIM(a) /*@unused@*/ a##_unused __attribute__unused__
 
 /* One of the most common shim arguments is the interpreter itself, so it
  * gets its own macro.
  */
-#define SHIM_INTERP Interp *interp_unused __attribute__unused__
+#define SHIM_INTERP /*@unused@*/ Interp *interp_unused __attribute__unused__
 
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.
