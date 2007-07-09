@@ -324,7 +324,7 @@ sub get_c_language_files {
 
     return @c_language_files;
 
-    # XXX: lex_source_files() collects lisp files as well...  how to fix ???
+    # RT#43691: lex_source_files() collects lisp files as well...  how to fix ???
 }
 
 =item C<is_c_exemption()>
