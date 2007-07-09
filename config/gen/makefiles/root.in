@@ -1748,9 +1748,9 @@ SPLINTFLAGS  = \
 	+forcehints \
 	-globs \
 	+imptype \
-	-includenest \
 	+incondefs \
 	+incondefslib \
+	-initallelements \
 	-isoreserved \
 	-isoreservedinternal \
 	+linelen 9999 \
@@ -1774,7 +1774,7 @@ SPLINTFLAGS  = \
 
 # Other options we'd like to add back
 # -includedepth 8 : Let's investigate why we do so many includes.
-# --initallelements : Right now, the *.ops files don't initialize all values of the arrays
+# +initallelements : Right now, the *.ops files don't initialize all values of the arrays
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
