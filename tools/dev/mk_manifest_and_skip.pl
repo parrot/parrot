@@ -156,9 +156,11 @@ foreach (@ignore) {
     }
 }
 
-foreach my $dir ( sort keys %ignore ) {
+foreach my $directory ( sort keys %ignore ) {
+    my $dir = $directory;
+    $dir =~ s!\\!/!g;
     print $MANIFEST_SKIP "# generated from svn:ignore of '$dir/'\n";
-    foreach ( sort split /\n/, $ignore{$dir} ) {
+    foreach ( sort split /\n/, $ignore{$directory} ) {
         s/\./\\./g;
         s/\*/.*/g;
         print $MANIFEST_SKIP $dir ne '.'
