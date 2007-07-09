@@ -1732,10 +1732,8 @@ SPLINTFLAGS  = \
 	-ansireserved \
 	+ansireservedinternal \
 	+assignexpose \
-	-bitwisesigned \
 	+boolcompare \
 	+booltype BOOLVAL \
-	+casebreak \
 	-castfcnptr \
 	-charint \
 	+continuecomment \
@@ -1744,6 +1742,7 @@ SPLINTFLAGS  = \
 	+declundef \
 	-distinctinternalnames \
 	+evalorder \
+	-fcnuse \
 	+fielduse \
 	+forcehints \
 	-globs \
@@ -1760,11 +1759,10 @@ SPLINTFLAGS  = \
 	+macroredef \
 	+matchanyintegral \
 	+nestedextern \
-	+noeffect \
 	+posixstrictlib \
 	-predboolothers \
 	+readonlystrings \
-	-realcompare \
+	-redef \
 	-retvalother \
 	+shadow \
 	+showscan \
@@ -1775,6 +1773,11 @@ SPLINTFLAGS  = \
 # Other options we'd like to add back
 # -includedepth 8 : Let's investigate why we do so many includes.
 # +initallelements : Right now, the *.ops files don't initialize all values of the arrays
+# +casebreak: Auto-generated ops have way too case fallthrus right now
+# +noeffect: Right now the UNUSED(macro) trips +noeffect
+# +realcompare: Make sure we're not doing comparisons on equality on real numbers
+# +fcnuse: We have many functions that are defined but not used, but they should get hidden or ifdeffed
+# +redef: Ops currently have tons of redefinitions
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
