@@ -22,6 +22,7 @@ C<BigInt> provides arbitrary precision integer mathematic functions.
 
 */
 
+#ifndef S_SPLINT_S
 #include "parrot/parrot.h"
 
 /*
@@ -1310,6 +1311,8 @@ MMD_DEFAULT: {
     }
 
 }
+
+#endif /* S_SPLINT_S */
 
 /*
 
