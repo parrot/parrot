@@ -231,7 +231,7 @@ buffer_location(Interp *interp, const PObj *b)
     parrot_context_t* const ctx = CONTEXT(interp->ctx);
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        PObj * const obj = (PObj *) CTX_REG_STR(ctx, i);
+        PObj * const obj = (PObj *) CTX_REG_STR(interp, ctx, i);
         if (obj == b) {
             sprintf(reg, "S%d", i);
             return reg;

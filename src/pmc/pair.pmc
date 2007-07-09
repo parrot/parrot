@@ -48,22 +48,22 @@ Class method to construct an Integer according to passed arguments.
     }
 
     PMC* instantiate(PMC* sig) {
-        PMC * const _class = REG_PMC(2);
-        const int argcP = REG_INT(3);
-        const int argcS = REG_INT(2);
+        PMC * const _class = REG_PMC(interp, 2);
+        const int argcP = REG_INT(interp, 3);
+        const int argcS = REG_INT(interp, 2);
 
         return PMCNULL; /* XXX This looks wrong, since we skip all the
                          * following code */
 
         SELF = pmc_new(INTERP, _class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {
-            PMC_struct_val(SELF) = REG_STR(5);
+            PMC_struct_val(SELF) = REG_STR(interp, 5);
             PObj_key_is_string_SET(SELF);
-            PMC_pmc_val(SELF) = REG_PMC(5);
+            PMC_pmc_val(SELF) = REG_PMC(interp, 5);
         }
         else if (argcP == 2) {
-            PMC_struct_val(SELF) = REG_PMC(5);
-            PMC_pmc_val(SELF) = REG_PMC(6);
+            PMC_struct_val(SELF) = REG_PMC(interp, 5);
+            PMC_pmc_val(SELF) = REG_PMC(interp, 6);
         }
         else
             real_exception(INTERP, NULL, E_ValueError,

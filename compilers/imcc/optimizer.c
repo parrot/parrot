@@ -685,17 +685,17 @@ eval_ins(Interp *interp, char *op, size_t ops, SymReg **r)
                 if (ops <= 2 || i) { /* fill source regs */
                     switch (r[i]->set) {
                         case 'I':
-                            REG_INT(i) =
+                            REG_INT(interp, i) =
                                 IMCC_int_from_reg(interp, r[i]);
                             break;
                         case 'N':
                             s = string_from_cstring(interp,
                                     r[i]->name, 0);
-                            REG_NUM(i) =
+                            REG_NUM(interp, i) =
                                 string_to_num(interp, s);
                             break;
                         case 'S':
-                            REG_STR(i) =
+                            REG_STR(interp, i) =
                                 IMCC_string_from_reg(interp, r[i]);
                             break;
                     }
@@ -874,10 +874,10 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
          */
         switch (r[0]->set) {
             case 'I':
-                sprintf(b, INTVAL_FMT, REG_INT(0));
+                sprintf(b, INTVAL_FMT, REG_INT(interp, 0));
                 break;
             case 'N':
-                sprintf(b, fmt, REG_NUM(0));
+                sprintf(b, fmt, REG_NUM(interp, 0));
                 break;
         }
         r[1] = mk_const(interp, str_dup(b), r[0]->set);

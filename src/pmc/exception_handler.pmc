@@ -9,7 +9,7 @@ src/pmc/exception_handler.pmc - Exception Handler PMC
 =head1 DESCRIPTION
 
 When an exception handler is called, the exception object is passed as
-C<REG_PMC(5)>, the original contents of this register is in the
+C<REG_PMC(interp, 5)>, the original contents of this register is in the
 exception object's C<_P5> attribute.
 
 =head2 Methods
@@ -90,7 +90,7 @@ Initializes the exception handler.
         parrot_context_t   *ex_ctx;
         opcode_t           *results;
 
-        /* COMPAT:  PMC *p5 = REG_PMC(5);*/
+        /* COMPAT:  PMC *p5 = REG_PMC(interp, 5);*/
 
         assert(cc->to_ctx == cc->from_ctx);
         results = cc->current_results;

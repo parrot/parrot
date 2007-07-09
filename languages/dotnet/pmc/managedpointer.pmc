@@ -94,7 +94,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value from it. */
                     if (mp->r.reg_type == PTR_REGTYPE_I)
                     {
-                        ret_val = CTX_REG_INT(mp->ctx, mp->r.number);
+                        ret_val = CTX_REG_INT(interp, mp->ctx, mp->r.number);
                     }
                     else
                     {
@@ -175,7 +175,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value in it. */
                     if (mp->r.reg_type == PTR_REGTYPE_I)
                     {
-                        CTX_REG_INT(mp->ctx, mp->r.number) = value;
+                        CTX_REG_INT(interp, mp->ctx, mp->r.number) = value;
                     }
                     else
                     {
@@ -254,7 +254,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value from it. */
                     if (mp->r.reg_type == PTR_REGTYPE_N)
                     {
-                        ret_val = CTX_REG_NUM(mp->ctx, mp->r.number);
+                        ret_val = CTX_REG_NUM(interp, mp->ctx, mp->r.number);
                     }
                     else
                     {
@@ -335,7 +335,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value in it. */
                     if (mp->r.reg_type == PTR_REGTYPE_N)
                     {
-                        CTX_REG_NUM(mp->ctx, mp->r.number) = value;
+                        CTX_REG_NUM(interp, mp->ctx, mp->r.number) = value;
                     }
                     else
                     {
@@ -413,7 +413,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value from it. */
                     if (mp->r.reg_type == PTR_REGTYPE_P)
                     {
-                        ret_val = CTX_REG_PMC(mp->ctx, mp->r.number);
+                        ret_val = CTX_REG_PMC(interp, mp->ctx, mp->r.number);
                     }
                     else
                     {
@@ -492,7 +492,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
                        an integer value in it. */
                     if (mp->r.reg_type == PTR_REGTYPE_P)
                     {
-                        CTX_REG_PMC(mp->ctx, mp->r.number) = value;
+                        CTX_REG_PMC(interp, mp->ctx, mp->r.number) = value;
                     }
                     else
                     {

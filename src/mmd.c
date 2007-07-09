@@ -1015,7 +1015,7 @@ mmd_arg_tuple_func(Interp *interp /*NN*/)
             int j, n;
 
             idx = *args_op;
-            arg = REG_PMC(idx);
+            arg = REG_PMC(interp, idx);
             n = VTABLE_elements(interp, arg);
             for (j = 0; j < n; ++j)  {
                 PMC * const elem = VTABLE_get_pmc_keyed_int(interp, arg, j);
@@ -1039,7 +1039,7 @@ mmd_arg_tuple_func(Interp *interp /*NN*/)
                 if ((type & PARROT_ARG_CONSTANT))
                     arg = constants[idx]->u.key;
                 else
-                    arg = REG_PMC(idx);
+                    arg = REG_PMC(interp, idx);
                 type = VTABLE_type(interp, arg);
                 VTABLE_push_integer(interp, arg_tuple, type);
                 break;

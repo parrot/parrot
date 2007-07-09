@@ -240,10 +240,10 @@ Create a new complex PMC with passed arguments according to pdd03.
     PMC* instantiate(PMC* sig) {
         PMC *res = pmc_new(INTERP, enum_class_Complex);
         FLOATVAL re = 0.0, im = 0.0;
-        int argcI = REG_INT(1);
-        int argcS = REG_INT(2);
-        int argcP = REG_INT(3);
-        int argcN = REG_INT(4);
+        int argcI = REG_INT(interp, 1);
+        int argcS = REG_INT(interp, 2);
+        int argcP = REG_INT(interp, 3);
+        int argcN = REG_INT(interp, 4);
 
         return PMCNULL;  /* TODO */
         /*
@@ -251,25 +251,25 @@ Create a new complex PMC with passed arguments according to pdd03.
          * mixed (e.g. N,P) args the order of arguments isn't fixed
          */
         if (argcP) {
-            re = VTABLE_get_number(INTERP, REG_PMC(5));
+            re = VTABLE_get_number(INTERP, REG_PMC(interp, 5));
             if (argcP == 2)
-                im = VTABLE_get_number(INTERP, REG_PMC(6));
+                im = VTABLE_get_number(INTERP, REG_PMC(interp, 6));
             /*
              * TODO throw exception if argument mismatch
              */
         }
         else if (argcN) {
-            re = REG_NUM(5);
+            re = REG_NUM(interp, 5);
             if (argcN == 2)
-                im = REG_NUM(6);
+                im = REG_NUM(interp, 6);
         }
         else if (argcI) {
-            re = REG_INT(5);
+            re = REG_INT(interp, 5);
             if (argcI == 2)
-                im = REG_INT(6);
+                im = REG_INT(interp, 6);
         }
         else if (argcS == 1) {
-            complex_parse_string(INTERP, &RE(res), &IM(res), REG_STR(5));
+            complex_parse_string(INTERP, &RE(res), &IM(res), REG_STR(interp, 5));
             return res;
         }
         RE(res) = re;
@@ -288,12 +288,11 @@ C<complex> object according to 2.1. Built-in Functions.
 
 */
     opcode_t* invoke(void *next) {
-        int argcP = REG_INT(3);
-        PMC *res  = pmc_new(INTERP, enum_class_Complex);
+        const int argcP = REG_INT(interp, 3);
+        PMC * const res  = pmc_new(INTERP, enum_class_Complex);
 
         if (argcP == 1) {
-            PMC *arg;
-            arg = REG_PMC(5);
+            PMC * const arg = REG_PMC(interp, 5);
 
             if (arg->vtable->base_type == enum_class_String)
                 VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
@@ -301,11 +300,11 @@ C<complex> object according to 2.1. Built-in Functions.
                 RE(res) = VTABLE_get_number(INTERP, arg);
         }
         else if (argcP == 2) {
-            RE(res) = VTABLE_get_number(INTERP, REG_PMC(5));
-            IM(res) = VTABLE_get_number(INTERP, REG_PMC(6));
+            RE(res) = VTABLE_get_number(INTERP, REG_PMC(interp, 5));
+            IM(res) = VTABLE_get_number(INTERP, REG_PMC(interp, 6));
         }
 
-        REG_PMC(5) = res;
+        REG_PMC(interp, 5) = res;
         return (opcode_t *)next;
     }
 
@@ -434,7 +433,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 */
 
     INTVAL get_integer_keyed(PMC* key) {
-        STRING* s = VTABLE_get_string(INTERP, key);
+        STRING * const s = VTABLE_get_string(INTERP, key);
         return DYNSELF.get_integer_keyed_str(s);
     }
 
@@ -443,28 +442,25 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     FLOATVAL get_number_keyed(PMC* key) {
-        STRING* s = VTABLE_get_string(INTERP, key);
+        STRING * const s = VTABLE_get_string(INTERP, key);
         return DYNSELF.get_number_keyed_str(s);
     }
 
     FLOATVAL get_number_keyed_str(STRING* key) {
-        FLOATVAL *num = complex_locate_keyed_num(INTERP, SELF, key);
+        const FLOATVAL * const num = complex_locate_keyed_num(INTERP, SELF, key);
         if (num)
             return *num;
         return 0.0;
     }
 
     PMC* get_pmc_keyed(PMC* key) {
-        STRING* s = VTABLE_get_string(INTERP, key);
+        STRING * const s = VTABLE_get_string(INTERP, key);
         return DYNSELF.get_pmc_keyed_str(s);
     }
 
     PMC* get_pmc_keyed_str(STRING* key) {
-        PMC *ret;
-        FLOATVAL val;
-
-        ret = pmc_new(INTERP, enum_class_Float);
-        val = DYNSELF.get_number_keyed_str(key);
+        PMC * const ret = pmc_new(INTERP, enum_class_Float);
+        const FLOATVAL val = DYNSELF.get_number_keyed_str(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
     }
@@ -480,11 +476,8 @@ Returns the requested number (real part for C<0> and imaginary for C<1>).
 */
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        PMC *ret;
-        FLOATVAL val;
-
-        ret = pmc_new(INTERP, enum_class_Float);
-        val = DYNSELF.get_number_keyed_int(key);
+        PMC * const ret = pmc_new(INTERP, enum_class_Float);
+        const FLOATVAL val = DYNSELF.get_number_keyed_int(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
     }
@@ -614,18 +607,18 @@ to C<value>.
     }
 
     void set_number_keyed_str(STRING* key, FLOATVAL value) {
-        FLOATVAL *num = complex_locate_keyed_num(INTERP, SELF, key);
+        FLOATVAL * const num = complex_locate_keyed_num(INTERP, SELF, key);
         if (num)
             *num = value;
     }
 
     void set_pmc_keyed(PMC* key, PMC* value) {
-        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        const FLOATVAL f = VTABLE_get_number(INTERP, value);
         DYNSELF.set_number_keyed(key, f);
     }
 
     void set_pmc_keyed_str(STRING* key, PMC* value) {
-        FLOATVAL f = VTABLE_get_number(INTERP, value);
+        const FLOATVAL f = VTABLE_get_number(INTERP, value);
         DYNSELF.set_number_keyed_str(key, f);
     }
 

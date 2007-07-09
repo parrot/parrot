@@ -527,7 +527,7 @@ BigInt object.
 
 */
     PMC* instantiate(PMC* sig) {
-        int argcP = REG_INT(3);
+        int argcP = REG_INT(interp, 3);
         int base;
         PMC *res;
         STRING *num;
@@ -540,8 +540,8 @@ BigInt object.
         }
         base = 10;
         if (argcP == 2)
-            base = VTABLE_get_integer(INTERP, REG_PMC(6));
-        num = VTABLE_get_string(INTERP, REG_PMC(5));
+            base = VTABLE_get_integer(INTERP, REG_PMC(interp, 6));
+        num = VTABLE_get_string(INTERP, REG_PMC(interp, 5));
         VTABLE_set_string_keyed_int(INTERP, res, base, num);
         return res;
     }

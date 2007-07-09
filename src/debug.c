@@ -1194,12 +1194,12 @@ PDB_check_condition(Interp *interp /*NN*/, PDB_condition_t *condition /*NN*/)
         /*
          * TODO verify register is in range
          */
-        i = REG_INT(condition->reg);
+        i = REG_INT(interp, condition->reg);
 
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
         else
-            j = REG_INT(*(int *)condition->value);
+            j = REG_INT(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) && (i >  j)) ||
             ((condition->type & PDB_cond_ge) && (i >= j)) ||
@@ -1214,12 +1214,12 @@ PDB_check_condition(Interp *interp /*NN*/, PDB_condition_t *condition /*NN*/)
     else if (condition->type & PDB_cond_num) {
         FLOATVAL k,  l;
 
-        k = REG_NUM(condition->reg);
+        k = REG_NUM(interp, condition->reg);
 
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
         else
-            l = REG_NUM(*(int *)condition->value);
+            l = REG_NUM(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) && (k >  l)) ||
             ((condition->type & PDB_cond_ge) && (k >= l)) ||
@@ -1234,12 +1234,12 @@ PDB_check_condition(Interp *interp /*NN*/, PDB_condition_t *condition /*NN*/)
     else if (condition->type & PDB_cond_str) {
         STRING  *m, *n;
 
-        m = REG_STR(condition->reg);
+        m = REG_STR(interp, condition->reg);
 
         if (condition->type & PDB_cond_const)
             n = (STRING *)condition->value;
         else
-            n = REG_STR(*(int *)condition->value);
+            n = REG_STR(interp, *(int *)condition->value);
 
         if (((condition->type & PDB_cond_gt) &&
                 (string_compare(interp, m, n) >  0)) ||
@@ -2504,14 +2504,14 @@ GDB_P(Interp *interp, const char *s /*NN*/)
     if (n >= 0 && n < CONTEXT(interp->ctx)->n_regs_used[t]) {
         switch (t) {
             case REGNO_INT:
-                return string_from_int(interp, REG_INT(n))->strstart;
+                return string_from_int(interp, REG_INT(interp, n))->strstart;
             case REGNO_NUM:
-                return string_from_num(interp, REG_NUM(n))->strstart;
+                return string_from_num(interp, REG_NUM(interp, n))->strstart;
             case REGNO_STR:
-                return REG_STR(n)->strstart;
+                return REG_STR(interp, n)->strstart;
             case REGNO_PMC:
                 /* prints directly */
-                trace_pmc_dump(interp, REG_PMC(n));
+                trace_pmc_dump(interp, REG_PMC(interp, n));
                 return "";
         }
     }

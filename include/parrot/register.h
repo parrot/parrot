@@ -21,15 +21,16 @@
  * Macros to make accessing registers more convenient/readable.
  */
 
-#define INTERP_REG_NUM(i, x) (i)->ctx.bp.regs_n[-1L-(x)]
-#define INTERP_REG_INT(i, x) (i)->ctx.bp.regs_i[x]
-#define INTERP_REG_PMC(i, x) (i)->ctx.bp_ps.regs_p[-1L-(x)]
-#define INTERP_REG_STR(i, x) (i)->ctx.bp_ps.regs_s[x]
-
 #define CTX_REG_NUM(ctx, x) (ctx)->bp.regs_n[-1L-(x)]
 #define CTX_REG_INT(ctx, x) (ctx)->bp.regs_i[x]
 #define CTX_REG_PMC(ctx, x) (ctx)->bp_ps.regs_p[-1L-(x)]
 #define CTX_REG_STR(ctx, x) (ctx)->bp_ps.regs_s[x]
+
+#define REG_NUM(interp, x) CTX_REG_NUM(&(interp)->ctx, x)
+#define REG_INT(interp, x) CTX_REG_INT(&(interp)->ctx, x)
+#define REG_PMC(interp, x) CTX_REG_PMC(&(interp)->ctx, x)
+#define REG_STR(interp, x) CTX_REG_STR(&(interp)->ctx, x)
+
 /*
  * and a set of macros to access a register by offset, used
  * in JIT emit prederef code
@@ -54,16 +55,6 @@
 #define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
         (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
 #define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
-
-
-/*
- * same with the default name interpreter
- */
-/* XXX Redfine these to explicitly pass interp, rather than assuming it's there */
-#define REG_INT(x) INTERP_REG_INT(interp, x)
-#define REG_NUM(x) INTERP_REG_NUM(interp, x)
-#define REG_STR(x) INTERP_REG_STR(interp, x)
-#define REG_PMC(x) INTERP_REG_PMC(interp, x)
 
 
 struct Stack_Chunk;

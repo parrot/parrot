@@ -33,10 +33,10 @@ Returns the C C<#define> macros required by the ops.
 sub defines {
     return <<END;
 #define REL_PC (cur_opcode - start_code)
-#define IREG(i) REG_INT(i)
-#define NREG(i) REG_NUM(i)
-#define PREG(i) REG_PMC(i)
-#define SREG(i) REG_STR(i)
+#define IREG(i) REG_INT(interp, i)
+#define NREG(i) REG_NUM(interp, i)
+#define PREG(i) REG_PMC(interp, i)
+#define SREG(i) REG_STR(interp, i)
 #define CONST(i) interp->code->const_table->constants[i]
 END
 }

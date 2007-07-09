@@ -848,7 +848,7 @@ PARROT_API
 Parrot_Int
 Parrot_get_intreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum)
 {
-    return REG_INT(regnum);
+    return REG_INT(interp, regnum);
 }
 
 /*
@@ -863,7 +863,7 @@ PARROT_API
 Parrot_Float
 Parrot_get_numreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum)
 {
-    return REG_NUM(regnum);
+    return REG_NUM(interp, regnum);
 }
 
 /*
@@ -878,7 +878,7 @@ PARROT_API
 Parrot_String
 Parrot_get_strreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum)
 {
-    return REG_STR(regnum);
+    return REG_STR(interp, regnum);
 }
 
 /*
@@ -893,7 +893,7 @@ PARROT_API
 Parrot_PMC
 Parrot_get_pmcreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum)
 {
-    return REG_PMC(regnum);
+    return REG_PMC(interp, regnum);
 }
 
 /*
@@ -909,7 +909,7 @@ void
 Parrot_set_intreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum,
                   Parrot_Int value)
 {
-    REG_INT(regnum) = value;
+    REG_INT(interp, regnum) = value;
 }
 
 /*
@@ -925,7 +925,7 @@ void
 Parrot_set_numreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum,
                   Parrot_Float value)
 {
-    REG_NUM(regnum) = value;
+    REG_NUM(interp, regnum) = value;
 }
 
 /*
@@ -941,7 +941,7 @@ void
 Parrot_set_strreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum,
                   Parrot_String value)
 {
-    REG_STR(regnum) = value;
+    REG_STR(interp, regnum) = value;
 }
 
 /*
@@ -957,7 +957,7 @@ void
 Parrot_set_pmcreg(Parrot_Interp interp /*NN*/, Parrot_Int regnum,
                   Parrot_PMC value)
 {
-    REG_PMC(regnum) = value;
+    REG_PMC(interp, regnum) = value;
 }
 
 /*=for api extend Parrot_new_string

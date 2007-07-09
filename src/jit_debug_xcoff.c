@@ -196,13 +196,13 @@ write_vars(FILE *stabs, Interp *interp)
     fprintf(stabs, ".bs parrot_jit_vars\n");
     for (i = 0; i < NUM_REGISTERS; i++) {
         fprintf(stabs, ".stabx \"I%d:V12\",0x%p," C_STSYM ",0\n", i,
-                (char*)&REG_INT(i));
+                (char*)&REG_INT(interp, i));
         fprintf(stabs, ".stabx \"N%d:V13\",0x%p," C_STSYM ",0\n", i,
-                (char*)&REG_NUM(i));
+                (char*)&REG_NUM(interp, i));
         fprintf(stabs, ".stabx \"S%d:V16\",0x%p," C_STSYM ",0\n", i,
-                (char*)&REG_STR(i));
+                (char*)&REG_STR(interp, i));
         fprintf(stabs, ".stabx \"P%d:V19\",0x%p," C_STSYM ",0\n", i,
-                (char*)&REG_PMC(i));
+                (char*)&REG_PMC(interp, i));
     }
     fprintf(stabs, ".es\n");
 }

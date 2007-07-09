@@ -416,7 +416,7 @@ op instantiate(out PMC) {
           _class = interp->vtables[typ]->pmc_class;
           break;
       case PARROT_ARG_P:
-          _class = REG_PMC(arg_op[2]);
+          _class = REG_PMC(interp, arg_op[2]);
           break;
       default:
           real_exception(interp, NULL, UNIMPLEMENTED,

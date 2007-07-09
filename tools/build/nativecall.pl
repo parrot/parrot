@@ -735,11 +735,11 @@ static void pcf_$funcname(Interp *interp, PMC *self) {
     pointer = PMC_struct_val(self);
     return_data = ($ret_type)(*pointer)($params);
     $ret_reg  = return_data;
-    REG_INT(0) = $stack_returns;
-    REG_INT(1) = $int_returns;
-    REG_INT(2) = $string_returns;
-    REG_INT(3) = $pmc_returns;
-    REG_INT(4) = $num_returns;
+    REG_INT(interp, 0) = $stack_returns;
+    REG_INT(interp, 1) = $int_returns;
+    REG_INT(interp, 2) = $string_returns;
+    REG_INT(interp, 3) = $pmc_returns;
+    REG_INT(interp, 4) = $num_returns;
     return;
 }
 

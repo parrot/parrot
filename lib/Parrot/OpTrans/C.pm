@@ -54,10 +54,10 @@ sub defines {
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
 #define CUR_OPCODE cur_opcode
-#define IREG(i) REG_INT(cur_opcode[i])
-#define NREG(i) REG_NUM(cur_opcode[i])
-#define PREG(i) REG_PMC(cur_opcode[i])
-#define SREG(i) REG_STR(cur_opcode[i])
+#define IREG(i) REG_INT(interp, cur_opcode[i])
+#define NREG(i) REG_NUM(interp, cur_opcode[i])
+#define PREG(i) REG_PMC(interp, cur_opcode[i])
+#define SREG(i) REG_STR(interp, cur_opcode[i])
 #define CONST(i) CONTEXT(interp->ctx)->constants[cur_opcode[i]]
 END
 }

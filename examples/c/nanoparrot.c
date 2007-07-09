@@ -39,14 +39,14 @@ struct Reg {
     PMC *pmc_reg;
 };
 
-#define REG_INT(x) interp->bp[x].int_reg
+#define REG_INT(interp, x) interp->bp[x].int_reg
 
 #if defined(PREDEREF_CORE)
 #  define IREG(x)   (_reg_base + pc[x])
 #  define ICONST(x) *(INTVAL*)pc[x]
 #  define SCONST(x) *(STRING**)pc[x]
 #else
-#  define IREG(x)   REG_INT(pc[x])
+#  define IREG(x)   REG_INT(interp, pc[x])
 #  define ICONST(x) pc[x]
 #  define SCONST(x) interp->code->const_table[pc[x]]
 #endif

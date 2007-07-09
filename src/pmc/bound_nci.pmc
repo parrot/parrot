@@ -75,11 +75,11 @@ Set the bound object live.
                 /* Get invocant register. */
                 if (SIG_ELEMS(sig) > 0 && SIG_ITEM(sig, 0) & PARROT_ARG_PMC) {
                     int invocant_reg       = interp->current_args[2];
-                    PMC *p2                = REG_PMC(invocant_reg);
-                    INTERP->current_object = REG_PMC(invocant_reg)
+                    PMC *p2                = REG_PMC(interp, invocant_reg);
+                    INTERP->current_object = REG_PMC(interp, invocant_reg)
                                            = PMC_pmc_val(SELF);
                     SUPER(next);
-                    REG_PMC(invocant_reg)  = p2;
+                    REG_PMC(interp, invocant_reg)  = p2;
                 }
                 else {
                     real_exception(interp, NULL, INVALID_OPERATION,

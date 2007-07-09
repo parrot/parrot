@@ -652,7 +652,7 @@ Parrot_clear_i(Interp *interp /*NN*/)
 {
     int i;
     for (i = 0; i < CONTEXT(interp->ctx)->n_regs_used[REGNO_INT]; ++i)
-        REG_INT(i) = 0;
+        REG_INT(interp, i) = 0;
 }
 
 PARROT_API
@@ -661,7 +661,7 @@ Parrot_clear_s(Interp *interp /*NN*/)
 {
     int i;
     for (i = 0; i < CONTEXT(interp->ctx)->n_regs_used[REGNO_STR]; ++i)
-        REG_STR(i) = NULL;
+        REG_STR(interp, i) = NULL;
 }
 
 PARROT_API
@@ -670,7 +670,7 @@ Parrot_clear_p(Interp *interp /*NN*/)
 {
     int i;
     for (i = 0; i < CONTEXT(interp->ctx)->n_regs_used[REGNO_PMC]; ++i)
-        REG_PMC(i) = PMCNULL;
+        REG_PMC(interp, i) = PMCNULL;
 }
 
 PARROT_API
@@ -679,7 +679,7 @@ Parrot_clear_n(Interp *interp /*NN*/)
 {
     int i;
     for (i = 0; i < CONTEXT(interp->ctx)->n_regs_used[REGNO_NUM]; ++i)
-        REG_NUM(i) = 0.0;
+        REG_NUM(interp, i) = 0.0;
 }
 
 
