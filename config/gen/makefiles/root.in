@@ -1723,9 +1723,16 @@ bsdlint : $(PARROT)
 	rm -f *.ln
 	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) $(LINTABLE_CFILES)
 
+# Splint: http://splint.org
 SPLINT = splint
+
+SPLINT_TMP = $(TMP)/splint
+
+# Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-	-weak \
+	-standard \
+	+keep \
+	-tmpdir $(SPLINT_TMP) \
 	\
 	-abstract \
 	+aliasunique \
@@ -1734,6 +1741,7 @@ SPLINTFLAGS  = \
 	+assignexpose \
 	+boolcompare \
 	+booltype BOOLVAL \
+	-casebreak \
 	-castfcnptr \
 	-charint \
 	+continuecomment \
@@ -1759,9 +1767,13 @@ SPLINTFLAGS  = \
 	+macroredef \
 	+matchanyintegral \
 	+nestedextern \
+	-nullpass \
+	-nullstate \
 	+posixstrictlib \
 	-predboolothers \
+	+ptrnegate \
 	+readonlystrings \
+	-realcompare \
 	-redef \
 	-retvalother \
 	+shadow \
@@ -1769,8 +1781,12 @@ SPLINTFLAGS  = \
 	+showsummary \
 	-skipposixheaders \
 	-type \
+	\
+	-temptrans \
+	-mustfreefresh \
 
 # Other options we'd like to add back
+# +nullstate, +nullpass: This is one of the great things about splint, so it's tops on my list
 # -includedepth 8 : Let's investigate why we do so many includes.
 # +initallelements : Right now, the *.ops files don't initialize all values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
@@ -1784,6 +1800,7 @@ SPLINTFLAGS  = \
 SPLINTFLAGS_TEST   =
 
 splint : $(PARROT)
+	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
