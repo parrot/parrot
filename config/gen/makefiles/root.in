@@ -1726,12 +1726,12 @@ bsdlint : $(PARROT)
 # Splint: http://splint.org
 SPLINT = splint
 
+# Temp directory for splint.  Add +keep to splintflags if you want work files kept in there after completion.
 SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
 	-standard \
-	+keep \
 	-tmpdir $(SPLINT_TMP) \
 	\
 	-abstract \
@@ -1767,6 +1767,7 @@ SPLINTFLAGS  = \
 	+macroredef \
 	+matchanyintegral \
 	+nestedextern \
+	-noeffect \
 	-nullpass \
 	-nullstate \
 	+posixstrictlib \
@@ -1784,6 +1785,8 @@ SPLINTFLAGS  = \
 	\
 	-temptrans \
 	-mustfreefresh \
+	-mustfreeonly \
+	-compdestroy \
 
 # Other options we'd like to add back
 # +nullstate, +nullpass: This is one of the great things about splint, so it's tops on my list
