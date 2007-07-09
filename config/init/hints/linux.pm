@@ -39,6 +39,8 @@ sub runstep {
         # suppress sprintf warnings that don't apply
         $cflags .= ' -wd269';
 
+        $cflags .= ' -Wall -Wcheck -w2';
+
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
     }
