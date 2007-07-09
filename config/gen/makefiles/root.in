@@ -120,7 +120,7 @@ SPLINTFLAGS  = -weak +showscan +showsummary +posixstrictlib -abstract \
     +imptype +includenest 8 +incondefs +incondefslib +linelen 9999 \
     +longintegral +macroassign +macroempty +macroredef +matchanyintegral \
     +nestedextern +noeffect +readonlystrings -realcompare +shadow -type \
-    -isoreserved
+    -isoreserved -isoreservedinternal
 
 # slightly weaker, more realistic variant.
 SPLINTFLAGS2 = $(SPLINTFLAGS) -ansireserved -retvalother -bitwisesigned \
