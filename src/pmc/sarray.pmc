@@ -106,7 +106,7 @@ ret_num(Interp* interp, const HashEntry *e)
     }
     real_exception(interp, NULL, E_IndexError,
             "SArray: Entry not a number!");
-    return 0;
+    return (FLOATVAL)0;
 }
 
 /*
