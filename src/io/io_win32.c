@@ -53,8 +53,6 @@ static INTVAL PIO_win32_close( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io );
 
-static INTVAL PIO_win32_isatty(PIOHANDLE fd);
-
 static INTVAL PIO_win32_connect( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io,
@@ -70,6 +68,7 @@ static INTVAL PIO_win32_flush( Interp *interp,
     ParrotIO *io );
 
 static INTVAL PIO_win32_init( Interp *interp, ParrotIOLayer *layer );
+static INTVAL PIO_win32_isatty( PIOHANDLE fd );
 static INTVAL PIO_win32_listen( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io,
@@ -377,7 +376,7 @@ PIO_win32_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 
 /*
 
-=item C<INTVAL
+=item C<static INTVAL
 PIO_win32_isatty(PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
@@ -386,7 +385,7 @@ Returns whether C<fd> is a console/tty.
 
 */
 
-INTVAL
+static INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
 {
     DWORD ftype = GetFileType(fd);
