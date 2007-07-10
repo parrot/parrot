@@ -360,7 +360,7 @@ PIO_init_stacks(Interp *interp)
     for (i = 0, p = interp->piodata->default_stack; p; p = p->down) {
         bottom = p;
         if (fill) {
-            assert(i < n);
+            assert(i < n); /* XXX n can be undefined at this point. */
             pio_registered_layers[i++] = p;
             pio_registered_layers[i] = NULL;
         }
