@@ -1722,9 +1722,21 @@ sunlint :
 
 BSDLINTFLAGS = -a -c -e -h -n -p -r -u -z -F -V
 
+# 132: conversion from '...' may lose accuracy
+# 135: possible pointer alignment problem
+# 236: static function unused
+# 241: dubious operation on enum
+# 247: pointer casts may be troublesome
+# 249: syntax error (huh? this appears in atomic/gcc_x86.h but doesn't cause any compiler to barf)
+# 259: conversion to '...' due to prototype
+# 265: ANSI C does not support 'long long'
+# 277: initialisation of '...' with '...'
+# 278: combination of '...' and '...', arg #...
+BSDLINTEXCLUSIONS = -X132,135,236,241,247,249,259,265,277,278
+
 bsdlint : $(PARROT)
 	rm -f *.ln
-	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) $(LINTABLE_CFILES)
+	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) $(BSDLINTEXCLUSIONS) $(LINTABLE_CFILES)
 
 # Splint: http://splint.org
 SPLINT = splint
