@@ -35,7 +35,8 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'PAST-pm.pbc'
     load_bytecode 'Parrot/HLLCompiler.pbc'
 
-    $P0 = new [ 'HLLCompiler' ]
+    $P0 = subclass 'HLLCompiler', 'Lua::Compiler'
+    $P0 = new [ 'Lua::Compiler' ]
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('Lua::PAST::Grammar')
@@ -58,40 +59,11 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
 
 =over 4
 
-=item C<warning (message)>
+=item C<syntaxerror (match, [message])>
 
 =cut
 
-.sub 'warning'
-    .param pmc self
-    .param string message
-
-    if null self goto NO_SELF
-    if null message goto NO_MSG
-
-    printerr "Warning: "
-    $P0 = get_hll_global ['PGE::Util'], 'warn'
-    if null $P0 goto NO_WARN
-    self.$P0(message)
-    .return()
-  NO_WARN:
-    printerr "Cannot find method 'warn'\n"
-    .return()
-  NO_MSG:
-    printerr "Warning: 'no message specified for warning()\n"
-    .return()
-  NO_SELF:
-    printerr "No 'self' in warning()\n"
-
-    .return()
-.end
-
-
-=item C<syntax_error (match, [message])>
-
-=cut
-
-.sub 'syntax_error'
+.sub 'syntaxerror'
     .param pmc mob
     .param string message :optional
     unless null message goto L1
@@ -163,7 +135,7 @@ for internal global variables used by Lua.
     .local pmc mfrom, mpos
     .local int pos, lastpos
 
-    $P0 = get_hll_global ["PGE::Match"], 'newfrom'
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
     (mob, target, mfrom, mpos) = $P0(mob)
 
     pos = mfrom
@@ -301,7 +273,7 @@ by prefixing them with C<0x>. Examples of valid numerical constants are
     .local pmc mfrom, mpos
     .local int pos, lastpos
 
-    $P0 = get_hll_global ["PGE::Match"], 'newfrom'
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
     (mob, target, mfrom, mpos) = $P0(mob)
 
     pos = mfrom
@@ -682,35 +654,11 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ "Lua::POST" ]
+.namespace [ "Lua::POST::Chunk" ]
 
 .sub '__onload' :load :init
-
     $P0 = subclass 'POST::Sub', 'Lua::POST::Chunk'
-
-#    .local pmc pirtable
-#    pirtable = new .Hash
-#    pirtable['add'] = '%tP+'
-#    pirtable['sub'] = '%tP+'
-#    pirtable['mul'] = '%tP+'
-#    pirtable['div'] = '%tP+'
-#    pirtable['n_add'] = '%rP+'
-#    pirtable['n_sub'] = '%rP+'
-#    pirtable['n_mul'] = '%rP+'
-#    pirtable['n_div'] = '%rP+'
-#    pirtable['concat'] = '%tP~'
-#    pirtable['abs'] = '%t'
-#    pirtable['say'] = '%v'
-#    pirtable['print'] = '%v'
-#    pirtable['set'] = '%rP'
-#    pirtable['call'] = '%rPPPPPPPPPPPPPPPP'                # FIXME:
-#    pirtable['callmethod'] = '%rPPPPPPPPPPPPPPPP'          # FIXME:
-#    set_hll_global ['Lua::POST'], '%pirtable', pirtable
-    .return ()
 .end
-
-
-.namespace [ "Lua::POST::Chunk" ]
 
 .sub 'prologue' :method
     .param pmc value           :optional
@@ -732,16 +680,74 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
+.namespace [ 'PAST::Node' ]
+
+.sub 'clone' :vtable :method
+    .local pmc res
+    $S0 = classname self
+    $I0 = find_type $S0
+    res = new $I0
+    .local pmc iter
+    iter = self.'iterator'()
+  L1:
+    unless iter goto L2
+    $P0 = shift iter
+    $P1 = clone $P0
+    res.'push'($P1)
+    goto L1
+  L2:
+    iter = new .Iterator, self
+  L3:
+    unless iter goto L4
+    $S0 = shift iter
+    $P0 = iter[$S0]
+    res[$S0] = $P0
+    goto L3
+  L4:
+    .return (res)
+.end
+
+
+.namespace [ 'POST::Node' ]
+
+.sub 'pop' :method
+    $P0 = self.'get_array'()
+    $P1 = pop $P0
+    .return ($P1)
+.end
+
+
+.namespace [ 'POST::Sub' ]
+
+.sub 'storage' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('storage', value, has_value)
+.end
+
+
 .namespace [ "Lua::Symbtab" ]
 
 .sub '__onload' :load :init
     $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
+    new $P0, .Integer
+    set $P0, 0
+    global '$nb' = $P0
 .end
 
 .sub 'insert' :method
     .param string name
     $P0 = self[0]
-    $P0[name] = 1
+    $I0 = exists $P0[name]
+    if $I0 goto L1
+    $S0 = name . '_'
+    $P1 = global '$nb'
+    $S1 = $P1
+    $S0 .= $S1
+    $P0[name] = $S0
+  L1:
+    $S0 = $P0[name]
+    .return ($S0)
 .end
 
 .sub 'lookup' :method
@@ -753,7 +759,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
     $P0 = shift iter
     $I0 = exists $P0[name]
     unless $I0 goto L1
-    .return (1)
+    $S0 = $P0[name]
+    .return (1, $S0)
   L2:
     .return (0)
 .end
@@ -761,6 +768,8 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'push_scope' :method
     new $P0, .Hash
     unshift self, $P0
+    $P1 = global '$nb'
+    inc $P1
 .end
 
 .sub 'pop_scope' :method

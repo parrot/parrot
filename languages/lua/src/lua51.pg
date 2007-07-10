@@ -26,6 +26,7 @@ rule block {
 
 
 rule statement {
+  | <expression_stat>
   | <if_stat>
   | <while_stat>
   | <do_block>
@@ -33,12 +34,25 @@ rule statement {
   | <repeat_stat>
   | <function_stat>
   | <local_stat>
-  | <expression_stat>
 }
 
 rule last_statement {
   | <return_statement>
   | <break_statement>
+}
+
+
+rule expression_stat {
+  <primary_expression> <assignment>?
+}
+
+rule assignment {
+  | <','> <primary_expression> <assignment>
+  | <'='> <expression_list>
+}
+
+rule expression_list {
+  <expression> [ <','> <expression> ]*
 }
 
 
@@ -122,20 +136,6 @@ rule local_declaration {
 }
 
 
-rule expression_stat {
-  <primary_expression> <assignment>?
-}
-
-rule assignment {
-  | <','> <primary_expression> <assignment>
-  | <'='> <expression_list>
-}
-
-rule expression_list {
-  <expression> [ <','> <expression> ]*
-}
-
-
 rule return_statement {
   <'return'> <expression_list>?
 }
@@ -172,8 +172,12 @@ rule primary_expression {
 }
 
 rule prefix_expression {
-  | <'('> <expression> <?closeparen>
+  | <parenthesed_expression>
   | <name>
+}
+
+rule parenthesed_expression {
+  <'('> <expression> <?closeparen>
 }
 
 rule slice_expression {
@@ -205,45 +209,45 @@ rule simple_expression {
 =head2 HELPER RULES
 
 Helper rules will match a specific token, otherwise a syntax error is generated.
-These rules make the grammar more readable, so the calls to syntax_error() are
+These rules make the grammar more readable, so the calls to syntaxerror() are
 not all over the grammar, but only in these rules.
 
 =cut
 
 rule do {
-  <'do'> | <syntax_error: 'do' expected>
+  <'do'> | <syntaxerror: 'do' expected>
 }
 
 rule then {
-  <'then'> | <syntax_error: 'then' expected>
+  <'then'> | <syntaxerror: 'then' expected>
 }
 
 rule end {
-  <'end'> | <syntax_error: 'end' expected>
+  <'end'> | <syntaxerror: 'end' expected>
 }
 
 rule until {
-  <'until'> | <syntax_error: 'until' expected>
+  <'until'> | <syntaxerror: 'until' expected>
 }
 
 rule comma {
-  <','> | <syntax_error: ',' expected>
+  <','> | <syntaxerror: ',' expected>
 }
 
 rule in {
-  <'in'> | <syntax_error: 'in' expected>
+  <'in'> | <syntaxerror: 'in' expected>
 }
 
 rule closebracket {
-  <']'>  | <syntax_error: ']' expected>
+  <']'>  | <syntaxerror: ']' expected>
 }
 
 rule closebrace {
-  <'}'> | <syntax_error: '}' expected>
+  <'}'> | <syntaxerror: '}' expected>
 }
 
 rule closeparen {
-  <')'> | <syntax_error: ')' expected>
+  <')'> | <syntaxerror: ')' expected>
 }
 
 
@@ -312,16 +316,16 @@ proto 'infix:-'     is equiv('infix:+')     is pirop('sub')     { ... }
 proto 'infix:..'    is looser('infix:+')    is pirop('concat')
                     is assoc('right')                           { ... }
 
-proto 'infix:<'     is looser('infix:..')                       { ... }
-proto 'infix:>'     is equiv('infix:<')                         { ... }
-proto 'infix:<='    is equiv('infix:<')                         { ... }
-proto 'infix:>='    is equiv('infix:<')                         { ... }
-proto 'infix:~='    is equiv('infix:<')                         { ... }
-proto 'infix:=='    is equiv('infix:<')                         { ... }
+proto 'infix:<'     is looser('infix:..')   is pirop('islt')    { ... }
+proto 'infix:>'     is equiv('infix:<')     is pirop('isgt')    { ... }
+proto 'infix:<='    is equiv('infix:<')     is pirop('isle')    { ... }
+proto 'infix:>='    is equiv('infix:<')     is pirop('isge')    { ... }
+proto 'infix:~='    is equiv('infix:<')     is pirop('isne')    { ... }
+proto 'infix:=='    is equiv('infix:<')     is pirop('iseq')    { ... }
 
-proto 'infix:and'   is looser('infix:<')                        { ... }
+proto 'infix:and'   is looser('infix:<')    is past('and')      { ... }
 
-proto 'infix:or'    is looser('infix:and')                      { ... }
+proto 'infix:or'    is looser('infix:and')  is past('or')       { ... }
 
 
 =head1 AUTHORS
