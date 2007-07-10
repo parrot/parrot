@@ -51,7 +51,7 @@ foreach my $func ( keys %language_test_map ) {
         my $params = $options{params} || q{};
 
         # flatten filenames (don't use directories)
-        my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || 'luac.pl';
+        my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc';
         my $lang_fn = Parrot::Test::per_test( '.lua', $count );
         my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
         my $lua_out_fn =
@@ -71,7 +71,7 @@ foreach my $func ( keys %language_test_map ) {
         }
         elsif ( $lua_test eq 'lua.pbc' ) {
             @test_prog = (
-                "$self->{parrot} --no-gc languages/lua/lua.pbc languages/${lang_fn}",
+                "$self->{parrot} --no-gc languages/lua/lua.pbc languages/${lang_fn} $params",
             );
         }
         else {

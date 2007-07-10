@@ -125,7 +125,7 @@ close $X;
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (syntax error)');
 dofile('foo.lua')
 CODE
-/\?/
+/lua:/
 OUTPUT
 
 # clean up foo.lua
@@ -228,7 +228,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (syntax 
 f, msg = loadfile('foo.lua')
 print(f, msg)
 CODE
-/nil\t.*\?/
+/nil\t.*/
 OUTPUT
 
 # clean up foo.lua
@@ -260,7 +260,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring (synta
 f, msg = loadstring("?syntax error?")
 print(f, msg)
 CODE
-/nil\t.*\?/
+/nil\t.*/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function next (array)' );

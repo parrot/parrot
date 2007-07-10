@@ -190,9 +190,6 @@ a	1	2
 c	1
 OUT
 
-TODO: {
-    local $TODO = "cannot use '...' outside a vararg function";
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'invalid var args' );
 function f ()
     print(...)
@@ -201,7 +198,6 @@ f()
 CODE
 /^[^:]+: [^:]+:\d+: cannot use '...' outside a vararg function/
 OUT
-}
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'orphan break' );
 function f()
