@@ -89,7 +89,7 @@ PARROT_API int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
     parrot_context_t *ctx /*NN*/,
     opcode_t *indexes /*NN*/,
     PMC* sig_pmc /*NN*/,
-    call_state_item *st /*NN*/ )
+    call_state_item *sti /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -105,7 +105,7 @@ PARROT_API int Parrot_init_arg_nci( Interp *interp /*NN*/,
 PARROT_API int Parrot_init_arg_op( Interp *interp,
     parrot_context_t *ctx /*NN*/,
     opcode_t *pc /*NULLOK*/,
-    call_state_item *st /*NN*/ )
+    call_state_item *sti /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
@@ -113,7 +113,7 @@ PARROT_API int Parrot_init_arg_sig( Interp *interp,
     parrot_context_t *ctx,
     const char *sig /*NN*/,
     void *ap,
-    call_state_item *st /*NN*/ )
+    call_state_item *sti /*NN*/ )
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 

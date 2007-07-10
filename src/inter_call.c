@@ -91,7 +91,7 @@ static int locate_named_named( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void next_arg_sig( call_state_item *st /*NN*/ )
+static void next_arg_sig( call_state_item *sti /*NN*/ )
         __attribute__nonnull__(1);
 
 static void null_val( int sig, call_state *st /*NN*/ )
@@ -218,7 +218,7 @@ These functions return 0, if no arguments are present, or 1 on success.
 PARROT_API
 int
 Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx /*NN*/,
-        opcode_t *indexes /*NN*/, PMC* sig_pmc /*NN*/, call_state_item *st /*NN*/)
+        opcode_t *indexes /*NN*/, PMC* sig_pmc /*NN*/, call_state_item *sti /*NN*/)
 {
     UNUSED(interp);
 
@@ -229,30 +229,30 @@ Parrot_init_arg_indexes_and_sig_pmc(Interp *interp, parrot_context_t *ctx /*NN*/
         ++indexes;
     }
 
-    st->used = 1;
-    st->i = 0;
-    st->n = 0;
-    st->mode = CALL_STATE_OP;
-    st->ctx = ctx;
-    st->sig = 0;
+    sti->used = 1;
+    sti->i = 0;
+    sti->n = 0;
+    sti->mode = CALL_STATE_OP;
+    sti->ctx = ctx;
+    sti->sig = 0;
 
     if (indexes) {
         ASSERT_SIG_PMC(sig_pmc);
-        st->u.op.signature = sig_pmc;
-        st->u.op.pc = indexes;
-        st->n = SIG_ELEMS(sig_pmc);
-        /* initialize st->sig */
-        if (st->n)
-            next_arg_sig(st);
+        sti->u.op.signature = sig_pmc;
+        sti->u.op.pc = indexes;
+        sti->n = SIG_ELEMS(sig_pmc);
+        /* initialize sti->sig */
+        if (sti->n)
+            next_arg_sig(sti);
 
     }
-    return st->n > 0;
+    return sti->n > 0;
 }
 
 PARROT_API
 int
 Parrot_init_arg_op(Interp *interp, parrot_context_t *ctx /*NN*/, opcode_t *pc /*NULLOK*/,
-    call_state_item *st /*NN*/)
+    call_state_item *sti /*NN*/)
 {
     PMC *sig_pmc = PMCNULL;
 
@@ -262,32 +262,32 @@ Parrot_init_arg_op(Interp *interp, parrot_context_t *ctx /*NN*/, opcode_t *pc /*
         ASSERT_SIG_PMC(sig_pmc);
         ++pc;
     }
-    return Parrot_init_arg_indexes_and_sig_pmc(interp, ctx, pc, sig_pmc, st);
+    return Parrot_init_arg_indexes_and_sig_pmc(interp, ctx, pc, sig_pmc, sti);
 }
 
 PARROT_API
 int
 Parrot_init_arg_sig(Interp *interp, parrot_context_t *ctx, const char *sig /*NN*/,
-    void *ap, call_state_item *st /*NN*/)
+    void *ap, call_state_item *sti /*NN*/)
 {
     UNUSED(interp);
 
-    st->used = 1;
-    st->i = 0;
-    st->n = 0;
-    st->mode = CALL_STATE_SIG;
-    st->ctx = ctx;
-    st->sig = 0;
+    sti->used = 1;
+    sti->i = 0;
+    sti->n = 0;
+    sti->mode = CALL_STATE_SIG;
+    sti->ctx = ctx;
+    sti->sig = 0;
 
     if (*sig) {
-        st->u.sig.sig = sig;
-        st->u.sig.ap = ap;
-        st->n = strlen(sig);
+        sti->u.sig.sig = sig;
+        sti->u.sig.ap = ap;
+        sti->n = strlen(sig);
         /* initialize st->sig */
-        if (st->n)
-            next_arg_sig(st);
+        if (sti->n)
+            next_arg_sig(sti);
     }
-    return st->n > 0;
+    return sti->n > 0;
 }
 
 /* mark the source state as flattening with the passed
@@ -325,27 +325,27 @@ start_flatten(Interp *interp /*NN*/, call_state *st /*NN*/, PMC *p_arg)
 
 
 static void
-next_arg_sig(call_state_item *st /*NN*/)
+next_arg_sig(call_state_item *sti /*NN*/)
 {
-    switch (st->mode & CALL_S_D_MASK) {
+    switch (sti->mode & CALL_S_D_MASK) {
         case CALL_STATE_OP:
-            st->sig = SIG_ITEM(st->u.op.signature, st->i);
+            sti->sig = SIG_ITEM(sti->u.op.signature, sti->i);
             break;
         case CALL_STATE_SIG:
-            switch (st->u.sig.sig[st->i]) {
+            switch (sti->u.sig.sig[sti->i]) {
                 case 'I':
-                    st->sig = PARROT_ARG_INTVAL; break;
+                    sti->sig = PARROT_ARG_INTVAL; break;
                 case 'N':
-                    st->sig = PARROT_ARG_FLOATVAL; break;
+                    sti->sig = PARROT_ARG_FLOATVAL; break;
                 case 'S':
-                    st->sig = PARROT_ARG_STRING; break;
+                    sti->sig = PARROT_ARG_STRING; break;
                 case 'O':
                 case 'P':
-                    st->sig = PARROT_ARG_PMC; break;
+                    sti->sig = PARROT_ARG_PMC; break;
                 case '@':
-                    st->sig = PARROT_ARG_PMC | PARROT_ARG_SLURPY_ARRAY; break;
+                    sti->sig = PARROT_ARG_PMC | PARROT_ARG_SLURPY_ARRAY; break;
                 case 'F':
-                    st->sig = PARROT_ARG_PMC | PARROT_ARG_FLATTEN; break;
+                    sti->sig = PARROT_ARG_PMC | PARROT_ARG_FLATTEN; break;
             }
             break;
     }
