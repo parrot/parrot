@@ -294,6 +294,8 @@ sub main {
     for my $ofile (@ofiles) {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/;
 
+        $ofile =~ s/\\/\//g;
+
         my $cfile = $ofile;
         $cfile =~ s/\Q$PConfig{o}\E$/.c/ or die "$cfile doesn't look like an object file";
 
