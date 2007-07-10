@@ -159,6 +159,8 @@ C<POST::Op> nodes represents any PIR opcodes.
 
 Get/set
 
+call, callmethod, tailcall, inline
+
 =cut
 
 .namespace [ 'POST::Op' ]
@@ -206,6 +208,7 @@ Get/set
     pirop = self.'pirop'()
     if pirop == 'call' goto pir_call
     if pirop == 'callmethod' goto pir_callmethod
+    if pirop == 'tailcall' goto pir_tailcall
     if pirop == 'inline' goto pir_inline
     code.'emit'('    %n %,', arglist :flat, 'n'=>pirop)
     .return (code)
@@ -223,6 +226,12 @@ Get/set
     name = shift arglist
     invocant = shift arglist
     code.'emit'('    %r = %i.%n(%,)', arglist :flat, 'r'=>result, 'i'=>invocant, 'n'=>name)
+    .return (code)
+
+  pir_tailcall:
+    .local pmc name
+    name = shift arglist
+    code.'emit'('    .return %n(%,)', arglist :flat, 'n'=>name)
     .return (code)
 
   pir_inline:
