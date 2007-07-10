@@ -1,0 +1,46 @@
+=head1 Named Variables
+
+The other kind of variables in PIR are named variables.
+You declare these with the .local directive, followed by
+the type of the variable, followed by the name. The types
+of named variables are the same set as the types of
+temporary variables, int for integer, num for numbers
+(floats), string for strings, and pmc for PMCs (objects).
+
+The general rule of thumb is to use temporary variables
+if for variables that are used on 3 or fewer lines of
+code, and named variables for any longer-lived variables.
+
+=cut
+
+.sub main :main
+
+    .local int answer
+    answer = 42         # set local integer var to the integer value 42
+    print answer
+    print "\n"
+
+    .local num pi
+    pi = 3.14159    # set local float var to an approximation of pi
+    print pi
+    print "\n"
+
+    .local string greeting
+    greeting = "Hello"    # set temp string var to "Hello"
+    print greeting
+    print "\n"
+
+    .local pmc player
+    player = new String
+    player = "Ford"     # set temp PMC var to "Ford"
+    print player
+    print "\n"
+
+.end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
