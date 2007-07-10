@@ -66,6 +66,7 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
 .sub 'syntaxerror'
     .param pmc mob
     .param string message :optional
+    .param pmc adv :slurpy :named
     unless null message goto L1
     message = 'syntax error'
   L1:
