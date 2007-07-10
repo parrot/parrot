@@ -48,7 +48,6 @@ sub new {
             $self->new_item( '', 'docs/submissions.pod' ),
             $self->new_item( '', 'docs/glossary.pod' ),
             $self->new_item( '', 'docs/faq.pod' ),
-            $self->new_item( '', 'docs/practical_notes.pod' ),
             $self->new_item( '', 'docs/parrot.pod' ),
         ),
         $self->new_group(
