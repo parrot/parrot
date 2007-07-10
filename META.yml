@@ -12,6 +12,7 @@ no_index:
         - lib/Digest
         - lib/File
         - lib/Parse
+        - lib/Perl/Critic
         - lib/Pod
         - lib/Test
         - lib/Text
