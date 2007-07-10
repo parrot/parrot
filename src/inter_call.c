@@ -1616,29 +1616,32 @@ Parrot_PCCINVOKE(Interp* interp, PMC* pmc, STRING *method_name, const char *sign
     index      = 0;
     seen_arrow = 1;
 
-    for (x=ret_x; *x != '\0'; x++) {
+    for (x=ret_x; *x; x++) {
         if (isupper(*x)) {
-            INTVAL    *tmpINTVAL;
-            FLOATVAL  *tmpFLOATVAL;
-            STRING   **tmpSTRING;
-            PMC      **tmpPMC;
-
             switch (*x) {
                 case 'I':
-                    tmpINTVAL  = va_arg(list, INTVAL*);
+                    {
+                    INTVAL * const tmpINTVAL  = va_arg(list, INTVAL*);
                     *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
+                    }
                     break;
                 case 'N':
-                    tmpFLOATVAL  = va_arg(list, FLOATVAL*);
+                    {
+                    FLOATVAL * const tmpFLOATVAL  = va_arg(list, FLOATVAL*);
                     *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
+                    }
                     break;
                 case 'S':
-                    tmpSTRING  = va_arg(list, STRING**);
+                    {
+                    STRING ** const tmpSTRING  = va_arg(list, STRING**);
                     *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
+                    }
                     break;
                 case 'P':
-                    tmpPMC  = va_arg(list, PMC**);
+                    {
+                    PMC ** const tmpPMC  = va_arg(list, PMC**);
                     *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
+                    }
                     break;
                 default:
                           real_exception(interp, NULL, E_IndexError,
