@@ -1612,7 +1612,7 @@ test-clean :
     "t/examples/*_pbcexe*" \
     "t/examples/*.past"
 	$(RM_F) \
-    "t/*/*.o" \
+    "t/*/*$(O)" \
     "t/*/*.out" \
     "t/*/*.pasm" \
     "t/*/*_pbcexe*" \
@@ -1630,7 +1630,7 @@ test-clean :
 imcc-clean:
 	$(RM_F) \
     $(IMCC_DIR)/core \
-    "$(IMCC_DIR)/*.o" \
+    "$(IMCC_DIR)/*$(O)" \
     $(IMCC_DIR)/imcparser.output
 
 realclean : clean
@@ -1963,76 +1963,76 @@ HEADERIZER_O_FILES = \
     $(CHARSET_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IO_O_FILES) \
-    src/builtin.o \
-    src/byteorder.o \
-    src/charset.o \
-    src/cpu_dep.o \
-    src/datatypes.o \
-    src/debug.o \
-    src/dynext.o \
-    src/encoding.o \
-    src/events.o \
-    src/exceptions.o \
-    src/exit.o \
-    src/extend.o \
-    src/fingerprint.o \
-    src/gc/dod.o \
-    src/gc/gc_gms.o \
-    src/gc/gc_ims.o \
-    src/gc/memory.o \
-    src/gc/register.o \
-    src/gc/resources.o \
-    src/gc/smallobject.o \
-    src/global.o \
-    src/global_setup.o \
-    src/hash.o \
-    src/headers.o \
-    src/hll.o \
-    src/inter_call.o \
-    src/inter_run.o \
-    src/interpreter.o \
-    src/intlist.o \
-    src/key.o \
-    src/library.o \
-    src/list.o \
-    src/longopt.o \
-    src/misc.o \
-    src/mmd.o \
-    src/objects.o \
-    src/packdump.o \
-    src/packfile.o \
-    src/packfile/pf_items.o \
-    src/packout.o \
-    src/pbc_merge.o \
-    src/pic_jit.o \
-    src/pic.o \
-    src/pmc.o \
-    src/pmc_freeze.o \
-    src/spf_render.o \
-    src/spf_vtable.o \
-    src/stack_common.o \
-    src/stacks.o \
-    src/stm/backend.o \
-    src/string.o \
-    src/string_primitives.o \
-    src/sub.o \
-    src/trace.o \
-    src/tsq.o \
-    src/utils.o \
-    src/vtables.o \
-    compilers/imcc/cfg.o \
-    compilers/imcc/debug.o \
-    compilers/imcc/imc.o \
-    compilers/imcc/imcparser.o \
-    compilers/imcc/instructions.o \
-    compilers/imcc/main.o \
-    compilers/imcc/optimizer.o \
-    compilers/imcc/parser_util.o \
-    compilers/imcc/pbc.o \
-    compilers/imcc/pcc.o \
-    compilers/imcc/reg_alloc.o \
-    compilers/imcc/sets.o \
-    compilers/imcc/symreg.o \
+    src/builtin$(O) \
+    src/byteorder$(O) \
+    src/charset$(O) \
+    src/cpu_dep$(O) \
+    src/datatypes$(O) \
+    src/debug$(O) \
+    src/dynext$(O) \
+    src/encoding$(O) \
+    src/events$(O) \
+    src/exceptions$(O) \
+    src/exit$(O) \
+    src/extend$(O) \
+    src/fingerprint$(O) \
+    src/gc/dod$(O) \
+    src/gc/gc_gms$(O) \
+    src/gc/gc_ims$(O) \
+    src/gc/memory$(O) \
+    src/gc/register$(O) \
+    src/gc/resources$(O) \
+    src/gc/smallobject$(O) \
+    src/global$(O) \
+    src/global_setup$(O) \
+    src/hash$(O) \
+    src/headers$(O) \
+    src/hll$(O) \
+    src/inter_call$(O) \
+    src/inter_run$(O) \
+    src/interpreter$(O) \
+    src/intlist$(O) \
+    src/key$(O) \
+    src/library$(O) \
+    src/list$(O) \
+    src/longopt$(O) \
+    src/misc$(O) \
+    src/mmd$(O) \
+    src/objects$(O) \
+    src/packdump$(O) \
+    src/packfile$(O) \
+    src/packfile/pf_items$(O) \
+    src/packout$(O) \
+    src/pbc_merge$(O) \
+    src/pic_jit$(O) \
+    src/pic$(O) \
+    src/pmc$(O) \
+    src/pmc_freeze$(O) \
+    src/spf_render$(O) \
+    src/spf_vtable$(O) \
+    src/stack_common$(O) \
+    src/stacks$(O) \
+    src/stm/backend$(O) \
+    src/string$(O) \
+    src/string_primitives$(O) \
+    src/sub$(O) \
+    src/trace$(O) \
+    src/tsq$(O) \
+    src/utils$(O) \
+    src/vtables$(O) \
+    compilers/imcc/cfg$(O) \
+    compilers/imcc/debug$(O) \
+    compilers/imcc/imc$(O) \
+    compilers/imcc/imcparser$(O) \
+    compilers/imcc/instructions$(O) \
+    compilers/imcc/main$(O) \
+    compilers/imcc/optimizer$(O) \
+    compilers/imcc/parser_util$(O) \
+    compilers/imcc/pbc$(O) \
+    compilers/imcc/pcc$(O) \
+    compilers/imcc/reg_alloc$(O) \
+    compilers/imcc/sets$(O) \
+    compilers/imcc/symreg$(O) \
 
 headerizer : $(SRC_DIR)/fingerprint.c $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES)
