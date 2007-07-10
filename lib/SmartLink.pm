@@ -31,7 +31,7 @@ has 'keyphrases' => (
     is => 'ro', isa => 'Keyphrase',
     default => sub{
         ($_)= shift->link =~ m|^L<.*?/.*?/([^>]+)>|;
-        Keyphrase->new( string => defined $_ ? $_ : '' );
+        defined $_ ? Keyphrase->new( string => $_ ) : undef;
     },
     predicate => 'has_keyphrases',
 );
@@ -420,7 +420,8 @@ has 'mergetree' =>(
         my $tree= {};
         for my $spectype ( keys %{ $self->specfiles } ) {
             my $specs= $self->specfiles_of_type( $spectype );
-            for my $spec ( @{$specs->files} ) {
+            $specs= $specs->files;
+            for my $spec ( @$specs ) {
                 my $linkdoc= $self->linktree->get_doc( $spec->name );
                 warn $spec->name,$/; # XXX: FIXME: TODO:
                 next unless $linkdoc;
