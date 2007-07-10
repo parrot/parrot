@@ -53,6 +53,8 @@ static INTVAL PIO_win32_close( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io );
 
+static INTVAL PIO_win32_isatty(PIOHANDLE fd);
+
 static INTVAL PIO_win32_connect( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io,
