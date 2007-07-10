@@ -43,7 +43,7 @@ See "WMLScript Standard Libraries Specification".
     $P1 = getConsole()
     $P0[99] = $P1
 
-    global '@stdlibs' = $P0
+    set_global '@stdlibs', $P0
 .end
 
 .sub 'not_implemented'
@@ -66,7 +66,7 @@ helper for CALL_LIB* opcodes.
 .sub 'find_lib'
     .param int lindex
     .param int findex
-    $P0 = global '@stdlibs'
+    $P0 = get_global '@stdlibs'
     push_eh _handler
     $P1 = $P0[lindex]
     $P2 = $P1[findex]
@@ -109,7 +109,7 @@ helper for CALL_URL* opcodes.
     $S0 = url
     $S0 .= ':'
     $S0 .= function
-    entry = global $S0
+    entry = get_global $S0
     if_null entry, _handler_2
     .return (entry)
   _handler_1:

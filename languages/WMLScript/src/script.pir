@@ -97,7 +97,7 @@
 
 .sub '__onload' :load :anon
 
-  $P0 = global '@stdlibs'
+  $P0 = get_global '@stdlibs'
   unless null $P0 goto L1
   load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
 L1:
@@ -413,11 +413,11 @@ PIRCODE
     pir .= " = 'function"
     $S0 = function_index
     pir .= $S0
-    pir .= "'\n  global '"
+    pir .= "'\n  set_global '"
     pir .= namespace
     pir .= ":"
     pir .= function_name
-    pir .= "' = "
+    pir .= "', "
     pir .= function_name
     pir .= "\n"
     inc idx

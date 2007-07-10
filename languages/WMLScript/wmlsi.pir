@@ -72,7 +72,7 @@ Francois Perrad.
     $S0 = filename
     $S0 .= ':'
     $S0 .= entryname
-    entry = global $S0
+    entry = get_global $S0
     entry(params :flat)
     end
   _handler:
