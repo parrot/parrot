@@ -185,21 +185,13 @@ mark a TODO test.
 
 =item C<example_output_is( $example_f, $expected, @todo )>
 
-Determine the language from the extension of C<$example_f> and runs
-language_output_is().  This I<does> set a description for you, so don't pass
-one.
-
 =item C<example_output_like( $example_f, $expected, @todo )>
-
-Determine the language from the extension of C<$example_f> and runs
-language_output_like().  This I<does> set a description for you, so don't pass
-one.
 
 =item C<example_output_isnt( $example_f, $expected, @todo )>
 
-Determine the language from the extension of C<$example_f> and runs
-language_output_isnt().  This I<does> set a description for you, so don't pass
-one.
+Determines the language, PIR or PASM, from the extension of C<$example_f> and runs
+the appropriate C<^language_output_(is|kike|isnt)> sub.
+C<$example_f> is used as a description, so don't pass one.
 
 =item C<skip($why, $how_many)>
 
@@ -858,7 +850,6 @@ sub _generate_functions {
         *{ $package . '::' . $func } = $test_sub;
     }
 
-    # RT#43755 this is broken WRT todo tests
     my %example_test_map = (
         example_output_is   => 'language_output_is',
         example_output_like => 'language_output_like',
