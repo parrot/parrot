@@ -22,12 +22,15 @@ C<BigInt> provides arbitrary precision integer mathematic functions.
 
 */
 
-#ifndef S_SPLINT_S
 #include "parrot/parrot.h"
 
 /*
  * TODO split that out into a separate file
  */
+
+#ifdef S_SPLINT_S
+#undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
+#endif /* S_SPLINT_S */
 
 #ifdef PARROT_HAS_GMP
 #  include <gmp.h>
@@ -1312,7 +1315,6 @@ MMD_DEFAULT: {
 
 }
 
-#endif /* S_SPLINT_S */
 
 /*
 
