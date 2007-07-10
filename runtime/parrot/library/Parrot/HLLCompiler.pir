@@ -363,6 +363,8 @@ specifies the encoding to use for the input (e.g., "utf8").
 
 =cut
 
+.include 'except_severity.pasm'
+
 .sub 'interactive' :method
     .param pmc adverbs         :slurpy :named
     .local string target, encoding
@@ -414,6 +416,9 @@ specifies the encoding to use for the input (e.g., "utf8").
     goto interactive_loop
   interactive_trap:
     get_results '(0,0)', $P0, $S0
+    .local int severity
+    severity = $P0[2]
+    if severity == .EXCEPT_EXIT goto interactive_end
     $S1 = substr $S0, -1, 1
     $I0 = is_cclass .CCLASS_NEWLINE, $S1, 0
     if $I0 goto have_newline
@@ -474,7 +479,7 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
-    $P0 = self.'eval'(code, adverbs :flat :named)
+    $P0 = self.'eval'(code, args, adverbs :flat :named)
     if target == '' goto end
     if target == 'pir' goto end
     '_dumper'($P0, target)
