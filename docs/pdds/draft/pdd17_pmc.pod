@@ -58,6 +58,41 @@ of space. <allison> 8 bits is pretty limited, and IIRC we've already run into
 the limitation. This runs back to Leo's proposal to make PMCs a little more
 flexible, so we wouldn't have to hold all PMCs to the same 8 bits
 
+=item *
+
+<pmichaud> there is a question about when 'Integer' is not really .Integer
+e.g., in a HLL, the meaning of 'Integer' can be different, and using C<new
+'Integer'> is safe only if in the root of the parrot HLL namespace
+
+<allison> true, the only way to guarantee that you're getting a built-in PMC
+under the type id-less system is to look in the 'parrot' HLL, and even that
+isn't a total guarantee, because it could have been replaced in the 'parrot'
+HLL
+
+<pmichaud> the closest we have at the moment is
+
+  $P0 = get_root_namespace ['parrot'; 'Integer']
+  $P1 = new $P0
+
+but even this assumes that the 'Integer' namespace is tied to the Integer
+class, which also hasn't been specced
+
+<allison> builtin PMCs will be tied to a corresponding spot in the 'parrot' HLL
+namespace
+
+<pmichaud> according to pdd15: C<$P0 = new .Integer> can be replaced by C<$P0 =
+new 'Integer'> only in the parrot root namespace. in all other
+namespaces, one would need to get the namespace for the 'Integer' class and use
+that
+
+  $P0 = new 'Integer' # works in parrot HLL, root namespace
+  $P0 = new ['Integer'] # works in parrot HLL, any namespace
+
+<pmichaud> even easier, HLLs can set their notion of 'Integer' to point to the
+parrot class :-)
+
+<allison> yes, aliasing across namespaces is allowed
+
 =back
 
 =head1 DESCRIPTION
