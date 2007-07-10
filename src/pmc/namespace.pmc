@@ -325,7 +325,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
     void* get_pointer_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)PMC_struct_val(SELF),
                                         key);
-        if (!ns)
+        if (PMC_IS_NULL(ns))
             return PMCNULL;
 
         if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
@@ -338,6 +338,9 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
     void* get_pointer_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
+        
+        if (PMC_IS_NULL(key))
+          return PMCNULL;
 
         if (key->vtable->base_type == enum_class_String) {
             return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
