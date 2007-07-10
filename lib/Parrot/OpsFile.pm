@@ -494,7 +494,7 @@ sub make_op {
         # on the mode of operation (function calls, switch statements, gotos
         # with labels, etc.).
         #
-        # TODO: Complain about using, e.g. $3 in an op with only 2 args.
+        # RT#43719: Complain about using, e.g. $3 in an op with only 2 args.
         #
 
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
@@ -640,7 +640,7 @@ sub preamble {
         s/goto\s+POP\(\)/{{=*}}/mg;
         s/HALT\(\)/{{=0}}/mg;
 
-        # FIXME: This ought to throw errors when attempting to rewrite $n
+        # RT#43721: This ought to throw errors when attempting to rewrite $n
         # argument accesses and other things that make no sense in the
         # preamble.
         $_ = Parrot::Op->rewrite_body( $_, $trans );

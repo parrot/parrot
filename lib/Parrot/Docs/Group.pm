@@ -60,7 +60,7 @@ sub new {
     my $text     = shift;
     my @contents = @_;
 
-    # TODO - Groups should only contain items or paths.
+    # RT#43709 - Groups should only contain items or paths.
 
     $self = $self->SUPER::new( $text, @contents );
     $self->{NAME} = $name;

@@ -38,7 +38,7 @@ sub add_pir {
     return;    #void
 }
 
-# XXX we should check for proper nesting
+# RT#43723 we should check for proper nesting
 
 my $block_begin = qr{ ( ^ \.sub | ^push_eh) }smx;
 

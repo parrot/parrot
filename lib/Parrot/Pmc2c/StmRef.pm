@@ -19,7 +19,7 @@ PMC *real_pmc;
 
     handle   = (Parrot_STM_PMC_handle)PMC_struct_val(pmc);
 EOC
-    if ( $self->does_write($name) ) {    # XXX is this good enough?
+    if ( $self->does_write($name) ) {    # RT#43749 is this good enough?
         $code .= <<'EOC';
     real_pmc = Parrot_STM_begin_update(interp, handle);
 EOC

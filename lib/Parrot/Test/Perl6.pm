@@ -131,7 +131,7 @@ sub _generate_functions {
             ## read in the command output
             my $actual_output = Parrot::Test::slurp_file($f_out);
 
-            ## tell Test::Builder if the test is marked TODO
+            ## tell Test::Builder if the test is marked as a todo-item
             my $call_pkg = $b->exported_to() || '';
             local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};

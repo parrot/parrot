@@ -67,7 +67,7 @@ sub new {
     my $text     = shift;
     my @contents = @_;
 
-    # TODO - Items should only contain paths.
+    # RT#43713 - Items should only contain paths.
 
     die "No contents ($text).\n" unless @contents;
 

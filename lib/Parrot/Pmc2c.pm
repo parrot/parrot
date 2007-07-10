@@ -145,7 +145,7 @@ sub make_constlike {
     {
 
         # autogenerate for exotic types
-        # (XXX is this appropriate or do we want them to each
+        # (RT#43725 is this appropriate or do we want them to each
         # be explicitly cleared to have the variant?)
         no strict 'refs';
         if ( !@{ ref($const) . '::ISA' } ) {
@@ -158,7 +158,7 @@ sub make_constlike {
     $const->{super} = { %{ $self->{super} } };
     my $i;
 
-    # FIXME support getting implementations from central superclass instead
+    # RT#43727 support getting implementations from central superclass instead
     # (e.g. some ro_fail pseudoclass that generates an exception)
     foreach my $entry ( @{ $self->{vtable}{methods} } ) {
         my $meth = $entry->{meth};
@@ -243,7 +243,7 @@ Initializes the instance.
 sub init {
     my ($self) = @_;
 
-    # XXX FIXME unused?
+    # RT#43729 unused?
     #Creates a hash of all the method names correspdoning vtable section.
     #Creates a hash of all the method names correspdoning to their attributes.
     foreach my $entry ( @{ $self->{vtable}->{methods} } ) {
@@ -396,7 +396,7 @@ my %calltype = (
     "void*"    => "b",
     "void**"   => "B",
 
-    #"BIGNUM*" => "???" # XXX
+    #"BIGNUM*" => "???" # RT#43731
 );
 
 sub proto {
@@ -410,9 +410,9 @@ sub proto {
     my $ret = $calltype{ $type or "void" };
     $ret .= "JO" . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
 
-    # TODO
-    # scan src/call_list.txt if the generated signature is available
-    # TODO report errors for "?"
+    # RT#43733 scan src/call_list.txt if the generated signature is available
+
+    # RT#43735 report errors for "?"
     # --leo
 
     return $ret;
@@ -676,7 +676,7 @@ sub pmc_is_dynpmc {
     return exists( $pmc_types{ $_[1] } ) ? 0 : 1;
 }
 
-# XXX quick hack - to get MMD variants
+# RT#43737 quick hack - to get MMD variants
 sub get_super_mmds {
     my ( $self, $meth, $right_type, $func ) = @_;
     ## use Data::Dumper;
@@ -770,7 +770,7 @@ sub find_mmd_methods {
             $meth_name = $variant->[1] . '_' . $variant->[0];
             push @mmds, [ $func, $left_type, $right_type, $meth_name ];
         }
-        $self->{mmds} = @mmds;    # XXX?
+        $self->{mmds} = @mmds;    # RT#43739?
     }
     return ( \@mmds, \@init_mmds, [ keys %init_mmds ] );
 }
@@ -823,7 +823,7 @@ sub vtable_decl {
     my $cout = "";
     return "" if exists $self->{flags}{noinit};
 
-    # TODO gen C line comment
+    # RT#43741 gen C line comment
     my $classname = $self->{class};
     my $vtbl_flag =
           $self->{flags}{const_too} ? 'VTABLE_HAS_CONST_TOO'
