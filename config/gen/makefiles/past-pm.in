@@ -3,7 +3,7 @@
 # Setup some commands
 LN_S     = @lns@
 PERL     = @perl@
-RM_RF    = @rm_rf@
+RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 TGE_DIR  = ../../compilers/tge
@@ -32,7 +32,7 @@ $(PARROT_LIBRARY)/PAST-pm.pbc: PAST-pm.pbc
 	$(CP) PAST-pm.pbc $(PARROT_LIBRARY)/PAST-pm.pbc
 
 PAST-pm.pbc: $(PARROT) $(SOURCES)
-	$(RM_RF) PAST-pm.pbc $(PARROT_LIBRARY)/PAST-pm.pbc
+	$(RM_F) PAST-pm.pbc $(PARROT_LIBRARY)/PAST-pm.pbc
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=POST/Grammar_gen.pir POST/Grammar.tg
 	$(PARROT) -o PAST-pm.pbc --output-pbc PAST-pm.pir
 
@@ -72,16 +72,16 @@ NoneGrammar.pir: $(TEST_DIR)/NoneGrammar.tg
 	    $(TEST_DIR)/NoneGrammar.tg
 
 testclean:
-	$(RM_RF) $(TEST_DIR)/*.pir \
+	$(RM_F) $(TEST_DIR)/*.pir \
 	    $(TEST_DIR)/*.pbc
 
 clean: testclean
-	$(RM_RF) \
+	$(RM_F) \
     PAST-pm.pbc \
     $(PARROT_LIBRARY)/PAST-pm.pbc \
     POST/Grammar_gen.pir
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
