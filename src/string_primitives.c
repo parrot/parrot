@@ -39,7 +39,7 @@ etc.).
 
 PARROT_API
 void
-string_set_data_directory(Interp *interp, const char *dir)
+string_set_data_directory(PARROT_INTERP, const char *dir)
 {
 #if PARROT_HAS_ICU
     u_setDataDirectory(dir);
@@ -72,7 +72,7 @@ supported encoding into Parrot string's internal format.
 
 PARROT_API
 void
-string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
+string_fill_from_buffer(PARROT_INTERP, const void *buffer /*NN*/,
             UINTVAL len, const char *encoding_name, STRING *s /*NULLOK*/)
 {
 #if PARROT_HAS_ICU
@@ -161,7 +161,7 @@ string_fill_from_buffer(Interp *interp, const void *buffer /*NN*/,
    sequence, right after the \ */
 PARROT_API
 Parrot_UInt4
-string_unescape_one(Interp *interp, UINTVAL *offset /*NN*/,
+string_unescape_one(PARROT_INTERP, UINTVAL *offset /*NN*/,
         STRING *string)
 {
     UINTVAL workchar = 0;

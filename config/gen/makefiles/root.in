@@ -1734,8 +1734,9 @@ SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-	-checks \
+	-standard \
 	-tmpdir $(SPLINT_TMP) \
+	-message-stream-stdout \
 	\
 	-abstract \
 	+aliasunique \
@@ -1807,6 +1808,7 @@ SPLINTFLAGS  = \
 	-retalias \
 	-redecl \
 	\
+	-readonlytrans \
 	-onlytrans \
 	-unqualifiedtrans \
 	-observertrans \

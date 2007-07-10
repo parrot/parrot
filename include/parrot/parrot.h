@@ -253,6 +253,7 @@ typedef void (*funcptr_t)(void);
  * gets its own macro.
  */
 #define SHIM_INTERP /*@unused@*/ Interp *interp_unused __attribute__unused__
+#define PARROT_INTERP /*@notnull@*/ Parrot_Interp interp
 
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.

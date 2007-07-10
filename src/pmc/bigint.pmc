@@ -29,7 +29,7 @@ C<BigInt> provides arbitrary precision integer mathematic functions.
  */
 
 #ifdef S_SPLINT_S
-#undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
+#  undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
 #endif /* S_SPLINT_S */
 
 #ifdef PARROT_HAS_GMP

@@ -159,7 +159,7 @@ sub function_components_from_declaration {
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
         s/SHIM_INTERP/SHIM(Interp *interp)/;
-        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' )
+        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || ( $_ eq 'PARROT_INTERP' )
             or die "Bad args in $proto";
         s/SHIM\(\s*(\w+.*\w+)\s*\)/$1/e;
     }
@@ -188,7 +188,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg ( @args ) {
         ++$n;
-        if ( $arg =~ m{/\*\s*NN\s*\*/} ) {
+        if ( $arg =~ m{/\*\s*NN\s*\*/} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
     }
@@ -231,8 +231,6 @@ sub attrs_from_flags {
     return @attrs;
 }
 
-sub wango { 'foo' }
-
 sub make_function_decls {
     my @funcs = @_;
 
@@ -261,7 +259,7 @@ sub make_function_decls {
             $decl = "$decl $argline )";
         }
         else {
-            if ( $args[0] =~ /^Interp\b/ ) {
+            if ( $args[0] =~ /^(PARROT_INTERP|Interp)\b/ ) {
                 $decl .= " " . (shift @args);
                 $decl .= "," if @args;
             }
