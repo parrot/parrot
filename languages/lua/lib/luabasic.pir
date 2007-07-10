@@ -28,11 +28,11 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = new .LuaTable
-    global '_REGISTRY' = _lua__REGISTRY
+    set_global '_REGISTRY', _lua__REGISTRY
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = new .LuaTable
-    global '_G' = _lua__GLOBAL
+    set_global '_G', _lua__GLOBAL
     new $P1, .LuaString
 
     set $P1, '_LOADED'
@@ -477,7 +477,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     lua_checktype(1, t, 'table')
     unless null i goto L1
     .local pmc _G
-    _G = global '_G'
+    _G = get_global '_G'
     .const .LuaString key_ipairs = 'ipairs'
     .local pmc ipairs
     ipairs = _G.'rawget'(key_ipairs)
@@ -625,7 +625,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .param pmc t :optional
     lua_checktype(1, t, 'table')
     .local pmc _G
-    _G = global '_G'
+    _G = get_global '_G'
     .const .LuaString key_next = 'next'
     .local pmc next
     next = _G.'rawget'(key_next)

@@ -26,7 +26,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 #    print "init Lua Package\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global '_G'
+    _lua__GLOBAL = get_global '_G'
     new $P1, .LuaString
 
     .const .Sub _lua_module = 'module'
@@ -85,7 +85,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     setpath(_package, 'pbcpath', 'LUA_PBCPATH', './?.pbc;./?.pir;languages/lua/lib/?.pbc')
 
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     set $P1, '_LOADED'
     $P0 = _lua__REGISTRY[$P1]
     set $P1, 'loaded'
@@ -122,7 +122,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .param string name
     .param string pname
     name = lua_gsub(name, '.', '/')
-    $P0 = global '_G'
+    $P0 = get_global '_G'
     new $P1, .LuaString
     set $P1, 'package'
     $P0 = $P0[$P1]
@@ -274,7 +274,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 .sub 'loader_preload' :anon
     .param pmc name :optional
     $S1 = lua_checkstring(1, name)
-    $P0 = global '_G'
+    $P0 = get_global '_G'
     new $P1, .LuaString
     set $P1, 'package'
     $P0 = $P0[$P1]
@@ -329,7 +329,7 @@ each option is a function to be applied over the module.
     .local pmc m
     $S1 = lua_checkstring(1, name)
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     new $P1, .LuaString
     set $P1, '_LOADED'
     .local pmc _LOADED
@@ -338,7 +338,7 @@ each option is a function to be applied over the module.
     $I0 = isa m, 'LuaTable'
     if $I0 goto L1
     # try global variable (and create one if it does not exist)
-    $P0 = global '_G'
+    $P0 = get_global '_G'
     m = lua_findtable($P0, $S1)
     unless null m goto L2
     lua_error("name conflict for module '", $S1, "'")
@@ -410,7 +410,7 @@ any loader for the module, then C<require> signals an error.
     .local pmc res
     $S1 = lua_checkstring(1, modname)
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     new $P1, .LuaString
     set $P1, '_LOADED'
     .local pmc _LOADED
@@ -425,7 +425,7 @@ any loader for the module, then C<require> signals an error.
     # package is already loaded
     .return (res)
   L1:
-    $P0 = global '_G'
+    $P0 = get_global '_G'
     set $P1, 'package'
     $P0 = $P0[$P1]
     .local pmc loaders
@@ -562,7 +562,7 @@ environment. To be used as an option to function C<module>.
     module.'set_metatable'(mt)
   L1:
     # mt.__index = _G
-    $P0 = global '_G'
+    $P0 = get_global '_G'
     new $P1, .LuaString
     set $P1, '__index'
     mt[$P1] = $P0

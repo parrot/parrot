@@ -37,7 +37,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 #    print "init Lua Debug\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global '_G'
+    _lua__GLOBAL = get_global '_G'
     new $P1, .LuaString
 
     .local pmc _debug
@@ -262,7 +262,7 @@ Returns the registry table.
 
 .sub 'getregistry' :anon
     .local pmc res
-    res = global '_REGISTRY'
+    res = get_global '_REGISTRY'
     .return (res)
 .end
 

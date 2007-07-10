@@ -34,7 +34,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 #    print "luaopen_lfs\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global '_G'
+    _lua__GLOBAL = get_global '_G'
 
     new $P1, .LuaString
 

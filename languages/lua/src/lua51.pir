@@ -733,7 +733,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
     $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
     new $P0, .Integer
     set $P0, 0
-    global '$nb' = $P0
+    set_global '$nb', $P0
 .end
 
 .sub 'insert' :method
@@ -742,7 +742,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
     $I0 = exists $P0[name]
     if $I0 goto L1
     $S0 = name . '_'
-    $P1 = global '$nb'
+    $P1 = get_global '$nb'
     $S1 = $P1
     $S0 .= $S1
     $P0[name] = $S0
@@ -769,7 +769,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'push_scope' :method
     new $P0, .Hash
     unshift self, $P0
-    $P1 = global '$nb'
+    $P1 = get_global '$nb'
     inc $P1
 .end
 

@@ -154,7 +154,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     unless $I0 goto L1
     .local pmc _lua__REGISTRY
     .local pmc key
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     new key, .LuaString
     set key, type
     $P0 = _lua__REGISTRY[key]
@@ -334,7 +334,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param string tname
     .local pmc _lua__REGISTRY
     .local pmc res
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     new $P1, .LuaString
     set $P1, tname
     res = _lua__REGISTRY[$P1]
@@ -390,7 +390,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param pmc lib
     .const .LuaString _loaded = '_LOADED'
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     $P0 = _lua__REGISTRY[_loaded]
     $P0[libname] = lib
 .end

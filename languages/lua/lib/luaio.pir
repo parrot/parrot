@@ -43,7 +43,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 #    print "init Lua I/O\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global '_G'
+    _lua__GLOBAL = get_global '_G'
     new $P1, .LuaString
 
     .local pmc _io_env
@@ -229,7 +229,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .local pmc file
     .local pmc _lua__REGISTRY
     .local pmc mt
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
     mt = _lua__REGISTRY[key]
     new file, .LuaUserdata
@@ -337,7 +337,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     unless $I0 goto L1
     mt = file.'get_metatable'()
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
@@ -682,7 +682,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     lua_checkany(1, obj)
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = global '_REGISTRY'
+    _lua__REGISTRY = get_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
