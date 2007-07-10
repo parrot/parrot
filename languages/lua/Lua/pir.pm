@@ -14,48 +14,28 @@ package pirVisitor;
         $self->{fh}       = $fh;
         $self->{prologue} = q{
 .include 'interpinfo.pasm'
-
 .HLL 'Lua', 'lua_group'
 
-.sub '__start' :main
+.sub '__start' :anon :main
     .param pmc args
-    $S0 = shift args
-    $I1 = args
-    $P1 = new .Array
-    set $P1, $I1
-    $I0 = 0
-  L1:
-    unless $I0 < $I1 goto L2
-    $S0 = shift args
-    $P0 = new .LuaString
-    set $P0, $S0
-    $P1[$I0] = $P0
-    inc $I0
-    goto L1
-  L2:
 #    print "start Lua\n"
-
     load_bytecode 'languages/lua/lib/luabasic.pbc'
-    load_bytecode 'languages/lua/lib/luacoroutine.pir'
+    load_bytecode 'languages/lua/lib/luacoroutine.pbc'
     load_bytecode 'languages/lua/lib/luapackage.pbc'
-    load_bytecode 'languages/lua/lib/luastring.pir'
+    load_bytecode 'languages/lua/lib/luastring.pbc'
     load_bytecode 'languages/lua/lib/luatable.pbc'
     load_bytecode 'languages/lua/lib/luamath.pbc'
-    load_bytecode 'languages/lua/lib/luaio.pir'
+    load_bytecode 'languages/lua/lib/luaio.pbc'
     load_bytecode 'languages/lua/lib/luaos.pbc'
     load_bytecode 'languages/lua/lib/luadebug.pbc'
     load_bytecode 'languages/lua/lib/luaperl.pbc'
-
+    .local pmc env
+    env = get_global '_G'
+    .local pmc vararg
+    vararg = argstolua(env, args)
     .const .Sub main = '_main'
-    $P0 = get_global '_G'
-    main.'setfenv'($P0)
-    docall(main, $P1 :flat)
-.end
-
-.sub '__onload' :anon :init
-    .const .Sub main = '_main'
-#    print "onload tmp\n"
-    set_root_global 'tmp', main
+    main.'setfenv'(env)
+    docall(main, vararg :flat)
 .end
 
 };

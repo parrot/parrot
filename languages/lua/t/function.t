@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
@@ -266,6 +266,17 @@ CODE
 2
 1
 0
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'sub name' );
+local function f () return 1 end
+print(f())
+
+local function f () return 2 end
+print(f())
+CODE
+1
+2
 OUT
 
 # Local Variables:

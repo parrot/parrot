@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 1, 10, 2' );
@@ -37,6 +37,36 @@ CODE
 5
 7
 9
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for 1, 10, 2 lex' );
+for i = 1, 10, 2 do
+    function f ()
+        print(i)
+    end
+    f()
+end
+CODE
+1
+3
+5
+7
+9
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'for 1, 10, 2 !lex' );
+function f ()
+    print(i)
+end
+for i = 1, 10, 2 do
+    f()
+end
+CODE
+nil
+nil
+nil
+nil
+nil
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 3, 5' );

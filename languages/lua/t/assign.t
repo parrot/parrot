@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'global variable' );
@@ -82,6 +82,16 @@ CODE
 1	2	nil	nil
 OUT
 
+language_output_is( 'lua', <<'CODE', <<'OUT', 'padding with function' );
+function f() print("f") end
+a = 2
+a, b, c = f(), 3
+print(a, b, c)
+CODE
+f
+nil	3	nil
+OUT
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'local variable' );
 j = 10
 local i = 1
@@ -93,6 +103,17 @@ CODE
 1
 10
 2
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'local variable' );
+local i = 1
+local j = i
+print(i, j)
+j = 2
+print(i, j)
+CODE
+1	1
+1	2
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'param & result of function' );

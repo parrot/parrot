@@ -445,7 +445,6 @@ sub BuildAssigns {
         my $expr = shift @{$exprs};
         unless ( defined $expr ) {
             $expr = BuildLiteral( $parser, 'nil', 'nil' );
-            push @opcodes2, @{ $expr->[1] };
         }
         if (    scalar( @{$exprs} ) == 0
             and scalar( @{$vars} ) != 0
@@ -470,12 +469,7 @@ sub BuildAssigns {
         }
         push @opcodes2, @{ $expr->[1] };
         my $assign = $var->[2];
-        if ( $assign->isa('AssignOp') ) {
-            $assign->configure( 'arg1' => $expr->[0], );
-        }
-        else {
-            $assign->configure( 'arg2' => $expr->[0], );
-        }
+        $assign->configure( 'arg2' => $expr->[0] );
         push @opcodes3, $assign;
     }
     push @opcodes1, @opcodes2, @opcodes3;
@@ -894,8 +888,8 @@ sub BuildForNum {
     push @opcodes, @{ $e_start->[1] };
     push @opcodes, @{ $e_limit->[1] };
     push @opcodes, @{ $e_step->[1] };
-    my $_var = new_tmp( $parser, 'pmc', 'number' );
-    push @opcodes, new LocalDir( $parser, 'result' => $_var, );
+    my $_var = $var->[0];
+    push @opcodes, @{ $var->[1] };
     my $_limit = new_tmp( $parser, 'pmc', 'number' );
     push @opcodes, new LocalDir( $parser, 'result' => $_limit, );
     my $_step = new_tmp( $parser, 'pmc', 'number' );
@@ -938,12 +932,6 @@ sub BuildForNum {
         'result' => $lbl_end,
     );
     push @opcodes, new LabelOp( $parser, 'arg1' => $lbl_blk, );
-    push @opcodes, @{ $var->[1] };
-    push @opcodes, new StoreLexOp(
-        $parser,
-        'arg1'   => $var->[0],
-        'arg2'   => $_var,
-    );
 
     foreach my $op ( @{$block} ) {
         if ( $op and $op->isa('BranchOp') ) {
@@ -1067,19 +1055,12 @@ sub BuildForList {
     my @return2 = ();
     @opcodes2 = ();
     for ( @{$vars} ) {
-        my $result = new_tmp( $parser, 'pmc' );
-        push @opcodes1, new LocalDir( $parser, 'result' => $result, );
         push @opcodes1, new NewOp(
             $parser,
-            'result' => $result,
+            'result' => $_->[0],
             'arg1'   => '.LuaNil',
         );
-        push @return2,  $result;
-        push @opcodes2, new StoreLexOp(
-            $parser,
-            'arg1'   => $_->[0],
-            'arg2'   => $result,
-        );
+        push @return2,  $_->[0];
     }
     push @opcodes1, new CallOp(
         $parser,
@@ -1301,11 +1282,6 @@ sub BuildMain {
             'result' => new defn( 'vararg', 'local', 'pmc' ),
             'pragma' => ':slurpy',
         );
-        my $arg = BuildVariable($parser, [ 'arg' ]);
-        my $vararg = [ BuildCallVararg($parser) ];
-        my $val = BuildTable($parser, [ $vararg ]);
-        my $ass = BuildAssigns($parser, [ $arg ], [ $val ]);
-        push @opcodes, @{$ass};
         push @opcodes, @{$stat};
         push @opcodes, new EndDir($parser);
         foreach my $op (@opcodes) {
