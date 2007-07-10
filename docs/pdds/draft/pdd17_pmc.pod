@@ -93,6 +93,18 @@ parrot class :-)
 
 <allison> yes, aliasing across namespaces is allowed
 
+=item *
+
+<particle> we can design a decoration for core pmcs with something that doesn't
+allow override in 'parrot' namespace, if it's wanted.
+
+<pmichaud> particle: I'm not sure it's entirely necessary to have the
+decoration i.e., I'd wait until we find we need it :-)
+
+<particle> sure, it's mostly a change for pmc2c i suspect
+
+  pmclass Foo does bar extends baz is_core {
+
 =back
 
 =head1 DESCRIPTION
