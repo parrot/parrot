@@ -338,7 +338,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
     void* get_pointer_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
-        
+
         if (PMC_IS_NULL(key))
           return PMCNULL;
 
