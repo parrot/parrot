@@ -119,11 +119,18 @@ sub gen_h {
     my ($self)     = @_;
     my $hout       = dont_edit('various files');
     my $lc_libname = lc $self->{opt}{library};
+    my $guardname  = uc(join('_', 'PARROT_LIB', $lc_libname, 'H_GUARD'));
 
     $hout .= <<"EOH";
+
+#ifndef $guardname
+#define $guardname
+
 Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp);
 EOH
     $hout .= $self->c_code_coda;
+
+#endif $guardname
 
     return $hout;
 }
