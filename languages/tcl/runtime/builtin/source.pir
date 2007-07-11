@@ -18,7 +18,9 @@
    __precompiled = get_root_global [ '_tcl' ], 'check_precompiled'
 
 execute:
-  $P1 = __precompiled(filename)
+  push_eh badfile
+    $P1 = __precompiled(filename)
+  clear_eh
   .return $P1()
 
 badfile:
