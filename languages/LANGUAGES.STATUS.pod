@@ -6,7 +6,7 @@ Most language implementations that target parrot are listed here.
 At least the implementations that live in the 'languages' directory
 of the parrot repository should be covered.
 
-No author information is given here. This is because maintainers 
+No author information is given here. This is because maintainers
 should be tracked in the respective languages/*/MAINTAINER files, and we
 don't want to repeat ourselves.
 
@@ -451,9 +451,9 @@ C<languages/lazy-k>
 
 =item Description
 
-Lua 5.1 compiler, implemented in Perl5 with yapp.
+Lua 5.1 interpreter implemented with PGE/TGE/Partridge and friends.
 
-Lua 5.1 Standard Libraries implemented in PIR (still incomplete).
+Lua 5.1 Standard Libraries (a large subset) implemented in PIR.
 
 =item Status
 
@@ -734,7 +734,7 @@ A PIR compiler using Parrot compiler tools.
 =item Status
 
 Fairly complete, about 95%. Note that this implementation is not exactly the same
-as the language as accepted by IMCC. 
+as the language as accepted by IMCC.
 
 =item Last verified with parrot version
 
@@ -1183,4 +1183,4 @@ variables, nested words and classes and (as a result) nested compile-time and
 run-time lexical word, class and variable scopes.
 
 Removed from the repository (C<languages/parakeet>)
-prior to 0.4.10, after having been broken since 0.0.11. 
+prior to 0.4.10, after having been broken since 0.0.11.
