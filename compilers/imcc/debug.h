@@ -21,14 +21,16 @@
 
 /* HEADERIZER BEGIN: compilers/imcc/debug.c */
 
-PARROT_API void IMCC_debug( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_debug( Interp *interp /*NN*/,
     int level,
     const char *fmt /*NN*/,
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API void IMCC_fatal( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_fatal( Interp *interp /*NN*/,
     int code,
     const char *fmt /*NN*/,
     ... )
@@ -36,14 +38,16 @@ PARROT_API void IMCC_fatal( Interp *interp /*NN*/,
         __attribute__nonnull__(3)
         __attribute__noreturn__;
 
-PARROT_API void IMCC_fatal_standalone( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_fatal_standalone( Interp *interp /*NN*/,
     int code,
     const char *fmt /*NN*/,
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API void IMCC_fataly( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_fataly( Interp *interp /*NN*/,
     int code,
     const char *fmt /*NN*/,
     ... )
@@ -51,23 +55,24 @@ PARROT_API void IMCC_fataly( Interp *interp /*NN*/,
         __attribute__nonnull__(3)
         __attribute__noreturn__;
 
-PARROT_API void IMCC_fataly_standalone( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_fataly_standalone( Interp *interp /*NN*/,
     int code,
     const char *fmt /*NN*/,
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API void IMCC_info( Interp *interp /*NN*/,
+PARROT_API
+void IMCC_info( Interp *interp /*NN*/,
     int level,
     const char *fmt /*NN*/,
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API void IMCC_warning( Interp *interp /*NN*/,
-    const char *fmt /*NN*/,
-    ... )
+PARROT_API
+void IMCC_warning( Interp *interp /*NN*/, const char *fmt /*NN*/, ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

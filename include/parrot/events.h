@@ -80,37 +80,49 @@ struct QUEUE_ENTRY;
 
 /* HEADERIZER BEGIN: src/events.c */
 
-PARROT_API void Parrot_del_timer_event( Interp *interp, PMC *timer );
-PARROT_API opcode_t * Parrot_do_check_events( Interp *interp /*NN*/,
-    opcode_t *next )
+PARROT_API
+void Parrot_del_timer_event( Interp *interp, PMC *timer );
+
+PARROT_API
+opcode_t * Parrot_do_check_events( Interp *interp /*NN*/, opcode_t *next )
         __attribute__nonnull__(1);
 
-PARROT_API opcode_t * Parrot_do_handle_events( Interp *interp /*NN*/,
+PARROT_API
+opcode_t * Parrot_do_handle_events( Interp *interp /*NN*/,
     int restore,
     opcode_t *next )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_event_add_io_event( Interp *interp,
+PARROT_API
+void Parrot_event_add_io_event( Interp *interp,
     PMC *pio,
     PMC *sub,
     PMC *data,
     INTVAL which );
 
-PARROT_API void Parrot_init_events( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_init_events( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_init_signals( void );
-PARROT_API void Parrot_kill_event_loop( void );
-PARROT_API void Parrot_new_cb_event( Interp *interp /*NN*/,
-    PMC *cbi,
-    char *ext )
+PARROT_API
+void Parrot_init_signals( void );
+
+PARROT_API
+void Parrot_kill_event_loop( void );
+
+PARROT_API
+void Parrot_new_cb_event( Interp *interp /*NN*/, PMC *cbi, char *ext )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_new_suspend_for_gc_event( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_new_suspend_for_gc_event( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_new_terminate_event( Interp *interp );
-PARROT_API void Parrot_new_timer_event( Interp *interp,
+PARROT_API
+void Parrot_new_terminate_event( Interp *interp );
+
+PARROT_API
+void Parrot_new_timer_event( Interp *interp,
     PMC *timer,
     FLOATVAL diff,
     FLOATVAL interval,
@@ -118,16 +130,18 @@ PARROT_API void Parrot_new_timer_event( Interp *interp,
     PMC *sub,
     parrot_event_type_enum typ );
 
-PARROT_API void Parrot_schedule_event( Interp *interp,
-    parrot_event* ev /*NN*/ )
+PARROT_API
+void Parrot_schedule_event( Interp *interp, parrot_event* ev /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void Parrot_schedule_interp_qentry( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_schedule_interp_qentry( Interp *interp /*NN*/,
     struct QUEUE_ENTRY *entry /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API opcode_t * Parrot_sleep_on_event( Interp *interp /*NN*/,
+PARROT_API
+opcode_t * Parrot_sleep_on_event( Interp *interp /*NN*/,
     FLOATVAL t,
     opcode_t *next )
         __attribute__nonnull__(1);

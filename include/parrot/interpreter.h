@@ -489,13 +489,15 @@ PARROT_API void Parrot_destroy(Interp *);
 
 /* HEADERIZER BEGIN: src/inter_run.c */
 
-PARROT_API void * Parrot_run_meth_fromc( Interp *interp /*NN*/,
+PARROT_API
+void * Parrot_run_meth_fromc( Interp *interp /*NN*/,
     PMC *sub,
     PMC *obj,
     STRING *meth )
         __attribute__nonnull__(1);
 
-PARROT_API void* Parrot_run_meth_fromc_arglist(
+PARROT_API
+void* Parrot_run_meth_fromc_arglist(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -503,7 +505,8 @@ PARROT_API void* Parrot_run_meth_fromc_arglist(
     const char *sig,
     va_list args );
 
-PARROT_API FLOATVAL Parrot_run_meth_fromc_arglist_retf(
+PARROT_API
+FLOATVAL Parrot_run_meth_fromc_arglist_retf(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -511,7 +514,8 @@ PARROT_API FLOATVAL Parrot_run_meth_fromc_arglist_retf(
     const char *sig,
     va_list args );
 
-PARROT_API INTVAL Parrot_run_meth_fromc_arglist_reti(
+PARROT_API
+INTVAL Parrot_run_meth_fromc_arglist_reti(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -519,7 +523,8 @@ PARROT_API INTVAL Parrot_run_meth_fromc_arglist_reti(
     const char *sig,
     va_list args );
 
-PARROT_API void* Parrot_run_meth_fromc_args(
+PARROT_API
+void* Parrot_run_meth_fromc_args(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -527,7 +532,8 @@ PARROT_API void* Parrot_run_meth_fromc_args(
     const char *sig,
     ... );
 
-PARROT_API FLOATVAL Parrot_run_meth_fromc_args_retf(
+PARROT_API
+FLOATVAL Parrot_run_meth_fromc_args_retf(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -535,7 +541,8 @@ PARROT_API FLOATVAL Parrot_run_meth_fromc_args_retf(
     const char *sig,
     ... );
 
-PARROT_API INTVAL Parrot_run_meth_fromc_args_reti(
+PARROT_API
+INTVAL Parrot_run_meth_fromc_args_reti(
     Parrot_Interp interp,
     PMC *sub,
     PMC *obj,
@@ -543,47 +550,54 @@ PARROT_API INTVAL Parrot_run_meth_fromc_args_reti(
     const char *sig,
     ... );
 
-PARROT_API parrot_context_t * Parrot_runops_fromc( Interp *interp /*NN*/,
-    PMC *sub )
+PARROT_API
+parrot_context_t * Parrot_runops_fromc( Interp *interp /*NN*/, PMC *sub )
         __attribute__nonnull__(1);
 
-PARROT_API void * Parrot_runops_fromc_arglist(
+PARROT_API
+void * Parrot_runops_fromc_arglist(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     va_list args );
 
-PARROT_API FLOATVAL Parrot_runops_fromc_arglist_retf(
+PARROT_API
+FLOATVAL Parrot_runops_fromc_arglist_retf(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     va_list args );
 
-PARROT_API INTVAL Parrot_runops_fromc_arglist_reti(
+PARROT_API
+INTVAL Parrot_runops_fromc_arglist_reti(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     va_list args );
 
-PARROT_API PMC * Parrot_runops_fromc_args(
+PARROT_API
+PMC * Parrot_runops_fromc_args(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     ... );
 
-PARROT_API void * Parrot_runops_fromc_args_event(
+PARROT_API
+void * Parrot_runops_fromc_args_event(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     ... );
 
-PARROT_API FLOATVAL Parrot_runops_fromc_args_retf(
+PARROT_API
+FLOATVAL Parrot_runops_fromc_args_retf(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,
     ... );
 
-PARROT_API INTVAL Parrot_runops_fromc_args_reti(
+PARROT_API
+INTVAL Parrot_runops_fromc_args_reti(
     Parrot_Interp interp,
     PMC *sub,
     const char *sig,

@@ -19,7 +19,8 @@
 
 /* HEADERIZER BEGIN: src/global_setup.c */
 
-PARROT_API void Parrot_set_config_hash_internal(
+PARROT_API
+void Parrot_set_config_hash_internal(
     const unsigned char* parrot_config /*NN*/,
     unsigned int parrot_config_size )
         __attribute__nonnull__(1);

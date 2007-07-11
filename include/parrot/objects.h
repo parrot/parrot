@@ -30,17 +30,20 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/objects.c */
 
-PARROT_API INTVAL Parrot_add_attribute( Interp *interp,
-    PMC* _class,
-    STRING* attr );
+PARROT_API
+INTVAL Parrot_add_attribute( Interp *interp, PMC* _class, STRING* attr );
 
-PARROT_API void Parrot_add_parent( Interp *interp, PMC *_class, PMC *parent );
-PARROT_API PMC * Parrot_class_lookup( Interp *interp, STRING *class_name );
-PARROT_API INTVAL Parrot_class_offset( Interp *interp,
-    PMC *object,
-    STRING *_class );
+PARROT_API
+void Parrot_add_parent( Interp *interp, PMC *_class, PMC *parent );
 
-PARROT_API void Parrot_ComposeRole( Interp *interp,
+PARROT_API
+PMC * Parrot_class_lookup( Interp *interp, STRING *class_name );
+
+PARROT_API
+INTVAL Parrot_class_offset( Interp *interp, PMC *object, STRING *_class );
+
+PARROT_API
+void Parrot_ComposeRole( Interp *interp,
     PMC *role,
     PMC *exclude,
     int got_exclude,
@@ -49,108 +52,130 @@ PARROT_API void Parrot_ComposeRole( Interp *interp,
     PMC *methods_hash,
     PMC *roles_list );
 
-PARROT_API PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
-PARROT_API PMC * Parrot_find_class_constructor( Interp *interp,
+PARROT_API
+PMC* Parrot_ComputeMRO_C3( Interp *interp, PMC *_class );
+
+PARROT_API
+PMC * Parrot_find_class_constructor( Interp *interp,
     STRING *_class,
     INTVAL classtoken );
 
-PARROT_API PMC * Parrot_find_class_destructor( Interp *interp,
+PARROT_API
+PMC * Parrot_find_class_destructor( Interp *interp,
     STRING *_class,
     INTVAL classtoken );
 
-PARROT_API PMC * Parrot_find_class_fallback( Interp *interp,
+PARROT_API
+PMC * Parrot_find_class_fallback( Interp *interp,
     STRING *_class,
     INTVAL classtoken );
 
-PARROT_API PMC * Parrot_find_method_direct( Interp *interp,
+PARROT_API
+PMC * Parrot_find_method_direct( Interp *interp,
     PMC *_class,
     STRING *method_name );
 
-PARROT_API PMC * Parrot_find_method_with_cache( Interp *interp,
+PARROT_API
+PMC * Parrot_find_method_with_cache( Interp *interp,
     PMC *_class,
     STRING *method_name /*NN*/ )
         __attribute__nonnull__(3);
 
-PARROT_API PMC* Parrot_find_vtable_meth( Interp *interp,
-    PMC *pmc /*NN*/,
-    STRING *meth )
+PARROT_API
+PMC* Parrot_find_vtable_meth( Interp *interp, PMC *pmc /*NN*/, STRING *meth )
         __attribute__nonnull__(2);
 
-PARROT_API PMC * Parrot_get_attrib_by_num( Interp *interp,
-    PMC *object,
-    INTVAL attrib );
+PARROT_API
+PMC * Parrot_get_attrib_by_num( Interp *interp, PMC *object, INTVAL attrib );
 
-PARROT_API PMC * Parrot_get_attrib_by_str( Interp *interp,
-    PMC *object,
-    STRING *attr );
+PARROT_API
+PMC * Parrot_get_attrib_by_str( Interp *interp, PMC *object, STRING *attr );
 
-PARROT_API INTVAL Parrot_get_vtable_index( Interp *interp,
-    const STRING *name /*NN*/ )
+PARROT_API
+INTVAL Parrot_get_vtable_index( Interp *interp, const STRING *name /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void Parrot_instantiate_object( Interp *interp, PMC *object );
-PARROT_API void Parrot_instantiate_object_init( Interp *interp,
-    PMC *object,
-    PMC *init );
+PARROT_API
+void Parrot_instantiate_object( Interp *interp, PMC *object );
 
-PARROT_API void Parrot_invalidate_method_cache( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_instantiate_object_init( Interp *interp, PMC *object, PMC *init );
+
+PARROT_API
+void Parrot_invalidate_method_cache( Interp *interp /*NN*/,
     STRING *_class,
     STRING *meth )
         __attribute__nonnull__(1);
 
-PARROT_API INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
+PARROT_API
+INTVAL Parrot_MMD_method_idx( Interp *interp, const char *name )
         __attribute__warn_unused_result__
         __attribute__pure__;
 
-PARROT_API const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx )
+PARROT_API
+const char* Parrot_MMD_method_name( Interp *interp, INTVAL idx )
         __attribute__warn_unused_result__
         __attribute__pure__;
 
-PARROT_API PMC * Parrot_multi_subclass( Interp *interp,
+PARROT_API
+PMC * Parrot_multi_subclass( Interp *interp,
     PMC *base_class_array,
     STRING *child_class_name );
 
-PARROT_API void Parrot_new_class( Interp *interp, PMC *_class, PMC *name );
-PARROT_API PMC * Parrot_new_method_cache( Interp *interp );
-PARROT_API void Parrot_note_method_offset( Interp *interp,
-    UINTVAL offset,
-    PMC *method );
+PARROT_API
+void Parrot_new_class( Interp *interp, PMC *_class, PMC *name );
 
-PARROT_API INTVAL Parrot_object_isa( Interp *interp, PMC *pmc, PMC *_class );
-PARROT_API PMC * Parrot_remove_parent( Interp *interp,
+PARROT_API
+PMC * Parrot_new_method_cache( Interp *interp );
+
+PARROT_API
+void Parrot_note_method_offset( Interp *interp, UINTVAL offset, PMC *method );
+
+PARROT_API
+INTVAL Parrot_object_isa( Interp *interp, PMC *pmc, PMC *_class );
+
+PARROT_API
+PMC * Parrot_remove_parent( Interp *interp,
     PMC *removed_class,
     PMC *existing_class );
 
-PARROT_API void Parrot_set_attrib_by_num( Interp *interp,
+PARROT_API
+void Parrot_set_attrib_by_num( Interp *interp,
     PMC *object,
     INTVAL attrib,
     PMC *value );
 
-PARROT_API void Parrot_set_attrib_by_str( Interp *interp,
+PARROT_API
+void Parrot_set_attrib_by_str( Interp *interp,
     PMC *object,
     STRING *attr,
     PMC *value );
 
-PARROT_API void Parrot_set_class_constructor( Interp *interp,
+PARROT_API
+void Parrot_set_class_constructor( Interp *interp,
     STRING *_class,
     INTVAL classtoken,
     STRING *method );
 
-PARROT_API void Parrot_set_class_destructor( Interp *interp,
+PARROT_API
+void Parrot_set_class_destructor( Interp *interp,
     STRING *_class,
     INTVAL classtoken,
     STRING *method );
 
-PARROT_API void Parrot_set_class_fallback( Interp *interp,
+PARROT_API
+void Parrot_set_class_fallback( Interp *interp,
     STRING *_class,
     INTVAL classtoken,
     STRING *method );
 
-PARROT_API PMC * Parrot_single_subclass( Interp *interp,
+PARROT_API
+PMC * Parrot_single_subclass( Interp *interp,
     PMC *base_class,
     PMC *name /*NULLOK*/ );
 
-PARROT_API STRING* readable_name( Interp *interp, PMC *name /*NN*/ )
+PARROT_API
+STRING* readable_name( Interp *interp, PMC *name /*NN*/ )
         __attribute__nonnull__(2);
 
 void destroy_object_cache( Interp *interp /*NN*/ )

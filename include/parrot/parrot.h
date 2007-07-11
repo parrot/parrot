@@ -260,6 +260,16 @@ typedef void (*funcptr_t)(void);
  */
 #define UNUSED(a) if (0) (void)(a);
 
+#define PARROT_CAN_RETURN_NULL      /*@null@*/
+#define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
+#define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
+#define PARROT_PURE_FUNCTION        __attribute__pure__
+#define PARROT_CONST_FUNCTION       __attribute__const__
+#define PARROT_MALLOC               __attribute__malloc__
+
+#define NOTNULL(x)                  /*@notnull@*/ x
+#define NULLOK(x)                   /*@null@*/ x
+
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d,s)    assert(d);assert(s);*(d)=*(s);
 #define STRUCT_COPY_N(d,s,n) assert(d);assert(s);assert(sizeof(*d)==sizeof(*s));memcpy((d),(s),sizeof(*d)*(n));

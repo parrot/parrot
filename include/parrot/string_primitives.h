@@ -17,10 +17,11 @@
 
 /* HEADERIZER BEGIN: src/string_primitives.c */
 
-PARROT_API UINTVAL Parrot_char_digit_value( Interp *interp,
-    UINTVAL character );
+PARROT_API
+UINTVAL Parrot_char_digit_value( Interp *interp, UINTVAL character );
 
-PARROT_API void string_fill_from_buffer( PARROT_INTERP,
+PARROT_API
+void string_fill_from_buffer( PARROT_INTERP,
     const void *buffer /*NN*/,
     UINTVAL len,
     const char *encoding_name,
@@ -28,10 +29,12 @@ PARROT_API void string_fill_from_buffer( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API void string_set_data_directory( PARROT_INTERP, const char *dir )
+PARROT_API
+void string_set_data_directory( PARROT_INTERP, const char *dir )
         __attribute__nonnull__(1);
 
-PARROT_API Parrot_UInt4 string_unescape_one( PARROT_INTERP,
+PARROT_API
+Parrot_UInt4 string_unescape_one( PARROT_INTERP,
     UINTVAL *offset /*NN*/,
     STRING *string )
         __attribute__nonnull__(1)

@@ -29,14 +29,16 @@ typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 
 /* HEADERIZER BEGIN: src/utils.c */
 
-PARROT_API INTVAL Parrot_byte_index( Interp *interp,
+PARROT_API
+INTVAL Parrot_byte_index( Interp *interp,
     const STRING *base /*NN*/,
     const STRING *search /*NN*/,
     UINTVAL start_offset )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API INTVAL Parrot_byte_rindex( Interp *interp,
+PARROT_API
+INTVAL Parrot_byte_rindex( Interp *interp,
     const STRING *base /*NN*/,
     const STRING *search /*NN*/,
     UINTVAL start_offset )
@@ -44,23 +46,32 @@ PARROT_API INTVAL Parrot_byte_rindex( Interp *interp,
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-PARROT_API void Parrot_destroy_cpa( char **array /*NN*/ )
+PARROT_API
+void Parrot_destroy_cpa( char **array /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_destroy_la( long *array );
-PARROT_API FLOATVAL Parrot_float_rand( INTVAL how_random );
-PARROT_API INTVAL Parrot_int_rand( INTVAL how_random );
-PARROT_API void * Parrot_make_cpa( Interp *interp, PMC *array );
-PARROT_API void * Parrot_make_la( Interp *interp, PMC *array /*NN*/ )
+PARROT_API
+void Parrot_destroy_la( long *array );
+
+PARROT_API
+FLOATVAL Parrot_float_rand( INTVAL how_random );
+
+PARROT_API
+INTVAL Parrot_int_rand( INTVAL how_random );
+
+PARROT_API
+void * Parrot_make_cpa( Interp *interp, PMC *array );
+
+PARROT_API
+void * Parrot_make_la( Interp *interp, PMC *array /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-PARROT_API INTVAL Parrot_range_rand(
-    INTVAL from,
-    INTVAL to,
-    INTVAL how_random );
+PARROT_API
+INTVAL Parrot_range_rand( INTVAL from, INTVAL to, INTVAL how_random );
 
-PARROT_API void Parrot_register_move( Interp *interp,
+PARROT_API
+void Parrot_register_move( Interp *interp,
     int n_regs,
     unsigned char *dest_regs /*NN*/,
     unsigned char *src_regs /*NN*/,
@@ -71,11 +82,14 @@ PARROT_API void Parrot_register_move( Interp *interp,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-PARROT_API void Parrot_srand( INTVAL seed );
-PARROT_API INTVAL Parrot_uint_rand( INTVAL how_random );
-PARROT_API PMC* tm_to_array(
-    Parrot_Interp interp,
-    const struct tm *tm /*NN*/ )
+PARROT_API
+void Parrot_srand( INTVAL seed );
+
+PARROT_API
+INTVAL Parrot_uint_rand( INTVAL how_random );
+
+PARROT_API
+PMC* tm_to_array( Parrot_Interp interp, const struct tm *tm /*NN*/ )
         __attribute__nonnull__(2);
 
 FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )
@@ -91,6 +105,7 @@ INTVAL intval_mod( INTVAL i2, INTVAL i3 )
 
 /*
  * IMCC API
+ * XXX These should go into another file, not seen by libparrot
  */
 void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
         STRING **error_message);
@@ -103,15 +118,15 @@ PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
 
 /* HEADERIZER BEGIN: src/misc.c */
 
-PARROT_API STRING * Parrot_psprintf( Interp *interp /*NN*/,
-    STRING *pat /*NN*/,
-    PMC *ary /*NN*/ )
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_psprintf( PARROT_INTERP, STRING *pat /*NN*/, PMC *ary /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
-PARROT_API void Parrot_snprintf( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_snprintf( PARROT_INTERP,
     char *targ /*NN*/,
     size_t len,
     const char *pat /*NN*/,
@@ -120,21 +135,20 @@ PARROT_API void Parrot_snprintf( Interp *interp /*NN*/,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-PARROT_API STRING * Parrot_sprintf_c( Interp *interp /*NN*/,
-    const char *pat /*NN*/,
-    ... )
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_sprintf_c( PARROT_INTERP, NOTNULL(const char *pat), ... )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-PARROT_API STRING * Parrot_sprintf_s( Interp *interp /*NN*/,
-    STRING *pat /*NN*/,
-    ... )
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_sprintf_s( PARROT_INTERP, STRING *pat /*NN*/, ... )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-PARROT_API void Parrot_vsnprintf( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_vsnprintf( PARROT_INTERP,
     char *targ /*NN*/,
     size_t len,
     const char *pat /*NN*/,
@@ -143,19 +157,18 @@ PARROT_API void Parrot_vsnprintf( Interp *interp /*NN*/,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-PARROT_API STRING * Parrot_vsprintf_c( Interp *interp /*NN*/,
+PARROT_API
+STRING * Parrot_vsprintf_c( PARROT_INTERP,
     const char *pat /*NN*/,
     va_list args )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-PARROT_API STRING * Parrot_vsprintf_s( Interp *interp /*NN*/,
-    STRING *pat /*NN*/,
-    va_list args )
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_vsprintf_s( PARROT_INTERP, STRING *pat /*NN*/, va_list args )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/misc.c */
 
@@ -249,7 +262,7 @@ PARROT_API STRING * Parrot_vsprintf_s( Interp *interp /*NN*/,
 
 /* HEADERIZER BEGIN: src/spf_render.c */
 
-STRING * Parrot_sprintf_format( Interp *interp /*NN*/,
+STRING * Parrot_sprintf_format( PARROT_INTERP,
     STRING *pat /*NN*/,
     SPRINTF_OBJ *obj /*NN*/ )
         __attribute__nonnull__(1)

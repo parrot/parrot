@@ -87,21 +87,24 @@ typedef struct _visit_info {
 
 /* HEADERIZER BEGIN: src/pmc_freeze.c */
 
-PARROT_API PMC* Parrot_clone( Parrot_Interp interp /*NN*/, PMC* pmc )
+PARROT_API
+PMC* Parrot_clone( Parrot_Interp interp /*NN*/, PMC* pmc )
         __attribute__nonnull__(1);
 
-PARROT_API STRING* Parrot_freeze( Parrot_Interp interp /*NN*/, PMC* pmc )
+PARROT_API
+STRING* Parrot_freeze( Parrot_Interp interp /*NN*/, PMC* pmc )
         __attribute__nonnull__(1);
 
-PARROT_API STRING* Parrot_freeze_at_destruct(
-    Parrot_Interp interp /*NN*/,
-    PMC* pmc )
+PARROT_API
+STRING* Parrot_freeze_at_destruct( Parrot_Interp interp /*NN*/, PMC* pmc )
         __attribute__nonnull__(1);
 
-PARROT_API PMC* Parrot_thaw( Parrot_Interp interp /*NN*/, STRING* image )
+PARROT_API
+PMC* Parrot_thaw( Parrot_Interp interp /*NN*/, STRING* image )
         __attribute__nonnull__(1);
 
-PARROT_API PMC* Parrot_thaw_constants(
+PARROT_API
+PMC* Parrot_thaw_constants(
     Parrot_Interp interp /*NN*/,
     STRING* image /*NN*/ )
         __attribute__nonnull__(1)

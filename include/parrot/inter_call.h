@@ -70,22 +70,23 @@ typedef enum arg_pass_t {
 
 /* HEADERIZER BEGIN: src/inter_call.c */
 
-PARROT_API void Parrot_convert_arg( Interp *interp /*NN*/,
-    call_state *st /*NN*/ )
+PARROT_API
+void Parrot_convert_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API int Parrot_fetch_arg( Interp *interp /*NN*/,
-    call_state *st /*NN*/ )
+PARROT_API
+int Parrot_fetch_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API int Parrot_fetch_arg_nci( Interp *interp /*NN*/,
-    call_state *st /*NN*/ )
+PARROT_API
+int Parrot_fetch_arg_nci( Interp *interp /*NN*/, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
+PARROT_API
+int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
     parrot_context_t *ctx /*NN*/,
     opcode_t *indexes /*NN*/,
     PMC* sig_pmc /*NN*/,
@@ -95,21 +96,24 @@ PARROT_API int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API int Parrot_init_arg_nci( Interp *interp /*NN*/,
+PARROT_API
+int Parrot_init_arg_nci( Interp *interp /*NN*/,
     call_state *st /*NN*/,
     const char *sig /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API int Parrot_init_arg_op( Interp *interp,
+PARROT_API
+int Parrot_init_arg_op( Interp *interp,
     parrot_context_t *ctx /*NN*/,
     opcode_t *pc /*NULLOK*/,
     call_state_item *sti /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-PARROT_API int Parrot_init_arg_sig( Interp *interp,
+PARROT_API
+int Parrot_init_arg_sig( Interp *interp,
     parrot_context_t *ctx,
     const char *sig /*NN*/,
     void *ap,
@@ -117,14 +121,16 @@ PARROT_API int Parrot_init_arg_sig( Interp *interp,
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
-PARROT_API int Parrot_init_ret_nci( Interp *interp /*NN*/,
+PARROT_API
+int Parrot_init_ret_nci( Interp *interp /*NN*/,
     call_state *st /*NN*/,
     const char *sig /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API void parrot_pass_args( Interp *interp /*NN*/,
+PARROT_API
+void parrot_pass_args( Interp *interp /*NN*/,
     parrot_context_t *src_ctx /*NN*/,
     parrot_context_t *dest_ctx /*NN*/,
     opcode_t *src_indexes /*NN*/,
@@ -136,13 +142,15 @@ PARROT_API void parrot_pass_args( Interp *interp /*NN*/,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API void Parrot_PCCINVOKE( Interp* interp,
+PARROT_API
+void Parrot_PCCINVOKE( Interp* interp,
     PMC* pmc,
     STRING *method_name,
     const char *signature,
     ... );
 
-PARROT_API void Parrot_process_args( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_process_args( Interp *interp /*NN*/,
     call_state *st /*NN*/,
     arg_pass_t param_or_result )
         __attribute__nonnull__(1)

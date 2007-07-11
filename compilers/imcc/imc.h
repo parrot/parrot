@@ -69,13 +69,16 @@
 
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 
-PARROT_API void imc_cleanup( Interp *interp /*NN*/, void *yyscanner )
+PARROT_API
+void imc_cleanup( Interp *interp /*NN*/, void *yyscanner )
         __attribute__nonnull__(1);
 
-PARROT_API void imc_compile_all_units( Interp *interp /*NN*/ )
+PARROT_API
+void imc_compile_all_units( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void imc_compile_unit( Interp *interp /*NN*/, IMC_Unit *unit )
+PARROT_API
+void imc_compile_unit( Interp *interp /*NN*/, IMC_Unit *unit )
         __attribute__nonnull__(1);
 
 void imc_close_unit( Interp *interp, IMC_Unit *unit /*NULLOK*/ );
@@ -124,13 +127,16 @@ Instruction * INS_LABEL( Interp *interp /*NN*/,
 
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 
-PARROT_API int do_yylex_init( Interp* interp, yyscan_t* yyscanner /*NN*/ )
+PARROT_API
+int do_yylex_init( Interp* interp, yyscan_t* yyscanner /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void imcc_destroy( Interp *interp /*NN*/ )
+PARROT_API
+void imcc_destroy( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void imcc_init( Interp *interp /*NN*/ )
+PARROT_API
+void imcc_init( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
 int check_op( Interp *interp /*NN*/,

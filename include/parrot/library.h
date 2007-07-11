@@ -35,18 +35,21 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/library.c */
 
-PARROT_API char* Parrot_get_runtime_prefix( Interp *interp /*NN*/,
+PARROT_API
+char* Parrot_get_runtime_prefix( Interp *interp /*NN*/,
     STRING **prefix_str /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-PARROT_API char* Parrot_locate_runtime_file( Interp *interp /*NN*/,
+PARROT_API
+char* Parrot_locate_runtime_file( Interp *interp /*NN*/,
     const char *file_name /*NN*/,
     enum_runtime_ft type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-PARROT_API STRING* Parrot_locate_runtime_file_str( Interp *interp /*NN*/,
+PARROT_API
+STRING* Parrot_locate_runtime_file_str( Interp *interp /*NN*/,
     STRING *file /*NN*/,
     enum_runtime_ft type )
         __attribute__nonnull__(1)

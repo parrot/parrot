@@ -33,7 +33,7 @@ static void gen_sprintf_call(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * handle_flags( Interp *interp /*NN*/,
+static STRING * handle_flags( PARROT_INTERP,
     SpfInfo info,
     STRING *str /*NN*/,
     INTVAL is_int_type,
@@ -41,7 +41,7 @@ static STRING * handle_flags( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static STRING* str_append_w_flags( Interp *interp /*NN*/,
+static STRING* str_append_w_flags( PARROT_INTERP,
     STRING* dest /*NN*/,
     SpfInfo info,
     STRING* src /*NN*/,
@@ -69,7 +69,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 */
 
 static STRING *
-handle_flags(Interp *interp /*NN*/,
+handle_flags(PARROT_INTERP,
              SpfInfo info, STRING *str /*NN*/, INTVAL is_int_type, STRING* prefix /*NULLOK*/)
 {
     UINTVAL len = string_length(interp, str);
@@ -159,7 +159,7 @@ handle_flags(Interp *interp /*NN*/,
 }
 
 static STRING*
-str_append_w_flags(Interp *interp /*NN*/,
+str_append_w_flags(PARROT_INTERP,
         STRING* dest /*NN*/, SpfInfo info, STRING* src /*NN*/, STRING *prefix /*NULLOK*/)
 {
     src = handle_flags(interp, info, src, 1, prefix);
@@ -236,7 +236,7 @@ This is the engine that does all the formatting.
 */
 
 STRING *
-Parrot_sprintf_format(Interp *interp /*NN*/,
+Parrot_sprintf_format(PARROT_INTERP,
         STRING *pat /*NN*/, SPRINTF_OBJ *obj /*NN*/)
     /* WARN_UNUSED */
 {

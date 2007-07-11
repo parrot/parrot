@@ -46,7 +46,8 @@ struct longopt_opt_info {
 
 /* HEADERIZER BEGIN: src/longopt.c */
 
-PARROT_API int longopt_get( Interp *interp /*NN*/,
+PARROT_API
+int longopt_get( Interp *interp /*NN*/,
     int argc,
     char* argv[] /*NN*/,
     const struct longopt_opt_decl options[] /*NN*/,

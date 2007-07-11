@@ -38,80 +38,90 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/key.c */
 
-PARROT_API PMC * key_append( Interp *interp,
-    PMC *key1 /*NN*/,
-    PMC *key2 /*NN*/ )
+PARROT_API
+PMC * key_append( Interp *interp, PMC *key1 /*NN*/, PMC *key2 /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API INTVAL key_integer( Interp *interp, PMC *key /*NN*/ )
+PARROT_API
+INTVAL key_integer( Interp *interp, PMC *key /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void key_mark( Interp *interp /*NN*/, PMC *key /*NN*/ )
+PARROT_API
+void key_mark( Interp *interp /*NN*/, PMC *key /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API PMC * key_new( Interp *interp /*NN*/ )
+PARROT_API
+PMC * key_new( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_new_cstring( Interp *interp /*NN*/,
-    const char *value /*NULLOK*/ )
+PARROT_API
+PMC * key_new_cstring( Interp *interp /*NN*/, const char *value /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_new_integer( Interp *interp /*NN*/, INTVAL value )
+PARROT_API
+PMC * key_new_integer( Interp *interp /*NN*/, INTVAL value )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_new_number( Interp *interp /*NN*/, FLOATVAL value )
+PARROT_API
+PMC * key_new_number( Interp *interp /*NN*/, FLOATVAL value )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_new_pmc( Interp *interp /*NN*/, PMC *value )
+PARROT_API
+PMC * key_new_pmc( Interp *interp /*NN*/, PMC *value )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_new_string( Interp *interp /*NN*/, STRING *value )
+PARROT_API
+PMC * key_new_string( Interp *interp /*NN*/, STRING *value )
         __attribute__nonnull__(1);
 
-PARROT_API PMC * key_next( Interp *interp, PMC *key /*NN*/ )
+PARROT_API
+PMC * key_next( Interp *interp, PMC *key /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API FLOATVAL key_number( Interp *interp, PMC *key /*NN*/ )
+PARROT_API
+FLOATVAL key_number( Interp *interp, PMC *key /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API PMC * key_pmc( Interp *interp, PMC *key /*NN*/ )
+PARROT_API
+PMC * key_pmc( Interp *interp, PMC *key /*NN*/ )
         __attribute__nonnull__(2);
 
-PARROT_API void key_set_integer( Interp *interp,
-    PMC *key /*NN*/,
-    INTVAL value )
+PARROT_API
+void key_set_integer( Interp *interp, PMC *key /*NN*/, INTVAL value )
         __attribute__nonnull__(2);
 
-PARROT_API void key_set_number( Interp *interp,
-    PMC *key /*NN*/,
-    FLOATVAL value )
+PARROT_API
+void key_set_number( Interp *interp, PMC *key /*NN*/, FLOATVAL value )
         __attribute__nonnull__(2);
 
-PARROT_API void key_set_pmc( Interp *interp, PMC *key /*NN*/, PMC *value )
+PARROT_API
+void key_set_pmc( Interp *interp, PMC *key /*NN*/, PMC *value )
         __attribute__nonnull__(2);
 
-PARROT_API void key_set_register( Interp *interp,
+PARROT_API
+void key_set_register( Interp *interp,
     PMC *key /*NN*/,
     INTVAL value,
     INTVAL flag )
         __attribute__nonnull__(2);
 
-PARROT_API void key_set_string( Interp *interp,
-    PMC *key /*NN*/,
-    STRING *value )
+PARROT_API
+void key_set_string( Interp *interp, PMC *key /*NN*/, STRING *value )
         __attribute__nonnull__(2);
 
-PARROT_API STRING * key_set_to_string( Interp *interp /*NN*/,
-    PMC *key /*NULLOK*/ )
+PARROT_API
+STRING * key_set_to_string( Interp *interp /*NN*/, PMC *key /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-PARROT_API STRING * key_string( Interp *interp /*NN*/, PMC *key /*NN*/ )
+PARROT_API
+STRING * key_string( Interp *interp /*NN*/, PMC *key /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API INTVAL key_type( Interp *interp, const PMC *key /*NN*/ )
+PARROT_API
+INTVAL key_type( Interp *interp, const PMC *key /*NN*/ )
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/key.c */

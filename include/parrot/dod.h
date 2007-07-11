@@ -50,37 +50,45 @@
 
 /* HEADERIZER BEGIN: src/gc/dod.c */
 
-PARROT_API void Parrot_do_dod_run( Interp *interp /*NN*/, UINTVAL flags )
+PARROT_API
+void Parrot_do_dod_run( Interp *interp /*NN*/, UINTVAL flags )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_clear_live_bits( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_dod_clear_live_bits( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_ms_run( Interp *interp /*NN*/, int flags )
+PARROT_API
+void Parrot_dod_ms_run( Interp *interp /*NN*/, int flags )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_ms_run_init( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_dod_ms_run_init( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_profile_end( Interp *interp /*NN*/, int what )
+PARROT_API
+void Parrot_dod_profile_end( Interp *interp /*NN*/, int what )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_profile_start( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_dod_profile_start( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_dod_sweep( Interp *interp /*NN*/,
-    Small_Object_Pool *pool /*NN*/ )
+PARROT_API
+void Parrot_dod_sweep( Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API int Parrot_dod_trace_children( Interp *interp /*NN*/,
-    size_t how_many )
+PARROT_API
+int Parrot_dod_trace_children( Interp *interp /*NN*/, size_t how_many )
         __attribute__nonnull__(1);
 
-PARROT_API int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
+PARROT_API
+int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
         __attribute__nonnull__(1);
 
-PARROT_API void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
+PARROT_API
+void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -115,11 +123,12 @@ extern int CONSERVATIVE_POINTER_CHASING;
 /* GC subsystem init functions */
 /* HEADERIZER BEGIN: src/gc/gc_gms.c */
 
-PARROT_API void Parrot_gc_gms_init( Interp* interp /*NN*/ )
+PARROT_API
+void Parrot_gc_gms_init( Interp* interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void parrot_gc_gms_pobject_lives( Interp* interp /*NN*/,
-    PObj *obj /*NN*/ )
+PARROT_API
+void parrot_gc_gms_pobject_lives( Interp* interp /*NN*/, PObj *obj /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -137,8 +146,11 @@ void parrot_gc_gms_wb_key( Interp *interp,
 
 /* HEADERIZER BEGIN: src/gc/gc_ims.c */
 
-PARROT_API void Parrot_dod_ims_wb( Interp* interp, PMC *agg, PMC *_new );
-PARROT_API void Parrot_gc_ims_init( Interp* interp /*NN*/ )
+PARROT_API
+void Parrot_dod_ims_wb( Interp* interp, PMC *agg, PMC *_new );
+
+PARROT_API
+void Parrot_gc_ims_init( Interp* interp /*NN*/ )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/gc_ims.c */

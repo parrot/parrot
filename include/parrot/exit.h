@@ -26,11 +26,13 @@ typedef struct _handler_node_t {
 
 /* HEADERIZER BEGIN: src/exit.c */
 
-PARROT_API void Parrot_exit( Interp *interp /*NN*/, int status )
+PARROT_API
+void Parrot_exit( Interp *interp /*NN*/, int status )
         __attribute__nonnull__(1)
         __attribute__noreturn__;
 
-PARROT_API int Parrot_on_exit( Interp *interp /*NN*/,
+PARROT_API
+int Parrot_on_exit( Interp *interp /*NN*/,
     exit_handler_f function /*NN*/,
     void *arg )
         __attribute__nonnull__(1)

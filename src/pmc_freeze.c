@@ -69,7 +69,8 @@ static void create_image(
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_INLINE static void do_action(
+PARROT_INLINE
+static void do_action(
     Parrot_Interp interp /*NN*/,
     PMC *pmc,
     visit_info *info /*NN*/,
@@ -78,13 +79,12 @@ PARROT_INLINE static void do_action(
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_INLINE static void do_thaw(
-    Parrot_Interp interp /*NN*/,
-    PMC* pmc,
-    visit_info *info )
+PARROT_INLINE
+static void do_thaw( Parrot_Interp interp /*NN*/, PMC* pmc, visit_info *info )
         __attribute__nonnull__(1);
 
-PARROT_INLINE static void freeze_pmc(
+PARROT_INLINE
+static void freeze_pmc(
     Parrot_Interp interp /*NN*/,
     PMC *pmc,
     visit_info *info,
@@ -99,7 +99,8 @@ static void ft_init( Parrot_Interp interp /*NN*/, visit_info *info /*NN*/ )
 static UINTVAL id_from_pmc( Parrot_Interp interp /*NN*/, PMC* pmc )
         __attribute__nonnull__(1);
 
-PARROT_INLINE static int next_for_GC_seen(
+PARROT_INLINE
+static int next_for_GC_seen(
     Parrot_Interp interp /*NN*/,
     PMC *pmc,
     visit_info *info,
@@ -113,7 +114,8 @@ static void op_append(
     size_t len )
         __attribute__nonnull__(1);
 
-PARROT_INLINE static void op_check_size(
+PARROT_INLINE
+static void op_check_size(
     Parrot_Interp interp /*NN*/,
     STRING *s,
     size_t len )
@@ -201,13 +203,15 @@ static void str_append(
     size_t len )
         __attribute__nonnull__(1);
 
-PARROT_INLINE static PMC* thaw_create_pmc(
+PARROT_INLINE
+static PMC* thaw_create_pmc(
     Parrot_Interp interp /*NN*/,
     const visit_info *info,
     INTVAL type )
         __attribute__nonnull__(1);
 
-PARROT_INLINE static int thaw_pmc(
+PARROT_INLINE
+static int thaw_pmc(
     Parrot_Interp interp /*NN*/,
     visit_info *info,
     UINTVAL *id,
@@ -220,7 +224,8 @@ static void todo_list_init(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_INLINE static int todo_list_seen(
+PARROT_INLINE
+static int todo_list_seen(
     Parrot_Interp interp /*NN*/,
     PMC *pmc,
     visit_info *info /*NN*/,

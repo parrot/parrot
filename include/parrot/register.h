@@ -62,42 +62,53 @@ struct Parrot_Context;        /* parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: src/gc/register.c */
 
-PARROT_API void Parrot_clear_i( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_clear_i( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_clear_n( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_clear_n( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_clear_p( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_clear_p( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_clear_s( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_clear_s( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_free_context( Interp *interp /*NN*/,
+PARROT_API
+void Parrot_free_context( Interp *interp /*NN*/,
     struct Parrot_Context *ctxp /*NN*/,
     int re_use )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API void parrot_gc_context( Interp *interp /*NN*/ )
+PARROT_API
+void parrot_gc_context( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_pop_context( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_pop_context( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_pop_regs( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_pop_regs( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API struct Parrot_Context * Parrot_push_context( Interp *interp /*NN*/,
+PARROT_API
+struct Parrot_Context * Parrot_push_context( Interp *interp /*NN*/,
     INTVAL *n_regs_used /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API void Parrot_push_regs( Interp *interp /*NN*/ )
+PARROT_API
+void Parrot_push_regs( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-PARROT_API void Parrot_set_context_threshold( Interp *interp,
+PARROT_API
+void Parrot_set_context_threshold( Interp *interp,
     struct Parrot_Context *ctxp );
 
 void create_initial_context( Interp *interp /*NN*/ )

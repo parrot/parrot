@@ -131,16 +131,19 @@ sub function_components_from_declaration {
 
     my @lines = split( /\n/, $proto );
     chomp @lines;
+
+    my @macros;
     my $parrot_api;
     my $parrot_inline;
-    if ( $lines[0] eq 'PARROT_API' ) {
-        $parrot_api = 1;
-        shift @lines;
-    }
 
-    if ( $lines[0] eq 'PARROT_INLINE' ) {
-        $parrot_inline = 1;
-        shift @lines;
+    while ( @lines && ( $lines[0] =~ /^PARROT_/ ) ) {
+        my $macro = shift @lines;
+        if ( $macro eq 'PARROT_API' ) {
+            $parrot_api = 1;
+        } elsif ( $macro eq 'PARROT_INLINE' ) {
+            $parrot_inline = 1;
+        }
+        push( @macros, $macro );
     }
 
     my $return_type = shift @lines;
@@ -152,7 +155,7 @@ sub function_components_from_declaration {
 
     my $name = $1;
     $args = $2;
-    my $flags = $4;
+    my $flags = $4; # Soon to be replaced by the PARROT_X macros
 
     die "Can't have both PARROT_API and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
 
@@ -173,6 +176,7 @@ sub function_components_from_declaration {
         name        => $name,
         flags       => $flags,
         args        => \@args,
+        macros      => \@macros,
         is_static   => $is_static,
         is_inline   => $parrot_inline,
         is_api      => $parrot_api,
@@ -188,7 +192,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg ( @args ) {
         ++$n;
-        if ( $arg =~ m{/\*\s*NN\s*\*/} || $arg eq 'PARROT_INTERP' ) {
+        if ( $arg =~ m{/\*\s*NN\s*\*/} || $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
     }
@@ -239,10 +243,7 @@ sub make_function_decls {
         my $multiline = 0;
 
         my $decl = sprintf( "%s %s(", $func->{return_type}, $func->{name} );
-        $decl = "PARROT_API $decl" if $func->{is_api};
         $decl = "static $decl" if $func->{is_static};
-
-        $decl = "PARROT_INLINE $decl" if $func->{is_inline};
 
         my @args = @{$func->{args}};
         my @attrs = attrs_from_args( @args );
@@ -273,7 +274,11 @@ sub make_function_decls {
             $decl .= $attrs;
             $multiline = 1;
         }
+        my @macros = @{$func->{macros}};
+        $multiline = 1 if @macros;
+
         $decl .= $multiline ? ";\n" : ";";
+        $decl = join( "\n", @macros, $decl );
         $decl =~ s/\t/    /g;
         push( @decls, $decl );
     }
