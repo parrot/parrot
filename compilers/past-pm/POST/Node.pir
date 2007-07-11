@@ -100,14 +100,6 @@ Get/set
 .end
 
 
-.sub 'pir' :method
-    .local pmc code
-    code = self.'cpir'()
-    # code = concat "    # POST::Node\n", code
-    .return (code)
-.end
-
-
 =item cpir()
 
 =cut
@@ -217,7 +209,11 @@ call, callmethod, tailcall, inline
     .local pmc result, name
     result = self.'result'()
     name = shift arglist
+    if result == '' goto call_without_ret
     code.'emit'('    %r = %n(%,)', arglist :flat, 'r'=>result, 'n'=>name)
+    .return (code)
+  call_without_ret:
+    code.'emit'('    %n(%,)', arglist :flat, 'n'=>name)
     .return (code)
 
   pir_callmethod:
@@ -225,7 +221,11 @@ call, callmethod, tailcall, inline
     result = self.'result'()
     name = shift arglist
     invocant = shift arglist
+    if result == '' goto callmethod_without_ret
     code.'emit'('    %r = %i.%n(%,)', arglist :flat, 'r'=>result, 'i'=>invocant, 'n'=>name)
+    .return (code)
+  callmethod_without_ret:
+    code.'emit'('    %i.%n(%,)', arglist :flat, 'i'=>invocant, 'n'=>name)
     .return (code)
 
   pir_tailcall:
