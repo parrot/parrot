@@ -913,7 +913,7 @@ AGAIN:
             case EWOULDBLOCK:
                 goto AGAIN;
 #    else
-            case EGAIN:
+            case EAGAIN:
                 goto AGAIN;
 #    endif
             case ECONNRESET:
