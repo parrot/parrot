@@ -21,59 +21,94 @@ This file implements the charset functions for unicode data
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL compare( Interp *interp, const STRING *lhs, const STRING *rhs );
-static STRING* compose( Interp *interp, STRING *src );
-static size_t compute_hash( Interp *interp, const STRING *src, size_t seed );
-static INTVAL cs_rindex( Interp *interp,
+static INTVAL compare( PARROT_INTERP, const STRING *lhs, const STRING *rhs )
+        __attribute__nonnull__(1);
+
+static STRING* compose( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static size_t compute_hash( PARROT_INTERP, const STRING *src, size_t seed )
+        __attribute__nonnull__(1);
+
+static INTVAL cs_rindex( PARROT_INTERP,
     STRING *source_string,
     STRING *search_string,
-    UINTVAL offset );
+    UINTVAL offset )
+        __attribute__nonnull__(1);
 
-static STRING* decompose( Interp *interp, STRING *src );
-static void downcase( Interp *interp, STRING *src );
-static void downcase_first( Interp *interp, STRING *source_string );
-static INTVAL find_cclass( Interp *interp,
+static STRING* decompose( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static void downcase( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static void downcase_first( PARROT_INTERP, STRING *source_string )
+        __attribute__nonnull__(1);
+
+static INTVAL find_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static INTVAL find_not_cclass( Interp *interp,
+static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static STRING * get_graphemes( Interp *interp,
+static STRING * get_graphemes( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static STRING * get_graphemes_inplace( Interp *interp,
+static STRING * get_graphemes_inplace( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
     UINTVAL count,
-    STRING *dest_string );
+    STRING *dest_string )
+        __attribute__nonnull__(1);
 
-static INTVAL is_cclass( Interp *interp,
+static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string,
-    UINTVAL offset );
+    UINTVAL offset )
+        __attribute__nonnull__(1);
 
-static void set_graphemes( Interp *interp,
+static void set_graphemes( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
     UINTVAL replace_count,
-    STRING *insert_string );
+    STRING *insert_string )
+        __attribute__nonnull__(1);
 
-static STRING * string_from_codepoint( Interp *interp, UINTVAL codepoint );
-static void titlecase( Interp *interp, STRING *src );
-static void titlecase_first( Interp *interp, STRING *source_string );
-static STRING* to_charset( Interp *interp, STRING *src, STRING *dest );
-static int u_iscclass( Interp *interp, UINTVAL codepoint, INTVAL flags );
-static void upcase( Interp *interp, STRING *src );
-static void upcase_first( Interp *interp, STRING *source_string );
-static UINTVAL validate( Interp *interp, STRING *src );
+static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
+        __attribute__nonnull__(1);
+
+static void titlecase( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static void titlecase_first( PARROT_INTERP, STRING *source_string )
+        __attribute__nonnull__(1);
+
+static STRING* to_charset( PARROT_INTERP, STRING *src, STRING *dest )
+        __attribute__nonnull__(1);
+
+static int u_iscclass( PARROT_INTERP, UINTVAL codepoint, INTVAL flags )
+        __attribute__nonnull__(1);
+
+static void upcase( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static void upcase_first( PARROT_INTERP, STRING *source_string )
+        __attribute__nonnull__(1);
+
+static UINTVAL validate( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 #ifdef EXCEPTION
@@ -93,7 +128,7 @@ static UINTVAL validate( Interp *interp, STRING *src );
 #define UNIMPL EXCEPTION(UNIMPLEMENTED, "unimplemented unicode")
 
 static void
-set_graphemes(Interp *interp, STRING *source_string,
+set_graphemes(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
     ENCODING_SET_CODEPOINTS(interp, source_string, offset,
@@ -101,14 +136,14 @@ set_graphemes(Interp *interp, STRING *source_string,
 }
 
 static STRING *
-get_graphemes(Interp *interp, STRING *source_string,
+get_graphemes(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_CODEPOINTS(interp, source_string, offset, count);
 }
 
 static STRING *
-get_graphemes_inplace(Interp *interp, STRING *source_string,
+get_graphemes_inplace(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
     return ENCODING_GET_CODEPOINTS_INPLACE(interp, source_string,
@@ -116,7 +151,7 @@ get_graphemes_inplace(Interp *interp, STRING *source_string,
 }
 
 static STRING*
-to_charset(Interp *interp, STRING *src, STRING *dest)
+to_charset(PARROT_INTERP, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
 
@@ -129,7 +164,7 @@ to_charset(Interp *interp, STRING *src, STRING *dest)
 
 
 static STRING*
-compose(Interp *interp, STRING *src)
+compose(PARROT_INTERP, STRING *src)
 {
 #if PARROT_HAS_ICU
     STRING *dest;
@@ -175,14 +210,14 @@ compose(Interp *interp, STRING *src)
 }
 
 static STRING*
-decompose(Interp *interp, STRING *src)
+decompose(PARROT_INTERP, STRING *src)
 {
     UNIMPL;
     return NULL;
 }
 
 static void
-upcase(Interp *interp, STRING *src)
+upcase(PARROT_INTERP, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -254,7 +289,7 @@ upcase(Interp *interp, STRING *src)
 }
 
 static void
-downcase(Interp *interp, STRING *src)
+downcase(PARROT_INTERP, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -301,7 +336,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 }
 
 static void
-titlecase(Interp *interp, STRING *src)
+titlecase(PARROT_INTERP, STRING *src)
 {
 #if PARROT_HAS_ICU
 
@@ -349,25 +384,25 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 }
 
 static void
-upcase_first(Interp *interp, STRING *source_string)
+upcase_first(PARROT_INTERP, STRING *source_string)
 {
     UNIMPL;
 }
 
 static void
-downcase_first(Interp *interp, STRING *source_string)
+downcase_first(PARROT_INTERP, STRING *source_string)
 {
     UNIMPL;
 }
 
 static void
-titlecase_first(Interp *interp, STRING *source_string)
+titlecase_first(PARROT_INTERP, STRING *source_string)
 {
     UNIMPL;
 }
 
 static INTVAL
-compare(Interp *interp, const STRING *lhs, const STRING *rhs)
+compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)
 {
     String_iter l_iter, r_iter;
     UINTVAL offs, cl, cr, min_len, l_len, r_len;
@@ -395,7 +430,7 @@ compare(Interp *interp, const STRING *lhs, const STRING *rhs)
 
 
 static INTVAL
-cs_rindex(Interp *interp, STRING *source_string,
+cs_rindex(PARROT_INTERP, STRING *source_string,
         STRING *search_string, UINTVAL offset)
 {
     UNIMPL;
@@ -403,7 +438,7 @@ cs_rindex(Interp *interp, STRING *source_string,
 }
 
 static UINTVAL
-validate(Interp *interp, STRING *src)
+validate(PARROT_INTERP, STRING *src)
 {
     UINTVAL codepoint, offset;
 
@@ -419,7 +454,7 @@ validate(Interp *interp, STRING *src)
 }
 
 static int
-u_iscclass(Interp *interp, UINTVAL codepoint, INTVAL flags)
+u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 {
 #if PARROT_HAS_ICU
             /* XXX which one
@@ -486,7 +521,7 @@ u_iscclass(Interp *interp, UINTVAL codepoint, INTVAL flags)
 }
 
 static INTVAL
-is_cclass(Interp *interp, INTVAL flags,
+is_cclass(PARROT_INTERP, INTVAL flags,
           STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
@@ -501,7 +536,7 @@ is_cclass(Interp *interp, INTVAL flags,
 }
 
 static INTVAL
-find_cclass(Interp *interp, INTVAL flags,
+find_cclass(PARROT_INTERP, INTVAL flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -526,7 +561,7 @@ find_cclass(Interp *interp, INTVAL flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interp, INTVAL flags,
+find_not_cclass(PARROT_INTERP, INTVAL flags,
                 STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -555,7 +590,7 @@ find_not_cclass(Interp *interp, INTVAL flags,
 }
 
 static STRING *
-string_from_codepoint(Interp *interp, UINTVAL codepoint)
+string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
     STRING *dest;
     String_iter iter;
@@ -570,7 +605,7 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 }
 
 static size_t
-compute_hash(Interp *interp, const STRING *src, size_t seed)
+compute_hash(PARROT_INTERP, const STRING *src, size_t seed)
 {
     String_iter iter;
     size_t hashval = seed;
@@ -586,7 +621,7 @@ compute_hash(Interp *interp, const STRING *src, size_t seed)
 }
 
 CHARSET *
-Parrot_charset_unicode_init(Interp *interp)
+Parrot_charset_unicode_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {

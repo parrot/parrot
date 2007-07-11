@@ -15,7 +15,7 @@
 
 /* HEADERIZER BEGIN: src/encodings/ucs2.c */
 
-ENCODING * Parrot_encoding_ucs2_init( Interp *interp /*NN*/ )
+ENCODING * Parrot_encoding_ucs2_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/encodings/ucs2.c */

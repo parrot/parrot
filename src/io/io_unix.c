@@ -47,14 +47,16 @@ static INTVAL flags_to_unix( INTVAL flags )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-static ParrotIO * PIO_unix_accept( Interp *interp,
+static ParrotIO * PIO_unix_accept( PARROT_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io );
+    ParrotIO *io )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_unix_async( Interp *interp,
+static INTVAL PIO_unix_async( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    INTVAL b );
+    INTVAL b )
+        __attribute__nonnull__(1);
 
 static INTVAL PIO_unix_bind(
     SHIM_INTERP,
@@ -76,10 +78,11 @@ static INTVAL PIO_unix_connect(
     STRING *r /*NULLOK*/ )
         __attribute__nonnull__(3);
 
-static ParrotIO * PIO_unix_fdopen( Interp *interp,
+static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
     ParrotIOLayer *layer,
     PIOHANDLE fd,
-    INTVAL flags );
+    INTVAL flags )
+        __attribute__nonnull__(1);
 
 static INTVAL PIO_unix_flush(
     SHIM_INTERP,
@@ -87,7 +90,9 @@ static INTVAL PIO_unix_flush(
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_init( Interp *interp, ParrotIOLayer *layer );
+static INTVAL PIO_unix_init( PARROT_INTERP, ParrotIOLayer *layer )
+        __attribute__nonnull__(1);
+
 static INTVAL PIO_unix_isatty( PIOHANDLE fd );
 static INTVAL PIO_unix_listen(
     SHIM_INTERP,
@@ -96,15 +101,17 @@ static INTVAL PIO_unix_listen(
     INTVAL sec )
         __attribute__nonnull__(3);
 
-static ParrotIO * PIO_unix_open( Interp *interp,
+static ParrotIO * PIO_unix_open( PARROT_INTERP,
     ParrotIOLayer *layer,
     const char *spath,
-    INTVAL flags );
+    INTVAL flags )
+        __attribute__nonnull__(1);
 
-static ParrotIO * PIO_unix_pipe( Interp *interp,
+static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
     ParrotIOLayer *l,
     const char *cmd,
-    int flags );
+    int flags )
+        __attribute__nonnull__(1);
 
 static INTVAL PIO_unix_poll(
     SHIM_INTERP,
@@ -114,15 +121,17 @@ static INTVAL PIO_unix_poll(
     int sec,
     int usec );
 
-static size_t PIO_unix_read( Interp *interp,
+static size_t PIO_unix_read( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING **buf );
+    STRING **buf )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_unix_recv( Interp *interp,
+static INTVAL PIO_unix_recv( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO * io,
-    STRING **s );
+    STRING **s )
+        __attribute__nonnull__(1);
 
 static PIOOFF_T PIO_unix_seek(
     SHIM_INTERP,
@@ -139,11 +148,12 @@ static INTVAL PIO_unix_send(
     STRING *s )
         __attribute__nonnull__(3);
 
-static ParrotIO * PIO_unix_socket( Interp *interp,
+static ParrotIO * PIO_unix_socket( PARROT_INTERP,
     ParrotIOLayer *layer,
     int fam,
     int type,
-    int proto );
+    int proto )
+        __attribute__nonnull__(1);
 
 static PIOOFF_T PIO_unix_tell(
     SHIM_INTERP,
@@ -205,7 +215,7 @@ success and C<-1> on error.
 */
 
 static INTVAL
-PIO_unix_init(Interp *interp, ParrotIOLayer *layer)
+PIO_unix_init(PARROT_INTERP, ParrotIOLayer *layer)
 {
     ParrotIOData * const d = interp->piodata;
     if (d != NULL && d->table != NULL) {
@@ -241,7 +251,7 @@ values.
 */
 
 static ParrotIO *
-PIO_unix_open(Interp *interp, ParrotIOLayer *layer,
+PIO_unix_open(PARROT_INTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)
 {
     INTVAL oflags;
@@ -339,7 +349,7 @@ Toggles the C<O_ASYNC> flag on the IO file descriptor.
 */
 
 static INTVAL
-PIO_unix_async(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
+PIO_unix_async(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL b)
 {
     int rflags;
 #    if defined(linux)
@@ -367,7 +377,7 @@ Returns a new C<ParrotIO> with file descriptor C<fd>.
 */
 
 static ParrotIO *
-PIO_unix_fdopen(Interp *interp, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
+PIO_unix_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
     const INTVAL mode = 0;
@@ -507,7 +517,7 @@ C<buffer>.
 */
 
 static size_t
-PIO_unix_read(Interp *interp, SHIM(ParrotIOLayer *layer), ParrotIO *io,
+PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io,
               STRING **buf)
 {
     STRING * const s = PIO_make_io_string(interp, buf, 2048);
@@ -664,7 +674,7 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 */
 
 STRING *
-PIO_sockaddr_in(Interp *interp, unsigned short port, STRING * addr)
+PIO_sockaddr_in(PARROT_INTERP, unsigned short port, STRING * addr)
 {
     struct sockaddr_in sa;
     /* Hard coded to IPv4 for now */
@@ -720,7 +730,7 @@ socket type and protocol number.
 */
 
 static ParrotIO *
-PIO_unix_socket(Interp *interp, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)
+PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)
 {
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
@@ -817,7 +827,7 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 */
 
 static ParrotIO *
-PIO_unix_accept(Interp *interp, SHIM(ParrotIOLayer *layer), ParrotIO *io)
+PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io)
 {
     ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
 
@@ -900,7 +910,7 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_recv(Interp *interp, SHIM(ParrotIOLayer *layer), ParrotIO * io, STRING **s)
+PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO * io, STRING **s)
 {
     int error;
     unsigned int bytesread = 0;
@@ -999,7 +1009,7 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 */
 
 static ParrotIO *
-PIO_unix_pipe(Interp *interp, SHIM(ParrotIOLayer *l), const char *cmd, int flags)
+PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), const char *cmd, int flags)
 {
     /*
      * pipe(), fork() should be defined, if this header is present

@@ -20,57 +20,80 @@ This file implements the charset functions for iso-8859-1 data
 
 /* HEADERIZER BEGIN: static */
 
-static STRING* compose( Interp *interp, STRING *src );
-static STRING* decompose( Interp *interp, STRING *src );
-static void downcase( Interp *interp, STRING *source_string /*NN*/ )
+static STRING* compose( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static STRING* decompose( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
+static void downcase( PARROT_INTERP, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void downcase_first( Interp *interp, STRING *source_string /*NN*/ )
+static void downcase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL find_cclass( Interp *interp,
+static INTVAL find_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static INTVAL find_not_cclass( Interp *interp,
+static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string /*NN*/,
     UINTVAL offset,
     UINTVAL count )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL is_cclass( Interp *interp,
+static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
     STRING *source_string /*NN*/,
     UINTVAL offset )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void set_graphemes( Interp *interp,
+static void set_graphemes( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
     UINTVAL replace_count,
-    STRING *insert_string );
+    STRING *insert_string )
+        __attribute__nonnull__(1);
 
-static STRING * string_from_codepoint( Interp *interp, UINTVAL codepoint );
-static void titlecase( Interp *interp, STRING *source_string );
-static void titlecase_first( Interp *interp, STRING *source_string /*NN*/ )
+static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
+        __attribute__nonnull__(1);
+
+static void titlecase( PARROT_INTERP, STRING *source_string )
+        __attribute__nonnull__(1);
+
+static void titlecase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_charset( Interp *interp, STRING *src, STRING *dest );
-static STRING * to_latin1( Interp *interp, STRING *src /*NN*/, STRING *dest )
+static STRING * to_charset( PARROT_INTERP, STRING *src, STRING *dest )
+        __attribute__nonnull__(1);
+
+static STRING * to_latin1( PARROT_INTERP, STRING *src /*NN*/, STRING *dest )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_unicode( Interp *interp,
+static STRING * to_unicode( PARROT_INTERP,
     STRING *src,
-    STRING *dest /*NULLOK*/ );
+    STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
-static void upcase( Interp *interp, STRING *source_string );
-static void upcase_first( Interp *interp, STRING *source_string /*NN*/ )
+static void upcase( PARROT_INTERP, STRING *source_string )
+        __attribute__nonnull__(1);
+
+static void upcase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL validate( Interp *interp, STRING *src /*NN*/ )
+static UINTVAL validate( PARROT_INTERP, STRING *src /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -89,7 +112,7 @@ static UINTVAL validate( Interp *interp, STRING *src /*NN*/ )
 #include "tables.h"
 
 static void
-set_graphemes(Interp *interp, STRING *source_string,
+set_graphemes(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
     ENCODING_SET_BYTES(interp, source_string, offset,
@@ -97,7 +120,7 @@ set_graphemes(Interp *interp, STRING *source_string,
 }
 
 static STRING *
-to_latin1(Interp *interp, STRING *src /*NN*/, STRING *dest)
+to_latin1(PARROT_INTERP, STRING *src /*NN*/, STRING *dest)
 {
     UINTVAL offs, src_len;
     String_iter iter;
@@ -126,7 +149,7 @@ to_latin1(Interp *interp, STRING *src /*NN*/, STRING *dest)
 }
 
 static STRING *
-to_unicode(Interp *interp, STRING *src, STRING *dest /*NULLOK*/)
+to_unicode(PARROT_INTERP, STRING *src, STRING *dest /*NULLOK*/)
 {
     if (dest) {
         UINTVAL offs;
@@ -160,7 +183,7 @@ to_unicode(Interp *interp, STRING *src, STRING *dest /*NULLOK*/)
 }
 
 static STRING *
-to_charset(Interp *interp, STRING *src, STRING *dest)
+to_charset(PARROT_INTERP, STRING *src, STRING *dest)
 {
     charset_converter_t conversion_func;
 
@@ -176,13 +199,13 @@ to_charset(Interp *interp, STRING *src, STRING *dest)
 
 /* A noop. can't compose iso-8859-1 */
 static STRING*
-compose(Interp *interp, STRING *src)
+compose(PARROT_INTERP, STRING *src)
 {
     return string_copy(interp, src);
 }
 
 static STRING*
-decompose(Interp *interp, STRING *src)
+decompose(PARROT_INTERP, STRING *src)
 {
     real_exception(interp, NULL, UNIMPLEMENTED,
             "decompose for iso-8859-1 not implemented");
@@ -190,7 +213,7 @@ decompose(Interp *interp, STRING *src)
 }
 
 static void
-upcase(Interp *interp, STRING *source_string)
+upcase(PARROT_INTERP, STRING *source_string)
 {
     unsigned char *buffer;
     UINTVAL offset = 0;
@@ -212,7 +235,7 @@ upcase(Interp *interp, STRING *source_string)
 }
 
 static void
-downcase(Interp *interp, STRING *source_string /*NN*/)
+downcase(PARROT_INTERP, STRING *source_string /*NN*/)
 {
     if (source_string->strlen) {
         UINTVAL offset;
@@ -232,7 +255,7 @@ downcase(Interp *interp, STRING *source_string /*NN*/)
 }
 
 static void
-titlecase(Interp *interp, STRING *source_string)
+titlecase(PARROT_INTERP, STRING *source_string)
 {
     unsigned char *buffer;
     unsigned int c;
@@ -261,7 +284,7 @@ titlecase(Interp *interp, STRING *source_string)
 }
 
 static void
-upcase_first(Interp *interp, STRING *source_string /*NN*/)
+upcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
 {
     if (source_string->strlen) {
         unsigned char *buffer;
@@ -279,7 +302,7 @@ upcase_first(Interp *interp, STRING *source_string /*NN*/)
 }
 
 static void
-downcase_first(Interp *interp, STRING *source_string /*NN*/)
+downcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
 {
     if (source_string->strlen) {
         unsigned char *buffer;
@@ -298,14 +321,14 @@ downcase_first(Interp *interp, STRING *source_string /*NN*/)
 }
 
 static void
-titlecase_first(Interp *interp, STRING *source_string /*NN*/)
+titlecase_first(PARROT_INTERP, STRING *source_string /*NN*/)
 {
     upcase_first(interp, source_string);
 }
 
 
 static UINTVAL
-validate(Interp *interp, STRING *src /*NN*/)
+validate(PARROT_INTERP, STRING *src /*NN*/)
 {
     UINTVAL offset;
 
@@ -318,7 +341,7 @@ validate(Interp *interp, STRING *src /*NN*/)
 }
 
 static INTVAL
-is_cclass(Interp *interp, INTVAL flags,
+is_cclass(PARROT_INTERP, INTVAL flags,
           STRING *source_string /*NN*/, UINTVAL offset)
 {
     UINTVAL codepoint;
@@ -334,7 +357,7 @@ is_cclass(Interp *interp, INTVAL flags,
 }
 
 static INTVAL
-find_cclass(Interp *interp, INTVAL flags,
+find_cclass(PARROT_INTERP, INTVAL flags,
             STRING *source_string, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -353,7 +376,7 @@ find_cclass(Interp *interp, INTVAL flags,
 }
 
 static INTVAL
-find_not_cclass(Interp *interp, INTVAL flags,
+find_not_cclass(PARROT_INTERP, INTVAL flags,
                 STRING *source_string /*NN*/, UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
@@ -372,7 +395,7 @@ find_not_cclass(Interp *interp, INTVAL flags,
 
 
 static STRING *
-string_from_codepoint(Interp *interp, UINTVAL codepoint)
+string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
     char real_codepoint = (char)codepoint;
     STRING * const return_string = string_make(interp, &real_codepoint, 1,
@@ -381,7 +404,7 @@ string_from_codepoint(Interp *interp, UINTVAL codepoint)
 }
 
 CHARSET *
-Parrot_charset_iso_8859_1_init(Interp *interp)
+Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
@@ -417,7 +440,7 @@ Parrot_charset_iso_8859_1_init(Interp *interp)
 }
 
 STRING *
-charset_cvt_iso_8859_1_to_ascii(Interp *interp, STRING *src /*NN*/, STRING *dest /*NULLOK*/)
+charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src /*NN*/, STRING *dest /*NULLOK*/)
     /* WARN_UNUSED */
 {
     UINTVAL offs, c;

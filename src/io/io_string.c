@@ -25,15 +25,19 @@ Capture output to a string PMC.
 
 /* HEADERIZER BEGIN: static */
 
-static size_t PIO_string_read( Interp *interp,
-    ParrotIOLayer *l,
+static size_t PIO_string_read(
+    SHIM_INTERP,
+    NOTNULL(ParrotIOLayer *l),
     ParrotIO *io,
-    STRING **buf );
+    NOTNULL(STRING **buf) )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
-static size_t PIO_string_write( Interp *interp,
+static size_t PIO_string_write( PARROT_INTERP,
     ParrotIOLayer *l,
     ParrotIO *io,
-    STRING *s );
+    STRING *s )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -87,7 +91,7 @@ PIO_string_register_layer(void)
 }
 
 static size_t
-PIO_string_read(SHIM(Interp *interp), ParrotIOLayer *l, SHIM(ParrotIO *io), STRING **buf)
+PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING **buf))
 {
     if (l->self == 0)
         return 0;
@@ -99,7 +103,7 @@ PIO_string_read(SHIM(Interp *interp), ParrotIOLayer *l, SHIM(ParrotIO *io), STRI
 }
 
 static size_t
-PIO_string_write(Interp *interp, ParrotIOLayer *l, SHIM(ParrotIO *io), STRING *s)
+PIO_string_write(PARROT_INTERP, ParrotIOLayer *l, SHIM(ParrotIO *io), STRING *s)
 {
     STRING * const old_string = (STRING *)l->self;
 

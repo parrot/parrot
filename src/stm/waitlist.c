@@ -298,7 +298,7 @@ Parrot_STM_waitlist_destroy_thread(Parrot_Interp interp) {
 }
 
 static STM_tx_log *
-Parrot_STM_tx_log_alloc(Interp *interp /*NN*/, size_t size)
+Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
 {
     int                i;
     STM_tx_log * const log       = (STM_tx_log *)mem_sys_allocate_zeroed(size);
@@ -331,7 +331,7 @@ Parrot_STM_tx_log_alloc(Interp *interp /*NN*/, size_t size)
 }
 
 STM_tx_log *
-Parrot_STM_tx_log_get(Interp *interp /*NN*/)
+Parrot_STM_tx_log_get(PARROT_INTERP)
 {
     STM_tx_log *log = interp->thread_data->stm_log;
 

@@ -25,59 +25,72 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
-static INTVAL PIO_buf_close( Interp *interp,
+static INTVAL PIO_buf_close( PARROT_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io );
+    ParrotIO *io )
+        __attribute__nonnull__(1);
 
-static ParrotIO * PIO_buf_fdopen( Interp *interp,
+static ParrotIO * PIO_buf_fdopen( PARROT_INTERP,
     ParrotIOLayer *layer,
     PIOHANDLE fd,
-    INTVAL flags );
+    INTVAL flags )
+        __attribute__nonnull__(1);
 
-static size_t PIO_buf_fill_readbuf( Interp *interp,
+static size_t PIO_buf_fill_readbuf( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    ParrotIOBuf *b );
+    ParrotIOBuf *b )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_buf_flush( Interp *interp,
+static INTVAL PIO_buf_flush( PARROT_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io );
+    ParrotIO *io )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_buf_init( Interp *interp, ParrotIOLayer *layer );
-static ParrotIO * PIO_buf_open( Interp *interp,
+static INTVAL PIO_buf_init( PARROT_INTERP, ParrotIOLayer *layer )
+        __attribute__nonnull__(1);
+
+static ParrotIO * PIO_buf_open( PARROT_INTERP,
     ParrotIOLayer *layer,
     const char *path,
-    INTVAL flags );
+    INTVAL flags )
+        __attribute__nonnull__(1);
 
-static size_t PIO_buf_peek( Interp *interp,
+static size_t PIO_buf_peek( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING **buf );
+    STRING **buf )
+        __attribute__nonnull__(1);
 
-static size_t PIO_buf_read( Interp *interp,
+static size_t PIO_buf_read( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING **buf );
+    STRING **buf )
+        __attribute__nonnull__(1);
 
-static size_t PIO_buf_readline( Interp *interp,
+static size_t PIO_buf_readline( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING **buf );
+    STRING **buf )
+        __attribute__nonnull__(1);
 
-static PIOOFF_T PIO_buf_seek( Interp *interp,
+static PIOOFF_T PIO_buf_seek( PARROT_INTERP,
     ParrotIOLayer *l,
     ParrotIO *io,
     PIOOFF_T offset,
-    INTVAL whence );
+    INTVAL whence )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_buf_setbuf( Interp *interp,
+static INTVAL PIO_buf_setbuf( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    size_t bufsize );
+    size_t bufsize )
+        __attribute__nonnull__(1);
 
-static INTVAL PIO_buf_setlinebuf( Interp *interp,
+static INTVAL PIO_buf_setlinebuf( PARROT_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io );
+    ParrotIO *io )
+        __attribute__nonnull__(1);
 
 static PIOOFF_T PIO_buf_tell(
     SHIM_INTERP,
@@ -85,10 +98,11 @@ static PIOOFF_T PIO_buf_tell(
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
-static size_t PIO_buf_write( Interp *interp,
+static size_t PIO_buf_write( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING *s );
+    STRING *s )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -115,7 +129,7 @@ ParrotIOLayer pio_buf_layer = {
 /*
 
 =item C<static INTVAL
-PIO_buf_init(Interp *interp, ParrotIOLayer *layer)>
+PIO_buf_init(PARROT_INTERP, ParrotIOLayer *layer)>
 
 The buffer layer's C<Init> function. Initializes buffering.
 
@@ -124,7 +138,7 @@ The buffer layer's C<Init> function. Initializes buffering.
 */
 
 static INTVAL
-PIO_buf_init(Interp *interp, ParrotIOLayer *layer)
+PIO_buf_init(PARROT_INTERP, ParrotIOLayer *layer)
 {
     if (PIO_STDOUT(interp))
         PIO_buf_setlinebuf(interp, layer,
@@ -140,7 +154,7 @@ PIO_buf_init(Interp *interp, ParrotIOLayer *layer)
 /*
 
 =item C<static ParrotIO *
-PIO_buf_open(Interp *interp, ParrotIOLayer *layer,
+PIO_buf_open(PARROT_INTERP, ParrotIOLayer *layer,
                const char *path, INTVAL flags)>
 
 The buffer layer's C<Open> function.
@@ -150,7 +164,7 @@ The buffer layer's C<Open> function.
 */
 
 static ParrotIO *
-PIO_buf_open(Interp *interp, ParrotIOLayer *layer,
+PIO_buf_open(PARROT_INTERP, ParrotIOLayer *layer,
                const char *path, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
@@ -172,7 +186,7 @@ PIO_buf_open(Interp *interp, ParrotIOLayer *layer,
 /*
 
 =item C<static INTVAL
-PIO_buf_setbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)>
+PIO_buf_setbuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)>
 
 The buffer layer's C<SetBuf> function.
 
@@ -186,7 +200,7 @@ not implement C<SetBuf>.
 */
 
 static INTVAL
-PIO_buf_setbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
+PIO_buf_setbuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 {
     ParrotIOLayer * const l = layer ? layer : io->stack;
     ParrotIOBuf   * const b = &io->b;
@@ -235,7 +249,7 @@ PIO_buf_setbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, size_t bufsiz
 /*
 
 =item C<static INTVAL
-PIO_buf_setlinebuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)>
+PIO_buf_setlinebuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)>
 
 The buffer layer's C<SetLineBuf> function.
 
@@ -244,7 +258,7 @@ The buffer layer's C<SetLineBuf> function.
 */
 
 static INTVAL
-PIO_buf_setlinebuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+PIO_buf_setlinebuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     int err;
     ParrotIOLayer * const l = layer ? layer : io->stack;
@@ -267,7 +281,7 @@ PIO_buf_setlinebuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 /*
 
 =item C<static ParrotIO *
-PIO_buf_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)>
+PIO_buf_fdopen(PARROT_INTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)>
 
 The buffer layer's C<FDOpen> function.
 
@@ -276,7 +290,7 @@ The buffer layer's C<FDOpen> function.
 */
 
 static ParrotIO *
-PIO_buf_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
+PIO_buf_fdopen(PARROT_INTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     ParrotIO * const io = PIO_fdopen_down(interp, l, fd, flags);
@@ -297,7 +311,7 @@ PIO_buf_fdopen(Interp *interp, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 /*
 
 =item C<static INTVAL
-PIO_buf_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)>
+PIO_buf_close(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)>
 
 The buffer layer's C<Close> function.
 
@@ -306,7 +320,7 @@ The buffer layer's C<Close> function.
 */
 
 static INTVAL
-PIO_buf_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+PIO_buf_close(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     PIO_buf_flush(interp, layer, io);
@@ -317,7 +331,7 @@ PIO_buf_close(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 /*
 
 =item C<static INTVAL
-PIO_buf_flush(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)>
+PIO_buf_flush(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)>
 
 The buffer layer's C<Flush> function.
 
@@ -326,7 +340,7 @@ The buffer layer's C<Flush> function.
 */
 
 static INTVAL
-PIO_buf_flush(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+PIO_buf_flush(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     long wrote;
     size_t to_write;
@@ -372,7 +386,7 @@ PIO_buf_flush(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
 /*
 
 =item C<static size_t
-PIO_buf_fill_readbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_fill_readbuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                      ParrotIOBuf *b)>
 
 The buffer layer's C<Fill> function.
@@ -382,7 +396,7 @@ The buffer layer's C<Fill> function.
 */
 
 static size_t
-PIO_buf_fill_readbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_fill_readbuf(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                      ParrotIOBuf *b)
 {
     size_t got;
@@ -412,7 +426,7 @@ PIO_buf_fill_readbuf(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
 /*
 
 =item C<static size_t
-PIO_buf_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_read(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                STRING **buf)>
 
 The buffer layer's C<Read> function.
@@ -422,7 +436,7 @@ The buffer layer's C<Read> function.
 */
 
 static size_t
-PIO_buf_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_read(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                STRING **buf)
 {
     ParrotIOLayer *l = layer;
@@ -519,7 +533,7 @@ PIO_buf_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 static size_t
-PIO_buf_peek(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
+PIO_buf_peek(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
@@ -566,7 +580,7 @@ ret_string:
 /*
 
 =item C<static size_t
-PIO_buf_readline(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_readline(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                  void *buffer, size_t len)>
 
 This is called from C<PIO_buf_read()> to do line buffered reading if
@@ -578,7 +592,7 @@ that is what is required.
 
 
 static size_t
-PIO_buf_readline(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_buf_readline(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
                  STRING **buf)
 {
     size_t l;
@@ -656,7 +670,7 @@ PIO_buf_readline(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
 /*
 
 =item C<static size_t
-PIO_buf_write(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *s)>
+PIO_buf_write(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)>
 
 The buffer layer's C<Write> function.
 
@@ -665,7 +679,7 @@ The buffer layer's C<Write> function.
 */
 
 static size_t
-PIO_buf_write(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
+PIO_buf_write(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
 {
     size_t avail;
     long wrote;
@@ -746,7 +760,7 @@ PIO_buf_write(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *s)
 /*
 
 =item C<static PIOOFF_T
-PIO_buf_seek(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
+PIO_buf_seek(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T offset, INTVAL whence)>
 
 The buffer layer's C<Seek> function.
@@ -756,7 +770,7 @@ The buffer layer's C<Seek> function.
 */
 
 static PIOOFF_T
-PIO_buf_seek(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
+PIO_buf_seek(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T newpos;
@@ -798,7 +812,7 @@ PIO_buf_seek(Interp *interp, ParrotIOLayer *l, ParrotIO *io,
 /*
 
 =item C<static PIOOFF_T
-PIO_buf_tell(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)>
+PIO_buf_tell(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)>
 
 The buffer layer's C<Tell> function.
 

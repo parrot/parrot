@@ -29,19 +29,20 @@ static void gc_ms_add_free_object(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void gc_ms_alloc_objects( Interp *interp /*NN*/,
+static void gc_ms_alloc_objects( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * gc_ms_get_free_object( Interp *interp,
+static void * gc_ms_get_free_object( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void gc_ms_pool_init( SHIM_INTERP, Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(2);
 
-static void more_traceable_objects( Interp *interp /*NN*/,
+static void more_traceable_objects( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -119,7 +120,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 */
 
 static void
-more_traceable_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
+more_traceable_objects(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     if (pool->skip)
         pool->skip = 0;
@@ -165,7 +166,7 @@ Get a new object from the free pool and return it.
 */
 
 static void *
-gc_ms_get_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/)
+gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     void *ptr;
 
@@ -192,7 +193,7 @@ Adds the memory between C<start> and C<end> to the free list.
 */
 
 void
-Parrot_add_to_free_list(Interp *interp,
+Parrot_add_to_free_list(PARROT_INTERP,
         Small_Object_Pool  *pool /*NN*/,
         Small_Object_Arena *arena /*NN*/,
         UINTVAL             start,
@@ -229,7 +230,7 @@ insert the new arena into the pool's structure, update stats
 
 */
 void
-Parrot_append_arena_in_pool(Interp *interp /*NN*/,
+Parrot_append_arena_in_pool(PARROT_INTERP,
     Small_Object_Pool  *pool /*NN*/,
     Small_Object_Arena *new_arena /*NN*/, size_t size)
 {
@@ -265,7 +266,7 @@ and put them on.
 */
 
 static void
-gc_ms_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
+gc_ms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     size_t  size;
     UINTVAL start, end;
@@ -363,7 +364,7 @@ C<more_object_fn>.
 */
 
 void
-Parrot_gc_ms_init(Interp *interp /*NN*/)
+Parrot_gc_ms_init(PARROT_INTERP)
 {
     Arenas * const arena_base     = interp->arena_base;
 
@@ -381,7 +382,7 @@ Merge C<source> into C<dest>.
 */
 
 void
-Parrot_small_object_pool_merge(Interp *interp,
+Parrot_small_object_pool_merge(PARROT_INTERP,
         Small_Object_Pool *dest /*NN*/, Small_Object_Pool *source /*NN*/)
 {
     Small_Object_Arena  *cur_arena;

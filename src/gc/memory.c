@@ -31,9 +31,9 @@ Uses C<malloc> to allocate system memory.
 */
 
 PARROT_API
+PARROT_MALLOC
 void *
 mem_sys_allocate(size_t size)
-    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -44,9 +44,9 @@ mem_sys_allocate(size_t size)
     return ptr;
 }
 
+PARROT_MALLOC
 void *
-mem__internal_allocate(size_t size, const char *file, int line)
-    /* MALLOC, WARN_UNUSED */
+mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)
 {
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -70,9 +70,9 @@ Uses C<calloc> to allocate system memory.
 */
 
 PARROT_API
+PARROT_MALLOC
 void *
 mem_sys_allocate_zeroed(size_t size)
-    /* MALLOC, WARN_UNUSED */
 {
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -83,9 +83,9 @@ mem_sys_allocate_zeroed(size_t size)
     return ptr;
 }
 
+PARROT_MALLOC
 void *
-mem__internal_allocate_zeroed(size_t size, const char *file, int line)
-    /* MALLOC, WARN_UNUSED */
+mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
 {
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -109,9 +109,9 @@ Resize a chunk of system memory.
 */
 
 PARROT_API
+PARROT_MALLOC
 void *
-mem__sys_realloc(void *from /*NULLOK*/, size_t size)
-    /* MALLOC, WARN_UNUSED */
+mem__sys_realloc(NULLOK(void *from), size_t size)
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
@@ -136,8 +136,9 @@ Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 */
 
 PARROT_API
+PARROT_MALLOC
 void *
-mem__sys_realloc_zeroed(void *from /*NULLOK*/, size_t size, size_t old_size)
+mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
     /* MALLOC, WARN_UNUSED */
 {
     void *ptr;
@@ -157,10 +158,10 @@ mem__sys_realloc_zeroed(void *from /*NULLOK*/, size_t size, size_t old_size)
     return ptr;
 }
 
+PARROT_MALLOC
 void *
-mem__internal_realloc(void *from /*NN*/, size_t size,
-        const char *file /*NN*/, int line)
-    /* MALLOC, WARN_UNUSED */
+mem__internal_realloc(NOTNULL(void *from), size_t size,
+        NOTNULL(const char *file), int line)
 {
     void * const ptr = realloc(from, size);
 #ifdef DETAIL_MEMORY_DEBUG
@@ -187,7 +188,7 @@ Free a chunk of memory back to the system.
 
 PARROT_API
 void
-mem_sys_free(void * from)
+mem_sys_free(NULLOK(void *from))
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p\n", from);
@@ -197,7 +198,7 @@ mem_sys_free(void * from)
 }
 
 void
-mem__internal_free(void *from, const char *file /*NN*/, int line)
+mem__internal_free(NULLOK(void *from), NOTNULL(const char *file /*NN*/), int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
@@ -217,7 +218,7 @@ Initializes the allocator.
 */
 
 void
-mem_setup_allocator(Interp *interp /*NN*/)
+mem_setup_allocator(PARROT_INTERP)
 {
     interp->arena_base = mem_allocate_zeroed_typed(Arenas);
     interp->arena_base->sized_header_pools = NULL;

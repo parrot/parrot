@@ -487,7 +487,7 @@ Opcode format is:
 */
 
 STRING *
-PF_fetch_string(Interp *interp /*NN*/, PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
+PF_fetch_string(PARROT_INTERP, PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
     /* WARN_UNUSED */
 {
     UINTVAL flags;

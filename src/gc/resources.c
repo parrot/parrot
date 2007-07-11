@@ -41,20 +41,24 @@ static size_t aligned_size( const Buffer *buffer /*NN*/, size_t len )
         __attribute__warn_unused_result__;
 
 static size_t aligned_string_size( size_t len );
-static void * alloc_new_block( Interp *interp,
+static void * alloc_new_block( PARROT_INTERP,
     size_t size,
     Memory_Pool *pool,
-    const char *why );
+    const char *why )
+        __attribute__nonnull__(1);
 
-static const char* buffer_location( Interp *interp, const PObj *b );
-static void compact_pool( Interp *interp /*NN*/, Memory_Pool *pool /*NN*/ )
+static const char* buffer_location( PARROT_INTERP, const PObj *b )
+        __attribute__nonnull__(1);
+
+static void compact_pool( PARROT_INTERP, Memory_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void debug_print_buf( Interp *interp, const PObj *b /*NN*/ )
+static void debug_print_buf( PARROT_INTERP, const PObj *b /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * mem_allocate( Interp *interp /*NN*/,
+static void * mem_allocate( PARROT_INTERP,
     size_t size,
     Memory_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
@@ -81,7 +85,7 @@ the default size.  The given text is used for debugging.
 */
 
 static void *
-alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
+alloc_new_block(PARROT_INTERP, size_t size, Memory_Pool *pool, const char *why)
 {
     Memory_Block *new_block;
 
@@ -163,7 +167,7 @@ Buffer memory layout:
 */
 
 static void *
-mem_allocate(Interp *interp /*NN*/, size_t size, Memory_Pool *pool /*NN*/)
+mem_allocate(PARROT_INTERP, size_t size, Memory_Pool *pool /*NN*/)
     /* WARN_UNUSED */
 {
     void *return_val;
@@ -223,7 +227,7 @@ mem_allocate(Interp *interp /*NN*/, size_t size, Memory_Pool *pool /*NN*/)
 
 #if RESOURCE_DEBUG
 static const char*
-buffer_location(Interp *interp, const PObj *b)
+buffer_location(PARROT_INTERP, const PObj *b)
 {
     int i;
     static char reg[10];
@@ -242,7 +246,7 @@ buffer_location(Interp *interp, const PObj *b)
 }
 
 static void
-debug_print_buf(Interp *interp, const PObj *b /*NN*/)
+debug_print_buf(PARROT_INTERP, const PObj *b /*NN*/)
 {
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
             b, (int)PObj_buflen(b), (uint)PObj_get_FLAGS(b),
@@ -261,7 +265,7 @@ Compact the buffer pool.
 */
 
 static void
-compact_pool(Interp *interp /*NN*/, Memory_Pool *pool /*NN*/)
+compact_pool(PARROT_INTERP, Memory_Pool *pool /*NN*/)
 {
     INTVAL        j;
     UINTVAL       object_size;
@@ -486,7 +490,7 @@ doesn't check for string liveness.
 */
 
 void
-Parrot_go_collect(Interp *interp /*NN*/)
+Parrot_go_collect(PARROT_INTERP)
 {
     compact_pool(interp, interp->arena_base->memory_pool);
 }
@@ -531,7 +535,7 @@ aligned_string_size(size_t len) /* XXX Looks like we can lose buffer here */
 }
 
 int
-Parrot_in_memory_pool(Interp *interp /*NN*/, void *bufstart /*NN*/)
+Parrot_in_memory_pool(PARROT_INTERP, void *bufstart /*NN*/)
     /* WARN_UNUSED */
 {
     Memory_Pool * const pool = interp->arena_base->memory_pool;
@@ -563,7 +567,7 @@ memory is not cleared.
 */
 
 void
-Parrot_reallocate(Interp *interp /*NN*/, Buffer *buffer /*NN*/, size_t tosize)
+Parrot_reallocate(PARROT_INTERP, Buffer *buffer /*NN*/, size_t tosize)
 {
     size_t copysize;
     char  *mem;
@@ -624,7 +628,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 */
 
 void
-Parrot_reallocate_string(Interp *interp /*NN*/, STRING *str /*NN*/, size_t tosize)
+Parrot_reallocate_string(PARROT_INTERP, STRING *str /*NN*/, size_t tosize)
 {
     size_t copysize;
     char *mem, *oldmem;
@@ -692,7 +696,7 @@ C<PObj_buflen> will be set to exactly the given C<size>.
 */
 
 void
-Parrot_allocate(Interp *interp /*NN*/, Buffer *buffer /*NN*/, size_t size)
+Parrot_allocate(PARROT_INTERP, Buffer *buffer /*NN*/, size_t size)
 {
     PObj_buflen(buffer) = 0;
     PObj_bufstart(buffer) = NULL;
@@ -714,7 +718,7 @@ malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
 */
 
 void
-Parrot_allocate_aligned(Interp *interp /*NN*/, Buffer *buffer /*NN*/, size_t size)
+Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer /*NN*/, size_t size)
 {
     size_t new_size;
     char *mem;
@@ -743,7 +747,7 @@ is B<not> changed.
 */
 
 void
-Parrot_allocate_string(Interp *interp /*NN*/, STRING *str /*NN*/, size_t size)
+Parrot_allocate_string(PARROT_INTERP, STRING *str /*NN*/, size_t size)
 {
     size_t       new_size;
     Memory_Pool *pool;
@@ -807,7 +811,7 @@ Initialize the managed memory pools.
 */
 
 void
-Parrot_initialize_memory_pools(Interp *interp /*NN*/)
+Parrot_initialize_memory_pools(PARROT_INTERP)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -831,7 +835,7 @@ Destroys the memory pools.
 */
 
 void
-Parrot_destroy_memory_pools(Interp *interp /*NN*/)
+Parrot_destroy_memory_pools(PARROT_INTERP)
 {
     int i;
 

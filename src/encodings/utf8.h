@@ -15,7 +15,7 @@
 
 /* HEADERIZER BEGIN: src/encodings/utf8.c */
 
-ENCODING * Parrot_encoding_utf8_init( Interp *interp /*NN*/ )
+ENCODING * Parrot_encoding_utf8_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/encodings/utf8.c */

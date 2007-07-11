@@ -337,22 +337,24 @@ a sleep opcode.
 
 /* HEADERIZER BEGIN: static */
 
-static int collect_cb( Interp *interp,
+static int collect_cb( PARROT_INTERP,
     Small_Object_Pool *pool,
     int flag,
-    void *arg );
+    void *arg )
+        __attribute__nonnull__(1);
 
-static void gc_ims_add_free_object( Interp *interp,
+static void gc_ims_add_free_object( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/,
     void *to_add )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ims_alloc_objects( Interp *interp /*NN*/,
+static void gc_ims_alloc_objects( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * gc_ims_get_free_object( Interp *interp /*NN*/,
+static void * gc_ims_get_free_object( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -370,7 +372,7 @@ static void parrot_gc_ims_mark( Interp* interp /*NN*/ )
 static void parrot_gc_ims_reinit( Interp* interp /*NN*/ )
         __attribute__nonnull__(1);
 
-static void parrot_gc_ims_run( Interp *interp /*NN*/, int flags )
+static void parrot_gc_ims_run( PARROT_INTERP, int flags )
         __attribute__nonnull__(1);
 
 static void parrot_gc_ims_run_increment( Interp* interp /*NN*/ )
@@ -379,7 +381,7 @@ static void parrot_gc_ims_run_increment( Interp* interp /*NN*/ )
 static void parrot_gc_ims_sweep( Interp* interp /*NN*/ )
         __attribute__nonnull__(1);
 
-static int sweep_cb( Interp *interp /*NN*/,
+static int sweep_cb( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/,
     int flag,
     void *arg )
@@ -472,7 +474,7 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/, void *to_add)
+gc_ims_add_free_object(PARROT_INTERP, Small_Object_Pool *pool /*NN*/, void *to_add)
 {
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
@@ -490,7 +492,7 @@ gc_ims_add_free_object(Interp *interp, Small_Object_Pool *pool /*NN*/, void *to_
 
 
 static void *
-gc_ims_get_free_object(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
+gc_ims_get_free_object(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     PObj *ptr;
     Arenas * const arena_base    = interp->arena_base;
@@ -516,7 +518,7 @@ gc_ims_get_free_object(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
 }
 
 static void
-gc_ims_alloc_objects(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
+gc_ims_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
 {
     Small_Object_Arena *new_arena;
     size_t size;
@@ -664,7 +666,7 @@ TODO split work per pool.
 */
 
 static int
-sweep_cb(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag, void *arg)
+sweep_cb(PARROT_INTERP, Small_Object_Pool *pool /*NN*/, int flag, void *arg)
 {
     int * const n_obj = (int *) arg;
 
@@ -719,7 +721,7 @@ memory.
 
 #if !GC_IS_MALLOC
 static int
-collect_cb(Interp *interp, Small_Object_Pool *pool, int flag, void *arg)
+collect_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag, void *arg)
 {
     const int check_only = (int)(INTVAL)arg;
     Memory_Pool *mem_pool;
@@ -866,7 +868,7 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 */
 
 static void
-parrot_gc_ims_run(Interp *interp /*NN*/, int flags)
+parrot_gc_ims_run(PARROT_INTERP, int flags)
 {
     int lazy;
     Arenas * const arena_base    = interp->arena_base;

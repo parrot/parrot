@@ -23,15 +23,17 @@ representation.
 
 /* HEADERIZER BEGIN: static */
 
-static size_t PIO_utf8_read( Interp *interp,
+static size_t PIO_utf8_read( PARROT_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
-    STRING **buf );
+    STRING **buf )
+        __attribute__nonnull__(1);
 
-static size_t PIO_utf8_write( Interp *interp,
+static size_t PIO_utf8_write( PARROT_INTERP,
     ParrotIOLayer *l /*NN*/,
     ParrotIO *io,
     STRING *s )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -86,7 +88,7 @@ PIO_utf8_register_layer(void)
 }
 
 static size_t
-PIO_utf8_read(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_utf8_read(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
               STRING **buf)
 {
     STRING *s, *s2;
@@ -130,7 +132,7 @@ ok:
 }
 
 static size_t
-PIO_utf8_write(Interp *interp, ParrotIOLayer *l /*NN*/, ParrotIO *io, STRING *s)
+PIO_utf8_write(PARROT_INTERP, ParrotIOLayer *l /*NN*/, ParrotIO *io, STRING *s)
 {
     STRING *dest;
 

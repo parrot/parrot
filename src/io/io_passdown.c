@@ -33,7 +33,7 @@ Returns C<NULL> if no implementation is found.
 */
 
 ParrotIO *
-PIO_open_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
+PIO_open_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
               INTVAL flags)
     /* WARN_UNUSED */
 {
@@ -59,7 +59,7 @@ Returns C<NULL> if no implementation is found.
 */
 
 ParrotIO *
-PIO_open_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
+PIO_open_async_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, const char *name /*NN*/,
                     const char *mode /*NN*/, DummyCodeRef * dummy)
     /* WARN_UNUSED */
 {
@@ -86,7 +86,7 @@ Returns C<NULL> if no implementation is found.
 */
 
 ParrotIO *
-PIO_fdopen_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, PIOHANDLE fd, INTVAL flags)
+PIO_fdopen_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, PIOHANDLE fd, INTVAL flags)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -100,7 +100,7 @@ PIO_fdopen_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, PIOHANDLE fd, I
 }
 
 size_t
-PIO_peek_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
+PIO_peek_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -127,7 +127,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_close_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+PIO_close_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -152,7 +152,7 @@ Returns C<0> if no implementation is found.
 */
 
 size_t
-PIO_write_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING *s)
+PIO_write_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING *s)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -177,7 +177,7 @@ Returns C<0> if no implementation is found.
 */
 
 size_t
-PIO_write_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
+PIO_write_async_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                      STRING *s, DummyCodeRef *dummy)
     /* WARN_UNUSED */
 {
@@ -203,7 +203,7 @@ Returns C<0> if no implementation is found.
 */
 
 size_t
-PIO_read_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
+PIO_read_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, STRING ** buf)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -228,7 +228,7 @@ Returns C<0> if no implementation is found.
 */
 
 size_t
-PIO_read_async_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
+PIO_read_async_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                     STRING ** buf, DummyCodeRef *dummy)
     /* WARN_UNUSED */
 {
@@ -254,7 +254,7 @@ Returns C<0> if no implementation is found.
 */
 
 INTVAL
-PIO_flush_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+PIO_flush_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -279,7 +279,7 @@ Returns C<-1> if no implementation is found.
 */
 
 PIOOFF_T
-PIO_seek_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, PIOOFF_T offset,
+PIO_seek_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io, PIOOFF_T offset,
               INTVAL whence)
     /* WARN_UNUSED */
 {
@@ -305,7 +305,7 @@ Returns C<0> if no implementation is found.
 */
 
 PIOOFF_T
-PIO_tell_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+PIO_tell_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -330,7 +330,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_setbuf_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
+PIO_setbuf_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io,
                 size_t bufsize)
     /* WARN_UNUSED */
 {
@@ -356,7 +356,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_setlinebuf_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+PIO_setlinebuf_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -381,7 +381,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_eof_down(Interp *interp, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
+PIO_eof_down(PARROT_INTERP, ParrotIOLayer *layer /*NULLOK*/, ParrotIO * io)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -406,7 +406,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_poll_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io,
+PIO_poll_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io,
         INTVAL which, INTVAL sec, INTVAL usec)
     /* WARN_UNUSED */
 {
@@ -431,7 +431,7 @@ Returns C<NULL> if no implementation is found.
 */
 
 ParrotIO *
-PIO_socket_down(Interp *interp, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
+PIO_socket_down(PARROT_INTERP, ParrotIOLayer *layer, INTVAL fam, INTVAL type,
                 INTVAL proto)
     /* WARN_UNUSED */
 {
@@ -456,7 +456,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_recv_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
+PIO_recv_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -480,7 +480,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_send_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
+PIO_send_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *buf)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -504,7 +504,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_connect_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+PIO_connect_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -528,7 +528,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_bind_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
+PIO_bind_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -552,7 +552,7 @@ Returns C<-1> if no implementation is found.
 */
 
 INTVAL
-PIO_listen_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
+PIO_listen_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL backlog)
     /* WARN_UNUSED */
 {
     while (layer) {
@@ -576,7 +576,7 @@ Returns C<-1> if no implementation is found.
 */
 
 ParrotIO *
-PIO_accept_down(Interp *interp, ParrotIOLayer *layer, ParrotIO *io)
+PIO_accept_down(PARROT_INTERP, ParrotIOLayer *layer, ParrotIO *io)
     /* WARN_UNUSED */
 {
     while (layer) {

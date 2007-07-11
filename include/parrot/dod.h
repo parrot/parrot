@@ -51,56 +51,56 @@
 /* HEADERIZER BEGIN: src/gc/dod.c */
 
 PARROT_API
-void Parrot_do_dod_run( Interp *interp /*NN*/, UINTVAL flags )
+void Parrot_do_dod_run( PARROT_INTERP, UINTVAL flags )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_clear_live_bits( Interp *interp /*NN*/ )
+void Parrot_dod_clear_live_bits( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_ms_run( Interp *interp /*NN*/, int flags )
+void Parrot_dod_ms_run( PARROT_INTERP, int flags )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_ms_run_init( Interp *interp /*NN*/ )
+void Parrot_dod_ms_run_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_profile_end( Interp *interp /*NN*/, int what )
+void Parrot_dod_profile_end( PARROT_INTERP, int what )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_profile_start( Interp *interp /*NN*/ )
+void Parrot_dod_profile_start( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_dod_sweep( Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/ )
+void Parrot_dod_sweep( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int Parrot_dod_trace_children( Interp *interp /*NN*/, size_t how_many )
+int Parrot_dod_trace_children( PARROT_INTERP, size_t how_many )
         __attribute__nonnull__(1);
 
 PARROT_API
-int Parrot_dod_trace_root( Interp *interp /*NN*/, int trace_stack )
+int Parrot_dod_trace_root( PARROT_INTERP, int trace_stack )
         __attribute__nonnull__(1);
 
 PARROT_API
-void pobject_lives( Interp *interp /*NN*/, PObj *obj /*NN*/ )
+void pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void clear_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
+void clear_cow( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int cleanup )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void trace_mem_block( Interp *interp /*NN*/,
-    size_t lo_var_ptr,
-    size_t hi_var_ptr )
+void trace_mem_block( PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr )
         __attribute__nonnull__(1);
 
-void used_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
+void used_cow( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int cleanup )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/gc/dod.c */
@@ -132,15 +132,17 @@ void parrot_gc_gms_pobject_lives( Interp* interp /*NN*/, PObj *obj /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void parrot_gc_gms_wb( Interp *interp, PMC *agg, void *old, void *new /*NN*/ )
+void parrot_gc_gms_wb( PARROT_INTERP, PMC *agg, void *old, void *new /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-void parrot_gc_gms_wb_key( Interp *interp,
+void parrot_gc_gms_wb_key( PARROT_INTERP,
     PMC *agg,
     void *old,
     void *old_key,
     void *new,
-    void *new_key );
+    void *new_key )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/gc_gms.c */
 

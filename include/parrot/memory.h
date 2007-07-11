@@ -41,56 +41,59 @@
 /* HEADERIZER BEGIN: src/gc/memory.c */
 
 PARROT_API
-void * mem__sys_realloc( void *from /*NULLOK*/, size_t size )
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+PARROT_MALLOC
+void * mem__sys_realloc( NULLOK(void *from), size_t size );
 
 PARROT_API
+PARROT_MALLOC
 void * mem__sys_realloc_zeroed(
-    void *from /*NULLOK*/,
+    NULLOK(void *from),
     size_t size,
     size_t old_size )
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API
-void * mem_sys_allocate( size_t size )
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+PARROT_MALLOC
+void * mem_sys_allocate( size_t size );
 
 PARROT_API
-void * mem_sys_allocate_zeroed( size_t size )
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+PARROT_MALLOC
+void * mem_sys_allocate_zeroed( size_t size );
 
 PARROT_API
-void mem_sys_free( void * from );
+void mem_sys_free( NULLOK(void *from) );
 
-void * mem__internal_allocate( size_t size, const char *file, int line )
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
-
-void * mem__internal_allocate_zeroed(
+PARROT_MALLOC
+void * mem__internal_allocate(
     size_t size,
-    const char *file,
+    NOTNULL(const char *file),
     int line )
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
-
-void mem__internal_free( void *from, const char *file /*NN*/, int line )
         __attribute__nonnull__(2);
 
-void * mem__internal_realloc(
-    void *from /*NN*/,
+PARROT_MALLOC
+void * mem__internal_allocate_zeroed(
     size_t size,
-    const char *file /*NN*/,
+    NOTNULL(const char *file),
+    int line )
+        __attribute__nonnull__(2);
+
+void mem__internal_free(
+    NULLOK(void *from),
+    NOTNULL(const char *file /*NN*/),
+    int line )
+        __attribute__nonnull__(2);
+
+PARROT_MALLOC
+void * mem__internal_realloc(
+    NOTNULL(void *from),
+    size_t size,
+    NOTNULL(const char *file),
     int line )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
-void mem_setup_allocator( Interp *interp /*NN*/ )
+void mem_setup_allocator( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/memory.c */

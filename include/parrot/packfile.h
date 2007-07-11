@@ -589,7 +589,7 @@ opcode_t PF_fetch_opcode( PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-STRING * PF_fetch_string( Interp *interp /*NN*/,
+STRING * PF_fetch_string( PARROT_INTERP,
     PackFile *pf /*NN*/,
     opcode_t **cursor /*NN*/ )
         __attribute__nonnull__(1)

@@ -15,13 +15,16 @@
 
 /* HEADERIZER BEGIN: src/charset/iso-8859-1.c */
 
-STRING * charset_cvt_iso_8859_1_to_ascii( Interp *interp,
+STRING * charset_cvt_iso_8859_1_to_ascii( PARROT_INTERP,
     STRING *src /*NN*/,
     STRING *dest /*NULLOK*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-CHARSET * Parrot_charset_iso_8859_1_init( Interp *interp );
+CHARSET * Parrot_charset_iso_8859_1_init( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/charset/iso-8859-1.c */
 
 #endif /* PARROT_CHARSET_ISO_8859_1_H_GUARD */

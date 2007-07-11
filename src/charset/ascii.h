@@ -19,70 +19,79 @@
 
 /* HEADERIZER BEGIN: src/charset/ascii.c */
 
-INTVAL ascii_compare( Interp *interp,
+INTVAL ascii_compare( PARROT_INTERP,
     const STRING *lhs /*NN*/,
     const STRING *rhs /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-size_t ascii_compute_hash( Interp *interp,
+size_t ascii_compute_hash( PARROT_INTERP,
     const STRING *source_string /*NN*/,
     size_t seed )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-INTVAL ascii_cs_index( Interp *interp,
+INTVAL ascii_cs_index( PARROT_INTERP,
     STRING *source_string /*NN*/,
     STRING *search_string /*NN*/,
     UINTVAL offset )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-INTVAL ascii_cs_rindex( Interp *interp,
+INTVAL ascii_cs_rindex( PARROT_INTERP,
     STRING *source_string /*NN*/,
     STRING *search_string /*NN*/,
     UINTVAL offset )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-STRING * ascii_get_graphemes( Interp *interp,
+STRING * ascii_get_graphemes( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
     UINTVAL count )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-STRING * ascii_get_graphemes_inplace( Interp *interp,
+STRING * ascii_get_graphemes_inplace( PARROT_INTERP,
     STRING *source_string,
     UINTVAL offset,
     UINTVAL count,
     STRING *dest_string )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-STRING * charset_cvt_ascii_to_binary( Interp *interp /*NN*/,
+STRING * charset_cvt_ascii_to_binary( PARROT_INTERP,
     STRING *src /*NN*/,
     STRING *dest /*NULLOK*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-STRING * charset_cvt_ascii_to_iso_8859_1( Interp *interp /*NN*/,
+STRING * charset_cvt_ascii_to_iso_8859_1( PARROT_INTERP,
     STRING *src /*NN*/,
     STRING *dest /*NULLOK*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-INTVAL mixed_cs_index( Interp *interp,
+INTVAL mixed_cs_index( PARROT_INTERP,
     STRING *src /*NN*/,
     STRING *search /*NN*/,
     UINTVAL offs )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-CHARSET * Parrot_charset_ascii_init( Interp *interp );
+CHARSET * Parrot_charset_ascii_init( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/charset/ascii.c */
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */

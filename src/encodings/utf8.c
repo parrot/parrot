@@ -22,13 +22,16 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 /* HEADERIZER BEGIN: static */
 
-static void become_encoding( Interp *interp, STRING *src );
+static void become_encoding( PARROT_INTERP, STRING *src )
+        __attribute__nonnull__(1);
+
 static UINTVAL bytes( SHIM_INTERP, STRING *src /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-static UINTVAL codepoints( Interp *interp, STRING *src /*NN*/ )
+static UINTVAL codepoints( PARROT_INTERP, STRING *src /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static UINTVAL get_byte(
@@ -37,32 +40,37 @@ static UINTVAL get_byte(
     UINTVAL offset )
         __attribute__nonnull__(2);
 
-static STRING * get_bytes( Interp *interp,
+static STRING * get_bytes( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static STRING * get_bytes_inplace( Interp *interp,
+static STRING * get_bytes_inplace( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
     UINTVAL count,
-    STRING *return_string );
+    STRING *return_string )
+        __attribute__nonnull__(1);
 
-static UINTVAL get_codepoint( Interp *interp,
+static UINTVAL get_codepoint( PARROT_INTERP,
     const STRING *src /*NN*/,
     UINTVAL offset )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * get_codepoints( Interp *interp,
+static STRING * get_codepoints( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
-    UINTVAL count );
+    UINTVAL count )
+        __attribute__nonnull__(1);
 
-static STRING * get_codepoints_inplace( Interp *interp,
+static STRING * get_codepoints_inplace( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
     UINTVAL count,
-    STRING *return_string );
+    STRING *return_string )
+        __attribute__nonnull__(1);
 
 static void iter_init(
     SHIM_INTERP,
@@ -70,52 +78,56 @@ static void iter_init(
     String_iter *iter /*NN*/ )
         __attribute__nonnull__(3);
 
-static void set_byte( Interp *interp /*NN*/,
+static void set_byte( PARROT_INTERP,
     const STRING *src /*NN*/,
     UINTVAL offset,
     UINTVAL byte )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void set_bytes( Interp *interp,
+static void set_bytes( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
     UINTVAL count,
-    STRING *new_bytes );
+    STRING *new_bytes )
+        __attribute__nonnull__(1);
 
-static void set_codepoint( Interp *interp,
+static void set_codepoint( PARROT_INTERP,
     STRING *src /*NN*/,
     UINTVAL offset,
     UINTVAL codepoint )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void set_codepoints( Interp *interp,
+static void set_codepoints( PARROT_INTERP,
     STRING *src,
     UINTVAL offset,
     UINTVAL count,
-    STRING *new_codepoints );
+    STRING *new_codepoints )
+        __attribute__nonnull__(1);
 
-static STRING * to_encoding( Interp *interp /*NN*/,
-    STRING *src /*NN*/,
-    STRING *dest )
+static STRING * to_encoding( PARROT_INTERP, STRING *src /*NN*/, STRING *dest )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_characters( Interp *interp,
+static UINTVAL utf8_characters( PARROT_INTERP,
     const utf8_t *ptr /*NN*/,
     UINTVAL byte_len )
-        __attribute__nonnull__(2);
-
-static UINTVAL utf8_decode( Interp *interp, const utf8_t *ptr );
-static UINTVAL utf8_decode_and_advance( Interp *interp /*NN*/,
-    String_iter *i /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * utf8_encode( Interp *interp, void *ptr /*NN*/, UINTVAL c )
+static UINTVAL utf8_decode( PARROT_INTERP, const utf8_t *ptr )
+        __attribute__nonnull__(1);
+
+static UINTVAL utf8_decode_and_advance( PARROT_INTERP, String_iter *i /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void utf8_encode_and_advance( Interp *interp /*NN*/,
+static void * utf8_encode( PARROT_INTERP, void *ptr /*NN*/, UINTVAL c )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void utf8_encode_and_advance( PARROT_INTERP,
     String_iter *i /*NN*/,
     UINTVAL c )
         __attribute__nonnull__(1)
@@ -169,7 +181,7 @@ Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
 */
 
 static UINTVAL
-utf8_characters(Interp *interp, const utf8_t *ptr /*NN*/, UINTVAL byte_len)
+utf8_characters(PARROT_INTERP, const utf8_t *ptr /*NN*/, UINTVAL byte_len)
 {
     const utf8_t *u8ptr = ptr;
     const utf8_t *u8end = u8ptr + byte_len;
@@ -196,7 +208,7 @@ Returns the integer for the UTF-8 character found at C<*ptr>.
 */
 
 static UINTVAL
-utf8_decode(Interp *interp, const utf8_t *ptr)
+utf8_decode(PARROT_INTERP, const utf8_t *ptr)
 {
     const utf8_t *u8ptr = ptr;
     UINTVAL c = *u8ptr;
@@ -234,7 +246,7 @@ Returns the UTF-8 encoding of integer C<c>.
 */
 
 static void *
-utf8_encode(Interp *interp, void *ptr /*NN*/, UINTVAL c)
+utf8_encode(PARROT_INTERP, void *ptr /*NN*/, UINTVAL c)
 {
     utf8_t *u8ptr = (utf8_t *)ptr;
     UINTVAL len = UNISKIP(c);
@@ -314,7 +326,7 @@ function.
 */
 
 static UINTVAL
-utf8_decode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/)
+utf8_decode_and_advance(PARROT_INTERP, String_iter *i /*NN*/)
 {
     const utf8_t *u8ptr = (utf8_t *)((char *)i->str->strstart + i->bytepos);
     UINTVAL c = *u8ptr;
@@ -348,7 +360,7 @@ utf8_decode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/)
 }
 
 static void
-utf8_encode_and_advance(Interp *interp /*NN*/, String_iter *i /*NN*/, UINTVAL c)
+utf8_encode_and_advance(PARROT_INTERP, String_iter *i /*NN*/, UINTVAL c)
 {
     const STRING * const s = i->str;
     unsigned char * const pos = (unsigned char *)s->strstart + i->bytepos;
@@ -384,7 +396,7 @@ utf8_set_position(SHIM_INTERP, String_iter *i /*NN*/, UINTVAL pos)
 
 
 static STRING *
-to_encoding(Interp *interp /*NN*/, STRING *src /*NN*/, STRING *dest)
+to_encoding(PARROT_INTERP, STRING *src /*NN*/, STRING *dest)
 {
     STRING *result;
     String_iter src_iter;
@@ -459,14 +471,14 @@ to_encoding(Interp *interp /*NN*/, STRING *src /*NN*/, STRING *dest)
 }
 
 static UINTVAL
-get_codepoint(Interp *interp, const STRING *src /*NN*/, UINTVAL offset)
+get_codepoint(PARROT_INTERP, const STRING *src /*NN*/, UINTVAL offset)
 {
     const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
     return utf8_decode(interp, start);
 }
 
 static void
-set_codepoint(Interp *interp, STRING *src /*NN*/,
+set_codepoint(PARROT_INTERP, STRING *src /*NN*/,
         UINTVAL offset, UINTVAL codepoint)
 {
     const void *start;
@@ -492,7 +504,7 @@ get_byte(SHIM_INTERP, const STRING *src /*NN*/, UINTVAL offset)
 }
 
 static void
-set_byte(Interp *interp /*NN*/, const STRING *src /*NN*/,
+set_byte(PARROT_INTERP, const STRING *src /*NN*/,
         UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;
@@ -504,7 +516,7 @@ set_byte(Interp *interp /*NN*/, const STRING *src /*NN*/,
 }
 
 static STRING *
-get_codepoints(Interp *interp, STRING *src,
+get_codepoints(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count)
 {
     String_iter iter;
@@ -522,7 +534,7 @@ get_codepoints(Interp *interp, STRING *src,
 }
 
 static STRING *
-get_bytes(Interp *interp, STRING *src,
+get_bytes(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count)
 {
     STRING *return_string = Parrot_make_COW_reference(interp,
@@ -541,7 +553,7 @@ get_bytes(Interp *interp, STRING *src,
 
 
 static STRING *
-get_codepoints_inplace(Interp *interp, STRING *src,
+get_codepoints_inplace(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     String_iter iter;
@@ -559,7 +571,7 @@ get_codepoints_inplace(Interp *interp, STRING *src,
 }
 
 static STRING *
-get_bytes_inplace(Interp *interp, STRING *src,
+get_bytes_inplace(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *return_string)
 {
     UNIMPL;
@@ -570,7 +582,7 @@ get_bytes_inplace(Interp *interp, STRING *src,
 }
 
 static void
-set_codepoints(Interp *interp, STRING *src,
+set_codepoints(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_codepoints)
 {
     UNUSED(interp);
@@ -580,7 +592,7 @@ set_codepoints(Interp *interp, STRING *src,
 }
 
 static void
-set_bytes(Interp *interp, STRING *src,
+set_bytes(PARROT_INTERP, STRING *src,
         UINTVAL offset, UINTVAL count, STRING *new_bytes)
 {
     UNUSED(interp);
@@ -592,7 +604,7 @@ set_bytes(Interp *interp, STRING *src,
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
 static void
-become_encoding(Interp *interp, STRING *src)
+become_encoding(PARROT_INTERP, STRING *src)
 {
     UNUSED(interp);
     UNUSED(src);
@@ -601,7 +613,7 @@ become_encoding(Interp *interp, STRING *src)
 
 
 static UINTVAL
-codepoints(Interp *interp, STRING *src /*NN*/)
+codepoints(PARROT_INTERP, STRING *src /*NN*/)
 {
     String_iter iter;
     /*
@@ -632,7 +644,7 @@ iter_init(SHIM_INTERP, const STRING *src, String_iter *iter /*NN*/)
 }
 
 ENCODING *
-Parrot_encoding_utf8_init(Interp *interp /*NN*/)
+Parrot_encoding_utf8_init(PARROT_INTERP)
 {
     ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
