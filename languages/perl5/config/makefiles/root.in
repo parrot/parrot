@@ -65,6 +65,9 @@ BUILD_CLEANERS = \
 clean:
 	$(RM_F) $(BUILD_CLEANERS) $(TEST_CLEANERS)
 
+realclean: clean
+	$(RM_F) Makefile
+
 distclean: clean
 	$(RM_F) Makefile
 
