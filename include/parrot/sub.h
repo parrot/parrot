@@ -209,11 +209,11 @@ typedef struct Parrot_Context_info {
 /* HEADERIZER BEGIN: src/sub.c */
 
 PARROT_API
-PMC * new_ret_continuation_pmc( Interp *interp /*NN*/, opcode_t *address )
+PMC * new_ret_continuation_pmc( PARROT_INTERP, opcode_t *address )
         __attribute__nonnull__(1);
 
 PARROT_API
-int Parrot_Context_get_info( Interp *interp /*NN*/,
+int Parrot_Context_get_info( PARROT_INTERP,
     parrot_context_t *ctx /*NN*/,
     Parrot_Context_info *info /*NN*/ )
         __attribute__nonnull__(1)
@@ -221,44 +221,42 @@ int Parrot_Context_get_info( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 PARROT_API
-STRING* Parrot_Context_infostr( Interp *interp /*NN*/,
-    parrot_context_t *ctx /*NN*/ )
+STRING* Parrot_Context_infostr( PARROT_INTERP, parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-STRING* Parrot_full_sub_name( Interp *interp /*NN*/, PMC* sub /*NULLOK*/ )
+STRING* Parrot_full_sub_name( PARROT_INTERP, PMC* sub /*NULLOK*/ )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC* parrot_new_closure( Interp *interp /*NN*/, PMC *sub_pmc )
+PMC* parrot_new_closure( PARROT_INTERP, PMC *sub_pmc )
         __attribute__nonnull__(1);
 
-void invalidate_retc_context( Interp *interp /*NN*/, PMC *cont /*NN*/ )
+void invalidate_retc_context( PARROT_INTERP, PMC *cont /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_context( Interp *interp /*NN*/, parrot_context_t* ctx /*NN*/ )
+void mark_context( PARROT_INTERP, parrot_context_t* ctx /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Parrot_sub * new_closure( Interp *interp /*NN*/ )
+Parrot_sub * new_closure( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-Parrot_cont * new_continuation( Interp *interp /*NN*/,
-    Parrot_cont *to /*NULLOK*/ )
+Parrot_cont * new_continuation( PARROT_INTERP, Parrot_cont *to /*NULLOK*/ )
         __attribute__nonnull__(1);
 
-Parrot_coro * new_coroutine( Interp *interp /*NN*/ )
+Parrot_coro * new_coroutine( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-Parrot_cont * new_ret_continuation( Interp *interp /*NN*/ )
+Parrot_cont * new_ret_continuation( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-Parrot_sub * new_sub( Interp *interp /*NN*/ )
+Parrot_sub * new_sub( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-PMC* Parrot_find_pad( Interp *interp /*NN*/,
+PMC* Parrot_find_pad( PARROT_INTERP,
     STRING *lex_name,
     parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)

@@ -22,44 +22,42 @@
 /* HEADERIZER BEGIN: src/hll.c */
 
 PARROT_API
-PMC* Parrot_get_ctx_HLL_namespace( Interp *interp /*NN*/ )
+PMC* Parrot_get_ctx_HLL_namespace( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_ctx_HLL_type( Interp *interp /*NN*/, INTVAL core_type )
+INTVAL Parrot_get_ctx_HLL_type( PARROT_INTERP, INTVAL core_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_HLL_id( Interp *interp /*NN*/, STRING *hll_name /*NULLOK*/ )
+INTVAL Parrot_get_HLL_id( PARROT_INTERP, STRING *hll_name /*NULLOK*/ )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 PARROT_API
-STRING * Parrot_get_HLL_name( Interp *interp /*NN*/, INTVAL id )
+STRING * Parrot_get_HLL_name( PARROT_INTERP, INTVAL id )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC* Parrot_get_HLL_namespace( Interp *interp /*NN*/, int hll_id )
+PMC* Parrot_get_HLL_namespace( PARROT_INTERP, int hll_id )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_HLL_type( Interp *interp /*NN*/,
-    INTVAL hll_id,
-    INTVAL core_type )
+INTVAL Parrot_get_HLL_type( PARROT_INTERP, INTVAL hll_id, INTVAL core_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_regenerate_HLL_namespaces( Interp *interp /*NN*/ )
+void Parrot_regenerate_HLL_namespaces( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_register_HLL( Interp *interp /*NN*/,
+INTVAL Parrot_register_HLL( PARROT_INTERP,
     STRING *hll_name /*NULLOK*/,
     STRING *hll_lib )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_register_HLL_type( Interp *interp /*NN*/,
+void Parrot_register_HLL_type( PARROT_INTERP,
     INTVAL hll_id,
     INTVAL core_type,
     INTVAL hll_type )

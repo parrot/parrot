@@ -357,7 +357,7 @@ static void * gc_ims_get_free_object( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ims_pool_init( Interp *interp, Small_Object_Pool *pool /*NN*/ )
+static void gc_ims_pool_init( SHIM_INTERP, Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(2);
 
 static int parrot_gc_ims_collect( Interp* interp, int check_only );

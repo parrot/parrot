@@ -79,7 +79,8 @@ static INTVAL PIO_buf_setlinebuf( Interp *interp,
     ParrotIOLayer *layer,
     ParrotIO *io );
 
-static PIOOFF_T PIO_buf_tell( Interp *interp,
+static PIOOFF_T PIO_buf_tell(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);

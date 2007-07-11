@@ -35,7 +35,7 @@ static void save_struct(FILE *fp, void *sp, size_t size);
 /*
 
 =item C<void
-Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)>
+Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)>
 
 Save the C<Parrot_exec_objfile_t> to C<file>.
 
@@ -44,7 +44,7 @@ Save the C<Parrot_exec_objfile_t> to C<file>.
 */
 
 void
-Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;
@@ -187,7 +187,7 @@ Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
 #  define NSECTIONS     8
 
 void
-Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
     Elf32_Ehdr header;
     Elf32_Shdr sechdr;
@@ -582,7 +582,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  define SYMTAB     DATA_RELOC + (obj->data_rellocation_count * 0xA)
 
 void
-Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;

@@ -57,7 +57,7 @@ trace_class_name(const PMC* pmc /*NN*/)
 }
 
 void
-trace_pmc_dump(Interp *interp /*NN*/, PMC *pmc /*NN*/)
+trace_pmc_dump(PARROT_INTERP, PMC *pmc /*NN*/)
 {
     Interp * const debugger = interp->debugger;
 
@@ -144,7 +144,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(Interp *interp /*NN*/, const PMC *key /*NN*/)
+trace_key_dump(PARROT_INTERP, const PMC *key /*NN*/)
 {
     Interp * const debugger = interp->debugger;
 
@@ -222,7 +222,7 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(Interp *interp /*NN*/, const opcode_t *code_start /*NN*/, const opcode_t *pc /*NN*/)
+trace_op_dump(PARROT_INTERP, const opcode_t *code_start /*NN*/, const opcode_t *pc /*NN*/)
 {
     INTVAL s, n;
     int more = 0, var_args;
@@ -420,7 +420,7 @@ checking.
 */
 
 void
-trace_op(Interp *interp, const opcode_t *code_start /*NN*/,
+trace_op(PARROT_INTERP, const opcode_t *code_start /*NN*/,
          const opcode_t *code_end /*NN*/, const opcode_t *pc /*NULLOK*/)
 {
     if (!pc) {

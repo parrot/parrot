@@ -71,7 +71,8 @@ static const char * to_infix( Interp *interp /*NN*/,
         __attribute__nonnull__(4)
         __attribute__warn_unused_result__;
 
-static const char * try_rev_cmp( Interp *interp,
+static const char * try_rev_cmp(
+    SHIM_INTERP,
     IMC_Unit * unit,
     const char *name,
     SymReg ** r );

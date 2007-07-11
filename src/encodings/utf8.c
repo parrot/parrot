@@ -23,7 +23,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 /* HEADERIZER BEGIN: static */
 
 static void become_encoding( Interp *interp, STRING *src );
-static UINTVAL bytes( Interp *interp, STRING *src /*NN*/ )
+static UINTVAL bytes( SHIM_INTERP, STRING *src /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
@@ -31,7 +31,8 @@ static UINTVAL bytes( Interp *interp, STRING *src /*NN*/ )
 static UINTVAL codepoints( Interp *interp, STRING *src /*NN*/ )
         __attribute__nonnull__(2);
 
-static UINTVAL get_byte( Interp *interp,
+static UINTVAL get_byte(
+    SHIM_INTERP,
     const STRING *src /*NN*/,
     UINTVAL offset )
         __attribute__nonnull__(2);
@@ -63,7 +64,8 @@ static STRING * get_codepoints_inplace( Interp *interp,
     UINTVAL count,
     STRING *return_string );
 
-static void iter_init( Interp *interp,
+static void iter_init(
+    SHIM_INTERP,
     const STRING *src,
     String_iter *iter /*NN*/ )
         __attribute__nonnull__(3);
@@ -119,7 +121,8 @@ static void utf8_encode_and_advance( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void utf8_set_position( Interp *interp,
+static void utf8_set_position(
+    SHIM_INTERP,
     String_iter *i /*NN*/,
     UINTVAL pos )
         __attribute__nonnull__(2);

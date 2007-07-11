@@ -108,7 +108,7 @@ void used_cow( Interp *interp, Small_Object_Pool *pool /*NN*/, int cleanup )
 
 /* HEADERIZER BEGIN: src/cpu_dep.c */
 
-void trace_system_areas( Interp *interp /*NN*/ )
+void trace_system_areas( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/cpu_dep.c */

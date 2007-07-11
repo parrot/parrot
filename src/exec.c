@@ -56,7 +56,7 @@ section. And emits the executable.
 */
 
 void
-Parrot_exec(Interp *interp, opcode_t *pc,
+Parrot_exec(PARROT_INTERP, opcode_t *pc,
         opcode_t *code_start, opcode_t *code_end)
 {
 #ifdef JIT_CGP

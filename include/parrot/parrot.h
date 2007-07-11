@@ -240,36 +240,6 @@ typedef void (*funcptr_t)(void);
 #  define O_BINARY 0
 #endif /* O_BINARY */
 
-
-/* Shim arguments are arguments that must be included in your function,
- * but serve no purpose inside.  Mark them with the SHIM() macro so that
- * the compiler and/or lint know that it's OK it's unused.  Shim arguments
- * get "_unused" added to them so that you can't accidentally use them
- * without removing the shim designation.
- */
-#define SHIM(a) /*@unused@*/ a##_unused __attribute__unused__
-
-/* One of the most common shim arguments is the interpreter itself, so it
- * gets its own macro.
- */
-#define SHIM_INTERP /*@unused@*/ Interp *interp_unused __attribute__unused__
-#define PARROT_INTERP /*@notnull@*/ Parrot_Interp interp
-
-/* UNUSED() is the old way we handled shim arguments Should still be
-   used in cases where the argument should, at some point be used.
- */
-#define UNUSED(a) if (0) (void)(a);
-
-#define PARROT_CAN_RETURN_NULL      /*@null@*/
-#define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
-#define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
-#define PARROT_PURE_FUNCTION        __attribute__pure__
-#define PARROT_CONST_FUNCTION       __attribute__const__
-#define PARROT_MALLOC               __attribute__malloc__
-
-#define NOTNULL(x)                  /*@notnull@*/ x
-#define NULLOK(x)                   /*@null@*/ x
-
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d,s)    assert(d);assert(s);*(d)=*(s);
 #define STRUCT_COPY_N(d,s,n) assert(d);assert(s);assert(sizeof(*d)==sizeof(*s));memcpy((d),(s),sizeof(*d)*(n));

@@ -77,7 +77,7 @@ Parrot_destroy_vtable(SHIM_INTERP, VTABLE *vtable /*NULLOK*/)
 }
 
 void
-parrot_alloc_vtables(Interp *interp /*NN*/)
+parrot_alloc_vtables(PARROT_INTERP)
 {
     interp->vtables =
         (VTABLE **)mem_sys_allocate_zeroed(sizeof (VTABLE *) * PARROT_MAX_CLASSES);
@@ -86,7 +86,7 @@ parrot_alloc_vtables(Interp *interp /*NN*/)
 }
 
 void
-parrot_realloc_vtables(Interp *interp /*NN*/)
+parrot_realloc_vtables(PARROT_INTERP)
 {
     /* 16 bigger seems reasonable, though it's only a pointer
        table and we could get bigger without blowing much memory
@@ -99,7 +99,7 @@ parrot_realloc_vtables(Interp *interp /*NN*/)
 }
 
 void
-parrot_free_vtables(Interp *interp /*NN*/)
+parrot_free_vtables(PARROT_INTERP)
 {
     int i;
 

@@ -32,7 +32,8 @@ static const char * flags_to_stdio( INTVAL flags )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-static INTVAL PIO_stdio_close( Interp *interp,
+static INTVAL PIO_stdio_close(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
@@ -42,7 +43,8 @@ static ParrotIO * PIO_stdio_fdopen( Interp *interp,
     PIOHANDLE fptr,
     INTVAL flags );
 
-static INTVAL PIO_stdio_flush( Interp *interp,
+static INTVAL PIO_stdio_flush(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
@@ -64,19 +66,22 @@ static size_t PIO_stdio_read( Interp *interp,
     ParrotIO *io,
     STRING ** buf );
 
-static PIOOFF_T PIO_stdio_seek( Interp *interp,
+static PIOOFF_T PIO_stdio_seek(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
-static PIOOFF_T PIO_stdio_tell( Interp *interp,
+static PIOOFF_T PIO_stdio_tell(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
-static size_t PIO_stdio_write( Interp *interp,
+static size_t PIO_stdio_write(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     STRING *s /*NN*/ )

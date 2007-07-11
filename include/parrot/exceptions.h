@@ -150,16 +150,16 @@ typedef struct parrot_exception_t {
 /* HEADERIZER BEGIN: src/exceptions.c */
 
 PARROT_API
-void do_exception( Interp *interp /*NN*/, INTVAL severity, long error )
+void do_exception( PARROT_INTERP, INTVAL severity, long error )
         __attribute__nonnull__(1)
         __attribute__noreturn__;
 
 PARROT_API
-void free_internal_exception( Interp *interp /*NN*/ )
+void free_internal_exception( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-size_t handle_exception( Interp *interp /*NN*/ )
+size_t handle_exception( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -168,41 +168,40 @@ void internal_exception( int exitcode, const char *format /*NN*/, ... )
         __attribute__noreturn__;
 
 PARROT_API
-PMC* new_c_exception_handler( Interp *interp /*NN*/, Parrot_exception *jb )
+PMC* new_c_exception_handler( PARROT_INTERP, Parrot_exception *jb )
         __attribute__nonnull__(1);
 
 PARROT_API
-void new_internal_exception( Interp *interp /*NN*/ )
+void new_internal_exception( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_pop_mark( Interp *interp /*NN*/, INTVAL mark )
+void Parrot_pop_mark( PARROT_INTERP, INTVAL mark )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_push_action( Interp *interp /*NN*/, PMC *sub )
+void Parrot_push_action( PARROT_INTERP, PMC *sub )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_push_mark( Interp *interp /*NN*/, INTVAL mark )
+void Parrot_push_mark( PARROT_INTERP, INTVAL mark )
         __attribute__nonnull__(1);
 
 PARROT_API
-void pop_exception( Interp *interp /*NN*/ )
+void pop_exception( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void push_exception( Interp *interp /*NN*/, PMC *handler /*NN*/ )
+void push_exception( PARROT_INTERP, PMC *handler /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void push_new_c_exception_handler( Interp *interp /*NN*/,
-    Parrot_exception *jb )
+void push_new_c_exception_handler( PARROT_INTERP, Parrot_exception *jb )
         __attribute__nonnull__(1);
 
 PARROT_API
-void real_exception( Interp *interp /*NN*/,
+void real_exception( PARROT_INTERP,
     void *ret_addr,
     int exitcode,
     const char *format /*NN*/,
@@ -212,30 +211,28 @@ void real_exception( Interp *interp /*NN*/,
         __attribute__noreturn__;
 
 PARROT_API
-opcode_t * rethrow_exception( Interp *interp /*NN*/, PMC *exception /*NN*/ )
+opcode_t * rethrow_exception( PARROT_INTERP, PMC *exception /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * throw_exception( Interp *interp /*NN*/,
-    PMC *exception,
-    void *dest )
+opcode_t * throw_exception( PARROT_INTERP, PMC *exception, void *dest )
         __attribute__nonnull__(1);
 
-void destroy_exception_list( Interp *interp /*NN*/ )
+void destroy_exception_list( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void do_panic( Interp *interp /*NULLOK*/,
+void do_panic( PARROT_INTERP /*NULLOK*/,
     const char *message /*NULLOK*/,
     const char *file /*NULLOK*/,
     int line )
         __attribute__noreturn__;
 
-void Parrot_init_exceptions( Interp *interp /*NN*/ )
+void Parrot_init_exceptions( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 void really_destroy_exception_list( Parrot_exception *e /*NULLOK*/ );
-void rethrow_c_exception( Interp *interp /*NN*/ )
+void rethrow_c_exception( PARROT_INTERP )
         __attribute__nonnull__(1)
         __attribute__noreturn__;
 

@@ -58,13 +58,16 @@ static All_charsets *all_charsets;
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL register_charset( Interp *interp,
+static INTVAL register_charset( PARROT_INTERP,
     const char *charsetname /*NN*/,
     CHARSET *charset /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void register_static_converters( Interp *interp );
+static void register_static_converters( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 PARROT_API
@@ -111,7 +114,7 @@ Parrot_find_charset(SHIM_INTERP, const char *charsetname /*NN*/)
 
 PARROT_API
 CHARSET *
-Parrot_load_charset(Interp *interp, const char *charsetname /*NN*/)
+Parrot_load_charset(PARROT_INTERP, const char *charsetname /*NN*/)
     /* WARN_UNUSED, NORETURN */
 {
     UNUSED(interp);
@@ -131,7 +134,7 @@ Return the number of the charset or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_charset_number(Interp *interp, STRING *charsetname /*NN*/)
+Parrot_charset_number(PARROT_INTERP, STRING *charsetname /*NN*/)
     /* WARN_UNUSED */
 {
     const int n = all_charsets->n_charsets;
@@ -198,7 +201,7 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 }
 
 static INTVAL
-register_charset(Interp *interp, const char *charsetname /*NN*/,
+register_charset(PARROT_INTERP, const char *charsetname /*NN*/,
         CHARSET *charset /*NN*/)
 {
     const int n = all_charsets->n_charsets;
@@ -227,7 +230,7 @@ register_charset(Interp *interp, const char *charsetname /*NN*/,
 }
 
 static void
-register_static_converters(Interp *interp)
+register_static_converters(PARROT_INTERP)
 {
     Parrot_register_charset_converter(interp,
             Parrot_iso_8859_1_charset_ptr, Parrot_ascii_charset_ptr,
@@ -246,7 +249,7 @@ register_static_converters(Interp *interp)
 
 PARROT_API
 INTVAL
-Parrot_register_charset(Interp *interp, const char *charsetname /*NN*/,
+Parrot_register_charset(PARROT_INTERP, const char *charsetname /*NN*/,
         CHARSET *charset /*NN*/)
 {
     if (!all_charsets) {
@@ -278,7 +281,7 @@ Parrot_register_charset(Interp *interp, const char *charsetname /*NN*/,
 
 PARROT_API
 void
-Parrot_charsets_encodings_init(Interp *interp /*NN*/)
+Parrot_charsets_encodings_init(PARROT_INTERP)
 {
     /* the order is crucial here:
      * 1) encodings, default = fixed_8

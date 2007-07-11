@@ -20,11 +20,11 @@ src/pmc.c - The base vtable calling functions
 
 /* HEADERIZER BEGIN: static */
 
-static PMC* create_class_pmc( Interp *interp /*NN*/, INTVAL type )
+static PMC* create_class_pmc( PARROT_INTERP, INTVAL type )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-static PMC* get_new_pmc_header( Interp *interp /*NN*/,
+static PMC* get_new_pmc_header( PARROT_INTERP,
     INTVAL base_type,
     UINTVAL flags )
         __attribute__nonnull__(1)
@@ -48,7 +48,7 @@ any other necessary initialization.
 
 PARROT_API
 PMC *
-pmc_new(Interp *interp /*NN*/, INTVAL base_type)
+pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = pmc_new_noinit(interp, base_type);
     VTABLE_init(interp, pmc);
@@ -69,7 +69,7 @@ type.
 
 PARROT_API
 PMC*
-pmc_reuse(Interp *interp /*NN*/, PMC *pmc /*NN*/, INTVAL new_type,
+pmc_reuse(PARROT_INTERP, PMC *pmc /*NN*/, INTVAL new_type,
           SHIM(UINTVAL flags))
 {
     INTVAL has_ext, new_flags;
@@ -166,7 +166,7 @@ Gets a new PMC header.
 */
 
 static PMC*
-get_new_pmc_header(Interp *interp /*NN*/, INTVAL base_type, UINTVAL flags)
+get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     /* WARN_UNUSED */
 {
     PMC *pmc;
@@ -262,7 +262,7 @@ initialization for continuations.
 
 PARROT_API
 PMC *
-pmc_new_noinit(Interp *interp /*NN*/, INTVAL base_type)
+pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
 
@@ -278,7 +278,7 @@ Creates a new constant PMC of type C<base_type>.
 
 PARROT_API
 PMC *
-constant_pmc_new_noinit(Interp *interp /*NN*/, INTVAL base_type)
+constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type,
             PObj_constant_FLAG);
@@ -294,7 +294,7 @@ Creates a new constant PMC of type C<base_type>, the call C<init>.
 
 PARROT_API
 PMC *
-constant_pmc_new(Interp *interp /*NN*/, INTVAL base_type)
+constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type,
             PObj_constant_FLAG);
@@ -311,7 +311,7 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 
 PARROT_API
 PMC *
-pmc_new_init(Interp *interp /*NN*/, INTVAL base_type, PMC *init)
+pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)
 {
     PMC * const pmc = pmc_new_noinit(interp, base_type);
 
@@ -329,7 +329,7 @@ As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
 PARROT_API
 PMC *
-constant_pmc_new_init(Interp *interp /*NN*/, INTVAL base_type, PMC *init)
+constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
@@ -414,7 +414,7 @@ pmc_type_p(Interp* interp /*NN*/, PMC *name /*NN*/)
 }
 
 static PMC*
-create_class_pmc(Interp *interp /*NN*/, INTVAL type)
+create_class_pmc(PARROT_INTERP, INTVAL type)
     /* WARN_UNUSED */
 {
     /*
@@ -469,7 +469,7 @@ Create the MRO (method resolution order) array for this type.
 
 PARROT_API
 void
-Parrot_create_mro(Interp *interp /*NN*/, INTVAL type)
+Parrot_create_mro(PARROT_INTERP, INTVAL type)
 {
     STRING *class_name, *isa;
     INTVAL pos, parent_type, total;

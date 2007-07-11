@@ -20,7 +20,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 /* HEADERIZER BEGIN: static */
 
 static void become_encoding( Interp *interp, STRING *source_string );
-static UINTVAL bytes( Interp *interp, STRING *source_string /*NN*/ )
+static UINTVAL bytes( SHIM_INTERP, STRING *source_string /*NN*/ )
         __attribute__nonnull__(2);
 
 static UINTVAL codepoints( Interp *interp, STRING *source_string /*NN*/ )
@@ -37,7 +37,8 @@ static void fixed8_set_next( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixed8_set_position( Interp *interp,
+static void fixed8_set_position(
+    SHIM_INTERP,
     String_iter *iter /*NN*/,
     UINTVAL pos )
         __attribute__nonnull__(2);
@@ -78,7 +79,7 @@ static STRING * get_codepoints_inplace( Interp *interp,
     STRING *dest_string /*NN*/ )
         __attribute__nonnull__(5);
 
-static void iter_init( Interp *interp, const STRING *src, String_iter *iter );
+static void iter_init( SHIM_INTERP, const STRING *src, String_iter *iter );
 static void set_byte( Interp *interp,
     const STRING *source_string /*NN*/,
     UINTVAL offset,

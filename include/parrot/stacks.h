@@ -49,43 +49,46 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 /* HEADERIZER BEGIN: src/stacks.c */
 
 PARROT_API
-Stack_entry_type get_entry_type( Interp *interp,
+Stack_entry_type get_entry_type(
+    SHIM_INTERP,
     const Stack_Entry_t *entry /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API
-void mark_stack( Interp *interp /*NN*/, Stack_Chunk_t *chunk /*NN*/ )
+void mark_stack( PARROT_INTERP, Stack_Chunk_t *chunk /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-Stack_Chunk_t * new_stack( Interp *interp, const char *name /*NN*/ )
+Stack_Chunk_t * new_stack( PARROT_INTERP, const char *name /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-void Parrot_dump_dynamic_environment( Interp *interp /*NN*/,
+void Parrot_dump_dynamic_environment( PARROT_INTERP,
     Stack_Chunk_t *dynamic_env /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void * pop_dest( Interp *interp /*NN*/ )
+void * pop_dest( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void rotate_entries( Interp *interp,
+void rotate_entries( PARROT_INTERP,
     Stack_Chunk_t **stack_p /*NN*/,
     INTVAL num_entries )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void stack_destroy( Stack_Chunk_t *top );
 
 PARROT_API
-Stack_Entry_t * stack_entry( Interp *interp /*NN*/,
+Stack_Entry_t * stack_entry( PARROT_INTERP,
     Stack_Chunk_t *stack /*NN*/,
     INTVAL depth )
         __attribute__nonnull__(1)
@@ -93,12 +96,12 @@ Stack_Entry_t * stack_entry( Interp *interp /*NN*/,
         __attribute__warn_unused_result__;
 
 PARROT_API
-size_t stack_height( Interp *interp, const Stack_Chunk_t *chunk /*NN*/ )
+size_t stack_height( SHIM_INTERP, const Stack_Chunk_t *chunk /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-void * stack_peek( Interp *interp /*NN*/,
+void * stack_peek( PARROT_INTERP,
     Stack_Chunk_t *stack_base /*NN*/,
     Stack_entry_type *type /*NULLOK*/ )
         __attribute__nonnull__(1)
@@ -106,49 +109,52 @@ void * stack_peek( Interp *interp /*NN*/,
         __attribute__warn_unused_result__;
 
 PARROT_API
-void * stack_pop( Interp *interp,
+void * stack_pop( PARROT_INTERP,
     Stack_Chunk_t **stack_p /*NN*/,
     void *where /*NULLOK*/,
     Stack_entry_type type )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void stack_push( Interp *interp,
+void stack_push( PARROT_INTERP,
     Stack_Chunk_t **stack_p /*NN*/,
     void *thing,
     Stack_entry_type type,
     Stack_cleanup_method cleanup )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/stacks.c */
 /* HEADERIZER BEGIN: src/stack_common.c */
 
 PARROT_API
-Stack_Chunk_t * cst_new_stack_chunk(
-    Parrot_Interp interp,
+Stack_Chunk_t * cst_new_stack_chunk( PARROT_INTERP,
     const Stack_Chunk_t *chunk /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-Stack_Chunk_t * register_new_stack( Interp *interp,
+Stack_Chunk_t * register_new_stack( PARROT_INTERP,
     const char *name /*NN*/,
     size_t item_size )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-void* stack_prepare_pop( Interp *interp, Stack_Chunk_t **stack_p /*NN*/ )
+void* stack_prepare_pop( PARROT_INTERP, Stack_Chunk_t **stack_p /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void* stack_prepare_push(
-    Parrot_Interp interp,
-    Stack_Chunk_t **stack_p /*NN*/ )
+void* stack_prepare_push( PARROT_INTERP, Stack_Chunk_t **stack_p /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void stack_system_init( Interp *interp );
+void stack_system_init( SHIM_INTERP );
 
 /* HEADERIZER END: src/stack_common.c */
 

@@ -43,7 +43,7 @@ static int e_file_emit( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open( Interp *interp, void *param );
+static int e_file_open( SHIM_INTERP, void *param );
 /* HEADERIZER END: static */
 
 const char types[] = "INPS";

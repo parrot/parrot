@@ -23,7 +23,7 @@ This is only used by the PBC dumper C<pdump>.
 
 /* HEADERIZER BEGIN: static */
 
-static void PackFile_Constant_dump( Interp *interp /*NN*/,
+static void PackFile_Constant_dump( PARROT_INTERP,
     PackFile_ConstTable *ct /*NN*/,
     PackFile_Constant *self /*NN*/ )
         __attribute__nonnull__(1)
@@ -43,7 +43,7 @@ Dumps the constant table C<self>.
 
 PARROT_API
 void
-PackFile_ConstTable_dump(Interp *interp /*NN*/, const PackFile_ConstTable *self /*NN*/)
+PackFile_ConstTable_dump(PARROT_INTERP, const PackFile_ConstTable *self /*NN*/)
 {
     opcode_t i;
 
@@ -62,7 +62,7 @@ Dumps the constant C<self>.
 */
 
 static void
-PackFile_Constant_dump(Interp *interp /*NN*/, PackFile_ConstTable *ct /*NN*/,
+PackFile_Constant_dump(PARROT_INTERP, PackFile_ConstTable *ct /*NN*/,
                        PackFile_Constant *self /*NN*/)
 {
     PMC *key;
@@ -281,7 +281,7 @@ Dumps the fix-up table C<ft>.
 
 PARROT_API
 void
-PackFile_Fixup_dump(Interp *interp /*NN*/, const PackFile_FixupTable *ft /*NN*/)
+PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft /*NN*/)
 {
     opcode_t i;
 

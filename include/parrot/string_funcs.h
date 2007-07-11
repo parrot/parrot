@@ -45,7 +45,8 @@ STRING * Parrot_make_COW_reference( PARROT_INTERP, NULLOK(STRING *s) )
         __attribute__nonnull__(1);
 
 PARROT_API
-STRING* Parrot_reuse_COW_reference( Interp *interp,
+STRING* Parrot_reuse_COW_reference(
+    SHIM_INTERP,
     STRING *s /*NN*/,
     STRING *d /*NN*/ )
         __attribute__nonnull__(2)
@@ -54,7 +55,7 @@ STRING* Parrot_reuse_COW_reference( Interp *interp,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-const char * Parrot_string_cstring( Interp *interp, const STRING *str /*NN*/ )
+const char * Parrot_string_cstring( SHIM_INTERP, const STRING *str /*NN*/ )
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -142,7 +143,7 @@ INTVAL string_bool( PARROT_INTERP, const STRING *s /*NULLOK*/ )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-UINTVAL string_capacity( Interp *interp, const STRING *s /*NN*/ )
+UINTVAL string_capacity( SHIM_INTERP, const STRING *s /*NN*/ )
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -271,7 +272,7 @@ STRING* string_join( PARROT_INTERP, STRING *j /*NULLOK*/, PMC *ar )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-UINTVAL string_length( Interp *interp, const STRING *s /*NULLOK*/ );
+UINTVAL string_length( SHIM_INTERP, const STRING *s /*NULLOK*/ );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -301,9 +302,7 @@ STRING * string_make_empty( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL string_max_bytes( Interp *interp,
-    const STRING *s /*NN*/,
-    INTVAL nchars )
+INTVAL string_max_bytes( SHIM_INTERP, const STRING *s /*NN*/, INTVAL nchars )
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -337,7 +336,8 @@ STRING* string_printf( PARROT_INTERP, const char *format /*NN*/, ... )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-CHARSET * string_rep_compatible( Interp *interp,
+CHARSET * string_rep_compatible(
+    SHIM_INTERP,
     const STRING *a /*NN*/,
     const STRING *b /*NN*/,
     ENCODING **e /*NN*/ )
@@ -414,11 +414,11 @@ void string_titlecase_inplace( PARROT_INTERP, STRING *s /*NN*/ )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
-char * string_to_cstring( Interp *interp, const STRING *s /*NULLOK*/ );
+char * string_to_cstring( SHIM_INTERP, const STRING *s /*NULLOK*/ );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_to_int( Interp *interp, const STRING *s /*NULLOK*/ );
+INTVAL string_to_int( SHIM_INTERP, const STRING *s /*NULLOK*/ );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

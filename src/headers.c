@@ -27,23 +27,22 @@ static void fix_pmc_syncs( Interp *dest_interp,
 static void free_pool( Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1);
 
-static void * get_free_buffer( Interp *interp /*NN*/,
-    Small_Object_Pool *pool /*NN*/ )
+static void * get_free_buffer( PARROT_INTERP, Small_Object_Pool *pool /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-static PMC_EXT * new_pmc_ext( Interp *interp /*NN*/ )
+static PMC_EXT * new_pmc_ext( PARROT_INTERP )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-static int sweep_cb_buf( Interp *interp /*NN*/,
+static int sweep_cb_buf( PARROT_INTERP,
     Small_Object_Pool *pool,
     int flag,
     void *arg )
         __attribute__nonnull__(1);
 
-static int sweep_cb_pmc( Interp *interp /*NN*/,
+static int sweep_cb_pmc( PARROT_INTERP,
     Small_Object_Pool *pool /*NN*/,
     int flag,
     void *arg )
@@ -77,7 +76,7 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 */
 
 static void *
-get_free_buffer(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/)
+get_free_buffer(PARROT_INTERP, Small_Object_Pool *pool /*NN*/)
     /* WARN_UNUSED */
 {
     PObj * const buffer = (PObj *)pool->get_free_object(interp, pool);
@@ -103,7 +102,7 @@ Creates an new pool for PMCs and returns it.
 */
 
 Small_Object_Pool *
-new_pmc_pool(Interp *interp /*NN*/)
+new_pmc_pool(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     const int num_headers = PMC_HEADERS_PER_ALLOC;
@@ -125,7 +124,7 @@ C<make_bufferlike_pool()>.
 */
 
 Small_Object_Pool *
-new_bufferlike_pool(Interp *interp /*NN*/, size_t actual_buffer_size)
+new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
     /* WARN_UNUSED */
 {
     const int num_headers = BUFFER_HEADERS_PER_ALLOC;
@@ -148,7 +147,7 @@ Non-constant strings and plain Buffers are in the sized header pools.
 */
 
 Small_Object_Pool *
-new_buffer_pool(Interp *interp /*NN*/)
+new_buffer_pool(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     return make_bufferlike_pool(interp, sizeof (Buffer));
@@ -163,7 +162,7 @@ Creates a new pool for C<STRINGS> and returns it.
 */
 
 Small_Object_Pool *
-new_string_pool(Interp *interp /*NN*/, INTVAL constant)
+new_string_pool(PARROT_INTERP, INTVAL constant)
     /* WARN_UNUSED */
 {
     Small_Object_Pool *pool;
@@ -186,7 +185,7 @@ Make and return a bufferlike header pool.
 */
 
 Small_Object_Pool *
-make_bufferlike_pool(Interp *interp /*NN*/, size_t buffer_size)
+make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 {
     const UINTVAL num_old = interp->arena_base->num_sized;
     Small_Object_Pool **sized_pools =
@@ -221,7 +220,7 @@ Return a bufferlike header pool, it must exist.
 */
 
 Small_Object_Pool *
-get_bufferlike_pool(Interp *interp /*NN*/, size_t buffer_size)
+get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
     /* WARN_UNUSED */
 {
     Small_Object_Pool ** const sized_pools =
@@ -239,7 +238,7 @@ Get a header.
 */
 
 PMC *
-new_pmc_header(Interp *interp /*NN*/, UINTVAL flags)
+new_pmc_header(PARROT_INTERP, UINTVAL flags)
     /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool =
@@ -275,7 +274,7 @@ Creates a new C<PMC_EXT> and returns it.
 */
 
 static PMC_EXT *
-new_pmc_ext(Interp *interp /*NN*/)
+new_pmc_ext(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
@@ -301,7 +300,7 @@ Adds a new C<PMC_EXT> to C<pmc>.
 */
 
 void
-add_pmc_ext(Interp *interp /*NN*/, PMC *pmc /*NN*/)
+add_pmc_ext(PARROT_INTERP, PMC *pmc /*NN*/)
 {
     pmc->pmc_ext = new_pmc_ext(interp);
     PObj_is_PMC_EXT_SET(pmc);
@@ -325,7 +324,7 @@ Adds a PMC_sync field to C<pmc>.
 */
 
 void
-add_pmc_sync(Interp *interp, PMC *pmc /*NN*/)
+add_pmc_sync(PARROT_INTERP, PMC *pmc /*NN*/)
 {
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
@@ -344,7 +343,7 @@ Returns a new C<STRING> header.
 */
 
 STRING *
-new_string_header(Interp *interp /*NN*/, UINTVAL flags)
+new_string_header(PARROT_INTERP, UINTVAL flags)
     /* WARN_UNUSED */
 {
     STRING * const string = (STRING *)get_free_buffer(interp,
@@ -369,7 +368,7 @@ Creates and returns a new C<Buffer>.
 */
 
 Buffer *
-new_buffer_header(Interp *interp /*NN*/)
+new_buffer_header(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     return (Buffer *)get_free_buffer(interp,
@@ -386,7 +385,7 @@ Creates and returns a new buffer-like header.
 */
 
 void *
-new_bufferlike_header(Interp *interp /*NN*/, size_t size)
+new_bufferlike_header(PARROT_INTERP, size_t size)
     /* WARN_UNUSED */
 {
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
@@ -403,7 +402,7 @@ Calculates the maximum buffer address and returns it.
 */
 
 size_t
-get_max_buffer_address(Interp *interp /*NN*/)
+get_max_buffer_address(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     UINTVAL i;
@@ -429,7 +428,7 @@ Calculates the minimum buffer address and returns it.
 */
 
 size_t
-get_min_buffer_address(Interp *interp /*NN*/)
+get_min_buffer_address(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     UINTVAL i;
@@ -455,7 +454,7 @@ Calculates the maximum PMC address and returns it.
 */
 
 size_t
-get_max_pmc_address(const Interp *interp /*NN*/)
+get_max_pmc_address(const PARROT_INTERP)
     /* WARN_UNUSED */
 {
     return interp->arena_base->pmc_pool->end_arena_memory;
@@ -470,7 +469,7 @@ Calculates the maximum PMC address and returns it.
 */
 
 size_t
-get_min_pmc_address(Interp *interp /*NN*/)
+get_min_pmc_address(PARROT_INTERP)
     /* WARN_UNUSED */
 {
     return interp->arena_base->pmc_pool->start_arena_memory;
@@ -485,7 +484,7 @@ Checks that C<ptr> is actually a C<Buffer>.
 */
 
 int
-is_buffer_ptr(const Interp *interp /*NN*/, const void *ptr /*NN*/)
+is_buffer_ptr(const PARROT_INTERP, const void *ptr /*NN*/)
     /* WARN_UNUSED */
 {
     UINTVAL i;
@@ -509,7 +508,7 @@ Checks that C<ptr> is actually a PMC.
 */
 
 int
-is_pmc_ptr(const Interp *interp /*NN*/, const void *ptr)
+is_pmc_ptr(const PARROT_INTERP, const void *ptr)
     /* WARN_UNUSED */
 {
     return contained_in_pool(interp->arena_base->pmc_pool, ptr);
@@ -525,7 +524,7 @@ Initialize the pools for the tracked resources.
 */
 
 void
-Parrot_initialize_header_pools(Interp *interp /*NN*/)
+Parrot_initialize_header_pools(PARROT_INTERP)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -601,7 +600,7 @@ If the function returns a non-zero value iteration will stop.
 */
 
 int
-Parrot_forall_header_pools(Interp *interp /*NN*/, int flag, void *arg, pool_iter_fn func /*NN*/)
+Parrot_forall_header_pools(PARROT_INTERP, int flag, void *arg, pool_iter_fn func /*NN*/)
 {
     Arenas * const arena_base = interp->arena_base;
     int i;
@@ -659,7 +658,7 @@ free_pool(Small_Object_Pool *pool /*NN*/)
 }
 
 static int
-sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, SHIM(int flag),
+sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool, SHIM(int flag),
         void *arg)
 {
 #ifdef GC_IS_MALLOC
@@ -682,7 +681,7 @@ sweep_cb_buf(Interp *interp /*NN*/, Small_Object_Pool *pool, SHIM(int flag),
 }
 
 static int
-sweep_cb_pmc(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag,
+sweep_cb_pmc(PARROT_INTERP, Small_Object_Pool *pool /*NN*/, int flag,
         void *arg)
 {
     UNUSED(flag);
@@ -694,7 +693,7 @@ sweep_cb_pmc(Interp *interp /*NN*/, Small_Object_Pool *pool /*NN*/, int flag,
 }
 
 void
-Parrot_destroy_header_pools(Interp *interp /*NN*/)
+Parrot_destroy_header_pools(PARROT_INTERP)
 {
     INTVAL pass, start;
 
@@ -807,14 +806,14 @@ Parrot_merge_header_pools(Interp *dest_interp /*NN*/, Interp *source_interp /*NN
 
 /*
 
-Parrot_initialize_header_pool_names(Interp *interp)>
+Parrot_initialize_header_pool_names(PARROT_INTERP)>
 
 If we want these names, they must be added in DOD.
 
 */
 
 void
-Parrot_initialize_header_pool_names(Interp *interp)
+Parrot_initialize_header_pool_names(PARROT_INTERP)
 {
     interp->arena_base->string_header_pool->name
             = string_make(interp, "String Pool", strlen("String Pool"),

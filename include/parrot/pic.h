@@ -72,10 +72,8 @@ typedef int (*arg_pass_f)(Interp *, PMC *sig,
 
 /* HEADERIZER BEGIN: src/pic.c */
 
-Parrot_MIC* parrot_PIC_alloc_mic( const Interp *interp /*NN*/, size_t n )
-        __attribute__nonnull__(1);
-
-Parrot_PIC* parrot_PIC_alloc_pic( Interp *interp /*NN*/ )
+Parrot_MIC* parrot_PIC_alloc_mic( const PARROT_INTERP, size_t n );
+Parrot_PIC* parrot_PIC_alloc_pic( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 void parrot_PIC_alloc_store( struct PackFile_ByteCode *cs /*NN*/, size_t n )
@@ -93,11 +91,12 @@ int parrot_pic_check_sig(
 void parrot_PIC_destroy( struct PackFile_ByteCode *cs /*NN*/ )
         __attribute__nonnull__(1);
 
-void parrot_pic_find_infix_v_pp( Interp *interp,
+void parrot_pic_find_infix_v_pp( PARROT_INTERP,
     PMC *left /*NN*/,
     PMC *right /*NN*/,
     Parrot_MIC *mic /*NN*/,
     opcode_t *cur_opcode /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -107,18 +106,21 @@ int parrot_PIC_op_is_cached( int op_code )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-void * parrot_pic_opcode( Interp *interp, INTVAL op );
-void parrot_PIC_prederef( Interp *interp,
+void * parrot_pic_opcode( PARROT_INTERP, INTVAL op )
+        __attribute__nonnull__(1);
+
+void parrot_PIC_prederef( PARROT_INTERP,
     opcode_t op,
     void **pc_pred,
-    int core );
+    int core )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/pic.c */
 
 
 /* HEADERIZER BEGIN: src/pic_jit.c */
 
-int parrot_pic_is_safe_to_jit( Interp *interp /*NN*/,
+int parrot_pic_is_safe_to_jit( PARROT_INTERP,
     PMC *sub /*NN*/,
     PMC *sig_args,
     PMC *sig_results,
@@ -126,7 +128,9 @@ int parrot_pic_is_safe_to_jit( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-funcptr_t parrot_pic_JIT_sub( Interp *interp, PMC *sub, int flags );
+funcptr_t parrot_pic_JIT_sub( PARROT_INTERP, PMC *sub, int flags )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/pic_jit.c */
 
 #endif /* PARROT_PIC_H_GUARD */

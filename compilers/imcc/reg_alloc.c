@@ -96,7 +96,7 @@ static int try_allocate( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void vanilla_reg_alloc( Interp *interp, IMC_Unit *unit );
+static void vanilla_reg_alloc( SHIM_INTERP, IMC_Unit *unit );
 /* HEADERIZER END: static */
 
 static unsigned int*

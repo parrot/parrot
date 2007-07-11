@@ -442,7 +442,7 @@ Used in C<src/nci.c>.
 
 PARROT_API
 void *
-Parrot_make_la(Interp *interp, PMC *array /*NN*/)
+Parrot_make_la(PARROT_INTERP, PMC *array /*NN*/)
     /* WARN_UNUSED */
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
@@ -493,7 +493,7 @@ Note that you need to free this array with C<Parrot_destroy_cpa()>.
 
 PARROT_API
 void *
-Parrot_make_cpa(Interp *interp, PMC *array)
+Parrot_make_cpa(PARROT_INTERP, PMC *array)
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
@@ -564,7 +564,7 @@ Helper to convert a B<struct tm *> to an Array
 
 PARROT_API
 PMC*
-tm_to_array(Parrot_Interp interp, const struct tm *tm /*NN*/)
+tm_to_array(PARROT_INTERP, const struct tm *tm /*NN*/)
 {
     PMC * const Array = pmc_new(interp, enum_class_Array);
 
@@ -774,7 +774,7 @@ TODO: Add tests for the above conditions.
 
 PARROT_API
 void
-Parrot_register_move(Interp *interp, int n_regs,
+Parrot_register_move(PARROT_INTERP, int n_regs,
                      unsigned char *dest_regs /*NN*/, unsigned char *src_regs /*NN*/,
                      unsigned char temp_reg,
                      reg_move_func mov, reg_move_func mov_alt, void *info)

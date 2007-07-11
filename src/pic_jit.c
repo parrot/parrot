@@ -48,19 +48,23 @@ static int call_is_safe( const PMC *sub /*NN*/, opcode_t **set_args /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-static int jit_can_compile_sub( Interp *interp, PMC *sub );
-static int ops_jittable( Interp *interp,
+static int jit_can_compile_sub( PARROT_INTERP, PMC *sub )
+        __attribute__nonnull__(1);
+
+static int ops_jittable( PARROT_INTERP,
     PMC *sub,
     const PMC *sig_results,
     PackFile_ByteCode *seg /*NN*/,
     opcode_t *pc,
     opcode_t *end,
     int *flags )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static opcode_t * pic_test_func( Interp *interp,
+static opcode_t * pic_test_func( PARROT_INTERP,
     INTVAL *sig_bits,
-    void **args );
+    void **args )
+        __attribute__nonnull__(1);
 
 static int returns_match_results(
     const PMC *sig_ret /*NN*/,
@@ -103,7 +107,7 @@ static int returns_match_results(
 */
 
 static opcode_t *
-pic_test_func(Interp *interp, INTVAL *sig_bits, void **args)
+pic_test_func(PARROT_INTERP, INTVAL *sig_bits, void **args)
 {
     INTVAL * const result = (INTVAL*) args[0];
     INTVAL   const i      = (INTVAL) args[1];
@@ -116,7 +120,7 @@ pic_test_func(Interp *interp, INTVAL *sig_bits, void **args)
 #  endif
 
 static int
-jit_can_compile_sub(Interp *interp, PMC *sub)
+jit_can_compile_sub(PARROT_INTERP, PMC *sub)
 {
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
@@ -250,7 +254,7 @@ call_is_safe(const PMC *sub /*NN*/, opcode_t **set_args /*NN*/)
 }
 
 static int
-ops_jittable(Interp *interp, PMC *sub, const PMC *sig_results,
+ops_jittable(PARROT_INTERP, PMC *sub, const PMC *sig_results,
         PackFile_ByteCode *seg /*NN*/, opcode_t *pc, opcode_t *end, int *flags)
 {
     while (pc < end) {
@@ -313,7 +317,7 @@ op_is_ok:
 
 
 int
-parrot_pic_is_safe_to_jit(Interp *interp /*NN*/, PMC *sub /*NN*/,
+parrot_pic_is_safe_to_jit(PARROT_INTERP, PMC *sub /*NN*/,
         PMC *sig_args, PMC *sig_results, int *flags)
 {
 #ifdef HAS_JIT
@@ -366,7 +370,7 @@ parrot_pic_is_safe_to_jit(Interp *interp /*NN*/, PMC *sub /*NN*/,
 }
 
 funcptr_t
-parrot_pic_JIT_sub(Interp *interp, PMC *sub, int flags)
+parrot_pic_JIT_sub(PARROT_INTERP, PMC *sub, int flags)
 {
 #ifdef HAS_JIT
 #  if PIC_TEST

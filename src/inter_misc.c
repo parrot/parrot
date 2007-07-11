@@ -28,7 +28,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 /*
 
 =item C<void
-register_nci_method(Parrot_Interp interp, int type,
+register_nci_method(PARROT_INTERP, int type,
                     void *func, const char *name, const char *proto)>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
@@ -37,11 +37,11 @@ class C<type>.
 =cut
 
 */
-void Parrot_NCI_nci_make_raw_nci(Interp *interp, PMC *method, void *func);
+void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
 
 PARROT_API
 void
-register_nci_method(Parrot_Interp interp, const int type, void *func,
+register_nci_method(PARROT_INTERP, const int type, void *func,
                     const char *name, const char *proto)
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
@@ -68,7 +68,7 @@ register_nci_method(Parrot_Interp interp, const int type, void *func,
 
 PARROT_API
 void
-register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func,
+register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
         const char *name)
 {
     PMC * const method = pmc_new(interp, enum_class_NCI);
@@ -93,7 +93,7 @@ register_raw_nci_method_in_ns(Parrot_Interp interp, const int type, void *func,
 /*
 
 =item C<void
-Parrot_mark_method_writes(Parrot_Interp interp,
+Parrot_mark_method_writes(PARROT_INTERP,
                           int type, const char *name)>
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
@@ -104,7 +104,7 @@ Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
 PARROT_API
 void
-Parrot_mark_method_writes(Parrot_Interp interp,
+Parrot_mark_method_writes(PARROT_INTERP,
                                int type, const char *name) {
     STRING *const str_name = const_string(interp, name);
     PMC *const pmc_true = pmc_new(interp, enum_class_Integer);
@@ -125,7 +125,7 @@ Register a parser/compiler function.
 
 PARROT_API
 void
-Parrot_compreg(Parrot_Interp interp, STRING *type,
+Parrot_compreg(PARROT_INTERP, STRING *type,
                     Parrot_compiler_func_t func)
 {
     PMC *hash, *nci;
@@ -157,7 +157,7 @@ Compile code string.
 
 PARROT_API
 PMC *
-Parrot_compile_string(Parrot_Interp interp, STRING *type,
+Parrot_compile_string(PARROT_INTERP, STRING *type,
                       char *code, STRING **error)
 {
     if (!string_compare(interp, const_string(interp, "PIR"),
@@ -184,7 +184,7 @@ Compile code file.
 
 PARROT_API
 void *
-Parrot_compile_file(Parrot_Interp interp, char *fullname,
+Parrot_compile_file(PARROT_INTERP, char *fullname,
                     STRING **error)
 {
     return IMCC_compile_file_s(interp, fullname, error);
@@ -212,10 +212,10 @@ extern struct mallinfo mallinfo(void);
 /*
 
 =item C<INTVAL
-interpinfo(Interp *interp, INTVAL what)>
+interpinfo(PARROT_INTERP, INTVAL what)>
 
 =item C<PMC*
-interpinfo_p(Interp *interp, INTVAL what)>
+interpinfo_p(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -226,7 +226,7 @@ interpreter.
 
 PARROT_API
 INTVAL
-interpinfo(Interp *interp /*NN*/, INTVAL what)
+interpinfo(PARROT_INTERP, INTVAL what)
 {
     INTVAL ret = 0;
     int j;
@@ -300,7 +300,7 @@ interpinfo(Interp *interp /*NN*/, INTVAL what)
 
 PARROT_API
 PMC*
-interpinfo_p(Interp *interp, INTVAL what)
+interpinfo_p(PARROT_INTERP, INTVAL what)
 {
     switch (what) {
         case CURRENT_SUB:
@@ -326,7 +326,7 @@ interpinfo_p(Interp *interp, INTVAL what)
 
 PARROT_API
 STRING*
-interpinfo_s(Interp *interp, INTVAL what)
+interpinfo_s(PARROT_INTERP, INTVAL what)
 {
     STRING *fullname, *basename;
     char *fullname_c;
@@ -368,7 +368,7 @@ interpinfo_s(Interp *interp, INTVAL what)
 /*
 
 =item C<INTVAL
-sysinfo_i(Parrot_Interp interp, INTVAL info_wanted)>
+sysinfo_i(PARROT_INTERP, INTVAL info_wanted)>
 
 Returns the system info.
 
@@ -402,7 +402,7 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 /*
 
 =item C<STRING *
-sysinfo_s(Parrot_Interp interp, INTVAL info_wanted)>
+sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
 
 Returns the system info string.
 
@@ -421,7 +421,7 @@ If unknown info is requested then and empty string is returned.
 */
 
 STRING *
-sysinfo_s(Parrot_Interp interp, INTVAL info_wanted)
+sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 {
     switch (info_wanted) {
     case PARROT_OS:

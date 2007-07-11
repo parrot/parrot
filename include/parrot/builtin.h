@@ -29,11 +29,12 @@ int Parrot_builtin_is_void( int bi )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-PMC* Parrot_find_builtin( Interp *interp, STRING *func /*NN*/ )
+PMC* Parrot_find_builtin( PARROT_INTERP, STRING *func /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-void Parrot_init_builtins( Interp *interp /*NN*/ )
+void Parrot_init_builtins( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 int Parrot_is_builtin( const char *func /*NN*/, const char *sig /*NULLOK*/ )

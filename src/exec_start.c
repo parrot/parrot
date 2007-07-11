@@ -31,7 +31,7 @@ executables.
 #include "jit_emit.h"
 #include "parrot/embed.h"
 
-opcode_t* run_compiled(Interp *interp,
+opcode_t* run_compiled(PARROT_INTERP,
     opcode_t *cur_opcode, opcode_t *code_start);
 
 /*

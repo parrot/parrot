@@ -276,7 +276,7 @@ Returns the item at C<idx>.
 */
 
 INTVAL
-intlist_get(Interp *interp /*NN*/, IntList *list /*NN*/, INTVAL idx)
+intlist_get(PARROT_INTERP, IntList *list /*NN*/, INTVAL idx)
     /* WARN_UNUSED */
 {
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);

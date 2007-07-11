@@ -28,7 +28,7 @@ Remember you read something about it in F<docs/infant.dev>?
 
 /* HEADERIZER BEGIN: static */
 
-static void trace_system_stack( Interp *interp /*NN*/ )
+static void trace_system_stack( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -50,7 +50,7 @@ Traces the system stack and any additional CPU-specific areas.
 */
 
 void
-trace_system_areas(Interp *interp /*NN*/)
+trace_system_areas(PARROT_INTERP)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {
@@ -108,7 +108,7 @@ Traces the memory block starting at C<< interp->lo_var_ptr >>.
 */
 
 static void
-trace_system_stack(Interp *interp /*NN*/)
+trace_system_stack(PARROT_INTERP)
 {
     const size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
 

@@ -71,33 +71,34 @@ typedef enum arg_pass_t {
 /* HEADERIZER BEGIN: src/inter_call.c */
 
 PARROT_API
-void Parrot_convert_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
+void Parrot_convert_arg( PARROT_INTERP, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int Parrot_fetch_arg( Interp *interp /*NN*/, call_state *st /*NN*/ )
+int Parrot_fetch_arg( PARROT_INTERP, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int Parrot_fetch_arg_nci( Interp *interp /*NN*/, call_state *st /*NN*/ )
+int Parrot_fetch_arg_nci( PARROT_INTERP, call_state *st /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int Parrot_init_arg_indexes_and_sig_pmc( Interp *interp,
+int Parrot_init_arg_indexes_and_sig_pmc( PARROT_INTERP,
     parrot_context_t *ctx /*NN*/,
     opcode_t *indexes /*NN*/,
     PMC* sig_pmc /*NN*/,
     call_state_item *sti /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 PARROT_API
-int Parrot_init_arg_nci( Interp *interp /*NN*/,
+int Parrot_init_arg_nci( PARROT_INTERP,
     call_state *st /*NN*/,
     const char *sig /*NN*/ )
         __attribute__nonnull__(1)
@@ -105,24 +106,26 @@ int Parrot_init_arg_nci( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 PARROT_API
-int Parrot_init_arg_op( Interp *interp,
+int Parrot_init_arg_op( PARROT_INTERP,
     parrot_context_t *ctx /*NN*/,
     opcode_t *pc /*NULLOK*/,
     call_state_item *sti /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_API
-int Parrot_init_arg_sig( Interp *interp,
+int Parrot_init_arg_sig( PARROT_INTERP,
     parrot_context_t *ctx,
     const char *sig /*NN*/,
     void *ap,
     call_state_item *sti /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
 PARROT_API
-int Parrot_init_ret_nci( Interp *interp /*NN*/,
+int Parrot_init_ret_nci( PARROT_INTERP,
     call_state *st /*NN*/,
     const char *sig /*NN*/ )
         __attribute__nonnull__(1)
@@ -130,7 +133,7 @@ int Parrot_init_ret_nci( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 PARROT_API
-void parrot_pass_args( Interp *interp /*NN*/,
+void parrot_pass_args( PARROT_INTERP,
     parrot_context_t *src_ctx /*NN*/,
     parrot_context_t *dest_ctx /*NN*/,
     opcode_t *src_indexes /*NN*/,
@@ -150,47 +153,44 @@ void Parrot_PCCINVOKE( Interp* interp,
     ... );
 
 PARROT_API
-void Parrot_process_args( Interp *interp /*NN*/,
+void Parrot_process_args( PARROT_INTERP,
     call_state *st /*NN*/,
     arg_pass_t param_or_result )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-opcode_t * parrot_pass_args_fromc( Interp *interp /*NN*/,
+opcode_t * parrot_pass_args_fromc( PARROT_INTERP,
     const char *sig,
     opcode_t *dest,
     parrot_context_t *old_ctxp,
     va_list ap )
         __attribute__nonnull__(1);
 
-int Parrot_store_arg( Interp *interp, call_state *st /*NN*/ )
+int Parrot_store_arg( PARROT_INTERP, call_state *st /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void* set_retval( Interp *interp /*NN*/,
+void* set_retval( PARROT_INTERP, int sig_ret, parrot_context_t *ctx /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+FLOATVAL set_retval_f( PARROT_INTERP,
     int sig_ret,
     parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-FLOATVAL set_retval_f( Interp *interp /*NN*/,
+INTVAL set_retval_i( PARROT_INTERP,
     int sig_ret,
     parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-INTVAL set_retval_i( Interp *interp /*NN*/,
-    int sig_ret,
-    parrot_context_t *ctx /*NN*/ )
+PMC* set_retval_p( PARROT_INTERP, int sig_ret, parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PMC* set_retval_p( Interp *interp /*NN*/,
-    int sig_ret,
-    parrot_context_t *ctx /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-STRING* set_retval_s( Interp *interp /*NN*/,
+STRING* set_retval_s( PARROT_INTERP,
     int sig_ret,
     parrot_context_t *ctx /*NN*/ )
         __attribute__nonnull__(1)

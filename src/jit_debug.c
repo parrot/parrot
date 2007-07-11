@@ -92,7 +92,7 @@ typedef struct BaseTypes {
 
 /*
 
-=item C<static void write_types(FILE *stabs, Interp *interp)>
+=item C<static void write_types(FILE *stabs, PARROT_INTERP)>
 
 Writes the types to C<stabs>.
 
@@ -101,7 +101,7 @@ Writes the types to C<stabs>.
 */
 
 static void
-write_types(FILE *stabs, Interp *interp)
+write_types(FILE *stabs, PARROT_INTERP)
 {
     int i, j;
     /* borrowed from mono */
@@ -212,7 +212,7 @@ write_types(FILE *stabs, Interp *interp)
 /*
 
 =item C<static void
-write_vars(FILE *stabs, Interp *interp)>
+write_vars(FILE *stabs, PARROT_INTERP)>
 
 Writes the contents of the registers to C<stabs>.
 
@@ -221,7 +221,7 @@ Writes the contents of the registers to C<stabs>.
 */
 
 static void
-write_vars(FILE *stabs, Interp *interp)
+write_vars(FILE *stabs, PARROT_INTERP)
 {
     int i;
     /* fake static var stabs */
@@ -240,7 +240,7 @@ write_vars(FILE *stabs, Interp *interp)
 /*
 
 =item C<static STRING *
-debug_file(Interp *interp, STRING *file, const char *ext)>
+debug_file(PARROT_INTERP, STRING *file, const char *ext)>
 
 Returns C<file> with C<ext> appended.
 
@@ -249,7 +249,7 @@ Returns C<file> with C<ext> appended.
 */
 
 static STRING *
-debug_file(Interp *interp, STRING *file, const char *ext)
+debug_file(PARROT_INTERP, STRING *file, const char *ext)
 {
     STRING *ret;
     ret = string_copy(interp, file);
@@ -262,7 +262,7 @@ debug_file(Interp *interp, STRING *file, const char *ext)
 /*
 
 =item C<static void
-Parrot_jit_debug_stabs(Interp *interp)>
+Parrot_jit_debug_stabs(PARROT_INTERP)>
 
 Writes the JIT debugging stabs.
 
@@ -271,7 +271,7 @@ Writes the JIT debugging stabs.
 */
 
 static void
-Parrot_jit_debug_stabs(Interp *interp)
+Parrot_jit_debug_stabs(PARROT_INTERP)
 {
     Parrot_jit_info_t *jit_info = interp->code->jit_info;
     STRING *file = NULL;

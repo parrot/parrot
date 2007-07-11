@@ -19,7 +19,7 @@ src/dynext.c - Dynamic extensions to Parrot
 
 /* HEADERIZER BEGIN: static */
 
-static STRING * get_path( Interp *interp /*NN*/,
+static STRING * get_path( PARROT_INTERP,
     STRING *lib,
     void **handle /*NN*/,
     STRING *wo_ext,
@@ -27,31 +27,32 @@ static STRING * get_path( Interp *interp /*NN*/,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static PMC* is_loaded( Interp *interp /*NN*/, STRING *path )
+static PMC* is_loaded( PARROT_INTERP, STRING *path )
         __attribute__nonnull__(1);
 
-static PMC * make_string_pmc( Interp *interp /*NN*/, STRING *string )
+static PMC * make_string_pmc( PARROT_INTERP, STRING *string )
         __attribute__nonnull__(1);
 
-static PMC * run_init_lib( Interp *interp,
+static PMC * run_init_lib( PARROT_INTERP,
     void *handle,
     STRING *lib_name /*NN*/,
     STRING *wo_ext )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void set_cstring_prop(
-    Parrot_Interp interp,
+static void set_cstring_prop( PARROT_INTERP,
     PMC *lib_pmc,
     const char *what /*NN*/,
     STRING *name )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void store_lib_pmc(
-    Parrot_Interp interp,
+static void store_lib_pmc( PARROT_INTERP,
     PMC* lib_pmc,
     STRING *path,
     STRING *type,
-    STRING *lib_name );
+    STRING *lib_name )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -68,7 +69,7 @@ C<lib_pmc>.
 */
 
 static void
-set_cstring_prop(Parrot_Interp interp, PMC *lib_pmc, const char *what /*NN*/,
+set_cstring_prop(PARROT_INTERP, PMC *lib_pmc, const char *what /*NN*/,
         STRING *name)
 {
     STRING *key;
@@ -88,7 +89,7 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 */
 
 static void
-store_lib_pmc(Parrot_Interp interp, PMC* lib_pmc, STRING *path,
+store_lib_pmc(PARROT_INTERP, PMC* lib_pmc, STRING *path,
         STRING *type, STRING *lib_name)
 {
     PMC * const iglobals = interp->iglobals;
@@ -114,7 +115,7 @@ If it does, return it. Otherwise, return NULL.
 */
 
 static PMC*
-is_loaded(Interp *interp /*NN*/, STRING *path)
+is_loaded(PARROT_INTERP, STRING *path)
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -134,7 +135,7 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 */
 
 static STRING *
-get_path(Interp *interp /*NN*/, STRING *lib, void **handle /*NN*/,
+get_path(PARROT_INTERP, STRING *lib, void **handle /*NN*/,
                          STRING *wo_ext, STRING *ext)
 {
     STRING *path, *full_name;
@@ -251,7 +252,7 @@ TODO: fetch Parrot_lib load/init handler exceptions
 
 PARROT_API
 PMC *
-Parrot_init_lib(Interp *interp,
+Parrot_init_lib(PARROT_INTERP,
                 PMC *(*load_func)(Interp *) /*NULLOK*/,
                 void (*init_func)(Interp *, PMC *) /*NULLOK*/)
 {
@@ -280,7 +281,7 @@ Parrot_init_lib(Interp *interp,
 }
 
 static PMC *
-run_init_lib(Interp *interp, void *handle,
+run_init_lib(PARROT_INTERP, void *handle,
                          STRING *lib_name /*NN*/, STRING *wo_ext)
 {
     STRING *type;
@@ -352,7 +353,7 @@ clone_string_into(Interp *d, Interp *s, PMC *value) {
 }
 
 static PMC *
-make_string_pmc(Interp *interp /*NN*/, STRING *string)
+make_string_pmc(PARROT_INTERP, STRING *string)
 {
     PMC * const ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->pmc_class,
@@ -413,7 +414,7 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)
 
 PARROT_API
 PMC *
-Parrot_load_lib(Interp *interp /*NN*/, STRING *lib /*NULLOK*/, SHIM(PMC *initializer))
+Parrot_load_lib(PARROT_INTERP, STRING *lib /*NULLOK*/, SHIM(PMC *initializer))
 {
     void * handle;
     PMC *lib_pmc;

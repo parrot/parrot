@@ -23,8 +23,8 @@ I<What are these global variables?>
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
-extern void Parrot_initialize_core_pmcs(Interp *interp);
-void Parrot_register_core_pmcs(Interp *interp, PMC* registry);
+extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
+void Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
@@ -93,7 +93,7 @@ parrot_set_config_hash_interpreter(Interp* interp /*NN*/)
 
 /*
 
-FUNCDOC: init_world(Interp *interp)>
+FUNCDOC: init_world(PARROT_INTERP)>
 
 This is the actual initialization code called by C<Parrot_init()>.
 
@@ -106,7 +106,7 @@ C<interp> should be the root interpreter returned by C<Parrot_new(NULL)>.
 */
 
 void
-init_world(Interp *interp /*NN*/)
+init_world(PARROT_INTERP)
 {
     PMC *iglobals;
     PMC *self, *pmc;
@@ -160,7 +160,7 @@ init_world(Interp *interp /*NN*/)
 
 
 void
-parrot_global_setup_2(Interp *interp /*NN*/)
+parrot_global_setup_2(PARROT_INTERP)
 {
     PMC *classname_hash, *iglobals;
     int i;

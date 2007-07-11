@@ -125,7 +125,7 @@ static int get_old_size( Interp *interp /*NN*/, int *ins_line /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void imcc_globals_destroy( Interp *interp, int ex, void *param );
+static void imcc_globals_destroy( SHIM_INTERP, int ex, void *param );
 static void make_new_sub( IMC_Unit *unit );
 static void make_pmc_const( Interp *interp /*NN*/, SymReg *r /*NN*/ )
         __attribute__nonnull__(1)

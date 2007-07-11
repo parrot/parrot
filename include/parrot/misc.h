@@ -30,7 +30,8 @@ typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 /* HEADERIZER BEGIN: src/utils.c */
 
 PARROT_API
-INTVAL Parrot_byte_index( Interp *interp,
+INTVAL Parrot_byte_index(
+    SHIM_INTERP,
     const STRING *base /*NN*/,
     const STRING *search /*NN*/,
     UINTVAL start_offset )
@@ -38,7 +39,8 @@ INTVAL Parrot_byte_index( Interp *interp,
         __attribute__nonnull__(3);
 
 PARROT_API
-INTVAL Parrot_byte_rindex( Interp *interp,
+INTVAL Parrot_byte_rindex(
+    SHIM_INTERP,
     const STRING *base /*NN*/,
     const STRING *search /*NN*/,
     UINTVAL start_offset )
@@ -60,10 +62,12 @@ PARROT_API
 INTVAL Parrot_int_rand( INTVAL how_random );
 
 PARROT_API
-void * Parrot_make_cpa( Interp *interp, PMC *array );
+void * Parrot_make_cpa( PARROT_INTERP, PMC *array )
+        __attribute__nonnull__(1);
 
 PARROT_API
-void * Parrot_make_la( Interp *interp, PMC *array /*NN*/ )
+void * Parrot_make_la( PARROT_INTERP, PMC *array /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
@@ -71,7 +75,7 @@ PARROT_API
 INTVAL Parrot_range_rand( INTVAL from, INTVAL to, INTVAL how_random );
 
 PARROT_API
-void Parrot_register_move( Interp *interp,
+void Parrot_register_move( PARROT_INTERP,
     int n_regs,
     unsigned char *dest_regs /*NN*/,
     unsigned char *src_regs /*NN*/,
@@ -79,6 +83,7 @@ void Parrot_register_move( Interp *interp,
     reg_move_func mov,
     reg_move_func mov_alt,
     void *info )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -89,7 +94,8 @@ PARROT_API
 INTVAL Parrot_uint_rand( INTVAL how_random );
 
 PARROT_API
-PMC* tm_to_array( Parrot_Interp interp, const struct tm *tm /*NN*/ )
+PMC* tm_to_array( PARROT_INTERP, const struct tm *tm /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )

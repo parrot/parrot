@@ -25,7 +25,7 @@ messages.
 /*
 
 =item C<void
-print_pbc_location(Parrot_Interp interp)>
+print_pbc_location(PARROT_INTERP)>
 
 Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 
@@ -34,7 +34,7 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 */
 
 void
-print_pbc_location(Parrot_Interp interp)
+print_pbc_location(PARROT_INTERP)
 {
     Interp * const tracer =
         interp->debugger ?
@@ -47,7 +47,7 @@ print_pbc_location(Parrot_Interp interp)
 /*
 
 =item C<static INTVAL
-print_warning(Interp *interp, STRING *msg)>
+print_warning(PARROT_INTERP, STRING *msg)>
 
 Prints the warning message and the bytecode location.
 
@@ -56,7 +56,7 @@ Prints the warning message and the bytecode location.
 */
 
 static INTVAL
-print_warning(Interp *interp, STRING *msg)
+print_warning(PARROT_INTERP, STRING *msg)
 {
 
     if (!msg)
@@ -79,7 +79,7 @@ print_warning(Interp *interp, STRING *msg)
 =over
 
 =item C<INTVAL
-Parrot_warn(Interp *interp, INTVAL warnclass,
+Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             const char *message, ...)>
 
 The Parrot C string warning/error reporter.
@@ -93,7 +93,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 */
 
 INTVAL
-Parrot_warn(Interp *interp, INTVAL warnclass,
+Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             const char *message, ...)
 {
     STRING *targ;
@@ -114,7 +114,7 @@ Parrot_warn(Interp *interp, INTVAL warnclass,
 /*
 
 =item C<INTVAL
-Parrot_warn_s(Interp *interp, INTVAL warnclass,
+Parrot_warn_s(PARROT_INTERP, INTVAL warnclass,
               STRING *message, ...)>
 
 The Parrot C<STRING> warning/error reporter.
@@ -128,7 +128,7 @@ C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 */
 
 INTVAL
-Parrot_warn_s(Interp *interp, INTVAL warnclass,
+Parrot_warn_s(PARROT_INTERP, INTVAL warnclass,
               STRING *message, ...)
 {
     STRING *targ;

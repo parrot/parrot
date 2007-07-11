@@ -33,7 +33,7 @@ the C-library.
 
 /*
 
-=item C<PMC* Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user
+=item C<PMC* Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user
         STRING* cb_signature)>
 
 Create a callback function according to pdd16.
@@ -44,7 +44,7 @@ Create a callback function according to pdd16.
 
 PARROT_API
 PMC*
-Parrot_make_cb(Parrot_Interp interp, PMC* sub, PMC* user_data,
+Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
         STRING *cb_signature)
 {
     PMC* interp_pmc, *cb, *cb_sig;
@@ -135,7 +135,7 @@ static void callback_CD(Parrot_Interp, char *, PMC *user_data);
 static void
 verify_CD(char *external_data, PMC *user_data)
 {
-    Parrot_Interp interp = NULL;
+    PARROT_INTERP = NULL;
     size_t i;
 
     /*
@@ -196,7 +196,7 @@ Common callback function handler. See pdd16.
 */
 
 static void
-callback_CD(Parrot_Interp interp, char *external_data, PMC *user_data)
+callback_CD(PARROT_INTERP, char *external_data, PMC *user_data)
 {
 
     PMC *passed_interp;       /* the interp that originated the CB */
@@ -255,7 +255,7 @@ necessary items in its properties.
 
 PARROT_API
 void
-Parrot_run_callback(Interp *interp /*NN*/,
+Parrot_run_callback(PARROT_INTERP,
         PMC* user_data, char* external_data)
 {
     PMC *    signature;

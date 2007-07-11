@@ -30,7 +30,7 @@ Return datatype C<enum> for C<STRING*> type_name.
 
 PARROT_API
 INTVAL
-Parrot_get_datatype_enum(Interp *interp, const STRING *type_name /*NN*/)
+Parrot_get_datatype_enum(PARROT_INTERP, const STRING *type_name /*NN*/)
     /* WARN_UNUSED */
 {
     char * const type = string_to_cstring(interp, type_name);
@@ -57,7 +57,7 @@ Return datatype name for C<type>.
 
 PARROT_API
 STRING *
-Parrot_get_datatype_name(Interp *interp, INTVAL type)
+Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
     /* WARN_UNUSED */
 {
     const char * const s =

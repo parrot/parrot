@@ -215,7 +215,7 @@ Init event system for first interpreter.
 */
 
 static void
-init_events_first(Interp *interp)
+init_events_first(PARROT_INTERP)
 {
     Parrot_thread    ev_handle;
 #ifndef WIN32
@@ -272,7 +272,7 @@ Init events for all interpreters.
 */
 
 static void
-init_events_all(Interp *interp)
+init_events_all(PARROT_INTERP)
 {
     /*
      * create per interpreter task queue
@@ -290,7 +290,7 @@ Initialize the event system.
 
 PARROT_API
 void
-Parrot_init_events(Interp *interp /*NN*/)
+Parrot_init_events(PARROT_INTERP)
 {
     if (!interp->parent_interpreter) {
         /* add the very first interpreter to the list of interps. */
@@ -313,6 +313,7 @@ Create queue entry and insert event into task queue.
 PARROT_API
 void
 Parrot_schedule_event(Interp *interp, parrot_event* ev /*NN*/)
+    /* XXX Why is it OK to pass in a null interpreter? */
 {
     QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
@@ -368,7 +369,7 @@ and running the passed C<sub>.
 
 PARROT_API
 void
-Parrot_new_timer_event(Interp *interp, PMC *timer, FLOATVAL diff,
+Parrot_new_timer_event(PARROT_INTERP, PMC *timer, FLOATVAL diff,
         FLOATVAL interval, int repeat, PMC *sub, parrot_event_type_enum typ)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
@@ -394,7 +395,7 @@ Prepare and schedule a callback event.
 
 PARROT_API
 void
-Parrot_new_cb_event(Interp *interp /*NN*/, PMC *cbi, char *ext)
+Parrot_new_cb_event(PARROT_INTERP, PMC *cbi, char *ext)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
     QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
@@ -418,7 +419,7 @@ Deactivate the timer identified by C<timer>.
 
 PARROT_API
 void
-Parrot_del_timer_event(Interp *interp, PMC *timer)
+Parrot_del_timer_event(PARROT_INTERP, PMC *timer)
 {
     QUEUE_ENTRY  *entry;
 
@@ -451,7 +452,7 @@ event arrives.
 
 PARROT_API
 void
-Parrot_new_terminate_event(Interp *interp)
+Parrot_new_terminate_event(PARROT_INTERP)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_TERMINATE;
@@ -469,7 +470,7 @@ variable for GC to finish when the event arrives.
 
 PARROT_API
 void
-Parrot_new_suspend_for_gc_event(Interp *interp /*NN*/)
+Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 {
     QUEUE_ENTRY *qe;
     parrot_event* const ev = mem_allocate_typed(parrot_event);
@@ -512,7 +513,7 @@ checking for the interpreter.
 
 PARROT_API
 void
-Parrot_schedule_interp_qentry(Interp *interp /*NN*/, struct QUEUE_ENTRY *entry /*NN*/)
+Parrot_schedule_interp_qentry(PARROT_INTERP, struct QUEUE_ENTRY *entry /*NN*/)
 {
     parrot_event * const event = (parrot_event *)entry->data;
     /*
@@ -572,11 +573,11 @@ Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
                 case SIGHUP:
                 case SIGINT:
                     {
-                    Interp *interp;
                     if (n_interpreters) {
                         size_t i;
                         LOCK(interpreter_array_mutex);
                         for (i = 1; i < n_interpreters; ++i) {
+                            Interp *interp;
                             edebug((stderr, "deliver SIGINT to %d\n", i));
                             interp = interpreter_array[i];
                             if (interp)
@@ -585,8 +586,7 @@ Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)
                         }
                         UNLOCK(interpreter_array_mutex);
                     }
-                    interp = interpreter_array[0];
-                    Parrot_schedule_interp_qentry(interp, entry);
+                    Parrot_schedule_interp_qentry(interpreter_array[0], entry);
                     edebug((stderr, "deliver SIGINT to 0\n"));
                     }
                     break;
@@ -799,7 +799,7 @@ stop_io_thread(void)
 
 PARROT_API
 void
-Parrot_event_add_io_event(Interp *interp,
+Parrot_event_add_io_event(PARROT_INTERP,
         PMC *pio, PMC *sub, PMC *data, INTVAL which)
 {
     io_thread_msg buf;
@@ -1022,7 +1022,7 @@ is processed. Terminate the loop if sleeping is finished.
 */
 
 static opcode_t *
-wait_for_wakeup(Interp *interp /*NN*/, opcode_t *next)
+wait_for_wakeup(PARROT_INTERP, opcode_t *next)
 {
     QUEUE        * const tq = interp->task_queue;
 
@@ -1065,7 +1065,7 @@ Go to sleep. This is called from the C<sleep> opcode.
 
 PARROT_API
 opcode_t *
-Parrot_sleep_on_event(Interp *interp /*NN*/, FLOATVAL t, opcode_t *next)
+Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, opcode_t *next)
 {
 #if PARROT_HAS_THREADS
 
@@ -1099,7 +1099,7 @@ Explicitly C<sync> called by the check_event opcode from run loops.
 
 PARROT_API
 opcode_t *
-Parrot_do_check_events(Interp *interp /*NN*/, opcode_t *next)
+Parrot_do_check_events(PARROT_INTERP, opcode_t *next)
 {
     if (peek_entry(interp->task_queue))
         return Parrot_do_handle_events(interp, 0, next);
@@ -1116,7 +1116,7 @@ Convert event to exception and throw it.
 */
 
 static void
-event_to_exception(Interp *interp /*NN*/, const parrot_event* event /*NN*/)
+event_to_exception(PARROT_INTERP, const parrot_event* event /*NN*/)
 {
     const int exit_code = -event->u.signal;
 
@@ -1144,7 +1144,7 @@ Run user code or such.
 */
 
 static opcode_t *
-do_event(Interp *interp, parrot_event* event /*NN*/, opcode_t *next)
+do_event(PARROT_INTERP, parrot_event* event /*NN*/, opcode_t *next)
 {
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
@@ -1202,7 +1202,7 @@ C<op_func_table>.
 
 PARROT_API
 opcode_t *
-Parrot_do_handle_events(Interp *interp /*NN*/, int restore, opcode_t *next)
+Parrot_do_handle_events(PARROT_INTERP, int restore, opcode_t *next)
 {
     QUEUE        * const tq = interp->task_queue;
 

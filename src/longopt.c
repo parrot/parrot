@@ -21,7 +21,7 @@ This is used by C<parrot>.
 
 /* HEADERIZER BEGIN: static */
 
-static int longopt_get_longopt( Interp *interp /*NN*/,
+static int longopt_get_longopt( PARROT_INTERP,
     int argc,
     char* argv[] /*NN*/,
     const struct longopt_opt_decl options[] /*NN*/,
@@ -30,7 +30,7 @@ static int longopt_get_longopt( Interp *interp /*NN*/,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int longopt_get_shortopt( Interp *interp /*NN*/,
+static int longopt_get_shortopt( PARROT_INTERP,
     int argc,
     char* argv[] /*NN*/,
     const struct longopt_opt_decl options[] /*NN*/,
@@ -63,7 +63,7 @@ Any other value is a valid option identifier.
 
 PARROT_API
 int
-longopt_get(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+longopt_get(PARROT_INTERP, int argc, char* argv[] /*NN*/,
             const struct longopt_opt_decl options[] /*NN*/,
             struct longopt_opt_info* info_buf /*NN*/)
 {
@@ -110,7 +110,7 @@ characters and start with C<-->.
 */
 
 static int
-longopt_get_longopt(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+longopt_get_longopt(PARROT_INTERP, int argc, char* argv[] /*NN*/,
                     const struct longopt_opt_decl options[] /*NN*/,
                     struct longopt_opt_info* info_buf)
 {
@@ -202,7 +202,7 @@ characters long and start with a dash.
 */
 
 static int
-longopt_get_shortopt(Interp *interp /*NN*/, int argc, char* argv[] /*NN*/,
+longopt_get_shortopt(PARROT_INTERP, int argc, char* argv[] /*NN*/,
                      const struct longopt_opt_decl options[] /*NN*/,
                      struct longopt_opt_info* info_buf /*NN*/)
 {

@@ -76,60 +76,71 @@ typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
 /* HEADERIZER BEGIN: src/encoding.c */
 
 PARROT_API
-ENCODING * Parrot_default_encoding( Interp *interp );
+ENCODING * Parrot_default_encoding( PARROT_INTERP )
+        __attribute__nonnull__(1);
 
 PARROT_API
-const char * Parrot_encoding_c_name( Interp *interp,
+const char * Parrot_encoding_c_name( PARROT_INTERP,
     INTVAL number_of_encoding )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 PARROT_API
-STRING* Parrot_encoding_name( Interp *interp, INTVAL number_of_encoding )
+STRING* Parrot_encoding_name( PARROT_INTERP, INTVAL number_of_encoding )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 PARROT_API
-INTVAL Parrot_encoding_number( Interp *interp, STRING *encodingname /*NN*/ )
+INTVAL Parrot_encoding_number( PARROT_INTERP, STRING *encodingname /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-INTVAL Parrot_encoding_number_of_str( Interp *interp, STRING *src /*NN*/ )
+INTVAL Parrot_encoding_number_of_str( PARROT_INTERP, STRING *src /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-ENCODING * Parrot_find_encoding( Interp *interp,
+ENCODING * Parrot_find_encoding( PARROT_INTERP,
     const char *encodingname /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
-encoding_converter_t Parrot_find_encoding_converter( Interp *interp,
+encoding_converter_t Parrot_find_encoding_converter( PARROT_INTERP,
     ENCODING *lhs,
-    ENCODING *rhs );
+    ENCODING *rhs )
+        __attribute__nonnull__(1);
 
 PARROT_API
-ENCODING* Parrot_get_encoding( Interp *interp, INTVAL number_of_encoding )
+ENCODING* Parrot_get_encoding( PARROT_INTERP, INTVAL number_of_encoding )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 PARROT_API
-ENCODING * Parrot_load_encoding( Interp *interp, const char *encodingname )
+ENCODING * Parrot_load_encoding( PARROT_INTERP, const char *encodingname )
+        __attribute__nonnull__(1)
         __attribute__warn_unused_result__
         __attribute__noreturn__;
 
 PARROT_API
-INTVAL Parrot_make_default_encoding( Interp *interp,
+INTVAL Parrot_make_default_encoding( PARROT_INTERP,
     const char *encodingname,
     ENCODING *encoding /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-ENCODING * Parrot_new_encoding( Interp *interp )
+ENCODING * Parrot_new_encoding( PARROT_INTERP )
+        __attribute__nonnull__(1)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API
-INTVAL Parrot_register_encoding( Interp *interp /*NN*/,
+INTVAL Parrot_register_encoding( PARROT_INTERP,
     const char *encodingname /*NN*/,
     ENCODING *encoding /*NN*/ )
         __attribute__nonnull__(1)

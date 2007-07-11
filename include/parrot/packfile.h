@@ -238,28 +238,30 @@ typedef enum {
 /* HEADERIZER BEGIN: src/packout.c */
 
 PARROT_API
-opcode_t * PackFile_Constant_pack( Interp *interp,
+opcode_t * PackFile_Constant_pack( PARROT_INTERP,
     const PackFile_ConstTable *const_table /*NN*/,
     const PackFile_Constant *self /*NN*/,
     opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_API
-opcode_t * PackFile_ConstTable_pack( Interp *interp,
+opcode_t * PackFile_ConstTable_pack( PARROT_INTERP,
     PackFile_Segment *seg /*NN*/,
     opcode_t *cursor )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-size_t PackFile_ConstTable_pack_size( Interp *interp /*NN*/,
+size_t PackFile_ConstTable_pack_size( PARROT_INTERP,
     PackFile_Segment *seg /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int PackFile_find_in_const( Interp *interp /*NN*/,
+int PackFile_find_in_const( PARROT_INTERP,
     const PackFile_ConstTable *ct /*NN*/,
     const PMC *key /*NN*/,
     int type )
@@ -268,14 +270,16 @@ int PackFile_find_in_const( Interp *interp /*NN*/,
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_pack( Interp *interp,
+void PackFile_pack( PARROT_INTERP,
     PackFile *self /*NN*/,
     opcode_t *cursor /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-opcode_t PackFile_pack_size( Interp *interp, PackFile *self /*NN*/ )
+opcode_t PackFile_pack_size( PARROT_INTERP, PackFile *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/packout.c */
@@ -283,7 +287,7 @@ opcode_t PackFile_pack_size( Interp *interp, PackFile *self /*NN*/ )
 /* HEADERIZER BEGIN: src/packfile.c */
 
 PARROT_API
-void do_sub_pragmas( Interp *interp /*NN*/,
+void do_sub_pragmas( PARROT_INTERP,
     PackFile_ByteCode *self /*NN*/,
     int action,
     PMC *eval_pmc )
@@ -291,86 +295,92 @@ void do_sub_pragmas( Interp *interp /*NN*/,
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_add_segment( Interp *interp,
+INTVAL PackFile_add_segment(
+    SHIM_INTERP,
     PackFile_Directory *dir /*NN*/,
     PackFile_Segment *seg /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_Constant_destroy( Interp *interp, PackFile_Constant *self );
+void PackFile_Constant_destroy( SHIM_INTERP, PackFile_Constant *self );
 
 PARROT_API
-PackFile_Constant * PackFile_Constant_new( Interp *interp );
+PackFile_Constant * PackFile_Constant_new( SHIM_INTERP );
 
 PARROT_API
-size_t PackFile_Constant_pack_size( Interp *interp,
+size_t PackFile_Constant_pack_size( PARROT_INTERP,
     PackFile_Constant *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * PackFile_Constant_unpack( Interp *interp,
+opcode_t * PackFile_Constant_unpack( PARROT_INTERP,
     PackFile_ConstTable *constt,
     PackFile_Constant *self /*NN*/,
     opcode_t *cursor )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-opcode_t * PackFile_Constant_unpack_key( Interp *interp,
+opcode_t * PackFile_Constant_unpack_key( PARROT_INTERP,
     PackFile_ConstTable *constt /*NN*/,
     PackFile_Constant *self,
     opcode_t *cursor )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * PackFile_Constant_unpack_pmc( Interp *interp /*NN*/,
+opcode_t * PackFile_Constant_unpack_pmc( PARROT_INTERP,
     PackFile_ConstTable *constt,
     PackFile_Constant *self,
     opcode_t *cursor )
         __attribute__nonnull__(1);
 
 PARROT_API
-void PackFile_ConstTable_clear( Interp *interp,
+void PackFile_ConstTable_clear( PARROT_INTERP,
     PackFile_ConstTable *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * PackFile_ConstTable_unpack( Interp *interp /*NN*/,
+opcode_t * PackFile_ConstTable_unpack( PARROT_INTERP,
     PackFile_Segment *seg /*NN*/,
     opcode_t *cursor )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_destroy( Interp *interp, PackFile *pf /*NULLOK*/ );
+void PackFile_destroy( PARROT_INTERP, PackFile *pf /*NULLOK*/ )
+        __attribute__nonnull__(1);
 
 PARROT_API
-PackFile_FixupEntry * PackFile_find_fixup_entry( Interp *interp /*NN*/,
+PackFile_FixupEntry * PackFile_find_fixup_entry( PARROT_INTERP,
     INTVAL type,
     char *name )
         __attribute__nonnull__(1);
 
 PARROT_API
-PackFile_Segment * PackFile_find_segment( Interp *interp,
+PackFile_Segment * PackFile_find_segment( PARROT_INTERP,
     PackFile_Directory *dir /*NN*/,
     const char *name /*NN*/,
     int sub_dir )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_fixup_subs( Interp *interp /*NN*/,
-    pbc_action_enum_t what,
-    PMC *eval )
+void PackFile_fixup_subs( PARROT_INTERP, pbc_action_enum_t what, PMC *eval )
         __attribute__nonnull__(1);
 
 PARROT_API
-void PackFile_FixupTable_clear( Interp *interp,
+void PackFile_FixupTable_clear( PARROT_INTERP,
     PackFile_FixupTable *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_FixupTable_new_entry( Interp *interp /*NN*/,
+void PackFile_FixupTable_new_entry( PARROT_INTERP,
     const char *label /*NN*/,
     INTVAL type,
     opcode_t offs )
@@ -378,134 +388,148 @@ void PackFile_FixupTable_new_entry( Interp *interp /*NN*/,
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_funcs_register( Interp *interp,
+INTVAL PackFile_funcs_register(
+    SHIM_INTERP,
     PackFile *pf /*NN*/,
     UINTVAL type,
     PackFile_funcs funcs )
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_map_segments( Interp *interp,
+INTVAL PackFile_map_segments( PARROT_INTERP,
     PackFile_Directory *dir /*NN*/,
     PackFile_map_segments_func_t callback,
     void *user_data )
-        __attribute__nonnull__(2);
-
-PARROT_API
-PackFile * PackFile_new( Interp *interp, INTVAL is_mapped );
-
-PARROT_API
-PackFile * PackFile_new_dummy( Interp *interp /*NN*/,
-    const char *name /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-PackFile_Segment * PackFile_remove_segment_by_name( Interp *interp,
+PackFile * PackFile_new( PARROT_INTERP, INTVAL is_mapped )
+        __attribute__nonnull__(1);
+
+PARROT_API
+PackFile * PackFile_new_dummy( PARROT_INTERP, const char *name /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PackFile_Segment * PackFile_remove_segment_by_name(
+    SHIM_INTERP,
     PackFile_Directory *dir /*NN*/,
     const char *name /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_Segment_destroy( Interp *interp, PackFile_Segment *self /*NN*/ )
+void PackFile_Segment_destroy( PARROT_INTERP, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_Segment_dump( Interp *interp, PackFile_Segment *self /*NN*/ )
+void PackFile_Segment_dump( PARROT_INTERP, PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-PackFile_Segment * PackFile_Segment_new( Interp *interp,
+PackFile_Segment * PackFile_Segment_new(
+    SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
 
 PARROT_API
-PackFile_Segment * PackFile_Segment_new_seg( Interp *interp,
+PackFile_Segment * PackFile_Segment_new_seg( PARROT_INTERP,
     PackFile_Directory *dir /*NN*/,
     UINTVAL type,
     const char *name,
     int add )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * PackFile_Segment_pack( Interp *interp,
+opcode_t * PackFile_Segment_pack( PARROT_INTERP,
     PackFile_Segment *self /*NN*/,
     opcode_t *cursor )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-size_t PackFile_Segment_packed_size( Interp *interp,
+size_t PackFile_Segment_packed_size( PARROT_INTERP,
     PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t * PackFile_Segment_unpack( Interp *interp,
+opcode_t * PackFile_Segment_unpack( PARROT_INTERP,
     PackFile_Segment *self /*NN*/,
     opcode_t *cursor )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-opcode_t PackFile_unpack( Interp *interp,
+opcode_t PackFile_unpack( PARROT_INTERP,
     PackFile *self /*NN*/,
     opcode_t *packed,
     size_t packed_size )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_debug_add_mapping( Interp *interp,
+void Parrot_debug_add_mapping( PARROT_INTERP,
     PackFile_Debug *debug /*NN*/,
     opcode_t offset,
     int mapping_type,
     const char *filename,
     int source_seg )
-        __attribute__nonnull__(2);
-
-PARROT_API
-STRING * Parrot_debug_pc_to_filename( Interp *interp,
-    PackFile_Debug *debug /*NN*/,
-    opcode_t pc )
-        __attribute__nonnull__(2);
-
-PARROT_API
-void Parrot_destroy_constants( Interp *interp /*NN*/ )
-        __attribute__nonnull__(1);
-
-PARROT_API
-void Parrot_load_bytecode( Interp *interp /*NN*/, STRING *file_str /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-PackFile_Debug * Parrot_new_debug_seg( Interp *interp,
-    PackFile_ByteCode *cs /*NN*/,
-    size_t size )
+STRING * Parrot_debug_pc_to_filename( PARROT_INTERP,
+    PackFile_Debug *debug /*NN*/,
+    opcode_t pc )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-PackFile_ByteCode * Parrot_switch_to_cs( Interp *interp /*NN*/,
+void Parrot_destroy_constants( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_load_bytecode( PARROT_INTERP, STRING *file_str /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PackFile_Debug * Parrot_new_debug_seg( PARROT_INTERP,
+    PackFile_ByteCode *cs /*NN*/,
+    size_t size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PackFile_ByteCode * Parrot_switch_to_cs( PARROT_INTERP,
     PackFile_ByteCode *new_cs /*NN*/,
     int really )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_switch_to_cs_by_nr( Interp *interp /*NN*/, opcode_t seg )
+void Parrot_switch_to_cs_by_nr( PARROT_INTERP, opcode_t seg )
         __attribute__nonnull__(1);
 
 PARROT_API
-PackFile_ByteCode * PF_create_default_segs( Interp *interp,
+PackFile_ByteCode * PF_create_default_segs( PARROT_INTERP,
     const char *file_name /*NN*/,
     int add )
-        __attribute__nonnull__(2);
-
-void default_dump_header( Interp *interp /*NN*/,
-    const PackFile_Segment *self /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_const_subs( Interp *interp /*NN*/ )
+void default_dump_header( PARROT_INTERP, const PackFile_Segment *self /*NN*/ )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void mark_const_subs( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/packfile.c */
@@ -514,13 +538,13 @@ void mark_const_subs( Interp *interp /*NN*/ )
 /* HEADERIZER BEGIN: src/packdump.c */
 
 PARROT_API
-void PackFile_ConstTable_dump( Interp *interp /*NN*/,
+void PackFile_ConstTable_dump( PARROT_INTERP,
     const PackFile_ConstTable *self /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_Fixup_dump( Interp *interp /*NN*/,
+void PackFile_Fixup_dump( PARROT_INTERP,
     const PackFile_FixupTable *ft /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

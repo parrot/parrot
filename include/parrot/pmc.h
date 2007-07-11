@@ -22,17 +22,15 @@
 /* HEADERIZER BEGIN: src/pmc.c */
 
 PARROT_API
-PMC * constant_pmc_new( Interp *interp /*NN*/, INTVAL base_type )
+PMC * constant_pmc_new( PARROT_INTERP, INTVAL base_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * constant_pmc_new_init( Interp *interp /*NN*/,
-    INTVAL base_type,
-    PMC *init )
+PMC * constant_pmc_new_init( PARROT_INTERP, INTVAL base_type, PMC *init )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * constant_pmc_new_noinit( Interp *interp /*NN*/, INTVAL base_type )
+PMC * constant_pmc_new_noinit( PARROT_INTERP, INTVAL base_type )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -40,7 +38,7 @@ void dod_register_pmc( Interp* interp /*NN*/, PMC* pmc )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_create_mro( Interp *interp /*NN*/, INTVAL type )
+void Parrot_create_mro( PARROT_INTERP, INTVAL type )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -48,15 +46,15 @@ void Parrot_create_pmc_proxy( Interp* interp /*NN*/, int type_num )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * pmc_new( Interp *interp /*NN*/, INTVAL base_type )
+PMC * pmc_new( PARROT_INTERP, INTVAL base_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * pmc_new_init( Interp *interp /*NN*/, INTVAL base_type, PMC *init )
+PMC * pmc_new_init( PARROT_INTERP, INTVAL base_type, PMC *init )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * pmc_new_noinit( Interp *interp /*NN*/, INTVAL base_type )
+PMC * pmc_new_noinit( PARROT_INTERP, INTVAL base_type )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -64,7 +62,7 @@ INTVAL pmc_register( Interp* interp /*NN*/, STRING *name )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC* pmc_reuse( Interp *interp /*NN*/,
+PMC* pmc_reuse( PARROT_INTERP,
     PMC *pmc /*NN*/,
     INTVAL new_type,
     UINTVAL flags )

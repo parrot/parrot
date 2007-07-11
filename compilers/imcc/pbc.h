@@ -18,7 +18,7 @@ int e_pbc_end_sub( Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int e_pbc_new_sub( Interp *interp, void *param, IMC_Unit *unit /*NN*/ )
+int e_pbc_new_sub( SHIM_INTERP, void *param, IMC_Unit *unit /*NN*/ )
         __attribute__nonnull__(3);
 
 int e_pbc_open( Interp *interp, void *param );

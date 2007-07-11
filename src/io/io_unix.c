@@ -56,18 +56,21 @@ static INTVAL PIO_unix_async( Interp *interp,
     ParrotIO *io,
     INTVAL b );
 
-static INTVAL PIO_unix_bind( Interp *interp,
+static INTVAL PIO_unix_bind(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     STRING *l )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_close( Interp *interp,
+static INTVAL PIO_unix_close(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_connect( Interp *interp,
+static INTVAL PIO_unix_connect(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     STRING *r /*NULLOK*/ )
@@ -78,14 +81,16 @@ static ParrotIO * PIO_unix_fdopen( Interp *interp,
     PIOHANDLE fd,
     INTVAL flags );
 
-static INTVAL PIO_unix_flush( Interp *interp,
+static INTVAL PIO_unix_flush(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_init( Interp *interp, ParrotIOLayer *layer );
 static INTVAL PIO_unix_isatty( PIOHANDLE fd );
-static INTVAL PIO_unix_listen( Interp *interp,
+static INTVAL PIO_unix_listen(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     INTVAL sec )
@@ -101,7 +106,8 @@ static ParrotIO * PIO_unix_pipe( Interp *interp,
     const char *cmd,
     int flags );
 
-static INTVAL PIO_unix_poll( Interp *interp,
+static INTVAL PIO_unix_poll(
+    SHIM_INTERP,
     ParrotIOLayer *l,
     ParrotIO *io,
     int which,
@@ -118,14 +124,16 @@ static INTVAL PIO_unix_recv( Interp *interp,
     ParrotIO * io,
     STRING **s );
 
-static PIOOFF_T PIO_unix_seek( Interp *interp,
+static PIOOFF_T PIO_unix_seek(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_send( Interp *interp,
+static INTVAL PIO_unix_send(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/,
     STRING *s )
@@ -137,12 +145,14 @@ static ParrotIO * PIO_unix_socket( Interp *interp,
     int type,
     int proto );
 
-static PIOOFF_T PIO_unix_tell( Interp *interp,
+static PIOOFF_T PIO_unix_tell(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io /*NN*/ )
         __attribute__nonnull__(3);
 
-static size_t PIO_unix_write( Interp *interp,
+static size_t PIO_unix_write(
+    SHIM_INTERP,
     ParrotIOLayer *layer,
     ParrotIO *io,
     STRING *s );

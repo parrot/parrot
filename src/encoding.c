@@ -19,7 +19,7 @@ These are parrot's generic encoding handling functions
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL register_encoding( Interp *interp /*NN*/,
+static INTVAL register_encoding( PARROT_INTERP,
     const char *encodingname /*NN*/,
     ENCODING *encoding /*NN*/ )
         __attribute__nonnull__(1)
@@ -73,7 +73,7 @@ parrot_deinit_encodings(void)
 
 PARROT_API
 ENCODING *
-Parrot_new_encoding(Interp *interp)
+Parrot_new_encoding(PARROT_INTERP)
     /* MALLOC, WARN_UNUSED */
 {
     UNUSED(interp);
@@ -83,7 +83,7 @@ Parrot_new_encoding(Interp *interp)
 
 PARROT_API
 ENCODING *
-Parrot_find_encoding(Interp *interp, const char *encodingname /*NN*/)
+Parrot_find_encoding(PARROT_INTERP, const char *encodingname /*NN*/)
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -104,7 +104,7 @@ Parrot_find_encoding(Interp *interp, const char *encodingname /*NN*/)
 
 PARROT_API
 ENCODING *
-Parrot_load_encoding(Interp *interp, const char *encodingname)
+Parrot_load_encoding(PARROT_INTERP, const char *encodingname)
     /* WARN_UNUSED, NORETURN */
 {
     UNUSED(encodingname);
@@ -122,7 +122,7 @@ Return the number of the encoding or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_encoding_number(Interp *interp, STRING *encodingname /*NN*/)
+Parrot_encoding_number(PARROT_INTERP, STRING *encodingname /*NN*/)
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -146,7 +146,7 @@ Return the number of the encoding of the given string or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_encoding_number_of_str(Interp *interp, STRING *src /*NN*/)
+Parrot_encoding_number_of_str(PARROT_INTERP, STRING *src /*NN*/)
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -162,7 +162,7 @@ Parrot_encoding_number_of_str(Interp *interp, STRING *src /*NN*/)
 
 PARROT_API
 STRING*
-Parrot_encoding_name(Interp *interp, INTVAL number_of_encoding)
+Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
     UNUSED(interp);
@@ -174,7 +174,7 @@ Parrot_encoding_name(Interp *interp, INTVAL number_of_encoding)
 
 PARROT_API
 ENCODING*
-Parrot_get_encoding(Interp *interp, INTVAL number_of_encoding)
+Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
     UNUSED(interp);
@@ -186,7 +186,7 @@ Parrot_get_encoding(Interp *interp, INTVAL number_of_encoding)
 
 PARROT_API
 const char *
-Parrot_encoding_c_name(Interp *interp, INTVAL number_of_encoding)
+Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
     /* WARN_UNUSED */
 {
     UNUSED(interp);
@@ -197,7 +197,7 @@ Parrot_encoding_c_name(Interp *interp, INTVAL number_of_encoding)
 }
 
 static INTVAL
-register_encoding(Interp *interp /*NN*/, const char *encodingname /*NN*/,
+register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
         ENCODING *encoding /*NN*/)
 {
     const int n = all_encodings->n_encodings;
@@ -226,7 +226,7 @@ register_encoding(Interp *interp /*NN*/, const char *encodingname /*NN*/,
 
 PARROT_API
 INTVAL
-Parrot_register_encoding(Interp *interp /*NN*/, const char *encodingname /*NN*/,
+Parrot_register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
         ENCODING *encoding /*NN*/)
 {
     if (!all_encodings) {
@@ -259,7 +259,7 @@ Parrot_register_encoding(Interp *interp /*NN*/, const char *encodingname /*NN*/,
 
 PARROT_API
 INTVAL
-Parrot_make_default_encoding(Interp *interp, const char *encodingname,
+Parrot_make_default_encoding(PARROT_INTERP, const char *encodingname,
         ENCODING *encoding /*NN*/)
 {
     UNUSED(interp);
@@ -271,7 +271,7 @@ Parrot_make_default_encoding(Interp *interp, const char *encodingname,
 
 PARROT_API
 ENCODING *
-Parrot_default_encoding(Interp *interp)
+Parrot_default_encoding(PARROT_INTERP)
 {
     UNUSED(interp);
 
@@ -280,7 +280,7 @@ Parrot_default_encoding(Interp *interp)
 
 PARROT_API
 encoding_converter_t
-Parrot_find_encoding_converter(Interp *interp, ENCODING *lhs,
+Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs,
         ENCODING *rhs)
 {
     UNUSED(interp);

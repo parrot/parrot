@@ -33,7 +33,7 @@ the faster dispatch of operations.
 /*
 
 =item C<opcode_t *
-runops_fast_core(Interp *interp, opcode_t *pc)>
+runops_fast_core(PARROT_INTERP, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.
@@ -45,7 +45,7 @@ No bounds checking, profiling or tracing is performed.
 */
 
 opcode_t *
-runops_fast_core(Interp *interp, opcode_t *pc)
+runops_fast_core(PARROT_INTERP, opcode_t *pc)
 {
     while (pc) {
         DO_OP(pc, interp);
@@ -56,7 +56,7 @@ runops_fast_core(Interp *interp, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_cgoto_core(Interp *interp, opcode_t *pc)>
+runops_cgoto_core(PARROT_INTERP, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core.
@@ -70,7 +70,7 @@ If computed C<goto> is not available then Parrot exits with exit code 1.
 */
 
 opcode_t *
-runops_cgoto_core(Interp *interp, opcode_t *pc)
+runops_cgoto_core(PARROT_INTERP, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interp);
@@ -86,7 +86,7 @@ runops_cgoto_core(Interp *interp, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_slow_core(Interp *interp, opcode_t *pc)>
+runops_slow_core(PARROT_INTERP, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
@@ -106,7 +106,7 @@ operations, with tracing and bounds checking enabled.
 #define  code_end   (interp->code->base.data + \
         interp->code->base.size)
 static opcode_t *
-runops_trace_core(Interp *interp /*NN*/, opcode_t *pc)
+runops_trace_core(PARROT_INTERP, opcode_t *pc)
 {
     static size_t dod, gc;
     Arenas * const arena_base = interp->arena_base;
@@ -165,7 +165,7 @@ runops_trace_core(Interp *interp /*NN*/, opcode_t *pc)
 }
 
 opcode_t *
-runops_slow_core(Interp *interp /*NN*/, opcode_t *pc)
+runops_slow_core(PARROT_INTERP, opcode_t *pc)
 {
 
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
@@ -191,7 +191,7 @@ runops_slow_core(Interp *interp /*NN*/, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_profile_core(Interp *interp, opcode_t *pc)>
+runops_profile_core(PARROT_INTERP, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking and profiling enabled.
@@ -201,7 +201,7 @@ operations, with tracing, bounds checking and profiling enabled.
 */
 
 opcode_t *
-runops_profile_core(Interp *interp, opcode_t *pc)
+runops_profile_core(PARROT_INTERP, opcode_t *pc)
 {
     opcode_t cur_op;
     RunProfile * const profile = interp->profile;

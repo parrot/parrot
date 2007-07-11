@@ -18,7 +18,7 @@
 /* HEADERIZER BEGIN: src/string_primitives.c */
 
 PARROT_API
-UINTVAL Parrot_char_digit_value( Interp *interp, UINTVAL character );
+UINTVAL Parrot_char_digit_value( SHIM_INTERP, UINTVAL character );
 
 PARROT_API
 void string_fill_from_buffer( PARROT_INTERP,

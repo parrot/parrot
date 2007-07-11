@@ -56,12 +56,12 @@ IntList * intlist_clone( Interp *i /*NN*/, const IntList *list/*NN*/ )
 void intlist_dump( FILE *fp, IntList *list /*NN*/, int verbose )
         __attribute__nonnull__(2);
 
-INTVAL intlist_get( Interp *interp /*NN*/, IntList *list /*NN*/, INTVAL idx )
+INTVAL intlist_get( PARROT_INTERP, IntList *list /*NN*/, INTVAL idx )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-INTVAL intlist_length( Interp *interp, const IntList *list /*NN*/ )
+INTVAL intlist_length( SHIM_INTERP, const IntList *list /*NN*/ )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
