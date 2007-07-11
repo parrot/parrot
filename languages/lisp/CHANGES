@@ -1,3 +1,8 @@
+Changes for version 0.4.13
+--------------------------
+  * Change LICENSE to Artistic License 2.0
+  * Start with a test suite
+
 Changes for version 0.4.12
 --------------------------
   * Make languages/lisp compile again, as it was broken due to changes in Parrot
