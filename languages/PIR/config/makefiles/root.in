@@ -109,3 +109,6 @@ clean:
   lib/pasm_core_gen.pbc \
   lib/ASTGrammar.pir \
   lib/ASTGrammar.pbc
+
+realclean: clean
+	$(RM_F) Makefile
