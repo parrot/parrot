@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -29,27 +29,27 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $version = 0;
-    my $a = capture_output('perldoc -ud c99da7c4.tmp perldoc') || undef;
+    my $content = capture_output('perldoc -ud c99da7c4.tmp perldoc') || undef;
 
-    if ( defined $a ) {
-        if ( $a =~ m/^Unknown option:/ ) {
-            $a = capture_output('perldoc perldoc') || '';
+    if ( defined $content ) {
+        if ( $content =~ m/^Unknown option:/ ) {
+            $content = capture_output('perldoc perldoc') || '';
             $version = 1;
             $self->set_result('yes, old version');
         }
         else {
-            if ( open my $FH, "<", "c99da7c4.tmp" ) {
+            if ( open my $FH, '<', 'c99da7c4.tmp' ) {
                 local $/;
-                $a = <$FH>;
+                $content = <$FH>;
                 close $FH;
                 $version = 2;
                 $self->set_result('yes');
             }
             else {
-                $a = undef;
+                $content = undef;
             }
         }
-        unless ( defined $a && $a =~ m/perldoc/ ) {
+        unless ( defined $content && $content =~ m/perldoc/ ) {
             $version = 0;
             $self->set_result('failed');
         }
@@ -57,7 +57,7 @@ sub runstep {
     else {
         $self->set_result('no');
     }
-    unlink "c99da7c4.tmp";
+    unlink 'c99da7c4.tmp';
 
     $conf->data->set(
         has_perldoc => $version != 0 ? 1 : 0,
