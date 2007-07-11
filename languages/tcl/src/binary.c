@@ -322,7 +322,7 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
     return binstr;
 }
 
-STRING *
+static STRING *
 binary_format_number(Interp *interp, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
 {
@@ -360,7 +360,7 @@ binary_format_string_field(Interp *interp, char field, STRING *binstr,
     return binstr;
 }
 
-STRING *
+static STRING *
 binary_format_string(Interp *interp, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
 {
