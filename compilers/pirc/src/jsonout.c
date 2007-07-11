@@ -405,7 +405,7 @@ init_json_vtable(char *outputfile) {
     vtable->data = (emit_data *)malloc(sizeof(emit_data));
     if (vtable->data == NULL) {
         fprintf(stderr, "Failed to allocate memory for vtable data\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     vtable->data->indent = 0;
     vtable->data->outputfile = outputfile;

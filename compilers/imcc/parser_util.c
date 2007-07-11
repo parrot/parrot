@@ -1246,7 +1246,7 @@ imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/,
         if (!ch) {
             /* no fatal here, else we get recursion */
             fprintf(stderr, "illegal format at %s\n", cp);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         /* ok, we have a valid format char */
         ++fmt;

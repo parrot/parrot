@@ -172,7 +172,7 @@ static void help(void)
            "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
            "non native PBCs\n");
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 static struct longopt_opt_decl options[] = {
@@ -256,19 +256,19 @@ main(int argc, char **argv)
         pack = (opcode_t*) mem_sys_allocate(size);
         if (!pack) {
             printf("out of mem\n");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         PackFile_pack(interp, interp->code->base.pf, pack);
         if (strcmp(file, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(file, "wb")) == 0) {
             printf("Couldn't open %s\n", file);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         if ((1 != fwrite(pack, size, 1, fp))) {
             printf("Couldn't write %s\n", file);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         fclose(fp);
         mem_sys_free(pack);

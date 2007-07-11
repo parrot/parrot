@@ -101,7 +101,7 @@ alloc_new_block(Interp *interp, size_t size, Memory_Pool *pool, const char *why)
 
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     new_block->free  = alloc_size;
@@ -208,7 +208,7 @@ mem_allocate(Interp *interp /*NN*/, size_t size, Memory_Pool *pool /*NN*/)
 
             if (pool->top_block->free < size) {
                 fprintf(stderr, "out of mem\n");
-                exit(1);
+                exit(EXIT_FAILURE);
             }
         }
     }

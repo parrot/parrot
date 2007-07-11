@@ -1041,7 +1041,7 @@ PIO_unix_pipe(Interp *interp, SHIM(ParrotIOLayer *l), const char *cmd, int flags
             close(STDIN_FILENO);
             close(fds[1]);
             if (dup(fds[0]) != STDIN_FILENO) {
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
         }
         else {
@@ -1052,7 +1052,7 @@ PIO_unix_pipe(Interp *interp, SHIM(ParrotIOLayer *l), const char *cmd, int flags
             if (dup(fds[0]) != STDIN_FILENO || dup(fds[1]) != STDOUT_FILENO
                     || dup(fds[1]) != STDERR_FILENO)
             {
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
         }
         /*
@@ -1069,7 +1069,7 @@ PIO_unix_pipe(Interp *interp, SHIM(ParrotIOLayer *l), const char *cmd, int flags
         execv(cmd, argv);       /* XXX use execvp ? */
         /* Will never reach this unless exec fails. */
         perror("execvp");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     perror("fork");

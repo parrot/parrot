@@ -614,7 +614,7 @@ read_file(char const * filename) {
 
     if (filebuff == NULL) {
         fprintf(stderr, "Error in read_file(): failed to allocate memory for file buffer\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     filebuff->filename = clone_string(filename);
@@ -632,7 +632,7 @@ read_file(char const * filename) {
 
     if (filebuff->buffer == NULL) {
         fprintf(stderr, "Error in read_file(): failed to allocate memory for file contents\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* initialize other fields */
@@ -925,7 +925,7 @@ new_lexer(char const * filename) {
     lexer_state *lexer = (lexer_state *)malloc(sizeof(lexer_state));
     if (lexer == NULL) {
         fprintf(stderr, "Error in new_lexer(): failed to allocate memory for lexer\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     lexer->token_chars = (char *)calloc(MAX_ID_LENGTH, sizeof(char));
@@ -1626,7 +1626,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
             if (lexer->curfile->curchar >= lexer->curfile->buffer+lexer->curfile->filesize) {
                 printf("FATAL: end of file passed!\n");
             }
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -1641,4 +1641,5 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

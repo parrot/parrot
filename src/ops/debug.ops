@@ -102,7 +102,7 @@ op debug_break() :base_debug {
             PDB_run_command(interp,command);
         }
         /* RT#42378 this is not ok */
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
     PDB_set_break(interp,NULL);

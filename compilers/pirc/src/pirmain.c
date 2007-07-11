@@ -128,7 +128,7 @@ main(int argc, char **argv) {
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", opt);
                 print_help();
-                exit(1);
+                exit(EXIT_FAILURE);
         }
         /* get next commandline argument */
         argv++;
@@ -138,7 +138,7 @@ main(int argc, char **argv) {
 
     if (argv[0] == NULL) {
         fprintf(stderr, "No file specified. Try -h for help.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* create a vtable based on the desired output */
@@ -166,7 +166,7 @@ main(int argc, char **argv) {
             break;
         default:
             fprintf(stderr, "Unknown output type specified\n");
-            exit(1);
+            exit(EXIT_FAILURE);
     }
 
     /* create a new parser, specifying the file name and the vtable */
@@ -208,6 +208,7 @@ main(int argc, char **argv) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 
 
 

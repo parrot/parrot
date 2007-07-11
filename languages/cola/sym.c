@@ -647,7 +647,7 @@ Symbol * check_id_redecl(SymbolTable * table, const char * name) {
     if ((t = lookup_symbol_scope(table, name, scope)) != NULL) {
         printf("error (line %ld): identifier %s previously declared in this scope, line %d.\n", line, name, t->line);
         abort();
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     return t;
 }

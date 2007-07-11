@@ -61,7 +61,7 @@ open_file(char const *filename, char const *mode) {
 
     if (file == NULL) {
         fprintf(stderr, "Failed to open file '%s' in mode '%s'\nTerminating\n", filename, mode);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     return file;

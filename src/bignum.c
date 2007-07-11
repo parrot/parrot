@@ -706,7 +706,7 @@ version is provided until Parrot exceptions are sorted out properly.
 void
 BN_exception(PINTD_ BN_EXCEPTIONS exception, const char* message) {
     printf("Exception %d %s\n", exception, message);
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 /*

@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < n; ++i)
     if (d[i] != (i & 0xff)) {
         printf("error s[%d] = %d d = %d\n", i, s[i], d[i]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     puts("ok");
     return 0;

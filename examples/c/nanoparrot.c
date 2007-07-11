@@ -149,7 +149,7 @@ run(Interp *interp, opcode_t *pc)
 #    define NEXT            continue;
 #    define DONE            return;
 #    define ENDDISPATCH     default : printf("illegal instruction"); \
-                                  exit(1);                           \
+                                  exit(EXIT_FAILURE)                 \
                         }}
 #  else  /* CGOTO */
 
@@ -199,7 +199,7 @@ run(Interp *interp, opcode_t *pc)
             NEXT
         CASE(MAX)
             printf("illegal opcode\n");
-            exit(1);
+            exit(EXIT_FAILURE);
             NEXT
     ENDDISPATCH
 ENDRUN

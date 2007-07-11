@@ -42,11 +42,11 @@ void gen_ast(AST * ast) {
                 break;
             default:
                 printf("Unknown AST statement type [%d].\n", p->asttype);
-                exit(0);
+                exit(EXIT_SUCCESS);
         }
         else {
             printf("Unknown AST kind or type at top level.\n");
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
 }
@@ -147,7 +147,7 @@ void gen_statement(AST * p) {
         case ASTT_BREAK:
             if (get_cur_primary_block() == NULL) {
                 printf("break statement not within loop or switch\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             printf("\tgoto %s\n", get_cur_primary_block()->end_label);
             break;
@@ -155,7 +155,7 @@ void gen_statement(AST * p) {
             if ((b = get_cur_primary_block()) == NULL
                 || (b->asttype != ASTT_FOR && b->asttype != ASTT_WHILE)) {
                 printf("continue statement not within a loop\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             if (b->asttype == ASTT_WHILE)
                 printf("\tgoto %s\n", b->start_label);
@@ -169,13 +169,13 @@ void gen_statement(AST * p) {
         case ASTT_RETURN:
             if (cur_method == NULL) {
                 printf("return statement not within a method\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             if (cur_method->sym->type != t_void) {
                 if (p->arg1 == NULL) {
                     printf("ERROR: Method '%s' must return a value.\n",
                             cur_method->sym->name);
-                    exit(0);
+                    exit(EXIT_SUCCESS);
                 }
                 if (!eval_expr(p->arg1))
                     gen_expr(p->arg1, NULL, cur_method->sym->type);
@@ -328,7 +328,7 @@ void gen_assign(AST * ast) {
         }
 
         printf("#gen_assign: Internal error, unsupported assignment.\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
 #if DEBUG
@@ -383,7 +383,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
     /* Expression has no operands */
     if (p->arg1 == NULL && p->arg2 == NULL) {
         printf("#gen_expr: no operands\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     /* Expression is a method call */
@@ -432,7 +432,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
         printf("%s:\n", tl3);
         if (!p->arg1->targ || !p->arg2->targ) {
             fprintf(stderr, "Error: ternary conditionals must generate rvalues to be a statement.\n");
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         return;
     }
@@ -459,11 +459,11 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
 #endif
             if (type2 != t_int32) {
                 fprintf(stderr, "Array subscript expression must be type integer.\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             if (type1 != t_string) {
                 fprintf(stderr, "Index operators not yet implemented for non-string types.\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             if (p->targ == NULL)
                 p->targ = new_temp(type1);
@@ -577,7 +577,7 @@ void gen_arg_list_expr(AST * p) {
         gen_expr(p, NULL, NULL);
     if (!p->targ) {
         fprintf(stderr, "Internal compiler error: argument expression didn't generate an rvalue\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     if (p->next) {
         gen_arg_list_expr(p->next);
@@ -597,7 +597,7 @@ void gen_arg_list(AST * p) {
         printf("%s", NAME(p->targ));
     else {
         fprintf(stderr, "Internal compiler error: argument expression didn't generate an rvalue\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     if (p->next) {
         printf(", ");
@@ -636,7 +636,7 @@ void gen_method_call(AST * p) {
             /* If caller wants a return value, method can't be void. */
             fprintf(stderr, "ERROR: void function [%s] does not return a value.\n",
                         p->arg1->targ->name);
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
     else {
@@ -658,12 +658,12 @@ void gen_if(AST * p) {
     if (!p->Attr.Conditional.condition
         || p->Attr.Conditional.condition->kind != KIND_EXPR) {
         fprintf(stderr, "gen_if: Null or invalid CONDITION node\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     if (!p->arg1) {
         fprintf(stderr, "gen_if: Null THEN node\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     /* If Then Else */
@@ -792,7 +792,7 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
         case ASTT_COMPARISON:
             if (!p->arg1 || !p->arg2) {
                 printf("#gen_boolean(comparison): Need 2 operands\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             if (!eval_expr(p->arg1))
                 gen_expr(p->arg1, NULL, NULL);
@@ -811,7 +811,7 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
             return;
         default:
             printf("#gen_boolean: Unknown boolean AST type(%d).\n", p->arg1->asttype);
-            exit(0);
+            exit(EXIT_SUCCESS);
     }
 }
 
@@ -827,7 +827,7 @@ void coerce_operands(Type ** t1, Type ** t2) {
             *t1 = t_float;
         else {
             printf("Can't coerce types (int, %s)\n", type_name(*t2));
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
     else if (*t1 == t_float) {
@@ -835,13 +835,13 @@ void coerce_operands(Type ** t1, Type ** t2) {
             *t2 = t_float;
         else {
             printf("Can't coerce types (float, %s)\n", type_name(*t2));
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
     else {
         printf("Unsupported type coercion requested (%s, %s).\n",
                             (*t1)->sym->name, (*t2)->sym->name);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 }
 
@@ -880,7 +880,7 @@ char * op_name(int operator) {
         case LEFT_SHIFT:    return "<<";
         case RIGHT_SHIFT:   return ">>";
         default:    printf("Invalid operator %d\n", operator);
-                exit(0);
+                exit(EXIT_SUCCESS);
     }
 }
 
@@ -894,7 +894,7 @@ int op_inverse(int operator) {
         case LOGICAL_GTE:   return '<';
     }
     printf("op_inverse: Invalid logical operator %d\n", operator);
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 char * new_itemp() {

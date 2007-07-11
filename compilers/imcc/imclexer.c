@@ -5300,7 +5300,7 @@ int yywrap (void* yyscanner) {
 
     if (!interp) {
         fprintf(stderr, "Argh, interp not found\n");
-        exit (1);
+        exit (EXIT_FAILURE);
     }
 
     yy_delete_buffer(YY_CURRENT_BUFFER,yyscanner);
@@ -5895,4 +5895,5 @@ int at_eof(yyscan_t yyscanner)
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

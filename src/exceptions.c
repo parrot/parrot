@@ -94,7 +94,7 @@ internal_exception(int exitcode, const char *format /*NN*/, ...)
 #  define dumpcore() \
      fprintf(stderr, "Sorry, coredump is not yet implemented " \
              "for this platform.\n\n"); \
-             exit(1);
+             exit(EXIT_FAILURE);
 #endif
 
 /*

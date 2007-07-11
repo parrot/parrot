@@ -564,7 +564,7 @@ ins_print(Interp *interp /*NN*/, FILE *fd /*NN*/, const Instruction *ins /*NN*/)
         default:
             fprintf(stderr, "unhandled: opsize (%d), op %s, fmt %s\n",
                     ins->opsize, ins->op, ins->fmt);
-            exit(1);
+            exit(EXIT_FAILURE);
             break;
     }
     return len;
@@ -650,4 +650,5 @@ emit_close(Interp *interp, void *param)
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

@@ -128,7 +128,7 @@ exit_parser(parser_state *p) {
     p->heredoc_ids = NULL;
     free(p);
     p = NULL;
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -166,7 +166,7 @@ new_parser(char const * filename, pirvtable *vtable) {
 
     if (p == NULL) {
         fprintf(stderr, "no parser");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     p->lexer         = new_lexer(filename);
     p->curtoken      = next_token(p->lexer);

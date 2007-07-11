@@ -63,7 +63,7 @@ new_pirvtable(void) {
 
     if (vtable == NULL) {
         fprintf(stderr, "Failed to allocate memory for vtable!\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* set all entries to 'default' by default. This way, another output module
@@ -149,4 +149,5 @@ destroy_pirvtable(pirvtable *vtable) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

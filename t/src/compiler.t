@@ -55,7 +55,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
     if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     /*
      * compile source
@@ -64,7 +64,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
 
     if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
@@ -138,7 +138,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
     if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /*
@@ -148,7 +148,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
 
     if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
@@ -213,7 +213,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
 
     if (PMC_IS_NULL(prog) || !VTABLE_defined(interp, prog)) {
         PIO_eprintf(interp, "Pir compiler returned no prog");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     /* keep eval PMC alive */
     dod_register_pmc(interp, prog);
@@ -249,7 +249,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     comp = VTABLE_get_pmc_keyed_str(interp, compreg, pir);
     if (PMC_IS_NULL(comp) || !VTABLE_defined(interp, comp)) {
         PIO_eprintf(interp, "Pir compiler not loaded");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     compile_run(interp, c_src, pir, argc, argv);
     compile_run(interp, c2_src, pir, argc, argv);

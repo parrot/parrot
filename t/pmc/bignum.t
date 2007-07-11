@@ -197,7 +197,7 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
   case 5 : context.rounding = ROUND_FLOOR;
     break;
   default : printf("Unknown rounding %i\n", round);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   one = BN_from_string(lef, &context);
@@ -230,7 +230,7 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
     break;
 
   default : printf("No operation of type %i\n", oper);
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 
   BN_to_scientific_string(result, &output);

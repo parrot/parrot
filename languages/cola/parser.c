@@ -1858,7 +1858,7 @@ yyreduce:
             Symbol *n, *t, *last = current_namespace;
             if(lookup_type_symbol((yyvsp[(2) - (2)].sym))) {
                 printf("Error, redefinition of [%s]\n", (yyvsp[(2) - (2)].sym)->name);
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             for(n = split(".", (yyvsp[(2) - (2)].sym)->name); n; n = n->tnext) {
                 n->kind = (yyvsp[(2) - (2)].sym)->kind;
@@ -2279,7 +2279,7 @@ yyreduce:
     {
             (yyval.ast) = NULL;
             printf("GOTO not supported yet.\n");
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     break;
 
@@ -2352,7 +2352,7 @@ yyreduce:
     {
             if((yyvsp[(3) - (9)].ast) == NULL) {
                 printf("for_statement: NULL init statement\n");
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             (yyval.ast) = new_for((yyvsp[(3) - (9)].ast), (yyvsp[(5) - (9)].ast), (yyvsp[(7) - (9)].ast), (yyvsp[(9) - (9)].ast));
         }
@@ -2530,7 +2530,7 @@ yyreduce:
     {
             if((yyvsp[(1) - (4)].ast)->asttype != ASTT_IDENTIFIER) {
                 fprintf(stderr, "Error (line %d), method call must be a simple name or member access.\n", line);
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
             (yyval.ast) = new_expr(ASTT_METHOD_CALL, (yyvsp[(1) - (4)].ast), (yyvsp[(3) - (4)].ast));
 #if DEBUG
@@ -2937,12 +2937,12 @@ int main(int argc, char * argv[])
     if(argc > 1) {
         if(!(yyin = fopen(argv[1], "r")))    {
             printf( "Error reading source file %s.\n", argv[1] );
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
     else {
         printf( "No source file specified.\n" );
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     line = 1;
@@ -3008,7 +3008,7 @@ int yyerror(char * s)
 */
     fprintf(stderr, "(error) line %ld: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -3018,4 +3018,5 @@ int yyerror(char * s)
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

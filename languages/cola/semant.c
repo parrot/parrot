@@ -165,7 +165,7 @@ void build_conditional(AST * c) {
     build_expr(c->arg2);
     if (c->arg1->type != c->arg2->type) {
         fprintf(stderr, "Error: expression types not equivalent in ternary expression\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     c->typename = c->arg1->typename;
     c->type = c->arg1->type;

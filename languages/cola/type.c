@@ -173,7 +173,7 @@ void resolve_identifier(Symbol ** ps) {
     t = lookup_symbol(s->name);
     if (!t) {
         fprintf(stderr, "Error: identifier [%s] undeclared.\n", s->name);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     if (s != t) {
@@ -204,7 +204,7 @@ void resolve_identifier(Symbol ** ps) {
         else {
             fprintf(stderr, "Error: identifier [%s] has unknown type [%s].\n",
                         s->name, s->typename->name);
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
 
