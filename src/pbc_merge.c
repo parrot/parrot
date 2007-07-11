@@ -129,6 +129,12 @@ static void pbc_merge_write( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_MALLOC
+static char * str_dup( NOTNULL(const char *old) )
+        __attribute__nonnull__(1)
+        __attribute__malloc__
+        __attribute__warn_unused_result__;
+
 /* HEADERIZER END: static */
 
 /*
@@ -148,6 +154,27 @@ help(PARROT_INTERP)
     Parrot_exit(interp, 0);
 }
 
+/*
+
+FUNCDOC: str_dup
+
+Duplicate a C string
+
+*/
+
+PARROT_MALLOC
+static char *
+str_dup(NOTNULL(const char *old))
+    /* MALLOC, WARN_UNUSED */
+{
+    const size_t bytes = strlen(old) + 1;
+    char * const copy = mem_sys_allocate(bytes);
+    memcpy(copy, old, bytes);
+#ifdef MEMDEBUG
+    debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);
+#endif
+    return copy;
+}
 
 /*
 
@@ -291,7 +318,7 @@ pbc_merge_bytecode(PARROT_INTERP, pbc_merge_input **inputs /*NN*/,
     /* Stash produced bytecode. */
     bc_seg->base.data = bc;
     bc_seg->base.size = cursor;
-    bc_seg->base.name = strdup("MERGED");
+    bc_seg->base.name = str_dup("MERGED");
     return bc_seg;
 }
 
@@ -681,7 +708,6 @@ static PackFile*
 pbc_merge_begin(PARROT_INTERP, pbc_merge_input **inputs /*NN*/, int num_inputs)
 {
     PackFile_ByteCode   *bc;
-    PackFile_ConstTable *ct;
 
     /* Create a new empty packfile. */
     PackFile * const merged = PackFile_new(interp, 0);
@@ -692,7 +718,7 @@ pbc_merge_begin(PARROT_INTERP, pbc_merge_input **inputs /*NN*/, int num_inputs)
 
     /* Merge the various stuff. */
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
+    pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
 
     pbc_merge_fixups(interp, inputs, num_inputs, merged, bc);
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);

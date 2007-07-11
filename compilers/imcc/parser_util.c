@@ -1305,9 +1305,10 @@ imcc_vfprintf(Interp *interp /*NN*/, FILE *fd /*NN*/, const char *format /*NN*/,
  * Utility functions
  */
 
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 char *
-str_dup(const char *old /*NN*/)
-    /* MALLOC, WARN_UNUSED */
+str_dup(NOTNULL(const char *old))
 {
     const size_t bytes = strlen(old) + 1;
     char * const copy = mem_sys_allocate(bytes);
@@ -1317,20 +1318,6 @@ str_dup(const char *old /*NN*/)
 #endif
     return copy;
 }
-
-char *
-str_cat(const char *s1 /*NN*/, const char *s2 /*NN*/)
-{
-    const size_t len1 = strlen(s1);
-    const size_t len2 = strlen(s2);
-
-    char * const s3 = mem_sys_allocate(len1 + len2 + 1);
-    memcpy(s3, s1, len1);
-    memcpy(s3+len1, s2, len2+1);
-
-    return s3;
-}
-
 
 PARROT_API
 void

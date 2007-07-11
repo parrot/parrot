@@ -254,14 +254,10 @@ void op_fullname(
 void register_compilers( Interp *interp /*NN*/ )
         __attribute__nonnull__(1);
 
-char * str_cat( const char *s1 /*NN*/, const char *s2 /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-char * str_dup( const char *old /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+char * str_dup( NOTNULL(const char *old) )
+        __attribute__nonnull__(1);
 
 int try_find_op( Interp *interp /*NN*/,
     IMC_Unit * unit,
