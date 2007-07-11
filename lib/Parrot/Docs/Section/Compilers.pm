@@ -50,6 +50,7 @@ sub new {
             'the Parrot/Punie Abstract Syntax Tree (new implementation)',
             'compilers/past-pm'
         ),
+        $self->new_group( 'PCT',  'Parrot Compiler Toolkit',     'compilers/pct' ),
         $self->new_group( 'BCG',  'Byte Code Generation',        'compilers/bcg' ),
         $self->new_group( 'JSON', 'JavaScript Object Notation',  'compilers/json' ),
         $self->new_group( 'PIRC', 'a PIR Compiler',              'compilers/pirc' ),
