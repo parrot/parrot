@@ -92,8 +92,11 @@ L:          foreach my $line (@source) {
                 $redundants{$file} = $1 if defined $ifndef;
 
                 # check for the same guard-name in multiple files
-                $collisions{$file} = $guardnames{$1}
-                    if exists $guardnames{$1};
+                if(exists($guardnames{$1})) {
+                    if(!duplicate_files($file, $guardnames{$1})) {
+                        $collisions{$file} = $guardnames{$1};
+                    }
+                }
 
                 $ifndef = $1;
                 $guardnames{$1} = $file;
@@ -115,13 +118,9 @@ L:          foreach my $line (@source) {
         $missing_comment{$file} = 1 unless defined $endif;
     }
 
-TODO: {
-    local $TODO = "Need to account for headers copied between subdirs";
-
     ok(!(scalar %collisions), "identical PARROT_*_GUARD macro names used in headers");
     diag("collisions: \n" . join(", \n", %collisions))
         if scalar keys %collisions;
-};
 
     ok(!(scalar %redundants), "multiple PARROT_*_GUARD macros found in headers");
     diag("redundants: \n" . join(", \n", keys %redundants))
@@ -142,10 +141,23 @@ TODO: {
     return 0;
 }
 
+sub duplicate_files {
+    my ($file1, $file2) = @_;
+    open my $fh1, '<', $file1
+        or die "Cannot open '$file1' for reading!\n";
+    open my $fh2, '<', $file2
+        or die "Cannot open '$file2' for reading!\n";
+    local $/;
+    $file1 = <$fh1>;
+    $file2 = <$fh2>;
+    return $file1 eq $file2;
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+
 
