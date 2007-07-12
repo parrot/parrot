@@ -7,13 +7,13 @@ RM_F    = @rm_f@
 RM_RF   = @rm_rf@
 CHMOD   = @chmod@
 
-CC 	    = @cc@
-CFLAGS 	= @ccflags@
-DEBUG 	= @cc_debug@
-LINK 	= @link@
+CC      = @cc@
+CFLAGS  = @ccflags@
+DEBUG   = @cc_debug@
+LINK    = @link@
 
-YACC 	= @yacc@
-LEX 	= @lex@
+YACC    = @yacc@
+LEX     = @lex@
 
 O       = @o@
 EXE     = @exe@
@@ -26,7 +26,7 @@ EXE     = @exe@
 # You might need these for some versions of flex and/or yacc:
 # LIBS = -ll -ly
 # Ordinarily, no special libraries are needed for cola.
-LIBS 	=
+LIBS    =
 
 # These manual settings might be helpful in some situations.
 # Visual C++
@@ -42,7 +42,7 @@ LIBS 	=
 HEADERS = cola.h parser.h
 
 default :
-	$(CHMOD) 775 colac$(EXE)
+	-$(CHMOD) 775 colacc$(EXE)
 	$(MAKE) colacc$(EXE)
 
 nogen : gen$(O) semant$(O) sym$(O) type$(O)
