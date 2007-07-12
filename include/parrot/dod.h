@@ -124,11 +124,11 @@ extern int CONSERVATIVE_POINTER_CHASING;
 /* HEADERIZER BEGIN: src/gc/gc_gms.c */
 
 PARROT_API
-void Parrot_gc_gms_init( Interp* interp /*NN*/ )
+void Parrot_gc_gms_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void parrot_gc_gms_pobject_lives( Interp* interp /*NN*/, PObj *obj /*NN*/ )
+void parrot_gc_gms_pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -149,10 +149,13 @@ void parrot_gc_gms_wb_key( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/gc/gc_ims.c */
 
 PARROT_API
-void Parrot_dod_ims_wb( Interp* interp, PMC *agg, PMC *_new );
+void Parrot_dod_ims_wb( PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(PMC *_new) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_gc_ims_init( Interp* interp /*NN*/ )
+void Parrot_gc_ims_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/gc_ims.c */

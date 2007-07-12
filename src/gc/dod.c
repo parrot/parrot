@@ -32,6 +32,8 @@ There's also a verbose mode for garbage collection.
 static void clear_live_bits( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t find_common_mask( PARROT_INTERP, size_t val1, size_t val2 )
         __attribute__nonnull__(1);
 
@@ -61,10 +63,6 @@ static int trace_active_PMCs( PARROT_INTERP, int trace_stack )
 /* Set when walking the system stack */
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
-
-static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
-    __attribute__const__
-    __attribute__warn_unused_result__;
 
 /*
 
@@ -725,6 +723,8 @@ Find a mask covering the longest common bit-prefix of C<val1> and C<val2>.
 
 */
 
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t
 find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 {
