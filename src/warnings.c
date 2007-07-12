@@ -82,6 +82,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 
 */
 
+PARROT_API
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             NOTNULL(const char *message), ...)
@@ -112,6 +113,7 @@ C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 
 */
 
+PARROT_API
 INTVAL
 Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
               NOTNULL(STRING *message), ...)
