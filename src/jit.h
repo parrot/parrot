@@ -286,9 +286,9 @@ typedef struct jit_arch_regs {
     const char *map_F;
 } jit_arch_regs;
 
-typedef void (*mov_RM_f)(Parrot_jit_info_t *,
+typedef void (*mov_RM_f)(Interp *interp, Parrot_jit_info_t *,
         int cpu_reg, int base_reg, INTVAL offs);
-typedef void (*mov_MR_f)(Parrot_jit_info_t *,
+typedef void (*mov_MR_f)(Interp *interp, Parrot_jit_info_t *,
         int base_reg, INTVAL offs, int cpu_reg);
 
 typedef struct jit_arch_info_t {

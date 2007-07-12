@@ -1149,10 +1149,10 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                     }
                     offs = reg_offs(interp, typ, us);
                     if (typ == 3)
-                        (arch_info->mov_RM_n)(jit_info,
+                        (arch_info->mov_RM_n)(interp, jit_info,
                                               maps[typ][i], base_reg, offs);
                     else
-                        (arch_info->mov_RM_i)(jit_info,
+                        (arch_info->mov_RM_i)(interp, jit_info,
                                               maps[typ][i], base_reg, offs);
 
                 }
@@ -1221,10 +1221,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
                     offs = reg_offs(interp, typ, us);
                     if (typ == 3)
-                        (arch_info->mov_MR_n)(jit_info,
+                        (arch_info->mov_MR_n)(interp, jit_info,
                                  base_reg, offs, maps[typ][i]);
                     else
-                        (arch_info->mov_MR_i)(jit_info,
+                        (arch_info->mov_MR_i)(interp, jit_info,
                                  base_reg, offs, maps[typ][i]);
 
                 }
