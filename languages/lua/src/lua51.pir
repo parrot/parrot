@@ -681,34 +681,6 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'PAST::Node' ]
-
-.sub 'clone' :vtable :method
-    .local pmc res
-    $S0 = classname self
-    $I0 = find_type $S0
-    res = new $I0
-    .local pmc iter
-    iter = self.'iterator'()
-  L1:
-    unless iter goto L2
-    $P0 = shift iter
-    $P1 = clone $P0
-    res.'push'($P1)
-    goto L1
-  L2:
-    iter = new .Iterator, self
-  L3:
-    unless iter goto L4
-    $S0 = shift iter
-    $P0 = iter[$S0]
-    res[$S0] = $P0
-    goto L3
-  L4:
-    .return (res)
-.end
-
-
 .namespace [ 'POST::Node' ]
 
 .sub 'pop' :method
@@ -720,10 +692,22 @@ used in F<languages/lua/src/POSTGrammar.tg>
 
 .namespace [ 'POST::Sub' ]
 
-.sub 'storage' :method
+.sub 'ops_const' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('storage', value, has_value)
+    .return self.'attr'('ops_const', value, has_value)
+.end
+
+.sub 'storage_const' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('storage_const', value, has_value)
+.end
+
+.sub 'storage_lex' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('storage_lex', value, has_value)
 .end
 
 
