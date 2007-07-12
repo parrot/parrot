@@ -33,15 +33,14 @@ Define the internal interpreter exceptions.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t * create_exception( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
-static size_t dest2offset( PARROT_INTERP, const opcode_t *dest /*NN*/ )
+PARROT_WARN_UNUSED_RESULT
+static size_t dest2offset( PARROT_INTERP, NOTNULL(const opcode_t *dest) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 static PMC * find_exception_handler( PARROT_INTERP, PMC *exception )
         __attribute__nonnull__(1)
@@ -477,9 +476,9 @@ after an exception had occurred.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static size_t
-dest2offset(PARROT_INTERP, const opcode_t *dest /*NN*/)
-    /* PURE, WARN_UNUSED */
+dest2offset(PARROT_INTERP, NOTNULL(const opcode_t *dest))
 {
     size_t offset;
     /* translate an absolute location in byte_code to an offset
@@ -506,9 +505,9 @@ Create an exception.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t *
 create_exception(PARROT_INTERP)
-    /* WARN_UNUSED */
 {
     PMC *exception;     /* exception object */
     opcode_t *dest;     /* absolute address of handler */
@@ -663,8 +662,8 @@ C<throw_exception>, which calls the handler.
 
 PARROT_API
 void
-real_exception(PARROT_INTERP, void *ret_addr,
-        int exitcode, const char *format /*NN*/, ...)
+real_exception(PARROT_INTERP, NULLOK(void *ret_addr),
+        int exitcode, NOTNULL(const char *format), ...)
     /* NORETURN */
 {
     STRING *msg;

@@ -202,9 +202,9 @@ void push_new_c_exception_handler( PARROT_INTERP, Parrot_exception *jb )
 
 PARROT_API
 void real_exception( PARROT_INTERP,
-    void *ret_addr,
+    NULLOK(void *ret_addr),
     int exitcode,
-    const char *format /*NN*/,
+    NOTNULL(const char *format),
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
