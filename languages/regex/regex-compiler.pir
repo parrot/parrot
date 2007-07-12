@@ -17,7 +17,7 @@
   $S0 = uniq
   pirfile = concat $S0
   pirfile = concat ".pir"
-  
+
   cmdline = "regex.pl --sub-name=_regex -o "
   cmdline = concat pirfile
   cmdline = concat " '"
@@ -32,7 +32,7 @@
 pir_to_pbc:
   pir_data = _readfile(pirfile)
   $P0 = compreg "PIR"
-  $P1 = compile $P0, pir_data
+  $P1 = $P0.compile(pir_data)
 
 #  $P0 = compreg "FILE"
 #  $P1 = $P0(pirfile)
