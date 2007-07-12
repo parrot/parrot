@@ -106,8 +106,10 @@ struct parrot_interp_t;
 /* One of the most common shim arguments is the interpreter itself, so it
  * gets its own macro.
  */
-#define SHIM_INTERP /*@unused@*/ Interp *interp_unused __attribute__unused__
+
 #define PARROT_INTERP /*@notnull@*/ Parrot_Interp interp
+#define NULLOK_INTERP /*@null@*/    Parrot_Interp interp
+#define SHIM_INTERP   /*@unused@*/  Interp *interp_unused __attribute__unused__
 
 
 #ifdef PARROT_IN_CORE

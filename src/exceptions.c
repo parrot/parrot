@@ -106,8 +106,8 @@ Panic handler.
 */
 
 void
-do_panic(PARROT_INTERP /*NULLOK*/, const char *message /*NULLOK*/,
-         const char *file /*NULLOK*/, int line)
+do_panic(NULLOK_INTERP, NULLOK(const char *message),
+         NULLOK(const char *file), int line)
     /* NORETURN */
 {
     /* Note: we can't format any floats in here--Parrot_sprintf

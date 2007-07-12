@@ -1963,6 +1963,7 @@ HEADERIZER_O_FILES = \
     $(CHARSET_O_FILES) \
     $(ENCODING_O_FILES) \
     $(IO_O_FILES) \
+    \
     src/builtin$(O) \
     src/byteorder$(O) \
     src/charset$(O) \
@@ -2020,6 +2021,8 @@ HEADERIZER_O_FILES = \
     src/tsq$(O) \
     src/utils$(O) \
     src/vtables$(O) \
+    src/warnings$(O) \
+    \
     compilers/imcc/cfg$(O) \
     compilers/imcc/debug$(O) \
     compilers/imcc/imc$(O) \

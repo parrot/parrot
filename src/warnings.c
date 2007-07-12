@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -11,10 +11,6 @@ src/warnings.c - Warning and error reporting
 Parrot C<STRING> and C string versions of a function to print warning/error
 messages.
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -22,14 +18,20 @@ messages.
 #include <stdarg.h>
 #include <assert.h>
 
+/* HEADERIZER HFILE: include/parrot/warnings.h */
+
+/* HEADERIZER BEGIN: static */
+
+static INTVAL print_warning( PARROT_INTERP, NULLOK(STRING *msg) )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
 /*
 
-=item C<void
-print_pbc_location(PARROT_INTERP)>
+FUNCDOC: print_pbc_location
 
 Prints the bytecode location of the warning or error to C<PIO_STDERR>.
-
-=cut
 
 */
 
@@ -46,19 +48,15 @@ print_pbc_location(PARROT_INTERP)
 
 /*
 
-=item C<static INTVAL
-print_warning(PARROT_INTERP, STRING *msg)>
+FUNCDOC: print_warning
 
 Prints the warning message and the bytecode location.
-
-=cut
 
 */
 
 static INTVAL
-print_warning(PARROT_INTERP, STRING *msg)
+print_warning(PARROT_INTERP, NULLOK(STRING *msg))
 {
-
     if (!msg)
         PIO_puts(interp, PIO_STDERR(interp), "Unknown warning\n");
     else {
@@ -72,15 +70,9 @@ print_warning(PARROT_INTERP, STRING *msg)
 
 /*
 
-=back
-
 =head2 Parrot Warnings Interface
 
-=over
-
-=item C<INTVAL
-Parrot_warn(PARROT_INTERP, INTVAL warnclass,
-            const char *message, ...)>
+FUNCDOC: Parrot_warn
 
 The Parrot C string warning/error reporter.
 
@@ -88,13 +80,11 @@ Returns 2 on error, 1 on success.
 
 C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 
-=cut
-
 */
 
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
-            const char *message, ...)
+            NOTNULL(const char *message), ...)
 {
     STRING *targ;
 
@@ -108,14 +98,11 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
     targ = Parrot_vsprintf_c(interp, message, args);
     va_end(args);
     return print_warning(interp, targ);
-
 }
 
 /*
 
-=item C<INTVAL
-Parrot_warn_s(PARROT_INTERP, INTVAL warnclass,
-              STRING *message, ...)>
+FUNCDOC: Parrot_warn_s
 
 The Parrot C<STRING> warning/error reporter.
 
@@ -123,13 +110,11 @@ Returns 2 on error, 1 on success.
 
 C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 
-=cut
-
 */
 
 INTVAL
-Parrot_warn_s(PARROT_INTERP, INTVAL warnclass,
-              STRING *message, ...)
+Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
+              NOTNULL(STRING *message), ...)
 {
     STRING *targ;
 
@@ -147,13 +132,9 @@ Parrot_warn_s(PARROT_INTERP, INTVAL warnclass,
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/warnings.h>.
-
-=cut
 
 */
 

@@ -161,7 +161,7 @@ sub function_components_from_declaration {
 
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
-        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || ( $_ =~ /(SHIM|PARROT)_INTERP/ )
+        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
             or die "Bad args in $proto";
         s/SHIM\(\s*(\w+.*\w+)\s*\)/$1/e;
     }

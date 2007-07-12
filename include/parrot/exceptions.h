@@ -222,9 +222,10 @@ opcode_t * throw_exception( PARROT_INTERP, PMC *exception, void *dest )
 void destroy_exception_list( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void do_panic( PARROT_INTERP /*NULLOK*/,
-    const char *message /*NULLOK*/,
-    const char *file /*NULLOK*/,
+void do_panic(
+    NULLOK_INTERP,
+    NULLOK(const char *message),
+    NULLOK(const char *file),
     int line )
         __attribute__noreturn__;
 
