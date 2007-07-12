@@ -115,6 +115,38 @@ children and attributes.  Returns the newly created node.
 .end
 
 
+=item clone
+
+Create and returns a clone of a PAST node.
+
+=cut
+
+.sub 'clone' :vtable :method
+    .local pmc res
+    $S0 = classname self
+    $I0 = find_type $S0
+    res = new $I0
+    .local pmc iter
+    iter = self.'iterator'()
+  iter_child_loop:
+    unless iter goto iter_child_end
+    $P0 = shift iter
+    $P1 = clone $P0
+    res.'push'($P1)
+    goto iter_child_loop
+  iter_child_end:
+    iter = new .Iterator, self
+  iter_attr_loop:
+    unless iter goto iter_attr_end
+    $S0 = shift iter
+    $P0 = iter[$S0]
+    res[$S0] = $P0
+    goto iter_attr_loop
+  iter_attr_end:
+    .return (res)
+.end
+
+
 =item push(child)
 
 Add C<child> to the end of the invocant's list of children.
@@ -482,7 +514,7 @@ while      - Evaluate the first child, if the result is
 until      - Evaluate the first child, if the result is
              false then evaluate the second child and repeat.
 
-for        - Iterate over the first child. For each element, 
+for        - Iterate over the first child. For each element,
              invoke the sub in the second child, passing the
              element as the only parameter.
 
