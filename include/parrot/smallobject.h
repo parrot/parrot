@@ -133,13 +133,14 @@ typedef struct Small_Object_Pool {
 
 /* HEADERIZER BEGIN: src/gc/smallobject.c */
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(
-    const Small_Object_Pool *pool /*NN*/,
-    const void *ptr )
+    NOTNULL(const Small_Object_Pool *pool),
+    NOTNULL(const void *ptr) )
         __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-void gc_pmc_ext_pool_init( Small_Object_Pool *pool /*NN*/ )
+void gc_pmc_ext_pool_init( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
 Small_Object_Pool * new_small_object_pool(
@@ -149,8 +150,8 @@ Small_Object_Pool * new_small_object_pool(
         __attribute__malloc__;
 
 void Parrot_add_to_free_list( PARROT_INTERP,
-    Small_Object_Pool *pool /*NN*/,
-    Small_Object_Arena *arena /*NN*/,
+    NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(Small_Object_Arena *arena),
     UINTVAL start,
     UINTVAL end )
         __attribute__nonnull__(1)
@@ -158,8 +159,8 @@ void Parrot_add_to_free_list( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 void Parrot_append_arena_in_pool( PARROT_INTERP,
-    Small_Object_Pool *pool /*NN*/,
-    Small_Object_Arena *new_arena /*NN*/,
+    NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(Small_Object_Arena *new_arena),
     size_t size )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -168,12 +169,13 @@ void Parrot_append_arena_in_pool( PARROT_INTERP,
 void Parrot_gc_ms_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-int Parrot_is_const_pmc( Parrot_Interp interp /*NN*/, PMC *pmc )
-        __attribute__nonnull__(1);
+int Parrot_is_const_pmc( PARROT_INTERP, NOTNULL(PMC *pmc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void Parrot_small_object_pool_merge( PARROT_INTERP,
-    Small_Object_Pool *dest /*NN*/,
-    Small_Object_Pool *source /*NN*/ )
+    NOTNULL(Small_Object_Pool *dest),
+    NOTNULL(Small_Object_Pool *source) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

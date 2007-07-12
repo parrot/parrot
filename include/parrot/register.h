@@ -80,7 +80,7 @@ void Parrot_clear_s( PARROT_INTERP )
 
 PARROT_API
 void Parrot_free_context( PARROT_INTERP,
-    struct Parrot_Context *ctxp /*NN*/,
+    NOTNULL(struct Parrot_Context *ctxp),
     int re_use )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -99,7 +99,7 @@ void Parrot_pop_regs( PARROT_INTERP )
 
 PARROT_API
 struct Parrot_Context * Parrot_push_context( PARROT_INTERP,
-    INTVAL *n_regs_used /*NN*/ )
+    NOTNULL(INTVAL *n_regs_used) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -118,16 +118,18 @@ void create_initial_context( PARROT_INTERP )
 void destroy_context( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void mark_register_stack( Parrot_Interp interp, Stack_Chunk_t* chunk /*NN*/ )
-        __attribute__nonnull__(2);
-
-struct Parrot_Context * Parrot_alloc_context( PARROT_INTERP,
-    INTVAL *n_regs_used /*NN*/ )
+void mark_register_stack( PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+struct Parrot_Context * Parrot_alloc_context( PARROT_INTERP,
+    NOTNULL(INTVAL *n_regs_used) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context * Parrot_dup_context( PARROT_INTERP,
-    const struct Parrot_Context *old /*NN*/ )
+    NOTNULL(const struct Parrot_Context *old)  )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
