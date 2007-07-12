@@ -508,18 +508,12 @@ const char*
 string_primary_encoding_for_representation(PARROT_INTERP,
     parrot_string_representation_t representation)
 {
-    switch (representation) {
-        case enum_stringrep_one:
-            return "ascii";
-            break;
-        default:
-            real_exception(interp, NULL, INVALID_STRING_REPRESENTATION,
-                "string_primary_encoding_for_representation: "
-                "invalid string representation");
-            return NULL;
-            break;
-    }
-    return NULL;
+    if (representation == enum_stringrep_one)
+        return "ascii";
+
+    real_exception(interp, NULL, INVALID_STRING_REPRESENTATION,
+        "string_primary_encoding_for_representation: "
+        "invalid string representation");
 }
 
 /*

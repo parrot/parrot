@@ -86,6 +86,7 @@
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
 #define PARROT_PURE_FUNCTION        __attribute__pure__
 #define PARROT_CONST_FUNCTION       __attribute__const__
+#define PARROT_DOES_NOT_RETURN      __attribute__noreturn__
 #define PARROT_MALLOC               __attribute__malloc__ __attribute__warn_unused_result__
 
 #define NOTNULL(x)                  /*@notnull@*/ x

@@ -68,9 +68,9 @@ environment.
 */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
-internal_exception(int exitcode, const char *format /*NN*/, ...)
-    /* NORETURN */
+internal_exception(int exitcode, NOTNULL(const char *format), ...)
 {
     va_list arglist;
     va_start(arglist, format);
@@ -104,10 +104,10 @@ Panic handler.
 
 */
 
+PARROT_DOES_NOT_RETURN
 void
 do_panic(NULLOK_INTERP, NULLOK(const char *message),
          NULLOK(const char *file), int line)
-    /* NORETURN */
 {
     /* Note: we can't format any floats in here--Parrot_sprintf
     ** may panic because of floats.
@@ -444,9 +444,9 @@ that this is called from within a handler setup with C<new_c_exception>.
 
 */
 
+PARROT_DOES_NOT_RETURN
 void
 rethrow_c_exception(PARROT_INTERP)
-    /* NORETURN */
 {
     Parrot_exception * const the_exception = interp->exceptions;
 
@@ -633,9 +633,9 @@ execution then resumes.
 */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 do_exception(PARROT_INTERP, INTVAL severity, long error)
-    /* NORETURN */
 {
     Parrot_exception * const the_exception = interp->exceptions;
 
@@ -661,10 +661,10 @@ C<throw_exception>, which calls the handler.
 */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 real_exception(PARROT_INTERP, NULLOK(void *ret_addr),
         int exitcode, NOTNULL(const char *format), ...)
-    /* NORETURN */
 {
     STRING *msg;
     Parrot_exception * const the_exception = interp->exceptions;
