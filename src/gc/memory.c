@@ -198,7 +198,7 @@ mem_sys_free(NULLOK(void *from))
 }
 
 void
-mem__internal_free(NULLOK(void *from), NOTNULL(const char *file /*NN*/), int line)
+mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)
 {
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);

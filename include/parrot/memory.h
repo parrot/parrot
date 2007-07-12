@@ -80,7 +80,7 @@ void * mem__internal_allocate_zeroed(
 
 void mem__internal_free(
     NULLOK(void *from),
-    NOTNULL(const char *file /*NN*/),
+    NOTNULL(const char *file),
     int line )
         __attribute__nonnull__(2);
 

@@ -30,13 +30,13 @@ to the previous values and the allocated register memory is discarded.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_regs( PARROT_INTERP, parrot_context_t *ctx /*NN*/ )
+static void clear_regs( PARROT_INTERP, NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void init_context( PARROT_INTERP,
-    parrot_context_t *ctx /*NN*/,
-    const parrot_context_t *old /*NULLOK*/ )
+    NOTNULL(parrot_context_t *ctx),
+    NULLOK(const parrot_context_t *old) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -195,7 +195,7 @@ parrot_gc_context(PARROT_INTERP)
 }
 
 static void
-clear_regs(PARROT_INTERP, parrot_context_t *ctx /*NN*/)
+clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 {
     int i;
 
@@ -234,8 +234,8 @@ clear_regs(PARROT_INTERP, parrot_context_t *ctx /*NN*/)
 }
 
 static void
-init_context(PARROT_INTERP, parrot_context_t *ctx /*NN*/,
-        const parrot_context_t *old /*NULLOK*/)
+init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
+        NULLOK(const parrot_context_t *old))
 {
     ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
     ctx->current_results = NULL;

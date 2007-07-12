@@ -38,17 +38,19 @@ typedef struct Memory_Pool {
 
 /* HEADERIZER BEGIN: src/gc/resources.c */
 
-void Parrot_allocate( PARROT_INTERP, Buffer *buffer /*NN*/, size_t size )
+void Parrot_allocate( PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void Parrot_allocate_aligned( PARROT_INTERP,
-    Buffer *buffer /*NN*/,
+    NOTNULL(Buffer *buffer),
     size_t size )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_allocate_string( PARROT_INTERP, STRING *str /*NN*/, size_t size )
+void Parrot_allocate_string( PARROT_INTERP,
+    NOTNULL(STRING *str),
+    size_t size )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -58,25 +60,28 @@ void Parrot_destroy_memory_pools( PARROT_INTERP )
 void Parrot_go_collect( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-int Parrot_in_memory_pool( PARROT_INTERP, void *bufstart /*NN*/ )
+PARROT_WARN_UNUSED_RESULT
+int Parrot_in_memory_pool( PARROT_INTERP, NOTNULL(void *bufstart) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 void Parrot_initialize_memory_pools( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void Parrot_merge_memory_pools( Interp *dest_interp /*NN*/,
-    Interp *source_interp /*NN*/ )
+void Parrot_merge_memory_pools(
+    NOTNULL(Interp *dest_interp),
+    NOTNULL(Interp *source_interp) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_reallocate( PARROT_INTERP, Buffer *buffer /*NN*/, size_t tosize )
+void Parrot_reallocate( PARROT_INTERP,
+    NOTNULL(Buffer *buffer),
+    size_t tosize )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void Parrot_reallocate_string( PARROT_INTERP,
-    STRING *str /*NN*/,
+    NOTNULL(STRING *str),
     size_t tosize )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
