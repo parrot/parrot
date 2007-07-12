@@ -60,8 +60,7 @@ transform post (PAST::Block) :language('PIR') {
     $P0 = ops.'push_pirop'('newclosure')
     $P0.'arglist'($P0, $S0)
     $P1= ops.'push_pirop'('callmethod', 'getfenv', 'subr')
-    #ops.'push_pirop'('callmethod', 'setfenv', $P0, $P1, 'result'=>'')
-    ops.'push_pirop'('callmethod', 'setfenv', $P0, $P1)
+    ops.'push_pirop'('callmethod', 'setfenv', $P0, $P1, 'result'=>'')
     ops.'result'($P0)
     .return (ops)
   L4:
@@ -203,7 +202,7 @@ transform cmp (PAST::Op) :language('PIR') {
 transform call (PAST::Op) :language('PIR') {
     .local pmc post
     post = new 'POST::Op'
-    post.'init'('node'=>node, 'pirop'=>'call')
+    post.'init'('node'=>node, 'pirop'=>'call', 'result'=>'')
     .local pmc arglist, iter, cpost
     arglist = new .ResizableStringArray
     iter = node.'iterator'()
@@ -230,7 +229,6 @@ transform call (PAST::Op) :language('PIR') {
     push arglist, $S0
     goto L1
   L2:
-#    post.'result'('')
     post.'arglist'(arglist :flat)
     null $P0
     set_hll_global ['Lua::POST'], '$?environ', $P0
