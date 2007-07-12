@@ -618,7 +618,7 @@ If the function returns a non-zero value iteration will stop.
 
 PARROT_WARN_UNUSED_RESULT
 int
-Parrot_forall_header_pools(PARROT_INTERP, int flag, NOTNULL(void *arg), NOTNULL(pool_iter_fn func))
+Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(pool_iter_fn func))
 {
     Arenas * const arena_base = interp->arena_base;
     int i;
@@ -725,7 +725,7 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 #else
     start = 2;
 #endif
-    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, 0,
+    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
     for (pass = start; pass <= 2; pass++) {

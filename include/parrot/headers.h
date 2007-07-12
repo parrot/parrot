@@ -138,10 +138,9 @@ void Parrot_destroy_header_pools( PARROT_INTERP )
 PARROT_WARN_UNUSED_RESULT
 int Parrot_forall_header_pools( PARROT_INTERP,
     int flag,
-    NOTNULL(void *arg),
+    NULLOK(void *arg),
     NOTNULL(pool_iter_fn func) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 void Parrot_initialize_header_pool_names( PARROT_INTERP )
