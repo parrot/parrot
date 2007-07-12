@@ -41,12 +41,13 @@ STRING * int_to_str( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_make_COW_reference( PARROT_INTERP, NULLOK(STRING *s) )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING* Parrot_reuse_COW_reference(
     SHIM_INTERP,
     NOTNULL(STRING *s),
@@ -64,16 +65,17 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_string_find_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *s,
+    NOTNULL(STRING *s),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_string_find_not_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *s /*NULLOK*/,
+    NULLOK(STRING *s),
     UINTVAL offset,
     UINTVAL count )
         __attribute__nonnull__(1);
@@ -82,26 +84,27 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_string_is_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *s,
+    NOTNULL(STRING *s),
     UINTVAL offset )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_string_trans_charset( PARROT_INTERP,
-    STRING *src /*NULLOK*/,
+    NULLOK(STRING *src),
     INTVAL charset_nr,
-    STRING *dest /*NULLOK*/ )
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_string_trans_encoding( PARROT_INTERP,
-    STRING *src /*NULLOK*/,
+    NULLOK(STRING *src),
     INTVAL encoding_nr,
-    STRING *dest /*NULLOK*/ )
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -115,34 +118,34 @@ STRING * string_append( PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b) )
 
 PARROT_API
 STRING * string_bitwise_and( PARROT_INTERP,
-    STRING *s1 /*NULLOK*/,
-    STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ )
+    NULLOK(STRING *s1),
+    NULLOK(STRING *s2),
+    NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 STRING * string_bitwise_not( PARROT_INTERP,
-    STRING *s /*NULLOK*/,
-    STRING **dest /*NULLOK*/ )
+    NULLOK(STRING *s),
+    NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 STRING * string_bitwise_or( PARROT_INTERP,
-    STRING *s1 /*NULLOK*/,
-    STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ )
+    NULLOK(STRING *s1),
+    NULLOK(STRING *s2),
+    NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 STRING * string_bitwise_xor( PARROT_INTERP,
-    STRING *s1 /*NULLOK*/,
-    STRING *s2 /*NULLOK*/,
-    STRING **dest /*NULLOK*/ )
+    NULLOK(STRING *s1),
+    NULLOK(STRING *s2),
+    NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_bool( PARROT_INTERP, const STRING *s /*NULLOK*/ )
+INTVAL string_bool( PARROT_INTERP, NULLOK(const STRING *s) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -165,16 +168,15 @@ STRING * string_chr( PARROT_INTERP, UINTVAL character )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
 INTVAL string_compare( PARROT_INTERP,
-    const STRING *s1 /*NULLOK*/,
-    const STRING *s2 /*NULLOK*/ )
+    NULLOK(const STRING *s1),
+    NULLOK(const STRING *s2) )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING * string_compose( PARROT_INTERP, STRING *src /*NULLOK*/ )
+STRING * string_compose( PARROT_INTERP, NULLOK(STRING *src) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -184,8 +186,8 @@ INTVAL string_compute_strlen( PARROT_INTERP, NOTNULL(STRING *s) )
 
 PARROT_API
 STRING * string_concat( PARROT_INTERP,
-    STRING *a /*NULLOK*/,
-    STRING *b /*NULLOK*/,
+    NULLOK(STRING *a),
+    NULLOK(STRING *b),
     UINTVAL Uflags )
         __attribute__nonnull__(1);
 
@@ -217,8 +219,8 @@ void string_downcase_inplace( PARROT_INTERP, NOTNULL(STRING *s) )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL string_equal( PARROT_INTERP,
-    const STRING *s1 /*NULLOK*/,
-    const STRING *s2 /*NULLOK*/ )
+    NULLOK(const STRING *s1),
+    NULLOK(const STRING *s2) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -259,7 +261,8 @@ size_t string_hash( PARROT_INTERP, NULLOK(STRING *s), size_t seed )
         __attribute__nonnull__(1);
 
 PARROT_API
-STRING * string_increment( PARROT_INTERP, const STRING *s /*NULLOK*/ )
+PARROT_CANNOT_RETURN_NULL
+STRING * string_increment( PARROT_INTERP, NULLOK(const STRING *s) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -273,16 +276,17 @@ void string_init( PARROT_INTERP )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-STRING* string_join( PARROT_INTERP, STRING *j /*NULLOK*/, PMC *ar )
+STRING* string_join( PARROT_INTERP, NULLOK(STRING *j), PMC *ar )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-UINTVAL string_length( SHIM_INTERP, const STRING *s /*NULLOK*/ );
+UINTVAL string_length( SHIM_INTERP, NULLOK(const STRING *s) );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING * string_make( PARROT_INTERP,
     NULLOK(const char *buffer),
     UINTVAL len,
@@ -292,6 +296,7 @@ STRING * string_make( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * string_make_direct( PARROT_INTERP,
     NULLOK(const char *buffer),
     UINTVAL len,
@@ -433,11 +438,11 @@ char * string_to_cstring( SHIM_INTERP, NULLOK(const STRING *s) );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_to_int( SHIM_INTERP, const STRING *s /*NULLOK*/ );
+INTVAL string_to_int( SHIM_INTERP, NULLOK(const STRING *s) );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL string_to_num( PARROT_INTERP, const STRING *s /*NULLOK*/ )
+FLOATVAL string_to_num( PARROT_INTERP, NULLOK(const STRING *s) )
         __attribute__nonnull__(1);
 
 PARROT_API

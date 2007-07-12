@@ -129,27 +129,29 @@ void stack_push( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/stack_common.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t * cst_new_stack_chunk( PARROT_INTERP,
-    const Stack_Chunk_t *chunk /*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
-
-PARROT_API
-Stack_Chunk_t * register_new_stack( PARROT_INTERP,
-    const char *name /*NN*/,
-    size_t item_size )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
-
-PARROT_API
-void* stack_prepare_pop( PARROT_INTERP, Stack_Chunk_t **stack_p /*NN*/ )
+    NOTNULL(const Stack_Chunk_t *chunk) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void* stack_prepare_push( PARROT_INTERP, Stack_Chunk_t **stack_p /*NN*/ )
+PARROT_WARN_UNUSED_RESULT
+Stack_Chunk_t * register_new_stack( PARROT_INTERP,
+    NOTNULL(const char *name),
+    size_t item_size )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+void* stack_prepare_pop( PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+void* stack_prepare_push( PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

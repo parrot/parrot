@@ -59,8 +59,8 @@ static All_charsets *all_charsets;
 /* HEADERIZER BEGIN: static */
 
 static INTVAL register_charset( PARROT_INTERP,
-    const char *charsetname /*NN*/,
-    CHARSET *charset /*NN*/ )
+    NOTNULL(const char *charsetname),
+    NOTNULL(CHARSET *charset) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -71,9 +71,11 @@ static void register_static_converters( PARROT_INTERP )
 /* HEADERIZER END: static */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_new_charset(SHIM_INTERP)
-    /* MALLOC, WARN_UNUSED */
 {
     return mem_allocate_typed(CHARSET);
 }
@@ -97,9 +99,10 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 }
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_find_charset(SHIM_INTERP, const char *charsetname /*NN*/)
-    /* WARN_UNUSED */
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -113,11 +116,11 @@ Parrot_find_charset(SHIM_INTERP, const char *charsetname /*NN*/)
 }
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_load_charset(PARROT_INTERP, const char *charsetname /*NN*/)
-    /* WARN_UNUSED, NORETURN */
 {
-    UNUSED(interp);
     UNUSED(charsetname);
 
     real_exception(interp, NULL, UNIMPLEMENTED, "Can't load charsets yet");
@@ -133,9 +136,9 @@ Return the number of the charset or -1 if not found.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_charset_number(PARROT_INTERP, STRING *charsetname /*NN*/)
-    /* WARN_UNUSED */
+Parrot_charset_number(PARROT_INTERP, NOTNULL(STRING *charsetname))
 {
     const int n = all_charsets->n_charsets;
     int i;
@@ -156,9 +159,9 @@ Return the number of the charset of the given string or -1 if not found.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_charset_number_of_str(SHIM_INTERP, STRING *src /*NN*/)
-    /* WARN_UNUSED */
+Parrot_charset_number_of_str(SHIM_INTERP, NOTNULL(STRING *src))
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -171,9 +174,10 @@ Parrot_charset_number_of_str(SHIM_INTERP, STRING *src /*NN*/)
 }
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
-    /* WARN_UNUSED */
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -181,9 +185,10 @@ Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 }
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 CHARSET*
 Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
-    /* WARN_UNUSED */
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -191,9 +196,10 @@ Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 }
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 const char *
 Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
-    /* WARN_UNUSED */
 {
     if (number_of_charset >= all_charsets->n_charsets)
         return NULL;
@@ -201,8 +207,8 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 }
 
 static INTVAL
-register_charset(PARROT_INTERP, const char *charsetname /*NN*/,
-        CHARSET *charset /*NN*/)
+register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
+        NOTNULL(CHARSET *charset))
 {
     const int n = all_charsets->n_charsets;
     int i;
@@ -249,8 +255,8 @@ register_static_converters(PARROT_INTERP)
 
 PARROT_API
 INTVAL
-Parrot_register_charset(PARROT_INTERP, const char *charsetname /*NN*/,
-        CHARSET *charset /*NN*/)
+Parrot_register_charset(PARROT_INTERP, NOTNULL(const char *charsetname),
+        NOTNULL(CHARSET *charset))
 {
     if (!all_charsets) {
         all_charsets = mem_allocate_typed(All_charsets);
@@ -310,25 +316,25 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
 PARROT_API
 INTVAL
 Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
-        CHARSET *charset /*NN*/)
+        NOTNULL(CHARSET *charset))
 {
     Parrot_default_charset_ptr = charset;
     return 1;
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_default_charset(SHIM_INTERP)
-    /* WARN_UNUSED */
 {
     return Parrot_default_charset_ptr;
 }
 
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 charset_converter_t
-Parrot_find_charset_converter(SHIM_INTERP, CHARSET *lhs /*NN*/, CHARSET *rhs /*NN*/)
-    /* WARN_UNUSED */
+Parrot_find_charset_converter(SHIM_INTERP, NOTNULL(CHARSET *lhs), NOTNULL(CHARSET *rhs))
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -351,7 +357,7 @@ Parrot_find_charset_converter(SHIM_INTERP, CHARSET *lhs /*NN*/, CHARSET *rhs /*N
 PARROT_API
 void
 Parrot_register_charset_converter(SHIM_INTERP,
-        CHARSET *lhs /*NN*/, CHARSET *rhs /*NN*/, charset_converter_t func /*NN*/)
+        NOTNULL(CHARSET *lhs), NOTNULL(CHARSET *rhs), NOTNULL(charset_converter_t func))
 {
     const int n = all_charsets->n_charsets;
     int i;

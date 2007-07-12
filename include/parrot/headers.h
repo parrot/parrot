@@ -47,84 +47,101 @@ typedef int (*pool_iter_fn)(Interp *, struct Small_Object_Pool *, int, void*);
 
 /* HEADERIZER BEGIN: src/headers.c */
 
-void add_pmc_ext( PARROT_INTERP, PMC *pmc /*NN*/ )
+void add_pmc_ext( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void add_pmc_sync( PARROT_INTERP, PMC *pmc /*NN*/ )
+void add_pmc_sync( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * get_bufferlike_pool( PARROT_INTERP, size_t buffer_size )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 size_t get_max_buffer_address( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
-size_t get_max_pmc_address( const PARROT_INTERP )
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+size_t get_max_pmc_address( PARROT_INTERP )
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 size_t get_min_buffer_address( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 size_t get_min_pmc_address( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+int is_buffer_ptr( PARROT_INTERP, NOTNULL(const void *ptr) )
         __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-int is_buffer_ptr( const PARROT_INTERP, const void *ptr /*NN*/ )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+int is_pmc_ptr( PARROT_INTERP, NOTNULL(const void *ptr) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-int is_pmc_ptr( const PARROT_INTERP, const void *ptr )
-        __attribute__warn_unused_result__;
-
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * make_bufferlike_pool( PARROT_INTERP, size_t buffer_size )
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Buffer * new_buffer_header( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_buffer_pool( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 void * new_bufferlike_header( PARROT_INTERP, size_t size )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_bufferlike_pool( PARROT_INTERP,
     size_t actual_buffer_size )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * new_pmc_header( PARROT_INTERP, UINTVAL flags )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_pmc_pool( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * new_string_header( PARROT_INTERP, UINTVAL flags )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_string_pool( PARROT_INTERP, INTVAL constant )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 void Parrot_destroy_header_pools( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int Parrot_forall_header_pools( PARROT_INTERP,
     int flag,
-    void *arg,
-    pool_iter_fn func /*NN*/ )
+    NOTNULL(void *arg),
+    NOTNULL(pool_iter_fn func) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 void Parrot_initialize_header_pool_names( PARROT_INTERP )
@@ -133,8 +150,9 @@ void Parrot_initialize_header_pool_names( PARROT_INTERP )
 void Parrot_initialize_header_pools( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void Parrot_merge_header_pools( Interp *dest_interp /*NN*/,
-    Interp *source_interp /*NN*/ )
+void Parrot_merge_header_pools(
+    NOTNULL(Interp *dest_interp),
+    NOTNULL(Interp *source_interp) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
