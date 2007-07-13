@@ -167,9 +167,6 @@ help:
 test:
 	cd .. && $(PERL) t/harness --languages=lua
 
-test2:
-	cd .. && cd lua2 && $(PERL) -I../../lib t/harness
-
 
 TEST_CLEANERS = \
  "t/pmc/*.pir" \
