@@ -49,37 +49,37 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 /* HEADERIZER BEGIN: src/stacks.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 Stack_entry_type get_entry_type(
     SHIM_INTERP,
-    const Stack_Entry_t *entry /*NN*/ )
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+    NOTNULL(const Stack_Entry_t *entry) )
+        __attribute__nonnull__(2);
 
 PARROT_API
-void mark_stack( PARROT_INTERP, Stack_Chunk_t *chunk /*NN*/ )
+void mark_stack( PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-Stack_Chunk_t * new_stack( PARROT_INTERP, const char *name /*NN*/ )
+Stack_Chunk_t * new_stack( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_dump_dynamic_environment( PARROT_INTERP,
-    Stack_Chunk_t *dynamic_env /*NN*/ )
+    NOTNULL(Stack_Chunk_t *dynamic_env) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 void * pop_dest( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
 void rotate_entries( PARROT_INTERP,
-    Stack_Chunk_t **stack_p /*NN*/,
+    NOTNULL(Stack_Chunk_t **stack_p),
     INTVAL num_entries )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -88,42 +88,47 @@ PARROT_API
 void stack_destroy( Stack_Chunk_t *top );
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t * stack_entry( PARROT_INTERP,
-    Stack_Chunk_t *stack /*NN*/,
+    NOTNULL(Stack_Chunk_t *stack),
     INTVAL depth )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
-size_t stack_height( SHIM_INTERP, const Stack_Chunk_t *chunk /*NN*/ )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+size_t stack_height( SHIM_INTERP, NOTNULL(const Stack_Chunk_t *chunk) )
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 void * stack_peek( PARROT_INTERP,
-    Stack_Chunk_t *stack_base /*NN*/,
-    Stack_entry_type *type /*NULLOK*/ )
+    NOTNULL(Stack_Chunk_t *stack_base),
+    NULLOK(Stack_entry_type *type) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 void * stack_pop( PARROT_INTERP,
-    Stack_Chunk_t **stack_p /*NN*/,
-    void *where /*NULLOK*/,
+    NOTNULL(Stack_Chunk_t **stack_p),
+    NULLOK(void *where),
     Stack_entry_type type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void stack_push( PARROT_INTERP,
-    Stack_Chunk_t **stack_p /*NN*/,
-    void *thing,
+    NOTNULL(Stack_Chunk_t **stack_p),
+    NOTNULL(void *thing),
     Stack_entry_type type,
-    Stack_cleanup_method cleanup )
+    NOTNULL(Stack_cleanup_method cleanup) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5);
 
 /* HEADERIZER END: src/stacks.c */
 /* HEADERIZER BEGIN: src/stack_common.c */

@@ -1852,8 +1852,13 @@ splint : $(PARROT)
 
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	/var/splint312/bin/splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+		-declundef \
+		-show-summary \
+		-exportlocal \
+		\
 		src/string.c \
+		src/stacks.c \
 
 ###############################################################################
 #
