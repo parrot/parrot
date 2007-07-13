@@ -45,6 +45,7 @@ sub runstep {
         }
         cc_clean();
     }
+    return;
 }
 
 1;

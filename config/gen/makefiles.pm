@@ -99,6 +99,8 @@ EOF
     }
 
     close $CFLAGS;
+
+    return;
 }
 
 
@@ -163,6 +165,7 @@ sub makefiles {
             }
         }
     }
+    return;
 }
 
 1;

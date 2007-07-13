@@ -89,7 +89,7 @@ sub sort_pmcs {
         }
     }
     ## print "***\n", join(' ', @sorted_pmcs), "\n";
-    @sorted_pmcs;
+    return @sorted_pmcs;
 }
 
 sub runstep {

@@ -94,6 +94,7 @@ sub runstep {
     if ( ( split( '-', $Config{archname} ) )[0] eq 'ia64' ) {
         $conf->data->set( platform_asm => 1 );
     }
+    return;
 }
 
 1;
