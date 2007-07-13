@@ -47,22 +47,40 @@ There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
 
-The C<classname> op will deprecated in the 0.5.0 release. It's an exact
-duplicate of the string return variant of the C<typeof> op.
-
-=head1 Deprecated vtable methods
-
-The following vtable methods are deprecated:
-
-=over 4
-
-=item PMC* subclass(PMC* name)
-
-=back
 
 =head1 Deprecated Class Features
 
+=over 4
+
+=item 1
+
 Type IDs will go away in 0.5.0.
+
+=item 2
+
+The C<classname> op is deprecated and will be removed in the 0.5.0 release.
+It's an exact duplicate of the string return variant of the C<typeof> op.
+
+=item 3
+
+The experimental C<instantiate> opcode is deprecated and will be removed in the
+0.5.0 release. 
+
+(The C<instantiate> vtable function becomes core in 0.5.0, but is accessed via
+the "new" opcode for the PMCs that use it.)
+
+=item 4
+
+  PMC* subclass(PMC* name)
+
+The subclass vtable method is deprecated and will be removed in the 0.5.0 release.
+
+=item 5
+
+The PMC union struct is deprecated and will be removed once all core PMCs have
+been updated.
+
+=back
 
 =head1 FUTURE changes
 
