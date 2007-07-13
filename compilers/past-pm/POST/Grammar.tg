@@ -217,10 +217,9 @@ transform if (PAST::Op) :language('PIR') {
     elsepast = node[2]
 
     .local pmc thenlabel, endlabel
-    .local string pasttype, n
+    .local string pasttype
     pasttype = node.'pasttype'()
-    n = node.'unique'('_')
-    $S0 = concat pasttype, n
+    $S0 = node.'unique'(pasttype, '_')
     thenlabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
@@ -265,10 +264,9 @@ transform while (PAST::Op) :language('PIR') {
     blockpast = node[1]
 
     .local pmc looplabel, endlabel
-    .local string pasttype, n
+    .local string pasttype
     pasttype = node.'pasttype'()
-    n = node.'unique'('_')
-    $S0 = concat pasttype, n
+    $S0 = node.'unique'(pasttype, '_')
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
@@ -303,16 +301,15 @@ transform for (PAST::Op) :language('PIR') {
     ops.'init'('node'=>node)
 
     .local pmc looplabel, endlabel
-    .local string pasttype, n
+    .local string pasttype
     pasttype = node.'pasttype'()
-    n = node.'unique'('_')
-    $S0 = concat pasttype, n
+    $S0 = node.'unique'(pasttype, '_')
     looplabel = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)
 
     .local pmc collpast, collpost
-    collpast = node[0] 
+    collpast = node[0]
     collpost = tree.'get'('post', collpast)
 
     .local pmc collvar
@@ -330,7 +327,7 @@ transform for (PAST::Op) :language('PIR') {
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
     # end unless iterator
-    
+
     # assign nextval to loop variable
     .local pmc nextval
     nextval = ops.'unique'('$P')
@@ -338,7 +335,7 @@ transform for (PAST::Op) :language('PIR') {
 
     # execute block
     .local pmc subpast, subpost
-    subpast = node[1] 
+    subpast = node[1]
     subpost = tree.'get'('post', subpast)
     $P0 = subpost[0] # get to the sub so we can add the param..
     ops.'push'(subpost)
@@ -591,7 +588,7 @@ transform bind (PAST::Var) :language('PIR') {
 
 
 transform vivipost (PAST::Var) :language('PIR') {
-    .local pmc vivipost, vivilabel
+    .local pmc vivipost
     .local string viviself
     viviself = node.'viviself'()
     if viviself goto have_viviself
@@ -623,7 +620,7 @@ transform post (PAST::Var) :language('PIR') {
     goto have_scope
 
   scope_keyed:
-    .local pmc keypost, basepost
+    .local pmc keypost
     keypost = tree.'get'('keypost', node)
     post.'push'(keypost)
     name = keypost.'result'()

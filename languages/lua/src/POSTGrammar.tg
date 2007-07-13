@@ -28,8 +28,7 @@ transform post (PAST::Block) :language('PIR') {
     unless $S0 == '' goto L1
     $S0 = 'anon'
   L1:
-    $S0 .= '_'
-    name = node.'unique'($S0)
+    name = node.'unique'($S0, '_')
     .local pmc post
     post = new 'POST::Sub'
     post.'init'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'pragma'=>':anon :lex', 'blocktype'=>'declaration', 'result'=>'')
@@ -267,8 +266,7 @@ transform and (PAST::Op) :language('PIR') {
     expr1 = tree.'get'('post', $P0)
     ops.'push'(expr1)
     .local pmc label, endlabel
-    $S0 = type . '_'
-    $S0 = node.'unique'($S0)
+    $S0 = node.'unique'(type, '_')
     label = ops.'new'('POST::Label', 'result'=>$S0)
     $S0 = $S0 . '_end'
     endlabel = ops.'new'('POST::Label', 'result'=>$S0)

@@ -254,15 +254,11 @@ unique number.
 =cut
 
 .sub 'unique' :method
-    .param string fmt          :optional
-    .param int has_fmt         :opt_flag
-
-    if has_fmt goto unique_1
-    fmt = ''
-  unique_1:
+    .param pmc fmt             :slurpy
+    $S1 = join '', fmt
     $P0 = get_global '$!serno'
     $S0 = $P0
-    $S0 = concat fmt, $S0
+    $S0 = concat $S1, $S0
     inc $P0
     .return ($S0)
 .end
