@@ -114,7 +114,7 @@ Creates and returns a clone of the scalar.
 */
     PMC* clone () {
         PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
+        STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
     }
 
