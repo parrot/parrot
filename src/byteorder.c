@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -36,9 +36,10 @@ conversion is done.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 INTVAL
 fetch_iv_le(INTVAL w)
-    /* CONST,WARN_UNUSED */
 {
 #if !PARROT_BIGENDIAN
     return w;
@@ -70,9 +71,10 @@ If the native format is already big endian, then no conversion is done.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 INTVAL
 fetch_iv_be(INTVAL w)
-    /* CONST, WARN_UNUSED */
 {
 #if PARROT_BIGENDIAN
     return w;
@@ -102,9 +104,10 @@ Same as C<fetch_iv_be> for opcode_t
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 opcode_t
 fetch_op_be(opcode_t w)
-    /* CONST, WARN_UNUSED */
 {
 #if PARROT_BIGENDIAN
     return w;
@@ -136,9 +139,10 @@ Same as C<fetch_iv_le> for opcode_t
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
 opcode_t
 fetch_op_le(opcode_t w)
-    /* CONST, WARN_UNUSED */
 {
 #if !PARROT_BIGENDIAN
     return w;

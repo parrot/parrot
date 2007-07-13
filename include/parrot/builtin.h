@@ -17,29 +17,29 @@
 
 /* HEADERIZER BEGIN: src/builtin.c */
 
-const char * Parrot_builtin_get_c_namespace( int bi )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+const char * Parrot_builtin_get_c_namespace( int bi );
 
-int Parrot_builtin_is_class_method( int bi )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+int Parrot_builtin_is_class_method( int bi );
 
-int Parrot_builtin_is_void( int bi )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+int Parrot_builtin_is_void( int bi );
 
-PMC* Parrot_find_builtin( PARROT_INTERP, STRING *func /*NN*/ )
+PARROT_WARN_UNUSED_RESULT
+PMC* Parrot_find_builtin( PARROT_INTERP, NOTNULL(STRING *func) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 void Parrot_init_builtins( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-int Parrot_is_builtin( const char *func /*NN*/, const char *sig /*NULLOK*/ )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+int Parrot_is_builtin( NOTNULL(const char *func), NULLOK(const char *sig) )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/builtin.c */
 

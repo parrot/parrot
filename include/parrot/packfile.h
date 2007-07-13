@@ -689,21 +689,21 @@ void fetch_buf_le_8( unsigned char *rb /*NN*/, const unsigned char *b /*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-INTVAL fetch_iv_be( INTVAL w )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+INTVAL fetch_iv_be( INTVAL w );
 
-INTVAL fetch_iv_le( INTVAL w )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+INTVAL fetch_iv_le( INTVAL w );
 
-opcode_t fetch_op_be( opcode_t w )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+opcode_t fetch_op_be( opcode_t w );
 
-opcode_t fetch_op_le( opcode_t w )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+opcode_t fetch_op_le( opcode_t w );
 
 /* HEADERIZER END: src/byteorder.c */
 

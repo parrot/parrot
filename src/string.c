@@ -349,6 +349,7 @@ Returs NULL, if no compatible string representation can be found.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 CHARSET *
 string_rep_compatible(SHIM_INTERP,
     NOTNULL(const STRING *a), NOTNULL(const STRING *b), NOTNULL(ENCODING **e))
@@ -482,6 +483,8 @@ Make a Parrot string from a specified C string.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 STRING *
 string_from_cstring(PARROT_INTERP,
     NULLOK(const char * const buffer), const UINTVAL len)
@@ -504,7 +507,7 @@ or BOCU.
 */
 
 PARROT_API
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 const char*
 string_primary_encoding_for_representation(PARROT_INTERP,
     parrot_string_representation_t representation)
@@ -526,7 +529,7 @@ Creates and returns a constant Parrot string.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 const_string(PARROT_INTERP, NOTNULL(const char *buffer))
 {
@@ -564,7 +567,7 @@ together.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 string_make(PARROT_INTERP, NULLOK(const char *buffer),
         UINTVAL len, NULLOK(const char *charset_name), UINTVAL flags)
@@ -643,6 +646,7 @@ Grows the Parrot string's buffer by the specified number of characters.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING *
 string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
 {
@@ -688,6 +692,7 @@ Note that this is not range-checked.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_index(PARROT_INTERP, NOTNULL(const STRING *s), UINTVAL idx)
 {
@@ -787,6 +792,8 @@ TODO - Allow this to take an array of characters?
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 string_chr(PARROT_INTERP, UINTVAL character)
 {
@@ -810,6 +817,7 @@ Creates and returns a copy of the specified Parrot string.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 string_copy(PARROT_INTERP, NOTNULL(STRING *s))
@@ -830,6 +838,7 @@ string.
 */
 
 PARROT_API
+PARROT_MAY_IGNORE_RESULT
 INTVAL
 string_compute_strlen(PARROT_INTERP, NOTNULL(STRING *s))
 {
@@ -847,6 +856,7 @@ of characters in the specified Parrot string's representation.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_max_bytes(SHIM_INTERP, NOTNULL(const STRING *s), INTVAL nchars)
 {
@@ -2035,6 +2045,7 @@ C<< s->hashval >>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 size_t
 string_hash(PARROT_INTERP, NULLOK(STRING *s), size_t seed)
 {
@@ -2435,6 +2446,7 @@ Perl5ish increment the string. Currently single char only.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 string_increment(PARROT_INTERP, NULLOK(const STRING *s))
 {
