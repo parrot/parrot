@@ -28,19 +28,19 @@ Handles class and object manipulation.
 static INTVAL attr_str_2_num( PARROT_INTERP, PMC *object, STRING *attr )
         __attribute__nonnull__(1);
 
-static PMC* C3_merge( PARROT_INTERP, PMC *merge_list /*NN*/ )
+static PMC* C3_merge( PARROT_INTERP, NOTNULL(PMC *merge_list) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static PMC* class_mro_merge( PARROT_INTERP, PMC *seqs )
         __attribute__nonnull__(1);
 
-static PMC* create_class_mro( PARROT_INTERP, PMC *_class /*NN*/ )
+static PMC* create_class_mro( PARROT_INTERP, NOTNULL(PMC *_class) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void create_deleg_pmc_vtable( PARROT_INTERP,
-    PMC *_class /*NN*/,
+    NOTNULL(PMC *_class),
     int full )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -58,7 +58,7 @@ static void fail_if_exist( PARROT_INTERP, PMC *name )
         __attribute__nonnull__(1);
 
 static PMC * find_method_direct_1( PARROT_INTERP,
-    PMC *_class /*NN*/,
+    NOTNULL(PMC *_class),
     STRING *method_name )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -71,12 +71,14 @@ static PMC* find_vtable_meth_ns( PARROT_INTERP, PMC *ns, INTVAL vtable_index )
 static PMC* get_init_meth( PARROT_INTERP,
     PMC *_class,
     STRING *prop_str,
-    STRING **meth_str /*NN*/ )
+    NOTNULL(STRING **meth_str) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__warn_unused_result__;
 
-static void instantiate_object( PARROT_INTERP, PMC *object /*NN*/, PMC *init )
+static void instantiate_object( PARROT_INTERP,
+    NOTNULL(PMC *object),
+    PMC *init )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -93,15 +95,15 @@ static PMC* not_empty( PARROT_INTERP, PMC *seqs )
 static void parrot_class_register( PARROT_INTERP,
     PMC *name,
     PMC *new_class,
-    PMC *parent /*NULLOK*/,
+    NULLOK(PMC *parent),
     PMC *mro )
         __attribute__nonnull__(1);
 
-static void rebuild_attrib_stuff( PARROT_INTERP, PMC *_class /*NN*/ )
+static void rebuild_attrib_stuff( PARROT_INTERP, NOTNULL(PMC *_class) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL register_type( PARROT_INTERP, PMC *name /*NN*/ )
+static INTVAL register_type( PARROT_INTERP, NOTNULL(PMC *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -118,7 +120,7 @@ Return index if C<name> is a valid vtable slot name.
 
 PARROT_API
 INTVAL
-Parrot_get_vtable_index(PARROT_INTERP, const STRING *name /*NN*/)
+Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))
 {
     char * const name_c      = string_to_cstring(interp, name);
 
@@ -172,7 +174,7 @@ Return the vtable method PMC if found.
 
 PARROT_API
 PMC*
-Parrot_find_vtable_meth(PARROT_INTERP, PMC *pmc /*NN*/, STRING *meth)
+Parrot_find_vtable_meth(PARROT_INTERP, NOTNULL(PMC *pmc), STRING *meth)
 {
     INTVAL i, n;
     PMC   *ns, *mro;
@@ -220,7 +222,7 @@ XXX this function, key_set_to_string, and the key PMC get_repr should be consoli
 
 PARROT_API
 STRING*
-readable_name(PARROT_INTERP, PMC *name /*NN*/)
+readable_name(PARROT_INTERP, NOTNULL(PMC *name))
 {
     STRING *join_on;
     PMC    *array;
@@ -281,7 +283,7 @@ fail_if_exist(PARROT_INTERP, PMC *name)
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
 static void
-rebuild_attrib_stuff(PARROT_INTERP, PMC *_class /*NN*/)
+rebuild_attrib_stuff(PARROT_INTERP, NOTNULL(PMC *_class))
 {
     INTVAL    attr_count, cur_offset, n_class, n_mro, offset;
     PMC      *attr_offset_hash, *mro, *attribs;
@@ -359,7 +361,7 @@ on the existence of the method for this class.
 */
 
 static void
-create_deleg_pmc_vtable(PARROT_INTERP, PMC *_class /*NN*/, int full)
+create_deleg_pmc_vtable(PARROT_INTERP, NOTNULL(PMC *_class), int full)
 {
     int         i;
     const char *meth;
@@ -472,7 +474,7 @@ function.
 
 PARROT_API
 PMC *
-Parrot_single_subclass(PARROT_INTERP, PMC *base_class, PMC *name /*NULLOK*/)
+Parrot_single_subclass(PARROT_INTERP, PMC *base_class, NULLOK(PMC *name))
 {
     PMC      *child_class, *parents, *temp_pmc, *mro;
     SLOTTYPE *child_class_array;
@@ -660,7 +662,7 @@ Parrot_class_lookup_p(PARROT_INTERP, PMC *class_name)
 }
 
 static INTVAL
-register_type(PARROT_INTERP, PMC *name /*NN*/)
+register_type(PARROT_INTERP, NOTNULL(PMC *name))
     /* WARN_UNUSED */
 {
     INTVAL type;
@@ -699,7 +701,7 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 
 static void
 parrot_class_register(PARROT_INTERP, PMC *name,
-        PMC *new_class, PMC *parent /*NULLOK*/, PMC *mro)
+        PMC *new_class, NULLOK(PMC *parent), PMC *mro)
 {
     VTABLE *new_vtable, *parent_vtable;
     PMC    *vtable_pmc, *ns, *top;
@@ -803,7 +805,7 @@ parrot_class_register(PARROT_INTERP, PMC *name,
 }
 
 static PMC*
-get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, STRING **meth_str /*NN*/)
+get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, NOTNULL(STRING **meth_str))
     /* WARN_UNUSED */
 {
     STRING     *meth;
@@ -958,7 +960,7 @@ Parrot_instantiate_object(PARROT_INTERP, PMC *object)
 }
 
 static void
-instantiate_object(PARROT_INTERP, PMC *object /*NN*/, PMC *init)
+instantiate_object(PARROT_INTERP, NOTNULL(PMC *object), PMC *init)
 {
     SLOTTYPE *new_object_array;
     INTVAL    attrib_count, i;
@@ -1082,7 +1084,7 @@ class_mro_merge(PARROT_INTERP, PMC *seqs)
 
 /* create C3 MRO */
 static PMC*
-create_class_mro(PARROT_INTERP, PMC *_class /*NN*/)
+create_class_mro(PARROT_INTERP, NOTNULL(PMC *_class))
 {
     PMC   *lparents, *bases;
     INTVAL i;
@@ -1392,7 +1394,7 @@ the name in the global stash.
 
 PARROT_API
 PMC *
-Parrot_find_method_with_cache(PARROT_INTERP, PMC *_class, STRING *method_name /*NN*/)
+Parrot_find_method_with_cache(PARROT_INTERP, PMC *_class, NOTNULL(STRING *method_name))
 {
     UINTVAL type, bits;
 
@@ -1494,7 +1496,7 @@ debug_trace_find_meth(PARROT_INTERP, PMC *_class, STRING *name, PMC *sub)
 #endif
 
 static PMC *
-find_method_direct_1(PARROT_INTERP, PMC *_class /*NN*/,
+find_method_direct_1(PARROT_INTERP, NOTNULL(PMC *_class),
                               STRING *method_name)
     /* WARN_UNUSED */
 {
@@ -1841,7 +1843,7 @@ Parrot_set_class_fallback(PARROT_INTERP, STRING *_class,
 /* ************************************************************************ */
 
 static PMC*
-C3_merge(PARROT_INTERP, PMC *merge_list /*NN*/)
+C3_merge(PARROT_INTERP, NOTNULL(PMC *merge_list))
 {
     PMC *result    = pmc_new(interp, enum_class_ResizablePMCArray);
     const int list_count = VTABLE_elements(interp, merge_list);

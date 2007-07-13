@@ -19,8 +19,8 @@ PARROT_API PMC *Parrot_get_namespace_keyed_str(Interp *, PMC *base_ns, STRING *s
 PARROT_API PMC *Parrot_make_namespace_keyed(Interp *, PMC *base_ns, PMC *pmc_key);
 PARROT_API PMC *Parrot_make_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key);
 
-PARROT_API PMC *Parrot_get_namespace_autobase(Interp *interp, PMC *key);
-PARROT_API PMC *Parrot_make_namespace_autobase(Interp *interp, PMC *key);
+PARROT_API PMC *Parrot_get_namespace_autobase(PARROT_INTERP, PMC *key);
+PARROT_API PMC *Parrot_make_namespace_autobase(PARROT_INTERP, PMC *key);
 
 /*
  * {get,set}_global.

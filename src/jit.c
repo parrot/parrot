@@ -43,7 +43,7 @@ extern int jit_op_count(void);
 #endif
 
 #if defined __GNUC__ || defined __IBMC__
-void Parrot_jit_debug(Interp* interp);
+void Parrot_jit_debug(PARROT_INTERP);
 #endif
 
 PARROT_API char **Parrot_exec_rel_addr;
@@ -52,7 +52,7 @@ PARROT_API int Parrot_exec_rel_count;
 /*
 
 =item C<static void
-insert_fixup_targets(Interp* interp, char *branch,
+insert_fixup_targets(PARROT_INTERP, char *branch,
         size_t limit)>
 
 Look at fixups, mark all fixup entries as branch target.
@@ -66,7 +66,7 @@ inserted.
 */
 
 static void
-insert_fixup_targets(Interp* interp, char *branch,
+insert_fixup_targets(PARROT_INTERP, char *branch,
         size_t limit)
 {
     PackFile_FixupTable *ft = interp->code->fixups;

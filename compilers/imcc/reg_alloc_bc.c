@@ -57,10 +57,10 @@ typedef struct graph {
     unsigned* E; /* edge data, adjacency matrix */
 } graph;
 static void build_interference_graph(Parrot_Interp, IMC_Unit*, graph* G);
-static void ig_color_graph(Interp *interp, IMC_Unit*, graph*);
-static void apply_coloring(Interp *interp, IMC_Unit*, graph*);
-static void ig_precolor(Interp *interp, IMC_Unit*, graph*);
-static int ig_init_graph(Interp *interp, IMC_Unit*, graph*);
+static void ig_color_graph(PARROT_INTERP, IMC_Unit*, graph*);
+static void apply_coloring(PARROT_INTERP, IMC_Unit*, graph*);
+static void ig_precolor(PARROT_INTERP, IMC_Unit*, graph*);
+static int ig_init_graph(PARROT_INTERP, IMC_Unit*, graph*);
 static void ig_clear_graph(IMC_Unit*, graph*);
 static int spill_registers(Interp *, IMC_Unit *, graph*);
 /******************************************************************/
@@ -129,7 +129,7 @@ static unsigned int* ig_allocate(int N)
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(Interp *interp, IMC_Unit * unit)
+imc_reg_alloc(PARROT_INTERP, IMC_Unit * unit)
 {
     int todo, first, loop_counter;
     graph G={0,0,NULL,NULL};
@@ -620,7 +620,7 @@ done:
  */
 
 static int
-interferes(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1)
+interferes(PARROT_INTERP, IMC_Unit * unit, SymReg * r0, SymReg * r1)
 {
 
     int i;
@@ -794,7 +794,7 @@ update_life(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
 inline
 #endif
 static void
-spill(Interp *interp, IMC_Unit * unit, int spilled)
+spill(PARROT_INTERP, IMC_Unit * unit, int spilled)
 {
     Instruction * tmp, *ins;
     int i, n, dl;
@@ -1032,7 +1032,7 @@ done:
  * Use colors from G to allocate registers and spill the high colors.
  */
 static void
-apply_coloring(Interp* interp, IMC_Unit* unit, graph* G)
+apply_coloring(PARROT_INTERP, IMC_Unit* unit, graph* G)
 {
     int j,x=0;
     SymReg ** reglist = unit->reglist;
@@ -1093,7 +1093,7 @@ static int degree_comparator(const void * u, const void * v) {
 }
 
 static int
-ig_init_graph(Interp* interp, IMC_Unit* unit, graph* G) {
+ig_init_graph(PARROT_INTERP, IMC_Unit* unit, graph* G) {
     int x,y;
     int num_nodes = unit->n_symbols;
 
@@ -1155,7 +1155,7 @@ ig_clear_graph(IMC_Unit* unit, graph* G)
  * Set colors in G to pre-allocated values, from allocate_wanted_regs
  */
 static void
-ig_precolor(Interp* interp, IMC_Unit* unit, graph* G)
+ig_precolor(PARROT_INTERP, IMC_Unit* unit, graph* G)
 {
     int j,x;
     SymReg ** reglist = unit->reglist;
@@ -1235,7 +1235,7 @@ ig_find_color(SHIM_INTERP, IMC_Unit *unit, int x, const char *avail)
 
 /* select first available color, over 17 */
 static int
-ig_color_node(Interp *interp, IMC_Unit* unit, graph* G, int j)
+ig_color_node(PARROT_INTERP, IMC_Unit* unit, graph* G, int j)
 {
     int c,k;
     node* u = &G->V[j];
@@ -1293,7 +1293,7 @@ ig_color_node(Interp *interp, IMC_Unit* unit, graph* G, int j)
 }
 
 static void
-ig_remove_node(Interp *interp, IMC_Unit *unit, graph* G, int j) {
+ig_remove_node(PARROT_INTERP, IMC_Unit *unit, graph* G, int j) {
     int i,k;
     node* u = &G->V[j], tmpnode;
     int x = u->id;
@@ -1346,7 +1346,7 @@ ig_remove_node(Interp *interp, IMC_Unit *unit, graph* G, int j) {
  */
 
 static void
-ig_color_graph(Interp *interp, IMC_Unit* unit, graph* G) {
+ig_color_graph(PARROT_INTERP, IMC_Unit* unit, graph* G) {
     int j;
 
     IMCC_debug(interp, DEBUG_REG, "ig_color_graph n=%d\n", G->n);

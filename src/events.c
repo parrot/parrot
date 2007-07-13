@@ -312,8 +312,7 @@ Create queue entry and insert event into task queue.
 
 PARROT_API
 void
-Parrot_schedule_event(Interp *interp, parrot_event* ev /*NN*/)
-    /* XXX Why is it OK to pass in a null interpreter? */
+Parrot_schedule_event(PARROT_INTERP, NOTNULL(parrot_event* ev))
 {
     QUEUE_ENTRY* const entry = mem_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
@@ -513,7 +512,7 @@ checking for the interpreter.
 
 PARROT_API
 void
-Parrot_schedule_interp_qentry(PARROT_INTERP, struct QUEUE_ENTRY *entry /*NN*/)
+Parrot_schedule_interp_qentry(PARROT_INTERP, NOTNULL(struct QUEUE_ENTRY *entry))
 {
     parrot_event * const event = (parrot_event *)entry->data;
     /*
@@ -836,7 +835,7 @@ Duplicate queue entry.
 */
 
 static QUEUE_ENTRY*
-dup_entry(const QUEUE_ENTRY *entry /*NN*/)
+dup_entry(NOTNULL(const QUEUE_ENTRY *entry))
     /* MALLOC, WARN_UNUSED */
 {
     QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
@@ -1116,7 +1115,7 @@ Convert event to exception and throw it.
 */
 
 static void
-event_to_exception(PARROT_INTERP, const parrot_event* event /*NN*/)
+event_to_exception(PARROT_INTERP, NOTNULL(const parrot_event* event))
 {
     const int exit_code = -event->u.signal;
 
@@ -1144,7 +1143,7 @@ Run user code or such.
 */
 
 static opcode_t *
-do_event(PARROT_INTERP, parrot_event* event /*NN*/, opcode_t *next)
+do_event(PARROT_INTERP, NOTNULL(parrot_event* event), opcode_t *next)
 {
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {

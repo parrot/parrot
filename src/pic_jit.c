@@ -36,14 +36,16 @@ TODO:
 /* HEADERIZER BEGIN: static */
 
 static int args_match_params(
-    const PMC *sig_args /*NN*/,
+    NOTNULL(const PMC *sig_args),
     PackFile_ByteCode *seg,
-    opcode_t *start /*NN*/ )
+    NOTNULL(opcode_t *start) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-static int call_is_safe( const PMC *sub /*NN*/, opcode_t **set_args /*NN*/ )
+static int call_is_safe(
+    NOTNULL(const PMC *sub),
+    NOTNULL(opcode_t **set_args) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -54,7 +56,7 @@ static int jit_can_compile_sub( PARROT_INTERP, PMC *sub )
 static int ops_jittable( PARROT_INTERP,
     PMC *sub,
     const PMC *sig_results,
-    PackFile_ByteCode *seg /*NN*/,
+    NOTNULL(PackFile_ByteCode *seg),
     opcode_t *pc,
     opcode_t *end,
     int *flags )
@@ -67,8 +69,8 @@ static opcode_t * pic_test_func( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static int returns_match_results(
-    const PMC *sig_ret /*NN*/,
-    const PMC *sig_result /*NN*/ )
+    NOTNULL(const PMC *sig_ret),
+    NOTNULL(const PMC *sig_result) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -150,8 +152,8 @@ jit_can_compile_sub(PARROT_INTERP, PMC *sub)
 
 
 static int
-args_match_params(const PMC *sig_args /*NN*/, PackFile_ByteCode *seg,
-    opcode_t *start /*NN*/)
+args_match_params(NOTNULL(const PMC *sig_args), PackFile_ByteCode *seg,
+    NOTNULL(opcode_t *start))
     /* WARN_UNUSED */
 {
     const PMC *sig_params;
@@ -188,7 +190,7 @@ args_match_params(const PMC *sig_args /*NN*/, PackFile_ByteCode *seg,
 }
 
 static int
-returns_match_results(const PMC *sig_ret /*NN*/, const PMC *sig_result /*NN*/)
+returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))
     /* WARN_UNUSED */
 {
     int type;
@@ -215,7 +217,7 @@ returns_match_results(const PMC *sig_ret /*NN*/, const PMC *sig_result /*NN*/)
 }
 
 static int
-call_is_safe(const PMC *sub /*NN*/, opcode_t **set_args /*NN*/)
+call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
     /* WARN_UNUSED */
 {
     PMC *called, *sig_results;
@@ -255,7 +257,7 @@ call_is_safe(const PMC *sub /*NN*/, opcode_t **set_args /*NN*/)
 
 static int
 ops_jittable(PARROT_INTERP, PMC *sub, const PMC *sig_results,
-        PackFile_ByteCode *seg /*NN*/, opcode_t *pc, opcode_t *end, int *flags)
+        NOTNULL(PackFile_ByteCode *seg), opcode_t *pc, opcode_t *end, int *flags)
 {
     while (pc < end) {
         /* special opcodes which are handled, but not marked as JITtable */
@@ -317,7 +319,7 @@ op_is_ok:
 
 
 int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, PMC *sub /*NN*/,
+parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
         PMC *sig_args, PMC *sig_results, int *flags)
 {
 #ifdef HAS_JIT

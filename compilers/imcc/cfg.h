@@ -47,65 +47,65 @@ struct _IMC_Unit;
 /* HEADERIZER BEGIN: compilers/imcc/cfg.c */
 
 int blocks_are_connected(
-    const Basic_block *from /*NN*/,
-    const Basic_block *to /*NN*/ )
+    NOTNULL(const Basic_block *from),
+    NOTNULL(const Basic_block *to) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-void build_cfg( Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/ )
+void build_cfg( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void clear_basic_blocks( struct _IMC_Unit *unit /*NN*/ )
+void clear_basic_blocks( NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-void compute_dominance_frontiers( Interp *interp /*NN*/,
-    struct _IMC_Unit *unit /*NN*/ )
+void compute_dominance_frontiers( PARROT_INTERP,
+    NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void compute_dominators( Interp *interp /*NN*/,
-    struct _IMC_Unit *unit /*NN*/ )
+void compute_dominators( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int edge_count( const struct _IMC_Unit *unit /*NN*/ )
+int edge_count( NOTNULL(const struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-void find_basic_blocks( Interp *interp /*NN*/,
-    struct _IMC_Unit *unit /*NN*/,
+void find_basic_blocks( PARROT_INTERP,
+    NOTNULL(struct _IMC_Unit *unit),
     int first )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void find_loops( Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/ )
+void find_loops( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void free_life_info( const struct _IMC_Unit *unit /*NN*/, SymReg *r /*NN*/ )
+void free_life_info(
+    NOTNULL(const struct _IMC_Unit *unit),
+    NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void life_analysis( Interp *interp /*NN*/,
-    const struct _IMC_Unit *unit /*NN*/ )
+void life_analysis( PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Life_range * make_life_range( SymReg *r /*NN*/, int idx )
+Life_range * make_life_range( NOTNULL(SymReg *r), int idx )
         __attribute__nonnull__(1)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
 int natural_preheader(
-    const struct _IMC_Unit *unit /*NN*/,
-    const Loop_info* loop_info /*NN*/ )
+    NOTNULL(const struct _IMC_Unit *unit),
+    NOTNULL(const Loop_info* loop_info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-void search_predecessors_not_in( const Basic_block *node /*NN*/, Set* s )
+void search_predecessors_not_in( NOTNULL(const Basic_block *node), Set* s )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */

@@ -477,7 +477,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, hppa_iregister_t s1,
 
 static void
 Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
-                        Interp *interp)
+                        PARROT_INTERP)
 {
     /* This calculates (INDEX into op_map * 4) */
 
@@ -548,7 +548,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
     jit_emit_mov_rr(jit_info->native_ptr, r25, BASE);
     jit_emit_mov_ri_i(jit_info->native_ptr, r26, ((int)(jit_info->cur_op)));
@@ -564,7 +564,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_jit_normal_op(jit_info, interp);
     Parrot_emit_jump_to_ret(jit_info, interp);
@@ -573,7 +573,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 #  undef Parrot_jit_restart_op
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                    Interp *interp)
+                    PARROT_INTERP)
 {
     char *jmp_ptr, *sav_ptr;
 
@@ -598,7 +598,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp *interp)
+                 PARROT_INTERP)
 {
     /* Save the return address in the stack. */
     emit_stw(jit_info->native_ptr, r30, r2, -0x14);
@@ -632,7 +632,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
@@ -766,7 +766,7 @@ static const jit_arch_info arch_info = {
     }
 };
 const jit_arch_info*
-Parrot_jit_init(Interp *interp)
+Parrot_jit_init(PARROT_INTERP)
 {
     return &arch_info;
 }

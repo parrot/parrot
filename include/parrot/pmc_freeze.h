@@ -104,7 +104,7 @@ PMC* Parrot_thaw( PARROT_INTERP, STRING* image )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC* Parrot_thaw_constants( PARROT_INTERP, STRING* image /*NN*/ )
+PMC* Parrot_thaw_constants( PARROT_INTERP, NOTNULL(STRING* image) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

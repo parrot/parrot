@@ -77,35 +77,35 @@ PARROT_API
 void parrot_dump_hash( SHIM_INTERP, const Hash *hash );
 
 PARROT_API
-void parrot_hash_clone( PARROT_INTERP, Hash *hash /*NN*/, Hash **dest )
+void parrot_hash_clone( PARROT_INTERP, NOTNULL(Hash *hash), Hash **dest )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void parrot_hash_delete( PARROT_INTERP, Hash *hash /*NN*/, void *key )
+void parrot_hash_delete( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void parrot_hash_destroy( SHIM_INTERP, Hash *hash /*NN*/ )
+void parrot_hash_destroy( SHIM_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL parrot_hash_exists( PARROT_INTERP, Hash *hash /*NN*/, void *key )
+INTVAL parrot_hash_exists( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API
-void * parrot_hash_get( PARROT_INTERP, Hash *hash /*NN*/, void *key )
+void * parrot_hash_get( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
 PARROT_API
 HashBucket * parrot_hash_get_bucket( PARROT_INTERP,
-    const Hash *hash /*NN*/,
+    NOTNULL(const Hash *hash),
     void *key )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -114,8 +114,8 @@ HashBucket * parrot_hash_get_bucket( PARROT_INTERP,
 PARROT_API
 void * parrot_hash_get_idx(
     SHIM_INTERP,
-    const Hash *hash /*NN*/,
-    PMC *key /*NN*/ )
+    NOTNULL(const Hash *hash),
+    NOTNULL(PMC *key) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__pure__
@@ -123,27 +123,29 @@ void * parrot_hash_get_idx(
 
 PARROT_API
 HashBucket* parrot_hash_put( PARROT_INTERP,
-    Hash *hash /*NN*/,
+    NOTNULL(Hash *hash),
     void *key,
     void *value )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL parrot_hash_size( PARROT_INTERP, const Hash *hash /*NN*/ )
+INTVAL parrot_hash_size( PARROT_INTERP, NOTNULL(const Hash *hash) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
 PARROT_API
-void parrot_hash_visit( PARROT_INTERP, Hash *hash /*NN*/, void *pinfo /*NN*/ )
+void parrot_hash_visit( PARROT_INTERP,
+    NOTNULL(Hash *hash),
+    NOTNULL(void *pinfo) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void parrot_mark_hash( PARROT_INTERP, Hash *hash /*NN*/ )
+void parrot_mark_hash( PARROT_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -162,15 +164,15 @@ void parrot_new_pmc_hash( PARROT_INTERP, PMC *container )
         __attribute__nonnull__(1);
 
 PARROT_API
-void parrot_new_pointer_hash( SHIM_INTERP, Hash **hptr /*NN*/ )
+void parrot_new_pointer_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )
         __attribute__nonnull__(2);
 
-void parrot_chash_destroy( PARROT_INTERP, Hash *hash /*NN*/ )
+void parrot_chash_destroy( PARROT_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void parrot_new_hash_x(
-    Hash **hptr /*NN*/,
+    NOTNULL(Hash **hptr),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
@@ -179,7 +181,7 @@ void parrot_new_hash_x(
 
 void parrot_new_pmc_hash_x(
     SHIM_INTERP,
-    PMC *container /*NN*/,
+    NOTNULL(PMC *container),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,

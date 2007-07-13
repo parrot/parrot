@@ -32,7 +32,7 @@ static PMC * get_namespace_pmc( PARROT_INTERP, PMC *sub )
 static PMC * internal_ns_keyed( PARROT_INTERP,
     PMC *base_ns,
     PMC *pmc_key,
-    STRING *str_key /*NULLOK*/,
+    NULLOK(STRING *str_key),
     int flags )
         __attribute__nonnull__(1);
 
@@ -54,7 +54,7 @@ static void store_sub_in_multi( PARROT_INTERP, PMC *sub, PMC *ns )
 
 static PMC *
 internal_ns_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key,
-                               STRING *str_key /*NULLOK*/, int flags)
+                               NULLOK(STRING *str_key), int flags)
 {
     PMC *ns, *sub_ns;
     INTVAL i, n;
@@ -258,7 +258,7 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 PARROT_API
 PMC *
-Parrot_get_global(PARROT_INTERP, PMC *ns /*NULLOK*/, STRING *globalname)
+Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 {
     if (PMC_IS_NULL(ns))
         return PMCNULL;
@@ -311,7 +311,7 @@ entirely use the untyped interface.
 
 PARROT_API
 PMC *
-Parrot_find_global_n(PARROT_INTERP, PMC *ns /*NULLOK*/, STRING *globalname)
+Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 {
     PMC *res;
 
@@ -395,7 +395,7 @@ the HLL root if C<str_key> is NULL, with the name C<globalname>.
 
 PARROT_API
 void
-Parrot_store_global_n(PARROT_INTERP, PMC *ns /*NULLOK*/,
+Parrot_store_global_n(PARROT_INTERP, NULLOK(PMC *ns),
                       STRING *globalname, PMC *val)
 {
 #if DEBUG_GLOBAL
@@ -422,7 +422,7 @@ Parrot_store_global_cur(PARROT_INTERP, STRING *globalname, PMC *val)
 
 PARROT_API
 void
-Parrot_store_global_k(PARROT_INTERP, PMC *pmc_key /*NN*/,
+Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
                       STRING *globalname, PMC *val)
 {
     PMC *ns;
@@ -449,7 +449,7 @@ Parrot_store_global_k(PARROT_INTERP, PMC *pmc_key /*NN*/,
 
 PARROT_API
 void
-Parrot_store_global_s(Interp *inter /*NN*/, STRING *str_key,
+Parrot_store_global_s(NOTNULL(Interp *inter), STRING *str_key,
                       STRING *globalname, PMC *val)
 {
     PMC * const ns = Parrot_make_namespace_keyed_str(inter,
@@ -477,7 +477,7 @@ PMCNULL.
 
 PMC *
 Parrot_find_global_op(PARROT_INTERP, PMC *ns,
-                      STRING *globalname /*NN*/, void *next)
+                      NOTNULL(STRING *globalname), void *next)
 {
     PMC *res;
 

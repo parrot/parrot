@@ -72,8 +72,8 @@ supported encoding into Parrot string's internal format.
 
 PARROT_API
 void
-string_fill_from_buffer(PARROT_INTERP, const void *buffer /*NN*/,
-            UINTVAL len, const char *encoding_name, STRING *s /*NULLOK*/)
+string_fill_from_buffer(PARROT_INTERP, NOTNULL(const void *buffer),
+            UINTVAL len, const char *encoding_name, NULLOK(STRING *s))
 {
 #if PARROT_HAS_ICU
     UErrorCode icuError = U_ZERO_ERROR;
@@ -161,7 +161,7 @@ string_fill_from_buffer(PARROT_INTERP, const void *buffer /*NN*/,
    sequence, right after the \ */
 PARROT_API
 Parrot_UInt4
-string_unescape_one(PARROT_INTERP, UINTVAL *offset /*NN*/,
+string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
         STRING *string)
 {
     UINTVAL workchar = 0;

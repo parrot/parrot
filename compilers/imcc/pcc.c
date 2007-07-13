@@ -33,7 +33,7 @@ static Instruction * insINS(
     SymReg **regs,
     int n );
 
-static Instruction * move_regs( Interp *interp /*NN*/,
+static Instruction * move_regs( PARROT_INTERP,
     IMC_Unit * unit,
     Instruction *ins,
     int n,
@@ -50,10 +50,11 @@ static Instruction* pcc_get_args(
     SymReg **args,
     int *arg_flags );
 
-static int pcc_reg_mov( Interp *interp,
+static int pcc_reg_mov( PARROT_INTERP,
     unsigned char d,
     unsigned char s,
-    void *vinfo );
+    void *vinfo )
+        __attribute__nonnull__(1);
 
 static int recursive_tail_call(
     Parrot_Interp interp,
@@ -61,7 +62,7 @@ static int recursive_tail_call(
     Instruction *ins,
     SymReg *sub );
 
-static void unshift_self( SymReg *sub /*NN*/, SymReg *obj )
+static void unshift_self( NOTNULL(SymReg *sub), SymReg *obj )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -83,7 +84,7 @@ insINS(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
  * get or create the SymReg
  */
 SymReg*
-get_pasm_reg(Interp* interp /*NN*/, const char *name)
+get_pasm_reg(PARROT_INTERP, const char *name)
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
@@ -96,7 +97,7 @@ get_pasm_reg(Interp* interp /*NN*/, const char *name)
  * get or create a constant
  */
 SymReg*
-get_const(Interp *interp /*NN*/, const char *name, int type)
+get_const(PARROT_INTERP, const char *name, int type)
 {
     SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
 
@@ -169,7 +170,7 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
  * prepend the object to args or self to params
  */
 static void
-unshift_self(SymReg *sub /*NN*/, SymReg *obj)
+unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
 {
     int i;
     const int n = sub->pcc_sub->nargs;
@@ -197,7 +198,7 @@ unshift_self(SymReg *sub /*NN*/, SymReg *obj)
  */
 
 void
-expand_pcc_sub(Parrot_Interp interp, IMC_Unit *unit /*NN*/, Instruction *ins /*NN*/)
+expand_pcc_sub(Parrot_Interp interp, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
     int          nargs;
     SymReg      *sub = ins->r[0];
@@ -300,7 +301,7 @@ struct move_info_t {
 };
 
 static int
-pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
+pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
         void *vinfo)
 {
     struct move_info_t *info = (struct move_info_t *)vinfo;
@@ -362,7 +363,7 @@ pcc_reg_mov(Interp *interp, unsigned char d, unsigned char s,
 }
 
 static Instruction *
-move_regs(Interp *interp /*NN*/, IMC_Unit * unit,
+move_regs(PARROT_INTERP, IMC_Unit * unit,
         Instruction *ins, int n, SymReg **dest, SymReg **src)
 {
     unsigned char *move_list;

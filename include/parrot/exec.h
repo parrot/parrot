@@ -94,7 +94,7 @@ typedef struct Parrot_exec_objfile_t {
 } Parrot_exec_objfile_t;
 
 /* HEADERIZER BEGIN: src/exec.c */
-void Parrot_exec(Interp *interp, opcode_t *pc,
+void Parrot_exec(PARROT_INTERP, opcode_t *pc,
     opcode_t *code_start, opcode_t *code_end);
 PARROT_API void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
     char *nptr, const char *func_name);
@@ -106,12 +106,12 @@ int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol, int s
     __attribute__nonnull__(1)
     __attribute__nonnull__(2);
 
-void Parrot_exec_save(Interp *interp, Parrot_exec_objfile_t *obj, const char *file);
+void Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file);
 
-void Parrot_exec_emit_mov_mr(Interp *interp, char *mem, int reg);
-void Parrot_exec_emit_mov_mr_n(Interp *interp, char *mem, int reg);
-void Parrot_exec_emit_mov_rm(Interp *interp, int reg, char *mem);
-void Parrot_exec_emit_mov_rm_n(Interp *interp, int reg, char *mem);
+void Parrot_exec_emit_mov_mr(PARROT_INTERP, char *mem, int reg);
+void Parrot_exec_emit_mov_mr_n(PARROT_INTERP, char *mem, int reg);
+void Parrot_exec_emit_mov_rm(PARROT_INTERP, int reg, char *mem);
+void Parrot_exec_emit_mov_rm_n(PARROT_INTERP, int reg, char *mem);
 /* HEADERIZER END: src/exec.c */
 
 #endif /* EXEC_CAPABLE */

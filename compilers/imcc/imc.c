@@ -15,7 +15,7 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void imc_free_unit( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+static void imc_free_unit( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -30,7 +30,7 @@ extern FILE* yyin;
 
 PARROT_API
 void
-imc_compile_all_units(Interp *interp /*NN*/)
+imc_compile_all_units(PARROT_INTERP)
 {
     IMC_Unit *unit;
 #if ! COMPILE_IMMEDIATE
@@ -66,7 +66,7 @@ imc_compile_all_units(Interp *interp /*NN*/)
 
 PARROT_API
 void
-imc_compile_unit(Interp *interp /*NN*/, IMC_Unit *unit)
+imc_compile_unit(PARROT_INTERP, IMC_Unit *unit)
 {
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;
@@ -83,7 +83,7 @@ imc_compile_unit(Interp *interp /*NN*/, IMC_Unit *unit)
 
 PARROT_API
 void
-imc_cleanup(Interp *interp /*NN*/, void *yyscanner)
+imc_cleanup(PARROT_INTERP, void *yyscanner)
 {
     IMCC_pop_parser_state(interp, yyscanner);
     clear_globals(interp);
@@ -111,7 +111,7 @@ imc_new_unit(IMC_Unit_Type t)
  */
 
 IMC_Unit *
-imc_open_unit(Interp *interp /*NN*/, IMC_Unit_Type t)
+imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
     IMC_Unit * const unit = imc_new_unit(t);
     imc_info_t * const imc_info = IMCC_INFO(interp);
@@ -137,7 +137,7 @@ imc_open_unit(Interp *interp /*NN*/, IMC_Unit_Type t)
  * list.
  */
 void
-imc_close_unit(Interp *interp, IMC_Unit *unit /*NULLOK*/)
+imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 {
 #if COMPILE_IMMEDIATE
     if (unit) {
@@ -148,7 +148,7 @@ imc_close_unit(Interp *interp, IMC_Unit *unit /*NULLOK*/)
 }
 
 static void
-imc_free_unit(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     imc_info_t * const imc = IMCC_INFO(interp);
 

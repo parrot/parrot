@@ -14,7 +14,7 @@
 
 PARROT_API
 void
-IMCC_fatal(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
+IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     /* NORETURN */
 {
     va_list ap;
@@ -27,7 +27,7 @@ IMCC_fatal(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
 
 PARROT_API
 void
-IMCC_fataly(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
+IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     /* NORETURN */
 {
     va_list ap;
@@ -40,7 +40,7 @@ IMCC_fataly(Interp *interp /*NN*/, SHIM(int code), const char *fmt /*NN*/, ...)
 
 PARROT_API
 void
-IMCC_fatal_standalone(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
+IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 {
     va_list ap;
 
@@ -52,7 +52,7 @@ IMCC_fatal_standalone(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, .
 
 PARROT_API
 void
-IMCC_fataly_standalone(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, ...)
+IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 {
 
     va_list ap;
@@ -67,7 +67,7 @@ IMCC_fataly_standalone(Interp *interp /*NN*/, int code, const char *fmt /*NN*/, 
 
 PARROT_API
 void
-IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...)
+IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)
 {
     va_list ap;
     if (IMCC_INFO(interp)->imcc_warn)
@@ -80,7 +80,7 @@ IMCC_warning(Interp *interp /*NN*/, const char *fmt /*NN*/, ...)
 
 PARROT_API
 void
-IMCC_info(Interp *interp /*NN*/, int level, const char *fmt /*NN*/, ...)
+IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
 {
     va_list ap;
 
@@ -94,7 +94,7 @@ IMCC_info(Interp *interp /*NN*/, int level, const char *fmt /*NN*/, ...)
 
 PARROT_API
 void
-IMCC_debug(Interp *interp /*NN*/, int level, const char *fmt /*NN*/, ...)
+IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
 {
     va_list ap;
 
@@ -106,7 +106,7 @@ IMCC_debug(Interp *interp /*NN*/, int level, const char *fmt /*NN*/, ...)
 }
 
 void
-dump_instructions(Interp *interp /*NN*/, const IMC_Unit *unit /*NN*/)
+dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))
 {
     const Instruction *ins;
     int pc;
@@ -136,7 +136,7 @@ dump_instructions(Interp *interp /*NN*/, const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_cfg(const IMC_Unit *unit /*NN*/)
+dump_cfg(NOTNULL(const IMC_Unit *unit))
 {
     int i;
     Edge *e;
@@ -161,7 +161,7 @@ dump_cfg(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_loops(const IMC_Unit *unit /*NN*/)
+dump_loops(NOTNULL(const IMC_Unit *unit))
 {
     int i;
     Loop_info ** loop_info = unit->loop_info;
@@ -191,7 +191,7 @@ dump_loops(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_labels(const IMC_Unit *unit /*NN*/)
+dump_labels(NOTNULL(const IMC_Unit *unit))
 {
     int i;
     const SymHash * const hsh = &unit->hash;
@@ -214,7 +214,7 @@ dump_labels(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_symreg(const IMC_Unit *unit /*NN*/)
+dump_symreg(NOTNULL(const IMC_Unit *unit))
 {
     int i;
     SymReg** const reglist = unit->reglist;
@@ -250,7 +250,7 @@ dump_symreg(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_liveness_status(const IMC_Unit *unit /*NN*/)
+dump_liveness_status(NOTNULL(const IMC_Unit *unit))
 {
     int i;
     SymReg** const reglist = unit->reglist;
@@ -267,7 +267,7 @@ dump_liveness_status(const IMC_Unit *unit /*NN*/)
 
 
 void
-dump_liveness_status_var(const IMC_Unit *unit /*NN*/, const SymReg* r /*NN*/)
+dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r))
 {
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info) {
@@ -306,7 +306,7 @@ dump_liveness_status_var(const IMC_Unit *unit /*NN*/, const SymReg* r /*NN*/)
 }
 
 void
-dump_interference_graph(const IMC_Unit *unit /*NN*/)
+dump_interference_graph(NOTNULL(const IMC_Unit *unit))
 {
     int x;
     SymReg** const reglist = unit->reglist;
@@ -335,7 +335,7 @@ dump_interference_graph(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_dominators(const IMC_Unit *unit /*NN*/)
+dump_dominators(NOTNULL(const IMC_Unit *unit))
 {
     int i;
 
@@ -358,7 +358,7 @@ dump_dominators(const IMC_Unit *unit /*NN*/)
 }
 
 void
-dump_dominance_frontiers(const IMC_Unit *unit /*NN*/)
+dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))
 {
     int i;
 

@@ -27,25 +27,25 @@ and its utility functions.
 /* HEADERIZER BEGIN: static */
 
 static void gen_sprintf_call(
-    char *out /*NN*/,
-    SpfInfo info /*NN*/,
+    NOTNULL(char *out),
+    NOTNULL(SpfInfo info),
     int thingy )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static STRING * handle_flags( PARROT_INTERP,
     SpfInfo info,
-    STRING *str /*NN*/,
+    NOTNULL(STRING *str),
     INTVAL is_int_type,
-    STRING* prefix /*NULLOK*/ )
+    NULLOK(STRING* prefix) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static STRING* str_append_w_flags( PARROT_INTERP,
-    STRING* dest /*NN*/,
+    NOTNULL(STRING* dest),
     SpfInfo info,
-    STRING* src /*NN*/,
-    STRING *prefix /*NULLOK*/ )
+    NOTNULL(STRING* src),
+    NULLOK(STRING *prefix) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -70,7 +70,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 static STRING *
 handle_flags(PARROT_INTERP,
-             SpfInfo info, STRING *str /*NN*/, INTVAL is_int_type, STRING* prefix /*NULLOK*/)
+             SpfInfo info, NOTNULL(STRING *str), INTVAL is_int_type, NULLOK(STRING* prefix))
 {
     UINTVAL len = string_length(interp, str);
 
@@ -160,7 +160,7 @@ handle_flags(PARROT_INTERP,
 
 static STRING*
 str_append_w_flags(PARROT_INTERP,
-        STRING* dest /*NN*/, SpfInfo info, STRING* src /*NN*/, STRING *prefix /*NULLOK*/)
+        NOTNULL(STRING* dest), SpfInfo info, NOTNULL(STRING* src), NULLOK(STRING *prefix))
 {
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);
@@ -178,7 +178,7 @@ a float.
 */
 
 static void
-gen_sprintf_call(char *out /*NN*/, SpfInfo info /*NN*/, int thingy)
+gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo info), int thingy)
 {
     int i = 0;
 
@@ -237,7 +237,7 @@ This is the engine that does all the formatting.
 
 STRING *
 Parrot_sprintf_format(PARROT_INTERP,
-        STRING *pat /*NN*/, SPRINTF_OBJ *obj /*NN*/)
+        NOTNULL(STRING *pat), NOTNULL(SPRINTF_OBJ *obj))
     /* WARN_UNUSED */
 {
     INTVAL i, len, old;

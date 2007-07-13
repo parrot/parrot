@@ -102,7 +102,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 CHARSET *
-Parrot_find_charset(SHIM_INTERP, const char *charsetname /*NN*/)
+Parrot_find_charset(SHIM_INTERP, NOTNULL(const char *charsetname))
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -119,7 +119,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 CHARSET *
-Parrot_load_charset(PARROT_INTERP, const char *charsetname /*NN*/)
+Parrot_load_charset(PARROT_INTERP, NOTNULL(const char *charsetname))
 {
     UNUSED(charsetname);
 

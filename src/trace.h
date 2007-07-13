@@ -17,26 +17,26 @@
 
 /* HEADERIZER BEGIN: src/trace.c */
 
-int trace_key_dump( PARROT_INTERP, const PMC *key /*NN*/ )
+int trace_key_dump( PARROT_INTERP, NOTNULL(const PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void trace_op( PARROT_INTERP,
-    const opcode_t *code_start /*NN*/,
-    const opcode_t *code_end /*NN*/,
-    const opcode_t *pc /*NULLOK*/ )
+    NOTNULL(const opcode_t *code_start),
+    NOTNULL(const opcode_t *code_end),
+    NULLOK(const opcode_t *pc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 void trace_op_dump( PARROT_INTERP,
-    const opcode_t *code_start /*NN*/,
-    const opcode_t *pc /*NN*/ )
+    NOTNULL(const opcode_t *code_start),
+    NOTNULL(const opcode_t *pc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void trace_pmc_dump( PARROT_INTERP, PMC *pmc /*NN*/ )
+void trace_pmc_dump( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

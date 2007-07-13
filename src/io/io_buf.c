@@ -95,7 +95,7 @@ static INTVAL PIO_buf_setlinebuf( PARROT_INTERP,
 static PIOOFF_T PIO_buf_tell(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static size_t PIO_buf_write( PARROT_INTERP,
@@ -821,7 +821,7 @@ The buffer layer's C<Tell> function.
 */
 
 static PIOOFF_T
-PIO_buf_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_buf_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     return io->fpos;
 }

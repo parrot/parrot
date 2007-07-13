@@ -70,7 +70,7 @@ static void load_prederef( PARROT_INTERP, int which )
         __attribute__nonnull__(1);
 
 static void notify_func_table( PARROT_INTERP,
-    op_func_t* table /*NN*/,
+    NOTNULL(op_func_t* table),
     int on )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -78,8 +78,8 @@ static void notify_func_table( PARROT_INTERP,
 static void prederef_args(
     void **pc_prederef,
     PARROT_INTERP,
-    opcode_t *pc /*NN*/,
-    const op_info_t *opinfo /*NN*/ )
+    NOTNULL(opcode_t *pc),
+    NOTNULL(const op_info_t *opinfo) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -93,7 +93,7 @@ static opcode_t * runops_exec( PARROT_INTERP, opcode_t *pc )
 static opcode_t * runops_jit( PARROT_INTERP, opcode_t *pc )
         __attribute__nonnull__(1);
 
-static opcode_t * runops_switch( PARROT_INTERP, opcode_t *pc /*NN*/ )
+static opcode_t * runops_switch( PARROT_INTERP, NOTNULL(opcode_t *pc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -117,7 +117,7 @@ C<pc_prederef> is the current opcode.
 
 static void
 prederef_args(void **pc_prederef, PARROT_INTERP,
-        opcode_t *pc /*NN*/, const op_info_t *opinfo /*NN*/)
+        NOTNULL(opcode_t *pc), NOTNULL(const op_info_t *opinfo))
 {
     const PackFile_ConstTable * const const_table = interp->code->const_table;
 
@@ -679,7 +679,7 @@ Runs the C<switch> core.
 */
 
 static opcode_t *
-runops_switch(PARROT_INTERP, opcode_t *pc /*NN*/)
+runops_switch(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t *pc_prederef;
@@ -1078,7 +1078,7 @@ Tell the interpreter's running core about the new function table.
 */
 
 static void
-notify_func_table(PARROT_INTERP, op_func_t* table /*NN*/, int on)
+notify_func_table(PARROT_INTERP, NOTNULL(op_func_t* table), int on)
 {
     const oplib_init_f init_func = get_op_lib_init(interp, 1, interp->run_core, NULL);
 

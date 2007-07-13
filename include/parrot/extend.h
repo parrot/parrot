@@ -59,7 +59,7 @@ typedef const void * Parrot_VTABLE;
 
 PARROT_API
 void * Parrot_call_method(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     Parrot_PMC obj,
     Parrot_String method,
@@ -69,7 +69,7 @@ void * Parrot_call_method(
 
 PARROT_API
 Parrot_Float Parrot_call_method_ret_float(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     Parrot_PMC obj,
     Parrot_String method,
@@ -79,7 +79,7 @@ Parrot_Float Parrot_call_method_ret_float(
 
 PARROT_API
 Parrot_Int Parrot_call_method_ret_int(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     Parrot_PMC obj,
     Parrot_String method,
@@ -89,7 +89,7 @@ Parrot_Int Parrot_call_method_ret_int(
 
 PARROT_API
 void* Parrot_call_sub(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     const char *signature,
     ... )
@@ -97,7 +97,7 @@ void* Parrot_call_sub(
 
 PARROT_API
 Parrot_Float Parrot_call_sub_ret_float(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     const char *signature,
     ... )
@@ -105,7 +105,7 @@ Parrot_Float Parrot_call_sub_ret_float(
 
 PARROT_API
 Parrot_Int Parrot_call_sub_ret_int(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC sub,
     const char *signature,
     ... )
@@ -113,7 +113,7 @@ Parrot_Int Parrot_call_sub_ret_int(
 
 PARROT_API
 Parrot_Language Parrot_find_language(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     char *language )
         __attribute__nonnull__(1);
 
@@ -121,32 +121,36 @@ PARROT_API
 void Parrot_free_cstring( char *string );
 
 PARROT_API
-Parrot_PMC Parrot_get_dod_registry( Parrot_Interp interp /*NN*/ )
+Parrot_PMC Parrot_get_dod_registry( NOTNULL(Parrot_Interp interp) )
         __attribute__nonnull__(1);
 
 PARROT_API
-Parrot_Int Parrot_get_intreg( Parrot_Interp interp /*NN*/, Parrot_Int regnum )
-        __attribute__nonnull__(1);
-
-PARROT_API
-Parrot_Float Parrot_get_numreg(
-    Parrot_Interp interp /*NN*/,
+Parrot_Int Parrot_get_intreg(
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum )
         __attribute__nonnull__(1);
 
 PARROT_API
-Parrot_PMC Parrot_get_pmcreg( Parrot_Interp interp /*NN*/, Parrot_Int regnum )
+Parrot_Float Parrot_get_numreg(
+    NOTNULL(Parrot_Interp interp),
+    Parrot_Int regnum )
+        __attribute__nonnull__(1);
+
+PARROT_API
+Parrot_PMC Parrot_get_pmcreg(
+    NOTNULL(Parrot_Interp interp),
+    Parrot_Int regnum )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_String Parrot_get_strreg(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_VTABLE Parrot_get_vtable(
-    const Parrot_Interp interp /*NN*/,
+    NOTNULL(const Parrot_Interp interp),
     Parrot_Int id )
         __attribute__nonnull__(1)
         __attribute__pure__
@@ -154,7 +158,7 @@ Parrot_VTABLE Parrot_get_vtable(
 
 PARROT_API
 Parrot_String Parrot_new_string(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     char *buffer,
     int length,
     const char * const encoding_name,
@@ -163,20 +167,20 @@ Parrot_String Parrot_new_string(
 
 PARROT_API
 void Parrot_PMC_delete_pmckey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_PMC key )
         __attribute__nonnull__(1);
 
 PARROT_API
-char * Parrot_PMC_get_cstring( Parrot_Interp interp /*NN*/, Parrot_PMC pmc )
+char * Parrot_PMC_get_cstring( NOTNULL(Parrot_Interp interp), Parrot_PMC pmc )
         __attribute__nonnull__(1)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
 PARROT_API
 char * Parrot_PMC_get_cstring_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1)
@@ -185,9 +189,9 @@ char * Parrot_PMC_get_cstring_intkey(
 
 PARROT_API
 char * Parrot_PMC_get_cstringn(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
-    Parrot_Int *length /*NN*/ )
+    NOTNULL(Parrot_Int *length) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__
@@ -195,9 +199,9 @@ char * Parrot_PMC_get_cstringn(
 
 PARROT_API
 char * Parrot_PMC_get_cstringn_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
-    Parrot_Int *length /*NN*/,
+    NOTNULL(Parrot_Int *length),
     Parrot_Int key )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -206,60 +210,60 @@ char * Parrot_PMC_get_cstringn_intkey(
 
 PARROT_API
 Parrot_Int Parrot_PMC_get_intval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_Int Parrot_PMC_get_intval_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_Int Parrot_PMC_get_intval_pmckey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_PMC key )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_Float Parrot_PMC_get_numval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_Float Parrot_PMC_get_numval_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_PMC Parrot_PMC_get_pmc_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1);
 
 PARROT_API
 void * Parrot_PMC_get_pointer_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_String Parrot_PMC_get_string_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
         __attribute__nonnull__(1);
 
 PARROT_API
-Parrot_PMC Parrot_PMC_new( Parrot_Interp interp /*NN*/, Parrot_Int type )
+Parrot_PMC Parrot_PMC_new( NOTNULL(Parrot_Interp interp), Parrot_Int type )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -267,37 +271,37 @@ Parrot_PMC Parrot_PMC_null( void );
 
 PARROT_API
 void Parrot_PMC_push_intval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_push_numval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Float value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_cstring(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     const char *value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_cstring_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
-    const char *value /*NN*/ )
+    NOTNULL(const char *value) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_PMC_set_cstringn(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     const char *value,
     Parrot_Int length )
@@ -305,7 +309,7 @@ void Parrot_PMC_set_cstringn(
 
 PARROT_API
 void Parrot_PMC_set_cstringn_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     const char *value,
@@ -314,14 +318,14 @@ void Parrot_PMC_set_cstringn_intkey(
 
 PARROT_API
 void Parrot_PMC_set_intval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_intval_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     Parrot_Int value )
@@ -329,14 +333,14 @@ void Parrot_PMC_set_intval_intkey(
 
 PARROT_API
 void Parrot_PMC_set_numval(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Float value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_numval_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     Parrot_Float value )
@@ -344,7 +348,7 @@ void Parrot_PMC_set_numval_intkey(
 
 PARROT_API
 void Parrot_PMC_set_pmc_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     Parrot_PMC value )
@@ -352,7 +356,7 @@ void Parrot_PMC_set_pmc_intkey(
 
 PARROT_API
 void Parrot_PMC_set_pmc_pmckey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_PMC key,
     Parrot_PMC value )
@@ -360,7 +364,7 @@ void Parrot_PMC_set_pmc_pmckey(
 
 PARROT_API
 void Parrot_PMC_set_pointer_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     void *value )
@@ -368,14 +372,14 @@ void Parrot_PMC_set_pointer_intkey(
 
 PARROT_API
 void Parrot_PMC_set_string(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_String value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_PMC_set_string_intkey(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key,
     Parrot_String value )
@@ -389,44 +393,44 @@ void Parrot_PMC_set_vtable(
 
 PARROT_API
 Parrot_Int Parrot_PMC_typenum(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     const char *_class )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_register_pmc( Parrot_Interp interp /*NN*/, Parrot_PMC pmc )
+void Parrot_register_pmc( NOTNULL(Parrot_Interp interp), Parrot_PMC pmc )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_set_intreg(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum,
     Parrot_Int value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_set_numreg(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum,
     Parrot_Float value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_set_pmcreg(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum,
     Parrot_PMC value )
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_set_strreg(
-    Parrot_Interp interp /*NN*/,
+    NOTNULL(Parrot_Interp interp),
     Parrot_Int regnum,
     Parrot_String value )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_unregister_pmc( Parrot_Interp interp /*NN*/, Parrot_PMC pmc )
+void Parrot_unregister_pmc( NOTNULL(Parrot_Interp interp), Parrot_PMC pmc )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/extend.c */

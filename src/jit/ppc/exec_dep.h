@@ -18,7 +18,7 @@
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
 }
 
@@ -26,7 +26,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
     add_disp(jit_info->native_ptr, r3,
         ((long)jit_info->cur_op - (long)interp->code->base.data));
@@ -42,7 +42,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_exec_normal_op(jit_info, interp);
     jit_emit_sub_rrr(jit_info->native_ptr, r3, r3, r15);
@@ -54,7 +54,7 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                       Interp *interp)
+                       PARROT_INTERP)
 {
 }
 

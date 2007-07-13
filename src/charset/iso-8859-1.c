@@ -26,11 +26,11 @@ static STRING* compose( PARROT_INTERP, STRING *src )
 static STRING* decompose( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
 
-static void downcase( PARROT_INTERP, STRING *source_string /*NN*/ )
+static void downcase( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void downcase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+static void downcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -43,7 +43,7 @@ static INTVAL find_cclass( PARROT_INTERP,
 
 static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string /*NN*/,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
         __attribute__nonnull__(1)
@@ -51,7 +51,7 @@ static INTVAL find_not_cclass( PARROT_INTERP,
 
 static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string /*NN*/,
+    NOTNULL(STRING *source_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -69,30 +69,28 @@ static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
 static void titlecase( PARROT_INTERP, STRING *source_string )
         __attribute__nonnull__(1);
 
-static void titlecase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+static void titlecase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static STRING * to_charset( PARROT_INTERP, STRING *src, STRING *dest )
         __attribute__nonnull__(1);
 
-static STRING * to_latin1( PARROT_INTERP, STRING *src /*NN*/, STRING *dest )
+static STRING * to_latin1( PARROT_INTERP, NOTNULL(STRING *src), STRING *dest )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_unicode( PARROT_INTERP,
-    STRING *src,
-    STRING *dest /*NULLOK*/ )
+static STRING * to_unicode( PARROT_INTERP, STRING *src, NULLOK(STRING *dest) )
         __attribute__nonnull__(1);
 
 static void upcase( PARROT_INTERP, STRING *source_string )
         __attribute__nonnull__(1);
 
-static void upcase_first( PARROT_INTERP, STRING *source_string /*NN*/ )
+static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL validate( PARROT_INTERP, STRING *src /*NN*/ )
+static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -120,7 +118,7 @@ set_graphemes(PARROT_INTERP, STRING *source_string,
 }
 
 static STRING *
-to_latin1(PARROT_INTERP, STRING *src /*NN*/, STRING *dest)
+to_latin1(PARROT_INTERP, NOTNULL(STRING *src), STRING *dest)
 {
     UINTVAL offs, src_len;
     String_iter iter;
@@ -149,7 +147,7 @@ to_latin1(PARROT_INTERP, STRING *src /*NN*/, STRING *dest)
 }
 
 static STRING *
-to_unicode(PARROT_INTERP, STRING *src, STRING *dest /*NULLOK*/)
+to_unicode(PARROT_INTERP, STRING *src, NULLOK(STRING *dest))
 {
     if (dest) {
         UINTVAL offs;
@@ -235,7 +233,7 @@ upcase(PARROT_INTERP, STRING *source_string)
 }
 
 static void
-downcase(PARROT_INTERP, STRING *source_string /*NN*/)
+downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     if (source_string->strlen) {
         UINTVAL offset;
@@ -284,7 +282,7 @@ titlecase(PARROT_INTERP, STRING *source_string)
 }
 
 static void
-upcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
+upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     if (source_string->strlen) {
         unsigned char *buffer;
@@ -302,7 +300,7 @@ upcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
 }
 
 static void
-downcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
+downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     if (source_string->strlen) {
         unsigned char *buffer;
@@ -321,14 +319,14 @@ downcase_first(PARROT_INTERP, STRING *source_string /*NN*/)
 }
 
 static void
-titlecase_first(PARROT_INTERP, STRING *source_string /*NN*/)
+titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     upcase_first(interp, source_string);
 }
 
 
 static UINTVAL
-validate(PARROT_INTERP, STRING *src /*NN*/)
+validate(PARROT_INTERP, NOTNULL(STRING *src))
 {
     UINTVAL offset;
 
@@ -342,7 +340,7 @@ validate(PARROT_INTERP, STRING *src /*NN*/)
 
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags,
-          STRING *source_string /*NN*/, UINTVAL offset)
+          NOTNULL(STRING *source_string), UINTVAL offset)
 {
     UINTVAL codepoint;
 
@@ -377,7 +375,7 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
-                STRING *source_string /*NN*/, UINTVAL offset, UINTVAL count)
+                NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -440,7 +438,7 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 }
 
 STRING *
-charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src /*NN*/, STRING *dest /*NULLOK*/)
+charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
     /* WARN_UNUSED */
 {
     UINTVAL offs, c;

@@ -61,21 +61,21 @@ static INTVAL PIO_unix_async( PARROT_INTERP,
 static INTVAL PIO_unix_bind(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
+    NOTNULL(ParrotIO *io),
     STRING *l )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_close(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_connect(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
-    STRING *r /*NULLOK*/ )
+    NOTNULL(ParrotIO *io),
+    NULLOK(STRING *r) )
         __attribute__nonnull__(3);
 
 static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
@@ -87,7 +87,7 @@ static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
 static INTVAL PIO_unix_flush(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_init( PARROT_INTERP, ParrotIOLayer *layer )
@@ -97,7 +97,7 @@ static INTVAL PIO_unix_isatty( PIOHANDLE fd );
 static INTVAL PIO_unix_listen(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
+    NOTNULL(ParrotIO *io),
     INTVAL sec )
         __attribute__nonnull__(3);
 
@@ -136,7 +136,7 @@ static INTVAL PIO_unix_recv( PARROT_INTERP,
 static PIOOFF_T PIO_unix_seek(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
+    NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
@@ -144,7 +144,7 @@ static PIOOFF_T PIO_unix_seek(
 static INTVAL PIO_unix_send(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
+    NOTNULL(ParrotIO *io),
     STRING *s )
         __attribute__nonnull__(3);
 
@@ -158,7 +158,7 @@ static ParrotIO * PIO_unix_socket( PARROT_INTERP,
 static PIOOFF_T PIO_unix_tell(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static size_t PIO_unix_write(
@@ -425,7 +425,7 @@ Closes C<*io>'s file descriptor.
 */
 
 static INTVAL
-PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     if (io->fd >= 0)
         close(io->fd);
@@ -502,7 +502,7 @@ XXX: Is it necessary to C<sync()> here?
 */
 
 static INTVAL
-PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     return fsync(io->fd);
 }
@@ -608,7 +608,7 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 static PIOOFF_T
-PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/,
+PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
               PIOOFF_T offset, INTVAL whence)
 {
     const PIOOFF_T pos = lseek(io->fd, offset, whence);
@@ -646,7 +646,7 @@ Returns the current read/write position on C<*io>'s file discriptor.
 */
 
 static PIOOFF_T
-PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     const PIOOFF_T pos = lseek(io->fd, (PIOOFF_T)0, SEEK_CUR);
 
@@ -753,7 +753,7 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 static INTVAL
-PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/, STRING *r /*NULLOK*/)
+PIO_unix_connect(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NULLOK(STRING *r))
 {
     if (r) {
         memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
@@ -785,7 +785,7 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 static INTVAL
-PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/, STRING *l)
+PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), STRING *l)
 {
     if (!l)
         return -1;
@@ -810,7 +810,7 @@ C<SEQ> sockets.
 */
 
 static INTVAL
-PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/, INTVAL sec)
+PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL sec)
 {
     if ((listen(io->fd, sec)) == -1) {
         return -1;
@@ -861,7 +861,7 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/, STRING *s)
+PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), STRING *s)
 {
     int error, bytes, byteswrote;
 

@@ -30,7 +30,7 @@ INTVAL Parrot_get_ctx_HLL_type( PARROT_INTERP, INTVAL core_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_HLL_id( PARROT_INTERP, STRING *hll_name /*NULLOK*/ )
+INTVAL Parrot_get_HLL_id( PARROT_INTERP, NULLOK(STRING *hll_name) )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
@@ -52,7 +52,7 @@ void Parrot_regenerate_HLL_namespaces( PARROT_INTERP )
 
 PARROT_API
 INTVAL Parrot_register_HLL( PARROT_INTERP,
-    STRING *hll_name /*NULLOK*/,
+    NULLOK(STRING *hll_name),
     STRING *hll_lib )
         __attribute__nonnull__(1);
 

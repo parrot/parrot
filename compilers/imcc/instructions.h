@@ -99,22 +99,21 @@ enum Emitter_type { EMIT_FILE, EMIT_PBC };
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 
 PARROT_API
-int emit_close( Interp *interp, void *param );
+int emit_close( PARROT_INTERP, void *param )
+        __attribute__nonnull__(1);
 
 PARROT_API
-int emit_flush( Interp *interp /*NN*/,
-    void *param,
-    struct _IMC_Unit *unit /*NN*/ )
+int emit_flush( PARROT_INTERP, void *param, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-int emit_open( Interp *interp /*NN*/, int type, void *param )
+int emit_open( PARROT_INTERP, int type, void *param )
         __attribute__nonnull__(1);
 
 Instruction * _mk_instruction(
-    const char *op /*NN*/,
-    const char *fmt /*NN*/,
+    NOTNULL(const char *op),
+    NOTNULL(const char *fmt),
     int n,
     SymReg ** r,
     int flags )
@@ -124,78 +123,80 @@ Instruction * _mk_instruction(
         __attribute__warn_unused_result__;
 
 Instruction * delete_ins(
-    struct _IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NN*/,
+    NOTNULL(struct _IMC_Unit *unit),
+    NOTNULL(Instruction *ins),
     int needs_freeing )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Instruction * emitb( Interp *interp /*NN*/,
-    struct _IMC_Unit *unit /*NULLOK*/,
-    Instruction *i /*NULLOK*/ )
+Instruction * emitb( PARROT_INTERP,
+    NULLOK(struct _IMC_Unit *unit),
+    NULLOK(Instruction *i) )
         __attribute__nonnull__(1);
 
-void free_ins( Instruction *ins /*NN*/ )
+void free_ins( NOTNULL(Instruction *ins) )
         __attribute__nonnull__(1);
 
-SymReg * get_branch_reg( const Instruction *ins /*NN*/ )
+SymReg * get_branch_reg( NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1);
 
-int get_branch_regno( const Instruction *ins /*NN*/ )
+int get_branch_regno( NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1);
 
-void imcc_init_tables( Interp *interp /*NN*/ )
+void imcc_init_tables( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-int ins_print( Interp *interp /*NN*/,
-    FILE *fd /*NN*/,
-    const Instruction *ins /*NN*/ )
+int ins_print( PARROT_INTERP,
+    NOTNULL(FILE *fd),
+    NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-int ins_reads2( const Instruction *ins /*NN*/, int t )
+int ins_reads2( NOTNULL(const Instruction *ins), int t )
         __attribute__nonnull__(1);
 
-int ins_writes2( const Instruction *ins /*NN*/, int t )
+int ins_writes2( NOTNULL(const Instruction *ins), int t )
         __attribute__nonnull__(1);
 
 void insert_ins(
-    struct _IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NULLOK*/,
-    Instruction *tmp /*NN*/ )
+    NOTNULL(struct _IMC_Unit *unit),
+    NULLOK(Instruction *ins),
+    NOTNULL(Instruction *tmp) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int instruction_reads( const Instruction *ins /*NN*/, const SymReg *r /*NN*/ )
+int instruction_reads(
+    NOTNULL(const Instruction *ins),
+    NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 int instruction_writes(
-    const Instruction *ins /*NN*/,
-    const SymReg *r /*NN*/ )
+    NOTNULL(const Instruction *ins),
+    NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 Instruction * move_ins(
-    struct _IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NN*/,
-    Instruction *to /*NN*/ )
+    NOTNULL(struct _IMC_Unit *unit),
+    NOTNULL(Instruction *ins),
+    NOTNULL(Instruction *to) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 void prepend_ins(
-    struct _IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NULLOK*/,
-    Instruction *tmp /*NN*/ )
+    NOTNULL(struct _IMC_Unit *unit),
+    NULLOK(Instruction *ins),
+    NOTNULL(Instruction *tmp) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 void subst_ins(
-    struct _IMC_Unit *unit /*NN*/,
-    Instruction *ins /*NN*/,
-    Instruction *tmp /*NN*/,
+    NOTNULL(struct _IMC_Unit *unit),
+    NOTNULL(Instruction *ins),
+    NOTNULL(Instruction *tmp),
     int needs_freeing )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -156,7 +156,7 @@ INTVAL PIO_bind_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 INTVAL PIO_close_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
@@ -169,20 +169,20 @@ INTVAL PIO_connect_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 INTVAL PIO_eof_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 ParrotIO * PIO_fdopen_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     PIOHANDLE fd,
     INTVAL flags )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 INTVAL PIO_flush_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
@@ -195,9 +195,9 @@ INTVAL PIO_listen_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 ParrotIO * PIO_open_async_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
-    const char *name /*NN*/,
-    const char *mode /*NN*/,
+    NULLOK(ParrotIOLayer *layer),
+    NOTNULL(const char *name),
+    NOTNULL(const char *mode),
     DummyCodeRef * dummy )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -205,15 +205,15 @@ ParrotIO * PIO_open_async_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 ParrotIO * PIO_open_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
-    const char *name /*NN*/,
+    NULLOK(ParrotIOLayer *layer),
+    NOTNULL(const char *name),
     INTVAL flags )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 size_t PIO_peek_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     STRING ** buf )
         __attribute__nonnull__(1)
@@ -229,7 +229,7 @@ INTVAL PIO_poll_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 size_t PIO_read_async_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     STRING ** buf,
     DummyCodeRef *dummy )
@@ -237,7 +237,7 @@ size_t PIO_read_async_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 size_t PIO_read_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     STRING ** buf )
         __attribute__nonnull__(1)
@@ -251,7 +251,7 @@ INTVAL PIO_recv_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 PIOOFF_T PIO_seek_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     PIOOFF_T offset,
     INTVAL whence )
@@ -266,14 +266,14 @@ INTVAL PIO_send_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 INTVAL PIO_setbuf_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     size_t bufsize )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 INTVAL PIO_setlinebuf_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
@@ -287,13 +287,13 @@ ParrotIO * PIO_socket_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 PIOOFF_T PIO_tell_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
 size_t PIO_write_async_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     STRING *s,
     DummyCodeRef *dummy )
@@ -301,7 +301,7 @@ size_t PIO_write_async_down( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 size_t PIO_write_down( PARROT_INTERP,
-    ParrotIOLayer *layer /*NULLOK*/,
+    NULLOK(ParrotIOLayer *layer),
     ParrotIO * io,
     STRING *s )
         __attribute__nonnull__(1)

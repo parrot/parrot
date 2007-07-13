@@ -5,35 +5,37 @@
 
 /* HEADERIZER BEGIN: compilers/imcc/optimizer.c */
 
-int cfg_optimize( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+int cfg_optimize( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-const char * get_neg_op( const char *op /*NN*/, int *n /*NN*/ )
+const char * get_neg_op( NOTNULL(const char *op), NOTNULL(int *n) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Instruction * IMCC_subst_constants( Interp *interp,
+Instruction * IMCC_subst_constants( PARROT_INTERP,
     IMC_Unit * unit,
-    const char *name /*NN*/,
+    NOTNULL(const char *name),
     SymReg **r,
     int n,
-    int *ok /*NN*/ )
+    NOTNULL(int *ok) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(6);
 
-Instruction * IMCC_subst_constants_umix( Interp *interp,
+Instruction * IMCC_subst_constants_umix( PARROT_INTERP,
     IMC_Unit * unit,
-    const char *name /*NN*/,
+    NOTNULL(const char *name),
     SymReg **r,
     int n )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int optimize( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+int optimize( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int pre_optimize( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+int pre_optimize( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

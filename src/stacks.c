@@ -232,7 +232,7 @@ variable or something.
 PARROT_API
 void
 stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
-           NOTNULL(void *thing), Stack_entry_type type, NOTNULL(Stack_cleanup_method cleanup))
+           NOTNULL(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))
 {
     Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
 
@@ -276,7 +276,7 @@ Pop off an entry and return a pointer to the contents.
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void *
 stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
           NULLOK(void *where), Stack_entry_type type)

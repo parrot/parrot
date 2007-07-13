@@ -29,7 +29,7 @@ contiguous region of memory.
 
 PARROT_API
 opcode_t
-PackFile_pack_size(PARROT_INTERP, PackFile *self /*NN*/)
+PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
 {
     size_t size;
     PackFile_Directory * const dir = &self->directory;
@@ -62,7 +62,7 @@ Other pack routines are in F<src/packfile.c>.
 
 PARROT_API
 void
-PackFile_pack(PARROT_INTERP, PackFile *self /*NN*/, opcode_t *cursor /*NN*/)
+PackFile_pack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *cursor))
 {
     opcode_t *ret;
 
@@ -102,7 +102,7 @@ constant table into a contiguous region of memory.
 
 PARROT_API
 size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, PackFile_Segment *seg /*NN*/)
+PackFile_ConstTable_pack_size(PARROT_INTERP, NOTNULL(PackFile_Segment *seg))
 {
     opcode_t i;
     PackFile_ConstTable* const self = (PackFile_ConstTable *) seg;
@@ -130,7 +130,7 @@ C<PackFile_ConstTable_pack()>
 PARROT_API
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        PackFile_Segment *seg /*NN*/, opcode_t *cursor)
+        NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
 {
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     opcode_t i;
@@ -156,7 +156,7 @@ constant is in constant table, so we have to search for it.
 PARROT_API
 int
 PackFile_find_in_const(PARROT_INTERP,
-        const PackFile_ConstTable *ct /*NN*/, const PMC *key /*NN*/, int type)
+        NOTNULL(const PackFile_ConstTable *ct), NOTNULL(const PMC *key), int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
@@ -191,8 +191,8 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 PARROT_API
 opcode_t *
 PackFile_Constant_pack(PARROT_INTERP,
-        const PackFile_ConstTable *const_table /*NN*/,
-        const PackFile_Constant *self /*NN*/, opcode_t *cursor /*NN*/)
+        NOTNULL(const PackFile_ConstTable *const_table),
+        NOTNULL(const PackFile_Constant *self), NOTNULL(opcode_t *cursor))
 {
     PMC *key;
     size_t i;

@@ -146,7 +146,7 @@ struct STM_saved_tx_log {
 };
 typedef struct STM_saved_tx_log STM_saved_tx_log;
 
-STM_tx_log *Parrot_STM_tx_log_get(Interp *interp);
+STM_tx_log *Parrot_STM_tx_log_get(PARROT_INTERP);
 
 #endif /* PARROT_STM_INTERNAL_H_GUARD */
 

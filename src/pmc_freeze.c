@@ -37,7 +37,7 @@ void Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
 
 /* XXX This should be in a header file. */
 extern void
-Parrot_default_thawfinish(Interp* interp, PMC* pmc, visit_info *info);
+Parrot_default_thawfinish(PARROT_INTERP, PMC* pmc, visit_info *info);
 
 
 /* HEADERIZER HFILE: include/parrot/pmc_freeze.h */
@@ -45,31 +45,31 @@ Parrot_default_thawfinish(Interp* interp, PMC* pmc, visit_info *info);
 
 static void add_pmc_next_for_GC(
     SHIM_INTERP,
-    PMC *pmc /*NN*/,
-    visit_info *info /*NN*/ )
+    NOTNULL(PMC *pmc),
+    NOTNULL(visit_info *info) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void add_pmc_todo_list( PARROT_INTERP,
     PMC *pmc,
-    visit_info *info /*NN*/ )
+    NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static void cleanup_next_for_GC( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-static void cleanup_next_for_GC_pool( Small_Object_Pool *pool /*NN*/ )
+static void cleanup_next_for_GC_pool( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
-static void create_image( PARROT_INTERP, PMC *pmc, visit_info *info /*NN*/ )
+static void create_image( PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
 static void do_action( PARROT_INTERP,
     PMC *pmc,
-    visit_info *info /*NN*/,
+    NOTNULL(visit_info *info),
     int seen,
     UINTVAL id )
         __attribute__nonnull__(1)
@@ -87,7 +87,7 @@ static void freeze_pmc( PARROT_INTERP,
     UINTVAL id )
         __attribute__nonnull__(1);
 
-static void ft_init( PARROT_INTERP, visit_info *info /*NN*/ )
+static void ft_init( PARROT_INTERP, NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -108,7 +108,7 @@ PARROT_INLINE
 static void op_check_size( PARROT_INTERP, STRING *s, size_t len )
         __attribute__nonnull__(1);
 
-static void pmc_add_ext( PARROT_INTERP, PMC *pmc /*NN*/ )
+static void pmc_add_ext( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -137,7 +137,7 @@ static void push_opcode_string( PARROT_INTERP, IMAGE_IO *io, STRING* v )
         __attribute__nonnull__(1);
 
 static PMC* run_thaw( PARROT_INTERP,
-    STRING* image /*NN*/,
+    NOTNULL(STRING* image),
     visit_enum_type what )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -172,40 +172,40 @@ static int thaw_pmc( PARROT_INTERP,
     INTVAL *type )
         __attribute__nonnull__(1);
 
-static void todo_list_init( PARROT_INTERP, visit_info *info /*NN*/ )
+static void todo_list_init( PARROT_INTERP, NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_INLINE
 static int todo_list_seen( PARROT_INTERP,
     PMC *pmc,
-    visit_info *info /*NN*/,
-    UINTVAL *id /*NN*/ )
+    NOTNULL(visit_info *info),
+    NOTNULL(UINTVAL *id) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void visit_loop_next_for_GC( PARROT_INTERP,
-    PMC *current /*NN*/,
+    NOTNULL(PMC *current),
     visit_info *info )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void visit_loop_todo_list( PARROT_INTERP,
     PMC *current,
-    visit_info *info /*NN*/ )
+    NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static void visit_next_for_GC( PARROT_INTERP,
     PMC* pmc,
-    visit_info* info /*NN*/ )
+    NOTNULL(visit_info* info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static void visit_todo_list( PARROT_INTERP,
     PMC* pmc,
-    visit_info* info /*NN*/ )
+    NOTNULL(visit_info* info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -668,7 +668,7 @@ Adds a C<PMC_EXT> to C<*pmc>.
 */
 
 static void
-pmc_add_ext(PARROT_INTERP, PMC *pmc /*NN*/)
+pmc_add_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
         add_pmc_ext(interp, pmc);
@@ -683,7 +683,7 @@ Sets all the C<next_for_GC> pointers to C<NULL>.
 */
 
 static void
-cleanup_next_for_GC_pool(Small_Object_Pool *pool /*NN*/)
+cleanup_next_for_GC_pool(NOTNULL(Small_Object_Pool *pool))
 {
     Small_Object_Arena *arena;
 
@@ -755,7 +755,7 @@ Initializes the freeze/thaw subsystem.
 */
 
 static void
-ft_init(PARROT_INTERP, visit_info *info /*NN*/)
+ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
 {
     STRING *s = info->image;
     PackFile *pf;
@@ -803,7 +803,7 @@ Initializes the C<*info> lists.
 */
 
 static void
-todo_list_init(PARROT_INTERP, visit_info *info /*NN*/)
+todo_list_init(PARROT_INTERP, NOTNULL(visit_info *info))
 {
     info->visit_pmc_now = visit_todo_list;
     info->visit_pmc_later = add_pmc_todo_list;
@@ -919,7 +919,7 @@ Currently only C<VISIT_FREEZE_NORMAL> is implemented.
 
 PARROT_INLINE
 static void
-do_action(PARROT_INTERP, PMC *pmc, visit_info *info /*NN*/,
+do_action(PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info),
         int seen, UINTVAL id)
 {
     switch (info->what) {
@@ -1104,7 +1104,7 @@ Remembers the PMC for later processing.
 */
 
 static void
-add_pmc_next_for_GC(SHIM_INTERP, PMC *pmc /*NN*/, visit_info *info /*NN*/)
+add_pmc_next_for_GC(SHIM_INTERP, NOTNULL(PMC *pmc), NOTNULL(visit_info *info))
 {
     if (pmc->pmc_ext) {
         PMC_next_for_GC(info->mark_ptr) = pmc;
@@ -1163,7 +1163,7 @@ Remembers the PMC to be processed later.
 */
 
 static void
-add_pmc_todo_list(PARROT_INTERP, PMC *pmc, visit_info *info /*NN*/)
+add_pmc_todo_list(PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info))
 {
     list_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
@@ -1180,8 +1180,8 @@ are flags.
 
 PARROT_INLINE
 static int
-todo_list_seen(PARROT_INTERP, PMC *pmc, visit_info *info /*NN*/,
-        UINTVAL *id /*NN*/)
+todo_list_seen(PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info),
+        NOTNULL(UINTVAL *id))
 {
     HashBucket * const b =
         parrot_hash_get_bucket(interp, (Hash *)PMC_struct_val(info->seen), pmc);
@@ -1212,7 +1212,7 @@ appropriate action.
 */
 
 static void
-visit_next_for_GC(PARROT_INTERP, PMC* pmc, visit_info* info /*NN*/)
+visit_next_for_GC(PARROT_INTERP, PMC* pmc, NOTNULL(visit_info* info))
 {
     UINTVAL id;
     const int seen = next_for_GC_seen(interp, pmc, info, &id);
@@ -1238,7 +1238,7 @@ Checks the seen PMC via the todo list.
 */
 
 static void
-visit_todo_list(PARROT_INTERP, PMC* pmc, visit_info* info /*NN*/)
+visit_todo_list(PARROT_INTERP, PMC* pmc, NOTNULL(visit_info* info))
 {
     UINTVAL id;
     int seen;
@@ -1280,7 +1280,7 @@ done.
 */
 
 static void
-visit_loop_next_for_GC(PARROT_INTERP, PMC *current /*NN*/,
+visit_loop_next_for_GC(PARROT_INTERP, NOTNULL(PMC *current),
         visit_info *info)
 {
     visit_next_for_GC(interp, current, info);
@@ -1305,7 +1305,7 @@ The thaw loop.
 
 static void
 visit_loop_todo_list(PARROT_INTERP, PMC *current,
-        visit_info *info /*NN*/)
+        NOTNULL(visit_info *info))
 {
     List *todo = (List *)PMC_data(info->todo);
     PMC *finish_list_pmc;
@@ -1378,7 +1378,7 @@ Allocate image to some estimated size.
 */
 
 static void
-create_image(PARROT_INTERP, PMC *pmc, visit_info *info /*NN*/)
+create_image(PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info))
 {
     INTVAL len;
     if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc,
@@ -1416,7 +1416,7 @@ nested containers, for which the C<next_for_GC> approach could be a win.
 */
 
 static PMC*
-run_thaw(PARROT_INTERP, STRING* image /*NN*/, visit_enum_type what)
+run_thaw(PARROT_INTERP, NOTNULL(STRING* image), visit_enum_type what)
 {
     visit_info info;
     int dod_block = 0;
@@ -1567,7 +1567,7 @@ constants.
 
 PARROT_API
 PMC*
-Parrot_thaw_constants(PARROT_INTERP, STRING* image /*NN*/)
+Parrot_thaw_constants(PARROT_INTERP, NOTNULL(STRING* image))
 {
     return run_thaw(interp, image, VISIT_THAW_CONSTANTS);
 }

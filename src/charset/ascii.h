@@ -20,15 +20,15 @@
 /* HEADERIZER BEGIN: src/charset/ascii.c */
 
 INTVAL ascii_compare( PARROT_INTERP,
-    const STRING *lhs /*NN*/,
-    const STRING *rhs /*NN*/ )
+    NOTNULL(const STRING *lhs),
+    NOTNULL(const STRING *rhs) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 size_t ascii_compute_hash( PARROT_INTERP,
-    const STRING *source_string /*NN*/,
+    NOTNULL(const STRING *source_string),
     size_t seed )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -36,8 +36,8 @@ size_t ascii_compute_hash( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 INTVAL ascii_cs_index( PARROT_INTERP,
-    STRING *source_string /*NN*/,
-    STRING *search_string /*NN*/,
+    NOTNULL(STRING *source_string),
+    NOTNULL(STRING *search_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -45,8 +45,8 @@ INTVAL ascii_cs_index( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 INTVAL ascii_cs_rindex( PARROT_INTERP,
-    STRING *source_string /*NN*/,
-    STRING *search_string /*NN*/,
+    NOTNULL(STRING *source_string),
+    NOTNULL(STRING *search_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -69,20 +69,20 @@ STRING * ascii_get_graphemes_inplace( PARROT_INTERP,
         __attribute__warn_unused_result__;
 
 STRING * charset_cvt_ascii_to_binary( PARROT_INTERP,
-    STRING *src /*NN*/,
-    STRING *dest /*NULLOK*/ )
+    NOTNULL(STRING *src),
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 STRING * charset_cvt_ascii_to_iso_8859_1( PARROT_INTERP,
-    STRING *src /*NN*/,
-    STRING *dest /*NULLOK*/ )
+    NOTNULL(STRING *src),
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 INTVAL mixed_cs_index( PARROT_INTERP,
-    STRING *src /*NN*/,
-    STRING *search /*NN*/,
+    NOTNULL(STRING *src),
+    NOTNULL(STRING *search),
     UINTVAL offs )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

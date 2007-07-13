@@ -88,12 +88,12 @@ PMC * Parrot_find_method_direct( PARROT_INTERP,
 PARROT_API
 PMC * Parrot_find_method_with_cache( PARROT_INTERP,
     PMC *_class,
-    STRING *method_name /*NN*/ )
+    NOTNULL(STRING *method_name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-PMC* Parrot_find_vtable_meth( PARROT_INTERP, PMC *pmc /*NN*/, STRING *meth )
+PMC* Parrot_find_vtable_meth( PARROT_INTERP, NOTNULL(PMC *pmc), STRING *meth )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -106,7 +106,7 @@ PMC * Parrot_get_attrib_by_str( PARROT_INTERP, PMC *object, STRING *attr )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_vtable_index( PARROT_INTERP, const STRING *name /*NN*/ )
+INTVAL Parrot_get_vtable_index( PARROT_INTERP, NOTNULL(const STRING *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -200,11 +200,11 @@ void Parrot_set_class_fallback( PARROT_INTERP,
 PARROT_API
 PMC * Parrot_single_subclass( PARROT_INTERP,
     PMC *base_class,
-    PMC *name /*NULLOK*/ )
+    NULLOK(PMC *name) )
         __attribute__nonnull__(1);
 
 PARROT_API
-STRING* readable_name( PARROT_INTERP, PMC *name /*NN*/ )
+STRING* readable_name( PARROT_INTERP, NOTNULL(PMC *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

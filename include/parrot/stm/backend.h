@@ -12,8 +12,8 @@ typedef struct Parrot_STM_PMC_handle_data *Parrot_STM_PMC_handle;
 /* HEADERIZER BEGIN: src/stm/backend.c */
 
 void Parrot_freeze_STM_PMC_handle( PARROT_INTERP,
-    IMAGE_IO *io /*NN*/,
-    Parrot_STM_PMC_handle handle /*NN*/ )
+    NOTNULL(IMAGE_IO *io),
+    NOTNULL(Parrot_STM_PMC_handle handle) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -51,7 +51,7 @@ void Parrot_STM_mark_pmc_handle( PARROT_INTERP, Parrot_STM_PMC_handle handle )
 void Parrot_STM_mark_transaction( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void Parrot_STM_merge_profile( Interp *d /*NN*/, Interp *s /*NN*/ )
+void Parrot_STM_merge_profile( NOTNULL(Interp *d), NOTNULL(Interp *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -80,7 +80,7 @@ void Parrot_STM_write( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 Parrot_STM_PMC_handle Parrot_thaw_STM_PMC_handle( PARROT_INTERP,
-    IMAGE_IO *io /*NN*/ )
+    NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

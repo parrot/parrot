@@ -28,7 +28,7 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(PARROT_INTERP, parrot_context_t* ctx /*NN*/)
+mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
 {
     PObj *obj;
     int i;
@@ -115,7 +115,7 @@ to the current context.
 */
 
 Parrot_cont *
-new_continuation(PARROT_INTERP, Parrot_cont *to /*NULLOK*/)
+new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
 {
     Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
     Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp->ctx);
@@ -208,7 +208,7 @@ Make true Continuation from all RetContinuations up the call chain.
 */
 
 void
-invalidate_retc_context(PARROT_INTERP, PMC *cont /*NN*/)
+invalidate_retc_context(PARROT_INTERP, NOTNULL(PMC *cont))
 {
     Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
 
@@ -244,7 +244,7 @@ Return namespace, name, and location of subroutine.
 
 PARROT_API
 STRING*
-Parrot_full_sub_name(PARROT_INTERP, PMC* sub /*NULLOK*/)
+Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
 {
     if (sub && VTABLE_defined(interp, sub)) {
         Parrot_sub * const s = PMC_sub(sub);
@@ -273,8 +273,8 @@ Parrot_full_sub_name(PARROT_INTERP, PMC* sub /*NULLOK*/)
 
 PARROT_API
 int
-Parrot_Context_get_info(PARROT_INTERP, parrot_context_t *ctx /*NN*/,
-                    Parrot_Context_info *info /*NN*/)
+Parrot_Context_get_info(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
+                    NOTNULL(Parrot_Context_info *info))
 {
     Parrot_sub *sub;
     DECL_CONST_CAST;
@@ -354,7 +354,7 @@ Parrot_Context_get_info(PARROT_INTERP, parrot_context_t *ctx /*NN*/,
 
 PARROT_API
 STRING*
-Parrot_Context_infostr(PARROT_INTERP, parrot_context_t *ctx /*NN*/)
+Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 {
     Parrot_Context_info info;
     const char* const msg = (CONTEXT(interp->ctx) == ctx)
@@ -390,7 +390,7 @@ Locate the LexPad containing the given name. Return NULL on failure.
 */
 
 PMC*
-Parrot_find_pad(PARROT_INTERP, STRING *lex_name, parrot_context_t *ctx /*NN*/)
+Parrot_find_pad(PARROT_INTERP, STRING *lex_name, NOTNULL(parrot_context_t *ctx))
 {
     while (1) {
         PMC * const lex_pad = ctx->lex_pad;

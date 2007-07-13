@@ -21,7 +21,7 @@
 
 PARROT_API
 void Parrot_set_config_hash_internal(
-    const unsigned char* parrot_config /*NN*/,
+    NOTNULL(const unsigned char* parrot_config),
     unsigned int parrot_config_size )
         __attribute__nonnull__(1);
 

@@ -31,7 +31,7 @@ static UINTVAL codepoints( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
 
 static UINTVAL get_byte( PARROT_INTERP,
-    const STRING *src /*NN*/,
+    NOTNULL(const STRING *src),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -96,7 +96,9 @@ static void set_codepoints( PARROT_INTERP,
     STRING *new_codepoints )
         __attribute__nonnull__(1);
 
-static STRING * to_encoding( PARROT_INTERP, STRING *src /*NN*/, STRING *dest )
+static STRING * to_encoding( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    STRING *dest )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -136,7 +138,7 @@ fill it with the converted result, else operate inplace.
 */
 
 static STRING *
-to_encoding(PARROT_INTERP, STRING *src /*NN*/, STRING *dest)
+to_encoding(PARROT_INTERP, NOTNULL(STRING *src), STRING *dest)
     /* WARN_UNUSED */
 {
 #if PARROT_HAS_ICU
@@ -257,7 +259,7 @@ set_codepoint(PARROT_INTERP, STRING *src,
 }
 
 static UINTVAL
-get_byte(PARROT_INTERP, const STRING *src /*NN*/, UINTVAL offset)
+get_byte(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {

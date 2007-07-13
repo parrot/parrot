@@ -202,7 +202,7 @@ Test the interpreter flags specified in C<flag>.
 
 PARROT_API
 Parrot_Int
-Parrot_test_flag(Interp* interp /*NN*/, INTVAL flag)
+Parrot_test_flag(PARROT_INTERP, INTVAL flag)
 {
     return Interp_flags_TEST(interp, flag);
 }
@@ -262,7 +262,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
 PARROT_API
 PackFile *
-Parrot_readbc(PARROT_INTERP, const char *fullname /*NULLOK*/)
+Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))
 {
     INTVAL program_size, wanted;
     char *program_code;
@@ -428,7 +428,7 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
 PARROT_API
 void
-Parrot_loadbc(PARROT_INTERP, PackFile *pf /*NN*/)
+Parrot_loadbc(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
     if (pf == NULL) {
         PIO_eprintf(interp, "Invalid packfile\n");
@@ -488,7 +488,7 @@ Sort function for profile data. Sorts by time.
 */
 
 static int
-prof_sort_f(const void *a /*NN*/, const void *b /*NN*/)
+prof_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
 {
     const FLOATVAL timea = ((const ProfData *)a)->time;
     const FLOATVAL timeb = ((const ProfData *)b)->time;

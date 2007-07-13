@@ -55,7 +55,7 @@ static funcptr_t get_mmd_dispatcher( PARROT_INTERP,
     PMC *left,
     PMC *right,
     INTVAL function,
-    int *is_pmc /*NN*/ )
+    NOTNULL(int *is_pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(5);
 
@@ -63,7 +63,7 @@ static PMC* mmd_arg_tuple_func( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 static PMC* mmd_arg_tuple_inline( PARROT_INTERP,
-    STRING *signature /*NN*/,
+    NOTNULL(STRING *signature),
     va_list args )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -71,7 +71,7 @@ static PMC* mmd_arg_tuple_inline( PARROT_INTERP,
 static void mmd_create_builtin_multi_meth( PARROT_INTERP,
     PMC *ns,
     INTVAL type,
-    const MMD_init *entry /*NN*/ )
+    NOTNULL(const MMD_init *entry) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
@@ -88,18 +88,22 @@ static PMC * mmd_create_builtin_multi_stub( PARROT_INTERP,
     INTVAL func_nr )
         __attribute__nonnull__(1);
 
-static PMC* mmd_cvt_to_types( Interp* interp, PMC *multi_sig );
-static PMC * mmd_deref( PARROT_INTERP, PMC *value /*NN*/ )
+static PMC* mmd_cvt_to_types( PARROT_INTERP, PMC *multi_sig )
+        __attribute__nonnull__(1);
+
+static PMC * mmd_deref( PARROT_INTERP, NOTNULL(PMC *value) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL mmd_distance( PARROT_INTERP, PMC *pmc /*NN*/, PMC *arg_tuple )
+static UINTVAL mmd_distance( PARROT_INTERP,
+    NOTNULL(PMC *pmc),
+    PMC *arg_tuple )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void mmd_ensure_writable( PARROT_INTERP,
     INTVAL function,
-    PMC *pmc /*NULLOK*/ )
+    NULLOK(PMC *pmc) )
         __attribute__nonnull__(1);
 
 static void mmd_expand_x( PARROT_INTERP, INTVAL func_nr, INTVAL new_x )
@@ -192,7 +196,7 @@ dump_mmd(PARROT_INTERP, INTVAL function)
 PARROT_API
 funcptr_t
 get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
-        INTVAL right_type, int *is_pmc /*NN*/ )
+        INTVAL right_type, NOTNULL(int *is_pmc))
     /* WARN_UNUSED */
 {
     funcptr_t func, func_;
@@ -258,7 +262,7 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
 
 static funcptr_t
 get_mmd_dispatcher(PARROT_INTERP, PMC *left, PMC *right,
-        INTVAL function, int *is_pmc /*NN*/)
+        INTVAL function, NOTNULL(int *is_pmc))
 {
     const UINTVAL left_type = VTABLE_type(interp, left);
     const UINTVAL right_type = VTABLE_type(interp, right);
@@ -275,7 +279,7 @@ call on the 'real' value.
 */
 
 static PMC *
-mmd_deref(PARROT_INTERP, PMC *value /*NN*/)
+mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
 {
     if (VTABLE_type(interp, value) != value->vtable->base_type)
         return VTABLE_get_pmc(interp, value);
@@ -291,7 +295,7 @@ Make sure C<pmc> is writable enough for C<function>.
 */
 
 static void
-mmd_ensure_writable(PARROT_INTERP, INTVAL function, PMC *pmc /*NULLOK*/)
+mmd_ensure_writable(PARROT_INTERP, INTVAL function, NULLOK(PMC *pmc))
 {
     if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
         real_exception(interp, 0, 1, "%s applied to read-only argument",
@@ -340,7 +344,7 @@ Inplace dispatch functions for C<< left <op=> right >>.
 PARROT_API
 PMC*
 mmd_dispatch_p_ppp(PARROT_INTERP,
-        PMC *left /*NN*/, PMC *right /*NN*/, PMC *dest, INTVAL func_nr)
+        NOTNULL(PMC *left), NOTNULL(PMC *right), PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_ppp real_function;
     int is_pmc;
@@ -368,7 +372,7 @@ mmd_dispatch_p_ppp(PARROT_INTERP,
 PARROT_API
 PMC*
 mmd_dispatch_p_pip(PARROT_INTERP,
-        PMC *left /*NN*/, INTVAL right, PMC *dest, INTVAL func_nr)
+        NOTNULL(PMC *left), INTVAL right, PMC *dest, INTVAL func_nr)
 {
     int is_pmc;
 
@@ -401,7 +405,7 @@ mmd_dispatch_p_pip(PARROT_INTERP,
 PARROT_API
 PMC*
 mmd_dispatch_p_pnp(PARROT_INTERP,
-        PMC *left /*NN*/, FLOATVAL right, PMC *dest, INTVAL func_nr)
+        NOTNULL(PMC *left), FLOATVAL right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_pnp real_function;
     int is_pmc;
@@ -429,7 +433,7 @@ mmd_dispatch_p_pnp(PARROT_INTERP,
 PARROT_API
 PMC*
 mmd_dispatch_p_psp(PARROT_INTERP,
-        PMC *left /*NN*/, STRING *right, PMC *dest, INTVAL func_nr)
+        NOTNULL(PMC *left), STRING *right, PMC *dest, INTVAL func_nr)
 {
     mmd_f_p_psp real_function;
     int is_pmc;
@@ -457,7 +461,7 @@ mmd_dispatch_p_psp(PARROT_INTERP,
 PARROT_API
 void
 mmd_dispatch_v_pp(PARROT_INTERP,
-        PMC *left /*NN*/, PMC *right /*NN*/, INTVAL func_nr)
+        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)
 {
     mmd_f_v_pp real_function;
     int is_pmc;
@@ -481,7 +485,7 @@ mmd_dispatch_v_pp(PARROT_INTERP,
 
 void
 mmd_dispatch_v_pi(PARROT_INTERP,
-        PMC *left /*NN*/, INTVAL right, INTVAL func_nr)
+        NOTNULL(PMC *left), INTVAL right, INTVAL func_nr)
 {
     mmd_f_v_pi real_function;
     int is_pmc;
@@ -505,7 +509,7 @@ mmd_dispatch_v_pi(PARROT_INTERP,
 PARROT_API
 void
 mmd_dispatch_v_pn(PARROT_INTERP,
-        PMC *left /*NN*/, FLOATVAL right, INTVAL func_nr)
+        NOTNULL(PMC *left), FLOATVAL right, INTVAL func_nr)
 {
     mmd_f_v_pn real_function;
     int is_pmc;
@@ -529,7 +533,7 @@ mmd_dispatch_v_pn(PARROT_INTERP,
 PARROT_API
 void
 mmd_dispatch_v_ps(PARROT_INTERP,
-        PMC *left /*NN*/, STRING *right, INTVAL func_nr)
+        NOTNULL(PMC *left), STRING *right, INTVAL func_nr)
 {
     mmd_f_v_ps real_function;
     int is_pmc;
@@ -561,7 +565,7 @@ by MMD compare functions.
 PARROT_API
 INTVAL
 mmd_dispatch_i_pp(PARROT_INTERP,
-        PMC *left /*NN*/, PMC *right /*NN*/, INTVAL func_nr)
+        NOTNULL(PMC *left), NOTNULL(PMC *right), INTVAL func_nr)
 {
     mmd_f_i_pp real_function;
     int is_pmc;
@@ -734,8 +738,8 @@ PARROT_API
 void
 mmd_add_by_class(PARROT_INTERP,
              INTVAL functype,
-             STRING *left_class /*NN*/, STRING *right_class /*NN*/,
-             funcptr_t funcptr /*NULLOK*/)
+             NOTNULL(STRING *left_class), NOTNULL(STRING *right_class),
+             NULLOK(funcptr_t funcptr))
 {
     INTVAL left_type = pmc_type(interp, left_class);
     INTVAL right_type = pmc_type(interp, right_class);
@@ -781,7 +785,7 @@ void
 mmd_register(PARROT_INTERP,
              INTVAL func_nr,
              INTVAL left_type, INTVAL right_type,
-             funcptr_t funcptr /*NULLOK*/)
+             NULLOK(funcptr_t funcptr))
 {
 
     INTVAL offset;
@@ -813,7 +817,7 @@ void
 mmd_register_sub(PARROT_INTERP,
              INTVAL func_nr,
              INTVAL left_type, INTVAL right_type,
-             PMC *sub /*NN*/)
+             NOTNULL(PMC *sub))
 {
     if (sub->vtable->base_type == enum_class_NCI) {
         /* returned from mmdvt_find */
@@ -940,7 +944,7 @@ according to calling conventions.
 */
 
 static PMC*
-mmd_arg_tuple_inline(PARROT_INTERP, STRING *signature /*NN*/, va_list args)
+mmd_arg_tuple_inline(PARROT_INTERP, NOTNULL(STRING *signature), va_list args)
 {
     INTVAL i;
     PMC *arg;
@@ -1194,7 +1198,7 @@ Create Manhattan Distance of sub C<pmc> against given argument types.
 */
 
 static PMC*
-mmd_cvt_to_types(Interp* interp, PMC *multi_sig)
+mmd_cvt_to_types(PARROT_INTERP, PMC *multi_sig)
 {
     const INTVAL n = VTABLE_elements(interp, multi_sig);
     INTVAL i;
@@ -1224,7 +1228,7 @@ mmd_cvt_to_types(Interp* interp, PMC *multi_sig)
 #define MMD_BIG_DISTANCE 0x7fff
 
 static UINTVAL
-mmd_distance(PARROT_INTERP, PMC *pmc /*NN*/, PMC *arg_tuple)
+mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), PMC *arg_tuple)
 {
     PMC *multi_sig, *mro;
     INTVAL i, n, args, dist, j, m;
@@ -1629,7 +1633,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, PMC *ns,
 
 static void
 mmd_create_builtin_multi_meth(PARROT_INTERP, PMC *ns, INTVAL type,
-        const MMD_init *entry /*NN*/)
+        NOTNULL(const MMD_init *entry))
 {
     mmd_create_builtin_multi_meth_2(interp, ns,
             entry->func_nr, type, entry->right, entry->func_ptr);
@@ -1644,7 +1648,7 @@ Register MMD functions for this PMC type.
 
 PARROT_API
 void
-Parrot_mmd_register_table(Interp* interp, INTVAL type,
+Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
         const MMD_init *mmd_table, INTVAL n)
 {
     MMD_table * const table = interp->binop_mmd_funcs;
@@ -1694,7 +1698,7 @@ negative all MMD functions are rebuilt.
 
 PARROT_API
 void
-Parrot_mmd_rebuild_table(Interp* interp /*NN*/, INTVAL type, INTVAL func_nr)
+Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
 {
     MMD_table *table;
     UINTVAL i;

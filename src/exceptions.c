@@ -46,7 +46,7 @@ static PMC * find_exception_handler( PARROT_INTERP, PMC *exception )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
-static void run_cleanup_action( PARROT_INTERP, Stack_Entry_t *e /*NN*/ )
+static void run_cleanup_action( PARROT_INTERP, NOTNULL(Stack_Entry_t *e) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -167,7 +167,7 @@ Pop items off the dynamic environment up to the mark.
 
 PARROT_API
 void
-push_exception(PARROT_INTERP, PMC *handler /*NN*/)
+push_exception(PARROT_INTERP, NOTNULL(PMC *handler))
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC(interp, "Tried to set_eh a non Exception_Handler");
@@ -176,7 +176,7 @@ push_exception(PARROT_INTERP, PMC *handler /*NN*/)
 }
 
 static void
-run_cleanup_action(PARROT_INTERP, Stack_Entry_t *e /*NN*/)
+run_cleanup_action(PARROT_INTERP, NOTNULL(Stack_Entry_t *e))
 {
     /*
      * this is called during normal stack_pop of the control
@@ -422,7 +422,7 @@ Rethrow the exception.
 
 PARROT_API
 opcode_t *
-rethrow_exception(PARROT_INTERP, PMC *exception /*NN*/)
+rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
 {
     PMC *handler;
     opcode_t *address;
@@ -613,7 +613,7 @@ destroy_exception_list(PARROT_INTERP)
 }
 
 void
-really_destroy_exception_list(Parrot_exception *e /*NULLOK*/)
+really_destroy_exception_list(NULLOK(Parrot_exception *e))
 {
     while (e != NULL) {
         Parrot_exception * const prev = e->prev;

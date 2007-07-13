@@ -30,7 +30,7 @@ static size_t PIO_utf8_read( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static size_t PIO_utf8_write( PARROT_INTERP,
-    ParrotIOLayer *l /*NN*/,
+    NOTNULL(ParrotIOLayer *l),
     ParrotIO *io,
     STRING *s )
         __attribute__nonnull__(1)
@@ -132,7 +132,7 @@ ok:
 }
 
 static size_t
-PIO_utf8_write(PARROT_INTERP, ParrotIOLayer *l /*NN*/, ParrotIO *io, STRING *s)
+PIO_utf8_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), ParrotIO *io, STRING *s)
 {
     STRING *dest;
 

@@ -15,15 +15,13 @@ PMC * Parrot_clone_lib_into( Interp *d, Interp *s, PMC *lib_pmc );
 
 PARROT_API
 PMC * Parrot_init_lib( PARROT_INTERP,
-    PMC *(*load_func)(Interp *) /*NULLOK*/,
+    PMC *(*load_func)(NULLOK(Interp *)),
     void (*init_func)(Interp *,
-    PMC *) /*NULLOK*/ )
+    NULLOK(PMC *)) )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * Parrot_load_lib( PARROT_INTERP,
-    STRING *lib /*NULLOK*/,
-    PMC *initializer )
+PMC * Parrot_load_lib( PARROT_INTERP, NULLOK(STRING *lib), PMC *initializer )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/dynext.c */

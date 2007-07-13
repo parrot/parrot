@@ -102,7 +102,7 @@ C<STRING>.
 
 PARROT_API
 PMC *
-key_new_cstring(PARROT_INTERP, const char *value /*NULLOK*/)
+key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
 {
     return key_new_string(interp,
             string_from_cstring(interp, value, 0));
@@ -137,7 +137,7 @@ Set the integer C<value> in C<key>.
 
 PARROT_API
 void
-key_set_integer(SHIM_INTERP, PMC *key /*NN*/, INTVAL value)
+key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -155,7 +155,7 @@ Set the register C<value> in C<key>.
 
 PARROT_API
 void
-key_set_register(SHIM_INTERP, PMC *key /*NN*/, INTVAL value,
+key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
                  INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
@@ -174,7 +174,7 @@ Set the number C<value> in C<key>.
 
 PARROT_API
 void
-key_set_number(SHIM_INTERP, PMC *key /*NN*/, FLOATVAL value)
+key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -192,7 +192,7 @@ Set the string C<value> in C<key>.
 
 PARROT_API
 void
-key_set_string(SHIM_INTERP, PMC *key /*NN*/, STRING *value)
+key_set_string(SHIM_INTERP, NOTNULL(PMC *key), STRING *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -210,7 +210,7 @@ Set the PMC C<value> in C<key>.
 
 PARROT_API
 void
-key_set_pmc(PARROT_INTERP, PMC *key /*NN*/, PMC *value)
+key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), PMC *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -233,14 +233,14 @@ Returns the type of C<key>.
 
 PARROT_API
 INTVAL
-key_type(SHIM_INTERP, const PMC *key /*NN*/)
+key_type(SHIM_INTERP, NOTNULL(const PMC *key))
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
 
 PARROT_API
 INTVAL
-key_integer(PARROT_INTERP, PMC *key /*NN*/)
+key_integer(PARROT_INTERP, NOTNULL(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_hash_iterator_FLAGS:
@@ -268,7 +268,7 @@ key_integer(PARROT_INTERP, PMC *key /*NN*/)
 
 PARROT_API
 FLOATVAL
-key_number(PARROT_INTERP, PMC *key /*NN*/)
+key_number(PARROT_INTERP, NOTNULL(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
@@ -291,7 +291,7 @@ key_number(PARROT_INTERP, PMC *key /*NN*/)
 
 PARROT_API
 STRING *
-key_string(PARROT_INTERP, PMC *key /*NN*/)
+key_string(PARROT_INTERP, NOTNULL(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_string_FLAG:
@@ -324,7 +324,7 @@ possible. Otherwise they throws an exceptions.
 
 PARROT_API
 PMC *
-key_pmc(PARROT_INTERP, PMC *key /*NN*/)
+key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
@@ -343,7 +343,7 @@ Returns the next key if C<key> is in a sequence of linked keys.
 
 PARROT_API
 PMC *
-key_next(SHIM_INTERP, PMC *key /*NN*/)
+key_next(SHIM_INTERP, NOTNULL(PMC *key))
 {
     return key->pmc_ext ? (PMC *)PMC_data(key) : NULL;
 }
@@ -362,7 +362,7 @@ Returns C<key1>.
 
 PARROT_API
 PMC *
-key_append(SHIM_INTERP, PMC *key1 /*NN*/, PMC *key2 /*NN*/)
+key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
 {
     PMC *tail = key1;
 
@@ -384,7 +384,7 @@ Marks C<key> as live.
 
 PARROT_API
 void
-key_mark(PARROT_INTERP, PMC *key /*NN*/)
+key_mark(PARROT_INTERP, NOTNULL(PMC *key))
 {
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
 
@@ -405,7 +405,7 @@ key_mark(PARROT_INTERP, PMC *key /*NN*/)
 
 PARROT_API
 STRING *
-key_set_to_string(PARROT_INTERP, PMC *key /*NULLOK*/)
+key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
 {
     STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
     STRING * const quote = string_from_cstring(interp, "'", 1);

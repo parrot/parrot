@@ -29,55 +29,55 @@ debugger, and the C<debug> ops.
 /* Not sure how we want to handle this sort of cross-project header */
 PARROT_API
 void
-IMCC_warning(PARROT_INTERP, const char *fmt /*NN*/, ...);
+IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...);
 
 
 /* HEADERIZER HFILE: include/parrot/debug.h */
 
 /* HEADERIZER BEGIN: static */
 
-static void dump_string( PARROT_INTERP, const STRING *s /*NULLOK*/ )
+static void dump_string( PARROT_INTERP, NULLOK(const STRING *s) )
         __attribute__nonnull__(1);
 
-static int GDB_B( PARROT_INTERP, char *s /*NN*/ )
+static int GDB_B( PARROT_INTERP, NOTNULL(char *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static const char* GDB_P( PARROT_INTERP, const char *s /*NN*/ )
+static const char* GDB_P( PARROT_INTERP, NOTNULL(const char *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static char const * nextarg( char const *command /*NN*/ )
+static char const * nextarg( NOTNULL(char const *command) )
         __attribute__nonnull__(1);
 
 static const char * parse_command(
-    const char *command /*NN*/,
-    unsigned long *cmdP /*NN*/ )
+    NOTNULL(const char *command),
+    NOTNULL(unsigned long *cmdP) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static const char * parse_int( const char *str /*NN*/, int *intP /*NN*/ )
+static const char * parse_int( NOTNULL(const char *str), NOTNULL(int *intP) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static const char* parse_key( PARROT_INTERP,
-    const char *str /*NN*/,
-    PMC **keyP /*NN*/ )
+    NOTNULL(const char *str),
+    NOTNULL(PMC **keyP) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static const char * parse_string( PARROT_INTERP,
-    const char *str /*NN*/,
-    STRING **strP /*NN*/ )
+    NOTNULL(const char *str),
+    NOTNULL(STRING **strP) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static const char * skip_command( const char *str /*NN*/ )
+static const char * skip_command( NOTNULL(const char *str) )
         __attribute__nonnull__(1);
 
-static const char * skip_ws( const char *str /*NN*/ )
+static const char * skip_ws( NOTNULL(const char *str) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -94,7 +94,7 @@ debugger commands. This function is used for C<eval>.
 */
 
 static char const *
-nextarg(char const *command /*NN*/)
+nextarg(NOTNULL(char const *command))
 {
     /* as long as the character pointed to by command is not NULL,
      * and it is either alphanumeric, a comma or a closing bracket,
@@ -120,7 +120,7 @@ Returns the pointer past any whitespace.
 */
 
 static const char *
-skip_ws(const char *str /*NN*/)
+skip_ws(NOTNULL(const char *str))
 {
     /* as long as str is not NULL and it contains space, skip it */
     while (*str && isspace((int) *str))
@@ -139,7 +139,7 @@ alternative to the C<skip_command()> macro above.)
 */
 
 static const char *
-skip_command(const char *str /*NN*/)
+skip_command(NOTNULL(const char *str))
 {
     /* while str is not null and it contains a command (no spaces),
      * skip the character
@@ -164,7 +164,7 @@ The output parameter C<intP> contains the parsed value.
 */
 
 static const char *
-parse_int(const char *str /*NN*/, int *intP /*NN*/)
+parse_int(NOTNULL(const char *str), NOTNULL(int *intP))
 {
     char *end;
 
@@ -184,7 +184,7 @@ C<STRING> and placed in the output parameter C<strP>.
 */
 
 static const char *
-parse_string(PARROT_INTERP, const char *str /*NN*/, STRING **strP /*NN*/)
+parse_string(PARROT_INTERP, NOTNULL(const char *str), NOTNULL(STRING **strP))
 {
     const char *string_start;
 
@@ -226,7 +226,7 @@ after the key. Currently only string and integer keys are allowed.
 */
 
 static const char*
-parse_key(PARROT_INTERP, const char *str /*NN*/, PMC **keyP /*NN*/)
+parse_key(PARROT_INTERP, NOTNULL(const char *str), NOTNULL(PMC **keyP))
 {
     /* clear output parameter */
     *keyP = NULL;
@@ -273,7 +273,7 @@ that can be used as a switch key for fast lookup.
 */
 
 static const char *
-parse_command(const char *command /*NN*/, unsigned long *cmdP /*NN*/)
+parse_command(NOTNULL(const char *command), NOTNULL(unsigned long *cmdP))
 {
     int           i;
     unsigned long c = 0;
@@ -383,7 +383,7 @@ Interprets the contents of a file as user input commands
 */
 
 void
-PDB_script_file(PARROT_INTERP, const char *command /*NN*/)
+PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
 {
     char buf[1024];
     const char *ptr = (const char *)&buf;
@@ -438,7 +438,7 @@ Hash the command to make a simple switch calling the correct handler.
 */
 
 int
-PDB_run_command(PARROT_INTERP, const char *command /*NN*/)
+PDB_run_command(PARROT_INTERP, NOTNULL(const char *command))
 {
     unsigned long c;
     PDB_t        * const pdb = interp->pdb;
@@ -543,7 +543,7 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 */
 
 void
-PDB_next(PARROT_INTERP, const char *command /*NULLOK*/)
+PDB_next(PARROT_INTERP, NULLOK(const char *command))
 {
     unsigned long  n   = 1;
     PDB_t  * const pdb = interp->pdb;
@@ -585,7 +585,7 @@ Execute the next N operations; if no number is specified, it defaults to 1.
 */
 
 void
-PDB_trace(PARROT_INTERP, const char *command /*NULLOK*/)
+PDB_trace(PARROT_INTERP, NULLOK(const char *command))
 {
     unsigned long  n   = 1;
     PDB_t *  const pdb = interp->pdb;
@@ -631,7 +631,7 @@ Analyzes a condition from the user input.
 */
 
 PDB_condition_t *
-PDB_cond(PARROT_INTERP, const char *command /*NN*/)
+PDB_cond(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_condition_t *condition;
     int              i, reg_number;
@@ -821,7 +821,7 @@ Set a watchpoint.
 */
 
 void
-PDB_watchpoint(PARROT_INTERP, const char *command /*NN*/)
+PDB_watchpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_t           * const pdb = interp->pdb;
     PDB_condition_t * const condition = PDB_cond(interp, command);
@@ -972,7 +972,7 @@ breakpoints.
 */
 
 void
-PDB_continue(PARROT_INTERP, const char *command /*NULLOK*/)
+PDB_continue(PARROT_INTERP, NULLOK(const char *command))
 {
     PDB_t *pdb = interp->pdb;
 
@@ -1004,7 +1004,7 @@ exist or if no breakpoint was specified.
 */
 
 PDB_breakpoint_t *
-PDB_find_breakpoint(PARROT_INTERP, const char *command /*NN*/)
+PDB_find_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     command = nextarg(command);
     if (isdigit((int) *command)) {
@@ -1041,7 +1041,7 @@ Disable a breakpoint; it can be reenabled with the enable command.
 */
 
 void
-PDB_disable_breakpoint(PARROT_INTERP, const char *command /*NN*/)
+PDB_disable_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1060,7 +1060,7 @@ no effect.
 */
 
 void
-PDB_enable_breakpoint(PARROT_INTERP, const char *command /*NN*/)
+PDB_enable_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1078,7 +1078,7 @@ Delete a breakpoint.
 */
 
 void
-PDB_delete_breakpoint(PARROT_INTERP, const char *command /*NN*/)
+PDB_delete_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
@@ -1124,7 +1124,7 @@ Delete a condition associated with a breakpoint.
 */
 
 void
-PDB_delete_condition(SHIM_INTERP, PDB_breakpoint_t *breakpoint /*NN*/)
+PDB_delete_condition(SHIM_INTERP, NOTNULL(PDB_breakpoint_t *breakpoint))
 {
     if (breakpoint->condition->value) {
         if (breakpoint->condition->type & PDB_cond_str) {
@@ -1188,7 +1188,7 @@ Returns true if the condition was met.
 */
 
 char
-PDB_check_condition(PARROT_INTERP, PDB_condition_t *condition /*NN*/)
+PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
 {
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
@@ -1333,7 +1333,7 @@ Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 */
 
 char *
-PDB_escape(const char *string /*NN*/, INTVAL length)
+PDB_escape(NOTNULL(const char *string), INTVAL length)
 {
     const char *end;
     char       *_new, *fill;
@@ -1449,9 +1449,9 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(PARROT_INTERP, char *dest /*NN*/, int space,
-                   op_info_t *info /*NN*/, opcode_t *op /*NN*/,
-                   PDB_file_t *file /*NULLOK*/, opcode_t *code_start /*NULLOK*/, int full_name)
+PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
+                   NOTNULL(op_info_t *info), NOTNULL(opcode_t *op),
+                   NULLOK(PDB_file_t *file), NULLOK(opcode_t *code_start), int full_name)
 {
     int         j;
     int         size = 0;
@@ -1763,7 +1763,7 @@ Add a label to the label list.
 */
 
 long
-PDB_add_label(PDB_file_t *file /*NN*/, opcode_t *cur_opcode /*NN*/, opcode_t offset)
+PDB_add_label(NOTNULL(PDB_file_t *file), NOTNULL(opcode_t *cur_opcode), opcode_t offset)
 {
     PDB_label_t *_new;
     PDB_label_t *label = file->label;
@@ -1856,7 +1856,7 @@ Load a source code file.
 */
 
 void
-PDB_load_source(PARROT_INTERP, const char *command /*NN*/)
+PDB_load_source(PARROT_INTERP, NOTNULL(const char *command))
 {
     FILE          *file;
     char           f[255];
@@ -1981,7 +1981,7 @@ Show lines from the source code file.
 */
 
 void
-PDB_list(PARROT_INTERP, const char *command /*NN*/)
+PDB_list(PARROT_INTERP, NOTNULL(const char *command))
 {
     char          *c;
     long           line_number;
@@ -2060,7 +2060,7 @@ C<eval>s an instruction.
 */
 
 void
-PDB_eval(PARROT_INTERP, const char *command /*NN*/)
+PDB_eval(PARROT_INTERP, NOTNULL(const char *command))
 {
     /* This code is almost certainly wrong. The Parrot debugger needs love. */
     opcode_t *run = PDB_compile(interp, command);
@@ -2083,7 +2083,7 @@ which generates a malloced string.
 */
 
 opcode_t *
-PDB_compile(PARROT_INTERP, const char *command /*NN*/)
+PDB_compile(PARROT_INTERP, NOTNULL(const char *command))
 {
     STRING     *buf;
     const char *end      = "\nend\n";
@@ -2141,7 +2141,7 @@ and the string itself.
 */
 
 static void
-dump_string(PARROT_INTERP, const STRING *s /*NULLOK*/)
+dump_string(PARROT_INTERP, NULLOK(const STRING *s))
 {
     if (!s)
         return;
@@ -2216,7 +2216,7 @@ Print interp registers.
 */
 
 void
-PDB_print(PARROT_INTERP, const char *command /*NN*/)
+PDB_print(PARROT_INTERP, NOTNULL(const char *command))
 {
     const char * const s = GDB_P(interp->pdb->debugee, command);
     PIO_eprintf(interp, "%s\n", s);
@@ -2272,7 +2272,7 @@ Print the help text. "Help" with no arguments prints a list of commands.
 */
 
 void
-PDB_help(PARROT_INTERP, const char *command /*NN*/)
+PDB_help(PARROT_INTERP, NOTNULL(const char *command))
 {
     unsigned long c;
     const char   *temp = command;
@@ -2487,7 +2487,7 @@ PDB_backtrace(PARROT_INTERP)
  */
 
 static const char*
-GDB_P(PARROT_INTERP, const char *s /*NN*/)
+GDB_P(PARROT_INTERP, NOTNULL(const char *s))
 {
     int t, n;
     switch (*s) {
@@ -2533,7 +2533,7 @@ static PDB_breakpoint_t *gdb_bps;
  *
  */
 static int
-GDB_B(PARROT_INTERP, char *s /*NN*/) {
+GDB_B(PARROT_INTERP, NOTNULL(char *s)) {
     int               nr;
     opcode_t         *pc;
     PDB_breakpoint_t *bp, *newbreak;

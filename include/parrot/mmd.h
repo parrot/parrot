@@ -50,7 +50,7 @@ funcptr_t get_mmd_dispatch_type( PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
-    int *is_pmc /*NN*/  )
+    NOTNULL(int *is_pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(5)
         __attribute__warn_unused_result__;
@@ -58,9 +58,9 @@ funcptr_t get_mmd_dispatch_type( PARROT_INTERP,
 PARROT_API
 void mmd_add_by_class( PARROT_INTERP,
     INTVAL functype,
-    STRING *left_class /*NN*/,
-    STRING *right_class /*NN*/,
-    funcptr_t funcptr /*NULLOK*/ )
+    NOTNULL(STRING *left_class),
+    NOTNULL(STRING *right_class),
+    NULLOK(funcptr_t funcptr) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -75,8 +75,8 @@ void mmd_destroy( PARROT_INTERP )
 
 PARROT_API
 INTVAL mmd_dispatch_i_pp( PARROT_INTERP,
-    PMC *left /*NN*/,
-    PMC *right /*NN*/,
+    NOTNULL(PMC *left),
+    NOTNULL(PMC *right),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -84,7 +84,7 @@ INTVAL mmd_dispatch_i_pp( PARROT_INTERP,
 
 PARROT_API
 PMC* mmd_dispatch_p_pip( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     INTVAL right,
     PMC *dest,
     INTVAL func_nr )
@@ -93,7 +93,7 @@ PMC* mmd_dispatch_p_pip( PARROT_INTERP,
 
 PARROT_API
 PMC* mmd_dispatch_p_pnp( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     FLOATVAL right,
     PMC *dest,
     INTVAL func_nr )
@@ -102,8 +102,8 @@ PMC* mmd_dispatch_p_pnp( PARROT_INTERP,
 
 PARROT_API
 PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
-    PMC *left /*NN*/,
-    PMC *right /*NN*/,
+    NOTNULL(PMC *left),
+    NOTNULL(PMC *right),
     PMC *dest,
     INTVAL func_nr )
         __attribute__nonnull__(1)
@@ -112,7 +112,7 @@ PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
 
 PARROT_API
 PMC* mmd_dispatch_p_psp( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     STRING *right,
     PMC *dest,
     INTVAL func_nr )
@@ -121,7 +121,7 @@ PMC* mmd_dispatch_p_psp( PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_pn( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     FLOATVAL right,
     INTVAL func_nr )
         __attribute__nonnull__(1)
@@ -129,8 +129,8 @@ void mmd_dispatch_v_pn( PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_pp( PARROT_INTERP,
-    PMC *left /*NN*/,
-    PMC *right /*NN*/,
+    NOTNULL(PMC *left),
+    NOTNULL(PMC *right),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -138,7 +138,7 @@ void mmd_dispatch_v_pp( PARROT_INTERP,
 
 PARROT_API
 void mmd_dispatch_v_ps( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     STRING *right,
     INTVAL func_nr )
         __attribute__nonnull__(1)
@@ -149,7 +149,7 @@ void mmd_register( PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
-    funcptr_t funcptr /*NULLOK*/ )
+    NULLOK(funcptr_t funcptr) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -157,7 +157,7 @@ void mmd_register_sub( PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
-    PMC *sub /*NN*/ )
+    NOTNULL(PMC *sub) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(5);
 
@@ -167,16 +167,15 @@ PMC * mmd_vtfind( PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right )
         __attribute__warn_unused_result__;
 
 PARROT_API
-void Parrot_mmd_rebuild_table( Interp* interp /*NN*/,
-    INTVAL type,
-    INTVAL func_nr )
+void Parrot_mmd_rebuild_table( PARROT_INTERP, INTVAL type, INTVAL func_nr )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_mmd_register_table( Interp* interp,
+void Parrot_mmd_register_table( PARROT_INTERP,
     INTVAL type,
     const MMD_init *mmd_table,
-    INTVAL n );
+    INTVAL n )
+        __attribute__nonnull__(1);
 
 PARROT_API
 PMC * Parrot_MMD_search_default_infix( PARROT_INTERP,
@@ -190,7 +189,7 @@ PMC * Parrot_mmd_sort_candidate_list( PARROT_INTERP, PMC *candidates )
         __attribute__nonnull__(1);
 
 void mmd_dispatch_v_pi( PARROT_INTERP,
-    PMC *left /*NN*/,
+    NOTNULL(PMC *left),
     INTVAL right,
     INTVAL func_nr )
         __attribute__nonnull__(1)

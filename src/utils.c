@@ -44,18 +44,18 @@ static long _lrand48( void );
 static long _mrand48( void );
 static long _nrand48( _rand_buf buf );
 static void _srand48( long seed );
-static void move_reg( int from, int dest, parrot_prm_context* c /*NN*/ )
+static void move_reg( int from, int dest, NOTNULL(parrot_prm_context* c) )
         __attribute__nonnull__(3);
 
 static void next_rand( _rand_buf X );
 static void process_cycle_without_exit(
     int node_index,
-    parrot_prm_context* c /*NN*/ )
+    NOTNULL(parrot_prm_context* c) )
         __attribute__nonnull__(2);
 
 static void rec_climb_back_and_mark(
     int node_index,
-    parrot_prm_context* c /*NN*/ )
+    NOTNULL(parrot_prm_context* c) )
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -442,7 +442,7 @@ Used in C<src/nci.c>.
 
 PARROT_API
 void *
-Parrot_make_la(PARROT_INTERP, PMC *array /*NN*/)
+Parrot_make_la(PARROT_INTERP, NOTNULL(PMC *array))
     /* WARN_UNUSED */
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
@@ -529,7 +529,7 @@ Use this to destroy an array created with C<Parrot_make_cpa()>.
 
 PARROT_API
 void
-Parrot_destroy_cpa(char **array /*NN*/)
+Parrot_destroy_cpa(NOTNULL(char **array))
 {
     UINTVAL offset = 0;
     /* Free each piece */
@@ -564,7 +564,7 @@ Helper to convert a B<struct tm *> to an Array
 
 PARROT_API
 PMC*
-tm_to_array(PARROT_INTERP, const struct tm *tm /*NN*/)
+tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
 {
     PMC * const Array = pmc_new(interp, enum_class_Array);
 
@@ -584,8 +584,8 @@ tm_to_array(PARROT_INTERP, const struct tm *tm /*NN*/)
 
 PARROT_API
 INTVAL
-Parrot_byte_index(SHIM_INTERP, const STRING *base /*NN*/,
-        const STRING *search /*NN*/, UINTVAL start_offset)
+Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
+        NOTNULL(const STRING *search), UINTVAL start_offset)
 {
     const INTVAL searchlen = search->strlen;
     const char * const search_start = search->strstart;
@@ -605,8 +605,8 @@ Parrot_byte_index(SHIM_INTERP, const STRING *base /*NN*/,
 
 PARROT_API
 INTVAL
-Parrot_byte_rindex(SHIM_INTERP, const STRING *base /*NN*/,
-        const STRING *search /*NN*/, UINTVAL start_offset)
+Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
+        NOTNULL(const STRING *search), UINTVAL start_offset)
     /* WARN_UNUSED */
 {
     const INTVAL searchlen = search->strlen;
@@ -652,7 +652,7 @@ case marks it, and set node_index as its backup.
 */
 
 static void
-rec_climb_back_and_mark(int node_index, parrot_prm_context* c /*NN*/)
+rec_climb_back_and_mark(int node_index, NOTNULL(parrot_prm_context* c))
 {
     const int node = c->dest_regs[node_index];
     const int pred = c->src_regs[node_index];
@@ -691,7 +691,7 @@ For instance: 1-->2, 2-->3, 3-->1
 */
 
 static void
-process_cycle_without_exit(int node_index, parrot_prm_context* c /*NN*/)
+process_cycle_without_exit(int node_index, NOTNULL(parrot_prm_context* c))
 {
     const int pred = c->src_regs[node_index];
 
@@ -716,7 +716,7 @@ process_cycle_without_exit(int node_index, parrot_prm_context* c /*NN*/)
  */
 
 static void
-move_reg(int from, int dest, parrot_prm_context* c /*NN*/)
+move_reg(int from, int dest, NOTNULL(parrot_prm_context* c))
 {
    /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
     c->mov(c->interp, dest, from, c->info);
@@ -775,7 +775,7 @@ TODO: Add tests for the above conditions.
 PARROT_API
 void
 Parrot_register_move(PARROT_INTERP, int n_regs,
-                     unsigned char *dest_regs /*NN*/, unsigned char *src_regs /*NN*/,
+                     NOTNULL(unsigned char *dest_regs), NOTNULL(unsigned char *src_regs),
                      unsigned char temp_reg,
                      reg_move_func mov, reg_move_func mov_alt, void *info)
 {

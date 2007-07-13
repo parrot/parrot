@@ -126,7 +126,7 @@ C<< obj->data_size[N] >>.
 */
 
 static void
-add_data_member(Parrot_exec_objfile_t *obj /*NN*/, void *src /*NULLOK*/, size_t len)
+add_data_member(NOTNULL(Parrot_exec_objfile_t *obj), NULLOK(void *src), size_t len)
 {
     char *cp;
 
@@ -161,7 +161,7 @@ Initialize the obj structure.
 */
 
 static void
-exec_init(Parrot_exec_objfile_t *obj /*NN*/)
+exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
 {
     obj->text_rellocation_table = (Parrot_exec_rellocation_t *)
         mem_sys_allocate_zeroed(sizeof (Parrot_exec_rellocation_t));
@@ -197,8 +197,8 @@ Adds a symbol to the object file.
 */
 
 int
-Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/,
-                       const char *symbol /*NN*/, int stype)
+Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
+                       NOTNULL(const char *symbol), int stype)
 {
 
     int symbol_number = symbol_list_find(obj, symbol);
@@ -233,7 +233,7 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj /*NN*/,
 }
 
 int *
-Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/,
+Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
                                      char *nptr, const char *var, int offset,
                                      int disp)
 {
@@ -242,7 +242,7 @@ Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj /*NN*/,
 }
 
 void
-Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj /*NN*/,
+Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
                                       char *nptr, const char *func_name)
 {
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
@@ -257,7 +257,7 @@ Adds a text rellocation to the object file.
 */
 
 void
-Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj /*NN*/, char *nptr,
+Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr,
     int type, const char *symbol, int disp)
 {
     int symbol_number = 0;
@@ -306,7 +306,7 @@ Used by C<Parrot_exec_add_symbol()>.
 */
 
 static int
-symbol_list_find(Parrot_exec_objfile_t *obj /*NN*/, const char *symbol /*NN*/)
+symbol_list_find(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(const char *symbol))
 {
     int i;
 

@@ -57,7 +57,7 @@ in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_vsprintf_s(PARROT_INTERP, STRING *pat /*NN*/, va_list args)
+Parrot_vsprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), va_list args)
 {
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
@@ -75,7 +75,7 @@ C string version of C<Parrot_vsprintf_s()>.
 
 PARROT_API
 STRING *
-Parrot_vsprintf_c(PARROT_INTERP, const char *pat /*NN*/, va_list args)
+Parrot_vsprintf_c(PARROT_INTERP, NOTNULL(const char *pat), va_list args)
 {
     STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
@@ -96,8 +96,8 @@ Similar to C<Parrot_vsprintf()> but with an option to specify the length
 
 PARROT_API
 void
-Parrot_vsnprintf(PARROT_INTERP, char *targ /*NN*/,
-                 size_t len, const char *pat /*NN*/, va_list args)
+Parrot_vsnprintf(PARROT_INTERP, NOTNULL(char *targ),
+                 size_t len, NOTNULL(const char *pat), va_list args)
 {
     if (len == 0)
         return;
@@ -127,7 +127,7 @@ Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_sprintf_s(PARROT_INTERP, STRING *pat /*NN*/, ...)
+Parrot_sprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), ...)
 {
     STRING *ret;
     va_list args;
@@ -177,8 +177,8 @@ Similar to C<Parrot_sprintf()> but with an option to specify the length
 
 PARROT_API
 void
-Parrot_snprintf(PARROT_INTERP, char *targ /*NN*/, size_t len,
-                const char *pat /*NN*/, ...)
+Parrot_snprintf(PARROT_INTERP, NOTNULL(char *targ), size_t len,
+                NOTNULL(const char *pat), ...)
 {
     va_list args;
 
@@ -201,7 +201,7 @@ C<Array> PMC.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_psprintf(PARROT_INTERP, STRING *pat /*NN*/, PMC *ary /*NN*/)
+Parrot_psprintf(PARROT_INTERP, NOTNULL(STRING *pat), NOTNULL(PMC *ary))
 {
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;

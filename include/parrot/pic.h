@@ -76,26 +76,26 @@ Parrot_MIC* parrot_PIC_alloc_mic( const PARROT_INTERP, size_t n );
 Parrot_PIC* parrot_PIC_alloc_pic( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void parrot_PIC_alloc_store( struct PackFile_ByteCode *cs /*NN*/, size_t n )
+void parrot_PIC_alloc_store( NOTNULL(struct PackFile_ByteCode *cs), size_t n )
         __attribute__nonnull__(1);
 
 int parrot_pic_check_sig(
-    const PMC *sig1 /*NN*/,
-    const PMC *sig2 /*NN*/,
-    int *type /*NN*/ )
+    NOTNULL(const PMC *sig1),
+    NOTNULL(const PMC *sig2),
+    NOTNULL(int *type) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-void parrot_PIC_destroy( struct PackFile_ByteCode *cs /*NN*/ )
+void parrot_PIC_destroy( NOTNULL(struct PackFile_ByteCode *cs) )
         __attribute__nonnull__(1);
 
 void parrot_pic_find_infix_v_pp( PARROT_INTERP,
-    PMC *left /*NN*/,
-    PMC *right /*NN*/,
-    Parrot_MIC *mic /*NN*/,
-    opcode_t *cur_opcode /*NN*/ )
+    NOTNULL(PMC *left),
+    NOTNULL(PMC *right),
+    NOTNULL(Parrot_MIC *mic),
+    NOTNULL(opcode_t *cur_opcode) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -121,7 +121,7 @@ void parrot_PIC_prederef( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/pic_jit.c */
 
 int parrot_pic_is_safe_to_jit( PARROT_INTERP,
-    PMC *sub /*NN*/,
+    NOTNULL(PMC *sub),
     PMC *sig_args,
     PMC *sig_results,
     int *flags )

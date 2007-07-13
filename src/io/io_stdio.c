@@ -35,7 +35,7 @@ static const char * flags_to_stdio( INTVAL flags )
 static INTVAL PIO_stdio_close(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
@@ -47,7 +47,7 @@ static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
 static INTVAL PIO_stdio_flush(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_stdio_init( PARROT_INTERP, ParrotIOLayer *layer )
@@ -75,7 +75,7 @@ static size_t PIO_stdio_read( PARROT_INTERP,
 static PIOOFF_T PIO_stdio_seek(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
+    NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
@@ -83,14 +83,14 @@ static PIOOFF_T PIO_stdio_seek(
 static PIOOFF_T PIO_stdio_tell(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/ )
+    NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static size_t PIO_stdio_write(
     SHIM_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO *io /*NN*/,
-    STRING *s /*NN*/ )
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *s) )
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -273,7 +273,7 @@ Desc.
 */
 
 static INTVAL
-PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     FILE * const fptr = (FILE*)io->fd;
 
@@ -356,7 +356,7 @@ Desc.
 */
 
 static INTVAL
-PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     return fflush((FILE*)io->fd);
 }
@@ -408,7 +408,7 @@ Desc.
 */
 
 static size_t
-PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/, STRING *s /*NN*/)
+PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
 {
     void * const buffer = s->strstart;
     return fwrite(buffer, 1, s->bufused, (FILE*)io->fd);
@@ -427,7 +427,7 @@ Hard seek.
 */
 
 static PIOOFF_T
-PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/,
+PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
               PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T pos;
@@ -455,7 +455,7 @@ Desc.
 */
 
 static PIOOFF_T
-PIO_stdio_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO *io /*NN*/)
+PIO_stdio_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
     return (ftell((FILE*)io->fd));
 }

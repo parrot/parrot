@@ -43,7 +43,7 @@ Checks whether the specified environment variable is set.
 */
 
 static int
-is_env_var_set(const char* var /*NN*/)
+is_env_var_set(NOTNULL(const char* var))
 {
     int free_it, retval;
     char* const value = Parrot_getenv(var, &free_it);
@@ -89,7 +89,7 @@ void Parrot_really_destroy(Interp *, int exit_code, void *);
 
 PARROT_API
 Parrot_Interp
-make_interpreter(Interp *parent /*NULLOK*/, INTVAL flags)
+make_interpreter(NULLOK(Interp *parent), INTVAL flags)
 {
     Interp *interp;
 #if EXEC_CAPABLE

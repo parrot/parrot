@@ -20,8 +20,8 @@ These are parrot's generic encoding handling functions
 /* HEADERIZER BEGIN: static */
 
 static INTVAL register_encoding( PARROT_INTERP,
-    const char *encodingname /*NN*/,
-    ENCODING *encoding /*NN*/ )
+    NOTNULL(const char *encodingname),
+    NOTNULL(ENCODING *encoding) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -83,7 +83,7 @@ Parrot_new_encoding(PARROT_INTERP)
 
 PARROT_API
 ENCODING *
-Parrot_find_encoding(PARROT_INTERP, const char *encodingname /*NN*/)
+Parrot_find_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -122,7 +122,7 @@ Return the number of the encoding or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_encoding_number(PARROT_INTERP, STRING *encodingname /*NN*/)
+Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -146,7 +146,7 @@ Return the number of the encoding of the given string or -1 if not found.
 
 PARROT_API
 INTVAL
-Parrot_encoding_number_of_str(PARROT_INTERP, STRING *src /*NN*/)
+Parrot_encoding_number_of_str(PARROT_INTERP, NOTNULL(STRING *src))
     /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
@@ -197,8 +197,8 @@ Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
 }
 
 static INTVAL
-register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
-        ENCODING *encoding /*NN*/)
+register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
+        NOTNULL(ENCODING *encoding))
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -226,8 +226,8 @@ register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
 
 PARROT_API
 INTVAL
-Parrot_register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
-        ENCODING *encoding /*NN*/)
+Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
+        NOTNULL(ENCODING *encoding))
 {
     if (!all_encodings) {
         all_encodings = mem_allocate_typed(All_encodings);
@@ -260,7 +260,7 @@ Parrot_register_encoding(PARROT_INTERP, const char *encodingname /*NN*/,
 PARROT_API
 INTVAL
 Parrot_make_default_encoding(PARROT_INTERP, const char *encodingname,
-        ENCODING *encoding /*NN*/)
+        NOTNULL(ENCODING *encoding))
 {
     UNUSED(interp);
     UNUSED(encodingname);

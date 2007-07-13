@@ -137,12 +137,13 @@ void Parrot_new_timer_event( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_schedule_event( Interp *interp, parrot_event* ev /*NN*/ )
+void Parrot_schedule_event( PARROT_INTERP, NOTNULL(parrot_event* ev) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_schedule_interp_qentry( PARROT_INTERP,
-    struct QUEUE_ENTRY *entry /*NN*/ )
+    NOTNULL(struct QUEUE_ENTRY *entry) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

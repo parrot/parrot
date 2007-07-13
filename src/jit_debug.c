@@ -79,7 +79,7 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 #define N_NBLCS "248"
 
 #ifdef __GNUC__
-void Parrot_jit_debug(Interp* interp);
+void Parrot_jit_debug(PARROT_INTERP);
 
 #  define BIT_SIZE(t) ((int)(sizeof (t)*8))
 #  define BYTE_SIZE(t) ((int)sizeof (t))
@@ -373,7 +373,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
 /*
 
 =item C<void
-Parrot_jit_debug(Interp* interp)>
+Parrot_jit_debug(PARROT_INTERP)>
 
 Writes the JIT debugging stabs. Just calls C<Parrot_jit_debug_stabs()>.
 
@@ -382,7 +382,7 @@ Writes the JIT debugging stabs. Just calls C<Parrot_jit_debug_stabs()>.
 */
 
 void
-Parrot_jit_debug(Interp* interp)
+Parrot_jit_debug(PARROT_INTERP)
 {
     Parrot_jit_debug_stabs(interp);
 }

@@ -114,7 +114,7 @@ CHARSET * Parrot_default_charset( SHIM_INTERP );
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET * Parrot_find_charset( SHIM_INTERP, const char *charsetname /*NN*/ )
+CHARSET * Parrot_find_charset( SHIM_INTERP, NOTNULL(const char *charsetname) )
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -134,7 +134,8 @@ CHARSET* Parrot_get_charset( SHIM_INTERP, INTVAL number_of_charset );
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET * Parrot_load_charset( PARROT_INTERP, const char *charsetname /*NN*/ )
+CHARSET * Parrot_load_charset( PARROT_INTERP,
+    NOTNULL(const char *charsetname) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

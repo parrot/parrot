@@ -16,8 +16,8 @@
 /* HEADERIZER BEGIN: src/charset/iso-8859-1.c */
 
 STRING * charset_cvt_iso_8859_1_to_ascii( PARROT_INTERP,
-    STRING *src /*NN*/,
-    STRING *dest /*NULLOK*/ )
+    NOTNULL(STRING *src),
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;

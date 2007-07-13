@@ -69,7 +69,7 @@ type.
 
 PARROT_API
 PMC*
-pmc_reuse(PARROT_INTERP, PMC *pmc /*NN*/, INTVAL new_type,
+pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
           SHIM(UINTVAL flags))
 {
     INTVAL has_ext, new_flags;
@@ -345,7 +345,7 @@ This segment handles PMC registration and such.
 
 PARROT_API
 INTVAL
-pmc_register(Interp* interp /*NN*/, STRING *name)
+pmc_register(PARROT_INTERP, STRING *name)
 {
     INTVAL type;
     PMC *classname_hash;
@@ -380,7 +380,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type(Interp* interp /*NN*/, STRING *name /*NN*/)
+pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
     /* WARN_UNUSED */
 {
     PMC * const classname_hash = interp->class_hash;
@@ -403,7 +403,7 @@ Returns the PMC type for C<name>.
 
 PARROT_API
 INTVAL
-pmc_type_p(Interp* interp /*NN*/, PMC *name /*NN*/)
+pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
@@ -532,7 +532,7 @@ Registers the PMC with the interpreter's DOD registery.
 
 PARROT_API
 void
-dod_register_pmc(Interp* interp /*NN*/, PMC* pmc)
+dod_register_pmc(PARROT_INTERP, PMC* pmc)
 {
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_DOD(interp);
@@ -552,7 +552,7 @@ Unregisters the PMC from the interpreter's DOD registery.
 */
 
 void
-dod_unregister_pmc(Interp* interp /*NN*/, PMC* pmc)
+dod_unregister_pmc(PARROT_INTERP, PMC* pmc)
 {
     if (!interp->DOD_registry)
         return; /* XXX or signal exception? */
@@ -572,7 +572,7 @@ of proxies.
 
 PARROT_API
 void
-Parrot_create_pmc_proxy(Interp* interp /*NN*/, int type_num)
+Parrot_create_pmc_proxy(PARROT_INTERP, int type_num)
 {
     PMC *proxy;
     Parrot_PMCProxy *proxy_info;

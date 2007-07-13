@@ -33,7 +33,7 @@ static unsigned int parrot_config_size_stored = 0;
 
 /* HEADERIZER BEGIN: static */
 
-static void parrot_set_config_hash_interpreter( Interp* interp /*NN*/ )
+static void parrot_set_config_hash_interpreter( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -50,7 +50,7 @@ will be used in subsequently created Interpreters
 
 PARROT_API
 void
-Parrot_set_config_hash_internal(const unsigned char* parrot_config /*NN*/,
+Parrot_set_config_hash_internal(NOTNULL(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
     parrot_config_stored      = parrot_config;
@@ -67,7 +67,7 @@ using the last registered config data.
 */
 
 static void
-parrot_set_config_hash_interpreter(Interp* interp /*NN*/)
+parrot_set_config_hash_interpreter(PARROT_INTERP)
 {
     PMC *iglobals = interp->iglobals;
 

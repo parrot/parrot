@@ -39,17 +39,17 @@ typedef enum {
 /* HEADERIZER BEGIN: src/key.c */
 
 PARROT_API
-PMC * key_append( SHIM_INTERP, PMC *key1 /*NN*/, PMC *key2 /*NN*/ )
+PMC * key_append( SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-INTVAL key_integer( PARROT_INTERP, PMC *key /*NN*/ )
+INTVAL key_integer( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_mark( PARROT_INTERP, PMC *key /*NN*/ )
+void key_mark( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -58,7 +58,7 @@ PMC * key_new( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * key_new_cstring( PARROT_INTERP, const char *value /*NULLOK*/ )
+PMC * key_new_cstring( PARROT_INTERP, NULLOK(const char *value) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -78,55 +78,55 @@ PMC * key_new_string( PARROT_INTERP, STRING *value )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC * key_next( SHIM_INTERP, PMC *key /*NN*/ )
+PMC * key_next( SHIM_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(2);
 
 PARROT_API
-FLOATVAL key_number( PARROT_INTERP, PMC *key /*NN*/ )
+FLOATVAL key_number( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-PMC * key_pmc( PARROT_INTERP, PMC *key /*NN*/ )
+PMC * key_pmc( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_integer( SHIM_INTERP, PMC *key /*NN*/, INTVAL value )
+void key_set_integer( SHIM_INTERP, NOTNULL(PMC *key), INTVAL value )
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_number( SHIM_INTERP, PMC *key /*NN*/, FLOATVAL value )
+void key_set_number( SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value )
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_pmc( PARROT_INTERP, PMC *key /*NN*/, PMC *value )
+void key_set_pmc( PARROT_INTERP, NOTNULL(PMC *key), PMC *value )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void key_set_register(
     SHIM_INTERP,
-    PMC *key /*NN*/,
+    NOTNULL(PMC *key),
     INTVAL value,
     INTVAL flag )
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_string( SHIM_INTERP, PMC *key /*NN*/, STRING *value )
+void key_set_string( SHIM_INTERP, NOTNULL(PMC *key), STRING *value )
         __attribute__nonnull__(2);
 
 PARROT_API
-STRING * key_set_to_string( PARROT_INTERP, PMC *key /*NULLOK*/ )
+STRING * key_set_to_string( PARROT_INTERP, NULLOK(PMC *key) )
         __attribute__nonnull__(1);
 
 PARROT_API
-STRING * key_string( PARROT_INTERP, PMC *key /*NN*/ )
+STRING * key_string( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL key_type( SHIM_INTERP, const PMC *key /*NN*/ )
+INTVAL key_type( SHIM_INTERP, NOTNULL(const PMC *key) )
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/key.c */

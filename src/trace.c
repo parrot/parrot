@@ -25,7 +25,7 @@ src/test_main.c
 
 /* HEADERIZER BEGIN: static */
 
-static STRING* trace_class_name( const PMC* pmc /*NN*/ )
+static STRING* trace_class_name( NOTNULL(const PMC* pmc) )
         __attribute__nonnull__(1)
         __attribute__warn_unused_result__;
 
@@ -41,7 +41,7 @@ Prints a PMC to C<stderr>.
 */
 
 static STRING*
-trace_class_name(const PMC* pmc /*NN*/)
+trace_class_name(NOTNULL(const PMC* pmc))
     /* WARN_UNUSED */
 {
     STRING *class_name;
@@ -57,7 +57,7 @@ trace_class_name(const PMC* pmc /*NN*/)
 }
 
 void
-trace_pmc_dump(PARROT_INTERP, PMC *pmc /*NN*/)
+trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
     Interp * const debugger = interp->debugger;
 
@@ -144,7 +144,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(PARROT_INTERP, const PMC *key /*NN*/)
+trace_key_dump(PARROT_INTERP, NOTNULL(const PMC *key))
 {
     Interp * const debugger = interp->debugger;
 
@@ -222,7 +222,7 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(PARROT_INTERP, const opcode_t *code_start /*NN*/, const opcode_t *pc /*NN*/)
+trace_op_dump(PARROT_INTERP, NOTNULL(const opcode_t *code_start), NOTNULL(const opcode_t *pc))
 {
     INTVAL s, n;
     int more = 0, var_args;
@@ -420,8 +420,8 @@ checking.
 */
 
 void
-trace_op(PARROT_INTERP, const opcode_t *code_start /*NN*/,
-         const opcode_t *code_end /*NN*/, const opcode_t *pc /*NULLOK*/)
+trace_op(PARROT_INTERP, NOTNULL(const opcode_t *code_start),
+         NOTNULL(const opcode_t *code_end), NULLOK(const opcode_t *pc))
 {
     if (!pc) {
         return;

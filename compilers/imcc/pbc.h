@@ -3,33 +3,36 @@
 
 /* HEADERIZER BEGIN: compilers/imcc/pbc.c */
 
-int e_pbc_close( Interp *interp /*NN*/, void *param )
+int e_pbc_close( PARROT_INTERP, void *param )
         __attribute__nonnull__(1);
 
-int e_pbc_emit( Interp *interp /*NN*/,
+int e_pbc_emit( PARROT_INTERP,
     void *param,
-    IMC_Unit *unit /*NN*/,
-    const Instruction *ins /*NN*/ )
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-int e_pbc_end_sub( Interp *interp /*NN*/, void *param, IMC_Unit *unit /*NN*/ )
+int e_pbc_end_sub( PARROT_INTERP, void *param, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-int e_pbc_new_sub( SHIM_INTERP, void *param, IMC_Unit *unit /*NN*/ )
+int e_pbc_new_sub( SHIM_INTERP, void *param, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(3);
 
-int e_pbc_open( Interp *interp, void *param );
-INTVAL IMCC_int_from_reg( Interp *interp, const SymReg *r /*NN*/ )
-        __attribute__nonnull__(2);
+int e_pbc_open( PARROT_INTERP, void *param )
+        __attribute__nonnull__(1);
 
-STRING * IMCC_string_from_reg( Interp *interp /*NN*/, const SymReg *r /*NN*/ )
+INTVAL IMCC_int_from_reg( PARROT_INTERP, NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-opcode_t * make_jit_info( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+STRING * IMCC_string_from_reg( PARROT_INTERP, NOTNULL(const SymReg *r) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+opcode_t * make_jit_info( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

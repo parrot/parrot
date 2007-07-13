@@ -288,7 +288,7 @@ Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 */
 
 opcode_t
-PF_fetch_opcode(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
     /* WARN_UNUSED */
 {
     opcode_t o;
@@ -311,7 +311,7 @@ Store an C<opcode_t> to stream as is.
 */
 
 opcode_t*
-PF_store_opcode(opcode_t *cursor /*NN*/, opcode_t val)
+PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
     /* WARN_UNUSED */
 {
     *cursor++ = val;
@@ -346,7 +346,7 @@ C<INTVAL> size in the PackFile header.
 */
 
 INTVAL
-PF_fetch_integer(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
     /* WARN_UNUSED */
 {
     INTVAL i;
@@ -402,7 +402,7 @@ Then advance stream pointer by amount of packfile float size.
 */
 
 FLOATVAL
-PF_fetch_number(PackFile *pf /*NULLOK*/, opcode_t **stream /*NN*/)
+PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
     /* WARN_UNUSED */
 {
     /* When we have alignment all squared away we don't need
@@ -446,7 +446,7 @@ Write a C<FLOATVAL> to the opcode stream as is.
 */
 
 opcode_t*
-PF_store_number(opcode_t *cursor /*NN*/, const FLOATVAL *val /*NN*/)
+PF_store_number(NOTNULL(opcode_t *cursor), NOTNULL(const FLOATVAL *val))
 {
     opcode_t padded_size  = (sizeof (FLOATVAL) + sizeof (opcode_t) - 1) /
         sizeof (opcode_t);
@@ -487,7 +487,7 @@ Opcode format is:
 */
 
 STRING *
-PF_fetch_string(PARROT_INTERP, PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
+PF_fetch_string(PARROT_INTERP, NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
     /* WARN_UNUSED */
 {
     UINTVAL flags;
@@ -541,7 +541,7 @@ Write a STRING to the opcode stream.
 */
 
 opcode_t*
-PF_store_string(opcode_t *cursor /*NN*/, STRING *s /*NN*/)
+PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 {
     opcode_t padded_size = s->bufused;
     char *charcursor;
@@ -595,7 +595,7 @@ Report store size of C<STRING> in C<opcode_t> units.
 */
 
 size_t
-PF_size_string(const STRING *s /*NN*/)
+PF_size_string(NOTNULL(const STRING *s))
     /* PURE, WARN_UNUSED */
 {
     opcode_t padded_size = s->bufused;
@@ -617,7 +617,7 @@ Fetch a cstring from bytecode and return an allocated copy
 */
 
 char *
-PF_fetch_cstring(PackFile *pf /*NN*/, opcode_t **cursor /*NN*/)
+PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
     /* WARN_UNUSED, MALLOC */
 {
     const size_t str_len = strlen ((char *)(*cursor)) + 1;
@@ -642,7 +642,7 @@ Write a 0-terminated string to the stream.
 */
 
 opcode_t*
-PF_store_cstring(opcode_t *cursor /*NN*/, const char *s /*NN*/)
+PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))
     /* WARN_UNUSED */
 {
     strcpy((char *) cursor, s);
@@ -658,7 +658,7 @@ Return store size of a C-string in C<opcode_t> units.
 */
 
 size_t
-PF_size_cstring(const char *s /*NN*/)
+PF_size_cstring(NOTNULL(const char *s))
     /* PURE, WARN_UNUSED */
 {
     size_t str_len;
@@ -677,7 +677,7 @@ Assign transform functions to vtable.
 */
 
 void
-PackFile_assign_transforms(PackFile *pf /*NN*/)
+PackFile_assign_transforms(NOTNULL(PackFile *pf))
 {
     const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
     const int need_wordsize  = pf->header->wordsize != sizeof (opcode_t);

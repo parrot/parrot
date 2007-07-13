@@ -56,7 +56,7 @@ Parrot_setenv(const char *name, const char *value)
 }
 
 char *
-Parrot_getenv(const char *name /*NN*/, int *free_it /*NN*/)
+Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))
 {
     const DWORD size = GetEnvironmentVariable(name, NULL, 0);
     char *buffer;

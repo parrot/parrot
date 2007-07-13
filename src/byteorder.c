@@ -175,7 +175,7 @@ out of a padded buffer.
 */
 
 void
-fetch_buf_be_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -188,7 +188,7 @@ fetch_buf_be_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_le_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
@@ -201,7 +201,7 @@ fetch_buf_le_4(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_be_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -218,7 +218,7 @@ fetch_buf_be_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_le_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
@@ -235,7 +235,7 @@ fetch_buf_le_8(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_le_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -256,7 +256,7 @@ fetch_buf_le_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_be_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
@@ -277,7 +277,7 @@ fetch_buf_be_12(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_le_16(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
@@ -302,7 +302,7 @@ fetch_buf_le_16(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
 }
 
 void
-fetch_buf_be_16(unsigned char *rb /*NN*/, const unsigned char *b /*NN*/)
+fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);

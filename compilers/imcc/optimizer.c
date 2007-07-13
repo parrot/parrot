@@ -74,28 +74,40 @@ static int _is_ins_save(
     SymReg *r,
     int what );
 
-static int branch_branch( Interp *interp, IMC_Unit * unit /*NN*/ )
+static int branch_branch( PARROT_INTERP, NOTNULL(IMC_Unit * unit) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int branch_cond_loop( Interp *interp, IMC_Unit * unit );
-static int branch_cond_loop_swap( Interp *interp,
+static int branch_cond_loop( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
+static int branch_cond_loop_swap( PARROT_INTERP,
     IMC_Unit *unit,
     Instruction *branch,
     Instruction *start,
-    Instruction *cond );
+    Instruction *cond )
+        __attribute__nonnull__(1);
 
-static int branch_reorg( Interp *interp, IMC_Unit * unit );
+static int branch_reorg( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
 static int check_clone(
     Parrot_Interp interp,
     IMC_Unit * unit,
     Instruction *ins );
 
 static int clone_remove( Parrot_Interp interp, IMC_Unit * unit );
-static int constant_propagation( Interp *interp, IMC_Unit * unit );
-static int dead_code_remove( Interp *interp, IMC_Unit * unit );
-static int eval_ins( Interp *interp, char *op, size_t ops, SymReg **r );
+static int constant_propagation( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
+static int dead_code_remove( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
+static int eval_ins( PARROT_INTERP, char *op, size_t ops, SymReg **r )
+        __attribute__nonnull__(1);
+
 static Basic_block * find_outer( IMC_Unit * unit, Basic_block * blk );
-static int if_branch( Interp *interp /*NN*/, IMC_Unit *unit )
+static int if_branch( PARROT_INTERP, IMC_Unit *unit )
         __attribute__nonnull__(1);
 
 static int is_ins_save(
@@ -110,20 +122,27 @@ static int is_invariant(
     IMC_Unit * unit,
     Instruction *ins );
 
-static int loop_one( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int bnr )
+static int loop_one( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int loop_optimization( Interp *interp, IMC_Unit * unit );
+static int loop_optimization( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
 static int max_loop_depth( IMC_Unit * unit );
-static int move_ins_out( Interp *interp,
-    IMC_Unit *unit /*NN*/,
+static int move_ins_out( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
     Instruction **ins,
     Basic_block *bb )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int strength_reduce( Interp *interp, IMC_Unit * unit );
-static int unused_label( Interp *interp, IMC_Unit * unit );
+static int strength_reduce( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
+static int unused_label( PARROT_INTERP, IMC_Unit * unit )
+        __attribute__nonnull__(1);
+
 static int used_once( Parrot_Interp interp, IMC_Unit * unit );
 /* HEADERIZER END: static */
 #if DO_LOOP_OPTIMIZATION
@@ -134,7 +153,7 @@ static int loop_optimization(Interp *, IMC_Unit *);
  * Handles optimizations occuring before the construction of the CFG.
  */
 int
-pre_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+pre_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int changed = 0;
 
@@ -154,7 +173,7 @@ pre_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
  * FALSE.
  */
 int
-cfg_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     if (IMCC_INFO(interp)->dont_optimize)
         return 0;
@@ -176,7 +195,7 @@ cfg_optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 }
 
 int
-optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int any = 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
@@ -198,7 +217,7 @@ optimize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
  * Get negated form of operator. If no negated form is known, return 0.
  */
 const char *
-get_neg_op(const char *op /*NN*/, int *n /*NN*/)
+get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
 {
     static struct br_pairs {
         const char *op;
@@ -234,7 +253,7 @@ get_neg_op(const char *op /*NN*/, int *n /*NN*/)
  *
  */
 static int
-if_branch(Interp *interp /*NN*/, IMC_Unit *unit)
+if_branch(PARROT_INTERP, IMC_Unit *unit)
 {
     Instruction *ins, *last;
     int reg, changed = 0;
@@ -291,7 +310,7 @@ if_branch(Interp *interp /*NN*/, IMC_Unit *unit)
  * guaranteed that one operand is non constant if opsize == 4
  */
 static int
-strength_reduce(Interp *interp, IMC_Unit * unit)
+strength_reduce(PARROT_INTERP, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     SymReg *r;
@@ -528,7 +547,7 @@ strength_reduce(Interp *interp, IMC_Unit * unit)
  */
 
 static int
-constant_propagation(Interp *interp, IMC_Unit * unit)
+constant_propagation(PARROT_INTERP, IMC_Unit * unit)
 {
     Instruction *ins, *ins2, *tmp, *prev;
     int op;
@@ -624,7 +643,7 @@ next_constant:;
  * rewrite e.g. add_n_ic => add_n_nc
  */
 Instruction *
-IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
+IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         SymReg **r, int n)
 {
     Instruction *tmp;
@@ -657,7 +676,7 @@ IMCC_subst_constants_umix(Interp *interp, IMC_Unit * unit, const char *name /*NN
  * core evaluates the constants.
  */
 static int
-eval_ins(Interp *interp, char *op, size_t ops, SymReg **r)
+eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
 {
     opcode_t eval[4], *pc;
     int opnum;
@@ -731,8 +750,8 @@ eval_ins(Interp *interp, char *op, size_t ops, SymReg **r)
  */
 
 Instruction *
-IMCC_subst_constants(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
-        SymReg **r, int n, int *ok /*NN*/)
+IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
+        SymReg **r, int n, NOTNULL(int *ok))
 {
     Instruction *tmp;
     const char *ops[] = {
@@ -904,7 +923,7 @@ IMCC_subst_constants(Interp *interp, IMC_Unit * unit, const char *name /*NN*/,
  * FALSE.
  */
 static int
-branch_branch(Interp *interp, IMC_Unit * unit /*NN*/)
+branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
 {
     Instruction *ins, *next;
     SymReg * r;
@@ -952,7 +971,7 @@ branch_branch(Interp *interp, IMC_Unit * unit /*NN*/)
  * FALSE.
  */
 static int
-branch_reorg(Interp *interp, IMC_Unit * unit)
+branch_reorg(PARROT_INTERP, IMC_Unit * unit)
 {
     Instruction *ins, *start, *end;
     SymReg * r;
@@ -1014,7 +1033,7 @@ branch_reorg(Interp *interp, IMC_Unit * unit)
 }
 
 static int
-branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
+branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
         Instruction *start, Instruction *cond)
 {
     int changed = 0;
@@ -1095,7 +1114,7 @@ branch_cond_loop_swap(Interp *interp, IMC_Unit *unit, Instruction *branch,
  * FALSE.
  */
 static int
-branch_cond_loop(Interp *interp, IMC_Unit * unit)
+branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
 {
     Instruction *ins, *cond, *end, *start, *prev;
     SymReg * r;
@@ -1160,7 +1179,7 @@ branch_cond_loop(Interp *interp, IMC_Unit * unit)
  * FALSE.
  */
 static int
-unused_label(Interp *interp, IMC_Unit * unit)
+unused_label(PARROT_INTERP, IMC_Unit * unit)
 {
     Instruction *ins;
     int used;
@@ -1224,7 +1243,7 @@ unused_label(Interp *interp, IMC_Unit * unit)
 }
 
 static int
-dead_code_remove(Interp *interp, IMC_Unit * unit)
+dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
 {
     Basic_block *bb;
     int i;
@@ -1479,7 +1498,7 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(Interp *interp, IMC_Unit *unit /*NN*/,
+move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
                      Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
@@ -1520,7 +1539,7 @@ move_ins_out(Interp *interp, IMC_Unit *unit /*NN*/,
 }
 
 static int
-loop_one(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int bnr)
+loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
 {
     Basic_block * const bb = unit->bb_list[bnr];
     Instruction *ins;
@@ -1548,7 +1567,7 @@ loop_one(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int bnr)
 }
 
 static int
-loop_optimization(Interp *interp, IMC_Unit * unit)
+loop_optimization(PARROT_INTERP, IMC_Unit * unit)
 {
     int l, bb, loop_depth;
     int changed = 0;

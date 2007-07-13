@@ -18,22 +18,23 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void analyse_life_block( Interp *interp,
-    Basic_block* bb /*NN*/,
-    SymReg* r /*NN*/ )
+static void analyse_life_block( PARROT_INTERP,
+    NOTNULL(Basic_block* bb),
+    NOTNULL(SymReg* r) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void analyse_life_symbol(
     Parrot_Interp interp,
-    const struct _IMC_Unit *unit /*NN*/,
+    NOTNULL(const struct _IMC_Unit *unit),
     SymReg* r )
         __attribute__nonnull__(2);
 
 static void bb_add_edge(
-    IMC_Unit *unit /*NN*/,
-    Basic_block *from /*NN*/,
-    Basic_block *to /*NN*/ )
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Basic_block *from),
+    NOTNULL(Basic_block *to) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -50,30 +51,30 @@ static void bb_findadd_edge(
     Basic_block *from,
     SymReg *label );
 
-static void bb_remove_edge( IMC_Unit *unit /*NN*/, Edge *edge /*NN*/ )
+static void bb_remove_edge( NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int check_invoke_type( Interp *interp /*NN*/,
+static int check_invoke_type( PARROT_INTERP,
     const IMC_Unit * unit,
-    const Instruction *ins /*NN*/ )
+    NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static void free_dominance_frontiers( IMC_Unit * unit );
-static void free_dominators( IMC_Unit *unit /*NN*/ )
+static void free_dominators( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static void free_edge( IMC_Unit *unit /*NN*/ )
+static void free_edge( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
 static void free_loops( IMC_Unit * unit );
-static void init_basic_blocks( IMC_Unit *unit /*NN*/ )
+static void init_basic_blocks( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static Basic_block* make_basic_block( Interp *interp /*NN*/,
-    IMC_Unit *unit /*NN*/,
-    Instruction* ins /*NN*/ )
+static Basic_block* make_basic_block( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction* ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -91,7 +92,7 @@ static void sort_loops( Parrot_Interp interp, IMC_Unit * unit );
 #define INVOKE_SUB_OTHER 4
 
 static int
-check_invoke_type(Interp *interp /*NN*/, const IMC_Unit * unit, const Instruction *ins /*NN*/)
+check_invoke_type(PARROT_INTERP, const IMC_Unit * unit, NOTNULL(const Instruction *ins))
 {
     /*
      * 1) pcc sub call or yield
@@ -115,7 +116,7 @@ check_invoke_type(Interp *interp /*NN*/, const IMC_Unit * unit, const Instructio
 }
 
 void
-find_basic_blocks(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/, int first)
+find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 {
     Basic_block *bb;
     Instruction *ins;
@@ -235,7 +236,7 @@ bb_check_set_addr(Parrot_Interp interp, IMC_Unit * unit,
 /* Once the basic blocks have been computed, build_cfg computes
    the dependencies between them. */
 void
-build_cfg(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
+build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
     int i, changes;
     SymReg * addr;
@@ -395,7 +396,7 @@ bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
 
 
 int
-blocks_are_connected(const Basic_block *from /*NN*/, const Basic_block *to /*NN*/)
+blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))
     /* WARN_UNUSED */
 {
     const Edge *pred = to->pred_list;
@@ -410,7 +411,7 @@ blocks_are_connected(const Basic_block *from /*NN*/, const Basic_block *to /*NN*
 
 
 static void
-bb_add_edge(IMC_Unit *unit /*NN*/, Basic_block *from /*NN*/, Basic_block *to /*NN*/)
+bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))
 {
     Edge *e;
     if (blocks_are_connected(from, to))
@@ -441,7 +442,7 @@ bb_add_edge(IMC_Unit *unit /*NN*/, Basic_block *from /*NN*/, Basic_block *to /*N
 }
 
 static void
-bb_remove_edge(IMC_Unit *unit /*NN*/, Edge *edge /*NN*/)
+bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
 {
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
@@ -485,7 +486,7 @@ bb_remove_edge(IMC_Unit *unit /*NN*/, Edge *edge /*NN*/)
 }
 
 static void
-free_edge(IMC_Unit *unit /*NN*/)
+free_edge(NOTNULL(IMC_Unit *unit))
 {
     Edge *e;
 
@@ -498,7 +499,7 @@ free_edge(IMC_Unit *unit /*NN*/)
 }
 
 int
-edge_count(const struct _IMC_Unit *unit /*NN*/)
+edge_count(NOTNULL(const struct _IMC_Unit *unit))
     /* WARN_UNUSED */
 {
     Edge *e;
@@ -511,7 +512,7 @@ edge_count(const struct _IMC_Unit *unit /*NN*/)
 }
 
 void
-life_analysis(Interp *interp /*NN*/, const struct _IMC_Unit *unit /*NN*/)
+life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 {
     int i;
     SymReg** const reglist = unit->reglist;
@@ -522,7 +523,7 @@ life_analysis(Interp *interp /*NN*/, const struct _IMC_Unit *unit /*NN*/)
 }
 
 static void
-analyse_life_symbol(Parrot_Interp interp, const struct _IMC_Unit *unit /*NN*/, SymReg* r)
+analyse_life_symbol(Parrot_Interp interp, NOTNULL(const struct _IMC_Unit *unit), SymReg* r)
 {
     int i;
 
@@ -577,7 +578,7 @@ analyse_life_symbol(Parrot_Interp interp, const struct _IMC_Unit *unit /*NN*/, S
 }
 
 void
-free_life_info(const struct _IMC_Unit *unit /*NN*/, SymReg *r /*NN*/)
+free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
 {
     int i;
 #if IMC_TRACE_HIGH
@@ -602,7 +603,7 @@ free_life_info(const struct _IMC_Unit *unit /*NN*/, SymReg *r /*NN*/)
  */
 
 static void
-analyse_life_block(Interp *interp, Basic_block* bb /*NN*/, SymReg* r /*NN*/)
+analyse_life_block(PARROT_INTERP, NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 {
     Instruction* ins, *special;
     Life_range* l;
@@ -745,7 +746,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
  */
 
 void
-compute_dominators(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
+compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
 #define USE_BFS 0
 
@@ -863,7 +864,7 @@ compute_dominators(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
  * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
  */
 void
-compute_dominance_frontiers(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
+compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
     int i, b;
 
@@ -905,7 +906,7 @@ compute_dominance_frontiers(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/
 }
 
 static void
-free_dominators(IMC_Unit *unit /*NN*/)
+free_dominators(NOTNULL(IMC_Unit *unit))
 {
     int i;
 
@@ -1000,7 +1001,7 @@ sort_loops(Parrot_Interp interp, IMC_Unit * unit)
  */
 
 void
-find_loops(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
+find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
     int i;
 
@@ -1031,7 +1032,7 @@ find_loops(Interp *interp /*NN*/, struct _IMC_Unit *unit /*NN*/)
  * always transfers control directly to the header.
  */
 int
-natural_preheader(const struct _IMC_Unit *unit /*NN*/, const Loop_info* loop_info /*NN*/)
+natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))
     /* WARN_UNUSED */
 {
     int preheader = -1;
@@ -1154,7 +1155,7 @@ free_loops(IMC_Unit * unit)
 }
 
 void
-search_predecessors_not_in(const Basic_block *node /*NN*/, Set* s)
+search_predecessors_not_in(NOTNULL(const Basic_block *node), Set* s)
 {
    Edge *edge;
 
@@ -1172,7 +1173,7 @@ search_predecessors_not_in(const Basic_block *node /*NN*/, Set* s)
 /*** Utility functions ***/
 
 static void
-init_basic_blocks(IMC_Unit *unit /*NN*/)
+init_basic_blocks(NOTNULL(IMC_Unit *unit))
 {
     if (unit->bb_list != NULL)
         clear_basic_blocks(unit);
@@ -1184,7 +1185,7 @@ init_basic_blocks(IMC_Unit *unit /*NN*/)
 }
 
 void
-clear_basic_blocks(struct _IMC_Unit *unit /*NN*/)
+clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
 {
     int i;
     if (unit->bb_list) {
@@ -1200,7 +1201,7 @@ clear_basic_blocks(struct _IMC_Unit *unit /*NN*/)
 }
 
 static Basic_block*
-make_basic_block(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, Instruction* ins /*NN*/)
+make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))
 {
     int n;
     Basic_block * const bb = mem_sys_allocate(sizeof (Basic_block));
@@ -1231,7 +1232,7 @@ make_basic_block(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, Instruction* ins 
 }
 
 Life_range *
-make_life_range(SymReg *r /*NN*/, int idx)
+make_life_range(NOTNULL(SymReg *r), int idx)
     /* MALLOC, WARN_UNUSED */
 {
    Life_range * const l = mem_sys_allocate_zeroed(sizeof(*l));

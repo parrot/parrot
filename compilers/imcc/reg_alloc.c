@@ -26,26 +26,27 @@
 static void allocate_lexicals( Parrot_Interp interp, IMC_Unit *unit );
 static void allocate_non_volatile( Parrot_Interp interp, IMC_Unit *unit );
 static void allocate_uniq( Parrot_Interp interp, IMC_Unit *unit, int usage );
-static void build_interference_graph( Interp *interp /*NN*/,
-    IMC_Unit *unit /*NN*/ )
+static void build_interference_graph( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void build_reglist( Parrot_Interp interp, IMC_Unit *unit /*NN*/ )
+static void build_reglist( Parrot_Interp interp, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(2);
 
-static void compute_du_chain( IMC_Unit *unit /*NN*/ )
+static void compute_du_chain( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static void compute_one_du_chain( SymReg *r /*NN*/, IMC_Unit *unit /*NN*/ )
+static void compute_one_du_chain(
+    NOTNULL(SymReg *r),
+    NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int first_avail( IMC_Unit *unit, int reg_set, Set **avail );
 static unsigned int* ig_allocate( int N );
 static int ig_find_color(
-    const IMC_Unit *unit /*NN*/,
-    const char *avail /*NN*/ )
+    NOTNULL(const IMC_Unit *unit),
+    NOTNULL(const char *avail) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -57,21 +58,22 @@ static unsigned int* ig_get_word(
     int* bit_ofs );
 
 static void ig_set( int i, int j, int N, unsigned int* graph );
-static void imc_stat_init( IMC_Unit *unit /*NN*/ )
+static void imc_stat_init( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static int interferes( Interp *interp,
-    IMC_Unit *unit /*NN*/,
-    SymReg *r0 /*NN*/,
-    SymReg *r1 /*NN*/ )
+static int interferes( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(SymReg *r0),
+    NOTNULL(SymReg *r1) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void make_stat(
-    IMC_Unit *unit /*NN*/,
-    int *sets /*NULLOK*/,
-    int *cols /*NULLOK*/ )
+    NOTNULL(IMC_Unit *unit),
+    NULLOK(int *sets),
+    NULLOK(int *cols) )
         __attribute__nonnull__(1);
 
 static void map_colors(
@@ -82,17 +84,17 @@ static void map_colors(
     int typ,
     int already_allocated );
 
-static void print_stat( Interp *interp /*N*/, IMC_Unit *unit /*NN*/ )
+static void print_stat( PARROT_INTERP /*N*/, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(2);
 
-static void rebuild_reglist( IMC_Unit *unit /*NN*/ )
+static void rebuild_reglist( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
 static int reg_sort_f( const void *a, const void *b );
-static void sort_reglist( IMC_Unit *unit /*NN*/ )
+static void sort_reglist( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static int try_allocate( Interp *interp /*NN*/, IMC_Unit *unit /*NN*/ )
+static int try_allocate( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -138,7 +140,7 @@ ig_allocate(int N)
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(Interp *interp /*NN*/, IMC_Unit *unit /*NULLOK*/)
+imc_reg_alloc(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 {
     char *function;
 
@@ -227,7 +229,7 @@ done:
 }
 
 void
-free_reglist(IMC_Unit *unit /*NN*/)
+free_reglist(NOTNULL(IMC_Unit *unit))
 {
 #if IMC_TRACE
     fprintf(stderr, "reg_alloc.c: free_reglist\n");
@@ -247,7 +249,7 @@ free_reglist(IMC_Unit *unit /*NN*/)
 }
 
 void
-graph_coloring_reg_alloc(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+graph_coloring_reg_alloc(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     build_interference_graph(interp, unit);
 
@@ -259,7 +261,7 @@ graph_coloring_reg_alloc(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
  * printed with --verbose --verbose
  */
 static void
-make_stat(IMC_Unit *unit /*NN*/, int *sets /*NULLOK*/, int *cols /*NULLOK*/)
+make_stat(NOTNULL(IMC_Unit *unit), NULLOK(int *sets), NULLOK(int *cols))
 {
     /* register usage summary */
     const char type[] = "INSP";
@@ -292,7 +294,7 @@ make_stat(IMC_Unit *unit /*NN*/, int *sets /*NULLOK*/, int *cols /*NULLOK*/)
 
 /* registes usage of .pir */
 static void
-imc_stat_init(IMC_Unit *unit /*NN*/)
+imc_stat_init(NOTNULL(IMC_Unit *unit))
 {
     int j;
 
@@ -307,7 +309,7 @@ imc_stat_init(IMC_Unit *unit /*NN*/)
 
 /* and final */
 static void
-print_stat(Interp *interp /*N*/, IMC_Unit *unit /*NN*/)
+print_stat(PARROT_INTERP /*N*/, NOTNULL(IMC_Unit *unit))
 {
     int sets[4] = {0,0,0,0};
 
@@ -362,7 +364,7 @@ reg_sort_f(const void *a, const void *b)
 }
 
 static void
-sort_reglist(IMC_Unit *unit /*NN*/)
+sort_reglist(NOTNULL(IMC_Unit *unit))
 {
     qsort(unit->reglist, unit->n_symbols, sizeof (SymReg*), reg_sort_f);
 }
@@ -382,7 +384,7 @@ sort_reglist(IMC_Unit *unit /*NN*/)
  */
 
 static void
-build_reglist(Parrot_Interp interp, IMC_Unit *unit /*NN*/)
+build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
 {
     int i, count, unused, n_symbols;
     SymHash  const *hsh = &unit->hash;
@@ -429,7 +431,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit *unit /*NN*/)
  * significantly
  */
 static void
-rebuild_reglist(IMC_Unit *unit /*NN*/)
+rebuild_reglist(NOTNULL(IMC_Unit *unit))
 {
     int i, count, unused;
     const char types[] = "INSP";
@@ -468,7 +470,7 @@ use_it:
  */
 
 static void
-build_interference_graph(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int x;
     unsigned int* interference_graph;
@@ -508,7 +510,7 @@ build_interference_graph(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
 /* Compute a DU-chain for each symbolic in a compilation unit
  */
 static void
-compute_du_chain(IMC_Unit *unit /*NN*/)
+compute_du_chain(NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins = unit->instructions;
     Instruction *lastbranch = NULL;
@@ -535,7 +537,7 @@ compute_du_chain(IMC_Unit *unit /*NN*/)
 }
 
 static void
-compute_one_du_chain(SymReg *r /*NN*/, IMC_Unit *unit /*NN*/)
+compute_one_du_chain(NOTNULL(SymReg *r), NOTNULL(IMC_Unit *unit))
 {
     Instruction * ins;
 
@@ -576,7 +578,7 @@ compute_one_du_chain(SymReg *r /*NN*/, IMC_Unit *unit /*NN*/)
  */
 
 static int
-interferes(Interp *interp, IMC_Unit *unit /*NN*/, SymReg *r0 /*NN*/, SymReg *r1 /*NN*/)
+interferes(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0), NOTNULL(SymReg *r1))
 {
     int i;
 
@@ -657,7 +659,7 @@ interferes(Interp *interp, IMC_Unit *unit /*NN*/, SymReg *r0 /*NN*/, SymReg *r1 
  * find available color for register #x in available colors
  */
 static int
-ig_find_color(const IMC_Unit *unit /*NN*/, const char *avail /*NN*/)
+ig_find_color(NOTNULL(const IMC_Unit *unit), NOTNULL(const char *avail))
 {
     int c;
 
@@ -676,7 +678,7 @@ ig_find_color(const IMC_Unit *unit /*NN*/, const char *avail /*NN*/)
  */
 
 static int
-try_allocate(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int x;
     char *avail;

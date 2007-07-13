@@ -38,31 +38,31 @@ don't apply.
 
 static int cstring_compare(
     SHIM_INTERP,
-    const char *a /*NN*/,
-    const char *b /*NN*/ )
+    NOTNULL(const char *a),
+    NOTNULL(const char *b) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void expand_hash( PARROT_INTERP, Hash *hash /*NN*/ )
+static void expand_hash( PARROT_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void hash_freeze( PARROT_INTERP,
-    const Hash * const hash /*NN*/,
-    visit_info* info /*NN*/ )
+    NOTNULL(const Hash * const hash),
+    NOTNULL(visit_info* info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void hash_thaw( PARROT_INTERP,
-    Hash *hash /*NN*/,
-    visit_info* info /*NN*/ )
+    NOTNULL(Hash *hash),
+    NOTNULL(visit_info* info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void init_hash(
-    Hash *hash /*NN*/,
+    NOTNULL(Hash *hash),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
@@ -75,14 +75,14 @@ static int int_compare( SHIM_INTERP, const void *a, const void *b )
 
 static size_t key_hash_cstring(
     SHIM_INTERP,
-    const void *value /*NN*/,
+    NOTNULL(const void *value),
     size_t seed )
         __attribute__nonnull__(2);
 
 static size_t key_hash_int( SHIM_INTERP, void *value, size_t seed );
 static size_t key_hash_pointer( SHIM_INTERP, void *value, size_t seed );
 static size_t key_hash_STRING( PARROT_INTERP,
-    STRING *value /*NN*/,
+    NOTNULL(STRING *value),
     size_t seed )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -110,7 +110,7 @@ Return the hashed value of the key C<value>.  See also string.c.
 
 
 static size_t
-key_hash_STRING(PARROT_INTERP, STRING *value /*NN*/, size_t seed)
+key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)
 {
     STRING * const s = value;
 
@@ -161,7 +161,7 @@ key_hash_pointer(SHIM_INTERP, void *value, size_t seed)
 }
 
 static size_t
-key_hash_cstring(SHIM_INTERP, const void *value /*NN*/, size_t seed)
+key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
 {
     register size_t h = seed;
     const unsigned char * p = (const unsigned char *) value;
@@ -181,7 +181,7 @@ C string versions of the C<key_hash> and C<compare> functions.
 */
 
 static int
-cstring_compare(SHIM_INTERP, const char *a /*NN*/, const char *b /*NN*/)
+cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))
 {
     return strcmp(a, b);
 }
@@ -238,7 +238,7 @@ Marks the hash and its contents as live.
 
 PARROT_API
 void
-parrot_mark_hash(PARROT_INTERP, Hash *hash /*NN*/)
+parrot_mark_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 {
     UINTVAL found = 0;
     int mark_key = 0;
@@ -281,7 +281,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 */
 
 static void
-hash_thaw(PARROT_INTERP, Hash *hash /*NN*/, visit_info* info /*NN*/)
+hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
 {
     size_t i;
     IMAGE_IO * const io = info->image_io;
@@ -328,7 +328,7 @@ hash_thaw(PARROT_INTERP, Hash *hash /*NN*/, visit_info* info /*NN*/)
 }
 
 static void
-hash_freeze(PARROT_INTERP, const Hash * const hash /*NN*/, visit_info* info /*NN*/)
+hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))
 {
     size_t i;
     IMAGE_IO * const io = info->image_io;
@@ -367,7 +367,7 @@ hash_freeze(PARROT_INTERP, const Hash * const hash /*NN*/, visit_info* info /*NN
 
 PARROT_API
 void
-parrot_hash_visit(PARROT_INTERP, Hash *hash /*NN*/, void *pinfo /*NN*/)
+parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))
 {
     visit_info* const info = (visit_info*) pinfo;
 
@@ -414,7 +414,7 @@ pointers, and they'll be all over memory.)
 */
 
 static void
-expand_hash(PARROT_INTERP, Hash *hash /*NN*/)
+expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 {
     const UINTVAL old_size = hash->mask + 1;
     const UINTVAL new_size = old_size << 1;
@@ -560,7 +560,7 @@ parrot_new_cstring_hash(SHIM_INTERP, Hash **hptr)
 }
 
 static void
-init_hash(Hash *hash /*NN*/,
+init_hash(NOTNULL(Hash *hash),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
@@ -607,14 +607,14 @@ init_hash(Hash *hash /*NN*/,
 
 PARROT_API
 void
-parrot_hash_destroy(SHIM_INTERP, Hash *hash /*NN*/)
+parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))
 {
     mem_sys_free(hash->bs);
     mem_sys_free(hash);
 }
 
 void
-parrot_chash_destroy(PARROT_INTERP, Hash *hash /*NN*/)
+parrot_chash_destroy(PARROT_INTERP, NOTNULL(Hash *hash))
 {
     UINTVAL i;
 
@@ -649,7 +649,7 @@ marked properly.
 */
 
 void
-parrot_new_hash_x(Hash **hptr /*NN*/,
+parrot_new_hash_x(NOTNULL(Hash **hptr),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
@@ -670,7 +670,7 @@ in PMC_struct_val(container).
 */
 
 void
-parrot_new_pmc_hash_x(SHIM_INTERP, PMC *container /*NN*/,
+parrot_new_pmc_hash_x(SHIM_INTERP, NOTNULL(PMC *container),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
@@ -691,7 +691,7 @@ Create a new HASH with void * keys and values.
 
 PARROT_API
 void
-parrot_new_pointer_hash(SHIM_INTERP, Hash **hptr /*NN*/)
+parrot_new_pointer_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 {
     parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr,
                         pointer_compare, key_hash_pointer);
@@ -730,7 +730,7 @@ Return the number of used entries in the hash.
 
 PARROT_API
 INTVAL
-parrot_hash_size(PARROT_INTERP, const Hash *hash /*NN*/)
+parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
     /*PURE, WARN_UNUSED*/
 {
     if (hash)
@@ -748,7 +748,7 @@ Called by iterator.
 
 PARROT_API
 void *
-parrot_hash_get_idx(SHIM_INTERP, const Hash *hash /*NN*/, PMC *key /*NN*/)
+parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
     /* PURE, WARN_UNUSED */
 {
     INTVAL i = PMC_int_val(key);
@@ -798,7 +798,7 @@ Returns the bucket for C<key>.
 
 PARROT_API
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, const Hash *hash /*NN*/, void *key)
+parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), void *key)
     /* WARN_UNUSED */
 {
     const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
@@ -822,7 +822,7 @@ Returns the bucket for C<key> or C<NULL> if no bucket is found.
 
 PARROT_API
 void *
-parrot_hash_get(PARROT_INTERP, Hash *hash /*NN*/, void *key)
+parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
     /* WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
@@ -838,7 +838,7 @@ Returns whether the key exists in the hash.
 
 PARROT_API
 INTVAL
-parrot_hash_exists(PARROT_INTERP, Hash *hash /*NN*/, void *key)
+parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
     /* PURE, WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
@@ -855,7 +855,7 @@ copied.
 
 PARROT_API
 HashBucket*
-parrot_hash_put(PARROT_INTERP, Hash *hash /*NN*/, void *key, void *value)
+parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), void *key, void *value)
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket = hash->bi[hashval & hash->mask];
@@ -907,7 +907,7 @@ Deletes the key from the hash.
 
 PARROT_API
 void
-parrot_hash_delete(PARROT_INTERP, Hash *hash /*NN*/, void *key)
+parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
 {
     HashBucket *bucket;
     HashBucket *prev = NULL;
@@ -940,7 +940,7 @@ Clones C<hash> to C<dest>.
 
 PARROT_API
 void
-parrot_hash_clone(PARROT_INTERP, Hash *hash /*NN*/, Hash **dest)
+parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), Hash **dest)
 {
     UINTVAL i;
 

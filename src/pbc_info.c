@@ -37,7 +37,7 @@ the name of each segment in the directory.
 */
 
 static INTVAL
-iter(Interp* interp, PackFile_Segment *seg, void *user_data)
+iter(PARROT_INTERP, PackFile_Segment *seg, void *user_data)
 {
     int ident = (int)user_data;
     printf("%*.0s%s\n", ident, "", seg->name);

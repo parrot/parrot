@@ -192,7 +192,7 @@ void pop_exception( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void push_exception( PARROT_INTERP, PMC *handler /*NN*/ )
+void push_exception( PARROT_INTERP, NOTNULL(PMC *handler) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -211,7 +211,7 @@ void real_exception( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
-opcode_t * rethrow_exception( PARROT_INTERP, PMC *exception /*NN*/ )
+opcode_t * rethrow_exception( PARROT_INTERP, NOTNULL(PMC *exception) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -232,7 +232,7 @@ void do_panic(
 void Parrot_init_exceptions( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void really_destroy_exception_list( Parrot_exception *e /*NULLOK*/ );
+void really_destroy_exception_list( NULLOK(Parrot_exception *e) );
 PARROT_DOES_NOT_RETURN
 void rethrow_c_exception( PARROT_INTERP )
         __attribute__nonnull__(1);

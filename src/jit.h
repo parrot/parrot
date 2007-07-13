@@ -11,7 +11,7 @@
 #  include "parrot/exec.h"
 #endif
 
-typedef void (*jit_f)(Interp *interp, opcode_t *pc);
+typedef void (*jit_f)(PARROT_INTERP, opcode_t *pc);
 
 
 void Parrot_destroy_jit(void *);
@@ -214,7 +214,7 @@ typedef struct Parrot_jit_info_t {
     ((jit_info)->arena.start + (fixup)->native_offset)
 
 typedef void (*jit_fn_t)(Parrot_jit_info_t *jit_info,
-                         Interp *interp);
+                         PARROT_INTERP);
 
 /*  Parrot_jit_fn_info_t
  *      The table of opcodes.
@@ -236,22 +236,22 @@ extern Parrot_jit_fn_info_t op_exec[];
 PARROT_API void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        Interp *interp);
+                        PARROT_INTERP);
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                          Interp *interp);
+                          PARROT_INTERP);
 
 void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                          Interp *interp);
+                          PARROT_INTERP);
 
 void Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                        Interp *interp);
+                        PARROT_INTERP);
 
 void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                          Interp *interp);
+                          PARROT_INTERP);
 
 void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                          Interp *interp);
+                          PARROT_INTERP);
 
 /*
  * interface functions for the register save/restore code
@@ -286,9 +286,9 @@ typedef struct jit_arch_regs {
     const char *map_F;
 } jit_arch_regs;
 
-typedef void (*mov_RM_f)(Interp *interp, Parrot_jit_info_t *,
+typedef void (*mov_RM_f)(PARROT_INTERP, Parrot_jit_info_t *,
         int cpu_reg, int base_reg, INTVAL offs);
-typedef void (*mov_MR_f)(Interp *interp, Parrot_jit_info_t *,
+typedef void (*mov_MR_f)(PARROT_INTERP, Parrot_jit_info_t *,
         int base_reg, INTVAL offs, int cpu_reg);
 
 typedef struct jit_arch_info_t {
@@ -316,7 +316,7 @@ const jit_arch_info * Parrot_jit_init(Interp *);
  * interface to create JIT code
  */
 Parrot_jit_info_t *
-parrot_build_asm(Interp *interp,
+parrot_build_asm(PARROT_INTERP,
                 opcode_t *code_start, opcode_t *code_end,
                 void *objfile, INTVAL);
 /*

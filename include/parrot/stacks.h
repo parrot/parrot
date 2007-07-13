@@ -111,7 +111,7 @@ void * stack_peek( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * stack_pop( PARROT_INTERP,
     NOTNULL(Stack_Chunk_t **stack_p),
     NULLOK(void *where),
@@ -124,11 +124,10 @@ void stack_push( PARROT_INTERP,
     NOTNULL(Stack_Chunk_t **stack_p),
     NOTNULL(void *thing),
     Stack_entry_type type,
-    NOTNULL(Stack_cleanup_method cleanup) )
+    NULLOK(Stack_cleanup_method cleanup) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/stacks.c */
 /* HEADERIZER BEGIN: src/stack_common.c */

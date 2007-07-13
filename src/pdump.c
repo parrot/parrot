@@ -54,14 +54,14 @@ F<src/packdump.c>.
 /*
 
 static void
-const_dump(Interp *interp, PackFile_Segment *segp)
+const_dump(PARROT_INTERP, PackFile_Segment *segp)
 
 Dump the constant table.
 
 */
 
 static void
-const_dump(Interp *interp, PackFile_Segment *segp)
+const_dump(PARROT_INTERP, PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
     PackFile_ConstTable_dump(interp, (PackFile_ConstTable *)segp);
@@ -71,14 +71,14 @@ const_dump(Interp *interp, PackFile_Segment *segp)
 /*
 
 static void
-fixup_dump(Interp *interp, PackFile_Segment *segp)
+fixup_dump(PARROT_INTERP, PackFile_Segment *segp)
 
 Dump the fixup table.
 
 */
 
 static void
-fixup_dump(Interp *interp, PackFile_Segment *segp)
+fixup_dump(PARROT_INTERP, PackFile_Segment *segp)
 {
     PIO_printf(interp, "%s => [\n", segp->name);
     PackFile_Fixup_dump(interp, (PackFile_FixupTable *)segp);
@@ -88,14 +88,14 @@ fixup_dump(Interp *interp, PackFile_Segment *segp)
 /*
 
 static void
-disas_dump(Interp *interp, PackFile_Segment *self)
+disas_dump(PARROT_INTERP, PackFile_Segment *self)
 
 Disassemble and dump.
 
 */
 
 static void
-disas_dump(Interp *interp, PackFile_Segment *self)
+disas_dump(PARROT_INTERP, PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
@@ -122,14 +122,14 @@ disas_dump(Interp *interp, PackFile_Segment *self)
 /*
 
 static void
-PackFile_header_dump(Interp *interp, PackFile *pf)
+PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 
 Dump the header.
 
 */
 
 static void
-PackFile_header_dump(Interp *interp, PackFile *pf)
+PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 {
     PIO_printf(interp, "HEADER => [\n");
     PIO_printf(interp, "\twordsize  = %d", pf->header->wordsize);

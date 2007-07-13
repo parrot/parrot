@@ -35,7 +35,7 @@ extract_int(char *str, int *pos, int length)
  * that value.
  */
 static PMC *
-binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, int length)
+binary_scan_number_field(PARROT_INTERP, char field, char *binstr, int *_pos, int length)
 {
     char *c;
     double *d;
@@ -97,7 +97,7 @@ binary_scan_number_field(Interp *interp, char field, char *binstr, int *_pos, in
  * of the field. Returns a TclList PMC of the number PMCs.
  */
 static PMC *
-binary_scan_number_slurpy(Interp *interp, char field, char *binstr, int *_pos, int length)
+binary_scan_number_slurpy(PARROT_INTERP, char field, char *binstr, int *_pos, int length)
 {
     PMC *elem;
     PMC *values = pmc_new(interp, class_TclList);
@@ -114,7 +114,7 @@ binary_scan_number_slurpy(Interp *interp, char field, char *binstr, int *_pos, i
  * the field specifier.
  */
 static PMC *
-binary_scan_number(Interp *interp, char field,
+binary_scan_number(PARROT_INTERP, char field,
                    char *format, int *formatpos, int formatlen,
                    char *binstr, int *binstrpos, int binstrlen)
 {
@@ -137,7 +137,7 @@ binary_scan_number(Interp *interp, char field,
  * string (concatenated to its previous value).
  */
 static STRING *
-binary_scan_string_field(Interp *interp, char field,
+binary_scan_string_field(PARROT_INTERP, char field,
                          char *binstr, int *_binstrpos, int binstrlen,
                          STRING *value, int length)
 {
@@ -174,7 +174,7 @@ binary_scan_string_field(Interp *interp, char field,
  * new value of the STRING value passed in.
  */
 static STRING *
-binary_scan_string_slurpy(Interp *interp, char field,
+binary_scan_string_slurpy(PARROT_INTERP, char field,
                           char *binstr, int *_binstrpos, int binstrlen, STRING *value)
 {
     int length = string_length(interp, value);
@@ -191,7 +191,7 @@ binary_scan_string_slurpy(Interp *interp, char field,
  * value(s) extracted.
  */
 static PMC *
-binary_scan_string(Interp *interp, char field,
+binary_scan_string(PARROT_INTERP, char field,
                    char *format, int *formatpos, int formatlen,
                    char *binstr, int *binstrpos, int binstrlen)
 {
@@ -225,7 +225,7 @@ binary_scan_string(Interp *interp, char field,
  *
  * String and number field code has been separated in an effort to reduce code.
  */
-PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
+PMC *ParTcl_binary_scan(PARROT_INTERP, STRING *BINSTR, STRING *FORMAT)
 {
     char *binstr  = string_to_cstring(interp, BINSTR);
     int binstrlen = (int)string_length(interp, BINSTR);
@@ -283,7 +283,7 @@ PMC *ParTcl_binary_scan(Interp *interp, STRING *BINSTR, STRING *FORMAT)
 }
 
 static STRING *
-binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *value)
+binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value)
 {
     char c;
     double d;
@@ -323,7 +323,7 @@ binary_format_number_field(Interp *interp, char field, STRING *binstr, PMC *valu
 }
 
 static STRING *
-binary_format_number(Interp *interp, char field, STRING *binstr, PMC *value,
+binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
 {
     binstr = binary_format_number_field(interp, field, binstr, value);
@@ -332,7 +332,7 @@ binary_format_number(Interp *interp, char field, STRING *binstr, PMC *value,
 }
 
 static STRING *
-binary_format_string_field(Interp *interp, char field, STRING *binstr,
+binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
                            STRING *strval, int length)
 {
     int strlen = string_length(interp, strval);
@@ -361,7 +361,7 @@ binary_format_string_field(Interp *interp, char field, STRING *binstr,
 }
 
 static STRING *
-binary_format_string(Interp *interp, char field, STRING *binstr, PMC *value,
+binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
 {
     STRING *strval = VTABLE_get_string(interp, value);
@@ -381,7 +381,7 @@ binary_format_string(Interp *interp, char field, STRING *binstr, PMC *value,
     return binstr;
 }
 
-STRING *ParTcl_binary_format(Interp *interp, STRING *FORMAT, PMC *values)
+STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)
 {
     char *format   = string_to_cstring(interp, FORMAT);
     int formatlen  = string_length(interp, FORMAT);

@@ -18,7 +18,7 @@
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
 }
 
@@ -26,7 +26,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
     jit_info->native_ptr = emit_mov(jit_info->native_ptr, r1, r4);
 #  ifndef ARM_K_BUG
@@ -64,7 +64,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_exec_normal_op(jit_info, interp);
     Parrot_jump_to_op_in_reg(jit_info, interp, r0);
@@ -72,7 +72,7 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
-                       Interp *interp)
+                       PARROT_INTERP)
 {
 }
 

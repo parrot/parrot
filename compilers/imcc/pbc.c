@@ -70,68 +70,74 @@ static struct globals {
 
 /* HEADERIZER BEGIN: static */
 
-static void add_1_const( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+static void add_1_const( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int add_const_key( Interp *interp,
+static int add_const_key( PARROT_INTERP,
     opcode_t key[],
     int size,
-    char *s_key );
-
-static int add_const_num( Interp *interp /*NN*/, const char *buf )
+    char *s_key )
         __attribute__nonnull__(1);
 
-static int add_const_pmc_sub( Interp *interp, SymReg *r, int offs, int end );
-static int add_const_str( Interp *interp /*NN*/, const SymReg *r /*NN*/ )
+static int add_const_num( PARROT_INTERP, const char *buf )
+        __attribute__nonnull__(1);
+
+static int add_const_pmc_sub( PARROT_INTERP, SymReg *r, int offs, int end )
+        __attribute__nonnull__(1);
+
+static int add_const_str( PARROT_INTERP, NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static opcode_t build_key( Interp *interp /*NN*/, SymReg *key_reg /*NN*/ )
+static opcode_t build_key( PARROT_INTERP, NOTNULL(SymReg *key_reg) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void constant_folding( Interp *interp, IMC_Unit *unit /*NN*/ )
+static void constant_folding( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PMC* create_lexinfo( Interp *interp,
+static PMC* create_lexinfo( PARROT_INTERP,
     IMC_Unit *unit,
     PMC *sub,
-    int need_lex );
+    int need_lex )
+        __attribute__nonnull__(1);
 
 static subs_t * find_global_label(
-    const char *name /*NN*/,
-    const subs_t *sym /*NN*/,
-    int *pc /*NN*/ )
+    NOTNULL(const char *name),
+    NOTNULL(const subs_t *sym),
+    NOTNULL(int *pc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static PMC* find_outer( Interp *interp, IMC_Unit *unit /*NN*/ )
+static PMC* find_outer( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixup_globals( Interp *interp /*NN*/ )
+static void fixup_globals( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-static int get_codesize( Interp *interp /*NN*/,
-    IMC_Unit *unit /*NN*/,
-    int *src_lines /*NN*/ )
+static int get_codesize( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(int *src_lines) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-static int get_old_size( Interp *interp /*NN*/, int *ins_line /*NN*/ )
+static int get_old_size( PARROT_INTERP, NOTNULL(int *ins_line) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void imcc_globals_destroy( SHIM_INTERP, int ex, void *param );
 static void make_new_sub( IMC_Unit *unit );
-static void make_pmc_const( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+static void make_pmc_const( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PMC* mk_multi_sig( Interp *interp /*NN*/, SymReg *r /*NN*/ )
+static PMC* mk_multi_sig( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -142,18 +148,19 @@ static const char * slice_deb( int bits )
         __attribute__const__
         __attribute__warn_unused_result__;
 
-static void store_fixup( Interp *interp,
-    SymReg *r /*NN*/,
+static void store_fixup( PARROT_INTERP,
+    NOTNULL(SymReg *r),
     int pc,
     int offset )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void store_key_const( const char *str /*NN*/, int idx )
+static void store_key_const( NOTNULL(const char *str), int idx )
         __attribute__nonnull__(1);
 
 static void store_sub_size( size_t size, size_t ins_line );
-static void verify_signature( Interp *interp /*NN*/,
-    const Instruction *ins /*NN*/,
+static void verify_signature( PARROT_INTERP,
+    NOTNULL(const Instruction *ins),
     opcode_t *pc )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -187,7 +194,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 }
 
 int
-e_pbc_open(Interp *interp, SHIM(void *param))
+e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     cs_t *cs;
 
@@ -260,7 +267,7 @@ old_blocks(void)
 }
 
 opcode_t *
-make_jit_info(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/)
+make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     size_t size, old;
 
@@ -312,7 +319,7 @@ make_new_sub(IMC_Unit *unit)
 
 /* get size/line of bytecode in ops till now */
 static int
-get_old_size(Interp *interp /*NN*/, int *ins_line /*NN*/)
+get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
 {
     subs_t *s;
     size_t  size = 0;
@@ -337,7 +344,7 @@ store_sub_size(size_t size, size_t ins_line)
 }
 
 static void
-store_fixup(Interp *interp, SymReg *r /*NN*/, int pc, int offset)
+store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
 {
     SymReg * const fixup = _mk_address(interp, &globals.cs->subs->fixup,
             str_dup(r->name), U_add_all);
@@ -354,7 +361,7 @@ store_fixup(Interp *interp, SymReg *r /*NN*/, int pc, int offset)
 }
 
 static void
-store_key_const(const char *str /*NN*/, int idx)
+store_key_const(NOTNULL(const char *str), int idx)
 {
     SymReg * const c = _mk_const(&globals.cs->key_consts, str_dup(str), 0);
     c->color = idx;
@@ -363,7 +370,7 @@ store_key_const(const char *str /*NN*/, int idx)
 /* store globals for later fixup
  * return size in ops */
 static int
-get_codesize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int *src_lines /*NN*/)
+get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
     /* WARN_UNUSED */
 {
     Instruction *ins;
@@ -412,7 +419,7 @@ get_codesize(Interp *interp /*NN*/, IMC_Unit *unit /*NN*/, int *src_lines /*NN*/
 
 /* get a global label, return the pc (absolute) */
 static subs_t *
-find_global_label(const char *name /*NN*/, const subs_t *sym /*NN*/, int *pc /*NN*/)
+find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))
 {
     subs_t *s;
 
@@ -438,7 +445,7 @@ find_global_label(const char *name /*NN*/, const subs_t *sym /*NN*/, int *pc /*N
 
 /* fix global stuff */
 static void
-fixup_globals(Interp *interp /*NN*/)
+fixup_globals(PARROT_INTERP)
 {
     SymHash     *hsh;
     Instruction *ins;
@@ -530,7 +537,7 @@ fixup_globals(Interp *interp /*NN*/)
 }
 
 STRING *
-IMCC_string_from_reg(Interp *interp /*NN*/, const SymReg *r /*NN*/)
+IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
     const char *buf = r->name;
     STRING *s;
@@ -574,7 +581,7 @@ IMCC_string_from_reg(Interp *interp /*NN*/, const SymReg *r /*NN*/)
 
 /* add constant string to constant_table */
 static int
-add_const_str(Interp *interp /*NN*/, const SymReg *r /*NN*/)
+add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
     const int      k = PDB_extend_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
@@ -586,7 +593,7 @@ add_const_str(Interp *interp /*NN*/, const SymReg *r /*NN*/)
 }
 
 static int
-add_const_num(Interp *interp /*NN*/, const char *buf)
+add_const_num(PARROT_INTERP, const char *buf)
 {
     const int      k = PDB_extend_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);
@@ -598,7 +605,7 @@ add_const_num(Interp *interp /*NN*/, const char *buf)
 }
 
 static PMC*
-mk_multi_sig(Interp *interp /*NN*/, SymReg *r /*NN*/)
+mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
 {
     PMC       *multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
     pcc_sub_t *pcc_sub   = r->pcc_sub;
@@ -648,7 +655,7 @@ mk_multi_sig(Interp *interp /*NN*/, SymReg *r /*NN*/)
 typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
 
 static PMC*
-create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
+create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)
 {
     int                 i, k;
     SymReg             *r;
@@ -721,7 +728,7 @@ create_lexinfo(Interp *interp, IMC_Unit *unit, PMC *sub, int need_lex)
 }
 
 static PMC*
-find_outer(Interp *interp, IMC_Unit *unit /*NN*/)
+find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     subs_t *s;
     SymReg *sub;
@@ -770,7 +777,7 @@ find_outer(Interp *interp, IMC_Unit *unit /*NN*/)
 }
 
 static int
-add_const_pmc_sub(Interp *interp, SymReg *r,
+add_const_pmc_sub(PARROT_INTERP, SymReg *r,
         int offs, int end)
 {
     int                  i, k;
@@ -912,7 +919,7 @@ add_const_pmc_sub(Interp *interp, SymReg *r,
 
 /* add constant key to constant_table */
 static int
-add_const_key(Interp *interp, opcode_t key[], int size, char *s_key)
+add_const_key(PARROT_INTERP, opcode_t key[], int size, char *s_key)
 {
     int                k;
     SymReg            *r;
@@ -982,7 +989,7 @@ slice_deb(int bits)
  */
 
 static opcode_t
-build_key(Interp *interp /*NN*/, SymReg *key_reg /*NN*/)
+build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
 {
 #define KEYLEN 21
     char      s_key[KEYLEN * 10];
@@ -1097,7 +1104,7 @@ build_key(Interp *interp /*NN*/, SymReg *key_reg /*NN*/)
 }
 
 INTVAL
-IMCC_int_from_reg(Interp *interp, const SymReg *r /*NN*/)
+IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
     INTVAL i;
 
@@ -1129,7 +1136,7 @@ IMCC_int_from_reg(Interp *interp, const SymReg *r /*NN*/)
 }
 
 static void
-make_pmc_const(Interp *interp /*NN*/, SymReg *r /*NN*/)
+make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
 {
     STRING *s;
     PMC    *p, *_class;
@@ -1156,7 +1163,7 @@ make_pmc_const(Interp *interp /*NN*/, SymReg *r /*NN*/)
 }
 
 static void
-add_1_const(Interp *interp /*NN*/, SymReg *r /*NN*/)
+add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
 {
     if (r->color >= 0)
         return;
@@ -1204,7 +1211,7 @@ add_1_const(Interp *interp /*NN*/, SymReg *r /*NN*/)
 
 /* store a constants idx for later reuse */
 static void
-constant_folding(Interp *interp, IMC_Unit *unit /*NN*/)
+constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int      i;
     SymHash *hsh = &IMCC_INFO(interp)->ghash;
@@ -1250,7 +1257,7 @@ constant_folding(Interp *interp, IMC_Unit *unit /*NN*/)
 }
 
 int
-e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), IMC_Unit *unit /*NN*/)
+e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 {
     if (!unit->instructions)
         return 0;
@@ -1262,7 +1269,7 @@ e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), IMC_Unit *unit /*NN*/)
 }
 
 int
-e_pbc_end_sub(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/)
+e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins;
     int          pragma;
@@ -1298,7 +1305,7 @@ e_pbc_end_sub(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/)
  */
 
 static void
-verify_signature(Interp *interp /*NN*/, const Instruction *ins /*NN*/, opcode_t *pc)
+verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
 {
     INTVAL  i, n;
     int     no_consts;
@@ -1364,7 +1371,7 @@ verify_signature(Interp *interp /*NN*/, const Instruction *ins /*NN*/, opcode_t 
 
 /* now let the fun begin, actually emit code for one ins */
 int
-e_pbc_emit(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/, const Instruction *ins /*NN*/)
+e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(const Instruction *ins))
 {
     int        op, i;
     int        ok = 0;
@@ -1582,7 +1589,7 @@ e_pbc_emit(Interp *interp /*NN*/, SHIM(void *param), IMC_Unit *unit /*NN*/, cons
 }
 
 int
-e_pbc_close(Interp *interp /*NN*/, SHIM(void *param))
+e_pbc_close(PARROT_INTERP, SHIM(void *param))
 {
     fixup_globals(interp);
 

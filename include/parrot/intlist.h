@@ -40,53 +40,54 @@ typedef IntList_Chunk IntList;
 
 /* HEADERIZER BEGIN: src/intlist.c */
 
-void intlist_assign( Interp *i /*NN*/,
-    IntList *l /*NN*/,
+void intlist_assign(
+    NOTNULL(Interp *i),
+    NOTNULL(IntList *l),
     INTVAL idx,
     INTVAL val )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-IntList * intlist_clone( Interp *i /*NN*/, const IntList *list/*NN*/ )
+IntList * intlist_clone( NOTNULL(Interp *i), const IntList *list/*NN*/ )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
-void intlist_dump( FILE *fp, IntList *list /*NN*/, int verbose )
+void intlist_dump( FILE *fp, NOTNULL(IntList *list), int verbose )
         __attribute__nonnull__(2);
 
-INTVAL intlist_get( PARROT_INTERP, IntList *list /*NN*/, INTVAL idx )
+INTVAL intlist_get( PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
 
-INTVAL intlist_length( SHIM_INTERP, const IntList *list /*NN*/ )
+INTVAL intlist_length( SHIM_INTERP, NOTNULL(const IntList *list) )
         __attribute__nonnull__(2)
         __attribute__pure__
         __attribute__warn_unused_result__;
 
-void intlist_mark( Interp *i /*NN*/, IntList *l /*NN*/ )
+void intlist_mark( NOTNULL(Interp *i), NOTNULL(IntList *l) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-IntList * intlist_new( Interp *i /*NN*/ )
+IntList * intlist_new( NOTNULL(Interp *i) )
         __attribute__nonnull__(1)
         __attribute__malloc__
         __attribute__warn_unused_result__;
 
-INTVAL intlist_pop( Interp *i /*NN*/, IntList *l /*NN*/ )
+INTVAL intlist_pop( NOTNULL(Interp *i), NOTNULL(IntList *l) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void intlist_push( Interp *i /*NN*/, IntList *l /*NN*/, INTVAL val )
+void intlist_push( NOTNULL(Interp *i), NOTNULL(IntList *l), INTVAL val )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-INTVAL intlist_shift( Interp *i, IntList **l /*NN*/ )
+INTVAL intlist_shift( Interp *i, NOTNULL(IntList **l) )
         __attribute__nonnull__(2);
 
-void intlist_unshift( Interp *i /*NN*/, IntList **l /*NN*/, INTVAL val )
+void intlist_unshift( NOTNULL(Interp *i), NOTNULL(IntList **l), INTVAL val )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

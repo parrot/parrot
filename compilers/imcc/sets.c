@@ -39,20 +39,20 @@ set_make_full(int length)
 }
 
 void
-set_free(Set *s /*NN*/)
+set_free(NOTNULL(Set *s))
 {
     mem_sys_free(s->bmp);
     mem_sys_free(s);
 }
 
 void
-set_clear(Set *s /*NN*/)
+set_clear(NOTNULL(Set *s))
 {
     memset(s->bmp, 0, s->length/8 +1);
 }
 
 Set*
-set_copy(Set *s1 /*NN*/)
+set_copy(NOTNULL(Set *s1))
     /* WARN_UNUSED, MALLOC */
 {
     Set * const s = set_make(s1->length);
@@ -63,7 +63,7 @@ set_copy(Set *s1 /*NN*/)
 
 
 int
-set_equal(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
+set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 {
     int mask;
     const int bytes = s1->length/8;
@@ -84,13 +84,13 @@ set_equal(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
 }
 
 void
-set_add(Set *s /*NN*/, int element)
+set_add(NOTNULL(Set *s), int element)
 {
     s->bmp[element >> 3] |= (1 << (element & 7));
 }
 
 int
-set_first_zero(const Set *s /*NN*/)
+set_first_zero(NOTNULL(const Set *s))
     /* WARN_UNUSED */
 {
     int i;
@@ -101,7 +101,7 @@ set_first_zero(const Set *s /*NN*/)
 }
 
 int
-set_contains(const Set *s /*NN*/, int element)
+set_contains(NOTNULL(const Set *s), int element)
     /* WARN_UNUSED */
 {
 #ifdef __LCC__
@@ -114,7 +114,7 @@ set_contains(const Set *s /*NN*/, int element)
 }
 
 Set *
-set_union(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
+set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
     /* WARN_UNUSED, MALLOC */
 {
     int i;
@@ -133,7 +133,7 @@ set_union(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
 
 
 Set *
-set_intersec(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
+set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
     /* WARN_UNUSED, MALLOC */
 {
     int i;
@@ -150,7 +150,7 @@ set_intersec(const Set *s1 /*NN*/, const Set *s2 /*NN*/)
 }
 
 void
-set_intersec_inplace(Set *s1 /*NN*/, const Set *s2 /*NN*/)
+set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))
 {
     int i;
 

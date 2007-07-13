@@ -3,19 +3,19 @@
  */
 
 PMC *
-Parrot_stat_file(Interp* interp, STRING *filename)
+Parrot_stat_file(PARROT_INTERP, STRING *filename)
 {
     return NULL;
 }
 
 PMC *
-Parrot_stat_info_pmc(Interp* interp, STRING *filename, INTVAL thing)
+Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
 
 static INTVAL
-stat_common(Interp *interp, struct stat *statbuf,
+stat_common(PARROT_INTERP, struct stat *statbuf,
         INTVAL thing, int status)
 {
     INTVAL result = -1;
@@ -86,7 +86,7 @@ stat_common(Interp *interp, struct stat *statbuf,
 }
 
 INTVAL
-Parrot_stat_info_intval(Interp* interp, STRING *file, INTVAL thing)
+Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
     struct stat statbuf;
     char *filename;
@@ -102,7 +102,7 @@ Parrot_stat_info_intval(Interp* interp, STRING *file, INTVAL thing)
 }
 
 INTVAL
-Parrot_fstat_info_intval(Interp* interp, INTVAL file, INTVAL thing)
+Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
 {
     struct stat statbuf;
     int status;
@@ -113,13 +113,13 @@ Parrot_fstat_info_intval(Interp* interp, INTVAL file, INTVAL thing)
 }
 
 FLOATVAL
-Parrot_stat_info_floatval(Interp* interp, STRING *filename, INTVAL thing)
+Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return (FLOATVAL)-1;
 }
 
 STRING *
-Parrot_stat_info_string(Interp* interp, STRING *filename, INTVAL thing)
+Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return NULL;
 }

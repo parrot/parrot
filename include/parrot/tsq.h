@@ -42,53 +42,55 @@ struct QUEUE {
 
 /* HEADERIZER BEGIN: src/tsq.c */
 
-void insert_entry( QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/ )
+void insert_entry( NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void nosync_insert_entry( QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/ )
+void nosync_insert_entry( NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-QUEUE_ENTRY * nosync_pop_entry( QUEUE *queue /*NN*/ )
+QUEUE_ENTRY * nosync_pop_entry( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-QUEUE_ENTRY * peek_entry( QUEUE *queue /*NN*/ )
+QUEUE_ENTRY * peek_entry( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-QUEUE_ENTRY * pop_entry( QUEUE *queue /*NN*/ )
+QUEUE_ENTRY * pop_entry( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void push_entry( QUEUE *queue /*NN*/, QUEUE_ENTRY *entry )
+void push_entry( NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry )
         __attribute__nonnull__(1);
 
-void queue_broadcast( QUEUE *queue /*NN*/ )
+void queue_broadcast( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void queue_destroy( QUEUE *queue /*NN*/ )
+void queue_destroy( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
 QUEUE* queue_init( UINTVAL prio );
-void queue_lock( QUEUE *queue /*NN*/ )
+void queue_lock( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void queue_signal( QUEUE *queue /*NN*/ )
+void queue_signal( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void queue_timedwait( QUEUE *queue /*NN*/, struct timespec *abs_time /*NN*/ )
+void queue_timedwait(
+    NOTNULL(QUEUE *queue),
+    NOTNULL(struct timespec *abs_time) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void queue_unlock( QUEUE *queue /*NN*/ )
+void queue_unlock( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void queue_wait( QUEUE *queue /*NN*/ )
+void queue_wait( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
-void unshift_entry( QUEUE *queue /*NN*/, QUEUE_ENTRY *entry )
+void unshift_entry( NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry )
         __attribute__nonnull__(1);
 
-QUEUE_ENTRY * wait_for_entry( QUEUE *queue /*NN*/ )
+QUEUE_ENTRY * wait_for_entry( NOTNULL(QUEUE *queue) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/tsq.c */

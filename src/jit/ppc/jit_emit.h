@@ -798,7 +798,7 @@ void Parrot_ppc_jit_restore_nonvolatile_registers(void);
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     Interp *interp)
+                     PARROT_INTERP)
 {
     add_disp(jit_info->native_ptr, r3,
         ((long)jit_info->cur_op - (long)interp->code->base.data));
@@ -820,7 +820,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_jit_normal_op(jit_info, interp);
 
@@ -838,7 +838,7 @@ static void Parrot_end_jit(Parrot_jit_info_t *, Interp *);
 /* Parrot_jit_restart_op is based on the i386 version */
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                      Interp *interp)
+                      PARROT_INTERP)
 {
     char *jmp_ptr, *sav_ptr;
 
@@ -871,7 +871,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 #  define CUR_OPCODE jit_info->cur_op
 #  define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
 static void
-jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp *interp)
+jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     PMC *sig_pmc;
     INTVAL *sig_bits, i, n;
@@ -895,7 +895,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, Interp *interp)
 
 #  define CONST(i) interp->code->const_table->constants[jit_info->cur_op[i]]
 static void
-jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp *interp,
+jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
 {
     PMC *sig_pmc;
@@ -956,7 +956,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, Interp *interp,
 static int jit_save_regs_call(Parrot_jit_info_t *, Interp * , int skip);
 
 static void
-jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
+jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
 {
     PMC *sig_args, *sig_params, *sig_result;
@@ -1021,7 +1021,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, Interp *interp,
  *    TODO save N regs for b) too
  */
 static int
-jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp *interp, int skip)
+jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
 {
     int i, used_i, save_i;
     const jit_arch_regs *reg_info;
@@ -1043,7 +1043,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, Interp *interp, int skip)
 }
 
 static void
-jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp *interp,
+jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int skip)
 {
 
@@ -1075,7 +1075,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, Interp *interp,
  */
 static void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 Interp *interp)
+                 PARROT_INTERP)
 {
     int i;
     jit_emit_mflr(jit_info->native_ptr, r0);
@@ -1112,13 +1112,13 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
-                 Interp *interp)
+                 PARROT_INTERP)
 {
 }
 
 static void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
-                 Interp *interp)
+                 PARROT_INTERP)
 {
     jit_emit_mflr(jit_info->native_ptr, r0);    /* optional */
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1); /* stw     r0,8(r1) */
@@ -1156,7 +1156,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   Interp *interp)
+                   PARROT_INTERP)
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
@@ -1377,7 +1377,7 @@ static const jit_arch_info arch_info = {
 
 
 const jit_arch_info *
-Parrot_jit_init(Interp *interp)
+Parrot_jit_init(PARROT_INTERP)
 {
     return &arch_info;
 }

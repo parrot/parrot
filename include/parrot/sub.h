@@ -214,37 +214,38 @@ PMC * new_ret_continuation_pmc( PARROT_INTERP, opcode_t *address )
 
 PARROT_API
 int Parrot_Context_get_info( PARROT_INTERP,
-    parrot_context_t *ctx /*NN*/,
-    Parrot_Context_info *info /*NN*/ )
+    NOTNULL(parrot_context_t *ctx),
+    NOTNULL(Parrot_Context_info *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-STRING* Parrot_Context_infostr( PARROT_INTERP, parrot_context_t *ctx /*NN*/ )
+STRING* Parrot_Context_infostr( PARROT_INTERP,
+    NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-STRING* Parrot_full_sub_name( PARROT_INTERP, PMC* sub /*NULLOK*/ )
+STRING* Parrot_full_sub_name( PARROT_INTERP, NULLOK(PMC* sub) )
         __attribute__nonnull__(1);
 
 PARROT_API
 PMC* parrot_new_closure( PARROT_INTERP, PMC *sub_pmc )
         __attribute__nonnull__(1);
 
-void invalidate_retc_context( PARROT_INTERP, PMC *cont /*NN*/ )
+void invalidate_retc_context( PARROT_INTERP, NOTNULL(PMC *cont) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_context( PARROT_INTERP, parrot_context_t* ctx /*NN*/ )
+void mark_context( PARROT_INTERP, NOTNULL(parrot_context_t* ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 Parrot_sub * new_closure( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-Parrot_cont * new_continuation( PARROT_INTERP, Parrot_cont *to /*NULLOK*/ )
+Parrot_cont * new_continuation( PARROT_INTERP, NULLOK(Parrot_cont *to) )
         __attribute__nonnull__(1);
 
 Parrot_coro * new_coroutine( PARROT_INTERP )
@@ -258,7 +259,7 @@ Parrot_sub * new_sub( PARROT_INTERP )
 
 PMC* Parrot_find_pad( PARROT_INTERP,
     STRING *lex_name,
-    parrot_context_t *ctx /*NN*/ )
+    NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

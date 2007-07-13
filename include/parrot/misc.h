@@ -32,8 +32,8 @@ typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 PARROT_API
 INTVAL Parrot_byte_index(
     SHIM_INTERP,
-    const STRING *base /*NN*/,
-    const STRING *search /*NN*/,
+    NOTNULL(const STRING *base),
+    NOTNULL(const STRING *search),
     UINTVAL start_offset )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -41,15 +41,15 @@ INTVAL Parrot_byte_index(
 PARROT_API
 INTVAL Parrot_byte_rindex(
     SHIM_INTERP,
-    const STRING *base /*NN*/,
-    const STRING *search /*NN*/,
+    NOTNULL(const STRING *base),
+    NOTNULL(const STRING *search),
     UINTVAL start_offset )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
 PARROT_API
-void Parrot_destroy_cpa( char **array /*NN*/ )
+void Parrot_destroy_cpa( NOTNULL(char **array) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -66,7 +66,7 @@ void * Parrot_make_cpa( PARROT_INTERP, PMC *array )
         __attribute__nonnull__(1);
 
 PARROT_API
-void * Parrot_make_la( PARROT_INTERP, PMC *array /*NN*/ )
+void * Parrot_make_la( PARROT_INTERP, NOTNULL(PMC *array) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__warn_unused_result__;
@@ -77,8 +77,8 @@ INTVAL Parrot_range_rand( INTVAL from, INTVAL to, INTVAL how_random );
 PARROT_API
 void Parrot_register_move( PARROT_INTERP,
     int n_regs,
-    unsigned char *dest_regs /*NN*/,
-    unsigned char *src_regs /*NN*/,
+    NOTNULL(unsigned char *dest_regs),
+    NOTNULL(unsigned char *src_regs),
     unsigned char temp_reg,
     reg_move_func mov,
     reg_move_func mov_alt,
@@ -94,7 +94,7 @@ PARROT_API
 INTVAL Parrot_uint_rand( INTVAL how_random );
 
 PARROT_API
-PMC* tm_to_array( PARROT_INTERP, const struct tm *tm /*NN*/ )
+PMC* tm_to_array( PARROT_INTERP, NOTNULL(const struct tm *tm) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -126,16 +126,18 @@ PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_psprintf( PARROT_INTERP, STRING *pat /*NN*/, PMC *ary /*NN*/ )
+STRING * Parrot_psprintf( PARROT_INTERP,
+    NOTNULL(STRING *pat),
+    NOTNULL(PMC *ary) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_snprintf( PARROT_INTERP,
-    char *targ /*NN*/,
+    NOTNULL(char *targ),
     size_t len,
-    const char *pat /*NN*/,
+    NOTNULL(const char *pat),
     ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -149,15 +151,15 @@ STRING * Parrot_sprintf_c( PARROT_INTERP, NOTNULL(const char *pat), ... )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_sprintf_s( PARROT_INTERP, STRING *pat /*NN*/, ... )
+STRING * Parrot_sprintf_s( PARROT_INTERP, NOTNULL(STRING *pat), ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_vsnprintf( PARROT_INTERP,
-    char *targ /*NN*/,
+    NOTNULL(char *targ),
     size_t len,
-    const char *pat /*NN*/,
+    NOTNULL(const char *pat),
     va_list args )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -165,14 +167,16 @@ void Parrot_vsnprintf( PARROT_INTERP,
 
 PARROT_API
 STRING * Parrot_vsprintf_c( PARROT_INTERP,
-    const char *pat /*NN*/,
+    NOTNULL(const char *pat),
     va_list args )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_vsprintf_s( PARROT_INTERP, STRING *pat /*NN*/, va_list args )
+STRING * Parrot_vsprintf_s( PARROT_INTERP,
+    NOTNULL(STRING *pat),
+    va_list args )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -269,8 +273,8 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP, STRING *pat /*NN*/, va_list args )
 /* HEADERIZER BEGIN: src/spf_render.c */
 
 STRING * Parrot_sprintf_format( PARROT_INTERP,
-    STRING *pat /*NN*/,
-    SPRINTF_OBJ *obj /*NN*/ )
+    NOTNULL(STRING *pat),
+    NOTNULL(SPRINTF_OBJ *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

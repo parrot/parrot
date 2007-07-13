@@ -26,7 +26,7 @@ Does a synchronized removal of the head entry off the queue and returns it.
 */
 
 QUEUE_ENTRY *
-pop_entry(QUEUE *queue /*NN*/)
+pop_entry(NOTNULL(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
     queue_lock(queue);
@@ -46,7 +46,7 @@ return C<NULL> if the queue is empty.
 */
 
 QUEUE_ENTRY *
-peek_entry(QUEUE *queue /*NN*/)
+peek_entry(NOTNULL(QUEUE *queue))
 {
     return queue->head;
 }
@@ -62,7 +62,7 @@ in here so we don't have to duplicate pop code.
 */
 
 QUEUE_ENTRY *
-nosync_pop_entry(QUEUE *queue /*NN*/)
+nosync_pop_entry(NOTNULL(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
     if (!queue->head) {
@@ -90,7 +90,7 @@ necessary until there is an entry, and then returns it.
 */
 
 QUEUE_ENTRY *
-wait_for_entry(QUEUE *queue /*NN*/)
+wait_for_entry(NOTNULL(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
 
@@ -113,7 +113,7 @@ Does a synchronized insertion of C<entry> onto the tail of the queue.
 */
 
 void
-push_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry)
+push_entry(NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry)
 {
     queue_lock(queue);
     /* Is there something in the queue? */
@@ -138,7 +138,7 @@ Does a synchronized insertion of C<entry> into the head of the queue.
 */
 
 void
-unshift_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry)
+unshift_entry(NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry)
 {
     QUEUE_ENTRY *cur;
 
@@ -167,7 +167,7 @@ queue mutex.
 */
 
 void
-nosync_insert_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/)
+nosync_insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 {
     QUEUE_ENTRY *cur = queue->head;
     QUEUE_ENTRY *prev;
@@ -216,7 +216,7 @@ Does a synchronized insert of C<entry>.
 */
 
 void
-insert_entry(QUEUE *queue /*NN*/, QUEUE_ENTRY *entry /*NN*/)
+insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 {
     queue_lock(queue);
     nosync_insert_entry(queue, entry);
@@ -233,7 +233,7 @@ Locks the queue's mutex.
 */
 
 void
-queue_lock(QUEUE *queue /*NN*/)
+queue_lock(NOTNULL(QUEUE *queue))
 {
     LOCK(queue->queue_mutex);
 }
@@ -247,7 +247,7 @@ Unlocks the queue's mutex.
 */
 
 void
-queue_unlock(QUEUE *queue /*NN*/)
+queue_unlock(NOTNULL(QUEUE *queue))
 {
     UNLOCK(queue->queue_mutex);
 }
@@ -261,7 +261,7 @@ This function wakes up I<every> thread waiting on the queue.
 */
 
 void
-queue_broadcast(QUEUE *queue /*NN*/)
+queue_broadcast(NOTNULL(QUEUE *queue))
 {
     COND_BROADCAST(queue->queue_condition);
 }
@@ -275,7 +275,7 @@ XXX Needs a description
 */
 
 void
-queue_signal(QUEUE *queue /*NN*/)
+queue_signal(NOTNULL(QUEUE *queue))
 {
     COND_SIGNAL(queue->queue_condition);
 }
@@ -289,7 +289,7 @@ Instructs the queue to wait.
 */
 
 void
-queue_wait(QUEUE *queue /*NN*/)
+queue_wait(NOTNULL(QUEUE *queue))
 {
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
 }
@@ -303,7 +303,7 @@ Instructs the queue to wait for C<abs_time> seconds (?).
 */
 
 void
-queue_timedwait(QUEUE *queue /*NN*/, struct timespec *abs_time /*NN*/)
+queue_timedwait(NOTNULL(QUEUE *queue), NOTNULL(struct timespec *abs_time))
 {
     COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
@@ -337,7 +337,7 @@ Destroys the queue, raising an exception if it is not empty.
 */
 
 void
-queue_destroy(QUEUE *queue /*NN*/)
+queue_destroy(NOTNULL(QUEUE *queue))
 {
     if (peek_entry(queue)) {
         internal_exception(1, "Queue not empty on destroy");
