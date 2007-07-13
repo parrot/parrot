@@ -889,9 +889,15 @@ go.
 =item getattribute
 
   $P1 = getattribute $P2, $S3
+  $P1 = getattribute $P2, $P3, $S4
 
 Get the attribute with the fully qualified name $S3 from object $P2 and
-put it in $P1.
+put it in $P1. To get an attribute for a parent class that has the same name
+as an attribute in the child class, pass an optional class object or namespace
+key $P3 for the parent class.
+
+If the attribute doesn't exist, it will throw an exception. If the attribute
+exists, but the value hasn't been set, it will return an C<Undef> PMC.
 
 =item setattribute
 
@@ -902,6 +908,8 @@ Set the attribute of object $P1 with the attribute name $S2 to $P3. To set an
 attribute for a parent class that has the same name as an attribute in the
 child class, pass an optional class object or namespace key $P2 for the parent
 class.
+
+If the attribute doesn't exist, it will throw an exception.
 
 =item callmethod
 
