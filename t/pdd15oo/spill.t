@@ -433,8 +433,7 @@ pir_output_is( <<'CODE', <<'OUT', "bug #32996" );
 
 .sub __biginit :main
         newpdd15class $P0, "Foo"
-        $I1 = find_type "Foo"
-        $P1 = new $I1
+        $P1 = new "Foo"
         $P1.method1()
         $P1.method2()
 

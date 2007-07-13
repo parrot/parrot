@@ -4,14 +4,11 @@
 	load_bytecode 'library/Test/Builder/Tester.pir'
 	load_bytecode 'library/Test/More.pir'
 
-	.local int tb_type
-	find_type tb_type, 'Test::Builder'
-
 	.local pmc tb_args
 	tb_args = new .Hash
 
 	.local pmc test
-	test = new tb_type, tb_args
+	test = new 'Test::Builder', tb_args
 
 	.local pmc exports, curr_namespace, test_namespace
 	curr_namespace = get_namespace

@@ -450,8 +450,7 @@ ok1:
     print S10
     print "\n"
 
-    find_type I4, S10
-    new P5, I4
+    new P5, S10
     print "ok 3\n"
     new P6, .String
     set P6, "ok 5\n"
@@ -490,8 +489,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     print S10
     print "\n"
 
-    find_type I4, S10
-    new P5, I4
+    new P5, S10
     print "ok 3\n"
     new P6, .String
     set P6, "ok 5\n"
@@ -522,8 +520,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     newpdd15class P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
-    find_type I4, "Foo"
-    new P10, I4
+    new P10, "Foo"
     freeze S3, P10
     open P3, "temp.fpmc", ">"
     print P3, S3

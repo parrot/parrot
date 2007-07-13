@@ -123,7 +123,7 @@ parrot;Bar
 parrot;Baz
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "getclass" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "getclass" );
     newpdd15class P1, "Foo"
     getclass P2, "Foo"
     set S2, P2
@@ -217,8 +217,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new object" );
     newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, "Foo"
     print "ok 1\n"
     end
 CODE
@@ -227,28 +226,22 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new object - type, isa" );
     newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
     print "ok 1\n"
-    typeof I1, P2
-    eq I0, I1, ok2
+    isa I0, P2, "Foo"
+    if I0, ok2
     print "not "
 ok2:
     print "ok 2\n"
-    isa I3, P2, "Foo"
-    print I3
-    print "\n"
     end
 CODE
 ok 1
 ok 2
-1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new object - classname" );
     newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
     set S0, P1	# class
     print S0
     print "\n"
@@ -403,10 +396,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     $P0 = getattribute o, 'i'
     print $P0
     print ' '
-    $P0 = getattribute o, 'Foo\x0j'
+    $P0 = getattribute o, ['Foo'], 'j'
     print $P0
     print ' '
-    $P0 = getattribute o, 'Bar\x0j'
+    $P0 = getattribute o, ['Bar'], 'j'
     print $P0
     print ' '
     $P0 = getattribute o, 'k'
@@ -415,7 +408,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
     $P0 = getattribute o, 'i'
     print $P0
     print ' '
-    $P0 = getattribute o, "Foo\x0j"
+    $P0 = getattribute o, ['Foo'], "j"
     print $P0
     print ' '
     $P0 = getattribute o, 'j'
@@ -429,16 +422,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
 .sub init :vtable :method
     $P0 = new .String
     $P0 = 'Foo.i'
-    setattribute self, "Foo\x0i", $P0
+    setattribute self, ['Foo'], "i", $P0
     $P0 = new .String
     $P0 = 'Foo.j'
-    setattribute self, "Foo\x0j", $P0
+    setattribute self, ["Foo"], "j", $P0
     $P0 = new .String
     $P0 = 'Bar.j'
-    setattribute self, "Bar\x0j", $P0
+    setattribute self, ["Bar"], "j", $P0
     $P0 = new .String
     $P0 = 'Bar.k'
-    setattribute self, "Bar\x0k", $P0
+    setattribute self, ["Bar"], "k", $P0
 .end
 CODE
 ok 1
@@ -449,8 +442,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "set/get object attribs" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
 
     new P3, .Integer
     set P3, 1024
@@ -469,8 +461,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get multiple object attribs" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
     addattribute P1, "j"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, "Foo"
 
     new P3, .Integer
     set P3, 4201
@@ -493,10 +484,9 @@ CODE
 Value
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" );
     newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
 
     new P3, .Integer
     setattribute P2, "bar", P3
@@ -505,29 +495,29 @@ CODE
 /No such attribute/
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
+pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
     newpdd15class P1, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
 
     new P3, .Integer
-    setattribute P2, "Foo\x0no_such", P3
+    setattribute P2, ["Foo"], "no_such", P3
     end
 CODE
-/No such attribute 'Foo\\x0no_such'/
+/No such attribute 'no_such' in class 'Foo'/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, P1
 
     getattribute P3, P2, "i"
-    print P3
+    typeof S1, P3
+    print S1
+    print "\n"
     end
 CODE
-/Null PMC access/
+Undef
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "getting non-existent attribute" );
@@ -544,9 +534,8 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values are specific to objects" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
-    find_type I0, "Foo"
-    new P2, I0
-    new P3, I0
+    new P2, P1
+    new P3, P1
 
     new P4, .Integer
     set P4, 100
@@ -575,9 +564,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
     addattribute P2, "k"
     addattribute P2, "l"
 
-    find_type I0, "Bar"
-    new P2, I0
-    new P3, I0
+    new P2, "Bar"
+    new P3, "Bar"
 
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
@@ -585,6 +573,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
     new P4, .Integer
     set P4, 10
     setattribute P2, "i", P4
+    inc P4
     setattribute P2, "j", P4
 
     new P5, .Integer
@@ -633,8 +622,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     # which is suitable for adding multiple parents to one class
 
     # instantiate a Bar object
-    find_type I1, "Bar"
-    new P3, I1
+    new P3, "Bar"
 
     # print I3                  # don't assume anything about this offset
     # print "\n"		# ' for vim
@@ -696,8 +684,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     store_global "Bar", "Bar::get", P5
 
     # instantiate a Bar object
-    find_type I1, "Bar"
-    new P13, I1
+    new P13, "Bar"
 
     # Foo and Bar have attribute accessor methods
     new P5, .String		# set attribute values
@@ -818,8 +805,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     # which is suitable for adding multiple parents to one class
 
     # instantiate a Bar object
-    find_type I1, "Bar"
-    new P2, I1
+    new P2, "Bar"
 
     # Foo and Bar have attribute accessor methods
     new P5, .String		# set attribute values
@@ -915,9 +901,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
     # must add attributes before object instantiation
     addattribute P1, ".i"
 
-    find_type I1, "Foo"
     P3 = P1.'new'()
-    new P3, I1
     set P3, 1
     P4 = P1.'new'()
     set P4, 1
@@ -1001,10 +985,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "typeof objects" );
     newpdd15class P0, "A"
     newpdd15class P1, "B"
 
-    find_type I0, "A"
-    find_type I1, "B"
-    new P0, I0
-    new P1, I1
+    new P0, "A"
+    new P1, "B"
 
     typeof S0, P0
     typeof S1, P1
@@ -1014,8 +996,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "typeof objects" );
     print "\n"
     end
 CODE
-Class
-Class
+parrot;A
+parrot;B
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
@@ -1028,8 +1010,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
     subclass P3, P1, "Sun"
     addparent P3, P2
 
-    find_type I0, "Sun"
-    new P4, I0
+    new P4, "Sun"
 
     new P5, .String
     set P5, "G"
@@ -1062,8 +1043,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "two levels of inheritance" );
     addparent P2, P1
     addparent P2, P0
 
-    find_type I0, "Sun"
-    new P4, I0
+    new P4, "Sun"
 
     new P5, .String
     set P5, "Taurus"
@@ -1101,16 +1081,16 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "class op test" );
     newpdd15class P0, "City"
-    find_type I0, "City"
-    new P1, I0
+    new P1, "City"
 
     class P2, P1
-    classname S0, P2
+#    classname S0, P2 # deprecated
+    set S0, P2
     print S0
     print "\n"
     end
 CODE
-City
+parrot;City
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "subclassing a non-existent class" );
@@ -1132,27 +1112,29 @@ OUTPUT
 
 # '
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "anon. subclass classname" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "anon. subclass has no name" );
     newpdd15class P0, "City"
     subclass P1, P0
-    classname S0, P1
+#    classname S0, P1 # deprecated
+    set S0, P1
+    print "'"
     print S0
+    print "'"
     print "\n"
     end
 CODE
-/anon_\d+/
+''
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
-    find_type I1, "Foo"
-    new P2, I1
+    new P2, "Foo"
     new P3, .String
     set P3, "ok\n"
     setattribute P2, "i", P3
 
-    getattribute P4, P2, "Foo\x0i"
+    getattribute P4, P2, ["Foo"], "i"
     print P4
     end
 CODE
@@ -1164,8 +1146,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     addattribute P0, "j"
     subclass P1, P0, "Foo"
     addattribute P1, "i"
-    find_type I1, "Foo"
-    new P2, I1
+    new P2, "Foo"
     new P3, .String
     set P3, "foo i\n"
     setattribute P2, "i", P3
@@ -1173,9 +1154,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     set P3, "bar j\n"
     setattribute P2, "j", P3
 
-    getattribute P4, P2, "Foo\x0i"
+    getattribute P4, P2, ["Foo"], "i"
     print P4
-    getattribute P4, P2, "Bar\x0j"
+    getattribute P4, P2, ["Bar"], "j"
     print P4
     end
 CODE
@@ -1188,14 +1169,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set attrib by name subclass" );
     addattribute P0, "j"
     subclass P1, P0, "Foo"
     addattribute P1, "i"
-    find_type I1, "Foo"
-    new P2, I1
+    new P2, "Foo"
     new P3, .String
     set P3, "foo i\n"
-    setattribute P2, "Foo\x0i", P3
+    setattribute P2, ["Foo"], "i", P3
     new P3, .String
     set P3, "bar j\n"
-    setattribute P2, "Bar\x0j", P3
+    setattribute P2, ["Bar"], "j", P3
 
     getattribute P4, P2, "i"
     print P4
@@ -1267,8 +1247,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - instantiate" );
   addattribute MyInt, ".i"
   print "ok 2\n"
   .local pmc i
-  $I0 = find_type "MyInt"
-  i = new $I0
+  i = new "MyInt"
   print "ok 3\n"
 .end
 CODE
@@ -1286,8 +1265,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - methods" );
   subclass MyInt, $P0, "MyInt"
   print "ok 2\n"
   .local pmc i
-  $I0 = find_type "MyInt"
-  i = new $I0
+  i = new "MyInt"
   print "ok 3\n"
   i = 42	# set_integer is inherited from Integer
   print "ok 4\n"
@@ -1339,10 +1317,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - mmd methods" );
   .local pmc i
   .local pmc j
   .local pmc k
-  $I0 = find_type "MyInt"
-  i = new $I0
-  j = new $I0
-  k = new $I0
+  i = new "MyInt"
+  j = new "MyInt"
+  k = new "MyInt"
   i = 6
   j = 7
   k = i * j
@@ -1381,10 +1358,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
   .local pmc i
   .local pmc j
   .local pmc k
-  $I0 = find_type "MyInt"
-  i = new $I0
-  j = new $I0
-  k = new $I0
+  i = new "MyInt"
+  j = new "MyInt"
+  k = new "MyInt"
   i = 6
   j = 7
   k = i + j
@@ -1429,8 +1405,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 1" );
   subclass MyInt2, $P1, "MyInt2"
   print "ok 2\n"
   .local pmc i
-  $I0 = find_type "MyInt2"
-  i = new $I0
+  i = new "MyInt2"
   $I0 = isa i, "Integer"
   print $I0
   $I0 = isa i, "MyInt"
@@ -1493,8 +1468,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 2" );
   subclass MyInt2, $P1, "MyInt2"
   print "ok 2\n"
   .local pmc i
-  $I0 = find_type "MyInt2"
-  i = new $I0
+  i = new "MyInt2"
   $I0 = isa i, "Integer"
   print $I0
   $I0 = isa i, "MyInt"
@@ -1569,8 +1543,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - derived 3" );
   subclass MyInt2, $P1, "MyInt2"
   print "ok 2\n"
   .local pmc i
-  $I0 = find_type "MyInt2"
-  i = new $I0
+  i = new "MyInt2"
   $I0 = isa i, "Integer"
   print $I0
   $I0 = isa i, "MyInt"
@@ -1626,13 +1599,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "subclassing ParrotClass" );
 .sub main :main
     .local pmc cl
     .local pmc parent
-    parent = getclass "ParrotClass"
+    parent = getclass "Class"
     cl = subclass parent, "Foo"
     print "ok 1\n"
     .local pmc o
     o = new "Foo"
     print "ok 2\n"
-    $S0 = classname o
+#    $S0 = classname o # deprecated
+    $S0 = o
     print $S0
     print "\n"
 .end
@@ -1656,8 +1630,7 @@ SKIP: {
     end
 .namespace [ "Foo" ]
 .pcc_sub __instantiate:	# create object the hard way
-    find_type I0, "Foo"
-    new P10, I0			# should inspect passed arguments
+    new P10, "Foo"		# should inspect passed arguments
     classoffset I0, P10, "Foo"	# better should clone the argument
     setattribute P10, I0, P5	# the first attribute is the internal __value
     set P5, P10			# set return value
@@ -1682,9 +1655,8 @@ OUTPUT
 .namespace ["Foo"]
 .sub __instantiate :method
     .param int val		# in realiter check what is passed
-    $I0 = find_type "Foo"
     .local pmc obj
-    obj = new $I0
+    obj = new "Foo"
     $I1 = classoffset obj, "Foo"
     $P0 = new Integer
     $P0 = val
@@ -1702,8 +1674,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "namespace vs name" );
 .sub main :main
     .local pmc o, cl, f
     newpdd15class cl, "Foo"
-    $I0 = find_type "Foo"
-    o = new $I0
+    o = new "Foo"
     print o
     Foo()
     f = global "Foo"
@@ -1785,8 +1756,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
     addattribute P2, "k"
     addattribute P2, "l"
 
-    find_type I0, "Bar"
-    new P2, I0
+    new P2, "Bar"
 
     new P4, .Integer
     set P4, 10
@@ -1811,9 +1781,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
     getattribute P6, P2, "l"
     bsr l1
 
-    getattribute P6, P2, "Foo\x0i"
+    getattribute P6, P2, ["Foo"], "i"
     bsr l1
-    getattribute P6, P2, "Bar\x0k"
+    getattribute P6, P2, ["Bar"], "k"
     bsr l1
     branch end
 l1:

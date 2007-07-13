@@ -180,8 +180,7 @@ OUTPUT
 .sub main :main
     .local int type
     .local pmc value
-    type = find_type 'ROTest'
-    value = new type
+    value = new 'ROTest'
     #READONLYTEST
     $test
     print "reached end\\n"

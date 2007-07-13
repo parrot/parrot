@@ -1053,8 +1053,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "mmd bug reported by Jeff" );
 .sub main :main
     newpdd15class $P0, 'Foo'
 
-    $I0 = find_type 'Foo'
-    $P0 = new $I0
+    $P0 = new 'Foo'
 
     $P0.'bar'('Bar!')
 
@@ -1257,11 +1256,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
     .local pmc class
     newpdd15class class, [ 'Some'; 'Class' ]
 
-    .local int class_type
-    class_type = find_type [ 'Some'; 'Class' ]
-
     .local pmc instance
-    instance = new class_type
+    instance = new [ 'Some'; 'Class' ]
 
     .local string name
     name = typeof instance
@@ -1280,11 +1276,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
     .local pmc class
     newpdd15class class, [ 'Some'; 'Class' ]
 
-    .local int class_type
-    class_type = find_type [ 'Some'; 'Class' ]
 
     .local pmc instance
-    instance = new class_type
+    instance = new [ 'Some'; 'Class' ]
 
     foo( instance )
     end

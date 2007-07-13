@@ -186,8 +186,7 @@ do_ret:
     $I0 = $P0
     length = new Integer
     length = $I0
-    $I1 = find_type 'STMQueue'
-    result = new $I1, length
+    result = new 'STMQueue', length
     
     $P0 = getattribute self, 'array'
     $P1 = clone $P0
@@ -210,10 +209,9 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Single-threaded case" );
     $P0 = get_hll_global ['STMQueue'], '__onload'
     $P0()
 
-    $I0 = find_type 'STMQueue'
     $P0 = new Integer
     $P0 = 10
-    queue = new $I0, $P0
+    queue = new 'STMQueue', $P0
 
 
     queue.'addTail'(0, 0)
@@ -292,10 +290,9 @@ not_okay:
 
     addThread = new ParrotThread
     removeThread = new ParrotThread
-    $I0 = find_type 'STMQueue'
     $P0 = new Integer
     $P0 = SIZE 
-    queue = new $I0, $P0
+    queue = new 'STMQueue', $P0
 
     addThreadId = addThread
     removeThreadId = removeThread
@@ -364,10 +361,9 @@ no_sleep:
 
     addThread = new ParrotThread
     removeThread = new ParrotThread
-    $I0 = find_type 'STMQueue'
     $P0 = new Integer
     $P0 = 2 
-    queue = new $I0, $P0
+    queue = new 'STMQueue', $P0
 
     addThreadId = addThread
     removeThreadId = removeThread
@@ -451,10 +447,9 @@ no_sleep:
 
     addThread = new ParrotThread
     removeThread = new ParrotThread
-    $I0 = find_type 'STMQueue'
     $P0 = new Integer
     $P0 = 2 
-    queue = new $I0, $P0
+    queue = new 'STMQueue', $P0
 
     addThreadId = addThread
     removeThreadId = removeThread

@@ -605,8 +605,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not
 .end
 
 .sub thread_test_func
-    $I0 = find_type 'Bar'
-    $P0 = new $I0
+    $P0 = new 'Bar'
     print $P0
     print "\n"
     $P0.'barmeth'()
@@ -691,8 +690,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass bui
 .end
 
 .sub thread_test_func
-    $I0 = find_type 'Bar'
-    $P0 = new $I0
+    $P0 = new 'Bar'
     print $P0
     print "\n"
     $P0.'barmeth'()
@@ -946,8 +944,7 @@ pir_output_is(
     .param pmc passed_value
     .local int PerlIntType
     .local pmc the_value
-    PerlIntType = find_type 'PerlInt'
-    the_value = new PerlIntType
+    the_value = new 'PerlInt'
     the_value = 42
     store_global 'Foo', 'x', the_value
     $I0 = typeof passed_value
@@ -984,8 +981,7 @@ okay:
 
     .local pmc passed
     .local int PerlIntType
-    PerlIntType = find_type 'PerlInt'
-    passed = new PerlIntType
+    passed = new 'PerlInt'
     passed = 15
     
     .local pmc thread_func

@@ -103,8 +103,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "can object" );
     newpdd15class P2, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, "Foo"
 
     set S0, "meth"
 
@@ -126,8 +125,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "constructor" );
     newpdd15class P1, "Foo"
-    find_type I1, "Foo"
-    new P3, I1
+    new P3, "Foo"
     print "ok 2\n"
     end
 .namespace ["Foo"]
@@ -144,8 +142,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "disabling the constructor" );
     newpdd15class P1, "Foo"
     new P0, .String
     setprop P1, "BUILD", P0
-    find_type I1, "Foo"
-    new P3, I1
+    new P3, "Foo"
     print "ok 1\n"
     end
 .namespace ["Foo"]
@@ -164,8 +161,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "specified constructor method does not exi
 
     push_eh _handler
 
-    find_type I1, "Foo"
-    new P3, I1
+    new P3, "Foo"
     print "not ok 1\n"
     end
 
@@ -188,8 +184,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
     newpdd15class P1, "Foo"
     addattribute P1, ".i"
-    find_type I1, "Foo"
-    new P3, I1
+    new P3, "Foo"
     print "ok 2\n"
     print P3
     print "\n"
@@ -218,10 +213,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
     newpdd15class P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
-    find_type I1, "Baz"
-    new P3, I1
-    find_type I1, "Bar"
-    new P3, I1
+    new P3, "Baz"
+    new P3, "Bar"
     find_global P0, "_sub"
     invokecc P0
     print "done\n"
@@ -274,11 +267,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self" );
     newpdd15class A, "A"
     newpdd15class B, "B"
 
-    find_type I0, "A"
-    find_type I1, "B"
-
-    new A, I0
-    new B, I1
+    new A, "A"
+    new B, "B"
 
     setprop A, "B", B
 
@@ -332,11 +322,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg" );
     newpdd15class A, "A"
     newpdd15class B, "B"
 
-    find_type I0, "A"
-    find_type I1, "B"
-
-    new A, I0
-    new B, I1
+    new A, "A"
+    new B, "B"
 
     A."foo"(B)
     B."foo"()
@@ -387,11 +374,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
     newpdd15class A, "A"
     newpdd15class B, "B"
 
-    find_type I0, "A"
-    find_type I1, "B"
-
-    new A, I0
-    new B, I1
+    new A, "A"
+    new B, "B"
 
     .local pmc r
     r = A."foo"(B)
@@ -446,8 +430,7 @@ _main:
     newpdd15class P0, "Foo"
 
     print "new\n"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, "Foo"
 eh:
     print "back in main\n"
     end
@@ -470,8 +453,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "find_method" );
     newpdd15class P3, "Foo"
-    find_type I0, "Foo"
-    new P2, I0
+    new P2, "Foo"
 
     set S0, "meth"
     find_method P0, P2, S0
@@ -528,8 +510,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
     bsr _check_isa
 
     print "new F\n"
-    find_type I1, "F"
-    new P16, I1
+    new P16, "F"
     print "done\n"
     end
 
@@ -658,10 +639,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
     setprop P2, "BUILD", P10
     subclass P3, P2, "Baz"
     setprop P3, "BUILD", P10
-    find_type I1, "Baz"
-    new P3, I1
-    find_type I1, "Bar"
-    new P3, I1
+    new P3, "Baz"
+    new P3, "Bar"
     find_global P0, "_sub"
     invokecc P0
     print "done\n"
@@ -759,9 +738,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
     .local pmc A
 
     newpdd15class A, "A"
-    find_type I0, "A"
-
-    new A, I0
+    new A, "A"
     A."foo"()
     end
 .end
@@ -784,8 +761,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" 
 .sub _main
     newpdd15class $P0, "Foo"
 
-    find_type $I0, "Foo"
-    new $P1, $I0
+    new $P1, "Foo"
 
     $I1 = $P1["foo"]
 
@@ -814,8 +790,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys -
 .sub _main
     newpdd15class $P0, "Foo"
 
-    find_type $I0, "Foo"
-    new $P1, $I0
+    new $P1, "Foo"
 
     $I1 = $P1["foo"]
 
@@ -849,8 +824,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
     .local pmc o, cl
     newpdd15class cl, "Foo"
     subclass cl, cl, "Bar"
-    $I0 = find_type "Bar"
-    o = new $I0
+    o = new "Bar"
     print o
     $P0 = global "ok2"
     store_global "Bar", "__get_string", $P0

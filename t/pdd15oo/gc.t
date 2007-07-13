@@ -178,8 +178,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
     .local pmc o, cl
     cl = newpdd15class "Foo"
 
-    find_type $I1, "Foo"
-    new o, $I1
+    new o, "Foo"
     print "ok\n"
     end
 .end
@@ -215,8 +214,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     newpdd15class P9, "Source"
     newpdd15class P10, "Source::Buffer"
-    find_type I9,"Source"
-    new P12, I9
+    new P12, "Source"
 
     set S20, P12
     print S20
@@ -230,8 +228,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     getprop P12, "buffer", P2
     sweep 1
     unless_null P12, buffer_ok
-    find_type I12, "Source::Buffer"
-    new P12, I12
+    new P12, "Source::Buffer"
     new P14, .String
     set P14, "hello\n"
     setprop P12, "buf", P14
@@ -292,8 +289,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     $P0 = getinterp
     $P0."recursion_limit"(10)
     newpdd15class $P0, "b"
-    $I0 = find_type "b"
-    $P0 = new $I0
+    $P0 = new "b"
     $P1 = new Integer
     $P1 = 0
     n = $P0."b11"($P1)

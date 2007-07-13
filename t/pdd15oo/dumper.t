@@ -518,7 +518,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     newpdd15class temp, "TestClass"
 
-    find_type I0, "TestClass"
     new array, .ResizablePMCArray
     o = temp.'new'()
     push array, o
