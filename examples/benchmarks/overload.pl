@@ -7,11 +7,11 @@ use overload '*' => \&my_mul, 'fallback' => 1;
 
 sub new {
     my ( $class, $val ) = @_;
-    bless \$val, $class;
+    return bless \$val, $class;
 }
 
 sub my_mul {
-    ${ $_[0] } * ${ $_[1] };
+    return ${ $_[0] } * ${ $_[1] };
 }
 
 1;

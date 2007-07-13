@@ -19,7 +19,7 @@ sub fibA {
 
 package B;
 @B::ISA = qw(A);
-sub new { bless {}, $_[0] }
+sub new { return bless {}, $_[0] }
 
 sub fibB {
     my $self = shift;
