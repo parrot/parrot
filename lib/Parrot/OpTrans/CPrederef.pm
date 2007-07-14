@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -76,7 +76,7 @@ sub run_core_func_decl {
     my $prefix = $self->core_prefix;
     return <<END;
 /* run_core_func_decl - $0 -> $type */
-opcode_t * $prefix$core(opcode_t *cur_op, Parrot_Interp interp)
+opcode_t * $prefix$core(opcode_t *cur_op, PARROT_INTERP)
 END
 }
 

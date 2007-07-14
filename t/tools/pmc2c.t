@@ -99,7 +99,7 @@ pmc2c_output_like( <<'END_PMC', <<'END_C', 'class initialization' );
 pmclass a { }
 END_PMC
 void
-Parrot_a_class_init(Parrot_Interp interp, int entry, int pass)
+Parrot_a_class_init(PARROT_INTERP, int entry, int pass)
 {
     const VTABLE temp_base_vtable = {
 END_C
@@ -147,7 +147,7 @@ pmc2c_output_like( <<'END_PMC', <<'END_C', 'const_too 1' );
 pmclass a const_too { }
 END_PMC
 void
-Parrot_a_class_init(Parrot_Interp interp, int entry, int pass)
+Parrot_a_class_init(PARROT_INTERP, int entry, int pass)
 {
     const VTABLE temp_base_vtable = {
         NULL, /* namespace */
@@ -160,7 +160,7 @@ pmc2c_output_like( <<'END_PMC', <<'END_C', 'const_too 2' );
 pmclass a const_too { }
 END_PMC
 void
-Parrot_Consta_class_init(Parrot_Interp interp, int entry, int pass)
+Parrot_Consta_class_init(PARROT_INTERP, int entry, int pass)
 {
     const VTABLE temp_base_vtable = {
         NULL, /* namespace */

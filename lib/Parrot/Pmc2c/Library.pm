@@ -126,7 +126,7 @@ sub gen_h {
 #ifndef $guardname
 #define $guardname
 
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp);
+Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP);
 EOH
     $hout .= $self->c_code_coda;
 

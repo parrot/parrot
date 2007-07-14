@@ -344,7 +344,7 @@ sub vtbl_embed {
         next unless $mmd eq '-1';
 
         my @params = parse_params($params);
-        my @sig    = ( 'Parrot_Interp interp', 'Parrot_PMC pmc' );
+        my @sig    = ( 'PARROT_INTERP', 'Parrot_PMC pmc' );
         my @args   = ( 'interp', 'pmc' );
 
         while ( my ( $type, $name ) = splice( @params, 0, 2 ) ) {

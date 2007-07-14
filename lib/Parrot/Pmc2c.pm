@@ -305,10 +305,15 @@ sub decl {
 
     my @args = ( 'PMC *pmc' );
     push( @args, split( /\s*,\s*/, $args ) ) if $args =~ /\S+/;
-    @args = map { "SHIM($_)" } @args if $unused;
-    unshift( @args, 'Interp *interp' );
-    my $arg_list = join( ', ', @args );
 
+    if ( $unused ) {
+        @args = ( 'PARROT_INTERP', map { "SHIM($_)" } @args );
+    }
+    else {
+        @args = ( 'PARROT_INTERP', @args );
+    }
+
+    my $arg_list = join( ', ', @args );
     if ( $for_header ) {
         my $export = $self->{flags}->{dynpmc} ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
         return <<"EOC";
@@ -899,7 +904,7 @@ sub init_func {
 
     $cout .= <<"EOC";
 void
-Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
+Parrot_${classname}_class_init(PARROT_INTERP, int entry, int pass)
 {
 $vtable_decl
 EOC
@@ -1164,7 +1169,7 @@ sub hdecls {
 
     # class init decl
     $hout .= 'PARROT_DYNEXT_EXPORT ' if ( $self->{flags}->{dynpmc} );
-    $hout           .= "void Parrot_${classname}_class_init(Parrot_Interp, int, int);\n";
+    $hout           .= "void Parrot_${classname}_class_init(PARROT_INTERP, int, int);\n";
     $self->{hdecls} .= $hout;
     $self->{hdecls};
 }

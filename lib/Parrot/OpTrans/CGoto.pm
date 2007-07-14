@@ -254,7 +254,7 @@ Returns the C code for the run core function declaration.
 sub run_core_func_decl {
     my ( $self, $core ) = @_;
 
-    return "opcode_t * " . $self->core_prefix . "$core(opcode_t *cur_op, Parrot_Interp interp)";
+    return "opcode_t * " . $self->core_prefix . "$core(opcode_t *cur_op, PARROT_INTERP)";
 }
 
 =item C<ops_addr_decl($base_suffix)>

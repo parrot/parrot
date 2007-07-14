@@ -91,8 +91,8 @@ sub dynext_load_code {
 EOC
     $cout .= <<"EOC";
 
-PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp); /* don't warn */
-Parrot_PMC Parrot_lib_${lc_libname}_load(Parrot_Interp interp)
+PARROT_DYNEXT_EXPORT extern Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP); /* don't warn */
+Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP)
 {
     Parrot_String whoami;
     Parrot_PMC    pmc;
