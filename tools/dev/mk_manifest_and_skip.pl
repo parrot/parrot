@@ -88,32 +88,32 @@ sub prepare_manifest {
     my $argsref = shift;
     # get all files from sv[nk] status -v
     my @status_output = qx($argsref->{cmd} status -v);
-    
+
     # now grab the versioned resources:
     my @versioned_files = ();
     my @versioned_output = grep !/^\?/, @status_output;
     for my $line (@versioned_output) {
         my @line_info = split( /\s+/, $line );
-    
+
         # the file is the last item in the @line_info array
         my $filename = $line_info[-1];
         $filename =~ s/\\/\//g;
         push @versioned_files, $filename;
     }
-    
+
     my $manifest_lines_ref = [];
-    
+
     for my $file (@versioned_files) {
-    
+
         # ignore the debian directory
         next if $file =~ m[/\.svn|blib|debian];
-    
+
         # don't want to keep directories
         if ( -d $file ) {
             push @{ $argsref->{dirs} }, $file;
             next;
         }
-    
+
         # now get the manifest entry
         $manifest_lines_ref = get_manifest_entry(
             $file, $manifest_lines_ref, $argsref->{special}
