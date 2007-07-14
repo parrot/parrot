@@ -26,13 +26,13 @@ This file contains a C function to access Parrot's bytecode library functions.
 static void cnv_to_win32_filesep( NOTNULL(STRING *path) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static PMC* get_search_paths( PARROT_INTERP, enum_lib_paths which )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_PURE_FUNCTION
 static int is_abs_path( NOTNULL(const STRING *file) )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static STRING* path_append( PARROT_INTERP,
     NOTNULL(STRING *l_path),
@@ -57,15 +57,15 @@ static STRING* path_guarantee_trailing_separator( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING* try_bytecode_extensions( PARROT_INTERP, NOTNULL(STRING* path) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING* try_load_path( PARROT_INTERP, NOTNULL(STRING* path) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -171,9 +171,9 @@ parrot_init_library_paths(PARROT_INTERP)
 #endif
 }
 
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 get_search_paths(PARROT_INTERP, enum_lib_paths which)
-    /* WARN_UNUSED */
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
@@ -181,9 +181,9 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
     return VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
 }
 
+PARROT_PURE_FUNCTION
 static int
 is_abs_path(NOTNULL(const STRING *file))
-    /* WARN_UNUSED */
 {
     const char * const file_name = file->strstart;
     if (file->strlen <= 1)
@@ -314,9 +314,9 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
     ".pir",
 };
 
+PARROT_WARN_UNUSED_RESULT
 static STRING*
 try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
-    /* WARN_UNUSED */
 {
     STRING *final;
 
@@ -342,9 +342,9 @@ try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
   a .pbc or a .pir file is used.
  */
 
+PARROT_WARN_UNUSED_RESULT
 static STRING*
 try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
-    /* WARN_UNUSED */
 {
     STRING *with_ext, *result;
 
@@ -399,10 +399,10 @@ F<include/parrot/library.h>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
         enum_runtime_ft type)
-    /* WARN_UNUSED */
 {
     STRING *prefix;
     STRING *full_name;
@@ -458,10 +458,10 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 char*
 Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
         enum_runtime_ft type)
-    /* WARN_UNUSED */
 {
     STRING * const file = string_from_cstring(interp, file_name, 0);
     STRING * const result = Parrot_locate_runtime_file_str(interp,

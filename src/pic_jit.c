@@ -35,20 +35,21 @@ TODO:
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static int args_match_params(
     NOTNULL(const PMC *sig_args),
-    PackFile_ByteCode *seg,
+    NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(
     NOTNULL(const PMC *sub),
     NOTNULL(opcode_t **set_args) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 static int jit_can_compile_sub( PARROT_INTERP, PMC *sub )
         __attribute__nonnull__(1);
@@ -68,12 +69,12 @@ static opcode_t * pic_test_func( PARROT_INTERP,
     void **args )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int returns_match_results(
     NOTNULL(const PMC *sig_ret),
     NOTNULL(const PMC *sig_result) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -151,10 +152,10 @@ jit_can_compile_sub(PARROT_INTERP, PMC *sub)
 }
 
 
+PARROT_WARN_UNUSED_RESULT
 static int
-args_match_params(NOTNULL(const PMC *sig_args), PackFile_ByteCode *seg,
+args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *start))
-    /* WARN_UNUSED */
 {
     const PMC *sig_params;
     int n, type;
@@ -189,9 +190,9 @@ args_match_params(NOTNULL(const PMC *sig_args), PackFile_ByteCode *seg,
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))
-    /* WARN_UNUSED */
 {
     int type;
     const int n = parrot_pic_check_sig(sig_ret, sig_result, &type);
@@ -216,9 +217,9 @@ returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
-    /* WARN_UNUSED */
 {
     PMC *called, *sig_results;
 

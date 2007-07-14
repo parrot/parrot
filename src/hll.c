@@ -199,9 +199,9 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), STRING *hll_lib)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
-    /* WARN_UNUSED */
 {
     INTVAL i, nelements;
 

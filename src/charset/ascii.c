@@ -50,14 +50,14 @@ static void downcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL find_cclass( PARROT_INTERP,
     INTVAL flags,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
@@ -67,13 +67,13 @@ static INTVAL find_not_cclass( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
     NOTNULL(STRING *source_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 static void set_graphemes( PARROT_INTERP,
     STRING *source_string,
@@ -82,9 +82,9 @@ static void set_graphemes( PARROT_INTERP,
     STRING *insert_string )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static void titlecase( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
@@ -120,16 +120,16 @@ static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL validate( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
+PARROT_WARN_UNUSED_RESULT
 STRING *
 ascii_get_graphemes(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL count)
-    /* WARN_UNUSED */
 {
     return ENCODING_GET_BYTES(interp, source_string, offset, count);
 }
@@ -143,10 +143,10 @@ set_graphemes(PARROT_INTERP, STRING *source_string,
 
 }
 
+PARROT_WARN_UNUSED_RESULT
 STRING *
 ascii_get_graphemes_inplace(PARROT_INTERP, STRING *source_string,
         UINTVAL offset, UINTVAL count, STRING *dest_string)
-    /* WARN_UNUSED */
 {
     return ENCODING_GET_BYTES_INPLACE(interp, source_string,
             offset, count, dest_string);
@@ -309,9 +309,9 @@ titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))
-    /* WARN_UNUSED */
 {
     const UINTVAL l_len = lhs->strlen;
     const UINTVAL r_len = rhs->strlen;
@@ -343,9 +343,9 @@ ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *r
     return 0;
 }
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 mixed_cs_index(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *search), UINTVAL offs)
-    /* WARN_UNUSED */
 {
     String_iter src_iter, search_iter;
     UINTVAL len;
@@ -376,10 +376,10 @@ mixed_cs_index(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *search), UIN
     return -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
         NOTNULL(STRING *search_string), UINTVAL offset)
-    /* WARN_UNUSED */
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
@@ -393,10 +393,10 @@ ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
     return retval;
 }
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
         NOTNULL(STRING *search_string), UINTVAL offset)
-    /* WARN_UNUSED */
 {
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
@@ -409,9 +409,9 @@ ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
     return retval;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 validate(PARROT_INTERP, STRING *src)
-    /* WARN_UNUSED */
 {
     UINTVAL offset;
     String_iter iter;
@@ -425,18 +425,18 @@ validate(PARROT_INTERP, STRING *src)
     return 1;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
-    /* WARN_UNUSED */
 {
     char real_codepoint = (char)codepoint;
     STRING * const return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string), UINTVAL offset)
-    /* WARN_UNUSED */
 {
     UINTVAL codepoint;
 
@@ -451,10 +451,10 @@ is_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string), UINTVAL o
     return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
             UINTVAL offset, UINTVAL count)
-    /* WARN_UNUSED */
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;

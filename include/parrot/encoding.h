@@ -80,27 +80,27 @@ ENCODING * Parrot_default_encoding( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 const char * Parrot_encoding_c_name( PARROT_INTERP,
     INTVAL number_of_encoding )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 STRING* Parrot_encoding_name( PARROT_INTERP, INTVAL number_of_encoding )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number( PARROT_INTERP, NOTNULL(STRING *encodingname) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number_of_str( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -116,9 +116,9 @@ encoding_converter_t Parrot_find_encoding_converter( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 ENCODING* Parrot_get_encoding( PARROT_INTERP, INTVAL number_of_encoding )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN

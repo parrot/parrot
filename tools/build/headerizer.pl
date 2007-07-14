@@ -150,12 +150,11 @@ sub function_components_from_declaration {
     my $args      = join( " ", @lines );
 
     $args =~ s/\s+/ /g;
-    $args =~ s{([^(]+)\s*\((.+)\)\s*(/\*\s*(.*?)\s*\*/)?;?}{$2} or
+    $args =~ s{([^(]+)\s*\((.+)\);?}{$2} or
         die qq{Couldn't handle "$proto"};
 
     my $name = $1;
     $args = $2;
-    my $flags = $4; # Soon to be replaced by the PARROT_X macros
 
     die "Can't have both PARROT_API and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
 
@@ -173,7 +172,6 @@ sub function_components_from_declaration {
 
     return {
         name        => $name,
-        flags       => $flags,
         args        => \@args,
         macros      => \@macros,
         is_static   => $is_static,
@@ -199,29 +197,6 @@ sub attrs_from_args {
     return @attrs;
 }
 
-sub attrs_from_flags {
-    my $flags = shift;
-
-    return if not $flags;
-    return if $flags =~ /XXX/;
-
-    my @attrs = ();
-    my @opts = split( /\s*,\s*/, $flags );
-
-    # For details about these attributes, see
-    # http://gcc.gnu.org/onlinedocs/gcc-4.2.0/gcc/Function-Attributes.html
-    for my $opt ( @opts ) {
-        if ( $opt eq 'WARN_UNUSED' ) {
-            push( @attrs, '__attribute__warn_unused_result__' );
-        }
-        else {
-            confess( qq{Unknown function flag "$flags" -> "$opt"\n} );
-        }
-    }
-
-    return @attrs;
-}
-
 sub make_function_decls {
     my @funcs = @_;
 
@@ -234,7 +209,6 @@ sub make_function_decls {
 
         my @args = @{$func->{args}};
         my @attrs = attrs_from_args( @args );
-        push( @attrs, attrs_from_flags( $func->{flags} ) );
 
         for my $arg ( @args ) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {

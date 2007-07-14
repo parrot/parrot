@@ -70,10 +70,10 @@ PMC* pmc_reuse( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL pmc_type( PARROT_INTERP, NOTNULL(STRING *name) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 INTVAL pmc_type_p( PARROT_INTERP, NOTNULL(PMC *name) )

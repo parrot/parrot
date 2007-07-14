@@ -57,24 +57,24 @@ static void do_initcall( PARROT_INTERP, PMC* _class, PMC *object, PMC *init )
 static void fail_if_exist( PARROT_INTERP, PMC *name )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static PMC * find_method_direct_1( PARROT_INTERP,
     NOTNULL(PMC *_class),
     STRING *method_name )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static PMC* find_vtable_meth_ns( PARROT_INTERP, PMC *ns, INTVAL vtable_index )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static PMC* get_init_meth( PARROT_INTERP,
     PMC *_class,
     STRING *prop_str,
     NOTNULL(STRING **meth_str) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(4);
 
 static void instantiate_object( PARROT_INTERP,
     NOTNULL(PMC *object),
@@ -88,9 +88,9 @@ static void invalidate_all_caches( PARROT_INTERP )
 static void invalidate_type_caches( PARROT_INTERP, UINTVAL type )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static PMC* not_empty( PARROT_INTERP, PMC *seqs )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static void parrot_class_register( PARROT_INTERP,
     PMC *name,

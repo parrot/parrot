@@ -79,14 +79,14 @@ Parrot_PIC* parrot_PIC_alloc_pic( PARROT_INTERP )
 void parrot_PIC_alloc_store( NOTNULL(struct PackFile_ByteCode *cs), size_t n )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int parrot_pic_check_sig(
     NOTNULL(const PMC *sig1),
     NOTNULL(const PMC *sig2),
     NOTNULL(int *type) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 void parrot_PIC_destroy( NOTNULL(struct PackFile_ByteCode *cs) )
         __attribute__nonnull__(1);

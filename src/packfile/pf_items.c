@@ -287,9 +287,9 @@ Fetch an C<opcode_t> from the stream, converting byteorder if needed.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 opcode_t
 PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
-    /* WARN_UNUSED */
 {
     opcode_t o;
     if (!pf || !pf->fetch_op)
@@ -310,9 +310,10 @@ Store an C<opcode_t> to stream as is.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
-    /* WARN_UNUSED */
 {
     *cursor++ = val;
     return cursor;
@@ -345,9 +346,9 @@ C<INTVAL> size in the PackFile header.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
-    /* WARN_UNUSED */
 {
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
@@ -369,8 +370,9 @@ Store an C<INTVAL> to stream as is.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 opcode_t*
-PF_store_integer(opcode_t *cursor, INTVAL val)
+PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
 {
     *cursor++ = (opcode_t)val; /* XXX */
     return cursor;
@@ -401,9 +403,9 @@ Then advance stream pointer by amount of packfile float size.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
-    /* WARN_UNUSED */
 {
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.
@@ -486,9 +488,10 @@ Opcode format is:
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
-PF_fetch_string(PARROT_INTERP, NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
-    /* WARN_UNUSED */
+PF_fetch_string(PARROT_INTERP, NULLOK(PackFile *pf), NOTNULL(opcode_t **cursor))
 {
     UINTVAL flags;
     opcode_t charset_nr;
@@ -641,9 +644,10 @@ Write a 0-terminated string to the stream.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))
-    /* WARN_UNUSED */
 {
     strcpy((char *) cursor, s);
     return cursor + PF_size_cstring(s);

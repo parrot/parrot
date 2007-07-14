@@ -261,6 +261,7 @@ PARROT_WARN_UNUSED_RESULT
 char * str_dup( NOTNULL(const char *old) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int try_find_op( PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(const char *name),
@@ -269,8 +270,7 @@ int try_find_op( PARROT_INTERP,
     int keyvec,
     int emit )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 

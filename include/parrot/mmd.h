@@ -46,14 +46,15 @@ typedef struct _MMD_table {
 /* HEADERIZER BEGIN: src/mmd.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 funcptr_t get_mmd_dispatch_type( PARROT_INTERP,
     INTVAL func_nr,
     INTVAL left_type,
     INTVAL right_type,
     NOTNULL(int *is_pmc) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(5)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(5);
 
 PARROT_API
 void mmd_add_by_class( PARROT_INTERP,
@@ -162,9 +163,9 @@ void mmd_register_sub( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PMC * mmd_vtfind( PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_mmd_rebuild_table( PARROT_INTERP, INTVAL type, INTVAL func_nr )

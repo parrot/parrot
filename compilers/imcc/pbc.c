@@ -119,13 +119,13 @@ static PMC* find_outer( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
 static void fixup_globals( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static int get_codesize( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(int *src_lines) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 static int get_old_size( PARROT_INTERP, NOTNULL(int *ins_line) )
         __attribute__nonnull__(1)
@@ -141,11 +141,10 @@ static PMC* mk_multi_sig( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int old_blocks( void )
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+static int old_blocks( void );
 
 PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
 static const char * slice_deb( int bits );
 
 static void store_fixup( PARROT_INTERP,

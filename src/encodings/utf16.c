@@ -96,12 +96,12 @@ static void set_codepoints( PARROT_INTERP,
     STRING *new_codepoints )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * to_encoding( PARROT_INTERP,
     NOTNULL(STRING *src),
     STRING *dest )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 static UINTVAL utf16_decode_and_advance( PARROT_INTERP, String_iter *i )
         __attribute__nonnull__(1);
@@ -137,9 +137,9 @@ fill it with the converted result, else operate inplace.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), STRING *dest)
-    /* WARN_UNUSED */
 {
 #if PARROT_HAS_ICU
     UErrorCode err;

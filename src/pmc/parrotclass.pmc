@@ -48,9 +48,9 @@ Vtable PMC that holds the vtable for objects of this class.
 
 #include "parrot/parrot.h"
 
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, STRING **meth_str /*NN*/)
-    /* WARN_UNUSED */
+get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, NOTNULL(STRING **meth_str))
 {
     STRING     *meth;
     HashBucket *b;

@@ -31,14 +31,14 @@
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static int change_op( PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(SymReg **r),
     int num,
     int emit )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 static void * imcc_compile_file( PARROT_INTERP,
     NOTNULL(const char *fullname),
@@ -47,10 +47,10 @@ static void * imcc_compile_file( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 static int is_infix( NOTNULL(const char *name), int n, NOTNULL(SymReg **r) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 static Instruction * maybe_builtin( PARROT_INTERP,
     IMC_Unit *unit,
@@ -60,6 +60,8 @@ static Instruction * maybe_builtin( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const char * to_infix( PARROT_INTERP,
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
@@ -68,8 +70,7 @@ static const char * to_infix( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(4);
 
 static const char * try_rev_cmp(
     SHIM_INTERP,
@@ -77,6 +78,7 @@ static const char * try_rev_cmp(
     const char *name,
     SymReg ** r );
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction * var_arg_ins( PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(const char *name),
@@ -85,8 +87,7 @@ static Instruction * var_arg_ins( PARROT_INTERP,
     int emit )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: static */
 
@@ -297,10 +298,11 @@ is_op(PARROT_INTERP, const char *name)
 }
 
 /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const char *
 to_infix(PARROT_INTERP, NOTNULL(const char *name), NOTNULL(SymReg **r),
         NOTNULL(int *n), int mmd_op)
-    /* WARN_UNUSED */
 {
     SymReg *mmd;
     int is_n;
@@ -330,9 +332,9 @@ to_infix(PARROT_INTERP, NOTNULL(const char *name), NOTNULL(SymReg **r),
         return "infix";
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 is_infix(NOTNULL(const char *name), int n, NOTNULL(SymReg **r))
-    /* WARN_UNUSED */
 {
     if (n < 2 || r[0]->set != 'P')
         return -1;
@@ -393,10 +395,10 @@ is_infix(NOTNULL(const char *name), int n, NOTNULL(SymReg **r))
     return -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction *
 var_arg_ins(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         NOTNULL(SymReg **r), int n, int emit)
-    /* WARN_UNUSED */
 {
     int op;
     Instruction *ins;
@@ -942,9 +944,9 @@ register_compilers(PARROT_INTERP)
                       imcc_compile_file ); */
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 change_op(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg **r), int num, int emit)
-    /* WARN_UNUSED */
 {
     int changed = 0;
 
@@ -988,10 +990,10 @@ change_op(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg **r), int num, int emit)
  *      ge_n_ic_ic => ge_n_nc_ic
  *      acos_n_i   => acos_n_n
  */
+PARROT_WARN_UNUSED_RESULT
 int
 try_find_op(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         SymReg ** r, int n, int keyvec, int emit)
-    /* WARN_UNUSED */
 {
     char fullname[64];
     int changed = 0;

@@ -93,8 +93,7 @@ static int find_builtin( NOTNULL(const char *func) )
 PARROT_WARN_UNUSED_RESULT
 static int find_builtin_s( PARROT_INTERP, NOTNULL(STRING *func) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -168,7 +167,6 @@ find_builtin(NOTNULL(const char *func))
 PARROT_WARN_UNUSED_RESULT
 static int
 find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
-    /* WARN_UNUSED */
 {
     int low  = 0;
     int high = N_BUILTINS - 1;

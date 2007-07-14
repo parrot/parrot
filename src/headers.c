@@ -27,11 +27,12 @@ static void fix_pmc_syncs( Interp *dest_interp,
 static void free_pool( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void * get_free_buffer( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

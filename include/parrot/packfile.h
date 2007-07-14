@@ -577,25 +577,25 @@ char * PF_fetch_cstring( NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL PF_fetch_integer( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL PF_fetch_number( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 opcode_t PF_fetch_opcode( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * PF_fetch_string( PARROT_INTERP,
-    NOTNULL(PackFile *pf),
+    NULLOK(PackFile *pf),
     NOTNULL(opcode_t **cursor) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_PURE_FUNCTION
 size_t PF_size_cstring( NOTNULL(const char *s) )
@@ -614,23 +614,28 @@ PARROT_PURE_FUNCTION
 size_t PF_size_string( NOTNULL(const STRING *s) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_cstring(
     NOTNULL(opcode_t *cursor),
     NOTNULL(const char *s) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
-opcode_t* PF_store_integer( opcode_t *cursor, INTVAL val );
+PARROT_WARN_UNUSED_RESULT
+opcode_t* PF_store_integer( NOTNULL(opcode_t *cursor), INTVAL val )
+        __attribute__nonnull__(1);
+
 opcode_t* PF_store_number(
     NOTNULL(opcode_t *cursor),
     NOTNULL(const FLOATVAL *val) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_opcode( NOTNULL(opcode_t *cursor), opcode_t val )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 opcode_t* PF_store_string( NOTNULL(opcode_t *cursor), NOTNULL(STRING *s) )
         __attribute__nonnull__(1)

@@ -39,14 +39,14 @@ INTVAL Parrot_byte_index(
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_rindex(
     SHIM_INTERP,
     NOTNULL(const STRING *base),
     NOTNULL(const STRING *search),
     UINTVAL start_offset )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_destroy_cpa( NOTNULL(char **array) )
@@ -66,10 +66,10 @@ void * Parrot_make_cpa( PARROT_INTERP, PMC *array )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 void * Parrot_make_la( PARROT_INTERP, NOTNULL(PMC *array) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 INTVAL Parrot_range_rand( INTVAL from, INTVAL to, INTVAL how_random );
@@ -270,13 +270,13 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
 
 /* HEADERIZER BEGIN: src/spf_render.c */
 
+PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_sprintf_format( PARROT_INTERP,
     NOTNULL(STRING *pat),
     NOTNULL(SPRINTF_OBJ *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/spf_render.c */
 

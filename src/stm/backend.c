@@ -62,13 +62,13 @@ static void do_real_abort( PARROT_INTERP,
 static int do_real_commit( PARROT_INTERP, STM_tx_log *log )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static STM_write_record * find_write_record( PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
     Parrot_STM_PMC_handle handle,
     int overwrite_p )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 static PMC * force_sharing( PARROT_INTERP, PMC *pmc )
         __attribute__nonnull__(1);
@@ -80,19 +80,21 @@ static int get_read_valid_depth( PARROT_INTERP, NOTNULL(STM_tx_log *log) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STM_tx_log_sub * get_sublog( STM_tx_log *log, int i );
+static STM_tx_log_sub * get_sublog( NOTNULL(STM_tx_log *log), int i )
+        __attribute__nonnull__(1);
+
 static STM_write_record * get_write( PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
     int i )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int is_aborted( STM_tx_log *log )
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+static int is_aborted( STM_tx_log *log );
 
+PARROT_PURE_FUNCTION
 static int is_version( NOTNULL(const void *maybe_version) )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static PMC * local_pmc_copy( PARROT_INTERP, PMC * const original )
         __attribute__nonnull__(1);
@@ -113,9 +115,9 @@ static int merge_transactions( PARROT_INTERP,
     int always )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static void * next_version( NOTNULL(const void *old_version) )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static void replay_writes( PARROT_INTERP, STM_tx_log *log, int from, int to )
         __attribute__nonnull__(1);

@@ -25,9 +25,9 @@ src/test_main.c
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static STRING* trace_class_name( NOTNULL(const PMC* pmc) )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 

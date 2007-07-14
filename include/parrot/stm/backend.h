@@ -67,9 +67,9 @@ void Parrot_STM_start_transaction( PARROT_INTERP )
 int Parrot_STM_transaction_depth( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int Parrot_STM_validate( PARROT_INTERP )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 void Parrot_STM_wait( PARROT_INTERP )
         __attribute__nonnull__(1);

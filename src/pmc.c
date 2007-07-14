@@ -20,15 +20,16 @@ src/pmc.c - The base vtable calling functions
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
 static PMC* create_class_pmc( PARROT_INTERP, INTVAL type )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC* get_new_pmc_header( PARROT_INTERP,
     INTVAL base_type,
     UINTVAL flags )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -165,9 +166,10 @@ Gets a new PMC header.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
-    /* WARN_UNUSED */
 {
     PMC *pmc;
     VTABLE *vtable = interp->vtables[base_type];
@@ -195,6 +197,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
         /* LOCK */
         if (!pmc) {
             pmc = new_pmc_header(interp, PObj_constant_FLAG);
+            assert(pmc);
             pmc->vtable = vtable;
             pmc->real_self = pmc;
             VTABLE_set_pointer(interp, pmc, pmc);
@@ -230,11 +233,9 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     }
 
     pmc = new_pmc_header(interp, flags);
-    if (!pmc) {
+    if (!pmc)
         real_exception(interp, NULL, ALLOCATION_ERROR,
                 "Parrot VM: PMC allocation failed!\n");
-        return NULL;
-    }
 
     pmc->vtable = vtable;
     pmc->real_self = pmc;
@@ -379,9 +380,9 @@ Returns the PMC type for C<name>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
-    /* WARN_UNUSED */
 {
     PMC * const classname_hash = interp->class_hash;
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
@@ -414,9 +415,9 @@ pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
     return 0;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 create_class_pmc(PARROT_INTERP, INTVAL type)
-    /* WARN_UNUSED */
 {
     /*
      * class interface - a PMC is its own class

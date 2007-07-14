@@ -194,10 +194,11 @@ dump_mmd(PARROT_INTERP, INTVAL function)
 #endif
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 funcptr_t
 get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
         INTVAL right_type, NOTNULL(int *is_pmc))
-    /* WARN_UNUSED */
 {
     funcptr_t func, func_;
     INTVAL r;
@@ -864,9 +865,9 @@ C function pointer in PMC_struct_val.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PMC *
 mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)
-    /* WARN_UNUSED */
 {
     int is_pmc;
     PMC *f;
