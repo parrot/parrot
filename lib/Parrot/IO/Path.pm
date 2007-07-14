@@ -228,6 +228,8 @@ sub delete {
     delete( $instance_for_path{ $_[0]->path } );
 
     undef $_[0];
+
+    return;
 }
 
 =back

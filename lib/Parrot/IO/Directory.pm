@@ -546,7 +546,7 @@ sub delete {
     $_[0]->delete_contents;
     rmdir( $_[0]->path ) or die 'Failed to rmdir ' . $_[0]->path . ": $!";
 
-    $_[0]->SUPER::delete;
+    return $_[0]->SUPER::delete;
 }
 
 =item C<delete_contents()>
@@ -567,6 +567,8 @@ sub delete_contents {
     foreach my $dir ( $self->directories ) {
         $dir->delete;
     }
+
+    return;
 }
 
 =back
