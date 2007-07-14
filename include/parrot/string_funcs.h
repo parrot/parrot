@@ -155,10 +155,13 @@ UINTVAL string_capacity( SHIM_INTERP, NOTNULL(const STRING *s) )
         __attribute__nonnull__(2);
 
 PARROT_API
-STRING * string_chopn( PARROT_INTERP,
-    NOTNULL(STRING *s),
-    INTVAL n,
-    int in_place )
+PARROT_CANNOT_RETURN_NULL
+STRING * string_chopn( PARROT_INTERP, NOTNULL(STRING *s), INTVAL n )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+void string_chopn_inplace( PARROT_INTERP, NOTNULL(STRING *s), INTVAL n )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

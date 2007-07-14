@@ -78,7 +78,7 @@ handle_flags(PARROT_INTERP,
         if (info->flags & FLAG_PREC && info->prec == 0 &&
                 len == 1 &&
                 string_ord(interp, str, 0) == '0') {
-            string_chopn(interp, str, len, 1);
+            string_chopn_inplace(interp, str, len);
             len = 0;
         }
         /* +, space */
@@ -119,12 +119,12 @@ handle_flags(PARROT_INTERP,
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec == 0) {
-            string_chopn(interp, str, len, 1);
+            string_chopn_inplace(interp, str, len);
             len = 0;
         }
         else
             if (info->flags & FLAG_PREC && info->prec < len) {
-                string_chopn(interp, str, -(INTVAL)(info->prec), 1);
+                string_chopn_inplace(interp, str, -(INTVAL)(info->prec));
                 len = info->prec;
             }
     }
@@ -146,7 +146,7 @@ handle_flags(PARROT_INTERP,
                     string_ord(interp, str,0) == '+')) {
                 STRING *temp = NULL;
                 string_substr(interp, str, 1, len-1, &temp, 0);
-                string_chopn(interp, str, -1, 1);
+                string_chopn_inplace(interp, str, -1);
                 str = string_append(interp, str, fill);
                 str = string_append(interp, str, temp);
             }

@@ -1175,29 +1175,44 @@ string_replace(PARROT_INTERP, NOTNULL(STRING *src),
 FUNCDOC: string_chopn
 
 Chops off the last C<n> characters of the specified Parrot string. If
-C<n> is negative, cuts the string after C<+n> characters.
-If C<in_place> is true, the string is chopped in place, else a copy
-of the string is chopped and returned.
+C<n> is negative, cuts the string after C<+n> characters. The returned
+string is a copy of the one passed in.
 
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING *
-string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n, int in_place)
+string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
+{
+    s = string_copy(interp, s);
+    string_chopn_inplace(interp, s, n);
+    return s;
+}
+
+/*
+
+FUNCDOC: string_chopn_inplace
+
+Chops off the last C<n> characters of the specified Parrot string. If
+C<n> is negative, cuts the string after C<+n> characters. The string
+passed in is modified and returned.
+
+*/
+
+PARROT_API
+void
+string_chopn_inplace(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
 {
     UINTVAL new_length, uchar_size;
     String_iter iter;
 
-    /* constant or external strings can't be chopped inplace */
-    if (in_place)
-        Parrot_unmake_COW(interp, s);
-    else
-        s = string_copy(interp, s);
+    Parrot_unmake_COW(interp, s);
 
     if (n < 0) {
         new_length = -n;
         if (new_length > s->strlen)
-            return s;
+            return;
     }
     else {
         if (s->strlen > (UINTVAL)n)
@@ -1210,7 +1225,7 @@ string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n, int in_place)
 
     if (!new_length || !s->strlen) {
         s->bufused = s->strlen = 0;
-        return s;
+        return;
     }
 
     uchar_size = s->bufused / s->strlen;
@@ -1228,7 +1243,7 @@ string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n, int in_place)
         s->bufused = iter.bytepos;
     }
 
-    return s;
+    return;
 }
 
 

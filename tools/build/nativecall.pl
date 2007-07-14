@@ -671,7 +671,7 @@ build_call_func(Interp *interp, SHIM(PMC *pmc_nci), STRING *signature)
     /* remove deprecated void argument 'v' character */
     if (2 == signature_len && 'v' == string_index(interp, signature, 1)) {
        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
-       signature = string_chopn(interp, signature, 1, 1);
+       string_chopn_inplace(interp, signature, 1);
        signature_len = string_length(interp, signature);
     }
 

@@ -341,7 +341,7 @@ binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
     {
         case 'a':
             if (strlen > length)
-                strval = string_chopn(interp, strval, strlen - length, 1);
+                string_chopn_inplace(interp, strval, strlen - length);
             binstr = string_concat(interp, binstr, strval, 0);
             /* pad with nulls if necessary */
             while (length-- > strlen)
@@ -349,7 +349,7 @@ binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
             break;
         case 'A':
             if (strlen > length)
-                strval = string_chopn(interp, strval, strlen - length, 1);
+                string_chopn_inplace(interp, strval, strlen - length);
             binstr = string_concat(interp, binstr, strval, 0);
             /* pad with spaces if necessary */
             while (length-- > strlen)

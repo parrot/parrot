@@ -75,12 +75,12 @@ in $1. If $3 is negative, cut the string after -$3 characters.
 =cut
 
 inline op chopn(inout STR, in INT) :base_core {
-  $1 = string_chopn(interp, $1, $2, 1);
+  string_chopn_inplace(interp, $1, $2);
   goto NEXT();
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
-  $1 = string_chopn(interp, $2, $3, 0);
+  $1 = string_chopn(interp, $2, $3);
   goto NEXT();
 }
 
