@@ -231,6 +231,7 @@ sub check_pod {
         $self->{POD_ERRORS_COUNT} = $checker->errors_seen;
         $self->{CONTAINS_POD}     = $checker->content_seen;
     }
+    return;
 }
 
 =item C<contains_pod()>

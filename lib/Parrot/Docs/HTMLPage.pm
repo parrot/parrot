@@ -41,7 +41,7 @@ sub header {
     my $navigation = shift || '';
     my $resources  = shift || '';
 
-    <<"HEADER";
+    my $header_text = <<"HEADER";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
     "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>  
@@ -65,6 +65,7 @@ sub header {
         </TABLE>
         <DIV CLASS="pod">
 HEADER
+    return $header_text;
 }
 
 =item C<footer($navigation, $resources)>
@@ -83,7 +84,7 @@ sub footer {
     my $navigation = shift || '';
     my $resources  = shift || '';
 
-    <<"FOOTER";
+    my $footer_text = <<"FOOTER";
         </DIV>
         <P>
         <TABLE BORDER="0" WIDTH="730" CELLSPACING="0" CELLPADDING="0">
@@ -105,6 +106,7 @@ sub footer {
     </BODY>
 </HTML>
 FOOTER
+    return $footer_text;
 }
 
 =back

@@ -97,7 +97,7 @@ sub write_docs {
 
     $dist->delete_html_docs if $delete;
 
-    $self->write_html( $dist, $dist->html_docs_directory, $silent );
+    return $self->write_html( $dist, $dist->html_docs_directory, $silent );
 }
 
 =back

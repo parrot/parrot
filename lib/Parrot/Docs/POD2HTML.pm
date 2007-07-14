@@ -111,22 +111,22 @@ sub process_start_token {
     my $tagname = $token->tagname;
 
     if ( $tagname eq 'L' ) {
-        $self->process_link_start_token($token);
+        return $self->process_link_start_token($token);
     }
     elsif ( $tagname eq 'F' ) {
-        $self->process_file_start_token($token);
+        return $self->process_file_start_token($token);
     }
     elsif ( $tagname eq 'C' ) {
-        $self->process_code_start_token($token);
+        return $self->process_code_start_token($token);
     }
     elsif ( $tagname eq 'item-text' or $tagname =~ m/^head\d$/s ) {
-        $self->process_item_text_or_head_start_token($token);
+        return $self->process_item_text_or_head_start_token($token);
     }
     elsif ( $tagname eq 'Data' ) {
-        $self->process_data_start_token($token);
+        return $self->process_data_start_token($token);
     }
     else {
-        $self->process_other_start_token($token);
+        return $self->process_other_start_token($token);
     }
 }
 
@@ -149,6 +149,7 @@ sub process_link_start_token {
     else {
         print { $self->{'output_fh'} } "<a>";
     }
+    return;
 }
 
 =item C<process_code_start_token($token)>
@@ -203,6 +204,7 @@ sub process_code_start_token {
     }
 
     print { $self->{'output_fh'} } $text;
+    return;
 }
 
 =item C<process_file_start_token($token)>
@@ -246,6 +248,7 @@ sub process_file_start_token {
         $self->unget_token($next);
         print { $self->{'output_fh'} } $self->{'Tagmap'}{$tagname};
     }
+    return;
 }
 
 =item C<process_item_text_or_head_start_token($token)>
@@ -291,7 +294,7 @@ sub process_item_text_or_head_start_token {
         print { $self->{'output_fh'} } "<a\n>";
     }
 
-    $self->unget_token(@to_unget);
+    return $self->unget_token(@to_unget);
 }
 
 =item C<process_data_start_token($token)>
@@ -313,6 +316,7 @@ sub process_data_start_token {
     }
 
     printf { $self->{'output_fh'} } "\n" . $next->text . "\n";
+    return;
 }
 
 =item C<process_other_start_token($token)>
@@ -336,7 +340,7 @@ sub process_other_start_token {
 
     print { $self->{'output_fh'} } $self->{'Tagmap'}{$tagname} || return;
 
-    ++$self->{DONT_WRAP}
+    return ++$self->{DONT_WRAP}
         if $tagname eq 'Verbatim'
         or $tagname eq "VerbatimFormatted"
         or $tagname eq 'X';
@@ -378,7 +382,7 @@ sub process_end_token {
 
     print { $self->{'output_fh'} } $self->{'Tagmap'}{"/$tagname"} || return;
 
-    --$self->{DONT_WRAP} if $tagname eq 'Verbatim' or $tagname eq 'X';
+    return --$self->{DONT_WRAP} if $tagname eq 'Verbatim' or $tagname eq 'X';
 }
 
 =item C<process_text_token($token)>
@@ -400,6 +404,7 @@ sub process_text_token {
     $text =~ s|(http://[^\s)]+)|<a href="$1">$1</a>|gs;
 
     print { $self->{'output_fh'} } $text;
+    return;
 }
 
 =item C<do_pod_link($link)>
