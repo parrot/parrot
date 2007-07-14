@@ -238,6 +238,8 @@ use Cwd;
 use Data::Dumper;
 use File::Basename;
 use File::Spec;
+use Memoize ();
+
 use Parrot::Config;
 
 require Exporter;
@@ -248,6 +250,9 @@ our @EXPORT = qw( plan run_command skip slurp_file );
 
 use base qw( Exporter );
 
+# Memoize functions with a fixed output
+Memoize::memoize( 'path_to_parrot' );
+ 
 # tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
@@ -400,11 +405,10 @@ sub path_to_parrot {
 
     my $path = $INC{'Parrot/Config.pm'};
     $path =~ s{ /lib/Parrot/Config.pm \z}{}xms;
-    if ( $path eq q{} ) {
-        $path = File::Spec->curdir();
-    }
-
-    return $path;
+    return $path eq q{} ?
+               File::Spec->curdir()
+               :
+               $path;
 }
 
 
