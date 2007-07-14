@@ -1,23 +1,7 @@
 #! perl
 # $Id$
 
-=head1 NAME
-
-tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
-
-=head1 SYNOPSIS
-
-    % perl tools/dev/mk_manifest_and_skip.pl
-
-=head1 DESCRIPTION
-
-Recreates MANIFEST and MANIFEST.SKIP from the svn/svk directories.
-So far tested with svn 1.2.0, svn 1.4.2, and svk 1.08.
-
-=cut
-
 package main;
-
 use strict;
 use warnings;
 
@@ -68,6 +52,18 @@ my %special = qw(
 
 my $keyword = '$' . 'Id$';     # avoid an svn issue.
 my $time    = scalar gmtime;
+
+my %current_skips = ();
+open my $SKIP, "<", 'MANIFEST.SKIP'
+    or die "Unable to open MANIFEST.SKIP for reading";
+while (my $line = <$SKIP>) {
+    chomp $line;
+    next if $line =~ /^\s*$/o;
+    next if $line =~ /^#/o;
+    $current_skips{$line}++;
+}
+close $SKIP or die "Unable to close MANIFEST.SKIP after reading";
+
 open my $MANIFEST, '>', 'MANIFEST';
 print {$MANIFEST} <<"END_HEADER";
 # ex: set ro:
@@ -118,7 +114,7 @@ for my $line (@versioned_output) {
     push @versioned_files, $filename;
 }
 
-my @MANIFEST_LINES = ();
+my $MANIFEST_LINES_ref = [];
 
 for my $file (@versioned_files) {
 
@@ -132,10 +128,11 @@ for my $file (@versioned_files) {
     }
 
     # now get the manifest entry
-    get_manifest_entry($file);
+    $MANIFEST_LINES_ref = get_manifest_entry($file, $MANIFEST_LINES_ref);
 }
 
-print $MANIFEST $_ for ( sort @MANIFEST_LINES );
+print $MANIFEST $_ for ( sort @{ $MANIFEST_LINES_ref } );
+close $MANIFEST or die "Unable to close MANIFEST after writing";
 
 my $svnignore = `$cmd propget svn:ignore @dirs`;
 $svnignore =~ s/\n{3,}/\n\n/g;    # cope with trailing newlines in svn:ignore output
@@ -169,11 +166,10 @@ foreach my $directory ( sort keys %ignore ) {
     }
 }
 
-close $MANIFEST;
 close $MANIFEST_SKIP;
 
 sub get_manifest_entry {
-    my $file = shift;
+    my ($file, $MANIFEST_LINES_ref) = @_;
     my $loc  = '[]';
     for ($file) {
         $loc =
@@ -192,10 +188,25 @@ sub get_manifest_entry {
             : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
-    push @MANIFEST_LINES, sprintf( "%- 59s %s\n", $file, $loc );
+    push @{ $MANIFEST_LINES_ref }, sprintf( "%- 59s %s\n", $file, $loc );
 
-    return;
+    return $MANIFEST_LINES_ref;
 }
+
+=head1 NAME
+
+tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/mk_manifest_and_skip.pl
+
+=head1 DESCRIPTION
+
+Recreates MANIFEST and MANIFEST.SKIP from the svn/svk directories.
+So far tested with svn 1.2.0, svn 1.4.2, and svk 1.08.
+
+=cut
 
 # Local Variables:
 #   mode: cperl
