@@ -96,7 +96,7 @@ Accessors for the containing section/group for the item.
 sub set_parent {
     my $self = shift;
 
-    return $self->{PARENT} = shift;
+    $self->{PARENT} = shift;
 }
 
 sub parent {
