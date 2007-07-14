@@ -229,6 +229,7 @@ sub runstep {
             } );
         }
     }
+    return;
 }
 
 sub _run_this_step {
@@ -300,7 +301,7 @@ sub _run_this_step {
     print "$result." unless $step =~ m{^inter/} && $args->{ask};
 
     # reset verbose value for the next step
-    $self->options->set( verbose => $args->{verbose} );
+    return $self->options->set( verbose => $args->{verbose} );
 }
 
 =back

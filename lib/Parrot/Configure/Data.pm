@@ -186,7 +186,7 @@ EVAL_CONFIG
     if ( not defined $res ) {
         die "You cannot use --step until you have completed the full configure process\n";
     }
-    $self->{c} = $res;
+    return $self->{c} = $res;
 }
 
 
@@ -210,7 +210,7 @@ EVAL_CONFIG_TEMP
     if ( not defined $res ) {
         die "You cannot use --step until you have completed the full configure process\n";
     }
-    $self->{c}{$_} = $res->{$_}
+    return $self->{c}{$_} = $res->{$_}
         for CORE::keys %$res;
 }
 
