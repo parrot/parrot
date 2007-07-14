@@ -588,7 +588,7 @@ sub _print_goto_opcode {
 # endif
 #endif
     _reg_base = (char*)interp->ctx.bp.regs_i;
-    goto *(void *)cur_opcode;
+    goto **cur_opcode;
 
 END_C
     }
