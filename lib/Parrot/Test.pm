@@ -230,7 +230,7 @@ Construct a relative path from the current dir to the parrot root dir.
 Construct a path for a temporary files.
 Takes C<$0> into account.
 
-=item C<write_code_to_file($code, $code_f)> 
+=item C<write_code_to_file($code, $code_f)>
 
 Writes C<$code> into the file C<$code_f>.
 
@@ -269,7 +269,7 @@ use base qw( Exporter );
 
 # Memoize functions with a fixed output
 Memoize::memoize( 'path_to_parrot' );
- 
+
 # Tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
