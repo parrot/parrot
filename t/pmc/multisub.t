@@ -26,7 +26,7 @@ Tests the creation and invocation of Perl6 multi subs.
     exports = split " ", "plan ok is"
     test_namespace.export_to(curr_namespace, exports)
 
-    plan( 6 )
+    plan( 8 )
 
     $P0 = new .MultiSub
     $I0 = defined $P0
@@ -43,6 +43,20 @@ Tests the creation and invocation of Perl6 multi subs.
     is($S0, "testing 5", "single int variant")
     $S0 = foo(42, "goodbye")
     is($S0, "testing 42, goodbye", "int and string variant")
+
+    ## Test handling of :flat parameters.
+    $P0 = new .ResizablePMCArray
+    push $P0, 42
+    push $P0, "goodbye"
+    $S0 = foo($P0 :flat)
+    is($S0, "testing 42, goodbye", "Int and String :flat")
+    ## Now try double :flat (regression test for RT#43869).
+    $P1 = new .ResizablePMCArray
+    push $P1, 42
+    $P2 = new .ResizablePMCArray
+    push $P2, "goodbye"
+    $S0 = foo($P1 :flat, $P2 :flat)
+    is($S0, "testing 42, goodbye", "Int and String double :flat")
 
 .end
 
@@ -70,6 +84,17 @@ Tests the creation and invocation of Perl6 multi subs.
     $S0 = "testing " . $S1
     $S0 .= ", "
     $S0 .= baz
+    .return ($S0)
+.end
+
+.sub foo :multi(Integer, String)
+    .param pmc bar
+    .param pmc baz
+    $S1 = bar
+    $S2 = baz
+    $S0 = "testing " . $S1
+    $S0 .= ", "
+    $S0 .= $S2
     .return ($S0)
 .end
 

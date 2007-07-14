@@ -1024,21 +1024,7 @@ mmd_arg_tuple_func(PARROT_INTERP)
         /* named don't MMD */
         if (type & PARROT_ARG_NAME)
             break;
-        /* expand flattening args */
-        if (type & PARROT_ARG_FLATTEN) {
-            int j, n;
-
-            idx = *args_op;
-            arg = REG_PMC(interp, idx);
-            n = VTABLE_elements(interp, arg);
-            for (j = 0; j < n; ++j)  {
-                PMC * const elem = VTABLE_get_pmc_keyed_int(interp, arg, j);
-                type = VTABLE_type(interp, elem);
-                VTABLE_push_integer(interp, arg_tuple, type);
-            }
-            return arg_tuple;
-        }
-        switch (type & PARROT_ARG_TYPE_MASK) {
+        switch (type & (PARROT_ARG_TYPE_MASK | PARROT_ARG_FLATTEN)) {
             case PARROT_ARG_INTVAL:
                 VTABLE_push_integer(interp, arg_tuple, enum_type_INTVAL);
                 break;
@@ -1057,6 +1043,20 @@ mmd_arg_tuple_func(PARROT_INTERP)
                 type = VTABLE_type(interp, arg);
                 VTABLE_push_integer(interp, arg_tuple, type);
                 break;
+            case PARROT_ARG_FLATTEN | PARROT_ARG_PMC:  {
+                /* expand flattening args */
+                int j, n;
+
+                idx = *args_op;
+                arg = REG_PMC(interp, idx);
+                n = VTABLE_elements(interp, arg);
+                for (j = 0; j < n; ++j)  {
+                    PMC * const elem = VTABLE_get_pmc_keyed_int(interp, arg, j);
+                    type = VTABLE_type(interp, elem);
+                    VTABLE_push_integer(interp, arg_tuple, type);
+                }
+                break;
+            }
             default:
                 real_exception(interp, NULL, 1,
                         "Unknown signature type %d in mmd_arg_tuple", type);
