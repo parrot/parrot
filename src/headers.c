@@ -58,13 +58,13 @@ static int sweep_cb_pmc( PARROT_INTERP,
 
 
 #ifndef GC_IS_MALLOC
-#  define PMC_HEADERS_PER_ALLOC 512
-#  define BUFFER_HEADERS_PER_ALLOC 256
-#  define STRING_HEADERS_PER_ALLOC 256
+#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
+#  define BUFFER_HEADERS_PER_ALLOC  5120 / sizeof (Buffer)
+#  define STRING_HEADERS_PER_ALLOC  5120 / sizeof (STRING)
 #else /* GC_IS_MALLOC */
-#  define PMC_HEADERS_PER_ALLOC 512
-#  define BUFFER_HEADERS_PER_ALLOC 512
-#  define STRING_HEADERS_PER_ALLOC 512
+#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
+#  define BUFFER_HEADERS_PER_ALLOC 10240 / sizeof (Buffer)
+#  define STRING_HEADERS_PER_ALLOC 10240 / sizeof (STRING)
 #endif /* GC_IS_MALLOC */
 
 #  define CONSTANT_PMC_HEADERS_PER_ALLOC 64
