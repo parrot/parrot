@@ -67,7 +67,8 @@ print_manifest( {
     lines   => $manifest_lines_ref,
 } );
 
-
+# Will employ $current_skips_ref to determine when NOT to update
+# MANIFEST.SKIP.  Work in progress (Bastille Day 2007).
 my $current_skips_ref = get_current_skips();
 
 my $ignore_ref = prepare_manifest_skip( {
