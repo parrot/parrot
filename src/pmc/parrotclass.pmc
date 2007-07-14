@@ -48,6 +48,133 @@ Vtable PMC that holds the vtable for objects of this class.
 
 #include "parrot/parrot.h"
 
+static PMC*
+get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, STRING **meth_str /*NN*/)
+    /* WARN_UNUSED */
+{
+    STRING     *meth;
+    HashBucket *b;
+    PMC        *props, *ns, *method;
+
+    *meth_str = NULL;
+    props = PMC_metadata(_class);
+    if (!props)
+        return PMCNULL;
+    b = parrot_hash_get_bucket(interp,
+                (Hash*) PMC_struct_val(props), prop_str);
+    if (!b)
+        return PMCNULL;
+    meth = PMC_str_val((PMC*) b->value);
+
+    *meth_str = meth;
+    ns        = VTABLE_pmc_namespace(interp, _class);
+    method    = VTABLE_get_pmc_keyed_str(interp, ns, meth);
+
+    return method;
+}
+
+static void
+do_initcall(PARROT_INTERP, PMC* _class, PMC *object, PMC *init)
+{
+    PMC * const classsearch_array = _class->vtable->mro;
+    INTVAL      i, nparents;
+
+    /*
+     * 1) if class has a CONSTRUCT property run it on the object
+     *    no redispatch
+     *
+     * XXX isn't CONSTRUCT for creating new objects?
+     */
+    STRING *meth_str;
+    PMC    *meth = get_init_meth(interp, _class,
+            string_from_cstring(interp, "CONSTRUCT", 9), &meth_str);
+    int     default_meth;
+
+    if (!PMC_IS_NULL(meth)) {
+        if (!PMC_IS_NULL(init))
+            Parrot_run_meth_fromc_args(interp, meth,
+                    object, meth_str, "vP", init);
+        else
+            Parrot_run_meth_fromc_args(interp, meth,
+                    object, meth_str, "v");
+    }
+    /*
+     * 2. if class has a BUILD property call it for all classes
+     *    in reverse search order - this class last.
+     *
+     *    Note: mro contains this class as first element
+     */
+    nparents = VTABLE_elements(interp, classsearch_array);
+
+    for (i = nparents - 1; i >= 0; --i) {
+        PMC * const parent_class =
+            VTABLE_get_pmc_keyed_int(interp, classsearch_array, i);
+        /* if it's a PMC, we put one PMC of that type into
+         * the attribute slot #0 and call init() on that PMC
+         */
+        if (!PObj_is_class_TEST(parent_class)) {
+            PMC *attr, *next_parent;
+            SLOTTYPE *obj_data;
+
+            /*
+             * but only if init isn't inherited
+             * or rather just on the last non-class parent
+             */
+            assert(i >= 1);
+            next_parent = VTABLE_get_pmc_keyed_int(interp,
+                    classsearch_array, i - 1);
+            if (!PObj_is_class_TEST(next_parent))
+                continue;
+
+            attr     = pmc_new_noinit(interp, parent_class->vtable->base_type);
+            obj_data = PMC_data_typed(object, SLOTTYPE *);
+            set_attrib_num(object, obj_data, 0, attr);
+            VTABLE_init(interp, attr);
+            continue;
+        }
+        meth = get_init_meth(interp, parent_class,
+                string_from_cstring(interp, "BUILD", 5), &meth_str);
+/*                CONST_STRING(interp, "BUILD"), &meth_str); */
+        /* no method found and no BUILD property set? */
+        if (PMC_IS_NULL(meth) && meth_str == NULL) {
+            PMC   *ns;
+            INTVAL vtable_index;
+
+            /* use __init or __init_pmc (depending on if an argument was passed)
+             * as fallback constructor method, if it exists */
+            if (init)
+                meth_str = string_from_cstring(interp, "init_pmc", 8);
+/*                meth_str = CONST_STRING(interp, "init_pmc"); */
+            else
+                meth_str = string_from_cstring(interp, "init", 4);
+/*                meth_str = CONST_STRING(interp, "init"); */
+
+            ns   = VTABLE_pmc_namespace(interp, parent_class);
+
+            /* can't use find_method, it walks mro */
+            vtable_index = Parrot_get_vtable_index(interp, meth_str);
+            meth         = VTABLE_get_pmc_keyed_int(interp, ns, vtable_index);
+            default_meth = 1;
+        }
+        else
+            default_meth = 0;
+
+        if (!PMC_IS_NULL(meth)) {
+            if (init)
+                Parrot_run_meth_fromc_args(interp, meth,
+                        object, meth_str, "vP", init);
+            else
+                Parrot_run_meth_fromc_args(interp, meth,
+                        object, meth_str, "v");
+        }
+        else if (meth_str != NULL &&
+                string_length(interp, meth_str) != 0 && !default_meth) {
+            real_exception(interp, NULL, METH_NOT_FOUND,
+                    "Class BUILD method ('%Ss') not found", meth_str);
+        }
+    }
+}
+
 pmclass ParrotClass extends delegate need_ext {
 
 /*
@@ -95,6 +222,55 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
         if (PMC_int_val(SELF)) {
             mem_sys_free(PMC_data(SELF));
         }
+    }
+
+/*
+
+=item C<PMC* instantiate(PMC* init)>
+
+Creates a new PMC object of the type of the class and calls init().
+
+=cut
+
+*/
+
+    PMC* instantiate(PMC* init) {
+        SLOTTYPE    *new_object_array;
+        INTVAL       attrib_count, i;
+        const INTVAL type   = SELF->vtable->base_type;
+        PMC         *object = pmc_new_noinit(interp, type);
+        PMC * const _class  = object->vtable->pmc_class;
+        /*
+         * put in the real vtable
+         */
+        PMC * const vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(_class),
+                                                PCD_OBJECT_VTABLE);
+        object->vtable         = (VTABLE *)PMC_struct_val(vtable_pmc);
+
+        /* Grab the attribute count from the class */
+        attrib_count = CLASS_ATTRIB_COUNT(_class);
+
+        /* Build the array that hangs off the new object */
+        /* First presize it */
+        set_attrib_array_size(object, attrib_count);
+        new_object_array = PMC_data_typed(object, SLOTTYPE *);
+
+        /* fill with PMCNULL, so that access doesn't segfault */
+        for (i = 0; i < attrib_count; ++i)
+            set_attrib_num(object, new_object_array, i, PMCNULL);
+
+        /* turn marking on */
+        set_attrib_flags(object);
+
+        /* We are an object now */
+        PObj_is_object_SET(object);
+
+        /* We really ought to call the class init routines here...
+         * this assumes that an object isa delegate
+         */
+        do_initcall(interp, _class, object, init);
+
+        return object;
     }
 
 /*

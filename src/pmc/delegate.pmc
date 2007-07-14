@@ -120,6 +120,13 @@ useful defaults and don't throw exceptions.
         return SUPER();
     }
 
+    INTVAL isa(STRING *classname) {
+        if (SUPER(classname))
+            return 1;
+
+        return 0;
+    }
+
 /*
 
 =item C<opcode_t *invoke(void *next)>

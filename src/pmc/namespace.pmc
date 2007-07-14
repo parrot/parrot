@@ -119,6 +119,23 @@ Frees the namespace info struct.
 
 /*
 
+=item C<PMC* get_class()>
+
+Returns the class or role PMC that is associated with this namespace.
+
+=cut
+
+*/
+
+    PMC* get_class()
+    {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        PMC *ret_class = nsinfo->_class;
+        return ret_class;
+    }
+
+/*
+
 =item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
 
 Sets C<*value> as the namespace item for C<*key>. This is part of the
@@ -788,6 +805,9 @@ Returns the class or role PMC that is associated with this namespace.
     {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         PMC *ret_class = nsinfo->_class;
+        if (PMC_IS_NULL(ret_class))
+            ret_class = PMCNULL;
+
         PCCRETURN(PMC *ret_class);
     }
 

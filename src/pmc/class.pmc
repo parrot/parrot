@@ -272,6 +272,8 @@ init_class_from_hash(Parrot_Interp interp, PMC *self, PMC *info) {
         new_vtable = Parrot_clone_vtable(interp, self->vtable);
         new_vtable->base_type     = type_num;
         new_vtable->pmc_class     = self;
+
+        /* Store the class's vtable in the global table */
         interp->vtables[type_num] = new_vtable;
     }
 
@@ -374,11 +376,11 @@ pmclass Class
 
 Initializes a Class PMC.
 
-=item C<void init_pmc(PMC *name)>
+=item C<void init_pmc(PMC *init_data)>
 
-The actual class creation code, called from C<newclass> opcode.
-The C<init> argument must stringify to the name of the class.
-The class is attatched to the current namespace.
+The actual class creation code, called from C<newclass> opcode.  The C<init>
+argument may either be the name of the class, or a hash of initialization
+arguments.  The class is attatched to the current namespace.
 
 =cut
 
@@ -867,6 +869,129 @@ unset to allow further modifications.
 
 /*
 
+=item C<PMC* instantiate(PMC* init)>
+
+Creates a new PMC object of the type of the class and calls init().
+
+=cut
+
+*/
+
+    PMC* instantiate(PMC* init) {
+/*        const INTVAL type = SELF->vtable->base_type;
+        PMC* const ret = pmc_new_noinit(INTERP, type);
+        VTABLE_init(INTERP, ret);
+        return ret;
+ */
+        Parrot_Object *obj_guts  = NULL;
+        Parrot_Class  *_class    = PARROT_CLASS(SELF);
+        STRING * const class_str = string_from_cstring(interp, "Class", 5);
+        PMC           *iter, *object;
+
+        int            i, mro_length;
+
+        /* If we've not been instantiated before... */
+        if (!_class->instantiated) {
+            /* Check that we have all methods listed in resolve list. */
+            int resolve_count = VTABLE_elements(interp, _class->resolve_method);
+
+            for (i = 0; i < resolve_count; i++) {
+                STRING *check_meth = VTABLE_get_string_keyed_int(interp,
+                    _class->resolve_method, i);
+                if (!VTABLE_exists_keyed_str(interp, _class->methods, check_meth)) {
+                    real_exception(interp, NULL, METH_NOT_FOUND,
+                        "The method '%S' was named in the resolve list, but not supplied",
+                        check_meth);
+                }
+            }
+
+            /* Build full parents list.
+             * XXX Need pluggable MRO, for now always do C3. */
+            _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+
+            build_attrib_index(interp, SELF);
+
+            if (PMC_IS_NULL(_class->attrib_index))
+                return object;
+
+            /* See if we have any parents from other universes and if so set a
+             * flag stating so. */
+            mro_length = VTABLE_elements(interp, _class->all_parents);
+
+            for (i = 0; i < mro_length; i++) {
+                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
+                    _class->all_parents, i);
+                if (!VTABLE_isa(interp, class_check, class_str)) {
+                    /* Found one; that's enough. */
+                    PObj_HasAlienParents_SET(SELF);
+                    break;
+                }
+            }
+        }
+
+        /* Set instantiated flag. */
+        _class->instantiated = 1;
+
+        /* Create object. */
+        object = pmc_new_noinit(interp, enum_class_Object);
+
+        /* Set custom DOD mark and destroy on the object. */
+        PObj_custom_mark_SET(object);
+        PObj_active_destroy_SET(object);
+
+        /* Initialize the object's underlying structure, pointing it to this
+         * class. */
+        obj_guts               = mem_allocate_zeroed_typed(Parrot_Object);
+        obj_guts->_class       = SELF;
+        obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC_data(object)       = obj_guts;
+
+        if (!PMC_IS_NULL(init)) {
+            /* Initialize attributes with the supplied values. */
+            iter = VTABLE_get_iter(interp, init);
+
+            while (VTABLE_get_bool(interp, iter)) {
+                /* Get name and value. */
+                STRING * const attr_name  = VTABLE_shift_string(interp, iter);
+                PMC    * const attr_value = VTABLE_get_pmc_keyed_str(interp, init,
+                    attr_name);
+
+                /* Set the attribute. */
+                VTABLE_set_attr_str(interp, object, attr_name, attr_value);
+            }
+        }
+
+        /* If we have parents that are out of this class universe, find them
+         * in the MRO and create instances of them. */
+        if (PObj_HasAlienParents_TEST(SELF)) {
+            mro_length = VTABLE_elements(interp, _class->all_parents);
+
+            for (i = 0; i < mro_length; i++) {
+                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
+                    _class->all_parents, i);
+
+                if (!VTABLE_isa(interp, class_check, class_str)) {
+                    /* From another universe. Create instance... */
+                    PMC *parent_ins;
+                    int  position;
+
+                    Parrot_PCCINVOKE(interp, class_check,
+                        string_from_literal(interp, "new"), "P->", parent_ins);
+
+                    /* ...and tack on end of the attribute store (after all the
+                     * slots for attributes). */
+                    position = VTABLE_elements(interp, obj_guts->attrib_store);
+                    VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
+                        position, class_check);
+                }
+            }
+        }
+        return object;
+    }
+
+
+/*
+
 =item C<INTVAL isa(STRING *classname)>
 
 Returns whether the class is or inherits from C<*classname>.
@@ -877,8 +1002,7 @@ Returns whether the class is or inherits from C<*classname>.
 
     INTVAL isa(STRING *classname) {
         Parrot_Class *_class      = PARROT_CLASS(SELF);
-        const INTVAL  num_classes = VTABLE_elements(interp, _class->parents);
-        INTVAL        i;
+        INTVAL        i, num_classes;
 
         if (SUPER(classname))
             return 1;
@@ -894,6 +1018,7 @@ Returns whether the class is or inherits from C<*classname>.
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the classname.
          */
+        num_classes = VTABLE_elements(interp, _class->parents);
         for (i = 0; i < num_classes; i++) {
             PMC *cur_class = VTABLE_get_pmc_keyed_int(interp, _class->parents, i);
             if (VTABLE_isa(interp, cur_class, classname))

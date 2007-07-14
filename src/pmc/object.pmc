@@ -108,6 +108,23 @@ Free the object's underlying struct.
 
 /*
 
+=item C<STRING* name()>
+
+Returns the fully qualified name of the object's class.
+
+=cut
+
+*/
+
+    STRING* name() {
+        PMC *class = VTABLE_get_class(interp, SELF);
+        STRING *class_name = VTABLE_get_string(interp, class);
+
+        return class_name;
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any referenced strings and PMCs.
@@ -125,7 +142,7 @@ Mark any referenced strings and PMCs.
 
 /*
 
-=item C<PMC* get_attr_str(STRING *idx)>
+=item C<PMC* get_attr_str(STRING *name)>
 
 Gets the value of an attribute for this object. Will find the first attribute
 of the given name walking up the inheritance tree.

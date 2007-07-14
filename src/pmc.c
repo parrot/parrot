@@ -390,7 +390,8 @@ pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
     if (item->vtable->base_type == enum_class_NameSpace)
         return 0;
     if (!PMC_IS_NULL(item))
-        return PMC_int_val((PMC*) item);
+        return VTABLE_get_integer(interp, item);
+
     return Parrot_get_datatype_enum(interp, name);
 }
 
@@ -409,7 +410,7 @@ pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
     PMC * const item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
     if (!PMC_IS_NULL(item))
-        return PMC_int_val((PMC*) item);
+        return VTABLE_get_integer(interp, item);
     return 0;
 }
 

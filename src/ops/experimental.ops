@@ -455,28 +455,104 @@ op pmcinfo(out INT, invar PMC, inconst INT) {
 
 =item B<new>(out PMC, invar PMC)
 
+Instantiate a new object from a string PMC or key name, or from a class object.
+For strings and keys, first check the namespace for a class object, then fall
+back to the type ID if no class object is stored in the namespace.
+
 =cut
 
 inline op new(out PMC, invar PMC) :object_classes {
+    PMC *ns, *classobj;
     INTVAL type;
     switch ($2->vtable->base_type) {
         case enum_class_String:
+            /* Lookup namespace by string */
+            ns = Parrot_get_namespace_keyed_str(interp,
+                CONTEXT(interp->ctx)->current_namespace, VTABLE_get_string(interp,$2));
+            if (!PMC_IS_NULL(ns))
+                classobj = VTABLE_get_class(interp, ns);
+            if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+                    string_from_literal(interp, "PMCProxy")))
+                $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+            else {
                 type = pmc_type(interp, PMC_str_val($2));
-            if (type <= 0)
-                real_exception(interp, NULL, NO_CLASS,
-                    "Class '%Ss' not found", PMC_str_val($2));
-            $1 = pmc_new(interp, type);
+                if (type <= 0)
+                    real_exception(interp, NULL, NO_CLASS,
+                        "Class '%Ss' not found", PMC_str_val($2));
+                $1 = pmc_new(interp, type);
+            }
             break;
         case enum_class_Key:
-            type = pmc_type_p(interp, $2);
-            if (type <= 0)
-                real_exception(interp, NULL, NO_CLASS,
-                    "Class '%Ss' not found", readable_name(interp, $2));
-            $1 = pmc_new(interp, type);
+            /* Lookup namespace by key */
+            ns = Parrot_get_namespace_keyed(interp,
+                CONTEXT(interp->ctx)->current_namespace, $2);
+            if (!PMC_IS_NULL(ns))
+                classobj = VTABLE_get_class(interp, ns);
+            if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+                    string_from_literal(interp, "PMCProxy")))
+                $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+            else {
+                type = pmc_type_p(interp, $2);
+                if (type <= 0)
+                    real_exception(interp, NULL, NO_CLASS,
+                        "Class '%Ss' not found", readable_name(interp, $2));
+                $1 = pmc_new(interp, type);
+            }
+            break;
+        case enum_class_Class:
+            $1 = VTABLE_instantiate(interp, $2, PMCNULL);
             break;
         default:
             real_exception(interp, NULL, NO_CLASS,
-                "Can only use a Key or String PMC with new");
+                "Can only use a Key, String, or Class PMC with new");
+    }
+    goto NEXT();
+}
+
+inline op new(out PMC, invar PMC, in PMC) :object_classes {
+    PMC *ns, *classobj;
+    INTVAL type;
+    switch ($2->vtable->base_type) {
+        case enum_class_String:
+            /* Lookup namespace by string */
+            ns = Parrot_get_namespace_keyed_str(interp,
+                CONTEXT(interp->ctx)->current_namespace, VTABLE_get_string(interp,$2));
+            if (!PMC_IS_NULL(ns))
+                classobj = VTABLE_get_class(interp, ns);
+            if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+                    string_from_literal(interp, "PMCProxy")))
+                $1 = VTABLE_instantiate(interp, classobj, $3);
+            else {
+                type = pmc_type(interp, PMC_str_val($2));
+                if (type <= 0)
+                    real_exception(interp, NULL, NO_CLASS,
+                        "Class '%Ss' not found", PMC_str_val($2));
+                $1 = pmc_new(interp, type);
+            }
+            break;
+        case enum_class_Key:
+            /* Lookup namespace by key */
+            ns = Parrot_get_namespace_keyed(interp,
+                CONTEXT(interp->ctx)->current_namespace, $2);
+            if (!PMC_IS_NULL(ns))
+                classobj = VTABLE_get_class(interp, ns);
+            if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+                    string_from_literal(interp, "PMCProxy")))
+                $1 = VTABLE_instantiate(interp, classobj, $3);
+            else {
+                type = pmc_type_p(interp, $2);
+                if (type <= 0)
+                    real_exception(interp, NULL, NO_CLASS,
+                        "Class '%Ss' not found", readable_name(interp, $2));
+                $1 = pmc_new(interp, type);
+            }
+            break;
+        case enum_class_Class:
+            $1 = VTABLE_instantiate(interp, $2, $3);
+            break;
+        default:
+            real_exception(interp, NULL, NO_CLASS,
+                "Can only use a Key, String, or Class PMC with new");
     }
     goto NEXT();
 }

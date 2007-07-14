@@ -85,35 +85,71 @@ op new(out PMC, in INT, in PMC) {
 
 op new(out PMC, in STR) {
     STRING *_class = $2;
-    INTVAL type = pmc_type(interp, _class);
-    if (!type)
-        type = pmc_type(interp, _class);
-    if (type <= 0)
-        real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", _class);
-  $1 = pmc_new(interp, type);
-  goto NEXT();
+    PMC *classobj = PMCNULL;
+
+    /* Look up a namespace with the given name within the current
+     * namespace and if we find it, get the class associated with it, if any. */
+    PMC *ns = Parrot_get_namespace_keyed_str(interp,
+      CONTEXT(interp->ctx)->current_namespace, _class);
+    if (!PMC_IS_NULL(ns))
+        classobj = VTABLE_get_class(interp, ns);
+
+    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj, string_from_literal(interp, "PMCProxy")))
+        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        INTVAL type = pmc_type(interp, _class);
+        if (!type)
+            type = pmc_type(interp, _class);
+        if (type <= 0)
+            real_exception(interp, NULL, NO_CLASS,
+                "Class '%Ss' not found", _class);
+        $1 = pmc_new(interp, type);
+    }
+    goto NEXT();
 }
 
 op new(out PMC, in STR, in PMC) {
     STRING *_class = $2;
-    INTVAL type = pmc_type(interp, _class);
-    if (!type)
-        type = pmc_type(interp, _class);
-    if (type <= 0)
-        real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", _class);
-    $1 = pmc_new_init(interp, type, $3);
+    PMC *classobj = PMCNULL;
+
+    PMC *ns = Parrot_get_namespace_keyed_str(interp,
+      CONTEXT(interp->ctx)->current_namespace, _class);
+    if (!PMC_IS_NULL(ns))
+        classobj = VTABLE_get_class(interp, ns);
+
+    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+            string_from_literal(interp, "PMCProxy")))
+        $1 = VTABLE_instantiate(interp, classobj, $3);
+    else {
+        INTVAL type = pmc_type(interp, _class);
+        if (!type)
+            type = pmc_type(interp, _class);
+        if (type <= 0)
+            real_exception(interp, NULL, NO_CLASS,
+                "Class '%Ss' not found", _class);
+        $1 = pmc_new_init(interp, type, $3);
+    }
     goto NEXT();
 }
 
 inline op new(out PMC, inconst PMC) :object_classes {
+    PMC *ns, *classobj;
     PMC *_class = $2;
-    INTVAL type = pmc_type_p(interp, _class);
-    if (type <= 0)
-        real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interp, _class));
-    $1 = pmc_new(interp, type);
+    /* Lookup namespace by key */
+    ns = Parrot_get_namespace_keyed(interp,
+        CONTEXT(interp->ctx)->current_namespace, $2);
+    if (!PMC_IS_NULL(ns))
+        classobj = VTABLE_get_class(interp, ns);
+    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
+            string_from_literal(interp, "PMCProxy")))
+        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        INTVAL type = pmc_type_p(interp, _class);
+        if (type <= 0)
+            real_exception(interp, NULL, NO_CLASS,
+                "Class '%Ss' not found", readable_name(interp, _class));
+        $1 = pmc_new(interp, type);
+    }
     goto NEXT();
 }
 
@@ -149,7 +185,11 @@ inline op typeof (out STR, invar PMC) {
 }
 
 inline op typeof (out INT, invar PMC) {
-  $1 = $2->vtable->type(interp, $2);
+  if (VTABLE_isa(interp, $2, string_from_literal(interp, "Object")))
+      real_exception(interp, NULL, INVALID_OPERATION,
+         "Numeric 'typeof' will not be supported in new object model");
+  else
+      $1 = $2->vtable->type(interp, $2);
   goto NEXT();
 }
 
