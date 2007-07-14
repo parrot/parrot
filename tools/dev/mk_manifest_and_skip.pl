@@ -117,32 +117,44 @@ END_HEADER
 print $MANIFEST $_ for ( sort @{ $MANIFEST_LINES_ref } );
 close $MANIFEST or die "Unable to close MANIFEST after writing";
 
-my $svnignore = `$cmd propget svn:ignore @dirs`;
-$svnignore =~ s/\n{3,}/\n\n/g;    # cope with trailing newlines in svn:ignore output
-my %ignore;
-my @ignore = split( /\n\n/, $svnignore );
-foreach (@ignore) {
-    my @cnt = m/( - )/g;
-    if ($#cnt) {
-        my @a = split /\n(?=(?:.*?) - )/, $_;
-        foreach (@a) {
-            m/^\s*(.*?) - (.+)/sm;
-            $ignore{$1} = $2 if $2;
-        }
-    }
-    else {
-        m/^(.*) - (.+)/sm;
-        $ignore{$1} = $2 if $2;
-    }
-}
+my $ignore_ref = prepare_manifest_skip( {
+    cmd     => $cmd,
+    dirs    => \@dirs,
+} );
 
 print_manifest_skip( {
     id      => $keyword,
     time    => $time,
-    ignore  => \%ignore,
+#    ignore  => \%ignore,
+    ignore  => $ignore_ref,
 } );
 
 #################### SUBROUTINES ####################
+
+sub prepare_manifest_skip {
+    my $argsref = shift;
+#    my $svnignore = `$cmd propget svn:ignore @dirs`;
+    my $svnignore = `$argsref->{cmd} propget svn:ignore @{ $argsref->{dirs} }`;
+    # cope with trailing newlines in svn:ignore output
+    $svnignore =~ s/\n{3,}/\n\n/g;
+    my %ignore;
+    my @ignore = split( /\n\n/, $svnignore );
+    foreach (@ignore) {
+        my @cnt = m/( - )/g;
+        if ($#cnt) {
+            my @a = split /\n(?=(?:.*?) - )/, $_;
+            foreach (@a) {
+                m/^\s*(.*?) - (.+)/sm;
+                $ignore{$1} = $2 if $2;
+            }
+        }
+        else {
+            m/^(.*) - (.+)/sm;
+            $ignore{$1} = $2 if $2;
+        }
+    }
+    return \%ignore;
+}
 
 sub print_manifest_skip {
     my $argsref = shift;
