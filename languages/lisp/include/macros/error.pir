@@ -1,5 +1,13 @@
 # $Id$
 
+=head1 NAME
+
+include/macros/error.pir - macros for reporting errors
+
+=head1 Macros
+
+=cut
+
 .macro ERROR_0(T,M)
   _error(.T, .M)
 .endm

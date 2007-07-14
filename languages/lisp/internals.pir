@@ -1,6 +1,12 @@
 # $Id$
 
-=head1 _LOOKUP_GLOBAL(pkgname, symname)
+=head1 NAME
+
+internals.pir - lexical and global variables, function call
+
+=head1 Functions
+
+=head2 _LOOKUP_GLOBAL(pkgname, symname)
 
 =cut
 
@@ -31,7 +37,7 @@ DONE:
 .end
 
 
-=head1 _LOOKUP_LEXICAL(symname)
+=head2 _LOOKUP_LEXICAL(symname)
 
 =cut
 
@@ -55,7 +61,7 @@ DONE:
 .end
 
 
-=head1 _LOOKUP_SYMBOL(symname)
+=head2 _LOOKUP_SYMBOL(symname)
 
 =cut
 
@@ -93,7 +99,7 @@ DONE:
 .end
 
 
-=head1 _INTERN_GLOBAL(symbol, pkgname)
+=head2 _INTERN_GLOBAL(symbol, pkgname)
 
 =cut
 
@@ -109,7 +115,7 @@ DONE:
 .end
 
 
-=head1 .INTERN_LEXICAL(symbol)
+=head2 .INTERN_LEXICAL(symbol)
 
 =cut
 
@@ -125,7 +131,7 @@ DONE:
 .end
 
 
-=head1 _LEXICAL_SYMBOL
+=head2 _LEXICAL_SYMBOL
 
 =cut
 
@@ -157,7 +163,7 @@ DONE:
 .end
 
 
-=head1 _SYMBOL
+=head2 _SYMBOL
 
 =cut
 
@@ -177,7 +183,7 @@ DONE:
 .end
 
 
-=head1 _GLOBAL_SYMBOL
+=head2 _GLOBAL_SYMBOL
 
 =cut
 
@@ -224,7 +230,7 @@ DONE:
   .return(symbol)
 .end
 
-=head1 _FUNCTION_CALL
+=head2 _FUNCTION_CALL
 
 =cut
 

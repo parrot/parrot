@@ -1,5 +1,11 @@
 # $Id$
 
+=head1 NAME
+
+read.pir - lexing and parsing, reader macros
+
+=cut
+
 .sub _read
   .param pmc args
 

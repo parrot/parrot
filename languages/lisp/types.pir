@@ -1,5 +1,11 @@
 # $Id$
 
+=head1 NAME
+
+types.pir - Lisp data types
+
+=cut
+
 .sub _init_types
   .local pmc class
 

@@ -1,8 +1,8 @@
 # $Id$
 
-=head2
+=head1 NAME
 
-Set up the package 'COMMON-LISP'
+cl.pir - Set up the package 'COMMON-LISP'
 
 =cut
 

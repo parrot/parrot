@@ -6,7 +6,7 @@ system.pir - implementation specific package SYSTEM
 
 =head1 DESCRIPTION
 
-Use in bootstrapping.
+Used in bootstrapping.
 
 =cut
 

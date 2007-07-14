@@ -1,10 +1,15 @@
 # $Id$
 
-=head1 LIST PROCESSING MACROS
+=head1 NAME
 
-This file contains various list processing macros.  All macro arguments are assumed to be PMC types unless otherwise noted.
+include/macros/list.pir - list processing macros
 
-=head1 .NULL(L,B) 
+This file contains various list processing macros.
+All macro arguments are assumed to be PMC types unless otherwise noted.
+
+=head1 Macros
+
+=head2 .NULL(L,B) 
 
 Branch to B if L is an empty list.
 
@@ -17,7 +22,7 @@ Branch to B if L is an empty list.
   eq_addr .L, _nilp, .B
 .endm
 
-=head1 .CAR(R,A) 
+=head2 .CAR(R,A) 
 
 Puts the car of A into R.  A is assumed to be a valid list.
 
@@ -37,7 +42,7 @@ Puts the car of A into R.  A is assumed to be a valid list.
 .local $DONE:
 .endm
 
-=head1 .APPEND(R,A,B)
+=head2 .APPEND(R,A,B)
 
 Appends B to list A, placing the result into R.  A is assumed to be a valid list.
 
@@ -71,7 +76,7 @@ Appends B to list A, placing the result into R.  A is assumed to be a valid list
 .local $DONE:
 .endm
 
-=head1 .CDR(R,A) 
+=head2 .CDR(R,A) 
 
 Puts the cdr of A into R.  A is assumed to be a valid list.
 
@@ -90,7 +95,7 @@ Puts the cdr of A into R.  A is assumed to be a valid list.
 .local $DONE:
 .endm
 
-=head1 .SECOND(R,A) 
+=head2 .SECOND(R,A) 
 
 Puts the second element of A into R.  A is assumed to be a valid list.
 
@@ -103,7 +108,7 @@ Puts the second element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head1 .THIRD(R,A) 
+=head2 .THIRD(R,A) 
 
 Puts the third element of A into R.  A is assumed to be a valid list.
 
@@ -117,7 +122,7 @@ Puts the third element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head1 .FOURTH(R,A) 
+=head2 .FOURTH(R,A) 
 
 Puts the fourth element of A into R.  A is assumed to be a valid list.
 
@@ -132,7 +137,7 @@ Puts the fourth element of A into R.  A is assumed to be a valid list.
   .CAR(.R, _cdrp)
 .endm
 
-=head1 .LIST_1(R,A) 
+=head2 .LIST_1(R,A) 
 
 Creates a one element list containing A, placing the result in R.
 
@@ -146,7 +151,7 @@ Creates a one element list containing A, placing the result in R.
 .endm
 
 
-=head1 .LIST_2(R,A,B) 
+=head2 .LIST_2(R,A,B) 
 
 Creates a two element list containing A and B, placing the result in R.
 

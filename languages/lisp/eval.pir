@@ -1,5 +1,11 @@
 # $Id$
 
+=head1 NAME
+
+eval.pir - evaluate forms
+
+=cut
+
 .sub _eval
   .param pmc args
 

@@ -1,5 +1,11 @@
 # $Id$
 
+=head1 NAME
+
+validate.pir - lexing
+
+=cut
+
 .sub _VALIDATE_TOKEN
   .param string token
 

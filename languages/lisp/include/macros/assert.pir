@@ -1,6 +1,12 @@
 # $Id$
 
-=head1 ASSERT_TYPE(A,T)
+=head1 NAME
+
+include/macros/assert.pir - macros for checking assumptions
+
+=head1 Macros
+
+=head2 ASSERT_TYPE(A,T)
 
 Asserts that A is of type T, throwing a error of type "type-error" on failure
 
@@ -21,7 +27,7 @@ Asserts that A is of type T, throwing a error of type "type-error" on failure
 .local $DONE:
 .endm
 
-=head1 ASSERT_TYPE_AND_BRANCH(A,T,B)
+=head2 ASSERT_TYPE_AND_BRANCH(A,T,B)
 
 Asserts that A is of type T, branching to B on failure.
 
@@ -38,7 +44,7 @@ Asserts that A is of type T, branching to B on failure.
 .local $DONE:
 .endm
 
-=head1 ASSERT_LENGTH(A,L,B)
+=head2 ASSERT_LENGTH(A,L,B)
 
 Asserts that list A is of length L, branching to B on failure.
 
@@ -54,7 +60,7 @@ Asserts that list A is of length L, branching to B on failure.
 .local $DONE:
 .endm
 
-=head1 ASSERT_MINIMUM_LENGTH(A,L,B)
+=head2 ASSERT_MINIMUM_LENGTH(A,L,B)
 
 Asserts that list A is at least of length L, branching to B on failure.
 
@@ -70,7 +76,7 @@ Asserts that list A is at least of length L, branching to B on failure.
 .local $DONE:
 .endm
 
-=head1 ASSERT_LENGTH_BETWEEN(A,L,M,B)
+=head2 ASSERT_LENGTH_BETWEEN(A,L,M,B)
 
 Asserts that list A is at least of length L and at most of length M, branching to B on failure.
 
@@ -87,7 +93,7 @@ Asserts that list A is at least of length L and at most of length M, branching t
 .local $DONE:
 .endm
 
-=head1 ASSERT_EVEN_LENGTH(A,B)
+=head2 ASSERT_EVEN_LENGTH(A,B)
 
 Asserts that list A is composed of an even number of elements, branching to B on failure.
 

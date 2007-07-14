@@ -1,6 +1,12 @@
 # $Id$
 
-=head1 .CONS(R,A,B) 
+=head1 NAME
+
+include/macros/types.pir
+
+=head1 Macros
+
+=head2 .CONS(R,A,B) 
 
 Creates a new cons with car A and cdr B, placing the result in R.
 
@@ -18,7 +24,7 @@ Creates a new cons with car A and cdr B, placing the result in R.
   .R = _consp
 .endm
 
-=head1 .STRING(R,S) 
+=head2 .STRING(R,S) 
 
 Creates a new string with value S, placing the result in R.
 
@@ -29,7 +35,7 @@ Creates a new string with value S, placing the result in R.
   .R = .S
 .endm
 
-=head1 .STREAM(R,S)
+=head2 .STREAM(R,S)
 
 Create a new stream object from ParrotIO object S, placing the result in R.
 
@@ -40,7 +46,7 @@ Create a new stream object from ParrotIO object S, placing the result in R.
   .R._set_io(.S)
 .endm
 
-=head1 .READTABLE(R)
+=head2 .READTABLE(R)
 
 Create a new readtable object and places it in R.
 
@@ -50,7 +56,7 @@ Create a new readtable object and places it in R.
   .R = new "LispReadtable"
 .endm
 
-=head1 .FLOAT(R,F) 
+=head2 .FLOAT(R,F) 
 
 Creates a new float with value F, placing the result in R.
 
@@ -61,7 +67,7 @@ Creates a new float with value F, placing the result in R.
   .R = .F
 .endm
 
-=head1 .INTEGER(R,I) 
+=head2 .INTEGER(R,I) 
 
 Creates a new integer with value I, placing the result in R.
 
@@ -72,7 +78,7 @@ Creates a new integer with value I, placing the result in R.
   .R = .I
 .endm
 
-=head1 .HASH(R) 
+=head2 .HASH(R) 
 
 Creates a new hash table, placing the result in R.
 
@@ -82,7 +88,7 @@ Creates a new hash table, placing the result in R.
   .R = new "LispHash"
 .endm
 
-=head1 .PACKAGE(P,N)
+=head2 .PACKAGE(P,N)
 
 Create a new package with name N, placing the result in P.
 
@@ -102,7 +108,7 @@ Create a new package with name N, placing the result in P.
     setattribute .P, "name", _name
 .endm
 
-=head1 .FUNCTION(F,L)
+=head2 .FUNCTION(F,L)
 
 Create a new function object with label L, placing the result in F.
 
@@ -118,7 +124,7 @@ Create a new function object with label L, placing the result in F.
 
 .endm
 
-=head1 .MACRO(F,L)
+=head2 .MACRO(F,L)
 
 Create a new macro object with label L, placing the result in F.
 

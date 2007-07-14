@@ -1,5 +1,16 @@
 # $Id$
 
+=head1 NAME
+
+lisp.pir - main function of Parrot Common Lisp 
+
+=head1 Description
+
+The C<main> sub is provided here.
+Needed code is included.
+
+=cut
+
 .const int INVALID_CHAR     = 0
 .const int CONSTITUENT_CHAR = 1
 .const int WHITESPACE_CHAR  = 2

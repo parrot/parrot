@@ -1,10 +1,16 @@
 # $Id$
 
-=head1 MISCELLANEOUS MACROS
+=head1 NAME
+
+include/macros/standard.pir - miscellaneous macros
+
+=head1 DESCRITPTION
 
 This file contains miscellaneous macros.
 
-=head1 .NIL(R) 
+=head1 Macros
+
+=head2 .NIL(R) 
 
 Sets R to the empty list (the NIL symbol).
 
@@ -14,7 +20,7 @@ Sets R to the empty list (the NIL symbol).
   find_global .R, "SYMBOLS", "NIL"
 .endm
 
-=head1 .TRUE(R) 
+=head2 .TRUE(R) 
 
 Sets R to true (the TRUE symbol).
 
