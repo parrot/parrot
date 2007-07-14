@@ -103,10 +103,10 @@ static void rebuild_attrib_stuff( PARROT_INTERP, NOTNULL(PMC *_class) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL register_type( PARROT_INTERP, NOTNULL(PMC *name) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -157,9 +157,9 @@ Return Sub PMC if a method with the vtable name exists in ns
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 find_vtable_meth_ns(PARROT_INTERP, PMC *ns, INTVAL vtable_index)
-    /* WARN_UNUSED */
 {
     return VTABLE_get_pmc_keyed_int(interp, ns, vtable_index);
 }
@@ -420,15 +420,16 @@ create_deleg_pmc_vtable(PARROT_INTERP, NOTNULL(PMC *_class), int full)
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_MMD_method_name
 Return the method name for the given MMD enum.
 
 */
 
 PARROT_API
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 const char*
 Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
-    /* WARN_UNUSED, PURE */
 {
     assert(idx >= 0);
 
@@ -440,7 +441,7 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_MMD_method_idx
 Return the MMD function number for method name or -1 on failure.
 
 TODO allow dynamic expansion at runtime.
@@ -448,9 +449,9 @@ TODO allow dynamic expansion at runtime.
 */
 
 PARROT_API
+PARROT_PURE_FUNCTION
 INTVAL
-Parrot_MMD_method_idx(SHIM_INTERP, const char *name)
-    /* WARN_UNUSED, PURE */
+Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))
 {
     INTVAL i;
 
@@ -661,9 +662,9 @@ Parrot_class_lookup_p(PARROT_INTERP, PMC *class_name)
     return pmc;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 register_type(PARROT_INTERP, NOTNULL(PMC *name))
-    /* WARN_UNUSED */
 {
     INTVAL type;
     PMC   *classname_hash, *item;
@@ -804,9 +805,9 @@ parrot_class_register(PARROT_INTERP, PMC *name,
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, NOTNULL(STRING **meth_str))
-    /* WARN_UNUSED */
 {
     STRING     *meth;
     HashBucket *b;
@@ -1011,9 +1012,9 @@ L<http://pugs.blogs.com/pugs/2005/07/day_165_r5671_j.html>
 */
 
 /* create a list if non-empty lists */
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 not_empty(PARROT_INTERP, PMC *seqs)
-    /* WARN_UNUSED */
 {
     INTVAL i;
     PMC * const nseqs = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -1495,10 +1496,10 @@ debug_trace_find_meth(PARROT_INTERP, PMC *_class, STRING *name, PMC *sub)
     debug_trace_find_meth(i, c, m, sub)
 #endif
 
+PARROT_WARN_UNUSED_RESULT
 static PMC *
 find_method_direct_1(PARROT_INTERP, NOTNULL(PMC *_class),
                               STRING *method_name)
-    /* WARN_UNUSED */
 {
     INTVAL i;
 

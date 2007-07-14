@@ -84,9 +84,9 @@ Mathematics*, Second Edition. Addison-Wesley, 1994.
 
 */
 
+PARROT_CONST_FUNCTION
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
-    /* CONST, WARN_UNUSED */
 {
     INTVAL y;
     INTVAL z = i3;
@@ -125,9 +125,9 @@ Includes a workaround for buggy code generation in the C<lcc> compiler.
 
 */
 
+PARROT_CONST_FUNCTION
 FLOATVAL
 floatval_mod(FLOATVAL n2, FLOATVAL n3)
-    /* CONST, WARN_UNUSED */
 {
 #ifdef __LCC__
 
@@ -441,9 +441,9 @@ Used in C<src/nci.c>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 void *
 Parrot_make_la(PARROT_INTERP, NOTNULL(PMC *array))
-    /* WARN_UNUSED */
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
@@ -604,19 +604,19 @@ Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
         NOTNULL(const STRING *search), UINTVAL start_offset)
-    /* WARN_UNUSED */
 {
     const INTVAL searchlen = search->strlen;
     const char * const search_start = search->strstart;
     UINTVAL max_possible_offset = (base->strlen - search->strlen);
     INTVAL current_offset;
 
-    if (start_offset && start_offset < max_possible_offset) {
+    if (start_offset && start_offset < max_possible_offset)
         max_possible_offset = start_offset;
-    }
+
     for (current_offset = max_possible_offset; current_offset >= 0;
             current_offset--) {
         const char * const base_start = (char *)base->strstart + current_offset;

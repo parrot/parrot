@@ -395,9 +395,9 @@ bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
 }
 
 
+PARROT_WARN_UNUSED_RESULT
 int
 blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))
-    /* WARN_UNUSED */
 {
     const Edge *pred = to->pred_list;
 
@@ -498,9 +498,9 @@ free_edge(NOTNULL(IMC_Unit *unit))
     unit->edge_list = 0;
 }
 
+PARROT_WARN_UNUSED_RESULT
 int
 edge_count(NOTNULL(const struct _IMC_Unit *unit))
-    /* WARN_UNUSED */
 {
     Edge *e;
     int i = 0;
@@ -1031,9 +1031,9 @@ find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
  * only one predecessor to the loop header outside of the loop body, and if it
  * always transfers control directly to the header.
  */
+PARROT_WARN_UNUSED_RESULT
 int
 natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))
-    /* WARN_UNUSED */
 {
     int preheader = -1;
     Edge* edge;
@@ -1231,9 +1231,10 @@ make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* in
     return bb;
 }
 
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 Life_range *
 make_life_range(NOTNULL(SymReg *r), int idx)
-    /* MALLOC, WARN_UNUSED */
 {
    Life_range * const l = mem_sys_allocate_zeroed(sizeof(*l));
 

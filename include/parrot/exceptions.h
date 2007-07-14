@@ -168,6 +168,7 @@ void internal_exception( int exitcode, NOTNULL(const char *format), ... )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PMC* new_c_exception_handler( PARROT_INTERP, Parrot_exception *jb )
         __attribute__nonnull__(1);
 
@@ -211,11 +212,13 @@ void real_exception( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 opcode_t * rethrow_exception( PARROT_INTERP, NOTNULL(PMC *exception) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 opcode_t * throw_exception( PARROT_INTERP, PMC *exception, void *dest )
         __attribute__nonnull__(1);
 

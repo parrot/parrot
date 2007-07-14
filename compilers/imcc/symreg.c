@@ -143,9 +143,9 @@ mk_symreg(PARROT_INTERP, NOTNULL(char *name), int t)
 /*
  * Dump a SymReg to a printable format.
  */
+PARROT_MALLOC
 char *
 symreg_to_str(NOTNULL(const SymReg *s))
-    /* MALLOC, WARN_UNUSED */
 {
     /* NOTE: the below magic number encompasses all the quoted strings which
      * may be included in the sprintf output */
@@ -662,13 +662,12 @@ mk_label_address(PARROT_INTERP, char *name)
  *
  */
 
+PARROT_MALLOC
 SymReg *
 dup_sym(NOTNULL(const SymReg *r))
-    /* MALLOC, WARN_UNUSED */
 {
     SymReg * const new_sym = mem_allocate_typed(SymReg);
-
-    *new_sym      = *r;
+    STRUCT_COPY(new_sym,r);
     new_sym->name = str_dup(r->name);
 
     return new_sym;
@@ -955,7 +954,7 @@ clear_sym_hash(NOTNULL(SymHash *hsh))
 }
 
 void
-debug_dump_sym_hash(SymHash *hsh)
+debug_dump_sym_hash(NOTNULL(SymHash *hsh))
 {
     int i;
 
@@ -1005,9 +1004,9 @@ clear_globals(PARROT_INTERP)
 
 /* utility functions: */
 
+PARROT_PURE_FUNCTION
 unsigned int
 hash_str(NOTNULL(const char *str))
-    /* PURE, WARN_UNUSED */
 {
     unsigned long  key = 0;
     const    char *s;

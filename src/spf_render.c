@@ -235,10 +235,10 @@ This is the engine that does all the formatting.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_sprintf_format(PARROT_INTERP,
         NOTNULL(STRING *pat), NOTNULL(SPRINTF_OBJ *obj))
-    /* WARN_UNUSED */
 {
     INTVAL i, len, old;
     /*
@@ -259,6 +259,7 @@ Parrot_sprintf_format(PARROT_INTERP,
         if (string_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interp, pat, old, len, &substr, 1);
+                /* XXX This shouldn't modify targ the pointer */
                 targ = string_append(interp, targ, substr);
             }
             len = 0;

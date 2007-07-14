@@ -46,12 +46,12 @@ struct _IMC_Unit;
 
 /* HEADERIZER BEGIN: compilers/imcc/cfg.c */
 
+PARROT_WARN_UNUSED_RESULT
 int blocks_are_connected(
     NOTNULL(const Basic_block *from),
     NOTNULL(const Basic_block *to) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 void build_cfg( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
@@ -69,9 +69,9 @@ void compute_dominators( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 int edge_count( NOTNULL(const struct _IMC_Unit *unit) )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 void find_basic_blocks( PARROT_INTERP,
     NOTNULL(struct _IMC_Unit *unit),
@@ -93,17 +93,17 @@ void life_analysis( PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
 Life_range * make_life_range( NOTNULL(SymReg *r), int idx )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
     NOTNULL(const struct _IMC_Unit *unit),
     NOTNULL(const Loop_info* loop_info) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 void search_predecessors_not_in( NOTNULL(const Basic_block *node), Set* s )
         __attribute__nonnull__(1);

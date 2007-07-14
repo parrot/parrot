@@ -27,9 +27,9 @@ typedef struct _handler_node_t {
 /* HEADERIZER BEGIN: src/exit.c */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void Parrot_exit( PARROT_INTERP, int status )
-        __attribute__nonnull__(1)
-        __attribute__noreturn__;
+        __attribute__nonnull__(1);
 
 PARROT_API
 int Parrot_on_exit( PARROT_INTERP,

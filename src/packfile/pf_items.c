@@ -327,9 +327,9 @@ definitionem>.
 
 */
 
+PARROT_CONST_FUNCTION
 size_t
 PF_size_opcode(void)
-    /* CONST, WARN_UNUSED */
 {
     return 1;
 }
@@ -384,9 +384,9 @@ Return store size of C<INTVAL> in C<opcode_t> units.
 
 */
 
+PARROT_CONST_FUNCTION
 size_t
 PF_size_integer(void)
-    /* CONST, WARN_UNUSED */
 {
     const size_t s = sizeof (INTVAL) / sizeof (opcode_t);
     return s ? s : 1;
@@ -463,9 +463,9 @@ Return store size of FLOATVAL in opcode_t units.
 
 */
 
+PARROT_CONST_FUNCTION
 size_t
 PF_size_number(void)
-    /* CONST, WARN_UNUSED */
 {
     return ROUND_UP(sizeof (FLOATVAL), sizeof (opcode_t));
 }
@@ -594,9 +594,9 @@ Report store size of C<STRING> in C<opcode_t> units.
 
 */
 
+PARROT_PURE_FUNCTION
 size_t
 PF_size_string(NOTNULL(const STRING *s))
-    /* PURE, WARN_UNUSED */
 {
     opcode_t padded_size = s->bufused;
 
@@ -616,9 +616,9 @@ Fetch a cstring from bytecode and return an allocated copy
 
 */
 
+PARROT_MALLOC
 char *
 PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
-    /* WARN_UNUSED, MALLOC */
 {
     const size_t str_len = strlen ((char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
@@ -657,9 +657,9 @@ Return store size of a C-string in C<opcode_t> units.
 
 */
 
+PARROT_PURE_FUNCTION
 size_t
 PF_size_cstring(NOTNULL(const char *s))
-    /* PURE, WARN_UNUSED */
 {
     size_t str_len;
 

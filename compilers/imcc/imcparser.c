@@ -376,16 +376,17 @@ static void do_loadlib( PARROT_INTERP, NOTNULL(const char *lib) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction* func_ins(
     Parrot_Interp interp,
     IMC_Unit *unit,
     SymReg *lhs,
     const char *op,
-    SymReg ** r,
+    NOTNULL(SymReg ** r),
     int n,
     int keyv,
     int emit )
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(5);
 
 static Instruction * iINDEXFETCH( PARROT_INTERP,
     IMC_Unit * unit,
@@ -419,6 +420,7 @@ static Instruction * MK_I( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction* mk_pmc_const( PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *type),
@@ -427,8 +429,7 @@ static Instruction* mk_pmc_const( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(5);
 
 static SymReg * mk_sub_address_fromc( PARROT_INTERP, char * name )
         __attribute__nonnull__(1);
@@ -501,10 +502,10 @@ MK_I(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *fmt), int n, ...)
                IMCC_INFO(interp)->keyvec, 1);
 }
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction*
 mk_pmc_const(PARROT_INTERP, IMC_Unit *unit,
              NOTNULL(const char *type), NOTNULL(SymReg *left), NOTNULL(char *constant))
-    /* WARN_UNUSED */
 {
     const int type_enum = atoi(type);
     SymReg *rhs;
@@ -551,10 +552,10 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit,
     return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
 
+PARROT_WARN_UNUSED_RESULT
 static Instruction*
 func_ins(Parrot_Interp interp, IMC_Unit *unit, SymReg *lhs, const char *op,
-         SymReg ** r, int n, int keyv, int emit)
-    /* WARN_UNUSED */
+         NOTNULL(SymReg ** r), int n, int keyv, int emit)
 {
     int i;
     /* shift regs up by 1 */

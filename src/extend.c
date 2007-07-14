@@ -229,10 +229,10 @@ Note that you must free this string with C<string_cstring_free()>!
 */
 
 PARROT_API
+PARROT_MALLOC
 char *
 Parrot_PMC_get_cstring_intkey(NOTNULL(Parrot_Interp interp),
         Parrot_PMC pmc, Parrot_Int key)
-    /* WARN_UNUSED, MALLOC */
 {
     STRING *intermediate;
     char   *retval;
@@ -256,9 +256,9 @@ Note that you must free this string with C<string_cstring_free()>!
 */
 
 PARROT_API
+PARROT_MALLOC
 char *
 Parrot_PMC_get_cstring(NOTNULL(Parrot_Interp interp), Parrot_PMC pmc)
-    /* MALLOC, WARN_UNUSED */
 {
     STRING *intermediate;
     char   *retval;
@@ -285,10 +285,10 @@ Note that you must free the string with C<string_cstring_free()>.
 */
 
 PARROT_API
+PARROT_MALLOC
 char *
 Parrot_PMC_get_cstringn(NOTNULL(Parrot_Interp interp),
         Parrot_PMC pmc, NOTNULL(Parrot_Int *length))
-    /* WARN_UNUSED, MALLOC */
 {
     char *retval;
 
@@ -314,10 +314,10 @@ Note that you must free this string with C<string_cstring_free()>.
 */
 
 PARROT_API
+PARROT_MALLOC
 char *
 Parrot_PMC_get_cstringn_intkey(NOTNULL(Parrot_Interp interp),
         Parrot_PMC pmc, NOTNULL(Parrot_Int *length), Parrot_Int key)
-    /* WARN_UNUSED, MALLOC */
 {
     char *retval;
 
@@ -1083,9 +1083,9 @@ Returns the vtable corresponding to the given PMC ID.
 */
 
 PARROT_API
+PARROT_PURE_FUNCTION
 Parrot_VTABLE
 Parrot_get_vtable(NOTNULL(const Parrot_Interp interp), Parrot_Int id)
-    /* PURE, WARN_UNUSED */
 {
     return interp->vtables[id];
 }

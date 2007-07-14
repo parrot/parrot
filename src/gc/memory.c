@@ -139,7 +139,6 @@ PARROT_API
 PARROT_MALLOC
 void *
 mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
-    /* MALLOC, WARN_UNUSED */
 {
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG

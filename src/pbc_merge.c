@@ -131,9 +131,7 @@ static void pbc_merge_write( PARROT_INTERP,
 
 PARROT_MALLOC
 static char * str_dup( NOTNULL(const char *old) )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
 
@@ -165,7 +163,6 @@ Duplicate a C string
 PARROT_MALLOC
 static char *
 str_dup(NOTNULL(const char *old))
-    /* MALLOC, WARN_UNUSED */
 {
     const size_t bytes = strlen(old) + 1;
     char * const copy = mem_sys_allocate(bytes);

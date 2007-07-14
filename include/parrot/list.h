@@ -79,9 +79,9 @@ typedef enum {
 /* HEADERIZER BEGIN: src/list.c */
 
 PARROT_API
-UINTVAL ld( UINTVAL x )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+UINTVAL ld( UINTVAL x );
 
 PARROT_API
 void list_assign( PARROT_INTERP,
@@ -93,11 +93,11 @@ void list_assign( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 List * list_clone( PARROT_INTERP, NOTNULL(const List *other) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 void list_delete( PARROT_INTERP,
@@ -108,10 +108,11 @@ void list_delete( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 void * list_get( PARROT_INTERP, NOTNULL(List *list), INTVAL idx, int type )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 void list_insert( PARROT_INTERP,
@@ -122,10 +123,10 @@ void list_insert( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL list_length( SHIM_INTERP, NOTNULL(const List *list) )
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 void list_mark( PARROT_INTERP, NOTNULL(List *list) )
@@ -133,18 +134,18 @@ void list_mark( PARROT_INTERP, NOTNULL(List *list) )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_MALLOC
 List * list_new( PARROT_INTERP, PARROT_DATA_TYPE type )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 List * list_new_init( PARROT_INTERP,
     PARROT_DATA_TYPE type,
     NOTNULL(PMC *init) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_API
 void list_pmc_new( PARROT_INTERP, NOTNULL(PMC *container) )
@@ -160,6 +161,7 @@ void list_pmc_new_init( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 void * list_pop( PARROT_INTERP, NOTNULL(List *list), int type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -175,6 +177,7 @@ void list_set_length( PARROT_INTERP, NOTNULL(List *list), INTVAL len )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 void * list_shift( PARROT_INTERP, NOTNULL(List *list), int type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

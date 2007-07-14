@@ -67,10 +67,10 @@ static int emitter;     /* XXX */
 
 /* Creates a new instruction */
 
+PARROT_MALLOC
 Instruction *
 _mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
         SymReg ** r, int flags)
-    /* MALLOC, WARN_UNUSED */
 {
     int i, reg_space;
     Instruction * ins;

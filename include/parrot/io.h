@@ -408,10 +408,10 @@ ParrotIOLayer * PIO_base_new_layer( NULLOK(ParrotIOLayer *proto) );
 PARROT_API
 ParrotIOLayer * PIO_copy_stack( NULLOK(ParrotIOLayer *stack) );
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_API
 ParrotIOLayer * PIO_get_layer( SHIM_INTERP, NOTNULL(const char *name) )
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 ParrotIOLayer * PIO_pop_layer( PARROT_INTERP, NULLOK(PMC *pmc) )

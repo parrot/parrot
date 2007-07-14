@@ -42,9 +42,10 @@ static size_t dest2offset( PARROT_INTERP, NOTNULL(const opcode_t *dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * find_exception_handler( PARROT_INTERP, PMC *exception )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static void run_cleanup_action( PARROT_INTERP, NOTNULL(Stack_Entry_t *e) )
         __attribute__nonnull__(1)
@@ -233,9 +234,10 @@ Find the exception handler for C<exception>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 find_exception_handler(PARROT_INTERP, PMC *exception)
-    /* WARN_UNUSED */
 {
     char *m;
     int exit_status, print_location;
@@ -356,6 +358,7 @@ flag bit is set.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PMC*
 new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
 {
@@ -392,6 +395,7 @@ Throw the exception.
 */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 opcode_t *
 throw_exception(PARROT_INTERP, PMC *exception, SHIM(void *dest))
 {
@@ -421,6 +425,7 @@ Rethrow the exception.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 opcode_t *
 rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
 {

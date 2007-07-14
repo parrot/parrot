@@ -10,9 +10,9 @@
     exit(e); \
 } while (0)
 
+PARROT_MALLOC
 Set*
 set_make(int length)
-    /* WARN_UNUSED, MALLOC */
 {
     Set * const s = mem_sys_allocate(sizeof (Set));
     s->length = length;
@@ -20,9 +20,9 @@ set_make(int length)
     return s;
 }
 
+PARROT_MALLOC
 Set*
 set_make_full(int length)
-    /* WARN_UNUSED, MALLOC */
 {
     Set * const s = set_make(length);
     int i;
@@ -51,9 +51,9 @@ set_clear(NOTNULL(Set *s))
     memset(s->bmp, 0, s->length/8 +1);
 }
 
+PARROT_MALLOC
 Set*
 set_copy(NOTNULL(Set *s1))
-    /* WARN_UNUSED, MALLOC */
 {
     Set * const s = set_make(s1->length);
 
@@ -89,9 +89,10 @@ set_add(NOTNULL(Set *s), int element)
     s->bmp[element >> 3] |= (1 << (element & 7));
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 set_first_zero(NOTNULL(const Set *s))
-    /* WARN_UNUSED */
 {
     int i;
     for (i = 0; i < s->length; ++i)
@@ -100,9 +101,10 @@ set_first_zero(NOTNULL(const Set *s))
     return s->length;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 int
 set_contains(NOTNULL(const Set *s), int element)
-    /* WARN_UNUSED */
 {
 #ifdef __LCC__
     /* workaround for another lcc bug.. */
@@ -113,9 +115,9 @@ set_contains(NOTNULL(const Set *s), int element)
 #endif
 }
 
+PARROT_MALLOC
 Set *
 set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
-    /* WARN_UNUSED, MALLOC */
 {
     int i;
     Set * const s = set_make(s1->length);
@@ -132,9 +134,9 @@ set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 
 
 
+PARROT_MALLOC
 Set *
 set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
-    /* WARN_UNUSED, MALLOC */
 {
     int i;
     Set * const s = set_make(s1->length);

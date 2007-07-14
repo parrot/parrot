@@ -64,16 +64,16 @@ if ( -e 'DEVELOPING' ) {
     print << "EOF";
 
 PARROT_API
+PARROT_PURE_FUNCTION
 int
-PackFile_check_fingerprint(const void *cursor /*NN*/)
-    /* PURE, WARN_UNUSED */
+PackFile_check_fingerprint(NOTNULL(const void *cursor))
 {
     return memcmp (cursor, fingerprint, $len) == 0;
 }
 
 PARROT_API
 size_t
-PackFile_write_fingerprint(void *cursor /*NN*/)
+PackFile_write_fingerprint(NOTNULL(void *cursor))
 {
     memcpy (cursor, fingerprint, $len);
     return $len;
@@ -87,16 +87,16 @@ else {    # !DEVELOPING
 /* fingerprint checking is only enabled in development versions */
 
 PARROT_API
+PARROT_PURE_FUNCTION
 int
-PackFile_check_fingerprint(const void *cursor /*NN*/)
-    /* PURE, WARN_UNUSED */
+PackFile_check_fingerprint(NOTNULL(const void *cursor))
 {
     return 1;
 }
 
 PARROT_API
 size_t
-PackFile_write_fingerprint(void *cursor /*NN*/)
+PackFile_write_fingerprint(NOTNULL(void *cursor))
 {
     memset (cursor, 0, $len);
     return $len;

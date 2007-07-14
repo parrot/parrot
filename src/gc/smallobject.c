@@ -317,9 +317,9 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 
 */
 
+PARROT_MALLOC
 Small_Object_Pool *
 new_small_object_pool(size_t object_size, size_t objects_per_alloc)
-    /* WARN_UNUSED, MALLOC */
 {
     Small_Object_Pool * const pool =
         mem_internal_allocate_zeroed_typed(Small_Object_Pool);

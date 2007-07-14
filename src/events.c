@@ -834,9 +834,9 @@ Duplicate queue entry.
 
 */
 
+PARROT_MALLOC
 static QUEUE_ENTRY*
 dup_entry(NOTNULL(const QUEUE_ENTRY *entry))
-    /* MALLOC, WARN_UNUSED */
 {
     QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
 

@@ -125,14 +125,14 @@ void Parrot_invalidate_method_cache( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_MMD_method_idx( SHIM_INTERP, const char *name )
-        __attribute__warn_unused_result__
-        __attribute__pure__;
+PARROT_PURE_FUNCTION
+INTVAL Parrot_MMD_method_idx( SHIM_INTERP, NOTNULL(const char *name) )
+        __attribute__nonnull__(2);
 
 PARROT_API
-const char* Parrot_MMD_method_name( SHIM_INTERP, INTVAL idx )
-        __attribute__warn_unused_result__
-        __attribute__pure__;
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+const char* Parrot_MMD_method_name( SHIM_INTERP, INTVAL idx );
 
 PARROT_API
 PMC * Parrot_multi_subclass( PARROT_INTERP,

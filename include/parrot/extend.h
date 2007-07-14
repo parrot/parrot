@@ -149,12 +149,11 @@ Parrot_String Parrot_get_strreg(
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_PURE_FUNCTION
 Parrot_VTABLE Parrot_get_vtable(
     NOTNULL(const Parrot_Interp interp),
     Parrot_Int id )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
 Parrot_String Parrot_new_string(
@@ -173,40 +172,36 @@ void Parrot_PMC_delete_pmckey(
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_MALLOC
 char * Parrot_PMC_get_cstring( NOTNULL(Parrot_Interp interp), Parrot_PMC pmc )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_MALLOC
 char * Parrot_PMC_get_cstring_intkey(
     NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     Parrot_Int key )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__
-        __attribute__malloc__;
+        __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_MALLOC
 char * Parrot_PMC_get_cstringn(
     NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     NOTNULL(Parrot_Int *length) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__
-        __attribute__malloc__;
+        __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_MALLOC
 char * Parrot_PMC_get_cstringn_intkey(
     NOTNULL(Parrot_Interp interp),
     Parrot_PMC pmc,
     NOTNULL(Parrot_Int *length),
     Parrot_Int key )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__warn_unused_result__
-        __attribute__malloc__;
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Int Parrot_PMC_get_intval(

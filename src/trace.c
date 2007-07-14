@@ -40,9 +40,9 @@ Prints a PMC to C<stderr>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static STRING*
 trace_class_name(NOTNULL(const PMC* pmc))
-    /* WARN_UNUSED */
 {
     STRING *class_name;
     if (PObj_is_class_TEST(pmc)) {

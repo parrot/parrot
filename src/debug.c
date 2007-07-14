@@ -1948,9 +1948,10 @@ that instruction and check that is the correct one.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 char
 PDB_hasinstruction(const char *c)
-    /* WARN_UNUSED */
 {
     char h = 0;
 

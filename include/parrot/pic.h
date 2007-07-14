@@ -102,9 +102,8 @@ void parrot_pic_find_infix_v_pp( PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-int parrot_PIC_op_is_cached( int op_code )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+int parrot_PIC_op_is_cached( int op_code );
 
 void * parrot_pic_opcode( PARROT_INTERP, INTVAL op )
         __attribute__nonnull__(1);

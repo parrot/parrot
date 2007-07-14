@@ -80,9 +80,10 @@ Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void *
 get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
-    /* WARN_UNUSED */
 {
     PObj * const buffer = (PObj *)pool->get_free_object(interp, pool);
 

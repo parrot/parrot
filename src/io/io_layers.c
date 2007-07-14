@@ -151,10 +151,10 @@ PIO_push_layer(PARROT_INTERP, NULLOK(PMC *pmc), NULLOK(ParrotIOLayer *layer))
     return -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_API
 ParrotIOLayer *
 PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))
-    /* WARN_UNUSED */
 {
     ParrotIOLayer **t;
 

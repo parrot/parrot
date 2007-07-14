@@ -143,11 +143,10 @@ INTVAL contained_in_pool(
 void gc_pmc_ext_pool_init( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
+PARROT_MALLOC
 Small_Object_Pool * new_small_object_pool(
     size_t object_size,
-    size_t objects_per_alloc )
-        __attribute__warn_unused_result__
-        __attribute__malloc__;
+    size_t objects_per_alloc );
 
 void Parrot_add_to_free_list( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),

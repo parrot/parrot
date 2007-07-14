@@ -36,6 +36,8 @@ don't apply.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int cstring_compare(
     SHIM_INTERP,
     NOTNULL(const char *a),
@@ -69,29 +71,41 @@ static void init_hash(
     hash_hash_key_fn keyhash )
         __attribute__nonnull__(1);
 
-static int int_compare( SHIM_INTERP, const void *a, const void *b )
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int int_compare( SHIM_INTERP, const void *a, const void *b );
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t key_hash_cstring(
     SHIM_INTERP,
     NOTNULL(const void *value),
     size_t seed )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t key_hash_int( SHIM_INTERP, void *value, size_t seed );
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t key_hash_pointer( SHIM_INTERP, void *value, size_t seed );
+
+PARROT_WARN_UNUSED_RESULT
 static size_t key_hash_STRING( PARROT_INTERP,
     NOTNULL(STRING *value),
     size_t seed )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int pointer_compare(
     SHIM_INTERP,
     const void * const a,
     const void * const b );
 
+PARROT_WARN_UNUSED_RESULT
 static int STRING_compare( PARROT_INTERP,
     const void *search_key,
     const void *bucket_key )
@@ -103,12 +117,13 @@ static int STRING_compare( PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_hash_STRING
 Return the hashed value of the key C<value>.  See also string.c.
 
 */
 
 
+PARROT_WARN_UNUSED_RESULT
 static size_t
 key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)
 {
@@ -123,11 +138,12 @@ key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)
 
 /*
 
-FUNCDOC:
+FUNCDOC: STRING_compare
 Compares the two strings, returning 0 if they are identical.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 STRING_compare(PARROT_INTERP, const void *search_key, const void *bucket_key)
 {
@@ -141,6 +157,8 @@ Compares the two pointers, returning 0 if they are identical
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 pointer_compare(SHIM_INTERP, const void * const a, const void * const b)
 {
@@ -149,17 +167,21 @@ pointer_compare(SHIM_INTERP, const void * const a, const void * const b)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_hash_pointer
 Returns a hashvalue for a pointer.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t
 key_hash_pointer(SHIM_INTERP, void *value, size_t seed)
 {
     return ((size_t) value) ^ seed;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t
 key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
 {
@@ -175,11 +197,13 @@ key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
 
 /*
 
-FUNCDOC:
+FUNCDOC: cstring_compare
 C string versions of the C<key_hash> and C<compare> functions.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))
 {
@@ -188,11 +212,13 @@ cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_hash_int
 Custom C<key_hash> function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static size_t
 key_hash_int(SHIM_INTERP, void *value, size_t seed)
 {
@@ -201,21 +227,23 @@ key_hash_int(SHIM_INTERP, void *value, size_t seed)
 
 /*
 
-FUNCDOC:
+FUNCDOC: int_compare
 Custom C<compare> function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 int_compare(SHIM_INTERP, const void *a, const void *b)
-    /* PURE, WARN_UNUSED */
 {
     return a != b;
 }
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_dump_hash
+
 Print out the hash in human-readable form.  Except it's empty.
 
 =cut
@@ -231,7 +259,8 @@ parrot_dump_hash(SHIM_INTERP, const Hash *hash)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_mark_hash
+
 Marks the hash and its contents as live.
 
 */
@@ -273,7 +302,8 @@ parrot_mark_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 
 /*
 
-FUNCDOC:
+FUNCDOC: hash_thaw
+
 This is used by freeze/thaw to visit the contents of the hash.
 
 C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
@@ -388,7 +418,8 @@ parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))
 
 /*
 
-FUNCDOC:
+FUNCDOC: expand_hash
+
 For a hashtable of size N, we use C<MAXFULL_PERCENT> % of N as the
 number of buckets. This way, as soon as we run out of buckets on the
 free list, we know that it's time to resize the hashtable.
@@ -508,14 +539,14 @@ expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_new_hash
 Returns a new Parrot STRING hash in C<hptr>.
 
 */
 
 PARROT_API
 void
-parrot_new_hash(SHIM_INTERP, Hash **hptr)
+parrot_new_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 {
     parrot_new_hash_x(hptr,
             enum_type_PMC,
@@ -526,7 +557,7 @@ parrot_new_hash(SHIM_INTERP, Hash **hptr)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_new_pmc_hash
 Create a new Parrot STRING hash in PMC_struct_val(container)
 
 */
@@ -543,14 +574,14 @@ parrot_new_pmc_hash(PARROT_INTERP, PMC *container)
 }
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_new_cstring_hash
 Returns a new C string hash in C<hptr>.
 
 */
 
 PARROT_API
 void
-parrot_new_cstring_hash(SHIM_INTERP, Hash **hptr)
+parrot_new_cstring_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 {
     parrot_new_hash_x(hptr,
             enum_type_PMC,
@@ -684,7 +715,7 @@ parrot_new_pmc_hash_x(SHIM_INTERP, NOTNULL(PMC *container),
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_new_pointer_hash
 Create a new HASH with void * keys and values.
 
 */
@@ -699,7 +730,7 @@ parrot_new_pointer_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_new_INTVAL_hash
 Create a new Hash PMC with INTVAL keys and values. C<flags> can be
 C<PObj_constant_FLAG> or 0.
 
@@ -723,15 +754,16 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_size
 Return the number of used entries in the hash.
 
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
-    /*PURE, WARN_UNUSED*/
 {
     if (hash)
         return hash->entries;
@@ -741,15 +773,16 @@ parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_get_idx
 Called by iterator.
 
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void *
 parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
-    /* PURE, WARN_UNUSED */
 {
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);
@@ -791,15 +824,15 @@ parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_get_bucket
 Returns the bucket for C<key>.
 
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 HashBucket *
 parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), void *key)
-    /* WARN_UNUSED */
 {
     const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket    *bucket  = hash->bi[hashval & hash->mask];
@@ -815,15 +848,16 @@ parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), void *key)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_get
 Returns the bucket for C<key> or C<NULL> if no bucket is found.
 
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void *
 parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
-    /* WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? bucket->value : NULL;
@@ -837,9 +871,9 @@ Returns whether the key exists in the hash.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
-    /* PURE, WARN_UNUSED */
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? 1 : 0;
@@ -847,7 +881,7 @@ parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_put
 Puts the key and value into the hash. Note that C<key> is B<not>
 copied.
 
@@ -900,7 +934,7 @@ parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), void *key, void *value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_delete
 Deletes the key from the hash.
 
 */
@@ -933,14 +967,14 @@ parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
 
 /*
 
-FUNCDOC:
+FUNCDOC: parrot_hash_clone
 Clones C<hash> to C<dest>.
 
 */
 
 PARROT_API
 void
-parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), Hash **dest)
+parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash **dest))
 {
     UINTVAL i;
 
@@ -984,49 +1018,6 @@ parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), Hash **dest)
 =head1 SEE ALSO
 
 F<docs/pdds/pdd08_keys.pod>.
-
-=head1 HISTORY
-
-=over 4
-
-=item * Initial version by Jeff G. on 2001.12.05
-
-=item * Substantially rewritten by Steve F.
-
-=item * 2003.10.25
-
-leo add function pointer for compare, hash, mark
-
-hash keys are now C<(void *)>
-
-add C<parrot_new_cstring_hash()> function
-
-=item * 2003.11.04
-
-C<< bucket->value >> is now a plain pointer, no more an C<HASH_ENTRY>
-
-With little changes, we can again store arbitrary items if needed, see
-TODO in code.
-
-=item * 2003.11.06
-
-boemmels renamed C<HASH> and C<HASHBUCKET> to C<Hash> and C<HashBucket>
-
-=item * 2003.11.11
-
-leo randomize C<key_hash> seed
-
-extend C<parrot_new_hash_x()> init call by C<value_type> and C<_size>.
-
-=item * 2003.11.14
-
-leo C<USE_STRING_EQUAL> define, see comment above
-
-=item * 2005.05.23
-
-leo heavy rewrite: use just one piece of malloced memory
-
-=back
 
 =head1 TODO
 

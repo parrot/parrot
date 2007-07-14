@@ -214,18 +214,6 @@ sub attrs_from_flags {
         if ( $opt eq 'WARN_UNUSED' ) {
             push( @attrs, '__attribute__warn_unused_result__' );
         }
-        elsif ( $opt eq 'NORETURN' ) {
-            push( @attrs, '__attribute__noreturn__' );
-        }
-        elsif ( $opt eq 'CONST' ) {
-            push( @attrs, '__attribute__const__' );
-        }
-        elsif ( $opt eq 'PURE' ) {
-            push( @attrs, '__attribute__pure__' );
-        }
-        elsif ( $opt eq 'MALLOC' ) {
-            push( @attrs, '__attribute__malloc__' );
-        }
         else {
             confess( qq{Unknown function flag "$flags" -> "$opt"\n} );
         }

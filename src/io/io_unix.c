@@ -43,9 +43,8 @@ ParrotIOLayer pio_unix_layer = {
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL flags_to_unix( INTVAL flags )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+static INTVAL flags_to_unix( INTVAL flags );
 
 static ParrotIO * PIO_unix_accept( PARROT_INTERP,
     ParrotIOLayer *layer,
@@ -180,9 +179,9 @@ C<PIO_unix_fdopen()> respectively.
 
 */
 
+PARROT_CONST_FUNCTION
 static INTVAL
 flags_to_unix(INTVAL flags)
-    /* CONST, WARN_UNUSED */
 {
     INTVAL oflags = 0;
 

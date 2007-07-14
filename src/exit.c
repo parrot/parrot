@@ -55,9 +55,9 @@ Exit, calling any registered exit handlers.
 */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 Parrot_exit(PARROT_INTERP, int status)
-    /* NORETURN */
 {
     /* call all the exit handlers */
     /* we are well "below" the runloop now, where lo_var_ptr

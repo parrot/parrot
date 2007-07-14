@@ -144,9 +144,9 @@ static PMC* mk_multi_sig( PARROT_INTERP, NOTNULL(SymReg *r) )
 static int old_blocks( void )
         __attribute__warn_unused_result__;
 
-static const char * slice_deb( int bits )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static const char * slice_deb( int bits );
 
 static void store_fixup( PARROT_INTERP,
     NOTNULL(SymReg *r),
@@ -252,9 +252,9 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 #ifdef HAS_JIT
 
 /* get size/line of bytecode in ops till now */
+PARROT_WARN_UNUSED_RESULT
 static int
 old_blocks(void)
-    /* WARN_UNUSED */
 {
     size_t  size = 0;
     const subs_t *s;
@@ -369,9 +369,9 @@ store_key_const(NOTNULL(const char *str), int idx)
 
 /* store globals for later fixup
  * return size in ops */
+PARROT_WARN_UNUSED_RESULT
 static int
 get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
-    /* WARN_UNUSED */
 {
     Instruction *ins;
     int          code_size;
@@ -956,9 +956,9 @@ add_const_key(PARROT_INTERP, opcode_t key[], int size, char *s_key)
     return k;
 }
 
+PARROT_CONST_FUNCTION
 static const char *
 slice_deb(int bits)
-    /* CONST, WARN_UNUSED */
 {
     if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_SLICE))
         return "start+end";

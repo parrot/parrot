@@ -129,16 +129,17 @@ extern const struct _data_types data_types[];
 /* HEADERIZER BEGIN: src/datatypes.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_datatype_enum( PARROT_INTERP,
     NOTNULL(const STRING *type_name) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_datatype_name( PARROT_INTERP, INTVAL type )
-        __attribute__nonnull__(1)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/datatypes.c */
 

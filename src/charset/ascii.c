@@ -491,15 +491,13 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
 /*
  * TODO pass in the Hash's seed value as initial hashval
  */
+PARROT_PURE_FUNCTION
 size_t
-ascii_compute_hash(PARROT_INTERP, NOTNULL(const STRING *source_string), size_t seed)
-    /* PURE,WARN_UNUSED */
+ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t seed)
 {
     size_t hashval = seed;
     const char *buffptr = (const char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
-
-    UNUSED(interp);
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {
@@ -549,13 +547,13 @@ STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
     if (dest) {
-        UINTVAL offs, c;
+        UINTVAL offs;
 
         Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_BYTE(interp, src, offs);
+            const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
             ENCODING_SET_BYTE(interp, dest, offs, c);
         }
         return dest;
@@ -568,13 +566,13 @@ STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
     if (dest) {
-        UINTVAL offs, c;
+        UINTVAL offs;
 
         Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {
-            c = ENCODING_GET_BYTE(interp, src, offs);
+            const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
             ENCODING_SET_BYTE(interp, dest, offs, c);
         }
         return dest;

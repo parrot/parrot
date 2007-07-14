@@ -27,13 +27,12 @@ INTVAL ascii_compare( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
-size_t ascii_compute_hash( PARROT_INTERP,
+PARROT_PURE_FUNCTION
+size_t ascii_compute_hash(
+    SHIM_INTERP,
     NOTNULL(const STRING *source_string),
     size_t seed )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 INTVAL ascii_cs_index( PARROT_INTERP,
     NOTNULL(STRING *source_string),

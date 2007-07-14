@@ -111,6 +111,7 @@ PARROT_API
 int emit_open( PARROT_INTERP, int type, void *param )
         __attribute__nonnull__(1);
 
+PARROT_MALLOC
 Instruction * _mk_instruction(
     NOTNULL(const char *op),
     NOTNULL(const char *fmt),
@@ -118,9 +119,7 @@ Instruction * _mk_instruction(
     SymReg ** r,
     int flags )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 Instruction * delete_ins(
     NOTNULL(struct _IMC_Unit *unit),

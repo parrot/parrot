@@ -26,9 +26,9 @@ Creates and returns a pointer to the new C<VTABLE>.
 */
 
 PARROT_API
+PARROT_MALLOC
 VTABLE *
 Parrot_new_vtable(SHIM_INTERP)
-    /* MALLOC, WARN_UNUSED */
 {
     return mem_allocate_zeroed_typed(VTABLE);
 }
@@ -42,9 +42,9 @@ Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 */
 
 PARROT_API
+PARROT_MALLOC
 VTABLE *
 Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))
-    /* MALLOC, WARN_UNUSED */
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
     if (new_vtable) {

@@ -91,7 +91,7 @@ If the platform defines
 
 if will be called as a function with this prototype:
 
-  void the_init_hook(Interp*, PMC *lib_paths);
+  void the_init_hook(PARROT_INTERP, PMC *lib_paths);
 
 Platform code may add, delete, or replace search path entries as needed. See
 also F<include/parrot/library.h> for C<enum_lib_paths>.

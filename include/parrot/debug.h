@@ -249,8 +249,9 @@ void PDB_free_file( PARROT_INTERP )
 void PDB_get_command( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-char PDB_hasinstruction( const char *c )
-        __attribute__warn_unused_result__;
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+char PDB_hasinstruction( const char *c );
 
 void PDB_help( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)

@@ -47,10 +47,10 @@ static void imcc_write_pbc( PARROT_INTERP, NOTNULL(const char *output_file) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int is_all_hex_digits( NOTNULL(const char *s) )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 static void Parrot_version( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -220,9 +220,10 @@ static struct longopt_opt_decl options[] = {
     { 0, 0, (OPTION_flags)0, { NULL } }
 };
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(NOTNULL(const char *s))
-    /* PURE, WARN_UNUSED */
 {
     for (; *s; s++)
         if (!isxdigit(*s))
@@ -232,7 +233,7 @@ is_all_hex_digits(NOTNULL(const char *s))
 
 /* most stolen from test_main.c */
 char *
-parseflags(Parrot_Interp interp, int *argc, char **argv[])
+parseflags(PARROT_INTERP, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int   status;

@@ -437,18 +437,18 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
     return return_set;
 }
 
+PARROT_WARN_UNUSED_RESULT
 STRING *
 charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
-    /* WARN_UNUSED */
 {
-    UINTVAL offs, c;
+    UINTVAL offs;
     if (dest) {
         Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
     }
     for (offs = 0; offs < src->strlen; ++offs) {
-        c = ENCODING_GET_BYTE(interp, src, offs);
+        UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
         if (c >= 0x80) {
             EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
         }

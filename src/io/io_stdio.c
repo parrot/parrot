@@ -28,9 +28,8 @@ Win32), this is I<buffered> IO, out of necessity.
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
-static const char * flags_to_stdio( INTVAL flags )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+static const char * flags_to_stdio( INTVAL flags );
 
 static INTVAL PIO_stdio_close(
     SHIM_INTERP,
@@ -122,9 +121,9 @@ C<fopen()> in C<PIO_stdio_open()>.
 
 */
 
+PARROT_CONST_FUNCTION
 static const char *
 flags_to_stdio(INTVAL flags)
-    /* CONST, WARN_UNUSED */
 {
     if ((flags & (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) ==
         (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) {

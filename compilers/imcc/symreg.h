@@ -185,11 +185,12 @@ void clear_sym_hash( NOTNULL(SymHash *hsh) )
 void create_symhash( NOTNULL(SymHash *hash) )
         __attribute__nonnull__(1);
 
-void debug_dump_sym_hash( SymHash *hsh );
+void debug_dump_sym_hash( NOTNULL(SymHash *hsh) )
+        __attribute__nonnull__(1);
+
+PARROT_MALLOC
 SymReg * dup_sym( NOTNULL(const SymReg *r) )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 SymReg * find_sym( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
@@ -202,10 +203,9 @@ SymReg * get_sym( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_PURE_FUNCTION
 unsigned int hash_str( NOTNULL(const char *str) )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 SymReg * link_keys( PARROT_INTERP, int nargs, SymReg * keys[], int force )
         __attribute__nonnull__(1);
@@ -267,10 +267,9 @@ void store_symreg( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_MALLOC
 char * symreg_to_str( NOTNULL(const SymReg *s) )
-        __attribute__nonnull__(1)
-        __attribute__malloc__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/symreg.c */
 

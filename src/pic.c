@@ -243,9 +243,9 @@ Return true, if the opcode needs a PIC slot.
 
 */
 
+PARROT_CONST_FUNCTION
 int
 parrot_PIC_op_is_cached(int op_code)
-    /* CONST, WARN_UNUSED */
 {
     switch (op_code) {
         case PARROT_OP_infix_ic_p_p:
@@ -441,10 +441,10 @@ pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
  * return argument count and type of the signature or -1 if not pic-able
  * the type PARROT_ARG_CONSTANT stands for mixed types or constants
  */
+PARROT_WARN_UNUSED_RESULT
 int
 parrot_pic_check_sig(NOTNULL(const PMC *sig1), NOTNULL(const PMC *sig2),
         NOTNULL(int *type))
-    /* WARN_UNUSED */
 {
     int i, n, t0, t1, t2;
     t0 = 0; /* silence compiler uninit warning */

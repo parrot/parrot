@@ -556,10 +556,9 @@ void PackFile_Fixup_dump( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/fingerprint.c */
 
 PARROT_API
+PARROT_PURE_FUNCTION
 int PackFile_check_fingerprint( NOTNULL(const void *cursor) )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 PARROT_API
 size_t PackFile_write_fingerprint( NOTNULL(void *cursor) )
@@ -573,11 +572,10 @@ size_t PackFile_write_fingerprint( NOTNULL(void *cursor) )
 void PackFile_assign_transforms( NOTNULL(PackFile *pf) )
         __attribute__nonnull__(1);
 
+PARROT_MALLOC
 char * PF_fetch_cstring( NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__
-        __attribute__malloc__;
+        __attribute__nonnull__(2);
 
 INTVAL PF_fetch_integer( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
         __attribute__nonnull__(2)
@@ -599,27 +597,22 @@ STRING * PF_fetch_string( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__warn_unused_result__;
 
+PARROT_PURE_FUNCTION
 size_t PF_size_cstring( NOTNULL(const char *s) )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
-size_t PF_size_integer( void )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+size_t PF_size_integer( void );
 
-size_t PF_size_number( void )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+size_t PF_size_number( void );
 
-size_t PF_size_opcode( void )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+size_t PF_size_opcode( void );
 
+PARROT_PURE_FUNCTION
 size_t PF_size_string( NOTNULL(const STRING *s) )
-        __attribute__nonnull__(1)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(1);
 
 opcode_t* PF_store_cstring(
     NOTNULL(opcode_t *cursor),

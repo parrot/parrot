@@ -72,19 +72,17 @@ parrot_deinit_encodings(void)
 }
 
 PARROT_API
+PARROT_MALLOC
 ENCODING *
-Parrot_new_encoding(PARROT_INTERP)
-    /* MALLOC, WARN_UNUSED */
+Parrot_new_encoding(SHIM_INTERP)
 {
-    UNUSED(interp);
-
     return mem_allocate_typed(ENCODING);
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 ENCODING *
 Parrot_find_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
-    /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -103,9 +101,9 @@ Parrot_find_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
    info set up to actually build strings... */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 ENCODING *
-Parrot_load_encoding(PARROT_INTERP, const char *encodingname)
-    /* WARN_UNUSED, NORETURN */
+Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {
     UNUSED(encodingname);
     real_exception(interp, NULL, UNIMPLEMENTED, "Can't load encodings yet");
@@ -121,9 +119,9 @@ Return the number of the encoding or -1 if not found.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
-    /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -145,9 +143,9 @@ Return the number of the encoding of the given string or -1 if not found.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number_of_str(PARROT_INTERP, NOTNULL(STRING *src))
-    /* WARN_UNUSED */
 {
     const int n = all_encodings->n_encodings;
     int i;
@@ -161,9 +159,9 @@ Parrot_encoding_number_of_str(PARROT_INTERP, NOTNULL(STRING *src))
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding)
-    /* WARN_UNUSED */
 {
     UNUSED(interp);
 
@@ -173,9 +171,9 @@ Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 ENCODING*
 Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
-    /* WARN_UNUSED */
 {
     UNUSED(interp);
 
@@ -185,9 +183,9 @@ Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 const char *
 Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
-    /* WARN_UNUSED */
 {
     UNUSED(interp);
 

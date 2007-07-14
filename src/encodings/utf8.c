@@ -25,10 +25,9 @@ UTF-8 (L<http://www.utf-8.com/>).
 static void become_encoding( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
 
+PARROT_PURE_FUNCTION
 static UINTVAL bytes( SHIM_INTERP, NOTNULL(STRING *src) )
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
@@ -629,9 +628,9 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
     return iter.charpos;
 }
 
+PARROT_PURE_FUNCTION
 static UINTVAL
 bytes(SHIM_INTERP, NOTNULL(STRING *src))
-    /* PURE, WARN_UNUSED */
 {
     return src->bufused;
 }

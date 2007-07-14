@@ -13,9 +13,9 @@
 /* HEADERIZER HFILE: compilers/imcc/debug.h */
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
-    /* NORETURN */
 {
     va_list ap;
 
@@ -26,9 +26,9 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
 }
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
-    /* NORETURN */
 {
     va_list ap;
 
@@ -39,6 +39,7 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
 }
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 {
@@ -51,6 +52,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 }
 
 PARROT_API
+PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
 {

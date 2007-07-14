@@ -77,9 +77,12 @@ PARROT_API
 void parrot_dump_hash( SHIM_INTERP, const Hash *hash );
 
 PARROT_API
-void parrot_hash_clone( PARROT_INTERP, NOTNULL(Hash *hash), Hash **dest )
+void parrot_hash_clone( PARROT_INTERP,
+    NOTNULL(Hash *hash),
+    NOTNULL(Hash **dest) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void parrot_hash_delete( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
@@ -91,35 +94,35 @@ void parrot_hash_destroy( SHIM_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL parrot_hash_exists( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * parrot_hash_get( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 HashBucket * parrot_hash_get_bucket( PARROT_INTERP,
     NOTNULL(const Hash *hash),
     void *key )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * parrot_hash_get_idx(
     SHIM_INTERP,
     NOTNULL(const Hash *hash),
     NOTNULL(PMC *key) )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(3);
 
 PARROT_API
 HashBucket* parrot_hash_put( PARROT_INTERP,
@@ -130,11 +133,11 @@ HashBucket* parrot_hash_put( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL parrot_hash_size( PARROT_INTERP, NOTNULL(const Hash *hash) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__pure__
-        __attribute__warn_unused_result__;
+        __attribute__nonnull__(2);
 
 PARROT_API
 void parrot_hash_visit( PARROT_INTERP,
@@ -150,10 +153,12 @@ void parrot_mark_hash( PARROT_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(2);
 
 PARROT_API
-void parrot_new_cstring_hash( SHIM_INTERP, Hash **hptr );
+void parrot_new_cstring_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )
+        __attribute__nonnull__(2);
 
 PARROT_API
-void parrot_new_hash( SHIM_INTERP, Hash **hptr );
+void parrot_new_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )
+        __attribute__nonnull__(2);
 
 PARROT_API
 PMC* Parrot_new_INTVAL_hash( PARROT_INTERP, UINTVAL flags )

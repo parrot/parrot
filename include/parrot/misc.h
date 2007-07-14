@@ -98,13 +98,11 @@ PMC* tm_to_array( PARROT_INTERP, NOTNULL(const struct tm *tm) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+FLOATVAL floatval_mod( FLOATVAL n2, FLOATVAL n3 );
 
-INTVAL intval_mod( INTVAL i2, INTVAL i3 )
-        __attribute__const__
-        __attribute__warn_unused_result__;
+PARROT_CONST_FUNCTION
+INTVAL intval_mod( INTVAL i2, INTVAL i3 );
 
 /* HEADERIZER END: src/utils.c */
 

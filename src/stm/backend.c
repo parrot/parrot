@@ -273,34 +273,34 @@ alloc_read(PARROT_INTERP, STM_tx_log *log)
     return read;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static void *
 next_version(NOTNULL(const void *old_version))
-    /* WARN_UNUSED */
 {
     const UINTVAL v = PTR2UINTVAL(old_version) + 2;
 
     return UINTVAL2PTR(void *, v);
 }
 
+PARROT_PURE_FUNCTION
 static int
 is_version(NOTNULL(const void *maybe_version))
-    /* WARN_UNUSED */
 {
     const UINTVAL v = PTR2UINTVAL(maybe_version);
     return v & 1;
 }
 
 static STM_tx_log_sub *
-get_sublog(STM_tx_log *log, int i)
+get_sublog(NOTNULL(STM_tx_log *log), int i)
 {
     assert(i > 0);
     assert(i <= log->depth);
     return &log->inner[i - 1];
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 is_aborted(STM_tx_log *log)
-    /* WARN_UNUSED */
 {
     int i;
 
@@ -857,9 +857,9 @@ active transaction.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 int
 Parrot_STM_validate(PARROT_INTERP)
-    /* WARN_UNUSED */
 {
     STM_tx_log_sub *inner;
     int             status;
@@ -1195,10 +1195,10 @@ local_pmc_copy(PARROT_INTERP, PMC * const original)
  * If C<overwrite_p> is true, assume we are going to overwrite this record,
  * so initialize it to PMCNULL.
  */
+PARROT_WARN_UNUSED_RESULT
 static STM_write_record *
 find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
         Parrot_STM_PMC_handle handle, int overwrite_p)
-    /* WARN_UNUSED */
 {
     /* FIXME check for read log or previous tx's write log */
     STM_tx_log_sub   *cursub;
