@@ -66,44 +66,16 @@ close $SKIP or die "Unable to close MANIFEST.SKIP after reading";
 
 my $cmd = -d '.svn' ? 'svn' : 'svk';
 
-# get all files from sv[nk] status -v
-my @status_output = qx($cmd status -v);
-
-# now grab the versioned resources:
-my @versioned_files = ();
-my @versioned_output = grep !/^\?/, @status_output;
-for my $line (@versioned_output) {
-    my @line_info = split( /\s+/, $line );
-
-    # the file is the last item in the @line_info array
-    my $filename = $line_info[-1];
-    $filename =~ s/\\/\//g;
-    push @versioned_files, $filename;
-}
-
-my $MANIFEST_LINES_ref = [];
-
-for my $file (@versioned_files) {
-
-    # ignore the debian directory
-    next if $file =~ m[/\.svn|blib|debian];
-
-    # don't want to keep directories
-    if ( -d $file ) {
-        push @dirs, $file;
-        next;
-    }
-
-    # now get the manifest entry
-    $MANIFEST_LINES_ref = get_manifest_entry(
-        $file, $MANIFEST_LINES_ref, \%special
-    );
-}
+my $manifest_lines_ref = prepare_manifest( {
+    cmd     => $cmd,
+    dirs    => \@dirs,
+    special => \%special,
+} );
 
 print_manifest( {
     id      => $keyword,
     time    => $time,
-    lines   => $MANIFEST_LINES_ref,
+    lines   => $manifest_lines_ref,
 } );
 
 my $ignore_ref = prepare_manifest_skip( {
@@ -118,6 +90,44 @@ print_manifest_skip( {
 } );
 
 #################### SUBROUTINES ####################
+
+sub prepare_manifest {
+    my $argsref = shift;
+    # get all files from sv[nk] status -v
+    my @status_output = qx($argsref->{cmd} status -v);
+    
+    # now grab the versioned resources:
+    my @versioned_files = ();
+    my @versioned_output = grep !/^\?/, @status_output;
+    for my $line (@versioned_output) {
+        my @line_info = split( /\s+/, $line );
+    
+        # the file is the last item in the @line_info array
+        my $filename = $line_info[-1];
+        $filename =~ s/\\/\//g;
+        push @versioned_files, $filename;
+    }
+    
+    my $manifest_lines_ref = [];
+    
+    for my $file (@versioned_files) {
+    
+        # ignore the debian directory
+        next if $file =~ m[/\.svn|blib|debian];
+    
+        # don't want to keep directories
+        if ( -d $file ) {
+            push @{ $argsref->{dirs} }, $file;
+            next;
+        }
+    
+        # now get the manifest entry
+        $manifest_lines_ref = get_manifest_entry(
+            $file, $manifest_lines_ref, $argsref->{special}
+        );
+    }
+    return $manifest_lines_ref;
+}
 
 sub print_manifest {
     my $argsref = shift;
@@ -205,7 +215,7 @@ END_HEADER
 }
 
 sub get_manifest_entry {
-    my ($file, $MANIFEST_LINES_ref, $special) = @_;
+    my ($file, $manifest_lines_ref, $special) = @_;
     my $loc  = '[]';
     for ($file) {
         $loc =
@@ -224,9 +234,9 @@ sub get_manifest_entry {
             : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
-    push @{ $MANIFEST_LINES_ref }, sprintf( "%- 59s %s\n", $file, $loc );
+    push @{ $manifest_lines_ref }, sprintf( "%- 59s %s\n", $file, $loc );
 
-    return $MANIFEST_LINES_ref;
+    return $manifest_lines_ref;
 }
 
 =head1 NAME
