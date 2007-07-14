@@ -53,17 +53,6 @@ my %special = qw(
 my $keyword = '$' . 'Id$';     # avoid an svn issue.
 my $time    = scalar gmtime;
 
-my %current_skips = ();
-open my $SKIP, "<", 'MANIFEST.SKIP'
-    or die "Unable to open MANIFEST.SKIP for reading";
-while (my $line = <$SKIP>) {
-    chomp $line;
-    next if $line =~ /^\s*$/o;
-    next if $line =~ /^#/o;
-    $current_skips{$line}++;
-}
-close $SKIP or die "Unable to close MANIFEST.SKIP after reading";
-
 my $cmd = -d '.svn' ? 'svn' : 'svk';
 
 my $manifest_lines_ref = prepare_manifest( {
@@ -77,6 +66,9 @@ print_manifest( {
     time    => $time,
     lines   => $manifest_lines_ref,
 } );
+
+
+my $current_skips_ref = get_current_skips();
 
 my $ignore_ref = prepare_manifest_skip( {
     cmd     => $cmd,
@@ -147,6 +139,20 @@ END_HEADER
 
     print $MANIFEST $_ for ( sort @{ $argsref->{lines} } );
     close $MANIFEST or die "Unable to close MANIFEST after writing";
+}
+
+sub get_current_skips {
+    my %current_skips = ();
+    open my $SKIP, "<", 'MANIFEST.SKIP'
+        or die "Unable to open MANIFEST.SKIP for reading";
+    while (my $line = <$SKIP>) {
+        chomp $line;
+        next if $line =~ /^\s*$/o;
+        next if $line =~ /^#/o;
+        $current_skips{$line}++;
+    }
+    close $SKIP or die "Unable to close MANIFEST.SKIP after reading";
+    return \%current_skips;
 }
 
 sub prepare_manifest_skip {
