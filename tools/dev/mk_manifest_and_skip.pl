@@ -95,7 +95,9 @@ for my $file (@versioned_files) {
     }
 
     # now get the manifest entry
-    $MANIFEST_LINES_ref = get_manifest_entry($file, $MANIFEST_LINES_ref);
+    $MANIFEST_LINES_ref = get_manifest_entry(
+        $file, $MANIFEST_LINES_ref, \%special
+    );
 }
 
 open my $MANIFEST, '>', 'MANIFEST'
@@ -173,11 +175,11 @@ close $MANIFEST_SKIP
 #################### SUBROUTINES ####################
 
 sub get_manifest_entry {
-    my ($file, $MANIFEST_LINES_ref) = @_;
+    my ($file, $MANIFEST_LINES_ref, $special) = @_;
     my $loc  = '[]';
     for ($file) {
         $loc =
-              exists( $special{$_} ) ? $special{$_}
+              exists( $special->{$_} ) ? $special->{$_}
             : !m[/]                  ? '[]'
             : m[^LICENSES/]          ? '[main]doc'
             : m[^docs/]              ? '[main]doc'
