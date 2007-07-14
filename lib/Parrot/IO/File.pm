@@ -131,7 +131,7 @@ sub write {
 
     print $fh @_;
 
-    return $fh->close;
+    $fh->close;
 }
 
 =item C<append(@lines)>
@@ -150,7 +150,7 @@ sub append {
 
     print $fh @_;
 
-    return $fh->close;
+    $fh->close;
 }
 
 =item C<is_executable()>
@@ -285,7 +285,7 @@ sub delete {
 
     unlink( $_[0]->path ) or die 'Failed to unlink ' . $_[0]->path . ": $!";
 
-    return $_[0]->SUPER::delete;
+    $_[0]->SUPER::delete;
 }
 
 =back

@@ -6,12 +6,12 @@ use warnings;
 
 sub TIEHANDLE {
     my $class = shift;
-    return bless [], $class;
+    bless [], $class;
 }
 
 sub PRINT {
     my $self = shift;
-    return push @$self, join '', @_;
+    push @$self, join '', @_;
 }
 
 sub READLINE {
