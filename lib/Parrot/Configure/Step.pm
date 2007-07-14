@@ -155,7 +155,7 @@ its contents have changed.
 sub move_if_diff {
     my ( $from, $to, $ignore_pattern ) = @_;
     copy_if_diff( $from, $to, $ignore_pattern );
-    return unlink $from;
+    unlink $from;
 }
 
 =item C<genfile($source, $target, %options)>
@@ -403,7 +403,7 @@ sub genfile {
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    return move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
+    move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
 }
 
 =item C<_run_command($command, $out, $err)>
@@ -472,7 +472,7 @@ Generates F<test.c> from the specified source file.
 sub cc_gen {
     my ($source) = @_;
 
-    return genfile( $source, "test.c" );
+    genfile( $source, "test.c" );
 }
 
 =item C<cc_build($cc_args, $link_args)>
@@ -564,7 +564,7 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 =cut
 
 sub cc_clean {
-    return unlink map "test$_", qw( .c .cco .ldo .out), $conf->data->get(qw( o exe ));
+    unlink map "test$_", qw( .c .cco .ldo .out), $conf->data->get(qw( o exe ));
 }
 
 =item C<capture_output($command)>
