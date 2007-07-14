@@ -461,7 +461,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 #ifdef EXEC_MACH_O
 
 void
-Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
+Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;
