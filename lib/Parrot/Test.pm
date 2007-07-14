@@ -225,6 +225,23 @@ Convert Win32 style line endins with Unix style line endings.
 
 Construct a relative path from the current dir to the parrot root dir.
 
+=item C<per_test( $ext, $test_no )>
+
+Construct a path for a temporary files.
+Takes C<$0> into account.
+
+=item C<write_code_to_file($code, $code_f)> 
+
+Writes C<$code> into the file C<$code_f>.
+
+=item C<generate_languages_functions>
+
+Generate functions that are only used by a couple of
+Parrot::Test::<lang> modules.
+See RT#43266.
+This implementation is experimental and currently only works
+for languages/plumhead.
+
 =back
 
 =cut
@@ -344,16 +361,6 @@ sub run_command {
     );
 }
 
-sub handle_error_output {
-    my ( $builder, $real_output, $expected, $desc ) = @_;
-
-    $builder->ok( 0, $desc );
-    $builder->diag( "Expected error but exited cleanly\n" .
-    "Received:\n$real_output\nExpected:\n$expected\n" );
-
-    return 0;
-}
-
 sub per_test {
     my ( $ext, $test_no ) = @_;
 
@@ -411,12 +418,6 @@ sub path_to_parrot {
                $path;
 }
 
-
-# These functions are only used by various
-# Parrot::Test::<lang> modules.
-# See RT#43266
-# This implementation is experimental and currently only works
-# for languages/plumhead
 sub generate_languages_functions {
 
     my %test_map = (
@@ -495,13 +496,21 @@ sub generate_languages_functions {
     }
 }
 
-#
-# private methods, should not be used by Modules inheriting from Parrot::Test
-#
+# The following methods are private.
+# They should not be used by modules inheriting from Parrot::Test.
 
-sub run_test_file
-{
-    local $SIG{__WARN__}                          = \&report_odd_hash;
+sub _handle_error_output {
+    my ( $builder, $real_output, $expected, $desc ) = @_;
+
+    $builder->ok( 0, $desc );
+    $builder->diag( "Expected error but exited cleanly\n" .
+    "Received:\n$real_output\nExpected:\n$expected\n" );
+
+    return 0;
+}
+
+sub _run_test_file {
+    local $SIG{__WARN__}                          = \&_report_odd_hash;
     my ( $func, $code, $expected, $desc, %extra ) = @_;
 
     my $path_to_parrot   = path_to_parrot();
@@ -640,6 +649,21 @@ sub run_test_file
     return ( $out_f, $cmd, $exit_code );
 }
 
+sub _report_odd_hash {
+    my $warning = shift;
+    if ( $warning =~ m/Odd number of elements in hash assignment/ ) {
+        require Carp;
+        my @args = DB::uplevel_args();
+        shift @args;
+        my $func = ( caller() )[2];
+
+        Carp::carp("Odd $func invocation; probably missing description for TODO test");
+    }
+    else {
+        warn $warning;
+    }
+}
+
 sub _generate_functions {
     my $package = 'Parrot::Test';
 
@@ -671,7 +695,7 @@ sub _generate_functions {
 
         my $test_sub = sub {
             my ( $code, $expected, $desc, %extra ) = @_;
-            my ( $out_f, $cmd, $exit_code )        = run_test_file( $func, @_ );
+            my ( $out_f, $cmd, $exit_code )        = _run_test_file( $func, @_ );
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
@@ -686,7 +710,7 @@ sub _generate_functions {
                 if defined $extra{todo};
 
             if ($func =~ /_error_/) {
-                return handle_error_output(
+                return _handle_error_output(
                     $builder, $real_output, $expected, $desc
                 ) unless $exit_code;
             }
@@ -1038,21 +1062,6 @@ Parrot::Test::_generate_functions();
 =back
 
 =cut
-
-sub report_odd_hash {
-    my $warning = shift;
-    if ( $warning =~ m/Odd number of elements in hash assignment/ ) {
-        require Carp;
-        my @args = DB::uplevel_args();
-        shift @args;
-        my $func = ( caller() )[2];
-
-        Carp::carp("Odd $func invocation; probably missing description for TODO test");
-    }
-    else {
-        warn $warning;
-    }
-}
 
 package DB;
 
