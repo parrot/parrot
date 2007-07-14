@@ -270,11 +270,15 @@ use base qw( Exporter );
 # Memoize functions with a fixed output
 Memoize::memoize( 'path_to_parrot' );
  
-# tell parrot it's being tested--disables searching of installed libraries.
+# Tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
 $ENV{PARROT_TEST} = 1 unless defined $ENV{PARROT_TEST};
 
 my $builder = Test::Builder->new();
+
+# Generate subs where the name serves as an
+# extra parameter.
+_generate_test_functions();
 
 sub import {
     my ( $class, $plan, @args ) = @_;
@@ -664,32 +668,23 @@ sub _report_odd_hash {
     }
 }
 
-sub _generate_functions {
-    my $package = 'Parrot::Test';
+sub _generate_test_functions {
 
+    my $package = 'Parrot::Test';
     my $path_to_parrot = path_to_parrot();
     my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 
-    my %parrot_test_map = (
-        pbc_output_is      => 'is_eq',
-        pbc_output_isnt    => 'isnt_eq',
-        pbc_output_like    => 'like',
-        pbc_output_unlike  => 'unlike',
-        pasm_output_is     => 'is_eq',
-        pasm_output_isnt   => 'isnt_eq',
-        pasm_output_like   => 'like',
-        pasm_output_unlike => 'unlike',
-        pir_output_is      => 'is_eq',
-        pir_output_isnt    => 'isnt_eq',
-        pir_output_like    => 'like',
-        pir_output_unlike  => 'unlike',
-    );
-
-    for my $func ( keys %parrot_test_map ) {
-        (my $error_func = $func) =~ s/_output/_error_output/;
-        $parrot_test_map{ $error_func } = $parrot_test_map{ $func };
-    }
-
+    my %parrot_test_map
+         = map { $_ . '_output_is'            => 'is_eq',
+                 $_ . '_error_output_is'      => 'is_eq',
+                 $_ . '_output_isnt'          => 'isnt_eq',
+                 $_ . '_error_output_isnt'    => 'isnt_eq',
+                 $_ . '_output_like'          => 'like',
+                 $_ . '_error_output_like'    => 'like',
+                 $_ . '_output_unlike'        => 'unlike',
+                 $_ . '_error_output_unlike'  => 'unlike',
+               }
+               qw( pasm pbc pir );
     for my $func ( keys %parrot_test_map ) {
         push @EXPORT, $func;
 
@@ -1044,8 +1039,6 @@ sub _generate_functions {
 
     return;
 }
-
-Parrot::Test::_generate_functions();
 
 =head1 SEE ALSO
 
