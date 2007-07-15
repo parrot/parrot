@@ -236,7 +236,7 @@ same for the rest):
         print "!\n"
     .end
 
-Whew! There's alot of new stuff in this code. I'll take them
+Whew! There's a lot of new stuff in this code. I'll take them
 starting from the top of the program and working towards the
 bottom.
 
