@@ -130,51 +130,67 @@ static void parrot_pic_move( PARROT_INTERP, NOTNULL(Parrot_MIC *mic) )
 
 static int pass_int( PARROT_INTERP,
     NOTNULL(PMC *sig),
-    char *src_base,
-    void **src,
-    char *dest_base,
+    NOTNULL(char *src_base),
+    NOTNULL(void **src),
+    NOTNULL(char *dest_base),
     NOTNULL(void **dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
 static int pass_mixed( PARROT_INTERP,
     NOTNULL(PMC *sig),
-    char *src_base,
-    void **src,
-    char *dest_base,
-    void **dest )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static int pass_num( PARROT_INTERP,
-    NOTNULL(PMC *sig),
-    char *src_base,
-    void **src,
-    char *dest_base,
+    NOTNULL(char *src_base),
+    NOTNULL(void **src),
+    NOTNULL(char *dest_base),
     NOTNULL(void **dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6);
+
+static int pass_num( PARROT_INTERP,
+    NOTNULL(PMC *sig),
+    NOTNULL(char *src_base),
+    NOTNULL(void **src),
+    NOTNULL(char *dest_base),
+    NOTNULL(void **dest) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
 static int pass_pmc( PARROT_INTERP,
     NOTNULL(PMC *sig),
-    char *src_base,
-    void **src,
-    char *dest_base,
+    NOTNULL(char *src_base),
+    NOTNULL(void **src),
+    NOTNULL(char *dest_base),
     NOTNULL(void **dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
 static int pass_str( PARROT_INTERP,
     NOTNULL(PMC *sig),
-    char *src_base,
-    void **src,
-    char *dest_base,
+    NOTNULL(char *src_base),
+    NOTNULL(void **src),
+    NOTNULL(char *dest_base),
     NOTNULL(void **dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
 /* HEADERIZER END: static */
@@ -327,8 +343,8 @@ parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 }
 
 static int
-pass_int(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
-        char *dest_base, NOTNULL(void **dest))
+pass_int(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
+        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
@@ -341,8 +357,8 @@ pass_int(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
 }
 
 static int
-pass_num(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
-        char *dest_base, NOTNULL(void **dest))
+pass_num(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
+        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
@@ -355,8 +371,8 @@ pass_num(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
 }
 
 static int
-pass_str(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
-        char *dest_base, NOTNULL(void **dest))
+pass_str(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
+        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
@@ -369,8 +385,8 @@ pass_str(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
 }
 
 static int
-pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
-        char *dest_base, NOTNULL(void **dest))
+pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
+        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
 {
     int n = SIG_ELEMS(sig);
     int i;
@@ -383,8 +399,8 @@ pass_pmc(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
 }
 
 static int
-pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), char *src_base, void **src,
-        char *dest_base, void **dest)
+pass_mixed(PARROT_INTERP, NOTNULL(PMC *sig), NOTNULL(char *src_base),
+        NOTNULL(void **src), NOTNULL(char *dest_base), NOTNULL(void **dest))
 {
     PMC* argP;
     int i, n = SIG_ELEMS(sig);

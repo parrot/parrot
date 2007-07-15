@@ -167,7 +167,10 @@ void * list_pop( PARROT_INTERP, NOTNULL(List *list), int type )
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_push( PARROT_INTERP, NOTNULL(List *list), void *item, int type )
+void list_push( PARROT_INTERP,
+    NOTNULL(List *list),
+    NULLOK(void *item),
+    int type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

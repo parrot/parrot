@@ -54,8 +54,9 @@ static void debug_trace_find_meth( PARROT_INTERP,
 static void do_initcall( PARROT_INTERP, PMC* _class, PMC *object, PMC *init )
         __attribute__nonnull__(1);
 
-static void fail_if_exist( PARROT_INTERP, PMC *name )
-        __attribute__nonnull__(1);
+static void fail_if_exist( PARROT_INTERP, NOTNULL(PMC *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static PMC * find_method_direct_1( PARROT_INTERP,
@@ -253,7 +254,7 @@ XXX uses global class registry
 */
 
 static void
-fail_if_exist(PARROT_INTERP, PMC *name)
+fail_if_exist(PARROT_INTERP, NOTNULL(PMC *name))
 {
     INTVAL      type;
 

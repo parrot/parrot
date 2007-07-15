@@ -218,7 +218,7 @@ static List_chunk * get_chunk( PARROT_INTERP,
 
 static void list_append( PARROT_INTERP,
     NOTNULL(List *list),
-    void *item,
+    NULLOK(void *item),
     int type,
     UINTVAL idx )
         __attribute__nonnull__(1)
@@ -238,7 +238,7 @@ static void * list_item( PARROT_INTERP,
 
 static void list_set( PARROT_INTERP,
     NOTNULL(List *list),
-    void *item,
+    NULLOK(void *item),
     INTVAL type,
     INTVAL idx )
         __attribute__nonnull__(1)
@@ -1033,7 +1033,7 @@ Set C<item> of type C<type> in chunk at C<idx>.
 */
 
 static void
-list_set(PARROT_INTERP, NOTNULL(List *list), void *item, INTVAL type, INTVAL idx)
+list_set(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), INTVAL type, INTVAL idx)
 {
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
@@ -1145,7 +1145,7 @@ Add one or more chunks to end of list.
 */
 
 static void
-list_append(PARROT_INTERP, NOTNULL(List *list), void *item, int type, UINTVAL idx)
+list_append(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), int type, UINTVAL idx)
 {
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)
@@ -1684,7 +1684,7 @@ Pushes C<item> of type C<type> on to the end of the list.
 
 PARROT_API
 void
-list_push(PARROT_INTERP, NOTNULL(List *list), void *item, int type)
+list_push(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), int type)
 {
     const INTVAL idx = list->start + list->length++;
 

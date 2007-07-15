@@ -127,8 +127,9 @@ int parrot_pic_is_safe_to_jit( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-funcptr_t parrot_pic_JIT_sub( PARROT_INTERP, PMC *sub, int flags )
-        __attribute__nonnull__(1);
+funcptr_t parrot_pic_JIT_sub( PARROT_INTERP, NOTNULL(PMC *sub), int flags )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: src/pic_jit.c */
 

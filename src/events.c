@@ -656,6 +656,7 @@ io_thread_ready_rd(pending_io_events *ios, int ready_rd)
     }
 }
 
+PARROT_CAN_RETURN_NULL
 static void*
 io_thread(SHIM(void *data))
 {

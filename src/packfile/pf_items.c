@@ -32,16 +32,45 @@ C<opcode_t> units.
 
 /* HEADERIZER BEGIN: static */
 
-static void cvt_num12_num8( unsigned char *dest, const unsigned char *src );
-static void cvt_num12_num8_be( unsigned char *dest, const unsigned char *src );
-static void cvt_num12_num8_le( unsigned char *dest, unsigned char *src );
-static opcode_t fetch_op_be_4( unsigned char *b );
-static opcode_t fetch_op_be_8( unsigned char *b );
-static opcode_t fetch_op_le_4( unsigned char *b );
-static opcode_t fetch_op_le_8( unsigned char *b );
-static opcode_t fetch_op_mixed_be( unsigned char *b );
-static opcode_t fetch_op_mixed_le( unsigned char *b );
-static opcode_t fetch_op_test( unsigned char *b );
+static void cvt_num12_num8(
+    NOTNULL(unsigned char *dest),
+    NOTNULL(const unsigned char *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void cvt_num12_num8_be(
+    NOTNULL(unsigned char *dest),
+    NOTNULL(const unsigned char *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void cvt_num12_num8_le(
+    NOTNULL(unsigned char *dest),
+    NOTNULL(unsigned char *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static opcode_t fetch_op_be_4( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_be_8( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_le_4( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_le_8( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_mixed_be( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_mixed_le( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
+static opcode_t fetch_op_test( NOTNULL(unsigned char *b) )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: static */
 
 
@@ -65,7 +94,7 @@ static opcode_t fetch_op_test( unsigned char *b );
  * convert i386 LE 12 byte long double to IEEE 754 8 byte double
  */
 static void
-cvt_num12_num8(unsigned char *dest, const unsigned char *src)
+cvt_num12_num8(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))
 {
     int expo, i, s;
 #ifdef __LCC__
@@ -113,7 +142,7 @@ nul:
 }
 
 static void
-cvt_num12_num8_be(unsigned char *dest, const unsigned char *src)
+cvt_num12_num8_be(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))
 {
     cvt_num12_num8(dest, src);
     /* TODO endianize */
@@ -121,14 +150,14 @@ cvt_num12_num8_be(unsigned char *dest, const unsigned char *src)
 }
 
 static void
-cvt_num12_num8_le(unsigned char *dest, unsigned char *src)
+cvt_num12_num8_le(NOTNULL(unsigned char *dest), NOTNULL(unsigned char *src))
 {
     unsigned char b[8];
     cvt_num12_num8(b, src);
     fetch_buf_le_8(dest, b);
 }
 static opcode_t
-fetch_op_test(unsigned char *b)
+fetch_op_test(NOTNULL(unsigned char *b))
 {
     union {
         unsigned char buf[4];
@@ -146,7 +175,7 @@ fetch_op_test(unsigned char *b)
  * Fetch an opcode and convert to LE
  */
 static opcode_t
-fetch_op_mixed_le(unsigned char *b)
+fetch_op_mixed_le(NOTNULL(unsigned char *b))
 {
 #if OPCODE_T_SIZE == 4
     union {
@@ -173,7 +202,7 @@ fetch_op_mixed_le(unsigned char *b)
  * Fetch an opcode and convert to BE
  */
 static opcode_t
-fetch_op_mixed_be(unsigned char *b)
+fetch_op_mixed_be(NOTNULL(unsigned char *b))
 {
 #if OPCODE_T_SIZE == 4
     union {
@@ -196,7 +225,7 @@ fetch_op_mixed_be(unsigned char *b)
 }
 
 static opcode_t
-fetch_op_be_4(unsigned char *b)
+fetch_op_be_4(NOTNULL(unsigned char *b))
 {
     union {
         unsigned char buf[4];
@@ -219,7 +248,7 @@ fetch_op_be_4(unsigned char *b)
 }
 
 static opcode_t
-fetch_op_be_8(unsigned char *b)
+fetch_op_be_8(NOTNULL(unsigned char *b))
 {
     union {
         unsigned char buf[8];
@@ -238,7 +267,7 @@ fetch_op_be_8(unsigned char *b)
 }
 
 static opcode_t
-fetch_op_le_4(unsigned char *b)
+fetch_op_le_4(NOTNULL(unsigned char *b))
 {
     union {
         unsigned char buf[4];
@@ -261,7 +290,7 @@ fetch_op_le_4(unsigned char *b)
 }
 
 static opcode_t
-fetch_op_le_8(unsigned char *b)
+fetch_op_le_8(NOTNULL(unsigned char *b))
 {
     union {
         unsigned char buf[8];

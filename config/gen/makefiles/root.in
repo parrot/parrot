@@ -1856,9 +1856,16 @@ splint-andy :
 		-declundef \
 		-show-summary \
 		-exportlocal \
+		+linelen 80 \
+		+showdeephistory \
+		-showfunc \
+		-hints \
 		\
-		src/string.c \
+		src/builtin.c \
 		src/stacks.c \
+
+LATER = \
+		src/string.c \
 		src/list.c \
 		src/intlist.c \
 

@@ -211,9 +211,10 @@ static size_t pf_debug_packed_size(
 
 static opcode_t * pf_debug_unpack( PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    opcode_t *cursor )
+    NOTNULL(opcode_t *cursor) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static INTVAL pf_register_standard_funcs( PARROT_INTERP, PackFile *pf )
         __attribute__nonnull__(1);
@@ -2016,7 +2017,7 @@ Unpack a debug segment into a PackFile_Debug structure.
 */
 
 static opcode_t *
-pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), opcode_t *cursor)
+pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))
 {
     PackFile_Debug * const debug = (PackFile_Debug *)self;
     PackFile_ByteCode *code;

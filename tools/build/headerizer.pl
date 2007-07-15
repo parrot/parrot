@@ -182,15 +182,24 @@ sub function_components_from_declaration {
 }
 
 sub attrs_from_args {
+    my $func = shift;
     my @args = @_;
 
     my @attrs = ();
 
     my $n = 0;
+    my $complaints = 0;
+
     for my $arg ( @args ) {
         ++$n;
-        if ( $arg =~ m{/\*\s*NN\s*\*/} || $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
+        if ( $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
+        }
+        if ( ( $arg =~ m{\*} ) && ( $arg !~ /SHIM|NOTNULL|NULLOK/ ) ) {
+            if ( ++$complaints == 1 ) {
+                warn qq{In function $func->{name}\n};
+            }
+            warn qq{    "$arg" isn't protected with NOTNULL or NULLOK\n};
         }
     }
 
@@ -208,7 +217,7 @@ sub make_function_decls {
         $decl = "static $decl" if $func->{is_static};
 
         my @args = @{$func->{args}};
-        my @attrs = attrs_from_args( @args );
+        my @attrs = attrs_from_args( $func, @args );
 
         for my $arg ( @args ) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {
@@ -317,6 +326,8 @@ sub main {
         write_file( $cfile, $source );
     }
 
+    print "Headerization complete.\n";
+
     return;
 }
 
@@ -337,7 +348,6 @@ sub write_file {
     open my $fh, '>', $filename or die "couldn't write '$filename': $!";
     print {$fh} $text;
     close $fh;
-    print "Wrote '$filename'\n";
 }
 
 sub replace_headerized_declarations {

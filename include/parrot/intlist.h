@@ -49,8 +49,7 @@ void intlist_assign( PARROT_INTERP,
 
 PARROT_MALLOC
 IntList * intlist_clone( PARROT_INTERP, const IntList *list/*NN*/ )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 void intlist_dump( NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose )
         __attribute__nonnull__(1)

@@ -48,6 +48,7 @@ any other necessary initialization.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 pmc_new(PARROT_INTERP, INTVAL base_type)
 {
@@ -69,6 +70,7 @@ type.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC*
 pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
           SHIM(UINTVAL flags))
@@ -87,32 +89,24 @@ pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
         & (VTABLE_PMC_IS_SINGLETON | VTABLE_IS_CONST_FLAG))
     {
         /* First, is the destination a singleton? No joy for us there */
-        if (new_vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+        if (new_vtable->flags & VTABLE_PMC_IS_SINGLETON)
             real_exception(interp, NULL, ALLOCATION_ERROR,
                                "Parrot VM: Can't turn to a singleton type!\n");
-            return NULL;
-        }
 
         /* First, is the destination a constant? No joy for us there */
-        if (new_vtable->flags & VTABLE_IS_CONST_FLAG) {
+        if (new_vtable->flags & VTABLE_IS_CONST_FLAG)
             real_exception(interp, NULL, ALLOCATION_ERROR,
                                "Parrot VM: Can't turn to a constant type!\n");
-            return NULL;
-        }
 
         /* Is the source a singleton? */
-        if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON) {
+        if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON)
             real_exception(interp, NULL, ALLOCATION_ERROR,
                                "Parrot VM: Can't modify a singleton\n");
-            return NULL;
-        }
 
         /* Is the source constant? */
-        if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG) {
+        if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG)
             real_exception(interp, NULL, ALLOCATION_ERROR,
                                "Parrot VM: Can't modify a constant\n");
-            return NULL;
-        }
     }
 
     /* Do we have an extension area? */
@@ -262,6 +256,7 @@ initialization for continuations.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
