@@ -1,4 +1,4 @@
-# $Id: Manifest.pm 19888 2007-07-15 13:03:16Z jkeenan $
+# $Id$
 package Parrot::Manifest;
 use strict;
 use warnings;
