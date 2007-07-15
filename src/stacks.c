@@ -263,7 +263,6 @@ stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
         default:
             real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                     "Invalid Stack_Entry_type!");
-            break;
     }
 }
 
@@ -320,7 +319,6 @@ stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
     default:
         real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
                            "Wrong type on top of stack!\n");
-        break;
     }
 
     return where;
