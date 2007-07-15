@@ -104,7 +104,9 @@ PARROT_PURE_FUNCTION
 static int is_version( NOTNULL(const void *maybe_version) )
         __attribute__nonnull__(1);
 
-static PMC * local_pmc_copy( PARROT_INTERP, PMC * const original )
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC * local_pmc_copy( PARROT_INTERP, NULLOK(PMC * const original) )
         __attribute__nonnull__(1);
 
 static void mark_read_record( PARROT_INTERP, NOTNULL(STM_read_record *read) )
@@ -118,11 +120,13 @@ static void mark_write_record( PARROT_INTERP,
 
 static int merge_transactions( PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
-    STM_tx_log_sub *outer,
-    STM_tx_log_sub *inner,
+    NOTNULL(STM_tx_log_sub *outer),
+    NOTNULL(STM_tx_log_sub *inner),
     int always )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 static void * next_version( NOTNULL(const void *old_version) )
@@ -135,6 +139,7 @@ static void replay_writes( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static int safe_to_clone( PARROT_INTERP, NOTNULL(const PMC * const original) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -373,7 +378,7 @@ Parrot_STM_start_transaction(PARROT_INTERP)
  */
 static int
 merge_transactions(PARROT_INTERP, NOTNULL(STM_tx_log *log),
-        STM_tx_log_sub *outer, STM_tx_log_sub *inner, int always)
+        NOTNULL(STM_tx_log_sub *outer), NOTNULL(STM_tx_log_sub *inner), int always)
 {
     int i;
     int status;
@@ -1180,6 +1185,7 @@ Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
     return read->value;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))
 {
@@ -1192,8 +1198,10 @@ safe_to_clone(PARROT_INTERP, NOTNULL(const PMC * const original))
         return 0;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC *
-local_pmc_copy(PARROT_INTERP, PMC * const original)
+local_pmc_copy(PARROT_INTERP, NULLOK(PMC * const original))
 {
     if (PMC_IS_NULL(original))
         return PMCNULL;

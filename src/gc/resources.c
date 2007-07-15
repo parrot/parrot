@@ -46,12 +46,15 @@ static size_t aligned_string_size( size_t len );
 
 static void * alloc_new_block( PARROT_INTERP,
     size_t size,
-    Memory_Pool *pool,
-    const char *why )
-        __attribute__nonnull__(1);
+    NOTNULL(Memory_Pool *pool),
+    NOTNULL(const char *why) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static const char* buffer_location( PARROT_INTERP, const PObj *b )
-        __attribute__nonnull__(1);
+static const char* buffer_location( PARROT_INTERP, NOTNULL(const PObj *b) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void compact_pool( PARROT_INTERP, NOTNULL(Memory_Pool *pool) )
         __attribute__nonnull__(1)
@@ -75,7 +78,9 @@ static void merge_pools(
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
-static Memory_Pool * new_memory_pool( size_t min_block, compact_f compact );
+static Memory_Pool * new_memory_pool(
+    size_t min_block,
+    NULLOK(compact_f compact) );
 
 /* HEADERIZER END: static */
 
@@ -88,7 +93,8 @@ the default size.  The given text is used for debugging.
 */
 
 static void *
-alloc_new_block(PARROT_INTERP, size_t size, Memory_Pool *pool, const char *why)
+alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
+        NOTNULL(const char *why))
 {
     Memory_Block *new_block;
 
@@ -230,7 +236,7 @@ mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
 
 #if RESOURCE_DEBUG
 static const char*
-buffer_location(PARROT_INTERP, const PObj *b)
+buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
 {
     int i;
     static char reg[10];
@@ -790,7 +796,7 @@ Create a new memory pool.
 
 PARROT_MALLOC
 static Memory_Pool *
-new_memory_pool(size_t min_block, compact_f compact)
+new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
     Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
 
@@ -824,8 +830,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
     alloc_new_block(interp, POOL_SIZE, arena_base->memory_pool, "init");
 
     /* Constant strings - not compacted */
-    arena_base->constant_string_pool =
-        new_memory_pool(POOL_SIZE, (compact_f)NULLfunc);
+    arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
 
     alloc_new_block(interp, POOL_SIZE,
                     arena_base->constant_string_pool, "init");

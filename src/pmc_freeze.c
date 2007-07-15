@@ -244,23 +244,26 @@ static void todo_list_init( PARROT_INTERP, NOTNULL(visit_info *info) )
 
 PARROT_INLINE
 static int todo_list_seen( PARROT_INTERP,
-    PMC *pmc,
+    NOTNULL(PMC *pmc),
     NOTNULL(visit_info *info),
     NOTNULL(UINTVAL *id) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void visit_loop_next_for_GC( PARROT_INTERP,
     NOTNULL(PMC *current),
-    visit_info *info )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void visit_loop_todo_list( PARROT_INTERP,
-    PMC *current,
     NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void visit_loop_todo_list( PARROT_INTERP,
+    NOTNULL(PMC *current),
+    NOTNULL(visit_info *info) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void visit_next_for_GC( PARROT_INTERP,
@@ -277,8 +280,12 @@ static void visit_todo_list( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void visit_todo_list_thaw( PARROT_INTERP, PMC* old, visit_info* info )
-        __attribute__nonnull__(1);
+static void visit_todo_list_thaw( PARROT_INTERP,
+    NOTNULL(PMC* old),
+    NOTNULL(visit_info* info) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 
@@ -1246,7 +1253,7 @@ are flags.
 
 PARROT_INLINE
 static int
-todo_list_seen(PARROT_INTERP, PMC *pmc, NOTNULL(visit_info *info),
+todo_list_seen(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(visit_info *info),
         NOTNULL(UINTVAL *id))
 {
     HashBucket * const b =
@@ -1331,7 +1338,7 @@ Todo-list and seen handling is all in C<do_thaw()>.
 */
 
 static void
-visit_todo_list_thaw(PARROT_INTERP, PMC* old, visit_info* info)
+visit_todo_list_thaw(PARROT_INTERP, NOTNULL(PMC* old), NOTNULL(visit_info* info))
 {
     do_thaw(interp, old, info);
 }
@@ -1347,7 +1354,7 @@ done.
 
 static void
 visit_loop_next_for_GC(PARROT_INTERP, NOTNULL(PMC *current),
-        visit_info *info)
+        NOTNULL(visit_info *info))
 {
     visit_next_for_GC(interp, current, info);
     if (current->pmc_ext) {
@@ -1370,10 +1377,10 @@ The thaw loop.
 */
 
 static void
-visit_loop_todo_list(PARROT_INTERP, PMC *current,
+visit_loop_todo_list(PARROT_INTERP, NOTNULL(PMC *current),
         NOTNULL(visit_info *info))
 {
-    List *todo = (List *)PMC_data(info->todo);
+    List * const todo = (List *)PMC_data(info->todo);
     PMC *finish_list_pmc;
     int i, n;
     List *finish_list = NULL;   /* gcc -O3 warning */

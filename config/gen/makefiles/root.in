@@ -1749,6 +1749,13 @@ SPLINTFLAGS  = \
 	-standard \
 	-tmpdir $(SPLINT_TMP) \
 	-message-stream-stdout \
+	-declundef \
+	-show-summary \
+	-exportlocal \
+	+linelen 120 \
+	+showdeephistory \
+	-showfunc \
+	-hints \
 	\
 	-abstract \
 	+aliasunique \
@@ -1777,7 +1784,6 @@ SPLINTFLAGS  = \
 	-initallelements \
 	-isoreserved \
 	-isoreservedinternal \
-	+linelen 9999 \
 	+longintegral \
 	+macroassign \
 	+macroempty \
@@ -1808,6 +1814,8 @@ SPLINTFLAGS  = \
 	+showsummary \
 	-skipposixheaders \
 	-type \
+	\
+	\
 	\
 	-mustfreefresh \
 	-mustfreeonly \
@@ -1853,21 +1861,10 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	/var/splint312/bin/splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-		-declundef \
-		-show-summary \
-		-exportlocal \
-		+linelen 80 \
-		+showdeephistory \
-		-showfunc \
-		-hints \
 		\
-		src/builtin.c \
-		src/stacks.c \
-
-LATER = \
-		src/string.c \
-		src/list.c \
-		src/intlist.c \
+		src/gc/dod.c  src/gc/gc_gms.c  src/gc/gc_ims.c \
+		src/gc/memory.c  src/gc/register.c  \
+		src/gc/resources.c  src/gc/smallobject.c \
 
 ###############################################################################
 #

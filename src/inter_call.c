@@ -104,9 +104,10 @@ static int set_retval_util( PARROT_INTERP,
 
 static void start_flatten( PARROT_INTERP,
     NOTNULL(call_state *st),
-    PMC *p_arg )
+    NOTNULL(PMC *p_arg) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void store_arg( NOTNULL(call_state *st), INTVAL idx )
         __attribute__nonnull__(1);
@@ -292,7 +293,7 @@ Parrot_init_arg_sig(PARROT_INTERP, parrot_context_t *ctx, NOTNULL(const char *si
  * PMC being flattened, and fetch the first arg from the flattened set.
  */
 static void
-start_flatten(PARROT_INTERP, NOTNULL(call_state *st), PMC *p_arg)
+start_flatten(PARROT_INTERP, NOTNULL(call_state *st), NOTNULL(PMC *p_arg))
 {
     if (PARROT_ARG_NAME_ISSET(st->src.sig)) {
         /* src ought to be an hash */
@@ -352,7 +353,7 @@ next_arg_sig(NOTNULL(call_state_item *sti))
 static int
 fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
 {
-    va_list *ap = (va_list*)(st->src.u.sig.ap);
+    va_list * const ap = (va_list*)(st->src.u.sig.ap);
     switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = va_arg(*ap, INTVAL);

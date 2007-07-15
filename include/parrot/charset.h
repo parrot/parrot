@@ -119,6 +119,7 @@ CHARSET * Parrot_find_charset( SHIM_INTERP, NOTNULL(const char *charsetname) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 charset_converter_t Parrot_find_charset_converter(
     SHIM_INTERP,
     NOTNULL(CHARSET *lhs),

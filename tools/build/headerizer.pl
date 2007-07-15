@@ -162,7 +162,6 @@ sub function_components_from_declaration {
     for (@args) {
         /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
             or die "Bad args in $proto";
-        s/SHIM\(\s*(\w+.*\w+)\s*\)/$1/e;
     }
 
     my $is_static = 0;
@@ -180,6 +179,7 @@ sub function_components_from_declaration {
         return_type => $return_type,
     };
 }
+
 
 sub attrs_from_args {
     my $func = shift;
@@ -205,6 +205,7 @@ sub attrs_from_args {
 
     return @attrs;
 }
+
 
 sub make_function_decls {
     my @funcs = @_;

@@ -135,14 +135,18 @@ static void gc_gms_add_free_object( PARROT_INTERP,
     void *to_add )
         __attribute__nonnull__(1);
 
-static void gc_gms_alloc_objects( PARROT_INTERP, Small_Object_Pool *pool )
-        __attribute__nonnull__(1);
+static void gc_gms_alloc_objects( PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_chain_objects( PARROT_INTERP,
-    Small_Object_Pool *pool,
-    Small_Object_Arena *new_arena,
+    NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(Small_Object_Arena *new_arena),
     size_t real_size )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_gms_clear_hdr_list( PARROT_INTERP,
     NOTNULL(Gc_gms_hdr_list *l) )
@@ -155,9 +159,10 @@ static void gc_gms_clear_igp( PARROT_INTERP, NOTNULL(Gc_gms_gen *gen) )
 
 PARROT_MALLOC
 static Gc_gms_gen * gc_gms_create_gen( PARROT_INTERP,
-    Small_Object_Pool *pool,
+    NOTNULL(Small_Object_Pool *pool),
     size_t gen_no )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_end_cycle( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -169,11 +174,14 @@ static Gc_gms_gen * gc_gms_find_gen( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void * gc_gms_get_free_object( PARROT_INTERP, Small_Object_Pool *pool )
-        __attribute__nonnull__(1);
+static void * gc_gms_get_free_object( PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void gc_gms_init_gen( PARROT_INTERP, Small_Object_Pool *pool )
-        __attribute__nonnull__(1);
+static void gc_gms_init_gen( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_init_mark( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -186,8 +194,10 @@ static void gc_gms_merge_gen( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void gc_gms_more_objects( PARROT_INTERP, Small_Object_Pool *pool )
-        __attribute__nonnull__(1);
+static void gc_gms_more_objects( PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void gc_gms_pool_init( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool)  )
@@ -495,8 +505,8 @@ gc_gms_add_free_object(PARROT_INTERP, Small_Object_Pool *pool, void *to_add)
 
 static void
 gc_gms_chain_objects(PARROT_INTERP,
-        Small_Object_Pool *pool,
-        Small_Object_Arena *new_arena,
+        NOTNULL(Small_Object_Pool *pool),
+        NOTNULL(Small_Object_Arena *new_arena),
         size_t real_size)
 {
     Gc_gms_hdr *p, *next, *prev, *marker;
@@ -543,7 +553,7 @@ gc_gms_chain_objects(PARROT_INTERP,
 }
 
 static void
-gc_gms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)
+gc_gms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     const size_t real_size = pool->object_size;
     Small_Object_Arena * const new_arena = mem_internal_allocate(sizeof (Small_Object_Arena));
@@ -565,7 +575,7 @@ gc_gms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)
 }
 
 static void
-gc_gms_more_objects(PARROT_INTERP, Small_Object_Pool *pool)
+gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     if (pool->skip)
         pool->skip = 0;
@@ -586,7 +596,7 @@ gc_gms_more_objects(PARROT_INTERP, Small_Object_Pool *pool)
  */
 
 static void *
-gc_gms_get_free_object(PARROT_INTERP, Small_Object_Pool *pool)
+gc_gms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     PObj *ptr;
     Gc_gms_hdr *hdr;
@@ -638,7 +648,7 @@ Initalize the generation system by creating the first two generations.
 
 PARROT_MALLOC
 static Gc_gms_gen *
-gc_gms_create_gen(PARROT_INTERP, Small_Object_Pool *pool, size_t gen_no)
+gc_gms_create_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), size_t gen_no)
 {
     Gc_gms_gen * const gen = mem_sys_allocate(sizeof (*gen));
 
@@ -653,7 +663,7 @@ gc_gms_create_gen(PARROT_INTERP, Small_Object_Pool *pool, size_t gen_no)
 }
 
 static void
-gc_gms_init_gen(PARROT_INTERP, Small_Object_Pool *pool)
+gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     Gc_gms_private *gmsp;
     /*

@@ -124,7 +124,6 @@ Parrot_load_charset(PARROT_INTERP, NOTNULL(const char *charsetname))
     UNUSED(charsetname);
 
     real_exception(interp, NULL, UNIMPLEMENTED, "Can't load charsets yet");
-    return NULL;
 }
 
 /*
@@ -333,6 +332,7 @@ Parrot_default_charset(SHIM_INTERP)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 charset_converter_t
 Parrot_find_charset_converter(SHIM_INTERP, NOTNULL(CHARSET *lhs), NOTNULL(CHARSET *rhs))
 {

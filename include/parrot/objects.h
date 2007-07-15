@@ -98,8 +98,11 @@ PMC* Parrot_find_vtable_meth( PARROT_INTERP, NOTNULL(PMC *pmc), STRING *meth )
         __attribute__nonnull__(2);
 
 PARROT_API
-PMC * Parrot_get_attrib_by_num( PARROT_INTERP, PMC *object, INTVAL attrib )
-        __attribute__nonnull__(1);
+PMC * Parrot_get_attrib_by_num( PARROT_INTERP,
+    NOTNULL(PMC *object),
+    INTVAL attrib )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PMC * Parrot_get_attrib_by_str( PARROT_INTERP, PMC *object, STRING *attr )
@@ -111,12 +114,17 @@ INTVAL Parrot_get_vtable_index( PARROT_INTERP, NOTNULL(const STRING *name) )
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_instantiate_object( PARROT_INTERP, PMC *object )
-        __attribute__nonnull__(1);
+void Parrot_instantiate_object( PARROT_INTERP, NOTNULL(PMC *object) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_instantiate_object_init( PARROT_INTERP, PMC *object, PMC *init )
-        __attribute__nonnull__(1);
+void Parrot_instantiate_object_init( PARROT_INTERP,
+    NOTNULL(PMC *object),
+    NOTNULL(PMC *init) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_invalidate_method_cache( PARROT_INTERP,
@@ -164,17 +172,22 @@ PMC * Parrot_remove_parent( PARROT_INTERP,
 
 PARROT_API
 void Parrot_set_attrib_by_num( PARROT_INTERP,
-    PMC *object,
+    NOTNULL(PMC *object),
     INTVAL attrib,
-    PMC *value )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *value) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_set_attrib_by_str( PARROT_INTERP,
-    PMC *object,
-    STRING *attr,
-    PMC *value )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *object),
+    NOTNULL(STRING *attr),
+    NOTNULL(PMC *value) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_set_class_constructor( PARROT_INTERP,

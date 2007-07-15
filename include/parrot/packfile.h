@@ -442,10 +442,11 @@ PARROT_API
 PackFile_Segment * PackFile_Segment_new_seg( PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     UINTVAL type,
-    const char *name,
+    NOTNULL(const char *name),
     int add )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 opcode_t * PackFile_Segment_pack( PARROT_INTERP,

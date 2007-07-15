@@ -33,7 +33,6 @@ static void clear_live_bits( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
 static size_t find_common_mask( PARROT_INTERP, size_t val1, size_t val2 )
         __attribute__nonnull__(1);
 
@@ -44,9 +43,10 @@ static void mark_special( PARROT_INTERP, NOTNULL(PMC *obj) )
 static int sweep_cb( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    void *arg )
+    NOTNULL(void *arg) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 static int trace_active_PMCs( PARROT_INTERP, int trace_stack )
         __attribute__nonnull__(1);
@@ -724,7 +724,6 @@ Find a mask covering the longest common bit-prefix of C<val1> and C<val2>.
 */
 
 PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
 static size_t
 find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 {
@@ -922,7 +921,7 @@ Parrot_dod_ms_run_init(PARROT_INTERP)
 }
 
 static int
-sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, void *arg)
+sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
 {
     int * const total_free = (int *) arg;
 

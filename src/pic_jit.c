@@ -51,19 +51,28 @@ static int call_is_safe(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int jit_can_compile_sub( PARROT_INTERP, PMC *sub )
-        __attribute__nonnull__(1);
-
-static int ops_jittable( PARROT_INTERP,
-    PMC *sub,
-    const PMC *sig_results,
-    NOTNULL(PackFile_ByteCode *seg),
-    opcode_t *pc,
-    opcode_t *end,
-    int *flags )
+PARROT_WARN_UNUSED_RESULT
+static int jit_can_compile_sub( PARROT_INTERP, NOTNULL(PMC *sub) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static int ops_jittable( PARROT_INTERP,
+    NOTNULL(PMC *sub),
+    NOTNULL(const PMC *sig_results),
+    NOTNULL(PackFile_ByteCode *seg),
+    NOTNULL(opcode_t *pc),
+    NOTNULL(opcode_t *end),
+    NOTNULL(int *flags) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7);
+
+PARROT_WARN_UNUSED_RESULT
 static opcode_t * pic_test_func( PARROT_INTERP,
     INTVAL *sig_bits,
     NOTNULL(void **args) )
@@ -110,6 +119,7 @@ static int returns_match_results(
     with -C and -S runcores.
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t *
 pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
 {
@@ -123,8 +133,9 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
 }
 #  endif
 
+PARROT_WARN_UNUSED_RESULT
 static int
-jit_can_compile_sub(PARROT_INTERP, PMC *sub)
+jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
 {
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
@@ -257,9 +268,11 @@ call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
     return 1;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, PMC *sub, const PMC *sig_results,
-        NOTNULL(PackFile_ByteCode *seg), opcode_t *pc, opcode_t *end, int *flags)
+ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const PMC *sig_results),
+        NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
+        NOTNULL(opcode_t *end), NOTNULL(int *flags))
 {
     while (pc < end) {
         /* special opcodes which are handled, but not marked as JITtable */

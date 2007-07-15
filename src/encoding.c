@@ -81,6 +81,7 @@ Parrot_new_encoding(SHIM_INTERP)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ENCODING *
 Parrot_find_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {
@@ -107,7 +108,6 @@ Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {
     UNUSED(encodingname);
     real_exception(interp, NULL, UNIMPLEMENTED, "Can't load encodings yet");
-    return NULL;
 }
 
 /*
@@ -160,11 +160,10 @@ Parrot_encoding_number_of_str(PARROT_INTERP, NOTNULL(STRING *src))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding)
+Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
-    UNUSED(interp);
-
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].name;
@@ -172,11 +171,10 @@ Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ENCODING*
 Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 {
-    UNUSED(interp);
-
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding;
@@ -184,11 +182,10 @@ Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 const char *
 Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
 {
-    UNUSED(interp);
-
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding->name;
@@ -257,29 +254,23 @@ Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
 
 PARROT_API
 INTVAL
-Parrot_make_default_encoding(PARROT_INTERP, const char *encodingname,
+Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
         NOTNULL(ENCODING *encoding))
 {
-    UNUSED(interp);
-    UNUSED(encodingname);
-
     Parrot_default_encoding_ptr = encoding;
     return 1;
 }
 
 PARROT_API
 ENCODING *
-Parrot_default_encoding(PARROT_INTERP)
+Parrot_default_encoding(SHIM_INTERP)
 {
-    UNUSED(interp);
-
     return Parrot_default_encoding_ptr;
 }
 
 PARROT_API
 encoding_converter_t
-Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs,
-        ENCODING *rhs)
+Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs, ENCODING *rhs)
 {
     UNUSED(interp);
     UNUSED(lhs);

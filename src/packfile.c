@@ -109,9 +109,10 @@ static size_t directory_packed_size( PARROT_INTERP,
 
 static opcode_t * directory_unpack( PARROT_INTERP,
     NOTNULL(PackFile_Segment *segp),
-    opcode_t *cursor )
+    NOTNULL(opcode_t *cursor) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static PMC* do_1_sub_pragma( PARROT_INTERP,
     NOTNULL(PMC *sub_pmc),
@@ -143,8 +144,9 @@ static INTVAL find_fixup_iter( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixup_destroy( PARROT_INTERP, PackFile_Segment *self )
-        __attribute__nonnull__(1);
+static void fixup_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static PackFile_Segment * fixup_new(
     SHIM_INTERP,
@@ -216,8 +218,10 @@ static opcode_t * pf_debug_unpack( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL pf_register_standard_funcs( PARROT_INTERP, PackFile *pf )
-        __attribute__nonnull__(1);
+static INTVAL pf_register_standard_funcs( PARROT_INTERP,
+    NOTNULL(PackFile *pf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static PMC* run_sub( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
         __attribute__nonnull__(1)
@@ -225,9 +229,10 @@ static PMC* run_sub( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
 
 static void segment_init(
     NOTNULL(PackFile_Segment *self),
-    PackFile *pf,
+    NOTNULL(PackFile *pf),
     NOTNULL(const char *name) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void sort_segs( NOTNULL(PackFile_Directory *dir) )
@@ -1170,7 +1175,7 @@ Called from within C<PackFile_new()> register the standard functions.
 */
 
 static INTVAL
-pf_register_standard_funcs(PARROT_INTERP, PackFile *pf)
+pf_register_standard_funcs(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
     PackFile_funcs dirf = {
         directory_new,
@@ -1239,12 +1244,13 @@ Create a new segment.
 
 PARROT_API
 PackFile_Segment *
-PackFile_Segment_new_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir), UINTVAL type,
-                         const char *name, int add)
+PackFile_Segment_new_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
+        UINTVAL type, NOTNULL(const char *name), int add)
 {
     PackFile * const pf = dir->base.pf;
     PackFile_Segment_new_func_t f = pf->PackFuncs[type].new_seg;
     PackFile_Segment * const seg = (f)(interp, pf, name, add);
+
     segment_init(seg, pf, name);
     seg->type = type;
     if (add)
@@ -1460,7 +1466,7 @@ Unpacks the directory.
 */
 
 static opcode_t *
-directory_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *segp), opcode_t *cursor)
+directory_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *segp), NOTNULL(opcode_t *cursor))
 {
     size_t i;
     PackFile_Directory * const dir = (PackFile_Directory *) segp;
@@ -1736,7 +1742,8 @@ Initializes the segment C<self>.
 */
 
 static void
-segment_init(NOTNULL(PackFile_Segment *self), PackFile *pf, NOTNULL(const char *name))
+segment_init(NOTNULL(PackFile_Segment *self), NOTNULL(PackFile *pf),
+        NOTNULL(const char *name))
 {
     self->pf          = pf;
     self->type        = PF_UNKNOWN_SEG;
@@ -2547,7 +2554,7 @@ Just calls C<PackFile_FixupTable_clear()> with C<self>.
 */
 
 static void
-fixup_destroy(PARROT_INTERP, PackFile_Segment *self)
+fixup_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 {
     PackFile_FixupTable * const ft = (PackFile_FixupTable *)self;
     PackFile_FixupTable_clear(interp, ft);

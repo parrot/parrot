@@ -19,6 +19,8 @@ src/dynext.c - Dynamic extensions to Parrot
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING * get_path( PARROT_INTERP,
     STRING *lib,
     NOTNULL(void **handle),
@@ -27,9 +29,13 @@ static STRING * get_path( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* is_loaded( PARROT_INTERP, STRING *path )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC * make_string_pmc( PARROT_INTERP, STRING *string )
         __attribute__nonnull__(1);
 
@@ -114,6 +120,8 @@ If it does, return it. Otherwise, return NULL.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 is_loaded(PARROT_INTERP, STRING *path)
 {
@@ -134,6 +142,8 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING *
 get_path(PARROT_INTERP, STRING *lib, NOTNULL(void **handle),
                          STRING *wo_ext, STRING *ext)
@@ -340,6 +350,8 @@ run_init_lib(PARROT_INTERP, void *handle,
     return lib_pmc;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 clone_string_into(Interp *d, Interp *s, PMC *value) {
     STRING * const orig = VTABLE_get_string(s, value);
@@ -352,6 +364,8 @@ clone_string_into(Interp *d, Interp *s, PMC *value) {
     return ret;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 make_string_pmc(PARROT_INTERP, STRING *string)
 {
@@ -362,6 +376,8 @@ make_string_pmc(PARROT_INTERP, STRING *string)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)
 {
@@ -413,6 +429,8 @@ Parrot_clone_lib_into(Interp *d, Interp *s, PMC *lib_pmc)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
 {

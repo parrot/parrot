@@ -144,8 +144,9 @@ static INTVAL PIO_unix_send(
     SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
-    STRING *s )
-        __attribute__nonnull__(3);
+    NOTNULL(STRING *s) )
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static ParrotIO * PIO_unix_socket( PARROT_INTERP,
     ParrotIOLayer *layer,
@@ -860,7 +861,7 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), STRING *s)
+PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
 {
     int error, bytes, byteswrote;
 

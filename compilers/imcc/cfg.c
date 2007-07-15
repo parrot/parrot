@@ -61,14 +61,18 @@ static int check_invoke_type( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void free_dominance_frontiers( IMC_Unit * unit );
+static void free_dominance_frontiers( NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1);
+
 static void free_dominators( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
 static void free_edge( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static void free_loops( IMC_Unit * unit );
+static void free_loops( NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1);
+
 static void init_basic_blocks( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
@@ -79,9 +83,18 @@ static Basic_block* make_basic_block( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mark_loop( Parrot_Interp interp, IMC_Unit * unit, const Edge* e );
+static void mark_loop( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(const Edge *e) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void propagate_need( Basic_block *bb, SymReg* r, int i );
-static void sort_loops( Parrot_Interp interp, IMC_Unit * unit );
+static void sort_loops( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 
 /* Code: */
@@ -921,7 +934,7 @@ free_dominators(NOTNULL(IMC_Unit *unit))
 }
 
 static void
-free_dominance_frontiers(IMC_Unit * unit)
+free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
 {
     int i;
 
@@ -936,7 +949,7 @@ free_dominance_frontiers(IMC_Unit * unit)
 
 
 static void
-sort_loops(Parrot_Interp interp, IMC_Unit * unit)
+sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int i, j, changed;
     Loop_info *li;
@@ -1060,7 +1073,7 @@ natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info
 /* Increases the loop_depth of all the nodes in a loop */
 
 static void
-mark_loop(Parrot_Interp interp, IMC_Unit * unit, const Edge* e)
+mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
 {
     Set* loop;
     Set* exits;
@@ -1140,7 +1153,7 @@ mark_loop(Parrot_Interp interp, IMC_Unit * unit, const Edge* e)
 }
 
 static void
-free_loops(IMC_Unit * unit)
+free_loops(NOTNULL(IMC_Unit *unit))
 {
     int i;
     for (i = 0; i < unit->n_loops; i++) {

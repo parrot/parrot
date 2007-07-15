@@ -87,7 +87,7 @@ PARROT_API
 PMC* mmd_dispatch_p_pip( PARROT_INTERP,
     NOTNULL(PMC *left),
     INTVAL right,
-    PMC *dest,
+    NULLOK(PMC *dest),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -96,7 +96,7 @@ PARROT_API
 PMC* mmd_dispatch_p_pnp( PARROT_INTERP,
     NOTNULL(PMC *left),
     FLOATVAL right,
-    PMC *dest,
+    NULLOK(PMC *dest),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -105,7 +105,7 @@ PARROT_API
 PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
     NOTNULL(PMC *left),
     NOTNULL(PMC *right),
-    PMC *dest,
+    NULLOK(PMC *dest),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -114,11 +114,12 @@ PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
 PARROT_API
 PMC* mmd_dispatch_p_psp( PARROT_INTERP,
     NOTNULL(PMC *left),
-    STRING *right,
-    PMC *dest,
+    NOTNULL(STRING *right),
+    NULLOK(PMC *dest),
     INTVAL func_nr )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void mmd_dispatch_v_pn( PARROT_INTERP,
@@ -174,9 +175,10 @@ void Parrot_mmd_rebuild_table( PARROT_INTERP, INTVAL type, INTVAL func_nr )
 PARROT_API
 void Parrot_mmd_register_table( PARROT_INTERP,
     INTVAL type,
-    const MMD_init *mmd_table,
+    NOTNULL(const MMD_init *mmd_table),
     INTVAL n )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PMC * Parrot_MMD_search_default_infix( PARROT_INTERP,

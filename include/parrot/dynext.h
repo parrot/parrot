@@ -11,6 +11,8 @@
 /* HEADERIZER BEGIN: src/dynext.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_clone_lib_into( Interp *d, Interp *s, PMC *lib_pmc );
 
 PARROT_API
@@ -21,6 +23,8 @@ PMC * Parrot_init_lib( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_load_lib( PARROT_INTERP, NULLOK(STRING *lib), PMC *initializer )
         __attribute__nonnull__(1);
 
