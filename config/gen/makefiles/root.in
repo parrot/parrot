@@ -653,6 +653,7 @@ help :
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  doc_tests:         Check POD syntax of all files containing POD."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
+	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
@@ -1368,6 +1369,10 @@ BUILDTOOLS_TEST_FILES = \
         $(OPS2CUTILS_DIR)/07-make_incdir.t \
         $(OPS2CUTILS_DIR)/08-nolines.t \
         $(OPS2CUTILS_DIR)/09-dynamic_nolines.t
+MANIFEST_DIR = t/manifest
+MANIFEST_TEST_FILES = \
+        $(MANIFEST_DIR)/01-basic.t
+
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -1460,6 +1465,9 @@ codingstd_tests :
 
 buildtools_tests :
 	$(PERL) t/harness $(BUILDTOOLS_TEST_FILES)
+
+manifest_tests :
+	$(PERL) t/harness $(MANIFEST_TEST_FILES)
 
 # obsolete
 testbench :
