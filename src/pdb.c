@@ -217,7 +217,7 @@ Prints out the welcome string.
 */
 
 static void
-PDB_printwelcome()
+PDB_printwelcome(void)
 {
     fprintf(stderr, "Parrot Debugger 0.4.x\n");
     fprintf(stderr, "\nPlease note: ");
