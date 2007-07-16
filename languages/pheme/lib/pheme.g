@@ -1,8 +1,14 @@
 grammar Pheme::Grammar;
 
-rule prog { <list>+ }
+rule TOP { <list>+ }
 
-rule list { \( <list_item>+ \) }
+rule list { \( [ <special_form> | <application> | <cons> ] \) }
+
+rule special_form { <special> <list_item>+ }
+
+rule application { <atom> <list_item>+ }
+
+rule cons { <list_item>+ }
 
 # quoted_string has to come first
 rule list_item { <quoted_string> | <atom> | <list> | <empty_list> }
@@ -18,3 +24,5 @@ token quote { ' }
 token symbol_tag { \# }
 
 token ws { [ [ ; \N+ ]? \s+ ]* }
+
+token special { (if | cond | define | lambda | quote) }

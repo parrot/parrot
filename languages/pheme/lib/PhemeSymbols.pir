@@ -1,19 +1,20 @@
 .namespace [ 'PhemeCompiler' ]
 
-.sub __onload :load
+.sub __onload :load :init
 	.local pmc symbols
 	symbols = new .Hash
 
-	symbols['car']               = 1
-	symbols['cdr']               = 1
-	symbols['cons']              = 1
-	symbols['cond']              = 1
-	symbols['include_file']      = 1
-	symbols['write']             = 1
-	symbols['+']                 = 1
-	symbols['-']                 = 1
-	symbols['*']                 = 1
-	symbols['/']                 = 1
+	symbols["'define'"]            = 1
+	symbols["'car'"]               = 1
+	symbols["'cdr'"]               = 1
+	symbols["'cons'"]              = 1
+	symbols["'cond'"]              = 1
+	symbols["'include_file'"]      = 1
+	symbols["'write'"]             = 1
+	symbols["'+'"]                 = 1
+	symbols["'-'"]                 = 1
+	symbols["'*'"]                 = 1
+	symbols["'/'"]                 = 1
 
 	store_global 'PhemeCompiler', 'symbols', symbols
 	.return()
@@ -25,7 +26,7 @@
 	.param pmc args :slurpy
 
 	.local pmc result
-	result = __list_to_cons( args :flat ) 
+	result = __list_to_cons( args :flat )
 	.return( result )
 .end
 
@@ -76,8 +77,8 @@
 .sub '__evaluate' :multi( [ 'Pheme'; 'Cons' ] )
 	.param pmc cons
 
-	.local pmc cons_eval_order
-	cons_eval_order = new .ResizablePMCArray
+	.local pmc cons_list
+	cons_list = new .ResizablePMCArray
 
 	# walk through cons
 	# push onto stack backwards
@@ -88,23 +89,11 @@
 	head = cons.'head'()
 	item_defined = defined head
 	unless item_defined goto end_get_loop
-	unshift cons_eval_order, head
+	push cons_list, head
 
 	cons = cons.'tail'()
 	goto get_loop
   end_get_loop:
-
-	.local pmc cons_list
-	cons_list = new .ResizablePMCArray
-
-	.local pmc item
-  eval_loop:
-	unless cons_eval_order goto end_eval_loop
-	item = shift cons_eval_order
-	item = __evaluate( item )
-	unshift cons_list, item
-	goto eval_loop
-  end_eval_loop:
 
 	.local pmc first
 	first = cons_list[0]
@@ -255,7 +244,7 @@
 	r_head = r_cons.'head'()
 
 	.local int head_equal
-	head_equal = 'eq?'( l_head, r_head ) 
+	head_equal = 'eq?'( l_head, r_head )
 
 	if head_equal goto compare_tail
 	.return( 0 )
@@ -268,7 +257,7 @@
 	r_tail = r_cons.'tail'()
 
 	.local int tail_equal
-	tail_equal = 'eqlist?'( l_head, r_head ) 
+	tail_equal = 'eqlist?'( l_head, r_head )
 	.return( tail_equal )
 .end
 

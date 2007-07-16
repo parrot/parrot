@@ -1,86 +1,84 @@
-.include 'errors.pasm'
+=head1 TITLE
 
-.sub _main :main
-	.param pmc args
+pheme.pir - A Pheme compiler.
 
-	errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
+=head2 Description
 
-	load_bytecode 'languages/pheme/lib/PhemeCompiler.pbc'
-	load_bytecode 'languages/pheme/lib/PhemeObjects.pir'
-	load_bytecode 'languages/pheme/lib/PhemeSymbols.pbc'
-	load_bytecode 'languages/pheme/lib/pheme_grammar_gen.pir'
-	load_bytecode 'languages/pheme/lib/ASTGrammar.pbc'
-	load_bytecode 'languages/pheme/lib/OSTGrammar.pbc'
-	load_bytecode 'languages/pheme/lib/PIRGrammar.pbc'
+This is the base file for the Pheme compiler.
 
-	.local string source
-	source     = _get_source( args )
+This file includes the parsing and grammar rules from
+the src/ directory, loads the relevant PGE libraries,
+and registers the compiler under the name 'Pheme'.
 
-	.local int compiler_type
-	.local pmc compiler
+=head2 Functions
 
-	compiler_type = find_type 'PhemeCompiler'
+=over 4
 
-	.local pmc ast, ost, pir
-	ast = new 'ASTGrammar'
-	ost = new 'OSTGrammar'
-	pir = new 'PIRGrammar'
+=item __onload()
 
-	compiler = new compiler_type
-	compiler.'init'( 'ast' => ast, 'ost' => ost, 'pir' => pir )
+Loads the PGE libraries needed for running the parser,
+and registers the Pheme compiler using a C<HLLCompiler>
+object.
 
-	.local pmc ast
-	ast = compiler.'compile'( source )
-	end
+=cut
+
+.namespace [ 'Pheme::Compiler' ]
+
+.sub '__onload' :load :init
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Text.pbc'
+    load_bytecode 'PGE/Util.pbc'
+    load_bytecode 'Parrot/HLLCompiler.pir'
+    load_bytecode 'PAST-pm.pbc'
+
+    $P0 = subclass 'PGE::Match', 'Match'
+    $P0 = subclass 'Match',      'Grammar'
+    $P0 = subclass 'Grammar',    'Pheme::PGE::Grammar'
+
+    $P0 = new [ 'HLLCompiler' ]
+
+    $P0.'language'('Pheme')
+    $P0.'parsegrammar'( 'Pheme::Grammar' )
+    $P0.'astgrammar'(   'Pheme::AST::Grammar' )
 .end
 
-.sub _get_source
-    .param pmc argv
-    .local string filename
+=item main(args :slurpy)  :main
 
-	.local int arg_count
+Start compilation by passing any command line C<args> to the Pheme compiler.
 
-    arg_count = argv
-    unless arg_count == 2 goto err_no_file
+=cut
 
-    # Read in the source file
-    filename = argv[1]
+.const int SEVERITY_SLOT = 2 # _severity
 
-	.local string file_source
-    file_source = _slurp_file(filename)
-    .return( file_source )
+.sub 'main' :main
+    .param pmc args
 
-  err_no_file:
-    print "You must supply a Pheme file to parse.\n"
+    $P0 = compreg 'Pheme'
+
+    push_eh exit_handler
+      $P1 = $P0.'command_line'(args)
+    clear_eh
+    goto done
+
+  exit_handler:
+    .get_results($P0, $S0)
+    .include 'except_severity.pasm'
+    $I0 = $P0[SEVERITY_SLOT]
+    if $I0 != .EXCEPT_EXIT goto rethrow_error
+
+  done:
     end
+
+  rethrow_error:
+    rethrow $P0
 .end
 
-.sub _slurp_file
-    .param string filename
-    .local pmc filehandle
-    filehandle = open filename, "<"
-    unless filehandle goto err_no_file
-    $S1 = read filehandle, 65535
-    close filehandle
-    .return ($S1)
+.include 'languages/pheme/lib/PhemeObjects.pir'
+.include 'languages/pheme/lib/PhemeSymbols.pir'
+.include 'languages/pheme/lib/pheme_grammar_gen.pir'
+.include 'languages/pheme/lib/ASTGrammar.pir'
 
-  err_no_file:
-    print "Unable to open file "
-    print filename
-    print "\n"
-    end
-.end
-
-=head1 LICENSE
-
-Copyright (C) 2006, The Perl Foundation.
-
-This is free software; you may redistribute it and/or modify it under the same
-terms as Parrot.
-
-=head1 AUTHOR
-
-chromatic <chromatic@wgz.org>
+=back
 
 =cut
 

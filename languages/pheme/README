@@ -1,7 +1,7 @@
-This is Pheme, version 0.0.1
+This is Pheme, version 0.1.0
 ----------------------------
 
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006 - 2007, The Perl Foundation.
 
 Pheme is a Parrot-based implementation of Scheme, in the sense that it has the
 same syntax (what syntax it has) and shares the name of some built-ins.  Please
@@ -10,13 +10,13 @@ note the version number.
 PREREQUISITES
 -------------
 
-Pheme depends on Parrot 0.4.3 or higher, PGE, and TGE.
+Pheme depends on Parrot 0.4.13 or higher, PGE, and TGE.
 
 INSTRUCTIONS
 ------------
 
 Get Parrot.  Compile Parrot.  Make sure its tests pass, particularly those of
-PGE.
+PGE and TGE.
 
 Compile Pheme:
 
@@ -36,5 +36,5 @@ Read the TODO file for an idea of some ways to improve this language.
 Please send all patches, bug reports, and suggestions to the Parrot mailing
 list.
 
-18 April 2006
+15 July 2007
 chromatic
