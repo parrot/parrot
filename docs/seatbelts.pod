@@ -1,0 +1,112 @@
+=head1 SEATBELTS
+
+DEFINITELY UNDER CONSTRUCTION
+
+I'm trying to create as many seat belts and idiot lights as
+possible. Using C macros and automatic function declaration generation
+makes this much easier for me to do, and is far more maintainable.
+
+Headerizer creates function declarations based on function
+definitions. It scans the source files passed to it and extracts the
+function declarations. Then it puts them into the appropriate .h file or,
+in the case of static functions, back into the source file itself.
+
+The headerizer also adds function attributes as specified by the
+decorations on the source.
+
+All of these macros are GCC-specific right now, but soon will have
+equivalent semantics for lint added to them. This will make lint a far
+more powerful tool. If/when we ever get splint going, too, we can add
+semantics there as well.
+
+=head1 What's a shim?
+
+Think of "shim" as shorthand for "placeholder". It's 64% shorter.
+
+GCC (and lint and splint) likes to complain (as well it should) if you
+pass an argument into a function and don't use it. If we know that we're
+not going to use an argument, we can either remove the argument from
+the function declaration, or mark it as unused.
+
+Throwing the argument away is not always possible. Usually, it's because
+the function is one that gets referred to by a function pointer, and
+all functions of this group must have the same, say, three args: Interp,
+Foo and Bar. Maybe a given function doesn't use Foo, but we still have to
+accept Foo. In this case, we can in the body of the func, C<UNUSED(Foo)>,
+if we plan to use it in the future. Or, if we never will use it, mark
+it as a C<SHIM(Foo)> in the declaration.
+
+=head1 Decorators
+
+=head2 Function decorators
+
+XXX CLEAN THIS UP
+
+* `/* WARN_UNUSED */`
+** Use this to flag functions where it is definitely an error to call it without checking its return value.
+** Headerizes to `__attribute__warn_unused_result__`
+* `/* MALLOC */`
+** Denotes functions that return a new piece of memory, such that losing the return value would cause a memory leak.
+** Headerizes to `__attribute__malloc__`
+* `/* CONST */`
+** For functions that operate only on their operands, do not use global memory, and have no side effects. The compiler can optimize away repeated calls to CONST functions. mod() is a good example. rand() is an anti-example. Note that this sense of const is unrelated to the const qualifier on variables.
+** Headerizes to `__attribute__malloc__`
+* `/* PURE */`
+** Less stringent than CONST. Can check global memory or dereference pointers. strlen() is a good example.
+** Headerizes to `__attribute__pure__`
+* `/* NORETURN */`
+** For functions that never return. This can help the compiler's program flow analysis. Functions like exit() the compiler already knows about, but others like internal_exception() we have to tell it about.
+** Headerizes to `__attribute__noreturn__`
+
+=head2 Function argument decorators
+
+* `/* NN */`
+** GCC warns if it determines that a NULL could be passed to this argument.
+** Headerizes to `__attribute__nonnull__`
+* SHIM(int foo)
+** Squelches warnings about being unused, and since it manges the argument name, you can't accidentally use the argument without specfically unshimming the argument.
+** Headerizes to `int foo_unused __attribute__unused__`.
+
+=head2 Interpreters
+
+There are only two states for the interpreter: Used, or shimmed. If we're using it, it has to be /NN/. (Except in a couple of cases like real_exception) The interpreter is so common in functions, we give it its own two macros: INTERP and SHIM_INTERP.
+
+* `SHIM_INTERP`
+** Headerizes to `SHIM(Interp *interp)`
+** Because it's shimmed, we're guaranteed we won't accidentally use it.
+* `INTERP`
+** Any interpreter that isn't a shimmed interpreter must be non-null.
+** Headerizes to `Interp *interp /*NN*/`
+
+=head1 Examples
+
+    PARROT_API
+    PARROT_WARN_UNUSED_RESULT
+    INTVAL
+    string_str_index(PARROT_INTERP, NOTNULL(const STRING *s),
+            NOTNULL(const STRING *s2), INTVAL start)
+
+
+C<string_str_index> is part of the Parrot API, and returns an INTVAL. The
+interpreter is used somewhere in the function. String C<s> and C<s2>
+cannot be NULL. If the calling function ignores the return value,
+it's an error, because you'd never want to call C<string_str_index()>
+without wanting to know its value.
+
+    PARROT_API
+    PARROT_PURE_FUNCTION
+    INTVAL
+    parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
+    {
+        return hash->entries;
+    }
+
+This function is a pure function because it only looks at its parameters
+or global memory. The interpreter doesn't get used, but needs to be
+passed because all PARROT_API functions have interpreters passed, so is
+flagged as a SHIM_INTERP.
+
+We could put C<PARROT_WARN_UNUSED_RESULT> on this function, but since
+all C<PARROT_PURE_FUNCTION>s and C<PARROT_CONST_FUNCTION>s get flagged
+that way anyway, there's no need.
+
