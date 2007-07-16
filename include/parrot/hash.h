@@ -74,7 +74,8 @@ typedef struct _hash {
 /* HEADERIZER BEGIN: src/hash.c */
 
 PARROT_API
-void parrot_dump_hash( SHIM_INTERP, const Hash *hash );
+void parrot_dump_hash( SHIM_INTERP, NOTNULL(const Hash *hash) )
+        __attribute__nonnull__(2);
 
 PARROT_API
 void parrot_hash_clone( PARROT_INTERP,
@@ -164,8 +165,9 @@ PMC* Parrot_new_INTVAL_hash( PARROT_INTERP, UINTVAL flags )
         __attribute__nonnull__(1);
 
 PARROT_API
-void parrot_new_pmc_hash( PARROT_INTERP, PMC *container )
-        __attribute__nonnull__(1);
+void parrot_new_pmc_hash( PARROT_INTERP, NOTNULL(PMC *container) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void parrot_new_pointer_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )

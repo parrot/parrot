@@ -30,11 +30,13 @@ static PMC * get_namespace_pmc( PARROT_INTERP, PMC *sub )
         __attribute__nonnull__(1);
 
 static PMC * internal_ns_keyed( PARROT_INTERP,
-    PMC *base_ns,
-    PMC *pmc_key,
+    NOTNULL(PMC *base_ns),
+    NOTNULL(PMC *pmc_key),
     NULLOK(STRING *str_key),
     int flags )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void store_sub_in_multi( PARROT_INTERP, PMC *sub, PMC *ns )
         __attribute__nonnull__(1);
@@ -53,7 +55,7 @@ static void store_sub_in_multi( PARROT_INTERP, PMC *sub, PMC *ns )
 #define INTERN_NS_CREAT 1       /* I'm a fan of the classics */
 
 static PMC *
-internal_ns_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key,
+internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NOTNULL(PMC *pmc_key),
                                NULLOK(STRING *str_key), int flags)
 {
     PMC *ns, *sub_ns;

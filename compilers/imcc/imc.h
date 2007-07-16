@@ -78,8 +78,9 @@ void imc_compile_all_units( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
-void imc_compile_unit( PARROT_INTERP, IMC_Unit *unit )
-        __attribute__nonnull__(1);
+void imc_compile_unit( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void imc_close_unit( PARROT_INTERP, NULLOK(IMC_Unit *unit) )
         __attribute__nonnull__(1);

@@ -614,7 +614,7 @@ e_file_emit(PARROT_INTERP, SHIM(void *param), SHIM(IMC_Unit *unit), NOTNULL(cons
 
 PARROT_API
 int
-emit_open(PARROT_INTERP, int type, NOTNULL(void *param))
+emit_open(PARROT_INTERP, int type, NULLOK(void *param))
 {
     emitter = type;
     IMCC_INFO(interp)->has_compile = 0;
@@ -624,7 +624,7 @@ emit_open(PARROT_INTERP, int type, NOTNULL(void *param))
 
 PARROT_API
 int
-emit_flush(PARROT_INTERP, NOTNULL(void *param), NOTNULL(struct _IMC_Unit *unit))
+emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))
 {
     Instruction * ins;
 

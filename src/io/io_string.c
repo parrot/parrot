@@ -12,10 +12,6 @@ Capture output to a string PMC.
 
 =head2 String Layer Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -33,10 +29,12 @@ static size_t PIO_string_read( SHIM_INTERP,
         __attribute__nonnull__(4);
 
 static size_t PIO_string_write( PARROT_INTERP,
-    ParrotIOLayer *l,
+    NOTNULL(ParrotIOLayer *l),
     ParrotIO *io,
-    STRING *s )
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *s) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: static */
 
@@ -65,14 +63,14 @@ static const ParrotIOLayerAPI pio_string_layer_api = {
     PIO_null_getcount,
     PIO_null_fill,
     PIO_null_eof,
-    0, /* no poll */
-    0, /* no socket */
-    0, /* no connect */
-    0, /* no send */
-    0, /* no recv */
-    0, /* no bind */
-    0, /* no listen */
-    0  /* no accept */
+    NULL, /* no poll */
+    NULL, /* no socket */
+    NULL, /* no connect */
+    NULL, /* no send */
+    NULL, /* no recv */
+    NULL, /* no bind */
+    NULL, /* no listen */
+    NULL  /* no accept */
 };
 
 ParrotIOLayer pio_string_layer = {
@@ -80,7 +78,7 @@ ParrotIOLayer pio_string_layer = {
     "string",
     0,
     &pio_string_layer_api,
-    0, 0
+    NULL, NULL
 };
 
 ParrotIOLayer *
@@ -102,7 +100,7 @@ PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTN
 }
 
 static size_t
-PIO_string_write(PARROT_INTERP, ParrotIOLayer *l, SHIM(ParrotIO *io), STRING *s)
+PIO_string_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING *s))
 {
     STRING * const old_string = (STRING *)l->self;
 
@@ -117,8 +115,6 @@ PIO_string_write(PARROT_INTERP, ParrotIOLayer *l, SHIM(ParrotIO *io), STRING *s)
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<src/io/io_passdown.c>,
@@ -129,8 +125,6 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by chromatic.
-
-=cut
 
 */
 

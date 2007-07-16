@@ -66,7 +66,7 @@ imc_compile_all_units(PARROT_INTERP)
 
 PARROT_API
 void
-imc_compile_unit(PARROT_INTERP, IMC_Unit *unit)
+imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;

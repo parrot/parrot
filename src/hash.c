@@ -72,7 +72,11 @@ static void init_hash(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int int_compare( SHIM_INTERP, const void *a, const void *b );
+static int int_compare( SHIM_INTERP,
+    NOTNULL(const void *a),
+    NOTNULL(const void *b) )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -232,7 +236,7 @@ Custom C<compare> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-int_compare(SHIM_INTERP, const void *a, const void *b)
+int_compare(SHIM_INTERP, NOTNULL(const void *a), NOTNULL(const void *b))
 {
     return a != b;
 }
@@ -249,7 +253,7 @@ Print out the hash in human-readable form.  Except it's empty.
 
 PARROT_API
 void
-parrot_dump_hash(SHIM_INTERP, const Hash *hash)
+parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))
 {
     UNUSED(hash);
 }
@@ -561,7 +565,7 @@ Create a new Parrot STRING hash in PMC_struct_val(container)
 
 PARROT_API
 void
-parrot_new_pmc_hash(PARROT_INTERP, PMC *container)
+parrot_new_pmc_hash(PARROT_INTERP, NOTNULL(PMC *container))
 {
     parrot_new_pmc_hash_x(interp, container,
             enum_type_PMC,

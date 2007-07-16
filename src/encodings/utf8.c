@@ -115,8 +115,9 @@ static UINTVAL utf8_characters( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL utf8_decode( PARROT_INTERP, const utf8_t *ptr )
-        __attribute__nonnull__(1);
+static UINTVAL utf8_decode( PARROT_INTERP, NOTNULL(const utf8_t *ptr) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static UINTVAL utf8_decode_and_advance( PARROT_INTERP,
     NOTNULL(String_iter *i) )
@@ -207,7 +208,7 @@ Returns the integer for the UTF-8 character found at C<*ptr>.
 */
 
 static UINTVAL
-utf8_decode(PARROT_INTERP, const utf8_t *ptr)
+utf8_decode(PARROT_INTERP, NOTNULL(const utf8_t *ptr))
 {
     const utf8_t *u8ptr = ptr;
     UINTVAL c = *u8ptr;

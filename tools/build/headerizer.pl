@@ -188,18 +188,14 @@ sub attrs_from_args {
     my @attrs = ();
 
     my $n = 0;
-    my $complaints = 0;
-
     for my $arg ( @args ) {
         ++$n;
         if ( $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /SHIM|NOTNULL|NULLOK/ ) ) {
-            if ( ++$complaints == 1 ) {
-                warn qq{In function $func->{name}\n};
-            }
-            warn qq{    "$arg" isn't protected with NOTNULL or NULLOK\n};
+            my $name = $func->{name};
+            warn qq{$name: "$arg" isn't protected with NOTNULL or NULLOK\n};
         }
     }
 

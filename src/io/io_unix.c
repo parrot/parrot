@@ -63,8 +63,9 @@ static INTVAL PIO_unix_async( PARROT_INTERP,
 static INTVAL PIO_unix_bind( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
-    STRING *l )
-        __attribute__nonnull__(3);
+    NOTNULL(STRING *l) )
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static INTVAL PIO_unix_close( SHIM_INTERP,
     ParrotIOLayer *layer,
@@ -109,9 +110,10 @@ static ParrotIO * PIO_unix_open( PARROT_INTERP,
 
 static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
     ParrotIOLayer *l,
-    const char *cmd,
+    NOTNULL(const char *cmd),
     int flags )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_poll( SHIM_INTERP,
     ParrotIOLayer *l,
@@ -131,9 +133,11 @@ static size_t PIO_unix_read( PARROT_INTERP,
 
 static INTVAL PIO_unix_recv( PARROT_INTERP,
     ParrotIOLayer *layer,
-    ParrotIO * io,
-    STRING **s )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING **s) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static PIOOFF_T PIO_unix_seek( SHIM_INTERP,
     ParrotIOLayer *layer,
@@ -785,7 +789,8 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 static INTVAL
-PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), STRING *l)
+PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *l))
 {
     if (!l)
         return -1;
@@ -810,7 +815,8 @@ C<SEQ> sockets.
 */
 
 static INTVAL
-PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL sec)
+PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+        INTVAL sec)
 {
     if ((listen(io->fd, sec)) == -1) {
         return -1;
@@ -861,7 +867,8 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
+PIO_unix_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *s))
 {
     int error, bytes, byteswrote;
 
@@ -910,7 +917,8 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer), ParrotIO * io, STRING **s)
+PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io), NOTNULL(STRING **s))
 {
     int error;
     unsigned int bytesread = 0;
@@ -1009,7 +1017,7 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 */
 
 static ParrotIO *
-PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), const char *cmd, int flags)
+PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(const char *cmd), int flags)
 {
     /*
      * pipe(), fork() should be defined, if this header is present
@@ -1128,14 +1136,14 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_listen,
     PIO_unix_accept
 #  else
-    0, /* no poll */
-    0, /* no socket */
-    0, /* no connect */
-    0, /* no send */
-    0, /* no recv */
-    0, /* no bind */
-    0, /* no listen */
-    0  /* no accept */
+    NULL, /* no poll */
+    NULL, /* no socket */
+    NULL, /* no connect */
+    NULL, /* no send */
+    NULL, /* no recv */
+    NULL, /* no bind */
+    NULL, /* no listen */
+    NULL  /* no accept */
 #  endif
 };
 
@@ -1157,8 +1165,6 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by Melvin Smith (mrjoltcola@mindspring.com).
-
-=cut
 
 */
 
