@@ -43,7 +43,9 @@ static int e_file_emit( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open( SHIM_INTERP, void *param );
+static int e_file_open( SHIM_INTERP, NOTNULL(void *param) )
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 
 const char types[] = "INPS";
@@ -574,7 +576,7 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
 static char *output;
 
 static int
-e_file_open(SHIM_INTERP, void *param)
+e_file_open(SHIM_INTERP, NOTNULL(void *param))
 {
     char * const file = (char *) param;
 
@@ -612,7 +614,7 @@ e_file_emit(PARROT_INTERP, SHIM(void *param), SHIM(IMC_Unit *unit), NOTNULL(cons
 
 PARROT_API
 int
-emit_open(PARROT_INTERP, int type, void *param)
+emit_open(PARROT_INTERP, int type, NOTNULL(void *param))
 {
     emitter = type;
     IMCC_INFO(interp)->has_compile = 0;
@@ -622,7 +624,7 @@ emit_open(PARROT_INTERP, int type, void *param)
 
 PARROT_API
 int
-emit_flush(PARROT_INTERP, void *param, NOTNULL(struct _IMC_Unit *unit))
+emit_flush(PARROT_INTERP, NOTNULL(void *param), NOTNULL(struct _IMC_Unit *unit))
 {
     Instruction * ins;
 
@@ -639,7 +641,7 @@ emit_flush(PARROT_INTERP, void *param, NOTNULL(struct _IMC_Unit *unit))
 
 PARROT_API
 int
-emit_close(PARROT_INTERP, void *param)
+emit_close(PARROT_INTERP, NOTNULL(void *param))
 {
     return (emitters[emitter]).close(interp, param);
 }

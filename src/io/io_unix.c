@@ -121,10 +121,11 @@ static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
 static INTVAL PIO_unix_poll(
     SHIM_INTERP,
     ParrotIOLayer *l,
-    ParrotIO *io,
+    NOTNULL(ParrotIO *io),
     int which,
     int sec,
-    int usec );
+    int usec )
+        __attribute__nonnull__(3);
 
 static size_t PIO_unix_read( PARROT_INTERP,
     ParrotIOLayer *layer,
@@ -977,7 +978,7 @@ the read buffer.
 */
 
 static INTVAL
-PIO_unix_poll(SHIM_INTERP, SHIM(ParrotIOLayer *l), ParrotIO *io, int which,
+PIO_unix_poll(SHIM_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(ParrotIO *io), int which,
                int sec, int usec)
 {
     int n;

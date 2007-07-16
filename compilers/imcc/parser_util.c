@@ -52,14 +52,15 @@ static int is_infix( NOTNULL(const char *name), int n, NOTNULL(SymReg **r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction * maybe_builtin( PARROT_INTERP,
-    IMC_Unit *unit,
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
     int n )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -112,9 +113,12 @@ static INTVAL eval_nr = 0;
  * is done in the lexer, this is a mess
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
-iNEW(PARROT_INTERP, IMC_Unit *unit, SymReg *r0,
-        char *type, SymReg *init, int emit)
+iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
+        NOTNULL(char *type), NOTNULL(SymReg *init), int emit)
 {
     char fmt[256];
     SymReg *regs[3];
@@ -131,9 +135,9 @@ iNEW(PARROT_INTERP, IMC_Unit *unit, SymReg *r0,
                 "Unknown PMC type '%s'\n", type);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage |= U_NEW;
-    if (!strcmp(type, "Hash"))
+    if (strcmp(type, "Hash") == 0)
         r0->usage |= U_KEYED;
-    free(type);
+    free(type); /* XXX This terrifies me that we're passing in C<type> so it can get freed */
     regs[0] = r0;
     regs[1] = pmc;
     if (init) {
@@ -214,8 +218,14 @@ op_fullname(NOTNULL(char *dest), NOTNULL(const char *name), SymReg * args[],
 }
 
 /*
- * Return opcode value for op name
+
+FUNCDOC: check_op
+
+Return opcode value for op name
+
  */
+
+PARROT_WARN_UNUSED_RESULT
 int
 check_op(PARROT_INTERP, NOTNULL(char *fullname),
         NOTNULL(const char *name), NOTNULL(SymReg *r[]), int narg, int keyvec)
@@ -227,10 +237,11 @@ check_op(PARROT_INTERP, NOTNULL(char *fullname),
     return op;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static Instruction *
-maybe_builtin(PARROT_INTERP, SHIM(IMC_Unit *unit), NOTNULL(const char *name),
+maybe_builtin(PARROT_INTERP, NOTNULL(const char *name),
         NOTNULL(SymReg **r), int n)
-    /* XXX de-shim this */
 {
     Instruction *ins;
     char sig[16];
@@ -286,16 +297,16 @@ maybe_builtin(PARROT_INTERP, SHIM(IMC_Unit *unit), NOTNULL(const char *name),
 /*
  * Is instruction a parrot opcode?
  */
+
+PARROT_WARN_UNUSED_RESULT
 int
-is_op(PARROT_INTERP, const char *name)
+is_op(PARROT_INTERP, NOTNULL(const char *name))
 {
-    int (*op_lookup)(const char *, int full) =
-        interp->op_lib->op_code;
-    return op_lookup(name, 0) >= 0
-        || op_lookup(name, 1) >= 0
+    return interp->op_lib->op_code(name, 0) >= 0
+        || interp->op_lib->op_code(name, 1) >= 0
         || ((name[0] == 'n' && name[1] == '_')
-                && (op_lookup(name + 2, 0) >= 0
-                   || op_lookup(name + 2, 1) >= 0))
+                && (interp->op_lib->op_code(name + 2, 0) >= 0
+                   || interp->op_lib->op_code(name + 2, 1) >= 0))
         || Parrot_is_builtin(name, NULL) >= 0;
 }
 
@@ -433,9 +444,12 @@ var_arg_ins(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
  *
  * s. e.g. imc.c for usage
  */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
-INS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
-        const char *fmt, SymReg **r, int n, int keyvec, int emit)
+INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;
@@ -506,7 +520,7 @@ INS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
     else
         strcpy(fullname, name);
     if (op < 0 && emit) {
-        ins = maybe_builtin(interp, unit, name, r, n);
+        ins = maybe_builtin(interp, name, r, n);
         if (ins)
             return ins;
     }

@@ -93,9 +93,12 @@ PMC * Parrot_find_method_with_cache( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-PMC* Parrot_find_vtable_meth( PARROT_INTERP, NOTNULL(PMC *pmc), STRING *meth )
+PMC* Parrot_find_vtable_meth( PARROT_INTERP,
+    NOTNULL(PMC *pmc),
+    NOTNULL(STRING *meth) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PMC * Parrot_get_attrib_by_num( PARROT_INTERP,

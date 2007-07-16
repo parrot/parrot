@@ -207,8 +207,12 @@ PARROT_PURE_FUNCTION
 unsigned int hash_str( NOTNULL(const char *str) )
         __attribute__nonnull__(1);
 
-SymReg * link_keys( PARROT_INTERP, int nargs, SymReg * keys[], int force )
-        __attribute__nonnull__(1);
+SymReg * link_keys( PARROT_INTERP,
+    int nargs,
+    NOTNULL(SymReg * keys[]),
+    int force )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 SymReg * mk_address( PARROT_INTERP, char *name, int uniq )
         __attribute__nonnull__(1);
@@ -235,11 +239,13 @@ SymReg * mk_ident( PARROT_INTERP, NOTNULL(char *name), int t )
 SymReg* mk_ident_ur( PARROT_INTERP, char *name, int t )
         __attribute__nonnull__(1);
 
-SymReg * mk_label_address( PARROT_INTERP, char *name )
-        __attribute__nonnull__(1);
+SymReg * mk_label_address( PARROT_INTERP, NOTNULL(char *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-SymReg * mk_local_label( PARROT_INTERP, char *name )
-        __attribute__nonnull__(1);
+SymReg * mk_local_label( PARROT_INTERP, NOTNULL(char *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 SymReg * mk_pasm_reg( PARROT_INTERP, char *name )
         __attribute__nonnull__(1);
@@ -248,11 +254,13 @@ SymReg * mk_pcc_sub( PARROT_INTERP, NOTNULL(char *name), int proto )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-SymReg * mk_sub_address( PARROT_INTERP, char *name )
-        __attribute__nonnull__(1);
+SymReg * mk_sub_address( PARROT_INTERP, NOTNULL(char *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-SymReg * mk_sub_label( PARROT_INTERP, char *name )
-        __attribute__nonnull__(1);
+SymReg * mk_sub_label( PARROT_INTERP, NOTNULL(char *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 SymReg * mk_symreg( PARROT_INTERP, NOTNULL(char *name), int t )
         __attribute__nonnull__(1)

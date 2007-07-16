@@ -77,10 +77,12 @@ static opcode_t * default_pack(
 static size_t default_packed_size( NOTNULL(const PackFile_Segment *self) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t * default_unpack(
     NOTNULL(PackFile_Segment *self),
-    opcode_t *cursor )
-        __attribute__nonnull__(1);
+    NOTNULL(opcode_t *cursor) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void directory_destroy( PARROT_INTERP,
     NOTNULL(PackFile_Segment *self) )
@@ -1078,8 +1080,9 @@ The default unpack function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t *
-default_unpack(NOTNULL(PackFile_Segment *self), opcode_t *cursor)
+default_unpack(NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))
 {
     if (self->pf->header->dir_format) {
         self->op_count = PF_fetch_opcode(self->pf, &cursor);

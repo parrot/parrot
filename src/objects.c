@@ -79,8 +79,11 @@ static PMC * find_method_direct_1( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static PMC* find_vtable_meth_ns( PARROT_INTERP, PMC *ns, INTVAL vtable_index )
-        __attribute__nonnull__(1);
+static PMC* find_vtable_meth_ns( PARROT_INTERP,
+    NOTNULL(PMC *ns),
+    INTVAL vtable_index )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static PMC* get_init_meth( PARROT_INTERP,
@@ -180,7 +183,7 @@ Return Sub PMC if a method with the vtable name exists in ns
 
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-find_vtable_meth_ns(PARROT_INTERP, PMC *ns, INTVAL vtable_index)
+find_vtable_meth_ns(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL vtable_index)
 {
     return VTABLE_get_pmc_keyed_int(interp, ns, vtable_index);
 }
@@ -195,7 +198,7 @@ Return the vtable method PMC if found.
 
 PARROT_API
 PMC*
-Parrot_find_vtable_meth(PARROT_INTERP, NOTNULL(PMC *pmc), STRING *meth)
+Parrot_find_vtable_meth(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *meth))
 {
     INTVAL i, n;
     PMC   *ns, *mro;

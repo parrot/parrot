@@ -75,16 +75,22 @@ static void add_1_const( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(2);
 
 static int add_const_key( PARROT_INTERP,
-    opcode_t key[],
+    NOTNULL(opcode_t key[]),
     int size,
-    char *s_key )
-        __attribute__nonnull__(1);
+    NOTNULL(const char *s_key) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 static int add_const_num( PARROT_INTERP, const char *buf )
         __attribute__nonnull__(1);
 
-static int add_const_pmc_sub( PARROT_INTERP, SymReg *r, int offs, int end )
-        __attribute__nonnull__(1);
+static int add_const_pmc_sub( PARROT_INTERP,
+    NOTNULL(SymReg *r),
+    int offs,
+    int end )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int add_const_str( PARROT_INTERP, NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1)
@@ -778,15 +784,12 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 }
 
 static int
-add_const_pmc_sub(PARROT_INTERP, SymReg *r,
-        int offs, int end)
+add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
 {
     int                  i, k;
     int                  ns_const = -1;
     INTVAL               type;
     INTVAL               vtable_index;
-    char                *real_name;
-    char                *c_name;
     PMC                 *ns_pmc;
     PMC                 *sub_pmc;
     struct Parrot_sub   *sub;
@@ -795,9 +798,10 @@ add_const_pmc_sub(PARROT_INTERP, SymReg *r,
     SymReg              *ns;
     STRING              *vtable_name;
 
-    IMC_Unit            *unit = globals.cs->subs->unit;
+    IMC_Unit            * const unit = globals.cs->subs->unit;
 
     if (unit->_namespace) {
+        const char *real_name;
         ns = unit->_namespace->reg;
         IMCC_debug(interp, DEBUG_PBC_CONST,
                 "name space const = %d ns name '%s'\n", ns->color, ns->name);
@@ -806,11 +810,8 @@ add_const_pmc_sub(PARROT_INTERP, SymReg *r,
 
         /* strip namespace off from front */
         real_name = strrchr(r->name, '@');
-
         if (real_name) {
-            char *p;
-            ++real_name;
-            p       = str_dup(real_name);
+            char * const p = str_dup(real_name+1);
             free(r->name);
             r->name = p;
         }
@@ -871,6 +872,7 @@ add_const_pmc_sub(PARROT_INTERP, SymReg *r,
         sub->multi_signature = NULL;
 
     if (unit->is_vtable_method == 1) {
+        char *c_name;
         /* Work out the name of the vtable method. */
         if (unit->vtable_name != NULL)
             vtable_name = string_from_cstring(interp, unit->vtable_name + 1,
@@ -920,14 +922,15 @@ add_const_pmc_sub(PARROT_INTERP, SymReg *r,
 
 /* add constant key to constant_table */
 static int
-add_const_key(PARROT_INTERP, opcode_t key[], int size, char *s_key)
+add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const char *s_key))
 {
     int                k;
-    SymReg            *r;
     opcode_t          *rc;
     PackFile_Constant *pfc;
 
-    if ( (r = _get_sym(&globals.cs->key_consts, s_key)) != 0)
+    SymReg * const r = _get_sym(&globals.cs->key_consts, s_key);
+
+    if (r)
         return r->color;
 
     pfc = mem_allocate_typed(PackFile_Constant);

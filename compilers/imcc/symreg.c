@@ -582,7 +582,7 @@ mk_address(PARROT_INTERP, char *name, int uniq)
  * Label gets a fixup entry.
  */
 SymReg *
-mk_sub_label(PARROT_INTERP, char *name)
+mk_sub_label(PARROT_INTERP, NOTNULL(char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_uniq_sub);
@@ -596,7 +596,7 @@ mk_sub_label(PARROT_INTERP, char *name)
  * Make a symbol for a label, symbol gets a fixup entry.
  */
 SymReg *
-mk_sub_address(PARROT_INTERP, char *name)
+mk_sub_address(PARROT_INTERP, NOTNULL(char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_all);
@@ -610,14 +610,14 @@ mk_sub_address(PARROT_INTERP, char *name)
  * Make a local symbol, no fixup entry.
  */
 SymReg *
-mk_local_label(PARROT_INTERP, char *name)
+mk_local_label(PARROT_INTERP, NOTNULL(char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
 }
 
 SymReg *
-mk_label_address(PARROT_INTERP, char *name)
+mk_label_address(PARROT_INTERP, NOTNULL(char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     return _mk_address(interp, &unit->hash, name, U_add_once);
@@ -674,7 +674,7 @@ dup_sym(NOTNULL(const SymReg *r))
 }
 
 SymReg *
-link_keys(PARROT_INTERP, int nargs, SymReg * keys[], int force)
+link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)
 {
     SymReg *key, *keychain;
     int i, len, any_slice;

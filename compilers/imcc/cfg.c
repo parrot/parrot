@@ -41,25 +41,33 @@ static void bb_add_edge(
         __attribute__nonnull__(3);
 
 static void bb_check_set_addr( PARROT_INTERP,
-    IMC_Unit * unit,
-    Basic_block *bb,
-    SymReg *label )
-        __attribute__nonnull__(1);
+    NOTNULL(IMC_Unit * unit),
+    NOTNULL(Basic_block *bb),
+    NOTNULL(SymReg *label) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void bb_findadd_edge( PARROT_INTERP,
-    IMC_Unit * unit,
-    Basic_block *from,
-    SymReg *label )
-        __attribute__nonnull__(1);
+    NOTNULL(IMC_Unit * unit),
+    NOTNULL(Basic_block *from),
+    NOTNULL(SymReg *label) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void bb_remove_edge( NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type( PARROT_INTERP,
-    const IMC_Unit * unit,
+    NOTNULL(const IMC_Unit * unit),
     NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void free_dominance_frontiers( NOTNULL(IMC_Unit *unit) )
@@ -91,7 +99,13 @@ static void mark_loop( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void propagate_need( Basic_block *bb, SymReg* r, int i );
+static void propagate_need(
+    NOTNULL(Basic_block *bb),
+    NOTNULL(SymReg* r),
+    int i )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void sort_loops( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -105,8 +119,9 @@ static void sort_loops( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
 #define INVOKE_SUB_LOOP 3
 #define INVOKE_SUB_OTHER 4
 
+PARROT_WARN_UNUSED_RESULT
 static int
-check_invoke_type(PARROT_INTERP, const IMC_Unit * unit, NOTNULL(const Instruction *ins))
+check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))
 {
     /*
      * 1) pcc sub call or yield
@@ -224,8 +239,8 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 }
 
 static void
-bb_check_set_addr(PARROT_INTERP, IMC_Unit * unit,
-        Basic_block *bb, SymReg *label)
+bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(Basic_block *bb), NOTNULL(SymReg *label))
 {
     const Instruction *ins;
 
@@ -380,8 +395,8 @@ invok:
 /* find the placement of the label, and link the two nodes */
 
 static void
-bb_findadd_edge(PARROT_INTERP, IMC_Unit * unit,
-                Basic_block *from, SymReg *label)
+bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(Basic_block *from), NOTNULL(SymReg *label))
 {
     Instruction *ins;
     const SymReg * const r = find_sym(interp, label->name);
@@ -516,11 +531,12 @@ PARROT_WARN_UNUSED_RESULT
 int
 edge_count(NOTNULL(const struct _IMC_Unit *unit))
 {
-    Edge *e;
+    Edge *e = unit->edge_list;
     int i = 0;
 
-    for (e = unit->edge_list; e; e = e->next++) {
+    while (e) {
         i++;
+        e = e->next++;
     }
     return i;
 }
@@ -697,7 +713,7 @@ analyse_life_block(PARROT_INTERP, NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 
 
 static void
-propagate_need(Basic_block *bb, SymReg* r, int i)
+propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
 {
     Edge *edge;
     Basic_block *pred;

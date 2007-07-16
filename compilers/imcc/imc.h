@@ -141,6 +141,7 @@ PARROT_API
 void imcc_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 int check_op( PARROT_INTERP,
     NOTNULL(char *fullname),
     NOTNULL(const char *name),
@@ -217,27 +218,40 @@ int imcc_vfprintf( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction * iNEW( PARROT_INTERP,
-    IMC_Unit *unit,
-    SymReg *r0,
-    char *type,
-    SymReg *init,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(SymReg *r0),
+    NOTNULL(char *type),
+    NOTNULL(SymReg *init),
     int emit )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction * INS( PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(const char *name),
-    const char *fmt,
-    SymReg **r,
+    NOTNULL(const char *fmt),
+    NOTNULL(SymReg **r),
     int n,
     int keyvec,
     int emit )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
-int is_op( PARROT_INTERP, const char *name )
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+int is_op( PARROT_INTERP, NOTNULL(const char *name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 Instruction * multi_keyed( PARROT_INTERP,
     IMC_Unit * unit,
