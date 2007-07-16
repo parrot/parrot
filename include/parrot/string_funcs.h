@@ -289,8 +289,10 @@ void string_init( PARROT_INTERP )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-STRING* string_join( PARROT_INTERP, NULLOK(STRING *j), PMC *ar )
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+STRING* string_join( PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

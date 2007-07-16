@@ -21,93 +21,120 @@ This file implements the charset functions for unicode data
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL compare( PARROT_INTERP, const STRING *lhs, const STRING *rhs )
-        __attribute__nonnull__(1);
+static INTVAL compare( PARROT_INTERP,
+    NOTNULL(const STRING *lhs),
+    NOTNULL(const STRING *rhs) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static STRING* compose( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static STRING* compose( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static size_t compute_hash( PARROT_INTERP, const STRING *src, size_t seed )
-        __attribute__nonnull__(1);
+static size_t compute_hash( PARROT_INTERP,
+    NOTNULL(const STRING *src),
+    size_t seed )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static INTVAL cs_rindex( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     STRING *search_string,
     UINTVAL offset )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING* decompose( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
 
-static void downcase( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static void downcase( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void downcase_first( PARROT_INTERP, STRING *source_string )
-        __attribute__nonnull__(1);
+static void downcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static INTVAL find_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static STRING * get_graphemes( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING * get_graphemes_inplace( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    STRING *dest_string )
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *dest_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static void set_graphemes( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
     STRING *insert_string )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
         __attribute__nonnull__(1);
 
-static void titlecase( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static void titlecase( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void titlecase_first( PARROT_INTERP, STRING *source_string )
-        __attribute__nonnull__(1);
+static void titlecase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static STRING* to_charset( PARROT_INTERP, STRING *src, STRING *dest )
-        __attribute__nonnull__(1);
+static STRING* to_charset( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    NOTNULL(STRING *dest) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static int u_iscclass( PARROT_INTERP, UINTVAL codepoint, INTVAL flags )
         __attribute__nonnull__(1);
 
-static void upcase( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static void upcase( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void upcase_first( PARROT_INTERP, STRING *source_string )
-        __attribute__nonnull__(1);
+static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static UINTVAL validate( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -128,7 +155,7 @@ static UINTVAL validate( PARROT_INTERP, STRING *src )
 #define UNIMPL EXCEPTION(UNIMPLEMENTED, "unimplemented unicode")
 
 static void
-set_graphemes(PARROT_INTERP, STRING *source_string,
+set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
 {
     ENCODING_SET_CODEPOINTS(interp, source_string, offset,
@@ -136,22 +163,22 @@ set_graphemes(PARROT_INTERP, STRING *source_string,
 }
 
 static STRING *
-get_graphemes(PARROT_INTERP, STRING *source_string,
+get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_CODEPOINTS(interp, source_string, offset, count);
 }
 
 static STRING *
-get_graphemes_inplace(PARROT_INTERP, STRING *source_string,
-        UINTVAL offset, UINTVAL count, STRING *dest_string)
+get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))
 {
     return ENCODING_GET_CODEPOINTS_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
 
 static STRING*
-to_charset(PARROT_INTERP, STRING *src, STRING *dest)
+to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
     charset_converter_t conversion_func;
 
@@ -164,7 +191,7 @@ to_charset(PARROT_INTERP, STRING *src, STRING *dest)
 
 
 static STRING*
-compose(PARROT_INTERP, STRING *src)
+compose(PARROT_INTERP, NOTNULL(STRING *src))
 {
 #if PARROT_HAS_ICU
     STRING *dest;
@@ -190,7 +217,7 @@ compose(PARROT_INTERP, STRING *src)
     dest->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, dest, dest->bufused);
+        Parrot_reallocate_strinNOTNULL(interp, dest, dest->bufused);
         dest_len = unorm_normalize((UChar *)src->strstart, src_len,
                 UNORM_DEFAULT,      /* default is NFC */
                 0,                  /* options 0 default - no specific
@@ -210,14 +237,14 @@ compose(PARROT_INTERP, STRING *src)
 }
 
 static STRING*
-decompose(PARROT_INTERP, STRING *src)
+decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     UNIMPL;
     return NULL;
 }
 
 static void
-upcase(PARROT_INTERP, STRING *src)
+upcase(PARROT_INTERP, NOTNULL(STRING *src))
 {
 #if PARROT_HAS_ICU
 
@@ -229,7 +256,7 @@ upcase(PARROT_INTERP, STRING *src)
         Parrot_ascii_charset_ptr->upcase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
     /*
        U_CAPI int32_t U_EXPORT2
        u_strToUpper(UChar *dest, int32_t destCapacity,
@@ -263,7 +290,7 @@ upcase(PARROT_INTERP, STRING *src)
             NULL,       /* locale = default */
             &err);
     if (needed > dest_len) {
-        Parrot_reallocate_string(interp, src, needed * sizeof (UChar));
+        Parrot_reallocate_strinNOTNULL(interp, src, needed * sizeof (UChar));
         dest_len = needed;
     }
     err = U_ZERO_ERROR;
@@ -289,7 +316,7 @@ upcase(PARROT_INTERP, STRING *src)
 }
 
 static void
-downcase(PARROT_INTERP, STRING *src)
+downcase(PARROT_INTERP, NOTNULL(STRING *src))
 {
 #if PARROT_HAS_ICU
 
@@ -302,7 +329,7 @@ downcase(PARROT_INTERP, STRING *src)
         return;
     }
 
-    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToLower(UChar *dest, int32_t destCapacity,
@@ -319,7 +346,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     src->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, src, src->bufused);
+        Parrot_reallocate_strinNOTNULL(interp, src, src->bufused);
         dest_len = u_strToLower((UChar *)src->strstart, dest_len,
                 (UChar *)src->strstart, src_len,
                 NULL,       /* locale = default */
@@ -336,7 +363,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 }
 
 static void
-titlecase(PARROT_INTERP, STRING *src)
+titlecase(PARROT_INTERP, NOTNULL(STRING *src))
 {
 #if PARROT_HAS_ICU
 
@@ -348,7 +375,7 @@ titlecase(PARROT_INTERP, STRING *src)
         Parrot_ascii_charset_ptr->titlecase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToTitle(UChar *dest, int32_t destCapacity,
@@ -367,7 +394,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
     src->bufused = dest_len * sizeof (UChar);
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, src, src->bufused);
+        Parrot_reallocate_strinNOTNULL(interp, src, src->bufused);
         dest_len = u_strToTitle((UChar *)src->strstart, dest_len,
                 (UChar *)src->strstart, src_len,
                 NULL, NULL,
@@ -384,25 +411,25 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 }
 
 static void
-upcase_first(PARROT_INTERP, STRING *source_string)
+upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     UNIMPL;
 }
 
 static void
-downcase_first(PARROT_INTERP, STRING *source_string)
+downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     UNIMPL;
 }
 
 static void
-titlecase_first(PARROT_INTERP, STRING *source_string)
+titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     UNIMPL;
 }
 
 static INTVAL
-compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)
+compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))
 {
     String_iter l_iter, r_iter;
     UINTVAL offs, cl, cr, min_len, l_len, r_len;
@@ -430,20 +457,20 @@ compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)
 
 
 static INTVAL
-cs_rindex(PARROT_INTERP, STRING *source_string,
-        STRING *search_string, UINTVAL offset)
+cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
+        SHIM(STRING *search_string), UINTVAL offset)
 {
     UNIMPL;
     return 0;
 }
 
 static UINTVAL
-validate(PARROT_INTERP, STRING *src)
+validate(PARROT_INTERP, NOTNULL(STRING *src))
 {
-    UINTVAL codepoint, offset;
+    UINTVAL offset;
 
     for (offset = 0; offset < string_length(interp, src); ++offset) {
-        codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
+        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0 &&
             (codepoint <= 0xfdef || (codepoint & 0xfffe) == 0xfffe) &&
@@ -522,7 +549,7 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags,
-          STRING *source_string, UINTVAL offset)
+          NOTNULL(STRING *source_string), UINTVAL offset)
 {
     UINTVAL codepoint;
 
@@ -537,7 +564,7 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
-            STRING *source_string, UINTVAL offset, UINTVAL count)
+            NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -562,7 +589,7 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
-                STRING *source_string, UINTVAL offset, UINTVAL count)
+                NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
@@ -592,10 +619,9 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
-    STRING *dest;
     String_iter iter;
+    STRING * const dest = string_make(interp, "", 1, "unicode", 0);
 
-    dest = string_make(interp, "", 1, "unicode", 0);
     dest->strlen = 1;
     ENCODING_ITER_INIT(interp, dest, &iter);
     iter.set_and_advance(interp, &iter, codepoint);
@@ -605,7 +631,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 }
 
 static size_t
-compute_hash(PARROT_INTERP, const STRING *src, size_t seed)
+compute_hash(PARROT_INTERP, NOTNULL(const STRING *src), size_t seed)
 {
     String_iter iter;
     size_t hashval = seed;

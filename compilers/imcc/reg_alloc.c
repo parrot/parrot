@@ -98,12 +98,15 @@ static void make_stat(
         __attribute__nonnull__(1);
 
 static void map_colors(
-    IMC_Unit* unit,
+    NOTNULL(IMC_Unit* unit),
     int x,
-    unsigned int *graph,
-    char avail[],
+    NOTNULL(unsigned int *graph),
+    NOTNULL(char *avail),
     int typ,
-    int already_allocated );
+    int already_allocated )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void print_stat( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
@@ -112,7 +115,10 @@ static void print_stat( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
 static void rebuild_reglist( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static int reg_sort_f( const void *a, const void *b );
+static int reg_sort_f( NOTNULL(const void *a), NOTNULL(const void *b) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void sort_reglist( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
@@ -374,7 +380,7 @@ print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /* sort list by line  nr */
 static int
-reg_sort_f(const void *a, const void *b)
+reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
 {
     const SymReg * const ra = *(SymReg**) a;
     const SymReg * const rb = *(SymReg**) b;
@@ -764,22 +770,21 @@ try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
 static void
-map_colors(IMC_Unit* unit, int x, unsigned int *graph, char avail[],
+map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL(char *avail),
         int typ, int already_allocated)
 {
-    int y = 0, n_symbols;
-    SymReg * r;
+    const int n_symbols = unit->n_symbols;
+    int y;
 
-    n_symbols = unit->n_symbols;
     for (y = 0; y < n_symbols; y++) {
-        if (! ig_test(x, y, n_symbols, graph))
-            continue;
-        r = unit->reglist[y];
-        if (   r
-                && r->color != -1
-                && r->set == typ) {
-            assert(r->color - already_allocated >= 0);
-            avail[r->color - already_allocated] = 0;
+        if (ig_test(x, y, n_symbols, graph)) {
+            const SymReg * const r = unit->reglist[y];
+            if (   r
+                    && r->color != -1
+                    && r->set == typ) {
+                assert(r->color - already_allocated >= 0);
+                avail[r->color - already_allocated] = 0;
+            }
         }
     }
 }
@@ -792,7 +797,6 @@ static int
 first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
 {
     int i, n, first;
-    SymReg * r;
     SymHash *hsh;
     Set *allocated;
 
@@ -802,6 +806,7 @@ first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
     allocated = set_make(n + 1);
     hsh = &unit->hash;
     for (i = 0; i < hsh->size; i++) {
+        SymReg * r;
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set != reg_set)
                 continue;

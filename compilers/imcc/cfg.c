@@ -1170,7 +1170,7 @@ free_loops(NOTNULL(IMC_Unit *unit))
 }
 
 void
-search_predecessors_not_in(NOTNULL(const Basic_block *node), Set* s)
+search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
 {
    Edge *edge;
 

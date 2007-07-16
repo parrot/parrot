@@ -18,37 +18,43 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void insert_tail_call(
-    Parrot_Interp interp,
-    IMC_Unit * unit,
-    Instruction *ins,
-    SymReg *sub,
-    SymReg *meth );
+static void insert_tail_call( PARROT_INTERP,
+    NOTNULL(IMC_Unit * unit),
+    NOTNULL(NOTNULL(Instruction *ins)),
+    NOTNULL(SymReg *sub),
+    NULLOK(SymReg *meth) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static Instruction * insINS(
-    Parrot_Interp interp,
+static Instruction * insINS( PARROT_INTERP,
     IMC_Unit * unit,
-    Instruction *ins,
+    NOTNULL(Instruction *ins),
     char *name,
     SymReg **regs,
-    int n );
+    int n )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static Instruction * move_regs( PARROT_INTERP,
     IMC_Unit * unit,
-    Instruction *ins,
+    NOTNULL(Instruction *ins),
     int n,
     SymReg **dest,
     SymReg **src )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
-static Instruction* pcc_get_args(
-    Parrot_Interp interp,
+static Instruction* pcc_get_args( PARROT_INTERP,
     IMC_Unit * unit,
-    Instruction *ins,
+    NOTNULL(Instruction *ins),
     char *op_name,
     int n,
     SymReg **args,
-    int *arg_flags );
+    int *arg_flags )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static int pcc_reg_mov( PARROT_INTERP,
     unsigned char d,
@@ -56,11 +62,14 @@ static int pcc_reg_mov( PARROT_INTERP,
     void *vinfo )
         __attribute__nonnull__(1);
 
-static int recursive_tail_call(
-    Parrot_Interp interp,
-    IMC_Unit * unit,
-    Instruction *ins,
-    SymReg *sub );
+static int recursive_tail_call( PARROT_INTERP,
+    NOTNULL(NOTNULL(IMC_Unit *unit)),
+    NOTNULL(NOTNULL(Instruction *ins)),
+    NOTNULL(SymReg *sub) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static void unshift_self( NOTNULL(SymReg *sub), SymReg *obj )
         __attribute__nonnull__(1);
@@ -72,7 +81,7 @@ static void unshift_self( NOTNULL(SymReg *sub), SymReg *obj )
  * into the current block in one call.
  */
 static Instruction *
-insINS(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
+insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
         char *name, SymReg **regs, int n)
 {
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
@@ -113,7 +122,7 @@ get_const(PARROT_INTERP, const char *name, int type)
  * used by expand_pcc_sub_call and expand_pcc_sub
  */
 static Instruction*
-pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
+pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
         char *op_name, int n, SymReg **args, int *arg_flags)
 {
     int i, flags;
@@ -198,7 +207,7 @@ unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
  */
 
 void
-expand_pcc_sub(Parrot_Interp interp, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
+expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(Instruction *ins)))
 {
     int          nargs;
     SymReg      *sub = ins->r[0];
@@ -264,7 +273,7 @@ expand_pcc_sub(Parrot_Interp interp, NOTNULL(IMC_Unit *unit), NOTNULL(Instructio
  * Expand a PCC sub return directive into its PASM instructions
  */
 void
-expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *unit, Instruction *ins)
+expand_pcc_sub_ret(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
     const int is_yield = ins->type & ITPCCYIELD;
     SymReg * const sub = ins->r[0];
@@ -294,7 +303,7 @@ expand_pcc_sub_ret(Parrot_Interp interp, IMC_Unit *unit, Instruction *ins)
 
 struct move_info_t {
     IMC_Unit    *unit;
-    Instruction *ins;
+    NOTNULL(Instruction *ins);
     int          n;
     SymReg      **dest;
     SymReg      **src;
@@ -364,7 +373,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
 
 static Instruction *
 move_regs(PARROT_INTERP, IMC_Unit * unit,
-        Instruction *ins, int n, SymReg **dest, SymReg **src)
+        NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)
 {
     unsigned char *move_list;
     int i;
@@ -410,8 +419,8 @@ done:
  */
 
 static int
-recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
-        Instruction *ins, SymReg *sub)
+recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
+        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub))
 {
     SymReg *called_sub, *this_sub, *label;
     SymReg *regs[2];
@@ -463,8 +472,8 @@ recursive_tail_call(Parrot_Interp interp, IMC_Unit * unit,
 }
 
 static void
-insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
-        Instruction *ins, SymReg *sub, SymReg *meth)
+insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub), NULLOK(SymReg *meth))
 {
     SymReg *regs[2];
 
@@ -489,7 +498,7 @@ insert_tail_call(Parrot_Interp interp, IMC_Unit * unit,
  *
  */
 void
-expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit *unit, Instruction *ins)
+expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
     SymReg *arg, *sub, *reg, *regs[3];
     int          n;

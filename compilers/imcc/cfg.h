@@ -105,8 +105,11 @@ int natural_preheader(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void search_predecessors_not_in( NOTNULL(const Basic_block *node), Set* s )
-        __attribute__nonnull__(1);
+void search_predecessors_not_in(
+    NOTNULL(const Basic_block *node),
+    NOTNULL(Set* s) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: compilers/imcc/cfg.c */
 

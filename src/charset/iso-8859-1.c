@@ -20,8 +20,10 @@ This file implements the charset functions for iso-8859-1 data
 
 /* HEADERIZER BEGIN: static */
 
-static STRING* compose( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static STRING* compose( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING* decompose( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
@@ -57,11 +59,13 @@ static INTVAL is_cclass( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void set_graphemes( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
-    STRING *insert_string )
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *insert_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
         __attribute__nonnull__(1);
@@ -73,15 +77,25 @@ static void titlecase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_charset( PARROT_INTERP, STRING *src, STRING *dest )
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static STRING * to_charset( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    NOTNULL(STRING *dest) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static STRING * to_latin1( PARROT_INTERP, NOTNULL(STRING *src), STRING *dest )
+static STRING * to_latin1( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    NULLOK(STRING *dest) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_unicode( PARROT_INTERP, STRING *src, NULLOK(STRING *dest) )
-        __attribute__nonnull__(1);
+static STRING * to_unicode( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    NULLOK(STRING *dest) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void upcase( PARROT_INTERP, STRING *source_string )
         __attribute__nonnull__(1);
@@ -96,29 +110,18 @@ static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
 
 /* HEADERIZER END: static */
 
-#ifdef EXCEPTION
-#  undef EXCEPTION
-#endif
-
-/*
- * TODO check interpreter error and warnings setting
- */
-
-#define EXCEPTION(err, str) \
-    real_exception(interp, NULL, err, str)
-
 #include "tables.h"
 
 static void
-set_graphemes(PARROT_INTERP, STRING *source_string,
-        UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
+set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
 {
     ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
 }
 
 static STRING *
-to_latin1(PARROT_INTERP, NOTNULL(STRING *src), STRING *dest)
+to_latin1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
     UINTVAL offs, src_len;
     String_iter iter;
@@ -138,16 +141,15 @@ to_latin1(PARROT_INTERP, NOTNULL(STRING *src), STRING *dest)
     dest->encoding = Parrot_fixed_8_encoding_ptr;
     for (offs = 0; offs < src_len; ++offs) {
         const UINTVAL c = iter.get_and_advance(interp, &iter);
-        if (c >= 0x100) {
-            EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
-        }
+        if (c >= 0x100)
+            real_exception(interp, NULL, LOSSY_CONVERSION, "lossy conversion to ascii");
         ENCODING_SET_BYTE(interp, dest, offs, c);
     }
     return dest;
 }
 
 static STRING *
-to_unicode(PARROT_INTERP, STRING *src, NULLOK(STRING *dest))
+to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
     if (dest) {
         UINTVAL offs;
@@ -180,30 +182,30 @@ to_unicode(PARROT_INTERP, STRING *src, NULLOK(STRING *dest))
     return NULL;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static STRING *
-to_charset(PARROT_INTERP, STRING *src, STRING *dest)
+to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
-    charset_converter_t conversion_func;
+    const charset_converter_t conversion_func =
+        Parrot_find_charset_converter(interp, src->charset, Parrot_iso_8859_1_charset_ptr);
 
-    if ((conversion_func = Parrot_find_charset_converter(interp,
-                    src->charset, Parrot_iso_8859_1_charset_ptr))) {
+    if (conversion_func)
          return conversion_func(interp, src, dest);
-    }
-    else {
+    else
         return to_latin1(interp, src, dest);
-    }
 }
 
 
 /* A noop. can't compose iso-8859-1 */
+PARROT_WARN_UNUSED_RESULT
 static STRING*
-compose(PARROT_INTERP, STRING *src)
+compose(PARROT_INTERP, NOTNULL(STRING *src))
 {
     return string_copy(interp, src);
 }
 
 static STRING*
-decompose(PARROT_INTERP, STRING *src)
+decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     real_exception(interp, NULL, UNIMPLEMENTED,
             "decompose for iso-8859-1 not implemented");
@@ -449,9 +451,8 @@ charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRI
     }
     for (offs = 0; offs < src->strlen; ++offs) {
         UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
-        if (c >= 0x80) {
-            EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
-        }
+        if (c >= 0x80)
+            real_exception(interp, NULL, LOSSY_CONVERSION, "lossy conversion to ascii");
         if (dest)
             ENCODING_SET_BYTE(interp, dest, offs, c);
     }

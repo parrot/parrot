@@ -55,10 +55,11 @@ static int is_infix( NOTNULL(const char *name), int n, NOTNULL(SymReg **r) )
 static Instruction * maybe_builtin( PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *name),
-    SymReg **r,
+    NOTNULL(SymReg **r),
     int n )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -217,7 +218,7 @@ op_fullname(NOTNULL(char *dest), NOTNULL(const char *name), SymReg * args[],
  */
 int
 check_op(PARROT_INTERP, NOTNULL(char *fullname),
-        const char *name, SymReg *r[], int narg, int keyvec)
+        NOTNULL(const char *name), NOTNULL(SymReg *r[]), int narg, int keyvec)
 {
     int op;
 
@@ -228,7 +229,8 @@ check_op(PARROT_INTERP, NOTNULL(char *fullname),
 
 static Instruction *
 maybe_builtin(PARROT_INTERP, SHIM(IMC_Unit *unit), NOTNULL(const char *name),
-        SymReg **r, int n)
+        NOTNULL(SymReg **r), int n)
+    /* XXX de-shim this */
 {
     Instruction *ins;
     char sig[16];

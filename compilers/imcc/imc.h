@@ -143,12 +143,14 @@ void imcc_init( PARROT_INTERP )
 
 int check_op( PARROT_INTERP,
     NOTNULL(char *fullname),
-    const char *name,
-    SymReg *r[],
+    NOTNULL(const char *name),
+    NOTNULL(SymReg *r[]),
     int narg,
     int keyvec )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PMC * imcc_compile( PARROT_INTERP,
     NOTNULL(const char *s),
@@ -283,22 +285,26 @@ void IMCC_print_inc(PARROT_INTERP);
 
 /* HEADERIZER BEGIN: compilers/imcc/pcc.c */
 
-void expand_pcc_sub(
-    Parrot_Interp interp,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *ins) )
+void expand_pcc_sub( PARROT_INTERP,
+    NOTNULL(NOTNULL(IMC_Unit *unit)),
+    NOTNULL(NOTNULL(Instruction *ins)) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void expand_pcc_sub_call(
-    Parrot_Interp interp,
-    IMC_Unit *unit,
-    Instruction *ins );
+void expand_pcc_sub_call( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction *ins) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-void expand_pcc_sub_ret(
-    Parrot_Interp interp,
-    IMC_Unit *unit,
-    Instruction *ins );
+void expand_pcc_sub_ret( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction *ins) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 SymReg* get_const( PARROT_INTERP, const char *name, int type )
         __attribute__nonnull__(1);

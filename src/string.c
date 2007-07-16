@@ -2665,12 +2665,14 @@ string_compose(PARROT_INTERP, NULLOK(STRING *src))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING*
-string_join(PARROT_INTERP, NULLOK(STRING *j), PMC *ar)
+string_join(PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar))
 {
     STRING *res;
     STRING *s;
-    int i, ar_len = VTABLE_elements(interp, ar);
+    const int ar_len = VTABLE_elements(interp, ar);
+    int i;
 
     if (ar_len == 0)
         return string_make_empty(interp, enum_stringrep_one, 0);
