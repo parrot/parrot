@@ -373,8 +373,6 @@ IO_O_FILES = \
 INTERP_O_FILES = \
     $(SRC_DIR)/string$(O) \
     \
-    $(OPS_DIR)/core_ops$(O) \
-    $(OPS_DIR)/core_ops_switch$(O) \
     $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/byteorder$(O) \
     $(SRC_DIR)/charset$(O) \
@@ -440,6 +438,8 @@ INTERP_O_FILES = \
     $(SRC_DIR)/utils$(O) \
     $(SRC_DIR)/vtables$(O) \
     $(SRC_DIR)/warnings$(O) \
+    $(OPS_DIR)/core_ops$(O) \
+    $(OPS_DIR)/core_ops_switch$(O) \
     \
     $(PF_DIR)/pf_items$(O) \
     \
