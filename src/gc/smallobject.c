@@ -22,8 +22,7 @@ Handles the accessing of small object pools (header pools).
 
 /* HEADERIZER BEGIN: static */
 
-static void gc_ms_add_free_object(
-    SHIM_INTERP,
+static void gc_ms_add_free_object( SHIM_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     NOTNULL(void *to_add) )
         __attribute__nonnull__(2)

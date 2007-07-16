@@ -43,8 +43,7 @@ Parrot_default_thawfinish(PARROT_INTERP, PMC* pmc, visit_info *info);
 /* HEADERIZER HFILE: include/parrot/pmc_freeze.h */
 /* HEADERIZER BEGIN: static */
 
-static void add_pmc_next_for_GC(
-    SHIM_INTERP,
+static void add_pmc_next_for_GC( SHIM_INTERP,
     NOTNULL(PMC *pmc),
     NOTNULL(visit_info *info) )
         __attribute__nonnull__(2)

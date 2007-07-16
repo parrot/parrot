@@ -39,8 +39,7 @@ static void fixed8_set_next( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixed8_set_position(
-    SHIM_INTERP,
+static void fixed8_set_position( SHIM_INTERP,
     NOTNULL(String_iter *iter),
     UINTVAL pos )
         __attribute__nonnull__(2);
@@ -95,8 +94,7 @@ static STRING * get_codepoints_inplace( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
-static void iter_init(
-    SHIM_INTERP,
+static void iter_init( SHIM_INTERP,
     NOTNULL(const STRING *src),
     NOTNULL(String_iter *iter) )
         __attribute__nonnull__(2)

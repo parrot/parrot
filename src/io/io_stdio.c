@@ -31,8 +31,7 @@ Win32), this is I<buffered> IO, out of necessity.
 PARROT_CONST_FUNCTION
 static const char * flags_to_stdio( INTVAL flags );
 
-static INTVAL PIO_stdio_close(
-    SHIM_INTERP,
+static INTVAL PIO_stdio_close( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
@@ -43,8 +42,7 @@ static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
     INTVAL flags )
         __attribute__nonnull__(1);
 
-static INTVAL PIO_stdio_flush(
-    SHIM_INTERP,
+static INTVAL PIO_stdio_flush( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
@@ -71,22 +69,19 @@ static size_t PIO_stdio_read( PARROT_INTERP,
     STRING ** buf )
         __attribute__nonnull__(1);
 
-static PIOOFF_T PIO_stdio_seek(
-    SHIM_INTERP,
+static PIOOFF_T PIO_stdio_seek( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
-static PIOOFF_T PIO_stdio_tell(
-    SHIM_INTERP,
+static PIOOFF_T PIO_stdio_tell( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
-static size_t PIO_stdio_write(
-    SHIM_INTERP,
+static size_t PIO_stdio_write( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )

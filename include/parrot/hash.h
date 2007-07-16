@@ -117,8 +117,7 @@ HashBucket * parrot_hash_get_bucket( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * parrot_hash_get_idx(
-    SHIM_INTERP,
+void * parrot_hash_get_idx( SHIM_INTERP,
     NOTNULL(const Hash *hash),
     NOTNULL(PMC *key) )
         __attribute__nonnull__(2)
@@ -184,8 +183,7 @@ void parrot_new_hash_x(
     hash_hash_key_fn keyhash )
         __attribute__nonnull__(1);
 
-void parrot_new_pmc_hash_x(
-    SHIM_INTERP,
+void parrot_new_pmc_hash_x( SHIM_INTERP,
     NOTNULL(PMC *container),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,

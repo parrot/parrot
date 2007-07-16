@@ -641,7 +641,7 @@ emit_flush(PARROT_INTERP, NOTNULL(void *param), NOTNULL(struct _IMC_Unit *unit))
 
 PARROT_API
 int
-emit_close(PARROT_INTERP, NOTNULL(void *param))
+emit_close(PARROT_INTERP, NULLOK(void *param))
 {
     return (emitters[emitter]).close(interp, param);
 }

@@ -33,8 +33,7 @@ static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL get_byte(
-    SHIM_INTERP,
+static UINTVAL get_byte( SHIM_INTERP,
     NOTNULL(const STRING *src),
     UINTVAL offset )
         __attribute__nonnull__(2);
@@ -71,8 +70,7 @@ static STRING * get_codepoints_inplace( PARROT_INTERP,
     STRING *return_string )
         __attribute__nonnull__(1);
 
-static void iter_init(
-    SHIM_INTERP,
+static void iter_init( SHIM_INTERP,
     const STRING *src,
     NOTNULL(String_iter *iter) )
         __attribute__nonnull__(3);
@@ -135,8 +133,7 @@ static void utf8_encode_and_advance( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void utf8_set_position(
-    SHIM_INTERP,
+static void utf8_set_position( SHIM_INTERP,
     NOTNULL(String_iter *i),
     UINTVAL pos )
         __attribute__nonnull__(2);

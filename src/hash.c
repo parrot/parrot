@@ -38,8 +38,7 @@ don't apply.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int cstring_compare(
-    SHIM_INTERP,
+static int cstring_compare( SHIM_INTERP,
     NOTNULL(const char *a),
     NOTNULL(const char *b) )
         __attribute__nonnull__(2)
@@ -77,8 +76,7 @@ static int int_compare( SHIM_INTERP, const void *a, const void *b );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_cstring(
-    SHIM_INTERP,
+static size_t key_hash_cstring( SHIM_INTERP,
     NOTNULL(const void *value),
     size_t seed )
         __attribute__nonnull__(2);
@@ -100,8 +98,7 @@ static size_t key_hash_STRING( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int pointer_compare(
-    SHIM_INTERP,
+static int pointer_compare( SHIM_INTERP,
     const void * const a,
     const void * const b );
 

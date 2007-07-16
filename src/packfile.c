@@ -32,8 +32,7 @@ structure of the frozen bytecode.
 static void byte_code_destroy( SHIM_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(2);
 
-static PackFile_Segment * byte_code_new(
-    SHIM_INTERP,
+static PackFile_Segment * byte_code_new( SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
@@ -44,8 +43,7 @@ static void const_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * const_new(
-    SHIM_INTERP,
+static PackFile_Segment * const_new( SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
@@ -93,8 +91,7 @@ static void directory_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PackFile_Segment * directory_new(
-    SHIM_INTERP,
+static PackFile_Segment * directory_new( SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
@@ -154,8 +151,7 @@ static void fixup_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PackFile_Segment * fixup_new(
-    SHIM_INTERP,
+static PackFile_Segment * fixup_new( SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
@@ -201,21 +197,18 @@ static void pf_debug_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PackFile_Segment * pf_debug_new(
-    SHIM_INTERP,
+static PackFile_Segment * pf_debug_new( SHIM_INTERP,
     PackFile *pf,
     const char *name,
     int add );
 
-static opcode_t * pf_debug_pack(
-    SHIM_INTERP,
+static opcode_t * pf_debug_pack( SHIM_INTERP,
     NOTNULL(PackFile_Segment *self),
     NOTNULL(opcode_t *cursor) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t pf_debug_packed_size(
-    SHIM_INTERP,
+static size_t pf_debug_packed_size( SHIM_INTERP,
     NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(2);
 

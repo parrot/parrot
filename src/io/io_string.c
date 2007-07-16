@@ -25,8 +25,7 @@ Capture output to a string PMC.
 
 /* HEADERIZER BEGIN: static */
 
-static size_t PIO_string_read(
-    SHIM_INTERP,
+static size_t PIO_string_read( SHIM_INTERP,
     NOTNULL(ParrotIOLayer *l),
     ParrotIO *io,
     NOTNULL(STRING **buf) )

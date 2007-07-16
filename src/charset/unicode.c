@@ -256,7 +256,7 @@ upcase(PARROT_INTERP, NOTNULL(STRING *src))
         Parrot_ascii_charset_ptr->upcase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
        U_CAPI int32_t U_EXPORT2
        u_strToUpper(UChar *dest, int32_t destCapacity,
@@ -329,7 +329,7 @@ downcase(PARROT_INTERP, NOTNULL(STRING *src))
         return;
     }
 
-    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToLower(UChar *dest, int32_t destCapacity,
@@ -375,7 +375,7 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *src))
         Parrot_ascii_charset_ptr->titlecase(interp, src);
         return;
     }
-    src = Parrot_utf16_encoding_ptr->to_encodinNOTNULL(interp, src, NULL);
+    src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
 U_CAPI int32_t U_EXPORT2
 u_strToTitle(UChar *dest, int32_t destCapacity,

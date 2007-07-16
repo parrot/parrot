@@ -83,17 +83,14 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ENCODING *
-Parrot_find_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
+Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
 {
     const int n = all_encodings->n_encodings;
     int i;
-    UNUSED(interp);
 
-    for (i = 0; i < n; ++i) {
-        if (strcmp(all_encodings->enc[i].encoding->name, encodingname) == 0) {
+    for (i = 0; i < n; ++i)
+        if (strcmp(all_encodings->enc[i].encoding->name, encodingname) == 0)
             return all_encodings->enc[i].encoding;
-        }
-    }
     return NULL;
 }
 

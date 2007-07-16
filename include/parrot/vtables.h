@@ -18,8 +18,7 @@
 
 PARROT_API
 PARROT_MALLOC
-VTABLE * Parrot_clone_vtable(
-    SHIM_INTERP,
+VTABLE * Parrot_clone_vtable( SHIM_INTERP,
     NOTNULL(const VTABLE *base_vtable) )
         __attribute__nonnull__(2);
 

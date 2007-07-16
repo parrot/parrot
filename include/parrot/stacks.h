@@ -51,8 +51,7 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-Stack_entry_type get_entry_type(
-    SHIM_INTERP,
+Stack_entry_type get_entry_type( SHIM_INTERP,
     NOTNULL(const Stack_Entry_t *entry) )
         __attribute__nonnull__(2);
 

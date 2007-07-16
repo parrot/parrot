@@ -60,21 +60,18 @@ static INTVAL PIO_unix_async( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_bind(
-    SHIM_INTERP,
+static INTVAL PIO_unix_bind( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     STRING *l )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_close(
-    SHIM_INTERP,
+static INTVAL PIO_unix_close( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_connect(
-    SHIM_INTERP,
+static INTVAL PIO_unix_connect( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     NULLOK(STRING *r) )
@@ -86,8 +83,7 @@ static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
     INTVAL flags )
         __attribute__nonnull__(1);
 
-static INTVAL PIO_unix_flush(
-    SHIM_INTERP,
+static INTVAL PIO_unix_flush( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
@@ -97,8 +93,7 @@ static INTVAL PIO_unix_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
         __attribute__nonnull__(2);
 
 static INTVAL PIO_unix_isatty( PIOHANDLE fd );
-static INTVAL PIO_unix_listen(
-    SHIM_INTERP,
+static INTVAL PIO_unix_listen( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     INTVAL sec )
@@ -118,8 +113,7 @@ static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
     int flags )
         __attribute__nonnull__(1);
 
-static INTVAL PIO_unix_poll(
-    SHIM_INTERP,
+static INTVAL PIO_unix_poll( SHIM_INTERP,
     ParrotIOLayer *l,
     NOTNULL(ParrotIO *io),
     int which,
@@ -141,16 +135,14 @@ static INTVAL PIO_unix_recv( PARROT_INTERP,
     STRING **s )
         __attribute__nonnull__(1);
 
-static PIOOFF_T PIO_unix_seek(
-    SHIM_INTERP,
+static PIOOFF_T PIO_unix_seek( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_send(
-    SHIM_INTERP,
+static INTVAL PIO_unix_send( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )
@@ -164,14 +156,12 @@ static ParrotIO * PIO_unix_socket( PARROT_INTERP,
     int proto )
         __attribute__nonnull__(1);
 
-static PIOOFF_T PIO_unix_tell(
-    SHIM_INTERP,
+static PIOOFF_T PIO_unix_tell( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
-static size_t PIO_unix_write(
-    SHIM_INTERP,
+static size_t PIO_unix_write( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )

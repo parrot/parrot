@@ -105,9 +105,8 @@ INTVAL Parrot_encoding_number_of_str( PARROT_INTERP, NOTNULL(STRING *src) )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-ENCODING * Parrot_find_encoding( PARROT_INTERP,
+ENCODING * Parrot_find_encoding( SHIM_INTERP,
     NOTNULL(const char *encodingname) )
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -130,8 +129,7 @@ ENCODING * Parrot_load_encoding( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL Parrot_make_default_encoding(
-    SHIM_INTERP,
+INTVAL Parrot_make_default_encoding( SHIM_INTERP,
     const char *encodingname,
     NOTNULL(ENCODING *encoding) )
         __attribute__nonnull__(3);

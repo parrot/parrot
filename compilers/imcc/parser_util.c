@@ -74,20 +74,20 @@ static const char * to_infix( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static const char * try_rev_cmp(
-    SHIM_INTERP,
+static const char * try_rev_cmp( SHIM_INTERP,
     IMC_Unit * unit,
     const char *name,
     SymReg ** r );
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction * var_arg_ins( PARROT_INTERP,
-    IMC_Unit * unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
     int n,
     int emit )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -114,11 +114,10 @@ static INTVAL eval_nr = 0;
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
-        NOTNULL(char *type), NOTNULL(SymReg *init), int emit)
+        NOTNULL(char *type), NULLOK(SymReg *init), int emit)
 {
     char fmt[256];
     SymReg *regs[3];
@@ -410,7 +409,7 @@ is_infix(NOTNULL(const char *name), int n, NOTNULL(SymReg **r))
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction *
-var_arg_ins(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
+var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         NOTNULL(SymReg **r), int n, int emit)
 {
     int op;
@@ -445,11 +444,10 @@ var_arg_ins(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
  * s. e.g. imc.c for usage
  */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
 INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
-        NOTNULL(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
+        NULLOK(const char *fmt), NOTNULL(SymReg **r), int n, int keyvec, int emit)
 {
     char fullname[64];
     int i;
@@ -1122,11 +1120,10 @@ try_rev_cmp(SHIM_INTERP, SHIM(IMC_Unit * unit), const char *name,
 }
 
 Instruction *
-multi_keyed(PARROT_INTERP, IMC_Unit * unit, char *name,
-            SymReg ** r, int nr, int keyvec, int emit)
+multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
+            NOTNULL(SymReg **r), int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;
-    char buf[16];
     static int p = 0;
     SymReg *preg[3];    /* px,py,pz */
     SymReg *nreg[3];
@@ -1152,6 +1149,7 @@ multi_keyed(PARROT_INTERP, IMC_Unit * unit, char *name,
 
     kv = keyvec;
     for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
+        char buf[16];
         if (kv & 1) {
             IMCC_fataly(interp, E_SyntaxError,
                 "illegal key operand\n");

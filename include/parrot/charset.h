@@ -120,8 +120,7 @@ CHARSET * Parrot_find_charset( SHIM_INTERP, NOTNULL(const char *charsetname) )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-charset_converter_t Parrot_find_charset_converter(
-    SHIM_INTERP,
+charset_converter_t Parrot_find_charset_converter( SHIM_INTERP,
     NOTNULL(CHARSET *lhs),
     NOTNULL(CHARSET *rhs) )
         __attribute__nonnull__(2)
@@ -141,8 +140,7 @@ CHARSET * Parrot_load_charset( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL Parrot_make_default_charset(
-    SHIM_INTERP,
+INTVAL Parrot_make_default_charset( SHIM_INTERP,
     const char *charsetname,
     NOTNULL(CHARSET *charset) )
         __attribute__nonnull__(3);
@@ -162,8 +160,7 @@ INTVAL Parrot_register_charset( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_register_charset_converter(
-    SHIM_INTERP,
+void Parrot_register_charset_converter( SHIM_INTERP,
     NOTNULL(CHARSET *lhs),
     NOTNULL(CHARSET *rhs),
     NOTNULL(charset_converter_t func) )

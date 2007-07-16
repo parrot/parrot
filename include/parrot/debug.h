@@ -199,8 +199,7 @@ void PDB_delete_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_delete_condition(
-    SHIM_INTERP,
+void PDB_delete_condition( SHIM_INTERP,
     NOTNULL(PDB_breakpoint_t *breakpoint) )
         __attribute__nonnull__(2);
 

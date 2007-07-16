@@ -105,8 +105,7 @@ void key_set_pmc( PARROT_INTERP, NOTNULL(PMC *key), PMC *value )
         __attribute__nonnull__(2);
 
 PARROT_API
-void key_set_register(
-    SHIM_INTERP,
+void key_set_register( SHIM_INTERP,
     NOTNULL(PMC *key),
     INTVAL value,
     INTVAL flag )

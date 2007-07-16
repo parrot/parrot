@@ -115,8 +115,7 @@ static INTVAL PIO_buf_setlinebuf( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static PIOOFF_T PIO_buf_tell(
-    SHIM_INTERP,
+static PIOOFF_T PIO_buf_tell( SHIM_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);

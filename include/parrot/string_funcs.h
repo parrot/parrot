@@ -48,8 +48,7 @@ STRING * Parrot_make_COW_reference( PARROT_INTERP, NULLOK(STRING *s) )
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-STRING* Parrot_reuse_COW_reference(
-    SHIM_INTERP,
+STRING* Parrot_reuse_COW_reference( SHIM_INTERP,
     NOTNULL(STRING *s),
     NOTNULL(STRING *d) )
         __attribute__nonnull__(2)
@@ -330,8 +329,7 @@ STRING * string_make_empty( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_max_bytes(
-    SHIM_INTERP,
+INTVAL string_max_bytes( SHIM_INTERP,
     NOTNULL(const STRING *s),
     INTVAL nchars )
         __attribute__nonnull__(2);
@@ -369,8 +367,7 @@ STRING* string_printf( PARROT_INTERP, NOTNULL(const char *format), ... )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-CHARSET * string_rep_compatible(
-    SHIM_INTERP,
+CHARSET * string_rep_compatible( SHIM_INTERP,
     NOTNULL(const STRING *a),
     NOTNULL(const STRING *b),
     NOTNULL(ENCODING **e) )

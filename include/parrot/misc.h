@@ -30,8 +30,7 @@ typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
 /* HEADERIZER BEGIN: src/utils.c */
 
 PARROT_API
-INTVAL Parrot_byte_index(
-    SHIM_INTERP,
+INTVAL Parrot_byte_index( SHIM_INTERP,
     NOTNULL(const STRING *base),
     NOTNULL(const STRING *search),
     UINTVAL start_offset )
@@ -40,8 +39,7 @@ INTVAL Parrot_byte_index(
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_byte_rindex(
-    SHIM_INTERP,
+INTVAL Parrot_byte_rindex( SHIM_INTERP,
     NOTNULL(const STRING *base),
     NOTNULL(const STRING *search),
     UINTVAL start_offset )

@@ -231,7 +231,7 @@ sub make_function_decls {
             $decl = "$decl $argline )";
         }
         else {
-            if ( $args[0] =~ /^(PARROT_INTERP|Interp)\b/ ) {
+            if ( $args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
                 $decl .= " " . (shift @args);
                 $decl .= "," if @args;
             }
