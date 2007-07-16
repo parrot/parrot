@@ -96,6 +96,7 @@ clean: testclean
     $(PMCDIR)/*.lib \
     $(PMCDIR)/*.exp \
     $(PMCDIR)/*.ilk \
+    $(PMCDIR)/*.manifest \
     $(PMCDIR)/*$(O) \
     $(PMCDIR)/*$(LOAD_EXT)
 

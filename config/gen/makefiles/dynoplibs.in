@@ -32,7 +32,7 @@ testclean :
 # win32 exported functions and data items
 # win32 export definition files
 dynext-clean :
-	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def"
+	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def" "*.manifest"
 
 clean : testclean dynext-clean
 	$(RM_F) "*.h" "*.c" "*$(LOAD_EXT)" "*$(O)"
