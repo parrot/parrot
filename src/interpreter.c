@@ -57,11 +57,14 @@ static void dynop_register_xx( PARROT_INTERP,
     oplib_init_f init_func )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static oplib_init_f get_op_lib_init( PARROT_INTERP,
     int core_op,
     int which,
-    PMC *lib )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *lib) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 static void init_prederef( PARROT_INTERP, int which )
         __attribute__nonnull__(1);
@@ -318,8 +321,10 @@ C<ParrotLibrary> PMC.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_op_lib_init(PARROT_INTERP, int core_op, int which, PMC *lib)
+get_op_lib_init(PARROT_INTERP, int core_op, int which, NOTNULL(PMC *lib))
 {
     if (core_op) {
         oplib_init_f init_func;
@@ -344,9 +349,7 @@ get_op_lib_init(PARROT_INTERP, int core_op, int which, PMC *lib)
                 init_func = PARROT_CORE_OPLIB_INIT;
                 break;
             default:
-                init_func = NULL;
                 real_exception(interp, NULL, 1, "Couldn't find init_func for core %d", which);
-                break;
         }
         return init_func;
     }

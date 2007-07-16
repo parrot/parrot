@@ -131,9 +131,11 @@ static int end_cycle_cb( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static void gc_gms_add_free_object( PARROT_INTERP,
-    Small_Object_Pool *pool,
-    void *to_add )
-        __attribute__nonnull__(1);
+    NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(void *to_add) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void gc_gms_alloc_objects( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
@@ -461,7 +463,8 @@ Run a GC cycle or allocate new objects for the given pool.
 */
 
 static void
-gc_gms_add_free_object(PARROT_INTERP, Small_Object_Pool *pool, void *to_add)
+gc_gms_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+        NOTNULL(void *to_add))
 {
     real_exception(interp, NULL, 1, "gms abuse");
 }

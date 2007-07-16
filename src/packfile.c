@@ -42,6 +42,8 @@ static void const_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * const_new(
     SHIM_INTERP,
     PackFile *pf,
@@ -131,6 +133,8 @@ static PackFile_Constant ** find_constants( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PackFile_FixupEntry * find_fixup(
     NOTNULL(PackFile_FixupTable *ft),
     INTVAL type,
@@ -166,9 +170,11 @@ static size_t fixup_packed_size( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t * fixup_unpack( PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    opcode_t *cursor )
+    NULLOK(opcode_t *cursor) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -2653,8 +2659,10 @@ Returns one (1) if everything is OK, else zero (0).
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t *
-fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
+fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(opcode_t *cursor))
 {
     opcode_t i;
     PackFile *pf;
@@ -2662,7 +2670,7 @@ fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
 
     if (!self) {
         PIO_eprintf(interp, "PackFile_FixupTable_unpack: self == NULL!\n");
-        return 0;
+        return NULL;
     }
 
     PackFile_FixupTable_clear(interp, self);
@@ -2679,7 +2687,7 @@ fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
                     "PackFile_FixupTable_unpack: Could not allocate "
                     "memory for array!\n");
             self->fixup_count = 0;
-            return 0;
+            return NULL;
         }
     }
 
@@ -2700,7 +2708,7 @@ fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
                 PIO_eprintf(interp,
                         "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
                         entry->type);
-                return 0;
+                return NULL;
         }
     }
 
@@ -2756,6 +2764,8 @@ Finds the fix-up entry for C<name> and returns it.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PackFile_FixupEntry *
 find_fixup(NOTNULL(PackFile_FixupTable *ft), INTVAL type, NOTNULL(const char *name))
 {
@@ -2807,6 +2817,8 @@ I<What does this do?>
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry *
 PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
 {
@@ -2872,6 +2884,8 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg),
                            opcode_t *cursor)
@@ -2905,7 +2919,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg),
                 "PackFile_ConstTable_unpack: Could not allocate "
                 "memory for array!\n");
         self->const_count = 0;
-        return 0;
+        return NULL;
     }
 
     for (i = 0; i < self->const_count; i++) {
@@ -2935,6 +2949,8 @@ Returns a new C<PackFile_ConstTable> segment.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
 const_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))
 {
@@ -2972,6 +2988,8 @@ This is only here so we can make a new one and then do an unpack.
 */
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 PackFile_Constant *
 PackFile_Constant_new(SHIM_INTERP)
 {
@@ -2995,7 +3013,7 @@ Don't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
 
 PARROT_API
 void
-PackFile_Constant_destroy(SHIM_INTERP, PackFile_Constant *self)
+PackFile_Constant_destroy(SHIM_INTERP, NULLOK(PackFile_Constant *self))
 {
     mem_sys_free(self);
 }
@@ -3010,6 +3028,7 @@ Constant into a contiguous region of memory.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 size_t
 PackFile_Constant_pack_size(PARROT_INTERP, NOTNULL(PackFile_Constant *self))
 {
@@ -3072,10 +3091,11 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
-PackFile_Constant_unpack(PARROT_INTERP,
-                         PackFile_ConstTable *constt,
-                         NOTNULL(PackFile_Constant *self), opcode_t *cursor)
+PackFile_Constant_unpack(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt),
+        NOTNULL(PackFile_Constant *self), NOTNULL(opcode_t *cursor))
 {
     PackFile * const pf = constt->base.pf;
     const opcode_t type = PF_fetch_opcode(pf, &cursor);
@@ -3110,7 +3130,7 @@ PackFile_Constant_unpack(PARROT_INTERP,
         PIO_eprintf(NULL,
                 "Constant_unpack: Unrecognized type '%c' during unpack!\n",
                 (char)type);
-        return 0;
+        return NULL;
     }
     return cursor;
 }

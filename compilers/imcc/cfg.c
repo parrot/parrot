@@ -25,11 +25,12 @@ static void analyse_life_block( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void analyse_life_symbol(
-    Parrot_Interp interp,
+static void analyse_life_symbol( PARROT_INTERP,
     NOTNULL(const struct _IMC_Unit *unit),
-    SymReg* r )
-        __attribute__nonnull__(2);
+    NOTNULL(SymReg* r) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void bb_add_edge(
     NOTNULL(IMC_Unit *unit),
@@ -39,17 +40,17 @@ static void bb_add_edge(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void bb_check_set_addr(
-    Parrot_Interp interp,
+static void bb_check_set_addr( PARROT_INTERP,
     IMC_Unit * unit,
     Basic_block *bb,
-    SymReg *label );
+    SymReg *label )
+        __attribute__nonnull__(1);
 
-static void bb_findadd_edge(
-    Parrot_Interp interp,
+static void bb_findadd_edge( PARROT_INTERP,
     IMC_Unit * unit,
     Basic_block *from,
-    SymReg *label );
+    SymReg *label )
+        __attribute__nonnull__(1);
 
 static void bb_remove_edge( NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge) )
         __attribute__nonnull__(1)
@@ -223,7 +224,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
 }
 
 static void
-bb_check_set_addr(Parrot_Interp interp, IMC_Unit * unit,
+bb_check_set_addr(PARROT_INTERP, IMC_Unit * unit,
         Basic_block *bb, SymReg *label)
 {
     const Instruction *ins;
@@ -379,7 +380,7 @@ invok:
 /* find the placement of the label, and link the two nodes */
 
 static void
-bb_findadd_edge(Parrot_Interp interp, IMC_Unit * unit,
+bb_findadd_edge(PARROT_INTERP, IMC_Unit * unit,
                 Basic_block *from, SymReg *label)
 {
     Instruction *ins;
@@ -536,7 +537,8 @@ life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 }
 
 static void
-analyse_life_symbol(Parrot_Interp interp, NOTNULL(const struct _IMC_Unit *unit), SymReg* r)
+analyse_life_symbol(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit),
+        NOTNULL(SymReg* r))
 {
     int i;
 

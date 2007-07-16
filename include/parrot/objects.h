@@ -128,9 +128,10 @@ void Parrot_instantiate_object_init( PARROT_INTERP,
 
 PARROT_API
 void Parrot_invalidate_method_cache( PARROT_INTERP,
-    STRING *_class,
-    STRING *meth )
-        __attribute__nonnull__(1);
+    NULLOK(STRING *_class),
+    NOTNULL(STRING *meth) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_PURE_FUNCTION
@@ -144,9 +145,11 @@ const char* Parrot_MMD_method_name( SHIM_INTERP, INTVAL idx );
 
 PARROT_API
 PMC * Parrot_multi_subclass( PARROT_INTERP,
-    PMC *base_class_array,
-    STRING *child_class_name )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *base_class_array),
+    NOTNULL(STRING *child_class_name) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_new_class( PARROT_INTERP, PMC *_class, PMC *name )
@@ -161,14 +164,20 @@ void Parrot_note_method_offset( PARROT_INTERP, UINTVAL offset, PMC *method )
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_object_isa( PARROT_INTERP, PMC *pmc, PMC *_class )
-        __attribute__nonnull__(1);
+INTVAL Parrot_object_isa( PARROT_INTERP,
+    NOTNULL(PMC *pmc),
+    NOTNULL(PMC *_class) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PMC * Parrot_remove_parent( PARROT_INTERP,
-    PMC *removed_class,
-    PMC *existing_class )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *removed_class),
+    NOTNULL(PMC *existing_class) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_set_attrib_by_num( PARROT_INTERP,

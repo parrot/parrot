@@ -110,9 +110,10 @@ void * parrot_pic_opcode( PARROT_INTERP, INTVAL op )
 
 void parrot_PIC_prederef( PARROT_INTERP,
     opcode_t op,
-    void **pc_pred,
+    NOTNULL(void **pc_pred),
     int core )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/pic.c */
 

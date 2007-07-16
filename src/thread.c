@@ -54,7 +54,7 @@ Parrot_clone() depends on freezing).
 */
 
 static PMC *
-make_local_copy(PARROT_INTERP, Parrot_Interp from, PMC *arg)
+make_local_copy(PARROT_INTERP, NOTNULL(Parrot_Interp from), NULLOK(PMC *arg))
 {
     PMC            *ret_val;
     STRING * const  _sub       = interp->vtables[enum_class_Sub]->whoami;
@@ -68,7 +68,7 @@ make_local_copy(PARROT_INTERP, Parrot_Interp from, PMC *arg)
     }
     else if (VTABLE_isa(from, arg, _multi_sub)) {
         INTVAL i = 0;
-        INTVAL n = VTABLE_elements(from, arg);
+        const INTVAL n = VTABLE_elements(from, arg);
         ret_val  = pmc_new(interp, enum_class_MultiSub);
 
         for (i = 0; i < n; ++i) {
@@ -1054,7 +1054,7 @@ Join (wait for) a joinable thread.
 */
 
 PMC*
-pt_thread_join(Parrot_Interp parent, UINTVAL tid)
+pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
 {
     int           state;
     Parrot_Interp interp;

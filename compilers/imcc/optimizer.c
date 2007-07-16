@@ -69,10 +69,13 @@
 /* HEADERIZER BEGIN: static */
 
 static int _is_ins_save(
-    IMC_Unit * unit,
-    Instruction *check_ins,
-    SymReg *r,
-    int what );
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction *check_ins),
+    NOTNULL(SymReg *r),
+    int what )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static int branch_branch( PARROT_INTERP, NOTNULL(IMC_Unit * unit) )
         __attribute__nonnull__(1)
@@ -91,12 +94,18 @@ static int branch_cond_loop_swap( PARROT_INTERP,
 static int branch_reorg( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
 
-static int check_clone(
-    Parrot_Interp interp,
-    IMC_Unit * unit,
-    Instruction *ins );
+PARROT_WARN_UNUSED_RESULT
+static int check_clone( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction *ins) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static int clone_remove( Parrot_Interp interp, IMC_Unit * unit );
+static int clone_remove( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int constant_propagation( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
 
@@ -106,36 +115,52 @@ static int dead_code_remove( PARROT_INTERP, IMC_Unit * unit )
 static int eval_ins( PARROT_INTERP, char *op, size_t ops, SymReg **r )
         __attribute__nonnull__(1);
 
-static Basic_block * find_outer( IMC_Unit * unit, Basic_block * blk );
+static Basic_block * find_outer(
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Basic_block *blk) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int if_branch( PARROT_INTERP, IMC_Unit *unit )
         __attribute__nonnull__(1);
 
-static int is_ins_save(
-    Parrot_Interp interp,
-    IMC_Unit * unit,
-    Instruction *ins,
-    SymReg *r,
-    int what );
+PARROT_WARN_UNUSED_RESULT
+static int is_ins_save( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction *ins),
+    NOTNULL(SymReg *r),
+    int what )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static int is_invariant(
-    Parrot_Interp interp,
-    IMC_Unit * unit,
-    Instruction *ins );
+static int is_invariant( PARROT_INTERP,
+    NOTNULL(IMC_Unit * unit),
+    NOTNULL(Instruction *ins) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static int loop_one( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int loop_optimization( PARROT_INTERP, IMC_Unit * unit )
-        __attribute__nonnull__(1);
-
-static int max_loop_depth( IMC_Unit * unit );
-static int move_ins_out( PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    Instruction **ins,
-    Basic_block *bb )
+static int loop_optimization( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static int max_loop_depth( NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1);
+
+static int move_ins_out( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction **ins),
+    NOTNULL(Basic_block *bb) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 static int strength_reduce( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
@@ -143,7 +168,10 @@ static int strength_reduce( PARROT_INTERP, IMC_Unit * unit )
 static int unused_label( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
 
-static int used_once( Parrot_Interp interp, IMC_Unit * unit );
+static int used_once( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 #if DO_LOOP_OPTIMIZATION
 static int loop_optimization(Interp *, IMC_Unit *);
@@ -749,6 +777,8 @@ eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
  *              if_ic_ic    => branch_ic / delete
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 Instruction *
 IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
         SymReg **r, int n, NOTNULL(int *ok))
@@ -1311,13 +1341,13 @@ dead_code_remove(PARROT_INTERP, IMC_Unit * unit)
 
 /* optimizations with CFG & life info built */
 static int
-used_once(Parrot_Interp interp, IMC_Unit * unit)
+used_once(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins;
-    SymReg * r;
     int opt = 0;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
+        SymReg *r;
         if (!ins->r)
             continue;
         r = ins->r[0];
@@ -1341,8 +1371,8 @@ static int reason;
 enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
 
 static int
-_is_ins_save(IMC_Unit * unit, Instruction *check_ins,
-        SymReg *r, int what)
+_is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
+        NOTNULL(SymReg *r), int what)
 {
     Instruction *ins;
     int bb;
@@ -1429,9 +1459,10 @@ _is_ins_save(IMC_Unit * unit, Instruction *check_ins,
     return what == CHK_CLONE ? 1 : (reason=10,0);
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
-is_ins_save(Parrot_Interp interp, IMC_Unit * unit,
-            Instruction *ins, SymReg *r, int what)
+is_ins_save(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
+            NOTNULL(Instruction *ins), NOTNULL(SymReg *r), int what)
 {
     int save;
 
@@ -1446,7 +1477,7 @@ is_ins_save(Parrot_Interp interp, IMC_Unit * unit,
 
 #if DO_LOOP_OPTIMIZATION
 static int
-max_loop_depth(IMC_Unit * unit)
+max_loop_depth(NOTNULL(IMC_Unit *unit))
 {
     int i, d;
     d = 0;
@@ -1457,7 +1488,7 @@ max_loop_depth(IMC_Unit * unit)
 }
 
 static int
-is_invariant(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
+is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))
 {
     int ok = 0;
     int what = 0;
@@ -1480,7 +1511,7 @@ is_invariant(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 #  define MOVE_INS_1_BL
 #  ifdef MOVE_INS_1_BL
 static Basic_block *
-find_outer(IMC_Unit * unit, Basic_block * blk)
+find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
 {
     int bb = blk->index;
     int i;
@@ -1499,7 +1530,7 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
 /* move the instruction ins before loop in bb */
 static int
 move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
-                     Instruction **ins, Basic_block *bb)
+        NOTNULL(Instruction **ins), NOTNULL(Basic_block *bb))
 {
     Basic_block *pred;
     Instruction * next, *out;
@@ -1567,7 +1598,7 @@ loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
 }
 
 static int
-loop_optimization(PARROT_INTERP, IMC_Unit * unit)
+loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int l, bb, loop_depth;
     int changed = 0;
@@ -1597,8 +1628,9 @@ loop_optimization(PARROT_INTERP, IMC_Unit * unit)
 }
 #endif
 
+PARROT_WARN_UNUSED_RESULT
 static int
-check_clone(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
+check_clone(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
     SymReg * rl = ins->r[0];
     SymReg * rr = ins->r[1];
@@ -1613,7 +1645,7 @@ check_clone(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 }
 
 static int
-clone_remove(Parrot_Interp interp, IMC_Unit * unit)
+clone_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins;
     int changes = 0;

@@ -20,8 +20,10 @@ Handles getting of various headers, and pool creation.
 
 /* HEADERIZER BEGIN: static */
 
-static void fix_pmc_syncs( Interp *dest_interp,
+static void fix_pmc_syncs(
+    NOTNULL(Interp *dest_interp),
     NOTNULL(Small_Object_Pool *pool) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void free_pool( NOTNULL(Small_Object_Pool *pool) )
@@ -740,7 +742,7 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 }
 
 static void
-fix_pmc_syncs(Interp *dest_interp, NOTNULL(Small_Object_Pool *pool))
+fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))
 {
     /* XXX largely copied from dod_sweep */
     Small_Object_Arena *cur_arena;

@@ -45,12 +45,14 @@ static void fixed8_set_position(
     UINTVAL pos )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL get_byte( PARROT_INTERP,
     NOTNULL(const STRING *source_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * get_bytes( PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -58,20 +60,24 @@ static STRING * get_bytes( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * get_bytes_inplace( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
     NOTNULL(STRING *return_string) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL get_codepoint( PARROT_INTERP,
     NOTNULL(const STRING *source_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * get_codepoints( PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -79,15 +85,23 @@ static STRING * get_codepoints( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static STRING * get_codepoints_inplace( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
     NOTNULL(STRING *dest_string) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
-static void iter_init( SHIM_INTERP, const STRING *src, String_iter *iter );
+static void iter_init(
+    SHIM_INTERP,
+    NOTNULL(const STRING *src),
+    NOTNULL(String_iter *iter) )
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void set_byte( PARROT_INTERP,
     NOTNULL(const STRING *source_string),
     UINTVAL offset,
@@ -105,19 +119,22 @@ static void set_bytes( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 static void set_codepoint( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL codepoint )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_codepoints( PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    STRING *new_codepoints )
+    NOTNULL(STRING *new_codepoints) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
+PARROT_DOES_NOT_RETURN
 static STRING * to_encoding( PARROT_INTERP, STRING *src, STRING *dest )
         __attribute__nonnull__(1);
 
@@ -125,18 +142,16 @@ static STRING * to_encoding( PARROT_INTERP, STRING *src, STRING *dest )
 
 #define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl fixed_8")
 
+PARROT_DOES_NOT_RETURN
 static STRING *
-to_encoding(PARROT_INTERP, STRING *src, STRING *dest)
+to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))
 {
     UNIMPL;
-    UNUSED(interp);
-    UNUSED(src);
-    UNUSED(dest);
-    return NULL;
 }
 
 
 /* codepoints are bytes, so delegate */
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *source_string),
         UINTVAL offset)
@@ -146,12 +161,13 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *source_string),
 
 /* This is the same as set byte */
 static void
-set_codepoint(PARROT_INTERP, STRING *source_string,
+set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL codepoint)
 {
     set_byte(interp, source_string, offset, codepoint);
 }
 
+PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 get_byte(PARROT_INTERP, NOTNULL(const STRING *source_string), UINTVAL offset)
 {
@@ -178,6 +194,7 @@ set_byte(PARROT_INTERP, NOTNULL(const STRING *source_string),
 }
 
 /* Delegate to get_bytes */
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
@@ -188,6 +205,7 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
     return return_string;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
@@ -208,8 +226,9 @@ get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 
 /* Delegate to get_bytes */
+PARROT_WARN_UNUSED_RESULT
 static STRING *
-get_codepoints_inplace(PARROT_INTERP, STRING *source_string,
+get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))
 {
 
@@ -217,8 +236,9 @@ get_codepoints_inplace(PARROT_INTERP, STRING *source_string,
             count, dest_string);
 }
 
+PARROT_WARN_UNUSED_RESULT
 static STRING *
-get_bytes_inplace(PARROT_INTERP, STRING *source_string,
+get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *return_string))
 {
     Parrot_reuse_COW_reference(interp, source_string, return_string);
@@ -235,7 +255,7 @@ get_bytes_inplace(PARROT_INTERP, STRING *source_string,
 /* Delegate to set_bytes */
 static void
 set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL count, STRING *new_codepoints)
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_codepoints))
 {
     set_bytes(interp, source_string, offset, count, NOTNULL(new_codepoints));
 }
@@ -250,10 +270,8 @@ set_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
 static void
-become_encoding(PARROT_INTERP, STRING *source_string)
+become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    UNUSED(interp);
-    UNUSED(source_string);
     UNIMPL;
 }
 
@@ -298,7 +316,7 @@ fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)
 
 
 static void
-iter_init(SHIM_INTERP, const STRING *src, String_iter *iter)
+iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 {
     iter->str = src;
     iter->bytepos = iter->charpos = 0;

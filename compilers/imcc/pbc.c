@@ -132,7 +132,9 @@ static int get_old_size( PARROT_INTERP, NOTNULL(int *ins_line) )
         __attribute__nonnull__(2);
 
 static void imcc_globals_destroy( SHIM_INTERP, int ex, void *param );
-static void make_new_sub( IMC_Unit *unit );
+static void make_new_sub( NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1);
+
 static void make_pmc_const( PARROT_INTERP, NOTNULL(SymReg *r) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -296,7 +298,7 @@ make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 /* allocate a new globals.cs->subs structure */
 static void
-make_new_sub(IMC_Unit *unit)
+make_new_sub(NOTNULL(IMC_Unit *unit))
 {
     subs_t * const s = mem_allocate_zeroed_typed(subs_t);
 

@@ -70,10 +70,6 @@ lookup of the cache has to be done in the opcode itself.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -275,14 +271,15 @@ parrot_PIC_op_is_cached(int op_code)
 
 /*
 
-=item C<Parrot_MIC* parrot_PIC_alloc_mic(Interp*, size_t n);>
+FUNCDOC: parrot_PIC_alloc_mic
 
-=item C<Parrot_MIC* parrot_PIC_alloc_pic(Interp*);>
-
-Allocate a new PIC or MIC structure for the C<n>th cached opcode in this
+Allocate a new MIC structure for the C<n>th cached opcode in this
 bytecode segement.
 
-=cut
+FUNCDOC: parrot_PIC_alloc_pic
+
+Allocate a new PIC structure for the C<n>th cached opcode in this
+bytecode segement.
 
 */
 
@@ -625,18 +622,15 @@ is_pic_func(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC *mic), int cor
 
 /*
 
-=item C<void parrot_PIC_prederef(Interp *, opcode_t op,
-                                 void **pc_pred, int type)>
+FUNCDOC: parrot_PIC_prederef
 
 Define either the normal prederef function or the PIC stub, if PIC for
 this opcode function is available. Called from C<do_prederef>.
 
-=cut
-
 */
 
 void
-parrot_PIC_prederef(PARROT_INTERP, opcode_t op, void **pc_pred, int core)
+parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int core)
 {
     op_func_t * const prederef_op_func = interp->op_lib->op_func_table;
     opcode_t * const cur_opcode = (opcode_t*)pc_pred;
@@ -788,8 +782,6 @@ parrot_pic_find_infix_v_pp(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right
 
 /*
 
-=back
-
 =head1 AUTHOR
 
 Leopold Toetsch with many hints from Ken Fox.
@@ -798,8 +790,6 @@ Leopold Toetsch with many hints from Ken Fox.
 
 F<src/mmd.c>, F<src/object.c>, F<src/interpreter.c>, F<ops/core_ops_cgp.c>,
 F<include/parrot/pic.h>, F<ops/pic.ops>
-
-=cut
 
 */
 

@@ -99,7 +99,9 @@ void graph_coloring_reg_alloc( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int ig_test( int i, int j, int N, unsigned int* graph );
+int ig_test( int i, int j, int N, NOTNULL(unsigned int *graph) )
+        __attribute__nonnull__(4);
+
 void imc_reg_alloc( PARROT_INTERP, NULLOK(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
