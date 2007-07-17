@@ -4,10 +4,6 @@
 #include "tableinfo.h"
 #include "structures.h"
 
-/* ugly, just fix linking, not functional */
-/* How replace Parrot_ManagedPointer_load_pmc calls ? */
-#define Parrot_ManagedPointer_load_pmc(INTERP, SELF)    NULL
-
 
 pmclass ManagedPointer dynpmc group dotnet_runtime {
 
@@ -539,7 +535,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
 
     PMC* get_attr(INTVAL idx)
     {
-        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        PMC *ref = SELF.load_pmc();
         if (ref)
             return VTABLE_get_attr(INTERP, ref, idx);
         else
@@ -548,7 +544,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
 
     PMC* get_attr_str(STRING* idx)
     {
-        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        PMC *ref = SELF.load_pmc();
         if (ref)
             return VTABLE_get_attr_str(INTERP, ref, idx);
         else
@@ -557,14 +553,14 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
 
     void set_attr(INTVAL idx, PMC* value)
     {
-        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        PMC *ref = SELF.load_pmc();
         if (ref)
             VTABLE_set_attr(INTERP, ref, idx, value);
     }
 
     void set_attr_str(STRING* idx, PMC* value)
     {
-        PMC *ref = Parrot_ManagedPointer_load_pmc(INTERP, SELF);
+        PMC *ref = SELF.load_pmc();
         if (ref)
             VTABLE_set_attr_str(INTERP, ref, idx, value);
     }
