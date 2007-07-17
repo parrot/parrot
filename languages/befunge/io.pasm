@@ -1,26 +1,22 @@
 # $Id$
 
 # String mode.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ...
 #   after:      ... c
 # i = ord(current char)
 IO_PUSH_CHAR:
-        pushi
         ord I10, S0
         push P2, I10
-        popi
         branch MOVE_PC
 
 # Input integer.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ...
-#   after:      ... i                                   
+#   after:      ... i
 # i = readint()
 IO_INPUT_INT:
         save S2
-        pushi
-        pushs
         restore S2
         length I10, S2
         gt I10, 0, IO_INPUT_INT_PARSE_INPUT
@@ -42,19 +38,15 @@ IO_INPUT_INT_NEXT_CHAR:
 IO_INPUT_INT_NAN:
         substr S2, S2, I11, I10
         push P2, S10
-        pops
-        popi
         branch MOVE_PC
 
 # Input character.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ...
 #   after:      ... c
 # c = getchar()
 IO_INPUT_CHAR:
         save S2
-        pushi
-        pushs
         restore S2
         length I10, S2
         gt I10, 0, IO_INPUT_CHAR_SUBSTR
@@ -67,52 +59,43 @@ IO_INPUT_CHAR_SUBSTR:
         ord I10, S10
         push P2, I10
         save S2
-        pops
         restore S2
-        popi
         branch MOVE_PC
-                             
+
 # Output integer.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ... i
-#   after:      ...                                   
+#   after:      ...
 # writeint(i)
 IO_OUTPUT_INT:
-        pushi
         set I10, P2
         unless I10, IO_OUTPUT_INT_POP_1
         pop I10, P2
-IO_OUTPUT_INT_POP_1:    
+IO_OUTPUT_INT_POP_1:
         print I10
         print " "
-        popi
         branch MOVE_PC
 
 # Output character.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ... i
 #   after:      ...
 # writechar( chr(i) )
 IO_OUTPUT_CHAR:
-        pushi
-        pushs
         set I10, P2
         unless I10, IO_OUTPUT_CHAR_POP_1
         pop I10, P2
-IO_OUTPUT_CHAR_POP_1:   
+IO_OUTPUT_CHAR_POP_1:
         chr S10, I10
         print S10
-        popi
-        pops
         branch MOVE_PC
-                             
+
 # Get a value from playfield.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ... x y
 #   after:      ... i
-# i = value_at(x,y)                                
+# i = value_at(x,y)
 IO_GET_VALUE:
-        pushi
         set I11, P2
         unless I11, IO_GET_VALUE_POP_1
         pop I11, P2
@@ -123,20 +106,18 @@ IO_GET_VALUE_POP_1:
 IO_GET_VALUE_POP_2:
         set I12, P1[I11;I10]
         push P2, I12
-        popi
         branch MOVE_PC
-        
+
 # Put a value in the playfield.
-# Befunge stack:        
+# Befunge stack:
 #   before:     ... i x y
 #   after:      ...
-# value_at(x,y) = i                                
+# value_at(x,y) = i
 IO_PUT_VALUE:
-        pushi
         set I11, P2
         unless I11, IO_PUT_VALUE_POP_1
         pop I11, P2
-IO_PUT_VALUE_POP_1:     
+IO_PUT_VALUE_POP_1:
         set I10, P2             # offset
         unless I10, IO_PUT_VALUE_POP_2
         pop I10, P2
@@ -146,5 +127,4 @@ IO_PUT_VALUE_POP_2:
         pop I20, P2
 IO_PUT_VALUE_POP_3:
         set P1[I11;I10], I20
-        popi
         branch MOVE_PC

@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-#use Test::More tests => 1;
-use Test::More skip_all => 'befunge.pasm does not compile';
+use Test::More tests => 1;
 use Parrot::Test;
 
 use FindBin;

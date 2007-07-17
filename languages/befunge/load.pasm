@@ -7,20 +7,17 @@
 # The perlarray is a perlarray of perlarrays filled with the
 # ordinal values of the content of the file, 80x25.
 LOAD:
-        pushi
-        pushs
-        pushp
         restore S0              # Fetch the filename
-	open P0, S0, "<"
-	set S1, ""              # S1 = accumulator
+        open P0, S0, "<"
+        set S1, ""              # S1 = accumulator
 
-# Read the file.  
+# Read the file.
 LOAD_READ:
-	read S2, P0, 256
-	length I0, S2
-	le I0, 0, LOAD_EOF
-	concat S1, S2
-	branch LOAD_READ
+        read S2, P0, 256
+        length I0, S2
+        le I0, 0, LOAD_EOF
+        concat S1, S2
+        branch LOAD_READ
 
 # Split the buffer around its newlines.
 LOAD_EOF:
@@ -66,10 +63,8 @@ LOAD_STORE_EMPTY_LINE:
         branch LOAD_END_BUFFER
 
 # Truncate playfield to 25 rows.
-LOAD_COMPLETE:  
+LOAD_COMPLETE:
         set P1, 25              # Truncate at 25 lines.
         save P1                 # Return the playfield
-        popp
-        pops
-        popi
         ret
+

@@ -1,4 +1,5 @@
 # $Id$
+        get_params "(0)", P5    # get @ARGV as a ResizableStringArray
         branch MAIN
 
 .include "debug.pasm"

@@ -27,11 +27,13 @@ help :
 
 all: build
 
-test: build
-	cd .. && $(PERL) befunge/t/harness
+build: befunge.pbc
 
-build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
+befunge.pbc: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
 	$(PARROT) -o befunge.pbc befunge.pasm
+
+test: befunge.pbc
+	cd .. && $(PERL) t/harness --languages=befunge
 
 clean:
 	$(RM_F) core \
@@ -40,3 +42,4 @@ clean:
 
 realclean: clean
 	$(RM_RF) Makefile
+

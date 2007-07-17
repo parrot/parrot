@@ -7,24 +7,17 @@
 #         when reaching it, or a location "y,x", or a column "c:nn"
 #         or a row "r:nn"
 DEBUG_INITIALIZE:
-        pushi
-        pushs
         new P3, .ResizablePMCArray
         set P3[0], 1          # Stop at first step.
         repeat S10, "0", 128  # No char to break on.
         new P4, .Hash
         set P3[1], P4         # The breakpoints.
-        pops
-        popi
         ret
 
 
 # Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
 DEBUG_CHECK_BREAKPOINT:
-        pushi
-        pushs
-        pushp
         set I10, P3[0]
         eq 0, I10, DEBUG_CHECK_BREAKPOINT_CHAR
         bsr DEBUG_INTERACT
@@ -62,9 +55,6 @@ DEBUG_CHECK_BREAKPOINT_COL:
         # Fallback
         # branch DEBUG_CHECK_BREAKPOINT_END
 DEBUG_CHECK_BREAKPOINT_END:
-        popp
-        pops
-        popi
         ret
 
 
@@ -73,7 +63,7 @@ DEBUG_CHECK_BREAKPOINT_END:
 DEBUG_INTERACT:
         bsr DEBUG_PRINT_STATUS
         print "bef> "
-	getstdin P5
+        getstdin P5
         readline S10, P5
         chopn S10, 1
         length I10, S10
@@ -97,20 +87,16 @@ DEBUG_INTERACT:
         branch DEBUG_INTERACT
 DEBUG_INTERACT_BREAK:
         substr S11, S10, 0, 6, ""
-        pushp
         set P4, P3[1]
         set P4[S10], 1      # stop at specified breakpoint
-        popp
         branch DEBUG_INTERACT
 DEBUG_INTERACT_CONTINUE:
         set P3[0], 0        # do not stop at next instruction
         branch DEBUG_INTERACT_END
 DEBUG_INTERACT_DELETE:
         substr S11, S10, 0, 7, ""
-        pushp
         set P4, P3[1]
         delete P4[S10]
-        popp
         branch DEBUG_INTERACT
 DEBUG_INTERACT_DUMP:
         bsr DEBUG_DUMP_PLAYFIELD
@@ -203,8 +189,6 @@ DEBUG_PRINT_STATUS_STACK_END:
 
 # Dump the playfield on stdout.
 DEBUG_DUMP_PLAYFIELD:
-        pushi
-        pushs
         repeat S10, "-", 82
         concat S10, "\n"
         print S10
@@ -227,6 +211,5 @@ DEBUG_DUMP_PLAYFIELD_EOL:
         branch DEBUG_DUMP_PLAYFIELD_NEXT_LINE
 DEBUG_DUMP_PLAYFIELD_END:
         print S10
-        pops
-        popi
         ret
+

@@ -153,13 +153,14 @@ Functioning -93 interpreter (input routines may be funky).
 
 =item Status
 
-Broken with recent deprecation of push[simp]/pop[simp]. Samples working,
-README explain how to build/use. (waiting for Parrot objects for a
-befunge-98 version).
+Samples working, README explain how to build/use.
+(waiting for Parrot objects for a befunge-98 version).
+
+Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.0.11
+0.4.13
 
 =item Location
 
