@@ -105,6 +105,14 @@ decoration i.e., I'd wait until we find we need it :-)
 
   pmclass Foo does bar extends baz is_core {
 
+=item *
+
+ResizablePMCArray returns Undef for unset elements (so does the new object
+model, because it uses ResizablePMCArray for storage), but Hash returns null.
+Various other PMCs return different values for undefinedness.  Pick a standard.
+The current favorite is a singleton Null PMC. Check the implementation of
+PMCNULL.
+
 =back
 
 =head1 DESCRIPTION
