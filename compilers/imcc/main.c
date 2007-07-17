@@ -266,7 +266,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 SET_CORE(PARROT_SWITCH_CORE);
                 break;
             case 'C':
-                SET_CORE(PARROT_CGP_CORE);
                 break;
             case 'f':
                 SET_CORE(PARROT_FAST_CORE);
