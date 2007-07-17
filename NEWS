@@ -1,5 +1,35 @@
 # $Id$
 
+New in 0.4.14
+- Now, with Seat Belts!
+ + added makefile targets for Sun lint, BSD lint, and splint
+ + corrected many errors picked up by these tools
+ + decorated source code with compiler hints, assertions, and attribute macros
+ + automated creation of function declarations to prevent common errors
+ + increased compiler warnings levels
+ + converted more exceptions to a recoverable form
+- Languages:
+ + updated Lisp, Lua, Perl 6, tcl, regex, Scheme ("Pheme")
+ + Perl 6 now fetches selected tests from pugs, and even passes some
+ + PGE modified to handle {*} action subs for top-down and bottom-up parsers,
+   and to allow grammar subclassing
+ + HLLCompiler now has better exception, eval, and exit support
+ + Introduced PCT, a refactor of HLLCompiler and PAST-pm
+- Design:
+ + PDD15 "Objects" - details added to 'new' and 'getattribute' opcodes
+ + PDD17 "PMCs" - notes added on instantiation and dynamic extention in PIR
+- Documentation:
+ + added Parrot-related text from "Perl6 and Parrot Essentials" book,
+   tutorial examples from "Learning PIR" talk, and PDD15 metamodel diagrams
+- Implementation:
+ + reduced memory footprint when using named registers
+ + implemented overridding of vtable methods by PDD15 classes
+ + improved PDD15 support for 'new', 'instantiate', and others
+ + added makefile targets to ease core and HLL makefile regeneration
+ + updated parrot dubugger, "pdb", to allow loading of commands from file
+- Misc:
+ + many bugfixes, enhancements, documentation, and coding standard updates
+
 New in 0.4.13
 - Languages:
  + Updated Lisp, Lua, PHP ("Plumhead"), Python ("Pynie"), ABC,

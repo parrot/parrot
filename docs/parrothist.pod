@@ -98,4 +98,6 @@ the strings?).
 
  Allison   0.4.13         2007-Jun-19     "Clifton"
 
+ Jerry     0.4.14         2007-Jul-17     "Now, with Seat Belts!"
+
 =cut

@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.4.13",
-    "release.name"     : "Clifton",
+    "release.version"  : "0.4.14",
+    "release.name"     : "Now, with Seat Belts!",
     "release.day"      : "Tuesday",
-    "release.date"     : "19 June 2007",
-    "release.nextdate" : "17 July 2007",
+    "release.date"     : "17 July 2007",
+    "release.nextdate" : "21 August 2007",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,14 +11,14 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 July 2007",
+    "bugday.date"      : "18 August 2007",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=43254",
-    "rt.saved_search"  : "http://xrl.us/2fnt",
+    "rt.tracking"      : "Ticket/Display.html?id=44003",
+    "rt.saved_search"  : "http://xrl.us/25ar",
 
     "wiki.root"        : "http://rakudo.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2007_07_14",
+    "wiki.bugday"      : "bug_day_2007_08_18",
 
     "cpan.search"      : "http://search.cpan.org/",
     "subversion.root"  : "http://subversion.tigris.org/",
