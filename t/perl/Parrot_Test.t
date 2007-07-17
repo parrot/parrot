@@ -44,17 +44,33 @@ BEGIN {
 }
 
 can_ok( 'Parrot::Test', $_ ) for qw/
-    language_output_is language_output_like language_output_isnt
-    example_output_is
-    pasm_output_is     pasm_output_like     pasm_output_isnt
-    pir_output_is      pir_output_like      pir_output_isnt
-    pir_2_pasm_is      pir_2_pasm_like      pir_2_pasm_isnt
-    pbc_output_is      pbc_output_like      pbc_output_isnt
-    c_output_is        c_output_like        c_output_isnt
+    c_output_is                     c_output_isnt
+    c_output_like
+    example_output_is               example_output_isnt
+    example_output_like
+    language_output_is              language_output_isnt
+    language_output_like
+    pasm_error_output_is            pasm_error_output_isnt
+    pasm_error_output_like          pasm_error_output_unlike
+    pasm_output_is                  pasm_output_isnt
+    pasm_output_like                pasm_output_unlike
+    pbc_error_output_is             pbc_error_output_isnt
+    pbc_error_output_like           pbc_error_output_unlike
+    pbc_output_is                   pbc_output_isnt
+    pbc_output_like                 pbc_output_unlike
+    pir_error_output_is             pir_error_output_isnt
+    pir_error_output_like           pir_error_output_unlike
+    pir_output_is                   pir_output_isnt
+    pir_output_like                 pir_output_unlike
+    pir_2_pasm_is                   pir_2_pasm_isnt
+    pir_2_pasm_like                 pir_2_pasm_unlike
+    generate_languages_functions
+    per_test
     plan
     skip
     slurp_file
     run_command
+    write_code_to_file
     /;
 
 ## TODO run_command
@@ -260,8 +276,8 @@ CODE
 OUTPUT
 test_test $desc;
 
-## remember to change the number of tests :-)
-BEGIN { plan tests => 39; }
+# remember to change the number of tests
+BEGIN { plan tests => 60; }
 
 # Local Variables:
 #   mode: cperl
