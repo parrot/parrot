@@ -120,3 +120,16 @@ Will have to be:
     substr $P0, 1, 2, "x"
 
 =back
+
+=head1 Deprecated compiler tools
+
+=over 4
+
+=item compilers/past and compilers/post [#44011]
+
+The compilers/past and compilers/post tools are deprecated in
+favor of compilers/past-pm and compilers/pct .  They are expected
+to be completely removed from the repository in an upcoming release.
+
+=back
+
