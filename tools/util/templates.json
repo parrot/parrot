@@ -24,8 +24,8 @@ Enjoy!
     "html.news" : true,
     "html.text" : "
 <p>On behalf of the Parrot team, I'm proud to announce Parrot @release.version@
-\"@release.name@.\" <a href=\"@web.root@\">Parrot</a> is a virtual machine aimed
-at running all dynamic languages.</p>
+&quot;@release.name@.&quot; <a href=\"@web.root@\">Parrot</a>
+is a virtual machine aimed at running all dynamic languages.</p>
 
 <p>Parrot @release.version@ can be obtained via <a href=\"@cpan.search@\">CPAN</a>
 (soon), or <a href=\"@web.root@@web.source@\">follow the download instructions</a>.
