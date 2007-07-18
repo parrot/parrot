@@ -68,6 +68,19 @@ use Parrot::Config;
 
 my %opt;
 
+my %valid_macros = map {($_,1)} qw(
+    PARROT_API
+    PARROT_INLINE
+    PARROT_CAN_RETURN_NULL
+    PARROT_CANNOT_RETURN_NULL
+    PARROT_MAY_IGNORE_RESULT
+    PARROT_WARN_UNUSED_RESULT
+    PARROT_PURE_FUNCTION
+    PARROT_CONST_FUNCTION
+    PARROT_DOES_NOT_RETURN
+    PARROT_MALLOC
+);
+
 main();
 
 =head1 FUNCTIONS
@@ -127,6 +140,7 @@ sub extract_function_declarations {
 }
 
 sub function_components_from_declaration {
+    my $file = shift;
     my $proto = shift;
 
     my @lines = split( /\n/, $proto );
@@ -167,9 +181,16 @@ sub function_components_from_declaration {
     my $is_static = 0;
     $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
 
-    die "Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
+    die "$file $name: Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
+
+    for my $macro ( @macros ) {
+        if ( not $valid_macros{$macro} ) {
+            warn "$file $name: Invalid macro $macro\n";
+        }
+    }
 
     return {
+        file        => $file,
         name        => $name,
         args        => \@args,
         macros      => \@macros,
@@ -195,7 +216,8 @@ sub attrs_from_args {
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /SHIM|NOTNULL|NULLOK/ ) ) {
             my $name = $func->{name};
-            warn qq{$name: "$arg" isn't protected with NOTNULL or NULLOK\n};
+            my $file = $func->{file};
+            warn qq{$file $name: "$arg" isn't protected with NOTNULL or NULLOK\n};
         }
     }
 
@@ -288,7 +310,7 @@ sub main {
 
         my @decls = extract_function_declarations($source);
         for my $decl (@decls) {
-            my $components = function_components_from_declaration($decl);
+            my $components = function_components_from_declaration($cfile, $decl);
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
             push( @{ $cfiles_with_statics{ $cfile } }, $components ) if $components->{is_static};
             ++$nfuncs;
