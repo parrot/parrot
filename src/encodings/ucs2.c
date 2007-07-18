@@ -24,11 +24,13 @@ UCS-2 encoding with the help of the ICU library.
 static void become_encoding( PARROT_INTERP, STRING *src )
         __attribute__nonnull__(1);
 
-static UINTVAL bytes( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static UINTVAL bytes( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static UINTVAL codepoints( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static UINTVAL get_byte( PARROT_INTERP, const STRING *src, UINTVAL offset )
         __attribute__nonnull__(1);
@@ -47,15 +49,17 @@ static STRING * get_bytes_inplace( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static UINTVAL get_codepoint( PARROT_INTERP,
-    const STRING *src,
+    NOTNULL(const STRING *src),
     UINTVAL offset )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING * get_codepoints( PARROT_INTERP,
-    STRING *src,
+    NOTNULL(STRING *src),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static STRING * get_codepoints_inplace( PARROT_INTERP,
     STRING *src,
@@ -64,8 +68,12 @@ static STRING * get_codepoints_inplace( PARROT_INTERP,
     STRING *dest_string )
         __attribute__nonnull__(1);
 
-static void iter_init( PARROT_INTERP, const STRING *src, String_iter *iter )
-        __attribute__nonnull__(1);
+static void iter_init( PARROT_INTERP,
+    NOTNULL(const STRING *src),
+    NOTNULL(String_iter *iter) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void set_byte( PARROT_INTERP,
     const STRING *src,
@@ -81,10 +89,11 @@ static void set_bytes( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 static void set_codepoint( PARROT_INTERP,
-    STRING *src,
+    NOTNULL(STRING *src),
     UINTVAL offset,
     UINTVAL codepoint )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void set_codepoints( PARROT_INTERP,
     STRING *src,
@@ -93,19 +102,28 @@ static void set_codepoints( PARROT_INTERP,
     STRING *new_codepoints )
         __attribute__nonnull__(1);
 
-static STRING * to_encoding( PARROT_INTERP, STRING *src, STRING *dest )
-        __attribute__nonnull__(1);
+static STRING * to_encoding( PARROT_INTERP,
+    NOTNULL(STRING *src),
+    NOTNULL(STRING *dest) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static UINTVAL ucs2_decode_and_advance( PARROT_INTERP, String_iter *i )
-        __attribute__nonnull__(1);
+static UINTVAL ucs2_decode_and_advance( PARROT_INTERP,
+    NOTNULL(String_iter *i) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void ucs2_encode_and_advance( PARROT_INTERP,
-    String_iter *i,
+    NOTNULL(String_iter *i),
     UINTVAL c )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void ucs2_set_position( PARROT_INTERP, String_iter *i, UINTVAL n )
-        __attribute__nonnull__(1);
+static void ucs2_set_position( SHIM_INTERP,
+    NOTNULL(String_iter *i),
+    UINTVAL n )
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
@@ -118,11 +136,9 @@ static void ucs2_set_position( PARROT_INTERP, String_iter *i, UINTVAL n )
 #define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl ucs2")
 
 
-static void iter_init(Interp *, const STRING *src, String_iter *iter);
-
 
 static STRING *
-to_encoding(PARROT_INTERP, STRING *src, STRING *dest)
+to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
@@ -137,10 +153,10 @@ to_encoding(PARROT_INTERP, STRING *src, STRING *dest)
 }
 
 static UINTVAL
-get_codepoint(PARROT_INTERP, const STRING *src, UINTVAL offset)
+get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
 #if PARROT_HAS_ICU
-    UChar *s = (UChar*) src->strstart;
+    UChar * const s = (UChar*) src->strstart;
     return s[offset];
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
@@ -150,37 +166,35 @@ get_codepoint(PARROT_INTERP, const STRING *src, UINTVAL offset)
 }
 
 static void
-set_codepoint(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL codepoint)
+set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)
 {
 #if PARROT_HAS_ICU
-    UChar *s = (UChar*) src->strstart;
+    UChar * const s = (UChar*) src->strstart;
     s[offset] = codepoint;
 #else
+    UNUSED(src);
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
 }
 
 static UINTVAL
-get_byte(PARROT_INTERP, const STRING *src, UINTVAL offset)
+get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 {
     UNIMPL;
     return 0;
 }
 
 static void
-set_byte(PARROT_INTERP, const STRING *src,
-        UINTVAL offset, UINTVAL byte)
+set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 {
     UNIMPL;
 }
 
 static STRING *
-get_codepoints(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count)
+get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)
 {
-    STRING *return_string = Parrot_make_COW_reference(interp, src);
+    STRING * const return_string = Parrot_make_COW_reference(interp, src);
 #if PARROT_HAS_ICU
     return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
     return_string->bufused = count * sizeof (UChar);
@@ -203,8 +217,7 @@ get_codepoints(PARROT_INTERP, STRING *src,
 }
 
 static STRING *
-get_bytes(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count)
+get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
     return NULL;
@@ -212,8 +225,8 @@ get_bytes(PARROT_INTERP, STRING *src,
 
 
 static STRING *
-get_codepoints_inplace(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count, STRING *dest_string)
+get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
+        UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))
 {
 
     UNIMPL;
@@ -221,23 +234,23 @@ get_codepoints_inplace(PARROT_INTERP, STRING *src,
 }
 
 static STRING *
-get_bytes_inplace(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count, STRING *return_string)
+get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
+        UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
     return NULL;
 }
 
 static void
-set_codepoints(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count, STRING *new_codepoints)
+set_codepoints(PARROT_INTERP, SHIM(STRING *src),
+        UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))
 {
     UNIMPL;
 }
 
 static void
-set_bytes(PARROT_INTERP, STRING *src,
-        UINTVAL offset, UINTVAL count, STRING *new_bytes)
+set_bytes(PARROT_INTERP, SHIM(STRING *src),
+        UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
 {
     UNIMPL;
 }
@@ -245,14 +258,14 @@ set_bytes(PARROT_INTERP, STRING *src,
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
 static void
-become_encoding(PARROT_INTERP, STRING *src)
+become_encoding(PARROT_INTERP, SHIM(STRING *src))
 {
     UNIMPL;
 }
 
 
 static UINTVAL
-codepoints(PARROT_INTERP, STRING *src)
+codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 {
 #if PARROT_HAS_ICU
     return src->bufused / sizeof (UChar);
@@ -264,40 +277,39 @@ codepoints(PARROT_INTERP, STRING *src)
 }
 
 static UINTVAL
-bytes(PARROT_INTERP, STRING *src)
+bytes(PARROT_INTERP, NOTNULL(STRING *src))
 {
     return src->bufused;
 }
 
 #if PARROT_HAS_ICU
 static UINTVAL
-ucs2_decode_and_advance(PARROT_INTERP, String_iter *i)
+ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
 {
-    UChar *s = (UChar*) i->str->strstart, c;
-    size_t pos;
-    pos = i->bytepos / sizeof (UChar);
+    UChar * const s = (UChar*) i->str->strstart;
+    const size_t pos = i->bytepos / sizeof (UChar);
+
     /* TODO either make sure that we don't go past end or use SAFE
      *      iter versions
      */
-    c = s[pos++];
+    const UChar c = s[pos++];
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
     return c;
 }
 
 static void
-ucs2_encode_and_advance(PARROT_INTERP, String_iter *i, UINTVAL c)
+ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 {
-    UChar *s = (UChar*) i->str->strstart;
-    UINTVAL pos;
-    pos = i->bytepos / sizeof (UChar);
+    UChar * const s = (UChar*) i->str->strstart;
+    UINTVAL pos = i->bytepos / sizeof (UChar);
     s[pos++] = (UChar)c;
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
 }
 
 static void
-ucs2_set_position(PARROT_INTERP, String_iter *i, UINTVAL n)
+ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 {
     i->charpos = n;
     i->bytepos = n * sizeof (UChar);
@@ -305,11 +317,12 @@ ucs2_set_position(PARROT_INTERP, String_iter *i, UINTVAL n)
 
 #endif
 static void
-iter_init(PARROT_INTERP, const STRING *src, String_iter *iter)
+iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 {
-    iter->str = src;
-    iter->bytepos = iter->charpos = 0;
 #if PARROT_HAS_ICU
+    iter->str = src;
+    iter->bytepos = 0;
+    iter->charpos = 0;
     iter->get_and_advance = ucs2_decode_and_advance;
     iter->set_and_advance = ucs2_encode_and_advance;
     iter->set_position =    ucs2_set_position;
@@ -319,6 +332,8 @@ iter_init(PARROT_INTERP, const STRING *src, String_iter *iter)
 #endif
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_ucs2_init(PARROT_INTERP)
 {

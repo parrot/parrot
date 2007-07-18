@@ -59,8 +59,9 @@ static Instruction* pcc_get_args( PARROT_INTERP,
 static int pcc_reg_mov( PARROT_INTERP,
     unsigned char d,
     unsigned char s,
-    void *vinfo )
-        __attribute__nonnull__(1);
+    NOTNULL(void *vinfo) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
 
 static int recursive_tail_call( PARROT_INTERP,
     NOTNULL(NOTNULL(IMC_Unit *unit)),
@@ -310,8 +311,7 @@ struct move_info_t {
 };
 
 static int
-pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
-        void *vinfo)
+pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo))
 {
     struct move_info_t *info = (struct move_info_t *)vinfo;
     SymReg *regs[2], *src, *dest;

@@ -29,11 +29,14 @@ static char * add_ns( PARROT_INTERP, NOTNULL(char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static SymReg* mk_pmc_const_2( PARROT_INTERP,
-    IMC_Unit *unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(SymReg *left),
     NOTNULL(SymReg *rhs) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -341,6 +344,8 @@ mk_fullname(NOTNULL(const char *name))
 }
 
 /* Makes a new identifier */
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg *
 mk_ident(PARROT_INTERP, NOTNULL(char *name), int t)
 {
@@ -369,8 +374,10 @@ mk_ident(PARROT_INTERP, NOTNULL(char *name), int t)
     return r;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg*
-mk_ident_ur(PARROT_INTERP, char *name, int t)
+mk_ident_ur(PARROT_INTERP, NOTNULL(char *name), int t)
 {
     SymReg * const r = mk_ident(interp, name, t);
     r->usage        |= U_NON_VOLATILE;
@@ -378,8 +385,11 @@ mk_ident_ur(PARROT_INTERP, char *name, int t)
     return r;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static SymReg*
-mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg *left), NOTNULL(SymReg *rhs))
+mk_pmc_const_2(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *left), NOTNULL(SymReg *rhs))
+    /* XXX This always returns NULL.  Probably shouldn't return anything then. */
 {
     SymReg *r[2];
     char   *name;

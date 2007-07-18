@@ -233,12 +233,17 @@ SymReg * mk_const_ident( PARROT_INTERP,
 char * mk_fullname( NOTNULL(const char *name) )
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg * mk_ident( PARROT_INTERP, NOTNULL(char *name), int t )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-SymReg* mk_ident_ur( PARROT_INTERP, char *name, int t )
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+SymReg* mk_ident_ur( PARROT_INTERP, NOTNULL(char *name), int t )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 SymReg * mk_label_address( PARROT_INTERP, NOTNULL(char *name) )
         __attribute__nonnull__(1)

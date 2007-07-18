@@ -76,11 +76,13 @@ static INTVAL is_cclass( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void set_graphemes( PARROT_INTERP,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
-    STRING *insert_string )
-        __attribute__nonnull__(1);
+    NOTNULL(STRING *insert_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
@@ -121,22 +123,23 @@ static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL validate( PARROT_INTERP, STRING *src )
-        __attribute__nonnull__(1);
+static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
 
 PARROT_WARN_UNUSED_RESULT
 STRING *
-ascii_get_graphemes(PARROT_INTERP, STRING *source_string,
+ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_BYTES(interp, source_string, offset, count);
 }
 
 static void
-set_graphemes(PARROT_INTERP, STRING *source_string,
-        UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
+set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
 {
     ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
@@ -144,9 +147,10 @@ set_graphemes(PARROT_INTERP, STRING *source_string,
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
-ascii_get_graphemes_inplace(PARROT_INTERP, STRING *source_string,
-        UINTVAL offset, UINTVAL count, STRING *dest_string)
+ascii_get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))
 {
     return ENCODING_GET_BYTES_INPLACE(interp, source_string,
             offset, count, dest_string);
@@ -411,7 +415,7 @@ ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-validate(PARROT_INTERP, STRING *src)
+validate(PARROT_INTERP, NOTNULL(STRING *src))
 {
     UINTVAL offset;
     String_iter iter;

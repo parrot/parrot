@@ -323,6 +323,8 @@ iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
     iter->set_position =    fixed8_set_position;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_fixed_8_init(PARROT_INTERP)
 {

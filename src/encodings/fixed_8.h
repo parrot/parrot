@@ -15,6 +15,8 @@
 
 /* HEADERIZER BEGIN: src/encodings/fixed_8.c */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ENCODING * Parrot_encoding_fixed_8_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 

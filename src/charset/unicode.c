@@ -99,9 +99,10 @@ static void set_graphemes( PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
-    STRING *insert_string )
+    NOTNULL(STRING *insert_string) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
         __attribute__nonnull__(1);
@@ -156,7 +157,7 @@ static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
 
 static void
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
-        UINTVAL offset, UINTVAL replace_count, STRING *insert_string)
+        UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
 {
     ENCODING_SET_CODEPOINTS(interp, source_string, offset,
             replace_count, insert_string);

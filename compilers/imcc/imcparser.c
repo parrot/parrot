@@ -388,39 +388,48 @@ static void do_loadlib( PARROT_INTERP, NOTNULL(const char *lib) )
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static Instruction* func_ins(
-    Parrot_Interp interp,
+static Instruction* func_ins( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    SymReg *lhs,
-    const char *op,
-    NOTNULL(SymReg ** r),
+    NOTNULL(SymReg *lhs),
+    NOTNULL(const char *op),
+    NOTNULL(SymReg **r),
     int n,
     int keyv,
     int emit )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
 static Instruction * iINDEXFETCH( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    SymReg * r0,
-    SymReg * r1,
-    SymReg * r2 )
+    NOTNULL(SymReg *r0),
+    NOTNULL(SymReg *r1),
+    NOTNULL(SymReg *r2) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static Instruction * iINDEXSET( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    SymReg * r0,
-    SymReg * r1,
-    SymReg * r2 )
+    NOTNULL(SymReg *r0),
+    NOTNULL(SymReg *r1),
+    NOTNULL(SymReg *r2) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static Instruction * iLABEL( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    SymReg * r0 )
+    NOTNULL(SymReg *r0) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static const char * inv_op( const char *op );
 static Instruction * iSUBROUTINE( PARROT_INTERP,
@@ -580,8 +589,8 @@ mk_pmc_const(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
 
 PARROT_WARN_UNUSED_RESULT
 static Instruction*
-func_ins(Parrot_Interp interp, NOTNULL(IMC_Unit *unit), SymReg *lhs, const char *op,
-         NOTNULL(SymReg ** r), int n, int keyv, int emit)
+func_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *lhs), NOTNULL(const char *op),
+         NOTNULL(SymReg **r), int n, int keyv, int emit)
 {
     int i;
     /* shift regs up by 1 */
@@ -618,7 +627,7 @@ INS_LABEL(PARROT_INTERP, NOTNULL(IMC_Unit *unit), SymReg *r0, int emit)
 }
 
 static Instruction *
-iLABEL(PARROT_INTERP, NOTNULL(IMC_Unit *unit), SymReg * r0)
+iLABEL(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0))
 {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
 
@@ -644,8 +653,8 @@ iSUBROUTINE(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r))
  * substr or X = P[key]
  */
 static Instruction *
-iINDEXFETCH(PARROT_INTERP, NOTNULL(IMC_Unit *unit), SymReg * r0, SymReg * r1,
-            SymReg * r2)
+iINDEXFETCH(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0), NOTNULL(SymReg *r1),
+            NOTNULL(SymReg *r2))
 {
     if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
         SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
@@ -661,10 +670,10 @@ iINDEXFETCH(PARROT_INTERP, NOTNULL(IMC_Unit *unit), SymReg * r0, SymReg * r1,
 
 static Instruction *
 iINDEXSET(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
-          SymReg * r0, SymReg * r1, SymReg * r2)
+          NOTNULL(SymReg *r0), NOTNULL(SymReg *r1), NOTNULL(SymReg *r2))
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
+        SymReg * const r3 = mk_const(interp, str_dup("1"), 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1,r3, r2);
     }
     else if (r0->set == 'P') {
@@ -702,7 +711,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
 
 
 static SymReg *
-mk_sub_address_fromc(PARROT_INTERP, char * name)
+mk_sub_address_fromc(PARROT_INTERP, char * name) /* XXX Why are we truncating and freeing what's been sent in??? */
 {
     /* name is a quoted sub name */
     SymReg *r;
