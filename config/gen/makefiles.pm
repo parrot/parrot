@@ -39,7 +39,6 @@ my %makefiles = (
         conditioned_lines   => 1,
     },
 
-     'compilers/past/Makefile'    => { SOURCE => 'config/gen/makefiles/past.in' },
      'compilers/past-pm/Makefile' => { SOURCE => 'config/gen/makefiles/past-pm.in' },
      'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },
      'compilers/tge/Makefile'     => { SOURCE => 'config/gen/makefiles/tge.in' },
