@@ -6,7 +6,10 @@
  * $Id$
  */
 
-#if 0
+#ifndef PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
+#define PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
+
+/*
 
 hex to binary converter
 perl -ne '@a=split;push@b,unpack"B*",chr hex foreach@a;print"@b\n";@b=()'
@@ -15,7 +18,7 @@ src/jit/amd64/jit_emit.h copied to src/jit_emit.h
 src/jit/amd64/exec_dep.h copied to src/exec_dep.h
 src/jit/amd64/core.jit used to build src/jit_cpu.h
 src/jit/amd64/core.jit used to build src/exec_cpu.h
- 
+
 src/exec_start.c    #define JIT_EMIT 1
 src/exec.c          #define JIT_EMIT 1
 src/jit.c           #define JIT_EMIT 0
@@ -36,13 +39,13 @@ ModRM
         10  disp16/32
         11  only regs
     xxx/yyy
-        0   EAX     AX  AL  SS0 MM0 
-        1   ECX     CX  CL  SS1 MM1 
-        2   EDX     DX  DL  SS2 MM2 
-        3   EBX     BX  BL  SS3 MM3 
-        4   ESP     SP  AH  SS4 MM4 
-        5   EBP     BP  CH  SS5 MM5 
-        6   ESI     SI  DH  SS6 MM6 
+        0   EAX     AX  AL  SS0 MM0
+        1   ECX     CX  CL  SS1 MM1
+        2   EDX     DX  DL  SS2 MM2
+        3   EBX     BX  BL  SS3 MM3
+        4   ESP     SP  AH  SS4 MM4
+        5   EBP     BP  CH  SS5 MM5
+        6   ESI     SI  DH  SS6 MM6
         7   EDI     DI  BH  SS7 MM7
 
 SIB
@@ -63,11 +66,8 @@ For calling functions use:  RDI, RSI, RDX, RCX, R8, and R9
     R10 is used for a static chain pointer
 
 RBP, RBX, and R12->R15 are preserved
-    
-#endif
 
-#ifndef PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
-#define PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
+*/
 
 #  include <unistd.h>
 #  include <limits.h>
@@ -75,21 +75,6 @@ RBP, RBX, and R12->R15 are preserved
 void Parrot_jit_begin(Parrot_jit_info_t *, Interp *);
 
 
-#if DEBUG_ENUM_TEST
-#define foobar(a) printf("%-16s %d\n", #a, a)
-#define foobar2(a, e) do { \
-    if (a == e) \
-    printf("%-16s is %x\n", #a, e); \
-    else \
-    printf("%-16s is %x, not %x\n", #a, a, e); \
-} while (0)
-foobar(RAX); foobar(RCX); foobar(RDX); foobar(RBX); foobar(RSP);
-foobar(RBP); foobar(RSI); foobar(RDI);
-foobar(R8); foobar(R9); foobar(R10); foobar(R11); foobar(R12); foobar(R13);
-foobar(R14); foobar(R15);
-#undef foobar
-#undef foobar2
-#endif
 /*
  * define all the available cpu registers
  * reserve some for special purposes
@@ -303,7 +288,7 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
             *(int *)pc = (int)disp; \
             pc += 4; \
         } \
-} while (0) 
+} while (0)
 
 typedef enum {
  jcc_jo,                /* Jump if overflow */
@@ -361,57 +346,6 @@ typedef enum {
 
 #ifdef JIT_EMIT
 
-/*
- * load register from memory offset, relative to the register base pointer
- * this is used to load hardware cpu registers from parrot registers
- */
-//#  define jit_emit_mov_rm_i(pc, reg, offs) \
-//      jit_emit_lwz(pc, reg, offs, BP)     /* e.g. PPC */
-
-/* load floating point register from Parrot register */
-//#  define jit_emit_mov_rm_n(pc, reg, offs) \
-//      jit_emit_lfd(pc, reg, offs, BP)     /* e.g. PPC */
-
-/* Store a CPU register back to a Parrot register. */
-
-//#  define jit_emit_mov_mr_i(pc, offs, reg) \
-      jit_emit_stw(pc, reg, offs, BP)
-
-//#  define jit_emit_mov_mr_n(pc, offs, reg) \
-      jit_emit_stfd(pc, reg,  offs, BP)
-
-/*
- * emit a branch and remember the branch target for code fixup,
- * which id done, when all code is emitted
- */
-
-//static void
-//jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp)
-//{
-//    /* see other architectures */
-//}
-
-
-/*
- * Load a 32-bit immediate value.
- */
-
-//#  define jit_emit_mov_ri_i(pc, D, imm)   ...
-
-/*
- * define some helper macros for code generation
- * Parrot_jit_normal_op() is: create code that does the equivalent of:
- *
- * PC = ((INTERP->op_func_table)[*PC])(PC,INTERP)
- *
- * First we need to calculate the PC at runtime by adding disp to
- * to the cached CODE_START register 'add_disp' in jit/ppc
- */
-
-//#  define add_disp(pc, D, disp) \
-//      jit_emit_mov_ri_i(pc, ISR1, disp); \
-//      jit_emit_add_rrr(pc, D, CODE_START, ISR1)
-
 /* These two can be mixed together just like in the i386 jit.  All the places I
  * can see this being called require it to be included, but for the moment I'm
  * keeping it as these macros. */
@@ -434,11 +368,6 @@ typedef enum {
         emit_mov_r_mr(jit_info->native_ptr, CODE_START, INTERP, (long)offsetof(Interp, code)); \
         emit_mov_r_mr(jit_info->native_ptr, CODE_START, CODE_START, (long)offsetof(PackFile_Segment, data)); \
 }
-
-/*
- * emit code that branches to the next code piece
- */
-//#  define jit_emit_branch_to_opcode(pc, D)  ...
 
 /*
  * emit code that calls a Parrot opcode function
@@ -516,11 +445,11 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     Parrot_jit_normal_op(jit_info, interp);
     /* Parrot_emit_jump_to_eax */
     if (!jit_info->objfile) {
-        // Get interp->code->base.data
+        /* Get interp->code->base.data */
         jit_emit_load_code_start(jit_info->native_ptr);
         emit_sub_r_r(jit_info->native_ptr, RAX, CODE_START);
 
-        // Get interp->code->jit_info->arena->op_map
+        /* Get interp->code->jit_info->arena->op_map */
         jit_emit_load_op_map(jit_info->native_ptr);
     }
 
@@ -558,11 +487,11 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 
     /* Parrot_emit_jump_to_eax */
     if (!jit_info->objfile) {
-        // Get interp->code->base.data
+        /* Get interp->code->base.data */
         jit_emit_load_code_start(jit_info->native_ptr);
         emit_sub_r_r(jit_info->native_ptr, RAX, CODE_START);
 
-        // Get interp->code->jit_info->arena->op_map
+        /* Get interp->code->jit_info->arena->op_map */
         jit_emit_load_op_map(jit_info->native_ptr);
     }
 
@@ -571,7 +500,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     emit_modrm(jit_info->native_ptr, b00, 0x4, RSP);
     emit_sib(jit_info->native_ptr, b00, RAX, OP_MAP);
     /* END Parrot_emit_jump_to_eax */
-    
+
 }
 
 #endif /* JIT_EMIT == 2 */
@@ -618,11 +547,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     /* Parrot_emit_jump_to_eax */
     if (!jit_info->objfile) {
-        // Get interp->code->base.data
+        /* Get interp->code->base.data */
         jit_emit_load_code_start(jit_info->native_ptr);
         emit_sub_r_r(jit_info->native_ptr, RAX, CODE_START);
 
-        // Get interp->code->jit_info->arena->op_map
+        /* Get interp->code->jit_info->arena->op_map */
         jit_emit_load_op_map(jit_info->native_ptr);
     }
 
@@ -649,7 +578,7 @@ static void
 Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
                          Interp *interp)
 {
-    // NOT CALLED CURRENTLY
+    /* NOT CALLED CURRENTLY */
 }
 
 
@@ -708,7 +637,7 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
         /* Preserved */
         RBP, RBX, R12, R13, R14, R15,
         /* Unpreserved */
-        RAX, RCX, RDX,  RSP, RSI, RDI, R8, R9, R10, R11, 
+        RAX, RCX, RDX,  RSP, RSI, RDI, R8, R9, R10, R11,
     };
 
 static const char floatval_map[FLOAT_REGISTERS_TO_MAP] =
