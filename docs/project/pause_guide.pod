@@ -139,8 +139,7 @@ Once you fix the permissions, you can ask PAUSE to re-index the module:
 If the module is an external module and just copied into the
 distribution (e.g. lib/Test/More.pm), then it shouldn't be indexed by
 PAUSE at all. Modify META.yml and add the directory, file, or package
-name to the list of modules under 'no_index'. (This flag is not
-respected by the PAUSE indexer, but it is respected by CPAN Search.)
+name to the list of modules under 'no_index'.
 
 Unfortunately, at this time there is no way to update the META.yml file
 on a distribution that has already been uploaded to CPAN, and no way to
