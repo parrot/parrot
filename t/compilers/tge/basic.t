@@ -95,7 +95,6 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386' );
 
 .sub test
-  load_bytecode "PAST.pbc"
   load_bytecode "TGE.pbc"
   print "1\n"
 .end
