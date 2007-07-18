@@ -33,7 +33,7 @@ static void _init(Interp *interp, STRING *str)
     fp = (const unsigned char *)bytecode;
 }
 
-#define _info_get()     (&bytecode[maxi] - (const char *)fp)
+#define _info_get()     (UINTVAL)(&bytecode[maxi] - (const char *)fp)
 #define _get_pos()      (fp)
 #define _get_c()        (*(fp++))
 
