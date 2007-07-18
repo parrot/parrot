@@ -149,9 +149,18 @@ See also L<Appendix 1> below.
 
 Upload to CPAN.
 
-NOTE: you may get a failure message from the CPAN Indexer about
-the content of META.yml. Don't worry, the tarball still uploaded okay.
-You can fix META.yml after the release. (TODO: clarify what this means)
+NOTE: you may get a failure message from the CPAN Indexer about the content of
+META.yml. Don't panic, the tarball still uploaded okay.  You do need to fix
+META.yml for the next release. Under "no_index" list any modules that aren't
+properly part of the Parrot distribution (generally these are modules that have
+been copied into the repository from CPAN). 
+
+Once you get a reply from the PAUSE indexer, log in to PAUSE to clean up module
+permissions. Under "View Permissions" search for your PAUSE ID. Any new modules
+added in this release will list your PAUSE ID as the "owner". Change the owner
+to PARROTRE and add all the other release managers as co-maintainers.
+
+See F<docs/project/pause_guide.pod> for more details.
 
 =item 9.
 
