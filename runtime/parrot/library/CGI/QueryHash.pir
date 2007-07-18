@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-['CGI' ; 'QueryHash'] - A helper for classic CGI 
+CGI;QueryHash - A helper for classic CGI 
 
 =head1 SYNOPSIS
 

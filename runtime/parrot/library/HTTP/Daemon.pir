@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-['HTTP' ; 'Daemon'] - A Simple HTTPD Server
+HTTP;Daemon - A Simple HTTPD Server
 
 =head1 SYNOPSIS
 

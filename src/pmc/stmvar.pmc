@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-XXX
+src/pmc/stmvar.pmc -- A transactional variable
 
 =head1 DESCRIPTION
 

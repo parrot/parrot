@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-['String';'Utils'] - Utilities for string processing
+String;Utils - Utilities for string processing
 
 =head1 SYNOPSIS
 
