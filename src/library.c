@@ -491,6 +491,9 @@ whether we're searching for a STRING or a cstring.
 */
 
 PARROT_API
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 char*
 Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
 {
