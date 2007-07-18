@@ -1875,12 +1875,19 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	/var/splint312/bin/splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+		+fcnpost \
+		+showscan \
+		+stats \
+		-showsummary \
 		\
+		src/string.c
+
+X = \
 		src/gc/dod.c  src/gc/gc_gms.c  src/gc/gc_ims.c \
 		src/gc/memory.c  src/gc/register.c  \
 		src/gc/resources.c  src/gc/smallobject.c \
 
-###############################################################################
+
 #
 # installation
 #
