@@ -191,12 +191,12 @@ static void
 dump_mmd(PARROT_INTERP, INTVAL function)
 {
     UINTVAL x, y;
-    UINTVAL offset, x_funcs, y_funcs;
+    UINTVAL offset;
     MMD_table * const table = interp->binop_mmd_funcs + function;
-    funcptr_t func, def; /* XXX Looks like def is never defined */
+    funcptr_t func;
+    const UINTVAL x_funcs = table->x;
+    const UINTVAL y_funcs = table->y;
 
-    x_funcs = table->x;
-    y_funcs = table->y;
     printf("    ");
     for (x = 0; x < x_funcs; ++x) {
         if (! (x % 10))
@@ -211,7 +211,6 @@ dump_mmd(PARROT_INTERP, INTVAL function)
             offset = x_funcs * y + x;
             func = table->mmd_funcs[offset];
             printf("%c",
-                    func == def ?  '.' :
                     (UINTVAL)func & 1 ?  'P' :
                     !func  ? '0' : 'F');
         }
@@ -221,7 +220,7 @@ dump_mmd(PARROT_INTERP, INTVAL function)
         for (x = 0; x < x_funcs; ++x) {
             offset = x_funcs * y + x;
             func = table->mmd_funcs[offset];
-            if (func && func != def && !((UINTVAL) func & 1))
+            if (func && !((UINTVAL) func & 1))
                 printf("%3d %3d: %p\n", (int)x, (int)y, (void*) func);
         }
     }
