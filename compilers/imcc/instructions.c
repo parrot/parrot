@@ -318,7 +318,7 @@ get_branch_reg(NOTNULL(const Instruction *ins))
     const int r = get_branch_regno(ins);
     if (r >= 0)
         return ins->r[r];
-    return 0;
+    return NULL;
 }
 
 /* some useful instruction routines */
@@ -451,7 +451,7 @@ emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))
 {
 
     if (!unit || !i)
-        return 0;
+        return NULL;
     if (!unit->instructions)
         unit->last_ins = unit->instructions = i;
     else {
