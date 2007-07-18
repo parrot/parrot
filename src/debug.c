@@ -319,7 +319,6 @@ PDB_get_command(PARROT_INTERP)
     int           ch;
     char         *c;
     PDB_t        * const pdb = interp->pdb;
-    PDB_line_t   *line;
 
     /* flush the buffered data */
     fflush(stdout);
@@ -336,7 +335,7 @@ PDB_get_command(PARROT_INTERP)
 
     /* if the program is stopped and running show the next line to run */
     if ((pdb->state & PDB_STOPPED) && (pdb->state & PDB_RUNNING)) {
-        line = pdb->file->line;
+        PDB_line_t *line = pdb->file->line;
 
         while (pdb->cur_opcode != line->opcode)
             line = line->next;
@@ -344,7 +343,7 @@ PDB_get_command(PARROT_INTERP)
         PIO_eprintf(interp, "%li  ", line->number);
         c = pdb->file->source + line->source_offset;
 
-        while (*c != '\n'  && c)
+        while (c && (*c != '\n'))
             PIO_eprintf(interp, "%c", *(c++));
     }
 
@@ -361,7 +360,7 @@ PDB_get_command(PARROT_INTERP)
     } while (isspace(ch) && ch != '\n');
 
     /* generate string (no more than 255 chars) */
-     while (ch != EOF && ch != '\n' && (i < 255)) {
+    while (ch != EOF && ch != '\n' && (i < 255)) {
         c[i++] = ch;
         ch     = fgetc(stdin);
     }
