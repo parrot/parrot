@@ -263,6 +263,10 @@ sub parse_p_args_string {
     my $linear_args = [];
     for my $x ( split /,/, $parameters ) {
         my ( $type, $name, $rest ) = split / /, trim($x), 3;
+        if (!defined($name)) {
+          die "invalid PCC arg '$x': did you forget to specify a type?\n";
+        }
+ 
         $name =~ /[\**]?(\"?[\w_]+\"?)/;
         my $arg = {
             type  => convert_type_string_to_reg_type($type),
