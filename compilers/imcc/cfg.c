@@ -636,19 +636,13 @@ free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
 static void
 analyse_life_block(PARROT_INTERP, NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 {
-    Instruction* ins, *special;
-    Life_range* l;
-    int is_alias;
+    Life_range* const l = make_life_range(r, bb->index);
 
-    l = make_life_range(r, bb->index);
+    Instruction *special = NULL;
+    Instruction *ins;
 
-    special = NULL;
     for (ins = bb->start; ins ; ins = ins->next) {
-        if (ins==NULL) {
-            IMCC_fatal(interp, 1,"analyse_life_block: "
-                    "Index %i of %i has NULL instruction\n",
-                    ins->index, bb->end->index);
-        }
+        int is_alias;
         /*
          * if we have a setp_ind opcode, it may write all PMC
          * registers
