@@ -40,6 +40,7 @@ my %makefiles = (
     },
 
      'compilers/past-pm/Makefile' => { SOURCE => 'config/gen/makefiles/past-pm.in' },
+     'compilers/pct/Makefile'     => { SOURCE => 'config/gen/makefiles/pct.in' },
      'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },
      'compilers/tge/Makefile'     => { SOURCE => 'config/gen/makefiles/tge.in' },
      'compilers/bcg/Makefile'     => { SOURCE => 'config/gen/makefiles/bcg.in' },

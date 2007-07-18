@@ -142,6 +142,7 @@ GEN_MAKEFILES = \
     Makefile \
 #CONDITIONED_LINE(has_perldoc):    docs/Makefile \
     compilers/past-pm/Makefile \
+    compilers/pct/Makefile \
     compilers/pge/Makefile \
     compilers/pirc/Makefile \
     compilers/tge/Makefile \
@@ -1256,6 +1257,7 @@ compilers.dummy : $(PARROT)
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/past-pm
+	$(MAKE) compilers/pct
 	$(MAKE) compilers/json
 
 languages : languages.dummy
@@ -1280,6 +1282,7 @@ languages-clean :
 
 compilers-clean :
 	$(MAKE) compilers/past-pm clean
+	$(MAKE) compilers/pct clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/json clean
