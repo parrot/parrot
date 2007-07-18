@@ -23,7 +23,7 @@ These are the vtable functions for the APL Vector class.
 
 #include "parrot/parrot.h"
 
-INTVAL
+static INTVAL
 size_of_shape(Interp *interp, PMC* self, PMC* shape)
 {
     INTVAL retval;
