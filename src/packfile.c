@@ -2819,13 +2819,13 @@ PackFile_FixupEntry *
 PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
 {
     /* TODO make a hash of all fixups */
-    PackFile_Directory *dir = interp->code->base.dir;
+    PackFile_Directory * const dir = interp->code->base.dir;
     PackFile_FixupEntry *ep, e;
     int found;
 
     e.type = type;
     e.name = name;
-    ep = &e;
+    ep = &e; /* XXX It's possible to return this pointer to e, even though e is on the stack. */
     found = PackFile_map_segments(interp, dir, find_fixup_iter,
             (void *) &ep);
     return found ? ep : NULL;
