@@ -479,7 +479,7 @@ _mk_const(NOTNULL(SymHash *hsh), NOTNULL(char *name), int t)
 }
 
 SymReg *
-mk_const(PARROT_INTERP, char * name, int t)
+mk_const(PARROT_INTERP, NOTNULL(char *name), int t)
 {
     SymHash * const h = &IMCC_INFO(interp)->ghash;
 

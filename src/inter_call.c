@@ -13,10 +13,6 @@ subroutines.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 
@@ -43,14 +39,19 @@ static void clone_key_arg( PARROT_INTERP, NOTNULL(call_state *st) )
 static void commit_last_arg( PARROT_INTERP,
     int index,
     int cur,
-    opcode_t *n_regs_used,
+    NOTNULL(opcode_t *n_regs_used),
     int seen_arrow,
-    PMC **sigs,
-    opcode_t **indexes,
-    parrot_context_t *ctx,
-    PMC *pmc,
-    va_list *list )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC **sigs),
+    NOTNULL(opcode_t **indexes),
+    NOTNULL(parrot_context_t *ctx),
+    NULLOK(PMC *pmc),
+    NOTNULL(va_list *list) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7)
+        __attribute__nonnull__(8)
+        __attribute__nonnull__(10);
 
 static void convert_arg_from_int( PARROT_INTERP, NOTNULL(call_state *st) )
         __attribute__nonnull__(1)
@@ -1312,8 +1313,9 @@ set_retval_p(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
  * in the arg signature.  see Parrot_PCCINVOKE for signature syntax.
  */
 static void
-commit_last_arg(PARROT_INTERP, int index, int cur, opcode_t *n_regs_used, int seen_arrow,
-        PMC **sigs, opcode_t **indexes, parrot_context_t *ctx, PMC *pmc, va_list *list)
+commit_last_arg(PARROT_INTERP, int index, int cur, NOTNULL(opcode_t *n_regs_used),
+        int seen_arrow, NOTNULL(PMC **sigs), NOTNULL(opcode_t **indexes),
+        NOTNULL(parrot_context_t *ctx), NULLOK(PMC *pmc), NOTNULL(va_list *list))
 {
     int reg_offset = 0;
 
@@ -1361,8 +1363,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur, opcode_t *n_regs_used, int se
 
 /*
 
-=item C<void
-Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name, const char *signature, ... )>
+FUNCDOC: Parrot_PCCINVOKE
 
 pmc is the invocant.
 method_name is the method_name used in the find_method VTABLE call
@@ -1397,13 +1398,13 @@ Example signature
     a slurpy PMC: Ps
 
 invokes a PMC method
-=cut
 
 */
 
 PARROT_API
 void
-Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name, const char *signature, ...)
+Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
+        NOTNULL(const char *signature), ...)
 {
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
@@ -1662,13 +1663,9 @@ Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name, const char *signa
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/inter_run.c>, F<src/pmc/sub.pmc>.
-
-=cut
 
 */
 

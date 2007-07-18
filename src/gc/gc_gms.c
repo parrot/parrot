@@ -276,7 +276,7 @@ static void parrot_gc_gms_deinit( PARROT_INTERP )
 static void parrot_gc_gms_run( PARROT_INTERP, int flags )
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED
+PARROT_WARN_UNUSED_RESULT
 static int set_gen_cb( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
@@ -906,7 +906,7 @@ gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 
 }
 
-PARROT_WARN_UNUSED
+PARROT_WARN_UNUSED_RESULT
 static int
 set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
 {

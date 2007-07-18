@@ -73,7 +73,7 @@ supported encoding into Parrot string's internal format.
 PARROT_API
 void
 string_fill_from_buffer(PARROT_INTERP, NOTNULL(const void *buffer),
-            UINTVAL len, const char *encoding_name, NULLOK(STRING *s))
+            UINTVAL len, NOTNULL(const char *encoding_name), NULLOK(STRING *s))
 {
 #if PARROT_HAS_ICU
     UErrorCode icuError = U_ZERO_ERROR;

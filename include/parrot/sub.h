@@ -258,9 +258,10 @@ Parrot_sub * new_sub( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PMC* Parrot_find_pad( PARROT_INTERP,
-    STRING *lex_name,
+    NOTNULL(STRING *lex_name),
     NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/sub.c */

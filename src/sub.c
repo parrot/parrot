@@ -390,7 +390,7 @@ Locate the LexPad containing the given name. Return NULL on failure.
 */
 
 PMC*
-Parrot_find_pad(PARROT_INTERP, STRING *lex_name, NOTNULL(parrot_context_t *ctx))
+Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context_t *ctx))
 {
     while (1) {
         PMC * const lex_pad = ctx->lex_pad;

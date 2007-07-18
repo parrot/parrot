@@ -147,11 +147,13 @@ void parrot_pass_args( PARROT_INTERP,
 
 PARROT_API
 void Parrot_PCCINVOKE( PARROT_INTERP,
-    PMC* pmc,
-    STRING *method_name,
-    const char *signature,
+    NULLOK(PMC* pmc),
+    NOTNULL(STRING *method_name),
+    NOTNULL(const char *signature),
     ... )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void Parrot_process_args( PARROT_INTERP,

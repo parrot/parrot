@@ -33,11 +33,12 @@
 
 PARROT_WARN_UNUSED_RESULT
 static int change_op( PARROT_INTERP,
-    IMC_Unit *unit,
+    NOTNULL(IMC_Unit *unit),
     NOTNULL(SymReg **r),
     int num,
     int emit )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void * imcc_compile_file( PARROT_INTERP,
@@ -464,7 +465,9 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         (strcmp(name, "set_returns") == 0)) {
         return var_arg_ins(interp, unit, name, r, n, emit);
     }
-    if ((op = is_infix(name, n, r)) >= 0) {
+
+    op = is_infix(name, n, r);
+    if (op >= 0) {
         /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
         name = to_infix(interp, name, r, &n, op);
     }
@@ -960,13 +963,13 @@ register_compilers(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 static int
-change_op(PARROT_INTERP, IMC_Unit *unit, NOTNULL(SymReg **r), int num, int emit)
+change_op(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg **r), int num, int emit)
 {
     int changed = 0;
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
-        SymReg *c = r[num];
+        const SymReg *c = r[num];
         SymReg *s;
         if (c->type & VT_CONSTP)
             c = c->reg;
@@ -1087,14 +1090,16 @@ try_find_op(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
     return -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static const char *
-try_rev_cmp(SHIM_INTERP, SHIM(IMC_Unit * unit), const char *name,
-        SymReg ** r)
+try_rev_cmp(SHIM_INTERP, SHIM(IMC_Unit *unit), NOTNULL(const char *name),
+        NOTNULL(SymReg **r))
 {
     static struct br_pairs {
-        const char *op;
-        const char *nop;
-        int to_swap;
+        NOTNULL( const char * const op );
+        NOTNULL( const char * const nop );
+        const int to_swap;
     } br_pairs[] = {
         { "gt", "lt", 0 },
         { "ge", "le", 0 },

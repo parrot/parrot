@@ -217,8 +217,9 @@ SymReg * link_keys( PARROT_INTERP,
 SymReg * mk_address( PARROT_INTERP, char *name, int uniq )
         __attribute__nonnull__(1);
 
-SymReg * mk_const( PARROT_INTERP, char * name, int t )
-        __attribute__nonnull__(1);
+SymReg * mk_const( PARROT_INTERP, NOTNULL(char *name), int t )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 SymReg * mk_const_ident( PARROT_INTERP,
     NOTNULL(char *name),

@@ -24,10 +24,11 @@ PARROT_API
 void string_fill_from_buffer( PARROT_INTERP,
     NOTNULL(const void *buffer),
     UINTVAL len,
-    const char *encoding_name,
+    NOTNULL(const char *encoding_name),
     NULLOK(STRING *s) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4);
 
 PARROT_API
 void string_set_data_directory( PARROT_INTERP, const char *dir )

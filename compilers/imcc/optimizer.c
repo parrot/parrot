@@ -121,8 +121,9 @@ static Basic_block * find_outer(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int if_branch( PARROT_INTERP, IMC_Unit *unit )
-        __attribute__nonnull__(1);
+static int if_branch( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int is_ins_save( PARROT_INTERP,
@@ -281,7 +282,7 @@ get_neg_op(NOTNULL(const char *op), NOTNULL(int *n))
  *
  */
 static int
-if_branch(PARROT_INTERP, IMC_Unit *unit)
+if_branch(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     Instruction *ins, *last;
     int reg, changed = 0;
@@ -1068,15 +1069,13 @@ branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
 {
     int changed = 0;
     int args;
-    const char *neg_op = get_neg_op(cond->op, &args);
+    const char * const neg_op = get_neg_op(cond->op, &args);
     if (neg_op) {
-        char *label;
-        int count, size, found;
+        const size_t size = strlen(branch->r[0]->name) + 10; /* + '_post999' */
+        char * const label = malloc(size);
+        int count;
+        int found = 0;
 
-        size = strlen(branch->r[0]->name) + 10; /* + '_post999' */
-
-        label = malloc(size);
-        found = 0;
         for (count = 1; count != 999; ++count) {
             sprintf(label, "%s_post%d", branch->r[0]->name, count);
             if (get_sym(interp, label) == 0) {
@@ -1111,7 +1110,7 @@ branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
 
             regs[get_branch_regno(cond)] =
                 mk_label_address(interp, str_dup(label));
-            tmp = INS(interp, unit, (char*)neg_op, "", regs, args, 0, 0);
+            tmp = INS(interp, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
             IMCC_debug(interp, DEBUG_OPT1,
             "loop %s -> %s converted to post-test, added label %s\n",

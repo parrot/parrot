@@ -73,10 +73,8 @@ static void init_hash(
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int int_compare( SHIM_INTERP,
-    NOTNULL(const void *a),
-    NOTNULL(const void *b) )
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    NULLOK(const void *a),
+    NULLOK(const void *b) );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -87,11 +85,13 @@ static size_t key_hash_cstring( SHIM_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_int( SHIM_INTERP, void *value, size_t seed );
+static size_t key_hash_int( SHIM_INTERP, NULLOK(void *value), size_t seed );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_pointer( SHIM_INTERP, void *value, size_t seed );
+static size_t key_hash_pointer( SHIM_INTERP,
+    NULLOK(void *value),
+    size_t seed );
 
 PARROT_WARN_UNUSED_RESULT
 static size_t key_hash_STRING( PARROT_INTERP,
@@ -103,14 +103,16 @@ static size_t key_hash_STRING( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int pointer_compare( SHIM_INTERP,
-    const void * const a,
-    const void * const b );
+    NULLOK(const void *a),
+    NULLOK(const void *b) );
 
 PARROT_WARN_UNUSED_RESULT
 static int STRING_compare( PARROT_INTERP,
-    const void *search_key,
-    const void *bucket_key )
-        __attribute__nonnull__(1);
+    NOTNULL(const void *search_key),
+    NOTNULL(const void *bucket_key) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 
@@ -146,7 +148,7 @@ Compares the two strings, returning 0 if they are identical.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-STRING_compare(PARROT_INTERP, const void *search_key, const void *bucket_key)
+STRING_compare(PARROT_INTERP, NOTNULL(const void *search_key), NOTNULL(const void *bucket_key))
 {
     return string_equal(interp, (const STRING *)search_key, (const STRING *)bucket_key);
 }
@@ -161,7 +163,7 @@ Compares the two pointers, returning 0 if they are identical
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-pointer_compare(SHIM_INTERP, const void * const a, const void * const b)
+pointer_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 {
     return a != b;
 }
@@ -176,7 +178,7 @@ Returns a hashvalue for a pointer.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-key_hash_pointer(SHIM_INTERP, void *value, size_t seed)
+key_hash_pointer(SHIM_INTERP, NULLOK(void *value), size_t seed)
 {
     return ((size_t) value) ^ seed;
 }
@@ -221,7 +223,7 @@ Custom C<key_hash> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static size_t
-key_hash_int(SHIM_INTERP, void *value, size_t seed)
+key_hash_int(SHIM_INTERP, NULLOK(void *value), size_t seed)
 {
     return (size_t)value ^ seed;
 }
@@ -236,7 +238,7 @@ Custom C<compare> function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-int_compare(SHIM_INTERP, NOTNULL(const void *a), NOTNULL(const void *b))
+int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 {
     return a != b;
 }

@@ -259,10 +259,9 @@ static void visit_loop_next_for_GC( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void visit_loop_todo_list( PARROT_INTERP,
-    NOTNULL(PMC *current),
+    NULLOK(PMC *current),
     NOTNULL(visit_info *info) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void visit_next_for_GC( PARROT_INTERP,
@@ -1376,7 +1375,7 @@ The thaw loop.
 */
 
 static void
-visit_loop_todo_list(PARROT_INTERP, NOTNULL(PMC *current),
+visit_loop_todo_list(PARROT_INTERP, NULLOK(PMC *current),
         NOTNULL(visit_info *info))
 {
     List * const todo = (List *)PMC_data(info->todo);
