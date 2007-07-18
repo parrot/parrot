@@ -1,0 +1,19 @@
+;
+; i386/core.jit
+;
+; $Id: core.jit 18183 2007-04-14 03:15:44Z chromatic $
+;
+
+Parrot_end {
+    jit_emit_end(NATIVECODE);
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
