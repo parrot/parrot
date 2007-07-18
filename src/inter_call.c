@@ -1615,7 +1615,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name, const char *signa
     index      = 0;
     seen_arrow = 1;
 
-    for (x=ret_x; *x; x++) {
+    for (x=ret_x; x && *x; x++) {
         if (isupper(*x)) {
             switch (*x) {
                 case 'I':
