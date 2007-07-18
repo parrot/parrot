@@ -1,7 +1,7 @@
 ;
 ; i386/core.jit
 ;
-; $Id: core.jit 18183 2007-04-14 03:15:44Z chromatic $
+; $Id$
 ;
 
 Parrot_end {

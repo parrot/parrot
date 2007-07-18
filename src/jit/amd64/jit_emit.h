@@ -3,7 +3,7 @@
  *
  * skeleton example - a stripped down jit/ppc/jit_emit.h
  *
- * $Id: jit_emit.h 18484 2007-05-09 12:16:31Z paultcochrane $
+ * $Id$
  */
 
 #if 0
