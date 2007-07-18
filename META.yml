@@ -3,7 +3,7 @@ name: parrot
 version: 0.4.14
 author: ~
 abstract: ~
-license: perl
+license: artistic2
 no_index:
     directory:
         - config
