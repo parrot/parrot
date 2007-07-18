@@ -79,22 +79,27 @@ static void notify_func_table( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void prederef_args(
-    void **pc_prederef,
+    NOTNULL(void **pc_prederef),
     PARROT_INTERP,
     NOTNULL(opcode_t *pc),
     NOTNULL(const op_info_t *opinfo) )
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static opcode_t * runops_cgp( PARROT_INTERP, opcode_t *pc )
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static opcode_t * runops_cgp( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static opcode_t * runops_exec( PARROT_INTERP, opcode_t *pc )
-        __attribute__nonnull__(1);
+static opcode_t * runops_exec( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static opcode_t * runops_jit( PARROT_INTERP, opcode_t *pc )
-        __attribute__nonnull__(1);
+static opcode_t * runops_jit( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static opcode_t * runops_switch( PARROT_INTERP, NOTNULL(opcode_t *pc) )
         __attribute__nonnull__(1)
@@ -119,7 +124,7 @@ C<pc_prederef> is the current opcode.
 */
 
 static void
-prederef_args(void **pc_prederef, PARROT_INTERP,
+prederef_args(NOTNULL(void **pc_prederef), PARROT_INTERP,
         NOTNULL(opcode_t *pc), NOTNULL(const op_info_t *opinfo))
 {
     const PackFile_ConstTable * const const_table = interp->code->const_table;
@@ -574,7 +579,7 @@ Runs the JIT code for the specified opcode.
 */
 
 static opcode_t *
-runops_jit(PARROT_INTERP, opcode_t *pc)
+runops_jit(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
 #if JIT_CAPABLE
 #  ifdef PARROT_EXEC_OS_AIX
@@ -609,7 +614,7 @@ Runs the native executable version of the specified opcode.
 */
 
 static opcode_t *
-runops_exec(PARROT_INTERP, opcode_t *pc)
+runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
 #if EXEC_CAPABLE
     opcode_t *code_start;
@@ -655,11 +660,12 @@ Runs the C C<goto>, predereferenced core.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-runops_cgp(PARROT_INTERP, opcode_t *pc)
+runops_cgp(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
 #ifdef HAVE_COMPUTED_GOTO
-    opcode_t *code_start = (opcode_t *)interp->code->base.data;
+    opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t *pc_prederef;
     init_prederef(interp, PARROT_CGP_CORE);
     pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
@@ -669,7 +675,6 @@ runops_cgp(PARROT_INTERP, opcode_t *pc)
     PIO_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);
-    return NULL;
 #endif
 }
 
