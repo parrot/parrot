@@ -462,7 +462,7 @@ mk_const_ident(PARROT_INTERP,
 
 /* Makes a new constant */
 SymReg *
-_mk_const(NOTNULL(SymHash *hsh), NOTNULL(char *name), int t)
+_mk_const(NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t)
 {
     SymReg * const r = _mk_symreg(hsh, name, t);
     r->type          = VTCONST;
@@ -479,7 +479,7 @@ _mk_const(NOTNULL(SymHash *hsh), NOTNULL(char *name), int t)
 }
 
 SymReg *
-mk_const(PARROT_INTERP, NOTNULL(char *name), int t)
+mk_const(PARROT_INTERP, NOTNULL(const char *name), int t)
 {
     SymHash * const h = &IMCC_INFO(interp)->ghash;
 

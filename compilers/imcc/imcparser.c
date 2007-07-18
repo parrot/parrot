@@ -536,7 +536,7 @@ mk_pmc_const(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
     const int type_enum = atoi(type);
     SymReg *rhs;
     SymReg *r[2];
-    NOTNULL(const char *name);
+    char *name;
     int ascii;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */

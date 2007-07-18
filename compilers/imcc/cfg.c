@@ -18,19 +18,15 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void analyse_life_block( PARROT_INTERP,
-    NOTNULL(Basic_block* bb),
-    NOTNULL(SymReg* r) )
+static void analyse_life_block( NOTNULL(Basic_block* bb), NOTNULL(SymReg* r) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
-static void analyse_life_symbol( PARROT_INTERP,
+static void analyse_life_symbol(
     NOTNULL(const struct _IMC_Unit *unit),
     NOTNULL(SymReg* r) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void bb_add_edge(
     NOTNULL(IMC_Unit *unit),
@@ -549,11 +545,11 @@ life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 
     IMCC_info(interp, 2, "life_analysis\n");
     for (i = 0; i < unit->n_symbols; i++)
-        analyse_life_symbol(interp, unit, reglist[i]);
+        analyse_life_symbol(unit, reglist[i]);
 }
 
 static void
-analyse_life_symbol(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit),
+analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
         NOTNULL(SymReg* r))
 {
     int i;
@@ -571,7 +567,7 @@ analyse_life_symbol(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit),
      * that can be obtained locally */
 
     for (i=0; i < unit->n_basic_blocks; i++) {
-        analyse_life_block(interp, unit->bb_list[i], r);
+        analyse_life_block(unit->bb_list[i], r);
     }
 
     /* Now we need to consider the relations between blocks */
@@ -634,7 +630,7 @@ free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
  */
 
 static void
-analyse_life_block(PARROT_INTERP, NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
+analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 {
     Life_range* const l = make_life_range(r, bb->index);
 

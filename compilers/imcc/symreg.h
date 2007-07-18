@@ -131,7 +131,7 @@ SymReg * _mk_address( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-SymReg * _mk_const( NOTNULL(SymHash *hsh), NOTNULL(char *name), int t )
+SymReg * _mk_const( NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -217,7 +217,7 @@ SymReg * link_keys( PARROT_INTERP,
 SymReg * mk_address( PARROT_INTERP, char *name, int uniq )
         __attribute__nonnull__(1);
 
-SymReg * mk_const( PARROT_INTERP, NOTNULL(char *name), int t )
+SymReg * mk_const( PARROT_INTERP, NOTNULL(const char *name), int t )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
