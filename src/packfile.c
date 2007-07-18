@@ -657,10 +657,6 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), opcode_t *packed,
     PackFile_Header * const header = self->header;
     opcode_t *cursor;
 
-    if (!self) {
-        PIO_eprintf(NULL, "PackFile_unpack: self == NULL!\n");
-        return 0;
-    }
     self->src = packed;
     self->size = packed_size;
 
