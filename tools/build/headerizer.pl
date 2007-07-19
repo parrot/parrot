@@ -66,6 +66,7 @@ use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
 
+my %warnings;
 my %opt;
 
 my %valid_macros = map {($_,1)} qw(
@@ -187,15 +188,15 @@ sub function_components_from_declaration {
     for my $macro ( @macros ) {
         $macros{$macro} = 1;
         if ( not $valid_macros{$macro} ) {
-            warn "$file $name: Invalid macro $macro\n";
+            squawk( $file, $name, "Invalid macro $macro" );
         }
     }
     if ( $return_type =~ /\*/ ) {
         if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            warn "$file $name: Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.\n";
+            squawk( $file, $name, "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
         }
         elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            warn "$file $name: Can't have both PARROT_CAN_RETURN_NULL and PARROT_CAN_RETURN_NULL together.\n";
+            squawk( $file, $name, "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CAN_RETURN_NULL together." );
         }
     }
 
@@ -227,7 +228,7 @@ sub attrs_from_args {
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /SHIM|NOTNULL|NULLOK/ ) ) {
             my $name = $func->{name};
             my $file = $func->{file};
-            warn qq{$file $name: "$arg" isn't protected with NOTNULL or NULLOK\n};
+            squawk( $file, $name, qq{"$arg" isn't protected with NOTNULL or NULLOK} );
         }
     }
 
@@ -285,6 +286,14 @@ sub make_function_decls {
     return @decls;
 }
 
+sub squawk {
+    my $file = shift;
+    my $func = shift;
+    my $error = shift;
+
+    push( @{$warnings{$file}->{$func}}, $error );
+}
+
 sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
@@ -327,7 +336,6 @@ sub main {
         }
     }    # for @cfiles
     my $nfiles = scalar keys %cfiles;
-    print "$nfuncs funcs in $nfiles C files\n";
 
     # Update all the .h files
     for my $hfile ( sort keys %cfiles ) {
@@ -355,7 +363,20 @@ sub main {
         write_file( $cfile, $source );
     }
 
+    my $nwarnings;
+    for my $file ( sort keys %warnings ) {
+        print "$file\n";
+        my $funcs = $warnings{$file};
+        for my $func ( sort keys %{$funcs} ) {
+            for my $error ( @{$funcs->{$func}} ) {
+                print "    $func: $error\n";
+                ++$nwarnings;
+            }
+        }
+    }
+
     print "Headerization complete.\n";
+    print "$nwarnings warnings in $nfuncs funcs in $nfiles C files\n";
 
     return;
 }
