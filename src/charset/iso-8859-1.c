@@ -38,10 +38,11 @@ static void downcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
 
 static INTVAL find_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string,
+    NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 static INTVAL find_not_cclass( PARROT_INTERP,
     INTVAL flags,
@@ -70,8 +71,9 @@ static void set_graphemes( PARROT_INTERP,
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
         __attribute__nonnull__(1);
 
-static void titlecase( PARROT_INTERP, STRING *source_string )
-        __attribute__nonnull__(1);
+static void titlecase( PARROT_INTERP, NOTNULL(STRING *source_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void titlecase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
@@ -97,8 +99,9 @@ static STRING * to_unicode( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void upcase( PARROT_INTERP, STRING *source_string )
-        __attribute__nonnull__(1);
+static void upcase( PARROT_INTERP, NOTNULL(STRING *source_string) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
         __attribute__nonnull__(1)
@@ -175,11 +178,8 @@ to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
         dest->strlen  = iter.charpos;
         return dest;
     }
-    else {
-        real_exception(interp, NULL, UNIMPLEMENTED,
-                "to_unicode inplace for iso-8859-1 not implemented");
-    }
-    return NULL;
+    real_exception(interp, NULL, UNIMPLEMENTED,
+            "to_unicode inplace for iso-8859-1 not implemented");
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -209,18 +209,16 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     real_exception(interp, NULL, UNIMPLEMENTED,
             "decompose for iso-8859-1 not implemented");
-    return NULL;
 }
 
 static void
-upcase(PARROT_INTERP, STRING *source_string)
+upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     unsigned char *buffer;
     UINTVAL offset = 0;
 
-    if (!source_string->strlen) {
+    if (!source_string->strlen)
         return;
-    }
 
     Parrot_unmake_COW(interp, source_string);
     buffer = (unsigned char *)source_string->strstart;
@@ -255,15 +253,15 @@ downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 }
 
 static void
-titlecase(PARROT_INTERP, STRING *source_string)
+titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     unsigned char *buffer;
     unsigned int c;
     UINTVAL offset;
 
-    if (!source_string->strlen) {
+    if (!source_string->strlen)
         return;
-    }
+
     Parrot_unmake_COW(interp, source_string);
     buffer = (unsigned char *)source_string->strstart;
     c = buffer[0];
@@ -358,7 +356,7 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
-            STRING *source_string, UINTVAL offset, UINTVAL count)
+            NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     UINTVAL pos = offset;
     UINTVAL end = offset + count;

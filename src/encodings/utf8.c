@@ -583,7 +583,6 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
-    return NULL;
 }
 
 static void

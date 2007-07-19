@@ -161,7 +161,6 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
-    return 0;
 #endif
 }
 
@@ -182,7 +181,6 @@ static UINTVAL
 get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 {
     UNIMPL;
-    return 0;
 }
 
 static void
@@ -220,7 +218,6 @@ static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
-    return NULL;
 }
 
 
@@ -230,7 +227,6 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 {
 
     UNIMPL;
-    return NULL;
 }
 
 static STRING *
@@ -238,7 +234,6 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
-    return NULL;
 }
 
 static void
@@ -272,7 +267,6 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
-    return 0;
 #endif
 }
 

@@ -233,7 +233,6 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
-    return NULL;
 #endif
 }
 
@@ -241,7 +240,6 @@ static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     UNIMPL;
-    return NULL;
 }
 
 static void
@@ -462,7 +460,6 @@ cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)
 {
     UNIMPL;
-    return 0;
 }
 
 static UINTVAL

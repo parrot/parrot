@@ -62,9 +62,8 @@ PARROT_CANNOT_RETURN_NULL
 static oplib_init_f get_op_lib_init( PARROT_INTERP,
     int core_op,
     int which,
-    NOTNULL(PMC *lib) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+    NULLOK(PMC *lib) )
+        __attribute__nonnull__(1);
 
 static void init_prederef( PARROT_INTERP, int which )
         __attribute__nonnull__(1);
@@ -329,7 +328,7 @@ C<ParrotLibrary> PMC.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
-get_op_lib_init(PARROT_INTERP, int core_op, int which, NOTNULL(PMC *lib))
+get_op_lib_init(PARROT_INTERP, int core_op, int which, NULLOK(PMC *lib))
 {
     if (core_op) {
         oplib_init_f init_func;

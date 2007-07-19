@@ -244,18 +244,18 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
         result->encoding = Parrot_ucs2_encoding_ptr;
+    return result;
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
 #endif
-    return result;
 }
 
 static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
 #if PARROT_HAS_ICU
-    UChar *s = (UChar*) src->strstart;
+    UChar * const s = (UChar*) src->strstart;
     UINTVAL c, pos;
 
     pos = 0;
@@ -265,7 +265,6 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 #else
     real_exception(interp, NULL, E_LibraryNotLoadedError,
             "no ICU lib loaded");
-    return 0;
 #endif
 }
 
@@ -341,7 +340,6 @@ static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
-    return NULL;
 }
 
 static STRING *
@@ -349,7 +347,6 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
-    return NULL;
 }
 
 static void

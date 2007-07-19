@@ -21,6 +21,7 @@ src/pmc.c - The base vtable calling functions
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC* create_class_pmc( PARROT_INTERP, INTVAL type )
         __attribute__nonnull__(1);
 
@@ -273,6 +274,7 @@ Creates a new constant PMC of type C<base_type>.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
@@ -289,6 +291,7 @@ Creates a new constant PMC of type C<base_type>, the call C<init>.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
@@ -306,8 +309,9 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
-pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)
+pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 {
     PMC * const pmc = pmc_new_noinit(interp, base_type);
 
@@ -324,8 +328,9 @@ As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
-constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)
+constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
@@ -341,13 +346,15 @@ This segment handles PMC registration and such.
 
 PARROT_API
 INTVAL
-pmc_register(PARROT_INTERP, STRING *name)
+pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
 {
     INTVAL type;
     PMC *classname_hash;
     /* If they're looking to register an existing class, return that
        class' type number */
-    if ((type = pmc_type(interp, name)) > enum_type_undef) {
+    type = pmc_type(interp, name);
+
+    if (type > enum_type_undef) {
         return type;
     }
     if (type < enum_type_undef) {
@@ -411,6 +418,7 @@ pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 create_class_pmc(PARROT_INTERP, INTVAL type)
 {
@@ -544,12 +552,12 @@ dod_register_pmc(PARROT_INTERP, PMC* pmc)
 /*
 
 FUNCDOC: dod_unregister_pmc
-Unregisters the PMC from the interpreter's DOD registery.
+Unregisters the PMC from the interpreter's DOD registry.
 
 */
 
 void
-dod_unregister_pmc(PARROT_INTERP, PMC* pmc)
+dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
     if (!interp->DOD_registry)
         return; /* XXX or signal exception? */

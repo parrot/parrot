@@ -39,6 +39,7 @@ typedef enum {
 /* HEADERIZER BEGIN: src/key.c */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_append( SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -58,26 +59,32 @@ PMC * key_new( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_new_cstring( PARROT_INTERP, NULLOK(const char *value) )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_new_integer( PARROT_INTERP, INTVAL value )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_new_number( PARROT_INTERP, FLOATVAL value )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_new_pmc( PARROT_INTERP, PMC *value )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_new_string( PARROT_INTERP, STRING *value )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 PMC * key_next( SHIM_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(2);
 
@@ -87,6 +94,7 @@ FLOATVAL key_number( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC * key_pmc( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -116,10 +124,12 @@ void key_set_string( SHIM_INTERP, NOTNULL(PMC *key), STRING *value )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING * key_set_to_string( PARROT_INTERP, NULLOK(PMC *key) )
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING * key_string( PARROT_INTERP, NOTNULL(PMC *key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

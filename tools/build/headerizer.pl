@@ -183,9 +183,19 @@ sub function_components_from_declaration {
 
     die "$file $name: Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
 
+    my %macros;
     for my $macro ( @macros ) {
+        $macros{$macro} = 1;
         if ( not $valid_macros{$macro} ) {
             warn "$file $name: Invalid macro $macro\n";
+        }
+    }
+    if ( $return_type =~ /\*/ ) {
+        if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
+            warn "$file $name: Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.\n";
+        }
+        elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
+            warn "$file $name: Can't have both PARROT_CAN_RETURN_NULL and PARROT_CAN_RETURN_NULL together.\n";
         }
     }
 

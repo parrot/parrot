@@ -255,7 +255,7 @@ static void
 set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_codepoints))
 {
-    set_bytes(interp, source_string, offset, count, NOTNULL(new_codepoints));
+    set_bytes(interp, source_string, offset, count, new_codepoints);
 }
 
 static void
