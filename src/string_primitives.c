@@ -39,7 +39,7 @@ etc.).
 
 PARROT_API
 void
-string_set_data_directory(PARROT_INTERP, const char *dir)
+string_set_data_directory(PARROT_INTERP, NOTNULL(const char *dir))
 {
 #if PARROT_HAS_ICU
     u_setDataDirectory(dir);
@@ -69,7 +69,7 @@ string_set_data_directory(PARROT_INTERP, const char *dir)
 PARROT_API
 Parrot_UInt4
 string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
-        STRING *string)
+        NOTNULL(STRING *string))
 {
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;
@@ -286,6 +286,7 @@ C<Parrot_char_is_digit()> returns false.
 */
 
 PARROT_API
+PARROT_CONST_FUNCTION
 UINTVAL
 Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 {

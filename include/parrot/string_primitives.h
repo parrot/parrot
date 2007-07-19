@@ -18,18 +18,21 @@
 /* HEADERIZER BEGIN: src/string_primitives.c */
 
 PARROT_API
+PARROT_CONST_FUNCTION
 UINTVAL Parrot_char_digit_value( SHIM_INTERP, UINTVAL character );
 
 PARROT_API
-void string_set_data_directory( PARROT_INTERP, const char *dir )
-        __attribute__nonnull__(1);
+void string_set_data_directory( PARROT_INTERP, NOTNULL(const char *dir) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_UInt4 string_unescape_one( PARROT_INTERP,
     NOTNULL(UINTVAL *offset),
-    STRING *string )
+    NOTNULL(STRING *string) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/string_primitives.c */
 

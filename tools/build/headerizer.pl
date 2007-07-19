@@ -297,7 +297,6 @@ sub squawk {
 sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
-    my $nfuncs = 0;
     my %ofiles = map {($_,1)} @ARGV;
     my @ofiles = sort keys %ofiles;
     my %cfiles;
@@ -332,10 +331,8 @@ sub main {
             my $components = function_components_from_declaration($cfile, $decl);
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
             push( @{ $cfiles_with_statics{ $cfile } }, $components ) if $components->{is_static};
-            ++$nfuncs;
         }
     }    # for @cfiles
-    my $nfiles = scalar keys %cfiles;
 
     # Update all the .h files
     for my $hfile ( sort keys %cfiles ) {
@@ -363,20 +360,26 @@ sub main {
         write_file( $cfile, $source );
     }
 
-    my $nwarnings;
-    for my $file ( sort keys %warnings ) {
-        print "$file\n";
-        my $funcs = $warnings{$file};
-        for my $func ( sort keys %{$funcs} ) {
-            for my $error ( @{$funcs->{$func}} ) {
-                print "    $func: $error\n";
-                ++$nwarnings;
+    print "Headerization complete.\n";
+    if ( keys %warnings ) {
+        my $nwarnings = 0;
+        my $nwarningfuncs = 0;
+        my $nwarningfiles = 0;
+        for my $file ( sort keys %warnings ) {
+            ++$nwarningfiles;
+            print "$file\n";
+            my $funcs = $warnings{$file};
+            for my $func ( sort keys %{$funcs} ) {
+                ++$nwarningfuncs;
+                for my $error ( @{$funcs->{$func}} ) {
+                    print "    $func: $error\n";
+                    ++$nwarnings;
+                }
             }
         }
-    }
 
-    print "Headerization complete.\n";
-    print "$nwarnings warnings in $nfuncs funcs in $nfiles C files\n";
+        print "$nwarnings warnings in $nwarningfuncs funcs in $nwarningfiles C files\n";
+    }
 
     return;
 }

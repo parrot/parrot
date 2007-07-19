@@ -28,6 +28,8 @@ static INTVAL PIO_buf_close( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static ParrotIO * PIO_buf_fdopen( PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     PIOHANDLE fd,
@@ -301,21 +303,20 @@ The buffer layer's C<FDOpen> function.
 
 */
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static ParrotIO *
 PIO_buf_fdopen(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
 {
     ParrotIOLayer * const l = PIO_DOWNLAYER(layer);
     ParrotIO * const io = PIO_fdopen_down(interp, l, fd, flags);
 
-    if (!io) {
-        /* error creating IO stream */
-        return NULL;
+    if (io) {
+        if (io->flags & PIO_F_CONSOLE)
+            PIO_buf_setlinebuf(interp, l, io);
+        else
+            PIO_buf_setbuf(interp, l, io, PIO_UNBOUND);
     }
-
-    if (io->flags & PIO_F_CONSOLE)
-        PIO_buf_setlinebuf(interp, l, io);
-    else
-        PIO_buf_setbuf(interp, l, io, PIO_UNBOUND);
 
     return io;
 }

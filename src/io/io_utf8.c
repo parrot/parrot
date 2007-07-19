@@ -86,6 +86,8 @@ ParrotIOLayer pio_utf8_layer = {
     NULL, NULL
 };
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_utf8_register_layer(void)
 {

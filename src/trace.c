@@ -26,6 +26,7 @@ src/test_main.c
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* trace_class_name( NOTNULL(const PMC* pmc) )
         __attribute__nonnull__(1);
 
@@ -41,6 +42,7 @@ Prints a PMC to C<stderr>.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 trace_class_name(NOTNULL(const PMC* pmc))
 {

@@ -442,6 +442,7 @@ Used in C<src/nci.c>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_make_la(PARROT_INTERP, NOTNULL(PMC *array))
 {
@@ -473,7 +474,7 @@ Use this to destroy an array created with C<Parrot_make_la()>.
 
 PARROT_API
 void
-Parrot_destroy_la(long *array) {
+Parrot_destroy_la(NULLOK(long *array)) {
     mem_sys_free(array);
 }
 
@@ -492,8 +493,10 @@ Note that you need to free this array with C<Parrot_destroy_cpa()>.
 */
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_make_cpa(PARROT_INTERP, PMC *array)
+Parrot_make_cpa(PARROT_INTERP, NOTNULL(PMC *array))
 {
     const INTVAL arraylen = VTABLE_elements(interp, array);
     INTVAL cur;
@@ -563,6 +566,7 @@ Helper to convert a B<struct tm *> to an Array
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC*
 tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
 {
@@ -777,7 +781,7 @@ void
 Parrot_register_move(PARROT_INTERP, int n_regs,
                      NOTNULL(unsigned char *dest_regs), NOTNULL(unsigned char *src_regs),
                      unsigned char temp_reg,
-                     reg_move_func mov, reg_move_func mov_alt, void *info)
+                     reg_move_func mov, reg_move_func mov_alt, NOTNULL(void *info))
 {
     int i;
     int max_reg = 0;

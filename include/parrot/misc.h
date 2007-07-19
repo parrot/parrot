@@ -51,7 +51,7 @@ void Parrot_destroy_cpa( NOTNULL(char **array) )
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_destroy_la( long *array );
+void Parrot_destroy_la( NULLOK(long *array) );
 
 PARROT_API
 FLOATVAL Parrot_float_rand( INTVAL how_random );
@@ -60,11 +60,15 @@ PARROT_API
 INTVAL Parrot_int_rand( INTVAL how_random );
 
 PARROT_API
-void * Parrot_make_cpa( PARROT_INTERP, PMC *array )
-        __attribute__nonnull__(1);
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void * Parrot_make_cpa( PARROT_INTERP, NOTNULL(PMC *array) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void * Parrot_make_la( PARROT_INTERP, NOTNULL(PMC *array) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -80,10 +84,11 @@ void Parrot_register_move( PARROT_INTERP,
     unsigned char temp_reg,
     reg_move_func mov,
     reg_move_func mov_alt,
-    void *info )
+    NOTNULL(void *info) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(8);
 
 PARROT_API
 void Parrot_srand( INTVAL seed );
@@ -92,6 +97,7 @@ PARROT_API
 INTVAL Parrot_uint_rand( INTVAL how_random );
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC* tm_to_array( PARROT_INTERP, NOTNULL(const struct tm *tm) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -57,6 +57,7 @@ STRING * Parrot_reuse_COW_reference( SHIM_INTERP,
 
 PARROT_API
 PARROT_PURE_FUNCTION
+PARROT_CANNOT_RETURN_NULL
 const char * Parrot_string_cstring( SHIM_INTERP, NOTNULL(const STRING *str) )
         __attribute__nonnull__(2);
 
@@ -348,7 +349,7 @@ INTVAL string_max_bytes( SHIM_INTERP,
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * string_nprintf( PARROT_INTERP,
-    STRING *dest,
+    NULLOK(STRING *dest),
     INTVAL bytelen,
     NOTNULL(const char *format),
     ... )

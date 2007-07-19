@@ -32,6 +32,7 @@ Uses C<malloc> to allocate system memory.
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate(size_t size)
 {
@@ -45,6 +46,7 @@ mem_sys_allocate(size_t size)
 }
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)
 {
@@ -71,6 +73,7 @@ Uses C<calloc> to allocate system memory.
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
@@ -84,6 +87,7 @@ mem_sys_allocate_zeroed(size_t size)
 }
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
 {
@@ -110,6 +114,7 @@ Resize a chunk of system memory.
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem__sys_realloc(NULLOK(void *from), size_t size)
 {
@@ -137,6 +142,7 @@ Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
 {
@@ -158,6 +164,7 @@ mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
 }
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_realloc(NOTNULL(void *from), size_t size,
         NOTNULL(const char *file), int line)

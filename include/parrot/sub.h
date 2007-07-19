@@ -221,6 +221,8 @@ int Parrot_Context_get_info( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING* Parrot_Context_infostr( PARROT_INTERP,
     NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
@@ -231,8 +233,10 @@ STRING* Parrot_full_sub_name( PARROT_INTERP, NULLOK(PMC* sub) )
         __attribute__nonnull__(1);
 
 PARROT_API
-PMC* parrot_new_closure( PARROT_INTERP, PMC *sub_pmc )
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+PMC* parrot_new_closure( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void invalidate_retc_context( PARROT_INTERP, NOTNULL(PMC *cont) )
         __attribute__nonnull__(1)

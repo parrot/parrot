@@ -1726,7 +1726,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_nprintf(PARROT_INTERP,
-    STRING *dest, INTVAL bytelen, NOTNULL(const char *format), ...)
+    NULLOK(STRING *dest), INTVAL bytelen, NOTNULL(const char *format), ...)
 {
     STRING  *output;
     va_list  args;
@@ -2496,6 +2496,7 @@ as constants -- i.e. do not resize the result.
 
 PARROT_API
 PARROT_PURE_FUNCTION
+PARROT_CANNOT_RETURN_NULL
 const char *
 Parrot_string_cstring(SHIM_INTERP, NOTNULL(const STRING *str))
 {
