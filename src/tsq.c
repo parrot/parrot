@@ -25,6 +25,7 @@ Does a synchronized removal of the head entry off the queue and returns it.
 
 */
 
+PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY *
 pop_entry(NOTNULL(QUEUE *queue))
 {
@@ -45,6 +46,8 @@ return C<NULL> if the queue is empty.
 
 */
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 QUEUE_ENTRY *
 peek_entry(NOTNULL(QUEUE *queue))
 {
@@ -61,6 +64,7 @@ in here so we don't have to duplicate pop code.
 
 */
 
+PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY *
 nosync_pop_entry(NOTNULL(QUEUE *queue))
 {
@@ -89,6 +93,7 @@ necessary until there is an entry, and then returns it.
 
 */
 
+PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY *
 wait_for_entry(NOTNULL(QUEUE *queue))
 {
@@ -113,7 +118,7 @@ Does a synchronized insertion of C<entry> onto the tail of the queue.
 */
 
 void
-push_entry(NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry)
+push_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 {
     queue_lock(queue);
     /* Is there something in the queue? */
@@ -138,7 +143,7 @@ Does a synchronized insertion of C<entry> into the head of the queue.
 */
 
 void
-unshift_entry(NOTNULL(QUEUE *queue), QUEUE_ENTRY *entry)
+unshift_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 {
     QUEUE_ENTRY *cur;
 
@@ -316,6 +321,8 @@ Initializes the queue, setting C<prio> as the queue's priority.
 
 */
 
+PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
 QUEUE*
 queue_init(UINTVAL prio)
 {
@@ -339,9 +346,9 @@ Destroys the queue, raising an exception if it is not empty.
 void
 queue_destroy(NOTNULL(QUEUE *queue))
 {
-    if (peek_entry(queue)) {
+    if (peek_entry(queue))
         internal_exception(1, "Queue not empty on destroy");
-    }
+
     COND_DESTROY(queue->queue_condition);
     MUTEX_DESTROY(queue->queue_mutex);
     mem_sys_free(queue);

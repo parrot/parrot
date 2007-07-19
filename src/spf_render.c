@@ -33,6 +33,7 @@ static void gen_sprintf_call(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags( PARROT_INTERP,
     SpfInfo info,
     NOTNULL(STRING *str),
@@ -41,6 +42,7 @@ static STRING * handle_flags( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* str_append_w_flags( PARROT_INTERP,
     NOTNULL(STRING* dest),
     SpfInfo info,
@@ -68,6 +70,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 handle_flags(PARROT_INTERP,
              SpfInfo info, NOTNULL(STRING *str), INTVAL is_int_type, NULLOK(STRING* prefix))
@@ -158,6 +161,7 @@ handle_flags(PARROT_INTERP,
     return str;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 str_append_w_flags(PARROT_INTERP,
         NOTNULL(STRING* dest), SpfInfo info, NOTNULL(STRING* src), NULLOK(STRING *prefix))
@@ -236,6 +240,7 @@ This is the engine that does all the formatting.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_format(PARROT_INTERP,
         NOTNULL(STRING *pat), NOTNULL(SPRINTF_OBJ *obj))

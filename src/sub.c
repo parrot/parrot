@@ -78,6 +78,8 @@ Returns a new C<Parrot_sub>.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Parrot_sub *
 new_sub(PARROT_INTERP)
 {
@@ -97,6 +99,8 @@ XXX: Need to document semantics in detail.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Parrot_sub *
 new_closure(PARROT_INTERP)
 {
@@ -114,6 +118,8 @@ to the current context.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
 new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
 {
@@ -145,6 +151,8 @@ Returns a new C<Parrot_cont> pointing to the current context.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
 new_ret_continuation(PARROT_INTERP)
 {
@@ -170,6 +178,8 @@ XXX: Need to document semantics in detail.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Parrot_coro *
 new_coroutine(PARROT_INTERP)
 {
@@ -191,8 +201,10 @@ if possible; otherwise, creates a new one.
 */
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 PMC *
-new_ret_continuation_pmc(PARROT_INTERP, opcode_t *address)
+new_ret_continuation_pmc(PARROT_INTERP, NOTNULL(opcode_t *address))
 {
     PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
     VTABLE_set_pointer(interp, continuation, address);
@@ -243,6 +255,8 @@ Return namespace, name, and location of subroutine.
 */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
 {
@@ -391,6 +405,8 @@ Locate the LexPad containing the given name. Return NULL on failure.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC*
 Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context_t *ctx))
 {
@@ -422,6 +438,7 @@ Parrot_find_pad(PARROT_INTERP, NOTNULL(STRING *lex_name), NOTNULL(parrot_context
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC*
 parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
 {

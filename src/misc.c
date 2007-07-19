@@ -56,6 +56,7 @@ in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), va_list args)
 {
@@ -74,6 +75,7 @@ C string version of C<Parrot_vsprintf_s()>.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_c(PARROT_INTERP, NOTNULL(const char *pat), va_list args)
 {
@@ -151,6 +153,7 @@ C string version of C<Parrot_sprintf_s()>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_c(PARROT_INTERP, NOTNULL(const char *pat), ...)
 {
@@ -200,6 +203,7 @@ C<Array> PMC.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_psprintf(PARROT_INTERP, NOTNULL(STRING *pat), NOTNULL(PMC *ary))
 {

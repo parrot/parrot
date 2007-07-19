@@ -128,6 +128,7 @@ PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_psprintf( PARROT_INTERP,
     NOTNULL(STRING *pat),
     NOTNULL(PMC *ary) )
@@ -147,6 +148,7 @@ void Parrot_snprintf( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_c( PARROT_INTERP, NOTNULL(const char *pat), ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -168,6 +170,7 @@ void Parrot_vsnprintf( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_c( PARROT_INTERP,
     NOTNULL(const char *pat),
     va_list args )
@@ -176,6 +179,7 @@ STRING * Parrot_vsprintf_c( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_vsprintf_s( PARROT_INTERP,
     NOTNULL(STRING *pat),
     va_list args )
@@ -275,6 +279,7 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/spf_render.c */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_format( PARROT_INTERP,
     NOTNULL(STRING *pat),
     NOTNULL(SPRINTF_OBJ *obj) )
