@@ -248,6 +248,7 @@ again:
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
 {
@@ -264,6 +265,7 @@ Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const char *
 Parrot_builtin_get_c_namespace(int bi)
 {

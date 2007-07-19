@@ -24,6 +24,8 @@ void Parrot_STM_abort( PARROT_INTERP )
 Parrot_STM_PMC_handle Parrot_STM_alloc( PARROT_INTERP, PMC *pmc )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_STM_begin_update( PARROT_INTERP, Parrot_STM_PMC_handle handle )
         __attribute__nonnull__(1);
 
@@ -39,6 +41,8 @@ void Parrot_STM_destroy_extracted( PARROT_INTERP, void *saved_log_data )
 void Parrot_STM_dump_profile( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * Parrot_STM_extract( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -55,6 +59,8 @@ void Parrot_STM_merge_profile( NOTNULL(Interp *d), NOTNULL(Interp *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_STM_read( PARROT_INTERP, Parrot_STM_PMC_handle handle )
         __attribute__nonnull__(1);
 

@@ -177,9 +177,11 @@ long PDB_add_label(
 void PDB_backtrace( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 char PDB_break( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 char PDB_check_condition( PARROT_INTERP, NOTNULL(PDB_condition_t *condition) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -227,6 +229,8 @@ void PDB_enable_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 char * PDB_escape( NOTNULL(const char *string), INTVAL length )
         __attribute__nonnull__(1);
 
@@ -237,6 +241,8 @@ void PDB_eval( PARROT_INTERP, NOTNULL(const char *command) )
 int PDB_extend_const_table( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PDB_breakpoint_t * PDB_find_breakpoint( PARROT_INTERP,
     NOTNULL(const char *command) )
         __attribute__nonnull__(1)
@@ -283,6 +289,7 @@ void PDB_print_user_stack( PARROT_INTERP, const char *command )
 char PDB_program_end( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_MAY_IGNORE_RESULT
 int PDB_run_command( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

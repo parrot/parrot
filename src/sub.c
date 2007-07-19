@@ -204,7 +204,7 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PMC *
-new_ret_continuation_pmc(PARROT_INTERP, NOTNULL(opcode_t *address))
+new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
 {
     PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
     VTABLE_set_pointer(interp, continuation, address);

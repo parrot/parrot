@@ -72,7 +72,12 @@ typedef int (*arg_pass_f)(Interp *, PMC *sig,
 
 /* HEADERIZER BEGIN: src/pic.c */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Parrot_MIC* parrot_PIC_alloc_mic( const PARROT_INTERP, size_t n );
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Parrot_PIC* parrot_PIC_alloc_pic( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -105,6 +110,8 @@ void parrot_pic_find_infix_v_pp( PARROT_INTERP,
 PARROT_CONST_FUNCTION
 int parrot_PIC_op_is_cached( int op_code );
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * parrot_pic_opcode( PARROT_INTERP, INTVAL op )
         __attribute__nonnull__(1);
 

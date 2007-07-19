@@ -238,6 +238,8 @@ typedef enum {
 /* HEADERIZER BEGIN: src/packout.c */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 opcode_t * PackFile_Constant_pack( PARROT_INTERP,
     NOTNULL(const PackFile_ConstTable *const_table),
     NOTNULL(const PackFile_Constant *self),
@@ -248,11 +250,14 @@ opcode_t * PackFile_Constant_pack( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_ConstTable_pack( PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    opcode_t *cursor )
+    NOTNULL(opcode_t *cursor) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 size_t PackFile_ConstTable_pack_size( PARROT_INTERP,

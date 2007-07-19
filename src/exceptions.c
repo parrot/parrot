@@ -310,8 +310,6 @@ find_exception_handler(PARROT_INTERP, PMC *exception)
      * is freed during Parrot_exit
      */
     Parrot_exit(interp, exit_status);
-
-    return NULL;
 }
 
 /*

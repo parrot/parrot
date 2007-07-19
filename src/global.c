@@ -26,10 +26,14 @@ tdb
 /* HEADERIZER HFILE: none */ /* XXX It's really include/parrot/global.h, but not yet */
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * get_namespace_pmc( PARROT_INTERP, NOTNULL(PMC *sub) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * internal_ns_keyed( PARROT_INTERP,
     NOTNULL(PMC *base_ns),
     NULLOK(PMC *pmc_key),
@@ -58,6 +62,8 @@ static void store_sub_in_multi( PARROT_INTERP,
 /* flags for internal_ns_keyed */
 #define INTERN_NS_CREAT 1       /* I'm a fan of the classics */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
                                NULLOK(STRING *str_key), int flags)
@@ -150,6 +156,8 @@ will result in exceptions.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
 {
@@ -158,6 +166,8 @@ Parrot_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING *str_key)
 {
@@ -166,6 +176,8 @@ Parrot_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING *str_key)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
 {
@@ -174,6 +186,8 @@ Parrot_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_make_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING *str_key)
 {
@@ -263,6 +277,8 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
  */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 {
@@ -316,6 +332,8 @@ entirely use the untyped interface.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 {
@@ -343,6 +361,8 @@ Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_cur(PARROT_INTERP, STRING *globalname)
 {
@@ -351,6 +371,8 @@ Parrot_find_global_cur(PARROT_INTERP, STRING *globalname)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_k(PARROT_INTERP, PMC *pmc_key, STRING *globalname)
 {
@@ -362,6 +384,8 @@ Parrot_find_global_k(PARROT_INTERP, PMC *pmc_key, STRING *globalname)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_s(Interp *inter, STRING *str_key, STRING *globalname)
 {
@@ -515,6 +539,8 @@ anywhere, return PMCNULL.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_name_op(PARROT_INTERP, NOTNULL(STRING *name), SHIM(void *next))
 {
@@ -546,6 +572,8 @@ Parrot_find_name_op(PARROT_INTERP, NOTNULL(STRING *name), SHIM(void *next))
         return PMCNULL;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))
 {

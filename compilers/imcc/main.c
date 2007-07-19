@@ -234,6 +234,8 @@ is_all_hex_digits(NOTNULL(const char *s))
 }
 
 /* most stolen from test_main.c */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 char *
 parseflags(PARROT_INTERP, int *argc, char **argv[])
 {

@@ -155,6 +155,7 @@ STRING * Parrot_sprintf_c( PARROT_INTERP, NOTNULL(const char *pat), ... )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_sprintf_s( PARROT_INTERP, NOTNULL(STRING *pat), ... )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -322,6 +322,7 @@ Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 const CHARSET *
 Parrot_default_charset(SHIM_INTERP)
 {

@@ -39,10 +39,14 @@ static void STM_TRACE_SAFE(const char *x, ...) /* HEADERIZER SKIP */
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_read_record * alloc_read( PARROT_INTERP, NOTNULL(STM_tx_log *log) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_write_record * alloc_write( PARROT_INTERP,
     NOTNULL(STM_tx_log *log) )
         __attribute__nonnull__(1)
@@ -74,6 +78,8 @@ static STM_write_record * find_write_record( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * force_sharing( PARROT_INTERP, NULLOK(PMC *pmc) )
         __attribute__nonnull__(1);
 
@@ -87,6 +93,8 @@ static int get_read_valid_depth( PARROT_INTERP, NOTNULL(STM_tx_log *log) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_tx_log_sub * get_sublog( NOTNULL(STM_tx_log *log), int i )
         __attribute__nonnull__(1);
 
@@ -129,6 +137,7 @@ static int merge_transactions( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void * next_version( NOTNULL(const void *old_version) )
         __attribute__nonnull__(1);
 
@@ -148,6 +157,8 @@ static int setup_wait( PARROT_INTERP, NOTNULL(STM_tx_log *log) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static void * wait_for_version( PARROT_INTERP,
     NOTNULL(STM_tx_log *log),
     Parrot_STM_PMC_handle handle )
@@ -258,6 +269,8 @@ get_read(PARROT_INTERP, NOTNULL(STM_tx_log *log), int i)
  * marked with the value uninitialized.
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_write_record *
 alloc_write(PARROT_INTERP, NOTNULL(STM_tx_log *log))
 {
@@ -276,6 +289,8 @@ alloc_write(PARROT_INTERP, NOTNULL(STM_tx_log *log))
     return write;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_read_record *
 alloc_read(PARROT_INTERP, NOTNULL(STM_tx_log *log))
 {
@@ -295,6 +310,7 @@ alloc_read(PARROT_INTERP, NOTNULL(STM_tx_log *log))
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void *
 next_version(NOTNULL(const void *old_version))
 {
@@ -311,6 +327,8 @@ is_version(NOTNULL(const void *maybe_version))
     return v & 1;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STM_tx_log_sub *
 get_sublog(NOTNULL(STM_tx_log *log), int i)
 {
@@ -460,6 +478,8 @@ merge_transactions(PARROT_INTERP, NOTNULL(STM_tx_log *log),
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 force_sharing(PARROT_INTERP, NULLOK(PMC *pmc))
 {
@@ -997,6 +1017,9 @@ Parrot_STM_transaction_depth(PARROT_INTERP)
  *
  * This may mark us as aborted and return NULL.
  */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static void *
 wait_for_version(PARROT_INTERP,
         NOTNULL(STM_tx_log *log), Parrot_STM_PMC_handle handle)
@@ -1113,6 +1136,8 @@ Read the value stored in the PMC wrapped by C<handle>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 {
@@ -1370,6 +1395,8 @@ be given it when they read the value).
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_STM_begin_update(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 {
@@ -1420,6 +1447,8 @@ enough to wait() for it to become valid. User access through STMLog PMC class.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void *
 Parrot_STM_extract(PARROT_INTERP)
 {

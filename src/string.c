@@ -971,6 +971,7 @@ necessary. The substring is also returned.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 string_substr(PARROT_INTERP, NOTNULL(STRING *src), INTVAL offset, INTVAL length,
         NULLOK(STRING **d), int replace_dest)

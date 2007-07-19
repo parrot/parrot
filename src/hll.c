@@ -230,6 +230,8 @@ Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
     return i < nelements ? i : -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PARROT_API
 STRING *
 Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
@@ -355,6 +357,8 @@ Return root namespace of the current HLL.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
 {
@@ -371,6 +375,8 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {

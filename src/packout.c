@@ -128,18 +128,19 @@ C<PackFile_ConstTable_pack()>
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        NOTNULL(PackFile_Segment *seg), opcode_t *cursor)
+        NOTNULL(PackFile_Segment *seg), NOTNULL(opcode_t *cursor))
 {
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     opcode_t i;
 
     *cursor++ = self->const_count;
 
-    for (i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; i++)
         cursor = PackFile_Constant_pack(interp, self, self->constants[i], cursor);
-    }
 
     return cursor;
 }
@@ -189,6 +190,8 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 opcode_t *
 PackFile_Constant_pack(PARROT_INTERP,
         NOTNULL(const PackFile_ConstTable *const_table),

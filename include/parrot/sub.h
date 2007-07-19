@@ -211,9 +211,8 @@ typedef struct Parrot_Context_info {
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-PMC * new_ret_continuation_pmc( PARROT_INTERP, NOTNULL(opcode_t *address) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PMC * new_ret_continuation_pmc( PARROT_INTERP, NULLOK(opcode_t *address) )
+        __attribute__nonnull__(1);
 
 PARROT_API
 int Parrot_Context_get_info( PARROT_INTERP,

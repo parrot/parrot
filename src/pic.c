@@ -283,6 +283,8 @@ bytecode segement.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Parrot_MIC*
 parrot_PIC_alloc_mic(const PARROT_INTERP, size_t n)
 {
@@ -291,6 +293,8 @@ parrot_PIC_alloc_mic(const PARROT_INTERP, size_t n)
     return store->mic + n;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Parrot_PIC*
 parrot_PIC_alloc_pic(PARROT_INTERP)
 {
@@ -321,6 +325,8 @@ parrot_PIC_alloc_pic(PARROT_INTERP)
     return --store->pic;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void *
 parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 {
