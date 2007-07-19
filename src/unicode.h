@@ -78,7 +78,7 @@ typedef unsigned long utf32_t;
 
 extern const char Parrot_utf8skip[256];
 
-#define UTF8SKIP(s) Parrot_utf8skip[*(s)]
+#define UTF8SKIP(s) Parrot_utf8skip[(int)*(s)]
 
 #define UTF8_MAXLEN 4
 #define UTF16_MAXLEN 4
