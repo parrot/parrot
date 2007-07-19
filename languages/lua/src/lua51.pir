@@ -655,7 +655,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ "Lua::POST::Chunk" ]
+.namespace [ 'Lua::POST::Chunk' ]
 
 .sub '__onload' :load :init
     $P0 = subclass 'POST::Sub', 'Lua::POST::Chunk'
@@ -711,7 +711,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ "Lua::Symbtab" ]
+.namespace [ 'Lua::Symbtab' ]
 
 .sub '__onload' :load :init
     $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'

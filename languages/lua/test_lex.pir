@@ -63,6 +63,8 @@ and imports many definitions from the full Lua compiler
     set_hll_global ['Lua::TestLex'], 'long_string', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'long_comment'
     set_hll_global ['Lua::TestLex'], 'long_comment', $P0
+    $P0 = get_hll_global ['Lua::Grammar'], 'shebang'
+    set_hll_global ['Lua::TestLex'], 'shebang', $P0
 
     # import Lua::PAST::Grammar::internal_error into Lua::DumpLex
     $P0 = get_hll_global ['Lua::PAST::Grammar'], 'internal_error'

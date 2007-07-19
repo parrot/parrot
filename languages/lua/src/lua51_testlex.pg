@@ -28,7 +28,7 @@ Used by F<languages/lua/test_lex.pir>.
 grammar Lua::TestLex
 
 rule TOP {
-        <token>* [ $ | <die>]
+        ^ <shebang>? <token>* [ $ | <die>]
 }
 
 rule token {

@@ -17,7 +17,7 @@ in the lua distribution.
 grammar Lua::Grammar;
 
 token TOP {
-  ^ <block> $
+  ^ <shebang>? <block> $
 }
 
 rule block {
@@ -287,6 +287,9 @@ token ws {
     ]*
 }
 
+token shebang {
+    <'#'> \N*
+}
 
 =head2 EXPRESSIONS
 

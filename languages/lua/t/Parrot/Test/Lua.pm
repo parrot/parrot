@@ -58,20 +58,21 @@ foreach my $func ( keys %language_test_map ) {
             Parrot::Test::per_test( $lua_test eq 'lua' ? '.orig_out' : '.parrot_out', $count );
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
         my @test_prog;
+        my $src = (defined $code) ? 'languages/' . $lang_fn : q{};
         if ( $lua_test eq 'lua' ) {
             @test_prog = (
-                "$ENV{PARROT_LUA_TEST_PROG} ${test_prog_args} languages/${lang_fn} $params",
+                "$ENV{PARROT_LUA_TEST_PROG} $test_prog_args $src $params",
             );
         }
         elsif ( $lua_test eq 'luac.pl' ) {
             @test_prog = (
-                "perl -Ilanguages/lua languages/lua/luac.pl languages/${lang_fn}",
+                "perl -Ilanguages/lua languages/lua/luac.pl $src",
                 "$self->{parrot} --no-gc languages/${pir_fn} $params",
             );
         }
         elsif ( $lua_test eq 'lua.pbc' ) {
             @test_prog = (
-                "$self->{parrot} --no-gc languages/lua/lua.pbc languages/${lang_fn} $params",
+                "$self->{parrot} --no-gc languages/lua/lua.pbc $test_prog_args $src $params",
             );
         }
         else {
@@ -79,7 +80,8 @@ foreach my $func ( keys %language_test_map ) {
         }
 
         # This does not create byte code, but lua code
-        Parrot::Test::write_code_to_file( $code, $lang_fn );
+        Parrot::Test::write_code_to_file( $code, $lang_fn )
+            if (defined $code);
 
         # STDERR is written into same output file
         my $exit_code = Parrot::Test::run_command(
