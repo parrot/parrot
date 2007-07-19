@@ -287,7 +287,7 @@ static UINTVAL
 ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
 {
     UChar * const s = (UChar*) i->str->strstart;
-    const size_t pos = i->bytepos / sizeof (UChar);
+    size_t pos = i->bytepos / sizeof (UChar);
 
     /* TODO either make sure that we don't go past end or use SAFE
      *      iter versions
