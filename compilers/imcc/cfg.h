@@ -94,7 +94,7 @@ void life_analysis( PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit) )
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Life_range * make_life_range( NOTNULL(SymReg *r), int idx )
         __attribute__nonnull__(1);
 

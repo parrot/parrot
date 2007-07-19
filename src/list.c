@@ -1701,7 +1701,7 @@ Pushes C<item> of type C<type> on to the start of the list.
 
 PARROT_API
 void
-list_unshift(PARROT_INTERP, NOTNULL(List *list), void *item, int type)
+list_unshift(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), int type)
 {
     List_chunk *chunk;
 
@@ -1796,7 +1796,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_API
 void
-list_assign(PARROT_INTERP, NOTNULL(List *list), INTVAL idx, void *item, int type)
+list_assign(PARROT_INTERP, NOTNULL(List *list), INTVAL idx, NULLOK(void *item), int type)
 {
     const INTVAL length = list->length;
 

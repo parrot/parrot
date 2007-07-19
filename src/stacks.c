@@ -31,6 +31,8 @@ debugging/error reporting.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
 new_stack(PARROT_INTERP, NOTNULL(const char *name))
 {
@@ -334,6 +336,7 @@ Pop off a destination entry and return a pointer to the contents.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void *
 pop_dest(PARROT_INTERP)
 {

@@ -61,6 +61,8 @@ void mark_stack( PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk) )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t * new_stack( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -73,6 +75,7 @@ void Parrot_dump_dynamic_environment( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void * pop_dest( PARROT_INTERP )
         __attribute__nonnull__(1);
 

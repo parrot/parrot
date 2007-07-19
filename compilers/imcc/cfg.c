@@ -81,6 +81,8 @@ static void free_loops( NOTNULL(IMC_Unit *unit) )
 static void init_basic_blocks( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static Basic_block* make_basic_block( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction* ins) )
@@ -1221,6 +1223,8 @@ clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
     free_loops(unit);
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static Basic_block*
 make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))
 {
@@ -1253,7 +1257,7 @@ make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* in
 }
 
 PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Life_range *
 make_life_range(NOTNULL(SymReg *r), int idx)
 {

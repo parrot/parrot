@@ -87,7 +87,7 @@ PARROT_API
 void list_assign( PARROT_INTERP,
     NOTNULL(List *list),
     INTVAL idx,
-    void *item,
+    NULLOK(void *item),
     int type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -195,7 +195,10 @@ void list_splice( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_unshift( PARROT_INTERP, NOTNULL(List *list), void *item, int type )
+void list_unshift( PARROT_INTERP,
+    NOTNULL(List *list),
+    NULLOK(void *item),
+    int type )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

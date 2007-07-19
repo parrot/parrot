@@ -1553,7 +1553,7 @@ interrupted by a DOD run.
 
 PARROT_API
 STRING*
-Parrot_freeze_at_destruct(PARROT_INTERP, PMC* pmc)
+Parrot_freeze_at_destruct(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
     visit_info info;
 
@@ -1585,7 +1585,7 @@ Freeze using either method.
 
 PARROT_API
 STRING*
-Parrot_freeze(PARROT_INTERP, PMC* pmc)
+Parrot_freeze(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
 #if FREEZE_USE_NEXT_FOR_GC
     /*
@@ -1655,7 +1655,7 @@ PMC.
 
 PARROT_API
 PMC*
-Parrot_clone(PARROT_INTERP, PMC* pmc)
+Parrot_clone(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
     return Parrot_thaw(interp, Parrot_freeze(interp, pmc));
 }
