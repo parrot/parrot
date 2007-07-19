@@ -91,7 +91,8 @@ INTVAL mixed_cs_index( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-CHARSET * Parrot_charset_ascii_init( PARROT_INTERP )
+PARROT_CANNOT_RETURN_NULL
+const CHARSET * Parrot_charset_ascii_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/charset/ascii.c */

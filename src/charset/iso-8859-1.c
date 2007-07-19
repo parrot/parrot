@@ -403,7 +403,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
     return return_string;
 }
 
-CHARSET *
+PARROT_CANNOT_RETURN_NULL
+const CHARSET *
 Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);

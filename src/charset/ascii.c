@@ -511,7 +511,8 @@ ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t see
     return hashval;
 }
 
-CHARSET *
+PARROT_CANNOT_RETURN_NULL
+const CHARSET *
 Parrot_charset_ascii_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);

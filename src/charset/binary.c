@@ -245,7 +245,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 }
 
 
-CHARSET *
+PARROT_CANNOT_RETURN_NULL
+const CHARSET *
 Parrot_charset_binary_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);

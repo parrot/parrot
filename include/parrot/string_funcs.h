@@ -314,8 +314,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_make_direct( PARROT_INTERP,
     NULLOK(const char *buffer),
     UINTVAL len,
-    NOTNULL(ENCODING *encoding),
-    NOTNULL(CHARSET *charset),
+    NOTNULL(const ENCODING *encoding),
+    NOTNULL(const CHARSET *charset),
     UINTVAL flags )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
@@ -367,10 +367,10 @@ STRING* string_printf( PARROT_INTERP, NOTNULL(const char *format), ... )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-CHARSET * string_rep_compatible( SHIM_INTERP,
+const CHARSET * string_rep_compatible( SHIM_INTERP,
     NOTNULL(const STRING *a),
     NOTNULL(const STRING *b),
-    NOTNULL(ENCODING **e) )
+    NOTNULL(const ENCODING **e) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);

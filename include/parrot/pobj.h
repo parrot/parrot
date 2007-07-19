@@ -129,8 +129,8 @@ struct parrot_string_t {
     char *strstart;
     UINTVAL strlen;
     /*    parrot_string_representation_t representation;*/
-    struct _encoding *encoding;
-    struct _charset *charset;
+    const struct _encoding *encoding;
+    const struct _charset *charset;
     UINTVAL hashval; /* cached hash value computation; not yet used */
 };
 

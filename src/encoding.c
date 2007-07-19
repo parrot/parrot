@@ -35,7 +35,7 @@ ENCODING *Parrot_ucs2_encoding_ptr;
 ENCODING *Parrot_utf16_encoding_ptr;
 
 typedef struct One_encoding {
-    ENCODING *encoding;
+    NOTNULL(ENCODING *encoding);
     STRING  *name;
 } One_encoding;
 
@@ -82,7 +82,7 @@ Parrot_new_encoding(SHIM_INTERP)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-ENCODING *
+const ENCODING *
 Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
 {
     const int n = all_encodings->n_encodings;
@@ -100,7 +100,7 @@ Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-ENCODING *
+const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {
     UNUSED(encodingname);
@@ -142,11 +142,10 @@ Return the number of the encoding of the given string or -1 if not found.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_encoding_number_of_str(PARROT_INTERP, NOTNULL(STRING *src))
+Parrot_encoding_number_of_str(SHIM_INTERP, NOTNULL(const STRING *src))
 {
     const int n = all_encodings->n_encodings;
     int i;
-    UNUSED(interp);
 
     for (i = 0; i < n; ++i) {
         if (src->encoding == all_encodings->enc[i].encoding)
@@ -169,7 +168,7 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-ENCODING*
+const ENCODING*
 Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 {
     if (number_of_encoding >= all_encodings->n_encodings)
@@ -259,7 +258,7 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 }
 
 PARROT_API
-ENCODING *
+const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)
 {
     return Parrot_default_encoding_ptr;

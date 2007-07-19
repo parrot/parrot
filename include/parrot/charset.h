@@ -109,27 +109,28 @@ void Parrot_charsets_encodings_init( PARROT_INTERP )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-CHARSET * Parrot_default_charset( SHIM_INTERP );
+const CHARSET * Parrot_default_charset( SHIM_INTERP );
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET * Parrot_find_charset( SHIM_INTERP, NOTNULL(const char *charsetname) )
+const CHARSET * Parrot_find_charset( SHIM_INTERP,
+    NOTNULL(const char *charsetname) )
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 charset_converter_t Parrot_find_charset_converter( SHIM_INTERP,
-    NOTNULL(CHARSET *lhs),
-    NOTNULL(CHARSET *rhs) )
+    NOTNULL(const CHARSET *lhs),
+    NOTNULL(const CHARSET *rhs) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET* Parrot_get_charset( SHIM_INTERP, INTVAL number_of_charset );
+const CHARSET * Parrot_get_charset( SHIM_INTERP, INTVAL number_of_charset );
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
@@ -148,7 +149,6 @@ INTVAL Parrot_make_default_charset( SHIM_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
 CHARSET * Parrot_new_charset( SHIM_INTERP );
 
 PARROT_API
@@ -161,7 +161,7 @@ INTVAL Parrot_register_charset( PARROT_INTERP,
 
 PARROT_API
 void Parrot_register_charset_converter( SHIM_INTERP,
-    NOTNULL(CHARSET *lhs),
+    NOTNULL(const CHARSET *lhs),
     NOTNULL(CHARSET *rhs),
     NOTNULL(charset_converter_t func) )
         __attribute__nonnull__(2)
@@ -193,46 +193,46 @@ struct _charset {
     charset_find_not_cclass_t find_not_cclass;
     charset_string_from_codepoint_t string_from_codepoint;
     charset_compute_hash_t compute_hash;
-    ENCODING *preferred_encoding;
+    const ENCODING *preferred_encoding;
 };
 
-#define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((CHARSET *)source->charset)->get_graphemes(interp, source, offset, count)
-#define CHARSET_GET_GRAPHEMES_INPLACE(interp, source, dest, offset, count) ((CHARSET *)source->charset)->get_graphemes(interp, source, dest, offset, count)
-#define CHARSET_SET_GRAPHEMES(interp, source, offset, replace_count, insert) ((CHARSET *)source->charset)->set_graphemes(interp, source, offset, replace_count, insert)
-#define CHARSET_TO_UNICODE(interp, source, dest) ((CHARSET *)source->charset)->to_unicode(interp, source, dest)
-#define CHARSET_COMPOSE(interp, source) ((CHARSET *)source->charset)->compose(interp, source)
-#define CHARSET_DECOMPOSE(interp, source) ((CHARSET *)source->charset)->decompose(interp, source)
-#define CHARSET_UPCASE(interp, source) ((CHARSET *)source->charset)->upcase(interp, source)
-#define CHARSET_DOWNCASE(interp, source) ((CHARSET *)source->charset)->downcase(interp, source)
-#define CHARSET_TITLECASE(interp, source) ((CHARSET *)source->charset)->titlecase(interp, source)
-#define CHARSET_UPCASE_FIRST(interp, source) ((CHARSET *)source->charset)->upcase_first(interp, source)
-#define CHARSET_DOWNCASE_FIRST(interp, source) ((CHARSET *)source->charset)->downcase_first(interp, source)
-#define CHARSET_TITLECASE_FIRST(interp, source) ((CHARSET *)source->charset)->titlecase_first(interp, source)
-#define CHARSET_COMPARE(interp, lhs, rhs) ((CHARSET *)lhs->charset)->compare(interp, lhs, rhs)
-#define CHARSET_INDEX(interp, source, search, offset) ((CHARSET *)source->charset)->index(interp, source, search, offset)
-#define CHARSET_RINDEX(interp, source, search, offset) ((CHARSET *)source->charset)->rindex(interp, source, search, offset)
-#define CHARSET_VALIDATE(interp, source, offset) ((CHARSET *)source->charset)->validate(interp, source)
-#define CHARSET_IS_CCLASS(interp, flags, source, offset) ((CHARSET *)source->charset)->is_cclass(interp, flags, source, offset)
-#define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_cclass(interp, flags, source, offset, count)
-#define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((CHARSET *)source->charset)->find_not_cclass(interp, flags, source, offset, count)
-#define CHARSET_COMPUTE_HASH(interp, source, seed) ((CHARSET *)source->charset)->compute_hash(interp, source, seed)
-#define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((CHARSET *)source->charset)->preferred_encoding
+#define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((source)->charset)->get_graphemes(interp, source, offset, count)
+#define CHARSET_GET_GRAPHEMES_INPLACE(interp, source, dest, offset, count) ((source)->charset)->get_graphemes(interp, source, dest, offset, count)
+#define CHARSET_SET_GRAPHEMES(interp, source, offset, replace_count, insert) ((source)->charset)->set_graphemes(interp, source, offset, replace_count, insert)
+#define CHARSET_TO_UNICODE(interp, source, dest) ((source)->charset)->to_unicode(interp, source, dest)
+#define CHARSET_COMPOSE(interp, source) ((source)->charset)->compose(interp, source)
+#define CHARSET_DECOMPOSE(interp, source) ((source)->charset)->decompose(interp, source)
+#define CHARSET_UPCASE(interp, source) ((source)->charset)->upcase(interp, source)
+#define CHARSET_DOWNCASE(interp, source) ((source)->charset)->downcase(interp, source)
+#define CHARSET_TITLECASE(interp, source) ((source)->charset)->titlecase(interp, source)
+#define CHARSET_UPCASE_FIRST(interp, source) ((source)->charset)->upcase_first(interp, source)
+#define CHARSET_DOWNCASE_FIRST(interp, source) ((source)->charset)->downcase_first(interp, source)
+#define CHARSET_TITLECASE_FIRST(interp, source) ((source)->charset)->titlecase_first(interp, source)
+#define CHARSET_COMPARE(interp, lhs, rhs) ((const CHARSET *)lhs->charset)->compare(interp, lhs, rhs)
+#define CHARSET_INDEX(interp, source, search, offset) ((source)->charset)->index(interp, source, search, offset)
+#define CHARSET_RINDEX(interp, source, search, offset) ((source)->charset)->rindex(interp, source, search, offset)
+#define CHARSET_VALIDATE(interp, source, offset) ((source)->charset)->validate(interp, source)
+#define CHARSET_IS_CCLASS(interp, flags, source, offset) ((source)->charset)->is_cclass(interp, flags, source, offset)
+#define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_cclass(interp, flags, source, offset, count)
+#define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_not_cclass(interp, flags, source, offset, count)
+#define CHARSET_COMPUTE_HASH(interp, source, seed) ((source)->charset)->compute_hash(interp, source, seed)
+#define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((source)->charset)->preferred_encoding
 
-#define CHARSET_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->to_encoding(interp, source)
-#define CHARSET_COPY_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->copy_to_encoding(interp, source)
-#define CHARSET_GET_CODEPOINT(interp, source, offset) ((ENCODING *)source->encoding)->get_codepoint(interp, source, offset)
-#define CHARSET_SET_CODEPOINT(interp, source, offset, codepoint) ((ENCODING *)source->encoding)->set_codepoint(interp, source, offset, codepoint)
-#define CHARSET_GET_BYTE(interp, source, offset) ((ENCODING *)source->encoding)->get_byte(interp, source, offset)
-#define CHARSET_SET_BYTE(interp, source, offset, value) ((ENCODING *)source->encoding)->set_byte(interp, source, offset, value)
-#define CHARSET_GET_CODEPOINTS(interp, source, offset, count) ((ENCODING *)source->encoding)->get_codepoints(interp, source, offset, count)
-#define CHARSET_GET_CODEPOINTS_INPLACE(interp, source, dest, offset, count) ((ENCODING *)source->encoding)->get_codepoints_inplace(interp, source, dest, offset, count)
-#define CHARSET_GET_BYTES(interp, source, offset, count) ((ENCODING *)source->encoding)->get_bytes(interp, source, offset, count)
-#define CHARSET_GET_BYTES_INPLACE(interp, source, offset, count, dest) ((ENCODING *)source->encoding)->get_bytes(interp, source, offset, count, dest)
-#define CHARSET_SET_CODEPOINTS(interp, source, offset, count, newdata) ((ENCODING *)source->encoding)->set_codepoints(interp, source, offset, count, newdata)
-#define CHARSET_SET_BYTES(interp, source, offset, count, newdata) ((ENCODING *)source->encoding)->set_bytes(interp, source, offset, count, newdata)
-#define CHARSET_BECOME_ENCODING(interp, source) ((ENCODING *)source->encoding)->become_encoding(interp, source)
-#define CHARSET_CODEPOINTS(interp, source) ((ENCODING *)source->encoding)->codepoints(interp, source)
-#define CHARSET_BYTES(interp, source) ((ENCODING *)source->encoding)->bytes(interp, source)
+#define CHARSET_TO_ENCODING(interp, source) ((source)->encoding)->to_encoding(interp, source)
+#define CHARSET_COPY_TO_ENCODING(interp, source) ((source)->encoding)->copy_to_encoding(interp, source)
+#define CHARSET_GET_CODEPOINT(interp, source, offset) ((source)->encoding)->get_codepoint(interp, source, offset)
+#define CHARSET_SET_CODEPOINT(interp, source, offset, codepoint) ((source)->encoding)->set_codepoint(interp, source, offset, codepoint)
+#define CHARSET_GET_BYTE(interp, source, offset) ((source)->encoding)->get_byte(interp, source, offset)
+#define CHARSET_SET_BYTE(interp, source, offset, value) ((source)->encoding)->set_byte(interp, source, offset, value)
+#define CHARSET_GET_CODEPOINTS(interp, source, offset, count) ((source)->encoding)->get_codepoints(interp, source, offset, count)
+#define CHARSET_GET_CODEPOINTS_INPLACE(interp, source, dest, offset, count) ((source)->encoding)->get_codepoints_inplace(interp, source, dest, offset, count)
+#define CHARSET_GET_BYTES(interp, source, offset, count) ((source)->encoding)->get_bytes(interp, source, offset, count)
+#define CHARSET_GET_BYTES_INPLACE(interp, source, offset, count, dest) ((source)->encoding)->get_bytes(interp, source, offset, count, dest)
+#define CHARSET_SET_CODEPOINTS(interp, source, offset, count, newdata) ((source)->encoding)->set_codepoints(interp, source, offset, count, newdata)
+#define CHARSET_SET_BYTES(interp, source, offset, count, newdata) ((source)->encoding)->set_bytes(interp, source, offset, count, newdata)
+#define CHARSET_BECOME_ENCODING(interp, source) ((source)->encoding)->become_encoding(interp, source)
+#define CHARSET_CODEPOINTS(interp, source) ((source)->encoding)->codepoints(interp, source)
+#define CHARSET_BYTES(interp, source) ((source)->encoding)->bytes(interp, source)
 
 
 #endif /* PARROT_CHARSET_H_GUARD */

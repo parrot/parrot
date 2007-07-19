@@ -647,7 +647,8 @@ compute_hash(PARROT_INTERP, NOTNULL(const STRING *src), size_t seed)
     return hashval;
 }
 
-CHARSET *
+PARROT_CANNOT_RETURN_NULL
+const CHARSET *
 Parrot_charset_unicode_init(PARROT_INTERP)
 {
     CHARSET * const return_set = Parrot_new_charset(interp);

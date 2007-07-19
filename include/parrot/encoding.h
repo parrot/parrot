@@ -40,21 +40,21 @@ typedef void (*encoding_iter_init_t)(PARROT_INTERP, const STRING *src,
 struct _encoding {
     const char *name;
     UINTVAL max_bytes_per_codepoint;
-    encoding_to_encoding_t to_encoding;
-    encoding_get_codepoint_t get_codepoint;
-    encoding_set_codepoint_t  set_codepoint;
-    encoding_get_byte_t  get_byte;
-    encoding_set_byte_t  set_byte;
-    encoding_get_codepoints_t  get_codepoints;
-    encoding_get_codepoints_inplace_t  get_codepoints_inplace;
-    encoding_get_bytes_t  get_bytes;
-    encoding_get_bytes_inplace_t  get_bytes_inplace;
-    encoding_set_codepoints_t  set_codepoints;
-    encoding_set_bytes_t  set_bytes;
-    encoding_become_encoding_t  become_encoding;
-    encoding_codepoints_t  codepoints;
-    encoding_bytes_t  bytes;
-    encoding_iter_init_t     iter_init;
+    encoding_to_encoding_t              to_encoding;
+    encoding_get_codepoint_t            get_codepoint;
+    encoding_set_codepoint_t            set_codepoint;
+    encoding_get_byte_t                 get_byte;
+    encoding_set_byte_t                 set_byte;
+    encoding_get_codepoints_t           get_codepoints;
+    encoding_get_codepoints_inplace_t   get_codepoints_inplace;
+    encoding_get_bytes_t                get_bytes;
+    encoding_get_bytes_inplace_t        get_bytes_inplace;
+    encoding_set_codepoints_t           set_codepoints;
+    encoding_set_bytes_t                set_bytes;
+    encoding_become_encoding_t          become_encoding;
+    encoding_codepoints_t               codepoints;
+    encoding_bytes_t                    bytes;
+    encoding_iter_init_t                iter_init;
 };
 
 typedef struct _encoding ENCODING;
@@ -76,7 +76,7 @@ typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
 /* HEADERIZER BEGIN: src/encoding.c */
 
 PARROT_API
-ENCODING * Parrot_default_encoding( SHIM_INTERP );
+const ENCODING * Parrot_default_encoding( SHIM_INTERP );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -98,14 +98,14 @@ INTVAL Parrot_encoding_number( PARROT_INTERP, NOTNULL(STRING *encodingname) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_encoding_number_of_str( PARROT_INTERP, NOTNULL(STRING *src) )
-        __attribute__nonnull__(1)
+INTVAL Parrot_encoding_number_of_str( SHIM_INTERP,
+    NOTNULL(const STRING *src) )
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-ENCODING * Parrot_find_encoding( SHIM_INTERP,
+const ENCODING * Parrot_find_encoding( SHIM_INTERP,
     NOTNULL(const char *encodingname) )
         __attribute__nonnull__(2);
 
@@ -118,12 +118,13 @@ encoding_converter_t Parrot_find_encoding_converter( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-ENCODING* Parrot_get_encoding( PARROT_INTERP, INTVAL number_of_encoding )
+const ENCODING* Parrot_get_encoding( PARROT_INTERP,
+    INTVAL number_of_encoding )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-ENCODING * Parrot_load_encoding( PARROT_INTERP,
+const ENCODING * Parrot_load_encoding( PARROT_INTERP,
     NOTNULL(const char *encodingname) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -36,12 +36,12 @@ CHARSET *Parrot_ascii_charset_ptr;
  */
 
 typedef struct To_converter {
-    CHARSET *to;
-    charset_converter_t func;
+    NOTNULL(CHARSET *to);
+    NOTNULL(charset_converter_t func);
 } To_converter;
 
 typedef struct One_charset {
-    CHARSET *charset;
+    NOTNULL(CHARSET *charset);
     STRING  *name;
     int n_converters;
     To_converter *to_converters;
@@ -73,7 +73,6 @@ static void register_static_converters( PARROT_INTERP )
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
 CHARSET *
 Parrot_new_charset(SHIM_INTERP)
 {
@@ -101,7 +100,7 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET *
+const CHARSET *
 Parrot_find_charset(SHIM_INTERP, NOTNULL(const char *charsetname))
 {
     int i;
@@ -186,7 +185,7 @@ Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-CHARSET*
+const CHARSET *
 Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 {
     if (number_of_charset >= all_charsets->n_charsets)
@@ -323,7 +322,7 @@ Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-CHARSET *
+const CHARSET *
 Parrot_default_charset(SHIM_INTERP)
 {
     return Parrot_default_charset_ptr;
@@ -334,7 +333,8 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 charset_converter_t
-Parrot_find_charset_converter(SHIM_INTERP, NOTNULL(CHARSET *lhs), NOTNULL(CHARSET *rhs))
+Parrot_find_charset_converter(SHIM_INTERP,
+        NOTNULL(const CHARSET *lhs), NOTNULL(const CHARSET *rhs))
 {
     int i;
     const int n = all_charsets->n_charsets;
@@ -357,7 +357,8 @@ Parrot_find_charset_converter(SHIM_INTERP, NOTNULL(CHARSET *lhs), NOTNULL(CHARSE
 PARROT_API
 void
 Parrot_register_charset_converter(SHIM_INTERP,
-        NOTNULL(CHARSET *lhs), NOTNULL(CHARSET *rhs), NOTNULL(charset_converter_t func))
+        NOTNULL(const CHARSET *lhs), NOTNULL(CHARSET *rhs),
+        NOTNULL(charset_converter_t func))
 {
     const int n = all_charsets->n_charsets;
     int i;

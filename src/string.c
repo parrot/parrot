@@ -323,7 +323,7 @@ string_make_empty(PARROT_INTERP,
      */
     if (representation == enum_stringrep_one) {
         s->charset = PARROT_DEFAULT_CHARSET;
-        s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);;
+        s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);
     }
     else {
         real_exception(interp, NULL, INVALID_CHARTYPE, "Unsupported representation");
@@ -350,9 +350,9 @@ Returs NULL, if no compatible string representation can be found.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-CHARSET *
+const CHARSET *
 string_rep_compatible(SHIM_INTERP,
-    NOTNULL(const STRING *a), NOTNULL(const STRING *b), NOTNULL(ENCODING **e))
+    NOTNULL(const STRING *a), NOTNULL(const STRING *b), NOTNULL(const ENCODING **e))
 {
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
@@ -572,8 +572,8 @@ STRING *
 string_make(PARROT_INTERP, NULLOK(const char *buffer),
         UINTVAL len, NULLOK(const char *charset_name), UINTVAL flags)
 {
-    ENCODING *encoding;
-    CHARSET *charset;
+    const ENCODING *encoding;
+    const CHARSET *charset;
 
     if (!charset_name)
         charset_name = "ascii";
@@ -592,7 +592,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_make_direct(PARROT_INTERP, NULLOK(const char *buffer), UINTVAL len,
-        NOTNULL(ENCODING *encoding), NOTNULL(CHARSET *charset), UINTVAL flags)
+        NOTNULL(const ENCODING *encoding), NOTNULL(const CHARSET *charset), UINTVAL flags)
 {
     STRING * const s = new_string_header(interp, flags);
     DECL_CONST_CAST;
@@ -882,8 +882,8 @@ string_concat(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b), UINTVAL Uflag
 {
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
-            CHARSET *cs;
-            ENCODING *enc;
+            const CHARSET *cs;
+            const ENCODING *enc;
             STRING *result;
 
             cs = string_rep_compatible(interp, a, b, &enc);
@@ -1365,23 +1365,19 @@ STRING *
 string_bitwise_and(PARROT_INTERP, NULLOK(STRING *s1),
         NULLOK(STRING *s2), NULLOK(STRING **dest))
 {
-    STRING *res = NULL;
+    STRING *res;
     size_t minlen;
 
     /* we could also trans_charset to iso-8859-1 */
-    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr) {
+    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr)
         real_exception(interp, NULL, INVALID_ENCODING,
                 "string bitwise_and (%s/%s) unsupported",
-                ((ENCODING *)(s1->encoding))->name,
-                ((ENCODING *)(s2->encoding))->name);
-    }
+                s1->encoding->name, s2->encoding->name);
 
-    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr) {
+    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr)
         real_exception(interp, NULL, INVALID_ENCODING,
                 "string bitwise_and (%s/%s) unsupported",
-                ((ENCODING *)(s2->encoding))->name,
-                ((ENCODING *)(s2->encoding))->name);
-    }
+                s1->encoding->name, s2->encoding->name);
 
     /* think about case of dest string is one of the operands */
     if (s1 && s2)
@@ -1477,22 +1473,18 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
     size_t  maxlen = 0;
 
     if (s1) {
-        if (s1->encoding != Parrot_fixed_8_encoding_ptr) {
+        if (s1->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_and (%s/%s) unsupported",
-                    ((ENCODING *)(s1->encoding))->name,
-                    ((ENCODING *)(s2->encoding))->name);
-        }
+                    s1->encoding->name, s2->encoding->name);
         maxlen = s1->bufused;
     }
 
     if (s2) {
-        if (s2->encoding != Parrot_fixed_8_encoding_ptr) {
+        if (s2->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_and (%s/%s) unsupported",
-                    ((ENCODING *)(s2->encoding))->name,
-                    ((ENCODING *)(s2->encoding))->name);
-        }
+                    s1->encoding->name, s2->encoding->name);
 
         if (s2->bufused > maxlen)
             maxlen = s2->bufused;
@@ -1553,8 +1545,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
         if (s1->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_and (%s/%s) unsupported",
-                    ((ENCODING *)(s1->encoding))->name,
-                    ((ENCODING *)(s2->encoding))->name);
+                    s1->encoding->name, s2->encoding->name);
         }
         maxlen = s1->bufused;
     }
@@ -1563,8 +1554,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
         if (s2->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_and (%s/%s) unsupported",
-                    ((ENCODING *)(s2->encoding))->name,
-                    ((ENCODING *)(s2->encoding))->name);
+                    s1->encoding->name, s2->encoding->name);
         }
 
         if (s2->bufused > maxlen)
@@ -1633,12 +1623,10 @@ string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), NULLOK(STRING **dest))
     size_t  len;
 
     if (s) {
-        if (s->encoding != Parrot_fixed_8_encoding_ptr) {
+        if (s->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_and (%s/%s) unsupported",
-                    ((ENCODING *)(s->encoding))->name,
-                    ((ENCODING *)(s->encoding))->name);
-        }
+                    s->encoding->name, s->encoding->name);
         len = s->bufused;
     }
     else
@@ -2245,8 +2233,8 @@ string_unescape_cstring(PARROT_INTERP,
     Parrot_UInt4 r;
     UINTVAL flags;
     String_iter iter;
-    ENCODING *encoding;
-    CHARSET *charset;
+    const ENCODING *encoding;
+    const CHARSET *charset;
     char *p;
 
     if (delimiter && clength)
@@ -2562,7 +2550,7 @@ STRING*
 Parrot_string_trans_charset(PARROT_INTERP, NULLOK(STRING *src),
         INTVAL charset_nr, NULLOK(STRING *dest))
 {
-    CHARSET *new_charset;
+    const CHARSET *new_charset;
 
     if (!src)
         return NULL;
