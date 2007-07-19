@@ -81,7 +81,7 @@ static INTVAL PIO_win32_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RETURN
+PARROT_WARN_UNUSED_RESULT
 static INTVAL PIO_win32_isatty( PIOHANDLE fd );
 
 static INTVAL PIO_win32_listen( SHIM_INTERP,
@@ -387,7 +387,7 @@ Returns whether C<fd> is a console/tty.
 
 */
 
-PARROT_WARN_UNUSED_RETURN
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
 {
