@@ -28,6 +28,8 @@ static INTVAL PIO_mmap_close( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_mmap_open( PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(const char *path),
@@ -91,6 +93,8 @@ ParrotIOLayer pio_mmap_layer = {
     NULL, NULL
 };
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_mmap_register_layer(void)
 {
@@ -105,6 +109,8 @@ The buffer layer's C<Open> function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_mmap_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
                NOTNULL(const char *path), INTVAL flags)

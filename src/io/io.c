@@ -58,6 +58,8 @@ Creates and returns a new C<ParrotIO> PMC.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 new_io_pmc(PARROT_INTERP, NULLOK(ParrotIO *io))
 {
@@ -98,6 +100,7 @@ allocate the STRING memory.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_make_io_string(PARROT_INTERP, NOTNULL(STRING **buf), size_t len)
 {
@@ -130,6 +133,7 @@ Currently C<iotype> is unused.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 ParrotIO *
 PIO_new(PARROT_INTERP, SHIM(INTVAL iotype), INTVAL flags, INTVAL mode)
 {
@@ -627,6 +631,7 @@ Creates and returns a C<ParrotIO> PMC for C<*spath>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_open(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(const char *spath),
          NOTNULL(const char *sflags))
@@ -665,6 +670,7 @@ OS IO handles (0,1,2).
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_fdopen(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), PIOHANDLE fd, NOTNULL(const char *sflags))
 {
@@ -750,6 +756,7 @@ Reads up to C<len> bytes from C<*pmc> and copies them into C<*buffer>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_reads(PARROT_INTERP, NOTNULL(PMC *pmc), size_t len)
 {
@@ -1063,6 +1070,8 @@ Returns the C<ParrotIO> PMC for C<stdin>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_STDIN(PARROT_INTERP)
 {
@@ -1078,6 +1087,8 @@ Returns the C<ParrotIO> PMC for C<stdout>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_STDOUT(PARROT_INTERP)
 {
@@ -1093,6 +1104,8 @@ Returns the C<ParrotIO> PMC for C<stderr>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_STDERR(PARROT_INTERP)
 {
@@ -1168,7 +1181,7 @@ Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 */
 
 PIOOFF_T
-PIO_make_offset_pmc(PARROT_INTERP, PMC *pmc)
+PIO_make_offset_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
     /* XXX: Maybe use bignums here */
     return VTABLE_get_integer(interp, pmc);
@@ -1212,6 +1225,8 @@ the socket was successfully created.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 PIO_socket(PARROT_INTERP, INTVAL fam, INTVAL type, INTVAL proto)
 {
@@ -1340,6 +1355,8 @@ Returns C<NULL> on failure.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 PIO_accept(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
@@ -1399,8 +1416,6 @@ Rework to use copy-on-write IO stacks rather than creating a new stack for each
 IO stream.
 
 Add support for loadable layers in Parrot bytecode.
-
-=cut
 
 */
 

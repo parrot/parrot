@@ -537,7 +537,7 @@ Registers the PMC with the interpreter's DOD registery.
 
 PARROT_API
 void
-dod_register_pmc(PARROT_INTERP, PMC* pmc)
+dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_DOD(interp);

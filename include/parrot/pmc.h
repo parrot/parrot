@@ -39,8 +39,9 @@ PMC * constant_pmc_new_noinit( PARROT_INTERP, INTVAL base_type )
         __attribute__nonnull__(1);
 
 PARROT_API
-void dod_register_pmc( PARROT_INTERP, PMC* pmc )
-        __attribute__nonnull__(1);
+void dod_register_pmc( PARROT_INTERP, NOTNULL(PMC* pmc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_create_mro( PARROT_INTERP, INTVAL type )

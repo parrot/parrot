@@ -46,6 +46,8 @@ ParrotIOLayer pio_unix_layer = {
 PARROT_CONST_FUNCTION
 static INTVAL flags_to_unix( INTVAL flags );
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_accept( PARROT_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(ParrotIO *io) )
@@ -78,6 +80,8 @@ static INTVAL PIO_unix_connect( SHIM_INTERP,
     NULLOK(STRING *r) )
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
     ParrotIOLayer *layer,
     PIOHANDLE fd,
@@ -100,6 +104,8 @@ static INTVAL PIO_unix_listen( SHIM_INTERP,
     INTVAL sec )
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_open( PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(const char *spath),
@@ -108,6 +114,8 @@ static ParrotIO * PIO_unix_open( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
     ParrotIOLayer *l,
     NOTNULL(const char *cmd),
@@ -153,6 +161,8 @@ static INTVAL PIO_unix_send( SHIM_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_socket( PARROT_INTERP,
     ParrotIOLayer *layer,
     int fam,
@@ -255,6 +265,8 @@ values.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
               NOTNULL(const char *spath), INTVAL flags)
@@ -381,6 +393,8 @@ Returns a new C<ParrotIO> with file descriptor C<fd>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_unix_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
 {
@@ -677,6 +691,8 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 {
@@ -684,7 +700,7 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
     /* Hard coded to IPv4 for now */
     int family = AF_INET;
 
-    char * s = string_to_cstring(interp, addr);
+    char * const s = string_to_cstring(interp, addr);
     /*
      * due to a bug in OS/X, we've to zero the struct
      * else bind is failing erratically
@@ -733,6 +749,8 @@ socket type and protocol number.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)
 {
@@ -745,7 +763,7 @@ PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, in
         io->remote.sin_family = fam;
         return io;
     }
-    return 0;
+    return NULL;
 }
 
 /*
@@ -832,6 +850,8 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 {
@@ -1016,6 +1036,8 @@ XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(const char *cmd), int flags)
 {
@@ -1118,7 +1140,7 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_read,
     PIO_null_read_async,
     PIO_unix_flush,
-    0, /* no peek */
+    NULL, /* no peek */
     PIO_unix_seek,
     PIO_unix_tell,
     PIO_null_setbuf,

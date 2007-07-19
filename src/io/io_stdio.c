@@ -25,6 +25,7 @@ Win32), this is I<buffered> IO, out of necessity.
 /* HEADERIZER BEGIN: static */
 
 PARROT_CONST_FUNCTION
+PARROT_CANNOT_RETURN_NULL
 static const char * flags_to_stdio( INTVAL flags );
 
 static INTVAL PIO_stdio_close( SHIM_INTERP,
@@ -32,6 +33,8 @@ static INTVAL PIO_stdio_close( SHIM_INTERP,
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
     ParrotIOLayer *layer,
     PIOHANDLE fptr,
@@ -48,6 +51,8 @@ static INTVAL PIO_stdio_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
         __attribute__nonnull__(2);
 
 static INTVAL PIO_stdio_isatty( PIOHANDLE fptr );
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_stdio_open( PARROT_INTERP,
     ParrotIOLayer *layer,
     NOTNULL(const char *spath),
@@ -116,6 +121,7 @@ C<fopen()> in C<PIO_stdio_open()>.
 */
 
 PARROT_CONST_FUNCTION
+PARROT_CANNOT_RETURN_NULL
 static const char *
 flags_to_stdio(INTVAL flags)
 {
@@ -183,6 +189,8 @@ using C<< < >>, C<< > >>, etc.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
               NOTNULL(const char *spath), INTVAL flags)
@@ -220,6 +228,8 @@ PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
 }
 
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_stdio_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fptr, INTVAL flags)
 {
