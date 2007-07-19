@@ -87,6 +87,7 @@ transform post (PAST::Block) :language('PIR') {
     start.'push_pirop'('inline', '    .const .Sub main = %0', esc_name)
     start.'push_pirop'('inline', '    main."setfenv"(env)')
     start.'push_pirop'('inline', '    docall(main, vararg :flat)')
+    start.'push_pirop'('inline', '    prompt(env)')
     post.'init'('outer'=>start)
     .return post.'new'('Lua::POST::Chunk', post, start, 'prologue'=><<'PIRCODE')
 .include "interpinfo.pasm"

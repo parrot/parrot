@@ -587,6 +587,24 @@ Support variable number of arguments function call.
 .end
 
 
+=item C<prompt (env)>
+
+=cut
+
+.sub 'prompt'
+    .param pmc env
+    $S0 = '> '
+    .const .LuaString k__PROMPT = '_PROMPT'
+    $P0 = env[k__PROMPT]
+    $I0 = isa $P0, 'LuaNil'
+    if $I0 goto L1
+    $S0 = $P0
+  L1:
+    $P0 = compreg 'Lua'
+    $P0.'commandline_prompt'($S0)
+.end
+
+
 =item C<tconstruct (table, index, argv)>
 
 end of table constructor with argv
