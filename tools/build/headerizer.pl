@@ -196,7 +196,7 @@ sub function_components_from_declaration {
             squawk( $file, $name, "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
         }
         elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name, "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CAN_RETURN_NULL together." );
+            squawk( $file, $name, "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
         }
     }
 
