@@ -33,8 +33,8 @@
 .end
 
 
+# test library loading
 .sub 'load'
-    'diag'('test library loading')
 
   T1:
     push_eh err_load_bytecode
@@ -54,8 +54,8 @@
 .end
 
 
+# test object initialization
 .sub 'object_init'
-    'diag'('test object initialization')
 
   T1:
     $P99 = new .FixedPMCArray
@@ -89,8 +89,8 @@
 .end
 
 
+# test empty FixedPMCArray
 .sub 'FixedPMCArray_empty'
-    'diag'('test empty FixedPMCArray')
 
   T1:
     $P99 = new .FixedPMCArray
@@ -133,8 +133,8 @@
 .end
 
 
+# test FixedPMCArray with three elements
 .sub 'FixedPMCArray_3elem'
-    'diag'('test FixedPMCArray with three elements')
 
   T1:
     $P99 = new .FixedPMCArray
@@ -225,8 +225,8 @@
 .end
 
 
+# test empty ResizablePMCArray
 .sub 'ResizablePMCArray_empty'
-    'diag'('test empty ResizablePMCArray')
 
   T1:
     $P99 = new .ResizablePMCArray
@@ -269,8 +269,8 @@
 .end
 
 
+# test ResizablePMCArray with three elements
 .sub 'ResizablePMCArray_3elem'
-    'diag'('test ResizablePMCArray with three elements')
 
   T1:
     $P99 = new .ResizablePMCArray
