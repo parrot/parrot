@@ -125,6 +125,8 @@ void * parrot_hash_get_idx( SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_RESULT_IGNORABLE
+PARROT_CANNOT_RETURN_NULL
 HashBucket* parrot_hash_put( PARROT_INTERP,
     NOTNULL(Hash *hash),
     void *key,

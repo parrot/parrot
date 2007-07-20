@@ -295,7 +295,7 @@ PARROT_API
 void do_sub_pragmas( PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *self),
     int action,
-    PMC *eval_pmc )
+    NULLOK(PMC *eval_pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -554,7 +554,7 @@ PackFile_Debug * Parrot_new_debug_seg( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_switch_to_cs( PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *new_cs),

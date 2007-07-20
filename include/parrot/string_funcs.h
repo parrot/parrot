@@ -191,7 +191,7 @@ STRING * string_compose( PARROT_INTERP, NULLOK(STRING *src) )
         __attribute__nonnull__(1);
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 INTVAL string_compute_strlen( PARROT_INTERP, NOTNULL(STRING *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

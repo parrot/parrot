@@ -185,6 +185,8 @@ Also all array usage depends on list.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_RESULT_IGNORABLE
+PARROT_CANNOT_RETURN_NULL
 static List_chunk * add_chunk( PARROT_INTERP,
     NOTNULL(List *list),
     int where,
@@ -192,6 +194,8 @@ static List_chunk * add_chunk( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static List_chunk * alloc_next_size( PARROT_INTERP,
     NOTNULL(List *list),
     int where,
@@ -200,6 +204,7 @@ static List_chunk * alloc_next_size( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static List_chunk * allocate_chunk( PARROT_INTERP,
     NOTNULL(List *list),
     UINTVAL items,
@@ -287,6 +292,7 @@ Make a new chunk, size bytes big, holding items items.
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 allocate_chunk(PARROT_INTERP, NOTNULL(List *list), UINTVAL items, UINTVAL size)
 {
@@ -644,6 +650,8 @@ Calculate size and items for next chunk and allocate it.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 alloc_next_size(PARROT_INTERP, NOTNULL(List *list), int where, UINTVAL idx)
 {
@@ -739,6 +747,8 @@ Add chunk at start or end.
 
 */
 
+PARROT_RESULT_IGNORABLE
+PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 add_chunk(PARROT_INTERP, NOTNULL(List *list), int where, UINTVAL idx)
 {
@@ -1447,7 +1457,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 PARROT_API
 void
-list_visit(PARROT_INTERP, NOTNULL(List *list), void *pinfo)
+list_visit(PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo))
 {
     List_chunk *chunk;
     visit_info * const info = (visit_info*) pinfo;

@@ -204,9 +204,10 @@ void list_unshift( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_visit( PARROT_INTERP, NOTNULL(List *list), void *pinfo )
+void list_visit( PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/list.c */
 

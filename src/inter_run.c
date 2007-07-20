@@ -132,7 +132,7 @@ is an invocable C<Sub> PMC.
 */
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CANNOT_RETURN_NULL
 parrot_context_t *
 Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
@@ -261,7 +261,7 @@ Signatures are similar to NCI:
 */
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_run_meth_fromc(PARROT_INTERP,
@@ -282,7 +282,7 @@ Parrot_run_meth_fromc(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
@@ -308,7 +308,7 @@ didn't return properly.
 */
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
@@ -342,7 +342,7 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 INTVAL
 Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), ...)
@@ -357,7 +357,7 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 FLOATVAL
 Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), ...)
@@ -372,7 +372,7 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 void*
 Parrot_run_meth_fromc_args(PARROT_INTERP,
@@ -388,7 +388,7 @@ Parrot_run_meth_fromc_args(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 INTVAL
 Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
         NOTNULL(PMC *sub), NOTNULL(PMC *obj), STRING *meth, NOTNULL(const char *sig), ...)
@@ -403,7 +403,7 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 FLOATVAL
 Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
         NOTNULL(PMC *sub), NOTNULL(PMC *obj), STRING *meth, NOTNULL(const char *sig), ...)
@@ -418,7 +418,7 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
@@ -430,7 +430,7 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 INTVAL
 Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), va_list args)
@@ -441,7 +441,7 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 FLOATVAL
 Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
         NOTNULL(const char *sig), va_list args)
@@ -452,7 +452,7 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 void*
 Parrot_run_meth_fromc_arglist(PARROT_INTERP,
@@ -465,7 +465,7 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CAN_RETURN_NULL
 INTVAL
 Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
@@ -477,7 +477,7 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_RESULT_IGNORABLE
 FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
         NOTNULL(PMC *sub), NOTNULL(PMC *obj), STRING *meth, NOTNULL(const char *sig), va_list args)

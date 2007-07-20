@@ -84,8 +84,7 @@
 #define PARROT_CAN_RETURN_NULL      /*@null@*/
 #define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
 
-#define PARROT_MAY_IGNORE_RESULT
-#define PARROT_CAN_IGNORE_RESULT
+#define PARROT_RESULT_IGNORABLE
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
 
 #define PARROT_PURE_FUNCTION        __attribute__pure__ __attribute__warn_unused_result__

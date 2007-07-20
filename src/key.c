@@ -77,7 +77,7 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_new_string
 Returns a new string C<Key> PMC with value C<value>.
 
 */
@@ -97,7 +97,7 @@ key_new_string(PARROT_INTERP, STRING *value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_new_cstring
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
 
@@ -114,7 +114,7 @@ key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_new_pmc
 Returns a new PMC C<Key> PMC with value C<value>.
 
 */
@@ -135,7 +135,7 @@ key_new_pmc(PARROT_INTERP, PMC *value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_set_integer
 Set the integer C<value> in C<key>.
 
 */
@@ -153,7 +153,7 @@ key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_set_register
 Set the register C<value> in C<key>.
 
 */
@@ -172,7 +172,7 @@ key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_set_number
 Set the number C<value> in C<key>.
 
 */
@@ -190,7 +190,7 @@ key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
 
 /*
 
-FUNCDOC:
+FUNCDOC: key_set_string
 Set the string C<value> in C<key>.
 
 */

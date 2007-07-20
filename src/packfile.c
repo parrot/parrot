@@ -591,7 +591,7 @@ the eval PMC is kept alive be living subs.
 PARROT_API
 void
 do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
-        int action, PMC *eval_pmc)
+        int action, NULLOK(PMC *eval_pmc))
 {
     opcode_t i;
     PackFile_FixupTable * const ft = self->fixups;
@@ -2431,7 +2431,7 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 */
 
 PARROT_API
-PARROT_MAY_IGNORE_RESULT
+PARROT_RESULT_IGNORABLE
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_switch_to_cs(PARROT_INTERP, NOTNULL(PackFile_ByteCode *new_cs), int really)
