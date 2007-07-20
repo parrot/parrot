@@ -22,13 +22,32 @@ and its utility functions.
 #include "spf_render.str"
 #include <assert.h>
 
-typedef struct spfinfo_t {
+typedef enum {
+    PHASE_FLAGS = 0,
+    PHASE_WIDTH,
+    PHASE_PREC,
+    PHASE_TYPE,
+    PHASE_TERM,
+    PHASE_DONE
+} PHASE;
+
+typedef struct SpfInfo_tag {
     UINTVAL width;
     UINTVAL prec;
-    INTVAL flags;
-    INTVAL type;
-    INTVAL phase;
+    INTVAL  flags;
+    INTVAL  type;
+    PHASE   phase;
 } SpfInfo;
+
+typedef enum {
+    FLAG_MINUS  = (1<<0),
+    FLAG_PLUS   = (1<<1),
+    FLAG_ZERO   = (1<<2),
+    FLAG_SPACE  = (1<<3),
+    FLAG_SHARP  = (1<<4),
+    FLAG_WIDTH  = (1<<5),
+    FLAG_PREC   = (1<<6)
+};
 
 /* HEADERIZER HFILE: include/parrot/misc.h */
 
@@ -293,7 +312,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                 HUGEINTVAL sharedint = 0;
 
                 /* Storage for flags, etc. */
-                struct spfinfo_t info = { 0, 0, 0, 0, 0 };
+                SpfInfo info = { 0, 0, 0, 0, 0 };
 
                 /* Reset temporaries */
                 tc[0] = '\0';

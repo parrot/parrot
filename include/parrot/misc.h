@@ -207,26 +207,7 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
 
     /* SPRINTF DATA STRUCTURE AND FLAGS */
 
-    typedef enum spf_phase_t {
-        PHASE_FLAGS = 0,
-        PHASE_WIDTH,
-        PHASE_PREC,
-        PHASE_TYPE,
-        PHASE_TERM,
-        PHASE_DONE
-    } PHASE;
-
-    typedef enum spf_flag_t {
-        FLAG_MINUS = 1,
-        FLAG_PLUS = 2,
-        FLAG_ZERO = 4,
-        FLAG_SPACE = 8,
-        FLAG_SHARP = 16,
-        FLAG_WIDTH = 32,
-        FLAG_PREC = 64
-    } FLAG;
-
-    typedef enum spf_type_t {
+    typedef enum {
         SIZE_REG = 0,
         SIZE_SHORT,
         SIZE_LONG,
@@ -235,7 +216,7 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
         SIZE_OPCODE,
         SIZE_PMC,
         SIZE_PSTR
-    } TYPE;
+    } spf_type_t;
 
     /* SPRINTF ARGUMENT OBJECT */
 
