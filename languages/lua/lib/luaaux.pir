@@ -527,7 +527,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .lex 'where', where
     new where, .LuaString
     f(vararg :flat)
-    .return ()
+    .return (0)
   _handler:
     .local pmc ex
     .local string msg
@@ -544,7 +544,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $S0 .= "\n"
     printerr $S0
     printerr traceback
-    .return ()
+    .return (1)
   L1:
     rethrow ex
 .end

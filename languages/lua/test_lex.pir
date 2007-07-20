@@ -73,7 +73,6 @@ and imports many definitions from the full Lua compiler
 
 .sub 'main' :main
     .param pmc args
-    load_bytecode 'PGE/Dumper.pbc'
     $P0 = compreg 'LuaTestLex'
     $P0.'command_line'(args)
 .end
