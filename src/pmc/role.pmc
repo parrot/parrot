@@ -227,10 +227,6 @@ C<init_data>.
     void init() {
         Parrot_Role *role = NULL;
 
-        /* Set flags for custom DOD mark and destroy. */
-        PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
-
         /* Set up the object. */
         role                  = mem_allocate_zeroed_typed(Parrot_Role);
         role->name            = CONST_STRING(interp, "");
@@ -239,6 +235,10 @@ C<init_data>.
         role->methods         = pmc_new(interp, enum_class_Hash);
         role->attrib_metadata = pmc_new(interp, enum_class_Hash);
         PMC_data(SELF)        = role;
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
     }
 
     void init_pmc(PMC* init_data) {

@@ -77,13 +77,6 @@ Initializes a PMCProxy PMC.
     void init() {
         Parrot_PMCProxy *_pmc = NULL;
 
-        /* Set flags for custom DOD mark and destroy. */
-        PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
-
-        /* We are a class. */
-        PObj_is_class_SET(SELF);
-
         /* Set up the object. */
         _pmc = mem_allocate_zeroed_typed(Parrot_PMCProxy);
         _pmc->id              = 0;
@@ -97,6 +90,13 @@ Initializes a PMCProxy PMC.
         VTABLE_push_pmc(interp, _pmc->all_parents, SELF);
 
         PMC_data(SELF)         = _pmc;
+
+        /* We are a class. */
+        PObj_is_class_SET(SELF);
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
     }
 
 /*

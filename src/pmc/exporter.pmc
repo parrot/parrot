@@ -97,16 +97,16 @@ Initializes an Exporter PMC.
     void init() {
         Parrot_Exporter *exp = NULL;
 
-        /* Set flags for custom DOD mark and destroy. */
-        PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
-
         /* Set up the object. */
         exp            = mem_allocate_zeroed_typed(Parrot_Exporter);
         exp->ns_src    = PMCNULL;
         exp->ns_dest   = CONTEXT(interp->ctx)->current_namespace;
         exp->globals   = PMCNULL;
         PMC_data(SELF) = exp;
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
     }
 
 
