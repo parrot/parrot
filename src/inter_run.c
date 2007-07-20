@@ -462,6 +462,7 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 INTVAL
 Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
         NOTNULL(PMC *sub), NOTNULL(PMC *obj), STRING *meth, NOTNULL(const char *sig), va_list args)

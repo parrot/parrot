@@ -115,7 +115,7 @@ new_hll_entry(PARROT_INTERP)
 
 PARROT_API
 INTVAL
-Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NOTNULL(STRING *hll_lib))
+Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_lib))
 {
     PMC *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;

@@ -781,7 +781,6 @@ string_ord(PARROT_INTERP, NULLOK(const STRING *s), INTVAL idx)
 
         return string_index(interp, s, true_index);
     }
-    return -1;
 }
 
 /*

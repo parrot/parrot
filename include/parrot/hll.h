@@ -59,9 +59,8 @@ void Parrot_regenerate_HLL_namespaces( PARROT_INTERP )
 PARROT_API
 INTVAL Parrot_register_HLL( PARROT_INTERP,
     NULLOK(STRING *hll_name),
-    NOTNULL(STRING *hll_lib) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+    NULLOK(STRING *hll_lib) )
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_register_HLL_type( PARROT_INTERP,
