@@ -27,6 +27,8 @@ Returns a new C<Key> PMC.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new(PARROT_INTERP)
 {
@@ -44,6 +46,7 @@ Returns a new integer C<Key> PMC with value C<value>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_integer(PARROT_INTERP, INTVAL value)
 {
@@ -64,6 +67,7 @@ Returns a new number C<Key> PMC with value C<value>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_number(PARROT_INTERP, FLOATVAL value)
 {
@@ -84,8 +88,9 @@ Returns a new string C<Key> PMC with value C<value>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_string(PARROT_INTERP, STRING *value)
+key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -105,6 +110,7 @@ C<STRING>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
 {
@@ -121,8 +127,9 @@ Returns a new PMC C<Key> PMC with value C<value>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
-key_new_pmc(PARROT_INTERP, PMC *value)
+key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
 {
     PMC * const key = pmc_new(interp, enum_class_Key);
 
@@ -197,7 +204,7 @@ Set the string C<value> in C<key>.
 
 PARROT_API
 void
-key_set_string(SHIM_INTERP, NOTNULL(PMC *key), STRING *value)
+key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -215,7 +222,7 @@ Set the PMC C<value> in C<key>.
 
 PARROT_API
 void
-key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), PMC *value)
+key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -237,6 +244,7 @@ Returns the type of C<key>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_type(SHIM_INTERP, NOTNULL(const PMC *key))
 {
@@ -244,6 +252,7 @@ key_type(SHIM_INTERP, NOTNULL(const PMC *key))
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_integer(PARROT_INTERP, NOTNULL(PMC *key))
 {
@@ -272,6 +281,7 @@ key_integer(PARROT_INTERP, NOTNULL(PMC *key))
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 key_number(PARROT_INTERP, NOTNULL(PMC *key))
 {
@@ -295,6 +305,7 @@ key_number(PARROT_INTERP, NOTNULL(PMC *key))
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 key_string(PARROT_INTERP, NOTNULL(PMC *key))
@@ -330,6 +341,7 @@ possible. Otherwise they throws an exceptions.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
 {
@@ -350,6 +362,7 @@ Returns the next key if C<key> is in a sequence of linked keys.
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC *
 key_next(SHIM_INTERP, NOTNULL(PMC *key))
 {
@@ -370,6 +383,7 @@ Returns C<key1>.
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_IGNORABLE_RESULT
 PMC *
 key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
 {
@@ -414,6 +428,7 @@ key_mark(PARROT_INTERP, NOTNULL(PMC *key))
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
 {

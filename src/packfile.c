@@ -163,9 +163,10 @@ static PackFile_FixupEntry * find_fixup(
 
 static INTVAL find_fixup_iter( PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    void *user_data )
+    NOTNULL(void *user_data) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void fixup_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
@@ -256,6 +257,8 @@ static INTVAL pf_register_standard_funcs( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* run_sub( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -412,6 +415,8 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
 {
@@ -684,8 +689,9 @@ Returns size of unpacked if everything is OK, else zero (0).
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 opcode_t
-PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), opcode_t *packed,
+PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed),
     size_t packed_size)
 {
     PackFile_Header * const header = self->header;
@@ -2866,7 +2872,7 @@ I<What does this do?>
 */
 
 static INTVAL
-find_fixup_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), void *user_data)
+find_fixup_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NOTNULL(void *user_data))
 {
     if (seg->type == PF_DIR_SEG) {
         if (PackFile_map_segments(interp, (PackFile_Directory *)seg,
@@ -2907,6 +2913,7 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
     e.type = type;
     e.name = name;
     ep = &e; /* XXX It's possible to return this pointer to e, even though e is on the stack. */
+    /* XXX That is a big big big error. */
     found = PackFile_map_segments(interp, dir, find_fixup_iter,
             (void *) &ep);
     return found ? ep : NULL;

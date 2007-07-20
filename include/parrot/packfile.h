@@ -509,12 +509,14 @@ opcode_t * PackFile_Segment_unpack( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack( PARROT_INTERP,
     NOTNULL(PackFile *self),
-    opcode_t *packed,
+    NOTNULL(opcode_t *packed),
     size_t packed_size )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void Parrot_debug_add_mapping( PARROT_INTERP,

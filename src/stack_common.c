@@ -48,6 +48,7 @@ debugging/error reporting.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
 register_new_stack(PARROT_INTERP, NOTNULL(const char *name), size_t item_size)
 {
@@ -71,6 +72,7 @@ Get a new chunk either from the freelist or allocate one.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
 cst_new_stack_chunk(PARROT_INTERP, NOTNULL(const Stack_Chunk_t *chunk))
 {
@@ -95,6 +97,7 @@ Return a pointer, where new entries go for push.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void*
 stack_prepare_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))
 {
@@ -116,6 +119,7 @@ Return a pointer, where new entries are popped off.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void*
 stack_prepare_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))
 {
