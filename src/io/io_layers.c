@@ -31,6 +31,8 @@ will be copied to the new instance.
 /* HEADERIZER HFILE: include/parrot/io.h */
 
 PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_base_new_layer(NULLOK(ParrotIOLayer *proto))
 {
@@ -152,6 +154,7 @@ PIO_push_layer(PARROT_INTERP, NULLOK(PMC *pmc), NULLOK(ParrotIOLayer *layer))
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PARROT_API
 ParrotIOLayer *
 PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))
@@ -165,16 +168,15 @@ PIO_get_layer(SHIM_INTERP, NOTNULL(const char *name))
 }
 
 void
-PIO_push_layer_str(PARROT_INTERP, PMC *pmc, STRING *ls)
+PIO_push_layer_str(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *ls))
 {
     char * const cls = string_to_cstring(interp, ls);
     ParrotIOLayer * const l = PIO_get_layer(interp, cls);
     ParrotIOLayer * newlayer;
 
     string_cstring_free(cls);
-    if (!l) {
+    if (!l)
         real_exception(interp, NULL, 1, "Layer not found");
-    }
 
     /* make private copy */
     newlayer = PIO_base_new_layer(l);
@@ -196,6 +198,8 @@ popped layer. The layer gets freed.
 */
 
 PARROT_API
+PARROT_RESULT_IGNORABLE
+PARROT_CAN_RETURN_NULL
 ParrotIOLayer *
 PIO_pop_layer(PARROT_INTERP, NULLOK(PMC *pmc))
 {
@@ -246,6 +250,8 @@ PIO_pop_layer(PARROT_INTERP, NULLOK(PMC *pmc))
     return NULL;
 }
 
+PARROT_RESULT_IGNORABLE
+PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_pop_layer_str(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
@@ -266,6 +272,8 @@ we will do some funky copy-on-write stuff.
 */
 
 PARROT_API
+PARROT_RESULT_IGNORABLE
+PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
 PIO_copy_stack(NULLOK(ParrotIOLayer *stack))
 {

@@ -27,6 +27,7 @@ static void cnv_to_win32_filesep( NOTNULL(STRING *path) )
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC* get_search_paths( PARROT_INTERP, enum_lib_paths which )
         __attribute__nonnull__(1);
 
@@ -34,6 +35,8 @@ PARROT_PURE_FUNCTION
 static int is_abs_path( NOTNULL(const STRING *file) )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* path_append( PARROT_INTERP,
     NOTNULL(STRING *l_path),
     NOTNULL(STRING *r_path) )
@@ -41,6 +44,8 @@ static STRING* path_append( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* path_concat( PARROT_INTERP,
     NOTNULL(STRING *l_path),
     NOTNULL(STRING *r_path) )
@@ -48,21 +53,27 @@ static STRING* path_concat( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* path_finalize( PARROT_INTERP, NOTNULL(STRING *path) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* path_guarantee_trailing_separator( PARROT_INTERP,
     NOTNULL(STRING *path) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING* try_bytecode_extensions( PARROT_INTERP, NOTNULL(STRING* path) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING* try_load_path( PARROT_INTERP, NOTNULL(STRING* path) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -172,6 +183,7 @@ parrot_init_library_paths(PARROT_INTERP)
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_search_paths(PARROT_INTERP, enum_lib_paths which)
 {
@@ -228,6 +240,8 @@ cnv_to_win32_filesep(NOTNULL(STRING *path))
 
 #endif
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
 {
@@ -256,6 +270,8 @@ path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
   there already.
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, NOTNULL(STRING *path))
 {
@@ -275,6 +291,8 @@ path_guarantee_trailing_separator(PARROT_INTERP, NOTNULL(STRING *path))
   argument and the right argument is appended
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_append(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
 {
@@ -290,6 +308,8 @@ path_append(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
   with a path-separator.
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_concat(PARROT_INTERP, NOTNULL(STRING *l_path), NOTNULL(STRING *r_path))
 {
@@ -315,17 +335,13 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
 };
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING*
 try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
 {
     STRING *final;
 
     final = string_copy(interp, path);
-
-#if 0
-    printf("path is \"%s\"\n",
-           string_to_cstring(interp, final ));
-#endif
 
     final = path_finalize(interp, final);
 
@@ -343,6 +359,7 @@ try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
  */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING*
 try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
 {
@@ -357,7 +374,8 @@ try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
 
     with_ext = string_copy(interp, path);
 
-    if ( (result = try_load_path(interp, with_ext) ) )
+    result = try_load_path(interp, with_ext);
+    if (result)
         return result;
 
     /*
@@ -371,7 +389,8 @@ try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
         with_ext = string_append(interp,
                                  with_ext, const_string(interp, load_ext_code[guess]));
 
-        if ( (result = try_load_path(interp, with_ext)) )
+        result = try_load_path(interp, with_ext);
+        if (result)
             return result;
     }
 
@@ -400,6 +419,7 @@ F<include/parrot/library.h>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
         enum_runtime_ft type)
@@ -408,11 +428,6 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
     STRING *full_name;
     INTVAL i, n;
     PMC *paths;
-
-#if 0
-    printf("requesting path: \"%s\"\n",
-           string_to_cstring(interp, file ));
-#endif
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(file))
@@ -459,6 +474,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char*
 Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
         enum_runtime_ft type)
@@ -492,7 +508,6 @@ whether we're searching for a STRING or a cstring.
 
 PARROT_API
 PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 char*
 Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
@@ -552,8 +567,10 @@ extension and C<ext> to the extension or NULL.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING *
-parrot_split_path_ext(PARROT_INTERP, STRING *in,
+parrot_split_path_ext(PARROT_INTERP, NOTNULL(STRING *in),
         NOTNULL(STRING **wo_ext), NOTNULL(STRING **ext))
 {
     STRING * const slash1 = CONST_STRING(interp, "/");
@@ -588,7 +605,7 @@ parrot_split_path_ext(PARROT_INTERP, STRING *in,
     else if (pos_sl) {
         stem = string_substr(interp, in, pos_sl, len - pos_sl, NULL, 0);
         *wo_ext = string_copy(interp, in);
-        *ext = 0;
+        *ext = NULL;
     }
     else {
         stem = string_copy(interp, in);

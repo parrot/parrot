@@ -186,10 +186,12 @@ char PDB_check_condition( PARROT_INTERP, NOTNULL(PDB_condition_t *condition) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 opcode_t * PDB_compile( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 PDB_condition_t * PDB_cond( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

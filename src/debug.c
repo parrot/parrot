@@ -660,6 +660,7 @@ Analyzes a condition from the user input.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PDB_condition_t *
 PDB_cond(PARROT_INTERP, NOTNULL(const char *command))
 {
@@ -2117,6 +2118,7 @@ which generates a malloced string.
 
 */
 
+PARROT_CAN_RETURN_NULL
 opcode_t *
 PDB_compile(PARROT_INTERP, NOTNULL(const char *command))
 {
