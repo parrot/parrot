@@ -58,6 +58,8 @@ void Parrot_ComposeRole( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC* Parrot_ComputeMRO_C3( PARROT_INTERP, PMC *_class )
         __attribute__nonnull__(1);
 
@@ -223,12 +225,17 @@ void Parrot_set_class_fallback( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_single_subclass( PARROT_INTERP,
-    PMC *base_class,
+    NOTNULL(PMC *base_class),
     NULLOK(PMC *name) )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING* readable_name( PARROT_INTERP, NOTNULL(PMC *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -498,6 +498,8 @@ PARROT_API void Parrot_destroy(Interp *);
 /* HEADERIZER BEGIN: src/inter_run.c */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * Parrot_run_meth_fromc( PARROT_INTERP,
     NOTNULL(NOTNULL(PMC *sub)),
     NOTNULL(NOTNULL(PMC *obj)),
@@ -507,6 +509,8 @@ void * Parrot_run_meth_fromc( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void* Parrot_run_meth_fromc_arglist( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -519,6 +523,7 @@ void* Parrot_run_meth_fromc_arglist( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_run_meth_fromc_arglist_retf( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -531,6 +536,7 @@ FLOATVAL Parrot_run_meth_fromc_arglist_retf( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_run_meth_fromc_arglist_reti( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -543,6 +549,8 @@ INTVAL Parrot_run_meth_fromc_arglist_reti( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void* Parrot_run_meth_fromc_args( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -555,6 +563,7 @@ void* Parrot_run_meth_fromc_args( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_run_meth_fromc_args_retf( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -567,6 +576,7 @@ FLOATVAL Parrot_run_meth_fromc_args_retf( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_run_meth_fromc_args_reti( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
@@ -579,11 +589,15 @@ INTVAL Parrot_run_meth_fromc_args_reti( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 parrot_context_t * Parrot_runops_fromc( PARROT_INTERP, NOTNULL(PMC *sub) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * Parrot_runops_fromc_arglist( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const char *sig),
@@ -593,6 +607,7 @@ void * Parrot_runops_fromc_arglist( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_runops_fromc_arglist_retf( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const char *sig),
@@ -602,6 +617,7 @@ FLOATVAL Parrot_runops_fromc_arglist_retf( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_runops_fromc_arglist_reti( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const char *sig),
@@ -622,6 +638,8 @@ PMC * Parrot_runops_fromc_args( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void * Parrot_runops_fromc_args_event( PARROT_INTERP,
     NOTNULL(NOTNULL(PMC *sub)),
     NOTNULL(NOTNULL(const char *sig)),
@@ -631,6 +649,7 @@ void * Parrot_runops_fromc_args_event( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_runops_fromc_args_retf( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const char *sig),
@@ -640,6 +659,7 @@ FLOATVAL Parrot_runops_fromc_args_retf( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_runops_fromc_args_reti( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const char *sig),

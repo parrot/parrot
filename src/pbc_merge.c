@@ -55,12 +55,16 @@ typedef struct pbc_merge_input {
 static void help( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_begin( PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile_ByteCode* pbc_merge_bytecode( PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
@@ -69,6 +73,8 @@ static PackFile_ByteCode* pbc_merge_bytecode( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile_ConstTable* pbc_merge_constants( PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
@@ -107,6 +113,8 @@ static void pbc_merge_fixups( PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_loadpbc( PARROT_INTERP,
     NOTNULL(const char *fullname) )
         __attribute__nonnull__(1)
@@ -130,6 +138,7 @@ static void pbc_merge_write( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static char * str_dup( NOTNULL(const char *old) )
         __attribute__nonnull__(1);
 
@@ -161,6 +170,7 @@ Duplicate a C string
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static char *
 str_dup(NOTNULL(const char *old))
 {
@@ -182,6 +192,8 @@ use Parrot_readbc because that is specified to also
 fixup the segments, which we don't want.
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_loadpbc(PARROT_INTERP, NOTNULL(const char *fullname))
 {
@@ -267,6 +279,8 @@ This function merges the bytecode from the input packfiles, storing the
 offsets that each bit of bytecode now exists at.
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile_ByteCode*
 pbc_merge_bytecode(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
                    int num_inputs, NOTNULL(PackFile *pf))
@@ -327,6 +341,8 @@ FUNCDOC: pbc_merge_constants
 This function merges the constants tables from the input PBC files.
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
                     int num_inputs, NOTNULL(PackFile *pf), NOTNULL(PackFile_ByteCode *bc))
@@ -701,6 +717,8 @@ FUNCDOC: pbc_merge_begin
 This is the function that drives PBC merging process.
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs)
 {

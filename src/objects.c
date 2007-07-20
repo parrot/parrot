@@ -32,6 +32,8 @@ static INTVAL attr_str_2_num( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* C3_merge( PARROT_INTERP, NOTNULL(PMC *merge_list) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -42,6 +44,8 @@ static PMC* class_mro_merge( PARROT_INTERP, NOTNULL(PMC *seqs) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC* create_class_mro( PARROT_INTERP, NOTNULL(PMC *_class) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -245,6 +249,8 @@ XXX this function, key_set_to_string, and the key PMC get_repr should be consoli
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING*
 readable_name(PARROT_INTERP, NOTNULL(PMC *name))
 {
@@ -490,7 +496,8 @@ Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))
 
 /*
 
-FUNCDOC:
+FUNCDOC: Parrot_single_subclass
+
 Subclass a class. Single parent class, nice and straightforward. If
 C<child_class> is C<NULL>, this is an anonymous subclass we're creating,
 function.
@@ -498,8 +505,10 @@ function.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_single_subclass(PARROT_INTERP, PMC *base_class, NULLOK(PMC *name))
+Parrot_single_subclass(PARROT_INTERP, NOTNULL(PMC *base_class), NULLOK(PMC *name))
 {
     PMC      *child_class, *parents, *temp_pmc, *mro;
     SLOTTYPE *child_class_array;
@@ -1113,6 +1122,8 @@ class_mro_merge(PARROT_INTERP, NOTNULL(PMC *seqs))
 }
 
 /* create C3 MRO */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 create_class_mro(PARROT_INTERP, NOTNULL(PMC *_class))
 {
@@ -1874,6 +1885,8 @@ Parrot_set_class_fallback(PARROT_INTERP, STRING *_class,
 /* ********* BELOW HERE IS NEW PPD15 IMPLEMENTATION RELATED STUFF ********* */
 /* ************************************************************************ */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 C3_merge(PARROT_INTERP, NOTNULL(PMC *merge_list))
 {
@@ -1965,6 +1978,8 @@ Computes the C3 linearization for the given class.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, PMC *_class)
 {

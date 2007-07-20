@@ -1220,6 +1220,8 @@ set_retval_util(PARROT_INTERP, NOTNULL(const char *sig), NOTNULL(parrot_context_
 /*
  * handle void, and pointer (PMC*, STRING*) return values
  */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void*
 set_retval(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
 {

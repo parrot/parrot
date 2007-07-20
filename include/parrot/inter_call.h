@@ -173,6 +173,8 @@ int Parrot_store_arg( PARROT_INTERP, NOTNULL(call_state *st) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 void* set_retval( PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
