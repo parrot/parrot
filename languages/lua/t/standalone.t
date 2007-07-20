@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 delete $ENV{LUA_INIT};
@@ -34,6 +34,14 @@ language_output_is( 'lua', <<'CODE', <<'OUT', 'shebang' );
 print("Hello World")
 CODE
 Hello World
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'shebang misplaced' );
+
+#!/usr/bin/env lua
+print("Hello World")
+CODE
+/^lua[^:]*: [^:]+:1: syntax error/
 OUT
 
 SKIP:

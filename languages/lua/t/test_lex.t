@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 use Test::More;
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'hello' );
@@ -250,6 +250,21 @@ OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'syntax error' );
 !!
+CODE
+/^[^:]+: [^:]+:1: syntax error/
+OUT
+
+language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'shebang' );
+#!/usr/bin/env lua
+1
+CODE
+Number:	1
+OUT
+
+language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'shebang misplaced' );
+
+#!/usr/bin/env lua
+1
 CODE
 /^[^:]+: [^:]+:1: syntax error/
 OUT
