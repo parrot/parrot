@@ -554,7 +554,7 @@ PackFile_Debug * Parrot_new_debug_seg( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_switch_to_cs( PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *new_cs),

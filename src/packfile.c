@@ -2431,7 +2431,7 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
 Parrot_switch_to_cs(PARROT_INTERP, NOTNULL(PackFile_ByteCode *new_cs), int really)

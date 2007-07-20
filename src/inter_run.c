@@ -23,6 +23,8 @@ Various functions that call the run loop.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static parrot_context_t * runops_args( PARROT_INTERP,
     NOTNULL(NOTNULL(PMC *sub)),
     NOTNULL(NOTNULL(PMC *obj)),
@@ -130,7 +132,7 @@ is an invocable C<Sub> PMC.
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CANNOT_RETURN_NULL
 parrot_context_t *
 Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
@@ -158,6 +160,8 @@ Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
 }
 
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static parrot_context_t *
 runops_args(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)), NOTNULL(NOTNULL(PMC *obj)),
         SHIM(STRING *meth), NOTNULL(NOTNULL(const char *sig)), va_list ap)
@@ -257,7 +261,7 @@ Signatures are similar to NCI:
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_run_meth_fromc(PARROT_INTERP,
@@ -278,7 +282,7 @@ Parrot_run_meth_fromc(PARROT_INTERP,
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
@@ -304,7 +308,7 @@ didn't return properly.
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
@@ -368,7 +372,7 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 }
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
+PARROT_MAY_IGNORE_RESULT
 PARROT_CAN_RETURN_NULL
 void*
 Parrot_run_meth_fromc_args(PARROT_INTERP,
