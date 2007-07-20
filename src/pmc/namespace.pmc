@@ -237,7 +237,7 @@ really a public API.
                 STRING *meth_name = key;
 
                 if (string_str_index(interp, key,
-                    CONST_STRING(interp, "__"), 0 == 0)) {
+                    CONST_STRING(interp, "__"), 0) == 0) {
                     meth_name = string_substr(interp, key, 2,
                         string_length(interp, key) - 2, NULL, 0);
                 }
