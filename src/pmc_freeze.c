@@ -178,6 +178,8 @@ static void push_opcode_string( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* run_thaw( PARROT_INTERP,
     NOTNULL(STRING* image),
     visit_enum_type what )
@@ -190,9 +192,13 @@ static INTVAL shift_ascii_integer( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
 static FLOATVAL shift_ascii_number( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* shift_ascii_pmc( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING* shift_ascii_string( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -203,10 +209,14 @@ static INTVAL shift_opcode_integer( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
 static FLOATVAL shift_opcode_number( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* shift_opcode_pmc( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING* shift_opcode_string( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -487,6 +497,8 @@ Removes and returns an string from the start of the C<*io> "stream".
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING*
 shift_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 {
@@ -515,6 +527,8 @@ Removes and returns a PMC from the start of the C<*io> "stream".
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 shift_ascii_pmc(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 {
@@ -684,6 +698,8 @@ Note that this actually reads a PMC id, not a PMC.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 shift_opcode_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 {
@@ -718,6 +734,8 @@ Removes and returns a string from the start of the C<*io> "stream".
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 {
@@ -1486,6 +1504,8 @@ nested containers, for which the C<next_for_GC> approach could be a win.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 run_thaw(PARROT_INTERP, NOTNULL(STRING* image), visit_enum_type what)
 {
@@ -1552,6 +1572,8 @@ interrupted by a DOD run.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_freeze_at_destruct(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
@@ -1584,6 +1606,8 @@ Freeze using either method.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_freeze(PARROT_INTERP, NOTNULL(PMC* pmc))
 {
@@ -1621,8 +1645,10 @@ Thaw a PMC, called from the C<thaw> opcode.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_thaw(PARROT_INTERP, STRING* image)
+Parrot_thaw(PARROT_INTERP, NOTNULL(STRING* image))
 {
     return run_thaw(interp, image, VISIT_THAW_NORMAL);
 }
@@ -1637,6 +1663,8 @@ constants.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_thaw_constants(PARROT_INTERP, NOTNULL(STRING* image))
 {
@@ -1654,6 +1682,8 @@ PMC.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_clone(PARROT_INTERP, NOTNULL(PMC* pmc))
 {

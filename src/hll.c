@@ -62,6 +62,8 @@ the context.  If no type is registered, returns C<core_type>.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC* new_hll_entry( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -92,6 +94,8 @@ enum {
 #define ASSERT_CONST_STRING(src) assert(PObj_constant_TEST(src))
 
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
 new_hll_entry(PARROT_INTERP)
 {
@@ -111,7 +115,7 @@ new_hll_entry(PARROT_INTERP)
 
 PARROT_API
 INTVAL
-Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), STRING *hll_lib)
+Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NOTNULL(STRING *hll_lib))
 {
     PMC *entry, *name, *type_hash, *ns_hash, *hll_info;
     INTVAL idx;

@@ -241,8 +241,8 @@ typedef void (*funcptr_t)(void);
 #endif /* O_BINARY */
 
 /* Hide our struct copying behind macros */
-#define STRUCT_COPY(d,s)    assert(d);assert(s);*(d)=*(s);
-#define STRUCT_COPY_N(d,s,n) assert(d);assert(s);assert(sizeof(*d)==sizeof(*s));memcpy((d),(s),sizeof(*d)*(n));
+#define STRUCT_COPY(d,s)    (assert(d),assert(s),*(d)=*(s))
+#define STRUCT_COPY_N(d,s,n) (assert(d),assert(s),assert(sizeof(*d)==sizeof(*s)),memcpy((d),(s),sizeof(*d)*(n)))
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"

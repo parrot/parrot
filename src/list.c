@@ -1167,6 +1167,7 @@ Returns a new list of type C<type>.
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 List *
 list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 {

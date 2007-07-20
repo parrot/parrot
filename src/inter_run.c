@@ -275,6 +275,8 @@ Parrot_run_meth_fromc(PARROT_INTERP,
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(NOTNULL(PMC *sub)),
         NOTNULL(NOTNULL(const char *sig)), ...)

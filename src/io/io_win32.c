@@ -66,6 +66,8 @@ static INTVAL PIO_win32_connect( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_win32_fdopen( PARROT_INTERP,
     ParrotIOLayer *layer,
     PIOHANDLE fd,
@@ -128,6 +130,7 @@ static INTVAL PIO_win32_send( SHIM_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_win32_socket( PARROT_INTERP,
     ParrotIOLayer *layer,
@@ -343,6 +346,8 @@ Returns a new C<ParrotIO> with C<fd> as its file descriptor.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static ParrotIO *
 PIO_win32_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)
 {
@@ -558,6 +563,8 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 STRING *
 PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 {
@@ -601,6 +608,7 @@ socket type and protocol number.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO *
 PIO_win32_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)

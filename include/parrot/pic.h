@@ -127,13 +127,17 @@ void parrot_PIC_prederef( PARROT_INTERP,
 
 /* HEADERIZER BEGIN: src/pic_jit.c */
 
+PARROT_WARN_UNUSED_RESULT
 int parrot_pic_is_safe_to_jit( PARROT_INTERP,
     NOTNULL(PMC *sub),
-    PMC *sig_args,
-    PMC *sig_results,
-    int *flags )
+    NOTNULL(PMC *sig_args),
+    NOTNULL(PMC *sig_results),
+    NOTNULL(int *flags) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 funcptr_t parrot_pic_JIT_sub( PARROT_INTERP, NOTNULL(PMC *sub), int flags )
         __attribute__nonnull__(1)

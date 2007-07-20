@@ -400,6 +400,7 @@ Store an C<INTVAL> to stream as is.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
 {
@@ -476,6 +477,8 @@ Write a C<FLOATVAL> to the opcode stream as is.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_number(NOTNULL(opcode_t *cursor), NOTNULL(const FLOATVAL *val))
 {
@@ -572,6 +575,8 @@ Write a STRING to the opcode stream.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 {
@@ -649,18 +654,17 @@ Fetch a cstring from bytecode and return an allocated copy
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 char *
 PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
 {
     const size_t str_len = strlen ((char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
 
-    if (p) {
-        const int wordsize = pf->header->wordsize;
+    const int wordsize = pf->header->wordsize;
 
-        strcpy(p, (char*) (*cursor));
-        *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
-    }
+    strcpy(p, (char*) (*cursor));
+    *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
 
     return p;
 }

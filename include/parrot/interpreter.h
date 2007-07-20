@@ -611,6 +611,8 @@ INTVAL Parrot_runops_fromc_arglist_reti( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_runops_fromc_args( PARROT_INTERP,
     NOTNULL(NOTNULL(PMC *sub)),
     NOTNULL(NOTNULL(const char *sig)),

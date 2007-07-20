@@ -157,8 +157,9 @@ Returns a clone of the list.
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 IntList *
-intlist_clone(PARROT_INTERP, const IntList *list/*NN*/)
+intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))
 {
     return (IntList *)list_clone(interp, (const List *)list);
 }
@@ -172,6 +173,7 @@ Returns a new list.
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 IntList *
 intlist_new(PARROT_INTERP)
 {

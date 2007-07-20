@@ -73,6 +73,7 @@ static int ops_jittable( PARROT_INTERP,
         __attribute__nonnull__(7);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t * pic_test_func( PARROT_INTERP,
     INTVAL *sig_bits,
     NOTNULL(void **args) )
@@ -120,6 +121,7 @@ static int returns_match_results(
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t *
 pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
 {
@@ -333,9 +335,10 @@ op_is_ok:
 #endif     /* HAS_JIT */
 
 
+PARROT_WARN_UNUSED_RESULT
 int
 parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
-        PMC *sig_args, PMC *sig_results, int *flags)
+        NOTNULL(PMC *sig_args), NOTNULL(PMC *sig_results), NOTNULL(int *flags))
 {
 #ifdef HAS_JIT
     opcode_t *base, *start, *end;

@@ -135,6 +135,7 @@ void list_mark( PARROT_INTERP, NOTNULL(List *list) )
 
 PARROT_API
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 List * list_new( PARROT_INTERP, PARROT_DATA_TYPE type )
         __attribute__nonnull__(1);
 
