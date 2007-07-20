@@ -21,7 +21,6 @@ running compilers from a command line.
     addattribute $P0, '$astgrammar'
     addattribute $P0, '$ostgrammar'
     addattribute $P0, '@stages'
-    addattribute $P0, '$!compsub'
 
     # the commandline_banner is the welcome message for interactive mode
     addattribute $P0, '$commandline_banner'
@@ -229,23 +228,17 @@ be added at every instance of the repeated stage.
 
 =item compile(pmc code [, "option" => value, ... ])
 
-Compile C<source> (possibly modified by any provided options).
-If a compsub has been registered for this compiler, use it,
-otherwise use the C<parsegrammar> and C<astgrammar> attributes
-to get to an AST and compile it, otherwise throw an exception.
+Compile C<source> (possibly modified by any provided options)
+by iterating through any stages identified for this compiler.
+If a C<target> option is provided, then halt the iteration
+when the stage corresponding to target has been reached.
 
 =cut
 
 .sub 'compile' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
-    .local pmc compsub
 
-    #   $!compsub is deprecated
-    compsub = getattribute self, '$!compsub'
-    if null compsub goto default
-    .return compsub(source, adverbs :flat :named)
-  default:
     .local string target
     target = adverbs['target']
     target = downcase target
@@ -659,23 +652,6 @@ resulting ost.
     $P0 = compreg 'PIR'
     $P1 = $P0(source)
     .return ($P1)
-.end
-
-
-=item register(string name, pmc compsub)  # DEPRECATED
-
-(Deprecated.) Registers this compiler object as C<name> and
-using C<compsub> as the subroutine to call for performing compilation.
-
-=cut
-
-.sub 'register' :method
-    .param string name
-    .param pmc compsub
-
-    setattribute self, '$!compsub', compsub
-    compreg name, self
-    .return ()
 .end
 
 
