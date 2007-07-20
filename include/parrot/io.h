@@ -426,7 +426,7 @@ PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer * PIO_base_new_layer( NULLOK(ParrotIOLayer *proto) );
 
 PARROT_API
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer * PIO_copy_stack( NULLOK(ParrotIOLayer *stack) );
 
@@ -437,7 +437,7 @@ ParrotIOLayer * PIO_get_layer( SHIM_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIOLayer * PIO_pop_layer( PARROT_INTERP, NULLOK(PMC *pmc) )
         __attribute__nonnull__(1);
@@ -448,7 +448,7 @@ INTVAL PIO_push_layer( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer) )
         __attribute__nonnull__(1);
 
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * PIO_pop_layer_str( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(1)

@@ -889,7 +889,7 @@ copied.
 */
 
 PARROT_API
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
 parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), void *key, void *value)

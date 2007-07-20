@@ -232,7 +232,7 @@ INTVAL Parrot_object_isa( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_remove_parent( PARROT_INTERP,
     NOTNULL(PMC *removed_class),

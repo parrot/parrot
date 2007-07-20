@@ -466,7 +466,7 @@ Hash the command to make a simple switch calling the correct handler.
 
 */
 
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 int
 PDB_run_command(PARROT_INTERP, NOTNULL(const char *command))
 {

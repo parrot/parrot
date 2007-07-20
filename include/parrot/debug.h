@@ -291,7 +291,7 @@ void PDB_print_user_stack( PARROT_INTERP, const char *command )
 char PDB_program_end( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 int PDB_run_command( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -185,7 +185,7 @@ Also all array usage depends on list.
 
 /* HEADERIZER BEGIN: static */
 
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk * add_chunk( PARROT_INTERP,
     NOTNULL(List *list),
@@ -747,7 +747,7 @@ Add chunk at start or end.
 
 */
 
-PARROT_RESULT_IGNORABLE
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 add_chunk(PARROT_INTERP, NOTNULL(List *list), int where, UINTVAL idx)
