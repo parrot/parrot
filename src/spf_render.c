@@ -22,34 +22,44 @@ and its utility functions.
 #include "spf_render.str"
 #include <assert.h>
 
+typedef struct spfinfo_t {
+    UINTVAL width;
+    UINTVAL prec;
+    INTVAL flags;
+    INTVAL type;
+    INTVAL phase;
+} SpfInfo;
+
 /* HEADERIZER HFILE: include/parrot/misc.h */
 
 /* HEADERIZER BEGIN: static */
 
 static void gen_sprintf_call(
     NOTNULL(char *out),
-    NOTNULL(SpfInfo info),
+    NOTNULL(SpfInfo *info),
     int thingy )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags( PARROT_INTERP,
-    SpfInfo info,
+    NOTNULL(SpfInfo *info),
     NOTNULL(STRING *str),
     INTVAL is_int_type,
     NULLOK(STRING* prefix) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* str_append_w_flags( PARROT_INTERP,
     NOTNULL(STRING* dest),
-    SpfInfo info,
+    NOTNULL(SpfInfo *info),
     NOTNULL(STRING* src),
     NULLOK(STRING *prefix) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 /* HEADERIZER END: static */
@@ -72,8 +82,8 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-handle_flags(PARROT_INTERP,
-             SpfInfo info, NOTNULL(STRING *str), INTVAL is_int_type, NULLOK(STRING* prefix))
+handle_flags(PARROT_INTERP, NOTNULL(SpfInfo *info), NOTNULL(STRING *str),
+        INTVAL is_int_type, NULLOK(STRING* prefix))
 {
     UINTVAL len = string_length(interp, str);
 
@@ -163,8 +173,8 @@ handle_flags(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-str_append_w_flags(PARROT_INTERP,
-        NOTNULL(STRING* dest), SpfInfo info, NOTNULL(STRING* src), NULLOK(STRING *prefix))
+str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
+        NOTNULL(STRING* src), NULLOK(STRING *prefix))
 {
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);
@@ -182,7 +192,7 @@ a float.
 */
 
 static void
-gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo info), int thingy)
+gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo *info), int thingy)
 {
     int i = 0;
 

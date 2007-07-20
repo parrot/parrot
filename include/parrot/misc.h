@@ -237,14 +237,6 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
         SIZE_PSTR
     } TYPE;
 
-    typedef struct spfinfo_t {
-        UINTVAL width;
-        UINTVAL prec;
-        INTVAL flags;
-        INTVAL type;
-        INTVAL phase;
-    } *SpfInfo;
-
     /* SPRINTF ARGUMENT OBJECT */
 
     typedef struct sprintf_obj SPRINTF_OBJ;
