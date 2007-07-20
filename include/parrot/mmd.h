@@ -84,6 +84,7 @@ INTVAL mmd_dispatch_i_pp( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_pip( PARROT_INTERP,
     NOTNULL(PMC *left),
     INTVAL right,
@@ -93,6 +94,7 @@ PMC* mmd_dispatch_p_pip( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_pnp( PARROT_INTERP,
     NOTNULL(PMC *left),
     FLOATVAL right,
@@ -102,6 +104,8 @@ PMC* mmd_dispatch_p_pnp( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
     NOTNULL(PMC *left),
     NOTNULL(PMC *right),
@@ -112,6 +116,7 @@ PMC* mmd_dispatch_p_ppp( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 PMC* mmd_dispatch_p_psp( PARROT_INTERP,
     NOTNULL(PMC *left),
     NOTNULL(STRING *right),
@@ -120,6 +125,14 @@ PMC* mmd_dispatch_p_psp( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+PARROT_API
+void mmd_dispatch_v_pi( PARROT_INTERP,
+    NOTNULL(PMC *left),
+    INTVAL right,
+    INTVAL func_nr )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void mmd_dispatch_v_pn( PARROT_INTERP,
@@ -141,10 +154,11 @@ void mmd_dispatch_v_pp( PARROT_INTERP,
 PARROT_API
 void mmd_dispatch_v_ps( PARROT_INTERP,
     NOTNULL(PMC *left),
-    STRING *right,
+    NOTNULL(STRING *right),
     INTVAL func_nr )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void mmd_register( PARROT_INTERP,
@@ -164,6 +178,7 @@ void mmd_register_sub( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * mmd_vtfind( PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right )
         __attribute__nonnull__(1);
@@ -181,20 +196,20 @@ void Parrot_mmd_register_table( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_MMD_search_default_infix( PARROT_INTERP,
-    STRING *meth,
+    NOTNULL(STRING *meth),
     INTVAL left_type,
     INTVAL right_type )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
-PMC * Parrot_mmd_sort_candidate_list( PARROT_INTERP, PMC *candidates )
-        __attribute__nonnull__(1);
-
-void mmd_dispatch_v_pi( PARROT_INTERP,
-    NOTNULL(PMC *left),
-    INTVAL right,
-    INTVAL func_nr )
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_mmd_sort_candidate_list( PARROT_INTERP,
+    NOTNULL(PMC *candidates) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
