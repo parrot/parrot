@@ -252,7 +252,11 @@ sub _run_this_step {
     if ( defined $args->{verbose_step} ) {
 
         # by step number
-        if ( $args->{verbose_step} =~ /^\d+$/ && $args->{n} == $args->{verbose_step} ) {
+        if (
+            $args->{verbose_step} =~ /^\d+$/
+            &&
+            $args->{n} == $args->{verbose_step}
+        ) {
             $self->options->set( verbose => 2 );
         }
 
