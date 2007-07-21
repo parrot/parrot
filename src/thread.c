@@ -803,6 +803,7 @@ remove_queued_suspend_gc(PARROT_INTERP) {
 
         mem_sys_free(ev);
         mem_sys_free(cur);
+        cur = NULL;
         TRACE_THREAD("%p: remove_queued_suspend_gc: got one", interp);
     }
 
