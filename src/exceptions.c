@@ -279,15 +279,19 @@ find_exception_handler(PARROT_INTERP, PMC *exception)
         string_cstring_free(m);
     }
     else {
-        const INTVAL severity =
-            VTABLE_get_integer_keyed_int(interp, exception, 2);
-        if (severity == EXCEPT_exit) {
-            print_location = 0;
-            exit_status =
-                (int)VTABLE_get_integer_keyed_int(interp, exception, 1);
+        if (m)
+            string_cstring_free(m); /* coverity fix, m was allocated but was "\0" */
+        /* new block for const assignment */
+        {
+            const INTVAL severity = VTABLE_get_integer_keyed_int(interp, exception, 2);
+            if (severity == EXCEPT_exit) {
+                print_location = 0;
+                exit_status =
+                    (int)VTABLE_get_integer_keyed_int(interp, exception, 1);
+            }
+            else
+                fprintf(stderr, "No exception handler and no message\n");
         }
-        else
-            fprintf(stderr, "No exception handler and no message\n");
     }
     /* caution against output swap (with PDB_backtrace) */
     fflush(stderr);
