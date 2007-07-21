@@ -567,7 +567,7 @@ extension and C<ext> to the extension or NULL.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 parrot_split_path_ext(PARROT_INTERP, NOTNULL(STRING *in),

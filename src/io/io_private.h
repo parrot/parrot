@@ -143,38 +143,50 @@ struct _ParrotIOData {
 /* HEADERIZER BEGIN: src/io/io_passdown.c */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_accept_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_bind_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
-    STRING *address )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *address) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_close_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_connect_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
-    STRING *address )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *address) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_eof_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_fdopen_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
     PIOHANDLE fd,
@@ -184,27 +196,33 @@ ParrotIO * PIO_fdopen_down( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_flush_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_listen_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
     INTVAL backlog )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_open_async_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
     NOTNULL(const char *name),
     NOTNULL(const char *mode),
-    DummyCodeRef * dummy )
+    NOTNULL(DummyCodeRef *dummy) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_open_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
     NOTNULL(const char *name),
@@ -215,97 +233,123 @@ ParrotIO * PIO_open_down( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_peek_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
-    STRING ** buf )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING **buf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_poll_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
     INTVAL which,
     INTVAL sec,
     INTVAL usec )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_read_async_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
-    STRING ** buf,
-    DummyCodeRef *dummy )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING **buf),
+    NOTNULL(DummyCodeRef *dummy) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_read_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
-    STRING ** buf )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING **buf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_recv_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
-    STRING **buf )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING **buf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T PIO_seek_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
+    NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_send_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
-    ParrotIO *io,
-    STRING *buf )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIOLayer *layer),
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *buf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_setbuf_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
+    NOTNULL(ParrotIO *io),
     size_t bufsize )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PIO_setlinebuf_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 ParrotIO * PIO_socket_down( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    NOTNULL(ParrotIOLayer *layer),
     INTVAL fam,
     INTVAL type,
     INTVAL proto )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T PIO_tell_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_write_async_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
-    STRING *s,
-    DummyCodeRef *dummy )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *s),
+    NOTNULL(DummyCodeRef *dummy) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 size_t PIO_write_down( PARROT_INTERP,
     NULLOK(ParrotIOLayer *layer),
-    ParrotIO * io,
-    STRING *s )
-        __attribute__nonnull__(1);
+    NOTNULL(ParrotIO *io),
+    NOTNULL(STRING *s) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 /* HEADERIZER END: src/io/io_passdown.c */
 

@@ -2287,7 +2287,7 @@ PARROT_API
 void
 Parrot_debug_add_mapping(PARROT_INTERP, NOTNULL(PackFile_Debug *debug),
                          opcode_t offset, int mapping_type,
-                         const char *filename, int source_seg)
+                         NOTNULL(const char *filename), int source_seg)
 {
     PackFile_DebugMapping *mapping;
     PackFile_ConstTable * const ct = debug->code->const_table;

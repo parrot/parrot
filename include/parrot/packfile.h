@@ -523,10 +523,11 @@ void Parrot_debug_add_mapping( PARROT_INTERP,
     NOTNULL(PackFile_Debug *debug),
     opcode_t offset,
     int mapping_type,
-    const char *filename,
+    NOTNULL(const char *filename),
     int source_seg )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

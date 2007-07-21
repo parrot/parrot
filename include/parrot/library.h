@@ -62,7 +62,7 @@ STRING* Parrot_locate_runtime_file_str( PARROT_INTERP,
 void parrot_init_library_paths( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext( PARROT_INTERP,
     NOTNULL(STRING *in),
