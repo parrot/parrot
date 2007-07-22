@@ -115,7 +115,7 @@ eval_undo (void)
 
 static eval_token eval_lex( eval_t *val )
 {
-  while ( isspace(*eval_text) ) eval_text++;
+  while ( isspace((unsigned char)*eval_text) ) eval_text++;
 
   last_text = eval_text;
 
