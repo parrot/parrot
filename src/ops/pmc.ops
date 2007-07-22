@@ -133,7 +133,8 @@ op new(out PMC, in STR, in PMC) {
 }
 
 inline op new(out PMC, inconst PMC) :object_classes {
-    PMC *ns, *classobj;
+    PMC *ns;
+    PMC *classobj = PMCNULL;
     PMC *_class = $2;
     /* Lookup namespace by key */
     ns = Parrot_get_namespace_keyed(interp,
