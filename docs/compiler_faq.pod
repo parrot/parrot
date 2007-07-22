@@ -266,7 +266,7 @@ If your language looks up variables differently, you have to walk the
 
 Don't emit C<store_lex> at all. Use C<find_lex> only if the compiler
 doesn't know the variable. You can always just use the register that was
-defined in the C<.lex> directive as an alias to that lexical, if you are in t
+defined in the C<.lex> directive as an alias to that lexical, if you are in
 the same scope.
 
 =head1 Modules, Classes, and Objects
