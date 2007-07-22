@@ -20,7 +20,7 @@ extract_int(char *str, int *pos, int length)
 {
     int n = 0;
 
-    while (*pos < length && isdigit(str[*pos]))
+    while (*pos < length && isdigit((unsigned char)str[*pos]))
         n = 10*n + (str[(*pos)++] - '0');
 
     if (!n)
