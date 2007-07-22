@@ -772,7 +772,7 @@ read_digits(lexer_state *lexer) {
     int count = 0;
     char c    = read_char(lexer->curfile);
 
-    while ( isdigit(c) ) {
+    while ( isdigit((unsigned char)c) ) {
         buffer_char(lexer, c);
         c = read_char(lexer->curfile);
         count++;
@@ -871,7 +871,7 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
             }
 
             /* the loop broke, but why? */
-            if (*heredoc_iter == '\0' && isspace(c)) { /* loop broke because heredoc label was fully iterated; success! */
+            if (*heredoc_iter == '\0' && isspace((unsigned char)c)) { /* loop broke because heredoc label was fully iterated; success! */
                 unread_char(lexer->curfile); /* we read 1 char too many; put back last read character */
                 return T_HEREDOC_STRING;   /* return success */
             }
@@ -1042,7 +1042,7 @@ next_token(lexer_state *lexer) {
         /* skip spaces but not newlines.
          * read the next character and continue
          */
-        if (isspace(c) && (c != '\n')) continue;
+        if (isspace((unsigned char)c) && (c != '\n')) continue;
 
         /* skip pod */
 
@@ -1125,7 +1125,7 @@ is indicated explicitly.
 
 */
 
-        if (isalpha(c) || c == '_' ) {  /* check for identifier, op, invocant or label */
+        if (isalpha((unsigned char)c) || c == '_' ) {  /* check for identifier, op, invocant or label */
 
             /* handle pasm registers */
             if (c == 'P' || c == 'I' || c == 'N' || c == 'S') {
@@ -1137,7 +1137,7 @@ is indicated explicitly.
 
                 /* only if the current char is not an alpha and we just read a number of digits,
                  * can this be a pasm register. */
-                if (count > 0 && !isalpha(c)) {
+                if (count > 0 && !isalpha((unsigned char)c)) {
                     if (c != '.') {
                         /* last char was not a dot, so this is not an invocant */
                         unread_char(lexer->curfile);
@@ -1156,7 +1156,7 @@ is indicated explicitly.
 
             /* it was not a pasm register or a single-letter invocant */
 
-            while (isalnum(c) || c == '_') {
+            while (isalnum((unsigned char)c) || c == '_') {
                 buffer_char(lexer, c);
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) break;
@@ -1208,12 +1208,12 @@ is indicated explicitly.
             if (c == '=') return T_CONCAT_ASSIGN;
             if (c == '.') return T_DOTDOT;  /* ".." */
 
-            if ( isspace(c) ) { /* a dot followed by a space */
+            if ( isspace((unsigned char)c) ) { /* a dot followed by a space */
                 unread_char(lexer->curfile);
                 return T_CONCAT;
             }
 
-            while ( isalnum(c) || c == '_') {
+            while ( isalnum((unsigned char)c) || c == '_') {
                 buffer_char(lexer, c);
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) break;
@@ -1229,11 +1229,11 @@ is indicated explicitly.
                 return tmp;
             }
         }
-        else if (isdigit(c) ) { /* check for numbers */
+        else if (isdigit((unsigned char)c) ) { /* check for numbers */
             buffer_char(lexer, c);
             c = read_char(lexer->curfile);
 
-            while (isdigit(c)) {
+            while (isdigit((unsigned char)c)) {
                 buffer_char(lexer, c);
                 c = read_char(lexer->curfile);
             }
@@ -1279,7 +1279,7 @@ is indicated explicitly.
                     c = read_char(lexer->curfile);
                     if (c == EOF_MARKER) return T_EOF;
 
-                    while (isalnum(c) || c == '_') { /* this is all part of the label name */
+                    while (isalnum((unsigned char)c) || c == '_') { /* this is all part of the label name */
                         buffer_char(lexer, c);
                         c = read_char(lexer->curfile);
                         if (c == EOF_MARKER) return T_EOF;
@@ -1438,7 +1438,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
                     /* TODO: refactor this number reading code, it's also somewhere else */
 
-                    if (isdigit(c)) { /* handle negative numbers here */
+                    if (isdigit((unsigned char)c)) { /* handle negative numbers here */
                         int count = read_digits(lexer);
                         c = read_char(lexer->curfile);
                         if (c == '.') {
@@ -1581,7 +1581,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 if (c == '\n') update_line(lexer);
                 else if (c == EOF_MARKER) return T_EOF;
             }
-            while (isspace(c));
+            while (isspace((unsigned char)c));
 
             /* the last read char. was not space/newline, put it back */
             unread_char(lexer->curfile);
@@ -1602,7 +1602,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) return T_EOF;
             }
-            while ( isalnum(c) || c == '_' );
+            while ( isalnum((unsigned char)c) || c == '_' );
 
             unread_char(lexer->curfile); /* push back last character not needed */
             tmp = check_dictionary(lexer, dictionary);
