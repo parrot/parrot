@@ -84,7 +84,7 @@ bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)
     buff_ptr += len;
 
     for (i = 0; i < op->op_arg_count; i++) {
-        len = sprintf(buff_ptr, "_%c", tolower(op->op_args[i]->data_type));
+        len = sprintf(buff_ptr, "_%c", tolower((unsigned char)op->op_args[i]->data_type));
         buff_ptr += len;
         if (op->op_args[i]->is_constant) {
             len = sprintf(buff_ptr, "c");
