@@ -231,6 +231,13 @@ Parrot_get_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
 
 FUNCDOC: Parrot_get_global
 
+Parrot_get_global allows a null namespace without throwing an exception; it
+simply returns PMCNULL in that case.
+
+NOTE: At present the use of the {get,set}_global functions is mandatory due to the
+      wacky namespace typing of the default Parrot namespace.  Eventually it will be
+      safe to just use the standard hash interface (if desired).
+
 Look up the global named C<globalname> in the namespace C<ns>.  Return the
 global, or return PMCNULL if C<ns> is null or if the global is not found.
 
