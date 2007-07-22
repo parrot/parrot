@@ -40,6 +40,17 @@ PMC * Parrot_find_global_n( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_find_global_op( PARROT_INTERP,
+    NOTNULL(PMC *ns),
+    NOTNULL(STRING *globalname),
+    NULLOK(void *next) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_find_global_s( PARROT_INTERP,
     NULLOK(STRING *str_key),
@@ -148,16 +159,6 @@ PARROT_API
 void Parrot_store_sub_in_namespace( PARROT_INTERP, NOTNULL(PMC *sub) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_find_global_op( PARROT_INTERP,
-    NOTNULL(PMC *ns),
-    NOTNULL(STRING *globalname),
-    NULLOK(void *next) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 /* HEADERIZER END: src/global.c */
 
