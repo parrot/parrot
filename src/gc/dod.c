@@ -679,8 +679,10 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
                         if (PObj_COW_TEST(b)) {
                             INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
 
-                            if (!--(*refcount))
+                            if (!--(*refcount)) {
                                 free(refcount); /* the actual bufstart */
+                                refcount = NULL;
+                            }
                         }
                         else
                             free((INTVAL*)PObj_bufstart(b) - 1);
