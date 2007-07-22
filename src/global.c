@@ -8,22 +8,14 @@ src/global.c - Access to global PMCs
 
 =head1 DESCRIPTION
 
-tdb
-
 =head2 Functions
-
-tdb
-
-=over 4
-
-=cut
 
 */
 
 #include "parrot/parrot.h"
 #include "global.str"
 
-/* HEADERIZER HFILE: none */ /* XXX It's really include/parrot/global.h, but not yet */
+/* HEADERIZER HFILE: include/parrot/global.h */
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
@@ -124,34 +116,28 @@ internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
 
 /*
 
-=item C<PMC *
-Parrot_get_namespace_keyed(Interp *, PMC *base_ns, PMC *pmc_key)>
+FUNCDOC: Parrot_get_namespace_keyed
 
 Find the namespace relative to the namespace C<base_ns> with the key
 C<pmc_key>, which may be a String, a Key, or an array of strings.  Return
 the namespace, or NULL if not found.
 
-=item C<PMC *
-Parrot_get_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key)>
+FUNCDOC: Parrot_get_namespace_keyed_str
 
 Find the namespace relative to the namespace C<base_ns> with the string key
 C<str_key>.  Return the namespace, or NULL if not found.
 
-=item C<PMC *
-Parrot_make_namespace_keyed(Interp *, PMC *base_ns, PMC *pmc_key)>
+FUNCDOC: Parrot_make_namespace_keyed
 
 Find, or create if necessary, the namespace relative to the namespace
 C<base_ns> with the key C<pmc_key>, which may be a String, a Key, or an
 array of strings.  Return the namespace.  Errors will result in exceptions.
 
-=item C<PMC *
-Parrot_make_namespace_keyed_str(Interp *, PMC *base_ns, STRING *str_key)>
+FUNCDOC: Parrot_make_namespace_keyed_str
 
 Find, or create if necessary, the namespace relative to the namespace
 C<base_ns> with the string key C<str_key>.  Return the namespace.  Errors
 will result in exceptions.
-
-=cut
 
 */
 
@@ -159,68 +145,62 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
+Parrot_get_namespace_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key))
 {
-    return internal_ns_keyed(interp, base_ns,
-                             pmc_key, NULL, 0);
+    return internal_ns_keyed(interp, base_ns, pmc_key, NULL, 0);
 }
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING *str_key)
+Parrot_get_namespace_keyed_str(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(STRING *str_key))
 {
-    return internal_ns_keyed(interp, base_ns,
-                             PMCNULL, str_key, 0);
+    return internal_ns_keyed(interp, base_ns, PMCNULL, str_key, 0);
 }
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC *pmc_key)
+Parrot_make_namespace_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key))
 {
-    return internal_ns_keyed(interp, base_ns,
-                             pmc_key, NULL, INTERN_NS_CREAT);
+    return internal_ns_keyed(interp, base_ns, pmc_key, NULL, INTERN_NS_CREAT);
 }
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING *str_key)
+Parrot_make_namespace_keyed_str(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(STRING *str_key))
 {
-    return internal_ns_keyed(interp, base_ns,
-                             NULL, str_key, INTERN_NS_CREAT);
+    return internal_ns_keyed(interp, base_ns, NULL, str_key, INTERN_NS_CREAT);
 }
 
 
 /*
 
-=item C<PMC *
-Parrot_get_namespace_autobase(Interp *, PMC *key)>
+FUNCDOC: Parrot_get_namespace_autobase
 
 Find a namespace with the key C<key>, which may be a String, a Key, or an
 array of strings. If it is a String, then the lookup is relative to the
 current namespace. Otherwise, it is relative to the current HLL root
 namespace. Return the namespace, or NULL if not found.
 
-=item C<PMC *
-Parrot_make_namespace_autobase(Interp *, PMC *pmc_key)>
+FUNCDOC: Parrot_make_namespace_autobase
 
 Find, or create if necessary, a namespace with the key C<key>, which may be a
 String, a Key, or an array of strings. If it is a String, then the lookup is
 relative to the current namespace. Otherwise, it is relative to the current HLL
 root namespace. Return the namespace.  Errors will result in exceptions.
 
-=cut
-
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_make_namespace_autobase(PARROT_INTERP, PMC *key)
+Parrot_make_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, string_from_literal(interp, "String")))
@@ -232,8 +212,10 @@ Parrot_make_namespace_autobase(PARROT_INTERP, PMC *key)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_autobase(PARROT_INTERP, PMC *key)
+Parrot_get_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
 {
     PMC *base_ns;
     if (VTABLE_isa(interp, key, string_from_literal(interp, "String")))
@@ -247,20 +229,16 @@ Parrot_get_namespace_autobase(PARROT_INTERP, PMC *key)
 
 /*
 
-=item C<PMC *
-Parrot_get_global(Interp *, PMC *ns, STRING *globalname)>
+FUNCDOC: Parrot_get_global
 
 Look up the global named C<globalname> in the namespace C<ns>.  Return the
 global, or return PMCNULL if C<ns> is null or if the global is not found.
 
 KLUDGE ALERT: Currently prefers non-namespaces in case of collision.
 
-=item C<PMC *
-Parrot_set_global(Interp *, PMC *ns, STRING *globalname, PMC *val)>
+FUNCDOC: Parrot_set_global
 
 Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
-
-=cut
 
 */
 
@@ -280,7 +258,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
+Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))
 {
     if (PMC_IS_NULL(ns))
         return PMCNULL;
@@ -290,7 +268,7 @@ Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
 
 PARROT_API
 void
-Parrot_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC *val)
+Parrot_set_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
     VTABLE_set_pmc_keyed_str(interp, ns, globalname, val);
 }
@@ -298,8 +276,7 @@ Parrot_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC *val)
 
 /*
 
-=item C<PMC *
-Parrot_find_global_n(Interp *, PMC *ns, STRING *globalname)>
+FUNCDOC: Parrot_find_global_n
 
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -307,8 +284,7 @@ Return the object, or NULL if not found.
 XXX - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
-=item C<PMC *
-Parrot_find_global_k(Interp *, PMC *pmc_key, STRING *globalname)>
+FUNCDOC: Parrot_find_global_k
 
 Search the namespace designated by C<pmc_key>, which may be a key PMC,
 an array of namespace name strings, or a string PMC, for an object
@@ -317,8 +293,7 @@ with name C<globalname>.  Return the object, or NULL if not found.
 XXX - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
-=item C<PMC *
-Parrot_find_global_s(Interp *, STRING *str_key, STRING *globalname)>
+FUNCDOC: Parrot_find_global_s
 
 Search the namespace designated by C<str_key>, or the HLL root if
 C<str_key> is NULL, for an object with name C<globalname>.  Return the
@@ -327,15 +302,13 @@ object, or NULL if not found.
 XXX - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
-=cut
-
 */
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), STRING *globalname)
+Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))
 {
     PMC *res;
 
@@ -364,7 +337,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_cur(PARROT_INTERP, STRING *globalname)
+Parrot_find_global_cur(PARROT_INTERP, NULLOK(STRING *globalname))
 {
     PMC * const ns = CONTEXT(interp->ctx)->current_namespace;
     return Parrot_find_global_n(interp, ns, globalname);
@@ -374,7 +347,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_k(PARROT_INTERP, PMC *pmc_key, STRING *globalname)
+Parrot_find_global_k(PARROT_INTERP, NULLOK(PMC *pmc_key), NOTNULL(STRING *globalname))
 {
     PMC * const ns =
         Parrot_get_namespace_keyed(interp,
@@ -387,24 +360,22 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_find_global_s(Interp *inter, STRING *str_key, STRING *globalname)
+Parrot_find_global_s(PARROT_INTERP, NULLOK(STRING *str_key), NULLOK(STRING *globalname))
 {
     PMC *const ns =
-        Parrot_get_namespace_keyed_str(inter,
-                                       Parrot_get_ctx_HLL_namespace(inter),
+        Parrot_get_namespace_keyed_str(interp,
+                                       Parrot_get_ctx_HLL_namespace(interp),
                                        str_key);
-    return Parrot_find_global_n(inter, ns, globalname);
+    return Parrot_find_global_n(interp, ns, globalname);
 }
 
 /*
 
-=item C<PMC *
-Parrot_store_global_n(Interp *, PMC *ns, STRING *globalname, PMC *val)>
+FUNCDOC: Parrot_store_global_n
 
 Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
 
-=item C<PMC *
-Parrot_store_global_k(Interp *, PMC *pmc_key, STRING *globalname, PMC *val)>
+FUNCDOC: Parrot_store_global_k
 
 Store the PMC C<val> into the namespace designated by C<pmc_key>,
 which may be a key PMC, an array of namespace name strings, or a
@@ -413,20 +384,17 @@ string PMC, with name C<globalname>.
 XXX - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
-=item C<PMC *
-Parrot_store_global_s(Interp *, STRING *str_key, STRING *globalname, PMC *val)>
+FUNCDOC: Parrot_store_global_s
 
 Store the PMC C<val> into the namespace designated by C<str_key>, or
 the HLL root if C<str_key> is NULL, with the name C<globalname>.
-
-=cut
 
 */
 
 PARROT_API
 void
 Parrot_store_global_n(PARROT_INTERP, NULLOK(PMC *ns),
-                      STRING *globalname, PMC *val)
+                      NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
 #if DEBUG_GLOBAL
     if (globalname)
@@ -441,7 +409,7 @@ Parrot_store_global_n(PARROT_INTERP, NULLOK(PMC *ns),
 
 PARROT_API
 void
-Parrot_store_global_cur(PARROT_INTERP, STRING *globalname, PMC *val)
+Parrot_store_global_cur(PARROT_INTERP, NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
     Parrot_store_global_n(interp,
                           CONTEXT(interp->ctx)->current_namespace,
@@ -453,7 +421,7 @@ Parrot_store_global_cur(PARROT_INTERP, STRING *globalname, PMC *val)
 PARROT_API
 void
 Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
-                      STRING *globalname, PMC *val)
+                      NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
     PMC *ns;
 
@@ -479,8 +447,8 @@ Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
 
 PARROT_API
 void
-Parrot_store_global_s(NOTNULL(Interp *inter), STRING *str_key,
-                      STRING *globalname, PMC *val)
+Parrot_store_global_s(NOTNULL(Interp *inter), NULLOK(STRING *str_key),
+                      NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
     PMC * const ns = Parrot_make_namespace_keyed_str(inter,
                                          Parrot_get_ctx_HLL_namespace(inter),
@@ -495,19 +463,18 @@ Parrot_store_global_s(NOTNULL(Interp *inter), STRING *str_key,
 
 /*
 
-=item C<PMC *
-Parrot_find_global_op(Interp *, PMC *ns, STRING *globalname, void *next)>
+FUNCDOC: Parrot_find_global_op
 
 If the global exists in the given namespace PMC, return it.  If not, return
 PMCNULL.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_find_global_op(PARROT_INTERP, PMC *ns,
-                      NOTNULL(STRING *globalname), void *next)
+Parrot_find_global_op(PARROT_INTERP, NOTNULL(PMC *ns),
+        NOTNULL(STRING *globalname), NULLOK(void *next))
 {
     PMC *res;
 
@@ -525,16 +492,13 @@ Parrot_find_global_op(PARROT_INTERP, PMC *ns,
 
 /*
 
-=item C<PMC *
-Parrot_find_name_op(Interp *, STRING *name, void *next)>
+FUNCDOC: Parrot_find_name_op
 
 TODO - THIS IS BROKEN - it doesn't walk up the scopes yet - TODO
 
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
 anywhere, return PMCNULL.
-
-=cut
 
 */
 
@@ -658,13 +622,9 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, NOTNULL(PMC *sub))
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/global.h>
-
-=cut
 
 */
 

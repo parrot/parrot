@@ -1879,14 +1879,7 @@ splint-andy :
 		+stats \
 		-showsummary \
 		+partial \
-		\
-		src/charset.c \
-		src/charset/*.c \
-		src/encoding.c \
-		src/encodings/*c \
-		src/hash.c \
-		src/list.c \
-		src/intlist.c \
+		src/gc/*.c \
 
 X = \
 		src/gc/dod.c  src/gc/gc_gms.c  src/gc/gc_ims.c \
