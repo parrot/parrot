@@ -507,6 +507,7 @@ bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
             if (prev->next == edge) {
                 prev->next = edge->next;
                 free(edge);
+                break;
             }
         }
     }
