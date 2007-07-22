@@ -205,7 +205,7 @@ FINDENTERN:
     }
 
     print <<END_C;
-static opcode_t* run_compiled(Interp *interp,
+static opcode_t* run_compiled(PARROT_INTERP,
                               opcode_t *cur_opcode, opcode_t *start_code);
 
 #include "parrot/embed.h"
@@ -277,7 +277,7 @@ main(int argc, char **argv) {
     exit(0);
 }
 
-static opcode_t* run_compiled(Interp *interp, opcode_t *cur_opcode,
+static opcode_t* run_compiled(PARROT_INTERP, opcode_t *cur_opcode,
                                                    opcode_t *start_code) {
 
 switch_label:
