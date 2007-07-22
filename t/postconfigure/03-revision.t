@@ -46,6 +46,10 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
+Certain of the modules C<use>d by F<Configure.pl> have functionality which is
+only meaningful I<after> F<Configure.pl> has actually been run and
+Parrot::Config::Generated has been created.  So certain tests need to be run
+when your Parrot filesystem is in a "pre-F<make>, post-F<Configure.pl>" state.
 
 The tests in this file test aspects of Parrot::Revision
 (F<lib/Parrot/Revision.pm>) which presume that configuration has been
