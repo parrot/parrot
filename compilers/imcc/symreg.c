@@ -577,11 +577,12 @@ _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
 SymReg *
 mk_address(PARROT_INTERP, char *name, int uniq)
 {
-    SymHash * const h = *name == '_'
+    const int begins_with_underscore = *name == '_';
+    SymHash * const h = begins_with_underscore
         ? &IMCC_INFO(interp)->ghash : &IMCC_INFO(interp)->cur_unit->hash;
     SymReg  * const s = _mk_address(interp, h, name, uniq);
 
-    if (*name == '_')
+    if (begins_with_underscore)
        s->usage |= U_FIXUP;
 
     return s;
