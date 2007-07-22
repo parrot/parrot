@@ -1567,7 +1567,7 @@ MMD_DEFAULT: {
         rep = DYNSELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d = strtol(s1, &s2, 10);
-        if ( s1 != s2 && (*s2 == '\0' || isspace(*s2)) ) {
+        if ( s1 != s2 && (*s2 == '\0' || isspace((unsigned char)*s2)) ) {
             PMC *retval = pmc_new(INTERP, dynpmc_WmlsInteger);
             PMC_int_val(retval) = d;
             return retval;
@@ -1591,7 +1591,7 @@ MMD_DEFAULT: {
         rep = DYNSELF.get_string();
         s1 = string_to_cstring(INTERP, rep);
         d = strtod(s1, &s2);
-        if ( s1 != s2 && (*s2 == '\0' || isspace(*s2)) ) {
+        if ( s1 != s2 && (*s2 == '\0' || isspace((unsigned char)*s2)) ) {
             if (fabs(d) < 3.40282347e+38) {
                 PMC *retval = pmc_new(INTERP, dynpmc_WmlsFloat);
                 if (fabs(d) < 1.17549435e-38) {
