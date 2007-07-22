@@ -16,13 +16,13 @@
 #include "parrot/parrot.h"
 #include "parrot/op.h"
 
-opcode_t *runops_fast_core(Interp *, opcode_t *);
+opcode_t *runops_fast_core(PARROT_INTERP, opcode_t *);
 
-opcode_t *runops_cgoto_core(Interp *, opcode_t *);
+opcode_t *runops_cgoto_core(PARROT_INTERP, opcode_t *);
 
-opcode_t *runops_slow_core(Interp *, opcode_t *);
+opcode_t *runops_slow_core(PARROT_INTERP, opcode_t *);
 
-opcode_t *runops_profile_core(Interp *, opcode_t *);
+opcode_t *runops_profile_core(PARROT_INTERP, opcode_t *);
 
 #endif /* PARROT_RUNOPS_CORES_H_GUARD */
 

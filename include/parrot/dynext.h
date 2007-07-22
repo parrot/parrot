@@ -23,8 +23,8 @@ PMC * Parrot_clone_lib_into(
 
 PARROT_API
 PMC * Parrot_init_lib( PARROT_INTERP,
-    PMC *(*load_func)(NULLOK(Interp *)),
-    void (*init_func)(Interp *,
+    PMC *(*load_func)(PARROT_INTERP),
+    void (*init_func)(PARROT_INTERP,
     NULLOK(PMC *)) )
         __attribute__nonnull__(1);
 

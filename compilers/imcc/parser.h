@@ -32,10 +32,10 @@ EXTERN int is_def;
 typedef void* yyscan_t;
 #endif
 
-SymReg * macro(Interp *, char *name);
+SymReg * macro(PARROT_INTERP, char *name);
 
-PARROT_API int yyparse(yyscan_t, Interp*);
-PARROT_API int yylex(YYSTYPE *, yyscan_t, Interp*);
+PARROT_API int yyparse(yyscan_t, PARROT_INTERP);
+PARROT_API int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
 PARROT_API int yylex_destroy(yyscan_t);
 
 int yylex_init(yyscan_t*);

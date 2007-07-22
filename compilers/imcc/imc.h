@@ -379,8 +379,8 @@ typedef enum _imcc_reg_allocator_t {
     IMCC_GRAPH_ALLOCATOR
 } imcc_reg_allocator;
 
-PARROT_API void IMCC_push_parser_state(Interp*);
-PARROT_API void IMCC_pop_parser_state(Interp*, void *yyscanner);
+PARROT_API void IMCC_push_parser_state(PARROT_INTERP);
+PARROT_API void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
 
 typedef struct _imc_info_t {
     struct _imc_info_t *prev;

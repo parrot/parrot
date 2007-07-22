@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -360,85 +360,85 @@ size_t PIO_write_down( PARROT_INTERP,
  * the specific call.
  */
 struct _ParrotIOLayerAPI {
-    INTVAL          (*Init)(Interp *, ParrotIOLayer * l);
+    INTVAL          (*Init)(PARROT_INTERP, ParrotIOLayer * l);
     ParrotIOLayer * (*New)(ParrotIOLayer * proto);
     void            (*Delete)(ParrotIOLayer * l);
     INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
     INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
-    ParrotIO *      (*Open)(Interp *, ParrotIOLayer * l,
+    ParrotIO *      (*Open)(PARROT_INTERP, ParrotIOLayer * l,
                             const char * name, INTVAL flags);
-    ParrotIO *      (*Open2_Unused)(Interp *);
-    ParrotIO *      (*Open3_Unused)(Interp *);
-    ParrotIO *      (*Open_ASync)(Interp *, ParrotIOLayer * l,
+    ParrotIO *      (*Open2_Unused)(PARROT_INTERP);
+    ParrotIO *      (*Open3_Unused)(PARROT_INTERP);
+    ParrotIO *      (*Open_ASync)(PARROT_INTERP, ParrotIOLayer * l,
                                   const char * name, const char * mode,
                                   DummyCodeRef *);
-    ParrotIO *      (*FDOpen)(Interp *, ParrotIOLayer * l,
+    ParrotIO *      (*FDOpen)(PARROT_INTERP, ParrotIOLayer * l,
                               PIOHANDLE fd, INTVAL flags);
-    INTVAL          (*Close)(Interp *, ParrotIOLayer * l,
+    INTVAL          (*Close)(PARROT_INTERP, ParrotIOLayer * l,
                                 ParrotIO * io);
-    size_t          (*Write)(Interp *, ParrotIOLayer * l,
+    size_t          (*Write)(PARROT_INTERP, ParrotIOLayer * l,
                              ParrotIO * io, STRING *);
-    size_t          (*Write_ASync)(Interp *, ParrotIOLayer * layer,
+    size_t          (*Write_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
                                    ParrotIO * io, STRING *, DummyCodeRef *);
-    size_t          (*Read)(Interp *, ParrotIOLayer * layer,
+    size_t          (*Read)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, STRING **);
-    size_t          (*Read_ASync)(Interp *, ParrotIOLayer * layer,
+    size_t          (*Read_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
                                   ParrotIO * io, STRING **, DummyCodeRef *);
-    INTVAL          (*Flush)(Interp *, ParrotIOLayer * layer,
+    INTVAL          (*Flush)(PARROT_INTERP, ParrotIOLayer * layer,
                              ParrotIO * io);
-    size_t          (*Peek)(Interp *, ParrotIOLayer * layer,
+    size_t          (*Peek)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, STRING ** buf);
-    PIOOFF_T        (*Seek)(Interp *, ParrotIOLayer * layer,
+    PIOOFF_T        (*Seek)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, PIOOFF_T offset, INTVAL whence);
-    PIOOFF_T        (*Tell)(Interp *, ParrotIOLayer * layer,
+    PIOOFF_T        (*Tell)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io);
-    INTVAL          (*SetBuf)(Interp *, ParrotIOLayer * layer,
+    INTVAL          (*SetBuf)(PARROT_INTERP, ParrotIOLayer * layer,
                               ParrotIO * io, size_t bufsize);
-    INTVAL          (*SetLineBuf)(Interp *, ParrotIOLayer * layer,
+    INTVAL          (*SetLineBuf)(PARROT_INTERP, ParrotIOLayer * layer,
                                   ParrotIO * io);
-    INTVAL          (*GetCount)(Interp *, ParrotIOLayer * layer);
-    INTVAL          (*Fill)(Interp *, ParrotIOLayer * layer);
-    INTVAL          (*Eof)(Interp *, ParrotIOLayer * l,
+    INTVAL          (*GetCount)(PARROT_INTERP, ParrotIOLayer * layer);
+    INTVAL          (*Fill)(PARROT_INTERP, ParrotIOLayer * layer);
+    INTVAL          (*Eof)(PARROT_INTERP, ParrotIOLayer * l,
                            ParrotIO * io);
     /* Network API */
-    INTVAL          (*Poll)(Interp *, ParrotIOLayer *l, ParrotIO *io,
+    INTVAL          (*Poll)(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io,
                             int which, int sec, int usec);
-    ParrotIO *      (*Socket)(Interp *, ParrotIOLayer *,
+    ParrotIO *      (*Socket)(PARROT_INTERP, ParrotIOLayer *,
                             int dom, int type, int proto);
-    INTVAL          (*Connect)(Interp *, ParrotIOLayer *, ParrotIO *,
+    INTVAL          (*Connect)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *,
                             STRING *);
-    INTVAL          (*Send)(Interp *, ParrotIOLayer *, ParrotIO *, STRING *);
-    INTVAL          (*Recv)(Interp *, ParrotIOLayer *, ParrotIO *, STRING **);
-    INTVAL          (*Bind)(Interp *, ParrotIOLayer *, ParrotIO *, STRING *);
-    INTVAL          (*Listen)(Interp *, ParrotIOLayer *, ParrotIO *, INTVAL);
-    ParrotIO *      (*Accept)(Interp *, ParrotIOLayer *, ParrotIO *);
+    INTVAL          (*Send)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL          (*Recv)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING **);
+    INTVAL          (*Bind)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL          (*Listen)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, INTVAL);
+    ParrotIO *      (*Accept)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *);
 };
 
 /* these are defined rather than using NULL because strictly-speaking, ANSI C
  * doesn't like conversions between function and non-function pointers. */
-#define PIO_null_init (INTVAL (*)(Interp *, ParrotIOLayer *))0
+#define PIO_null_init (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *))0
 #define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_open (ParrotIO * (*)(Interp *, ParrotIOLayer *, const char*, INTVAL))0
-#define PIO_null_open2 (ParrotIO * (*)(Interp *))0
-#define PIO_null_open3 (ParrotIO * (*)(Interp *))0
-#define PIO_null_open_async (ParrotIO * (*)(Interp *, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
-#define PIO_null_fdopen (ParrotIO * (*)(Interp *, ParrotIOLayer *, PIOHANDLE, INTVAL))0
-#define PIO_null_close (INTVAL (*)(Interp *, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_write (size_t (*)(Interp *, ParrotIOLayer *, ParrotIO *, STRING*))0
-#define PIO_null_write_async (size_t (*)(Interp *, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
-#define PIO_null_read (size_t (*)(Interp *, ParrotIOLayer *, ParrotIO *, STRING**))0
-#define PIO_null_read_async (size_t (*)(Interp *, ParrotIOLayer *, ParrotIO *, STRING **, DummyCodeRef *))0
-#define PIO_null_flush (INTVAL (*)(Interp *, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_peek (size_t (*)(Interp *, ParrotIOLayer *, ParrotIO *, STRING**))0
-#define PIO_null_seek (PIOOFF_T (*)(Interp *, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
-#define PIO_null_tell (PIOOFF_T (*)(Interp *, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_setbuf (INTVAL (*)(Interp *, ParrotIOLayer *, ParrotIO *, size_t))0
-#define PIO_null_setlinebuf (INTVAL (*)(Interp *, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_getcount (INTVAL (*)(Interp *, ParrotIOLayer *))0
-#define PIO_null_fill (INTVAL (*)(Interp *, ParrotIOLayer *))0
-#define PIO_null_eof (INTVAL (*)(Interp *, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_socket (ParrotIO * (*)(Interp *, ParrotIOLayer *, int, int, int))0
+#define PIO_null_open (ParrotIO * (*)(PARROT_INTERP, ParrotIOLayer *, const char*, INTVAL))0
+#define PIO_null_open2 (ParrotIO * (*)(PARROT_INTERP))0
+#define PIO_null_open3 (ParrotIO * (*)(PARROT_INTERP))0
+#define PIO_null_open_async (ParrotIO * (*)(PARROT_INTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
+#define PIO_null_fdopen (ParrotIO * (*)(PARROT_INTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
+#define PIO_null_close (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_write (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
+#define PIO_null_write_async (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
+#define PIO_null_read (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
+#define PIO_null_read_async (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING **, DummyCodeRef *))0
+#define PIO_null_flush (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_peek (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
+#define PIO_null_seek (PIOOFF_T (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
+#define PIO_null_tell (PIOOFF_T (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_setbuf (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, size_t))0
+#define PIO_null_setlinebuf (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_getcount (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *))0
+#define PIO_null_fill (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *))0
+#define PIO_null_eof (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_socket (ParrotIO * (*)(PARROT_INTERP, ParrotIOLayer *, int, int, int))0
 
 /*
  * more API XXX should be in io.h when things settle

@@ -72,17 +72,17 @@ typedef struct PackFile_DebugMapping {
 */
 
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
-    (Interp *, struct PackFile *, const char *, int add);
-typedef void (*PackFile_Segment_destroy_func_t) (Interp *,
-        struct PackFile_Segment *);
-typedef size_t (*PackFile_Segment_packed_size_func_t)(Interp *,
-        struct PackFile_Segment *);
-typedef opcode_t * (*PackFile_Segment_pack_func_t) (Interp *,
-        struct PackFile_Segment *, opcode_t *dest);
-typedef opcode_t * (*PackFile_Segment_unpack_func_t) (Interp *,
-        struct PackFile_Segment *, opcode_t *packed);
-typedef void (*PackFile_Segment_dump_func_t) (Interp *,
-        struct PackFile_Segment *);
+    (PARROT_INTERP, struct PackFile *, const char *, int add);
+typedef void (*PackFile_Segment_destroy_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *);
+typedef size_t (*PackFile_Segment_packed_size_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *);
+typedef opcode_t * (*PackFile_Segment_pack_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *, opcode_t *dest);
+typedef opcode_t * (*PackFile_Segment_unpack_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *, opcode_t *packed);
+typedef void (*PackFile_Segment_dump_func_t)
+    (PARROT_INTERP, struct PackFile_Segment *);
 
 typedef struct PackFile_funcs {
     PackFile_Segment_new_func_t         new_seg;
@@ -123,8 +123,8 @@ typedef struct PackFile_Segment {
     opcode_t            *data;         /* oparray e.g. bytecode */
 } PackFile_Segment;
 
-typedef INTVAL (*PackFile_map_segments_func_t) (Interp *,
-        PackFile_Segment *seg, void *user_data);
+typedef INTVAL (*PackFile_map_segments_func_t)
+    (PARROT_INTERP, PackFile_Segment *seg, void *user_data);
 
 /*
 ** PackFile_FixupTable:
@@ -397,7 +397,9 @@ PackFile_Segment * PackFile_find_segment( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_fixup_subs( PARROT_INTERP, pbc_action_enum_t what, PMC *eval )
+void PackFile_fixup_subs( PARROT_INTERP,
+    pbc_action_enum_t what,
+    NULLOK(PMC *eval) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -425,7 +427,7 @@ PARROT_API
 INTVAL PackFile_map_segments( PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
-    void *user_data )
+    NULLOK(void *user_data) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

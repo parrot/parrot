@@ -42,7 +42,7 @@ typedef enum {
     POOL_ALL    = 0x07
 } pool_iter_enum;
 
-typedef int (*pool_iter_fn)(Interp *, struct Small_Object_Pool *, int, void*);
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
 
 
 /* HEADERIZER BEGIN: src/headers.c */

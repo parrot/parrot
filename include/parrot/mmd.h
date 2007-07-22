@@ -18,17 +18,17 @@
 #include "parrot/parrot.h"
 
 /* function typedefs */
-typedef PMC*    (*mmd_f_p_ppp)(Interp *, PMC *, PMC *, PMC *);
-typedef PMC*    (*mmd_f_p_pip)(Interp *, PMC *, INTVAL, PMC *);
-typedef PMC*    (*mmd_f_p_pnp)(Interp *, PMC *, FLOATVAL, PMC *);
-typedef PMC*    (*mmd_f_p_psp)(Interp *, PMC *, STRING *, PMC *);
+typedef PMC*    (*mmd_f_p_ppp)(PARROT_INTERP, PMC *, PMC *, PMC *);
+typedef PMC*    (*mmd_f_p_pip)(PARROT_INTERP, PMC *, INTVAL, PMC *);
+typedef PMC*    (*mmd_f_p_pnp)(PARROT_INTERP, PMC *, FLOATVAL, PMC *);
+typedef PMC*    (*mmd_f_p_psp)(PARROT_INTERP, PMC *, STRING *, PMC *);
 
-typedef void    (*mmd_f_v_pp)(Interp *, PMC *, PMC *);
-typedef void    (*mmd_f_v_pi)(Interp *, PMC *, INTVAL);
-typedef void    (*mmd_f_v_pn)(Interp *, PMC *, FLOATVAL);
-typedef void    (*mmd_f_v_ps)(Interp *, PMC *, STRING *);
+typedef void    (*mmd_f_v_pp)(PARROT_INTERP, PMC *, PMC *);
+typedef void    (*mmd_f_v_pi)(PARROT_INTERP, PMC *, INTVAL);
+typedef void    (*mmd_f_v_pn)(PARROT_INTERP, PMC *, FLOATVAL);
+typedef void    (*mmd_f_v_ps)(PARROT_INTERP, PMC *, STRING *);
 
-typedef INTVAL  (*mmd_f_i_pp) (Interp *, PMC *, PMC *);
+typedef INTVAL  (*mmd_f_i_pp)(PARROT_INTERP, PMC *, PMC *);
 
 typedef struct _MMD_init {
         INTVAL func_nr;

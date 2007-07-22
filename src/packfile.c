@@ -141,7 +141,7 @@ static PMC* do_1_sub_pragma( PARROT_INTERP,
 
 static INTVAL find_const_iter( PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    void *user_data )
+    NULLOK(void *user_data) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -553,7 +553,7 @@ mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
 }
 
 static INTVAL
-find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), void *user_data)
+find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user_data))
 {
     if (seg->type == PF_DIR_SEG) {
         PackFile_map_segments(interp, (PackFile_Directory *)seg,
@@ -838,7 +838,7 @@ PARROT_API
 INTVAL
 PackFile_map_segments(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
                        PackFile_map_segments_func_t callback,
-                       void *user_data)
+                       NULLOK(void *user_data))
 {
     size_t i;
 
@@ -3461,7 +3461,7 @@ If C<eval> is given, set this is the owner of the subroutines.
 
 PARROT_API
 void
-PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC *eval)
+PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, NULLOK(PMC *eval))
 {
     do_sub_pragmas(interp, interp->code, what, eval);
 }

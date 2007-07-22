@@ -276,8 +276,8 @@ TODO: fetch Parrot_lib load/init handler exceptions
 PARROT_API
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                PMC *(*load_func)(NULLOK(Interp *)),
-                void (*init_func)(Interp *, NULLOK(PMC *)))
+                PMC *(*load_func)(PARROT_INTERP),
+                void (*init_func)(PARROT_INTERP, NULLOK(PMC *)))
 {
     NOTNULL(PMC *lib_pmc) = NULL;
 
@@ -308,8 +308,8 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
             NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))
 {
     STRING *type;
-    PMC *(*load_func)(Interp *);
-    void (*init_func)(Interp *, PMC *);
+    PMC *(*load_func)(PARROT_INTERP);
+    void (*init_func)(PARROT_INTERP, PMC *);
     char *cinit_func_name;
     NOTNULL(PMC *lib_pmc);
 
@@ -325,14 +325,14 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
         char * const cload_func_name = string_to_cstring(interp, load_func_name);
         STRING *init_func_name;
 
-        load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
+        load_func = (PMC * (*)(PARROT_INTERP))D2FPTR(Parrot_dlsym(handle,
                     cload_func_name));
         string_cstring_free(cload_func_name);
         /* get init_func */
         init_func_name = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_init",
                                           lib_name);
         cinit_func_name = string_to_cstring(interp, init_func_name);
-        init_func = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(handle,
+        init_func = (void (*)(PARROT_INTERP, PMC *))D2FPTR(Parrot_dlsym(handle,
                     cinit_func_name));
         string_cstring_free(cinit_func_name);
     }
@@ -366,7 +366,7 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-clone_string_into(Interp *d, Interp *s, PMC *value) {
+clone_string_into(NOTNULL(Interp *d), NOTNULL(Interp *s), PMC *value) {
     STRING * const orig = VTABLE_get_string(s, value);
     char * const raw_str = string_to_cstring(s, orig);
     STRING * const ret =

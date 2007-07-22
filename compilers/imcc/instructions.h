@@ -87,11 +87,11 @@ Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
 /* Globals */
 
 typedef struct _emittert {
-    int (*open)(Interp *, void *param);
-    int (*emit)(Interp *, void *param, struct _IMC_Unit *, const Instruction *ins);
-    int (*new_sub)(Interp *, void *param, struct _IMC_Unit *);
-    int (*end_sub)(Interp *, void *param, struct _IMC_Unit *);
-    int (*close)(Interp *, void *param);
+    int (*open)(PARROT_INTERP, void *param);
+    int (*emit)(PARROT_INTERP, void *param, struct _IMC_Unit *, const Instruction *ins);
+    int (*new_sub)(PARROT_INTERP, void *param, struct _IMC_Unit *);
+    int (*end_sub)(PARROT_INTERP, void *param, struct _IMC_Unit *);
+    int (*close)(PARROT_INTERP, void *param);
 } Emitter;
 
 enum Emitter_type { EMIT_FILE, EMIT_PBC };

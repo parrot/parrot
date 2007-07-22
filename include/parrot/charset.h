@@ -33,49 +33,49 @@ PARROT_API extern CHARSET *Parrot_ascii_charset_ptr;
 #define PARROT_BINARY_CHARSET Parrot_binary_charset_ptr
 #define PARROT_UNICODE_CHARSET Parrot_unicode_charset_ptr
 
-typedef STRING *(*charset_get_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*charset_get_graphemes_inplace_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
-typedef void (*charset_set_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
+typedef STRING *(*charset_get_graphemes_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*charset_get_graphemes_inplace_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
+typedef void (*charset_set_graphemes_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 
-typedef STRING * (*charset_to_charset_t)(Interp *, STRING *source_string,
+typedef STRING * (*charset_to_charset_t)(PARROT_INTERP, STRING *source_string,
         STRING *dest);
-typedef STRING * (*charset_from_unicode_t)(Interp *, STRING *source_string,
+typedef STRING * (*charset_from_unicode_t)(PARROT_INTERP, STRING *source_string,
         STRING *dest);
-typedef STRING* (*charset_compose_t)(Interp *, STRING *source_string);
-typedef STRING* (*charset_decompose_t)(Interp *, STRING *source_string);
-typedef void (*charset_upcase_t)(Interp *, STRING *source_string);
-typedef void (*charset_downcase_t)(Interp *, STRING *source_string);
-typedef void (*charset_titlecase_t)(Interp *, STRING *source_string);
-typedef void (*charset_upcase_first_t)(Interp *, STRING *source_string);
-typedef void (*charset_downcase_first_t)(Interp *, STRING *source_string);
-typedef void (*charset_titlecase_first_t)(Interp *, STRING *source_string);
-typedef INTVAL (*charset_compare_t)(Interp *, const STRING *lhs, const STRING *rhs);
-typedef INTVAL (*charset_index_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
-typedef INTVAL (*charset_rindex_t)(Interp *, STRING *source_string, STRING *search_string, UINTVAL offset);
-typedef UINTVAL (*charset_validate_t)(Interp *, STRING *source_string);
-typedef INTVAL (*charset_is_cclass_t)(Interp *, INTVAL, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_cclass_t)(Interp *, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef INTVAL (*charset_find_not_cclass_t)(Interp *, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef INTVAL (*charset_is_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_not_wordchar_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_is_whitespace_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_whitespace_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_not_whitespace_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_is_digit_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_digit_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_not_digit_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_is_punctuation_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_punctuation_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_not_punctuation_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_is_newline_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_newline_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_not_newline_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef INTVAL (*charset_find_word_boundary_t)(Interp *, STRING *source_string, UINTVAL offset);
-typedef STRING *(*charset_string_from_codepoint_t)(Interp *, UINTVAL codepoint);
-typedef size_t (*charset_compute_hash_t)(Interp *, const STRING *, size_t seed);
+typedef STRING* (*charset_compose_t)(PARROT_INTERP, STRING *source_string);
+typedef STRING* (*charset_decompose_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_upcase_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_downcase_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_titlecase_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_upcase_first_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_downcase_first_t)(PARROT_INTERP, STRING *source_string);
+typedef void (*charset_titlecase_first_t)(PARROT_INTERP, STRING *source_string);
+typedef INTVAL (*charset_compare_t)(PARROT_INTERP, const STRING *lhs, const STRING *rhs);
+typedef INTVAL (*charset_index_t)(PARROT_INTERP, STRING *source_string, STRING *search_string, UINTVAL offset);
+typedef INTVAL (*charset_rindex_t)(PARROT_INTERP, STRING *source_string, STRING *search_string, UINTVAL offset);
+typedef UINTVAL (*charset_validate_t)(PARROT_INTERP, STRING *source_string);
+typedef INTVAL (*charset_is_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef INTVAL (*charset_find_not_cclass_t)(PARROT_INTERP, INTVAL, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef INTVAL (*charset_is_wordchar_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_wordchar_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_not_wordchar_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_is_whitespace_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_whitespace_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_not_whitespace_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_is_digit_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_digit_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_not_digit_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_is_punctuation_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_punctuation_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_not_punctuation_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_is_newline_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_newline_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_not_newline_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef INTVAL (*charset_find_word_boundary_t)(PARROT_INTERP, STRING *source_string, UINTVAL offset);
+typedef STRING *(*charset_string_from_codepoint_t)(PARROT_INTERP, UINTVAL codepoint);
+typedef size_t (*charset_compute_hash_t)(PARROT_INTERP, const STRING *, size_t seed);
 
-typedef STRING* (*charset_converter_t)(Interp *, STRING *src, STRING *dst);
+typedef STRING* (*charset_converter_t)(PARROT_INTERP, STRING *src, STRING *dst);
 
 /* HEADERIZER BEGIN: src/charset.c */
 

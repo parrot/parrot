@@ -138,8 +138,7 @@ void Parrot_store_global_n( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_store_global_s(
-    NOTNULL(Interp *inter),
+void Parrot_store_global_s( PARROT_INTERP,
     NULLOK(STRING *str_key),
     NULLOK(STRING *globalname),
     NULLOK(PMC *val) )

@@ -26,7 +26,7 @@ typedef struct Memory_Block {
 
 typedef struct Memory_Pool {
     Memory_Block *top_block;
-    void (*compact)(Interp *, struct Memory_Pool *);
+    void (*compact)(PARROT_INTERP, struct Memory_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
@@ -102,9 +102,9 @@ typedef struct Arenas {
     /*
      * function slots that each subsystem must provide
      */
-    void (*do_dod_run)(Interp*, int flags);
-    void (*de_init_gc_system) (Interp*);
-    void (*init_pool)(Interp *, struct Small_Object_Pool *);
+    void (*do_dod_run)(PARROT_INTERP, int flags);
+    void (*de_init_gc_system) (PARROT_INTERP);
+    void (*init_pool)(PARROT_INTERP, struct Small_Object_Pool *);
     /*
      * statistics for DOD and GC
      */

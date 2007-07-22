@@ -33,12 +33,12 @@ typedef struct string_iterator_t {
     const STRING *str;
     UINTVAL bytepos;
     UINTVAL charpos;
-    UINTVAL (*get_and_advance)(Interp *, struct string_iterator_t *i);
-    void (*set_and_advance)(Interp *, struct string_iterator_t *i, UINTVAL c);
-    void (*set_position)(Interp *, struct string_iterator_t *i, UINTVAL pos);
+    UINTVAL (*get_and_advance)(PARROT_INTERP, struct string_iterator_t *i);
+    void (*set_and_advance)(PARROT_INTERP, struct string_iterator_t *i, UINTVAL c);
+    void (*set_position)(PARROT_INTERP, struct string_iterator_t *i, UINTVAL pos);
 } String_iter;
 
-void string_iter_init(Interp *, const STRING *str, String_iter *);
+void string_iter_init(PARROT_INTERP, const STRING *str, String_iter *);
 
 /* stringinfo parameters */
 

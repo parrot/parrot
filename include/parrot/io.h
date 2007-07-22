@@ -464,13 +464,13 @@ void PIO_push_layer_str( PARROT_INTERP,
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
-extern STRING          *PIO_sockaddr_in(Interp *, unsigned short, STRING *);
+extern STRING          *PIO_sockaddr_in(PARROT_INTERP, unsigned short, STRING *);
 extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_win32_getblksize(x)
 #endif
 
 #ifdef PIO_OS_UNIX
-extern STRING          *PIO_sockaddr_in(Interp *, unsigned short, STRING *);
+extern STRING          *PIO_sockaddr_in(PARROT_INTERP, unsigned short, STRING *);
 extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
 #  define PIO_getblksize(x)   PIO_unix_getblksize(x)
 #endif

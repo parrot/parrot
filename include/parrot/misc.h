@@ -25,7 +25,7 @@
 /*
  * utils.c
  */
-typedef int (*reg_move_func)(Interp*, unsigned char d, unsigned char s, void *);
+typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, void *);
 
 /* HEADERIZER BEGIN: src/utils.c */
 
@@ -222,18 +222,12 @@ STRING * Parrot_vsprintf_s( PARROT_INTERP,
 
     typedef struct sprintf_obj SPRINTF_OBJ;
 
-    typedef STRING *(*sprintf_getchar_t) (Interp *, INTVAL,
-                                          SPRINTF_OBJ *);
-    typedef HUGEINTVAL(*sprintf_getint_t) (Interp *, INTVAL,
-                                           SPRINTF_OBJ *);
-    typedef UHUGEINTVAL(*sprintf_getuint_t) (Interp *, INTVAL,
-                                             SPRINTF_OBJ *);
-    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (Interp *, INTVAL,
-                                               SPRINTF_OBJ *);
-    typedef STRING *(*sprintf_getstring_t) (Interp *, INTVAL,
-                                            SPRINTF_OBJ *);
-    typedef void *(*sprintf_getptr_t) (Interp *, INTVAL,
-                                       SPRINTF_OBJ *);
+    typedef STRING *(*sprintf_getchar_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef HUGEINTVAL(*sprintf_getint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef UHUGEINTVAL(*sprintf_getuint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef STRING *(*sprintf_getstring_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef void *(*sprintf_getptr_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
 
     struct sprintf_obj {
         void *data;

@@ -454,17 +454,17 @@ Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
 
 PARROT_API
 void
-Parrot_store_global_s(NOTNULL(Interp *inter), NULLOK(STRING *str_key),
+Parrot_store_global_s(PARROT_INTERP, NULLOK(STRING *str_key),
                       NULLOK(STRING *globalname), NULLOK(PMC *val))
 {
-    PMC * const ns = Parrot_make_namespace_keyed_str(inter,
-                                         Parrot_get_ctx_HLL_namespace(inter),
+    PMC * const ns = Parrot_make_namespace_keyed_str(interp,
+                                         Parrot_get_ctx_HLL_namespace(interp),
                                          str_key);
 
-    Parrot_store_global_n(inter, ns, globalname, val);
+    Parrot_store_global_n(interp, ns, globalname, val);
 
     /* FIXME - method cache invalidation should be a namespace function */
-    Parrot_invalidate_method_cache(inter, str_key, globalname);
+    Parrot_invalidate_method_cache(interp, str_key, globalname);
 }
 
 

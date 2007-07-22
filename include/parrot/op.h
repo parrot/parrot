@@ -1,5 +1,5 @@
 /* op.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -61,8 +61,8 @@ typedef enum {
 
 /* NOTE: Sure wish we could put the types here... */
 
-typedef opcode_t *(*op_func_t)(opcode_t *, Interp *);
-typedef void **(*op_func_prederef_t)(void **, Interp *);
+typedef opcode_t *(*op_func_t)(opcode_t *, PARROT_INTERP);
+typedef void **(*op_func_prederef_t)(void **, PARROT_INTERP);
 
 
 /*

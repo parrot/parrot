@@ -65,7 +65,7 @@ typedef struct Parrot_pic_store_t {
     size_t n_mics;                      /* range check, debugging mainly */
 } Parrot_PIC_store;
 
-typedef int (*arg_pass_f)(Interp *, PMC *sig,
+typedef int (*arg_pass_f)(PARROT_INTERP, PMC *sig,
             char *src_base, void **src_pc, char *dest_base, void **dest_pc);
 
 /* more or less private interfaces */

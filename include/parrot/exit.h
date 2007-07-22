@@ -16,7 +16,7 @@
 
 #include "parrot/compiler.h"    /* compiler capabilities */
 
-typedef void (*exit_handler_f)(Interp *, int , void *);
+typedef void (*exit_handler_f)(PARROT_INTERP, int , void *);
 
 typedef struct _handler_node_t {
     exit_handler_f function;
