@@ -227,7 +227,7 @@ upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         if (c >= 0xe0 && c != 0xf7)
             c &= ~0x20;
         else
-            c = toupper(c);
+            c = toupper((unsigned char)c);
         buffer[offset] = c;
     }
 }
@@ -246,7 +246,7 @@ downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
             if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
                 c |= 0x20;
             else
-                c = tolower(c);
+                c = tolower((unsigned char)c);
             buffer[offset] = c;
         }
     }
@@ -268,7 +268,7 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
     else
-        c = toupper(c);
+        c = toupper((unsigned char)c);
     buffer[0] = c;
 
     for (offset = 1; offset < source_string->strlen; offset++) {
@@ -276,7 +276,7 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
             c |= 0x20;
         else
-            c = tolower(c);
+            c = tolower((unsigned char)c);
         buffer[offset] = c;
     }
 }
@@ -294,7 +294,7 @@ upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         if (c >= 0xe0 && c != 0xf7)
             c &= ~0x20;
         else
-            c = toupper(c);
+            c = toupper((unsigned char)c);
         buffer[0] = c;
     }
 }
@@ -312,9 +312,9 @@ downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
             c &= ~0x20;
         else
-            c = tolower(c);
+            c = tolower((unsigned char)c);
         buffer[0] = c;
-        buffer[0] = toupper(buffer[0]);
+        buffer[0] = toupper((unsigned char)buffer[0]);
     }
 }
 
