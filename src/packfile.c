@@ -906,14 +906,14 @@ PackFile_find_segment(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
         return NULL;
     for (i=0; i < dir->num_segments; i++) {
         PackFile_Segment *seg = dir->segments[i];
-        if (seg && (strcmp(seg->name, name) == 0)) {
-            return seg;
-        }
-        if (sub_dir && seg->type == PF_DIR_SEG) {
-            seg = PackFile_find_segment(interp,
-                    (PackFile_Directory *)seg, name, sub_dir);
-            if (seg)
+        if (seg) {
+            if (strcmp(seg->name, name) == 0)
                 return seg;
+            if (sub_dir && seg->type == PF_DIR_SEG) {
+                seg = PackFile_find_segment(interp, (PackFile_Directory *)seg, name, sub_dir);
+                if (seg)
+                    return seg;
+            }
         }
     }
 
