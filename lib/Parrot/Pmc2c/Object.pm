@@ -74,7 +74,10 @@ sub body {
     # icc), so we add a workaround for the null return from a FLOATVAL
     # function
     my $null_return;
-    if ($method->{type} =~ /void|PMC|INTVAL|STRING|opcode_t/) {
+    if ($method->{type} eq 'void') {
+        $null_return = '';
+    }
+    elsif ($method->{type} =~ /PMC|INTVAL|STRING|opcode_t/) {
         $null_return = "return ($method->{type})NULL;";
     }
     # workaround for gcc because the general case doesn't work there
