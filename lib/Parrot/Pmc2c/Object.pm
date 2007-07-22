@@ -65,6 +65,7 @@ sub body {
 
     # Do we have a return value?
     my $return = $method->{type} =~ /void/ ? '' : 'return ';
+    my $void_return = $method->{type} =~ /void/ ? 'return;' : '';
 
     # work out what the null return should be so that we can quieten the "no
     # return from non-void function" warnings.
@@ -113,6 +114,7 @@ $decl {
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
                     class_info->vtable_methods, string_from_literal(interp, "$meth"));
                 ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, string_from_literal(interp, "$meth"), "$sig"$arg);
+                $void_return
             }
         }
         else {
@@ -131,7 +133,7 @@ EOC
 sub ctype_to_sigchar($) {
     my $ctype = shift;
     $ctype =~ s/\s//g;
-    if (!$ctype) {
+    if (!$ctype || $ctype =~ /void/) {
         return "v";
     } elsif ($ctype =~ /opcode_t\*/) {
         # Only invoke's return needs this; we'll get away with this.
