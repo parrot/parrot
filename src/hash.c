@@ -738,6 +738,8 @@ C<PObj_constant_FLAG> or 0.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 {
@@ -769,7 +771,6 @@ parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
     if (hash)
         return hash->entries;
     real_exception(interp, NULL, 1, "parrot_hash_size asked to check a NULL hash\n");
-    return 0;
 }
 
 /*
@@ -832,8 +833,9 @@ Returns the bucket for C<key>.
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), void *key)
+parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))
 {
     const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket    *bucket  = hash->bi[hashval & hash->mask];
@@ -858,7 +860,7 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
+parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? bucket->value : NULL;
@@ -874,7 +876,7 @@ Returns whether the key exists in the hash.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
+parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 {
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? 1 : 0;
@@ -892,7 +894,7 @@ PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
-parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), void *key, void *value)
+parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key), NULLOK(void *value))
 {
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket = hash->bi[hashval & hash->mask];
@@ -944,7 +946,7 @@ Deletes the key from the hash.
 
 PARROT_API
 void
-parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), void *key)
+parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 {
     HashBucket *bucket;
     HashBucket *prev = NULL;
@@ -1006,9 +1008,9 @@ parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash **dest))
                 break;
 
             default:
+                valtmp = NULL; /* avoid warning */
                 real_exception(interp, NULL, -1, "hash corruption: type = %d\n",
                                    hash->entry_type);
-                valtmp = NULL; /* avoid warning */
             };
             parrot_hash_put(interp, *dest, key, valtmp);
             b = b->next;

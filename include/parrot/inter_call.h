@@ -115,12 +115,12 @@ int Parrot_init_arg_op( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
-int Parrot_init_arg_sig( PARROT_INTERP,
-    parrot_context_t *ctx,
+int Parrot_init_arg_sig( SHIM_INTERP,
+    NOTNULL(parrot_context_t *ctx),
     NOTNULL(const char *sig),
-    void *ap,
+    NULLOK(void *ap),
     NOTNULL(call_state_item *sti) )
-        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
@@ -162,12 +162,17 @@ void Parrot_process_args( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 opcode_t * parrot_pass_args_fromc( PARROT_INTERP,
-    const char *sig,
-    opcode_t *dest,
-    parrot_context_t *old_ctxp,
+    NOTNULL(const char *sig),
+    NOTNULL(opcode_t *dest),
+    NOTNULL(parrot_context_t *old_ctxp),
     va_list ap )
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 int Parrot_store_arg( PARROT_INTERP, NOTNULL(call_state *st) )
         __attribute__nonnull__(1)
@@ -191,12 +196,16 @@ INTVAL set_retval_i( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC* set_retval_p( PARROT_INTERP,
     int sig_ret,
     NOTNULL(parrot_context_t *ctx) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING* set_retval_s( PARROT_INTERP,
     int sig_ret,
     NOTNULL(parrot_context_t *ctx) )

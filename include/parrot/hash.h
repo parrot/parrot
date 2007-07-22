@@ -40,7 +40,7 @@ typedef UINTVAL BucketIndex;
 
 typedef int    (*hash_comp_fn)(Parrot_Interp, const void*const, const void*const);
 typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
-typedef size_t (*hash_hash_key_fn)(Parrot_Interp, void*, size_t seed);
+typedef size_t (*hash_hash_key_fn)(Parrot_Interp, NOTNULL(void*), size_t seed);
 
 typedef enum {
     Hash_key_type_int,
@@ -86,9 +86,12 @@ void parrot_hash_clone( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void parrot_hash_delete( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
+void parrot_hash_delete( PARROT_INTERP,
+    NOTNULL(Hash *hash),
+    NOTNULL(void *key) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 void parrot_hash_destroy( SHIM_INTERP, NOTNULL(Hash *hash) )
@@ -96,24 +99,32 @@ void parrot_hash_destroy( SHIM_INTERP, NOTNULL(Hash *hash) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL parrot_hash_exists( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
+INTVAL parrot_hash_exists( PARROT_INTERP,
+    NOTNULL(Hash *hash),
+    NOTNULL(void *key) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * parrot_hash_get( PARROT_INTERP, NOTNULL(Hash *hash), void *key )
+void * parrot_hash_get( PARROT_INTERP,
+    NOTNULL(Hash *hash),
+    NOTNULL(void *key) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 HashBucket * parrot_hash_get_bucket( PARROT_INTERP,
     NOTNULL(const Hash *hash),
-    void *key )
+    NOTNULL(void *key) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -129,10 +140,11 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket* parrot_hash_put( PARROT_INTERP,
     NOTNULL(Hash *hash),
-    void *key,
-    void *value )
+    NOTNULL(void *key),
+    NULLOK(void *value) )
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -163,6 +175,8 @@ void parrot_new_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_new_INTVAL_hash( PARROT_INTERP, UINTVAL flags )
         __attribute__nonnull__(1);
 
