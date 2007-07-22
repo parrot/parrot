@@ -202,17 +202,17 @@ op_fullname(NOTNULL(char *dest), NOTNULL(const char *name), NOTNULL(SymReg *args
         if (args[i]->set == 'K')
             *dest++ = 'p';
         else
-            *dest++ = tolower(args[i]->set);
+            *dest++ = tolower((unsigned char)args[i]->set);
 
         if (args[i]->type & (VTCONST|VT_CONSTP)) {
 #if IMC_TRACE_HIGH
-            PIO_eprintf(NULL, " (%cc)%s", tolower(args[i]->set), args[i]->name);
+            PIO_eprintf(NULL, " (%cc)%s", tolower((unsigned char)args[i]->set), args[i]->name);
 #endif
             *dest++ = 'c';
         }
 #if IMC_TRACE_HIGH
         else
-            PIO_eprintf(NULL, " (%c)%s", tolower(args[i]->set), args[i]->name);
+            PIO_eprintf(NULL, " (%c)%s", tolower((unsigned char)args[i]->set), args[i]->name);
 #endif
     }
     *dest = '\0';

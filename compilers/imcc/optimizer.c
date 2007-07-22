@@ -839,8 +839,8 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
             /*
              * create instruction e.g. add_i_ic_ic => add_i_i_i
              */
-            sprintf(op, "%s_%c_%c_%c", name, tolower(r[0]->set),
-                    tolower(r[1]->set), tolower(r[2]->set));
+            sprintf(op, "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
+                    tolower((unsigned char)r[1]->set), tolower((unsigned char)r[2]->set));
             debug_fmt = "opt %s_x_xc_xc => ";
             break;
         }
@@ -853,8 +853,8 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 !strcmp(name, ops2[i])) {
             found = 3;
-            sprintf(op, "%s_%c_%c", name, tolower(r[0]->set),
-                    tolower(r[1]->set));
+            sprintf(op, "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
+                    tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_x_xc => ";
             break;
         }
@@ -868,8 +868,8 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
                 r[1]->type & (VTCONST|VT_CONSTP)  &&
                 !strcmp(name, ops3[i])) {
             found = 2;
-            sprintf(op, "%s_%c_%c_ic", name, tolower(r[0]->set),
-                    tolower(r[1]->set));
+            sprintf(op, "%s_%c_%c_ic", name, tolower((unsigned char)r[0]->set),
+                    tolower((unsigned char)r[1]->set));
             debug_fmt = "opt %s_xc_xc_ic => ";
             break;
         }
@@ -882,7 +882,7 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 !strcmp(name, ops4[i])) {
             found = 1;
-            sprintf(op, "%s_%c_ic", name, tolower(r[0]->set));
+            sprintf(op, "%s_%c_ic", name, tolower((unsigned char)r[0]->set));
             debug_fmt = "opt %s_xc_ic => ";
             break;
         }

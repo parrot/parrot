@@ -507,7 +507,7 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
                 (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
                 p->set != 'K' &&
                 p->color < 0 && (p->type & VTREGISTER)) {
-                    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - (int)p->color);
+                    sprintf(regb[i], "r%c%d", tolower((unsigned char)p->set), -1 - (int)p->color);
                     regstr[i] = regb[i];
         }
         else if (p->type & VTREGKEY) {
@@ -522,7 +522,7 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
                         k->reg &&
                         k->reg->color < 0)
                     sprintf(regb[i]+strlen(regb[i]), "r%c%d",
-                            tolower(k->reg->set), -1 - (int)k->reg->color);
+                            tolower((unsigned char)k->reg->set), -1 - (int)k->reg->color);
                 else
                     strcat(regb[i], k->name);   /* XXX */
                 if (k->nextkey)
