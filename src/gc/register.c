@@ -273,6 +273,7 @@ Duplicate the passed context
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context *
 Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
 {
@@ -284,13 +285,13 @@ Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
     const int slot = CALCULATE_SLOT_NUM(reg_alloc);
     void * ptr = interp->ctx_mem.free_list[slot];
 
-    if (ptr) {
+    if (ptr)
         interp->ctx_mem.free_list[slot] = *(void **) ptr;
-    }
-    else {
+    else
         ptr = (void *)mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
-    }
-    CONTEXT(interp->ctx) = ctx = (Parrot_Context *)ptr;
+
+    ctx = (Parrot_Context *)ptr;
+    CONTEXT(interp->ctx) = ctx;
 
     ctx->regs_mem_size   = reg_alloc;
     ctx->n_regs_used     = old->n_regs_used;
@@ -312,6 +313,8 @@ C<Parrot_pop_context>.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context *
 Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
 {
@@ -362,6 +365,8 @@ stored.  The function returns the new context.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
 {
@@ -503,7 +508,7 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(PARROT_INTERP, struct Parrot_Context *ctxp)
+Parrot_set_context_threshold(PARROT_INTERP, NULLOK(struct Parrot_Context *ctxp))
 {
     UNUSED(interp);
     UNUSED(ctxp);

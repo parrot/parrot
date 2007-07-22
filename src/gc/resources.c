@@ -31,6 +31,8 @@ typedef void (*compact_f) (Interp *, Memory_Pool *);
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static char * aligned_mem( NOTNULL(const Buffer *buffer), NOTNULL(char *mem) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -44,6 +46,9 @@ PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static size_t aligned_string_size( size_t len );
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static void * alloc_new_block( PARROT_INTERP,
     size_t size,
     NOTNULL(Memory_Pool *pool),
@@ -52,6 +57,8 @@ static void * alloc_new_block( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static const char* buffer_location( PARROT_INTERP, NOTNULL(const PObj *b) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -65,6 +72,7 @@ static void debug_print_buf( PARROT_INTERP, NOTNULL(const PObj *b) )
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static void * mem_allocate( PARROT_INTERP,
     size_t size,
     NOTNULL(Memory_Pool *pool) )
@@ -78,6 +86,7 @@ static void merge_pools(
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static Memory_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact) );
@@ -92,6 +101,9 @@ the default size.  The given text is used for debugging.
 
 */
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static void *
 alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
         NOTNULL(const char *why))
@@ -176,6 +188,7 @@ Buffer memory layout:
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static void *
 mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
 {
@@ -235,6 +248,8 @@ mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
 }
 
 #if RESOURCE_DEBUG
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static const char*
 buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
 {
@@ -511,27 +526,26 @@ aligned_size(NOTNULL(const Buffer *buffer), size_t len)
 {
     if (PObj_is_COWable_TEST(buffer))
         len += sizeof (void*);
-    if (PObj_aligned_TEST(buffer)) {
+    if (PObj_aligned_TEST(buffer))
         len = (len + BUFFER_ALIGN_1) & BUFFER_ALIGN_MASK;
-    }
-    else {
+    else
         len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
-    }
     return len;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static char *
 aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))
 {
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof (void*);
-    if (PObj_aligned_TEST(buffer)) {
+    if (PObj_aligned_TEST(buffer))
         mem = (char*)(((unsigned long)(mem + BUFFER_ALIGN_1)) &
                 BUFFER_ALIGN_MASK);
-    }
-    else {
+    else
         mem = (char*)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
-    }
+
     return mem;
 }
 
@@ -795,20 +809,19 @@ Create a new memory pool.
 */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static Memory_Pool *
 new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
     Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
 
-    if (pool) {
-        pool->top_block              = NULL;
-        pool->compact                = compact;
-        pool->minimum_block_size     = min_block;
-        pool->total_allocated        = 0;
-        pool->guaranteed_reclaimable = 0;
-        pool->possibly_reclaimable   = 0;
-        pool->reclaim_factor         = RECLAMATION_FACTOR;
-    }
+    pool->top_block              = NULL;
+    pool->compact                = compact;
+    pool->minimum_block_size     = min_block;
+    pool->total_allocated        = 0;
+    pool->guaranteed_reclaimable = 0;
+    pool->possibly_reclaimable   = 0;
+    pool->reclaim_factor         = RECLAMATION_FACTOR;
 
     return pool;
 }

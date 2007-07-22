@@ -357,6 +357,8 @@ static void gc_ims_alloc_objects( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static void * gc_ims_get_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
@@ -497,6 +499,8 @@ gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(
 }
 
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static void *
 gc_ims_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
@@ -643,9 +647,8 @@ parrot_gc_ims_mark(PARROT_INTERP)
     /*
      * use statistics from the previous run
      */
-    if (g_ims->n_objects) {
+    if (g_ims->n_objects)
         work_factor = (double)g_ims->n_extended_PMCs / g_ims->n_objects;
-    }
     else
         work_factor = 1.0;
     todo = (size_t)(g_ims->alloc_trigger * g_ims->throttle * work_factor);
@@ -805,9 +808,9 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
     Arenas * const arena_base    = interp->arena_base;
     Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
 
-    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD) {
+    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD)
         return;
-    }
+
     ++g_ims->increments;
     IMS_DEBUG((stderr, "state = %d => ", g_ims->state));
 
@@ -819,6 +822,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
             break;
         case GC_IMS_STARTING:
             /*  fall through and start */
+            /* FALLTHRU */
         case GC_IMS_RE_INIT:
             parrot_gc_ims_reinit(interp);
             break;

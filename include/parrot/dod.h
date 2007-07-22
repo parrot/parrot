@@ -133,19 +133,26 @@ void parrot_gc_gms_pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
         __attribute__nonnull__(2);
 
 void parrot_gc_gms_wb( PARROT_INTERP,
-    PMC *agg,
-    void *old,
+    NOTNULL(PMC *agg),
+    NOTNULL(void *old),
     NOTNULL(void *new) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 void parrot_gc_gms_wb_key( PARROT_INTERP,
-    PMC *agg,
-    void *old,
-    void *old_key,
-    void *new,
-    void *new_key )
-        __attribute__nonnull__(1);
+    NOTNULL(PMC *agg),
+    NOTNULL(void *old),
+    NOTNULL(void *old_key),
+    NOTNULL(void *new),
+    NOTNULL(void *new_key) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6);
 
 /* HEADERIZER END: src/gc/gc_gms.c */
 

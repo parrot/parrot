@@ -160,6 +160,7 @@ static void gc_gms_clear_igp( PARROT_INTERP, NOTNULL(Gc_gms_gen *gen) )
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen * gc_gms_create_gen( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     size_t gen_no )
@@ -170,12 +171,15 @@ static void gc_gms_end_cycle( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen * gc_gms_find_gen( PARROT_INTERP,
     NOTNULL(Gc_gms_hdr *h),
     UINTVAL gen_no )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void * gc_gms_get_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
@@ -598,6 +602,8 @@ gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
  *    the free ptr moves towards the marker
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static void *
 gc_gms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
@@ -650,6 +656,7 @@ Initalize the generation system by creating the first two generations.
  */
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
 gc_gms_create_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), size_t gen_no)
 {
@@ -659,9 +666,12 @@ gc_gms_create_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), size_t gen_no
     gen->pool = pool;
     gen->timely_destruct_obj_sofar = 0;
     gen->black_color = b_PObj_live_FLAG;
-    gen->prev = gen->next = NULL;
+    gen->prev = NULL;
+    gen->next = NULL;
     gen->first = gen->last = gen->fin = &pool->marker;
-    gen->igp.first = gen->igp.last = NULL;
+    gen->igp.first = NULL;
+    gen->igp.last = NULL;
+
     return gen;
 }
 
@@ -696,11 +706,14 @@ to other items, and promote it to the old generation.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
 gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     Small_Object_Pool * const pool = h->gen->pool;
+
+    assert(pool);
 
     for (gen = pool->first_gen; gen; gen = gen->next) {
         if (gen_no == gen->gen_no)
@@ -717,7 +730,6 @@ gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
      */
     real_exception(interp, NULL, 1, "generation %d not found for hdr %p",
             gen_no, h);
-    return NULL;
 }
 
 static void
@@ -810,7 +822,7 @@ gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
 }
 
 void
-parrot_gc_gms_wb(PARROT_INTERP, PMC *agg, void *old, NOTNULL(void *new))
+parrot_gc_gms_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(void *old), NOTNULL(void *new))
 {
     Gc_gms_hdr * const nh = PObj_to_GMSH(new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
@@ -832,8 +844,8 @@ parrot_gc_gms_wb(PARROT_INTERP, PMC *agg, void *old, NOTNULL(void *new))
 }
 
 void
-parrot_gc_gms_wb_key(PARROT_INTERP, PMC *agg,
-        void *old, void *old_key, void *new, void *new_key)
+parrot_gc_gms_wb_key(PARROT_INTERP, NOTNULL(PMC *agg),
+        NOTNULL(void *old), NOTNULL(void *old_key), NOTNULL(void *new), NOTNULL(void *new_key))
 {
     Gc_gms_hdr *nh, *ah;
 

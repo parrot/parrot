@@ -257,7 +257,7 @@ static INTVAL pf_register_standard_funcs( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC* run_sub( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
         __attribute__nonnull__(1)
@@ -415,7 +415,7 @@ Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 
 */
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
 run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))

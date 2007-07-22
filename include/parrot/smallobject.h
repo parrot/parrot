@@ -144,6 +144,7 @@ void gc_pmc_ext_pool_init( NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_small_object_pool(
     size_t object_size,
     size_t objects_per_alloc );

@@ -59,7 +59,7 @@ push_namespace(char * name)
 void
 pop_namespace(NULLOK(char *name))
 {
-    Namespace * ns = _namespace;
+    Namespace * const ns = _namespace;
 
     if (ns == NULL) {
         fprintf(stderr, "pop() on empty namespace stack\n");
