@@ -204,7 +204,7 @@ is_abs_path(NOTNULL(const STRING *file))
             file->encoding == Parrot_utf8_encoding_ptr);
 #ifdef WIN32
     if (file_name[0] == '\\' || file_name[0] == '/' ||
-            (isalpha(file_name[0]) && file->strlen > 2 &&
+            (isalpha((unsigned char)file_name[0]) && file->strlen > 2 &&
              (strncmp(file_name+1, ":\\", 2) == 0 ||
               strncmp(file_name+1, ":/",  2) == 0)))
 #else
@@ -586,7 +586,7 @@ parrot_split_path_ext(PARROT_INTERP, NOTNULL(STRING *in),
     pos_dot = CHARSET_RINDEX(interp, in, dot, len);
 
     /* XXX directory parrot-0.4.1 or such */
-    if (pos_dot != -1 && isdigit(((char*)in->strstart)[pos_dot+1]))
+    if (pos_dot != -1 && isdigit((unsigned char)((char*)in->strstart)[pos_dot+1]))
         pos_dot = -1;
 
     ++pos_dot;

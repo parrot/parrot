@@ -1471,7 +1471,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
         if (*x == '-') {
             seen_arrow = 1 ;
         }
-        else if (isupper(*x)) {
+        else if (isupper((unsigned char)*x)) {
              /* calculate needed length of arg and result sig FIAs */
             arg_ret_cnt[seen_arrow]++;
 
@@ -1555,7 +1555,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
             n_regs_used[3] = 0;
         }
         /* parse arg type */
-        else if (isupper(*x)) {
+        else if (isupper((unsigned char)*x)) {
             if (index >= 0)
                 commit_last_arg(interp, index, cur, n_regs_used, seen_arrow,
                     sigs, indexes, ctx, pmc, &list);
@@ -1574,7 +1574,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
 
         }
         /* parse arg adverbs */
-        else if (islower(*x)) {
+        else if (islower((unsigned char)*x)) {
             switch (*x) {
                 case 'n': cur |= PARROT_ARG_NAME;         break;
                 case 'f': cur |= PARROT_ARG_FLATTEN;      break;
@@ -1623,7 +1623,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
     seen_arrow = 1;
 
     for (x=ret_x; x && *x; x++) {
-        if (isupper(*x)) {
+        if (isupper((unsigned char)*x)) {
             switch (*x) {
                 case 'I':
                     {

@@ -683,7 +683,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
             const unsigned char c = *start;
             int dig;
 
-            if (isdigit(c)) {
+            if (isdigit((unsigned char)c)) {
                 dig = c - '0';
             }
             else if (c >= 'a' && c <= 'z') {

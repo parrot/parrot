@@ -380,7 +380,7 @@ Return a representation of the hash contents.
             PMC *val;
 
             for (i = 0; i < (int)key->strlen; ++i) {
-                if (!isdigit(((char *)key->strstart)[i])) {
+                if (!isdigit((unsigned char)((char *)key->strstart)[i])) {
                     all_digit = 0;
                     break;
                 }

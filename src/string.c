@@ -1811,7 +1811,7 @@ string_to_int(SHIM_INTERP, NULLOK(const STRING *s))
         while (start < end) {
             const unsigned char c = *start;
 
-            if (isdigit(c)) {
+            if (isdigit((unsigned char)c)) {
                 in_number = 1;
                 i = i * 10 + (c - '0');
             }
@@ -1823,7 +1823,7 @@ string_to_int(SHIM_INTERP, NULLOK(const STRING *s))
                 }
                 else if (c == '+')
                     in_number = 1;
-                else if (isspace(c))
+                else if (isspace((unsigned char)c))
                     ;
                 else
                     break;
@@ -1865,7 +1865,7 @@ string_to_num(PARROT_INTERP, NULLOK(const STRING *s))
         char * const  cstr = string_to_cstring(interp, (STRING *)const_cast(s));
         const char   *p    = cstr;
 
-        while (isspace(*p))
+        while (isspace((unsigned char)*p))
             p++;
 
         f = atof(p);

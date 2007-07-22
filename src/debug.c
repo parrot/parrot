@@ -119,12 +119,12 @@ nextarg(NOTNULL(char const *command))
      * and it is either alphanumeric, a comma or a closing bracket,
      * continue looking for the next argument.
      */
-    while (*command && (isalnum((int) *command) || *command == ',' ||
+    while (*command && (isalnum((unsigned char) *command) || *command == ',' ||
         *command == ']'))
             command++;
 
     /* eat as much space as possible */
-    while (*command && isspace((int) *command))
+    while (*command && isspace((unsigned char) *command))
         command++;
 
     return command;
@@ -144,7 +144,7 @@ static const char *
 skip_ws(NOTNULL(const char *str))
 {
     /* as long as str is not NULL and it contains space, skip it */
-    while (*str && isspace((int) *str))
+    while (*str && isspace((unsigned char) *str))
         str++;
 
     return str;
@@ -166,11 +166,11 @@ skip_command(NOTNULL(const char *str))
     /* while str is not null and it contains a command (no spaces),
      * skip the character
      */
-    while (*str && !isspace((int) *str))
+    while (*str && !isspace((unsigned char) *str))
         str++;
 
     /* eat all space after that */
-    while (*str && isspace((int) *str))
+    while (*str && isspace((unsigned char) *str))
         str++;
 
     return str;
@@ -273,7 +273,7 @@ parse_key(PARROT_INTERP, NOTNULL(const char *str), NOTNULL(PMC **keyP))
         *keyP = key_new_string(interp, parrot_string);
     }
     /* if this is a numeric key */
-    else if (isdigit((int) *str)) {
+    else if (isdigit((unsigned char) *str)) {
         int value;
         str   = parse_int(str, &value);
         *keyP = key_new_integer(interp, (INTVAL) value);
@@ -313,7 +313,7 @@ parse_command(NOTNULL(const char *command), NOTNULL(unsigned long *cmdP))
         return NULL;
     }
 
-    for (i = 0; *command && isalpha((int) *command); command++, i++)
+    for (i = 0; *command && isalpha((unsigned char) *command); command++, i++)
         c += (tolower((int) *command) + (i + 1)) * ((i + 1) * 255);
 
     /* Nonempty and did not start with a letter */
@@ -387,7 +387,7 @@ PDB_get_command(PARROT_INTERP)
     /* skip leading whitespace */
     do {
         ch = fgetc(stdin);
-    } while (isspace(ch) && ch != '\n');
+    } while (isspace((unsigned char)ch) && ch != '\n');
 
     /* generate string (no more than 255 chars) */
     while (ch != EOF && ch != '\n' && (i < 255)) {
@@ -435,7 +435,7 @@ PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
         fgets(buf, 1024, fd);
 
         /* skip spaces */
-        for(ptr=(char *)&buf;*ptr&&isspace(*ptr);ptr=ptr+1);
+        for(ptr=(char *)&buf;*ptr&&isspace((unsigned char)*ptr);ptr=ptr+1);
 
         /* avoid null blank and commented lines */
         if (*buf == '\0' || *buf == '#')
@@ -584,7 +584,7 @@ PDB_next(PARROT_INTERP, NULLOK(const char *command))
 
     command = nextarg(command);
     /* Get the number of operations to execute if any */
-    if (command && isdigit((int) *command))
+    if (command && isdigit((unsigned char) *command))
         n = atol(command);
 
     /* Erase the stopped flag */
@@ -627,7 +627,7 @@ PDB_trace(PARROT_INTERP, NULLOK(const char *command))
 
     command = nextarg(command);
     /* if the number of ops to run is specified, convert to a long */
-    if (command && isdigit((int) *command))
+    if (command && isdigit((unsigned char) *command))
         n = atol(command);
 
     /* clear the PDB_STOPPED flag, we'll be running n ops now */
@@ -768,7 +768,7 @@ INV_COND:   PIO_eprintf(interp, "Invalid condition\n");
         return NULL;
     }
 
-    if (isalpha((int)*command)) {
+    if (isalpha((unsigned char)*command)) {
         /* It's a register - we first check that it's the correct type */
         switch (*command) {
             case 'i':
@@ -1038,7 +1038,7 @@ PDB_breakpoint_t *
 PDB_find_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
 {
     command = nextarg(command);
-    if (isdigit((int) *command)) {
+    if (isdigit((unsigned char) *command)) {
         const long n = atol(command);
         PDB_breakpoint_t *breakpoint = interp->pdb->breakpoint;
 
@@ -1994,7 +1994,7 @@ PDB_hasinstruction(const char *c)
     while (*c && *c != '#' && *c != '\n') {
         /* ... and c is alphanumeric or a quoted string then the line contains
          * an instruction. */
-        if (isalnum((int) *c) || *c == '"') {
+        if (isalnum((unsigned char) *c) || *c == '"') {
             h = 1;
         }
         else if (*c == ':') {
@@ -2033,7 +2033,7 @@ PDB_list(PARROT_INTERP, NOTNULL(const char *command))
 
     command = nextarg(command);
     /* set the list line if provided */
-    if (isdigit((int) *command)) {
+    if (isdigit((unsigned char) *command)) {
         line_number = atol(command) - 1;
         if (line_number < 0)
             pdb->file->list_line = 0;
@@ -2047,7 +2047,7 @@ PDB_list(PARROT_INTERP, NOTNULL(const char *command))
     }
 
     /* set the number of lines to print */
-    if (isdigit((int) *command)) {
+    if (isdigit((unsigned char) *command)) {
         n = atol(command);
         skip_command(command);
     }
@@ -2536,7 +2536,7 @@ GDB_P(PARROT_INTERP, NOTNULL(const char *s))
         case 'P': t = REGNO_PMC; break;
         default: return "no such reg";
     }
-    if (s[1] && isdigit(s[1]))
+    if (s[1] && isdigit((unsigned char)s[1]))
         n = atoi(s + 1);
     else
         return "no such reg";

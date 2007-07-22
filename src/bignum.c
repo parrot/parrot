@@ -921,7 +921,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
     temp = BN_new(PINT_ 1);     /* We store coeff reversed in temp */
 
     while (*s2) { /* charge through the string */
-        if (isdigit(*s2) && !in_exp) {
+        if (isdigit((unsigned char)*s2) && !in_exp) {
             /* We're somewhere in the main string of numbers */
             int digit = *s2 - '0'; /* byte me! */
             if (digit ==0 && !non_zero_digits) { /* ignore leading zeros */
@@ -941,7 +941,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
                 fake_exponent--;
             }
         }
-        else if (isdigit(*s2) && in_exp) {
+        else if (isdigit((unsigned char)*s2) && in_exp) {
             exponent = 10 * exponent + (*s2 - '0'); /*XXX: overflow check */
         }
         else if (!in_number) {
