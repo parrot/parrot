@@ -3,19 +3,19 @@
  */
 
 PMC *
-Parrot_stat_file(Parrot_Interp interpreter, STRING *filename)
+Parrot_stat_file(Parrot_Interp interp, STRING *filename)
 {
   return NULL;
 }
 
 PMC *
-Parrot_stat_info_pmc(Parrot_Interp interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_pmc(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return NULL;
 }
 
 INTVAL
-Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
+Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
 {
   struct stat statbuf;
   char *filename;
@@ -23,7 +23,7 @@ Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
   int status;
 
   /* Get the name of the file as something we can use */
-  filename = string_to_cstring(interpreter, file);
+  filename = string_to_cstring(interp, file);
 
   /* Everything needs the result of stat, so just go do it */
   status = stat(filename, &statbuf);
@@ -90,7 +90,7 @@ Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
 }
 
 INTVAL
-Parrot_fstat_info_intval(Parrot_Interp interpreter, INTVAL file, INTVAL thing)
+Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)
 {
   struct stat statbuf;
   INTVAL result = -1;
@@ -160,13 +160,13 @@ Parrot_fstat_info_intval(Parrot_Interp interpreter, INTVAL file, INTVAL thing)
 }
 
 FLOATVAL
-Parrot_stat_info_floatval(Parrot_Interp interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_floatval(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return -1;
 }
 
 STRING *
-Parrot_stat_info_string(Parrot_Interp interpreter, STRING *filename, INTVAL thing)
+Parrot_stat_info_string(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return NULL;
 }

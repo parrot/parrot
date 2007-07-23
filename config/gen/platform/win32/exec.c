@@ -5,14 +5,14 @@
  *
  */
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
+Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command) {
     DWORD status = 0;
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     int free_it = 0;
     char* cmd = mem_sys_allocate( command->strlen + 4 );
     char* shell = Parrot_getenv( "ComSpec", &free_it );
-    char* cmdin = string_to_cstring(interpreter, command);
+    char* cmdin = string_to_cstring(interp, command);
 
     strcpy( cmd, "/c " );
     strcat( cmd, cmdin );
@@ -34,7 +34,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
 
     if ( !GetExitCodeProcess( pi.hProcess, &status ) ) {
         /* XXX njs Should call GetLastError for failure message? */
-        Parrot_warn( interpreter, PARROT_WARNINGS_PLATFORM_FLAG,
+        Parrot_warn( interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
     CloseHandle( pi.hProcess );
@@ -47,7 +47,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
 }
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 {
     DWORD status = 0;
     STARTUPINFO si;
@@ -59,15 +59,15 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
     int i;
 
     /* Ensure there's something in the PMC array. */
-    pmclen = VTABLE_elements(interpreter, cmdargs);
+    pmclen = VTABLE_elements(interp, cmdargs);
     if (pmclen == 0) {
         internal_exception(NOSPAWN, "Empty argument array for spawnw");
     }
 
     /* Now build command line. */
     for (i = 0; i < pmclen; i++) {
-        STRING *s = VTABLE_get_string_keyed_int(interpreter, cmdargs, i);
-        char *cs = string_to_cstring(interpreter, s);
+        STRING *s = VTABLE_get_string_keyed_int(interp, cmdargs, i);
+        char *cs = string_to_cstring(interp, s);
         if (cmdlinepos + (int)s->strlen + 3 > cmdlinelen) {
             cmdlinelen += s->strlen + 4;
             cmdline = mem_sys_realloc(cmdline, cmdlinelen);
@@ -94,7 +94,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
     /* Get exit code. */
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
         /* XXX njs Should call GetLastError for failure message? */
-        Parrot_warn( interpreter, PARROT_WARNINGS_PLATFORM_FLAG,
+        Parrot_warn( interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
 
@@ -108,10 +108,10 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interpreter, PMC *cmdargs)
 }
 
 void
-Parrot_Exec_OS_Command(Parrot_Interp interpreter, STRING *command)
+Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
 {
     int status;
-    char *in = string_to_cstring(interpreter, command);
+    char *in = string_to_cstring(interp, command);
     char *cmd = NULL;
     char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
 
