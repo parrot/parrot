@@ -58,6 +58,10 @@ mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
     obj = (PObj*)ctx->lex_pad;
     if (obj)
         pobject_lives(interp, obj);
+
+    if (!ctx->n_regs_used)
+        return;
+
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj*) CTX_REG_PMC(ctx, i);
         if (obj)

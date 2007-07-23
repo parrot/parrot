@@ -293,9 +293,13 @@ Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
     ctx = (Parrot_Context *)ptr;
     CONTEXT(interp->ctx) = ctx;
 
-    ctx->regs_mem_size   = reg_alloc;
-    ctx->n_regs_used     = old->n_regs_used;
-    diff                 = (long *)ctx - (long *)const_cast(old);
+    ctx->regs_mem_size          = reg_alloc;
+    ctx->n_regs_used            = mem_sys_allocate(sizeof (INTVAL) * 4);
+    ctx->n_regs_used[REGNO_INT] = old->n_regs_used[REGNO_INT];
+    ctx->n_regs_used[REGNO_NUM] = old->n_regs_used[REGNO_NUM];
+    ctx->n_regs_used[REGNO_STR] = old->n_regs_used[REGNO_STR];
+    ctx->n_regs_used[REGNO_PMC] = old->n_regs_used[REGNO_PMC];
+    diff                        = (long *)ctx - (long *)const_cast(old);
 
     interp->ctx.bp.regs_i    += diff;
     interp->ctx.bp_ps.regs_s += diff;
@@ -359,19 +363,26 @@ Parrot_pop_context(PARROT_INTERP)
 
 FUNCDOC: Parrot_alloc_context
 
-Allocate a new context and set the context pointer. Please note that
-the register usage C<n_regs_used> is not copied; just the pointer is
-stored.  The function returns the new context.
+Allocate a new context and set the context pointer. Please note that the
+register usage C<n_regs_used> is copied.  The function returns the new context.
 
 */
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context *
-Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
+Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
     void *ptr, *p;
+
+    /* this gets attached to the context, which should free it */
+
+    INTVAL *n_regs_used    = mem_sys_allocate(sizeof (INTVAL) * 4);
+    n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
+    n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
+    n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
+    n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
 
     /*
      * TODO (OPT) if we allocate a new context due to a self-recursive call
@@ -489,6 +500,11 @@ Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_
                      : (char*)doomed->name->strstart));
         }
 #endif
+        if (ctxp->n_regs_used) {
+            mem_sys_free(ctxp->n_regs_used);
+            ctxp->n_regs_used = NULL;
+        }
+
         ptr  = ctxp;
         slot = CALCULATE_SLOT_NUM(ctxp->regs_mem_size);
 

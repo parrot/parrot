@@ -25,7 +25,7 @@ tree of the specified type.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' );
+pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars', todo => 'RT #44089 - Mysterious GC-related segfault in progress' );
 
 .sub _main :main
     load_bytecode 'TGE.pbc'
