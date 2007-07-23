@@ -34,10 +34,10 @@ swap(void **x, void **y)
     *y = t;
 }
 
-typedef INTVAL(*sort_func_t)(Interp *, void*, void*);
+typedef INTVAL(*sort_func_t)(PARROT_INTERP, void*, void*);
 
 static INTVAL
-COMPARE(Interp *interp, void *a, void *b, PMC *cmp)
+COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)
 {
     if (PMC_IS_NULL(cmp))
         return mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_CMP);
@@ -51,7 +51,7 @@ COMPARE(Interp *interp, void *a, void *b, PMC *cmp)
 }
 
 static void
-quicksort(Interp *interp, void **data, UINTVAL n, PMC *cmp)
+quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)
 {
     UINTVAL i, j, ln, rn;
 

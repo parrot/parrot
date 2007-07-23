@@ -13,6 +13,7 @@ my @steps = qw(
     init::install
     init::miniparrot
     init::hints
+    init::attributes
     init::headers
     inter::progs
     inter::make

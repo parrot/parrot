@@ -41,47 +41,47 @@ typedef struct BIGINT {
 #  define BN(x) ((BIGINT*)PMC_struct_val(x))->b
 
 static void
-bigint_init(Interp *interp, PMC *self) {
+bigint_init(PARROT_INTERP, PMC *self) {
     PMC_struct_val(self) = malloc(sizeof (BIGINT));
     mpz_init(BN(self));
 }
 static void
-bigint_clear(Interp *interp, PMC *self) {
+bigint_clear(PARROT_INTERP, PMC *self) {
     mpz_clear(BN(self));
 }
 
 static void
-bigint_set(Interp *interp, PMC *dest, PMC *src) {
+bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
     mpz_set(BN(dest), BN(src));
 }
 
 static void
-bigint_set_long(Interp *interp, PMC *self, long value) {
+bigint_set_long(PARROT_INTERP, PMC *self, long value) {
     mpz_set_si(BN(self), value);
 }
 
 static void
-bigint_set_double(Interp *interp, PMC *self, double value) {
+bigint_set_double(PARROT_INTERP, PMC *self, double value) {
     mpz_set_d(BN(self), value);
 }
 
 static void
-bigint_set_str(Interp *interp, PMC *self, char* value, int base) {
+bigint_set_str(PARROT_INTERP, PMC *self, char* value, int base) {
     mpz_set_str(BN(self), value, base);
 }
 
 static BIGNUM*
-bigint_get_self(Interp *interp, PMC *self) {
+bigint_get_self(PARROT_INTERP, PMC *self) {
     return PMC_struct_val(self);
 }
 
 static void
-bigint_set_self(Interp *interp, PMC *self, BIGNUM *value) {
+bigint_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
     mpz_set(BN(self), (mpz_srcptr)value);
 }
 
 static long
-bigint_get_long(Interp *interp, PMC *self) {
+bigint_get_long(PARROT_INTERP, PMC *self) {
     if (mpz_fits_slong_p(BN(self)))
         return mpz_get_si(BN(self));
     real_exception(interp, NULL, 1, "bigint_get_long: number too big");
@@ -89,7 +89,7 @@ bigint_get_long(Interp *interp, PMC *self) {
 }
 
 static int
-bigint_get_bool(Interp *interp, PMC *self) {
+bigint_get_bool(PARROT_INTERP, PMC *self) {
     if (mpz_sgn(BN(self)) != 0) {
         return 1;
     }
@@ -98,25 +98,25 @@ bigint_get_bool(Interp *interp, PMC *self) {
     }
 }
 static char *
-bigint_get_string(Interp *interp, PMC *self, int base) {
+bigint_get_string(PARROT_INTERP, PMC *self, int base) {
     size_t n = mpz_sizeinbase(BN(self), base) + 2;
     char  *s  = (char *)mem_sys_allocate(n);
     return mpz_get_str(s, base, BN(self));
 }
 
 static double
-bigint_get_double(Interp *interp, PMC *self) {
+bigint_get_double(PARROT_INTERP, PMC *self) {
     return mpz_get_d(BN(self));
 }
 
 static void
-bigint_add_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_add_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     mpz_add(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_add_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_add_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     int n = value < 0;
@@ -127,13 +127,13 @@ bigint_add_bigint_int(Interp *interp, PMC* self, INTVAL value,
         mpz_add_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_sub_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_sub_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     mpz_sub(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_sub_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_sub_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     int n = value < 0;
@@ -143,27 +143,27 @@ bigint_sub_bigint_int(Interp *interp, PMC* self, INTVAL value,
         mpz_sub_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_mul_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_mul_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     mpz_mul(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_mul_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_mul_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     mpz_mul_si(BN(dest), BN(self), value);
 }
 
 static void
-bigint_pow_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_pow_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     mpz_pow_ui(BN(dest), BN(self), value);
 }
 
 static void
-int_check_divide_zero(Interp *interp, INTVAL value)
+int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
     if (value == 0) {
         real_exception(interp, NULL, E_ZeroDivisionError,
@@ -172,7 +172,7 @@ int_check_divide_zero(Interp *interp, INTVAL value)
 }
 
 static void
-bigint_check_divide_zero(Interp *interp, PMC *value)
+bigint_check_divide_zero(PARROT_INTERP, PMC *value)
 {
     /* Throw an exception if we are dividing by zero. */
     if (mpz_cmp_si(BN(value), 0) == 0) {
@@ -182,14 +182,14 @@ bigint_check_divide_zero(Interp *interp, PMC *value)
 }
 
 static void
-bigint_div_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_div_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     bigint_check_divide_zero(interp, value);
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
 }
 static void
-bigint_div_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_div_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
     int_check_divide_zero(interp, value);
@@ -203,13 +203,13 @@ bigint_div_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
         mpz_div_ui(BN(dest), BN(self), value);
 }
 static void
-bigint_fdiv_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_fdiv_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     bigint_check_divide_zero(interp, value);
     mpz_fdiv_q(BN(dest), BN(self), BN(value));
 }
 static void
-bigint_fdiv_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_fdiv_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
     int_check_divide_zero(interp, value);
@@ -223,14 +223,14 @@ bigint_fdiv_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
 }
 
 static void
-bigint_mod_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_mod_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     bigint_check_divide_zero(interp, value);
     mpz_mod(BN(dest), BN(self), BN(value));
 }
 
 static void
-bigint_mod_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_mod_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     int n;
     int_check_divide_zero(interp, value);
@@ -242,33 +242,33 @@ bigint_mod_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
         mpz_mod_ui(BN(dest), BN(self), value);
 }
 static INTVAL
-bigint_cmp(Interp *interp, PMC* self, PMC *value)
+bigint_cmp(PARROT_INTERP, PMC* self, PMC *value)
 {
     return mpz_cmp(BN(self), BN(value));
 }
 
 static INTVAL
-bigint_cmp_int(Interp *interp, PMC* self, INTVAL value)
+bigint_cmp_int(PARROT_INTERP, PMC* self, INTVAL value)
 {
     return mpz_cmp_si(BN(self), value);
 }
 
 static void
-bigint_abs(Interp *interp, PMC* self, PMC *dest)
+bigint_abs(PARROT_INTERP, PMC* self, PMC *dest)
 {
     VTABLE_morph(interp, dest, enum_class_BigInt);
     mpz_abs(BN(dest), BN(self));
 }
 
 static void
-bigint_neg(Interp *interp, PMC* self, PMC *dest)
+bigint_neg(PARROT_INTERP, PMC* self, PMC *dest)
 {
     VTABLE_morph(interp, dest, enum_class_BigInt);
     mpz_neg(BN(dest), BN(self));
 }
 
 static void
-bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
+bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC* self,
                               INTVAL value, PMC *dest)
 {
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
@@ -279,7 +279,7 @@ bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
         mpz_tdiv_q_2exp(BN(dest), BN(self), -value);
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
+bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC* self,
                               INTVAL value, PMC *dest)
 {
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
@@ -293,201 +293,199 @@ bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
 #else /* ifdef PARROT_HAS_GMP */
 
 static void
-bigint_init(Interp *interp, PMC *self) {
+bigint_init(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_clear(Interp *interp, PMC *self) {
+bigint_clear(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_long(Interp *interp, PMC *self, long value) {
+bigint_set_long(PARROT_INTERP, PMC *self, long value) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set(Interp *interp, PMC *dest, PMC *src) {
+bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_double(Interp *interp, PMC *self, double value) {
+bigint_set_double(PARROT_INTERP, PMC *self, double value) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_str(Interp *interp, PMC *self, char* value, int base) {
+bigint_set_str(PARROT_INTERP, PMC *self, char* value, int base) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_set_self(Interp *interp, PMC *self, BIGNUM *value) {
+bigint_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static BIGNUM*
-bigint_get_self(Interp *interp, PMC *self) {
+bigint_get_self(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return NULL;
 }
 
 static char *
-bigint_get_string(Interp *interp, PMC *self, int base) {
+bigint_get_string(PARROT_INTERP, PMC *self, int base) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return NULL;
 }
 
 static long
-bigint_get_long(Interp *interp, PMC *self) {
+bigint_get_long(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0L;
 }
 static long
-bigint_get_bool(Interp *interp, PMC *self) {
+bigint_get_bool(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0L;
 }
 static double
-bigint_get_double(Interp *interp, PMC *self) {
+bigint_get_double(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0.0;
 }
 static void
-bigint_add_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_add_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_add_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_add_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_sub_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_sub_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_sub_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_sub_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mul_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_mul_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mul_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_mul_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_pow_bigint_int(Interp *interp, PMC* self, INTVAL value,
+bigint_pow_bigint_int(PARROT_INTERP, PMC* self, INTVAL value,
         PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_div_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_div_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_div_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_div_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_fdiv_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_fdiv_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_fdiv_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_fdiv_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mod_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_mod_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_mod_bigint_int(Interp *interp, PMC* self, INTVAL value, PMC *dest)
+bigint_mod_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static INTVAL
-bigint_cmp(Interp *interp, PMC* self, PMC *value)
+bigint_cmp(PARROT_INTERP, PMC* self, PMC *value)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0;
 }
 static INTVAL
-bigint_cmp_int(Interp *interp, PMC* self, INTVAL value)
+bigint_cmp_int(PARROT_INTERP, PMC* self, INTVAL value)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
     return 0;
 }
 static void
-bigint_abs(Interp *interp, PMC* self, PMC *dest)
+bigint_abs(PARROT_INTERP, PMC* self, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_neg(Interp *interp, PMC* self, PMC *dest)
+bigint_neg(PARROT_INTERP, PMC* self, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_bitwise_shl_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shl_bigint_int(Interp *interp, PMC* self,
-                              INTVAL value, PMC *dest)
+bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 
 static void
-bigint_bitwise_shr_bigint(Interp *interp, PMC* self, PMC *value, PMC *dest)
+bigint_bitwise_shr_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
 }
 static void
-bigint_bitwise_shr_bigint_int(Interp *interp, PMC* self,
-                              INTVAL value, PMC *dest)
+bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC* self, INTVAL value, PMC *dest)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");

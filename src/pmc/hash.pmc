@@ -24,7 +24,7 @@ These are the vtable functions for the Hash PMC.
 
 /*
 
-=item C<static PMC * get_integer_pmc(Interp *interp, INTVAL base_type )>
+=item C<static PMC * get_integer_pmc(PARROT_INTERP, INTVAL base_type )>
 
 Lookup the PMC type which is used for storing native integers.
 
@@ -34,7 +34,7 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC* get_integer_pmc(Interp *interp, INTVAL base_type) {
+static PMC* get_integer_pmc(PARROT_INTERP, INTVAL base_type) {
 
     return pmc_new(interp,
                    Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
@@ -43,7 +43,7 @@ static PMC* get_integer_pmc(Interp *interp, INTVAL base_type) {
 
 /*
 
-=item C<static PMC * get_number_pmc(Interp *interp, INTVAL base_type )>
+=item C<static PMC * get_number_pmc(PARROT_INTERP, INTVAL base_type )>
 
 Lookup the PMC type which is used for floating point numbers.
 
@@ -53,7 +53,7 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC * get_number_pmc(Interp *interp, INTVAL base_type) {
+static PMC * get_number_pmc(PARROT_INTERP, INTVAL base_type) {
 
     return pmc_new(interp,
                    Parrot_get_ctx_HLL_type(interp, enum_class_Float));
@@ -61,7 +61,7 @@ static PMC * get_number_pmc(Interp *interp, INTVAL base_type) {
 
 /*
 
-=item C<static PMC * get_string_pmc(Interp *interp, INTVAL base_type )>
+=item C<static PMC * get_string_pmc(PARROT_INTERP, INTVAL base_type )>
 
 Lookup the PMC type which is used for storing strings.
 
@@ -71,7 +71,7 @@ TODO: PMCs extending Hash should probably register themselves.
 
 */
 
-static PMC * get_string_pmc(Interp *interp, INTVAL base_type) {
+static PMC * get_string_pmc(PARROT_INTERP, INTVAL base_type) {
 
     return pmc_new(interp,
                    Parrot_get_ctx_HLL_type(interp, enum_class_String));
@@ -80,7 +80,7 @@ static PMC * get_string_pmc(Interp *interp, INTVAL base_type) {
 
 /*
 
-=item C<static STRING* make_hash_key(Interp *interp, PMC *key)>
+=item C<static STRING* make_hash_key(PARROT_INTERP, PMC *key)>
 
 Returns a Parrot string for C<*key>.
 
@@ -88,13 +88,11 @@ Returns a Parrot string for C<*key>.
 
 */
 
-static STRING* make_hash_key(Interp *interp, PMC * key)
+static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC *key))
 {
-    if (key == NULL) {
+    if (key == NULL)
         real_exception(interp, NULL, E_KeyError,
                 "Hash: Cannot use NULL key");
-        return NULL;
-    }
     return key_string(interp, key);
 }
 

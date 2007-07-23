@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -22,10 +22,10 @@ These are the vtable functions for the scalar base PMC class
 
 /* XXX This should be declared in a .h file somewhere */
 extern PMC *
-Parrot_BigInt_bitwise_shl_int(Interp *interp, PMC* pmc, INTVAL value, PMC* dest);
+Parrot_BigInt_bitwise_shl_int(PARROT_INTERP, PMC* pmc, INTVAL value, PMC* dest);
 
 static PMC *
-bitwise_left_shift_internal(Interp *interp, PMC *self,
+bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
                             PMC *dest, INTVAL shift_amount)
 {
     /* This handles both left and right shifts; the sign of shift_amount

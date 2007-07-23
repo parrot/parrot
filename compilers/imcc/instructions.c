@@ -53,8 +53,8 @@ const char types[] = "INPS";
 Emitter emitters[2] = {
     {e_file_open,
      e_file_emit,
-     (int (*)(Interp *, void *, IMC_Unit *))NULLfunc,
-     (int (*)(Interp *, void *, IMC_Unit *))NULLfunc,
+     NULL,
+     NULL,
      e_file_close},
 
     {e_pbc_open,

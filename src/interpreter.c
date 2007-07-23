@@ -727,8 +727,7 @@ void
 runops_int(PARROT_INTERP, size_t offset)
 {
     int lo_var_ptr;
-    opcode_t *(*core) (Interp *, opcode_t *) =
-        (opcode_t *(*) (Interp *, opcode_t *)) 0;
+    opcode_t *(*core) (PARROT_INTERP, opcode_t *) = NULL;
 
     if (!interp->lo_var_ptr) {
         /*

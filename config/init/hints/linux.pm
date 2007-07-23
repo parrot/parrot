@@ -8,17 +8,21 @@ use warnings;
 
 use Config;
 
+sub option_or_data {
+    my $conf = shift;
+    my $arg = shift;
+
+    my $opt = $conf->options->get( $arg );
+    return $opt ? $opt : $conf->data->get( $arg );
+}
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs      = $conf->options->get('libs') ?
-        $conf->options->get('libs') : $conf->data->get('libs');
-    my $cflags    = $conf->options->get('ccflags') ?
-        $conf->options->get('ccflags') : $conf->data->get('ccflags');
-    my $cc        = $conf->options->get('cc') ?
-        $conf->options->get('cc') : $conf->data->get('cc');
-    my $linkflags = $conf->options->get('linkflags') ?
-        $conf->options->get('linkflags') : $conf->data->get('linkflags');
+    my $libs        = option_or_data('libs');
+    my $cflags      = option_or_data('cflags');
+    my $cc          = option_or_data('cc');
+    my $linkflags   = option_or_data('linkflags');
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
@@ -31,7 +35,7 @@ sub runstep {
 
     if ( $cc =~ /icc/ ) {
         # Intel C++ compiler has the same name as its C compiler
-        $link = 'icc';
+        $link = $cc;
 
         # don't allow icc to pretend it's gcc
         $cflags .= ' -no-gcc';

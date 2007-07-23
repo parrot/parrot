@@ -127,7 +127,7 @@ void mark_register_stack( PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk) )
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 struct Parrot_Context * Parrot_alloc_context( PARROT_INTERP,
-    NOTNULL(INTVAL *n_regs_used) )
+    NOTNULL(INTVAL *number_regs_used) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

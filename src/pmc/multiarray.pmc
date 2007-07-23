@@ -37,7 +37,7 @@ array creation.
 
 /*
 
-=item C<static INTVAL calc_offset(Interp *interp, List *list, PMC *key)>
+=item C<static INTVAL calc_offset(PARROT_INTERP, List *list, PMC *key)>
 
 Calculates the offset for C<*key>.
 
@@ -45,7 +45,7 @@ Calculates the offset for C<*key>.
 
 */
 
-static INTVAL calc_offset(Interp *interp, List*list, PMC *key)
+static INTVAL calc_offset(PARROT_INTERP, List*list, PMC *key)
 {
     INTVAL l;
     INTVAL ninj;

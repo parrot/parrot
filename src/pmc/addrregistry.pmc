@@ -30,16 +30,14 @@ e.g. with C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "pmc_hash.h"
 
 static size_t
-key_hash_int(Interp *interp, void *value, size_t seed)
+key_hash_int(SHIM_INTERP, void *value, size_t seed)
 {
-    UNUSED(interp);
     return (size_t)value ^ seed;
 }
 
 static int
-int_compare(Interp *interp, const void * const a, const void * const b)
+int_compare(SHIM_INTERP, const void * const a, const void * const b)
 {
-    UNUSED(interp);
     return a != b;
 }
 

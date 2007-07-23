@@ -38,7 +38,7 @@ static PMC* undef(Interp* interp)
 
 /*
 
-=item C<static PMC* retval(Interp *interp, void *ret)>
+=item C<static PMC* retval(PARROT_INTERP, void *ret)>
 
 Processes C<*ret>, returning the appropriate PMC, or raising an
 exception if necessary.
@@ -47,7 +47,7 @@ exception if necessary.
 
 */
 
-static PMC* retval(Interp *interp, void *ret)
+static PMC* retval(PARROT_INTERP, void *ret)
 {
     PMC *value;
     if (ret == 0)
@@ -68,7 +68,7 @@ static PMC* retval(Interp *interp, void *ret)
 /*
 
 =item C<static PMC*
-Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
+Parrot_Array_set_pmc_ptr(PARROT_INTERP, List *list, INTVAL key)>
 
 Returns a pointer to the element at index C<key> of C<*list>. If
 this element was previously empty, then this function also creates
@@ -79,7 +79,7 @@ and assigns an "undef" PMC to that element.
 */
 
 static PMC*
-Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
+Parrot_Array_set_pmc_ptr(PARROT_INTERP, List *list, INTVAL key)
 {
     void * const ret = list_get(interp, list, key, enum_type_PMC);
     PMC *value;

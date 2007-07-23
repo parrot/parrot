@@ -27,14 +27,13 @@ bounds access will very likely segfault.
 #include <assert.h>
 
 
-static INTVAL key_2_idx(Interp *interp, PMC *pmc, PMC *key);
-static size_t calc_offsets(Interp *interp, PMC*,
-    PMC *init, size_t toff);
+static INTVAL key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key);
+static size_t calc_offsets(PARROT_INTERP, PMC*, PMC *init, size_t toff);
 
 /*
 
 =item C<static char *
-char_offset_int(Interp *interp, PMC *pmc, INTVAL ix, int *type)>
+char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)>
 
 Returns the pointer for the element at index C<ix>, and sets the element
 type in C<*type>.
@@ -44,7 +43,7 @@ type in C<*type>.
 */
 
 static char *
-char_offset_int(Interp *interp, PMC *pmc, INTVAL ix, int *type)
+char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
 {
     size_t offs, n;
     ix *= 3;
@@ -68,7 +67,7 @@ char_offset_int(Interp *interp, PMC *pmc, INTVAL ix, int *type)
 /*
 
 =item C<static INTVAL
-key_2_idx(Interp *interp, PMC *pmc, PMC *key)>
+key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)>
 
 Returns the index for the element associated with key C<*key>. Raises an
 exception if the key doesn't exist.
@@ -78,7 +77,7 @@ exception if the key doesn't exist.
 */
 
 static INTVAL
-key_2_idx(Interp *interp, PMC *pmc, PMC *key)
+key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
 {
     int ix;
     ix = 0;
@@ -110,7 +109,7 @@ key_2_idx(Interp *interp, PMC *pmc, PMC *key)
 /*
 
 =item C<static char *
-char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)>
+char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)>
 
 Returns the pointer for the element associated with key C<*key>, and
 sets the element type in C<*type>.
@@ -120,7 +119,7 @@ sets the element type in C<*type>.
 */
 
 static char *
-char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)
+char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
 {
     size_t offs, count, size, max;
     PMC *next, *init;
@@ -204,7 +203,7 @@ char_offset_key(Interp *interp, PMC *pmc, PMC *key, int *type)
 /*
 
 =item C<static INTVAL
-ret_int(Interp *interp, const char *p, int type)>
+ret_int(PARROT_INTERP, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as an C<INTVAL>.
 
@@ -216,11 +215,11 @@ we need some more configure support for type sizes.
 */
 
 static INTVAL
-ret_int(Interp *interp, const char *p, int type)
+ret_int(PARROT_INTERP, const char *p, int type)
     __attribute__nonnull__(1);
 
 static INTVAL
-ret_int(Interp *interp, const char *p, int type)
+ret_int(PARROT_INTERP, const char *p, int type)
 {
     switch (type) {
         case enum_type_INTVAL:
@@ -267,7 +266,7 @@ ret_int(Interp *interp, const char *p, int type)
 /*
 
 =item C<static FLOATVAL
-ret_float(Interp *interp, const char *p, int type)>
+ret_float(PARROT_INTERP, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 
@@ -276,11 +275,11 @@ Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 */
 
 static FLOATVAL
-ret_float(Interp *interp, const char *p, int type)
+ret_float(PARROT_INTERP, const char *p, int type)
     __attribute__nonnull__(1);
 
 static FLOATVAL
-ret_float(Interp *interp, const char *p, int type)
+ret_float(PARROT_INTERP, const char *p, int type)
 {
     switch (type) {
         case enum_type_FLOATVAL:
@@ -298,7 +297,7 @@ ret_float(Interp *interp, const char *p, int type)
 /*
 
 =item C<static STRING*
-ret_string(Interp *interp, char *p, int type)>
+ret_string(PARROT_INTERP, char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a Parrot string.
 
@@ -307,7 +306,7 @@ Returns the element of type C<type> starting at C<*p> as a Parrot string.
 */
 
 static STRING*
-ret_string(Interp *interp, char *p, int type)
+ret_string(PARROT_INTERP, char *p, int type)
 {
     char *cstr;
     size_t len;
@@ -328,7 +327,7 @@ ret_string(Interp *interp, char *p, int type)
 /*
 
 =item C<static PMC*
-ret_pmc(Interp *interp, PMC* pmc, char *p, int type, INTVAL idx)>
+ret_pmc(PARROT_INTERP, PMC* pmc, char *p, int type, INTVAL idx)>
 
 Returns the element of type C<type> starting at C<*p> as a PMC.
 
@@ -337,7 +336,7 @@ Returns the element of type C<type> starting at C<*p> as a PMC.
 */
 
 static PMC*
-ret_pmc(Interp *interp, PMC* pmc, char *p, int type, INTVAL idx)
+ret_pmc(PARROT_INTERP, PMC* pmc, char *p, int type, INTVAL idx)
 {
     PMC *ret = NULL, *init, *ptr;
 
@@ -392,14 +391,14 @@ ret_pmc(Interp *interp, PMC* pmc, char *p, int type, INTVAL idx)
 /*
 
 =item C<static void
-set_int(Interp *interp, char *p, int type, INTVAL value)>
+set_int(PARROT_INTERP, char *p, int type, INTVAL value)>
 
 =cut
 
 */
 
 static void
-set_int(Interp *interp, char *p, int type, INTVAL value)
+set_int(PARROT_INTERP, char *p, int type, INTVAL value)
 {
     switch (type) {
         case enum_type_uint8:
@@ -428,7 +427,7 @@ set_int(Interp *interp, char *p, int type, INTVAL value)
 /*
 
 =item C<static void
-set_float(Interp *interp, char *p, int type, FLOATVAL value)>
+set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<value>.
@@ -438,7 +437,7 @@ C<value>.
 */
 
 static void
-set_float(Interp *interp, char *p, int type, FLOATVAL value)
+set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)
 {
     switch (type) {
         case enum_type_FLOATVAL:
@@ -459,7 +458,7 @@ set_float(Interp *interp, char *p, int type, FLOATVAL value)
 /*
 
 =item C<static void
-set_string(Interp *interp, char *p, int type, STRING *value)>
+set_string(PARROT_INTERP, char *p, int type, STRING *value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<*value>.
@@ -469,7 +468,7 @@ C<*value>.
 */
 
 static void
-set_string(Interp *interp, char *p, int type, STRING* value)
+set_string(PARROT_INTERP, char *p, int type, STRING* value)
 {
     char *cstr;
     switch (type) {
@@ -489,7 +488,7 @@ set_string(Interp *interp, char *p, int type, STRING* value)
 /*
 
 =item C<static int
-calc_align(Interp *interp, PMC *pmc, PMC *type_pmc,
+calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
         int type, int offs)>
 
 Alignment of contained structures is the alignment of the
@@ -504,7 +503,7 @@ This is recursive as structure definitions.
 */
 
 static int
-calc_align(Interp *interp, PMC* pmc, PMC* type_pmc,
+calc_align(PARROT_INTERP, PMC* pmc, PMC* type_pmc,
         int type, int offs)
 {
     int align = data_types[type - enum_first_type].size;
@@ -555,7 +554,7 @@ calc_align(Interp *interp, PMC* pmc, PMC* type_pmc,
 /*
 
 =item C<static size_t
-calc_offsets(Interp *interp, PMC *pmc, PMC *value, size_t toff)>
+calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)>
 
 Calculates the offsets for the C<struct>. See C<init_pmc()> for a
 description of C<*value>.
@@ -565,7 +564,7 @@ description of C<*value>.
 */
 
 static size_t
-calc_offsets(Interp *interp, PMC* pmc, PMC *value, size_t toff)
+calc_offsets(PARROT_INTERP, PMC* pmc, PMC *value, size_t toff)
 {
     size_t i, n = (size_t)VTABLE_elements(interp, value);
     int size;

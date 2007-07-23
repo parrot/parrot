@@ -24,7 +24,8 @@ Implements an instance of a class.
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
 static INTVAL
-get_attrib_index(Parrot_Interp interp, PMC *self, STRING *name) {
+get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
+{
     Parrot_Class * const _class = PARROT_CLASS(self);
     int                  num_classes, i;
 

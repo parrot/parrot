@@ -50,7 +50,7 @@ structures.
  *
  */
 static void
-set_slice_start(Interp *interp, PMC *self, PMC *key, PMC *agg)
+set_slice_start(PARROT_INTERP, PMC *self, PMC *key, PMC *agg)
 {
     parrot_range_t *range = mem_allocate_typed(parrot_range_t);
 
@@ -158,9 +158,9 @@ range_end:
  * next range PMC in Key chain
  */
 static void
-set_slice_next(Interp *interp, PMC *self, PMC *agg)
+set_slice_next(PARROT_INTERP, PMC *self, PMC *agg)
 {
-    parrot_range_t *r = (parrot_range_t *)PMC_struct_val(self);
+    parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(self);
 
     if (!r || (INTVAL) r == -1)
         real_exception(interp, NULL, E_StopIteration, "StopIteration");
@@ -186,8 +186,8 @@ next_range:
         }
     }
     else {
-        STRING *cur = RVal_str(r->cur);
-        STRING *end = RVal_str(r->end);
+        STRING * const cur = RVal_str(r->cur);
+        STRING * const end = RVal_str(r->end);
 
         if (string_compare(interp, cur, end) < 0)
             RVal_str(r->cur) = string_increment(interp, cur);

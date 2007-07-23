@@ -30,7 +30,7 @@ generated from F<vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 /*
 
-=item C<static const char *caller(Interp *interp, PMC *pmc)>
+=item C<static const char *caller(PARROT_INTERP, PMC *pmc)>
 
 Returns a C string for the name of C<*pmc>.
 
@@ -39,7 +39,7 @@ Returns a C string for the name of C<*pmc>.
 */
 
 static const char *
-caller(Interp *interp, PMC *pmc /*NULLOK*/)
+caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
     VTABLE_name(interp, pmc)->strstart : "(null)";
@@ -47,7 +47,7 @@ caller(Interp *interp, PMC *pmc /*NULLOK*/)
 
 /*
 
-=item C<static void cant_do_method(Interp *interp, PMC * pmc,
+=item C<static void cant_do_method(PARROT_INTERP, PMC * pmc,
                                    const char *methname)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by
@@ -58,7 +58,7 @@ all unimplemented messages.
 */
 
 static void
-cant_do_method(Interp *interp, PMC *pmc /*NULLOK*/, const char *methname)
+cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
 {
     real_exception(interp, NULL, ILL_INHERIT,
                        "%s() not implemented in class '%s'", methname,
@@ -68,7 +68,7 @@ cant_do_method(Interp *interp, PMC *pmc /*NULLOK*/, const char *methname)
 /*
 
 =item C<static INTVAL
-check_set_std_props(Interp *interp, PMC *pmc, STRING *key, PMC *value)>
+check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)>
 
 Called from C<setprop()>.
 
@@ -81,7 +81,7 @@ in a future call to C<propagate_std_props()>
 */
 
 static INTVAL
-check_set_std_props(Interp *interp, PMC *pmc, STRING *key, PMC *value)
+check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
 {
     /* the quick hack below cannot be used because the string could
        be constructed in an interpreter that is later destroyed */
@@ -127,7 +127,7 @@ check_set_std_props(Interp *interp, PMC *pmc, STRING *key, PMC *value)
 /*
 
 =item C<static void
-propagate_std_props(Interp *interp, PMC *self, PMC *prop_hash)>
+propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash)>
 
 Set pending standard properties in C<prop_hash>.
 
@@ -136,7 +136,7 @@ Set pending standard properties in C<prop_hash>.
 */
 
 static void
-propagate_std_props(Interp *interp, PMC *self, PMC *prop_hash) {
+propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC * const pmc_true = pmc_new(interp, enum_class_Integer);
         PMC_int_val(pmc_true) = 1;
@@ -168,7 +168,7 @@ has_pending_std_props(PMC *self) {
 /*
 
 =item C<static PMC*
-check_get_std_props(Interp *interpeter, PMC *self, STRING *key)>
+check_get_std_props(PARROT_INTERPeter, PMC *self, STRING *key)>
 
 Checks if we can infer the value of C<key> property from C<self> without
 looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
@@ -177,7 +177,7 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 */
 
 static PMC*
-check_get_std_props(Interp *interp, PMC *self, STRING *key) {
+check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         &&!string_compare(interp, key,
                           string_from_cstring(interp, "_ro", 3))) {
@@ -192,7 +192,7 @@ check_get_std_props(Interp *interp, PMC *self, STRING *key) {
 /*
 
 =item C<static PMC *
-make_prop_hash(Interp *interp, PMC *self)>
+make_prop_hash(PARROT_INTERP, PMC *self)>
 
 Create a property hash for C<self>. Returns the created hash. Inferred
 properties will be added to the hash and it will be set as
@@ -203,7 +203,7 @@ C<PMC_metadata(self)>.
 */
 
 static PMC*
-make_prop_hash(Interp *interp, PMC *self) {
+make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC *prop;
 
     if (!self->pmc_ext)

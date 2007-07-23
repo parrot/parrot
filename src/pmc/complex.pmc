@@ -197,7 +197,7 @@ complex_locate_keyed_num(Interp* interp, PMC* self, STRING *key) {
 }
 
 static void
-int_check_divide_zero(Interp *interp, INTVAL value)
+int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
     if (value == 0) {
         real_exception(interp, NULL, E_ZeroDivisionError,
@@ -206,7 +206,7 @@ int_check_divide_zero(Interp *interp, INTVAL value)
 }
 
 static void
-float_check_divide_zero(Interp *interp, FLOATVAL value)
+float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 {
     if (value == 0.0) {
         real_exception(interp, NULL, E_ZeroDivisionError,
@@ -215,7 +215,7 @@ float_check_divide_zero(Interp *interp, FLOATVAL value)
 }
 
 static void
-complex_check_divide_zero(Interp *interp, PMC *value)
+complex_check_divide_zero(PARROT_INTERP, PMC *value)
 {
     /* Throw an exception if we are dividing by zero. */
     if (RE(value) == 0.0 && IM(value) == 0.0) {

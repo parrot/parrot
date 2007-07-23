@@ -24,7 +24,7 @@ exception object's C<_P5> attribute.
 #include "parrot/oplib/ops.h"
 
 static opcode_t *
-pass_exception_args(Interp *interp, const char *sig,
+pass_exception_args(PARROT_INTERP, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctx, ...)
 {
     va_list ap;

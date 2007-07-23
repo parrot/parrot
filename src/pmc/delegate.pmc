@@ -34,7 +34,7 @@ let flow through.
 */
 
 static void
-vtable_meth_not_found(Interp *interp, PMC *pmc, const char *meth)
+vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
 {
     char *_class;
 
@@ -75,22 +75,22 @@ useful defaults and don't throw exceptions.
 */
 
     void init() {
-        STRING *meth = CONST_STRING(interp, "init");
-        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        STRING* const meth = CONST_STRING(interp, "init");
+        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (!PMC_IS_NULL(sub))
             Parrot_run_meth_fromc(interp, sub, SELF, meth);
     }
 
     void init_pmc(PMC* initializer) {
-        STRING *meth = CONST_STRING(interp, "init_pmc");
-        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        STRING* const meth = CONST_STRING(interp, "init_pmc");
+        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (!PMC_IS_NULL(sub))
             Parrot_run_meth_fromc_args(interp, sub, pmc, meth, "vP", initializer);
     }
 
     PMC* instantiate(PMC* sig) {
-        STRING *meth = CONST_STRING(interp, "instantiate");
-        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        STRING* const meth = CONST_STRING(interp, "instantiate");
+        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (PMC_IS_NULL(sub))
             return SUPER(sig);
         return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
@@ -138,8 +138,8 @@ Invokes a subroutine.
 */
 
     opcode_t* invoke(void *next) {
-        STRING *meth = CONST_STRING(interp, "invoke");
-        PMC *sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        STRING* const meth = CONST_STRING(interp, "invoke");
+        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (PMC_IS_NULL(sub))
             vtable_meth_not_found(INTERP, SELF, "invoke");
         INTERP->current_object = SELF;

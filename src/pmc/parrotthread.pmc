@@ -59,7 +59,7 @@ stop_GC(Interp* parent, Interp *thread)
    coke's]
  */
 
-static INTVAL do_thread_run(Interp *interp, PMC *thread,
+static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid;
 
@@ -76,7 +76,7 @@ static INTVAL do_thread_run(Interp *interp, PMC *thread,
     return tid;
 }
 
-static INTVAL do_thread_run_clone_default(Interp *interp,
+static INTVAL do_thread_run_clone_default(PARROT_INTERP,
                                           PMC *thread, PMC *sub, PMC *args) {
     return do_thread_run(interp, thread, PARROT_CLONE_DEFAULT, sub, args);
 }
@@ -101,7 +101,7 @@ Equivalent to calling run with PARROT_CLONE_DEFAULT.
 */
 
     void class_init() {
-        int typ = enum_class_ParrotThread;
+        const int typ = enum_class_ParrotThread;
 
         if (pass) {
             register_nci_method(INTERP, typ,
