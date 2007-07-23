@@ -38,9 +38,9 @@ typedef struct _hash_entry {
 typedef UINTVAL BucketIndex;
 #define INITBucketIndex ((BucketIndex)-2)
 
-typedef int    (*hash_comp_fn)(Parrot_Interp, const void*const, const void*const);
-typedef void   (*hash_mark_key_fn)(Parrot_Interp, PObj *);
-typedef size_t (*hash_hash_key_fn)(Parrot_Interp, NOTNULL(void*), size_t seed);
+typedef int    (*hash_comp_fn)(PARROT_INTERP, const void*const, const void*const);
+typedef void   (*hash_mark_key_fn)(PARROT_INTERP, PObj *);
+typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, NOTNULL(void*), size_t seed);
 
 typedef enum {
     Hash_key_type_int,

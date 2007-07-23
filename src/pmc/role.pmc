@@ -62,9 +62,9 @@ typedef struct Parrot_Role {
 
 
 /* Takes a hash and initializes the role based on it. */
-static void init_role_from_hash(Parrot_Interp interp, PMC *self, PMC *info)
+static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 {
-    Parrot_Role *role = PARROT_ROLE(self);
+    Parrot_Role * const role = PARROT_ROLE(self);
     int have_name, have_ns;
     PMC *old_ns;
     int i;

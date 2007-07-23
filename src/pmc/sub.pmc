@@ -24,7 +24,7 @@ These are the vtable functions for the Sub (subroutine) base class
 #include <assert.h>
 
 static void
-print_sub_name(Interp* interp, PMC* sub)
+print_sub_name(PARROT_INTERP, PMC* sub)
 {
     Interp * const tracer =
         interp->debugger ? interp->debugger : interp;

@@ -507,9 +507,9 @@ sub _iterate_over_ops {
     $prev_src = '';
     foreach my $op ( $self->{ops}->ops ) {
         my $func_name = $op->func_name( $self->{trans} );
-        my $arg_types = "$self->{opsarraytype} *, Interp *";
+        my $arg_types = "$self->{opsarraytype} *, PARROT_INTERP";
         my $prototype = "$self->{sym_export} $self->{opsarraytype} * $func_name ($arg_types)";
-        my $args      = "$self->{opsarraytype} *cur_opcode, Interp *interp";
+        my $args      = "$self->{opsarraytype} *cur_opcode, PARROT_INTERP";
         my $definition;
         my $comment = '';
         my $one_op  = "";

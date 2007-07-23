@@ -131,14 +131,14 @@ END_C
     }
 }
 
-static void register_pmc(Interp *interp, PMC* registry, int pmc_id)
+static void register_pmc(PARROT_INTERP, PMC* registry, int pmc_id)
 {
     STRING* const key = interp->vtables[pmc_id]->whoami;
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
 void
-Parrot_register_core_pmcs(Interp *interp, PMC* registry)
+Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry)
 {
 END_C
 
