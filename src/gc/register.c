@@ -376,27 +376,26 @@ Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
     Parrot_Context *old, *ctx;
     void *ptr, *p;
 
-    /* this gets attached to the context, which should free it */
-
-    INTVAL *n_regs_used    = mem_sys_allocate(sizeof (INTVAL) * 4);
-    n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
-    n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
-    n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
-    n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
-
     /*
      * TODO (OPT) if we allocate a new context due to a self-recursive call
      *      create a specialized version that just uses caller's size
      */
-    const size_t size_i = sizeof (INTVAL)   * n_regs_used[REGNO_INT];
-    const size_t size_n = sizeof (FLOATVAL) * n_regs_used[REGNO_NUM];
-    const size_t size_s = sizeof (STRING*)  * n_regs_used[REGNO_STR];
-    const size_t size_p = sizeof (PMC*)     * n_regs_used[REGNO_PMC];
+    const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
+    const size_t size_n = sizeof (FLOATVAL) * number_regs_used[REGNO_NUM];
+    const size_t size_s = sizeof (STRING*)  * number_regs_used[REGNO_STR];
+    const size_t size_p = sizeof (PMC*)     * number_regs_used[REGNO_PMC];
 
     const size_t size_nip      = size_n + size_i + size_p;
     const size_t all_regs_size = size_n + size_i + size_p + size_s;
     const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
     const int    slot          = CALCULATE_SLOT_NUM(reg_alloc);
+
+    /* this gets attached to the context, which should free it */
+    INTVAL *n_regs_used    = mem_sys_allocate(sizeof (INTVAL) * 4);
+    n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
+    n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
+    n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
+    n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
 
     /*
      * If slot is beyond the end of the allocated list, extend the list to
