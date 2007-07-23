@@ -590,7 +590,7 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         Buffer *b = (Buffer *)cur_arena->start_objects;
 
-        for (i = 0; i < cur_arena->used; i++) {
+        for (i = 0; i < cur_arena->total_objects; i++) {
             if (PObj_on_free_list_TEST(b))
                 ; /* if it's on free list, do nothing */
             else if (PObj_live_TEST(b)) {

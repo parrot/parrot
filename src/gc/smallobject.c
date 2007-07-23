@@ -204,7 +204,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
     UINTVAL  i;
     void    *object;
 
-    pool->total_objects += end - start;
+    pool->total_objects += (end - start) / pool->object_size;
     arena->used          = end;
 
     /* Move all the new objects into the free list */
@@ -221,7 +221,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
         object = (void *)((char *)object + pool->object_size);
     }
 
-    pool->num_free_objects += end - start;
+    pool->num_free_objects += (end - start) / pool->object_size;
 }
 
 /*
