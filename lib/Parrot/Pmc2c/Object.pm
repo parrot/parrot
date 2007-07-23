@@ -78,6 +78,9 @@ sub body {
     if ($method->{type} eq 'void') {
         $null_return = '';
     }
+    elsif ($method->{type} eq 'void*') {
+        $null_return = 'return NULL;';
+    }
     elsif ($method->{type} =~ /PMC|INTVAL|STRING|opcode_t/) {
         $null_return = "return ($method->{type})NULL;";
     }
@@ -90,7 +93,7 @@ sub body {
     }
 
     my $l = $self->line_directive( $line + 1, "\L$self->{class}.c" );
-    return <<EOC;
+    my $generated = <<EOC;
 $l
 $decl {
     Parrot_Object * const obj = PARROT_OBJECT(pmc);
@@ -108,6 +111,12 @@ $decl {
         /* If it's from this universe or the class doesn't inherit from
          * anything outside of it... */
         if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
+EOC
+
+    # We shouldn't allow overrides of get_pointer and friends,
+    # since it's unsafe.
+    if ($meth !~ /get_pointer/) {
+        $generated .= <<EOC;
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
             if (VTABLE_exists_keyed_str(interp, class_info->vtable_methods, string_from_literal(interp, "$meth"))) {
                 /* Found it; call. */
@@ -116,6 +125,10 @@ $decl {
                 ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, string_from_literal(interp, "$meth"), "$sig"$arg);
                 $void_return
             }
+EOC
+    }
+
+    $generated .= <<EOC;
         }
         else {
             /* Get the PMC instance and call the vtable method on that. */
@@ -127,6 +140,8 @@ $decl {
     $null_return
 }
 EOC
+    
+    return $generated;
 }
 
 
