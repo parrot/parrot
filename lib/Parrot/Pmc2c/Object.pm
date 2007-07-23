@@ -140,7 +140,7 @@ EOC
     $null_return
 }
 EOC
-    
+
     return $generated;
 }
 
