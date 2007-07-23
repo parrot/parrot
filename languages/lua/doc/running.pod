@@ -38,9 +38,6 @@ or in interactive mode :
 Lua PMC have problems with the Parrot garbage collector. So, use the option
 C<--no-gc>.
 
-Currently, the command line options accepted by C<lua.pbc> come from
-C<HLLCompiler> and are not compatible with the original C<lua> ones.
-
 =head1 SEE ALSO
 
 F<languages/lua/doc/status.pod>

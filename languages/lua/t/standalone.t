@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 18;
 use Test::More;
 
 delete $ENV{LUA_INIT};
@@ -46,7 +46,7 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 10) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
+skip('only with an interpreter', 13) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
 
 $ENV{LUA_INIT} = 'print "init"';
 language_output_is( 'lua', <<'CODE', <<'OUT', 'LUA_INIT string' );
@@ -122,6 +122,13 @@ CODE
 Hello World
 OUT
 
+$ENV{TEST_PROG_ARGS} = '-e "?syntax error?"';
+language_output_like( 'lua', <<'CODE', <<'OUT', '-e bad' );
+print "hello"
+CODE
+/^lua[^:]*: /
+OUT
+
 $ENV{TEST_PROG_ARGS} = '-v';
 language_output_like( 'lua', undef, <<'OUT', '-v' );
 /^Lua 5.1/
@@ -134,11 +141,23 @@ CODE
 /^Lua 5.1.*\n-v$/
 OUT
 
+$ENV{TEST_PROG_ARGS} = '--';
+language_output_is( 'lua', <<'CODE', <<'OUT', '--', params => "-v" );
+print(arg[1])
+CODE
+-v
+OUT
+
+$ENV{TEST_PROG_ARGS} = '-u';
+language_output_like( 'lua', undef, <<'OUT', 'unknown option' );
+/^usage: lua/
+OUT
+
 }
 
 SKIP:
 {
-skip('only with Parrot', 2) unless (($ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc') eq 'lua.pbc');
+skip('only with Parrot', 3) unless (($ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc') eq 'lua.pbc');
 
 $ENV{TEST_PROG_ARGS} = '-lalarm';
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', '-lalarm' );
@@ -152,6 +171,13 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', '-l alarm' );
 print(type(alarm))
 CODE
 function
+OUTPUT
+
+$ENV{TEST_PROG_ARGS} = '-l no_lib';
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', '-l no_lib' );
+print "hello"
+CODE
+/^lua.pbc: module 'no_lib' not found:\n/
 OUTPUT
 
 }

@@ -55,6 +55,8 @@ F<runtime/parrot/library/Parrot/HLLCompiler.pir>.
 
 The lexicography part could be checked with F<languages/lua/test_lex.pir>.
 
+The code generation could be examined with F<languages/lua/luap.pir>.
+
 =head2 KNOWN PROBLEMS
 
 in F<languages/lua/t/closure.t> :

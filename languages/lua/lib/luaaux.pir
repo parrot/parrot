@@ -595,7 +595,7 @@ Support variable number of arguments function call.
     .param pmc env
     $S0 = '> '
     .const .LuaString k__PROMPT = '_PROMPT'
-    $P0 = env[k__PROMPT]
+    $P0 = env.'rawget'(k__PROMPT)
     $I0 = isa $P0, 'LuaNil'
     if $I0 goto L1
     $S0 = $P0
