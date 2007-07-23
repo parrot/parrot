@@ -26,6 +26,9 @@ use 5;
 my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
 my $PERL5  = $PConfig{perl};
 
+my $ended_ok = 0;
+
+delete_temp_files();
 ##############################
 open my $FOO, ">", "temp.pasm" or die "Can't write temp.pasm\n";
 print $FOO <<'ENDF';
@@ -154,7 +157,7 @@ close $FOO;
 
 # compile it
 
-system("$PARROT -o temp.pbc temp.pir");
+system_or_die("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is( <<'CODE', <<'OUT', "call sub in external pbc" );
 .pcc_sub _sub1
@@ -188,7 +191,7 @@ close $FOO;
 
 # compile it
 
-system("$PARROT -o temp.pbc temp.pir");
+system_or_die("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is( <<'CODE', <<'OUT', "call sub in external pbc, return" );
 .pcc_sub _sub1
@@ -330,7 +333,7 @@ close $FOO;
 
 # compile it
 
-system("$PARROT -o temp.pbc temp.pir");
+system_or_die("$PARROT -o temp.pbc temp.pir");
 
 use Test::More;
 is( `$PARROT temp.pbc`, <<OUT, "call internal sub like external, precompiled" );
@@ -358,7 +361,7 @@ END_PIR
         my $OLDERR;
         open $OLDERR, ">&", "STDERR"   or die "Can't save STDERR\n";
         open STDERR, ">",  "temp.out" or die "Can't write temp.out\n";
-        system "$PARROT temp.pir";
+        system_or_die( "$PARROT temp.pir" );
         open $FOO, "<", "temp.out" or die "Can't read temp.out\n";
         { local $/; $err_msg = <$FOO>; }
         close $FOO;
@@ -482,11 +485,27 @@ without_slash() called!
 OUT
 }
 
-END {
-    unlink $file;
+$ended_ok = 1;
+
+sub system_or_die {
+    my @args = @_;
+
+    my $rc = system( @args );
+    if ( $rc != 0 ) {
+        die "Couldn't run: @args\n";
+    }
+    print "# Ran @args\n";
+}
+
+sub delete_temp_files {
+    unlink $file if $file;
     unlink "temp.pir";
     unlink "temp.pbc";
     unlink @temp_files;
+}
+
+END {
+    delete_temp_files() if $ended_ok;
 }
 
 # Local Variables:
