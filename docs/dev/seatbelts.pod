@@ -19,6 +19,9 @@ equivalent semantics for lint added to them. This will make lint a far
 more powerful tool. If/when we ever get splint going, too, we can add
 semantics there as well.
 
+Also, where it says "compiler", it could also mean "lint or any
+other static analysis tool like splint."
+
 =head1 What's a shim?
 
 Think of "shim" as shorthand for "placeholder". It's 64% shorter.
@@ -36,47 +39,68 @@ accept Foo. In this case, we can in the body of the func, C<UNUSED(Foo)>,
 if we plan to use it in the future. Or, if we never will use it, mark
 it as a C<SHIM(Foo)> in the declaration.
 
-=head1 Decorators
+=head1 Function Decorators
 
-=head2 Function decorators
+=head2 PARROT_WARN_UNUSED_RESULT
 
-XXX CLEAN THIS UP
+Tells the compiler to warn if the function is called, but the result is ignored.
 
-* `/* WARN_UNUSED */`
-** Use this to flag functions where it is definitely an error to call it without checking its return value.
-** Headerizes to `__attribute__warn_unused_result__`
-* `/* MALLOC */`
-** Denotes functions that return a new piece of memory, such that losing the return value would cause a memory leak.
-** Headerizes to `__attribute__malloc__`
-* `/* CONST */`
-** For functions that operate only on their operands, do not use global memory, and have no side effects. The compiler can optimize away repeated calls to CONST functions. mod() is a good example. rand() is an anti-example. Note that this sense of const is unrelated to the const qualifier on variables.
-** Headerizes to `__attribute__malloc__`
-* `/* PURE */`
-** Less stringent than CONST. Can check global memory or dereference pointers. strlen() is a good example.
-** Headerizes to `__attribute__pure__`
-* `/* NORETURN */`
-** For functions that never return. This can help the compiler's program flow analysis. Functions like exit() the compiler already knows about, but others like internal_exception() we have to tell it about.
-** Headerizes to `__attribute__noreturn__`
+=head2 PARROT_IGNORABLE_RESULT
 
-=head2 Function argument decorators
+Tells the compiler that it's OK to ignore the function's return value
 
-* `/* NN */`
-** GCC warns if it determines that a NULL could be passed to this argument.
-** Headerizes to `__attribute__nonnull__`
-* SHIM(int foo)
-** Squelches warnings about being unused, and since it manges the argument name, you can't accidentally use the argument without specfically unshimming the argument.
-** Headerizes to `int foo_unused __attribute__unused__`.
+=head2 PARROT_MALLOC
 
-=head2 Interpreters
+Functions marked with this are flagged as having received C<malloc>ed
+memory.  This lets the compiler do analysis on memory leaks.
 
-There are only two states for the interpreter: Used, or shimmed. If we're using it, it has to be /NN/. (Except in a couple of cases like real_exception) The interpreter is so common in functions, we give it its own two macros: INTERP and SHIM_INTERP.
+=head2 PARROT_CONST_FUNCTION
 
-* `SHIM_INTERP`
-** Headerizes to `SHIM(Interp *interp)`
-** Because it's shimmed, we're guaranteed we won't accidentally use it.
-* `INTERP`
-** Any interpreter that isn't a shimmed interpreter must be non-null.
-** Headerizes to `Interp *interp /*NN*/`
+The function is a deterministic one that will always return the
+same value if given the same arguments, every time.  Examples include
+functions like C<mod> or C<max>.  An anti-example is C<rand()> which
+returns a different value every time.
+
+=head2 PARROT_PURE_FUNCTION
+
+Less stringent than PARROT_CONST_FUNCTION, these functions only
+operate on their arguments and the data they point to.  Examples
+include C<strlen()> or C<strchr()>.
+
+=head2 PARROT_DOES_NOT_RETURN
+
+For functions that can't return, like C<Parrot_exit()>.  This helps
+the compiler's flow analysis.
+
+=head2 PARROT_CANNOT_RETURN_NULL
+
+For functions that return a pointer, but the pointer is guaranteed to not be NULL.
+
+=head2 PARROT_CAN_RETURN_NULL
+
+For functions that return a pointer that could be null.
+
+=head1 ARGUMENT & VARIABLE DECORATORS
+
+=head2 NOTNULL(x)
+
+For function arguments and variables that must never have NULL
+assigned to them, or passed into them.  For example, if we were
+defining C<strlen()> in Parrot, we'd do it as C<strlen(NOTNULL(const char *p))>.
+
+=head2 NULLOK(x)
+
+For function arguments and variables where it's OK to pass in NULL.
+For example, if we wrote C<free()> in Parrot, it would be
+C<strlen(NULLOK(void *p))>.
+
+=head2 SHIM(x)
+
+=head1 PASSING AROUND INTERPRETERS
+
+Most of the time, if you need an interpreter in your function,
+define that argument as C<PARROT_INTERP>.  If your interpreter is
+a shim, then use C<SHIM_INTERP>, not C<SHIM(PARROT_INTERP)>.
 
 =head1 Examples
 
