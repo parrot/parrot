@@ -359,7 +359,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET *
 string_rep_compatible(SHIM_INTERP,
-    NOTNULL(const STRING *a), NOTNULL(const STRING *b), NOTNULL(const ENCODING **e))
+    NOTNULL(const STRING *a), NOTNULL(const STRING *b), OUT(const ENCODING **e))
 {
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
@@ -1804,45 +1804,45 @@ number, rounding towards zero.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_to_int(SHIM_INTERP, NULLOK(const STRING *s))
+string_to_int(SHIM_INTERP, NOTNULL(const STRING *s))
 {
     INTVAL i = 0;
 
-    if (s) {
-        const char         *start = s->strstart;
-        const char * const  end   = start + s->bufused;
+    const char         *start = s->strstart;
+    const char * const  end   = start + s->bufused;
 
-        int    sign      = 1;
-        INTVAL in_number = 0;
+    int    sign      = 1;
+    INTVAL in_number = 0;
 
-        while (start < end) {
-            const unsigned char c = *start;
+    assert(s);
 
-            if (isdigit((unsigned char)c)) {
-                in_number = 1;
-                i = i * 10 + (c - '0');
-            }
-            else if (!in_number) {
-                /* we've not yet seen any digits */
-                if (c == '-') {
-                    sign = -1;
-                    in_number = 1;
-                }
-                else if (c == '+')
-                    in_number = 1;
-                else if (isspace((unsigned char)c))
-                    ;
-                else
-                    break;
-            }
-            else {
-                break;
-            }
-            ++start;
+    while (start < end) {
+        const unsigned char c = *start;
+
+        if (isdigit((unsigned char)c)) {
+            in_number = 1;
+            i = i * 10 + (c - '0');
         }
-
-        i = i * sign;
+        else if (!in_number) {
+            /* we've not yet seen any digits */
+            if (c == '-') {
+                sign = -1;
+                in_number = 1;
+            }
+            else if (c == '+')
+                in_number = 1;
+            else if (isspace((unsigned char)c))
+                ;
+            else
+                break;
+        }
+        else {
+            break;
+        }
+        ++start;
     }
+
+    i = i * sign;
 
     return i;
 }

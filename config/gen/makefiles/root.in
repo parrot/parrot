@@ -1762,7 +1762,7 @@ SPLINTFLAGS  = \
 	+linelen 120 \
 	+showdeephistory \
 	-showfunc \
-	-hints \
+	+hints \
 	\
 	-abstract \
 	+aliasunique \
@@ -1802,7 +1802,7 @@ SPLINTFLAGS  = \
 	+nullderef \
 	+nullret \
 	+nullpass \
-	+nullstate \
+	-nullstate \
 	-paramuse \
 	+posixstrictlib \
 	-predboolint \
@@ -1824,6 +1824,8 @@ SPLINTFLAGS  = \
 	\
 	\
 	\
+	-nullstate \
+	-usereleased \
 	-mustfreefresh \
 	-mustfreeonly \
 	-compdestroy \
@@ -1873,12 +1875,7 @@ splint-andy :
 		+stats \
 		-showsummary \
 		+partial \
-		src/ops/core_ops.c \
-
-X = \
-		src/gc/dod.c  src/gc/gc_gms.c  src/gc/gc_ims.c \
-		src/gc/memory.c  src/gc/register.c  \
-		src/gc/resources.c  src/gc/smallobject.c \
+		src/string.c \
 
 
 #

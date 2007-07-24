@@ -387,10 +387,9 @@ PARROT_CAN_RETURN_NULL
 const CHARSET * string_rep_compatible( SHIM_INTERP,
     NOTNULL(const STRING *a),
     NOTNULL(const STRING *b),
-    NOTNULL(const ENCODING **e) )
+    OUT(const ENCODING **e) )
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
@@ -473,7 +472,8 @@ char * string_to_cstring( SHIM_INTERP, NOTNULL(const STRING *s) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_to_int( SHIM_INTERP, NULLOK(const STRING *s) );
+INTVAL string_to_int( SHIM_INTERP, NOTNULL(const STRING *s) )
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
