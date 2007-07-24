@@ -30,13 +30,13 @@ my $ended_ok = 0;
 
 delete_temp_files();
 ##############################
-open my $FOO, ">", "temp.pasm" or die "Can't write temp.pasm\n";
+open my $FOO, '>', "temp.pasm" or die "Can't write temp.pasm\n";
 print $FOO <<'ENDF';
   .constant BAR 42
 ENDF
 close $FOO;
 
-pir_output_is( <<'CODE', <<'OUT', "include pasm" );
+pir_output_is( <<'CODE', <<'OUT', 'include pasm' );
 .sub test :main
     print "before\n"
     .include "temp.pasm"
@@ -49,16 +49,16 @@ before
 42
 after
 OUT
-unlink "temp.pasm";
+unlink 'temp.pasm';
 
 ##############################
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
   .const int BAR = 42
 ENDF
 close $FOO;
 
-pir_output_is( <<'CODE', <<'OUT', "include pir" );
+pir_output_is( <<'CODE', <<'OUT', 'include pir' );
 .sub test :main
     print "before\n"
     .include "temp.pir"
@@ -74,13 +74,13 @@ OUT
 unlink "temp.pir";
 
 ##############################
-open $FOO, ">", "temp.inc" or die "Can't write temp.inc\n";
+open $FOO, '>', 'temp.inc' or die "Can't write temp.inc: $!\n";
 print $FOO <<'ENDF';
   .const int BAR = 42
 ENDF
 close $FOO;
 
-pir_output_is( <<'CODE', <<'OUT', "include .inc" );
+pir_output_is( <<'CODE', <<'OUT', 'include temp.inc' );
 .sub test :main
     print "before\n"
     .include "temp.inc"
@@ -97,7 +97,7 @@ unlink "temp.inc";
 
 ##############################
 my $file = '_test.inc';
-open my $F, ">", "$file";
+open my $F, '>', $file or die "Can't create $file: $!\n";
 print $F <<'EOF';
 .sub _foo		# sub foo(int a, int b)
    .param int a
@@ -117,7 +117,7 @@ print $F <<'EOF';
 EOF
 close $F;
 
-pir_output_is( <<'CODE', <<'OUT', "subroutine in external file" );
+pir_output_is( <<'CODE', <<'OUT', 'subroutine in external file' );
 .sub test :main
    .local int x
    x = 10
@@ -146,7 +146,7 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -157,9 +157,9 @@ close $FOO;
 
 # compile it
 
-system_or_die("$PARROT -o temp.pbc temp.pir");
+system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
-pir_output_is( <<'CODE', <<'OUT', "call sub in external pbc" );
+pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc' );
 .pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -178,7 +178,7 @@ sub2
 OUT
 
 # write sub2
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -191,9 +191,9 @@ close $FOO;
 
 # compile it
 
-system_or_die("$PARROT -o temp.pbc temp.pir");
+system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
-pir_output_is( <<'CODE', <<'OUT', "call sub in external pbc, return" );
+pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc, return' );
 .pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -214,7 +214,7 @@ back
 OUT
 
 # write sub2
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .pcc_sub _not_sub2
     print "not sub2\n"
@@ -232,7 +232,7 @@ close $FOO;
 
 system("$PARROT -o temp.pbc temp.pir");
 
-pir_output_is( <<'CODE', <<'OUT', "call sub in external pbc with 2 subs" );
+pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc with 2 subs' );
 .pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
@@ -251,7 +251,7 @@ sub2
 OUT
 
 # write sub2
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', "temp.pir" or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .pcc_sub _sub2
     print "sub2\n"
@@ -264,7 +264,7 @@ close $FOO;
 
 # compile it
 
-pir_output_is( <<'CODE', <<'OUT', "call sub in external pir, return" );
+pir_output_is( <<'CODE', <<'OUT', 'call sub in external pir, return' );
 .pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pir"
@@ -284,7 +284,7 @@ sub2
 back
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "call internal sub like external" );
+pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
 .pcc_sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
@@ -309,7 +309,7 @@ back
 OUT
 
 # write subs
-open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .pcc_sub _sub1
     print "sub1\n"
@@ -333,10 +333,10 @@ close $FOO;
 
 # compile it
 
-system_or_die("$PARROT -o temp.pbc temp.pir");
+system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
 use Test::More;
-is( `$PARROT temp.pbc`, <<OUT, "call internal sub like external, precompiled" );
+is( `$PARROT temp.pbc`, <<OUT, 'call internal sub like external, precompiled' );
 sub1
 sub2
 back
@@ -347,7 +347,7 @@ OUT
     # include a non-existent file and catch the error message
     my $err_msg;
     {
-        open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+        open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
         print $FOO <<'END_PIR';
 # Including a non-existent file should produce an error
 .include "non_existent.pir"
@@ -359,22 +359,22 @@ OUT
 END_PIR
         close $FOO;
         my $OLDERR;
-        open $OLDERR, ">&", "STDERR"   or die "Can't save STDERR\n";
-        open STDERR, ">",  "temp.out" or die "Can't write temp.out\n";
-        system_or_die( "$PARROT temp.pir" );
-        open $FOO, "<", "temp.out" or die "Can't read temp.out\n";
+        open $OLDERR, '>&', 'STDERR' or die "Can't save STDERR: $!\n";
+        open STDERR, '>',  'temp.out' or die "Can't write temp.out: $!\n";
+        system_or_die( $PARROT, 'temp.pir' );
+        open $FOO, '<', 'temp.out' or die "Can't read temp.out: $!\n";
         { local $/; $err_msg = <$FOO>; }
         close $FOO;
-        open STDERR, ">&", $OLDERR or die "Can't restore STDERR\n";
-        unlink "temp.out";
+        open STDERR, '>&', $OLDERR or die "Can't restore STDERR: $!\n";
+        unlink 'temp.out';
     }
 
     # read a non-existent file and catch the error message
     my $enoent_err_msg;
     {
-        open $FOO, "<", "non_existent.file";
+        open $FOO, '<', 'non_existent.file';
         my $ENOENT = $! + 0;
-        open $FOO, ">", "temp.pir" or die "Can't write temp.pir\n";
+        open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
         print $FOO <<"END_PIR";
 .sub test \:main
   # run a OS command, and get the errmessge for the exit code
@@ -389,18 +389,18 @@ END_PIR
     }
 
     $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;
-    is( $err_msg, << "OUT", "including a non-existent file" );
+    is( $err_msg, << "OUT", 'including a non-existent file' );
 error:imcc:$enoent_err_msg
 \tin file 'temp.pir' line 2
 OUT
-    unlink "temp.pir";
+    unlink 'temp.pir';
 }
 
 SKIP:
 {
-    skip( "multiple loading not speced - failing", 1 );
+    skip( 'multiple loading not speced - failing', 1 );
 
-    pir_output_is( <<'CODE', <<'OUT', "twice call sub in external pir, return" );
+    pir_output_is( <<'CODE', <<'OUT', 'twice call sub in external pir, return' );
 .pcc_sub _sub1
     print "sub1\n"
     load_bytecode "temp.pir"
@@ -454,7 +454,7 @@ SKIP:
 TEMP_PIR
     }
 
-    pir_output_is( <<"CODE", <<'OUT', "load PIR from added paths, minding slash" );
+    pir_output_is( <<"CODE", <<'OUT', 'load PIR from added paths, minding slash' );
   .include 'iglobals.pasm'
 
   .sub main :main
@@ -490,18 +490,18 @@ $ended_ok = 1;
 sub system_or_die {
     my @args = @_;
 
+    print "# Running @args\n";
     my $rc = system( @args );
     if ( $rc != 0 ) {
         die "Couldn't run: @args\n";
     }
-    print "# Ran @args\n";
+    print "# Return $rc\n";
 }
 
 sub delete_temp_files {
-    unlink $file if $file;
-    unlink "temp.pir";
-    unlink "temp.pbc";
-    unlink @temp_files;
+    for ( @temp_files, $file, 'temp.pir', 'temp.pbc' ) {
+        unlink if defined;
+    }
 }
 
 END {
