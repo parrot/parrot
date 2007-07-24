@@ -294,24 +294,24 @@ inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
 
 =item B<index>(out INT, in STR, in STR, in INT)
 
-The index function searches for one string within
-another, but without the wildcard-like behavior of
-a full regular-expression pattern match.  It
-returns the position of the first occurrence of
-$3 in $2 at or after $4.  If $4 is omitted, starts
-searching from the beginning of the string.
+The B<index> function searches for a substring within target string, but
+without the wildcard-like behavior of a full regular-expression pattern match.
+It returns the position of the first occurrence of substring $3
+in target string $2 at or after zero-based position $4.
+If $4 is omitted, B<index> starts searching from the beginning of the string.
 The return value is based at "0".
-If the substring is not found, returns "-1".
+If the string is null, or the substring is not found or is null,
+B<index> returns "-1".
 
 =cut
 
 inline op index(out INT, in STR, in STR) :base_core {
-    $1 = $2 && $3 ? string_str_index(interp, $2, $3, 0) : -1;
+    $1 = ($2 && $3) ? string_str_index(interp, $2, $3, 0) : -1;
     goto NEXT();
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
-    $1 = $2 && $3 ? string_str_index(interp, $2, $3, $4) : -1;
+    $1 = ($2 && $3) ? string_str_index(interp, $2, $3, $4) : -1;
     goto NEXT();
 }
 
