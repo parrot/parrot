@@ -52,7 +52,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "STMVar init'd containing NULL" );
 .sub main :main
-    $P1 = new .STMVar
+    $P1 = new 'STMVar'
 tx: stm_start
     $P0 = $P1."get_read"()
     if null $P0 goto okay2
@@ -71,7 +71,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "STMRef init'd containing NULL" );
 .sub main :main
-    $P1 = new .STMRef
+    $P1 = new 'STMRef'
 tx: stm_start
     $I0 = defined $P1
     unless $I0 goto okay1
@@ -108,9 +108,9 @@ done:
 .end
 
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 42
-    $P1 = new .STMVar, $P0
+    $P1 = new 'STMVar', $P0
 tx: stm_start
     $P2 = $P1."get_read"()
     check("get_read", $P2)
@@ -147,9 +147,9 @@ done:
 .end
 
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 42
-    $P1 = new .STMRef, $P0
+    $P1 = new 'STMRef', $P0
 tx: stm_start
     check("STMRef value", $P1)
     stm_commit tx
@@ -162,9 +162,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "aborting acts as expected" );
 .sub main :main
     .local string reason
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 42
-    $P1 = new .STMRef, $P0
+    $P1 = new 'STMRef', $P0
     stm_start
     $P1 = 45
     reason = "New value not visible in transaction"
@@ -193,9 +193,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "committed updates are seen afterwards" );
 .sub main :main
     .local string reason
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 42
-    $P1 = new .STMRef, $P0
+    $P1 = new 'STMRef', $P0
 tx_a:
     stm_start
     $P1 = 45
@@ -246,9 +246,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "GC isn't too eager" );
 .sub main :main
     .local string reason
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 0
-    $P1 = new .STMRef, $P0
+    $P1 = new 'STMRef', $P0
 tx_a:
     stm_start
     sweep 1
@@ -282,14 +282,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Push limits (write and read records)" );
     .local pmc arr
     .local int i
     .local pmc sv
-    arr = new FixedPMCArray
+    arr = new 'FixedPMCArray'
     arr = NUM_VALS
 
     i = 0
 loop1:
-    sv = new Integer
+    sv = new 'Integer'
     sv = i
-    sv = new STMVar, sv
+    sv = new 'STMVar', sv
     arr[i] = sv
     inc i
     if i < NUM_VALS goto loop1
@@ -330,7 +330,7 @@ tx_write:
 loop_write:
     sv = arr[i]
     .local pmc tmp
-    tmp = new Integer
+    tmp = new 'Integer'
     tmp = -1
     sv.'set'(tmp)
     inc i
