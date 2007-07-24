@@ -876,19 +876,19 @@ Set a break point, the source code file must be loaded.
 */
 
 void
-PDB_set_break(PARROT_INTERP, const char *command /*NULL*/)
+PDB_set_break(PARROT_INTERP, NOTNULL(const char *command))
 {
     PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak = NULL;
     PDB_breakpoint_t *sbreak;
     PDB_condition_t  *condition;
     PDB_line_t       *line;
-    long              ln, i;
+    long              i;
 
     command = nextarg(command);
     /* If no line number was specified, set it at the current line */
     if (command && *command) {
-        ln = atol(command);
+        const long ln = atol(command);
 
         /* Move to the line where we will set the break point */
         line = pdb->file->line;
@@ -1432,7 +1432,7 @@ Do inplace unescape of C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 */
 
 int
-PDB_unescape(char *string)
+PDB_unescape(NOTNULL(char *string))
 {
     int l = 0;
 
@@ -1986,7 +1986,7 @@ that instruction and check that is the correct one.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 char
-PDB_hasinstruction(const char *c)
+PDB_hasinstruction(NOTNULL(const char *c))
 {
     char h = 0;
 
@@ -2201,7 +2201,7 @@ Print an entry from the user stack.
 */
 
 void
-PDB_print_user_stack(PARROT_INTERP, const char *command)
+PDB_print_user_stack(PARROT_INTERP, NOTNULL(const char *command))
 {
     Stack_Entry_t *entry;
     long           depth = 0;

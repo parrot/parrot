@@ -258,7 +258,8 @@ void PDB_get_command( PARROT_INTERP )
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-char PDB_hasinstruction( const char *c );
+char PDB_hasinstruction( NOTNULL(const char *c) )
+        __attribute__nonnull__(1);
 
 void PDB_help( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
@@ -285,8 +286,9 @@ void PDB_print( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_print_user_stack( PARROT_INTERP, const char *command )
-        __attribute__nonnull__(1);
+void PDB_print_user_stack( PARROT_INTERP, NOTNULL(const char *command) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 char PDB_program_end( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -300,8 +302,9 @@ void PDB_script_file( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_set_break( PARROT_INTERP, const char *command /*NULL*/ )
-        __attribute__nonnull__(1);
+void PDB_set_break( PARROT_INTERP, NOTNULL(const char *command) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_skip_breakpoint( PARROT_INTERP, long i )
         __attribute__nonnull__(1);
@@ -309,7 +312,9 @@ void PDB_skip_breakpoint( PARROT_INTERP, long i )
 void PDB_trace( PARROT_INTERP, NULLOK(const char *command) )
         __attribute__nonnull__(1);
 
-int PDB_unescape( char *string );
+int PDB_unescape( NOTNULL(char *string) )
+        __attribute__nonnull__(1);
+
 void PDB_watchpoint( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
