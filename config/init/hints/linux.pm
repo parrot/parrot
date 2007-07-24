@@ -20,7 +20,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs        = option_or_data($conf, 'libs');
-    my $cflags      = option_or_data($conf, 'cflags');
+    my $cflags      = option_or_data($conf, 'ccflags');
     my $cc          = option_or_data($conf, 'cc');
     my $linkflags   = option_or_data($conf, 'linkflags');
 
