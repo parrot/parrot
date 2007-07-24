@@ -222,6 +222,7 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
 does_isa(Interp* interp, STRING *method, STRING *what)>
 
 Compares C<*method> and C<*what>.
+Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
 
 =cut
 
@@ -866,11 +867,14 @@ C<nextkey_keyed()> with it.
         return DYNSELF.nextkey_keyed(r_key, w);
     }
 
+
 /*
 
 =item C<INTVAL can(STRING *method)>
 
-Returns whether the PMC "can" perform C<*method>.
+Reports whether the PMC "can" perform C<method>.
+If the PMC implements the vtable function C<method>,
+true (1) is returned; otherwise, false (0) is returned.
 
 =cut
 
@@ -880,11 +884,14 @@ Returns whether the PMC "can" perform C<*method>.
         return !PMC_IS_NULL(VTABLE_find_method(INTERP, SELF, method));
     }
 
+
 /*
 
 =item C<INTVAL does(STRING *interface)>
 
-Returns whether the PMC "does" perform C<*interface>.
+Reports whether the PMC "does" perform C<interface>.
+If the interface C<interface> is found in the PMC's interface list,
+true (1) is returned; otherwise, false (0) is returned.
 
 =cut
 
@@ -894,11 +901,14 @@ Returns whether the PMC "does" perform C<*interface>.
         return does_isa(INTERP, interface, SELF->vtable->does_str);
     }
 
+
 /*
 
 =item C<INTVAL isa(STRING *_class)>
 
-Returns whether the PMC "isa" C<*class>.
+Reports whether the PMC "isa" C<_class>.
+If the class C<_class> is found in the PMC's class hierarchy,
+true (1) is returned; otherwise, false (0) is returned.
 
 =cut
 
@@ -910,6 +920,7 @@ Returns whether the PMC "isa" C<*class>.
     }
 
 /*
+
 
 =item C<PMC* subclass(PMC* name)>
 

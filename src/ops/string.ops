@@ -151,11 +151,13 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
 
 =item B<length>(out INT, in STR)
 
-Set $1 to the length (in characters) of the string in $2.
+Set result $1 to the length (in characters) of string $2.
+If $2 is NULL or zero length, zero is returned.
 
 =item B<bytelength>(out INT, in STR)
 
-Set $1 to the length (in bytes) of the string in $2.
+Set result $1 to the length (in bytes) of the string $2.
+If $2 is NULL or zero length, zero is returned.
 
 =cut
 
@@ -534,11 +536,12 @@ op split(out PMC, in STR, in STR) :base_core {
 
 =item B<charset>(out INT, in STR)
 
-Return the charset number of string $2.
+Return the charset number $1 of string $2.
 
 =item B<charsetname>(out STR, in INT)
 
-Return the name of charset numbered $2.
+Return the name $1 of charset number $2.
+If charset number $2 is not found, name $1 is set to null.
 
 =item B<find_charset>(out INT, in STR)
 
@@ -590,11 +593,12 @@ op trans_charset(out STR, in STR, in INT) {
 
 =item B<encoding>(out INT, in STR)
 
-Return the encoding number of string $2.
+Return the encoding number $1 of string $2.
 
 =item B<encodingname>(out STR, in INT)
 
-Return the name of encoding numbered $2.
+Return the name $1 of encoding number $2.
+If encoding number $2 is not found, name $1 is set to null.
 
 =item B<find_encoding>(out INT, in STR)
 

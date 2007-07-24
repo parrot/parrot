@@ -166,9 +166,11 @@ inline op addmethod(invar PMC, in STR, invar PMC) :object_classes {
   goto NEXT();
 }
 
+
 =item B<can>(out INT, invar PMC, in STR)
 
-Sets $1 to true or false, depending on whether $2 ->can the method in $3.
+Sets result $1 to the result of the "can" vtable function for PMC $2,
+given method $3.
 
 =cut
 
@@ -177,24 +179,28 @@ inline op can(out INT, invar PMC, in STR) :object_base {
   goto NEXT();
 }
 
+
 =item B<does>(out INT, invar PMC, in STR)
 
-Sets $1 to true or false, depending on whether $2 ->does the interface in $3.
+Sets result $1 to the result of the "does" vtable function for PMC $2,
+given interface $3.
 
 See L<tools/build/pmc2c.pl> for a list of available interfaces.
-
-=item B<isa>(out INT, invar PMC, in STR)
-
-=item B<isa>(out INT, invar PMC, in PMC)
-
-Sets $1 to true or false, depending on whether $2 isa $3.
-
-=cut
 
 inline op does(out INT, invar PMC, in STR) :object_base {
   $1 = $3 ? $2->vtable->does(interp, $2, $3) : 0;
   goto NEXT();
 }
+
+
+=item B<isa>(out INT, invar PMC, in STR)
+
+=item B<isa>(out INT, invar PMC, in PMC)
+
+Sets result $1 to the result of the "isa" vtable function for PMC $2,
+given class $3.
+
+=cut
 
 inline op isa(out INT, invar PMC, in STR) :object_base {
   $1 = $3 ? $2->vtable->isa(interp, $2, $3) : 0;
