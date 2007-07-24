@@ -49,7 +49,7 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
         /* Look up. */
         if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
             /* Found it. Get value, cache it and we're done. */
-            INTVAL index = VTABLE_get_integer_keyed_str(interp,
+            const INTVAL index = VTABLE_get_integer_keyed_str(interp,
                 _class->attrib_index, fq_name);
             VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name,
                 index);
@@ -118,8 +118,8 @@ Returns the fully qualified name of the object's class.
 */
 
     STRING* name() {
-        PMC *class = VTABLE_get_class(interp, SELF);
-        STRING *class_name = VTABLE_get_string(interp, class);
+        PMC * const class = VTABLE_get_class(interp, SELF);
+        STRING * const class_name = VTABLE_get_string(interp, class);
 
         return class_name;
     }
@@ -204,8 +204,8 @@ Queries this object's class to find the method with the given name.
         PMC *method;
 
         /* Walk and search. One day, we'll use the cache first. */
-        int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
+        const int num_classes = VTABLE_elements(interp, _class->all_parents);
+        const int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
         int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
         int i;
         for (i = 0; i < num_classes; i++) {
@@ -224,7 +224,7 @@ Queries this object's class to find the method with the given name.
             }
             else {
                 /* Delegate the lookup to the class. */
-                PMC *del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
+                PMC * const del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
                     alien_parents_pos);
                 method = VTABLE_find_method(interp, del_class, name);
 
