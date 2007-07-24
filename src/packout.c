@@ -32,11 +32,17 @@ opcode_t
 PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
 {
     size_t size;
+    size_t header_size = 0;
     PackFile_Directory * const dir = &self->directory;
 
-    size = PACKFILE_HEADER_BYTES / sizeof (opcode_t);
+    header_size = PACKFILE_HEADER_BYTES;
+    header_size += self->header->uuid_size;
+    header_size += header_size % 16 ?
+        16 - header_size % 16 : 0;
 
-    size += 4; /* magic + opcode type + directory type + pad */
+    size = header_size / sizeof (opcode_t);
+
+    size += 4; /* directory type + 3 padding zeros */
 
     dir->base.file_offset = size;
     size += PackFile_Segment_packed_size(interp, (PackFile_Segment *) dir);
@@ -69,19 +75,44 @@ PackFile_pack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *cursor))
     size_t size;
     PackFile_Directory * const dir = &self->directory;
     PackFile_Segment *seg;
+    int padding_size;
+    char *byte_cursor = (char*)cursor;
 
     self->src = cursor;
 
-    /* Pack the header */
+    /* Pack the fixed part of the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
-    cursor += PACKFILE_HEADER_BYTES / sizeof (opcode_t);
-    *cursor++ = PARROT_MAGIC;           /* Pack the magic */
-    *cursor++ = OPCODE_TYPE_PERL;       /* Pack opcode type */
-    *cursor++ = PF_DIR_FORMAT;          /* dir format */
-    *cursor++ = 0;                      /* pad */
+    byte_cursor += PACKFILE_HEADER_BYTES;
+
+    /* Pack the UUID. */
+    if (self->header->uuid_size > 0)
+        mem_sys_memcopy(byte_cursor, self->header->uuid_data,
+            self->header->uuid_size);
+
+    /* Padding. */
+    padding_size = 16 - (PACKFILE_HEADER_BYTES + self->header->uuid_size) % 16;
+    if (padding_size < 16) {
+        int i;
+        for (i = 0; i < padding_size; i++)
+            *byte_cursor++ = 0;
+    }
+    else {
+        padding_size = 0;
+    }
+
+    /* Set cursor. */
+    cursor += (PACKFILE_HEADER_BYTES + self->header->uuid_size + padding_size)
+        / sizeof(opcode_t);
+
+    /* Directory format and padding. */
+    *cursor++ = PF_DIR_FORMAT;
+    *cursor++ = 0;
+    *cursor++ = 0;
+    *cursor++ = 0;
 
     /* pack the directory */
     seg = (PackFile_Segment *) dir;
+
     /* dir size */
     size = seg->op_count;
     ret = PackFile_Segment_pack(interp, seg, cursor);

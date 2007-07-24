@@ -851,6 +851,12 @@ ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
     STRING *s = info->image;
     PackFile *pf;
 
+    /* We want to store a 16-byte aligned header, but the actual
+     * header may be shorter. */
+    const int header_length = PACKFILE_HEADER_BYTES +
+        (PACKFILE_HEADER_BYTES % 16 ?
+         16 - PACKFILE_HEADER_BYTES % 16 : 0);
+
     info->image_io = mem_allocate_typed(IMAGE_IO);
     info->image_io->image = s = info->image;
 #if FREEZE_ASCII
@@ -862,20 +868,20 @@ ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
     if (info->what == VISIT_FREEZE_NORMAL ||
         info->what == VISIT_FREEZE_AT_DESTRUCT) {
 
-        op_check_size(interp, s, PACKFILE_HEADER_BYTES);
+        op_check_size(interp, s, header_length);
         mem_sys_memcopy(s->strstart, pf->header, PACKFILE_HEADER_BYTES);
-        s->bufused += PACKFILE_HEADER_BYTES;
-        s->strlen += PACKFILE_HEADER_BYTES;
+        s->bufused += header_length;
+        s->strlen += header_length;
     }
     else {
-        if (string_length(interp, s) < PACKFILE_HEADER_BYTES) {
+        if (string_length(interp, s) < header_length) {
             real_exception(interp, NULL, E_IOError,
                     "bad string to thaw");
         }
         mem_sys_memcopy(pf->header, s->strstart, PACKFILE_HEADER_BYTES);
         PackFile_assign_transforms(pf);
-        s->bufused -= PACKFILE_HEADER_BYTES;
-        LVALUE_CAST(char *, s->strstart) += 16;
+        s->bufused -= header_length;
+        LVALUE_CAST(char *, s->strstart) += header_length;
     }
 
     info->last_type = -1;

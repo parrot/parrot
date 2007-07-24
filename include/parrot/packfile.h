@@ -26,24 +26,39 @@
 
 
 /*
-** Bytes that we don't have to reorder
-*  PACKFILE_HEADER_BYTES must be an integer times sizeof (opcode_t).
+** The number of bytes in the packfile header that we can read/write
+** directly. This excludes the final element in the struct, which holds a
+** pointer to the UUID data, if there is any.
 */
-#define PACKFILE_HEADER_BYTES 16
+#define PACKFILE_HEADER_BYTES 18
 
 typedef struct PackFile_Header {
+    /* Magic string to identify the PBC file. */
+    unsigned char magic[8];
+
+    /* Word size, byte ordering and floating point number format. */
     unsigned char wordsize;
     unsigned char byteorder;
+    unsigned char floattype;
+
+    /* Version of Parrot that wrote the bytecode file. */
     unsigned char major;
     unsigned char minor;
-    unsigned char intvalsize;   /* was flags */
-    unsigned char floattype;
-    unsigned char pad[10];      /* fingerprint */
-    /* Start words/opcodes on 16-byte boundary */
-    opcode_t magic;
-    opcode_t opcodetype;
-    opcode_t dir_format;        /* was fixup_ss */
-    opcode_t _unused_padding;
+    unsigned char patch;
+
+    /* Bytecode format version. */
+    unsigned char bc_major;
+    unsigned char bc_minor;
+
+    /* UUID type and length. */
+    unsigned char uuid_type;
+    unsigned char uuid_size;
+
+    /* The UUID data. */
+    unsigned char *uuid_data;
+
+    /* Directory format. */
+    opcode_t dir_format;
 } PackFile_Header;
 
 typedef struct PackFile_Constant {
