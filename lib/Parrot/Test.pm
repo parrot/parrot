@@ -46,18 +46,27 @@ B<Note:> you I<must> use a C<$description> with TODO tests.
 
 =item C<language_output_is( $language, $code, $expected, $description)>
 
+=item C<language_error_output_is( $language, $code, $expected, $description)>
+
 Runs a language test and passes the test if a string comparison
 of the output with the expected result it true.
+For C<language_error_output_is()> the exit code also has to be non-zero.
 
 =item C<language_output_like( $language, $code, $expected, $description)>
 
+=item C<language_error_output_like( $language, $code, $expected, $description)>
+
 Runs a language test and passes the test if the output matches the expected
 result.
+For C<language_error_output_like()> the exit code also has to be non-zero.
 
 =item C<language_output_isnt( $language, $code, $expected, $description)>
 
+=item C<language_error_output_isnt( $language, $code, $expected, $description)>
+
 Runs a language test and passes the test if a string comparison
 if a string comparison of the output with the unexpected result is false.
+For C<language_error_output_isnt()> the exit code also has to be non-zero.
 
 =item C<pasm_output_is($code, $expected, $description)>
 
@@ -72,12 +81,13 @@ non-zero exit code.
 
 =item C<pasm_output_like($code, $expected, $description)>
 
-Runs the Parrot Assembler code and passes the test if the output matches the
+Runs the Parrot Assembler code and passes the test if the output matches 
+C<$expected>.
 
 =item C<pasm_error_output_like($code, $expected, $description)>
 
-Runs the Parrot Assembler code and passes the test if the output the expected
-result it true I<and> if Parrot exits with a non-zero exit code.
+Runs the Parrot Assembler code and passes the test if the output matches
+C<$expected> I<and> if Parrot exits with a non-zero exit code.
 
 =item C<pasm_output_isnt($code, $unexpected, $description)>
 
@@ -88,7 +98,7 @@ the output with the unexpected result is false.
 
 Runs the Parrot Assembler code and passes the test if a string comparison of
 the output with the unexpected result is false I<and> if Parrot exits with a
-non-zero exit cod3.
+non-zero exit code.
 
 =item C<pir_output_is($code, $expected, $description)>
 
@@ -127,7 +137,7 @@ with the expected result is true.
 
 =item C<pbc_error_output_is($code, $expected, $description)>
 
-Runs the Parrot Bytecode and passes the test if a string comparison of output
+Runs the Parrot Bytecode and passes the test if a string comparison of the output
 with the expected result is true I<and> if Parrot exits with a non-zero exit code.
 
 =item C<pbc_output_like($code, $expected, $description)>
@@ -425,16 +435,19 @@ sub path_to_parrot {
 sub generate_languages_functions {
 
     my %test_map = (
-        output_is   => 'is_eq',
-        output_like => 'like',
-        output_isnt => 'isnt_eq'
+        output_is          => 'is_eq',
+        error_output_is    => 'is_eq',
+        output_like        => 'like',
+        error_output_like  => 'like',
+        output_isnt        => 'isnt_eq',
+        error_output_isnt  => 'isnt_eq',
     );
 
     foreach my $func ( keys %test_map ) {
 
         my $test_sub = sub {
             my $self = shift;
-            my ( $code, $output, $desc, %options ) = @_;
+            my ( $code, $expected, $desc, %options ) = @_;
 
             # set a todo-item for Test::Builder to find
             my $call_pkg = $self->{builder}->exported_to() || '';
@@ -468,8 +481,14 @@ sub generate_languages_functions {
                     STDOUT => $out_f,
                     STDERR => $out_f
                 );
+                my $real_output = slurp_file($out_f);
 
-                if ( $exit_code ) {
+                if ($func =~ /_error_/) {
+                    return _handle_error_output(
+                        $self->{builder}, $real_output, $expected, $desc
+                    ) unless $exit_code;
+                }
+                elsif ( $exit_code ) {
                     $self->{builder}->ok( 0, $desc );
 
                     my $test_prog = join ' && ', @test_prog;
@@ -480,8 +499,8 @@ sub generate_languages_functions {
 
                 my $meth = $test_map{$func};
                 $self->{builder}->$meth(
-                    Parrot::Test::slurp_file($out_f),
-                    $output,
+                    $real_output,
+                    $expected,
                     $desc
                 );
             }
@@ -816,9 +835,12 @@ sub _generate_test_functions {
     );
 
     my %language_test_map = (
-        language_output_is   => 'output_is',
-        language_output_like => 'output_like',
-        language_output_isnt => 'output_isnt',
+        language_output_is          => 'output_is',
+        language_error_output_is    => 'error_output_is',
+        language_output_like        => 'output_like',
+        language_error_output_like  => 'error_output_like',
+        language_output_isnt        => 'output_isnt',
+        language_error_output_isnt  => 'error_output_isnt',
     );
 
     foreach my $func ( keys %language_test_map ) {
