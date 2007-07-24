@@ -120,13 +120,13 @@ OUT
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished string' );
 print "unfinished string
 CODE
-/^[^:]+: [^:]+:1: unfinished string near '"?unfinished string'/
+/^[^:]+:1: unfinished string near '"?unfinished string'/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'string with escape sequence too large' );
 print "escape\333sequence"
 CODE
-/^[^:]+: [^:]+:1: escape sequence too large near '"?escape/
+/^[^:]+:1: escape sequence too large near '"?escape/
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'long string' );
@@ -145,21 +145,21 @@ OUT
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'invalid long string delimiter' );
 print [===+ string ]===]
 CODE
-/^[^:]+: [^:]+:1: invalid long string delimiter near '\[==='/
+/^[^:]+:1: invalid long string delimiter near '\[==='/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished string' );
 print [[unfinished long string
 
 CODE
-/^[^:]+: [^:]+:1: unfinished long string/
+/^[^:]+:1: unfinished long string/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'nested long string' );
 print [[ long string [[ nested ]] ]]
 
 CODE
-/^[^:]+: [^:]+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long string \[\['/
+/^[^:]+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long string \[\['/
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'number' );
@@ -185,19 +185,19 @@ OUT
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
 0x1Bh
 CODE
-/^[^:]+: [^:]+:1: malformed number near '0x1Bh'/
+/^[^:]+:1: malformed number near '0x1Bh'/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
 1.2.34
 CODE
-/^[^:]+: [^:]+:1: malformed number near '1.2.34'/
+/^[^:]+:1: malformed number near '1.2.34'/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'malformed number' );
 .2A
 CODE
-/^[^:]+: [^:]+:1: malformed number near '.2A'/
+/^[^:]+:1: malformed number near '.2A'/
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'comment' );
@@ -238,20 +238,20 @@ language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'unfinished long comment' );
  --[[unfinished long comment
 
 CODE
-/^[^:]+: [^:]+:1: unfinished long comment/
+/^[^:]+:1: unfinished long comment/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'nested long comment' );
 --[[ long comment [[ nested ]] ]]
 
 CODE
-/^[^:]+: [^:]+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long comment \[\['/
+/^[^:]+:1: nesting of \[\[\.\.\.\]\] is deprecated near '\[\[ long comment \[\['/
 OUT
 
 language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'syntax error' );
 !!
 CODE
-/^[^:]+: [^:]+:1: syntax error/
+/^[^:]+:1: syntax error/
 OUT
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'shebang' );
@@ -266,7 +266,7 @@ language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'shebang misplaced' );
 #!/usr/bin/env lua
 1
 CODE
-/^[^:]+: [^:]+:1: syntax error/
+/^[^:]+:1: syntax error/
 OUT
 
 

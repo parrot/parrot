@@ -36,17 +36,17 @@ CODE
 Hello World
 OUT
 
-language_output_like( 'Lua_lex', <<'CODE', <<'OUT', 'shebang misplaced' );
+SKIP:
+{
+skip('only with an interpreter', 14) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'shebang misplaced' );
 
 #!/usr/bin/env lua
 print("Hello World")
 CODE
-/^lua[^:]*: [^:]+:1: syntax error/
+/^lua[^:]*: /
 OUT
-
-SKIP:
-{
-skip('only with an interpreter', 13) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
 
 $ENV{LUA_INIT} = 'print "init"';
 language_output_is( 'lua', <<'CODE', <<'OUT', 'LUA_INIT string' );
