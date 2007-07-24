@@ -226,7 +226,7 @@ greatest compatibility with previous Parrots.
 These versions will be listed in the PBC_COMPAT file, sorted with the latest
 version first in the format:
 
-MAJOR.MINOR DATE DESCRIPTION
+MAJOR.MINOR DATE NAME DESCRIPTION
 
 
 =head3 Directory Format Header
