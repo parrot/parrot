@@ -306,12 +306,12 @@ If the substring is not found, returns "-1".
 =cut
 
 inline op index(out INT, in STR, in STR) :base_core {
-    $1 = string_str_index(interp, $2, $3, 0);
+    $1 = $2 && $3 ? string_str_index(interp, $2, $3, 0) : -1;
     goto NEXT();
 }
 
 inline op index(out INT, in STR, in STR, in INT) :base_core {
-    $1 = string_str_index(interp, $2, $3, $4);
+    $1 = $2 && $3 ? string_str_index(interp, $2, $3, $4) : -1;
     goto NEXT();
 }
 
