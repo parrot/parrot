@@ -474,14 +474,13 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 char*
 Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
         enum_runtime_ft type)
 {
     STRING * const file = string_from_cstring(interp, file_name, 0);
-    STRING * const result = Parrot_locate_runtime_file_str(interp,
-            file, type);
+    STRING * const result = Parrot_locate_runtime_file_str(interp, file, type);
     /*
      * XXX valgrind shows e.g.
      *     invalid read of size 8 inside a string of length 69
@@ -490,7 +489,7 @@ Parrot_locate_runtime_file(PARROT_INTERP, NOTNULL(const char *file_name),
      *
      *     see also the log at #37814
      */
-    return string_to_cstring(interp, result);
+    return result ? string_to_cstring(interp, result) : NULL;
 }
 
 /*

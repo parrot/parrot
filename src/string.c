@@ -74,6 +74,8 @@ PARROT_API
 void
 Parrot_unmake_COW(PARROT_INTERP, NOTNULL(STRING *s))
 {
+    assert(s);
+
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
         STRING for_alloc;
@@ -118,15 +120,14 @@ allocating a new buffer.
 
 */
 PARROT_API
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, NULLOK(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
 {
     STRING *d;
 
-    if (!s)
-        return NULL;
+    assert(s);
 
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
@@ -175,6 +176,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
 {
+    assert(s);
+
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
         STRUCT_COPY(d,s);
@@ -300,6 +303,8 @@ PARROT_PURE_FUNCTION
 UINTVAL
 string_capacity(SHIM_INTERP, NOTNULL(const STRING *s))
 {
+    assert(s);
+
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
 }
@@ -672,12 +677,13 @@ Returns the number of characters in the specified Parrot string.
 */
 
 PARROT_API
-PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 UINTVAL
-string_length(SHIM_INTERP, NULLOK(const STRING *s))
+string_length(SHIM_INTERP, NOTNULL(const STRING *s))
 {
-    return s ? s->strlen : 0;
+    assert(s);
+
+    return s->strlen;
 }
 
 /*
@@ -1686,7 +1692,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_bool(PARROT_INTERP, NULLOK(const STRING *s))
+string_bool(PARROT_INTERP, NOTNULL(const STRING *s))
 {
     const INTVAL len = string_length(interp, s);
 
@@ -1936,18 +1942,13 @@ result in a memory leak.
 
 PARROT_API
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 char *
-string_to_cstring(SHIM_INTERP, NULLOK(const STRING *s))
+string_to_cstring(SHIM_INTERP, NOTNULL(const STRING *s))
 {
     char *p;
 
-    /*
-     * TODO always provide a NUL at end of strings
-     *      ICU needs this too for a lot of string functions
-     */
-    if (s == NULL)
-        return NULL;
+    assert(s);
 
     p = (char *)mem_sys_allocate(s->bufused + 1);
     memcpy(p, s->strstart, s->bufused);

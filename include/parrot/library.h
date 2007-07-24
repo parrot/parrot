@@ -43,7 +43,7 @@ char* Parrot_get_runtime_prefix( PARROT_INTERP, NULLOK(STRING **prefix_str) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 char* Parrot_locate_runtime_file( PARROT_INTERP,
     NOTNULL(const char *file_name),
     enum_runtime_ft type )
