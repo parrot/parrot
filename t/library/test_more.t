@@ -1,5 +1,4 @@
 #!./parrot
-# ex: ft=pir
 
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
@@ -422,3 +421,8 @@
 	test_test( 'failing test isnt() for PMC/string')
 
 .end
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
