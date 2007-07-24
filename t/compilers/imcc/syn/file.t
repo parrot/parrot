@@ -361,7 +361,7 @@ END_PIR
         my $OLDERR;
         open $OLDERR, '>&', 'STDERR' or die "Can't save STDERR: $!\n";
         open STDERR, '>',  'temp.out' or die "Can't write temp.out: $!\n";
-        system_or_die( $PARROT, 'temp.pir' );
+        system( $PARROT, 'temp.pir' ); # We expect an error here.
         open $FOO, '<', 'temp.out' or die "Can't read temp.out: $!\n";
         { local $/; $err_msg = <$FOO>; }
         close $FOO;
