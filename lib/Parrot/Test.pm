@@ -483,7 +483,7 @@ sub generate_languages_functions {
                 );
                 my $real_output = slurp_file($out_f);
 
-                if ($func =~ /_error_/) {
+                if ($func =~ m/^ error_/xms ) {
                     return _handle_error_output(
                         $self->{builder}, $real_output, $expected, $desc
                     ) unless $exit_code;
