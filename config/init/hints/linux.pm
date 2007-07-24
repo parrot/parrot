@@ -19,10 +19,10 @@ sub option_or_data {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs        = option_or_data('libs');
-    my $cflags      = option_or_data('cflags');
-    my $cc          = option_or_data('cc');
-    my $linkflags   = option_or_data('linkflags');
+    my $libs        = option_or_data($conf, 'libs');
+    my $cflags      = option_or_data($conf, 'cflags');
+    my $cc          = option_or_data($conf, 'cc');
+    my $linkflags   = option_or_data($conf, 'linkflags');
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
