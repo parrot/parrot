@@ -120,14 +120,15 @@ allocating a new buffer.
 
 */
 PARROT_API
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, NULLOK(STRING *s))
 {
     STRING *d;
 
-    assert(s);
+    if (!s)
+        return NULL;
 
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);

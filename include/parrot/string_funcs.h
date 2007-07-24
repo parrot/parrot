@@ -42,11 +42,10 @@ STRING * int_to_str( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_make_COW_reference( PARROT_INTERP, NOTNULL(STRING *s) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+STRING * Parrot_make_COW_reference( PARROT_INTERP, NULLOK(STRING *s) )
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
