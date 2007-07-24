@@ -152,35 +152,35 @@ void parrot_init_encodings_2( void );
 /* HEADERIZER END: src/encoding.c */
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \
-    ((const ENCODING *)src->encoding)->max_bytes_per_codepoint
+    ((src)->encoding)->max_bytes_per_codepoint
 #define ENCODING_GET_CODEPOINT(i, src, offset) \
-    ((const ENCODING *)src->encoding)->get_codepoint(i, src, offset)
+    ((src)->encoding)->get_codepoint(i, src, offset)
 #define ENCODING_SET_CODEPOINT(i, src, offset, codepoint) \
-    ((const ENCODING *)src->encoding)->set_codepoint(i, src, offset, codepoint)
+    ((src)->encoding)->set_codepoint(i, src, offset, codepoint)
 #define ENCODING_GET_BYTE(i, src, offset) \
-    ((const ENCODING *)src->encoding)->get_byte(i, src, offset)
+    ((src)->encoding)->get_byte(i, src, offset)
 #define ENCODING_SET_BYTE(i, src, offset, value) \
-    ((const ENCODING *)src->encoding)->set_byte(i, src, offset, value)
+    ((src)->encoding)->set_byte(i, src, offset, value)
 #define ENCODING_GET_CODEPOINTS(i, src, offset, count) \
-    ((const ENCODING *)src->encoding)->get_codepoints(i, src, offset, count)
+    ((src)->encoding)->get_codepoints(i, src, offset, count)
 #define ENCODING_GET_CODEPOINTS_INPLACE(i, src, offset, count, dest) \
-    ((const ENCODING *)src->encoding)->get_codepoints_inplace(i, src, offset, count, dest)
+    ((src)->encoding)->get_codepoints_inplace(i, src, offset, count, dest)
 #define ENCODING_GET_BYTES(i, src, offset, count) \
-    ((const ENCODING *)src->encoding)->get_bytes(i, src, offset, count)
+    ((src)->encoding)->get_bytes(i, src, offset, count)
 #define ENCODING_GET_BYTES_INPLACE(i, src, offset, count, dest) \
-    ((const ENCODING *)src->encoding)->get_bytes_inplace(i, src, offset, count, dest)
+    ((src)->encoding)->get_bytes_inplace(i, src, offset, count, dest)
 #define ENCODING_SET_CODEPOINTS(i, src, offset, count, newdata) \
-    ((const ENCODING *)src->encoding)->set_codepoints(i, src, offset, count, newdata)
+    ((src)->encoding)->set_codepoints(i, src, offset, count, newdata)
 #define ENCODING_SET_BYTES(i, src, offset, count, newdata) \
-    ((const ENCODING *)src->encoding)->set_bytes(i, src, offset, count, newdata)
+    ((src)->encoding)->set_bytes(i, src, offset, count, newdata)
 #define ENCODING_BECOME_ENCODING(i, src) \
-    ((const ENCODING *)src->encoding)->become_encoding(i, src)
+    ((src)->encoding)->become_encoding(i, src)
 #define ENCODING_CODEPOINTS(i, src) \
-    ((const ENCODING *)src->encoding)->codepoints(i, src)
+    ((src)->encoding)->codepoints(i, src)
 #define ENCODING_BYTES(i, src) \
-    ((const ENCODING *)src->encoding)->bytes(i, src)
+    ((src)->encoding)->bytes(i, src)
 #define ENCODING_ITER_INIT(i, src, iter) \
-    ((const ENCODING *)src->encoding)->iter_init(i, src, iter)
+    ((src)->encoding)->iter_init(i, src, iter)
 
 #endif /* PARROT_ENCODING_H_GUARD */
 
