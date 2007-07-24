@@ -2469,9 +2469,11 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_increment(PARROT_INTERP, NULLOK(const STRING *s))
+string_increment(PARROT_INTERP, NOTNULL(const STRING *s))
 {
     INTVAL o;
+
+    assert(s);
 
     if (string_length(interp, s) != 1)
         real_exception(interp, NULL, UNIMPLEMENTED, "increment only for length=1 done");
