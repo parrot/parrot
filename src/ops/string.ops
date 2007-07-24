@@ -160,13 +160,13 @@ Set $1 to the length (in bytes) of the string in $2.
 =cut
 
 inline op length(out INT, in STR) :base_mem {
-  $1 = string_length(interp, $2);
+  $1 = $2 ? string_length(interp, $2) : 0;
   goto NEXT();
 }
 
 inline op bytelength(out INT, in STR) :base_mem {
   UINTVAL n;
-  STRING *s = $2;
+  STRING * const s = $2;
   if (!s)
     n = 0;
   else {
@@ -254,8 +254,7 @@ B<Handle with care>
 =cut
 
 inline op substr(out STR, in STR, in INT) :base_core {
-  INTVAL len;
-  len = string_length(interp, $2);
+  const INTVAL len = string_length(interp, $2);
   $1 = string_substr(interp, $2, $3, len, &$1, 0);
   goto NEXT();
 }
@@ -564,7 +563,8 @@ op charset(out INT, in STR) :base_core {
 }
 
 op charsetname(out STR, in INT) :base_core {
-  $1 = string_copy(interp, Parrot_charset_name(interp, $2));
+  STRING * const name = Parrot_charset_name(interp, $2);
+  $1 = name ? string_copy(interp, name) : NULL;
   goto NEXT();
 }
 
@@ -619,7 +619,8 @@ op encoding(out INT, in STR) :base_core {
 }
 
 op encodingname(out STR, in INT) :base_core {
-  $1 = string_copy(interp, Parrot_encoding_name(interp, $2));
+  STRING * const name = Parrot_encoding_name(interp, $2);
+  $1 = name ? string_copy(interp, name) : NULL;
   goto NEXT();
 }
 

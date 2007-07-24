@@ -1867,13 +1867,13 @@ splint : $(PARROT)
 
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
-	/var/splint312/bin/splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 		+fcnpost \
 		+showscan \
 		+stats \
 		-showsummary \
 		+partial \
-		src/gc/*.c \
+		src/ops/core_ops.c \
 
 X = \
 		src/gc/dod.c  src/gc/gc_gms.c  src/gc/gc_ims.c \
