@@ -710,8 +710,6 @@ $put_pointer
      */
     c = string_to_cstring(interp, message);
     PANIC(interp, c);
-    string_cstring_free(c);
-    return NULL;
 }
 
 TAIL
