@@ -108,80 +108,31 @@ transform pirop (PAST::Op) :language('PIR') {
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>pirop)
 
-    .local pmc pirtable
-    .local string signature
-    pirtable = get_hll_global ['POST'], '%pirtable'
-    signature = pirtable[pirop]
-    if signature > '' goto have_signature
-    signature = '%uppppppppppppp'                          # FIXME:
-  have_signature:
-    .local pmc arglist, iter
-    .local int aindex
-    aindex = 2
-    arglist = new .ResizablePMCArray
+    # if pirop == 'inline' goto pirop_inline
+    if pirop == 'call' goto pirop_call
+    if pirop == 'callmethod' goto pirop_call
+    goto post_children
+
+  pirop_call:
+    .local string name
+    name = node.'name'()
+    unless name goto post_children
+    post.'push_new'('POST::Val', 'value'=>name)
+    goto post_children
+
+  post_children:
+    .local pmc iter
     iter = node.'iterator'()
   iter_loop:
     unless iter goto iter_end
     .local pmc cpast, cpost
     cpast = shift iter
-    $S0 = substr signature, aindex, 1
-    cpast.'atype'($S0)
     cpost = tree.'get'('post', cpast)
     post.'push'(cpost)
-    push arglist, cpost
-    inc aindex
     goto iter_loop
   iter_end:
-    .local int argresult
-    argresult = 1
-
-    if pirop == 'call' goto pirop_call
-    if pirop == 'callmethod' goto pirop_call
-    if pirop == 'inline' goto pirop_inline
-    goto pirop_result
-
-  pirop_call:
-    .local string name
-    argresult = 0
-    name = node.'name'()
-    unless name goto pirop_result
-    name = node.'escape'(name)
-    unshift arglist, name
-    goto pirop_result
-
-  pirop_inline:
-    .local string inline
-    argresult = 0
-    inline = node.'inline'()
-    unless inline goto pirop_result
-    unshift arglist, inline
-    signature = inline
-    goto pirop_result
-
-  pirop_result:
-    $I0 = index signature, '%v'
-    if $I0 >= 0 goto pirop_void
-    $I0 = index signature, '%r'
-    if $I0 >= 0 goto pirop_reg
-    .local string returns
-    returns = '.Undef'
-    $S0 = node.'returns'()
-    unless $S0 goto pirop_returns
-    returns = $S0
-  pirop_returns:
-    $P0 = post.'push_new'('POST::Op', 'pirop'=>'new')
-    $P0.'arglist'($P0, returns)
-    post.'result'($P0)
-    goto pirop_reg
-  pirop_void:
-    $P0 = post[0]
-    post.'result'($P0)
-    argresult = 0
-  pirop_reg:
-    unless argresult goto have_result
-    unshift arglist, post
-  have_result:
-    post.'arglist'(arglist :flat)
+    $P0 = post.'get_array'()
+    post.'arglist'($P0 :flat)
     .return (post)
 }
 
@@ -507,37 +458,10 @@ transform chain (PAST::Op) :language('PIR') {
 
 
 transform post (PAST::Val) :language('PIR') {
-    .local string vtype, ctype, name
-    vtype = node.'vtype'()
-    ctype = node.'ctype'()
-    name = node.'name'()
-
-    $I0 = index ctype, '~'
-    if $I0 < 0 goto skip_escape
-    name = node.'escape'(name)
-  skip_escape:
-
-    .local pmc post
-    post = new 'POST::Ops'
-    post.'init'('node'=>node)
-
-    .local string atype
-    atype = node.'atype'()
-    if ctype == '' goto return_pmc
-    if atype == '*' goto return_native
-    $I0 = index ctype, atype
-    if $I0 >= 0 goto return_native
-
-  return_pmc:
-    $P0 = post.'push_new'('POST::Op', 'pirop'=>'new')
-    $P0.'arglist'($P0, vtype)
-    $P1 = post.'push_pirop'('assign', $P0, name, 'result'=>$P0)
-    post.'result'($P1)
-    .return (post)
-
-  return_native:
-    post.'result'(name)
-    .return (post)
+    .local pmc value
+    value = node['value']
+    $P0 = getclass 'POST::Val'
+    .return $P0.'new'('node'=>node, 'value'=>value)
 }
 
 
@@ -549,7 +473,6 @@ transform keypost (PAST::Var) :language('PIR') {
     .local pmc basepost, keypost
     basepast = node[0]
     keypast = node[1]
-    keypast.'atype'('*')
     keypost = tree.'get'('post', keypast)
     post.'push'(keypost)
     basepost = tree.'get'('post', basepast)

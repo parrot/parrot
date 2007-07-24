@@ -108,10 +108,8 @@ children and attributes.  Returns the newly created node.
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    $S0 = typeof self                                      # FIXME
-    $P0 = new 'String'                                     # FIXME
-    $P0 = $S0                                              # FIXME
-    $P1 = new $P0                                          # FIXME
+    $S0 = classname self                                   # FIXME
+    $P1 = new $S0                                          # FIXME
     $P1.'init'(children :flat, 'node'=>self, adverbs :flat :named)
     .return ($P1)
 .end
@@ -304,46 +302,18 @@ node.
 
 =over 4
 
-=item vtype([value])
+=item value([value])
 
-Get/set the type of the value (as a Parrot class identifier).
-For example, a string value might use C<'String'>, or an
-integer might use a language-specific C<'MyInt'> class.
+Get/set the constant value for this node.
 
 =cut
 
 .namespace [ 'PAST::Val' ]
 
-.sub 'vtype' :method
+.sub 'value' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('vtype', value, has_value)
-.end
-
-
-=item ctype([value])
-
-Get/set the argument types for which this C<PAST::Val> node may be
-rendered directly into PIR code as a Parrot constant instead of
-first generating a PMC.  C<value> is a sequence of character
-representing the various argument types for which the node's
-name is a usable constant:
-
-    i    I registers or int
-    n    N register or num
-    +    Any numeric argument (int/num)
-    s    S register or string
-    ~    Any string argument
-
-If C<ctype> isn't set, then the PAST::Val node always results in
-a newly generated PMC initialized with the node's name.
-
-=cut
-
-.sub 'ctype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('ctype', value, has_value)
+    .return self.'attr'('value', value, has_value)
 .end
 
 
