@@ -359,8 +359,9 @@ STRING * string_nprintf( PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_ord( PARROT_INTERP, NULLOK(const STRING *s), INTVAL idx )
-        __attribute__nonnull__(1);
+INTVAL string_ord( PARROT_INTERP, NOTNULL(const STRING *s), INTVAL idx )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void string_pin( PARROT_INTERP, NOTNULL(STRING *s) )

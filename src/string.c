@@ -429,7 +429,7 @@ string_append(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b))
     /* XXX should this be a CHARSET method? */
 
     /* If B isn't real, we just bail */
-    const UINTVAL b_len = string_length(interp, b);
+    const UINTVAL b_len = b ? string_length(interp, b) : 0;
     if (!b_len)
         return a;
 
@@ -759,9 +759,9 @@ are treated as counting from the end of the string.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_ord(PARROT_INTERP, NULLOK(const STRING *s), INTVAL idx)
+string_ord(PARROT_INTERP, NOTNULL(const STRING *s), INTVAL idx)
 {
-    const UINTVAL len = string_length(interp, s);
+    const UINTVAL len = s ? string_length(interp, s) : 0;
 
     if (len == 0) {
         real_exception(interp, NULL, ORD_OUT_OF_STRING,
