@@ -1,4 +1,5 @@
 #!./parrot
+# ex: ft=pir
 
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
