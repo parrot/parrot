@@ -90,9 +90,11 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-                  0 => "-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline"
-                . " -Wshadow -Wpointer-arith -Wcast-qual"
+                  0 => "-W -Wall -Wundef -Wmissing-declarations"
+                . " -Wstrict-prototypes -Wmissing-prototypes"
+                . " -Winline -Wshadow -Wpointer-arith -Wcast-qual"
                 . " -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
+                . " -Wnested-externs"
                 . ( $maint ? " -Wlarger-than-4096" : "" ),
 
             # others; ones we might like marked with ?
