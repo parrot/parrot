@@ -49,6 +49,8 @@ can_ok( 'Parrot::Test', $_ ) for qw/
     c_output_like
     example_output_is               example_output_isnt
     example_output_like
+    language_error_output_is        language_error_output_isnt
+    language_error_output_like
     language_output_is              language_output_isnt
     language_output_like
     pasm_error_output_is            pasm_error_output_isnt
@@ -279,7 +281,7 @@ OUTPUT
 test_test( $desc );
 
 # remember to change the number of tests
-BEGIN { plan tests => 60; }
+BEGIN { plan tests => 63; }
 
 # Local Variables:
 #   mode: cperl
