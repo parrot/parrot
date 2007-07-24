@@ -241,7 +241,6 @@ GEN_HEADERS = \
 
 GEN_SOURCES = \
     $(SRC_DIR)/core_ops.c \
-    $(SRC_DIR)/fingerprint.c \
     $(SRC_DIR)/nci.c \
     $(SRC_DIR)/core_ops_switch.c \
     $(SRC_DIR)/jit_cpu.c \
@@ -388,7 +387,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/exit$(O) \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/extend_vtable$(O) \
-    $(SRC_DIR)/fingerprint$(O) \
     $(SRC_DIR)/gc/dod$(O) \
     $(SRC_DIR)/gc/gc_gms$(O) \
     $(SRC_DIR)/gc/gc_ims$(O) \
@@ -895,10 +893,6 @@ $(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES) $(IMCC_H_FILES)
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num $(OPS_DIR)/ops.skip
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl $(OPS_FILES)
-
-$(SRC_DIR)/fingerprint.c : $(BUILD_TOOLS_DIR)/fingerprint_c.pl PBC_COMPAT
-	$(PERL) $(BUILD_TOOLS_DIR)/fingerprint_c.pl > $(SRC_DIR)/fingerprint.c
-
 
 $(SRC_DIR)/revision.c : $(SVN_ENTRIES) $(BUILD_TOOLS_DIR)/revision_c.pl
 	$(PERL) -Ilib $(BUILD_TOOLS_DIR)/revision_c.pl > $(SRC_DIR)/revision.c
@@ -2007,7 +2001,6 @@ HEADERIZER_O_FILES = \
     src/exceptions$(O) \
     src/exit$(O) \
     src/extend$(O) \
-    src/fingerprint$(O) \
     src/gc/dod$(O) \
     src/gc/gc_gms$(O) \
     src/gc/gc_ims$(O) \
@@ -2068,7 +2061,7 @@ HEADERIZER_O_FILES = \
     compilers/imcc/sets$(O) \
     compilers/imcc/symreg$(O) \
 
-headerizer : $(SRC_DIR)/fingerprint.c $(SRC_DIR)/core_pmcs.c
+headerizer : $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES)
 
 ###############################################################################
