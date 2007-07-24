@@ -706,7 +706,7 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
 
     /* Ensure the magic is correct. */
     if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        PIO_eprintf(NULL, "PackFile_unpack: This is not a valid Parrot bytecoe file\n");
+        PIO_eprintf(NULL, "PackFile_unpack: This is not a valid Parrot bytecode file\n");
         return 0;
     }
 
