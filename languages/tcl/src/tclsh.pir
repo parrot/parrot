@@ -37,7 +37,6 @@
   .local pmc retval
   .local string mode,contents,filename
   .local int argc,retcode
-  argc = argv
 
   .local pmc tcl_interactive
   tcl_interactive = new 'Integer'
@@ -46,7 +45,23 @@
   .local pmc __script
   __script = get_root_global ['_tcl'], '__script'
 
-  if argc > 1 goto open_file
+  .local pmc get_options
+  get_options = new 'Getopt::Obj'
+  push get_options, 'pir'
+  push get_options, 'e=s'
+
+  .local pmc opt
+  $S0 = shift argv   # drop "tcl.pbc"
+  opt = get_options.'get_options'(argv)
+
+  .local int dump_only, execute
+  dump_only = defined opt['pir']
+  execute   = defined opt['e']
+
+  if execute goto oneliner
+
+  argc = argv
+  if argc >0 goto open_file
 
   tcl_interactive = 1
 
@@ -72,6 +87,12 @@ input_loop:
   $S0 = $P0
   $S0 .= "\n" # add back in the newline the prompt chomped
   input_line .= $S0
+  # could probably avoid calling __script 2x here...
+  unless dump_only goto execute_line
+  .local string _pir
+  _pir = __script(input_line, 'pir_only'=>1, 'bsnl'=>1)
+  say _pir
+execute_line:
   push_eh loop_error
     $P2 = __script(input_line)
     retval = $P2()
@@ -108,21 +129,6 @@ input_loop_continue2:
 
 open_file:
   tcl_interactive = 0
- 
-  .local pmc get_options
-  get_options = new 'Getopt::Obj'
-  push get_options, 'pir'
-  push get_options, 'e=s'
-
-  .local pmc opt
-  $S1 = shift argv # drop program name.
-  opt = get_options.'get_options'(argv)
-
-  .local int dump_only, execute
-  dump_only = defined opt['pir']
-
-  execute = defined opt['e']
-  if execute goto oneliner
  
 file:
   filename = shift argv
