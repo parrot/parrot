@@ -11,55 +11,73 @@ lua.pbc -- A stand-alone interpreter for Lua 5.1
 
 =head1 DESCRIPTION
 
-C<lua> is the stand-alone Lua interpreter. It loads and executes Lua programs.
+B<lua> is the stand-alone Lua interpreter. It loads and executes Lua programs.
 
 See also "Lua 5.1 Reference Manual", section 6 "Lua Stand-alone",
 L<http://www.lua.org/manual/5.1/manual.html#6>.
 
 The given I<options> (see below) are executed and then the Lua program in file
 I<script> is loaded and executed. The given I<args> are available to I<script>
-as strings in a global table named C<arg>. If these arguments contain spaces
+as strings in a global table named B<arg>. If these arguments contain spaces
 or other characters special to the shell, then they should be quoted (but note
-that the quotes will be removed by the shell). The arguments in C<arg> start
+that the quotes will be removed by the shell). The arguments in B<arg> start
 at 0, which contains the string 'I<script>'. The arguments given in the
 command line before I<script>, including the name of the interpreter, are
-available in negative indices in C<arg>.
+available in negative indices in B<arg>.
 
-At the very start, before even handling the command line, C<lua> executes
-the contents of the environment variable C<LUA_INIT>, if it is defined.
-If the value of C<LUA_INIT> is of the form '@I<filename>', then I<filename>
+At the very start, before even handling the command line, B<lua> executes
+the contents of the environment variable B<LUA_INIT>, if it is defined.
+If the value of B<LUA_INIT> is of the form '@I<filename>', then I<filename>
 is executed. Otherwise, the string is assumed to be a Lua statement and is
 executed.
 
-Options start with C<'-'> and are described below. You can use C<'--'> to
+Options start with B<'-'> and are described below. You can use B<'--'> to
 signal the end of options.
 
-If no arguments are given, then C<"-v -i"> is assumed when the standard input
-is a terminal; otherwise, C<"-"> is assumed.
+If no arguments are given, then B<"-v -i"> is assumed when the standard input
+is a terminal; otherwise, B<"-"> is assumed.
+
+In interactive mode, B<lua> prompts the user, reads lines from the standard
+input, and executes them as they are read. If a line does not contain a
+complete statement, then a secondary prompt is displayed and lines are read
+until a complete statement is formed or a syntax error is found. So, one way
+to interrupt the reading of an incomplete statement is to force a syntax
+error: adding a B<';'> in the middle of a statement is a sure way of forcing
+a syntax error (except inside multiline strings and comments; these must be
+closed explicitly). If a line starts with B<'='>, then B<lua> displays the
+values of all the expressions in the remainder of the line. The expressions
+must be separated by commas. The primary prompt is the value of the global
+variable B<_PROMPT>, if this value is a string; otherwise, the default prompt
+is used. Similarly, the secondary prompt is the value of the global variable
+B<_PROMPT2>. So, to change the prompts, set the corresponding variable to a
+string of your choice. You can do that after calling the interpreter or on the
+command line (but in this case you have to be careful with quotes if the
+prompt string contains a space; otherwise you may confuse the shell.) The
+default prompts are "> " and ">> ".
 
 =head1 OPTIONS
 
 =over 4
 
-=item C<->
+=item B<->
 
 load and execute the standard input as a file, that is, not interactively, even when the standard input is a terminal.
 
-=item C<-e> I<stat>
+=item B<-e> I<stat>
 
 execute statement I<stat>. You need to quote I<stat> if it contains spaces,
 quotes, or other characters special to the shell.
 
-=item C<-i>
+=item B<-i>
 
 enter interactive mode after I<script> is executed.
 
-=item C<-l> I<name>
+=item B<-l> I<name>
 
-call C<require>('I<name>') before executing I<script>.
+call B<require>('I<name>') before executing I<script>.
 Typically used to load libraries.
 
-=item C<-v>
+=item B<-v>
 
 show version information.
 
@@ -74,6 +92,8 @@ show version information.
 
 .sub 'main' :main
     .param pmc args
+    load_bytecode "languages/lua/lib/luaaux.pbc"
+    # lua_gc('stop')
     load_bytecode "languages/lua/lib/luabasic.pbc"
     load_bytecode "languages/lua/lib/luacoroutine.pbc"
     load_bytecode "languages/lua/lib/luapackage.pbc"
@@ -83,12 +103,15 @@ show version information.
     load_bytecode "languages/lua/lib/luaio.pbc"
     load_bytecode "languages/lua/lib/luaos.pbc"
     load_bytecode "languages/lua/lib/luadebug.pbc"
-    $I0 = handle_luainit()
-    if $I0 goto L1
+    # lua_gc('restart')
+    .local int status
+    status = handle_luainit()
+    if status goto L1
     .local int script, has_i, has_v, has_e
     (script, has_i, has_v, has_e) = collectargs(args)
     unless script < 0 goto L2 # invalid args?
     print_usage()
+    status = 1
     goto L1
   L2:
     unless has_v goto L3
@@ -100,11 +123,11 @@ show version information.
   L4:
     $I0 = elements args
   L5:
-    $I0 = runargs(args, $I0)
-    if $I0 goto L1
+    status = runargs(args, $I0)
+    if status goto L1
     unless script goto L6
-    $I0 = handle_script(args, script)
-    if $I0 goto L1
+    status = handle_script(args, script)
+    if status goto L1
   L6:
     unless has_i goto L7
     dotty()
@@ -113,9 +136,17 @@ show version information.
     if script goto L1
     if has_v goto L1
     if has_e goto L1
+    # $P0 = getstdin
+    # $I0 = $P0.'isatty'()
+    $I0 = 1
+    unless $I0 goto L8
     print_version()
     dotty()
+    goto L1
+  L8:
+    status = dofile('')    # executes stdin as a file
   L1:
+    exit status
 .end
 
 
@@ -276,9 +307,10 @@ show version information.
     inc $I0
     goto L3
   L4:
-    .return docall($P0, vararg :flat)
+    ($P0 :slurpy) = docall($P0, vararg :flat)
+    .return report($P0 :flat)
   L2:
-    .return report($S0)
+    .return report(1, $S0)
 .end
 
 
@@ -313,9 +345,10 @@ show version information.
     .param string name
     ($P0, $S0) = lua_loadfile(name)
     if null $P0 goto L1
-    .return docall($P0)
+    ($P0 :slurpy) = docall($P0)
+    .return report($P0 :flat)
   L1:
-    .return report($S0)
+    .return report(1, $S0)
 .end
 
 
@@ -324,9 +357,10 @@ show version information.
     .param string name
     ($P0, $S0) = lua_loadbuffer(s, name)
     if null $P0 goto L1
-    .return docall($P0)
+    ($P0 :slurpy) = docall($P0)
+    .return report($P0 :flat)
   L1:
-    .return report($S0)
+    .return report(1, $S0)
 .end
 
 
@@ -343,21 +377,99 @@ show version information.
     .return (0)
   _handler:
     .get_results ($P0, $S0)
-    .return report($S0)
+    .return report(1, $S0)
 .end
 
 
 .sub 'dotty' :anon
-    # STILL INCOMPLETE
-    $P0 = compreg 'Lua'
-    $P0.'interactive'()
+    .local pmc env
+    env = get_global '_G'
+    .const .LuaString k_print = 'print'
+    .local int has_readline
+    .local pmc stdin, code
+    stdin = getstdin
+    has_readline = stdin.'set_readline_interactive'(1)
+  L1:
+    code = get_line (stdin, has_readline, 1)
+    if null code goto L2    # no input
+    unless code goto L2     # empty
+    ($P0, $S0) = lua_loadbuffer(code, '=stdin')
+    # TODO : retry when incomplete code (with _PROMPT2)
+    if null $P0 goto L3
+    ($I0, $P0) = docall($P0)
+    if $I0 goto L4
+    $I0 = elements $P0
+    unless $I0 goto L1
+    $P1 = env.'rawget'(k_print)
+    $P1($P0 :flat)
+    goto L1
+  L4:
+    $S0 = $P0
+  L3:
+    l_message('', $S0)
+    goto L1
+  L2:
+.end
+
+
+.sub 'get_line' :anon
+    .param pmc stdin
+    .param int has_readline
+    .param int firstline
+    .local string prmt
+    prmt = get_prompt(firstline)
+    printerr prmt
+    .local pmc code
+    if has_readline < 0 goto L1
+    code = stdin.'readline'('')
+    if null code goto L2        # no input
+    code .= "\n"
+    goto L3
+  L1:
+    $S0 = readline stdin
+    code = new .String
+    code = $S0
+  L3:
+    unless firstline goto L2
+    $S0 = code
+    $S1 = substr $S0, 0, 1
+    unless $S1 == '=' goto L2
+    $S0 = substr $S0, 1         # first line starts with `='
+    $S0 = 'return ' . $S0
+    set code, $S0               # change it to `return'
+  L2:
+    .return (code)
+.end
+
+
+.sub 'get_prompt' :anon
+    .param int firstline
+    .local pmc env
+    env = get_global '_G'
+    $S0 = '_PROMPT'
+    $S1 = '> '
+    if firstline goto L1
+    $S0 = '_PROMPT2'
+    $S1 = '>> '
+  L1:
+    new $P0, .LuaString
+    set $P0, $S0
+    $P0 = env.'rawget'($P0)
+    $I0 = isa $P0, 'LuaNil'
+    if $I0 goto L2
+    $S1 = $P0
+  L2:
+    .return ($S1)
 .end
 
 
 .sub 'report' :anon
-    .param string msg
+    .param int status
+    .param pmc msg
+    unless status goto L1
     l_message('lua.pbc', msg)
-    .return (1)
+  L1:
+    .return (status)
 .end
 
 

@@ -35,7 +35,11 @@ package pirVisitor;
     vararg = argstolua(env, args)
     .const .Sub main = '_main'
     main.'setfenv'(env)
-    docall(main, vararg :flat)
+    ($I0, $P0) = docall(main, vararg :flat)
+    unless $I0 goto L1
+    printerr 'luac.pl: '
+    printerr $P0
+  L1:
 .end
 
 };

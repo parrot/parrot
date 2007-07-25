@@ -262,7 +262,7 @@ sets C<arg>/100 as the new value for the I<step multiplier> of the collector.
 
 =back
 
-STILL INCOMPLETE (see gc).
+STILL INCOMPLETE (see lua_gc).
 
 =cut
 
@@ -273,7 +273,7 @@ STILL INCOMPLETE (see gc).
     $S1 = lua_optstring(1, opt, 'collect')
     lua_checkoption(1, $S1, 'stop restart collect count step setpause setstepmul')
     $I2 = lua_optint(2, arg, 0)
-    $N0 = gc($S1, $I2)
+    $N0 = lua_gc($S1, $I2)
     unless $S1 == 'step' goto L1
     new res, .LuaBoolean
     $I0 = $N0
@@ -283,47 +283,6 @@ STILL INCOMPLETE (see gc).
     new res, .LuaNumber
     set res, $N0
   L2:
-    .return (res)
-.end
-
-.include 'interpinfo.pasm'
-
-.sub 'gc' :anon
-    .param string what
-    .param int data
-    .local float res
-    res = 0
-  L_stop:
-    unless what == 'stop' goto L_restart
-    collectoff
-    goto L_end
-  L_restart:
-    unless what == 'restart' goto L_collect
-    collecton
-    goto L_end
-  L_collect:
-    unless what == 'collect' goto L_count
-    collect
-    goto L_end
-  L_count:
-    unless what == 'count' goto L_step
-    interpinfo $I0, .INTERPINFO_TOTAL_MEM_ALLOC
-    # GC values are expressed in Kbytes
-    res = $I0 / 1024
-    goto L_end
-  L_step:
-    unless what == 'step' goto L_setpause
-    goto L_end
-  L_setpause:
-    unless what == 'setpause' goto L_setstepmul
-    # not_implemented()
-    goto L_end
-  L_setstepmul:
-    unless what == 'setstepmul' goto L_default
-    goto L_end
-  L_default:
-    res = -1
-  L_end:
     .return (res)
 .end
 
@@ -347,6 +306,7 @@ protected mode).
   L1:
     lua_error($S0)
 .end
+
 
 =item C<error (message [, level])>
 

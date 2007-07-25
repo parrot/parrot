@@ -125,7 +125,7 @@ close $X;
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (syntax error)');
 dofile('foo.lua')
 CODE
-/lua:/
+/lua[^:]*:/
 OUTPUT
 
 # clean up foo.lua

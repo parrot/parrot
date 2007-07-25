@@ -217,6 +217,52 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
+=item C<lua_gc (what, data)>
+
+=cut
+
+.include 'interpinfo.pasm'
+
+.sub 'lua_gc'
+    .param string what
+    .param int data :optional
+    .local float res
+    res = 0
+  L_stop:
+    unless what == 'stop' goto L_restart
+    collectoff
+    goto L_end
+  L_restart:
+    unless what == 'restart' goto L_collect
+    collecton
+    goto L_end
+  L_collect:
+    unless what == 'collect' goto L_count
+    collect
+    goto L_end
+  L_count:
+    unless what == 'count' goto L_step
+    interpinfo $I0, .INTERPINFO_TOTAL_MEM_ALLOC
+    # GC values are expressed in Kbytes
+    res = $I0 / 1024
+    goto L_end
+  L_step:
+    unless what == 'step' goto L_setpause
+    goto L_end
+  L_setpause:
+    unless what == 'setpause' goto L_setstepmul
+    # not_implemented()
+    goto L_end
+  L_setstepmul:
+    unless what == 'setstepmul' goto L_default
+    goto L_end
+  L_default:
+    res = -1
+  L_end:
+    .return (res)
+.end
+
+
 =item C<lua_getfenv (o)>
 
 =cut
@@ -474,7 +520,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     goto L4
   L5:
     .const .LuaString k_arg = 'arg'
-    env[k_arg] = $P0
+    env.'rawset'(k_arg, $P0)
   L3:
     .return (res)
 .end
@@ -526,8 +572,8 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc where
     .lex 'where', where
     new where, .LuaString
-    f(vararg :flat)
-    .return (0)
+    ($P0 :slurpy) = f(vararg :flat)
+    .return (0, $P0)
   _handler:
     .local pmc ex
     .local string msg
@@ -536,15 +582,14 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     severity = ex[2]
     if severity == .EXCEPT_EXIT goto L1
     .local int lineno
-    $S0 = 'lua: '
     $S1 = where
-    $S0 .= $S1
+    $S0 = $S1
     $S0 .= ' '
     $S0 .= msg
     $S0 .= "\n"
-    printerr $S0
-    printerr traceback
-    .return (1)
+    $S1 = traceback
+    $S0 .= $S1
+    .return (1, $S0)
   L1:
     rethrow ex
 .end
@@ -584,24 +629,6 @@ Support variable number of arguments function call.
     ex = new .Exception
     ex['_message'] =  "not implemented"
     throw ex
-.end
-
-
-=item C<prompt (env)>
-
-=cut
-
-.sub 'prompt'
-    .param pmc env
-    $S0 = '> '
-    .const .LuaString k__PROMPT = '_PROMPT'
-    $P0 = env.'rawget'(k__PROMPT)
-    $I0 = isa $P0, 'LuaNil'
-    if $I0 goto L1
-    $S0 = $P0
-  L1:
-    $P0 = compreg 'Lua'
-    $P0.'commandline_prompt'($S0)
 .end
 
 
