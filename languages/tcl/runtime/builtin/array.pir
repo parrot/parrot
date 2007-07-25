@@ -219,7 +219,7 @@ no_args:
   .local string str
 
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   .local pmc rule
   rule = globber.'compile'(match_str)
 
@@ -285,7 +285,7 @@ no_args:
   .local string str
 
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   .local pmc rule
   (rule, $P0, $P1) = globber.'compile'(match_str)
 
@@ -370,7 +370,7 @@ not_array:
   .local string name
 
   .local pmc globber, retval
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   .local pmc rule
   rule = globber.'compile'(pattern)
 

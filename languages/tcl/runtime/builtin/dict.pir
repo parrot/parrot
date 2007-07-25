@@ -217,7 +217,7 @@ bad_args:
   if option == 'script' goto do_script_prelude
 
   .local pmc globber, pattern
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   if argc != 3 goto missing_glob
   pattern = shift argv 
 
@@ -587,7 +587,7 @@ bad_args:
 
 got_pattern:
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
 
   .local pmc rule, match
   rule = globber.'compile'(pattern)
@@ -952,7 +952,7 @@ bad_args:
 
 got_pattern:
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
 
   .local pmc rule, match
   rule = globber.'compile'(pattern)

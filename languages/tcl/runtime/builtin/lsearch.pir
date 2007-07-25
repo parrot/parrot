@@ -63,7 +63,7 @@ got_case:
 
 glob_begin:
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   .local pmc rule, match
   rule = globber.'compile'(pattern)
 

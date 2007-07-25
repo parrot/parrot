@@ -318,7 +318,7 @@ bad_args:
   if argc != 2 goto iterate
 
   .local pmc glob, pattern
-  glob        = compreg 'PGE::Glob'
+  glob        = compreg 'Tcl::Glob'
   pattern     = argv[1]
   pattern     = glob.'compile'(pattern)
   has_pattern = 1

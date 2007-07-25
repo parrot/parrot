@@ -101,7 +101,7 @@ exact_do:
 
 glob_mode:
   .local pmc globber, rule
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
 glob_loop:
   unless body goto body_end
   pattern = shift body

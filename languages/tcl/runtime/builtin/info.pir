@@ -269,7 +269,7 @@ bad_args:
   retval = new 'TclList'
 
   .local pmc globber,rule,match
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   if argc == 1 goto got_glob
   $S1 = '&*'
   goto compile
@@ -304,7 +304,7 @@ bad_args:
     null matching
     if argc ==0 goto done_setup
 
-    $P1 = compreg 'PGE::Glob'
+    $P1 = compreg 'Tcl::Glob'
     .local string pattern
     pattern = argv[0]
 
@@ -507,7 +507,7 @@ find_info_level:
   retval = new 'TclList'
 
   .local pmc globber,rule,match
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
   if argc == 1 goto got_glob
   $S1 = "$*"
   goto compile

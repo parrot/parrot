@@ -59,10 +59,11 @@ providing a compreg-compatible method.
   # Load any dependant libraries.
   load_bytecode 'Getopt/Obj.pbc'
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Glob.pbc'
   load_bytecode 'PGE/Text.pbc'                                                                                                                                  
   load_bytecode 'PGE/Util.pbc'
   load_bytecode 'TGE.pbc'
+
+  load_bytecode 'Tcl/Glob.pbc'
 
   # Expose Environment variables.
   .local pmc env,tcl_env,iterator

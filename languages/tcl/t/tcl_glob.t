@@ -38,18 +38,16 @@ not_ok [string match {[ab]*} ring]  ""
     ok [string match {[0-9]} 9]     ""
 not_ok [string match {[0-9]} a]     ""
 
-set TODO {TODO "globbing needs to be specialised for Tcl"}
-
-not_ok [string match {[^d-f]} z]    "" $TODO
-not_ok [string match {[^d-f]} c]    "" $TODO
-not_ok [string match {[!d-f]} g]    "" $TODO
-    ok [string match {[!d-f]} d]    "" $TODO
-    ok [string match {[^d-f]} e]    "" $TODO
-    ok [string match {[^d-f]} f]    "" $TODO
+not_ok [string match {[^d-f]} z]    ""
+not_ok [string match {[^d-f]} c]    ""
+not_ok [string match {[!d-f]} g]    ""
+    ok [string match {[!d-f]} d]    ""
+    ok [string match {[^d-f]} e]    ""
+    ok [string match {[^d-f]} f]    ""
 
 # braces should be literal
 
-    ok [string match {{az,bz}} "{az,bz}"] "" $TODO
-not_ok [string match {{az,bz}} "bz"]      "" $TODO
-    ok [string match {[a-z]{5}} "b{5}"]   "" $TODO
+    ok [string match {{az,bz}} "{az,bz}"] ""
+not_ok [string match {{az,bz}} "bz"]      ""
+    ok [string match {[a-z]{5}} "b{5}"]   ""
 not_ok [string match {[a-z]{5}} "bbbbb"]  ""

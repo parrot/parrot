@@ -440,7 +440,7 @@ match_next:
 
 match_continue:
   .local pmc globber
-  globber = compreg 'PGE::Glob'
+  globber = compreg 'Tcl::Glob'
 
   .local pmc rule, match 
   rule = globber.'compile'(pattern)
