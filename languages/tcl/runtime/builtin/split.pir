@@ -27,7 +27,7 @@ got_splitchars:
   if splitchars == '' goto split_empty
 
   .local pmc charHash 
-  charHash = new .Hash
+  charHash = new 'Hash'
 
   .local int sc_len, pos
   .local string split_char
@@ -46,7 +46,7 @@ done_hash_loop:
   # Loop over each character in the string. Is it one of the split
   # chars?
   .local pmc results
-  results = new .TclList
+  results = new 'TclList'
   .local int str_len
   str_len = length splitstring
 
@@ -82,7 +82,7 @@ split_really_done:
   .return (results)
 
 split_empty:
-  results = new .TclList
+  results = new 'TclList'
   str_len = length splitstring
   pos = 0
 split_empty_loop:

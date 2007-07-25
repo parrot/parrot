@@ -54,7 +54,7 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     store_global 'TclExpr::PAST', '$!serno', $P0
 .end
 
@@ -73,9 +73,9 @@ Initializes a new C<PAST::Node> object.
 =cut
 
 .sub init :vtable :method
-    $P0 = new .String
-    $P1 = new .Integer
-    $P2 = new .ResizablePMCArray
+    $P0 = new 'String'
+    $P1 = new 'Integer'
+    $P2 = new 'ResizablePMCArray'
 
     setattribute self, "PAST::Node\x0$.source",   $P0
     setattribute self, "PAST::Node\x0$.pos",      $P1
@@ -154,7 +154,7 @@ with C<Data::Dumper>.
     print ' @ '
     print $I0
     hascapts = 0
-    iter = new .Iterator, self
+    iter = new 'Iterator', self
     iter = 0
   dump_hash_1:
     unless iter goto dump_end
@@ -190,7 +190,7 @@ with C<Data::Dumper>.
 
 .sub 'child_iter' :method
     $P0 = getattribute self, '@.children'
-    $P1 = new .Iterator, $P0
+    $P1 = new 'Iterator', $P0
     $P1 = 0
     .return ($P1)
 .end

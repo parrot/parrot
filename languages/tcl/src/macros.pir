@@ -92,7 +92,7 @@ Simplistic implementation of C<clone> vtable
 
 .sub clone :vtable :method
   .sym pmc obj
-  obj = new .Undef
+  obj = new 'Undef'
   assign obj, self
   .return(obj)
 .end

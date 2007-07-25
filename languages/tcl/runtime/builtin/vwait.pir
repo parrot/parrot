@@ -17,7 +17,7 @@
 
 outer:
     .local pmc iter, var
-    iter = new .Iterator, events
+    iter = new 'Iterator', events
     push_eh inner
       var = __read(name)
     clear_eh

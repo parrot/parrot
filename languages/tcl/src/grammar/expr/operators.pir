@@ -237,7 +237,7 @@ empty_string:
     .return($P0)
 
 divide_by_zero:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DIVZERO'
     $S0 = 'divide by zero'
@@ -975,7 +975,7 @@ empty_string:
 
     .local pmc iter
     list = __list(list)
-    iter = new .Iterator, list
+    iter = new 'Iterator', list
 loop:
     unless iter goto false
     $P0 = shift iter
@@ -998,7 +998,7 @@ false:
 
     .local pmc iter
     list = __list(list)
-    iter = new .Iterator, list
+    iter = new 'Iterator', list
 loop:
     unless iter goto true
     $P0 = shift iter

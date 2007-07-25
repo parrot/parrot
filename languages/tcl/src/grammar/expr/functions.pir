@@ -67,7 +67,7 @@ is_string:
     tcl_error $S0
 
 domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'
@@ -102,7 +102,7 @@ is_string:
     tcl_error $S0
 
 domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'
@@ -243,7 +243,7 @@ is_string:
     clear_eh
 
     .local pmc ret
-    ret = new .TclInt
+    ret = new 'TclInt'
     assign ret, n
     .return(ret)
 
@@ -296,14 +296,14 @@ negative:
     $I0 = result
     dec $I0
     $N0 = $I0
-    $P0 = new .TclFloat
+    $P0 = new 'TclFloat'
     $P0 = $N0
     .return ($P0) 
 
 positive: 
     $I0 = result
     $N0 = $I0
-    $P0 = new .TclFloat
+    $P0 = new 'TclFloat'
     $P0 = $N0
     .return ($P0)
 
@@ -358,7 +358,7 @@ is_string:
     .return (ret)
 
 domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'
@@ -392,7 +392,7 @@ is_string:
     .return (ret)
 
 domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'
@@ -410,7 +410,7 @@ is_string:
     .param pmc args :slurpy
 
     .local pmc iter, max
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
     max  = shift iter
 loop:
     unless iter goto done
@@ -426,7 +426,7 @@ done:
     .param pmc args :slurpy
 
     .local pmc iter, min
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
     min  = shift iter
 loop:
     unless iter goto done
@@ -531,7 +531,7 @@ is_string:
     .return (ret)
 
 domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'
@@ -667,7 +667,7 @@ is_string:
     .return (ret)
 
  domain_error:
-    $P0 = new .TclList
+    $P0 = new 'TclList'
     $P0[0] = 'ARITH'
     $P0[1] = 'DOMAIN'
     $S0 = 'domain error: argument not in valid range'

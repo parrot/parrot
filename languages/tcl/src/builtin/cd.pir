@@ -20,14 +20,14 @@
 
 noargs:
   pir.emit(<<'END_PIR', retval)
-  %0 = new .Env
+  %0 = new 'Env'
   %0 = %0['HOME']
 END_PIR
   dir = retval
 
 cd_it:
   pir.emit(<<'END_PIR', retval, dir)
-  $P0 = new .OS
+  $P0 = new 'OS'
   %0  = $P0.'chdir'(%1)
 END_PIR
 

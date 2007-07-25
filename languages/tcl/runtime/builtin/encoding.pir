@@ -16,7 +16,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'convertfrom'
   push options, 'convertto'
   push options, 'dirs'

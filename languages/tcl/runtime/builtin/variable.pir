@@ -17,7 +17,7 @@
     __namespace = get_root_global ['_tcl'], '__namespace'
 
     .local pmc iter, name, value, ns
-    iter = new .Iterator, argv
+    iter = new 'Iterator', argv
 loop:
     unless iter goto end
     name = shift iter
@@ -55,7 +55,7 @@ no_value:
     goto end
 
 create_new:
-    value = new .Undef
+    value = new 'Undef'
     # store as a lexical *and* a global
     __store_var($S0, value)
     __store_var(name, value, 'global'=>1)

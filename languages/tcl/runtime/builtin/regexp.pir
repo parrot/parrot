@@ -9,7 +9,7 @@
   if argc < 2 goto badargs
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'all'
   push options, 'about'
   push options, 'indices'
@@ -92,7 +92,7 @@ next_submatch:
 
 matches_ind:
   .local pmc matchList
-  matchList = new .TclList
+  matchList = new 'TclList'
   matchList[0] = -1
   matchList[1] = -1
   $I0 = match.'from'()
@@ -111,7 +111,7 @@ subMatches_ind_loop:
    unless argc goto done
 
    subMatchVar = shift argv
-   subMatchList = new .TclList
+   subMatchList = new 'TclList'
    subMatchList[0] = -1
    subMatchList[1] = -1
    if_null matches, set_it_ind

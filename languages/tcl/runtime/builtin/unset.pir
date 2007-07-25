@@ -84,7 +84,7 @@ scalar:
   var = find_var(name)
   if null var goto no_such_var
 
-  $P1 = new .Undef
+  $P1 = new 'Undef'
   assign var, $P1
   # goto next
 

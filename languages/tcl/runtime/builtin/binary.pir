@@ -13,7 +13,7 @@
     subcommand_name = shift argv
 
     .local pmc options
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     push options, 'format'
     push options, 'scan'
 
@@ -74,8 +74,8 @@ bad_args:
 
     .local pmc __set, variables, values
     __set = get_root_global ['_tcl'], '__set'
-    variables = new .Iterator, argv
-    values    = new .Iterator, ret
+    variables = new 'Iterator', argv
+    values    = new 'Iterator', ret
 loop:
     unless variables goto end
     unless values    goto end

@@ -7,7 +7,7 @@
 .sub '&list'
   .param pmc argv :slurpy
 
-  $P0 = new TclList
+  $P0 = new 'TclList'
   assign $P0, argv
 
   .return($P0)

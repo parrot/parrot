@@ -133,7 +133,7 @@ transform pir (PAST::Op) {
     .local pmc return_register
  
     pir = new 'PGE::CodeString'
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     iter = node.'child_iter'()
   iter_loop: 
     unless iter goto iter_done
@@ -168,7 +168,7 @@ transform pir (PAST::MathFunc) {
     .local pmc return_register
  
     pir  = new 'PGE::CodeString'
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     iter = node.'child_iter'()
   iter_loop: 
     unless iter goto iter_done
@@ -200,9 +200,9 @@ transform pir (PAST::StaticCommand) {
     .local string reg
     
     pir  = new 'PGE::CodeString'
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     children = node.'get_children'()
-    iter = new .Iterator, children
+    iter = new 'Iterator', children
 
     .local string name
     $P0  = shift iter
@@ -329,9 +329,9 @@ transform pir (PAST::DynamicCommand) {
     .local pmc args, children, iter, pir, reg
     
     pir  = new 'PGE::CodeString'
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     children = node.'get_children'()
-    iter = new .Iterator, children
+    iter = new 'Iterator', children
   iter_loop: 
     unless iter goto iter_done
     $P1 = shift iter

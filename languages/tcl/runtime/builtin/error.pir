@@ -34,7 +34,7 @@ arg_3:
   goto finish
 
 arg_2:
-  errorCode = new .TclString
+  errorCode = new 'TclString'
   errorCode = 'NONE'
   errorInfo = argv[1]
 

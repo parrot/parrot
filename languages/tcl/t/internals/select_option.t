@@ -49,7 +49,7 @@ done_1:
 
     # Setup options
     .local pmc options
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     options[0] = 'dank'
     options[1] = 'dark'
     options[2] = 'dunk'
@@ -113,7 +113,7 @@ check_6:
 
     # 7
     message='no comma with only two options'
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     options[0] = 'bill'
     options[1] = 'bob'
     push_eh eh_7
@@ -129,7 +129,7 @@ check_7:
 
     # 8
     message='no comma with only two options, ambiguous'
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     options[0] = 'bill'
     options[1] = 'bob'
     push_eh eh_8

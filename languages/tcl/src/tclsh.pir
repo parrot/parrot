@@ -40,7 +40,7 @@
   argc = argv
 
   .local pmc tcl_interactive
-  tcl_interactive = new .Integer
+  tcl_interactive = new 'Integer'
   store_global '$tcl_interactive', tcl_interactive
 
   .local pmc __script

@@ -13,7 +13,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'add'
   push options, 'clicks'
   push options, 'format'

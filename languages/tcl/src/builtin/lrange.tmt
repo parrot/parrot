@@ -23,7 +23,7 @@ set_last:
 
 have_indices:
   $I0 = from
-  $R  = new .TclList
+  $R  = new 'TclList'
 loop:
   if $I0 > to goto end
   $P0 = $list[$I0]

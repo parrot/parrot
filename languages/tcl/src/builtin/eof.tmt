@@ -1,5 +1,5 @@
 [eof channelId:channel]
 
 $I0 = isfalse $channelId
-$R  = new .TclInt
+$R  = new 'TclInt'
 $R  = $I0

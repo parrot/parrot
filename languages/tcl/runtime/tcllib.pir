@@ -66,10 +66,10 @@ providing a compreg-compatible method.
 
   # Expose Environment variables.
   .local pmc env,tcl_env,iterator
-  env = new .Env
-  tcl_env = new .TclArray
+  env = new 'Env'
+  tcl_env = new 'TclArray'
   
-  iterator = new .Iterator, env
+  iterator = new 'Iterator', env
   iterator = 0
 
   .local string key,value
@@ -90,7 +90,7 @@ env_loop_done:
   clear_eh
   goto set_tcl_library 
  non_interactive:
-  $P1 = new .TclInt
+  $P1 = new 'TclInt'
   $P1 = 0
   set_root_global ['tcl'], '$tcl_interactive', $P1
 
@@ -147,7 +147,7 @@ env_loop_done:
 
   # keep track of names of file types.
   .local pmc filetypes
-  filetypes = new .TclArray
+  filetypes = new 'TclArray'
   filetypes[0o060000] = 'blockSpecial'
   filetypes[0o020000] = 'characterSpecial'
   filetypes[0o040000] = 'directory'
@@ -159,7 +159,7 @@ env_loop_done:
    store_global 'filetypes', filetypes
 
    .local pmc binary_types
-   binary_types = new .TclArray
+   binary_types = new 'TclArray'
    binary_types['a'] = 1
    binary_types['A'] = 1
    binary_types['b'] = 1
@@ -184,32 +184,32 @@ env_loop_done:
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
-  $P1 = new .ResizablePMCArray
+  $P1 = new 'ResizablePMCArray'
   store_global 'info_level', $P1
 
-  $P1 = new .ResizablePMCArray
+  $P1 = new 'ResizablePMCArray'
   store_global 'events', $P1
 
   # Global variable initialization
 
    #version info
-  $P0 = new .String
+  $P0 = new 'String'
   $P0 = '0.1'
   set_root_global ['tcl'], '$tcl_patchLevel', $P0
-  $P0 = new .String
+  $P0 = new 'String'
   $P0 = '0.1'
   set_root_global ['tcl'], '$tcl_version', $P0
    
   #error information
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = 'NONE'
   set_root_global ['tcl'], '$errorCode', $P0
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = ''
   set_root_global ['tcl'], '$errorInfo', $P0
 
   # Setup the default channelIds
-  $P1 = new .TclArray
+  $P1 = new 'TclArray'
   $P2 = getstdin
   $P1['stdin'] = $P2
   $P2 = getstdout
@@ -219,19 +219,19 @@ env_loop_done:
   store_global 'channels', $P1
   
   # Setup the id # for channels..
-  $P1 = new .Integer
+  $P1 = new 'Integer'
   $P1 = 1
   store_global 'next_channel_id', $P1
 
   # call chain of lex pads (for upvar and uplevel)
-  $P1 = new .ResizablePMCArray
+  $P1 = new 'ResizablePMCArray'
   store_global 'call_chain', $P1
 
   # Change counter: when something is compiled, it is compared to
   # This counter: if the counter hasn't changed since it was compiled,
   # it's safe to use the inline version (if available)
   # Otherwise fallback to the interpreted version.
-  $P1 = new .Integer
+  $P1 = new 'Integer'
   $P1 = 0
   store_global 'epoch', $P1
 
@@ -246,7 +246,7 @@ env_loop_done:
   compreg 'TCL', $P1
   
   # Setup a global to keep a unique id for compiled subs.
-  $P1 = new .Integer
+  $P1 = new 'Integer'
   $P1 = 0
   store_global 'compiled_num', $P1
 

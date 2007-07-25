@@ -13,7 +13,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'atime'
   push options, 'attributes'
   push options, 'channels'
@@ -132,7 +132,7 @@ bad_args:
   file = shift argv
   varname = shift argv 
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -140,7 +140,7 @@ bad_args:
   .local pmc __set
   __set = find_global '__set' 
 
-  $P3 = new .TclArray
+  $P3 = new 'TclArray'
   $P1 = $P2[8]
   $P3['atime'] = $P1
   $P1 = $P2[10]
@@ -197,7 +197,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -234,7 +234,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -271,7 +271,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -305,7 +305,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -333,7 +333,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -361,7 +361,7 @@ bad_args:
   .local string file
   file = shift argv
 
-  $P1 = new .OS
+  $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
   clear_eh
@@ -408,7 +408,7 @@ bad_args:
     $I0 = elements array
     if $I0 == 0 goto empty
 
-    $P1 = new .ResizableStringArray
+    $P1 = new 'ResizableStringArray'
   loop:
     unless array goto done
     $S0 = shift array
@@ -487,7 +487,7 @@ bad_args:
     if argc != 1 goto badargs
 
     .local pmc os
-    os = new .OS
+    os = new 'OS'
     $S0 = argv[0]
     push_eh false
       $P0 = os.'stat'($S0)

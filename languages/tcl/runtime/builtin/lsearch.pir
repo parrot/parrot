@@ -7,7 +7,7 @@
   .param pmc argv :slurpy
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'all'
   push options, 'ascii'
   push options, 'decreasing'
@@ -44,7 +44,7 @@
   pattern = shift argv
 
   .local pmc iter
-  iter = new .Iterator, list 
+  iter = new 'Iterator', list 
 
   .local int pos, result
   result = -1 

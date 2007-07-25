@@ -49,13 +49,13 @@ done_1:
 
     # Setup options
     .local pmc options, argv
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     options[0] = 'baz'
     options[1] = 'bob'
     options[2] = 'joe'
 
     # 2-5
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joe'
     argv[1] = 'what'
     message='exact match, single, leftover args' 
@@ -78,7 +78,7 @@ done_1:
     is ($S0, 'what', $S1)
 
     # 6-8
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joe'
     message='exact match, single, no leftover args'
     $P1 = select_switches(options, argv)
@@ -96,7 +96,7 @@ done_1:
     is ($I1, 0, $S1)
 
     # 9-13
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joe'
     argv[1] = '-baz'
     argv[2] = 'what'
@@ -124,7 +124,7 @@ done_1:
     is ($S0, 'what', $S1)
 
     # 14-17
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joe'
     argv[1] = '--'
     argv[2] = '-bob'
@@ -148,7 +148,7 @@ done_1:
     is ($S0, '-bob', $S1)
 
     # 18-22
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joke'
     argv[1] = 'bag_o_donuts'
     message='invalid option specified, no exception'
@@ -175,7 +175,7 @@ done_1:
     is ($S0, 'bag_o_donuts', $S1)
 
     # 23
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joke'
     argv[1] = 'bag_o_donuts'
     message='invalid option specified, w/ exception'
@@ -193,7 +193,7 @@ check_23:
     is($S2, 'bad switch "-joke": must be -baz, -bob, or -joe', message)
 
     # 24
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joke'
     argv[1] = 'bag_o_donuts'
     message='invalid option specified, w/ exception and --'
@@ -211,7 +211,7 @@ check_24:
     is($S2, 'bad switch "-joke": must be -baz, -bob, -joe, or --', message)
 
     # 25
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joke'
     argv[1] = 'bag_o_donuts'
     message='invalid option specified, w/ exception, --, and override name'
@@ -231,7 +231,7 @@ check_25:
     # 26-29
     options[2] = 'joe:s' # change this to take a value..
 
-    argv = new .ResizablePMCArray
+    argv = new 'ResizablePMCArray'
     argv[0] = '-joe'
     argv[1] = 'bag_o_donuts'
     argv[2] = 'what'

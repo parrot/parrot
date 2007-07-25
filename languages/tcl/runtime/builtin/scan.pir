@@ -10,7 +10,7 @@
   if argc < 2 goto bad_args
 
   .local pmc results
-  results = new .TclList
+  results = new 'TclList'
 
   .local pmc __integer, __number
   __integer = get_root_global [ '_tcl' ], '__integer'
@@ -180,7 +180,7 @@ got_width:
 handle_charclass:
   .local int negated
   .local pmc class
-  class = new .Hash
+  class = new 'Hash'
 
   negated = 0
   $S0 = substr format, format_pos, 1
@@ -257,7 +257,7 @@ neg_do_loop:
 done_loop:
   $I2 = $I1 - input_pos
   $S0 = substr input, input_pos, $I2
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = $S0
   bsr set_val
   goto next
@@ -302,7 +302,7 @@ handle_character:
   $S1 = substr input, input_pos, 1
   inc input_pos
   $I0 = ord $S1
-  $P0 = new .TclInt
+  $P0 = new 'TclInt'
   $P0 = $I0
   bsr set_val
   goto next
@@ -313,7 +313,7 @@ bad_character_width:
   tcl_error 'field width may not be specified in %c conversion'
 
 handle_numchars:
-  $P0 = new .TclInt
+  $P0 = new 'TclInt'
   $P0 = input_pos
   bsr set_val
   goto next
@@ -395,13 +395,13 @@ handle_string:
 string_width: 
   $S1 = substr input, input_pos, $I2
   input_pos = $I1
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = $S1
   bsr set_val 
   goto next
  
 bad_match:
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = ''
   bsr set_val
   goto next

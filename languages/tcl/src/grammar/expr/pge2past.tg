@@ -157,7 +157,7 @@ transform past (operator) {
     past['opfunc'] = name
     $P0 = node.'get_array'()
     if null $P0 goto iter_end
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
@@ -193,7 +193,7 @@ transform past (program) {
     past = new 'PAST::Program'
 
     .local pmc iter
-    iter = new .Iterator, node
+    iter = new 'Iterator', node
 loop:
     unless iter goto end
     $P0 = shift iter
@@ -272,7 +272,7 @@ has_argc:
     function_name = node['nary_function']
 
     .local pmc iter
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
   nary_loop:
     unless iter goto arguments
     $P0 = shift iter
@@ -517,7 +517,7 @@ empty_string:
 transform past (array) {
     .local pmc past
     .local pmc iter
-    iter = new .Iterator, node
+    iter = new 'Iterator', node
     null past
   iter_loop:
     unless iter goto iter_end
@@ -576,7 +576,7 @@ create_node:
     past.set_node(node)
     past.'add_child'(command)
 
-    iter = new .Iterator, words
+    iter = new 'Iterator', words
 loop2:
     unless iter goto end2
     $P0 = shift iter

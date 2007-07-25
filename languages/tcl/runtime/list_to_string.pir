@@ -81,7 +81,7 @@ check_spaces:
   goto append_elem
 
 escape:
-  $P0 = new .String
+  $P0 = new 'String'
   $P0 = str
   
   $P0.'replace'('\', '\\')
@@ -136,10 +136,10 @@ Given a dictionary, return a string representing it.
   .param pmc dict
   
   .local pmc list
-  list = new .ResizablePMCArray
+  list = new 'ResizablePMCArray'
 
   .local pmc iterator
-  iterator = new .Iterator, dict
+  iterator = new 'Iterator', dict
 
 loop:
   unless iterator goto done

@@ -279,7 +279,7 @@ sub inlined_arguments {
 
             $code .= "  goto done_$name \n";
             $code .= "default_$name: \n";
-            $code .= emit( "a_${name}_%0 = new .$type", 'loop_num' );
+            $code .= emit( "a_${name}_%0 = new '$type'", 'loop_num' );
             $code .= emit( "a_${name}_%0 = $quote$default$quote", 'loop_num' );
             $code .= "done_$name: \n";
         }
@@ -329,7 +329,7 @@ sub arguments {
 
             $code .= "  goto done_$name \n";
             $code .= "default_$name: \n";
-            $code .= "  a_$name = new .$type \n";
+            $code .= "  a_$name = new '$type' \n";
             $code .= "  a_$name = $quote$default$quote \n";
             $code .= "done_$name: \n";
         }

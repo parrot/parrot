@@ -11,7 +11,7 @@
   .local string expression, target, subSpec, original_target
  
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'all'
   push options, 'nocase'
   push options, 'expanded' # RT#40774: use tcl-regexps

@@ -30,5 +30,5 @@ next_exception:
   .rethrow()
 
 done:
-  $R = new .String
+  $R = new 'String'
   $R = ''

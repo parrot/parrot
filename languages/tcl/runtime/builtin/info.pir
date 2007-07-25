@@ -18,7 +18,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   push options, 'args'
   push options, 'body'
   push options, 'cmdcount'
@@ -215,7 +215,7 @@ bad_args:
 check_arg:
   # there's no default. is there even an arg?
   $P3 = __list($P9)
-  $P4 = new .Iterator, $P3
+  $P4 = new 'Iterator', $P3
 loop:
   unless $P4 goto not_argument 
   $S1 = shift $P4
@@ -264,9 +264,9 @@ bad_args:
   .local pmc mathfunc,iterator,retval
 
   mathfunc = get_root_namespace ['tcl'; 'tcl'; 'mathfunc']
-  iterator = new .Iterator, mathfunc
+  iterator = new 'Iterator', mathfunc
   iterator = 0
-  retval = new .TclList
+  retval = new 'TclList'
 
   .local pmc globber,rule,match
   globber = compreg 'PGE::Glob'
@@ -437,8 +437,8 @@ iterate:
 
   .local pmc    iter, retval
   .local string elem
-  iter   = new .Iterator, lexpad
-  retval = new .TclList
+  iter   = new 'Iterator', lexpad
+  retval = new 'TclList'
 loop:
   unless iter goto end
   elem = shift iter
@@ -502,9 +502,9 @@ find_info_level:
   .local pmc ns,iterator,retval
 
   ns = get_root_namespace ['tcl']
-  iterator = new .Iterator, ns
+  iterator = new 'Iterator', ns
   iterator = 0
-  retval = new .TclList
+  retval = new 'TclList'
 
   .local pmc globber,rule,match
   globber = compreg 'PGE::Glob'

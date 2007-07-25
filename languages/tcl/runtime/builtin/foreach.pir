@@ -23,15 +23,15 @@
   __set    = get_root_global ['_tcl'], '__set'
 
   .local pmc varLists, lists, command
-  varLists = new .TclList
-  lists    = new .TclList
+  varLists = new 'TclList'
+  lists    = new 'TclList'
   command  = pop argv
   command  = __script(command, 'ns'=>ns)
 
   .local int iterations
   iterations = 0
   .local pmc iter
-  iter = new .Iterator, argv
+  iter = new 'Iterator', argv
 arg_loop:
   unless iter goto arg_done
 
@@ -50,7 +50,7 @@ arg_loop:
   $N0 = $N1 / $N0
   $I0 = ceil $N0
 
-  list = new .Iterator, list
+  list = new 'Iterator', list
   push varLists, varList
   push lists, list
   
@@ -95,7 +95,7 @@ next_variable:
   goto next_variable
 
 empty_var:
-  value = new .TclString
+  value = new 'TclString'
   value = ''
   push_eh couldnt_set
     __set(varname, value)

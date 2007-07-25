@@ -24,7 +24,7 @@ real top level namespace.
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   options[0] = 'children'
   options[1] = 'code'
   options[2] = 'current'
@@ -234,12 +234,12 @@ bad_args:
 
   .local pmc call_chain, temp_call_chain
   call_chain      = get_root_global ['_tcl'], 'call_chain'
-  temp_call_chain = new .ResizablePMCArray
+  temp_call_chain = new 'ResizablePMCArray'
   set_root_global ['_tcl'], 'call_chain', temp_call_chain
 
   .local pmc info_level
   info_level = get_root_global ['_tcl'], 'info_level'
-  $P0 = new .TclList
+  $P0 = new 'TclList'
   assign $P0, argv
   unshift $P0, 'eval'
   unshift $P0, 'namespace'
@@ -325,7 +325,7 @@ bad_args:
 
 iterate:
   .local pmc list
-  list = new .TclList
+  list = new 'TclList'
   
   .local pmc __namespace, ns, ns_name
   .local string name
@@ -342,7 +342,7 @@ getname:
   if null ns goto unknown_namespace
 
   .local pmc iter
-  iter = new .Iterator, ns
+  iter = new 'Iterator', ns
 loop:
   unless iter goto end
   $S0 = shift iter
@@ -353,7 +353,7 @@ loop:
   $S0 = shift $P0 # get rid of 'tcl'
   $S0 = join '::', $P0
   $S0 = '::' . $S0
-  $P0 = new .TclString
+  $P0 = new 'TclString'
   $P0 = $S0
   unless has_pattern goto is_namespace
   $P1 = pattern($P0)

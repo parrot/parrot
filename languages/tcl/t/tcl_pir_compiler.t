@@ -27,7 +27,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "test tcl compiler global variable interop"
   .sub main :main
      load_bytecode 'languages/tcl/runtime/tcllib.pbc'
      .local pmc tcl_compiler,compiled_sub
-     $P1 = new String
+     $P1 = new 'String'
      $P1 = 'ok 1' 
      store_global '$a', $P1
      tcl_compiler = compreg 'TCL'
@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pass arguments to a tcl proc from PIR" );
 
   $P2 = find_global '&_tmp'
 
-  $P3 = new String
+  $P3 = new 'String'
   $P3 = 'hello'
   $P2($P3)
 .end

@@ -5,7 +5,7 @@
     .param pmc argv :slurpy
 
     .local pmc options
-    options = new .ResizablePMCArray
+    options = new 'ResizablePMCArray'
     options[0] = 'nobackslashes'
     options[1] = 'nocommands'
     options[2] = 'novariables'

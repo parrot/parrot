@@ -35,7 +35,7 @@ select_elem:
   goto select
 
 not_a_list:
-  indices = new .FixedPMCArray
+  indices = new 'FixedPMCArray'
   indices = 1
   indices[0] = $P0
 

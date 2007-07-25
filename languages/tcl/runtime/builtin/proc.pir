@@ -36,7 +36,7 @@ Create a PIR sub on the fly for this user defined proc.
 
   .local pmc ns
   .local string name
-  ns   = new .ResizablePMCArray
+  ns   = new 'ResizablePMCArray'
   name = ''
 
   if full_name == '' goto create
@@ -84,19 +84,19 @@ create:
 
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
-  lexpad = new .Hash
+  lexpad = new 'Hash'
   push call_chain, lexpad
 
   .local pmc info_level
   info_level = get_root_global ['_tcl'], 'info_level'
-  $P0 = new .TclList
+  $P0 = new 'TclList'
   assign $P0, args
   unshift $P0, '%1'
   unshift info_level, $P0
 END_PIR
 
    .local pmc defaults_info
-   defaults_info = new .TclDict 
+   defaults_info = new 'TclDict'
 
   .local string args_usage, args_info
   .local int i, elems, min, max, is_slurpy
@@ -151,7 +151,7 @@ got_default_key:
 
     defaults.emit(<<'END_PIR', i, $S0, $S1)
 default_%0:
-  $P1 = new TclString
+  $P1 = new 'TclString'
   $P1 = '%2'
   lexpad['$%1'] = $P1
 END_PIR
@@ -188,7 +188,7 @@ emit_args:
   # Convert the remaining elements returned by foldup into a TclList
   code.emit(<<'END_PIR')
   .local pmc arg_list
-  arg_list = new .TclList
+  arg_list = new 'TclList'
   unless args goto NO_SLURPY_ARGS
   assign arg_list, args
 NO_SLURPY_ARGS:
@@ -256,17 +256,17 @@ END_PIR
   $P1 = new 'TclProc'
   assign $P1, $P0
 
-  $P9 = new .String
+  $P9 = new 'String'
   $P9 = $S0
   setattribute $P1, 'PIR_source', $P9
 
-  $P9 = new .String
+  $P9 = new 'String'
   $P9 = 'Tcl'
   setattribute $P1, 'HLL',        $P9
 
   setattribute $P1, 'HLL_source', body
 
-  $P9 = new .String
+  $P9 = new 'String'
   $P9 = args_info
   setattribute $P1, 'args',       $P9
 
@@ -277,7 +277,7 @@ END_PIR
   ns_target = get_hll_namespace 
 
   .local pmc iter, sub_ns
-  iter = new .Iterator, ns
+  iter = new 'Iterator', ns
 walk_ns:
   unless iter goto done_walk
   sub_ns = shift iter

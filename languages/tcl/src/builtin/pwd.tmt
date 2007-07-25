@@ -1,4 +1,4 @@
 [pwd]
 
-$R = new .OS
+$R = new 'OS'
 $R = $R.'cwd'()

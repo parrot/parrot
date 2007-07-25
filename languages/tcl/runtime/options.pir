@@ -26,7 +26,7 @@ Defaults to 'option'.
 got_type_name:
 
   .local pmc partials
-  partials = new .ResizablePMCArray
+  partials = new 'ResizablePMCArray'
 
   # is there an exact match?
 
@@ -127,9 +127,9 @@ check_name:
 init:
   # setup types
   .local pmc with_type, results
-  with_type = new .Hash
-  results = new .Hash
-  $P1 = new .Iterator, switches
+  with_type = new 'Hash'
+  results = new 'Hash'
+  $P1 = new 'Iterator', switches
   .local string switch,type
 init_loop:
   unless $P1 goto init_loop_done
@@ -197,7 +197,7 @@ loop_done:
 
   # delete any processed switches from the argv
   if pos <= 0 goto done
-  $P1 = new .ResizablePMCArray
+  $P1 = new 'ResizablePMCArray'
   splice argv, $P1, 0, pos   
  
 done:

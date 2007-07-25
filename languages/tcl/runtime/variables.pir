@@ -126,7 +126,7 @@ array:
   variable = __find_var(var, 'depth' => depth)
   unless null variable goto check_is_hash
 
-  variable = new .TclArray
+  variable = new 'TclArray'
   variable = __store_var(var, variable, 'depth' => depth)
   
 check_is_hash:
@@ -138,7 +138,7 @@ check_is_hash:
   .return($P0)
 
 create_elem:
-  $P0 = new .Undef
+  $P0 = new 'Undef'
   variable[key] = $P0
   .return($P0)
 
@@ -154,7 +154,7 @@ scalar:
   .return(variable)
 
 make_variable:
-    variable = new .Undef
+    variable = new 'Undef'
     variable = __store_var(name, variable, 'depth' => depth)
     .return(variable)
 .end
@@ -179,7 +179,7 @@ other than the default, and multiple interpreters.
   # Some cases in the code allow a NULL pmc to show up here.
   # This defensively converts them to an empty string.
   unless_null value, got_value
-  value = new TclString
+  value = new 'TclString'
   value = ''
 
  got_value:
@@ -214,7 +214,7 @@ find_array:
   goto set_array
 
 create_array:
-  array = new .TclArray
+  array = new 'TclArray'
   array = __store_var(var, array)
 
 set_array:
@@ -267,7 +267,7 @@ Gets the actual variable from memory and returns it.
   .param int    depth    :named('depth')  :optional
 
   .local pmc value, ns
-  ns = new .ResizableStringArray
+  ns = new 'ResizableStringArray'
 
   .local int absolute
   absolute = 0
@@ -364,7 +364,7 @@ Sets the actual variable from memory.
   .param int    depth    :named('depth')  :optional
 
   .local pmc value, ns
-  ns = new .ResizableStringArray
+  ns = new 'ResizableStringArray'
 
   $I0 = index name, '::'
   if $I0 != -1 goto global_var

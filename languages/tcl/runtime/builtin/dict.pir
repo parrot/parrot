@@ -16,7 +16,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   options[0] = 'append'
   options[1] = 'create'
   options[2] = 'exists'
@@ -84,7 +84,7 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc key, value
@@ -94,7 +94,7 @@ got_dict:
 
   $I0 = exists dictionary[key]
   if $I0 goto vivified
-  value = new .TclString
+  value = new 'TclString'
   value = ''
   goto loop
 
@@ -135,7 +135,7 @@ bad_args:
   if $I3 goto bad_args
 
   .local pmc retval
-  retval = new .TclDict
+  retval = new 'TclDict'
 
   .local pmc key,value
   
@@ -198,7 +198,7 @@ bad_args:
   dictionary = __dict(dictionary)
 
   .local pmc options
-  options = new .TclList
+  options = new 'TclList'
   options[0] = 'key'
   options[1] = 'script'
   options[2] = 'value'
@@ -212,7 +212,7 @@ bad_args:
   option = select_option(options, option, 'filterType')
 
   .local pmc results, key, value
-  results = new .TclDict
+  results = new 'TclDict'
 
   if option == 'script' goto do_script_prelude
 
@@ -223,7 +223,7 @@ bad_args:
 
   .local pmc rule, match, iterator
   rule = globber.'compile'(pattern)
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 
   if option == 'key' goto do_key_loop
 
@@ -265,9 +265,9 @@ do_script_prelude:
   valueVar = vars[1]
 
   .local pmc iterator
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
   .local pmc retval
-  retval = new .TclDict
+  retval = new 'TclDict'
   .local pmc body_proc
   body_proc = __script(body)
 
@@ -341,7 +341,7 @@ bad_args:
   code = __script(body)
 
   .local pmc iterator
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 for_loop:
   unless iterator goto for_loop_done
   $P1 = shift iterator
@@ -439,14 +439,14 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc key
   key = shift argv   
 
   .local pmc increment
-  increment = new .TclInt
+  increment = new 'TclInt'
   increment = 1
   
   if argc == 2 goto got_increment
@@ -469,7 +469,7 @@ vivified:
 done:
   dictionary[key] = value
   set(dict_name, dictionary)
-  $P1 = new .TclList
+  $P1 = new 'TclList'
   $P1[0] = key
   $P1[1] = value
   .return ($P1)
@@ -529,7 +529,7 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc key, value
@@ -539,7 +539,7 @@ got_dict:
 
   $I0 = exists dictionary[key]
   if $I0 goto vivified
-  value = new .TclList
+  value = new 'TclList'
   goto loop
 
 vivified:
@@ -593,10 +593,10 @@ got_pattern:
   rule = globber.'compile'(pattern)
  
   .local pmc iterator
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 
   .local pmc results, key
-  results = new .TclList
+  results = new 'TclList'
 loop:
   unless iterator goto loop_done
   key = shift iterator
@@ -634,7 +634,7 @@ dict_loop:
   unless $I1 goto done
   dictionary = shift argv 
   dictionary = __dict(dictionary)
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 key_loop:
   unless iterator goto dict_loop 
   key = shift iterator
@@ -736,7 +736,7 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc value
@@ -754,7 +754,7 @@ loop:
   sub_dict = $P1
   goto loop 
 new_key:
-  $P1 = new .TclDict
+  $P1 = new 'TclDict'
   sub_dict[key] = $P1
   sub_dict = $P1
   goto loop
@@ -818,7 +818,7 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
   set(dict_name, dictionary)
 
 got_dict:
@@ -879,15 +879,15 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc body
   body = pop argv
 
   .local pmc keys,varnames
-  keys = new .ResizablePMCArray
-  varnames = new .ResizablePMCArray
+  keys = new 'ResizablePMCArray'
+  varnames = new 'ResizablePMCArray'
   # get lists of both keys & varnames, setting the variables.
 key_loop:
   $I0 = elements argv
@@ -907,8 +907,8 @@ done_key_loop:
 
 # go through the varnames, setting the appropriate keys to those values.
   .local pmc iter1,iter2
-  iter1 = new .Iterator, keys
-  iter2 = new .Iterator, varnames
+  iter1 = new 'Iterator', keys
+  iter2 = new 'Iterator', varnames
 set_loop:
   unless iter1 goto set_loop_done
   $P1 = shift iter1
@@ -958,10 +958,10 @@ got_pattern:
   rule = globber.'compile'(pattern)
  
   .local pmc iterator
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 
   .local pmc results, key, value
-  results = new .TclList
+  results = new 'TclList'
 loop:
   unless iterator goto loop_done
   key = shift iterator
@@ -1001,7 +1001,7 @@ dict_error:
   get_results '(0,0)', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
-  dictionary = new .TclDict
+  dictionary = new 'TclDict'
 
 got_dict:
   .local pmc body
@@ -1017,7 +1017,7 @@ while_keys:
 
 done_keys:
   .local pmc iterator
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
   
 alias_keys:
   unless iterator goto done_alias
@@ -1030,7 +1030,7 @@ done_alias:
   $P1 = __script(body)
   retval = $P1()
 
-  iterator = new .Iterator, dictionary
+  iterator = new 'Iterator', dictionary
 update_keys:
   unless iterator goto done_update
   $P1 = shift iterator

@@ -51,7 +51,7 @@ bad_args:
 exception:
   .catch()
   .get_message($S0)
-  $P0 = new .String
+  $P0 = new 'String'
   $P0 = $S0
   $P0.replace('\', '\\')
   $P0.replace('"', '\"')

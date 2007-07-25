@@ -107,13 +107,12 @@ Given a PMC, get a number from it.
   astbuilder = astgrammar.apply(match)
   ast = astbuilder.get('past')
 
-  .local string class
+  .local string className
   .local pmc    value
-  class = ast['class']
-  value = ast['value']
+  className = ast['class']
+  value     = ast['value']
 
-  $I0    = find_type class
-  number = new $I0
+  number = new className
   assign number, value
 
   .return(number)
@@ -579,7 +578,7 @@ was this a valid tcl-style level, or did we get this value as a default?
 .sub __call_level
   .param pmc tcl_level
   .local pmc parrot_level, defaulted, orig_level
-  defaulted = new .Integer
+  defaulted = new 'Integer'
   defaulted = 0
 
   .local pmc call_chain, __number
@@ -587,7 +586,7 @@ was this a valid tcl-style level, or did we get this value as a default?
   call_chain = get_root_global ['_tcl'], 'call_chain'
   call_level = elements call_chain
   __number   = get_root_global ['_tcl'], '__number'
-  orig_level = new .Integer
+  orig_level = new 'Integer'
   orig_level = call_level
  
   .local int num_length
@@ -613,7 +612,7 @@ get_integer:
  
 default:
   defaulted = 1
-  parrot_level = new Integer
+  parrot_level = new 'Integer'
   parrot_level = orig_level - 1
   # fallthrough.
 

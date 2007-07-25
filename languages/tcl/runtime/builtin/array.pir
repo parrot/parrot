@@ -21,7 +21,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new .ResizablePMCArray
+  options = new 'ResizablePMCArray'
   options[0] = 'anymore'
   options[1] = 'donesearch'
   options[2] = 'exists'
@@ -156,7 +156,7 @@ pre_loop:
   goto set_loop
 
 new_array:
-  the_array = new .TclArray
+  the_array = new 'TclArray'
   set(array_name,the_array) # create an empty named array...
 
 set_loop:
@@ -223,10 +223,10 @@ no_args:
   .local pmc rule
   rule = globber.'compile'(match_str)
 
-  iter = new .Iterator, the_array
+  iter = new 'Iterator', the_array
   iter = .ITERATE_FROM_START
 
-  retval = new .TclList
+  retval = new 'TclList'
 
   .local int count
   count = 0
@@ -289,7 +289,7 @@ no_args:
   .local pmc rule
   (rule, $P0, $P1) = globber.'compile'(match_str)
 
-  iter = new .Iterator, the_array
+  iter = new 'Iterator', the_array
   iter = .ITERATE_FROM_START
 
 push_loop:
@@ -374,10 +374,10 @@ not_array:
   .local pmc rule
   rule = globber.'compile'(pattern)
 
-  iter = new .Iterator, the_array
+  iter = new 'Iterator', the_array
   iter = .ITERATE_FROM_START
 
-  retval = new .TclList
+  retval = new 'TclList'
 
   .local int count
   count = 0
@@ -404,10 +404,10 @@ check_end:
   .local pmc iter, retval
   .local string name
 
-  iter = new .Iterator, the_array
+  iter = new 'Iterator', the_array
   iter = .ITERATE_FROM_START
 
-  retval = new .String
+  retval = new 'String'
   retval = ''
 
 check_loop:
@@ -436,10 +436,10 @@ found_match:
   .local pmc rule
   rule = tclARE(pattern)
 
-  iter = new .Iterator, the_array
+  iter = new 'Iterator', the_array
   iter = .ITERATE_FROM_START
 
-  retval = new .TclList
+  retval = new 'TclList'
 
   .local int count
   count = 0
