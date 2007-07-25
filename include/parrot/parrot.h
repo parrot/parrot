@@ -297,6 +297,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/slice.h"
 #include "parrot/hll.h"
 #include "parrot/stm/backend.h"
+#include "parrot/pbcversion.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 

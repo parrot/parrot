@@ -652,37 +652,9 @@ do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
 
 FUNCDOC: PackFile_unpack
 
-Unpack a C<PackFile> from a block of memory. The format is:
-
-  byte     wordsize
-  byte     byteorder
-  byte     major
-  byte     minor
-  byte     intvalsize
-  byte     floattype
-  byte     pad[10] = fingerprint
-
-  opcode_t magic
-  opcode_t language type
-
-  opcode_t dir_format
-  opcode_t padding
-
-  directory segment
-    * segment
-    ...
-
-All segments have this common header:
-
-  - op_count    ... total segment size incl. this count
-  - itype       ... internal type of data
-  - id          ... id of data e.g. byte code nr.
-  - size        ... size of data oparray
-  - data[size]  ... data array e.g. bytecode
-  segment specific data follows here ...
-
-Checks to see if the magic matches the Parrot magic number for
-Parrot C<PackFiles>.
+Unpack a C<PackFile> from a block of memory, ensuring the the magic number is
+valid, the bytecode version can be read by this Parrot and doing any endian
+and word size transforms that are required.
 
 Returns size of unpacked if everything is OK, else zero (0).
 
@@ -707,6 +679,14 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     /* Ensure the magic is correct. */
     if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
         PIO_eprintf(NULL, "PackFile_unpack: This is not a valid Parrot bytecode file\n");
+        return 0;
+    }
+
+    /* Ensure the bytecode version is one we can read. Currently, we only
+     * support bytecode versions matching the current one. */
+    if (header->bc_major != PARROT_PBC_MAJOR && header->bc_minor != PARROT_PBC_MINOR) {
+        PIO_eprintf(NULL, "PackFile_unpack: This Parrot cannot read bytecode "
+            "files with version %d.%d.\n", header->bc_major, header->bc_minor);
         return 0;
     }
 
@@ -965,6 +945,8 @@ PackFile_set_header(NOTNULL(PackFile *self))
     self->header->major = PARROT_MAJOR_VERSION;
     self->header->minor = PARROT_MINOR_VERSION;
     self->header->patch = PARROT_PATCH_VERSION;
+    self->header->bc_major = PARROT_PBC_MAJOR;
+    self->header->bc_minor = PARROT_PBC_MINOR;
     if (NUMVAL_SIZE == 8)
         self->header->floattype = 0;
     else /* if XXX */

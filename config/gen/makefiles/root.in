@@ -237,7 +237,8 @@ GEN_HEADERS = \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/oplib/core_ops_switch.h \
-    $(INC_DIR)/extend_vtable.h
+    $(INC_DIR)/extend_vtable.h \
+    $(INC_DIR)/pbcversion.h
 
 GEN_SOURCES = \
     $(SRC_DIR)/core_ops.c \
@@ -750,6 +751,9 @@ $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/main$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
+
+$(INC_DIR)/pbcversion.h :
+    $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \
     $(BUILD_TOOLS_DIR)/parrot_config_c.pl
