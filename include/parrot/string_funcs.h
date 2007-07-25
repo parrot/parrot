@@ -387,7 +387,7 @@ PARROT_CAN_RETURN_NULL
 const CHARSET * string_rep_compatible( SHIM_INTERP,
     NOTNULL(const STRING *a),
     NOTNULL(const STRING *b),
-    OUT(const ENCODING **e) )
+    ARGOUT(const ENCODING **e) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 

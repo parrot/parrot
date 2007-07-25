@@ -359,7 +359,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET *
 string_rep_compatible(SHIM_INTERP,
-    NOTNULL(const STRING *a), NOTNULL(const STRING *b), OUT(const ENCODING **e))
+    NOTNULL(const STRING *a), NOTNULL(const STRING *b), ARGOUT(const ENCODING **e))
 {
     if (a->encoding == b->encoding && a->charset == b->charset) {
         *e = a->encoding;
