@@ -1,7 +1,7 @@
 #
 # Hacks - these functions exist only to speed up repeated [source]ing of
 #         a .tcl file;
-#
+# XXX This is currently uninvoked, pending resolution of a GC bug.
 
 .HLL '_Tcl', ''
 

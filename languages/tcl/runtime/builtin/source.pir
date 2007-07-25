@@ -14,14 +14,22 @@
   .local string filename
   filename = shift argv
 
-   .local pmc __precompiled
-   __precompiled = get_root_global [ '_tcl' ], 'check_precompiled'
-
-execute:
+  .local pmc IO
+  .local string file_contents
+  IO = getclass 'ParrotIO'
   push_eh badfile
-    $P1 = __precompiled(filename)
+    file_contents = IO.'slurp'( filename )
   clear_eh
-  .return $P1()
+
+  .local pmc ns, interp
+  interp = getinterp
+  ns = interp['namespace';1]
+
+  .local pmc __script, code
+  __script = get_root_global ['_tcl'], '__script'
+  code = __script ( file_contents, 'ns' => ns, 'bsnl' => 1)
+
+  .return code()
 
 badfile:
   $S0 = "couldn't read file \""
