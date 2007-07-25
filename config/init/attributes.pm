@@ -37,7 +37,7 @@ our @potential_attributes = qw(
     HASATTRIBUTE_WARN_UNUSED_RESULT
 );
 
-sub option_or_data {
+sub _option_or_data {
     my $conf = shift;
     my $arg = shift;
 
@@ -49,7 +49,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
-    my $ccflags = option_or_data( $conf, 'ccflags');
+    my $ccflags = _option_or_data( $conf, 'ccflags');
     $conf->data->set( 'ccflags' => "$ccflags -DHASCANCHEEZBURGER" );
 
     if ( 0 ) {
@@ -62,8 +62,9 @@ sub runstep {
         eval "use $hints";
         die $@ if $@;
 
-        # call the runstep method if it exists.  Otherwise the step must have done
-        # it's work when it was loaded.
+        # Call the runstep method if it exists.  
+        # Otherwise the step must have done
+        # its work when it was loaded.
         $hints->runstep( $conf, @_ ) if $hints->can('runstep');
         $hints_used++;
 
