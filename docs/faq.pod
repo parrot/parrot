@@ -156,10 +156,8 @@ The most common issues are:
 =item *
 License compatibility.
 
-Parrot has an odd license -- it currently uses the same license as Perl 5,
-which is the disjunction of the GNU GPL and the Artistic License, which can be
-written (Artistic|GPL) for short.  Thus, Parrot's license is compatible with
-the GNU GPL, which means you can combine Parrot with GPL'ed code.
+Parrot uses the Artistic License 2.0, which is compatible with
+the GNU GPL. This means you can combine Parrot with GPL'ed code.
 
 Code accepted into the core interpreter must fall under the same terms as
 Parrot. Library code (for example the ICU library we're using for Unicode) we
