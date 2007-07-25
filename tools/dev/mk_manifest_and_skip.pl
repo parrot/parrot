@@ -7,13 +7,19 @@ use Parrot::Manifest;
 
 my $script = $0;
 
-my $mani = Parrot::Manifest->new($script);
+my $mani = Parrot::Manifest->new( {
+    script          => $script,
+} );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
-$mani->print_manifest($manifest_lines_ref);
+my $need_for_files = $mani->determine_need_for_manifest($manifest_lines_ref);
+$mani->print_manifest($manifest_lines_ref) if $need_for_files;
 
-my $ignore_ref = $mani->prepare_manifest_skip();
-$mani->print_manifest_skip($ignore_ref);
+my $print_str = $mani->prepare_manifest_skip();
+my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
+$mani->print_manifest_skip($print_str) if $need_for_skip;
+
+#################### DOCUMENTATION ####################
 
 =head1 NAME
 
