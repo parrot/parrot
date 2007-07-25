@@ -753,7 +753,7 @@ $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
 
 $(INC_DIR)/pbcversion.h :
-    $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
+	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
 $(SRC_DIR)/parrot_config.c :  runtime/parrot/include/config.fpmc \
     $(BUILD_TOOLS_DIR)/parrot_config_c.pl
