@@ -51,6 +51,8 @@ Returns the Parrot string value of the element at index C<key>.
             DYNSELF.set_integer_native(key+1);
 
         data = (STRING**)PMC_data(SELF);
+        if (!data[key])
+            data[key] = string_from_cstring(interp, NULL, 0);
         return data[key];
     }
 
