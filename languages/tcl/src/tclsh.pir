@@ -134,7 +134,7 @@ file:
   .set_tcl_argv()
   unless dump_only goto run_file  
   push_eh file_error
-    ($S0,$I0) = __script(contents, 'pir_only'=>1, 'bsnl'=>1)
+    ($S0,$I0) = __script(contents, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
   clear_eh
   print $S0
   goto done
@@ -165,8 +165,8 @@ oneliner:
   goto done
 
 oneliner_dump:
-  ($I0, $S1) = __script(tcl_code, 'pir_only'=>1)
-  print $S1
+  ($S0,$I0) = __script(tcl_code, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
+  print $S0
 
 done:
   end
