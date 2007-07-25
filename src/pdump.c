@@ -135,7 +135,6 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
     PIO_printf(interp, "\twordsize  = %d", pf->header->wordsize);
     PIO_printf(interp, "\t(interpreter's wordsize    = %d)\n",
             sizeof (opcode_t));
-    PIO_printf(interp, "\tint_size  = %d", pf->header->intvalsize);
     PIO_printf(interp, "\t(interpreter's INTVAL size = %d)\n",
             sizeof (INTVAL));
     PIO_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
