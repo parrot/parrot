@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: hints.pm 16144 2006-12-17 18:42:49Z paultcochrane $
+# $Id$
 
 =head1 NAME
 

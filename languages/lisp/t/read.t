@@ -1,4 +1,4 @@
-# $Id: system.t 19624 2007-07-05 19:47:20Z bernhard $
+# $Id$
 
 =head1 NAME
 
