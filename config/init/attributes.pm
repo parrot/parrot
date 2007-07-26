@@ -62,7 +62,7 @@ sub runstep {
         eval "use $hints";
         die $@ if $@;
 
-        # Call the runstep method if it exists.  
+        # Call the runstep method if it exists.
         # Otherwise the step must have done
         # its work when it was loaded.
         $hints->runstep( $conf, @_ ) if $hints->can('runstep');
