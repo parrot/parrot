@@ -756,7 +756,7 @@ Parrot_init_exceptions(PARROT_INTERP) {
 
 FUNCDOC: Parrot_confess
 
-A more suitable version of assert() that gives a backtrace
+A better version of assert() that gives a backtrace if possible.
 
 */
 
@@ -765,25 +765,28 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_confess(NOTNULL(const char *cond), NOTNULL(const char *file), unsigned int line)
 {
+    printf ("%s:%u: failed assertion '%s'\n", file, line, cond);
+    Parrot_print_backtrace();
+    exit(EXIT_FAILURE);
+}
+
+void
+Parrot_print_backtrace(void)
+{
+#if 0
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[10];
     size_t i;
 
-    /*
     const size_t size = backtrace (array, 10);
     char ** const strings = backtrace_symbols (array, size);
-    */
 
-    printf ("%s:%u: failed assertion '%s'\n", file, line, cond);
-    /*
     printf ("Obtained %zd stack frames.\n", size);
-
     for (i = 0; i < size; i++)
         printf ("%s\n", strings[i]);
 
     free (strings);
-    */
-    exit(EXIT_FAILURE);
+#endif
 }
 
 

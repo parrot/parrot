@@ -244,6 +244,7 @@ void do_panic(
 void Parrot_init_exceptions( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+void Parrot_print_backtrace( void );
 void really_destroy_exception_list( NULLOK(Parrot_exception *e) );
 PARROT_DOES_NOT_RETURN
 void rethrow_c_exception( PARROT_INTERP )
