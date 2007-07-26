@@ -22,8 +22,8 @@ my $args = process_options( {
                         # init::defaults::runsteps() they create what, from a
                         # testing coverage perspective, create branches or
                         # conditions.  The regular run of Configure.pl during
-                        # coverage analysis will cover the default 
-                        # branches/conditions.  Hence, we supply the 
+                        # coverage analysis will cover the default
+                        # branches/conditions.  Hence, we supply the
                         # non-default options here to increase coverage.
     script          => $0,
     parrot_version  => $parrot_version,

@@ -35,15 +35,15 @@ my $cwd = cwd();
         parrot_version  => $parrot_version,
         svnid           => '$Id$',
     } );
-    
+
     my $conf = Parrot::Configure->new;
     $conf->add_steps($pkg);
     $conf->options->set(%{$args});
-    
+
     my $task = $conf->steps->[0];
     my $step_name   = $task->step;
     my @step_params = @{ $task->params };
-    
+
     my $step = $step_name->new();
     ok(defined $step, "$step_name constructor returned defined value");
     isa_ok($step, $step_name);
