@@ -120,15 +120,14 @@ allocating a new buffer.
 
 */
 PARROT_API
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, NULLOK(STRING *s))
+Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
 {
     STRING *d;
 
-    if (!s)
-        return NULL;
+    assert(s);
 
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
@@ -916,12 +915,9 @@ string_concat(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b), UINTVAL Uflag
         }
     }
     else {
-        if (b != NULL) {
-            return string_copy(interp, b);
-        }
-        else {
-            return string_make(interp, NULL, 0, NULL, Uflags);
-        }
+        return b
+            ? string_copy(interp, b)
+            : string_make(interp, NULL, 0, NULL, Uflags);
     }
 }
 
@@ -1198,9 +1194,9 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
 {
-    s = string_copy(interp, s);
-    string_chopn_inplace(interp, s, n);
-    return s;
+    STRING * const chopped = string_copy(interp, s);
+    string_chopn_inplace(interp, chopped, n);
+    return chopped;
 }
 
 /*
@@ -2686,12 +2682,14 @@ string_join(PARROT_INTERP, NULLOK(STRING *j), NOTNULL(PMC *ar))
         return string_make_empty(interp, enum_stringrep_one, 0);
 
     s   = VTABLE_get_string_keyed_int(interp, ar, 0);
-    res = string_copy(interp, s);
+    res = s ? string_copy(interp, s) : NULL;
 
     for (i = 1; i < ar_len; ++i) {
+        STRING *next;
+
         res = string_append(interp, res, j);
-        s   = VTABLE_get_string_keyed_int(interp, ar, i);
-        res = string_append(interp, res, s);
+        next = VTABLE_get_string_keyed_int(interp, ar, i);
+        res = string_append(interp, res, next);
     }
 
     return res;
