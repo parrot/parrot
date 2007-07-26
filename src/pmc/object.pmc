@@ -201,7 +201,7 @@ Queries this object's class to find the method with the given name.
     PMC* find_method(STRING *name) {
         Parrot_Object * const obj = PARROT_OBJECT(SELF);
         Parrot_Class * const _class = PARROT_CLASS(obj->_class);
-        PMC *method;
+        PMC *method = PMCNULL;
 
         /* Walk and search. One day, we'll use the cache first. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
