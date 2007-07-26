@@ -27,8 +27,8 @@ my $print_str = $mani->prepare_manifest_skip();
 ok($print_str, "prepare_manifest_skip() returned");
 
 # 1:  Copy the real MANIFEST.SKIP unaltered to the tempdir.
-# Assuming the real MANIFEST.SKIP was correct going in to this test, the 
-# absence of any change in it will mean that there will be no need to 
+# Assuming the real MANIFEST.SKIP was correct going in to this test, the
+# absence of any change in it will mean that there will be no need to
 # regenerate it.
 {
     my $tdir = tempdir( CLEANUP => 1 );
