@@ -148,6 +148,16 @@ END_PRINT
 
 print OUT <<'END_PRINT';
 
+/* from config/auto/backtrace */
+END_PRINT
+if (defined @glibc_backtrace@) {
+    print OUT <<"END_PRINT";
+#define PARROT_HAS_GLIBC_BACKTRACE
+END_PRINT
+}
+
+print OUT <<'END_PRINT';
+
 
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT
