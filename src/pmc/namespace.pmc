@@ -211,7 +211,7 @@ really a public API.
                     nsinfo->methods = pmc_new(interp, enum_class_Hash);
 
                 /* Insert it. */
-                VTABLE_set_pmc_keyed_int(INTERP, nsinfo->methods, key, value);
+                VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
             }
 
             /* If it's anonymous, we're done. */
@@ -852,6 +852,44 @@ Sets the class or role PMC that is associated with this namespace.
     {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         nsinfo->_class        = class_or_role;
+    }
+
+/*
+
+=item C<PCCMETHOD PMC* get_associated_methods()>
+
+Gets the Hash of methods associated with this namespace and removes it from
+the namespace.
+
+=cut
+
+*/
+
+    PCCMETHOD void get_associated_methods()
+    {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        PMC *ret_methods = nsinfo->methods;
+        nsinfo->methods = PMCNULL;
+        PCCRETURN(PMC *ret_methods);
+    }
+
+/*
+
+=item C<PCCMETHOD PMC* get_associated_vtable_methods()>
+
+Gets the Hash of vtable methods associated with this namespace and removes it
+from the namespace.
+
+=cut
+
+*/
+
+    PCCMETHOD void get_associated_vtable_methods()
+    {
+        Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
+        PMC *ret_methods = nsinfo->vtable;
+        nsinfo->vtable = PMCNULL;
+        PCCRETURN(PMC *ret_methods);
     }
 
 }
