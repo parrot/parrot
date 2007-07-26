@@ -324,7 +324,6 @@ my $args = process_options( {
     svnid           => '$Id$',
 } );
 exit(1) unless defined $args;
-my %args = %{$args};
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
 # configuration tests will only be run if you requested them
@@ -332,7 +331,7 @@ my $opttest = Parrot::Configure::Options::Test->new($args);
 $opttest->run_configure_tests();
 
 # from Parrot::Configure::Messages
-print_introduction($parrot_version) unless exists $args{step};
+print_introduction($parrot_version) unless exists $args->{step};
 
 my $conf = Parrot::Configure->new;
 
@@ -340,15 +339,15 @@ my $conf = Parrot::Configure->new;
 $conf->add_steps(get_steps_list());
 
 # from Parrot::Configure::Data
-$conf->options->set(%args);
+$conf->options->set(%{$args});
 
-if ( exists $args{step} ) {
+if ( exists $args->{step} ) {
     # from Parrot::Configure::Data
     $conf->data()->slurp();
     $conf->data()->slurp_temp()
-        if $args{step} =~ /gen::makefiles/;
+        if $args->{step} =~ /gen::makefiles/;
     # from Parrot::Configure
-    $conf->runstep( $args{step} );
+    $conf->runstep( $args->{step} );
     print "\n";
 }
 else {
@@ -362,8 +361,7 @@ else {
 $opttest->run_build_tests();
 
 # from Parrot::Configure::Messages
-print_conclusion($conf->data->get('make')) unless exists $args{step};
-
+print_conclusion($conf->data->get('make')) unless exists $args->{step};
 exit(0);
 
 ################### DOCUMENTATION ###################
