@@ -774,7 +774,7 @@ void
 Parrot_print_backtrace(void)
 {
 #ifdef PARROT_HAS_GLIBC_BACKTRACE
-#define BACKTRACE_DEPTH 32
+#  define BACKTRACE_DEPTH 32
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     size_t i;
@@ -787,8 +787,8 @@ Parrot_print_backtrace(void)
         printf ("%s\n", strings[i]);
 
     free (strings);
-#undef BACKTRACE_DEPTH
-#endif // ifdef PARROT_HAS_GLIBC_BACKTRACE
+#  undef BACKTRACE_DEPTH
+#endif /* ifdef PARROT_HAS_GLIBC_BACKTRACE */
 }
 
 
