@@ -81,7 +81,7 @@ non-zero exit code.
 
 =item C<pasm_output_like($code, $expected, $description)>
 
-Runs the Parrot Assembler code and passes the test if the output matches 
+Runs the Parrot Assembler code and passes the test if the output matches
 C<$expected>.
 
 =item C<pasm_error_output_like($code, $expected, $description)>

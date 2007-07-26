@@ -93,7 +93,7 @@ END_HEADER
 
     for my $k ( sort keys %{ $manifest_lines_ref } ) {
         $print_str .= sprintf "%- 59s %s\n", ($k, $manifest_lines_ref->{$k});
-    } 
+    }
     open my $MANIFEST, '>', $self->{file}
         or croak "Unable to open $self->{file} for writing";
     print $MANIFEST $print_str;
