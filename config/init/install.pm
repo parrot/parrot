@@ -66,45 +66,44 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $prefix  = $conf->options->get('prefix')      || "/usr/local";
-    my $eprefix = $conf->options->get('exec-prefix') || $prefix;
+    my $ep = $conf->options->get('exec-prefix');
+    my $eprefix = $ep ? $ep : $prefix;
 
     #  --bindir=DIR           user executables [EPREFIX/bin]
-    my $bindir = $conf->options->get('bindir') || $eprefix . "/bin";
+    my $bindir = assign_dir($conf, 'bindir', $eprefix, '/bin');
 
     #  --sbindir=DIR          system admin executables [EPREFIX/sbin]
-    my $sbindir = $conf->options->get('sbindir') || $eprefix . "/sbin";
+    my $sbindir = assign_dir($conf, 'sbindir', $eprefix, '/sbin');
 
     #  --libexecdir=DIR       program executables [EPREFIX/libexec]
-    my $libexecdir = $conf->options->get('libexecdir') || $eprefix . "/libexec";
+    my $libexecdir = assign_dir($conf, 'libexecdir', $eprefix, '/libexec');
 
     #  --datadir=DIR          read-only architecture-independent data [PREFIX/share]
-    my $datadir = $conf->options->get('datadir') || $prefix . "/share";
+    my $datadir = assign_dir($conf, 'datadir', $prefix, '/share');
 
     #  --sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
-    my $sysconfdir = $conf->options->get('sysconfdir') || $prefix . "/etc";
+    my $sysconfdir = assign_dir($conf, 'sysconfdir', $prefix, '/etc');
 
     #  --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
-    my $sharedstatedir = $conf->options->get('sharedstatedir')
-        || $prefix . "/com";
+    my $sharedstatedir = assign_dir($conf, 'sharedstatedir', $prefix, '/com');
 
     #  --localstatedir=DIR    modifiable single-machine data [PREFIX/var]
-    my $localstatedir = $conf->options->get('localstatedir')
-        || $prefix . "/var";
+    my $localstatedir = assign_dir($conf, 'localstatedir', $prefix, '/var');
 
     #  --libdir=DIR           object code libraries [EPREFIX/lib]
-    my $libdir = $conf->options->get('libdir') || $eprefix . "/lib";
+    my $libdir = assign_dir($conf, 'libdir', $eprefix, '/lib');
 
     #  --includedir=DIR       C header files [PREFIX/include]
-    my $includedir = $conf->options->get('includedir') || $prefix . "/include";
+    my $includedir = assign_dir($conf, 'includedir', $prefix, '/include');
 
     #  --oldincludedir=DIR    C header files f|| non-gcc [/usr/include]
-    my $oldincludedir = $conf->options->get('oldincludedir') || "/usr/include";
+    my $oldincludedir = assign_dir($conf, 'oldincludedir', q{}, '/usr/include');
 
     #  --infodir=DIR          info documentation [PREFIX/info]
-    my $infodir = $conf->options->get('infodir') || $prefix . "/info";
+    my $infodir = assign_dir($conf, 'infodir', $prefix, '/info');
 
     #  --mandir=DIR           man documentation [PREFIX/man]
-    my $mandir = $conf->options->get('mandir') || $prefix . "/man";
+    my $mandir = assign_dir($conf, 'mandir', $prefix, '/man');
 
     $conf->data->set(
         prefix         => $prefix,
@@ -130,6 +129,12 @@ sub runstep {
     );
 
     return $self;
+}
+
+sub assign_dir {
+  my ($conf, $dir_str, $fix, $ext) = @_;
+  my $d = $conf->options->get($dir_str);
+  return $d ? $d : $fix . $ext;
 }
 
 1;
