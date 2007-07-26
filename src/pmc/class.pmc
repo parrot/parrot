@@ -912,7 +912,7 @@ Creates a new PMC object of the type of the class and calls init().
                         PMC *meth_sub = VTABLE_get_pmc_keyed_str(interp, methods,
                             meth_name);
                         VTABLE_add_method(interp, SELF, meth_name, meth_sub);
-                    }        
+                    }
                 }
 
                 /* Import any vtable methods. */
@@ -1167,7 +1167,7 @@ parameter list.
                         PMC *meth_sub = VTABLE_get_pmc_keyed_str(interp, methods,
                             meth_name);
                         VTABLE_add_method(interp, SELF, meth_name, meth_sub);
-                    }        
+                    }
                 }
 
                 /* Import any vtable methods. */

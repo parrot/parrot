@@ -177,13 +177,13 @@ really a public API.
         PMC        *new_tuple = NULL;
         HashBucket *b         =
             parrot_hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), key);
-        
+
         /* If it's a sub... */
         if (value->vtable->base_type == enum_class_Sub) {
             Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
             PMC           *vtable    = nsinfo->vtable;
             Parrot_sub    *sub       = PMC_sub(value);
-            
+
             /* Handle vtable methods with two underscores at the start. */
             if (sub->vtable_index == -1) {
                 if (string_str_index(interp, key,
