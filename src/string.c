@@ -25,7 +25,6 @@ strings.
 #include "parrot/string_funcs.h"
 #include "string_private_cstring.h"
 #include "parrot/resources.h"
-#include <assert.h>
 
 /*
  * this extra size is in the hope that some concat ops might
@@ -43,9 +42,9 @@ strings.
 
 
 #define saneify_string(s) \
-    assert(s->encoding); \
-    assert(s->charset); \
-    assert(!PObj_on_free_list_TEST(s))
+    PARROT_ASSERT(s->encoding); \
+    PARROT_ASSERT(s->charset); \
+    PARROT_ASSERT(!PObj_on_free_list_TEST(s))
 
 /* HEADERIZER HFILE: include/parrot/string_funcs.h */
 
@@ -74,7 +73,7 @@ PARROT_API
 void
 Parrot_unmake_COW(PARROT_INTERP, NOTNULL(STRING *s))
 {
-    assert(s);
+    PARROT_ASSERT(s);
 
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
@@ -127,7 +126,7 @@ Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
 {
     STRING *d;
 
-    assert(s);
+    PARROT_ASSERT(s);
 
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
@@ -176,7 +175,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
 {
-    assert(s);
+    PARROT_ASSERT(s);
 
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
@@ -303,7 +302,7 @@ PARROT_PURE_FUNCTION
 UINTVAL
 string_capacity(SHIM_INTERP, NOTNULL(const STRING *s))
 {
-    assert(s);
+    PARROT_ASSERT(s);
 
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
             (ptrcast_t)s->strstart);
@@ -681,7 +680,7 @@ PARROT_PURE_FUNCTION
 UINTVAL
 string_length(SHIM_INTERP, NOTNULL(const STRING *s))
 {
-    assert(s);
+    PARROT_ASSERT(s);
 
     return s->strlen;
 }
@@ -868,7 +867,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_max_bytes(SHIM_INTERP, NOTNULL(const STRING *s), INTVAL nchars)
 {
-    assert(s->encoding);
+    PARROT_ASSERT(s->encoding);
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
 }
 
@@ -1003,7 +1002,7 @@ string_substr(PARROT_INTERP, NOTNULL(STRING *src), INTVAL offset, INTVAL length,
 
     /* do in-place i.e. reuse existing header if one */
     if (replace_dest && d && *d) {
-        assert(src->encoding == Parrot_fixed_8_encoding_ptr);
+        PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
         dest           = *d;
 
         dest->encoding = src->encoding;
@@ -1810,7 +1809,7 @@ string_to_int(SHIM_INTERP, NOTNULL(const STRING *s))
     int    sign      = 1;
     INTVAL in_number = 0;
 
-    assert(s);
+    PARROT_ASSERT(s);
 
     while (start < end) {
         const unsigned char c = *start;
@@ -1945,7 +1944,7 @@ string_to_cstring(SHIM_INTERP, NOTNULL(const STRING *s))
 {
     char *p;
 
-    assert(s);
+    PARROT_ASSERT(s);
 
     p = (char *)mem_sys_allocate(s->bufused + 1);
     memcpy(p, s->strstart, s->bufused);
@@ -2190,7 +2189,7 @@ string_escape_string_delimited(PARROT_INTERP,
             }
             if (c >= 0x20) {
                 dp[i++] = (unsigned char)c;
-                assert(i < charlen);
+                PARROT_ASSERT(i < charlen);
                 continue;
             }
         }
@@ -2212,7 +2211,7 @@ string_escape_string_delimited(PARROT_INTERP,
         charlen = PObj_buflen(result);
         dp      = (unsigned char *)result->strstart;
 
-        assert(i < charlen);
+        PARROT_ASSERT(i < charlen);
     }
 
     result->bufused = result->strlen = i;
@@ -2291,7 +2290,7 @@ string_unescape_cstring(PARROT_INTERP,
         r = (Parrot_UInt4)((unsigned char*)result->strstart)[offs];
 
         /* There cannot be any NULs within this string.  */
-        assert(r != '\0');
+        PARROT_ASSERT(r != '\0');
 
         if (r == '\\') {
             ++offs;
@@ -2307,7 +2306,7 @@ string_unescape_cstring(PARROT_INTERP,
             continue;
         }
 
-        assert(d < offs);
+        PARROT_ASSERT(d < offs);
         iter.set_and_advance(interp, &iter, r);
         ++d;
     }
@@ -2469,7 +2468,7 @@ string_increment(PARROT_INTERP, NOTNULL(const STRING *s))
 {
     INTVAL o;
 
-    assert(s);
+    PARROT_ASSERT(s);
 
     if (string_length(interp, s) != 1)
         real_exception(interp, NULL, UNIMPLEMENTED, "increment only for length=1 done");
@@ -2776,7 +2775,7 @@ uint_to_str(PARROT_INTERP,
     char *p = tc + sizeof (UHUGEINTVAL)*8 + 1;
     const char * const tail = p;
 
-    assert(base >= 2 && base <= 36);
+    PARROT_ASSERT(base >= 2 && base <= 36);
     do {
         const char cur = (char)(num % base);
         if (cur < 10) {
