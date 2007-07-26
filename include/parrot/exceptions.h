@@ -253,7 +253,12 @@ void rethrow_c_exception( PARROT_INTERP )
 
 #define PANIC(interp, message) do_panic(interp, message, __FILE__, __LINE__)
 
-#define PARROT_ASSERT(x) ((void) ((x) ? 0 : Parrot_confess(#x, __FILE__, __LINE__)))
+#ifdef NDEBUG
+#  define PARROT_ASSERT(x) ((void)0)
+#else
+#  define PARROT_ASSERT(x) ((void) ((x) ? 0 : Parrot_confess(#x, __FILE__, __LINE__)))
+#endif
+
 
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
