@@ -60,6 +60,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_2     = SUB_FLAG(2),
     SUB_COMP_FLAG_BIT_3     = SUB_FLAG(3),
     SUB_COMP_FLAG_BIT_4     = SUB_FLAG(4),
+    SUB_COMP_FLAG_METHOD    = SUB_COMP_FLAG_BIT_4,
     SUB_COMP_FLAG_BIT_5     = SUB_FLAG(5),
     SUB_COMP_FLAG_BIT_6     = SUB_FLAG(6),
     SUB_COMP_FLAG_BIT_7     = SUB_FLAG(7),
@@ -87,7 +88,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_28    = SUB_FLAG(28),
     SUB_COMP_FLAG_BIT_29    = SUB_FLAG(29),
     SUB_COMP_FLAG_BIT_30    = SUB_FLAG(30),
-    SUB_COMP_FLAG_MASK      = 0x00000400
+    SUB_COMP_FLAG_MASK      = 0x00000404
 } sub_comp_flags_enum;
 #undef SUB_FLAG
 
