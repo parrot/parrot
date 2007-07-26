@@ -7,14 +7,6 @@ use warnings;
 use Data::Dumper;
 use Carp qw(longmess croak);
 
-=pod
-
-$SIG{__WARN__} = sub {
-    print longmess;
-};
-
-=cut
-
 =head1 NAME
 
 Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:Pmc2c::Pmc2cMain>
@@ -33,7 +25,7 @@ Parrot::Pmc2c::PCCMETHOD - Parses and preps PMC PCCMETHOD called from F<Parrot:P
 
 =head2 Publicly Available Methods
 
-=head3 C<rewrite_pccmethod($self, $method, $body)>
+=head3 C<rewrite_pccmethod($method, $pmc)>
 
 B<Purpose:>  Parse and Build PMC PCCMETHODS.
 
@@ -53,7 +45,7 @@ Current Method Body
 
 =back
 
-=head3 C<rewrite_pccinvoke($self, $method, $body)>
+=head3 C<rewrite_pccinvoke($method, $pmc)>
 
 B<Purpose:>  Parse and Build a PCCINVOKE Call.
 
@@ -203,44 +195,56 @@ sub gen_arg_accessor {
     }
 }
 
-=head3 C<rewrite_PCCRETURNs($method, $body)>
+=head3 C<rewrite_PCCRETURNs($method, $pmc)>
 
 Rewrites the method body performing the various macro substitutions for PCCRETURNs.
 
 =cut
 
 sub rewrite_PCCRETURNs {
-    my ( $self, $body ) = @_;
-    my $method_name  = $self->{meth};
+    my ( $self, $pmc) = @_;
+    my $method_name  = $self->name;
+    my $body         = $self->body;
     my $regs_used    = [];
+    my $qty_returns  = 0;
     my $signature_re = qr{
-      (PCCRETURN         #method name
+      (PCCRETURN       #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #returns ( stuff ... )
       ;?)              #optional semicolon
     }sx;
 
-    if ( $body and $body =~ m/\breturn\b/ ) {
-        croak "return not allowed in pccmethods, use PCCRETURN instead";
-    }
+    croak "return not allowed in pccmethods, use PCCRETURN instead $body" 
+        if ( $body and $body =~ m/\breturn\b/ );
 
-    while ( $$body and $$body =~ m/$signature_re/ ) {
+
+    while ($body) {
+        my $matched = undef;
+        if ( $body ) {
+            $matched = $body->find( $signature_re );
+            last unless $matched;
+        }
+
+        $qty_returns++;
+        $matched =~ /$signature_re/;
         my ( $match, $returns ) = ( $1, $2 );
         my $goto_string = "goto ${method_name}_returns;";
         my ( $returns_n_regs_used, $returns_indexes, $returns_flags, $returns_accessors ) =
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
+        $returns_indexes = "0" unless $returns_indexes;
 
         push @$regs_used, $returns_n_regs_used;
-        my $file        = '"' . __FILE__ . '"';
-        my $lineno1     = __LINE__ + 2;
-        my $lineno2     = __LINE__ + 7;
-        my $replacement = <<END;
-{
-#line $lineno1 $file
+        my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
+
+        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+    {
     /*BEGIN PCCRETURN $returns */
     /*BEGIN GENERATED ACCESSORS */
+END
+        $e->emit(<<"END");
 $returns_accessors
-#line $lineno2 $file
+END
+        $e->emit(<<"END", __FILE__, __LINE__ + 1);
     /*END GENERATED ACCESSORS */
     {
         opcode_t temp_return_indexes[] = { $returns_indexes };
@@ -250,12 +254,12 @@ $returns_accessors
         string_from_literal(interp, $returns_flags), 0);
     $goto_string
     /*END PCCRETURN $returns */
-}
-END
-        $$body =~ s/\Q$1\E/$replacement/;
     }
-
-    return $regs_used;
+END
+        $matched->replace($match, $e);
+    }
+    
+    return $regs_used, $qty_returns;
 }
 
 sub parse_p_args_string {
@@ -338,16 +342,18 @@ sub find_max_regs {
 
 =head3 C<rewrite_pccmethod()>
 
-    rewrite_pccmethod($method_hash);
+    rewrite_pccmethod($method, $pmc);
 
 =cut
 
 sub rewrite_pccmethod {
-    my ($self) = @_;
-    croak "return method of PCCMETHOD must be void, not $self->{type}" if $self->{type} ne 'void';
+    my ($self, $pmc) = @_;
+    
+    my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
+    my $e_post = Parrot::Pmc2c::Emitter->new($pmc->filename);
 
     # parse pccmethod parameters, then unshift the a PMC arg for the invocant
-    my $linear_args = parse_p_args_string( $self->{parameters} );
+    my $linear_args = parse_p_args_string( $self->parameters );
     unshift @$linear_args,
         {
         type  => convert_type_string_to_reg_type('PMC'),
@@ -358,16 +364,12 @@ sub rewrite_pccmethod {
     my ( $params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
-    my $n_regs = rewrite_PCCRETURNs( $self, \$self->{body} );
-    rewrite_pccinvoke( $self->{meth}, \$self->{body} );
+    my ($n_regs, $qty_returns) = rewrite_PCCRETURNs( $self, $pmc );
+    rewrite_pccinvoke( $self, $pmc );
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
-    my $file     = '"' . __FILE__ . '"';
-    my $lineno   = __LINE__ + 5;
-    my $PRE_STUB = <<END;
-{
-#line $lineno $file
+    $e->emit(<<"END", __FILE__, __LINE__ + 1);
     INTVAL   n_regs_used[]   = { $n_regs_used };
     opcode_t param_indexes[] = { $params_indexes };
     opcode_t *return_indexes;
@@ -389,7 +391,11 @@ sub rewrite_pccmethod {
     current_args                 = interp->current_args;
     interp->current_args         = NULL;
 
+END
+    $e->emit(<<"END");
 $named_names
+END
+    $e->emit(<<"END", __FILE__, __LINE__ + 1);
 
     interp->params_signature     = param_sig;
     parrot_pass_args(interp, caller_ctx, ctx, current_args, param_indexes,
@@ -404,34 +410,40 @@ $named_names
     }
     /* BEGIN PARMS SCOPE */
     {
+END
+    $e->emit(<<"END");
 $params_accessors
+END
+    $e->emit(<<"END", __FILE__, __LINE__ + 1);
 
     /* BEGIN PMETHOD BODY */
+    {
 END
 
-    my $method_returns = $self->{meth} . "_returns:";
-    $lineno = __LINE__ + 4;
-    my $POST_STUB = <<END;
+    my $method_returns = $self->name . "_returns:";
+    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
 
-#line $lineno $file
+    }
     goto no_return;
     /* END PMETHOD BODY */
 
+END
+    if ($qty_returns) {
+    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
 $method_returns
 
-    /* if (PMC_cont(ccont)->address) { */
-    {
-        /* parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx; */
-        if (! caller_ctx) {
-            /* there is no point calling real_exception here, because
-               PDB_backtrace can't deal with a missing to_ctx either. */
-            internal_exception(1, "No caller_ctx for continuation \%p.", ccont);
-        }
-
-        interp->returns_signature = return_sig;
-        parrot_pass_args(interp, ctx, caller_ctx, return_indexes,
-            caller_ctx->current_results, PARROT_PASS_RESULTS);
+    if (! caller_ctx) {
+        /* there is no point calling real_exception here, because
+           PDB_backtrace can't deal with a missing to_ctx either. */
+        internal_exception(1, "No caller_ctx for continuation \%p.", ccont);
     }
+
+    interp->returns_signature = return_sig;
+    parrot_pass_args(interp, ctx, caller_ctx, return_indexes,
+        caller_ctx->current_results, PARROT_PASS_RESULTS);
+END
+}
+    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
 
     /* END PARAMS SCOPE */
     }
@@ -441,9 +453,16 @@ $method_returns
     PObj_live_CLEAR(return_sig);
     Parrot_pop_context(interp);
 END
-    ( $self->{parameters}, $self->{pre_block}, $self->{post_block} ) =
-        ( "", $PRE_STUB, $POST_STUB );
-    return;
+    $self->return_type('void');
+    $self->parameters('');
+    my $e_body = Parrot::Pmc2c::Emitter->new($pmc->filename);
+    $e_body->emit($e);
+    $e_body->emit($self->body);
+    $e_body->emit($e_post);
+    $self->body($e_body);
+    $self->{PCCMETHOD} = 1;
+    
+    return 1;
 }
 
 sub isquoted {
@@ -451,25 +470,32 @@ sub isquoted {
 }
 
 sub rewrite_pccinvoke {
-    my ( $method, $body ) = @_;
+    my ( $method, $pmc ) = @_;
+    my $body = $method->body;
     my $signature_re = qr{
       (
       (
       \( ([^\(]*) \)   #results
       \s*              #optional whitespace
       =                #results equals PCCINVOKE invocation
-      )?               #results are optional
       \s*              #optional whitespace
+      )?               #results are optional
       PCCINVOKE        #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #parameters
       ;?               #optional semicolon
       )
     }sx;
+    
+    while ($body) {
+        my $matched = undef;
+        if ( $body ) {
+            $matched = $body->find( $signature_re );
+            last unless $matched;
+        }
 
-    while ( $$body and $$body =~ m/$signature_re/ ) {
+        $matched =~ /$signature_re/;
         my ( $match, $result_clause, $results, $parameters ) = ( $1, $2, $3, $4 );
-
         #optional results portion of pccinvoke statement
         my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors ) =
             ( defined $results )
@@ -488,13 +514,10 @@ sub rewrite_pccinvoke {
         $method_name = "string_from_literal(interp, $method_name)"
             if isquoted($method_name);
 
-        my $file   = '"' . __FILE__ . '"';
-        my $lineno = __LINE__ + 8;
-
-        my $replacement .= <<END;
+        my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
+        $e->emit(<<"END", __FILE__, __LINE__ + 1);
 
     /*BEGIN PCCINVOKE $invocant */
-#line $lineno $file
     {
       INTVAL   n_regs_used[]    = { $n_regs_used };
       opcode_t arg_indexes[]    = { $arg_indexes };
@@ -519,9 +542,13 @@ sub rewrite_pccinvoke {
       ctx->current_results        = result_indexes;
       ctx->results_signature      = results_sig;
 
+END
+        $e->emit(<<"END");
 $named_names
 
 $arg_accessors
+END
+        $e->emit(<<"END", __FILE__, __LINE__ + 1);
 
       interp->current_object       = $invocant;
       interp->current_cont         = NEED_CONTINUATION;
@@ -535,7 +562,11 @@ $arg_accessors
       else
           VTABLE_invoke(interp, pccinvoke_meth, NULL);
 
+END
+        $e->emit(<<"END");
 $result_accessors
+END
+        $e->emit(<<"END", __FILE__, __LINE__ + 1);
 
       PObj_live_CLEAR(_type);
       PObj_live_CLEAR(args_sig);
@@ -549,8 +580,9 @@ $result_accessors
     /*END PCCINVOKE $method_name */
 END
 
-        $$body =~ s/\Q$match\E/$replacement/;
-    }
+        $matched->replace($match, $e);
+    };
+    return 1;
 }
 
 1;

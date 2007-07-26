@@ -19,12 +19,12 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 23;
+use Test::More tests => 13;
 use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
-use_ok('Parrot::Pmc2c::Pmc2cMain');
+use_ok('Parrot::Pmc2c::UtilFunctions');
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -35,7 +35,7 @@ my $rv;
 my $cwd = cwd();
 
 my $file = q{sample.txt};
-my ( $direction, $verbose );
+my ( $direction );
 my $fh;
 
 {
@@ -45,64 +45,19 @@ my $fh;
     ok( create_test_file($file), "test file created" );
 
     $direction = '<';
-    ok( $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose ),
+    ok( $fh = Parrot::Pmc2c::UtilFunctions::open_file( $direction, $file ),
         "file opened for reading" );
     close $fh or die "Unable to close handle to test file";
 
     $direction = '>';
-    ok( $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose ),
+    ok( $fh = Parrot::Pmc2c::UtilFunctions::open_file( $direction, $file ),
         "file opened for writing" );
     close $fh or die "Unable to close handle to test file";
 
     $direction = '>>';
-    ok( $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose ),
+    ok( $fh = Parrot::Pmc2c::UtilFunctions::open_file( $direction, $file ),
         "file opened for appending" );
     close $fh or die "Unable to close handle to test file";
-
-    ok( chdir $cwd, "changed back to original directory" );
-}
-
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir, 'changed to temp directory for testing' );
-
-    ok( create_test_file($file), "test file created" );
-
-    $verbose = 1;
-    my ( $currfh, $msg, $msgfh );
-
-    $direction = '<';
-    {
-        $currfh = select($msgfh);
-        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose );
-        ok( $fh, "file opened for reading" );
-        close $fh or die "Unable to close handle: $!";
-        select($currfh);
-    }
-    like( $msg, qr/^Reading/, "verbose option reports Reading" );
-
-    $direction = '>';
-    {
-        $currfh = select($msgfh);
-        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose );
-        ok( $fh, "file opened for writing" );
-        close $fh or die "Unable to close handle: $!";
-        select($currfh);
-    }
-    like( $msg, qr/^Writing/, "verbose option reports Writing" );
-
-    $direction = '>>';
-    {
-        $currfh = select($msgfh);
-        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
-        $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose );
-        ok( $fh, "file opened for appending" );
-        close $fh or die "Unable to close handle: $!";
-        select($currfh);
-    }
-    like( $msg, qr/^Appending/, "verbose option reports Appending" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -115,14 +70,8 @@ my $fh;
     my ( $currfh, $msg, $msgfh );
 
     $direction = '<';
-    {
-        $currfh = select($msgfh);
-        open( $msgfh, '>', \$msg ) or die "Unable to open handle: $!";
-        eval { $fh = Parrot::Pmc2c::Pmc2cMain::open_file( $direction, $file, $verbose ); };
-        select($currfh);
-    }
+    eval { $fh = Parrot::Pmc2c::UtilFunctions::open_file( $direction, $file ); };
     like( $@,   qr/^Reading sample.txt/, "correctly failed to read nonexistent file" );
-    like( $msg, qr/^Reading sample.txt/, "correct message upon trying to read nonexistent file" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -140,7 +89,7 @@ sub create_test_file {
 
 =head1 NAME
 
-07-open_file.t - test C<Parrot::Pmc2c::Pmc2cMain::open_file()>
+07-open_file.t - test C<Parrot::Pmc2c::UtilFunctions::open_file()>
 
 =head1 SYNOPSIS
 
@@ -153,7 +102,7 @@ F<lib/Parrot/Pmc2c/Pmc2cMain.pm>.  By doing so, they test the functionality
 of the F<pmc2c.pl> utility.  That functionality has largely been extracted
 into the methods of F<Pmc2cMain.pm>.
 
-F<07-open_file.t> tests the C<Parrot::Pmc2c::Pmc2cMain::open_file()> subroutine.
+F<07-open_file.t> tests the C<Parrot::Pmc2c::UtilFunctions::open_file()> subroutine.
 This subroutine is I<not> called F<make> but is called by  methods which are
 called by F<make>.
 

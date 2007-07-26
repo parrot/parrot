@@ -172,7 +172,7 @@ Throws an exception if a non-NameSpace PMC is passed.
             if (src->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
                         "source must be a NameSpace PMC");
-                return;
+                PCCRETURN();
             }
             exp->ns_src = src;
         }
@@ -204,7 +204,7 @@ Throws an exception if a non-NameSpace PMC is passed.
             if (dest->vtable->base_type != enum_class_NameSpace) {
                 real_exception(interp, NULL, 0,
                         "destination must be a NameSpace PMC");
-                return;
+                PCCRETURN();
             }
             exp->ns_dest = dest;
         }
@@ -277,7 +277,7 @@ Throws an exception if an unknown PMC type is passed.
             else {
                 real_exception(interp, NULL, 0,
                     "Invalid type %d in globals()", glb->vtable->base_type);
-                return;
+                PCCRETURN();
             }
 
             exp->globals = temp_globals;
@@ -329,11 +329,11 @@ Throws an exception upon error.
 
         if (PMC_IS_NULL(exp->ns_src)) {
             real_exception(interp, NULL, 0, "source namespace not set");
-            return;
+            PCCRETURN();
         }
         if (PMC_IS_NULL(exp->ns_dest)) {
             real_exception(interp, NULL, 0, "destination namespace not set");
-            return;
+            PCCRETURN();
         }
 
         ns_src     = exp->ns_src;

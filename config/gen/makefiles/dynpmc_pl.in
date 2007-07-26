@@ -204,7 +204,6 @@ sub gather_groups_and_libs {
         # There should be at most a single group
         my $group = $class->{flags}{group}
           or next;
-        ($group) = keys %$group;
         $pmc_group{$pmc} = $group;
         push @{ $group_files{$group} }, $pmc;
         $group_libs{$group} ||= {};

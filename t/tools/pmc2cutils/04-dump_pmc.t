@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 117;
+use Test::More tests => 106;
 use File::Basename;
 use File::Copy;
 use FindBin;
@@ -299,62 +299,6 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         qr/^cannot find file 'scalar\.dump' in path/,
         "dump_pmc failed on integer because prerequisite scalar wasn't supplied to 'args' key"
     );
-
-    ok( chdir $cwd, "changed back to original directory" );
-}
-
-# test with verbose option
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir, 'changed to temp directory for testing' );
-    my $pmcdir = q{src/pmc};
-    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
-    my $temppmcdir = qq{$tdir/src/pmc};
-    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
-
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
-    my $pmcfilecount = scalar(@pmcfiles);
-    my $copycount;
-    foreach my $pmcfile (@pmcfiles) {
-        my $basename = basename($pmcfile);
-        my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
-        $copycount++ if $rv;
-    }
-    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
-    my @include = ( $tdir, $temppmcdir, @include_orig );
-
-    @args = ( qq{$temppmcdir/default.pmc}, );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
-        {
-            include => \@include,
-            opt     => { verbose => 1 },
-            args    => [@args],
-        }
-    );
-    isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
-
-    my ( $fh, $currfh, $msg );
-    {
-        $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
-        $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-        close $fh or die "Unable to close handle: $!";
-        select($currfh);
-    }
-    ok( -e $dump_file, "dump_vtable created vtable.dump" );
-    like( $msg, qr/^Writing.*?vtable\.dump/s,
-        "dump_pmc() returned expected  message in verbose mode" );
-
-    {
-        $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
-        ok( $self->dump_pmc(), "dump_pmc succeeded" );
-        close $fh or die "Unable to close handle: $!";
-        select($currfh);
-    }
-    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
-    like( $msg, qr/^Reading.*?vtable\.dump/s,
-        "dump_pmc() returned expected  message in verbose mode" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }

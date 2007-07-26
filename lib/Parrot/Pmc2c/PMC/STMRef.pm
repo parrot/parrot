@@ -1,5 +1,5 @@
-package Parrot::Pmc2c::STMRef;
-use base 'Parrot::Pmc2c::Ref';
+package Parrot::Pmc2c::PMC::STMRef;
+use base 'Parrot::Pmc2c::PMC::Ref';
 use strict;
 use warnings;
 
@@ -9,17 +9,16 @@ use warnings;
 
 sub prederef {
     my ( $self, $method ) = @_;
-    my $name = $method->{meth};
-    my $code = '';
-    $code .= <<'EOC';
-PMC *real_pmc;
+    my $name = $method->name;
+
+    my $code = <<'EOC';
+    PMC *real_pmc;
     Parrot_STM_PMC_handle handle;
-
     assert(pmc->vtable->pmc_class != pmc);
-
     handle   = (Parrot_STM_PMC_handle)PMC_struct_val(pmc);
 EOC
-    if ( $self->does_write($name) ) {    # RT#43749 is this good enough?
+
+    if ( $self->vtable_method_does_write($name) ) {    # RT#43749 is this good enough?
         $code .= <<'EOC';
     real_pmc = Parrot_STM_begin_update(interp, handle);
 EOC

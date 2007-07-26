@@ -175,7 +175,7 @@ do_initcall(PARROT_INTERP, PMC* _class, PMC *object, PMC *init)
     }
 }
 
-pmclass ParrotClass extends delegate need_ext {
+pmclass ParrotClass need_ext {
 
 /*
 

@@ -5,7 +5,8 @@ package Parrot::Pmc2c::UtilFunctions;
 use strict;
 use warnings;
 use base qw( Exporter );
-our @EXPORT_OK = qw( count_newlines gen_ret dont_edit dynext_load_code c_code_coda );
+our @EXPORT_OK = qw( count_newlines gen_ret dont_edit dynext_load_code
+        c_code_coda slurp spew splat open_file filename escape_filename );
 
 =over 4
 
@@ -17,6 +18,11 @@ Returns the number of newlines (C<\n>) in C<$string>.
 
 sub count_newlines {
     return scalar $_[0] =~ tr/\n//;
+}
+
+sub escape_filename {
+    (my $filename = shift) =~ s|(\\)|$1$1|g;
+    return $filename;
 }
 
 =item C<dont_edit($pmcfile)>
@@ -55,14 +61,15 @@ This method is imported by subclasses.
 sub gen_ret {
     my ( $method, $body ) = @_;
 
+    my $return_type = $method->return_type;
     if ($body) {
-        return "$body;" if $method->{type} eq 'void';
+        return "$body;" if $return_type eq 'void';
         return "return $body;";
     }
     else {
-        return '' if $method->{type} eq 'void';
-        return "return PMCNULL;" if $method->{type} eq 'PMC*';
-        return "return ($method->{type})0;";
+        return '' if $return_type eq 'void';
+        return "return PMCNULL;" if $return_type eq 'PMC*';
+        return "return ($return_type)0;";
     }
 }
 
@@ -98,7 +105,7 @@ Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP)
     Parrot_PMC    pmc;
 EOC
     while ( my ( $class, $info ) = each %classes ) {
-        next if $info->{flags}->{noinit};
+        next if $info->{flags}{noinit};
         $cout .= <<"EOC";
     Parrot_Int type${class};
 EOC
@@ -120,7 +127,7 @@ EOC
      */
 EOC
     while ( my ( $class, $info ) = each %classes ) {
-        my $lhs = $info->{flags}->{noinit} ? "" : "type$class = ";
+        my $lhs = $info->{flags}{noinit} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = const_string(interp, "$class");
     ${lhs}pmc_register(interp, whoami);
@@ -132,7 +139,7 @@ EOC
     for (pass = 0; pass <= 1; ++pass) {
 EOC
     while ( my ( $class, $info ) = each %classes ) {
-        next if $info->{flags}->{noinit};
+        next if $info->{flags}{noinit};
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interp, type$class, pass);
 EOC
@@ -154,19 +161,88 @@ Returns the Parrot C code coda
 =cut
 
 sub c_code_coda() {
-    my $self = shift;
-    my $cout = "";
-    $cout .= <<"EOC";
+    <<"EOC";
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 EOC
-    "$cout\n";
 }
 
+=head3 C<open_file()>
+
+    $fh = open_file( "<", $file );
+
+B<Purpose:>  Utility subroutine.
+
+B<Arguments:>  List of scalars:  two required, one optional.
+
+=over 4
+
+=item * action
+
+String holding action/direction desired:   C<E<lt>> for
+reading or C<E<gt>E<gt>> for writing or appending.
+
+=item * filename
+
+String holding name of file to be opened.
+
+=back
+
+B<Return Values:>  Filehandle to file so opened.
+
+B<Comment:>  Called within C<dump_vtable()>, C<read_dump()>, and C<dump_pmc()>.
+
+=cut
+
+sub open_file {
+    my ( $direction, $filename ) = @_;
+
+    my $verbose = 0;
+    my $actions_descriptions = { '<' => 'Reading', '>>' => "Appending", '>' => "Writing" };
+    my $action = $actions_descriptions->{$direction} || "Unknown";
+    print "$action $filename\n" if $verbose;
+
+    open my $fh, $direction, $filename or die "$action $filename: $!\n";
+    return $fh;
+}
+
+
+sub slurp {
+    my ( $filename ) = @_;
+    my $fh = open_file( '<', $filename );
+    my $data = do { local $/; <$fh> };
+    close $fh;
+    return $data;
+}
+
+sub spew {
+    my ( $filename, $data ) = @_;
+    my $fh = open_file( '>', $filename );
+    print $fh $data;
+    close $fh;
+}
+
+sub splat {
+    my ( $filename, $data ) = @_;
+    my $fh = open_file( '>>', $filename );
+    print $fh $data;
+    close $fh;
+}
+
+sub filename {
+    my ( $filename, $type ) = @_;
+    
+    $filename =~ s/(\w+)\.\w+$/pmc_$1.h/ if ($type eq ".h");
+    $filename =~ s/\.\w+$/.c/            if ($type eq ".c");
+    $filename =~ s/\.\w+$/.dump/         if ($type eq ".dump");
+    $filename =~ s/\.\w+$/.pmc/          if ($type eq ".pmc");
+    return $filename;
+}
 1;
 
 # Local Variables:

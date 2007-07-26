@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
-# $Id: gcc.pm 20151 2007-07-24 12:35:13Z paultcochrane $
+# $Id$
 
 =head1 NAME
 

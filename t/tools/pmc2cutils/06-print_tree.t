@@ -131,6 +131,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         select($currfh);
     }
     ok( $rv, "tree printed for default.dump and array.dump" );
+    print "$msg\n";
     like(
         $msg,
         qr/^default\nArray\n\s{4}default$/s,

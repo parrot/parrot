@@ -6,12 +6,26 @@ use warnings;
 use FindBin;
 use Data::Dumper;
 use Parrot::Vtable;
+use Parrot::PMC;
+use Parrot::Pmc2c::VTable;
+use Parrot::Pmc2c::Dumper;
 use Parrot::Pmc2c::Library;
+use Parrot::Pmc2c::UtilFunctions qw( slurp spew filename );
 use Parrot::Pmc2c::PCCMETHOD;
-use Parrot::Pmc2c::Parser qw(parse_pmc);
+use Parrot::Pmc2c::PMC::default;
+use Parrot::Pmc2c::PMC::delegate;
+use Parrot::Pmc2c::PMC::deleg_pmc;
+use Parrot::Pmc2c::PMC::Null;
+use Parrot::Pmc2c::PMC::Ref;
+use Parrot::Pmc2c::PMC::SharedRef;
+use Parrot::Pmc2c::PMC::STMRef;
+use Parrot::Pmc2c::PMC::Object;
 use Cwd qw(cwd realpath);
 use File::Basename;
 use Carp;
+
+$SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
+
 
 =head1 NAME
 
@@ -80,48 +94,12 @@ sub new {
     unshift @{ $allargsref->{include} },
         ( ".", "$FindBin::Bin/../..", "$FindBin::Bin/../../src/pmc/" );
 
-    foreach my $opt qw(nolines debug verbose) {
+    foreach my $opt qw(nolines) {
         if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }
     }
     return bless( $allargsref, $class );
-}
-
-=head3 C<find_file()>
-
-    $path = $self->find_file($file, $die_unless_found_flag);
-
-B<Purpose:>  Return the full path to C<$file>.  (Search in the directories
-listed in the C<include> key in the hash passed by reference to the
-constructor).  Optionally, die with an error message if that file cannot
-be found.
-
-B<Arguments:>  Two arguments.  Required:  string holding name of the file
-sought.  Optional:  a flag variable which, if set to a true value, will cause
-program to die if file is not located.
-
-B<Return Values:>  Upon success, string holding a path.  Upon failure,
-C<undef> (unless C<$die_unless_found_flag> is set to a true value, in which
-case program C<die>s).
-
-B<Comment:>  Called inside C<read_dump()> and C<dump_pmc()>.
-
-=cut
-
-sub find_file {
-    my ( $self, $file, $die_unless_found ) = @_;
-
-    return $file if ( File::Spec->file_name_is_absolute($file) && -e $file );
-
-    my @includes = @{ $self->{include} };
-    foreach my $dir (@includes) {
-        my $path = File::Spec->catfile( $dir, $file );
-        return $path if -e $path;
-    }
-
-    die "cannot find file '$file' in path '", join( "', '", @includes ), "'" if $die_unless_found;
-    return;
 }
 
 =head3 C<dump_vtable()>
@@ -148,41 +126,13 @@ When the caller is F<make>, that directory is the top-level Parrot directory.
 
 sub dump_vtable {
     my ( $self, $file ) = @_;
-    my $default = parse_vtable($file);
-    my $dump    = $file;
-    $dump =~ s/\.\w+$/\.dump/;
-    $dump = cwd() . q{/} . basename($dump);
-
-    my $vtd = open_file( ">", $dump, $self->{opt}{verbose} );
-
-    my %vtable = (
-        flags => {},
-        pre   => '',
-        post  => '',
-    );
-    my %meth_hash;
-    my $i = 0;
-    foreach my $entry (@$default) {
-        $meth_hash{ $entry->[1] } = $i++;
-        push @{ $vtable{methods} },
-            {
-            parameters => $entry->[2],
-            meth       => $entry->[1],
-            type       => $entry->[0],
-            section    => $entry->[3],
-            mmd        => $entry->[4],
-            attr       => $entry->[5]
-            };
-    }
-    $vtable{'has_method'} = \%meth_hash;
-
-    my $Dumper = Data::Dumper->new( [ \%vtable ], ['class'] );
-    $Dumper->Indent(3);
-    print $vtd $Dumper->Dump();
-    close $vtd;
-
-    return $dump;
+    return Parrot::Pmc2c::VTable->new( $file )->dump;
 }
+
+=head3 C<dump_pmc()>
+
+see C<lib/Parrot/Pmc2c/Dumper>.
+
 
 =head3 C<print_tree()>
 
@@ -257,8 +207,8 @@ sub print_tree {
 
     for my $f (@files) {
         my $class = $self->read_dump($f);
-        print "    " x $depth, $class->{class}, "\n";
-        for my $k ( keys %{ $class->{flags}{extends} } ) {
+        print "    " x $depth, $class->{name}, "\n";
+        for my $k ( @{ $class->parents } ) {
             $self->print_tree(
                 {
                     depth => $depth + 1,
@@ -294,18 +244,13 @@ C<dump_pmc()>.
 =cut
 
 sub read_dump {
-    my ( $self, $file ) = @_;
-
-    $file =~ s/\.\w+$/.dump/;
-    $file = $self->find_file( $file, 1 );
-
-    my $fh = open_file( "<", $file, $self->{opt}{verbose} );
+    my ( $self, $filename ) = @_;
+    $filename = $self->find_file( filename($filename, '.dump'), 1 );
 
     my $class;
-    eval do { local $/; <$fh> };
+    eval do { slurp($filename); };
     die $@ if $@;
 
-    close $fh;
     return $class;
 }
 
@@ -328,370 +273,63 @@ Perl-ish C<1>.
 =cut
 
 sub gen_c {
-    my $self    = shift;
-    my @files   = @{ $self->{args} };
-    my $optsref = $self->{opt};
-    my %pmcs    = map { $_, $self->read_dump($_) } @files;
+    my $self        = shift;
+    my $vtable_dump = $self->read_dump("vtable.pmc");
 
-    Parrot::Pmc2c::Library->new( $optsref, $self->read_dump("vtable.pmc"), %pmcs )->write_all_files;
-
+    foreach my $filename ( @{ $self->{args} } ) {
+        Parrot::Pmc2c::PMC->prep_for_emit($self->read_dump($filename), $vtable_dump)->generate;
+    }
     return 1;
 }
 
-=head3 C<dump_pmc()>
+sub gen_library {
+    my ( $self, $library_name ) = @_;
+    my $pmcs = [ map { $self->read_dump($_) } @{ $self->{args} } ];
 
-    $return_value = $self->dump_pmc();
-
-B<Purpose:>  Create a F<.dump> file for each file listed in the constructor's
-C<arg> key (which can be found in the directories listed in the C<include> key).
-
-A C<'*.pmc'> glob may also be passed to emulate a proper shell in the presence
-of a dumb one.
-
-    $self = Parrot::Pmc2c::Pmc2cMain->new( {
-        include => \@include,
-        opt     => \%opt,
-        args    => [ ( q{*.pmc} ) ],
-    } );
-    $self->dump_pmc();
-
-B<Arguments:>  None.
-
-B<Return Values:>  Returns 1 upon success.
-
-B<Comments:>  Called when C<--dump> is specified as the command-line option to
-F<pmc2c.pl>.
-
-=cut
-
-sub dump_pmc {
-    my $self    = shift;
-    my @files   = @{ $self->{args} };
-    my $opt     = $self->{opt};
-
-    # help these dumb 'shells' that are no shells
-    if ( $files[0] eq 'src/pmc/*.pmc' ) {
-        @files = glob $files[0];
-    }
-
-    # make sure that a default.dump will always be created if it doesn't
-    # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, qq{./src/pmc/default.pmc} unless ( -e qq{./src/pmc/default.dump} );
-
-    my $all;
-    for my $file (@files) {
-        $file =~ s/\.\w+$/.pmc/;
-        $file = $self->find_file( $file, 1 );
-
-        #slurp file contents
-        my $fh = open_file( "<", $file );
-        my $contents = do { local $/; <$fh> };
-        close $fh;
-
-        my $parsed_pmc = parse_pmc( $contents, $opt );
-        $parsed_pmc->{file} = $file;
-        $all->{$parsed_pmc->{class}} = $parsed_pmc;
-    }
-
-    $all->{default} = $self->read_dump("default.pmc") if not $all->{default};
-
-    my $vt = $self->read_dump("vtable.pmc");
-
-    foreach my $entry ( @{ $vt->{methods} } ) {
-        my $method_name = $entry->{meth};
-        $all->{default}->{super}{$method_name} = 'default';
-    }
-
-    foreach my $name ( keys %{$all} ) {
-        my $dumpfile = $all->{$name}->{file};
-        $dumpfile =~ s/\.\w+$/.dump/;
-        my $existing = $self->find_file($dumpfile);
-
-        if ( $dumpfile =~ /default\.dump$/ && defined $existing && dump_is_newer($existing) ) {
-           # don't overwrite default.dump skip all preparations for dumping
-           next;
-        }
-
-        $all = $self->gen_parent_list( $name, $all );
-
-        my $class = gen_super_meths( $name, $all, $vt );
-        my $Dumper = Data::Dumper->new( [$class], ['class'] );
-        $Dumper->Indent(1);
-
-        my $fh = open_file( ">", $dumpfile );
-        print $fh $Dumper->Dump;
-        close $fh;
-    }    # end foreach loop
+    Parrot::Pmc2c::Library->generate_library( $library_name, $pmcs );
     return 1;
-}
-
-=head2 Non-Public Methods
-
-These functions are expressed as methods called on the Parrot::Pmc2c::Pmc2cMain
-object, but only because they make use of data stored in that object.  They
-are called within the publicly available methods described above and are not
-intended to be publicly callable.
-
-=head3 C<gen_parent_list()>
-
-    $self->gen_parent_list($name, \%all);
-
-B<Purpose:>  Generate an ordered list of parent classes to put in the
-C<$classes->{class}->{parents}> array, using the given directories
-to find parents.
-
-B<Arguments:>  List of two arguments:
-
-=over 4
-
-=item *
-
-String holding class name.
-
-=item *
-
-Hash reference holding data structure being built up within C<dump_pmc()>.
-
-=back
-
-B<Return Value:>  Reference to hash holding the data structure being built up
-within C<dump_pmc()>, suitably modified.
-
-B<Comments:>  Called within C<dump_pmc()>.
-
-=cut
-
-sub gen_parent_list {
-    my ( $self, $pmc_name, $all ) = @_;
-    my $pmc_class = $all->{$pmc_name};
-
-    # An interesting construction:  note below that in the course of processing
-    # @todo, new elements can be pushed on to it.  So it's not necessarily
-    # exhausted when $n is shifted off it.
-    my @todo = ($pmc_name);
-    while (@todo) {
-        my $current_pmc_name  = shift @todo;
-        next if $current_pmc_name eq 'default';
-        my $current_pmc = $all->{$current_pmc_name};
-
-        #generate list of parent_names and sort by extends order
-        my %parent_hash = %{ $current_pmc->{flags}{extends} };
-        my @parent_names = sort { $parent_hash{$a} <=> $parent_hash{$b} } keys %parent_hash;
-
-        for my $parent_name (@parent_names) {
-            #load $parent_name into $all
-            $all->{$parent_name} =
-                $self->read_dump( lc("$parent_name.pmc") ) if not $all->{$parent_name};
-
-            #add parent's has_method hash to pmc_class' has_parent hash
-            $pmc_class->{has_parent}{$parent_name} = { %{ $all->{$parent_name}{has_method} } };
-            #add parent_name to parents lists
-            push @{ $pmc_class->{parents} }, $parent_name;
-            #add parent_name to recursion list.
-            push @todo, $parent_name;
-        }
-    }
-    return $all;
 }
 
 =head2 Subroutines
 
 These are auxiliary subroutines called inside the methods described above.
 
-=head3 C<open_file()>
 
-    $fh = open_file( "<", $file, $verbose);
+=head3 C<find_file()>
 
-B<Purpose:>  Utility subroutine.
+    $path = $self->find_file($file, $die_unless_found_flag);
 
-B<Arguments:>  List of scalars:  two required, one optional.
+B<Purpose:>  Return the full path to C<$file>.  (Search in the directories
+listed in the C<include> key in the hash passed by reference to the
+constructor).  Optionally, die with an error message if that file cannot
+be found.
 
-=over 4
+B<Arguments:>  Two arguments.  Required:  string holding name of the file
+sought.  Optional:  a flag variable which, if set to a true value, will cause
+program to die if file is not located.
 
-=item * action
+B<Return Values:>  Upon success, string holding a path.  Upon failure,
+C<undef> (unless C<$die_unless_found_flag> is set to a true value, in which
+case program C<die>s).
 
-String holding action/direction desired:   C<E<lt>> for
-reading or C<E<gt>E<gt>> for writing or appending.
-
-=item * filename
-
-String holding name of file to be opened.
-
-=item * verbose
-
-Optional.  True value if verbose output is desired.  That output will be the
-action followed by the filename.
-In most cases, the third argument will be C<$self->{opt}{verbose}>.
-
-=back
-
-B<Return Values:>  Filehandle to file so opened.
-
-B<Comment:>  Called within C<dump_vtable()>, C<read_dump()>, C<find_and_parse_pmc()>,
-and C<dump_pmc()>.
+B<Comment:>  Called inside C<read_dump()> and C<dump_pmc()>.
 
 =cut
 
-sub open_file {
-    my ( $direction, $filename, $verbose ) = @_;
+sub find_file {
+    my ( $self, $file, $die_unless_found ) = @_;
 
-    my $actions_descriptions = { '<' => 'Reading', '>>' => "Appending", '>' => "Writing" };
-    my $action = $actions_descriptions->{$direction} || "Unknown";
+    return $file if ( File::Spec->file_name_is_absolute($file) && -e $file );
 
-    print "$action $filename\n" if $verbose;
-    open my $fh, $direction, $filename or die "$action $filename: $!\n";
-    return $fh;
-}
-
-=head3 C<dump_is_newer()>
-
-    dump_is_newer($existing);
-
-B<Purpose:>  Determines whether the dump of a file is newer than the PMC file.
-(If it's not, then the PMC file has changed and the dump has not been updated.)
-
-B<Arguments:>  String holding filename.
-
-B<Return Values:>  Returns true if timestamp of existing is more recent than
-that of PMC.
-
-B<Comments:>  Called within C<find_and_parse_pmc()>.
-
-=cut
-
-sub dump_is_newer {
-    my $dumpfile = shift;
-
-    # Extract name of .pmc file corresponding to .dump file
-    my $pmc = $dumpfile;
-    $pmc =~ s/\.\w+$/.pmc/;
-
-    my $pmc_dt  = 0;
-    my $dump_dt = 0;
-    $pmc_dt  = ( stat $pmc )[9];
-    $dump_dt = ( stat $dumpfile )[9];
-    return $dump_dt > $pmc_dt;
-}
-
-=head3 C<gen_super_meths()>
-
-    $class = gen_super_meths($name, $all, $vt);
-
-B<Purpose:>  Generate a list of inherited methods for C<$name> by searching the
-inheritance tree. The method list is found in C<$vt>.
-
-B<Arguments:>  List of three elements:
-
-=over 4
-
-=item *
-
-String holding name of class being dumped.
-
-=item *
-
-Reference to the hash holding the data structure being built up within
-C<dump_pmc()>.
-
-=item *
-
-The result of a call of C<read_dump()> on F<vtable.pmc>.
-
-=back
-
-B<Return Value:>  Hash reference representing the class being dumped.
-
-B<Comments:>  Called within C<dump_pmc()>.
-
-=cut
-
-sub gen_super_meths {
-    my ( $name, $all, $vt ) = @_;
-    my $class = $all->{$name};
-
-    # look through all meths in class and locate the nearest parent
-    foreach my $entry ( @{ $vt->{methods} } ) {
-        my $meth = $entry->{meth};
-        next if exists $class->{super}{$meth};
-        foreach my $pname ( @{ $class->{parents} } ) {
-            if ( exists( $class->{has_parent}{$pname}{$meth} ) ) {
-                $class->{super}{$meth} = $pname;
-                my $n = $class->{has_parent}{$pname}{$meth};
-                $class->{super_attrs}{$meth} = $all->{$pname}{methods}[$n]{attrs};
-                if ( exists $class->{has_method}{$meth} ) {
-                    $class = inherit_attrs( $class, $meth );
-                }
-                my $super_mmd = $all->{$pname}{methods}[$n]{mmds};
-                if ( $super_mmd && scalar @{$super_mmd} ) {
-                    push @{ $class->{super_mmd} },
-                        {
-                        $pname => $super_mmd,
-                        'meth' => $meth,
-                        };
-                }
-                last;
-            }
-        }
-        unless ( exists $class->{super}{$meth} ) {
-
-            # RT#43745 this is a quick hack to get the inheritance
-            # ParrotClass isa delegate
-            #
-            # delegate has everything autogenerated, so these
-            # methods aren't seen and not inherited properly
-            #
-            # the correct way would be to look at
-            # $class->implements but when dumping there isn't
-            # a $class object
-            $class->{super}{$meth} =
-                   $class->{class} eq 'ParrotObject'
-                || $class->{class} eq 'ParrotClass'
-                ? 'delegate'
-                : 'default';
-        }
+    my @includes = @{ $self->{include} };
+    foreach my $dir (@includes) {
+        my $path = File::Spec->catfile( $dir, $file );
+        return $path if -e $path;
     }
-    return $class;
-}
-
-=head3 C<inherit_attrs()>
-
-    $class = inherit_attrs($class, $meth);
-
-B<Purpose:>  Modify $attrs to inherit attrs from $super_attrs as appropriate.
-
-B<Arguments:>  List of two arguments:
-
-=over 4
-
-=item *
-
-Reference to hash holding the data structure being built up within
-C<dump_pmc()>.
-
-=item *
-
-Method name.
-
-=back
-
-B<Return Values:>  Reference to hash holding the data structure being built up
-within C<dump_pmc()>.
-
-B<Comments:> Called within C<gen_super_meths()>.
-
-=cut
-
-sub inherit_attrs {
-    my ( $class, $meth ) = @_;
-    my $super_attrs = $class->{methods}[ $class->{has_method}{$meth} ]->{attrs};
-    my $attrs       = $class->{super_attrs}{$meth};
-    if ( ( $super_attrs->{read} or $super_attrs->{write} )
-        and not( $attrs->{read} or $attrs->{write} ) )
-    {
-        $attrs->{read} = $super_attrs->{read} if exists $super_attrs->{read};
-        $attrs->{write} = $super_attrs->{write} if exists $super_attrs->{write};
-    }
-    return $class;
+    
+    print Carp::longmess;
+    die "cannot find file '$file' in path '", join( "', '", @includes ), "'" if $die_unless_found;
+    return;
 }
 
 =head1 AUTHOR

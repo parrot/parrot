@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 12;
+use Test::More tests => 8;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 use_ok('File::Basename');
 use_ok( 'File::Temp', qw| tempdir | );
@@ -47,33 +47,6 @@ my $cwd;
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     is( dirname($dump_file), realpath($tdir1), "vtable.dump created in expected directory" );
-
-    ok( chdir $cwd, "changed back to original directory" );
-}
-
-# test verbose option
-{
-    $cwd = cwd();
-    my $tdir2 = tempdir( CLEANUP => 1 );
-    ok( chdir $tdir2, 'changed to temp directory for testing' );
-
-    %opt = ( verbose => 1 );
-    $self = Parrot::Pmc2c::Pmc2cMain->new(
-        {
-            include => \@include,
-            opt     => \%opt,
-            args    => [@args],
-        }
-    );
-    my ( $fh, $msg );
-    {
-        my $currfh = select($fh);
-        open( $fh, '>', \$msg ) or die "Unable to open handle: $!";
-        $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
-        select($currfh);
-    }
-    ok( -e $dump_file, "dump_vtable created dump file" );
-    like( $msg, qr/^Writing/, "verbose output is as expected" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }

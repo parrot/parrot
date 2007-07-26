@@ -22,8 +22,6 @@ GetOptions(
     "tree"      => \$action{tree},
     #command line options
     "no-lines"  => \$options{nolines},
-    "debug+"    => \$options{debug},
-    "verbose+"  => \$options{verbose},
     "library=s" => \$options{library},
     "testing"   => \$options{testing},
 ) or exit 1;
@@ -54,6 +52,11 @@ if ( $action{dump} ) {
 
 if ( $action{tree} ) {
     $self->print_tree();
+    exit;
+}
+
+if ( $options{library} ) {
+    $self->gen_library($options{library});
     exit;
 }
 
@@ -104,14 +107,6 @@ that can be compiled for use with the Parrot interpreter.
 =head1 COMMAND-LINE OPTIONS
 
 =over 4
-
-=item C<--debug>
-
-Increase debug level
-
-=item C<--verbose>
-
-Increase verbose level
 
 =item C<--no-lines>
 

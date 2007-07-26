@@ -132,6 +132,28 @@ END
 
 E_NOTE
 
+        $TEMP_pmc_build .= <<END;
+PMC2C_FILES = \\
+\t\tlib/Parrot/Pmc2c/Pmc2cMain.pm \\
+\t\tlib/Parrot/Pmc2c/Parser.pm \\
+\t\tlib/Parrot/Pmc2c/Dumper.pm \\
+\t\tlib/Parrot/Pmc2c/PMC.pm \\
+\t\tlib/Parrot/Pmc2c/Method.pm \\
+\t\tlib/Parrot/Pmc2c/PCCMETHOD.pm \\
+\t\tlib/Parrot/Pmc2c/PMCEmitter.pm \\
+\t\tlib/Parrot/Pmc2c/MethodEmitter.pm \\
+\t\tlib/Parrot/Pmc2c/Library.pm \\
+\t\tlib/Parrot/Pmc2c/UtilFunctions.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/default.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/delegate.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/deleg_pmc.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/Null.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/Ref.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/SharedRef.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/STMRef.pm \\
+\t\tlib/Parrot/Pmc2c/PMC/RO.pm
+END
+
     foreach my $pmc ( split( /\s+/, $pmc_list ) ) {
         $pmc =~ s/\.pmc$//;
         next if ( $pmc =~ /^const/ );
@@ -146,15 +168,7 @@ E_NOTE
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
 
-src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \\
-\t\tlib/Parrot/Pmc2c/StmRef.pm      lib/Parrot/Pmc2c.pm \\
-\t\tlib/Parrot/Pmc2c/default.pm     lib/Parrot/Pmc2c/Library.pm \\
-\t\tlib/Parrot/Pmc2c/Ref.pm         lib/Parrot/Pmc2c/SharedRef.pm \\
-\t\tlib/Parrot/Pmc2c/Standard.pm    lib/Parrot/Pmc2c/UtilFunctions.pm \\
-\t\tlib/Parrot/Pmc2c/delegate.pm    lib/Parrot/Pmc2c/Null.pm \\
-\t\tlib/Parrot/Pmc2c/StandardRO.pm  lib/Parrot/Pmc2c/Pmc2cMain.pm \\
-\t\tlib/Parrot/Pmc2c/deleg_pmc.pm   lib/Parrot/Pmc2c/PCCMETHOD.pm  \\
-\t\tlib/Parrot/Pmc2c/StandardConst.pm
+src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) 
 \t\$(PMC2CD) src/pmc/$pmc.pmc 
 
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c

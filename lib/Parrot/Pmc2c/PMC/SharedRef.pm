@@ -5,8 +5,8 @@
 
 =cut
 
-package Parrot::Pmc2c::SharedRef;
-use base 'Parrot::Pmc2c::Ref';
+package Parrot::Pmc2c::PMC::SharedRef;
+use base 'Parrot::Pmc2c::PMC::Ref';
 use strict;
 use warnings;
 

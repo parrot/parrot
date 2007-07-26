@@ -897,8 +897,8 @@ true (1) is returned; otherwise, false (0) is returned.
 
 */
 
-    INTVAL does(STRING* interface) {
-        return does_isa(INTERP, interface, SELF->vtable->does_str);
+    INTVAL does(STRING* _interface) {
+        return does_isa(INTERP, _interface, SELF->vtable->does_str);
     }
 
 

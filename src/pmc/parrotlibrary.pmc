@@ -34,7 +34,7 @@ a ParrotLibrary PMC.
 
 #include "parrot/parrot.h"
 
-pmclass ParrotLibrary need_ext does library const_too {
+pmclass ParrotLibrary need_ext does library {
 
 /*
 

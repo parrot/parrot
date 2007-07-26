@@ -74,6 +74,7 @@ useful defaults and don't throw exceptions.
 
 */
 
+
     void init() {
         STRING* const meth = CONST_STRING(interp, "init");
         PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);

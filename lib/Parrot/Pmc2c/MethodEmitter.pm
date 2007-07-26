@@ -1,0 +1,329 @@
+# Copyright (C) 2004-2007, The Perl Foundation.
+
+# $Id$
+
+=head1 NAME
+
+Parrot::Pmc2c - PMC to C Code Generation
+
+=head1 SYNOPSIS
+
+    use Parrot::Pmc2c;
+
+=head1 DESCRIPTION
+
+C<Parrot::Pmc2c> is used by F<tools/build/pmc2c.pl> to generate C code from PMC files.
+
+=head2 Functions
+
+=over
+
+=cut
+
+package Parrot::Pmc2c::Method;
+use strict;
+use warnings;
+use Data::Dumper;
+use Parrot::Pmc2c::Emitter;
+use Parrot::Pmc2c::UtilFunctions
+    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
+use Text::Balanced 'extract_bracketed';
+use Parrot::Pmc2c::PCCMETHOD;
+
+=item C<body($method, $line, $out_name)>
+
+Returns the C code for the method body. C<$line> is used to accumulate
+the number of lines, C<$out_name> is the name of the output file we are
+generating.
+
+=cut
+
+sub generate_body {
+    my ( $self, $pmc ) = @_;
+    my $emit = sub { $pmc->{emitter}->emit(@_) };
+
+    Parrot::Pmc2c::PCCMETHOD::rewrite_pccinvoke( $self, $pmc );
+
+    my $body    = $self->body;
+
+    if ( $self->is_vtable ) {
+        $self->rewrite_vtable_method( $pmc );
+    }
+    else {
+        $self->rewrite_nci_method( $pmc );
+    }
+
+    $emit->($self->decl( $pmc, 'CFILE' ));
+    $emit->("{\n");
+    $emit->($body);
+    $emit->("}\n");
+
+    for my $mmd ( @{ $self->mmds } ) {
+        $mmd->generate_body($pmc);
+    }
+
+    return 1;
+}
+
+sub generate_headers {
+    my ( $self, $pmc ) = @_;
+    my $hout = "";
+    
+    $hout .= $self->decl( $pmc, 'HEADER' );
+
+    for my $mmd ( @{ $self->mmds } ) {
+        $hout .= $mmd->decl( $pmc, 'HEADER' );
+    }
+
+    return $hout;
+}
+
+=item C<decl($classname, $method, $for_header)>
+
+Returns the C code for the PMC method declaration. C<$for_header>
+indicates whether the code is for a header or implementation file.
+
+=cut
+
+sub decl {
+    my ( $self, $pmc, $for_header ) = @_;
+
+    my $pmcname = $pmc->name;
+    my $ret     = $self->return_type;
+    my $meth    = $self->name;
+    my $args    = $self->parameters;
+    my $ro      = $pmc->flag('is_ro') ? '' : '';
+    $args = ", $args" if $args =~ /\S/;
+    my ( $export, $extern, $newl, $semi, $interp, $pmcvar );
+    if ($for_header eq 'HEADER') {
+        $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
+        $extern = "extern ";
+        $newl   = " ";
+        $semi   = ";";
+        $interp = $pmcvar = "";
+    }
+    else {
+        $export = "";
+        $extern = "";
+        $newl   = "\n";
+        $semi   = "";
+        $interp = 'interp';
+        $pmcvar    = ' pmc';
+    }
+    return <<"EOC";
+$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(Interp *$interp, PMC*$pmcvar$args)$semi
+EOC
+}
+
+=item C<proto($type,$parameters)>
+
+Determines the prototype (argument signature) for a method body
+(see F<src/call_list>).
+
+=cut
+
+my %calltype = (
+    "char"     => "c",
+    "short"    => "s",
+    "char"     => "c",
+    "short"    => "s",
+    "int"      => "i",
+    "INTVAL"   => "I",
+    "float"    => "f",
+    "FLOATVAL" => "N",
+    "double"   => "d",
+    "STRING*"  => "S",
+    "char*"    => "t",
+    "PMC*"     => "P",
+    "short*"   => "2",
+    "int*"     => "3",
+    "long*"    => "4",
+    "void"     => "v",
+    "void*"    => "b",
+    "void**"   => "B",
+
+    #"BIGNUM*" => "???" # XXX
+);
+
+sub proto {
+    my ( $type, $parameters ) = @_;
+
+    # reduce to a comma separated set of types
+    $parameters =~ s/\w+(,|$)/,/g;
+    $parameters =~ s/ //g;
+
+    # type method(interp, self, parameters...)
+    my $ret = $calltype{ $type or "void" };
+    $ret .= "JO" . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
+
+    # TODO
+    # scan src/call_list.txt if the generated signature is available
+    # TODO report errors for "?"
+    # --leo
+
+    return $ret;
+}
+
+=item C<rewrite_nci_method($self, $pmc )>
+
+Rewrites the method body performing the various macro substitutions for
+nci method bodies (see F<tools/build/pmc2c.pl>).
+
+=cut
+
+sub rewrite_nci_method {
+    my ( $self, $pmc ) = @_;
+    my $pmcname = $pmc->name;
+    my $body = $self->body;
+    
+    # Rewrite DYNSELF.other_method(args...)
+    $body->subst( qr{
+    \bDYNSELF\b       # Macro: DYNSELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub { "pmc->real_self->vtable->$1(" . full_arguments($2, 'pmc->real_self') . ')' });
+
+    # Rewrite SELF.other_method(args...)
+    $body->subst( qr{
+      \bSELF\b          # Macro SELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub {
+      "Parrot_${pmcname}" .  ($pmc->is_vtable_method($1) ? "" : "_nci") .
+      "_$1(" . full_arguments($2) . ")"
+      });
+
+    # Rewrite SELF -> pmc, INTERP -> interp
+    $body->subst( qr{\bSELF\b}, sub { 'pmc' } );
+    $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
+}
+
+=item C<rewrite_vtable_method($self, $pmc, $super, $super_table)>
+
+Rewrites the method body performing the various macro substitutions for
+vtable method bodies (see F<tools/build/pmc2c.pl>).
+
+=cut
+
+sub rewrite_vtable_method {
+    my ( $self, $pmc ) = @_;
+    my $name = $self->name;
+    my $pmcname = $pmc->name;
+    my $super = $pmc->{super}{$name};
+    my $super_table = $pmc->{super};
+    my $body = $self->body;
+    my $sub;
+    
+    # Rewrite method body
+    # Some MMD variants don't have a super mapping.
+    if ($super)
+    {
+        my $supertype = "enum_class_$super";
+        die "$pmcname defines unknown vtable method '$name'\n" unless defined $super_table->{$name};
+        my $supermethod = "Parrot_" . $super_table->{$name} . "_$name";
+
+        # Rewrite DYNSUPER(args)
+        $body->subst( qr{
+            \bDYNSUPER\b      # Macro: DYNSUPER
+            \(\s*(.*?)\)      # capture argument list
+          }x,
+          sub { "interp->vtables[$supertype].$name(" . full_arguments($1) . ')' });
+
+        # Rewrite OtherClass.SUPER(args...)
+        $body->subst( qr{
+            (\w+)             # capture OtherClass
+            \.SUPER\b         # Macro: SUPER
+            \(\s*(.*?)\)      # capture argument list
+          }x,
+          sub { "Parrot_${1}_$name(" . full_arguments($2) . ')' });
+
+        # Rewrite SUPER(args...)
+        $body->subst( qr{
+            \bSUPER\b         # Macro: SUPER
+            \(\s*(.*?)\)      # capture argument list
+          }x,
+          sub { "$supermethod(" . full_arguments($1) . ')' });
+    }
+
+    # Rewrite DYNSELF.other_method(args...)
+    $body->subst( qr{
+        \bDYNSELF\b       # Macro: DYNSELF
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub { "pmc->vtable->$1(" . full_arguments($2) . ')'});
+
+    # Rewrite DYNSELF(args...). See comments above.
+    $body->subst( qr{
+        \bDYNSELF\b       # Macro: DYNSELF
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub { "pmc->vtable->$name(" . full_arguments($1) . ')'});
+
+    # Rewrite OtherClass.SELF.other_method(args...)
+    $body->subst( qr{
+        (\w+)             # OtherClass
+        \.\bSELF\b        # Macro SELF
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub { "Parrot_${1}" .  ($pmc->is_vtable_method($2) ? "" : "_nci") . "_$2(" .
+        full_arguments($3) . ')'});
+
+    # Rewrite OtherClass.object.other_method(args...)
+    $body->subst( qr{
+        (\w+)             # OtherClass
+        \.\b(\w+)\b       # any object
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub { "Parrot_${1}" .  ($pmc->is_vtable_method($3) ? "" : "_nci") . "_$3(" 
+        . full_arguments($4, $2) . ')'});
+
+    # Rewrite SELF.other_method(args...)
+    $body->subst( qr{
+        \bSELF\b          # Macro SELF
+        \.(\w+)           # other_method
+        \(\s*(.*?)\)      # capture argument list
+      }x,
+      sub {"Parrot_${pmcname}" .
+      ($pmc->is_vtable_method($1) ? "" : "_nci") .  "_$1(" . full_arguments($2) . ")"});
+
+    # Rewrite SELF -> pmc, INTERP -> interp
+    $body->subst( qr{\bSELF\b}, sub { 'pmc' } );
+    $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
+    # now use macros for all rewritten stuff
+    $body->subst( qr{\b(?:\w+)->vtable->(\w+)\(}, sub { "VTABLE_$1(" } );
+
+    return 1;
+}
+
+=item C<full_arguments($args)>
+
+Prepends C<INTERP, SELF> to C<$args>.
+
+=cut
+
+sub full_arguments {
+    my $args = shift;
+    my $obj  = shift || 'SELF';
+
+    return "INTERP, $obj, $args" if ( $args =~ m/\S/ );
+    return "INTERP, $obj";
+}
+
+sub full_method_name {
+    my ( $self, $parent_name ) = @_;
+    return "Parrot_${parent_name}_" . $self->name;
+}
+
+1;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -48,10 +48,10 @@ my $ident_re   = make_re('[A-Za-z_][A-Za-z0-9_]*');
 my $type_re    = make_re( '(?:(?:struct\s+)|(?:union\s+))?' . $ident_re . '\**' );
 my $param_re   = make_re( $type_re . '\s+' . $ident_re );
 my $arglist_re = make_re( '(?:' . $param_re . '(?:\s*,\s*' . $param_re . ')*)?' );
-my $method_re =
+my $method_re  =
     make_re( '^\s*(' . $type_re . ')\s+(' . $ident_re . ')\s*\((' . $arglist_re . ')\)\s*$' );
-my $attrs_re = make_re('(?::(\w+)\s*)*');
-my $attr_re  = make_re(':(\w+)\s*');
+my $attrs_re   = make_re('(?::(\w+)\s*)*');
+my $attr_re    = make_re(':(\w+)\s*');
 
 sub parse_attrs {
     my $attrs = shift;
@@ -75,11 +75,10 @@ defaults to F<vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
 
 sub parse_vtable {
 
-    my $file   = defined $_[0] ? shift() : 'vtable.tbl';
-    my $vtable = [];
-    my $mmd    = [];
-    my $fh     = FileHandle->new( $file, O_RDONLY )
-        or die "Can't open $file for reading: $!\n";
+    my $file    = defined $_[0] ? shift() : 'vtable.tbl';
+    my $vtable  = [];
+    my $mmd     = [];
+    my $fh      = FileHandle->new( $file, O_RDONLY ) or die "Can't open $file for reading: $!\n";
     my $section = 'MAIN';
 
     my $default_attrs = {};
@@ -96,13 +95,13 @@ sub parse_vtable {
             m/^\s*
             ($type_re)\s+
             ($ident_re)\s*
-        \(($arglist_re)\)
-        (?:\s+(MMD_\w+))?\s*($attrs_re)$/x
+            \(($arglist_re)\)
+            (?:\s+(MMD_\w+))?\s*($attrs_re)$/x
             )
         {
             my $mmdop = defined $4 ? $4 : -1;
-
             my $entry = [ $1, $2, $3, $section, $mmdop, parse_attrs( $5, $default_attrs ) ];
+
             if (defined $4) {
                 push @{$mmd}, $entry;
             }

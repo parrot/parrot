@@ -1199,7 +1199,21 @@ parameter list.
             build_attrib_index(interp, SELF);
 
             if (PMC_IS_NULL(_class->attrib_index))
-                return;
+                PCCRETURN();
+
+            /* See if we have any parents from other universes and if so set a
+             * flag stating so. */
+            mro_length = VTABLE_elements(interp, _class->all_parents);
+
+            for (i = 0; i < mro_length; i++) {
+                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
+                    _class->all_parents, i);
+                if (!VTABLE_isa(interp, class_check, class_str)) {
+                    /* Found one; that's enough. */
+                    PObj_HasAlienParents_SET(SELF);
+                    break;
+                }
+            }
 
             /* See if we have any parents from other universes and if so set a
              * flag stating so. */
