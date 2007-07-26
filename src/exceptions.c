@@ -774,19 +774,21 @@ void
 Parrot_print_backtrace(void)
 {
 #ifdef PARROT_HAS_GLIBC_BACKTRACE
+#define BACKTRACE_DEPTH 32
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
-    void *array[10];
+    void *array[BACKTRACE_DEPTH];
     size_t i;
 
-    const size_t size = backtrace (array, 10);
+    const size_t size = backtrace (array, BACKTRACE_DEPTH);
     char ** const strings = backtrace_symbols (array, size);
 
-    printf ("Obtained %zd stack frames.\n", size);
+    printf ("Obtained %zd stack frames (max trace depth is %d).\n", size, BACKTRACE_DEPTH);
     for (i = 0; i < size; i++)
         printf ("%s\n", strings[i]);
 
     free (strings);
-#endif
+#undef BACKTRACE_DEPTH
+#endif // ifdef PARROT_HAS_GLIBC_BACKTRACE
 }
 
 
