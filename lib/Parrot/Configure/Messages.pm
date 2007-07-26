@@ -19,7 +19,7 @@ Copyright (C) 2001-2007, The Perl Foundation.
 
 Hello, I'm Configure. My job is to poke and prod your system to figure out
 how to build Parrot. The process is completely automated, unless you passed in
-the `--ask' flag on the command line, in which case it'll prompt you for a few
+the `--ask' flag on the command line, in which case I'll prompt you for a few
 pieces of info.
 
 Since you're running this program, you obviously have Perl 5--I'll be pulling
