@@ -176,7 +176,7 @@ show version information.
   L1:
     .local string arg
     arg = args[i]
-    if null arg goto L2
+    unless arg goto L2
     $S0 = substr arg, 0, 1
     if $S0 == '-' goto L3 # not an option?
     .return (i, has_i, has_v, has_e)
