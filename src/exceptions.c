@@ -773,7 +773,7 @@ Parrot_confess(NOTNULL(const char *cond), NOTNULL(const char *file), unsigned in
 void
 Parrot_print_backtrace(void)
 {
-#if 0
+#ifdef PARROT_HAS_GLIBC_BACKTRACE
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[10];
     size_t i;
