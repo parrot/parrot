@@ -1,0 +1,24 @@
+/*
+ * test_c.c - figure out if libc has backtrace() & backtrace_symbols()
+ */
+
+void backtrace();
+void backtrace_symbols();
+
+int
+main(int argc, char **argv)
+{
+    backtrace();
+    backtrace_symbols();
+    return 0;
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
