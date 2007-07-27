@@ -9,12 +9,6 @@
     .return ()
 .end    
 
-# Local Variables:
-#   mode: pir
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4:
-
 .sub 'quote_literal'
     .param pmc mob
     .param pmc adverbs         :slurpy :named
@@ -116,3 +110,8 @@
     .return (mob)
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
