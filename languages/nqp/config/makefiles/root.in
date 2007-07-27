@@ -1,4 +1,4 @@
-# $Id: root.in 19234 2007-06-21 19:39:35Z particle $
+# $Id$
 
 # Setup some commands
 LN_S     = @lns@
