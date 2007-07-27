@@ -110,7 +110,7 @@ children and attributes.  Returns the newly created node.
 
     $S0 = classname self                                   # FIXME
     $P1 = new $S0                                          # FIXME
-    $P1.'init'(children :flat, 'node'=>self, adverbs :flat :named)
+    $P1.'init'(children :flat, adverbs :flat :named)
     .return ($P1)
 .end
 
@@ -345,19 +345,19 @@ parameter, and array/hash variables respectively.
 .end
 
 
-=item ismy([flag])
+=item isdecl([flag])
 
-Get/set the node's C<ismy> attribute (for lexical variables) to C<flag>.
-A true value of C<ismy> indicates that the variable given by
+Get/set the node's C<isdecl> attribute (for lexical variables) to C<flag>.
+A true value of C<isdecl> indicates that the variable given by
 this node is to be created within the current lexical scope.
 Otherwise, the node refers to a lexical variable from an outer scope.
 
 =cut
 
-.sub 'ismy' :method
+.sub 'isdecl' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('ismy', value, has_value)
+    .return self.'attr'('isdecl', value, has_value)
 .end
 
 =item isslurpy([flag])

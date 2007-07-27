@@ -188,7 +188,7 @@ Get/set
     $P0 = get_hll_global [ 'POST' ], '%pirtable'
     signature = $P0[pirop]
     if signature goto have_signature
-    signature = '%uPPPPPPPPPPPPPPPP'
+    signature = '%vPPPPPPPPPPPPPPPP'
   have_signature:
 
     ##  evaluate children nodes

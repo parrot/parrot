@@ -507,7 +507,7 @@ transform bind (PAST::Var) :language('PIR') {
 
   lexical:
     .local int isdecl
-    isdecl = node.'ismy'()
+    isdecl = node.'isdecl'()
     if isdecl goto lexical_decl
     post.'pirop'('store_lex')
     .return (post)
@@ -527,15 +527,22 @@ transform bind (PAST::Var) :language('PIR') {
 
 
 transform vivipost (PAST::Var) :language('PIR') {
-    .local pmc vivipost, vivilabel
-    .local string viviself
+    .local pmc viviself, vivipost
     viviself = node.'viviself'()
-    if viviself goto have_viviself
-    viviself = '.Undef'
-  have_viviself:
+    $I0 = isa viviself, 'PAST::Node'
+    unless $I0 goto viviself_string
+    .return tree.'get'('post', viviself)
+
+  viviself_string:
+    $S0 = "'Undef'"
+    unless viviself goto viviself_undef
+    $S0 = viviself
+    $S0 = concat "'", $S0
+    concat $S0, "'"
+  viviself_undef:
     vivipost = new 'POST::Op'
-    vivipost.'init'('node'=>node, 'pirop'=>'new', 'result'=>vivipost)
-    vivipost.'arglist'(vivipost, viviself)
+    vivipost.'init'('node'=>node, 'pirop'=>'new')
+    vivipost.'arglist'(vivipost, $S0)
     .return (vivipost)
 }
 
@@ -572,7 +579,7 @@ transform post (PAST::Var) :language('PIR') {
   scope_lexical:
     fetchop = 'find_lex'
     storeop = 'store_lex'
-    $I0 = node.'ismy'()
+    $I0 = node.'isdecl'()
     if $I0 == 0 goto have_scope
     post.'push'(vivipost)
     post.'push_pirop'('.lex', name, vivipost)
@@ -591,13 +598,13 @@ transform post (PAST::Var) :language('PIR') {
     .return (post)
 
   have_scope:
-    post.'push_pirop'(fetchop, vivipost, name)
+    post.'push_pirop'(fetchop, post, name)
     post.'push_pirop'('unless_null', post, vivilabel)
     post.'push'(vivipost)
     .local int islvalue
     islvalue = node.'islvalue'()
     unless islvalue goto done_lvalue
-    post.'push_pirop'(storeop, name, post)
+    post.'push_pirop'(storeop, name, post, 'result'=>post)
   done_lvalue:
     post.'push'(vivilabel)
     .return (post)
