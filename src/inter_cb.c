@@ -24,7 +24,6 @@ the C-library.
 
 */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "inter_cb.str"
 

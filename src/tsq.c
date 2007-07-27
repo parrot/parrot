@@ -13,7 +13,6 @@ src/tsq.c - Thread-safe queues
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/tsq.h */
 
@@ -179,7 +178,7 @@ nosync_insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
     parrot_event *event;
     FLOATVAL abs_time;
 
-    assert(entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT);
+    PARROT_ASSERT(entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT);
     /*
      * empty queue - just insert
      */

@@ -179,7 +179,6 @@ Also all array usage depends on list.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/list.h */
 
@@ -668,7 +667,7 @@ alloc_next_size(PARROT_INTERP, NOTNULL(List *list), int where, UINTVAL idx)
         do_sparse = 0;
     }
     else if (do_sparse) {
-        assert(where);
+        PARROT_ASSERT(where);
         /* don't add sparse chunk at start of list */
         if (!list->n_chunks) {
             list->grow_policy = enum_grow_fixed;
@@ -947,7 +946,7 @@ get_chunk(PARROT_INTERP, NOTNULL(List *list), NOTNULL(UINTVAL *idx))
             const UINTVAL slot = ld(*idx + chunk->items) - ld_first;
 
             /* we are in this growing area, so we are done */
-            assert(slot < chunk->n_chunks);
+            PARROT_ASSERT(slot < chunk->n_chunks);
             *idx -= (1 << (ld_first + slot)) - chunk->items;
             return chunk_list_ptr(list, i + slot);
         }
@@ -1048,7 +1047,7 @@ list_set(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), INTVAL type, IN
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
 
-    assert(chunk);
+    PARROT_ASSERT(chunk);
     /* if this is a sparse chunk: split in possibly 2 sparse parts before and
      * after then make a real chunk, rebuild chunk list and set item */
     if (chunk->flags & sparse) {
@@ -1056,8 +1055,8 @@ list_set(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), INTVAL type, IN
         /* reget chunk and idx */
         idx = oidx;
         chunk = get_chunk(interp, list, (UINTVAL *)&idx);
-        assert(chunk);
-        assert(!(chunk->flags & sparse));
+        PARROT_ASSERT(chunk);
+        PARROT_ASSERT(!(chunk->flags & sparse));
     }
 
     switch (type) {
@@ -1464,7 +1463,7 @@ list_visit(PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo))
     UINTVAL idx;
 
     const UINTVAL n = list_length(interp, list);
-    assert(list->item_type == enum_type_PMC);
+    PARROT_ASSERT(list->item_type == enum_type_PMC);
     /* TODO intlist ... */
     for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
         /* TODO deleted elements */
@@ -1548,9 +1547,9 @@ list_insert(PARROT_INTERP, NOTNULL(List *list), INTVAL idx, INTVAL n_items)
 {
     List_chunk *chunk;
 
-    assert(idx >= 0);
+    PARROT_ASSERT(idx >= 0);
     idx += list->start;
-    assert(n_items >= 0);
+    PARROT_ASSERT(n_items >= 0);
     if (n_items == 0)
         return;
     /* empty list */
@@ -1619,8 +1618,8 @@ list_delete(PARROT_INTERP, NOTNULL(List *list), INTVAL idx, INTVAL n_items)
 {
     List_chunk *chunk;
 
-    assert(idx >= 0);
-    assert(n_items >= 0);
+    PARROT_ASSERT(idx >= 0);
+    PARROT_ASSERT(n_items >= 0);
     if (n_items == 0)
         return;
     idx += list->start;
@@ -1721,7 +1720,7 @@ list_unshift(PARROT_INTERP, NOTNULL(List *list), NULLOK(void *item), int type)
         list->start = chunk->items;
     }
     else
-        chunk = list->first;
+        chunk = list->first; /* XXX This chunk is unused.  Why are we getting it? */
     list_set(interp, list, item, type, --list->start);
     list->length++;
 }

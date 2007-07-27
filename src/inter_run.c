@@ -15,7 +15,6 @@ Various functions that call the run loop.
 */
 
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 

@@ -16,7 +16,6 @@ src/packout.c - Functions for writing out packfiles
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 

@@ -19,7 +19,6 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 */
 
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "inter_misc.str"
 

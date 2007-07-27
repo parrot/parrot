@@ -30,7 +30,6 @@ C<STRING> with a vtable.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* default.pmc thawing of properties */
 void Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
@@ -353,7 +352,7 @@ str_append(PARROT_INTERP, NOTNULL(STRING *s), NOTNULL(const void *b), size_t len
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
         Parrot_reallocate_string(interp, s, new_size);
-        assert(PObj_buflen(s) - used - len >= 15);
+        PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
     mem_sys_memcopy((void *)((ptrcast_t)s->strstart + used), b, len);
     s->bufused += len;
@@ -459,10 +458,10 @@ shift_ascii_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
     const INTVAL i = strtoul(p, &p, 10);
 
     ++p;
-    assert(p <= start + io->image->bufused);
+    PARROT_ASSERT(p <= start + io->image->bufused);
     io->image->strstart = p;
     io->image->bufused -= (p - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return i;
 }
 
@@ -482,10 +481,10 @@ shift_ascii_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
     const FLOATVAL f = (FLOATVAL) strtod(p, &p);
 
     ++p;
-    assert(p <= start + io->image->bufused);
+    PARROT_ASSERT(p <= start + io->image->bufused);
     io->image->strstart = p;
     io->image->bufused -= (p - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return f;
 }
 
@@ -510,10 +509,10 @@ shift_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
     while (*p != ' ')
         ++p;
     ++p;
-    assert(p <= start + io->image->bufused);
+    PARROT_ASSERT(p <= start + io->image->bufused);
     io->image->strstart = p;
     io->image->bufused -= (p - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     s = string_make(interp, start, p - start - 1, "iso-8859-1", 0);
 /*    s = string_make(interp, start, p - start - 1, "UTF-8", 0); */
     return s;
@@ -536,10 +535,10 @@ shift_ascii_pmc(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
     char *p = start;
     const unsigned long i = strtoul(p, &p, 16);
     ++p;
-    assert(p <= start + io->image->bufused);
+    PARROT_ASSERT(p <= start + io->image->bufused);
     io->image->strstart = p;
     io->image->bufused -= (p - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return (PMC*) i;
 }
 
@@ -568,7 +567,7 @@ op_check_size(PARROT_INTERP, NOTNULL(STRING *s), size_t len)
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
         Parrot_reallocate_string(interp, s, new_size);
-        assert(PObj_buflen(s) - used - len >= 15);
+        PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
 #ifndef DISABLE_GC_DEBUG
     Parrot_go_collect(interp);
@@ -605,7 +604,7 @@ XXX assumes sizeof (opcode_t) == sizeof (INTVAL).
 static void
 push_opcode_integer(PARROT_INTERP, NOTNULL(IMAGE_IO *io), INTVAL v)
 {
-    assert(sizeof (opcode_t) == sizeof (INTVAL));
+    PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
     op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
 }
 
@@ -684,7 +683,7 @@ shift_opcode_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         PF_fetch_integer(io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return i;
 }
 
@@ -722,7 +721,7 @@ shift_opcode_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         PF_fetch_number(io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return f;
 }
 
@@ -744,7 +743,7 @@ shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
         PF_fetch_string(interp, io->pf, (opcode_t**) &io->image->strstart);
 
     io->image->bufused -= ((char*)io->image->strstart - start);
-    assert((int)io->image->bufused >= 0);
+    PARROT_ASSERT((int)io->image->bufused >= 0);
     return s;
 }
 
@@ -1119,7 +1118,7 @@ do_thaw(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info *info))
             VTABLE_thaw(interp, pmc, info);
         }
 #else
-        assert(must_have_seen);
+        PARROT_ASSERT(must_have_seen);
 #endif
         /*
          * that's a duplicate
@@ -1130,7 +1129,7 @@ do_thaw(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info *info))
         return;
     }
 
-    assert(!must_have_seen);
+    PARROT_ASSERT(!must_have_seen);
     pmc = thaw_create_pmc(interp, info, type);
 
     VTABLE_thaw(interp, pmc, info);
@@ -1168,7 +1167,7 @@ id_from_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
         ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
         if (ptr_diff >= 0 && ptr_diff <
                 (ptrdiff_t)(arena->used * pool->object_size)) {
-            assert(ptr_diff % pool->object_size == 0);
+            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
             id += ptr_diff / pool->object_size;
             return id << 2;
         }
@@ -1179,7 +1178,7 @@ id_from_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
         ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
         if (ptr_diff >= 0 && ptr_diff <
                 (ptrdiff_t)(arena->used * pool->object_size)) {
-            assert(ptr_diff % pool->object_size == 0);
+            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
             id += ptr_diff / pool->object_size;
             return id << 2;
         }
@@ -1554,7 +1553,7 @@ run_thaw(PARROT_INTERP, NOTNULL(STRING* image), visit_enum_type what)
      */
     LVALUE_CAST(char *, image->strstart) -= bufused;
     image->bufused = bufused;
-    assert(image->strstart >= (char *)PObj_bufstart(image));
+    PARROT_ASSERT(image->strstart >= (char *)PObj_bufstart(image));
 
     if (dod_block) {
         Parrot_unblock_DOD(interp);

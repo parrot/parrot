@@ -20,7 +20,6 @@ and its utility functions.
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
 #include "spf_render.str"
-#include <assert.h>
 
 typedef enum {
     PHASE_FLAGS = 0,
@@ -39,7 +38,7 @@ typedef struct SpfInfo_tag {
     PHASE   phase;
 } SpfInfo;
 
-typedef enum {
+enum {
     FLAG_MINUS  = (1<<0),
     FLAG_PLUS   = (1<<1),
     FLAG_ZERO   = (1<<2),

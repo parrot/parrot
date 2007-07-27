@@ -19,7 +19,6 @@ Create or destroy a Parrot interpreter
 */
 
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"

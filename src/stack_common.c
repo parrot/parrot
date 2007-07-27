@@ -19,7 +19,6 @@ These stacks all differ only in the size of items.
 
 #include "parrot/parrot.h"
 #include "parrot/stacks.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/stacks.h */
 

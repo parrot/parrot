@@ -17,7 +17,6 @@ Handles class and object manipulation.
 #define PARROT_IN_OBJECTS_C
 #include "parrot/parrot.h"
 #include "parrot/objects.h"
-#include <assert.h>
 
 #include "objects.str"
 
@@ -272,7 +271,7 @@ readable_name(PARROT_INTERP, NOTNULL(PMC *name))
     join_on = CONST_STRING(interp, ";");
     array   = pmc_new(interp, enum_class_ResizableStringArray);
 
-    assert(name->vtable->base_type == enum_class_Key);
+    PARROT_ASSERT(name->vtable->base_type == enum_class_Key);
 
     while (name) {
         VTABLE_push_string(interp, array, key_string(interp, name));
@@ -383,7 +382,7 @@ rebuild_attrib_stuff(PARROT_INTERP, NOTNULL(PMC *_class))
     }
 
 #ifndef NDEBUG
-    assert(_class == orig_class);
+    PARROT_ASSERT(_class == orig_class);
 #endif
 
     /* And note the totals */
@@ -473,7 +472,7 @@ PARROT_CAN_RETURN_NULL
 const char*
 Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 {
-    assert(idx >= 0);
+    PARROT_ASSERT(idx >= 0);
 
     if (idx >= MMD_USER_FIRST)
         return NULL;
@@ -685,7 +684,7 @@ Parrot_class_lookup(PARROT_INTERP, NOTNULL(STRING *class_name))
         return PMCNULL;
 
     pmc = interp->vtables[type]->pmc_class;
-    assert(pmc);
+    PARROT_ASSERT(pmc);
     return pmc;
 }
 
@@ -709,7 +708,7 @@ Parrot_class_lookup_p(PARROT_INTERP, NOTNULL(PMC *class_name))
         return PMCNULL;
 
     pmc = interp->vtables[type]->pmc_class;
-    assert(pmc);
+    PARROT_ASSERT(pmc);
     return pmc;
 }
 
@@ -940,7 +939,7 @@ do_initcall(PARROT_INTERP, NULLOK(PMC* _class), NULLOK(PMC *object),
              * but only if init isn't inherited
              * or rather just on the last non-class parent
              */
-            assert(i >= 1);
+            PARROT_ASSERT(i >= 1);
             next_parent = VTABLE_get_pmc_keyed_int(interp,
                     classsearch_array, i - 1);
             if (!PObj_is_class_TEST(next_parent))
@@ -1471,7 +1470,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(STRIN
     Caches           *mc;
     Meth_cache_entry *e, *old;
 
-    assert(method_name != 0);
+    PARROT_ASSERT(method_name != 0);
 
 #if DISABLE_METH_CACHE
     return Parrot_find_method_direct(interp, _class, method_name);

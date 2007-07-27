@@ -28,7 +28,6 @@ have the same number of elements because there is a one-to-one mapping.
 
 */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "interp_guts.h"
 #include "parrot/oplib/core_ops.h"
@@ -926,7 +925,7 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
     n_tot = n_old + n_new;
     core = PARROT_CORE_OPLIB_INIT(1);
 
-    assert(interp->op_count == core->op_count);
+    PARROT_ASSERT(interp->op_count == core->op_count);
     new_evc_func_table = (op_func_t *)mem__sys_realloc(interp->evc_func_table,
             sizeof (op_func_t) * n_tot);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
@@ -1109,7 +1108,7 @@ notify_func_table(PARROT_INTERP, NOTNULL(op_func_t* table), int on)
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */
         case PARROT_CGOTO_CORE:      /* cgoto address list  */
-            assert(table);
+            PARROT_ASSERT(table);
             interp->op_func_table = table;
             break;
         case PARROT_CGP_CORE:
@@ -1138,7 +1137,7 @@ disable_event_checking(PARROT_INTERP)
     /*
      * restore func table
      */
-    assert(interp->save_func_table);
+    PARROT_ASSERT(interp->save_func_table);
     notify_func_table(interp, interp->save_func_table, 0);
 }
 

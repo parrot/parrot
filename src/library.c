@@ -16,7 +16,6 @@ This file contains a C function to access Parrot's bytecode library functions.
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
-#include <assert.h>
 #include "library.str"
 
 /* HEADERIZER HFILE: include/parrot/library.h */
@@ -200,7 +199,7 @@ is_abs_path(NOTNULL(const STRING *file))
     const char * const file_name = file->strstart;
     if (file->strlen <= 1)
         return 0;
-    assert(file->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
             file->encoding == Parrot_utf8_encoding_ptr);
 #ifdef WIN32
     if (file_name[0] == '\\' || file_name[0] == '/' ||
@@ -230,7 +229,7 @@ cnv_to_win32_filesep(NOTNULL(STRING *path))
 {
     char* cnv;
 
-    assert(path->encoding == Parrot_fixed_8_encoding_ptr ||
+    PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
 
     cnv = path->strstart;

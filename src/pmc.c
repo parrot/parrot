@@ -13,7 +13,6 @@ src/pmc.c - The base vtable calling functions
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 #include "pmc.str"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
@@ -192,7 +191,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
         /* LOCK */
         if (!pmc) {
             pmc = new_pmc_header(interp, PObj_constant_FLAG);
-            assert(pmc);
+            PARROT_ASSERT(pmc);
             pmc->vtable = vtable;
             pmc->real_self = pmc;
             VTABLE_set_pointer(interp, pmc, pmc);

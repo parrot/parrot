@@ -235,7 +235,7 @@ trace_op_dump(PARROT_INTERP, NOTNULL(const opcode_t *code_start), NOTNULL(const 
     int len;
 #define ARGS_COLUMN 40
 
-    assert(debugger);
+    PARROT_ASSERT(debugger);
     sig = NULL; /* silence compiler uninit warning */
 
     s = 1;

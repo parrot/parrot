@@ -16,7 +16,6 @@ subroutines.
 */
 
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
@@ -455,12 +454,12 @@ Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
     /* check if we're at a :flat argument */
     if (st->src.mode & CALL_STATE_FLATTEN) {
         PMC *elem;
-        assert(st->src.slurp_i < st->src.slurp_n);
+        PARROT_ASSERT(st->src.slurp_i < st->src.slurp_n);
         if (!PMC_IS_NULL(st->key)) {
             st->src.slurp_i++;
             st->name = (STRING *)parrot_hash_get_idx(interp,
                             (Hash *)PMC_struct_val(st->src.slurp), st->key);
-            assert(st->name);
+            PARROT_ASSERT(st->name);
             elem = VTABLE_get_pmc_keyed_str(interp, st->src.slurp, st->name);
         }
         else {
@@ -507,7 +506,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))
     next_arg_sig(&st->dest);
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
         PMC *slurped;
-        assert((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
+        PARROT_ASSERT((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
         slurped = pmc_new(interp, enum_class_ResizablePMCArray);
         while (Parrot_fetch_arg(interp, st)) {
             st->src.used = 1;
@@ -625,7 +624,7 @@ check_for_opt_flag(NOTNULL(call_state *st), int has_arg)
     /* we're at an :opt_flag argument, so actually store something */
     idx = st->dest.u.op.pc[st->dest.i];
     --st->params;
-    assert(idx >= 0);
+    PARROT_ASSERT(idx >= 0);
     CTX_REG_INT(st->dest.ctx, idx) = has_arg;
 }
 
@@ -768,9 +767,9 @@ store_current_arg(NOTNULL(call_state *st))
     if (st->dest.i >= st->dest.n)
         return 0;
 
-    assert(st->dest.mode & CALL_STATE_OP);
+    PARROT_ASSERT(st->dest.mode & CALL_STATE_OP);
     idx = st->dest.u.op.pc[st->dest.i];
-    assert(idx >= 0);
+    PARROT_ASSERT(idx >= 0);
     store_arg(st, idx);
 
     return 1;
@@ -868,7 +867,7 @@ check_named(PARROT_INTERP, NOTNULL(call_state *st))
 
             /* verify that an actual arg exists */
             arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
-            assert(!(arg_sig & PARROT_ARG_NAME));
+            PARROT_ASSERT(!(arg_sig & PARROT_ARG_NAME));
             /* if this named arg is already filled, continue*/
             if (st->named_done & (1 << n_named)) {
                 arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
@@ -967,7 +966,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
                 null_val(st->dest.sig, st);
                 /* actually store the argument */
                 idx = st->dest.u.op.pc[st->dest.i];
-                assert(idx >= 0);
+                PARROT_ASSERT(idx >= 0);
                 store_arg(st, idx);
                 /* check for :opt_flag */
                 check_for_opt_flag(st, 0);
@@ -1003,7 +1002,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
             return;
         /* actually store the argument */
         idx = st->dest.u.op.pc[st->dest.i];
-        assert(idx >= 0);
+        PARROT_ASSERT(idx >= 0);
         store_arg(st, idx);
 
         /* if we're at an :optional argument, we need to check for an :opt_flag */
@@ -1019,7 +1018,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
         PMC * const array = pmc_new(interp, enum_class_ResizablePMCArray);
 
         const INTVAL idx = st->dest.u.op.pc[dest->i];
-        assert(idx >= 0);
+        PARROT_ASSERT(idx >= 0);
         /* Must register this PMC or it may get collected when only the struct
          * references it. */
         dod_register_pmc(interp, array);

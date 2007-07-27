@@ -74,7 +74,6 @@ lookup of the cache has to be done in the opcode itself.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
-#include <assert.h>
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
@@ -289,7 +288,7 @@ Parrot_MIC*
 parrot_PIC_alloc_mic(const PARROT_INTERP, size_t n)
 {
     Parrot_PIC_store * const store = interp->code->pic_store;
-    assert(n < store->n_mics);
+    PARROT_ASSERT(n < store->n_mics);
     return store->mic + n;
 }
 
@@ -606,7 +605,7 @@ is_pic_func(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC *mic), int cor
         return 0;
     do_prederef(pc, interp, core_type);
     sub = (PMC*)(pc[2]);
-    assert(PObj_is_PMC_TEST(sub));
+    PARROT_ASSERT(PObj_is_PMC_TEST(sub));
     if (sub->vtable->base_type != enum_class_Sub)
         return 0;
     pc += 3;    /* results */
@@ -649,7 +648,7 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int cor
          * pic_index is half the size of the code
          * XXX if it's there - pbc_merge needs updates
          */
-        assert(cs->pic_index);
+        PARROT_ASSERT(cs->pic_index);
         n = cs->pic_index->data[n / 2];
         mic = parrot_PIC_alloc_mic(interp, n);
     }

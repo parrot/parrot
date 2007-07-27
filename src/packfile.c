@@ -282,9 +282,6 @@ static int sub_pragma( PARROT_INTERP,
 
 /* HEADERIZER END: static */
 
-
-#include <assert.h>
-
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 
@@ -2491,7 +2488,7 @@ find_constants(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
         Hash *tables;
         PackFile_Constant **new_consts;
 
-        assert(interp->thread_data);
+        PARROT_ASSERT(interp->thread_data);
 
         if (!interp->thread_data->const_tables) {
             interp->thread_data->const_tables = mem_allocate_typed(Hash);

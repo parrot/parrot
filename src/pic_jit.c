@@ -29,7 +29,6 @@ TODO:
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/pic.h */
 

@@ -20,7 +20,6 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 
 #include "parrot/parrot.h"
 #include "parrot/atomic.h"
-#include <assert.h>
 
 #define THREAD_DEBUG 0
 
@@ -158,7 +157,7 @@ PMC *pt_shared_fixup(PARROT_INTERP, PMC *pmc) {
 
         /* keep the original vtable from going away... */
         vtable_cache = ((PMC**)PMC_data(pmc->vtable->pmc_class))[PCD_OBJECT_VTABLE];
-        assert(vtable_cache->vtable->base_type == enum_class_VtableCache);
+        PARROT_ASSERT(vtable_cache->vtable->base_type == enum_class_VtableCache);
 
         add_pmc_sync(interp, vtable_cache);
         PObj_is_PMC_shared_SET(vtable_cache);
@@ -407,7 +406,7 @@ thread_func(void *arg)
 
     /* make sure we don't block a GC run */
     pt_gc_wakeup_check(interp);
-    assert(interp->thread_data->state & THREAD_STATE_FINISHED);
+    PARROT_ASSERT(interp->thread_data->state & THREAD_STATE_FINISHED);
 
     UNLOCK(interpreter_array_mutex);
 
@@ -845,14 +844,14 @@ pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
     TRACE_THREAD("%p: got lock", interp);
     thread_count = pt_gc_count_threads(interp);
 
-    assert(info->gc_stage == from_stage);
-    assert(!(interp->thread_data->state & THREAD_STATE_NOT_STARTED));
-    assert(!(interp->thread_data->state & THREAD_STATE_FINISHED));
+    PARROT_ASSERT(info->gc_stage == from_stage);
+    PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_NOT_STARTED));
+    PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_FINISHED));
 
     if (from_stage == 0)
-        assert(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC);
+        PARROT_ASSERT(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC);
     else
-        assert(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
+        PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
 
     ++info->num_reached;
 
@@ -883,7 +882,7 @@ pt_gc_wakeup_check(PARROT_INTERP) {
     thread_count = pt_gc_count_threads(interp);
 
     if (info->num_reached == thread_count) {
-        assert(info->gc_stage == THREAD_GC_STAGE_NONE);
+        PARROT_ASSERT(info->gc_stage == THREAD_GC_STAGE_NONE);
         info->gc_stage    = THREAD_GC_STAGE_MARK;
         info->num_reached = 0;
         COND_BROADCAST(info->gc_cond);
@@ -971,7 +970,7 @@ pt_suspend_all_for_gc(PARROT_INTERP)
                          other_interp);
             fprintf(stderr, "??? found later (%p)\n", other_interp);
             successp = remove_queued_suspend_gc(interp);
-            assert(successp);
+            PARROT_ASSERT(successp);
             UNLOCK(interpreter_array_mutex);
             return;
         }
@@ -1010,8 +1009,8 @@ as it becomes unblocked.
 void
 pt_suspend_self_for_gc(PARROT_INTERP)
 {
-    assert(interp);
-    assert(!interp->arena_base->DOD_block_level);
+    PARROT_ASSERT(interp);
+    PARROT_ASSERT(!interp->arena_base->DOD_block_level);
     TRACE_THREAD("%p: suspend_self_for_gc", interp);
     /* since we are modifying our own state, we need to lock
      * the interpreter_array_mutex.
@@ -1019,7 +1018,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
     LOCK(interpreter_array_mutex);
     TRACE_THREAD("%p: got lock", interp);
 
-    assert(interp->thread_data->state &
+    PARROT_ASSERT(interp->thread_data->state &
             (THREAD_STATE_SUSPEND_GC_REQUESTED | THREAD_STATE_SUSPENDED_GC));
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
@@ -1040,7 +1039,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
      */
     Parrot_dod_ms_run(interp, DOD_trace_stack_FLAG);
 
-    assert(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
+    PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
 }
 
 /*
@@ -1315,8 +1314,8 @@ pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
          * Create an entry for the very first interpreter, event
          * handling needs it
          */
-        assert(!interpreter_array);
-        assert(n_interpreters == 0);
+        PARROT_ASSERT(!interpreter_array);
+        PARROT_ASSERT(n_interpreters == 0);
 
         interpreter_array    = mem_allocate_typed(Interp *);
         interpreter_array[0] = interp;
@@ -1328,7 +1327,7 @@ pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
         PARROT_ATOMIC_INT_SET(shared_gc_info->gc_block_level, 0);
 
         /* XXX try to defer this until later */
-        assert(interp == interpreter_array[0]);
+        PARROT_ASSERT(interp == interpreter_array[0]);
         interp->thread_data      = mem_allocate_zeroed_typed(Thread_data);
         INTERPRETER_LOCK_INIT(interp);
         interp->thread_data->tid = 0;
@@ -1416,7 +1415,7 @@ pt_DOD_start_mark(PARROT_INTERP)
      */
     LOCK(interpreter_array_mutex);
     if (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC) {
-        assert(!(interp->thread_data->state &
+        PARROT_ASSERT(!(interp->thread_data->state &
                  THREAD_STATE_SUSPEND_GC_REQUESTED));
         TRACE_THREAD("already suspended...");
         UNLOCK(interpreter_array_mutex);
@@ -1509,7 +1508,7 @@ pt_DOD_stop_mark(PARROT_INTERP)
         return;
     }
 
-    assert(!(interp->thread_data->state &
+    PARROT_ASSERT(!(interp->thread_data->state &
              THREAD_STATE_SUSPEND_GC_REQUESTED));
     interp->thread_data->state &= ~THREAD_STATE_SUSPENDED_GC;
 
@@ -1545,7 +1544,7 @@ Parrot_shared_DOD_block(PARROT_INTERP) {
 
     if (info) {
         PARROT_ATOMIC_INT_INC(level, info->gc_block_level);
-        assert(level > 0);
+        PARROT_ASSERT(level > 0);
     }
 }
 
@@ -1561,14 +1560,11 @@ Unblock stop-the-world DOD runs.
 */
 
 void Parrot_shared_DOD_unblock(PARROT_INTERP) {
-    Shared_gc_info *info;
-    int             level;
-
-    info = get_pool(interp);
-
+    Shared_gc_info * const info = get_pool(interp);
     if (info) {
+        int level;
         PARROT_ATOMIC_INT_DEC(level, info->gc_block_level);
-        assert(level >= 0);
+        PARROT_ASSERT(level >= 0);
     }
 }
 

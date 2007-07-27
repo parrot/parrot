@@ -26,7 +26,6 @@ C<opcode_t> units.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -617,7 +616,7 @@ PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
             }
         }
     }
-    assert(((long)charcursor & 3) == 0);
+    PARROT_ASSERT(((long)charcursor & 3) == 0);
     cursor = (opcode_t *)charcursor;
 
     return cursor;
@@ -700,7 +699,7 @@ PF_size_cstring(NOTNULL(const char *s))
 {
     size_t str_len;
 
-    assert(s);
+    PARROT_ASSERT(s);
     str_len = strlen(s);
     return ROUND_UP(str_len + 1, sizeof (opcode_t));
 }
