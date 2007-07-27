@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 47;
+use Test::More tests => 45;
 use Carp;
 use File::Basename;
 use File::Copy;
@@ -38,9 +38,6 @@ my $cwd = cwd();
 
 my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 my ( $tie, $msg, @lines );
-
-my $warnpattern =
-  qr/get_bool_keyed_int.*elements_keyed_int.*set_bool_keyed_int.*is_equal_str/s;
 
 # basic test:  @args holds default.pmc
 {
@@ -84,11 +81,6 @@ my $warnpattern =
         @lines = $tie->READLINE;
 #        untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc" );
-        $msg = join("\n", @lines);
-        like( $msg,
-            $warnpattern,
-            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
-        );
     }
 
 
@@ -138,11 +130,6 @@ my $warnpattern =
         @lines = $tie->READLINE;
 #        untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
-        $msg = join("\n", @lines);
-        like( $msg,
-            $warnpattern,
-            "Warnings from Parrot::Pmc2c re 4 unknown methods have been captured"
-        );
     }
 
     ok( chdir $cwd, "changed back to original directory" );
