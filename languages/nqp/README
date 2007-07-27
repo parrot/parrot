@@ -1,0 +1,61 @@
+## $Id$
+
+=head1 NQP - Not Quite Perl (6)
+
+This is "Not Quite Perl" -- a compiler for quickly generating PIR
+routines from Perl6-like code.  The key feature of NQP is that it's
+designed to be a very small compiler (as compared with, say, perl6)
+and is focused on being a high-level way to create transformers
+for Parrot (especially hll compilers).
+
+One way that NQP aims to be a lighter version of Perl 6 is by
+avoiding syntactic sugar and "dwimminess" that isn't needed
+for the types of routines that are written.  Sometimes this
+makes coding a bit more work, but it also lowers the learning
+curve somewhat.
+
+
+=head2 Things that NQP has (or should have)
+
+This list isn't exhaustive; for now it's intended to identify the
+language constructs that we explicitly know will be supported
+
+* scalars
+* binding
+* lexical 'my', package 'our'
+* method calls (including named arguments)
+* subroutine calls (including named arguments)
+* method definitions
+* subroutine definitions
+* '...'                 # string constants
+* "..."                 # string value with escapes (non-interpolating)
+* postcircumfix:<[ ]>   # array subscript
+* postcircumfix:<{ }>   # hash subscript
+* postcircumfix:«< >»   # constant hash subscript
+* $<...>                # constant hash subscript of $/
+* $(...)                # scalar context
+* prefix:~              # string context
+* prefix:+              # numeric context
+* say(), print()        # output
+* if/unless             # conditional
+* for                   # iterative loop
+
+=head2 Things that aren't in NQP
+
+There are a large number of Perl 6 constructs and idioms that
+aren't supported or expected to be supported in NQP.  This
+is by design -- the point of NQP is to provide a lightweight
+HLL for generating PIR subroutines while adhering to a Perl 6
+syntax.  
+
+Some items not planned for NQP:
+
+* string interpolation
+* listops
+* quoted lists
+* array and hash slices
+
+Of course, if we later decide that some item is vitally
+important for NQP programs, we can add it -- but for now
+the point is to maintain a minimal set of constructs.
+

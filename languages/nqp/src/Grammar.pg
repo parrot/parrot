@@ -1,0 +1,81 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
+grammar NQP::Grammar is PCT::Grammar;
+
+token TOP { <statementlist> [ $ | <panic: Syntax error> ] {*} }
+
+token ws {
+    [ \s+
+    | ^^ [ \# \N*
+         | <?pod_comment>
+         ]
+    | \# \N*
+    ]*
+}
+
+regex pod_comment {
+    ^^ '=' [ [ 'cut' \h*: | 'end' [\h\N*]? ]
+           | 'for' [ \h\N+: ] \n [ \N+\n ]*:
+           | \w\N*: \n .*? \n '=' [ 'cut' \h*: | 'end' [\h\N*:]? ]
+           ]
+           [\n|$]
+}
+
+
+rule statementlist {
+    <statement> [ ';' <statement> ]* ';'?
+    {*}
+}
+
+
+rule statement {
+    | <EXPR> {*}
+}
+
+rule block {
+    '{' <statementlist> '}'
+    {*}
+}
+
+rule noun { 
+    | <variable> {*}                                       #= variable
+    | <quote> {*}                                          #= quote
+    | <number> {*}                                         #= number
+    | <subcall> {*}                                        #= subcall
+}
+
+token variable {
+    $<sigil>:=['$']
+    <ident>
+    {*}
+}
+
+token quote {
+    <quote_literal> {*}
+}
+
+rule subcall {
+    <name> '(' <EXPR>? ')' 
+    {*}
+}
+
+token name { 
+    <ident> [ '::' <ident> ]* 
+    {*}
+}
+
+token number { \d+ {*} }
+
+
+rule EXPR is optable { ... }
+
+proto 'term:' is precedence('z=')
+    is parsed(&noun)
+    { ... }
+
+proto postcircumfix:<( )> is equiv('term:') { ... }
+
+proto infix:<+> is looser('term:')
+    is pirop('add')
+    { ... }

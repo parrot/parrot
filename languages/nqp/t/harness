@@ -1,0 +1,8 @@
+#! perl
+
+# $Id: harness 15656 2006-11-18 15:43:01Z pmichaud $
+
+use FindBin;
+use lib qw( . lib ../lib ../../lib ../../lib );
+use Parrot::Test::Harness language => 'nqp', compiler => 'nqp.pbc';
+

@@ -168,6 +168,7 @@ GEN_MAKEFILES = \
     languages/lua/Makefile \
     languages/m4/Makefile \
     languages/miniperl/Makefile \
+    languages/nqp/Makefile \
     languages/ook/Makefile \
     languages/parrot_compiler/Makefile \
     languages/perl6/Makefile \
