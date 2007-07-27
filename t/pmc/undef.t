@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -242,6 +242,20 @@ pir_output_is( << 'CODE', << 'OUTPUT', "verify clone works." );
 .end
 CODE
 Undef
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "Undef == Undef (RT#33603)" );
+
+.sub _main
+    $P1 = new Undef
+    $P2 = new Undef
+    if $P1 == $P1 goto ok
+    print "not "
+  ok: 
+    print "ok\n"
+.end
+CODE
+ok
 OUTPUT
 
 # Local Variables:

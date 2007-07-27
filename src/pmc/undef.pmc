@@ -95,6 +95,15 @@ pmclass Undef extends default no_ro {
   PMC* clone() {
       return pmc_new(INTERP, SELF->vtable->base_type);
   }
+
+  INTVAL is_equal (PMC* value) {
+    MMD_Undef: {
+        return 1;
+    }
+    MMD_DEFAULT: {
+        return 0;
+    }
+  }
 }
 
 /*
