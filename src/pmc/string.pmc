@@ -151,7 +151,8 @@ Returns the string itself.
 */
 
     STRING* get_string() {
-        return Parrot_make_COW_reference(INTERP, (STRING*)PMC_str_val(SELF));
+        STRING * const s = PMC_str_val(SELF);
+        return s ? Parrot_make_COW_reference(INTERP, s) : NULL;
     }
 
 /*
