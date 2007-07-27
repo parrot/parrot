@@ -27,7 +27,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command) {
         !CreateProcess( shell, cmd,
         NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi )
     ) {
-        internal_exception(NOSPAWN, "Can't spawn child process");
+        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
     }
 
     WaitForSingleObject( pi.hProcess, INFINITE );
@@ -61,7 +61,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
     /* Ensure there's something in the PMC array. */
     pmclen = VTABLE_elements(interp, cmdargs);
     if (pmclen == 0) {
-        internal_exception(NOSPAWN, "Empty argument array for spawnw");
+        real_exception(interp, NULL, NOSPAWN, "Empty argument array for spawnw");
     }
 
     /* Now build command line. */
@@ -87,7 +87,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
         NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)
     )
     {
-        internal_exception(NOSPAWN, "Can't spawn child process");
+        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
     }
     WaitForSingleObject( pi.hProcess, INFINITE );
 
@@ -175,13 +175,13 @@ Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
     /* If we still have a seek char, then the input was improper. */
     if (seekChar)
     {
-        internal_exception(NOSPAWN, "Exec failed, invalid command string");
+        real_exception(interp, NULL, NOSPAWN, "Exec failed, invalid command string");
     }
 
     /* Now do the exec. */
     status = _execvp(cmd, argv);
     if (status) {
-        internal_exception(NOSPAWN, "Exec failed, code %i", status);
+        real_exception(interp, NULL, NOSPAWN, "Exec failed, code %i", status);
     }
 }
 
