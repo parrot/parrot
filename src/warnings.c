@@ -16,7 +16,6 @@ messages.
 #include "parrot/parrot.h"
 
 #include <stdarg.h>
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/warnings.h */
 
@@ -91,7 +90,7 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
 
     va_list args;
 
-    assert(interp);
+    PARROT_ASSERT(interp);
     if (!PARROT_WARNINGS_test(interp, warnclass))
         return 2;
 

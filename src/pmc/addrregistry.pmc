@@ -26,7 +26,6 @@ e.g. with C<Parrot_register_pmc> if it isn't visible to Parrot.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 #include "pmc_hash.h"
 
 static size_t

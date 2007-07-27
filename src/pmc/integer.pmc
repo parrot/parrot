@@ -21,7 +21,6 @@ register.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* XXX create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(PARROT_INTERP, PMC*, PMC*);

@@ -19,7 +19,6 @@ version comparison (number and string). A version can be a simple string
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 pmclass Version need_ext {
 

@@ -26,7 +26,6 @@ API.
 #else
 #  include <ctype.h>
 #endif
-#include <assert.h>
 
 /*
 

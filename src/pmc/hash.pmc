@@ -19,8 +19,6 @@ These are the vtable functions for the Hash PMC.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
-
 
 /*
 
@@ -1077,8 +1075,8 @@ Used to unarchive the hash.
 
             hash            = (Hash *)PMC_struct_val(SELF);
 
-            assert((INTVAL)hash->key_type == k_type);
-            assert(hash->entry_type       == v_type);
+            PARROT_ASSERT((INTVAL)hash->key_type == k_type);
+            PARROT_ASSERT(hash->entry_type       == v_type);
 
             hash->container = SELF;
             hash->entries   = elems;

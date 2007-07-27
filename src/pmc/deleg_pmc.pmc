@@ -22,7 +22,6 @@ Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
 
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 pmclass deleg_pmc no_ro {
 

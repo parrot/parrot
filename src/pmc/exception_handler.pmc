@@ -92,7 +92,7 @@ Initializes the exception handler.
 
         /* COMPAT:  PMC *p5 = REG_PMC(interp, 5);*/
 
-        assert(cc->to_ctx == cc->from_ctx);
+        PARROT_ASSERT(cc->to_ctx == cc->from_ctx);
         results = cc->current_results;
 
         /* clear all results, so that continuation.invoke
@@ -105,7 +105,7 @@ Initializes the exception handler.
         if (results) {
             STRING *message = VTABLE_get_string_keyed_int(INTERP,
                     exception, 0);
-            assert(next == results);
+            PARROT_ASSERT(next == results);
             next            = pass_exception_args(interp, "PS", next,
                                                   ex_ctx, exception, message);
         }

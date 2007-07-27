@@ -19,7 +19,6 @@ These are the vtable functions for the lexinfo PMC.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 #include "pmc_hash.h"
 
 static size_t
@@ -71,7 +70,7 @@ subroutine.
     }
 
     void init_pmc(PMC* sub) {
-        assert(PObj_constant_TEST(SELF));
+        PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
         parrot_new_pmc_hash_x(INTERP, SELF,
             (PARROT_DATA_TYPE)enum_hash_int,
@@ -138,7 +137,7 @@ The implementation of the Hash PMC is called.
             UNUSED(k_type);
             UNUSED(v_type);
 
-            assert(v_type == enum_hash_int);
+            PARROT_ASSERT(v_type == enum_hash_int);
             /* TODO make a better interface for hash creation
              * TODO create hash with needed types in the first place
              */
