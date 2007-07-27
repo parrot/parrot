@@ -369,8 +369,8 @@ sub find_mmd_methods {
                 my $right = $mmd->right;
                 if ( $self->is_dynamic( $right ) ) {
                     $right = 0;
-                    push @init_mmds, [ $#mmds + 1, $right ];
-                    $init_mmds{ $right } = 1;
+                    push @init_mmds, [ $#mmds + 1, $mmd->right ];
+                    $init_mmds{ $mmd->right } = 1;
                 }
                 else {
                     $right = "enum_class_$right";
