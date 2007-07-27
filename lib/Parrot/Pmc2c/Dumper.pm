@@ -109,6 +109,7 @@ sub gen_parent_lookup_info {
         next if $current_pmc_name eq 'default';
 
         for my $parent_name ( @{ [ @{ $pmcs->{$current_pmc_name}->parents } ] } ) {
+            next if $parent_name eq 'default';
             #load $parent_name pmc into $pmcs if needed
             $pmcs->{$parent_name} = 
                 $pmc2cMain->read_dump( lc("$parent_name.pmc") ) if not $pmcs->{$parent_name};
@@ -119,6 +120,9 @@ sub gen_parent_lookup_info {
             push @c3_work_queue, $parent_name;
         }
     }
+
+    #default should appear very last in the @c3 order
+    $pmc->add_parent($pmcs->{"default"});
     return 1;
 }
 
