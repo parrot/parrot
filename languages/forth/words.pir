@@ -33,7 +33,7 @@
     name  = token
     dict  = get_hll_global ' dict'
     nstack = new 'VirtualStack'
-    nword  = new 'PGE::CodeString'
+    nword  = new 'CodeString'
 
     subname = ' ' . name
     subname = nword.unique(subname)

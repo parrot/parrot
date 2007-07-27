@@ -137,9 +137,9 @@ the output to the correct output file.
     nstable = new .Hash
     namespace = new .String
     $P0 = new .Hash
-    $P1 = new 'PGE::CodeString'
+    $P1 = new 'CodeString'
     $P0['optable'] = $P1
-    $P1 = new 'PGE::CodeString'
+    $P1 = new 'CodeString'
     $P0['rule'] = $P1
     nstable[''] = $P0
 
@@ -164,8 +164,8 @@ the output to the correct output file.
 
     .local pmc initpir, rulepir, iter, ns
     .local string namespace
-    initpir = new 'PGE::CodeString'
-    rulepir = new 'PGE::CodeString'
+    initpir = new 'CodeString'
+    rulepir = new 'CodeString'
     iter = new .Iterator, nstable
   iter_loop:
     unless iter goto iter_end
@@ -195,7 +195,7 @@ the output to the correct output file.
   iter_end:
 
     .local pmc out
-    out = new 'PGE::CodeString'
+    out = new 'CodeString'
     if initpir == '' goto out_rule
     out.emit("      .sub '__onload' :load :init")
     out.emit("          .local pmc optable")
@@ -240,9 +240,9 @@ the output to the correct output file.
     .local pmc ns
     ns = new .Hash
     ns['inherit'] = inherit
-    $P1 = new 'PGE::CodeString'
+    $P1 = new 'CodeString'
     ns['optable'] = $P1
-    $P1 = new 'PGE::CodeString'
+    $P1 = new 'CodeString'
     ns['rule'] = $P1
     nstable[name] = ns
 
@@ -286,7 +286,7 @@ the output to the correct output file.
     goto with_rulepir
   rulepir_optable:
     ##   this is a special rule generated via the 'is optable' trait
-    rulepir = new 'PGE::CodeString'
+    rulepir = new 'CodeString'
     rulepir.emit(<<'      END', namespace, name)
       .namespace [ "%0" ]
       .sub "%1"

@@ -6,7 +6,7 @@ transform result (ROOT) {
  
     $S0 = tree.'get'('pir', node, 'thing')
 
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     pir.emit('.sub anon :anon')
     pir.emit($S0)
     result = node['ret']
@@ -52,7 +52,7 @@ transform pir (thing) {
     .return (pir)
 
   got_true:
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
     pir.emit('    %0 = new .Boolean', result)
@@ -61,7 +61,7 @@ transform pir (thing) {
     .return(pir)
 
   got_false:
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
     pir.emit('    %0 = new .Boolean', result)
@@ -70,7 +70,7 @@ transform pir (thing) {
     .return(pir)
 
   got_null:
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
     pir.emit('    null %0', result)
@@ -80,7 +80,7 @@ transform pir (thing) {
 
 transform pir (object) {
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     .local string result, child_result, key_result
     result = pir.unique('$P')
     pir.emit('    %0 = new .Hash', result)
@@ -127,7 +127,7 @@ end:
 
 transform pir (array) {
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     .local string result, child_result
     result = pir.unique('$P')
     pir.emit('    %0 = new .ResizablePMCArray', result)
@@ -162,7 +162,7 @@ transform pir (string) {
     .local pmc pir, result, children, iter, child
     .local string tmp
     tmp = ''
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     children = node['char']
     if null children goto loop_end
     iter = new .Iterator, children 
@@ -200,7 +200,7 @@ transform pir (string) {
 
 transform pir (number) {
     .local pmc pir, result
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     result = pir.unique('$P')
     $S0 = node
     pir.emit('    %0 = new .Integer', result)

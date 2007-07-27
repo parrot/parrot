@@ -106,7 +106,7 @@ Get/set
 
 .sub 'cpir' :method
     .local pmc code, iter
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     iter = self.'iterator'()
   iter_loop:
     unless iter goto iter_end
@@ -326,7 +326,7 @@ C<POST::Sub> nodes represent PIR subroutines.
     .local string pragma
     pragma = self.'pragma'()
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     .local string namespace
     namespace = self.'namespace'()
     unless namespace goto have_namespace
@@ -354,7 +354,7 @@ C<POST::Sub> nodes represent PIR subroutines.
     code .= $P0
     set_hll_global ['POST'], '$!subpir', code
 
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     $S0 = self.'blocktype'()
     if $S0 == 'declaration' goto skip_declaration
     code.'emit'("    %0 = find_name %1", value, name)
@@ -402,7 +402,7 @@ C<POST::Sub> nodes represent PIR subroutines.
     result = self.'result'()
     name = self.'escape'(name)
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.'emit'("    %0 = find_name %1", result, name)
     .return (code)
 .end
@@ -509,7 +509,7 @@ Get/set
     .local pmc paramcode
     paramcode = self.'paramcode'()
     if paramcode goto add_param
-    paramcode = new 'PGE::CodeString'
+    paramcode = new 'CodeString'
     self.'paramcode'(paramcode)
   add_param:
     if has_flags goto have_flags

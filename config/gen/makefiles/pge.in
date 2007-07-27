@@ -26,7 +26,6 @@ PMC_SOURCES = \
 	$(PMCDIR)/codestring.pmc
 
 SOURCES = PGE.pir \
-  PGE/CodeString.pir \
   PGE/Exp.pir \
   PGE/Match.pir \
   PGE/Regex.pir \

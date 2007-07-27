@@ -70,7 +70,7 @@ according to the C<target> adverb.
     nsformat = ".namespace [ '%0' ]"
   pir:
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.'emit'(nsformat, grammar)
     $P0 = source.'root_pir'(adverbs :flat :named)
     code .= $P0
@@ -123,12 +123,12 @@ tree as a PIR code object that can be compiled.
 
     ##   generate the PIR for the expression tree.
     .local pmc expcode
-    expcode = new 'PGE::CodeString'
+    expcode = new 'CodeString'
     explabel = 'R'
     exp.pir(expcode, explabel, 'succeed')
 
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     if cutrule goto code_cutrule
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
@@ -280,9 +280,9 @@ tree as a PIR code object that can be compiled.
     cname = self['cname']
     iscapture = self['iscapture']
     isarray = self['isarray']
-    captgen = new 'PGE::CodeString'
-    captsave = new 'PGE::CodeString'
-    captback = new 'PGE::CodeString'
+    captgen = new 'CodeString'
+    captsave = new 'CodeString'
+    captback = new 'CodeString'
     if iscapture == 0 goto end
     if isarray != 0 goto capt_array
     captsave.emit("captscope[%0] = captob", cname)
@@ -1161,7 +1161,7 @@ tree as a PIR code object that can be compiled.
     group = get_hll_global ['PGE::Exp'], '$!group'
     cutmark = group['cutmark']
     if cutmark > 0 goto has_cutmark
-    $P1 = new 'PGE::CodeString'
+    $P1 = new 'CodeString'
     cutmark = $P1.unique()
     group['cutmark'] = cutmark
   has_cutmark:

@@ -239,7 +239,7 @@ err_no_rule:
     .param pmc node
     .local pmc value, infile
     .local int lineno
-    value = new 'PGE::CodeString'
+    value = new 'CodeString'
     infile = get_global '$!infile'
     $P2 = node[0]
     (lineno) = $P2.'line_number'()

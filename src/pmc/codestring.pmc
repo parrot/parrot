@@ -1,0 +1,219 @@
+/*
+Copyright (C) 2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/codestring.pmc - CodeString PMC Class
+
+=head1 DESCRIPTION
+
+C<CodeString> is a class intended to simplify the process of
+emitting code strings.  Ideally this will eventually
+become a form of "CodeBuffer" that is more efficient
+than string concatenation, but for now it works well
+enough for me.
+
+The primary method for C<CodeString> objects is C<emit>,
+which appends a line (or lines) of code to the string
+according to a format parameter.  The line can contain
+substitution markers (ala printf) that indicate where
+other parameters to the call should be placed.
+
+Note that C<CodeString> is just a subclass of Parrot's
+native C<String> class, so it's easy to combine CodeString
+objects with other strings outside of the C<emit> method.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass CodeString extends String does string {
+
+/*
+
+=item C<emit(string fmt [, pmc args ] [, pmc hash ])>
+
+Add a line to a C<CodeString> object according to C<fmt>.
+The C<fmt> string can contain any number of "%-replacements"
+which are replaced by the corresponding values from C<args>
+or C<hash> prior to being appended to the string.  (Here
+C<args> is a slurpy array, and C<hash> is a slurpy hash.)
+
+The currently defined replacements include:
+
+    %0 %1 ... %9     the value from the args array at index 0..9
+    %,               the values of the args array separated by commas
+    %%               a percent sign
+
+A percent-sign followed by any other character that is a hash
+key receives the value of the hash element.
+
+A newline is automatically added to the end of the fmt.
+
+=cut
+*/
+
+  PCCMETHOD void emit(STRING* fmt, PMC* args :slurpy, PMC* hash :slurpy :named) {
+    INTVAL pos = 0;
+    INTVAL replen = 0;
+    STRING *key, *repl;
+    STRING *percent       = string_from_literal(INTERP, "%");
+    STRING *comma         = string_from_literal(INTERP, ",");
+    STRING *comma_space   = string_from_literal(INTERP, ", ");
+    STRING *newline       = string_from_literal(INTERP, "\n");
+    INTVAL I0, I1;
+    STRING *S0, *S1;
+
+    fmt = Parrot_make_COW_reference(INTERP, fmt);
+
+    while (pos >= 0) {
+        pos += replen;
+        pos = string_str_index(INTERP, fmt, percent, pos);
+
+        key = string_substr(INTERP, fmt, pos+1, 1, &key, 0);
+
+        if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
+            repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
+        }
+        else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt, pos+1)) {
+            I0 = string_to_int(INTERP, key);
+            repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
+        }
+        else if (0 == string_equal(INTERP, key, comma)) {
+            repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
+            repl = Parrot_make_COW_reference(INTERP, repl);
+            I1 = VTABLE_elements(INTERP, args);
+            I0 = 1;
+            while (I0 < I1) {
+                S0 = VTABLE_get_string_keyed_int(INTERP, args, I0);
+                repl = string_append(INTERP, repl, comma_space);
+                repl = string_append(INTERP, repl, S0);
+                I0++;
+            }
+        }
+        else if (0 == string_equal(INTERP, key, percent)) {
+            repl = percent;
+        }
+        else {
+            /* No substitution is necessary */
+            replen = 2;
+            continue;
+        }
+
+        (void) string_replace(INTERP, fmt, pos, 2, repl, NULL);
+        replen = string_length(INTERP, repl);
+    }
+    S1 = string_concat(INTERP, DYNSELF.get_string(), fmt, 0);
+    VTABLE_set_string_native(INTERP, SELF, S1);
+
+    /* Add a newline if necessary */
+    S0 = string_substr(interp, fmt, -1, 1, &S0, 0);
+    if (0 != string_equal(INTERP, S0, newline)) {
+        S1 = DYNSELF.get_string();
+        S1 = string_concat(INTERP, S1, newline, 0);
+        VTABLE_set_string_native(INTERP, SELF, S1);
+    }
+
+    PCCRETURN(PMC* SELF);
+}
+
+
+
+/*
+
+=item C<unique([string fmt])>
+
+Each call to C<unique> returns a unique number, or if a C<fmt>
+parameter is given it returns a unique string beginning with
+C<fmt>.  (This may eventually be generalized to allow
+uniqueness anywhere in the string.)  The function starts
+counting at 10 (so that the values 0..9 can be considered "safe").
+
+=cut
+
+*/
+
+  PCCMETHOD void unique(STRING* format :optional, int has_fmt :opt_flag) {
+    static INTVAL counter = 10;
+    STRING* counter_as_string = string_from_int(INTERP, counter);
+
+    counter++;
+
+    if (!has_fmt) {
+        PCCRETURN(STRING* counter_as_string);
+    }
+    else {
+        STRING* result;
+        result = Parrot_make_COW_reference(INTERP, format);
+        result = string_concat(INTERP, result, counter_as_string, 1);
+        PCCRETURN(STRING* result);
+    }
+  }
+
+/*
+
+=item C<escape(string str)>
+
+Returns an escaped value of C<str> suitable for including in PIR.
+If the string contains any non-ASCII characters, then it's
+prefixed with 'unicode:'.
+
+=cut
+
+*/
+
+  PCCMETHOD void escape(STRING* str) {
+    STRING *escaped_str = string_escape_string(INTERP, str);
+    STRING *quote       = string_from_literal (INTERP, "\"");
+    STRING *x           = string_from_literal (INTERP, "\\x");
+    INTVAL x_pos;
+    INTVAL is_unicode = 0;
+
+    escaped_str = string_concat(INTERP, quote, escaped_str, 1);
+    escaped_str = string_concat(INTERP, escaped_str, quote, 1);
+
+    x_pos  = string_str_index(INTERP, escaped_str, x, 0);
+    if (x_pos != -1) {
+      is_unicode = 1;
+    }
+    else
+    {
+      STRING *u = string_from_literal (INTERP, "\\u");
+      INTVAL u_pos = string_str_index (INTERP, escaped_str, u, 0);
+      if (u_pos != -1) {
+        is_unicode = 1;
+      }
+    }
+
+    if (is_unicode) {
+      STRING *unicode = string_from_literal (INTERP, "unicode:");
+      escaped_str = string_concat(INTERP, unicode, escaped_str, 1);
+    }
+
+    PCCRETURN(STRING* escaped_str);
+  }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

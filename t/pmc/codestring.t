@@ -6,16 +6,16 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
-t/compilers/pge/pge_codestring.t - test the CodeString class
+t/pmc/codestring.t - test the CodeString class
 
 
 =head1 SYNOPSIS
 
-        % prove t/compilers/pge/pge_codestring.t
+        % prove t/pmc/codestring.t
 
 =head1 DESCRIPTION
 
@@ -25,9 +25,8 @@ Tests the CodeString class directly.
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'create a CodeString object' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code = 'ok 1'
     say code
 .end
@@ -37,9 +36,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'calls to unique' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     $P1 = code.'unique'('ok ')
     say $P1
     $P1 = code.'unique'()
@@ -55,9 +53,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'basic emit' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.emit('  label:')
     code.emit('    say "Hello, World"')
     code.emit('    $I0 = 1')
@@ -73,9 +70,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos args' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.emit('  label_%0:', 1234)
     code.emit('    say "%0, %1"', 'Hello', 'World')
     code.emit('    %0 = %2', '$I0', 24, 48)
@@ -89,9 +85,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'emit with %, args' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.emit('  label_%0:', 1234)
     code.emit('    say "%,"', 'Hello')
     code.emit('    say "%,"', 'Hello', 'World', 'of', 'Parrot')
@@ -105,9 +100,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'emit with named args' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.emit('  label_%a:', 'a'=>1234)
     code.emit('    say "%b, %c"', 'b'=>'Hello', 'c'=>'World')
     code.emit('    say "%d"', 'b'=>'Hello', 'c'=>'World')
@@ -121,9 +115,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos + named args' );
 .sub main :main
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.emit('  label_%a:', 'a'=>1234)
     code.emit('    %0 "%b, %c"', 'say', 'print', 'b'=>'H', 'c'=>'W')
     code.emit('    say "%,, %c"', 'alpha', 'beta', 'b'=>'H', 'c'=>'W')
@@ -133,6 +126,22 @@ CODE
   label_1234:
     say "H, W"
     say "alpha, beta, W"
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'global unique #' );
+.sub main :main
+    .local pmc code1, code2
+    code1 = new 'CodeString'
+    code2 = new 'CodeString'
+    .local string unique1, unique2
+    unique1 = code1.'unique'()
+    unique2 = code2.'unique'('$P')
+    say unique1
+    say unique2
+.end
+CODE
+10
+$P11
 OUTPUT
 
 # Local Variables:

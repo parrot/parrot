@@ -34,7 +34,7 @@ either PIR or executable bytecode.
     post = post.'new'('POST::Sub', post, 'name'=>'anon')
   with_sub:
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     set_hll_global ['POST'], '$!subpir', code
     post.'pir'()
 

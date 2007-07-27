@@ -9,7 +9,6 @@
     load_bytecode 'languages/forth/tokenstream.pbc'
     load_bytecode 'languages/forth/variablestack.pbc'
     load_bytecode 'languages/forth/virtualstack.pbc'
-    load_bytecode 'compilers/pge/PGE/CodeString.pir'
     
     # initialize the rstack
     .local pmc stack
@@ -84,7 +83,7 @@ exception:
     .param string input
 
     .local pmc code, stream, stack
-    code   = new 'PGE::CodeString'
+    code   = new 'CodeString'
     $I0    = find_type 'TokenStream'
     stream = new $I0, input
     $I0    = find_type 'VirtualStack'
