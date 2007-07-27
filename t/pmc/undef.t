@@ -249,7 +249,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Undef == Undef (RT#33603)" );
 .sub _main
     $P1 = new Undef
     $P2 = new Undef
-    if $P1 == $P1 goto ok
+    if $P1 == $P2 goto ok
     print "not "
   ok: 
     print "ok\n"
