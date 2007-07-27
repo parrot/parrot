@@ -303,7 +303,7 @@ init_events_first(PARROT_INTERP)
      * s. p6i: "event.c - of signals and pipes"
      */
     if (pipe(pipe_fds))
-        internal_exception(1, "Couldn't create message pipe");
+        real_exception(interp, NULL, 1, "Couldn't create message pipe");
 #endif
     /*
      * now set some sig handlers before any thread is started, so
@@ -878,7 +878,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
     buf.ev      = event;
 #ifndef WIN32
     if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
-        internal_exception(1, "msg pipe write failed");
+        real_exception(interp, NULL, 1, "msg pipe write failed");
 #endif
 }
 
