@@ -722,7 +722,7 @@ eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
     for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
             case PARROT_ARG_IC:
-                assert(i && ops == (unsigned int)i);
+                PARROT_ASSERT(i && ops == (unsigned int)i);
                 /* set branch offset to zero */
                 eval[i + 1] = 0;
                 break;
@@ -767,7 +767,7 @@ eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
     /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
      */
-    assert(pc == eval + op_info->op_count || pc == eval);
+    PARROT_ASSERT(pc == eval + op_info->op_count || pc == eval);
     return pc == eval;
 }
 
@@ -1089,7 +1089,7 @@ branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
             SymReg *regs[3], *r;
 
             /* cond_op has 2 or 3 args */
-            assert(args <= 3);
+            PARROT_ASSERT(args <= 3);
 
             r = mk_local_label(interp, str_dup(label));
             tmp = INS_LABEL(interp, unit, r, 0);

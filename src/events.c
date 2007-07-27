@@ -19,7 +19,6 @@ dispatches these to one or all interpreters.
 
 #include "parrot/parrot.h"
 #include "parrot/events.h"
-#include <assert.h>
 
 typedef struct pending_io_events {
     int n;
@@ -984,7 +983,7 @@ process_events(NOTNULL(QUEUE *event_q))
             default:
                 internal_exception(1, "Unknown queue entry");
         }
-        assert(event);
+        PARROT_ASSERT(event);
         if (event->type == EVENT_TYPE_NONE) {
             mem_sys_free(entry);
             mem_sys_free(event);

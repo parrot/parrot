@@ -327,7 +327,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #define _PARSER
 #define PARSER_MAIN

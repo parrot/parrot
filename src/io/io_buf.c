@@ -16,7 +16,6 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */

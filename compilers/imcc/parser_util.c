@@ -15,7 +15,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #define _PARSER
 
@@ -253,7 +252,7 @@ maybe_builtin(PARROT_INTERP, NOTNULL(const char *name),
     SymReg *sub, *meth, *rr[10];
     int first_arg, is_void;
 
-    assert(n < 15);
+    PARROT_ASSERT(n < 15);
     for (i = 0; i < n; ++i) {
         sig[i] = r[i]->set;
         rr[i] = r[i];
@@ -324,7 +323,7 @@ to_infix(PARROT_INTERP, NOTNULL(const char *name), NOTNULL(SymReg **r),
     SymReg *mmd;
     int is_n;
 
-    assert(*n >= 2);
+    PARROT_ASSERT(*n >= 2);
     is_n = (IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS) ||
         (name[0] == 'n' && name[1] == '_') ||
         (mmd_op == MMD_LOR || mmd_op == MMD_LAND || mmd_op == MMD_LXOR);
@@ -427,7 +426,7 @@ var_arg_ins(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
     dirs = 1;           /* in constant */
     op_fullname(fullname, name, r, 1, 0);
     op = interp->op_lib->op_code(fullname, 1);
-    assert(op >= 0);
+    PARROT_ASSERT(op >= 0);
 
     ins = _mk_instruction(name, "", n, r, dirs);
     ins->opnum = op;
@@ -559,7 +558,7 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
                 break;
 
             default:
-                assert(0);
+                PARROT_ASSERT(0);
         };
         if (keyvec & KEY_BIT(i)) {
             len = strlen(format);
@@ -1145,7 +1144,7 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
     if (keyf <= 1)
         return 0;
     /* XXX what to do, if we don't emit instruction? */
-    assert(emit);
+    PARROT_ASSERT(emit);
     UNUSED(emit);
     /* OP  _p_k    _p_k_p_k =>
      * set      py, p_k
@@ -1307,7 +1306,7 @@ imcc_vfprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *format), va_
                 {
                 const char * const _string = va_arg(ap, char *);
                 memcpy(buf, cp, n = (fmt - cp));
-                assert(n<128);
+                PARROT_ASSERT(n<128);
                 buf[n] = '\0';
                 len += fprintf(fd, buf, _string);
                 }

@@ -28,7 +28,6 @@ Parrot ops. The C<ParrotIO struct> is defined in F<src/io/io_private.h>.
 #include "io_private.h"
 
 #include <stdarg.h>
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 
@@ -190,7 +189,7 @@ PIO_destroy(SHIM_INTERP, NOTNULL(PMC *pmc))
         for (p = io->stack; p;) {
             ParrotIOLayer *down;
             /* if top got copied, all have to be malloced */
-            assert(p->flags & PIO_L_LAYER_COPIED);
+            PARROT_ASSERT(p->flags & PIO_L_LAYER_COPIED);
             down = p->down;
             if (p->api->Delete)
                 (*p->api->Delete) (p);
@@ -364,7 +363,7 @@ PIO_init_stacks(PARROT_INTERP)
     for (i = 0, p = interp->piodata->default_stack; p; p = p->down) {
         bottom = p;
         if (fill) {
-            assert(i < n); /* XXX n can be undefined at this point. */
+            PARROT_ASSERT(i < n); /* XXX n can be undefined at this point. */
             pio_registered_layers[i++] = p;
             pio_registered_layers[i] = NULL;
         }
@@ -388,8 +387,8 @@ PIO_init_stacks(PARROT_INTERP)
         }
     }
     if (fill) {
-        assert(i == 2);
-        assert(pio_registered_layers[2] == NULL);
+        PARROT_ASSERT(i == 2);
+        PARROT_ASSERT(pio_registered_layers[2] == NULL);
         pio_registered_layers[2] = PIO_utf8_register_layer();
         pio_registered_layers[3] = PIO_mmap_register_layer();
         pio_registered_layers[4] = PIO_string_register_layer();
@@ -930,8 +929,8 @@ PIO_putps(PARROT_INTERP, NOTNULL(PMC *pmc), NULLOK(STRING *s))
 {
     ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
     ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
-    assert((unsigned long)l != 0xdeadbeefUL);
-    assert(io != 0);
+    PARROT_ASSERT((unsigned long)l != 0xdeadbeefUL);
+    PARROT_ASSERT(io);
 
     if (!s)
         return 0;

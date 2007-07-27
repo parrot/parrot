@@ -15,7 +15,6 @@
  */
 
 #include <string.h>
-#include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
 
@@ -782,7 +781,7 @@ map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL
             if (   r
                     && r->color != -1
                     && r->set == typ) {
-                assert(r->color - already_allocated >= 0);
+                PARROT_ASSERT(r->color - already_allocated >= 0);
                 avail[r->color - already_allocated] = 0;
             }
         }

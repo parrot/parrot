@@ -15,7 +15,6 @@
  */
 
 #include <string.h>
-#include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
 
@@ -227,7 +226,7 @@ imc_reg_alloc(PARROT_INTERP, IMC_Unit * unit)
                                 x,r->name,r->set,r->color,
                                 y,unit->reglist[y]->name,unit->reglist[y]->set,
                                 unit->reglist[y]->color);
-                    assert(r->color==-1 || r->color != unit->reglist[y]->color);
+                    PARROT_ASSERT(r->color==-1 || r->color != unit->reglist[y]->color);
                 }
             }
         }
@@ -1062,9 +1061,9 @@ apply_coloring(PARROT_INTERP, IMC_Unit* unit, graph* G)
         for (j = 0; j < G->n; j++) {
             int k;
             int x = G->V[j].id;
-            assert(reglist[x]->color >= 0);
-            assert(reglist[x]->color < MAX_COLOR);
-            assert(reglist[x]->color == G->V[j].col-1);
+            PARROT_ASSERT(reglist[x]->color >= 0);
+            PARROT_ASSERT(reglist[x]->color < MAX_COLOR);
+            PARROT_ASSERT(reglist[x]->color == G->V[j].col-1);
             IMCC_debug(interp, DEBUG_REG,"%d (reg==%ld):", x,
                        reglist[x]->color);
             for (k = 0; k < G->n; k++) {
@@ -1072,7 +1071,7 @@ apply_coloring(PARROT_INTERP, IMC_Unit* unit, graph* G)
                 if (ig_test(x, y, G->n, G->E)) {
                     IMCC_debug(interp, DEBUG_REG," %d(c=%ld)",y,
                                reglist[y]->color);
-                    assert(reglist[x]->color != reglist[y]->color);
+                    PARROT_ASSERT(reglist[x]->color != reglist[y]->color);
                 }
             }
             IMCC_debug(interp, DEBUG_REG, "\n");
@@ -1114,7 +1113,7 @@ ig_init_graph(PARROT_INTERP, IMC_Unit* unit, graph* G) {
         for (y = 0; y < num_nodes; y++)
             if (ig_test(x, y, num_nodes, G->E))
                 G->V[x].deg++;    /* another neighbor of x is recorded */
-        assert(G->V[x].deg>=0 && G->V[x].deg<G->n);
+        PARROT_ASSERT(G->V[x].deg>=0 && G->V[x].deg<G->n);
     }
     qsort(G->V, G->n, sizeof (node), degree_comparator);
 #ifndef NDEBUG
@@ -1166,7 +1165,7 @@ ig_precolor(PARROT_INTERP, IMC_Unit* unit, graph* G)
         u->col = 1 + reglist[x]->color;
         if (unit->reglist[x]->usage & U_SPILL) {
             int c=1+MAX_COLOR/2, k=0;  /* precolor spilled symbols */
-            assert(!u->col);
+            PARROT_ASSERT(!u->col);
             while (k < G->n) {
                 for (k = 0; k < G->n; k++)
                     if (ig_test(x, G->V[k].id, G->n, G->E))
@@ -1179,7 +1178,7 @@ ig_precolor(PARROT_INTERP, IMC_Unit* unit, graph* G)
             IMCC_debug(interp, DEBUG_REG, "PRECOLORing spilled node %d, "
                        "%s, as color %d\n", x,unit->reglist[x]->name,c);
         }
-        assert(0<=u->col && u->col<=MAX_COLOR); /*uncolored is okay*/
+        PARROT_ASSERT(0<=u->col && u->col<=MAX_COLOR); /*uncolored is okay*/
         if (u->col>G->k)
             G->k = u->col;
         if (u->col)
@@ -1229,7 +1228,7 @@ ig_find_color(SHIM_INTERP, IMC_Unit *unit, int x, const char *avail)
     for (c = 33; ; c++)
         if (avail[c])
             return c;
-    assert(0);
+    PARROT_ASSERT(0);
     return 0;
 }
 
@@ -1270,12 +1269,12 @@ ig_color_node(PARROT_INTERP, IMC_Unit* unit, graph* G, int j)
             IMCC_debug(interp, DEBUG_REG2,
                     "ig_color_node k=%d, node %d, col=%d\n",
                     G->k, G->V[k].id, G->V[k].col);
-            assert(0<=G->V[k].col && G->V[k].col<=G->k); /*uncolored is okay*/
+            PARROT_ASSERT(0<=G->V[k].col && G->V[k].col<=G->k); /*uncolored is okay*/
             avail[G->V[k].col] = 0;  /* color no longer available. */
         }
     if (u->col && avail[u->col]) {
         c = u->col;
-        assert(avail[u->col]);   /* verify no conflict */
+        PARROT_ASSERT(avail[u->col]);   /* verify no conflict */
     }
     else {
         if (u->col)
@@ -1298,9 +1297,9 @@ ig_remove_node(PARROT_INTERP, IMC_Unit *unit, graph* G, int j) {
     node* u = &G->V[j], tmpnode;
     int x = u->id;
 
-    assert(u->deg>=0 && u->deg < G->n);
+    PARROT_ASSERT(u->deg>=0 && u->deg < G->n);
     u->in = 0;             /* node u is no longer "in" the graph */
-    assert(j==0 || !G->V[j-1].in);
+    PARROT_ASSERT(j==0 || !G->V[j-1].in);
 
 #ifdef NDEBUG
     u->deg=0;
@@ -1314,7 +1313,7 @@ ig_remove_node(PARROT_INTERP, IMC_Unit *unit, graph* G, int j) {
         }
     }
     IMCC_debug(interp, DEBUG_REG, "\n");
-    assert(u->deg==0);
+    PARROT_ASSERT(u->deg==0);
 #endif
 
     for (k = 0; k < G->n; k++) {
@@ -1329,9 +1328,9 @@ ig_remove_node(PARROT_INTERP, IMC_Unit *unit, graph* G, int j) {
             tmpnode = G->V[i];
             G->V[i] = G->V[k];
             G->V[k] = tmpnode;
-            assert(G->V[k].deg >= G->V[i].deg);
-            assert(k == 0 || G->V[k].deg >= G->V[k-1].deg);
-            assert(k == G->n - 1 || G->V[k].deg <= G->V[k+1].deg);
+            PARROT_ASSERT(G->V[k].deg >= G->V[i].deg);
+            PARROT_ASSERT(k == 0 || G->V[k].deg >= G->V[k-1].deg);
+            PARROT_ASSERT(k == G->n - 1 || G->V[k].deg <= G->V[k+1].deg);
         }
     }
 }
@@ -1368,10 +1367,10 @@ ig_color_graph(PARROT_INTERP, IMC_Unit* unit, graph* G) {
             int k;
             for (k = 0; k < G->n; k++) {
                 if (ig_test(G->V[j].id, G->V[k].id, G->n, G->E)) {
-                    assert(G->V[j].col != G->V[k].col);
+                    PARROT_ASSERT(G->V[j].col != G->V[k].col);
                 }
             }
-            assert(G->V[j].deg == 0);
+            PARROT_ASSERT(G->V[j].deg == 0);
         }
 #endif
     }

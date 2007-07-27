@@ -481,16 +481,16 @@ fixup_globals(PARROT_INTERP)
                  *   convert to find_name, if the sub is a multi
                  */
                 if (s1) {
-                    assert(s1->unit);
+                    PARROT_ASSERT(s1->unit);
                     if (s1->unit->type & IMC_PCCSUB) {
                         ins     = s1->unit->instructions;
-                        assert(ins);
+                        PARROT_ASSERT(ins);
 
                         r1      = ins->r[0];
-                        assert(r1);
+                        PARROT_ASSERT(r1);
 
                         pcc_sub = r1->pcc_sub;
-                        assert(pcc_sub);
+                        PARROT_ASSERT(pcc_sub);
 
                         /* if the sub is multi, don't insert constant */
                         if (pcc_sub->nmulti)
@@ -502,7 +502,7 @@ fixup_globals(PARROT_INTERP)
                     SymReg *nam;
 
                     op = interp->op_lib->op_code("find_name_p_sc", 1);
-                    assert(op);
+                    PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = op;
 
@@ -556,7 +556,7 @@ IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
          */
         const char *charset;
         char * const p = strchr(r->name, '"');
-        assert(p && p[-1] == ':');
+        PARROT_ASSERT(p && p[-1] == ':');
 
         p[-1]   = 0;
         charset = r->name;
@@ -649,7 +649,7 @@ mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
                     ct->constants[r->color]->u.string);
         }
         else {
-            assert(r->set == 'K');
+            PARROT_ASSERT(r->set == 'K');
             sig_pmc = ct->constants[r->color]->u.key;
         }
 
@@ -704,14 +704,14 @@ create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)
 
                 /* at least one lexical name */
                 n = r->reg;
-                assert(n);
+                PARROT_ASSERT(n);
 
                 while (n) {
                     k = n->color;
-                    assert(k >= 0);
+                    PARROT_ASSERT(k >= 0);
 
                     lex_name = constants[k]->u.string;
-                    assert(PObj_is_string_TEST(lex_name));
+                    PARROT_ASSERT(PObj_is_string_TEST(lex_name));
 
                     IMCC_debug(interp, DEBUG_PBC_CONST,
                             "add lexical '%s' to sub name '%s'\n",
@@ -1318,8 +1318,8 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
     PMC    *changed_sig = NULL;
     PMC    *sig_arr     = interp->code->const_table->constants[pc[-1]]->u.key;
 
-    assert(PObj_is_PMC_TEST(sig_arr));
-    assert(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
+    PARROT_ASSERT(PObj_is_PMC_TEST(sig_arr));
+    PARROT_ASSERT(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
 
     no_consts = (ins->opnum == PARROT_OP_get_results_pc ||
         ins->opnum == PARROT_OP_get_params_pc);
@@ -1552,7 +1552,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(co
                 case PARROT_ARG_KC:
                     r = ins->r[i];
                     if (r->set == 'K') {
-                        assert(r->color >= 0);
+                        PARROT_ASSERT(r->color >= 0);
                         *pc++ = r->color;
                     }
                     else {

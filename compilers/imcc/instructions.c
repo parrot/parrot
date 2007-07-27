@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #define _PARSER
 #include "imc.h"
 #include "pbc.h"
@@ -123,12 +122,12 @@ imcc_init_tables(PARROT_INTERP)
         size_t i;
         for (i = 0; i < N_ELEMENTS(reads); i++) {
             const int n = interp->op_lib->op_code(reads[i], 1);
-            assert(n);
+            PARROT_ASSERT(n);
             r_special[i] = n;
         }
         for (i = 0; i < N_ELEMENTS(writes); i++) {
             const int n = interp->op_lib->op_code(writes[i], 1);
-            assert(n);
+            PARROT_ASSERT(n);
             w_special[i] = n;
         }
     }

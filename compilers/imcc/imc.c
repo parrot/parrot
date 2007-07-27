@@ -7,7 +7,6 @@
  */
 
 #include <string.h>
-#include <assert.h>
 #include "imc.h"
 #include "optimizer.h"
 

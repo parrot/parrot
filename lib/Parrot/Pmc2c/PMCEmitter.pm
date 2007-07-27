@@ -645,7 +645,7 @@ EOC
     foreach my $dynpmc (@$dyn_mmds) {
         next if $dynpmc eq $classname;
         $cout .= <<"EOC";
-            assert(my_enum_class_$dynpmc != enum_class_default);
+            PARROT_ASSERT(my_enum_class_$dynpmc != enum_class_default);
 EOC
     }
     if ( scalar @$mmds ) {

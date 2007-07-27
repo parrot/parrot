@@ -10,7 +10,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "imc.h"
 #include "parser.h"
 
@@ -323,8 +322,8 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
         int t;
 
         /* handle temp use/create temp of src type */
-        assert(s != 255);
-        assert(s < 2 * info->n);
+        PARROT_ASSERT(s != 255);
+        PARROT_ASSERT(s < 2 * info->n);
 
         src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
 
@@ -343,7 +342,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
     else if (s == 255) {
         int t;
         /* handle temp use/create temp of dest type */
-        assert(d < 2 * info->n);
+        PARROT_ASSERT(d < 2 * info->n);
 
         dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
 
@@ -397,12 +396,12 @@ move_regs(PARROT_INTERP, IMC_Unit * unit,
         for (j = 0; j < i; ++j) {
             SymReg * const rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
-                assert(j < 255);
+                PARROT_ASSERT(j < 255);
                 move_list[i] = j;
                 goto done;
             }
         }
-        assert(i < 255);
+        PARROT_ASSERT(i < 255);
         move_list[i] = i;
 done:
         ;

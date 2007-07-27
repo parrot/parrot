@@ -14,7 +14,7 @@ sub prederef {
     my $code = <<'EOC';
     PMC *real_pmc;
     Parrot_STM_PMC_handle handle;
-    assert(pmc->vtable->pmc_class != pmc);
+    PARROT_ASSERT(pmc->vtable->pmc_class != pmc);
     handle   = (Parrot_STM_PMC_handle)PMC_struct_val(pmc);
 EOC
 
