@@ -810,7 +810,8 @@ Parrot_print_backtrace(void)
                 fputc(caller[j], stderr);
             }
             fprintf(stderr, "\n");
-        } else {
+        }
+        else {
             fprintf(stderr, "(unknown)\n");
         }
     }
