@@ -18,6 +18,7 @@ sub get_valid_options {
         ccflags
         ccwarn
         cgoto
+        configure_trace
         cxx
         datadir
         debugging

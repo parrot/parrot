@@ -309,7 +309,8 @@ FLUID_FILES = \
     $(GEN_MODULES) \
     $(GEN_LIBRARY) \
     $(SRC_DIR)/jit_emit.h \
-    runtime/parrot/include/parrotlib.pbc
+    runtime/parrot/include/parrotlib.pbc \
+	.configure_trace.sto
 
 
 ###############################################################################

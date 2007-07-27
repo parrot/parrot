@@ -19,7 +19,7 @@ Parrot::Configure - Conducts the execution of Configuration Steps
 =head1 DESCRIPTION
 
 This module provides provides a means for registering, executing, and
-coordinating one or more Configuration steps.  Please see
+coordinating one or more configuration steps.  Please see
 F<docs/configuration.pod> for further details about the configuration
 framework.
 
@@ -39,6 +39,7 @@ use warnings;
 
 use lib qw(config);
 use Carp qw(carp);
+use Storable qw(nstore retrieve);
 use Parrot::Configure::Data;
 
 use Class::Struct;
@@ -241,6 +242,11 @@ sub _run_this_step {
     eval "use $step_name;";
     die $@ if $@;
 
+    my $conftrace = [];
+    my $sto = q{.configure_trace.sto};
+    if ($self->options->get(q{configure_trace}) and (-e $sto)) {
+        $conftrace = retrieve($sto);
+    }
     my $step = $step_name->new;
 
     # RT#43675 This works. but is probably not a good design.
@@ -303,6 +309,18 @@ sub _run_this_step {
     print "." x ( 71 - length($description) - length($result) );
     print "$result." unless $step =~ m{^inter/} && $args->{ask};
 
+    if ($self->options->get(q{configure_trace}) ) {
+        if (! defined $conftrace->[0]) {
+            $conftrace->[0] = [];
+        }
+        push @{$conftrace->[0]}, $step_name;
+        my $evolved_data = {
+            options => $self->{options},
+            data    => $self->{data},
+        };
+        push @{$conftrace}, $evolved_data;
+        nstore($conftrace, $sto);
+    }
     # reset verbose value for the next step
     $self->options->set( verbose => $args->{verbose} );
 }
