@@ -1485,7 +1485,7 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
     if (s1) {
         if (s1->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
-                    "string bitwise_and (%s/%s) unsupported",
+                    "string bitwise_or (%s/%s) unsupported",
                     s1->encoding->name, s2->encoding->name);
         maxlen = s1->bufused;
     }
@@ -1493,7 +1493,7 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
     if (s2) {
         if (s2->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
-                    "string bitwise_and (%s/%s) unsupported",
+                    "string bitwise_or (%s/%s) unsupported",
                     s1->encoding->name, s2->encoding->name);
 
         if (s2->bufused > maxlen)
@@ -1555,7 +1555,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
     if (s1) {
         if (s1->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
-                    "string bitwise_and (%s/%s) unsupported",
+                    "string bitwise_xor (%s/%s) unsupported",
                     s1->encoding->name, s2->encoding->name);
         }
         maxlen = s1->bufused;
@@ -1564,7 +1564,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
     if (s2) {
         if (s2->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
-                    "string bitwise_and (%s/%s) unsupported",
+                    "string bitwise_xor (%s/%s) unsupported",
                     s1->encoding->name, s2->encoding->name);
         }
 
@@ -1637,7 +1637,7 @@ string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), NULLOK(STRING **dest))
     if (s) {
         if (s->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
-                    "string bitwise_and (%s/%s) unsupported",
+                    "string bitwise_not (%s/%s) unsupported",
                     s->encoding->name, s->encoding->name);
         len = s->bufused;
     }
