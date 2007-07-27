@@ -386,26 +386,37 @@ show version information.
     env = get_global '_G'
     .const .LuaString k_print = 'print'
     .local int has_readline
-    .local pmc stdin, code
+    .local pmc stdin
     stdin = getstdin
     has_readline = stdin.'set_readline_interactive'(1)
   L1:
+    .local pmc code
     code = get_line (stdin, has_readline, 1)
     if null code goto L2    # no input
     unless code goto L2     # empty
     ($P0, $S0) = lua_loadbuffer(code, '=stdin')
-    # TODO : retry when incomplete code (with _PROMPT2)
-    if null $P0 goto L3
+    unless null $P0 goto L3
+  L4:
+    $I0 = index $S0, "'eof' expected"
+    if $I0 < 0 goto L5
+    .local pmc code2
+    code2 = get_line (stdin, has_readline, 0)
+    if null code2 goto L5   # no input
+    unless code2 goto L5    # empty
+    code = concat code2
+    ($P0, $S0) = lua_loadbuffer(code, '=stdin')
+    if null $P0 goto L4
+  L3:
     ($I0, $P0) = docall($P0)
-    if $I0 goto L4
+    if $I0 goto L6
     $I0 = elements $P0
     unless $I0 goto L1
     $P1 = env.'rawget'(k_print)
     $P1($P0 :flat)
     goto L1
-  L4:
+  L6:
     $S0 = $P0
-  L3:
+  L5:
     l_message('', $S0)
     goto L1
   L2:

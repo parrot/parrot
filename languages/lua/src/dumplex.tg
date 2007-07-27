@@ -39,8 +39,7 @@ transform past (ROOT) :language('PIR') {
     past.'push'($P1)
     goto L2
   L1:
-    past = past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'anon')
-    .return (past)
+    .return past.'new'('PAST::Block', past, 'node'=>node, 'name'=>'anon')
 }
 
 
@@ -54,8 +53,7 @@ transform past (Lua::TestLex::token) :language('PIR') {
     $P0 = node[$S0]
     $S1 = concat 'Lua::TestLex::', $S0
     past = tree.'get'('past', $P0, $S1)
-    past = past.'new'('PAST::Op', past, 'node'=>node, 'name'=>'println')
-    .return (past)
+    .return past.'new'('PAST::Op', past, 'node'=>node, 'name'=>'println')
 }
 
 
@@ -68,8 +66,7 @@ transform past (Lua::TestLex::keyword) :language('PIR') {
     new past, 'PAST::Val'
     $S0 = node.'result_object'()
     $S1 = concat "keyword:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 
@@ -82,8 +79,7 @@ transform past (Lua::TestLex::punctuator) :language('PIR') {
     new past, 'PAST::Val'
     $S0 = node.'result_object'()
     $S1 = concat "punct:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 
@@ -96,8 +92,7 @@ transform past (Lua::TestLex::Name) :language('PIR') {
     new past, 'PAST::Val'
     $S0 = node.'result_object'()
     $S1 = concat "Name:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 
@@ -124,8 +119,7 @@ transform past (Lua::TestLex::String) :language('PIR') {
   L2:
     internal_error('unknown string')
   L9:
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 
@@ -138,8 +132,7 @@ transform past (Lua::TestLex::Number) :language('PIR') {
     new past, 'PAST::Val'
     $S0 = node.'result_object'()
     $S1 = concat "Number:\t", $S0
-    past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
-    .return (past)
+    .return past.'init'('node'=>node, 'vtype'=>'.String', 'name'=>$S1, 'ctype'=>'s~')
 }
 
 =back

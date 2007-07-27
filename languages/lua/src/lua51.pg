@@ -17,13 +17,12 @@ in the lua distribution.
 grammar Lua::Grammar;
 
 token TOP {
-  ^ <shebang>? <block> $
+  ^ <shebang>? <block> <eof>
 }
 
 rule block {
-  [ <statement> <';'>? ]* [ <last_statement> <';'>? ]?
+  [ <statement> <';'>? ]*
 }
-
 
 rule statement {
   | <expression_stat>
@@ -34,11 +33,9 @@ rule statement {
   | <repeat_stat>
   | <function_stat>
   | <local_stat>
-}
-
-rule last_statement {
   | <return_statement>
   | <break_statement>
+  | <unexpected>
 }
 
 
@@ -285,6 +282,10 @@ token ws {
     | <'--'> <long_comment>
     | <'--'> \N*
     ]*
+}
+
+token eof {
+  $ | <syntaxerror: 'eof' expected>
 }
 
 token shebang {

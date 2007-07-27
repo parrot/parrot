@@ -618,6 +618,41 @@ long bracket. Long comments are frequently used to disable code temporarily.
 .end
 
 
+=item C<unexpected>
+
+=cut
+
+.sub 'unexpected'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+    .local string target
+    .local pmc mfrom, mpos
+    .local int pos, lastpos
+
+    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
+    (mob, target, mfrom, mpos) = $P0(mob)
+
+    pos = mfrom
+    $I0 = index target, ';', pos
+    unless $I0 > 1 goto L1
+    lastpos = length target
+    $I1 = find_not_cclass .CCLASS_WORD, target, pos, lastpos
+    $I2 = $I1 - pos
+    unless $I2 goto L2
+    $S0 = substr target, pos, $I2
+    if $S0 == 'end' goto L1
+    if $S0 == 'else' goto L1
+    if $S0 == 'elseif' goto L1
+    if $S0 == 'until' goto L1
+    $I0 = $I1
+  L2:
+    mpos = $I0
+    lexerror(mob, "unexpected symbol")
+  L1:
+    .return (mob)
+.end
+
+
 .namespace [ 'Lua::PAST::Grammar' ]
 
 =item C<internal_error>
