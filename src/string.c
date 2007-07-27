@@ -493,8 +493,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_from_cstring(PARROT_INTERP,
-    NULLOK(const char * const buffer), const UINTVAL len)
+string_from_cstring(PARROT_INTERP, NULLOK(const char * const buffer), const UINTVAL len)
 {
     return string_make_direct(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
@@ -540,6 +539,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 const_string(PARROT_INTERP, NOTNULL(const char *buffer))
 {
+    PARROT_ASSERT(buffer);
+
     /* TODO cache the strings */
     return string_make_direct(interp, buffer, strlen(buffer),
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
@@ -849,6 +850,8 @@ PARROT_IGNORABLE_RESULT
 INTVAL
 string_compute_strlen(PARROT_INTERP, NOTNULL(STRING *s))
 {
+    PARROT_ASSERT(s);
+
     s->strlen = CHARSET_CODEPOINTS(interp, s);
     return s->strlen;
 }
@@ -1854,35 +1857,37 @@ returned.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-string_to_num(PARROT_INTERP, NULLOK(const STRING *s))
+string_to_num(PARROT_INTERP, NOTNULL(const STRING *s))
 {
     FLOATVAL f = 0.0;
+    char *cstr;
+    const char *p;
     DECL_CONST_CAST;
 
-    if (s) {
-        /*
-         * XXX C99 atof interprets 0x prefix
-         * XXX would strtod() be better for detecting malformed input?
-         */
-        char * const  cstr = string_to_cstring(interp, (STRING *)const_cast(s));
-        const char   *p    = cstr;
+    PARROT_ASSERT(s);
 
-        while (isspace((unsigned char)*p))
-            p++;
+    /*
+     * XXX C99 atof interprets 0x prefix
+     * XXX would strtod() be better for detecting malformed input?
+     */
+    cstr = string_to_cstring(interp, (STRING *)const_cast(s));
+    p = cstr;
 
-        f = atof(p);
+    while (isspace(*p))
+        p++;
 
-        /* Not all atof()s return -0 from "-0" */
-        if (*p == '-' && f == 0.0)
+    f = atof(p);
+
+    /* Not all atof()s return -0 from "-0" */
+    if (*p == '-' && f == 0.0)
 #if defined(_MSC_VER)
-            /* Visual C++ compiles -0.0 to 0.0, so we need to trick
-               the compiler. */
-            f = 0.0 * -1;
+        /* Visual C++ compiles -0.0 to 0.0, so we need to trick
+            the compiler. */
+        f = 0.0 * -1;
 #else
-            f = -0.0;
+        f = -0.0;
 #endif
-        string_cstring_free(cstr);
-    }
+    string_cstring_free(cstr);
 
     return f;
 }

@@ -15,7 +15,6 @@ debugger, and the C<debug> ops.
 
 */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
@@ -1505,7 +1504,7 @@ PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
         FLOATVAL  f;
         PMC      *k;
 
-        assert(size + 2 < space);
+        PARROT_ASSERT(size + 2 < space);
 
         switch (info->types[j-1]) {
         case PARROT_ARG_I:
@@ -1547,7 +1546,7 @@ PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
             if (i == 0)
                 i = (INTVAL) op[j];
 
-            assert(size + 20 < space);
+            PARROT_ASSERT(size + 20 < space);
 
             sprintf(&dest[size], INTVAL_FMT, i);
             size += strlen(&dest[size]);
@@ -1557,7 +1556,7 @@ PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
             if (j == 1 && info->types[j-1] == PARROT_ARG_IC
                 && (strcmp(info->name, "infix") == 0
                     || strcmp(info->name, "n_infix") == 0)) {
-                assert(size + 20 < space);
+                PARROT_ASSERT(size + 20 < space);
 
                 sprintf(&dest[size], " [%s]",
                         /* [kludge: the "2+" skips the leading underscores.  --

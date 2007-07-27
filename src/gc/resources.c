@@ -12,7 +12,6 @@ src/resources.c - Allocate and deallocate tracked resources
 
 */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/resources.h"
 
@@ -195,7 +194,7 @@ mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
     void *return_val;
 
     /* we always should have one block at least */
-    assert(pool->top_block);
+    PARROT_ASSERT(pool->top_block);
 
     /* If not enough room, try to find some */
     if (pool->top_block->free < size) {
@@ -407,7 +406,7 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
                         /* Find out who else references our data */
                         Buffer * const hdr = *(Buffer **)(PObj_bufstart(b));
 
-                        assert(PObj_is_COWable_TEST(b));
+                        PARROT_ASSERT(PObj_is_COWable_TEST(b));
 
                         /* Make sure they know that we own it too */
                         PObj_COW_SET(hdr);
@@ -437,7 +436,7 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
 
                         /* If we're COW */
                         if (PObj_COW_TEST(b)) {
-                            assert(PObj_is_COWable_TEST(b));
+                            PARROT_ASSERT(PObj_is_COWable_TEST(b));
 
                             /* Let the old buffer know how to find us */
                             *(Buffer **)(PObj_bufstart(b)) = b;
@@ -468,7 +467,7 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
     /* First, where we allocate next */
     new_block->top = cur_spot;
 
-    assert(new_block->size >= (size_t)new_block->top -
+    PARROT_ASSERT(new_block->size >= (size_t)new_block->top -
             (size_t)new_block->start);
 
     /* How much is free. That's the total size minus the amount we used */
@@ -481,7 +480,7 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
     {
         Memory_Block *cur_block;
 
-        assert(new_block == pool->top_block);
+        PARROT_ASSERT(new_block == pool->top_block);
         cur_block = new_block->prev;
         while (cur_block) {
             Memory_Block * const next_block = cur_block->prev;
@@ -685,7 +684,7 @@ Parrot_reallocate_string(PARROT_INTERP, NOTNULL(STRING *str), size_t tosize)
         PObj_buflen(str) = new_size - sizeof (void*);
         return;
     }
-    assert(str->bufused <= tosize);
+    PARROT_ASSERT(str->bufused <= tosize);
     /* only copy used memory, not total string buffer */
     copysize = str->bufused;
 
@@ -725,7 +724,7 @@ Parrot_allocate(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size)
 {
     PObj_buflen(buffer) = 0;
     PObj_bufstart(buffer) = NULL;
-    assert((size & WORD_ALIGN_1) == 0);
+    PARROT_ASSERT((size & WORD_ALIGN_1) == 0);
     PObj_bufstart(buffer) = mem_allocate(interp, size,
             interp->arena_base->memory_pool);
     PObj_buflen(buffer) = size;

@@ -17,7 +17,6 @@ src/builtin.c - Builtin Methods
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
 #include "builtin.str"
-#include <assert.h>
 
 
 typedef struct _builtin {
@@ -269,7 +268,7 @@ PARROT_CANNOT_RETURN_NULL
 const char *
 Parrot_builtin_get_c_namespace(int bi)
 {
-    assert(bi >= 0 && bi < N_BUILTINS);
+    PARROT_ASSERT(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].c_ns;
 }
 
@@ -278,7 +277,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_builtin_is_class_method(int bi)
 {
-    assert(bi >= 0 && bi < N_BUILTINS);
+    PARROT_ASSERT(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[2] != 'O';
 }
 
@@ -287,7 +286,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_builtin_is_void(int bi)
 {
-    assert(bi >= 0 && bi < N_BUILTINS);
+    PARROT_ASSERT(bi >= 0 && bi < N_BUILTINS);
     return builtins[bi].signature[0] == 'v';
 }
 

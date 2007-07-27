@@ -23,7 +23,6 @@ There's also a verbose mode for garbage collection.
 #define DOD_C_SOURCE
 #include "parrot/parrot.h"
 #include "parrot/dod.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
@@ -95,7 +94,7 @@ mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
      */
     if (PObj_is_PMC_shared_TEST(obj)) {
         interp = PMC_sync(obj)->owner;
-        assert(interp);
+        PARROT_ASSERT(interp);
         /* XXX FIXME hack */
         if (!interp->arena_base->dod_mark_ptr)
             interp->arena_base->dod_mark_ptr = obj;
@@ -436,7 +435,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
             }
             else {
                 /* All that's left is the custom */
-                assert(!PObj_on_free_list_TEST(current));
+                PARROT_ASSERT(!PObj_on_free_list_TEST(current));
                 VTABLE_mark(interp, current);
             }
         }
@@ -744,7 +743,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
     }
 
     if (val1 == val2) {
-        assert(i == bound);
+        PARROT_ASSERT(i == bound);
         return 0;
     }
 

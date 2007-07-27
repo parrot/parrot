@@ -478,8 +478,9 @@ INTVAL string_to_int( SHIM_INTERP, NOTNULL(const STRING *s) )
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL string_to_num( PARROT_INTERP, NULLOK(const STRING *s) )
-        __attribute__nonnull__(1);
+FLOATVAL string_to_num( PARROT_INTERP, NOTNULL(const STRING *s) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL

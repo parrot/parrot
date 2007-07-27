@@ -572,6 +572,8 @@ tm_to_array(PARROT_INTERP, NOTNULL(const struct tm *tm))
 {
     PMC * const Array = pmc_new(interp, enum_class_Array);
 
+    PARROT_ASSERT(tm);
+
     VTABLE_set_integer_native(interp, Array, 9);
     VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
     VTABLE_set_integer_keyed_int(interp, Array, 1, tm->tm_min);

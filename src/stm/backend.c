@@ -257,8 +257,8 @@ PARROT_CAN_RETURN_NULL
 static STM_write_record *
 get_write(PARROT_INTERP, NOTNULL(STM_tx_log *log), int i)
 {
-    assert(i >= 0);
-    assert(i <= log->last_write);
+    PARROT_ASSERT(i >= 0);
+    PARROT_ASSERT(i <= log->last_write);
     return &log->writes[i];
 }
 
@@ -267,8 +267,8 @@ PARROT_CAN_RETURN_NULL
 static STM_read_record *
 get_read(PARROT_INTERP, NOTNULL(STM_tx_log *log), int i)
 {
-    assert(i >= 0);
-    assert(i <= log->last_read);
+    PARROT_ASSERT(i >= 0);
+    PARROT_ASSERT(i <= log->last_read);
     return &log->reads[i];
 }
 
@@ -341,8 +341,8 @@ PARROT_CANNOT_RETURN_NULL
 static STM_tx_log_sub *
 get_sublog(NOTNULL(STM_tx_log *log), int i)
 {
-    assert(i > 0);
-    assert(i <= log->depth);
+    PARROT_ASSERT(i > 0);
+    PARROT_ASSERT(i <= log->depth);
     return &log->inner[i - 1];
 }
 
@@ -388,8 +388,8 @@ Parrot_STM_start_transaction(PARROT_INTERP)
     newsub->first_write = log->last_write + 1;
 
     if (log->depth == 1) {
-        assert(newsub->first_read == 0);
-        assert(newsub->first_write == 0);
+        PARROT_ASSERT(newsub->first_read == 0);
+        PARROT_ASSERT(newsub->first_write == 0);
     }
 
     PARROT_ATOMIC_INT_SET(newsub->status, STM_STATUS_ACTIVE);
@@ -443,7 +443,7 @@ merge_transactions(PARROT_INTERP, NOTNULL(STM_tx_log *log),
                 }
             }
 
-            assert(write->saw_version != outer);
+            PARROT_ASSERT(write->saw_version != outer);
         }
 
         if (!successp) {
@@ -498,7 +498,7 @@ force_sharing(PARROT_INTERP, NULLOK(PMC *pmc))
         return PMCNULL;
 
     ret = VTABLE_share_ro(interp, pmc);
-    assert(PObj_is_PMC_shared_TEST(ret));
+    PARROT_ASSERT(PObj_is_PMC_shared_TEST(ret));
     return ret;
 }
 
@@ -562,7 +562,7 @@ do_real_commit(PARROT_INTERP, NOTNULL(STM_tx_log *log)) {
     int successp;
     STM_tx_log_sub *inner;
 
-    assert(log->depth == 1);
+    PARROT_ASSERT(log->depth == 1);
 
     inner = get_sublog(log, 1);
 
@@ -604,7 +604,7 @@ do_real_commit(PARROT_INTERP, NOTNULL(STM_tx_log *log)) {
                        new_version, write->handle);
 
         /* no one should steal our ownership when we are committed */
-        assert(successp);
+        PARROT_ASSERT(successp);
 
         Parrot_STM_waitlist_signal(interp, &write->handle->change_waitlist);
         STM_TRACE_SAFE("done waitlist_signal");
@@ -735,7 +735,7 @@ Parrot_STM_commit(PARROT_INTERP)
         return 0;
     }
 
-    assert(log->depth > 0);
+    PARROT_ASSERT(log->depth > 0);
 
     PROFILE_TRIED_COMMIT(log);
 
@@ -746,7 +746,7 @@ Parrot_STM_commit(PARROT_INTERP)
             get_sublog(log, log->depth - 1), cursub, 1);
 
         /* should always return true, since we pass 1 for the always argument */
-        assert(successp);
+        PARROT_ASSERT(successp);
     }
     else
         successp = do_real_commit(interp, log);
@@ -783,7 +783,7 @@ Parrot_STM_abort(PARROT_INTERP)
         return;
     }
 
-    assert(log->depth > 0);
+    PARROT_ASSERT(log->depth > 0);
 
     PROFILE_ABORTED(log);
 
@@ -997,7 +997,7 @@ Parrot_STM_mark_pmc_handle(PARROT_INTERP, Parrot_STM_PMC_handle handle)
     value = handle->value;
 
     if (!PMC_IS_NULL(value)) {
-        assert(PObj_is_PMC_shared_TEST(value));
+        PARROT_ASSERT(PObj_is_PMC_shared_TEST(value));
         pobject_lives(interp, (PObj*) value);
     }
 }
@@ -1068,10 +1068,10 @@ wait_for_version(PARROT_INTERP,
          * FIXME XXX race in accessing n_interpreters?
          * FIXME XXX race if other log goes away
          */
-        assert(n_interpreters > 1);
+        PARROT_ASSERT(n_interpreters > 1);
         other  = (STM_tx_log_sub*)version;
 
-        assert(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
+        PARROT_ASSERT(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
         curlog = get_sublog(log, log->depth);
 
         PARROT_ATOMIC_INT_GET(other_wait_len, other->wait_length);
@@ -1271,7 +1271,7 @@ find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
     STM_TRACE("finding write record for %p", handle);
 
     log      = Parrot_STM_tx_log_get(interp);
-    assert(log->depth > 0);
+    PARROT_ASSERT(log->depth > 0);
 
     cursub   = get_sublog(log, log->depth);
     outersub = NULL;
@@ -1344,7 +1344,7 @@ find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
                     read->saw_version, cursub);
             }
             else {
-                assert(outersub);
+                PARROT_ASSERT(outersub);
                 STM_TRACE("... from outer transaction's write record");
                 PARROT_ATOMIC_PTR_GET(write->saw_version,
                                       handle->owner_or_version);

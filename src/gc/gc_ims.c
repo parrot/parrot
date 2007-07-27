@@ -331,7 +331,6 @@ a sleep opcode.
 
 #include "parrot/parrot.h"
 #include "parrot/dod.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/dod.h */
 
@@ -652,7 +651,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
     else
         work_factor = 1.0;
     todo = (size_t)(g_ims->alloc_trigger * g_ims->throttle * work_factor);
-    assert(arena_base->lazy_dod == 0);
+    PARROT_ASSERT(arena_base->lazy_dod == 0);
     Parrot_dod_trace_children(interp, todo);
     /*
      * check if we are finished with marking - the end is
@@ -728,7 +727,7 @@ memory.
 
 */
 
-#if !GC_IS_MALLOC
+#if !defined(GC_IS_MALLOC) || !GC_IS_MALLOC
 static int
 collect_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
 {
@@ -769,7 +768,7 @@ collect_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(vo
 static int
 parrot_gc_ims_collect(PARROT_INTERP, int check_only)
 {
-#if GC_IS_MALLOC
+#if defined(GC_IS_MALLOC) && GC_IS_MALLOC
     UNUSED(interp);
     UNUSED(check_only);
 #else

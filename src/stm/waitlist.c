@@ -51,8 +51,8 @@ alloc_entry(Parrot_Interp interp) {
     if (!thr->entries[i])
         thr->entries[i] = mem_sys_allocate_zeroed(sizeof (**thr->entries));
 
-    assert(thr->entries[i]->head == NULL);
-    assert(thr->entries[i]->next == NULL);
+    PARROT_ASSERT(thr->entries[i]->head == NULL);
+    PARROT_ASSERT(thr->entries[i]->next == NULL);
     memset(thr->entries[i], 0, sizeof (*thr->entries[i]));
     thr->entries[i]->thread = thr;
 
@@ -62,11 +62,11 @@ alloc_entry(Parrot_Interp interp) {
 static void
 add_entry(STM_waitlist *waitlist, struct waitlist_entry *entry) {
     int successp = -1;
-    assert(entry->next == NULL);
+    PARROT_ASSERT(entry->next == NULL);
     do {
         PARROT_ATOMIC_PTR_GET(entry->next, waitlist->first);
-        assert(successp != -1 || entry->next != entry);
-        assert(entry->next != entry);
+        PARROT_ASSERT(successp != -1 || entry->next != entry);
+        PARROT_ASSERT(entry->next != entry);
         PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, entry->next, entry);
     } while (!successp);
 #if WAITLIST_DEBUG
@@ -113,18 +113,18 @@ waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what) {
     if (!cur) {
         /* removal occured before we acquired the lock */
         UNLOCK(waitlist->remove_mutex);
-        assert(!what->head);
+        PARROT_ASSERT(!what->head);
         return;
     }
     while (cur->next && cur->next != what) {
-        assert(cur != cur->next);
+        PARROT_ASSERT(cur != cur->next);
         cur = cur->next;
     }
 
     if (cur->next == what)
         cur->next = what->next;
     else
-        assert(!what->head);
+        PARROT_ASSERT(!what->head);
     UNLOCK(waitlist->remove_mutex);
 
     what->next = NULL;
@@ -146,7 +146,7 @@ waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what) {
             break;
         cur = cur->next;
     }
-    assert(!cur);
+    PARROT_ASSERT(!cur);
 }
 #endif
 
@@ -310,7 +310,7 @@ Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
         PARROT_ATOMIC_INT_INIT(log->inner[i].status);
         PARROT_ATOMIC_INT_INIT(log->inner[i].wait_length);
         PARROT_ATOMIC_INT_SET(log->inner[i].status, STM_STATUS_INVALID);
-        assert((PTR2UINTVAL(&log->inner[i]) & 1) == 0);
+        PARROT_ASSERT((PTR2UINTVAL(&log->inner[i]) & 1) == 0);
     }
 
     log->inner[0].first_read  =  0;
@@ -338,7 +338,7 @@ Parrot_STM_tx_log_get(PARROT_INTERP)
     if (!log)
         log = Parrot_STM_tx_log_alloc(interp, sizeof(*log));
 
-    assert(log->depth >= 0);
+    PARROT_ASSERT(log->depth >= 0);
     return log;
 }
 

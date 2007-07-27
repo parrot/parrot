@@ -434,7 +434,8 @@ Parrot_new_timer_event(PARROT_INTERP, NOTNULL(PMC *timer), FLOATVAL diff,
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
 
-    FLOATVAL now = Parrot_floatval_time();
+    const FLOATVAL now = Parrot_floatval_time();
+
     ev->type = typ;
     ev->u.timer_event.timer = timer;
     ev->u.timer_event.abs_time = now + diff;

@@ -48,7 +48,6 @@ Access digits, macros assume length given.
 
 #include <stdio.h>
 #include "bignum.h"
-#include <assert.h>
 #include <string.h> /* XXX:ajg fixme later*/
 
 /* * This lot wants to go in a (bignum specific seperate header file * */
@@ -254,8 +253,8 @@ modify the value of the bignumber.
 */
 
 void
-BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
-    assert(in != NULL);
+BN_grow(PINTD_ NOTNULL(BIGNUM *in), INTVAL length) {
+    PARROT_ASSERT(in);
     if (length <= in->nibs * BN_D_PER_NIB) {
         return;
     }
@@ -284,7 +283,7 @@ Frees all the memory used by the BIGNUM.
 
 void
 BN_destroy(PINTD_ BIGNUM *bn) {
-    assert(bn!=NULL);
+    PARROT_ASSERT(bn!=NULL);
 
     BN_free(PINT_ bn->buffer);
     BN_free(PINT_ bn);
@@ -353,12 +352,12 @@ updated.
 
 INTVAL
 BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
-    assert(bn != NULL);
+    PARROT_ASSERT(bn != NULL);
     if (pos > bn->nibs * BN_D_PER_NIB) {
         BN_grow(bn, pos);
     }
-    assert(value < 10);
-    assert(value > -1);
+    PARROT_ASSERT(value < 10);
+    PARROT_ASSERT(value > -1);
     BN_setd(bn, pos, value);
     if (bn->digits < pos+1) {
         bn->digits = pos+1;
@@ -380,7 +379,7 @@ out of bounds.
 
 INTVAL
 BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
-    assert(bn != NULL);
+    PARROT_ASSERT(bn != NULL);
     if (pos > bn->digits || pos < 0) return -1;
     return BN_getd(bn, pos);
 }
@@ -409,21 +408,21 @@ and only the qNAN bit set.
 */
 
 int BN_set_inf(PINTD_ BIGNUM* bn) {
-    assert(bn != NULL);
+    PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_INF_FLAG;
     return;
 }
 
 int BN_set_qNAN(PINTD_ BIGNUM* bn) {
-    assert(bn != NULL);
+    PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG;
     return;
 }
 
 int BN_set_sNAN(PINTD_ BIGNUM* bn) {
-    assert(bn != NULL);
+    PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG | BN_sNAN_FLAG;
     return;
@@ -494,7 +493,7 @@ Copies two into one, returning one for convenience.
 
 BIGNUM*
 BN_copy(PINTD_ BIGNUM* one, BIGNUM* two) {
-    assert(one != NULL); assert(two != NULL);
+    PARROT_ASSERT(one != NULL); PARROT_ASSERT(two != NULL);
 
     BN_grow(PINT_ two, one->digits);
     memcpy((void*)one->buffer, (void*)two->buffer,
@@ -760,7 +759,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     char* cur;
     INTVAL adj_exp = 0; /* as bn->expn is relative to 0th digit */
     INTVAL cur_dig = 0;
-    assert(bn!=NULL);
+    PARROT_ASSERT(bn!=NULL);
     /* Special values have digits set to zero, so this should be enough */
     *dest = (char*)BN_alloc(PINT_ bn->digits + 5 + BN_D_PER_INT);
     if (dest == NULL) {
@@ -1285,8 +1284,8 @@ eg. for  1.234567E+3 with rounding of C<ROUND_DOWN>
 
 int
 BN_iround(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
-    assert(bn!= NULL);
-    assert(context != NULL);
+    PARROT_ASSERT(bn!= NULL);
+    PARROT_ASSERT(context != NULL);
 
     if (bn->digits == 0) {
         return 0; /* rounding special values always works */
@@ -2120,7 +2119,7 @@ BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             }
         }
 
-        assert(!carry); /* as to get here a > b*/
+        PARROT_ASSERT(!carry); /* as to get here a > b*/
 
         result->digits = one->digits;
         result->expn = one->expn;

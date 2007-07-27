@@ -29,7 +29,6 @@ handle "external" strings.
 
 */
 
-#include <assert.h>
 #include "parrot/parrot.h"
 
 /*

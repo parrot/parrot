@@ -225,7 +225,7 @@ sub attrs_from_args {
         if ( $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
-        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|NOTNULL|NULLOK|IN|OUT)\b/ ) ) {
+        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|NOTNULL|NULLOK|ARGIN|ARGOUT)\b/ ) ) {
             my $name = $func->{name};
             my $file = $func->{file};
             squawk( $file, $name, qq{"$arg" isn't protected with NOTNULL or NULLOK} );

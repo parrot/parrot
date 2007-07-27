@@ -38,11 +38,11 @@
 #  define THREAD_CREATE_DETACHED(t, func, arg) do { \
         pthread_attr_t      attr;   \
         int rc = pthread_attr_init(&attr);      \
-        assert(rc == 0);    \
+        PARROT_ASSERT(rc == 0);    \
         rc = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);   \
-        assert(rc == 0);    \
+        PARROT_ASSERT(rc == 0);    \
         rc = pthread_create(&t, &attr, func, arg); \
-        assert(rc == 0);    \
+        PARROT_ASSERT(rc == 0);    \
         pthread_attr_destroy(&attr);        \
    } while (0)
 

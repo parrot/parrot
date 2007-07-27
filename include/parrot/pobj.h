@@ -183,7 +183,7 @@ typedef struct PMC_EXT {
 #ifdef NDEBUG
 #  define PMC_ext_checked(pmc)             (pmc)->pmc_ext
 #else
-#  define PMC_ext_checked(pmc)             (assert((pmc)->pmc_ext), (pmc)->pmc_ext)
+#  define PMC_ext_checked(pmc)             (PARROT_ASSERT((pmc)->pmc_ext), (pmc)->pmc_ext)
 #endif /* NDEBUG */
 #if PMC_DATA_IN_EXT
 #  define PMC_data(pmc)                   PMC_ext_checked(pmc)->data

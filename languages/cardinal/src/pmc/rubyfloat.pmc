@@ -11,7 +11,6 @@
  */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 #define RUBY_NUMBER_FMT		("%.14g")
 

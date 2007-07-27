@@ -16,7 +16,6 @@ Handles the accessing of small object pools (header pools).
 
 #include "parrot/parrot.h"
 #include "parrot/smallobject.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/smallobject.h */
 
@@ -106,7 +105,7 @@ Parrot_is_const_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
     const               int   c    = contained_in_pool(pool, pmc);
 
     /* some paranoia first */
-    assert(!!PObj_constant_TEST(pmc) == !!c);
+    PARROT_ASSERT(!!PObj_constant_TEST(pmc) == !!c);
 
     return c;
 }
@@ -400,9 +399,9 @@ Parrot_small_object_pool_merge(PARROT_INTERP,
     }
 #endif
 
-    /* assert(source->total_objects); */
-    assert(dest->object_size == source->object_size);
-    assert((dest->name == NULL && source->name == NULL) ||
+    /* PARROT_ASSERT(source->total_objects); */
+    PARROT_ASSERT(dest->object_size == source->object_size);
+    PARROT_ASSERT((dest->name == NULL && source->name == NULL) ||
         0 == strcmp(dest->name, source->name));
 
     dest->total_objects += source->total_objects;

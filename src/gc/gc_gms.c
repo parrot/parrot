@@ -110,7 +110,6 @@ A chained list of headers used e.g. for the IGP list.
 
 #include "parrot/parrot.h"
 #include "parrot/dod.h"
-#include <assert.h>
 
 #if PARROT_GC_GMS
 
@@ -521,7 +520,7 @@ gc_gms_chain_objects(PARROT_INTERP,
 
     p = new_arena->start_objects;
     marker = &pool->marker;
-    assert(pool->free_list == marker);
+    PARROT_ASSERT(pool->free_list == marker);
 
     /* update pool statistics */
     n = new_arena->total_objects;
@@ -552,11 +551,11 @@ gc_gms_chain_objects(PARROT_INTERP,
 #  endif
         next = p;
     }
-    assert(p == new_arena->start_objects);
+    PARROT_ASSERT(p == new_arena->start_objects);
     p->prev = prev;
     prev->next = p;
     pool->free_list = p;
-    assert(p != marker);
+    PARROT_ASSERT(p != marker);
 }
 
 static void
@@ -713,7 +712,7 @@ gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
     Gc_gms_gen *gen;
     Small_Object_Pool * const pool = h->gen->pool;
 
-    assert(pool);
+    PARROT_ASSERT(pool);
 
     for (gen = pool->first_gen; gen; gen = gen->next) {
         if (gen_no == gen->gen_no)
@@ -750,8 +749,8 @@ gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
 
     /* locate generation pointer */
     gen = gc_gms_find_gen(interp, h, gen_no);
-    assert(gen->last);
-    assert(gen->first);
+    PARROT_ASSERT(gen->last);
+    PARROT_ASSERT(gen->first);
 
     /* TODO if it needs destroy put it in front */
     next = gen->last;
@@ -781,7 +780,7 @@ gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms
         s->next = NULL;
         /* chain new store to old one */
         if (l->first) {
-            assert(l->last);
+            PARROT_ASSERT(l->last);
             l->last->next = s;
         }
         else {
@@ -1064,7 +1063,7 @@ gc_gms_setto_gray(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
             }
         }
     }
-    assert(h != pool->white);
+    PARROT_ASSERT(h != pool->white);
     /* verify all these pointer moves */
 #  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "to_gray");
@@ -1098,8 +1097,8 @@ gc_gms_setto_black(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
      * if the white is adjacent to black, move pointer
      */
     if (pool->black == h) {
-        assert(pool->gray == h);
-        assert(pool->white == h);
+        PARROT_ASSERT(pool->gray == h);
+        PARROT_ASSERT(pool->white == h);
         pool->white = h->next;
         pool->gray = h->next;
     }
@@ -1127,8 +1126,8 @@ gc_gms_setto_black(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
             pool->black = h;
         }
     }
-    assert(h != pool->white);
-    assert(h != pool->gray);
+    PARROT_ASSERT(h != pool->white);
+    PARROT_ASSERT(h != pool->gray);
 #  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "to_black");
 #  endif
