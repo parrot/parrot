@@ -312,16 +312,13 @@ transform for (PAST::Op) :language('PIR') {
     collpast = node[0]
     collpost = tree.'get'('post', collpast)
 
-    .local pmc collvar
-    collvar=collpost['result']
-
     # reference our collection ...
     ops.'push'(collpost)
     # Create a temporary iterator for our collection
     # $P<unique> = new .Iterator, obj from collection.
     .local pmc iter
     iter = ops.'unique'('$P')
-    ops.'push_pirop'('new',iter,'.Iterator',collvar)
+    ops.'push_pirop'('new', iter, "'Iterator'", collpost)
 
     # loop
     ops.'push'(looplabel)
