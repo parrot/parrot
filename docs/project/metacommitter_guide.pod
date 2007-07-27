@@ -75,6 +75,20 @@ Only existing Metacommitters can perform this activity.
 navigate to L<https://rt.perl.org/rt3/Admin/Groups/Members.html?id=178219>
 and add/remove users as desired.
 
+=back 
+
+=head2 To manage the list of Bug Admins.
+
+Only existing Metacommitters can perform this activity.
+
+=over 4
+
+=item 1
+
+navigate to L<https://rt.perl.org/rt3/Admin/Groups/Members.html?id=20479>
+and add/remove users as desired. Be sure to verify that the userid is the
+one the user shows as logged in as. (Some bugadmins have multiple RT accounts.)
+
 =back
 
 =head1 AUTHOR
