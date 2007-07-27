@@ -17,7 +17,6 @@ charset functionality for similar charsets like iso-8859-1.
 
 #include "parrot/parrot.h"
 #include "ascii.h"
-#include <assert.h>
 
 #ifdef EXCEPTION
 #  undef EXCEPTION
@@ -393,7 +392,7 @@ ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
                 offset);
     }
 
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     retval = Parrot_byte_index(interp, source_string,
             search_string, offset);
     return retval;
@@ -409,7 +408,7 @@ ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
         real_exception(interp, NULL, UNIMPLEMENTED, "Cross-charset index not supported");
     }
 
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     retval = Parrot_byte_rindex(interp, source_string,
             search_string, offset);
     return retval;
@@ -465,7 +464,7 @@ find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
@@ -483,7 +482,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
@@ -505,7 +504,7 @@ ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t see
     const char *buffptr = (const char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
 
-    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {
         hashval += hashval << 5;
         hashval += *buffptr++;

@@ -56,7 +56,6 @@ the context.  If no type is registered, returns C<core_type>.
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/hll.h */
 
@@ -91,7 +90,7 @@ enum {
     } while (0)
 #define END_WRITE_HLL_INFO(interp, hll_info)
 
-#define ASSERT_CONST_STRING(src) assert(PObj_constant_TEST(src))
+#define ASSERT_CONST_STRING(src) PARROT_ASSERT(PObj_constant_TEST(src))
 
 
 PARROT_CANNOT_RETURN_NULL
@@ -286,10 +285,10 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
     START_WRITE_HLL_INFO(interp, hll_info);
 
     entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
-    assert(!PMC_IS_NULL(entry));
+    PARROT_ASSERT(!PMC_IS_NULL(entry));
 
     type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
-    assert(!PMC_IS_NULL(type_hash));
+    PARROT_ASSERT(!PMC_IS_NULL(type_hash));
 
     hash      = (Hash *)PMC_struct_val(type_hash);
 

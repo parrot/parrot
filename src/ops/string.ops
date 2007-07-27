@@ -173,7 +173,7 @@ inline op bytelength(out INT, in STR) :base_mem {
     n = 0;
   else {
     n = s->bufused;
-    assert(n == ENCODING_BYTES(interp, $2));
+    PARROT_ASSERT(n == ENCODING_BYTES(interp, $2));
   }
   $1 = n;
   goto NEXT();

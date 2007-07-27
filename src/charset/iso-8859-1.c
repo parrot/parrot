@@ -362,7 +362,7 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL end = offset + count;
     UINTVAL codepoint;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
@@ -380,7 +380,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);

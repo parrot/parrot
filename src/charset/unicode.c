@@ -225,7 +225,7 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
                                      * icu version */
                 (UChar *)dest->strstart, dest_len,
                 &err);
-        assert(U_SUCCESS(err));
+        PARROT_ASSERT(U_SUCCESS(err));
         dest->bufused = dest_len * sizeof (UChar);
     }
     dest->strlen = dest_len;
@@ -297,7 +297,7 @@ upcase(PARROT_INTERP, NOTNULL(STRING *src))
             (UChar *)src->strstart, src_len,
             NULL,       /* locale = default */
             &err);
-    assert(U_SUCCESS(err));
+    PARROT_ASSERT(U_SUCCESS(err));
     src->bufused = dest_len * sizeof (UChar);
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
@@ -350,7 +350,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
                 (UChar *)src->strstart, src_len,
                 NULL,       /* locale = default */
                 &err);
-        assert(U_SUCCESS(err));
+        PARROT_ASSERT(U_SUCCESS(err));
     }
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
@@ -398,7 +398,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
                 (UChar *)src->strstart, src_len,
                 NULL, NULL,
                 &err);
-        assert(U_SUCCESS(err));
+        PARROT_ASSERT(U_SUCCESS(err));
     }
     /* downgrade if possible */
     if (dest_len == (int)src->strlen)
@@ -568,7 +568,7 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL end = offset + count;
     UINTVAL codepoint;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string != 0);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
@@ -594,7 +594,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL codepoint;
     int bit;
 
-    assert(source_string != 0);
+    PARROT_ASSERT(source_string);
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
         codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);

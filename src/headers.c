@@ -14,7 +14,6 @@ Handles getting of various headers, and pool creation.
 
 #include "parrot/parrot.h"
 #include "parrot/headers.h"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/headers.h */
 
@@ -765,7 +764,7 @@ fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))
                         /* fprintf(stderr, "BAD PMC: address=%p,
                                    base_type=%d\n",
                                    p, p->vtable->base_type); */
-                        assert(0);
+                        PARROT_ASSERT(0);
                     }
                 }
             }
@@ -816,7 +815,7 @@ Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
             !dest_arena->sized_header_pools[i]) {
             make_bufferlike_pool(dest_interp, i * sizeof (void *)
                 + sizeof (Buffer));
-            assert(dest_arena->sized_header_pools[i]);
+            PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
 
         Parrot_small_object_pool_merge(dest_interp,

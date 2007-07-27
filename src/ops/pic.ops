@@ -261,7 +261,7 @@ inline op pic_callr__(inconst PMC) :pic {
         pred_pc = (void**) pc - ctx->pred_offset;
         sig = (PMC*)(pred_pc[1]);
         ASSERT_SIG_PMC(sig);
-        assert(SIG_ELEMS(sig) <= 1);
+        PARROT_ASSERT(SIG_ELEMS(sig) <= 1);
         args[0] = SIG_ELEMS(sig) ?
             (_reg_base + ((opcode_t*)pred_pc)[2]) : NULL;
     }

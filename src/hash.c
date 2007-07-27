@@ -24,7 +24,6 @@ don't apply.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 #define INITIAL_BUCKETS 16
 
@@ -608,7 +607,7 @@ init_hash(NOTNULL(Hash *hash),
      * TODO randomize
      */
     hash->seed = 3793;
-    assert(INITIAL_BUCKETS % 4 == 0);
+    PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
     hash->mask = INITIAL_BUCKETS-1;
     hash->entries = 0;
 

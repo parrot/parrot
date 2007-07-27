@@ -41,7 +41,6 @@ not highest type in table.
 #include "parrot/mmd.h"
 #include "parrot/oplib/ops.h"
 #include "mmd.str"
-#include <assert.h>
 
 /* HEADERIZER HFILE: include/parrot/mmd.h */
 
@@ -266,8 +265,8 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
 #endif
 
     func = NULL;
-    assert(left_type >= 0);
-    assert(right_type >=0 ||
+    PARROT_ASSERT(left_type >= 0);
+    PARROT_ASSERT(right_type >=0 ||
             (right_type >= enum_type_INTVAL && right_type <= enum_type_PMC));
     r = right_type;
     if (right_type < 0)
@@ -758,7 +757,7 @@ mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
     UINTVAL           new_size, old_size;
     MMD_table * const table = interp->binop_mmd_funcs + func_nr;
 
-    assert(table->x);
+    PARROT_ASSERT(table->x);
 
     old_size = sizeof (funcptr_t) * table->x * table->y;
     new_size = sizeof (funcptr_t) * table->x * new_y;
@@ -854,9 +853,9 @@ mmd_register(PARROT_INTERP,
     INTVAL offset;
     MMD_table *table;
 
-    assert(func_nr < (INTVAL)interp->n_binop_mmd_funcs);
-    assert(left_type >= 0);
-    assert(right_type >=0 ||
+    PARROT_ASSERT(func_nr < (INTVAL)interp->n_binop_mmd_funcs);
+    PARROT_ASSERT(left_type >= 0);
+    PARROT_ASSERT(right_type >=0 ||
             (right_type >= enum_type_INTVAL && right_type <= enum_type_PMC));
     if (right_type < 0)
         right_type -= enum_type_INTVAL;
@@ -1081,7 +1080,7 @@ mmd_arg_tuple_func(PARROT_INTERP)
     args_op = interp->current_args;
     if (!args_op)
         return arg_tuple;
-    assert(*args_op == PARROT_OP_set_args_pc);
+    PARROT_ASSERT(*args_op == PARROT_OP_set_args_pc);
     constants = interp->code->const_table->constants;
     ++args_op;
     args_array = constants[*args_op]->u.key;
@@ -1638,7 +1637,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
     STRING *meth_name;
     PMC *method, *multi, *_class, *multi_sig;
 
-    assert(type != enum_class_Null && type != enum_class_delegate &&
+    PARROT_ASSERT(type != enum_class_Null && type != enum_class_delegate &&
             type != enum_class_Ref  && type != enum_class_SharedRef &&
             type != enum_class_deleg_pmc && type != enum_class_ParrotClass &&
             type != enum_class_ParrotObject);
@@ -1687,7 +1686,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
             VTABLE_push_pmc(interp, multi, method);
         }
         else {
-            assert(method->vtable->base_type == enum_class_MultiSub);
+            PARROT_ASSERT(method->vtable->base_type == enum_class_MultiSub);
             multi = method;
         }
         method = constant_pmc_new(interp, enum_class_NCI);
@@ -1713,7 +1712,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
      */
     multi = Parrot_find_global_n(interp, ns,
                                  const_string(interp, short_name));
-    assert(multi);
+    PARROT_ASSERT(multi);
     VTABLE_push_pmc(interp, multi, method);
 }
 
@@ -1762,7 +1761,7 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
          * but I'm assuming it's optimizer related.
          */
 #ifndef __INTEL_COMPILER
-        assert((PTR2UINTVAL(mmd_table[i].func_ptr) & 3) == 0);
+        PARROT_ASSERT((PTR2UINTVAL(mmd_table[i].func_ptr) & 3) == 0);
 #endif
         mmd_register(interp,
                 mmd_table[i].func_nr, type,

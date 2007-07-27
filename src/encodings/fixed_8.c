@@ -309,7 +309,7 @@ static void
 fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)
 {
     iter->bytepos = iter->charpos = pos;
-    assert(pos <= PObj_buflen(iter->str));
+    PARROT_ASSERT(pos <= PObj_buflen(iter->str));
 }
 
 

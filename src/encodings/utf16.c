@@ -228,7 +228,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
             }
             u_strFromUTF8(p, dest_len,
                     &dest_len, src->strstart, src->bufused, &err);
-            assert(U_SUCCESS(err));
+            PARROT_ASSERT(U_SUCCESS(err));
         }
     }
     result->bufused = dest_len * sizeof (UChar);

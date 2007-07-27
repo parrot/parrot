@@ -376,7 +376,7 @@ utf8_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 
     i->bytepos += (new_pos - pos);
     /* XXX possible buffer overrun exception? */
-    assert(i->bytepos <= PObj_buflen(s));
+    PARROT_ASSERT(i->bytepos <= PObj_buflen(s));
     i->charpos++;
 }
 
