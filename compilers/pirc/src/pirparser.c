@@ -57,7 +57,6 @@ Clean up grammar after discussion.
 #include "pirutil.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <stdarg.h>
 #include <string.h>
 

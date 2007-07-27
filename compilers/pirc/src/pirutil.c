@@ -8,7 +8,6 @@ pirutil.c - various utility functions
 
 */
 #include "pirutil.h"
-#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,11 +28,12 @@ this function's client code simple. Please free() the memory after usage!
 
 */
 char *
-clone_string(char const * src) {
+clone_string(NOTNULL(char const * src))
+{
     int srclen;
     char * dest, *ptr;
 
-    assert(src != NULL);
+    PARROT_ASSERT(src != NULL);
     srclen = strlen(src);
     /* dest is used as an iterator, ptr - still pointing to the beginning
      * of the string - is returned
