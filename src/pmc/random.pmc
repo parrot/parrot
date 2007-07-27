@@ -21,7 +21,6 @@ This is a singleton (monadic) class - only one instance exists.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 static PMC * Rand_PMC;
 
@@ -51,7 +50,7 @@ information see F<src/pmc.c>.
 */
 
     void set_pointer(void* ptr) {
-        assert(!Rand_PMC);
+        PARROT_ASSERT(!Rand_PMC);
         Rand_PMC = (PMC*) ptr;
     }
 

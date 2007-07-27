@@ -19,7 +19,6 @@ These are the vtable functions for Parrot IO.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /* This class is actually part of the io subsystem */
 #include "../src/io/io_private.h"

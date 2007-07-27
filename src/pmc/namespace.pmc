@@ -27,7 +27,6 @@ These are the vtable functions for the namespace PMC.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /*
  * Typically a named slot contains either another namespace or a

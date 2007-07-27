@@ -19,10 +19,7 @@ XXX
 */
 
 #include "parrot/parrot.h"
-
 #include "parrot/stm/backend.h"
-
-#include <assert.h>
 
 /* we set need_ext here because we really want to have PMC sync structure;
  * we set no_ro because we are logically read-only; one can't change which
@@ -81,8 +78,8 @@ Mark data associated with this transactional variable.
 */
 
     void mark() {
-        assert(PObj_is_PMC_shared_TEST(SELF));
-        assert(PMC_sync(SELF)->owner == INTERP);
+        PARROT_ASSERT(PObj_is_PMC_shared_TEST(SELF));
+        PARROT_ASSERT(PMC_sync(SELF)->owner == INTERP);
         Parrot_STM_mark_pmc_handle(INTERP,
             (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
     }
@@ -119,8 +116,8 @@ Mark data associated with this transactional variable.
         PMC_struct_val(SELF) =
             Parrot_thaw_STM_PMC_handle(INTERP, io);
 
-        assert(PObj_is_PMC_shared_TEST(SELF));
-        assert(PMC_sync(SELF));
+        PARROT_ASSERT(PObj_is_PMC_shared_TEST(SELF));
+        PARROT_ASSERT(PMC_sync(SELF));
     }
 
     /* we can do this because we don't modify ourself in dangerous

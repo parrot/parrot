@@ -21,7 +21,6 @@ These are the vtable functions for the Sub (subroutine) base class
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "sub.str"
-#include <assert.h>
 
 static void
 print_sub_name(PARROT_INTERP, PMC* sub)
@@ -248,7 +247,7 @@ Invokes the subroutine.
         if (ccont == NEED_CONTINUATION)
             ccont = new_ret_continuation_pmc(interp, (opcode_t *)next);
 
-        assert(!PMC_IS_NULL(ccont));
+        PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
         /*
          * plain subroutine call
@@ -570,7 +569,7 @@ Return the MMD signature PMC, if any or a Null PMC.
         static const char types[] = "INSP";
         char *p;
 
-        assert(sub->n_regs_used);
+        PARROT_ASSERT(sub->n_regs_used);
         if (!*kind || kind[1])
             real_exception(INTERP, NULL, E_ValueError,
                 "illegal register kind '%s'", kind);

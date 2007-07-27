@@ -31,7 +31,6 @@ Note: The TQueue must always be emptied before program exit.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 pmclass TQueue need_ext is_shared {
 

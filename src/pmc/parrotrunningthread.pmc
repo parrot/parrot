@@ -30,8 +30,6 @@ unrelated thread.
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-#include <assert.h>
-
 
 pmclass ParrotRunningThread no_ro {
 

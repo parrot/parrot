@@ -28,7 +28,6 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/dynext.h"
-#include <assert.h>
 
 /*
 
@@ -79,9 +78,8 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         for (i = s->n_vtable_max - 1; i >= start; --i) {
             if (s->vtables[i] && s->vtables[i]->pmc_class &&
                 PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
-                STRING *class_name;
-                class_name = VTABLE_name(s, s->vtables[i]->pmc_class);
-                assert(VTABLE_exists_keyed_str(d, d->class_hash, class_name));
+                STRING * const class_name = VTABLE_name(s, s->vtables[i]->pmc_class);
+                PARROT_ASSERT(VTABLE_exists_keyed_str(d, d->class_hash, class_name));
                 VTABLE_delete_keyed_str(d, d->class_hash, class_name);
                 if (last_remove == i + 1) {
                     --d->n_vtable_max;
@@ -213,7 +211,7 @@ Initializes the interpreter.
          */
         if (!PMC_data(SELF)) {
             create_interp(SELF, INTERP);
-            assert(PMC_data(SELF));
+            PARROT_ASSERT(PMC_data(SELF));
         }
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF) = NULL;

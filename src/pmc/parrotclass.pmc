@@ -120,7 +120,7 @@ do_initcall(PARROT_INTERP, PMC* _class, PMC *object, PMC *init)
              * but only if init isn't inherited
              * or rather just on the last non-class parent
              */
-            assert(i >= 1);
+            PARROT_ASSERT(i >= 1);
             next_parent = VTABLE_get_pmc_keyed_int(interp,
                     classsearch_array, i - 1);
             if (!PObj_is_class_TEST(next_parent))
@@ -465,7 +465,7 @@ Create the class from the thawed parents and attributes array.
                 PMC *parent_class;
                 parent_class = VTABLE_get_pmc_keyed_int(INTERP, parents, i);
                 if (!PObj_is_class_TEST(parent_class)) {
-                    assert(!parent_not_class);
+                    PARROT_ASSERT(!parent_not_class);
                     parent_not_class++;
                     parent_class = parent_class->vtable->pmc_class;
                 }

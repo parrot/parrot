@@ -546,10 +546,9 @@ it's just SUPER aka the default implementation.
          * this interpreter dies.
          */
         {
-            PMC *new_class;
-            new_class = ret->vtable->pmc_class;
-            assert(new_class);
-            assert(ret->vtable->share_ro == Parrot_ParrotObject_share_ro);
+            PMC * const new_class = ret->vtable->pmc_class;
+            PARROT_ASSERT(new_class);
+            PARROT_ASSERT(ret->vtable->share_ro == Parrot_ParrotObject_share_ro);
             SET_CLASS((SLOTTYPE *) PMC_data(ret), ret, new_class);
         }
         return ret;

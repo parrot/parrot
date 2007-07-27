@@ -19,7 +19,6 @@ These are the vtable functions for the lexpad PMC.
 */
 
 #include "parrot/parrot.h"
-#include <assert.h>
 
 /*
  * LexPad provides a Hash interface for lexical fetch/store

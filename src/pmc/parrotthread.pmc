@@ -38,7 +38,6 @@ and these methods:
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-#include <assert.h>
 
 /*
  * can't do multi-threaded DOD/GC yet
