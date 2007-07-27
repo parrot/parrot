@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 45;
+use Test::More tests => 47;
 use Carp;
 use File::Basename;
 use File::Copy;
@@ -38,6 +38,9 @@ my $cwd = cwd();
 
 my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 my ( $tie, $msg, @lines );
+
+my $warnpattern =
+  qr/get_bool_keyed_int.*elements_keyed_int.*set_bool_keyed_int.*is_equal_str/s;
 
 # basic test:  @args holds default.pmc
 {
@@ -79,7 +82,7 @@ my ( $tie, $msg, @lines );
             or croak "Unable to tie";
         $rv = $self->gen_c();
         @lines = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
+#        untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc" );
         $msg = join("\n", @lines);
         like( $msg,
@@ -133,7 +136,7 @@ my ( $tie, $msg, @lines );
             or croak "Unable to tie";
         $rv = $self->gen_c();
         @lines = $tie->READLINE;
-        untie *STDERR or croak "Unable to untie";
+#        untie *STDERR or croak "Unable to untie";
         ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
         $msg = join("\n", @lines);
         like( $msg,
