@@ -62,7 +62,7 @@ transform pir (Cardinal::POST::Var) :language('PIR') {
     value = node.'value'()
     islvalue = node.'islvalue'()
     block = self.'top_scope_stack'()
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
 
     if scope == 'lexical' goto generate_lexical
     if scope == 'parameter' goto generate_parameter
@@ -108,7 +108,7 @@ transform pir (Cardinal::POST::Ops) :language('PIR') {
     .local pmc code
     .local pmc iter
 
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     iter = node.'child_iter'()
   iter_loop:
     unless iter goto iter_end
@@ -132,7 +132,7 @@ transform pir (Cardinal::POST::Assign) :language('PIR') {
     value = lnode.'value'()
     scope = lnode.'scope'()
     rvalue = rnode.'value'()
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     block = self.'top_scope_stack'()
     varhash = block.'varhash'()
     $I0 = exists varhash[name]
@@ -164,7 +164,7 @@ transform pir (Cardinal::POST::Call) :language('PIR') {
     .local string args
     sub_name = node.'name'()
     args = ""
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.'emit'("    '%0'(%1)", sub_name, args)
     .return (code)
 }
@@ -172,7 +172,7 @@ transform pir (Cardinal::POST::Call) :language('PIR') {
 transform pir (Cardinal::POST::Raw) :language('PIR') {
     .local pmc code
     $P1 = node.'raw'()
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.'emit'("%0", $P1)
     .return (code)
     }
@@ -181,7 +181,7 @@ transform pir (Cardinal::POST::Namespace) :language('PIR') {
     .local pmc code
     .local pmc iter
 
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code .= "\n.namespace [ "
     $S0 = node.'get_pir_name'()
     code .= $S0
@@ -207,7 +207,7 @@ transform pir (Cardinal::POST::NamespaceLookup) :language('PIR') {
 transform pir (Cardinal::POST::Sub) :language('PIR') {
     .local pmc prologue
     .local pmc varhash
-    prologue = new 'PGE::CodeString'
+    prologue = new 'CodeString'
     node.'prologue'(prologue)
     varhash = new .Hash
     node.'varhash'(varhash)
@@ -232,7 +232,7 @@ transform pir (Cardinal::POST::Sub) :language('PIR') {
     
     .local pmc subcode_parts
     .local pmc iter
-    subcode_parts = new 'PGE::CodeString'
+    subcode_parts = new 'CodeString'
     iter = node.'child_iter'()
 
     self.'push_scope_stack'(node)
@@ -250,7 +250,7 @@ transform pir (Cardinal::POST::Sub) :language('PIR') {
     prologue = node.'prologue'()
 
     .local pmc subcode
-    subcode = new 'PGE::CodeString'
+    subcode = new 'CodeString'
     subcode .= prologue
     subcode .= subcode_parts
     subcode.'emit'("    .return (%0)\n.end\n", value)

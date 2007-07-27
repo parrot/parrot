@@ -154,7 +154,7 @@ sub inlined_header {
   # the number for the loops
   .local pmc codestring
   .local int loop_num
-  codestring = new 'PGE::CodeString'
+  codestring = new 'CodeString'
   loop_num   = codestring.unique()
 
 END_PIR

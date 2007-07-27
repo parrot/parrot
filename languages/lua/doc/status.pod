@@ -31,7 +31,7 @@ C<lua.pbc> uses the following Parrot compiler toolchain components :
 
 The Lua grammar is described in F<languages/lua/src/lua51.pg>.
 
-The PIR code is emitted by C<PGE::CodeString>.
+The PIR code is emitted by C<CodeString>.
 
 C<PGE> is also used by the Lua pattern compiler in
 F<languages/lua/lib/luaregex.pir>.

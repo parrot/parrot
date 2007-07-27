@@ -109,7 +109,7 @@ PMC register (uninitialized) and use that.
     .param pmc grammar
     .local pmc code, iter
 
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     iter = self.'child_iter'()
   iter_loop:
     unless iter goto iter_end
@@ -141,7 +141,7 @@ PMC register (uninitialized) and use that.
   iter_end:
 
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     $P0 = self.'name'()
     # $I0 = isa $P0, 'Cardinal::POST::Sub'
     # if $I0 goto get_sub_name
@@ -268,7 +268,7 @@ and that is returned.
     regexpir = p6regex(regexast, 'name'=>name, 'grammar'=>'', 'target'=>'PIR')
 
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     code.'emit'("    %0 = find_name '%1'", value, name)
     .return (regexpir, code)
 .end
@@ -327,7 +327,7 @@ and that is returned.
     scope = self.'scope'()
     value = self.'value'()
     islvalue = self.'islvalue'()
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     if scope == 'lexical' goto generate_lexical
     if scope == 'instance' goto generate_instance
     if scope == 'class' goto generate_class
@@ -387,7 +387,7 @@ and that is returned.
     value = self.'value'()
     scope = self.'scope'()
     xvalue = x.'value'()
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     varhash = block.'varhash'()
     $I0 = exists varhash[name]
     if $I0 goto with_varhash_name
@@ -467,7 +467,7 @@ and that is returned.
     value = self.'value'()
 
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     $S0 = "'"
     $S1 = item
     $S0 .= $S1

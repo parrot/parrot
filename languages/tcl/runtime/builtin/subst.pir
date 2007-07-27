@@ -87,7 +87,7 @@ subst:
     ret = ast['ret']
 
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit(".loadlib 'tcl_ops'")

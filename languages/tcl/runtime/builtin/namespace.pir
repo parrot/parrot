@@ -263,7 +263,7 @@ bad_args:
 global_ns:
   .local pmc __script, code
   __script = get_root_global ['_tcl'], '__script'
-  code     = new 'PGE::CodeString'
+  code     = new 'CodeString'
   $S0 = join ' ', argv
   ($S0, $S1) = __script($S0, 'pir_only'=>1)
   $I0 = code.unique()

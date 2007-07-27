@@ -7,7 +7,7 @@ transform result (ROOT)  {
 
 transform pir (PAST::Expr) {
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
 
     .local pmc value
     value = node['value']
@@ -34,7 +34,7 @@ END_PIR
 
 transform pir (PAST::Program) {
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
 
     pir.emit(<<'END_PIR')
     .local pmc colons, split, epoch
@@ -63,7 +63,7 @@ transform pir (PAST::Val) {
     .local pmc ret
     .local pmc class
 
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     ret = pir.unique('$P')
     class = node['class']
     pir.emit("    %0 = new '%1'", ret, class)
@@ -92,7 +92,7 @@ transform pir (PAST::Val) {
 
 transform pir (PAST::Var) {
     .local pmc pir, ret
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     ret = pir.unique('$P')
     node['ret']    = ret
     node['istemp'] = 1
@@ -132,7 +132,7 @@ transform pir (PAST::Op) {
     .local pmc args,iter,pir
     .local pmc return_register
  
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     args = new 'ResizablePMCArray'
     iter = node.'child_iter'()
   iter_loop: 
@@ -167,7 +167,7 @@ transform pir (PAST::MathFunc) {
     .local pmc args,iter,pir
     .local pmc return_register
  
-    pir  = new 'PGE::CodeString'
+    pir  = new 'CodeString'
     args = new 'ResizablePMCArray'
     iter = node.'child_iter'()
   iter_loop: 
@@ -199,7 +199,7 @@ transform pir (PAST::StaticCommand) {
     .local pmc args, children, iter, pir
     .local string reg
     
-    pir  = new 'PGE::CodeString'
+    pir  = new 'CodeString'
     args = new 'ResizablePMCArray'
     children = node.'get_children'()
     iter = new 'Iterator', children
@@ -328,7 +328,7 @@ END_PIR
 transform pir (PAST::DynamicCommand) {
     .local pmc args, children, iter, pir, reg
     
-    pir  = new 'PGE::CodeString'
+    pir  = new 'CodeString'
     args = new 'ResizablePMCArray'
     children = node.'get_children'()
     iter = new 'Iterator', children
@@ -391,7 +391,7 @@ END_PIR
 
 transform pir (PAST::Expand) {
     .local pmc pir, value
-    pir   = new 'PGE::CodeString'
+    pir   = new 'CodeString'
     value = node['value']
 
     $S0 = tree.get('pir', value)
@@ -417,7 +417,7 @@ transform pir (PAST::Cond) {
     .local pmc children, cond, then, else
     .local string cond_result, then_result, else_result
 
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     pir.emit('  .local pmc __boolean')
     pir.emit('  __boolean = get_root_global ["_tcl"], "__boolean"')
 

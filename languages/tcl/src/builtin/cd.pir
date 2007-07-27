@@ -7,7 +7,7 @@
   .param pmc    argv
 
   .local pmc pir
-  pir = new 'PGE::CodeString'
+  pir = new 'CodeString'
   .local string dir
   .local int argc
   argc = elements argv

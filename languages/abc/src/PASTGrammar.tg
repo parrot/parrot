@@ -52,7 +52,7 @@ transform past (ABC::Grammar::statement) :language('PIR') {
     .local string val
     val = $P0
     .local pmc code
-    code = new 'PGE::CodeString'
+    code = new 'CodeString'
     ( val ) = code.'escape'( val )
     .local pmc vpast
     vpast = new 'PAST::Val'

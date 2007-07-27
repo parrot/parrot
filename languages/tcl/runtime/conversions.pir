@@ -331,7 +331,7 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     if pir_only goto only_pir
 
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
 
     pir.emit(".HLL 'Tcl', ''")
     pir.emit('.namespace %0', namespace)
@@ -423,7 +423,7 @@ end_preamble:
     ret = ast['ret']
 
     .local pmc pir
-    pir = new 'PGE::CodeString'
+    pir = new 'CodeString'
     unless pir_only goto do_wrapper
     if has_wrapper  goto do_wrapper
     pir = result

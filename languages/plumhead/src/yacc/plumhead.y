@@ -85,7 +85,7 @@ program : HELLO
         printf( "  val = \"Hello, World!\"                                       \n" );
         printf( "  past_temp = new 'PAST::Val'                                     \n" );
         printf( "  .local pmc code_string                                          \n" );
-        printf( "  code_string = new 'PGE::CodeString'                             \n" );
+        printf( "  code_string = new 'CodeString'                             \n" );
         printf( "  ( val ) = code_string.'escape'( val )                           \n" );
         printf( "      past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      \n" );
         printf( "  past_echo.'push'( past_temp )                    \n" );

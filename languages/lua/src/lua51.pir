@@ -669,7 +669,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
     $S0 = self.'prologue'()
     if $S0 == '' goto L1
     .local pmc code
-    new code, 'PGE::CodeString'
+    new code, 'CodeString'
     code.'emit'($S0)
     $P0 = get_hll_global ['POST'], '$!subpir'
     code .= $P0

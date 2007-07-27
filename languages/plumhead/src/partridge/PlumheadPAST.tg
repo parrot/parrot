@@ -407,7 +407,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_SEA
     SEA:
         val = $P0
-        code_string = new 'PGE::CodeString'
+        code_string = new 'CodeString'
         ( val ) = code_string.'escape'( val )
         past_val = new 'PAST::Val'                             
         past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              

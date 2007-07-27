@@ -34,7 +34,7 @@ end:
   push_eh exception
     ($P0, $S0) = __expr(arg, 'pir_only'=>1)
   clear_eh
-  pir = new 'PGE::CodeString'
+  pir = new 'CodeString'
   pir .= $P0
 
   pir.emit('  %0 = %1', retval, $S0)

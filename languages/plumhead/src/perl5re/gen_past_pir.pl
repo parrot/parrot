@@ -82,7 +82,7 @@ my $past_pir = <<'END_PAST';
   val = "Hello, World!"                                       
   past_temp = new 'PAST::Val'                                     
   .local pmc code_string                                          
-  code_string = new 'PGE::CodeString'                             
+  code_string = new 'CodeString'                             
   ( val ) = code_string.'escape'( val )                           
       past_temp.'init'( 'name' => val, 'vtype' => '.Undef' )      
   past_echo.'push'( past_temp )                    
