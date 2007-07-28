@@ -1478,7 +1478,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(co
 #endif
         if ((ins->type & ITBRANCH) &&
                 (addr = get_branch_reg(ins)) != 0 &&
-                !(addr->type & VTREGISTER)) {
+                !REG_NEEDS_ALLOC(addr)) {
             /* fixup local jumps - calc offset */
             if (addr->color == -1)
                 IMCC_fatal(interp, 1, "e_pbc_emit: "

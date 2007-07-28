@@ -301,7 +301,7 @@ make_stat(IMC_Unit * unit, int *sets, int *cols)
         SymReg * r = unit->hash[i];
         for (; r; r = r->next)
             for (j = 0; j < 4; j++)
-                if (r->set == type[j] && (r->type & VTREGISTER)) {
+                if (r->set == type[j] && REG_NEEDS_ALLOC(r)) {
                     sets[j]++;
                     if (cols)
                         if (r->color > cols[j])
@@ -394,7 +394,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit, int first)
     for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
         for (; r; r = r->next) {
-            if (r->set != 'K' && r->type & VTREGISTER)
+            if (r->set != 'K' && REG_NEEDS_ALLOC(r))
                 count++;
         }
     }
@@ -409,7 +409,7 @@ build_reglist(Parrot_Interp interp, IMC_Unit * unit, int first)
         SymReg * r = unit->hash[i];
         /* Add each symbol to reglist  */
         for (; r; r = r->next) {
-            if (r->set != 'K' && (r->type & VTREGISTER)) {
+            if (r->set != 'K' && REG_NEEDS_ALLOC(r)) {
                 unit->reglist[count++] = r;
                 /* rearange I/N registers
                  * XXX not here, do it, when reading the source

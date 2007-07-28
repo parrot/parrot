@@ -231,7 +231,7 @@ dump_symreg(NOTNULL(const IMC_Unit *unit))
             "----------------------------------------------\n");
     for (i = 0; i < unit->n_symbols; i++) {
         const SymReg * const r = reglist[i];
-        if (!(r->type & VTREGISTER))
+        if (!REG_NEEDS_ALLOC(r))
             continue;
         if (!r->first_ins)
             continue;
@@ -260,7 +260,7 @@ dump_liveness_status(NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
     for (i = 0; i < unit->n_symbols; i++) {
         const SymReg * const r = reglist[i];
-        if (r->type & VTREGISTER )
+        if (REG_NEEDS_ALLOC(r))
             dump_liveness_status_var(unit, r);
     }
     fprintf(stderr, "\n");

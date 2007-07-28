@@ -744,7 +744,7 @@ link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)
         /* if any component is a variable, we need to track it in
          * life analysis
          */
-        if (keys[i]->type & VTREGISTER)
+        if (REG_NEEDS_ALLOC(keys[i]))
             keychain->type |= VTREGKEY;
 
         key->nextkey = dup_sym(keys[i]);
@@ -753,7 +753,7 @@ link_keys(PARROT_INTERP, int nargs, NOTNULL(SymReg * keys[]), int force)
         /* for registers, point ->reg to the original, needed by
          * life analyses & coloring
          */
-        if (keys[i]->type & VTREGISTER)
+        if (REG_NEEDS_ALLOC(keys[i]))
             key->reg = keys[i];
     }
 

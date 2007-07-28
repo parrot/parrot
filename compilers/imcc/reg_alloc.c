@@ -308,7 +308,7 @@ make_stat(NOTNULL(IMC_Unit *unit), NULLOK(int *sets), NULLOK(int *cols))
             if (r->color > unit->max_color)
                 unit->max_color = r->color;
             for (j = 0; j < 4; j++)
-                if (r->set == type[j] && (r->type & VTREGISTER)) {
+                if (r->set == type[j] && REG_NEEDS_ALLOC(r)) {
                     if (sets)
                         sets[j]++;
                     if (cols)
@@ -434,7 +434,7 @@ build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
         SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             /* Add each symbol to reglist  */
-            if (r->type & VTREGISTER) {
+            if (REG_NEEDS_ALLOC(r)) {
                 unit->reglist[count++] = r;
             }
         }
@@ -809,7 +809,7 @@ first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set != reg_set)
                 continue;
-            if (r->type & VTREGISTER) {
+            if (REG_NEEDS_ALLOC(r)) {
                 if (r->color >= 0)
                     set_add(allocated, r->color);
             }
@@ -847,8 +847,7 @@ allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if ((r->type & VTREGISTER) &&
-                        r->color == -1 &&
+                if (REG_NEEDS_ALLOC(r) && r->color == -1 &&
                         (r->usage & usage)) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(unit, reg_set, NULL);
@@ -874,39 +873,40 @@ allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
 static void
 vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
 {
-    char type[] = "INSP";
     int i, j, reg_set, first_reg;
-    SymReg * r;
-    SymHash *hsh;
-    Set *avail;
-
-    hsh = &unit->hash;
+    char     type[] = "INSP";
+    Set     *avail;
+    SymReg  *r;
+    SymHash *hsh = &unit->hash;
 
     /* Clear the pre-assigned colors. */
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {
-            if (r->type & VTREGISTER) /* TODO Ignore non-volatiles */
+            /* TODO Ignore non-volatiles */
+            if (REG_NEEDS_ALLOC(r))
                 r->color=-1;
         }
     }
 
     /* Assign new colors. */
     for (j = 0; j < 4; j++) {
-        reg_set = type[j];
+        reg_set   = type[j];
         first_reg = first_avail(unit, reg_set, &avail);
+
         for (i = 0; i < hsh->size; i++) {
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if ((r->type & VTREGISTER) && (r->color == -1 )
-                        ) {
+                if (REG_NEEDS_ALLOC(r) && (r->color == -1 )) {
                     if (set_contains(avail, first_reg))
-                        first_reg = first_avail(unit, reg_set, NULL);
+                        first_reg = first_avail(unit, reg_set, &avail);
+
                     set_add(avail, first_reg);
                     r->color = first_reg++;
                 }
             }
         }
+
         set_free(avail);
         unit->first_avail[j] = first_reg;
     }

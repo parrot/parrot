@@ -498,14 +498,14 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
             continue;
         if (p->type & VT_CONSTP)
             p = p->reg;
-        if (p->color >= 0 && (p->type & VTREGISTER)) {
+        if (p->color >= 0 && REG_NEEDS_ALLOC(p)) {
             sprintf(regb[i], "%c%d", p->set, (int)p->color);
             regstr[i] = regb[i];
         }
         else if (IMCC_INFO(interp)->allocated &&
                 (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
                 p->set != 'K' &&
-                p->color < 0 && (p->type & VTREGISTER)) {
+                p->color < 0 && REG_NEEDS_ALLOC(p)) {
                     sprintf(regb[i], "r%c%d", tolower((unsigned char)p->set), -1 - (int)p->color);
                     regstr[i] = regb[i];
         }

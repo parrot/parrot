@@ -633,8 +633,7 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
     }
     else if (!strcmp(name, "set") && n == 2) {
         /* set Px, Py: both PMCs have the same address */
-        if (r[0]->set == r[1]->set &&
-                (r[1]->type & VTREGISTER))
+        if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
             ins->type |= ITALIAS;
     }
     else if (!strcmp(name, "compile"))

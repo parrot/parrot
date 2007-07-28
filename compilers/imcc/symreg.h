@@ -30,6 +30,7 @@ enum VARTYPE {              /* variable type can be */
 
 /* this VARTYPE needs register allocation and such */
 #define VTREGISTER (VTREG | VTIDENTIFIER | VTREGKEY | VTPASM)
+#define REG_NEEDS_ALLOC(r) ((r)->type & VTREGISTER)
 
 enum LIFEFLAG {    /* The status of a var inside a basic block can be */
     LF_use       = 1 << 0, /* block uses the the var before defining it */
