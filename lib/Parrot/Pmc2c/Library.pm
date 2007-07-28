@@ -84,7 +84,7 @@ sub gen_c {
 #include "parrot/dynext.h"
 EOC
     my %pmcs = ( map { $_->{name} => $_ } @{ $pmcs } );
-    
+
     foreach my $name ( keys %pmcs ) {
         my $lcname = lc $name;
         $cout .= <<"EOC";

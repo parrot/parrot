@@ -236,7 +236,7 @@ sub splat {
 
 sub filename {
     my ( $filename, $type ) = @_;
-    
+
     $filename =~ s/(\w+)\.\w+$/pmc_$1.h/ if ($type eq ".h");
     $filename =~ s/\.\w+$/.c/            if ($type eq ".c");
     $filename =~ s/\.\w+$/.dump/         if ($type eq ".dump");

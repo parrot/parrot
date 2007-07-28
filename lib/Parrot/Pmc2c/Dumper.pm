@@ -32,7 +32,7 @@ sub dump_pmc {
     my $pmc2cMain = $self;
     my @files = @{ $pmc2cMain->{args} };
     my $pmcs;
-    
+
     # help those dumb 'shells' that are not shells
     @files = glob $files[0] if ( $files[0] eq 'src/pmc/*.pmc' );
 
@@ -111,7 +111,7 @@ sub gen_parent_lookup_info {
         for my $parent_name ( @{ [ @{ $pmcs->{$current_pmc_name}->parents } ] } ) {
             next if $parent_name eq 'default';
             #load $parent_name pmc into $pmcs if needed
-            $pmcs->{$parent_name} = 
+            $pmcs->{$parent_name} =
                 $pmc2cMain->read_dump( lc("$parent_name.pmc") ) if not $pmcs->{$parent_name};
 
             $pmc->add_parent($pmcs->{$parent_name});
@@ -164,7 +164,7 @@ B<Comments:>  Called within C<dump_pmc()>.
 sub gen_parent_reverse_lookup_info {
     my ( $pmc, $pmcs, $vt ) = @_;
 
-    # for each vt_meth in pmc, locate the implementing 
+    # for each vt_meth in pmc, locate the implementing
     foreach my $vt_method_name ( @{ $vt->names } ) {
         next if $pmc->super_method($vt_method_name); #skip if super mapping is already set
 

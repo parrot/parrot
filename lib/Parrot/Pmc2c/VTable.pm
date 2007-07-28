@@ -26,7 +26,7 @@ sub build {
     my $vtable_table = parse_vtable($filename);
 
     my ( %method_lookup, @methods, @method_names );
-    
+
     foreach my $entry (@$vtable_table) {
         $method_lookup{ $entry->[1] } = scalar @methods;
         push @methods, Parrot::Pmc2c::Method->new(
@@ -71,7 +71,7 @@ sub prefix {
 sub dump {
     my ( $self ) = @_;
 
-    my $dump_filename = cwd() . q{/} . basename( 
+    my $dump_filename = cwd() . q{/} . basename(
         Parrot::Pmc2c::UtilFunctions::filename($self->filename, '.dump') );
     my $Dumper = Data::Dumper->new( [$self], ['class'] );
     $Dumper->Indent(3);

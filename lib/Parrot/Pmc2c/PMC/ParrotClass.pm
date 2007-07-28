@@ -60,7 +60,7 @@ sub pre_method_gen {
         next if exists $dont_delegate->{ $vt_method_name };
         next unless $self->normal_unimplemented_vtable($vt_method_name);
         my $composed_method = Parrot::Pmc2c::ComposedMethod->new(
-          { 
+          {
             name => $vt_method_name,
             parent_name => 'delegate',
             type => Parrot::Pmc2c::Method::VTABLE,
@@ -70,7 +70,7 @@ sub pre_method_gen {
     $self->add_mixin('delegate');
     return 1;
 }
- 
+
 1;
 
 # Local Variables:

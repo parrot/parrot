@@ -61,15 +61,15 @@ sub pre_method_gen {
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
-        my $new_default_method = $method->clone({ 
-                parent_name => $self->name, 
+        my $new_default_method = $method->clone({
+                parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
           });
-    
+
         my $n    = 0;
         my @args = grep { $n++ & 1 ? $_ : 0 } split / /, $method->parameters;
         my $arg  = @args ? ", " . join( ' ', @args ) : '';
-        
+
         my $pre        = $self->prederef($method);
         my $post       = $self->postderef($method);
         my $deref      = $self->raw_deref($method);

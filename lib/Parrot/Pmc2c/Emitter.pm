@@ -12,7 +12,7 @@ use Data::Dumper;
 
 sub new {
     my ( $class, $filename ) = @_;
-    my $self = { 
+    my $self = {
         filename => $filename,
     };
     bless $self, (ref($class) || $class);
@@ -102,7 +102,7 @@ sub annotate {
     $self->{output} = "";
     $self->{current_file} = $self->filename;
     $self->{current_line} = 1;
- 
+
     $self->annotate_worker($self);
 
     my $output = $self->{output};
@@ -116,7 +116,7 @@ sub annotate {
 
 sub annotate_worker {
     my ( $self, $it ) = @_;
-    
+
     if ( $it->{items} ) {
         for my $x ( @{ $it->{items} } ) {
             $self->annotate_worker($x);

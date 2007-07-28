@@ -4,7 +4,7 @@
 #
 =head1 NAME
 
-Parrot::Pmc2c::PMC - PMC model object  
+Parrot::Pmc2c::PMC - PMC model object
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ sub create {
 sub new {
     my ( $class, $self ) = @_;
     $self = {} unless $self;
-    $self = { ( 
+    $self = { (
         methods => [],
         super => {},
         variant => '',

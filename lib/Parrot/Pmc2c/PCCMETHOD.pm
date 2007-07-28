@@ -214,7 +214,7 @@ sub rewrite_PCCRETURNs {
       ;?)              #optional semicolon
     }sx;
 
-    croak "return not allowed in pccmethods, use PCCRETURN instead $body" 
+    croak "return not allowed in pccmethods, use PCCRETURN instead $body"
         if ( $body and $body =~ m/\breturn\b/ );
 
 
@@ -258,7 +258,7 @@ END
 END
         $matched->replace($match, $e);
     }
-    
+
     return $regs_used, $qty_returns;
 }
 
@@ -348,7 +348,7 @@ sub find_max_regs {
 
 sub rewrite_pccmethod {
     my ($self, $pmc) = @_;
-    
+
     my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
     my $e_post = Parrot::Pmc2c::Emitter->new($pmc->filename);
 
@@ -461,7 +461,7 @@ END
     $e_body->emit($e_post);
     $self->body($e_body);
     $self->{PCCMETHOD} = 1;
-    
+
     return 1;
 }
 
@@ -486,7 +486,7 @@ sub rewrite_pccinvoke {
       ;?               #optional semicolon
       )
     }sx;
-    
+
     while ($body) {
         my $matched = undef;
         if ( $body ) {

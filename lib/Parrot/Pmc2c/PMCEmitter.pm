@@ -171,7 +171,7 @@ sub fixup_singleton {
     #
     # Note that this trick won't work if the singleton inherits from something else
     # (because the MRO will still be shared).
-    unless ( $self->implements_vtable('pmc_namespace') 
+    unless ( $self->implements_vtable('pmc_namespace')
             or $self->super_method('pmc_namespace') ne 'default' ) {
         my $body = Parrot::Pmc2c::Emitter->text("  return INTERP->vtables[SELF->vtable->base_type]->_namespace;\n");
         $self->add_method( Parrot::Pmc2c::Method->new( {
@@ -335,7 +335,7 @@ sub find_mmd_methods {
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $vt_method->name;
         next unless $vt_method->is_mmd;
-       
+
 
         my $implementor;
         if ( !$self->implements_vtable($vt_method_name) ) {
@@ -521,7 +521,7 @@ EOC
             PObj_constant_FLAG|PObj_external_FLAG);
         vt_clone->isa_str = string_make(interp, "$isa", @{[length($isa)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-        vt_clone->does_str = string_make(interp, "$does", @{[length($does)]}, "ascii", 
+        vt_clone->does_str = string_make(interp, "$does", @{[length($does)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
 EOC
     }

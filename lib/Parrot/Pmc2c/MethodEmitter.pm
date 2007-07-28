@@ -68,7 +68,7 @@ sub generate_body {
 sub generate_headers {
     my ( $self, $pmc ) = @_;
     my $hout = "";
-    
+
     $hout .= $self->decl( $pmc, 'HEADER' );
 
     for my $mmd ( @{ $self->mmds } ) {
@@ -175,7 +175,7 @@ sub rewrite_nci_method {
     my ( $self, $pmc ) = @_;
     my $pmcname = $pmc->name;
     my $body = $self->body;
-    
+
     # Rewrite DYNSELF.other_method(args...)
     $body->subst( qr{
     \bDYNSELF\b       # Macro: DYNSELF
@@ -215,7 +215,7 @@ sub rewrite_vtable_method {
     my $super_table = $pmc->{super};
     my $body = $self->body;
     my $sub;
-    
+
     # Rewrite method body
     # Some MMD variants don't have a super mapping.
     if ($super)
@@ -279,7 +279,7 @@ sub rewrite_vtable_method {
         \.(\w+)           # other_method
         \(\s*(.*?)\)      # capture argument list
       }x,
-      sub { "Parrot_${1}" .  ($pmc->is_vtable_method($3) ? "" : "_nci") . "_$3(" 
+      sub { "Parrot_${1}" .  ($pmc->is_vtable_method($3) ? "" : "_nci") . "_$3("
         . full_arguments($4, $2) . ')'});
 
     # Rewrite SELF.other_method(args...)

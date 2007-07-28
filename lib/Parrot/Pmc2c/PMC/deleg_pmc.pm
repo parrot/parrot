@@ -24,8 +24,8 @@ sub pre_method_gen {
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
-        my $new_method = $method->clone({ 
-                parent_name => $self->name, 
+        my $new_method = $method->clone({
+                parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
           });
 

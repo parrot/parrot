@@ -326,7 +326,7 @@ sub find_file {
         my $path = File::Spec->catfile( $dir, $file );
         return $path if -e $path;
     }
-    
+
     print Carp::longmess;
     die "cannot find file '$file' in path '", join( "', '", @includes ), "'" if $die_unless_found;
     return;

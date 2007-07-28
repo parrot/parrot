@@ -59,7 +59,7 @@ sub parse_pmc {
 
     my ($preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines)
         = parse_top_level( $code );
-   
+
     my $pmc = Parrot::Pmc2c::PMC->create($pmcname);
     $pmc->preamble( Parrot::Pmc2c::Emitter->text($preamble, $filename, 1));
     $pmc->name($pmcname);
@@ -91,7 +91,7 @@ sub parse_pmc {
 
     while ( $pmcbody =~ s/($signature_re)// ) {
         $lineno += count_newlines($1);
-        my ( $marker, $return_type, $methodname, $parameters, $attrs) 
+        my ( $marker, $return_type, $methodname, $parameters, $attrs)
             = ( $2, $3, $4, $5, parse_method_attrs($6));
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
         $methodblock = strip_outer_brackets($methodblock);
@@ -235,7 +235,7 @@ the code found after the pmc body
 
 =item *
 
-number of newlines in the pmc signatuer that need to be addde to the 
+number of newlines in the pmc signatuer that need to be addde to the
 running total of lines in the file
 
 =back
@@ -270,7 +270,7 @@ sub parse_top_level {
     $body = strip_outer_brackets($body); # trim out the { }
     return ($preamble, $pmcname, $flags, $parents, $body, $postamble, $chewed_lines);
 }
-  
+
 our %has_value = map { $_ => 1 } qw(group hll);
 our %has_values = map { $_ => 1 } qw(does extends maps lib);
 
@@ -339,7 +339,7 @@ C<Badly balanced> if not balanced.
 sub extract_balanced {
     my $code = shift;
     my $unbalanced = 0;
-    
+
     die "Unexpected whitespace, expecting" if $code =~ /^\s+/;
     die "bad block open: ", substr( $code, 0, 10 ), "..." unless $code =~ /^\{/;
 
