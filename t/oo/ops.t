@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -204,6 +204,31 @@ pir_output_is( <<'CODE', <<'OUT', 'new_p_s works with string register arg' );
 .end
 CODE
 100
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'can_i_p_s' );
+.sub main :main
+    $P0 = newpdd15class "Foo"
+    $P1 = new $P0
+
+    can $I0, $P1, "bar"
+
+    if $I0 goto can_bar
+    print "not "
+  can_bar:
+    print "ok 1\n"
+
+    $P1.'bar'()
+.end
+
+.namespace ["Foo"]
+.sub bar :method
+    print "called bar\n"
+.end
+
+CODE
+ok 1
+called bar
 OUT
 
 # Local Variables:
