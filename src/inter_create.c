@@ -12,8 +12,6 @@ Create or destroy a Parrot interpreter
 
 =head2 Functions
 
-=over 4
-
 =cut
 
 */
