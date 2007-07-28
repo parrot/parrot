@@ -795,17 +795,16 @@ map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL
 static int
 first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
 {
-    int i, n, first;
-    SymHash *hsh;
-    Set *allocated;
+    int      n         = unit->n_symbols > unit->max_color ?
+                         unit->n_symbols : unit->max_color;
+    Set     *allocated = set_make(n + 1);
+    SymHash *hsh       = &unit->hash;
 
-    n = unit->n_symbols;
-    if (unit->max_color > n)
-        n = unit->max_color;
-    allocated = set_make(n + 1);
-    hsh = &unit->hash;
+    int i, first;
+
+    /* find allocated registers */
     for (i = 0; i < hsh->size; i++) {
-        SymReg * r;
+        SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set != reg_set)
                 continue;
@@ -815,11 +814,14 @@ first_avail(NOTNULL(IMC_Unit *unit), int reg_set, NULLOK(Set **avail))
             }
         }
     }
+
     first = set_first_zero(allocated);
+
     if (avail)
         *avail = allocated;
     else
         set_free(allocated);
+
     return first;
 }
 
@@ -884,7 +886,7 @@ vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
         for (r = hsh->data[i]; r; r = r->next) {
             /* TODO Ignore non-volatiles */
             if (REG_NEEDS_ALLOC(r))
-                r->color=-1;
+                r->color = -1;
         }
     }
 
@@ -899,7 +901,7 @@ vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
                     continue;
                 if (REG_NEEDS_ALLOC(r) && (r->color == -1 )) {
                     if (set_contains(avail, first_reg))
-                        first_reg = first_avail(unit, reg_set, &avail);
+                        first_reg = first_avail(unit, reg_set, NULL);
 
                     set_add(avail, first_reg);
                     r->color = first_reg++;

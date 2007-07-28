@@ -10,7 +10,9 @@
     exit(e); \
 } while (0)
 
-#define NUM_BYTES(length) ((length / 8) + 1)
+#define NUM_BYTES(length)    ((length / 8) + 1)
+#define BYTE_IN_SET(element) (element >> 3)
+#define BIT_IN_BYTE(element) (1 << (element & 7))
 
 PARROT_MALLOC
 Set*
@@ -60,7 +62,6 @@ set_copy(NOTNULL(Set *s))
     return d;
 }
 
-
 int
 set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 {
@@ -89,7 +90,16 @@ set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
 void
 set_add(NOTNULL(Set *s), int element)
 {
-    s->bmp[element >> 3] |= (1 << (element & 7));
+    const int elem_byte_in_set = BYTE_IN_SET(element);
+    const int bytes_in_set     = BYTE_IN_SET(s->length);
+
+    if (bytes_in_set < elem_byte_in_set) {
+        s->bmp = mem_sys_realloc_zeroed(s->bmp, NUM_BYTES(element),
+            NUM_BYTES(s->length));
+        s->length += 8;
+    }
+
+    s->bmp[elem_byte_in_set] |= BIT_IN_BYTE(element);
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -111,13 +121,14 @@ PARROT_PURE_FUNCTION
 int
 set_contains(NOTNULL(const Set *s), int element)
 {
-#ifdef __LCC__
     /* workaround for another lcc bug.. */
-    const int tmp = (1 << (element & 7));
-    return s->bmp[element >> 3] & tmp;
-#else
-    return s->bmp[element >> 3] & (1 << (element & 7));
-#endif
+    const int byte_in_set = element >> 3;
+    const int pos_in_byte = BIT_IN_BYTE(element);
+
+    if (element > s->length)
+        return 0;
+
+    return s->bmp[byte_in_set] & pos_in_byte;
 }
 
 PARROT_MALLOC
@@ -131,7 +142,7 @@ set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
         fatal(1, "set_union", "Sets don't have the same length\n");
     }
 
-    for (i=0; i < NUM_BYTES(s1->length); i++) {
+    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] | s2->bmp[i];
     }
 
@@ -149,7 +160,7 @@ set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
         fatal(1, "set_intersec", "Sets don't have the same length\n");
     }
 
-    for (i=0; i < NUM_BYTES(s1->length); i++) {
+    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
         s->bmp[i] = s1->bmp[i] & s2->bmp[i];
     }
 
@@ -165,7 +176,7 @@ set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))
         fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
     }
 
-    for (i=0; i < NUM_BYTES(s1->length); i++) {
+    for (i=0; i < BYTE_IN_SET(s1->length); i++) {
         s1->bmp[i] &= s2->bmp[i];
     }
 }
