@@ -516,9 +516,11 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     .local pmc temp
     .local pmc array
 
-    newpdd15class temp, "TestClass"
+    load_bytecode "dumper.pbc"
 
-    new array, .ResizablePMCArray
+    temp = newpdd15class "TestClass"
+
+    array = new .ResizablePMCArray
     o = temp.'new'()
     push array, o
     o = temp.'new'()
@@ -555,8 +557,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     .return()
 .end
-.namespace
-.include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
     PMC 'Object' {
