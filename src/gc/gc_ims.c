@@ -531,7 +531,6 @@ gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     Small_Object_Arena *new_arena;
     size_t size;
-    UINTVAL start, end;
 
     pool->objects_per_alloc  = ALLOCATION_BLOCK_SIZE / pool->object_size;
 
@@ -542,9 +541,7 @@ gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
     Parrot_append_arena_in_pool(interp, pool, new_arena, size);
 
-    start = 0;
-    end = pool->objects_per_alloc;
-    Parrot_add_to_free_list(interp, pool, new_arena, start, end);
+    Parrot_add_to_free_list(interp, pool, new_arena);
 }
 
 static void

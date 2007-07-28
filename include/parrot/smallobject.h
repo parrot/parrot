@@ -148,9 +148,7 @@ Small_Object_Pool * new_small_object_pool(
 
 void Parrot_add_to_free_list( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(Small_Object_Arena *arena),
-    UINTVAL start,
-    UINTVAL end )
+    NOTNULL(Small_Object_Arena *arena) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
