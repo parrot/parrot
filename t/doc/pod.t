@@ -88,6 +88,9 @@ foreach my $file (@files) {
 my $bad_files = join( "\n", @failed );
 is( $bad_files, q{}, 'Pod syntax correct' );    # only ok if everything passed
 
+diag("You should use podchecker to check the failed files.\n")
+    if $bad_files;
+
 # Pulled from Test::Pod
 sub file_pod_ok {
     my $file    = shift;
