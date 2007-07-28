@@ -765,7 +765,7 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_confess(NOTNULL(const char *cond), NOTNULL(const char *file), unsigned int line)
 {
-    printf ("%s:%u: failed assertion '%s'\n", file, line, cond);
+    fprintf(stderr, "%s:%u: failed assertion '%s'\n", file, line, cond);
     Parrot_print_backtrace();
     exit(EXIT_FAILURE);
 }
