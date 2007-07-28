@@ -1350,17 +1350,6 @@ make_writable(PARROT_INTERP, NOTNULL(STRING **s),
         Parrot_unmake_COW(interp, *s);
 }
 
-#define BITWISE_AND_STRINGS(type1, type2, restype, s1, s2, res, minlen) \
-do { \
-    const type1 *curr1 = (type1 *)s1->strstart; \
-    const type2 *curr2 = (type2 *)s2->strstart; \
-    restype     *dp    = (restype *)res->strstart; \
-    size_t       len   = minlen; \
- \
-    for (; len ; ++curr1, ++curr2, ++dp, --len) \
-        *dp = *curr1 & *curr2; \
-} while (0)
-
 /*
 
 FUNCDOC: string_bitwise_and
@@ -1421,8 +1410,15 @@ string_bitwise_and(PARROT_INTERP, NULLOK(STRING *s1),
 
     make_writable(interp, &res, minlen, enum_stringrep_one);
 
-    BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
-            Parrot_UInt1, s1, s2, res, minlen);
+    { /* bitwise AND the strings */
+        const Parrot_UInt1 *curr1 = (Parrot_UInt1 *)s1->strstart;
+        const Parrot_UInt1 *curr2 = (Parrot_UInt1 *)s2->strstart;
+        Parrot_UInt1       *dp    = (Parrot_UInt1 *)res->strstart;
+        size_t len = minlen;
+
+        while (len--)
+            *dp++ = *curr1++ & *curr2++;
+    }
 
     res->bufused = res->strlen = minlen;
 
