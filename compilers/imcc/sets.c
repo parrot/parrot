@@ -107,11 +107,19 @@ PARROT_PURE_FUNCTION
 int
 set_first_zero(NOTNULL(const Set *s))
 {
-    int i;
+    int i, j;
 
-    for (i = 0; i < s->length; ++i)
-        if (!set_contains(s, i))
-            return i;
+    for (i = 0; i < NUM_BYTES(s->length); ++i) {
+        int set_byte = s->bmp[i];
+        if (set_byte == 0xFF)
+            continue;
+
+        for (j = 0; j < 8; ++j) {
+            int element = i * 8 + j;
+            if (!set_contains(s, element))
+                return element;
+        }
+    }
 
     return s->length;
 }
