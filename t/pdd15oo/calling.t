@@ -993,8 +993,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     print " "
     print s
 .end
-.sub baz
-    .param pmc self
+.sub baz :method
     .param string s
     print self
     print " "
@@ -1005,10 +1004,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     .return ($S0)
 .end
 CODE
-Foo ok 1
-Foo ok 2
-Foo ok 3
-Foo ok 4
+parrot;Foo ok 1
+parrot;Foo ok 2
+parrot;Foo ok 3
+parrot;Foo ok 4
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 2" );
