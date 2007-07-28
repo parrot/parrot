@@ -29,7 +29,7 @@ pmclass TclInt
         else
             DYNSELF.set_integer_native( VTABLE_get_integer(INTERP, value) );
     }
-    
+
 
     /*
      * MMD Override:
