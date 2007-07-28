@@ -1,13 +1,9 @@
 /* interpreter.h
- *  Copyright (C) 2001-2006, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     The interpreter api handles running the operations
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ *     The interpreter API handles running the operations
  */
 
 #ifndef PARROT_INTERPRETER_H_GUARD
@@ -489,11 +485,22 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
                                        const char * program );
 
 /* embed.c */
-PARROT_API void Parrot_init(Interp *);
+PARROT_API void Parrot_init(PARROT_INTERP);
 
-/* inter_create.c */
-PARROT_API Interp *make_interpreter(Interp * parent, INTVAL);
-PARROT_API void Parrot_destroy(Interp *);
+/* HEADERIZER BEGIN: src/inter_create.c */
+
+PARROT_API
+PARROT_CANNOT_RETURN_NULL
+Parrot_Interp make_interpreter( NULLOK(Interp *parent), INTVAL flags );
+
+PARROT_API
+void Parrot_destroy( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void Parrot_really_destroy( PARROT_INTERP, int exit_code, void *arg )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/inter_create.c */
 
 /* HEADERIZER BEGIN: src/inter_run.c */
 
@@ -680,13 +687,26 @@ void runops( PARROT_INTERP, size_t offs )
 
 /* HEADERIZER END: src/inter_run.c */
 
-/* inter_cb.c */
-PARROT_API void Parrot_run_callback(Parrot_Interp, PMC* cbi, char *ext);
+/* HEADERIZER BEGIN: src/inter_cb.c */
 
-PARROT_API void Parrot_callback_C(char *external_data, PMC *callback_info);
-PARROT_API void Parrot_callback_D(PMC *callback_info, char *external_data);
-PARROT_API PMC* Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
-        STRING* cb_signature);
+PARROT_API
+void Parrot_callback_C( char *external_data, PMC *user_data );
+
+PARROT_API
+void Parrot_callback_D( PMC *user_data, char *external_data );
+
+PARROT_API
+PMC* Parrot_make_cb( PARROT_INTERP,
+    PMC* sub,
+    PMC* user_data,
+    STRING *cb_signature )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_run_callback( PARROT_INTERP, PMC* user_data, char* external_data )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/inter_cb.c */
 
 /* inter_misc.c */
 PARROT_API INTVAL interpinfo(PARROT_INTERP, INTVAL what);

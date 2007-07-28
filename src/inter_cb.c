@@ -28,7 +28,15 @@ the C-library.
 #include "inter_cb.str"
 
 
-/* HEADERIZER HFILE: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* HEADERIZER HFILE: include/parrot/interpreter.h */
+
+/* HEADERIZER BEGIN: static */
+
+static void callback_CD( PARROT_INTERP, char *external_data, PMC *user_data )
+        __attribute__nonnull__(1);
+
+static void verify_CD( char *external_data, PMC *user_data );
+/* HEADERIZER END: static */
 
 /*
 

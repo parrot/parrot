@@ -23,7 +23,18 @@ Create or destroy a Parrot interpreter
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 
-/* HEADERIZER HFILE: none */ /* XXX Headerize this at the same time as the other interpreter files */
+/* HEADERIZER HFILE: include/parrot/interpreter.h */
+
+/* HEADERIZER BEGIN: static */
+
+PARROT_WARN_UNUSED_RESULT
+static int is_env_var_set( NOTNULL(const char* var) )
+        __attribute__nonnull__(1);
+
+static void setup_default_compreg( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
 
 #if EXEC_CAPABLE
 Interp interpre;
@@ -33,14 +44,13 @@ Interp interpre;
 
 /*
 
-=item C<static int is_env_var_set(const char* var)>
+FUNCDOC: is_env_var_set
 
 Checks whether the specified environment variable is set.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 is_env_var_set(NOTNULL(const char* var))
 {
@@ -59,11 +69,9 @@ is_env_var_set(NOTNULL(const char* var))
 
 /*
 
-=item C<static void setup_default_compreg(PARROT_INTERP)>
+FUNCDOC: setup_default_compreg
 
 Setup default compiler for PASM.
-
-=cut
 
 */
 
@@ -281,15 +289,12 @@ Parrot_destroy(PARROT_INTERP)
 
 /*
 
-=item C<void
-Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)>
+FUNCDOC: Parrot_really_destroy
 
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
 Note that C<exit_code> is ignored.
-
-=cut
 
 */
 
@@ -449,13 +454,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/interpreter.c>.
-
-=cut
 
 */
 
