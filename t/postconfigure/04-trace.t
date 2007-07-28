@@ -38,7 +38,7 @@ eval {
     } );
 };
 like($@, qr/^Unable to retrieve storable file of configuration step data/,
-    "Correctly failed due to non-existent config data file"); 
+    "Correctly failed due to non-existent config data file");
 
 ok($obj = Parrot::Configure::Trace->new(),
     "Constructor returned true");

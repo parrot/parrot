@@ -23,7 +23,7 @@ my $cwd = cwd();
     my $tdir1 = tempdir();
     my $parrot_version = Parrot::BuildUtil::parrot_version();
     my $args = process_options( {
-        argv            => [ 
+        argv            => [
                             qq{--prefix=$tdir},
                             qq{--exec-prefix=$tdir},
                             qq{--bindir=$tdir1},
@@ -43,7 +43,7 @@ my $cwd = cwd();
         parrot_version  => $parrot_version,
         svnid           => '$Id$',
     } );
-    
+
     my $conf = Parrot::Configure->new;
     test_step_thru_runstep($conf, q{init::install}, $args, 0);
 
