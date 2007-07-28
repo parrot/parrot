@@ -892,6 +892,18 @@ Parrot ever leave a pool with no interpreters at all.
 
 =back 
 
+=head1 QUESTIONS
+
+=over 4
+
+=item *
+
+Do we need a concurrent version of C<runinterp>? Needs to accept an interp and
+sub argument, as well as an event sub to throw on returning. Also returns a
+status object.
+
+=back
+
 =head1 IMPLEMENTATION
 
 [Excerpt from Perl 6 and Parrot Essentials to seed discussion.]
