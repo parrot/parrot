@@ -59,7 +59,7 @@ Initializes the continuation.
 
     void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         /* PANIC("don't do that"); */
         /*
