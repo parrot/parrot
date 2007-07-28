@@ -42,15 +42,15 @@ These are the opcodes relevant to exceptions and exception handlers:
 
 =over
 
-=item B<push_eh I<SUB_LABEL>>
+=item B<push_eh I<LABEL>>
 
 =item B<push_eh I<INVOCABLE_PMC>>
 
 Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine --
 onto the exception handler stack.
 
-If a I<SUB_LABEL> is provided, Parrot automatically performs the equivalent of
-a C<newclosure> operation on the given subroutine, and pushes the resulting
+If a I<LABEL> is provided, Parrot automatically performs the equivalent of
+a C<newclosure> operation on the current subroutine, and pushes the resulting
 closure.
 
 When an exception is thrown, Parrot walks up the stack of active exception
