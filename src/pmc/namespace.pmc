@@ -211,6 +211,9 @@ really a public API.
 
                 /* Insert it. */
                 VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
+
+                /* insert it in the parent temporarily until PDD 15 lands */
+                SUPER(key, value);
             }
 
             /* If it's anonymous, we're done. */
