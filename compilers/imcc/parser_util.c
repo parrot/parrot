@@ -937,6 +937,7 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
  * Note: This function is provided for backward compatibility. This
  * function can go away in future.
  */
+PARROT_CANNOT_RETURN_NULL
 void *
 IMCC_compile_file(PARROT_INTERP, NOTNULL(const char *s))
 {
@@ -944,6 +945,7 @@ IMCC_compile_file(PARROT_INTERP, NOTNULL(const char *s))
     return imcc_compile_file(interp, s, &error_message);
 }
 
+PARROT_CANNOT_RETURN_NULL
 void *
 IMCC_compile_file_s(PARROT_INTERP, NOTNULL(const char *s),
                    NOTNULL(STRING **error_message))

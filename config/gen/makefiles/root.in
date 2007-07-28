@@ -2023,6 +2023,7 @@ HEADERIZER_O_FILES = \
     src/inter_call$(O) \
     src/inter_cb$(O) \
     src/inter_create$(O) \
+    src/inter_misc$(O) \
     src/inter_run$(O) \
     src/interpreter$(O) \
     src/intlist$(O) \

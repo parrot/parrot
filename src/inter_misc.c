@@ -12,31 +12,25 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 
 #include "parrot/parrot.h"
 #include "inter_misc.str"
 
-/* HEADERIZER HFILE: none */ /* XXX Needs to get done at the same time as the other interpreter files */
+/* XXX Put me somewhere else */
+void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
+
+/* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /*
 
-=item C<void
-register_nci_method(PARROT_INTERP, int type,
-                    void *func, const char *name, const char *proto)>
+FUNCDOC: register_nci_method
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
 
-=cut
-
 */
-void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
 
 PARROT_API
 void
@@ -91,20 +85,16 @@ register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
 
 /*
 
-=item C<void
-Parrot_mark_method_writes(PARROT_INTERP,
-                          int type, const char *name)>
+FUNCDOC: Parrot_mark_method_writes
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
-
-=cut
 
 */
 
 PARROT_API
 void
-Parrot_mark_method_writes(PARROT_INTERP,
-                               int type, const char *name) {
+Parrot_mark_method_writes(PARROT_INTERP, int type, NOTNULL(const char *name))
+{
     STRING *const str_name = const_string(interp, name);
     PMC *const pmc_true = pmc_new(interp, enum_class_Integer);
     PMC *const method = VTABLE_get_pmc_keyed_str(
@@ -155,22 +145,20 @@ Compile code string.
 */
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_compile_string(PARROT_INTERP, STRING *type,
-                      char *code, STRING **error)
+Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
+        NOTNULL(const char *code), NOTNULL(STRING **error))
 {
-    if (!string_compare(interp, const_string(interp, "PIR"),
-        type)) {
+    if (string_compare(interp, const_string(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
-    }
-    else if (!string_compare(interp,const_string(interp,
-        "PASM"), type)) {
+
+    if (string_compare(interp,const_string(interp, "PASM"), type) == 0)
         return IMCC_compile_pasm_s(interp, code, error);
-    }
-    else {
-        *error=const_string(interp, "Invalid interpreter type");
-        return NULL;
-    }
+
+    *error=const_string(interp, "Invalid interpreter type");
+    return NULL;
 }
 
 /*
@@ -182,9 +170,9 @@ Compile code file.
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_compile_file(PARROT_INTERP, char *fullname,
-                    STRING **error)
+Parrot_compile_file(PARROT_INTERP, NOTNULL(const char *fullname), NOTNULL(STRING **error))
 {
     return IMCC_compile_file_s(interp, fullname, error);
 }
@@ -210,16 +198,15 @@ extern struct mallinfo mallinfo(void);
 
 /*
 
-=item C<INTVAL
-interpinfo(PARROT_INTERP, INTVAL what)>
-
-=item C<PMC*
-interpinfo_p(PARROT_INTERP, INTVAL what)>
+FUNCDOC: interpinfo
 
 C<what> specifies the type of information you want about the
 interpreter.
 
-=cut
+FUNCDOC: interpinfo_p
+
+C<what> specifies the type of information you want about the
+interpreter.
 
 */
 
@@ -298,6 +285,8 @@ interpinfo(PARROT_INTERP, INTVAL what)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC*
 interpinfo_p(PARROT_INTERP, INTVAL what)
 {
@@ -324,6 +313,8 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 }
 
 PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING*
 interpinfo_s(PARROT_INTERP, INTVAL what)
 {
@@ -356,18 +347,15 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             fullname = string_from_cstring(interp, fullname_c, 0);
             mem_sys_free(fullname_c);
             return fullname;
+    } /* switch */
 
-        default:        /* or a warning only? */
-            real_exception(interp, NULL, UNIMPLEMENTED,
-                    "illegal argument in interpinfo");
-    }
-    return NULL;
+    real_exception(interp, NULL, UNIMPLEMENTED,
+            "illegal argument in interpinfo");
 }
 
 /*
 
-=item C<INTVAL
-sysinfo_i(PARROT_INTERP, INTVAL info_wanted)>
+FUNCDOC: sysinfo_i
 
 Returns the system info.
 
@@ -379,10 +367,9 @@ C<info_wanted> is one of:
 
 In unknown info is requested then -1 is returned.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 {
@@ -400,8 +387,7 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 
 /*
 
-=item C<STRING *
-sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
+FUNCDOC: sysinfo_s
 
 Returns the system info string.
 
@@ -415,10 +401,10 @@ C<info_wanted> is one of:
 
 If unknown info is requested then and empty string is returned.
 
-=cut
-
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 {
@@ -433,19 +419,6 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
         return CONST_STRING(interp, "");
     }
 }
-/*
-
-=back
-
-=head1 SEE ALSO
-
-F<include/parrot/interpreter.h>.
-
-=cut
-
-*/
-
-
 
 /*
  * Local variables:

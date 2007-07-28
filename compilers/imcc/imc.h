@@ -168,10 +168,12 @@ PMC * imcc_compile( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
+PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file( PARROT_INTERP, NOTNULL(const char *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file_s( PARROT_INTERP,
     NOTNULL(const char *s),
     NOTNULL(STRING **error_message) )
