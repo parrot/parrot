@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,7 +24,6 @@ package Parrot::Pmc2c::Library;
 
 use strict;
 use warnings;
-use Data::Dumper;
 use Parrot::Pmc2c::PMCEmitter;
 use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew);
 
@@ -69,7 +68,7 @@ EOH
 
 =item C<gen_c>
 
-rites the C file for the library.
+Writes the C file for the library.
 
 =cut
 
