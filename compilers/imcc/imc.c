@@ -143,6 +143,7 @@ imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
         imc_compile_unit(interp, unit);
     }
 #endif
+
     IMCC_INFO(interp)->cur_unit = NULL;
 }
 
