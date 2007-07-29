@@ -560,7 +560,7 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, NOTNULL(ch
     return;
 }
 
-int
+void
 imcc_initialize(PARROT_INTERP)
 {
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
@@ -583,8 +583,6 @@ imcc_initialize(PARROT_INTERP)
         IMCC_INFO(interp)->optimizer_level = OPT_PRE;
 #endif
     }
-
-    return 1;
 }
 
 static void
