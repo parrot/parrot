@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 45;
+use Test::More qw(no_plan); # tests => 45;
 use Carp;
 use File::Basename;
 use File::Copy;
@@ -48,7 +48,10 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/array.pmc"
+    );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -74,14 +77,8 @@ my ( $tie, $msg, @lines );
     ok( $self->dump_pmc(), "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
 
-    {
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        $rv = $self->gen_c();
-        @lines = $tie->READLINE;
-#        untie *STDERR or croak "Unable to untie";
-        ok( $rv, "gen_c completed successfully; args:  default.pmc" );
-    }
+    $rv = $self->gen_c();
+    ok( $rv, "gen_c completed successfully; args:  default.pmc" );
 
 
     ok( chdir $cwd, "changed back to original directory" );
@@ -96,7 +93,10 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/array.pmc"
+    );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -123,14 +123,8 @@ my ( $tie, $msg, @lines );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
 
-    {
-        $tie = tie *STDERR, "Parrot::IO::Capture::Mini"
-            or croak "Unable to tie";
-        $rv = $self->gen_c();
-        @lines = $tie->READLINE;
-#        untie *STDERR or croak "Unable to untie";
-        ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
-    }
+    $rv = $self->gen_c();
+    ok( $rv, "gen_c completed successfully; args:  default.pmc and array.pmc" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -144,7 +138,10 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc", );
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/array.pmc"
+    );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -167,14 +164,19 @@ my ( $tie, $msg, @lines );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    # $self->dump_pmc();
+    ### $self->dump_pmc();
 
-    eval { $rv = $self->gen_c(); };
-    like(
-        $@,
-        qr<^cannot find file '.*/src/pmc/default.dump' in path>,
-        "gen_c() predictably failed because dump_pmc() was not called first"
-    );
+    {
+        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        eval { $rv = $self->gen_c(); };
+        @lines = $tie->READLINE;
+        like(
+            $@,
+            qr<^cannot find file '.*/src/pmc/default.dump' in path>,
+            "gen_c() predictably failed because dump_pmc() was not called first"
+        );
+    }
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -188,7 +190,10 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/class.pmc", );
+    my @pmcfiles = (
+        "$main::topdir/src/pmc/default.pmc",
+        "$main::topdir/src/pmc/class.pmc"
+    );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -215,10 +220,8 @@ my ( $tie, $msg, @lines );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/class.dump},   "class.dump created as expected" );
 
-    {
-        $rv = $self->gen_c();
-        ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
-    }
+    $rv = $self->gen_c();
+    ok( $rv, "gen_c completed successfully; args:  default.pmc and class.pmc" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
