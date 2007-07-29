@@ -204,17 +204,18 @@ sub print_tree {
             die "print_tree() lacked files to print; nothing in constructor's 'args' key";
         }
     }
-
     for my $f (@files) {
         my $class = $self->read_dump($f);
         print "    " x $depth, $class->{name}, "\n";
         for my $k ( @{ $class->parents } ) {
-            $self->print_tree(
-                {
-                    depth => $depth + 1,
-                    files => [ lc("$k.pmc") ],
-                }
-            );
+            unless ($k eq $class->{name}) {
+                $self->print_tree(
+                    {
+                        depth => $depth + 1,
+                        files => [ lc("$k.pmc") ],
+                    }
+                );
+            }
         }
     }
     return 1;

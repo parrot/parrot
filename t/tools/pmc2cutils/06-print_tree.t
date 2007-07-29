@@ -19,12 +19,14 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 55;
+use Test::More tests => 56;
+use Carp;
 use File::Basename;
 use File::Copy;
 use FindBin;
 use Data::Dumper;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
+use_ok('Parrot::IO::Capture::Mini');
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 
@@ -81,7 +83,8 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         select($currfh);
     }
     ok( $rv, "tree printed for default.dump" );
-    like( $msg, qr/^default$/, "print_tree() correctly reported which .dump was printed" );
+    like( $msg, qr/^default$/,
+        "print_tree() correctly reported which .dump was printed" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -131,7 +134,6 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         select($currfh);
     }
     ok( $rv, "tree printed for default.dump and array.dump" );
-    print "$msg\n";
     like(
         $msg,
         qr/^default\nArray\n\s{4}default$/s,
@@ -225,13 +227,19 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    # $self->dump_pmc();
-    eval { $self->print_tree(); };
-    like(
-        $@,
-        qr<cannot find file '.*/src/pmc/default.dump'>,
-        "print_tree() predictably failed because dump_pmc() had not been called"
-    );
+    ### $self->dump_pmc();
+    my ($tie, @lines);
+    {
+        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        eval { $self->print_tree(); };
+        @lines = $tie->READLINE;
+        like(
+            $@,
+            qr<cannot find file '.*/src/pmc/default.dump'>,
+            "print_tree() predictably failed because dump_pmc() had not been called"
+        );
+    }
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -268,16 +276,22 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    # $self->dump_pmc();
-    eval { $self->print_tree(); };
-    like(
-        $@,
-        qr<^print_tree\(\) lacked files>,
-        "print_tree() predictably failed because nothing in \@args and dump_pmc() not called"
-    );
+    ### $self->dump_pmc();
+    my ($tie, @lines);
+    {
+        $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+            or croak "Unable to tie";
+        eval { $self->print_tree(); };
+        like(
+            $@,
+            qr<^print_tree\(\) lacked files>,
+            "print_tree() predictably failed because nothing in \@args and dump_pmc() not called"
+        );
+    }
 
     ok( chdir $cwd, "changed back to original directory" );
 }
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
