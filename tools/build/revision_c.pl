@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -33,6 +33,9 @@ print <<"EOF";
  * Any changes made here will be lost!
  *
  */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
 
 #include "parrot/config.h"
 
