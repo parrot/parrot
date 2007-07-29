@@ -37,7 +37,6 @@ for compiling programs in Parrot.
     pirtable['abs'] = '%t'
     pirtable['say'] = '%v'
     pirtable['print'] = '%v'
-    pirtable['set'] = '%rP'
     pirtable['call'] = '%r*PPPPPPPPPPPPPPPP'                # FIXME:
     pirtable['callmethod'] = '%r*PPPPPPPPPPPPPPPP'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
