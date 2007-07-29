@@ -786,11 +786,12 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
     const int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
-    dominators = unit->dominators = malloc(sizeof (Set*) * n);
+    dominators  = unit->dominators = malloc(sizeof (Set*) * n);
     unit->idoms = malloc(sizeof (int) * n);
 
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
+
     for (i = 1; i < n; i++) {
         if (unit->bb_list[i]->pred_list) {
             dominators[i] = set_make_full(n);
@@ -802,11 +803,11 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
     }
 
 #if USE_BFS
-    q = calloc(n, sizeof (int));
+    q       = calloc(n, sizeof (int));
     visited = set_make(n);
     set_add(visited, 0);
-    len=1;
-    cur=0;
+    len     = 1;
+    cur     = 0;
 
     while (cur < len) {
         Edge *edge;
@@ -830,11 +831,12 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
         /* TODO: This 'for' should be a breadth-first search for speed */
         for (i = 1; i < n; i++) {
-            Set *s = set_copy(dominators[i]);
+            Set  *s = set_copy(dominators[i]);
             Edge *edge;
 
-            for (edge=unit->bb_list[i]->pred_list;
-                    edge; edge=edge->pred_next) {
+            for (edge = unit->bb_list[i]->pred_list;
+                 edge;
+                 edge = edge->pred_next) {
                 pred_index = edge->from->index;
                 set_intersec_inplace(s, dominators[pred_index]);
             }
@@ -851,8 +853,10 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         }
     }
 #endif
+
     /* calc idoms */
     unit->idoms[0] = unit->bb_list[0]->index;
+
     for (b = 1; b < n; b++) {
         unit->idoms[b] = 0;
         for (i = n - 1; i > 0; i--) {
@@ -868,10 +872,12 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
                         }
                     }
                 }
+
                 if (!wrong) {
                     unit->idoms[b] = unit->bb_list[i]->index;
                     break;
                 }
+
             }
        }
    }
