@@ -91,6 +91,46 @@
 .end
 
 
+##    method expect_term($/, $key) {
+##        my $past := $($<noun>);
+##        for $<methodop> {
+##          $past = PAST::Op.new($past,
+##                               name => ~$_<ident>,
+##                               pasttype => 'callmethod',
+##                               node => $_)
+##          if ($<methodop><EXPR>) {
+##              $past.push($($<EXPR>[0]));
+##          }
+##        }
+##        return $past;
+##    }
+.sub 'term' :method
+    .param pmc match
+    .param pmc key
+    .local pmc past
+    $P0 = match['noun']
+    past = $P0.'get_scalar'()
+    $P1 = match['methodop']
+    if null $P1 goto iter_end
+    .local pmc iter
+    iter = new Iterator, $P1
+  iter_loop:
+    unless iter goto iter_end
+    $P2 = shift iter
+    $S2 = $P2['ident']
+    $P3 = getclass 'PAST::Op'
+    past = $P3.'new'(past, 'name'=>$S2, 'pasttype'=>'callmethod', 'node'=>$P2)
+    $P4 = $P2['EXPR']
+    if null $P4 goto iter_loop
+    $P5 = $P4[0]
+    $P6 = $P5.'get_scalar'()
+    past.push($P6)
+    goto iter_loop
+  iter_end:
+    .return (past)
+.end
+
+
 ##    method variable($/, $key) {
 ##        if ($key eq '$< >') {
 ##            return PAST::Var.new(

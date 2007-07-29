@@ -38,11 +38,22 @@ rule block {
     {*}
 }
 
-rule noun { 
+token noun { 
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
     | <number> {*}                                         #= number
     | <subcall> {*}                                        #= subcall
+}
+
+token term {
+    <noun>
+    <methodop>*
+    {*}                                                    #= end
+}
+
+
+token methodop {
+    '.' <ident> '(' <EXPR>? ')'
 }
 
 token variable {
@@ -71,7 +82,7 @@ token number { \d+ {*} }
 rule EXPR is optable { ... }
 
 proto 'term:' is precedence('z=')
-    is parsed(&noun)
+    is parsed(&term)
     { ... }
 
 proto postcircumfix:<( )> is equiv('term:') { ... }
