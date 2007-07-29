@@ -112,6 +112,8 @@ struct _IMC_Unit;
 
 /* HEADERIZER BEGIN: compilers/imcc/symreg.c */
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg * _find_sym( PARROT_INTERP,
     NULLOK(const Namespace *nspace),
     NOTNULL(SymHash *hsh),
@@ -120,6 +122,8 @@ SymReg * _find_sym( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg * _get_sym( NOTNULL(SymHash *hsh), NOTNULL(const char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -193,6 +197,8 @@ PARROT_MALLOC
 SymReg * dup_sym( NOTNULL(const SymReg *r) )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg * find_sym( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -200,6 +206,8 @@ SymReg * find_sym( PARROT_INTERP, NOTNULL(const char *name) )
 void free_sym( NOTNULL(SymReg *r) )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 SymReg * get_sym( PARROT_INTERP, NOTNULL(const char *name) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

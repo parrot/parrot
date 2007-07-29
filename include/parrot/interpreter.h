@@ -690,12 +690,22 @@ void runops( PARROT_INTERP, size_t offs )
 /* HEADERIZER BEGIN: src/inter_cb.c */
 
 PARROT_API
-void Parrot_callback_C( char *external_data, PMC *user_data );
+void Parrot_callback_C(
+    NOTNULL(char *external_data),
+    NOTNULL(PMC *user_data) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_callback_D( PMC *user_data, char *external_data );
+void Parrot_callback_D(
+    NOTNULL(PMC *user_data),
+    NOTNULL(char *external_data) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_make_cb( PARROT_INTERP,
     PMC* sub,
     PMC* user_data,

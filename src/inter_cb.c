@@ -18,10 +18,6 @@ the C-library.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "parrot/parrot.h"
@@ -32,29 +28,35 @@ the C-library.
 
 /* HEADERIZER BEGIN: static */
 
-static void callback_CD( PARROT_INTERP, char *external_data, PMC *user_data )
-        __attribute__nonnull__(1);
+static void callback_CD( PARROT_INTERP,
+    NOTNULL(char *external_data),
+    NOTNULL(PMC *user_data) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static void verify_CD( char *external_data, PMC *user_data );
+static void verify_CD( NOTNULL(char *external_data), NOTNULL(PMC *user_data) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: static */
 
 /*
 
-=item C<PMC* Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user
-        STRING* cb_signature)>
+FUNCDOC: Parrot_make_cb
 
 Create a callback function according to pdd16.
-
-=cut
 
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC*
 Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
         STRING *cb_signature)
 {
-    PMC* interp_pmc, *cb, *cb_sig;
+    PMC *cb, *cb_sig;
     int type = '?';     /* avoid -Ox warning */
     char * sig_str;
     STRING *sc;
@@ -62,8 +64,9 @@ Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
      */
-    interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+    PMC * const interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
+
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
     VTABLE_setprop(interp, user_data, sc, interp_pmc);
@@ -129,18 +132,14 @@ Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
 
 /*
 
-=item C<static void verify_CD(char *external_data, PMC *user_data)>
+FUNCDOC: verify_CD
 
 Verify user_data PMC then continue with callback_CD
 
-=cut
-
 */
 
-static void callback_CD(Parrot_Interp, char *, PMC *user_data);
-
 static void
-verify_CD(char *external_data, PMC *user_data)
+verify_CD(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
 {
     PARROT_INTERP = NULL;
     size_t i;
@@ -193,17 +192,14 @@ verify_CD(char *external_data, PMC *user_data)
 
 /*
 
-=item C<static void
-callback_CD(Parrot_Interp, void *external_data, PMC *user_data)>
+FUNCDOC: callback_CD
 
 Common callback function handler. See pdd16.
-
-=cut
 
 */
 
 static void
-callback_CD(PARROT_INTERP, char *external_data, PMC *user_data)
+callback_CD(PARROT_INTERP, NOTNULL(char *external_data), NOTNULL(PMC *user_data))
 {
 
     PMC *passed_interp;       /* the interp that originated the CB */
@@ -346,41 +342,27 @@ case_I:
 }
 /*
 
-=item C<void Parrot_callback_C(void *external_data, PMC *user_data)>
+FUNCDOC: Parrot_callback_C
 
-=item C<void Parrot_callback_D(PMC *user_data, void *external_data)>
+FUNCDOC: Parrot_callback_D
 
 NCI callback functions. See pdd16.
 
-=cut
-
 */
 
 PARROT_API
 void
-Parrot_callback_C(char *external_data, PMC *user_data)
+Parrot_callback_C(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
 {
     verify_CD(external_data, user_data);
 }
 
 PARROT_API
 void
-Parrot_callback_D(PMC *user_data, char *external_data)
+Parrot_callback_D(NOTNULL(PMC *user_data), NOTNULL(char *external_data))
 {
     verify_CD(external_data, user_data);
 }
-
-/*
-
-=back
-
-=head1 SEE ALSO
-
-F<include/parrot/interpreter.h>, F<docs/pdds/pdd16_native_call.pod>.
-
-=cut
-
-*/
 
 
 /*

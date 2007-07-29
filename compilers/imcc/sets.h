@@ -20,7 +20,7 @@ int set_contains( NOTNULL(const Set *s), int element )
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
-Set* set_copy( NOTNULL(Set *s1) )
+Set* set_copy( NOTNULL(Set *s) )
         __attribute__nonnull__(1);
 
 int set_equal( NOTNULL(const Set *s1), NOTNULL(const Set *s2) )
