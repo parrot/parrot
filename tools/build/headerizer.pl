@@ -297,8 +297,12 @@ sub squawk {
 sub main {
     GetOptions( 'verbose' => \$opt{verbose}, ) or exit(1);
 
-    my %ofiles = map {($_,1)} @ARGV;
+    my %ofiles;
+    ++$ofiles{$_} for @ARGV;
     my @ofiles = sort keys %ofiles;
+    for ( @ofiles ) {
+        print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
+    }
     my %cfiles;
     my %cfiles_with_statics;
 
