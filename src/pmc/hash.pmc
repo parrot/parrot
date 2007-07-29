@@ -1070,8 +1070,6 @@ Used to unarchive the hash.
                 PMC_struct_val(SELF) = PMC_struct_val(dummy);
                 PMC_struct_val(dummy) = NULL;
             }
-            else
-                SELF.init();
 
             hash            = (Hash *)PMC_struct_val(SELF);
 

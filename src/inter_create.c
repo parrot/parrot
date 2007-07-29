@@ -279,7 +279,7 @@ Parrot_destroy(PARROT_INTERP)
 #ifdef ATEXIT_DESTROY
     UNUSED(interp);
 #else
-    Parrot_really_destroy(0, (void*) interp);
+    Parrot_really_destroy(interp, 0);
 #endif
 }
 
