@@ -93,7 +93,7 @@ sub is_mmd {
 sub get_method {
     my ( $self, $methodname ) = @_;
     my $method_index = $self->has_method($methodname);
-    return undef unless defined $method_index;
+    return unless defined $method_index;
     return $self->{methods}->[$method_index];
 }
 

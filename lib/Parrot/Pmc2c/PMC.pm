@@ -83,7 +83,7 @@ sub method_index {
 sub get_method {
     my ( $self, $methodname ) = @_;
     my $method_index = $self->method_index($methodname);
-    return undef unless defined $method_index;
+    return unless defined $method_index;
     return $self->{methods}->[$method_index];
 }
 sub inherits_method {
