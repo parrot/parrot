@@ -100,6 +100,7 @@ foreach my $script (@shootouts) {
     }
 
     $ENV{TEST_PROG_ARGS} = $args;
+    warn "$file $args\n";
     example_output_is( $file, $expected );
 }
 
