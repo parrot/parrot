@@ -9,7 +9,7 @@ src/dod.c - Dead object destruction of the various headers
 =head1 DESCRIPTION
 
 This file implements I<dead object destruction>. This is documented in
-PDD 9 with supplementary notes in F<docs/dev/dod.dev>.
+PDD 9 with supplementary notes in F<docs/dev/dod.pod>.
 
 It's possible to turn on/off the checking of the system stack and
 processor registers. The actual checking is implemented in F<src/cpu_dep.c>.
@@ -99,6 +99,7 @@ mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
         if (!interp->arena_base->dod_mark_ptr)
             interp->arena_base->dod_mark_ptr = obj;
     }
+
     arena_base = interp->arena_base;
 
     if (PObj_needs_early_DOD_TEST(obj))
@@ -164,9 +165,9 @@ pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
     } while (0);
 #else /* not PARROT_GC_GMS */
     /* if object is live or on free list return */
-    if (PObj_is_live_or_free_TESTALL(obj)) {
+    if (PObj_is_live_or_free_TESTALL(obj))
         return;
-    }
+
 #  if ! DISABLE_GC_DEBUG
 #    if GC_VERBOSE
     if (CONSERVATIVE_POINTER_CHASING) {
@@ -240,9 +241,7 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     Arenas           * const arena_base = interp->arena_base;
     parrot_context_t *ctx;
 
-    /*
-     * note: adding locals here did cause increased DOD runs
-     */
+    /* note: adding locals here did cause increased DOD runs */
     unsigned int i = 0;
 
     if (trace_stack == 2) {
@@ -372,9 +371,9 @@ int
 Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 {
     Arenas * const arena_base = interp->arena_base;
-    const int     lazy_dod    = arena_base->lazy_dod;
-    PMC          *current     = arena_base->dod_mark_start;
-    PMC          *next;
+    const int      lazy_dod   = arena_base->lazy_dod;
+    PMC           *current    = arena_base->dod_mark_start;
+    PMC           *next;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
@@ -402,14 +401,10 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 
         arena_base->dod_trace_ptr = current;
 
-        /*
-         * short-term hack to color objects black
-         */
+        /* short-term hack to color objects black */
         PObj_get_FLAGS(current) |= PObj_custom_GC_FLAG;
 
-        /*
-         * clearing the flag is much more expensive then testing
-         */
+        /* clearing the flag is much more expensive then testing */
         if (!PObj_needs_early_DOD_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
 
@@ -562,7 +557,9 @@ void
 Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     Arenas * const arena_base = interp->arena_base;
-    UINTVAL i, total_used = 0;
+
+    UINTVAL i;
+    UINTVAL total_used    = 0;
     UINTVAL object_size   = pool->object_size;
 
     Small_Object_Arena *cur_arena;
@@ -626,7 +623,7 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {
-                    PMC * const p = (PMC*)b;
+                    PMC * const p = (PMC *)b;
 
                     /* then destroy it here
                      *
@@ -640,9 +637,9 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
                     if (PObj_is_PMC_EXT_TEST(p) && p->pmc_ext != NULL) {
                         /* if the PMC has a PMC_EXT structure,
-                         * return it to the pool/arena
-                         */
-                        Small_Object_Pool * const ext_pool = arena_base->pmc_ext_pool;
+                         * return it to the pool/arena */
+                        Small_Object_Pool * const ext_pool
+                            = arena_base->pmc_ext_pool;
 
                         if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
                             MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
@@ -813,6 +810,7 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
             }
         }
     }
+
     return;
 }
 #endif
@@ -920,7 +918,8 @@ Parrot_dod_ms_run_init(PARROT_INTERP)
 }
 
 static int
-sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
+sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
+    NOTNULL(void *arg))
 {
     int * const total_free = (int *) arg;
 
@@ -1018,12 +1017,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
         /* successful lazy DOD count */
         ++arena_base->lazy_dod_runs;
 
-        /* it was an aborted lazy dod run - we should clear the live bits, but
-         * e.g. t/pmc/timer_7 succeeds w/o this */
-
-#if 1
         Parrot_dod_clear_live_bits(interp);
-#endif
         if (interp->profile)
             Parrot_dod_profile_end(interp, PARROT_PROF_DOD_p2);
     }
