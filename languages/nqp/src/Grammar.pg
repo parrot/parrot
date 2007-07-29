@@ -46,9 +46,8 @@ rule noun {
 }
 
 token variable {
-    $<sigil>:=['$']
-    <ident>
-    {*}
+    | '$<' ( <-[\>]>* ) '>' {*}                            #= $< >
+    | '$' <ident> {*}                                      #= $var
 }
 
 token quote {

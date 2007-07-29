@@ -92,11 +92,26 @@
 
 
 ##    method variable($/, $key) {
+##        if ($key eq '$< >') {
+##            return PAST::Var.new(
+##                       PAST::Var.new(scope=>'lexical', name=>'$/'),
+##                       PAST::Val.new(value=>~$[0]),
+##                       scope=>'keyed');
+##        }
 ##        return PAST::Var.new(node=>$/, name=>~$/)
 ##    }
 .sub 'variable' :method
     .param pmc match
-    .param pmc key             :optional
+    .param pmc key
+    if key != '$< >' goto past_var
+  past_match_keyed:
+    $P0 = getclass 'PAST::Var'
+    $P1 = $P0.'new'('scope'=>'lexical', 'name'=>'$/')
+    $P2 = getclass 'PAST::Val'
+    $S0 = match[0]
+    $P3 = $P2.'new'('value'=>$S0)
+    .return $P0.'new'($P1, $P3, 'scope'=>'keyed')
+  past_var:
     $S0 = match
     $P0 = getclass 'PAST::Var'
     .return $P0.'new'('node'=>match, 'name'=>$S0, 'scope'=>'package')
