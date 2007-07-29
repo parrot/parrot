@@ -1992,9 +1992,7 @@ tags.dummy:
 # run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
-    $(CHARSET_O_FILES) \
-    $(ENCODING_O_FILES) \
-    $(IO_O_FILES) \
+    $(O_FILES) \
     \
     src/builtin$(O) \
     src/byteorder$(O) \

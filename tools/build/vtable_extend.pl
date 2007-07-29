@@ -84,6 +84,9 @@ can.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 /* Some internal notes. Parrot will die a horrible and bizarre death
    if the stack start pointer's not set and a DOD run is
    triggered. The pointer *will* be set by the interpreter if the
