@@ -46,6 +46,9 @@ sub dont_edit {
  *
  */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 EOC
 }
 

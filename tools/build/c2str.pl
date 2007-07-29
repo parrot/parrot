@@ -90,6 +90,9 @@ sub process_cfile {
  *
  */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 #define CONCAT(a,b) a##b
 #define _CONST_STRING(i, l) (i)->const_cstring_table[CONCAT(_CONST_STRING_, l)]
 #define CONST_STRING(i, s) _CONST_STRING(i, __LINE__)
@@ -160,6 +163,9 @@ sub create_c_include {
  * Any changes made here will be lost!
  *
  */
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
 
 #ifndef PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 #define PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
