@@ -1,3 +1,6 @@
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 #line 2 "compilers/imcc/imclexer.c"
 
 #line 4 "compilers/imcc/imclexer.c"
@@ -21,8 +24,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-
-/* HEADERIZER HFILE: none */
 
 /* end standard C headers. */
 
