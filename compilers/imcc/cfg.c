@@ -835,8 +835,8 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
             Edge *edge;
 
             for (edge = unit->bb_list[i]->pred_list;
-                 edge;
-                 edge = edge->pred_next) {
+                edge;
+                edge = edge->pred_next) {
                 pred_index = edge->from->index;
                 set_intersec_inplace(s, dominators[pred_index]);
             }
