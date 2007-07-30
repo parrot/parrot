@@ -18,7 +18,7 @@ This file implements the Parrot embedding interface.
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADERIZER HFILE: include/parrot/embed.h */
+/* HEADERIZER HFILE: none */ /* The visible types are different than what we use in here */
 
 /* HEADERIZER BEGIN: static */
 
