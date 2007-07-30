@@ -197,15 +197,15 @@ method depends completely on information that is available at run time.
 
 =over
 
-=item * Functions marked as C<static> can only be identified by address as
-they have no "symbol name" for dynamic linking in the executable's symbol table.
+=item * Functions marked as C<static> can only be identified by address as they
+have no "symbol name" for dynamic linking in the executable's symbol table.
 Static functions will appears as C<(unknown)>.
 
-=item * There must be some means available for walking the stack at runtime.  On
-x86(-64)? the "stack pointer" must be in C<[re]sp> register.  For example, this
-C<gcc> compliiation flag would break backtracing (except for functions that do
-dynamic allocation on the stack as this optimization can no be allied to them).
-C<perl Configure.pl --ccflags=-rdynamic>
+=item * There must be some means available for walking the stack at runtime.
+On x86(-64)? the "stack pointer" must be in C<[re]sp> register.  For example,
+this C<gcc> compliiation flag would break backtracing (except for functions
+that do dynamic allocation on the stack as this optimization can no be allied
+to them).  C<perl Configure.pl --ccflags=-fomit-frame-pointer>
 
 =item * Some platforms may require extra linker flags in order to get all of
 the required symbols exported in the symbol table.  C<Configure.pl
@@ -223,9 +223,12 @@ file and line number can not be included as part of the backtrace information.
 On systems not equipped with libc, one will need to use an external debugger to
 get backtrace information.   This method is actually more capable then the
 L<auto-magical> approach as most debuggers will use debugging information if
-it's available in the object code (for example, if parrot was built with C<-g>).
+it's available in the object code (for example, if parrot was built with
+C<-g>).
 
-Since the C<Parrot_confess> symbol is I<always> compiled into parrot it can be used as a break point to obtain a backtrace.  Here is an example of doing this with gdb and a version of parrot compiled with <gcc> and the C<-g> flag.
+Since the C<Parrot_confess> symbol is I<always> compiled into parrot it can be
+used as a break point to obtain a backtrace.  Here is an example of doing this
+with gdb and a version of parrot compiled with <gcc> and the C<-g> flag.
 
     $ gdb parrot
     GNU gdb 6.6
