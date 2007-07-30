@@ -7,7 +7,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More qw(no_plan); # tests => 20;
+use Test::More tests => 22;
 
 use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/tempfile/;
