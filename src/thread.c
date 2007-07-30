@@ -76,13 +76,13 @@ static void* thread_func( void *arg );
 #define THREAD_DEBUG 0
 
 #if THREAD_DEBUG
-#  define TRACE_THREAD(x...) \
+#  define TRACE_THREAD(x, ...) \
      do { \
          fprintf(stderr, x); \
          fprintf(stderr, "\n"); \
      } while (0);
 #else
-#  define TRACE_THREAD(x...) {}
+#  define TRACE_THREAD(x, ...) {}
 #endif
 
 static int running_threads;
