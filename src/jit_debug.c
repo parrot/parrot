@@ -28,6 +28,9 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
 #include "jit.h"

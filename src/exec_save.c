@@ -18,6 +18,9 @@ Save the C<Parrot_exec_objfile_t> to the native format.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
 #include "exec_save.h"
