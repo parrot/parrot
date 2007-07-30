@@ -38,9 +38,9 @@ static void byte_code_destroy( SHIM_INTERP, NOTNULL(PackFile_Segment *self) )
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * byte_code_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    SHIM(int add) );
 
 static void const_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
         __attribute__nonnull__(1)
@@ -49,9 +49,9 @@ static void const_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * const_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    SHIM(int add) );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -104,9 +104,9 @@ static void directory_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * directory_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    SHIM(int add) );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -175,9 +175,9 @@ static void fixup_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * fixup_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    SHIM(int add) );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -227,9 +227,9 @@ static void pf_debug_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * pf_debug_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    SHIM(int add) );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

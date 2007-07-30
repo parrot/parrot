@@ -40,12 +40,12 @@ static size_t compute_hash( PARROT_INTERP,
 
 static INTVAL cs_rindex( PARROT_INTERP,
     NOTNULL(STRING *source_string),
-    STRING *search_string,
+    SHIM(STRING *search_string),
     UINTVAL offset )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING* decompose( PARROT_INTERP, STRING *src )
+static STRING* decompose( PARROT_INTERP, SHIM(STRING *src) )
         __attribute__nonnull__(1);
 
 static void downcase( PARROT_INTERP, NOTNULL(STRING *src) )

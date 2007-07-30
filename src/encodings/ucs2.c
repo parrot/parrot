@@ -21,7 +21,7 @@ UCS-2 encoding with the help of the ICU library.
 
 /* HEADERIZER BEGIN: static */
 
-static void become_encoding( PARROT_INTERP, STRING *src )
+static void become_encoding( PARROT_INTERP, SHIM(STRING *src) )
         __attribute__nonnull__(1);
 
 static UINTVAL bytes( PARROT_INTERP, NOTNULL(STRING *src) )
@@ -32,20 +32,22 @@ static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL get_byte( PARROT_INTERP, const STRING *src, UINTVAL offset )
+static UINTVAL get_byte( PARROT_INTERP,
+    SHIM(const STRING *src),
+    UINTVAL offset )
         __attribute__nonnull__(1);
 
 static STRING * get_bytes( PARROT_INTERP,
-    STRING *src,
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count )
         __attribute__nonnull__(1);
 
 static STRING * get_bytes_inplace( PARROT_INTERP,
-    STRING *src,
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    STRING *return_string )
+    SHIM(STRING *return_string) )
         __attribute__nonnull__(1);
 
 static UINTVAL get_codepoint( PARROT_INTERP,
@@ -62,10 +64,10 @@ static STRING * get_codepoints( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static STRING * get_codepoints_inplace( PARROT_INTERP,
-    STRING *src,
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    STRING *dest_string )
+    SHIM(STRING *dest_string) )
         __attribute__nonnull__(1);
 
 static void iter_init( PARROT_INTERP,
@@ -76,16 +78,16 @@ static void iter_init( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void set_byte( PARROT_INTERP,
-    const STRING *src,
+    SHIM(const STRING *src),
     UINTVAL offset,
     UINTVAL byte )
         __attribute__nonnull__(1);
 
 static void set_bytes( PARROT_INTERP,
-    STRING *src,
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    STRING *new_bytes )
+    SHIM(STRING *new_bytes) )
         __attribute__nonnull__(1);
 
 static void set_codepoint( PARROT_INTERP,
@@ -96,10 +98,10 @@ static void set_codepoint( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void set_codepoints( PARROT_INTERP,
-    STRING *src,
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    STRING *new_codepoints )
+    SHIM(STRING *new_codepoints) )
         __attribute__nonnull__(1);
 
 static STRING * to_encoding( PARROT_INTERP,

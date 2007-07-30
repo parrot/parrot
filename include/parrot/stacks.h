@@ -87,7 +87,7 @@ void rotate_entries( PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void stack_destroy( Stack_Chunk_t *top );
+void stack_destroy( SHIM(Stack_Chunk_t *top) );
 
 PARROT_API
 PARROT_CAN_RETURN_NULL

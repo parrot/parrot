@@ -211,7 +211,7 @@ void PDB_disable_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_disassemble( PARROT_INTERP, const char *command )
+void PDB_disassemble( PARROT_INTERP, SHIM(const char *command) )
         __attribute__nonnull__(1);
 
 size_t PDB_disassemble_op( PARROT_INTERP,
@@ -268,7 +268,7 @@ void PDB_help( PARROT_INTERP, NOTNULL(const char *command) )
 void PDB_info( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void PDB_init( PARROT_INTERP, const char *command )
+void PDB_init( PARROT_INTERP, SHIM(const char *command) )
         __attribute__nonnull__(1);
 
 void PDB_list( PARROT_INTERP, NOTNULL(const char *command) )

@@ -497,7 +497,9 @@ PARROT_API
 void Parrot_destroy( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void Parrot_really_destroy( PARROT_INTERP, int exit_code, void *arg )
+void Parrot_really_destroy( PARROT_INTERP,
+    NULLOK(int exit_code),
+    SHIM(void *arg) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/inter_create.c */
@@ -510,7 +512,7 @@ PARROT_CAN_RETURN_NULL
 void * Parrot_run_meth_fromc( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
-    STRING *meth )
+    SHIM(STRING *meth) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

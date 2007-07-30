@@ -24,31 +24,33 @@ This file implements the charset functions for binary data
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL compare( PARROT_INTERP, const STRING *lhs, const STRING *rhs )
+static INTVAL compare( PARROT_INTERP,
+    SHIM(const STRING *lhs),
+    SHIM(const STRING *rhs) )
         __attribute__nonnull__(1);
 
-static STRING* compose( PARROT_INTERP, STRING *source_string )
+static STRING* compose( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
 static INTVAL cs_index( PARROT_INTERP,
-    STRING *source_string,
-    STRING *search_string,
+    SHIM(STRING *source_string),
+    SHIM(STRING *search_string),
     UINTVAL offset )
         __attribute__nonnull__(1);
 
 static INTVAL cs_rindex( PARROT_INTERP,
-    STRING *source_string,
-    STRING *search_string,
+    SHIM(STRING *source_string),
+    SHIM(STRING *search_string),
     UINTVAL offset )
         __attribute__nonnull__(1);
 
-static STRING* decompose( PARROT_INTERP, STRING *source_string )
+static STRING* decompose( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
-static void downcase( PARROT_INTERP, STRING *source_string )
+static void downcase( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
-static void downcase_first( PARROT_INTERP, STRING *source_string )
+static void downcase_first( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
 static INTVAL find_cclass( PARROT_INTERP,
@@ -69,7 +71,7 @@ static INTVAL find_not_cclass( PARROT_INTERP,
 
 static INTVAL is_cclass( PARROT_INTERP,
     INTVAL flags,
-    STRING *source_string,
+    SHIM(STRING *source_string),
     UINTVAL offset )
         __attribute__nonnull__(1);
 
@@ -85,10 +87,10 @@ static void set_graphemes( PARROT_INTERP,
 static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
         __attribute__nonnull__(1);
 
-static void titlecase( PARROT_INTERP, STRING *source_string )
+static void titlecase( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
-static void titlecase_first( PARROT_INTERP, STRING *source_string )
+static void titlecase_first( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
 static STRING* to_charset( PARROT_INTERP,
@@ -98,13 +100,13 @@ static STRING* to_charset( PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void upcase( PARROT_INTERP, STRING *source_string )
+static void upcase( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
-static void upcase_first( PARROT_INTERP, STRING *source_string )
+static void upcase_first( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
-static UINTVAL validate( PARROT_INTERP, STRING *source_string )
+static UINTVAL validate( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

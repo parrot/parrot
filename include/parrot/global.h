@@ -60,7 +60,9 @@ PMC * Parrot_find_global_s( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_name_op( PARROT_INTERP, NOTNULL(STRING *name), void *next )
+PMC * Parrot_find_name_op( PARROT_INTERP,
+    NOTNULL(STRING *name),
+    SHIM(void *next) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

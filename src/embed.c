@@ -28,10 +28,10 @@ static FLOATVAL calibrate( PARROT_INTERP )
 static const char * op_name( PARROT_INTERP, int k )
         __attribute__nonnull__(1);
 
-static void print_debug( PARROT_INTERP, int status, void *p )
+static void print_debug( PARROT_INTERP, SHIM(int status), SHIM(void *p) )
         __attribute__nonnull__(1);
 
-static void print_profile( PARROT_INTERP, int status, void *p )
+static void print_profile( PARROT_INTERP, SHIM(int status), SHIM(void *p) )
         __attribute__nonnull__(1);
 
 static int prof_sort_f( NOTNULL(const void *a), NOTNULL(const void *b) )

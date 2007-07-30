@@ -483,9 +483,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Segment_new( SHIM_INTERP,
-    PackFile *pf,
-    const char *name,
-    int add );
+    SHIM(PackFile *pf),
+    SHIM(const char *name),
+    NULLOK(int add) );
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

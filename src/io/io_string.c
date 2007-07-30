@@ -23,14 +23,14 @@ Capture output to a string PMC.
 
 static size_t PIO_string_read( SHIM_INTERP,
     NOTNULL(ParrotIOLayer *l),
-    ParrotIO *io,
+    SHIM(ParrotIO *io),
     NOTNULL(STRING **buf) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 static size_t PIO_string_write( PARROT_INTERP,
     NOTNULL(ParrotIOLayer *l),
-    ParrotIO *io,
+    SHIM(ParrotIO *io),
     NOTNULL(STRING *s) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

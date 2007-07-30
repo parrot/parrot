@@ -74,7 +74,7 @@ static int ops_jittable( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * pic_test_func( PARROT_INTERP,
-    INTVAL *sig_bits,
+    SHIM(INTVAL *sig_bits),
     NOTNULL(void **args) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

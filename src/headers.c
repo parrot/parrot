@@ -42,7 +42,7 @@ static PMC_EXT * new_pmc_ext( PARROT_INTERP )
 
 static int sweep_cb_buf( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    int flag,
+    SHIM(int flag),
     NOTNULL(void *arg) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

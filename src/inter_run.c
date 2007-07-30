@@ -27,7 +27,7 @@ PARROT_CANNOT_RETURN_NULL
 static parrot_context_t * runops_args( PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
-    STRING *meth,
+    SHIM(STRING *meth),
     NOTNULL(const char *sig),
     va_list ap )
         __attribute__nonnull__(1)

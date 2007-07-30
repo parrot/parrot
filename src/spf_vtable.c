@@ -81,7 +81,7 @@ static void * getptr_pmc( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static void * getptr_va( PARROT_INTERP,
-    INTVAL size,
+    SHIM(INTVAL size),
     NOTNULL(SPRINTF_OBJ *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

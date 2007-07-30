@@ -137,7 +137,10 @@ static int get_old_size( PARROT_INTERP, NOTNULL(int *ins_line) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void imcc_globals_destroy( SHIM_INTERP, int ex, void *param );
+static void imcc_globals_destroy( SHIM_INTERP,
+    SHIM(int ex),
+    SHIM(void *param) );
+
 static void make_new_sub( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 

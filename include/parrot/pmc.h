@@ -77,7 +77,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC* pmc_reuse( PARROT_INTERP,
     NOTNULL(PMC *pmc),
     INTVAL new_type,
-    UINTVAL flags )
+    NULLOK(UINTVAL flags) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

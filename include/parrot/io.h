@@ -164,7 +164,7 @@ PMC * PIO_accept( PARROT_INTERP, NOTNULL(PMC *pmc) )
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PIO_base_init( SHIM_INTERP, ParrotIOLayer *l );
+INTVAL PIO_base_init( SHIM_INTERP, SHIM(ParrotIOLayer *l) );
 
 PARROT_API
 INTVAL PIO_bind( PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *address) )
@@ -255,7 +255,10 @@ INTVAL PIO_listen( PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL backlog )
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-ParrotIO * PIO_new( PARROT_INTERP, INTVAL iotype, INTVAL flags, INTVAL mode )
+ParrotIO * PIO_new( PARROT_INTERP,
+    NULLOK(INTVAL iotype),
+    INTVAL flags,
+    INTVAL mode )
         __attribute__nonnull__(1);
 
 PARROT_API

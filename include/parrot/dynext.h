@@ -31,7 +31,9 @@ PMC * Parrot_init_lib( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_load_lib( PARROT_INTERP, NULLOK(STRING *lib), PMC *initializer )
+PMC * Parrot_load_lib( PARROT_INTERP,
+    NULLOK(STRING *lib),
+    SHIM(PMC *initializer) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/dynext.c */

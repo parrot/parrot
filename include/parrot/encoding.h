@@ -131,7 +131,7 @@ const ENCODING * Parrot_load_encoding( PARROT_INTERP,
 
 PARROT_API
 INTVAL Parrot_make_default_encoding( SHIM_INTERP,
-    const char *encodingname,
+    SHIM(const char *encodingname),
     NOTNULL(ENCODING *encoding) )
         __attribute__nonnull__(3);
 

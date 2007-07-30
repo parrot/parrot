@@ -252,6 +252,12 @@ sub make_function_decls {
         for my $arg ( @args ) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {
                 $arg = $1;
+                if ( $func->{is_static} || ($arg =~ /\*/) ) {
+                    $arg = "SHIM($arg)";
+                }
+                else {
+                    $arg = "NULLOK($arg)";
+                }
             }
         }
 

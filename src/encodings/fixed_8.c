@@ -19,7 +19,7 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 
 /* HEADERIZER BEGIN: static */
 
-static void become_encoding( PARROT_INTERP, STRING *source_string )
+static void become_encoding( PARROT_INTERP, SHIM(STRING *source_string) )
         __attribute__nonnull__(1);
 
 static UINTVAL bytes( SHIM_INTERP, NOTNULL(STRING *source_string) )
@@ -133,7 +133,9 @@ static void set_codepoints( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_DOES_NOT_RETURN
-static STRING * to_encoding( PARROT_INTERP, STRING *src, STRING *dest )
+static STRING * to_encoding( PARROT_INTERP,
+    SHIM(STRING *src),
+    SHIM(STRING *dest) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

@@ -67,7 +67,9 @@ void mmd_add_by_class( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_API
-void mmd_add_function( PARROT_INTERP, INTVAL func_nr, funcptr_t function )
+void mmd_add_function( PARROT_INTERP,
+    INTVAL func_nr,
+    NULLOK(funcptr_t function) )
         __attribute__nonnull__(1);
 
 PARROT_API

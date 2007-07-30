@@ -32,12 +32,12 @@ int n_comp_units;
 
 /* HEADERIZER BEGIN: static */
 
-static int e_file_close( PARROT_INTERP, void *param )
+static int e_file_close( PARROT_INTERP, SHIM(void *param) )
         __attribute__nonnull__(1);
 
 static int e_file_emit( PARROT_INTERP,
-    void *param,
-    IMC_Unit *unit,
+    SHIM(void *param),
+    SHIM(IMC_Unit *unit),
     NOTNULL(const Instruction *ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);

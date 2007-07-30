@@ -143,7 +143,7 @@ CHARSET * Parrot_load_charset( PARROT_INTERP,
 
 PARROT_API
 INTVAL Parrot_make_default_charset( SHIM_INTERP,
-    const char *charsetname,
+    SHIM(const char *charsetname),
     NOTNULL(CHARSET *charset) )
         __attribute__nonnull__(3);
 

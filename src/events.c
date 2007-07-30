@@ -66,7 +66,7 @@ static void init_events_first( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static void* io_thread( void *data );
+static void* io_thread( SHIM(void *data) );
 
 static void io_thread_ready_rd(
     NOTNULL(pending_io_events *ios),

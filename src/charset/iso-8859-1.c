@@ -25,7 +25,7 @@ static STRING* compose( PARROT_INTERP, NOTNULL(STRING *src) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING* decompose( PARROT_INTERP, STRING *src )
+static STRING* decompose( PARROT_INTERP, SHIM(STRING *src) )
         __attribute__nonnull__(1);
 
 static void downcase( PARROT_INTERP, NOTNULL(STRING *source_string) )

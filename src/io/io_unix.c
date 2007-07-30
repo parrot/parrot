@@ -49,7 +49,7 @@ static INTVAL flags_to_unix( INTVAL flags );
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_accept( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -63,19 +63,19 @@ static INTVAL PIO_unix_async( PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_bind( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *l) )
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static INTVAL PIO_unix_close( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_connect( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NULLOK(STRING *r) )
         __attribute__nonnull__(3);
@@ -83,13 +83,13 @@ static INTVAL PIO_unix_connect( SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     PIOHANDLE fd,
     INTVAL flags )
         __attribute__nonnull__(1);
 
 static INTVAL PIO_unix_flush( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
@@ -99,7 +99,7 @@ static INTVAL PIO_unix_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
 
 static INTVAL PIO_unix_isatty( PIOHANDLE fd );
 static INTVAL PIO_unix_listen( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     INTVAL sec )
         __attribute__nonnull__(3);
@@ -117,14 +117,14 @@ static ParrotIO * PIO_unix_open( PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
-    ParrotIOLayer *l,
+    SHIM(ParrotIOLayer *l),
     NOTNULL(const char *cmd),
     int flags )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_poll( SHIM_INTERP,
-    ParrotIOLayer *l,
+    SHIM(ParrotIOLayer *l),
     NOTNULL(ParrotIO *io),
     int which,
     int sec,
@@ -132,7 +132,7 @@ static INTVAL PIO_unix_poll( SHIM_INTERP,
         __attribute__nonnull__(3);
 
 static size_t PIO_unix_read( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING **buf) )
         __attribute__nonnull__(1)
@@ -140,7 +140,7 @@ static size_t PIO_unix_read( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static INTVAL PIO_unix_recv( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING **s) )
         __attribute__nonnull__(1)
@@ -148,14 +148,14 @@ static INTVAL PIO_unix_recv( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static PIOOFF_T PIO_unix_seek( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
 static INTVAL PIO_unix_send( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )
         __attribute__nonnull__(3)
@@ -164,19 +164,19 @@ static INTVAL PIO_unix_send( SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static ParrotIO * PIO_unix_socket( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     int fam,
     int type,
     int proto )
         __attribute__nonnull__(1);
 
 static PIOOFF_T PIO_unix_tell( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static size_t PIO_unix_write( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )
         __attribute__nonnull__(3)

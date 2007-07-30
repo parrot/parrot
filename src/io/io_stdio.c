@@ -29,20 +29,20 @@ PARROT_CANNOT_RETURN_NULL
 static const char * flags_to_stdio( INTVAL flags );
 
 static INTVAL PIO_stdio_close( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     PIOHANDLE fptr,
     INTVAL flags )
         __attribute__nonnull__(1);
 
 static INTVAL PIO_stdio_flush( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
@@ -54,14 +54,14 @@ static INTVAL PIO_stdio_isatty( PIOHANDLE fptr );
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static ParrotIO * PIO_stdio_open( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(const char *spath),
     INTVAL flags )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 static size_t PIO_stdio_peek( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING **buf) )
         __attribute__nonnull__(1)
@@ -69,7 +69,7 @@ static size_t PIO_stdio_peek( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static size_t PIO_stdio_read( PARROT_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING **buf) )
         __attribute__nonnull__(1)
@@ -77,19 +77,19 @@ static size_t PIO_stdio_read( PARROT_INTERP,
         __attribute__nonnull__(4);
 
 static PIOOFF_T PIO_stdio_seek( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
     INTVAL whence )
         __attribute__nonnull__(3);
 
 static PIOOFF_T PIO_stdio_tell( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io) )
         __attribute__nonnull__(3);
 
 static size_t PIO_stdio_write( SHIM_INTERP,
-    ParrotIOLayer *layer,
+    SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     NOTNULL(STRING *s) )
         __attribute__nonnull__(3)
