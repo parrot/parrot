@@ -14,8 +14,8 @@ typedef struct Small_Object_Arena {
 
 struct Small_Object_Pool;
 
-typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
-typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
+typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
+typedef PObj * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 
 #if PARROT_GC_GMS

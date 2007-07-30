@@ -346,7 +346,7 @@ static int collect_cb( PARROT_INTERP,
 
 static void gc_ims_add_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(void *to_add) )
+    NOTNULL(PObj *to_add) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -358,7 +358,7 @@ static void gc_ims_alloc_objects( PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static void * gc_ims_get_free_object( PARROT_INTERP,
+static PObj * gc_ims_get_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -481,7 +481,7 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(void *to_add))
+gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(PObj *to_add))
 {
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
@@ -500,7 +500,7 @@ gc_ims_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static void *
+static PObj *
 gc_ims_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     PObj *ptr;
@@ -550,7 +550,7 @@ gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
     pool->add_free_object = gc_ims_add_free_object;
     pool->get_free_object = gc_ims_get_free_object;
     pool->alloc_objects   = gc_ims_alloc_objects;
-    pool->more_objects = pool->alloc_objects;
+    pool->more_objects    = pool->alloc_objects;
 }
 
 static void

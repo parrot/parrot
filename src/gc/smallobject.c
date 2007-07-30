@@ -23,7 +23,7 @@ Handles the accessing of small object pools (header pools).
 
 static void gc_ms_add_free_object( SHIM_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(void *to_add) )
+    NOTNULL(PObj *to_add) )
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -34,7 +34,7 @@ static void gc_ms_alloc_objects( PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static void * gc_ms_get_free_object( PARROT_INTERP,
+static PObj * gc_ms_get_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -150,10 +150,10 @@ Add an unused object back to the free pool for later reuse.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(void *to_add))
+gc_ms_add_free_object(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(PObj *to_add))
 {
-    *(void **)to_add = pool->free_list;
-    pool->free_list  = to_add;
+    PMC_struct_val(to_add) = pool->free_list;
+    pool->free_list        = to_add;
 }
 
 /*
@@ -166,19 +166,22 @@ Get a new object from the free pool and return it.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static void *
+static PObj *
 gc_ms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
-    void *ptr;
+    PObj *ptr;
+    PObj *free_list = (PObj *)pool->free_list;
 
     /* if we don't have any objects */
-    if (!pool->free_list)
+    if (!free_list) {
         (*pool->more_objects)(interp, pool);
+        free_list = (PObj *)pool->free_list;
+    }
 
-    ptr             = pool->free_list;
-    pool->free_list = *(void **)ptr;
+    ptr             = free_list;
+    pool->free_list = PMC_struct_val(ptr);
 
-    PObj_flags_SETTO((PObj*) ptr, 0);
+    PObj_flags_SETTO(ptr, 0);
 
     --pool->num_free_objects;
 
@@ -206,7 +209,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
     arena->used          = num_objects;
 
     /* Move all the new objects into the free list */
-    object = (void *)((char *)arena->start_objects);
+    object = (PObj *)((char *)arena->start_objects);
 
     for (i = 0; i < num_objects; i++) {
         PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
@@ -216,7 +219,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
          */
         PObj_buflen((PObj*)object) = 0;
         pool->add_free_object(interp, pool, object);
-        object = (void *)((char *)object + pool->object_size);
+        object = (PObj *)((char *)object + pool->object_size);
     }
 
     pool->num_free_objects += num_objects;

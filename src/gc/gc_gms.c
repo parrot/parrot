@@ -131,7 +131,7 @@ static int end_cycle_cb( PARROT_INTERP,
 
 static void gc_gms_add_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(void *to_add) )
+    NOTNULL(PObj *to_add) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -179,7 +179,7 @@ static Gc_gms_gen * gc_gms_find_gen( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * gc_gms_get_free_object( PARROT_INTERP,
+static PObj * gc_gms_get_free_object( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -467,7 +467,7 @@ Run a GC cycle or allocate new objects for the given pool.
 
 static void
 gc_gms_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-        NOTNULL(void *to_add))
+        NOTNULL(PObj *to_add))
 {
     real_exception(interp, NULL, 1, "gms abuse");
 }
@@ -603,7 +603,7 @@ gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void *
+static PObj *
 gc_gms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     PObj *ptr;
