@@ -2,13 +2,58 @@
 #include "stm_internal.h"
 #include "stm_waitlist.h"
 
+/* HEADERIZER HFILE: src/stm/stm_waitlist.h */
+
+/* HEADERIZER BEGIN: static */
+
+static void add_entry(
+    NOTNULL(STM_waitlist *waitlist),
+    NOTNULL(struct waitlist_entry *entry) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static struct waitlist_entry * alloc_entry( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static struct waitlist_thread_data * get_thread( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static struct waitlist_thread_data * get_thread_noalloc( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+static STM_tx_log * Parrot_STM_tx_log_alloc( PARROT_INTERP, size_t size )
+        __attribute__nonnull__(1);
+
+static int remove_first(
+    NOTNULL(STM_waitlist *waitlist),
+    NOTNULL(struct waitlist_entry *expect_first) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void waitlist_remove(
+    STM_waitlist *waitlist,
+    struct waitlist_entry *what );
+
+static void waitlist_remove_check(
+    STM_waitlist *waitlist,
+    struct waitlist_entry *what );
+
+static void waitlist_signal_all( STM_waitlist *list );
+static void waitlist_signal_one( struct waitlist_entry *who );
+/* HEADERIZER END: static */
+
 #define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really
                                  * remove -- for debugging */
 
+PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
-get_thread(Parrot_Interp interp) {
-    STM_tx_log *txlog;
-    txlog = Parrot_STM_tx_log_get(interp);
+get_thread(PARROT_INTERP)
+{
+    STM_tx_log * const txlog = Parrot_STM_tx_log_get(interp);
+
     if (!txlog->waitlist_data) {
         txlog->waitlist_data =
             mem_sys_allocate_zeroed(sizeof (*txlog->waitlist_data));
@@ -21,15 +66,18 @@ get_thread(Parrot_Interp interp) {
     return txlog->waitlist_data;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
-get_thread_noalloc(Parrot_Interp interp) {
-    STM_tx_log *txlog;
-    txlog = Parrot_STM_tx_log_get(interp);
+get_thread_noalloc(PARROT_INTERP)
+{
+    const STM_tx_log * const txlog = Parrot_STM_tx_log_get(interp);
     return txlog->waitlist_data;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static struct waitlist_entry *
-alloc_entry(Parrot_Interp interp) {
+alloc_entry(PARROT_INTERP)
+{
     struct waitlist_thread_data *thr;
     size_t i;
 
@@ -60,7 +108,8 @@ alloc_entry(Parrot_Interp interp) {
 }
 
 static void
-add_entry(STM_waitlist *waitlist, struct waitlist_entry *entry) {
+add_entry(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *entry))
+{
     int successp = -1;
     PARROT_ASSERT(entry->next == NULL);
     do {
@@ -76,7 +125,8 @@ add_entry(STM_waitlist *waitlist, struct waitlist_entry *entry) {
 }
 
 static int
-remove_first(STM_waitlist *waitlist, struct waitlist_entry *expect_first) {
+remove_first(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *expect_first))
+{
     int successp;
     PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, expect_first,
                         expect_first->next);
@@ -90,7 +140,8 @@ remove_first(STM_waitlist *waitlist, struct waitlist_entry *expect_first) {
 }
 
 static void
-waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what) {
+waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
+{
     struct waitlist_entry *cur;
 
     if (!waitlist)
@@ -134,7 +185,8 @@ waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what) {
 #if WAITLIST_REMOVE_CHECK
 /* this function is here to facilitate debugging */
 static void
-waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what) {
+waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)
+{
     struct waitlist_entry *cur;
 
     if (!waitlist)
@@ -151,7 +203,8 @@ waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what) {
 #endif
 
 static void
-waitlist_signal_one(struct waitlist_entry *who) {
+waitlist_signal_one(struct waitlist_entry *who)
+{
     struct waitlist_thread_data *thread;
 
     thread = who->thread;
@@ -168,7 +221,8 @@ waitlist_signal_one(struct waitlist_entry *who) {
 }
 
 static void
-waitlist_signal_all(STM_waitlist *list) {
+waitlist_signal_all(STM_waitlist *list)
+{
     int successp;
     struct waitlist_entry *cur;
 
@@ -201,7 +255,7 @@ waitlist_signal_all(STM_waitlist *list) {
 }
 
 void
-Parrot_STM_waitlist_add_self(Parrot_Interp interp, STM_waitlist *waitlist) {
+Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist) {
     struct waitlist_entry *entry;
 
 
@@ -215,7 +269,8 @@ Parrot_STM_waitlist_add_self(Parrot_Interp interp, STM_waitlist *waitlist) {
 }
 
 void
-Parrot_STM_waitlist_signal(Parrot_Interp interp, STM_waitlist *waitlist) {
+Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)
+{
 #if WAITLIST_DEBUG
     fprintf(stderr, "%p: signal %p\n", interp, waitlist);
 #endif
@@ -223,7 +278,8 @@ Parrot_STM_waitlist_signal(Parrot_Interp interp, STM_waitlist *waitlist) {
 }
 
 void
-Parrot_STM_waitlist_remove_all(Parrot_Interp interp) {
+Parrot_STM_waitlist_remove_all(PARROT_INTERP)
+{
     struct waitlist_thread_data *thr;
     size_t i;
 #if WAITLIST_DEBUG
@@ -251,7 +307,8 @@ Parrot_STM_waitlist_remove_all(Parrot_Interp interp) {
 
 /* TODO handle events here */
 void
-Parrot_STM_waitlist_wait(Parrot_Interp interp) {
+Parrot_STM_waitlist_wait(PARROT_INTERP)
+{
     struct waitlist_thread_data *thr;
     thr = get_thread(interp);
     LOCK(thr->signal_mutex);
@@ -271,14 +328,16 @@ Parrot_STM_waitlist_wait(Parrot_Interp interp) {
 }
 
 void
-Parrot_STM_waitlist_init(Parrot_Interp interp, STM_waitlist *waitlist) {
+Parrot_STM_waitlist_init(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))
+{
     PARROT_ATOMIC_PTR_INIT(waitlist->first);
     PARROT_ATOMIC_PTR_SET(waitlist->first, NULL);
     MUTEX_INIT(waitlist->remove_mutex);
 }
 
 void
-Parrot_STM_waitlist_destroy_thread(Parrot_Interp interp) {
+Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
+{
     struct waitlist_thread_data *thr;
     size_t i;
 

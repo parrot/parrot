@@ -16,6 +16,34 @@
 #include "parrot/parrot.h"
 #include "parrot/op.h"
 
+/* HEADERIZER BEGIN: src/runops_cores.c */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t * runops_cgoto_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t * runops_fast_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t * runops_profile_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t * runops_slow_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: src/runops_cores.c */
+
 opcode_t *runops_fast_core(PARROT_INTERP, opcode_t *);
 
 opcode_t *runops_cgoto_core(PARROT_INTERP, opcode_t *);

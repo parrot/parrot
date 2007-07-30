@@ -17,6 +17,7 @@ the low-level synchronization.
 */
 
 
+#include "stm_waitlist.h"
 #include "stm_internal.h"
 
 #define STM_DEBUG 0

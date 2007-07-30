@@ -1,5 +1,5 @@
 /* thread.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+ *  Copyright (C) 2001-2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -160,6 +160,64 @@ typedef struct _Sync {
                                            the arena, where the PMC is in */
     Parrot_mutex pmc_lock;              /* for wr access to PMCs content */
 } Sync;
+
+/* HEADERIZER BEGIN: src/thread.c */
+
+PARROT_API
+void Parrot_shared_DOD_block( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_shared_DOD_unblock( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void pt_add_to_interpreters( PARROT_INTERP, Parrot_Interp new_interp )
+        __attribute__nonnull__(1);
+
+void pt_clone_code( Parrot_Interp d, Parrot_Interp s );
+void pt_clone_globals( Parrot_Interp d, Parrot_Interp s );
+void pt_DOD_mark_root_finished( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void pt_DOD_start_mark( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void pt_DOD_stop_mark( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void pt_join_threads( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PMC * pt_shared_fixup( PARROT_INTERP, PMC *pmc )
+        __attribute__nonnull__(1);
+
+void pt_suspend_self_for_gc( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void pt_thread_detach( UINTVAL tid );
+PMC* pt_thread_join( NOTNULL(Parrot_Interp parent), UINTVAL tid )
+        __attribute__nonnull__(1);
+
+void pt_thread_kill( UINTVAL tid );
+void pt_thread_prepare_for_run( Parrot_Interp d, Parrot_Interp s );
+int pt_thread_run( PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg )
+        __attribute__nonnull__(1);
+
+int pt_thread_run_1( PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg )
+        __attribute__nonnull__(1);
+
+int pt_thread_run_2( PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg )
+        __attribute__nonnull__(1);
+
+int pt_thread_run_3( PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg )
+        __attribute__nonnull__(1);
+
+void pt_thread_wait_with( PARROT_INTERP, Parrot_mutex *mutex )
+        __attribute__nonnull__(1);
+
+void pt_thread_yield( void );
+PMC * pt_transfer_sub( Parrot_Interp d, Parrot_Interp s, PMC *sub );
+/* HEADERIZER END: src/thread.c */
 
 /*
  * thread.c interface functions

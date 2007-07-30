@@ -1,9 +1,13 @@
 #ifndef PARROT_STM_WAITLIST_H_GUARD
 #define PARROT_STM_WAITLIST_H_GUARD
 
-#include <parrot/atomic.h>
+#include "parrot/atomic.h"
 
 #define WAITLIST_DEBUG 0
+
+struct STM_tx_log;
+
+typedef struct STM_tx_log STM_tx_log;
 
 typedef struct waitlist_entry {
     /* next entry in the waitlist */
@@ -44,14 +48,32 @@ typedef struct waitlist_thread_data {
 
 typedef struct waitlist_head STM_waitlist;
 
-/* marks waitlist-associated data structures */
-void Parrot_STM_waitlist_init(Parrot_Interp, STM_waitlist *waitlist);
-void Parrot_STM_waitlist_add_self(Parrot_Interp, STM_waitlist *waitlist);
-void Parrot_STM_waitlist_signal(Parrot_Interp, STM_waitlist *waitlist);
-void Parrot_STM_waitlist_remove_all(Parrot_Interp);
-void Parrot_STM_waitlist_wait(Parrot_Interp);
-void Parrot_STM_waitlist_destroy_thread(Parrot_Interp);
-static waitlist_thread_data * get_thread(Parrot_Interp interp);
+/* HEADERIZER BEGIN: src/stm/waitlist.c */
+
+STM_tx_log * Parrot_STM_tx_log_get( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void Parrot_STM_waitlist_add_self( PARROT_INTERP, STM_waitlist *waitlist )
+        __attribute__nonnull__(1);
+
+void Parrot_STM_waitlist_destroy_thread( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void Parrot_STM_waitlist_init( PARROT_INTERP,
+    NOTNULL(STM_waitlist *waitlist) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_STM_waitlist_remove_all( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+void Parrot_STM_waitlist_signal( PARROT_INTERP, STM_waitlist *waitlist )
+        __attribute__nonnull__(1);
+
+void Parrot_STM_waitlist_wait( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/stm/waitlist.c */
 
 #endif /* PARROT_STM_WAITLIST_H_GUARD */
 

@@ -75,10 +75,6 @@ typedef struct Parrot_STM_PMC_handle_data {
     STM_waitlist change_waitlist;
 } Parrot_STM_PMC_handle_data;
 
-struct STM_tx_log;
-
-typedef struct STM_tx_log STM_tx_log;
-
 struct STM_write_record {
     Parrot_STM_PMC_handle handle;
     void *saw_version;
@@ -145,8 +141,6 @@ struct STM_saved_tx_log {
     STM_write_record *writes;
 };
 typedef struct STM_saved_tx_log STM_saved_tx_log;
-
-STM_tx_log *Parrot_STM_tx_log_get(PARROT_INTERP);
 
 #endif /* PARROT_STM_INTERNAL_H_GUARD */
 

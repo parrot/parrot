@@ -22,6 +22,90 @@
 
 typedef int Parrot_warnclass;
 
+/* HEADERIZER BEGIN: src/embed.c */
+
+PARROT_API
+void Parrot_clear_debug( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_clear_flag( PARROT_INTERP, INTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_clear_trace( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+opcode_t * Parrot_debug( NOTNULL(Parrot_Interp debugger), opcode_t * pc )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_disassemble( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_init( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_init_stacktop( PARROT_INTERP, void *stack_top )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_loadbc( PARROT_INTERP, NOTNULL(PackFile *pf) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+Parrot_Interp Parrot_new( Parrot_Interp parent );
+
+PARROT_API
+PackFile * Parrot_readbc( PARROT_INTERP, NULLOK(const char *fullname) )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_run_native( PARROT_INTERP, native_func_t func )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_runcode( PARROT_INTERP, int argc, char *argv[] )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_set_debug( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_set_flag( PARROT_INTERP, INTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_set_run_core( PARROT_INTERP, Parrot_Run_core_t core )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_set_trace( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_setwarnings( PARROT_INTERP, Parrot_warnclass wc )
+        __attribute__nonnull__(1);
+
+PARROT_API
+UINTVAL Parrot_test_debug( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+Parrot_Int Parrot_test_flag( PARROT_INTERP, INTVAL flag )
+        __attribute__nonnull__(1);
+
+PARROT_API
+UINTVAL Parrot_test_trace( PARROT_INTERP, UINTVAL flag )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: src/embed.c */
+
 PARROT_API Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 /* XXX Parrot_init() should be removed, no longer required for embedders */

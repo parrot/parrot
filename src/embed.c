@@ -20,6 +20,32 @@ This file implements the Parrot embedding interface.
 
 /* HEADERIZER HFILE: include/parrot/embed.h */
 
+/* HEADERIZER BEGIN: static */
+
+static FLOATVAL calibrate( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+static const char * op_name( PARROT_INTERP, int k )
+        __attribute__nonnull__(1);
+
+static void print_debug( PARROT_INTERP, int status, void *p )
+        __attribute__nonnull__(1);
+
+static void print_profile( PARROT_INTERP, int status, void *p )
+        __attribute__nonnull__(1);
+
+static int prof_sort_f( NOTNULL(const void *a), NOTNULL(const void *b) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PMC* set_current_sub( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
+static PMC* setup_argv( PARROT_INTERP, int argc, char ** argv )
+        __attribute__nonnull__(1);
+
+/* HEADERIZER END: static */
+
 /*
 
 FUNCDOC: Parrot_new

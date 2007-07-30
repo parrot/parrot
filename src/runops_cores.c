@@ -15,10 +15,6 @@ the faster dispatch of operations.
 
 =head2 Functions
 
-=over 4
-
-=cut
-
 */
 
 #include "runops_cores.h"
@@ -30,22 +26,33 @@ the faster dispatch of operations.
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
+/* HEADERIZER HFILE: src/runops_cores.h */
+
+/* HEADERIZER BEGIN: static */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static opcode_t * runops_trace_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
+
 /*
 
-=item C<opcode_t *
-runops_fast_core(PARROT_INTERP, opcode_t *pc)>
+FUNCDOC: runops_fast_core
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.
 
 No bounds checking, profiling or tracing is performed.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
-runops_fast_core(PARROT_INTERP, opcode_t *pc)
+runops_fast_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
     while (pc) {
         DO_OP(pc, interp);
@@ -55,8 +62,7 @@ runops_fast_core(PARROT_INTERP, opcode_t *pc)
 
 /*
 
-=item C<opcode_t *
-runops_cgoto_core(PARROT_INTERP, opcode_t *pc)>
+FUNCDOC: runops_cgoto_core
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core.
@@ -65,12 +71,12 @@ No bounds checking, profiling or tracing is performed.
 
 If computed C<goto> is not available then Parrot exits with exit code 1.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
-runops_cgoto_core(PARROT_INTERP, opcode_t *pc)
+runops_cgoto_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interp);
@@ -79,19 +85,15 @@ runops_cgoto_core(PARROT_INTERP, opcode_t *pc)
     PIO_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);
-    return NULL;
 #endif
 }
 
 /*
 
-=item C<opcode_t *
-runops_slow_core(PARROT_INTERP, opcode_t *pc)>
+FUNCDOC: runops_slow_core
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
-
-=cut
 
 */
 
@@ -103,10 +105,12 @@ operations, with tracing and bounds checking enabled.
 #endif
 
 #define  code_start interp->code->base.data
-#define  code_end   (interp->code->base.data + \
-        interp->code->base.size)
+#define  code_end   (interp->code->base.data + interp->code->base.size)
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_trace_core(PARROT_INTERP, opcode_t *pc)
+runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
     static size_t dod, gc;
     Arenas * const arena_base = interp->arena_base;
@@ -161,11 +165,14 @@ runops_trace_core(PARROT_INTERP, opcode_t *pc)
     }
     pio = PIO_STDERR(debugger);
     PIO_flush(debugger, pio);
+
     return pc;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
-runops_slow_core(PARROT_INTERP, opcode_t *pc)
+runops_slow_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
 
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
@@ -190,18 +197,17 @@ runops_slow_core(PARROT_INTERP, opcode_t *pc)
 
 /*
 
-=item C<opcode_t *
-runops_profile_core(PARROT_INTERP, opcode_t *pc)>
+FUNCDOC: runops_profile_core
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking and profiling enabled.
 
-=cut
-
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 opcode_t *
-runops_profile_core(PARROT_INTERP, opcode_t *pc)
+runops_profile_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
 {
     opcode_t cur_op;
     RunProfile * const profile = interp->profile;
@@ -236,18 +242,6 @@ runops_profile_core(PARROT_INTERP, opcode_t *pc)
     return pc;
 }
 
-
-/*
-
-=back
-
-=head1 SEE ALSO
-
-F<src/runops_cores.h>.
-
-=cut
-
-*/
 
 
 /*
