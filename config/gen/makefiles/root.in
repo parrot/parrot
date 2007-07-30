@@ -1772,7 +1772,7 @@ SPLINTFLAGS  = \
 	+linelen 120 \
 	+showdeephistory \
 	-showfunc \
-	+hints \
+	-hints \
 	\
 	-abstract \
 	+aliasunique \
@@ -1886,6 +1886,7 @@ splint-andy :
 		-showsummary \
 		+partial \
 		src/nci.c \
+		src/inte*.c \
 
 
 #
