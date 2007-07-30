@@ -291,6 +291,7 @@ sub print_head {
 #include "parrot/oplib/ops.h"
 
 /* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
 
 /*
  * if the architecture can build some or all of these signatures
