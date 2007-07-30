@@ -109,7 +109,7 @@ other structure members) yields a C<PMC>.
 
 Only three flags need to be checked during a DOD run: C<PObj_live_FLAG>,
 C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
-flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
+flags are stored in C<<PObj->flags>>, meaning that each PMC must be accessed
 during the DOD run.
 
 An alternative approach is to store the DOD-Flags in the Arenas as a packed
@@ -124,9 +124,9 @@ C<struct Small_Object_Arena> is extended with a pointer to the packed bitarray
         ...
     };
 
-The memory for this Small_Object_Arena is allocated at the beginning of a 
-large aligned block of memory (currently 4Mib) and the objects in this arena 
-come from this memory block. Therefore the arena of an object can be found by 
+The memory for this Small_Object_Arena is allocated at the beginning of a
+large aligned block of memory (currently 4Mib) and the objects in this arena
+come from this memory block. Therefore the arena of an object can be found by
 simply masking out the lower bits of the pointer to the object:
 
     arena = object & ARENA_MASK;
@@ -138,7 +138,7 @@ the C<struct Small_Object_Arena>), creating the appropriate bitmask by shifting
 and accessing the right element of C<dod_flags[]>.
 
     n = (object - arena->start_objects) / arena->object_size;
-    arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
+    arena->dod_flags[n >> ARENA_FLAG_SHIFT]
         & flag << ((n & ARENA_FLAG_MASK) << 2)
 
 
@@ -150,7 +150,7 @@ manipulating the DOD-relevant object flags.
 =head3 Flag packing format
 
 The three object flags consulted during DOD are packed into one 4-bit nibble
-per object (one bit is currently unused).  Since C<arena-E<gt>dod_flags[]> is
+per object (one bit is currently unused).  Since C<<arena->dod_flags[]>> is
 an array of native-sized UINTVALs ("words"), the number of nibbles per array
 entry varies depending on the platform.
 

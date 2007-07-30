@@ -41,7 +41,7 @@
 #define Parrot_is_blocked_GC(interp) \
         ((interp)->arena_base->GC_block_level)
 
-#define DOD_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areads and stack */
+#define DOD_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areas and stack */
 #define DOD_trace_normal        (UINTVAL)(1 << 0)   /* the same */
 #define DOD_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
 #define DOD_finish_FLAG         (UINTVAL)(1 << 2)   /* run async past sweep */
