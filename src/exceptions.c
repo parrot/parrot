@@ -30,7 +30,7 @@ Define the internal interpreter exceptions.
 #include "parrot/exceptions.h"
 
 #ifdef PARROT_HAS_GLIBC_BACKTRACE
-#include <execinfo.h>
+#  include <execinfo.h>
 #endif
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
