@@ -46,17 +46,17 @@ These are the opcodes relevant to exceptions and exception handlers:
 
 =item B<push_eh I<INVOCABLE_PMC>>
 
-Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine --
-onto the exception handler stack.
-
-If a I<LABEL> is provided, Parrot automatically performs the equivalent of
-a C<newclosure> operation on the current subroutine, and pushes the resulting
-closure.
+Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine or
+continuation -- onto the exception handler stack.
 
 When an exception is thrown, Parrot walks up the stack of active exception
 handlers, invoking each one in turn, but still in the dynamic context of the
 exception (i.e. the call stack is I<not> unwound first).  See below for more
 detail.
+
+If a I<LABEL> is provided, Parrot creates and pushes a continuation that
+resumes execution at I<LABEL> if invoked, which has the effect of
+unconditionally handling all errors, and unwinding the stack to that label.
 
 =item B<pop_eh>
 
