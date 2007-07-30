@@ -92,9 +92,12 @@
 #define PARROT_DOES_NOT_RETURN      /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_MALLOC               __attribute__malloc__ __attribute__warn_unused_result__
 
-#define ARGOUT(x)                   /*@notnull@*/ /*@out@*/ x
 #define NOTNULL(x)                  /*@notnull@*/ x
 #define NULLOK(x)                   /*@null@*/ x
+
+#define ARGOUT(x)                   /*@notnull@*/ /*@out@*/ x
+#define ARGINOUT(x)                 /*@notnull@*/ /*@in@*/ /*@out@*/ x
+#define ARGOUT_NULLOK(x)            /*@out@*/ x
 
 
 #endif /* PARROT_COMPILER_H_GUARD */

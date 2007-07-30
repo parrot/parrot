@@ -124,14 +124,14 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_bitwise_and( PARROT_INTERP,
     NULLOK(STRING *s1),
     NULLOK(STRING *s2),
-    NULLOK(STRING **dest) )
+    ARGOUT_NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING * string_bitwise_not( PARROT_INTERP,
     NULLOK(STRING *s),
-    NULLOK(STRING **dest) )
+    ARGOUT_NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -139,7 +139,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_bitwise_or( PARROT_INTERP,
     NULLOK(STRING *s1),
     NULLOK(STRING *s2),
-    NULLOK(STRING **dest) )
+    ARGOUT_NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -147,7 +147,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_bitwise_xor( PARROT_INTERP,
     NULLOK(STRING *s1),
     NULLOK(STRING *s2),
-    NULLOK(STRING **dest) )
+    ARGOUT_NULLOK(STRING **dest) )
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -398,7 +398,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING * string_repeat( PARROT_INTERP,
     NOTNULL(const STRING *s),
     UINTVAL num,
-    NULLOK(STRING **d) )
+    ARGOUT_NULLOK(STRING **d) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -409,7 +409,7 @@ STRING * string_replace( PARROT_INTERP,
     INTVAL offset,
     INTVAL length,
     NOTNULL(STRING *rep),
-    NULLOK(STRING **d) )
+    ARGOUT_NULLOK(STRING **d) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
@@ -449,7 +449,7 @@ STRING * string_substr( PARROT_INTERP,
     NOTNULL(STRING *src),
     INTVAL offset,
     INTVAL length,
-    NULLOK(STRING **d),
+    ARGOUT_NULLOK(STRING **d),
     int replace_dest )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

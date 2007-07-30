@@ -51,7 +51,7 @@ strings.
 /* HEADERIZER BEGIN: static */
 
 static void make_writable( PARROT_INTERP,
-    NOTNULL(STRING **s),
+    ARGINOUT(STRING **s),
     const size_t len,
     parrot_string_representation_t representation )
         __attribute__nonnull__(1)
@@ -937,7 +937,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_repeat(PARROT_INTERP, NOTNULL(const STRING *s),
-    UINTVAL num, NULLOK(STRING **d))
+    UINTVAL num, ARGOUT_NULLOK(STRING **d))
 {
     UINTVAL i;
 
@@ -978,7 +978,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 string_substr(PARROT_INTERP, NOTNULL(STRING *src), INTVAL offset, INTVAL length,
-        NULLOK(STRING **d), int replace_dest)
+        ARGOUT_NULLOK(STRING **d), int replace_dest)
 {
     STRING *dest;
     UINTVAL true_offset;
@@ -1053,7 +1053,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 STRING *
 string_replace(PARROT_INTERP, NOTNULL(STRING *src),
-    INTVAL offset, INTVAL length, NOTNULL(STRING *rep), NULLOK(STRING **d))
+    INTVAL offset, INTVAL length, NOTNULL(STRING *rep), ARGOUT_NULLOK(STRING **d))
 {
     STRING *dest = NULL;
     UINTVAL start_byte, end_byte;
@@ -1339,7 +1339,7 @@ has to be created.
 */
 
 static void
-make_writable(PARROT_INTERP, NOTNULL(STRING **s),
+make_writable(PARROT_INTERP, ARGINOUT(STRING **s),
     const size_t len, parrot_string_representation_t representation)
 {
     if (!*s)
@@ -1364,7 +1364,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_bitwise_and(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), NULLOK(STRING **dest))
+        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t minlen;
@@ -1476,7 +1476,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), NULLOK(STRING **dest))
+        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  maxlen = 0;
@@ -1546,7 +1546,7 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
 string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
-        NULLOK(STRING *s2), NULLOK(STRING **dest))
+        NULLOK(STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  maxlen = 0;
@@ -1628,7 +1628,7 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), NULLOK(STRING **dest))
+string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), ARGOUT_NULLOK(STRING **dest))
 {
     STRING *res;
     size_t  len;
