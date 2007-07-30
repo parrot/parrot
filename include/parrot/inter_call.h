@@ -102,6 +102,7 @@ int Parrot_init_arg_nci( PARROT_INTERP,
     ARGOUT(call_state *st),
     NOTNULL(const char *sig) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
@@ -128,6 +129,7 @@ int Parrot_init_ret_nci( PARROT_INTERP,
     ARGOUT(call_state *st),
     NOTNULL(const char *sig) )
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API

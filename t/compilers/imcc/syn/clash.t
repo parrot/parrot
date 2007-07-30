@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 15;
 
 pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
@@ -248,17 +248,6 @@ no_such:
 .end
 CODE
 ok
-OUT
-
-pir_output_like( <<'CODE', <<'OUT', "variable redefinition is an error");
-.sub main
-    .local pmc abc
-    .local string abc
-    .local int abc
-    .local num abc
-.end
-CODE
-/error.*variable 'abc' redefined/
 OUT
 
 # Local Variables:

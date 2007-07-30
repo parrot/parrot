@@ -1269,7 +1269,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addmethod op" );
     $P0.'foo'()
 .end
 
-.sub whatever_foo :method
+.sub whatever_foo :anon :method
     print "Foo!\n"
 .end
 CODE
