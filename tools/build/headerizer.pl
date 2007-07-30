@@ -222,7 +222,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg ( @args ) {
         ++$n;
-        if ( $arg =~ m{NOTNULL\(} || $arg eq 'PARROT_INTERP' ) {
+        if ( $arg =~ m{(ARGOUT|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|NOTNULL|NULLOK|ARGIN|ARGOUT)\b/ ) ) {

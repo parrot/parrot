@@ -99,7 +99,7 @@ int Parrot_init_arg_indexes_and_sig_pmc( PARROT_INTERP,
 
 PARROT_API
 int Parrot_init_arg_nci( PARROT_INTERP,
-    NOTNULL(call_state *st),
+    ARGOUT(call_state *st),
     NOTNULL(const char *sig) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -126,7 +126,7 @@ int Parrot_init_arg_sig( SHIM_INTERP,
 
 PARROT_API
 int Parrot_init_ret_nci( PARROT_INTERP,
-    NOTNULL(call_state *st),
+    ARGOUT(call_state *st),
     NOTNULL(const char *sig) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -1994,7 +1994,7 @@ tags.dummy:
 
 HEADERIZER_O_FILES = \
     $(O_FILES) \
-    \
+    src/exec$(O) \
     src/packdump$(O) \
     src/pbc_merge$(O) \
 

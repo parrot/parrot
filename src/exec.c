@@ -16,9 +16,6 @@ src/exec.c - Generate an object file
 
 */
 
-/* HEADERIZER HFILE: none */
-/* HEADERIZER STOP */
-
 #include <parrot/parrot.h>
 #if HAVE_COMPUTED_GOTO
 #  include <parrot/oplib/core_ops_cgp.h>
@@ -33,9 +30,24 @@ src/exec.c - Generate an object file
 
 /* HEADERIZER HFILE: include/parrot/exec.h */
 
-static void exec_init(Parrot_exec_objfile_t *obj);
-static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
-static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
+/* HEADERIZER BEGIN: static */
+
+static void add_data_member(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    NULLOK(void *src),
+    size_t len )
+        __attribute__nonnull__(1);
+
+static void exec_init( NOTNULL(Parrot_exec_objfile_t *obj) )
+        __attribute__nonnull__(1);
+
+static int symbol_list_find(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    NOTNULL(const char *symbol) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* HEADERIZER END: static */
 
 /*
  * Parrot_exec_run must be 0 while the program runs.
@@ -235,6 +247,7 @@ Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
     return symbol_number;
 }
 
+PARROT_API
 int *
 Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
                                      char *nptr, const char *var, int offset,
@@ -244,6 +257,7 @@ Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
     return (int *)offset;
 }
 
+PARROT_API
 void
 Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
                                       char *nptr, const char *func_name)
@@ -259,6 +273,7 @@ Adds a text rellocation to the object file.
 
 */
 
+PARROT_API
 void
 Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr,
     int type, const char *symbol, int disp)

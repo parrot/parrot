@@ -94,24 +94,45 @@ typedef struct Parrot_exec_objfile_t {
 } Parrot_exec_objfile_t;
 
 /* HEADERIZER BEGIN: src/exec.c */
-void Parrot_exec(PARROT_INTERP, opcode_t *pc,
-    opcode_t *code_start, opcode_t *code_end);
-PARROT_API void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
-    char *nptr, const char *func_name);
-PARROT_API int *Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
-    char *nptr, const char *var, int offset, int disp);
-PARROT_API void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj,
-    char *nptr, int type, const char *symbol, int disp);
-int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol, int stype)
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2);
 
-void Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file);
+PARROT_API
+void Parrot_exec_add_text_rellocation(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    char *nptr,
+    int type,
+    const char *symbol,
+    int disp )
+        __attribute__nonnull__(1);
 
-void Parrot_exec_emit_mov_mr(PARROT_INTERP, char *mem, int reg);
-void Parrot_exec_emit_mov_mr_n(PARROT_INTERP, char *mem, int reg);
-void Parrot_exec_emit_mov_rm(PARROT_INTERP, int reg, char *mem);
-void Parrot_exec_emit_mov_rm_n(PARROT_INTERP, int reg, char *mem);
+PARROT_API
+void Parrot_exec_add_text_rellocation_func(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    char *nptr,
+    const char *func_name )
+        __attribute__nonnull__(1);
+
+PARROT_API
+int * Parrot_exec_add_text_rellocation_reg(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    char *nptr,
+    const char *var,
+    int offset,
+    int disp )
+        __attribute__nonnull__(1);
+
+void Parrot_exec( PARROT_INTERP,
+    opcode_t *pc,
+    opcode_t *code_start,
+    opcode_t *code_end )
+        __attribute__nonnull__(1);
+
+int Parrot_exec_add_symbol(
+    NOTNULL(Parrot_exec_objfile_t *obj),
+    NOTNULL(const char *symbol),
+    int stype )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/exec.c */
 
 #endif /* EXEC_CAPABLE */
