@@ -20,10 +20,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_basic' :load :anon
-
-    load_bytecode 'languages/lua/lib/luaaux.pbc'
-
+.sub 'luaopen_basic'
 #    print "init Lua Basic\n"
 
     .local pmc _lua__REGISTRY

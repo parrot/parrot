@@ -30,10 +30,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_debug' :load :anon
-
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-
+.sub 'luaopen_debug'
 #    print "init Lua Debug\n"
 
     .local pmc _lua__GLOBAL

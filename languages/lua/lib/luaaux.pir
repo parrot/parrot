@@ -393,6 +393,23 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .end
 
 
+=item C<lua_openlibs ()>
+
+=cut
+
+.sub 'lua_openlibs'
+    luaopen_basic()
+    luaopen_coroutine()
+    luaopen_package()
+    luaopen_table()
+    luaopen_io()
+    luaopen_os()
+    luaopen_string()
+    luaopen_math()
+    luaopen_debug()
+.end
+
+
 =item C<lua_optint (narg, arg)>
 
 =cut

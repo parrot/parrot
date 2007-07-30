@@ -25,10 +25,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.5>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_table' :load :anon
-
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-
+.sub 'luaopen_table'
 #    print "init Lua Table\n"
 
     .local pmc _lua__GLOBAL

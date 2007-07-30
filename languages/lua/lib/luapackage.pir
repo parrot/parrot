@@ -19,10 +19,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_package' :load :anon
-
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-
+.sub 'luaopen_package'
 #    print "init Lua Package\n"
 
     .local pmc _lua__GLOBAL

@@ -20,10 +20,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_os' :load :anon
-
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-
+.sub 'luaopen_os'
 #    print "init Lua OS\n"
 
     .local pmc _lua__GLOBAL

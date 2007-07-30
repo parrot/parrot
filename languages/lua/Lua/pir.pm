@@ -19,16 +19,20 @@ package pirVisitor;
 .sub '__start' :anon :main
     .param pmc args
 #    print "start Lua\n"
+    load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
     load_bytecode 'languages/lua/lib/luacoroutine.pbc'
     load_bytecode 'languages/lua/lib/luapackage.pbc'
     load_bytecode 'languages/lua/lib/luastring.pbc'
+    load_bytecode 'languages/lua/lib/luaregex.pbc'
     load_bytecode 'languages/lua/lib/luatable.pbc'
     load_bytecode 'languages/lua/lib/luamath.pbc'
     load_bytecode 'languages/lua/lib/luaio.pbc'
+    load_bytecode 'languages/lua/lib/luafile.pbc'
     load_bytecode 'languages/lua/lib/luaos.pbc'
     load_bytecode 'languages/lua/lib/luadebug.pbc'
     load_bytecode 'languages/lua/lib/luaperl.pbc'
+    lua_openlibs()
     .local pmc env
     env = get_global '_G'
     .local pmc vararg

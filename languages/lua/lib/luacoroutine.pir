@@ -21,9 +21,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 
 .HLL 'Lua', 'lua_group'
 
-.sub 'init_coroutine' :load :anon
-
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
+.sub 'luaopen_coroutine'
     load_bytecode 'Parrot/Coroutine.pbc'
 
 #    print "init Lua Coroutine\n"

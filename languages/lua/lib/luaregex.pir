@@ -184,7 +184,7 @@ Francois Perrad
 
 =cut
 
-.sub '__onload' :load
+.sub '__onload' :anon :load
     load_bytecode 'PGE.pbc'
 
     $P0 = getclass 'PGE::Exp::CCShortcut'
