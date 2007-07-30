@@ -167,9 +167,7 @@ runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
 {
     opcode_t offset, *dest;
     parrot_context_t *ctx;
-    /*
-     * FIXME argument count limited - check strlen of sig
-     */
+
     char new_sig[10];
     const char *sig_p;
     parrot_context_t * const old_ctx = CONTEXT(interp->ctx);

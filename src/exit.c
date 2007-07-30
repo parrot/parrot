@@ -31,7 +31,7 @@ Register the specified function to be called on exit.
 */
 
 PARROT_API
-int
+void
 Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), NULLOK(void *arg))
 {
     /* XXX  we might want locking around the list access.   I'm sure this
@@ -43,7 +43,6 @@ Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), NULLOK(void *arg
     new_node->arg = arg;
     new_node->next = interp->exit_handler_list;
     interp->exit_handler_list = new_node;
-    return 0;
 }
 
 /*
