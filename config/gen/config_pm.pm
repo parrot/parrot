@@ -22,7 +22,6 @@ use vars qw($description @args);
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw(genfile);
-use Data::Dumper;
 use Cwd qw(cwd);
 use File::Spec::Functions qw(catdir);
 
@@ -41,9 +40,10 @@ sub runstep {
     open( my $IN, "<", "config/gen/config_pm/Config_pm.in" )
         or die "Can't open Config_pm.in: $!";
 
-    unless ( -d catdir(qw/lib Parrot Config/) ) {
-        mkdir catdir(qw/lib Parrot Config/)
-            or die "Can't create dir " . catdir(qw/lib Parrot Config/) . ": $!";
+    my $configdir = catdir(qw/lib Parrot Config/);
+    if ( !-d $configdir ) {
+        mkdir $configdir
+            or die "Can't create dir $configdir: $!";
     }
     open( my $OUT, ">", "lib/Parrot/Config/Generated.pm" )
         or die "Can't open lib/Parrot/Config/Generated.pm: $!";
