@@ -47,6 +47,8 @@ be reclaimed.
 
 =head2 GC Variants
 
+There are several variants possible with the preceding schemes.  These variants achieve different goals:
+
 =over 4
 
 =item stop-the-world
@@ -70,13 +72,13 @@ multi-processor machine.
 
 =item parallel
 
-Multiple threads are participating in GC.
+Multiple threads participate in GC.
 
 =item generational
 
 The object space is divided between a young generation (short-lived
-temporaries) and one or more old generations. By not scanning the old
-generation this can considerably speed up GC.
+temporaries) and one or more old generations. Not scanning the old
+generation repeatedly can considerably speed up GC.
 
 =back
 
@@ -182,19 +184,19 @@ Trace root set except volatile roots. That is skip e.g. registers.
 
 =back
 
-=item C<void (*de_init_gc_system) (Interp*)>
+=item C<void (*de_init_gc_system) (Interp *)>
 
 Called during interpreter destruction. Free used resources and memory pools.
 
-=item C<void (*mark_object) (Interp*, Pobj*)>
+=item C<void (*mark_object) (Interp *, Pobj*)>
 
-Mark the object being live. This function gets invoked by the following macro:
+Mark the object being live. This function gets invoked by the function:
 
-=item C<Parrot_pobj_lives(Interp*, PObj *)>
+=item C<pobject_lives(Interp *, PObj *)>
 
-which might do nothing if the object is already marked live.
+... which might do nothing if the object is already marked live.
 
-=item C<void (*init_pool) (Interp*, struct Small_Object_Pool *)>
+=item C<void (*init_pool) (Interp *, struct Small_Object_Pool *)>
 
 A function to initialize the given pool. This function should set the following
 object allocation functions for the given pool.
@@ -208,7 +210,7 @@ pool.
 
 =over 4
 
-=item C<PObj * (*get_free_object) (Interp*, struct Small_Object_Pool*)>
+=item C<PObj * (*get_free_object) (Interp *, struct Small_Object_Pool*)>
 
 It should return one free object from the given pool. Object flags are returned
 clear, except flags that are used by the garbage collector itself. If the pool
@@ -222,12 +224,12 @@ The GC subsystem has to provide these (possibly empty) macros:
 
 =over 4
 
-=item C<DOD_WRITE_BARRIER(Interp*, PMC *agg, PMC *old, PMC *new)>
+=item C<DOD_WRITE_BARRIER(Interp *, PMC *agg, PMC *old, PMC *new)>
 
 This macro is invoked when in aggregate C<agg> the element C<old> is getting
 overritten by C<new>. Both C<old> and C<new> may be NULL.
 
-=item C<DOD_WRITE_BARRIER_KEY(Interp*, PMC *agg, PMC *old, PObj
+=item C<DOD_WRITE_BARRIER_KEY(Interp *, PMC *agg, PMC *old, PObj
 *old_key, PMC *new, PObj *new_key)>
 
 Like above. Invoked when a hash key is inserted, possibly replacing an old
@@ -292,9 +294,9 @@ called when the PMC is destroyed.
 =item PObj_custom_mark_FLAG
 
 The C<mark> vtable slot will be called during DOD. The mark function must call
-C<Parrot_pobj_lives> for all non-NULL objects that PMC refers too.
+C<pobject_lives> for all non-NULL objects that PMC refers to.
 
-Please note that C<Parrot_pobj_lives> may be a macro.
+Please note that C<pobject_lives> may be a macro.
 
 =item PObj_data_is_PMC_array_FLAG
 
