@@ -370,7 +370,7 @@ get_nci_P(PARROT_INTERP, NOTNULL(call_state *st), int n)
  * set return value
  */
 static void
-set_nci_I(PARROT_INTERP, NOTNULL(call_state *st), INTVAL val)
+set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val)
 {
     Parrot_init_ret_nci(interp, st, "I");
     if (st->dest.i < st->dest.n) {
@@ -381,7 +381,7 @@ set_nci_I(PARROT_INTERP, NOTNULL(call_state *st), INTVAL val)
 }
 
 static void
-set_nci_N(PARROT_INTERP, NOTNULL(call_state *st), FLOATVAL val)
+set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val)
 {
     Parrot_init_ret_nci(interp, st, "N");
     if (st->dest.i < st->dest.n) {
@@ -392,7 +392,7 @@ set_nci_N(PARROT_INTERP, NOTNULL(call_state *st), FLOATVAL val)
 }
 
 static void
-set_nci_S(PARROT_INTERP, NOTNULL(call_state *st), STRING *val)
+set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val)
 {
     Parrot_init_ret_nci(interp, st, "S");
     if (st->dest.i < st->dest.n) {
@@ -403,7 +403,7 @@ set_nci_S(PARROT_INTERP, NOTNULL(call_state *st), STRING *val)
 }
 
 static void
-set_nci_P(PARROT_INTERP, NOTNULL(call_state *st), PMC* val)
+set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
 {
     Parrot_init_ret_nci(interp, st, "P");
     if (st->dest.i < st->dest.n) {

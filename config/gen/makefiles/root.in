@@ -1885,7 +1885,7 @@ splint-andy :
 		+stats \
 		-showsummary \
 		+partial \
-		src/gc/*.c \
+		src/nci.c \
 
 
 #
