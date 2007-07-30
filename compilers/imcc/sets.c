@@ -30,7 +30,6 @@ set_make_full(int length)
 {
     Set * const s   = set_make(length);
     const int bytes = NUM_BYTES(length);
-    int i;
 
     if (bytes)
         memset(s->bmp, 0xff, bytes);
