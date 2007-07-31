@@ -142,7 +142,7 @@ Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
     /* we need one return continuation with a NULL offset */
     PMC * const ret_c = new_ret_continuation_pmc(interp, NULL);
     interp->current_cont = ret_c;
-#if GC_VERBOSE
+#if defined GC_VERBOSE && GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
 #endif
     /* invoke the sub, which places the context of the sub in the
@@ -311,17 +311,15 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(PMC *sub),
 {
     va_list args;
     parrot_context_t *ctx;
-    opcode_t *cargs, *params, *returns;
-    PMC *cont;
     void *retval;
     /*
      * running code from event handlers isn't fully reentrant due to
      * these interpreter variables - mainly related to calls
      */
-    cargs   = interp->current_args;
-    params  = interp->current_params;
-    returns = interp->current_returns;
-    cont    = interp->current_cont;
+    opcode_t * const cargs   = interp->current_args;
+    opcode_t * const params  = interp->current_params;
+    opcode_t * const returns = interp->current_returns;
+    PMC *      const cont    = interp->current_cont;
     /* what else ? */
 
     va_start(args, sig);
