@@ -17,6 +17,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 #include "parrot/parrot.h"
 #include "inter_misc.str"
+#include "../compilers/imcc/imc.h"
 
 /* XXX Put me somewhere else */
 void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
