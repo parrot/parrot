@@ -16,11 +16,12 @@ The library exports a single function: alarm(s,[f]).
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::alarm' ]
 
 .sub '__onload' :anon :load
 #    print "__onload alarm\n"
     .const .Sub entry = 'luaopen_alarm'
-    set_root_global 'luaopen_alarm', entry
+    set_hll_global 'luaopen_alarm', entry
 .end
 
 .sub 'luaopen_alarm'
@@ -28,7 +29,7 @@ The library exports a single function: alarm(s,[f]).
 #    print "luaopen_alarm\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = get_global '_G'
+    _lua__GLOBAL = get_hll_global '_G'
 
     new $P1, .LuaString
 
@@ -55,7 +56,7 @@ inside C<f>.
     .param pmc func :optional
     .local pmc res
     $I1 = lua_checknumber(1, s)
-    $P0 = get_global '_REGISTRY'
+    $P0 = get_hll_global '_REGISTRY'
     new $P1, .LuaString
     set $P1, 'alarm handler'
     unless null func goto L1

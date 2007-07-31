@@ -25,11 +25,11 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = new .LuaTable
-    set_global '_REGISTRY', _lua__REGISTRY
+    set_hll_global '_REGISTRY', _lua__REGISTRY
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = new .LuaTable
-    set_global '_G', _lua__GLOBAL
+    set_hll_global '_G', _lua__GLOBAL
     new $P1, .LuaString
 
     set $P1, '_LOADED'
@@ -353,7 +353,7 @@ default for C<f> is 1.
     $I0 = isa f, 'LuaClosure'
     if $I0 goto L3
   L2:
-    res = get_global '_G'
+    res = get_hll_global '_G'
     .return (res)
   L3:
     .return lua_getfenv(f)
@@ -434,7 +434,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     lua_checktype(1, t, 'table')
     unless null i goto L1
     .local pmc _G
-    _G = get_global '_G'
+    _G = get_hll_global '_G'
     .const .LuaString key_ipairs = 'ipairs'
     .local pmc ipairs
     ipairs = _G.'rawget'(key_ipairs)
@@ -582,7 +582,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .param pmc t :optional
     lua_checktype(1, t, 'table')
     .local pmc _G
-    _G = get_global '_G'
+    _G = get_hll_global '_G'
     .const .LuaString key_next = 'next'
     .local pmc next
     next = _G.'rawget'(key_next)

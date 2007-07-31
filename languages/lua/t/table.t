@@ -56,14 +56,14 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (out of ra
 t = {"a","b","c","d","e"}
 print(table.concat(t,",",2,7))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'concat' \(table contains non-strings\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*concat' \(table contains non-strings\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function concat (non-string)' );
 t = {"a","b",true,"d","e"}
 print(table.concat(t,","))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'concat' \(table contains non-strings\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*concat' \(table contains non-strings\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (array)' );

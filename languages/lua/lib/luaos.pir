@@ -19,12 +19,13 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::os' ]
 
 .sub 'luaopen_os'
 #    print "init Lua OS\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = get_global '_G'
+    _lua__GLOBAL = get_hll_global '_G'
     new $P1, .LuaString
 
     .local pmc _os

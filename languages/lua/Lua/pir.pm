@@ -34,7 +34,7 @@ package pirVisitor;
     load_bytecode 'languages/lua/lib/luaperl.pbc'
     lua_openlibs()
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     .local pmc vararg
     vararg = argstolua(env, args)
     .const .Sub main = '_main'

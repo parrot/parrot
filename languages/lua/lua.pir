@@ -288,7 +288,7 @@ show version information.
     .local int narg
     (narg, $P0) = getargs(args, n)  # collect arguments
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     .const .LuaString k_arg = 'arg'
     env.'rawset'(k_arg, $P0)
     .local string fname
@@ -375,7 +375,7 @@ show version information.
 .sub 'dolibrary' :anon
     .param string name
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     .const .LuaString k_require = 'require'
     $P0 = env.'rawget'(k_require)
     new $P1, .LuaString
@@ -391,7 +391,7 @@ show version information.
 
 .sub 'dotty' :anon
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     .const .LuaString k_print = 'print'
     .local int has_readline
     .local pmc stdin
@@ -464,7 +464,7 @@ show version information.
 .sub 'get_prompt' :anon
     .param int firstline
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     $S0 = '_PROMPT'
     $S1 = '> '
     if firstline goto L1

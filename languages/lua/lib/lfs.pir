@@ -22,11 +22,12 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::lfs'; 'Lua' ]
 
 .sub '__onload' :anon :load
 #    print "__onload lfs\n"
     .const .Sub entry = 'luaopen_lfs'
-    set_root_global 'luaopen_lfs', entry
+    set_hll_global 'luaopen_lfs', entry
 .end
 
 .sub 'luaopen_lfs'
@@ -34,7 +35,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 #    print "luaopen_lfs\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = get_global '_G'
+    _lua__GLOBAL = get_hll_global '_G'
 
     new $P1, .LuaString
 

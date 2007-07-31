@@ -217,8 +217,7 @@ Francois Perrad
     target = downcase target
 
     .local pmc match
-    $P0 = get_global 'luaregex'
-    match = $P0(source)
+    match = luaregex(source)
     if target != 'parse' goto check
     .return (match)
 

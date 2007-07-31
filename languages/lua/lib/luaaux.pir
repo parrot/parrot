@@ -154,7 +154,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     unless $I0 goto L1
     .local pmc _lua__REGISTRY
     .local pmc key
-    _lua__REGISTRY = get_global '_REGISTRY'
+    _lua__REGISTRY = get_hll_global '_REGISTRY'
     new key, .LuaString
     set key, type
     $P0 = _lua__REGISTRY[key]
@@ -320,7 +320,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $P0 = lua_comp.'compile'(buff)
     $P0 = $P0[1]
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     $P0.'setfenv'(env)
     .return ($P0)
   _handler:
@@ -354,7 +354,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $P0 = lua_comp.'compile'($S0)
     $P0 = $P0[1]
     .local pmc env
-    env = get_global '_G'
+    env = get_hll_global '_G'
     $P0.'setfenv'(env)
     .return ($P0)
   _handler:
@@ -380,7 +380,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param string tname
     .local pmc _lua__REGISTRY
     .local pmc res
-    _lua__REGISTRY = get_global '_REGISTRY'
+    _lua__REGISTRY = get_hll_global '_REGISTRY'
     new $P1, .LuaString
     set $P1, tname
     res = _lua__REGISTRY[$P1]
@@ -398,15 +398,24 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 =cut
 
 .sub 'lua_openlibs'
-    luaopen_basic()
-    luaopen_coroutine()
-    luaopen_package()
-    luaopen_table()
-    luaopen_io()
-    luaopen_os()
-    luaopen_string()
-    luaopen_math()
-    luaopen_debug()
+    $P0 = get_hll_global 'luaopen_basic'
+    $P0()
+    $P0 = get_hll_global ['Lua::coroutine'], 'luaopen_coroutine'
+    $P0()
+    $P0 = get_hll_global ['Lua::package'], 'luaopen_package'
+    $P0()
+    $P0 = get_hll_global ['Lua::table'], 'luaopen_table'
+    $P0()
+    $P0 = get_hll_global ['Lua::io'], 'luaopen_io'
+    $P0()
+    $P0 = get_hll_global ['Lua::os'], 'luaopen_os'
+    $P0()
+    $P0 = get_hll_global ['Lua::string'], 'luaopen_string'
+    $P0()
+    $P0 = get_hll_global ['Lua::math'], 'luaopen_math'
+    $P0()
+    $P0 = get_hll_global ['Lua::debug'], 'luaopen_debug'
+    $P0()
 .end
 
 
@@ -453,7 +462,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param pmc lib
     .const .LuaString _loaded = '_LOADED'
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = get_global '_REGISTRY'
+    _lua__REGISTRY = get_hll_global '_REGISTRY'
     $P0 = _lua__REGISTRY[_loaded]
     $P0[libname] = lib
 .end

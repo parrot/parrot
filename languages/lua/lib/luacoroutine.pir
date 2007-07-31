@@ -20,6 +20,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::coroutine' ]
 
 .sub 'luaopen_coroutine'
     load_bytecode 'Parrot/Coroutine.pbc'
@@ -27,7 +28,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 #    print "init Lua Coroutine\n"
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = get_global '_G'
+    _lua__GLOBAL = get_hll_global '_G'
     new $P1, .LuaString
 
     .local pmc _coroutine
@@ -68,7 +69,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
     _coroutine[$P1] = _coroutine_yield
 
     new $P0, .ResizablePMCArray
-    set_global '_COROUTINE_STACK', $P0
+    set_hll_global '_COROUTINE_STACK', $P0
 
 .end
 
@@ -130,7 +131,7 @@ C<resume> returns B<false> plus the error message.
     .param pmc argv :slurpy
     .local pmc res
     .local pmc co_stack
-    co_stack = get_global '_COROUTINE_STACK'
+    co_stack = get_hll_global '_COROUTINE_STACK'
     push co_stack, co
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
@@ -158,7 +159,7 @@ Returns the running coroutine, or B<nil> when called by the main thread.
 .sub 'running' :anon
     .local pmc co_stack
     .local pmc res
-    co_stack = get_global '_COROUTINE_STACK'
+    co_stack = get_hll_global '_COROUTINE_STACK'
     $I0 = elements co_stack
     if $I0 goto L1
     new res, .LuaNil
@@ -248,7 +249,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
     .local pmc res
     .local pmc co
     .local pmc co_stack
-    co_stack = get_global '_COROUTINE_STACK'
+    co_stack = get_hll_global '_COROUTINE_STACK'
     co = pop co_stack
     $P0 = getattribute co, 'co'
     (res :slurpy) = $P0.'yield'(argv :flat)

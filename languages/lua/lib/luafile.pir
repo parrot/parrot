@@ -16,6 +16,7 @@ See F<languages/lua/lib/luaio.pir>.
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::io' ]
 
 .sub 'createmeta'
     .param pmc env

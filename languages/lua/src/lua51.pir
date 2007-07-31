@@ -148,10 +148,10 @@ for internal global variables used by Lua.
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
     .local pmc kw
-    kw = get_hll_global 'keyword'
+    kw = get_global 'keyword'
     unless null kw goto L3
     kw = _const_keyword()
-    set_hll_global 'keyword', kw
+    set_global 'keyword', kw
   L3:
     $I0 = exists kw[$S0]
     if $I0 goto L2
