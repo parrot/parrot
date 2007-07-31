@@ -162,6 +162,7 @@ PARROT_API
 int
 Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st), NOTNULL(const char *sig))
 {
+    init_call_stats(st);
     if (PMC_IS_NULL(interp->args_signature))
         Parrot_init_arg_op(interp, CONTEXT(interp->ctx), interp->current_args, &st->src);
     else

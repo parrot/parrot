@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -1396,6 +1396,23 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading get_class vtable" );
 
 CODE
 get_class was called
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', ":flat args to NCI methods" );
+## The point of this is to make sure that we can call File.exists (which is
+## an NCI method) with a :flat arg,  Fixes RT#44247.
+.sub _ :main
+    .local pmc arr, file
+    arr = new .ResizablePMCArray
+    push arr, 'no such file.txt'
+    file = new .File
+    $I0 = file.exists(arr :flat)
+    print "exists:  "
+    print $I0
+    print "\n"
+.end
+CODE
+exists:  0
 OUTPUT
 
 # Local Variables:
