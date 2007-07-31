@@ -55,15 +55,6 @@ extract:
   pos = $I0
   goto eat_space
 
-loop_done:
-  # grab the rest of the string
-  $I1 = len - pos
-  $S0 = substr str, pos, $I1
-  $P0 = new 'String'
-  $P0 = $S0
-  push retval, $P0
-  goto done
-
   # find the closing '"'
 quote:
   inc pos
