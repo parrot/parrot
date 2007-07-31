@@ -113,6 +113,10 @@ Various other PMCs return different values for undefinedness.  Pick a standard.
 The current favorite is a singleton Null PMC. Check the implementation of
 PMCNULL.
 
+=item *
+
+<chromatic> How does COW work and why doesn't COW work? (docs/glossary.pod)
+
 =back
 
 =head1 DESCRIPTION
