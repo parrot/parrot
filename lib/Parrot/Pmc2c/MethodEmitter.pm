@@ -115,7 +115,7 @@ sub decl {
         $pmcvar    = ' pmc';
     }
     return <<"EOC";
-$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(Interp *$interp, PMC*$pmcvar$args)$semi
+$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC*$pmcvar$args)$semi
 EOC
 }
 
