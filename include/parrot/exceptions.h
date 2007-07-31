@@ -257,7 +257,7 @@ void rethrow_c_exception( PARROT_INTERP )
 #ifdef NDEBUG
 #  define PARROT_ASSERT(x) ((void)0)
 #else
-#  define PARROT_ASSERT(x) ((void) ((x) ? 0 : Parrot_confess(#x, __FILE__, __LINE__)))
+#  define PARROT_ASSERT(x) (((x) ? (void)0 : (void)Parrot_confess(#x, __FILE__, __LINE__)))
 #endif
 
 
