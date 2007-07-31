@@ -219,42 +219,6 @@ void pt_thread_yield( void );
 PMC * pt_transfer_sub( Parrot_Interp d, Parrot_Interp s, PMC *sub );
 /* HEADERIZER END: src/thread.c */
 
-/*
- * thread.c interface functions
- */
-int  pt_thread_run(Parrot_Interp, PMC* dest_interp, PMC* sub, PMC *arg);
-int  pt_thread_run_1(Parrot_Interp, PMC* dest_interp, PMC* sub, PMC *arg);
-int  pt_thread_run_2(Parrot_Interp, PMC* dest_interp, PMC* sub, PMC *arg);
-int  pt_thread_run_3(Parrot_Interp, PMC* dest_interp, PMC* sub, PMC *arg);
-
-void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
-void pt_clone_code(Parrot_Interp d, Parrot_Interp s);
-void pt_clone_globals(Parrot_Interp d, Parrot_Interp s);
-void pt_add_to_interpreters(Parrot_Interp first, Parrot_Interp new_interp);
-void pt_thread_yield(void);
-PMC* pt_thread_join(Parrot_Interp, UINTVAL);
-void pt_thread_detach(UINTVAL);
-void pt_thread_kill(UINTVAL);
-void pt_join_threads(Parrot_Interp);
-void pt_suspend_self_for_gc(Parrot_Interp);
-
-PMC *pt_shared_fixup(Parrot_Interp, PMC*);
-
-PMC *pt_transfer_sub(Parrot_Interp dest, Parrot_Interp source, PMC *sub);
-
-void pt_thread_wait_with(Parrot_Interp, Parrot_mutex *);
-
-/*
- * DOD interface
- */
-void pt_DOD_start_mark(Parrot_Interp);
-void pt_DOD_mark_root_finished(Parrot_Interp);
-void pt_DOD_stop_mark(Parrot_Interp);
-
-
-PARROT_API void Parrot_shared_DOD_block(Parrot_Interp);
-PARROT_API void Parrot_shared_DOD_unblock(Parrot_Interp);
-
 #endif /* PARROT_THREAD_H_GUARD */
 
 /*
