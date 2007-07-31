@@ -111,19 +111,6 @@ INTVAL intval_mod( INTVAL i2, INTVAL i3 );
 /* HEADERIZER END: src/utils.c */
 
 
-/*
- * IMCC API
- * XXX These should go into another file, not seen by libparrot
- */
-void *IMCC_compile_file_s(Parrot_Interp interp, const char *s,
-        STRING **error_message);
-void * IMCC_compile_file(Parrot_Interp interp, const char *s);
-PMC * IMCC_compile_pir_s(Parrot_Interp interp, const char *s,
-        STRING **error_message);
-PMC * IMCC_compile_pasm_s(Parrot_Interp interp, const char *s,
-        STRING **error_message);
-
-
 /* HEADERIZER BEGIN: src/misc.c */
 
 PARROT_API
