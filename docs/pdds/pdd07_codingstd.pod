@@ -624,20 +624,6 @@ All other source files associated with the subsystem will have the prefix foo_
 
 =back
 
-=item Header Files
-
-All .h files should include the following "guards" to prevent
-multiple-inclusion:
-
-    /* file header comments */
-
-    #if !defined(PARROT_<FILENAME>_H_GUARD)
-    #define PARROT_<FILENAME>_H_GUARD
-
-    /* body of file */
-
-    #endif /* PARROT_<FILENAME>_H_GUARD */
-
 =item Names of code entities
 
 Code entities such as variables, functions, macros etc (apart from strictly
