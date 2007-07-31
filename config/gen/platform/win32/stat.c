@@ -45,13 +45,13 @@ Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
     result = -1;
     break;
   case STAT_ACCESSTIME:
-    result = statbuf.st_atime;
+    result = (INTVAL)statbuf.st_atime;
     break;
   case STAT_MODIFYTIME:
-    result = statbuf.st_mtime;
+    result = (INTVAL)statbuf.st_mtime;
     break;
   case STAT_CHANGETIME:
-    result = statbuf.st_ctime;
+    result = (INTVAL)statbuf.st_ctime;
     break;
   case STAT_BACKUPTIME:
     result = -1;
@@ -116,13 +116,13 @@ Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)
     result = -1;
     break;
   case STAT_ACCESSTIME:
-    result = statbuf.st_atime;
+    result = (INTVAL)statbuf.st_atime;
     break;
   case STAT_MODIFYTIME:
-    result = statbuf.st_mtime;
+    result = (INTVAL)statbuf.st_mtime;
     break;
   case STAT_CHANGETIME:
-    result = statbuf.st_ctime;
+    result = (INTVAL)statbuf.st_ctime;
     break;
   case STAT_BACKUPTIME:
     result = -1;
