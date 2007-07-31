@@ -59,9 +59,9 @@ sub generate_body {
     $emit->("}\n");
 
     if ($self->mmds) {
-	for my $mmd ( @{ $self->mmds } ) {
-	    $mmd->generate_body($pmc);
-	}
+        for my $mmd ( @{ $self->mmds } ) {
+            $mmd->generate_body($pmc);
+        }
     }
 
     return 1;
@@ -74,9 +74,9 @@ sub generate_headers {
     $hout .= $self->decl( $pmc, 'HEADER' );
 
     if ($self->mmds) {
-	for my $mmd ( @{ $self->mmds } ) {
-	    $hout .= $mmd->decl( $pmc, 'HEADER' );
-	}
+        for my $mmd ( @{ $self->mmds } ) {
+            $hout .= $mmd->decl( $pmc, 'HEADER' );
+        }
     }
 
     return $hout;
