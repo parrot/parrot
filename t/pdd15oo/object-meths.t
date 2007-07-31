@@ -62,77 +62,81 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
-    newpdd15class P2, "Foo"
-    set S0, "meth"
+pir_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
+.sub main :main
+    $P2 = newpdd15class "Foo"
+    $P3 = new $P2
+    set $S0, "meth"
 
     print "main\n"
-    callmethodcc P2, S0
+    $P3.'meth'()
     print "back\n"
     end
+.end
 
 .namespace ["Foo"]
-.pcc_sub meth:
+.sub meth :method
     print "in meth\n"
-    returncc
+    .return ()
+.end
 CODE
 main
 in meth
 back
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "can class" );
-    newpdd15class P2, "Foo"
-    set S0, "meth"
+pir_output_is( <<'CODE', <<'OUTPUT', "can class" );
+.sub main :main
+    $P2 = newpdd15class "Foo"
 
-    new P3, .Sub
-    # store the sub with the real name
-    store_global "Foo", "meth", P3
+    $P3 = new "Sub"
+    # Add a method to the class manually
+    $P2.'add_method'("meth", $P3)
 
-    can I0, P2, "meth"
-    print I0
-    print "\n"
-    can I0, P2, "no_such_meth"
-    print I0
+    # Classes only report 'can' for class methods, not instance methods
+    can $I0, $P2, "meth"
+    print $I0
     print "\n"
     end
+.end
+CODE
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "can object" );
+.sub main :main
+    $P2 = newpdd15class "Foo"
+    $P4 = new "Foo"
+
+    $P3 = new "Sub"
+    # Add a method to the class manually
+    $P2.'add_method'("meth", $P3)
+
+    can $I0, $P4, "meth"
+    print $I0
+    print "\n"
+    can $I0, $P4, "no_such_meth"
+    print $I0
+    print "\n"
+    end
+.end
 CODE
 1
 0
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "can object" );
-    newpdd15class P2, "Foo"
-    new P2, "Foo"
-
-    set S0, "meth"
-
-    new P3, .Sub
-    # store the sub with the real name
-    store_global "Foo", "meth", P3
-
-    can I0, P2, "meth"
-    print I0
-    print "\n"
-    can I0, P2, "no_such_meth"
-    print I0
-    print "\n"
-    end
-CODE
-1
-0
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "constructor" );
-    newpdd15class P1, "Foo"
-    new P3, "Foo"
+pir_output_is( <<'CODE', <<'OUTPUT', "constructor" );
+.sub main :main
+    $P1 = newpdd15class "Foo"
+    new $P3, "Foo"
     print "ok 2\n"
     end
+.end
+
 .namespace ["Foo"]
-.pcc_sub __init:
-    get_params "(0)", P2
+.sub init :method :vtable
     print "ok 1\n"
-    returncc
+.end
 CODE
 ok 1
 ok 2
