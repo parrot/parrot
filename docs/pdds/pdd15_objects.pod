@@ -353,10 +353,17 @@ names and namespace names as a parameter, not just class objects.}}
 Returns true or false if the class can perform the requested method.
 (Including with an AUTOLOAD)
 
+A class object only reports on class methods, it does not report on instance
+methods.
+
 =item does(class *)
 
 Returns true or false to note whether the class in question implements the
 interface passed in.
+
+A class object only reports on interfaces of the class (i.e. roles composed
+into the metaclass), while an instance object only reports on interfaces of the
+instance (i.e. roles composed into the class).
 
 =item inspect()
 
@@ -518,12 +525,18 @@ objects instantiated from the class), false otherwise.
 Returns true if the class object can perform the requested method, false
 otherwise.
 
+A class object only reports on class methods, not on instance methods.
+
 =item does
 
   $I1 = $P2.does($S3)
 
 Returns true if the object in question implements the role, class, type,
 or behavior passed in, false otherwise.
+
+A class object only reports on interfaces of the class (i.e. roles composed
+into the metaclass), while an instance object only reports on interfaces of the
+instance (i.e. roles composed into the class).
 
 =item inspect
 
@@ -611,10 +624,15 @@ inheritance hierarchy of the object.
 Returns true or false if the object can perform the requested method.
 (Including with an AUTOLOAD)
 
+An instance object only reports on instance methods, not on class methods.
+
 =item does(class *)
 
 Returns true or false to note whether the object in question implements the
 interface passed in.
+
+An instance object only reports on interfaces of the instance (i.e. roles
+composed into the class).
 
 =item get_attr(STRING*)
 
@@ -712,6 +730,10 @@ Returns true or false if the role can perform the requested method.
 
 Returns true or false to note whether the role in question implements the
 interface passed in.
+
+A role object only reports on interfaces of the role (i.e. roles composed into
+the metarole), it doesn't report on which interfaces will be added to an object
+that composes the role.
 
 =item clone
 
