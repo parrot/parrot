@@ -235,7 +235,7 @@ the code found after the pmc body
 
 =item *
 
-number of newlines in the pmc signatuer that need to be addde to the
+number of newlines in the pmc signature that need to be added to the
 running total of lines in the file
 
 =back
