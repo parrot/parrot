@@ -28,7 +28,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Fatal qw{open close};
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 my $pmc2c = join $PConfig{slash}, qw(. tools build pmc2c.pl);
@@ -148,6 +148,30 @@ END_PMC
                 Parrot_register_HLL_type( interp, pmc_id, enum_class_Integer, entry);
 END_C
 
+
+pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps' );
+pmclass a hll dale maps Integer {
+    void init() {
+    }
+}
+END_PMC
+Parrot_a_init(PARROT_INTERP, PMC* pmc)
+{
+#line 2
+END_C
+
+pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps' );
+pmclass a
+    hll dale
+    maps Integer {
+    void init() {
+    }
+}
+END_PMC
+Parrot_a_init(PARROT_INTERP, PMC* pmc)
+{
+#line 4
+END_C
 
 # Local Variables:
 #   mode: cperl
