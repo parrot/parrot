@@ -303,7 +303,7 @@ the list of parents this pmc extends
 
 =back
 
-B<Comments:>  Called internally by C<parse_pmc()>.
+B<Comments:>  Called internally by C<parse_top_level()>.
 
 =cut
 
