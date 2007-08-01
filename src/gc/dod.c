@@ -647,7 +647,7 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
                             PMC_sync(p) = NULL;
                         }
 
-                        ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
+                        ext_pool->add_free_object(interp, ext_pool, (PObj *)p->pmc_ext);
                     }
 #ifndef NDEBUG
                     /*
