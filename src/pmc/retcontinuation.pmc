@@ -96,10 +96,10 @@ Transfers control to the calling context, and frees the current context.
             Small_Object_Pool *pool, *ext_pool =
                 arena_base->pmc_ext_pool;
             ext_pool->add_free_object(interp, ext_pool,
-                    SELF->pmc_ext);
+                    (PObj *)SELF->pmc_ext);
             PObj_flags_SETTO((PObj *)SELF, PObj_on_free_list_FLAG);
             pool = arena_base->pmc_pool;
-            pool->add_free_object(interp, pool, SELF);
+            pool->add_free_object(interp, pool, (PObj *)SELF);
             pool->num_free_objects ++;
         }
 #else
