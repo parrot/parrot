@@ -832,10 +832,10 @@ PIO_win32_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io
     int err_code;
 
     ParrotIO * const newio = PIO_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
-    const int newsize = sizeof (struct sockaddr);
+    Parrot_Socklen_t newsize = sizeof (struct sockaddr);
 
     newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote),
-                     (Parrot_Socklen_t *)&newsize);
+                     &newsize);
     err_code = WSAGetLastError();
 
     if (err_code != 0) {
