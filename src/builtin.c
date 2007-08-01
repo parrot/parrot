@@ -82,7 +82,7 @@ static Builtins builtins[] = {
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int check_builtin_sig( size_t i, NOTNULL(const char *sig), int pass )
+static int check_builtin_sig( size_t i, NOTNULL(const char *sig), int convert_pmcs )
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -118,20 +118,8 @@ Parrot_init_builtins(PARROT_INTERP)
     size_t i;
 
     for (i = 0; i < N_BUILTINS; ++i) {
-        /* XXX mangle yes or no */
-#ifdef MANGLE_BUILTINS
-        char buffer[128];
-
-        buffer[0] = '_';
-        buffer[1] = '_';
-        strcpy(buffer + 2, builtins[i].c_name);
-        builtins[i].meth_name = const_string(interp, buffer);
-#else
-        builtins[i].meth_name = const_string(interp,
-                builtins[i].c_name);
-#endif
-        builtins[i]._namespace = const_string(interp,
-                builtins[i].c_ns);
+        builtins[i].meth_name  = const_string(interp, builtins[i].c_name);
+        builtins[i]._namespace = const_string(interp, builtins[i].c_ns);
     }
 }
 
@@ -187,18 +175,25 @@ find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
 
 PARROT_WARN_UNUSED_RESULT
 static int
-check_builtin_sig(size_t i, NOTNULL(const char *sig), int pass)
+check_builtin_sig(size_t i, NOTNULL(const char *sig), int convert_pmcs)
 {
     const Builtins * const b = builtins + i;
     const char *p;
     int opt = 0;
 
     p = b->signature;
+
+    /* opcodes don't have a void type,
+     * so skip to the next type if the builtin is void */
     if (*p != *sig && *p == 'v')
         ++p;
+
+    /*
+     * Check that each type in the signatures match.
+     */
     for (; *p && *sig; ++sig, ++p) {
         switch (*p) {
-            case '.':   /* optional start */
+            case '.':   /* start of :optional parameters */
                 opt = 1;
                 /* fall through */
             case 'J':   /* interpreter */
@@ -206,15 +201,21 @@ check_builtin_sig(size_t i, NOTNULL(const char *sig), int pass)
         }
         if (*p == 'O' && *sig == 'P')
             continue;
-        if (pass && (*p == 'P' || *sig == 'P'))
+        if (convert_pmcs && (*p == 'P' || *sig == 'P'))
             continue;
         if (*p != *sig)
             return 0;
     }
+
+    /* if we've reached the end of both signatures */
     if (!*p && !*sig)
         return 1;
+
+    /* if we're at the end of the passed in signature and the rest of the
+     * builtin's signature is :optional args */
     if (*p && opt)
         return 1;
+
     return 0;
 }
 
@@ -222,27 +223,33 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_is_builtin(NOTNULL(const char *func), NULLOK(const char *sig))
 {
-    int bi, i, pass;
+    int bi, i, convert_pmcs;
 
     i = find_builtin(func);
     if (i < 0)
         return -1;
+
+    /* if the sig is NULL, we don't need to check it -- just return */
     if (!sig)
         return i;
+
+    /* First, try to find an exact match. If we can't find one, see if we can
+     * find a match by allowing conversions to/from PMCs. */
     bi = i;
-    for (pass = 0; pass <= 1; ++pass) {
+    for (convert_pmcs = 0; convert_pmcs <= 1; ++convert_pmcs) {
         i = bi;
 again:
-        if (check_builtin_sig(i, sig, pass))
+        if (check_builtin_sig(i, sig, convert_pmcs))
             return i;
         if (i < N_BUILTINS - 1) {
             /* try next with same name */
             ++i;
-            if (strcmp(func, builtins[i].c_name))
-                continue;
-            goto again;
+            /* if the name of the next builtin matches, check its signature */
+            if (!strcmp(func, builtins[i].c_name))
+                goto again;
         }
     }
+
     return -1;
 }
 
@@ -252,6 +259,8 @@ PMC*
 Parrot_find_builtin(PARROT_INTERP, NOTNULL(STRING *func))
 {
     const int i = find_builtin_s(interp, func);
+
+    /* XXX What's going on here? --mdiep, 31 July 07 */
     if (i < 0)
         return Parrot_find_global_s(interp,
                                     CONST_STRING(interp, "__parrot_core"),
