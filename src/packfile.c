@@ -24,6 +24,7 @@ structure of the frozen bytecode.
 #include "parrot/embed.h"
 #include "parrot/packfile.h"
 #include "jit.h"
+#include "../compilers/imcc/imc.h"
 
 /* XXX Declare this elsewhere */
 void * IMCC_compile_file(PARROT_INTERP, const char *s);
