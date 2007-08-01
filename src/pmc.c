@@ -133,7 +133,7 @@ pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
                 mem_internal_free(PMC_sync(pmc));
                 PMC_sync(pmc) = NULL;
             }
-            ext_pool->add_free_object(interp, ext_pool, pmc->pmc_ext);
+            ext_pool->add_free_object(interp, ext_pool, (PObj *)pmc->pmc_ext);
         }
         pmc->pmc_ext = NULL;
 #if ! PMC_DATA_IN_EXT
@@ -451,7 +451,7 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
             mem_internal_free(PMC_sync(_class));
             PMC_sync(_class) = NULL;
         }
-        ext_pool->add_free_object(interp, ext_pool, _class->pmc_ext);
+        ext_pool->add_free_object(interp, ext_pool, (PObj *)_class->pmc_ext);
     }
     _class->pmc_ext = NULL;
     DOD_flag_CLEAR(is_special_PMC, _class);
