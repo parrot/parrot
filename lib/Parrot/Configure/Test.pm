@@ -23,7 +23,7 @@ sub stepnum {
 sub test_step_thru_runstep {
     my ($conf, $pkg, $args) = @_;
     my ($task, $step_name, @step_params, $step, $ret);
-    
+
     $conf->add_steps($pkg);
     $conf->options->set(%{$args});
 
