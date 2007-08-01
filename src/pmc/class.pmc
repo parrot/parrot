@@ -891,6 +891,8 @@ Creates a new PMC object of the type of the class and calls init().
 
         int            i, mro_length;
 
+        object = PMCNULL;
+
         /* If we've not been instantiated before... */
         if (!_class->instantiated) {
             int resolve_count;
