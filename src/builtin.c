@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2006, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -82,7 +82,10 @@ static Builtins builtins[] = {
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int check_builtin_sig( size_t i, NOTNULL(const char *sig), int convert_pmcs )
+static int check_builtin_sig(
+    size_t i,
+    NOTNULL(const char *sig),
+    int convert_pmcs )
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -245,7 +248,7 @@ again:
             /* try next with same name */
             ++i;
             /* if the name of the next builtin matches, check its signature */
-            if (!strcmp(func, builtins[i].c_name))
+            if (strcmp(func, builtins[i].c_name) == 0)
                 goto again;
         }
     }
