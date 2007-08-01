@@ -218,7 +218,7 @@ the net.
     cdecl> explain const char * str;
     declare str as pointer to const char
     cdecl> explain char * const str;
-    declare str as const pointer to char=back
+    declare str as const pointer to char
 
 =head2 Decreasing the amount of repeated code
 
