@@ -397,7 +397,7 @@ sub extract_balanced {
             return ( substr($code, 0, pos, "" ), $code ) if not $unbalanced;
         }
     }
-    die "Badly balanced" if $unbalanced;
+    die "Badly balanced PMC source\n" if $unbalanced;
     return;
 }
 
