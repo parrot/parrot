@@ -1,4 +1,4 @@
-IMCC 0.0.9.5
+IMCC
 
 imcc is the Intermediate Code Compiler for Parrot.
 The language it compiles is currently termed Parrot
@@ -20,15 +20,13 @@ This way, language designers can get right to work on
    Tokenizing, parsing, type checking AST/DAG production
 
 Then they can simply feed PIR to imcc which will compile
-directly to Parrot bytecode, altogether skipping the reference
-assembler.
+directly to Parrot bytecode.
 
-So far, all the compiler does (besides translating the PIR to pasm) is
-register allocation and spilling. I like Steve Muchnick's MIR language,
-and I'm taking a few things from it.
+So far, all the compiler does is register allocation and spilling. I like
+Steve Muchnick's MIR language, and I'm taking a few things from it.
 
 Presently you can write code with unlimited symbolics or named
-locals and imcc will translate to pasm.
+locals and imcc will map them to ``physical'' registers.
 
 I expect the IR compiler to be FAST, simple, and maintainable,
 and never develop featuritis; however I want it to be adequate
@@ -74,7 +72,7 @@ Variables, Registers and Constants
   spell renaming the registers.
 
   You may use an infinite number of typed temporaries.
-  S=String, I=Int, N=Float, P=Object(or PMC)
+  S=String, I=Int, N=Number, P=Object(or PMC)
 
    $S0 = 1
    $S1 = $S0 + 2
@@ -175,10 +173,8 @@ op_info_table and must have the proper amount and types of
 arguments.
 
 
-The best way to learn PIR quickly is to study the output
-of other compilers that use it (Perl6 and Cola), and
-consult the source file imcc.y.
-
+The best way to learn PIR quickly is to study the examples
+in examples/tutorial.
 
 
 Please mail parrot-porters@perl.org with bug-reports or patches.
@@ -187,12 +183,6 @@ Please mail parrot-porters@perl.org with bug-reports or patches.
 Original Author:
 
 Melvin Smith <melvin.smith@mindspring.com>, <melvins@us.ibm.com>
-
-
-Active Maintainer:
-
-Leopold Toetsch <lt@toetsch.at>
-
 
 Contributing Authors:
 
