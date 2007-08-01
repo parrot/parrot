@@ -499,7 +499,7 @@ if ( $genfile =~ /jit_cpu.c/ ) {
     PARROT_API Parrot_jit_fn_info_t *op_jit = &_op_jit[0];
 
     extern int jit_op_count(void);
-    int jit_op_count() { return $core_numops; }
+    int jit_op_count(void) { return $core_numops; }
 EOC
 }
 
