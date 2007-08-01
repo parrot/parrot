@@ -835,7 +835,7 @@ PIO_win32_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io
     const int newsize = sizeof (struct sockaddr);
 
     newsock = accept((SOCKET)io->fd, (struct sockaddr *)&(newio->remote),
-                     &newsize);
+                     (Parrot_Socklen_t *)&newsize);
     err_code = WSAGetLastError();
 
     if (err_code != 0) {
