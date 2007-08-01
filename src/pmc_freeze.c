@@ -852,7 +852,7 @@ ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
 
     /* We want to store a 16-byte aligned header, but the actual
      * header may be shorter. */
-    const int header_length = PACKFILE_HEADER_BYTES +
+    const unsigned int header_length = PACKFILE_HEADER_BYTES +
         (PACKFILE_HEADER_BYTES % 16 ?
          16 - PACKFILE_HEADER_BYTES % 16 : 0);
 
