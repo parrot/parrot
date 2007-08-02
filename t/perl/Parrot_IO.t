@@ -146,7 +146,7 @@ my $time = time;
 ok( !$f3->modified_since($time), 'not modified_since' );
 
 # So that the modified time will be greater than $time.
-sleep 1;
+sleep 1 while time() <= ($time+1);
 
 # Now the read/write stuff.
 $f3->write("hello");
