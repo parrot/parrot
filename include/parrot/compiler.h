@@ -41,9 +41,7 @@
 #  define __attribute__unused__             __attribute__((unused))
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
-#  ifndef _MSC_VER
-#    define __attribute__warn_unused_result__ __attribute__((warn_unused_result))
-#  endif
+#  define __attribute__warn_unused_result__ __attribute__((warn_unused_result))
 #endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
