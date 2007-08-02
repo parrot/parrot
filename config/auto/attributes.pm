@@ -39,6 +39,9 @@ our @potential_attributes = qw(
     HASATTRIBUTE_NEVER_WORKS
 );
 
+our $verbose = 0;
+
+
 sub _option_or_data {
     my $conf = shift;
     my $arg = shift;
@@ -50,7 +53,8 @@ sub _option_or_data {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
+    my $verbose = _option_or_data( $conf, 'verbose' );
+    print $/ if $verbose;
 
     for my $maybe_attr ( @potential_attributes ) {
         $self->try_attr( $conf, $maybe_attr );
@@ -60,6 +64,8 @@ sub runstep {
 
 sub try_attr {
     my ( $self, $conf, $attr ) = @_;
+
+    $verbose and print "trying attribute '$attr'$/";
 
     my $cc = _option_or_data( $conf, 'cc' );
 
@@ -71,7 +77,9 @@ sub try_attr {
 
     # These are OK to fail, becuase we're trying them out.
     my $command_line = "$cc -o test -Iinclude $tryflags test.c";
+    $verbose and print "  ", $command_line, $/;
     my $exit_code = Parrot::Configure::Step::_run_command( $command_line, 'test.cco', 'test.cco' );
+    $verbose and print "  exit code: $exit_code$/";
 
     return if $exit_code;
 
