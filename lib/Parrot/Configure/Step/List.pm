@@ -13,7 +13,6 @@ my @steps = qw(
     init::install
     init::miniparrot
     init::hints
-    init::attributes
     init::headers
     inter::progs
     inter::make
@@ -23,6 +22,7 @@ my @steps = qw(
     auto::backtrace
     auto::msvc
     init::optimize
+    init::attributes
     inter::shlibs
     inter::libparrot
     inter::charset

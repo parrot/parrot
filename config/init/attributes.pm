@@ -20,9 +20,10 @@ use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step;
+use Parrot::Configure::Step qw( cc_gen cc_run );
 
-$description = 'Detecting attributes';
+
+$description = 'Detecting compiler attributes (-DHASATTRIBUTE_xxx)';
 
 @args = qw( cc verbose define );
 
@@ -35,6 +36,7 @@ our @potential_attributes = qw(
     HASATTRIBUTE_PURE
     HASATTRIBUTE_UNUSED
     HASATTRIBUTE_WARN_UNUSED_RESULT
+    HASATTRIBUTE_NEVER_WORKS
 );
 
 sub _option_or_data {
@@ -49,9 +51,42 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
-    my $ccflags = _option_or_data( $conf, 'ccflags');
-    $conf->data->set( 'ccflags' => "$ccflags -DHASCANCHEEZBURGER" );
 
+    for my $maybe_attr ( @potential_attributes ) {
+        $self->try_attr( $conf, $maybe_attr );
+    }
+    return $self;
+}
+
+sub try_attr {
+    my ( $self, $conf, $attr ) = @_;
+
+    my $cc = _option_or_data( $conf, 'cc' );
+
+    cc_gen('config/auto/gcc/test_c.in');
+
+    my $ccflags = _option_or_data( $conf, 'ccflags');
+
+    my $tryflags = "$ccflags -D$attr";
+
+    # These are OK to fail, becuase we're trying them out.
+    my $command_line = "$cc -o test -Iinclude $tryflags test.c";
+    my $exit_code = Parrot::Configure::Step::_run_command( $command_line, 'test.cco', 'test.cco' );
+
+    return if $exit_code;
+
+    my %eval = eval cc_run();
+    return if !%eval;
+
+    $conf->data->set( ccflags => $tryflags );
+
+    return;
+}
+
+sub blerugh {
+    my ( $self, $conf, $attr ) = @_;
+
+    my $verbose = $conf->options->get('verbose');
     if ( 0 ) {
         my $hints_used = 0;
 

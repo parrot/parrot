@@ -4,6 +4,25 @@
 
 #include <stdio.h>
 
+#include "parrot/compiler.h"
+
+int dummyfunc(int x, int y, int z)
+    __attribute__malloc__
+    __attribute__format__(1,2,3)
+    __attribute__nonnull__(1)
+    __attribute__noreturn__
+    ;
+
+int constfunc(int x)
+    __attribute__const__
+    ;
+
+int purefunc(int x)
+    __attribute__pure__
+    ;
+
+int useless(void) { int x __attribute__unused__; }
+
 int
 main(int argc, char **argv)
 {
