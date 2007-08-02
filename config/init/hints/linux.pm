@@ -8,21 +8,13 @@ use warnings;
 
 use Config;
 
-sub option_or_data {
-    my $conf = shift;
-    my $arg = shift;
-
-    my $opt = $conf->options->get( $arg );
-    return $opt ? $opt : $conf->data->get( $arg );
-}
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs        = option_or_data($conf, 'libs');
-    my $cc_flags      = option_or_data($conf, 'ccflags');
-    my $cc          = option_or_data($conf, 'cc');
-    my $linkflags   = option_or_data($conf, 'linkflags');
+    my $libs        = $conf->option_or_data('libs');
+    my $cc_flags    = $conf->option_or_data('ccflags');
+    my $cc          = $conf->option_or_data('cc');
+    my $linkflags   = $conf->option_or_data('linkflags');
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';

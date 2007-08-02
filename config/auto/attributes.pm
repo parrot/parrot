@@ -42,18 +42,10 @@ our @potential_attributes = qw(
 our $verbose = 0;
 
 
-sub _option_or_data {
-    my $conf = shift;
-    my $arg = shift;
-
-    my $opt = $conf->options->get( $arg );
-    return $opt ? $opt : $conf->data->get( $arg );
-}
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = _option_or_data( $conf, 'verbose' );
+    my $verbose = $conf->option_or_data( 'verbose' );
     print $/ if $verbose;
 
     for my $maybe_attr ( @potential_attributes ) {
@@ -67,11 +59,11 @@ sub try_attr {
 
     $verbose and print "trying attribute '$attr'$/";
 
-    my $cc = _option_or_data( $conf, 'cc' );
+    my $cc = $conf->option_or_data( 'cc' );
 
     cc_gen('config/auto/gcc/test_c.in');
 
-    my $ccflags = _option_or_data( $conf, 'ccflags');
+    my $ccflags = $conf->option_or_data( 'ccflags');
 
     my $tryflags = "$ccflags -D$attr";
 
