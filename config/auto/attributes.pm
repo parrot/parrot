@@ -20,7 +20,7 @@ use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step qw( cc_gen cc_run );
+use Parrot::Configure::Step ':auto';
 
 
 $description = 'Detecting compiler attributes (-DHASATTRIBUTE_xxx)';
@@ -29,6 +29,7 @@ $description = 'Detecting compiler attributes (-DHASATTRIBUTE_xxx)';
 
 our @potential_attributes = qw(
     HASATTRIBUTE_CONST
+    HASATTRIBUTE_DEPRECATED
     HASATTRIBUTE_FORMAT
     HASATTRIBUTE_MALLOC
     HASATTRIBUTE_NONNULL
@@ -39,13 +40,13 @@ our @potential_attributes = qw(
     HASATTRIBUTE_NEVER_WORKS
 );
 
-our $verbose = 0;
+our $verbose;
 
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->option_or_data( 'verbose' );
+    $verbose = $conf->options->get( 'verbose' );
     print $/ if $verbose;
 
     for my $maybe_attr ( @potential_attributes ) {
@@ -60,8 +61,14 @@ sub try_attr {
     $verbose and print "trying attribute '$attr'$/";
 
     my $cc = $conf->option_or_data( 'cc' );
+    $verbose and print "  cc: $cc$/";
 
-    cc_gen('config/auto/gcc/test_c.in');
+    if( $cc eq 'gcc' ) {
+        cc_gen('config/auto/gcc/test_c.in');
+    }
+    elsif( $cc eq 'cl' ) {
+        cc_gen('config/auto/msvc/test_c.in');
+    }
 
     my $ccflags = $conf->option_or_data( 'ccflags');
 

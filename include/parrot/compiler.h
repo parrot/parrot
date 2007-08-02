@@ -19,6 +19,13 @@
 #ifdef HASATTRIBUTE_NEVER_WORKS
 #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
+#ifdef HASATTRIBUTE_DEPRECATED
+#  ifdef _MSC_VER
+#    define __attribute__deprecated__         __declspec(deprecated)
+#  else
+#    define __attribute__deprecated__           __attribute__((deprecated))
+#  endif
+#endif
 #ifdef HASATTRIBUTE_FORMAT
 #  define __attribute__format__(x,y,z)      __attribute__((format(x,y,z)))
 #endif
@@ -29,7 +36,11 @@
 #  define __attribute__nonnull__(a)         __attribute__((nonnull(a)))
 #endif
 #ifdef HASATTRIBUTE_NORETURN
-#  define __attribute__noreturn__           __attribute__((noreturn))
+#  ifdef _MSC_VER
+#    define __attribute__noreturn__         __declspec(noreturn)
+#  else
+#    define __attribute__noreturn__           __attribute__((noreturn))
+#  endif
 #endif
 #ifdef HASATTRIBUTE_PURE
 #  define __attribute__pure__               __attribute__((pure))
@@ -45,6 +56,9 @@
 #endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
+#ifndef __attribute__deprecated__
+#  define __attribute__deprecated__
+#endif
 #ifndef __attribute__format__
 #  define __attribute__format__(x,y,z)
 #endif
@@ -86,6 +100,8 @@
 
 #define PARROT_CAN_RETURN_NULL      /*@null@*/
 #define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
+
+#define PARROT_DEPRECATED           __attribute__deprecated__
 
 #define PARROT_IGNORABLE_RESULT
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__

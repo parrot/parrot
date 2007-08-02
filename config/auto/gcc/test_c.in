@@ -6,21 +6,20 @@
 
 #include "parrot/compiler.h"
 
+__attribute__malloc__
+__attribute__noreturn__
+__attribute__warn_unused_result__
+__attribute__deprecated__
 int dummyfunc(int x, int y, int z)
-    __attribute__malloc__
     __attribute__format__(1,2,3)
     __attribute__nonnull__(1)
-    __attribute__noreturn__
-    __attribute__warn_unused_result__
     ;
 
-int constfunc(int x)
-    __attribute__const__
-    ;
+__attribute__const__
+int constfunc(int x);
 
-int purefunc(int x)
-    __attribute__pure__
-    ;
+__attribute__pure__
+int purefunc(int x);
 
 int useless(void) { int x __attribute__unused__; }
 
