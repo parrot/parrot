@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2007, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -16,6 +16,9 @@
  * ./Configure time.  For now, you'll have to do it by hand.
  */
 
+#ifdef HASATTRIBUTE_NEVER_WORKS
+#  error This attribute can never succeed.  Something has mis-sniffed your configuration.
+#endif
 #ifdef HASATTRIBUTE_FORMAT
 #  define __attribute__format__(x,y,z)      __attribute__((format(x,y,z)))
 #endif
