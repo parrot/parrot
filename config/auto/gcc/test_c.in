@@ -11,6 +11,7 @@ int dummyfunc(int x, int y, int z)
     __attribute__format__(1,2,3)
     __attribute__nonnull__(1)
     __attribute__noreturn__
+    __attribute__warn_unused_result__
     ;
 
 int constfunc(int x)
