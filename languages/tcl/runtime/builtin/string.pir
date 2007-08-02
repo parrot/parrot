@@ -729,9 +729,9 @@ double_check:
     $P2 = $P1(the_string)
   clear_eh
 
-  $I0 = typeof $P2
-  if $I0 == .TclFloat goto yep
-  if $I0 == .TclInt   goto yep
+  $S0 = typeof $P2
+  if $S0 == 'TclFloat' goto yep
+  if $S0 == 'TclInt'   goto yep
   goto nope
 false_check:
   if the_string == 'no' goto yep 
@@ -751,8 +751,8 @@ integer_check:
     $P2 = $P1(the_string)
   clear_eh
 
-  $I0 = typeof $P2
-  if $I0 == .TclInt goto yep
+  $S0 = typeof $P2
+  if $S0 == 'TclInt' goto yep
   goto nope
 list_check:
   $P1 = get_root_global ['_tcl'], '__list'
