@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/attributes.pm - Attributes detection
+config/auto/attributes.pm - Attributes detection
 
 =head1 DESCRIPTION
 
@@ -12,7 +12,7 @@ the compiler can support.
 
 =cut
 
-package init::attributes;
+package auto::attributes;
 
 use strict;
 use warnings;

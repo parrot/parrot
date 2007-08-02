@@ -21,8 +21,8 @@ my @steps = qw(
     auto::gcc
     auto::backtrace
     auto::msvc
+    auto::attributes
     init::optimize
-    init::attributes
     inter::shlibs
     inter::libparrot
     inter::charset
