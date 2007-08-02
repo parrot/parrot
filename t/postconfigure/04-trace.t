@@ -154,7 +154,7 @@ is($bad, 0,
     "With 'verbose', each element in array returned by trace_data_triggers() is hash ref");
 
 my @state;
-ok($state[0] = $obj->get_state_at_step(54),
+ok($state[0] = $obj->get_state_at_step(56),
     "get_state_at_step() returned true");
 ok($state[1] = $obj->get_state_at_step('gen::makefiles'),
     "get_state_at_step() returned true");
