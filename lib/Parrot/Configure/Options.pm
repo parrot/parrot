@@ -78,7 +78,6 @@ sub get_valid_options {
 
 sub process_options {
     my $optionsref = shift;
-    my @valid_opts = get_valid_options();
     $optionsref->{argv} = []
         unless defined $optionsref->{argv};
     $optionsref->{script} = q{Configure.pl}
@@ -87,6 +86,7 @@ sub process_options {
         unless $optionsref->{parrot_version};
     die "Must provide argument 'svnid'"
         unless $optionsref->{svnid};
+    my @valid_opts = get_valid_options();
     my %args;
     for ( @{ $optionsref->{argv} } ) {
         my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
