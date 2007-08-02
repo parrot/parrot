@@ -289,8 +289,6 @@ F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 use 5.008_000;
 use strict;
 use warnings;
-use Data::Dumper;
-$Data::Dumper::Indent = 1;
 use lib 'lib';
 
 use Parrot::BuildUtil;
