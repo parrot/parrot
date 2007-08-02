@@ -4,8 +4,7 @@
 =head2 _Tcl::__list
 
 Given a PMC, get a list from it. If the PMC is a TclList,
-this is as simple as returning the list. If it's a string,
-use __stringToList.
+this is as simple as returning the list.
 
 =cut
 
@@ -17,13 +16,24 @@ use __stringToList.
 .sub __list :multi(_)
   .param pmc value
 
-  $P0 = __stringToList(value)
+  $P0 = new 'TclString'
+  $S0 = value
+
+  push_eh convert_to_tcl_error
+    $P0 = $P0.'get_list'($S0)
+  clear_eh 
+
   morph value, .Undef
   assign value, $P0
 
   .return(value)
-.end
 
+  # The PMC method only throws a regular exception, we need to tcl-ify it.
+  convert_to_tcl_error:
+    get_results '(0,0)', $P0, $S0
+    tcl_error $S0
+
+.end
 
 =head2 _Tcl::__dict
 
@@ -93,12 +103,6 @@ Given a PMC, get a number from it.
   $I1 = len - $I0
   $I0 = find_not_cclass .CCLASS_WHITESPACE, str, $I0, $I1
   if $I0 < len goto NaN
-
-  # the following will dump out the match object
-  #load_bytecode 'dumper.pbc'
-  #load_bytecode 'PGE/Dumper.pbc'
-  #$P0 = get_root_global ['parrot'], '_dumper'
-  #$P0(match)
 
   unless match goto NaN
 
@@ -287,12 +291,6 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
     parse = get_root_global ['parrot'; 'TclExpr::Grammar'], 'expression'
     match = parse(expression, 'pos'=>0, 'grammar'=>'TclExpr::Grammar')
-
-    # the following will dump out the match object
-    #load_bytecode 'dumper.pbc'
-    #load_bytecode 'PGE/Dumper.pbc'
-    #$P0 = get_root_global ['parrot'], '_dumper'
-    #$P0(match)
 
     unless match goto premature_end
     $I0 = length expression
