@@ -86,32 +86,17 @@ show version information.
 =cut
 
 .include 'languages/lua/src/lua51.pir'
+.include 'languages/lua/lib/luaregex.pir'
 
 
 .HLL 'Lua', 'lua_group'
 
-.sub '__oninit' :anon :init
-    # to do with pbc_merge
-    load_bytecode 'languages/lua/lib/luaaux.pbc'
-    load_bytecode 'languages/lua/lib/luabasic.pbc'
-    load_bytecode 'languages/lua/lib/luacoroutine.pbc'
-    load_bytecode 'languages/lua/lib/luapackage.pbc'
-    load_bytecode 'languages/lua/lib/luastring.pbc'
-    load_bytecode 'languages/lua/lib/luaregex.pbc'
-    load_bytecode 'languages/lua/lib/luatable.pbc'
-    load_bytecode 'languages/lua/lib/luamath.pbc'
-    load_bytecode 'languages/lua/lib/luaio.pbc'
-    load_bytecode 'languages/lua/lib/luafile.pbc'
-    load_bytecode 'languages/lua/lib/luaos.pbc'
-    load_bytecode 'languages/lua/lib/luadebug.pbc'
-.end
-
-
 .sub 'main' :main
     .param pmc args
-    # lua_gc('stop')
+    collectoff  # stop collector during initialization
     lua_openlibs()
-    # lua_gc('restart')
+    # collecton
+    # collect
     .local int status
     status = handle_luainit()
     if status goto L1
@@ -521,6 +506,19 @@ Available options are:
   -        execute stdin and stop handling options
 USAGE
 .end
+
+
+.include 'languages/lua/lib/luaaux.pir'
+.include 'languages/lua/lib/luastring.pir'
+.include 'languages/lua/lib/luabasic.pir'
+.include 'languages/lua/lib/luacoroutine.pir'
+.include 'languages/lua/lib/luapackage.pir'
+.include 'languages/lua/lib/luatable.pir'
+.include 'languages/lua/lib/luamath.pir'
+.include 'languages/lua/lib/luaio.pir'
+.include 'languages/lua/lib/luafile.pir'
+.include 'languages/lua/lib/luaos.pir'
+.include 'languages/lua/lib/luadebug.pir'
 
 
 =head1 SEE ALSO

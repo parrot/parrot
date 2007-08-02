@@ -35,8 +35,9 @@ find_meth(Interp* interp, PMC *obj, const char *name) {
     INTVAL type = obj->vtable->base_type;
 
     if (dynpmc_LuaString == type) {
-        meta = Parrot_find_global_cur(interp,
-                                      const_string(interp, "mt_string"));
+        meta = Parrot_find_global_s(interp,
+                                    const_string(interp, "Lua::string"),
+                                    const_string(interp, "mt_string"));
     }
     if (dynpmc_LuaClosure != type && dynpmc_LuaFunction != type) {
         if (obj->pmc_ext != NULL) {

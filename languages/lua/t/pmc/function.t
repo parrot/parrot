@@ -241,12 +241,13 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .sub __start :main
     load_bytecode 'languages/lua/lib/luaaux.pbc'
     load_bytecode 'languages/lua/lib/luabasic.pbc'
-    luaopen_basic()
+    $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
+    $P0()
     _main()
 .end
 .sub _main :anon
     .local pmc tmp_0
-    tmp_0 = find_global '_G'
+    tmp_0 = get_hll_global '_G'
     .const .LuaString cst_1 = 'print'
     .local pmc tmp_1
     tmp_1 = tmp_0[cst_1]

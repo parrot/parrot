@@ -38,8 +38,21 @@ PMC_FILES = \
  $(PMCDIR)/luathread.pmc \
  $(PMCDIR)/luauserdata.pmc
 
+LIB_SRCS = \
+ $(LIBPATH)/luaaux.pir \
+ $(LIBPATH)/luabasic.pir \
+ $(LIBPATH)/luacoroutine.pir \
+ $(LIBPATH)/luapackage.pir \
+ $(LIBPATH)/luaregex.pir \
+ $(LIBPATH)/luastring.pir \
+ $(LIBPATH)/luatable.pir \
+ $(LIBPATH)/luamath.pir \
+ $(LIBPATH)/luaio.pir \
+ $(LIBPATH)/luafile.pir \
+ $(LIBPATH)/luaos.pir \
+ $(LIBPATH)/luadebug.pir
+
 LIB_PBCS = \
- $(LIBPATH)/luaperl.pbc \
  $(LIBPATH)/luaaux.pbc \
  $(LIBPATH)/luabasic.pbc \
  $(LIBPATH)/luacoroutine.pbc \
@@ -51,9 +64,7 @@ LIB_PBCS = \
  $(LIBPATH)/luaio.pbc \
  $(LIBPATH)/luafile.pbc \
  $(LIBPATH)/luaos.pbc \
- $(LIBPATH)/luadebug.pbc \
- $(LIBPATH)/alarm.pbc \
- $(LIBPATH)/lfs.pbc
+ $(LIBPATH)/luadebug.pbc
 
 GEN_PIR = \
  src/lua51_testlex_gen.pir \
@@ -68,6 +79,9 @@ GEN_PBC = \
 all: \
  pmc/lua_group$(LOAD_EXT) \
  $(LIB_PBCS) \
+ $(LIBPATH)/luaperl.pbc \
+ $(LIBPATH)/alarm.pbc \
+ $(LIBPATH)/lfs.pbc \
  $(GEN_PIR) \
  $(GEN_PBC) \
  Lua/parser.pm
@@ -88,8 +102,11 @@ src/PASTGrammar_gen.pir: src/PASTGrammar.tg
 src/POSTGrammar_gen.pir: src/POSTGrammar.tg
 	$(TGE) --output=src/POSTGrammar_gen.pir src/POSTGrammar.tg
 
-lua.pbc: lua.pir src/lua51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POSTGrammar_gen.pir
+lua.pbc: lua.pir src/lua51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POSTGrammar_gen.pir $(LIB_SRCS)
 	$(PARROT) -o lua.pbc --output-pbc lua.pir
+
+$(LIBPATH)/lualibs.pbc: $(LIB_PBCS)
+	$(PBC_MERGE) -o $(LIBPATH)/lualibs.pbc $(LIB_PBCS)
 
 pmc/lua_group$(LOAD_EXT) : $(PMC_FILES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)

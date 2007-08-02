@@ -123,7 +123,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 
     .local pmc _lua_mt_string
     new _lua_mt_string, .LuaTable
-    set_hll_global 'mt_string', _lua_mt_string
+    set_global 'mt_string', _lua_mt_string
     set $P1, '__index'
     _lua_mt_string[$P1] = _string
 

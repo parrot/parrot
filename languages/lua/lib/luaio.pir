@@ -50,7 +50,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     new _popen_env, .LuaTable
 
     .local pmc _file
-    _file = createmeta(_io_env)
+    $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
+    _file = $P0(_io_env)
 
     .local pmc _io
     new _io, .LuaTable

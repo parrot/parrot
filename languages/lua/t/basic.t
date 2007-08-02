@@ -75,7 +75,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function collectgarbage invalid' );
 collectgarbage('unknown')
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'collectgarbage' \(invalid option 'unknown'\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*collectgarbage' \(invalid option 'unknown'\)\nstack traceback:\n/
 OUTPUT
 
 unlink('../lib1.lua') if ( -f '../lib1.lua' );
@@ -151,13 +151,13 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function getfenv (negative)' );
 print(getfenv(-3))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'getfenv' \(level must be non-negative\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*getfenv' \(level must be non-negative\)\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function getfenv (too depth)' );
 print(getfenv(12))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'getfenv' \(invalid level\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*getfenv' \(invalid level\)\nstack traceback:\n/
 OUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function ipairs' );
@@ -284,7 +284,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function next (no arg)' );
 a = next()
 print(a)
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'next' \(table expected, got no value\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*next' \(table expected, got no value\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function next (invalid key)' );
@@ -346,7 +346,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function pcall (incomplete
 r, msg = pcall(assert)
 print(msg)
 CODE
-/bad argument #1 to '(\?|assert)' \(value expected\)/
+/bad argument #1 to '(\?|.*assert)' \(value expected\)/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function rawequal (true)' );
@@ -426,7 +426,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function select (out of range)' );
 print(select(0,"a","b","c"))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'select' \(index out of range\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*select' \(index out of range\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'function setfenv' );
@@ -493,20 +493,20 @@ OUT
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (negative)' );
 setfenv(-3, {})
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'setfenv' \(level must be non-negative\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*setfenv' \(level must be non-negative\)\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (too depth)' );
 print(setfenv(12, {}))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'setfenv' \(invalid level\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*setfenv' \(invalid level\)\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (bad arg)' );
 t = {}
 setfenv(t, t)
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'setfenv' \(number expected, got table\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*setfenv' \(number expected, got table\)\nstack traceback:\n/
 OUT
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function setfenv (forbidden)' );
@@ -555,7 +555,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function type (no arg)' );
 type()
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'type' \(value expected\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*type' \(value expected\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function type' );
@@ -603,20 +603,20 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tonumber (no arg)' );
 tonumber()
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'tonumber' \(value expected\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*tonumber' \(value expected\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tonumber (bad base)' );
 r = tonumber("111", 200)
 print(type(r), r)
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #2 to 'tonumber' \(base out of range\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #2 to '.*tonumber' \(base out of range\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function tostring (no arg)' );
 tostring()
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to 'tostring' \(value expected\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to '.*tostring' \(value expected\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function unpack' );

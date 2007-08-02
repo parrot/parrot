@@ -19,6 +19,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace [ 'Lua::basic' ]
 
 .sub 'luaopen_basic'
 #    print "init Lua Basic\n"

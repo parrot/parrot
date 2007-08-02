@@ -184,7 +184,7 @@ Francois Perrad
 
 =cut
 
-.sub '__onload' :anon :load
+.sub '__onload' :anon :load :init
     load_bytecode 'PGE.pbc'
 
     $P0 = getclass 'PGE::Exp::CCShortcut'
@@ -252,7 +252,7 @@ Francois Perrad
 .include 'cclass.pasm'
 
 
-.sub '__onload' :load
+.sub '__onload' :load :init
     .local pmc optable
 
     $I0 = find_type 'PGE::OPTable'

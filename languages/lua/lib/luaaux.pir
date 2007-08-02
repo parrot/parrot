@@ -398,7 +398,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 =cut
 
 .sub 'lua_openlibs'
-    $P0 = get_hll_global 'luaopen_basic'
+    $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
     $P0()
     $P0 = get_hll_global ['Lua::coroutine'], 'luaopen_coroutine'
     $P0()
