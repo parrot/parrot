@@ -65,7 +65,7 @@ can_ok("Parrot::Configure", qw| options |);
 can_ok("Parrot::Configure", qw| steps |);
 can_ok("Parrot::Configure", qw| add_step |);
 can_ok("Parrot::Configure", qw| add_steps |);
-can_ok("Parrot::Configure", qw| runstep |);
+can_ok("Parrot::Configure", qw| run_single_step |);
 can_ok("Parrot::Configure", qw| runsteps |);
 can_ok("Parrot::Configure", qw| _run_this_step |);
 

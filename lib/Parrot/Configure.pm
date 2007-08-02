@@ -202,7 +202,7 @@ sub runsteps {
     return 1;
 }
 
-=item * C<runstep()>
+=item * C<run_single_step()>
 
 The invoking L<Parrot::Configure> object is passed as the first argument to
 each step's C<runstep()> method, followed by any parameters that were
@@ -212,7 +212,7 @@ Accepts no arguments and modifies the data structure within the L<Parrot::Config
 
 =cut
 
-sub runstep {
+sub run_single_step {
     my $conf     = shift;
     my $taskname = shift;
 
