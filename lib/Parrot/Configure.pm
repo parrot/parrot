@@ -97,9 +97,9 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 =cut
 
 sub data {
-    my $self = shift;
+    my $conf = shift;
 
-    return $self->{data};
+    return $conf->{data};
 }
 
 =item * C<options()>
@@ -112,9 +112,9 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 =cut
 
 sub options {
-    my $self = shift;
+    my $conf = shift;
 
-    return $self->{options};
+    return $conf->{options};
 }
 
 =item * C<steps()>
@@ -129,9 +129,9 @@ scalar context.
 =cut
 
 sub steps {
-    my $self = shift;
+    my $conf = shift;
 
-    return wantarray ? @{ $self->{steps} } : $self->{steps};
+    return wantarray ? @{ $conf->{steps} } : $conf->{steps};
 }
 
 =item * C<add_step()>
@@ -146,9 +146,9 @@ Accepts a list and modifies the data structure within the L<Parrot::Configure> o
 =cut
 
 sub add_step {
-    my ( $self, $step, @params ) = @_;
+    my ( $conf, $step, @params ) = @_;
 
-    push @{ $self->{steps} }, Parrot::Configure::Task->new( step => $step, params => \@params );
+    push @{ $conf->{steps} }, Parrot::Configure::Task->new( step => $step, params => \@params );
 
     return 1;
 }
@@ -162,10 +162,10 @@ Accepts a list of new steps and modifies the data structure within the L<Parrot:
 =cut
 
 sub add_steps {
-    my ( $self, @new_steps ) = @_;
+    my ( $conf, @new_steps ) = @_;
 
     foreach my $step (@new_steps) {
-        $self->add_step($step);
+        $conf->add_step($step);
     }
 
     return 1;
@@ -183,15 +183,15 @@ Accepts no arguments and modifies the data structure within the L<Parrot::Config
 =cut
 
 sub runsteps {
-    my $self = shift;
+    my $conf = shift;
 
     my $n = 0;    # step number
     my ( $verbose, $verbose_step, $ask ) =
-        $self->options->get( qw( verbose verbose-step ask ) );
+        $conf->options->get( qw( verbose verbose-step ask ) );
 
-    foreach my $task ( $self->steps ) {
+    foreach my $task ( $conf->steps ) {
         $n++;
-        $self->_run_this_step( {
+        $conf->_run_this_step( {
             task            => $task,
             verbose         => $verbose,
             verbose_step    => $verbose_step,
@@ -213,15 +213,15 @@ Accepts no arguments and modifies the data structure within the L<Parrot::Config
 =cut
 
 sub runstep {
-    my $self     = shift;
+    my $conf     = shift;
     my $taskname = shift;
 
     my ( $verbose, $verbose_step, $ask ) =
-        $self->options->get( qw( verbose verbose-step ask ) );
+        $conf->options->get( qw( verbose verbose-step ask ) );
 
-    for my $task ( $self->steps() ) {
+    for my $task ( $conf->steps() ) {
         if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
-            $self->_run_this_step( {
+            $conf->_run_this_step( {
                 task            => $task,
                 verbose         => $verbose,
                 verbose_step    => $verbose_step,
@@ -233,7 +233,7 @@ sub runstep {
 }
 
 sub _run_this_step {
-    my $self = shift;
+    my $conf = shift;
     my $args = shift;
 
     my $step_name   = $args->{task}->step;
@@ -244,7 +244,7 @@ sub _run_this_step {
 
     my $conftrace = [];
     my $sto = q{.configure_trace.sto};
-    if ($self->options->get(q{configure_trace}) and (-e $sto)) {
+    if ($conf->options->get(q{configure_trace}) and (-e $sto)) {
         $conftrace = retrieve($sto);
     }
     my $step = $step_name->new;
@@ -263,17 +263,17 @@ sub _run_this_step {
             &&
             $args->{n} == $args->{verbose_step}
         ) {
-            $self->options->set( verbose => 2 );
+            $conf->options->set( verbose => 2 );
         }
 
         # by description
         elsif ( $description =~ /$args->{verbose_step}/ ) {
-            $self->options->set( verbose => 2 );
+            $conf->options->set( verbose => 2 );
         }
     }
 
     # RT#43673 cc_build uses this verbose setting, why?
-    $self->data->set( verbose => $args->{verbose} ) if $args->{n} > 2;
+    $conf->data->set( verbose => $args->{verbose} ) if $args->{n} > 2;
 
     print "\n", $description, '...';
     print "\n" if $args->{verbose} && $args->{verbose} == 2;
@@ -282,10 +282,10 @@ sub _run_this_step {
     eval {
         if (@step_params)
         {
-            $ret = $step->runstep( $self, @step_params );
+            $ret = $step->runstep( $conf, @step_params );
         }
         else {
-            $ret = $step->runstep($self);
+            $ret = $step->runstep($conf);
         }
     };
     if ($@) {
@@ -309,20 +309,20 @@ sub _run_this_step {
     print "." x ( 71 - length($description) - length($result) );
     print "$result." unless $step =~ m{^inter/} && $args->{ask};
 
-    if ($self->options->get(q{configure_trace}) ) {
+    if ($conf->options->get(q{configure_trace}) ) {
         if (! defined $conftrace->[0]) {
             $conftrace->[0] = [];
         }
         push @{$conftrace->[0]}, $step_name;
         my $evolved_data = {
-            options => $self->{options},
-            data    => $self->{data},
+            options => $conf->{options},
+            data    => $conf->{data},
         };
         push @{$conftrace}, $evolved_data;
         nstore($conftrace, $sto);
     }
     # reset verbose value for the next step
-    $self->options->set( verbose => $args->{verbose} );
+    $conf->options->set( verbose => $args->{verbose} );
 }
 
 =back
