@@ -330,11 +330,11 @@ sub _run_this_step {
 }
 
 sub option_or_data {
-    my $self = shift;
+    my $conf = shift;
     my $arg = shift;
 
-    my $opt = $self->options->get( $arg );
-    return $opt ? $opt : $self->data->get( $arg );
+    my $opt = $conf->options->get( $arg );
+    return $opt ? $opt : $conf->data->get( $arg );
 }
 
 
