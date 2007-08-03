@@ -94,7 +94,7 @@ assigning a new value:
   set P0[1], "A string"
 
 Accessing an out-of-bounds array element raises an exception; if you want an
-Array that will automatically resize, then use a C<PerlArray>.
+Array that will automatically resize, then use a C<ResizablePMCArray>.
 
 You can test if there is a defined element at an array position by using
 

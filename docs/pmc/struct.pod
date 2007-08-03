@@ -63,7 +63,7 @@ The C structure
 
 can be declared with this initializer:
 
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   .include "datatypes.pasm"
   push P2, .DATATYPE_DOUBLE
   push P2, 0	# no array i.e. 1 element
