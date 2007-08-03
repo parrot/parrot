@@ -90,10 +90,20 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-                  0 => "-W -Wall -Wundef -Wmissing-declarations"
-                . " -Wstrict-prototypes -Wmissing-prototypes"
-                . " -Winline -Wshadow -Wpointer-arith -Wcast-qual"
-                . " -Wwrite-strings -Waggregate-return -Winline -Wno-unused"
+            0 => " -W" 
+                . " -Wall" 
+                . " -Wundef" 
+                . " -Wmissing-declarations"
+                . " -Wstrict-prototypes" 
+                . " -Wmissing-prototypes"
+                . " -Winline" 
+                . " -Wshadow" 
+                . " -Wpointer-arith" 
+                . " -Wcast-qual"
+                . " -Wwrite-strings" 
+                . " -Waggregate-return" 
+                . " -Winline" 
+                . " -Wno-unused"
                 . " -Wnested-externs"
                 . ( $maint ? " -Wlarger-than-4096" : "" ),
 
@@ -125,12 +135,17 @@ sub runstep {
             #      -O2 and -O3
             #      -falign-functions=16 is the real alignment, no exponent
             3.0 => "-falign-functions=16"
-                . " -Wformat-nonliteral -Wformat-security -Wpacked"
-                . " -Wdisabled-optimization -mno-accumulate-outgoing-args"
+                . " -Wformat-nonliteral"
+                . " -Wformat-security"
+                . " -Wpacked"
+                . " -Wdisabled-optimization"
+                . " -mno-accumulate-outgoing-args"
                 . " -Wno-shadow",
 
-            3.4 => " -Wextra -Wdeclaration-after-statement"
-                . " -Wold-style-definition -Wbad-function-cast",
+            3.4 => " -Wextra "
+                . " -Wdeclaration-after-statement"
+                . " -Wold-style-definition"
+                . " -Wbad-function-cast",
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
@@ -140,9 +155,17 @@ sub runstep {
             4.0 => "-fvisibility=hidden",
         );
         my @cage_opt_and_vers = (
-            0 =>
-" -std=c89 -Wall -Wextra -Wundef -Wbad-function-cast -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wlong-long"
-                . " -Wfloat-equal -Wpadded -Wunreachable-code"
+            0 => " -std=c89"
+                . " -Wall" 
+                . " -Wextra" 
+                . " -Wundef" 
+                . " -Wbad-function-cast" 
+                . " -Wmissing-declarations" 
+                . " -Wredundant-decls" 
+                . " -Wnested-externs" 
+                . " -Wlong-long"
+                . " -Wpadded" 
+                . " -Wunreachable-code"
 
                 #. "-fsyntax-only "
                 #. "-pedantic -pedantic-errors "
@@ -224,7 +247,8 @@ sub runstep {
 
         $warns = "";
         my @warning_options = ( \@opt_and_vers );
-        push @warning_options, \@cage_opt_and_vers if $conf->options->get('cage');
+        push @warning_options, \@cage_opt_and_vers 
+            if $conf->options->get('cage');
 
         foreach my $curr_opt_and_vers (@warning_options) {
             while ( my ( $vers, $opt ) = splice @$curr_opt_and_vers, 0, 2 ) {
