@@ -35,13 +35,13 @@ C<svn:mime-type> properties.
 Most files in Parrot should have the file endings set to "native".  You do
 this like so:
 
-  % svn propset svn:eol-style=native <filename>
+  % svn propset svn:eol-style native <filename>
 
 Some files, however, require that the C<svn:eol-style> set explicitly to
 "LF".  These files are documented in F<t/distro/file_metadata.t>.  You set
 their property appropriately by:
 
-  % svn propset svn:eol-style=LF <filename>
+  % svn propset svn:eol-style LF <filename>
 
 =head2 C<svn:mime-type>
 
@@ -49,14 +49,14 @@ For most files the C<svn:mime-type> property should be set correctly,
 except for C<*.t> files which svn thinks they are troff files, so they need
 their C<svn:mime-type> set explicitly to "text/plain":
 
-  % svn propset svn:mime-type=text/plain <filename>
+  % svn propset svn:mime-type text/plain <filename>
 
 =head2 C<svn:keywords>
 
 All (text) files should have the C<svn:keywords> property set to 
 C<Author Date Id Revision>.  The command being:
 
-  % svn propset svn:keywords='Author Date Id Revision' <filename>
+  % svn propset svn:keywords 'Author Date Id Revision' <filename>
 
 Also, text files should have the following line somewhere near the beginning
 of the file (usually after the Copyright notice):
