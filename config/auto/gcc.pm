@@ -142,7 +142,7 @@ sub runstep {
                 . " -mno-accumulate-outgoing-args"
                 . " -Wno-shadow",
 
-            3.4 => " -Wextra "
+            3.4 => " -Wextra"
                 . " -Wdeclaration-after-statement"
                 . " -Wold-style-definition"
                 . " -Wbad-function-cast",
@@ -154,6 +154,7 @@ sub runstep {
             # -Wunreachable-code might be useful in a non debugging version
             4.0 => "-fvisibility=hidden",
         );
+
         my @cage_opt_and_vers = (
             0 => " -std=c89"
                 . " -Wall" 
@@ -171,24 +172,24 @@ sub runstep {
                 #. "-pedantic -pedantic-errors "
                 #. " -w "
                 #. " -Werror "
-                . " -Wextra -Wall -Waggregate-return -Wcast-align  -Wcast-qual  -Wchar-subscripts "
+                . " -Waggregate-return -Wcast-align  -Wcast-qual  -Wchar-subscripts "
                 . " -Wcomment -Wconversion  -Wno-deprecated-declarations -Wdisabled-optimization  -Wno-div-by-zero  -Wno-endif-labels "
                 . " -Werror-implicit-function-declaration -Wfloat-equal -Wformat  -Wformat=2 -Wno-format-extra-args -Wformat-nonliteral "
                 . " -Wformat-security  -Wformat-y2k -Wimplicit  -Wimplicit-function-declaration  -Wimplicit-int -Wimport  -Wno-import  -Winit-self "
-                . " -Winline -Winvalid-pch -Wlarger-than-4096 -Wlong-long -Wmain  -Wmissing-braces  "
+                . " -Winline -Winvalid-pch -Wlarger-than-4096 -Wmain  -Wmissing-braces  "
                 . " -Wmissing-format-attribute  -Wmissing-noreturn -Wno-multichar  -Wnonnull  -Wpacked "
-                . " -Wpadded -Wparentheses  -Wpointer-arith  -Wredundant-decls -Wreturn-type  -Wsequence-point  -Wshadow -Wsign-compare "
+                . " -Wparentheses  -Wpointer-arith  -Wreturn-type  -Wsequence-point  -Wshadow -Wsign-compare "
                 . " -Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default -Wswitch-enum -Wsystem-headers  -Wtrigraphs  -Wundef "
 
                 #. " -Wuninitialized "
                 #     requires -O
-                . " -Wunknown-pragmas  -Wunreachable-code -Wunused  -Wunused-function  -Wunused-label  -Wunused-parameter -Wunused-value "
+                . " -Wunknown-pragmas  -Wunused  -Wunused-function  -Wunused-label  -Wunused-parameter -Wunused-value "
                 . " -Wunused-variable  -Wwrite-strings "
 
                 #."-Wmost (APPLE ONLY)"
 
                 #C-only Warning Options
-                . " -Wbad-function-cast  -Wmissing-declarations -Wmissing-prototypes -Wnested-externs  -Wold-style-definition -Wstrict-prototypes "
+                    . " -Wmissing-prototypes -Wold-style-definition -Wstrict-prototypes "
 
                 #. " -Wtraditional "
                 . " -Wdeclaration-after-statement ",
