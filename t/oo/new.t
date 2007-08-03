@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -25,6 +25,71 @@ Tests OO features related to instantiating new objects.
 pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object');
 .sub main :main
     $P1 = newpdd15class "Foo"
+    $S1 = typeof $P1
+    say $S1
+
+    $I3 = isa $P1, "Class"
+    print $I3
+    print "\n"
+
+    $P2 = new $P1
+
+    $S1 = typeof $P2
+    say $S1
+
+    $I3 = isa $P2, "Foo"
+    print $I3
+    print "\n"
+
+    $I3 = isa $P2, "Object"
+    print $I3
+    print "\n"
+.end
+CODE
+Class
+1
+parrot;Foo
+1
+1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object');
+.sub main :main
+    $P1 = new "Class"
+    $S1 = typeof $P1
+    say $S1
+
+    $I3 = isa $P1, "Class"
+    print $I3
+    print "\n"
+
+    $P2 = new $P1
+
+    $S1 = typeof $P2
+    print "'" 
+    print $S1
+    print "'\n" 
+
+    $I3 = isa $P2, "Foo"
+    print $I3
+    print "\n"
+
+    $I3 = isa $P2, "Object"
+    print $I3
+    print "\n"
+.end
+CODE
+Class
+1
+''
+0
+1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'manually create named class object');
+.sub main :main
+    $P1 = new "Class"
+    $P1.name("Foo")
     $S1 = typeof $P1
     say $S1
 
