@@ -63,10 +63,10 @@ sub try_attr {
     my $cc = $conf->option_or_data( 'cc' );
     $verbose and print "  cc: $cc$/";
 
-    if( $cc eq 'gcc' ) {
+    if ( $cc =~ /gcc/ ) {
         cc_gen('config/auto/gcc/test_c.in');
     }
-    elsif( $cc eq 'cl' ) {
+    elsif ( $cc eq 'cl' ) {
         cc_gen('config/auto/msvc/test_c.in');
     }
 
