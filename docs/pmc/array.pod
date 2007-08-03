@@ -13,7 +13,7 @@ parrot source code.
 
 =head1 SYNOPSIS
 
-  new P0, .Array    # initialize P0 as an array
+  new P0, 'Array'   # initialize P0 as an array
 
   set I0, P0        # set I0 to the size of the array in P0
   set P0, 2         # set the size of the array in P0 to 2
@@ -32,7 +32,7 @@ parrot source code.
 As with any other PMC, the following line creates an array PMC in register 
 C<P0>:
 
-  new P0, .Array
+  new P0, 'Array'
 
 =head2 Array sizes
 
@@ -44,7 +44,7 @@ This will put the size of the array in register C<P0> into C<I0>. In the same
 way, assigning an integer directly to the array sets the size of the  array.
 For instance:
 
-  new P0, .Array
+  new P0, 'Array'
   set P0, 2
 
 creates a new Array (with default size 0) and then expands the size of the 
@@ -62,7 +62,7 @@ The following code initializes an array in C<P0> with size two, and sets the
 first position to the integer C<-8> and second position to the floating point
 number C<3.1415>.
 
-  new P0, .Array
+  new P0, 'Array'
   set P0, 2
 
   set P0[0], -8
@@ -70,7 +70,7 @@ number C<3.1415>.
 
 You can also assign directly from registers; for instance:
 
-  new P0, .Array
+  new P0, 'Array'
   set P0, 2
 
   set I0, -8

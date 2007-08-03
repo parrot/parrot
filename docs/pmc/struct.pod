@@ -63,7 +63,7 @@ The C structure
 
 can be declared with this initializer:
 
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   .include "datatypes.pasm"
   push P2, .DATATYPE_DOUBLE
   push P2, 0	# no array i.e. 1 element
@@ -84,7 +84,7 @@ The initializer can be an OrderedHash PMC too. When all elements are defined in
 the correct order this can be used to define and access struct elements by name
 and by index:
 
-  new P2, .OrderedHash
+  new P2, 'OrderedHash'
   .include "datatypes.pasm"
   set P2["d"], .DATATYPE_DOUBLE
   push P2, 0	# no array i.e. 1 element
@@ -100,7 +100,7 @@ initializer is attached to the Struct PMC.
 
 The size can be obtained by:
 
-  new P5, .ManagedStruct, P2   # P2 be some initializer
+  new P5, 'ManagedStruct', P2   # P2 be some initializer
 
   set I0, P5	# allocated size
 
@@ -164,7 +164,7 @@ The PASM would look like:
   push P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
   set P1, P2[-1]
-  new P3, .PerlString
+  new P3, 'String'
   set P3, "it"
   setprop P1, "_signature", P3
   push P2, 0
@@ -197,17 +197,17 @@ If a C function returns a pointer to this structure:
 ... access to elements could look like:
 
   # the nested structure
-  new P3, .OrderedHash
+  new P3, 'OrderedHash'
   set P3["i"], .DATATYPE_CHAR
   push P3, 0
   push P3, 0
   set P3["j"], .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
 
   # outer structure
-  new P2, .OrderedHash
+  new P2, 'OrderedHash'
   set P2["x"], .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -278,4 +278,3 @@ F<docs/pdds/pdd03_calling_conventions.pod> F<t/pmc/nci.t>, F<src/nci_test.c>
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
-
