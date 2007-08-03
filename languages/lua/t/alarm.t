@@ -91,7 +91,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad delay)
 require "alarm"
 alarm("bad")
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to '.*alarm' \(number expected, got string\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'alarm' \(number expected, got string\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (no handler)' );
@@ -105,7 +105,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad handle
 require "alarm"
 alarm(1, {})
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #2 to '.*alarm' \(function expected, got table\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'alarm' \(function expected, got table\)\nstack traceback:\n/
 OUTPUT
 
 # Local Variables:

@@ -184,7 +184,7 @@ language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (invali
 require "lfs"
 print(lfs.attributes("file.txt", "bad"))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #2 to '.*attributes' \(invalid option 'bad'\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'attributes' \(invalid option 'bad'\)\nstack traceback:\n/
 OUT
 }
 

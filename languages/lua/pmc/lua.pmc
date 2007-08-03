@@ -36,7 +36,7 @@ context_infostr(Interp *interp, parrot_context_t *ctx)
     if (Parrot_Context_get_info(interp, ctx, &info)) {
         char *file = info.file;
         res = Parrot_sprintf_c(interp, "\t%s:%d in function '%Ss'\n",
-                                       file, info.line, info.fullname);
+                                       file, info.line, info.subname);
 
         /* free the non-constant string, but not the constant one */
         if (strncmp( "(unknown file)", file, 14 ) < 0 )
@@ -95,7 +95,7 @@ information see F<src/pmc.c>.
                         string_cstring_free(info.file);
 
                     Parrot_unblock_DOD(INTERP);
-                    return info.fullname;
+                    return info.subname;
                 }
                 Parrot_unblock_DOD(INTERP);
                 break;

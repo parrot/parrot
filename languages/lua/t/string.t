@@ -141,13 +141,13 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (too few arg)' );
 print(string.format("%s %s", 1))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #3 to '.*format' \(string expected, got no value\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #3 to 'format' \(string expected, got no value\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (bad arg)' );
 print(string.format("%d", 'toto'))
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #2 to '.*format' \(number expected, got string\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'format' \(number expected, got string\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.format (invalid option)' );
@@ -314,7 +314,7 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (bad type)' );
 x = string.gsub("hello world", "(%w+)", true)
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #3 to '.*gsub' \(string\/function\/table expected\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #3 to 'gsub' \(string\/function\/table expected\)\nstack traceback:\n/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function string.gsub (invalid value)' );

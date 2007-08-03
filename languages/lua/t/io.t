@@ -250,7 +250,7 @@ language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'file:read invalid' );
 f = io.open("file.txt")
 f:read("*z")
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to '.*read' \(invalid (format|option)\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'read' \(invalid (format|option)\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:read *l' );
@@ -322,7 +322,7 @@ f = io.open("file.txt")
 print(f:seek("bad", 0))
 f:close()
 CODE
-/^[^:]+: [^:]+:\d+: bad argument #1 to '.*seek' \(invalid option 'bad'\)\nstack traceback:\n/
+/^[^:]+: [^:]+:\d+: bad argument #1 to 'seek' \(invalid option 'bad'\)\nstack traceback:\n/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:seek' );
