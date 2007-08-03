@@ -329,12 +329,31 @@ sub _run_this_step {
     $conf->options->set( verbose => $args->{verbose} );
 }
 
+=item * C<option_or_data($arg)>
+
+Are you tired of this construction all over the place?
+
+    my $opt = $conf->options->get( $arg );
+       $opt = $conf->data->get( $arg ) unless defined $opt;
+
+It gives you the user-specified option for I<$arg>, and if there
+isn't one, it gets it from the created data.  You do it all the
+time, but oh! the wear and tear on your fingers!
+
+Toil no more!  Use this simple construction:
+
+    my $opt = $conf->option_or_data($arg);
+
+and save your fingers for some real work!
+
+=cut
+
 sub option_or_data {
     my $conf = shift;
     my $arg = shift;
 
     my $opt = $conf->options->get( $arg );
-    return $opt ? $opt : $conf->data->get( $arg );
+    return defined $opt ? $opt : $conf->data->get( $arg );
 }
 
 
