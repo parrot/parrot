@@ -33,7 +33,6 @@ use strict;
 use warnings;
 use lib qw(lib);
 
-use Fatal qw{open close};
 use Test::More;
 use IO::File;
 use Parrot::Config;
