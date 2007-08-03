@@ -90,21 +90,21 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-            0 => " -W" 
-                . " -Wall" 
-                . " -Wundef" 
+            0 => " -W"
+                . " -Wall"
+                . " -Wundef"
                 . " -Wmissing-declarations"
-                . " -Wstrict-prototypes" 
+                . " -Wstrict-prototypes"
                 . " -Wmissing-prototypes"
-                . " -Winline" 
-                . " -Wshadow" 
-                . " -Wpointer-arith" 
+                . " -Winline"
+                . " -Wshadow"
+                . " -Wpointer-arith"
                 . " -Wcast-qual"
-                . " -Wwrite-strings" 
-                . " -Waggregate-return" 
-                . " -Winline" 
+                . " -Wwrite-strings"
+                . " -Waggregate-return"
+                . " -Winline"
                 . " -Wno-unused"
-                . " -Wnested-externs"
+                . " -Wnested-externs -Wfloat-equal"
                 . ( $maint ? " -Wlarger-than-4096" : "" ),
 
             # others; ones we might like marked with ?
@@ -157,15 +157,15 @@ sub runstep {
 
         my @cage_opt_and_vers = (
             0 => " -std=c89"
-                . " -Wall" 
-                . " -Wextra" 
-                . " -Wundef" 
-                . " -Wbad-function-cast" 
-                . " -Wmissing-declarations" 
-                . " -Wredundant-decls" 
-                . " -Wnested-externs" 
+                . " -Wall"
+                . " -Wextra"
+                . " -Wundef"
+                . " -Wbad-function-cast"
+                . " -Wmissing-declarations"
+                . " -Wredundant-decls"
+                . " -Wnested-externs"
                 . " -Wlong-long"
-                . " -Wpadded" 
+                . " -Wpadded"
                 . " -Wunreachable-code"
 
                 #. "-fsyntax-only "
@@ -296,7 +296,7 @@ sub runstep {
 
         $warns = "";
         my @warning_options = ( \@opt_and_vers );
-        push @warning_options, \@cage_opt_and_vers 
+        push @warning_options, \@cage_opt_and_vers
             if $conf->options->get('cage');
 
         foreach my $curr_opt_and_vers (@warning_options) {
