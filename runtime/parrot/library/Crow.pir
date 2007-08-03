@@ -31,7 +31,7 @@
     .param string prog
 
     .local pmc data
-    data = new .Hash
+    data = new 'Hash'
     data['prog'] = prog
 
     .local string template
@@ -95,7 +95,7 @@ END_HELP
     .return (news)
 
   err_news:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = concat "error: can't find news on version ", version
     $S0 .= " in 'NEWS'\n"
     $P0['_message'] = $S0
@@ -108,7 +108,7 @@ END_HELP
     .param pmc    data
 
     .local pmc    iter
-    iter = new .Iterator, data
+    iter = new 'Iterator', data
 
     .local string symbol, value
 

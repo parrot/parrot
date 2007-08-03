@@ -63,17 +63,17 @@ The stopwatch will be drawn onto the specified screen.
 
     $I0 = classoffset self, 'SDL::StopWatch'
     
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 0
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 0.1
     setattribute self, $I0, $P0
 
     inc $I0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 0
     setattribute self, $I0, $P0
 
@@ -268,7 +268,7 @@ It is drawn onto the screen consigned to the constructor.
 
 .sub __onload :load
     # XXX: an old array will be overwritten when loading this file again
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     store_global "SDL::StopWatch::Timer", "array", $P0
     
     $P0 = new SArray
@@ -283,7 +283,7 @@ It is drawn onto the screen consigned to the constructor.
     $P0[6] = .PARROT_TIMER_RUNNING
     $P0[7] = 0
 
-    $P0 = new .Timer, $P0
+    $P0 = new 'Timer', $P0
     store_global "SDL::StopWatch::Timer", "timer", $P0
 .end
 
@@ -297,7 +297,7 @@ It is drawn onto the screen consigned to the constructor.
     $I0 = array
     if $I0 == 0 goto DISABLE
 
-    array = new .Iterator, array
+    array = new 'Iterator', array
     array = .ITERATE_FROM_START
 LOOP:
     unless array goto END

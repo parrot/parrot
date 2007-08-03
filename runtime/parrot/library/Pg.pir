@@ -80,7 +80,7 @@ A class method that returns a new connection object.
     .local int ok
     ok = o_con.'status'()
     if ok == CONNECTION_OK goto is_ok
-    con = new .Undef
+    con = new 'Undef'
     o_con = new $I0, con
 is_ok:
     .return (o_con)
@@ -152,7 +152,7 @@ thereafter and inaccessible then.
     # XXX and what happens if Pg is loaded from another HLL?
     finish = get_root_global ['parrot';'Pg'], 'PQfinish'
     finish(con)
-    con = new .Undef
+    con = new 'Undef'
     setattribute self, 'con', con
 .end
 
@@ -195,11 +195,11 @@ are considered being text - there's no provision to use binary data.
     .local int i, n
     .local pmc str, vals
     n = elements values
-    str = new .OrderedHash
+    str = new 'OrderedHash'
     push str, .DATATYPE_CSTR
     push str, n
     push str, 0
-    vals = new .ManagedStruct
+    vals = new 'ManagedStruct'
     assign vals, str
     i = 0
 loop:
@@ -219,7 +219,7 @@ done:
     .local int n
     con = getattribute self, 'con'
     exec = get_root_global ['parrot';'Pg'], 'PQexecParams'
-    nil = new .ManagedStruct
+    nil = new 'ManagedStruct'
     (n, vals) = mk_struct(values)
     # we don't handle binary
     res = exec(con, cmd, n, nil, vals, nil, nil, 0)
@@ -239,7 +239,7 @@ Prepare a query for execution with B<execPrepared>
     .local pmc con, f, res, nil
     con = getattribute self, 'con'
     f = get_root_global ['parrot';'Pg'], 'PQprepare'
-    nil = new .ManagedStruct
+    nil = new 'ManagedStruct'
     res = f(con, name, query, nparams, nil)
     .return mk_res(res)
 .end
@@ -257,7 +257,7 @@ Execute a prepared query.
     .local int n
     con = getattribute self, 'con'
     f = get_root_global ['parrot';'Pg'], 'PQexecPrepared'
-    nil = new .ManagedStruct
+    nil = new 'ManagedStruct'
     (n, vals) = mk_struct(values)
     res = f(con, name, n, vals, nil, nil, 0)
     .return mk_res(res)

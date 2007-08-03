@@ -123,12 +123,12 @@ default:
     if is_alphanum goto DONE
 esc_oct:
     ## otherwise encode the value as an octal number
-    $P0 = new .ResizableIntegerArray
+    $P0 = new 'ResizableIntegerArray'
     push $P0, test_char_ord
     tmp = sprintf "\\%03o", $P0
     branch DONE
 esc_unicode:
-    $P0 = new .ResizableIntegerArray
+    $P0 = new 'ResizableIntegerArray'
     push $P0, test_char_ord
     tmp = sprintf "\\x{%x}", $P0
     # fall though to DONE

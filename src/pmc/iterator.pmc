@@ -17,7 +17,7 @@ in that aggregate.
 =head2 default usage
 
     .local pmc iterator, array, entry
-    iterator = new .Iterator, array
+    iterator = new 'Iterator', array
   iter_loop:
     unless iterator, iter_end  # while (more values)
     entry = shift iterator     # get an entry
@@ -32,7 +32,7 @@ The C<new> can alteratively be written as:
 =head2 iterate from the end, for arrays
 
     .local pmc iterator, array, entry
-    iterator = new .Iterator, array
+    iterator = new 'Iterator', array
     iterator = .ITERATE_FROM_END
   iter_loop:
     unless iterator, iter_end  # while (more values)
@@ -44,7 +44,7 @@ The C<new> can alteratively be written as:
 =head2 iterate over a hash
 
     .local pmc iterator, hash, key, entry
-    iterator = new .Iterator, hash
+    iterator = new 'Iterator', hash
   iter_loop:
     unless iterator, iter_end  # while (more values)
     key = shift iterator       # get the key..

@@ -59,7 +59,7 @@ END:
     .const .Sub temp = "_default_combiner"
     self."combiner"( temp )
 
-    temp = new .ResizablePMCArray
+    temp = new 'ResizablePMCArray'
     self."setSource"( temp )
 .end
 

@@ -312,7 +312,7 @@ Reads the specified number of bytes from the stream.
     branch OK
 
 CREATE:
-    buffer = new .String
+    buffer = new 'String'
 
 OK:
     ret = buffer

@@ -306,7 +306,7 @@ iter_loop:
 
     print subindent
 
-    val = new .ResizablePMCArray
+    val = new 'ResizablePMCArray'
     push val, name
     push val, pos
     sprintf name2, "%s[%d]", val

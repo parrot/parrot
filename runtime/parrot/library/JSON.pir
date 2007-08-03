@@ -261,9 +261,9 @@ done:
   not_empty = thing
 
   .local pmc keys
-  keys = new .ResizablePMCArray
-  .local pmc iter 
-  iter = new .Iterator, thing
+  keys = new 'ResizablePMCArray'
+  .local pmc iter
+  iter = new 'Iterator', thing
   iter = 0
   .local string key
 

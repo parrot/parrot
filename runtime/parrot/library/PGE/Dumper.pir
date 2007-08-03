@@ -27,7 +27,7 @@ This method enables Data::Dumper to work on Match objects.
     .local string key
     .local pmc hash, array
     .local int hascapts
-  
+
     (subindent, indent) = dumper."newIndent"()
     print "=> "
     $S0 = self
@@ -38,7 +38,7 @@ This method enables Data::Dumper to work on Match objects.
     hascapts = 0
     hash = self."get_hash"()
     if_null hash, dump_array
-    iter = new .Iterator, hash
+    iter = new 'Iterator', hash
   dump_hash_1:
     unless iter goto dump_array
     if hascapts goto dump_hash_2
@@ -144,7 +144,7 @@ An alternate dump output for a Match object and all of its subcaptures.
   subrules:
     capt = self.get_hash()
     if_null capt, end
-    iter = new .Iterator, capt
+    iter = new 'Iterator', capt
   subrules_1:
     unless iter goto end
     $S0 = shift iter
@@ -462,12 +462,12 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     .local pmc iter, val
     .local string key
     .local pmc hash, array
-  
+
     (subindent, indent) = dumper."newIndent"()
     print " {"
     hash = self
     if_null hash, dump_rest
-    iter = new .Iterator, hash
+    iter = new 'Iterator', hash
   dump_hash:
     unless iter goto dump_rest
     print "\n"

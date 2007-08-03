@@ -74,7 +74,7 @@ Parses a YAML string and returns a data structure.
 
     # tell about the string
     .local pmc syck_parser_str, read
-    read = new .UnManagedStruct
+    read = new 'UnManagedStruct'
     pin yaml_string
     syck_parser_str = dlfunc libsyck, "syck_parser_str", "vpbip"
     .local int yaml_string_len
@@ -171,7 +171,7 @@ NOT_LOADED:
     push data_str_decl, .DATATYPE_INT
     push data_str_decl, 0
     push data_str_decl, 0
-    data_str = new .UnManagedStruct, data_str_decl
+    data_str = new 'UnManagedStruct', data_str_decl
 
     push  external_data_decl, .DATATYPE_STRUCT_PTR
     P9 = external_data_decl[-1]

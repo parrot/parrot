@@ -24,7 +24,7 @@ If the data is not valid, an exception will be thrown.
 
     pio = open filename, '<'
     if pio goto slurp_file
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = concat "can't open file: ", filename
     $P0['_message'] = $S0
     throw $P0

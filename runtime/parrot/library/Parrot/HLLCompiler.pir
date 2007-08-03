@@ -56,7 +56,7 @@ by C<attrname> based on C<has_value>.
     if has_value goto set_value
     value = getattribute self, attrname
     unless null value goto end
-    value = new .Undef
+    value = new 'Undef'
     goto end
   set_value:
     setattribute self, attrname, value
@@ -135,9 +135,9 @@ Delete a stage from the compilation process queue.
 
     .local pmc stages, iter, newstages
     stages = getattribute self, '@stages'
-    newstages = new .ResizableStringArray
+    newstages = new 'ResizableStringArray'
 
-    iter = new .Iterator, stages
+    iter = new 'Iterator', stages
   iter_loop:
     unless iter goto iter_end
     .local pmc current
@@ -186,9 +186,9 @@ be added at every instance of the repeated stage.
 
   positional_insert:
     .local pmc iter, newstages
-    newstages = new .ResizableStringArray
+    newstages = new 'ResizableStringArray'
 
-    iter = new .Iterator, stages
+    iter = new 'Iterator', stages
   iter_loop:
     unless iter goto iter_end
     .local pmc current
@@ -242,7 +242,7 @@ to get to an AST and compile it, otherwise throw an exception.
     .local pmc stages, result, iter
     result = source
     stages = getattribute self, '@stages'
-    iter = new .Iterator, stages
+    iter = new 'Iterator', stages
   iter_loop:
     unless iter goto iter_end
     .local string stagename
@@ -272,7 +272,7 @@ to any options and return the resulting parse tree.
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
     top = get_hll_global parsegrammar_name, 'TOP'
-    unless null top goto have_top                   
+    unless null top goto have_top
     top = get_hll_global parsegrammar_name, 'apply'    # FIXME: deprecated
     unless null top goto have_top                      # FIXME: deprecated
     $P0 = getclass 'Exception'
@@ -285,11 +285,11 @@ to any options and return the resulting parse tree.
     .return (match)
 
   err_no_parsegrammar:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = 'Missing parsegrammar in compiler'
     throw $P0
   err_failedparse:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = 'Failed to parse source'
     throw $P0
 .end
@@ -315,7 +315,7 @@ resulting ast.
     .return astbuilder.'get'('past')
 
   err_no_astgrammar:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = 'Missing astgrammar in compiler'
     throw $P0
 .end
@@ -334,10 +334,10 @@ options provided.
     .param pmc adverbs         :slurpy :named
 
     unless null args goto have_args
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
   have_args:
     unless null adverbs goto have_adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
   have_adverbs:
 
     $P0 = self.'compile'(code, adverbs :flat :named)
@@ -399,7 +399,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     goto have_code
   no_readline:
     $S0 = readline stdin
-    code = new .String
+    code = new 'String'
     code = $S0
   have_code:
     unless code goto interactive_loop
@@ -447,7 +447,7 @@ options are passed to the evaluator.
     .param pmc adverbs         :slurpy :named
 
     unless null adverbs goto have_adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
   have_adverbs:
     .local string target
     target = adverbs['target']
@@ -456,14 +456,14 @@ options are passed to the evaluator.
     encoding = adverbs['encoding']
     $I0 = does files, 'array'
     if $I0 goto have_files_array
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, files
     files = $P0
   have_files_array:
     .local string code
     code = ''
     .local pmc iter
-    iter = new .Iterator, files
+    iter = new 'Iterator', files
   iter_loop:
     unless iter goto iter_end
     .local string iname
@@ -487,7 +487,7 @@ options are passed to the evaluator.
     .return ($P0)
 
   err_infile:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = 'Error: file cannot be read: '
     $S0 .= iname
     $S0 .= "\n"
@@ -527,7 +527,7 @@ Generic method for compilers invoked from a shell command line.
 
     ##   merge command-line args with defaults passed in from caller
     .local pmc iter
-    iter = new .Iterator, opts
+    iter = new 'Iterator', opts
   mergeopts_loop:
     unless iter goto mergeopts_end
     $S0 = shift iter
@@ -537,7 +537,7 @@ Generic method for compilers invoked from a shell command line.
   mergeopts_end:
 
     .local pmc result
-    result = new .String
+    result = new 'String'
     result = ''
     unless args goto interactive
     $I0 = adverbs['combine']
@@ -573,7 +573,7 @@ Generic method for compilers invoked from a shell command line.
     .return ()
 
   err_output:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = 'Error: file cannot be written: '
     $S0 .= output
     $S0 .= "\n"

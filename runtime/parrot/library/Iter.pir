@@ -60,7 +60,7 @@ Initialize the iterator. Must pass a PMC aggregate, or an exception is thrown.
     .param pmc agg
     $P0 = clone agg
     setattribute self, 'aggregate', $P0
-    $P99 = new .Integer
+    $P99 = new 'Integer'
     $P99 = 0
     setattribute self, 'exhausted', $P99
     null $P99
@@ -90,7 +90,7 @@ attribute if the iterator is exhausted.
     goto test_limit
   first_time:
     $I1 = 0
-    index = new .Integer
+    index = new 'Integer'
     index = 0
     goto test_limit
   test_limit:

@@ -4,31 +4,31 @@ Test::Builder - Parrot extension for building test modules
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/Test/Builder.pir'
+    # load this library
+    load_bytecode 'library/Test/Builder.pir'
 
-	# create a new Test::Builder object
-	.local pmc test
-	.local int test_type
+    # create a new Test::Builder object
+    .local pmc test
+    .local int test_type
 
-	find_type test_type, 'Test::Builder'
-	test = new test_type
+    find_type test_type, 'Test::Builder'
+    test = new test_type
 
-	# plan to run ten tests
-	test.'plan'( 10 )
+    # plan to run ten tests
+    test.'plan'( 10 )
 
-	test.'ok'( 1, 'some test description' )
-	test.'ok'( 0, 'some test description' )
-	test.'diag'( 'the last test failed on purpose!' )
+    test.'ok'( 1, 'some test description' )
+    test.'ok'( 0, 'some test description' )
+    test.'diag'( 'the last test failed on purpose!' )
 
-	test.'skip'( 3, 'do not run these three tests' )
-	test.'todo'( 1, 'this is a todo test that passes', 'i am not sure' )
-	test.'todo'( 0, 'this is a todo test that fails', ' i am still not sure' )
+    test.'skip'( 3, 'do not run these three tests' )
+    test.'todo'( 1, 'this is a todo test that passes', 'i am not sure' )
+    test.'todo'( 0, 'this is a todo test that fails', ' i am still not sure' )
 
-	test.'skip'( 4, 'cannot think of four more tests' )
+    test.'skip'( 4, 'cannot think of four more tests' )
 
-	# you must call this when you have finished!
-	test.'finish'()
+    # you must call this when you have finished!
+    test.'finish'()
 
 =head1 DESCRIPTION
 
@@ -48,21 +48,21 @@ This class defines the following methods:
 .namespace [ 'Test::Builder' ]
 
 .sub _initialize :load
-	load_bytecode 'library/Test/Builder/Test.pir'
-	load_bytecode 'library/Test/Builder/Output.pir'
-	load_bytecode 'library/Test/Builder/TestPlan.pir'
+    load_bytecode 'library/Test/Builder/Test.pir'
+    load_bytecode 'library/Test/Builder/Output.pir'
+    load_bytecode 'library/Test/Builder/TestPlan.pir'
 
-	.local pmc tb_class
+    .local pmc tb_class
 
-	newclass     tb_class, 'Test::Builder'
-	addattribute tb_class, 'output'
-	addattribute tb_class, 'testplan'
-	addattribute tb_class, 'results'
+    newclass     tb_class, 'Test::Builder'
+    addattribute tb_class, 'output'
+    addattribute tb_class, 'testplan'
+    addattribute tb_class, 'results'
 
-	.local pmc single
-	single = new .Undef
+    .local pmc single
+    single = new 'Undef'
 
-	store_global 'Test::Builder::_singleton', 'singleton', single
+    store_global 'Test::Builder::_singleton', 'singleton', single
 .end
 
 =item C<new( args_hash )>
@@ -94,33 +94,33 @@ the same state.
 .end
 
 .sub init :vtable :method
-	.local pmc args
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
+    .local pmc args
+    .local pmc output
+    .local pmc testplan
+    .local pmc results
 
-	(output, testplan, results) = self.'_assign_default_args'( args )
-	self.'_assign_args'( output, testplan, results )
+    (output, testplan, results) = self.'_assign_default_args'( args )
+    self.'_assign_args'( output, testplan, results )
 .end
 
 .sub init_pmc :vtable :method
     .param pmc args
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
+    .local pmc output
+    .local pmc testplan
+    .local pmc results
 
-	(output, testplan, results) = self.'_assign_default_args'( args )
-	self.'_assign_args'( output, testplan, results )
+    (output, testplan, results) = self.'_assign_default_args'( args )
+    self.'_assign_args'( output, testplan, results )
 .end
 
 .sub _assign_args :method
-	.param pmc output
-	.param pmc testplan
-	.param pmc results
+    .param pmc output
+    .param pmc testplan
+    .param pmc results
 
-	setattribute self, "output", output
-	setattribute self, "testplan", testplan
-	setattribute self, "results", results
+    setattribute self, "output", output
+    setattribute self, "testplan", testplan
+    setattribute self, "results", results
 
     results = self.'results'()
 .end
@@ -133,134 +133,134 @@ This probably doesn't work correctly yet, but you will probably never use it.
 =cut
 
 .sub create
-	.param pmc args
+    .param pmc args
 
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
+    .local pmc output
+    .local pmc testplan
+    .local pmc results
 
-	.local int is_defined
-	output     = args['output']
-	is_defined = defined output
-	if is_defined goto OUTPUT_DEFINED
+    .local int is_defined
+    output     = args['output']
+    is_defined = defined output
+    if is_defined goto OUTPUT_DEFINED
 
-	.local int output_class
-	find_type output_class, 'Test::Builder::Output'
-	output = new output_class
+    .local int output_class
+    find_type output_class, 'Test::Builder::Output'
+    output = new output_class
 
   OUTPUT_DEFINED:
-	is_defined = exists args['testplan']
-	unless is_defined goto DEFAULT_TESTPLAN
+    is_defined = exists args['testplan']
+    unless is_defined goto DEFAULT_TESTPLAN
 
-	testplan   = args['testplan']
-	goto TESTPLAN_DEFINED
+    testplan   = args['testplan']
+    goto TESTPLAN_DEFINED
 
   DEFAULT_TESTPLAN:
-	testplan   = new .String
-	testplan   = ''
+    testplan   = new 'String'
+    testplan   = ''
 
   TESTPLAN_DEFINED:
 
-	results    = new .ResizablePMCArray
-	.local int test_builder_type
+    results    = new 'ResizablePMCArray'
+    .local int test_builder_type
 
-	find_type test_builder_type, 'Test::Builder'
-	.local pmc real_init
-	.local pmc blank_init
-	real_init  = find_global 'Test::Builder', 'init'
-	blank_init = find_global 'Test::Builder', 'fake_init'
-	store_global 'Test::Builder', 'init', blank_init
+    find_type test_builder_type, 'Test::Builder'
+    .local pmc real_init
+    .local pmc blank_init
+    real_init  = find_global 'Test::Builder', 'init'
+    blank_init = find_global 'Test::Builder', 'fake_init'
+    store_global 'Test::Builder', 'init', blank_init
 
-	.local pmc test
-	test       = new test_builder_type
-	store_global 'Test::Builder', '__init', real_init
+    .local pmc test
+    test       = new test_builder_type
+    store_global 'Test::Builder', '__init', real_init
 
-	test.'_assign_args'( output, testplan, results )
-	.return( test )
+    test.'_assign_args'( output, testplan, results )
+    .return( test )
 .end
 
 .sub _assign_default_args :method
-	.param pmc args
+    .param pmc args
 
-	.local pmc single
-	single     = find_global 'Test::Builder::_singleton', 'singleton'
+    .local pmc single
+    single     = find_global 'Test::Builder::_singleton', 'singleton'
 
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
-	.local int is_defined
+    .local pmc output
+    .local pmc testplan
+    .local pmc results
+    .local int is_defined
 
-	# try for the global first
-	is_defined = isa single, 'Test::Builder'
-	unless is_defined goto CREATE_ATTRIBUTES
+    # try for the global first
+    is_defined = isa single, 'Test::Builder'
+    unless is_defined goto CREATE_ATTRIBUTES
 
-	output     = single.'output'()
-	testplan   = single.'testplan'()
-	results    = single.'results'()
+    output     = single.'output'()
+    testplan   = single.'testplan'()
+    results    = single.'results'()
 
-	goto RESULTS_DEFINED
+    goto RESULTS_DEFINED
 
   CREATE_ATTRIBUTES:
-	# now look in the args hash
-	is_defined = exists args['output']
-	unless is_defined goto CREATE_OUTPUT
-	output     = args['output']
-	goto OUTPUT_DEFINED
+    # now look in the args hash
+    is_defined = exists args['output']
+    unless is_defined goto CREATE_OUTPUT
+    output     = args['output']
+    goto OUTPUT_DEFINED
 
   CREATE_OUTPUT:
-	# create a Test::Builder::Output object
-	.local int output_type
-	find_type  output_type, 'Test::Builder::Output'
+    # create a Test::Builder::Output object
+    .local int output_type
+    find_type  output_type, 'Test::Builder::Output'
 
-	.local pmc args_hash
-	args_hash  = new Hash
-	output     = new output_type, args_hash
+    .local pmc args_hash
+    args_hash  = new Hash
+    output     = new output_type, args_hash
 
   OUTPUT_DEFINED:
-	# now try in the args hash
-	is_defined = exists args['testplan']
-	unless is_defined goto CREATE_TESTPLAN
-	testplan   = args['testplan']
-	goto TESTPLAN_DEFINED
+    # now try in the args hash
+    is_defined = exists args['testplan']
+    unless is_defined goto CREATE_TESTPLAN
+    testplan   = args['testplan']
+    goto TESTPLAN_DEFINED
 
   CREATE_TESTPLAN:
-	testplan   = new .String
-	testplan   = 'global_testplan'
+    testplan   = new 'String'
+    testplan   = 'global_testplan'
 
   TESTPLAN_DEFINED:
-	is_defined = defined results
-	if is_defined goto RESULTS_DEFINED
-	results    = new .ResizablePMCArray
+    is_defined = defined results
+    if is_defined goto RESULTS_DEFINED
+    results    = new 'ResizablePMCArray'
 
-	# store this as the singleton
-	store_global 'Test::Builder::_singleton', 'singleton', self
+    # store this as the singleton
+    store_global 'Test::Builder::_singleton', 'singleton', self
 
   RESULTS_DEFINED:
-	.return( output, testplan, results )
+    .return( output, testplan, results )
 .end
 
 .sub output :method
-	.local pmc output
+    .local pmc output
 
-	getattribute output, self, "output"
+    getattribute output, self, "output"
 
-	.return( output )
+    .return( output )
 .end
 
 .sub testplan :method
-	.local pmc testplan
+    .local pmc testplan
 
-	getattribute testplan, self, "testplan"
+    getattribute testplan, self, "testplan"
 
-	.return( testplan )
+    .return( testplan )
 .end
 
 .sub results :method
-	.local pmc results
+    .local pmc results
 
-	getattribute results, self, "results"
+    getattribute results, self, "results"
 
-	.return( results )
+    .return( results )
 .end
 
 =item C<finish()>
@@ -275,24 +275,24 @@ where "too many" means "more than one".
 =cut
 
 .sub finish :method
-	.local pmc output
-	.local pmc testplan
-	.local pmc results
+    .local pmc output
+    .local pmc testplan
+    .local pmc results
 
-	output   = self.'output'()
-	testplan = self.'testplan'()
-	results  = self.'results'()
+    output   = self.'output'()
+    testplan = self.'testplan'()
+    results  = self.'results'()
 
-	.local int elements
-	elements = results
+    .local int elements
+    elements = results
 
-	.local string footer
-	footer   = testplan.'footer'( elements )
+    .local string footer
+    footer   = testplan.'footer'( elements )
 
-	.local int is_defined
-	is_defined = length footer
-	unless is_defined goto DONE_PRINTING
-	output.'write'( footer )
+    .local int is_defined
+    is_defined = length footer
+    unless is_defined goto DONE_PRINTING
+    output.'write'( footer )
 
   DONE_PRINTING:
 
@@ -308,84 +308,84 @@ declared a plan or if you pass an invalid argument.
 =cut
 
 .sub plan :method
-	.param string tests
+    .param string tests
 
-	.local pmc testplan
-	testplan = self.'testplan'()
+    .local pmc testplan
+    testplan = self.'testplan'()
 
-	.local int vivify_global_testplan
-	.local int is_defined
+    .local int vivify_global_testplan
+    .local int is_defined
 
-	.local int is_equal
-	.local int is_plan
+    .local int is_equal
+    .local int is_plan
 
-	is_plan = isa testplan, 'Test::Builder::TestPlan'
-	if is_plan == 1 goto CHECK_REPLAN
-	eq_str testplan, 'global_testplan', SET_GLOBAL_TESTPLAN
-	goto CHECK_REPLAN
+    is_plan = isa testplan, 'Test::Builder::TestPlan'
+    if is_plan == 1 goto CHECK_REPLAN
+    eq_str testplan, 'global_testplan', SET_GLOBAL_TESTPLAN
+    goto CHECK_REPLAN
 
   SET_GLOBAL_TESTPLAN:
-	vivify_global_testplan = 1
-	goto CHECK_TESTNUM
+    vivify_global_testplan = 1
+    goto CHECK_TESTNUM
 
   CHECK_REPLAN:
-	.local int valid_tp
-	valid_tp = does testplan, 'Test::Builder::TestPlan'
+    .local int valid_tp
+    valid_tp = does testplan, 'Test::Builder::TestPlan'
 
-	unless valid_tp goto CHECK_TESTNUM
+    unless valid_tp goto CHECK_TESTNUM
 
-	.local pmc plan_exception
-	plan_exception = new .Exception
-	plan_exception['_message'] = 'Plan already set!'
-	throw plan_exception
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    plan_exception['_message'] = 'Plan already set!'
+    throw plan_exception
 
   CHECK_TESTNUM:
-	if tests == 'no_plan' goto PLAN_NULL
+    if tests == 'no_plan' goto PLAN_NULL
 
-	.local int num_tests
-	num_tests = tests
+    .local int num_tests
+    num_tests = tests
 
-	unless num_tests goto PLAN_FAILURE
+    unless num_tests goto PLAN_FAILURE
 
-	.local int plan_type
-	.local pmc args
+    .local int plan_type
+    .local pmc args
 
-	args = new .Hash
-	args['expect'] = num_tests
+    args = new 'Hash'
+    args['expect'] = num_tests
 
-	find_type plan_type, 'Test::Builder::TestPlan'
-	testplan = new plan_type, args
-	goto FINISH_PLAN
+    find_type plan_type, 'Test::Builder::TestPlan'
+    testplan = new plan_type, args
+    goto FINISH_PLAN
 
   CHECK_EXPLANATION:
-	goto PLAN_FAILURE
+    goto PLAN_FAILURE
 
   PLAN_NULL:
-	.local int null_type
-	find_type null_type, 'Test::Builder::NullPlan'
-	testplan = new null_type
-	goto FINISH_PLAN
+    .local int null_type
+    find_type null_type, 'Test::Builder::NullPlan'
+    testplan = new null_type
+    goto FINISH_PLAN
 
   PLAN_FAILURE:
-	.local pmc plan_exception
-	plan_exception = new .Exception
-	plan_exception['_message'] = 'Unknown test plan!'
-	throw plan_exception
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    plan_exception['_message'] = 'Unknown test plan!'
+    throw plan_exception
 
   FINISH_PLAN:
-	unless vivify_global_testplan goto WRITE_HEADER 
-	store_global 'Test::Builder::_singleton', 'testplan', testplan
+    unless vivify_global_testplan goto WRITE_HEADER 
+    store_global 'Test::Builder::_singleton', 'testplan', testplan
 
   WRITE_HEADER:
-	.local pmc output
-	output = self.'output'()
+    .local pmc output
+    output = self.'output'()
 
-	.local string header
-	header = testplan.'header'()
+    .local string header
+    header = testplan.'header'()
 
-	setattribute self, "testplan", testplan
+    setattribute self, "testplan", testplan
 
-	output.write( header )
+    output.write( header )
 .end
 
 =item C<diag( diagnostic_message )>
@@ -395,15 +395,15 @@ Records a diagnostic message for output.
 =cut
 
 .sub diag :method
-	.param string diagnostic
+    .param string diagnostic
 
-	if diagnostic goto DIAGNOSTIC_SET
-	.return()
+    if diagnostic goto DIAGNOSTIC_SET
+    .return()
 
   DIAGNOSTIC_SET:
-	.local pmc output
-	output = self.'output'()
-	output.'diag'( diagnostic )
+    .local pmc output
+    output = self.'output'()
+    output.'diag'( diagnostic )
 .end
 
 =item C<ok( passed, description )>
@@ -414,30 +414,30 @@ recording it with the optional test description in C<description>.
 =cut
 
 .sub ok :method
-	.param int    passed
-	.param string description     :optional
-	.param int    has_description :opt_flag
+    .param int    passed
+    .param string description     :optional
+    .param int    has_description :opt_flag
 
-	if has_description goto OK
-	description = ''
+    if has_description goto OK
+    description = ''
 
   OK:
-	.local pmc results
-	results = self.'results'()
+    .local pmc results
+    results = self.'results'()
 
-	.local int results_count
-	results_count = results
-	inc results_count
+    .local int results_count
+    results_count = results
+    inc results_count
 
-	.local pmc test_args
-	test_args = new .Hash
-	test_args['number']      = results_count
-	test_args['passed']      = passed
-	test_args['description'] = description
+    .local pmc test_args
+    test_args = new 'Hash'
+    test_args['number']      = results_count
+    test_args['passed']      = passed
+    test_args['description'] = description
 
-	self.'report_test'( test_args )
+    self.'report_test'( test_args )
 
-	.return( passed )
+    .return( passed )
 .end
 
 =item C<todo( passed, description, reason )>
@@ -450,38 +450,38 @@ TODO.
 =cut
 
 .sub todo :method
-	.param int    passed
-	.param string description     :optional
-	.param int    has_description :opt_flag
-	.param string reason          :optional
-	.param int    has_reason      :opt_flag
+    .param int    passed
+    .param string description     :optional
+    .param int    has_description :opt_flag
+    .param string reason          :optional
+    .param int    has_reason      :opt_flag
 
-	if has_description goto CHECK_REASON
-	description = ''
+    if has_description goto CHECK_REASON
+    description = ''
 
   CHECK_REASON:
-	if has_reason goto TODO
-	reason = ''
+    if has_reason goto TODO
+    reason = ''
 
   TODO:
-	.local pmc results
-	results = self.'results'()
+    .local pmc results
+    results = self.'results'()
 
-	.local int results_count
-	results_count = results
-	inc results_count
+    .local int results_count
+    results_count = results
+    inc results_count
 
-	.local pmc test_args
-	test_args = new .Hash
-	test_args['todo']       = 1
-	test_args['number']     = results_count
-	test_args['passed']     = passed
-	test_args['reason']     = reason
-	test_args['description']= description
+    .local pmc test_args
+    test_args = new 'Hash'
+    test_args['todo']       = 1
+    test_args['number']     = results_count
+    test_args['passed']     = passed
+    test_args['reason']     = reason
+    test_args['description']= description
 
-	self.'report_test'( test_args )
+    self.'report_test'( test_args )
 
-	.return( passed )
+    .return( passed )
 .end
 
 =item C<skip( number reason )>
@@ -492,44 +492,44 @@ why you've skipped them.
 =cut
 
 .sub skip :method
-	.param int    number          :optional
-	.param int    has_number      :opt_flag
-	.param string reason          :optional
-	.param int    has_reason      :opt_flag
+    .param int    number          :optional
+    .param int    has_number      :opt_flag
+    .param string reason          :optional
+    .param int    has_reason      :opt_flag
 
-	if has_number goto CHECK_NUMBER
-	number = 1
+    if has_number goto CHECK_NUMBER
+    number = 1
 
   CHECK_NUMBER:
-	if number > 0 goto CHECK_REASON
-	.return() # nothing to skip
+    if number > 0 goto CHECK_REASON
+    .return() # nothing to skip
 
   CHECK_REASON:
-	if has_reason goto SKIP_LOOP
-	reason = 'skipped'
+    if has_reason goto SKIP_LOOP
+    reason = 'skipped'
 
   SKIP_LOOP:
-	.local pmc results
-	results = self.'results'()
+    .local pmc results
+    results = self.'results'()
 
-	.local int results_count
-	results_count = results
+    .local int results_count
+    results_count = results
 
-	.local int loop_count
-	loop_count = 1
+    .local int loop_count
+    loop_count = 1
 
   LOOP:
-	inc results_count
+    inc results_count
 
-	.local pmc test_args
-	test_args = new .Hash
-	test_args['number'] = results_count
-	test_args['skip']   = 1
-	test_args['reason'] = reason
+    .local pmc test_args
+    test_args = new 'Hash'
+    test_args['number'] = results_count
+    test_args['skip']   = 1
+    test_args['reason'] = reason
 
-	self.'report_test'( test_args )
-	inc loop_count
-	if loop_count <= number goto LOOP
+    self.'report_test'( test_args )
+    inc loop_count
+    if loop_count <= number goto LOOP
 
 .end
 
@@ -541,21 +541,21 @@ plan.  This calls C<exit>; there's little point in continuing.
 =cut
 
 .sub skip_all :method
-	.local pmc testplan
-	testplan = self.'testplan'()
+    .local pmc testplan
+    testplan = self.'testplan'()
 
-	unless testplan goto SKIP_ALL
+    unless testplan goto SKIP_ALL
 
-	.local pmc plan_exception
-	plan_exception = new .Exception
-	plan_exception['_message'] = 'Cannot skip_all() with a plan!'
-	throw plan_exception
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    plan_exception['_message'] = 'Cannot skip_all() with a plan!'
+    throw plan_exception
 
   SKIP_ALL:
-	.local pmc output
-	output = self.'output'()
-	output.'write'( "1..0" )
-	exit 0
+    .local pmc output
+    output = self.'output'()
+    output.'write'( "1..0" )
+    exit 0
 .end
 
 =item C<BAILOUT( reason )>
@@ -566,69 +566,69 @@ also calls C<exit>.
 =cut
 
 .sub BAILOUT :method
-	.param string reason  :optional
-	.param int has_reason :opt_flag
+    .param string reason  :optional
+    .param int has_reason :opt_flag
 
-	.local pmc output
-	output   = self.'output'()
+    .local pmc output
+    output   = self.'output'()
 
-	.local string bail_out
-	bail_out = 'Bail out!'
+    .local string bail_out
+    bail_out = 'Bail out!'
 
-	unless has_reason goto WRITE_REASON
-	bail_out .= '  '
-	bail_out .= reason
+    unless has_reason goto WRITE_REASON
+    bail_out .= '  '
+    bail_out .= reason
 
   WRITE_REASON:
-	output.'write'( bail_out )
+    output.'write'( bail_out )
 
-	exit 0
+    exit 0
 .end
 
 .sub report_test :method
-	.param pmc test_args
+    .param pmc test_args
 
-	.local pmc testplan
-	testplan = self.'testplan'()
+    .local pmc testplan
+    testplan = self.'testplan'()
 
-	.local int plan_ok
-	plan_ok = isa testplan, 'Test::Builder::TestPlan'
-	if plan_ok goto CREATE_TEST
+    .local int plan_ok
+    plan_ok = isa testplan, 'Test::Builder::TestPlan'
+    if plan_ok goto CREATE_TEST
 
-	.local pmc plan_exception
-	plan_exception = new .Exception
-	plan_exception['_message'] = 'No plan set!'
-	throw plan_exception
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    plan_exception['_message'] = 'No plan set!'
+    throw plan_exception
 
   CREATE_TEST:
-	.local pmc results
-	results = self.'results'()
+    .local pmc results
+    results = self.'results'()
 
-	.local pmc test
+    .local pmc test
 
-	.local pmc number
-	number = new Integer
-	
-	.local int count
-	count  = results
-	number = count
-	inc number
+    .local pmc number
+    number = new Integer
+    
+    .local int count
+    count  = results
+    number = count
+    inc number
 
-	test_args['number'] = number
+    test_args['number'] = number
 
-	push results, test
+    push results, test
 
-	.local pmc tbt_create
-	find_global tbt_create, 'Test::Builder::Test', 'create'
-	test = tbt_create( test_args )
+    .local pmc tbt_create
+    find_global tbt_create, 'Test::Builder::Test', 'create'
+    test = tbt_create( test_args )
 
-	.local pmc output
-	output = self.'output'()
+    .local pmc output
+    output = self.'output'()
 
-	.local string report
-	report = test.'report'()
+    .local string report
+    report = test.'report'()
 
-	output.'write'( report )
+    output.'write'( report )
 .end
 
 =back

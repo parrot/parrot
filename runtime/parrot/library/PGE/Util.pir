@@ -38,7 +38,7 @@ of the match.
     .local pmc iter
     .local string message
     message = ''
-    iter = new .Iterator, list
+    iter = new 'Iterator', list
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter
@@ -78,7 +78,7 @@ of the match.
     message .= "\"\n"
 
   throw_message:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = message
     throw $P0
 
@@ -100,7 +100,7 @@ Emits the list of messages to stderr.
     .local pmc iter
     .local string message
     message = ''
-    iter = new .Iterator, list
+    iter = new 'Iterator', list
   iter_loop:
     unless iter goto iter_end
     $S0 = shift iter
@@ -196,7 +196,7 @@ the number of splits.
     .local pmc result, match
     .local int pos, n
 
-    result = new .ResizablePMCArray
+    result = new 'ResizablePMCArray'
     pos    = 0
     n      = 1
 

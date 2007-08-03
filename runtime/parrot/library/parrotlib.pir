@@ -26,7 +26,7 @@ parrotlib's interface functions.
 
 
     # XXX todo: get root from config
-    $P0 = new .Env
+    $P0 = new 'Env'
     root = $P0["PARROT_RUNTIME_ROOT"]
     length $I0, root
     if $I0 == 0 goto DEFAULT
@@ -38,13 +38,13 @@ OKAY:
     # XXX: get include paths from config
     $S0 = clone root
     concat $S0, "/include"
-    paths = new .ResizableStringArray
+    paths = new 'ResizableStringArray'
     push paths, "."
     push paths, $S0
     push paths, root
 
     # create includes array
-    includes = new .ResizablePMCArray
+    includes = new 'ResizablePMCArray'
     store_global "_parrotlib", "include_paths", includes
 
     # get the directory handler
@@ -53,7 +53,7 @@ OKAY:
     # fill the includes array
 LOOP:
     $P1 = clone $P0
-    $P2 = new .String
+    $P2 = new 'String'
     $S0 = shift paths
     concat $S0, "/"
     $P2 = $S0
@@ -71,7 +71,7 @@ LOOP:
     .param string name
     .param string sig
 
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = sig
     find_global $P0, "_parrotlib", name
     setprop $P0, "signature", $P1
@@ -166,7 +166,7 @@ END:
     .local string ret
     .local pmc iter
 
-    iter = new .Iterator, array
+    iter = new 'Iterator', array
     iter = 0 #ITERATE_FROM_START
 
 NEXT:

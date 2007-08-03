@@ -128,9 +128,9 @@ the output to the correct output file.
     .param pmc adverbs         :slurpy :named
 
     .local pmc nstable, namespace
-    nstable = new .Hash
-    namespace = new .String
-    $P0 = new .Hash
+    nstable = new 'Hash'
+    namespace = new 'String'
+    $P0 = new 'Hash'
     $P1 = new 'CodeString'
     $P0['optable'] = $P1
     $P1 = new 'CodeString'
@@ -160,7 +160,7 @@ the output to the correct output file.
     .local string namespace
     initpir = new 'CodeString'
     rulepir = new 'CodeString'
-    iter = new .Iterator, nstable
+    iter = new 'Iterator', nstable
   iter_loop:
     unless iter goto iter_end
     namespace = shift iter
@@ -231,7 +231,7 @@ the output to the correct output file.
     name = clone name
     $I0 = exists nstable[name]
     if $I0 goto end
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P1 = new 'CodeString'
     $P0['optable'] = $P1
     $P1 = new 'CodeString'
@@ -254,7 +254,7 @@ the output to the correct output file.
 
     ##   set compile adverbs
     .local pmc adverbs
-    adverbs = new .Hash
+    adverbs = new 'Hash'
     adverbs['grammar'] = namespace
     adverbs['name'] = name
 
@@ -329,7 +329,7 @@ the output to the correct output file.
     .local pmc iter
     .local string traitlist
     $P0 = stmt[0]
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
     traitlist = ''
   trait_loop:
     unless iter goto trait_end

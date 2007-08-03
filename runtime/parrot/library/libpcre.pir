@@ -27,7 +27,7 @@ See 'library/pcre.pir' for details on the user interface.
     null NULL
 
     .local pmc errptr
-    errptr= new .Integer
+    errptr= new 'Integer'
 
     ## error message string size
     error_size= 500

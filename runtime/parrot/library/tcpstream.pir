@@ -54,7 +54,7 @@ Iniitialize a TCPStream object (create a socket and a buffer).
 
 .sub init :anon :vtable :method
     .local pmc buffer
-    buffer = new .String
+    buffer = new 'String'
     buffer = ''
 
     .local pmc sock
@@ -75,7 +75,7 @@ use to create servers, among other things.
     .param pmc sock
 
     .local pmc buffer
-    buffer = new .String
+    buffer = new 'String'
     buffer = ''
 
     setattribute self, '$.buffer', buffer
@@ -152,7 +152,7 @@ Throws an exception if unable to connect.
 
 cant_connect:
     .local pmc excep
-    excep    = new .Exception
+    excep    = new 'Exception'
     excep[0] = "Can't connect socket"
     throw excep
 .end
@@ -230,7 +230,7 @@ Print C<msg> and an end-of-line character to the socket.
 
 cant_send:
     .local pmc excep
-    excep    = new .Exception
+    excep    = new 'Exception'
     excep[0] = "Can't send to socket"
     throw excep
 .end

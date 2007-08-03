@@ -8,7 +8,7 @@ HTTP;Daemon - A Simple HTTPD Server
 =head1 SYNOPSIS
 
   load_bytecode "HTTP/Daemon.pir"
-  opts = new .Hash
+  opts = new 'Hash'
   opts['LocalPort'] = 1234
   opts['LocalAddr'] = 'localhost'
   clid = find_type ['HTTP'; 'Daemon']
@@ -125,13 +125,13 @@ Redirect to and serve files from F<docs/html>.
     .param pmc args
 
     .local pmc active
-    
+
     setattribute self, 'opts', args
-    active = new .ResizablePMCArray
+    active = new 'ResizablePMCArray'
     setattribute self, 'active', active
-    $P0 = new .ResizableStringArray
+    $P0 = new 'ResizableStringArray'
     setattribute self, 'to_log', $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = '.'
     setattribute self, 'doc_root', $P0
 
@@ -161,7 +161,7 @@ Redirect to and serve files from F<docs/html>.
     self.'new_conn'(sock)
     .return()
 
-err_listen:    
+err_listen:
 err_bind:
     err $I0
     err $S0, $I0
@@ -169,7 +169,7 @@ err_bind:
     printerr "\n"
     close sock
 err_sock:
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     setattribute self, 'socket', $P0
 .end
 
@@ -515,9 +515,9 @@ Create a new connection object with the given socket pio.
 .sub init_pmc :vtable :method
     .param pmc sock
     setattribute self, 'socket', sock
-    $P0 = new .Boolean
+    $P0 = new 'Boolean'
     setattribute self, 'close', $P0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     time $I0
     $P0 = $I0
     setattribute self, 'time_stamp', $P0
@@ -863,10 +863,10 @@ cgi_1:
 
 # split query at '&', make hash from foo=bar items
 .sub make_query_hash
-    .param string query		# the unescapced one
+    .param string query                # the unescapced one
     .local pmc query_hash, items
     .local string kv, k, v
-    query_hash = new .Hash
+    query_hash = new 'Hash'
     items = split '&', query
     .local int i, n
     i = 0
@@ -929,9 +929,9 @@ attributes of the Message object.
 =cut
 
 .sub init :vtable :method
-    $P0 = new .OrderedHash
+    $P0 = new 'OrderedHash'
     setattribute self, 'headers', $P0
-    $P0 = new .String
+    $P0 = new 'String'
     setattribute self, 'content', $P0
 .end
 

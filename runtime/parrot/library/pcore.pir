@@ -7,7 +7,7 @@
 # implementation Sub.get_lexenv :method
 .sub get_lexenv :method
     .local pmc env, pad, interp
-    env = new .ResizablePMCArray
+    env = new 'ResizablePMCArray'
     .local int level
     null level
     interp = getinterp

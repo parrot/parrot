@@ -344,7 +344,7 @@ hard to extend it for hash-like structures, too.
     .local string diagnosis
 
     .local pmc position
-    position = new .ResizablePMCArray
+    position = new 'ResizablePMCArray'
 
     .local pmc test
     find_global test, 'Test::More', '_test'
@@ -439,8 +439,8 @@ hard to extend it for hash-like structures, too.
     .local pmc r_iter
     .local int count
 
-    l_iter = new .Iterator, l_array
-    r_iter = new .Iterator, r_array
+    l_iter = new 'Iterator', l_array
+    r_iter = new 'Iterator', r_array
     l_iter = 0
     r_iter = 0
     count  = 0
@@ -504,8 +504,8 @@ hard to extend it for hash-like structures, too.
     .local pmc r_iter
     .local int count
 
-    l_iter = new .Iterator, l_hash
-    r_iter = new .Iterator, r_hash
+    l_iter = new 'Iterator', l_hash
+    r_iter = new 'Iterator', r_hash
     l_iter = 0
     r_iter = 0
     count  = 0

@@ -6,47 +6,47 @@ Test::Builder::Tester - Parrot extension for testing test modules
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/Test/Builder/Tester.pir'
+    # load this library
+    load_bytecode 'library/Test/Builder/Tester.pir'
 
-	# grab the subroutines you want to use
-	.local pmc plan
-	.local pmc test_out
-	.local pmc test_diag
-	.local pmc test_test
+    # grab the subroutines you want to use
+    .local pmc plan
+    .local pmc test_out
+    .local pmc test_diag
+    .local pmc test_test
 
-	plan      = find_global 'Test::Builder::Tester', 'plan'
-	test_out  = find_global 'Test::Builder::Tester', 'test_out'
-	test_diag = find_global 'Test::Builder::Tester', 'test_diag'
-	test_test = find_global 'Test::Builder::Tester', 'test_test'
+    plan      = find_global 'Test::Builder::Tester', 'plan'
+    test_out  = find_global 'Test::Builder::Tester', 'test_out'
+    test_diag = find_global 'Test::Builder::Tester', 'test_diag'
+    test_test = find_global 'Test::Builder::Tester', 'test_test'
 
-	# create a new Test::Builder object
-	.local int tb_type
-	.local pmc tb_args
-	.local pmc test
+    # create a new Test::Builder object
+    .local int tb_type
+    .local pmc tb_args
+    .local pmc test
 
-	find_type tb_type, 'Test::Builder'
-	tb_args = new .Hash
-	test    = new tb_type, tb_args
+    find_type tb_type, 'Test::Builder'
+    tb_args = new 'Hash'
+    test    = new tb_type, tb_args
 
-	# set your test plan
-	plan( 4 )
+    # set your test plan
+    plan( 4 )
 
-	# test a passing test
-	test_out( 'ok 1 - hi' )
-	test.'ok'( 1, 'hi' )
-	test_test( 'passing test')
+    # test a passing test
+    test_out( 'ok 1 - hi' )
+    test.'ok'( 1, 'hi' )
+    test_test( 'passing test')
 
-	# test a test with some diagnostics
-	test_out( 'ok 3 - A message' )
-	test_diag( "some\nlines" )
-	test.ok( 1, 'A message' )
-	test.diag( 'some' )
-	test.diag( 'lines' )
-	test_test( 'passing test with diagnostics' )
+    # test a test with some diagnostics
+    test_out( 'ok 3 - A message' )
+    test_diag( "some\nlines" )
+    test.ok( 1, 'A message' )
+    test.diag( 'some' )
+    test.diag( 'lines' )
+    test_test( 'passing test with diagnostics' )
 
-	# clean up
-	test.'finish'()
+    # clean up
+    test.'finish'()
 
 =head1 DESCRIPTION
 
@@ -68,138 +68,138 @@ This module defines the following public functions:
 .namespace [ 'Test::Builder::Tester::Output' ]
 
 .sub _initialize :load
-	.local pmc tbto_class
-	newclass tbto_class, 'Test::Builder::Tester::Output'
-	addattribute tbto_class, 'output'
-	addattribute tbto_class, 'diagnostics'
+    .local pmc tbto_class
+    newclass tbto_class, 'Test::Builder::Tester::Output'
+    addattribute tbto_class, 'output'
+    addattribute tbto_class, 'diagnostics'
 .end
 
 .sub init :vtable :method
-	.local pmc output
-	.local pmc diagnostics
-	output      = new .ResizablePMCArray
-	diagnostics = new .ResizablePMCArray
+    .local pmc output
+    .local pmc diagnostics
+    output      = new 'ResizablePMCArray'
+    diagnostics = new 'ResizablePMCArray'
 
-	setattribute self, "output", output
-	setattribute self, "diagnostics", diagnostics
+    setattribute self, "output", output
+    setattribute self, "diagnostics", diagnostics
 
 .end
 
 .sub get_output :method
-	.local pmc output
+    .local pmc output
 
-	getattribute output, self, "output"
+    getattribute output, self, "output"
 
-	.return( output )
+    .return( output )
 .end
 
 .sub get_diagnostics :method
-	.local pmc diagnostics
+    .local pmc diagnostics
 
-	getattribute diagnostics, self, "diagnostics"
+    getattribute diagnostics, self, "diagnostics"
 
-	.return( diagnostics )
+    .return( diagnostics )
 .end
 
 .sub write :method
-	.param string message
+    .param string message
 
-	.local pmc message_string
-	message_string = new .String
-	set message_string, message
+    .local pmc message_string
+    message_string = new 'String'
+    set message_string, message
 
-	.local pmc output
-	output = self.'get_output'()
-	push output, message_string
+    .local pmc output
+    output = self.'get_output'()
+    push output, message_string
 .end
 
 .sub diag :method
-	.param string message
+    .param string message
 
-	.local pmc message_string
-	message_string = new .String
-	set message_string, message
+    .local pmc message_string
+    message_string = new 'String'
+    set message_string, message
 
-	.local pmc diagnostics
-	diagnostics = self.'get_diagnostics'()
-	push diagnostics, message_string
+    .local pmc diagnostics
+    diagnostics = self.'get_diagnostics'()
+    push diagnostics, message_string
 .end
 
 .sub output :method
-	.local pmc output
-	output = self.'get_output'()
+    .local pmc output
+    output = self.'get_output'()
 
-	unless_null output, JOIN_LINES
-	.return( '' )
+    unless_null output, JOIN_LINES
+    .return( '' )
 
   JOIN_LINES:
-	.local string output_string
-	output_string = join "\n", output
-	set output, 0
-	.return( output_string )
+    .local string output_string
+    output_string = join "\n", output
+    set output, 0
+    .return( output_string )
 .end
 
 .sub diagnostics :method
-	.local pmc diagnostics
-	diagnostics = self.'get_diagnostics'()
+    .local pmc diagnostics
+    diagnostics = self.'get_diagnostics'()
 
-	unless_null diagnostics, JOIN_LINES
-	.return( '' )
+    unless_null diagnostics, JOIN_LINES
+    .return( '' )
 
   JOIN_LINES:
-	.local string diag_string
-	diag_string = join "\n", diagnostics
-	diagnostics = 0
-	.return( diag_string )
+    .local string diag_string
+    diag_string = join "\n", diagnostics
+    diagnostics = 0
+    .return( diag_string )
 .end
 
 .namespace [ 'Test::Builder::Tester' ]
 
 .sub _initialize :load
-	load_bytecode 'library/Test/Builder.pir'
+    load_bytecode 'library/Test/Builder.pir'
 
-	.local pmc test
-	.local pmc output
-	.local pmc test_output
-	.local pmc expect_out
-	.local pmc expect_diag
-	.local pmc default_test
+    .local pmc test
+    .local pmc output
+    .local pmc test_output
+    .local pmc expect_out
+    .local pmc expect_diag
+    .local pmc default_test
 
-	.local int tb_class
-	.local int tbo_class
-	.local int tbto_class
-	.local pmc args
+    .local int tb_class
+    .local int tbo_class
+    .local int tbto_class
+    .local pmc args
 
-	# set the default output for the Test::Builder singleton
-	find_type tbto_class, 'Test::Builder::Tester::Output'
-	test_output  = new tbto_class
-	args         = new .Hash
-	set args['output'], test_output
+    # set the default output for the Test::Builder singleton
+    find_type tbto_class, 'Test::Builder::Tester::Output'
+    test_output  = new tbto_class
+    args         = new 'Hash'
+    set args['output'], test_output
 
-	find_type tb_class, 'Test::Builder'
-	default_test = new tb_class, args
-	default_test.'plan'( 'no_plan' )
-	test_output.'output'()
+    find_type tb_class, 'Test::Builder'
+    default_test = new tb_class, args
+    default_test.'plan'( 'no_plan' )
+    test_output.'output'()
 
-	# create the Test::Builder object that this uses
-	.local pmc tb_create
-	tb_create   = find_global 'Test::Builder', 'create'
-	find_type tbo_class, 'Test::Builder::Output'
+    # create the Test::Builder object that this uses
+    .local pmc tb_create
+    tb_create   = find_global 'Test::Builder', 'create'
+    find_type tbo_class, 'Test::Builder::Output'
 
-	args        = new .Hash
-	output      = new tbo_class, args
+    args        = new 'Hash'
+    output      = new tbo_class, args
 
-	set args['output'], output
-	test        = tb_create( args )
+    set args['output'], output
+    test        = tb_create( args )
 
-	expect_out  = new .ResizablePMCArray
-	expect_diag = new .ResizablePMCArray
+    expect_out  = new 'ResizablePMCArray'
+    expect_diag = new 'ResizablePMCArray'
 
-	store_global 'Test::Builder::Tester', '_test',         test
-	store_global 'Test::Builder::Tester', '_default_test', default_test
-	store_global 'Test::Builder::Tester', '_test_output',  test_output
-	store_global 'Test::Builder::Tester', '_expect_out',   expect_out
-	store_global 'Test::Builder::Tester', '_expect_diag',  expect_diag
+    store_global 'Test::Builder::Tester', '_test',         test
+    store_global 'Test::Builder::Tester', '_default_test', default_test
+    store_global 'Test::Builder::Tester', '_test_output',  test_output
+    store_global 'Test::Builder::Tester', '_expect_out',   expect_out
+    store_global 'Test::Builder::Tester', '_expect_diag',  expect_diag
 .end
 
 =item C<plan( num_tests )>
@@ -209,12 +209,12 @@ Sets the number of tests you plan to run, where C<num_tests> is an int.
 =cut
 
 .sub plan
-	.param int tests
+    .param int tests
 
-	.local pmc test
-	test = find_global 'Test::Builder::Tester', '_test'
+    .local pmc test
+    test = find_global 'Test::Builder::Tester', '_test'
 
-	test.'plan'( tests )
+    test.'plan'( tests )
 .end
 
 .sub line_num
@@ -228,9 +228,9 @@ description of the test.
 =cut
 
 .sub test_pass
-	.param string description :optional
+    .param string description :optional
 
-	set_output( 'ok', description )
+    set_output( 'ok', description )
 .end
 
 =item C<test_fail( test_string )>
@@ -241,45 +241,45 @@ description of the test.
 =cut
 
 .sub test_fail
-	.param string description :optional
+    .param string description :optional
 
-	set_output( 'not ok', description )
+    set_output( 'not ok', description )
 .end
 
 .sub set_output
-	.param string test_type
-	.param string description
+    .param string test_type
+    .param string description
 
-	.local pmc test
-	.local pmc results
-	.local int result_count
-	.local pmc next_result
+    .local pmc test
+    .local pmc results
+    .local int result_count
+    .local pmc next_result
 
-	test         = find_global 'Test::Builder::Tester', '_default_test'
-	results      = test.'results'()
-	result_count = results
-	inc result_count
+    test         = find_global 'Test::Builder::Tester', '_default_test'
+    results      = test.'results'()
+    result_count = results
+    inc result_count
 
-	next_result  = new .String
-	set next_result, result_count
+    next_result  = new 'String'
+    set next_result, result_count
 
-	.local pmc line_string
-	line_string = new .String
-	concat line_string, test_type
-	concat line_string, ' '
-	concat line_string, next_result
+    .local pmc line_string
+    line_string = new 'String'
+    concat line_string, test_type
+    concat line_string, ' '
+    concat line_string, next_result
 
-	.local int string_defined
-	string_defined = length description
-	unless string_defined goto SET_EXPECT_OUTPUT
-	concat line_string, ' - '
-	concat line_string, description
+    .local int string_defined
+    string_defined = length description
+    unless string_defined goto SET_EXPECT_OUTPUT
+    concat line_string, ' - '
+    concat line_string, description
 
   SET_EXPECT_OUTPUT:
-	.local pmc expect_out
-	expect_out = find_global 'Test::Builder::Tester', '_expect_out'
+    .local pmc expect_out
+    expect_out = find_global 'Test::Builder::Tester', '_expect_out'
 
-	push expect_out, line_string
+    push expect_out, line_string
 .end
 
 =item C<test_out( test_string )>
@@ -291,16 +291,16 @@ directive.
 =cut
 
 .sub test_out
-	.param string line
+    .param string line
 
-	.local pmc line_string
-	line_string = new .String
-	set line_string, line
+    .local pmc line_string
+    line_string = new 'String'
+    set line_string, line
 
-	.local pmc expect_out
-	expect_out = find_global 'Test::Builder::Tester', '_expect_out'
+    .local pmc expect_out
+    expect_out = find_global 'Test::Builder::Tester', '_expect_out'
 
-	push expect_out, line_string
+    push expect_out, line_string
 .end
 
 =item C<test_err( test_string )>
@@ -311,16 +311,16 @@ a line of TAP output containing a test directive.
 =cut
 
 .sub test_err
-	.param string line
+    .param string line
 
-	.local pmc line_string
-	line_string = new .String
-	set line_string, line
+    .local pmc line_string
+    line_string = new 'String'
+    set line_string, line
 
-	.local pmc expect_diag
-	expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
+    .local pmc expect_diag
+    expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
 
-	push expect_diag, line_string
+    push expect_diag, line_string
 .end
 
 =item C<test_diag( test_string )>
@@ -333,16 +333,16 @@ This and C<test_err()> are effectively the same.
 =cut
 
 .sub test_diag
-	.param string line
+    .param string line
 
-	.local pmc line_string
-	line_string = new .String
-	set line_string, line
+    .local pmc line_string
+    line_string = new 'String'
+    set line_string, line
 
-	.local pmc expect_diag
-	expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
+    .local pmc expect_diag
+    expect_diag = find_global 'Test::Builder::Tester', '_expect_diag'
 
-	push expect_diag, line_string
+    push expect_diag, line_string
 .end
 
 =item C<test_test( test_description )>
@@ -355,97 +355,97 @@ output or diagnostic output.
 =cut
 
 .sub test_test
-	.param string description
+    .param string description
 
-	.local int string_defined
-	string_defined = length description
-	if string_defined goto FETCH_GLOBALS
-	description = ''
+    .local int string_defined
+    string_defined = length description
+    if string_defined goto FETCH_GLOBALS
+    description = ''
 
   FETCH_GLOBALS:
-	.local pmc test
-	.local pmc expect_out
-	.local pmc expect_diag
-	.local pmc test_output
+    .local pmc test
+    .local pmc expect_out
+    .local pmc expect_diag
+    .local pmc test_output
 
-	test          = find_global 'Test::Builder::Tester', '_test'
-	expect_out    = find_global 'Test::Builder::Tester', '_expect_out'
-	expect_diag   = find_global 'Test::Builder::Tester', '_expect_diag'
-	test_output   = find_global 'Test::Builder::Tester', '_test_output'
+    test          = find_global 'Test::Builder::Tester', '_test'
+    expect_out    = find_global 'Test::Builder::Tester', '_expect_out'
+    expect_diag   = find_global 'Test::Builder::Tester', '_expect_diag'
+    test_output   = find_global 'Test::Builder::Tester', '_test_output'
 
-	.local string received_out_string
-	.local string received_diag_string
-	.local string expected_out_string
-	.local string expected_diag_string
+    .local string received_out_string
+    .local string received_diag_string
+    .local string expected_out_string
+    .local string expected_diag_string
 
-	received_out_string  = test_output.'output'()
-	received_diag_string = test_output.'diagnostics'()
+    received_out_string  = test_output.'output'()
+    received_diag_string = test_output.'diagnostics'()
 
   MAKE_EXPECTED_OUTPUT_STRING:
-	.local int num_lines
-	num_lines = expect_out
-	ne num_lines, 0, JOIN_EO_STRING
-	goto MAKE_EXPECTED_DIAG_STRING
+    .local int num_lines
+    num_lines = expect_out
+    ne num_lines, 0, JOIN_EO_STRING
+    goto MAKE_EXPECTED_DIAG_STRING
 
   JOIN_EO_STRING:
-	expected_out_string = join "\n", expect_out
-	expect_out          = 0
+    expected_out_string = join "\n", expect_out
+    expect_out          = 0
 
   MAKE_EXPECTED_DIAG_STRING:
-	num_lines = expect_diag
-	ne num_lines, 0, JOIN_DIAG_STRING
-	goto COMPARE_OUT_STRINGS
+    num_lines = expect_diag
+    ne num_lines, 0, JOIN_DIAG_STRING
+    goto COMPARE_OUT_STRINGS
 
   JOIN_DIAG_STRING:
-	expected_diag_string = join "\n", expect_diag
-	expect_diag          = 0
+    expected_diag_string = join "\n", expect_diag
+    expect_diag          = 0
 
-	.local int diag_matches
-	.local int output_matches
-	diag_matches   = 1
-	output_matches = 1
+    .local int diag_matches
+    .local int output_matches
+    diag_matches   = 1
+    output_matches = 1
 
   COMPARE_OUT_STRINGS:
-  	eq received_out_string, expected_out_string, COMPARE_DIAG_STRINGS
+    eq received_out_string, expected_out_string, COMPARE_DIAG_STRINGS
 
-	output_matches = 0
-	goto FAIL_TEST
+    output_matches = 0
+    goto FAIL_TEST
 
   COMPARE_DIAG_STRINGS:
-  	eq received_diag_string, expected_diag_string, PASS_TEST
+    eq received_diag_string, expected_diag_string, PASS_TEST
 
-	diag_matches = 0
-	goto FAIL_TEST
+    diag_matches = 0
+    goto FAIL_TEST
 
   PASS_TEST:
-	test.'ok'( 1, description )
-	.return( 1 )
+    test.'ok'( 1, description )
+    .return( 1 )
 
   FAIL_TEST:
-  	test.'ok'( 0, description )
-	eq output_matches, 1, REPORT_DIAG_MISMATCH
+    test.'ok'( 0, description )
+    eq output_matches, 1, REPORT_DIAG_MISMATCH
 
   REPORT_OUTPUT_MISMATCH:
-  	.local string diagnostic
-	diagnostic = "output mismatch\nexpected: "
-	concat diagnostic, expected_out_string
-	concat diagnostic, "\nreceived: "
-	concat diagnostic, received_out_string
-	concat diagnostic, "\n"
-  	test.'diag'( diagnostic )
+    .local string diagnostic
+    diagnostic = "output mismatch\nexpected: "
+    concat diagnostic, expected_out_string
+    concat diagnostic, "\nreceived: "
+    concat diagnostic, received_out_string
+    concat diagnostic, "\n"
+    test.'diag'( diagnostic )
 
-	eq diag_matches, 1, RETURN
+    eq diag_matches, 1, RETURN
 
   REPORT_DIAG_MISMATCH:
-	diagnostic = "diagnostic mismatch\nexpected: '"
-	concat diagnostic, expected_diag_string
-	concat diagnostic, "'\nreceived: '"
-	concat diagnostic, received_diag_string
-	concat diagnostic, "'\n"
-  	test.'diag'( diagnostic )
+    diagnostic = "diagnostic mismatch\nexpected: '"
+    concat diagnostic, expected_diag_string
+    concat diagnostic, "'\nreceived: '"
+    concat diagnostic, received_diag_string
+    concat diagnostic, "'\n"
+    test.'diag'( diagnostic )
 
   RETURN:
-  	.return( 0 )
+    .return( 0 )
 .end
 
 =back

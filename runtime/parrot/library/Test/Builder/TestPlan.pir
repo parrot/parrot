@@ -26,13 +26,13 @@ Both classes support the following methods.
 .namespace [ 'Test::Builder::TestPlan' ]
 
 .sub _initialize :load
-	.local pmc tbtp_class
-	newclass     tbtp_class, 'Test::Builder::TestPlan'
-	addattribute tbtp_class, 'expect'
+    .local pmc tbtp_class
+    newclass     tbtp_class, 'Test::Builder::TestPlan'
+    addattribute tbtp_class, 'expect'
 
-	# XXX - can't seem to do this within its own class
-	.local pmc tbnp_class
-	subclass tbnp_class, tbtp_class, 'Test::Builder::NullPlan'
+    # XXX - can't seem to do this within its own class
+    .local pmc tbnp_class
+    subclass tbnp_class, tbtp_class, 'Test::Builder::NullPlan'
 .end
 
 =item C<new( args_hash )>
@@ -45,32 +45,32 @@ Test::Builder::NullPlan object, do not pass the hash.
 =cut
 
 .sub init_pmc :vtable :method
-	.param pmc args
+    .param pmc args
 
-	.local int valid_args
-	valid_args = isa args, 'Hash'
-	if valid_args goto CHECK_ARGS
-	.return()
+    .local int valid_args
+    valid_args = isa args, 'Hash'
+    if valid_args goto CHECK_ARGS
+    .return()
 
   CHECK_ARGS:
-	.local int expect
-	.local int expect_exists
-	expect_exists = exists args['expect']
-	unless expect_exists goto NO_EXPECTATION
-	expect = args['expect']
-	goto SET_ATTRIBUTES
+    .local int expect
+    .local int expect_exists
+    expect_exists = exists args['expect']
+    unless expect_exists goto NO_EXPECTATION
+    expect = args['expect']
+    goto SET_ATTRIBUTES
 
   NO_EXPECTATION:
-	.local pmc plan_exception
-	plan_exception = new .Exception
-	set   plan_exception['_message'], 'Invalid or missing plan!'
-	throw plan_exception
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    set   plan_exception['_message'], 'Invalid or missing plan!'
+    throw plan_exception
 
   SET_ATTRIBUTES:
-	.local pmc intvalue
-	intvalue = new .Integer
-	intvalue = expect
-	setattribute self, "expect", intvalue
+    .local pmc intvalue
+    intvalue = new 'Integer'
+    intvalue = expect
+    setattribute self, "expect", intvalue
 .end
 
 =item C<header()>
@@ -81,17 +81,17 @@ plan.
 =cut
 
 .sub header :method
-	.local string expect
-	.local string header
+    .local string expect
+    .local string header
 
-	.local pmc expect_int
-	getattribute expect_int, self, "expect"
-	expect = expect_int
+    .local pmc expect_int
+    getattribute expect_int, self, "expect"
+    expect = expect_int
 
-	header = '1..'
-	concat header, expect
+    header = '1..'
+    concat header, expect
 
-	.return( header )
+    .return( header )
 .end
 
 =item C<footer()>
@@ -102,50 +102,50 @@ plan.
 =cut
 
 .sub footer :method
-	.param int    ran
+    .param int    ran
 
-	.local int    expect
-	.local string footer
-	.local string expect_string
-	.local string ran_string
+    .local int    expect
+    .local string footer
+    .local string expect_string
+    .local string ran_string
 
-	.local pmc expect_int
-	getattribute expect_int, self, "expect"
+    .local pmc expect_int
+    getattribute expect_int, self, "expect"
 
-	expect        = expect_int
-	expect_string = expect_int
-	ran_string    = ran
-	footer        = ''
+    expect        = expect_int
+    expect_string = expect_int
+    ran_string    = ran
+    footer        = ''
 
-	if ran == expect goto PLAN_MATCHED
-	concat footer, 'Expected '
-	concat footer, expect_string
-	concat footer, ' but ran '
-	concat footer, ran_string
+    if ran == expect goto PLAN_MATCHED
+    concat footer, 'Expected '
+    concat footer, expect_string
+    concat footer, ' but ran '
+    concat footer, ran_string
 
   PLAN_MATCHED:
-  	.return( footer )
+    .return( footer )
 .end
 
 .namespace [ 'Test::Builder::NullPlan' ]
 
 .sub header :method
-	.local string header
-	header = ''
-	.return( header )
+    .local string header
+    header = ''
+    .return( header )
 .end
 
 .sub footer :method
-	.param int tests_run
+    .param int tests_run
 
-	.local string tests_run_string
-	.local string footer
+    .local string tests_run_string
+    .local string footer
 
-	footer           = "1.."
-	tests_run_string = tests_run
+    footer           = "1.."
+    tests_run_string = tests_run
 
-	concat footer, tests_run_string
-	.return( footer )
+    concat footer, tests_run_string
+    .return( footer )
 .end
 
 =back

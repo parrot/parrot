@@ -24,7 +24,7 @@ version until the Capture PMC is working properly.
 .sub 'get_array' :method
     $P0 = getattribute self, '@!array'
     unless null $P0 goto end
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     setattribute self, '@!array', $P0
   end:
     .return ($P0)
@@ -85,7 +85,7 @@ version until the Capture PMC is working properly.
 
     .local pmc hash, iter
     hash = self.'get_hash'()
-    iter = new .Iterator, hash
+    iter = new 'Iterator', hash
   dump_hash_loop:
     unless iter goto dump_hash_end
     if hasstuff goto dump_hash_1

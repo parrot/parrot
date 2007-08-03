@@ -47,7 +47,7 @@ of the extraction.
     .local int balanced                            # in balanced match
     .local pmc stack                               # lookket backtracking
 
-    stack = new .ResizableStringArray
+    stack = new 'ResizableStringArray'
     newfrom = find_global "PGE::Match", "newfrom"
     (mob, target, mfrom, mpos) = newfrom(tgt, 0)
     pos = mfrom

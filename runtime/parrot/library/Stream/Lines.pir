@@ -47,7 +47,7 @@ END:
     .local pmc temp
 
     classoffset $I0, self, "Stream::Lines"
-    temp = new .String
+    temp = new 'String'
     setattribute self, $I0, temp
 .end
 

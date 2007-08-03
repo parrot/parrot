@@ -68,7 +68,7 @@ END:
     classoffset $I0, self, "Stream::Replay"
 
     inc $I0
-    temp = new .Integer
+    temp = new 'Integer'
     setattribute self, $I0, temp
 .end
 

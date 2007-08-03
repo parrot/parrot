@@ -17,29 +17,29 @@ This class provides the following methods:
 .namespace [ 'Test::Builder::Test' ]
 
 .sub _initialize :load
-	.local pmc tbtb_class
+    .local pmc tbtb_class
 
-	newclass     tbtb_class, 'Test::Builder::Test::Base'
-	addattribute tbtb_class, 'passed'
-	addattribute tbtb_class, 'number'
-	addattribute tbtb_class, 'diagnostic'
-	addattribute tbtb_class, 'description'
+    newclass     tbtb_class, 'Test::Builder::Test::Base'
+    addattribute tbtb_class, 'passed'
+    addattribute tbtb_class, 'number'
+    addattribute tbtb_class, 'diagnostic'
+    addattribute tbtb_class, 'description'
 
-	.local pmc tbtp_class
-	subclass tbtp_class, tbtb_class, 'Test::Builder::Test::Pass'
+    .local pmc tbtp_class
+    subclass tbtp_class, tbtb_class, 'Test::Builder::Test::Pass'
 
-	.local pmc tbtf_class
-	subclass tbtf_class, tbtb_class, 'Test::Builder::Test::Fail'
+    .local pmc tbtf_class
+    subclass tbtf_class, tbtb_class, 'Test::Builder::Test::Fail'
 
-	.local pmc tbtwr_class
-	subclass tbtwr_class, tbtb_class, 'Test::Builder::Test::WithReason'
-	addattribute tbtwr_class, 'reason'
+    .local pmc tbtwr_class
+    subclass tbtwr_class, tbtb_class, 'Test::Builder::Test::WithReason'
+    addattribute tbtwr_class, 'reason'
 
-	.local pmc tbts_class
-	subclass tbts_class, tbtwr_class, 'Test::Builder::Test::Skip'
+    .local pmc tbts_class
+    subclass tbts_class, tbtwr_class, 'Test::Builder::Test::Skip'
 
-	.local pmc tbtt_class
-	subclass tbtt_class, tbtwr_class, 'Test::Builder::Test::TODO'
+    .local pmc tbtt_class
+    subclass tbtt_class, tbtwr_class, 'Test::Builder::Test::TODO'
 .end
 
 =item C<create( args_hash )>
@@ -80,40 +80,40 @@ The returned object is a subclass of Test::Builder::Test.
 =cut
 
 .sub create
-	.param pmc args
+    .param pmc args
 
-	.local int test_class
-	.local int type_flag
+    .local int test_class
+    .local int type_flag
 
   CHECK_TODO:
-	type_flag = args['todo']
-	unless type_flag goto CHECK_SKIP
+    type_flag = args['todo']
+    unless type_flag goto CHECK_SKIP
 
-	find_type test_class, 'Test::Builder::Test::TODO'
-	goto CREATE_TEST
+    find_type test_class, 'Test::Builder::Test::TODO'
+    goto CREATE_TEST
 
   CHECK_SKIP:
-	type_flag = args['skip']
-	unless type_flag goto CHECK_PASS
+    type_flag = args['skip']
+    unless type_flag goto CHECK_PASS
 
-	find_type test_class, 'Test::Builder::Test::Skip'
-	goto CREATE_TEST
+    find_type test_class, 'Test::Builder::Test::Skip'
+    goto CREATE_TEST
 
   CHECK_PASS:
-  	type_flag = args['passed']
-	unless type_flag goto CHECK_FAIL
+    type_flag = args['passed']
+    unless type_flag goto CHECK_FAIL
 
-	find_type test_class, 'Test::Builder::Test::Pass'
-	goto CREATE_TEST
+    find_type test_class, 'Test::Builder::Test::Pass'
+    goto CREATE_TEST
 
   CHECK_FAIL:
-	find_type test_class, 'Test::Builder::Test::Fail'
-	goto CREATE_TEST
+    find_type test_class, 'Test::Builder::Test::Fail'
+    goto CREATE_TEST
 
   CREATE_TEST:
-	.local pmc test
-	test = new test_class, args
-	.return( test )
+    .local pmc test
+    test = new test_class, args
+    .return( test )
 .end
 
 =item C<status()>
@@ -130,115 +130,115 @@ Returns the TAP-compatible string representation of this test.
 .namespace [ 'Test::Builder::Test::Base' ]
 
 .sub init_pmc :vtable :method
-	.param pmc args
+    .param pmc args
 
-	.local pmc passed
-	.local pmc number
-	.local pmc diagnostic
-	.local pmc description
+    .local pmc passed
+    .local pmc number
+    .local pmc diagnostic
+    .local pmc description
 
-	passed = args['passed']
-	setattribute self, "passed", passed
+    passed = args['passed']
+    setattribute self, "passed", passed
 
-	number = args['number']
-	unless null number goto SET_NUMBER
-	number = new .Integer
-	number = 0
+    number = args['number']
+    unless null number goto SET_NUMBER
+    number = new 'Integer'
+    number = 0
 
   SET_NUMBER:
-  	setattribute self, "number", number
+    setattribute self, "number", number
 
-	diagnostic = args['diagnostic']
-	unless null diagnostic goto SET_DIAGNOSTIC
-	diagnostic = new .String
-	set diagnostic, '???'
+    diagnostic = args['diagnostic']
+    unless null diagnostic goto SET_DIAGNOSTIC
+    diagnostic = new 'String'
+    set diagnostic, '???'
 
   SET_DIAGNOSTIC:
-  	setattribute self, "diagnostic", diagnostic
+    setattribute self, "diagnostic", diagnostic
 
-	description = args['description']
-	unless null description goto SET_DESCRIPTION
-	description = new .String
-	set description, ''
+    description = args['description']
+    unless null description goto SET_DESCRIPTION
+    description = new 'String'
+    set description, ''
 
   SET_DESCRIPTION:
-  	setattribute self, "description", description
+    setattribute self, "description", description
 .end
 
 .sub passed :method
-	.local pmc passed
+    .local pmc passed
 
-	getattribute passed, self, "passed"
+    getattribute passed, self, "passed"
 
-	.return( passed )
+    .return( passed )
 .end
 
 .sub number :method
-	.local pmc number
+    .local pmc number
 
-	getattribute number, self, "number"
+    getattribute number, self, "number"
 
-	.return( number )
+    .return( number )
 .end
 
 .sub diagnostic :method
-	.local pmc diagnostic
+    .local pmc diagnostic
 
-	getattribute diagnostic, self, "diagnostic"
+    getattribute diagnostic, self, "diagnostic"
 
-	.return( diagnostic )
+    .return( diagnostic )
 .end
 
 .sub description :method
-	.local pmc description
+    .local pmc description
 
-	getattribute description, self, "description"
+    getattribute description, self, "description"
 
-	.return( description )
+    .return( description )
 .end
 
 .sub status :method
-	.local pmc passed
-	.local pmc description
-	.local pmc status
-	
-	passed      = self.'passed'()
-	description = self.'description'()
+    .local pmc passed
+    .local pmc description
+    .local pmc status
+    
+    passed      = self.'passed'()
+    description = self.'description'()
 
-	status = new .Hash
-	set status['passed'],      passed
-	set status['description'], description
+    status = new 'Hash'
+    set status['passed'],      passed
+    set status['description'], description
 .end
 
 .sub report :method
-	.local pmc    passed
-	.local pmc    number
-	.local pmc    description
-	.local string report
-	.local string number_string
-	.local string desc_string
-	
-	passed        = self.'passed'()
-	number        = self.'number'()
-	description   = self.'description'()
-	report        = ''
-	number_string = number
-	desc_string   = description
+    .local pmc    passed
+    .local pmc    number
+    .local pmc    description
+    .local string report
+    .local string number_string
+    .local string desc_string
+    
+    passed        = self.'passed'()
+    number        = self.'number'()
+    description   = self.'description'()
+    report        = ''
+    number_string = number
+    desc_string   = description
 
-	if passed goto PASSED
-	set report, 'not '
+    if passed goto PASSED
+    set report, 'not '
 
   PASSED:
-  	concat report, 'ok '
-	concat report, number_string
+    concat report, 'ok '
+    concat report, number_string
 
-	unless description goto REPORT
+    unless description goto REPORT
 
-	concat report, ' - '
-	concat report, desc_string
+    concat report, ' - '
+    concat report, desc_string
 
   REPORT:
-  	.return( report )
+    .return( report )
 .end
 
 # no code here
@@ -250,123 +250,123 @@ Returns the TAP-compatible string representation of this test.
 .namespace [ 'Test::Builder::Test::WithReason' ]
 
 .sub init_pmc :vtable :method
-	.param pmc args
+    .param pmc args
 
-	.local pmc reason
-	reason = new .String
-	set reason, ''
+    .local pmc reason
+    reason = new 'String'
+    set reason, ''
 
-	.local int is_defined
-	is_defined = exists args['reason']
-	unless is_defined goto SET_ATTRIBUTE
-	reason = args['reason']
+    .local int is_defined
+    is_defined = exists args['reason']
+    unless is_defined goto SET_ATTRIBUTE
+    reason = args['reason']
 
   SET_ATTRIBUTE:
-	setattribute self, "reason", reason
+    setattribute self, "reason", reason
 .end
 
 .sub reason :method
-	.local pmc reason
+    .local pmc reason
 
-	getattribute reason, self, "reason"
+    getattribute reason, self, "reason"
 
-	.return( reason )
+    .return( reason )
 .end
 
 .sub status :method
-	.local pmc reason
-	.local pmc status
-	.local pmc parent_status
+    .local pmc reason
+    .local pmc status
+    .local pmc parent_status
 
-	parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
-	status        = parent_status()
-	reason        = self.'reason'()
+    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    status        = parent_status()
+    reason        = self.'reason'()
 
-	set status['reason'], reason
+    set status['reason'], reason
 
-	.return( status )
+    .return( status )
 .end
 
 .namespace [ 'Test::Builder::Test::Skip' ]
 
 .sub report :method
-	.local pmc    reason
-	.local pmc    number
-	.local string report
-	.local string number_string
-	.local string reason_string
+    .local pmc    reason
+    .local pmc    number
+    .local string report
+    .local string number_string
+    .local string reason_string
 
-	number        = self.'number'()
-	reason        = self.'reason'()
-	report        = 'ok '
-	number_string = number
-	reason_string = reason
+    number        = self.'number'()
+    reason        = self.'reason'()
+    report        = 'ok '
+    number_string = number
+    reason_string = reason
 
-	concat report, number_string
-	concat report, ' #skip '
-	concat report, reason_string
+    concat report, number_string
+    concat report, ' #skip '
+    concat report, reason_string
 
-	.return( report )
+    .return( report )
 .end
 
 .sub status :method
-	.local pmc status
-	.local pmc parent_status
+    .local pmc status
+    .local pmc parent_status
 
-	parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
-	status        = parent_status()
+    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    status        = parent_status()
 
-	set status['skip'], 1
-	.return( status )
+    set status['skip'], 1
+    .return( status )
 .end
 
 .namespace [ 'Test::Builder::Test::TODO' ]
 
 .sub report :method
-	.local pmc    passed
-	.local pmc    description
-	.local pmc    number
-	.local string report
-	.local string number_string
-	.local string desc_string
+    .local pmc    passed
+    .local pmc    description
+    .local pmc    number
+    .local string report
+    .local string number_string
+    .local string desc_string
 
-	passed        = self.'passed'()
-	number        = self.'number'()
-	description   = self.'description'()
-	report        = ''
-	number_string = number
-	desc_string   = description
+    passed        = self.'passed'()
+    number        = self.'number'()
+    description   = self.'description'()
+    report        = ''
+    number_string = number
+    desc_string   = description
 
-	if passed goto PASSED
-	report      = 'not '
+    if passed goto PASSED
+    report      = 'not '
 
   PASSED:
-	concat report, 'ok '
-	concat report, number_string
-	concat report, ' # TODO'
+    concat report, 'ok '
+    concat report, number_string
+    concat report, ' # TODO'
 
-	unless description goto REPORT
-	concat report, ' '
-	concat report, desc_string
+    unless description goto REPORT
+    concat report, ' '
+    concat report, desc_string
 
   REPORT:
-	.return( report )
+    .return( report )
 .end
 
 .sub status :method
-	.local pmc passed
-	.local pmc status
-	.local pmc parent_status
+    .local pmc passed
+    .local pmc status
+    .local pmc parent_status
 
-	parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
-	status        = parent_status()
-	passed        = self.'passed'()
+    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    status        = parent_status()
+    passed        = self.'passed'()
 
-	set status['TODO'],          1
-	set status['passed'],        1
-	set status['really_passed'], 1
+    set status['TODO'],          1
+    set status['passed'],        1
+    set status['really_passed'], 1
 
-	.return( status )
+    .return( status )
 .end
 
 =back

@@ -76,7 +76,7 @@ Sets or returns the current block size.
     classoffset $I0, self, "Stream::ParrotIO"
     unless has_bs goto GET
 
-    temp = new .Integer
+    temp = new 'Integer'
     temp = bs
     setattribute self, $I0, temp
     branch RET

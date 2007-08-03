@@ -15,7 +15,7 @@ of the object's class.
 
   .sub meth method
       .local pmc s
-      s = new .Super, self
+      s = new 'Super', self
       s."meth"()
   .end
 

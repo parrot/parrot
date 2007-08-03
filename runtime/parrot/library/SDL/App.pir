@@ -7,36 +7,36 @@ SDL::App - Parrot extension for SDL Applications
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/SDL/App.pir'
+    # load this library
+    load_bytecode 'library/SDL/App.pir'
 
-	# create a new SDL::App object
-	.local pmc app
-	.local int app_type
+    # create a new SDL::App object
+    .local pmc app
+    .local int app_type
 
-	find_type app_type, 'SDL::App'
-	app = new app_type
+    find_type app_type, 'SDL::App'
+    app = new app_type
 
-	# set the app's arguments
-	.local pmc app_args
-	app_args = new .Hash
-	app_args[ 'height' ] = 480
-	app_args[ 'width'  ] = 640
-	app_args[ 'bpp'    ] =   0
-	app_args[ 'flags'  ] =   1
+    # set the app's arguments
+    .local pmc app_args
+    app_args = new 'Hash'
+    app_args[ 'height' ] = 480
+    app_args[ 'width'  ] = 640
+    app_args[ 'bpp'    ] =   0
+    app_args[ 'flags'  ] =   1
 
-	# initialize the object and get the main surface
-	.local pmc main_surface
-	main_surface = app.'BUILD'( app_args )
+    # initialize the object and get the main surface
+    .local pmc main_surface
+    main_surface = app.'BUILD'( app_args )
 
-	# go to town filling, blitting, and updating the app
-	# for example:
-	main_surface.update()
+    # go to town filling, blitting, and updating the app
+    # for example:
+    main_surface.update()
 
-	...
+    ...
 
-	# then, shut down cleanly
-	app.'quit'()
+    # then, shut down cleanly
+    app.'quit'()
 
 =head1 DESCRIPTION
 
@@ -64,21 +64,21 @@ The SDL::App object has the following methods:
 
 .sub _initialize :load
 
-	.include 'datatypes.pasm'
-	load_bytecode 'library/SDL.pir'
-	load_bytecode 'library/SDL/Surface.pir'
-	load_bytecode 'library/SDL/Constants.pir'
+    .include 'datatypes.pasm'
+    load_bytecode 'library/SDL.pir'
+    load_bytecode 'library/SDL/Surface.pir'
+    load_bytecode 'library/SDL/Constants.pir'
 
-	.local pmc app_class
+    .local pmc app_class
 
-	newclass     app_class, 'SDL::App'
-	addattribute app_class, 'height'
-	addattribute app_class, 'width'
-	addattribute app_class, 'bpp'
-	addattribute app_class, 'flags'
-	addattribute app_class, 'surface'
+    newclass     app_class, 'SDL::App'
+    addattribute app_class, 'height'
+    addattribute app_class, 'width'
+    addattribute app_class, 'bpp'
+    addattribute app_class, 'flags'
+    addattribute app_class, 'surface'
 
-	.return()
+    .return()
 .end
 
 =item init( [ width => xxx ], [ height => xxx ], [ bpp => xx ], [ flags => xx ])
@@ -113,56 +113,56 @@ about the interface here.
 =cut
 
 .sub 'init' :method
-	.param int width  :named('width')
-	.param int height :named('height')
-	.param int bpp    :named('bpp')
-	.param int flags  :named('flags')
+    .param int width  :named('width')
+    .param int height :named('height')
+    .param int bpp    :named('bpp')
+    .param int flags  :named('flags')
 
-	.local pmc SetVideoMode
-	SetVideoMode = find_global 'SDL::NCI', 'SetVideoMode'
+    .local pmc SetVideoMode
+    SetVideoMode = find_global 'SDL::NCI', 'SetVideoMode'
 
-	.local pmc screen
-	screen = SetVideoMode( width, height, bpp, flags )
-	# XXX - need to check this here somehow
-	# defined $I0, screen
+    .local pmc screen
+    screen = SetVideoMode( width, height, bpp, flags )
+    # XXX - need to check this here somehow
+    # defined $I0, screen
 
-	.local int surface_type
-	.local pmc main_surface
+    .local int surface_type
+    .local pmc main_surface
 
-	find_type surface_type, 'SDL::Surface'
-	new main_surface, surface_type
+    find_type surface_type, 'SDL::Surface'
+    new main_surface, surface_type
 
-	main_surface.'wrap_surface'( screen )
+    main_surface.'wrap_surface'( screen )
 
-	.local int offset
-	.local pmc intvalue
+    .local int offset
+    .local pmc intvalue
 
-	# set all other offsets in self
-	classoffset offset, self, 'SDL::App'
+    # set all other offsets in self
+    classoffset offset, self, 'SDL::App'
 
-	intvalue = new .Integer
-	set intvalue, height
-	setattribute self, offset, intvalue
+    intvalue = new 'Integer'
+    set intvalue, height
+    setattribute self, offset, intvalue
 
-	intvalue = new .Integer
-	set intvalue, width
-	inc offset
-	setattribute self, offset, intvalue
+    intvalue = new 'Integer'
+    set intvalue, width
+    inc offset
+    setattribute self, offset, intvalue
 
-	intvalue = new .Integer
-	set intvalue, bpp
-	inc offset
-	setattribute self, offset, intvalue
+    intvalue = new 'Integer'
+    set intvalue, bpp
+    inc offset
+    setattribute self, offset, intvalue
 
-	intvalue = new .Integer
-	set intvalue, flags
-	inc offset
-	setattribute self, offset, intvalue
+    intvalue = new 'Integer'
+    set intvalue, flags
+    inc offset
+    setattribute self, offset, intvalue
 
-	inc offset
-	setattribute self, offset, main_surface
+    inc offset
+    setattribute self, offset, main_surface
 
-	.return()
+    .return()
 .end
 
 =item surface()
@@ -172,14 +172,14 @@ Returns the main surface.  This is an L<SDL::Surface>.
 =cut
 
 .sub surface :method
-	.local pmc surface
-	.local int offset
+    .local pmc surface
+    .local int offset
 
-	classoffset offset, self, 'SDL::App'
-	add offset, 4
-	getattribute surface, self, offset
+    classoffset offset, self, 'SDL::App'
+    add offset, 4
+    getattribute surface, self, offset
 
-	.return( surface )
+    .return( surface )
 .end
 
 =item quit()
@@ -190,9 +190,9 @@ this.
 =cut
 
 .sub quit :method
-	.local pmc SDL_Quit
-	SDL_Quit = find_global 'SDL::NCI', 'Quit'
-	SDL_Quit()
+    .local pmc SDL_Quit
+    SDL_Quit = find_global 'SDL::NCI', 'Quit'
+    SDL_Quit()
 .end
 
 =item height()
@@ -203,15 +203,15 @@ L<SDL::Surface>.
 =cut
 
 .sub height :method
-	.local pmc height
-	.local int offset
-	.local int result
+    .local pmc height
+    .local int offset
+    .local int result
 
-	classoffset offset, self, 'SDL::App'
-	getattribute height, self, offset
-	set result, height
+    classoffset offset, self, 'SDL::App'
+    getattribute height, self, offset
+    set result, height
 
-	.return( result )
+    .return( result )
 .end
 
 =item width()
@@ -222,16 +222,16 @@ L<SDL::Surface>.
 =cut
 
 .sub width :method
-	.local pmc width
-	.local int offset
-	.local int result
+    .local pmc width
+    .local int offset
+    .local int result
 
-	classoffset offset, self, 'SDL::App'
-	add offset, 1
-	getattribute width, self, offset
-	set result, width
+    classoffset offset, self, 'SDL::App'
+    add offset, 1
+    getattribute width, self, offset
+    set result, width
 
-	.return( result )
+    .return( result )
 .end
 
 =item bpp()
@@ -241,16 +241,16 @@ Returns the bit depth of the main window, in pixels.
 =cut
 
 .sub bpp :method
-	.local pmc bpp
-	.local int offset
-	.local int result
+    .local pmc bpp
+    .local int offset
+    .local int result
 
-	classoffset offset, self, 'SDL::App'
-	add offset, 3
-	getattribute bpp, self, offset
-	set result, bpp
+    classoffset offset, self, 'SDL::App'
+    add offset, 3
+    getattribute bpp, self, offset
+    set result, bpp
 
-	.return( result )
+    .return( result )
 .end
 
 =back

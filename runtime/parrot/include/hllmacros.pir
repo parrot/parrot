@@ -203,7 +203,7 @@ A simple demonstration of the Foreach loop.
     .sub main :main
         print "Foreach\n"
         .local pmc array, letter
-        array = new .ResizablePMCArray
+        array = new 'ResizablePMCArray'
         push array, "a"
         push array, "b"
         push array, "c"

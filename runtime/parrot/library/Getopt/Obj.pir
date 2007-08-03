@@ -99,9 +99,9 @@ Creates the Specs and notOptStop attribute, interal stuff.
 =cut
 
 .sub init :vtable :method
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     setattribute self, "Specs", $P0
-    $P0 = new .Boolean
+    $P0 = new 'Boolean'
     setattribute self, "notOptStop", $P0
 .end
 
@@ -117,7 +117,7 @@ wanted.
     .local pmc return, spec
     .local int i, j, argc
     .local string name, long, short, arg, key, val
-    return = new .Hash
+    return = new 'Hash'
 
     i = 0
 beginfor:
@@ -217,7 +217,7 @@ beginfor_0:
     $I0 = spec."type"()
     unless $I0 == .Boolean goto error_2
 
-    $P0 = new .Boolean
+    $P0 = new 'Boolean'
     $P0 = 1
     return[name] = $P0
     inc jkl
@@ -244,7 +244,7 @@ else_6:
 error_1:
     MissingRequired(name)
 error_2:
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0["_message"] = "Not using only boolean arguments in a bundled argument"
     throw $P0
 
@@ -271,7 +271,7 @@ beginstore_1:
 undef:
     $I0 = spec."optarg"()
     unless $I0 goto optelse
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     goto endifelse
 optelse:
     MissingRequired(name)
@@ -282,7 +282,7 @@ array:
     $I0 = typeof $P0
     unless $I0 != .ResizableStringArray goto endif_5
 not_set:
-    $P0 = new .ResizableStringArray
+    $P0 = new 'ResizableStringArray'
 endif_5:
     push $P0, val
     goto endifelse
@@ -292,7 +292,7 @@ hash:
     $I0 = typeof $P0
     unless $I0 != .Hash goto endif_7
 not_set_hash:
-    $P0 = new .Hash
+    $P0 = new 'Hash'
 endif_7:
     $I0 = index val, '='
     unless $I0 == -1 goto else_8
@@ -305,21 +305,21 @@ else_8:
     $P0[$S0] = $S1
     goto endifelse
 str:
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = val
     goto endifelse
 integer:
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $I0 = val
     $P0 = $I0
     goto endifelse
 flt:
-    $P0 = new .Float
+    $P0 = new 'Float'
     $N0 = val
     $P0 = $N0
     goto endifelse
 bool:
-    $P0 = new .Boolean
+    $P0 = new 'Boolean'
     $P0 = 1
 endifelse:
     return[name] = $P0
@@ -400,7 +400,7 @@ check:
     if type == '%' goto hash
     if type == 'i' goto integer
     if type == 'f' goto flt
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = "Unknown specs option '"
     $S0 .= type
     $S0 .= "'"
@@ -494,9 +494,9 @@ endfor:
     # Don't return anything, easier to catch an exception...
     $I0 = self."notOptStop"()
     if $I0 goto finish
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = "Option '"
-    $S0 .= key 
+    $S0 .= key
     $S0 .= "' not in specs"
     $P0["_message"] = $S0
     throw $P0
@@ -542,7 +542,7 @@ When a required argument is missing, throws an exception with the message
 
 .sub MissingRequired
     .param string arg
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $S0 = "Missing a required argument for option '"
     $S0 .= arg
     $S0 .= "'"
@@ -571,21 +571,21 @@ Set the defaults to all our attributes, more internal stuff.  Sets the default
 =cut
 
 .sub init :vtable :method
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = ''
     setattribute self, "name", $P0
     # TODO? These next two will be ResizablePMCArray's
     # to allow the whole --height --length type thing
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = ''
     setattribute self, "long", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = ''
     setattribute self, "short", $P0
-    $P0 = new .Boolean
+    $P0 = new 'Boolean'
     $P0 = 0
     setattribute self, "optarg", $P0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = .Boolean
     setattribute self, "type", $P0
 .end

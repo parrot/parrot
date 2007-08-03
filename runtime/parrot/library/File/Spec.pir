@@ -4,17 +4,17 @@ File::Spec - portably perform operations on file names
 
 =head1 SYNOPSIS
 
-	.local int classtype
-	.local pmc spec
+    .local int classtype
+    .local pmc spec
 
-	load_bytecode 'File/Spec.pir'
+    load_bytecode 'File/Spec.pir'
 
-	find_type classtype, 'File::Spec'
-	new spec, classtype
+    find_type classtype, 'File::Spec'
+    new spec, classtype
 
-	.local pmc x
-	.local String a, b, c
-	x= spec.'catdir'( 'a', 'b', 'c' )
+    .local pmc x
+    .local String a, b, c
+    x= spec.'catdir'( 'a', 'b', 'c' )
 
 which returns 'a/b/c' under Unix.
 
@@ -31,11 +31,11 @@ Zakharevich, Paul Schinder, and others.
 Since these functions are different for most operating systems, each set of
 OS specific routines is available in a separate module, including:
 
-	*File::Spec::Unix
-	*File::Spec::Mac
-	*File::Spec::OS2
-	File::Spec::Win32
-	*File::Spec::VMS
+    *File::Spec::Unix
+    *File::Spec::Mac
+    *File::Spec::OS2
+    File::Spec::Win32
+    *File::Spec::VMS
 
 *These modules have not yet been created in this release.
 
@@ -55,119 +55,119 @@ called as object methods.
 
 
 .sub VERSION method
-	.local string version
-	version= '0.1'
-	.return( version )
+    .local string version
+    version= '0.1'
+    .return( version )
 .end
 
 
 .sub '__onload' :load
-	'_init'()
+    '_init'()
 
-	.local string osname
-	osname= '_get_osname'()
+    .local string osname
+    osname= '_get_osname'()
 
-	.local string platform
-	platform= '_get_module'( osname )
+    .local string platform
+    platform= '_get_module'( osname )
 
-	'_load_lib'( platform )
+    '_load_lib'( platform )
 
-	.local string baseclass
-	concat baseclass, 'File::Spec::', platform
+    .local string baseclass
+    concat baseclass, 'File::Spec::', platform
 
-	## make this class a subclass of the base class
-	.local pmc self
-	subclass self, baseclass, 'File::Spec'
+    ## make this class a subclass of the base class
+    .local pmc self
+    subclass self, baseclass, 'File::Spec'
 
-	.return()
+    .return()
 .end
 
 
 .sub '_init'
-	.local pmc modules
-	modules= new .Hash
+    .local pmc modules
+    modules= new 'Hash'
 
-	## TODO implement the other platforms
-	set modules['MSWin32'], 'Win32'
-	set modules['NetWare'], 'Win32'
-	## set modules['MacOS'], 'Mac'
-	## set modules['os2'], 'OS2'
-	## set modules['VMS'], 'VMS'
-	## set modules['epoc'], 'Epoc'
-	## set modules['dos'], 'OS2'
-	## set modules['cygwin'], 'Cygwin'
+    ## TODO implement the other platforms
+    set modules['MSWin32'], 'Win32'
+    set modules['NetWare'], 'Win32'
+    ## set modules['MacOS'], 'Mac'
+    ## set modules['os2'], 'OS2'
+    ## set modules['VMS'], 'VMS'
+    ## set modules['epoc'], 'Epoc'
+    ## set modules['dos'], 'OS2'
+    ## set modules['cygwin'], 'Cygwin'
 
-	store_global '_modules', modules
+    store_global '_modules', modules
 .end
 
 
 .sub '_get_osname'
-	.local pmc config
-	.local pmc osname
+    .local pmc config
+    .local pmc osname
 
-	config= '_config'()
-	osname= config['osname']
+    config= '_config'()
+    osname= config['osname']
 
-	.return( osname )
+    .return( osname )
 .end
 
 
 .sub '_get_module'
-	.param string osname
+    .param string osname
 
-	.local pmc modules
-	modules= new .Hash
+    .local pmc modules
+    modules= new 'Hash'
 
-	modules= find_global '_modules'
+    modules= find_global '_modules'
 
-	.local string module
-	module= modules[ osname ]
+    .local string module
+    module= modules[ osname ]
 
-	ne '', module, found_module
-	module= 'Unix'
+    ne '', module, found_module
+    module= 'Unix'
 
 found_module:
-	.return( module )
+    .return( module )
 .end
 
 
 .sub '_load_lib'
-	.param string module
+    .param string module
 
-	.local string filename
-	.local string libname
+    .local string filename
+    .local string libname
 
-	concat filename, module, ".pir"
-	concat libname, "File/Spec/", filename
-	load_bytecode libname
+    concat filename, module, ".pir"
+    concat libname, "File/Spec/", filename
+    load_bytecode libname
 
-	.return()
+    .return()
 .end
 
 
 .sub '__isa' method
-	.local pmc sub
-	.local string name
-	
-	classname name, self
+    .local pmc sub
+    .local string name
+    
+    classname name, self
 
-	.local string osname
-	osname= '_get_osname'()
+    .local string osname
+    osname= '_get_osname'()
 
-	.local string module
-	module= '_get_module'( osname )
+    .local string module
+    module= '_get_module'( osname )
 
-	.local pmc platform
-	platform= new String
-	platform= module
+    .local pmc platform
+    platform= new String
+    platform= module
 
-	.local pmc class
-	class= new String
-	class= name
+    .local pmc class
+    class= new String
+    class= name
 
-	concat class, class, '::'
-	concat class, class, platform
-	.return(class)
+    concat class, class, '::'
+    concat class, class, platform
+    .return(class)
 .end
 
 

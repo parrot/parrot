@@ -56,9 +56,9 @@ then a warning is generated if perl is running under -w.
 
     # TODO: find saner names
     .local pmc six_to_eight, eight_to_six
-    six_to_eight = new .FixedIntegerArray
+    six_to_eight = new 'FixedIntegerArray'
     six_to_eight = 64      # 2 ** 6
-    eight_to_six = new .FixedIntegerArray
+    eight_to_six = new 'FixedIntegerArray'
     eight_to_six = 256     # 2 ** 8
 
     # TODO: find easier way to initialize with undef or so

@@ -5,7 +5,7 @@
 
 =head1 NAME
 
-CGI;QueryHash - A helper for classic CGI 
+CGI;QueryHash - A helper for classic CGI
 
 =head1 SYNOPSIS
 
@@ -30,18 +30,18 @@ Get parameters for GET method.
 =cut
 
 
-.sub 'parse_get' 
+.sub 'parse_get'
 
     .local pmc my_env, query_hash
     .local int does_exist
 
-    query_hash      = new .Hash
-    my_env          = new .Env
+    query_hash      = new 'Hash'
+    my_env          = new 'Env'
     does_exist = exists my_env['QUERY_STRING']
     unless does_exist goto end_parse_get
         .local string query
         query           = my_env['QUERY_STRING']
-	#_dumper( query, 'queryGET:' )
+        #_dumper( query, 'queryGET:' )
         query_hash      = parse( query )
 
 end_parse_get:
@@ -55,13 +55,13 @@ Get parameters for POST method.
 =cut
 
 
-.sub 'parse_post' 
+.sub 'parse_post'
 
     .local pmc my_env, query_hash
     .local int does_exist
 
-    query_hash   = new .Hash
-    my_env       = new .Env
+    query_hash   = new 'Hash'
+    my_env       = new 'Env'
     does_exist   = exists my_env['CONTENT_LENGTH']
     unless does_exist goto end_parse_post
         .local pmc in
@@ -72,7 +72,7 @@ Get parameters for POST method.
         in              = getstdin
         query           = read in, len
         close in
-	#_dumper( query, 'queryPOST:' )
+        #_dumper( query, 'queryPOST:' )
         query_hash = parse( query )
 
 end_parse_post:
@@ -87,7 +87,7 @@ Split into a hash.
 
 =cut
 
-.sub 'parse' 
+.sub 'parse'
     .param string query
 
     unless query goto END
@@ -96,8 +96,8 @@ Split into a hash.
     .local string query, kv, k, v, item_tmp_1, item_tmp_2, last_chars_of_k
     .local int i, j, n, o, len_of_k
 
-    query_hash      = new .Hash
-    items           = new .ResizableStringArray
+    query_hash      = new 'Hash'
+    items           = new 'ResizableStringArray'
 
     # split by '&' and ';'
     items_tmp_1 = split ';', query
@@ -107,7 +107,7 @@ next_loop_1:
        if i >= n goto end_loop_1
        item_tmp_1 = items_tmp_1[i]
        inc i
-       items_tmp_2 = split '&', item_tmp_1  
+       items_tmp_2 = split '&', item_tmp_1
        j = 0
        o = elements items_tmp_2
 next_loop_2:
@@ -136,13 +136,13 @@ set_val:
     v = urldecode(v)
     # a special case: [] indicates an array
     len_of_k = length k
-    if len_of_k <= 2 goto v_isnt_array 
+    if len_of_k <= 2 goto v_isnt_array
     last_chars_of_k = substr k, -2
-    ne last_chars_of_k, '[]', v_isnt_array 
+    ne last_chars_of_k, '[]', v_isnt_array
         .local pmc v_array
-	# TODO: This should be an array
-	v_array = new .Hash
-	v_array[0] = v
+        # TODO: This should be an array
+        v_array = new 'Hash'
+        v_array[0] = v
         substr k, -2, 2, ''
         query_hash[k] = v_array
         branch next_item
@@ -152,14 +152,14 @@ v_isnt_array:
 next_item:
     inc i
     if i < n goto lp_items
-   
-END:   
+
+END:
     .return (query_hash)
 .end
 
 =item urldecode
 
-convert %xx to char 
+convert %xx to char
 
 =cut
 
@@ -178,7 +178,7 @@ START:
     substr char_in, in, pos_in, 1
     char_out = char_in
     if char_in != "+" goto NOT_A_PLUS
-	char_out = ' '
+        char_out = ' '
         goto INC_IN
 
 NOT_A_PLUS:
