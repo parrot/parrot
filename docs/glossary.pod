@@ -221,6 +221,12 @@ This let's Parrot talk to native "C" libraries, without a C-compiler.
 
 Acronym for Native Call Interface.
 
+=head2 NQP
+
+Acronym for Not Quite Perl (6).  NQP is designed to be a very small compiler for
+quickly generating PIR routines to create transformers for Parrot (especially
+HLL compilers).
+
 =head2 Packfile
 
 Another name for a PBC file, due to the names used for data structures in one
