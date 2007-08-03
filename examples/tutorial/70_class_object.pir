@@ -29,7 +29,7 @@
 .sub set_bar :method
     .param string value
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = value
     setattribute self, "bar", $P0
 .end
@@ -42,7 +42,7 @@
 .sub set_baz :method
     .param int value
 
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = value
     setattribute self, "baz", $P0
 .end

@@ -1,6 +1,6 @@
 .sub main :main
     .local pmc cont
-    cont = new Continuation
+    cont = new 'Continuation'
     set_addr cont, continued
 
     test_call(4, cont)

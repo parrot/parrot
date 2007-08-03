@@ -16,7 +16,7 @@ and P for PMC (any kind of object).
 
     $S5 = "Hello"    # set temp string var to "Hello"
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "Ford"     # set temp PMC var to "Ford"
 
     print $I0

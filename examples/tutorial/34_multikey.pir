@@ -1,8 +1,8 @@
 .sub main :main
 
     .local pmc myhash, innerarray
-    myhash  = new Hash
-    innerarray = new ResizableIntegerArray
+    myhash  = new 'Hash'
+    innerarray = new 'ResizableIntegerArray'
 
     $I0 = 2
     innerarray[2] = 42

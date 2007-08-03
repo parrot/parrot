@@ -1,6 +1,6 @@
 .sub main :main
     .lex "$n", $P0
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 22
 
     .local pmc base_sub, myclosure

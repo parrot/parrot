@@ -1,7 +1,7 @@
 .sub main :main
     .local pmc firstname
 
-    firstname = new String
+    firstname = new 'String'
     firstname = "Ford"
     say firstname 
 

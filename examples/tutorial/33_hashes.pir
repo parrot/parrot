@@ -1,7 +1,7 @@
 .sub main :main
 
     .local pmc myhash
-    myhash = new Hash
+    myhash = new 'Hash'
 
     myhash['foo'] = 5
     myhash['bar'] = "Hello"

@@ -31,7 +31,7 @@ code, and named variables for any longer-lived variables.
     print "\n"
 
     .local pmc player
-    player = new String
+    player = new 'String'
     player = "Ford"     # set temp PMC var to "Ford"
     print player
     print "\n"

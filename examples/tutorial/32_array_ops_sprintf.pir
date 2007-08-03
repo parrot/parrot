@@ -1,13 +1,13 @@
 .sub main :main
 
     .local pmc myarray
-    myarray = new ResizablePMCArray
+    myarray = new 'ResizablePMCArray'
    
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 42
     push myarray, $P0
 
-    $P1 = new Float
+    $P1 = new 'Float'
     $P1 = 10.5
     push myarray, $P1
 
