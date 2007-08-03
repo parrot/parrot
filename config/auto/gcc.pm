@@ -172,27 +172,75 @@ sub runstep {
                 #. "-pedantic -pedantic-errors "
                 #. " -w "
                 #. " -Werror "
-                . " -Waggregate-return -Wcast-align  -Wcast-qual  -Wchar-subscripts "
-                . " -Wcomment -Wconversion  -Wno-deprecated-declarations -Wdisabled-optimization  -Wno-div-by-zero  -Wno-endif-labels "
-                . " -Werror-implicit-function-declaration -Wfloat-equal -Wformat  -Wformat=2 -Wno-format-extra-args -Wformat-nonliteral "
-                . " -Wformat-security  -Wformat-y2k -Wimplicit  -Wimplicit-function-declaration  -Wimplicit-int -Wimport  -Wno-import  -Winit-self "
-                . " -Winline -Winvalid-pch -Wlarger-than-4096 -Wmain  -Wmissing-braces  "
-                . " -Wmissing-format-attribute  -Wmissing-noreturn -Wno-multichar  -Wnonnull  -Wpacked "
-                . " -Wparentheses  -Wpointer-arith  -Wreturn-type  -Wsequence-point  -Wshadow -Wsign-compare "
-                . " -Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default -Wswitch-enum -Wsystem-headers  -Wtrigraphs  -Wundef "
+                . " -Waggregate-return"
+                . " -Wcast-align"
+                . " -Wcast-qual"
+                . " -Wchar-subscripts "
+                . " -Wcomment"
+                . " -Wconversion"
+                . " -Wno-deprecated-declarations"
+                . " -Wdisabled-optimization"
+                . " -Wno-div-by-zero"
+                . " -Wno-endif-labels"
+                . " -Werror-implicit-function-declaration"
+                . " -Wfloat-equal"
+                . " -Wformat"
+                . " -Wformat=2"
+                . " -Wno-format-extra-args"
+                . " -Wformat-nonliteral"
+                . " -Wformat-security"
+                . " -Wformat-y2k"
+                . " -Wimplicit"
+                . " -Wimplicit-function-declaration"
+                . " -Wimplicit-int"
+                . " -Wimport"
+                . " -Wno-import"
+                . " -Winit-self"
+                . " -Winline"
+                . " -Winvalid-pch"
+                . " -Wlarger-than-4096"
+                . " -Wmain"
+                . " -Wmissing-braces"
+                . " -Wmissing-format-attribute"
+                . " -Wmissing-noreturn"
+                . " -Wno-multichar"
+                . " -Wnonnull"
+                . " -Wpacked"
+                . " -Wparentheses"
+                . " -Wpointer-arith"
+                . " -Wreturn-type"
+                . " -Wsequence-point"
+                . " -Wshadow"
+                . " -Wsign-compare"
+                . " -Wstrict-aliasing"
+                . " -Wstrict-aliasing=2"
+                . " -Wswitch"
+                . " -Wswitch-default"
+                . " -Wswitch-enum"
+                . " -Wsystem-headers"
+                . " -Wtrigraphs"
+                . " -Wundef"
 
                 #. " -Wuninitialized "
                 #     requires -O
-                . " -Wunknown-pragmas  -Wunused  -Wunused-function  -Wunused-label  -Wunused-parameter -Wunused-value "
-                . " -Wunused-variable  -Wwrite-strings "
+                . " -Wunknown-pragmas"
+                . " -Wunused"
+                . " -Wunused-function"
+                . " -Wunused-label"
+                . " -Wunused-parameter"
+                . " -Wunused-value"
+                . " -Wunused-variable"
+                . " -Wwrite-strings"
 
                 #."-Wmost (APPLE ONLY)"
 
                 #C-only Warning Options
-                    . " -Wmissing-prototypes -Wold-style-definition -Wstrict-prototypes "
+                . " -Wmissing-prototypes"
+                . " -Wold-style-definition"
+                . " -Wstrict-prototypes"
 
                 #. " -Wtraditional "
-                . " -Wdeclaration-after-statement ",
+                . " -Wdeclaration-after-statement",
 
 #"-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
 
@@ -230,13 +278,13 @@ sub runstep {
             #3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked "
             #    . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
             #    . "-Wno-shadow -falign-functions=16 ",
-            4.0 => "-Wfatal-errors "
-                . "-Wmissing-field-initializers "
-                . "-Wmissing-include-dirs "
-                . "-Wvariadic-macros "
-                . "-Wno-discard-qual "
-                . "-Wno-pointer-sign ",
-            4.1 => "-Wc++-compat",
+            4.0 => " -Wfatal-errors"
+                . " -Wmissing-field-initializers"
+                . " -Wmissing-include-dirs"
+                . " -Wvariadic-macros"
+                . " -Wno-discard-qual"
+                . " -Wno-pointer-sign",
+            4.1 => " -Wc++-compat",
             4.2 => "",
 
             # -Wsequence-point is part of -Wall
