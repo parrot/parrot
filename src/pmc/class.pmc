@@ -879,11 +879,6 @@ Creates a new PMC object of the type of the class and calls init().
 */
 
     PMC* instantiate(PMC* init) {
-/*        const INTVAL type = SELF->vtable->base_type;
-        PMC* const ret = pmc_new_noinit(INTERP, type);
-        VTABLE_init(INTERP, ret);
-        return ret;
- */
         Parrot_Object *obj_guts  = NULL;
         Parrot_Class  *_class    = PARROT_CLASS(SELF);
         STRING * const class_str = string_from_cstring(interp, "Class", 5);
@@ -1006,14 +1001,16 @@ Creates a new PMC object of the type of the class and calls init().
                     PMC *parent_ins;
                     int  position;
 
-                    Parrot_PCCINVOKE(interp, class_check,
-                        string_from_literal(interp, "new"), "P->", parent_ins);
+                    parent_ins = VTABLE_instantiate(interp, class_check, PMCNULL);
+
+                    /* Associate it with this class as the real self. */
+                    parent_ins->real_self = object;
 
                     /* ...and tack on end of the attribute store (after all the
                      * slots for attributes). */
                     position = VTABLE_elements(interp, obj_guts->attrib_store);
                     VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
-                        position, class_check);
+                        position, parent_ins);
                 }
             }
         }
@@ -1140,155 +1137,8 @@ parameter list.
 
 */
     PCCMETHOD void new(PMC *args :slurpy :named) {
-        Parrot_Object *obj_guts  = NULL;
-        Parrot_Class  *_class    = PARROT_CLASS(SELF);
-        STRING        *class_str = CONST_STRING(interp, "Class");
-        PMC           *obj;
-        PMC           *iter;
-
-        int            i, mro_length;
-
-        /* If we've not been instantiated before... */
-        if (!_class->instantiated) {
-            int resolve_count;
-
-            /* Pull in methods from the namespace, if any. */
-            if (!PMC_IS_NULL(_class->_namespace)) {
-                PMC *methods, *vtable_methods;
-                PMC *ns = _class->_namespace;
-
-                /* Import any methods. */
-                (PMC *methods) = PCCINVOKE(interp, ns,
-                    "get_associated_methods");
-                if (!PMC_IS_NULL(methods)) {
-                    PMC *iter = VTABLE_get_iter(interp, methods);
-                    while (VTABLE_get_bool(interp, iter)) {
-                        STRING *meth_name = VTABLE_shift_string(interp, iter);
-                        PMC *meth_sub = VTABLE_get_pmc_keyed_str(interp, methods,
-                            meth_name);
-                        VTABLE_add_method(interp, SELF, meth_name, meth_sub);
-                    }
-                }
-
-                /* Import any vtable methods. */
-                (PMC *vtable_methods) = PCCINVOKE(interp, ns,
-                    "get_associated_vtable_methods");
-                if (!PMC_IS_NULL(vtable_methods)) {
-                    /* TODO: Hash is keyed on index, not name, but a patch to do
-                     * that is forthcoming. */
-                }
-            }
-
-            /* Check that we have all methods listed in resolve list. */
-            resolve_count = VTABLE_elements(interp, _class->resolve_method);
-
-            for (i = 0; i < resolve_count; i++) {
-                STRING *check_meth = VTABLE_get_string_keyed_int(interp,
-                    _class->resolve_method, i);
-                if (!VTABLE_exists_keyed_str(interp, _class->methods, check_meth)) {
-                    real_exception(interp, NULL, METH_NOT_FOUND,
-                        "The method '%S' was named in the resolve list, but not supplied",
-                        check_meth);
-                }
-            }
-
-            /* Build full parents list.
-             * XXX Need pluggable MRO, for now always do C3. */
-            _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
-
-            build_attrib_index(interp, SELF);
-
-            if (PMC_IS_NULL(_class->attrib_index))
-                PCCRETURN();
-
-            /* See if we have any parents from other universes and if so set a
-             * flag stating so. */
-            mro_length = VTABLE_elements(interp, _class->all_parents);
-
-            for (i = 0; i < mro_length; i++) {
-                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
-                    _class->all_parents, i);
-                if (!VTABLE_isa(interp, class_check, class_str)) {
-                    /* Found one; that's enough. */
-                    PObj_HasAlienParents_SET(SELF);
-                    break;
-                }
-            }
-
-            /* See if we have any parents from other universes and if so set a
-             * flag stating so. */
-            mro_length = VTABLE_elements(interp, _class->all_parents);
-
-            for (i = 0; i < mro_length; i++) {
-                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
-                    _class->all_parents, i);
-                if (!VTABLE_isa(interp, class_check, class_str)) {
-                    /* Found one; that's enough. */
-                    PObj_HasAlienParents_SET(SELF);
-                    break;
-                }
-            }
-        }
-
-        /* Set instantiated flag. */
-        _class->instantiated = 1;
-
-        /* Create object. */
-        obj = pmc_new_noinit(interp, enum_class_Object);
-
-        /* Set custom DOD mark and destroy on the object. */
-        PObj_custom_mark_SET(obj);
-        PObj_active_destroy_SET(obj);
-
-        /* Initialize the object's underlying structure, pointing it to this
-         * class. */
-        obj_guts               = mem_allocate_zeroed_typed(Parrot_Object);
-        obj_guts->_class       = SELF;
-        obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
-        PMC_data(obj)          = obj_guts;
-
-        /* Initialize attributes with the supplied values. */
-        iter = VTABLE_get_iter(interp, args);
-
-        while (VTABLE_get_bool(interp, iter)) {
-            /* Get name and value. */
-            STRING * const attr_name  = VTABLE_shift_string(interp, iter);
-            PMC    * const attr_value = VTABLE_get_pmc_keyed_str(interp, args,
-                attr_name);
-
-            /* Set the attribute. */
-            VTABLE_set_attr_str(interp, obj, attr_name, attr_value);
-        }
-
-        /* If we have parents that are out of this class universe, find them
-         * in the MRO and create instances of them. */
-        if (PObj_HasAlienParents_TEST(SELF)) {
-            mro_length = VTABLE_elements(interp, _class->all_parents);
-
-            for (i = 0; i < mro_length; i++) {
-                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
-                    _class->all_parents, i);
-
-                if (!VTABLE_isa(interp, class_check, class_str)) {
-                    /* From another universe. Create instance... */
-                    PMC *parent_ins;
-                    int  position;
-
-                    (PMC *parent_ins) = PCCINVOKE(interp, class_check, "new");
-
-                    /* Associate it with this class as the real self. */
-                    parent_ins->real_self = obj;
-
-                    /* ...and tack on end of the attribute store (after all the
-                     * slots for attributes). */
-                    position = VTABLE_elements(interp, obj_guts->attrib_store);
-                    VTABLE_set_pmc_keyed_int(interp, obj_guts->attrib_store,
-                        position, parent_ins);
-                }
-            }
-        }
-
-        PCCRETURN(PMC *obj)
+        PMC *obj = VTABLE_instantiate(interp, SELF, args);
+        PCCRETURN(PMC *obj);
      }
 
 /*

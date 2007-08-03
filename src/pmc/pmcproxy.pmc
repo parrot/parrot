@@ -99,6 +99,26 @@ Initializes a PMCProxy PMC.
 
 /*
 
+=item C<PMC* instantiate(PMC* init)>
+
+Creates an instance of the PMC.
+
+=cut
+
+*/
+    PMC* instantiate(PMC* init) {
+        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
+        PMC *created;
+        if (!PMC_IS_NULL(init))
+            created = pmc_new_init(interp, _pmc->id, init);
+        else
+            created = pmc_new(interp, _pmc->id);
+
+        return created;
+    }
+
+/*
+
 =item C<void destroy()>
 
 Free the memory associated with the object's underlying struct.
@@ -261,13 +281,8 @@ Creates an instance of the PMC.
 
 */
     PCCMETHOD void new(PMC *args :optional, int got_args :opt_flag) {
-        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
-        PMC *created;
-        if (got_args)
-            created = pmc_new_init(interp, _pmc->id, args);
-        else
-            created = pmc_new(interp, _pmc->id);
-        PCCRETURN(PMC *created);
+        PMC *obj = VTABLE_instantiate(interp, SELF, args);
+        PCCRETURN(PMC *obj);
     }
 
 /*
