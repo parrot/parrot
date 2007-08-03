@@ -46,6 +46,9 @@ sub runstep {
         $ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
         $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
 
+        # override perl's warnings level
+        $ccflags =~ s/-W\d/-W4/;
+
         $conf->data->set(
             share_ext  => '.dll',
             load_ext   => '.dll',

@@ -64,7 +64,6 @@ sub runstep {
     $conf->data->set( msvcversion => $msvcversion );
 
     # Add Visual C++ specifics here
-    my $ccwarn = $conf->data->get('ccwarn');
     if ( $msvcversion >= 14.00 ) {
 
         # Version 14 (aka Visual C++ 2005) warns about unsafe, deprecated
@@ -74,43 +73,7 @@ sub runstep {
         # To disable deprecation, use _CRT_SECURE_NO_DEPRECATE. See online help
         # for details.
         $conf->data->add( " ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE" );
-
-        my @opt_and_vers = (
-            0 => " -W4"
-        );
-
-        my $warns = "";
-        my @warning_options = ( \@opt_and_vers );
-        foreach my $curr_opt_and_vers (@warning_options) {
-        while ( my ( $vers, $opt ) = splice @$curr_opt_and_vers, 0, 2 ) {
-            last if $vers > $msvcversion;
-            next unless $opt;    # Ignore blank lines
-
-            if ( $opt =~ /-mno-accumulate-outgoing-args/ ) {
-                use Config;
-                if ( $Config{archname} !~ /86/ ) {
-                    $opt =~ s/-mno-accumulate-outgoing-args//;
-                }
-            }
-            $warns .= " $opt";
-        }
-
-        # if the user overwrites the warnings remove it from $warns
-        if ($ccwarn) {
-            my @warns = split ' ', $warns;
-            foreach my $w ( split ' ', $ccwarn ) {
-                $w =~ s/^-W(?:no-)?(.*)$/$1/;
-                @warns = grep !/^-W(?:no-)?$w$/, @warns;
-            }
-            $warns = join ' ', @warns;
-        }
     }
-
-    # set the warnings
-    $conf->data->set(
-        ccwarn              => "$warns $ccwarn",
-    );
-}
 
     return $self;
 }
