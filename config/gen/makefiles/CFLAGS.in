@@ -12,7 +12,7 @@ src/ops/core_ops_cg.c      -{@optimize@}    # takes too long
 src/ops/core_ops_switch.c  -{@optimize@}    # Overwhelms some compilers.
 src/py_func.c       +{-Ipmc}             # include pmc_default.h
 
-# io should be -Wunsed clean
+# io should be -Wunused clean
 {^src/io/}              s/-Wno-unused/-Wunused/
 
 # files which make their way into dynamically loaded files should be compiled
@@ -21,7 +21,7 @@ src/extend.c        +{@cc_shared@}
 src/nci_test.c      +{@cc_shared@}
 
 # imcc file settings
-{^compilers/imcc/}            -{-Wwrite-strings -Wcast-qual} 
+{^compilers/imcc/}            -{-Wwrite-strings -Wcast-qual}
 {^compilers/imcc/(?!imclexer)}      s/-Wno-unused/-Wunused/
 compilers/imcc/instructions.c -{-Wformat-nonliteral} # noisy
 compilers/imcc/debug.c        -{-Wformat-nonliteral} # noisy

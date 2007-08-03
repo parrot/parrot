@@ -734,7 +734,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	@echo Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your fingers
 	$(MINIPARROT) config_lib.pasm > $@
 
-$(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
