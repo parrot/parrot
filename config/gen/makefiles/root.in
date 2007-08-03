@@ -1643,6 +1643,8 @@ test-clean :
 	$(RM_F) \
     "t/tools/pmc2c.t_*" \
     "t/tools/pmc2c.pmc_t_*"
+	$(RM_F) \
+    "t/tools/pdb.t.*"
 
 imcc-clean:
 	$(RM_F) \
