@@ -69,15 +69,15 @@ RBP, RBX, and R12->R15 are preserved
 
 */
 
-#  include <unistd.h>
-#  include <limits.h>
+#include <unistd.h>
+#include <limits.h>
 
 void Parrot_jit_begin(Parrot_jit_info_t *, Interp *);
 
 /* This is used for testing whether or not keeping these two in registers is an
  * improvement or not.  This file may need to be expanded further to know for
  * sure. */
-#  undef USE_OP_MAP_AND_CODE_START
+#undef USE_OP_MAP_AND_CODE_START
 
 
 /*
@@ -188,14 +188,14 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
             *(pc++) = (char)(0x40 | (((reg) & 8) >> 3)); \
         } \
         *(pc++) = (char)((op) | ((reg) & 7)); \
-    } 
+    }
 
 /* 0xXX /r */
 #  define emit_op_r_r(op, pc, dst, src) { \
         emit_REX(pc, dst, src); \
         *(pc++) = (char) op; \
         emit_modrm(pc, b11, dst, src); \
-    } 
+    }
 
 #  define emit_op_r_mr(op, pc, dst, src, disp) { \
         emit_REX(pc, dst, src); \
@@ -215,7 +215,7 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
         *(pc++) = (char)(op); \
         *(int *)pc = (int)(imm); \
         pc += 4; \
-    } 
+    }
 
 
 #  define emit_op_r_i(pc, op, op2, code, dst, imm) { \
@@ -329,7 +329,7 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
 #  define jit_emit_stack_frame_enter(pc) { \
         emit_push_r(pc, RBP); \
         emit_mov_r_r(pc, RBP, RSP); \
-    } 
+    }
 
 /* pop rbp */
 #  define jit_emit_stack_frame_leave(pc) { \
@@ -405,7 +405,7 @@ typedef enum {
 
 #ifdef JIT_EMIT
 
-#ifdef USE_OP_MAP_AND_CODE_START
+#  ifdef USE_OP_MAP_AND_CODE_START
 /* These two can be mixed together just like in the i386 jit.  All the places I
  * can see this being called require it to be included, but for the moment I'm
  * keeping it as these macros. */
@@ -413,7 +413,7 @@ typedef enum {
  * emit code that gets interp->code->jit_info->arena->op_map
  * and sets the OP_MAP register
  */
-#  define jit_emit_load_op_map(pc) { \
+#    define jit_emit_load_op_map(pc) { \
         emit_mov_r_mr(pc, OP_MAP, INTERP, (long)offsetof(Interp, code)); \
         emit_mov_r_mr(pc, OP_MAP, OP_MAP, (long)offsetof(PackFile_ByteCode, jit_info)); \
         emit_lea_r_mr(pc, OP_MAP, OP_MAP, (long)offsetof(Parrot_jit_info_t, arena)); \
@@ -424,12 +424,12 @@ typedef enum {
  * emit code that gets interp->code->base.data
  * and sets the CODE_START register
  */
-#  define jit_emit_load_code_start(pc) { \
+#    define jit_emit_load_code_start(pc) { \
         emit_mov_r_mr(pc, CODE_START, INTERP, (long)offsetof(Interp, code)); \
         emit_mov_r_mr(pc, CODE_START, CODE_START, (long)offsetof(PackFile_Segment, data)); \
 }
 
-#endif /* USE_OP_MAP_AND_CODE_START */
+#  endif /* USE_OP_MAP_AND_CODE_START */
 
 /*
  * emit code that calls a Parrot opcode function
@@ -459,33 +459,33 @@ static void
 Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp)
 {
     if (!jit_info->objfile) {
-#ifdef USE_OP_MAP_AND_CODE_START
+#  ifdef USE_OP_MAP_AND_CODE_START
         /* Get interp->code->base.data */
         jit_emit_load_code_start(jit_info->native_ptr);
         emit_sub_r_r(jit_info->native_ptr, RAX, CODE_START);
 
         /* Get interp->code->jit_info->arena->op_map */
         jit_emit_load_op_map(jit_info->native_ptr);
-#else
+#  else
         /* emit code that gets interp->code->base.data */
-        emit_mov_r_mr(jit_info->native_ptr, RCX, INTERP, (long)offsetof(Interp, code)); 
-        emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_Segment, data)); 
+        emit_mov_r_mr(jit_info->native_ptr, RCX, INTERP, (long)offsetof(Interp, code));
+        emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_Segment, data));
         emit_sub_r_r(jit_info->native_ptr, RAX, RDX);
 
         /* Reuse interp->code in RCX, get interp->code->jit_info->arena->op_map */
-        emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_ByteCode, jit_info)); 
-        emit_lea_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_info_t, arena)); 
-        emit_mov_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_arena_t, op_map)); 
-#endif
+        emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_ByteCode, jit_info));
+        emit_lea_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_info_t, arena));
+        emit_mov_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_arena_t, op_map));
+#  endif
     }
     /* Base pointer */
     emit_mov_r_mr(jit_info->native_ptr, RBX, INTERP, (long)offsetof(Interp, ctx.bp));
 
-#ifdef USE_OP_MAP_AND_CODE_START
+#  ifdef USE_OP_MAP_AND_CODE_START
     emit_jump_r_r(jit_info->native_ptr, RAX, OP_MAP);
-#else
+#  else
     emit_jump_r_r(jit_info->native_ptr, RAX, RDX);
-#endif
+#  endif
 }
 
 
@@ -693,7 +693,7 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
          * RBP which is used for easier debugging.  That's five registers used
          * for one reason or another at the moment.  I'm not sure if it's worth
          * it yet. */
-        /* 
+        /*
          *  RBX     for Interp->ctx.bp
          *  RBP     for debugging, can add it to the preserved list
          *  R12
@@ -702,9 +702,9 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
          *  R15     for INTERP
          */
         R12,
-#ifndef USE_OP_MAP_AND_CODE_START
+#  ifndef USE_OP_MAP_AND_CODE_START
         R13, R14,
-#endif
+#  endif
         /* Unpreserved */
         RSI, RDI, R8, R9, R10, RCX, RDX
     };
@@ -733,13 +733,13 @@ static const jit_arch_info arch_info = {
         /* JIT_CODE_FILE */
         {
             Parrot_jit_begin,   /* emit code prologue */
-#ifdef USE_OP_MAP_AND_CODE_START
+#  ifdef USE_OP_MAP_AND_CODE_START
             8,
             1,
-#else
+#  else
             10,                 /* mapped int */
             3,                  /* preserved int */
-#endif
+#  endif
             intval_map,         /* which ints mapped */
             0,                  /* mapped float  */
             0,                  /* preserved float */
