@@ -314,6 +314,15 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      */
     interp->arena_base->DOD_block_level =
         interp->arena_base->GC_block_level = 0;
+
+    if (Interp_trace_TEST(interp, ~0)) {
+        PIO_eprintf(interp, "ParrotIO objects (like stdout and stderr)"
+            "are about to be closed, so clearing trace flags.\n");
+        Interp_trace_CLEAR(interp, ~0);
+    }
+
+    /* Destroys all PMCs, even constants and the ParrotIO objects for
+     * std{in,out,err}, so don't be verbose about DOD'ing. */
     Parrot_do_dod_run(interp, DOD_finish_FLAG);
 
 #if STM_PROFILE

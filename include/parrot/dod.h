@@ -44,7 +44,8 @@
 #define DOD_trace_stack_FLAG    (UINTVAL)(1 << 0)   /* trace system areads and stack */
 #define DOD_trace_normal        (UINTVAL)(1 << 0)   /* the same */
 #define DOD_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
-#define DOD_finish_FLAG         (UINTVAL)(1 << 2)   /* run async past sweep */
+#define DOD_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
+                                                    /* garbage collect. */
 #define DOD_no_trace_volatile_roots (UINTVAL)(1 << 3)
             /* trace all but volatile root set, i.e. registers */
 
