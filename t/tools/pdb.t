@@ -113,3 +113,12 @@ Flesh it out.  This is a bare bones proof of concept.  Add tests for all of the
 commands.
 
 =back
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
