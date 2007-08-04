@@ -193,6 +193,7 @@ inline op branch_cs (in STR) :base_loop,check_event {
         interp->resume_offset = fe->offset;
         Parrot_switch_to_cs(interp, fe->seg, 1);
     }
+    mem_sys_free(fe);
     string_cstring_free(label);
     interp->resume_flag = 2;
     goto ADDRESS(0);

@@ -2874,15 +2874,12 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory * const dir = interp->code->base.dir;
-    PackFile_FixupEntry *ep, e;
+    PackFile_FixupEntry *ep        = mem_allocate_typed(PackFile_FixupEntry);
     int found;
 
-    e.type = type;
-    e.name = name;
-    ep = &e; /* XXX It's possible to return this pointer to e, even though e is on the stack. */
-    /* XXX That is a big big big error. */
-    found = PackFile_map_segments(interp, dir, find_fixup_iter,
-            (void *) &ep);
+    ep->type = type;
+    ep->name = name;
+    found    = PackFile_map_segments(interp, dir, find_fixup_iter, (void *) ep);
     return found ? ep : NULL;
 }
 
