@@ -55,7 +55,7 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 A directory of method names and method bodies this class provides.
 An empty Hash PMC is allocated during initialization.
 
-=item C<vtable_methods>
+=item C<vtable_overrides>
 
 A directory of vtable method names and method bodies this class overrides.
 An empty Hash PMC is allocated during initialization.
@@ -356,6 +356,39 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     }
 }
 
+PMC *
+find_vtable_override(PARROT_INTERP, PMC *class, STRING * name)
+{
+    Parrot_Class * const _class = PARROT_CLASS(class);
+    /* Walk and search for the vtable method. */
+    const int num_classes = VTABLE_elements(interp, _class->all_parents);
+    const int all_in_universe = !PObj_HasAlienParents_TEST(class);
+    const int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
+    int i;
+    for (i = 0; i < num_classes; i++) {
+        /* Get the class. */
+        PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+
+        /* If it's from this universe or the class doesn't inherit from
+         * anything outside of it... */
+        if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
+            const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
+            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, name)) {
+                /* Found it; call. */
+                PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
+                    class_info->vtable_overrides, name);
+                return meth;
+            }
+        }
+        else {
+            /* This is the case where a parent is of a type other than Class,
+             * but PMCProxy doesn't handle vtable overrides correctly yet. Will
+             * have to come back and add it later. */
+        }
+    }
+    return PMCNULL;
+}
+
 
 /*
 
@@ -405,7 +438,7 @@ arguments.  The class is attatched to the current namespace.
         _class->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
         _class->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
         _class->methods         = pmc_new(interp, enum_class_Hash);
-        _class->vtable_methods  = pmc_new(interp, enum_class_Hash);
+        _class->vtable_overrides  = pmc_new(interp, enum_class_Hash);
         _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
@@ -564,8 +597,8 @@ Mark any referenced strings and PMCs in the structure as live.
             pobject_lives(interp, (PObj*)_class->roles);
         if (_class->methods)
             pobject_lives(interp, (PObj*)_class->methods);
-        if (_class->vtable_methods)
-            pobject_lives(interp, (PObj*)_class->vtable_methods);
+        if (_class->vtable_overrides)
+            pobject_lives(interp, (PObj*)_class->vtable_overrides);
         if (_class->attrib_metadata)
             pobject_lives(interp, (PObj*)_class->attrib_metadata);
         if (_class->attrib_index)
@@ -639,6 +672,42 @@ Adds the given sub PMC as a method with the given name.
 
         /* Enter it into the table. */
         VTABLE_set_pmc_keyed_str(interp, _class->methods, name, sub);
+    }
+
+/*
+
+=item C<void add_vtable_override(STRING *name, PMC *sub)>
+
+Adds the given sub PMC as a vtable override with the given name.
+
+=cut
+
+*/
+    void add_vtable_override(STRING *name, PMC *sub) {
+        Parrot_Class * const _class = PARROT_CLASS(SELF);
+        char *c_name = string_to_cstring(interp, name);
+        int found = 0;
+        int i;
+
+        /* If we have already added a vtable override with this name... */
+        if (VTABLE_exists_keyed_str(interp, _class->vtable_overrides, name)) {
+            real_exception(interp, NULL, E_NotImplementedError,
+                "A vtable override of this name already exists. It may have been supplied by a role.");
+        }
+
+        /* Check name is a valid vtable method name. */
+        for (i = PARROT_VTABLE_LOW; i < NUM_VTABLE_FUNCTIONS; i++) {
+            if (strcmp(c_name, Parrot_vtable_slot_names[i] + 2) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found)
+            real_exception(interp, NULL, METH_NOT_FOUND,
+                "'%S' is not a valid vtable function name.", name);
+
+        /* Add it to vtable methods list. */
+        VTABLE_set_pmc_keyed_str(interp, _class->vtable_overrides, name, sub);
     }
 
 /*
@@ -835,8 +904,8 @@ namespace). Unsets the instantiated flag, allowing modifications.
         new_class->parents         = VTABLE_clone(interp, _class->parents);
         new_class->roles           = VTABLE_clone(interp, _class->roles);
         new_class->methods         = VTABLE_clone(interp, _class->methods);
-        new_class->vtable_methods  = VTABLE_clone(interp,
-                                                  _class->vtable_methods);
+        new_class->vtable_overrides  = VTABLE_clone(interp,
+                                                  _class->vtable_overrides);
         new_class->attrib_metadata = VTABLE_clone(interp,
                                                   _class->attrib_metadata);
         new_class->resolve_method  = VTABLE_clone(interp,
@@ -894,7 +963,7 @@ Creates a new PMC object of the type of the class and calls init().
 
             /* Pull in methods from the namespace, if any. */
             if (!PMC_IS_NULL(_class->_namespace)) {
-                PMC *methods, *vtable_methods;
+                PMC *methods, *vtable_overrides;
                 PMC *ns = _class->_namespace;
 
                 /* Import any methods. */
@@ -911,11 +980,28 @@ Creates a new PMC object of the type of the class and calls init().
                 }
 
                 /* Import any vtable methods. */
-                (PMC *vtable_methods) = PCCINVOKE(interp, ns,
+                (PMC *vtable_overrides) = PCCINVOKE(interp, ns,
                     "get_associated_vtable_methods");
-                if (!PMC_IS_NULL(vtable_methods)) {
-                    /* TODO: Hash is keyed on index, not name, but a patch to do
-                     * that is forthcoming. */
+                if (!PMC_IS_NULL(vtable_overrides)) {
+                    PMC *iter = VTABLE_get_iter(interp, vtable_overrides);
+                    while (VTABLE_get_bool(interp, iter)) {
+                        STRING *vtable_index_str = VTABLE_shift_string(interp, iter);
+                        PMC *vtable_sub = VTABLE_get_pmc_keyed_str(interp, vtable_overrides,
+                            vtable_index_str);
+                        /* Look up the name of the vtable function from the index. */
+                        INTVAL vtable_index = string_to_int(interp, vtable_index_str);
+                        const char * const meth_c = Parrot_vtable_slot_names[vtable_index];
+                        STRING *vtable_name = string_from_cstring(interp, meth_c, 0);
+
+                        /* Strip leading underscores in the vtable name */
+                        if (string_str_index(interp, vtable_name,
+                            CONST_STRING(interp, "__"), 0) == 0) {
+                            vtable_name = string_substr(interp, vtable_name, 2,
+                                string_length(interp, vtable_name) - 2, NULL, 0);
+                        }
+
+                        VTABLE_add_vtable_override(interp, SELF, vtable_name, vtable_sub);
+                    }
                 }
             }
 
@@ -1014,6 +1100,26 @@ Creates a new PMC object of the type of the class and calls init().
                 }
             }
         }
+
+        /* Check for overrides on the init or init_pmc vtable function and call
+         * them if they exist */
+        if (PMC_IS_NULL(init)) {
+            STRING *name = string_from_literal(interp, "init");
+            PMC * meth = find_vtable_override(interp, SELF, name);
+            if (!PMC_IS_NULL(meth)) {
+                Parrot_run_meth_fromc_args(interp, meth,
+                        object, name, "v");
+            }
+        }
+        else {
+            STRING *name = string_from_literal(interp, "init_pmc");
+            PMC * meth = find_vtable_override(interp, SELF, name);
+            if (!PMC_IS_NULL(meth)) {
+                Parrot_run_meth_fromc_args(interp, meth,
+                        object, name, "vP", init);
+            }
+        }
+
         return object;
     }
 
@@ -1208,22 +1314,7 @@ C<add_method> vtable method.
 
         /* If it's a vtable method... */
         if (got_vtable) {
-            /* Check name is a valid vtable method name. */
-            char *c_name = string_to_cstring(interp, name);
-            int found = 0;
-            int i;
-            for (i = PARROT_VTABLE_LOW; i < NUM_VTABLE_FUNCTIONS; i++) {
-                if (strcmp(c_name, Parrot_vtable_slot_names[i] + 2) == 0) {
-                    found = 1;
-                    break;
-                }
-            }
-            if (!found)
-                real_exception(interp, NULL, METH_NOT_FOUND,
-                    "'%S' is not a valid v-table method name.", name);
-
-            /* Add it to vtable methods list. */
-            VTABLE_set_pmc_keyed_str(interp, _class->vtable_methods, name, sub);
+            VTABLE_add_vtable_override(interp, SELF, name, sub);
         }
 
         /* Provided it's not anonymous, add it to the methods list. */

@@ -48,10 +48,10 @@ sub pre_method_gen {
          * anything outside of it... */
         if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->vtable_methods, string_from_literal(interp, "$vt_method_name"))) {
+            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, string_from_literal(interp, "$vt_method_name"))) {
                 /* Found it; call. */
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
-                    class_info->vtable_methods, string_from_literal(interp, "$vt_method_name"));
+                    class_info->vtable_overrides, string_from_literal(interp, "$vt_method_name"));
                 ${return}Parrot_run_meth_fromc_args$ret_suffix(interp, meth, pmc, string_from_literal(interp, "$vt_method_name"), "$sig"$args);
                 $void_return
             }

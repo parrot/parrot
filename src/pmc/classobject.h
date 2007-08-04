@@ -12,19 +12,19 @@
 
 /* Class PMC's underlying struct. */
 typedef struct Parrot_Class {
-    STRING *name;         /* The name of the class. */
-    PMC *_namespace;      /* The namespace it's linked to, if any. */
-    int instantiated;     /* Any instantiations since last modification? */
-    PMC *parents;         /* Immediate parent classes. */
-    PMC *all_parents;     /* Cached list of ourself and all parents, in MRO order. */
-    PMC *roles;           /* An array of roles. */
-    PMC *methods;         /* Hash of method names to methods in this class. */
-    PMC *vtable_methods;  /* Hash of Parrot v-table methods we override. */
-    PMC *attrib_metadata; /* Hash of attributes in this class to hashes of metadata. */
-    PMC *attrib_index;    /* Lookup table for attributes in this and parents. */
-    PMC *attrib_cache;    /* Cache of visible attrib names to indexes. */
-    PMC *resolve_method;  /* List of method names the class provides to resolve
-                           * conflicts with methods from roles. */
+    STRING *name;          /* The name of the class. */
+    PMC *_namespace;       /* The namespace it's linked to, if any. */
+    int instantiated;      /* Any instantiations since last modification? */
+    PMC *parents;          /* Immediate parent classes. */
+    PMC *all_parents;      /* Cached list of ourself and all parents, in MRO order. */
+    PMC *roles;            /* An array of roles. */
+    PMC *methods;          /* Hash of method names to methods in this class. */
+    PMC *vtable_overrides; /* Hash of Parrot v-table methods we override. */
+    PMC *attrib_metadata;  /* Hash of attributes in this class to hashes of metadata. */
+    PMC *attrib_index;     /* Lookup table for attributes in this and parents. */
+    PMC *attrib_cache;     /* Cache of visible attrib names to indexes. */
+    PMC *resolve_method;   /* List of method names the class provides to resolve
+                            * conflicts with methods from roles. */
 } Parrot_Class;
 
 /* Macro to access underlying structure of a Class PMC. */

@@ -118,10 +118,10 @@ EOC
     if ($meth !~ /get_pointer/) {
         $generated .= <<EOC;
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->vtable_methods, string_from_literal(interp, "$meth"))) {
+            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, string_from_literal(interp, "$meth"))) {
                 /* Found it; call. */
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
-                    class_info->vtable_methods, string_from_literal(interp, "$meth"));
+                    class_info->vtable_overrides, string_from_literal(interp, "$meth"));
                 ${return}Parrot_run_meth_fromc_args$ret_type(interp, meth, pmc, string_from_literal(interp, "$meth"), "$sig"$arg);
                 $void_return
             }
