@@ -480,6 +480,8 @@ PDB_run_command(PARROT_INTERP, NOTNULL(const char *command))
 
     if (command)
         skip_command(command);
+    else
+        return 0;
 
     switch (c) {
         case c_script_file:
