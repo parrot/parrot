@@ -1,5 +1,5 @@
 ;
-; i386/core.jit
+; amd64/core.jit
 ;
 ; $Id$
 ;
@@ -7,6 +7,76 @@
 Parrot_end {
     jit_emit_end(NATIVECODE);
 }
+
+Parrot_noop {
+    emit_nop(NATIVECODE); 
+}       
+
+TEMPLATE Parrot_set_x_x {
+    if (MAP[1] && MAP[2]) {
+        emit_mov_r_r(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_mov_r_mr(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
+    }
+    else if (MAP[2]) {
+        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
+    }
+    else {
+        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
+        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+    }
+}
+
+
+Parrot_set_i_i {
+    Parrot_set_x_x s/<_N>/_i/
+}
+
+
+Parrot_set_i_ic {
+    if (MAP[1]) {
+        emit_mov_r_i(NATIVECODE, MAP[1], *INT_CONST[2]);
+    }
+    else {
+        emit_mov_mr_i(NATIVECODE, RBX, (long)ROFFS_INT(1), *INT_CONST[2]);
+    }
+}
+
+TEMPLATE Parrot_binop_x_x {
+    if (MAP[1] && MAP[2]) {
+        emit_<op>_r_r(NATIVECODE, MAP[1], MAP[2]);
+    }
+    else if (MAP[1]) {
+        emit_<op>_r_mr(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
+    }
+    else if (MAP[2]) {
+# ifdef emit_<op>_mr_r
+        emit_<op>_mr_r(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
+# else  
+        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
+        emit_<op>_r_r(NATIVECODE, ISR1, MAP[2]);
+        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+# endif
+    }
+    else {
+        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
+        emit_<op>_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
+        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+    }
+}
+
+Parrot_add_i_i {
+    Parrot_binop_x_x s/<op>/add/
+}       
+
+Parrot_sub {
+    Parrot_binop_x_x s/<op>/sub/
+}       
+
+
+
+
 
 /*
  * Local variables:
