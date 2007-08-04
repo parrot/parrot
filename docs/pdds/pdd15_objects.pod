@@ -315,6 +315,10 @@ Returns a simple string name for the class.
 
 Add a method to the class.
 
+=item add_vtable_override(string *, vtable_sub *)
+
+Add a vtable override to the class.
+
 =item add_attribute(string *, key *)
 
 Add an attribute to the class.
@@ -458,6 +462,7 @@ containing the attribute's metadata. The accessor is read-only.
 =item add_method
 
   $P1.add_method($S2, $P3)
+  $P1.add_method($S2, $P3, 'vtable' => 1)
 
 Adds a method to the class. It takes a simple string name and a method
 PMC.  If the method already exists (and isn't a Multi) it will replace
@@ -708,6 +713,10 @@ All Roles need the following vtable entries.
 
 Add a method to the role.
 
+=item add_vtable_override(string *, vtable_sub *)
+
+Add a vtable override to the role.
+
 =item add_attribute(string *, key *)
 
 Add an attribute to the role.
@@ -826,6 +835,7 @@ no role will be mentioned more than once. The accessor is read-only.
 =item add_method
 
   $P1.add_method($S2, $P3)
+  $P1.add_method($S2, $P3, 'vtable' => 1)
 
 Adds a method to the role. It takes a simple string name and a method
 PMC. If the method already exists (and isn't a Multi) it will replace
