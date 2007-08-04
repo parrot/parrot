@@ -402,7 +402,8 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
                     }
 
                     /* buffer has already been moved; just change the header */
-                    if (PObj_COW_TEST(b) && *ref_count & Buffer_moved_FLAG) {
+                    if (PObj_COW_TEST(b) &&
+                        (ref_count && *ref_count & Buffer_moved_FLAG)) {
                         /* Find out who else references our data */
                         Buffer * const hdr = *(Buffer **)(PObj_bufstart(b));
 
