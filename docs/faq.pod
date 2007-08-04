@@ -9,16 +9,15 @@ docs/faq.pod - Parrot FAQ
 
 =head2 What is Parrot?
 
-Parrot is a virtual machine for dynamic languages such as PHP, Perl,
-Python, Ruby, Scheme, Tcl, etc. It compiles and executes bytecode, but is
-also designed to act as an interpreter. 
+Parrot is a virtual machine for dynamic languages such as PHP, Perl, Python,
+Ruby, Scheme, Tcl, etc. It compiles and executes bytecode, but is also designed
+to act as an interpreter.
 
 =head2 Why did you call it "Parrot"?
 
-The name "Parrot" started with Simon Cozens's 
-L<April Fool's Joke|http://www.perl.com/pub/a/2001/04/01/parrot.htm>
-where Larry Wall and Guido van Rossum announced the merger of the Perl 
-and Python languages.
+The name "Parrot" started with Simon Cozens's April Fool's Joke
+(L<http://www.perl.com/pub/a/2001/04/01/parrot.htm>) where Larry Wall and Guido
+van Rossum announced the merger of the Perl and Python languages.
 
 A year later, when we were looking for a name for our virtual machine that
 could run both Perl and Python, it seemed like a perfect fit.
@@ -32,9 +31,9 @@ information about Perl 6 on Parrot, see L<languages/perl6/>.
 
 Yes.
 
-Although Parrot is currently still under development, Parrot has been usable for 
-a long time. The primary way to use Parrot is to write Parrot Intermediate 
-Representation (PIR), described in L<PDD19|docs/pdds/draft/pdd19_pir.pod>. 
+Although Parrot is currently still under development, Parrot has been usable for
+a long time. The primary way to use Parrot is to write Parrot Intermediate
+Representation (PIR), described in L<PDD19|docs/pdds/draft/pdd19_pir.pod>.
 PIR is a high-level assembly language. PIR maps to the more low-level
 Parrot Assembly language (PASM), which is harder to write and read.
 Although you could write PASM instead of PIR, PIR is the recommended way
@@ -73,12 +72,12 @@ Parrot.
 
 =head2 When can I expect to use Parrot with a I<real> programming language?
 
-You can already today! There are quite a few high level languages being targeted
-to Parrot. Since the introduction of the Parrot Compiler Tools (the Parrot
-Grammar Engine (PGE) and the Tree Grammar Engine (TGE)), targeting a 
+You can already today! There are quite a few high level languages being
+targeted to Parrot. Since the introduction of the Parrot Compiler Tools (the
+Parrot Grammar Engine (PGE) and the Tree Grammar Engine (TGE)), targeting a
 language to Parrot has become a snap! Please note that, although some languages
-have come a long way, due to the fact that Parrot is still under active development,
-most library development is still done in PIR. 
+have come a long way, due to the fact that Parrot is still under active
+development, most library development is still done in PIR.
 
 Below is a list of some languages that are actively worked on.
 
@@ -92,8 +91,8 @@ Michaud.
 
 =item *
 
-Patrick R. Michaud is working on a Perl 6 implementation using the Parrot Compiler 
-Tools. (although the Perl 6 specification is not finished yet).
+Patrick R. Michaud is working on a Perl 6 implementation using the Parrot
+Compiler Tools. (although the Perl 6 specification is not finished yet).
 
 =item *
 
@@ -109,7 +108,7 @@ Jonathan Worthington has been working on a .NET to Parrot translator.
 
 =item *
 
-Many other languages are worked on, some more actively than others. See 
+Many other languages are worked on, some more actively than others. See
 C<http://www.parrotcode.org/languages/> for a complete list.
 
 =back
@@ -229,16 +228,16 @@ The JVM and the CLR (Mono and .NET) are two successful stack-based
 virtual machines. Many interpreters such as Perl, Python, and Ruby are
 also internally stack-based.
 
-On the other hand, most hardware is register-based, as are several
-virtual machines designed to emulate hardware. (Such as the L<68K
-emulator|http://en.wikipedia.org/wiki/Mac_68k_emulator> Apple shipped
-with its PPC-enabled versions of Mac OS.)
+On the other hand, most hardware is register-based, as are several virtual
+machines designed to emulate hardware (such as the 68K
+emulator--L<http://en.wikipedia.org/wiki/Mac_68k_emulator>--Apple shipped with
+its PPC-enabled versions of Mac OS).
 
 A few reasons we chose a register-based architecture:
 
 =over 4
 
-=item * 
+=item *
 
 Executing opcodes on a register-based VM takes fewer instructions (since
 you eliminate all the steps to push items on to the stack and pull them
@@ -253,8 +252,7 @@ stack-based), but we can significantly minimize them.
 
 =item *
 
-A register-based VM is far more pleasant to work with than a stack-based
-VM. 
+A register-based VM is far more pleasant to work with than a stack-based VM.
 
 =item *
 
@@ -265,6 +263,8 @@ of registers per sub. This change opens up many new possibilities, but it
 does push us past the limits of most research into register-based hardware.
 
 =item *
+
+See also L<http://www.usenix.org/publications/library/proceedings/vee05/full_papers/p153-yunhe.pdf>.
 
 We're pushing forward the state-of-the art in virtual machines.
 Innovation often involves breaking with tradition. We're pleased
