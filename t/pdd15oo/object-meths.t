@@ -846,23 +846,26 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
-    newpdd15class P2, "Foo"
-    set S0, "meth"
-
+pir_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
+.sub main :main
+    $P2 = newpdd15class "Foo"
+    $S0 = "meth"
     print "main\n"
-    callmethodcc P2, S0
+    $P3 = new $P2
+    $P3.$S0()
     print "back\n"
     end
+.end
 
 .namespace ["Foo"]
-.pcc_sub meth:
+.sub meth :method
     print "in meth\n"
     getinterp P0
-    set P1, P0["sub"]
-    print P1
+    $P1 = P0["sub"]
+    print $P1
     print "\n"
-    returncc
+    .return ()
+.end
 CODE
 main
 in meth
