@@ -66,7 +66,8 @@ foreach my $file (@files) {
         # find the instances without the explicit cast
         my $num_no_cast = grep !m/($toxxx_functions)\(\(unsigned char\)/, @toxxx_lines;
 
-        push @no_explicit_cast, $path, "\n" if $num_no_cast;
+        $path .= "\n";
+        push @no_explicit_cast, $path if $num_no_cast;
     }
     else {
         next;
@@ -74,7 +75,7 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@no_explicit_cast), 'toxxx() functions cast correctly' )
-    or diag( "toxxx() function incorrectly cast in " . scalar @no_explicit_cast . " files:\n@no_explicit_cast" );
+    or diag( "toxxx() function not cast to unsigned char " . scalar @no_explicit_cast . " files:\n@no_explicit_cast" );
 
 # Local Variables:
 #   mode: cperl
