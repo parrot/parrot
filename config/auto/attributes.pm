@@ -63,7 +63,7 @@ sub try_attr {
     my $cc = $conf->option_or_data( 'cc' );
     $verbose and print "  cc: $cc$/";
 
-    if ( $conf->data->get( 'gccversion' ) ) {
+    if ( $cc =~ /gcc/ ) {
         cc_gen('config/auto/gcc/test_c.in');
     }
     elsif ( $cc eq 'cl' ) {
