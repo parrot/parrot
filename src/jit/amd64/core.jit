@@ -14,25 +14,24 @@ Parrot_noop {
 
 TEMPLATE Parrot_set_x_x {
     if (MAP[1] && MAP[2]) {
-        emit_mov_r_r(NATIVECODE, MAP[1], MAP[2]);
+        emit_mov_<R>_<R>(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_mov_r_mr(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
+        emit_mov_<R>_m<R>(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
     }
     else if (MAP[2]) {
-        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
+        emit_mov_m<R>_<R>(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
     }
     else {
-        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
-        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+        emit_mov_<R>_m<R>(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
+        emit_mov_m<R>_<R>(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
     }
 }
 
 
 Parrot_set_i_i {
-    Parrot_set_x_x s/<_N>/_i/
+    Parrot_set_x_x s/<R>/r/
 }
-
 
 Parrot_set_i_ic {
     if (MAP[1]) {
@@ -43,35 +42,92 @@ Parrot_set_i_ic {
     }
 }
 
+Parrot_set_n_n {
+    Parrot_set_x_x s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
+}
+
+Parrot_set_n_ic {
+    if (MAP[1]) {
+        emit_mov_r_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        emit_cvtsi2sd_x_r(NATIVECODE, MAP[1], ISR1);
+    }
+    else {
+        emit_mov_r_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        emit_cvtsi2sd_x_r(NATIVECODE, FSR1, ISR1);
+        emit_mov_mx_x(NATIVECODE, RBX, ROFFS_NUM(1), FSR1);
+    }
+}
+
+Parrot_set_n_nc {
+    if (MAP[1]) {
+        /* I want something like this
+         * emit_mov_x_mx(NATIVECODE, MAP[1], RBX, ROFFS_NUM(2)); 
+         * but this works, even if ugly
+         * It's either this or dereferencing
+         *      ((interp->ctx).state)->constants[cur_opcode[2]]->u.number
+         */
+        emit_mov_r_i(NATIVECODE, ISR1, 0);
+        emit_mov_x_mx(NATIVECODE, MAP[1], ISR1, &NUM_CONST[2]);
+    }
+    else {
+        /* unmapped floats is screwy at the moment, but we get 15 plus a
+         * scratch */
+        emit_mov_r_i(NATIVECODE, ISR1, 0);
+        emit_mov_x_mx(NATIVECODE, FSR1, ISR1, &NUM_CONST[2]);
+        emit_mov_mx_x(NATIVECODE, RBX, ROFFS_NUM(1), FSR1);
+    }
+}
+
+
 TEMPLATE Parrot_binop_x_x {
     if (MAP[1] && MAP[2]) {
-        emit_<op>_r_r(NATIVECODE, MAP[1], MAP[2]);
+        emit_<op>_<R>_<R>(NATIVECODE, MAP[1], MAP[2]);
     }
     else if (MAP[1]) {
-        emit_<op>_r_mr(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
+        emit_<op>_<R>_m<R>(NATIVECODE, MAP[1], RBX, ROFFS_INT(2));
     }
     else if (MAP[2]) {
-# ifdef emit_<op>_mr_r
-        emit_<op>_mr_r(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
+# ifdef emit_<op>_m<R>_<R>
+        emit_<op>_m<R>_<R>(NATIVECODE, RBX, ROFFS_INT(1), MAP[2]);
 # else  
-        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
-        emit_<op>_r_r(NATIVECODE, ISR1, MAP[2]);
-        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+        emit_mov_<R>_m<R>(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
+        emit_<op>_<R>_<R>(NATIVECODE, ISR1, MAP[2]);
+        emit_mov_m<R>_<R>(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
 # endif
     }
     else {
-        emit_mov_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
-        emit_<op>_r_mr(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
-        emit_mov_mr_r(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
+        emit_mov_<R>_m<R>(NATIVECODE, ISR1, RBX, ROFFS_INT(1));
+        emit_<op>_<R>_m<R>(NATIVECODE, ISR1, RBX, ROFFS_INT(2));
+        emit_mov_m<R>_<R>(NATIVECODE, RBX, ROFFS_INT(1), ISR1);
     }
 }
 
 Parrot_add_i_i {
-    Parrot_binop_x_x s/<op>/add/
+    Parrot_binop_x_x s/<op>/add/ s/<R>/r/
 }       
 
-Parrot_sub {
-    Parrot_binop_x_x s/<op>/sub/
+Parrot_sub_i_i {
+    Parrot_binop_x_x s/<op>/sub/ s/<R>/r/
+}       
+
+Parrot_add_n_n {
+    Parrot_binop_x_x s/<op>/add/ s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
+}       
+
+Parrot_sub_n_n {
+    Parrot_binop_x_x s/<op>/sub/ s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
+}       
+
+Parrot_mul_n_n {
+    Parrot_binop_x_x s/<op>/mul/ s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
+}       
+
+Parrot_div_n_n {
+    Parrot_binop_x_x s/<op>/div/ s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
+}       
+
+Parrot_sqrt_n_n {
+    Parrot_binop_x_x s/<op>/sqrt/ s/<R>/x/ s/ISR/FSR/ s/INT/NUM/
 }       
 
 
