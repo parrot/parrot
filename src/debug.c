@@ -313,7 +313,7 @@ parse_command(NOTNULL(const char *command), NOTNULL(unsigned long *cmdP))
     }
 
     for (i = 0; *command && isalpha((unsigned char) *command); command++, i++)
-        c += (tolower((int) *command) + (i + 1)) * ((i + 1) * 255);
+        c += (tolower((unsigned char)(int) *command) + (i + 1)) * ((i + 1) * 255);
 
     /* Nonempty and did not start with a letter */
     if (c == 0)

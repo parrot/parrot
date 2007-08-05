@@ -1869,7 +1869,7 @@ string_to_num(PARROT_INTERP, NOTNULL(const STRING *s))
     cstr = string_to_cstring(interp, (STRING *)const_cast(s));
     p = cstr;
 
-    while (isspace(*p))
+    while (isspace((unsigned char)*p))
         p++;
 
     f = atof(p);
