@@ -74,7 +74,7 @@ Returns the current working directory.
 #ifdef _MSC_VER
         cwd = _getcwd(NULL, 0);
         /* capitalize the drive letter */
-        cwd[0] = toupper(cwd[0]);
+        cwd[0] = toupper((unsigned char)cwd[0]);
 #else
 #  ifdef PATH_MAX
         cwd = getcwd(NULL, PATH_MAX+1);
