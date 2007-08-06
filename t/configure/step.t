@@ -34,7 +34,7 @@ Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
 
 can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
 
-# XXX add verbose tests with some Test::Warn like mechanism
+# RT#44455 add verbose tests with some Test::Warn like mechanism
 
 # integrate()
 

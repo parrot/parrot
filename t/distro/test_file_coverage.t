@@ -63,7 +63,7 @@ TODO: {
 
 }    # PMC
 
-# TODO: DYNPMC, DYNOPS, etc.
+# RT#44457: DYNPMC, DYNOPS, etc.
 
 # remember to change the number of tests :-)
 BEGIN { plan tests => 2; }
