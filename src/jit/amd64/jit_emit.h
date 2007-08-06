@@ -125,12 +125,12 @@ typedef enum {
  *  RDI    allocated, unpreserved
 
  *  R8     allocated, unpreserved
- *  R9     allocated, unpreserved 
+ *  R9     allocated, unpreserved
  *  R10    allocated, unpreserved
  *  R11    Scratch
  *  R12    allocated, preserved
  *  R13    allocated, preserved, or code_start
- *  R14    allocated, preserved, or op_map 
+ *  R14    allocated, preserved, or op_map
  *  R15    interp
  */
 
@@ -464,8 +464,8 @@ typedef enum {
 
 #  define emit_mov_x_x(pc, dst, src) emit_op_x_x(0x66, 0x28, pc, dst, src)
 
-#  define emit_mov_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x10, pc, dst, src, offs) 
-#  define emit_mov_mx_x(pc, dst, offs, src) emit_op_x_mx(0xf2, 0x11, pc, src, dst, offs) 
+#  define emit_mov_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x10, pc, dst, src, offs)
+#  define emit_mov_mx_x(pc, dst, offs, src) emit_op_x_mx(0xf2, 0x11, pc, src, dst, offs)
 
 /* Intended to zero a register */
 #  define emit_movhlps_x_x(pc, dst, src) { \
@@ -492,16 +492,16 @@ typedef enum {
 }
 
 #  define emit_comisd_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x2f, pc, dst, src)
-#  define emit_comisd_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x2f, pc, dst, src, offs) 
+#  define emit_comisd_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x2f, pc, dst, src, offs)
 
 #  define emit_add_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x58, pc, dst, src)
-#  define emit_add_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x58, pc, dst, src, offs) 
+#  define emit_add_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x58, pc, dst, src, offs)
 
 #  define emit_sub_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x5c, pc, dst, src)
-#  define emit_sub_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x5c, pc, dst, src, offs) 
+#  define emit_sub_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x5c, pc, dst, src, offs)
 
 #  define emit_mul_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x59, pc, dst, src)
-#  define emit_mul_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x59, pc, dst, src, offs) 
+#  define emit_mul_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x59, pc, dst, src, offs)
 
 #  define emit_div_check_zero_x(pc, reg) { \
     char *sav_ptr; \
@@ -543,10 +543,10 @@ typedef enum {
 }
 
 #  define emit_sqrt_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x51, pc, dst, src)
-#  define emit_sqrt_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x51, pc, dst, src, offs) 
+#  define emit_sqrt_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x51, pc, dst, src, offs)
 
-#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x2a, pc, dst, src, offs) 
-#  define emit_cvtsi2sd_x_r(pc, dst, src) emit_op_x_x(0xf2, 0x2a, pc, dst, src) 
+#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x2a, pc, dst, src, offs)
+#  define emit_cvtsi2sd_x_r(pc, dst, src) emit_op_x_x(0xf2, 0x2a, pc, dst, src)
 
 /*********************************************************/
 
