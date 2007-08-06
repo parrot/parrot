@@ -188,7 +188,8 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as array ([2,1,0] => "cba")' );
 CODE
 cba
 OUT
-## TODO: more
+
+## RT#44445: more
 
 ## as hash
 pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'as hash (A => "a")' );

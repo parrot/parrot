@@ -38,7 +38,7 @@ my $ns_subs = {
         'PGE'          => [qw/ /],
         'PGE::Exp'     => [qw/ /],
         'PGE::P6Regex' => [qw/ /],
-        'PGE::Grammar' => [qw/ regex /],    ## TODO deprecated
+        'PGE::Grammar' => [qw/ regex /],    ## RT#44447 deprecated
     },
     'PGE/Regex.pir' => {
         'PGE::Match' => [
@@ -117,7 +117,7 @@ CODE
 ok
 OUT
 
-            ## TODO: test pod exists for subs
+            ## RT#44449: test pod exists for subs
         }
     }
 }
