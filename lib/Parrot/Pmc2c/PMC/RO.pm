@@ -59,14 +59,14 @@ sub new {
 
   {
     # autogenerate for nonstandard types
-    # (XXX is this appropriate or do we want them to each be explicitly cleared to have RO ?)
+    # (RT#44433 is this appropriate or do we want them to each be explicitly cleared to have RO ?)
     no strict 'refs';
     if ( !@{ ref($self) . '::ISA' } ) {
       @{ ref($self) . '::ISA' } = "Parrot::Pmc2c::PMC::RO";
     }
   }
 
-  # FIXME support getting implementations from central superclass instead
+  # RT#44435 support getting implementations from central superclass instead
   # (e.g. some ro_fail pseudoclass that generates an exception)
   foreach my $vt_method ( @{ $self->vtable->methods } ) {
     my $vt_method_name = $vt_method->name;

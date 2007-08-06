@@ -242,7 +242,7 @@ my %calltype = (
     "void*"    => "b",
     "void**"   => "B",
 
-    #"BIGNUM*" => "???" # XXX
+    #"BIGNUM*" => "???" # RT#43731
 );
 
 sub proto {
@@ -256,9 +256,10 @@ sub proto {
     my $ret = $calltype{ $type or "void" };
     $ret .= "JO" . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
 
-    # TODO
+    # RT#43733
     # scan src/call_list.txt if the generated signature is available
-    # TODO report errors for "?"
+
+    # RT#43735 report errors for "?"
     # --leo
 
     return $ret;
@@ -293,7 +294,7 @@ sub gen_methods {
 }
 
 
-# XXX quick hack - to get MMD variants
+# RT#43737 quick hack - to get MMD variants
 sub get_super_mmds {
     my ( $self, $vt_method_name, $right, $mmd_prefix ) = @_;
     my @mmds;
@@ -378,7 +379,7 @@ sub find_mmd_methods {
                 $mmd_method_name = "Parrot_" . $self->name . "_" . $mmd->name;
                 push @mmds, [ $func, $left, $right, $mmd_method_name ];
             }
-            #$self->{mmds} = @mmds;    # XXX?
+            #$self->{mmds} = @mmds;    # RT#43739
         }
     }
     return ( \@mmds, \@init_mmds, [ keys %init_mmds ] );
