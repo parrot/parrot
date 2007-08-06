@@ -57,7 +57,7 @@ my $DIST = Parrot::Distribution->new();
 my @files;
 if ( !@ARGV ) {
 
-    # XXX We should skip any files that are copied wholesale
+    # RT#44439 We should skip any files that are copied wholesale
     #     into our repository. Add a method to $DIST for this. -Coke
 
     @files = map { $_->path } $DIST->get_perl_language_files();
@@ -72,7 +72,7 @@ else {
     # under that directory.
 
     # use $_ for the check below, as File::Find chdirs on us.
-    # XXX Change this to simply return all files in the distribution
+    # RT#44441 Change this to simply return all files in the distribution
     #     from this point down? -Coke
     foreach my $file (@ARGV) {
         ( -d $file )
