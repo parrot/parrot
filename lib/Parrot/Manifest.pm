@@ -103,8 +103,6 @@ END_HEADER
 
 sub _get_manifest_entry {
     my $file = shift;
-    # RT#44431 Most of these can probably be cleaned up
-
     my $special = _get_special();
     my $loc  = '[]';
     for ($file) {
