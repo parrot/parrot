@@ -45,8 +45,6 @@ ok($step->description(), "$step_name has description");
 my $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
 
-# RT#44453:  Peer into $ret, which is actually $conf as augmented by the operation
-# of init::defaults::runstep().
 # RT#44451:  Write a SKIP block which will test the one OS-specific branch in
 # init::defaults.
 
