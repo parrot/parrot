@@ -373,7 +373,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
     Arenas * const arena_base = interp->arena_base;
     const int      lazy_dod   = arena_base->lazy_dod;
     PMC           *current    = arena_base->dod_mark_start;
-    PMC           *next;
+    PMC           *next       = PMCNULL;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
 
@@ -435,10 +435,9 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
             }
         }
 
-        /* this value may be null */
         next = PMC_next_for_GC(current);
 
-        if (next && next == current)
+        if (!PMC_IS_NULL(next) && next == current)
             break;
 
         if (--how_many == 0) {

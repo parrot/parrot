@@ -330,6 +330,7 @@ add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
     if (PObj_live_TEST(pmc))
         PObj_get_FLAGS(pmc) |= PObj_custom_GC_FLAG;
 #endif
+    PMC_next_for_GC(pmc) = PMCNULL;
 }
 
 /*

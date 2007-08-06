@@ -784,7 +784,7 @@ cleanup_next_for_GC_pool(NOTNULL(Small_Object_Pool *pool))
         for (i = 0; i < arena->used; i++) {
             if (!PObj_on_free_list_TEST(p)) {
                 if (p->pmc_ext)
-                    PMC_next_for_GC(p) = NULL;
+                    PMC_next_for_GC(p) = PMCNULL;
             }
             p++;
         }
@@ -1234,7 +1234,7 @@ next_for_GC_seen(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
      */
     if (pmc->pmc_ext) {
         /* already seen? */
-        if (PMC_next_for_GC(pmc)) {
+        if (!PMC_IS_NULL(PMC_next_for_GC(pmc))) {
             seen = 1;
             goto skip;
         }
