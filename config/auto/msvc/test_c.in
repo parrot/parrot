@@ -1,25 +1,11 @@
+/*
+ * figure out if the compiler is msvc.
+ */
+
 #include <stdio.h>
-
-
+#include <stdlib.h>
 #include "parrot/compiler.h"
 
-__attribute__malloc__
-__attribute__noreturn__
-__attribute__warn_unused_result__
-__attribute__deprecated__
-int
-dummyfunc(int x)
-    __attribute__format__(1,2,3)
-    __attribute__nonnull__(1)
-    ;
-
-__attribute__const__
-int constfunc(int x);
-
-__attribute__pure__
-int purefunc(int x);
-
-int useless(void) { int x __attribute__unused__; }
 
 int
 main(int argc, char *argv[])
@@ -38,8 +24,9 @@ main(int argc, char *argv[])
 #endif
     puts(");");
 
-    return 0;
+    return EXIT_SUCCESS;
 }
+
 
 /*
  * Local variables:

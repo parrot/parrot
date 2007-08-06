@@ -61,22 +61,15 @@ sub try_attr {
     $verbose and print "trying attribute '$attr'$/";
 
     my $cc = $conf->option_or_data( 'cc' );
-    $verbose and print "  cc: $cc$/";
-
-    if ( $cc =~ /gcc/ ) {
-        cc_gen('config/auto/gcc/test_c.in');
-    }
-    elsif ( $cc eq 'cl' ) {
-        cc_gen('config/auto/msvc/test_c.in');
-    }
+    cc_gen('config/auto/attributes/test_c.in');
 
     my $ccflags = $conf->option_or_data( 'ccflags');
-
     my $tryflags = "$ccflags -D$attr";
 
     # These are OK to fail, becuase we're trying them out.
     my $command_line = "$cc -o test -Iinclude $tryflags test.c";
     $verbose and print "  ", $command_line, $/;
+
     my $exit_code = Parrot::Configure::Step::_run_command( $command_line, 'test.cco', 'test.cco' );
     $verbose and print "  exit code: $exit_code$/";
 
