@@ -71,7 +71,7 @@ sub try_attr {
     $verbose and print "  ", $command_line, $/;
 
     my $exit_code = Parrot::Configure::Step::_run_command(
-        $command_line, 'test.cco', 'test.ccr' );
+        $command_line, 'test.cco', 'test.cco' );
     $verbose and print "  exit code: $exit_code$/";
 
     return if $exit_code;
@@ -79,44 +79,6 @@ sub try_attr {
     $conf->data->set( ccflags => $tryflags );
 
     return;
-}
-
-sub blerugh {
-    my ( $self, $conf, $attr ) = @_;
-
-    my $verbose = $conf->options->get('verbose');
-    if ( 0 ) {
-        my $hints_used = 0;
-
-        my $hints = "init::hints::" . lc($^O);
-
-        print "[ $hints " if $verbose;
-
-        eval "use $hints";
-        die $@ if $@;
-
-        # Call the runstep method if it exists.
-        # Otherwise the step must have done
-        # its work when it was loaded.
-        $hints->runstep( $conf, @_ ) if $hints->can('runstep');
-        $hints_used++;
-
-        $hints = "init::hints::local";
-        print "$hints " if $verbose;
-        eval "use $hints";
-        unless ($@) {
-            $hints->runstep( $conf, @_ ) if $hints->can('runstep');
-            $hints_used++;
-        }
-
-        if ( $hints_used == 0 ) {
-            print "(no hints) " if $verbose;
-        }
-
-        print "]" if $verbose;
-    }
-
-    return $self;
 }
 
 1;
