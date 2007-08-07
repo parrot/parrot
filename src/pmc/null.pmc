@@ -36,6 +36,7 @@ Overrides the default to do nothing.
     void init() {
     }
 
+    PARROT_CAN_RETURN_NULL
     void* get_pointer() {
         return PMCNULL;
     }
