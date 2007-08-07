@@ -62,20 +62,101 @@ Returns the list as a string
 */
 
     STRING* get_string() {
-        PMC *listToString, *namespace;
-        STRING *_tcl_namespace, *sub;
+        STRING* retval = string_from_literal(INTERP,"");
+        INTVAL elems = VTABLE_get_integer(INTERP, SELF);
+        INTVAL i;
+        STRING* str;
+        PMC* P0;
+        INTVAL count;
+        INTVAL str_len;
+        INTVAL pos;
 
-        _tcl_namespace = string_from_cstring(INTERP, "_tcl", 4);
-        sub            = string_from_cstring(INTERP, "__listToString",14);
+        for (i=0; i < elems; i++) {
+            str = VTABLE_get_string_keyed_int(INTERP, SELF, i);
+       
+            str_len = string_length(INTERP, str);
+            if (str_len == 0) {
+                /* empty element */
+                str = string_from_literal(INTERP, "{}");
+                goto append_elem;
+            } 
+            count = pos = 0;
+            while (pos < str_len) {
+                switch (string_ord(INTERP, str, pos)) {
+                    case '{':
+                        count++;
+                        break;
+                    case '}':
+                        if (--count < 0) goto escape;
+                        break;
+                }
+                pos++;
+            }
 
-        namespace = INTERP->root_namespace;
-        namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
-        listToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
+            if (count != 0) goto escape;
+          
+            if (-1 != string_str_index(INTERP,  str, string_from_literal(INTERP,"["), 0))
+                 goto quote;
+    
+            /* only check hashes on first elem.*/
+            if (i==0 && -1 != string_str_index(INTERP, str, string_from_literal(INTERP,"#"), 0))
+                goto quote;
+          
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"$"), 0))
+                goto quote;
+          
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,";"), 0))
+                goto quote;
+    
+            /* \'d constructs */
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"]"), 0))
+                goto escape;
+          
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"\\"), 0))
+                goto escape;
+          
+            /* {}'d constructs */
+            if (str_len != CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, 0, str_len))
+                goto quote;
 
-        CONTEXT(INTERP->ctx)->constants =
-          PMC_sub(listToString)->seg->const_table->constants;
+            goto append_elem;
+    
+          escape:
+            P0 = pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, P0, str);
+    
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\\"), string_from_literal(INTERP,"\\\\"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\t"), string_from_literal(INTERP,"\\t"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\f"), string_from_literal(INTERP,"\\f"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\n"), string_from_literal(INTERP,"\\n"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\r"), string_from_literal(INTERP,"\\r"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\v"), string_from_literal(INTERP,"\\v"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,";"), string_from_literal(INTERP,"\\;"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"$"), string_from_literal(INTERP,"\\$"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"}"), string_from_literal(INTERP,"\\}"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"{"), string_from_literal(INTERP,"\\{"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP," "), string_from_literal(INTERP,"\\ "));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"["), string_from_literal(INTERP,"\\["));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"]"), string_from_literal(INTERP,"\\]"));
+            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\""), string_from_literal(INTERP,"\\\""));
+    
+            str = VTABLE_get_string(INTERP, P0);
+            goto append_elem;
+      
+          quote:
+            str = string_append(INTERP, string_from_literal(INTERP, "{"), str);
+            str = string_append(INTERP, str, string_from_literal(INTERP, "}"));
 
-        return (STRING *)Parrot_runops_fromc_args(INTERP, listToString, "SP", SELF);
+          append_elem:
+            retval = string_append(INTERP, retval, str);
+            retval = string_append(INTERP, retval, string_from_literal(INTERP, " "));
+        }
+      
+        /* remove the extra space at the end, if necessary*/
+        if (string_length(INTERP, retval))
+            string_replace(INTERP, retval, -1, 1, string_from_literal(INTERP, ""),string_from_literal(INTERP, ""));
+      
+        return(retval);
     }
 
 /*
