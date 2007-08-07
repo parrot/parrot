@@ -6,12 +6,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
+use Parrot::BuildUtil;
 use_ok( 'Make_VERSION_File', qw| make_VERSION_file |);
 
 my $cwd = cwd();
@@ -21,11 +22,6 @@ my $errstr;
     ok(chdir $tdir, "Changed to temporary directory for testing");
     ok((mkdir "lib"), "Able to make directory lib");
     ok((mkdir "lib/Parrot"), "Able to make directory lib/Parrot");
-    ok(copy ("$cwd/lib/Parrot/BuildUtil.pm", "lib/Parrot/"),
-        "Able to copy Parrot::BuildUtil for testing");
-    unshift(@INC, "lib");
-
-    require Parrot::BuildUtil;
 
     # Case 3:  VERSION file with >4-element version number
     make_VERSION_file(q{0.4.11.7.5});

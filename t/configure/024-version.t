@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 022-version.t
+# $Id: 024-version.t 20526 2007-08-07 00:00:23Z jkeenan $
+# 024-version.t
 
 use strict;
 use warnings;
@@ -23,13 +23,12 @@ my $errstr;
     ok((mkdir "lib"), "Able to make directory lib");
     ok((mkdir "lib/Parrot"), "Able to make directory lib/Parrot");
 
-    # Case 4:  VERSION file with non-numeric component in version number
-    make_VERSION_file(q{0.tomboy.11});
-    eval {
-        my $pv = Parrot::BuildUtil::parrot_version();
-    };
-    like($@, qr/Illegal version component: 'tomboy'/,
-        "Correctly detected non-numeric component in version number");
+    # Case 5:  Valid version number
+    make_VERSION_file(q{0.4.11});
+    my ($pv, @pv);
+    @pv = Parrot::BuildUtil::parrot_version();
+    is_deeply(\@pv, [ 0, 4, 11 ],
+        "Correct version number returned in list context");
 
     ok(chdir $cwd, "Able to change back to directory after testing");
 }
@@ -40,11 +39,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-022-version.t - test C<Parrot::BuildUtil::parrot_version()>
+024-version.t - test C<Parrot::BuildUtil::parrot_version()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/022-version.t
+    % prove t/configure/024-version.t
 
 =head1 DESCRIPTION
 
