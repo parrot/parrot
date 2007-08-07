@@ -71,6 +71,10 @@ Parrot_exit(PARROT_INTERP, int status)
      *      (Parrot_really_destroy) has run
      */
     handler_node_t *node = interp->exit_handler_list;
+
+    Parrot_block_DOD(interp);
+    Parrot_block_GC(interp);
+
     while (node) {
         handler_node_t * const next = node->next;
 
@@ -78,7 +82,6 @@ Parrot_exit(PARROT_INTERP, int status)
         mem_sys_free(node);
         node = next;
     }
-
     exit(status);
 }
 
