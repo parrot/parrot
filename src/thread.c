@@ -1150,8 +1150,10 @@ pt_join_threads(PARROT_INTERP)
     size_t          i;
     Shared_gc_info *info = get_pool(interp);
 
-    if (info)
+    if (info) {
+        COND_DESTROY(info->gc_cond);
         mem_sys_free(info);
+    }
 
     /*
      * if no threads were started - fine
