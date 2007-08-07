@@ -730,6 +730,12 @@ used in F<languages/lua/src/POSTGrammar.tg>
     .return self.'attr'('ops_const', value, has_value)
 .end
 
+.sub 'ops_subr' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('ops_subr', value, has_value)
+.end
+
 .sub 'storage_const' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag

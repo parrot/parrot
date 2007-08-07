@@ -38,9 +38,9 @@ transform post (PAST::Block) :language('PIR') {
     post.'storage_const'($P0)
     $P0 = post.'push_new'('POST::Ops')
     post.'ops_const'($P0)
+    $P1 = post.'push_new'('POST::Ops')
+    post.'ops_subr'($P1)
     set_hll_global ['Lua::POST'], '$?SUB', post
-    post.'push_pirop'('inline', '    .local pmc subr')
-    post.'push_pirop'('inline', '    subr = interpinfo .INTERPINFO_CURRENT_SUB')
     .local pmc iter, cpost
     iter = node.'iterator'()
   L2:
@@ -55,6 +55,14 @@ transform post (PAST::Block) :language('PIR') {
     .local string esc_name
     esc_name = node.'escape'(name)
     if null outerpost goto L4
+    .local pmc ops_subr
+    ops_subr = outerpost.'ops_subr'()
+    unless ops_subr goto L5
+    ops_subr.'push_pirop'('inline', '    .local pmc subr')
+    ops_subr.'push_pirop'('inline', '    subr = interpinfo .INTERPINFO_CURRENT_SUB')
+    new $P0, .Undef
+    outerpost.'ops_subr'($P0)
+  L5:
     .local pmc ops
     ops = post.'new'('POST::Ops', 'node'=>node)
     ops.'push'(post)
@@ -965,26 +973,34 @@ transform package (PAST::Var) :language('PIR') {
     ops.'push'(keypost)
     goto L2
   L1:
+    .local pmc subpost
+    subpost = get_hll_global ['Lua::POST'], '$?SUB'
     basepost = get_hll_global ['Lua::POST'], '$?environ'
     unless null basepost goto L3
+    .local pmc ops_subr
+    ops_subr = subpost.'ops_subr'()
+    unless ops_subr goto L4
+    ops_subr.'push_pirop'('inline', '    .local pmc subr')
+    ops_subr.'push_pirop'('inline', '    subr = interpinfo .INTERPINFO_CURRENT_SUB')
+    new $P0, .Undef
+    subpost.'ops_subr'($P0)
+  L4:
     basepost = ops.'push_pirop'('callmethod', 'getfenv', 'subr')
     set_hll_global ['Lua::POST'], '$?environ', basepost
   L3:
-    .local pmc subpost
-    subpost = get_hll_global ['Lua::POST'], '$?SUB'
     .local pmc storage_const
     storage_const = subpost.'storage_const'()
     .local string name
     name = node.'name'()
     $I0 = exists storage_const[name]
-    if $I0 goto L4
+    if $I0 goto L5
     .local pmc ops_const
     ops_const = subpost.'ops_const'()
     $S0 = 'k_' . name
     $S1 = node.'escape'(name)
     $P0 = ops_const.'push_pirop'('inline', '    .const .LuaString %0 = %1', $S0, $S1)
     storage_const[name] = $S0
-  L4:
+  L5:
     keypost = new 'POST::Ops'
     keypost.'init'('node'=>node)
     $S0 = storage_const[name]
@@ -998,12 +1014,12 @@ transform package (PAST::Var) :language('PIR') {
     key .= ']'
     ops.'result'(key)
     $I0 = node.'islvalue'()
-    if $I0 goto L5
+    if $I0 goto L6
     $P0 = ops.'push_pirop'('set')
     $P0.'arglist'($P0, key)
     ops.'result'($P0)
     .return (ops)
-  L5:
+  L6:
     .local pmc post
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>'set')
