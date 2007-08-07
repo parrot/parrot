@@ -20,6 +20,7 @@ sub new {
         parameters => "",
         mmd_rights => [],
         parent_name => "",
+        decorators => [],
         %{ $self_hash || {} }
       )};
     bless $self, (ref($class) || $class);
@@ -45,7 +46,7 @@ sub mmd_rights {
 
 #getters/setters
 for my $x qw( name parent_name type return_type body mmds symbol mmd_prefix mmd_table mmd_name
-        right attrs parameters ) {
+        right attrs decorators parameters ) {
     my $code = <<'EOC';
 sub REPLACE {
     my ( $self, $value ) = @_;

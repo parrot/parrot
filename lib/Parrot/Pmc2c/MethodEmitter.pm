@@ -97,8 +97,10 @@ sub decl {
     my $meth    = $self->name;
     my $args    = $self->parameters;
     my $ro      = $pmc->flag('is_ro') ? '' : '';
+    my $decs    = $self->decorators;
     $args = ", $args" if $args =~ /\S/;
-    my ( $export, $extern, $newl, $semi, $interp, $pmcvar );
+    my ( $decorators, $export, $extern, $newl, $semi, $interp, $pmcvar );
+    $decorators = length @$decs ? join $/ => @$decs, '' : '';
     if ($for_header eq 'HEADER') {
         $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_API ';
         $extern = "extern ";
@@ -115,7 +117,7 @@ sub decl {
         $pmcvar    = ' pmc';
     }
     return <<"EOC";
-$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC*$pmcvar$args)$semi
+$decorators$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC*$pmcvar$args)$semi
 EOC
 }
 

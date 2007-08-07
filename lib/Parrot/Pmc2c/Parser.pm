@@ -77,6 +77,7 @@ sub parse_pmc {
           (?:/\*.*?\*/)?      #C comments
         )*
 
+        ((?:PARROT_\w+\s+)+)? #decorators
         ((?:PCC)?METHOD\s+)?  #method flag
 
         (\w+\**)              #return type
@@ -91,12 +92,16 @@ sub parse_pmc {
 
     while ( $pmcbody =~ s/($signature_re)// ) {
         $lineno += count_newlines($1);
-        my ( $marker, $return_type, $methodname, $parameters, $attrs)
-            = ( $2, $3, $4, $5, parse_method_attrs($6));
+        my ( $decorators, $marker, $return_type, $methodname, $parameters, $attrs)
+            = ( $2, $3, $4, $5, $6, parse_method_attrs($7));
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
         $methodblock = strip_outer_brackets($methodblock);
         $methodblock =~ s/^[ ]{4}//mg; #remove pmclass 4 space indent
         $methodblock =~ s/\n\s+$/\n/g; #trim trailing whitespace from lastline
+
+        $decorators ||= '';
+        $decorators =~ s/^\s*(.*?)\s*$/$1/s;
+        $decorators = [split /\s+/ => $decorators];
 
 
         my $method = Parrot::Pmc2c::Method->new( {
@@ -107,6 +112,7 @@ sub parse_pmc {
             parameters  => $parameters,
             type        => Parrot::Pmc2c::Method::VTABLE,
             attrs       => $attrs,
+            decorators  => $decorators,
         });
 
         #PCCMETHOD needs FixedIntegerArray header
