@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 delete $ENV{LUA_INIT};
@@ -38,7 +38,7 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 14) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
+skip('only with an interpreter', 15) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'shebang misplaced' );
 
@@ -47,6 +47,17 @@ print("Hello World")
 CODE
 /^lua[^:]*: [^:]+:\d+: /
 OUT
+
+unlink('../hello.lua') if ( -f '../hello.lua' );
+open my $X, '>', '../hello.lua';
+print {$X} "print 'Hello World'\n";
+close $X;
+
+language_output_is( 'lua', undef, << 'OUTPUT', 'redirect', params => "< hello.lua"  );
+Hello World
+OUTPUT
+
+unlink('../hello.lua') if ( -f '../hello.lua' );
 
 $ENV{LUA_INIT} = 'print "init"';
 language_output_is( 'lua', <<'CODE', <<'OUT', 'LUA_INIT string' );
@@ -74,7 +85,7 @@ OUT
 delete $ENV{LUA_INIT};
 
 unlink('../boot.lua') if ( -f '../boot.lua' );
-open my $X, '>', '../boot.lua';
+open $X, '>', '../boot.lua';
 print {$X} "print 'boot from boot.lua by LUA_INIT'\n";
 close $X;
 

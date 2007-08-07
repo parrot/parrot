@@ -129,9 +129,8 @@ show version information.
     if script goto L1
     if has_v goto L1
     if has_e goto L1
-    # $P0 = getstdin
-    # $I0 = $P0.'isatty'()
-    $I0 = 1
+    $P0 = getstdin
+    $I0 = $P0.'isatty'()
     unless $I0 goto L8
     print_version()
     dotty()

@@ -103,6 +103,18 @@ Opens the file with the given mode, using the given IO layer.
 
 /*
 
+=item C<METHOD INTVAL isatty()>
+
+=cut
+
+*/
+    METHOD INTVAL isatty() {
+        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
+        return (io->flags & PIO_F_CONSOLE) == PIO_F_CONSOLE;
+    }
+
+/*
+
 =item C<METHOD INTVAL set_readline_interactive(INTVAL)>
 
 Sets readline interactive mode to the given value, if PARROT_HAS_READLINE is
