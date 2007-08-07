@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 01-data_slurp.t
+# 02-data_slurp.t
 
 use strict;
 use warnings;
@@ -105,11 +105,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-01-data_slurp.t - test Parrot::Configure::Data::slurp() once configuration has been completed
+02-data_slurp.t - test Parrot::Configure::Data::slurp() once configuration has been completed
 
 =head1 SYNOPSIS
 
-    % prove t/postconfigure/01-data_slurp.t
+    % prove t/postconfigure/02-data_slurp.t
 
 =head1 DESCRIPTION
 

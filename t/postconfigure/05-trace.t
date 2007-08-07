@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 04-trace.t
+# 05-trace.t
 
 use strict;
 use warnings;
@@ -180,11 +180,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-04-trace.t - test Parrot::Configure::Trace
+05-trace.t - test Parrot::Configure::Trace
 
 =head1 SYNOPSIS
 
-    % prove t/postconfigure/04-trace.t
+    % prove t/postconfigure/05-trace.t
 
 =head1 DESCRIPTION
 
