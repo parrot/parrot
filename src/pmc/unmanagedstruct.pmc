@@ -258,7 +258,6 @@ ret_int(PARROT_INTERP, const char *p, int type)
         default:
             real_exception(interp, NULL, 1, "returning unhandled int type in struct");
     }
-    return -1;
 }
 
 /*
@@ -289,7 +288,6 @@ ret_float(PARROT_INTERP, const char *p, int type)
         default:
             real_exception(interp, NULL, 1, "returning unhandled float type in struct");
     }
-    return -1.0;
 }
 
 /*
@@ -319,7 +317,6 @@ ret_string(PARROT_INTERP, char *p, int type)
             real_exception(interp, NULL, E_TypeError,
                     "returning unhandled string type in struct");
     }
-    return NULL;
 }
 
 /*
@@ -383,7 +380,6 @@ ret_pmc(PARROT_INTERP, PMC* pmc, char *p, int type, INTVAL idx)
                     "returning unhandled pmc type (%d) in struct",
                     type);
     }
-    return NULL;
 }
 
 /*

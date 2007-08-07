@@ -1169,7 +1169,6 @@ Return a new iterator for SELF.
         }
         real_exception(INTERP, NULL, E_TypeError,
             "Array: Unknown slice type");
-        return NULL;
     }
 
     PMC* get_iter() {

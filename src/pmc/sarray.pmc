@@ -78,7 +78,6 @@ ret_int(Interp* interp, const HashEntry *e)
     }
     real_exception(interp, NULL, E_IndexError,
             "SArray: Entry not an integer!");
-    return 0;
 }
 
 /*
@@ -106,7 +105,6 @@ ret_num(Interp* interp, const HashEntry *e)
     }
     real_exception(interp, NULL, E_IndexError,
             "SArray: Entry not a number!");
-    return (FLOATVAL)0;
 }
 
 /*
@@ -134,7 +132,6 @@ ret_string(Interp* interp, const HashEntry *e)
     }
     real_exception(interp, NULL, E_IndexError,
             "SArray: Entry not a string!");
-    return 0;
 }
 
 /*
@@ -172,7 +169,6 @@ ret_pmc(Interp* interp, const HashEntry *e)
             real_exception(interp, NULL, E_IndexError,
                     "SArray: Unknown entry!");
     }
-    return NULL;
 }
 
 /*

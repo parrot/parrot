@@ -501,8 +501,6 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
                 return (opcode_t *)next;
                 }
         }
-
-        return NULL;
     }
 
 /*
@@ -556,10 +554,8 @@ the next one.
         PMC * const agg = (PMC *)PMC_pmc_val(SELF);
         PMC        *ret;
 
-        if (PMC_int_val(key) == -1) {
+        if (PMC_int_val(key) == -1)
             real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
-            return NULL;
-        }
 
         ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
 

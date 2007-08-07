@@ -77,8 +77,6 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
         real_exception(INTERP, NULL, KEY_NOT_FOUND,
                 "OrderedHash: No such key");
-
-        return PMCNULL;
     }
 
     PMC* get_pmc_keyed(PMC *key) {
@@ -134,8 +132,6 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
         real_exception(INTERP, NULL, KEY_NOT_FOUND,
                 "OrderedHash: No such key");
-
-        return NULL;
     }
 
     STRING* get_string_keyed(PMC *key) {
@@ -188,8 +184,6 @@ Returns the integer value associated with C<key>.
 
         real_exception(INTERP, NULL, KEY_NOT_FOUND,
                 "OrderedHash: No such key");
-
-        return 0;
     }
 
     INTVAL get_integer_keyed(PMC *key) {
@@ -248,8 +242,6 @@ Returns the floating-point value for the element at C<key>.
 
         real_exception(INTERP, NULL, KEY_NOT_FOUND,
                 "OrderedHash: No such key");
-
-        return 0.0;
     }
 
     FLOATVAL get_number_keyed(PMC *key) {

@@ -125,7 +125,6 @@ Catch dereferencing. This would unshare the referred PMC.
     PMC* get_pmc() {
         real_exception(INTERP, NULL, E_ReferenceError,
                 "deref not allowed");
-        return NULL;
     }
 
 /*

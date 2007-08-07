@@ -71,7 +71,6 @@ C<bool> object according to the passed PMC value.
         if (argcP)
             PMC_int_val(res) = VTABLE_get_bool(interp, REG_PMC(interp, 5));
         return PMCNULL; /* TODO */
-        return res;
     }
 /*
 

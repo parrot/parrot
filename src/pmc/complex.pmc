@@ -119,7 +119,6 @@ complex_parse_string(Interp* interp,
                 /* imaginary part does not end in 'i' or 'j' */
                 real_exception(interp, NULL, E_ValueError,
                     "Complex: malformed string");
-                first_num_length = second_num_length = 0;
             }
             /* this is useful if there is no number for the
                 imaginary part, like in "2+i" */
@@ -131,7 +130,6 @@ complex_parse_string(Interp* interp,
             /* "+" or "-" not found: error */
             real_exception(interp, NULL, E_ValueError,
                 "Complex: malformed string");
-            first_num_length = second_num_length = 0;
         }
     }
 
@@ -193,7 +191,6 @@ complex_locate_keyed_num(Interp* interp, PMC* self, STRING *key) {
         return &RE(self);
     real_exception(interp, NULL, E_KeyError,
         "Complex: key is neither 'real' or 'imag'");
-    return NULL;
 }
 
 static void
@@ -238,6 +235,10 @@ Create a new complex PMC with passed arguments according to pdd03.
 */
 
     PMC* instantiate(PMC* sig) {
+        return PMCNULL;
+
+        /* TODO -- really build this thing */
+#if 0
         PMC *res = pmc_new(INTERP, enum_class_Complex);
         FLOATVAL re = 0.0, im = 0.0;
         int argcI = REG_INT(interp, 1);
@@ -245,7 +246,6 @@ Create a new complex PMC with passed arguments according to pdd03.
         int argcP = REG_INT(interp, 3);
         int argcN = REG_INT(interp, 4);
 
-        return PMCNULL;  /* TODO */
         /*
          * we can only allow 0..2 arguments of one kind. For
          * mixed (e.g. N,P) args the order of arguments isn't fixed
@@ -275,6 +275,7 @@ Create a new complex PMC with passed arguments according to pdd03.
         RE(res) = re;
         IM(res) = im;
         return res;
+#endif
     }
 
 /*
@@ -509,7 +510,6 @@ Set real or imag depending on key
                 real_exception(interp, NULL, E_KeyError,
                         "Complex: key must be 0 or 1");
         }
-        return 0.0;
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL v) {

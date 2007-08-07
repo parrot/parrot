@@ -369,7 +369,6 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 MMD_Complex: {
             real_exception(INTERP, NULL, E_NotImplementedError,
                     "TODO mul<Float, Complex>");
-            return dest;
         }
 MMD_DEFAULT: {
             if (!dest)

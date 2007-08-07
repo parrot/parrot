@@ -161,7 +161,6 @@ of the given name walking up the inheritance tree.
         if (index == -1) {
             real_exception(interp, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute '%S'", name);
-            return PMCNULL;
         }
 
         return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);

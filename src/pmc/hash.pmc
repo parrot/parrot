@@ -1002,7 +1002,6 @@ Return a new iterator for the slice PMC C<key>
         }
         real_exception(INTERP, NULL, E_IndexError,
                 "Hash: Unknown slice type");
-        return NULL;
     }
 
 

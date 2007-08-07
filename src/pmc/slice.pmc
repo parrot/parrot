@@ -236,7 +236,6 @@ pmclass Slice need_ext extends Key {
 
     PMC* clone() {
         real_exception(INTERP, NULL, E_NotImplementedError, "Unimplemented");
-        return NULL;
     }
 
 /*
@@ -285,7 +284,6 @@ This is used for implementing Pythons xrange()
         if (f) {
             real_exception(INTERP, NULL, E_ValueError,
                     "Slice: Unknown slice type");
-            return NULL;
         }
         else {
             PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);

@@ -588,7 +588,6 @@ MMD_Integer: {
 MMD_Complex: {
                 real_exception(INTERP, NULL, E_NotImplementedError,
                         "TODO mul<Integer, Complex>");
-                return dest;
             }
 MMD_BigInt:     {
             return Parrot_BigInt_multiply_int(INTERP, value,

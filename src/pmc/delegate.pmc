@@ -48,7 +48,9 @@ vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
     real_exception(interp, NULL, E_LookupError,
         "Can't find vtable method '%s' in class '%s'", meth, _class);
 
+    /* sorry, can't do this here. will it leak?
     string_cstring_free(_class);
+    */
 }
 
 pmclass delegate {

@@ -422,7 +422,6 @@ Returns the thread id of the interpreter.
                 return VTABLE_clone(interp, ctx->current_cont);
             real_exception(interp, NULL, E_ValueError,
                     "No such item %Ss", item);
-            return PMCNULL;
         }
     /*
 

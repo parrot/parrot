@@ -331,33 +331,28 @@ static BIGNUM*
 bigint_get_self(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return NULL;
 }
 
 static char *
 bigint_get_string(PARROT_INTERP, PMC *self, int base) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return NULL;
 }
 
 static long
 bigint_get_long(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return 0L;
 }
 static long
 bigint_get_bool(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return 0L;
 }
 static double
 bigint_get_double(PARROT_INTERP, PMC *self) {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return 0.0;
 }
 static void
 bigint_add_bigint(PARROT_INTERP, PMC* self, PMC *value, PMC *dest)
@@ -444,14 +439,12 @@ bigint_cmp(PARROT_INTERP, PMC* self, PMC *value)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return 0;
 }
 static INTVAL
 bigint_cmp_int(PARROT_INTERP, PMC* self, INTVAL value)
 {
     real_exception(interp, NULL, E_LibraryNotLoadedError,
         "no bigint lib loaded");
-    return 0;
 }
 static void
 bigint_abs(PARROT_INTERP, PMC* self, PMC *dest)
@@ -529,12 +522,14 @@ BigInt object.
 
 */
     PMC* instantiate(PMC* sig) {
+        return PMCNULL;
+
+        /* TODO -- actually build this thing */
+#if 0
         int argcP = REG_INT(interp, 3);
         int base;
         PMC *res;
         STRING *num;
-
-        return PMCNULL;  /* TODO */
 
         res = pmc_new(INTERP, enum_class_BigInt);
         if (!argcP) {
@@ -546,6 +541,7 @@ BigInt object.
         num = VTABLE_get_string(INTERP, REG_PMC(interp, 5));
         VTABLE_set_string_keyed_int(INTERP, res, base, num);
         return res;
+#endif
     }
 
     void morph(INTVAL new_type) {
@@ -774,7 +770,6 @@ MMD_Integer: {
             }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp add");
-            return dest;
         }
     }
 
@@ -827,7 +822,6 @@ MMD_Integer: {
             }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp sub");
-            return dest;
         }
     }
 
@@ -880,7 +874,6 @@ MMD_Integer: {
          }
 MMD_DEFAULT: {
              real_exception(INTERP, NULL, E_NotImplementedError, "unimp mul");
-            return dest;
          }
     }
 
@@ -955,7 +948,6 @@ MMD_Integer: {
         }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp div");
-            return dest;
          }
     }
 
@@ -1003,7 +995,6 @@ MMD_Integer: {
         }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp fdiv");
-            return dest;
         }
     }
 
@@ -1051,7 +1042,6 @@ MMD_Integer: {
          }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp mod");
-            return dest;
         }
     }
 
@@ -1101,7 +1091,6 @@ MMD_Integer: {
             }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp cmp");
-            return 0;
         }
     }
 
@@ -1114,7 +1103,6 @@ MMD_Integer: {
             }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp eq");
-            return 0;
         }
     }
 
@@ -1205,7 +1193,6 @@ MMD_Integer: {
          }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp shl");
-            return dest;
          }
     }
 
@@ -1278,7 +1265,6 @@ MMD_Integer: {
          }
 MMD_DEFAULT: {
             real_exception(INTERP, NULL, E_NotImplementedError, "unimp shr");
-            return dest;
          }
     }
 

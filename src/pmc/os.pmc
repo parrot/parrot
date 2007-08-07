@@ -70,11 +70,11 @@ Returns the current working directory.
 */
 
     METHOD STRING* cwd() {
-        char * cwd;
+        char *cwd;
 #ifdef _MSC_VER
         cwd = _getcwd(NULL, 0);
         /* capitalize the drive letter */
-        cwd[0] = toupper((unsigned char)cwd[0]);
+        cwd[0] = (char)toupper(cwd[0]);
 #else
 #  ifdef PATH_MAX
         cwd = getcwd(NULL, PATH_MAX+1);
@@ -91,7 +91,6 @@ Returns the current working directory.
         else {
             char *errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
-            return NULL;
         }
     }
 
@@ -225,7 +224,6 @@ Stats a file, and returns a 13 position array as in Perl:
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
-            return NULL;
         }
         else {
             array = pmc_new(interp, enum_class_FixedPMCArray);
@@ -304,7 +302,6 @@ Stats a file, and returns a 13 position array as in Perl:
         if (error) {
             char *errmsg = strerror(errno);
             real_exception(interp, NULL, E_SystemError, errmsg);
-            return NULL;
         }
         else {
             array = pmc_new(interp, enum_class_FixedPMCArray);
@@ -414,7 +411,6 @@ previous one).
 #else
         real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
-        return 0;
 #endif
     }
 
@@ -486,7 +482,6 @@ reads entries from a directory.
 #else
         real_exception(interp, NULL, E_NotImplementedError,
                 "Win32 is not POSIX. Need win32 developer!");
-        return NULL;
 #endif
     }
 /*

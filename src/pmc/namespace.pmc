@@ -333,8 +333,6 @@ really a public API.
         }
 
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pmc_keyed_str");
-        /* NOTREACHED */
-        return PMCNULL;
     }
 
     PMC* get_pmc_keyed_int(INTVAL key) {
@@ -400,8 +398,6 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         }
 
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pointer_keyed");
-        /* NOTREACHED */
-        return PMCNULL;
     }
 
 /*
@@ -617,6 +613,7 @@ does not delete the PMC.
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%s' in del_namespace()",
                 ns->vtable->base_type, item_name);
+            /* not reached... leak? */
             string_cstring_free(item_name);
         }
 
@@ -650,6 +647,7 @@ delete the PMC.
             real_exception(INTERP, NULL, E_TypeError,
                 "Invalid type %d for '%s' in del_sub()",
                 sub->vtable->base_type, item_name);
+            /* not reached... leak? */
             string_cstring_free(item_name);
         }
 

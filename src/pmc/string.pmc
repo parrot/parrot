@@ -750,7 +750,6 @@ Return length of the string.
         }
         real_exception(INTERP, NULL, E_ValueError,
                 "String: Unknown slice type");
-        return NULL;
     }
 
     PMC* get_iter() {

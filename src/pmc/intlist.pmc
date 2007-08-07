@@ -231,7 +231,6 @@ Removes and returns the first element in the list.
         }
         real_exception(INTERP, NULL, E_IndexError,
                 "IntList: Unknown slice type");
-        return NULL;
     }
 
     PMC* get_iter() {
