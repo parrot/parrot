@@ -1152,6 +1152,7 @@ pt_join_threads(PARROT_INTERP)
 
     if (info) {
         COND_DESTROY(info->gc_cond);
+        PARROT_ATOMIC_INT_DESTROY(shared_gc_info->gc_block_level);
         mem_sys_free(info);
     }
 
