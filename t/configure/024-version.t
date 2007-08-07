@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 024-version.t 20526 2007-08-07 00:00:23Z jkeenan $
+# $Id$
 # 024-version.t
 
 use strict;
