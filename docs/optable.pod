@@ -89,7 +89,7 @@ TODO
 
   proto OPERATOR_NAME ADVERBIAL_CLAUSES* { ... }
 
-The C<grammar> statement at the top of is the namespace in which the optable
+The C<grammar> statement at the top is the namespace in which the optable
 will be generated.  Written in Perl6 style the C<grammar> statement is
 translated by PGE into valid Parrot namespace syntax.
 
