@@ -33,11 +33,10 @@ sub pre_method_gen {
                 type        => Parrot::Pmc2c::Method::VTABLE,
           });
 
-        my $ret = gen_ret($method);
+        # don't return anything, ever
         my $output = <<EOC;
     real_exception(interp, NULL, NULL_REG_ACCESS, "Null PMC access in $vt_method_name()");
 EOC
-        $output .= $ret if $ret;
         $new_default_method->body(Parrot::Pmc2c::Emitter->text($output));
         $self->add_method($new_default_method);
     }
