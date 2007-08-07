@@ -772,7 +772,7 @@ Parrot_confess(NOTNULL(const char *cond), NOTNULL(const char *file), unsigned in
 {
     fprintf(stderr, "%s:%u: failed assertion '%s'\n", file, line, cond);
     Parrot_print_backtrace();
-    exit(EXIT_FAILURE);
+    abort();
 }
 
 void
