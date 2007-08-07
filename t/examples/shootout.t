@@ -100,7 +100,7 @@ foreach my $script (@shootouts) {
     }
 
     $ENV{TEST_PROG_ARGS} = $args;
-    warn "$file $args\n";
+    warn "$file $args\n" if $ENV{TEST_VERBOSE};
     example_output_is( $file, $expected );
 }
 
