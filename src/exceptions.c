@@ -242,7 +242,7 @@ Find the exception handler for C<exception>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-find_exception_handler(PARROT_INTERP, PMC *exception)
+find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
 {
     char *m;
     int exit_status, print_location;

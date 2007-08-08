@@ -27,9 +27,10 @@
 static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
     const char * const sourcefile) );
 
-static void determine_output_file_type(PARROT_INTERP,
-    NOTNULL(int *obj_file),
-    NOTNULL(const char * const output_file) );
+static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
+    int *obj_file),
+    NOTNULL(const char *output_file) )
+        __attribute__nonnull__(2);
 
 static void do_pre_process( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -677,24 +678,25 @@ static void determine_input_file_type(PARROT_INTERP,
 }
 
 static void determine_output_file_type(PARROT_INTERP,
-                                       NOTNULL(int *obj_file),
-                                       NOTNULL(const char * const output_file))
+    NOTNULL(int *obj_file), NOTNULL(const char *output_file))
 {
     const char * const ext = strrchr(output_file, '.');
 
-    if (ext && strcmp(ext, ".pbc") == 0) {
-        write_pbc = 1;
-    }
-    else if (ext && strcmp(ext, PARROT_OBJ_EXT) == 0) {
+    if (ext) {
+        if (strcmp(ext, ".pbc") == 0) {
+            write_pbc = 1;
+        }
+        else if (strcmp(ext, PARROT_OBJ_EXT) == 0) {
 #if EXEC_CAPABLE
-        load_pbc  = 1;
-        write_pbc = 0;
-        run_pbc   = 1;
-        *obj_file  = 1;
-        Parrot_set_run_core(interp, PARROT_EXEC_CORE);
+            load_pbc  = 1;
+            write_pbc = 0;
+            run_pbc   = 1;
+            *obj_file = 1;
+            Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
-        IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
+            IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
 #endif
+        }
     }
 }
 
