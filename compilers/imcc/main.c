@@ -24,6 +24,12 @@
 
 /* HEADERIZER BEGIN: static */
 
+static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
+    const char * const sourcefile) );
+
+static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
+    const char * const output_file) );
+
 static void do_pre_process( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -639,23 +645,14 @@ imcc_write_pbc(PARROT_INTERP, NOTNULL(const char *output_file))
     free(packed);
 }
 
-int
-imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
+static void determine_input_file_type(PARROT_INTERP,
+                                      NOTNULL(const char * const sourcefile))
 {
-    int              obj_file;
-    yyscan_t        yyscanner   = IMCC_INFO(interp)->yyscanner;
-    const char * const output_file = interp->output_file;
+    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
-    if (!interp->lo_var_ptr)
-        interp->lo_var_ptr = (void *)&obj_file;
-
-    /* Read in the source and determine whether it's Parrot bytecode,
-       PASM or a Parrot abstract syntax tree (PAST) file. If it isn't
-       any of these, then we assume that it is PIR. */
-    if (!sourcefile || !*sourcefile) {
-        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
-    }
-    else if (strcmp(sourcefile, "-") == 0) {
+    /* Read in the source and determine whether it's Parrot bytecode
+       or PASM. If it either of these, then we assume that it is PIR. */
+    if (strcmp(sourcefile, "-") == 0) {
         imc_yyin_set(stdin, yyscanner);
     }
     else {
@@ -668,14 +665,120 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
         else if (!load_pbc) {
             if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
                 IMCC_fatal_standalone(interp, E_IOError,
-                    "Error reading source file %s.\n",
-                        sourcefile);
+                                      "Error reading source file %s.\n",
+                                      sourcefile);
             }
             if (ext && strcmp(ext, ".pasm") == 0) {
                 pasm_file = 1;
             }
         }
     }
+}
+
+static void determine_output_file_type(PARROT_INTERP,
+                                       NOTNULL(const char * const output_file))
+{
+    const char * const ext = strrchr(output_file, '.');
+
+    if (ext && strcmp(ext, ".pbc") == 0) {
+        write_pbc = 1;
+    }
+    else if (ext && strcmp(ext, PARROT_OBJ_EXT) == 0) {
+#if EXEC_CAPABLE
+        load_pbc  = 1;
+        write_pbc = 0;
+        run_pbc   = 1;
+        obj_file  = 1;
+        Parrot_set_run_core(interp, PARROT_EXEC_CORE);
+#else
+        IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
+#endif
+    }
+}
+
+void
+compile_to_bytecode(PARROT_INTERP,
+                    NOTNULL(const char * const sourcefile),
+                    NOTNULL(const char * const output_file))
+{
+    yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
+    const int per_pbc   = (write_pbc | run_pbc) != 0;
+    const int opt_level = IMCC_INFO(interp)->optimizer_level;
+    PackFile *pf;
+
+    /* Shouldn't be more than five, but five extra is cheap */
+    char opt_desc[10];
+
+    imcc_get_optimization_description(interp, opt_level, opt_desc);
+
+    IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
+              opt_desc, opt_level);
+
+    pf = PackFile_new(interp, 0);
+    Parrot_loadbc(interp, pf);
+
+    IMCC_push_parser_state(interp);
+    IMCC_INFO(interp)->state->file = sourcefile;
+
+    emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
+
+    IMCC_info(interp, 1, "Starting parse...\n");
+
+    IMCC_INFO(interp)->state->pasm_file = pasm_file;
+    IMCC_TRY(IMCC_INFO(interp)->jump_buf,
+             IMCC_INFO(interp)->error_code) {
+        if (yyparse(yyscanner, interp))
+            exit(EXIT_FAILURE);
+
+        imc_compile_all_units(interp);
+    }
+    IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
+        char * const error_str = string_to_cstring(interp,
+                                                   IMCC_INFO(interp)->error_message);
+
+        IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
+        fprintf(stderr,"error:imcc:%s", error_str);
+        IMCC_print_inc(interp);
+        string_cstring_free(error_str);
+        Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
+    }
+    IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
+        char * const error_str = string_to_cstring(interp,
+                                                   IMCC_INFO(interp)->error_message);
+
+        IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
+        fprintf(stderr,"error:imcc:%s", error_str);
+        IMCC_print_inc(interp);
+        string_cstring_free(error_str);
+        Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
+    }
+    IMCC_END_TRY;
+
+    imc_cleanup(interp, yyscanner);
+
+    fclose(imc_yyin_get(yyscanner));
+
+    IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
+    if (per_pbc)
+        PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+}
+
+int
+imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
+{
+    int              obj_file;
+    yyscan_t        yyscanner   = IMCC_INFO(interp)->yyscanner;
+    const char * const output_file = interp->output_file;
+
+    if (!interp->lo_var_ptr)
+        interp->lo_var_ptr = (void *)&obj_file;
+
+    /* Figure out what kind of source file we have -- if we have one */
+    if (!sourcefile || !*sourcefile)
+        IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");
+    else
+        determine_input_file_type(interp, sourcefile);
+
     if (pre_process_only) {
         do_pre_process(interp);
         Parrot_destroy(interp);
@@ -687,23 +790,9 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
 
     /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
-    if (interp->output_file) {
-        const char * const ext = strrchr(interp->output_file, '.');
+    if (output_file) {
+        determine_output_file_type(interp, output_file);
 
-        if (ext && strcmp(ext, ".pbc") == 0) {
-            write_pbc = 1;
-        }
-        else if (ext && strcmp(ext, PARROT_OBJ_EXT) == 0) {
-#if EXEC_CAPABLE
-            load_pbc  = 1;
-            write_pbc = 0;
-            run_pbc   = 1;
-            obj_file  = 1;
-            Parrot_set_run_core(interp, PARROT_EXEC_CORE);
-#else
-            IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
-#endif
-        }
         if (!strcmp(sourcefile, output_file) && strcmp(sourcefile, "-"))
             IMCC_fatal_standalone(interp, 1,
                 "main: outputfile is sourcefile\n");
@@ -726,68 +815,8 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
         Parrot_loadbc(interp, pf);
     }
-    else {
-        /* Otherwise, we need to compile our input to bytecode. */
-        const int per_pbc   = (write_pbc | run_pbc) != 0;
-        const int opt_level = IMCC_INFO(interp)->optimizer_level;
-        PackFile *pf;
-
-        /* Shouldn't be more than five, but five extra is cheap */
-        char opt_desc[10];
-
-        imcc_get_optimization_description(interp, opt_level, opt_desc);
-
-        IMCC_info(interp, 1, "using optimization '-O%s' (%x) \n",
-                  opt_desc, opt_level);
-
-        pf = PackFile_new(interp, 0);
-        Parrot_loadbc(interp, pf);
-
-        IMCC_push_parser_state(interp);
-        IMCC_INFO(interp)->state->file = sourcefile;
-
-        emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
-
-        IMCC_info(interp, 1, "Starting parse...\n");
-
-        IMCC_INFO(interp)->state->pasm_file = pasm_file;
-        IMCC_TRY(IMCC_INFO(interp)->jump_buf,
-                 IMCC_INFO(interp)->error_code) {
-            if (yyparse(yyscanner, interp))
-                exit(EXIT_FAILURE);
-
-            imc_compile_all_units(interp);
-        }
-        IMCC_CATCH(IMCC_FATAL_EXCEPTION) {
-            char * const error_str = string_to_cstring(interp,
-                    IMCC_INFO(interp)->error_message);
-
-            IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-            fprintf(stderr,"error:imcc:%s", error_str);
-            IMCC_print_inc(interp);
-            string_cstring_free(error_str);
-            Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
-        }
-        IMCC_CATCH(IMCC_FATALY_EXCEPTION) {
-            char * const error_str = string_to_cstring(interp,
-                    IMCC_INFO(interp)->error_message);
-
-            IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
-            fprintf(stderr,"error:imcc:%s", error_str);
-            IMCC_print_inc(interp);
-            string_cstring_free(error_str);
-            Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
-        }
-        IMCC_END_TRY;
-
-        imc_cleanup(interp, yyscanner);
-
-        fclose(imc_yyin_get(yyscanner));
-
-        IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
-        if (per_pbc)
-            PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
-    }
+    else
+        compile_to_bytecode(interp, sourcefile, output_file);
 
     /* Produce a PBC output file, if one was requested */
     if (write_pbc) {
