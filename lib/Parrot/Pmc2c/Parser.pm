@@ -80,8 +80,8 @@ sub parse_pmc {
         ((?:PARROT_\w+\s+)+)? #decorators
         ((?:PCC)?METHOD\s+)?  #method flag
 
-        (\w+\**)              #return type
-        \s+
+        (\w+(?:\s*\*)?)       #return type
+        \s*
         (\w+)                 #method name
         \s*
         \( ([^\(]*) \)        #parameters
@@ -102,7 +102,6 @@ sub parse_pmc {
         $decorators ||= '';
         $decorators =~ s/^\s*(.*?)\s*$/$1/s;
         $decorators = [split /\s+/ => $decorators];
-
 
         my $method = Parrot::Pmc2c::Method->new( {
             name        => $methodname,

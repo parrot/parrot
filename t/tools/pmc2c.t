@@ -155,7 +155,7 @@ pmclass a hll dale maps Integer {
     }
 }
 END_PMC
-Parrot_a_init(PARROT_INTERP, PMC* pmc)
+Parrot_a_init(PARROT_INTERP, PMC *pmc)
 {
 #line 2
 END_C
@@ -168,7 +168,7 @@ pmclass a
     }
 }
 END_PMC
-Parrot_a_init(PARROT_INTERP, PMC* pmc)
+Parrot_a_init(PARROT_INTERP, PMC *pmc)
 {
 #line 4
 END_C

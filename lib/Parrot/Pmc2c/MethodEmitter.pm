@@ -98,7 +98,14 @@ sub decl {
     my $args    = $self->parameters;
     my $ro      = $pmc->flag('is_ro') ? '' : '';
     my $decs    = $self->decorators;
+
+    # convert 'type*' to 'type *' per PDD07
+    $ret =~ s/^(.*)\s*(\*)$/$1 $2/;
+
+    # convert args to PDD07
     $args = ", $args" if $args =~ /\S/;
+    $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
+
     my ( $decorators, $export, $extern, $newl, $semi, $interp, $pmcvar );
     $decorators = length @$decs ? join $/ => @$decs, '' : '';
     if ($for_header eq 'HEADER') {
@@ -114,10 +121,11 @@ sub decl {
         $newl   = "\n";
         $semi   = "";
         $interp = 'interp';
-        $pmcvar    = ' pmc';
+        $pmcvar    = 'pmc';
     }
+
     return <<"EOC";
-$decorators$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC*$pmcvar$args)$semi
+$decorators$export$extern$ret${newl}Parrot_${pmcname}${ro}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
 EOC
 }
 
@@ -139,16 +147,25 @@ my %calltype = (
     "FLOATVAL" => "N",
     "double"   => "d",
     "STRING*"  => "S",
+    "STRING *" => "S",
     "char*"    => "t",
+    "char *"   => "t",
     "PMC*"     => "P",
+    "PMC *"    => "P",
     "short*"   => "2",
+    "short *"  => "2",
     "int*"     => "3",
+    "int *"    => "3",
     "long*"    => "4",
+    "long *"   => "4",
     "void"     => "v",
     "void*"    => "b",
+    "void *"   => "b",
     "void**"   => "B",
+    "void **"  => "B",
 
     #"BIGNUM*" => "???" # RT#43731
+    #"BIGNUM *"=> "???" # RT#43731
 );
 
 sub proto {
