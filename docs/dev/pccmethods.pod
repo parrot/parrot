@@ -26,15 +26,15 @@ implemented with C<PCCMETHOD>, too.
 To declare that a method in a PMC should take arguments using the Parrot
 Calling Conventions, prefix its name with the keyword C<PCCMETHOD>.
 Where you would put the C parameter list, put a PCC parameter list.
-You must always use the void return type for C<PCCMETHOD>s -- the true
+Do not specify a return type for C<PCCMETHOD>s -- the true
 signature of the return is specified inside the method using C<PCCRETURN>,
 described below.
 
-  PCCMETHOD void PlayRandomSong() {
+  PCCMETHOD PlayRandomSong() {
       ...
   }
 
-  PCCMETHOD void PlaySong(STRING *artist, STRING *title) {
+  PCCMETHOD PlaySong(STRING *artist, STRING *title) {
       ...
   }
 

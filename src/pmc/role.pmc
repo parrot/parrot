@@ -464,7 +464,7 @@ inspect_str.
 
 =over 4
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     name(STRING *name :optional, int got_name :opt_flag)>
 
 Sets the name of the role, and updates the namespace accoringly.
@@ -473,7 +473,7 @@ Sets the name of the role, and updates the namespace accoringly.
 
 */
 
-    PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_Role *role = PARROT_ROLE(SELF);
         STRING *ret_name = NULL;
 
@@ -492,7 +492,7 @@ Sets the name of the role, and updates the namespace accoringly.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     pmc_namespace()>
 
 Gets the namespace associated with this role, if any.
@@ -501,7 +501,7 @@ Gets the namespace associated with this role, if any.
 
 */
 
-    PCCMETHOD void pmc_namespace() {
+    PCCMETHOD pmc_namespace() {
         Parrot_Role *role = PARROT_ROLE(SELF);
         PMC *ret_namespace = role->_namespace;
         PCCRETURN(PMC *ret_namespace);
@@ -510,7 +510,7 @@ Gets the namespace associated with this role, if any.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     attributes()>
 
 Return a hash where the keys are attribute names and the values are hashes
@@ -519,7 +519,7 @@ providing a set of key/value pairs describing the attribute.
 =cut
 
 */
-    PCCMETHOD void attributes() {
+    PCCMETHOD attributes() {
         PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
         PCCRETURN(PMC *ret_attrib_metadata);
     }
@@ -527,7 +527,7 @@ providing a set of key/value pairs describing the attribute.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     add_attribute(STRING *attribute_name,
             PMC* attribute_type :optional, int got_type :opt_flag)>
 
@@ -536,7 +536,7 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 =cut
 
 */
-    PCCMETHOD void add_attribute(STRING *attribute_name,
+    PCCMETHOD add_attribute(STRING *attribute_name,
             PMC* attribute_type :optional, int got_type :opt_flag) {
         VTABLE_add_attribute(interp, SELF, attribute_name,
             got_type ? attribute_type : PMCNULL);
@@ -545,7 +545,7 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     methods()>
 
 Return a hash where the keys are method names and the values are methods.
@@ -553,7 +553,7 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
-    PCCMETHOD void methods() {
+    PCCMETHOD methods() {
         PMC *ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
         PCCRETURN(PMC *ret_methods);
     }
@@ -561,7 +561,7 @@ Return a hash where the keys are method names and the values are methods.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     add_method(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a method with the given name.
@@ -569,14 +569,14 @@ Adds the given sub PMC as a method with the given name.
 =cut
 
 */
-    PCCMETHOD void add_method(STRING *name, PMC *sub) {
+    PCCMETHOD add_method(STRING *name, PMC *sub) {
         VTABLE_add_method(interp, SELF, name, sub);
     }
 
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     roles()>
 
 Return the roles array PMC.
@@ -584,7 +584,7 @@ Return the roles array PMC.
 =cut
 
 */
-    PCCMETHOD void roles() {
+    PCCMETHOD roles() {
         PMC *ret_roles = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "roles"));
         PCCRETURN(PMC *ret_roles);
     }
@@ -592,7 +592,7 @@ Return the roles array PMC.
 
 /*
 
-=item C<PCCMETHOD void
+=item C<PCCMETHOD
     add_role(PMC* role,
             PMC* exclude_method :optional :named["exclude_method"],
             int got_exclude_method :opt_flag,
@@ -604,7 +604,7 @@ Compose the given role into this one, using the given exclusions and aliases.
 =cut
 
 */
-    PCCMETHOD void add_role(PMC* role,
+    PCCMETHOD add_role(PMC* role,
             PMC* exclude_method :optional :named["exclude_method"],
             int got_exclude_method :opt_flag,
             PMC* alias_method :optional :named["alias_method"],
@@ -630,7 +630,7 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    PCCMETHOD void inspect(STRING *what :optional, int got_what :opt_flag) {
+    PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {
         PMC *found;
 
         /* Just delegate to the appropriate vtable method. */
@@ -653,7 +653,7 @@ named role.  This will recurse through all roles as far back as it can.
 
 */
 
-    PCCMETHOD void does(STRING *name) {
+    PCCMETHOD does(STRING *name) {
         INTVAL  i, count;
         STRING *r_name;
         PMC    *roles, *role;

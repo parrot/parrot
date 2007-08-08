@@ -1177,7 +1177,7 @@ Sets the name of the class, and updates the namespace accoringly.
 =cut
 
 */
-    PCCMETHOD void name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_Class *_class   = PARROT_CLASS(SELF);
         STRING       *ret_name = NULL;
 
@@ -1203,7 +1203,7 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
-    PCCMETHOD void pmc_namespace(PMC *_namespace :optional, int got_name :opt_flag) {
+    PCCMETHOD pmc_namespace(PMC *_namespace :optional, int got_name :opt_flag) {
         Parrot_Class *_class        = PARROT_CLASS(SELF);
         PMC          *ret_namespace = _class->_namespace;
         PCCRETURN(PMC *ret_namespace);
@@ -1219,7 +1219,7 @@ methods from roles. When called with no parameter, returns the list.
 =cut
 
 */
-    PCCMETHOD void resolve_method(PMC *resolve_list :optional,
+    PCCMETHOD resolve_method(PMC *resolve_list :optional,
                                   int got_list :opt_flag) {
         Parrot_Class *_class   = PARROT_CLASS(SELF);
         PMC          *ret_list = NULL;
@@ -1242,7 +1242,7 @@ parameter list.
 =cut
 
 */
-    PCCMETHOD void new(PMC *args :slurpy :named) {
+    PCCMETHOD new(PMC *args :slurpy :named) {
         PMC *obj = VTABLE_instantiate(interp, SELF, args);
         PCCRETURN(PMC *obj);
      }
@@ -1257,7 +1257,7 @@ providing a set of key/value pairs describing the attribute.
 =cut
 
 */
-    PCCMETHOD void attributes() {
+    PCCMETHOD attributes() {
         PMC *ret_attrib_metadata = DYNSELF.inspect_str(
             CONST_STRING(interp, "attributes"));
 
@@ -1273,7 +1273,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 =cut
 
 */
-    PCCMETHOD void add_attribute(STRING *attribute_name,
+    PCCMETHOD add_attribute(STRING *attribute_name,
             PMC* attribute_type :optional, int got_type :opt_flag) {
         PMC *type = got_type ? attribute_type : PMCNULL;
         DYNSELF.add_attribute(attribute_name, type);
@@ -1288,7 +1288,7 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
-    PCCMETHOD void methods() {
+    PCCMETHOD methods() {
         PMC *ret_methods = DYNSELF.inspect_str(CONST_STRING(interp, "methods"));
 
         PCCRETURN(PMC *ret_methods);
@@ -1304,7 +1304,7 @@ C<add_method> vtable method.
 =cut
 
 */
-    PCCMETHOD void add_method(STRING *name, PMC *sub,
+    PCCMETHOD add_method(STRING *name, PMC *sub,
                               int vtable :optional :named["vtable"],
                               int got_vtable :opt_flag,
                               int anon :optional :named["anon"],
@@ -1330,7 +1330,7 @@ Walks the MRO of the class and finds the method with the given name.
 
 */
 
-    PCCMETHOD void find_method(STRING *name) {
+    PCCMETHOD find_method(STRING *name) {
         Parrot_Class * const  _class    = PARROT_CLASS(SELF);
         PMC                  *namespace = _class->_namespace;
         int num_classes, i;
@@ -1370,7 +1370,7 @@ Return the parents array PMC.
 =cut
 
 */
-    PCCMETHOD void parents() {
+    PCCMETHOD parents() {
         PMC *ret_parents = DYNSELF.inspect_str(CONST_STRING(interp, "parents"));
 
         PCCRETURN(PMC *ret_parents);
@@ -1385,7 +1385,7 @@ Adds the supplied PMC to the list of parents for the class.
 =cut
 
 */
-    PCCMETHOD void add_parent(PMC *parent) {
+    PCCMETHOD add_parent(PMC *parent) {
         DYNSELF.add_parent(parent);
     }
 
@@ -1398,7 +1398,7 @@ Return the roles array PMC.
 =cut
 
 */
-    PCCMETHOD void roles() {
+    PCCMETHOD roles() {
         PMC *ret_roles = DYNSELF.inspect_str(CONST_STRING(interp, "roles"));
 
         PCCRETURN(PMC *ret_roles);
@@ -1414,7 +1414,7 @@ Compose a role into a class with the given exclusions and aliases.
 =cut
 
 */
-    PCCMETHOD void add_role(PMC* role,
+    PCCMETHOD add_role(PMC* role,
             PMC* exclude_method     :optional :named["exclude_method"],
             int got_exclude_method  :opt_flag,
             PMC* alias_method       :optional :named["alias_method"],
@@ -1458,7 +1458,7 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    PCCMETHOD void inspect(STRING *what :optional, int got_what :opt_flag) {
+    PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {
         PMC *found;
 
         /* Just delegate to the appropriate vtable method. */
@@ -1480,7 +1480,7 @@ C<class_name>, false otherwise.
 =cut
 
 */
-    PCCMETHOD void isa(STRING *class_name) {
+    PCCMETHOD isa(STRING *class_name) {
         INTVAL isa = DYNSELF.isa(class_name);
 
         PCCRETURN(INTVAL isa);
@@ -1496,7 +1496,7 @@ false otherwise.
 =cut
 
 */
-    PCCMETHOD void does(STRING *role_name) {
+    PCCMETHOD does(STRING *role_name) {
         INTVAL i, role_count, isa;
         PMC *role_list = (PMC_data_typed(SELF, Parrot_Class *))->roles;
 

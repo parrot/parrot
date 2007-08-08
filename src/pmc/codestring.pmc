@@ -60,7 +60,7 @@ A newline is automatically added to the end of the fmt.
 =cut
 */
 
-  PCCMETHOD void emit(STRING* fmt, PMC* args :slurpy, PMC* hash :slurpy :named) {
+  PCCMETHOD emit(STRING* fmt, PMC* args :slurpy, PMC* hash :slurpy :named) {
     INTVAL pos = 0;
     INTVAL replen = 0;
     STRING *key, *repl;
@@ -140,7 +140,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
 
-  PCCMETHOD void unique(STRING* format :optional, int has_fmt :opt_flag) {
+  PCCMETHOD unique(STRING* format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
     STRING* counter_as_string = string_from_int(INTERP, counter);
 
@@ -169,7 +169,7 @@ prefixed with 'unicode:'.
 
 */
 
-  PCCMETHOD void escape(STRING* str) {
+  PCCMETHOD escape(STRING* str) {
     STRING *escaped_str = string_escape_string(INTERP, str);
     STRING *quote       = string_from_literal (INTERP, "\"");
     STRING *x           = string_from_literal (INTERP, "\\x");

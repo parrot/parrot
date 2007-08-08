@@ -90,7 +90,7 @@ and describe function, expected parameters, and return values.
 
  =over 4
 
- =item C<PCCMETHOD void
+ =item C<PCCMETHOD
  import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
  PMC *src :optional :named["source"], int got_src :opt_flag,
  PMC *globals :optional :named["globals"], int got_globals :opt_flag)>

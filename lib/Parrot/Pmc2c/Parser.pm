@@ -70,6 +70,7 @@ sub parse_pmc {
     my $lineno = count_newlines($preamble) + $chewed_lines + 1; #the +1 puts us on the current line
     my $class_init;
 
+    # backreferences here are all +1 because below the qr is wrapped in quotes
     my $signature_re = qr{
         ^
         (?:
@@ -78,9 +79,12 @@ sub parse_pmc {
         )*
 
         ((?:PARROT_\w+\s+)+)? #decorators
-        ((?:PCC)?METHOD\s+)?  #method flag
 
-        (\w+(?:\s*\*)?)       #return type
+        # no return type for PCCMETHOD
+        (
+          (PCC)?METHOD\s+)?   #method marker
+          (?(4) | (\w+\s*?\**) #return type
+        )
         \s*
         (\w+)                 #method name
         \s*
@@ -92,8 +96,9 @@ sub parse_pmc {
 
     while ( $pmcbody =~ s/($signature_re)// ) {
         $lineno += count_newlines($1);
-        my ( $decorators, $marker, $return_type, $methodname, $parameters, $attrs)
-            = ( $2, $3, $4, $5, $6, parse_method_attrs($7));
+        my ( $decorators, $marker, $pcc, $return_type, $methodname, $parameters, $attrs)
+            = ( $2, $3, $4, $5, $6, $7, parse_method_attrs($8));
+
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
         $methodblock = strip_outer_brackets($methodblock);
         $methodblock =~ s/^[ ]{4}//mg; #remove pmclass 4 space indent
@@ -102,6 +107,9 @@ sub parse_pmc {
         $decorators ||= '';
         $decorators =~ s/^\s*(.*?)\s*$/$1/s;
         $decorators = [split /\s+/ => $decorators];
+
+        $return_type = 'void'
+            if defined $pcc;
 
         my $method = Parrot::Pmc2c::Method->new( {
             name        => $methodname,

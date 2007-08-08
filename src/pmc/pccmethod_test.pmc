@@ -48,17 +48,17 @@ Marks the hash as live.
     {
         PIO_printf(interp, "test_method\n");
     }
-    PCCMETHOD void test_method0(int a1)
+    PCCMETHOD test_method0(int a1)
     {
         PIO_printf(interp, "test_method0\n");
         PIO_printf(interp, "%d\n", a1);
     }
-    PCCMETHOD void test_method1(int a1, int a2, int a3, int a4, int a5, int a6)
+    PCCMETHOD test_method1(int a1, int a2, int a3, int a4, int a5, int a6)
     {
         PIO_printf(interp, "test_method1\n");
         PIO_printf(interp, "%d,%d,%d,%d,%d,%d\n", a1, a2, a3, a4, a5, a6);
     }
-    PCCMETHOD void test_method2(int a1 :optional, int a1o :opt_flag, PMC *slurpy_pos :slurpy)
+    PCCMETHOD test_method2(int a1 :optional, int a1o :opt_flag, PMC *slurpy_pos :slurpy)
     {
         STRING* kevin = string_from_literal(interp, "KEVIN");
         PIO_printf(interp, "test_method2\n");
@@ -67,12 +67,12 @@ Marks the hash as live.
 
         PCCRETURN(int 1000, STRING* kevin);
     }
-    PCCMETHOD void test_method3(PMC* a1 :named["a1name"], PMC* a2  :named["a2name"])
+    PCCMETHOD test_method3(PMC* a1 :named["a1name"], PMC* a2  :named["a2name"])
     {
         PIO_printf(interp, "test_method3\n");
         PIO_printf(interp, "%Ps, %Ps\n", a1, a2);
     }
-    PCCMETHOD void test_method4(int george :optional, int g_f :opt_flag, PMC *slurpy_pos :slurpy,
+    PCCMETHOD test_method4(int george :optional, int g_f :opt_flag, PMC *slurpy_pos :slurpy,
             PMC *slurpy_named :slurpy :named)
     {
         PIO_printf(interp, "test_method4\n");
