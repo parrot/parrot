@@ -29,7 +29,7 @@ pmclass Bound_NCI extends NCI need_ext {
 
 Bind the object C<obj> to this call instance.
 
-=item C<PMC* get_pmc(void)>
+=item C<PMC *get_pmc(void)>
 
 Return the bound object.
 
@@ -51,11 +51,11 @@ Set the bound object live.
             PObj_custom_mark_SET(SELF);
     }
 
-    PMC* get_pmc() {
+    PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
-    opcode_t* invoke(void *next) {
+    opcode_t *invoke(void *next) {
         if (PObj_get_FLAGS(SELF) & PObj_private0_FLAG) {
             /* bound multi sub
              * XXX maybe create separate PMC class

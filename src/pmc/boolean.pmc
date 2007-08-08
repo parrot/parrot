@@ -55,7 +55,7 @@ XXX are these generally useful or should they be moved to src/py_func.c?
 
 /*
 
-=item C<PMC* instantiate(PMC* sig)>
+=item C<PMC *instantiate(PMC *sig)>
 
 Object constructor. SELF is a Boolean Class object. Return a new
 C<bool> object according to the passed PMC value.
@@ -63,7 +63,7 @@ C<bool> object according to the passed PMC value.
 =cut
 
 */
-    PMC* instantiate(PMC* sig) {
+    PMC *instantiate(PMC *sig) {
         /* XXX other types */
         const int argcP = REG_INT(interp, 3);
         PMC * const res = pmc_new(interp, enum_class_Boolean);
@@ -74,14 +74,14 @@ C<bool> object according to the passed PMC value.
     }
 /*
 
-=item C<STRING* get_string()>
+=item C<STRING *get_string()>
 
 Return "1" or "0".
 
 =cut
 
 */
-    STRING* get_string() {
+    STRING *get_string() {
         return SUPER();
     }
 
@@ -92,7 +92,7 @@ Return "1" or "0".
 
 =item C<void set_bool(INTVAL value)>
 
-=item C<void set_pmc(PMC* value)>
+=item C<void set_pmc(PMC *value)>
 
 =cut
 
@@ -122,7 +122,7 @@ Sets the value to C<value> evaluated in a boolean context.
 
 /*
 
-=item C<void set_string_native(STRING* value)>
+=item C<void set_string_native(STRING *value)>
 
 Sets the value to C<*value> evaluated in a boolean context.
 
@@ -130,7 +130,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 
 */
 
-    void set_string_native(STRING* value) {
+    void set_string_native(STRING *value) {
         PMC_int_val(SELF) = string_bool(INTERP, value);
     }
 }
