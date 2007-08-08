@@ -103,7 +103,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    INTVAL get_integer_keyed(PMC* key) {
+    INTVAL get_integer_keyed(PMC *key) {
         Hash       *hash = (Hash *)PMC_struct_val(SELF);
         HashBucket *b    = parrot_hash_get_bucket(INTERP, hash, key);
 
@@ -141,7 +141,7 @@ reaches 0, delete the entry.
 
 */
 
-    void set_pmc_keyed(PMC* key, PMC* value) {
+    void set_pmc_keyed(PMC *key, PMC *value) {
         Hash * const hash = (Hash *)PMC_struct_val(SELF);
         HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, key);
         if (b)
@@ -150,12 +150,12 @@ reaches 0, delete the entry.
             parrot_hash_put(INTERP, hash, key, (void *) 1);
     }
 
-    void set_integer_keyed(PMC* key, INTVAL value) {
+    void set_integer_keyed(PMC *key, INTVAL value) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
         parrot_hash_put(INTERP, hash, key, (void *) value);
     }
 
-    void delete_keyed(PMC* key) {
+    void delete_keyed(PMC *key) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
         b = parrot_hash_get_bucket(INTERP, hash, key);
@@ -169,7 +169,7 @@ reaches 0, delete the entry.
 
 /*
 
-=item C<PMC* get_iter ()>
+=item C<PMC *get_iter ()>
 
 Return a new iterator for the PMC.
 
@@ -181,11 +181,11 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 
 */
 
-    PMC* get_iter() {
+    PMC *get_iter() {
         return Parrot_Hash_get_iter(INTERP, SELF);
     }
 
-    PMC* get_pmc_keyed(PMC *key) {
+    PMC *get_pmc_keyed(PMC *key) {
         Hash *hash = (Hash *)PMC_struct_val(SELF);
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
