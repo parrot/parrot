@@ -524,7 +524,7 @@ success.
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = compreg 'PGE::P6Regex'
+    $P0 = compreg 'PGE::Perl6Regex'
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
@@ -575,7 +575,7 @@ potentially very inefficient, but it "works" for now.
     rule = cache[pattern]
     goto match
   new_pattern:
-    $P0 = compreg 'PGE::P6Regex'
+    $P0 = compreg 'PGE::Perl6Regex'
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
