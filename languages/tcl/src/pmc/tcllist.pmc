@@ -22,8 +22,6 @@ These are the vtable functions for the TclList base class
 
 /* cache of classes referenced */
 
-static INTVAL dynpmc_TclInt;
-
 pmclass TclList
     dynpmc
     need_ext
@@ -33,23 +31,6 @@ pmclass TclList
     hll     Tcl
     maps    Array
 {
-
-/*
-
-=item C<void class_init()>
-
-Class initialization. Caches the type id of various PMCs.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynpmc_TclInt = pmc_type(INTERP,
-                string_from_literal(INTERP, "TclInt"));
-        }
-    }
 
 /*
 

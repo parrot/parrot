@@ -27,8 +27,6 @@ This is the Array PMC for the Tcl implementation.
 
 #include "parrot/parrot.h"
 
-static INTVAL dynpmc_TclString;
-
 pmclass TclArray
     need_ext
     dynpmc
@@ -38,23 +36,6 @@ pmclass TclArray
     hll     Tcl
     maps    Hash
 {
-
-/*
-
-=item C<void class_init()>
-
-Initializes variables needed by the class.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynpmc_TclString = pmc_type(INTERP,
-                string_from_literal(INTERP, "TclString"));
-        }
-    }
 
 /*
 

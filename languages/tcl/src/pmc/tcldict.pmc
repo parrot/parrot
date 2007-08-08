@@ -27,8 +27,6 @@ This is the Dictionary PMC for the Tcl implementation (for use with [dict])
 
 #include "parrot/parrot.h"
 
-static INTVAL dynpmc_TclString;
-
 pmclass TclDict
     need_ext
     dynpmc
@@ -38,23 +36,6 @@ pmclass TclDict
     hll     Tcl
     maps    Hash
 {
-
-/*
-
-=item C<void class_init()>
-
-Initializes variables needed by the class.
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            dynpmc_TclString = pmc_type(INTERP,
-                string_from_literal(INTERP, "TclString"));
-        }
-    }
 
 /*
 
