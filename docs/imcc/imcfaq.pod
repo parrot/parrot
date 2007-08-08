@@ -243,9 +243,9 @@ features. You can explicitly create global variables at runtime, however,
 but currently it only works for PMC types, like so:
 
 	.sub _main
-	   .local Integer i
-	   .local Integer j
-	   i = new Integer
+	   .local pmc i
+	   .local pmc j
+	   i = new 'Integer'
 	   i = 123
 	   # Create the global
 	   global "i" = i

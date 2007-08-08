@@ -481,7 +481,7 @@ should map roughly to this PIR:
   .HLL "Perl5", "perl5_group"
   .namespace [ "Foo" ]
   .sub main :main
-    $P0 = new .PerlInt
+    $P0 = new 'PerlInt'
     $P0 = 5
     set_global "$x", $P0
   .end
@@ -504,7 +504,7 @@ subroutine that calls the store function.
   .HLL "Perl5", "perl5_group"
   .sub main :main
     # $a = 'x';
-    $P0 = new .PerlString
+    $P0 = new 'PerlString'
     $P0 = "x"
     set_global "$a", $P0
     # ${"Foo::$a"} = 5;
@@ -515,7 +515,7 @@ subroutine that calls the store function.
     $P2 = split "::", $S0
     $S0 = pop $P2
     $S0 = "$" . $S0
-    $P3 = new .PerlInt
+    $P3 = new 'PerlInt'
     $P3 = 5
     set_global $P2, $S0, $P3
   .end
