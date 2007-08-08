@@ -31,8 +31,8 @@ Functions are very similar to ops, so handle them similarly here.
     clear_eh
     
     .local pmc b
-    $I0 = typeof a
-    b = new $I0
+    $S0 = typeof a
+    b = new $S0
     b = abs a
     .return(b)
 
