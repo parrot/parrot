@@ -27,7 +27,7 @@
 static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
     const char * const sourcefile) );
 
-static void determine_output_file_type(PARROT_INTERP, 
+static void determine_output_file_type(PARROT_INTERP,
     NOTNULL(int *obj_file),
     NOTNULL(const char * const output_file) );
 
@@ -676,7 +676,7 @@ static void determine_input_file_type(PARROT_INTERP,
     }
 }
 
-static void determine_output_file_type(PARROT_INTERP, 
+static void determine_output_file_type(PARROT_INTERP,
                                        NOTNULL(int *obj_file),
                                        NOTNULL(const char * const output_file))
 {
