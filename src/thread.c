@@ -548,7 +548,7 @@ C<arg> should be an array of arguments for the subroutine.
 PMC *
 pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, PMC *sub)
 {
-#if THREAD_DEBUG
+#if defined THREAD_DEBUG && THREAD_DEBUG
     PIO_eprintf(s, "copying over subroutine [%Ss]\n",
         Parrot_full_sub_name(s, sub));
 #endif
