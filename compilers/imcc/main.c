@@ -27,8 +27,9 @@
 static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
     const char * const sourcefile) );
 
-static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
-    const char * const output_file) );
+static void determine_output_file_type(PARROT_INTERP, 
+    NOTNULL(int *obj_file),
+    NOTNULL(const char * const output_file) );
 
 static void do_pre_process( PARROT_INTERP )
         __attribute__nonnull__(1);
@@ -675,7 +676,8 @@ static void determine_input_file_type(PARROT_INTERP,
     }
 }
 
-static void determine_output_file_type(PARROT_INTERP,
+static void determine_output_file_type(PARROT_INTERP, 
+                                       NOTNULL(int *obj_file),
                                        NOTNULL(const char * const output_file))
 {
     const char * const ext = strrchr(output_file, '.');
@@ -688,7 +690,7 @@ static void determine_output_file_type(PARROT_INTERP,
         load_pbc  = 1;
         write_pbc = 0;
         run_pbc   = 1;
-        obj_file  = 1;
+        *obj_file  = 1;
         Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
         IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
@@ -791,7 +793,7 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
     /* Do we need to produce an output file? If so, what type? */
     obj_file = 0;
     if (output_file) {
-        determine_output_file_type(interp, output_file);
+        determine_output_file_type(interp, &obj_file, output_file);
 
         if (!strcmp(sourcefile, output_file) && strcmp(sourcefile, "-"))
             IMCC_fatal_standalone(interp, 1,
