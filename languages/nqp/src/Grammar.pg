@@ -40,6 +40,7 @@ rule statement_list {
 ##  or an expression.  Any statement termination is handled by
 ##  the calling rule.
 rule statement {
+    | <if_statement> {*}                                   #= if_statement
     | <block> {*}                                          #= block
     | <EXPR> {*}                                           #= EXPR
 }
@@ -63,6 +64,16 @@ token statement_end {
             .return (1)
             end:
         }} <fail>
+}
+
+
+##  The if_statement handles conditional statements such as 'if' and
+##  'unless'.
+
+rule if_statement {
+    $<sym>:=['if'|'unless'] <EXPR> <block>
+    [ 'else' <block> ]?
+    {*}
 }
 
 

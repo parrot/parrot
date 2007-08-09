@@ -64,6 +64,36 @@
 .end
 
 
+##    method if_statement($/) {
+##        my $past := PAST::Op.new($($<EXPR>),
+##                                 $($<block>[0]),
+##                                 pasttype => $<sym>,
+##                                 node => $/);
+##        if ($<block>[1]) {
+##            $past.push($(<block>[1]));
+##        }
+##        return $past;
+.sub 'if_statement' :method
+    .param pmc match
+    .local pmc block, past
+    $P0 = match['EXPR']
+    $P0 = $P0.'get_scalar'()
+    block = match['block']
+    $P1 = block[0]
+    $P1 = $P1.'get_scalar'()
+    $P2 = getclass 'PAST::Op'
+    $S1 = match['sym']
+    past = $P2.'new'($P0, $P1, 'pasttype'=>$S1, 'node'=>match)
+    $I0 = exists block[1]
+    unless $I0 goto end
+    $P1 = block[1]
+    $P1 = $P1.'get_scalar'()
+    past.'push'($P1)
+  end:
+    .return (past)
+.end
+
+
 ##    method block($/, $key) {
 ##        return PAST::Block.new($($<statement_list>),
 ##                               blocktype => 'immediate',
