@@ -65,20 +65,19 @@
 
 
 ##    method block($/, $key) {
-##        if ($key eq 'endstmt') { $!endstmt := $/.to().clone() }
-##        return PAST::Block($($<statement_list>),
-##                           node => $/,
-##                          );
+##        return PAST::Block.new($($<statement_list>),
+##                               blocktype => 'immediate',
+##                               node => $/
+##                              );
 ##    }
 .sub 'block' :method
     .param pmc match
     .param string key
-    .local pmc cpast, past
+    .local pmc cpast
     $P0 = match['statement_list']
     cpast = $P0.'get_scalar'()
     $P0 = getclass 'PAST::Block'
-    past = $P0.'new'(cpast, 'node'=>match)
-    .return (past)
+    .return $P0.'new'(cpast, 'blocktype'=>'immediate', 'node'=>match)
 .end
 
 
