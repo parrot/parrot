@@ -67,7 +67,7 @@ CLEANUPS = \
   src/Grammar_gen.pir \
 
 
-clean: 
+clean:
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean

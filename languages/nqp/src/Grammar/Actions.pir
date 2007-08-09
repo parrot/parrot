@@ -10,7 +10,7 @@
 
 
 ##    method TOP($/) {
-##        return PAST::Block.new($($<statement_list>), 
+##        return PAST::Block.new($($<statement_list>),
 ##                               node => $/,
 ##                               name => 'anon',
 ##                               );
@@ -54,7 +54,7 @@
 
 
 ##    method statement($/, $key) {
-##        return $(${$key});
+##        return $($/{$key});
 ##    }
 .sub 'statement' :method
     .param pmc match
@@ -197,7 +197,7 @@
     $P0 = getclass 'PAST::Val'
     .return $P0.'new'('node'=>match, 'value'=>value)
 .end
-    
+
 
 ##    method number($/, $key?) {
 ##        return PAST::Val.new(node=>$/, name=>~$/, vtype=>"Integer");
