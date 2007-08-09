@@ -49,7 +49,7 @@ Create a new, invalid handle to a running thread.
 
 /*
 
-=item C<void init_pmc(PMC* tid)>
+=item C<void init_pmc(PMC *tid)>
 
 Create a new running thread referring to the thread with
 the Thread ID specified in C<tid>.
@@ -58,7 +58,7 @@ the Thread ID specified in C<tid>.
 
 */
 
-    void init_pmc(PMC* tid) {
+    void init_pmc(PMC *tid) {
         PMC_int_val(SELF) = VTABLE_get_integer(INTERP, tid);
     }
 
@@ -89,14 +89,14 @@ Change the thread ID we refer to to C<new_tid>.
     }
 /*
 
-=item C<METHOD PMC* join()>
+=item C<METHOD PMC *join()>
 
 Join the thread, returning whatever its main method returns.
 
 =cut
 
 */
-    METHOD PMC* join() {
+    METHOD PMC *join() {
         PMC *ret;
         ret = pt_thread_join(INTERP, PMC_int_val(SELF));
         PMC_int_val(SELF) = -1; /* invalidate self */

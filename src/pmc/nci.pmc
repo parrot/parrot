@@ -27,7 +27,7 @@ pmclass NCI need_ext {
 
 /*
 
-=item C<METHOD PMC* get_multisig()>
+=item C<METHOD PMC *get_multisig()>
 
 Return the MMD signature PMC, if any or a Null PMC.
 
@@ -35,13 +35,13 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 */
 
-    METHOD PMC* get_multisig() {
+    METHOD PMC *get_multisig() {
         return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
     }
 
 /*
 
-=item C<METHOD PMC* set_raw_nci_ptr(void *func)>
+=item C<METHOD PMC *set_raw_nci_ptr(void *func)>
 
 Sets the specified function pointer and raw flag.
 
@@ -111,8 +111,8 @@ Creates and returns a clone of the NCI.
 
 */
 
-    PMC* clone() {
-        PMC* const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+    PMC *clone() {
+        PMC * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret) = NULL;
         /* FIXME if data is malloced (JIT/i386!) then we need
@@ -150,7 +150,7 @@ shifted down.
 
 */
 
-    opcode_t* invoke(void * next) {
+    opcode_t *invoke(void *next) {
         typedef INTVAL(*nci_sub_t)(PARROT_INTERP, PMC *);
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)

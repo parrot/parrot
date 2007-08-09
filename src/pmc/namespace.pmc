@@ -123,7 +123,7 @@ Frees the namespace info struct.
 
 /*
 
-=item C<PMC* get_class()>
+=item C<PMC *get_class()>
 
 Returns the class or role PMC that is associated with this namespace.
 
@@ -131,7 +131,7 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    PMC* get_class()
+    PMC *get_class()
     {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         PMC *ret_class = nsinfo->_class;
@@ -152,12 +152,12 @@ C<value> is stored too.
 If C<key> is a simple key, it works like above. If C<key> is an array
 of strings or a chained key, add all components to the namespace.
 
-=item C<PMC* get_pmc_keyed(PMC *key)>
+=item C<PMC *get_pmc_keyed(PMC *key)>
 
 Return the given namespace or PMCNULL. C<key> is either an array of
 strings, or a possibly nested key.
 
-=item C<PMC* get_pmc_keyed_str(STRING *key)>
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the NameSpace is returned.
@@ -298,7 +298,7 @@ really a public API.
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in set_pmc_keyed");
     }
 
-    PMC* get_pmc_keyed_str(STRING *key) {
+    PMC *get_pmc_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)PMC_struct_val(SELF),
                                          key);
         if (!ns)
@@ -311,7 +311,7 @@ really a public API.
         return ns;
     }
 
-    PMC* get_pmc_keyed(PMC *key) {
+    PMC *get_pmc_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
 
@@ -335,7 +335,7 @@ really a public API.
         real_exception(INTERP, NULL, E_NameError, "Invalid namespace key in get_pmc_keyed_str");
     }
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         PMC           *vtable = nsinfo->vtable;
 
@@ -347,9 +347,9 @@ really a public API.
 
 /*
 
-=item C<void* get_pointer_keyed_str(STRING *key)>
+=item C<void *get_pointer_keyed_str(STRING *key)>
 
-=item C<void* get_pointer_keyed(PMC *key)>
+=item C<void *get_pointer_keyed(PMC *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the var is returned.
@@ -360,7 +360,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 */
 
-    void* get_pointer_keyed_str(STRING *key) {
+    void *get_pointer_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)PMC_struct_val(SELF),
                                         key);
         if (PMC_IS_NULL(ns))
@@ -373,7 +373,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         return ns;
     }
 
-    void* get_pointer_keyed(PMC *key) {
+    void *get_pointer_keyed(PMC *key) {
         PMC *ns = SELF;
         STRING *part;
 
@@ -402,7 +402,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 /*
 
-=item C<STRING* get_string()>
+=item C<STRING *get_string()>
 
 Return the name of this namespace part.
 
@@ -410,7 +410,7 @@ Return the name of this namespace part.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         Parrot_NSInfo *nsinfo = PARROT_NSINFO(SELF);
         return nsinfo->name;
     }
@@ -429,7 +429,7 @@ Return the name of this namespace part.
 
 /*
 
-=item C<METHOD void PMC* add_namespace(STRING *name, PMC *namespace)>
+=item C<METHOD void PMC *add_namespace(STRING *name, PMC *namespace)>
 
 Stores the given namespace under this namespace, with the given name.  Throws
 an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
@@ -453,7 +453,7 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 /*
 
-=item C<METHOD void PMC* add_sub(STRING *name, PMC *sub)>
+=item C<METHOD void PMC *add_sub(STRING *name, PMC *sub)>
 
 Stores the given sub under this namespace, with the given name.  Throws an
 invalid type exception if C<sub> is not a Sub PMC or subclass.
@@ -476,7 +476,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 /*
 
-=item C<METHOD void PMC* add_var(STRING *name, PMC *var)>
+=item C<METHOD void PMC *add_var(STRING *name, PMC *var)>
 
 Stores the given sub under this namespace, with the given name.
 
@@ -491,7 +491,7 @@ Stores the given sub under this namespace, with the given name.
 
 /*
 
-=item C<METHOD PMC* get_name()>
+=item C<METHOD PMC *get_name()>
 
 Returns the name of the namespace as an array of strings.
 
@@ -502,7 +502,7 @@ Returns the name of the namespace as an array of strings.
 
 */
 
-    METHOD PMC* get_name() {
+    METHOD PMC *get_name() {
         PMC *ar, *ns;
 
         ar = pmc_new(INTERP, enum_class_ResizableStringArray);
@@ -520,7 +520,7 @@ Returns the name of the namespace as an array of strings.
     }
 /*
 
-=item C<METHOD PMC* find_namespace(STRING* name)>
+=item C<METHOD PMC *find_namespace(STRING *name)>
 
 Return the namespace with the given name.
 
@@ -528,7 +528,7 @@ Return the namespace with the given name.
 
 */
 
-    METHOD PMC* find_namespace(STRING* key) {
+    METHOD PMC *find_namespace(STRING *key) {
         STRING *s_ns = CONST_STRING(INTERP, "NameSpace");
         PMC    *ns   = (PMC *)parrot_hash_get(INTERP,
                                 (Hash *)PMC_struct_val(SELF), key);
@@ -545,7 +545,7 @@ Return the namespace with the given name.
 
 /*
 
-=item C<METHOD PMC* find_sub(STRING *name)>
+=item C<METHOD PMC *find_sub(STRING *name)>
 
 Return the Sub PMC with the given name.
 
@@ -553,7 +553,7 @@ Return the Sub PMC with the given name.
 
 */
 
-    METHOD PMC* find_sub(STRING *key) {
+    METHOD PMC *find_sub(STRING *key) {
         STRING *s_sub = CONST_STRING(INTERP, "Sub");
         PMC    *sub   = (PMC *)parrot_hash_get(INTERP,
                             (Hash *)PMC_struct_val(SELF), key);
@@ -570,7 +570,7 @@ Return the Sub PMC with the given name.
 
 /*
 
-=item C<METHOD PMC* find_var(STRING *name)>
+=item C<METHOD PMC *find_var(STRING *name)>
 
 Return the PMC with the given name.
 
@@ -578,7 +578,7 @@ Return the PMC with the given name.
 
 */
 
-    METHOD PMC* find_var(STRING *key) {
+    METHOD PMC *find_var(STRING *key) {
         PMC *val = (PMC *)parrot_hash_get(INTERP,
                     (Hash *)PMC_struct_val(SELF), key);
 
@@ -590,7 +590,7 @@ Return the PMC with the given name.
 
 /*
 
-=item C<METHOD PMC* del_namespace(STRING *name)>
+=item C<METHOD PMC *del_namespace(STRING *name)>
 
 Deletes the contained NameSpace PMC with the given name.  Throws an invalid
 type exception if the item to delete is not a NameSpace PMC or subclass, and
@@ -624,7 +624,7 @@ does not delete the PMC.
 
 /*
 
-=item C<METHOD PMC* del_sub(STRING *name)>
+=item C<METHOD PMC *del_sub(STRING *name)>
 
 Deletes the contained Sub PMC with the given name.  Throws an invalid type
 exception if the item to delete is not a Sub PMC or subclass, and does not
@@ -656,7 +656,7 @@ delete the PMC.
 
 /*
 
-=item C<METHOD PMC* del_var(STRING* name)>
+=item C<METHOD PMC *del_var(STRING *name)>
 
 Deletes the contained variable-like PMC with the given name.
 
@@ -664,13 +664,13 @@ Deletes the contained variable-like PMC with the given name.
 
 */
 
-    METHOD void del_var(STRING* name) {
+    METHOD void del_var(STRING *name) {
         parrot_hash_delete(INTERP, (Hash*) PMC_struct_val(SELF), name);
     }
 
 /*
 
-=item C<METHOD PMC* get_sym(STRING* name)>
+=item C<METHOD PMC *get_sym(STRING *name)>
 
 Return the symbol (var or sub) with the given name. This can be used
 to retrieve symbols, if a NameSpace with the same name exists.
@@ -679,7 +679,7 @@ to retrieve symbols, if a NameSpace with the same name exists.
 
 */
 
-    METHOD PMC* get_sym(STRING *key) {
+    METHOD PMC *get_sym(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP,
             (Hash *)PMC_struct_val(SELF), key);
 
@@ -717,7 +717,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
 
 */
 
-    METHOD void export_to(PMC* dest, PMC* what) {
+    METHOD void export_to(PMC *dest, PMC *what) {
         STRING *s_hash  = CONST_STRING(interp, "hash");
         STRING *s_array = CONST_STRING(interp, "array");
 
@@ -806,7 +806,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
 
 /*
 
-=item C<METHOD PMC* get_parent()>
+=item C<METHOD PMC *get_parent()>
 
 Return the parent NameSpace or PMCNULL, if none.
 
@@ -814,7 +814,7 @@ Return the parent NameSpace or PMCNULL, if none.
 
 */
 
-    METHOD PMC* get_parent() {
+    METHOD PMC *get_parent() {
         return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
     }
 

@@ -34,12 +34,12 @@ files and directories.
 /* XXX Check if we need to deallocate strerror strings */
 /* XXX apparently, strerror_r is thread-safe and should be used instead.*/
 
-static PMC * OS_PMC;
+static PMC *OS_PMC;
 pmclass OS singleton {
 
 /*
 
-=item C<void* get_pointer()>
+=item C<void *get_pointer()>
 
 =item C<void set_pointer(void *ptr)>
 
@@ -50,18 +50,18 @@ information see F<src/pmc.c>.
 
 */
 
-    void* get_pointer() {
+    void *get_pointer() {
         return OS_PMC;
     }
 
-    void set_pointer(void* ptr) {
+    void set_pointer(void *ptr) {
         OS_PMC = (PMC*) ptr;
     }
 
 
 /*
 
-=item C<STRING* cwd()>
+=item C<STRING *cwd()>
 
 Returns the current working directory.
 
@@ -69,7 +69,7 @@ Returns the current working directory.
 
 */
 
-    METHOD STRING* cwd() {
+    METHOD STRING *cwd() {
         char *cwd;
 #ifdef _MSC_VER
         cwd = _getcwd(NULL, 0);
@@ -121,7 +121,7 @@ Changes the current working directory to the one specified by C<path>.
 
 /*
 
-=item C<void rm(STRING* path)>
+=item C<void rm(STRING *path)>
 
 Calls C<remove> to remove the file or empty directory specified by
 C<path>.
@@ -163,7 +163,7 @@ C<path>.
 
 /*
 
-=item C<void mkdir(STRING* path, STRING* mode)>
+=item C<void mkdir(STRING *path, STRING *mode)>
 
 Creates a directory specified by C<path> with mode C<mode>.
 
@@ -189,7 +189,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 
 /*
 
-=item C<fixedpmcarray* stat(STRING* path)>
+=item C<fixedpmcarray *stat(STRING *path)>
 
 Stats a file, and returns a 13 position array as in Perl:
 
@@ -213,7 +213,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 */
 
-    METHOD PMC* stat(STRING *path) {
+    METHOD PMC *stat(STRING *path) {
         struct stat info;
         PMC *array;
 
@@ -263,7 +263,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 /*
 
-=item C<fixedpmcarray* lstat(STRING* path)>
+=item C<fixedpmcarray *lstat(STRING *path)>
 
 Stats a file, and returns a 13 position array as in Perl:
 
@@ -287,7 +287,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 */
 
-    METHOD PMC* lstat(STRING *path) {
+    METHOD PMC *lstat(STRING *path) {
         struct stat info;
         PMC *array;
 
@@ -341,7 +341,7 @@ Stats a file, and returns a 13 position array as in Perl:
 
 /*
 
-=item C<void symlink(STRING* from, STRING *to)>
+=item C<void symlink(STRING *from, STRING *to)>
 
 Creates a symlink, where available
 
@@ -368,7 +368,7 @@ Creates a symlink, where available
 
 /*
 
-=item C<void link(STRING* from, STRING *to)>
+=item C<void link(STRING *from, STRING *to)>
 
 Creates a hard link, where available(?)
 
@@ -416,7 +416,7 @@ previous one).
 
 /*
 
-=item C<INTVAL chroot(STRING* path)>
+=item C<INTVAL chroot(STRING *path)>
 
 it makes the named directory the new root directory for all further
 pathnames that begin with a "/" by your process and all its children.
@@ -428,7 +428,7 @@ idea to do the same with parrot.
 
 */
 
-    METHOD void chroot(STRING* path) {
+    METHOD void chroot(STRING *path) {
 #ifndef WIN32
         char *cpath = string_to_cstring(interp, path);
         int error = chroot(cpath);
@@ -446,14 +446,14 @@ idea to do the same with parrot.
 
 /*
 
-=item C<PMC* readdir(STRING* path)>
+=item C<PMC *readdir(STRING *path)>
 
 reads entries from a directory.
 
 =cut
 
 */
-    METHOD PMC* readdir(STRING* path) {
+    METHOD PMC *readdir(STRING *path) {
 #ifndef _MSC_VER
         DIR *dir ;
         struct dirent *dirent;
@@ -485,14 +485,14 @@ reads entries from a directory.
 #endif
     }
 /*
-=item C<rename(STRING* oldpath, STRING* newpath)>
+=item C<rename(STRING *oldpath, STRING *newpath)>
 
 This method is a wrapper for rename(2). On error a SystemError exception is
 thrown.
 
 =cut
 */
-    METHOD void rename(STRING* oldpath, STRING* newpath) {
+    METHOD void rename(STRING *oldpath, STRING *newpath) {
         char *coldpath = string_to_cstring(interp, oldpath);
         char *cnewpath = string_to_cstring(interp, newpath);
         int ret;

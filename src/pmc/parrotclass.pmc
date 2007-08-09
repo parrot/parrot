@@ -74,7 +74,7 @@ get_init_meth(PARROT_INTERP, PMC *_class, STRING *prop_str, NOTNULL(STRING **met
 }
 
 static void
-do_initcall(PARROT_INTERP, PMC* _class, PMC *object, PMC *init)
+do_initcall(PARROT_INTERP, PMC *_class, PMC *object, PMC *init)
 {
     PMC * const classsearch_array = _class->vtable->mro;
     INTVAL      i, nparents;
@@ -186,7 +186,7 @@ Initializes the class flags.
 =item C<void init_pmc(PMC *init)>
 
 The actual class creation code, called from C<newclass> opcode. The C<init>
-argument is not a PMC* but the C<classname> STRING.
+argument is not a PMC *but the C<classname> STRING.
 
 =cut
 
@@ -199,12 +199,12 @@ argument is not a PMC* but the C<classname> STRING.
         PObj_is_class_SET(SELF);
         /* turn on marking of the class_data array */
         PObj_data_is_PMC_array_SET(SELF);
-        /* turn on custom destruction since our PMC* array is
+        /* turn on custom destruction since our PMC *array is
            dynamically allocated */
         PObj_active_destroy_SET(SELF);
     }
 
-    void init_pmc(PMC* name) {
+    void init_pmc(PMC *name) {
         SELF.init();
         Parrot_new_class(INTERP, SELF, name);
     }
@@ -226,7 +226,7 @@ Free the class's attribute array, if any. Also used by ParrotObjects.
 
 /*
 
-=item C<PMC* instantiate(PMC* init)>
+=item C<PMC *instantiate(PMC *init)>
 
 Creates a new PMC object of the type of the class and calls init().
 
@@ -234,7 +234,7 @@ Creates a new PMC object of the type of the class and calls init().
 
 */
 
-    PMC* instantiate(PMC* init) {
+    PMC *instantiate(PMC *init) {
         SLOTTYPE    *new_object_array;
         INTVAL       attrib_count, i;
         const INTVAL type   = SELF->vtable->base_type;
@@ -283,7 +283,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    INTVAL isa(STRING* classname) {
+    INTVAL isa(STRING *classname) {
         PMC *_class;
         if (SUPER(classname))
             return 1;
@@ -298,7 +298,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 Return SELF.
 
-=item C<STRING* name()>
+=item C<STRING *name()>
 
 Return the classname.
 
@@ -306,11 +306,11 @@ Return the classname.
 
 */
 
-    PMC* get_class() {
+    PMC *get_class() {
         return SELF;
     }
 
-    STRING* name() {
+    STRING *name() {
         PMC **class_data, *name;
         class_data = (PMC **)PMC_data(SELF);
 
@@ -503,7 +503,7 @@ Create the class from the thawed parents and attributes array.
 
 /*
 
-=item C<METHOD PMC* get_parents()>
+=item C<METHOD PMC *get_parents()>
 
 Returns the array of parents for this class.
 
@@ -511,7 +511,7 @@ Returns the array of parents for this class.
 
 */
 
-    METHOD PMC* get_parents() {
+    METHOD PMC *get_parents() {
         PMC *_class;
         PMC **class_data;
 

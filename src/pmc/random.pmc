@@ -22,7 +22,7 @@ This is a singleton (monadic) class - only one instance exists.
 
 #include "parrot/parrot.h"
 
-static PMC * Rand_PMC;
+static PMC *Rand_PMC;
 
 pmclass Random singleton {
 
@@ -34,7 +34,7 @@ pmclass Random singleton {
 
 */
 
-void* get_pointer() {
+void *get_pointer() {
         return Rand_PMC;
     }
 
@@ -49,7 +49,7 @@ information see F<src/pmc.c>.
 
 */
 
-    void set_pointer(void* ptr) {
+    void set_pointer(void *ptr) {
         PARROT_ASSERT(!Rand_PMC);
         Rand_PMC = (PMC*) ptr;
     }

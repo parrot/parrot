@@ -74,8 +74,8 @@ Creates and returns a clone of the library.
 
 */
 
-    PMC* clone() {
-        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+    PMC *clone() {
+        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         PMC_data(dest) = PMC_data(SELF);
         if (PMC_metadata(SELF)) {
@@ -100,7 +100,7 @@ Returns whether a library has been successfully loaded.
 
 /*
 
-=item C<STRING* get_string()>
+=item C<STRING *get_string()>
 
 Returns the name of the loaded library.
 
@@ -108,7 +108,7 @@ Returns the name of the loaded library.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         PMC *prop;
         STRING *key;
         key = const_string(INTERP, "_filename");

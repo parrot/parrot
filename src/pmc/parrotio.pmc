@@ -24,7 +24,7 @@ These are the vtable functions for Parrot IO.
 #include "../src/io/io_private.h"
 
 #ifdef PARROT_HAS_READLINE
-extern char* readline(const char*);
+extern char *readline(const char*);
 void add_history(const char*);
 #endif
 
@@ -50,7 +50,7 @@ class method.
     }
 /*
 
-=item C<METHOD PMC* open(STRING* file, STRING *mode, STRING* layer)>
+=item C<METHOD PMC *open(STRING *file, STRING *mode, STRING *layer)>
 
 Opens the file with the given mode, using the given IO layer.
 
@@ -58,7 +58,7 @@ Opens the file with the given mode, using the given IO layer.
 
 */
 
-    METHOD PMC* open(STRING* file, STRING *mode, STRING* layer) {
+    METHOD PMC *open(STRING *file, STRING *mode, STRING *layer) {
         ParrotIOLayer *l;
         char *c_file, *c_mode, *c_layer;
         PMC *pio;
@@ -136,7 +136,7 @@ old interactive setting
 
 =back
 
-=item C<METHOD PMC* readline(STRING* prompt)>
+=item C<METHOD PMC *readline(STRING *prompt)>
 
 Reads a line from the given PIO. If readline is interactive and a prompt
 is not empty, it will be displayed. The interactive feature is not
@@ -187,7 +187,7 @@ SYNOPSIS
 #endif
     }
 
-    METHOD PMC* readline(STRING* prompt) {
+    METHOD PMC *readline(STRING *prompt) {
         ParrotIO *io = (ParrotIO *)PMC_data(SELF);
         PMC *pmc_res = NULL;
         STRING *res = NULL;
@@ -235,7 +235,7 @@ SYNOPSIS
 
 /*
 
-=item METHOD STRING* slurp(STRING* name);
+=item METHOD STRING *slurp(STRING *name);
 
 Slurp an (existing, disc) file named I<name> into a STRING result.
 
@@ -260,13 +260,13 @@ This does B<not> close the file.
 
 */
 
-    METHOD STRING* slurp(STRING* name) {
-        STRING* result;
+    METHOD STRING *slurp(STRING *name) {
+        STRING *result;
         if (!PMC_data0(SELF)) {
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interp, name);
             INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
-            PMC* pio = PIO_open(INTERP, NULL, path, "<");
+            PMC *pio = PIO_open(INTERP, NULL, path, "<");
             string_cstring_free(path);
             /* TODO handle stdin */
             result = PIO_reads(INTERP, pio, size);
@@ -372,7 +372,7 @@ Destroys the IO PMC, flushing and closing as necessary.
 
 /*
 
-=item C<PMC* clone()>
+=item C<PMC *clone()>
 
 Clones the IO PMC.
 
@@ -383,8 +383,8 @@ IO layers, we might copy C<data> and C<struct_val>.
 
 */
 
-    PMC* clone() {
-        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+    PMC *clone() {
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_data(dest) = PMC_data(SELF);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         return dest;
@@ -406,7 +406,7 @@ Returns whether at C<EOF> or not.
 
 /*
 
-=item C<STRING* get_string_keyed_int(INTVAL n)>
+=item C<STRING *get_string_keyed_int(INTVAL n)>
 
 Returns the name of the nth layer. B<n> >= 0 returns layer names up from the
 bottom.  If B<n> is negative, returns layer names from top down. For
@@ -416,7 +416,7 @@ non-existent layers, returns an empty string.
 
 */
 
-    STRING* get_string_keyed_int(INTVAL n) {
+    STRING *get_string_keyed_int(INTVAL n) {
         ParrotIO *io = (ParrotIO *)PMC_data(SELF);
         ParrotIOLayer *layer;
         if (!io)
@@ -441,11 +441,11 @@ non-existent layers, returns an empty string.
     }
 /*
 
-=item C<void push_string(STRING* value)>
+=item C<void push_string(STRING *value)>
 
 Pushes the layer name C<value> onto the PIO's layer stack.
 
-=item C<STRING* pop_string()>
+=item C<STRING *pop_string()>
 
 Pops a layer off the PIO's layer stack and returns its name.
 
@@ -453,11 +453,11 @@ Pops a layer off the PIO's layer stack and returns its name.
 
 */
 
-    void push_string(STRING* value) {
+    void push_string(STRING *value) {
         PIO_push_layer_str(INTERP, SELF, value);
     }
 
-    STRING* pop_string() {
+    STRING *pop_string() {
         return PIO_pop_layer_str(INTERP, SELF);
     }
 

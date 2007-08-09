@@ -240,7 +240,7 @@ C<init_data>.
         role->attrib_metadata = pmc_new(interp, enum_class_Hash);
     }
 
-    void init_pmc(PMC* init_data) {
+    void init_pmc(PMC *init_data) {
         /* Create the role. */
         SELF.init();
 
@@ -388,7 +388,7 @@ composed into this role.
 
 */
 
-    PMC* inspect_str(STRING *what) {
+    PMC *inspect_str(STRING *what) {
         Parrot_Role *role  = PARROT_ROLE(SELF);
 
         /* What should we return? */
@@ -432,7 +432,7 @@ inspect_str.
 
 */
 
-    PMC* inspect() {
+    PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
         PMC *metadata = pmc_new(interp, enum_class_Hash);
@@ -529,7 +529,7 @@ providing a set of key/value pairs describing the attribute.
 
 =item C<PCCMETHOD
     add_attribute(STRING *attribute_name,
-            PMC* attribute_type :optional, int got_type :opt_flag)>
+            PMC *attribute_type :optional, int got_type :opt_flag)>
 
 Add an attribute to the role. Requires a name and, optionally, a type.
 
@@ -537,7 +537,7 @@ Add an attribute to the role. Requires a name and, optionally, a type.
 
 */
     PCCMETHOD add_attribute(STRING *attribute_name,
-            PMC* attribute_type :optional, int got_type :opt_flag) {
+            PMC *attribute_type :optional, int got_type :opt_flag) {
         VTABLE_add_attribute(interp, SELF, attribute_name,
             got_type ? attribute_type : PMCNULL);
     }
@@ -593,10 +593,10 @@ Return the roles array PMC.
 /*
 
 =item C<PCCMETHOD
-    add_role(PMC* role,
-            PMC* exclude_method :optional :named["exclude_method"],
+    add_role(PMC *role,
+            PMC *exclude_method :optional :named["exclude_method"],
             int got_exclude_method :opt_flag,
-            PMC* alias_method :optional :named["alias_method"],
+            PMC *alias_method :optional :named["alias_method"],
             int got_alias_method :opt_flag)>
 
 Compose the given role into this one, using the given exclusions and aliases.
@@ -604,10 +604,10 @@ Compose the given role into this one, using the given exclusions and aliases.
 =cut
 
 */
-    PCCMETHOD add_role(PMC* role,
-            PMC* exclude_method :optional :named["exclude_method"],
+    PCCMETHOD add_role(PMC *role,
+            PMC *exclude_method :optional :named["exclude_method"],
             int got_exclude_method :opt_flag,
-            PMC* alias_method :optional :named["alias_method"],
+            PMC *alias_method :optional :named["alias_method"],
             int got_alias_method :opt_flag) {
         Parrot_Role *role_info = PARROT_ROLE(SELF);
         STRING *s_name, *r_name;

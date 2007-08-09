@@ -60,7 +60,7 @@ Returns the queue itself. No copy is made.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         /* XXX fake a shared PMC */
         return SELF;
     }
@@ -213,7 +213,7 @@ Removes the first thread from the start of the queue.
 
 */
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         QUEUE_ENTRY *entry;
         QUEUE       *queue = PMC_data_typed(SELF, QUEUE *);
         PMC         *ret;

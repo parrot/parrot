@@ -248,7 +248,7 @@ Sets C<struct_val> to C<*value>.
 
 */
 
-    void set_pointer(void* value) {
+    void set_pointer(void *value) {
         PMC_struct_val(SELF) = value;
     }
 
@@ -262,7 +262,7 @@ Returns C<struct_val>.
 
 */
 
-    void* get_pointer() {
+    void *get_pointer() {
         return PMC_struct_val(SELF);
     }
 
@@ -291,8 +291,8 @@ Returns the thread id of the interpreter.
 
     */
 
-        opcode_t* invoke(void *next) {
-            Interp * new_interp =
+        opcode_t *invoke(void *next) {
+            Interp *new_interp =
                 (Interp *)PMC_data(SELF);
             /*
              * setup code
@@ -322,8 +322,8 @@ Returns the thread id of the interpreter.
 
     */
 
-        PMC* get_pmc_keyed_int(INTVAL key) {
-            Interp * new_interp =
+        PMC *get_pmc_keyed_int(INTVAL key) {
+            Interp *new_interp =
                 (Interp *)PMC_data(SELF);
             if (key >= 0 && key < IGLOBALS_SIZE)
                 return VTABLE_get_pmc_keyed_int(new_interp,
@@ -336,7 +336,7 @@ Returns the thread id of the interpreter.
 
     /*
 
-    =item C<PMC *get_pmc_keyed(PMC* key)>
+    =item C<PMC *get_pmc_keyed(PMC *key)>
 
     Introspection interface. C<key> can be:
 
@@ -355,9 +355,9 @@ Returns the thread id of the interpreter.
 
     */
 
-        PMC* get_pmc_keyed(PMC * key) {
+        PMC *get_pmc_keyed(PMC *key) {
             int level = 0;
-            PMC* nextkey;
+            PMC *nextkey;
             STRING *item, *s, *outer;
             parrot_context_t *ctx;
             PMC *cont;
@@ -434,7 +434,7 @@ Returns the thread id of the interpreter.
     */
 
         INTVAL get_integer_keyed_int(INTVAL key) {
-            Interp * new_interp =
+            Interp *new_interp =
                 (Interp *)PMC_data(SELF);
             switch (key) {
                 case -1:
@@ -455,7 +455,7 @@ Returns the thread id of the interpreter.
     */
 
         void set_integer_keyed_int(INTVAL key, INTVAL val) {
-            Interp * new_interp =
+            Interp *new_interp =
                 (Interp *)PMC_data(SELF);
             INTVAL allowed;
 
@@ -486,8 +486,8 @@ Returns the thread id of the interpreter.
 
     */
 
-        PMC* clone() {
-            PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *clone() {
+            PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
 
             clone_interpreter((Parrot_Interp)PMC_data(dest),
                               (Parrot_Interp)PMC_data(SELF), PARROT_CLONE_DEFAULT);

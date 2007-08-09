@@ -32,8 +32,8 @@ Creates and returns a clone of the list.
 
 */
 
-    PMC* clone() {
-        PMC* const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+    PMC *clone() {
+        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_struct_val(dest) = intlist_clone(INTERP,
                                              (IntList *) PMC_struct_val(SELF));
@@ -96,7 +96,7 @@ Sets C<value> at index C<*key>.
 
 */
 
-    void set_integer_keyed(PMC* key, INTVAL value) {
+    void set_integer_keyed(PMC *key, INTVAL value) {
         INTVAL ix;
 
         if (!key) return;
@@ -146,7 +146,7 @@ Returns the value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC* key) {
+    INTVAL get_integer_keyed(PMC *key) {
         INTVAL ix;
         if (!key) return 0;
         ix = key_integer(INTERP, key);
@@ -211,7 +211,7 @@ Removes and returns the first element in the list.
         return intlist_shift(INTERP, list);
     }
 
-    void splice(PMC* value, INTVAL offset, INTVAL count) {
+    void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
             real_exception(INTERP, NULL, E_TypeError,
                     "Type mismatch in splice");
@@ -219,7 +219,7 @@ Removes and returns the first element in the list.
             (List *)PMC_struct_val(value), offset, count);
     }
 
-    PMC* slice(PMC* key, INTVAL f) {
+    PMC *slice(PMC *key, INTVAL f) {
         switch (f) {
             case 0:
                 {
@@ -233,7 +233,7 @@ Removes and returns the first element in the list.
                 "IntList: Unknown slice type");
     }
 
-    PMC* get_iter() {
+    PMC *get_iter() {
         PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC * const key =  pmc_new(INTERP, enum_class_Key);
 

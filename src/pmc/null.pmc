@@ -45,7 +45,7 @@ Overrides the default to do nothing.
         PMCNULL = (PMC *)p;
     }
 
-    INTVAL does(STRING* what) {
+    INTVAL does(STRING *what) {
         /* XXX maybe a hack to get TGE running again */
         return 0;
     }

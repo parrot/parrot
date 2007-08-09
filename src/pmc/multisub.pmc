@@ -24,7 +24,7 @@ Sub PMCs with the same short name, but different long names.
 
 pmclass MultiSub extends ResizablePMCArray need_ext does array {
 
-    void push_pmc(PMC* value) {
+    void push_pmc(PMC *value) {
         STRING * const _sub = CONST_STRING(interp, "Sub");
         STRING * const _nci = CONST_STRING(interp, "NCI");
         if (!VTABLE_isa(interp, value, _sub) &&
@@ -34,7 +34,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
         SUPER(value);
     }
 
-    void set_pmc_keyed_int(INTVAL key, PMC* value) {
+    void set_pmc_keyed_int(INTVAL key, PMC *value) {
         STRING *_sub = CONST_STRING(interp, "Sub");
         if (!VTABLE_isa(interp, value, _sub))
             real_exception(interp, NULL, E_TypeError,
@@ -47,7 +47,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
                 "attempt to set non Sub PMC");
     }
 
-    void set_string_keyed_int(INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING *value) {
         real_exception(interp, NULL, E_TypeError,
                 "attempt to set non Sub PMC");
     }
@@ -57,7 +57,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
                 "attempt to set non Sub PMC");
     }
 
-    opcode_t* invoke(void *next) {
+    opcode_t *invoke(void *next) {
         PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
         PMC * const func =
             PMC_IS_NULL(list)

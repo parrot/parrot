@@ -55,7 +55,7 @@ Creates and returns a clone of the key.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC *dkey = dest;
         PMC *key = SELF;
@@ -145,7 +145,7 @@ Returns the Parrot string value of the key.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         return key_string(INTERP, SELF);
     }
 
@@ -159,7 +159,7 @@ Returns the PMC value of the key.
 
 */
 
-    PMC* get_pmc() {
+    PMC *get_pmc() {
         return key_pmc(INTERP, SELF);
     }
 
@@ -198,7 +198,7 @@ Sets the value of the key to C<value>.
 
 */
 
-    void set_string_native(STRING* value) {
+    void set_string_native(STRING *value) {
         key_set_string(INTERP, SELF, value);
     }
 
@@ -212,7 +212,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    void set_pmc(PMC* value) {
+    void set_pmc(PMC *value) {
         key_set_pmc(INTERP, SELF, value);
     }
 
@@ -226,7 +226,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC * value /*NN*/) {
+    void push_pmc(PMC *value /*NN*/) {
         if (value->vtable->base_type != enum_class_Key)
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -246,7 +246,7 @@ chain.
 
 */
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         return key_next(INTERP, SELF);
     }
 
@@ -266,7 +266,7 @@ Returns the key itself.
 
 */
 
-    PMC* get_pmc_keyed(PMC* key) {
+    PMC *get_pmc_keyed(PMC *key) {
         return key;
     }
 
@@ -281,7 +281,7 @@ PMC_int_val(-1) means end of iteration.
 
 */
 
-    PMC* nextkey_keyed(PMC* agg, INTVAL what) {
+    PMC *nextkey_keyed(PMC *agg, INTVAL what) {
         const INTVAL n = VTABLE_elements(INTERP, agg);
         PMC *ret = SELF;
         STRING *_hash;

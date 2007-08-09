@@ -75,9 +75,9 @@ TODO
 */
 
     void destroy() {
-        PMC* _class;
-        PMC* meth, *ns;
-        STRING* fin;
+        PMC *_class;
+        PMC *meth, *ns;
+        STRING *fin;
 
         /* XXX have a better way to check for dead objects or classes
          */
@@ -115,7 +115,7 @@ XXX - this is bad and should go
 
 */
 
-    STRING* name() {
+    STRING *name() {
         PMC *_class = VTABLE_get_class(INTERP, SELF);
         return VTABLE_name(INTERP, _class);
     }
@@ -127,11 +127,11 @@ XXX - this is bad and should go
 
 Finds the method for C<*name>.
 
-=item C<PMC* get_attr(INTVAL idx)>
+=item C<PMC *get_attr(INTVAL idx)>
 
 Return attribute number C<idx>.
 
-=item C<PMC* get_attr_str(STRING *name)>
+=item C<PMC *get_attr_str(STRING *name)>
 
 Return attribute named C<name>.
 
@@ -151,7 +151,7 @@ Return the class of this object.
 
 */
 
-    PMC* find_method(STRING *name) {
+    PMC *find_method(STRING *name) {
         STRING *meth   = CONST_STRING(interp, "find_method");
         PMC    *_class = VTABLE_get_class(INTERP, SELF);
         PMC    *sub    = Parrot_find_vtable_meth(interp, SELF, meth);
@@ -162,7 +162,7 @@ Return the class of this object.
             SELF, meth, "PS", name);
     }
 
-    PMC* get_attr(INTVAL idx) {
+    PMC *get_attr(INTVAL idx) {
         STRING *meth = CONST_STRING(interp, "get_attr");
         PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
 
@@ -172,7 +172,7 @@ Return the class of this object.
             SELF, meth, "PI", idx);
     }
 
-    PMC* get_attr_str(STRING *idx) {
+    PMC *get_attr_str(STRING *idx) {
         STRING *meth = CONST_STRING(interp, "get_attr_str");
         PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
 
@@ -205,7 +205,7 @@ Return the class of this object.
                 "vSP", idx, value);
     }
 
-    PMC* get_class() {
+    PMC *get_class() {
         STRING *meth = CONST_STRING(interp, "get_class");
         PMC    *sub  = Parrot_find_vtable_meth(interp, SELF, meth);
         int     type_num;
@@ -240,9 +240,9 @@ Return the class of this object.
 
 =item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
-=item C<void set_string_keyed_int(INTVAL key, STRING* value)>
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
 
-=item C<void set_pmc_keyed_int(INTVAL key, PMC* value)>
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
 
 =item C<void delete_keyed_int(INTVAL key)>
 
@@ -307,7 +307,7 @@ it's just SUPER aka the default implementation.
                                                pmc, meth, "NI", key);
     }
 
-    STRING* get_string_keyed_int(INTVAL key) {
+    STRING *get_string_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(INTERP, "get_string_keyed_int");
         PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
 
@@ -330,7 +330,7 @@ it's just SUPER aka the default implementation.
                                                    pmc, meth, "SI", key);
     }
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         STRING *meth = CONST_STRING(INTERP, "get_pmc_keyed_int");
         PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
 
@@ -401,7 +401,7 @@ it's just SUPER aka the default implementation.
                                        pmc, meth, "vIN", key, value);
     }
 
-    void set_string_keyed_int(INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING *value) {
         STRING *meth = CONST_STRING(INTERP, "set_string_keyed_int");
         PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
 
@@ -425,7 +425,7 @@ it's just SUPER aka the default implementation.
                                        pmc, meth, "vIS", key, value);
     }
 
-    void set_pmc_keyed_int(INTVAL key, PMC* value) {
+    void set_pmc_keyed_int(INTVAL key, PMC *value) {
         STRING *meth = CONST_STRING(INTERP, "set_pmc_keyed_int");
         PMC    *sub  = Parrot_find_vtable_meth(INTERP, pmc, meth);
 
@@ -519,7 +519,7 @@ it's just SUPER aka the default implementation.
                                                pmc, meth, "II", key);
     }
 
-    PMC* share_ro() {
+    PMC *share_ro() {
         PMC *ret;
         PMC *_true;
         PMC **data;

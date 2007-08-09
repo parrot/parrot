@@ -171,7 +171,7 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL size = PMC_int_val(SELF);
         if (size) {
             PMC_int_val(dest) = size;

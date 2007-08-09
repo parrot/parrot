@@ -69,7 +69,7 @@ subroutine.
                 "don't create me like this");
     }
 
-    void init_pmc(PMC* sub) {
+    void init_pmc(PMC *sub) {
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
         parrot_new_pmc_hash_x(INTERP, SELF,

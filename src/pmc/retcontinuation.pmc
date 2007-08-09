@@ -49,14 +49,14 @@ Initializes the continuation.
      */
 
     void destroy() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct Parrot_cont *cc = PMC_cont(SELF);
         if (cc)
             mem_sys_free(cc);
         PMC_struct_val(SELF) = NULL;
     }
 /*
 
-=item C<PMC* clone>
+=item C<PMC *clone>
 
 Return a new Continuation PMC with the context of SELF. Note: the
 returned object is not a RetContinuation and creating a real
@@ -67,7 +67,7 @@ the GC gets at them.
 =cut
 
 */
-    PMC* clone() {
+    PMC *clone() {
         invalidate_retc_context(INTERP, SELF);
         return SUPER();
     }
@@ -81,7 +81,7 @@ Transfers control to the calling context, and frees the current context.
 
 */
 
-    opcode_t* invoke(void *in_next) {
+    opcode_t *invoke(void *in_next) {
         struct Parrot_cont *cc        = PMC_cont(SELF);
         parrot_context_t   *from_ctx  = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;

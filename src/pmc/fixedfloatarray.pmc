@@ -88,7 +88,7 @@ Creates and returns a copy of the array.
 
     PMC *clone() {
         INTVAL size;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         if (!PMC_data(SELF))
             return dest;

@@ -28,12 +28,12 @@ from there.
 
 pmclass Undef extends default no_ro {
 
-  void set_pmc(PMC* other) {
+  void set_pmc(PMC *other) {
     VTABLE_morph(INTERP, SELF, enum_class_Ref);
     VTABLE_set_pmc(INTERP, SELF, other);
   }
 
-  void assign_pmc(PMC* other) {
+  void assign_pmc(PMC *other) {
     VTABLE_morph(INTERP, SELF, other->vtable->base_type);
     /* don't want to call set_pmc if we're assigning an Undef to an Undef */
     if (other->vtable->base_type != enum_class_Undef)
@@ -66,7 +66,7 @@ pmclass Undef extends default no_ro {
     VTABLE_set_number_native(INTERP, SELF, value);
   }
 
-  STRING* get_string() {
+  STRING *get_string() {
     return string_make_empty(INTERP,enum_stringrep_one,0);
   }
 
@@ -83,7 +83,7 @@ pmclass Undef extends default no_ro {
     /* see src/pmc/integer.pmc */
   }
 
-  PMC* share_ro() {
+  PMC *share_ro() {
     if (PObj_is_PMC_shared_TEST(SELF)) {
         return SELF;
     }
@@ -92,11 +92,11 @@ pmclass Undef extends default no_ro {
     }
   }
 
-  PMC* clone() {
+  PMC *clone() {
       return pmc_new(INTERP, SELF->vtable->base_type);
   }
 
-  INTVAL is_equal (PMC* value) {
+  INTVAL is_equal (PMC *value) {
     MMD_Undef: {
         return 1;
     }

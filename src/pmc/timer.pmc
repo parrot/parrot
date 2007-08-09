@@ -73,7 +73,7 @@ typedef enum {
 /*
 
 =item C<static void
-add_timer(Interp* interp, PMC *pmc)>
+add_timer(Interp *interp, PMC *pmc)>
 
 Adds a new timer event to the event queue.
 
@@ -82,7 +82,7 @@ Adds a new timer event to the event queue.
 */
 
 static void
-add_timer(Interp* interp, PMC *pmc)
+add_timer(Interp *interp, PMC *pmc)
 {
     const parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(pmc);
 
@@ -94,7 +94,7 @@ add_timer(Interp* interp, PMC *pmc)
 /*
 
 =item C<static void
-del_timer(Interp* interp, PMC *pmc)>
+del_timer(Interp *interp, PMC *pmc)>
 
 Deletes the timer event.
 
@@ -103,7 +103,7 @@ Deletes the timer event.
 */
 
 static void
-del_timer(Interp* interp, PMC *pmc)
+del_timer(Interp *interp, PMC *pmc)
 {
    Parrot_del_timer_event(interp, pmc);
 }
@@ -227,7 +227,7 @@ Returns the PMC associated with C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
@@ -303,7 +303,7 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC* value) {
+    void set_pmc_keyed_int(INTVAL key, PMC *value) {
         parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
 
         switch (key) {
@@ -323,7 +323,7 @@ Adds the timer to the event queue.
 
 */
 
-    opcode_t* invoke(void *next) {
+    opcode_t *invoke(void *next) {
         add_timer(INTERP, SELF);
         return (opcode_t *)next;
     }

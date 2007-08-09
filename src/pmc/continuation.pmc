@@ -82,7 +82,7 @@ Marks the continuation as live.
 */
 
     void mark() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct Parrot_cont *cc = PMC_cont(SELF);
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
         if (cc->dynamic_state)
@@ -100,7 +100,7 @@ Destroys the continuation.
 */
 
     void destroy() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct Parrot_cont *cc = PMC_cont(SELF);
         if (cc) {
 #if CTX_LEAK_DEBUG
             if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
@@ -126,7 +126,7 @@ Creates and returns a clone of the continuation.
 */
 
     PMC *clone() {
-        struct Parrot_cont * cc;
+        struct Parrot_cont *cc;
         struct Parrot_cont *cc_self = PMC_cont(SELF);
         PMC *ret = pmc_new_noinit(INTERP, enum_class_Continuation);
 
@@ -225,7 +225,7 @@ destination to continue execution.
 */
 
     opcode_t *invoke(void *next) {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct Parrot_cont *cc = PMC_cont(SELF);
         Stack_Chunk_t *stack_target = cc->dynamic_state;
         Stack_Chunk_t *corresponding_target;
         int stack_delta = 0;
@@ -425,7 +425,7 @@ Experimental: return continuation PMC of this Continuation or Undef if none.
 */
 
     METHOD PMC *continuation() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+        struct Parrot_cont *cc = PMC_cont(SELF);
         PMC *cont = cc->to_ctx->current_cont;
         if (cont)
             return cont;

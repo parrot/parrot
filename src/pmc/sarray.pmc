@@ -56,7 +56,7 @@ Currently SArray's are used for:
 /*
 
 =item C<static PARROT_INLINE INTVAL
-ret_int(Interp* interp, const HashEntry *e)>
+ret_int(Interp *interp, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate integer, or raising an
 exception if necessary.
@@ -66,7 +66,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE INTVAL
-ret_int(Interp* interp, const HashEntry *e)
+ret_int(Interp *interp, const HashEntry *e)
 {
     switch (e->type) {
     case enum_hash_int:
@@ -83,7 +83,7 @@ ret_int(Interp* interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE FLOATVAL
-ret_num(Interp* interp, const HashEntry *e)>
+ret_num(Interp *interp, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate floating-point number, or
 raising an exception if necessary.
@@ -93,7 +93,7 @@ raising an exception if necessary.
 */
 
 static PARROT_INLINE FLOATVAL
-ret_num(Interp* interp, const HashEntry *e)
+ret_num(Interp *interp, const HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_num:
@@ -110,7 +110,7 @@ ret_num(Interp* interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE STRING *
-ret_string(Interp* interp, HashEntry *e)>
+ret_string(Interp *interp, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate Parrot string, or raising an
 exception if necessary.
@@ -120,7 +120,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE STRING*
-ret_string(Interp* interp, const HashEntry *e)
+ret_string(Interp *interp, const HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_string:
@@ -137,7 +137,7 @@ ret_string(Interp* interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE PMC *
-ret_pmc(Interp* interp, const HashEntry *e)>
+ret_pmc(Interp *interp, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate PMC, or raising an exception
 if necessary.
@@ -147,7 +147,7 @@ if necessary.
 */
 
 static PARROT_INLINE PMC*
-ret_pmc(Interp* interp, const HashEntry *e)
+ret_pmc(Interp *interp, const HashEntry *e)
 {
     PMC *ret;
     switch (e->type) {
@@ -328,11 +328,11 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         HashEntry *e, *d;
         int i, start, end;
         INTVAL size;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         if (!PMC_data(SELF))
             return dest;
@@ -456,7 +456,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC* key) {
+    INTVAL get_integer_keyed(PMC *key) {
         /* simple int keys only */
         INTVAL k = key_integer(INTERP, key);
         return SELF.get_integer_keyed_int(k);
@@ -494,7 +494,7 @@ Returns the floating-point value of the element at index C<key>.
 
 /*
 
-=item C<FLOATVAL get_number_keyed(PMC* key)>
+=item C<FLOATVAL get_number_keyed(PMC *key)>
 
 Returns the floating-point value of the element at index C<*key>.
 
@@ -502,7 +502,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed(PMC* key) {
+    FLOATVAL get_number_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return SELF.get_number_keyed_int(k);
     }
@@ -533,7 +533,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING* get_string_keyed_int(INTVAL key) {
+    STRING *get_string_keyed_int(INTVAL key) {
         HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_string(INTERP, e);
     }
@@ -548,14 +548,14 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    STRING* get_string_keyed(PMC* key) {
+    STRING *get_string_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return SELF.get_string_keyed_int(k);
     }
 
 /*
 
-=item C<STRING* shift_string()>
+=item C<STRING *shift_string()>
 
 Removes the first element from the array and returns its Parrot string
 value.
@@ -564,7 +564,7 @@ value.
 
 */
 
-    STRING* shift_string() {
+    STRING *shift_string() {
         HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_string(INTERP, ret);
     }
@@ -579,7 +579,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         HashEntry *e = get_entry(INTERP, SELF, key);
         return ret_pmc(INTERP, e);
     }
@@ -594,14 +594,14 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    PMC* get_pmc_keyed(PMC* key) {
+    PMC *get_pmc_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return SELF.get_pmc_keyed_int(k);
     }
 
 /*
 
-=item C<PMC* shift_pmc()>
+=item C<PMC *shift_pmc()>
 
 Removes the first element from the array and returns its PMC value.
 
@@ -609,7 +609,7 @@ Removes the first element from the array and returns its PMC value.
 
 */
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         HashEntry *ret = shift_entry(INTERP, SELF);
         return ret_pmc(INTERP, ret);
     }
@@ -737,7 +737,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING *value) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(interp, NULL, E_IndexError,
@@ -761,7 +761,7 @@ array.
 
 */
 
-    void push_string(STRING* value) {
+    void push_string(STRING *value) {
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))
@@ -782,7 +782,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC *src) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(interp, NULL, E_IndexError,
@@ -806,7 +806,7 @@ Adds an element with PMC value C<*value> to the end of the array.
 
 */
 
-    void push_pmc(PMC* value) {
+    void push_pmc(PMC *value) {
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))

@@ -56,7 +56,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL idx) {
+    PMC *get_pmc_keyed_int(INTVAL idx) {
         INTVAL      n;
         Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
@@ -79,7 +79,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
                 "OrderedHash: No such key");
     }
 
-    PMC* get_pmc_keyed(PMC *key) {
+    PMC *get_pmc_keyed(PMC *key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -111,7 +111,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
 
 */
 
-    STRING* get_string_keyed_int(INTVAL idx) {
+    STRING *get_string_keyed_int(INTVAL idx) {
         INTVAL      n;
         Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
@@ -134,7 +134,7 @@ pmclass OrderedHash extends Hash need_ext does array does hash {
                 "OrderedHash: No such key");
     }
 
-    STRING* get_string_keyed(PMC *key) {
+    STRING *get_string_keyed(PMC *key) {
         PMC *item, *next;
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_hash_iterator_FLAGS:
@@ -213,7 +213,7 @@ Returns the integer value associated with C<key>.
 
 =item C<FLOATVAL get_number_keyed_int(INTVAL key)>
 
-=item C<FLOATVAL get_number_keyed_str(STRING* key)>
+=item C<FLOATVAL get_number_keyed_str(STRING *key)>
 
 Returns the floating-point value for the element at C<key>.
 
@@ -326,7 +326,7 @@ The created key = "\1idx".
         SELF.set_pmc_keyed_int(idx, v);
     }
 
-    void set_string_keyed_int(INTVAL idx, STRING* value) {
+    void set_string_keyed_int(INTVAL idx, STRING *value) {
         PMC *v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, v, value);
@@ -340,7 +340,7 @@ The created key = "\1idx".
 
 =item C<void push_pmc(PMC *value)>
 
-=item C<void push_string(STRING* value)>
+=item C<void push_string(STRING *value)>
 
 =cut
 
@@ -434,7 +434,7 @@ The created key = "\1idx".
         }
     }
 
-    INTVAL exists_keyed_str(STRING* key) {
+    INTVAL exists_keyed_str(STRING *key) {
         Hash       *h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b = parrot_hash_get_bucket(INTERP, h, key);
 
@@ -579,7 +579,7 @@ Deletes the key C<*key> from the hash.
 
 /*
 
-=item C<PMC* clone()>
+=item C<PMC *clone()>
 
 Create a clone of the OrderedHash. Non-existent keys are compacted.  Accessing
 the clone via integers has different indices, if items were deleted.
@@ -588,7 +588,7 @@ the clone via integers has different indices, if items were deleted.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         PMC        *dest;
         Hash       *hash = (Hash *)PMC_struct_val(SELF);
         Hash       *h_dest;

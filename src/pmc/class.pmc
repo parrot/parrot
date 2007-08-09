@@ -357,7 +357,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 }
 
 PMC *
-find_vtable_override(PARROT_INTERP, PMC *class, STRING * name)
+find_vtable_override(PARROT_INTERP, PMC *class, STRING *name)
 {
     Parrot_Class * const _class = PARROT_CLASS(class);
     /* Walk and search for the vtable method. */
@@ -1105,7 +1105,7 @@ Creates a new PMC object of the type of the class and calls init().
          * them if they exist */
         if (PMC_IS_NULL(init)) {
             STRING *name = string_from_literal(interp, "init");
-            PMC * meth = find_vtable_override(interp, SELF, name);
+            PMC *meth = find_vtable_override(interp, SELF, name);
             if (!PMC_IS_NULL(meth)) {
                 Parrot_run_meth_fromc_args(interp, meth,
                         object, name, "v");
@@ -1113,7 +1113,7 @@ Creates a new PMC object of the type of the class and calls init().
         }
         else {
             STRING *name = string_from_literal(interp, "init_pmc");
-            PMC * meth = find_vtable_override(interp, SELF, name);
+            PMC *meth = find_vtable_override(interp, SELF, name);
             if (!PMC_IS_NULL(meth)) {
                 Parrot_run_meth_fromc_args(interp, meth,
                         object, name, "vP", init);
@@ -1415,7 +1415,7 @@ Compose a role into a class with the given exclusions and aliases.
 
 */
     PCCMETHOD add_role(PMC *role,
-            PMC* exclude_method     :optional :named["exclude_method"],
+            PMC *exclude_method     :optional :named["exclude_method"],
             int got_exclude_method  :opt_flag,
             PMC *alias_method       :optional :named["alias_method"],
             int got_alias_method    :opt_flag) {

@@ -47,7 +47,7 @@ caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 
 /*
 
-=item C<static void cant_do_method(PARROT_INTERP, PMC * pmc,
+=item C<static void cant_do_method(PARROT_INTERP, PMC *pmc,
                                    const char *methname)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by

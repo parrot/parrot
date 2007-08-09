@@ -33,7 +33,7 @@ pmclass Pair need_ext {
 
 Initializes the instance.
 
-=item C<PMC* instantiate(PMC* sig)>
+=item C<PMC *instantiate(PMC *sig)>
 
 Class method to construct an Integer according to passed arguments.
 
@@ -47,7 +47,7 @@ Class method to construct an Integer according to passed arguments.
         PObj_custom_mark_SET(SELF);
     }
 
-    PMC* instantiate(PMC* sig) {
+    PMC *instantiate(PMC *sig) {
         PMC * const _class = REG_PMC(interp, 2);
         const int argcP = REG_INT(interp, 3);
         const int argcS = REG_INT(interp, 2);
@@ -99,12 +99,12 @@ Marks the hash as live.
 
 */
 
-    PMC* get_pmc_keyed_str(STRING* key) {
+    PMC *get_pmc_keyed_str(STRING *key) {
         /* check key ? */
         return PMC_pmc_val(SELF);
     }
 
-    PMC* get_pmc_keyed(PMC* key) {
+    PMC *get_pmc_keyed(PMC *key) {
         /* check key ? */
         return PMC_pmc_val(SELF);
     }
@@ -118,7 +118,7 @@ Marks the hash as live.
 
 Set key and value. The key can only set once.
 
-=item C<void assign_pmc(PMC* value)>
+=item C<void assign_pmc(PMC *value)>
 
 Set the value of the Pair.
 
@@ -126,7 +126,7 @@ Set the value of the Pair.
 
 */
 
-    void set_pmc_keyed(PMC* key, PMC* value) {
+    void set_pmc_keyed(PMC *key, PMC *value) {
         if (PMC_struct_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
@@ -135,7 +135,7 @@ Set the value of the Pair.
     }
 
 
-    void set_pmc_keyed_str(STRING* key, PMC* value) {
+    void set_pmc_keyed_str(STRING *key, PMC *value) {
         if (PMC_struct_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
@@ -144,7 +144,7 @@ Set the value of the Pair.
         PMC_pmc_val(SELF)    = value;
     }
 
-    void assign_pmc(PMC* value) {
+    void assign_pmc(PMC *value) {
         PMC_pmc_val(SELF) = value;
     }
 
@@ -275,11 +275,11 @@ Used to unarchive the Pair.
 
 =over 4
 
-=item C<METHOD PMC* key()>
+=item C<METHOD PMC *key()>
 
-=item C<METHOD PMC* value()>
+=item C<METHOD PMC *value()>
 
-=item C<METHOD PMC* kv()>
+=item C<METHOD PMC *kv()>
 
 Return the key, the value, or a tuple of (key, value) respectively.
 
@@ -287,7 +287,7 @@ Return the key, the value, or a tuple of (key, value) respectively.
 
 */
 
-    METHOD PMC* key() {
+    METHOD PMC *key() {
         if (PObj_key_is_string_TEST(SELF)) {
             PMC * const k  = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
@@ -299,10 +299,10 @@ Return the key, the value, or a tuple of (key, value) respectively.
         return (PMC *)PMC_struct_val(SELF);
     }
 
-    METHOD PMC* value() {
+    METHOD PMC *value() {
         return PMC_pmc_val(SELF);
     }
-    METHOD PMC* kv() {
+    METHOD PMC *kv() {
         PMC * const t = pmc_new(INTERP,
             Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
         VTABLE_set_integer_native(INTERP, t, 2);

@@ -45,7 +45,7 @@ Initialize a new super instance, bound to the C<obj>.
 
 Bind the object C<obj> to this Super instance.
 
-=item C<PMC* get_pmc(void)>
+=item C<PMC *get_pmc(void)>
 
 Return the bound object.
 
@@ -82,7 +82,7 @@ Find the method for C<*name> in the parent class of the bound object.
         }
     }
 
-    PMC* get_pmc() {
+    PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
@@ -94,7 +94,7 @@ Find the method for C<*name> in the parent class of the bound object.
             pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
     }
 
-    PMC* find_method(STRING *name) {
+    PMC *find_method(STRING *name) {
         PMC *mro, *_class;
 
         PMC * const obj = PMC_pmc_val(SELF);

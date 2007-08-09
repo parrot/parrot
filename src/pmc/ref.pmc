@@ -73,7 +73,7 @@ Sets the referenced PMC to C<initializer>.
 
 Sets the referenced PMC to C<*other>.
 
-=item C<PMC* get_pmc()>
+=item C<PMC *get_pmc()>
 
 Get the referenced PMC.
 
@@ -81,16 +81,16 @@ Get the referenced PMC.
 
 */
 
-    void set_pmc(PMC* other) {
+    void set_pmc(PMC *other) {
         PObj_active_destroy_CLEAR(SELF);
         DOD_WRITE_BARRIER(INTERP, SELF, PMC_pmc_val(SELF), other);
         SELF.init_pmc(other);
     }
-    void assign_pmc(PMC* other) {
+    void assign_pmc(PMC *other) {
         SELF.set_pmc(other);   /* audreyt */
     }
 
-    PMC* get_pmc() {
+    PMC *get_pmc() {
         return PMC_pmc_val(SELF);
     }
 
@@ -138,7 +138,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
 */
 
-    STRING* name() {
+    STRING *name() {
         return SUPER();
     }
 }

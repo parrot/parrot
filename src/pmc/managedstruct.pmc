@@ -50,7 +50,7 @@ Initializes the struct with C<*value>.
 
 */
 
-    void init_pmc(PMC* value) {
+    void init_pmc(PMC *value) {
         SELF.init();
         SUPER(value);
     }

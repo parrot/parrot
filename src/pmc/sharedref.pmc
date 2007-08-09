@@ -71,7 +71,7 @@ shouldn't leak unshared PMCs into different threads.
 
 */
 
-    void init_pmc(PMC* initializer) {
+    void init_pmc(PMC *initializer) {
         SUPER(initializer);
         PObj_active_destroy_SET(SELF);
     }
@@ -109,7 +109,7 @@ Marks the reference as live.
 
 Sets the referenced PMC to C<*other>.
 
-=item C<PMC* get_pmc()>
+=item C<PMC *get_pmc()>
 
 Catch dereferencing. This would unshare the referred PMC.
 
@@ -117,12 +117,12 @@ Catch dereferencing. This would unshare the referred PMC.
 
 */
 
-    void set_pmc(PMC* other) {
+    void set_pmc(PMC *other) {
         SUPER(other);
         PObj_active_destroy_SET(SELF);
     }
 
-    PMC* get_pmc() {
+    PMC *get_pmc() {
         real_exception(INTERP, NULL, E_ReferenceError,
                 "deref not allowed");
     }

@@ -81,7 +81,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC_pmc_val(SELF) = lexinfo;
     }
 
-    void set_pointer(void* ctx) {
+    void set_pointer(void *ctx) {
         PMC_struct_val(SELF) = ctx;
     }
 
@@ -90,7 +90,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(info));
     }
 
-    INTVAL exists_keyed_str(STRING* name) {
+    INTVAL exists_keyed_str(STRING *name) {
         PMC * const info = PMC_pmc_val(SELF);
         return parrot_hash_get_bucket(INTERP,
             (Hash*) PMC_struct_val(info), name) != 0;
@@ -101,7 +101,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return SELF.exists_keyed_str(s);
     }
 
-    PMC* get_pmc_keyed_str(STRING* name) {
+    PMC *get_pmc_keyed_str(STRING *name) {
         PMC              * const info = PMC_pmc_val(SELF);
         Hash             * const hash = (Hash *)PMC_struct_val(info);
         parrot_context_t * const ctx  = (parrot_context_t *)PMC_struct_val(SELF);
@@ -116,7 +116,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_PMC(ctx, regno);
     }
 
-    PMC* get_pmc_keyed(PMC *name) {
+    PMC *get_pmc_keyed(PMC *name) {
         STRING * const s = key_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
@@ -141,7 +141,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         SELF.set_pmc_keyed_str(s, value);
     }
 
-    METHOD PMC* get_lexinfo() {
+    METHOD PMC *get_lexinfo() {
         return PMC_pmc_val(SELF);
     }
 

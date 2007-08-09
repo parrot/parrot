@@ -24,8 +24,8 @@ register.
 
 /* XXX create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(PARROT_INTERP, PMC*, PMC*);
-extern PMC* Parrot_BigInt_multiply_int(PARROT_INTERP,
-        PMC* pmc, INTVAL value, PMC* dest) ;
+extern PMC *Parrot_BigInt_multiply_int(PARROT_INTERP,
+        PMC *pmc, INTVAL value, PMC *dest) ;
 
 static PMC*
 overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, int mmd)
@@ -71,7 +71,7 @@ overflow_p(PARROT_INTERP, PMC *self, PMC *val, PMC *dest, int mmd)
 pmclass Integer extends scalar does integer does scalar {
 
 /*
-=item C<PMC instantiate(PMC* sig)>
+=item C<PMC instantiate(PMC *sig)>
 
 Create a new Integer with arguments passed according to pdd03.
 
@@ -83,8 +83,8 @@ Initializes the integer with a default value of C<0>.
 =cut
 
 */
-    PMC* instantiate(PMC* sig) {
-        PMC* const ret = new_pmc_header(INTERP, 0);
+    PMC *instantiate(PMC *sig) {
+        PMC * const ret = new_pmc_header(INTERP, 0);
         opcode_t *arg_op;
         INTVAL init = 0;
 
@@ -121,7 +121,7 @@ Class method to construct an Integer from the string representation C<rep>.
 =cut
 
 */
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
+    PMC *new_from_string(STRING *rep, INTVAL flags) {
         PMC *res;
         const INTVAL type = SELF->vtable->base_type;
 
@@ -218,7 +218,7 @@ Return a new BigInt PMC with the value of C<SELF>.
 =cut
 
 */
-    PMC* get_bignum() {
+    PMC *get_bignum() {
         const INTVAL val = DYNSELF.get_integer();
         PMC * const ret = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_integer_native(INTERP, ret, val);
@@ -234,10 +234,10 @@ Returns the string value of the integer.
 =cut
 
 */
-    STRING* get_string() {
+    STRING *get_string() {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
-    STRING* get_repr() {
+    STRING *get_repr() {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
 
@@ -252,7 +252,7 @@ Sets the value of the integer to the value of the C<Integer> C<*value>.
 =cut
 
 */
-    void set_integer_same(PMC * value) {
+    void set_integer_same(PMC *value) {
         PMC_int_val(SELF) = PMC_int_val(value);
     }
 
@@ -298,16 +298,16 @@ Morphs the integer to a C<String> and sets the value from C<value>.
         DYNSELF.set_integer_native(value);
     }
 
-    void set_string_native(STRING* value) {
+    void set_string_native(STRING *value) {
         DYNSELF.morph(enum_class_String);
         DYNSELF.set_string_native(value);
     }
 
 /*
 
-=item C<PMC* add(PMC *value, PMC *dest)>
+=item C<PMC *add(PMC *value, PMC *dest)>
 
-=item C<PMC* add_int(INTVAL value, PMC *dest)>
+=item C<PMC *add_int(INTVAL value, PMC *dest)>
 
 Adds C<value> to the integer and returns the result in C<*dest>.
 
@@ -319,7 +319,7 @@ two types.
 =cut
 
 */
-    PMC* add(PMC* value, PMC* dest) {
+    PMC *add(PMC *value, PMC *dest) {
 MMD_Integer: {
             /*
              * SELF and value can both be PMCs that inherit
@@ -370,7 +370,7 @@ MMD_DEFAULT: {
         }
     }
 
-    PMC* add_int(INTVAL b, PMC* dest) {
+    PMC *add_int(INTVAL b, PMC *dest) {
         /* INTVAL a = PMC_int_val(SELF); */
         const INTVAL a = VTABLE_get_integer(INTERP, SELF);
         const INTVAL c = a + b;
@@ -398,7 +398,7 @@ Adds C<value> to C<SELF> inplace.
 
 */
 
-    void i_add(PMC* value) {
+    void i_add(PMC *value) {
 MMD_Integer: {
             SELF.i_add_int(VTABLE_get_integer(INTERP, value));
         }
@@ -433,7 +433,7 @@ MMD_DEFAULT: {
     }
 /*
 
-=item C<PMC* subtract(PMC *value, PMC *dest)>
+=item C<PMC *subtract(PMC *value, PMC *dest)>
 
 Subtracts C<*value> from the integer and returns the result in C<*dest>.
 If C<dest> is NULL, a new int PMC is created.
@@ -444,7 +444,7 @@ call C<get_integer> and C<set_integer_native> always.
 =cut
 
 */
-    PMC* subtract(PMC* value, PMC* dest) {
+    PMC *subtract(PMC *value, PMC *dest) {
 MMD_Integer: {
             const INTVAL a = DYNSELF.get_integer();
             const INTVAL b = VTABLE_get_integer(INTERP, value);
@@ -484,14 +484,14 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* subtract_int(INTVAL value, PMC *dest)>
+=item C<PMC *subtract_int(INTVAL value, PMC *dest)>
 
 Subtracts C<value> from the integer and returns the result in C<*dest>.
 
 =cut
 
 */
-    PMC* subtract_int(INTVAL b, PMC* dest) {
+    PMC *subtract_int(INTVAL b, PMC *dest) {
         const INTVAL a = DYNSELF.get_integer();
         const INTVAL c = a - b;
         if ((c^a) >= 0 || (c^~b) >= 0) {
@@ -518,7 +518,7 @@ Subtracts C<value> from C<SELF> inplace.
 
 */
 
-    void i_subtract(PMC* value) {
+    void i_subtract(PMC *value) {
 MMD_Integer: {
             const INTVAL a = DYNSELF.get_integer();
             const INTVAL b = VTABLE_get_integer(INTERP, value);
@@ -561,16 +561,16 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* multiply(PMC *value, PMC *dest)>
+=item C<PMC *multiply(PMC *value, PMC *dest)>
 
-=item C<PMC* multiply_int(INTVAL value, PMC *dest)>
+=item C<PMC *multiply_int(INTVAL value, PMC *dest)>
 
 Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
 =cut
 
 */
-    PMC* multiply(PMC* value, PMC* dest) {
+    PMC *multiply(PMC *value, PMC *dest) {
 MMD_Integer: {
             const INTVAL a = VTABLE_get_integer(INTERP, SELF);
             const INTVAL b = VTABLE_get_integer(INTERP, value);
@@ -605,7 +605,7 @@ MMD_DEFAULT: {
         }
     }
 
-    PMC* multiply_int(INTVAL b, PMC* dest) {
+    PMC *multiply_int(INTVAL b, PMC *dest) {
         const INTVAL a = DYNSELF.get_integer();
         const double cf = (double)a * (double)b;
         const INTVAL c = a * b;
@@ -633,7 +633,7 @@ Multiply C<value> with C<SELF> inplace.
 
 */
 
-    void i_multiply(PMC* value) {
+    void i_multiply(PMC *value) {
 MMD_Integer: {
             SELF.i_multiply_int(VTABLE_get_integer(INTERP, value));
         }
@@ -669,11 +669,11 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* divide(PMC *value, PMC *dest)>
+=item C<PMC *divide(PMC *value, PMC *dest)>
 
-=item C<PMC* divide_int(INTVAL value, PMC *dest)>
+=item C<PMC *divide_int(INTVAL value, PMC *dest)>
 
-=item C<PMC* divide_float(FLOATVAL value, PMC *dest)>
+=item C<PMC *divide_float(FLOATVAL value, PMC *dest)>
 
 Divides the number by C<value> and returns the result in C<*dest>.
 
@@ -689,7 +689,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    PMC* divide(PMC* value, PMC* dest) {
+    PMC *divide(PMC *value, PMC *dest) {
 MMD_BigInt:     {
             return overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
@@ -706,7 +706,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_divide(PMC* value) {
+    void i_divide(PMC *value) {
 MMD_BigInt:     {
              overflow_p(INTERP, SELF, value, SELF, MMD_DIVIDE);
         }
@@ -722,11 +722,11 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* floor_divide(PMC *value, PMC *dest)>
+=item C<PMC *floor_divide(PMC *value, PMC *dest)>
 
-=item C<PMC* floor_divide_int(INTVAL value, PMC *dest)>
+=item C<PMC *floor_divide_int(INTVAL value, PMC *dest)>
 
-=item C<PMC* floor_divide_float(FLOATVAL value, PMC *dest)>
+=item C<PMC *floor_divide_float(FLOATVAL value, PMC *dest)>
 
 Divides the number by C<value> and returns the result in C<*dest>.
 
@@ -742,7 +742,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    PMC* floor_divide(PMC* value, PMC* dest) {
+    PMC *floor_divide(PMC *value, PMC *dest) {
 MMD_BigInt:     {
             return overflow_p(INTERP, SELF, value, dest, MMD_FLOOR_DIVIDE);
         }
@@ -760,7 +760,7 @@ MMD_DEFAULT: {
         }
     }
 
-    PMC* floor_divide_int(INTVAL value, PMC* dest) {
+    PMC *floor_divide_int(INTVAL value, PMC *dest) {
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
@@ -771,7 +771,7 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    PMC* floor_divide_float(FLOATVAL value, PMC* dest) {
+    PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
         if (value == 0.0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
@@ -782,7 +782,7 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    void i_floor_divide(PMC* value) {
+    void i_floor_divide(PMC *value) {
 MMD_BigInt:     {
             overflow_p(INTERP, SELF, value, SELF, MMD_FLOOR_DIVIDE);
         }
@@ -815,11 +815,11 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+=item C<PMC *cmodulus(PMC *value, PMC *dest)>
 
-=item C<PMC* cmodulus(INTVAL value, PMC *dest)>
+=item C<PMC *cmodulus(INTVAL value, PMC *dest)>
 
-=item C<PMC* cmodulus(FLOATVAL value, PMC *dest)>
+=item C<PMC *cmodulus(FLOATVAL value, PMC *dest)>
 
 Calculates the value of the number C-style C<mod> C<value> and returns
 the result in C<dest>.
@@ -837,7 +837,7 @@ the result in C<dest>.
 
 */
 
-    PMC* cmodulus(PMC* value, PMC* dest) {
+    PMC *cmodulus(PMC *value, PMC *dest) {
 MMD_BigInt: {
             return overflow_p(INTERP, SELF, value, dest, MMD_CMOD);
         }
@@ -855,7 +855,7 @@ MMD_DEFAULT: {
         }
     }
 
-    PMC* cmodulus_float(FLOATVAL value, PMC* dest) {
+    PMC *cmodulus_float(FLOATVAL value, PMC *dest) {
         if (value == 0.0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
@@ -866,7 +866,7 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    PMC* cmodulus_int(INTVAL value, PMC* dest) {
+    PMC *cmodulus_int(INTVAL value, PMC *dest) {
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
@@ -877,7 +877,7 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    void i_cmodulus(PMC* value) {
+    void i_cmodulus(PMC *value) {
 MMD_BigInt: {
              overflow_p(INTERP, SELF, value, SELF, MMD_CMOD);
         }
@@ -910,11 +910,11 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* modulus(PMC *value, PMC *dest)>
+=item C<PMC *modulus(PMC *value, PMC *dest)>
 
-=item C<PMC* modulus(INTVAL value, PMC *dest)>
+=item C<PMC *modulus(INTVAL value, PMC *dest)>
 
-=item C<PMC* modulus(FLOATVAL value, PMC *dest)>
+=item C<PMC *modulus(FLOATVAL value, PMC *dest)>
 
 Calculates the value of corrected C<mod> C<value> and returns
 the result in C<dest>. See also ops/math.ops.
@@ -931,7 +931,7 @@ Calculates modulus inplace
 
 */
 
-    PMC* modulus(PMC* value, PMC* dest) {
+    PMC *modulus(PMC *value, PMC *dest) {
 MMD_BigInt: {
             return overflow_p(INTERP, SELF, value, dest, MMD_MOD);
         }
@@ -949,7 +949,7 @@ MMD_DEFAULT: {
         }
     }
 
-    PMC* modulus_int(INTVAL value, PMC* dest) {
+    PMC *modulus_int(INTVAL value, PMC *dest) {
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
@@ -960,7 +960,7 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    PMC* modulus_float(FLOATVAL value, PMC* dest) {
+    PMC *modulus_float(FLOATVAL value, PMC *dest) {
         if (value == 0.0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
@@ -970,7 +970,7 @@ MMD_DEFAULT: {
                 intval_mod(DYNSELF.get_integer(), (INTVAL)value));
         return dest;
     }
-    void i_modulus(PMC* value) {
+    void i_modulus(PMC *value) {
 MMD_BigInt: {
              overflow_p(INTERP, SELF, value, SELF, MMD_MOD);
         }
@@ -1003,13 +1003,13 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* pow(PMC* value, PMC *dest)>
+=item C<PMC *pow(PMC *value, PMC *dest)>
 
-=item C<PMC* pow_int(INTVAL value, PMC *dest)>
+=item C<PMC *pow_int(INTVAL value, PMC *dest)>
 
 Return SELF to the C<value>th power and return result in C<dest>.
 
-=item C<void i_pow(PMC* value)>
+=item C<void i_pow(PMC *value)>
 
 =item C<void i_pow_int(INTVAL value)>
 
@@ -1020,12 +1020,12 @@ TODO Complex and BigInt rhs.
 =cut
 
 */
-    PMC* pow(PMC* value, PMC* dest) {
+    PMC *pow(PMC *value, PMC *dest) {
         const INTVAL v = VTABLE_get_integer(INTERP, value);
         return SELF.pow_int(v, dest);
     }
 
-    PMC* pow_int(INTVAL b, PMC* dest) {
+    PMC *pow_int(INTVAL b, PMC *dest) {
         const INTVAL a = DYNSELF.get_integer();
         const INTVAL orig_b = b;
         INTVAL r;
@@ -1060,7 +1060,7 @@ TODO Complex and BigInt rhs.
 
     }
 
-    void i_pow(PMC* value) {
+    void i_pow(PMC *value) {
         SELF.pow(value, SELF);
     }
 
@@ -1071,16 +1071,16 @@ TODO Complex and BigInt rhs.
 
 /*
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 The C<==> operation.
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
 MMD_BigInt: {
-        PMC* const temp = pmc_new(INTERP, enum_class_BigInt);
+        PMC * const temp = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_integer_native(INTERP, temp, PMC_int_val(SELF));
         return Parrot_BigInt_is_equal_BigInt(INTERP, temp, value);
     }
@@ -1099,7 +1099,7 @@ Returns the result of comparing the integer with C<*value>.
 =cut
 
 */
-    INTVAL cmp(PMC* value) {
+    INTVAL cmp(PMC *value) {
 MMD_String: {
             const FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
@@ -1134,7 +1134,7 @@ Returns the result of numerically comparing the integer with C<*value>.
 =cut
 
 */
-    INTVAL cmp_num(PMC* value) {
+    INTVAL cmp_num(PMC *value) {
 MMD_String: {
             const FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
@@ -1189,7 +1189,7 @@ Decrements the integer.
     }
 /*
 
-=item C<PMC* absolute(PMC* dest)>
+=item C<PMC *absolute(PMC *dest)>
 
 =item C<void absolute()>
 
@@ -1199,7 +1199,7 @@ Sets C<dest> to the absolute value of SELF.
 
 */
 
-    PMC* absolute(PMC *dest) {
+    PMC *absolute(PMC *dest) {
         const INTVAL a = abs(DYNSELF.get_integer());
         /* XXX overlflow for -maxint */
         if (!dest)
@@ -1216,7 +1216,7 @@ Sets C<dest> to the absolute value of SELF.
 
 /*
 
-=item C<STRING* get_as_base(INTVAL base)>
+=item C<STRING *get_as_base(INTVAL base)>
 
 Converts and returns the integer in base C<base>.
 C<base> must be between 2 and 36, inclusize.
@@ -1225,7 +1225,7 @@ C<base> must be between 2 and 36, inclusize.
 
 */
 
-    METHOD STRING* get_as_base(INTVAL base) {
+    METHOD STRING *get_as_base(INTVAL base) {
         char buf[128];
 
         if ((base < 2) || (base > 36))

@@ -60,14 +60,14 @@ Marks the hash as live.
     }
     PCCMETHOD test_method2(int a1 :optional, int a1o :opt_flag, PMC *slurpy_pos :slurpy)
     {
-        STRING* kevin = string_from_literal(interp, "KEVIN");
+        STRING *kevin = string_from_literal(interp, "KEVIN");
         PIO_printf(interp, "test_method2\n");
         PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o, VTABLE_name(interp, slurpy_pos),
                 VTABLE_get_repr(interp,slurpy_pos));
 
-        PCCRETURN(int 1000, STRING* kevin);
+        PCCRETURN(int 1000, STRING *kevin);
     }
-    PCCMETHOD test_method3(PMC* a1 :named["a1name"], PMC* a2  :named["a2name"])
+    PCCMETHOD test_method3(PMC *a1 :named["a1name"], PMC *a2  :named["a2name"])
     {
         PIO_printf(interp, "test_method3\n");
         PIO_printf(interp, "%Ps, %Ps\n", a1, a2);

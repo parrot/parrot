@@ -42,7 +42,7 @@ pmclass STMVar is_shared need_ext no_ro {
         PObj_custom_mark_SET(SELF);
     }
 
-    void init_pmc(PMC* value) {
+    void init_pmc(PMC *value) {
         PMC_struct_val(SELF) = NULL;
         if (value->vtable->base_type == enum_class_STMRef
             || value->vtable->base_type == enum_class_STMVar) {
@@ -63,7 +63,7 @@ Return the STMVar PMC.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         return SELF;
     }
 
@@ -84,17 +84,17 @@ Mark data associated with this transactional variable.
             (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
     }
 
-    METHOD PMC* get_read() {
+    METHOD PMC *get_read() {
         return Parrot_STM_read(INTERP,
             (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
     }
 
-    METHOD PMC* get_update() {
+    METHOD PMC *get_update() {
         return Parrot_STM_begin_update(INTERP,
             (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
     }
 
-    METHOD void set(PMC* new_value) {
+    METHOD void set(PMC *new_value) {
         Parrot_STM_write(INTERP, (Parrot_STM_PMC_handle)PMC_struct_val(SELF),
                          new_value);
     }
@@ -124,7 +124,7 @@ Mark data associated with this transactional variable.
        ways -- we are always a reference to the same transactional
        variable.
      */
-    PMC* share_ro() {
+    PMC *share_ro() {
         PMC *ret = pt_shared_fixup(INTERP, SELF);
         return ret;
     }

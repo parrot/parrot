@@ -124,7 +124,7 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
         booleanarray_clone(INTERP, SELF, dest);
         PObj_active_destroy_SET(dest);
         return dest;
@@ -516,7 +516,7 @@ Used to unarchive the string.
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL) {
             INTVAL size = io->vtable->shift_integer(INTERP, io);
-            STRING * s  = io->vtable->shift_string(INTERP, io);
+            STRING *s   = io->vtable->shift_string(INTERP, io);
             PMC_int_val(SELF) = size;
             PMC_int_val2(pmc) = s->bufused * BITS_PER_CHAR;
             PMC_data(pmc) = mem_sys_allocate_zeroed(s->bufused);

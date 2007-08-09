@@ -99,14 +99,14 @@ Initializes a PMCProxy PMC.
 
 /*
 
-=item C<PMC* instantiate(PMC* init)>
+=item C<PMC *instantiate(PMC *init)>
 
 Creates an instance of the PMC.
 
 =cut
 
 */
-    PMC* instantiate(PMC* init) {
+    PMC *instantiate(PMC *init) {
         Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
         PMC *created;
         if (!PMC_IS_NULL(init))
@@ -157,7 +157,7 @@ Mark any referenced strings and PMCs in the structure as live.
 
 /*
 
-=item C<PMC* inspect_str(STRING *what)>
+=item C<PMC *inspect_str(STRING *what)>
 
 Provides introspection of a specific piece of information about the PMC. The
 available information is:
@@ -185,7 +185,7 @@ Array of PMCProxy PMCs representing the direct parents of this class.
 =cut
 
 */
-    PMC* inspect_str(STRING *what)
+    PMC *inspect_str(STRING *what)
     {
         Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
 
@@ -217,7 +217,7 @@ Array of PMCProxy PMCs representing the direct parents of this class.
 
 /*
 
-=item C<PMC* inspect()>
+=item C<PMC *inspect()>
 
 Returns a Hash describing the PMC, with key/value pairs as described in
 inspect_str.
@@ -225,7 +225,7 @@ inspect_str.
 =cut
 
 */
-    PMC* inspect()
+    PMC *inspect()
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
@@ -243,7 +243,7 @@ inspect_str.
 
 /*
 
-=item C<STRING* name()>
+=item C<STRING *name()>
 
 Gets the name of the PMC.
 

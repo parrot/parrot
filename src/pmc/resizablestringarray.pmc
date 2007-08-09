@@ -36,7 +36,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING* get_string_keyed_int(INTVAL key) {
+    STRING *get_string_keyed_int(INTVAL key) {
         STRING **data;
         if (key < 0)
         {
@@ -66,7 +66,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING *value) {
         STRING **data;
         if (key < 0)
         {
@@ -87,7 +87,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 /*
 
-=item C<void push_string(STRING* value)>
+=item C<void push_string(STRING *value)>
 
 Extends the array by adding an element of value C<*value> to the end of
 the array.
@@ -96,14 +96,14 @@ the array.
 
 */
 
-    void push_string(STRING* value) {
+    void push_string(STRING *value) {
         INTVAL nextix = DYNSELF.elements();
         DYNSELF.set_string_keyed_int(nextix, value);
     }
 
 /*
 
-=item C<STRING* pop_string()>
+=item C<STRING *pop_string()>
 
 Removes and returns the last element in the array.
 
@@ -111,9 +111,9 @@ Removes and returns the last element in the array.
 
 */
 
-    STRING* pop_string() {
+    STRING *pop_string() {
         INTVAL size;
-        STRING* value;
+        STRING *value;
 
         size = PMC_int_val(SELF);
         if (size == 0) {
@@ -127,7 +127,7 @@ Removes and returns the last element in the array.
 
 /*
 
-=item C<PMC* pop_pmc()>
+=item C<PMC *pop_pmc()>
 
 Removes and returns the last element in the array.
 
@@ -135,7 +135,7 @@ Removes and returns the last element in the array.
 
 */
 
-    PMC* pop_pmc() {
+    PMC *pop_pmc() {
         STRING *strval = DYNSELF.pop_string();
         PMC    *value  = pmc_new(INTERP, enum_class_String);
 
@@ -246,7 +246,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         PMC *copy = SUPER();
         /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
@@ -255,7 +255,7 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<STRING* shift_string()>
+=item C<STRING *shift_string()>
 
 Removes and returns an item from the start of the array.
 
@@ -263,9 +263,9 @@ Removes and returns an item from the start of the array.
 
 */
 
-    STRING* shift_string() {
+    STRING *shift_string() {
         INTVAL size;
-        STRING* value;
+        STRING *value;
 
         size = PMC_int_val(SELF);
         if (size == 0)
@@ -279,7 +279,7 @@ Removes and returns an item from the start of the array.
 
 /*
 
-=item C<PMC* shift_pmc()>
+=item C<PMC *shift_pmc()>
 
 Removes and returns the first element in the array.
 
@@ -287,7 +287,7 @@ Removes and returns the first element in the array.
 
 */
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         STRING *strval = DYNSELF.shift_string();
         PMC    *value  = pmc_new(INTERP, enum_class_String);
 
@@ -389,7 +389,7 @@ the array.
 
 /*
 
-=item C<PMC* shift_pmc()>
+=item C<PMC *shift_pmc()>
 
 Removes and returns a String PMC from the start of the array.
 
@@ -397,10 +397,10 @@ Removes and returns a String PMC from the start of the array.
 
 */
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         INTVAL size;
         PMC *ret;
-        STRING* value;
+        STRING *value;
 
         size = PMC_int_val(SELF);
         if (size == 0)
@@ -523,7 +523,7 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
 /*
 
-=item C<void delete_keyed(PMC* key)>
+=item C<void delete_keyed(PMC *key)>
 
 Removes the element at C<*key>.
 
@@ -545,21 +545,21 @@ Removes the element at C<*key>.
 
 /*
 
-=item C<void splice(PMC* value, INTVAL offset, INTVAL count)>
+=item C<void splice(PMC *value, INTVAL offset, INTVAL count)>
 
 Replaces C<count> elements starting at C<offset> with the elements in
 C<value>.
 
 Note that the C<value> PMC can be of any of the various array types.
 
-Note that this implementation can be *VERY* inefficient as it manipulates
+Note that this implementation can be *VERY *inefficient as it manipulates
 everything via the VTABLE api.
 
 =cut
 
 */
 
-    void splice(PMC* value, INTVAL offset, INTVAL count) {
+    void splice(PMC *value, INTVAL offset, INTVAL count) {
         INTVAL length, elems, shift, i;
 
         if (value->vtable->base_type != SELF->vtable->base_type &&

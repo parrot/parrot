@@ -165,7 +165,7 @@ Creates and returns a copy of the array.
 
     PMC *clone() {
         INTVAL size;
-        PMC * dest;
+        PMC *dest;
         /* a quick hack to create a clone in the constant PMC arena
          * this is needed for the call signatures
          *

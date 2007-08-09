@@ -84,9 +84,9 @@ Resizes the array to C<size> elements.
 
 =item C<INTVAL shift_integer()>
 
-=item C<PMC* shift_pmc()>
+=item C<PMC *shift_pmc()>
 
-=item C<STRING* shift_string()>
+=item C<STRING *shift_string()>
 
 Removes and returns an item from the start of the array.
 
@@ -99,7 +99,7 @@ TODO: Check whether there is already an element that can be shifted
 
     FLOATVAL shift_float() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         PMC** item;
         FLOATVAL value;
 
@@ -121,7 +121,7 @@ TODO: Check whether there is already an element that can be shifted
 
     INTVAL shift_integer() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         PMC** item;
         INTVAL value;
 
@@ -141,9 +141,9 @@ TODO: Check whether there is already an element that can be shifted
         return value;
     }
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         PMC** item;
 
         if (0 == size) {
@@ -161,11 +161,11 @@ TODO: Check whether there is already an element that can be shifted
         return data;
     }
 
-    STRING* shift_string() {
+    STRING *shift_string() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         PMC** item;
-        STRING* value;
+        STRING *value;
 
         if (0 == size) {
             real_exception(INTERP, NULL, E_IndexError,
@@ -194,7 +194,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         PMC **data;
 
         if (key < 0)
@@ -229,7 +229,7 @@ If key is a slice, do a splice as set that item.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC *src) {
         PMC **data;
 
         /*
@@ -247,11 +247,11 @@ If key is a slice, do a splice as set that item.
         data[key] = src;
     }
 
-    void set_pmc_keyed(PMC* key, PMC* src) {
+    void set_pmc_keyed(PMC *key, PMC *src) {
         SUPER(key, src);
     }
 
-    void delete_keyed(PMC* key) {
+    void delete_keyed(PMC *key) {
         INTVAL  i;
         INTVAL  idx  = key_integer(INTERP, key);
         INTVAL  n    = PMC_int_val(SELF);
@@ -267,7 +267,7 @@ If key is a slice, do a splice as set that item.
 
 =item C<INTVAL exists_keyed_int(INTVAL key)>
 
-=item C<INTVAL exists_keyed_int(PMC* key)>
+=item C<INTVAL exists_keyed_int(PMC *key)>
 
 Returns TRUE is the element at C<key> exists; otherwise returns false.
 
@@ -286,7 +286,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         return !PMC_IS_NULL(data[key]);
     }
 
-    INTVAL exists_keyed(PMC* key) {
+    INTVAL exists_keyed(PMC *key) {
         INTVAL ix = key_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
@@ -302,7 +302,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 */
 
     INTVAL defined_keyed_int(INTVAL key) {
-        PMC* val;
+        PMC *val;
 
         if (key < 0)
             key += PMC_int_val(SELF);
@@ -321,9 +321,9 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 =item C<void push_integer(INTVAL value)>
 
-=item C<void push_pmc(PMC* value)>
+=item C<void push_pmc(PMC *value)>
 
-=item C<void push_string(STRING* value)>
+=item C<void push_string(STRING *value)>
 
 Extends the array by adding an element of value C<*value> to the end of
 the array.
@@ -334,7 +334,7 @@ the array.
 
     void push_float(FLOATVAL value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
 
         val= pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
@@ -346,7 +346,7 @@ the array.
 
     void push_integer(INTVAL value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
 
         val= pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, val, value);
@@ -356,7 +356,7 @@ the array.
         return;
     }
 
-    void push_pmc(PMC* value) {
+    void push_pmc(PMC *value) {
         INTVAL size = PMC_int_val(SELF);
 
         /* let set_integer_native() worry about memory allocation */
@@ -366,9 +366,9 @@ the array.
         return;
     }
 
-    void push_string(STRING* value) {
+    void push_string(STRING *value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
 
         val= pmc_new(INTERP, enum_class_String);
         VTABLE_assign_string_native(INTERP, val, value);
@@ -386,9 +386,9 @@ Removes and returns the last element in the array.
 
 =item C<INTVAL pop_integer()>
 
-=item C<PMC* pop_pmc()>
+=item C<PMC *pop_pmc()>
 
-=item C<STRING* pop_string()>
+=item C<STRING *pop_string()>
 
 =cut
 
@@ -396,7 +396,7 @@ Removes and returns the last element in the array.
 
     FLOATVAL pop_float() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         FLOATVAL value;
 
         if (0 == size) {
@@ -413,7 +413,7 @@ Removes and returns the last element in the array.
 
     INTVAL pop_integer() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
         INTVAL value;
 
         if (0 == size) {
@@ -428,9 +428,9 @@ Removes and returns the last element in the array.
         return value;
     }
 
-    PMC* pop_pmc() {
+    PMC *pop_pmc() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
+        PMC *data;
 
         if (0 == size) {
             real_exception(INTERP, NULL, E_IndexError,
@@ -442,10 +442,10 @@ Removes and returns the last element in the array.
         return data;
     }
 
-    STRING* pop_string() {
+    STRING *pop_string() {
         INTVAL size= PMC_int_val(SELF);
-        PMC* data;
-        STRING* value;
+        PMC *data;
+        STRING *value;
 
         if (0 == size) {
             real_exception(INTERP, NULL, E_IndexError,
@@ -465,9 +465,9 @@ Removes and returns the last element in the array.
 
 =item C<void unshift_integer(INTVAL value)>
 
-=item C<void unshift_pmc(PMC* value)>
+=item C<void unshift_pmc(PMC *value)>
 
-=item C<void unshift_string(STRING* value)>
+=item C<void unshift_string(STRING *value)>
 
 Extends the array by adding an element of value C<*value> to the begin of
 the array.
@@ -478,7 +478,7 @@ the array.
 
     void unshift_float(FLOATVAL value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
         PMC** data;
         INTVAL i;
 
@@ -498,7 +498,7 @@ the array.
 
     void unshift_integer(INTVAL value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
         PMC** data;
         INTVAL i;
 
@@ -516,7 +516,7 @@ the array.
         return;
     }
 
-    void unshift_pmc(PMC* value) {
+    void unshift_pmc(PMC *value) {
         INTVAL size= PMC_int_val(SELF);
         PMC** data;
         INTVAL i;
@@ -532,9 +532,9 @@ the array.
         return;
     }
 
-    void unshift_string(STRING* value) {
+    void unshift_string(STRING *value) {
         INTVAL size= PMC_int_val(SELF);
-        PMC* val;
+        PMC *val;
         PMC** data;
         INTVAL i;
 
@@ -562,7 +562,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         PMC *copy = SUPER();
         /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
@@ -571,7 +571,7 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<INTVAL is_equal(PMC* value)>
+=item C<INTVAL is_equal(PMC *value)>
 
 The C<==> operation. Compares two array to hold equal elements.
 
@@ -579,7 +579,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 */
 
-    INTVAL is_equal(PMC* value) {
+    INTVAL is_equal(PMC *value) {
         INTVAL j, n;
 
         if (value->vtable->base_type != enum_class_ResizablePMCArray)
@@ -601,7 +601,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 /*
 
-=item METHOD void append(PMC* other)
+=item METHOD void append(PMC *other)
 
 Append the other array to this array.
 
@@ -609,7 +609,7 @@ Append the other array to this array.
 
 */
 
-    METHOD void append(PMC* other) {
+    METHOD void append(PMC *other) {
         INTVAL i, n, m;
         n = VTABLE_elements(INTERP, SELF);
         m = VTABLE_elements(INTERP, other);
@@ -645,7 +645,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
 */
 
-    STRING* get_repr() {
+    STRING *get_repr() {
         STRING *res;
         INTVAL j, n;
         PMC *val;
@@ -664,21 +664,21 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
 /*
 
-=item C<void splice(PMC* value, INTVAL offset, INTVAL count)>
+=item C<void splice(PMC *value, INTVAL offset, INTVAL count)>
 
 Replaces C<count> elements starting at C<offset> with the elements in
 C<value>.
 
 Note that the C<value> PMC can be of any of the various array types.
 
-Note that this implementation can be *VERY* inefficient as it manipulates
+Note that this implementation can be *VERY *inefficient as it manipulates
 everything via the VTABLE api.
 
 =cut
 
 */
 
-    void splice(PMC* value, INTVAL offset, INTVAL count) {
+    void splice(PMC *value, INTVAL offset, INTVAL count) {
         const INTVAL length = VTABLE_elements(INTERP, SELF);
         const INTVAL elems  = VTABLE_elements(INTERP, value);
         INTVAL shift  = elems - count;
