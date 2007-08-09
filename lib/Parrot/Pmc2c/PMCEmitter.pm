@@ -252,6 +252,9 @@ sub proto {
     $parameters =~ s/\w+(,|$)/,/g;
     $parameters =~ s/ //g;
 
+    # flatten whitespace before "*" in return value
+    $type =~ s/\s+\*$/\*/ if defined $type;
+
     # type method(interp, self, parameters...)
     my $ret = $calltype{ $type or "void" };
     $ret .= "JO" . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
