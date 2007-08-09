@@ -32,7 +32,7 @@ but those starting with => are the ones used
 /*
 
 =item C<static void
-complex_parse_string(Interp *interp,
+complex_parse_string(PARROT_INTERP,
         FLOATVAL *re, FLOATVAL *im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
@@ -46,7 +46,7 @@ use C<j> instead of C<i>.
 */
 
 static void
-complex_parse_string(Interp *interp,
+complex_parse_string(PARROT_INTERP,
         FLOATVAL *re, FLOATVAL *im, STRING *value) {
     char *str;
     INTVAL first_num_length, second_num_length;
@@ -169,7 +169,7 @@ complex_parse_string(Interp *interp,
 /*
 
 =item C<static FLOATVAL*
-complex_locate_keyed_num(Interp *interp, PMC *self, STRING *key)>
+complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key)>
 
 Interpret the string C<key>; valid keys are C<real> and C<imag>,
 representing the real and imaginary parts of the complex number.
@@ -179,7 +179,7 @@ representing the real and imaginary parts of the complex number.
 */
 
 static FLOATVAL*
-complex_locate_keyed_num(Interp *interp, PMC *self, STRING *key) {
+complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key) {
     /* do imag first since real can be read much faster anyway */
     STRING *imag = string_from_cstring(interp, "imag", 4);
     STRING *real;

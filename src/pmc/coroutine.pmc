@@ -62,7 +62,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
     } while (0)
 
 static void
-print_sub_name(Interp *interp, PMC *sub)
+print_sub_name(PARROT_INTERP, PMC *sub)
 {
     Parrot_coro *co     = PMC_coro(sub);
     Interp      *tracer = interp->debugger ? interp->debugger : interp;

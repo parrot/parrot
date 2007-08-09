@@ -219,7 +219,7 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
 /*
 
 =item C<static INTVAL
-does_isa(Interp *interp, STRING *method, STRING *what)>
+does_isa(PARROT_INTERP, STRING *method, STRING *what)>
 
 Compares C<*method> and C<*what>.
 Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
@@ -229,7 +229,7 @@ Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
 */
 
 static INTVAL
-does_isa(Interp *interp, const STRING *method, const STRING *what)
+does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
 {
     INTVAL pos = 0;
     do {

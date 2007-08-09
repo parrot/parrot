@@ -56,7 +56,7 @@ Currently SArray's are used for:
 /*
 
 =item C<static PARROT_INLINE INTVAL
-ret_int(Interp *interp, const HashEntry *e)>
+ret_int(PARROT_INTERP, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate integer, or raising an
 exception if necessary.
@@ -66,7 +66,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE INTVAL
-ret_int(Interp *interp, const HashEntry *e)
+ret_int(PARROT_INTERP, const HashEntry *e)
 {
     switch (e->type) {
     case enum_hash_int:
@@ -83,7 +83,7 @@ ret_int(Interp *interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE FLOATVAL
-ret_num(Interp *interp, const HashEntry *e)>
+ret_num(PARROT_INTERP, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate floating-point number, or
 raising an exception if necessary.
@@ -93,7 +93,7 @@ raising an exception if necessary.
 */
 
 static PARROT_INLINE FLOATVAL
-ret_num(Interp *interp, const HashEntry *e)
+ret_num(PARROT_INTERP, const HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_num:
@@ -110,7 +110,7 @@ ret_num(Interp *interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE STRING *
-ret_string(Interp *interp, HashEntry *e)>
+ret_string(PARROT_INTERP, HashEntry *e)>
 
 Processes C<*e>, returning the appropriate Parrot string, or raising an
 exception if necessary.
@@ -120,7 +120,7 @@ exception if necessary.
 */
 
 static PARROT_INLINE STRING*
-ret_string(Interp *interp, const HashEntry *e)
+ret_string(PARROT_INTERP, const HashEntry *e)
 {
     switch (e->type) {
         case enum_hash_string:
@@ -137,7 +137,7 @@ ret_string(Interp *interp, const HashEntry *e)
 /*
 
 =item C<static PARROT_INLINE PMC *
-ret_pmc(Interp *interp, const HashEntry *e)>
+ret_pmc(PARROT_INTERP, const HashEntry *e)>
 
 Processes C<*e>, returning the appropriate PMC, or raising an exception
 if necessary.
@@ -147,7 +147,7 @@ if necessary.
 */
 
 static PARROT_INLINE PMC*
-ret_pmc(Interp *interp, const HashEntry *e)
+ret_pmc(PARROT_INTERP, const HashEntry *e)
 {
     PMC *ret;
     switch (e->type) {
