@@ -11,6 +11,9 @@
     $P0.'language'('NQP')
     $P0.'parsegrammar'('NQP::Grammar')
     $P0.'parseactions'('NQP::Grammar::Actions')
+
+    $P0 = new .Integer
+    set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
 .end
 
 .sub 'main' :main

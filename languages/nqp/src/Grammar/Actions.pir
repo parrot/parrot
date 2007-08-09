@@ -10,7 +10,7 @@
 
 
 ##    method TOP($/) {
-##        return PAST::Block.new($($<statementlist>), 
+##        return PAST::Block.new($($<statement_list>), 
 ##                               node => $/,
 ##                               name => 'anon',
 ##                               );
@@ -18,7 +18,7 @@
 .sub 'TOP' :method
     .param pmc match
     .local pmc cpast, past
-    $P0 = match['statementlist']
+    $P0 = match['statement_list']
     cpast = $P0.'get_scalar'()
     $P0 = getclass 'PAST::Block'
     past = $P0.'new'(cpast, 'node'=>match, 'name'=>'anon')
@@ -26,14 +26,14 @@
 .end
 
 
-##    method statementlist($/) {
+##    method statement_list($/) {
 ##        my $past := PAST::Stmts.new(node=>$/)
 ##        for $<statement> {
 ##            $past.push($($_));
 ##        }
 ##        return $past;
 ##    }
-.sub 'statementlist' :method
+.sub 'statement_list' :method
     .param pmc match
     .local pmc past
     $P0 = getclass 'PAST::Stmts'
@@ -53,26 +53,28 @@
 .end
 
 
-##    method statement($/, $key?) {
-##        return $($<EXPR>);
+##    method statement($/, $key) {
+##        return $(${$key});
 ##    }
 .sub 'statement' :method
     .param pmc match
-    .param string key          :optional
-    $P0 = match['EXPR']
+    .param string key
+    $P0 = match[key]
     .return $P0.'get_scalar'()
 .end
 
 
-##    method block($/) {
-##        return PAST::Block($($<statementlist>),
+##    method block($/, $key) {
+##        if ($key eq 'endstmt') { $!endstmt := $/.to().clone() }
+##        return PAST::Block($($<statement_list>),
 ##                           node => $/,
 ##                          );
 ##    }
 .sub 'block' :method
     .param pmc match
+    .param string key
     .local pmc cpast, past
-    $P0 = match['statementlist']
+    $P0 = match['statement_list']
     cpast = $P0.'get_scalar'()
     $P0 = getclass 'PAST::Block'
     past = $P0.'new'(cpast, 'node'=>match)

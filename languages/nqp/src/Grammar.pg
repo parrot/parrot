@@ -3,8 +3,12 @@
 
 grammar NQP::Grammar is PCT::Grammar;
 
-token TOP { <statementlist> [ $ | <panic: Syntax error> ] {*} }
 
+token TOP { <statement_list> [ $ | <panic: Syntax error> ] {*} }
+
+##  The <ws> and <pod_comment> rules handle whitespace and comments.
+##  These are taken from an earlier draft of Perl 6, so they do not
+##  yet handle all valid forms of Perl 6 whitespace.
 token ws {
     [ \s+
     | ^^ [ \# \N*
@@ -23,22 +27,64 @@ regex pod_comment {
 }
 
 
-rule statementlist {
-    <statement> [ ';' <statement> ]* ';'?
+##  Parse a list of statements.
+rule statement_list {
+    [ <statement>
+        [  <?statement_end> || <panic: Statement not terminated properly> ]
+    ]*
     {*}
 }
 
 
+##  Parse a single statement, which may be either a bare block
+##  or an expression.  Any statement termination is handled by
+##  the calling rule.
 rule statement {
-    | <EXPR> {*}
+    | <block> {*}                                          #= block
+    | <EXPR> {*}                                           #= EXPR
 }
 
-rule block {
-    '{' <statementlist> '}'
-    {*}
+
+##  The statement_end rule detects when we're at valid statement
+##  termination point.  A semicolon always acts as a valid
+##  statement ending point, as does the presence of any expression
+##  terminator.  Here we also handle the special case of a closing
+##  '}' on a line by itself (which will have been detected by
+##  a previous <block> rule).
+
+token terminator { <[ } \] ) ]> | $ }
+
+token statement_end {
+     || ';'
+     || <?before <terminator>>
+     || {{  $P0 = match.'to'()
+            $P1 = get_hll_global ['NQP::Grammar'], '$!endstmt'
+            if $P0 != $P1 goto end
+            .return (1)
+            end:
+        }} <fail>
 }
 
-token noun { 
+
+##  Parse a block.  If the closing brace is at the end of a line,
+##  then we grab any whitespace and set C<$!endstmt> to the resulting
+##  position so that the <statement_end> rule can detect it.
+
+token block {
+    '{'
+    <statement_list>
+    '}'
+    [
+        \h* [ \# \N* ]? \n <?ws>
+        {{  $P0 = match.'to'()
+            $P0 = clone $P0
+            set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
+        }}
+    ]?
+    {*}                                                    #= end
+}
+
+token noun {
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
     | <number> {*}                                         #= number
@@ -67,12 +113,12 @@ token quote {
 }
 
 rule subcall {
-    <name> '(' <EXPR>? ')' 
+    <name> '(' <EXPR>? ')'
     {*}
 }
 
-token name { 
-    <ident> [ '::' <ident> ]* 
+token name {
+    <ident> [ '::' <ident> ]*
     {*}
 }
 
