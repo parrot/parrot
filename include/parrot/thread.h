@@ -216,7 +216,7 @@ void pt_thread_wait_with( PARROT_INTERP, Parrot_mutex *mutex )
         __attribute__nonnull__(1);
 
 void pt_thread_yield( void );
-PMC * pt_transfer_sub( Parrot_Interp d, Parrot_Interp s, PMC *sub );
+PMC * pt_transfer_sub( Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub) );
 /* HEADERIZER END: src/thread.c */
 
 #endif /* PARROT_THREAD_H_GUARD */

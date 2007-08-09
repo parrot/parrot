@@ -118,8 +118,8 @@ void
 Parrot_compreg(PARROT_INTERP, STRING *type,
                     Parrot_compiler_func_t func)
 {
+    PMC* const iglobals = interp->iglobals;
     PMC *hash, *nci;
-    PMC* iglobals = interp->iglobals;
     STRING *sc;
 
     hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,

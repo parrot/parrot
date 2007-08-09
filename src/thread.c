@@ -28,11 +28,13 @@ static Shared_gc_info * get_pool( PARROT_INTERP )
 static int is_suspended_for_gc( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static PMC * make_local_args_copy( PARROT_INTERP,
     Parrot_Interp old_interp,
     PMC *args )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static PMC * make_local_copy( PARROT_INTERP,
     NOTNULL(Parrot_Interp from),
     NULLOK(PMC *arg) )
@@ -54,6 +56,12 @@ static void pt_gc_wait_for_stage( PARROT_INTERP,
 static void pt_gc_wakeup_check( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+static void pt_ns_clone(
+    Parrot_Interp d,
+    PMC *dest_ns,
+    Parrot_Interp s,
+    PMC *source_ns );
+
 static void pt_suspend_all_for_gc( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -70,7 +78,9 @@ static void pt_thread_wait( PARROT_INTERP )
 static QUEUE_ENTRY * remove_queued_suspend_gc( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
 static void* thread_func( void *arg );
+
 /* HEADERIZER END: static */
 
 #if defined THREAD_DEBUG && THREAD_DEBUG
@@ -95,6 +105,7 @@ Parrot_clone() depends on freezing).
 
 */
 
+PARROT_CAN_RETURN_NULL
 static PMC *
 make_local_copy(PARROT_INTERP, NOTNULL(Parrot_Interp from), NULLOK(PMC *arg))
 {
@@ -148,6 +159,7 @@ Make a local copy of the corresponding array of arguments.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static PMC *
 make_local_args_copy(PARROT_INTERP, Parrot_Interp old_interp, PMC *args)
 {
@@ -371,8 +383,7 @@ The actual thread function.
 
 */
 
-static void pt_gc_wakeup_check(Interp *);
-
+PARROT_CAN_RETURN_NULL
 static void*
 thread_func(void *arg)
 {
@@ -394,11 +405,8 @@ thread_func(void *arg)
     sub_arg            = PMC_pmc_val(self);
 
     if (setjmp(exp.destination)) {
-        Parrot_exception *except;
+        const Parrot_exception * const except = interp->exceptions;
         /* caught exception */
-        ret_val = PMCNULL;
-        except  = interp->exceptions;
-
         /* XXX what should we really do here */
         PIO_eprintf(interp,
                     "Unhandled exception in thread with tid %d "
@@ -406,6 +414,8 @@ thread_func(void *arg)
                     interp->thread_data->tid,
                     except->msg,
                     except->error);
+
+        ret_val = PMCNULL;
     }
     else {
         /* run normally */
@@ -475,7 +485,8 @@ Clone all globals from C<s> to C<d>.
 */
 
 static void
-pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns) {
+pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)
+{
     PMC * const iter = VTABLE_get_iter(s, source_ns);
     const INTVAL n   = VTABLE_elements(s, source_ns);
     INTVAL i;
@@ -498,8 +509,8 @@ pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns) {
             pt_ns_clone(d, sub_ns, s, val);
         }
         else {
-            PMC *dval;
-            dval = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
+            PMC * const dval = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
+
             if (PMC_IS_NULL(dval)) {
                 PMC *copy;
                 copy = make_local_copy(d, s, val);
@@ -546,7 +557,7 @@ C<arg> should be an array of arguments for the subroutine.
 /* create a clone of the sub suitable for the other interpreter */
 
 PMC *
-pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, PMC *sub)
+pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub))
 {
 #if defined THREAD_DEBUG && THREAD_DEBUG
     PIO_eprintf(s, "copying over subroutine [%Ss]\n",
