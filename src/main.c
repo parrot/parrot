@@ -62,8 +62,6 @@ main(int argc, char * argv[])
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
     Parrot_exit(interp, 0);
-
-    return status;
 }
 
 /*
