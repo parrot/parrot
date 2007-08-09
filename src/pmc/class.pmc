@@ -451,7 +451,7 @@ arguments.  The class is attatched to the current namespace.
         PObj_is_class_SET(SELF);
     }
 
-    void init_pmc(PMC* init_data) {
+    void init_pmc(PMC *init_data) {
         PMC           *arg;
         const INTVAL   arg_type = VTABLE_type(interp, init_data);
         STRING * const name_str = CONST_STRING(interp, "name");
@@ -499,7 +499,7 @@ arguments.  The class is attatched to the current namespace.
 
 /*
 
-=item C<PMC* subclass(PMC* name)>
+=item C<PMC *subclass(PMC *name)>
 
 Creates a subclass, optionally with a given C<name>.
 
@@ -507,7 +507,7 @@ Creates a subclass, optionally with a given C<name>.
 
 */
 
-    PMC* subclass(PMC *name) {
+    PMC *subclass(PMC *name) {
         PMC *child_class;
 
         /* Create a new class. Set the classname, if we have one. */
@@ -545,7 +545,7 @@ Free the memory associated with the object's underlying struct.
 
 /*
 
-=item C<STRING* get_string()>
+=item C<STRING *get_string()>
 
 Return the fully qualified name of the class.
 
@@ -553,7 +553,7 @@ Return the fully qualified name of the class.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         Parrot_Class * const  _class    = PARROT_CLASS(SELF);
         PMC                  *namespace = _class->_namespace;
         PMC                  *names;
@@ -762,7 +762,7 @@ no conflicts.
 
 /*
 
-=item C<PMC* inspect_str(STRING *what)>
+=item C<PMC *inspect_str(STRING *what)>
 
 Provides introspection of a specific piece of information about the class. The
 available information is:
@@ -800,7 +800,7 @@ Array of Class PMCs representing the direct parents of this class.
 =cut
 
 */
-    PMC* inspect_str(STRING *what) {
+    PMC *inspect_str(STRING *what) {
         Parrot_Class *_class = PARROT_CLASS(SELF);
 
         /* What should we return? */
@@ -837,7 +837,7 @@ Array of Class PMCs representing the direct parents of this class.
 
 /*
 
-=item C<PMC* inspect()>
+=item C<PMC *inspect()>
 
 Returns a Hash describing the class, with key/value pairs as described in
 inspect_str.
@@ -845,7 +845,7 @@ inspect_str.
 =cut
 
 */
-    PMC* inspect() {
+    PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
         PMC    *metadata    = pmc_new(interp, enum_class_Hash);
@@ -879,7 +879,7 @@ inspect_str.
 
 /*
 
-=item C<PMC* clone()>
+=item C<PMC *clone()>
 
 Returns an anonymous copy of the class (with no name and no link to a
 namespace). Unsets the instantiated flag, allowing modifications.
@@ -888,7 +888,7 @@ namespace). Unsets the instantiated flag, allowing modifications.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         Parrot_Class *_class = PARROT_CLASS(SELF);
 
         /* Create the new class PMC, of the same type of this one (we may
@@ -917,7 +917,7 @@ namespace). Unsets the instantiated flag, allowing modifications.
 
 /*
 
-=item C<PMC* clone_pmc(PMC *args)>
+=item C<PMC *clone_pmc(PMC *args)>
 
 Makes a copy of the class, then modifies or adds to it based upon the contents
 of the supplied initialization data. If a new name or namespace is not supplied
@@ -928,7 +928,7 @@ unset to allow further modifications.
 
 */
 
-    PMC* clone_pmc(PMC *args) {
+    PMC *clone_pmc(PMC *args) {
         /* Do the standard clone. */
         PMC *copy = DYNSELF.clone();
 
@@ -939,7 +939,7 @@ unset to allow further modifications.
 
 /*
 
-=item C<PMC* instantiate(PMC* init)>
+=item C<PMC *instantiate(PMC *init)>
 
 Creates a new PMC object of the type of the class and calls init().
 
@@ -947,7 +947,7 @@ Creates a new PMC object of the type of the class and calls init().
 
 */
 
-    PMC* instantiate(PMC* init) {
+    PMC *instantiate(PMC *init) {
         Parrot_Object *obj_guts  = NULL;
         Parrot_Class  *_class    = PARROT_CLASS(SELF);
         STRING * const class_str = string_from_cstring(interp, "Class", 5);
@@ -1274,7 +1274,7 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 
 */
     PCCMETHOD add_attribute(STRING *attribute_name,
-            PMC* attribute_type :optional, int got_type :opt_flag) {
+            PMC *attribute_type :optional, int got_type :opt_flag) {
         PMC *type = got_type ? attribute_type : PMCNULL;
         DYNSELF.add_attribute(attribute_name, type);
     }
@@ -1324,7 +1324,7 @@ C<add_method> vtable method.
 
 /*
 
-=item C<PMC* find_method(STRING *name)>
+=item C<PMC *find_method(STRING *name)>
 
 Walks the MRO of the class and finds the method with the given name.
 
@@ -1406,18 +1406,18 @@ Return the roles array PMC.
 
 /*
 
-=item C<void add_role(PMC* role, PMC* exclude :optional :named["exclude"],
-PMC* alias :optional :named["alias"])>
+=item C<void add_role(PMC *role, PMC *exclude :optional :named["exclude"],
+PMC *alias :optional :named["alias"])>
 
 Compose a role into a class with the given exclusions and aliases.
 
 =cut
 
 */
-    PCCMETHOD add_role(PMC* role,
+    PCCMETHOD add_role(PMC *role,
             PMC* exclude_method     :optional :named["exclude_method"],
             int got_exclude_method  :opt_flag,
-            PMC* alias_method       :optional :named["alias_method"],
+            PMC *alias_method       :optional :named["alias_method"],
             int got_alias_method    :opt_flag) {
 
         Parrot_Class *_class = PARROT_CLASS(SELF);

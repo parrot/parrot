@@ -56,7 +56,7 @@ in the constant PMC pool.
 =cut
 
 */
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
+    PMC *new_from_string(STRING *rep, INTVAL flags) {
         INTVAL type, n, elem;
         char *p, *start;
         UINTVAL i, l;
@@ -163,7 +163,7 @@ Creates and returns a copy of the array.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         INTVAL size;
         PMC * dest;
         /* a quick hack to create a clone in the constant PMC arena
@@ -261,7 +261,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    INTVAL get_integer_keyed(PMC* key) {
+    INTVAL get_integer_keyed(PMC *key) {
         /* simple int keys only */
         INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_integer_keyed_int(k);
@@ -284,7 +284,7 @@ Returns the floating-point value of the element at index C<key>.
 
 /*
 
-=item C<FLOATVAL get_number_keyed(PMC* key)>
+=item C<FLOATVAL get_number_keyed(PMC *key)>
 
 Returns the floating-point value of the element at index C<*key>.
 
@@ -292,7 +292,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    FLOATVAL get_number_keyed(PMC* key) {
+    FLOATVAL get_number_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_number_keyed_int(k);
     }
@@ -307,7 +307,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    STRING* get_string_keyed_int(INTVAL key) {
+    STRING *get_string_keyed_int(INTVAL key) {
         PMC *temp;
         temp = DYNSELF.get_pmc_keyed_int(key);
         return VTABLE_get_string(INTERP, temp);
@@ -323,7 +323,7 @@ Returns the Parrot string representation C<key>.
 
 */
 
-    STRING* get_repr() {
+    STRING *get_repr() {
         STRING *res;
         INTVAL j, n;
         PMC *val;
@@ -351,7 +351,7 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    STRING* get_string_keyed(PMC* key) {
+    STRING *get_string_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_string_keyed_int(k);
     }
@@ -367,7 +367,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         PMC *ret;
         INTVAL val;
 
@@ -387,7 +387,7 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    PMC* get_pmc_keyed(PMC* key) {
+    PMC *get_pmc_keyed(PMC *key) {
         INTVAL k = key_integer(INTERP, key);
         return DYNSELF.get_pmc_keyed_int(k);
     }
@@ -489,7 +489,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    void set_string_keyed_int(INTVAL key, STRING* value) {
+    void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
         PMC *tempPMC;
 
@@ -501,7 +501,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 /*
 
-=item C<void set_string_keyed(PMC *key, STRING* value)>
+=item C<void set_string_keyed(PMC *key, STRING *value)>
 
 Sets the string value of the element at index C<key> to
 C<value>.
@@ -510,7 +510,7 @@ C<value>.
 
 */
 
-    void set_string_keyed(PMC *key, STRING* value) {
+    void set_string_keyed(PMC *key, STRING *value) {
         INTVAL k;
         k = key_integer(INTERP, key);
         DYNSELF.set_string_keyed_int(k, value);
@@ -526,7 +526,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    void set_pmc_keyed_int(INTVAL key, PMC* src) {
+    void set_pmc_keyed_int(INTVAL key, PMC *src) {
         INTVAL tempInt;
 
         tempInt = VTABLE_get_integer(INTERP, src);
@@ -535,7 +535,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 /*
 
-=item C<void set_pmc_keyed(PMC *key, PMC* value)>
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 Sets the string value of the element at index C<key> to
 C<value>.
@@ -544,7 +544,7 @@ C<value>.
 
 */
 
-    void set_pmc_keyed(PMC *key, PMC* value) {
+    void set_pmc_keyed(PMC *key, PMC *value) {
         INTVAL k;
         k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);

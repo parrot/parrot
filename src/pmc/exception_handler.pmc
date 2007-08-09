@@ -77,13 +77,13 @@ Initializes the exception handler.
         }
     }
 
-    PMC* clone() {
+    PMC *clone() {
         PMC *result = SUPER();
         PObj_custom_mark_CLEAR(result);
         return result;
     }
 
-    opcode_t* invoke(void* ex) {
+    opcode_t *invoke(void *ex) {
         struct Parrot_cont *cc        = PMC_cont(SELF);
         PMC                *exception = (PMC *)ex;
         opcode_t           *next      = NULL;

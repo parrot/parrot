@@ -125,10 +125,10 @@ Creates and returns a clone of the continuation.
 
 */
 
-    PMC* clone() {
+    PMC *clone() {
         struct Parrot_cont * cc;
         struct Parrot_cont *cc_self = PMC_cont(SELF);
-        PMC* ret = pmc_new_noinit(INTERP, enum_class_Continuation);
+        PMC *ret = pmc_new_noinit(INTERP, enum_class_Continuation);
 
         PObj_custom_mark_destroy_SETALL(ret);
         cc = new_continuation(INTERP, cc_self);
@@ -148,7 +148,7 @@ Assign context.
 =cut
 
 */
-    void set_pmc(PMC* src) {
+    void set_pmc(PMC *src) {
         struct Parrot_cont * const cc_self = PMC_cont(SELF);
         struct Parrot_cont * const cc_src  = PMC_cont(src);
 
@@ -190,7 +190,7 @@ Returns the pointer to the return instruction.
 
 */
 
-    void* get_pointer() {
+    void *get_pointer() {
         return PMC_cont(SELF)->address;
     }
 /*
@@ -224,7 +224,7 @@ destination to continue execution.
 
 */
 
-    opcode_t* invoke(void* next) {
+    opcode_t *invoke(void *next) {
         struct Parrot_cont * cc = PMC_cont(SELF);
         Stack_Chunk_t *stack_target = cc->dynamic_state;
         Stack_Chunk_t *corresponding_target;
@@ -383,7 +383,7 @@ destination to continue execution.
 
 /*
 
-=item C<STRING* get_string()>
+=item C<STRING *get_string()>
 
 Experimental: return caller info as a STRING.
 
@@ -391,13 +391,13 @@ Experimental: return caller info as a STRING.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         return Parrot_Context_infostr(INTERP, PMC_cont(SELF)->to_ctx);
     }
 
 /*
 
-=item C<METHOD PMC* "caller"()>
+=item C<METHOD PMC *"caller"()>
 
 Experimental: return caller PMC or Undef if none.
 
@@ -405,8 +405,8 @@ Experimental: return caller PMC or Undef if none.
 
 */
 
-    METHOD PMC* caller() {
-        struct Parrot_cont * cc = PMC_cont(SELF);
+    METHOD PMC *caller() {
+        struct Parrot_cont *cc = PMC_cont(SELF);
         PMC *caller = cc->to_ctx->current_sub;
         if (!caller || !PMC_sub(caller)->seg) {
             caller = pmc_new(INTERP, enum_class_Undef);
@@ -416,7 +416,7 @@ Experimental: return caller PMC or Undef if none.
     }
 /*
 
-=item C<METHOD PMC* "continuation"()>
+=item C<METHOD PMC *"continuation"()>
 
 Experimental: return continuation PMC of this Continuation or Undef if none.
 
@@ -424,7 +424,7 @@ Experimental: return continuation PMC of this Continuation or Undef if none.
 
 */
 
-    METHOD PMC* continuation() {
+    METHOD PMC *continuation() {
         struct Parrot_cont * cc = PMC_cont(SELF);
         PMC *cont = cc->to_ctx->current_cont;
         if (cont)

@@ -60,7 +60,7 @@ A newline is automatically added to the end of the fmt.
 =cut
 */
 
-  PCCMETHOD emit(STRING* fmt, PMC* args :slurpy, PMC* hash :slurpy :named) {
+  PCCMETHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
     INTVAL pos = 0;
     INTVAL replen = 0;
     STRING *key, *repl;
@@ -121,7 +121,7 @@ A newline is automatically added to the end of the fmt.
         VTABLE_set_string_native(INTERP, SELF, S1);
     }
 
-    PCCRETURN(PMC* SELF);
+    PCCRETURN(PMC *SELF);
 }
 
 
@@ -140,20 +140,20 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
 */
 
-  PCCMETHOD unique(STRING* format :optional, int has_fmt :opt_flag) {
+  PCCMETHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
-    STRING* counter_as_string = string_from_int(INTERP, counter);
+    STRING *counter_as_string = string_from_int(INTERP, counter);
 
     counter++;
 
     if (!has_fmt) {
-        PCCRETURN(STRING* counter_as_string);
+        PCCRETURN(STRING *counter_as_string);
     }
     else {
-        STRING* result;
+        STRING *result;
         result = Parrot_make_COW_reference(INTERP, format);
         result = string_concat(INTERP, result, counter_as_string, 1);
-        PCCRETURN(STRING* result);
+        PCCRETURN(STRING *result);
     }
   }
 
@@ -169,7 +169,7 @@ prefixed with 'unicode:'.
 
 */
 
-  PCCMETHOD escape(STRING* str) {
+  PCCMETHOD escape(STRING *str) {
     STRING *escaped_str = string_escape_string(INTERP, str);
     STRING *quote       = string_from_literal (INTERP, "\"");
     STRING *x           = string_from_literal (INTERP, "\\x");
@@ -197,7 +197,7 @@ prefixed with 'unicode:'.
       escaped_str = string_concat(INTERP, unicode, escaped_str, 1);
     }
 
-    PCCRETURN(STRING* escaped_str);
+    PCCRETURN(STRING *escaped_str);
   }
 
 /*

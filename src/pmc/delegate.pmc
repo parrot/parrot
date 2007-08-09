@@ -63,7 +63,7 @@ pmclass delegate {
 
 =over 4
 
-=item C<PMC* instantiate(PMC* sig)>
+=item C<PMC *instantiate(PMC *sig)>
 
 Calls the delegated C<__instantiate> method if it exists.
 
@@ -77,22 +77,22 @@ useful defaults and don't throw exceptions.
 
 
     void init() {
-        STRING* const meth = CONST_STRING(interp, "init");
-        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+        STRING *const meth = CONST_STRING(interp, "init");
+        PMC *const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (!PMC_IS_NULL(sub))
             Parrot_run_meth_fromc(interp, sub, SELF, meth);
     }
 
-    void init_pmc(PMC* initializer) {
-        STRING* const meth = CONST_STRING(interp, "init_pmc");
-        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+    void init_pmc(PMC *initializer) {
+        STRING *const meth = CONST_STRING(interp, "init_pmc");
+        PMC *const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (!PMC_IS_NULL(sub))
             Parrot_run_meth_fromc_args(interp, sub, pmc, meth, "vP", initializer);
     }
 
-    PMC* instantiate(PMC* sig) {
-        STRING* const meth = CONST_STRING(interp, "instantiate");
-        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+    PMC *instantiate(PMC *sig) {
+        STRING *const meth = CONST_STRING(interp, "instantiate");
+        PMC *const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (PMC_IS_NULL(sub))
             return SUPER(sig);
         return (PMC*) Parrot_run_meth_fromc(INTERP, sub, SELF, meth);
@@ -110,11 +110,11 @@ useful defaults and don't throw exceptions.
         SUPER(method_name, sub_pmc);
     }
 
-    STRING* name() {
+    STRING *name() {
         return SELF->vtable->whoami;
     }
 
-    PMC* pmc_namespace() {
+    PMC *pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 
@@ -139,9 +139,9 @@ Invokes a subroutine.
 
 */
 
-    opcode_t* invoke(void *next) {
-        STRING* const meth = CONST_STRING(interp, "invoke");
-        PMC* const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
+    opcode_t *invoke(void *next) {
+        STRING *const meth = CONST_STRING(interp, "invoke");
+        PMC *const sub = Parrot_find_vtable_meth(INTERP, SELF, meth);
         if (PMC_IS_NULL(sub))
             vtable_meth_not_found(INTERP, SELF, "invoke");
         INTERP->current_object = SELF;

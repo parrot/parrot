@@ -32,7 +32,7 @@ pmclass File singleton {
 
 /*
 
-=item C<void* get_pointer()>
+=item C<void *get_pointer()>
 
 =item C<void set_pointer(void *ptr)>
 
@@ -43,17 +43,17 @@ information see F<src/pmc.c>.
 
 */
 
-    void* get_pointer() {
+    void *get_pointer() {
         return File_PMC;
     }
 
-    void set_pointer(void* ptr) {
+    void set_pointer(void *ptr) {
         File_PMC = (PMC*) ptr;
     }
 
 /*
 
-=item C<INTVAL exists(STRING* file)>
+=item C<INTVAL exists(STRING *file)>
 
 Returns a true value (1) if the supplied file or directory exists.
 
@@ -79,7 +79,7 @@ Returns a true value (1) if the supplied file or directory exists.
 
 /*
 
-=item C<INTVAL is_dir(STRING* path)>
+=item C<INTVAL is_dir(STRING *path)>
 
 Returns a true value (1) if the supplied path is a directory.
 
@@ -111,7 +111,7 @@ Returns a true value (1) if the supplied path is a directory.
 
 /*
 
-=item C<INTVAL is_file(STRING* path)>
+=item C<INTVAL is_file(STRING *path)>
 
 Returns a true value (1) if the supplied path is a plain file.
 
@@ -143,7 +143,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
 /*
 
-=item C<INTVAL is_link(STRING* path)>
+=item C<INTVAL is_link(STRING *path)>
 
 Returns a true value (1) if the supplied path is a link.
 
@@ -176,7 +176,7 @@ Returns a true value (1) if the supplied path is a link.
 
 /*
 
-=item C<void copy(STRING* from, STRING *to)>
+=item C<void copy(STRING *from, STRING *to)>
 
 Copy the contents from file represented by path C<from> to the path
 C<to>.
@@ -233,7 +233,7 @@ free to change or give me hints on how to change it. -- ambs
 
 /*
 
-=item C<void rename(STRING* from, STRING *to)>
+=item C<void rename(STRING *from, STRING *to)>
 
 Rename a file C<from> to the path C<to>.
 

@@ -38,7 +38,7 @@ pmclass deleg_pmc no_ro {
     void init() {
     }
 
-    void init_pmc(PMC* _class) {
+    void init_pmc(PMC *_class) {
     }
 
     void mark() {
@@ -53,7 +53,7 @@ pmclass deleg_pmc no_ro {
         /* don't pass that on */
     }
 
-    PMC* clone() {
+    PMC *clone() {
         PMC      *res          = pmc_new(INTERP, SELF->vtable->base_type);
         SLOTTYPE *attrib_array = PMC_data_typed(res, SLOTTYPE *);
         INTVAL    i;
@@ -64,7 +64,7 @@ pmclass deleg_pmc no_ro {
         return res;
     }
 
-    STRING* name() {
+    STRING *name() {
         return SELF->vtable->whoami;
     }
 
@@ -76,11 +76,11 @@ pmclass deleg_pmc no_ro {
         SUPER(method_name, sub_pmc);
     }
 
-    PMC* find_method(STRING* method_name) {
+    PMC *find_method(STRING *method_name) {
         return SUPER(method_name);
     }
 
-    PMC* pmc_namespace() {
+    PMC *pmc_namespace() {
         return SELF->vtable->_namespace;
     }
 

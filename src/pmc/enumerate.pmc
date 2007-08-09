@@ -22,7 +22,7 @@ These is an Iterator return [idx, item] tuples.
 
 pmclass Enumerate extends Iterator no_ro {
 
-    void init_pmc(PMC* iterable) {
+    void init_pmc(PMC *iterable) {
         SUPER(iterable);
         PMC_struct_val(SELF) = key_new_integer(INTERP, 0);
         PMC_pmc_val(SELF) = VTABLE_get_iter(INTERP, iterable);
@@ -30,7 +30,7 @@ pmclass Enumerate extends Iterator no_ro {
 
 /*
 
-=item C<PMC* shift_pmc()>
+=item C<PMC *shift_pmc()>
 
 Returns [idx, element] for the current idx/key and sets the idx/key to
 the next one.
@@ -50,7 +50,7 @@ the next one.
         return ok;
     }
 
-    PMC* shift_pmc() {
+    PMC *shift_pmc() {
         PMC *item, *tupl, *val;
         PMC *key  = (PMC *)PMC_struct_val(SELF);
         PMC *iter = (PMC *)PMC_pmc_val(SELF);
@@ -74,7 +74,7 @@ the next one.
         return tupl;
     }
 
-    PMC* get_iter() {
+    PMC *get_iter() {
         return SELF;
     }
 

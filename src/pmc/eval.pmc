@@ -55,7 +55,7 @@ clear_fixups(PARROT_INTERP, Parrot_sub *sub_data)
 }
 
 static PMC*
-get_sub(PARROT_INTERP, PMC* self, int idx)
+get_sub(PARROT_INTERP, PMC *self, int idx)
 {
     opcode_t i, n, ci;
     PackFile_ByteCode *seg;
@@ -86,7 +86,7 @@ get_sub(PARROT_INTERP, PMC* self, int idx)
 }
 
 static void
-mark_subs(PARROT_INTERP, PMC* self)
+mark_subs(PARROT_INTERP, PMC *self)
 {
     opcode_t i, ci;
     PackFile_FixupTable *ft;
@@ -131,7 +131,7 @@ Invokes the first subroutine in the eval code.
 
 */
 
-    opcode_t* invoke(void *next) {
+    opcode_t *invoke(void *next) {
         PMC *sub = SELF.get_pmc_keyed_int(0);
         return VTABLE_invoke(INTERP, sub, next);
     }
@@ -197,7 +197,7 @@ Invokes the first subroutine in the eval code.
 
 /*
 
-=item C<STRING* get_string>
+=item C<STRING *get_string>
 
 Get a STRING representing the bytecode for this code segment, suitable
 for writing to disc and later loading via C<load_bytecode>.
@@ -206,7 +206,7 @@ for writing to disc and later loading via C<load_bytecode>.
 
 */
 
-    STRING* get_string() {
+    STRING *get_string() {
         STRING *res;
         PackFile *pf;
         size_t size, aligned_size;
@@ -271,7 +271,7 @@ Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 */
 
-    PMC* get_pmc_keyed_int(INTVAL key) {
+    PMC *get_pmc_keyed_int(INTVAL key) {
         return get_sub(INTERP, SELF, key);
     }
 
