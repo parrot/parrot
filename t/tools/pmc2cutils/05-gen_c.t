@@ -43,10 +43,11 @@ my ( $tie, $msg, @lines );
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
-    my $pmcdir = q{src/pmc};
-    ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+
     my $temppmcdir = qq{$tdir/src/pmc};
-    ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
+    for ( qq{$tdir/src}, $temppmcdir ) {
+        ok( mkdir( $_ ), "created $_ under tempdir" );
+    }
 
     my @pmcfiles = (
         "$main::topdir/src/pmc/default.pmc",
