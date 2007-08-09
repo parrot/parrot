@@ -36,6 +36,7 @@ win32-x86-cygwin_1.5.21           -    -    -     -   -   -    -     -  20070221
 win32-x86-mingw-gcc3.4.2          Y    Y    -     -   -   Y    Y/19  Y  20070515
 win32-x86-msvc_7.1                -    Y    -     -   -   Y    Y/1   ?  20070717
 win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y/1*2 ?  20070717
+win32-x86-msvc_9.0                -    Y    -     -   -   Y    Y     ?  20070806
 
 ?   ... unknown or untested
 -   ... no
