@@ -48,7 +48,7 @@
 #    'get_string'()
     'sparse'()
 
-	'splice'()
+    'splice'()
 .end
 
 #
@@ -65,7 +65,7 @@
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-	array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     $I0 = array
     $I1 = elements array
@@ -121,8 +121,8 @@ still_ok:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array, elem
-    array = new .ResizableStringArray
-    elem  = new .Integer
+    array = new 'ResizableStringArray'
+    elem  = new 'Integer'
 
     array = 1
 
@@ -196,7 +196,7 @@ done:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
     array = 1
     array[0] = "first"
     array[1] = "second"
@@ -271,7 +271,7 @@ done:
 
     .local pmc    array
     .local string elem
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 1
 
@@ -345,7 +345,7 @@ done:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
     array = 1
     array[0] = "first"
     array[1] = "second"
@@ -405,7 +405,7 @@ done:
 
     .local pmc array
     .local int elem
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 1
 
@@ -479,7 +479,7 @@ done:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
     array = 1
     array[0] = "1"
     array[1] = "2"
@@ -539,7 +539,7 @@ done:
 
     .local pmc   array
     .local float elem
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 1
 
@@ -613,7 +613,7 @@ done:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
     array = 1
     array[0] = "1.1"
     array[1] = "2.2"
@@ -671,10 +671,10 @@ done:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "one"
     push array, $P0
     $I0 = elements array
@@ -682,7 +682,7 @@ done:
     is($I0, 1,     "push_pmc - elements")
     is($S0, "one", "push_pmc - value")
 
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "two"
     push array, $P0
     $I0 = elements array
@@ -707,7 +707,7 @@ done:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
     push array, "one"
@@ -739,7 +739,7 @@ done:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
     push array, 1
@@ -771,7 +771,7 @@ done:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
     push array, 1.1
@@ -800,7 +800,7 @@ done:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[1] = "foo"
     $P0 = pop array
@@ -829,7 +829,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[1] = "foo"
     $S0 = pop array
@@ -855,7 +855,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[1] = "2"
     $I1 = pop array
@@ -881,7 +881,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[1] = "2.2"
     $N0 = pop array
@@ -907,7 +907,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[0] = "foo"
     array[1] = "bar"
@@ -937,7 +937,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[0] = "foo"
     array[1] = "bar"
@@ -964,7 +964,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[0] = "2"
     array[1] = "3"
@@ -991,7 +991,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array[0] = "2.2"
     array[1] = "3.3"
@@ -1020,10 +1020,10 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "one"
     unshift array, $P0
     $I0 = elements array
@@ -1031,7 +1031,7 @@ exception:
     is($I0, 1,     "unshift_pmc - elements")
     is($S0, "one", "unshift_pmc - value")
 
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "two"
     unshift array, $P0
     $I0 = elements array
@@ -1056,7 +1056,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
     unshift array, "one"
@@ -1088,7 +1088,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     # unshift_string
     array = 0
@@ -1121,7 +1121,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     array = 0
     unshift array, 1.1
@@ -1153,7 +1153,7 @@ exception:
     is_deeply = get_hll_global ['Test::More'], 'is_deeply'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
     array = 3
     array[0] = 1
     array[1] = 3.2
@@ -1176,7 +1176,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizablePMCArray
+    array = new 'ResizablePMCArray'
     array[0] = "foo"
     array[1] = "bar"
     array[2] = "baz"
@@ -1190,7 +1190,7 @@ exception:
     is = get_hll_global ['Test::More'], 'is'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     $I0 = does array, 'array'
     is($I0, 1, "does array")
@@ -1208,7 +1208,7 @@ exception:
     ok = get_hll_global ['Test::More'], 'ok'
 
     .local pmc array
-    array = new .ResizableStringArray
+    array = new 'ResizableStringArray'
 
     $I10 = 110000
     $I0  = 1
@@ -1294,88 +1294,88 @@ err_2:
     is = get_hll_global ['Test::More'], 'is'
     like = get_hll_global ['Test::More'], 'like'
 
-	$P1 = new .ResizableStringArray
-	$P1 = 3
-	$P1[0] = '1'
-	$P1[1] = '2'
-	$P1[2] = '3'
-	$P2 = new .ResizableStringArray
-	$P2 = 1
-	$P2[0] = 'A'
-	splice $P1, $P2, 0, 2
-	$S0 = join "", $P1
-	is($S0, "A3", "splice replace")
+    $P1 = new 'ResizableStringArray'
+    $P1 = 3
+    $P1[0] = '1'
+    $P1[1] = '2'
+    $P1[2] = '3'
+    $P2 = new 'ResizableStringArray'
+    $P2 = 1
+    $P2[0] = 'A'
+    splice $P1, $P2, 0, 2
+    $S0 = join "", $P1
+    is($S0, "A3", "splice replace")
 
-	$P1 = new .ResizableStringArray
-	$P1 = 3
-	$P1[0] = '1'
-	$P1[1] = '2'
-	$P1[2] = '3'
-	$P2 = new .ResizableStringArray
-	$P2 = 1
-	$P2[0] = 'A'
-	splice $P1, $P2, 1, 2
-	$S0 = join "", $P1
-	is($S0, "1A", "splice replace")
+    $P1 = new 'ResizableStringArray'
+    $P1 = 3
+    $P1[0] = '1'
+    $P1[1] = '2'
+    $P1[2] = '3'
+    $P2 = new 'ResizableStringArray'
+    $P2 = 1
+    $P2[0] = 'A'
+    splice $P1, $P2, 1, 2
+    $S0 = join "", $P1
+    is($S0, "1A", "splice replace")
 
 .macro SpliceMadeEasy(code, out, testing)
-	$P1 = new .ResizableStringArray
-	$P1[0] = "1"
-	$P1[1] = "2"
-	$P1[2] = "3"
-	$P1[3] = "4"
-	$P1[4] = "5"
-	$P2 = new .ResizableStringArray
-	$P2[0] = 'A'
-	$P2[1] = 'B'
-	$P2[2] = 'C'
-	$P2[3] = 'D'
-	$P2[4] = 'E'
+    $P1 = new 'ResizableStringArray'
+    $P1[0] = "1"
+    $P1[1] = "2"
+    $P1[2] = "3"
+    $P1[3] = "4"
+    $P1[4] = "5"
+    $P2 = new 'ResizableStringArray'
+    $P2[0] = 'A'
+    $P2[1] = 'B'
+    $P2[2] = 'C'
+    $P2[3] = 'D'
+    $P2[4] = 'E'
 .code
-	$S0 = join "", $P1
-	is($S0, .out, .testing)
+    $S0 = join "", $P1
+    is($S0, .out, .testing)
 .endm
 
-	.SpliceMadeEasy({ splice $P1, $P2, 0, 5 }, "ABCDE", "splice, complete replace")
-	.SpliceMadeEasy({ splice $P1, $P2, 5, 0 }, "12345ABCDE", "splice, append")
-	.SpliceMadeEasy({ splice $P1, $P2, 4, 0 }, "1234ABCDE5", "splice, insert before last element")
-	.SpliceMadeEasy({ splice $P1, $P2, 3, 0 }, "123ABCDE45", "splice, append-in-middle")
-	.SpliceMadeEasy({ splice $P1, $P2, 0, 2 }, "ABCDE345", "splice, replace at beginning")
-	.SpliceMadeEasy({ splice $P1, $P2, 2, 2 }, "12ABCDE5", "splice, replace in middle")
-	.SpliceMadeEasy({ splice $P1, $P2, 3, 2 }, "123ABCDE", "splice, replace at end")
-	.SpliceMadeEasy({
-		$P2 = new .ResizableStringArray
-		splice $P1, $P2, 2, 2
-	}, "125", "splice, empty replacement")
-	.SpliceMadeEasy({
-		$P2 = new .ResizableStringArray
-		$P2[0] = "A"
-		splice $P1, $P2, 2, 1
-	}, "12A45", "splice, equal size replacement")
+    .SpliceMadeEasy({ splice $P1, $P2, 0, 5 }, "ABCDE", "splice, complete replace")
+    .SpliceMadeEasy({ splice $P1, $P2, 5, 0 }, "12345ABCDE", "splice, append")
+    .SpliceMadeEasy({ splice $P1, $P2, 4, 0 }, "1234ABCDE5", "splice, insert before last element")
+    .SpliceMadeEasy({ splice $P1, $P2, 3, 0 }, "123ABCDE45", "splice, append-in-middle")
+    .SpliceMadeEasy({ splice $P1, $P2, 0, 2 }, "ABCDE345", "splice, replace at beginning")
+    .SpliceMadeEasy({ splice $P1, $P2, 2, 2 }, "12ABCDE5", "splice, replace in middle")
+    .SpliceMadeEasy({ splice $P1, $P2, 3, 2 }, "123ABCDE", "splice, replace at end")
+    .SpliceMadeEasy({
+        $P2 = new 'ResizableStringArray'
+        splice $P1, $P2, 2, 2
+    }, "125", "splice, empty replacement")
+    .SpliceMadeEasy({
+        $P2 = new 'ResizableStringArray'
+        $P2[0] = "A"
+        splice $P1, $P2, 2, 1
+    }, "12A45", "splice, equal size replacement")
 
-	$P1 = new .ResizableStringArray
-	$P1[0] = "1"
-	$P1[1] = "2"
-	$P1[2] = "3"
-	$P1[3] = "4"
-	$P1[4] = "5"
-	$P2 = new .ResizablePMCArray
-	$P2[0] = 'A'
-	$P2[1] = 'B'
-	$P2[2] = 'C'
-	$P2[3] = 'D'
-	$P2[4] = 'E'
+    $P1 = new 'ResizableStringArray'
+    $P1[0] = "1"
+    $P1[1] = "2"
+    $P1[2] = "3"
+    $P1[3] = "4"
+    $P1[4] = "5"
+    $P2 = new 'ResizablePMCArray'
+    $P2[0] = 'A'
+    $P2[1] = 'B'
+    $P2[2] = 'C'
+    $P2[3] = 'D'
+    $P2[4] = 'E'
 
-	push_eh bad_type
-	splice $P1, $P2, 1, 0
-	clear_eh
-	goto still_ok
+    push_eh bad_type
+    splice $P1, $P2, 1, 0
+    clear_eh
+    goto still_ok
 
-	.local pmc exception
-	.local string message
+    .local pmc exception
+    .local string message
 bad_type:
-	.get_results (exception, message)
+    .get_results (exception, message)
 still_ok:
-	like(message, 'illegal\ type\ for\ splice', "splice with a different type")
+    like(message, 'illegal\ type\ for\ splice', "splice with a different type")
 .end
 
