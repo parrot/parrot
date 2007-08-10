@@ -129,6 +129,10 @@ transform pirop (PAST::Op) :language('PIR') {
     cpast = shift iter
     cpost = tree.'get'('post', cpast)
     post.'push'(cpost)
+    $P0 = cpast.'named'()
+    unless $P0 goto iter_loop
+    $P0 = tree.'get'('post', $P0)
+    cpost.'named'($P0)
     goto iter_loop
   iter_end:
     $P0 = post.'get_array'()

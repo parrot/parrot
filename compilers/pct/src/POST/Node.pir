@@ -37,8 +37,8 @@ for compiling programs in Parrot.
     pirtable['abs'] = '%t'
     pirtable['say'] = '%v'
     pirtable['print'] = '%v'
-    pirtable['call'] = '%r*PPPPPPPPPPPPPPPP'                # FIXME:
-    pirtable['callmethod'] = '%r*PPPPPPPPPPPPPPPP'          # FIXME:
+    pirtable['call'] = '%r*****************'                # FIXME:
+    pirtable['callmethod'] = '%r*****************'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
     .return ()
 .end
@@ -208,13 +208,13 @@ Get/set
   iter_end:
 
     .local pmc arglist
-    .local pmc result, name, invocant
+    .local pmc result
     arglist = self['arglist']
     arglist = clone arglist
 
+    # if pirop == 'inline' goto pir_inline
     if pirop == 'call' goto pir_call
     if pirop == 'callmethod' goto pir_callmethod
-    # if pirop == 'inline' goto pir_inline
 
   pir_opcode:
     $S0 = substr signature, 0, 2
@@ -227,24 +227,54 @@ Get/set
     code.'emit'("    %n %,", arglist :flat, 'n'=>pirop)
     .return (code)
 
-  pir_call:
-    result = self.'result'()
-    name = shift arglist
-    code.'emit'('    %r = %n(%,)', arglist :flat, 'r'=>result, 'n'=>name)
-    .return (code)
-
-  pir_callmethod:
-    result = self.'result'()
-    name = shift arglist
-    invocant = shift arglist
-    code.'emit'('    %r = %i.%n(%,)', arglist :flat, 'r'=>result, 'i'=>invocant, 'n'=>name)
-    .return (code)
-
   pir_inline:
     .local pmc inline
     result = self.'result'()
     inline = shift arglist
     code.'emit'(inline, arglist :flat, 'r'=>result, 't'=>result, 'u'=>result)
+    .return (code)
+
+  pir_call:
+    .local pmc name, invocant
+    .local string fmt
+    name = shift arglist
+    null invocant
+    fmt = '    %r = %n(%,)'
+    goto pir_callgen
+
+  pir_callmethod:
+    name = shift arglist
+    invocant = shift arglist
+    fmt = '    %r = %i.%n(%,)'
+
+  pir_callgen:
+    .local pmc posargs, namedargs
+    posargs = new 'ResizableStringArray'
+    namedargs = new 'ResizableStringArray'
+  callargs_loop:
+    unless arglist goto callargs_end
+    .local pmc arg, named
+    arg = shift arglist
+    $I0 = isa arg, 'POST::Node'
+    unless $I0 goto callargs_pos
+    named = arg.'named'()
+    unless named goto callargs_pos
+  callargs_named:
+    $P0 = named.'pir'('argtype' => '*')
+    code .= $P0
+    $S1 = named
+    $S0 = arg
+    concat $S0, ' :named('
+    concat $S0, $S1
+    concat $S0, ')'
+    push namedargs, $S0
+    goto callargs_loop
+  callargs_pos:
+    push posargs, arg
+    goto callargs_loop
+  callargs_end:
+    result = self.'result'()
+    code.'emit'(fmt, posargs :flat, namedargs :flat, 'r'=>result, 'n'=>name, 'i'=>invocant)
     .return (code)
 .end
 

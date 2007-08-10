@@ -190,6 +190,59 @@ a C<Match> object and obtains source/position information from that.
 .end
 
 
+=item name([value])
+
+Accessor method -- sets/returns the C<name> attribute of the invocant.
+
+=cut
+
+.sub 'name' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('name', value, has_value)
+.end
+
+
+=item returns([value])
+
+Accessor method -- sets/returns the return type for the invocant.
+
+=cut
+
+.sub 'returns' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('returns', value, has_value)
+.end
+
+
+=item named([value])
+
+Accessor method -- for named arguments, sets/returns the name to be
+associated with the argument.
+
+=cut
+
+.sub 'named' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('named', value, has_value)
+.end
+
+
+=item flat([value]
+
+Accessor method -- sets/returns the "flatten" flag on arguments.
+
+=cut
+
+.sub 'flat' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('flat', value, has_value)
+.end
+
+
 =item attr(STR attrname, PMC value, INT has_value)
 
 Helper method for accessors.  If C<has_value> is true then set
@@ -258,18 +311,6 @@ Returns C<name> in a format that can be compiled by PIR.
     .return (str)
 .end
 
-
-=item name([value])
-
-Accessor method -- sets/returns the C<name> attribute of the invocant.
-
-=cut
-
-.sub 'name' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('name', value, has_value)
-.end
 
 =item compile(code [, adverbs :slurpy :named])
 
@@ -511,22 +552,6 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('pirop', value, has_value)
-.end
-
-
-=item returns([type])
-
-Get/set the return type for this operation.  Some operations
-require creation of a temporary value to receive the result
-value, the C<returns> attribute identifies the type of the
-result (default is C<'Undef'> if not set).
-
-=cut
-
-.sub 'returns' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('returns', value, has_value)
 .end
 
 
