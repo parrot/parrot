@@ -192,7 +192,15 @@
 ##    method subcall($/, $key?) {
 ##        my $past = PAST::Op.new(node=>$/, name=>$<name>, pasttype=>'call')
 ##        if ($<EXPR>) {
-##            $past.push($($<EXPR>[0]));
+##            my $expr := $($<EXPR>[0]);
+##            if ($expr.name() eq 'infix:,') {
+##                for @($expr) {
+##                    $past.push($_);
+##                }
+##            }
+##            else {
+##                $past.push($expr);
+##            }
 ##        }
 ##        return $past;
 ##    }
@@ -206,9 +214,20 @@
     past = $P0.'new'('node'=>match, 'name'=>name, 'pasttype'=>'call')
     $P0 = match['EXPR']
     if null $P0 goto end
+    .local pmc expr
     $P1 = $P0[0]
-    $P2 = $P1.'get_scalar'()
-    past.'push'($P2)
+    expr = $P1.'get_scalar'()
+    $S0 = expr.'name'()
+    if $S0 != 'infix:,' goto one_arg
+    .local pmc iter
+    iter = expr.'iterator'()
+  iter_loop:
+    unless iter goto end
+    $P0 = shift iter
+    past.'push'($P0)
+    goto iter_loop
+  one_arg:
+    past.'push'(expr)
   end:
     .return (past)
 .end

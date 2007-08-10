@@ -147,3 +147,8 @@ proto postcircumfix:<( )> is equiv('term:') { ... }
 proto infix:<+> is looser('term:')
     is pirop('add')
     { ... }
+
+proto infix:<,> 
+    is assoc('list')
+    is looser(infix:<+>) 
+    { ... }
