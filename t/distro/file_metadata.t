@@ -262,8 +262,13 @@ sub get_attribute {
     my %results;
     map { $results{$_} = undef } @list;
 
+    # choose a chunk size such that we don't end calling svn on
+    # a single file (which causes the output format to change).
+    my $csize = $chunk_size;
+    $csize-- while ( ($csize > 1) && (@list % $csize == 1) );
+
     at_a_time(
-        $chunk_size,
+        $csize,
         sub {
             my @partial_list = @_;
 
