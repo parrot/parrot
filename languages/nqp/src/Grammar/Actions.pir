@@ -122,6 +122,27 @@
 .end
 
 
+##    method colonpair($/) {
+##        return PAST::Op.new( PAST::Val.new( :value(~$<ident>),
+##                                            :node($<ident>)),
+##                             $($<EXPR>),
+##                             :name('infix:=>'),
+##                             :returns('Pair'),
+##                             :node($/)
+##                           );
+##    }
+.sub 'colonpair' :method
+    .param pmc match
+    $S0 = match['ident']
+    $P0 = match['ident']
+    $P9 = getclass 'PAST::Val'
+    $P1 = $P9.'new'('value'=>$S0, 'node'=>$P0)
+    $P2 = match['EXPR']
+    $P2 = $P2.'get_scalar'()
+    $P9 = getclass 'PAST::Op'
+    .return $P9.'new'($P1, $P2, 'name'=>'infix:=>', 'returns'=>'Pair', 'node'=>match)
+.end
+
 ##    method expect_term($/, $key) {
 ##        my $past := $($<noun>);
 ##        for $<methodop> {
@@ -190,16 +211,23 @@
 
 
 ##    method subcall($/, $key?) {
+##        my sub subcallarg($arg) {
+##            if $arg.returns() eq 'Pair' {
+##                $arg[1].named($arg[0]);
+##                $arg := $arg[1];
+##            }
+##            $arg;
+##        }
 ##        my $past = PAST::Op.new(node=>$/, name=>$<name>, pasttype=>'call')
 ##        if ($<EXPR>) {
 ##            my $expr := $($<EXPR>[0]);
 ##            if ($expr.name() eq 'infix:,') {
 ##                for @($expr) {
-##                    $past.push($_);
+##                    $past.push( subcallarg($_) );
 ##                }
 ##            }
 ##            else {
-##                $past.push($expr);
+##                $past.push( subcallarg($expr) );
 ##            }
 ##        }
 ##        return $past;
@@ -224,12 +252,26 @@
   iter_loop:
     unless iter goto end
     $P0 = shift iter
+    $P0 = 'subcallarg'($P0)
     past.'push'($P0)
     goto iter_loop
   one_arg:
-    past.'push'(expr)
+    $P0 = 'subcallarg'(expr)
+    past.'push'($P0)
   end:
     .return (past)
+.end
+
+.sub 'subcallarg'
+    .param pmc arg
+    $S0 = arg.'returns'()
+    unless $S0 == 'Pair' goto end
+    $P0 = arg[0]
+    $P1 = arg[1]
+    $P1.'named'($P0)
+    arg = $P1
+  end:
+    .return (arg)
 .end
 
 
