@@ -271,12 +271,6 @@ Accessor method -- sets/returns the C<name> attribute of the invocant.
     .return self.'attr'('name', value, has_value)
 .end
 
-.sub 'atype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('atype', value, has_value)
-.end
-
 =item compile(code [, adverbs :slurpy :named])
 
 (Deprecated.)  Compile the given PAST tree according to C<adverbs>.
