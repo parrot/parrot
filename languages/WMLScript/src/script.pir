@@ -1,6 +1,6 @@
 
-.sub '_init_script'
-#    print "_init_script (script.pir)\n"
+.sub '__onload' :anon :load
+#    print "__onload (script.pir)\n"
     $P0 = subclass 'Hash', 'Wmls::Script'
     $P0 = subclass 'Array', 'Wmls::Constants'
     $P0 = subclass 'Integer', 'Wmls::ConstantInteger'
@@ -97,7 +97,7 @@
 
 .sub '__onload' :load :anon
 
-  $P0 = get_global '@stdlibs'
+  $P0 = get_hll_global '@stdlibs'
   unless null $P0 goto L1
   load_bytecode 'languages/WMLScript/src/WMLScript.pbc'
 L1:
@@ -413,7 +413,7 @@ PIRCODE
     pir .= " = 'function"
     $S0 = function_index
     pir .= $S0
-    pir .= "'\n  set_global '"
+    pir .= "'\n  set_hll_global '"
     pir .= namespace
     pir .= ":"
     pir .= function_name

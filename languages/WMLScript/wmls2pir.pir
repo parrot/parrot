@@ -33,8 +33,6 @@ Francois Perrad.
     .local string progname
     .local string filename
     .local string content
-    _init_script()
-    _init_lib()
     argc = elements argv
     if argc != 2 goto USAGE
     progname = shift argv

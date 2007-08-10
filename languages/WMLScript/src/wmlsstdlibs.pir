@@ -43,7 +43,7 @@ See "WMLScript Standard Libraries Specification".
     $P1 = getConsole()
     $P0[99] = $P1
 
-    set_global '@stdlibs', $P0
+    set_hll_global '@stdlibs', $P0
 .end
 
 .sub 'not_implemented'
@@ -66,7 +66,7 @@ helper for CALL_LIB* opcodes.
 .sub 'find_lib'
     .param int lindex
     .param int findex
-    $P0 = get_global '@stdlibs'
+    $P0 = get_hll_global '@stdlibs'
     push_eh _handler
     $P1 = $P0[lindex]
     $P2 = $P1[findex]
@@ -101,15 +101,15 @@ helper for CALL_URL* opcodes.
     .local pmc pbc_out
     pir_comp = compreg 'PIR'
     pbc_out = pir_comp(gen_pir)
-    $S0 = save_pbc(pbc_out, url)
-    load_bytecode $S0
+    $P0 = pbc_out[0]
+    $P0()
     clear_eh
 #    push_eh _handler_2
     .local pmc entry
     $S0 = url
     $S0 .= ':'
     $S0 .= function
-    entry = get_global $S0
+    entry = get_hll_global $S0
     if_null entry, _handler_2
     .return (entry)
   _handler_1:
