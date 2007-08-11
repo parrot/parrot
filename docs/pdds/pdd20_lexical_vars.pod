@@ -62,7 +62,7 @@ a.k.a. a call frame.
 
 =head3 LexInfo PMC
 
-LexInfos contain what is known at compile time about lexical variables of a
+LexInfo PMCs contain what is known at compile time about lexical variables of a
 given subroutine: their names (for most languages), perhaps their types, etc.
 They are the interface through which the PIR compiler stores and validates
 compile-time information about lexical variables.
@@ -128,7 +128,7 @@ through these steps:
 
 Parrot does not assume that every subroutine needs lexical variables.
 Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs.  It only
-creates a Lexinfo when it first encounters a ".lex" directive in the
+creates a LexInfo when it first encounters a ".lex" directive in the
 subroutine.  If no such directive is found, Parrot does not create a LexInfo
 for it at compile time, and therefore cannot create a LexPad for it at run
 time.
