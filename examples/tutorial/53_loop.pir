@@ -1,3 +1,14 @@
+=head1 Loops
+
+PIR has no built-in looping structures such as C<for>, C<while>,
+C<repeat> or C<until>.  All loops are built by using conditionals
+and C<goto>.
+
+The loop below calculates 5 factorial, stored in C<$I0>.  C<$I1>
+is the loop counter.
+
+=cut
+
 .sub main :main
 
     $I0 = 1               # product
