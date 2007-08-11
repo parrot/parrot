@@ -458,7 +458,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" 
 .end
 CODE
 /\A\(_, Float\) method:  1, 9\.5
-Null PMC access/
+No applicable methods/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "MMD on argument count" );
@@ -632,7 +632,7 @@ CODE
 PerlSt ok 2
 PerlSt ok 3
 String ok 4
-Null PMC access in invoke\(\)/
+No applicable methods/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
