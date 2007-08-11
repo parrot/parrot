@@ -138,6 +138,7 @@ General Options:
    --verbose            Output extra information
    --verbose=2          Output every setting change
    --verbose-step=N     Set verbose for step N only
+   --verbose-step=name  Set verbose for step some::step only
    --verbose-step=regex Set verbose for step matching description
    --nomanicheck        Don't check the MANIFEST
    --step=(gen::languages)
