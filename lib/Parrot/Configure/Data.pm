@@ -203,7 +203,7 @@ sub slurp_temp() {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG_TEMP;
 no strict;
-use Parrot::Config;
+use Parrot::Config::Generated;
 \\%PConfig_Temp;
 EVAL_CONFIG_TEMP
 

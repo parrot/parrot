@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id$
-# 004-configure.t
+# $Id: 06-data_slurp_temp.t 20500 2007-08-05 20:49:59Z jkeenan $
+# 06-data_slurp_temp.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 33;
 use Carp;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::BuildUtil;
@@ -15,6 +15,7 @@ use Parrot::Configure::Options qw( process_options );
 use_ok('Parrot::Configure::Step::List', qw|
     get_steps_list
 | );
+use Parrot::IO::Capture::Mini;
 
 my $parrot_version = Parrot::BuildUtil::parrot_version();
 like($parrot_version, qr/\d+\.\d+\.\d+/,
@@ -23,16 +24,11 @@ like($parrot_version, qr/\d+\.\d+\.\d+/,
 $| = 1;
 is($|, 1, "output autoflush is set");
 
-my $CC = "/usr/bin/gcc-3.3";
-my $localargv = [
-    qq{--cc=$CC},
-    qq{--step=init::manifest},
-];
 my $args = process_options( {
-    argv            => $localargv,
+    argv            => [ q{--step=gen::makefiles}, q{--target=Makefile} ],
     script          => $0,
     parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    svnid           => '$Id: 02-data_slurp.t 20550 2007-08-07 23:46:54Z jkeenan $',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;
@@ -69,7 +65,7 @@ can_ok("Parrot::Configure", qw| run_single_step |);
 can_ok("Parrot::Configure", qw| runsteps |);
 can_ok("Parrot::Configure", qw| _run_this_step |);
 
-$conf->add_steps(get_steps_list());
+$conf->add_step($args->{step});
 my @confsteps = @{$conf->steps};
 isnt(scalar @confsteps, 0,
     "Parrot::Configure object 'steps' key holds non-empty array reference");
@@ -79,9 +75,11 @@ foreach my $k (@confsteps) {
 }
 is($nontaskcount, 0, "Each step is a Parrot::Configure::Task object");
 
-$conf->options->set(%args);
-is($conf->options->{c}->{cc}, $CC,
-    "command-line option '--cc' has been stored in object");
+$conf->options->set(%{$args});
+is($conf->options->{c}->{step}, 'gen::makefiles',
+    "command-line option '--step=gen::makefiles' has been stored in object");
+is($conf->options->{c}->{target}, 'Makefile',
+    "command-line option '--target=Makefiles' has been stored in object");
 is($conf->options->{c}->{debugging}, 1,
     "command-line option '--debugging' has been stored in object");
 
@@ -90,31 +88,24 @@ SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration, 
 you can call Parrot::Configure::Data::slurp().
-But here you are testing for that method's failure.
+You appear not to have completed configuration;
+hence, two tests are skipped.
 REASON
 
-    skip $reason, 1 if defined $res;
+    skip $reason, 2 unless defined $res;
 
     eval { $conf->data()->slurp(); };
-    like($@,
-        qr/You cannot use --step until you have completed the full configure process/,
-        "Got expected error message when using --step option and slurp() without prior completed configuration");
-}
-
-$res  = eval "no strict; use Parrot::Config::Generated; \\%PConfig_Temp";
-SKIP: {
-    my $reason = <<REASON;
-If you have already completed configuration, 
-you can call Parrot::Configure::Data::slurp_temp().
-But here you are testing for that method's failure.
-REASON
-
-    skip $reason, 1 if defined $res;
+    ok( (defined $@) && (! $@), "Parrot::Configure::slurp() succeeded");
 
     eval { $conf->data()->slurp_temp(); };
-    like($@,
-        qr/You cannot use --step until you have completed the full configure process/,
-        "Got expected error message when using --step option and slurp_temp() without prior completed configuration");
+    ok( (defined $@) && (! $@), "Parrot::Configure::slurp_temp() succeeded");
+
+    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
+        or croak "Unable to tie";
+    my $ret = $conf->run_single_step( $args->{step} );
+    my @more_lines = $tie_out->READLINE;
+    ok( (defined $@) && (! $@),
+        "Parrot::Configure::run_single_step() succeeded");
 }
 
 pass("Completed all tests in $0");
@@ -123,20 +114,23 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-004-configure.t - test Parrot::Configure
+06-data_slurp_temp.t - test Parrot::Configure::Data::slurp() once configuration has been completed
 
 =head1 SYNOPSIS
 
-    % prove t/configure/004-configure.t
+    % prove t/postconfigure/06-data_slurp_temp.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
+Certain of the modules C<use>d by F<Configure.pl> have functionality which is
+only meaningful I<after> F<Configure.pl> has actually been run and
+Parrot::Config::Generated has been created.  So certain tests need to be run
+when your Parrot filesystem is in a "pre-F<make>, post-F<Configure.pl>" state.
 
-The tests in this file test those Parrot::Configure methods regularly called
-by F<Configure.pl> up to, but not including, C<Parrot::Configure::runsteps()>.
-There is also a test for failure of the C<--step> option without prior
-completed configuration.
+The tests in this file mimic the functionality of F<tools/dev/reconfigure.pl>
+and test C<Parrot::Configure::Data::slurp()>.  What is 'slurped' here is an
+already created C<%Parrot::Config::PConfig>.
 
 =head1 AUTHOR
 
