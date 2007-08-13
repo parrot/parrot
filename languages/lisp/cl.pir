@@ -7,145 +7,143 @@ cl.pir - Set up the package 'COMMON-LISP'
 =cut
 
 .sub _init_cl
-  .local pmc function
-  .local pmc package
-  .local pmc stream
-  .local pmc symbol
-  .local pmc value
-  .local pmc nil
-  .local pmc t
-  .local int res
 
-   null nil
+    .local pmc symbol
+    .local pmc value
 
-  .PACKAGE(package, "COMMON-LISP")
+    .local pmc package
+    .PACKAGE(package, "COMMON-LISP")
+    store_global "PACKAGES", "COMMON-LISP", package
+    store_global "PACKAGES", "CL", package
 
-   store_global "PACKAGES", "COMMON-LISP", package
-   store_global "PACKAGES", "CL", package
+    .local pmc t
+    t = package._intern_symbol("T")                      # Create the T symbol, T meaning true
+    t._set_value(t)
+    t._set_package(package)
+    t._set_special(t)
+    store_global "SYMBOLS", "T", t                       # Quick alias to T
 
-   t = package._intern_symbol("T")                      # Create the T symbol, T meaning true
-   t._set_value(t)
-   t._set_package(package)
-   t._set_special(t)
+    .local pmc nil
+    nil = package._intern_symbol("NIL")                  # Create the NIL symbol
+    nil._set_value(nil)
+    nil._set_package(package)
+    nil._set_special(t)
+    store_global "SYMBOLS", "NIL",  nil                  # Quick alias to NIL
 
-   store_global "SYMBOLS", "T", t                       # Quick alias to T, T meaning true
-   t = symbol
+    .INTEGER(value,1)
+    .DEFVAR(symbol, package, "*GENSYM-COUNTER*", value)
 
-   symbol = package._intern_symbol("NIL")               # Create the NIL symbol
-   symbol._set_value(symbol)
-   symbol._set_package(package)
-   symbol._set_special(t)
+    .DEFVAR(symbol, package, "*PACKAGE*", package)
 
-   store_global "SYMBOLS", "NIL", symbol                # Quick alias to NIL
+    .READTABLE(value)
+    .DEFVAR(symbol, package, "*READTABLE*", value)
 
-  .INTEGER(value,1)
-  .DEFVAR(symbol, package, "*GENSYM-COUNTER*", value)
+    .local pmc stream
 
-  .DEFVAR(symbol, package, "*PACKAGE*", package)
+    getstdin stream
+    .STREAM(value,stream)
+    .DEFVAR(symbol, package, "*STANDARD-INPUT*", value)
 
-  .READTABLE(value)
-  .DEFVAR(symbol, package, "*READTABLE*", value)
+    getstdout stream
+    .local int res
+    pioctl res, stream, 3, 0
+    .STREAM(value,stream)
+    .DEFVAR(symbol, package, "*STANDARD-OUTPUT*", value)
 
-   getstdin stream
-  .STREAM(value,stream)
-  .DEFVAR(symbol, package, "*STANDARD-INPUT*", value)
+    .local pmc function   # this is needed in r20261
 
-   getstdout stream
-   pioctl res, stream, 3, 0
-  .STREAM(value,stream)
-  .DEFVAR(symbol, package, "*STANDARD-OUTPUT*", value)
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "APPLY", _apply)
+    .DEFUN(symbol, package, "APPLY", "_apply")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "APPLY", _apply)
-  .DEFUN(symbol, package, "APPLY", "_apply")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "ATOM", _atom)
+    .DEFUN(symbol, package, "ATOM", "_atom")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "ATOM", _atom)
-  .DEFUN(symbol, package, "ATOM", "_atom")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "BOUNDP", _boundp)
+    .DEFUN(symbol, package, "BOUNDP", "_boundp")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "BOUNDP", _boundp)
-  .DEFUN(symbol, package, "BOUNDP", "_boundp")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CAR", _car)
+    .DEFUN(symbol, package, "CAR", "_car")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CAR", _car)
-  .DEFUN(symbol, package, "CAR", "_car")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CDR", _cdr)
+    .DEFUN(symbol, package, "CDR", "_cdr")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CDR", _cdr)
-  .DEFUN(symbol, package, "CDR", "_cdr")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CHAR", _char)
+    .DEFUN(symbol, package, "CHAR", "_char")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CHAR", _char)
-  .DEFUN(symbol, package, "CHAR", "_char")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CONS", _cons)
+    .DEFUN(symbol, package, "CONS", "_cons")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "CONS", _cons)
-  .DEFUN(symbol, package, "CONS", "_cons")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EQ", _eq)
+    .DEFUN(symbol, package, "EQ", "_eq")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EQ", _eq)
-  .DEFUN(symbol, package, "EQ", "_eq")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EVAL", _eval)
+    .DEFUN(symbol, package, "EVAL", "_eval")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "EVAL", _eval)
-  .DEFUN(symbol, package, "EVAL", "_eval")
+    .SPECIAL_FORM(symbol, package, "FUNCTION", '_function')
 
-  .SPECIAL_FORM(symbol, package, "FUNCTION", '_function')
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "GENSYM", _gensym)
+    .DEFUN(symbol, package, "GENSYM", "_gensym")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "GENSYM", _gensym)
-  .DEFUN(symbol, package, "GENSYM", "_gensym")
+    .SPECIAL_FORM(symbol, package, "IF", '_if')
 
-  .SPECIAL_FORM(symbol, package, "IF", '_if')
+    .SPECIAL_FORM(symbol, package, "LET", '_let')
 
-  .SPECIAL_FORM(symbol, package, "LET", '_let')
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "LIST", _list)
+    .DEFUN(symbol, package, "LIST", "_list")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "LIST", _list)
-  .DEFUN(symbol, package, "LIST", "_list")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "MOD", _modulus)
+    .DEFUN(symbol, package, "MOD", "_modulus")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "MOD", _modulus)
-  .DEFUN(symbol, package, "MOD", "_modulus")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "NULL", _null)
+    .DEFUN(symbol, package, "NULL", "_null")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "NULL", _null)
-  .DEFUN(symbol, package, "NULL", "_null")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "PRINT", _print)
-  .DEFUN(symbol, package, "PRINT", "_print")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "PRINT", _print)
+    .DEFUN(symbol, package, "PRINT", "_print")
 
-  .SPECIAL_FORM(symbol, package, "PROGN", '_progn')
+    .SPECIAL_FORM(symbol, package, "PROGN", '_progn')
 
-  .SPECIAL_FORM(symbol, package, "QUOTE", '_quote')
+    .SPECIAL_FORM(symbol, package, "QUOTE", '_quote')
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ", _read)
-  .DEFUN(symbol, package, "READ", "_read")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ", _read)
+    .DEFUN(symbol, package, "READ", "_read")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ-DELIMITED-LIST",_read_delimited_list)
-  .DEFUN(symbol, package, "READ-DELIMITED-LIST","_read_delimited_list")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "READ-DELIMITED-LIST",_read_delimited_list)
+    .DEFUN(symbol, package, "READ-DELIMITED-LIST","_read_delimited_list")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACA", _rplaca)
-  .DEFUN(symbol, package, "RPLACA", "_rplaca")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACA", _rplaca)
+    .DEFUN(symbol, package, "RPLACA", "_rplaca")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACD", _rplacd)
-  .DEFUN(symbol, package, "RPLACD", "_rplacd")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "RPLACD", _rplacd)
+    .DEFUN(symbol, package, "RPLACD", "_rplacd")
 
-  .SPECIAL_FORM(symbol, package, "SETQ", '_setq')
+    .SPECIAL_FORM(symbol, package, "SETQ", '_setq')
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "TYPE-OF", _type_of)
-  .DEFUN(symbol, package, "TYPE-OF", "_type_of")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "TYPE-OF", _type_of)
+    .DEFUN(symbol, package, "TYPE-OF", "_type_of")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "VALUES", _values)
-  .DEFUN(symbol, package, "VALUES", "_values")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "VALUES", _values)
+    .DEFUN(symbol, package, "VALUES", "_values")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "QUIT", _quit)
-  .DEFUN(symbol, package, "QUIT", "_quit")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "QUIT", _quit)
+    .DEFUN(symbol, package, "QUIT", "_quit")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "/", _divide)
-  .DEFUN(symbol, package, "/", "_divide")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "/", _divide)
+    .DEFUN(symbol, package, "/", "_divide")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "-", _subtract)
-  .DEFUN(symbol, package, "-", "_subtract")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "-", _subtract)
+    .DEFUN(symbol, package, "-", "_subtract")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "*", _multiply)
-  .DEFUN(symbol, package, "*", "_multiply")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "*", _multiply)
+    .DEFUN(symbol, package, "*", "_multiply")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "+", _add)
-  .DEFUN(symbol, package, "+", "_add")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "+", _add)
+    .DEFUN(symbol, package, "+", "_add")
 
-  # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "=", _equal)
-  .DEFUN(symbol, package, "=", "_equal")
+    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "=", _equal)
+    .DEFUN(symbol, package, "=", "_equal")
 
-  .return(1)
+    .return(1)
 .end
 
 .sub _apply

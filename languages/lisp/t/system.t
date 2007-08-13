@@ -23,19 +23,7 @@ use Test::More;
 # Parrot modules
 use Parrot::Test;
 
-my @test_cases = (
-    [ q{ ( print SYS:*INSIDE-BACKQUOTE* )
-      },
-      q{unused variable *INSIDE-BACKQUOTE*},
-      q{undefined var *INSIDE-BACKQUOTE*},
-      todo => 'need to check error output'
-    ],
-    [ q{ ( print sys:*inside-backquote-list*)
-      },
-      q{unused variable *INSIDE-BACKQUOTE-LIST*},
-      q{undefined var *INSIDE-BACKQUOTE-LIST*},
-      todo => 'need to check error output'
-    ],
+my @test_cases_without_exit_code = (
     [ q{ ( print *gensym-counter* )
       },
       q{1},
@@ -80,7 +68,12 @@ my @test_cases = (
     [ q{ ( print (sys:%package-name (sys:%find-package "common-lisp")))
       },
       q{COMMON-LISP},
-      q{package-name},
+      q{package-name of 'common-lisp' package},
+    ],
+    [ q{ ( print (sys:%package-name (sys:%find-package "cl")))
+      },
+      q{COMMON-LISP},
+      q{package-name of 'cl' package},
     ],
     [ q{ ( print ( null (sys:%find-package "common-lisp")))
       },
@@ -106,12 +99,34 @@ my @test_cases = (
     ],
 );
 
-Test::More::plan( tests => scalar @test_cases );
+my @test_cases_with_exit_code = (
+    [ q{ ( print SYS:*INSIDE-BACKQUOTE* )
+      },
+      qr{has no value},
+      q{undefined var *INSIDE-BACKQUOTE*},
+    ],
+    [ q{ ( print sys:*inside-backquote-list*)
+      },
+      qr{has no value},
+      q{undefined var *INSIDE-BACKQUOTE-LIST*},
+    ],
+);
 
-foreach ( @test_cases )
+Test::More::plan( tests =>   scalar @test_cases_without_exit_code
+                           + scalar @test_cases_with_exit_code );
+
+foreach ( @test_cases_without_exit_code )
 {
     my ( $code, $out, $desc, @other ) = @{ $_ };
 
     $desc ||= substr( $code, 0, 32 ); 
     language_output_is( 'Lisp', $code, $out . "\n", $desc, @other );
+}
+
+foreach ( @test_cases_with_exit_code )
+{
+    my ( $code, $regex, $desc, @other ) = @{ $_ };
+
+    $desc ||= substr( $code, 0, 32 ); 
+    language_error_output_like( 'Lisp', $code, $regex, $desc, @other );
 }
