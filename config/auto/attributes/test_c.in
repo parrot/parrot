@@ -48,5 +48,5 @@ main(int argc, char *argv[])
  * indent-tabs-mode: nil
  * End:
  *
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 ft=c:
  */
