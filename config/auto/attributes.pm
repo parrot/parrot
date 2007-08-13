@@ -58,6 +58,8 @@ sub runstep {
 sub try_attr {
     my ( $self, $conf, $attr ) = @_;
 
+    my $output_file = 'test.cco';
+
     $verbose and print "trying attribute '$attr'$/";
 
     my $cc = $conf->option_or_data( 'cc' );
@@ -71,12 +73,17 @@ sub try_attr {
 
     # Don't use cc_build, because failure is expected.
     my $exit_code = Parrot::Configure::Step::_run_command(
-        $command_line, 'test.cco', 'test.cco' );
+        $command_line, $output_file, $output_file );
     $verbose and print "  exit code: $exit_code$/";
 
     return if $exit_code;
 
-    $conf->data->set( ccflags => $tryflags );
+    use Parrot::Test;
+    my $output = Parrot::Test::slurp_file( $output_file );
+
+    if ( $output !~ /error|warning/i ) {
+        $conf->data->set( ccflags => $tryflags );
+    }
 
     return;
 }
