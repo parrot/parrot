@@ -37,10 +37,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _string
-    new _string, .LuaTable
+    new _string, 'LuaTable'
     set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
@@ -122,7 +122,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
 
 
     .local pmc _lua_mt_string
-    new _lua_mt_string, .LuaTable
+    new _lua_mt_string, 'LuaTable'
     set_global 'mt_string', _lua_mt_string
     set $P1, '__index'
     _lua_mt_string[$P1] = _string
@@ -176,7 +176,7 @@ Note that numerical codes are not necessarily portable across platforms.
     n = pose - posi
     inc n
     .local pmc res
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     set res, n
     .local int i
     i = 0
@@ -185,7 +185,7 @@ Note that numerical codes are not necessarily portable across platforms.
     $I0 = posi + i
     dec $I0
     $I1 = ord $S1, $I0
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I1
     res[i] = $P0
     inc i
@@ -226,7 +226,7 @@ Note that numerical codes are not necessarily portable across platforms.
     b = concat b, s
     goto L1
   L2:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, b
     .return (res)
 .end
@@ -312,11 +312,11 @@ are also returned, after the two indices.
     if idx < 0 goto L7
     .local pmc start
     .local pmc end
-    new start, .LuaNumber
+    new start, 'LuaNumber'
     $I0 = $I3 + idx
     inc $I0
     set start, $I0
-    new end, .LuaNumber
+    new end, 'LuaNumber'
     $I0 = $I3 + idx
     $I0 += $I2
     set end, $I0
@@ -332,12 +332,12 @@ are also returned, after the two indices.
     unless find goto L8
     .local pmc start
     .local pmc end
-    new start, .LuaNumber
+    new start, 'LuaNumber'
     $I0 = match.'from'()
     $I0 += $I3
     inc $I0
     set start, $I0
-    new end, .LuaNumber
+    new end, 'LuaNumber'
     $I0 = match.'to'()
     $I0 += $I3
     set end, $I0
@@ -349,7 +349,7 @@ are also returned, after the two indices.
   L7:
     # not found
     .local pmc res
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
 .end
 
@@ -357,7 +357,7 @@ are also returned, after the two indices.
     .param pmc match
     .param int whole
     .local pmc res
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     .local pmc capts
     capts = match.'get_array'()
     if null capts goto L1
@@ -370,7 +370,7 @@ are also returned, after the two indices.
     $I10 = can $P0, 'text'
     if $I10 goto L4
     $I10 = $P0
-    new $P1, .LuaNumber
+    new $P1, 'LuaNumber'
     set $P1, $I10
     goto L5
   L4:
@@ -380,7 +380,7 @@ are also returned, after the two indices.
     # sorry, strictly compatible
     $S0 = substr $S0, 0, $I2
   L6:
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, $S0
   L5:
     res[$I0] = $P1
@@ -397,7 +397,7 @@ are also returned, after the two indices.
     # sorry, strictly compatible
     $S0 = substr $S0, 0, $I2
   L8:
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, $S0
     res[0] = $P1
   L7:
@@ -442,7 +442,7 @@ This function does not accept string values containing embedded zeros.
     $I1 = length strfrmt
     b = ''
     arg = 0
-    new $P1, .FixedPMCArray
+    new $P1, 'FixedPMCArray'
     set $P1, 1
     idx = 0
   L1:
@@ -514,7 +514,7 @@ This function does not accept string values containing embedded zeros.
     goto L1
   L2:
     .local pmc res
-    new res, .LuaString
+    new res, 'LuaString'
     set res, b
     .return (res)
 .end
@@ -669,7 +669,7 @@ table:
     .return ($P0 :flat)
   L1:
     .local pmc res
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
 .end
 
@@ -720,7 +720,7 @@ is replaced.
     .local pmc rulesub
     rulesub = regex_comp($S2)
     .local pmc b
-    new b, .LuaString
+    new b, 'LuaString'
   L2:
     unless n < $I4 goto L3
     .local pmc match
@@ -736,7 +736,7 @@ is replaced.
     $S0 = b
     $S0 .= src
     set b, $S0
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, n
     .return (b, $P0)
 .end
@@ -843,7 +843,7 @@ is replaced.
     $I0 = can $P1, 'text'
     if $I0 goto L2
     $I0 = $P1
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
   L2:
@@ -853,7 +853,7 @@ is replaced.
     # sorry, strictly compatible
     $S0 = substr $S0, 0, $I0
   L3:
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     .return ($P0)
   L1:
@@ -872,7 +872,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
     .local pmc res
     $S1 = lua_checkstring(1, s)
     $I0 = length $S1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $I0
     .return (res)
 .end
@@ -891,7 +891,7 @@ of what is an uppercase letter depends on the current locale.
     .local pmc res
     $S1 = lua_checkstring(1, s)
     downcase $S1
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S1
     .return (res)
 .end
@@ -929,7 +929,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
     $I2 = 0
   L1:
     $S0 = repeat $S1, $I2
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
 .end
@@ -960,7 +960,7 @@ Returns a string that is the string C<s> reversed.
     goto L1
   L2:
     $S0 = join '', $P0
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
 .end
@@ -1001,7 +1001,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
   L3:
     $S0 = ''
   L4:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
 .end
@@ -1020,7 +1020,7 @@ of what is a lowercase letter depends on the current locale.
     .local pmc res
     $S1 = lua_checkstring(1, s)
     upcase $S1
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S1
     .return (res)
 .end

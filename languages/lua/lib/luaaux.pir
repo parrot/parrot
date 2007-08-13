@@ -24,7 +24,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param int narg
     .param pmc extramsg :slurpy
     $S1 = narg
-    new $P0, .Lua
+    new $P0, 'Lua'
     $S0 = $P0.'caller'()
     lua_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
@@ -155,7 +155,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc _lua__REGISTRY
     .local pmc key
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    new key, .LuaString
+    new key, 'LuaString'
     set key, type
     $P0 = _lua__REGISTRY[key]
     $P1 = arg.'get_metatable'()
@@ -174,7 +174,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param pmc message :slurpy
     $S0 = join '', message
     .local pmc ex
-    ex = new .Exception
+    new ex, 'Exception'
     ex['_message'] =  $S0
     throw ex
 .end
@@ -187,7 +187,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .sub 'lua_findtable'
     .param pmc t
     .param string fname
-    new $P1, .LuaString
+    new $P1, 'LuaString'
   L1:
     $I1 = index fname, '.'
     $I2 = $I2
@@ -199,7 +199,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     $P0 = t[$P1]
     $I0 = isa $P0, 'LuaNil'
     unless $I0 goto L3
-    new $P0, .LuaTable
+    new $P0, 'LuaTable'
     t[$P1] = $P0
     goto L4
   L3:
@@ -276,7 +276,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     res = o.'getfenv'()
     .return (res)
   L1:
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
 .end
 
@@ -381,12 +381,12 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc _lua__REGISTRY
     .local pmc res
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, tname
     res = _lua__REGISTRY[$P1]
     $I0 = isa res, 'LuaNil'
     unless $I0 goto L1
-    new res, .LuaTable
+    new res, 'LuaTable'
     _lua__REGISTRY[$P1] = res
   L1:
     .return (res)
@@ -511,7 +511,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .param pmc env
     .param pmc args
     .local pmc res
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     if null args goto L1
     $P0 = getinterp
     push_eh _handler
@@ -525,7 +525,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
   L2:
     unless $I0 < $I1 goto L1
     $S0 = shift args
-    $P0 = new .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     res[$I0] = $P0
     inc $I0
@@ -534,10 +534,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     if null args goto L3
     # not interactive mode
     .local pmc iter, i
-    new iter, .Iterator, res
-    new i, .LuaNumber
+    new iter, 'Iterator', res
+    new i, 'LuaNumber'
     set i, 1
-    new $P0, .LuaTable
+    new $P0, 'LuaTable'
   L4:
     unless iter goto L5
     $P1 = shift iter
@@ -594,10 +594,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     pushaction $P0
     .local pmc traceback
     .lex 'traceback', traceback
-    new traceback, .LuaString
+    new traceback, 'LuaString'
     .local pmc where
     .lex 'where', where
-    new where, .LuaString
+    new where, 'LuaString'
     ($P0 :slurpy) = f(vararg :flat)
     .return (0, $P0)
   _handler:
@@ -623,7 +623,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .sub 'traceback' :anon :outer(docall)
     .param int flag
     unless flag == 1 goto L1
-    $P0 = new .Lua
+    new $P0, 'Lua'
     $S0 = $P0.'traceback'(1)
     $P1 = find_lex 'traceback'
     set $P1, $S0
@@ -652,7 +652,7 @@ Support variable number of arguments function call.
 
 .sub 'not_implemented'
     .local pmc ex
-    ex = new .Exception
+    new ex, 'Exception'
     ex['_message'] =  "not implemented"
     throw ex
 .end

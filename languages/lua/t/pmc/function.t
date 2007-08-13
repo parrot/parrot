@@ -205,7 +205,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaFunction
+    pmc1 = new 'LuaFunction'
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -223,7 +223,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaFunction
+    pmc1 = new 'LuaFunction'
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"

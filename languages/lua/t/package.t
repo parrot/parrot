@@ -214,9 +214,9 @@ print {$X} <<'PIR';
 #    print "luaopen_mod_foo\n"
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     .local pmc _mod_foo
-    new _mod_foo, .LuaTable
+    new _mod_foo, 'LuaTable'
     set $P1, 'mod_foo'
     _lua__GLOBAL[$P1] = _mod_foo
     .const .Sub _mod_foo_bar = '_mod_foo_bar'
@@ -227,7 +227,7 @@ print {$X} <<'PIR';
 
 .sub '_mod_foo_bar' :anon
     .param pmc extra :slurpy
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, 3.14
     .return ($P0)
 .end

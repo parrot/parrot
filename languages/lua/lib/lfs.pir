@@ -37,10 +37,10 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
 
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _lfs
-    new _lfs, .LuaTable
+    new _lfs, 'LuaTable'
     set $P1, 'lfs'
     _lua__GLOBAL[$P1] = _lfs
 
@@ -92,7 +92,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     _lfs[$P1] = _lfs_unlock
 
 
-    new $P2, .LuaString
+    new $P2, 'LuaString'
 
     set $P2, "Copyright (C) 2007, The Perl Foundation"
     set $P1, "_COPYRIGHT"
@@ -203,7 +203,7 @@ optimal file system I/O blocksize; (Unix only)
     .local pmc members
     $S1 = lua_checkstring(1, filepath)
     $S0 = $S1
-    new members, .Hash
+    new members, 'Hash'
     .const .Sub st_mode = 'st_mode'
     members['mode'] = st_mode
     .const .Sub st_dev = 'st_dev'
@@ -230,7 +230,7 @@ optimal file system I/O blocksize; (Unix only)
     members['blocks'] = st_blocks
     .const .Sub st_blksize = 'st_blksize'
     members['blksize'] = st_blksize
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P1 = $P0.'stat'($S1)
     clear_eh
@@ -250,11 +250,11 @@ optimal file system I/O blocksize; (Unix only)
     res = aname
     goto L4
   L1:
-    new res, .LuaTable
+    new res, 'LuaTable'
   L4:
     .local pmc iter
-    new iter, .Iterator, members
-    new $P2, .LuaString
+    new iter, 'Iterator', members
+    new $P2, 'LuaString'
   L5:
     unless iter goto L6
     $S2 = shift iter
@@ -268,8 +268,8 @@ optimal file system I/O blocksize; (Unix only)
   _handler:
     .local pmc nil
     .local pmc msg
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     $S0 = concat "cannot obtain information from file `", $S0
     $S0 = concat "'"
     set msg, $S0
@@ -279,7 +279,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_dev' :anon
     .param pmc st
     $I0 = st[0]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -287,7 +287,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_ino' :anon
     .param pmc st
     $I0 = st[1]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -306,7 +306,7 @@ optimal file system I/O blocksize; (Unix only)
     .param pmc st
     $I0 = st[2]
     $I0 &= S_IFMT
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     unless $I0 == S_IFREG goto L1
     set $P0, 'file'
     .return ($P0)
@@ -342,7 +342,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_nlink' :anon
     .param pmc st
     $I0 = st[3]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -350,7 +350,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_uid' :anon
     .param pmc st
     $I0 = st[4]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -358,7 +358,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_gid' :anon
     .param pmc st
     $I0 = st[5]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -366,7 +366,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_rdev' :anon
     .param pmc st
     $I0 = st[6]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -374,7 +374,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_size' :anon
     .param pmc st
     $I0 = st[7]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -382,7 +382,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_atime' :anon
     .param pmc st
     $I0 = st[8]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -390,7 +390,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_mtime' :anon
     .param pmc st
     $I0 = st[9]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -398,7 +398,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'st_ctime' :anon
     .param pmc st
     $I0 = st[10]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
 .end
@@ -408,11 +408,11 @@ optimal file system I/O blocksize; (Unix only)
     $I0 = exists st[11]
     unless $I0 goto L1
     $I0 = st[11]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
   L1:
-    new $P0, .LuaNil
+    new $P0, 'LuaNil'
     .return ($P0)
 .end
 
@@ -421,11 +421,11 @@ optimal file system I/O blocksize; (Unix only)
     $I0 = exists st[12]
     unless $I0 goto L1
     $I0 = st[12]
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, $I0
     .return ($P0)
   L1:
-    new $P0, .LuaNil
+    new $P0, 'LuaNil'
     .return ($P0)
 .end
 
@@ -443,10 +443,10 @@ Returns C<true> in case of success or C<nil> plus an error string.
     .local pmc res
     $S1 = lua_checkstring(1, path)
     $S0 = $S1
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P0.'chdir'($S1)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
   _handler:
@@ -455,8 +455,8 @@ Returns C<true> in case of success or C<nil> plus an error string.
     .local pmc e
     .local string s
     .get_results (e, s)
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     $S0 = concat "Unable to change working directory to '", $S0
     $S0 = concat "'\n"
     $S0 = concat s
@@ -475,10 +475,10 @@ string.
 
 .sub 'currentdir' :anon
     .local pmc res
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $S0 = $P0.'cwd'()
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
   _handler:
@@ -487,8 +487,8 @@ string.
     .local pmc e
     .local string s
     .get_results (e, s)
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     set msg, s
     .return (nil, msg)
 .end
@@ -507,7 +507,7 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     .local pmc res
     $S1 = lua_checkstring(1, path)
     $S0 = $S1
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P1 = $P0.'readdir'($S1)
     .lex 'upvar_dir', $P1
@@ -526,11 +526,11 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     $P1 = find_lex 'upvar_dir'
     unless $P1 goto L1
     $S1 = shift $P1
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S1
     .return (res)
   L1:
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
 .end
 
@@ -576,11 +576,11 @@ C<nil> plus an error string.
     .param pmc dirname :optional
     .local pmc res
     $S1 = lua_checkstring(1, dirname)
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $I1 = 0o775
     $P0.'mkdir'($S1, $I1)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
   _handler:
@@ -589,8 +589,8 @@ C<nil> plus an error string.
     .local pmc e
     .local string s
     .get_results (e, s)
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     set msg, s
     .return (nil, msg)
 .end
@@ -609,10 +609,10 @@ C<nil> plus an error string.
     .param pmc dirname :optional
     .local pmc res
     $S1 = lua_checkstring(1, dirname)
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P0.'rm'($S1)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
   _handler:
@@ -621,8 +621,8 @@ C<nil> plus an error string.
     .local pmc e
     .local string s
     .get_results (e, s)
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     set msg, s
     .return (nil, msg)
 .end

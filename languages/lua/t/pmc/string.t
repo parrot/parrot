@@ -153,7 +153,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaString
+    pmc1 = new 'LuaString'
     pmc1 = "simple string"
     print pmc1
     print "\n"
@@ -228,7 +228,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaString
+    pmc1 = new 'LuaString'
     pmc1 = "value"
     print pmc1
     print "\n"
@@ -249,7 +249,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaString
+    pmc1 = new 'LuaString'
     pmc1 = "3.14"
     print pmc1
     print "\n"
@@ -270,7 +270,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tobase' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaString
+    pmc1 = new 'LuaString'
     pmc1 = "111"
     print pmc1
     print "\n"

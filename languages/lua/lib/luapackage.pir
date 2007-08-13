@@ -25,7 +25,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .const .Sub _lua_module = 'module'
     _lua_module.'setfenv'(_lua__GLOBAL)
@@ -38,7 +38,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     _lua__GLOBAL[$P1] = _lua_require
 
     .local pmc _package
-    new _package, .LuaTable
+    new _package, 'LuaTable'
     set $P1, 'package'
     _lua__GLOBAL[$P1] = _package
 
@@ -58,10 +58,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     _package[$P1] = _package_seeall
 
     .local pmc _loaders
-    new _loaders, .LuaTable
+    new _loaders, 'LuaTable'
     set $P1, 'loaders'
     _package[$P1] = _loaders
-    new $P2, .LuaNumber
+    new $P2, 'LuaNumber'
 
     .const .Sub loader_preload = 'loader_preload'
     set $P2, 1
@@ -89,7 +89,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     set $P1, 'loaded'
     _package[$P1] = $P0
 
-    new $P0, .LuaTable
+    new $P0, 'LuaTable'
     set $P1, 'preload'
     _package[$P1] = $P0
 
@@ -100,9 +100,9 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .param string fieldname
     .param string envname
     .param string default
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, fieldname
-    new $P0, .Env
+    new $P0, 'Env'
     $S0 = $P0[envname]
     if $S0 goto L1
     $S0 = default
@@ -111,7 +111,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     $S0 = lua_gsub($S0, ';;', ';,;')
     $S0 = lua_gsub($S0, ',', default)
   L2:
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     package[$P1] = $P0
 .end
@@ -121,7 +121,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .param string pname
     name = lua_gsub(name, '.', '/')
     $P0 = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, 'package'
     $P0 = $P0[$P1]
     set $P1, pname
@@ -134,7 +134,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .local string tmpl
     path = $P0
     .local pmc msg      # error accumulator
-    new msg, .LuaString
+    new msg, 'LuaString'
     set msg, ''
   L2:
     (path, tmpl) = nexttemplate(path)
@@ -229,7 +229,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     $S1 = lua_checkstring(1, name)
     $I0 = index $S1, '.'
     unless $I0 < 0 goto L1
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     .return ($P0)
   L1:
     $S0 = substr name, 0, $I0
@@ -273,7 +273,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     .param pmc name :optional
     $S1 = lua_checkstring(1, name)
     $P0 = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, 'package'
     $P0 = $P0[$P1]
     set $P1, 'preload'
@@ -288,7 +288,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     $S0 = "\n\tno field package.preload['"
     $S0 .= $S1
     $S0 .= "']"
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
   L2:
     .return ($P0)
@@ -328,7 +328,7 @@ each option is a function to be applied over the module.
     $S1 = lua_checkstring(1, name)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, '_LOADED'
     .local pmc _LOADED
     _LOADED = _lua__REGISTRY[$P1]
@@ -364,7 +364,7 @@ each option is a function to be applied over the module.
     dec $I1
     $S0 = substr $S1, 0, $I1
     # set _PACKAGE as package name (full module name minus last part)
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     m[$P1] = $P0
     goto L3
@@ -409,7 +409,7 @@ any loader for the module, then C<require> signals an error.
     $S1 = lua_checkstring(1, modname)
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, '_LOADED'
     .local pmc _LOADED
     _LOADED = _lua__REGISTRY[$P1]
@@ -430,10 +430,10 @@ any loader for the module, then C<require> signals an error.
     set $P1, 'loaders'
     loaders = $P0[$P1]
     .local pmc i
-    new i, .LuaNumber
+    new i, 'LuaNumber'
     set i, 1
     .local pmc msg      # error message accumulator
-    new msg, .LuaString
+    new msg, 'LuaString'
     set msg, ''
   L3:
     $P0 = loaders[i]    # get a loader
@@ -442,7 +442,7 @@ any loader for the module, then C<require> signals an error.
     $S0 = msg
     lua_error("module '", $S1, "' not found:", $S0)
   L4:
-    new $P1, .LuaNil
+    new $P1, 'LuaNil'
     $P1 = $P0(modname)  # call it
     $I0 = isa $P1 , 'LuaClosure'
     if $I0 goto L5
@@ -456,14 +456,14 @@ any loader for the module, then C<require> signals an error.
     goto L3
   L5:
     .local pmc sentinel
-    new sentinel, .LuaUserdata
+    new sentinel, 'LuaUserdata'
     _LOADED[modname] = sentinel
-    new $P0, .LuaNil
+    new $P0, 'LuaNil'
     $P0 = $P1(modname)  # run loaded module
     $I0 = isa $P0, 'LuaNil'
     unless $I0 goto L7
     # use true as result
-    new $P0, .LuaBoolean
+    new $P0, 'LuaBoolean'
     set $P0, 1
   L7:
     _LOADED[modname] = $P0
@@ -556,12 +556,12 @@ environment. To be used as an option to function C<module>.
     mt = module.'get_metatable'()
     $I0 = isa mt, 'LuaNil'
     unless $I0 goto L1
-    new mt, .LuaTable
+    new mt, 'LuaTable'
     module.'set_metatable'(mt)
   L1:
     # mt.__index = _G
     $P0 = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, '__index'
     mt[$P1] = $P0
 .end

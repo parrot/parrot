@@ -92,7 +92,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
     loadlib $P0, 'lua_group'
     find_type $I0, 'LuaUserdata'
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
     pmc1 = new $I0
     setattribute pmc1, 'data', val1
@@ -109,7 +109,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     loadlib $P0, 'lua_group'
     find_type $I0, 'LuaUserdata'
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
     pmc1 = new $I0
     setattribute pmc1, 'data', val1
@@ -127,7 +127,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
     loadlib $P0, 'lua_group'
     find_type $I0, 'LuaUserdata'
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
     pmc1 = new $I0
     setattribute pmc1, 'data', val1
@@ -152,9 +152,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
+    pmc1 = new 'LuaUserdata'
     setattribute pmc1, 'data', val1
     .local int bool1
     bool1 = isa pmc1, 'LuaUserdata'
@@ -170,9 +170,9 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
+    pmc1 = new 'LuaUserdata'
     setattribute pmc1, 'data', val1
     print pmc1
     print "\n"
@@ -191,9 +191,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc val1
-    val1 = new .Array
+    val1 = new 'Array'
     .local pmc pmc1
-    pmc1 = new .LuaUserdata
+    pmc1 = new 'LuaUserdata'
     setattribute pmc1, 'data', val1
     $P0 = pmc1.'tonumber'()
     print $P0

@@ -26,10 +26,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _os
-    new _os, .LuaTable
+    new _os, 'LuaTable'
     set $P1, 'os'
     _lua__GLOBAL[$P1] = _os
 
@@ -104,7 +104,7 @@ NOT YET IMPLEMENTED (no clock).
 
 .sub 'clock' :anon
     .local pmc res
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     not_implemented()
 .end
 
@@ -153,13 +153,13 @@ representation that depends on the host system and on the current locale
     $P0 = decodelocaltime t
   L2:
     unless null $P0 goto L3
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
   L3:
     unless $S1 == '*t' goto L4
-    new res, .LuaTable
-    new $P1, .LuaString
-    new $P2, .LuaNumber
+    new res, 'LuaTable'
+    new $P1, 'LuaString'
+    new $P2, 'LuaNumber'
     set $P1, 'sec'
     $I0 = $P0[.TM_SEC]
     set $P2, $I0
@@ -194,7 +194,7 @@ representation that depends on the host system and on the current locale
     inc $I0
     set $P2, $I0
     res[$P1] = $P2
-    new $P2, .LuaBoolean
+    new $P2, 'LuaBoolean'
     set $P1, 'isdst'
     $I0 = $P0[.TM_ISDST]
     set $P2, $I0
@@ -206,7 +206,7 @@ representation that depends on the host system and on the current locale
     b = ''
     idx = 0
     $I1 = length $S1
-    new $P1, .Lua
+    new $P1, 'Lua'
   L5:
     unless idx < $I1 goto L6
     $S0 = substr $S1, idx, 1
@@ -221,7 +221,7 @@ representation that depends on the host system and on the current locale
     inc idx
     goto L5
   L6:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, b
     .return (res)
 .end
@@ -241,7 +241,7 @@ Windows, and some other systems, this value is exactly C<t2-t1>.
     $I2 = lua_checknumber(1, t2)
     $I1 = lua_optint(2, t1, 0)
     $I0 = $I2 - $I1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $I0
     .return (res)
 .end
@@ -271,7 +271,7 @@ shell is available and zero otherwise.
     $I0 = spawnw $S1
     $I0 = $I0 / 256
   L2:
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     res = $I0
     .return (res)
 .end
@@ -302,13 +302,13 @@ if the variable is not defined.
     .param pmc varname :optional
     .local pmc res
     $S1 = lua_checkstring(1, varname)
-    new $P0, .Env
+    new $P0, 'Env'
     $S0 = $P0[$S1]
     if $S0 goto L1
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
   L1:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
 .end
@@ -327,10 +327,10 @@ describing the error.
     .local pmc res
     $S1 = lua_checkstring(1, filename)
     $S0 = $S1
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P0.'rm'($S1)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
   _handler:
@@ -341,8 +341,8 @@ describing the error.
     .get_results (e, s)
     concat $S0, ': '
     concat $S0, s
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     set msg, $S0
     .return (nil, msg)
 .end
@@ -362,10 +362,10 @@ fails, it returns B<nil>, plus a string describing the error.
     $S1 = lua_checkstring(1, oldname)
     $S0 = $S1
     $S2 = lua_checkstring(2, newname)
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P0.'rename'($S1, $S2)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
   _handler:
@@ -376,8 +376,8 @@ fails, it returns B<nil>, plus a string describing the error.
     .get_results (e, s)
     concat $S0, ': '
     concat $S0, s
-    new nil, .LuaNil
-    new msg, .LuaString
+    new nil, 'LuaNil'
+    new msg, 'LuaString'
     set msg, $S0
     .return (nil, msg)
 .end
@@ -430,7 +430,7 @@ STILL INCOMPLETE (no mktime).
     unless $I0 goto L2
   L1:
     $I0 = time
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $I0
     .return (res)
   L2:
@@ -452,7 +452,7 @@ STILL INCOMPLETE (no mktime).
     .param string key
     .param int d
     .local int res
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, key
     $P0 = t[$P1]
     $P0 = $P0.'tonumber'()
@@ -473,7 +473,7 @@ STILL INCOMPLETE (no mktime).
     .param pmc t
     .param string key
     .local int res
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, key
     $P0 = t[$P1]
     $I0 = isa $P0, 'LuaNil'
@@ -499,7 +499,7 @@ NOT YET IMPLEMENTED (no tmpname).
 
 .sub 'tmpname' :anon
     .local pmc res
-    new res, .LuaString
+    new res, 'LuaString'
     not_implemented()
 .end
 

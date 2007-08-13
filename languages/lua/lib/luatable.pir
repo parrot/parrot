@@ -31,10 +31,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.5>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _table
-    new _table, .LuaTable
+    new _table, 'LuaTable'
     set $P1, 'table'
     _lua__GLOBAL[$P1] = _table
 
@@ -114,7 +114,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     $I0 = table.'len'()
     last = lua_optint(4, j, $I0)
     res = ''
-    new idx, .LuaNumber
+    new idx, 'LuaNumber'
   L1:
     unless $I3 <= last goto L2
     set idx, $I3
@@ -133,7 +133,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     inc $I3
     goto L1
   L2:
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, res
     .return ($P0)
 .end
@@ -160,7 +160,7 @@ B<DEPRECATED>
     .local pmc res
     lua_checktype(1, table, 'table')
     lua_checktype(2, f, 'function')
-    new idx, .LuaNil
+    new idx, 'LuaNil'
   L1:
     $P0 = table.'next'(idx)
     unless $P0 goto L2
@@ -199,7 +199,7 @@ B<DEPRECATED>
     lua_checktype(2, f, 'function')
     n = table.'len'()
     i = 0
-    new idx, .LuaNumber
+    new idx, 'LuaNumber'
   L1:
     inc i
     unless i <= n goto L2
@@ -248,7 +248,7 @@ inserts C<x> at the end of table C<t>.
     .local pmc idx
     .local int e
     .local int pos
-    new idx, .LuaNumber
+    new idx, 'LuaNumber'
     lua_checktype(1, table, 'table')
     e = table.'len'()
     inc e
@@ -289,9 +289,9 @@ does a linear traversal of the whole table.)
     .local pmc idx
     .local pmc max
     lua_checktype(1, table, 'table')
-    new max, .LuaNumber
+    new max, 'LuaNumber'
     set max, 0
-    new idx, .LuaNil
+    new idx, 'LuaNil'
   L1:
     $P0 = table.'next'(idx)
     unless $P0 goto L2
@@ -328,10 +328,10 @@ table C<t>.
     ipos = lua_optint(2, pos, e)
     unless e <= 0 goto L1
     # table is `empty'
-    new res, .LuaNil
+    new res, 'LuaNil'
     .return (res)
   L1:
-    new idx, .LuaNumber
+    new idx, 'LuaNumber'
     set idx, ipos
     res = table.'rawget'(idx)
   L2:
@@ -344,7 +344,7 @@ table C<t>.
     ipos = $I2
     goto L2
   L3:
-    new $P0, .LuaNil
+    new $P0, 'LuaNil'
     set idx, e
     table.'rawset'(idx, $P0)
     .return (res)
@@ -402,8 +402,8 @@ the given order may have their relative positions changed by the sort.
     .local int i
     .local int j
     .local int tmp
-    new idx1, .LuaNumber
-    new idx2, .LuaNumber
+    new idx1, 'LuaNumber'
+    new idx2, 'LuaNumber'
   L1:
     unless l < u goto L2
     # sort elements a[l], a[(l+u)/2] and a[u]

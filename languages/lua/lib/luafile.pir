@@ -23,7 +23,7 @@ See F<languages/lua/lib/luaio.pir>.
     .local pmc _file
     _file = lua_newmetatable('ParrotIO')
 
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, '__index'
     _file[$P1] = _file
 
@@ -105,7 +105,7 @@ Saves any written data to C<file>.
     $P0 = get_hll_global ['Lua::io'], 'tofile'
     f = $P0(self)
     f.'flush'()
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
 .end
@@ -183,7 +183,7 @@ empty string, or B<nil> on end of file.
     .local int i
     .local pmc format
     narg = formats
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     set res, narg
     i = 0
   L2:
@@ -286,7 +286,7 @@ position to the end of the file, and returns its size.
     f = getattribute self, 'data'
     seek f, $I2, $I1
     $I0 = tell f
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $I0
     .return (res)
 .end
@@ -332,7 +332,7 @@ NOT YET IMPLEMENTED.
     $S1 = lua_checkstring(1, mode)
     $I1 = lua_checkoption(1, $S1, 'no full line')
     $I2 = lua_optint(2, size, 512)     # LUAL_BUFFERSIZE
-    new mode, .FixedIntegerArray
+    new mode, 'FixedIntegerArray'
     set mode, 3
     mode[0] = 0     # PIO_NONBUF
     mode[1] = 2     # PIO_FULLBUF
@@ -344,7 +344,7 @@ NOT YET IMPLEMENTED.
     if $I1 == 0 goto L1
     f.'buffer_size'($I2)
   L1:
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
 .end
@@ -382,7 +382,7 @@ or C<string.format> before write.
     print f, $S0
     goto L1
   L2:
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
 .end
@@ -416,7 +416,7 @@ or C<string.format> before write.
     .local pmc res
     $P0 = get_hll_global ['Lua::io'], 'topfile'
     f = $P0(self)
-    new res, .LuaString
+    new res, 'LuaString'
     if f goto L1
     $S0 = "file (closed)"
     goto L2

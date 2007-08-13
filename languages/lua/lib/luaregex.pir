@@ -233,7 +233,7 @@ Francois Perrad
   analyze:
     .local pmc expr, pad
     expr = match['expr']
-    pad = new .Hash
+    new pad, 'Hash'
     pad['subpats'] = 0
     expr = expr.'luaanalyze'(pad)
     .return expr.'compile'(adverbs :flat :named)
@@ -254,9 +254,7 @@ Francois Perrad
 
 .sub '__onload' :load :init
     .local pmc optable
-
-    $I0 = find_type 'PGE::OPTable'
-    optable = new $I0
+    new optable, 'PGE::OPTable'
     set_hll_global ['PGE::LuaRegex'], '$optable', optable
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_literal'
@@ -327,7 +325,8 @@ Francois Perrad
     .param string message
     $P0 = getattribute mob, '$.pos'
     $P0 = pos
-    $P0 = new .Exception
+    .local pmc ex
+    new ex, 'Exception'
     $S0 = 'luaregex parse error: '
     $S0 .= message
     $S0 .= ' at offset '
@@ -339,8 +338,8 @@ Francois Perrad
     $S1 = substr $S1, pos, 1
     $S0 .= $S1
     $S0 .= "'"
-    $P0['_message'] = $S0
-    throw $P0
+    ex['_message'] = $S0
+    throw ex
     .return ()
 .end
 
@@ -661,7 +660,7 @@ Francois Perrad
         %L: # empty capture
           %0
           push ustack, captscope
-          new captob, .Integer
+          new captob, 'Integer'
           set captob, pos
           inc captob
           %1

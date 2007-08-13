@@ -36,7 +36,7 @@ and imports many definitions from the full Lua compiler
 .sub '__onload' :load :init
     load_bytecode 'languages/lua/lua.pbc'
 
-    $P0 = new [ 'HLLCompiler' ]
+    new $P0, 'HLLCompiler'
     $P0.'language'('LuaTestLex')
     $P0.'parsegrammar'('Lua::TestLex')
     $P0.'astgrammar'('Lua::DumpLex')

@@ -179,7 +179,7 @@ sub BuildLiteral {
                 $parser,
                 'prolog' => 1,
                 'result' => $defn,
-                'arg1'   => '.Lua' . ucfirst($type),
+                'arg1'   => 'Lua' . ucfirst($type),
             );
             unless ( $type eq 'nil' ) {
                 if ( $type eq 'string' ) {
@@ -229,7 +229,7 @@ sub BuildTable {
     push @opcodes1, new NewOp(
         $parser,
         'result' => $result,
-        'arg1'   => ".LuaTable",
+        'arg1'   => "LuaTable",
     );
     my $num_key;
     while ( my $field = shift @{$fields} ) {
@@ -460,7 +460,7 @@ sub BuildAssigns {
                 push @{ $expr->[1] }, new NewOp(
                     $parser,
                     'result' => $result,
-                    'arg1'   => '.LuaNil',
+                    'arg1'   => 'LuaNil',
                 );
                 push @{$exprs}, [ $result, [] ];
                 push @{ $callop->{result} }, $result;
@@ -485,7 +485,7 @@ sub BuildCallVararg {
     push @opcodes, new NewOp(
         $parser,
         'result' => $result,
-        'arg1'   => '.LuaNil',
+        'arg1'   => 'LuaNil',
     );
     my $argv = new defn( 'vararg', 'local', 'pmc' );
     my $fct = new defn( 'mkarg', 'util' );
@@ -598,7 +598,7 @@ sub BuildCallFunction {
     push @opcodes, new NewOp(
         $parser,
         'result' => $result,
-        'arg1'   => '.LuaNil',
+        'arg1'   => 'LuaNil',
     );
     push @returns, $result;
     push @opcodes, new CallOp(
@@ -704,7 +704,7 @@ sub BuildRelop {
     push @opcodes, new NewOp(
         $parser,
         'result' => $result,
-        'arg1'   => '.LuaBoolean',
+        'arg1'   => 'LuaBoolean',
     );
     push @opcodes, new ToBoolOp(
         $parser,
@@ -973,7 +973,7 @@ sub BuildForList {
     push @opcodes1, new NewOp(
         $parser,
         'result' => $iter,
-        'arg1'   => '.LuaNil',
+        'arg1'   => 'LuaNil',
     );
     if (    scalar( @{$exprs} ) == 0
         and scalar( @{ $expr->[1] } ) != 0
@@ -995,7 +995,7 @@ sub BuildForList {
     push @opcodes1, new NewOp(
         $parser,
         'result' => $state,
-        'arg1'   => '.LuaNil',
+        'arg1'   => 'LuaNil',
     );
     if (   !defined( $expr )
         or (    scalar( @{$exprs} ) == 0
@@ -1018,7 +1018,7 @@ sub BuildForList {
     push @opcodes1, new NewOp(
         $parser,
         'result' => $var,
-        'arg1'   => '.LuaNil',
+        'arg1'   => 'LuaNil',
     );
     if (   !defined( $expr )
         or (    scalar( @{$exprs} ) == 0
@@ -1058,7 +1058,7 @@ sub BuildForList {
         push @opcodes1, new NewOp(
             $parser,
             'result' => $_->[0],
-            'arg1'   => '.LuaNil',
+            'arg1'   => 'LuaNil',
         );
         push @return2,  $_->[0];
     }
@@ -1184,7 +1184,7 @@ sub BuildParam {
             $parser,
             'prolog' => 1,
             'result' => $defn,
-            'arg1'   => '.LuaNil',
+            'arg1'   => 'LuaNil',
         );
         push @opcodes2, new LabelOp(
             $parser,

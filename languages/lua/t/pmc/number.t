@@ -165,7 +165,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaNumber
+    pmc1 = new 'LuaNumber'
     pmc1 = 3.14
     print pmc1
     print "\n"

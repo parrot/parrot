@@ -36,7 +36,7 @@ Used by F<languages/lua/lua.pir>.
     load_bytecode 'Parrot/HLLCompiler.pbc'
 
     $P0 = subclass 'HLLCompiler', 'Lua::Compiler'
-    $P0 = new [ 'Lua::Compiler' ]
+    new $P0, 'Lua::Compiler'
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('Lua::PAST::Grammar')
@@ -95,7 +95,7 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
     $S0 .= "'"
   L1:
     .local pmc ex
-    ex = new .Exception
+    new ex, 'Exception'
     ex['_message'] = $S0
     throw ex
 .end
@@ -162,7 +162,7 @@ for internal global variables used by Lua.
 
 .sub _const_keyword :anon
     .local pmc kw
-    new kw, .Hash
+    new kw, 'Hash'
     kw['and'] = 1
     kw['break'] = 1
     kw['do'] = 1
@@ -753,7 +753,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 
 .sub '__onload' :load :init
     $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
-    new $P0, .Integer
+    new $P0, 'Integer'
     set $P0, 0
     set_global '$nb', $P0
 .end
@@ -776,7 +776,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'lookup' :method
     .param string name
     .local pmc iter
-    new iter, .Iterator, self
+    new iter, 'Iterator', self
   L1:
     unless iter goto L2
     $P0 = shift iter
@@ -789,7 +789,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 .sub 'push_scope' :method
-    new $P0, .Hash
+    new $P0, 'Hash'
     unshift self, $P0
     $P1 = get_global '$nb'
     inc $P1

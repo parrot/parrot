@@ -157,7 +157,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "    $op->{result}->{symbol} = new $op->{arg1}\n";
+        print {$FH} "    $op->{result}->{symbol} = new '$op->{arg1}'\n";
         return;
     }
 

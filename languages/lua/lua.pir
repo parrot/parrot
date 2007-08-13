@@ -144,7 +144,7 @@ show version information.
 
 .sub 'handle_luainit' :anon
     $I0 = 0
-    new $P0, .Env
+    new $P0, 'Env'
     $S0 = $P0['LUA_INIT']
     if $S0 goto L1
     .return (0)
@@ -286,14 +286,14 @@ show version information.
     ($P0, $S0) = lua_loadfile(fname)
     if null $P0 goto L2
     .local pmc vararg
-    new vararg, .FixedPMCArray
+    new vararg, 'FixedPMCArray'
     set vararg, narg
     $I0 = 0
   L3:
     unless $I0 < narg goto L4
     inc n
     $S0 = args[n]
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, $S0
     vararg[$I0] = $P1
     inc $I0
@@ -315,15 +315,15 @@ show version information.
     narg = argc - n
     dec narg
     .local pmc iter, t, i
-    new iter, .Iterator, args
-    new t, .LuaTable
-    new i, .LuaNumber
+    new iter, 'Iterator', args
+    new t, 'LuaTable'
+    new i, 'LuaNumber'
     $I0 = neg n
     set i, $I0
   L1:
     unless iter goto L2
     $S0 = shift iter
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     t[i] = $P0
     inc i
@@ -362,7 +362,7 @@ show version information.
     env = get_hll_global '_G'
     .const .LuaString k_require = 'require'
     $P0 = env.'rawget'(k_require)
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, name
     push_eh _handler
     $P0($P1)
@@ -430,7 +430,7 @@ show version information.
     goto L3
   L1:
     $S0 = readline stdin
-    code = new .String
+    new code, 'String'
     code = $S0
   L3:
     unless firstline goto L2
@@ -455,7 +455,7 @@ show version information.
     $S0 = '_PROMPT2'
     $S1 = '>> '
   L1:
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, $S0
     $P0 = env.'rawget'($P0)
     $I0 = isa $P0, 'LuaNil'

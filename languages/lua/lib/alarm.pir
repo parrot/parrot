@@ -31,7 +31,7 @@ The library exports a single function: alarm(s,[f]).
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
 
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .const .Sub _alarm = 'alarm'
     _alarm.'setfenv'(_lua__GLOBAL)
@@ -57,7 +57,7 @@ inside C<f>.
     .local pmc res
     $I1 = lua_checknumber(1, s)
     $P0 = get_hll_global '_REGISTRY'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, 'alarm handler'
     unless null func goto L1
     func = $P0[$P1]
@@ -69,12 +69,12 @@ inside C<f>.
     lua_checktype(2, func, 'function')
     $P0[$P1] = func
   L2:
-    new $P0, .Timer
+    new $P0, 'Timer'
     $P0[.PARROT_TIMER_SEC] = $I1
     $P0[.PARROT_TIMER_REPEAT] = 0
     $P0[.PARROT_TIMER_HANDLER] = func
     $P0()
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $I1
     .return (res)
 .end

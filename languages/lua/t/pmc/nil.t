@@ -140,7 +140,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaNil
+    pmc1 = new 'LuaNil'
     print pmc1
     print "\n"
     .local int bool1
@@ -174,7 +174,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaNil
+    pmc1 = new 'LuaNil'
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -194,7 +194,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 .sub _main
     .local pmc pmc1
-    pmc1 = new .LuaNil
+    pmc1 = new 'LuaNil'
     print pmc1
     print "\n"
     $P0 = pmc1.'tonumber'()

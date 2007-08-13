@@ -41,20 +41,20 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _io_env
-    new _io_env, .LuaTable
+    new _io_env, 'LuaTable'
 
     .local pmc _popen_env
-    new _popen_env, .LuaTable
+    new _popen_env, 'LuaTable'
 
     .local pmc _file
     $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
     _file = $P0(_io_env)
 
     .local pmc _io
-    new _io, .LuaTable
+    new _io, 'LuaTable'
     set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
@@ -145,12 +145,12 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .param pmc mt
     .param pmc io
     .param pmc env
-    new $P1, .LuaString
-    new $P3, .LuaNumber
+    new $P1, 'LuaString'
+    new $P3, 'LuaNumber'
 
     set $P1, 'stdin'
     $P2 = getstdin
-    new $P0, .LuaUserdata
+    new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
     io[$P1] = $P0
@@ -159,7 +159,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     set $P1, 'stdout'
     $P2 = getstdout
-    new $P0, .LuaUserdata
+    new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
     io[$P1] = $P0
@@ -168,7 +168,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     set $P1, 'stderr'
     $P2 = getstderr
-    new $P0, .LuaUserdata
+    new $P0, 'LuaUserdata'
     setattribute $P0, 'data', $P2
     $P0.'set_metatable'(mt)
     io[$P1] = $P0
@@ -183,7 +183,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
     env = lua_getfenv($P1)
-    new io, .LuaNumber
+    new io, 'LuaNumber'
     set io, findex
     file = env[io]
     .return (file)
@@ -230,7 +230,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     _lua__REGISTRY = get_hll_global '_REGISTRY'
     .const .LuaString key = 'ParrotIO'
     mt = _lua__REGISTRY[key]
-    new file, .LuaUserdata
+    new file, 'LuaUserdata'
     file.'set_metatable'(mt)
     .return (file)
 .end
@@ -242,10 +242,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .local pmc res
     $S0 = read f, n
     unless $S0 == '' goto L1
-    new res, .LuaNil
+    new res, 'LuaNil'
     goto L2
   L1:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
   L2:
     .return (res)
@@ -257,11 +257,11 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .local pmc res
     $S0 = readline f
     unless $S0 == '' goto L1
-    new res, .LuaNil
+    new res, 'LuaNil'
     goto L2
   L1:
     chopn $S0, 1
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
   L2:
     .return (res)
@@ -289,7 +289,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     $S1 .= $S0
     goto L3
   L4:
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, $S1
     res = $P1.'tonumber'()
     .return (res)
@@ -304,7 +304,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
     env = lua_getfenv($P1)
-    new io, .LuaNumber
+    new io, 'LuaNumber'
     set io, findex
     env[io] = file
 .end
@@ -315,10 +315,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .local pmc res
     $I1 = isfalse f
     unless $I1 goto L1
-    new res, .LuaNil
+    new res, 'LuaNil'
     goto L2
   L1:
-    new res, .LuaString
+    new res, 'LuaString'
     set res, ''
   L2:
     .return (res)
@@ -361,7 +361,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     $P0 = getinterp
     $P1 = $P0['sub'; 1]
     env = lua_getfenv($P1)
-    new $P1, .LuaString
+    new $P1, 'LuaString'
     set $P1, '__close'
     $P0 = env[$P1]
     .return $P0(file)
@@ -564,9 +564,9 @@ in the standard C function C<fopen>.
     setattribute res, 'data', f
     .return (res)
   L1:
-    new res, .LuaNil
+    new res, 'LuaNil'
     .local pmc msg
-    new msg, .LuaString
+    new msg, 'LuaString'
     $S0 = err
     concat $S1, ': '
     concat $S1, $S0
@@ -684,10 +684,10 @@ handle, and B<nil> if C<obj> is not a file handle.
     .const .LuaString key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
-    res = new .LuaNil
+    new res, 'LuaNil'
     goto L3
   L1:
-    res = new .LuaString
+    new res, 'LuaString'
     f = getattribute obj, 'data'
     unless null f goto L2
     set res, 'closed file'
@@ -723,7 +723,7 @@ Equivalent to C<io.output():write>.
     close f
     null f
     setattribute file, 'data', f
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
 .end

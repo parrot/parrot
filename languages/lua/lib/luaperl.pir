@@ -40,7 +40,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
 
 .sub 'unlink' :anon
     .param string filename
-    new $P0, .OS
+    new $P0, 'OS'
     push_eh _handler
     $P0.'rm'(filename)
   _handler:
@@ -108,7 +108,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     $S0 = $P0.'slurp'(out)
     unlink(out)  # cleaning up the temporary file
     .local pmc ex
-    ex = new .Exception
+    new ex, 'Exception'
     ex['_message'] = $S0
     throw ex
   L1:
@@ -132,7 +132,7 @@ Compile C<source>.
     $S0 = 'tmp'
     $P0 = getprop 'num', self
     unless null $P0 goto L1
-    new $P0, .Integer
+    new $P0, 'Integer'
     set $P0, 0
   L1:
     inc $P0

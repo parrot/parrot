@@ -147,7 +147,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
     .local pmc pmc1
     pmc1 = new $I0, F1
     .local pmc pmc2
-    pmc2 = new .LuaBoolean
+    pmc2 = new 'LuaBoolean'
     pmc2 = not pmc1
     print pmc2
     print "\n"
@@ -175,7 +175,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .sub _main
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1
+    pmc1 = new 'LuaThread', F1
     .local int bool1
     bool1 = isa pmc1, 'LuaThread'
     print bool1
@@ -199,7 +199,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
 .sub '_main'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1
+    pmc1 = new 'LuaThread', F1
     print pmc1
     print "\n"
     $P0 = pmc1.'tostring'()
@@ -227,7 +227,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .sub '_main'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1
+    pmc1 = new 'LuaThread', F1
     $P0 = pmc1.'tonumber'()
     print $P0
     print "\n"
@@ -255,7 +255,7 @@ pir_error_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
     .const .LuaNumber cst1 = '3.14'
     .const .Sub F1 = 'f1'
     .local pmc pmc1
-    pmc1 = new .LuaThread, F1
+    pmc1 = new 'LuaThread', F1
     $P0 = add pmc1, cst1
     end
 .end

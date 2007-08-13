@@ -25,16 +25,16 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 #    print "init Lua Basic\n"
 
     .local pmc _lua__REGISTRY
-    _lua__REGISTRY = new .LuaTable
+    new _lua__REGISTRY, 'LuaTable'
     set_hll_global '_REGISTRY', _lua__REGISTRY
 
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = new .LuaTable
+    new _lua__GLOBAL, 'LuaTable'
     set_hll_global '_G', _lua__GLOBAL
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     set $P1, '_LOADED'
-    new $P0, .LuaTable
+    new $P0, 'LuaTable'
     _lua__REGISTRY[$P1] = $P0
 
 =item C<_G>
@@ -58,7 +58,7 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
 
 =cut
 
-    new $P0, .LuaString
+    new $P0, 'LuaString'
     set $P0, "Lua 5.1 (on Parrot)"
     set $P1, '_VERSION'
     _lua__GLOBAL[$P1] = $P0
@@ -273,12 +273,12 @@ STILL INCOMPLETE (see lua_gc).
     $I2 = lua_optint(2, arg, 0)
     $N0 = lua_gc($S1, $I2)
     unless $S1 == 'step' goto L1
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     $I0 = $N0
     set res, $I0
     goto L2
   L1:
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
   L2:
     .return (res)
@@ -440,7 +440,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .local pmc ipairs
     ipairs = _G.'rawget'(key_ipairs)
     .local pmc zero
-    new zero, .LuaNumber
+    new zero, 'LuaNumber'
     set zero, 0.0
     .return (ipairs, t, zero)
   L1:
@@ -489,9 +489,9 @@ NOT YET IMPLEMENTED.
     .return (func)
   L1:
     .local pmc msg
-    new msg, .LuaString
+    new msg, 'LuaString'
     set msg, error
-    new func, .LuaNil
+    new func, 'LuaNil'
     .return (func, msg)
 .end
 
@@ -588,7 +588,7 @@ See C<next> for the caveats of modifying the table during its traversal.
     .local pmc next
     next = _G.'rawget'(key_next)
     .local pmc nil
-    new nil, .LuaNil
+    new nil, 'LuaNil'
     .return (next, t, nil)
 .end
 
@@ -609,7 +609,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     .param pmc argv :slurpy
     .local pmc res
     .local pmc status
-    new status, .LuaBoolean
+    new status, 'LuaBoolean'
     lua_checkany(1, f)
     push_eh _handler
     (res :slurpy) = f(argv :flat)
@@ -621,7 +621,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     .local pmc msg
     .get_results (e, s)
     set status, 0
-    new msg, .LuaString
+    new msg, 'LuaString'
     set msg, s
     .return (status, msg)
 .end
@@ -733,7 +733,7 @@ total number of extra arguments it received.
     $S0 = idx
     unless $S0 == '#' goto L1
     $I1 = argv
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     res = $I1
     .return (res)
   L1:
@@ -753,7 +753,7 @@ total number of extra arguments it received.
     lua_argerror(1, "index out of range")
   L4:
     $I0 = n - i
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     set res, $I0
     $I1 = 0
     dec i
@@ -911,7 +911,7 @@ C<"userdata">.
     .local pmc res
     lua_checkany(1, v)
     $S0 = typeof v
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S0
     .return (res)
 .end
@@ -944,9 +944,9 @@ length operator.
     e = lua_optint(3, j, $I0)
     n = e - $I2
     inc n
-    new res, .FixedPMCArray
+    new res, 'FixedPMCArray'
     set res, n
-    new index_, .LuaNumber
+    new index_, 'LuaNumber'
     set index_, $I2
     idx = 0
   L1:
@@ -981,7 +981,7 @@ error, C<xpcall> returns false plus the result from C<err>.
     .param pmc err_ :optional
     .local pmc res
     .local pmc status
-    new status, .LuaBoolean
+    new status, 'LuaBoolean'
     lua_checkany(1, f)
     lua_checkany(2, err_)
     push_eh _handler

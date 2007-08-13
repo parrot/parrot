@@ -55,10 +55,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _math
-    new _math, .LuaTable
+    new _math, 'LuaTable'
     set $P1, 'math'
     _lua__GLOBAL[$P1] = _math
 
@@ -193,14 +193,14 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     set $P1, 'tan'
     _math[$P1] = _math_tan
 
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, 3.14159265358979323846
     $P1 = 'pi'
     _math[$P1] = $P0
 
-    new $P0, .LuaNumber
+    new $P0, 'LuaNumber'
     set $P0, 1.0
-    new $P2, .LuaNumber
+    new $P2, 'LuaNumber'
     set $P2, 0.0
     div $P0, $P2
     $P1 = 'huge'
@@ -214,7 +214,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = abs $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -225,7 +225,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = acos $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -236,7 +236,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = asin $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -247,7 +247,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = atan $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -260,7 +260,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     $N1 = lua_checknumber(1, y)
     $N2 = lua_checknumber(2, x)
     $N0 = atan $N1, $N2
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -271,7 +271,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ceil $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -282,7 +282,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = cos $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -294,7 +294,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
     $N0 = $N1 / $N0
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -305,7 +305,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = exp $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -316,7 +316,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = floor $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -329,7 +329,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(1, y)
     $N0 = cmod $N1, $N2
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -339,7 +339,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .param pmc x :optional
     .local pmc res
     lua_checknumber(1, x)
-    new $P0, .Lua
+    new $P0, 'Lua'
     res = $P0.'frexp'(x)
     .return (res :flat)
 .end
@@ -351,7 +351,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     lua_checknumber(1, x)
     lua_checknumber(2, nexp)
-    new $P0, .Lua
+    new $P0, 'Lua'
     res = $P0.'ldexp'(x, nexp)
     .return (res)
 .end
@@ -362,7 +362,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ln $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -373,7 +373,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = log10 $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -435,7 +435,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .param pmc x :optional
     .local pmc res
     lua_checknumber(1, x)
-    new $P0, .Lua
+    new $P0, 'Lua'
     res = $P0.'modf'(x)
     .return (res :flat)
 .end
@@ -448,7 +448,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(2, y)
     $N0 = pow $N1, $N2
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -460,7 +460,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
     $N0 = $N1 * $N0
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -473,9 +473,9 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     .local int u
     .local int l
-    new $P0, .Random
+    new $P0, 'Random'
     $N0 = $P0
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     unless null arg1 goto L1
     set res, $N0
     goto L2
@@ -512,7 +512,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 .sub 'randomseed' :anon
     .param pmc seed :optional
     $I1 = lua_checknumber(1, seed)
-    new $P0, .Random
+    new $P0, 'Random'
     set $P0, $I1
 .end
 
@@ -522,7 +522,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sin $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -533,7 +533,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sqrt $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end
@@ -544,7 +544,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = tan $N1
-    new res, .LuaNumber
+    new res, 'LuaNumber'
     set res, $N0
     .return (res)
 .end

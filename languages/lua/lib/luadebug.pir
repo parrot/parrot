@@ -36,10 +36,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _debug
-    new _debug, .LuaTable
+    new _debug, 'LuaTable'
     set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
@@ -381,7 +381,7 @@ be B<nil>).
     lua_argerror(2, "nil or table expected")
   L2:
     table.'set_metatable'(metatable)
-    new res, .LuaBoolean
+    new res, 'LuaBoolean'
     set res, 1
     .return (res)
 .end
@@ -418,10 +418,10 @@ STILL INCOMPLETE (see traceback in lua.pmc).
     .param pmc res
     $S1 = optstring(message, '')
     $I2 = optint(level, 1)
-    new $P0, .Lua
+    new $P0, 'Lua'
     $S0 = $P0.'traceback'($I2)
     $S1 .= $S0
-    new res, .LuaString
+    new res, 'LuaString'
     set res, $S1
     .return (res)
 .end

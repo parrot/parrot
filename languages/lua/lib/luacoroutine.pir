@@ -29,10 +29,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
-    new $P1, .LuaString
+    new $P1, 'LuaString'
 
     .local pmc _coroutine
-    new _coroutine, .LuaTable
+    new _coroutine, 'LuaTable'
     set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
@@ -68,7 +68,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
     set $P1, 'yield'
     _coroutine[$P1] = _coroutine_yield
 
-    new $P0, .ResizablePMCArray
+    new $P0, 'ResizablePMCArray'
     set_hll_global '_COROUTINE_STACK', $P0
 
 .end
@@ -88,7 +88,7 @@ Returns this new coroutine, an object with type C<"thread">.
     if $I0 goto L1
     lua_argerror(1, 'Lua function expected')
   L1:
-    res = new .LuaThread, f
+    new res, 'LuaThread', f
     .return (res)
 .end
 
@@ -114,14 +114,14 @@ C<resume> returns B<false> plus the error message.
     .local pmc status
     lua_checktype(1, co, 'thread')
     ($I0, res :slurpy) = auxresume(co, argv :flat)
-    new status, .LuaBoolean
+    new status, 'LuaBoolean'
     set status, $I0
     unless $I0 goto L1
     .return (status, res :flat)
   L1:
     .local pmc msg
     $S0 = res[0]
-    new msg, .LuaString
+    new msg, 'LuaString'
     set msg, $S0
     .return (status, msg)
 .end
@@ -162,7 +162,7 @@ Returns the running coroutine, or B<nil> when called by the main thread.
     co_stack = get_hll_global '_COROUTINE_STACK'
     $I0 = elements co_stack
     if $I0 goto L1
-    new res, .LuaNil
+    new res, 'LuaNil'
     goto L2
   L1:
     res = pop co_stack
@@ -189,7 +189,7 @@ STILL INCOMPLETE.
     .param pmc co :optional
     .local pmc res
     lua_checktype(1, co, 'thread')
-    new res, .LuaString
+    new res, 'LuaString'
     $P0 = getattribute co, 'co'
     $P1 = getattribute $P0, 'state'
     if $P1 goto L1
