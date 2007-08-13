@@ -78,14 +78,28 @@ sub try_attr {
 
     return if $exit_code;
 
-    use Parrot::Test;
-    my $output = Parrot::Test::slurp_file( $output_file );
+    my $output = _slurp_file( $output_file );
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );
     }
 
     return;
+}
+
+
+# Stolen from Parrot::Test
+# Should be put somewhere more central
+sub _slurp_file {
+    my ($file_name) = @_;
+
+    open( my $SLURP, '<', $file_name ) or die "open '$file_name': $!";
+    local $/ = undef;
+    my $file = <$SLURP> . '';
+    $file =~ s/\cM\cJ/\n/g;
+    close $SLURP;
+
+    return $file;
 }
 
 1;
