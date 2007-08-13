@@ -81,13 +81,13 @@ sub generate_pir {
 .sub '__onload' :anon :load
     .local pmc stdlibs
     .local pmc lib
-    new stdlibs, .Hash
+    new stdlibs, 'Hash'
 PIRCODE
 
     while ( my ( $num_lib, $lib ) = each %{$cfg} ) {
         my ( $name, $h_lib ) = @{$lib};
         $pir .= "\n    # $name\n";
-        $pir .= "    new lib, .Hash\n";
+        $pir .= "    new lib, 'Hash'\n";
 
         while ( my ( $num_func, $func ) = each %{$h_lib} ) {
             my ( $name, $nb ) = @{$func};

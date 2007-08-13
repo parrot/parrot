@@ -33,7 +33,7 @@ See "WMLScript Standard Libraries Specification".
     load_bytecode 'languages/WMLScript/runtime/wmlsstring.pbc'
     load_bytecode 'languages/WMLScript/runtime/wmlsconsole.pbc'
 
-    new $P0, .Hash
+    new $P0, 'Hash'
     $P1 = getLang()
     $P0[0] = $P1
     $P1 = getFloat()
@@ -48,7 +48,7 @@ See "WMLScript Standard Libraries Specification".
 
 .sub 'not_implemented'
     .local pmc ex
-    new ex, .Exception
+    new ex, 'Exception'
     ex['_message'] =  "not implemented"
     throw ex
 .end
@@ -91,7 +91,7 @@ helper for CALL_URL* opcodes.
     unless content goto L1
     .local pmc loader
     .local pmc script
-    new loader, .WmlsBytecode
+    new loader, 'WmlsBytecode'
     push_eh _handler_1
     script = loader.'load'(content)
     script['filename'] = url
@@ -118,14 +118,14 @@ helper for CALL_URL* opcodes.
     .get_results (e, s)
     print s
     print "\n"
-    new ex, .Exception
+    new ex, 'Exception'
     $S0 = "verification failed (can't translate '"
     $S0 .= url
     $S0 .= "')"
     ex['_message'] = $S0
     throw ex
   _handler_2:
-    new ex, .Exception
+    new ex, 'Exception'
     $S0 = "external function '"
     $S0 .= function
     $S0 .= "' not found in '"
@@ -134,7 +134,7 @@ helper for CALL_URL* opcodes.
     ex['_message'] = $S0
     throw ex
   L1:
-    new ex, .Exception
+    new ex, 'Exception'
     $S0 = "unable to load compilation unit"
     ex['_message'] = $S0
     throw ex

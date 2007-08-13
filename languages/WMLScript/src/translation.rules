@@ -479,7 +479,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_0\n"
     $I0 = exists ${CONST}['const_0']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_0\n  new const_0, .WmlsInteger\n  set const_0, 0\n"
+    $S0 = "  .local pmc const_0\n  new const_0, 'WmlsInteger'\n  set const_0, 0\n"
     ${CONST}['const_0'] = $S0
   L1_${CURIC}:
 PIR
@@ -494,7 +494,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_1\n"
     $I0 = exists ${CONST}['const_1']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_1\n  new const_1, .WmlsInteger\n  set const_1, 1\n"
+    $S0 = "  .local pmc const_1\n  new const_1, 'WmlsInteger'\n  set const_1, 1\n"
     ${CONST}['const_1'] = $S0
   L1_${CURIC}:
 PIR
@@ -509,7 +509,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_m1\n"
     $I0 = exists ${CONST}['const_m1']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_m1\n  new const_m1, .WmlsInteger\n  set const_m1, -1\n"
+    $S0 = "  .local pmc const_m1\n  new const_m1, 'WmlsInteger'\n  set const_m1, -1\n"
     ${CONST}['const_m1'] = $S0
   L1_${CURIC}:
 PIR
@@ -524,7 +524,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_es\n"
     $I0 = exists ${CONST}['const_es']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_es\n  new const_es, .WmlsString, ''\n"
+    $S0 = "  .local pmc const_es\n  new const_es, 'WmlsString'\n  set const_es, ''\n"
     ${CONST}['const_es'] = $S0
   L1_${CURIC}:
 PIR
@@ -539,7 +539,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_invalid\n"
     $I0 = exists ${CONST}['const_invalid']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_invalid\n  new const_invalid, .WmlsInvalid\n"
+    $S0 = "  .local pmc const_invalid\n  new const_invalid, 'WmlsInvalid'\n"
     ${CONST}['const_invalid'] = $S0
   L1_${CURIC}:
 PIR
@@ -554,7 +554,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_true\n"
     $I0 = exists ${CONST}['const_true']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_true\n  new const_true, .WmlsBoolean\n  set const_true, 1\n"
+    $S0 = "  .local pmc const_true\n  new const_true, 'WmlsBoolean'\n  set const_true, 1\n"
     ${CONST}['const_true'] = $S0
   L1_${CURIC}:
 PIR
@@ -569,7 +569,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_false\n"
     $I0 = exists ${CONST}['const_false']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_false\n  new const_false, .WmlsBoolean\n  set const_false, 0\n"
+    $S0 = "  .local pmc const_false\n  new const_false, 'WmlsBoolean'\n  set const_false, 0\n"
     ${CONST}['const_false'] = $S0
   L1_${CURIC}:
 PIR
@@ -835,12 +835,12 @@ ${__PUSH_1__}
     ${INS} = concat "_C:\n"
     $I0 = exists ${CONST}['const_true']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_true\n  new const_true, .WmlsBoolean\n  set const_true, 1\n"
+    $S0 = "  .local pmc const_true\n  new const_true, 'WmlsBoolean'\n  set const_true, 1\n"
     ${CONST}['const_true'] = $S0
   L1_${CURIC}:
     $I0 = exists ${CONST}['const_false']
     if $I0 goto L2_${CURIC}
-    $S0 = "  .local pmc const_false\n  new const_false, .WmlsBoolean\n  set const_false, 0\n"
+    $S0 = "  .local pmc const_false\n  new const_false, 'WmlsBoolean'\n  set const_false, 0\n"
     ${CONST}['const_false'] = $S0
   L2_${CURIC}:
 PIR
@@ -889,12 +889,12 @@ ${__PUSH_1__}
     ${INS} = concat "_C:\n"
     $I0 = exists ${CONST}['const_true']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_true\n  new const_true, .WmlsBoolean\n  set const_true, 1\n"
+    $S0 = "  .local pmc const_true\n  new const_true, 'WmlsBoolean'\n  set const_true, 1\n"
     ${CONST}['const_true'] = $S0
   L1_${CURIC}:
     $I0 = exists ${CONST}['const_false']
     if $I0 goto L2_${CURIC}
-    $S0 = "  .local pmc const_false\n  new const_false, .WmlsBoolean\n  set const_false, 0\n"
+    $S0 = "  .local pmc const_false\n  new const_false, 'WmlsBoolean'\n  set const_false, 0\n"
     ${CONST}['const_false'] = $S0
   L2_${CURIC}:
 PIR
@@ -946,7 +946,8 @@ PIR
 code = 3B
 class = op
 pir = <<PIR
-    ${INS} = concat "  ${PTEMP0} = new .WmlsString, ''\n"
+    ${INS} = concat "  new ${PTEMP0}, 'WmlsString'\n"
+    ${INS} = concat "  set ${PTEMP0}, ''\n"
     ${INS} = concat "  .return (${PTEMP0})\n"
 PIR
 

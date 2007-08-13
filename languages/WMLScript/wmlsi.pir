@@ -44,7 +44,7 @@ Francois Perrad.
     unless content goto L1
     .local pmc loader
     .local pmc script
-    new loader, .WmlsBytecode
+    new loader, 'WmlsBytecode'
     push_eh _handler
     script = loader.load(content)
     script['filename'] = filename
@@ -57,11 +57,11 @@ Francois Perrad.
     $P0 = pbc_out[0]    # __onload
     $P0()
     .local pmc params
-    params = new .ResizablePMCArray
+    new params, 'ResizablePMCArray'
   L2:
     unless argv goto L3
     $S0 = shift argv
-    new $P0, .WmlsString
+    new $P0, 'WmlsString'
     $P0 = $S0
     push params, $P0
     goto L2

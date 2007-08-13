@@ -20,7 +20,7 @@ sub pre_translation {
     ${INS} = concat <<'PIRCODE'
   .local pmc reg0, reg1, reg2
   .local pmc s
-  new s, .ResizablePMCArray
+  new s, 'ResizablePMCArray'
 PIRCODE
 PIR
 }
@@ -192,7 +192,7 @@ PIR
 # Pop everything on the stack.
 sub pop_all {
     return <<'PIR';
-    ${INS} = concat "  s = new .ResizablePMCArray\n"
+    ${INS} = concat "  s = new 'ResizablePMCArray'\n"
 PIR
 }
 

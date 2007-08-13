@@ -324,7 +324,7 @@ sub generate_initial_code {
     .local string loadreg
     .local string storereg
     .local pmc h_const
-    new h_const, .Hash
+    new h_const, 'Hash'
     .local pmc constants
     constants = script['Constants']
 
@@ -431,7 +431,7 @@ PIRCODE
   BDISPATCH_NOT_FOUND:
     .local pmc ex
     .local string msg
-    new ex, .Exception
+    new ex, 'Exception'
     msg = "unknown instruction (code "
     $S0 = cur_ic
     msg = concat $S0

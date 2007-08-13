@@ -27,7 +27,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'WMLScript.pbc' );
 
 .sub 'function0' :anon
   .local pmc const0
-  new const0, .WmlsString
+  new const0, "WmlsString"
   set const0, "Hello World!"
   .local pmc P_temp_0
 
@@ -40,7 +40,8 @@ PC3:  # POP
   # just pop
 PC4:
 
-  new $P0, .WmlsString, ''
+  new $P0, "WmlsString"
+  set $P0, ''
   .return ($P0)
 .end
 
@@ -62,7 +63,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'alternate way' );
 
 .sub 'function0' :anon
   .local pmc const0
-  new const0, .WmlsString
+  new const0, "WmlsString"
   set const0, "Hello World!"
   .local pmc P_temp_0
 
@@ -75,7 +76,8 @@ PC3:  # POP
   # just pop
 PC4:
 
-  new $P0, .WmlsString, ''
+  new $P0, "WmlsString"
+  set $P0, ''
   .return ($P0)
 .end
 

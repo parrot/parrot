@@ -21,7 +21,7 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
 
 
 .sub 'getLang'
-    new $P0, .Hash
+    new $P0, 'Hash'
 
     .const .Sub _lang_abs = '_lang_abs'
     $P0[0]  = _lang_abs
@@ -266,7 +266,7 @@ In case of a parsing error an C<invalid> value is returned.
     res = value
     $I0 = isa value, 'WmlsInteger'
     if $I0 goto L2
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L2:
     .return (res)
 .end
@@ -320,11 +320,11 @@ In case of a parsing error an C<invalid> value is returned.
     $I0 = isa value, 'WmlsInteger'
     unless $I0 goto L3
     $I0 = value
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, $I0
     goto L2
   L3:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L2:
     .return (res)
 .end
@@ -359,10 +359,10 @@ Boolean or invalid.
   L1:
     $I0 = isa value, 'WmlsInvalid'
     unless $I0 goto L2
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
   L2:
-    new res, .WmlsBoolean
+    new res, 'WmlsBoolean'
     $I0 = isa value, 'WmlsInteger'
     set res, $I0
     .return (res)
@@ -398,10 +398,10 @@ Boolean or invalid.
   L1:
     $I0 = isa value, 'WmlsInvalid'
     unless $I0 goto L2
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
   L2:
-    new res, .WmlsBoolean
+    new res, 'WmlsBoolean'
     $I0 = isa value, 'WmlsFloat'
     set res, $I0
     if $I0 goto L3
@@ -426,7 +426,7 @@ Integer 2147483647.
 
 .sub '_lang_maxInt' :anon
     .local pmc res
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, 2147483647
     .return (res)
 .end
@@ -446,7 +446,7 @@ Integer -2147483648.
 
 .sub '_lang_minInt' :anon
     .local pmc res
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, -2147483648
     .return (res)
 .end
@@ -466,7 +466,7 @@ Boolean.
 
 .sub '_lang_float' :anon
     .local pmc res
-    new res, .WmlsBoolean
+    new res, 'WmlsBoolean'
     set res, 1
     .return (res)
 .end
@@ -529,7 +529,7 @@ None (this function aborts the interpretation).
 .sub '_lang_abort' :anon
     .param pmc value
     .local pmc ex
-    new ex, .Exception
+    new ex, 'Exception'
     $S0 = value
     ex['_message'] = $S0
     throw ex
@@ -576,15 +576,15 @@ If value is less than zero (0), the function returns C<invalid>.
     if $I0 goto L2
     $I0 = $P0
     if $I0 < 0 goto L2
-    new $P0, .Random
+    new $P0, 'Random'
     $N0 = $P0
     $N0 = mul $I0
     $I0 = $N0
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -629,12 +629,13 @@ String or invalid.
     if $I0 >= 0 goto L3
     $I0 = time
   L3:
-    new $P0, .Random
+    new $P0, 'Random'
     $P0 = $I0
-    new res, .WmlsString, ''
+    new res, 'WmlsString'
+    set res, ''
     goto L4
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L4:
     .return (res)
 .end
@@ -656,7 +657,7 @@ Integer.
 
 .sub '_lang_characterSet' :anon
     .local pmc res
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     res = 4     # latin1
     .return (res)
 .end

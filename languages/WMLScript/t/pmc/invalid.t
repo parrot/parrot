@@ -123,7 +123,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
     .local pmc pmc1
-    pmc1 = new .WmlsInvalid
+    pmc1 = new "WmlsInvalid"
     print pmc1
     print "\n"
     .local int bool1
@@ -142,7 +142,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
     .local pmc cst1
-    cst1 = new .WmlsInvalid
+    cst1 = new "WmlsInvalid"
     print cst1
     print "\n"
     $P0 = istrue cst1
@@ -163,7 +163,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
     .local pmc cst1
-    cst1 = new .WmlsInvalid
+    cst1 = new "WmlsInvalid"
     print cst1
     print "\n"
     $P0 = typeof cst1
@@ -184,7 +184,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check defined' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
     .local pmc cst1
-    cst1 = new .WmlsInvalid
+    cst1 = new "WmlsInvalid"
     print cst1
     print "\n"
     $P0 = defined cst1

@@ -21,7 +21,7 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 
 
 .sub 'getFloat'
-    new $P0, .Hash
+    new $P0, 'Hash'
 
     .const .Sub _float_int = '_float_int'
     $P0[0]  = _float_int
@@ -72,11 +72,11 @@ Integer or invalid.
     $I0 = isa $P0, 'WmlsInvalid'
     if $I0 goto L2
     $I0 = $P0
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -111,11 +111,11 @@ Integer or invalid.
     if $I0 goto L2
     $N0 = $P0
     $I0 = floor $N0
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -150,11 +150,11 @@ Integer or invalid.
     if $I0 goto L2
     $N0 = $P0
     $I0 = ceil $N0
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -208,7 +208,7 @@ If value1 < 0 and value2 is not an integer then C<invalid> is returned.
     $N2 = $P2
     unless $N1 == 0.0 goto L4
     if $N2 < 0.0 goto L2
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, 0.0
     goto L5
   L4:
@@ -217,11 +217,11 @@ If value1 < 0 and value2 is not an integer then C<invalid> is returned.
     if $I0 goto L2
   L6:
     $N0 = pow $N1, $N2
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, $N0
     goto L5
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L5:
     .return (res)
 .end
@@ -259,11 +259,11 @@ Integer or invalid.
     $N0 = $P0
     $N0 += 0.5
     $I0 = floor $N0
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -303,11 +303,11 @@ If value is a negative number then invalid is returned.
     $N0 = $P0
     if $N0 < 0.0 goto L2
     $N1 = sqrt $N0
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, $N1
     goto L3
   L2:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
   L3:
     .return (res)
 .end
@@ -328,7 +328,7 @@ Floating-point 3.40282347e+38.
 
 .sub '_float_maxFloat' :anon
     .local pmc res
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, 3.40282347e+38
     .return (res)
 .end
@@ -350,7 +350,7 @@ precision floating-point value: 1.17549435e-38.
 
 .sub '_float_minFloat' :anon
     .local pmc res
-    new res, .WmlsFloat
+    new res, 'WmlsFloat'
     set res, 1.17549435e-38
     .return (res)
 .end

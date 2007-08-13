@@ -141,7 +141,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
     .local pmc pmc1
-    pmc1 = new .WmlsInteger
+    pmc1 = new "WmlsInteger"
     pmc1 = 42
     print pmc1
     print "\n"

@@ -41,7 +41,7 @@ Francois Perrad.
     unless content goto L1
     .local pmc loader
     .local pmc script
-    new loader, .WmlsBytecode
+    new loader, 'WmlsBytecode'
     push_eh _handler
     script = loader.load(content)
     script['filename'] = filename

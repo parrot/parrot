@@ -47,7 +47,7 @@ See "WMLScript Standard Libraries Specification", section 9 "String".
 
 
 .sub 'getString'
-    new $P0, .Hash
+    new $P0, 'Hash'
 
     .const .Sub _string_length = '_string_length'
     $P0[0]  = _string_length
@@ -109,11 +109,11 @@ Integer or invalid.
     if $I0 goto L1
     $S1 = str
     $I1 = length $S1
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I1
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -142,14 +142,14 @@ Boolean or invalid.
     if $I0 goto L1
     $S1 = str
     $I1 = length $S1
-    new res, .WmlsBoolean
+    new res, 'WmlsBoolean'
     set res, 0
     if $I1 goto L2
     set res, 1
   L2:
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -195,7 +195,7 @@ If index is out of range then an empty string (C<"">) is returned.
     $S1 = str
     $I1 = length $S1
     $I2 = index_
-    new res, .WmlsString
+    new res, 'WmlsString'
     if $I2 < 0 goto L3
     if $I2 >= $I1 goto L3
     $S0 = substr $S1, $I2, 1
@@ -203,7 +203,7 @@ If index is out of range then an empty string (C<"">) is returned.
   L3:
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -266,7 +266,7 @@ If length <= 0 an empty string (C<"">) is returned.
     if $I2 >= 0 goto L4
     $I2 = 0
   L4:
-    new res, .WmlsString
+    new res, 'WmlsString'
     if $I2 >= $I1 goto L5
     $I3 = Length
     if $I3 <= 0 goto L5
@@ -275,7 +275,7 @@ If length <= 0 an empty string (C<"">) is returned.
   L5:
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -320,11 +320,11 @@ If subString is an empty string (C<"">), an invalid value is returned.
     $I2 = length $S2
     if $I2 == 0 goto L1
     $I0 = index $S1, $S2
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     set res, $I0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -376,11 +376,11 @@ If oldSubString is an empty string an C<invalid> value is returned.
     $S3 = newSubString
     $P0 = split $S2, $S1
     $S0 = join $S3, $P0
-    new res, .WmlsString
+    new res, 'WmlsString'
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -422,7 +422,7 @@ Returns C<invalid> if the separator is an empty string.
     $I2 = length $S2
     if $I2 == 0 goto L1
     $S2 = substr $S2, 0, 1
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     $I1 = length $S1
     if $I1 != 0 goto L2
     set res, 1
@@ -433,7 +433,7 @@ Returns C<invalid> if the separator is an empty string.
     set res, $I0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -493,7 +493,7 @@ Returns C<invalid> if the separator is an empty string.
     $I3 = length $S3
     if $I3 == 0 goto L1
     $S3 = substr $S3, 0, 1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $I1 = length $S1
     if $I1 != 0 goto L4
     .return (res)
@@ -507,7 +507,7 @@ Returns C<invalid> if the separator is an empty string.
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -567,7 +567,7 @@ Returns C<invalid> if the separator is an empty string.
     $I3 = length $S3
     if $I3 == 0 goto L1
     $S3 = substr $S3, 0, 1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $I1 = length $S1
     if $I1 != 0 goto L4
     .return (res)
@@ -578,7 +578,7 @@ Returns C<invalid> if the separator is an empty string.
     $I2 = $I4 - 1
   L5:
     dec $I4
-    new $P1, .Array
+    new $P1, 'Array'
     set $P1, $I4
     $I0 = 0
     $I1 = 0
@@ -596,7 +596,7 @@ Returns C<invalid> if the separator is an empty string.
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -662,7 +662,7 @@ Returns C<invalid> if the separator is an empty string.
     $I4 = length $S4
     if $I4 == 0 goto L1
     $S4 = substr $S4, 0, 1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $I1 = length $S1
     if $I1 != 0 goto L4
     set res, $S2
@@ -678,7 +678,7 @@ Returns C<invalid> if the separator is an empty string.
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -744,7 +744,7 @@ Returns C<invalid> if the separator is an empty string.
     $I4 = length $S4
     if $I4 == 0 goto L1
     $S4 = substr $S4, 0, 1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $I1 = length $S1
     if $I1 != 0 goto L4
     set res, $S2
@@ -756,7 +756,7 @@ Returns C<invalid> if the separator is an empty string.
     $I3 = $I5
   L5:
     $I6 = $I5 + 1
-    new $P1, .Array
+    new $P1, 'Array'
     set $P1, $I6
     $I0 = 0
     $I1 = 0
@@ -776,7 +776,7 @@ Returns C<invalid> if the separator is an empty string.
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -831,13 +831,13 @@ String or invalid.
     .local pmc res
     $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $S1 = str
     $S0 = squeeze($S1)
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -885,13 +885,13 @@ String or invalid.
     .local pmc res
     $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
-    new res, .WmlsString
+    new res, 'WmlsString'
     $S1 = str
     $S0 = trim($S1)
     set res, $S0
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -927,7 +927,7 @@ Integer or invalid.
     if $I0 goto L1
     $S1 = string1
     $S2 = string2
-    new res, .WmlsInteger
+    new res, 'WmlsInteger'
     if $S1 >= $S2 goto L2
     set res, -1
     .return (res)
@@ -939,7 +939,7 @@ Integer or invalid.
     set res, 1
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
@@ -967,7 +967,7 @@ String.
     .param pmc value
     $S1 = value
     .local pmc res
-    new res, .WmlsString
+    new res, 'WmlsString'
     set res, $S1
     .return (res)
 .end
@@ -1088,16 +1088,16 @@ Illegal format specifier results in an C<invalid> return value.
     $I0 = isa format, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = format
-    new $P0, .Array
+    new $P0, 'Array'
     set $P0, 1
     $P0[0] = value
   L2:
     $S1 = sprintf $S0, $P0
-    new res, .WmlsString
+    new res, 'WmlsString'
     set res, $S1
     .return (res)
   L1:
-    new res, .WmlsInvalid
+    new res, 'WmlsInvalid'
     .return (res)
 .end
 
