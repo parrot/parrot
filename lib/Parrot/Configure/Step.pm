@@ -463,6 +463,19 @@ sub _run_command {
     return $exit_code;
 }
 
+=item C<_build_compile_command( $cc, $ccflags, $cc_args )>
+
+Constructs a command-line to do the compile.
+
+=cut
+
+sub _build_compile_command {
+    my ( $cc, $ccflags, $cc_args ) = @_;
+    $_ ||= '' for ( $cc, $ccflags, $cc_args );
+
+    return "$cc $ccflags $cc_args -I./include -c test.c";
+}
+
 =item C<cc_gen($source)>
 
 Generates F<test.c> from the specified source file.
@@ -499,7 +512,8 @@ sub cc_build {
             cc_exe_out exe libs)
         );
 
-    _run_command( "$cc $ccflags $cc_args -I./include -c test.c", 'test.cco', 'test.cco', $verbose )
+    my $compile_command = _build_compile_command( $cc, $ccflags, $cc_args );
+    _run_command( $compile_command, 'test.cco', 'test.cco', $verbose )
         and confess "C compiler failed (see test.cco)";
 
     _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs",

@@ -66,10 +66,10 @@ sub try_attr {
     my $ccflags = $conf->option_or_data( 'ccflags');
     my $tryflags = "$ccflags -D$attr";
 
-    # These are OK to fail, because we're trying them out.
-    my $command_line = "$cc -o test -Iinclude $tryflags test.c";
+    my $command_line = Parrot::Configure::Step::_build_compile_command( $cc, $tryflags );
     $verbose and print "  ", $command_line, $/;
 
+    # Don't use cc_build, because failure is expected.
     my $exit_code = Parrot::Configure::Step::_run_command(
         $command_line, 'test.cco', 'test.cco' );
     $verbose and print "  exit code: $exit_code$/";
