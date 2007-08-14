@@ -1,0 +1,127 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
+=head1 NAME
+
+docs/dev/debugging_with_msvc.pod - Debugging Parrot with Microsoft
+Visual C++
+
+=head1 ABSTRACT
+
+This document describes how to get started with debugging on Microsoft
+Windows using Visual C++ 7 and later.
+
+=head1 DESCRIPTION
+
+=head2 Compiler Options
+
+Probably the easiest way to get going with debugging is to add some
+compiler options.  One way to go about this is to run 
+C<perl Configure.pl>, look at the C<CFLAGS> in F<Makefile> and then run
+C<perl Configure.pl --ccflags="..."> with the new flags.  Once done,
+consider saving your Configure call in a batch file so you have it
+available the next time.
+
+=head3 C</Wall>
+
+Listen to your compiler.
+
+=head3 C</RTCcsu> - Enables run-time error checking
+
+This enables three different runtime checks: Conversion to smaller
+type, stacke frame and use of uninitialized local variable.  See
+L<http://msdn2.microsoft.com/en-us/library/8wtf2dfz(VS.80).aspx>.
+
+=head3 C</GS> - Buffers security check
+
+Detect some buffer overruns.  See
+L<http://msdn2.microsoft.com/en-us/library/8dbf701c(VS.80).aspx>.
+
+=head3 C</Wp64> - Detect 64-bit compatability problems
+
+I<Don't> use this one. Leave 64-bit checking to the real 64-bit
+compilers.
+
+=head3 C</D_DEBUG> vs. C</DNDEBUG>
+
+C<_DEBUG> enables the use of the debugging versions of the runtime
+functions.  C<NDEBUG> disables the debug function C<assert>.  Beware
+that the Visual C++ specific assertion macro C<_ASSERT> is only
+enabled if C<_DEBUG> is defined!
+
+It's probably best to start with making sure that C<NDEBUG> is not
+defined and enable the debugging C runtime later.
+
+=head3 Debugging C runtime
+
+Two steps are necessary to use the debugging C runtime.  First change
+the C<-MD> flag to C<-MDd>.  This will implicitly define C<_DEBUG>.
+Often this is enough, but Parrot lists the libraries explicitly, so
+you'd need to replace F<MSVCRT.lib> with F<MSVCRTd.lib>.  For this,
+run C<perl Configure.pl>, look at C<C_LIBS> in the F<Makefile> and run
+C<perl Configure.pl --libs="..."> with the new libs.
+
+=head3 C</analyze>
+
+Microsoft added more static source code analysis to the their
+compiler, but this is only available with certain editions.  If not
+supported you'll see the following warning.
+
+  cl : Command line warning D9040 : ignoring option '/analyze'; Code
+  Analysis warnings are not available in this edition of the compiler 
+
+
+=head3 Examples
+
+Here's an example how the new Configure call might look like.
+
+  perl Configure.pl ^
+      --ccflags="-nologo -Wall -MDd -Zi -Od -GS -RTCcsu -DWIN32 -D_CONSOLE" ^
+      --linkflags="-nologo -nodefaultlib -machine:x86 -debug -incremental:no" ^
+      --ldflags="-nologo -nodefaultlib -machine:x86 -debug -incremental:no" ^
+      --libs="kernel32.lib ws2_32.lib msvcrtd.lib oldnames.lib" ^
+      %*
+
+=head2 Debugging Tools for Windows
+
+TODO
+
+L<http://www.microsoft.com/whdc/devtools/debugging/default.mspx>
+
+=head3 Examples
+
+TODO
+
+
+=head2 Microsoft Application Verifier
+
+TODO
+
+L<http://www.microsoft.com/technet/prodtechnol/windows/appcompatibility/appverifier.mspx>
+
+=head3 Examples
+
+TODO
+
+
+=head2 Frequently Asked Questions
+
+TODO
+
+=head1 SEE ALSO
+
+=over
+
+=item Debugging Native Code
+
+L<http://msdn2.microsoft.com/en-us/library/k70yt3e2(VS.80).aspx>
+
+=back
+
+=head1 AUTHOR
+
+Ronald Blaschke <ron@rblasch.org>
+
+=cut
+
+# vim: expandtab shiftwidth=2 textwidth=70:
