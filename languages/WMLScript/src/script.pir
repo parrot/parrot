@@ -256,9 +256,7 @@ PIRCODE
     pir .= $S0
     pir .= "\n  new const"
     pir .= $S0
-    pir .= ", 'WmlsString'\n  set const"
-    pir .= $S0
-    pir .= ", ''\n"
+    pir .= ", 'WmlsString'\n"
     .return (pir)
 .end
 
@@ -543,7 +541,7 @@ PIRCODE
   L6:
 
     unless number_of_local_variables goto L7
-    pir .= "  new $P0, 'WmlsString'\n  set $P0, ''\n"
+    pir .= "  new $P0, 'WmlsString'\n"
   L7:
     unless idx < number_of_variables goto L8
     pir .= "  local"
@@ -561,7 +559,6 @@ PIRCODE
 
     pir .= <<'PIRCODE'
   new $P0, 'WmlsString'
-  set $P0, ''
   .return ($P0)
 .end
 PIRCODE

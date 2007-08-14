@@ -524,7 +524,7 @@ pir = <<PIR
     ${INS} = concat " = clone const_es\n"
     $I0 = exists ${CONST}['const_es']
     if $I0 goto L1_${CURIC}
-    $S0 = "  .local pmc const_es\n  new const_es, 'WmlsString'\n  set const_es, ''\n"
+    $S0 = "  .local pmc const_es\n  new const_es, 'WmlsString'\n"
     ${CONST}['const_es'] = $S0
   L1_${CURIC}:
 PIR
@@ -947,7 +947,6 @@ code = 3B
 class = op
 pir = <<PIR
     ${INS} = concat "  new ${PTEMP0}, 'WmlsString'\n"
-    ${INS} = concat "  set ${PTEMP0}, ''\n"
     ${INS} = concat "  .return (${PTEMP0})\n"
 PIR
 
