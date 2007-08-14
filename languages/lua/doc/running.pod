@@ -9,7 +9,7 @@ C<lua.pbc> is the Lua interpreter.
 
 =head1 Building
 
-After building C<parrot> :
+After building C<parrot> (see F<docs/gettingstarted.pod>):
 
   cd languages/lua
   make
