@@ -62,6 +62,8 @@ static Builtins builtins[] = {
     { "say",    "IJS",          "ParrotIO",     NULL, NULL },
     { "say",    "vJOS",         "ParrotIO",     NULL, NULL },
     { "say",    "vJS",          "ParrotIO",     NULL, NULL },
+    { "say",    "vJI",          "ParrotIO",     NULL, NULL },
+    { "say",    "vJN",          "ParrotIO",     NULL, NULL },
     { "sech",   "PJO",          "Float",        NULL, NULL },
     { "sec",    "PJO",          "Float",        NULL, NULL },
     { "sinh",   "PJO",          "Float",        NULL, NULL },

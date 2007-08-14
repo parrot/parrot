@@ -12,7 +12,7 @@ use Parrot::Test;
 plan skip_all => 'No reason to compile invalid PBC here'
     if $ENV{TEST_PROG_ARGS} =~ /-r/;
 
-plan tests => 4;
+plan tests => 3;
 
 ## tests for imcc error messages
 
@@ -53,16 +53,6 @@ $test_3_pir_code .= ".end\n";
 
 pir_error_output_like( $test_3_pir_code, <<'OUT', "check parser recovery patience.");
 /Too many errors. Correct some first.\n$/
-OUT
-
-pir_error_output_like( <<'CODE', <<'OUT', '#line nnn "file"');
-.sub main :main
-#line 54 "xyz.pir"
-    say "Hello"
-    say 3
-.end
-CODE
-/in file 'xyz.pir' line 57/
 OUT
 
 # Local Variables:
