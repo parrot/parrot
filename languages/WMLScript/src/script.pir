@@ -415,13 +415,13 @@ PIRCODE
     pir .= " = 'function"
     $S0 = function_index
     pir .= $S0
-    pir .= "'\n  set_hll_global '"
+    pir .= "'\n  $P0 = clone "
+    pir .= function_name
+    pir .= "\n  set_hll_global '"
     pir .= namespace
     pir .= ":"
     pir .= function_name
-    pir .= "', "
-    pir .= function_name
-    pir .= "\n"
+    pir .= "', $P0\n"
     inc idx
     goto L1
   L2:
