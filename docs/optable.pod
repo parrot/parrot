@@ -3,7 +3,7 @@
 
 =head1 ***** WARNING *****
 
-=head1 This is an ALPHA pod! The contents herein may not reflect reality. :)
+This is an ALPHA pod! The contents herein may not reflect reality. :)
 
 =head1 NAME
 
