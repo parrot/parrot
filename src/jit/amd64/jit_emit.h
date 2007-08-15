@@ -1,10 +1,21 @@
 /*
  * jit_emit.h
  *
- * skeleton example - a stripped down jit/ppc/jit_emit.h
+ * amd64
  *
  * $Id$
- */
+
+=head1 NAME
+
+src/jit/amd64/jit_emit.h - AMD64 JIT Generation
+
+=head1 DESCRIPTION
+
+Provide the support for a JIT on the AMD64 architecture.
+
+=cut
+
+*/
 
 #ifndef PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
 #define PARROT_JIT_AMD64_JIT_EMIT_H_GUARD
@@ -74,6 +85,7 @@ RBP, RBX, and R12->R15 are preserved
 
 void Parrot_jit_begin(Parrot_jit_info_t *, Interp *);
 static const char* div_by_zero = "Divide by zero";
+static const int mxcsr = 0x7fa0; /* Add 6000 to mxcsr */
 
 
 /* This is used for testing whether or not keeping these two in registers is an
@@ -88,6 +100,7 @@ static const char* div_by_zero = "Divide by zero";
  */
 typedef enum {
     RAX,
+    ISR2 = RAX, /* Not like it's good for anything else */
     RCX,
     RDX,
     RBX,
@@ -114,52 +127,106 @@ typedef enum {
     INTERP = R15
 } amd64_iregister_t;
 
-/* Register usage
- *  RAX    return values
- *  RCX    allocated, unpreserved
- *  RDX    allocated, unpreserved
- *  RBX    parrot register frame pointer
- *  RSP    stack pointer
- *  RBP    base pointer
- *  RSI    allocated, unpreserved
- *  RDI    allocated, unpreserved
-
- *  R8     allocated, unpreserved
- *  R9     allocated, unpreserved
- *  R10    allocated, unpreserved
- *  R11    Scratch
- *  R12    allocated, preserved
- *  R13    allocated, preserved, or code_start
- *  R14    allocated, preserved, or op_map
- *  R15    interp
- */
 
 /*
- * If your arch doesn't have that much register available, you
- * don't cache OP_MAP, CODE_START, and INTERP in a cpu register.
- * Only BP (the register base pointer is needed and 1 or 2 temp regs
- */
 
+=head2 Register usage
 
-/*
- * define, which register is the register base pointer
- */
+=over 4
+
+=item RAX
+
+Return values, second scratch
+
+=item RCX
+
+Allocated, unpreserved
+
+=item RDX
+
+Allocated, unpreserved
+
+=item RBX
+
+Parrot register frame pointer
+
+=item RSP
+
+Stack pointer
+
+=item RBP
+
+Base pointer
+
+=item RSI
+
+Allocated, unpreserved
+
+=item RDI
+
+Allocated, unpreserved
+
+=item R8
+
+Allocated, unpreserved
+
+=item R9
+
+Allocated, unpreserved
+
+=item R10
+
+Allocated, unpreserved
+
+=item R11
+
+Scratch
+
+=item R12
+
+Allocated, preserved
+
+=item R13
+
+Allocated, preserved, or code_start
+
+=item R14
+
+Allocated, preserved, or op_map
+
+=item R15
+
+Interp
+
+=item XMM0
+
+Scratch
+
+=item XMM1-XMM15
+
+Allocated, all unpreserved
+
+=back
+
+=cut
+
+*/
+
 
 #define Parrot_jit_emit_get_base_reg_no(pc) RBX
 
-/*
- * define floating point register too, if there are some
- */
 typedef enum {
       XMM0,
       FSR1 = XMM0,
-      XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
+      XMM1,
+      FSR2 = XMM1,
+      XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
       XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15
 } amd64_fregister_t;
 
 
 /* Call can be handled without a fixup */
-enum { JIT_X86BRANCH, JIT_X86JUMP };
+enum { JIT_AMD64BRANCH, JIT_AMD64JUMP, JIT_AMD64CALL };
 
 
 /*
@@ -169,6 +236,17 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
  * exec_cpu.c or jit_cpu.c
  */
 
+/*
+
+=head2 Macros
+
+Most of the functionality is provided by macros instead of functions.
+
+=over 4
+
+=cut
+
+*/
 
 #define b00 0
 #define b01 1
@@ -185,20 +263,28 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
 #define b111 7
 
 /* rex.[wrxb], incomplete but oh well */
-#  define emit_rex64(pc, dst, src) { \
-        *(pc++) = (char)(0x48 | (((dst) & 8) >> 1) | (((src) & 8) >> 3)); }
+/*
+
+=item C<emit_rex64(pc, reg, rm)>
+
+The REX prefix, setting REX.W making the instruction 64 bit.
+
+=item C<emit_rex(pc, reg, rm)>
+
+The REX prefix, only emitted if using an extended register.
+
+=cut
+
+*/
+#  define emit_rex64(pc, reg, rm) \
+    *(pc++) = (char)(0x48 | (((reg) & 8) >> 1) | (((rm) & 8) >> 3))
 
 #  define emit_rex(pc, dst, src) { \
-        if ((dst) & 8 || (src) & 8) { \
-        *(pc++) = (char)(0x40 | (((dst) & 8) >> 1) | (((src) & 8) >> 3)); }}
+        if ((dst) & 8 || (src) & 8) \
+        *(pc++) = (char)(0x40 | (((dst) & 8) >> 1) | (((src) & 8) >> 3)); }
 
 /* Use a 0x66 prefix for increased padding */
 #  define emit_nop(pc) { \
-        *(pc++) = (char)(0x90); }
-
-/* Same as above, but different disassemble from gdb */
-#  define emit_64nop(pc) { \
-        *(pc++) = (char)(0x48); \
         *(pc++) = (char)(0x90); }
 
 #  define emit_modrm(pc, mod, dst, src) { \
@@ -228,7 +314,10 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
 #  define emit_op_r_mr(op, pc, dst, src, disp) { \
         emit_rex64(pc, dst, src); \
         *(pc++) = (char) op; \
-        if (is8bit(disp)) { \
+        if ((disp) == 0) { \
+            emit_modrm(pc, b00, dst, src); \
+        } \
+        else if (is8bit(disp)) { \
             emit_modrm(pc, b01, dst, src); \
             *(pc++) = (char)disp; \
         } \
@@ -245,9 +334,8 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
         pc += 4; \
     }
 
-
 #  define emit_op_r_i(pc, op, op2, code, dst, imm) { \
-        emit_rex64(pc, dst, 0x0); \
+        emit_rex64(pc, 0x0, dst); \
         if (is8bit(imm)) { \
             *(pc++) = (char) op; \
             emit_modrm(pc, b11, code, dst); \
@@ -261,31 +349,174 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
         } \
     }
 
+#  define emit_op_mr_i(pc, op, op2, code, dst, disp, imm) { \
+        emit_rex64(pc, 0x0, dst); \
+        if (is8bit(imm)) { \
+            *(pc++) = (char) op; \
+            if ((disp) == 0) { \
+                emit_modrm(pc, b00, code, dst); \
+            } \
+            else if (is8bit(disp)) { \
+                emit_modrm(pc, b01, code, dst); \
+                *(pc++) = (char)disp; \
+            } \
+            else { \
+                emit_modrm(pc, b10, code, dst); \
+                *(int *)pc = (int)disp; \
+                pc += 4; \
+            } \
+            *(pc++) = (char)imm; \
+        } \
+        else { \
+            *(pc++) = (char) op2; \
+            if ((disp) == 0) { \
+                emit_modrm(pc, b00, code, dst); \
+            } \
+            else if (is8bit(disp)) { \
+                emit_modrm(pc, b01, code, dst); \
+                *(pc++) = (char)disp; \
+            } \
+            else { \
+                emit_modrm(pc, b10, code, dst); \
+                *(int *)pc = (int)disp; \
+                pc += 4; \
+            } \
+            *(int *)pc = (int)imm; \
+            pc += 4; \
+        } \
+    }
+
+/* Test for zero, then call this, and it'll throw a real_exception if you try
+ * to divide by zero */
+#  define emit_div_check_zero(pc) { \
+    char *sav_ptr; \
+    emit_jcc(pc, jcc_jnz, 0x00); \
+    sav_ptr = (void *)(pc - 1); \
+    emit_mov_r_r(pc, RDI, INTERP); \
+    emit_mov_r_i(pc, RSI, 0); \
+    emit_mov_r_i(pc, RDX, E_ZeroDivisionError); \
+    emit_mov_r_i(pc, RCX, div_by_zero); \
+    /* We must explicitly zero out RAX, since RAX is used in calling
+     * conventions for va_arg functions, and real_exception is a va_arg
+     * function */ \
+    emit_xor_r_r(pc, RAX, RAX); \
+    /* This assumes that jit_info is defined, if it's not, the code's not "consistent" */ \
+    call_func(jit_info, (void (*)(void)) real_exception); \
+    *sav_ptr = (char)(pc - sav_ptr - 1); \
+}
+
+#  define emit_cmp_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x7, dst, imm)
+#  define emit_cmp_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x7, dst, disp, imm)
+#  define emit_cmp_r_r(pc, dst, src) emit_op_r_r(0x3b, pc, dst, src)
+#  define emit_cmp_r_mr(pc, dst, src, disp) emit_op_r_mr(0x3b, pc, dst, src, disp)
+#  define emit_cmp_mr_r(pc, dst, disp, src) emit_op_r_mr(0x39, pc, src, dst, disp)
+
 
 #  define emit_add_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x0, dst, imm)
+#  define emit_add_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x0, dst, disp, imm)
 #  define emit_add_r_r(pc, dst, src) emit_op_r_r(0x03, pc, dst, src)
 #  define emit_add_r_mr(pc, dst, src, disp) emit_op_r_mr(0x03, pc, dst, src, disp)
 #  define emit_add_mr_r(pc, dst, disp, src) emit_op_r_mr(0x01, pc, src, dst, disp)
 
 #  define emit_sub_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x5, dst, imm)
+#  define emit_sub_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x5, dst, disp, imm)
 #  define emit_sub_r_r(pc, dst, src) emit_op_r_r(0x2b, pc, dst, src)
 #  define emit_sub_r_mr(pc, dst, src, disp) emit_op_r_mr(0x29, pc, dst, src, disp)
 #  define emit_sub_mr_r(pc, dst, disp, src) emit_op_r_mr(0x2b, pc, src, dst, disp)
 
+#  define emit_xchg_r_r(pc, dst, src) emit_op_r_r(0x87, pc, dst, src)
+#  define emit_xchg_r_mr(pc, dst, src, disp) emit_op_r_mr(0x87, pc, dst, src, disp)
+#  define emit_xchg_mr_r(pc, dst, disp, src) emit_op_r_mr(0x87, pc, src, dst, disp)
 
-/* XXX emit_call_i is slightly broken I think, stick to a shared parrot */
-#  define emit_call_i(pc, imm) { emit_op_i(0xe8, (pc), ((long)(imm) - (long)(pc) - 4));\
-         printf("Calling address %p\n", imm); }
+#  define emit_xor_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x6, dst, imm)
+#  define emit_xor_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x6, dst, disp, imm)
+#  define emit_xor_r_r(pc, dst, src) emit_op_r_r(0x33, pc, dst, src)
+#  define emit_xor_r_mr(pc, dst, src, disp) emit_op_r_mr(0x33, pc, dst, src, disp)
+#  define emit_xor_mr_r(pc, dst, disp, src) emit_op_r_mr(0x31, pc, src, dst, disp)
+
+#  define emit_and_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x4, dst, imm)
+#  define emit_and_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x4, dst, disp, imm)
+#  define emit_and_r_r(pc, dst, src) emit_op_r_r(0x23, pc, dst, src)
+#  define emit_and_r_mr(pc, dst, src, disp) emit_op_r_mr(0x23, pc, dst, src, disp)
+#  define emit_and_mr_r(pc, dst, disp, src) emit_op_r_mr(0x21, pc, src, dst, disp)
+
+#  define emit_or_r_i(pc, dst, imm) emit_op_r_i(pc, 0x83, 0x81, 0x1, dst, imm)
+#  define emit_or_mr_i(pc, dst, disp, imm) emit_op_mr_i(pc, 0x83, 0x81, 0x1, dst, disp, imm)
+#  define emit_or_r_r(pc, dst, src) emit_op_r_r(0x0b, pc, dst, src)
+#  define emit_or_r_mr(pc, dst, src, disp) emit_op_r_mr(0x0b, pc, dst, src, disp)
+#  define emit_or_mr_r(pc, dst, disp, src) emit_op_r_mr(0x09, pc, src, dst, disp)
+
+#  define emit_imul_r_r(pc, dst, src) { \
+    emit_rex64(pc, dst, src); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) 0xaf; \
+    emit_modrm(pc, b11, dst, src); \
+}
+#  define emit_imul_r_mr(pc, dst, src, disp) { \
+    emit_rex64(pc, dst, src); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) 0xaf; \
+    if ((disp) == 0) { \
+        emit_modrm(pc, b00, dst, src); \
+    } \
+    else if (is8bit(disp)) { \
+        emit_modrm(pc, b01, dst, src); \
+        *(pc++) = (char)disp; \
+    } \
+    else { \
+        emit_modrm(pc, b10, dst, src); \
+        *(int *)pc = (int)disp; \
+        pc += 4; \
+    } \
+}
+
+#  define emit_idiv_r_r(pc, dst, src) { \
+    emit_xor_r_r(pc, RDX, RDX); \
+    emit_test_r(pc, src); \
+    emit_div_check_zero(pc); \
+    emit_op_r_r(0xf7, pc, 0x7, src); \
+}
+#  define emit_idiv_r_mr(pc, dst, src, disp) { \
+    emit_xor_r_r(pc, RDX, RDX); \
+    emit_mov_r_mr(pc, ISR1, src, disp); \
+    emit_test_r(pc, ISR1); \
+    emit_div_check_zero(pc); \
+    emit_op_r_mr(0xf7, pc, 0x7, src, disp); \
+}
+
+#  define emit_abs_r(pc, reg) emit_and_r_i(pc, reg, ~(1L << 63))
+
+#  define emit_neg_r(pc, reg) emit_op_r_r(0xf7, pc, 0x2, reg)
+#  define emit_not_r(pc, reg) emit_op_r_r(0xf7, pc, 0x3, reg)
+#  define emit_inc_r(pc, reg) emit_op_r_r(0xff, pc, 0x0, reg)
+#  define emit_dec_r(pc, reg) emit_op_r_r(0xff, pc, 0x1, reg)
+
+/* This needs a fixup it seems...  call_r doesn't */
+#  define emit_call_i(pc, imm) emit_op_i(0xe8, pc, imm)
 #  define emit_call_r(pc, reg) { \
         emit_rex64(pc, 0x0, reg); \
         *(pc)++ = (char)0xff; \
         emit_modrm(pc, b11, 0x2, reg); }
 
-#  define emit_jump_r_r(pc, reg1, reg2) { \
+#  define emit_jmp_r_r(pc, reg1, reg2) { \
     emit_rex(pc, reg1, reg2); \
     *(pc++) = (char)0xff; \
     emit_modrm(pc, b00, 0x4, b100); \
     emit_sib(pc, b00, reg1, reg2); \
+}
+
+#  define emit_jmp_i(pc, imm) emit_op_i(0xe9, pc, imm)
+#  define emit_jmp_i_fixup(ji, imm) { \
+    opcode_t opcode; \
+    opcode = jit_info->op_i + imm; \
+    Parrot_jit_newfixup(jit_info); \
+    jit_info->arena.fixups->type = JIT_AMD64JUMP; \
+    jit_info->arena.fixups->param.opcode = opcode; \
+    if (jit_info->optimizer->cur_section->branch_target == \
+            jit_info->optimizer->cur_section) \
+        jit_info->arena.fixups->skip = \
+            jit_info->optimizer->cur_section->branch_target->load_size; \
+    emit_jmp_i(jit_info->native_ptr, 0xdead); \
 }
 
 #  define emit_leave(pc) *(pc++) = (char)0xc9;
@@ -299,7 +530,10 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
             if (is32bit(imm)) { \
                 emit_rex64(pc, 0x0, reg); \
                 *(pc++) = (char) 0xc7; \
-                    if (is8bit(offs)) { \
+                    if ((offs) == 0) { \
+                        emit_modrm(pc, b00, 0x0, reg); \
+                    } \
+                    else if (is8bit(offs)) { \
                         emit_modrm(pc, b01, 0x0, reg); \
                         *(pc++) = (char)offs; \
                     } \
@@ -379,6 +613,19 @@ enum { JIT_X86BRANCH, JIT_X86JUMP };
         } \
 }
 
+#  define emit_jcc_fixup(ji, code, imm) { \
+    opcode_t opcode; \
+    opcode = ji->op_i + imm; \
+    Parrot_jit_newfixup(ji); \
+    ji->arena.fixups->type = JIT_AMD64BRANCH; \
+    ji->arena.fixups->param.opcode = opcode; \
+    if (ji->optimizer->cur_section->branch_target == \
+            ji->optimizer->cur_section) \
+        ji->arena.fixups->skip = \
+            ji->optimizer->cur_section->branch_target->load_size; \
+    emit_jcc(ji->native_ptr, code, 0xdead); \
+}
+
 typedef enum {
  jcc_jo,                /* Jump if overflow */
  jcc_jno,               /* Jump if not overflow */
@@ -411,6 +658,9 @@ typedef enum {
  jcc_jnle,              /* Jump if not less or equal */
  jcc_jg   = jcc_jnle    /* Jump if greater */
 } amd64_jcc_t;
+
+#  define emit_test_r(pc, reg) \
+          emit_op_r_r(0x85, pc, reg, reg)
 
 #  define emit_test_r_r(pc, dst, src) \
           emit_op_r_r(0x85, pc, src, dst)
@@ -446,18 +696,48 @@ typedef enum {
     emit_modrm(pc, b11, dst, src); \
 }
 
+#  define emit_op64_x_x(prefix, op, pc, dst, src) { \
+    *(pc++) = (char) prefix; \
+    emit_rex64(pc, dst, src); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) op; \
+    emit_modrm(pc, b11, dst, src); \
+}
+
 #  define emit_op_x_mx(prefix, op, pc, dst, src, offs) { \
     *(pc++) = (char) prefix; \
     emit_rex(pc, dst, src); \
     *(pc++) = (char) 0x0f; \
     *(pc++) = (char) op; \
-    if (is8bit(offs)) { \
+    if ((offs) == 0) { \
+        emit_modrm(pc, b00, dst, src); \
+    } \
+    else if (is8bit(offs)) { \
         emit_modrm(pc, b01, dst, src); \
-        *(pc++) = (char)offs; \
+        *(pc++) = (char)(long)(offs); \
     } \
     else { \
         emit_modrm(pc, b10, dst, src); \
-        *(int *)pc = (int)offs; \
+        *(int *)pc = (int)(long)(offs); \
+        pc += 4; \
+    } \
+}
+
+#  define emit_op64_x_mx(prefix, op, pc, dst, src, offs) { \
+    *(pc++) = (char) prefix; \
+    emit_rex64(pc, dst, src); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) op; \
+    if ((offs) == 0 || src == RBP) { \
+        emit_modrm(pc, b00, dst, src); \
+    } \
+    else if (is8bit(offs)) { \
+        emit_modrm(pc, b01, dst, src); \
+        *(pc++) = (char)(long)(offs); \
+    } \
+    else { \
+        emit_modrm(pc, b10, dst, src); \
+        *(int *)pc = (int)(long)(offs); \
         pc += 4; \
     } \
 }
@@ -475,7 +755,22 @@ typedef enum {
     emit_modrm(pc, b11, src, dst); \
 }
 
+#  define emit_movlhps_x_x(pc, dst, src) { \
+    emit_rex(pc, src, dst); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) 0x16; \
+    emit_modrm(pc, b11, src, dst); \
+}
+
 #  define emit_movd_r_x(pc, dst, src) { \
+    *(pc++) = (char) 0x66; \
+    emit_rex64(pc, dst, src); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) 0x7e; \
+    emit_modrm(pc, b11, dst, src); \
+}
+
+#  define emit_movd_x_r(pc, dst, src) { \
     *(pc++) = (char) 0x66; \
     emit_rex64(pc, dst, src); \
     *(pc++) = (char) 0x0f; \
@@ -483,12 +778,9 @@ typedef enum {
     emit_modrm(pc, b11, dst, src); \
 }
 
-#  define emit_movd_x_r(pc, dst, src) { \
-    *(pc++) = (char) 0x66; \
-    emit_rex64(pc, src, dst); \
-    *(pc++) = (char) 0x0f; \
-    *(pc++) = (char) 0x7e; \
-    emit_modrm(pc, b11, src, dst); \
+#  define emit_test_x(pc, reg) { \
+    emit_xor_x_x(pc, FSR2, FSR2); \
+    emit_comisd_x_x(pc, reg, FSR2); \
 }
 
 #  define emit_comisd_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x2f, pc, dst, src)
@@ -500,54 +792,55 @@ typedef enum {
 #  define emit_sub_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x5c, pc, dst, src)
 #  define emit_sub_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x5c, pc, dst, src, offs)
 
+#  define emit_and_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x54, pc, dst, src)
+#  define emit_and_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x54, pc, dst, src, offs)
+
+#  define emit_xor_x_x(pc, dst, src)         emit_op_x_x(0x66, 0x57, pc, dst, src)
+#  define emit_xor_x_mx(pc, dst, src, offs) emit_op_x_mx(0x66, 0x57, pc, dst, src, offs)
+
 #  define emit_mul_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x59, pc, dst, src)
 #  define emit_mul_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x59, pc, dst, src, offs)
 
-#  define emit_div_check_zero_x(pc, reg) { \
-    char *sav_ptr; \
-    emit_movhlps_x_x(pc, FSR1, FSR1); \
-    emit_comisd_x_x(pc, FSR1, reg); \
-    emit_jcc(pc, jcc_jnz, 0x00); \
-    sav_ptr = (void *)(pc - 1); \
-    emit_mov_r_r(pc, RDI, INTERP); \
-    emit_mov_r_i(pc, RSI, 0); \
-    emit_mov_r_i(pc, RDX, E_ZeroDivisionError); \
-    emit_mov_r_i(pc, RCX, div_by_zero); \
-    /* This assumes that jit_info is defined, if it's not, the code's not "consistent" */ \
-    call_func(jit_info, (void *) real_exception); \
-    *sav_ptr = (char)(pc - sav_ptr - 1); \
-}
-
-#  define emit_div_check_zero_mx(pc, reg, offs) { \
-    char *sav_ptr; \
-    emit_movhlps_x_x(pc, FSR1, FSR1); \
-    emit_comisd_x_mx(pc, FSR1, reg, offs); \
-    emit_jcc(pc, jcc_jnz, 0x00); \
-    sav_ptr = (void *)(pc - 1); \
-    emit_mov_r_r(pc, RDI, INTERP); \
-    emit_mov_r_i(pc, RSI, 0); \
-    emit_mov_r_i(pc, RDX, E_ZeroDivisionError); \
-    emit_mov_r_i(pc, RCX, div_by_zero); \
-    /* This assumes that jit_info is defined, if it's not, the code's not "consistent" */ \
-    call_func(jit_info, (void *) real_exception); \
-    *sav_ptr = (char)(pc - sav_ptr - 1); \
-}
-
+/* I tried to do a check for FSR1 == dst, such as from core.jit, but the bugs
+ * to track down, the hackish things to do(movhlpd and movlhpd were used, but I
+ * gave up and settled on the cleaner and likely faster overall method of
+ * getting an FSR2 and going down to 14 mapped registers.
+ */
 #  define emit_div_x_x(pc, dst, src) { \
-    emit_div_check_zero_x(pc, src); \
+    emit_movhlps_x_x(pc, FSR2, FSR2); \
+    emit_comisd_x_x(pc, FSR2, src); \
+    emit_div_check_zero(pc); \
     emit_op_x_x(0xf2, 0x5e, pc, dst, src); \
 }
 #  define emit_div_x_mx(pc, dst, src, offs) { \
-    emit_div_check_zero_mx(pc, src, offs); \
+    emit_movhlps_x_x(pc, FSR2, FSR2); \
+    emit_comisd_x_mx(pc, FSR2, src, offs); \
+    emit_div_check_zero(pc); \
     emit_op_x_mx(0xf2, 0x5e, pc, dst, src, offs); \
 }
 
 #  define emit_sqrt_x_x(pc, dst, src)         emit_op_x_x(0xf2, 0x51, pc, dst, src)
 #  define emit_sqrt_x_mx(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x51, pc, dst, src, offs)
 
-#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op_x_mx(0xf2, 0x2a, pc, dst, src, offs)
-#  define emit_cvtsi2sd_x_r(pc, dst, src) emit_op_x_x(0xf2, 0x2a, pc, dst, src)
+#  define emit_cvtsi2sd_x_mr(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2a, pc, dst, src, offs)
+#  define emit_cvtsi2sd_x_r(pc, dst, src)         emit_op64_x_x(0xf2, 0x2a, pc, dst, src)
 
+/* Truncate */
+#  define emit_cvttsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2c, pc, dst, src, offs)
+#  define emit_cvttsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2c, pc, dst, src)
+
+/* Round */
+#  define emit_cvtsd2si_r_mx(pc, dst, src, offs) emit_op64_x_mx(0xf2, 0x2d, pc, dst, src, offs)
+#  define emit_cvtsd2si_r_x(pc, dst, src)         emit_op64_x_x(0xf2, 0x2d, pc, dst, src)
+
+#  define emit_ldmxcsr(pc) { \
+    emit_xor_r_r(pc, ISR2, ISR2); \
+    *(pc++) = (char) 0x0f; \
+    *(pc++) = (char) 0xAE; \
+    emit_modrm(pc, b10, 0x2, ISR2); \
+    *(int *)pc = (int)&mxcsr; \
+    pc += 4; \
+}
 /*********************************************************/
 
 #ifdef JIT_EMIT
@@ -597,7 +890,10 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr) {
     else {
         /* Call with an immediate value.  Mainly for a static parrot, and
          * debugging */
-        emit_call_i(jit_info->native_ptr, addr);
+        Parrot_jit_newfixup(jit_info);
+        jit_info->arena.fixups->type = JIT_AMD64CALL;
+        jit_info->arena.fixups->param.fptr = D2FPTR(addr);
+        emit_call_i(jit_info->native_ptr, 0xdead);
     }
 }
 
@@ -629,9 +925,9 @@ Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp)
     emit_mov_r_mr(jit_info->native_ptr, RBX, INTERP, (long)offsetof(Interp, ctx.bp));
 
 #  ifdef USE_OP_MAP_AND_CODE_START
-    emit_jump_r_r(jit_info->native_ptr, RAX, OP_MAP);
+    emit_jmp_r_r(jit_info->native_ptr, RAX, OP_MAP);
 #  else
-    emit_jump_r_r(jit_info->native_ptr, RAX, RDX);
+    emit_jmp_r_r(jit_info->native_ptr, RAX, RDX);
 #  endif
 }
 
@@ -705,7 +1001,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     char *sav_ptr;
 
     Parrot_jit_normal_op(jit_info, interp);
-    emit_test_r_r(jit_info->native_ptr, RAX, RAX);
+    emit_test_r(jit_info->native_ptr, RAX);
 
     /* Quick fixup, but we know it's 12, anyway it needs to be a byte */
     emit_jcc(jit_info->native_ptr, jcc_jnz, 0x00);
@@ -756,6 +1052,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * and RSI will be jit_info->native_ptr */
     /* Set R15 to interp */
     /* mov r15, rdi */
+    /* emit_ldmxcsr(jit_info->native_ptr); */
     emit_mov_r_r(jit_info->native_ptr, R15, RDI);
     emit_mov_r_r(jit_info->native_ptr, RAX, RSI);
 
@@ -772,6 +1069,39 @@ static void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                    Interp *interp)
 {
+    Parrot_jit_fixup_t *fixup, *next;
+    char *fixup_ptr;
+
+    fixup = jit_info->arena.fixups;
+
+    while (fixup) {
+        switch (fixup->type) {
+            case JIT_AMD64BRANCH:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 2;
+                *(int *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                    - (fixup->native_offset + 6) + fixup->skip;
+                break;
+            case JIT_AMD64JUMP:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 1;
+                *(int *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                    - (fixup->native_offset + 5) + fixup->skip;
+                break;
+            case JIT_AMD64CALL:
+                fixup_ptr = jit_info->arena.start + fixup->native_offset + 1;
+                *(int *)(fixup_ptr) = (int)(long)fixup->param.fptr -
+                    (int)(long)fixup_ptr - 4;
+                break;
+            default:
+                real_exception(interp, NULL, JIT_ERROR,
+                        "Unknown fixup type: %d\n", fixup->type);
+        }
+        next = fixup->next;
+        free(fixup);
+        fixup = next;
+    }
+    jit_info->arena.fixups = NULL;
 }
 
 static void
@@ -790,7 +1120,7 @@ Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
 
 /* set mem to reg */
 static void
-jit_mov_mr_n_offs(Interp *interp, Parrot_jit_info_t *jit_info,
+jit_mov_mx_x(Interp *interp, Parrot_jit_info_t *jit_info,
         int base_reg, INTVAL offs, int src_reg)
 {
     emit_mov_mx_x(jit_info->native_ptr, base_reg, offs, src_reg);
@@ -805,7 +1135,7 @@ jit_mov_mr_r(Interp *interp, Parrot_jit_info_t *jit_info,
 
 /* set reg to mem */
 static void
-jit_mov_rm_n_offs(Interp *interp, Parrot_jit_info_t *jit_info,
+jit_mov_x_mx(Interp *interp, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs)
 {
     emit_mov_x_mx(jit_info->native_ptr, dst_reg, base_reg, offs);
@@ -841,6 +1171,8 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
          * for one reason or another at the moment.  I'm not sure if it's worth
          * it yet. */
         /*
+         *  RAX     ISR2
+         *  RDX     for idiv, TODO: handle corner cases, i.e. steal i386 code
          *  RBX     for Interp->ctx.bp
          *  RBP     for debugging, can add it to the preserved list
          *  R12
@@ -853,12 +1185,12 @@ static const char intval_map[INT_REGISTERS_TO_MAP] =
         R13, R14,
 #  endif
         /* Unpreserved */
-        RCX, RDX, RSI, RDI, R8, R9, R10
+        RCX, RSI, RDI, R8, R9, R10, RDX
     };
 
 static const char floatval_map[FLOAT_REGISTERS_TO_MAP] =
     {
-      XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
+      XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
       XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15
     };
 
@@ -870,10 +1202,10 @@ static const char floatval_map[FLOAT_REGISTERS_TO_MAP] =
 static const jit_arch_info arch_info = {
     /* CPU <- Parrot reg move functions */
     jit_mov_r_mr,
-    jit_mov_rm_n_offs,
+    jit_mov_x_mx,
     /* Parrot <- CPU reg move functions */
     jit_mov_mr_r,
-    jit_mov_mr_n_offs,
+    jit_mov_mx_x,
     Parrot_jit_dofixup,
     (jit_arch_f)0,
     {
@@ -881,14 +1213,14 @@ static const jit_arch_info arch_info = {
         {
             Parrot_jit_begin,   /* emit code prologue */
 #  ifdef USE_OP_MAP_AND_CODE_START
-            8,
+            7,
             1,
 #  else
-            10,                 /* mapped int */
+            9,                 /* mapped int */
             3,                  /* preserved int */
 #  endif
             intval_map,         /* which ints mapped */
-            15,                 /* mapped float  */
+            14,                 /* mapped float  */
             0,                  /* preserved float */
             floatval_map        /* which floats mapped */
          },
@@ -915,10 +1247,6 @@ static const jit_arch_info arch_info = {
     }
 };
 
-/*
- * and finally you need an interface function to return above structure
- */
-
 const jit_arch_info *
 Parrot_jit_init(Interp *interp)
 {
@@ -929,6 +1257,13 @@ Parrot_jit_init(Interp *interp)
 #endif /* JIT_EMIT == 0 */
 #endif /* PARROT_JIT_AMD64_JIT_EMIT_H_GUARD */
 
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
