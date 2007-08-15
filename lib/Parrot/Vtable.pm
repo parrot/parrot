@@ -37,11 +37,10 @@ our @EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_macros vtbl_embed);
 
 sub make_re {
     my $re = shift;
-
-    my $comp_re = eval "qr/$re/";
-
-    if   ($@) { return "(?:$re)"; }
-    else      { return $comp_re; }
+    my $comp_re = qr/$re/;
+    return (defined $comp_re)
+        ? $comp_re
+        : "(?:$re)";
 }
 
 my $ident_re   = make_re('[A-Za-z_][A-Za-z0-9_]*');

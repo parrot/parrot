@@ -61,10 +61,10 @@ sub integrate {
     my ( $orig, $new ) = @_;
 
     # Rather than sprinkling "if defined(...)", everywhere,
-    # config/inter/progs.pl just passes in potentially undefined
-    # strings.  Just pass back the original in that case.  Don't
-    # bother warning.  --AD, 12 Sep 2005
-    # warn "String to be integrated in to '$orig' undefined";
+    # various inter::* steps (coded in config/inter/*.pm) permit simply 
+    # passing in potentially undefined strings.
+    # In these instances, we simply pass back the original string without
+    # generating a warning.
     return $orig unless defined $new;
 
     if ( $new =~ /\S/ ) {
