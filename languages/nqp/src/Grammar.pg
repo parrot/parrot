@@ -100,10 +100,23 @@ token block {
 
 #### Subroutine and method definitions ####
 
+rule method_def {
+    'method' <ident> '(' <signature> ')' <block>
+    {*}
+}
 
-#### Terms and expressions ####
+rule signature {
+    ( <param_var> ( ',' | <?before ')'> ) )*
+    {*}
+}
+
+token param_var {
+    <sigil> <ident>
+    {*}
+}
 
 
+#### Terms ####
 
 token term {
     <noun>
@@ -112,8 +125,14 @@ token term {
 }
 
 
+token methodop {
+    '.' <ident> '(' <EXPR>? ')'
+}
+
+
 token noun {
     | <colonpair> {*}                                      #= colonpair
+    | <method_def> {*}                                     #= method_def
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
     | <number> {*}                                         #= number
@@ -129,28 +148,31 @@ token colonpair {
 token variable {
     | '$<' ( <-[\>]>* ) '>' {*}                            #= $< >
     | '$/' {*}                                             #= $/
-    | '$' <ident> {*}                                      #= $var
+    | <sigil> <ident> {*}                                  #= $var
 }
+
+token sigil { '$' }
+
 
 token quote {
     <quote_literal> {*}
 }
 
-token subcall {
-    <name> '(' <EXPR>? ')'
-    {*}
-}
-
-token methodop {
-    '.' <ident> '(' <EXPR>? ')'
-}
 
 token name {
     <ident> [ '::' <ident> ]*
     {*}
 }
 
+
 token number { \d+ {*} }
+
+
+token subcall {
+    <name> '(' <EXPR>? ')'
+    {*}
+}
+
 
 
 #### Expressions and operators ####
