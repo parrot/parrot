@@ -27,6 +27,8 @@ regex pod_comment {
 }
 
 
+#### Blocks and Statements ####
+
 ##  Parse a list of statements.
 rule statement_list {
     [ <statement>
@@ -95,6 +97,21 @@ token block {
     {*}                                                    #= end
 }
 
+
+#### Subroutine and method definitions ####
+
+
+#### Terms and expressions ####
+
+
+
+token term {
+    <noun>
+    <methodop>*
+    {*}                                                    #= end
+}
+
+
 token noun {
     | <colonpair> {*}                                      #= colonpair
     | <variable> {*}                                       #= variable
@@ -109,17 +126,6 @@ token colonpair {
 }
 
 
-token term {
-    <noun>
-    <methodop>*
-    {*}                                                    #= end
-}
-
-
-token methodop {
-    '.' <ident> '(' <EXPR>? ')'
-}
-
 token variable {
     | '$<' ( <-[\>]>* ) '>' {*}                            #= $< >
     | '$/' {*}                                             #= $/
@@ -130,9 +136,13 @@ token quote {
     <quote_literal> {*}
 }
 
-rule subcall {
+token subcall {
     <name> '(' <EXPR>? ')'
     {*}
+}
+
+token methodop {
+    '.' <ident> '(' <EXPR>? ')'
 }
 
 token name {
@@ -142,6 +152,8 @@ token name {
 
 token number { \d+ {*} }
 
+
+#### Expressions and operators ####
 
 rule EXPR is optable { ... }
 
