@@ -26,6 +26,8 @@
 .end
 
 
+#### Blocks and Statements ####
+
 ##    method statement_list($/) {
 ##        my $past := PAST::Stmts.new(node=>$/)
 ##        for $<statement> {
@@ -111,39 +113,13 @@
 .end
 
 
-##    method noun($/, $key) {
-##        return $($/{$key});
-##    }
-.sub 'noun' :method
-    .param pmc match
-    .param pmc key
-    $P0 = match[key]
-    .return $P0.'get_scalar'()
-.end
+#### Subroutine and method definitions ####
 
 
-##    method colonpair($/) {
-##        return PAST::Op.new( PAST::Val.new( :value(~$<ident>),
-##                                            :node($<ident>)),
-##                             $($<EXPR>),
-##                             :name('infix:=>'),
-##                             :returns('Pair'),
-##                             :node($/)
-##                           );
-##    }
-.sub 'colonpair' :method
-    .param pmc match
-    $S0 = match['ident']
-    $P0 = match['ident']
-    $P9 = getclass 'PAST::Val'
-    $P1 = $P9.'new'('value'=>$S0, 'node'=>$P0)
-    $P2 = match['EXPR']
-    $P2 = $P2.'get_scalar'()
-    $P9 = getclass 'PAST::Op'
-    .return $P9.'new'($P1, $P2, 'name'=>'infix:=>', 'returns'=>'Pair', 'node'=>match)
-.end
 
-##    method expect_term($/, $key) {
+#### Terms and expressions ####
+
+##    method term($/, $key) {
 ##        my $past := $($<noun>);
 ##        for $<methodop> {
 ##          $past = PAST::Op.new($past,
@@ -183,6 +159,39 @@
 .end
 
 
+##    method noun($/, $key) {
+##        return $($/{$key});
+##    }
+.sub 'noun' :method
+    .param pmc match
+    .param pmc key
+    $P0 = match[key]
+    .return $P0.'get_scalar'()
+.end
+
+
+##    method colonpair($/) {
+##        return PAST::Op.new( PAST::Val.new( :value(~$<ident>),
+##                                            :node($<ident>)),
+##                             $($<EXPR>),
+##                             :name('infix:=>'),
+##                             :returns('Pair'),
+##                             :node($/)
+##                           );
+##    }
+.sub 'colonpair' :method
+    .param pmc match
+    $S0 = match['ident']
+    $P0 = match['ident']
+    $P9 = getclass 'PAST::Val'
+    $P1 = $P9.'new'('value'=>$S0, 'node'=>$P0)
+    $P2 = match['EXPR']
+    $P2 = $P2.'get_scalar'()
+    $P9 = getclass 'PAST::Op'
+    .return $P9.'new'($P1, $P2, 'name'=>'infix:=>', 'returns'=>'Pair', 'node'=>match)
+.end
+
+
 ##    method variable($/, $key) {
 ##        if ($key eq '$< >') {
 ##            return PAST::Var.new(
@@ -207,6 +216,34 @@
     $S0 = match
     $P0 = getclass 'PAST::Var'
     .return $P0.'new'('node'=>match, 'name'=>$S0, 'scope'=>'package')
+.end
+
+
+##    method quote($/, $key) {
+##        return PAST::Val.new(node=>$/, value=>~($<quote_literal>))
+##    }
+.sub 'quote' :method
+    .param pmc match
+    .param pmc key             :optional
+    .local string value
+    $P0 = match['quote_literal']
+    value = $P0.'get_scalar'()
+    $P0 = getclass 'PAST::Val'
+    .return $P0.'new'('node'=>match, 'value'=>value)
+.end
+
+
+##    method number($/, $key?) {
+##        return PAST::Val.new(node=>$/, name=>~$/, vtype=>"Integer");
+##    }
+.sub 'number' :method
+    .param pmc match
+    .param pmc key             :optional
+    .local pmc past
+    $I0 = match
+    $P0 = getclass 'PAST::Val'
+    past = $P0.'new'('node'=>match, 'value'=>$I0)
+    .return (past)
 .end
 
 
@@ -275,33 +312,7 @@
 .end
 
 
-##    method quote($/, $key) {
-##        return PAST::Val.new(node=>$/, value=>~($<quote_literal>))
-##    }
-.sub 'quote' :method
-    .param pmc match
-    .param pmc key             :optional
-    .local string value
-    $P0 = match['quote_literal']
-    value = $P0.'get_scalar'()
-    $P0 = getclass 'PAST::Val'
-    .return $P0.'new'('node'=>match, 'value'=>value)
-.end
-
-
-##    method number($/, $key?) {
-##        return PAST::Val.new(node=>$/, name=>~$/, vtype=>"Integer");
-##    }
-.sub 'number' :method
-    .param pmc match
-    .param pmc key             :optional
-    .local pmc past
-    $I0 = match
-    $P0 = getclass 'PAST::Val'
-    past = $P0.'new'('node'=>match, 'value'=>$I0)
-    .return (past)
-.end
-
+#### Expressions and operators ####
 
 ##    method EXPR($/, $key) {
 ##        if ($key eq 'end') { return $($<expr>); }
