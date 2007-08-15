@@ -100,8 +100,11 @@ token block {
 
 #### Subroutine and method definitions ####
 
-rule method_def {
-    'method' <ident> '(' <signature> ')' <block>
+rule routine_def {
+    $<declarator>:=['sub'|'method']
+    <ident>
+    '(' <signature> ')'
+    <block>
     {*}
 }
 
@@ -132,7 +135,7 @@ token methodop {
 
 token noun {
     | <colonpair> {*}                                      #= colonpair
-    | <method_def> {*}                                     #= method_def
+    | <routine_def> {*}                                    #= routine_def
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
     | <number> {*}                                         #= number

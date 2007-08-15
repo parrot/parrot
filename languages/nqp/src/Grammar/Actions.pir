@@ -115,6 +115,66 @@
 
 #### Subroutine and method definitions ####
 
+##    method routine_def($/) {
+##        my $past = PAST::Block.new( :name(~$<ident>),
+##                                    :blocktype('declaration'),
+##                                    :pragma(':method'),
+##                                    :node($/) );
+##        for $<signature>[0] {
+##            $past.push($($_['param_var']));
+##        }
+##        for $($<block>).iterator() {
+##            $past.push($_);
+##        }
+##        return $past;
+##    }
+.sub 'routine_def' :method
+    .param pmc match
+    .local pmc past
+    $S0 = match['ident']
+    $P0 = getclass 'PAST::Block'
+    past = $P0.'new'('name'=>$S0, 'blocktype'=>'declaration', 'node'=>match)
+    $S0 = match['declarator']
+    if $S0 != 'method' goto add_signature
+    past.'pragma'(':method')
+  add_signature:
+    $P0 = match['signature']
+    $P0 = $P0[0]
+    unless $P0 goto param_end
+    .local pmc iter
+    iter = new 'Iterator', $P0
+  param_loop:
+    unless iter goto param_end
+    $P1 = shift iter
+    $P1 = $P1['param_var']
+    $P1 = $P1.'get_scalar'()
+    past.push($P1)
+    goto param_loop
+  param_end:
+    $P0 = match['block']
+    $P0 = $P0.'get_scalar'()
+    iter = $P0.'iterator'()
+  block_loop:
+    unless iter goto block_end
+    $P0 = shift iter
+    past.'push'($P0)
+    goto block_loop
+  block_end:
+    .return (past)
+.end
+
+
+##    method param_var($/) {
+##        return PAST::Var.new(:name(~$/),
+##                             :scope('parameter'),
+##                             :node($/) );
+##    }
+.sub 'param_var' :method
+    .param pmc match
+    $S0 = match
+    $P0 = getclass 'PAST::Var'
+    .return $P0.'new'('name'=>$S0, 'scope'=>'parameter', 'node'=>match)
+.end
 
 
 #### Terms and expressions ####
@@ -123,9 +183,9 @@
 ##        my $past := $($<noun>);
 ##        for $<methodop> {
 ##          $past = PAST::Op.new($past,
-##                               name => ~$_<ident>,
-##                               pasttype => 'callmethod',
-##                               node => $_)
+##                               :name(~$_<ident>),
+##                               :pasttype('callmethod'),
+##                               :node($_) );
 ##          if ($<methodop><EXPR>) {
 ##              $past.push($($<EXPR>[0]));
 ##          }
