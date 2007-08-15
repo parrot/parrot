@@ -273,6 +273,10 @@ to any options and return the resulting parse tree.
     .param pmc adverbs         :slurpy :named
     .local pmc parsegrammar_name, top
 
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+
     parsegrammar_name = self.'parsegrammar'()
     unless parsegrammar_name goto err_no_parsegrammar
     top = get_hll_global parsegrammar_name, 'TOP'
@@ -285,6 +289,7 @@ to any options and return the resulting parse tree.
   have_top:
     .local pmc parseactions
     null parseactions
+    if target == 'parse' goto have_parseactions
     $S0 = self.'parseactions'()
     unless $S0 goto have_parseactions
     parseactions = new $S0
