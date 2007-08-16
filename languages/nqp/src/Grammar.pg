@@ -186,11 +186,16 @@ proto 'term:' is precedence('z=')
     is parsed(&term)
     { ... }
 
-proto infix:<+> is looser('term:')
+proto prefix:<~> is looser('term:')
+    { ... }
+
+proto prefix:<+> is equiv(prefix:<~>)
+    { ... }
+
+proto infix:<+> is looser(prefix:<~>)
     is pirop('add')
     { ... }
 
-proto infix:<,> 
+proto infix:<,> is looser(infix:<+>)
     is assoc('list')
-    is looser(infix:<+>) 
     { ... }
