@@ -27,7 +27,7 @@ Tests atomic operation support.
 
 # generic tests
 
-plan $^O =~ m/MSWin32/ ? ( skip_all => 'broken on win32' ) : tests => 4;
+plan tests => 4;
 
 c_output_is( <<'CODE', <<'OUTPUT', "PARROT_ATOMIC_PTR_GET/SET" );
 

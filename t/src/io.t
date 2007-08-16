@@ -8,9 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan $^O =~ m/MSWin32|cygwin/
-   ? ( skip_all => 'broken on win32 && cygwin' )
-   : ( tests => 20 );
+plan tests => 20;
 
 =head1 NAME
 
