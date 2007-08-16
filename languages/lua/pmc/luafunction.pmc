@@ -51,6 +51,21 @@ pmclass LuaFunction
 
 /*
 
+=item C<void mark()>
+
+Marks the function as live.
+
+=cut
+
+*/
+    void mark() {
+        SUPER();
+        if (PMC_metadata(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
+    }
+
+/*
+
 =item C<STRING* name()>
 
 Return the string "function".

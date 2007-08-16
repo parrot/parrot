@@ -73,6 +73,8 @@ Marks the userdata as live.
     void mark () {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (PMC_metadata(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
     }
 
 /*

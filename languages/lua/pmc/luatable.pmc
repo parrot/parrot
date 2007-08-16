@@ -129,6 +129,8 @@ Marks the hash as live.
     void mark () {
         if (PMC_struct_val(SELF))
             parrot_mark_hash(INTERP, PMC_struct_val(SELF));
+        if (PMC_metadata(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
     }
 
 /*
