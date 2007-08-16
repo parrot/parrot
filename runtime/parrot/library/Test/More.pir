@@ -183,9 +183,9 @@ add more.
   done:
 .end
 
-.sub is :multi( float, float )
-    .param float  left
-    .param float  right
+.sub is :multi( num, num )
+    .param num  left
+    .param num  right
     .param string description :optional
 
     .local pmc test
