@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -71,36 +71,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
     end
 CODE
 Float 3.14159
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
-    new P1, .Integer
-    set P1, 666
-    new P0, .Hash
-    set P0["k1"], P1
-    new P1, .Integer
-    set P1, 777
-    set P0["k2"], P1
-    freeze S0, P0
-
-    thaw P10, S0
-    typeof S10, P10
-    print S10
-    print " "
-    set I11, P10
-    print I11
-    print "\n"
-    set P12, P10["k1"]
-    print P12
-    print "\n"
-    set P12, P10["k2"]
-    print P12
-    print "\n"
-    end
-CODE
-Hash 2
-666
-777
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
