@@ -1257,7 +1257,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "shr_i_i" );
     j = j + 1
     j = j + 1  # esi
     k = k + 1
-    k = k + 1  # edx 
+    k = k + 1  # edx
     m = m + 32 # ecx
     m >>= l    # opt_shift_rm (count l in memory)
     .return (m)

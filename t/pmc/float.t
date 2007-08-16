@@ -336,7 +336,7 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" 
 	print "not "
 EQ1:	print "ok 1\\n"
 
-	sub P0, -24 
+	sub P0, -24
 	.fp_eq(P0, 50.45, EQ2)
 	print P0
 	print "not "
@@ -357,7 +357,7 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplicatio
 	print "not "
 EQ1:	print "ok 1\\n"
 
-	mul P0, -1 
+	mul P0, -1
 	.fp_eq(P0, -10.0, EQ2)
 	print P0
 	print "not "
@@ -379,7 +379,7 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
 @{[ $fp_equality_macro ]}
 	new P0, .Float
 	set P0, 1e8
-	div P0, 10000 
+	div P0, 10000
 	.fp_eq(P0, 10000.0, EQ1)
 	print P0
 	print "not "

@@ -64,7 +64,7 @@ the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
     STRING   *s;
     UINTVAL  length;
     unsigned char string_data[] = {0x82, 0xB7, 0x82, 0xB5}; /* sushi */
-    
+
     UNUSED(cur_op);
     UNUSED(start);
 
@@ -97,7 +97,7 @@ the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
     STRING   *s;
     UINTVAL  length;
     unsigned char string_data[] = {0x61, 0x62, 0x63, 0x64}; /* 'abcd' */
-    
+
     UNUSED(cur_op);
     UNUSED(start);
 
@@ -132,7 +132,7 @@ the_test(Interp *interp, opcode_t *cur_op, opcode_t *start)
     STRING   *string_a, *string_b, *string_c;
     UINTVAL  length;
     unsigned char string_data[] = {0x61, 0x62, 0x63, 0x64}; /* 'abcd' */
-    
+
     UNUSED(cur_op);
     UNUSED(start);
 

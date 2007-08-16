@@ -88,7 +88,7 @@ is($conf->options->{c}->{debugging}, 1,
 my $res  = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
-If you have already completed configuration, 
+If you have already completed configuration,
 you can call Parrot::Configure::Data::slurp().
 But here you are testing for that method's failure.
 REASON
@@ -104,7 +104,7 @@ REASON
 $res  = eval "no strict; use Parrot::Config::Generated; \\%PConfig_Temp";
 SKIP: {
     my $reason = <<REASON;
-If you have already completed configuration, 
+If you have already completed configuration,
 you can call Parrot::Configure::Data::slurp_temp().
 But here you are testing for that method's failure.
 REASON

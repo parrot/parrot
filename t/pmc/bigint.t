@@ -44,7 +44,7 @@ my $vers_check = <<'EOP';
     pa = ar[2]
     if ma >= 4 goto ge_4
 warn:
-    print 'GMP version ' 
+    print 'GMP version '
     print v
     print " is buggy with huge digit multiply - please upgrade\n"
     end

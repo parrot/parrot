@@ -22,9 +22,9 @@ END_PIR
 END_FORMATTED
 
 reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'trailing whitespace' );
- .sub main :main        
- $I0 = 3          
- .end           
+ .sub main :main
+ $I0 = 3
+ .end
 END_PIR
 .sub main :main
     $I0 = 3
@@ -35,7 +35,7 @@ reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'remove leading/trailing blank line
 
 
  .sub main :main
- $I0 = 4 
+ $I0 = 4
  .end
 
 
@@ -64,7 +64,7 @@ reformat_ok( <<'END_PIR', <<'END_FORMATTED', 'handle pod' );
  $I0 = 6
 
 =for testing
-  
+
  a
 
 b
@@ -77,7 +77,7 @@ END_PIR
     $I0 = 6
 
 =for testing
-  
+
  a
 
 b

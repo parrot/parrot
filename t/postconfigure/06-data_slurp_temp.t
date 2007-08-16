@@ -86,7 +86,7 @@ is($conf->options->{c}->{debugging}, 1,
 my $res  = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
-If you have already completed configuration, 
+If you have already completed configuration,
 you can call Parrot::Configure::Data::slurp().
 You appear not to have completed configuration;
 hence, two tests are skipped.

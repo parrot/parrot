@@ -33,7 +33,7 @@ my $library = <<'CODE';
 
 .sub make_writable
     .param pmc arg
-    .local pmc zero 
+    .local pmc zero
     zero = new Integer
     zero = 0
     setprop arg, '_ro', zero
@@ -72,7 +72,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be re
     print "\n"
     print $S0
     print "\n"
-    
+
     tmp = new Integer
     add tmp, foo, foo
     print tmp
@@ -114,7 +114,7 @@ OUTPUT
 pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
 .sub main :main
     .local pmc foo
-    
+
     foo = new Integer
     foo = 42
 
@@ -145,7 +145,7 @@ OUTPUT
 pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
 .sub main :main
     .local pmc foo
-    
+
     foo = new Complex
     foo[0] = 1.0
     foo[1] = 1.0
@@ -208,7 +208,7 @@ pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (no
     .local pmc foo
     .local pmc three
     .local pmc four
-    
+
     foo = new ResizablePMCArray
     three = new Integer
     three = 3
@@ -238,7 +238,7 @@ pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Objects" );
 
     fooclass = newpdd15class 'Foo'
     addattribute fooclass, 'bar'
-    foo = new 'Foo' 
+    foo = new 'Foo'
     setattribute foo, 'bar', $P0
     make_readonly(foo)
     inc $P0
@@ -269,7 +269,7 @@ OUTPUT
     make_readonly(foo)
     print "after\n"
 
-    # three = 4 # should fail -- is that what we want 
+    # three = 4 # should fail -- is that what we want
     tmp = foo[0]
     tmp = 4
     print "NOT OKAY\n"

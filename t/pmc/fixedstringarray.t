@@ -348,7 +348,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Garbage collection" );
      new P0, .FixedStringArray
      set P0, 8192
      set I0, 0
-L1:  set P0[I0], I0     
+L1:  set P0[I0], I0
      inc I0
      lt I0, 8192, L1
      sweep 1

@@ -33,13 +33,13 @@ pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' 
     # Load the grammar in a string
     .local string source
     source = <<'GRAMMAR'
-    transform min (Leaf) :language('PIR') { 
+    transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
        .return ($P1)
     }
 GRAMMAR
 
-    # Compile a grammar from the source 
+    # Compile a grammar from the source
     .local pmc grammar
     $P1 = new 'TGE::Compiler'
     grammar = $P1.'compile'(source)
@@ -76,7 +76,7 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     source = <<'GRAMMAR'
     grammar TreeMin is TGE::Grammar;
 
-    transform min (Leaf) :language('PIR') { 
+    transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
        .return ($P1)
     }
@@ -101,14 +101,14 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     }
 
     # find the global minimum and propagate it back down the tree
-    transform gmin (ROOT) :language('PIR') { 
+    transform gmin (ROOT) :language('PIR') {
         .local pmc gmin
         gmin = new Integer
         gmin = tree.get('min', node)
         .return (gmin)
     }
 
-    transform gmin (Branch) :applyto('left') :language('PIR') { 
+    transform gmin (Branch) :applyto('left') :language('PIR') {
         .local pmc gmin
         gmin = tree.get('gmin', node)
         .return (gmin)
@@ -147,7 +147,7 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     }
 GRAMMAR
 
-    # Compile a grammar from the source 
+    # Compile a grammar from the source
     .local pmc grammar
     $P1 = new 'TGE::Compiler'
     grammar = $P1.'compile'(source)
@@ -278,15 +278,15 @@ TODO: {
     source = <<'GRAMMAR'
     grammar TreeMin is TGE::Grammar;
 
-    transform tiddlywinks (ROOT) :language('PIR') { 
+    transform tiddlywinks (ROOT) :language('PIR') {
         say 'in tiddlywinks'
         tree.'get'('twister', node, 'pingpong')
         tree.'get'('twister', node, 'pongpong')
     }
-    transform twister (pingpong) :language('PIR') { 
+    transform twister (pingpong) :language('PIR') {
         say 'in first twister'
     }
-    transform twister (pongpong) :language('PIR') { 
+    transform twister (pongpong) :language('PIR') {
         say 'in second twister'
     }
 GRAMMAR
@@ -295,7 +295,7 @@ GRAMMAR
     .local object testing
     testing = new .Hash
 
-    # Compile a grammar from the source 
+    # Compile a grammar from the source
     .local pmc grammar
     $P1 = new 'TGE::Compiler'
     grammar = $P1.'compile'(source)

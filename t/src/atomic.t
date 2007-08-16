@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     PARROT_ATOMIC_PTR_INIT(a_ptr);
 
     PARROT_ATOMIC_PTR_SET(a_ptr, dummy);
-    
+
     PARROT_ATOMIC_PTR_GET(result, a_ptr);
 
     if (result != dummy) {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     }
 
     fputs("ok 2\n", stdout);
-    
+
     PARROT_ATOMIC_PTR_DESTROY(a_ptr);
 
     return EXIT_SUCCESS;
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     PARROT_ATOMIC_INT_INIT(a_int);
 
     PARROT_ATOMIC_INT_SET(a_int, 0x7fff);
-    
+
     PARROT_ATOMIC_INT_GET(result, a_int);
 
     if (result != 0x7fff) {
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     }
 
     fputs("ok 2\n", stdout);
-    
+
     PARROT_ATOMIC_INT_DESTROY(a_int);
 
     return EXIT_SUCCESS;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
     PARROT_ATOMIC_PTR_SET(a_ptr, NULL);
 
     PARROT_ATOMIC_PTR_CAS(success_p, a_ptr, tmp_a, tmp_b);
-    
+
     if (success_p) {
         fputs("not ", stdout);
     }
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         fputs("not ", stdout);
     }
     fputs("ok 2\n", stdout);
-    
+
     PARROT_ATOMIC_PTR_CAS(success_p, a_ptr, tmp_a, tmp_b);
 
     if (!success_p) {

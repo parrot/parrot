@@ -798,7 +798,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "multi key access" );
     elem = matrix[0;1]
     print elem
     print "\n"
-    
+
 .end
 CODE
 int in ResizableIntegerArray: 42
@@ -1013,7 +1013,7 @@ my $splice_postamble = <<'END_TEMPLATE';
   loop:
     unless P3 goto loop_end
     P4 = shift P3
-    print P4 
+    print P4
     goto loop
   loop_end:
     print "\n"
@@ -1021,7 +1021,7 @@ my $splice_postamble = <<'END_TEMPLATE';
 END_TEMPLATE
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, complete replace' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1035,7 +1035,7 @@ ABCDE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, append' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1049,7 +1049,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, insert before last element' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1077,7 +1077,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, replace at beginning' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1091,7 +1091,7 @@ ABCDE345
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, replace in middle' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1105,7 +1105,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice, replace at end' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   P2[1] = 'B'
@@ -1119,7 +1119,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice with another type' );
-  $splice_preamble 
+  $splice_preamble
   P2 = new 'Array'
   P2 = 5
   P2[0] = 'A'

@@ -284,8 +284,8 @@
 	left[  'array' ] = left_array
 	right[ 'array' ] = right_array
 
-	left_array[0]  = 1 
-	right_array[0] = 1 
+	left_array[0]  = 1
+	right_array[0] = 1
 
 	test_pass()
 	is_deeply( left, right )

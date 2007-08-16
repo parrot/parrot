@@ -322,7 +322,7 @@ L1:  set N0, I0
      push P0, N0
      inc I0
      lt I0, 100000, L1
-     
+
      set N0, P0[99999]
      .fp_eq(N0, 99999.0, OK1)
      print N0
@@ -368,7 +368,7 @@ L1:  set N0, I0
      set P0[I0], N0
      inc I0
      lt I0, 100000, L1
-     
+
 L2:  dec I0
      set N1, I0
      pop N0, P0

@@ -649,11 +649,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get compound key" );
     set P2, P0['b'; 'quux']
     print P2
     print "--\n"
-    set P2, P0[0] 
+    set P2, P0[0]
     print P2
-    set P2, P0[1, 'foo'] 
+    set P2, P0[1, 'foo']
     print P2
-    set P2, P0[1, 'quux'] 
+    set P2, P0[1, 'quux']
     print P2
     end
 CODE
@@ -751,7 +751,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
     new P0, .OrderedHash
     set P0["a"], "Foo\n"
     set P0["b"], "Bar\n"
-    
+
     freeze S0, P0
     thaw P1, S0
     set P2, P1["a"]
@@ -762,7 +762,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
     print P2
     set P2, P1[1]
     print P2
-  
+
     end
 CODE
 Foo
@@ -778,7 +778,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 2" );
     set P1['foo'], "bar\n"
     set P0["b"], P1
     set P0['b'; 'quux'], "xyzzy\n"
-    
+
     freeze S0, P0
     thaw P1, S0
     set P2, P1["a"]
@@ -793,7 +793,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 2" );
     print P2
     set P2, P1[1; "quux"]
     print P2
-  
+
     end
 CODE
 Foo

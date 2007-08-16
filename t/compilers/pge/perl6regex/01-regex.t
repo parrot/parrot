@@ -411,9 +411,9 @@ Description of the test.
 
   $I0 = ord digit
   if $I0 < 48 goto bad_digit
-  if $I0 > 57 goto non_numeric 
+  if $I0 > 57 goto non_numeric
   $I0 -=48
-  .return ($I0) 
+  .return ($I0)
 non_numeric:
   if $I0 < 65 goto bad_digit
   if $I0 > 70 goto not_capital

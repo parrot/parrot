@@ -1931,7 +1931,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
-.sub 'main' :main 
+.sub 'main' :main
     .local pmc cl, o, h, a
     cl = newclass "Foo"
     addattribute cl, "a"
@@ -2220,7 +2220,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Using key from classname op with new" );
     $P1 = class $P0
     $P2 = classname $P0
     $P3 = new $P2
-    $P3.ook()    
+    $P3.ook()
 .end
 
 .namespace [ "Monkey" ; "Banana" ]

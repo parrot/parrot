@@ -153,10 +153,10 @@ pir_output_is( <<'CODE', <<'OUT', 'can add_parent a ProxyPMC in a PDD15 class' )
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"
-    
+
     $P1 = get_class 'Hash'
     print "ok 2 - got the PMCProxy for Hash\n"
-    
+
     addparent $P0, $P1
     print "ok 3 - added Hash's PMCProxy as a parent of the PDD15 class\n"
 
@@ -174,10 +174,10 @@ pir_output_is( <<'CODE', <<'OUT', 'can call and override non-vtable methods of t
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"
-    
+
     $P1 = get_class 'Class'
     print "ok 2 - got the PMCProxy for Class\n"
-    
+
     addparent $P0, $P1
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 
@@ -212,10 +212,10 @@ pir_output_is( <<'CODE', <<'OUT', 'can call and override vtable methods of the P
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"
-    
+
     $P1 = get_class 'Class'
     print "ok 2 - got the PMCProxy for Class\n"
-    
+
     addparent $P0, $P1
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 
@@ -260,10 +260,10 @@ pir_output_is( <<'CODE', <<'OUT', 'DYNSELF in a PMC will call methods overridden
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"
-    
+
     $P1 = get_class 'Class'
     print "ok 2 - got the PMCProxy for Class\n"
-    
+
     addparent $P0, $P1
     print "ok 3 - added Class's PMCProxy as a parent of the PDD15 class\n"
 

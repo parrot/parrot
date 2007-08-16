@@ -40,7 +40,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_bool" );
     .local pmc pmc1
     pmc1 = new Undef
     print "A PMC Undef created by new is"
-    if pmc1 goto PMC1_IS 
+    if pmc1 goto PMC1_IS
       print " not"
     PMC1_IS:
     print "\n"
@@ -58,7 +58,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
     .local int is_defined
     is_defined = defined pmc1
     print "A PMC Undef is"
-    if is_defined goto PMC1_IS_DEFINED 
+    if is_defined goto PMC1_IS_DEFINED
       print " not"
     PMC1_IS_DEFINED:
     print " defined.\n"
@@ -251,7 +251,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Undef == Undef (RT#33603)" );
     $P2 = new Undef
     if $P1 == $P2 goto ok
     print "not "
-  ok: 
+  ok:
     print "ok\n"
 .end
 CODE

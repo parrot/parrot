@@ -66,9 +66,9 @@ pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object');
     $P2 = new $P1
 
     $S1 = typeof $P2
-    print "'" 
+    print "'"
     print $S1
-    print "'\n" 
+    print "'\n"
 
     $I3 = isa $P2, "Foo"
     print $I3
@@ -252,7 +252,7 @@ pir_output_is( <<'CODE', <<'OUT', 'instantiate from key PMC name', todo=>'create
 
     # How do you set the value of a non-constant key PMC?
     $P3 = new 'Key'
-    
+
     $P2 = new $P3
 
     $S1 = typeof $P2

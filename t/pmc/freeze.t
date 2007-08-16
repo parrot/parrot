@@ -795,8 +795,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
     o = new 'OPTable'
     o."init"()
     o."test"()
-    $S0 = freeze o 
-    $P1 = thaw $S0 
+    $S0 = freeze o
+    $P1 = thaw $S0
     $P1."test"()
 .end
 

@@ -34,7 +34,7 @@ my $library = <<'CODE';
 
 .namespace ['STMQueue']
 
-.sub __onload 
+.sub __onload
     .local pmc class
     $I0 = find_type 'STMQueue'
     if $I0 goto done
@@ -61,7 +61,7 @@ done:
     setattribute self, 'used', stmv
     stmv = new STMVar, tmpint
     setattribute self, 'tail', stmv
-    
+
     # create array
     .local pmc array
     array = new Array
@@ -89,11 +89,11 @@ tx:
     used = getattribute self, 'used'
     used = used.'get_read'()
     if used != 0 goto have_items
-    
+
     unless blockp goto no_block
     # FIXME: probably should throw exception instead
     # of going to no_block
-    stm_wait no_block 
+    stm_wait no_block
     branch tx
 have_items:
     tmp = getattribute self, 'head'
@@ -101,7 +101,7 @@ have_items:
     tmp = getattribute self, 'array'
     tmp = tmp[i]
     ret = tmp.'get_read'()
-    
+
     unless removep goto skip_remove
     tmp = getattribute self, 'head'
     $P0 = getattribute self, 'array'
@@ -123,7 +123,7 @@ no_block:
     ret = new Undef
     stm_abort
 normal_return:
-    .return (ret) 
+    .return (ret)
 .end
 
 .sub addTail :method
@@ -187,7 +187,7 @@ do_ret:
     length = new Integer
     length = $I0
     result = new 'STMQueue', length
-    
+
     $P0 = getattribute self, 'array'
     $P1 = clone $P0
     setattribute result, 'array', $P1
@@ -255,7 +255,7 @@ loop:
     .local int failed
     .local pmc got
 
-    failed = 0 
+    failed = 0
     i = 0
 loop:
     got = queue.'fetchHead'(1, 1)
@@ -278,7 +278,7 @@ not_okay:
     .local pmc _remove
 
     .local pmc copy
-     
+
     .local int addThreadId
     .local int removeThreadId
 
@@ -291,7 +291,7 @@ not_okay:
     addThread = new ParrotThread
     removeThread = new ParrotThread
     $P0 = new Integer
-    $P0 = SIZE 
+    $P0 = SIZE
     queue = new 'STMQueue', $P0
 
     addThreadId = addThread
@@ -325,7 +325,7 @@ loop:
     .local int failed
     .local pmc got
 
-    failed = 0 
+    failed = 0
     i = 0
 loop:
     got = queue.'fetchHead'(1, 1)
@@ -349,7 +349,7 @@ no_sleep:
     .local pmc _remove
 
     .local pmc copy
-     
+
     .local int addThreadId
     .local int removeThreadId
 
@@ -362,7 +362,7 @@ no_sleep:
     addThread = new ParrotThread
     removeThread = new ParrotThread
     $P0 = new Integer
-    $P0 = 2 
+    $P0 = 2
     queue = new 'STMQueue', $P0
 
     addThreadId = addThread
@@ -411,7 +411,7 @@ loop:
     .local int failed
     .local pmc got
 
-    failed = 0 
+    failed = 0
     i = 0
 loop:
     got = queue.'fetchHead'(1, 1)
@@ -435,7 +435,7 @@ no_sleep:
     .local pmc _remove
 
     .local pmc copy
-     
+
     .local int addThreadId
     .local int removeThreadId
 
@@ -448,7 +448,7 @@ no_sleep:
     addThread = new ParrotThread
     removeThread = new ParrotThread
     $P0 = new Integer
-    $P0 = 2 
+    $P0 = 2
     queue = new 'STMQueue', $P0
 
     addThreadId = addThread

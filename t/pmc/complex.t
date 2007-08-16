@@ -914,7 +914,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
     c[1] = $N0
     c2 = c.exp()
     c2 += 1.0
-        .PrintIt("%.3f%+.3fi\n", c2) 
+        .PrintIt("%.3f%+.3fi\n", c2)
 
     # another e^(pi * i) + 1 = 0
     c = new .Complex
@@ -928,7 +928,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
     c2[1] = $N0
     c3 = pow c, c2
     c3 += 1.0
-        .PrintIt("%.3f%+.3fi\n", c3) 
+        .PrintIt("%.3f%+.3fi\n", c3)
 .end
 CODE
 0.000+0.000i

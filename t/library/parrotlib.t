@@ -27,7 +27,7 @@ expected absolute filenames.
 # Common code in the test files
 
 my $template_top = << 'END_CODE';
-.sub _main 
+.sub _main
 
   load_bytecode 'runtime/parrot/include/parrotlib.pbc'
   .local pmc    location_sub

@@ -564,7 +564,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 
 .HLL '_Tcl', ''
 
-.sub huh 
+.sub huh
   $P0 = new .Integer
   $P0 = 3.14
   store_global '$variable', $P0
@@ -576,7 +576,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 .sub foo :main
   huh()
   $P1 = get_root_namespace ['_tcl']
-  $P2 = $P1['$variable'] 
+  $P2 = $P1['$variable']
   print $P2
   print "\n"
 .end
@@ -1425,7 +1425,7 @@ $create_nested_key
     .local pmc grandchild_ns
     grandchild_ns = child_ns.'find_namespace'( key )
 
-    child_ns.'del_namespace'( 'Child' ) 
+    child_ns.'del_namespace'( 'Child' )
 
     key      = create_nested_key( 'Child' )
 
@@ -1525,7 +1525,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
     parent_ns = root_ns.'find_namespace'( 'Parent' )
     parent_ns.'del_sub'( 'dummy' )
 
-    .local pmc my_sub   
+    .local pmc my_sub
     my_sub = find_global [ 'Parent' ], 'dummy'
     if_null my_sub, PARENT_NO_DUMMY
     print "Parent did not delete dummy\\n"
@@ -1538,7 +1538,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
     child_ns = parent_ns.'find_namespace'( 'Child' )
     child_ns.'del_sub'( 'dummy' )
 
-    .local pmc my_sub   
+    .local pmc my_sub
     my_sub = find_global [ 'Parent'; 'Child' ], 'dummy'
     if_null my_sub, CHILD_NO_DUMMY
     print "Child did not delete dummy\\n"

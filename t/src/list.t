@@ -34,7 +34,7 @@ the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int exit_value = 0;
 
-int 
+int
 main(int argc, char* argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);

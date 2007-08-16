@@ -1306,7 +1306,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init calls" );
 .end
 
 .sub init_pmc :method :vtable
-    .param pmc initializer 
+    .param pmc initializer
     print "init_pmc was called\n"
 .end
 CODE

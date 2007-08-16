@@ -90,12 +90,12 @@ SKIP: {
     print I5
     print "\n"
     # get tid of thread
-    $I0 = thread 
+    $I0 = thread
     # wait for it
     thread.'join'()
 .end
 
-.sub foo 
+.sub foo
     # check if vars are fresh
     inc I5
     print "thread"
@@ -133,12 +133,12 @@ loop:
     print I5
     print "\n"
     # get tid of thread
-    $I0 = thread 
+    $I0 = thread
     # wait for it
     thread.'join'()
 .end
 
-.sub foo 
+.sub foo
     # check if vars are fresh
     inc I5
     print "thread"
@@ -295,7 +295,7 @@ SKIP: {
     queue = new .TQueue # flag for when the thread is done
     thread = new .ParrotThread
     thread.'run_clone'(foo, queue)
-    
+
     thread.'detach'()
 wait:
     defined $I0, queue
@@ -329,7 +329,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
     thread.'run_clone'(foo, shared_ref)
 
     sleep 0.1 # to let the thread run
-    
+
     .local pmc result
     thread.'join'()
     print "done\n"
@@ -365,7 +365,7 @@ pir_output_is( <<'CODE', <<'OUT', "multi-threaded" );
     tmpInt = new Integer
     tmpInt = 3
     push queue, tmpInt
-    
+
     .local pmc thread
     thread = new ParrotThread
     .local pmc foo
@@ -382,7 +382,7 @@ pir_output_is( <<'CODE', <<'OUT', "multi-threaded" );
     print "\n"
 loop:
     $I0 = queue
-    if $I0 == 0 goto done 
+    if $I0 == 0 goto done
     shift $P0, queue
     print $P0
     print "\n"
@@ -478,7 +478,7 @@ okay:
     thread = new ParrotThread
     .local pmc thread_func
     thread_func = global 'thread_func'
-    $I0 = .PARROT_CLONE_CODE 
+    $I0 = .PARROT_CLONE_CODE
     thread.'run'($I0, thread_func, test2)
     thread.'join'()
     print "ok 5\n"
@@ -515,7 +515,7 @@ okay:
     print "\n"
 .end
 
-.sub thread_test_func 
+.sub thread_test_func
     $P0 = find_global 'Bar', 'alpha'
     'is'($P0, 1, 'Bar::alpha == 1', 'alpha')
     $P0 = 43
@@ -532,7 +532,7 @@ okay:
 
 .namespace [ 'main' ]
 
-.sub test_setup 
+.sub test_setup
     $P0 = new Integer
     $P0 = 1
     store_global 'Bar', 'alpha', $P0
@@ -596,7 +596,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not
 
 .namespace [ 'main' ]
 
-.sub init 
+.sub init
     $P1 = newpdd15class 'Foo'
     addattribute $P1, 'foo1'
     addattribute $P1, 'foo2'
@@ -680,7 +680,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass bui
 
 .namespace [ 'main' ]
 
-.sub init 
+.sub init
     $P0 = getclass .Integer
     $P1 = subclass $P0, 'Foo'
     addattribute $P1, 'foo1'
@@ -744,7 +744,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
 .HLL 'Test', ''
-.sub setup 
+.sub setup
     $P0 = new .Integer
     $P0 = 42
     store_global 'x', $P0
@@ -919,10 +919,10 @@ okay:
 
 
 .sub main :main
-    $P0 = new Integer 
+    $P0 = new Integer
     $P0 = 1
     store_global 'test_num', $P0
-    
+
     .const .Sub _check = 'full_check'
     _check()
 
@@ -983,7 +983,7 @@ okay:
     .local int PerlIntType
     passed = new 'PerlInt'
     passed = 15
-    
+
     .local pmc thread_func
     thread_func = global 'test'
     print "in thread:\n"

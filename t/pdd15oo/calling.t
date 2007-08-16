@@ -2210,8 +2210,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2230,8 +2230,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2250,8 +2250,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2270,8 +2270,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" )
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c

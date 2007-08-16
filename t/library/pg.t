@@ -1,4 +1,4 @@
-#!./parrot 
+#!./parrot
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
@@ -28,7 +28,7 @@ table, which should be created by your sysadmin.
 
 .sub main :main
     load_bytecode 'Test/Builder.pir'
-    .local pmc test       
+    .local pmc test
     test = new 'Test::Builder'
     test.'plan'(N_TESTS)
     push_eh no_pg
@@ -57,14 +57,14 @@ table, which should be created by your sysadmin.
   have_connected:
     test.'ok'($I0, 'con is true after connect')
     $I0 = con.'status'()
-    $I1 = iseq $I0, CONNECTION_OK 
+    $I1 = iseq $I0, CONNECTION_OK
     test.'ok'($I1, 'con.status() == CONNECTION_OK ')
     # PGconn
     $P0 = con.'PGconn'()
     $P1 = get_root_global ['parrot';'Pg'], 'PQstatus'
     $I0 = $P1($P0)
 
-    $I1 = iseq $I0, CONNECTION_OK 
+    $I1 = iseq $I0, CONNECTION_OK
     test.'ok'($I1, 'status(PGconn) == CONNECTION_OK ')
     # exec
     res = con.'exec'('BEGIN')

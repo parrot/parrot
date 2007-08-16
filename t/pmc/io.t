@@ -353,7 +353,7 @@ unlink("temp.file");
 pasm_output_is( <<'CODE', '', "PIO_flush on buffer full" );
        set I0, 0
        set I1, 10000
-   
+
        open P0, "temp.file", ">"
 
 PRINT:
@@ -376,8 +376,8 @@ unlink("temp.file");
 pasm_output_is( <<'CODE', '0', "turn off buffering" );
        open P0, "temp.file", ">"
 
-#                     PIOCTL_CMDSETBUFTYPE, PIOCTL_NONBUF 
-       pioctl I0, P0, 3, 0 
+#                     PIOCTL_CMDSETBUFTYPE, PIOCTL_NONBUF
+       pioctl I0, P0, 3, 0
 #                     PIOCTL_CMDGETBUFTYPE, <dummy value>
        pioctl I0, P0, 4, 0
        print I0

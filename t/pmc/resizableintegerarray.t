@@ -351,7 +351,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'pop many values' );
 L1:  set P0[I0], I0
      inc I0
      lt I0, 100000, L1
-     
+
 L2:  dec I0
      pop I1, P0
      eq I0, I1, OK

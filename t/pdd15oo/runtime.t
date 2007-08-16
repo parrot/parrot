@@ -276,7 +276,7 @@ do_retry:
     .local pmc choice
     choice = get_hll_global ['STM'], 'choice'
     choice($P0, $P1, $P2, $P3, $P4)
-.end 
+.end
 
 .sub _wakeup_func
     .param pmc what
@@ -284,7 +284,7 @@ do_retry:
 .end
 
 .sub wakeup_func
-    .param pmc what 
+    .param pmc what
     .local pmc transaction
     .local pmc real_sub
     transaction = get_hll_global ['STM'], 'transaction'
@@ -338,7 +338,7 @@ my $queue_test = <<'CODE';
 
 .namespace ['STMQueue']
 
-.sub __onload 
+.sub __onload
     .local pmc class
     $I0 = find_type 'STMQueue'
     if $I0 goto done
@@ -365,7 +365,7 @@ done:
     setattribute self, 'used', stmv
     stmv = new STMVar, tmpint
     setattribute self, 'tail', stmv
-    
+
     # create array
     .local pmc array
     array = new Array
@@ -400,7 +400,7 @@ loop:
     used = getattribute self, 'used'
     used = used.'get_read'()
     if used != 0 goto have_items
-    
+
     unless blockp goto no_block
     $P0 = get_hll_global ['STM'], 'retry'
     $P0()
@@ -411,7 +411,7 @@ have_items:
     tmp = getattribute self, 'array'
     tmp = tmp[i]
     ret = tmp.'get_read'()
-    
+
     unless removep goto skip_remove
     tmp = getattribute self, 'head'
     $P0 = getattribute self, 'array'
@@ -432,7 +432,7 @@ no_block:
     $P0 = get_hll_global ['STM'], 'give_up'
     $P0()
 normal_return:
-    .return (ret) 
+    .return (ret)
 .end
 
 .sub addTail :method
@@ -503,7 +503,7 @@ pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue adapted for the librar
 .sub adder
     .param pmc queue
     .local int i
-    
+
     i = 0
 loop:
     queue.'addTail'(i, 1)
@@ -517,7 +517,7 @@ loop:
     .local int failed
     .local pmc got
 
-    failed = 0 
+    failed = 0
     i = 0
 loop:
     got = queue.'fetchHead'(1, 1)
@@ -549,7 +549,7 @@ not_okay:
     addThread = new ParrotThread
     removeThread = new ParrotThread
     $P0 = new Integer
-    $P0 = SIZE 
+    $P0 = SIZE
     queue = new 'STMQueue', $P0
 
     # addThreadId = addThread
@@ -566,11 +566,11 @@ OUTPUT
 
 # test 5
 pir_output_is( $queue_test . <<'CODE', <<'OUTPUT', "queue (non-blocking; nested)" );
-.const int SIZE = 20 
+.const int SIZE = 20
 
 .sub _test
     .param pmc queue
-   
+
     $P0 = queue.'fetchHead'(1, 0)
     $I0 = defined $P0
     if $I0 == 1 goto fail
@@ -596,7 +596,7 @@ fail:
     $P0()
 
     $P0 = new Integer
-    $P0 = SIZE 
+    $P0 = SIZE
     queue = new 'STMQueue', $P0
 
     $P0 = get_hll_global ['STM'], 'transaction'

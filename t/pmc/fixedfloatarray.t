@@ -285,7 +285,7 @@ L2:  dec I0
      set N1, P0[I0]
      .fp_ne(N0, N1, BAD)
      gt I0, 0, L2
-     print "ok\\n" 
+     print "ok\\n"
      end
 
 BAD: print "not ok\\n"
@@ -304,7 +304,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Truth" );
     print "not "
 OK1:    print "ok 1\n"
         set P0, 1
-        if P0, OK2        
+        if P0, OK2
     print "not "
 OK2:    print "ok 2\n"
         end
