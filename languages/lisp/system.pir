@@ -19,16 +19,16 @@ Used in bootstrapping.
      store_global "PACKAGES", "SYSTEM", package
      store_global "PACKAGES", "SYS",    package
 
-    # strange things, removing one of these lines breaks things in r19582
-    .local pmc f111
-    .local pmc r111
-    .local pmc r112
-    .local pmc r113
-    .local pmc r114
-    .local pmc r115
-    .local pmc r116
-    .local pmc r117
-    .local pmc r118
+    # strange things, removing one of these lines breaks things in r20641
+    .local pmc dummy_1
+    .local pmc dummy_2
+    .local pmc dummy_3
+    .local pmc dummy_4
+    .local pmc dummy_5
+    .local pmc dummy_6
+    .local pmc dummy_7
+    .local pmc dummy_8
+    .local pmc dummy_9
 
     _init_reader_macros( package )
 

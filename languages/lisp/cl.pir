@@ -39,7 +39,6 @@ cl.pir - Set up the package 'COMMON-LISP'
     .DEFVAR(symbol, package, "*READTABLE*", value)
 
     .local pmc stream
-
     getstdin stream
     .STREAM(value,stream)
     .DEFVAR(symbol, package, "*STANDARD-INPUT*", value)
@@ -50,7 +49,7 @@ cl.pir - Set up the package 'COMMON-LISP'
     .STREAM(value,stream)
     .DEFVAR(symbol, package, "*STANDARD-OUTPUT*", value)
 
-    .local pmc function   # this is needed in r20261
+    .local pmc function   # this is needed in r20641
 
     # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "APPLY", _apply)
     .DEFUN(symbol, package, "APPLY", "_apply")

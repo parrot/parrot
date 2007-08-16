@@ -24,6 +24,31 @@ use Test::More;
 use Parrot::Test;
 
 my @test_cases = (
+    [ q{ ( print *gensym-counter* )
+      },
+      q{1},
+      q{defined var *gensym-counter*},
+    ],
+    [ q{ ( print *package* )
+      },
+      q{#<PACKAGE COMMON-LISP>},
+      q{*package* stringified},
+    ],
+    [ q{ ( print *readtable* )
+      },
+      q{#<READTABLE 0x????????>},
+      q{*readtable* stringified},
+    ],
+    [ q{ ( print *standard-input* )
+      },
+      q{#<IO STREAM>},
+      q{*standard-input* stringified},
+    ],
+    [ q{ ( print *standard-output* )
+      },
+      q{#<IO STREAM>},
+      q{*standard-output* stringified},
+    ],
     [ q{ (print '(1 2)) },
       q{(1 . (2 . NIL))},
       q{quoting a list},

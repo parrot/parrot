@@ -24,11 +24,6 @@ use Test::More;
 use Parrot::Test;
 
 my @test_cases_without_exit_code = (
-    [ q{ ( print *gensym-counter* )
-      },
-      q{1},
-      q{defined var *gensym-counter*},
-    ],
     [ q{ ( print (sys:%get-object-attribute '*gensym-counter* "LispSymbol" "name"))
       },
       q{*GENSYM-COUNTER*},
