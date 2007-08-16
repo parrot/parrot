@@ -175,7 +175,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT
 .sub main :main
     setfile "foo.p6"
     setline 123
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     assign $P0, 9876
     set_global '$a', $P0
 

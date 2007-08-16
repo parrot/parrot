@@ -40,7 +40,7 @@ Test  [ 'CGI'; 'QueryHash' ]
 
     # set up environment
     .local pmc my_env
-    my_env = new .Env
+    my_env = new 'Env'
     ok( my_env, 'Got an .Env pmc' )
     my_env['REQUEST_TYPE'] = 'GET'
 
@@ -63,7 +63,7 @@ Test  [ 'CGI'; 'QueryHash' ]
     val = query_hash['a']
     is( val, '1', 'numeric value' )
 
-.end   
+.end
 
 =head1 AUTHOR
 

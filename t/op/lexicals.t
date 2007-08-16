@@ -82,7 +82,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice fails (.local pmc ab
     .local pmc ab, a, b
     .lex '$a', ab
     .lex '$b', ab
-    ab = new .String
+    ab = new 'String'
     ab = "ok\n"
     a = find_lex '$a'
     print a
@@ -201,7 +201,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set var via pad' );
     end
 ok:
     print "ok\n"
-    P1 = new .Integer
+    P1 = new 'Integer'
     P1 = 13013
     pad['$a'] = P1
     print P0
@@ -226,7 +226,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -
     end
 ok:
     print "ok\n"
-    P1 = new .Integer
+    P1 = new 'Integer'
     P1 = 13013
     pad['$a'] = P1
     print P0
@@ -246,7 +246,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'synopsis example' );
 .sub main
     .lex '$a', P0
-    P1 = new .Integer
+    P1 = new 'Integer'
     P1 = 13013
     store_lex '$a', P1
     print P0
@@ -438,7 +438,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
     sub = interp["outer"; "sub"; 2]
     print sub
     print "\n"
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "I messed with your var\n"
     pad = interp["outer"; "lexpad"; 2]
     pad['a'] = $P0
@@ -827,7 +827,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'closure 8' );
 
 .sub main :main
     .lex '$x', $P0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 5
     anon_1()
 .end
@@ -837,7 +837,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'closure 8' );
     $P0 = find_lex '$x'
     print $P0
     .lex '$x', $P1
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 4
     print $P1
 .end
@@ -865,7 +865,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_name on lexicals' );
 .sub main :main
     .lex 'a', $P0
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = "ok\n"
     store_lex 'a', $P1
     $P2 = find_name 'a'
@@ -884,7 +884,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'multiple names' );
     .lex 'a', $P0
     .lex 'b', $P0
     .lex 'c', $P0
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = "ok\n"
     store_lex 'a', $P1
     $P2 = find_name 'b'
@@ -909,22 +909,22 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 1' );
 .sub '&main' :main :anon
     .local pmc sx
     .lex '$x', sx
-    sx = new .Integer
+    sx = new 'Integer'
     sx = 33
     '&f'()
     print sx    # no find_lex needed - 'sx' is defined here
     print "\n"
 
     '&f'()
-    print sx 
+    print sx
     print "\n"
 
     '&f'()
-    print sx 
+    print sx
     print "\n"
 .end
 
-.sub '&f' :outer('&main') 
+.sub '&f' :outer('&main')
     $P0 = find_lex '$x'           # find_lex needed
     inc $P0
 .end
@@ -943,7 +943,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 2' );
 .sub '&main' :main :anon
     .local pmc sx
     .lex '$x', sx
-    sx = new .Integer
+    sx = new 'Integer'
     sx = -32
     '&g'()
     print sx
@@ -959,7 +959,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 2' );
 
 .end
 
-.sub '&f' :outer('&main') 
+.sub '&f' :outer('&main')
     $P0 = find_lex '$x'
     inc $P0
 .end
@@ -975,12 +975,12 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 3 - autoclose' );
-#     sub f ($x) { 
-#         sub g ($y) { $x + $y }; g($x); 
-#     } 
-#     f(10); # 20 
+#     sub f ($x) {
+#         sub g ($y) { $x + $y }; g($x);
+#     }
+#     f(10); # 20
 #     g(100); # 110
-.sub '&f' 
+.sub '&f'
     .param pmc x
     .lex '$x', x
     $P0 = '&g'(x)
@@ -1012,11 +1012,11 @@ CODE
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'package-scoped closure 4 - autoclose' );
-#     sub f ($x) { 
-#         sub g () { print $x }; 
-#     } 
-#     g(); 
-.sub '&f' 
+#     sub f ($x) {
+#         sub g () { print $x };
+#     }
+#     g();
+.sub '&f'
     .param pmc x
     .lex '$x', x
 .end
@@ -1036,12 +1036,12 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 5 - autoclose' );
-#     sub f ($x) { 
-#         sub g () { print "$x\n" }; 
-#     } 
-#     f(10); 
-#     g(); 
-.sub '&f' 
+#     sub f ($x) {
+#         sub g () { print "$x\n" };
+#     }
+#     f(10);
+#     g();
+.sub '&f'
     .param pmc x
     .lex '$x', x
 .end
@@ -1062,13 +1062,13 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 6 - autoclose' );
-#     sub f ($x) { 
-#         sub g () { print "$x\n" }; 
-#     } 
-#     f(10); 
-#     f(20); 
-#     g(); 
-.sub '&f' 
+#     sub f ($x) {
+#         sub g () { print "$x\n" };
+#     }
+#     f(10);
+#     f(20);
+#     g();
+.sub '&f'
     .param pmc x
     .lex '$x', x
 .end

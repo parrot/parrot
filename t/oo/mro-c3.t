@@ -26,12 +26,12 @@ pir_output_is( <<'CODE', <<'OUT', 'single parent' );
 .sub 'test' :main
     .local pmc A, B
 
-    A = new .Class
+    A = new 'Class'
     $P0 = find_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
 
-    B = new .Class
+    B = new 'Class'
     B.'add_parent'(A)
     $P0 = find_global 'testB'
     B.'add_method'("foo", $P0)
@@ -56,19 +56,19 @@ pir_output_is( <<'CODE', <<'OUT', 'grandparent' );
 .sub 'test' :main
     .local pmc A, B, C
 
-    A = new .Class
+    A = new 'Class'
     $P0 = find_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
 
-    B = new .Class
+    B = new 'Class'
     B.'add_parent'(A)
     $P0 = find_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
 
-    C = new .Class
+    C = new 'Class'
     C.'add_parent'(B)
     $P0 = find_global 'testC'
     C.'add_method'("foo", $P0)
@@ -98,18 +98,18 @@ pir_output_is( <<'CODE', <<'OUT', 'multiple inheritance' );
 .sub 'test' :main
     .local pmc A, B, C
 
-    A = new .Class
+    A = new 'Class'
     $P0 = find_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
 
-    B = new .Class
+    B = new 'Class'
     $P0 = find_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
 
-    C = new .Class
+    C = new 'Class'
     C.'add_parent'(B)
     C.'add_parent'(A)
     $P0 = find_global 'testC'
@@ -140,27 +140,27 @@ pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
 .sub 'test' :main
     .local pmc A, B, C, D
 
-    A = new .Class
+    A = new 'Class'
     $P0 = find_global 'testA'
     A.'add_method'("foo", $P0)
     A.'add_method'("bar", $P0)
     A.'add_method'("baz", $P0)
     A.'add_method'("wag", $P0)
 
-    B = new .Class
+    B = new 'Class'
     B.'add_parent'(A)
     $P0 = find_global 'testB'
     B.'add_method'("foo", $P0)
     B.'add_method'("bar", $P0)
     B.'add_method'("baz", $P0)
 
-    C = new .Class
+    C = new 'Class'
     C.'add_parent'(A)
     $P0 = find_global 'testC'
     C.'add_method'("foo", $P0)
     C.'add_method'("bar", $P0)
 
-    D = new .Class
+    D = new 'Class'
     D.'add_parent'(C)
     D.'add_parent'(B)
     $P0 = find_global 'testD'

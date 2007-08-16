@@ -1,4 +1,4 @@
-#!./parrot 
+#!./parrot
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
 
@@ -39,12 +39,12 @@ L<http://swiss.csail.mit.edu/classes/symbolic/spring06/psets/ps6/samefringe.scm>
 
 	.local pmc result
 	if depth goto deeper
-	result = new .Undef
+	result = new 'Undef'
 	result = start
 	inc start
 	goto done
 deeper:
-	result = new .ResizablePMCArray
+	result = new 'ResizablePMCArray'
 	dec depth
 	.local int i
 	i = 0
@@ -183,7 +183,7 @@ equal:
 
 .sub main :main
 	load_bytecode 'Test/Builder.pir'
-	.local pmc test	   
+	.local pmc test	
 	test = new 'Test::Builder'
 	test.'plan'(N_TESTS)
 

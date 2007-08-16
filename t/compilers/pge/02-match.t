@@ -33,7 +33,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)' );
 
     say $P2              # world
 
-    $P3 = new .String
+    $P3 = new 'String'
     $P3 = 'hello '
 
     $P4 = n_concat $P3, $P2
@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
     .local pmc match, str, arr
     load_bytecode 'PGE.pbc'
     match = new 'PGE::Match'
-    str = new .String
+    str = new 'String'
     str = 'foo'
     push match, str
     arr = match.'get_array'()

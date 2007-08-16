@@ -330,7 +330,7 @@ Description of the test.
     .return (todo_tests)
 
   reset_todo_info:
-    todo_info = new .Hash
+    todo_info = new 'Hash'
     ret
 
   set_todo_loop:
@@ -361,7 +361,7 @@ Description of the test.
     .return (skip_tests)
 
   reset_skip_info:
-    skip_info = new .Hash
+    skip_info = new 'Hash'
     ret
 
   set_skip_loop:
@@ -493,9 +493,9 @@ Description of the test.
 
   $I0 = ord digit
   if $I0 < 48 goto bad_digit
-  if $I0 > 57 goto non_numeric 
+  if $I0 > 57 goto non_numeric
   $I0 -=48
-  .return ($I0) 
+  .return ($I0)
 non_numeric:
   if $I0 < 65 goto bad_digit
   if $I0 > 70 goto not_capital
@@ -518,7 +518,7 @@ bad_digit:
     .param string target
 
     .local int x_pos         # position in string of last \x escape..
-               x_pos = 0 
+               x_pos = 0
 
   target1:
     $I0 = index target, '\n'
@@ -546,7 +546,7 @@ bad_digit:
     substr target, $I0, 2, "\f"
     goto target5
   target6:
-    # handle \xHH, hex escape. 
+    # handle \xHH, hex escape.
 
     $I0 = index target, '\x', x_pos
     if $I0 == -1 goto target7

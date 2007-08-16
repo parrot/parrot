@@ -156,7 +156,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of an array' );
 .sub test :main
     .local pmc array
 
-    new array, .Array
+    new array, 'Array'
     array = 10
     array[0] = 0
     array[1] = 1
@@ -183,7 +183,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create pretty JSON of an array' );
 .sub test :main
     .local pmc array
 
-    new array, .Array
+    new array, 'Array'
     array = 10
     array[0] = 0
     array[1] = 1
@@ -221,7 +221,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of array, keep element ordering' 
 .sub test :main
     .local pmc array
 
-    new array, .Array
+    new array, 'Array'
     array = 6
     array[0] = 35
     array[1] = 1
@@ -251,7 +251,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of a mixed array' );
 .sub test :main
     .local pmc array
 
-    new array, .Array
+    new array, 'Array'
     array = 6
     array[0] = 0
     array[1] = 1500e-2
@@ -281,7 +281,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of hash' );
 .sub test :main
     .local pmc hash
 
-    new hash, .Hash
+    new hash, 'Hash'
     hash["alpha"] = 29
     hash["beta"] = "B"
     hash["gamma"] = 3.1
@@ -306,7 +306,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create non-pretty JSON of hash' );
 .sub test :main
     .local pmc hash
 
-    new hash, .Hash
+    new hash, 'Hash'
     hash["alpha"] = 29
     hash["beta"] = "B"
     hash["gamma"] = 3.1
@@ -327,25 +327,25 @@ pir_output_is(
 .sub test :main
     .local pmc street1, street2, city1, city2, country, world
 
-    street1 = new .Hash
+    street1 = new 'Hash'
     street1["Perl"] = "Highway"
     street1["Python"] = "Grove"
     street1["Ruby"] = "Lane"
 
-    street2 = new .Hash  # empty
+    street2 = new 'Hash'  # empty
 
-    city1 = new .ResizablePMCArray
+    city1 = new 'ResizablePMCArray'
     push city1, street1
     push city1, street2
 
-    city2 = new .Array  # empty
+    city2 = new 'Array'  # empty
 
-    country = new .Array
+    country = new 'Array'
     country = 2
     country[0] = city1
     country[1] = city2
 
-    world = new .Hash
+    world = new 'Hash'
     world["population"] = 1234567890
     world["some_country"] = country
 
@@ -378,25 +378,25 @@ pir_output_is( <<'CODE', <<'OUT', 'Create non-pretty JSON of nested structure' )
 .sub test :main
     .local pmc street1, street2, city1, city2, country, world
 
-    street1 = new .Hash
+    street1 = new 'Hash'
     street1["Perl"] = "Highway"
     street1["Python"] = "Grove"
     street1["Ruby"] = "Lane"
 
-    street2 = new .Hash  # empty
+    street2 = new 'Hash'  # empty
 
-    city1 = new .ResizablePMCArray
+    city1 = new 'ResizablePMCArray'
     push city1, street1
     push city1, street2
 
-    city2 = new .Array  # empty
+    city2 = new 'Array'  # empty
 
-    country = new .Array
+    country = new 'Array'
     country = 2
     country[0] = city1
     country[1] = city2
 
-    world = new .Hash
+    world = new 'Hash'
     world["population"] = 1234567890
     world["some_country"] = country
 
@@ -414,14 +414,14 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of String PMCs' );
 .sub test :main
     .local pmc s
 
-    s = new .String
+    s = new 'String'
     s = ''
     $S0 = _json( s, 0 )
     say $S0
     $S0 = _json( s, 1 )
     print $S0
 
-    s = new .String
+    s = new 'String'
     s = "12345\"67890"
     $S0 = _json( s, 0 )
     say $S0
@@ -442,14 +442,14 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of Integer PMCs' );
 .sub test :main
     .local pmc i
 
-    i = new .Integer
+    i = new 'Integer'
     i = 0
     $S0 = _json( i, 0 )
     say $S0
     $S0 = _json( i, 1 )
     print $S0
 
-    i = new .Integer
+    i = new 'Integer'
     i = -42
     $S0 = _json( i, 0 )
     say $S0
@@ -470,14 +470,14 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of Boolean PMCs' );
 .sub test :main
     .local pmc b
 
-    b = new .Boolean
+    b = new 'Boolean'
     b = 0
     $S0 = _json( b, 0 )
     say $S0
     $S0 = _json( b, 1 )
     print $S0
 
-    b = new .Boolean
+    b = new 'Boolean'
     b = 1
     $S0 = _json( b, 0 )
     say $S0
@@ -504,7 +504,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Create JSON of null and .Undef' );
     $S0 = _json( n, 1 )
     print $S0
 
-    n = new .Undef
+    n = new 'Undef'
     $S0 = _json( n, 0 )
     say $S0
     $S0 = _json( n, 1 )

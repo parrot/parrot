@@ -33,15 +33,15 @@ pir_output_is( <<'CODE', <<'OUT', "This made Parrot m4 fail" );
   rulesub_a  = p6rule( "a" )
   rulesub_b  = p6rule( "^(<[b]>)" )
 
-  .local string input_string    
+  .local string input_string
   input_string    = "_____________________________________________________________________"
 
-  rulesub_b( input_string ) 
+  rulesub_b( input_string )
 
   print "ok1\n"
   # end
 
-  rulesub_a( input_string ) 
+  rulesub_a( input_string )
   print "ok2\n"
 
 .end
@@ -66,8 +66,8 @@ pir_output_is( <<'CODE', <<'OUT', "parse FASTA" );
 grammar Bio::Fasta;
 
 regex databank    { <Bio::Fasta::entry>+ }
-regex entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> } 
-regex desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> } 
+regex entry       { <Bio::Fasta::desc_line> \n <Bio::Fasta::sequence> }
+regex desc_line   { <Bio::Fasta::start_entry> <Bio::Fasta::id> \s+ <Bio::Fasta::desc> }
 regex start_entry { \> }
 regex id          { (\S+) }
 regex desc        { (\N*) }
@@ -100,7 +100,7 @@ END_FASTA
     fasta_rule = find_global "Bio::Fasta", "databank"
     .local pmc match
     ( match ) = fasta_rule( fasta )
-    
+
     # TODO: Extract named or positional captures
     print match
 

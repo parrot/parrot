@@ -64,7 +64,7 @@ pir_output_is( <<'CODE', <<OUT, "get/set global with key" );
         print $P1
 .end
 .sub set_it
-        $P0 = new .String
+        $P0 = new 'String'
         $P0 = "Ook...BANG!\n"
         set_global [ "Toaster" ], "Explosion", $P0
 .end
@@ -80,7 +80,7 @@ pir_output_is( <<'CODE', <<OUT, "get/set root global with key" );
         print $P1
 .end
 .sub set_it
-        $P0 = new .String
+        $P0 = new 'String'
         $P0 = "Ook...BANG!\n"
         set_root_global [ "parrot"; "Monkey"; "Toaster" ], "Explosion", $P0
 .end
@@ -131,7 +131,7 @@ pir_output_is( <<'CODE', <<OUT, "find/store global with key" );
         print $P1
 .end
 .sub set_it
-        $P0 = new .String
+        $P0 = new 'String'
         $P0 = "Ook...BANG!\n"
         store_global [ "Monkey" ; "Toaster" ], "Explosion", $P0
 .end

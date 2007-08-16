@@ -524,14 +524,14 @@ SKIP: {
     i_bytes_per_word = sysinfo .SYSINFO_PARROT_INTSIZE
     i_bits_per_word_minus_one = 8 * i_bytes_per_word
     dec i_bits_per_word_minus_one
-    bits_per_word_minus_one = new .Integer
+    bits_per_word_minus_one = new 'Integer'
     bits_per_word_minus_one = i_bits_per_word_minus_one
-    integer_modulus = new .BigInt
+    integer_modulus = new 'BigInt'
     integer_modulus = 1
     integer_modulus <<= bits_per_word_minus_one
 
     ## Test shifting a positive number.
-    new $P0, .Integer
+    new $P0, 'Integer'
     set $P0, 1000001
     test_shift($P0, integer_modulus)
 
@@ -543,7 +543,7 @@ SKIP: {
 .sub test_shift
     .param pmc number
     .param pmc integer_modulus
-    new $P1, .Integer
+    new $P1, 'Integer'
     set $P1, 1
     .local int i_number
     i_number = number

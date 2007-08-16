@@ -7,10 +7,10 @@
 .sub 'main' :main
     load_bytecode 'Test/More.pir'
 
-    $P0 = new .Env
+    $P0 = new 'Env'
     $P0 = $P0['TEST_VERBOSE']
     unless null $P0 goto set_verbose
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 0
   set_verbose:
     store_global 'TEST_VERBOSE', $P0
@@ -58,7 +58,7 @@
 .sub 'object_init'
 
   T1:
-    $P99 = new .FixedPMCArray
+    $P99 = new 'FixedPMCArray'
     $P99 = 0
 
     .local pmc iter
@@ -93,7 +93,7 @@
 .sub 'FixedPMCArray_empty'
 
   T1:
-    $P99 = new .FixedPMCArray
+    $P99 = new 'FixedPMCArray'
     $P99 = 0
 
     .local pmc iter
@@ -137,7 +137,7 @@
 .sub 'FixedPMCArray_3elem'
 
   T1:
-    $P99 = new .FixedPMCArray
+    $P99 = new 'FixedPMCArray'
     $P99 = 3
     $P99[0] = 'a'
     $P99[1] = 'b'
@@ -229,7 +229,7 @@
 .sub 'ResizablePMCArray_empty'
 
   T1:
-    $P99 = new .ResizablePMCArray
+    $P99 = new 'ResizablePMCArray'
     $P99 = 0
 
     .local pmc iter
@@ -273,7 +273,7 @@
 .sub 'ResizablePMCArray_3elem'
 
   T1:
-    $P99 = new .ResizablePMCArray
+    $P99 = new 'ResizablePMCArray'
     $P99 = 3
     $P99[0] = 'a'
     $P99[1] = 'b'

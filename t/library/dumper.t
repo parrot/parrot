@@ -619,11 +619,11 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings" );
     .local pmc pmc_string, pmc_perl_string
     .local string string_1
 
-    pmc_string = new .String
+    pmc_string = new 'String'
     pmc_string = "This is a String PMC"
     push array, pmc_string
 
-    pmc_perl_string = new .String
+    pmc_perl_string = new 'String'
     pmc_perl_string = "This is a String PMC"
     push array, pmc_perl_string
 

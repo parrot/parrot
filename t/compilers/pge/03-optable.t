@@ -136,7 +136,7 @@ sub optable_output_is {
     print "failed\n"
   end:
 .end
-   
+
 .sub 'tree'
     .param pmc match
     .local string type
@@ -150,7 +150,7 @@ sub optable_output_is {
     $P0 = match.get_array()
     if null $P0 goto iter_end
     unless $P0 goto iter_end
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
     iter = 0
     unless iter goto iter_end
   iter_loop:

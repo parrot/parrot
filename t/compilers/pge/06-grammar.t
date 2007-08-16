@@ -27,14 +27,14 @@ Test some simple grammars.
     test = new 'Test::Builder'
 
     # PMCs to store TODO tests and reasons/descriptions
-    todo_tests = new .Hash
-    todo_desc = new .Hash
+    todo_tests = new 'Hash'
+    todo_desc  = new 'Hash'
 
     # PMCs to store grammars and expressions to test for each grammar
     # also set description for that grammar
-    grammar = new .ResizableStringArray
-    expr = new .ResizablePMCArray
-    description = new .ResizableStringArray
+    grammar     = new 'ResizableStringArray'
+    expr        = new 'ResizablePMCArray'
+    description = new 'ResizableStringArray'
 
     .local int ok,n_grammars,n_tests
 
@@ -45,7 +45,7 @@ Test some simple grammars.
 
     .local pmc targets
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, '1313'                    # n1
     push targets, ' 1414 '                  # n2
 
@@ -56,7 +56,7 @@ token number { \d+ }
 EOF_SIMPLE_GRAMMAR
 
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, '[1313]'                  # n3
     push targets, '[ 1313 ]'                # n4
     push targets, '[    1313  ]'            # n5
@@ -67,7 +67,7 @@ token number { \d+ }
 EOF_SIMPLE_GRAMMAR
 
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, ''                        # n6
     push targets, '11'                      # n7
     push targets, '11 12 13'                # n8
@@ -79,7 +79,7 @@ token number { \d+ }
 EOF_SIMPLE_GRAMMAR
 
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, '11 12 13'                # n10
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'another simple token/rule match with repetition using *' )
 grammar Simple::Test;
@@ -87,7 +87,7 @@ rule main { [<number> ]* }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, '11'                      # n11
     push targets, '11 12 13'                # n12
     push targets, ' 11     12  13   14'     # n13
@@ -97,7 +97,7 @@ rule main { [<number> <?ws>]+ }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
 
-    targets = new .ResizableStringArray
+    targets = new 'ResizableStringArray'
     push targets, '11'                      # n14
     push targets, '11 12 13'                # n15
     push targets, '  11     12  13  '       # n16

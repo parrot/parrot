@@ -28,7 +28,7 @@ pir_output_is( <<'CODE', <<'OUT', "basic long options" );
 
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo=bar'
         push argv, '--bar=3.14'
         push argv, '--bax=3'
@@ -87,7 +87,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "basic short options" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '-f'
         push argv, 'bar'
         push argv, '-Abc'
@@ -135,7 +135,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "simple array" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '-Iinca'
         push argv, '-Iincb'
 
@@ -169,7 +169,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '-Iinca'
         push argv, '--include=incb'
 
@@ -204,7 +204,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "hash" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '-Dfoo=bar'
         push argv, '--define=bax=baz'
         push argv, '-Dfoobar'
@@ -246,7 +246,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '-abc'
 
         load_bytecode "Getopt/Obj.pir"
@@ -288,7 +288,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "ignored options" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--ignore'
         push argv, '--foo'
 
@@ -322,7 +322,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '--'
         push argv, '--bar'
@@ -357,7 +357,7 @@ pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
 .end
 CODE
 foo is 1
-bar is 
+bar is
 argv[0] is --bar
 OUT
 
@@ -365,7 +365,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, 'foo'
         push argv, '--bar'
@@ -405,7 +405,7 @@ pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
 .end
 CODE
 foo is 1
-bar is 
+bar is
 argv[0] is foo
 argv[1] is --bar
 OUT
@@ -414,7 +414,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "optarg" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '-f'
         push argv, '-bbar'
@@ -458,8 +458,8 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
 
 .end
 CODE
-foo is 
-f is 
+foo is
+f is
 b is bar
 OUT
 
@@ -467,7 +467,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "pass through" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, 'foo'
         push argv, '--bar'
@@ -516,7 +516,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "lone dash" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '-'
         push argv, '--bar'
@@ -558,7 +558,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "push interface" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
         push argv, '-bfile.txt'
         push argv, '-x'
@@ -641,7 +641,7 @@ CODE
 foo is file
 bar is file.txt
 bax is file.t
-baz is 
+baz is
 I[0] is texta
 I[1] is textb
 define[foo] is bar
@@ -654,7 +654,7 @@ OUT
 pir_error_output_like( <<'CODE', <<'OUT', "missing spec" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
         load_bytecode "Getopt/Obj.pir"
         .local pmc getopts
@@ -677,7 +677,7 @@ OUT
 pir_error_output_like( <<'CODE', <<'OUT', "missing argument" );
 .sub main :main
         .local pmc argv
-        argv = new .ResizablePMCArray
+        argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
         push argv, '--bar'
         load_bytecode "Getopt/Obj.pir"

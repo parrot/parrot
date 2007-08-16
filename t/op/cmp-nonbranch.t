@@ -78,17 +78,17 @@ Tests all non-branching conditional operators.
     .SET_DESC('issame')
 
   init:
-    $P0 = new .Integer
-    $P1 = new .String
+    $P0 = new 'Integer'
+    $P1 = new 'String'
     bsr exp_nok
     bsr test_it   # not ok
-    $P0 = new .String
+    $P0 = new 'String'
     bsr test_it   # not ok
     bsr exp_ok
     $P1 = $P0
     bsr test_it   # ok
-    $P0 = new .Null
-    $P1 = new .Null
+    $P0 = new 'Null'
+    $P1 = new 'Null'
     bsr test_it   # ok -- Null is a singleton
     .return ()
 
@@ -105,17 +105,17 @@ Tests all non-branching conditional operators.
     .SET_DESC('isntsame')
 
   init:
-    $P0 = new .Integer
-    $P1 = new .String
+    $P0 = new 'Integer'
+    $P1 = new 'String'
     bsr exp_ok
     bsr test_it   # ok
-    $P0 = new .String
+    $P0 = new 'String'
     bsr test_it   # ok
     $P1 = $P0
     bsr exp_nok
     bsr test_it   # not ok
-    $P0 = new .Null
-    $P1 = new .Null
+    $P0 = new 'Null'
+    $P1 = new 'Null'
     bsr test_it   # not ok -- Null is a singleton
     .return ()
 
@@ -132,7 +132,7 @@ Tests all non-branching conditional operators.
     .SET_DESC('istrue')
 
   init:
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 0
     bsr exp_nok
     bsr test_it   # not ok
@@ -154,7 +154,7 @@ Tests all non-branching conditional operators.
     .SET_DESC('isfalse')
 
   init:
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 0
     bsr exp_ok
     bsr test_it   # ok

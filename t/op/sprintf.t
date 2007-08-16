@@ -158,7 +158,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     description = 'build_test_desc'( description, template )
 
     .local pmc data_hash
-    data_hash = new .Hash
+    data_hash = new 'Hash'
     data_hash["''"] = ''
     data_hash['2**32-1'] = 0xffffffff
     $N0 = pow 2, 38
@@ -300,7 +300,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     .return (todo_tests)
 
   reset_todo_info:
-    todo_info = new .Hash
+    todo_info = new 'Hash'
     ret
 
   set_todo_loop:
@@ -375,7 +375,7 @@ tag 'all' is allowed for todo tests that should fail on any system
     .return (skip_tests)
 
   reset_skip_info:
-    skip_info = new .Hash
+    skip_info = new 'Hash'
     ret
 
   set_skip_loop:

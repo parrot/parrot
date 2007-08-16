@@ -12,14 +12,14 @@ pir_output_is( <<'CODE', <<'OUT', "alligator" );
 # detected this program prints "Hi\nalligator\n"
 
 .sub main :main
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "Hi\n"
     $I0 = 2
 lab:
     print $P0
     dec $I0
     unless $I0 goto ex
-    new $P1, .Continuation
+    new $P1, 'Continuation'
     set_addr $P1, lab
     $P2 = find_name "alligator"
     set_args "(0)", $P1
@@ -38,7 +38,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "alligator 2 - r9629" );
 .sub xyz
     .local pmc args
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     push args, "abc"
     push args, "def"
     push args, "POPME"
@@ -115,7 +115,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PIR" );
 .sub main
-  P32 = new .String
+  P32 = new 'String'
   P32 = "ok\n"
   print P32
 .end
@@ -150,7 +150,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PASM" );
-  new P32, .String
+  new P32, 'String'
   set P32, "ok\n"
   print P32
   end

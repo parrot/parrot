@@ -54,19 +54,19 @@ pir_output_is( <<'CODE', <<'OUT', 'agid hash' );
     .local pmc tree
     tree = new 'TGE::Tree'
     .local int id
-    
-    $P0 = new .Integer
+
+    $P0 = new 'Integer'
     id = tree.'_lookup_id'($P0)
     print id
     print "\n"
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     id = tree.'_lookup_id'($P1)
     print id
     print "\n"
     id = tree.'_lookup_id'($P0)
     print id
     print "\n"
-    $P2 = new .Integer
+    $P2 = new 'Integer'
     id = tree.'_lookup_id'($P2)
     print id
     print "\n"

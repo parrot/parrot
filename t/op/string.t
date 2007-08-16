@@ -1919,14 +1919,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'sprintf - left justify' );
 .sub main :main
-  $P0 = new .ResizablePMCArray
-  $P1 = new .Integer
+  $P0 = new 'ResizablePMCArray'
+  $P1 = new 'Integer'
   $P1 = 10
   $P0[0] = $P1
-  $P1 = new .String
+  $P1 = new 'String'
   $P1 = "foo"
   $P0[1] = $P1
-  $P1 = new .String
+  $P1 = new 'String'
   $P1 = "bar"
   $P0[2] = $P1
   $S0 = sprintf "%-*s - %s\n", $P0
@@ -1941,7 +1941,7 @@ OUTPUT
     my $output = substr( ( 'f' x ( $PConfig{intvalsize} * 2 ) ) . ( ' ' x 20 ), 0, 20 );
     pir_output_is( <<'CODE', $output, 'Correct precision for %x' ); }
 .sub main :main
-  $P0 = new .ResizablePMCArray
+  $P0 = new 'ResizablePMCArray'
   $P0[0] = -1
   $S0 = sprintf "%-20x", $P0
   print $S0

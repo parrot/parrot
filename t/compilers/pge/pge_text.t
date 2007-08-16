@@ -38,7 +38,7 @@ pir_output_is( <<'CODE', <<'OUT', "bracketed" );
     $P0 = bracketed($S0)
     bsr result
     $S0 = "{ nested \n{ and } okay, \n() and <>, escaped \\}'s } okay"
-    $P0 = bracketed($S0) 
+    $P0 = bracketed($S0)
     bsr result
     $S0 = "{ nested { and } okay,  unbalanced ( and < , escaped \\}'s } okay"
     $P0 = bracketed($S0, "{}")

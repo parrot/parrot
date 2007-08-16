@@ -395,7 +395,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     .local pmc array
 
     i = 0
-    array = new .ResizablePMCArray
+    array = new 'ResizablePMCArray'
 
 LOOP:
     inc i

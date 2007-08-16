@@ -7,7 +7,7 @@
 	find_type tb_type, 'Test::Builder'
 
 	.local pmc tb_args
-	tb_args = new .Hash
+	tb_args = new 'Hash'
 
 	.local pmc test
 	test = new tb_type, tb_args

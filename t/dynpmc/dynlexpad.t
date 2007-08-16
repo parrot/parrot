@@ -56,7 +56,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "store_lex" );
     foo()
 .end
 .sub foo :lex
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 13013
     store_lex 'a', $P1
     print "ok 1\n"
@@ -77,7 +77,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check :outer" );
     foo()
 .end
 .sub foo :lex
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 13013
     store_lex 'a', $P1
     $P2 = find_lex 'a'
@@ -107,7 +107,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     foo()
 .end
 .sub foo :lex
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 13013
     store_lex 'a', $P1
     $P2 = find_lex 'a'
@@ -134,7 +134,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"; 2]
-    $P2 = new .Integer
+    $P2 = new 'Integer'
     $P2 = 55
     pad['b'] = $P2
     .return()
@@ -181,15 +181,15 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop" )
 .end
 .sub foo
     .lex 'a', $P0               # statix lexical
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = find_lex 'a'
     print $P1
-    $P2 = new .String
+    $P2 = new 'String'
     $P2 = "ok 2\n"
     store_lex 'a', $P2
     print $P0                   # sic!
-    $P3 = new .String
+    $P3 = new 'String'
     $P3 = "ok 3\n"
     store_lex 'b', $P3          # and a dynamic one
     $P4 = find_lex 'b'

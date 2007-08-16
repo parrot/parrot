@@ -495,7 +495,7 @@ Column 6, if present, contains a description of what is being tested.
     .return (todo_tests)
 
   reset_todo_info:
-    todo_info = new .Hash
+    todo_info = new 'Hash'
     ret
 
   set_todo_loop: # for developer testing. not used normally
@@ -659,7 +659,7 @@ Column 6, if present, contains a description of what is being tested.
     .return (skip_tests)
 
   reset_skip_info:
-    skip_info = new .Hash
+    skip_info = new 'Hash'
     ret
 
   set_range:                         # for setting a range of tests

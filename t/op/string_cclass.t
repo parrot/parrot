@@ -331,7 +331,7 @@ loop:
    if result goto ok
    \$S0 = s[i]
    \$I0 = ord \$S0
-   \$P0 = new .ResizablePMCArray
+   \$P0 = new 'ResizablePMCArray'
    push \$P0, \$I0
    \$S0 = sprintf "\\nchar %#x not reported as ws\\n", \$P0
    print \$S0

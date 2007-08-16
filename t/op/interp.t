@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works without printing' );
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
-               test_interp = new .ParrotInterpreter
+               test_interp = new 'ParrotInterpreter'
     .local pmc stdout
                stdout = getstdout
     push stdout, 'string'
@@ -82,7 +82,7 @@ pir_output_is(
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
-               test_interp = new .ParrotInterpreter
+               test_interp = new 'ParrotInterpreter'
     .local pmc stdout
                stdout = getstdout
     push stdout, 'string'

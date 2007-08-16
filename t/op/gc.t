@@ -610,8 +610,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 1" );
 .sub main :main
     .local pmc a, reg, nil
-    reg = new .AddrRegistry
-    a = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
     null nil
     $I0 = reg[a]
     if $I0 == 0 goto ok1
@@ -656,9 +656,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
 .sub main :main
     .local pmc a, b, reg, nil
     null nil
-    reg = new .AddrRegistry
-    a = new .String
-    b = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
+    b = new 'String'
     $I0 = elements reg
     print $I0
     reg[a] = nil
@@ -680,12 +680,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
 .sub main :main
     .local pmc a, b, c, reg, nil, it
     null nil
-    reg = new .AddrRegistry
-    a = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
     a = "k1"
-    b = new .String
+    b = new 'String'
     b = "k2"
-    c = new .String
+    c = new 'String'
     c = "k3"
     reg[a] = nil
     reg[b] = nil

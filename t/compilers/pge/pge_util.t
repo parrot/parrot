@@ -31,12 +31,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:+')
-  
+
   $P0 = split(regex, "Foo::Bar::baz")
   $S0 = join "\n", $P0
   print $S0
@@ -54,12 +54,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:+')
-  
+
   $P0 = split(regex, "Foo::")
   $S0 = join "\n", $P0
   print $S0
@@ -75,12 +75,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:+')
-  
+
   $P0 = split(regex, "::Foo")
   $S0 = join "\n", $P0
   print $S0
@@ -97,12 +97,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:+')
-  
+
   $P0 = split(regex, "Foo")
   $S0 = join "\n", $P0
   print $S0
@@ -118,12 +118,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:')
-  
+
   $P0 = split(regex, "Foo::Bar")
   $S0 = join "\n", $P0
   print $S0
@@ -141,12 +141,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('\:+')
-  
+
   $P0 = split(regex, "Foo::Bar::Baz", 2)
   $S0 = join "\n", $P0
   print $S0
@@ -163,12 +163,12 @@ pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
 .sub main :main
   load_bytecode 'PGE.pbc'
   load_bytecode 'PGE/Util.pir'
-  
+
   .local pmc split, p6rule, regex
   split  = find_global 'PGE::Util', 'split'
   p6rule = compreg 'PGE::P6Regex'
   regex  = p6rule('(a)(b)')
-  
+
   $P0 = split(regex, "abracadabra")
   $S0 = join "-", $P0
   print $S0

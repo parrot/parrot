@@ -179,11 +179,11 @@ OUTPUT
 open $FOO, '>', 'macro.tempfile';    # Clobber previous
 print $FOO <<'ENDF';
 .macro multiply(A,B)
-    new P0, .Float
+    new P0, 'Float'
     set P0, .A
-    new P1, .Float
+    new P1, 'Float'
     set P1, .B
-    new P2, .Float
+    new P2, 'Float'
     mul P2, P1, P0
 .endm
 ENDF

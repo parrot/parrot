@@ -169,7 +169,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure" );
 .sub main :main
     .local pmc a
     .lex 'a', a
-    a = new .Integer
+    a = new 'Integer'
     a = 42
     print "main\n"
     .const .Sub at_exit = "exit_handler"

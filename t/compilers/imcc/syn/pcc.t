@@ -170,7 +170,7 @@ pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
 .sub test :main
   .local int i
   i=5
-  new $P1, .Continuation
+  new $P1, 'Continuation'
   set_addr $P1, after_loop
 loop:
   $I2 = _addtwo($P1, i)
@@ -178,7 +178,7 @@ loop:
     print "\n"
     goto loop
  after_loop:
-  .get_results ()  
+  .get_results ()
   print "done in main\n"
 .end
 
@@ -238,7 +238,7 @@ loop:
     goto loop
  done:
   print "done in coroutine\n"
-  new $P0, .Exception
+  new $P0, 'Exception'
   throw $P0
 .end
 CODE
@@ -259,16 +259,16 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
 .sub _main
     .local pmc x, y, z, ar, ar2, s
-    x = new .String
+    x = new 'String'
     x = "first\n"
-    y = new .String
+    y = new 'String'
     y = "middle\n"
-    z = new .String
+    z = new 'String'
     z = "last\n"
-    ar = new .ResizablePMCArray
+    ar = new 'ResizablePMCArray'
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    ar2 = new .ResizablePMCArray
+    ar2 = new 'ResizablePMCArray'
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
@@ -315,16 +315,16 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "foo (arg :flat)" );
 .sub _main
     .local pmc x, y, z, ar, ar2
-    x = new .String
+    x = new 'String'
     x = "first\n"
-    y = new .String
+    y = new 'String'
     y = "middle\n"
-    z = new .String
+    z = new 'String'
     z = "last\n"
-    ar = new .ResizablePMCArray
+    ar = new 'ResizablePMCArray'
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    ar2 = new .ResizablePMCArray
+    ar2 = new 'ResizablePMCArray'
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
@@ -493,7 +493,7 @@ pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, no return values" );
 .end
 .sub foo
         print "foo\n"
-.end    
+.end
 CODE
 foo
 OUT
@@ -505,7 +505,7 @@ pir_output_is( <<'CODE', <<'OUT', "()=foo() syntax, skip returned value" );
 .sub foo
         print "foo\n"
     .return(1)
-.end    
+.end
 CODE
 foo
 OUT

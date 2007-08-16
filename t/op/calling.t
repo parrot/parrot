@@ -401,13 +401,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
 .sub main :main
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "hello"
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 42
-    $P2 = new .String
+    $P2 = new 'String'
     $P2 = "again"
-    $P3 = new .Float
+    $P3 = new 'Float'
     $P3 = 47.11
     find_name $P10, "foo"
     # set_args and invoke must be adjacent
@@ -1244,7 +1244,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
 .sub main :main
     .local pmc s
-    s = new .String
+    s = new 'String'
     s = "OK 1\n"
     $S0 = s."lower"()
     print $S0
@@ -1563,7 +1563,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via explicit continuation" );
     .local string result
     result = "not ok 2\n"
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
@@ -1590,7 +1590,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args" )
     .local string result
     result = "not ok 2\n"
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
@@ -1619,7 +1619,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         ## debug 0x80
         .lex "MAIN-CONT", $P41
         $I42 = 10
-        $P41 = new .Continuation
+        $P41 = new 'Continuation'
         set_addr $P41, L2
         goto L3
 L2:
@@ -2129,7 +2129,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "named flat/slurpy" );
 .sub main :main
         .local pmc h
-        h = new .Hash
+        h = new 'Hash'
         h['a'] = 20
         h['b'] = 10
         foo( h :named :flat )
@@ -2206,8 +2206,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2226,8 +2226,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - missing named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2246,8 +2246,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2266,8 +2266,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" )
 .end
 
 .sub foo
-        .param int d :named('b') 
-        .param int c :named('a') 
+        .param int d :named('b')
+        .param int c :named('a')
         print d
         print ' '
         print c
@@ -2281,10 +2281,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after slurpy array" );
 .sub main :main
     foo(0, 'abc' => 1)
     foo('abc' => 2)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 1
     foo($P0 :flat, 'abc' => 3)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
 .end
 
@@ -2305,7 +2305,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)" );
 .sub main :main
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['a'] = 11
     $P0['b'] = 22
     $P0['c'] = 33
@@ -2334,7 +2334,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named loses :flat arg" );
 .sub main :main
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['a'] = 11
     $P0['b'] = 22
     $P0['c'] = 33
@@ -2389,7 +2389,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
 .sub 'main' :main
         .local pmc args
-        args = new .Hash
+        args = new 'Hash'
         args['foo'] = 1
         args['bar'] = 2
 
@@ -2452,10 +2452,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
 .sub main :main
     foo(0, 'abc' => 1)
     foo('abc' => 2)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 1
     foo($P0 :flat, 'abc' => 3)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
 .end
 
