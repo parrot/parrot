@@ -32,8 +32,7 @@ These are the vtable functions for the ParrotInterpreter base class
 /*
 
 =item C<void
-clone_interpreter(Parrot_Interp dest, const Parrot_Interp source,
-    INTVAL flags)>
+clone_interpreter(Parrot_Interp dest, const Parrot_Interp source, INTVAL flags)>
 
 Clones the interpreter as specified by the flags.
 
@@ -46,13 +45,14 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 {
     /* we block DOD runs while cloning since C<d> is not yet running */
     Parrot_block_DOD(d);
-    if (flags & PARROT_CLONE_RUNOPS) {
+    if (flags & PARROT_CLONE_RUNOPS)
         d->run_core = s->run_core;
-    }
+
     if (flags & PARROT_CLONE_INTERP_FLAGS) {
         d->flags = s->flags; /* XXX setting of IS_THREAD? */
         d->debug_flags = s->debug_flags;
     }
+
     if (flags & PARROT_CLONE_HLL) {
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
@@ -60,6 +60,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         d->HLL_info = s->HLL_info;
         Parrot_regenerate_HLL_namespaces(d);
     }
+
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
         INTVAL i;
         INTVAL start;
@@ -604,50 +605,36 @@ Finish thawing.
     }
 
     void thawfinish(visit_info *info) {
-        INTVAL i, n, m;
-        PMC *hll_info, *entry, *lib_pmc, *new_info, *ns_hash;
-        STRING *lib_name, *hll_name;
+        PMC    *new_info = PMC_pmc_val(SELF);
+        INTVAL  m        = VTABLE_elements(INTERP, new_info);
+        INTVAL  i, id;
 
-        hll_info = INTERP->HLL_info;
-        n = VTABLE_elements(INTERP, hll_info);
-        new_info = PMC_pmc_val(SELF);
         PMC_pmc_val(SELF) = NULL;
-        m = VTABLE_elements(INTERP, new_info);
         /* merge new_info */
         /* TODO compare old entries */
-        for (i = n; i < m; ++i) {
-            entry = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
-            lib_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, 1);
+
+        for (i = 0; i < m; ++i) {
+            PMC *entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
+            PMC *lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
+            PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
+
+            STRING *lib_name = NULL;
+            STRING *hll_name = NULL;
+
             if (!PMC_IS_NULL(lib_pmc)) {
                 lib_name = VTABLE_get_string(INTERP, lib_pmc);
-                if (lib_name->strlen)
-                    Parrot_load_lib(INTERP, lib_name, NULL);
+                PObj_constant_SET(lib_name);
             }
-            entry = VTABLE_get_pmc_keyed_int(INTERP, entry, 0);
-            if (!PMC_IS_NULL(entry)) {
-                hll_name = VTABLE_get_string(INTERP, entry);
-                /* create HLL namespace */
-                hll_name = string_downcase(INTERP, hll_name);
 
-                /* HLL type mappings aren't yet created, we can't create
-                 * a namespace in HLL's flavor yet - maybe promote the
-                 * ns_hash to another type later, if mappings provide one?
-                 * XXX - FIXME
-                 */
-                ns_hash =
-                    Parrot_make_namespace_keyed_str(interp,
-                                                    interp->root_namespace,
-                                                    hll_name);
-
-                /* cache HLLs toplevel namespace */
-                VTABLE_set_pmc_keyed_int(INTERP,
-                                         INTERP->HLL_namespace, i, ns_hash);
+            if (!PMC_IS_NULL(name_pmc)) {
+                hll_name = VTABLE_get_string(INTERP, name_pmc);
+                PObj_constant_SET(hll_name);
             }
+
+            /* yes, id goes unused, but this API will get an overhaul soon */
+            id = Parrot_register_HLL(INTERP, hll_name, lib_name);
         }
 
-        /* TODO destruct old HLL_info are constants */
-        if (m > n)
-            INTERP->HLL_info = new_info;
     }
 
     METHOD void run_gc() {
