@@ -211,6 +211,12 @@ proto infix:<+> is looser(prefix:<~>)
     is pirop('add')
     { ... }
 
-proto infix:<,> is looser(infix:<+>)
+proto infix:<:=> is looser(infix:<+>)
+    is lvalue(1)
+    is pasttype('bind')
+    { ... }
+
+proto infix:<,> is looser(infix:<:=>)
     is assoc('list')
     { ... }
+

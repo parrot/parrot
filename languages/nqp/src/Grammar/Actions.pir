@@ -420,7 +420,11 @@
 
 ##    method EXPR($/, $key) {
 ##        if ($key eq 'end') { return $($<expr>); }
-##        my $past := PAST::Op.new(node=>$/, name=>$<type>, pirop=>$<top><pirop>)
+##        my $past := PAST::Op.new( :node($/),
+##                                  :name($<type>),
+##                                  :pasttype($<top><pasttype>),
+##                                  :pirop($<top><pirop>)
+##                                );
 ##        for @($/) {
 ##            $past.push($($_));
 ##        }
@@ -435,11 +439,12 @@
     .return $P0.'get_scalar'()
   expr_reduce:
     .local pmc past
-    .local string name, pirop
+    .local string name, pirop, pasttype
     name = match['type']
     pirop = match['top';'pirop']
+    pasttype = match['top'; 'pasttype']
     $P0 = getclass 'PAST::Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop)
+    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype)
     $P1 = match.'get_array'()
     if null $P1 goto iter_end
     .local pmc iter
