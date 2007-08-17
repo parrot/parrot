@@ -216,6 +216,12 @@ Sets the value of the string to that of the specified C<string>.
 */
 
     void set_string_native(STRING *value) {
+        /* COW doesn't work well with constant strings; workaround this */
+        if (PObj_constant_TEST(SELF) && PObj_COW_TEST(value)) {
+            const char *copy = string_to_cstring(INTERP, value);
+            value            = const_string(INTERP, copy);
+        }
+
         PMC_str_val(SELF) = value;
     }
 
