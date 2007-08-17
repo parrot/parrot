@@ -999,7 +999,7 @@ sub _generate_test_functions {
                     = $PConfig{parrot_is_shared}
                         ? "$PConfig{rpath_blib} -L$PConfig{blib_dir} "
                             . ( $^O =~ m/MSWin32/
-                                ? "libparrot.lib"
+                                ? $PConfig{libparrot_ldflags}
                                 : "-lparrot" )
                         : File::Spec->join( $PConfig{blib_dir}, $PConfig{libparrot_static} );
                 my $cmd =
