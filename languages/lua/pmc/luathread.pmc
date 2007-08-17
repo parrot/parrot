@@ -56,10 +56,7 @@ Raises an exception. Use C<init_pmc()>.
 
 /*
 
-=item C<void init_pmc(PMC *initializer)>
-
-Initializes the iterator with an aggregate PMC.
-Defaults iteration mode to iterate from start.
+=item C<void init_pmc(PMC *sub)>
 
 =cut
 

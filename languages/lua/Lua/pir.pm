@@ -32,7 +32,9 @@ package pirVisitor;
     load_bytecode 'languages/lua/lib/luaos.pbc'
     load_bytecode 'languages/lua/lib/luadebug.pbc'
     load_bytecode 'languages/lua/lib/luaperl.pbc'
+    collectoff
     lua_openlibs()
+    collecton
     .local pmc env
     env = get_hll_global '_G'
     .local pmc vararg

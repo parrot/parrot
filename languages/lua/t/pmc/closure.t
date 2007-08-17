@@ -20,7 +20,7 @@ Tests C<LuaClosure> PMC
 use strict;
 use warnings;
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -234,6 +234,28 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 CODE
 nil
 nil
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check init_pmc' );
+.HLL 'Lua', 'lua_group'
+.sub _main
+    .const .Sub pmc1 = 'f1'
+    .local pmc pmc2
+    pmc2 = new 'LuaClosure', pmc1
+    .local int bool1
+    bool1 = isa pmc2, 'LuaClosure'
+    print bool1
+    print "\n"
+    pmc2()
+    end
+.end
+.sub f1 :outer(_main)
+    print "f1()\n"
+    .return ()
+.end
+CODE
+1
+f1()
 OUTPUT
 
 #TODO: {
