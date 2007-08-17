@@ -68,14 +68,6 @@ static PMC* new_hll_entry( PARROT_INTERP )
 
 /* HEADERIZER END: static */
 
-
-typedef enum {
-    e_HLL_name,
-    e_HLL_lib,
-    e_HLL_typemap,
-    e_HLL_MAX
-} HLL_enum_t;
-
 /* for shared HLL data, do COW stuff */
 #define START_READ_HLL_INFO(interp, hll_info)
 #define END_READ_HLL_INFO(interp, hll_info)
@@ -122,10 +114,32 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
     /* TODO LOCK or disallow in threads */
 
     if (!hll_name) {
+        INTVAL nelements, i;
         /* .loadlib pragma */
         hll_info = interp->HLL_info;
 
         START_WRITE_HLL_INFO(interp, hll_info);
+
+        nelements = VTABLE_elements(interp, hll_info);
+
+        for (i = 0; i < nelements; ++i) {
+            STRING      *name;
+            PMC * const  entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
+            PMC * const  lib_name = VTABLE_get_pmc_keyed_int(interp, entry,
+                e_HLL_lib);
+
+            if (PMC_IS_NULL(lib_name))
+                continue;
+
+            name = VTABLE_get_string(interp, lib_name);
+
+            if (!string_equal(interp, name, hll_lib))
+                break;
+        }
+
+        if (i < nelements)
+            return i;
+
         entry    = new_hll_entry(interp);
 
         VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);

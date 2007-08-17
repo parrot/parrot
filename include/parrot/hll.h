@@ -71,6 +71,13 @@ void Parrot_register_HLL_type( PARROT_INTERP,
 
 /* HEADERIZER END: src/hll.c */
 
+typedef enum HLL_enum_t {
+    e_HLL_name,
+    e_HLL_lib,
+    e_HLL_typemap,
+    e_HLL_MAX
+} HLL_enum_t;
+
 #endif /* PARROT_HLL_H_GUARD */
 
 /*
