@@ -1,6 +1,12 @@
 grammar POST::Grammar is TGE::Grammar;
 
 transform root (PAST::Block) :language('PIR') {
+    .local pmc blockpast
+    blockpast = get_hll_global ['POST'], '@?BLOCK'
+    unless null blockpast goto have_blockpast
+    blockpast = new 'ResizablePMCArray'
+    set_hll_global ['POST'], '@?BLOCK', blockpast
+  have_blockpast:
     .local pmc post
     post = tree.'get'('post', node)
     $I0 = isa post, 'POST::Sub'
@@ -14,6 +20,11 @@ transform root (PAST::Block) :language('PIR') {
 
 
 transform post (PAST::Block) :language('PIR') {
+    ##  add current PAST::Block to @?BLOCK
+    .local pmc blockpast
+    blockpast = get_hll_global ['POST'], '@?BLOCK'
+    unshift blockpast, node
+
     .local string name, pragma, blocktype
     name = node.'name'()
     if name != '' goto with_name
@@ -58,7 +69,10 @@ transform post (PAST::Block) :language('PIR') {
     if blocktype != 'immediate' goto blocktype_end
     $P0 = getclass 'POST::Op'
     post = $P0.'new'(post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
+
   blocktype_end:
+    ##  pop current block from @?BLOCK
+    $P99 = shift blockpast
     .return (post)
 }
 
@@ -488,12 +502,38 @@ transform keypost (PAST::Var) :language('PIR') {
     .return (post)
 }
 
+##  Find the scope for the variable given by this node.  If
+##  defined directly in the node, return it, otherwise search
+##  through outer blocks for symbol information and use that
+##  if found.
+transform scope (PAST::Var) :language('PIR') {
+    .local pmc scope
+    scope = node.'scope'()
+    if scope goto end
+
+    .local string name
+    name = node.'name'()
+    .local pmc iter, bpast
+    $P0 = get_hll_global ['POST'], '@?BLOCK'
+    iter = new 'Iterator', $P0
+  iter_loop:
+    unless iter goto end
+    .local pmc bpast, symbol
+    bpast = shift iter
+    symbol = bpast.'symbol'(name)
+    unless symbol goto iter_loop
+    scope = symbol['scope']
+    unless scope goto iter_loop
+  end:
+    .return (scope)
+}
+
 
 transform bind (PAST::Var) :language('PIR') {
     .local pmc bindvalue
     .local string scope
     bindvalue = node.'bindvalue'()
-    scope = node.'scope'()
+    scope = tree.'get'('scope', node)
     if scope == 'keyed' goto keyed
 
     .local string name
@@ -557,7 +597,7 @@ transform post (PAST::Var) :language('PIR') {
     vivilabel = $P0.'new'('name'=>'vivify_')
 
     .local string scope, name, fetchop, storeop
-    scope = node.'scope'()
+    scope = tree.'get'('scope', node)
     if scope == 'keyed' goto scope_keyed
     name = node.'name'()
     name = node.'escape'(name)

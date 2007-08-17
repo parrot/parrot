@@ -637,11 +637,45 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 .end
 
 
+=item symbol(name, [attr1 => val, attr2 => val2, ...])
+
+If called with named arguments, sets the symbol hash corresponding
+to C<name> in the current block.  The HLL is free to select
+any symbol attributes desired, although the 'scope' attribute
+is typically used to assist with lexical scoping of PAST::Var
+nodes.
+
+If no named arguments are given, returns the current
+attribute hash for symbol C<name>.
+
+=cut
+
+.sub 'symbol' :method
+    .param string name
+    .param pmc attr            :slurpy :named
+    .local pmc symtable
+    symtable = self['symtable']
+    unless null symtable goto have_symtable
+    symtable = new 'Hash'
+    self['symtable'] = symtable
+  have_symtable:
+    if null attr goto get_symbol
+  set_symbol:
+    symtable[name] = attr
+    .return (attr)
+  get_symbol:
+    attr = symtable[name]
+    if attr goto have_attr
+    attr = new 'Hash'
+  have_attr:
+    .return (attr)
+.end
+
+
 =item symtable([value])
 
-Get/set the symbol table for the block.  In the current implementation,
-the data structure for the symbol table is left entirely up to the
-caller; PAST doesn't use C<symtable> for any code generation.
+Get/set the symbol table for the block.  May be deprecated in
+favor of the C<symbol> method above.
 
 =cut
 

@@ -14,8 +14,8 @@ for compiling programs in Parrot.
 .sub '__onload' :load :init
     .local pmc base
 
+    ##  create POST classes
     base = subclass 'PAST::Node', 'POST::Node'
-
     $P0 = subclass base, 'POST::Op'
     $P0 = subclass base, 'POST::Ops'
     $P0 = subclass base, 'POST::Val'
@@ -23,6 +23,7 @@ for compiling programs in Parrot.
     $P0 = subclass base, 'POST::Label'
     $P0 = subclass base, 'POST::Sub'
 
+    ##  initialize %pirtable with opcode argument types
     .local pmc pirtable
     pirtable = new 'Hash'
     pirtable['add'] = '%tP+'
@@ -40,6 +41,7 @@ for compiling programs in Parrot.
     pirtable['call'] = '%r*****************'                # FIXME:
     pirtable['callmethod'] = '%r*****************'          # FIXME:
     set_hll_global ['POST'], '%pirtable', pirtable
+
     .return ()
 .end
 
