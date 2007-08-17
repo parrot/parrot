@@ -662,7 +662,7 @@ attribute hash for symbol C<name>.
     if attr goto set_symbol
   get_symbol:
     $P0 = symtable[name]
-    unless $P0 goto set_symbol
+    if null $P0 goto set_symbol
     .return ($P0)
   set_symbol:
     symtable[name] = attr
