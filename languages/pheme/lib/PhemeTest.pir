@@ -1,4 +1,4 @@
-.namespace[ 'Test::More' ]
+.namespace[ 'Test'; 'More' ]
 
 .sub is :multi( [ 'Pheme'; 'Cons' ], [ 'Pheme'; 'Cons' ] )
 	.param pmc    l_cons

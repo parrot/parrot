@@ -22,7 +22,7 @@ Tests the creation and invocation of Perl6 multi subs.
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
-    test_namespace = get_namespace [ "Test::More" ]
+    test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "plan ok is"
     test_namespace.export_to(curr_namespace, exports)
 

@@ -909,9 +909,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', '$P1.append()' );
     .local pmc plan
     .local pmc ok
     .local pmc is
-    plan = find_global 'Test::More', 'plan'
-    ok   = find_global 'Test::More', 'ok'
-    is   = find_global 'Test::More', 'is'
+    plan = find_global [ 'Test'; 'More' ], 'plan'
+    ok   = find_global [ 'Test'; 'More' ], 'ok'
+    is   = find_global [ 'Test'; 'More' ], 'is'
 
     $P1 = new ResizablePMCArray
     push $P1, 'a'

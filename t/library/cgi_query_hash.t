@@ -23,9 +23,9 @@ Test  [ 'CGI'; 'QueryHash' ]
     load_bytecode 'CGI/QueryHash.pbc'
 
     .local pmc plan, is, ok
-    plan = get_hll_global ['Test::More'], 'plan'
-    is   = get_hll_global ['Test::More'], 'is'
-    ok   = get_hll_global ['Test::More'], 'ok'
+    plan = get_hll_global [ 'Test'; 'More' ], 'plan'
+    is   = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok   = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     plan(7)
 

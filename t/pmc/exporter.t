@@ -293,7 +293,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as string' );
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src
 
-    src      = get_namespace ['Test::More']
+    src      = get_namespace [ 'Test'; 'More' ]
 
     exporter = new .Exporter
     exporter.'import'( src :named('source'), 'plan ok' :named('globals') )
@@ -311,7 +311,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with source passed separatel
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src
 
-    src      = get_namespace ['Test::More']
+    src      = get_namespace [ 'Test'; 'More' ]
 
     exporter = new .Exporter
     exporter.'source'( src )
@@ -330,7 +330,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src, globals
 
-    src     = get_namespace ['Test::More']
+    src     = get_namespace [ 'Test'; 'More' ]
     globals = new .ResizableStringArray
     globals = push 'ok'
     globals = push 'plan'
@@ -352,7 +352,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - null + empty strin
     .local pmc exporter, src, globals, nul
 
     nul     = new .Null
-    src     = get_namespace ['Test::More']
+    src     = get_namespace [ 'Test'; 'More' ]
     globals = new .Hash
     globals['ok'] = nul
     globals['plan'] = ''
@@ -373,7 +373,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - with dest names (l
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src, globals
 
-    src     = get_namespace ['Test::More']
+    src     = get_namespace [ 'Test'; 'More' ]
     globals = new .Hash
     globals['plan'] = 'consilium'
     globals['ok'] = 'rectus'
@@ -394,7 +394,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src, dest, globals
 
-    src     = get_namespace ['Test::More']
+    src     = get_namespace [ 'Test'; 'More' ]
     dest    = get_namespace ['foo']
     globals = new .ResizableStringArray
     globals = push 'ok'

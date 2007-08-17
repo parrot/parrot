@@ -6,7 +6,7 @@
     load_bytecode 'library/Test/More.pir'
 
     .local pmc plan
-    plan = get_hll_global ['Test::More'], 'plan'
+    plan = get_hll_global [ 'Test'; 'More' ], 'plan'
 
     # set a test plan
     plan(NUM_OF_TESTS)
@@ -61,8 +61,8 @@
 #
 .sub 'size/resize'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -117,8 +117,8 @@ still_ok:
 #
 .sub 'set_pmc_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array, elem
     array = new 'ResizableStringArray'
@@ -192,8 +192,8 @@ done:
 #
 .sub 'get_pmc_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -266,8 +266,8 @@ done:
 #
 .sub 'set_string_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc    array
     .local string elem
@@ -341,8 +341,8 @@ done:
 #
 .sub 'get_string_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -400,8 +400,8 @@ done:
 #
 .sub 'set_integer_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     .local int elem
@@ -475,8 +475,8 @@ done:
 #
 .sub 'get_integer_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -534,8 +534,8 @@ done:
 #
 .sub 'set_number_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc   array
     .local float elem
@@ -609,8 +609,8 @@ done:
 #
 .sub 'get_number_keyed'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -668,7 +668,7 @@ done:
 #
 .sub 'push_pmc'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -704,7 +704,7 @@ done:
 #
 .sub 'push_string'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -736,7 +736,7 @@ done:
 #
 .sub 'push_integer'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -768,7 +768,7 @@ done:
 #
 .sub 'push_float'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -796,8 +796,8 @@ done:
 
 .sub 'pop_pmc'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -825,8 +825,8 @@ exception:
 
 .sub 'pop_string'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -851,8 +851,8 @@ exception:
 
 .sub 'pop_integer'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -877,8 +877,8 @@ exception:
 
 .sub 'pop_float'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -903,8 +903,8 @@ exception:
 
 .sub 'shift_pmc'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -933,8 +933,8 @@ exception:
 
 .sub 'shift_string'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -960,8 +960,8 @@ exception:
 
 .sub 'shift_integer'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -987,8 +987,8 @@ exception:
 
 .sub 'shift_float'
     .local pmc is, ok
-    is = get_hll_global ['Test::More'], 'is'
-    ok = get_hll_global ['Test::More'], 'ok'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1017,7 +1017,7 @@ exception:
 #
 .sub 'unshift_pmc'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1053,7 +1053,7 @@ exception:
 #
 .sub 'unshift_string'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1085,7 +1085,7 @@ exception:
 #
 .sub 'unshift_integer'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1118,7 +1118,7 @@ exception:
 #
 .sub 'unshift_float'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1149,8 +1149,8 @@ exception:
 #
 .sub 'clone'
     .local pmc is, is_deeply
-    is        = get_hll_global ['Test::More'], 'is'
-    is_deeply = get_hll_global ['Test::More'], 'is_deeply'
+    is        = get_hll_global [ 'Test'; 'More' ], 'is'
+    is_deeply = get_hll_global [ 'Test'; 'More' ], 'is_deeply'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1173,7 +1173,7 @@ exception:
 
 .sub 'get_string'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizablePMCArray'
@@ -1187,7 +1187,7 @@ exception:
 
 .sub 'does'
     .local pmc is
-    is = get_hll_global ['Test::More'], 'is'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1205,7 +1205,7 @@ exception:
 #
 .sub sparse
     .local pmc ok
-    ok = get_hll_global ['Test::More'], 'ok'
+    ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc array
     array = new 'ResizableStringArray'
@@ -1291,8 +1291,8 @@ err_2:
 
 .sub 'splice'
     .local pmc is, like
-    is = get_hll_global ['Test::More'], 'is'
-    like = get_hll_global ['Test::More'], 'like'
+    is = get_hll_global [ 'Test'; 'More' ], 'is'
+    like = get_hll_global [ 'Test'; 'More' ], 'like'
 
     $P1 = new 'ResizableStringArray'
     $P1 = 3

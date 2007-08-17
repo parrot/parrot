@@ -21,7 +21,7 @@ Tests the metamodel for the OO implementation.
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
-    test_namespace = get_namespace [ "Test::More" ]
+    test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "plan ok is isa_ok skip todo"
     test_namespace.export_to(curr_namespace, exports)
 

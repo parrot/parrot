@@ -24,7 +24,7 @@ Tests the Class PMC.
 .sub 'main' :main
      load_bytecode 'Test/More.pir'
      .local pmc exporter, test_ns
-     test_ns = get_namespace ['Test::More']
+     test_ns = get_namespace [ 'Test'; 'More' ]
      exporter = new 'Exporter'
      exporter.'import'( test_ns :named('source'), 'plan ok is isa_ok todo' :named('globals') )
 

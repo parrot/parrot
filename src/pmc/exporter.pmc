@@ -13,7 +13,7 @@ You can use Exporter in PIR to import subs from a library. At its simplest:
  .sub main :main
      load_bytecode 'Test/More.pir'
      .local pmc exporter, test_ns
-     test_ns = get_namespace ['Test::More']
+     test_ns = get_namespace [ 'Test'; 'More' ]
      exporter = new 'Exporter'
      exporter.'import'( test_ns :named('source'), 'plan ok' :named('globals') )
      plan(1)

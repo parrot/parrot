@@ -26,7 +26,7 @@ Tests the Super PMC.
 
     # get the testing functions
     .local pmc exporter, test_namespace
-    test_namespace = get_namespace [ "Test::More" ]
+    test_namespace = get_namespace [ 'Test'; 'More' ]
     exporter = new 'Exporter'
     exporter.'source'(test_namespace)
     exporter.'import'('plan diag ok is like skip isa_ok' :named('globals'))
