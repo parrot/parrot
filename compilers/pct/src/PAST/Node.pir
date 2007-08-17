@@ -659,15 +659,13 @@ attribute hash for symbol C<name>.
     symtable = new 'Hash'
     self['symtable'] = symtable
   have_symtable:
-    if null attr goto get_symbol
+    if attr goto set_symbol
+  get_symbol:
+    $P0 = symtable[name]
+    unless $P0 goto set_symbol
+    .return ($P0)
   set_symbol:
     symtable[name] = attr
-    .return (attr)
-  get_symbol:
-    attr = symtable[name]
-    if attr goto have_attr
-    attr = new 'Hash'
-  have_attr:
     .return (attr)
 .end
 
