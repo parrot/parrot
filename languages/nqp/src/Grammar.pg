@@ -85,6 +85,7 @@ rule if_statement {
 
 token block {
     '{'
+    {*}                                                    #= open
     <statement_list>
     '}'
     [
@@ -94,7 +95,7 @@ token block {
             set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
         }}
     ]?
-    {*}                                                    #= end
+    {*}                                                    #= close
 }
 
 

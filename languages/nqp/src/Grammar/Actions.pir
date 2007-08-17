@@ -3,6 +3,9 @@
 
 .sub '__onload' :init :load
     $P0 = newclass 'NQP::Grammar::Actions'
+
+    $P0 = new 'ResizablePMCArray'
+    set_hll_global ['NQP::Grammar::Actions'], '@?BLOCK', $P0
     .return ()
 .end
 
@@ -97,19 +100,40 @@
 
 
 ##    method block($/, $key) {
-##        return PAST::Block.new($($<statement_list>),
-##                               blocktype => 'immediate',
-##                               node => $/
-##                              );
+##        our $?BLOCK, @?BLOCK;
+##        if ($key ne 'close') {
+##            $?BLOCK := PAST::Block.new( :blocktype('immediate'),
+##                                           :node($/) );
+##            unshift @?BLOCK, $?BLOCK;
+##        }
+##        else {
+##            my $past := shift @?BLOCK;
+##            $?BLOCK := @?BLOCK[0];
+##            $past.push($($<statement_list>));
+##            .return ($past);
+##        }
 ##    }
 .sub 'block' :method
     .param pmc match
     .param string key
-    .local pmc cpast
-    $P0 = match['statement_list']
-    cpast = $P0.'get_scalar'()
+    if key == 'close' goto block_close
+  block_open:
+    .local pmc past
     $P0 = getclass 'PAST::Block'
-    .return $P0.'new'(cpast, 'blocktype'=>'immediate', 'node'=>match)
+    past = $P0.'new'('blocktype'=>'immediate', 'node'=>match)
+    set_global '$?BLOCK', past
+    $P0 = get_global '@?BLOCK'
+    unshift $P0, past
+    .return ()
+  block_close:
+    $P0 = get_global '@?BLOCK'
+    past = shift $P0
+    $P1 = $P0[0]
+    set_global '$?BLOCK', $P1
+    $P2 = match['statement_list']
+    $P3 = $P2.'get_scalar'()
+    past.'push'($P3)
+    .return (past)
 .end
 
 
