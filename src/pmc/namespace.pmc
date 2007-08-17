@@ -39,7 +39,7 @@ These are the vtable functions for the namespace PMC.
  * This could easily expand to a full-fledged typed namespace if needed.
  */
 
-enum {
+typedef enum {
     NS_slot_ns,
     NS_slot_var_sub,         /* unspecified ~half-raw slot */
     NS_max_slots

@@ -69,7 +69,7 @@ static PMC* new_hll_entry( PARROT_INTERP )
 /* HEADERIZER END: static */
 
 
-enum {
+typedef enum {
     e_HLL_name,
     e_HLL_lib,
     e_HLL_typemap,
