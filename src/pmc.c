@@ -34,7 +34,9 @@ static PMC* get_new_pmc_header( PARROT_INTERP,
 /* HEADERIZER END: static */
 
 
-PMC * PMCNULL;
+#if PARROT_CATCH_NULL
+PARROT_API PMC * PMCNULL;
+#endif
 
 /*
 
