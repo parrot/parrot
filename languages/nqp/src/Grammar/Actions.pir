@@ -12,20 +12,13 @@
 .namespace [ 'NQP::Grammar::Actions' ]
 
 
-##    method TOP($/) {
-##        return PAST::Block.new($($<statement_list>),
-##                               node => $/,
-##                               name => 'anon',
-##                               );
+##    method TOP($/, $key) {
+##        return self.block($/, $key);
 ##    }
 .sub 'TOP' :method
     .param pmc match
-    .local pmc cpast, past
-    $P0 = match['statement_list']
-    cpast = $P0.'get_scalar'()
-    $P0 = getclass 'PAST::Block'
-    past = $P0.'new'(cpast, 'node'=>match, 'name'=>'anon')
-    .return (past)
+    .param string key
+    .return self.'block'(match, key)
 .end
 
 
@@ -276,6 +269,33 @@
 .end
 
 
+##    method scope_declarator($/) {
+##        my $past := $($<variable>);
+##        $past.'isdecl'(1);
+##        our $?BLOCK;
+##        my $scope := ($<declarator> eq 'my') ? 'lexical' : 'package';
+##        $?BLOCK.symbol($past.name(), :scope($scope));
+##        .return ($past);
+##   }
+.sub 'scope_declarator' :method
+    .param pmc match
+    .local pmc past, block
+    $P0 = match['variable']
+    past = $P0.'get_scalar'()
+    past.'isdecl'(1)
+    block = get_global '$?BLOCK'
+    .local string scope
+    scope = 'package'
+    $S0 = match['declarator']
+    if $S0 != 'my' goto have_scope
+    scope = 'lexical'
+  have_scope:
+    $P0 = past.'name'()
+    block.'symbol'($P0, 'scope'=>scope)
+    .return (past)
+.end
+
+
 ##    method variable($/, $key) {
 ##        if ($key eq '$< >') {
 ##            return PAST::Var.new(
@@ -299,7 +319,7 @@
   past_var:
     $S0 = match
     $P0 = getclass 'PAST::Var'
-    .return $P0.'new'('node'=>match, 'name'=>$S0, 'scope'=>'package')
+    .return $P0.'new'('node'=>match, 'name'=>$S0)
 .end
 
 

@@ -4,7 +4,12 @@
 grammar NQP::Grammar is PCT::Grammar;
 
 
-token TOP { <statement_list> [ $ | <panic: Syntax error> ] {*} }
+token TOP {
+  {*}                                                      #= open
+  <statement_list>
+  [ $ | <panic: Syntax error> ]
+  {*}                                                      #= close
+}
 
 ##  The <ws> and <pod_comment> rules handle whitespace and comments.
 ##  These are taken from an earlier draft of Perl 6, so they do not
@@ -137,6 +142,7 @@ token methodop {
 
 token noun {
     | <colonpair> {*}                                      #= colonpair
+    | <scope_declarator> {*}                               #= scope_declarator
     | <routine_def> {*}                                    #= routine_def
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
@@ -147,6 +153,13 @@ token noun {
 
 token colonpair {
     | ':' <ident> [ '(' <EXPR> ')' ] {*}
+}
+
+
+rule scope_declarator {
+    $<declarator>:=[my|our]
+    <variable>
+    {*}
 }
 
 
