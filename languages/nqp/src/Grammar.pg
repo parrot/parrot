@@ -110,6 +110,7 @@ rule routine_def {
 
 rule signature {
     ( <param_var> ( ',' | <?before ')'> ) )*
+    ( <colonpair> ( ',' | <?before ')'> ) )*
     {*}
 }
 
