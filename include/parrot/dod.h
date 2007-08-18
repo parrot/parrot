@@ -136,7 +136,7 @@ void parrot_gc_gms_pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
 void parrot_gc_gms_wb( PARROT_INTERP,
     NOTNULL(PMC *agg),
     NOTNULL(void *old),
-    NOTNULL(void *new) )
+    NOTNULL(void *_new) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -146,7 +146,7 @@ void parrot_gc_gms_wb_key( PARROT_INTERP,
     NOTNULL(PMC *agg),
     NOTNULL(void *old),
     NOTNULL(void *old_key),
-    NOTNULL(void *new),
+    NOTNULL(void *_new),
     NOTNULL(void *new_key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -311,7 +311,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                 HUGEINTVAL sharedint = 0;
 
                 /* Storage for flags, etc. */
-                SpfInfo info = { 0, 0, 0, 0, 0 };
+                SpfInfo info = { 0, 0, 0, 0, (PHASE)0 };
 
                 /* Reset temporaries */
                 tc[0] = '\0';

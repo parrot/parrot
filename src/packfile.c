@@ -724,7 +724,7 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     else if (header->uuid_type == 1) {
         /* Read in the UUID. We'll put it in a NULL-terminated string, just in
          * case pepole use it that way. */
-        header->uuid_data = mem_sys_allocate(header->uuid_size + 1);
+        header->uuid_data = (unsigned char *)mem_sys_allocate(header->uuid_size + 1);
         memcpy(header->uuid_data, packed + PACKFILE_HEADER_BYTES,
             header->uuid_size);
         header->uuid_data[header->uuid_size] = 0; /* NULL terminate */

@@ -107,7 +107,7 @@ sub create_table {
     my ($name) = @_;
     my $len = 8;
 
-    print "const PARROT_CCLASS_FLAGS ${name}[256] = {\n";
+    print "const INTVAL ${name}[256] = {\n";
     foreach my $char ( 0 .. 255 ) {
         printf "0x%.4x, ", classify($char);
         print "/* @{[$char-$len+1]}-$char */\n" if $char % $len == $len - 1;
@@ -146,13 +146,14 @@ $header
 #ifndef PARROT_CHARSET_TABLES_H_GUARD
 #define PARROT_CHARSET_TABLES_H_GUARD
 #include "parrot/cclass.h"
+#include "parrot/parrot.h"
 #define WHITESPACE  enum_cclass_whitespace
 #define WORDCHAR    enum_cclass_word
 #define PUNCTUATION enum_cclass_punctuation
 #define DIGIT       enum_cclass_numeric
 END
 foreach my $name ( sort keys %table ) {
-    print "extern const PARROT_CCLASS_FLAGS ${table{$name}}[256];\n";
+    print "extern const INTVAL ${table{$name}}[256];\n";
 }
 print <<"EOF";
 #endif /* PARROT_CHARSET_TABLES_H_GUARD */

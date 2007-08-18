@@ -153,6 +153,8 @@ sub runstep {
             # us -Wpadded may prove interesting, or even noisy.
             # -Wunreachable-code might be useful in a non debugging version
             4.0 => "-fvisibility=hidden",
+            # Needed to prevent C++ compatibility issues
+            4.1 => " -Wc++-compat",
         );
 
         my @cage_opt_and_vers = (

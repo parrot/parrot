@@ -175,7 +175,7 @@ static char *
 str_dup(NOTNULL(const char *old))
 {
     const size_t bytes = strlen(old) + 1;
-    char * const copy = mem_sys_allocate(bytes);
+    char * const copy = (char *)mem_sys_allocate(bytes);
     memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
     debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);

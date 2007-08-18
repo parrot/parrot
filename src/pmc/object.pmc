@@ -118,8 +118,8 @@ Returns the fully qualified name of the object's class.
 */
 
     STRING *name() {
-        PMC * const class = VTABLE_get_class(interp, SELF);
-        STRING * const class_name = VTABLE_get_string(interp, class);
+        PMC * const _class = VTABLE_get_class(interp, SELF);
+        STRING * const class_name = VTABLE_get_string(interp, _class);
 
         return class_name;
     }
@@ -291,13 +291,13 @@ Returns whether the class is or inherits from C<*classname>.
 */
     INTVAL isa(STRING *classname)
     {
-        PMC   *class;
+        PMC   *_class;
 
         if (SUPER(classname))
             return 1;
 
-        class = VTABLE_get_class(interp, SELF);
-        return VTABLE_isa(interp, class, classname);
+        _class = VTABLE_get_class(interp, SELF);
+        return VTABLE_isa(interp, _class, classname);
     }
 
 }

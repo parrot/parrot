@@ -56,7 +56,7 @@ get_thread(PARROT_INTERP)
 
     if (!txlog->waitlist_data) {
         txlog->waitlist_data =
-            mem_sys_allocate_zeroed(sizeof (*txlog->waitlist_data));
+            (waitlist_thread_data*)mem_sys_allocate_zeroed(sizeof (*txlog->waitlist_data));
         MUTEX_INIT(txlog->waitlist_data->signal_mutex);
         txlog->waitlist_data->signal_cond = &interp->thread_data->interp_cond;
 #if WAITLIST_DEBUG
@@ -84,12 +84,12 @@ alloc_entry(PARROT_INTERP)
     thr = get_thread(interp);
 
     if (!thr->entries) {
-        thr->entries = mem_sys_allocate_zeroed(sizeof (*thr->entries) * 4);
+        thr->entries = (waitlist_entry**)mem_sys_allocate_zeroed(sizeof (*thr->entries) * 4);
         thr->entry_count = 4;
     }
 
     if (thr->used_entries >= thr->entry_count) {
-        thr->entries = mem_sys_realloc_zeroed(thr->entries,
+        thr->entries = (waitlist_entry**)mem_sys_realloc_zeroed(thr->entries,
             sizeof (*thr->entries) * thr->entry_count * 2,
             sizeof (*thr->entries) * thr->entry_count);
         thr->entry_count *= 2;
@@ -97,7 +97,7 @@ alloc_entry(PARROT_INTERP)
 
     i = thr->used_entries++;
     if (!thr->entries[i])
-        thr->entries[i] = mem_sys_allocate_zeroed(sizeof (**thr->entries));
+        thr->entries[i] = (waitlist_entry*)mem_sys_allocate_zeroed(sizeof (**thr->entries));
 
     PARROT_ASSERT(thr->entries[i]->head == NULL);
     PARROT_ASSERT(thr->entries[i]->next == NULL);
@@ -111,9 +111,11 @@ static void
 add_entry(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *entry))
 {
     int successp = -1;
+    void *result;
     PARROT_ASSERT(entry->next == NULL);
     do {
-        PARROT_ATOMIC_PTR_GET(entry->next, waitlist->first);
+        PARROT_ATOMIC_PTR_GET(result, waitlist->first);
+        entry->next = (waitlist_entry *)result;
         PARROT_ASSERT(successp != -1 || entry->next != entry);
         PARROT_ASSERT(entry->next != entry);
         PARROT_ATOMIC_PTR_CAS(successp, waitlist->first, entry->next, entry);
@@ -143,12 +145,14 @@ static void
 waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
 {
     struct waitlist_entry *cur;
+    void *result;
 
     if (!waitlist)
         return;
 
     LOCK(waitlist->remove_mutex);
-    PARROT_ATOMIC_PTR_GET(cur, waitlist->first);
+    PARROT_ATOMIC_PTR_GET(result, waitlist->first);
+    cur = (waitlist_entry *)result;
 
     /* if we became the first entry while we were acquiring the mutex */
     while (cur == what) {
@@ -158,7 +162,8 @@ waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
             what->next = NULL;
             return;
         }
-        PARROT_ATOMIC_PTR_GET(cur, waitlist->first);
+        PARROT_ATOMIC_PTR_GET(result, waitlist->first);
+        cur = (waitlist_entry *)result;
     }
 
     if (!cur) {
@@ -225,11 +230,13 @@ waitlist_signal_all(STM_waitlist *list)
 {
     int successp;
     struct waitlist_entry *cur;
+    void *result;
 
     /* make sure we are not interrupted by a concurrent removal */
     LOCK(list->remove_mutex);
     do {
-        PARROT_ATOMIC_PTR_GET(cur, list->first);
+        PARROT_ATOMIC_PTR_GET(result, list->first);
+        cur = (waitlist_entry *)result;
         PARROT_ATOMIC_PTR_CAS(successp, list->first, cur, NULL);
     } while (!successp);
 

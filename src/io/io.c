@@ -249,7 +249,7 @@ PIO_init(PARROT_INTERP)
     if (interp->piodata == NULL)
         real_exception(interp, NULL, PIO_ERROR, "PIO alloc piodata failure.");
     interp->piodata->default_stack = NULL;
-    interp->piodata->table = mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof(ParrotIO *));
+    interp->piodata->table = (PMC **)mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof(ParrotIO *));
     if (interp->piodata->table == NULL)
         real_exception(interp, NULL, PIO_ERROR, "PIO alloc table failure.");
 

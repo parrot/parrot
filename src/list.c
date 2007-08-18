@@ -1278,7 +1278,7 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, NOTNULL(PMC *init))
                 multi_key = VTABLE_get_pmc_keyed_int(interp, init, val);
                 break;
             case 2:
-                type = VTABLE_get_integer_keyed_int(interp, init, val);
+                type = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, init, val);
                 break;
             case 3:
                 item_size = VTABLE_get_integer_keyed_int(interp, init, val);
