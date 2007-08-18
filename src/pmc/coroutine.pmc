@@ -171,12 +171,11 @@ Swaps the "context".
                 real_exception(INTERP, NULL, E_Exception,
                         "tail call to coro not allowed");
 
-            caller_ctx = CONTEXT(INTERP->ctx);
-
             /* first time set current sub, cont, object */
-            Parrot_alloc_context(INTERP, co->n_regs_used);
+            caller_ctx = CONTEXT(INTERP->ctx);
+            ctx        = Parrot_alloc_context(INTERP, co->n_regs_used);
 
-            co->ctx                   = ctx = CONTEXT(INTERP->ctx);
+            co->ctx                   = ctx;
             co->dynamic_state         = interp->dynamic_env;
             ctx->caller_ctx           = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
