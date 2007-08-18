@@ -154,7 +154,8 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        return (INTVAL)DYNSELF.get_number_keyed_int(key);
+        FLOATVAL f = DYNSELF.get_number_keyed_int(key);
+        return (INTVAL)f;
     }
 
 /*
