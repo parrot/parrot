@@ -356,24 +356,31 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     }
 }
 
-PMC *
+static PMC *
 find_vtable_override(PARROT_INTERP, PMC *parrot_class, STRING *name)
 {
     Parrot_Class * const _class = PARROT_CLASS(parrot_class);
+
     /* Walk and search for the vtable method. */
-    const int num_classes = VTABLE_elements(interp, _class->all_parents);
-    const int all_in_universe = !PObj_HasAlienParents_TEST(parrot_class);
-    const int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
+    const int num_classes       = VTABLE_elements(interp, _class->all_parents);
+    const int all_in_universe   = !PObj_HasAlienParents_TEST(parrot_class);
+    const int alien_parents_pos = VTABLE_elements(interp,
+        _class->attrib_metadata);
+
     int i;
+
     for (i = 0; i < num_classes; i++) {
         /* Get the class. */
-        PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+        PMC * const cur_class =
+            VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
         /* If it's from this universe or the class doesn't inherit from
          * anything outside of it... */
-        if (all_in_universe || VTABLE_isa(interp, cur_class, string_from_literal(interp, "Class"))) {
+        if (all_in_universe || VTABLE_isa(interp, cur_class,
+                string_from_literal(interp, "Class"))) {
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
-            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, name)) {
+            if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides,
+                    name)) {
                 /* Found it; call. */
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
                     class_info->vtable_overrides, name);
