@@ -696,7 +696,7 @@ MMD_BigInt:     {
 MMD_DEFAULT: {
             const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
-            if (d == 0.0)
+            if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             if (!dest)
@@ -713,7 +713,7 @@ MMD_BigInt:     {
 MMD_DEFAULT: {
             const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
-            if (d == 0.0)
+            if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() / d);
@@ -750,7 +750,7 @@ MMD_DEFAULT: {
             const FLOATVAL d = VTABLE_get_number(INTERP, value);
             FLOATVAL       f;
 
-            if (d == 0.0)
+            if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
             if (!dest)
@@ -781,7 +781,7 @@ MMD_DEFAULT: {
     PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
         FLOATVAL f;
 
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
 
@@ -802,7 +802,7 @@ MMD_DEFAULT: {
             const FLOATVAL d = VTABLE_get_number(INTERP, value);
             FLOATVAL       f;
 
-            if (d == 0.0)
+            if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "float division by zero");
 
@@ -825,7 +825,7 @@ MMD_DEFAULT: {
     void i_floor_divide_float(FLOATVAL value) {
         FLOATVAL f;
 
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
 
@@ -864,7 +864,7 @@ MMD_BigInt: {
 MMD_DEFAULT: {
             INTVAL d = VTABLE_get_integer(INTERP, value);
 
-            if (d == 0.0)
+            if (d == 0)
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int cmodulus by zero");
             if (!dest)
@@ -878,7 +878,7 @@ MMD_DEFAULT: {
     PMC *cmodulus_float(FLOATVAL value, PMC *dest) {
         FLOATVAL f;
 
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
 
@@ -909,7 +909,7 @@ MMD_BigInt: {
 MMD_DEFAULT: {
             const INTVAL d = VTABLE_get_integer(INTERP, value);
 
-            if (d == 0.0)
+            if (d == 0)
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int cmodulus by zero");
             VTABLE_set_integer_native(INTERP, SELF,
@@ -928,7 +928,7 @@ MMD_DEFAULT: {
     void i_cmodulus_float(FLOATVAL value) {
         FLOATVAL f;
 
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int cmodulus by zero");
 
@@ -989,7 +989,7 @@ MMD_DEFAULT: {
     }
 
     PMC *modulus_float(FLOATVAL value, PMC *dest) {
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
         if (!dest)
@@ -1005,11 +1005,11 @@ MMD_BigInt: {
 MMD_DEFAULT: {
             const INTVAL d = VTABLE_get_integer(INTERP, value);
 
-            if (d == 0.0)
+            if (d == 0)
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int modulus by zero");
             VTABLE_set_integer_native(INTERP, SELF,
-                    intval_mod(DYNSELF.get_integer() , d));
+                    intval_mod(DYNSELF.get_integer(), d));
         }
     }
 
@@ -1022,7 +1022,7 @@ MMD_DEFAULT: {
     }
 
     void i_modulus_float(FLOATVAL value) {
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
         VTABLE_set_integer_native(INTERP, SELF,
@@ -1131,7 +1131,7 @@ Returns the result of comparing the integer with C<*value>.
 MMD_String: {
             const FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
-            if (fdiff == 0) {
+            if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
                     PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
@@ -1166,7 +1166,7 @@ Returns the result of numerically comparing the integer with C<*value>.
 MMD_String: {
             const FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
-            if (fdiff == 0) {
+            if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
                     PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
                 return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;

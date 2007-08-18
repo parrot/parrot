@@ -372,7 +372,7 @@ C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed_int(key, (value ? 1 : 0));
+        DYNSELF.set_integer_keyed_int(key, !FLOAT_IS_ZERO(value));
     }
 
 /*

@@ -96,7 +96,8 @@ Evaluates the number as a boolean, i.e. it's true if it's not zero.
 */
 
     INTVAL get_bool() {
-        return (INTVAL)(PMC_num_val(SELF) != 0.0);
+        FLOATVAL f = PMC_num_val(SELF);
+        return !FLOAT_IS_ZERO(f);
     }
 
 /*

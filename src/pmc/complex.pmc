@@ -205,7 +205,7 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
 static void
 float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 {
-    if (value == 0.0) {
+    if (FLOAT_IS_ZERO(value)) {
         real_exception(interp, NULL, E_ZeroDivisionError,
                        "Divide by zero");
     }
@@ -215,7 +215,7 @@ static void
 complex_check_divide_zero(PARROT_INTERP, PMC *value)
 {
     /* Throw an exception if we are dividing by zero. */
-    if (RE(value) == 0.0 && IM(value) == 0.0) {
+    if (FLOAT_IS_ZERO(RE(value)) && FLOAT_IS_ZERO(IM(value))) {
         real_exception(interp, NULL, E_ZeroDivisionError,
                        "Divide by zero");
     }
@@ -411,7 +411,7 @@ Returns true if the complex number is non-zero.
     }
 
     INTVAL get_bool() {
-        return (INTVAL)(RE(SELF) != 0.0 || IM(SELF) != 0.0);
+        return !(FLOAT_IS_ZERO(RE(SELF)) && FLOAT_IS_ZERO(IM(SELF)));
     }
 
 /*
@@ -1182,22 +1182,22 @@ Returns C<FUNC>(SELF).
 */
 
     METHOD PMC *sin() {
-        FLOATVAL re, im;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        re = RE(SELF);
-        im = IM(SELF);
-        if (im == 0.0) {
+        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL re = RE(SELF);
+        FLOATVAL im = IM(SELF);
+
+        if (FLOAT_IS_ZERO(im)) {
             RE(d) = sin(re);
             IM(d) = 0.0;
             return d;
         }
-        if (re == 0.0) {
+        if (FLOAT_IS_ZERO(re)) {
             RE(d) = 0.0;
             IM(d) = sinh(im);
             return d;
         }
         RE(d) = sin(re) * cosh(im);
-        if (im == 0.0)
+        if (FLOAT_IS_ZERO(im))
             IM(d) = im;
         else
             IM(d) = cos(re) * sinh(im);
@@ -1205,16 +1205,17 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD PMC *cos() {
-        FLOATVAL re, im;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        re = RE(SELF);
-        im = IM(SELF);
-        if (re == 0.0) {
+        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL re = RE(SELF);
+        FLOATVAL im = IM(SELF);
+
+        if (FLOAT_IS_ZERO(re)) {
             RE(d) = cosh(im);
             IM(d) = 0.0;
             return d;
         }
-        if (im == 0.0) {
+
+        if (FLOAT_IS_ZERO(im)) {
             RE(d) = cos(re);
             IM(d) = 0.0;
             return d;
