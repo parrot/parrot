@@ -92,7 +92,7 @@ token block {
     '{'
     {*}                                                    #= open
     <statement_list>
-    '}'
+    [ '}' | <panic: Syntax error> ]
     [
         \h* [ \# \N* ]? \n <?ws>
         {{  $P0 = match.'to'()
