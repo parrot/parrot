@@ -25,7 +25,7 @@ Tests the ParrotObject PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, .ParrotObject
+    new P0, 'ParrotObject'
     print "ok 1\n"
 .end
 CODE
@@ -170,9 +170,9 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', 'assign opcode in inherited classes', 'todo' => 'assign opcode inheritance' );
 .sub main :main
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     push $P1, 3
-    $P2 = new .ResizablePMCArray
+    $P2 = new 'ResizablePMCArray'
     assign $P2, $P1
     $I0 = elements $P2
     print $I0

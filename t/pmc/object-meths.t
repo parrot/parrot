@@ -85,7 +85,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "can class" );
     newclass P2, "Foo"
     set S0, "meth"
 
-    new P3, .Sub
+    new P3, 'Sub'
     # store the sub with the real name
     store_global "Foo", "meth", P3
 
@@ -108,7 +108,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "can object" );
 
     set S0, "meth"
 
-    new P3, .Sub
+    new P3, 'Sub'
     # store the sub with the real name
     store_global "Foo", "meth", P3
 
@@ -142,7 +142,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "disabling the constructor" );
     newclass P1, "Foo"
-    new P0, .String
+    new P0, 'String'
     setprop P1, "BUILD", P0
     find_type I1, "Foo"
     new P3, I1
@@ -158,7 +158,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "specified constructor method does not exist" );
     newclass P1, "Foo"
-    new P0, .String
+    new P0, 'String'
     set P0, "bar"
     setprop P1, "BUILD", P0
 
@@ -198,7 +198,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
 .pcc_sub __init:
     get_params "(0)", P2
     print "ok 1\n"
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 42
     classoffset I0, P2, "Foo"
     setattribute P2, I0, P10
@@ -652,7 +652,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
-    new P10, .String
+    new P10, 'String'
     set P10, "_new"
     newclass P1, "Foo"
     setprop P1, "BUILD", P10
@@ -899,7 +899,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUTPUT', "bound NCI method" );
 .sub main :main
     .local pmc s, l, f
-    s = new String
+    s = new 'String'
     s = "ABC\n"
     f = getattribute s, "lower"
     typeof $S0, f
@@ -920,7 +920,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
     cl = newclass "Foo"
     addattribute cl, "n"
     o = new "Foo"
-    n = new Integer
+    n = new 'Integer'
     n = 2000
     setattribute o, "Foo\0n", n
     o.go()
@@ -986,7 +986,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".Super - test dispatch with two classes" )
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 CODE
@@ -1020,7 +1020,7 @@ TODO: {
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 CODE
@@ -1049,7 +1049,7 @@ OUTPUT
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1057,7 +1057,7 @@ OUTPUT
 .sub foo :method
     print "GrandChild foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1089,7 +1089,7 @@ OUTPUT
 .sub foo :method
     print "Child1 foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1097,7 +1097,7 @@ OUTPUT
 .sub foo :method
     print "Child2 foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1105,7 +1105,7 @@ OUTPUT
 .sub foo :method
     print "Inbred foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1403,9 +1403,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', ":flat args to NCI methods" );
 ## an NCI method) with a :flat arg,  Fixes RT#44247.
 .sub _ :main
     .local pmc arr, file
-    arr = new .ResizablePMCArray
+    arr = new 'ResizablePMCArray'
     push arr, 'no such file.txt'
-    file = new .File
+    file = new 'File'
     $I0 = file.exists(arr :flat)
     print "exists:  "
     print $I0

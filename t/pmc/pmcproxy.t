@@ -24,8 +24,8 @@ Tests the PMCProxy PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, .PMCProxy
-    say 'ok 1 - $P0 = new .PMCProxy'
+    new $P0, 'PMCProxy'
+    say "ok 1 - $P0 = new 'PMCProxy'"
 
     $I0 = isa $P0, 'PMCProxy'
     if $I0 goto ok_2
@@ -34,7 +34,7 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
     say "ok 2 - isa $P0, 'PMCProxy'"
 .end
 CODE
-ok 1 - $P0 = new .PMCProxy
+ok 1 - $P0 = new 'PMCProxy'
 ok 2 - isa $P0, 'PMCProxy'
 OUT
 

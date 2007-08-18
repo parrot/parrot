@@ -82,7 +82,7 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_dlvar_double_decl
-    nci_dlvar_double_decl = new ResizablePMCArray
+    nci_dlvar_double_decl = new 'ResizablePMCArray'
     push nci_dlvar_double_decl, .DATATYPE_DOUBLE
     push nci_dlvar_double_decl, 0
     push nci_dlvar_double_decl, 0
@@ -144,7 +144,7 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_dlvar_float_decl
-    nci_dlvar_float_decl = new ResizablePMCArray
+    nci_dlvar_float_decl = new 'ResizablePMCArray'
     push nci_dlvar_float_decl, .DATATYPE_FLOAT
     push nci_dlvar_float_decl, 0
     push nci_dlvar_float_decl, 0
@@ -231,7 +231,7 @@ OUTPUT
 
     # the contained structure pointer
     .local pmc nci_p_out_decl
-    nci_p_out_decl = new ResizablePMCArray
+    nci_p_out_decl = new 'ResizablePMCArray'
     push nci_p_out_decl, .DATATYPE_INT
     push nci_p_out_decl, 0
     push nci_p_out_decl, 0
@@ -324,7 +324,7 @@ SKIP:
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
-    nci_dlvar_int_decl = new ResizablePMCArray
+    nci_dlvar_int_decl = new 'ResizablePMCArray'
     push nci_dlvar_int_decl, .DATATYPE_INT
     push nci_dlvar_int_decl, 0
     push nci_dlvar_int_decl, 0
@@ -679,7 +679,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_i4i", "i4i"
-  new P5, .Integer
+  new P5, 'Integer'
   set P5, -6
   set I5, -7
   set_args "(0,0)", P5,I5
@@ -698,7 +698,7 @@ OUTPUT
   dlfunc P0, P1, "nci_ii3", "ii3"
   set I5, -6
 
-  new P5, .Integer
+  new P5, 'Integer'
   set P5, -7
 
   set_args "(0,0)", I5,P5
@@ -749,7 +749,7 @@ OUTPUT
   set_args "(0)", I5
   get_results "(0)", P5
   invokecc P0
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
   push P2, 2	# 2 elem array
@@ -781,7 +781,7 @@ OUTPUT
   set_args "(0)", 1
   get_results "(0)", P5
   invokecc P0
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_FLOAT
   push P2, 2	# 2 elem array
@@ -813,7 +813,7 @@ OUTPUT
   set_args "(0)", 2
   get_results "(0)", P5
   invokecc P0
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_CHAR
   push P2, 0
@@ -847,7 +847,7 @@ OUTPUT
   set_args "(0)", 3
   get_results "(0)", P5
   invokecc P0
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_CSTR
   push P2, 0
@@ -877,7 +877,7 @@ OUTPUT
   invokecc P0
 .include "datatypes.pasm"
   # the contained structure
-  new P3, .ResizablePMCArray
+  new P3, 'ResizablePMCArray'
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -887,9 +887,9 @@ OUTPUT
   push P3, .DATATYPE_DOUBLE
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -931,16 +931,16 @@ OUTPUT
   invokecc P0
 .include "datatypes.pasm"
   # the contained structure pointer
-  new  P6, .OrderedHash
+  new  P6, 'OrderedHash'
   set  P6[ 'i' ], .DATATYPE_INT
   push P6, 0
   push P6, 0
   set  P6[ 'j' ], .DATATYPE_INT
   push P6, 0
   push P6, 0
-  new P7, .UnManagedStruct, P6
+  new P7, 'UnManagedStruct', P6
   # the contained structure
-  new  P3, .OrderedHash
+  new  P3, 'OrderedHash'
   set  P3[ 'i'  ], .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -952,9 +952,9 @@ OUTPUT
   setprop P1, "_struct", P7
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .OrderedHash
+  new P2, 'OrderedHash'
   set  P2[ 'x'  ], .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1000,12 +1000,12 @@ OUTPUT
   set_args "(0)", 5
   get_results "(0)", P5
   invokecc P0
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
   set P1, P2[-1]
-  new P3, .String
+  new P3, 'String'
   set P3, "it"
   setprop P1, "_signature", P3
   push P2, 0
@@ -1033,16 +1033,16 @@ OUTPUT
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
-  new P3, .ResizablePMCArray
+  new P3, 'ResizablePMCArray'
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1088,16 +1088,16 @@ OUTPUT
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
-  new P3, .ResizablePMCArray
+  new P3, 'ResizablePMCArray'
   push P3, .DATATYPE_CHAR
   push P3, 0
   push P3, 0
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -1143,16 +1143,16 @@ OUTPUT
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
-  new P3, .OrderedHash
+  new P3, 'OrderedHash'
   set P3["i"], .DATATYPE_CHAR
   push P3, 0
   push P3, 0
   set P3["j"], .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .OrderedHash
+  new P2, 'OrderedHash'
   set P2["x"], .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -1209,7 +1209,7 @@ OUTPUT
 
   # the contained structure pointer
   .local pmc nci_pi_out_decl
-  nci_pi_out_decl = new ResizablePMCArray
+  nci_pi_out_decl = new 'ResizablePMCArray'
   push nci_pi_out_decl, .DATATYPE_INT
   push nci_pi_out_decl, 0
   push nci_pi_out_decl, 0
@@ -1232,7 +1232,7 @@ OUTPUT
   # this test function wants a struct
   # { double d; float f; int i; char*}
   # and returns the sum of these values
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_DOUBLE
   push P2, 0
@@ -1246,7 +1246,7 @@ OUTPUT
   push P2, .DATATYPE_CSTR
   push P2, 0	# 1 elem array
   push P2, 0
-  new P5, .ManagedStruct, P2
+  new P5, 'ManagedStruct', P2
   set I6, 0
   sizeof I7, .DATATYPE_DOUBLE
   add I6, I7
@@ -1276,7 +1276,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
-  new P5, .String
+  new P5, 'String'
   set P5, "ok\n"
   set_args "(0)", P5
   invokecc P0
@@ -1294,12 +1294,12 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM" );
 
   # we need a flag if the call_back is already done
-  new P10, .Integer
+  new P10, 'Integer'
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
-  new P7, .Integer
+  new P7, 'Integer'
   set P7, 42
   new_callback P5, P6, P7, "vtU" # Z in pdd16
   print "ok 1\n"
@@ -1356,13 +1356,13 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new Integer
+    cb_done = new 'Integer'
     cb_done = 0
     store_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new Integer
+    user_data = new 'Integer'
     user_data = 42
 
     # A Sub that can be given to the library
@@ -1426,12 +1426,12 @@ OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C2 - PASM" );
   # we need a flag if the call_back is already done
-  new P10, .Integer
+  new P10, 'Integer'
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
-  new P7, .Integer
+  new P7, 'Integer'
   set P7, 42
   new_callback P5, P6, P7, "viU"	# Z in pdd16
   print "ok 1\n"
@@ -1492,13 +1492,13 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new Integer
+    cb_done = new 'Integer'
     cb_done = 0
     store_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new Integer
+    user_data = new 'Integer'
     user_data = 42
 
     # A Sub that can be given to the library
@@ -1544,7 +1544,7 @@ ERROR:
   print "\n"
 
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1573,12 +1573,12 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D1 - PASM" );
 
   # we need a flag if the call_back is already done
-  new P10, .Integer
+  new P10, 'Integer'
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
-  new P7, .Integer
+  new P7, 'Integer'
   set P7, 42
   new_callback P5, P6, P7, "vUt"	# Z in pdd16
   print "ok 1\n"
@@ -1631,12 +1631,12 @@ OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PASM" );
   # we need a flag if the call_back is already done
-  new P10, .Integer
+  new P10, 'Integer'
   store_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
   .const .Sub P6 = "_call_back"
   # prepare user data
-  new P7, .Integer
+  new P7, 'Integer'
   set P7, 42
   new_callback P5, P6, P7, "vUi"	# Z in pdd16
   print "ok 1\n"
@@ -1694,13 +1694,13 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new Integer
+    cb_done = new 'Integer'
     cb_done = 0
     store_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new Integer
+    user_data = new 'Integer'
     user_data = 42
 
     # A Sub that can be given to the library
@@ -1771,13 +1771,13 @@ OUTPUT
 
     # this flag will be set by the callback function
     .local pmc cb_done
-    cb_done = new Integer
+    cb_done = new 'Integer'
     cb_done = 0
     store_global "cb_done", cb_done
 
     # prepare user data
     .local pmc user_data
-    user_data = new Integer
+    user_data = new 'Integer'
     user_data = 42
 
     # A Sub that can be given to the library
@@ -1824,7 +1824,7 @@ ERROR:
   print "\n"
 
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1861,7 +1861,7 @@ OUTPUT
     bounds 1
     # prepare user data
     .local pmc user_data
-    user_data = new Integer
+    user_data = new 'Integer'
     user_data = 42
 
     # load libnci_test
@@ -1872,7 +1872,7 @@ OUTPUT
     .local pmc int_cb_D4
     int_cb_D4 = dlvar libnci_test, "int_cb_D4"
     .local pmc int_cb_D4_decl
-    int_cb_D4_decl = new ResizablePMCArray
+    int_cb_D4_decl = new 'ResizablePMCArray'
     push int_cb_D4_decl, .DATATYPE_INT
     push int_cb_D4_decl, 0
     push int_cb_D4_decl, 0
@@ -1896,7 +1896,7 @@ OUTPUT
     int_cb_D4[0] = 1
 
     .local pmc synchronous
-    synchronous = new Integer
+    synchronous = new 'Integer'
     synchronous = 1
     setprop user_data, "_synchronous", synchronous
     print "marked callback as synchronous\n"
@@ -1909,7 +1909,7 @@ OUTPUT
 .param pmc u
 .param pmc s
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1952,7 +1952,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pip - array of structs' );
 
 .include "datatypes.pasm"
-  new P3, .OrderedHash
+  new P3, 'OrderedHash'
   set  P3["x"], .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -1965,16 +1965,16 @@ OUTPUT
   set  P3["h"], .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P6, .UnManagedStruct, P3
+  new P6, 'UnManagedStruct', P3
 
-  new P4, .OrderedHash
+  new P4, 'OrderedHash'
   set  P4["Rect"], .DATATYPE_STRUCT
   set P1, P4[-1]
   setprop P1, "_struct", P6
   push P4, 4
   push P4, 0
 
-  new P5, .ManagedStruct, P4
+  new P5, 'ManagedStruct', P4
   set P5[0;0;'x'], 100
   set P5[0;0;'y'], 110
   set P5['Rect';0;'w'], 120
@@ -2024,9 +2024,9 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
 
 .include "datatypes.pasm"
-  new P2, .Integer
+  new P2, 'Integer'
   set P2, 3
-  new P3, .Integer
+  new P3, 'Integer'
   set P3, 2
 
   loadlib P1, "libnci_test"
@@ -2053,13 +2053,13 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 
 .include "datatypes.pasm"
-  new  P8, .OrderedHash
+  new  P8, 'OrderedHash'
   set  P8[ 'y' ],      .DATATYPE_INT
   push P8, 0
   push P8, 0
-  new  P9, .ManagedStruct, P8
+  new  P9, 'ManagedStruct', P8
 
-  new  P6, .OrderedHash
+  new  P6, 'OrderedHash'
   set  P6[ 'x' ],      .DATATYPE_INT
   push P6, 0
   push P6, 0
@@ -2071,7 +2071,7 @@ OUTPUT
   push P6, 0
   push P6, 0
 
-  new  P5, .ManagedStruct, P6
+  new  P5, 'ManagedStruct', P6
   set  P9[ 'y' ], 200
   set  P5[ 'x' ], 100
 
@@ -2119,16 +2119,16 @@ OUTPUT
   get_results "(0)", P5
   invokecc P0
 
-  new  P6, .OrderedHash
+  new  P6, 'OrderedHash'
   set  P6[ 'count' ], .DATATYPE_INT
   push P6, 0
   push P6, 0
 
-  new  P7, .OrderedHash
+  new  P7, 'OrderedHash'
   set  P7[ 'array' ], .DATATYPE_INT
   push P7, 0
   push P7, 0
-  new P8, .UnManagedStruct, P7
+  new P8, 'UnManagedStruct', P7
   # yes, the array within the struct has _4_ elements
   # but with an UnManagedStruct, you can't always know the amount beforehand
   set  P6[ 'array' ], .DATATYPE_STRUCT_PTR
@@ -2191,7 +2191,7 @@ OUTPUT
 
   # the contained structure pointer
   .local pmc product_pointer_decl
-  product_pointer_decl = new ResizablePMCArray
+  product_pointer_decl = new 'ResizablePMCArray'
   push product_pointer_decl, .DATATYPE_INT
   push product_pointer_decl, 0
   push product_pointer_decl, 0
@@ -2250,7 +2250,7 @@ SKIP:
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
-    nci_dlvar_int_decl = new ResizablePMCArray
+    nci_dlvar_int_decl = new 'ResizablePMCArray'
     push nci_dlvar_int_decl, .DATATYPE_INT
     push nci_dlvar_int_decl, 0
     push nci_dlvar_int_decl, 0
@@ -2376,7 +2376,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "opcode 'does'" );
 
 .sub test :main
     .local pmc pmc1
-    pmc1 = new ParrotLibrary
+    pmc1 = new 'ParrotLibrary'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -2404,7 +2404,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion d <-> P" );
     .local pmc twice
     twice = dlfunc libnci_test, "nci_dd", "dd"
     .local pmc f, g
-    f = new Integer
+    f = new 'Integer'
     f = 21
     g = twice( f )
     print g
@@ -2423,7 +2423,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion S <-> P" );
     .local pmc reverse
     reverse = dlfunc libnci_test, "nci_tt", "tt"
     .local pmc s, t
-    s = new String
+    s = new 'String'
     s = "ko"
     t = reverse( s )
     print t
@@ -2441,7 +2441,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
     .local pmc mult
     mult = dlfunc libnci_test, "nci_i4i", "i4i"
     .local pmc i, j
-    i = new Integer
+    i = new 'Integer'
     i = 2
     j = mult( 21, i )       # call signature is PI
     print j
@@ -2462,13 +2462,13 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'nested structs should be independent', t
     libnci_test = loadlib library_name
 
     .local pmc types
-    types = new .OrderedHash
+    types = new 'OrderedHash'
     types['y'] = .DATATYPE_INT
     push types, 0
     push types, 0
 
     .local pmc nested
-    nested = new .ManagedStruct, types
+    nested = new 'ManagedStruct', types
 
     .local pmc outer
     outer = make_outer_struct( nested )
@@ -2508,7 +2508,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'nested structs should be independent', t
     .param pmc nested
 
     .local pmc types
-    types        = new .OrderedHash
+    types        = new 'OrderedHash'
     types[ 'x' ] = .DATATYPE_INT
     push types, 0
     push types, 0
@@ -2521,7 +2521,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'nested structs should be independent', t
     push types, 0
 
     .local pmc outer
-    outer = new .ManagedStruct, types
+    outer = new 'ManagedStruct', types
 
     .return( outer )
 .end

@@ -43,7 +43,7 @@ CODE
 
 pasm_output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
       interpinfo I1, 2   # How many DOD runs have we done already?
-      new P0, .Undef
+      new P0, 'Undef'
       needs_destroy P0
       sweep 0
       interpinfo I2, 2   # Should be one more now
@@ -54,9 +54,9 @@ CODE
 
 pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy" );
       interpinfo I1, 2   # How many DOD runs have we done already?
-      new P0, .Undef
+      new P0, 'Undef'
       needs_destroy P0
-      new P0, .Undef # kill object
+      new P0, 'Undef' # kill object
       sweep 0
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
@@ -129,7 +129,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "sweepoff with newpmcs" );
     sweepoff
     set I0, 0
 
-LOOP: new P0, .String
+LOOP: new P0, 'String'
     set P0, "ABC"
     save P0
     inc I0
@@ -157,14 +157,14 @@ loop:
     end
 
 .pcc_sub _rand:
-    new P16, .Random
+    new P16, 'Random'
     set I5, P16[10]
     gt I5, 10, err
     lt I5, 0, err
     returncc
 err:
     print "singleton destroyed .Random = ."
-    new P16, .Random
+    new P16, 'Random'
     typeof S16, P16
     print S16
     print "\n"
@@ -187,7 +187,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
 .sub init :vtable :method
     print "init\n"
     sweep 1
-    new P6, .String
+    new P6, 'String'
     set P6, "hi"
     self."do_inc"()
     sweep 1
@@ -229,7 +229,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     sweep 1
     unless_null P12, buffer_ok
     new P12, "Source::Buffer"
-    new P14, .String
+    new P14, 'String'
     set P14, "hello\n"
     setprop P12, "buf", P14
     setprop P2, "buffer", P12
@@ -290,7 +290,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     $P0."recursion_limit"(10)
     newpdd15class $P0, "b"
     $P0 = new "b"
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = 0
     n = $P0."b11"($P1)
     print "ok 1\n"
@@ -303,7 +303,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     .local pmc n1
     # new_pad -1
     # store_lex -1, "n", n
-    n1 = new Integer
+    n1 = new 'Integer'
     n1 = n + 1
     push_eh catch
     n = self."b11"(n1)
@@ -324,10 +324,10 @@ pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 1" );
 lp3:
     null I0
     set I1, 1000
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
 lp1:
-    new P2, .ResizablePMCArray
-    new P0, .Integer
+    new P2, 'ResizablePMCArray'
+    new P0, 'Integer'
     set P0, I0
     set P2[0], P0
     set P1[I0], P2
@@ -336,8 +336,8 @@ lp1:
     # force marking past P2[0]
     sweep 0
 not_0:
-    new P3, .Undef
-    new P4, .Undef
+    new P3, 'Undef'
+    new P4, 'Undef'
     inc I0
     lt I0, I1, lp1
 
@@ -376,23 +376,23 @@ pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 2 - hash" );
 lp3:
     null I0
     set I1, 100
-    new P1, .Hash
+    new P1, 'Hash'
 lp1:
-    new P2, .Hash
-    new P0, .Integer
+    new P2, 'Hash'
+    new P0, 'Integer'
     set P0, I0
     set S0, I0
     set P2["first"], P0
     set P1[S0], P2
     if I0, not_0
-    new P0, .Integer
+    new P0, 'Integer'
     needs_destroy P0
     null P0
     # force full sweep
     sweep 0
 not_0:
-    new P3, .Undef
-    new P4, .Undef
+    new P3, 'Undef'
+    new P4, 'Undef'
     inc I0
     lt I0, I1, lp1
 
@@ -432,33 +432,33 @@ pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 3 - ref" );
 lp3:
     null I0
     set I1, 100
-    new P5, .Ref
-    new P0, .Integer
+    new P5, 'Ref'
+    new P0, 'Integer'
     needs_destroy P0
     # force partial sweep
     # ref should now be black
     sweep 0
     # store white hash in ref - needs a barrier
-    new P1, .Hash
+    new P1, 'Hash'
     setref P5, P1
     null P1
-    new P0, .Integer
+    new P0, 'Integer'
     needs_destroy P0
     null P0
     # force full sweep
     sweep 0
     deref P1, P5
 lp1:
-    new P0, .Integer
-    new P2, .Ref, P0
+    new P0, 'Integer'
+    new P2, 'Ref', P0
     set P0, I0
     set S0, I0
     set P1[S0], P2
     if I0, not_0
-    new P0, .Integer
+    new P0, 'Integer'
 not_0:
-    new P3, .Undef
-    new P4, .Undef
+    new P3, 'Undef'
+    new P4, 'Undef'
     inc I0
     lt I0, I1, lp1
 
@@ -500,33 +500,33 @@ pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 4 - tqueue" );
 lp3:
     null I0
     set I1, 10
-    new P5, .TQueue
-    new P0, .Integer
+    new P5, 'TQueue'
+    new P0, 'Integer'
     needs_destroy P0
     # force partial sweep
     # P5 should now be black
     sweep 0
     # store white queue P1 in black P5 - needs a barrier
-    new P1, .TQueue
+    new P1, 'TQueue'
     push P5, P1
     null P1
-    new P0, .Integer
+    new P0, 'Integer'
     needs_destroy P0
     # force  sweep
     sweep 0
     shift P1, P5
     push P5, P1
 lp1:
-    new P0, .Integer
+    new P0, 'Integer'
     needs_destroy P0
     # force  sweep
     sweep 0
     set P0, I0
-    new P2, .TQueue
+    new P2, 'TQueue'
     push P2, P0
     push P1, P2
-    new P3, .Undef
-    new P4, .Undef
+    new P3, 'Undef'
+    new P4, 'Undef'
     inc I0
     lt I0, I1, lp1
 
@@ -567,11 +567,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "verify deleg_pmc object marking" );
     addattribute cl, "o3"
     addattribute cl, "o4"
     s = new "X"
-    $P0 = new String
+    $P0 = new 'String'
     $S0 = "ok" . " 3\n"
     $P0 = $S0
     setattribute s, "X\0o3", $P0
-    $P0 = new String
+    $P0 = new 'String'
     $S0 = "ok" . " 4\n"
     $P0 = $S0
     setattribute s, "X\0o4", $P0
@@ -606,8 +606,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 1" );
 .sub main :main
     .local pmc a, reg, nil
-    reg = new .AddrRegistry
-    a = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
     null nil
     $I0 = reg[a]
     if $I0 == 0 goto ok1
@@ -652,9 +652,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
 .sub main :main
     .local pmc a, b, reg, nil
     null nil
-    reg = new .AddrRegistry
-    a = new .String
-    b = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
+    b = new 'String'
     $I0 = elements reg
     print $I0
     reg[a] = nil
@@ -676,12 +676,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
 .sub main :main
     .local pmc a, b, c, reg, nil, it
     null nil
-    reg = new .AddrRegistry
-    a = new .String
+    reg = new 'AddrRegistry'
+    a = new 'String'
     a = "k1"
-    b = new .String
+    b = new 'String'
     b = "k2"
-    c = new .String
+    c = new 'String'
     c = "k3"
     reg[a] = nil
     reg[b] = nil
@@ -703,14 +703,14 @@ k1k2k3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "reg_stack marking" );
-new P1, .Integer
+new P1, 'Integer'
 set P1, 0
-new P3, .Integer
+new P3, 'Integer'
 set P3, 0
-new P4, .Integer
+new P4, 'Integer'
 set P4, 50
-new P6, .Integer
-new P7, .Integer
+new P6, 'Integer'
+new P7, 'Integer'
 
 LOOP:
   save P1
@@ -740,25 +740,25 @@ PRIMECHECK:
   sweep 1
  restore P5
  lt P5,1,ret0
-new P6, .Integer
+new P6, 'Integer'
  assign P6,P5
  dec P6
 NLOOP:
   le P6, 1, ret1
-new P7, .Integer
+new P7, 'Integer'
   cmod P7, P5, P6
   eq P7, 0, ret0
   dec P6
   branch NLOOP
   # is prime
 ret1:
-  new P0, .Integer
+  new P0, 'Integer'
   set P0, 1
   save P0
   restoreall
   ret
 ret0:
-  new P0, .Integer
+  new P0, 'Integer'
   set P0, 0
   save P0
   restoreall

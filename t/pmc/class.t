@@ -53,9 +53,9 @@ Tests the Class PMC.
 .sub 'new op'
     .local pmc class
     .local int isa_class
-    new class, .Class
+    new class, 'Class'
 
-    ok(1, '$P0 = new .Class')
+    ok(1, "$P0 = new 'Class'")
     isa_ok(class, 'Class')
 .end
 
@@ -66,7 +66,7 @@ Tests the Class PMC.
     .local int class_flags, class_flag_set
     .const int POBJ_IS_CLASS_FLAG = 536870912  # 1 << 29
 
-    new class, .Class
+    new class, 'Class'
     class_flags = pmcinfo class, .PMCINFO_FLAGS    # XXX op currently experimental
     class_flag_set = class_flags & POBJ_IS_CLASS_FLAG
     ok(class_flag_set, 'Class PMC has "I am a class" flag set')
@@ -77,7 +77,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API/=item name>
 .sub 'name'
     .local pmc class, result
-    new class, .Class
+    new class, 'Class'
 
     result = class.'name'()
     is(result, '', 'name() with no args returns class name, which is empty at first')
@@ -104,7 +104,7 @@ Tests the Class PMC.
 .sub 'new method'
     .local pmc class, result, attrib
     .local int isa_object
-    new class, .Class
+    new class, 'Class'
     result = class.'new'()
 
     #isa_ok(result, 'Object')
@@ -120,7 +120,7 @@ Tests the Class PMC.
     ok($I0, 'new() with non-attribute key fails')
 
     $I0 = 1
-    class = new .Class
+    class = new 'Class'
     class.'add_attribute'('foo')
     class.'add_attribute'('bar')
     result = class.'new'('foo' => 1, 'bar' => 2)
@@ -140,7 +140,7 @@ Tests the Class PMC.
 .sub 'attributes'
     .local pmc class, attribs
     .local int test_val
-    new class, .Class
+    new class, 'Class'
     attribs = class.'attributes'()
     test_val = isa attribs, 'Hash'
 
@@ -164,7 +164,7 @@ Tests the Class PMC.
 .sub 'add_attribute'
     .local pmc class, attribs
     .local int test_val
-    new class, .Class
+    new class, 'Class'
 
     $I0 = 1
     push_eh t_no_args
@@ -200,7 +200,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API>
 .sub 'set_attr/get_attr'
     .local pmc class, class_instance, attrib_in, attrib_out
-    new class, .Class
+    new class, 'Class'
     class.'name'("Test")
     class.'add_attribute'("foo")
     ok(1, 'created a class with two attributes')
@@ -208,7 +208,7 @@ Tests the Class PMC.
     class_instance = class.'new'()
     ok(1, 'instantiated the class')
 
-    attrib_in = new Integer
+    attrib_in = new 'Integer'
     attrib_in = 42
     setattribute class_instance, "foo", attrib_in
     ok(1, 'set an attribute')
@@ -222,7 +222,7 @@ Tests the Class PMC.
 .sub 'add_method' # todo => 'not yet implemented'
     .local pmc class, attribs, meth_to_add, test_attr_val
     .local int test_val
-    new class, .Class
+    new class, 'Class'
 
     $I0 = 1
     push_eh t_no_args
@@ -287,7 +287,7 @@ Tests the Class PMC.
 .sub 'parents'
     .local pmc class, parents
     .local int isa_parent
-    new class, .Class
+    new class, 'Class'
     parents = class.'parents'()
 
     ## XXX is this really what's expected?
@@ -307,7 +307,7 @@ Tests the Class PMC.
 .sub 'roles'
     .local pmc class, array
     .local int is_array
-    new class, .Class
+    new class, 'Class'
     array = class.'roles'()
 
     ## XXX is this really what's expected?
@@ -459,7 +459,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API/=item isa>
 .sub 'isa'
     .local pmc class
-    new class, .Class
+    new class, 'Class'
 
     test_isa( class, 'Class', 1 )
     test_isa( class, 'Hash',  0 )

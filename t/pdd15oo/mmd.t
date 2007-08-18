@@ -424,10 +424,10 @@ pir_output_is( <<'CODE', <<'OUT', "MMD second arg int/float dispatch" );
 	print "\n"
 .end
 .sub main :main
-	$P0 = new .Float
+	$P0 = new 'Float'
 	$P0 = 9.5
 	foo(1, $P0)
-	$P1 = new .Integer
+	$P1 = new 'Integer'
 	$P1 = 3
 	foo(1, $P1)
 .end
@@ -448,10 +448,10 @@ pir_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" );
 	print "\n"
 .end
 .sub main :main
-	$P0 = new .Float
+	$P0 = new 'Float'
 	$P0 = 9.5
 	foo(1, $P0)
-	$P1 = new .Integer
+	$P1 = new 'Integer'
 	$P1 = 3
 	foo(1, $P1)
 .end
@@ -1057,7 +1057,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "mmd bug reported by Jeff" );
 
     $P0.'bar'('Bar!')
 
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = "Bar!"
     $P0.'bar'($P1)
 
@@ -1164,13 +1164,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/o .HLL" );
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     $P9 = 'foo'($P0)
 
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 4
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'hello'
     $P9 = 'foo'($P0, $P1)
 .end
@@ -1192,13 +1192,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161" );
 .HLL 'Perl6', ''
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     $P9 = 'foo'($P0)
 
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 4
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'hello'
     $P9 = 'foo'($P0, $P1)
 .end
@@ -1221,19 +1221,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ flatten" );
 # see also 'rt #39173
 .sub main :main
     .local pmc int_pmc
-    int_pmc = new .Integer
+    int_pmc = new 'Integer'
     int_pmc = 3
 
     .local pmc args
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     push args, int_pmc
     'foo'( args :flat )
 
     .local pmc string_pmc
-    string_pmc = new .String
+    string_pmc = new 'String'
     string_pmc = 'hello'
 
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     push args, string_pmc
     'foo'( args :flat )
     end
@@ -1372,15 +1372,15 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'type mix with _' );
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     'foo'($P0)
     'foo'(2)
     'foo'("1")
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "0"
     'foo'($P0)
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     'foo'($P0)
 .end
 
@@ -1418,9 +1418,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':multi with :outer' );
 .sub main :main
-    new $P0, .String
+    new $P0, 'String'
     assign $P0, 'arg0'
-    new $P1, .String
+    new $P1, 'String'
     assign $P1, 'arg1'
 
     $P99 = "foo"($P0)

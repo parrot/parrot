@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro diamond" );
     subclass F, C, "F"
     addparent F, D
     m = get_mro F
-    it = new .Iterator, m
+    it = new 'Iterator', m
     it = 0
 loop:
     unless it goto ex
@@ -114,7 +114,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 1" );
     .local pmc m, it, p
 
     m = get_mro A
-    it = new .Iterator, m
+    it = new 'Iterator', m
     it = 0
 loop:
     unless it goto ex
@@ -185,7 +185,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 2" );
     .local pmc m, it, p
 
     m = get_mro A
-    it = new .Iterator, m
+    it = new 'Iterator', m
     it = 0
 loop:
     unless it goto ex
@@ -223,7 +223,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 3" );
     .local pmc m, it, p
 
     m = get_mro D
-    it = new .Iterator, m
+    it = new 'Iterator', m
     it = 0
 loop:
     unless it goto ex
@@ -283,7 +283,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "print mro 4" );
     .local pmc m, it, p
 
     m = get_mro Vulcan
-    it = new .Iterator, m
+    it = new 'Iterator', m
     it = 0
 loop:
     unless it goto ex

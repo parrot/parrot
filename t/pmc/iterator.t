@@ -24,8 +24,8 @@ Tests the C<Iterator> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
-    new P2, .ResizablePMCArray
-    new P1, .Iterator, P2
+    new P2, 'ResizablePMCArray'
+    new P1, 'Iterator', P2
     print "ok 1\n"
     end
 CODE
@@ -34,24 +34,24 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
     .include "iterator.pasm"
-    new P0, .ResizablePMCArray    # empty array
-    new P2, .ResizablePMCArray    # array with 2 elements
+    new P0, 'ResizablePMCArray'    # empty array
+    new P2, 'ResizablePMCArray'    # array with 2 elements
     push P2, 10
     push P2, 20
     set I0, P2
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == array.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, .Iterator, P0
+    new P1, 'Iterator', P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -110,24 +110,24 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
     .include "iterator.pasm"
-    new P0, .Hash    # empty Hash
-    new P2, .Hash    # Hash with 2 elements
+    new P0, 'Hash'    # empty Hash
+    new P2, 'Hash'    # Hash with 2 elements
     set P2["ab"], 100
     set P2["xy"], "value"
     set I0, P2
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, .Iterator, P0
+    new P1, 'Iterator', P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -164,24 +164,24 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
     .include "iterator.pasm"
-    new P0, .Hash    # empty Hash
-    new P2, .Hash    # Hash with 2 elements
+    new P0, 'Hash'    # empty Hash
+    new P2, 'Hash'    # Hash with 2 elements
     set P2["ab"], 100
     set P2["xy"], "value"
     set I0, P2
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, .Iterator, P0
+    new P1, 'Iterator', P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -218,8 +218,8 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
     .include "iterator.pasm"
-    new P0, .Hash    # Hash for iteration
-    new P2, .Hash    # for test
+    new P0, 'Hash'    # Hash for iteration
+    new P2, 'Hash'    # for test
 
     set I0, 65
     set I1, 35
@@ -231,7 +231,7 @@ fill:
     dec I1
     if I1, fill
 
-    new P1, .Iterator, P0
+    new P1, 'Iterator', P0
     set I0, P1
     eq I0, I10, ok1
     print "not "
@@ -258,9 +258,9 @@ ok 2
 OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -279,9 +279,9 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -300,9 +300,9 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "ABC"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -321,9 +321,9 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
 .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "ABC"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -345,13 +345,13 @@ pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
-    string_1 = new String
+    string_1 = new 'String'
     string_1 = "abcd\x65\x66\x67"
     print string_1
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new Iterator, string_1
+    iter_1 = new 'Iterator', string_1
     iter_1 = .ITERATE_FROM_START
 
     .local int code_point_1
@@ -382,14 +382,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Index access for Iterator on String" );
 .include "iterator.pasm"
 .sub _main
     .local pmc string_1
-    string_1 = new String
+    string_1 = new 'String'
     string_1 = "abcd\x65\x66\x67"
     print 'String new: '
     print string_1
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new Iterator, string_1
+    iter_1 = new 'Iterator', string_1
     iter_1 = .ITERATE_FROM_START
 
     .local int    code_point_1
@@ -432,7 +432,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
 .include "iterator.pasm"
 .sub _main
     .local pmc array_1
-    array_1 = new ResizablePMCArray
+    array_1 = new 'ResizablePMCArray'
     push array_1, 'a'
     push array_1, 'b'
     push array_1, 'c'
@@ -447,7 +447,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new Iterator, array_1
+    iter_1 = new 'Iterator', array_1
     iter_1 = .ITERATE_FROM_START
 
     .local string elem_1
@@ -502,7 +502,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
     print "\n"
 
     .local pmc iter_2
-    iter_2 = new Iterator, array_1
+    iter_2 = new 'Iterator', array_1
     iter_2 = .ITERATE_FROM_END
 
     print 'Iterator shift_float: '
@@ -539,12 +539,12 @@ SKIP: {
     pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
     .include "iterator.pasm"
 
-    new P2, .ResizablePMCArray    # array with 4 elements
+    new P2, 'ResizablePMCArray'    # array with 4 elements
     push P2, 10
     push P2, 20
     push P2, 30
     push P2, 40
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
 
     set I0, P1        # arr.length
@@ -581,12 +581,12 @@ OUTPUT
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice syntax" );
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    slice P2, P0[2 .. 3, 4, 5 ..6]
    slice P2, P0[10 ..]
    slice P2, P0[.. 11]
    slice P2, P0[I1..3]
-   new P1, .Hash
+   new P1, 'Hash'
    slice P2, P1["0","a".."b","c"]
    print "ok\n"
    end
@@ -595,7 +595,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice creates an iterator" );
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    slice P2, P0[2 .. 3, 4, 5 ..6]
    typeof S0, P2
    print S0
@@ -607,7 +607,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter simple array elements" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -634,7 +634,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter simple array elements - repeat" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -671,7 +671,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter string" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot"
     slice P1, P2[0,1,4,5]
     set P1, .ITERATE_FROM_START
@@ -692,7 +692,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter start range" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -718,7 +718,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter end range" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -744,7 +744,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter start range, value" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -772,7 +772,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter range, value" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -801,7 +801,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slice iter range, range" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -833,7 +833,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter string range" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot rocks"
     slice P1, P2[1 ..3 ,5, 8 ..9]
     set P1, .ITERATE_FROM_START
@@ -854,7 +854,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter string range 2" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot rocks"
     slice P1, P2[ ..3 ,5, 8 ..]
     set P1, .ITERATE_FROM_START
@@ -875,7 +875,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter string variable range" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot rocks"
     set I0, 1
     set I1, 3
@@ -900,7 +900,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter hash values" );
     .include "iterator.pasm"
-    new P2, .Hash
+    new P2, 'Hash'
     set P2["a"], 100
     set P2["b"], 200
     set P2["c"], 300
@@ -924,7 +924,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter hash values 2" );
     .include "iterator.pasm"
-    new P2, .Hash
+    new P2, 'Hash'
     set P2["a"], 100
     set P2["b"], 200
     set P2["c"], 300
@@ -952,7 +952,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter range" );
     .include "iterator.pasm"
-    new P2, .Hash
+    new P2, 'Hash'
     set P2["a"], 10
     set P2["b"], 20
     set P2["c"], 30
@@ -978,7 +978,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter range 2" );
     .include "iterator.pasm"
-    new P2, .Hash
+    new P2, 'Hash'
     set P2["a"], 10
     set P2["b"], 20
     set P2["c"], 30
@@ -1012,7 +1012,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "slice iter range - vars" );
     .include "iterator.pasm"
-    new P2, .Hash
+    new P2, 'Hash'
     set P2["a"], 10
     set P2["b"], 20
     set P2["c"], 30
@@ -1054,8 +1054,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "xrange iterator" );
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
-    new P2, .Slice [10 .. 14]
-    new P1, .Iterator,  P2
+    new P2, 'Slice' [10 .. 14]
+    new P1, 'Iterator',  P2
 
     set P1, .ITERATE_FROM_START
 #    I0 = P1."len"()
@@ -1082,8 +1082,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "xrange iterator ..n" );
 .sub main
     .include "iterator.pasm"
         # xrange(4)
-    new P2, .Slice [ .. 4]
-    new P1, .Iterator,  P2
+    new P2, 'Slice' [ .. 4]
+    new P1, 'Iterator',  P2
 
     set P1, .ITERATE_FROM_START
 #    I0 = P1."len"()
@@ -1110,7 +1110,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slice, get strings from array" );
 .sub main :main
     .include "iterator.pasm"
     .local pmc ar
-    ar = new ResizablePMCArray
+    ar = new 'ResizablePMCArray'
     push ar, "a"
     push ar, "b"
     push ar, "c"
@@ -1133,7 +1133,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
    .include "iterator.pasm"
-   new P0, .ResizablePMCArray
+   new P0, 'ResizablePMCArray'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -1168,7 +1168,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
     .include "iterator.pasm"
-    new P2, .String
+    new P2, 'String'
     set P2, "parrot"
     iter P1, P2
 iter_loop:
@@ -1188,7 +1188,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "intlist iter vtable" );
    .include "iterator.pasm"
-   new P0, .IntList
+   new P0, 'IntList'
    push P0, 100
    push P0, 200
    push P0, 300
@@ -1226,7 +1226,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'xrange iterator, get_iter' );
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
-    new P2, .Slice [10 .. 14]
+    new P2, 'Slice' [10 .. 14]
     P1 = iter  P2
 #    I0 = P1."len"()
 iter_loop:
@@ -1256,7 +1256,7 @@ TODO: {
     .local string k
     .local int i,v
 
-    h = new .Hash
+    h = new 'Hash'
     i = 0
 lp1:
     $I0 = i + 65
@@ -1266,7 +1266,7 @@ lp1:
     if i < 10 goto lp1
 
     it = iter h
-    ar = new ResizablePMCArray
+    ar = new 'ResizablePMCArray'
     i = 20
 lp2:
     unless it goto ex
@@ -1300,7 +1300,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "by default, iterate from start" );
 .sub main :main
     .local pmc ar, it
-    ar= new ResizablePMCArray
+    ar= new 'ResizablePMCArray'
     push ar, 'pi'
     push ar, 3
     push ar, 6.28
@@ -1322,9 +1322,9 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "iterator can be cloned" );
 .sub main :main
     .local pmc ar, i1, i2
-    ar = new ResizableIntegerArray
+    ar = new 'ResizableIntegerArray'
     push ar, 17
-    new i1, .Iterator, ar
+    new i1, 'Iterator', ar
     clone i2, i1
 .end
 CODE
@@ -1333,11 +1333,11 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "cloned iterator independent of original" );
 .sub main :main
     .local pmc ar, i1, i2
-    ar = new ResizableIntegerArray
+    ar = new 'ResizableIntegerArray'
     push ar, 17
     push ar, 42
 
-    new i1, .Iterator, ar
+    new i1, 'Iterator', ar
     clone i2, i1
 
     .local Integer temp
@@ -1367,10 +1367,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone of partly-advanced iterator" );
 .sub main :main
     .local pmc ar, i1, i2
     .local Integer temp
-    ar = new ResizableIntegerArray
+    ar = new 'ResizableIntegerArray'
     push ar, 1
     push ar, 2
-    new i1, .Iterator, ar
+    new i1, 'Iterator', ar
 
     shift temp, i1
     unless temp == 1 goto fail
@@ -1397,10 +1397,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "cloned iterator doesn't copy the array to 
 .sub main :main
     .local pmc ar, i1, i2
     .local Integer temp
-    temp = new Integer
-    ar   = new ResizableIntegerArray
+    temp = new 'Integer'
+    ar   = new 'ResizableIntegerArray'
     push ar, 1
-    new i1, .Iterator, ar
+    new i1, 'Iterator', ar
 
     # i1 and i2 now "point" to the same element of the same array.
     clone i2, i1

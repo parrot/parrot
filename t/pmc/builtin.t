@@ -25,7 +25,7 @@ Tests builtin opcode-like methods.
 pir_output_is( <<'CODE', <<'OUT', "three ways to call a method" );
 .sub main :main
     .local pmc x, y, cl, m
-    x = new Float
+    x = new 'Float'
     x = 1.0
     # opcode syntax
     print "opcode        "
@@ -59,7 +59,7 @@ pir_output_is( <<'CODE', <<'OUT', "say" );
     say io, "ok 4"
     "say"(io, "ok 5")
     .local pmc s
-    s = new .String
+    s = new 'String'
     s = "ok 6"
     say io, s
     s = "ok 7"
@@ -80,7 +80,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUT', "bound methods" );
 .sub main :main
     .local pmc x, y, cl, m
-    x = new Float
+    x = new 'Float'
     x = 1.0
     # bound object nethod
     m = getattribute x, "cos"	# m = x.cos

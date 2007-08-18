@@ -71,10 +71,10 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
-    new P5, .Integer
+    new P5, 'Integer'
     set P5, 3
     store_global "foo", P5
-    new P1, .Continuation
+    new P1, 'Continuation'
     set_addr P1, endcont
 endcont:
     find_global P4, "foo"
@@ -103,7 +103,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
-    new P1, .Continuation
+    new P1, 'Continuation'
     defined I1, P1
     print I1
     print "\n"
@@ -376,7 +376,7 @@ OK2:  print "ok 2\n"
       end
 
 .pcc_sub :outer(main) f2:
-      new P1, .Undef
+      new P1, 'Undef'
       end
 CODE
 ok 1
@@ -403,7 +403,7 @@ OK2:  print "ok 2\n"
       end
 
 .pcc_sub f2:
-      new P1, .Undef
+      new P1, 'Undef'
       end
 CODE
 ok 1
@@ -763,7 +763,7 @@ pir_output_is( <<'CODE', '', 'warn on in main' );
     _f1()
 .end
 .sub _f1
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     print $P0
 .end
 CODE
@@ -772,7 +772,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub" );
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     print $P0
     print "ok\n"
 .end
@@ -790,7 +790,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
 .sub _main :main
 .include "warnings.pasm"
     _f1()
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     print "back\n"
     print $P0
     print "ok\n"
@@ -798,7 +798,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
 .sub _f1
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     print $P0
 .end
 .sub _f2
@@ -1030,7 +1030,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
 .sub make_pi :immediate, :anon
     $N0 = atan 1.0, 1.0
     $N0 *= 4
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = $N0
     .return ($P0)
 .end
@@ -1050,7 +1050,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );
     cl = newpdd15class "Foo"
     addattribute cl, 'x'
     o = new 'Foo'
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     setattribute o, 'x', $P0
     .return (o)
@@ -1325,7 +1325,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'assign' );
 .sub main :main
     $P0 = get_global 'ok'
 
-    $P1 = new .Undef
+    $P1 = new 'Undef'
     assign $P1, $P0
 
     $P1()
@@ -1342,7 +1342,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'assign w/:outer' );
 .sub main :main
     $P0 = get_global 'ok'
 
-    $P1 = new .Undef
+    $P1 = new 'Undef'
     assign $P1, $P0
 
     $P1()

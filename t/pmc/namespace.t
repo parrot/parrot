@@ -26,17 +26,17 @@ Test the NameSpace PMC as described in PDD21.
 # L<PDD21/Namespace PMC API/>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, .NameSpace
-    say 'ok 1 - $P0 = new .NameSpace'
+    new $P0, 'NameSpace'
+    say "ok 1 - $P0 = new 'NameSpace'"
 .end
 CODE
-ok 1 - $P0 = new .NameSpace
+ok 1 - $P0 = new 'NameSpace'
 OUT
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
 pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
 .sub 'test' :main
-    new $P0, .NameSpace
+    new $P0, 'NameSpace'
     $I0 = does $P0, 'hash'
     if $I0 goto ok_1
     print 'not '
@@ -426,7 +426,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "ns.name()" );
     .include "interpinfo.pasm"
     $P0 = get_root_namespace
     $P1 = $P0["parrot"]
-    $P3 = new .NameSpace
+    $P3 = new 'NameSpace'
     $P1["Foo"] = $P3
     $P2 = $P3.'get_name'()
     $I2 = elements $P2
@@ -444,10 +444,10 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc" );
 .sub main :main
     .include "interpinfo.pasm"
-    $P3 = new .NameSpace
+    $P3 = new 'NameSpace'
     set_hll_global "Foo", $P3
     # fetch w array
-    $P4 = new .FixedStringArray
+    $P4 = new 'FixedStringArray'
     $P4 = 1
     $P4[0] = 'Foo'
     $P0 = get_hll_namespace $P4
@@ -565,7 +565,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 .HLL '_Tcl', ''
 
 .sub huh
-  $P0 = new .Integer
+  $P0 = new 'Integer'
   $P0 = 3.14
   store_global '$variable', $P0
 .end
@@ -614,7 +614,7 @@ OUTPUT
 .HLL 'eek', ''
 
 .sub foo :load :anon
-  $P1 = new .String
+  $P1 = new 'String'
   $P1 = "3.14\n"
   store_global '$whee', $P1
 .end
@@ -657,7 +657,7 @@ SKIP:
 .namespace
 
 .sub a :immediate
-  $P1 = new .String
+  $P1 = new 'String'
   $P1 = "ok\n"
   store_global 'sub_namespace', "eek", $P1
 ## store_global "eek", $P1
@@ -688,9 +688,9 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination 
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
-    ar = new .ResizableStringArray
+    ar = new 'ResizableStringArray'
     push ar, 'foo'
-    nsa = new .Null
+    nsa = new 'Null'
     nsb = get_namespace ['B']
     nsb.'export_to'(nsa, ar)
 .end
@@ -707,7 +707,7 @@ pir_error_output_like(
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
-    ar = new .Null
+    ar = new 'Null'
     nsa = get_namespace
     nsb = get_namespace ['B']
     nsb.'export_to'(nsa, ar)
@@ -725,7 +725,7 @@ pir_error_output_like(
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
-    ar = new .ResizableStringArray
+    ar = new 'ResizableStringArray'
     nsa = get_namespace
     nsb = get_namespace ['B']
     nsb.'export_to'(nsa, ar)
@@ -743,7 +743,7 @@ pir_error_output_like(
 .sub 'test' :main
     .local pmc nsa, nsb, ar
 
-    ar = new .Hash
+    ar = new 'Hash'
     nsa = get_namespace
     nsb = get_namespace ['B']
     nsb.'export_to'(nsa, ar)
@@ -762,7 +762,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
     a_foo()
     load_bytecode "$temp_b.pir"
     .local pmc nsr, nsa, nsb, ar
-    ar = new .ResizableStringArray
+    ar = new 'ResizableStringArray'
     push ar, "b_foo"
     nsr = get_root_namespace
     nsa = nsr['a']
@@ -785,7 +785,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (empty valu
     a_foo()
     load_bytecode "$temp_b.pir"
     .local pmc nsr, nsa, nsb, ar
-    ar = new .Hash
+    ar = new 'Hash'
     ar["b_foo"] = ""
     nsr = get_root_namespace
     nsa = nsr['a']
@@ -808,8 +808,8 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (null value
     a_foo()
     load_bytecode "$temp_b.pir"
     .local pmc nsr, nsa, nsb, ar, nul
-    nul = new .Null
-    ar  = new .Hash
+    nul = new 'Null'
+    ar  = new 'Hash'
     ar["b_foo"] = nul
     nsr = get_root_namespace
     nsa = nsr['a']
@@ -832,7 +832,7 @@ pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (an
     a_foo()
     load_bytecode "$temp_b.pir"
     .local pmc nsr, nsa, nsb, ar
-    ar = new .Hash
+    ar = new 'Hash'
     ar["b_foo"] = "c_foo"
     nsr = get_root_namespace
     nsa = nsr['a']
@@ -896,7 +896,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "find_global with array ('')" );
 .namespace ['foo']
 
 .sub main :main
-  $P0 = new .ResizableStringArray
+  $P0 = new 'ResizableStringArray'
   $P0[0] = ''
   $P0 = find_global $P0, 'print_ok'
   $P0()
@@ -917,7 +917,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "find_global with empty array" );
 .namespace ['foo']
 
 .sub main :main
-  $P0 = new .ResizablePMCArray
+  $P0 = new 'ResizablePMCArray'
   $P0 = find_global $P0, 'print_ok'
   $P0()
   end
@@ -937,7 +937,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Namespace.get_global() with array ('')" );
 .namespace ['foo']
 
 .sub main :main
-  $P1 = new .ResizableStringArray
+  $P1 = new 'ResizableStringArray'
   $P1[0] = ''
   $P1 = get_hll_global $P1, 'print_ok'
   $P1()
@@ -1038,7 +1038,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
 
 .sub a_sub
     .local pmc some_var
-    some_var = new .String
+    some_var = new 'String'
     some_var = 'a string PMC'
     store_global [ 'Foo'; 'Bar' ], 'a_var', some_var
 .end
@@ -1102,7 +1102,7 @@ my $create_nested_key = <<'CREATE_NESTED_KEY';
     .param pmc other_names :slurpy
 
     .local pmc key
-    key = new .Key
+    key = new 'Key'
     key = name
 
     .local int elem
@@ -1197,15 +1197,15 @@ $create_nested_key
     root_ns = get_namespace
 
     .local pmc child_ns
-    child_ns = new .NameSpace
+    child_ns = new 'NameSpace'
     root_ns.'add_namespace'( 'Nested', child_ns )
 
     .local pmc grandchild_ns
-    grandchild_ns = new .NameSpace
+    grandchild_ns = new 'NameSpace'
     child_ns.'add_namespace'( 'Grandkid', grandchild_ns )
 
     .local pmc great_grandchild_ns
-    great_grandchild_ns = new .NameSpace
+    great_grandchild_ns = new 'NameSpace'
     grandchild_ns.'add_namespace'( 'Greatgrandkid', great_grandchild_ns )
 
     .local pmc parent
@@ -1250,7 +1250,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', 'add_namespace() with error' );
     root_ns.'add_namespace'( 'Really nested', child )
 
     .local pmc not_a_ns
-    not_a_ns = new .Integer
+    not_a_ns = new 'Integer'
 
     push_eh _invalid_ns
     root_ns.'add_namespace'( 'Nested', not_a_ns )
@@ -1357,7 +1357,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', 'add_sub() with error' );
     print "Added closure child\n"
 
     .local pmc not_a_sub
-    not_a_sub = new .Integer
+    not_a_sub = new 'Integer'
 
     push_eh _invalid_sub
     root_ns.'add_sub'( 'Nested', not_a_sub )
@@ -1385,11 +1385,11 @@ $create_nested_key
 
 .sub 'main' :main
     .local pmc foo
-    foo = new .String
+    foo = new 'String'
     foo = 'Foo'
 
     .local pmc bar
-    bar = new .String
+    bar = new 'String'
     bar = 'Bar'
 
     .local pmc key
@@ -1510,7 +1510,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', 'del_namespace() with error' );
 
 .sub main :main
     .local pmc not_a_ns
-    not_a_ns = new .Array
+    not_a_ns = new 'Array'
 
     store_global 'Not_A_NS', not_a_ns
 
@@ -1600,7 +1600,7 @@ OUTPUT
 pir_output_like( <<'CODE', <<'OUTPUT', 'del_sub() with error' );
 .sub main :main
     .local pmc not_a_ns
-    not_a_ns = new .Array
+    not_a_ns = new 'Array'
 
     store_global 'Not_A_Sub', not_a_ns
 
@@ -1626,11 +1626,11 @@ OUTPUT
 pir_output_is( <<"CODE", <<'OUTPUT', 'del_var()' );
 .sub 'main' :main
     .local pmc foo
-    foo = new .String
+    foo = new 'String'
     foo = 'Foo'
 
     .local pmc bar
-    bar = new .String
+    bar = new 'String'
     bar = 'Bar'
 
     store_global [ 'Parent' ],          'Foo', foo
@@ -1692,17 +1692,17 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT#39978" );
 .sub main :main
-     $P0 = new .String
+     $P0 = new 'String'
      $P0 = "Ook...BANG!\n"
      set_root_global [ "DUMMY"; "X"; "Y" ], "Explosion", $P0
 
-     $P1 = new .Integer
+     $P1 = new 'Integer'
      $P1 = 0
      set_root_global [ "DUMMY"; "X"; "Y" ], "T0", $P0
 
      .local pmc dummy_x_y_ns, iter
      dummy_x_y_ns = get_root_namespace [ "DUMMY"; "X"; "Y" ]
-     iter = new .Iterator, dummy_x_y_ns
+     iter = new 'Iterator', dummy_x_y_ns
 loop:
      unless iter goto loop_end
      $S0 = shift iter

@@ -159,7 +159,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "specified constructor method does not exist" );
     newpdd15class P1, "Foo"
-    new P0, .String
+    new P0, 'String'
     set P0, "bar"
     setprop P1, "BUILD", P0
 
@@ -197,7 +197,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
 .pcc_sub __init:
     get_params "(0)", P2
     print "ok 1\n"
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 42
     setattribute P2, ".i", P10
     set_returns "()"
@@ -635,7 +635,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
-    new P10, .String
+    new P10, 'String'
     set P10, "_new"
     newpdd15class P1, "Foo"
     setprop P1, "BUILD", P10
@@ -878,7 +878,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUTPUT', "bound NCI method" );
 .sub main :main
     .local pmc s, l, f
-    s = new String
+    s = new 'String'
     s = "ABC\n"
     f = getattribute s, "lower"
     typeof $S0, f
@@ -899,7 +899,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
     cl = newpdd15class "Foo"
     addattribute cl, "n"
     o = new "Foo"
-    n = new Integer
+    n = new 'Integer'
     n = 2000
     setattribute o, "Foo\0n", n
     o.go()
@@ -965,7 +965,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".Super - test dispatch with two classes" )
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 CODE
@@ -999,7 +999,7 @@ TODO: {
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 CODE
@@ -1028,7 +1028,7 @@ OUTPUT
 .sub foo :method
     print "Child foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1036,7 +1036,7 @@ OUTPUT
 .sub foo :method
     print "GrandChild foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1068,7 +1068,7 @@ OUTPUT
 .sub foo :method
     print "Child1 foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1076,7 +1076,7 @@ OUTPUT
 .sub foo :method
     print "Child2 foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 
@@ -1084,7 +1084,7 @@ OUTPUT
 .sub foo :method
     print "Inbred foo\n"
     .local pmc s
-    s = new .Super, self
+    s = new 'Super', self
     s."foo"()
 .end
 

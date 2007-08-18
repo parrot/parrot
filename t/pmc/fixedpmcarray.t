@@ -67,7 +67,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0,.FixedPMCArray
+    new P0,'FixedPMCArray'
 
     set I0,P0
     eq I0,0,OK_1
@@ -87,7 +87,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, .FixedPMCArray
+    new P0, 'FixedPMCArray'
 
     set I0,P0
     set P0,1
@@ -104,7 +104,7 @@ OUTPUT
 #VIM's syntax highlighter needs this line
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Truth and falsehood" );
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
 
         set P0, 0
         if P0, NOK_1
@@ -133,7 +133,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
         set P0, 1
 
     set P0[0],-7
@@ -162,7 +162,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
         set P0, 2
 
     set P0[1], -7
@@ -193,7 +193,7 @@ OUTPUT
 # TODO: Rewrite these properly when we have exceptions
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
         set P0, 1
 
     set P0[1], -7
@@ -205,7 +205,7 @@ current instr\.:/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
         set P0, 1
 
     set I0, P0[1]
@@ -217,9 +217,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 @{[ $fp_equality_macro ]}
-     new P0, .FixedPMCArray
+     new P0, 'FixedPMCArray'
      set P0, 3
-     new P1, .Key
+     new P1, 'Key'
 
      set P1, 0
      set P0[P1], 25
@@ -254,17 +254,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
 @{[ $fp_equality_macro ]}
-     new P0, .FixedPMCArray
+     new P0, 'FixedPMCArray'
      set P0, 1024
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, .Integer
+     new P1, 'Integer'
      set P1, 123456
      set P0[1023], P1
 
-     new P2, .Key
+     new P2, 'Key'
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -305,7 +305,7 @@ pir_output_like(
      .local pmc compares, cmp_fun
      # XXX doesnt work wit prederef of JIT
      bounds 1
-     compares = new .Integer
+     compares = new 'Integer'
      compares = 0
      global "compares" = compares
     cmp_fun = global "cmp_fun"
@@ -318,7 +318,7 @@ pir_output_like(
     compares = global "compares"
     compares = 0
     .local pmc ar
-    new ar, .FixedPMCArray
+    new ar, 'FixedPMCArray'
     ar = 5
     ar[0] = 10
     ar[1] = 2
@@ -368,7 +368,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new FixedPMCArray
+    pmc1 = new 'FixedPMCArray'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -391,7 +391,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
 
 .sub main :main
     .local pmc arr1
-    arr1 = new FixedPMCArray
+    arr1 = new 'FixedPMCArray'
     arr1 = 2005
     .local pmc elem_1956
     elem_1956 = arr1[1956]
@@ -413,14 +413,14 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
     .local num    elem_out_num
     .local string elem_out_string
 
-    matrix = new FixedPMCArray
+    matrix = new 'FixedPMCArray'
     matrix = 1
-    row = new FixedPMCArray
+    row = new 'FixedPMCArray'
     row = 4           # assing with an integer, number, pmc, string
     matrix[0] = row
     matrix[0;0] = 128
     matrix[0;1] = 128.128
-    elem_in_pmc = new Integer
+    elem_in_pmc = new 'Integer'
     elem_in_pmc = 256
     matrix[0;2] = elem_in_pmc
     matrix[0;3] = "asdf"
@@ -522,7 +522,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 .sub main :main
     .local pmc arr1
-    arr1 = new FixedPMCArray
+    arr1 = new 'FixedPMCArray'
     arr1 = 2005
     .local int defined_elem_1956
     defined_elem_1956 = defined arr1[1956]

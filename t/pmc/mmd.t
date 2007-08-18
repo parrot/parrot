@@ -39,9 +39,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer_divide_PerlInt  10 / 3 = 1003", to
     divide = global "Integer_divide_PerlInt"
     mmdvtregister .MMD_DIVIDE, .Integer, type_perl_int, divide
 
-    $P0 = new type_perl_int
-    $P1 = new Integer
-    $P2 = new type_perl_int
+    $P0 = new 'type_perl_int'
+    $P1 = new 'Integer'
+    $P2 = new 'type_perl_int'
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
@@ -75,9 +75,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3" );
     add = global "add"
     mmdvtregister .MMD_ADD, .Integer, .Integer, add
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 1
     $P2 = 1
     $P0 = $P1 + $P2
@@ -111,9 +111,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin 10 / 3 = 42
     divide = global "Integer_divide_Integer"
     mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
@@ -143,8 +143,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
     comp = global "Float_cmp_Integer"
     mmdvtregister .MMD_CMP, .Float, .Integer, comp
 
-    $P1 = new Float
-    $P2 = new Integer
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
     $P1 = 47.11
     $P2 = 47
     $I0 = cmp $P1, $P2   # XXX cmp calls cmp_num
@@ -210,8 +210,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "mmdvtfind - invoke it" );
     print "ok 1\n"
     ne_addr $P0, comp, nok
     print "ok 2\n"
-    $P1 = new Float
-    $P2 = new Integer
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
     $P1 = 47.11
     $P2 = 47
     $I0 = $P0($P1, $P2)
@@ -261,9 +261,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub" );
     divide = global "Integer_divide_Integer"
     mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
@@ -282,7 +282,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P1, .Integer
+    new P1, 'Integer'
     set P1, 3
     n_bxor P9, P1, 2    # create new result
     print P9
@@ -293,7 +293,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
-    new P6, .Integer
+    new P6, 'Integer'
     set P6, I11
     set_returns "(0)", P6
     returncc
@@ -309,8 +309,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P0, .Integer
-    new P1, .Integer
+    new P0, 'Integer'
+    new P1, 'Integer'
     set P1, 3
     bxor P0, P1, 2    # use result
     print P0
@@ -336,8 +336,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P0, .Integer
-    new P1, .Integer
+    new P0, 'Integer'
+    new P1, 'Integer'
     set P1, 3
     bxor P0, P1, 2      # reuse destination
     print P0
@@ -353,7 +353,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     set I10, P5
     bxor I11, I10, I5
     if I7, has_dest
-    new P6, .Integer
+    new P6, 'Integer'
 has_dest:
     set P6, I11
     set_returns "(0)", P6
@@ -425,10 +425,10 @@ pir_output_is( <<'CODE', <<'OUT', "MMD second arg int/float dispatch" );
     print "\n"
 .end
 .sub main :main
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 9.5
     foo(1, $P0)
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 3
     foo(1, $P1)
 .end
@@ -449,10 +449,10 @@ pir_error_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" 
     print "\n"
 .end
 .sub main :main
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 9.5
     foo(1, $P0)
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 3
     foo(1, $P1)
 .end
@@ -516,9 +516,9 @@ pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types', todo => 'RT #41374' );
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -557,9 +557,9 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted", todo => 'RT #41374'
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -598,9 +598,9 @@ pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid", todo => 'RT #41
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -612,7 +612,7 @@ pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid", todo => 'RT #41
     $P1 = "ok 4\n"
     p($P0)
     p($P1)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     p($P0)
 .end
 
@@ -644,9 +644,9 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -658,7 +658,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
     $P1 = "ok 4\n"
     p($P0)
     p($P1)
-    $P0 = new type_perl_int
+    $P0 = new 'type_perl_int'
     $P0 = 42
     p($P0)
 .end
@@ -699,9 +699,9 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace", todo => 
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -745,9 +745,9 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace", todo =>
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
@@ -789,16 +789,16 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo => 'RT #41374' 
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new type_perl_string
+    $P1 = new 'type_perl_string'
     $P1 = "ok 2\n"
     p($P0)
     p($P1)
-    $P0 = new type_perl_int
+    $P0 = new 'type_perl_int'
     $P0 = 42
     p($P0)
-    $P0 = new type_perl_int
+    $P0 = new 'type_perl_int'
     $P0 = 43
     q($P0)
 .end
@@ -841,9 +841,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as function - Int, Float" );
 .sub main :main
     .local pmc d, l, r, a
-    d = new Integer
-    l = new Integer
-    r = new Float
+    d = new 'Integer'
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     a = get_root_global ["__parrot_core"], "__add"
@@ -859,8 +859,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as method" );
 .sub main :main
     .local pmc d, l, r
-    l = new Integer
-    r = new Integer
+    l = new 'Integer'
+    r = new 'Integer'
     l = 3
     r = 39
     d = l."__add"(r)
@@ -882,8 +882,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - inherited", todo => 'RT 
     type_perl_int     = find_type 'PerlInt'
 
     .local pmc d, l, r
-    l = new type_perl_int
-    r = new type_perl_int
+    l = new 'type_perl_int'
+    r = new 'type_perl_int'
     l = 3
     r = 39
     d = l."__add"(r)
@@ -897,8 +897,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - Int, Float" );
 .sub main :main
     .local pmc d, l, r
-    l = new Integer
-    r = new Float
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     d = l."__add"(r)
@@ -913,16 +913,16 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "bound __add method" );
 .sub main :main
     .local pmc d, l, r, m
-    d = new Integer
-    l = new Integer
-    r = new Float
+    d = new 'Integer'
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     m = find_global 'Float', "__add"
     d = m(r, l)
     print d
     print "\n"
-    r = new Integer
+    r = new 'Integer'
     r = 39
     m = find_global 'Integer', "__add"
     d = m(r, l)
@@ -973,7 +973,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, n_add" );
 .sub main :main
     $P0 = subclass "Integer", "AInt"
     $P0 = new "AInt"
-    $P1 = new Integer
+    $P1 = new 'Integer'
     set $P0, 6
     set $P1, 2
 
@@ -988,7 +988,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, n_add" );
     print l
     print r
     print "\n"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     .return($P0)
 .end
@@ -1008,7 +1008,7 @@ print $P <<'EOF';
     print l
     print r
     print "\n"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     .return($P0)
 .end
@@ -1018,8 +1018,8 @@ close $P;
 pir_output_is( <<'CODE', <<'OUTPUT', "override builtin n_add" );
 .sub main
     load_bytecode "temp.pir"
-    $P0 = new Integer
-    $P1 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
     set $P0, 6
     set $P1, 2
 
@@ -1059,7 +1059,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "mmd bug reported by Jeff" );
 
     $P0.'bar'('Bar!')
 
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = "Bar!"
     $P0.'bar'($P1)
 
@@ -1097,7 +1097,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object" );
 .end
 .namespace ["AInt"]
 .sub init :vtable :method
-    $P0 = new Integer
+    $P0 = new 'Integer'
     setattribute self, ".i", $P0
 .end
 .sub set_integer_native :vtable :method
@@ -1166,13 +1166,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/o .HLL" );
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     $P9 = 'foo'($P0)
 
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 4
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'hello'
     $P9 = 'foo'($P0, $P1)
 .end
@@ -1194,13 +1194,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ .HLL, rt #39161" );
 .HLL 'Perl6', ''
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     $P9 = 'foo'($P0)
 
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 4
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'hello'
     $P9 = 'foo'($P0, $P1)
 .end
@@ -1223,19 +1223,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multisub w/ flatten" );
 # see also 'rt #39173
 .sub main :main
     .local pmc int_pmc
-    int_pmc = new .Integer
+    int_pmc = new 'Integer'
     int_pmc = 3
 
     .local pmc args
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     push args, int_pmc
     'foo'( args :flat )
 
     .local pmc string_pmc
-    string_pmc = new .String
+    string_pmc = new 'String'
     string_pmc = 'hello'
 
-    args = new .ResizablePMCArray
+    args = new 'ResizablePMCArray'
     push args, string_pmc
     'foo'( args :flat )
     end
@@ -1379,15 +1379,15 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'type mix with _' );
 .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     'foo'($P0)
     'foo'(2)
     'foo'("1")
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "0"
     'foo'($P0)
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     'foo'($P0)
 .end
 
@@ -1425,9 +1425,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':multi with :outer' );
 .sub main :main
-    new $P0, .String
+    new $P0, 'String'
     assign $P0, 'arg0'
-    new $P1, .String
+    new $P1, 'String'
     assign $P1, 'arg1'
 
     $P99 = "foo"($P0)

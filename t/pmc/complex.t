@@ -67,8 +67,8 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "String parsing" );
-    new P0, .Complex
-    new P1, .String
+    new P0, 'Complex'
+    new P1, 'String'
 
     set P0, "4"
     print P0
@@ -158,7 +158,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: real part" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "q + 3i"
     end
 CODE
@@ -166,7 +166,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: imaginary part" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "1 + ij"
     end
 CODE
@@ -174,17 +174,17 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Malformed string: missing +/-" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "1 * i"
 CODE
 /Complex: malformed string/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add" );
-    new P0, .Complex
-    new P1, .Complex
-    new P2, .Float
-        new P3, .Integer
+    new P0, 'Complex'
+    new P1, 'Complex'
+    new P2, 'Float'
+        new P3, 'Integer'
 
     set P0, "1 + i"
     add P0, P0, P0
@@ -247,10 +247,10 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "subtract" );
-    new P0, .Complex
-    new P1, .Complex
-    new P2, .Float
-        new P3, .Integer
+    new P0, 'Complex'
+    new P1, 'Complex'
+    new P2, 'Float'
+        new P3, 'Integer'
 
     set P0, "1 + i"
     sub P0, P0, P0
@@ -313,10 +313,10 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "multiply" );
-    new P0, .Complex
-    new P1, .Complex
-    new P2, .Float
-        new P3, .Integer
+    new P0, 'Complex'
+    new P1, 'Complex'
+    new P2, 'Float'
+        new P3, 'Integer'
 
     set P0, "2 + 3i"
     mul P0, P0, P0
@@ -374,9 +374,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "divide" );
-    new P0, .Complex
-    new P1, .Complex
-    new P2, .Float
+    new P0, 'Complex'
+    new P1, 'Complex'
+    new P2, 'Float'
 
     set P0, "2 + 3i"
     div P0, P0, P0
@@ -430,9 +430,9 @@ OUTPUT
 for my $type ( "Complex", "Float", "Integer" ) {
     pir_output_is( <<"CODE", <<OUTPUT, "complex divide by zero $type" );
 .sub _main :main
-    P0 = new Complex
+    P0 = new 'Complex'
     set P0, "4+3.5i"
-    P1 = new Complex
+    P1 = new 'Complex'
     ## divide by a zero $type
     P2 = new $type
     set P2, 0
@@ -454,7 +454,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "get int/num/bool" );
 @{[ $fp_equality_macro ]}
-        new P0, .Complex
+        new P0, 'Complex'
         set P0, "2 - 1.5i"
         print P0
         print "\\n"
@@ -488,8 +488,8 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "get keyed" );
 @{[ $fp_equality_macro ]}
-        new P0, .Complex
-        new P1, .String
+        new P0, 'Complex'
+        new P1, 'String'
         set P0, "- 3.3 + 1.2i"
         set P1, "imag"
 
@@ -531,7 +531,7 @@ N0 N1 N2 OK
 OUTPUT
 
 pasm_error_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid string key" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "5 + 3.5i"
     set N0, P0["Foo"]
     end
@@ -540,7 +540,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<"CODE", <<'OUTPUT', "get keyed: invalid numeric key" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "5 + 3.5i"
     set N0, P0[2]
     end
@@ -549,7 +549,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set int/num" );
-    new P0, .Complex
+    new P0, 'Complex'
 
     set P0, "3 + 4i"
     set P0, -2
@@ -568,9 +568,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set keyed" );
-    new P0, .Complex
-    new P1, .String
-    new P2, .String
+    new P0, 'Complex'
+    new P1, 'String'
+    new P2, 'String'
     set P1, "real"
 
     set P0[P1], 1
@@ -598,7 +598,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "set keyed: invalid key" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0[2], 12.5
     end
 CODE
@@ -606,8 +606,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "is_equal" );
-    new P0, .Complex
-    new P1, .Complex
+    new P0, 'Complex'
+    new P1, 'Complex'
 
     set P0, "2 + 3i"
     set P1["real"], 2
@@ -629,9 +629,9 @@ ok2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "abs" );
-    new P0, .Complex
+    new P0, 'Complex'
     set P0, "4 + 3j"
-    new P1, .Undef
+    new P1, 'Undef'
     abs P1, P0
     print P1
     print "\n"
@@ -645,7 +645,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new .Complex
+    pmc1 = new 'Complex'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -696,9 +696,9 @@ OUTPUT
 
 .sub main
     $P0 = getclass "Complex"
-    $P1 = new .Float
+    $P1 = new 'Float'
     $P1 = 2.0
-    $P2 = new .Float
+    $P2 = new 'Float'
     $P2 = 3.0
     $P1 = $P0."instantiate"($P1, $P2)
     print $P1
@@ -725,9 +725,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
 @{[ $fp_equality_macro ]}
-     new P0, .Complex
+     new P0, 'Complex'
      set P0, "1.3 + 1.7i"
-     new P1, .Integer
+     new P1, 'Integer'
      neg P1, P0
      set N0, P1[0]
      set N1, P1[1]
@@ -745,7 +745,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "clone" );
 @{[ $fp_equality_macro ]}
-     new P0, .Complex
+     new P0, 'Complex'
      set P0, "1 - 3i"
      clone P1, P0
      eq P0, P1, OK1
@@ -770,9 +770,9 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "sub" );
 .sub main :main
     .local pmc d, f, c
-    d = new .Undef
-    f = new .Float
-    c = new .Complex
+    d = new 'Undef'
+    f = new 'Float'
+    c = new 'Complex'
     f = 2.2
     c = "5+2j"
     d = c - f
@@ -798,14 +798,14 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "i_sub" );
 .sub main :main
     .local pmc f, c
-    f = new .Float
+    f = new 'Float'
     f = 2.2
-    c = new .Complex
+    c = new 'Complex'
     c = "5+2j"
     c -= f
     print c
     print "\n"
-    c = new .Complex
+    c = new 'Complex'
     c = "5+2j"
     f -= c
     print f
@@ -824,7 +824,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sprintf with a complex" );
 .endm
 .sub main :main
     .local pmc c, c2
-    c = new .Complex
+    c = new 'Complex'
     .DoIt("%d%+di\n", "1.35+35.1i")
     .DoIt("%.3f%+.3fi\n", "0+3.141592653589793i")
     .DoIt("%.3f%+.3fi\n", "0+i")
@@ -845,19 +845,19 @@ pir_output_is( << 'CODE', << 'OUTPUT', "pow with complex numbers" );
 .endm
 .sub main :main
     .local pmc c, c2, c3
-    c = new .Complex
-    c2 = new .Complex
-    c3 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
+    c3 = new 'Complex'
     .DoIt("i", "i")
     .DoIt("i", "2")
     .DoIt("2i", "2")
     .DoIt("2+2i", "2+2i")
     .DoIt("i", "0.5i")
     .DoIt(2, "2i")
-    c2 = new .Integer
+    c2 = new 'Integer'
     .DoIt("2i", 2)
     .DoIt("2", 4)
-    c2 = new .Float
+    c2 = new 'Float'
     .DoIt("2i", 0.5)
 .end
 CODE
@@ -881,7 +881,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .endm
 .sub main :main
     .local pmc c, c2
-    c = new .Complex
+    c = new 'Complex'
     .DoIt("4")
     .DoIt("i")
     .DoIt("2i")
@@ -904,9 +904,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
 .endm
 .sub main :main
     .local pmc c, c2, c3
-    c = new .Complex
-    c2 = new .Complex
-    c3 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
+    c3 = new 'Complex'
     # e^(pi * i) + 1 = 0
     $N0 = atan 1
     $N0 *= 4
@@ -917,8 +917,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "e^(pi*i) + 1 = 0" );
         .PrintIt("%.3f%+.3fi\n", c2)
 
     # another e^(pi * i) + 1 = 0
-    c = new .Complex
-    c2 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
     $N0 = exp 1
     c[0] = $N0
     c[1] = 0.0
@@ -970,8 +970,8 @@ OUTPUT
 #.sub main :main
 #    .local pmc c, c2
 #    .local string str
-#    c = new .Complex
-#    c2 = new .Complex
+#    c = new 'Complex'
+#    c2 = new 'Complex'
 #END
 #    foreach my $num (
 #        [-2.0, 0.0],
@@ -1039,8 +1039,8 @@ SKIP: {
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "0.693147+3.141593i")
     .DoIt("-1+0i", "0.000000+3.141593i")
     .DoIt("-0.5+0i", "-0.693147+3.141593i")
@@ -1083,8 +1083,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "exp of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "0.135335+0.000000i")
     .DoIt("-1+0i", "0.367879+0.000000i")
     .DoIt("-0.5+0i", "0.606531+0.000000i")
@@ -1126,8 +1126,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "0.000000+1.414214i")
     .DoIt("-1+0i", "0.000000+1.000000i")
     .DoIt("-0.5+0i", "0.000000+0.707107i")
@@ -1169,8 +1169,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sin of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.909297+0.000000i")
     .DoIt("-1+0i", "-0.841471+0.000000i")
     .DoIt("-0.5+0i", "-0.479426+0.000000i")
@@ -1212,8 +1212,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cos of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.416147+0.000000i")
     .DoIt("-1+0i", "0.540302+0.000000i")
     .DoIt("-0.5+0i", "0.877583+0.000000i")
@@ -1255,8 +1255,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "tan of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "2.185040+0.000000i")
     .DoIt("-1+0i", "-1.557408+0.000000i")
     .DoIt("-0.5+0i", "-0.546302+0.000000i")
@@ -1298,8 +1298,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cot of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "0.457658+0.000000i")
     .DoIt("-1+0i", "-0.642093-0.000000i")
     .DoIt("-0.5+0i", "-1.830488-0.000000i")
@@ -1340,8 +1340,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sec of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-2.402998-0.000000i")
     .DoIt("-1+0i", "1.850816+0.000000i")
     .DoIt("-0.5+0i", "1.139494+0.000000i")
@@ -1383,8 +1383,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "csc of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-1.099750-0.000000i")
     .DoIt("-1+0i", "-1.188395-0.000000i")
     .DoIt("-0.5+0i", "-2.085830-0.000000i")
@@ -1425,8 +1425,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "asin of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-1.570796+1.316958i")
     .DoIt("-1+0i", "-1.570796-0.000000i")
     .DoIt("-0.5+0i", "-0.523599-0.000000i")
@@ -1468,8 +1468,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acos of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "3.141593-1.316958i")
     .DoIt("-1+0i", "3.141593-0.000000i")
     .DoIt("-0.5+0i", "2.094395-0.000000i")
@@ -1511,8 +1511,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "atan of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-1.107149+0.000000i")
     .DoIt("-1+0i", "-0.785398+0.000000i")
     .DoIt("-0.5+0i", "-0.463648+0.000000i")
@@ -1552,8 +1552,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acot of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.463648+0.000000i")
     .DoIt("-1+0i", "-0.785398+0.000000i")
     .DoIt("-0.5+0i", "-1.107149+0.000000i")
@@ -1592,8 +1592,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "asec of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "2.094395-0.000000i")
     .DoIt("-1+0i", "3.141593-0.000000i")
     .DoIt("-0.5+0i", "3.141593-1.316958i")
@@ -1634,8 +1634,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acsc of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.523599-0.000000i")
     .DoIt("-1+0i", "-1.570796-0.000000i")
     .DoIt("-0.5+0i", "-1.570796+1.316958i")
@@ -1676,8 +1676,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-3.626860+0.000000i")
     .DoIt("-1+0i", "-1.175201+0.000000i")
     .DoIt("-0.5+0i", "-0.521095+0.000000i")
@@ -1719,8 +1719,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cosh of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "3.762196-0.000000i")
     .DoIt("-1+0i", "1.543081-0.000000i")
     .DoIt("-0.5+0i", "1.127626-0.000000i")
@@ -1762,8 +1762,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "tanh of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.964028+0.000000i")
     .DoIt("-1+0i", "-0.761594+0.000000i")
     .DoIt("-0.5+0i", "-0.462117+0.000000i")
@@ -1805,8 +1805,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "coth of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-1.037315-0.000000i")
     .DoIt("-1+0i", "-1.313035-0.000000i")
     .DoIt("-0.5+0i", "-2.163953-0.000000i")
@@ -1847,8 +1847,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sech of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "0.265802+0.000000i")
     .DoIt("-1+0i", "0.648054+0.000000i")
     .DoIt("-0.5+0i", "0.886819+0.000000i")
@@ -1890,8 +1890,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "csch of complex numbers" );
 .sub main :main
     .local pmc c, c2
     .local string str
-    c = new .Complex
-    c2 = new .Complex
+    c  = new 'Complex'
+    c2 = new 'Complex'
     .DoIt("-2+0i", "-0.275721-0.000000i")
     .DoIt("-1+0i", "-0.850918-0.000000i")
     .DoIt("-0.5+0i", "-1.919035-0.000000i")

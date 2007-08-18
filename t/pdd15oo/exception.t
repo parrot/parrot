@@ -38,7 +38,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh _handler
-    new P30, .Exception
+    new P30, 'Exception'
     throw P30
     print "not reached\n"
     end
@@ -53,7 +53,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "main\n"
     push_eh handler
-    new P1, .Exception
+    new P1, 'Exception'
     set P1[0], "just pining"
     throw P1
     print "not reached\n"
@@ -79,9 +79,9 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
 # see also #38459
     print "main\n"
-    new P0, .Integer
+    new P0, 'Integer'
     push_eh handler
-    new P1, .Exception
+    new P1, 'Exception'
     set P1[0], "just pining"
     throw P1
     print "not reached\n"
@@ -101,7 +101,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
 .sub main :main
     print "main\n"
     push_eh _handler
-    new P1, .Exception
+    new P1, 'Exception'
     set P1[0], "just pining"
     throw P1
     print "not reached\n"
@@ -129,7 +129,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     print "main\n"
     push_eh _handler
 
-    new P30, .Exception
+    new P30, 'Exception'
     set P30["_message"], "something happend"
     throw P30
     print "not reached\n"
@@ -147,7 +147,7 @@ something happend
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
-    new P0, .Exception
+    new P0, 'Exception'
     set P0["_message"], "something happend"
     throw P0
     print "not reached\n"
@@ -158,7 +158,7 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
     push_eh _handler
-    new P0, .Exception
+    new P0, 'Exception'
     clear_eh
     throw P0
     print "not reached\n"
@@ -170,7 +170,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
-    new P0, .Exception
+    new P0, 'Exception'
     throw P0
     print "not reached\n"
     end
@@ -183,7 +183,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     push_eh _handler1
     push_eh _handler2
 
-    new P30, .Exception
+    new P30, 'Exception'
     set P30["_message"], "something happend"
     throw P30
     print "not reached\n"
@@ -211,7 +211,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler1
     push_eh _handler2
 
-    new P30, .Exception
+    new P30, 'Exception'
     set P30["_message"], "something happend"
     throw P30
     print "not reached\n"
@@ -294,7 +294,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh handler
     print "ok\n"
-    new P30, .Exception
+    new P30, 'Exception'
     throw P30
     print "not reached\n"
     end
@@ -348,7 +348,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "pushaction, throw" );
     .const .Sub P10 = "action"
     pushaction P10
     print "ok 2\n"
-    new P10, .Exception
+    new P10, 'Exception'
     throw P10
     print "never\n"
 handler:
@@ -370,10 +370,10 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  continuation' );
 .sub main :main
     .local pmc outer, cont
-    outer = new String
+    outer = new 'String'
     outer = "Outer value\n"
     store_global "Foo::Bar", "test", outer
-    new cont, .Continuation
+    new cont, 'Continuation'
     set_addr cont, endcont
     store_global "Foo::Bar", "exit", cont
     show_value()
@@ -385,7 +385,7 @@ endcont:
 .sub test1
     .local pmc test1_binding, old_value, cleanup
     .lex "old_value", old_value
-    test1_binding = new String
+    test1_binding = new 'String'
     test1_binding = "Inner value\n"
     old_value = find_global "Foo::Bar", "test"
     .const .Sub test1_cleanup_sub = "test1_cleanup"
@@ -404,7 +404,7 @@ endcont:
 .end
 .sub test2
     .local pmc test2_binding, exit
-    test2_binding = new String
+    test2_binding = new 'String'
     test2_binding = "Innerer value\n"
     store_global "Foo::Bar", "test", test2_binding
     show_value()
@@ -427,7 +427,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  throw' );
 .sub main :main
     .local pmc outer
-    outer = new String
+    outer = new 'String'
     outer = "Outer value\n"
     store_global "Foo::Bar", "test", outer
     push_eh eh
@@ -446,7 +446,7 @@ last:
 .sub test1
     .local pmc test1_binding, old_value, cleanup
     .lex "old_value", old_value
-    test1_binding = new String
+    test1_binding = new 'String'
     test1_binding = "Inner value\n"
     old_value = find_global "Foo::Bar", "test"
     .const .Sub test1_cleanup_sub = "test1_cleanup"
@@ -465,11 +465,11 @@ last:
 .end
 .sub test2
     .local pmc test2_binding, exit
-    test2_binding = new String
+    test2_binding = new 'String'
     test2_binding = "Innerer value\n"
     store_global "Foo::Bar", "test", test2_binding
     show_value()
-    exit = new Exception
+    exit = new 'Exception'
     exit["_message"] = "something happened"
     throw exit
 .end
@@ -552,7 +552,7 @@ catch:
 .end
 
 .sub get_string :vtable :method
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     throw $P0
 .end
 CODE
@@ -564,7 +564,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
     print "main\n"
     .const .Sub at_exit = "exit_handler"
     pushaction at_exit
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     throw $P0
     .return()
 .end
@@ -589,7 +589,7 @@ pir_output_like(
     print "main\n"
     .const .Sub at_exit = "exit_handler"
     pushaction at_exit
-    $P1 = new .Exception
+    $P1 = new 'Exception'
     throw $P1
     print "never 1\n"
 h:
@@ -603,7 +603,7 @@ h:
     print "at_exit, flag = "
     print flag
     print_newline
-    $P2 = new .Exception
+    $P2 = new 'Exception'
     throw $P2
     print "never 2\n"
 .end
@@ -617,7 +617,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception" );
 .sub main :main
     .local pmc a
     .lex 'a', a
-    a = new .Integer
+    a = new 'Integer'
     a = 42
     push_eh handler
     exit 0
@@ -656,7 +656,7 @@ handler:
 .end
 
 .sub broken
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0["_message"] = "something broke"
     throw $P0
 .end

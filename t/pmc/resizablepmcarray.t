@@ -67,7 +67,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0,.ResizablePMCArray
+    new P0,'ResizablePMCArray'
 
     set I0,P0
     eq I0,0,OK_1
@@ -107,7 +107,7 @@ ok 5
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting negative array size" );
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
         set P0, -1
         end
 CODE
@@ -115,7 +115,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 1
 
     set P0[0],-7
@@ -144,7 +144,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
 
     set P0[1], -7
     set I0, P0[1]
@@ -172,12 +172,12 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting last element" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 10
-        new P1, .Integer
+        new P1, 'Integer'
         set P1, 1234
     set P0[-1], P1
-        new P2, .Integer
+        new P2, 'Integer'
         set P2, P0[9]
         print P2
         print "\n"
@@ -187,12 +187,12 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting last element" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 100
-        new P1, .Integer
+        new P1, 'Integer'
         set P1, 4321
     set P0[99], P1
-        new P2, .Integer
+        new P2, 'Integer'
         set P2, P0[-1]
         print P2
         print "\n"
@@ -204,7 +204,7 @@ OUTPUT
 # TODO: Rewrite these properly when we have exceptions
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 1
 
     set P0[1], -7
@@ -216,9 +216,9 @@ ok 1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting -ve out-of-bounds elements" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 1
-        new P1, .Integer
+        new P1, 'Integer'
         set P1, 12345
 
     set P0[-10], P1
@@ -228,7 +228,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 1
 
     set I0, P0[1]
@@ -239,9 +239,9 @@ ok 1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting -ve out-of-bounds elements" );
-        new P0, .ResizablePMCArray
+        new P0, 'ResizablePMCArray'
         set P0, 1
-        new P1, .Integer
+        new P1, 'Integer'
     set P1, P0[-10]
     end
 CODE
@@ -250,8 +250,8 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 @{[ $fp_equality_macro ]}
-     new P0, .ResizablePMCArray
-     new P1, .Key
+     new P0, 'ResizablePMCArray'
+     new P1, 'Key'
 
      set P1, 0
      set P0[P1], 25
@@ -262,7 +262,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      set P1, 2
      set P0[P1], "bleep"
 
-     new P2, .String
+     new P2, 'String'
      set P2, "Bloop"
      set P1, 3
      set P0[P1], P2
@@ -282,7 +282,7 @@ OK2: print "ok 2\\n"
      print "not "
 OK3: print "ok 3\\n"
 
-     new P3, .Undef
+     new P3, 'Undef'
      set P3, P0[3]
      set S0, P3
      eq S0, "Bloop", OK4
@@ -299,17 +299,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
 @{[ $fp_equality_macro ]}
-     new P0, .ResizablePMCArray
+     new P0, 'ResizablePMCArray'
      set P0, 1
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, .Integer
+     new P1, 'Integer'
      set P1, 123456
      set P0[1023], P1
 
-     new P2, .Key
+     new P2, 'Key'
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -347,7 +347,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub test :main
     .local pmc pmc1
-    pmc1 = new ResizablePMCArray
+    pmc1 = new 'ResizablePMCArray'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -370,7 +370,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "inherited sort method" );
 
 .sub test :main
     .local pmc ar
-    ar = new ResizablePMCArray
+    ar = new 'ResizablePMCArray'
 
     ar[0] = 10
     ar[1] = 2
@@ -403,10 +403,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push pmc" );
 
 .sub test :main
     .local pmc pmc_arr, pmc_9999, pmc_10000
-    pmc_arr = new ResizablePMCArray
-    pmc_9999  = new Float
+    pmc_arr = new 'ResizablePMCArray'
+    pmc_9999  = new 'Float'
     pmc_9999  = 10000.10000
-    pmc_10000 = new Float
+    pmc_10000 = new 'Float'
     pmc_10000 = 123.123
     pmc_arr[9999] = pmc_9999
     push pmc_arr, pmc_10000
@@ -430,8 +430,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push integer" );
 .sub test :main
     .local pmc pmc_arr, pmc_9999
     .local int int_10000
-    pmc_arr = new ResizablePMCArray
-    pmc_9999  = new Float
+    pmc_arr = new 'ResizablePMCArray'
+    pmc_9999  = new 'Float'
     pmc_9999  = 10000.10000
     int_10000 = 123
     pmc_arr[9999] = pmc_9999
@@ -456,8 +456,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push string" );
 .sub test :main
     .local pmc pmc_arr, pmc_9999
     .local string string_10000
-    pmc_arr = new ResizablePMCArray
-    pmc_9999  = new Float
+    pmc_arr = new 'ResizablePMCArray'
+    pmc_9999  = new 'Float'
     pmc_9999  = 10000.10000
     string_10000 = '123asdf'
     pmc_arr[9999] = pmc_9999
@@ -481,7 +481,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "shift integer" );
 
 .sub test :main
     .local pmc pmc_arr, elem
-    pmc_arr = new ResizablePMCArray
+    pmc_arr = new 'ResizablePMCArray'
     push pmc_arr, 4
     push pmc_arr, 3
     push pmc_arr, 2
@@ -540,12 +540,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "unshift pmc" );
-    new P0, .ResizablePMCArray
-    new P1, .Integer
+    new P0, 'ResizablePMCArray'
+    new P1, 'Integer'
     set P1, 1
-    new P2, .Integer
+    new P2, 'Integer'
     set P2, 2
-    new P3, .Integer
+    new P3, 'Integer'
     set P3, 3
     unshift P0, P1
     unshift P0, P2
@@ -571,7 +571,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "get_mro" );
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
     get_mro P1, P0
     print "ok 1\n"
     elements I1, P1
@@ -600,11 +600,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push and pop" );
 
     f= 123.123
     i= 123
-    p= new Float
+    p= new 'Float'
     p= 456.456
     s= "abc"
 
-    pmc_arr= new ResizablePMCArray
+    pmc_arr= new 'ResizablePMCArray'
 
     elements= pmc_arr
     print elements
@@ -694,11 +694,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
 
     f= 123.123
     i= 123
-    p= new Float
+    p= new 'Float'
     p= 456.456
     s= "abc"
 
-    pmc_arr= new ResizablePMCArray
+    pmc_arr= new 'ResizablePMCArray'
 
     elements= pmc_arr
     print elements
@@ -782,8 +782,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "multi key access" );
 
 .sub test :main
     .local pmc matrix, row_in, row_out
-    matrix = new ResizablePMCArray
-    row_in = new ResizableIntegerArray
+    matrix = new 'ResizablePMCArray'
+    row_in = new 'ResizableIntegerArray'
     push row_in, 42
     push matrix, row_in
 
@@ -808,14 +808,14 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "exists and defined" );
 .sub test :main
     .local pmc array
-    array = new ResizablePMCArray
+    array = new 'ResizablePMCArray'
     push array, 'a'
     push array, 'b'
     push array, 'c'
-    $P0 = new .Null
+    $P0 = new 'Null'
     push array, $P0
     push array, 'e'
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     push array, $P0
     push array, '7'
     push array, '-8.8'
@@ -913,27 +913,27 @@ pir_output_is( <<'CODE', <<'OUTPUT', '$P1.append()' );
     ok   = find_global [ 'Test'; 'More' ], 'ok'
     is   = find_global [ 'Test'; 'More' ], 'is'
 
-    $P1 = new ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     push $P1, 'a'
     push $P1, 'b'
     push $P1, 'c'
 
-    $P2 = new FixedPMCArray
+    $P2 = new 'FixedPMCArray'
     $P2 = 2
-    $P0 = new .Null
+    $P0 = new 'Null'
     $P2[0] = $P0
     $P2[1] = 'e'
-    $P0 = new .Undef
+    $P0 = new 'Undef'
 
-    $P3 = new ResizablePMCArray
+    $P3 = new 'ResizablePMCArray'
     push $P3, $P0
     push $P3, '7'
     push $P3, '-8.8'
 
-    $P4 = new ResizablePMCArray
+    $P4 = new 'ResizablePMCArray'
 
-    $P5 = new MultiSub    # extends ResizablePMCArray
-    $P99 = new Sub
+    $P5 = new 'MultiSub'    # extends ResizablePMCArray
+    $P99 = new 'Sub'
     push $P5, $P99
 
     plan( 13 )
@@ -1135,7 +1135,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice with empty replacement' );
   $splice_preamble
-  P2 = new .ResizablePMCArray
+  P2 = new 'ResizablePMCArray'
   splice P1, P2, 2, 2
   $splice_postamble
 CODE
@@ -1144,7 +1144,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'splice with equal size replacement' );
   $splice_preamble
-  P2 = new .ResizablePMCArray
+  P2 = new 'ResizablePMCArray'
   P2[0] = 'A'
   splice P1, P2, 2, 1
   $splice_postamble
@@ -1154,12 +1154,12 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'splice replace' );
 .sub main :main
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new .ResizablePMCArray
+    $P2 = new 'ResizablePMCArray'
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 1, 2
@@ -1172,12 +1172,12 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'splice replace' );
 .sub main :main
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new .ResizablePMCArray
+    $P2 = new 'ResizablePMCArray'
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 0, 2
@@ -1201,7 +1201,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'iterate subclass of rpa (RT #40958)' );
     print $I0
     print "\n"
 
-    iter = new .Iterator, arr
+    iter = new 'Iterator', arr
   loop:
     unless iter goto end
     $P2 = shift iter

@@ -27,7 +27,7 @@ a variety of keys and values.
 my $PRE = <<PRE;
 .sub 'test' :main
     .local pmc capt
-    capt = new .Capture
+    capt = new 'Capture'
 PRE
 
 my $POST = <<POST;
@@ -47,33 +47,33 @@ OUT
 pir_output_is( <<'CODE', <<'OUTPUT', "Basic capture tests" );
 .sub main :main
     .local pmc capt
-    capt = new .Capture
+    capt = new 'Capture'
 
     capt[0] = 0
     capt[1] = 1.5
     capt[2] = 'two'
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 3
     capt[3] = $P0
 
     push capt, 4
     push capt, 5.5
     push capt, 'six'
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 7
     push capt, $P0
 
     unshift capt, 8
     unshift capt, 9.5
     unshift capt, 'ten'
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 11
     unshift capt, $P0
 
     capt['alpha'] = 12
     capt['beta'] = 13.5
     capt['gamma'] = 'fourteen'
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 15
     capt['delta'] = $P0
 
@@ -164,7 +164,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );
 .sub main :main
     .local pmc capt
-    capt = new .Capture
+    capt = new 'Capture'
 
     $I0 = defined capt[2]
     $I1 = exists capt[2]
@@ -182,7 +182,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );
 
     capt[2] = 1
     capt['alpha'] = 1
-    $P0 = new .Undef
+    $P0 = new 'Undef'
     capt['beta'] = $P0
 
     $I0 = defined capt[2]
@@ -305,9 +305,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_array method delegation' );
     $P1 = new 'Match'
     $P1[1] = 1
 
-    $P2 = new .String
+    $P2 = new 'String'
     setattribute $P1, '$.abc', $P2
-    $P2 = new .String
+    $P2 = new 'String'
     setattribute $P1, '$.xyz', $P2
 
     $P2 = $P1.'get_array'()

@@ -25,7 +25,7 @@ Tests the Continuation PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, .Continuation
+    new P0, 'Continuation'
     print "ok 1\n"
 .end
 CODE
@@ -62,7 +62,7 @@ L6:
     ret
 rtn1:
     print "Taking continuation.\n"
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, L6
     ret
 rtn2:
@@ -84,7 +84,7 @@ pir_output_is( <<'CODE', <<'OUT', 'continuations call actions.' );
 .sub test_cont_action :main
     ## debug 0x80
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, continued
     _test_1(4, cont)
     _test_1("bar", cont)
@@ -140,7 +140,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'continuation action context' );
 ## invoked in the right dynamic context (i.e. without the error handler).
 .sub test_cont_action :main
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, continued
     _test_1("bar", cont)
     print "oops; no "
@@ -167,7 +167,7 @@ continued:
 .sub ___internal_test_1_0_
     .local pmc arg1
     print "unwinding\n"
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0["_message"] = "something happened"
     throw $P0
 .end

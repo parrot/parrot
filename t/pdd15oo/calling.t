@@ -143,7 +143,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set I16, 77
     set N16, 2.3
     set S16, "ok 1\n"
-    new P16, .Integer
+    new P16, 'Integer'
     set P16, 101
     set_args "(0, 0, 0, 0, 0, 0, 0)", 42, I16, 4.5, N16, S16, "ok 2\n", P16
     get_results "(0, 0, 0, 0)", I16, N16, S16, P16
@@ -173,7 +173,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set I16, 88
     set N16, 5.5
     set S16, "ok 3\n"
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 4\n"
     set_returns "(0, 0, 0, 0)", I16, N16, S16, P16
     returncc
@@ -193,13 +193,13 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "flatten arg" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P17, .ResizablePMCArray
+    new P17, 'ResizablePMCArray'
     push P17, "ok 2\n"
     push P17, "ok 3\n"
     push P17, "ok 4\n"
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 5\n"
     set_args "(0, 0x20, 0)", P16, P17, P18
     find_name P1, "foo"
@@ -225,11 +225,11 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slurpy param" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P17, .String
+    new P17, 'String'
     set P17, "ok 2\n"
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 3\n"
     set_args "(0, 0, 0)", P16, P17, P18
     find_name P1, "foo"
@@ -257,7 +257,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -274,23 +274,23 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "flatten + slurpy param" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P19, .ResizablePMCArray
-    new P17, .String
+    new P19, 'ResizablePMCArray'
+    new P17, 'String'
     set P17, "ok 2\n"
     push P19, P17
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 3\n"
     push P19, P18
-    new P20, .ResizablePMCArray
-    new P17, .String
+    new P20, 'ResizablePMCArray'
+    new P17, 'String'
     set P17, "ok 4\n"
     push P20, P17
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 5\n"
     push P20, P18
-    new P21, .String
+    new P21, 'String'
     set P21, "ok 6\n"
     set_args "(0, 0x20, 0x20, 0)", P16, P19, P20, P21
     find_name P1, "foo"
@@ -329,7 +329,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -346,7 +346,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - autobox" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -401,13 +401,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
 .sub main :main
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "hello"
-    $P1 = new .Integer
+    $P1 = new 'Integer'
     $P1 = 42
-    $P2 = new .String
+    $P2 = new 'String'
     $P2 = "again"
-    $P3 = new .Float
+    $P3 = new 'Float'
     $P3 = 47.11
     find_name $P10, "foo"
     # set_args and invoke must be adjacent
@@ -434,7 +434,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0)", $P0
@@ -483,7 +483,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0,0)", $P0,77
@@ -501,7 +501,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0,0)", $P0,77
@@ -525,7 +525,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0)", $P0
@@ -549,7 +549,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     .local pmc ar
-    ar = new ResizableIntegerArray
+    ar = new 'ResizableIntegerArray'
     push ar, 1
     push ar, 2
     push ar, 3
@@ -683,7 +683,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "empty args" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "()"
@@ -702,7 +702,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional args" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0x0)", $P0
@@ -836,7 +836,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - PIR const" );
 .const int MYCONST = -2
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     "foo"(MYCONST)
 .end
 .sub "foo"
@@ -851,7 +851,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional args, :opt_flag" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     foo($P0)
     foo()
@@ -874,7 +874,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional multiple :opt_flag" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     foo($P0, "ok 2\n", "ok 3\n")
 .end
@@ -938,9 +938,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 5 - arg/param conflict" );
 .sub main :main
     .local pmc a, b
-    a = new Integer
+    a = new 'Integer'
     a = 1
-    b = new Integer
+    b = new 'Integer'
     b = 2
     .local pmc c, d
     (c, d) = foo(a, b)
@@ -957,7 +957,7 @@ ok2:
 .sub foo
     .param pmc a
     .param pmc b
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 3
     .return bar($P0, a, b)
 .end
@@ -1071,9 +1071,9 @@ OUTPUT
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
 pir_output_is( <<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new String
+    $P1 = new 'String'
     $P1 = "ok 2\n"
     $P0 = foo($P0, $P1)
     print $P0
@@ -1103,7 +1103,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call :slurpy with :flat" );
         print "\n"
 .end
 .sub main :main
-        $P34 = new Array
+        $P34 = new 'Array'
         $P34 = 0
         ## normal flattening direct call, non-slurpy returns
         $P35 = _fn1($P34 :flat)
@@ -1129,11 +1129,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call with :flat in the middle" );
     print "\n"
 .end
 .sub main :main
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1162,11 +1162,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "right number of args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 3
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1195,11 +1195,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 4
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1229,11 +1229,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1246,7 +1246,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
 .sub main :main
     .local pmc s
-    s = new .String
+    s = new 'String'
     s = "OK 1\n"
     $S0 = s."lower"()
     print $S0
@@ -1566,7 +1566,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via explicit continuation" );
     .local string result
     result = "not ok 2\n"
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
@@ -1593,7 +1593,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall explicit continuation, no args" )
     .local string result
     result = "not ok 2\n"
     .local pmc cont
-    cont = new .Continuation
+    cont = new 'Continuation'
     set_addr cont, cont_dest
     bar(cont, "ok 1\n")
     print "oops\n"
@@ -1622,7 +1622,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         ## debug 0x80
         .lex "MAIN-CONT", $P41
         $I42 = 10
-        $P41 = new .Continuation
+        $P41 = new 'Continuation'
         set_addr $P41, L2
         goto L3
 L2:
@@ -2133,7 +2133,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "named flat/slurpy" );
 .sub main :main
         .local pmc h
-        h = new .Hash
+        h = new 'Hash'
         h['a'] = 20
         h['b'] = 10
         foo( h :named :flat )
@@ -2285,10 +2285,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after slurpy array" );
 .sub main :main
     foo(0, 'abc' => 1)
     foo('abc' => 2)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     push $P0, 1
     foo($P0 :flat, 'abc' => 3)
-    $P0 = new .ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
 .end
 
@@ -2309,7 +2309,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named loses :flat arg (#39044)" );
 .sub main :main
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['a'] = 11
     $P0['b'] = 22
     $P0['c'] = 33
@@ -2338,7 +2338,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named loses :flat arg" );
 .sub main :main
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['a'] = 11
     $P0['b'] = 22
     $P0['c'] = 33
@@ -2393,7 +2393,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
 .sub 'main' :main
         .local pmc args
-        args = new .Hash
+        args = new 'Hash'
         args['foo'] = 1
         args['bar'] = 2
 

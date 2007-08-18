@@ -147,7 +147,7 @@ OUTPUT
 # ' for vim
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "isa" );
-    new P1, .Boolean
+    new P1, 'Boolean'
     isa I0, P1, "Boolean"
     print I0
     isa I0, P1, "Bool"
@@ -186,7 +186,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "does scalar" );
-    new P1, .Boolean
+    new P1, 'Boolean'
     does I0, P1, "Boolean"
     print I0
     does I0, P1, "Bool"
@@ -200,7 +200,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "does array" );
-    new P1, .OrderedHash
+    new P1, 'OrderedHash'
     does I0, P1, "Boolean"
     print I0
     does I0, P1, "Bool"
@@ -420,16 +420,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
 .end
 .namespace ['Bar']
 .sub init :vtable :method
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Foo.i'
     setattribute self, ['Foo'], "i", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Foo.j'
     setattribute self, ["Foo"], "j", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Bar.j'
     setattribute self, ["Bar"], "j", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Bar.k'
     setattribute self, ["Bar"], "k", $P0
 .end
@@ -444,11 +444,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get object attribs" );
     addattribute P1, "i"
     new P2, P1
 
-    new P3, .Integer
+    new P3, 'Integer'
     set P3, 1024
     setattribute P2, "i", P3
 
-    new P4, .Integer
+    new P4, 'Integer'
     getattribute P4, P2, "i"
     print P4
     print "\n"
@@ -463,9 +463,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get multiple object attribs" );
     addattribute P1, "j"
     new P2, "Foo"
 
-    new P3, .Integer
+    new P3, 'Integer'
     set P3, 4201
-    new P4, .Hash
+    new P4, 'Hash'
     set P4["Key"], "Value"
 
     setattribute P2, "i", P3
@@ -488,7 +488,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" )
     newpdd15class P1, "Foo"
     new P2, P1
 
-    new P3, .Integer
+    new P3, 'Integer'
     setattribute P2, "bar", P3
     end
 CODE
@@ -499,7 +499,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
     newpdd15class P1, "Foo"
     new P2, P1
 
-    new P3, .Integer
+    new P3, 'Integer'
     setattribute P2, ["Foo"], "no_such", P3
     end
 CODE
@@ -537,10 +537,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values are specific to objects"
     new P2, P1
     new P3, P1
 
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 100
     setattribute P2, "i", P4
-    new P5, .String
+    new P5, 'String'
     set P5, "One hundred"
     setattribute P3, "i", P5
 
@@ -570,13 +570,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
 # both have the same value, despite the C<inc>.
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 10
     setattribute P2, "i", P4
     inc P4
     setattribute P2, "j", P4
 
-    new P5, .Integer
+    new P5, 'Integer'
     set P5, 100
     setattribute P3, "i", P5
     inc P5
@@ -627,18 +627,18 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
     # print I3                  # don't assume anything about this offset
     # print "\n"		# ' for vim
 
-    new P10, .String		# set attribute values
+    new P10, 'String'		# set attribute values
     set P10, "i\n"		# attribute slots have reference semantics
     setattribute P3, ".i", P10	# so always put new PMCs in
                                 # if you have unique values
-    new P10, .String
+    new P10, 'String'
     set P10, "j\n"
     setattribute P3, ".j", P10
 
-    new P10, .String
+    new P10, 'String'
     set P10, "k\n"
     setattribute P3, ".k", P10
-    new P10, .String
+    new P10, 'String'
     set P10, "l\n"
     setattribute P3, ".l", P10
 
@@ -687,25 +687,25 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     new P13, "Bar"
 
     # Foo and Bar have attribute accessor methods
-    new P5, .String		# set attribute values
+    new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set_args "(0,0)", P5, "i"
     get_results "()"
     callmethodcc P13, "Foo::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "j\n"
     set_args "(0,0)", P5, "j"
     get_results "()"
     callmethodcc  P13,"Foo::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "k\n"
     set_args "(0,0)", P5, "k"
     get_results "()"
     callmethodcc  P13,"Bar::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "l\n"
     set_args "(0,0)", P5, "l"
     get_results "()"
@@ -808,31 +808,31 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     new P2, "Bar"
 
     # Foo and Bar have attribute accessor methods
-    new P5, .String		# set attribute values
+    new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set_args "(0,0,0)", P5, "Foo", "i"
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "j\n"
     set_args "(0,0,0)", P5, "Foo", "j"
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "k\n"
     set_args "(0,0,0)", P5, "Bar", "k"
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "l\n"
     set_args "(0,0,0)", P5, "Bar", "l"
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "m\n"
     set_args "(0,0,0)", P5, "Bar", "m"
     get_results "()"
@@ -923,7 +923,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
     .param int val
 
     print "in set_integer\n"
-    new P6, .Integer
+    new P6, 'Integer'
     set P6, val
     setattribute P2, ".i", P6
 
@@ -937,7 +937,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
     print "in add\n"
     getattribute P10, self, ".i"
     getattribute P11, left, ".i"
-    new P12, .Integer
+    new P12, 'Integer'
     add P12, P10, P11
     setattribute P7, ".i", right
 
@@ -1012,11 +1012,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
 
     new P4, "Sun"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "G"
     setattribute P4, "Spectral Type", P5
 
-    new P6, .String
+    new P6, 'String'
     set P6, "$100,000,000"
     setattribute P4, "Annual Profit", P6
 
@@ -1045,7 +1045,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "two levels of inheritance" );
 
     new P4, "Sun"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "Taurus"
     setattribute P4, "Location", P5
     getattribute P6, P4, "Location"
@@ -1058,7 +1058,7 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #1" );
     newpdd15class P0, "Astronomical Object"
-    new P1, .String
+    new P1, 'String'
     set P1, "Not a class"
     addparent P0, P1
     end
@@ -1069,7 +1069,7 @@ OUTPUT
 # '
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #2" );
-    new P0, .Hash
+    new P0, 'Hash'
     newpdd15class P1, "Trashcan"
     addparent P0, P1
     end
@@ -1130,7 +1130,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name" );
     newpdd15class P1, "Foo"
     addattribute P1, "i"
     new P2, "Foo"
-    new P3, .String
+    new P3, 'String'
     set P3, "ok\n"
     setattribute P2, "i", P3
 
@@ -1147,10 +1147,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     subclass P1, P0, "Foo"
     addattribute P1, "i"
     new P2, "Foo"
-    new P3, .String
+    new P3, 'String'
     set P3, "foo i\n"
     setattribute P2, "i", P3
-    new P3, .String
+    new P3, 'String'
     set P3, "bar j\n"
     setattribute P2, "j", P3
 
@@ -1170,10 +1170,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set attrib by name subclass" );
     subclass P1, P0, "Foo"
     addattribute P1, "i"
     new P2, "Foo"
-    new P3, .String
+    new P3, 'String'
     set P3, "foo i\n"
     setattribute P2, ["Foo"], "i", P3
-    new P3, .String
+    new P3, 'String'
     set P3, "bar j\n"
     setattribute P2, ["Bar"], "j", P3
 
@@ -1366,7 +1366,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
   k = i + j
   print k
   print "\n"
-  j = new Integer
+  j = new 'Integer'
   j = 100
   k = i + j
   print k
@@ -1622,7 +1622,7 @@ SKIP: {
     subclass P2, "Integer", "Foo"
     set I0, 0
     set I3, 1
-    new P5, .Integer
+    new P5, 'Integer'
     set P5, 42
     instantiate P1
     print P1
@@ -1658,7 +1658,7 @@ OUTPUT
     .local pmc obj
     obj = new "Foo"
     $I1 = classoffset obj, "Foo"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = val
     setattribute obj, $I1, $P0
     .pcc_begin_return
@@ -1758,16 +1758,16 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
 
     new P2, "Bar"
 
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 10
     setattribute P2, "i", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 11
     setattribute P2, "j", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 20
     setattribute P2, "k", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 21
     setattribute P2, "l", P4
 
@@ -1809,8 +1809,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
     o = cl.'new'()
     a = getattribute o, "a"
     print a
-    h = new .Hash
-    $P0 = new .String
+    h = new 'Hash'
+    $P0 = new 'String'
     $P0 = "ok 2\n"
     h['a'] = $P0
     o  = cl.'new'(h)
@@ -1826,7 +1826,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
     .return()
 .end
 .sub init :vtable :method
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     setattribute self, 'a', $P0
 .end

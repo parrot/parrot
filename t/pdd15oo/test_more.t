@@ -5,7 +5,7 @@
 	load_bytecode 'library/Test/More.pir'
 
 	.local pmc tb_args
-	tb_args = new .Hash
+	tb_args = new 'Hash'
 
 	.local pmc test
 	test = new 'Test::Builder', tb_args
@@ -114,8 +114,8 @@
 
 	.local pmc left
 	.local pmc right
-	left  = new .String
-	right = new .String
+	left  = new 'String'
+	right = new 'String'
 	left  = 'zero'
 	right = 'zero'
 
@@ -123,7 +123,7 @@
 	is( left, right )
 	test_test( 'passing test is() for pmcs')
 
-	right = new .Integer
+	right = new 'Integer'
 	right = 0
 	test_fail()
 	test_diag( 'Received: zero' )
@@ -136,7 +136,7 @@
 	is( left, right, 'comparing two pmcs' )
 	test_test( 'passing test is() for pmcs with description')
 
-	right = new .Hash
+	right = new 'Hash'
 
 	.local string expected
 	.local string hash_string
@@ -181,8 +181,8 @@
 .sub test_is_deeply_array
 	.local pmc left
 	.local pmc right
-	left  = new .ResizablePMCArray
-	right = new .ResizablePMCArray
+	left  = new 'ResizablePMCArray'
+	right = new 'ResizablePMCArray'
 
 	push left,  7
 	push right, 7
@@ -225,8 +225,8 @@
 	.local pmc left
 	.local pmc right
 
-	left  = new .Hash
-	right = new .Hash
+	left  = new 'Hash'
+	right = new 'Hash'
 
 	test_pass()
 	is_deeply( left, right )
@@ -271,14 +271,14 @@
 	.local pmc left
 	.local pmc right
 
-	left  = new .Hash
-	right = new .Hash
+	left  = new 'Hash'
+	right = new 'Hash'
 
 	.local pmc left_array
 	.local pmc right_array
-	left_array  = new .Array
+	left_array  = new 'Array'
 	left_array  = 3
-	right_array = new .Array
+	right_array = new 'Array'
 	right_array = 3
 
 	left[  'array' ] = left_array
@@ -397,13 +397,13 @@
 	test_test( 'passing isa_ok for PMC/string (super)')
 
 	test_pass( 'Sossy isa daschund' )
-	$P1 = new String
+	$P1 = new 'String'
         $P1 = "daschund"
 	isa_ok(Sossy, $P1, "Sossy")
 	test_test( 'passing isa_ok for PMC/PMC (class =)' )
 
 	test_pass( 'Sossy isa dog' )
-	$P2 = new String
+	$P2 = new 'String'
         $P2 = "dog"
 	isa_ok(Sossy, $P2, "Sossy")
 	test_test( 'passing isa_ok for PMC/PMC (super)')

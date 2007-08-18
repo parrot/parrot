@@ -147,7 +147,7 @@ OUTPUT
 # ' for vim
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "isa" );
-    new P1, .Boolean
+    new P1, 'Boolean'
     isa I0, P1, "Boolean"
     print I0
     isa I0, P1, "Bool"
@@ -186,7 +186,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "does scalar" );
-    new P1, .Boolean
+    new P1, 'Boolean'
     does I0, P1, "Boolean"
     print I0
     does I0, P1, "Bool"
@@ -200,7 +200,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "does array" );
-    new P1, .OrderedHash
+    new P1, 'OrderedHash'
     does I0, P1, "Boolean"
     print I0
     does I0, P1, "Bool"
@@ -432,16 +432,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addattribute subclass - same name" );
 .end
 .namespace ['Bar']
 .sub init :vtable :method
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Foo.i'
     setattribute self, "Foo\0i", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Foo.j'
     setattribute self, "Foo\0j", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Bar.j'
     setattribute self, "Bar\0j", $P0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = 'Bar.k'
     setattribute self, "Bar\0k", $P0
 .end
@@ -476,7 +476,7 @@ OUTPUT
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "classoffset: non-object argument" );
     newclass P1, "Foo"
     find_type I0, "Foo"
-    new P2, .Undef
+    new P2, 'Undef'
     classoffset I1, P2, "Foo"
     print I1
     end
@@ -491,11 +491,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get object attribs" );
     new P2, I0
     classoffset I1, P2, "Foo"
 
-    new P3, .Integer
+    new P3, 'Integer'
     set P3, 1024
     setattribute P2, I1, P3
 
-    new P4, .Integer
+    new P4, 'Integer'
     getattribute P4, P2, I1
     print P4
     print "\n"
@@ -512,9 +512,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get multiple object attribs" );
     new P2, I0
     classoffset I1, P2, "Foo"
 
-    new P3, .Integer
+    new P3, 'Integer'
     set P3, 4201
-    new P4, .Hash
+    new P4, 'Hash'
     set P4["Key"], "Value"
 
     setattribute P2, I1, P3
@@ -540,7 +540,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute" )
     new P2, I0
     classoffset I1, P2, "Foo"
 
-    new P3, .Integer
+    new P3, 'Integer'
     setattribute P2, I1, P3
     end
 CODE
@@ -552,7 +552,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent by name" );
     find_type I0, "Foo"
     new P2, I0
 
-    new P3, .Integer
+    new P3, 'Integer'
     setattribute P2, "Foo\0no_such", P3
     end
 CODE
@@ -578,7 +578,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "setting non-existent attribute - 
     new P2, I0
     classoffset I1, P2, "Foo"
 
-    new P3, .Integer
+    new P3, 'Integer'
     dec I1
     setattribute P2, I1, P3
     end
@@ -608,10 +608,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values are specific to objects"
     new P3, I0
     classoffset I2, P3, "Foo"
 
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 100
     setattribute P2, I1, P4
-    new P5, .String
+    new P5, 'String'
     set P5, "One hundred"
     setattribute P3, I2, P5
 
@@ -644,14 +644,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing" );
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
 # both have the same value, despite the C<inc>.
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 10
     setattribute P2, I1, P4
     inc P4
     add I2, I1, 1
     setattribute P2, I2, P4
 
-    new P5, .Integer
+    new P5, 'Integer'
     set P5, 100
     setattribute P3, I3, P5
     inc P5
@@ -707,23 +707,23 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values and subclassing 2" );
 
     set I0, I3			# access Foo attribs, remember offset
 
-    new P10, .String		# set attribute values
+    new P10, 'String'		# set attribute values
     set P10, "i\n"		# attribute slots have reference semantics
     setattribute P3, I0, P10	# so always put new PMCs in
                                 # if you have unique values
     inc I0			# next attribute
-    new P10, .String
+    new P10, 'String'
     set P10, "j\n"
     setattribute P3, I0, P10
 
     classoffset I4, P3, "Bar"   # set Bar attribs
     set I1, I4			# dup offset for retrieval again
 
-    new P10, .String
+    new P10, 'String'
     set P10, "k\n"
     setattribute P3, I1, P10
     inc I1
-    new P10, .String
+    new P10, 'String'
     set P10, "l\n"
     setattribute P3, I1, P10
 
@@ -776,25 +776,25 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     new P13, I1
 
     # Foo and Bar have attribute accessor methods
-    new P5, .String		# set attribute values
+    new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set_args "(0,0)", P5, 0
     get_results "()"
     callmethodcc P13, "Foo::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "j\n"
     set_args "(0,0)", P5, 1
     get_results "()"
     callmethodcc  P13,"Foo::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "k\n"
     set_args "(0,0)", P5, 0
     get_results "()"
     callmethodcc  P13,"Bar::set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "l\n"
     set_args "(0,0)", P5, 1
     get_results "()"
@@ -906,31 +906,31 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     new P2, I1
 
     # Foo and Bar have attribute accessor methods
-    new P5, .String		# set attribute values
+    new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set_args "(0,0,0)", P5, "Foo", 0
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "j\n"
     set_args "(0,0,0)", P5, "Foo", 1
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "k\n"
     set_args "(0,0,0)", P5, "Bar", 0
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "l\n"
     set_args "(0,0,0)", P5, "Bar", 1
     get_results "()"
     callmethodcc P2, "set"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "m\n"
     set_args "(0,0,0)", P5, "Bar", 2
     get_results "()"
@@ -1033,7 +1033,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
     get_params "(0,0)", P2, I5
     print "in set_integer\n"
     classoffset I0, P2, "Foo"
-    new P6, .Integer
+    new P6, 'Integer'
     set P6, I5
     setattribute P2, I0, P6
     set_returns "()"
@@ -1044,7 +1044,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "overridden vtables" );
     classoffset I0, P5, "Foo"
     getattribute P10, P5, I0
     getattribute P11, P6, I0
-    new P12, .Integer
+    new P12, 'Integer'
     add P12, P10, P11
     setattribute P7, I0, P12
     set_returns "(0)", P7
@@ -1123,12 +1123,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
     new P4, I0
 
     classoffset I1, P4, "Star"
-    new P5, .String
+    new P5, 'String'
     set P5, "G"
     setattribute P4, I1, P5
 
     classoffset I2, P4, "Company"
-    new P6, .String
+    new P6, 'String'
     set P6, "$100,000,000"
     setattribute P4, I2, P6
 
@@ -1159,7 +1159,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "two levels of inheritance" );
     new P4, I0
     classoffset I1, P4, "Astronomical Object"
 
-    new P5, .String
+    new P5, 'String'
     set P5, "Taurus"
     setattribute P4, I1, P5
     getattribute P6, P4, I1
@@ -1172,7 +1172,7 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #1" );
     newclass P0, "Astronomical Object"
-    new P1, .String
+    new P1, 'String'
     set P1, "Not a class"
     addparent P0, P1
     end
@@ -1183,7 +1183,7 @@ OUTPUT
 # '
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "addparent exceptions #2" );
-    new P0, .Hash
+    new P0, 'Hash'
     newclass P1, "Trashcan"
     addparent P0, P1
     end
@@ -1243,7 +1243,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name" );
     find_type I1, "Foo"
     new P2, I1
     classoffset I2, P2, "Foo"
-    new P3, .String
+    new P3, 'String'
     set P3, "ok\n"
     setattribute P2, I2, P3
 
@@ -1262,11 +1262,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get attrib by name subclass" );
     find_type I1, "Foo"
     new P2, I1
     classoffset I2, P2, "Foo"
-    new P3, .String
+    new P3, 'String'
     set P3, "foo i\n"
     setattribute P2, I2, P3
     classoffset I2, P2, "Bar"
-    new P3, .String
+    new P3, 'String'
     set P3, "bar j\n"
     setattribute P2, I2, P3
 
@@ -1287,10 +1287,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set attrib by name subclass" );
     addattribute P1, "i"
     find_type I1, "Foo"
     new P2, I1
-    new P3, .String
+    new P3, 'String'
     set P3, "foo i\n"
     setattribute P2, "Foo\x0i", P3
-    new P3, .String
+    new P3, 'String'
     set P3, "bar j\n"
     setattribute P2, "Bar\x0j", P3
 
@@ -1489,7 +1489,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" )
   k = i + j
   print k
   print "\n"
-  j = new Integer
+  j = new 'Integer'
   j = 100
   k = i + j
   print k
@@ -1747,7 +1747,7 @@ SKIP: {
     subclass P2, "Integer", "Foo"
     set I0, 0
     set I3, 1
-    new P5, .Integer
+    new P5, 'Integer'
     set P5, 42
     instantiate P1
     print P1
@@ -1785,7 +1785,7 @@ OUTPUT
     .local pmc obj
     obj = new $I0
     $I1 = classoffset obj, "Foo"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = val
     setattribute obj, $I1, $P0
     .pcc_begin_return
@@ -1828,7 +1828,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
-    new P0, .ParrotObject
+    new P0, 'ParrotObject'
     end
 CODE
 /Can't create new ParrotObject/
@@ -1887,16 +1887,16 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
     find_type I0, "Bar"
     new P2, I0
 
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 10
     setattribute P2, "i", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 11
     setattribute P2, "j", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 20
     setattribute P2, "k", P4
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, 21
     setattribute P2, "l", P4
 
@@ -1938,8 +1938,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
     o = new 'Foo'
     a = getattribute o, "a"
     print a
-    h = new .Hash
-    $P0 = new .String
+    h = new 'Hash'
+    $P0 = new 'String'
     $P0 = "ok 2\n"
     h['a'] = $P0
     $I0 = find_type 'Foo'
@@ -1956,7 +1956,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "init with and w/o arg" );
     .return()
 .end
 .sub init :vtable :method
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     setattribute self, 'a', $P0
 .end

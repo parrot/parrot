@@ -28,7 +28,7 @@ various combinations of Parrot integer and number types.
 ###
 pir_output_is( <<'CODE', <<OUTPUT, "take the negative of an Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     ## negate zero.
     set P0, 0
     n_neg P1, P0
@@ -58,7 +58,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of an Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     ## find absolute zero (so to speak).
     set P0, 0
     P1 = n_abs P0
@@ -91,11 +91,11 @@ OUTPUT
 ###
 pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     set P0, 4000
-    P1 = new Integer
+    P1 = new 'Integer'
     set P1, -123
-    P2 = new Integer
+    P2 = new 'Integer'
     set P2, 666
     n_add P2, P0, P1
     print P2
@@ -125,11 +125,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     set P0, 4000
-    P1 = new Integer
+    P1 = new 'Integer'
     set P1, -123
-    P2 = new Integer
+    P2 = new 'Integer'
     set P2, 666
     n_sub P2, P0, P1
     print P2
@@ -159,11 +159,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "multiply Integer with Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     set P0, 4000
-    P1 = new Integer
+    P1 = new 'Integer'
     set P1, -123
-    P2 = new Integer
+    P2 = new 'Integer'
     set P2, 666
     n_mul P2, P0, P1
     print P2
@@ -188,11 +188,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "divide Integer by Integer" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     set P0, 4000
-    P1 = new Integer
+    P1 = new 'Integer'
     set P1, -123
-    P2 = new Integer
+    P2 = new 'Integer'
     set P2, 666
     n_div P2, P0, P1
     print P2
@@ -220,7 +220,7 @@ OUTPUT
 ###
 pir_output_is( <<'CODE', <<OUTPUT, "negate a Float" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 0
     P1 = n_neg P0
     print P1
@@ -247,7 +247,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "take the absolute value of a Float" );
 .sub _main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     set P0, 0
     P1 = n_abs P0
     print P1
@@ -277,9 +277,9 @@ OUTPUT
 ###
 pir_output_is( <<'CODE', <<OUTPUT, "add Integer to Float" );
 .sub _main :main
-    P10 = new Integer
+    P10 = new 'Integer'
     set P10, 4000
-    P0 = new Float
+    P0 = new 'Float'
     set P0, -123.123
     n_add P1, P0, P10
     print P1
@@ -308,9 +308,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "subtract Integer from Float" );
 .sub _main :main
-    P10 = new Integer
+    P10 = new 'Integer'
     set P10, 4000
-    P0 = new Float
+    P0 = new 'Float'
     set P0, -123.123
     n_sub P1, P0, P10
     print P1
@@ -339,9 +339,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Integer" );
 .sub _main :main
-    P10 = new Integer
+    P10 = new 'Integer'
     set P10, 4000
-    P0 = new Float
+    P0 = new 'Float'
     set P0, -123.123
     n_mul P1, P0, P10
     print P1
@@ -370,9 +370,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Integer" );
 .sub _main :main
-    P10 = new Integer
+    P10 = new 'Integer'
     set P10, 4000
-    P0 = new Float
+    P0 = new 'Float'
     set P0, -123.123
     n_div P1, P0, P10
     print P1
@@ -409,11 +409,11 @@ OUTPUT
 ###
 pir_output_is( <<'CODE', <<OUTPUT, "add Float to Float" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 4000.246
-    P1 = new Float
+    P1 = new 'Float'
     set P1, -123.123
-    P2 = new Float
+    P2 = new 'Float'
     set P2, 6.66
     n_add P2, P0, P1
     print P2
@@ -436,9 +436,9 @@ OUTPUT
 ## there is no n_infix_ic_p_nc_p op; the PMC argument always comes first.
 pir_output_is( <<'CODE', <<OUTPUT, "add/sub/mul/div of Float with constants" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 4000.246
-    P1 = new Float
+    P1 = new 'Float'
     set P1, -123.123
     P2 = n_add P1, 6.78
     print P2
@@ -462,11 +462,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "subtract Float from Float" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 4000.246
-    P1 = new Float
+    P1 = new 'Float'
     set P1, -123.123
-    P2 = new Float
+    P2 = new 'Float'
     set P2, 6.66
     n_sub P2, P0, P1
     print P2
@@ -487,11 +487,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "multiply Float with Float" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 400.0246
-    P1 = new Float
+    P1 = new 'Float'
     set P1, -123.123
-    P2 = new Float
+    P2 = new 'Float'
     set P2, 6.66
     n_mul P2, P0, P1
     print P2
@@ -512,11 +512,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "divide Float by Float" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, 4000.246
-    P1 = new Float
+    P1 = new 'Float'
     set P1, -123.123
-    P2 = new Float
+    P2 = new 'Float'
     set P2, 6.66
     n_div P2, P1, P0
     print P2
@@ -537,7 +537,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "verify new PMC" );
 .sub main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     P1 = P0
     P0 = n_add P0, 1
     print P0
@@ -557,7 +557,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators" );
 .pragma n_operators 1
 
 .sub main :main
-    P0 = new Integer
+    P0 = new 'Integer'
     P1 = P0
     P0 = P0 + 1
     print P0
@@ -577,7 +577,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".pragma n_operators - inplace" );
 .pragma n_operators 1
 .sub main :main
     .local pmc p
-    p = new .Integer
+    p = new 'Integer'
     p = 10
     p += 4
     print p
