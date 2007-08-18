@@ -232,41 +232,41 @@ DONE:
 
 =head2 _FUNCTION_CALL
 
+Call a function.
+
 =cut
 
 .sub _FUNCTION_CALL
-  .param pmc function
-  .param pmc args
+    .param pmc function
+    .param pmc args
 
-  .local string type
-  .local pmc proto
-  .local pmc scope
-  .local pmc body
+    .local pmc proto
+    proto = function._get_args()
+    .local pmc body
+    body  = function._get_body()
 
-  proto = function._get_args()
-  body  = function._get_body()
+    .local string type
+    type = typeof body                     # Get the function type
 
-  type = typeof body                     # Get the function type
-
-  if type == "Sub" goto COMPILED_FUNCTION
-  goto INTERPRETED_FUNCTION
+    if type == "Sub" goto COMPILED_FUNCTION
+    goto INTERPRETED_FUNCTION
 
 COMPILED_FUNCTION:
-  # VALID_IN_PARROT_0_2_0 set_args "0", args                    # First argument
-  # VALID_IN_PARROT_0_2_0 goto CALL_FUNCTION
-  # Just a wild guess
-  .return body( args )
+    # VALID_IN_PARROT_0_2_0 set_args "0", args                    # First argument
+    # VALID_IN_PARROT_0_2_0 goto CALL_FUNCTION
+    # Just a wild guess
+    .return body( args )
    
-
 INTERPRETED_FUNCTION:
-  scope = function._get_scope()
+    .local pmc scope
+    scope = function._get_scope()
 
                                         # 1st arg - the code to evaluate
                                         # 2nd arg - the arg prototype
                                         # 3rd arg - the args to evaluate
                                         # The closure
-  set_args "0,0,0", body, proto, args
-  goto CALL_FUNCTION
+    set_args "0,0,0", body, proto, args
+    goto CALL_FUNCTION
 
 CALL_FUNCTION:
   # VALID_IN_PARROT_0_2_0 pushtopp                            # Save the upper registers

@@ -146,57 +146,49 @@ cl.pir - Set up the package 'COMMON-LISP'
 .end
 
 .sub _apply
-  .param pmc args
-  .local string type
-  .local pmc func
-  .local pmc retv
-  .local pmc car
-  .local pmc cdr
+    .param pmc args
+    .ASSERT_MINIMUM_LENGTH(args, 2, ERROR_NARGS)
 
-  .ASSERT_MINIMUM_LENGTH(args, 2, ERROR_NARGS)
+    .local pmc car
+    .CAR(car, args)
 
-  .CAR(car, args)
-  .SECOND(cdr, args)
+    .local pmc cdr
+    .SECOND(cdr, args)
+    .ASSERT_TYPE(cdr, "list")
 
-  .ASSERT_TYPE(cdr, "list")
+    .local string type
+    type = typeof car
+    if type == "LispFunction" goto FUNCTION
+    if type == "LispSymbol" goto SYMBOL
 
-   type = typeof car
-
-   if type == "LispFunction" goto FUNCTION
-   if type == "LispSymbol" goto SYMBOL
-
-   goto INVALID_FUNCTION_NAME
+    goto INVALID_FUNCTION_NAME
 
 FUNCTION:
-   _FUNCTION_CALL(car, cdr)
-   goto DONE
+    _FUNCTION_CALL(car, cdr)
+    goto DONE
 
 SYMBOL:
-   func = car._get_function()                   # Get the function from symbol
-   if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
+    .local pmc func
+    func = car._get_function()                   # Get the function from symbol
+    if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
 
-   _FUNCTION_CALL(func,cdr)
-   goto DONE
+    _FUNCTION_CALL(func,cdr)
+    goto DONE
 
 INVALID_FUNCTION_NAME:
-  .ERROR_1("undefined-function", "%s is not a function name", car)
-   goto DONE
+    .ERROR_1("undefined-function", "%s is not a function name", car)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to APPLY")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to APPLY")
+    goto DONE
 
 ERROR_NONLIST:
-  .ERROR_0("type-error", "second argument to APPLY must be a proper list")
-   goto DONE
+    .ERROR_0("type-error", "second argument to APPLY must be a proper list")
+     goto DONE
 
 DONE:
-   # VALID_IN_PARROT_0_2_0 argcI = 0                                    # No integer values returned
-   # VALID_IN_PARROT_0_2_0 argcN = 0                                    # No float values returned
-   # VALID_IN_PARROT_0_2_0 argcS = 0                                    # No string values returned
-
-   # VALID_IN_PARROT_0_2_0 returncc                                     # Call the return continuation
-   .return()                                   # Call the return continuation
+    .return()                                   # Call the return continuation
 .end
 
 .sub _atom
