@@ -95,8 +95,9 @@
 ##    method block($/, $key) {
 ##        our $?BLOCK, @?BLOCK;
 ##        if ($key ne 'close') {
-##            $?BLOCK := PAST::Block.new( :blocktype('immediate'),
-##                                           :node($/) );
+##            $?BLOCK := PAST::Block.new( PAST::Stmts.new(),
+##                                        :blocktype('immediate'),
+##                                        :node($/) );
 ##            unshift @?BLOCK, $?BLOCK;
 ##        }
 ##        else {
@@ -112,8 +113,10 @@
     if key == 'close' goto block_close
   block_open:
     .local pmc past
+    $P1 = getclass 'PAST::Stmts'
+    $P2 = $P1.'new'()
     $P0 = getclass 'PAST::Block'
-    past = $P0.'new'('blocktype'=>'immediate', 'node'=>match)
+    past = $P0.'new'($P2, 'blocktype'=>'immediate', 'node'=>match)
     set_global '$?BLOCK', past
     $P0 = get_global '@?BLOCK'
     unshift $P0, past
@@ -133,28 +136,34 @@
 #### Subroutine and method definitions ####
 
 ##    method routine_def($/) {
-##        my $past = PAST::Block.new( :name(~$<ident>),
-##                                    :blocktype('declaration'),
-##                                    :pragma(':method'),
-##                                    :node($/) );
+##        my $past := $($<block>);
+##        $past.name(~$<ident>);
+##        $past.blocktype('declaration');
+##        $past.node($/);
+##        if $<declarator> eq 'method' { $past.pragma(':method'); }
+##        my $params := $past[0];
 ##        for $<signature>[0] {
-##            $past.push($($_['param_var']));
-##        }
-##        for $($<block>).iterator() {
-##            $past.push($_);
+##            my $param_var := $($_<param_var>);
+##            $past.symbol($param_var.name(), :scope('lexical'));
+##            $params.push($param_var);
 ##        }
 ##        return $past;
 ##    }
 .sub 'routine_def' :method
     .param pmc match
     .local pmc past
+    $P0 = match['block']
+    past = $P0.'get_scalar'()
     $S0 = match['ident']
-    $P0 = getclass 'PAST::Block'
-    past = $P0.'new'('name'=>$S0, 'blocktype'=>'declaration', 'node'=>match)
+    past.'name'($S0)
+    past.'blocktype'('declaration')
+    past.'node'(match)
     $S0 = match['declarator']
     if $S0 != 'method' goto add_signature
     past.'pragma'(':method')
   add_signature:
+    .local pmc params
+    params = past[0]
     $P0 = match['signature']
     $P0 = $P0[0]
     unless $P0 goto param_end
@@ -163,20 +172,14 @@
   param_loop:
     unless iter goto param_end
     $P1 = shift iter
-    $P1 = $P1['param_var']
-    $P1 = $P1.'get_scalar'()
-    past.push($P1)
+    .local pmc param_var
+    $P2 = $P1['param_var']
+    param_var = $P2.'get_scalar'()
+    $S0 = param_var['name']
+    past.'symbol'($S0, 'scope'=>'lexical')
+    params.'push'(param_var)
     goto param_loop
   param_end:
-    $P0 = match['block']
-    $P0 = $P0.'get_scalar'()
-    iter = $P0.'iterator'()
-  block_loop:
-    unless iter goto block_end
-    $P0 = shift iter
-    past.'push'($P0)
-    goto block_loop
-  block_end:
     .return (past)
 .end
 
