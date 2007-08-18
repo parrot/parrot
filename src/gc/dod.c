@@ -562,9 +562,6 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
     UINTVAL object_size   = pool->object_size;
 
     Small_Object_Arena *cur_arena;
-#if REDUCE_ARENAS
-    UINTVAL free_arenas = 0, old_total_used = 0;
-#endif
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
@@ -997,6 +994,8 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
 
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interp, flags & DOD_trace_stack_FLAG)) {
+        int ignored;
+
         arena_base->dod_trace_ptr = NULL;
         arena_base->dod_mark_ptr  = NULL;
 
@@ -1004,7 +1003,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
         pt_DOD_stop_mark(interp);
 
         /* Now put unused PMCs and Buffers on the free list */
-        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
+        ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
             (void*)&total_free, sweep_cb);
 
         if (interp->profile)

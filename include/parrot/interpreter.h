@@ -267,13 +267,13 @@ typedef struct _Prederef {
  * faster access of registers mainly
  * During a context switch a 3 pointers are set
  */
-struct Interp_Context {
+typedef struct Interp_Context {
     /* common header */
     struct Parrot_Context *state;       /* context  */
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
     Regs_ps                bp_ps;       /* pointers to PMC & STR */
     /* end common header */
-};
+} Interp_Context;
 
 #define CONTEXT(ctx) ((ctx).state)
 

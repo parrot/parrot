@@ -685,33 +685,34 @@ sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void
 static void
 parrot_gc_ims_sweep(PARROT_INTERP)
 {
-    Arenas * const arena_base = interp->arena_base;
-    Gc_ims_private *g_ims;
-    size_t n_objects;
+    Arenas * const  arena_base = interp->arena_base;
+    Gc_ims_private *g_ims      = (Gc_ims_private *)arena_base->gc_private;
+    size_t          n_objects;
+    int             ignored;
 
     IMS_DEBUG((stderr, "\nSWEEP\n"));
-    g_ims = (Gc_ims_private *)arena_base->gc_private;
     /*
      * as we are now gonna kill objects, make sure that we
      * have traced the current stack
      * except for a lazy run, which is invoked from the run loop
      */
+
     /* TODO mark volatile roots */
     Parrot_dod_trace_root(interp, g_ims->lazy ? 0 : DOD_trace_stack_FLAG);
-    /*
-     * mark (again) rest of children
-     */
+
+    /* mark (again) rest of children */
     Parrot_dod_trace_children(interp, (size_t) -1);
-    /*
-     * now sweep all
-     */
+
+    /* now sweep all */
     n_objects = 0;
-    Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
+    ignored   = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
             (void*)&n_objects, sweep_cb);
+
     if (interp->profile)
         Parrot_dod_profile_end(interp, PARROT_PROF_DOD_cb);
-    g_ims->state = GC_IMS_COLLECT;
-    g_ims->n_objects = n_objects;
+
+    g_ims->state           = GC_IMS_COLLECT;
+    g_ims->n_objects       = n_objects;
     g_ims->n_extended_PMCs = arena_base->num_extended_PMCs;
 }
 

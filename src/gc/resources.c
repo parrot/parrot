@@ -45,10 +45,7 @@ PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static size_t aligned_string_size( size_t len );
 
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void * alloc_new_block( PARROT_INTERP,
+static void alloc_new_block( PARROT_INTERP,
     size_t size,
     NOTNULL(Memory_Pool *pool),
     NOTNULL(const char *why) )
@@ -100,10 +97,7 @@ the default size.  The given text is used for debugging.
 
 */
 
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void *
+static void
 alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
         NOTNULL(const char *why))
 {
@@ -131,7 +125,7 @@ alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
     new_block->free  = alloc_size;
     new_block->size  = alloc_size;
 
-    new_block->next = NULL;
+    new_block->next  = NULL;
     new_block->start = (char *)new_block + sizeof (Memory_Block);
     new_block->top   = new_block->start;
 
@@ -147,8 +141,6 @@ alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
 
     pool->top_block        = new_block;
     pool->total_allocated += alloc_size;
-
-    return new_block;
 }
 
 /*
@@ -358,8 +350,9 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
 #endif
 
     /* Snag a block big enough for everything */
-    new_block = (Memory_Block *)alloc_new_block(interp, total_size, pool,
-            "inside compact");
+    alloc_new_block(interp, total_size, pool, "inside compact");
+
+    new_block = pool->top_block;
 
     /* Start at the beginning */
     cur_spot  = new_block->start;
@@ -845,8 +838,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
     /* Constant strings - not compacted */
     arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
 
-    alloc_new_block(interp, POOL_SIZE,
-                    arena_base->constant_string_pool, "init");
+    alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool,"init");
 }
 
 /*
