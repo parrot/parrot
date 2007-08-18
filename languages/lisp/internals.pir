@@ -333,109 +333,110 @@ DONE:
 .end
 
 .sub _MAKE_LAMBDA
-  .param pmc form
-  .local pmc closure
-  .local pmc symbol
-  .local pmc args
-  .local pmc body
-  .local pmc lptr
-  .local pmc retv
+    .param pmc form
 
-  .SECOND(args, form)
-  .THIRD(body, form)
-
-   lptr = args
-
+    .local pmc closure
+    .local pmc symbol
+    .local pmc lptr
+    .local pmc retv
+  
+    .local pmc args
+    .SECOND(args, form)
+    .local pmc body
+    .THIRD(body, form)
+  
+     lptr = args
+  
 ARG_LOOP:
-  .NULL(lptr, SETUP_CLOSURE)
+    .NULL(lptr, SETUP_CLOSURE)
 
-  .CAR(symbol, lptr)                            # Ensure all the arguments are
-  .ASSERT_TYPE(symbol, "symbol")                # symbol types.
+    .CAR(symbol, lptr)                            # Ensure all the arguments are
+    .ASSERT_TYPE(symbol, "symbol")                # symbol types.
 
-  .CDR(lptr, lptr)
-   goto ARG_LOOP
+    .CDR(lptr, lptr)
+    goto ARG_LOOP
 
 SETUP_CLOSURE:
-   closure = new .Closure                       # Capture the scope the closure
-   set_addr closure, CLOSURE_START              # will later be run in
+    closure = new .Closure                       # Capture the scope the closure
+    set_addr closure, CLOSURE_START              # will later be run in
 
-   retv = new "LispFunction"
+    retv = new "LispFunction"
 
-   retv._set_args(args)
-   retv._set_body(body)
-   retv._set_scope(closure)
+    retv._set_args(args)
+    retv._set_body(body)
+    retv._set_scope(closure)
 
-   goto DONE
+    goto DONE
 
 CLOSURE_START:
-  .local string clsymname
-  .local pmc clargsptr
-  .local pmc clprotptr
-  .local pmc clbody
-  .local pmc clprot
-  .local pmc clargs
-  .local pmc clarg
-  .local pmc clval
-  .local pmc clsym
+   .local string clsymname
+   .local pmc clargsptr
+   .local pmc clprotptr
+   .local pmc clbody
+   .local pmc clprot
+   .local pmc clargs
+   .local pmc clarg
+   .local pmc clval
+   .local pmc clsym
 
-   clbody = P5
-   clprot = P6
-   clargs = P7
+    clbody = P5
+    clprot = P6
+    clargs = P7
 
-   clargsptr = clargs
-   clprotptr = clprot
+    clargsptr = clargs
+    clprotptr = clprot
 
-   # VALID_IN_PARROT_0_2_0  new_pad -1
+    # VALID_IN_PARROT_0_2_0  new_pad -1
 
-   goto CLOSURE_ARGS
+    goto CLOSURE_ARGS
 
 CLOSURE_ARGS:
-  .NULL(clprotptr, CLOSURE_CHECK_ARGS)
-  .NULL(clargsptr, CLOSURE_TOO_FEW_ARGS)
+    .NULL(clprotptr, CLOSURE_CHECK_ARGS)
+    .NULL(clargsptr, CLOSURE_TOO_FEW_ARGS)
 
-  .CAR(clval, clargsptr)                        # The lexical value
-  .CAR(clarg, clprotptr)                        # The lexical arg prototype
+    .CAR(clval, clargsptr)                        # The lexical value
+    .CAR(clarg, clprotptr)                        # The lexical arg prototype
 
-   clsymname = clarg._get_name_as_string()
-   clsym = _LEXICAL_SYMBOL(clsymname, clval)    # Create a new lexical symbol
+    clsymname = clarg._get_name_as_string()
+    clsym = _LEXICAL_SYMBOL(clsymname, clval)    # Create a new lexical symbol
 
-  .CDR(clargsptr, clargsptr)
-  .CDR(clprotptr, clprotptr)
+    .CDR(clargsptr, clargsptr)
+    .CDR(clprotptr, clprotptr)
 
-   goto CLOSURE_ARGS
+    goto CLOSURE_ARGS
 
 CLOSURE_CHECK_ARGS:
-  .NULL(clargsptr, CLOSURE_BODY)                # Ensure we didn't have too
-   goto CLOSURE_TOO_MANY_ARGS                   # many args
+    .NULL(clargsptr, CLOSURE_BODY)                # Ensure we didn't have too
+    goto CLOSURE_TOO_MANY_ARGS                   # many args
 
 CLOSURE_BODY:
-  .local pmc clearg
-  .local pmc clretv
+    .local pmc clearg
+    .local pmc clretv
 
-  .LIST_1(clearg, clbody)
-   clretv = _eval(clearg)
+    .LIST_1(clearg, clbody)
+    clretv = _eval(clearg)
 
-   # VALID_IN_PARROT_0_2_0  pop_pad
+    # VALID_IN_PARROT_0_2_0  pop_pad
 
-   goto CLOSURE_DONE
+    goto CLOSURE_DONE
 
 CLOSURE_TOO_FEW_ARGS:
-   # VALID_IN_PARROT_0_2_0  pop_pad
+    # VALID_IN_PARROT_0_2_0  pop_pad
 
-  .ERROR_0("program-error", "Too few arguments given to LAMBDA")
-   goto CLOSURE_DONE
+    .ERROR_0("program-error", "Too few arguments given to LAMBDA")
+    goto CLOSURE_DONE
 
 CLOSURE_TOO_MANY_ARGS:
-   # VALID_IN_PARROT_0_2_0  pop_pad
+    # VALID_IN_PARROT_0_2_0  pop_pad
 
-  .ERROR_0("program-error", "Too many arguments given to LAMBDA")
-   goto CLOSURE_DONE
+    .ERROR_0("program-error", "Too many arguments given to LAMBDA")
+    goto CLOSURE_DONE
 
 CLOSURE_DONE:
-   returncc
+    returncc
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _LIST_LENGTH

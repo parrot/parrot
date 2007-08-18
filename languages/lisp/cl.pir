@@ -385,66 +385,64 @@ DONE:
 .end
 
 .sub _function
-  .param pmc args
+    .param pmc args
+    .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-  .local string symname
-  .local string pkgname
-  .local string type
-  .local pmc package
-  .local pmc symbol
-  .local int found
-  .local int test
-  .local pmc form
-  .local pmc retv
-
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
-
-  .CAR(form, args)
-
-   type = typeof form
-
-   if type == "LispSymbol" goto SYMBOL          # Retrieve function from symbol
-
-   test = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
-   if test goto LAMBDA_FORM                     # and build a closure if so
-
-   goto INVALID_FUNCTION_NAME
-
+    .local pmc retv
+  
+    .local pmc form
+    .CAR(form, args)
+  
+    .local string type
+    type = typeof form
+    if type == "LispSymbol" goto SYMBOL          # Retrieve function from symbol
+  
+    .local int test
+    test = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
+    if test goto LAMBDA_FORM                     # and build a closure if so
+  
+    goto INVALID_FUNCTION_NAME
+  
 SYMBOL:
-   symname = form._get_name_as_string()         # Retrieve the symbols name
-
-   package = form._get_package()                # Retrieve the symbols package name
-   pkgname = package._get_name_as_string()
-
-   symbol = _LOOKUP_GLOBAL(pkgname, symname)    # Lookup the symbol
-
-   defined found, symbol                        # Ensure the symbol was found in
-   unless found goto FUNCTION_NOT_FOUND         # the global namespace
-
-   retv = symbol._get_function()                # Ensure the symbol had a function
-   defined found, symbol                        # defined
-   unless found goto FUNCTION_NOT_FOUND
-
-   goto DONE
-
+    .local string symname
+    symname = form._get_name_as_string()         # Retrieve the symbols name
+ 
+    .local pmc package
+    package = form._get_package()                # Retrieve the symbols package name
+    .local string pkgname
+    pkgname = package._get_name_as_string()
+ 
+    .local pmc symbol
+    symbol = _LOOKUP_GLOBAL(pkgname, symname)    # Lookup the symbol
+ 
+    .local int found
+    found = defined symbol                       # Ensure the symbol was found in
+    unless found goto FUNCTION_NOT_FOUND         # the global namespace
+ 
+    retv = symbol._get_function()                # Ensure the symbol had a function
+    defined found, symbol                        # defined
+    unless found goto FUNCTION_NOT_FOUND
+ 
+    goto DONE
+ 
 LAMBDA_FORM:
-   retv = _MAKE_LAMBDA(form)                    # Create a closure object
-   goto DONE
+    retv = _MAKE_LAMBDA(form)                    # Create a closure object
+    goto DONE
 
 INVALID_FUNCTION_NAME:
-  .ERROR_1("undefined-function", "%s is not a function name", form)
-   goto DONE
+    .ERROR_1("undefined-function", "%s is not a function name", form)
+    goto DONE
 
 FUNCTION_NOT_FOUND:
-  .ERROR_1("undefined-function", "the function %s is undefined", symname)
-   goto DONE
+    .ERROR_1("undefined-function", "the function %s is undefined", symname)
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to FUNCTION")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to FUNCTION")
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _gensym
