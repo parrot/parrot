@@ -22,6 +22,17 @@
 
 #include "parrot/parrot.h"
 
+union { const FLOATVAL *__c_ptr; FLOATVAL *__ptr; } __ptr_u;
+
+#define const_cast_float(b) (__ptr_u.__c_ptr = &(b), __ptr_u.__ptr)
+
+
+#if INTVAL_SIZE == DOUBLE_SIZE
+#  define FLOAT_IS_ZERO(f) (*(INTVAL *)(const_cast_float(f)) == 0)
+#else
+#  define FLOAT_IS_ZERO(f) (*(HUGEINTVAL *)(const_cast_float(f)) == 0)
+#endif
+
 /*
  * utils.c
  */
