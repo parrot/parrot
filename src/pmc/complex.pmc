@@ -395,7 +395,8 @@ Returns true if the complex number is non-zero.
 */
 
     INTVAL get_integer() {
-        return (INTVAL)(DYNSELF.get_number());
+        FLOATVAL f = DYNSELF.get_number();
+        return (INTVAL)f;
     }
 
     FLOATVAL get_number() {
@@ -439,7 +440,8 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     INTVAL get_integer_keyed_str(STRING *key) {
-        return (INTVAL)(DYNSELF.get_number_keyed_str(key));
+        FLOATVAL f = DYNSELF.get_number_keyed_str(key);
+        return (INTVAL)f;
     }
 
     FLOATVAL get_number_keyed(PMC *key) {
