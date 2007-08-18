@@ -1740,7 +1740,7 @@ string_nprintf(PARROT_INTERP,
      * XXX -leo: bytelen with strlen compare
      */
     if (bytelen > 0 && bytelen < (INTVAL)string_length(interp, output))
-        string_substr(interp, output, 0, bytelen, &output, 1);
+        output = string_substr(interp, output, 0, bytelen, &output, 1);
 
     if (dest == NULL)
         return output;

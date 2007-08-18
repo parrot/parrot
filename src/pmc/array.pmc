@@ -115,9 +115,11 @@ Class initialization. Creates the required memory pools.
 */
 
     void class_init() {
-        /* class_init_code */
-        make_bufferlike_pool(INTERP, sizeof (List_chunk));
-        make_bufferlike_pool(INTERP, sizeof (List));
+        /* class_init_code; called for side effects */
+        Small_Object_Pool *List_chunks =
+            make_bufferlike_pool(INTERP, sizeof (List_chunk));
+        Small_Object_Pool *Lists       =
+            make_bufferlike_pool(INTERP, sizeof (List));
     }
 
 /*
@@ -276,7 +278,8 @@ Returns the number of elements in the array.
 */
 
     FLOATVAL get_number() {
-        return (FLOATVAL)(DYNSELF.elements());
+        INTVAL e = DYNSELF.elements();
+        return (FLOATVAL)e;
     }
 
 /*
