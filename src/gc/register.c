@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -157,7 +157,8 @@ Create initial interpreter context.
 void
 create_initial_context(PARROT_INTERP)
 {
-    static INTVAL num_regs[] ={32,32,32,32};
+    static INTVAL   num_regs[] = {32,32,32,32};
+    Parrot_Context *ignored;
 
     /* Create some initial free_list slots. */
 
@@ -166,11 +167,9 @@ create_initial_context(PARROT_INTERP)
     interp->ctx_mem.free_list    =
         (void **)mem_sys_allocate_zeroed(INITIAL_FREE_SLOTS * sizeof (void *));
 
-    /*
-     * For now create context with 32 regs each. Some src tests (and maybe other
-     * extenders) are assuming the presence of these registers
-     */
-    Parrot_alloc_context(interp, num_regs);
+    /* For now create context with 32 regs each. Some src tests (and maybe
+     * other extenders) assume the presence of these registers */
+    ignored = Parrot_alloc_context(interp, num_regs);
 }
 
 /*
@@ -191,7 +190,7 @@ parrot_gc_context(PARROT_INTERP)
     if (!interp->ctx_mem.threshold)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
-        sizeof (struct parrot_regs_t);
+        sizeof (parrot_regs_t);
     /* TODO */
 #else
     UNUSED(interp);
@@ -278,8 +277,8 @@ Duplicate the passed context
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
-Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
+Parrot_Context *
+Parrot_dup_context(PARROT_INTERP, NOTNULL(const Parrot_Context *old) )
 {
     size_t          diff;
     Parrot_Context *ctx;
@@ -323,7 +322,7 @@ C<Parrot_pop_context>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
+Parrot_Context *
 Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp->ctx);
@@ -374,7 +373,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-struct Parrot_Context *
+Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
@@ -456,11 +455,14 @@ Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
 
     /* regs start past the context */
     p = (void *) ((char *)ptr + ALIGNED_CTX_SIZE);
+
     /* ctx.bp points to I0, which has Nx on the left */
     interp->ctx.bp.regs_i = (INTVAL*)((char*)p + size_n);
+
     /* ctx.bp_ps points to S0, which has Px on the left */
     interp->ctx.bp_ps.regs_s = (STRING**)((char*)p + size_nip);
     init_context(interp, ctx, old);
+
     return ctx;
 }
 
@@ -475,7 +477,7 @@ return continuation invoke, else from the destructor of a continuation.
 
 PARROT_API
 void
-Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_use)
+Parrot_free_context(PARROT_INTERP, NOTNULL(Parrot_Context *ctxp), int re_use)
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
@@ -527,7 +529,7 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(PARROT_INTERP, NULLOK(struct Parrot_Context *ctxp))
+Parrot_set_context_threshold(PARROT_INTERP, NULLOK(Parrot_Context *ctxp))
 {
     UNUSED(interp);
     UNUSED(ctxp);
@@ -649,7 +651,7 @@ mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))
     for (; ; chunk = chunk->prev) {
         int i;
         save_regs_t   *save_r;
-        struct Interp_Context ctx;
+        Interp_Context ctx;
 
         pobject_lives(interp, (PObj*)chunk);
         if (chunk == chunk->prev)
