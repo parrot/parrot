@@ -4,8 +4,20 @@
 .sub '__onload' :init :load
     $P0 = newclass 'NQP::Grammar::Actions'
 
+    ##  create the stack for nested lexical blocks
     $P0 = new 'ResizablePMCArray'
     set_hll_global ['NQP::Grammar::Actions'], '@?BLOCK', $P0
+
+    ##  initialize optable with inline PIR
+    .local pmc optable
+    optable = get_hll_global [ 'NQP::Grammar' ], '$optable'
+    optable['prefix:~'; 'inline'] = <<"        END"
+        ##  inline prefix:~
+        $S0 = %0
+        %r = new 'String'
+        %r = $S0
+        END
+
     .return ()
 .end
 
@@ -449,12 +461,13 @@
     .return $P0.'get_scalar'()
   expr_reduce:
     .local pmc past
-    .local string name, pirop, pasttype
+    .local string name, pirop, pasttype, inline
     name = match['type']
     pirop = match['top';'pirop']
     pasttype = match['top'; 'pasttype']
+    inline = match['top'; 'inline']
     $P0 = getclass 'PAST::Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype)
+    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline)
     $P1 = match.'get_array'()
     if null $P1 goto iter_end
     .local pmc iter
