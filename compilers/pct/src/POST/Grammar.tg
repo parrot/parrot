@@ -122,7 +122,7 @@ transform pirop (PAST::Op) :language('PIR') {
     post = new 'POST::Op'
     post.'init'('node'=>node, 'pirop'=>pirop)
 
-    # if pirop == 'inline' goto pirop_inline
+    if pirop == 'inline' goto pirop_inline
     if pirop == 'call' goto pirop_call
     if pirop == 'callmethod' goto pirop_call
     goto post_children
@@ -133,6 +133,11 @@ transform pirop (PAST::Op) :language('PIR') {
     unless name goto post_children
     post.'push_new'('POST::Val', 'value'=>name)
     goto post_children
+
+  pirop_inline:
+    .local pmc inline
+    inline = node.'inline'()
+    post.'inline'(inline)
 
   post_children:
     .local pmc iter

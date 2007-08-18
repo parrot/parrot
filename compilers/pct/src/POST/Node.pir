@@ -162,6 +162,14 @@ Get/set
     .return self.'attr'('pirop', value, has_value)
 .end
 
+
+.sub 'inline' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('inline', value, has_value)
+.end
+
+
 =item arglist(arglist)
 
 =cut
@@ -214,7 +222,7 @@ Get/set
     arglist = self['arglist']
     arglist = clone arglist
 
-    # if pirop == 'inline' goto pir_inline
+    if pirop == 'inline' goto pir_inline
     if pirop == 'call' goto pir_call
     if pirop == 'callmethod' goto pir_callmethod
 
@@ -232,7 +240,7 @@ Get/set
   pir_inline:
     .local pmc inline
     result = self.'result'()
-    inline = shift arglist
+    inline = self.'inline'()
     code.'emit'(inline, arglist :flat, 'r'=>result, 't'=>result, 'u'=>result)
     .return (code)
 
