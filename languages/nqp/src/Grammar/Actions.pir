@@ -271,27 +271,34 @@
 
 ##    method scope_declarator($/) {
 ##        my $past := $($<variable>);
-##        $past.'isdecl'(1);
+##        my $name := $past.name();
 ##        our $?BLOCK;
-##        my $scope := ($<declarator> eq 'my') ? 'lexical' : 'package';
-##        $?BLOCK.symbol($past.name(), :scope($scope));
+##        unless $?BLOCK.symbol($name) {
+##            $past.'isdecl'(1);
+##            my $scope := ($<declarator> eq 'my') ? 'lexical' : 'package';
+##            $?BLOCK.symbol($name, :scope($scope));
+##        }
 ##        .return ($past);
 ##   }
 .sub 'scope_declarator' :method
     .param pmc match
     .local pmc past, block
+    .local string name
     $P0 = match['variable']
     past = $P0.'get_scalar'()
-    past.'isdecl'(1)
+    name = past.'name'()
     block = get_global '$?BLOCK'
+    $P0 = block.'symbol'(name)
+    if $P0 goto end
+    past.'isdecl'(1)
     .local string scope
     scope = 'package'
     $S0 = match['declarator']
     if $S0 != 'my' goto have_scope
     scope = 'lexical'
   have_scope:
-    $P0 = past.'name'()
-    block.'symbol'($P0, 'scope'=>scope)
+    block.'symbol'(name, 'scope'=>scope)
+  end:
     .return (past)
 .end
 
