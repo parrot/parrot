@@ -48,6 +48,8 @@ rule statement_list {
 ##  the calling rule.
 rule statement {
     | <if_statement> {*}                                   #= if_statement
+    | <for_statement> {*}                                  #= for_statement
+    | <return_statement> {*}                               #= return_statement
     | <block> {*}                                          #= block
     | <EXPR> {*}                                           #= EXPR
 }
@@ -84,6 +86,19 @@ rule if_statement {
 }
 
 
+rule for_statement {
+    $<sym>:=['for'] <EXPR> <block>
+    {*}
+}
+
+
+rule return_statement {
+    $<sym>:=['return']
+    [ <EXPR> | <panic: Unable to parse argument to 'return'> ]
+    {*}
+}
+
+
 ##  Parse a block.  If the closing brace is at the end of a line,
 ##  then we grab any whitespace and set C<$!endstmt> to the resulting
 ##  position so that the <statement_end> rule can detect it.
@@ -92,7 +107,7 @@ token block {
     '{'
     {*}                                                    #= open
     <statement_list>
-    [ '}' | <panic: Syntax error> ]
+    [ '}' | <panic: Missing '}'> ]
     [
         \h* [ \# \N* ]? \n <?ws>
         {{  $P0 = match.'to'()
@@ -121,7 +136,8 @@ rule signature {
 }
 
 token param_var {
-    <sigil> <ident>
+    | '$/'
+    | <sigil> <ident>
     {*}
 }
 
@@ -140,16 +156,20 @@ token postfix {
 }
 
 token methodop {
-    '.' <ident> '(' <arglist> ')' {*}                      #= methodop
+    '.' <ident>
+    '(' <arglist>
+    [ <?ws> ')' | <panic: Missing ')'> ]
+    {*}                                                    #= methodop
 }
 
 token postcircumfix {
     | '(' <arglist> ')' {*}                                #= ( )
-    | '[' <EXPR> ']' {*}                                   #= [ ]
-    | '{' <EXPR> '}' {*}                                   #= { }
+    | '[' <EXPR> <?ws> ']' {*}                             #= [ ]
+    | '{' <EXPR> <?ws> '}' {*}                             #= { }
+    | '<' ( <-[>]>* ) '>' {*}                              #= < >
 }
 
-token arglist {
+rule arglist {
     <EXPR>?
     {*}
 }
@@ -158,15 +178,17 @@ token noun {
     | <colonpair> {*}                                      #= colonpair
     | <scope_declarator> {*}                               #= scope_declarator
     | <routine_def> {*}                                    #= routine_def
+    | <circumfix> {*}                                      #= circumfix
     | <variable> {*}                                       #= variable
     | <quote> {*}                                          #= quote
     | <number> {*}                                         #= number
     | <subcall> {*}                                        #= subcall
+    | <name> {*}                                           #= name
 }
 
 
 token colonpair {
-    | ':' <ident> [ '(' <EXPR> ')' ] {*}
+    | ':' <ident> [ '(' <EXPR> <?ws> ')' ] {*}
 }
 
 
@@ -174,6 +196,13 @@ rule scope_declarator {
     $<declarator>:=[my|our]
     <variable>
     {*}
+}
+
+
+token circumfix {
+    | '(' <EXPR>? <?ws> ')' {*}                            #= ( )
+    | '$(' <EXPR>? <?ws> ')' {*}                           #= $( )
+    | '@(' <EXPR>? <?ws> ')' {*}                           #= @( )
 }
 
 
@@ -215,7 +244,11 @@ proto 'term:' is precedence('z=')
     is parsed(&term)
     { ... }
 
-proto prefix:<~> is looser('term:')
+proto prefix:<+> is looser('term:')
+    is pasttype('inline')
+    { ... }
+
+proto prefix:<~> is equiv(prefix:<+>)
     is pasttype('inline')
     { ... }
 
@@ -226,7 +259,24 @@ proto infix:<+> is looser(prefix:<~>)
     is pirop('add')
     { ... }
 
-proto infix:<:=> is looser(infix:<+>)
+proto infix:<==> is looser(infix:<+>)
+    { ... }
+proto infix:<!=> is equiv(infix:<==>)
+    { ... }
+proto infix:<eq> is equiv(infix:<==>)
+    { ... }
+proto infix:<ne> is equiv(infix:<==>)
+    { ... }
+
+proto infix:<&&> is looser(infix:<==>)
+    is pasttype('if')
+    { ... }
+
+proto infix:<||> is looser(infix:<&&>)
+    is pasttype('unless')
+    { ... }
+
+proto infix:<:=> is looser(infix:<||>)
     is lvalue(1)
     is pasttype('bind')
     { ... }
