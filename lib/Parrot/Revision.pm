@@ -36,6 +36,9 @@ sub __get_revision {
             ($revision) = $line =~ / (\d+)$/;
         }
     }
+    elsif ( my @git_svn_info = qx/git svn log --limit=1 2>$nul/ and $? == 0 ) {
+        ($revision) = $git_svn_info[1] =~ m/^r(\d+)\D/xms;
+    }
     elsif ( my @svk_info = qx/svk info 2>$nul/ and $? == 0 ) {
         if ( my ($line) = grep /(?:file|svn|https?)\b/, @svk_info ) {
             ($revision) = $line =~ / (\d+)$/;
