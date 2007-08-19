@@ -528,12 +528,13 @@ static void *
 getptr_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 {
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
-            ((PMC *)obj->data),
-            (obj->index));
+            ((PMC *)obj->data), (obj->index));
+    INTVAL      i   = VTABLE_get_integer(interp, tmp);
 
     obj->index++;
+
     /* XXX correct? */
-    return (void *)(VTABLE_get_integer(interp, tmp));
+    return (void *)i;
 }
 
 SPRINTF_OBJ pmc_core = {

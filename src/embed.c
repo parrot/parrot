@@ -46,6 +46,8 @@ static PMC* setup_argv( PARROT_INTERP, int argc, char ** argv )
 
 /* HEADERIZER END: static */
 
+extern int Parrot_exec_run;
+
 /*
 
 FUNCDOC: Parrot_new
@@ -782,7 +784,6 @@ Parrot_runcode(PARROT_INTERP, int argc, char *argv[])
 
     /* s. runops_exec interpreter.c */
     if (Interp_core_TEST(interp, PARROT_EXEC_CORE)) {
-        extern int Parrot_exec_run;
         Parrot_exec_run = 1;
     }
 

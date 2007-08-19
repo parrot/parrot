@@ -436,14 +436,16 @@ Parrot_new_timer_event(PARROT_INTERP, NOTNULL(PMC *timer), FLOATVAL diff,
 
     const FLOATVAL now = Parrot_floatval_time();
 
-    ev->type = typ;
-    ev->u.timer_event.timer = timer;
+    ev->type                   = typ;
+    ev->u.timer_event.timer    = timer;
     ev->u.timer_event.abs_time = now + diff;
     ev->u.timer_event.interval = interval;
     ev->u.timer_event.repeat   = repeat;
-    if (repeat && !interval)
+    ev->u.timer_event.sub      = sub;
+
+    if (repeat && FLOAT_IS_ZERO(interval))
         ev->u.timer_event.interval = diff;
-    ev->u.timer_event.sub = sub;
+
     Parrot_schedule_event(interp, ev);
 }
 
@@ -969,9 +971,9 @@ process_events(NOTNULL(QUEUE *event_q))
                 if (now < event->u.timer_event.abs_time)
                     return 1;
                 entry = nosync_pop_entry(event_q);
-                /*
-                 * if event is repeated dup and reinsert it
-                 */
+
+                /* if event is repeated dup and reinsert it */
+
                 if (event->u.timer_event.interval) {
                     if (event->u.timer_event.repeat) {
                         if (event->u.timer_event.repeat != -1)

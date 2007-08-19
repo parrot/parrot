@@ -118,6 +118,10 @@ static void turn_ev_check( PARROT_INTERP, int on )
 
 /* HEADERIZER END: static */
 
+#if EXEC_CAPABLE
+    extern int Parrot_exec_run;
+#endif
+
 /*
 
 FUNCDOC: prederef_args
@@ -558,9 +562,10 @@ Prepares to run the interpreter's run core.
 void
 prepare_for_run(PARROT_INTERP)
 {
+    void *ignored;
     switch (interp->run_core) {
         case PARROT_JIT_CORE:
-            (void) init_jit(interp, interp->code->base.data);
+            ignored = init_jit(interp, interp->code->base.data);
             break;
         case PARROT_SWITCH_CORE:
         case PARROT_SWITCH_JIT_CORE:
@@ -604,7 +609,7 @@ runops_jit(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
     ((jit_f) D2FPTR(&ptrgl_t)) (interp, pc);
 #  else
-    jit_f jit_code = (jit_f) D2FPTR(init_jit(interp, pc));
+    jit_f jit_code = (jit_f)(init_jit(interp, pc));
     (jit_code) (interp, pc);
 #  endif
 #else
@@ -631,7 +636,6 @@ runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
     opcode_t *code_start;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
-    extern int Parrot_exec_run;
 
     code_start = interp->code->base.data;
     code_size = interp->code->base.size;
@@ -644,9 +648,10 @@ runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
 #    endif
 #  endif
     if (Parrot_exec_run == 2) {
+        void *ignored;
         Parrot_exec_run = 0;
         Interp_core_SET(interp, PARROT_JIT_CORE);
-        runops_jit(interp, pc);
+        ignored = runops_jit(interp, pc);
         Interp_core_SET(interp, PARROT_EXEC_CORE);
     }
     else if (Parrot_exec_run == 1) {

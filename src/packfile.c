@@ -283,6 +283,10 @@ static int sub_pragma( PARROT_INTERP,
 
 /* HEADERIZER END: static */
 
+#if EXEC_CAPABLE
+    extern int Parrot_exec_run;
+#endif
+
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 
@@ -501,10 +505,10 @@ do_1_sub_pragma(PARROT_INTERP, NOTNULL(PMC *sub_pmc), int action)
                 if ((interp->resume_flag & RESUME_INITIAL) &&
                         interp->resume_offset == 0) {
                     const ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
+                    void           *ptr  = VTABLE_get_pointer(interp, sub_pmc);
 
-                    const size_t start_offs =
-                        ((ptrdiff_t) VTABLE_get_pointer(interp, sub_pmc)
-                         - code) / sizeof (opcode_t*);
+                    const size_t start_offs = ((ptrdiff_t)ptr - code) /
+                        sizeof (opcode_t*);
                     interp->resume_offset = start_offs;
                     PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_MAIN;
                     CONTEXT(interp->ctx)->current_sub = sub_pmc;
@@ -667,8 +671,9 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     PackFile_Header * const header = self->header;
     opcode_t *cursor;
     int header_read_length;
+    opcode_t padding;
 
-    self->src = packed;
+    self->src  = packed;
     self->size = packed_size;
 
     /* Extract the header. */
@@ -757,9 +762,9 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     }
 
     /* Padding. */
-    PF_fetch_opcode(self, &cursor);
-    PF_fetch_opcode(self, &cursor);
-    PF_fetch_opcode(self, &cursor);
+    padding = PF_fetch_opcode(self, &cursor);
+    padding = PF_fetch_opcode(self, &cursor);
+    padding = PF_fetch_opcode(self, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_unpack: Directory read, offset %d.\n",
@@ -2941,9 +2946,6 @@ PackFile_ConstTable_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg),
     opcode_t i;
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
     PackFile * const pf              = seg->pf;
-#if EXEC_CAPABLE
-    extern int Parrot_exec_run;
-#endif
 
     PackFile_ConstTable_clear(interp, self);
 

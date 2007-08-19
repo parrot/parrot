@@ -206,8 +206,9 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
 
     /* load lib */
-    if (string_length(interp, hll_lib))
-        Parrot_load_lib(interp, hll_lib, NULL);
+    if (string_length(interp, hll_lib)) {
+        PMC *ignored = Parrot_load_lib(interp, hll_lib, NULL);
+    }
 
     /* UNLOCK */
     END_WRITE_HLL_INFO(interp, hll_info);

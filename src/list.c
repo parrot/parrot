@@ -1270,6 +1270,7 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, NOTNULL(PMC *init))
     for (i = 0; i < len; i += 2) {
         const INTVAL key = VTABLE_get_integer_keyed_int(interp, init, i);
         const INTVAL val = i + 1;
+        INTVAL       result;
         switch (key) {
             case 0:
                 size = VTABLE_get_integer_keyed_int(interp, init, val);
@@ -1278,7 +1279,8 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, NOTNULL(PMC *init))
                 multi_key = VTABLE_get_pmc_keyed_int(interp, init, val);
                 break;
             case 2:
-                type = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, init, val);
+                result = VTABLE_get_integer_keyed_int(interp, init, val);
+                type   = (PARROT_DATA_TYPE)result;
                 break;
             case 3:
                 item_size = VTABLE_get_integer_keyed_int(interp, init, val);

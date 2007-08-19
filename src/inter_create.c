@@ -35,6 +35,10 @@ static void setup_default_compreg( PARROT_INTERP )
 /* HEADERIZER END: static */
 
 #if EXEC_CAPABLE
+    extern int Parrot_exec_run;
+#endif
+
+#if EXEC_CAPABLE
 Interp interpre;
 #endif
 
@@ -96,9 +100,6 @@ Parrot_Interp
 make_interpreter(NULLOK(Interp *parent), INTVAL flags)
 {
     Interp *interp;
-#if EXEC_CAPABLE
-    extern int Parrot_exec_run;
-#endif
 
     /* Get an empty interpreter from system memory */
 #if EXEC_CAPABLE

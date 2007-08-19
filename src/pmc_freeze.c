@@ -702,7 +702,8 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 shift_opcode_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 {
-    return (PMC*) shift_opcode_integer(interp, io);
+    INTVAL i = shift_opcode_integer(interp, io);
+    return (PMC *)i;
 }
 
 /*

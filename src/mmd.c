@@ -92,10 +92,8 @@ static void mmd_create_builtin_multi_meth_2( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC * mmd_create_builtin_multi_stub( PARROT_INTERP,
-    NOTNULL(PMC* ns),
+void mmd_create_builtin_multi_stub( PARROT_INTERP,
+    NOTNULL(PMC *ns),
     INTVAL func_nr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -1613,19 +1611,16 @@ mmd_search_builtin(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *cl))
         mmd_maybe_candidate(interp, pmc, cl);
 }
 
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC *
-mmd_create_builtin_multi_stub(PARROT_INTERP, NOTNULL(PMC* ns), INTVAL func_nr)
+void
+mmd_create_builtin_multi_stub(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL func_nr)
 {
-    const char * name = Parrot_MMD_method_name(interp, func_nr);
+    const char * name    = Parrot_MMD_method_name(interp, func_nr);
+
     /* create in constant pool */
-    STRING * const s = const_string(interp, name);
-    PMC * multi = constant_pmc_new(interp, enum_class_MultiSub);
+    STRING     * const s = const_string(interp, name);
+    PMC        * multi   = constant_pmc_new(interp, enum_class_MultiSub);
 
     VTABLE_set_pmc_keyed_str(interp, ns, s, multi);
-    return ns;
 }
 
 static void
@@ -1747,9 +1742,7 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
         for (i = 0; i < MMD_USER_FIRST; ++i) {
             mmd_register(interp, i, enum_class_core_max - 1,
                     enum_class_core_max - 1, NULL);
-            /*
-             * create a MultiSub stub
-             */
+            /* create a MultiSub stub */
             mmd_create_builtin_multi_stub(interp, ns, i);
         }
     }

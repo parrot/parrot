@@ -136,11 +136,11 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
    */
   const FLOATVAL temp = n3 * floor(n2 / n3);
 
-  return n3
+  return !FLOAT_IS_ZERO(n3)
      ? (n2 - temp)
      : n2;
 #else
-  return n3
+  return !FLOAT_IS_ZERO(n3)
      ? (n2 - n3 * floor(n2 / n3))
      : n2;
 #endif

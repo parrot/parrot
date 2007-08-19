@@ -202,7 +202,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
         NOTNULL(Small_Object_Arena *arena))
 {
     UINTVAL  i;
-    void    *object;
+    PObj    *object;
     UINTVAL  num_objects = pool->objects_per_alloc;
 
     pool->total_objects += num_objects;

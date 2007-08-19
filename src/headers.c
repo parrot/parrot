@@ -717,7 +717,7 @@ sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag,
 void
 Parrot_destroy_header_pools(PARROT_INTERP)
 {
-    INTVAL pass, start;
+    INTVAL pass, start, ignored;
 
     /* const/non const COW strings life in different pools
      * so in first pass
@@ -729,14 +729,15 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 #else
     start = 2;
 #endif
-    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
+    ignored = Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
     for (pass = start; pass <= 2; pass++) {
-        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
+        ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
 
     }
+
     free_pool(interp->arena_base->pmc_ext_pool);
     mem_internal_free(interp->arena_base->sized_header_pools);
 }
@@ -814,8 +815,8 @@ Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
 
         if (i >= dest_arena->num_sized ||
             !dest_arena->sized_header_pools[i]) {
-            make_bufferlike_pool(dest_interp, i * sizeof (void *)
-                + sizeof (Buffer));
+            Small_Object_Pool *ignored = make_bufferlike_pool(dest_interp,
+                i * sizeof (void *) + sizeof (Buffer));
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
 

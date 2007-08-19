@@ -97,7 +97,7 @@ static int returns_match_results(
 #  include "parrot/exec.h"
 #  include "jit.h"
 
-#  if PIC_TEST
+#  ifdef PIC_TEST
 /*
  * just for testing the whole scheme ...
 
@@ -392,7 +392,7 @@ funcptr_t
 parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)
 {
 #ifdef HAS_JIT
-#  if PIC_TEST
+#  ifdef PIC_TEST
     UNUSED(interp);
     UNUSED(sub);
     return (funcptr_t) pic_test_func;

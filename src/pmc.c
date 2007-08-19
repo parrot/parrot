@@ -237,7 +237,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     pmc->vtable = vtable;
     pmc->real_self = pmc;
 
-#if GC_VERBOSE
+#ifdef GC_VERBOSE
     if (Interp_flags_TEST(interp, PARROT_TRACE_FLAG)) {
         /* XXX make a more verbose trace flag */
         fprintf(stderr, "\t=> new %p type %d\n", pmc, (int)base_type);
