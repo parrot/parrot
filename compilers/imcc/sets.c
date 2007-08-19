@@ -20,7 +20,7 @@ set_make(int length)
 {
     Set * const s = mem_allocate_typed(Set);
     s->length     = length;
-    s->bmp        = mem_sys_allocate_zeroed(NUM_BYTES(length));
+    s->bmp        = (unsigned char *)mem_sys_allocate_zeroed(NUM_BYTES(length));
     return s;
 }
 
@@ -93,8 +93,8 @@ set_add(NOTNULL(Set *s), int element)
     const int bytes_in_set     = BYTE_IN_SET(s->length);
 
     if (bytes_in_set < elem_byte_in_set) {
-        s->bmp = mem_sys_realloc_zeroed(s->bmp, NUM_BYTES(element),
-            NUM_BYTES(s->length));
+        s->bmp = (unsigned char *)mem_sys_realloc_zeroed(s->bmp,
+            NUM_BYTES(element), NUM_BYTES(s->length));
         s->length += 8;
     }
 

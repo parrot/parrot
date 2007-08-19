@@ -499,9 +499,9 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         const char * const n_name = try_rev_cmp(name, r);
         if (n_name) {
             DECL_CONST_CAST;
-            name = const_cast(n_name);
+            name = (char *)const_cast(n_name);
             op_fullname(fullname, name, r, n, keyvec);
-            op = interp->op_lib->op_code(fullname, 1);
+            op   = interp->op_lib->op_code(fullname, 1);
         }
     }
     if (op < 0)         /* still wrong, try to find an existing op */
@@ -683,6 +683,7 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
     DECL_CONST_CAST;
     INTVAL regs_used[4] = {3,3,3,3};
     void *yyscanner;
+    Parrot_Context *ignored;
 
     do_yylex_init( interp, &yyscanner );
 
@@ -692,9 +693,9 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
     Parrot_block_DOD(interp);
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
-        imc_info = mem_sys_allocate_zeroed(sizeof (imc_info_t));
-        imc_info->ghash = IMCC_INFO(interp)->ghash;
-        imc_info->prev = IMCC_INFO(interp);
+        imc_info          = mem_allocate_zeroed_typed(imc_info_t);
+        imc_info->ghash   = IMCC_INFO(interp)->ghash;
+        imc_info->prev    = IMCC_INFO(interp);
         IMCC_INFO(interp) = imc_info;
     }
 
@@ -714,12 +715,14 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
     next = IMCC_INFO(interp)->state->next;
     if (imc_info)
         IMCC_INFO(interp)->state->next = NULL;
-    IMCC_INFO(interp)->state->pasm_file = pasm_file;
-    IMCC_INFO(interp)->state->file = name;
-    IMCC_INFO(interp)->expect_pasm = 0;
-    Parrot_push_context(interp, regs_used);
 
-    compile_string(interp, const_cast(s), yyscanner);
+    IMCC_INFO(interp)->state->pasm_file = pasm_file;
+    IMCC_INFO(interp)->state->file      = name;
+    IMCC_INFO(interp)->expect_pasm      = 0;
+
+    ignored = Parrot_push_context(interp, regs_used);
+
+    compile_string(interp, (char *)const_cast(s), yyscanner);
 
     Parrot_pop_context(interp);
     /*
@@ -853,6 +856,8 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
     FILE *fp;
     struct _imc_info_t *imc_info = NULL;
     STRING *fs;
+    Parrot_Context *ignored;
+
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants()
      */
@@ -860,9 +865,9 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
 
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
-        imc_info = mem_sys_allocate_zeroed(sizeof (imc_info_t));
-        imc_info->ghash = IMCC_INFO(interp)->ghash;
-        imc_info->prev = IMCC_INFO(interp);
+        imc_info          = mem_allocate_zeroed_typed(imc_info_t);
+        imc_info->prev    = IMCC_INFO(interp);
+        imc_info->ghash   = IMCC_INFO(interp)->ghash;
         IMCC_INFO(interp) = imc_info;
     }
 
@@ -891,7 +896,7 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
      * which can destroy packfiles under construction
      */
     Parrot_block_DOD(interp);
-    Parrot_push_context(interp, regs_used);
+    ignored = Parrot_push_context(interp, regs_used);
 
     if (ext && strcmp(ext, ".pasm") == 0) {
         void *yyscanner;
@@ -1337,7 +1342,7 @@ char *
 str_dup(NOTNULL(const char *old))
 {
     const size_t bytes = strlen(old) + 1;
-    char * const copy = mem_sys_allocate(bytes);
+    char * const copy  = (char *)mem_sys_allocate(bytes);
     memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
     debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);
@@ -1349,7 +1354,7 @@ PARROT_API
 void
 imcc_init(PARROT_INTERP)
 {
-    IMCC_INFO(interp) = mem_sys_allocate_zeroed(sizeof (imc_info_t));
+    IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interp);
 }

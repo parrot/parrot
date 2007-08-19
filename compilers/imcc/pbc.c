@@ -282,7 +282,8 @@ make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     size_t size, old;
 
     if (!globals.cs->jit_info) {
-        char * const name = malloc(strlen(globals.cs->seg->base.name) + 5);
+        char * const name = (char *)
+            malloc(strlen(globals.cs->seg->base.name) + 5);
         sprintf(name, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
             PackFile_Segment_new_seg(interp,
@@ -296,7 +297,7 @@ make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     globals.cs->subs->n_basic_blocks = unit->n_basic_blocks;
 
     /* offset of block start and end, 4 * registers_used */
-    globals.cs->jit_info->data = realloc(globals.cs->jit_info->data,
+    globals.cs->jit_info->data = (opcode_t *)realloc(globals.cs->jit_info->data,
             size * sizeof (opcode_t) * 6);
 
     globals.cs->jit_info->size = size * 6;
@@ -1418,14 +1419,15 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(co
          * this storage
          */
         if (interp->code->base.data) {
-            interp->code->base.data =
+            interp->code->base.data       = (opcode_t *)
                 mem_sys_realloc(interp->code->base.data, bytes);
-            interp->code->pic_index->data =
+            interp->code->pic_index->data = (opcode_t *)
                 mem_sys_realloc(interp->code->pic_index->data, bytes/2);
         }
         else {
-            interp->code->base.data = mem_sys_allocate(bytes);
-            interp->code->pic_index->data = mem_sys_allocate(bytes/2);
+            interp->code->base.data       = (opcode_t *)mem_sys_allocate(bytes);
+            interp->code->pic_index->data =
+                (opcode_t *)mem_sys_allocate(bytes/2);
         }
         interp->code->base.size       = oldsize + code_size;
         interp->code->pic_index->size = (oldsize + code_size) / 2;
@@ -1459,8 +1461,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(co
         else {
             /* need a dummy to hold register usage */
             SymReg * const r = mk_sub_label(interp, str_dup("(null)"));
-            r->type    = VT_PCC_SUB;
-            r->pcc_sub = calloc(1, sizeof (pcc_sub_t));
+            r->type          = VT_PCC_SUB;
+            r->pcc_sub       = (pcc_sub_t *)calloc(1, sizeof (pcc_sub_t));
 
             add_const_pmc_sub(interp, r, oldsize, oldsize + code_size);
         }

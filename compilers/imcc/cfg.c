@@ -448,18 +448,19 @@ bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_b
        on the predecessors of 'from', it won't be on the successors
        of 'to'. */
 
-    e = mem_sys_allocate(sizeof(*e));
+    e             = mem_allocate_typed(Edge);
 
-    e->succ_next = from->succ_list;
-    e->from = from;
+    e->succ_next  = from->succ_list;
+    e->from       = from;
 
-    e->pred_next = to->pred_list;
-    e->to = to;
+    e->pred_next  = to->pred_list;
+    e->to         = to;
 
-    from->succ_list = to->pred_list = e;
+    to->pred_list = from->succ_list = e;
 
     /* memory housekeeping */
     e->next = 0;
+
     if (unit->edge_list == 0)
         unit->edge_list = e;
     else {
@@ -563,8 +564,8 @@ analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
 
     if (r->life_info)
         free_life_info(unit, r);
-    r->life_info = mem_sys_allocate_zeroed(unit->n_basic_blocks *
-            sizeof (Life_range*));
+    r->life_info = (Life_range **)mem_sys_allocate_zeroed(unit->n_basic_blocks *
+            sizeof (Life_range *));
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
@@ -786,8 +787,9 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 
     const int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
-    dominators  = unit->dominators = malloc(sizeof (Set*) * n);
-    unit->idoms = malloc(sizeof (int) * n);
+
+    dominators  = unit->dominators = (Set **)malloc(sizeof (Set*) * n);
+    unit->idoms = (int *)malloc(sizeof (int) * n);
 
     dominators[0] = set_make(n);
     set_add(dominators[0], 0);
@@ -899,7 +901,8 @@ compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
     int i, b;
 
     const int n = unit->n_basic_blocks;
-    Set ** const dominance_frontiers = unit->dominance_frontiers = malloc(sizeof (Set*) * n);
+    Set ** const dominance_frontiers = unit->dominance_frontiers =
+        (Set **)malloc(sizeof (Set *) * n);
 
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
 
@@ -1149,23 +1152,25 @@ mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
         }
     }
 
-    /* now 'loop' contains the set of nodes inside the loop.
-    */
-    n_loops = unit->n_loops;
+    /* now 'loop' contains the set of nodes inside the loop.  */
+    n_loops  = unit->n_loops;
     loop_info = unit->loop_info;
+
     if (!loop_info)
-        loop_info = unit->loop_info = mem_sys_allocate(
-                (n_loops+1)*sizeof (Loop_info *));
+        loop_info = unit->loop_info = (Loop_info **)mem_sys_allocate(
+                (n_loops + 1) * sizeof (Loop_info *));
     else
-        loop_info = unit->loop_info = mem_sys_realloc(loop_info,
-                (n_loops+1)*sizeof (Loop_info *));
-    loop_info[n_loops] = mem_sys_allocate(sizeof (Loop_info));
-    loop_info[n_loops]->loop = loop;
-    loop_info[n_loops]->exits = exits;
-    loop_info[n_loops]->depth = footer->loop_depth;
+        loop_info = unit->loop_info = (Loop_info **)mem_sys_realloc(loop_info,
+                (n_loops + 1) * sizeof (Loop_info *));
+
+    loop_info[n_loops]            = mem_allocate_typed(Loop_info);
+    loop_info[n_loops]->loop      = loop;
+    loop_info[n_loops]->exits     = exits;
+    loop_info[n_loops]->depth     = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
-    loop_info[n_loops]->header = header->index;
+    loop_info[n_loops]->header    = header->index;
     loop_info[n_loops]->preheader = natural_preheader(unit, loop_info[n_loops]);
+
     unit->n_loops++;
 }
 
@@ -1200,6 +1205,7 @@ search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
    }
 
 }
+
 /*** Utility functions ***/
 
 static void
@@ -1207,11 +1213,12 @@ init_basic_blocks(NOTNULL(IMC_Unit *unit))
 {
     if (unit->bb_list != NULL)
         clear_basic_blocks(unit);
-    unit->bb_list =
-        calloc(unit->bb_list_size = 256,
-            sizeof (Basic_block*));
+
+    unit->bb_list = (Basic_block **)calloc(unit->bb_list_size = 256,
+            sizeof (Basic_block *));
+
     unit->n_basic_blocks = 0;
-    unit->edge_list = 0;
+    unit->edge_list      = 0;
 }
 
 void
@@ -1236,27 +1243,29 @@ static Basic_block*
 make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))
 {
     int n;
-    Basic_block * const bb = mem_sys_allocate(sizeof (Basic_block));
+    Basic_block * const bb = mem_allocate_typed(Basic_block);
 
     if (ins == NULL) {
         PANIC(interp, "make_basic_block: called with NULL argument\n");
     }
 
-    bb->start = ins;
-    bb->end = ins;
+    bb->start      = ins;
+    bb->end        = ins;
 
-    bb->pred_list = NULL;
-    bb->succ_list = NULL;
-    n = unit->n_basic_blocks;
-    ins->bbindex = n;
-    bb->index = n;
+    bb->pred_list  = NULL;
+    bb->succ_list  = NULL;
+
+    n              = unit->n_basic_blocks;
+    ins->bbindex   = n;
+    bb->index      = n;
     bb->loop_depth = 0;
+
     if (n == unit->bb_list_size) {
         unit->bb_list_size *= 2;
-        unit->bb_list =
-            mem_sys_realloc(unit->bb_list,
-                unit->bb_list_size*sizeof (Basic_block*));
+        unit->bb_list = (Basic_block **)mem_sys_realloc(unit->bb_list,
+                unit->bb_list_size * sizeof (Basic_block *));
     }
+
     unit->bb_list[n] = bb;
     unit->n_basic_blocks++;
 
@@ -1268,9 +1277,9 @@ PARROT_CANNOT_RETURN_NULL
 Life_range *
 make_life_range(NOTNULL(SymReg *r), int idx)
 {
-   Life_range * const l = mem_sys_allocate_zeroed(sizeof(*l));
+   Life_range * const l = mem_allocate_zeroed_typed(Life_range);
+   r->life_info[idx]    = l;
 
-   r->life_info[idx] = l;
    return l;
 }
 

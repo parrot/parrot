@@ -115,7 +115,7 @@ static int dead_code_remove( PARROT_INTERP, IMC_Unit * unit )
 static int eval_ins( PARROT_INTERP, char *op, size_t ops, SymReg **r )
         __attribute__nonnull__(1);
 
-static Basic_block * find_outer(
+Basic_block * find_outer(
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Basic_block *blk) )
         __attribute__nonnull__(1)
@@ -136,25 +136,25 @@ static int is_ins_save( PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int is_invariant( PARROT_INTERP,
+int is_invariant( PARROT_INTERP,
     NOTNULL(IMC_Unit * unit),
     NOTNULL(Instruction *ins) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static int loop_one( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr )
+int loop_one( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int loop_optimization( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+int loop_optimization( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int max_loop_depth( NOTNULL(IMC_Unit *unit) )
+int max_loop_depth( NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1);
 
-static int move_ins_out( PARROT_INTERP,
+int move_ins_out( PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Instruction **ins),
     NOTNULL(Basic_block *bb) )
@@ -175,7 +175,7 @@ static int used_once( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
 
 /* HEADERIZER END: static */
 #if DO_LOOP_OPTIMIZATION
-static int loop_optimization(Interp *, IMC_Unit *);
+int loop_optimization(Interp *, IMC_Unit *);
 #endif
 
 /*
@@ -344,6 +344,7 @@ strength_reduce(PARROT_INTERP, IMC_Unit * unit)
     Instruction *ins, *tmp;
     SymReg *r;
     int changes = 0;
+    FLOATVAL f;
 
     IMCC_info(interp, 2, "\tstrength_reduce\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -426,8 +427,8 @@ strength_reduce(PARROT_INTERP, IMC_Unit * unit)
                       IMCC_int_from_reg(interp, ins->r[1]) == 1)
           || ((ins->opnum == PARROT_OP_add_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_nc) &&
-                      atof(ins->r[1]->name) == 0.0)
-          || ((ins->opnum == PARROT_OP_mul_n_nc ||
+                (f = atof(ins->r[1]->name), FLOAT_IS_ZERO(f)))
+          || ((ins->opnum  == PARROT_OP_mul_n_nc  ||
                 ins->opnum == PARROT_OP_div_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_nc) &&
                       atof(ins->r[1]->name) == 1.0)) {
@@ -495,9 +496,9 @@ strength_reduce(PARROT_INTERP, IMC_Unit * unit)
                       IMCC_int_from_reg(interp, ins->r[1]) == 1)
           || ((ins->opnum == PARROT_OP_add_n_n_nc ||
                 ins->opnum == PARROT_OP_sub_n_n_nc) &&
-                      atof(ins->r[2]->name) == 0.0)
+                (f = atof(ins->r[2]->name), FLOAT_IS_ZERO(f)))
           || (ins->opnum == PARROT_OP_add_n_nc_n &&
-                      atof(ins->r[1]->name) == 0.0)
+             (f = atof(ins->r[1]->name), FLOAT_IS_ZERO(f)))
           || ((ins->opnum == PARROT_OP_mul_n_n_nc ||
                 ins->opnum == PARROT_OP_div_n_n_nc ||
                 ins->opnum == PARROT_OP_fdiv_n_n_nc) &&
@@ -530,10 +531,10 @@ strength_reduce(PARROT_INTERP, IMC_Unit * unit)
                 ins->opnum == PARROT_OP_mul_i_ic) &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_mul_n_n_nc &&
-                      atof(ins->r[2]->name) == 0.0)
+             (f = atof(ins->r[2]->name), FLOAT_IS_ZERO(f)))
           || ((ins->opnum == PARROT_OP_mul_n_nc_n ||
                 ins->opnum == PARROT_OP_mul_n_nc) &&
-                      atof(ins->r[1]->name) == 0.0)) {
+                (f = atof(ins->r[1]->name), FLOAT_IS_ZERO(f)))) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
             r = mk_const(interp, str_dup("0"), ins->r[0]->set);
             --ins->r[1]->use_count;
@@ -553,8 +554,8 @@ strength_reduce(PARROT_INTERP, IMC_Unit * unit)
         if ((ins->opnum == PARROT_OP_set_i_ic &&
                       IMCC_int_from_reg(interp, ins->r[1]) == 0)
           || (ins->opnum == PARROT_OP_set_n_nc &&
-                      atof(ins->r[1]->name) == 0.0 &&
-                      ins->r[1]->name[0] != '-')) {
+             (f = atof(ins->r[1]->name), FLOAT_IS_ZERO(f)) &&
+              ins->r[1]->name[0] != '-')) {
             IMCC_debug(interp, DEBUG_OPT1, "opt1 %I => ", ins);
             --ins->r[1]->use_count;
             tmp = INS(interp, unit, "null", "", ins->r, 1, 0, 0);
@@ -1071,8 +1072,8 @@ branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit, Instruction *branch,
     int args;
     const char * const neg_op = get_neg_op(cond->op, &args);
     if (neg_op) {
-        const size_t size = strlen(branch->r[0]->name) + 10; /* + '_post999' */
-        char * const label = malloc(size);
+        const size_t size  = strlen(branch->r[0]->name) + 10; /* + '_post999' */
+        char * const label = (char *)malloc(size);
         int count;
         int found = 0;
 
@@ -1475,18 +1476,19 @@ is_ins_save(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
 }
 
 #if DO_LOOP_OPTIMIZATION
-static int
+int
 max_loop_depth(NOTNULL(IMC_Unit *unit))
 {
-    int i, d;
-    d = 0;
+    int i;
+    int d = 0;
+
     for (i = 0; i < unit->n_basic_blocks; i++)
         if (unit->bb_list[i]->loop_depth > d)
             d = unit->bb_list[i]->loop_depth;
     return d;
 }
 
-static int
+int
 is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))
 {
     int ok = 0;
@@ -1509,7 +1511,7 @@ is_invariant(PARROT_INTERP, NOTNULL(IMC_Unit * unit), NOTNULL(Instruction *ins))
 
 #  define MOVE_INS_1_BL
 #  ifdef MOVE_INS_1_BL
-static Basic_block *
+Basic_block *
 find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
 {
     int bb = blk->index;
@@ -1527,7 +1529,7 @@ find_outer(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk))
 #  endif
 
 /* move the instruction ins before loop in bb */
-static int
+int
 move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
         NOTNULL(Instruction **ins), NOTNULL(Basic_block *bb))
 {
@@ -1568,7 +1570,7 @@ move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
     return 1;
 }
 
-static int
+int
 loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
 {
     Basic_block * const bb = unit->bb_list[bnr];
@@ -1596,7 +1598,7 @@ loop_one(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr)
 
 }
 
-static int
+int
 loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
     int l, bb, loop_depth;

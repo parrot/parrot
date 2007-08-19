@@ -428,7 +428,7 @@ build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
     count = unit->hash.entries;
     if (count == 0)
         return;
-    unit->reglist = mem_sys_allocate(count * sizeof (SymReg*));
+    unit->reglist = (SymReg **)mem_sys_allocate(count * sizeof (SymReg*));
 
     for (i = count = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -715,7 +715,7 @@ try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     int x;
     char *avail;
     int t, n;
-    unsigned int *graph = unit->interference_graph;
+    unsigned int *graph     = unit->interference_graph;
     SymReg ** const reglist = unit->reglist;
 
     /*
@@ -724,7 +724,7 @@ try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     n = unit->n_symbols;
     if (unit->max_color >= n)
         n = unit->max_color + 1;
-    avail = mem_sys_allocate(n);
+    avail = (char *)mem_sys_allocate(n);
 
     for (x = 0; x < unit->n_symbols; ++x) {
         SymReg *r = reglist[x];

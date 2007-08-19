@@ -474,7 +474,8 @@ mk_const_ident(PARROT_INTERP,
 SymReg *
 _mk_const(NOTNULL(SymHash *hsh), NOTNULL(const char *name), int t)
 {
-    SymReg * const r = _mk_symreg(hsh, name, t);
+    DECL_CONST_CAST;
+    SymReg * const r = _mk_symreg(hsh, (char *)const_cast(name), t);
     r->type          = VTCONST;
 
     if (t == 'U') {
