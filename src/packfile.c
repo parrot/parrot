@@ -1744,25 +1744,12 @@ directory_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t 
     align = 16/sizeof (opcode_t);
     if (align && (cursor - self->pf->src) % align)
         cursor += align - (cursor - self->pf->src) % align;
+
     /* now pack all segments into new format */
     for (i = 0; i < dir->num_segments; i++) {
         PackFile_Segment * const seg = dir->segments[i];
-        const size_t size = seg->op_count;
 
-        PackFile_Segment_pack(interp, seg, cursor);
-        /*
-         * XXX somehow it's smelling fishy here:
-         * - either cursor is unaligned
-         * - or the return result of _pack doesn't match
-         *   expected size
-         *
-         * likely in combination with pbc_merge
-         *
-         * the relevant code with size check is visible in:
-         *
-         * svn diff -r15516:15517
-         */
-        cursor += size;
+        cursor = PackFile_Segment_pack(interp, seg, cursor);
     }
 
     return cursor;
