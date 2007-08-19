@@ -1,11 +1,11 @@
-class ABC::Grammar::Actions;
+# class ABC::Grammar::Actions;
 
 method TOP($/) {
     return $($<program>);
 }
 
 method term($/, $key) {
-    return $(${$key});
+    return $($/{$key});
 }
 
 method float($/) {
@@ -25,11 +25,12 @@ method variable($/, $key) {
                               :node($/) );
     }
     else {
-        $var := PAST::Var.new( :name( ~$<ident>, :node($<ident>) );
+        $var := PAST::Var.new( :name(~$<ident>), :node($<ident>) );
         if ($key eq 'array') {
             $var := PAST::Var.new( $var, $($<EXPR>),
                                    :scope('keyed'),
                                    :node($/) );
+        }
     }
     return $var;
 }
@@ -60,7 +61,7 @@ method while_statement($/) {
 
 method statement($/, $key) {
     my $past := $( $/{$key} );
-    if ($key eq 'EXPR' && $past.pasttype() != 'assign') {
+    if ($key eq 'EXPR' && $past.pasttype() ne 'assign') {
         $past := PAST::Op.new( PAST::Var.new( :name('last') ),
                                $past,
                                :pasttype('assign'),
@@ -75,7 +76,7 @@ method statement($/, $key) {
 method statement_list($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for @($<statement_list>) {
-        $past.push( $($<statement_list> );
+        $past.push( $($<statement_list>) );
     }
     return $past;
 }
@@ -99,3 +100,4 @@ method EXPR($/, $key) {
     }
     return $past;
 }
+
