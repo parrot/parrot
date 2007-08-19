@@ -130,15 +130,29 @@ token param_var {
 
 token term {
     <noun>
-    <methodop>*
+    <postfix>*
     {*}                                                    #= end
 }
 
-
-token methodop {
-    '.' <ident> '(' <EXPR>? ')'
+token postfix {
+    | <methodop> {*}                                       #= methodop
+    | <postcircumfix> {*}                                  #= postcircumfix
 }
 
+token methodop {
+    '.' <ident> '(' <arglist> ')' {*}                      #= methodop
+}
+
+token postcircumfix {
+    | '(' <arglist> ')' {*}                                #= ( )
+    | '[' <EXPR> ']' {*}                                   #= [ ]
+    | '{' <EXPR> '}' {*}                                   #= { }
+}
+
+token arglist {
+    <EXPR>?
+    {*}
+}
 
 token noun {
     | <colonpair> {*}                                      #= colonpair
@@ -187,7 +201,7 @@ token number { \d+ {*} }
 
 
 token subcall {
-    <name> '(' <EXPR>? ')'
+    <name> '(' <arglist> ')'
     {*}
 }
 

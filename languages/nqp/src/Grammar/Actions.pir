@@ -213,14 +213,10 @@
 
 ##    method term($/, $key) {
 ##        my $past := $($<noun>);
-##        for $<methodop> {
-##          $past = PAST::Op.new($past,
-##                               :name(~$_<ident>),
-##                               :pasttype('callmethod'),
-##                               :node($_) );
-##          if ($<methodop><EXPR>) {
-##              $past.push($($<EXPR>[0]));
-##          }
+##        for $<postfix> {
+##            my $term := $past;
+##            $past := $($_);
+##            $past.unshift($term);
 ##        }
 ##        return $past;
 ##    }
@@ -230,24 +226,144 @@
     .local pmc past
     $P0 = match['noun']
     past = $P0.'get_scalar'()
-    $P1 = match['methodop']
-    if null $P1 goto iter_end
-    .local pmc iter
+    $P1 = match['postfix']
+    if null $P1 goto end
+    .local pmc iter, term
     iter = new Iterator, $P1
   iter_loop:
-    unless iter goto iter_end
+    unless iter goto end
     $P2 = shift iter
-    $S2 = $P2['ident']
-    $P3 = getclass 'PAST::Op'
-    past = $P3.'new'(past, 'name'=>$S2, 'pasttype'=>'callmethod', 'node'=>$P2)
-    $P4 = $P2['EXPR']
-    if null $P4 goto iter_loop
-    $P5 = $P4[0]
-    $P6 = $P5.'get_scalar'()
-    past.push($P6)
+    term = past
+    past = $P2.'get_scalar'()
+    past.'unshift'(term)
     goto iter_loop
-  iter_end:
+  end:
     .return (past)
+.end
+
+
+##    method postfix($/, $key) {
+##        return $($/{$key});
+##    }
+.sub 'postfix' :method
+    .param pmc match
+    .param string key
+    $P0 = match[key]
+    .return $P0.'get_scalar'()
+.end
+
+
+##    method methodop($/, $key) {
+##        my $past := $($<arglist>);
+##        $past.name(~$<ident>);
+##        $past.pasttype('callmethod');
+##        $past.node($/);
+##        return $past;
+##    }
+.sub 'methodop' :method
+    .param pmc match
+    .param string key
+    .local pmc past
+    $P0 = match['arglist']
+    past = $P0.'get_scalar'()
+    $S0 = match['ident']
+    past.'name'($S0)
+    past.'pasttype'('callmethod')
+    past.'node'(match)
+    .return (past)
+.end
+
+
+##    method postcircumfix($/, $key) {
+##        if $key eq '( )' {
+##            my $past := $($<arglist>);
+##            $past.pasttype('call');
+##            $past.node($/);
+##            return $past;
+##        }
+##        return PAST::Var.new( $($<EXPR>),
+##                              :scope('keyed'),
+##                              :node($/) );
+##    }
+.sub 'postcircumfix' :method
+    .param pmc match
+    .param string key
+    if key != '( )' goto keyed_var
+    .local pmc past
+    $P0 = match['arglist']
+    past = $P0.'get_scalar'()
+    past.'pasttype'('call')
+    past.'node'(match)
+    .return (past)
+  keyed_var:
+    $P0 = getclass 'PAST::Var'
+    $P1 = match['EXPR']
+    $P2 = $P1.'get_scalar'()
+    .return $P0.'new'( $P2, 'scope'=>'keyed', 'node'=>match )
+.end
+
+
+##    method arglist($/) {
+##        sub callarg($arg) {
+##            if $arg.returns() eq 'Pair' {
+##                $arg[1].named($arg[0]);
+##                $arg := $arg[1];
+##            }
+##            return $arg;
+##        }
+##
+##        my $past := PAST::Op.new( :node($/) );
+##        if ($<EXPR>) {
+##            my $expr := $($<EXPR>[0]);
+##            if ($expr.name() eq 'infix:,') {
+##                for @($expr) {
+##                    $past.push( callarg($_) );
+##                }
+##            }
+##            else {
+##                $past.push( callarg($expr) );
+##            }
+##        }
+##        return $past;
+##    }
+.sub 'arglist' :method
+    .param pmc match
+    .local pmc past
+    $P0 = getclass 'PAST::Op'
+    past = $P0.'new'( 'node'=>match )
+    $P1 = match['EXPR']
+    if null $P1 goto end
+    .local pmc expr, iter
+    $P2 = $P1[0]
+    expr = $P2.'get_scalar'()
+    $S0 = expr.'name'()
+    if $S0 != 'infix:,' goto one_arg
+  comma_arg:
+    .local pmc iter
+    iter = expr.'iterator'()
+  iter_loop:
+    unless iter goto end
+    $P0 = shift iter
+    $P0 = 'callarg'($P0)
+    past.'push'($P0)
+    goto iter_loop
+  one_arg:
+    $P0 = 'callarg'(expr)
+    past.'push'($P0)
+  end:
+    .return (past)
+.end
+
+.sub 'callarg'
+    .param pmc arg
+    $S0 = arg.'returns'()
+    unless $S0 == 'Pair' goto end
+    $P0 = arg[0]
+    $P1 = arg[1]
+    $P1.'named'($P0)
+    arg = $P1
+  end:
+    .return (arg)
 .end
 
 
@@ -374,67 +490,23 @@
 
 
 ##    method subcall($/, $key?) {
-##        my sub subcallarg($arg) {
-##            if $arg.returns() eq 'Pair' {
-##                $arg[1].named($arg[0]);
-##                $arg := $arg[1];
-##            }
-##            $arg;
-##        }
-##        my $past = PAST::Op.new(node=>$/, name=>$<name>, pasttype=>'call')
-##        if ($<EXPR>) {
-##            my $expr := $($<EXPR>[0]);
-##            if ($expr.name() eq 'infix:,') {
-##                for @($expr) {
-##                    $past.push( subcallarg($_) );
-##                }
-##            }
-##            else {
-##                $past.push( subcallarg($expr) );
-##            }
-##        }
+##        my $past := $($<arglist>);
+##        $past.name(~$<name>);
+##        $past.pasttype('call');
+##        $past.node($/);
 ##        return $past;
 ##    }
 .sub 'subcall' :method
     .param pmc match
     .param pmc key             :optional
-    .local string name
-    name = match['name']
     .local pmc past
-    $P0 = getclass 'PAST::Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pasttype'=>'call')
-    $P0 = match['EXPR']
-    if null $P0 goto end
-    .local pmc expr
-    $P1 = $P0[0]
-    expr = $P1.'get_scalar'()
-    $S0 = expr.'name'()
-    if $S0 != 'infix:,' goto one_arg
-    .local pmc iter
-    iter = expr.'iterator'()
-  iter_loop:
-    unless iter goto end
-    $P0 = shift iter
-    $P0 = 'subcallarg'($P0)
-    past.'push'($P0)
-    goto iter_loop
-  one_arg:
-    $P0 = 'subcallarg'(expr)
-    past.'push'($P0)
-  end:
+    $P0 = match['arglist']
+    past = $P0.'get_scalar'()
+    $S0 = match['name']
+    past.'name'($S0)
+    past.'pasttype'('call')
+    past.'node'(match)
     .return (past)
-.end
-
-.sub 'subcallarg'
-    .param pmc arg
-    $S0 = arg.'returns'()
-    unless $S0 == 'Pair' goto end
-    $P0 = arg[0]
-    $P1 = arg[1]
-    $P1.'named'($P0)
-    arg = $P1
-  end:
-    .return (arg)
 .end
 
 
@@ -445,7 +517,9 @@
 ##        my $past := PAST::Op.new( :node($/),
 ##                                  :name($<type>),
 ##                                  :pasttype($<top><pasttype>),
-##                                  :pirop($<top><pirop>)
+##                                  :pirop($<top><pirop>),
+##                                  :inline($<top><inline>),
+##                                  :islvalue($<top><lvalue>)
 ##                                );
 ##        for @($/) {
 ##            $past.push($($_));
@@ -461,13 +535,14 @@
     .return $P0.'get_scalar'()
   expr_reduce:
     .local pmc past
-    .local string name, pirop, pasttype, inline
+    .local string name, pirop, pasttype, inline, lvalue
     name = match['type']
     pirop = match['top';'pirop']
     pasttype = match['top'; 'pasttype']
     inline = match['top'; 'inline']
+    lvalue = match['top'; 'lvalue']
     $P0 = getclass 'PAST::Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline)
+    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline, 'islvalue'=>lvalue)
     $P1 = match.'get_array'()
     if null $P1 goto iter_end
     .local pmc iter
