@@ -786,7 +786,7 @@ PIO_buf_seek(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io),
     if ((newpos < io->fpos - (io->b.next - io->b.startb))
         || (newpos >= io->fpos + (io->b.endb - io->b.next))) {
         PIO_buf_flush(interp, l, io);
-        PIO_seek_down(interp, PIO_DOWNLAYER(l), io, newpos, SEEK_SET);
+        newpos = PIO_seek_down(interp, PIO_DOWNLAYER(l), io, newpos, SEEK_SET);
     }
     else {
         io->b.next += newpos - io->fpos;

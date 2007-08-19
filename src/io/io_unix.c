@@ -54,7 +54,7 @@ static ParrotIO * PIO_unix_accept( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_async( PARROT_INTERP,
+INTVAL PIO_unix_async( PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     INTVAL b )
@@ -365,7 +365,7 @@ Toggles the C<O_ASYNC> flag on the IO file descriptor.
 
 */
 
-static INTVAL
+INTVAL
 PIO_unix_async(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL b)
 {
     int rflags;

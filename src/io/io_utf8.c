@@ -101,33 +101,42 @@ PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
     STRING *s, *s2;
     String_iter iter;
 
-    size_t len = PIO_read_down(interp, layer->down, io, buf);
-
-    s = *buf;
+    size_t len  = PIO_read_down(interp, layer->down, io, buf);
+    s           = *buf;
     s->charset  = Parrot_unicode_charset_ptr;
     s->encoding = Parrot_utf8_encoding_ptr;
+
     /* count chars, verify utf8 */
     Parrot_utf8_encoding_ptr->iter_init(interp, s, &iter);
+
     while (iter.bytepos < s->bufused) {
         if (iter.bytepos + 4 > s->bufused) {
             const utf8_t *u8ptr = (utf8_t *)((char *)s->strstart +
                     iter.bytepos);
             UINTVAL c = *u8ptr;
+
             if (UTF8_IS_START(c)) {
                 UINTVAL len2 = UTF8SKIP(u8ptr);
+                INTVAL  read;
+
                 if (iter.bytepos + len2 <= s->bufused)
                     goto ok;
-                /* need len-1 more chars */
+
+                /* need len - 1 more chars */
                 len2--;
-                s2 = NULL;
-                s2 = PIO_make_io_string(interp, &s2, len2);
-                s2->bufused = len2;
+                s2           = NULL;
+                s2           = PIO_make_io_string(interp, &s2, len2);
+                s2->bufused  = len2;
                 s2->charset  = Parrot_unicode_charset_ptr;
                 s2->encoding = Parrot_utf8_encoding_ptr;
-                PIO_read_down(interp, layer->down, io, &s2);
-                s->strlen = iter.charpos;
-                s = string_append(interp, s, s2);
-                len += len2 + 1;
+
+                /* need to check the amount read here? */
+                read         = PIO_read_down(interp, layer->down, io, &s2);
+
+                s->strlen    = iter.charpos;
+                s            = string_append(interp, s, s2);
+                len         += len2 + 1;
+
                 /* check last char */
             }
         }

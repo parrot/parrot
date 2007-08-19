@@ -732,12 +732,14 @@ PARROT_API
 void
 PIO_flush(PARROT_INTERP, NOTNULL(PMC *pmc))
 {
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
+    ParrotIOLayer * const l  = (ParrotIOLayer *)PMC_struct_val(pmc);
+    ParrotIO      * const io = (ParrotIO *)PMC_data0(pmc);
+    INTVAL                ignored;
+
     if (!io)
         return;
 
-    PIO_flush_down(interp, l, io);
+    ignored = PIO_flush_down(interp, l, io);
 }
 
 /*
@@ -759,25 +761,24 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 PIO_reads(PARROT_INTERP, NOTNULL(PMC *pmc), size_t len)
 {
-    STRING *res;
-    ParrotIOLayer * const l = (ParrotIOLayer *)PMC_struct_val(pmc);
-    ParrotIO * const io = (ParrotIO *)PMC_data0(pmc);
+    STRING               *res = NULL;
+    ParrotIOLayer * const l   = (ParrotIOLayer *)PMC_struct_val(pmc);
+    ParrotIO      * const io  = (ParrotIO *)PMC_data0(pmc);
+    INTVAL                ignored;
 
     if (!io)
         return new_string_header(interp, 0);
 
     if (io->b.flags & PIO_BF_MMAP) {
-        res = new_string_header(interp, 0);
-        res->charset = Parrot_iso_8859_1_charset_ptr;   /* XXX binary */
+        res           = new_string_header(interp, 0);
+        res->charset  = Parrot_iso_8859_1_charset_ptr;   /* XXX binary */
         res->encoding = Parrot_fixed_8_encoding_ptr;
     }
-    else {
-        res = NULL;
+    else
         res = PIO_make_io_string(interp, &res, len);
-    }
 
     res->bufused = len;
-    PIO_read_down(interp, l, io, &res);
+    ignored      = PIO_read_down(interp, l, io, &res);
 
     return res;
 }
