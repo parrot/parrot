@@ -572,10 +572,11 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 */
     PMC *multiply(PMC *value, PMC *dest) {
 MMD_Integer: {
-            const INTVAL a = VTABLE_get_integer(INTERP, SELF);
-            const INTVAL b = VTABLE_get_integer(INTERP, value);
+            const INTVAL a  = VTABLE_get_integer(INTERP, SELF);
+            const INTVAL b  = VTABLE_get_integer(INTERP, value);
             const double cf = (double)a * (double)b;
-            const INTVAL c = a * b;
+            const INTVAL c  = a * b;
+
             if ((double) c == cf) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -694,7 +695,7 @@ MMD_BigInt:     {
             return overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
 MMD_DEFAULT: {
-            const FLOATVAL d = VTABLE_get_number(INTERP, value);
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
 
             if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -711,7 +712,7 @@ MMD_BigInt:     {
              overflow_p(INTERP, SELF, value, SELF, MMD_DIVIDE);
         }
 MMD_DEFAULT: {
-            const FLOATVAL d = VTABLE_get_number(INTERP, value);
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
 
             if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -747,8 +748,8 @@ MMD_BigInt:     {
             return overflow_p(INTERP, SELF, value, dest, MMD_FLOOR_DIVIDE);
         }
 MMD_DEFAULT: {
-            const FLOATVAL d = VTABLE_get_number(INTERP, value);
-            FLOATVAL       f;
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            FLOATVAL f;
 
             if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -799,8 +800,8 @@ MMD_BigInt:     {
             overflow_p(INTERP, SELF, value, SELF, MMD_FLOOR_DIVIDE);
         }
 MMD_DEFAULT: {
-            const FLOATVAL d = VTABLE_get_number(INTERP, value);
-            FLOATVAL       f;
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            FLOATVAL f;
 
             if (FLOAT_IS_ZERO(d))
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -1129,7 +1130,7 @@ Returns the result of comparing the integer with C<*value>.
 */
     INTVAL cmp(PMC *value) {
 MMD_String: {
-            const FLOATVAL fdiff =
+            FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
             if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
@@ -1164,7 +1165,7 @@ Returns the result of numerically comparing the integer with C<*value>.
 */
     INTVAL cmp_num(PMC *value) {
 MMD_String: {
-            const FLOATVAL fdiff =
+            FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
             if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =

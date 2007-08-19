@@ -439,7 +439,7 @@ Divides C<SELF> by C<value> inplace.
 */
 
     PMC *divide(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -471,7 +471,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     void i_divide(PMC *value) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -516,7 +516,7 @@ Divides C<SELF> by C<value> inplace.
 */
 
     PMC *floor_divide(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -551,7 +551,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     void i_floor_divide(PMC *value) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -602,7 +602,7 @@ the result in C<dest>.
 */
 
     PMC *cmodulus(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -636,7 +636,7 @@ the result in C<dest>.
         return dest;
     }
     void i_cmodulus(PMC *value) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -685,7 +685,7 @@ Calculates modulus inplace
 */
 
     PMC *modulus(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -720,7 +720,7 @@ Calculates modulus inplace
     }
 
     void i_modulus(PMC *value) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
@@ -1253,7 +1253,7 @@ and C<*value>.
 
     INTVAL cmp_num(PMC *value) {
         /* XXX - Floating-point precision errors possible? */
-        const FLOATVAL diff = VTABLE_get_number(INTERP, value) -
+        FLOATVAL diff = VTABLE_get_number(INTERP, value) -
                         DYNSELF.get_number();
 
         return FLOAT_IS_ZERO(diff) ? 0 : diff < 0.0 ? -1 : 1;
