@@ -152,28 +152,25 @@ cl.pir - Set up the package 'COMMON-LISP'
     .local pmc car
     .CAR(car, args)
 
-    .local pmc cdr
-    .SECOND(cdr, args)
-    .ASSERT_TYPE(cdr, "list")
+    .local pmc args_of_func
+    .SECOND(args_of_func, args)
+    .ASSERT_TYPE(args_of_func, "list")
 
     .local string type
     type = typeof car
-    if type == "LispFunction" goto FUNCTION
-    if type == "LispSymbol" goto SYMBOL
-
+    if type == "LispFunction" goto CAR_IS_FUNCTION
+    if type == "LispSymbol"   goto CAR_IS_SYMBOL
     goto INVALID_FUNCTION_NAME
 
-FUNCTION:
-    _FUNCTION_CALL(car, cdr)
+CAR_IS_FUNCTION:
+    .return _FUNCTION_CALL(car, args_of_func)
     goto DONE
 
-SYMBOL:
+CAR_IS_SYMBOL:
     .local pmc func
     func = car._get_function()                   # Get the function from symbol
     if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
-
-    _FUNCTION_CALL(func,cdr)
-    goto DONE
+    .return _FUNCTION_CALL(func,args_of_func)
 
 INVALID_FUNCTION_NAME:
     .ERROR_1("undefined-function", "%s is not a function name", car)

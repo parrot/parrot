@@ -24,6 +24,24 @@ use Test::More;
 use Parrot::Test;
 
 my @test_cases_without_exit_code = (
+    [ q{ ( print (apply ( function +) ( list 1 2)) ) },
+      q{3},
+      q{apply of builtin function},
+    ],
+    [ q{ ( print (funcall ( function +) 1 2) ) },
+      q{3},
+      q{funcall of builtin function},
+      todo => 'no FUNCALL yet'
+    ],
+    [ q{ ( setq my_function '+) ( print (apply my_function ( list 1 2)) ) },
+      q{3},
+      q{apply of setq'd builtin function},
+    ],
+    [ q{ ( setq my_function '+) ( print (funcall my_function 1 2) ) },
+      q{3},
+      q{funcall of setq'd builtin function},
+      todo => 'no FUNCALL yet'
+    ],
     [ q{ ( print ( function (lambda () ( + 1 5 ) ) ))
       },
       q{#<FUNCTION ANONYMOUS>},
@@ -35,7 +53,7 @@ my @test_cases_without_exit_code = (
       q{funcall a function with 0 params },
       todo => 'funcall does not work yet'
     ],
-    [ q{ ( print ( apply ( function (lambda () ( + 1 5 ) ) ) ) )
+    [ q{ ( print ( apply ( function (lambda () ( + 1 5 ) ) ) () ) )
       },
       q{6},
       q{apply a function with 0 params },
