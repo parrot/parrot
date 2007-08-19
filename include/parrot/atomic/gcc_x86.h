@@ -72,9 +72,10 @@ inline static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 
 #define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
-        if (expect == (long) parrot_i386_cmpxchg( \
+        void *res = parrot_i386_cmpxchg( \
                 (void * volatile *) &(a).val, \
-                (void *) expect, (void *) update)) { \
+                (void *) expect, (void *) update); \
+        if (expect == (long)res) { \
             result = 1; \
         } \
         else { \

@@ -1054,7 +1054,7 @@ wait_for_version(PARROT_INTERP,
             break;
         }
 
-        if (start_wait == 0.0)
+        if (FLOAT_IS_ZERO(start_wait))
             start_wait = Parrot_floatval_time();
 
         ++wait_count;
@@ -1070,9 +1070,11 @@ wait_for_version(PARROT_INTERP,
          * FIXME XXX race if other log goes away
          */
         PARROT_ASSERT(n_interpreters > 1);
-        other  = (STM_tx_log_sub*)version;
+        other  = (STM_tx_log_sub *)version;
 
-        PARROT_ASSERT(other < &log->inner[0] || other > &log->inner[STM_MAX_TX_DEPTH]);
+        PARROT_ASSERT(other < &log->inner[0] ||
+                      other > &log->inner[STM_MAX_TX_DEPTH]);
+
         curlog = get_sublog(log, log->depth);
 
         PARROT_ATOMIC_INT_GET(other_wait_len, other->wait_length);
