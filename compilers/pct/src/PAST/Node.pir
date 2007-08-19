@@ -115,11 +115,20 @@ children and attributes.  Returns the newly created node.
 .end
 
 
+=item unshift(child)
+
+Add C<child> to the beginning of the invocant's list of children.
+
 =item push(child)
 
 Add C<child> to the end of the invocant's list of children.
 
 =cut
+
+.sub 'unshift' :method
+    .param pmc value
+    unshift self, value
+.end
 
 .sub 'push' :method
     .param pmc value
