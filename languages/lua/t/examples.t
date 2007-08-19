@@ -86,7 +86,7 @@ OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'with args', params => "abc def"  );
 print(#arg)
-print(...)
+print(arg[1], arg[2])
 CODE
 2
 abc	def
