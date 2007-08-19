@@ -85,16 +85,18 @@ $1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a,b) = x*a + y*b)
 
 inline op gcd(out INT, in NUM, in NUM) :advanced_math {
 
-  FLOATVAL q = 0;
-  FLOATVAL c = 0;
-  FLOATVAL temp2 = $2 < 0.0 ? -$2 : $2;
-  FLOATVAL temp3 = $3 < 0.0 ? -$3 : $3;
-  while (temp3 != 0) {
-    q = floor((FLOATVAL)temp2/temp3);
-    c = temp2 - temp3*q;
+  FLOATVAL q     = 0;
+  FLOATVAL c     = 0;
+  FLOATVAL temp2 = fabs($2);
+  FLOATVAL temp3 = fabs($3);
+
+  while (!FLOAT_IS_ZERO(temp3)) {
+    q     = floor((FLOATVAL)temp2/temp3);
+    c     = temp2 - temp3*q;
     temp2 = temp3;
     temp3 = c;
   }
+
   $1 = (INTVAL)temp2;
   goto NEXT();
 }
