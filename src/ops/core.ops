@@ -307,9 +307,9 @@ inline op if(invar INT, labelconst INT) {
 }
 
 inline op if(invar NUM, labelconst INT) {
-    if ($1 != 0.0) {
+    if (!FLOAT_IS_ZERO($1))
         goto OFFSET($2);
-    }
+
     goto NEXT();
 }
 
@@ -349,9 +349,9 @@ inline op unless(invar INT, labelconst INT) {
 }
 
 inline op unless(invar NUM, labelconst INT) {
-    if ($1 == 0.0) {
+    if (FLOAT_IS_ZERO($1))
         goto OFFSET($2);
-    }
+
     goto NEXT();
 }
 
@@ -662,7 +662,8 @@ inline op set_addr(invar PMC, labelvar INT) {
 }
 
 inline op get_addr(out INT, invar PMC) {
-    $1 = (INTVAL)$2->vtable->get_pointer(interp, $2);
+    void *ptr = $2->vtable->get_pointer(interp, $2);
+    $1        = (INTVAL)ptr;
     goto NEXT();
 }
 
@@ -1192,10 +1193,11 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc (out PMC, invar PMC, in STR, in STR) {
     char * const name = string_to_cstring(interp, ($3));
+    void *ptr         = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2),
+        name);
 
-    funcptr_t p = D2FPTR(Parrot_dlsym(PMC_IS_NULL($2) ?
-            NULL : PMC_data($2), name));
-    string_cstring_free(name);
+    funcptr_t p = D2FPTR(ptr);
+
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
@@ -1207,6 +1209,7 @@ op dlfunc (out PMC, invar PMC, in STR, in STR) {
         $1->vtable->set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
+    string_cstring_free(name);
     goto NEXT();
 }
 
