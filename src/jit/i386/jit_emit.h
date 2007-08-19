@@ -139,6 +139,9 @@ extern PARROT_API UINTVAL ld(UINTVAL);
 
 #define emit_alu_r_r(reg1,reg2) emit_alu_X_r((reg1 - 1), (reg2))
 
+extern PARROT_API char **Parrot_exec_rel_addr;
+extern PARROT_API int Parrot_exec_rel_count;
+
 static int
 emit_is8bit(long disp)
 {
@@ -148,9 +151,6 @@ emit_is8bit(long disp)
 static char *
 emit_disp8_32(char *pc, int disp)
 {
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
-
     if (emit_is8bit(disp)) {
         *(pc++) = (char)disp;
         return pc;
@@ -194,9 +194,6 @@ emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
 static char *
 emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, long disp)
 {
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
-
     if (i && !scale) {
         real_exception(interp, NULL, JIT_ERROR,
                             "emit_r_X passed invalid scale+index combo\n");
@@ -598,8 +595,6 @@ static char *
 opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
 {
     UINTVAL ld2 = ld((UINTVAL) imm);
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
 
     if (imm == 0) {
         jit_emit_mov_ri_i(interp, pc, dest, 0);
@@ -2031,8 +2026,6 @@ opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int i
 {
     char *pc = jit_info->native_ptr;
     int saved = 0;
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
 
     if (dest != emit_EAX) {
         jit_emit_mov_rr_i(pc, emit_EAX, dest);
@@ -2167,9 +2160,6 @@ static void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP)
 {
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
-
     /* we have to get the code pointer, which might change
      * due too intersegment branches
      */
@@ -2445,9 +2435,6 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     int        idx, i, op;
     int        st      = 0;         /* stack pop correction */
     char      *L4      = NULL;
-
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int    Parrot_exec_rel_count;
 
     /* get the offset of the first vtable func */
     offset  = offsetof(VTABLE, absolute);
@@ -2778,8 +2765,6 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     int p1, i2;
     op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
     size_t offset = offsetof(VTABLE, init);
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
 
     assert(op_info->types[0] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
@@ -3529,8 +3514,6 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         jit_info->optimizer->cur_section;
     int last_is_branch = 0;
     void ** offset;
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
 
     assert(op_jit[*jit_info->cur_op].extcall == 1);
     if (cur_section->done == 1)
@@ -3719,13 +3702,12 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci,
     int next_i = 5;
     int st = 0;
     int size = 100 + signature->bufused * 20;
-    extern PARROT_API char **Parrot_exec_rel_addr;
-    extern PARROT_API int Parrot_exec_rel_count;
 
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    jit_info.native_ptr = jit_info.arena.start = mem_alloc_executable(size);
+    jit_info.native_ptr = jit_info.arena.start =
+        (char *)mem_alloc_executable(size);
     pc = jit_info.native_ptr;
 
     /* make stack frame, preserve %ebx */
