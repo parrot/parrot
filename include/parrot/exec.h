@@ -16,20 +16,20 @@
 
 #if EXEC_CAPABLE
 
-#  if PARROT_EXEC_OS_OPENBSD
+#  ifdef PARROT_EXEC_OS_OPENBSD
 #    ifdef PARROT_OPENBSD_ELF
 #      define EXEC_ELF
 #    else
 #      define EXEC_A_OUT
 #    endif
 #  endif
-#  if PARROT_EXEC_OS_DARWIN
+#  ifdef PARROT_EXEC_OS_DARWIN
 #    define EXEC_MACH_O
 #  endif
-#  if (PARROT_EXEC_OS_FREEBSD) || (PARROT_EXEC_OS_NETBSD) || (PARROT_EXEC_OS_LINUX)
+#  if defined(PARROT_EXEC_OS_FREEBSD) || defined(PARROT_EXEC_OS_NETBSD) || defined(PARROT_EXEC_OS_LINUX)
 #    define EXEC_ELF
 #  endif
-#  if PARROT_EXEC_OS_MSWIN32
+#  ifdef PARROT_EXEC_OS_MSWIN32
 #    define EXEC_COFF
 #  endif
 
