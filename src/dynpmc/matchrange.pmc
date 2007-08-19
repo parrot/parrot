@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -185,7 +185,8 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     INTVAL get_integer_keyed_str(STRING* key) {
-        return (INTVAL)(DYNSELF.get_number_keyed_str(key));
+        FLOATVAL f = DYNSELF.get_number_keyed_str(key);
+        return (INTVAL)f;
     }
 
     FLOATVAL get_number_keyed(PMC* key) {

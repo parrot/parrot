@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -108,19 +108,23 @@ Marks the lexpad hash as live.
         if (std_pad)
             pobject_lives(interp, (PObj *)std_pad);
         if (PMC_struct_val(SELF))
-            parrot_mark_hash(interp, PMC_struct_val(SELF));
+            parrot_mark_hash(interp, (Hash *)PMC_struct_val(SELF));
     }
 
     PMC* get_pmc_keyed_str(STRING* name) {
         HashBucket *b = parrot_hash_get_bucket(interp,
-            (Hash*) PMC_struct_val(SELF), name);
+            (Hash *)PMC_struct_val(SELF), name);
+
         if (!b) {
             PMC *std_pad = PMC_pmc_val(SELF);
+
             if (std_pad)
                 return VTABLE_get_pmc_keyed_str(interp, std_pad, name);
+
             return PMCNULL;
         }
-        return b->value;
+
+        return (PMC *)b->value;
     }
 
     INTVAL exists_keyed_str(STRING* name) {
@@ -145,10 +149,11 @@ Marks the lexpad hash as live.
 
     void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *std_pad = PMC_pmc_val(SELF);
-        if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name)) {
+
+        if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name))
             VTABLE_set_pmc_keyed_str(interp, std_pad, name, value);
-        }
-        parrot_hash_put(interp, PMC_struct_val(SELF), name, value);
+
+        parrot_hash_put(interp, (Hash *)PMC_struct_val(SELF), name, value);
     }
 
     void set_pmc_keyed(PMC* name, PMC* value) {

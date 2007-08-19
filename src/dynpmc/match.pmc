@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -134,55 +134,57 @@ Returns the string value for the element at C<*key>.
 */
 
     STRING* get_string_keyed(PMC* key) {
-        PMC* valpmc;
-        STRING* keystr;
+        PMC        *valpmc, *nextkey;
+        STRING     *keystr;
         HashBucket *b;
-        Hash *hash = PMC_struct_val(SELF);
-        PMC* nextkey;
+        Hash       *hash = (Hash *)PMC_struct_val(SELF);
+        void       *result;
 
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 /* called from iterator with an integer idx in key */
                 /* BUG! This will iterate through the input string as
                  * well as all of the real values. */
-                if (hash->key_type == Hash_key_type_int) {
-                    INTVAL i = (INTVAL)parrot_hash_get_idx(interp, hash, key);
-                    return string_from_int(interp, i);
-                }
-                return parrot_hash_get_idx(interp, hash, key);
+                result = parrot_hash_get_idx(interp, hash, key);
+
+                if (hash->key_type == Hash_key_type_int)
+                    return string_from_int(interp, (INTVAL)result);
+
+                return (STRING *)result;
             default:
                 keystr = make_hash_key(interp, key);
         }
+
         b = parrot_hash_get_bucket(interp, hash, keystr);
-        if (b == NULL) {
+
+        if (b == NULL)
             return SELF.get_string_keyed_str(keystr);
-        }
+
         nextkey = key_next(interp, key);
-        valpmc = b->value;
+        valpmc  = (PMC *)b->value;
+
         if (!nextkey)
             return fetch_string(interp, SELF, valpmc);
         return VTABLE_get_string_keyed(interp, valpmc, nextkey);
     }
 
     INTVAL get_integer_keyed(PMC* key) {
-        PMC* valpmc;
-        STRING* keystr;
-        Hash *hash = PMC_struct_val(SELF);
+        Hash       *hash = (Hash *)PMC_struct_val(SELF);
+        STRING     *keystr;
         HashBucket *b;
-        PMC* nextkey;
+        PMC        *valpmc, *nextkey;
+        void       *result;
 
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 /* called from iterator with an integer idx in key
-                 * check if we really have Hash_key_type_int
-                 */
-                if (hash->key_type == Hash_key_type_int) {
-                    return (INTVAL)parrot_hash_get_idx(interp, hash, key);
-                }
-                else {
-                    STRING *s = parrot_hash_get_idx(interp, hash, key);
-                    return string_to_int(interp, s);
-                }
+                 * check if we really have Hash_key_type_int */
+                result = parrot_hash_get_idx(interp, hash, key);
+
+                if (hash->key_type == Hash_key_type_int)
+                    return (INTVAL)result;
+                else
+                    return string_to_int(interp, (STRING *)result);
             default:
                 keystr = make_hash_key(interp, key);
         }
@@ -191,8 +193,10 @@ Returns the string value for the element at C<*key>.
             /* XXX Warning: use of uninitialized value */
             return 0;
         }
+
         nextkey = key_next(interp, key);
-        valpmc = b->value;
+        valpmc  = (PMC *)b->value;
+
         if (!nextkey)
             return fetch_integer(interp, SELF, valpmc);
         return VTABLE_get_integer_keyed(interp, valpmc, nextkey);
