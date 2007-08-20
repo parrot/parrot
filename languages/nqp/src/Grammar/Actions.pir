@@ -281,6 +281,13 @@
 ##            $past.node($/);
 ##            return $past;
 ##        }
+##        if $key eq '< >' {
+##            my $value := PAST::Val.new( :value( $($<string_literal>) ) );
+##            return PAST::Var.new( $value,
+##                                  :scope('keyed'),
+##                                  :viviself('Hash'),
+##                                  :node( $/ ) );
+##        }
 ##        return PAST::Var.new( $($<EXPR>),
 ##                              :scope('keyed'),
 ##                              :node($/) );
@@ -288,18 +295,28 @@
 .sub 'postcircumfix' :method
     .param pmc match
     .param string key
-    if key != '( )' goto keyed_var
     .local pmc past
-    $P0 = match['arglist']
-    past = $P0.'get_scalar'()
-    past.'pasttype'('call')
-    past.'node'(match)
-    .return (past)
+    if key == '( )' goto subcall
+    if key == '< >' goto keyed_const
   keyed_var:
     $P0 = getclass 'PAST::Var'
     $P1 = match['EXPR']
     $P2 = $P1.'get_scalar'()
     .return $P0.'new'( $P2, 'scope'=>'keyed', 'node'=>match )
+  subcall:
+    $P0 = match['arglist']
+    past = $P0.'get_scalar'()
+    past.'pasttype'('call')
+    past.'node'(match)
+    .return (past)
+  keyed_const:
+    $P0 = getclass 'PAST::Val'
+    $P1 = match['string_literal']
+    $P2 = $P1.'get_scalar'()
+    .local pmc value
+    value = $P0.'new'( 'value' => $P2, 'node'=> $P1 )
+    $P0 = getclass 'PAST::Var'
+    .return $P0.'new'( value, 'scope'=>'keyed', 'viviself'=>'Hash', 'node'=>match)
 .end
 
 
@@ -462,13 +479,13 @@
 
 
 ##    method quote($/, $key) {
-##        return PAST::Val.new(node=>$/, value=>~($<quote_literal>))
+##        return PAST::Val.new(node=>$/, value=>~($<string_literal>))
 ##    }
 .sub 'quote' :method
     .param pmc match
     .param pmc key             :optional
     .local string value
-    $P0 = match['quote_literal']
+    $P0 = match['string_literal']
     value = $P0.'get_scalar'()
     $P0 = getclass 'PAST::Val'
     .return $P0.'new'('node'=>match, 'value'=>value)

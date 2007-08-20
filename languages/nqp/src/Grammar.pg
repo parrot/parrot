@@ -166,7 +166,7 @@ token postcircumfix {
     | '(' <arglist> ')' {*}                                #= ( )
     | '[' <EXPR> <?ws> ']' {*}                             #= [ ]
     | '{' <EXPR> <?ws> '}' {*}                             #= { }
-    | '<' ( <-[>]>* ) '>' {*}                              #= < >
+    | '<' <string_literal: \>> '>' {*}                     #= < >
 }
 
 rule arglist {
@@ -216,7 +216,11 @@ token sigil { '$' }
 
 
 token quote {
-    <quote_literal> {*}
+    [ \'  <string_literal: '> \'
+    | '"' <string_literal: "> '"'
+    | '<' <string_literal: \>> '>'
+    ]
+    {*}
 }
 
 
