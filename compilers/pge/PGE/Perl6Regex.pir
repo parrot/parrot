@@ -753,12 +753,23 @@ Parses a subrule token.
     goto subrule_end
   subrule_text_arg:
     pos += 2
-    $I0 = index target, '>', pos
-    if $I0 < 0 goto end
-    $I0 -= pos
-    $S0 = substr target, pos, $I0
-    mob['arg'] = $S0
-    pos += $I0
+    .local string textarg
+    textarg = ''
+  subrule_text_loop:
+    $S0 = substr target, pos, 1
+    if $S0 == '>' goto subrule_text_end
+    if $S0 != "\\" goto subrule_text_add
+    inc pos
+    $S0 = substr target, pos, 1
+    $I0 = index "\\>", $S0
+    if $I0 >= 0 goto subrule_text_add
+    textarg .= "\\"
+  subrule_text_add:
+    textarg .= $S0
+    inc pos
+    goto subrule_text_loop
+  subrule_text_end:
+    mob['arg'] = textarg
   subrule_end:
     $S0 = substr target, pos, 1
     if $S0 != '>' goto end
