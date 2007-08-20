@@ -30,7 +30,7 @@ This syntax is also true for PGE::Glob and PGE::P5Regex
 
 =head1 Deprecated ops
 
-From http://www.parrotcode.org/docs/ops/var.html, the following ops are 
+From L<http://www.parrotcode.org/docs/ops/var.html>, the following ops are
 deprecated:
 
 =over 4
@@ -47,6 +47,18 @@ There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
 
+From L<http://www.parrotcode.org/docs/ops/experimental.html>, the following ops
+are deprecated:
+
+=over 4
+
+=item B<new>(out PMC, in INT, in STR)
+
+=item B<instantiate>(out PMC)
+
+=back
+
+They will be removed in the 0.5.0 release.
 
 =head1 Deprecated Class Features
 
@@ -64,16 +76,17 @@ It's an exact duplicate of the string return variant of the C<typeof> op.
 =item 3
 
 The experimental C<instantiate> opcode is deprecated and will be removed in the
-0.5.0 release. 
+0.5.0 release.
 
 (The C<instantiate> vtable function becomes core in 0.5.0, but is accessed via
 the "new" opcode for the PMCs that use it.)
 
 =item 4
 
-  PMC* subclass(PMC* name)
+  PMC* subclass(PMC *name)
 
-The subclass vtable method is deprecated and will be removed in the 0.5.0 release.
+The subclass vtable method is deprecated and will be removed in the 0.5.0
+release.
 
 =item 5
 
@@ -95,7 +108,7 @@ Instead of:
 
   $P0 = new Integer
 
-or 
+or
 
   $P0 = new .Integer # better, but ...
 
@@ -123,13 +136,4 @@ Will have to be:
 
 =head1 Deprecated compiler tools
 
-=over 4
-
-=item compilers/past and compilers/post [#44011]
-
-The compilers/past and compilers/post tools are deprecated in
-favor of compilers/past-pm and compilers/pct .  They are expected
-to be completely removed from the repository in an upcoming release.
-
-=back
-
+Currently no compiler tools are deprecated.
