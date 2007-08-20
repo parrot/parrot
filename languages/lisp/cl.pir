@@ -164,12 +164,14 @@ cl.pir - Set up the package 'COMMON-LISP'
 
 CAR_IS_FUNCTION:
     .return _FUNCTION_CALL(car, args_of_func)
-    goto DONE
 
 CAR_IS_SYMBOL:
     .local pmc func
     func = car._get_function()                   # Get the function from symbol
     if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
+    type = typeof func
+    # print type
+    # print ' for CAR_IS_SYMBOL'
     .return _FUNCTION_CALL(func,args_of_func)
 
 INVALID_FUNCTION_NAME:
@@ -385,18 +387,18 @@ DONE:
     .param pmc args
     .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-    .local pmc retv
-  
     .local pmc form
     .CAR(form, args)
   
+    .local pmc retv
+
     .local string type
     type = typeof form
     if type == "LispSymbol" goto SYMBOL          # Retrieve function from symbol
   
-    .local int test
-    test = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
-    if test goto LAMBDA_FORM                     # and build a closure if so
+    .local int is_lambda_list
+    is_lambda_list = _IS_ORDINARY_LAMBDA_LIST(form)        # Check if it's a lambda form
+    if is_lambda_list goto LAMBDA_FORM                     # and build a closure if so
   
     goto INVALID_FUNCTION_NAME
   
@@ -423,7 +425,7 @@ SYMBOL:
     goto DONE
  
 LAMBDA_FORM:
-    retv = _MAKE_LAMBDA(form)                    # Create a closure object
+    retv = _MAKE_LAMBDA(form)                    # Create a closure PMC
     goto DONE
 
 INVALID_FUNCTION_NAME:

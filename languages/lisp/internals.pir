@@ -246,34 +246,45 @@ Call a function.
     body  = function._get_body()
 
     .local string type
+    type = typeof function                     # Get the function type
+    # print function
+    # print " of type "
+    # print type
+    type = typeof body                     # Get the function type
+    # print " with body "
+    # print body
+    # print " with bodytype "
+    # print type
+    # print " in _FUNCTION_CALL\n"
     type = typeof body                     # Get the function type
 
-    if type == "Sub" goto COMPILED_FUNCTION
-    goto INTERPRETED_FUNCTION
+    # print type
+    # print " is the type\n"
+    if type != 'Sub' goto NOT_A_COMPILED_FUNCTION
+        .return body( args )
+    NOT_A_COMPILED_FUNCTION:
 
-COMPILED_FUNCTION:
-    # VALID_IN_PARROT_0_2_0 set_args "0", args                    # First argument
-    # VALID_IN_PARROT_0_2_0 goto CALL_FUNCTION
-    # Just a wild guess
-    .return body( args )
-   
-INTERPRETED_FUNCTION:
-    .local pmc scope
-    scope = function._get_scope()
+    if type != 'LispCons' goto NOT_A_LISP_CONS
+        .local pmc scope
+        scope = function._get_scope()
 
                                         # 1st arg - the code to evaluate
                                         # 2nd arg - the arg prototype
                                         # 3rd arg - the args to evaluate
                                         # The closure
-    set_args "0,0,0", body, proto, args
-    goto CALL_FUNCTION
+        # set_args "0,0,0", body, proto, args
+        .return scope( body, proto, args )
+        # VALID_IN_PARROT_0_2_0 pushtopp                            # Save the upper registers
+        # VALID_IN_PARROT_0_2_0 invokecc                            # Call the closure
+        # VALID_IN_PARROT_0_2_0 poptopp                             # Restore the upper registers
 
-CALL_FUNCTION:
-  # VALID_IN_PARROT_0_2_0 pushtopp                            # Save the upper registers
-  # VALID_IN_PARROT_0_2_0 invokecc                            # Call the closure
-  # VALID_IN_PARROT_0_2_0 poptopp                            # Restore the upper registers
+        # VALID_IN_PARROT_0_2_0 returncc
+    NOT_A_LISP_CONS:
+       
+    .return ()
 
-  # VALID_IN_PARROT_0_2_0 returncc
+DONE:
+  .return()
 .end
 
 .sub _IS_SPECIAL
@@ -335,40 +346,51 @@ DONE:
 .sub _MAKE_LAMBDA
     .param pmc form
 
-    .local pmc closure
-    .local pmc symbol
-    .local pmc lptr
-    .local pmc retv
-  
+    # .FIRST is 'lambda'
+
+    # check the parameter declaration
     .local pmc args
     .SECOND(args, form)
-    .local pmc body
-    .THIRD(body, form)
-  
-     lptr = args
-  
-ARG_LOOP:
-    .NULL(lptr, SETUP_CLOSURE)
+    .local pmc lptr
+    lptr = args
+    .local pmc symbol
+ARG_LOOP_BEGIN:
+    .NULL(lptr, ARG_LOOP_END)
 
     .CAR(symbol, lptr)                            # Ensure all the arguments are
     .ASSERT_TYPE(symbol, "symbol")                # symbol types.
 
     .CDR(lptr, lptr)
-    goto ARG_LOOP
+    goto ARG_LOOP_BEGIN
+ARG_LOOP_END:
 
-SETUP_CLOSURE:
-    closure = new .Closure                       # Capture the scope the closure
-    set_addr closure, CLOSURE_START              # will later be run in
+    .local pmc body
+    .THIRD(body, form)
 
-    retv = new "LispFunction"
+    .const .Sub sub_that_calls_eval = 'sub_that_calls_eval' 
+    .local pmc closure
+    closure = newclosure sub_that_calls_eval       # Capture the scope the closure
 
-    retv._set_args(args)
-    retv._set_body(body)
-    retv._set_scope(closure)
+    .local pmc lisp_function
+    lisp_function = new "LispFunction"
+    lisp_function._set_args(args)
+    lisp_function._set_body(body)
+    lisp_function._set_scope(closure)
 
-    goto DONE
+    .return(lisp_function)
+.end
 
-CLOSURE_START:
+.sub sub_that_calls_eval :outer('_MAKE_LAMBDA')    # TODO: what is really :outer ???
+   .param pmc clbody
+   .param pmc clprot
+   .param pmc clargs
+
+   # print "sub_that_calls_eval\n body: "
+   # print clbody
+   # print "\nproto: "
+   # print clprot
+   # print "\nargs: "
+   # print clargs
    .local string clsymname
    .local pmc clargsptr
    .local pmc clprotptr
@@ -378,10 +400,6 @@ CLOSURE_START:
    .local pmc clarg
    .local pmc clval
    .local pmc clsym
-
-    clbody = P5
-    clprot = P6
-    clargs = P7
 
     clargsptr = clargs
     clprotptr = clprot
@@ -414,11 +432,8 @@ CLOSURE_BODY:
     .local pmc clretv
 
     .LIST_1(clearg, clbody)
-    clretv = _eval(clearg)
-
     # VALID_IN_PARROT_0_2_0  pop_pad
-
-    goto CLOSURE_DONE
+    .return _eval(clearg)
 
 CLOSURE_TOO_FEW_ARGS:
     # VALID_IN_PARROT_0_2_0  pop_pad
@@ -433,10 +448,7 @@ CLOSURE_TOO_MANY_ARGS:
     goto CLOSURE_DONE
 
 CLOSURE_DONE:
-    returncc
-
-DONE:
-    .return(retv)
+    .return()
 .end
 
 .sub _LIST_LENGTH

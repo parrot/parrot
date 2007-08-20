@@ -57,7 +57,6 @@ my @test_cases_without_exit_code = (
       },
       q{6},
       q{apply a function with 0 params },
-      todo => 'apply does not work yet'
     ],
     [ q{ ( print ( function (lambda ( a b ) ( + a b ) ) ))
       },
