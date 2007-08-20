@@ -15,6 +15,15 @@ token TOP {
 ##  These are taken from an earlier draft of Perl 6, so they do not
 ##  yet handle all valid forms of Perl 6 whitespace.
 token ws {
+    {{  $P0 = match.'to'()
+        $P1 = get_hll_global [ 'NQP::Grammar' ], '$!ws'
+        if null $P1 goto set_new_ws
+        $P2 = $P1.'to'()
+        if $P0 != $P2 goto set_new_ws
+        .return (1)
+      set_new_ws:
+        set_hll_global [ 'NQP::Grammar' ], '$!ws', match
+    }}
     [ \s+
     | ^^ [ \# \N*
          | <?pod_comment>
@@ -22,6 +31,22 @@ token ws {
     | \# \N*
     ]*
 }
+
+
+token afterws {
+    ##  <?{ $¢ == $!ws_to != $!ws_from }>
+    {{  $P0 = match.'to'()
+        $P1 = get_hll_global [ 'NQP::Grammar' ], '$!ws'
+        $P2 = $P1.'to'()
+        if $P0 != $P2 goto end
+        $P2 = $P1.'from'()
+        if $P0 == $P1 goto end
+        .return (1)
+      end:
+    }}
+    <fail>
+}
+
 
 regex pod_comment {
     ^^ '=' [ [ 'cut' \h*: | 'end' [\h\N*]? ]
@@ -67,9 +92,10 @@ token terminator { <[ } \] ) ]> | $ }
 token statement_end {
      || ';'
      || <?before <terminator>>
-     || {{  $P0 = match.'to'()
-            $P1 = get_hll_global ['NQP::Grammar'], '$!endstmt'
-            if $P0 != $P1 goto end
+     || {{  $P0 = get_hll_global ['NQP::Grammar'], '$!endstmt'
+            $P1 = get_hll_global ['NQP::Grammar'], '$!ws'
+            $P2 = $P1.'from'()
+            if $P0 != $P2 goto end
             .return (1)
             end:
         }} <fail>
@@ -109,11 +135,12 @@ token block {
     <statement_list>
     [ '}' | <panic: Missing '}'> ]
     [
-        \h* [ \# \N* ]? \n <?ws>
+        \h* [ \# \N* ]? \n
         {{  $P0 = match.'to'()
             $P0 = clone $P0
             set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
         }}
+        <?ws>
     ]?
     {*}                                                    #= close
 }
@@ -151,8 +178,10 @@ token term {
 }
 
 token postfix {
-    | <methodop> {*}                                       #= methodop
+    <!afterws>
+    [ <methodop> {*}                                       #= methodop
     | <postcircumfix> {*}                                  #= postcircumfix
+    ]
 }
 
 token methodop {
