@@ -65,7 +65,8 @@ pmclass LuaClosure
             memcpy(PMC_sub(SELF), PMC_sub(sub), sizeof (struct Parrot_sub));
         }
         else {
-            real_exception(INTERP, NULL, E_Exception, "not a Closure");
+            real_exception(INTERP, NULL, E_Exception, "not a Closure (%s)",
+                           string_to_cstring(INTERP, SELF->vtable->whoami));
         }
     }
 
