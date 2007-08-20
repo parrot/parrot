@@ -18,6 +18,22 @@
         %r = $S0
         END
 
+    optable['infix:=='; 'inline'] = <<"        END"
+        ##  inline infix:==
+        $I0 = cmp_num %0, %1
+        $I0 = iseq $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:!='; 'inline'] = <<"        END"
+        ##  inline infix:!=
+        $I0 = cmp_num %0, %1
+        $I0 = isne $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     .return ()
 .end
 
