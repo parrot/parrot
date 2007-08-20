@@ -6,7 +6,10 @@ This is "Not Quite Perl" -- a compiler for quickly generating PIR
 routines from Perl6-like code.  The key feature of NQP is that it's
 designed to be a very small compiler (as compared with, say, perl6)
 and is focused on being a high-level way to create transformers
-for Parrot (especially hll compilers).
+for Parrot (especially hll compilers).  In addition, unlike perl6,
+NQP attempts to restrict itself to generating code that can run
+in Parrot without the existence of any NQP-specific runtime
+libraries.
 
 One way that NQP aims to be a lighter version of Perl 6 is by
 avoiding syntactic sugar and "dwimminess" that isn't needed
