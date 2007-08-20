@@ -30,6 +30,8 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 39;
 use Test::More;
 
+my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io environment' );
 assert(getfenv(io.lines) == _G)
 local env = debug.getfenv(io.lines)
@@ -382,7 +384,7 @@ OUTPUT
 
 SKIP:
 {
-skip('only with Parrot', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
+skip('only with Parrot', 1) if ($test_prog eq 'lua');
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:__gc' );
 function inner ()

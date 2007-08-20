@@ -25,6 +25,8 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 19;
 use Test::More;
 
+my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc';
+
 delete $ENV{LUA_INIT};
 delete $ENV{TEST_PROG_ARGS};
 
@@ -38,7 +40,7 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 15) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
+skip('only with an interpreter', 15) if ($test_prog eq 'luac.pl' || $test_prog eq 'luap.pir');
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'shebang misplaced' );
 
@@ -168,7 +170,7 @@ OUT
 
 SKIP:
 {
-skip('only with Parrot', 3) unless (($ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc') eq 'lua.pbc');
+skip('only with Parrot', 3) unless ($test_prog eq 'lua.pbc');
 
 $ENV{TEST_PROG_ARGS} = '-lalarm';
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', '-lalarm' );

@@ -27,6 +27,8 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 16;
 use Test::More;
 
+my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
 function add (a)
     local sum = 0
@@ -192,7 +194,7 @@ OUT
 
 SKIP:
 {
-skip('not implemented', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'luac.pl');
+skip('not implemented', 1) if ($test_prog eq 'luac.pl');
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'invalid var args' );
 function f ()
@@ -200,7 +202,7 @@ function f ()
 end
 f()
 CODE
-/^[^:]+: [^:]+:\d+: cannot use '...' outside a vararg function/
+/^([^:]+: )?[^:]+:\d+: cannot use '...' outside a vararg function/
 OUT
 }
 
@@ -214,7 +216,7 @@ function f()
     print "after"
 end
 CODE
-/^[^:]+: [^:]+:\d+: no loop to break/
+/^([^:]+: )?[^:]+:\d+: no loop to break/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'tail call' );

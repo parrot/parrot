@@ -28,6 +28,8 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 16;
 use Test::More;
 
+my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function module' );
 print(type(mod))
 local _G = _G
@@ -135,13 +137,13 @@ TODO: {
 
 unlink('../foo.lua') if ( -f '../foo.lua' );
 open $X, '>', '../foo.lua';
-print {$X} 'print(...)';
+print {$X} 'print("in foo.lua", ...)';
 close $X;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require (arg)' );
 require "foo"
 CODE
-foo
+in foo.lua	foo
 OUTPUT
 }
 
@@ -196,7 +198,7 @@ unlink('../complex.lua') if ( -f '../complex.lua' );
 
 SKIP:
 {
-skip('only with Parrot', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
+skip('only with Parrot', 1) if ($test_prog eq 'lua');
 
 unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
 unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
@@ -278,7 +280,7 @@ OUTPUT
 
 SKIP:
 {
-skip('only with Parrot', 3) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
+skip('only with Parrot', 3) if ($test_prog eq 'lua');
 
 delete $ENV{LUA_PBCPATH};
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.pbcpath' );

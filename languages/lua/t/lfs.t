@@ -28,6 +28,8 @@ use Cwd;
 use File::Basename;
 use File::Spec;
 
+my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+
 language_output_is( 'lua', << 'CODE', << 'OUT', 'require lfs' );
 require "lfs"
 print(type(lfs))
@@ -178,7 +180,7 @@ OUT
 
 SKIP:
 {
-skip('only with Parrot', 1) if (($ENV{PARROT_LUA_TEST_PROG} || q{}) eq 'lua');
+skip('only with Parrot', 1) if ($test_prog eq 'lua');
 
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.attributes (invalid)' );
 require "lfs"

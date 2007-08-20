@@ -70,6 +70,12 @@ foreach my $func ( keys %language_test_map ) {
                 "$self->{parrot} --no-gc languages/${pir_fn} $params",
             );
         }
+        elsif ( $lua_test eq 'luap.pir' ) {
+            @test_prog = (
+                "$self->{parrot} languages/lua/luap.pir -o languages/${pir_fn} --target=pir $src",
+                "$self->{parrot} --no-gc languages/${pir_fn} $params",
+            );
+        }
         elsif ( $lua_test eq 'lua.pbc' ) {
             @test_prog = (
                 "$self->{parrot} --no-gc languages/lua/lua.pbc $test_prog_args $src $params",
