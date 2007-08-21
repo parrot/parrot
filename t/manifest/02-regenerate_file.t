@@ -111,7 +111,7 @@ The files in this directory test the publicly callable methods of
 F<lib/Parrot/Manifest.pm> and packages which inherit from that package.
 
 F<02-regenerate_file.t> tests whether Parrot::Manifest correctly determines
-whether MANIFESTneeds to be regenerated or not.
+whether MANIFEST needs to be regenerated or not.
 
 =head1 AUTHOR
 
