@@ -94,7 +94,7 @@ sub runstep {
         # If we are building shared, need to include dynamic libparrot.lib, otherwise
         # the static libparrot.lib.
         if ( $conf->data->get('parrot_is_shared') ) {
-            $conf->data->set( libparrot_ldflags => 'libparrot$(A)' );
+            $conf->data->set( libparrot_ldflags => 'libparrot.lib' );
         }
 
         # 'link' needs to be link.exe, not cl.exe.
