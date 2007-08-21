@@ -65,8 +65,14 @@ sub try_attr {
     my $cc = $conf->option_or_data( 'cc' );
     cc_gen('config/auto/attributes/test_c.in');
 
+    my $disable_warnings = '';
+    # work around msvc warning for unused variable
+    if ( defined $conf->option_or_data( 'msvcversion' ) ) {
+        $disable_warnings = '-wd4101';
+    }
+
     my $ccflags = $conf->option_or_data( 'ccflags');
-    my $tryflags = "$ccflags -D$attr";
+    my $tryflags = "$ccflags -D$attr $disable_warnings";
 
     my $command_line = Parrot::Configure::Step::_build_compile_command( $cc, $tryflags );
     $verbose and print "  ", $command_line, $/;
