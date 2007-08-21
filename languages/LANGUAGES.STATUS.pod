@@ -61,7 +61,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -134,7 +134,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -160,7 +160,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -183,7 +183,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -304,7 +304,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -328,7 +328,7 @@ library.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -375,7 +375,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -413,7 +413,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -437,7 +437,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -464,7 +464,7 @@ See details in F<languages/lua/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -526,7 +526,7 @@ Development is stalled. Takers are welcome.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -555,6 +555,29 @@ Unknown
 
 Up to revision 12805 of the Parrot subversion repository:
 C<languages/miniperl>
+
+=back
+
+
+=head2 NQP
+
+=over 4
+
+=item Description
+
+Not Quite Perl : lite-Perl6 implemented with PCT
+
+=item Status
+
+In progress.
+
+=item Last verified with parrot version
+
+0.4.15
+
+=item Location
+
+C<languages/nqp>
 
 =back
 
@@ -621,7 +644,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -739,7 +762,7 @@ as the language as accepted by IMCC.
 
 =item Last verified with parrot version
 
-0.4.12
+0.4.15
 
 =item location
 
@@ -793,7 +816,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -846,7 +869,7 @@ and logic ops.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -917,7 +940,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -992,7 +1015,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.9
+0.4.15
 
 =item Location
 
@@ -1017,7 +1040,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -1066,7 +1089,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.9
+0.4.15
 
 =item Location
 
@@ -1090,7 +1113,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
@@ -1118,7 +1141,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.9
+0.4.15
 
 =item Location
 
@@ -1166,7 +1189,7 @@ Infocom's Z-machine. See also http://en.wikipedia.org/wiki/Z-machine.
 
 =item Last verified with parrot version
 
-0.4.13
+0.4.15
 
 =item Location
 
