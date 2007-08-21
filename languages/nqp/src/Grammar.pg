@@ -307,8 +307,10 @@ proto infix:<!=> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
 proto infix:<eq> is equiv(infix:<==>)
+    is pasttype('inline')
     { ... }
 proto infix:<ne> is equiv(infix:<==>)
+    is pasttype('inline')
     { ... }
 
 proto infix:<&&> is looser(infix:<==>)

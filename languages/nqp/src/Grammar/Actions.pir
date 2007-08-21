@@ -34,6 +34,22 @@
         %r = $I0
         END
 
+    optable['infix:eq'; 'inline'] = <<"        END"
+        ##  inline infix:eq
+        $I0 = cmp_str %0, %1
+        $I0 = iseq $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['infix:ne'; 'inline'] = <<"        END"
+        ##  inline infix:ne
+        $I0 = cmp_str %0, %1
+        $I0 = isne $I0, 0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     .return ()
 .end
 
