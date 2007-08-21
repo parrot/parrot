@@ -633,12 +633,7 @@ Finish thawing.
             STRING *hll_name = NULL;
 
             if (!PMC_IS_NULL(lib_pmc)) {
-                PMC *ignored;
                 lib_name = VTABLE_get_string(INTERP, lib_pmc);
-
-                if (!STRING_IS_EMPTY(lib_name))
-                    ignored = Parrot_load_lib(INTERP, lib_name, NULL);
-
                 PObj_constant_SET(lib_name);
             }
 
@@ -649,6 +644,10 @@ Finish thawing.
 
             /* yes, id goes unused, but this API will get an overhaul soon */
             id = Parrot_register_HLL(INTERP, hll_name, lib_name);
+
+            if (!STRING_IS_EMPTY(lib_name)) {
+                PMC *ignored = Parrot_load_lib(INTERP, lib_name, NULL);
+            }
         }
 
     }
