@@ -18,6 +18,13 @@
         %r = $S0
         END
 
+    optable['prefix:+'; 'inline'] = <<"        END"
+        ##  inline prefix:+
+        $I0 = %0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     optable['infix:=='; 'inline'] = <<"        END"
         ##  inline infix:==
         $I0 = cmp_num %0, %1

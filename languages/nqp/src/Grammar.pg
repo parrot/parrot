@@ -286,6 +286,7 @@ proto prefix:<~> is equiv(prefix:<+>)
     { ... }
 
 proto prefix:<+> is equiv(prefix:<~>)
+    is pasttype('inline')
     { ... }
 
 proto prefix:<-> is equiv(prefix:<+>)

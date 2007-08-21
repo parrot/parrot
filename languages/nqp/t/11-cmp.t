@@ -2,7 +2,7 @@
 
 # check comparisons
 
-say('1..10');
+say('1..14');
 
 ##Integers, positive and negative
 
@@ -37,3 +37,27 @@ if "ONE" ne "TWO" { say("ok 9 # string inequality"); }
 unless "STRING" ne "STRING" {
     say("ok 10 # string inequality, equal");
 }
+
+##Coerce strings into integers
+
+if "11" ne ~11 {
+    print("not ");
+}
+say("ok 11 # coerce integer 11 into string eleven");
+
+if "-12" ne ~-12 {
+    print("not ");
+}
+say("ok 12 # coerce integer -12 into string twelve");
+
+##Coerce integers into strings
+
+if 13 ne +"13" {
+    print("not ");
+}
+say("ok 13 # coerce string 13 into an integer");
+
+if -14 ne +"-14" {
+    print("not ");
+}
+say("ok 14 # coerce string -14 into an integer");
