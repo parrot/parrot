@@ -364,8 +364,10 @@ find_vtable_override(PARROT_INTERP, PMC *parrot_class, STRING *name)
     /* Walk and search for the vtable method. */
     const int num_classes       = VTABLE_elements(interp, _class->all_parents);
     const int all_in_universe   = !PObj_HasAlienParents_TEST(parrot_class);
+    /* xxx this isn't used yet
     const int alien_parents_pos = VTABLE_elements(interp,
         _class->attrib_metadata);
+    */
 
     int i;
 
@@ -641,7 +643,7 @@ Returns an error if an attribute of C<name> already exists.
                 "Modifications to already instantiated classes not allowed yet.");
         }
 
-        /* If we've already got an attribute of this name, it's an error. */
+        /* If we already have an attribute of this name, it's an error. */
         if (VTABLE_exists_keyed_str(interp, _class->attrib_metadata, name))
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Attribute '%s' already exists.",
@@ -1177,18 +1179,18 @@ Returns whether the class is or inherits from C<*classname>.
 
 /*
 
-=item C<void name(STRING *name :optional, int got_name :opt_flag)>
+=item C<void name(STRING *name :optional, int has_name :opt_flag)>
 
 Sets the name of the class, and updates the namespace accoringly.
 
 =cut
 
 */
-    PCCMETHOD name(STRING *name :optional, int got_name :opt_flag) {
+    PCCMETHOD name(STRING *name :optional, int has_name :opt_flag) {
         Parrot_Class *_class   = PARROT_CLASS(SELF);
         STRING       *ret_name = NULL;
 
-        if (got_name) {
+        if (has_name) {
             /* We'll build a hash just containing the name, then give this to
              * init_class_from_hash - saves some code duplication. */
             PMC *naming_hash = pmc_new(interp, enum_class_Hash);
@@ -1210,9 +1212,11 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
-    PCCMETHOD pmc_namespace(PMC *_namespace :optional, int got_name :opt_flag) {
+    PCCMETHOD pmc_namespace(PMC *_namespace :optional, int has_name :opt_flag) {
         Parrot_Class *_class        = PARROT_CLASS(SELF);
         PMC          *ret_namespace = _class->_namespace;
+        UNUSED(_namespace);
+        UNUSED(has_name);
         PCCRETURN(PMC *ret_namespace);
     }
 
@@ -1227,12 +1231,12 @@ methods from roles. When called with no parameter, returns the list.
 
 */
     PCCMETHOD resolve_method(PMC *resolve_list :optional,
-                                  int got_list :opt_flag) {
+                                  int has_list :opt_flag) {
         Parrot_Class *_class   = PARROT_CLASS(SELF);
         PMC          *ret_list = NULL;
 
         /* Store list. */
-        if (got_list)
+        if (has_list)
             _class->resolve_method = resolve_list;
 
         ret_list = _class->resolve_method;
@@ -1281,8 +1285,8 @@ Add an attribute to the class. Requires a name and, optionally, a type.
 
 */
     PCCMETHOD add_attribute(STRING *attribute_name,
-            PMC *attribute_type :optional, int got_type :opt_flag) {
-        PMC *type = got_type ? attribute_type : PMCNULL;
+            PMC *attribute_type :optional, int has_type :opt_flag) {
+        PMC *type = has_type ? attribute_type : PMCNULL;
         DYNSELF.add_attribute(attribute_name, type);
     }
 
@@ -1313,19 +1317,17 @@ C<add_method> vtable method.
 */
     PCCMETHOD add_method(STRING *name, PMC *sub,
                               int vtable :optional :named["vtable"],
-                              int got_vtable :opt_flag,
+                              int has_vtable :opt_flag,
                               int anon :optional :named["anon"],
-                              int got_anon :opt_flag)
+                              int has_anon :opt_flag)
     {
-        Parrot_Class  *_class    = PARROT_CLASS(SELF);
-
         /* If it's a vtable method... */
-        if (got_vtable) {
+        if (has_vtable && vtable) {
             VTABLE_add_vtable_override(interp, SELF, name, sub);
         }
 
         /* Provided it's not anonymous, add it to the methods list. */
-        if (!got_anon)
+        if (!has_anon || !anon)
             DYNSELF.add_method(name, sub);
     }
 
@@ -1423,19 +1425,19 @@ Compose a role into a class with the given exclusions and aliases.
 */
     PCCMETHOD add_role(PMC *role,
             PMC *exclude_method     :optional :named["exclude_method"],
-            int got_exclude_method  :opt_flag,
+            int has_exclude_method  :opt_flag,
             PMC *alias_method       :optional :named["alias_method"],
-            int got_alias_method    :opt_flag) {
+            int has_alias_method    :opt_flag) {
 
         Parrot_Class *_class = PARROT_CLASS(SELF);
 
         /* Add everything on the resolve list to the exclude list; if we have
          * no exclude list, pass along the resolve list in its place if it has
          * any methods listed in it. */
-        if (!got_exclude_method) {
+        if (!has_exclude_method) {
             if (VTABLE_elements(interp, _class->resolve_method) != 0) {
                 exclude_method     = _class->resolve_method;
-                got_exclude_method = 1;
+                has_exclude_method = 1;
             }
         }
         else {
@@ -1450,8 +1452,8 @@ Compose a role into a class with the given exclusions and aliases.
         }
 
         /* Do the composition. */
-        Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
-                           alias_method, got_alias_method,
+        Parrot_ComposeRole(interp, role, exclude_method, has_exclude_method,
+                           alias_method, has_alias_method,
                            _class->methods, _class->roles);
     }
 
@@ -1465,11 +1467,11 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {
+    PCCMETHOD inspect(STRING *what :optional, int has_what :opt_flag) {
         PMC *found;
 
         /* Just delegate to the appropriate vtable method. */
-        if (got_what)
+        if (has_what)
             found = DYNSELF.inspect_str(what);
         else
             found = DYNSELF.inspect();

@@ -35,8 +35,8 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
        destination is promoted to a BigInt before shifting.  If dest == self,
        then the shift is done in place.  */
     const INTVAL base = VTABLE_get_integer(interp, self);
-    INTVAL result;
-    int overflow_p = 0;
+    INTVAL result     = 0;
+    int overflow_p    = 0;
 
     /* Compute the shift. */
     if (shift_amount >= 8*INTVAL_SIZE) {

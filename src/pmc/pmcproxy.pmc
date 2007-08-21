@@ -282,6 +282,7 @@ Creates an instance of the PMC.
 */
     PCCMETHOD new(PMC *args :optional, int got_args :opt_flag) {
         PMC *obj = VTABLE_instantiate(interp, SELF, args);
+        UNUSED(got_args);
         PCCRETURN(PMC *obj);
     }
 

@@ -154,7 +154,7 @@ shifted down.
         typedef INTVAL(*nci_sub_t)(PARROT_INTERP, PMC *);
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)
-            : (nci_sub_t) D2FPTR(PMC_data(SELF));
+            : PMC_data_typed(SELF, nci_sub_t);
         PMC *cont;
 
         if (!func)

@@ -48,14 +48,14 @@ Class method to construct an Integer according to passed arguments.
     }
 
     PMC *instantiate(PMC *sig) {
-        PMC * const _class = REG_PMC(interp, 2);
-        const int argcP = REG_INT(interp, 3);
-        const int argcS = REG_INT(interp, 2);
-
         return PMCNULL;
 
         /* TODO -- really create this thing */
 #if 0
+        PMC * const _class = REG_PMC(interp, 2);
+        const int argcP = REG_INT(interp, 3);
+        const int argcS = REG_INT(interp, 2);
+
         SELF = pmc_new(INTERP, _class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {
             PMC_struct_val(SELF) = REG_STR(interp, 5);

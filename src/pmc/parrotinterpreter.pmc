@@ -104,6 +104,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
             STRING * const key     = VTABLE_shift_string(s, lib_iter);
             PMC    * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
             PMC    * const ignored = Parrot_clone_lib_into(d, s, lib_pmc);
+            UNUSED(ignored);
         }
     }
 
@@ -115,6 +116,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
                 /* Cloning the class into the new interpreter ought
                  * to be sufficient to instantiate the class.  */
                  PMC *ignored = Parrot_clone(d, s->vtables[i]->pmc_class);
+                UNUSED(ignored);
             }
         }
     }
@@ -647,6 +649,7 @@ Finish thawing.
 
             if (!STRING_IS_EMPTY(lib_name)) {
                 PMC *ignored = Parrot_load_lib(INTERP, lib_name, NULL);
+                UNUSED(ignored);
             }
         }
 

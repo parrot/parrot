@@ -143,6 +143,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
   PCCMETHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
     STRING *counter_as_string = string_from_int(INTERP, counter);
+    UNUSED(SELF);
 
     counter++;
 
@@ -175,6 +176,7 @@ prefixed with 'unicode:'.
     STRING *x           = string_from_literal (INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
+    UNUSED(SELF);
 
     escaped_str = string_concat(INTERP, quote, escaped_str, 1);
     escaped_str = string_concat(INTERP, escaped_str, quote, 1);
