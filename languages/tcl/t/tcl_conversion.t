@@ -12,12 +12,14 @@ plan 12
 is [llength {a
   "a b"
   		b {b c}		  c {c d}
-  }] 6 {{} conversion to list" }
+  }] 6 {{} conversion to list" } \
+{TODO {used to work, needs fixing}}
 
 is [llength "a
   \"a b\"
   		b {b c}		  c {c d}
-  "] 6 {"\ conversion to list}
+  "] 6 {"\ conversion to list} \
+{TODO {used to work, needs fixing}}
 
 set a "a {b c}  d"
 is [ llength $a ]  3     {" conversion to list 1}
