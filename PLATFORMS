@@ -26,10 +26,10 @@ linux-x86_64-gcc4.1.0         8   Y    -    -     Y   Y   Y    Y     ?  20070116
 linux-x86_64-gcc4.1.0         4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
 linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20070619
 openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
-sol8-sparc-cc                B    -    -    -     -   -   -    Y/441 ?  20070427
+sol8-sparc-cc                B    -    -    -     -   -   -    Y/409 ?  20070821
 sol10-sparc-cc_5.8           B    Y    -    -     Y   Y   Y    Y/9   ?  20060807
 sol10-sparc-gcc_4.0.2        B    Y    -    -     Y   Y   Y    Y/9   ?  20060807
-sol11-x86-cc_5.8                  Y    -    -     -   -   -    -     ?  20070417
+sol11-x86-cc_5.8                  -    -    -     -   -   -  Y/121*4 ?  20070821
 opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/3   ?  20070417
 tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 win32-x86-cygwin_1.5.21           -    -    -     -   -   -    -     -  20070221
@@ -67,6 +67,7 @@ Remarks:
 *2 some tests fail intermittently when building x86 on xeon processor
 *3 t/stm/basic_mt.t hangs. kill it for tests to complete. 92 others fail.
    7 unexpected todos succeed.
+*4 You must run Configure.pl with --cgoto=0
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
