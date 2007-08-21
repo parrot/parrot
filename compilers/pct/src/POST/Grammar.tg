@@ -576,16 +576,18 @@ transform vivipost (PAST::Var) :language('PIR') {
     .local pmc viviself, vivipost
     viviself = node.'viviself'()
     $I0 = isa viviself, 'PAST::Node'
-    unless $I0 goto viviself_string
+    if $I0 goto viviself_past
+    if viviself goto viviself_string
+    vivipost = new 'POST::Ops'
+    .return (vivipost)
+
+  viviself_past:
     .return tree.'get'('post', viviself)
 
   viviself_string:
-    $S0 = "'Undef'"
-    unless viviself goto viviself_undef
     $S0 = viviself
     $S0 = concat "'", $S0
     concat $S0, "'"
-  viviself_undef:
     vivipost = new 'POST::Op'
     vivipost.'init'('node'=>node, 'pirop'=>'new')
     vivipost.'arglist'(vivipost, $S0)
@@ -645,6 +647,8 @@ transform post (PAST::Var) :language('PIR') {
 
   have_scope:
     post.'push_pirop'(fetchop, post, name)
+    $P0 = node.'viviself'()
+    unless $P0 goto done_vivipost
     post.'push_pirop'('unless_null', post, vivilabel)
     post.'push'(vivipost)
     .local int islvalue
@@ -653,6 +657,7 @@ transform post (PAST::Var) :language('PIR') {
     post.'push_pirop'(storeop, name, post, 'result'=>post)
   done_lvalue:
     post.'push'(vivilabel)
+  done_vivipost:
     .return (post)
 }
 
