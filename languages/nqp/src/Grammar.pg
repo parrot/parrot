@@ -273,34 +273,31 @@ token subcall {
 
 rule EXPR is optable { ... }
 
+## Terms
 proto 'term:' is precedence('z=')
     is parsed(&term)
     { ... }
 
+## Unary prefix operators
 proto prefix:<+> is looser('term:')
     is pasttype('inline')
     { ... }
-
 proto prefix:<~> is equiv(prefix:<+>)
     is pasttype('inline')
     { ... }
-
-proto prefix:<+> is equiv(prefix:<~>)
-    is pasttype('inline')
-    { ... }
-
 proto prefix:<-> is equiv(prefix:<+>)
     is pirop('n_neg')
     { ... }
 
+## Additive operators
 proto infix:<+> is looser(prefix:<~>)
     is pirop('n_add')
     { ... }
-
 proto infix:<-> is equiv(prefix:<+>)
     is pirop('n_sub')
     { ... }
 
+## Comparison operators
 proto infix:<==> is looser(infix:<+>)
     is pasttype('inline')
     { ... }
@@ -314,19 +311,21 @@ proto infix:<ne> is equiv(infix:<==>)
     is pasttype('inline')
     { ... }
 
+## Tight logical operators
 proto infix:<&&> is looser(infix:<==>)
     is pasttype('if')
     { ... }
-
 proto infix:<||> is looser(infix:<&&>)
     is pasttype('unless')
     { ... }
 
+## Binding
 proto infix:<:=> is looser(infix:<||>)
     is lvalue(1)
     is pasttype('bind')
     { ... }
 
+## Comma
 proto infix:<,> is looser(infix:<:=>)
     is assoc('list')
     { ... }
