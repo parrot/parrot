@@ -283,7 +283,7 @@ sub genfile {
     }
 
     # this loop can not be implemented as a foreach loop as the body
-    # is dependant on <IN> being evaluated lazily
+    # is dependent on <IN> being evaluated lazily
 
     while ( my $line = <$in> ) {
 
@@ -372,7 +372,7 @@ sub genfile {
             goto GMAKES if $any_gmake;
         }
 
-        # interpolate @foo@ values
+        # interoplate @foo@ values
         $line =~ s{ \@ (\w+) \@ }{
             if(defined(my $val=$conf->data->get($1))) {
                 #use Data::Dumper;warn Dumper("val for $1 is ",$val);
@@ -453,9 +453,9 @@ sub _run_command {
                 && ( $_ ne File::Spec->devnull )
                 && ( !m/^&/ ) )
             {
-                open( my $out, '<', $_ );
-                print <$out>;
-                close $out;
+                open( my $verbose_handle, '<', $_ );
+                print <$verbose_handle>;
+                close $verbose_handle;
             }
         }
     }
