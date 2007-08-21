@@ -34,6 +34,7 @@ Note: These tests would benefit from judicial application of Iterators.
 =cut
 
 my $cmd = -d '.svn' ? 'svn' : 'svk';
+my @git_svn_metadata; # set in BEGIN block
 
 # how many files to check at a time. May have to lower this when we run
 # this on systems with finicky command lines.
@@ -60,6 +61,7 @@ TEST_MIME: {
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
         is( $failure, '', $test );
     }
     else {
@@ -92,6 +94,7 @@ KEYWORD_EXP: {
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
         is( $failure, '', $test );
     }
     else {
@@ -140,6 +143,7 @@ NATIVE_EOL_STYLE: {
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
         is( $failure, '', $test_name );
     }
     else {
@@ -171,6 +175,7 @@ LF_EOL_STYLE: {
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_;\n" } @failed;
+        $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
         is( $failure, '', $test_name );
     }
     else {
@@ -217,7 +222,25 @@ COPYRIGHT: {
 =cut
 
 BEGIN {
-    unless ( $Parrot::Revision::current or `svk ls .` ) {
+    if ( -d '.git' ) {
+        my $git_svn_metadata = catfile(qw/.git svn git-svn unhandled.log/);
+        if ( -e  $git_svn_metadata ) {
+            diag 'Checking git svn metadata';
+            plan tests => 4;
+            # Read the file once and store lines
+            if (! open my $git_svn_metadata_fh, '<', $git_svn_metadata ) {
+                diag "trouble opening metadata file: $git_svn_metadata";
+            }
+            else {
+                @git_svn_metadata = <$git_svn_metadata_fh>;
+                close $git_svn_metadata_fh;
+            }
+        }
+        else {
+            plan skip_all => q{git svn file metadata not retained};
+        }
+    }
+    elsif ( !($Parrot::Revision::current or `svk ls .`) ) {
         plan skip_all => 'not a working copy';
     }
     else { plan tests => 4 }
@@ -261,6 +284,10 @@ sub get_attribute {
 
     my %results;
     map { $results{$_} = undef } @list;
+
+    if ( -d '.git' ) {
+        return git_svn_metadata($attribute, \%results);
+    }
 
     # choose a chunk size such that we don't end calling svn on
     # a single file (which causes the output format to change).
@@ -335,6 +362,26 @@ sub verify_attributes {
     }
 
     return @failures;
+}
+
+sub git_svn_metadata {
+    my $attribute   = shift;
+    my $results_ref = shift;
+
+    GIT_SVN:
+    for my $line (@git_svn_metadata) {
+
+        # Determine file name and attribute value for the files we want
+        my ($filename, $value) = $line =~ m/prop: (\S+) $attribute (\S+)/;
+        next GIT_SVN unless $filename && exists $results_ref->{$filename};
+
+        # Unescape hex values that are in git-svn log and remove any newlines
+        $value =~ s/%([0-9A-F]{2})/chr(hex($1))/gie;
+        chomp($value);
+
+        $results_ref->{$filename} = $value;
+    }
+    return $results_ref;
 }
 
 # Local Variables:
