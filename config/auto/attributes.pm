@@ -76,9 +76,12 @@ sub try_attr {
         $command_line, $output_file, $output_file );
     $verbose and print "  exit code: $exit_code$/";
 
+    $conf->data->set( $attr => !$exit_code | 0 );
+
     return if $exit_code;
 
     my $output = _slurp_file( $output_file );
+    $verbose and print "  output: $output$/";
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );
