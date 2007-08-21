@@ -1091,14 +1091,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_lex: (Perl6 OUTER::)', todo => 'not yet implemented' );
 .sub main :main
-	.lex '$x', 42
-	get_outer()
+    .lex '$x', 42
+    get_outer()
 .end
 
 .sub 'get_outer' :outer('main')
-	.lex '$x', 13
-	$P0 = find_lex '$x', 1
-	say $P0
+    .lex '$x', 13
+    $P0 = find_lex '$x', 1
+    say $P0
 .end
 CODE
 42
@@ -1118,11 +1118,11 @@ test_closures();
 sub test_closures
 {
     my @closures;
-    
+
     # create some closures, outer scope
     {
          my $shared = 1;
-         
+
          # inner scope
          for (1..3) {
             my $not_shared = 1;
@@ -1135,7 +1135,7 @@ sub test_closures
                  };
          }
     }
-    
+
     for ( 1 .. 4 ) {
          foreach ( @closures ) {
              $_->();
@@ -1196,7 +1196,7 @@ sub test_closures
     .lex '$sub_num', $P0
     $P0 = new 'Integer'
     $P0 = topic
-     
+
     .lex '$not_shared', $P1
     $P1 = new 'Integer'
     $P1 = 1
@@ -1225,7 +1225,7 @@ sub test_closures
 
     inc $P1
     inc $P2
-          
+
     .return ()
 .end
 
