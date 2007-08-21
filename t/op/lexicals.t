@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 
 =head1 NAME
 
@@ -1102,6 +1102,147 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'find_lex: (Perl6 OUTER::)', todo => 'not y
 .end
 CODE
 42
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Example for RT 44395' );
+
+=for never
+
+# The following PIR should be like:
+
+use strict;
+
+test_closures();
+
+sub test_closures
+{
+    my @closures;
+    
+    # create some closures, outer scope
+    {
+         my $shared = 1;
+         
+         # inner scope
+         for (1..3) {
+            my $not_shared = 1;
+            my $sub_num    = $_;
+            push @closures,
+                 sub {
+                     print "Sub $sub_num was called $not_shared times. Any sub was called $shared times.\n";
+                     $shared++;
+                     $not_shared++;
+                 };
+         }
+    }
+    
+    for ( 1 .. 4 ) {
+         foreach ( @closures ) {
+             $_->();
+         }
+    }
+
+}
+
+=cut
+
+.sub test_closures :main
+
+    .lex '@closures', $P0
+    $P0 = new 'ResizablePMCArray'
+
+    # create some closures, outer scope
+    outer_scope()
+
+    # and call them in turn.
+    $I0 = 0
+    NEXT_LOOP0:
+    if $I0 >= 4 goto DONE_LOOP0
+        $I1 = 0
+        NEXT_LOOP1:
+        if $I1 >= 3 goto DONE_LOOP1
+           $P1 = $P0[$I1]
+           $P1()
+           inc $I1
+           goto NEXT_LOOP1
+        DONE_LOOP1:
+        inc $I0
+        goto NEXT_LOOP0
+    DONE_LOOP0:
+
+.end
+
+# Return n closures, each with lexical references to "$n" and "$sub_num".
+.sub 'outer_scope' :outer('test_closures')
+
+    .lex '$shared', $P0
+    $P0 = new 'Integer'
+    $P0 = 1
+
+    $I3 = 1
+    NEXT:
+    if $I3 > 3 goto DONE
+        inner_scope( $I3 )
+        inc $I3
+        goto NEXT
+    DONE:
+
+.end
+
+
+.sub 'inner_scope' :outer('outer_scope')
+    .param int topic
+
+    .lex '$sub_num', $P0
+    $P0 = new 'Integer'
+    $P0 = topic
+     
+    .lex '$not_shared', $P1
+    $P1 = new 'Integer'
+    $P1 = 1
+
+    find_lex $P2, '@closures'
+    .const .Sub $P3 = 'anonymous'
+    newclosure $P4, $P3
+    push $P2, $P4
+
+    .return ()
+.end
+
+.sub 'anonymous' :outer('inner_scope')
+
+    find_lex $P0, '$sub_num'
+    find_lex $P1, '$not_shared'
+    find_lex $P2, '$shared'
+
+    print "Sub "
+    print $P0
+    print " was called "
+    print $P1
+    print " times. Any sub was called "
+    print $P2
+    print " times.\n"
+
+    inc $P1
+    inc $P2
+          
+    .return ()
+.end
+
+
+CODE
+Sub 1 was called 1 times. Any sub was called 1 times.
+Sub 2 was called 1 times. Any sub was called 2 times.
+Sub 3 was called 1 times. Any sub was called 3 times.
+Sub 1 was called 2 times. Any sub was called 4 times.
+Sub 2 was called 2 times. Any sub was called 5 times.
+Sub 3 was called 2 times. Any sub was called 6 times.
+Sub 1 was called 3 times. Any sub was called 7 times.
+Sub 2 was called 3 times. Any sub was called 8 times.
+Sub 3 was called 3 times. Any sub was called 9 times.
+Sub 1 was called 4 times. Any sub was called 10 times.
+Sub 2 was called 4 times. Any sub was called 11 times.
+Sub 3 was called 4 times. Any sub was called 12 times.
 OUTPUT
 
 # Local Variables:
