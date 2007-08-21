@@ -115,7 +115,6 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
 
     if (!hll_name) {
         INTVAL nelements, i;
-        PMC   *ignored;
 
         /* .loadlib pragma */
         hll_info = interp->HLL_info;
@@ -154,8 +153,6 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
         VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
 
         END_WRITE_HLL_INFO(interp, hll_info);
-
-        ignored = Parrot_load_lib(interp, hll_lib, NULL);
 
         return 0;
     }
