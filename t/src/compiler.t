@@ -8,7 +8,9 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan  tests => 6;
+plan $^O =~ m/MSWin32|cygwin/
+   ? ( skip_all => 'broken on win32 && cygwin' )
+   : ( tests => 6 );
 
 =head1 NAME
 
@@ -115,8 +117,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-PMC *PMCNULL;
-
 extern void imcc_init(Parrot_Interp interp);
 
 static opcode_t *
@@ -198,8 +198,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-
-PMC *PMCNULL;
 
 extern void imcc_init(Parrot_Interp interp);
 
@@ -292,8 +290,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-PMC *PMCNULL;
-
 extern void imcc_init(Parrot_Interp interp);
 
 static void
@@ -385,8 +381,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-PMC *PMCNULL;
-
 extern void imcc_init(Parrot_Interp interp);
 
 static void
@@ -477,8 +471,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-
-PMC *PMCNULL;
 
 extern void imcc_init(Parrot_Interp interp);
 
