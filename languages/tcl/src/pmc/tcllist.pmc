@@ -135,7 +135,7 @@ Returns the list as a string
 
         /* remove the extra space at the end, if necessary*/
         if (string_length(INTERP, retval))
-            string_replace(INTERP, retval, -1, 1, string_from_literal(INTERP, ""),string_from_literal(INTERP, ""));
+            string_chopn_inplace(INTERP, retval, 1);
 
         return(retval);
     }
