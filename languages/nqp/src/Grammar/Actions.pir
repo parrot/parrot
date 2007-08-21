@@ -57,6 +57,20 @@
         %r = $I0
         END
 
+    optable['prefix:!'; 'inline'] = <<"        END"
+        ##  inline prefix:!
+        $I0 = isfalse %0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
+    optable['prefix:?'; 'inline'] = <<"        END"
+        ##  inline prefix:?
+        $I0 = istrue %0
+        %r = new 'Integer'
+        %r = $I0
+        END
+
     .return ()
 .end
 

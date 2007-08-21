@@ -288,6 +288,12 @@ proto prefix:<~> is equiv(prefix:<+>)
 proto prefix:<-> is equiv(prefix:<+>)
     is pirop('n_neg')
     { ... }
+proto prefix:<!> is equiv(prefix:<+>)
+    is pasttype('inline')
+    { ... }
+proto prefix:<?> is equiv(prefix:<+>)
+    is pasttype('inline')
+    { ... }
 
 ## Additive operators
 proto infix:<+> is looser(prefix:<~>)
