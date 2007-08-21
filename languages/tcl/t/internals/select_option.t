@@ -26,12 +26,12 @@ Excercise select_options() - the feature that lets us specify, for example
     # get the testing functions
     .local pmc plan, ok, is
 
-    plan      = find_global 'Test::More', 'plan'
-    ok        = find_global 'Test::More', 'ok'
-    is        = find_global 'Test::More', 'is'
+    plan      = find_global ['Test'; 'More'], 'plan'
+    ok        = find_global ['Test'; 'More'], 'ok'
+    is        = find_global ['Test'; 'More'], 'is'
 
     load_bytecode 'languages/tcl/runtime/tcllib.pir'
-
+ 
     plan(8)
     .local string message
 
