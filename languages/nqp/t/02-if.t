@@ -2,7 +2,7 @@
 
 # check literals
 
-say('1..3');
+say('1..4');
 
 if 1 { say("ok 1 # on one line"); }
 
@@ -13,5 +13,6 @@ if 1 {
 }
 
 if 0 {
-    say("not ok 4 # multi-line if");
+    print("not ");
 }
+say("ok 4 # multi-line if, false condition causes block not to execute");

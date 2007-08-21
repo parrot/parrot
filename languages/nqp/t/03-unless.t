@@ -2,7 +2,7 @@
 
 # check literals
 
-say('1..3');
+say('1..4');
 
 unless 0 { say("ok 1 # on one line"); }
 
@@ -13,5 +13,6 @@ unless 0 {
 }
 
 unless 1 {
-    say("not ok 4 # testing conditional");
+    print("not ");
 }
+say("ok 4 # testing conditional");

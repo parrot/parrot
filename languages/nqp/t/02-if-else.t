@@ -9,15 +9,17 @@ if 1 { say("ok 1 # on one line with else"); } else { say("not ok 1 # on one line
 say("ok 2 # statements following if with else are okay");
 
 if 1 {
-    say("ok 3 # multi-line if with else");
+    print("ok 3");
 }
 else {
-    say("not ok 3 # multi-line if with else");
+    print("not ok 3");
 }
+say(" # multi-line if with else");
 
 if 0 {
-    say("not ok 4 # multi-line if, else branch");
+    print("not ok 4");
 }
 else {
-    say("ok 4 # multi-line if, else branch");
+    print("ok 4");
 }
+say(" # multi-line if, else branch");

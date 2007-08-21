@@ -10,16 +10,18 @@ line with else")}
 say("ok 2 # statements following unless with else are okay");
 
 unless 0 {
-    say("ok 3 # multi-line unless with else");
+    print("ok 3");
 }
 else {
-    say("not ok 3 # multi-line unless with else");
+    print("not ok 3");
 }
+say(" # multi-line unless with else");
 
 unless 1 {
-    say("not ok 4 # multi-line unless, else branch");
+    print("not ok 4");
 }
 else {
-    say("ok 4 # multi-line unless, else branch");
+    print("ok 4");
 }
+say(" # multi-line unless, else branch");
 
