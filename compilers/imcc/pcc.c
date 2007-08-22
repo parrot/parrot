@@ -551,7 +551,6 @@ expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction 
             /*
              * insert set_p_pc with the sub as constant
              */
-            the_sub         = dup_sym(the_sub);
             the_sub->set    = 'p';
             the_sub->usage  = U_FIXUP;
             the_sub->type  &= ~VTADDRESS;
