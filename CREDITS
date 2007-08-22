@@ -456,6 +456,7 @@ D: Fixes for pdb, the Parrot debugger
 N: Patrick R. Michaud
 D: Parrot Grammar Engine
 D: Perl 6 pumpking
+D: NQP, PCT, PAST, POST
 D: APL
 D: Pynie
 E: pmichaud@pobox.com
