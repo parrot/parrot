@@ -731,11 +731,11 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 #endif
     ignored = Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
+    UNUSED(ignored);
 
     for (pass = start; pass <= 2; pass++) {
         ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
-
     }
 
     free_pool(interp->arena_base->pmc_ext_pool);

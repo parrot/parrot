@@ -209,6 +209,7 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
     /* load lib */
     if (string_length(interp, hll_lib)) {
         PMC *ignored = Parrot_load_lib(interp, hll_lib, NULL);
+        UNUSED(ignored);
     }
 
     /* UNLOCK */

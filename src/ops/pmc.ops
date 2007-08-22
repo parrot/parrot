@@ -320,6 +320,7 @@ op find_method(out PMC, invar PMC, in STR) {
         char *method_name = string_to_cstring(interp, $3);
         real_exception(interp, resume, METH_NOT_FOUND,
             "Method '%s' not found", method_name);
+        /* XXX leak! */
         string_cstring_free(method_name);
     }
     restart ADDRESS(resume);

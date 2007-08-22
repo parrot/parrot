@@ -749,12 +749,10 @@ inline op die(in INT, in INT) {
     if ($1 == EXCEPT_doomed)
         _exit($2);
     do_exception(interp, $1, $2);
-    restart NEXT();
 }
 
 inline op exit(in INT) {
     do_exception(interp, EXCEPT_exit, $1);
-    restart NEXT();
 }
 
 inline op pushmark(in INT) {

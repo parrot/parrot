@@ -317,7 +317,7 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
 {
     size_t i;
     IMAGE_IO * const io = info->image_io;
-    HashBucket *b;
+    HashBucket *b = NULL;
 
     /*
      * during thaw info->extra is the key/value count
@@ -853,7 +853,7 @@ parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *k
 /*
 
 FUNCDOC: parrot_hash_get
-Returns the bucket for C<key> or C<NULL> if no bucket is found.
+Returns the value keyed by C<key> or C<NULL> if no bucket is found.
 
 */
 

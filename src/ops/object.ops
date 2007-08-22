@@ -466,8 +466,6 @@ inline op get_class(out PMC, in PMC) :object_classes {
   }
 
   goto ADDRESS(next);
-  /* Shouldn't be reached */
-  return NULL;
 }
 
 ###############################################################################
@@ -562,12 +560,10 @@ Remove attribute $2 from class $1, specified either by name or offset.
 
 op removeattribute(invar PMC, in STR) {
     real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
-    goto NEXT();
 }
 
 op removeattribute(invar PMC, in INT) {
     real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
-    goto NEXT();
 }
 
 =item B<getattribute>(out PMC, invar PMC, in INT)

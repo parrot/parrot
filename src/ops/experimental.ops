@@ -422,9 +422,7 @@ op instantiate(out PMC) {
           break;
       default:
           real_exception(interp, NULL, UNIMPLEMENTED,
-                  "uninplement class argument in instantiate");
-          _class = NULL; /* just for cc */
-          break;
+                  "unimplemented class argument in instantiate");
   }
   $1 = VTABLE_instantiate(interp, _class, sig);
   interp->current_args = NULL;
@@ -464,7 +462,8 @@ back to the type ID if no class object is stored in the namespace.
 =cut
 
 inline op new(out PMC, invar PMC) :object_classes {
-    PMC *ns, *classobj;
+    PMC *ns       = PMCNULL;
+    PMC *classobj = PMCNULL;
     INTVAL type;
     switch ($2->vtable->base_type) {
         case enum_class_String:
@@ -512,7 +511,8 @@ inline op new(out PMC, invar PMC) :object_classes {
 }
 
 inline op new(out PMC, invar PMC, in PMC) :object_classes {
-    PMC *ns, *classobj;
+    PMC *ns       = PMCNULL;
+    PMC *classobj = PMCNULL;
     INTVAL type;
     switch ($2->vtable->base_type) {
         case enum_class_String:
