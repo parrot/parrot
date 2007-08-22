@@ -144,6 +144,11 @@ D: Many PIR tests and fixes
 D: A small XML parser in PASM
 D: Interpreter and compiler for BASIC
 
+N: Colin Kuskie
+D: nqp hackery
+D: PIR tutorial updates, docs/test cleanups
+E: ckuskie@sterling.net
+
 N: Cory Spencer
 D: Peek opcode and PIO implementation
 
