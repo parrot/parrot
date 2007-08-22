@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.4.14",
-    "release.name"     : "Now, with Seat Belts!",
-    "release.day"      : "Tuesday",
-    "release.date"     : "17 July 2007",
-    "release.nextdate" : "21 August 2007",
+    "release.version"  : "0.4.15",
+    "release.name"     : "Augean Stable",
+    "release.day"      : "Wednesday",
+    "release.date"     : "22 August 2007",
+    "release.nextdate" : "18 September 2007",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,14 +11,14 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "18 August 2007",
+    "bugday.date"      : "15 September 2007",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=44003",
-    "rt.saved_search"  : "http://xrl.us/25ar",
+    "rt.tracking"      : "Ticket/Display.html?id=44847",
+    "rt.saved_search"  : "http://xrl.us/4da4",
 
-    "wiki.root"        : "http://rakudo.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2007_08_18",
+    "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
+    "wiki.bugday"      : "bug_day_2007_09_15",
 
     "cpan.search"      : "http://search.cpan.org/",
     "subversion.root"  : "http://subversion.tigris.org/",

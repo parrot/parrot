@@ -100,4 +100,6 @@ the strings?).
 
  Jerry     0.4.14         2007-Jul-17     "Now, with Seat Belts!"
 
+ Patrick   0.4.15         2007-Aug-22     "Augean Stable"
+
 =cut

@@ -1,5 +1,24 @@
 # $Id$
 
+New in 0.4.15
+- Implementation:
+ + Lots of code review, many bugs fixed
+ + Many more code cleanups and compiler warning levels
+ + Started a new jit engine for 64-bit processors
+ + Refactored configure process, with tests and new diagnostic options
+ + Added new CodeString PMC for dynamic generation of PIR code
+ + More pdd15 support for object metamodel.
+- Languages:
+ + Added NQP ("Not Quite Perl"), a very lightweight Perl 6-like language
+ + Significant improvements and refactors to PCT (Parrot Compiler Toolkit)
+ + perl6 passes more spec tests
+ + Lua works now with a PGE/TGE/PAST-pm based compiler, lives in one pbc,
+   and the interpreter has same behavior as original.
+- Documentation
+ + Added a commiters' HOWTO
+ + More PIR tutorial examples
+ + Added PAUSE guide
+
 New in 0.4.14
 - Now, with Seat Belts!
  + added makefile targets for Sun lint, BSD lint, and splint
