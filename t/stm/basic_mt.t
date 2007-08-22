@@ -160,7 +160,7 @@ OUTPUT
 # threads should quickly be aborted and the other should succeed.
 # Without deadlock detection, the test will not complete quickly.
 SKIP: {
-    skip( "B0rked at least on x86_64", 1 )
+    skip( "Intermittent x86_64 failure (RT#44865)", 1 )
         if $PConfig{cpuarch} eq 'x86_64' ||
            $PConfig{cpuarch} eq 'amd64' ||
            $PConfig{cpuarch} eq 'sparc64';
