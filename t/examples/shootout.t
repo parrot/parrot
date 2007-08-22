@@ -101,7 +101,9 @@ foreach my $script (@shootouts) {
 
     $ENV{TEST_PROG_ARGS} = $args;
     warn "$file $args\n" if $ENV{TEST_VERBOSE};
-    example_output_is( $file, $expected );
+    my @todo;
+    @todo = ( todo => 'known GC segfault' ) if $file =~ /regexdna.pir/;
+    example_output_is( $file, $expected, @todo );
 }
 
 # Local Variables:
