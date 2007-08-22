@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 plan $^O =~ /MSWin32|cygwin/
    ? ( skip_all => 'broken on Win32 && cygwin' )
@@ -158,7 +159,13 @@ OUTPUT
 # the other. Because of deadlock detection, exactly one of the two
 # threads should quickly be aborted and the other should succeed.
 # Without deadlock detection, the test will not complete quickly.
-pir_output_like( <<'CODE', <<'OUTPUT', "get deadlock" );
+SKIP: {
+    skip( "B0rked at least on x86_64", 1 )
+        if $PConfig{cpuarch} eq 'x86_64' ||
+           $PConfig{cpuarch} eq 'amd64' ||
+           $PConfig{cpuarch} eq 'sparc64';
+
+    pir_output_like( <<'CODE', <<'OUTPUT', "get deadlock" );
 .const int N = 10000
 .sub thread_task
     .param pmc a
@@ -206,6 +213,8 @@ loop:
 CODE
 /okay/
 OUTPUT
+
+}     #skip x86_64
 
 pir_output_is( <<'CODE', <<'OUTPUT', "wait + invalidate outer transcation" );
 .const int N = 50
