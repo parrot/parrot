@@ -85,9 +85,8 @@ D: Numerous improvements and proposals.
 N: Bernhard Schmalhofer
 D: Bugfixes
 D: Parrot m4
-D: Parrot bc
 D: Plumhead
-D: Cleanup of examples/assembly
+D: Tests for languages/lisp
 E: Bernhard.Schmalhofer@gmx.de
 
 N: Bob Diertens
