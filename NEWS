@@ -15,7 +15,7 @@ New in 0.4.15
  + Lua works now with a PGE/TGE/PAST-pm based compiler, lives in one pbc,
    and the interpreter has same behavior as original.
 - Documentation
- + Added a commiters' HOWTO
+ + Added a committers' HOWTO
  + More PIR tutorial examples
  + Added PAUSE guide
 
