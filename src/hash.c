@@ -319,12 +319,11 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
     IMAGE_IO * const io = info->image_io;
     HashBucket *b = NULL;
 
-    /*
-     * during thaw info->extra is the key/value count
-     */
+    /* during thaw info->extra is the key/value count */
     const size_t n = (size_t) hash->entries;
 
     hash->entries = 0;
+
     for (i = 0; i < n; ++i) {
         switch (hash->key_type) {
             case Hash_key_type_STRING:
@@ -479,21 +478,24 @@ expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
            ^                       ^
          | new_mem                 | hash->bi
     */
-    bs = new_mem;
+    bs     = new_mem;
     old_bi = (HashBucket**) (bs + old_nb);
     new_bi = (HashBucket**) (bs + N_BUCKETS(new_size));
+
     /* things can have moved by this offset */
     offset = (char*)new_mem - (char*)old_mem;
+
     /* relocate the bucket index */
-    mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket*));
+    mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket *));
 
     /* update hash data */
-    hash->bi = new_bi;
-    hash->bs = bs;
+    hash->bi   = new_bi;
+    hash->bs   = bs;
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
-    memset(new_bi + old_size, 0, sizeof (HashBucket*) * old_size);
+    memset(new_bi + old_size, 0, sizeof (HashBucket *) * old_size);
+
     /*
      * reloc pointers - this part would be also needed, if we
      * allocate hash memory from GC movable memory, and then
@@ -510,6 +512,7 @@ expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
             }
         }
     }
+
     /* recalc bucket index */
     for (i = 0; i < old_size; ++i) {
         HashBucket **next_p = new_bi + i;
@@ -527,9 +530,9 @@ expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
                 next_p = &b->next;
         }
     }
+
     /* add new buckets to free_list in reverse order
-     * lowest bucket is top on free list and will be used first
-     */
+     * lowest bucket is top on free list and will be used first */
     for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
         b->next = hash->free_list;
         b->key = b->value = NULL;
@@ -598,19 +601,20 @@ init_hash(NOTNULL(Hash *hash),
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash)
 {
-    size_t i;
-    HashBucket *bp;
+    size_t      i;
+    HashBucket *bp = NULL;
 
-    hash->compare = compare;
-    hash->hash_val = keyhash;
+    hash->compare    = compare;
+    hash->hash_val   = keyhash;
     hash->entry_type = val_type;
-    hash->key_type = hkey_type;
-    /*
-     * TODO randomize
-     */
+    hash->key_type   = hkey_type;
+
+    /* TODO randomize */
     hash->seed = 3793;
+
     PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
-    hash->mask = INITIAL_BUCKETS-1;
+
+    hash->mask    = INITIAL_BUCKETS - 1;
     hash->entries = 0;
 
     /*
@@ -621,18 +625,22 @@ init_hash(NOTNULL(Hash *hash),
      */
     bp = (HashBucket *)mem_sys_allocate(HASH_ALLOC_SIZE(INITIAL_BUCKETS));
     hash->free_list = NULL;
+
     /* fill free_list from hi addresses so that we can use
      * buckets[i] directly in an OrderedHash, *if* nothing
-     * was deleted
-     */
-    hash->bs = bp;
-    bp += N_BUCKETS(INITIAL_BUCKETS);
-    hash->bi = (HashBucket**) bp;
+     * was deleted */
+
+    hash->bs  = bp;
+    bp       += N_BUCKETS(INITIAL_BUCKETS);
+    hash->bi  = (HashBucket **)bp;
+
     for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
-        bp->next = hash->free_list;
-        bp->key = bp->value = NULL;
+        bp->next        = hash->free_list;
+        bp->key         = NULL;
+        bp->value       = NULL;
         hash->free_list = bp;
     }
+
     for (i = 0; i < INITIAL_BUCKETS; ++i) {
         hash->bi[i] = NULL;
     }
@@ -839,7 +847,12 @@ HashBucket *
 parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))
 {
     const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket    *bucket  = hash->bi[hashval & hash->mask];
+    HashBucket    *bucket;
+
+    if (hash->entries == 0)
+        return NULL;
+
+    bucket = hash->bi[hashval & hash->mask];
 
     while (bucket) {
         /* store hash_val or not */
@@ -847,6 +860,7 @@ parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *k
             return bucket;
         bucket = bucket->next;
     }
+
     return NULL;
 }
 
@@ -956,17 +970,20 @@ parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 
     for (bucket = hash->bi[hashval]; bucket; bucket = bucket->next) {
         if ((hash->compare)(interp, key, bucket->key) == 0) {
+
             if (prev)
                 prev->next = bucket->next;
-            else {
+            else
                 hash->bi[hashval] = bucket->next;
-            }
+
             hash->entries--;
-            bucket->next = hash->free_list;
-            bucket->key = NULL;
+            bucket->next    = hash->free_list;
+            bucket->key     = NULL;
             hash->free_list = bucket;
+
             return;
         }
+
         prev = bucket;
     }
 }
