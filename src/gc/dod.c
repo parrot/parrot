@@ -278,18 +278,7 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
      * It seems that the Class PMC gets DODed - these should
      * get created as constant PMCs.
      */
-    for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
-        const VTABLE * const vtable = interp->vtables[i];
-        /*
-         * XXX dynpmc groups have empty slots for abstract objects
-         */
-        if (vtable) {
-            if (vtable->mro)
-                pobject_lives(interp, (PObj *)vtable->mro);
-
-            pobject_lives(interp, (PObj *)vtable->_namespace);
-        }
-    }
+    mark_vtables(interp);
 
     /* mark exception list */
     for (i = 0; i <= E_LAST_PYTHON_E; ++i)

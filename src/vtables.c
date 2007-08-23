@@ -110,6 +110,24 @@ parrot_free_vtables(PARROT_INTERP)
     mem_sys_free(interp->vtables);
 }
 
+void
+mark_vtables(PARROT_INTERP)
+{
+    INTVAL i;
+
+    for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
+        const VTABLE * const vtable = interp->vtables[i];
+
+        /* XXX dynpmc groups have empty slots for abstract objects */
+        if (vtable) {
+            if (vtable->mro)
+                pobject_lives(interp, (PObj *)vtable->mro);
+
+            pobject_lives(interp, (PObj *)vtable->_namespace);
+        }
+    }
+}
+
 /*
  * Local variables:
  *   c-file-style: "parrot"

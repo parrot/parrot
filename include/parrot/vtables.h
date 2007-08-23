@@ -40,6 +40,9 @@ void parrot_free_vtables( PARROT_INTERP )
 void parrot_realloc_vtables( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+void mark_vtables( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 /* HEADERIZER END: src/vtables.c */
 
 #endif /* PARROT_VTABLES_H_GUARD */
