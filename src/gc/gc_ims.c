@@ -573,7 +573,6 @@ C<more_objects_fn>.
 
 */
 
-PARROT_API
 void
 Parrot_gc_ims_init(PARROT_INTERP)
 {
@@ -964,7 +963,6 @@ be greyed or the aggregate must be rescanned - by greying it.
 
 #define DOD_IMS_GREY_NEW 1
 
-PARROT_API
 void
 Parrot_dod_ims_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(PMC *_new))
 {

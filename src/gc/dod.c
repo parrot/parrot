@@ -234,7 +234,6 @@ C<trace_stack> can have these values:
 
 */
 
-PARROT_API
 int
 Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
 {
@@ -355,7 +354,6 @@ Returns whether the tracing process completed.
 
 */
 
-PARROT_API
 int
 Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 {
@@ -545,7 +543,6 @@ are immune from collection (i.e. constant).
 
 */
 
-PARROT_API
 void
 Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
@@ -867,7 +864,6 @@ clear_live_bits(NOTNULL(Small_Object_Pool *pool))
 
 }
 
-PARROT_API
 void
 Parrot_dod_clear_live_bits(PARROT_INTERP)
 {
@@ -883,7 +879,6 @@ Records the start time of a DOD run when profiling is enabled.
 
 */
 
-PARROT_API
 void
 Parrot_dod_profile_start(PARROT_INTERP)
 {
@@ -900,7 +895,6 @@ Also record start time of next part.
 
 */
 
-PARROT_API
 void
 Parrot_dod_profile_end(PARROT_INTERP, int what)
 {
@@ -932,7 +926,6 @@ Prepare for a mark & sweep DOD run.
 
 */
 
-PARROT_API
 void
 Parrot_dod_ms_run_init(PARROT_INTERP)
 {
@@ -978,7 +971,6 @@ Run the stop-the-world mark & sweep collector.
 
 */
 
-PARROT_API
 void
 Parrot_dod_ms_run(PARROT_INTERP, int flags)
 {
@@ -1067,7 +1059,6 @@ Call the configured garbage collector to reclaim unused headers.
 
 */
 
-PARROT_API
 void
 Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 {
