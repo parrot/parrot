@@ -613,79 +613,60 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
                 /* if object is a PMC and needs destroying */
                 if (PObj_is_PMC_TEST(b)) {
-                    PMC * const p = (PMC *)b;
-
-                    /* then destroy it here
-                     *
-                     * TODO collect objects with finalizers
-                    */
-                    if (PObj_needs_early_DOD_TEST(p))
-                        --arena_base->num_early_DOD_PMCs;
-
-                    if (PObj_active_destroy_TEST(p))
-                        VTABLE_destroy(interp, p);
-
-                    if (PObj_is_PMC_EXT_TEST(p))
-                        Parrot_free_pmc_ext(interp, p);
-
-#ifndef NDEBUG
-                    /* invalidate the PMC */
-                    p->pmc_ext     = (PMC_EXT *)0xdeadbeef;
-                    p->vtable      = (VTABLE  *)0xdeadbeef;
-                    PMC_pmc_val(p) = (PMC     *)0xdeadbeef;
-#endif
+                    Parrot_dod_free_pmc(interp, (PMC *)b);
                 }
                 /* else object is a buffer(like) */
-                else if (PObj_sysmem_TEST(b) && PObj_bufstart(b)) {
-                    /* has sysmem allocated, e.g. string_pin */
-                    mem_sys_free(PObj_bufstart(b));
-                    PObj_bufstart(b) = NULL;
-                    PObj_buflen(b)   = 0;
+                else if (PObj_sysmem_TEST(b)) {
+                    Parrot_dod_free_sysmem(interp, b);
                 }
                 else {
 #ifdef GC_IS_MALLOC
-                    /* free allocated space at (int*)bufstart - 1,
-                     * but not if it used COW or is external
-                     */
-                    if (PObj_bufstart(b) &&
-                            !PObj_is_external_or_free_TESTALL(b)) {
-                        if (PObj_COW_TEST(b)) {
-                            INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
 
-                            if (!--(*refcount)) {
-                                free(refcount); /* the actual bufstart */
-                                refcount = NULL;
-                            }
-                        }
-                        else
-                            free((INTVAL*)PObj_bufstart(b) - 1);
-                    }
+                    /* free allocated space at (int*)bufstart - 1, but not if
+                     * it used COW or is external */
+                    if ( PObj_bufstart(b) &&
+                        !PObj_is_external_or_free_TESTALL(b))
+                        Parrot_dod_free_buffer_malloc(interp, b);
 #else
-                    /*
-                     * XXX Jarkko did report that on irix pool->mem_pool
-                     *     was NULL, which really shouldn't happen
-                     */
-                    if (pool->mem_pool) {
-                        if (!PObj_COW_TEST(b)) {
-                            ((Memory_Pool *)
-                             pool->mem_pool)->guaranteed_reclaimable +=
-                                PObj_buflen(b);
-                        }
-                        ((Memory_Pool *)
-                         pool->mem_pool)->possibly_reclaimable +=
-                            PObj_buflen(b);
-                    }
+                    Parrot_dod_free_buffer(interp, pool, b);
 #endif
                     PObj_buflen(b) = 0;
                 }
-                PObj_flags_SETTO((PObj *)b, PObj_on_free_list_FLAG);
+
                 pool->add_free_object(interp, pool, b);
             }
 next:
             b = (Buffer *)((char *)b + object_size);
         }
     }
+
     pool->num_free_objects = pool->total_objects - total_used;
+}
+
+void
+Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(PMC * const p))
+{
+    Arenas * const arena_base = interp->arena_base;
+
+    /* TODO collect objects with finalizers */
+    if (PObj_needs_early_DOD_TEST(p))
+        --arena_base->num_early_DOD_PMCs;
+
+    if (PObj_active_destroy_TEST(p))
+        VTABLE_destroy(interp, p);
+
+    if (PObj_is_PMC_EXT_TEST(p))
+         Parrot_free_pmc_ext(interp, p);
+
+#ifndef NDEBUG
+
+    /* invalidate the PMC */
+    p->pmc_ext     = (PMC_EXT *)0xdeadbeef;
+    p->vtable      = (VTABLE  *)0xdeadbeef;
+    PMC_pmc_val(p) = (PMC     *)0xdeadbeef;
+
+#endif
+
 }
 
 /*
@@ -713,6 +694,48 @@ Parrot_free_pmc_ext(PARROT_INTERP, NOTNULL(PMC *p))
         ext_pool->add_free_object(interp, ext_pool, (PObj *)p->pmc_ext);
 
     p->pmc_ext = NULL;
+}
+
+void
+Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(PObj *b))
+{
+    /* has sysmem allocated, e.g. string_pin */
+    if (PObj_bufstart(b))
+        mem_sys_free(PObj_bufstart(b));
+
+    PObj_bufstart(b) = NULL;
+    PObj_buflen(b)   = 0;
+}
+
+void
+Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(PObj *b))
+{
+    if (PObj_COW_TEST(b)) {
+        INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
+
+        if (!--(*refcount)) {
+            free(refcount); /* the actual bufstart */
+            refcount = NULL;
+        }
+    }
+    else
+        free((INTVAL *)PObj_bufstart(b) - 1);
+}
+
+void
+Parrot_dod_free_buffer( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(PObj *b))
+{
+    Memory_Pool *mem_pool = (Memory_Pool *)pool->mem_pool;
+
+    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
+     * shouldn't happen */
+    if (mem_pool) {
+        if (!PObj_COW_TEST(b))
+            mem_pool->guaranteed_reclaimable += PObj_buflen(b);
+
+         mem_pool->possibly_reclaimable += PObj_buflen(b);
+    }
 }
 
 #ifndef PLATFORM_STACK_WALK
