@@ -124,20 +124,9 @@ pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
         new_flags = PObj_is_PMC_EXT_FLAG;
     }
     else {
-        if (has_ext) {
-            /* if the PMC has a PMC_EXT structure,
-             * return it to the pool/arena
-             */
-            Small_Object_Pool * const ext_pool =
-                interp->arena_base->pmc_ext_pool;
-            if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc)) {
-                MUTEX_DESTROY(PMC_sync(pmc)->pmc_lock);
-                mem_internal_free(PMC_sync(pmc));
-                PMC_sync(pmc) = NULL;
-            }
-            ext_pool->add_free_object(interp, ext_pool, (PObj *)pmc->pmc_ext);
-        }
-        pmc->pmc_ext = NULL;
+        if (has_ext)
+            Parrot_free_pmc_ext(interp, pmc);
+
 #if ! PMC_DATA_IN_EXT
         PMC_data(pmc) = NULL;
 #endif
@@ -441,21 +430,10 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
         interp->vtables[type]->pmc_class = _class;
         return _class;
     }
-    if (PObj_is_PMC_EXT_TEST(_class)) {
-        /* if the PMC has a PMC_EXT structure,
-         * return it to the pool/arena
-         * we don't need it - basically only the vtable is important
-         */
-        Small_Object_Pool * const ext_pool =
-            interp->arena_base->pmc_ext_pool;
-        if (PMC_sync(_class)) {
-            MUTEX_DESTROY(PMC_sync(_class)->pmc_lock);
-            mem_internal_free(PMC_sync(_class));
-            PMC_sync(_class) = NULL;
-        }
-        ext_pool->add_free_object(interp, ext_pool, (PObj *)_class->pmc_ext);
-    }
-    _class->pmc_ext = NULL;
+
+    if (PObj_is_PMC_EXT_TEST(_class))
+        Parrot_free_pmc_ext(interp, _class);
+
     DOD_flag_CLEAR(is_special_PMC, _class);
     PMC_pmc_val(_class)   = (PMC *)0xdeadbeef;
     PMC_struct_val(_class)= (void*)0xdeadbeef;

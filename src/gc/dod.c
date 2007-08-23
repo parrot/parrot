@@ -631,24 +631,11 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
                     if (PObj_active_destroy_TEST(p))
                         VTABLE_destroy(interp, p);
 
-                    if (PObj_is_PMC_EXT_TEST(p) && p->pmc_ext != NULL) {
-                        /* if the PMC has a PMC_EXT structure,
-                         * return it to the pool/arena */
-                        Small_Object_Pool * const ext_pool
-                            = arena_base->pmc_ext_pool;
+                    if (PObj_is_PMC_EXT_TEST(p))
+                        Parrot_free_pmc_ext(interp, p);
 
-                        if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
-                            MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
-                            mem_internal_free(PMC_sync(p));
-                            PMC_sync(p) = NULL;
-                        }
-
-                        ext_pool->add_free_object(interp, ext_pool, (PObj *)p->pmc_ext);
-                    }
 #ifndef NDEBUG
-                    /*
-                     * invalidate the PMC
-                     */
+                    /* invalidate the PMC */
                     p->pmc_ext     = (PMC_EXT *)0xdeadbeef;
                     p->vtable      = (VTABLE  *)0xdeadbeef;
                     PMC_pmc_val(p) = (PMC     *)0xdeadbeef;
@@ -705,6 +692,33 @@ next:
         }
     }
     pool->num_free_objects = pool->total_objects - total_used;
+}
+
+/*
+
+FUNCDOC: Parrot_free_pmc_ext
+
+Frees the PMC_EXT structure attached to a PMC, if it exists.
+
+*/
+
+void
+Parrot_free_pmc_ext(PARROT_INTERP, NOTNULL(PMC *p))
+{
+    /* if the PMC has a PMC_EXT structure, return it to the pool/arena */
+    Arenas            * const arena_base = interp->arena_base;
+    Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
+
+    if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
+        MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
+        mem_internal_free(PMC_sync(p));
+        PMC_sync(p) = NULL;
+    }
+
+    if (p->pmc_ext)
+        ext_pool->add_free_object(interp, ext_pool, (PObj *)p->pmc_ext);
+
+    p->pmc_ext = NULL;
 }
 
 #ifndef PLATFORM_STACK_WALK

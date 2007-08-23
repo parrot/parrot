@@ -80,6 +80,10 @@ void Parrot_dod_sweep( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_free_pmc_ext( PARROT_INTERP, NOTNULL(PMC *p) )
+    __attribute__nonnull__(1)
+    __attribute__nonnull__(2);
+
 PARROT_API
 int Parrot_dod_trace_children( PARROT_INTERP, size_t how_many )
         __attribute__nonnull__(1);
