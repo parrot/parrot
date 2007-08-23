@@ -61,7 +61,7 @@ sub integrate {
     my ( $orig, $new ) = @_;
 
     # Rather than sprinkling "if defined(...)", everywhere,
-    # various inter::* steps (coded in config/inter/*.pm) permit simply 
+    # various inter::* steps (coded in config/inter/*.pm) permit simply
     # passing in potentially undefined strings.
     # In these instances, we simply pass back the original string without
     # generating a warning.
@@ -152,7 +152,7 @@ its contents have changed.
 
 =cut
 
-sub move_if_diff {
+sub move_if_diff {  ## no critic Subroutines::RequireFinalReturn
     my ( $from, $to, $ignore_pattern ) = @_;
     copy_if_diff( $from, $to, $ignore_pattern );
     unlink $from;
@@ -577,7 +577,7 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 
 =cut
 
-sub cc_clean {
+sub cc_clean { ## no critic Subroutines::RequireFinalReturn
     unlink map "test$_", qw( .c .cco .ldo .out), $conf->data->get(qw( o exe ));
 }
 
