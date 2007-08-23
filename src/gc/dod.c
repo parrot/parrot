@@ -405,18 +405,8 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
          * largest percentage of PMCs won't have anything in their data
          * pointer that we need to trace. */
         if (bits) {
-            if (bits == PObj_data_is_PMC_array_FLAG) {
-                /* malloced array of PMCs */
-                PMC ** const data = PMC_data_typed(current, PMC **);
-
-                if (data) {
-                    int i;
-                    for (i = 0; i < PMC_int_val(current); i++) {
-                        if (data[i])
-                            pobject_lives(interp, (PObj *)data[i]);
-                    }
-                }
-            }
+            if (bits == PObj_data_is_PMC_array_FLAG)
+                Parrot_dod_trace_pmc_data(interp, current);
             else {
                 /* All that's left is the custom */
                 PARROT_ASSERT(!PObj_on_free_list_TEST(current));
@@ -444,6 +434,21 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
     return 1;
 }
 
+void
+Parrot_dod_trace_pmc_data(PARROT_INTERP, NOTNULL(PMC * const p))
+{
+    /* malloced array of PMCs */
+    PMC ** const data = PMC_data_typed(p, PMC **);
+    INTVAL i;
+
+    if (!data)
+        return;
+
+    for (i = 0; i < PMC_int_val(p); i++) {
+        if (data[i])
+            pobject_lives(interp, (PObj *)data[i]);
+    }
+}
 
 #ifdef GC_IS_MALLOC
 

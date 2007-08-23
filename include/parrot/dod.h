@@ -88,6 +88,10 @@ PARROT_API
 int Parrot_dod_trace_children( PARROT_INTERP, size_t how_many )
         __attribute__nonnull__(1);
 
+void Parrot_dod_trace_pmc_data( PARROT_INTERP, NOTNULL(PMC * const p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_API
 int Parrot_dod_trace_root( PARROT_INTERP, int trace_stack )
         __attribute__nonnull__(1);
