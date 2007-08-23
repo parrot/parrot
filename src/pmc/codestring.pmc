@@ -204,6 +204,41 @@ prefixed with 'unicode:'.
 
 /*
 
+=item C<key( string name1 [, string name2, ...] )
+
+Construct a PIR key using the strings passed as arguments.
+For example, C<key('Foo', 'Bar')> returns C<[ "Foo" ; "Bar" ]>.
+
+=cut
+
+*/
+
+  PCCMETHOD key(PMC *args :slurpy) {
+    STRING *open_bracket  = string_from_literal(INTERP, "[ ");
+    STRING *semi          = string_from_literal(INTERP, " ; ");
+    STRING *close_bracket = string_from_literal(INTERP, " ]");
+    INTVAL elements, index;
+    STRING *out, *S0;
+
+    S0 = VTABLE_get_string_keyed_int(INTERP, args, 0);
+    (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
+    out = string_append(INTERP, open_bracket, S0);
+
+    elements = VTABLE_elements(INTERP, args);
+    for(index = 1; index < elements; index++) {
+        out = string_append(INTERP, out, semi);
+        S0 = VTABLE_get_string_keyed_int(INTERP, args, index);
+        (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
+        out = string_append(INTERP, out, S0);
+    }
+
+    out = string_append(INTERP, out, close_bracket);
+
+    PCCRETURN(STRING *out);
+}
+
+/*
+
 =back
 
 =cut

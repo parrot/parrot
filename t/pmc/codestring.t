@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -143,6 +143,26 @@ CODE
 10
 $P11
 OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'namespace keys' );
+.sub main :main
+    .local pmc code
+    code = new 'CodeString'
+    $S0 = code.'key'('abc')
+    say $S0
+    $S0 = code.'key'('abc', 'def')
+    say $S0
+    $P0 = split ' ', unicode:"abc def T\xe9st"
+    $S0 = code.'key'($P0 :flat)
+    say $S0
+.end
+CODE
+[ "abc" ]
+[ "abc" ; "def" ]
+[ "abc" ; "def" ; unicode:"T\x{e9}st" ]
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
