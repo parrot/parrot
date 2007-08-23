@@ -58,6 +58,7 @@ key receives the value of the hash element.
 A newline is automatically added to the end of the fmt.
 
 =cut
+
 */
 
   PCCMETHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
@@ -204,7 +205,7 @@ prefixed with 'unicode:'.
 
 /*
 
-=item C<key( string name1 [, string name2, ...] )
+=item C<key( string name1 [, string name2, ...] )>
 
 Construct a PIR key using the strings passed as arguments.
 For example, C<key('Foo', 'Bar')> returns C<[ "Foo" ; "Bar" ]>.
