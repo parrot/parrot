@@ -32,7 +32,7 @@ Needed PIR code is included.
 .include 'cl.pir'
 .include 'internals.pir'
 
-.sub _main :main
+.sub _common_lisp :main
     .param pmc argv
 
     .local pmc args                       # piece together args of function
