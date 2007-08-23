@@ -7,9 +7,13 @@ lisp.pir - main function of Parrot Common Lisp
 =head1 Description
 
 The C<main> sub is provided here.
-Needed code is included.
+Some constants are defined
+Needed PIR code is included.
 
 =cut
+
+# standard libs
+.include "library/dumper.pir"
 
 .const int INVALID_CHAR     = 0
 .const int CONSTITUENT_CHAR = 1
@@ -19,34 +23,25 @@ Needed code is included.
 .const int SESCAPE_CHAR     = 5
 .const int MESCAPE_CHAR     = 6
 
-.include "include/macros.pir"
-
-.include "library/dumper.pir"
-
-.include "types.pir"
-.include "read.pir"
-.include "eval.pir"
-.include "system.pir"
-.include "validate.pir"
-.include "cl.pir"
-.include "internals.pir"
+.include 'include/macros.pir'
+.include 'types.pir'
+.include 'read.pir'
+.include 'eval.pir'
+.include 'system.pir'
+.include 'validate.pir'
+.include 'cl.pir'
+.include 'internals.pir'
 
 .sub _main :main
     .param pmc argv
 
-    .local string names
-    .local pmc symbol
-    .local pmc stream
-    .local pmc name
-    .local pmc args
-    .local pmc retv
-    .local int argc
+    .local pmc args                       # piece together args of function
+    .local pmc retv                       # return value of function calls
     .local int res
-
 
     load_bytecode "PGE.pbc"               # Parrot Grammar engine
 
-    # compile a couble of regexes that are needed in validate.pir
+    # compile a couple of regexes that are needed in validate.pir
     .local pmc p6rule
     p6rule = compreg "PGE::Perl6Regex"
 
@@ -68,34 +63,41 @@ Needed code is included.
     _init_cl()                          # Initialize the built-in functions in
     _init_system()                      # the SYSTEM and COMMON-LISP packages.
 
-    # VALID_IN_PARROT_0_2_0  new_pad 0                            # Create the null lexical environment.
+    # TODO: initialize the null lexical environment.
 
-
-    .STRING(name, "lisp/bootstrap.l")   # Load the lisp bootstrap file.
-    .LIST_1(args, name)
+    # bootstrapping
+    .local pmc bootstrap_filename
+    .STRING(bootstrap_filename, "lisp/bootstrap.l")
+    .LIST_1(args, bootstrap_filename)
     _load(args)
 
+    # check the commandline whether we should read STDIN or load from file
+    .local int argc
     argc = argv
+    if argc <= 1 goto READ_STDIN   
 
-    if argc <= 1 goto READ_STDIN        # Check if we should read STDIN or load from file
+        # interpret a file
+        .local pmc infile_name          # name of the inputfile from the commandline
+        .STRING(infile_name, argv[1])       
+        .LIST_1(args, infile_name)
+        retv = _load(args)              # Load the specified file.
 
-    names = argv[1]                     # Get the file name
-   .STRING(name, names)
+        end
+    
+READ_STDIN:        
+    # Read-Eval-Print-Loop
 
-   .LIST_1(args, name)
-    retv = _load(args)                  # Load the specified file.
-
-    end
-
-READ_STDIN:
+    .local pmc symbol
     symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*STANDARD-INPUT*")
-    stream = symbol._get_value()
+    .local pmc stdin
+    stdin = symbol._get_value()
 
     push_eh DEBUGGER                    # Setup error handler for debug loop.
+
 REP_LOOP:
     print "-> "                         # Display the top level prompt.
 
-    .LIST_1(args, stream)               # Read!
+    .LIST_1(args, stdin)                # Read!
     retv = _read(args)
 
     .LIST_1(args, retv)                 # Eval!
@@ -133,17 +135,18 @@ DEBUGGER:
     .local string msgtype
     .local pmc e
 
+    # TODO: is P5 still the exception ?
     e = P5
 
     message = e["_message"]
 
-     print "*** ERROR: "
-     print message
-     print "\n"
+    print "*** ERROR: "
+    print message
+    print "\n"
 
-     push_eh DEBUGGER
+    push_eh DEBUGGER
 
-     goto REP_LOOP
+    goto REP_LOOP
 .end
 
 # Local Variables:
