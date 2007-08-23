@@ -17,7 +17,7 @@ package Parrot::BuildUtil;
 use strict;
 use warnings;
 
-=head2 SUBROUTINES
+=head1 SUBROUTINES
 
 =over 4
 
@@ -31,8 +31,6 @@ and returns it in a context-appropriate manner.
 
     @parrot_version = Parrot::BuildUtil::parrot_version();
     # @parrot_version is (0, 4, 11)
-
-=back
 
 =cut
 
@@ -69,7 +67,27 @@ sub parrot_version {
     return wantarray ? @parrot_version : $parrot_version;
 }
 
+=item C<slurp_file($filename)>
+
+Slurps up the filename and returns the content as one string.
+
+=cut
+
+sub slurp_file {
+    my ($file_name) = @_;
+
+    open( my $SLURP, '<', $file_name ) or die "open '$file_name': $!";
+    local $/ = undef;
+    my $file = <$SLURP> . '';
+    $file =~ s/\cM\cJ/\n/g;
+    close $SLURP;
+
+    return $file;
+}
+
 1;
+
+=back
 
 =head1 AUTHOR
 

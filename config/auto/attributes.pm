@@ -21,7 +21,7 @@ use vars qw($description @args);
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
-
+use Parrot::BuildUtil;
 
 $description = 'Detecting compiler attributes (-DHASATTRIBUTE_xxx)';
 
@@ -86,7 +86,7 @@ sub try_attr {
 
     return if $exit_code;
 
-    my $output = _slurp_file( $output_file );
+    my $output = Parrot::BuildUtil::slurp_file( $output_file );
     $verbose and print "  output: $output$/";
 
     if ( $output !~ /error|warning/i ) {
@@ -94,21 +94,6 @@ sub try_attr {
     }
 
     return;
-}
-
-
-# Stolen from Parrot::Test
-# Should be put somewhere more central
-sub _slurp_file {
-    my ($file_name) = @_;
-
-    open( my $SLURP, '<', $file_name ) or die "open '$file_name': $!";
-    local $/ = undef;
-    my $file = <$SLURP> . '';
-    $file =~ s/\cM\cJ/\n/g;
-    close $SLURP;
-
-    return $file;
 }
 
 1;
