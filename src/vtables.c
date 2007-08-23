@@ -49,9 +49,10 @@ VTABLE *
 Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
-    if (new_vtable) {
+
+    if (new_vtable)
         STRUCT_COPY(new_vtable, base_vtable);
-    }
+
     return new_vtable;
 }
 
@@ -68,22 +69,23 @@ PARROT_API
 void
 Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable))
 {
-    /* XXX We sometimes get a type number allocated without any corresponding
-     * vtable. E.g. if you load perl_group, perlscalar is this way.
-     */
-    if (!vtable)
-        return;
+    /* We sometimes get a type number allocated without any corresponding
+     * vtable. E.g. if you load perl_group, perlscalar is this way.  */
+    assert(vtable);
+
     if (vtable->ro_variant_vtable)
         mem_sys_free(vtable->ro_variant_vtable);
+
     mem_sys_free(vtable);
 }
 
 void
 parrot_alloc_vtables(PARROT_INTERP)
 {
-    interp->vtables =
-        (VTABLE **)mem_sys_allocate_zeroed(sizeof (VTABLE *) * PARROT_MAX_CLASSES);
-    interp->n_vtable_max = enum_class_core_max;
+    interp->vtables          = (VTABLE **)mem_sys_allocate_zeroed(
+        sizeof (VTABLE *) * PARROT_MAX_CLASSES);
+
+    interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES;
 }
 
@@ -93,11 +95,12 @@ parrot_realloc_vtables(PARROT_INTERP)
     /* 16 bigger seems reasonable, though it's only a pointer
        table and we could get bigger without blowing much memory
        */
-    const INTVAL new_max = interp->n_vtable_alloced + 16;
-    const INTVAL new_size = new_max              * sizeof (VTABLE *);
-    const INTVAL old_size = interp->n_vtable_max * sizeof (VTABLE *);
-    interp->vtables = (VTABLE **)mem_sys_realloc_zeroed(interp->vtables, new_size, old_size);
+    const INTVAL new_max     = interp->n_vtable_alloced + 16;
+    const INTVAL new_size    = new_max              * sizeof (VTABLE *);
+    const INTVAL old_size    = interp->n_vtable_max * sizeof (VTABLE *);
     interp->n_vtable_alloced = new_max;
+    interp->vtables          = (VTABLE **)mem_sys_realloc_zeroed(
+        interp->vtables, new_size, old_size);
 }
 
 void
@@ -107,6 +110,7 @@ parrot_free_vtables(PARROT_INTERP)
 
     for (i = 1; i < interp->n_vtable_max; i++)
         Parrot_destroy_vtable(interp, interp->vtables[i]);
+
     mem_sys_free(interp->vtables);
 }
 
@@ -115,7 +119,7 @@ mark_vtables(PARROT_INTERP)
 {
     INTVAL i;
 
-    for (i = 1; i < (unsigned int)interp->n_vtable_max; i++) {
+    for (i = 1; i < interp->n_vtable_max; i++) {
         const VTABLE * const vtable = interp->vtables[i];
 
         /* XXX dynpmc groups have empty slots for abstract objects */
