@@ -605,182 +605,179 @@ DONE:
 .end
 
 .sub _let
-  .param pmc args
-  .local string name
-  .local string type
-  .local pmc dynvars
-  .local pmc keyvals
-  .local pmc package
-  .local pmc symbol
-  .local pmc error
-  .local pmc value
-  .local pmc fargs
-  .local pmc init
-  .local pmc body
-  .local pmc lptr
-  .local pmc form
-  .local pmc retv
-  .local int test
-  .local int nvar
-  .local int i
+    .param pmc args
+    .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
 
-   # VALID_IN_PARROT_0_2_0 new_pad -1                    # Create new lexical scope
+    .local string name
+    .local string type
+    .local pmc package
+    .local pmc symbol
+    .local pmc value
+    .local pmc fargs
+    .local pmc init
+    .local pmc body
+    .local pmc lptr
+    .local pmc form
+    .local int test
+    .local int i
 
-  .ASSERT_MINIMUM_LENGTH(args, 1, ERROR_NARGS)
+    # VALID_IN_PARROT_0_2_0 new_pad -1                    # Create new lexical scope
 
-  .CAR(init, args)                              # The variable bindings
-  .CDR(body, args)                              # The form to evaluate
+    .CAR(init, args)                             # The variable bindings
+    .CDR(body, args)                             # The form to evaluate
 
-   keyvals = new ResizablePMCArray              # List for holding init values
-   dynvars = new ResizablePMCArray              # List for holding dynamic vars
-   null error
+    .local pmc keyvals
+    keyvals = new ResizablePMCArray              # List for holding init values
+    .local pmc dynvars
+    dynvars = new ResizablePMCArray              # List for holding dynamic vars
 
-  .NIL(retv)                                    # Initialize return value
+    # for exception handling, currently broken
+    .local pmc error
+    null error
+    push_eh CLEANUP_HANDLER                      # Set a handler for cleanup
 
-   push_eh CLEANUP_HANDLER                      # Set a handler for cleanup
+    .local pmc retv
+    .NIL(retv)                                   # Initialize return value
 
-INIT_FORM:                                      # Process the init form
-   type = typeof init
-   if type == "LispSymbol" goto INIT_SYMBOL
-   if type == "LispCons"   goto INIT_LIST
-   goto EVAL_BODY
+INIT_FORM:                                       # Process the init form
+    type = typeof init
+    if type == "LispSymbol" goto INIT_SYMBOL
+    if type == "LispCons"   goto INIT_LIST
+    goto EVAL_BODY
 
 INIT_SYMBOL:
-   null value                                   # Init form was just a symbol -
-   push keyvals, init                           # no value is assigned to it.
-   push keyvals, value
+    push keyvals, init                          # Init form was just a symbol -
+    null value                                  # no value is assigned to it
+    push keyvals, value
 
-   goto BIND_VARS
+    goto INIT_DONE
 
 INIT_LIST:
-   lptr = init
-   goto INIT_LIST_LOOP
+    lptr = init
+    goto INIT_LIST_LOOP
 
 INIT_LIST_LOOP:
-  .NULL(lptr, INIT_LIST_DONE)
+    .NULL(lptr, INIT_DONE)
 
-  .CAR(form, lptr)                              # Get the next init form
+    .CAR(form, lptr)                              # Get the next init form
 
-  .ASSERT_TYPE_AND_BRANCH(form, "list", ERROR_BAD_SPEC)
-  # VALID_IN_PARROT_0_2_0 .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)                # Ensure a valid init form
-  .ASSERT_LENGTH(form, 2, ERROR_BAD_SPEC)       # Ensure a valid init form
+    .ASSERT_TYPE_AND_BRANCH(form, "list", ERROR_BAD_SPEC)
+    # VALID_IN_PARROT_0_2_0 .ASSERT_LENGTH(form, 2, ERROR_BADSPEC)                # Ensure a valid init form
+    .ASSERT_LENGTH(form, 2, ERROR_BAD_SPEC)       # Ensure a valid init form
 
-  .CAR(symbol, form)                            # The symbol we're assigning to
-  .SECOND(value, form)                          # The value being assigned
+    .CAR(symbol, form)                            # The symbol we're assigning to
+    .SECOND(value, form)                          # The value being assigned
 
-  .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", ERROR_BAD_SPEC)
+    .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", ERROR_BAD_SPEC)
 
-  .LIST_1(fargs, value)                         # Put value into an arg list
-   value = _eval(fargs)                         # Evaluate it
+    .LIST_1(fargs, value)                         # Put value into an arg list
+     value = _eval(fargs)                         # Evaluate it
 
-   push keyvals, symbol                         # Push symbol onto key/val list
-   push keyvals, value                          # Push value onto key/val list
+     push keyvals, symbol                         # Push symbol onto key/val list
+     push keyvals, value                          # Push value onto key/val list
 
-  .CDR(lptr, lptr)
-   goto INIT_LIST_LOOP
+    .CDR(lptr, lptr)
+     goto INIT_LIST_LOOP
 
-INIT_LIST_DONE:
-   goto BIND_VARS
+INIT_DONE:
 
-
-BIND_VARS:
-   nvar = keyvals
-   i = 0
-   goto BIND_LOOP
-
+    # bind the variables in init
+    .local int nvar
+    nvar = keyvals
+    i = 0
 BIND_LOOP:
-   if i >= nvar goto BIND_DONE
+    if i >= nvar goto BIND_DONE
 
-   symbol = keyvals[i]                          # Pop symbol of key/val list
-   inc i
-   value  = keyvals[i]                          # Pop value of key/val list
+    symbol = keyvals[i]                          # Pop symbol of key/val list
+    inc i
+    value  = keyvals[i]                          # Pop value of key/val list
 
-   name = symbol._get_name_as_string()
-   test = _IS_SPECIAL(symbol)
+    name = symbol._get_name_as_string()
+    test = _IS_SPECIAL(symbol)
 
-   if test == 0 goto BIND_LEXICAL
-   goto BIND_DYNAMIC
+    if test == 0 goto BIND_LEXICAL
+    goto BIND_DYNAMIC
 
 BIND_LEXICAL:
-   symbol = _LEXICAL_SYMBOL(name, value)        # Create a new lexical symbol
-   inc i
-   goto BIND_LOOP
+    # TODO: replace push_pad, pop_pad, do not worry about closures yet
+    symbol = _LEXICAL_SYMBOL(name, value)        # Create a new lexical symbol
+    inc i
+    goto BIND_LOOP
 
 BIND_DYNAMIC:
-   package = symbol._get_package()              # Get dynamic symbols package
+    package = symbol._get_package()              # Get dynamic symbols package
 
-   symbol = package._shadow_symbol(name)        # Shadow the symbol
-   symbol._set_value(value)                     # Set the new value
+    symbol = package._shadow_symbol(name)        # Shadow the symbol
+    symbol._set_value(value)                     # Set the new value
 
-   push dynvars, symbol                         # Keep around for tracking
+    push dynvars, symbol                         # Keep around for tracking
 
-   inc i
-   goto BIND_LOOP
+    inc i
+    goto BIND_LOOP
 
 BIND_DONE:
    goto EVAL_BODY
 
 
 EVAL_BODY:
-   lptr = body                                  # Set pointer to the body form
+    lptr = body                                  # Set pointer to the body form
 
 EVAL_LOOP:                                      # Evaluate each form in order
-  .NULL(lptr, EVAL_DONE)
+    .NULL(lptr, EVAL_DONE)
 
-  .CAR(form, lptr)                              # Get the next form in the body
-  .LIST_1(fargs, form)                          # Put it into an arg list
-   retv = _eval(fargs)                          # Evaluate it
+    .CAR(form, lptr)                              # Get the next form in the body
+    .LIST_1(fargs, form)                          # Put it into an arg list
+    retv = _eval(fargs)                          # Evaluate it
 
-  .CDR(lptr, lptr)                              # Get a pointer to next form
-   goto EVAL_LOOP
+    .CDR(lptr, lptr)                              # Get a pointer to next form
+    goto EVAL_LOOP
 
 EVAL_DONE:
-   goto CLEANUP
+    goto CLEANUP
 
 
 CLEANUP_HANDLER:
-   error = P5                                   # Caught an exception - save it
-   goto CLEANUP                                 # and clean up before rethrow
+    error = P5                                   # Caught an exception - save it
+    goto CLEANUP                                 # and clean up before rethrow
 
 CLEANUP:
-   # VALID_IN_PARROT_0_2_0    pop_pad                       # Pop off the lexical scope
+    # VALID_IN_PARROT_0_2_0    pop_pad                       # Pop off the lexical scope
 
-   nvar = dynvars
-   i = 0
+    nvar = dynvars
+    i = 0
 
 CLEANUP_LOOP:
-   if i >= nvar goto CLEANUP_DONE
+    if i >= nvar goto CLEANUP_DONE
 
-   symbol  = dynvars[i]                         # Symbol to be unshadowed
-   name    = symbol._get_name_as_string()
-   package = symbol._get_package()
+    symbol  = dynvars[i]                         # Symbol to be unshadowed
+    name    = symbol._get_name_as_string()
+    package = symbol._get_package()
 
-   package._unshadow_symbol(name)               # Unshadow the symbol
+    package._unshadow_symbol(name)               # Unshadow the symbol
 
-   inc i
-   goto CLEANUP_LOOP
+    inc i
+    goto CLEANUP_LOOP
 
 CLEANUP_DONE:
-   if_null error, DONE                          # Rethrow an exception if we
-   rethrow error                                # need to
-   goto DONE
+    if_null error, DONE                          # Rethrow an exception if we
+    rethrow error                                # need to
+    goto DONE
 
 CLEANUP_RETHROW:
-   rethrow P5
-   goto DONE
-
+    rethrow P5
+    goto DONE
 
 # VALID_IN_PARROT_0_2_0 ERROR_BADSPEC:
 ERROR_BAD_SPEC:
-  .ERROR_1("program-error", "illegal variable specification %s", form)
-   goto CLEANUP
+    .ERROR_1("program-error", "illegal variable specification %s", form)
+    goto CLEANUP
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to LET")
-   goto CLEANUP
+    .ERROR_0("program-error", "wrong number of arguments to LET")
+    goto CLEANUP
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _print                     # This is just a temporary stand-in - it
