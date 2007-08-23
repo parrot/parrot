@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw();
-use Data::Dumper;
+use Storable;
 use Parrot::PMC;
 use Parrot::Pmc2c::UtilFunctions qw(spew);
 use Parrot::Pmc2c::Method;
@@ -61,9 +61,7 @@ sub dump {
     #gen_parent_lookup_info( $self, $pmc2cMain, $pmcs );
     #gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
 
-    my $Dumper = Data::Dumper->new( [$self], ['class'] );
-    $Dumper->Indent(1);
-    spew($self->filename('.dump'), $Dumper->Dump);
+    store($self, $self->filename('.dump'));
 }
 
 #methods

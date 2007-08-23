@@ -4,7 +4,7 @@ package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
 use FindBin;
-use Data::Dumper;
+use Storable;
 use Parrot::Vtable;
 use Parrot::PMC;
 use Parrot::Pmc2c::VTable;
@@ -226,7 +226,7 @@ sub print_tree {
   $self->read_dump('filename');
 
 B<Purpose:>  A F<.dump> file is the result of a call to C<dump_pmc()> and
-consists of a print-out of a hash reference Data::Dumper-style.
+consists of a binary dump of a hash reference, Storable-style.
 C<read_dump()> reads in the F<.dump> file, recreates the data structure and
 returns a new hash reference holding the data structure.
 
@@ -248,11 +248,8 @@ sub read_dump {
     my ( $self, $filename ) = @_;
     $filename = $self->find_file( filename($filename, '.dump'), 1 );
 
-    my $class;
-    eval do { slurp($filename); };
-    die $@ if $@;
-
-    return $class;
+    return unless -f $filename;
+    return retrieve($filename);
 }
 
 =head3 C<gen_c()>
