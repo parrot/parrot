@@ -372,7 +372,7 @@ sub genfile {
             goto GMAKES if $any_gmake;
         }
 
-        # interoplate @foo@ values
+        # interpolate @foo@ values
         $line =~ s{ \@ (\w+) \@ }{
             if(defined(my $val=$conf->data->get($1))) {
                 #use Data::Dumper;warn Dumper("val for $1 is ",$val);
