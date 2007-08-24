@@ -129,6 +129,10 @@ N: Chris Dolan
 D: TAP language author, and Parrot Bug fixes
 E: cdolan@cpan.org
 
+N: Christoph Otto
+D: Patch for key flags in pdd08
+E: christoph@mksig.org
+
 N: chromatic
 D: SDL library and examples; PIR Test::*; test suite cleanup
 D: Parrot::Embed; Pheme
