@@ -815,6 +815,8 @@ Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
 
         if (i >= dest_arena->num_sized ||
             !dest_arena->sized_header_pools[i]) {
+            Small_Object_Pool *ignored = make_bufferlike_pool(dest_interp,
+                    i * sizeof (void *) + sizeof (Buffer));
             UNUSED(ignored);
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
