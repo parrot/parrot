@@ -42,22 +42,21 @@ DONE:
 =cut
 
 .sub _LOOKUP_LEXICAL
-  .param string symname
+    .param string symname
 
-  .local pmc retv
+    push_eh LEXICAL_NOT_FOUND                     # Set an error handler
+    .local pmc retv
+    find_lex retv, symname                        # Look for the lexical symbol
+    clear_eh
 
-  push_eh LEXICAL_NOT_FOUND                     # Set an error handler
-  find_lex retv, symname                        # Look for the lexical symbol
-  clear_eh
-
-  goto DONE
+    goto DONE
 
 LEXICAL_NOT_FOUND:                              # Return null if not found
-  null retv
-  goto DONE
+    null retv
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 
@@ -288,27 +287,23 @@ DONE:
 .end
 
 .sub _IS_SPECIAL
-  .param pmc symbol
+    .param pmc symbol
 
-  .local pmc special
-  .local int retv
+    .local int retv
+    retv = 1
 
-   retv = 1
+    .local pmc special
+    special = getattribute symbol, "special"
+    if_null special, NOT_SPECIAL
 
-   # VALID_IN_PARROT_0_2_0 getattribute special, symbol, "LispSymbol\0special"
-   special = getattribute symbol, "special"
-   if_null special, NOT_SPECIAL
-
-  .NULL(special, NOT_SPECIAL)
-
-   goto DONE
+    goto DONE
 
 NOT_SPECIAL:
-   retv = 0
-   goto DONE
+    retv = 0
+    goto DONE
 
 DONE:
-   .return(retv)
+    .return(retv)
 .end
 
 .sub _IS_ORDINARY_LAMBDA_LIST

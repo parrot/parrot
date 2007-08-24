@@ -693,8 +693,8 @@ BIND_LOOP:
     value  = keyvals[i]                          # Pop value of key/val list
 
     name = symbol._get_name_as_string()
-    test = _IS_SPECIAL(symbol)
 
+    test = _IS_SPECIAL(symbol)
     if test == 0 goto BIND_LEXICAL
     goto BIND_DYNAMIC
 

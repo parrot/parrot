@@ -218,17 +218,15 @@ NAMED_FUNCTION:
     .param string name
 
     .local pmc symbol
-    .local pmc stack
-    .local int depth
 
     .local pmc hash
     hash = getattribute self,  "internal"
-    stack = hash[name]
 
+    .local pmc stack
+    stack = hash[name]
     if_null stack, SYMBOL_NOT_FOUND
 
     symbol = stack[-1]
-
     goto DONE
 
 SYMBOL_NOT_FOUND:
@@ -289,20 +287,18 @@ DONE:
 .sub _unshadow_symbol :method
     .param string name
 
-    .local pmc symbol
-    .local pmc stack
     .local pmc hash
-    .local int size
-
     hash = getattribute self, "internal"
+    .local pmc stack
     stack = hash[name]
 
+    # delete the currently active symbol
+    .local int size
     size = stack
     dec size
-
     stack = size
 
-    .return(symbol)
+    .return ()
 .end
 
 .sub _get_exports :method
