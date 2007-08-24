@@ -104,7 +104,7 @@ sub runstep {
                 . " -Waggregate-return"
                 . " -Winline"
                 . " -Wno-unused"
-                . " -Wnested-externs -Wfloat-equal"
+                . " -Wnested-externs"
                 . ( $maint ? " -Wlarger-than-4096" : "" ),
 
             # others; ones we might like marked with ?
@@ -185,7 +185,7 @@ sub runstep {
                 . " -Wno-div-by-zero"
                 . " -Wno-endif-labels"
                 . " -Werror-implicit-function-declaration"
-                . " -Wfloat-equal"
+                #. " -Wfloat-equal"
                 . " -Wformat"
                 . " -Wformat=2"
                 . " -Wno-format-extra-args"
