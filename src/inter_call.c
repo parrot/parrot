@@ -496,7 +496,6 @@ Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
     }
 
     real_exception(interp, NULL, 1, "invalid call state mode");
-    return 0;
 }
 
 
