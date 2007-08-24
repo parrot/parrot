@@ -123,12 +123,21 @@ mark_vtables(PARROT_INTERP)
         const VTABLE * const vtable = interp->vtables[i];
 
         /* XXX dynpmc groups have empty slots for abstract objects */
-        if (vtable) {
-            if (vtable->mro)
-                pobject_lives(interp, (PObj *)vtable->mro);
+        if (!vtable)
+            continue;
 
+        if (vtable->mro)
+            pobject_lives(interp, (PObj *)vtable->mro);
+        if (vtable->_namespace)
             pobject_lives(interp, (PObj *)vtable->_namespace);
-        }
+        if (vtable->whoami)
+            pobject_lives(interp, (PObj *)vtable->whoami);
+        if (vtable->does_str)
+            pobject_lives(interp, (PObj *)vtable->does_str);
+        if (vtable->isa_str)
+            pobject_lives(interp, (PObj *)vtable->isa_str);
+        if (vtable->pmc_class)
+            pobject_lives(interp, (PObj *)vtable->pmc_class);
     }
 }
 
