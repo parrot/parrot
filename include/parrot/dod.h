@@ -73,7 +73,7 @@ void Parrot_dod_sweep( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_dod_free_pmc( PARROT_INTERP, NOTNULL(PMC *p) )
+void Parrot_dod_free_pmc( PARROT_INTERP, NOTNULL(PMC * const p) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
