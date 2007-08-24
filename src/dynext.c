@@ -463,6 +463,7 @@ Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
     if (lib == NULL) {
         wo_ext   = string_from_literal(interp, "");
         lib_name = NULL;
+        ext      = NULL;
     }
     else {
         lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);

@@ -310,7 +310,6 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
             real_exception(interp, NULL, UNIMPLEMENTED,
                     "illegal argument in interpinfo");
     }
-    return PMCNULL;
 }
 
 PARROT_API

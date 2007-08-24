@@ -199,7 +199,6 @@ PackFile_find_in_const(PARROT_INTERP,
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     Parrot_exit(interp, 1);
-    return 0;
 }
 
 /*

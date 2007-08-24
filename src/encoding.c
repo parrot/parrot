@@ -99,7 +99,7 @@ Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
    info set up to actually build strings... */
 
 PARROT_API
-PARROT_DOES_NOT_RETURN
+PARROT_WARN_UNUSED_RESULT
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 {

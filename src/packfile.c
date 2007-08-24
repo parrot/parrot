@@ -2633,7 +2633,6 @@ fixup_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
                 break;
             default:
                 real_exception(interp, NULL, 1, "Unknown fixup type\n");
-                return 0;
         }
     }
     return size;

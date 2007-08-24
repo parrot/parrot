@@ -135,9 +135,6 @@ key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
-    PMC_pmc_val(key) = value;
-
-    return key;
 }
 
 /*
@@ -231,9 +228,6 @@ key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
      * what for is this indirection?
      */
     real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
-    PMC_pmc_val(key) = value;
-
-    return;
 }
 
 /*
@@ -300,7 +294,6 @@ key_number(PARROT_INTERP, NOTNULL(PMC *key))
         }
     default:
         real_exception(interp, NULL, INVALID_OPERATION, "Key not a number!\n");
-        return (FLOATVAL)0;
     }
 }
 

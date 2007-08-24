@@ -815,6 +815,7 @@ Parrot_merge_header_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
 
         if (i >= dest_arena->num_sized ||
             !dest_arena->sized_header_pools[i]) {
+            UNUSED(ignored);
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
 

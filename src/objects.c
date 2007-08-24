@@ -1648,6 +1648,7 @@ Parrot_add_attribute(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(STRING *attr))
     if (VTABLE_exists_keyed_str(interp, attr_hash, full_attr_name)) {
         char * const c_error = string_to_cstring(interp, full_attr_name);
         real_exception(interp, NULL, 1, "Attribute '%s' already exists", c_error);
+        /* XXX leak! */
         string_cstring_free(c_error);
     }
 
@@ -1729,7 +1730,6 @@ attr_str_2_num(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(STRING *attr))
     if (!idx) {
         real_exception(interp, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute '%Ss'", attr);
-        return 0;
     }
 
     length = string_length(interp, attr) - idx;
@@ -1740,8 +1740,6 @@ attr_str_2_num(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(STRING *attr))
 
     real_exception(interp, NULL, ATTRIB_NOT_FOUND,
             "No such attribute '%Ss\\0%Ss'", obj_name, attr_name);
-
-    return 0;
 }
 
 /*
@@ -1981,11 +1979,9 @@ C3_merge(PARROT_INTERP, NOTNULL(PMC *merge_list))
         return pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* If we didn't find anything to accept, error. */
-    if (PMC_IS_NULL(accepted)) {
+    if (PMC_IS_NULL(accepted))
         real_exception(interp, NULL, ILL_INHERIT,
             "Could not build C3 linearization: ambiguous hierarchy");
-        return PMCNULL;
-    }
 
     /* Otherwise, remove what was accepted from the merge lists. */
     for (i = 0; i < list_count; i++) {

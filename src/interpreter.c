@@ -495,9 +495,7 @@ exec_init_prederef(PARROT_INTERP, void *prederef_arena)
     load_prederef(interp, PARROT_CGP_CORE);
 
     if (!interp->code->prederef.code) {
-        size_t N = interp->code->base.size; /* XXX Unused */
         void **temp = (void **)prederef_arena;
-        opcode_t *pc = interp->code->base.data; /* XXX unused */
 
         interp->code->prederef.code = temp;
         /* TODO */

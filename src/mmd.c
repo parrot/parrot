@@ -1219,7 +1219,6 @@ mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
     type1 = VTABLE_get_integer_keyed_int(interp, arg_tuple, 0);
     if (type1 < 0) {
         return;
-        real_exception(interp, NULL, 1, "unimplemented native MMD type");
         /* TODO create some class namespace */
     }
     else {
