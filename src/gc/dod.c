@@ -546,8 +546,6 @@ are immune from collection (i.e. constant).
 void
 Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
-    Arenas * const arena_base = interp->arena_base;
-
     UINTVAL i;
     UINTVAL total_used    = 0;
     UINTVAL object_size   = pool->object_size;
