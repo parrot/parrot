@@ -25,12 +25,12 @@ These are the vtable functions for the Sub (subroutine) base class
 static void
 print_sub_name(PARROT_INTERP, PMC *sub)
 {
-    Interp * const tracer =
-        interp->debugger ? interp->debugger : interp;
+    Interp * const tracer = interp->debugger ? interp->debugger : interp;
 
-        /* sub was located via globals */
+    /* sub was located via globals */
     PIO_eprintf(tracer, "# Calling sub '%Ss'\n# ",
         Parrot_full_sub_name(interp, sub));
+
     print_pbc_location(interp);
 }
 
@@ -70,13 +70,8 @@ Initializes the subroutine.
      */
     void init() {
         PMC_struct_val(SELF) = new_sub(INTERP);
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-#if 0
-        if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
-            printf("Address of base segment is %p\n",
-                ((struct Parrot_sub *)PMC_sub(SELF))->seg->base.pf->base.data);
-#endif
     }
 
 /*
@@ -90,16 +85,11 @@ Destroys the subroutine.
 */
 
     void destroy() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        Parrot_sub * const sub = PMC_sub(SELF);
+
         if (!sub)
             return;
-#if 0
-        {
-            STRING *n = Parrot_full_sub_name(INTERP, SELF);
-            fprintf(stderr, "DESTROY sub %p %s\n", SELF,
-                    n && n->strstart ? (char*)n->strstart : "???");
-        }
-#endif
+
         mem_sys_free(sub);
         PMC_struct_val(SELF) = NULL;
     }
@@ -119,13 +109,13 @@ Sets the name of the subroutine.
 */
 
     STRING *get_string() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
-        return Parrot_make_COW_reference(INTERP, sub->name);
+        const Parrot_sub * const sub = PMC_sub(SELF);
+        return string_copy(INTERP, sub->name);
     }
 
     void set_string_native(STRING *subname) {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
-        sub->name = string_copy(INTERP, subname);
+        Parrot_sub * const sub = PMC_sub(SELF);
+        sub->name              = string_copy(INTERP, subname);
     }
 
 /*
@@ -157,7 +147,7 @@ Returns the address of the actual subroutine.
 */
 
     void *get_pointer() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
+        const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->seg->base.data + sub->start_offs;
     }
 
@@ -208,8 +198,8 @@ Invokes the subroutine.
 */
 
     opcode_t *invoke(void *next) {
-        struct Parrot_sub     * const sub = PMC_sub(SELF);
-        parrot_context_t      *caller_ctx;
+        Parrot_sub     * const sub = PMC_sub(SELF);
+        Parrot_Context        *caller_ctx;
         Parrot_Context        *context;
         PMC                   *ccont;
         opcode_t              *pc;
@@ -338,17 +328,16 @@ Creates and returns a clone of the subroutine.
 */
 
     PMC *clone() {
-        struct Parrot_sub *sub;
+        Parrot_sub *sub = mem_allocate_typed(Parrot_sub);
         PMC * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 
         /* we have to mark it ourselves */
         PObj_custom_mark_destroy_SETALL(ret);
-        sub = mem_allocate_typed(struct Parrot_sub);
 
         /* first set the sub struct, string_copy may cause GC */
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret)    = NULL;
-        memcpy(sub, PMC_sub(SELF), sizeof (struct Parrot_sub));
+        memcpy(sub, PMC_sub(SELF), sizeof (Parrot_sub));
         sub->name           = string_copy(INTERP, sub->name);
 
         return ret;
@@ -373,6 +362,7 @@ Set SELF to the data in other.
         if (other->vtable->base_type == SELF->vtable->base_type) {
             /* copy the sub struct */
             memcpy(PMC_sub(SELF), PMC_sub(other), sizeof (struct Parrot_sub));
+
             /* copy the name so it's a different string in memory */
             PMC_sub(SELF)->name = string_copy(INTERP, PMC_sub(SELF)->name);
         }
@@ -393,15 +383,21 @@ Marks the sub as live.
 */
 
     void mark() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
+        const Parrot_sub * const sub = PMC_sub(SELF);
+
         if (!sub)
             return;
+
         if (sub->name)
             pobject_lives(INTERP, (PObj *) sub->name);
         if (!PMC_IS_NULL(sub->namespace_name))
             pobject_lives(INTERP, (PObj *) sub->namespace_name);
         if (!PMC_IS_NULL(sub->multi_signature))
             pobject_lives(INTERP, (PObj *) sub->multi_signature);
+        if (!PMC_IS_NULL(sub->lex_info))
+            pobject_lives(INTERP, (PObj *) sub->lex_info);
+        if (!PMC_IS_NULL(sub->outer_sub))
+            pobject_lives(INTERP, (PObj *) sub->outer_sub);
         if (!PMC_IS_NULL(sub->eval_pmc))
             pobject_lives(INTERP, (PObj *) sub->eval_pmc);
     }
@@ -437,14 +433,17 @@ Archives the subroutine.
 */
 
     void visit(visit_info *info) {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        Parrot_sub * const sub = PMC_sub(SELF);
 
         info->thaw_ptr = &sub->namespace_name;
         (info->visit_pmc_now)(INTERP, sub->namespace_name, info);
+
         info->thaw_ptr = &sub->multi_signature;
         (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
+
         info->thaw_ptr = &sub->outer_sub;
         (info->visit_pmc_now)(INTERP, sub->outer_sub, info);
+
         /*
          * XXX visit_pmc_now is wrong, because it breaks
          *     depth-first visit inside the todo list
@@ -459,8 +458,8 @@ Archives the subroutine.
     }
 
     void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        IMAGE_IO   * const io  = info->image_io;
+        Parrot_sub * const sub = PMC_sub(SELF);
         int i;
 
         SUPER(info);
@@ -510,12 +509,11 @@ Unarchives the subroutine.
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            struct Parrot_sub * const sub = PMC_sub(SELF);
+            Parrot_sub * const sub = PMC_sub(SELF);
             INTVAL flags;
-            int i;
-            /*
-             * we get relative offsets
-             */
+            int    i;
+
+            /* we get relative offsets */
             sub->start_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
             sub->end_offs     = (size_t) io->vtable->shift_integer(INTERP, io);
             flags             = io->vtable->shift_integer(INTERP, io);
@@ -563,44 +561,47 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 */
 
-
     METHOD PMC *get_namespace() {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        Parrot_sub * const sub = PMC_sub(SELF);
 
         return sub->namespace_stash;
     }
 
     METHOD INTVAL __get_regs_used(char *kind) {
-        struct Parrot_sub * const sub = PMC_sub(SELF);
+        Parrot_sub * const sub = PMC_sub(SELF);
+
         /* TODO switch to canonical NiSP order
-         * see also imcc/reg_alloc.c
-         */
+         * see also imcc/reg_alloc.c */
         static const char types[] = "INSP";
         char *p;
 
         PARROT_ASSERT(sub->n_regs_used);
+
         if (!*kind || kind[1])
             real_exception(INTERP, NULL, E_ValueError,
                 "illegal register kind '%s'", kind);
+
         p = strchr(types, *kind);
+
         if (!p)
             real_exception(INTERP, NULL, E_ValueError,
                 "illegal register kind '%s'", kind);
+
         return sub->n_regs_used[p - types];
     }
 
     METHOD PMC *get_lexinfo() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
+        const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->lex_info ? sub->lex_info : PMCNULL;
     }
 
     METHOD PMC *get_outer() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
+        const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->outer_sub ? sub->outer_sub : PMCNULL;
     }
 
     METHOD PMC *get_multisig() {
-        const struct Parrot_sub * const sub = PMC_sub(SELF);
+        const Parrot_sub * const sub = PMC_sub(SELF);
         return sub->multi_signature ? sub->multi_signature : PMCNULL;
     }
 }
