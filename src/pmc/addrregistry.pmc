@@ -14,8 +14,8 @@ addresses of the key PMC, values are reference counts, i.e. the
 difference of (set_pmc_keyed - delete_pmc_keyed). If the reference
 goes to zero, the entry is deleted physically.
 
-Please note that you have to anchor an instance of AddrRegistry yourself
-e.g. with C<Parrot_register_pmc> if it isn't visible to Parrot.
+Please note that you have to anchor an instance of AddrRegistry yourself with
+C<Parrot_register_pmc> if it isn't visible to Parrot.
 
 =head2 Functions
 
@@ -64,7 +64,7 @@ Free hash structure.
 
     void destroy() {
         if (PMC_struct_val(SELF)) {
-            parrot_hash_destroy(INTERP, (Hash*) PMC_struct_val(SELF));
+            parrot_hash_destroy(INTERP, (Hash *)PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -88,8 +88,7 @@ Marks the hash as live.
 
 =item C<INTVAL get_integer_keyed(PMC *key)>
 
-Returns the reference count for C<key> or 0, if the key
-doesn't exist.
+Returns the reference count for C<key> or 0 if the key doesn't exist.
 
 =item C<INTVAL elements()>
 
@@ -142,28 +141,29 @@ reaches 0, delete the entry.
 */
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        Hash * const hash = (Hash *)PMC_struct_val(SELF);
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, key);
+        Hash       * const hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
+
         if (b)
             LVALUE_CAST(char *, b->value) ++;
         else
-            parrot_hash_put(INTERP, hash, key, (void *) 1);
+            parrot_hash_put(INTERP, hash, key, (void *)1);
     }
 
     void set_integer_keyed(PMC *key, INTVAL value) {
         Hash * hash = (Hash *)PMC_struct_val(SELF);
-        parrot_hash_put(INTERP, hash, key, (void *) value);
+        parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
     void delete_keyed(PMC *key) {
-        Hash * hash = (Hash *)PMC_struct_val(SELF);
-        HashBucket *b;
-        b = parrot_hash_get_bucket(INTERP, hash, key);
+        Hash       * const hash = (Hash *)PMC_struct_val(SELF);
+        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
+
         if (b) {
-            if ((long) b->value == 1L)
+            if ((long)b->value == 1L)
                 parrot_hash_delete(INTERP, hash, key);
             else
-                LVALUE_CAST(long, b->value) --;
+                LVALUE_CAST(long, b->value)--;
         }
     }
 
@@ -186,7 +186,7 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
     }
 
     PMC *get_pmc_keyed(PMC *key) {
-        Hash *hash = (Hash *)PMC_struct_val(SELF);
+        Hash * const hash = (Hash *)PMC_struct_val(SELF);
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
                 KEY_hash_iterator_FLAGS) {
