@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ src/pmc/eval.pmc - Dynamic code evaluation
 
 =head1 DESCRIPTION
 
-C<Eval> extends C<Closure> to provide C<eval>-like dynamic code
+C<Eval> extends C<Sub> to provide C<eval>-like dynamic code
 evaluation and execution.
 
 =head2 Methods
@@ -24,32 +24,30 @@ evaluation and execution.
 static void
 clear_fixups(PARROT_INTERP, Parrot_sub *sub_data)
 {
-    opcode_t i, ci;
-    PackFile_ByteCode *seg;
+    INTVAL               i;
+    PackFile_ByteCode   *seg = sub_data->seg;
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
-    PMC *sub;
 
-    seg = sub_data->seg;
     if (!seg)
         return;
+
     ft = seg->fixups;
     if (!ft)
         return;
+
     ct = seg->const_table;
     if (!ct)
         return;
+
     for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                sub = ct->constants[ci]->u.key;
-                if (PMC_sub(sub)) {
-                    PMC_sub(sub)->seg = NULL;
-                    PMC_sub(sub)->eval_pmc = NULL;
-                }
-                ct->constants[ci]->u.key = NULL;
-                ft->fixups[i]->type = 0;
+        PackFile_FixupEntry *e = ft->fixups[i];
+
+        if (e->type == enum_fixup_sub) {
+            opcode_t  ci             = e->offset;
+
+            ct->constants[ci]->u.key = NULL;
+            ft->fixups[i]->type      = 0;
         }
     }
 }
@@ -57,57 +55,64 @@ clear_fixups(PARROT_INTERP, Parrot_sub *sub_data)
 static PMC*
 get_sub(PARROT_INTERP, PMC *self, int idx)
 {
-    opcode_t i, n, ci;
-    PackFile_ByteCode *seg;
+    INTVAL               i, n;
+    PackFile_ByteCode   *seg = PMC_sub(self)->seg;
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
-    PMC *sub;
 
-    seg = PMC_sub(self)->seg;
     if (!seg)
         return PMCNULL;
+
     ft = seg->fixups;
     if (!ft)
         return PMCNULL;
+
     ct = seg->const_table;
     if (!ct)
         return PMCNULL;
+
     for (i = n = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                if (n++ != idx)
-                    continue;
-                ci = ft->fixups[i]->offset;
-                sub = ct->constants[ci]->u.key;
-                return sub;
+        PackFile_FixupEntry *e = ft->fixups[i];
+
+        if (e->type == enum_fixup_sub) {
+            opcode_t ci = e->offset;
+
+            if (n++ == idx)
+                return ct->constants[ci]->u.key;
         }
     }
+
     return PMCNULL;
 }
 
 static void
 mark_subs(PARROT_INTERP, PMC *self)
 {
-    opcode_t i, ci;
-    PackFile_FixupTable *ft;
+    INTVAL i;
     PackFile_ConstTable *ct;
-    PMC *sub;
     PackFile_ByteCode * const seg = PMC_sub(self)->seg;
+    PackFile_FixupTable *ft;
 
     if (!seg)
         return;
+
     ft = seg->fixups;
     if (!ft)
         return;
+
     ct = seg->const_table;
     if (!ct)
         return;
+
     for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                sub = ct->constants[ci]->u.key;
-                pobject_lives(interp, (PObj*)sub);
+        PackFile_FixupEntry *e = ft->fixups[i];
+
+        if (e->type == enum_fixup_sub) {
+            opcode_t  ci  = e->offset;
+            PMC      *sub = ct->constants[ci]->u.key;
+
+            if (!PMC_IS_NULL(sub))
+                pobject_lives(interp, (PObj *)sub);
         }
     }
 }
@@ -117,7 +122,8 @@ pmclass Eval extends Sub need_ext {
     void init() {
         Parrot_sub *sub_data;
         SUPER();
-        sub_data = PMC_sub(SELF);
+
+        sub_data      = PMC_sub(SELF);
         PObj_custom_mark_destroy_SETALL(SELF);
         sub_data->seg = NULL;
     }
@@ -152,46 +158,52 @@ Invokes the first subroutine in the eval code.
          * OTOH - if the global exists - this eval pmc ought
          *        to be alive and destroy isn't called.
          */
-        Parrot_sub *sub_data;
-        PackFile_Segment *seg;
+        PackFile_Segment  *seg;
         PackFile_ByteCode *cur_cs;
+        Parrot_sub        *sub_data = PMC_sub(SELF);
 
-        sub_data = PMC_sub(SELF);
-
-        if (!sub_data)
+        if (!sub_data) {
+            SUPER();
             return;
+        }
+
         clear_fixups(INTERP, sub_data);
         cur_cs = sub_data->seg;
-        if (!cur_cs)
+
+        if (!cur_cs) {
+            SUPER();
             return;
+        }
 
         /* TODO create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
-        if (seg) {
+        if (seg)
             PackFile_Segment_destroy(INTERP, seg);
-        }
+
         seg = (PackFile_Segment *)cur_cs->debugs;
-        if (seg) {
+        if (seg)
             PackFile_Segment_destroy(INTERP, seg);
-        }
+
         seg = (PackFile_Segment *)cur_cs->fixups;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
             cur_cs->fixups = NULL;
         }
+
         seg = cur_cs->pic_index;
-        if (seg) {
+        if (seg)
             PackFile_Segment_destroy(INTERP, seg);
-        }
+
         seg = (PackFile_Segment *)cur_cs;
-        PackFile_Segment_destroy(INTERP, seg);
+        if (seg)
+            PackFile_Segment_destroy(INTERP, seg);
+
         sub_data->seg = NULL;
-        PMC_struct_val(SELF) = NULL;
-        mem_sys_free(sub_data);
         SUPER();
     }
 
     void mark() {
+        SUPER();
         mark_subs(INTERP, SELF);
     }
 
