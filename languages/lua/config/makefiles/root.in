@@ -181,7 +181,7 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test:
+test: all
 	cd .. && $(PERL) t/harness --languages=lua
 
 
