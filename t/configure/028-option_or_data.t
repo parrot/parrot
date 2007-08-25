@@ -55,8 +55,10 @@ ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
 
-my $val = $conf->option_or_data('cc');
-is($val, q{cc}, 'option_or_data() returned expected value');
+my $arg = q{cc};
+my $val = $conf->option_or_data( $arg );
+is($val, $conf->data->get( $arg ),
+    'option_or_data() returned expected value when no option provided');
 
 pass("Completed all tests in $0");
 
