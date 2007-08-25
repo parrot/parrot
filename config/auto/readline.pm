@@ -44,9 +44,6 @@ sub runstep {
             $conf->data->add( ' ', libs => 'readline.lib' );
         }
     }
-    elsif ( $^O =~ /linux/i ) {
-        $conf->data->add( ' ', libs => '-lreadline -lncurses' );
-    }
     else {
         $conf->data->add( ' ', libs => '-lreadline' );
     }
