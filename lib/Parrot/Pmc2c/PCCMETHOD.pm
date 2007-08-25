@@ -383,7 +383,16 @@ sub rewrite_pccmethod {
     parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
     PMC* ret_cont                = new_ret_continuation_pmc(interp, NULL);
     parrot_context_t *ctx        = Parrot_push_context(interp, n_regs_used);
-    PMC* ccont                   = caller_ctx->current_cont;
+    PMC* ccont                   = PMCNULL;
+
+    if (caller_ctx) {
+        ccont = caller_ctx->current_cont;
+    }
+    else {
+        /* there is no point calling real_exception here, because
+           PDB_backtrace can't deal with a missing to_ctx either. */
+        internal_exception(1, "No caller_ctx for continuation \%p.", ccont);
+    }
 
     ctx->current_cont            = ret_cont;
     PMC_cont(ret_cont)->from_ctx = ctx;
