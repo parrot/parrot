@@ -10,12 +10,10 @@ use Carp;
 use Data::Dumper;
 use lib qw( . lib ../lib ../../lib );
 use_ok('config::init::defaults');
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
 my $pkg = q{init::defaults};
-my $parrot_version = Parrot::BuildUtil::parrot_version();
 my $args = process_options( {
     argv            => [q{--debugging=0}, q{--profile}, q{--m=32}],
                         # These 3 options are non-default and inside
@@ -25,9 +23,7 @@ my $args = process_options( {
                         # coverage analysis will cover the default
                         # branches/conditions.  Hence, we supply the
                         # non-default options here to increase coverage.
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    mode            => q{configure},
 } );
 
 my $conf = Parrot::Configure->new;

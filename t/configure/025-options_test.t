@@ -21,17 +21,14 @@ use_ok("Parrot::Configure::Options::Test");
 
 my ($args, $opttest);
 
-my $parrot_version = '0.4.10';
-my $svnid          = '$Id$';
 $args = process_options(
     {
         argv            => [ q{--test} ],
-        script           => $0,
-        parrot_version  => $parrot_version,
-        svnid           => $svnid,
+        mode            => q{configure},
     }
 );
-ok( defined $args, "process_options() returned successfully when options were specified" );
+ok( defined $args,
+    "process_options() returned successfully when options were specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
 ok(defined $opttest, "Constructor returned successfully");

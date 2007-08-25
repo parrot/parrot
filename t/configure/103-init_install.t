@@ -5,13 +5,12 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 19;
+use Test::More tests => 19;
 use Carp;
 use Cwd;
 use Data::Dumper;
 use File::Temp qw(tempdir);
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use_ok('config::init::install');
@@ -21,7 +20,6 @@ my $cwd = cwd();
 {
     my $tdir = tempdir();
     my $tdir1 = tempdir();
-    my $parrot_version = Parrot::BuildUtil::parrot_version();
     my $args = process_options( {
         argv            => [
                             qq{--prefix=$tdir},
@@ -39,9 +37,7 @@ my $cwd = cwd();
                             qq{--infodir=$tdir1},
                             qq{--mandir=$tdir1},
                             ],
-        script          => $0,
-        parrot_version  => $parrot_version,
-        svnid           => '$Id$',
+        mode            => q{configure},
     } );
 
     my $conf = Parrot::Configure->new;

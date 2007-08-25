@@ -6,26 +6,19 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 14;
 use Carp;
 use lib qw( . lib ../lib ../../lib t/configure/testlib );
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::IO::Capture::Mini;
-
-my $parrot_version = Parrot::BuildUtil::parrot_version();
-like($parrot_version, qr/\d+\.\d+\.\d+/,
-    "Parrot version is in 3-part format");
 
 $| = 1;
 is($|, 1, "output autoflush is set");
 
 my $args = process_options( {
     argv            => [ ],
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    mode            => q{configure},
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;

@@ -12,7 +12,6 @@ use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
 use lib qw( . lib ../lib ../../lib );
 use_ok('config::init::defaults');
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Step;
 use Parrot::Configure::Options qw( process_options );
@@ -28,12 +27,9 @@ my $cwd = cwd();
         "Able to copy VERSION for testing");
 
     my $pkg = q{init::defaults};
-    my $parrot_version = Parrot::BuildUtil::parrot_version();
     my $args = process_options( {
         argv            => [],
-        script          => $0,
-        parrot_version  => $parrot_version,
-        svnid           => '$Id$',
+        mode            => q{configure},
     } );
 
     my $conf = Parrot::Configure->new;

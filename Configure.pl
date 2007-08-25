@@ -40,10 +40,9 @@ is setting.
 Tells Configure.pl to output information about i<every> setting added or
 changed.
 
-=item C<--verbose-step={N|name|regex}>
+=item C<--verbose-step={N|regex}>
 
-Run one step with C<--verbose=2>; step indicated  by step number C<N>, by step
-name (I<e.g.>, C<--verbose-step=inter::make>), or by matching description.
+Run C<--verbose=2> for step number C<N> or matching description.
 
 =item C<--nomanicheck>
 
@@ -52,10 +51,6 @@ Tells Configure.pl not to run the MANIFEST check.
 =item C<--prefix>
 
 Sets the location where parrot will be installed.
-
-=item C<--step=>
-
-Execute a single configure step.
 
 =item C<--languages="list of languages">
 
@@ -292,7 +287,6 @@ use strict;
 use warnings;
 use lib 'lib';
 
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Options::Test;
@@ -301,8 +295,6 @@ use Parrot::Configure::Messages qw(
     print_conclusion
 );
 use Parrot::Configure::Step::List qw( get_steps_list );
-
-my $parrot_version = Parrot::BuildUtil::parrot_version();
 
 $| = 1; # $OUTPUT_AUTOFLUSH = 1;
 
@@ -317,10 +309,8 @@ $| = 1; # $OUTPUT_AUTOFLUSH = 1;
 
 # from Parrot::Configure::Options
 my $args = process_options( {
-    argv            => [ @ARGV ],
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    mode    => 'configure',
+    argv    => [ @ARGV ],
 } );
 exit(1) unless defined $args;
 
@@ -329,8 +319,9 @@ my $opttest = Parrot::Configure::Options::Test->new($args);
 # as command-line option
 $opttest->run_configure_tests();
 
+my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 # from Parrot::Configure::Messages
-print_introduction($parrot_version) unless exists $args->{step};
+print_introduction($parrot_version);
 
 my $conf = Parrot::Configure->new;
 
@@ -340,27 +331,16 @@ $conf->add_steps(get_steps_list());
 # from Parrot::Configure::Data
 $conf->options->set(%{$args});
 
-if ( exists $args->{step} ) {
-    # from Parrot::Configure::Data
-    $conf->data()->slurp();
-    $conf->data()->slurp_temp()
-        if $args->{step} =~ /gen::makefiles/;
-    # from Parrot::Configure
-    $conf->run_single_step( $args->{step} );
-    print "\n";
-}
-else {
-    # Run the actual steps
-    # from Parrot::Configure
-    $conf->runsteps or exit(1);
-}
+# Run the actual steps
+# from Parrot::Configure
+$conf->runsteps or exit(1);
 
 # build tests will only be run if you requested them
 # as command-line option
 $opttest->run_build_tests();
 
 # from Parrot::Configure::Messages
-print_conclusion($conf->data->get('make')) unless exists $args->{step};
+print_conclusion($conf->data->get('make'));
 exit(0);
 
 ################### DOCUMENTATION ###################

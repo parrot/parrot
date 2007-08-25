@@ -10,7 +10,6 @@ use Carp;
 use Data::Dumper;
 use lib qw( . lib ../lib ../../lib );
 use_ok('config::init::manifest');
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
@@ -20,12 +19,9 @@ thinks there are files missing from those listed in the MANIFEST.
 =cut
 
 my $pkg = q{init::manifest};
-my $parrot_version = Parrot::BuildUtil::parrot_version();
 my $args = process_options( {
     argv            => [ q{--nomanicheck} ],
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
+    mode            => q{configure},
 } );
 
 my $conf = Parrot::Configure->new;

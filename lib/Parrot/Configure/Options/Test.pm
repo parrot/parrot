@@ -78,9 +78,7 @@ In F<Configure.pl>:
 
     $args = process_options( {
         argv            => [ @ARGV ],
-        script          => $0,
-        parrot_version  => $parrot_version,
-        svnid           => '$Id$',
+        mode            => q{configure},
     } );
 
     $opttest = Parrot::Configure::Options::Test->new($args);

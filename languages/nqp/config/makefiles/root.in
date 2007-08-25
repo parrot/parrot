@@ -7,7 +7,8 @@ RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 BUILD_DIR= @build_dir@
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-CONFIGURE= $(PERL) @build_dir@/Configure.pl
+# CONFIGURE= $(PERL) @build_dir@/Configure.pl
+RECONFIGURE= $(PERL) @build_dir@/tools/dev/reconfigure.pl
 TOOL_DIR = ../..
 TGE_DIR  = ../../compilers/tge
 CAT      = $(PERL) -MExtUtils::Command -e cat
@@ -32,9 +33,10 @@ nqp.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 	    --output=src/Grammar_gen.pir src/Grammar.pg
 	$(PARROT) -o nqp.pbc nqp.pir
 
+#	cd $(BUILD_DIR) && $(CONFIGURE) --step=gen::languages --languages=nqp
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(CONFIGURE) --step=gen::languages --languages=nqp
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=nqp
 
 # This is a listing of all targets, that are meant to be called by users
 help:

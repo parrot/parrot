@@ -6,255 +6,59 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     process_options
-    get_valid_options
 );
-
-sub get_valid_options {
-    return qw(
-        ask
-        bindir
-        cage
-        cc
-        ccflags
-        ccwarn
-        cgoto
-        configure_trace
-        cxx
-        datadir
-        debugging
-        define
-        exec-prefix
-        execcapable
-        floatval
-        gc
-        help
-        icu-config
-        icudatadir
-        icuheaders
-        icushared
-        includedir
-        infodir
-        inline
-        intval
-        jitcapable
-        languages
-        ld
-        ldflags
-        lex
-        libdir
-        libexecdir
-        libs
-        link
-        linkflags
-        localstatedir
-        m
-        maintainer
-        mandir
-        miniparrot
-        nomanicheck
-        oldincludedir
-        opcode
-        ops
-        optimize
-        parrot_is_shared
-        pmc
-        prefix
-        profile
-        sbindir
-        sharedstatedir
-        step
-        sysconfdir
-        target
-        test
-        verbose
-        verbose-step
-        version
-        without-gdbm
-        without-gmp
-        without-icu
-        yacc
-    );
-}
+use Carp;
+use lib qw( lib );
+use Parrot::Configure::Options::Conf ();
+use Parrot::Configure::Options::Reconf ();
 
 sub process_options {
-    my $optionsref = shift;
-    $optionsref->{argv} = []
-        unless defined $optionsref->{argv};
-    $optionsref->{script} = q{Configure.pl}
-        unless defined $optionsref->{script};
-    die "Must provide argument 'parrot_version'"
-        unless $optionsref->{parrot_version};
-    die "Must provide argument 'svnid'"
-        unless $optionsref->{svnid};
-    my @valid_opts = get_valid_options();
-    my %args;
-    for ( @{ $optionsref->{argv} } ) {
+    my $argsref = shift;
+    my %options_components;
+    croak "'mode' argument not provided to process_options()"
+        unless defined $argsref->{mode};
+    if ($argsref->{mode} =~ /^reconfigure$/i) {
+        %options_components =
+            %Parrot::Configure::Options::Reconf::options_components;
+    } elsif ($argsref->{mode} =~ /^configure$/i) {
+        %options_components =
+            %Parrot::Configure::Options::Conf::options_components;
+    } else {
+        croak "Invalid value for 'mode' argument to process_options()";
+    }
+    $argsref->{argv} = [] unless defined $argsref->{argv};
+
+    my $script = $options_components{script}
+        ? $options_components{script}
+        : croak "Must provide value for 'script'";
+
+    my %valid_opts = map {$_, 1} @{ $options_components{valid_options} };
+    my $data = {};
+    my @short_circuits_seen = ();
+    for ( @{ $argsref->{argv} } ) {
         my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
 
-        unless ( grep $key eq $_, @valid_opts ) {
-            die qq/Invalid option "$key". See "perl Configure.pl --help" for valid options\n/;
+        unless ( $valid_opts{$key} ) {
+            die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
         }
-
-        for ($key) {
-            if ( $key =~ m/version/ ) {
-                print_version_info($optionsref);
-                return;
-            }
-
-            if ( $key =~ m/help/ ) {
-                print_help($optionsref);
-                return;
-            }
-            $args{$key} = $value;
+        if ($options_components{short_circuits}{$key}) {
+            push @short_circuits_seen, $key;
         }
+        $data->{$key} = $value;
     }
-
-    $args{debugging} = 1
-        unless ( ( exists $args{debugging} ) && !$args{debugging} );
-    $args{maintainer} = 1 if defined $args{lex} or defined $args{yacc};
-    return \%args;
+    if (@short_circuits_seen) {
+        # run all the short circuits
+        foreach my $sc (@short_circuits_seen) {
+            &{$options_components{short_circuits}{$sc}};
+        }
+        return;
+    } else {
+        $data = &{$options_components{conditionals}}($data);
+        return $data;
+    }
 }
-
-################### SUBROUTINES ###################
-
-sub print_version_info {
-    my $argsref = shift;
-    print "Parrot Version $argsref->{parrot_version} Configure 2.0\n";
-    print "$argsref->{svnid}\n";
-    return 1;
-}
-
-sub print_help {
-    my $argsref = shift;
-    print <<"EOT";
-$argsref->{script} - Parrot Configure 2.0
-
-General Options:
-
-   --help               Show this text
-   --version            Show version information
-   --verbose            Output extra information
-   --verbose=2          Output every setting change
-   --verbose-step=N     Set verbose for step N only
-   --verbose-step=name  Set verbose for step some::step only
-   --verbose-step=regex Set verbose for step matching description
-   --nomanicheck        Don't check the MANIFEST
-   --step=(gen::languages)
-                        Execute a single configure step
-   --languages="list of languages"
-                        Specify a list of languages to process
-
-   --ask                Have Configure ask for commonly-changed info
-   --test=configure     Run tests of configuration tools before configuring
-   --test=build         Run tests of build tools after configuring but before
-                        calling 'make'
-   --test               Run configuration tools tests, configure, then run
-                        build tools tests
-
-Compile Options:
-
-   --debugging=0        Disable debugging, default = 1
-   --inline             Compiler supports inline
-   --optimize           Optimized compile
-   --optimize=flags     Add given optimizer flags
-   --parrot_is_shared   Link parrot dynamically
-   --m=32               Build 32bit executable on 64-bit architecture.
-   --profile            Turn on profiled compile (gcc only for now)
-   --cage               [CAGE] compile includes many additional warnings
-
-   --cc=(compiler)      Use the given compiler
-   --ccflags=(flags)    Use the given compiler flags
-   --ccwarn=(flags)     Use the given compiler warning flags
-   --cxx=(compiler)     Use the given C++ compiler
-   --libs=(libs)        Use the given libraries
-   --link=(linker)      Use the given linker
-   --linkflags=(flags)  Use the given linker flags
-   --ld=(linker)        Use the given loader for shared libraries
-   --ldflags=(flags)    Use the given loader flags for shared libraries
-   --lex=(lexer)        Use the given lexical analyzer generator
-   --yacc=(parser)      Use the given parser generator
-
-   --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
-
-Parrot Options:
-
-   --intval=(type)      Use the given type for INTVAL
-   --floatval=(type)    Use the given type for FLOATVAL
-   --opcode=(type)      Use the given type for opcodes
-   --ops=(files)        Use the given ops files
-   --pmc=(files)        Use the given PMC files
-
-   --cgoto=0            Don't build cgoto core - recommended when short of mem
-   --jitcapable         Use JIT
-   --execcapable        Use JIT to emit a native executable
-   --gc=(type)          Determine the type of garbage collection
-                        type=(gc|libc|malloc|malloc-trace) default is gc
-
-External Library Options:
-
-   --without-gmp        Build parrot without GMP support
-   --without-gdbm       Build parrot without GDBM support
-
-ICU Options:
-
-   For using a system ICU, these options can be used:
-
-   --icu-config=/path/to/icu-config
-                        Location of the script used for ICU autodetection.
-                        You just need to specify this option if icu-config
-                        is not in your PATH.
-
-   --icu-config=none    Can be used to disable the autodetection feature.
-                        It will also be disabled if you specify any other
-                        of the following ICU options.
-
-   If you do not have a full ICU installation:
-
-   --without-icu        Build parrot without ICU support
-   --icuheaders=(path)  Location of ICU headers without /unicode
-   --icushared=(flags)  Full linker command to create shared libraries
-   --icudatadir=(path)  Directory to locate ICU's data file(s)
-
-Other Options (may not be implemented):
-
-   --maintainer         Create imcc's parser and lexer files. Needs a working
-                        parser and lexer.
-   --miniparrot         Build parrot assuming only pure ANSI C is available
-
-Install Options:
-
-    --prefix=PREFIX         Install architecture-independent files in PREFIX
-                            [/usr/local]
-    --exec-prefix=EPREFIX   Install architecture-dependent files in EPREFIX
-                            [PREFIX]
-
-    By default, `make install' will install all the files in
-    `/usr/local/bin', `/usr/local/lib' etc.  You can specify
-    an installation prefix other than `/usr/local' using `--prefix',
-    for instance `--prefix=\$HOME'.
-
-    For better control, use the options below.
-
-    Fine tuning of the installation directories:
-    --bindir=DIR          user executables [EPREFIX/bin]
-    --sbindir=DIR         system admin executables [EPREFIX/sbin]
-    --libexecdir=DIR      program executables [EPREFIX/libexec]
-    --datadir=DIR         read-only architecture-independent data [PREFIX/share]
-    --sysconfdir=DIR      read-only single-machine data [PREFIX/etc]
-    --sharedstatedir=DIR  modifiable architecture-independent data [PREFIX/com]
-    --localstatedir=DIR   modifiable single-machine data [PREFIX/var]
-    --libdir=DIR          object code libraries [EPREFIX/lib]
-    --includedir=DIR      C header files [PREFIX/include]
-    --oldincludedir=DIR   C header files for non-gcc [/usr/include]
-    --infodir=DIR         info documentation [PREFIX/info]
-    --mandir=DIR          man documentation [PREFIX/man]
-
-EOT
-    return 1;
-}
-
 1;
 
 #################### DOCUMENTATION ####################
@@ -268,14 +72,8 @@ Parrot::Configure::Options - Process command-line options to F<Configure.pl>
     use Parrot::Configure::Options qw( process_options );
 
     $args = process_options( {
-        argv            => [ @ARGV ],
-        script          => $0,
-        parrot_version  => $parrot_version,
-        svnid           =>
-            '$Id$',
+        mode    => q{configure},
     } );
-
-    @valid_options = get_valid_options();
 
 =head1 DESCRIPTION
 

@@ -6,19 +6,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 30;
 use Carp;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use_ok('Parrot::Configure::Step::List', qw|
     get_steps_list
 | );
-
-my $parrot_version = Parrot::BuildUtil::parrot_version();
-like($parrot_version, qr/\d+\.\d+\.\d+/,
-    "Parrot version is in 3-part format");
 
 $| = 1;
 is($|, 1, "output autoflush is set");
@@ -26,13 +21,10 @@ is($|, 1, "output autoflush is set");
 my $CC = "/usr/bin/gcc-3.3";
 my $localargv = [
     qq{--cc=$CC},
-    qq{--step=init::manifest},
 ];
 my $args = process_options( {
+    mode            => q{configure},
     argv            => $localargv,
-    script          => $0,
-    parrot_version  => $parrot_version,
-    svnid           => '$Id$',
 } );
 ok(defined $args, "process_options returned successfully");
 my %args = %$args;

@@ -10,11 +10,18 @@ use Carp;
 use lib qw( . lib ../lib ../../lib );
 use_ok('config::init::headers');
 
+
+
+
+
+
+
+
+pass("Completed all tests in $0");
+
 # config/init/headers.pm is completely tested in all statements, branches and
 # conditions by other tests among the configuration tests.  So there is no
 # need to add additional unit tests in this file.
-
-pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 

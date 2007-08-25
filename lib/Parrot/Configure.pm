@@ -168,11 +168,8 @@ Accepts a list of new steps and modifies the data structure within the L<Parrot:
 sub add_steps {
     my ( $conf, @new_steps ) = @_;
 
-    $conf->{list_of_steps} = [ @new_steps ];
-
-    for (my $i = 0; $i <= $#new_steps; $i++) {
-        $conf->add_step($new_steps[$i]);
-        $conf->{hash_of_steps}->{$new_steps[$i]} = $i + 1;
+    foreach my $step (@new_steps) {
+        $conf->add_step($step);
     }
 
     return 1;
@@ -263,26 +260,18 @@ sub _run_this_step {
 
     # set per step verbosity
     if ( defined $args->{verbose_step} ) {
+
+        # by step number
         if (
-            (
-                # by step number
-                ( $args->{verbose_step} =~ /^\d+$/ )
-                    and
-                ( $args->{n} == $args->{verbose_step} )
-            )
-                or
-            (
-                # by step name
-                ( ${$conf->{hash_of_steps}}{$args->{verbose_step}} )
-                    and
-                ( $args->{verbose_step} eq $step_name )
-            )
-                or
-            (
-                # by description
-                $description =~ /$args->{verbose_step}/
-            )
+            $args->{verbose_step} =~ /^\d+$/
+            &&
+            $args->{n} == $args->{verbose_step}
         ) {
+            $conf->options->set( verbose => 2 );
+        }
+
+        # by description
+        elsif ( $description =~ /$args->{verbose_step}/ ) {
             $conf->options->set( verbose => 2 );
         }
     }
@@ -323,8 +312,6 @@ sub _run_this_step {
     print "..." if $args->{verbose} && $args->{verbose} == 2;
     print "." x ( 71 - length($description) - length($result) );
     print "$result." unless $step =~ m{^inter/} && $args->{ask};
-    # reset verbose value for the next step
-    $conf->options->set( verbose => $args->{verbose} );
 
     if ($conf->options->get(q{configure_trace}) ) {
         if (! defined $conftrace->[0]) {
@@ -338,6 +325,8 @@ sub _run_this_step {
         push @{$conftrace}, $evolved_data;
         nstore($conftrace, $sto);
     }
+    # reset verbose value for the next step
+    $conf->options->set( verbose => $args->{verbose} );
 }
 
 =item * C<option_or_data($arg)>
@@ -366,7 +355,6 @@ sub option_or_data {
     my $opt = $conf->options->get( $arg );
     return defined $opt ? $opt : $conf->data->get( $arg );
 }
-
 
 =back
 

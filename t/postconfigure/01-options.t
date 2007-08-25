@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 001-options.t
+# 01-options.t
 
 use strict;
 use warnings;
@@ -12,14 +12,14 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 37;
+use Test::More tests => 31;
 use Carp;
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
     |
 );
-use_ok("Parrot::Configure::Options::Conf", qw|
+use_ok("Parrot::Configure::Options::Reconf", qw|
         @valid_options
     |
 );
@@ -29,52 +29,20 @@ my %valid;
 my $badoption = q{samsonanddelilah};
 
 no warnings 'once';
-%valid = map { $_, 1 } @Parrot::Configure::Options::Conf::valid_options;
+%valid = map { $_, 1 } @Parrot::Configure::Options::Reconf::valid_options;
 use warnings;
 ok( scalar keys %valid,          "non-zero quantity of valid options found" );
 ok( defined $valid{debugging},   "debugging option found" );
 ok( defined $valid{maintainer},  "maintainer option found" );
 ok( defined $valid{help},        "help option found" );
-ok( defined $valid{version},     "version option found" );
 ok( defined $valid{verbose},     "verbose option found" );
 ok( !defined $valid{$badoption}, "invalid option not found" );
-ok( !defined $valid{step}, "invalid 'step' option not found" );
-ok( !defined $valid{target}, "invalid 'target' option not found" );
-
-open my $FH, '<', "$main::topdir/Configure.pl"
-    or croak "Unable to open handle to $main::topdir/Configure.pl:  $!";
-my $bigstr;
-{
-    local $/ = undef;
-    $bigstr = <$FH>;
-}
-close $FH or croak "Unable to close handle to Configure.pl:  $!";
-
-# Ignore any POD I have moved to an __END__ block.
-$bigstr =~ s/__END__.*//s;
-my ( @lines, @possible_methods );
-@lines = grep { /^=item/ } ( split /\n/, $bigstr );
-foreach my $l (@lines) {
-    my $method;
-    if ( $l =~ /^=item C<--([-_\w]+)(?:[=>])/ ) {
-        $method = $1;
-        push @possible_methods, $method;
-    }
-}
-my $invalid = 0;
-foreach my $m (@possible_methods) {
-    unless ( defined $valid{$m} ) {
-        carp "Possibly invalid method: $m";
-        $invalid++;
-    }
-}
-ok( !$invalid, "No invalid methods described in POD" );
 
 my $args;
 $args = process_options(
     {
         argv           => [],
-        mode            => q{configure},
+        mode            => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -96,66 +64,43 @@ like(
 
 $args = process_options(
     {
-        mode => q{configure},,
+        mode => q{reconfigure},
     }
 );
 ok( defined $args,
     "process_options() returned successfully even though no explicit 'argv' key was provided" );
 
-my $CC = "/usr/bin/gcc-3.3";
-my $CX = "/usr/bin/g++-3.3";
 $args = process_options(
     {
-        argv => [
-            q{--cc=$CC},      q{--cxx=$CX}, q{--link=$CX}, q{--ld=$CX},
-            q{--without-icu}, q{--without-gmp},
-        ],
-        mode => q{configure},
+        argv => [ q{--ask}, q{--verbose} ],
+        mode => q{reconfigure},
     }
 );
-ok( defined $args, "process_options() returned successfully when options were specified" );
+ok( defined $args,
+    "process_options() returned successfully when options were specified" );
 
-eval {
-    $args = process_options(
-        {
-            argv    => [qq<--${badoption}=72>],
-            mode    => q{configure},
-        }
-    );
-};
-like(
-    $@,
-    qr/^Invalid option.*$badoption/,
-    "process_options() failed due to bad option '$badoption'"
+$args = process_options(
+    {
+        argv => [ q{--step=gen::makefiles}, q{--target=Makefile} ],
+        mode => q{reconfigure},
+    }
 );
+ok( defined $args,
+    "With 'reconfigure' mode, 'step' and 'target' are valid options to process_options()" );
 
-$badoption = q{step};
+$badoption = q{cc};
+my $CC = "/usr/bin/gcc-3.3";
 eval {
     $args = process_options(
         {
-            argv    => [qq<--${badoption}>],
-            mode    => q{configure},
+            argv => [ qq{--$badoption=$CC} ],
+            mode => q{reconfigure},
         }
     );
 };
 like(
     $@,
-    qr/^Invalid option.*$badoption/,
-    "process_options() failed due to bad option '$badoption'"
-);
-
-$badoption = q{target};
-eval {
-    $args = process_options(
-        {
-            argv    => [qq<--${badoption}>],
-            mode    => q{configure},
-        }
-    );
-};
-like(
-    $@,
-    qr/^Invalid option.*$badoption/,
+    qr/^Invalid option "$badoption"/,
     "process_options() failed due to bad option '$badoption'"
 );
 
@@ -166,7 +111,7 @@ like(
     $args = process_options(
         {
             argv    => [q{--help}],
-            mode    => q{configure},
+            mode    => q{reconfigure},
         }
     );
     ok( !defined $args,
@@ -182,7 +127,7 @@ like(
     $args = process_options(
         {
             argv    => [q{--}],
-            mode    => q{configure},
+            mode    => q{reconfigure},
         }
     );
     ok( !defined $args,
@@ -191,26 +136,25 @@ like(
     like( $msg, qr/--help/i, "got help message as expected");
 }
 
-{
-    my ( $tie, $rv, $msg );
-    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
+$badoption = q{version};
+eval {
     $args = process_options(
         {
-            argv    => [q{--version}],
-            mode    => q{configure},
+            argv => [ qq{--$badoption} ],
+            mode => q{reconfigure},
         }
     );
-    ok( !defined $args,
-        "process_options() returned undef after 'version' option" );
-    $msg = $tie->READLINE;
-    like( $msg, qr/Parrot Version/i, "got correct message after 'version' option" );
-}
+};
+like(
+    $@,
+    qr/^Invalid option "$badoption"/,
+    "process_options() failed due to bad option '$badoption'"
+);
 
 $args = process_options(
     {
         argv        => [ q{--lex}, ],
-        mode        => q{configure},
+        mode        => q{reconfigure},
     }
 );
 ok( defined $args,
@@ -220,7 +164,7 @@ ok( $args->{maintainer}, "'maintainer' attribute is true after 'lex' option" );
 $args = process_options(
     {
         argv        => [ q{--yacc}, ],
-        mode        => q{configure},
+        mode        => q{reconfigure},
     }
 );
 ok( defined $args,
@@ -230,7 +174,7 @@ ok( $args->{maintainer}, "'maintainer' attribute is true after 'yacc' option" );
 $args = process_options(
     {
         argv        => [q{--debugging=1}],
-        mode        => q{configure},
+        mode        => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -239,7 +183,7 @@ ok( $args->{debugging}, "debugging turned on explicitly" );
 $args = process_options(
     {
         argv        => [q{--debugging=0}],
-        mode        => q{configure},
+        mode        => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -251,19 +195,20 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-001-options.t - test Parrot::Configure::Options as used in Configure.pl
+01-options.t - test Parrot::Configure::Options as used in F<tools/dev/reconfigure.pl>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/001-options.t
+    % prove t/postconfigure/01-options.t
 
 =head1 DESCRIPTION
 
-The files in this directory test functionality used by F<Configure.pl>.
+The files in this directory test functionality used after initial
+configuration.
 
-The tests in this file test subroutines exported by
-Parrot::Configure::Options as it is used in F<Configure.pl>, I<i.e.>, with
-C<mode => configure>..
+The tests in this file test subroutines exported by Parrot::Configure::Options
+as it is used in F<tools/dev/reconfigure.pl>, I<i.e.>, with C<mode =>
+reconfigure>.
 
 =head1 AUTHOR
 
@@ -271,7 +216,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-Parrot::Configure::Options, Parrot::Configure::Options::Conf, F<Configure.pl>.
+Parrot::Configure::Options, Parrot::Configure::Options::Reconf, F<Configure.pl>.
 
 =cut
 
