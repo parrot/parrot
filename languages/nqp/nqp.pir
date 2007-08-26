@@ -12,7 +12,7 @@
     $P0.'parsegrammar'('NQP::Grammar')
     $P0.'parseactions'('NQP::Grammar::Actions')
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
 .end
 

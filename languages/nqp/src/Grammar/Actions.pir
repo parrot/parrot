@@ -282,7 +282,7 @@
     $P1 = match['postfix']
     if null $P1 goto end
     .local pmc iter, term
-    iter = new Iterator, $P1
+    iter = new 'Iterator', $P1
   iter_loop:
     unless iter goto end
     $P2 = shift iter
