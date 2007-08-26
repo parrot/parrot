@@ -96,8 +96,6 @@ cl.pir - Set up the package 'COMMON-LISP'
     # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "NULL", _null)
     .DEFUN(symbol, package, "NULL", "_null")
 
-
-    # VALID_IN_PARROT_0_2_0 .DEFUN(symbol, package, "PRINT", _print)
     .DEFUN(symbol, package, "PRINT", "_print")
 
     .SPECIAL_FORM(symbol, package, "PROGN", '_progn')
@@ -781,30 +779,29 @@ DONE:
 .end
 
 .sub _print                     # This is just a temporary stand-in - it
-  .param pmc args               # doesn't have near enough the amount of
+    .param pmc args               # doesn't have near enough the amount of
                                 # functionality required.
-  .local string strval          
-  .local pmc retv
-  .local pmc obj
+    .local string strval          
+    .local pmc retv
+    .local pmc obj
 
-  .ASSERT_LENGTH(args, 1, ERROR_NARGS)
+    .ASSERT_LENGTH(args, 1, ERROR_NARGS)
 
-  .CAR(obj, args)
+    .CAR(obj, args)
 
-   strval = obj
-  .STRING(retv, obj)
+    strval = obj
+    .STRING(retv, obj)
+    print retv
+    print "\n"
 
-   print retv
-   print "\n"
-
-   goto DONE
+    goto DONE
 
 ERROR_NARGS:
-  .ERROR_0("program-error", "wrong number of arguments to PRINT")
-   goto DONE
+    .ERROR_0("program-error", "wrong number of arguments to PRINT")
+    goto DONE
 
 DONE:
-  .return(retv)
+    .return(retv)
 .end
 
 .sub _progn
