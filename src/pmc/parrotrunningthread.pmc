@@ -1,5 +1,5 @@
 /*
-Copyright 2006 The Perl Foundation.
+Copyright 2006-2007 The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -97,9 +97,11 @@ Join the thread, returning whatever its main method returns.
 
 */
     METHOD PMC *join() {
-        PMC *ret;
-        ret = pt_thread_join(INTERP, PMC_int_val(SELF));
-        PMC_int_val(SELF) = -1; /* invalidate self */
+        PMC *ret          = pt_thread_join(INTERP, PMC_int_val(SELF));
+
+        /* invalidate self */
+        PMC_int_val(SELF) = -1;
+
         return ret;
     }
 

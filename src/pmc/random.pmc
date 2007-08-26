@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -34,7 +34,7 @@ pmclass Random singleton {
 
 */
 
-void *get_pointer() {
+    void *get_pointer() {
         return Rand_PMC;
     }
 
@@ -51,7 +51,7 @@ information see F<src/pmc.c>.
 
     void set_pointer(void *ptr) {
         PARROT_ASSERT(!Rand_PMC);
-        Rand_PMC = (PMC*) ptr;
+        Rand_PMC = (PMC *)ptr;
     }
 
 /*

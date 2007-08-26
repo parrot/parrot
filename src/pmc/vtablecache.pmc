@@ -25,9 +25,8 @@ pmclass VtableCache {
     }
 
     void destroy() {
-        if (NULL != PMC_struct_val(SELF)) {
+        if (PMC_struct_val(SELF))
             Parrot_destroy_vtable(INTERP, (VTABLE *)PMC_struct_val(SELF));
-        }
     }
 
 }

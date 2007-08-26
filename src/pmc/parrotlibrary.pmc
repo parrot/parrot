@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -75,12 +75,13 @@ Creates and returns a clone of the library.
 */
 
     PMC *clone() {
-        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC *dest            = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
-        PMC_data(dest) = PMC_data(SELF);
-        if (PMC_metadata(SELF)) {
+        PMC_data(dest)       = PMC_data(SELF);
+
+        if (PMC_metadata(SELF))
             PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
-        }
+
         return dest;
     }
 
@@ -109,10 +110,9 @@ Returns the name of the loaded library.
 */
 
     STRING *get_string() {
-        PMC *prop;
-        STRING *key;
-        key = const_string(INTERP, "_filename");
-        prop = VTABLE_getprop(INTERP, SELF, key);
+        STRING *key  = const_string(INTERP, "_filename");
+        PMC    *prop = VTABLE_getprop(INTERP, SELF, key);
+
         return VTABLE_get_string(INTERP, prop);
     }
 

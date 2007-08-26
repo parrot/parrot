@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 DESCRIPTION
@@ -81,19 +81,20 @@ Destroys the struct, freeing the allocated memory.
 */
 
     void set_integer_native(INTVAL value) {
-        if (PMC_data(SELF) && (! value)) {
+        if (PMC_data(SELF) && !value) {
             mem_sys_free(PMC_data(SELF));
-            PMC_data(SELF) = NULL;
+            PMC_data(SELF)    = NULL;
             PMC_int_val(SELF) = 0;
         }
-        else if (value && (! PMC_data(SELF))) {
-            PMC_data(SELF) = mem_sys_allocate_zeroed(value);
+        else if (value && !PMC_data(SELF)) {
+            PMC_data(SELF)    = mem_sys_allocate_zeroed(value);
             PMC_int_val(SELF) = value;
         }
         else if (value && PMC_data(SELF)) {
-            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), value);
+            PMC_data(SELF)    = mem_sys_realloc(PMC_data(SELF), value);
             PMC_int_val(SELF) = value;
         }
+
         return;
     }
 
