@@ -84,7 +84,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # pheme                test scripts are written in Scheme, not Perl 5
 # pynie                test scripts are written in PIR, not Perl 5
 # python               not maintained
-# ruby                 not maintained, should be removed
 
 my @unified_testable_languages
     = defined $languages_list ?
