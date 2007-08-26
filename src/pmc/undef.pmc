@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004 - 2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -28,82 +28,81 @@ from there.
 
 pmclass Undef extends default no_ro {
 
-  void set_pmc(PMC *other) {
-    VTABLE_morph(INTERP, SELF, enum_class_Ref);
-    VTABLE_set_pmc(INTERP, SELF, other);
-  }
-
-  void assign_pmc(PMC *other) {
-    VTABLE_morph(INTERP, SELF, other->vtable->base_type);
-    /* don't want to call set_pmc if we're assigning an Undef to an Undef */
-    if (other->vtable->base_type != enum_class_Undef)
+    void set_pmc(PMC *other) {
+        VTABLE_morph(INTERP, SELF, enum_class_Ref);
         VTABLE_set_pmc(INTERP, SELF, other);
-  }
-
-  void morph(INTVAL new_type) {
-    pmc_reuse(INTERP, SELF, new_type, 0);
-  }
-
-  INTVAL get_integer() {
-    return 0;
-  }
-
-  INTVAL defined() {
-    return 0;
-  }
-
-  void set_integer_native(INTVAL value) {
-    VTABLE_morph(INTERP, SELF, enum_class_Integer);
-    VTABLE_set_integer_native(INTERP, SELF, value);
-  }
-
-  FLOATVAL get_number() {
-    return 0.0;
-  }
-
-  void set_number_native(FLOATVAL value) {
-    VTABLE_morph(INTERP, SELF, enum_class_Float);
-    VTABLE_set_number_native(INTERP, SELF, value);
-  }
-
-  STRING *get_string() {
-    return string_make_empty(INTERP,enum_stringrep_one,0);
-  }
-
-  void set_string_native(STRING *value) {
-    VTABLE_morph(INTERP, SELF, UNDEF_STRING_CLASS);
-    VTABLE_set_string_native(INTERP, SELF, value);
-  }
-
-  INTVAL get_bool() {
-    return 0;
-  }
-
-  void share() {
-    /* see src/pmc/integer.pmc */
-  }
-
-  PMC *share_ro() {
-    if (PObj_is_PMC_shared_TEST(SELF)) {
-        return SELF;
     }
-    else {
-        return pt_shared_fixup(INTERP, SELF);
-    }
-  }
 
-  PMC *clone() {
-      return pmc_new(INTERP, SELF->vtable->base_type);
-  }
+    void assign_pmc(PMC *other) {
+        VTABLE_morph(INTERP, SELF, other->vtable->base_type);
 
-  INTVAL is_equal (PMC *value) {
-    MMD_Undef: {
-        return 1;
+        /* don't want to call set_pmc if we're assigning an Undef to an Undef */
+        if (other->vtable->base_type != enum_class_Undef)
+            VTABLE_set_pmc(INTERP, SELF, other);
     }
-    MMD_DEFAULT: {
+
+    void morph(INTVAL new_type) {
+        pmc_reuse(INTERP, SELF, new_type, 0);
+    }
+
+    INTVAL get_integer() {
         return 0;
     }
-  }
+
+    INTVAL defined() {
+        return 0;
+    }
+
+    void set_integer_native(INTVAL value) {
+        VTABLE_morph(INTERP, SELF, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, SELF, value);
+    }
+
+    FLOATVAL get_number() {
+        return 0.0;
+    }
+
+    void set_number_native(FLOATVAL value) {
+        VTABLE_morph(INTERP, SELF, enum_class_Float);
+        VTABLE_set_number_native(INTERP, SELF, value);
+    }
+
+    STRING *get_string() {
+        return string_make_empty(INTERP, enum_stringrep_one, 0);
+    }
+
+    void set_string_native(STRING *value) {
+        VTABLE_morph(INTERP, SELF, UNDEF_STRING_CLASS);
+        VTABLE_set_string_native(INTERP, SELF, value);
+    }
+
+    INTVAL get_bool() {
+        return 0;
+    }
+
+    void share() {
+        /* see src/pmc/integer.pmc */
+    }
+
+    PMC *share_ro() {
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+        else
+            return pt_shared_fixup(INTERP, SELF);
+    }
+
+    PMC *clone() {
+        return pmc_new(INTERP, SELF->vtable->base_type);
+    }
+
+    INTVAL is_equal (PMC *value) {
+        MMD_Undef: {
+            return 1;
+        }
+        MMD_DEFAULT: {
+            return 0;
+        }
+    }
 }
 
 /*

@@ -62,13 +62,15 @@ Marks the pointer as live.
 */
 
     void mark() {
-        void (*mark_function)(Interp*, void*) =
-            (void (*)(Interp*, void*))
-            D2FPTR(PMC_struct_val(SELF));
+        void (*mark_function)(Interp *, void *) =
+            (void (*)(Interp *, void *))D2FPTR(PMC_struct_val(SELF));
+
         if (PMC_data(SELF) == NULL)
             return;
+
         if (PMC_struct_val(SELF) == NULL)
             return;
+
         (*mark_function)(INTERP, PMC_data(SELF));
     }
 
@@ -83,7 +85,7 @@ Creates and returns a clone of the pointer.
 */
 
     PMC *clone() {
-        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC *dest      = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
         return dest;
@@ -166,8 +168,8 @@ Returns whether the pointer has the same value as C<*pmc2>.
 */
 
     INTVAL is_same(PMC *pmc2) {
-        return (INTVAL)(SELF->vtable == pmc2->vtable &&
-        PMC_data(SELF) == PMC_data(pmc2));
+        return (INTVAL)(SELF->vtable   == pmc2->vtable &&
+                        PMC_data(SELF) == PMC_data(pmc2));
     }
 }
 

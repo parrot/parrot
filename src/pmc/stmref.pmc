@@ -24,6 +24,8 @@ C<Parrot::Pmc2c>.
 #include "parrot/parrot.h"
 #include "parrot/stm/backend.h"
 
+#define PMC_STM_handle(o) ((Parrot_STM_PMC_handle)PMC_struct_val(o))
+
 pmclass STMRef does ref is_shared need_ext {
 
 /*
@@ -65,8 +67,7 @@ Marks the referenced PMC as live.
 */
 
     void mark() {
-        Parrot_STM_mark_pmc_handle(INTERP,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+        Parrot_STM_mark_pmc_handle(INTERP, PMC_STM_handle(SELF));
     }
 
 /*
@@ -86,7 +87,7 @@ Return ourself.
 
 =back
 
-This method must be implemented because they are not delegated.
+These methods must be implemented because they are not delegated.
 
 =over 4
 
@@ -103,9 +104,9 @@ Returns the name of the PMC, not the name of the referenced PMC.
     }
 
     INTVAL defined() {
-        Parrot_STM_PMC_handle handle =
-            (Parrot_STM_PMC_handle)PMC_struct_val(pmc);
-        PMC *value = Parrot_STM_read(INTERP, handle);
+        Parrot_STM_PMC_handle  handle = PMC_STM_handle(pmc);
+        PMC                   *value  = Parrot_STM_read(INTERP, handle);
+
         return !PMC_IS_NULL(value);
     }
 
@@ -118,8 +119,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
         SUPER(info);
 
-        Parrot_freeze_STM_PMC_handle(INTERP, io,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_STM_handle(SELF));
     }
 
     void thaw(visit_info *info) {
@@ -127,8 +127,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
 
         SUPER(info);
 
-        PMC_struct_val(SELF) =
-            Parrot_thaw_STM_PMC_handle(INTERP, io);
+        PMC_struct_val(SELF) = Parrot_thaw_STM_PMC_handle(INTERP, io);
     }
 
     void thawfinish(visit_info *info) {
@@ -136,8 +135,7 @@ Returns the name of the PMC, not the name of the referenced PMC.
     }
 
     PMC *get_pmc() {
-        Parrot_STM_PMC_handle handle =
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF);
+        Parrot_STM_PMC_handle handle = PMC_STM_handle(SELF);
         return Parrot_STM_begin_update(INTERP, handle);
     }
 }

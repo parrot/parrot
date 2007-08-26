@@ -55,16 +55,13 @@ Sets the referenced PMC to C<initializer>.
 */
 
     void init_pmc(PMC *initializer) {
-        PMC_pmc_val(SELF) = initializer; /* the referred PMC itself */
+        /* the referred PMC itself */
+        PMC_pmc_val(SELF) = initializer;
         PObj_custom_mark_SET(SELF);
-        if (initializer) {
-            /*
-             * if referred PMC needs active destruction
-             * we have to pass it on
-             */
-            if (PObj_active_destroy_TEST(initializer))
-                PObj_active_destroy_SET(SELF);
-        }
+
+        /* if referred PMC needs active destruction we have to pass it on */
+        if (initializer && PObj_active_destroy_TEST(initializer))
+            PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -86,8 +83,9 @@ Get the referenced PMC.
         DOD_WRITE_BARRIER(INTERP, SELF, PMC_pmc_val(SELF), other);
         SELF.init_pmc(other);
     }
+
     void assign_pmc(PMC *other) {
-        SELF.set_pmc(other);   /* audreyt */
+        SELF.set_pmc(other);
     }
 
     PMC *get_pmc() {
@@ -119,7 +117,7 @@ Marks the referenced PMC as live.
 */
 
     void mark() {
-        pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+        pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
 
 /*

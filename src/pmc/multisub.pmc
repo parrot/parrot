@@ -1,10 +1,10 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
 
-src/pmc/multisub.pmc - A container for Perl6 multi subs
+src/pmc/multisub.pmc - A container for multi-dispatched subs
 
 =head1 DESCRIPTION
 
@@ -61,10 +61,9 @@ pmclass MultiSub extends ResizablePMCArray need_ext does array {
         PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
         PMC *func;
 
-        if (PMC_IS_NULL(list)) {
-            real_exception(INTERP, NULL, 1,
-                           "No applicable methods.\n");
-        }
+        if (PMC_IS_NULL(list))
+            real_exception(INTERP, NULL, 1, "No applicable methods.\n");
+
         func = VTABLE_get_pmc_keyed_int(interp, list, 0);
         return VTABLE_invoke(INTERP, func, next);
     }

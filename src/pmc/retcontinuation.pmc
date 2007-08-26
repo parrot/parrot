@@ -10,8 +10,8 @@ src/pmc/retcontinuation.pmc - Return Continuation
 
 C<RetContinuation> extends C<Continuation>.
 
-A return continuation is a one shot Continuation, it gets recycled
-immediately after invocation.
+A return continuation is a one shot Continuation.  It gets recycled immediately
+after invocation.
 
 =head2 Methods
 
@@ -49,9 +49,11 @@ Initializes the continuation.
      */
 
     void destroy() {
-        struct Parrot_cont *cc = PMC_cont(SELF);
+        Parrot_cont *cc = PMC_cont(SELF);
+
         if (cc)
             mem_sys_free(cc);
+
         PMC_struct_val(SELF) = NULL;
     }
 /*
@@ -82,12 +84,13 @@ Transfers control to the calling context, and frees the current context.
 */
 
     opcode_t *invoke(void *in_next) {
-        struct Parrot_cont *cc        = PMC_cont(SELF);
-        parrot_context_t   *from_ctx  = cc->from_ctx;
+        Parrot_cont       *cc         = PMC_cont(SELF);
+        Parrot_Context    *from_ctx   = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;
-        opcode_t *next                = SUPER(in_next);
+        opcode_t          *next       = SUPER(in_next);
 
         Parrot_free_context(INTERP, from_ctx, 1);
+
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         mem_sys_free(cc);
@@ -104,12 +107,14 @@ Transfers control to the calling context, and frees the current context.
         }
 #else
         cc->from_ctx = NULL;
+
         /*
          * the to_ctx is marked in Continuation.mark
          * NULLify it or turn off the custom_mark bit
          */
         cc->to_ctx = NULL;
 #endif
+
         if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
 

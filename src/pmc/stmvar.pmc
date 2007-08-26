@@ -21,12 +21,16 @@ XXX
 #include "parrot/parrot.h"
 #include "parrot/stm/backend.h"
 
+#define PMC_STM_handle(o) ((Parrot_STM_PMC_handle)PMC_struct_val(o))
+
 /* we set need_ext here because we really want to have PMC sync structure;
  * we set no_ro because we are logically read-only; one can't change which
  * transactional object this references (though one can change that
  * object)
  */
+
 pmclass STMVar is_shared need_ext no_ro {
+
 /*
 
 =item C<void init()>
@@ -44,13 +48,13 @@ pmclass STMVar is_shared need_ext no_ro {
 
     void init_pmc(PMC *value) {
         PMC_struct_val(SELF) = NULL;
-        if (value->vtable->base_type == enum_class_STMRef
-            || value->vtable->base_type == enum_class_STMVar) {
+
+        if (value->vtable->base_type == enum_class_STMRef ||
+            value->vtable->base_type == enum_class_STMVar)
             PMC_struct_val(SELF) = PMC_struct_val(value);
-        }
-        else {
+        else
             PMC_struct_val(SELF) = Parrot_STM_alloc(INTERP, value);
-        }
+
         PObj_custom_mark_SET(SELF);
     }
 /*
@@ -80,23 +84,20 @@ Mark data associated with this transactional variable.
     void mark() {
         PARROT_ASSERT(PObj_is_PMC_shared_TEST(SELF));
         PARROT_ASSERT(PMC_sync(SELF)->owner == INTERP);
-        Parrot_STM_mark_pmc_handle(INTERP,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+
+        Parrot_STM_mark_pmc_handle(INTERP, PMC_STM_handle(SELF));
     }
 
     METHOD PMC *get_read() {
-        return Parrot_STM_read(INTERP,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+        return Parrot_STM_read(INTERP, PMC_STM_handle(SELF));
     }
 
     METHOD PMC *get_update() {
-        return Parrot_STM_begin_update(INTERP,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+        return Parrot_STM_begin_update(INTERP, PMC_STM_handle(SELF));
     }
 
     METHOD void set(PMC *new_value) {
-        Parrot_STM_write(INTERP, (Parrot_STM_PMC_handle)PMC_struct_val(SELF),
-                         new_value);
+        Parrot_STM_write(INTERP, PMC_STM_handle(SELF), new_value);
     }
 
     void freeze(visit_info *info) {
@@ -104,8 +105,7 @@ Mark data associated with this transactional variable.
 
         SUPER(info);
 
-        Parrot_freeze_STM_PMC_handle(INTERP, io,
-            (Parrot_STM_PMC_handle)PMC_struct_val(SELF));
+        Parrot_freeze_STM_PMC_handle(INTERP, io, PMC_STM_handle(SELF));
     }
 
     void thaw(visit_info *info) {
@@ -113,8 +113,7 @@ Mark data associated with this transactional variable.
 
         SUPER(info);
 
-        PMC_struct_val(SELF) =
-            Parrot_thaw_STM_PMC_handle(INTERP, io);
+        PMC_struct_val(SELF) = Parrot_thaw_STM_PMC_handle(INTERP, io);
 
         PARROT_ASSERT(PObj_is_PMC_shared_TEST(SELF));
         PARROT_ASSERT(PMC_sync(SELF));
@@ -125,8 +124,7 @@ Mark data associated with this transactional variable.
        variable.
      */
     PMC *share_ro() {
-        PMC *ret = pt_shared_fixup(INTERP, SELF);
-        return ret;
+        return pt_shared_fixup(INTERP, SELF);
     }
 }
 

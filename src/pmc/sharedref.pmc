@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -36,7 +36,6 @@ we can relax that a bit.
 #define UNLOCK_PMC(interp, pmc) UNLOCK(PMC_sync(pmc)->pmc_lock);
 
 pmclass SharedRef does ref need_ext is_shared extends Ref {
-
 
     void init() {
         SUPER();
@@ -80,7 +79,7 @@ shouldn't leak unshared PMCs into different threads.
 
 =item C<void share()>
 
-We do already sharing - so just ignore.
+We already share, so just ignore.
 
 =cut
 
@@ -123,8 +122,7 @@ Catch dereferencing. This would unshare the referred PMC.
     }
 
     PMC *get_pmc() {
-        real_exception(INTERP, NULL, E_ReferenceError,
-                "deref not allowed");
+        real_exception(INTERP, NULL, E_ReferenceError, "deref not allowed");
     }
 
 /*
@@ -140,10 +138,13 @@ or at least a detection if the referred PMC is already destroyed.
 
     void destroy() {
         PMC * const ref = PMC_pmc_val(SELF);
+
         if (PObj_active_destroy_TEST(ref))
             VTABLE_destroy(INTERP, ref);
+
         if (PMC_sync(SELF)->owner != INTERP)
             PANIC(INTERP, "SharedRef destroyed by wrong interpreter");
+
         SUPER();
     }
 }
