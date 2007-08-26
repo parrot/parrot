@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -27,34 +27,6 @@ pmclass Boolean extends Integer does boolean does scalar {
 
 /*
 
-=item C<class_init()>
-
-Define 2 pythonic globals C<True>, C<False>.
-
-XXX are these generally useful or should they be moved to src/py_func.c?
-
-=cut
-
-*/
-
-    void class_init() {
-        if (pass) {
-            PMC *t;
-            STRING *s;
-
-            t = pmc_new(INTERP, enum_class_Boolean);
-            PMC_int_val(t)  = 1;
-            s = CONST_STRING(INTERP, "True");
-            Parrot_store_global_cur(INTERP, s, t);
-
-            t = pmc_new(INTERP, enum_class_Boolean);
-            s = CONST_STRING(INTERP, "False");
-            Parrot_store_global_cur(INTERP, s, t);
-        }
-    }
-
-/*
-
 =item C<PMC *instantiate(PMC *sig)>
 
 Object constructor. SELF is a Boolean Class object. Return a new
@@ -70,6 +42,7 @@ C<bool> object according to the passed PMC value.
 
         if (argcP)
             PMC_int_val(res) = VTABLE_get_bool(interp, REG_PMC(interp, 5));
+
         return PMCNULL; /* TODO */
     }
 /*
