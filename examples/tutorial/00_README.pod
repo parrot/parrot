@@ -1,0 +1,13 @@
+=head1 PIR tutorial
+
+Each files in this directory contains valid PIR code and POD
+(Perl's Plain Old Documentation) and can be read as plain text.
+To view just the documentation without the sample code, use C<perldoc>:
+
+ perldoc example.pir
+
+If you'd like to execute the code from files, build parrot and then type:
+
+ ../../parrot example.pir
+
+=cut
