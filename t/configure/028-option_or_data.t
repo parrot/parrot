@@ -23,9 +23,7 @@ use_ok('Parrot::Configure::Step::List', qw|
 $| = 1;
 is($|, 1, "output autoflush is set");
 
-#my $CC = "/usr/bin/gcc-3.3";
-my $localargv = [
-];
+my $localargv = [ ];
 my $args = process_options( {
     mode            => q{configure},
     argv            => $localargv,
