@@ -23,25 +23,48 @@ curve somewhat.
 This list isn't exhaustive; for now it's intended to identify the
 language constructs that we explicitly know will be supported
 
-* scalars
-* binding
-* lexical 'my', package 'our'
-* method calls (including named arguments)
-* subroutine calls (including named arguments)
-* method definitions
-* subroutine definitions
-* '...'                 # string constants
-* "..."                 # string value with escapes (non-interpolating)
-* postcircumfix:<[ ]>   # array subscript
-* postcircumfix:<{ }>   # hash subscript
-* postcircumfix:«< >»   # constant hash subscript
-* $<...>                # constant hash subscript of $/
-* $(...)                # scalar context
-* prefix:~              # string context
-* prefix:+              # numeric context
-* say(), print()        # output
-* if/unless             # conditional
-* for                   # iterative loop
+=over 4
+
+=item * scalars
+
+=item * binding
+
+=item * lexical 'my', package 'our'
+
+=item * method calls (including named arguments)
+
+=item * subroutine calls (including named arguments)
+
+=item * method definitions
+
+=item * subroutine definitions
+
+=item * '...'                 # string constants
+
+=item * "..."                 # string value with escapes (non-interpolating)
+
+=item * postcircumfix:<[ ]>   # array subscript
+
+=item * postcircumfix:<{ }>   # hash subscript
+
+=item * postcircumfix:«< >»   # constant hash subscript
+
+=item * $<...>                # constant hash subscript of $/
+
+=item * $(...)                # scalar context
+
+=item * prefix:~              # string context
+
+=item * prefix:+              # numeric context
+
+=item * say(), print()        # output
+
+=item * if/unless             # conditional
+
+=item * for                   # iterative loop
+
+
+=back
 
 =head2 Things that aren't in NQP
 
@@ -53,10 +76,17 @@ syntax.
 
 Some items not planned for NQP:
 
-* string interpolation
-* listops
-* quoted lists
-* array and hash slices
+=over 4
+
+=item * string interpolation
+
+=item * listops
+
+=item * quoted lists
+
+=item * array and hash slices
+
+=back
 
 Of course, if we later decide that some item is vitally
 important for NQP programs, we can add it -- but for now
