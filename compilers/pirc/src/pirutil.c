@@ -12,6 +12,8 @@ pirutil.c - various utility functions
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "parrot/parrot.h"
+
 /*
 
 =head1 FUNCTIONS
