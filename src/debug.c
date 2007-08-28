@@ -925,7 +925,12 @@ PDB_set_break(PARROT_INTERP, NOTNULL(const char *command))
     /* Allocate the new break point */
     newbreak = mem_allocate_typed(PDB_breakpoint_t);
 
-    skip_command(command);
+    if (command) {
+        skip_command(command);
+    }
+    else {
+        real_exception(interp, NULL, 1, "NULL command passed to PDB_set_break");
+    }
     condition = NULL;
 
     /* if there is another argument to break, besides the line number,
