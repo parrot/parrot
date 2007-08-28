@@ -1748,19 +1748,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'sprintf' );
     branch MAIN
 
 NEWARYP:
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], P0
     ret
 NEWARYS:
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], S0
     ret
 NEWARYI:
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], I0
     ret
 NEWARYN:
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], N0
     ret
 PRINTF:
@@ -1795,7 +1795,7 @@ MAIN:
     bsr PRINTF
 
     set S1, "1 == %Pd\n"
-    new P0, .Integer
+    new P0, 'Integer'
     set P0, 1
     bsr NEWARYP
     bsr PRINTF
@@ -1897,17 +1897,17 @@ PRINTF:
     ret
 
 MAIN:
-    new P3, .String
+    new P3, 'String'
 
-    new P2, .String
+    new P2, 'String'
     set P2, "15 is %b\n"
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], 15
     bsr PRINTF
 
-    new P2, .String
+    new P2, 'String'
     set P2, "128 is %o\n"
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     set P1[0], 128
     bsr PRINTF
 
@@ -2632,7 +2632,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'join' );
 _main:
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
     join S0, "--", P0
     print S0
     print "\n"
@@ -2640,7 +2640,7 @@ _main:
     join S0, "--", P0
     print S0
     print "\n"
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
     push P0, "a"
     push P0, "b"
     join S0, "--", P0
@@ -2658,7 +2658,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 .sub _main
     newclass P0, "Foo"
 
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
 
     find_type I0, "Foo"
     new P1, I0

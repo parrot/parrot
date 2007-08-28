@@ -65,7 +65,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)' );
 .pcc_sub main:
     .lex '$a', P0
     .lex '$b', P0
-    new P0, .String
+    new P0, 'String'
     set P0, "ok\n"
     find_lex P1, '$a'
     print P1

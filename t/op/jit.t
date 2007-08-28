@@ -1009,7 +1009,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "t/op/arithmetic_26: non jit seq w. branch" );
-new P0, .Integer
+new P0, 'Integer'
 set N0, 4000
 set P0, 123
 div P0, P0, N0

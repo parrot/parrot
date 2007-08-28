@@ -158,9 +158,9 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "eq_num" );
-        new P0, .Float
+        new P0, 'Float'
         set P0, -1.2
-        new P1, .String
+        new P1, 'String'
         set P1, "-1.2"
         eq_num P0, P1, OK
         print "not "

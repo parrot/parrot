@@ -1155,8 +1155,8 @@ Tests all non-branching conditional operators.
     cmp I2, -2.4, N0
     set S0, "Bruhaha"
     cmp I3, S0, "Crumbum"
-    new P0, .Integer
-    new P1, .Integer
+    new P0, 'Integer'
+    new P1, 'Integer'
     set P0, 452
     set P1, -15
     cmp I4, P0, P1

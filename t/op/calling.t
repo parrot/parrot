@@ -143,7 +143,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set I16, 77
     set N16, 2.3
     set S16, "ok 1\n"
-    new P16, .Integer
+    new P16, 'Integer'
     set P16, 101
     set_args "(0, 0, 0, 0, 0, 0, 0)", 42, I16, 4.5, N16, S16, "ok 2\n", P16
     get_results "(0, 0, 0, 0)", I16, N16, S16, P16
@@ -173,7 +173,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set I16, 88
     set N16, 5.5
     set S16, "ok 3\n"
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 4\n"
     set_returns "(0, 0, 0, 0)", I16, N16, S16, P16
     returncc
@@ -193,13 +193,13 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "flatten arg" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P17, .ResizablePMCArray
+    new P17, 'ResizablePMCArray'
     push P17, "ok 2\n"
     push P17, "ok 3\n"
     push P17, "ok 4\n"
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 5\n"
     set_args "(0, 0x20, 0)", P16, P17, P18
     find_name P1, "foo"
@@ -225,11 +225,11 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "slurpy param" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P17, .String
+    new P17, 'String'
     set P17, "ok 2\n"
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 3\n"
     set_args "(0, 0, 0)", P16, P17, P18
     find_name P1, "foo"
@@ -274,23 +274,23 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "flatten + slurpy param" );
 .pcc_sub main:
-    new P16, .String
+    new P16, 'String'
     set P16, "ok 1\n"
-    new P19, .ResizablePMCArray
-    new P17, .String
+    new P19, 'ResizablePMCArray'
+    new P17, 'String'
     set P17, "ok 2\n"
     push P19, P17
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 3\n"
     push P19, P18
-    new P20, .ResizablePMCArray
-    new P17, .String
+    new P20, 'ResizablePMCArray'
+    new P17, 'String'
     set P17, "ok 4\n"
     push P20, P17
-    new P18, .String
+    new P18, 'String'
     set P18, "ok 5\n"
     push P20, P18
-    new P21, .String
+    new P21, 'String'
     set P21, "ok 6\n"
     set_args "(0, 0x20, 0x20, 0)", P16, P19, P20, P21
     find_name P1, "foo"
@@ -1720,7 +1720,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
 .pcc_sub main:
-    new P0, .Hash
+    new P0, 'Hash'
     set P0['a'], 20
     set P0['b'], 10
     set_args "(0x220)", P0            # :flatten :named

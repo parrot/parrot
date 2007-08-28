@@ -25,8 +25,8 @@ LEGACY: Tests the C<store_global> and C<find_global> operations.
 =cut
 
 pasm_output_is( <<'CODE', '12', "set/get" );
-        new P0, .Integer
-        new P1, .Integer
+        new P0, 'Integer'
+        new P1, 'Integer'
         set P0, 12
         set P1, 7
         set_global "Integer", P0
@@ -93,8 +93,8 @@ OUT
 #----------------------------------------------------------------
 
 pasm_output_is( <<'CODE', '12', "Fetch and store" );
-        new P0, .Integer
-        new P1, .Integer
+        new P0, 'Integer'
+        new P1, 'Integer'
         set P0, 12
         set P1, 7
         store_global "Integer", P0

@@ -28,7 +28,7 @@ SKIP: {
     skip( "we really shouldn't run just a label - use a sub", 1 );
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
-    new P0, .ParrotInterpreter
+    new P0, 'ParrotInterpreter'
     print "calling\n"
     # set_addr/invoke ?
     runinterp P0, foo
@@ -138,11 +138,11 @@ OUTPUT
 # This is the behavior as of Parrot 1.4.3
 # XXX Should there be a warning?
 pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
-    new P0, .Undef
+    new P0, 'Undef'
     set I0, P0
     printerr "nada:"
     warningson 1
-    new P1, .Undef
+    new P1, 'Undef'
     set I0, P1
     end
 CODE

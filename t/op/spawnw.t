@@ -88,7 +88,7 @@ OUTPUT
 # test array version of spawnw
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 0" );
-        new     P0, .Array
+        new     P0, 'Array'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"
@@ -105,7 +105,7 @@ return code: 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 123" );
-        new     P0, .Array
+        new     P0, 'Array'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"
@@ -122,7 +122,7 @@ return code: 123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exit code: 3" );
-        new     P0, .Array
+        new     P0, 'Array'
         set     P0, 3
         set     P0[0], "perl"
         set     P0[1], "-e"
@@ -151,7 +151,7 @@ loop:
         branch loop
 end:
         $S0 = concat $S0, "}) / 100"
-        new args, .ResizablePMCArray
+        new args, 'ResizablePMCArray'
         push args, "perl"
         push args, "-e"
         push args, $S0
