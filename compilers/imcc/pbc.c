@@ -503,15 +503,13 @@ fixup_globals(PARROT_INTERP)
                 }
                 if (!s1) {
                     int op, col;
-                    SymReg *nam;
+                    SymReg *nam = mk_const(interp, str_dup(fixup->name),
+                            fixup->type & VT_ENCODED ? 'U' : 'S');
 
                     op = interp->op_lib->op_code("find_name_p_sc", 1);
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = op;
-
-                    nam = mk_const(interp, str_dup(fixup->name),
-                            fixup->type & VT_ENCODED ? 'U' : 'S');
 
                     if (nam->color >= 0)
                         col = nam->color;
