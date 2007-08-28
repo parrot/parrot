@@ -1463,6 +1463,10 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
         arg_ret_cnt[seen_arrow]++;
         max_regs[REGNO_PMC]++;
     }
+    else {
+        real_exception(interp, NULL, 1,
+                "NULL PMC passed into Parrot_PCCINVOKE");
+    }
 
     /* first loop through signature to get sizing info */
     for (x = signature; *x != '\0'; x++) {
