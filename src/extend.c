@@ -84,7 +84,7 @@ Parrot_PMC_get_string_intkey(PARROT_INTERP,
 
 FUNCDOC: Parrot_PMC_get_pointer_intkey
 
-Return the keyed, signed integer value of the value in the PMC.
+Return a pointer to the PMC indicated by an integer key.
 
 */
 
