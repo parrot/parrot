@@ -332,7 +332,7 @@ node.
 =item vtype([value])
 
 Get/set the type of the value (as a Parrot class identifier).
-For example, a string value might use C<.String>, or an
+For example, a string value might use C<'String'>, or an
 integer might use a language-specific C<['MyInt']> class.
 
 =cut
