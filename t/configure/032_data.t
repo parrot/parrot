@@ -10,11 +10,11 @@ use Test::More tests => 70;
 
 =head1 NAME
 
-t/configure/data.t - tests Parrot::Configure::Data
+t/configure/032_data.t - tests Parrot::Configure::Data
 
 =head1 SYNOPSIS
 
-    prove t/configure/data.t
+    prove t/configure/032_data.t
 
 =head1 DESCRIPTION
 
