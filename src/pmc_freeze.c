@@ -1425,6 +1425,10 @@ visit_loop_todo_list(PARROT_INTERP, NULLOK(PMC *current),
 again:
     for (; (int)list_length(interp, todo);) {
         current = *(PMC**)list_shift(interp, todo, enum_type_PMC);
+        if (!current) {
+            real_exception(interp, NULL, 1,
+                    "NULL current PMC in visit_loop_todo_list");
+        }
         VTABLE_visit(interp, current, info);
         if (thawing) {
             if (current == info->thaw_result)
