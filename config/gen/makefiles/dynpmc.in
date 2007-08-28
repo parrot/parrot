@@ -10,8 +10,6 @@ O           = @o@
 #
 # gdbmhash is only built when 'libgdbm.so' is available
 #
-# There is no config probe for libquantum yet, so add 'quantumreg' manually if desired
-#
 PMCS = \
   dynlexpad \
   foo \
