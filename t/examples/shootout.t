@@ -13,7 +13,7 @@ use vars qw($EXT $DIR @shootouts);
 BEGIN {    # to be run before declaring the number of tests
     $EXT = '.output';
     $DIR = "examples/shootout";
-    opendir( DIR, $DIR ) or die "can’t opendir $DIR: $!";
+    opendir( DIR, $DIR ) or die "can't opendir $DIR: $!";
     @shootouts = grep { -e "$DIR/$_$EXT" } sort grep { /\.pir$/ } readdir(DIR);
     closedir DIR;
 }
@@ -102,7 +102,8 @@ foreach my $script (@shootouts) {
     $ENV{TEST_PROG_ARGS} = $args;
     warn "$file $args\n" if $ENV{TEST_VERBOSE};
     my @todo;
-    @todo = ( todo => 'known GC segfault' ) if $file =~ /regexdna.pir/;
+    # this is an example of todo syntax
+    # @todo = ( todo => 'known GC segfault' ) if $file =~ /regexdna.pir/;
     example_output_is( $file, $expected, @todo );
 }
 
