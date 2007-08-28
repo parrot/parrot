@@ -1,3 +1,10 @@
+=head1 String Operations (continued)
+
+To find the length of a string in PIR, use the length function.
+
+=cut
+
+
 .sub main :main
 
     $S0 = "Hello"
