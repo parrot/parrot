@@ -23,6 +23,11 @@ Needed PIR code is included.
 .const int SESCAPE_CHAR     = 5
 .const int MESCAPE_CHAR     = 6
 
+.sub _init_common_lisp :init
+    $P1 = loadlib 'rational'                   # The rational PMC is needed for 'LispRational'
+.end
+
+
 .include 'include/macros.pir'
 .include 'types.pir'
 .include 'read.pir'
@@ -39,7 +44,7 @@ Needed PIR code is included.
     .local pmc retv                       # return value of function calls
     .local int res
 
-    load_bytecode "PGE.pbc"               # Parrot Grammar engine
+    load_bytecode 'PGE.pbc'               # Parrot Grammar engine
 
     # compile a couple of regexes that are needed in validate.pir
     .local pmc p6rule

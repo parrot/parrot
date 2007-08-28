@@ -1,0 +1,43 @@
+/*
+Copyright (C) 2005-2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/rational.pmc - Rational numbers PMC
+
+=head1 DESCRIPTION
+
+Not implemented yet. 'LispRational' will subclass this.
+
+=head1 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass Rational dynpmc does scalar extends Integer {
+
+    INTVAL get_integer() {
+        return 43;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

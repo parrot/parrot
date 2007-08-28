@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../lib";
 
 # core Perl modules
-use Test::More     tests => 5;
+use Test::More     tests => 6;
 
 # Parrot modules
 use Parrot::Test;

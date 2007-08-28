@@ -42,6 +42,8 @@ Set up the types.
      addattribute class, "internal"
      addattribute class, "name"
 
+     class = subclass "Rational", "LispRational"
+
      class = newclass "LispReadtable"
      addattribute class, "table"
      addattribute class, "case"
