@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 
 use Test::More;
 use File::Find;

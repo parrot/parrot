@@ -10,7 +10,7 @@ use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use IO::Handle;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib t/configure/testlib );
 use Parrot::IO::Capture::Mini;
 
 BEGIN { use_ok('Parrot::Configure::Step'); }

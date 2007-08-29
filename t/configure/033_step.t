@@ -11,7 +11,7 @@ use Cwd;
 use File::Basename qw(basename dirname);
 use File::Temp 0.13 qw/ tempfile /;
 use File::Spec;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib t/configure/testlib );
 use Parrot::IO::Capture::Mini;
 use Tie::Filehandle::Preempt::Stdin;
 

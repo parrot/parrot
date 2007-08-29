@@ -10,7 +10,7 @@ use Carp;
 use Cwd;
 use File::Path ();
 use File::Temp qw(tempdir);
-use lib qw( . lib ../lib ../../lib t/configure/testlib );
+use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::init::install');
 use_ok('config::init::hints');
