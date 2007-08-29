@@ -42,7 +42,7 @@ my ( @no_copyright_files, @outdated_copyright_files );
 my @gmtime = gmtime(time);
 my $current_year = $gmtime[5] + 1900;
 my $copyright_text = 
-    "Copyright \\(C\\) \\d\\d\\d\\d\\-$current_year, The Perl Foundation";
+    "Copyright \\(C\\) \\d\\d\\d\\d\\-$current_year, The Perl Foundation.";
 print $copyright_text, "\n";
 
 foreach my $file (@files) {
@@ -82,7 +82,7 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
         scalar @no_copyright_files . " files:", 
         @no_copyright_files,
         "The copyright statement should read something like:",
-        "  Copyright (C) C<start-year>-$current_year, The Perl Foundation",
+        "  Copyright (C) C<start-year>-$current_year, The Perl Foundation.",
         "To find the C<start-year>, use a command such as:",
         "  svn log C<filename> | tail"
     );
