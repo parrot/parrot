@@ -11,9 +11,9 @@ sub runstep {
 
     $conf->data->set(
         ccflags =>
-            qq{/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/include="./include"},
+            qq{/Prefix=All/Obj=.obj/NoList/include="./include"/nowarn},
         perl => "MCR $^X",
-        exe  => "exe"
+        exe  => ".exe"
     );
 
     {
