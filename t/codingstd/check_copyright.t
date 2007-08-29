@@ -94,7 +94,7 @@ ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
         scalar @outdated_copyright_files . " files:", 
         @outdated_copyright_files,
         "Please update to read something like:",
-        "  Copyright (C) xxxx-$current_year, The Perl Foundation"
+        "  Copyright (C) xxxx-$current_year, The Perl Foundation."
     );
 
 # Local Variables:
