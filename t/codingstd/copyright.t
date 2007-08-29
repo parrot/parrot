@@ -42,7 +42,7 @@ my ( @no_copyright_files, @outdated_copyright_files );
 my @gmtime = gmtime(time);
 my $current_year = $gmtime[5] + 1900;
 my $copyright_text = 
-    "Copyright \\(C\\) \\d\\d\\d\\d\\-$current_year, The Perl Foundation.";
+    "Copyright \\(C\\) (\\d\\d\\d\\d\\-$current_year|$current_year), The Perl Foundation.";
 print $copyright_text, "\n";
 
 foreach my $file (@files) {
@@ -63,7 +63,7 @@ foreach my $file (@files) {
     }
 
     # does there exist a copyright statement at all?
-    if ( $buf !~ m{Copyright \(C\) \d\d\d\d\-}m ) {
+    if ( $buf !~ m{Copyright \(C\) }m ) {
         push @no_copyright_files, $path;
         next;
     }
