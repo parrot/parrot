@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
+/*
  * cfg.c
  *
  * A basic block is the longest sequence of instructions that we are

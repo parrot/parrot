@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
+/*
  * optimizer.c
  *
  * Optimization occurs in three stages:

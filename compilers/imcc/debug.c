@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
+/*
  * print debug info of various structures
  *
  * handle info/error/warning messages from imcc

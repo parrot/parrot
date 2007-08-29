@@ -1,5 +1,9 @@
 /* $Id$ */
 
+/*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #define _PARSER

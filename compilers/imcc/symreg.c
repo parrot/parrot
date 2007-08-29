@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
+/*
  * symreg.c
  *
  * XXX: SymReg stuff has become overused. SymReg should be for symbolic

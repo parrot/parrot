@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
 
 #include "imc.h"
 #include "sets.h"

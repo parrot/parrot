@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2005-2007, The Perl Foundation.
+ */
+
+/*
  * reg_alloc.c - by Bill Coffman
  *
  * Register allocator:
