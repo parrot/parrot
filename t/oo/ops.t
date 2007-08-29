@@ -159,7 +159,7 @@ Monkey
 ok 5 - got name of found class
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', 'addattribute_p_s' );
+pir_error_output_like( <<'CODE', <<'OUT', 'addattribute_p_s' );
 .sub main :main
     $P0 = new 'Class'
     addattribute $P0, 'foo'
