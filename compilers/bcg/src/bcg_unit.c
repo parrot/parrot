@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation.
+ */
+
 #include <string.h>
 #include "bcg.h"
 #include "bcg_private.h"

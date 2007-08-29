@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation.
+ */
+
 #include "bcg_utils.h"
 #include "bcg.h"
 #include "parrot/parrot.h"

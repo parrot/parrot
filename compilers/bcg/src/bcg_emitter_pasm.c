@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation.
+ */
+
 #include "bcg_emitter.h"
 #include "bcg_private.h"
 #include "bcg.h"
