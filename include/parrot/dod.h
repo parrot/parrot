@@ -15,10 +15,10 @@
 
 /* Macros for recursively blocking and unblocking DOD */
 #define Parrot_block_DOD(interp) \
-        do { \
+        { \
             (interp)->arena_base->DOD_block_level++; \
             Parrot_shared_DOD_block(interp); \
-        } while (0)
+        }
 
 #define Parrot_unblock_DOD(interp) \
         if ((interp)->arena_base->DOD_block_level) { \
