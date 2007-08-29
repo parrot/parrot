@@ -188,6 +188,22 @@ PMC itself. However, in the case that the PMC has been subclassed by a non-PMC
 it will hold a pointer to the real object. This is so DYNSELF.method() style
 calls will dispatch correctly, calling any methods and/or v-table methods that
 have been overridden in PIR.
+
+AR: Problem is, not all low-level PMCs have a PMCProxy that could be stored in
+real_self to handle these method calls (they're only created when the subclass
+is created). So, rather than storing real_self for all PMCs, we should only
+store the delegator for objects that are delegated to (whether they're proxied
+or otherwise delegated).
+
+AR: Alternatively, this magic could all live in the PMCProxy: look up the
+method object, and then invoke it passing in the delegator as the invocant.
+(Not practical, because the code from the delegated class will expect to be
+poking into the internals of the object, but will have the wrong object.)
+Alternatively, we could say that PMCProxies must create PDD15 style storage for
+the delegated class. (Not practical, because the delegated class methods will
+expect to be poking into the internals of the object, but will have the wrong
+object.)
+
 }}
 
 C<data> (if present) holds a pointer to any additional data associated  with
@@ -1106,6 +1122,11 @@ class. That something is the C<PMCProxy> PMC. Like a PDD15 class, it is
 attached to the namespace that a PMC is attached to, provides introspection
 facilities and can sit in an inheritance hierarchy.
 
+AR: The PMCProxy PMCs are only created when needed for subclassing a low-level
+PMC, to avoid a large load of unused PMCProxy objects. When created, they are
+cached in the class slot of the namespace corresponding to the low-level PMC,
+so they are only created once.
+
 Therefore, subclassing a PMC looks, at a PIR level, like subclassing a high
 level class.
 
@@ -1119,6 +1140,9 @@ a chunk of state that it can use as it wishes. Further to this, if multiple
 PMCs are inherited from, they may use the state in different ways. Users of
 Parrot at a PIR level should not have to care about such issues.
 
+(AR: I'm willing to make some changes in how low-level PMCs store state in
+order to make this easier.)
+
 Therefore, when a PDD15 object is instantiated and it inherits from PMCs, an
 instance of each of the PMCs that it inherits from is also created. These are
 stored at the end of the object's attributes store.
@@ -1131,6 +1155,9 @@ that are located by C<find_method>, a C<Bound_NCI> PMC is used to ensure that
 the method from the PMC is invoked with the correct instance, so it has access
 to the correct state.
 
+(AR: Why isn't it called directly on the delegated PMC stored in the delegating
+object's data store?)
+
 When a PMC calls a method on itself, it may have been overridden in a high
 level class. Therefore dynamic dispatches of method calls need to be done with
 the vtable of the high level class, not the vtable of the PMC itself.
@@ -1142,8 +1169,20 @@ this pointer will point to the instance of the high level class (an instance
 of the C<Object> PMC). Method dispatches using C<DYNSELF> will always go
 through this mechanism.
 
+(AR: See comment above about delegated calls. Better to have the delegator
+object only exist for delegated PMCs, and have DYNSELF check for it.)
+
 Attribute access is, like method access, delegated upwards. Since attribute
 lookup is a vtable method, the down case is covered by the previous paragraph.
+
+(AR: What about overriding a low-level attribute with a high-level attribute?
+Can you override the core data store of a Hash? The core struct members of an
+STMLog? This would be a lot easier if low-level PMCs had a standard way of
+defining their attributes (core struct members), which could be used to
+generate struct declarations, to automatically fill a PMC's C<inspect>,
+C<get_attr>, and C<set_attr> vtable functions, to annotate PMCProxy objects,
+and to allow state for compile-time roles to be generated in the same struct as
+state from the PMC itself.)
 
 }}
 
@@ -1157,8 +1196,8 @@ high-level class's list of parents. This entry is a proxy class object for the
 low-level PMC class that provides access to the low-level PMC's vtable
 (including the implementations of get_attr and set_attr), and defines the
 storage that the low-level object will need within the high-level object (this
-could be as simple as a single PMC attribute that is an instance of the
-low-level class).
+could be as simple as a single integer attribute that gives an index into the
+object's data store where an instance of the low-level class is stored).
 
 
 =head2 Core PMCs
