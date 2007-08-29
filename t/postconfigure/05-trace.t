@@ -18,7 +18,7 @@ if (
     plan skip_all =>
    q{Tests irrelevant unless configuration completed with tracing requested};
 }
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok( 'Parrot::Configure::Trace' );
 use Parrot::Configure::Step::List qw( get_steps_list );
 
