@@ -83,9 +83,12 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
         "The copyright statement should read something like:",
         "  Copyright (C) C<start-year>-$current_year, The Perl Foundation.",
         "To find the C<start-year>, use a command such as:",
-        "  svn log C<filename> | tail"
+        "  svn log C<filename> | grep 'lines' | tail -n 1"
     );
 
+SKIP: 
+{
+skip("Waiting for decision as to whether copyright dates are necessary");
 ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
     or diag(
     join
@@ -95,6 +98,7 @@ ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
         "Please update to read something like:",
         "  Copyright (C) xxxx-$current_year, The Perl Foundation."
     );
+}
 
 # Local Variables:
 #   mode: cperl
