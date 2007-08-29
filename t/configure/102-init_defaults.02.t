@@ -10,7 +10,7 @@ use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok('config::init::defaults');
 use Parrot::Configure;
 use Parrot::Configure::Step;

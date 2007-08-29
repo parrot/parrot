@@ -8,7 +8,7 @@ use warnings;
 use Test::More tests =>  6;
 use Carp;
 use Data::Dumper;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok('config::init::defaults');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );

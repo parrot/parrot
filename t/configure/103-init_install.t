@@ -10,7 +10,7 @@ use Carp;
 use Cwd;
 use Data::Dumper;
 use File::Temp qw(tempdir);
-use lib qw( . lib ../lib ../../lib t/configure/testlib );
+use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use_ok('config::init::install');

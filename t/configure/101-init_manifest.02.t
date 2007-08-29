@@ -11,7 +11,7 @@ use Cwd;
 use Data::Dumper;
 use File::Copy;
 use File::Temp qw(tempdir);
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok('config::init::manifest');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
