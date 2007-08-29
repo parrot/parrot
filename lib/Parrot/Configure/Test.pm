@@ -11,7 +11,7 @@ our ( @ISA, @EXPORT_OK );
 use Carp;
 *ok = *Test::More::ok;
 *isa_ok = *Test::More::isa_ok;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use Parrot::Configure;
 
 my $stepnum = -1;

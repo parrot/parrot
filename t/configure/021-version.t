@@ -11,7 +11,7 @@ use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
-use lib qw( . lib ../lib ../../lib t/configure/testlib );
+use lib qw( lib t/configure/testlib );
 use Parrot::BuildUtil;
 use_ok( 'Make_VERSION_File', qw| make_VERSION_file |);
 

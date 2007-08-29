@@ -8,7 +8,7 @@ use warnings;
 
 use Test::More tests => 25;
 use Carp;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok('config::init::defaults');
 use_ok('config::init::install');
 use_ok('config::init::hints');

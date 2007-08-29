@@ -10,7 +10,7 @@ use Cwd;
 use Data::Dumper;
 use File::Temp qw( tempdir );
 use Test::More tests => 14;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok('Parrot::IO::Capture::Mini');
 use_ok(
     'Parrot::Configure::Options', qw|

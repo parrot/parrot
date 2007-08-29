@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp;
 use Test::More tests => 10;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 use_ok(
     'Parrot::Configure::Messages', qw|
         print_introduction

@@ -11,7 +11,7 @@ use Carp;
 use_ok( 'Cwd' );
 use_ok( 'File::Copy' );
 use_ok( 'File::Temp', qw| tempdir | );
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 
 my ($current, $config);
 
