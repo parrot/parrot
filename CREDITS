@@ -574,6 +574,9 @@ D: Patch to repair 'make clean'
 N: Thilo Planz
 D: partcl tests and inspiration
 
+N: Thomas Kratz
+D: Fixes for VMS
+
 N: TOGoS
 D: Some FAQ questions and answers
 
