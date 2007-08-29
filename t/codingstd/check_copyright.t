@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006-2007, The Perl Foundation.
-# $Id: trailing_space.t 18563 2007-05-16 00:53:55Z chromatic $
+# $Id$
 
 use strict;
 use warnings;
