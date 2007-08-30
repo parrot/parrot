@@ -1038,7 +1038,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 2" );
     .return ($S0)
 .end
 CODE
-Foo ok 1
+parrot;Foo ok 1
 ok 2
 ok 1
 OUTPUT
@@ -1065,7 +1065,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 3" );
 .end
 
 CODE
-Foo ok 1
+parrot;Foo ok 1
 OUTPUT
 
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
