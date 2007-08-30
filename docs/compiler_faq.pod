@@ -146,7 +146,7 @@ list in PIR?
 If you have a variable amounts of arguments in an array, you can
 pass all items of that array with the C<:flat> directive.
 
-  ar = new .ResizablePMCArray
+  ar = new 'ResizablePMCArray'
   push ar, "arg 1\n"
   push ar, "arg 2\n"
   ...
@@ -210,7 +210,7 @@ or the C<find_global> op:
 You can retrieve the namespace hash and use the C<delete> opcode.
 
   .sub main :main
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     store_hll_global 'foo', $P0
     store_hll_global ['Bar'], 'baz', $P0
     # ...
@@ -389,7 +389,7 @@ Or you can specify the constructor method by setting the BUILD
 property of the class PMC:
 
     newclass $P0, 'Dog'         # create a class named Dog
-    new $P1, .String            # create a string
+    new $P1, 'String'           # create a string
     set $P1, 'initialise'       # set it to the name of the constructor method
     setprop $P0, 'BUILD', $P1   # set the BUILD property
 
@@ -412,7 +412,7 @@ You can pass only a single argument to a constructor.  By convention,
 a hash PMC is passed to the constructor that contains the arguments as
 key/value pairs:
 
-    new $P0, .Hash
+    new $P0, 'Hash'
     set $P0['greeting'], 'hello'
     set $P0['size'], 1.23
 
@@ -434,14 +434,14 @@ TODO
 
 Create an Exception object and throw it!
 
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     throw $P0
 
 Not too hard, is it?
 
 =head2 How do I throw an exception with an error message in PIR?
 
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = 'something happened'
     throw $P0
 
@@ -450,7 +450,7 @@ Not too hard, is it?
 Use C<push_eh> to push an exception handler onto the stack.
 
     push_eh handler
-      $P0 = new .Exception        # or any other code ...
+      $P0 = new 'Exception'       # or any other code ...
       throw $P0                   # ... that might throw
     clear_eh
     exit 0
@@ -482,7 +482,7 @@ Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
 =head2 How do I access the error message of an exception I've caught?
 
     push_eh handler
-    $P0 = new .Exception
+    $P0 = new 'Exception'
     $P0['_message'] = 'something happened'
     throw $P0
     clear_eh
@@ -553,7 +553,7 @@ makefile:
 Create a new C<Env> PMC and access it like a hash.
 
     .local pmc e
-    e = new .Env
+    e = new 'Env'
     $P0 = e['USER']      # lt
 
 =head2 How can I access Parrot's configuration?

@@ -109,11 +109,11 @@ USE_DEFAULT_SIZE:
 SIZE_IS_NOW_KNOWN:        
         print "\n"
 
-        new P0, .FixedPMCArray
+        new P0, 'FixedPMCArray'
         set P0, 3
-        new P1, .ResizableIntegerArray
-        new P2, .ResizableIntegerArray
-        new P3, .ResizableIntegerArray
+        new P1, 'ResizableIntegerArray'
+        new P2, 'ResizableIntegerArray'
+        new P3, 'ResizableIntegerArray'
         set P0[0], P1                         #P0 = [[],[],[]]
         set P0[1], P2
         set P0[2], P3

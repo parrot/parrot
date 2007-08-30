@@ -23,8 +23,8 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new ref" );
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P2, 'Integer'
+    new P1, 'Ref', P2
     print "ok 1\n"
     end
 CODE
@@ -32,8 +32,8 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "inc ref" );
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P2, 'Integer'
+    new P1, 'Ref', P2
     inc P1
     print P1
     print P2
@@ -44,9 +44,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "dec ref" );
-    new P2, .Integer
-        set P2, 2
-    new P1, .Ref, P2
+    new P2, 'Integer'
+    set P2, 2
+    new P1, 'Ref', P2
     dec P1
     print P1
     print P2
@@ -57,8 +57,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "deref" );
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P2, 'Integer'
+    new P1, 'Ref', P2
     print "ok 1\n"
     deref P3, P1
     typeof S0, P1
@@ -75,10 +75,10 @@ Integer
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "setref ref" );
-    new P2, .Integer
-    new P3, .Float
+    new P2, 'Integer'
+    new P3, 'Float'
     set P3, 0.5
-    new P1, .Ref, P2
+    new P1, 'Ref', P2
     inc P1
     print P1
     print "\n"
@@ -101,11 +101,11 @@ OUTPUT
 TODO: {
     local $TODO = 'pending new Ref semantic';
     pasm_output_is( <<'CODE', <<'OUTPUT', "assign ref" );
-    new P2, .Integer
-    new P3, .Float
-        set P2, 0
+    new P2, 'Integer'
+    new P3, 'Float'
+    set P2, 0
     set P3, 0.5
-    new P1, .Ref, P2
+    new P1, 'Ref', P2
     assign P1, 1
     print P1
     print "\n"
@@ -126,8 +126,8 @@ OUTPUT
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "typeof SharedRef" );
-    new P2, .Integer
-    new P1, .SharedRef, P2
+    new P2, 'Integer'
+    new P1, 'SharedRef', P2
     print "ok 1\n"
     set P1, 4711
     print P1
@@ -150,8 +150,8 @@ hello
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "deref SharedRef" );
-    new P2, .Integer
-    new P1, .SharedRef, P2
+    new P2, 'Integer'
+    new P1, 'SharedRef', P2
     print "ok 1\n"
     deref P3, P1
     print "never\n"
@@ -201,14 +201,14 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set/get int" );
-    new P2, .Integer
-    new P1, .Ref, P2
-        set P1, 10
-        print P2
-        print "\n"
-        set I0, P1
-        print I0
-        print "\n"
+    new P2, 'Integer'
+    new P1, 'Ref', P2
+    set P1, 10
+    print P2
+    print "\n"
+    set I0, P1
+    print I0
+    print "\n"
     end
 CODE
 10
@@ -216,8 +216,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set/get float" );
-    new P2, .Float
-    new P1, .Ref, P2
+    new P2, 'Float'
+    new P1, 'Ref', P2
         set P1, 12.5
         set N0, P2
         set N1, 12.5
@@ -235,8 +235,8 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push/pop" );
-    new P2, .ResizableIntegerArray
-    new P1, .Ref, P2
+    new P2, 'ResizableIntegerArray'
+    new P1, 'Ref', P2
         push P1, 200
         push P1, -3
         set I0, P1
@@ -264,8 +264,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, ref, ref" );
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P2, 'Integer'
+    new P1, 'Ref', P2
         set P1, 10
         add P1, P1, P1
         print P2
@@ -276,9 +276,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, ref, int" );
-        new P3, .Integer
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P3, 'Integer'
+    new P2, 'Integer'
+    new P1, 'Ref', P2
         set P3, 12
         set P1, 10
         add P1, P1, P3
@@ -290,9 +290,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, int, ref" );
-        new P3, .Integer
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P3, 'Integer'
+    new P2, 'Integer'
+    new P1, 'Ref', P2
         set P3, 12
         set P1, 10
         add P1, P3, P1
@@ -304,9 +304,9 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add ref, int, int" );
-        new P3, .Integer
-    new P2, .Integer
-    new P1, .Ref, P2
+    new P3, 'Integer'
+    new P2, 'Integer'
+    new P1, 'Ref', P2
         set P3, 12
         set P1, 10
         add P1, P3, P3

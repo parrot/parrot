@@ -4,7 +4,7 @@
     .param pmc argv
 
     .local pmc code_as_data
-    code_as_data = new .ResizableIntegerArray
+    code_as_data = new 'ResizableIntegerArray'
 # ------ Start of data section ------
 push code_as_data, 35
 push code_as_data, 32
@@ -1028,7 +1028,7 @@ push code_as_data, 110
 push code_as_data, 101
 push code_as_data, 119
 push code_as_data, 32
-push code_as_data, 46
+push code_as_data, 39
 push code_as_data, 82
 push code_as_data, 101
 push code_as_data, 115
@@ -1050,6 +1050,7 @@ push code_as_data, 114
 push code_as_data, 114
 push code_as_data, 97
 push code_as_data, 121
+push code_as_data, 39
 push code_as_data, 92
 push code_as_data, 110
 push code_as_data, 34
@@ -2162,7 +2163,7 @@ push code_as_data, 110
 push code_as_data, 101
 push code_as_data, 119
 push code_as_data, 32
-push code_as_data, 46
+push code_as_data, 39
 push code_as_data, 73
 push code_as_data, 116
 push code_as_data, 101
@@ -2171,6 +2172,7 @@ push code_as_data, 97
 push code_as_data, 116
 push code_as_data, 111
 push code_as_data, 114
+push code_as_data, 39
 push code_as_data, 44
 push code_as_data, 32
 push code_as_data, 100
@@ -2603,7 +2605,7 @@ push code_as_data, 110
 push code_as_data, 101
 push code_as_data, 119
 push code_as_data, 32
-push code_as_data, 46
+push code_as_data, 39
 push code_as_data, 73
 push code_as_data, 116
 push code_as_data, 101
@@ -2612,6 +2614,7 @@ push code_as_data, 97
 push code_as_data, 116
 push code_as_data, 111
 push code_as_data, 114
+push code_as_data, 39
 push code_as_data, 44
 push code_as_data, 32
 push code_as_data, 100
@@ -3532,7 +3535,7 @@ DO_QUINE:
     print "    .param pmc argv\n"
     print "\n"
     print "    .local pmc code_as_data\n"
-    print "    code_as_data = new .ResizableIntegerArray\n"
+    print "    code_as_data = new 'ResizableIntegerArray'\n"
     print "# ------ Start of data section ------\n"
 
     # Now the data
@@ -3581,7 +3584,7 @@ DO_QUINE:
    .local pmc iter
    .local int char_int
    
-   iter = new .Iterator, data     
+   iter = new 'Iterator', data     
     iter = .ITERATE_FROM_START # reset iterator, begin at start
     ITER_LOOP:
     unless iter goto ITER_END         # while (entries) ...
@@ -3600,7 +3603,7 @@ DO_QUINE:
    .include "iterator.pasm"
 
    .local pmc iter
-    iter = new .Iterator, data     
+    iter = new 'Iterator', data     
     iter = .ITERATE_FROM_START # reset iterator, begin at start
 
    .local int    char_int

@@ -22,7 +22,7 @@ argsok:
     $P0.'recursion_limit'(100000)
 
     .local pmc array
-    array = new .FixedFloatArray
+    array = new 'FixedFloatArray'
     array = 11
 
     dec n

@@ -180,7 +180,7 @@ object; it only calls the PMC's vtable method for assignment. So,
 rewriting the same example using a PMC has a completely different
 result:
 
-  new P0, .String
+  new P0, "String"
   set P0, "Ford"
   set P1, P0
   set P0, "Zaphod"
@@ -215,7 +215,7 @@ to look up the integer value of a named type.
 When the source argument is a PMC and the destination is a string
 register, C<typeof> returns the name of the type:
 
-  new P0, .String
+  new P0, "String"
   typeof S0, P0               # S0 is "String"
   print S0
   print "\n"
@@ -226,7 +226,7 @@ In this example, C<typeof> returns the type name "String".
 When the source argument is a PMC and the destination is an integer
 register, C<typeof> returns the integer representation of the type:
 
-  new P0, .String
+  new P0, "String"
   typeof I0, P0               # I0 is 36
   print I0
   print "\n"
@@ -327,7 +327,7 @@ Perl's polymorphic scalar behavior. Assigning a string to a number PMC
 morphs it into a string PMC. Assigning an integer value morphs it to a
 C<Int>, and assigning C<undef> morphs it to C<Undef>:
 
-  new P0, .String
+  new P0, "String"
   set P0, "Ford\n"
   print P0           # prints "Ford\n"
   set P0, 42
@@ -504,9 +504,9 @@ X<PMCs (Parrot Magic Cookies);concatenation>
 For PMC registers, C<concat> has only a three-argument form with
 separate registers for source and destination:
 
-  new P0, .String
-  new P1, .String
-  new P2, .String
+  new P0, "String"
+  new P1, "String"
+  new P2, "String"
   set P0, "ab"
   set P1, "cd"
   concat P2, P0, P1
@@ -652,7 +652,7 @@ string or PMC. Instead of just copying the pointer, as normal
 assignment would, it recursively copies the string or object
 underneath.
 
-  new P0, .String
+  new P0, "String"
   set P0, "Ford"
   clone P1, P0
   set P0, "Zaphod"
@@ -953,11 +953,11 @@ specified R<size>.
 
 Here's a short illustration of string formats:
 
-  new P2, .Array
-  new P0, .Int
+  new P2, "Array"
+  new P0, "Int"
   set P0, 42
   push P2, P0
-  new P1, .Num
+  new P1, "Num"
   set P1, 10
   push P2, P1
   sprintf S0, "int %#Px num %+2.3Pf\n", P2
@@ -1013,7 +1013,7 @@ The C<join> opcode joins the elements of an array PMC into a single
 string. The second argument separates the individual elements of the
 PMC in the final string result.
 
-  new P0, .Array
+  new P0, "Array"
   push P0, "hi"
   push P0, 0
   push P0, 1
@@ -1258,7 +1258,7 @@ The C<Array>X<Array PMC> PMC is an ordered aggregate with
 zero-baed integer keys. The syntax for X<keyed access to PMCs> keyed access to a
 PMC puts the key in square brackets after the register name:
 
-  new P0, .Array  # obtain a new array object
+  new P0, "Array"     # obtain a new array object
   set P0, 2           # set its length
   set P0[0], 10       # set first element to 10
   set P0[1], I31      # set second element to I31
@@ -1299,7 +1299,7 @@ X<PMCs (Parrot Magic Cookies);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
 string keys:
 
-  new P1, .Hash   # generate a new hash object
+  new P1, "Hash"      # generate a new hash object
   set P1["key"], 10   # set key and value
   set I0, P1["key"]   # obtain value for key
   set I1, P1          # number of entries in hash
@@ -1309,7 +1309,7 @@ value exists in an aggregate. It returns 1 if it finds the key in the
 aggregate, and returns 0 if it doesn't. It doesn't care if the value
 itself is true or false, only that the key has been set:
 
-  new P0, .Hash
+  new P0, "Hash"
   set P0["key"], 0
   exists I0, P0["key"] # does a value exist at "key"
   print I0             # prints 1
@@ -1327,7 +1327,7 @@ Iterators extract values from an aggregate PMC. You create an iterator
 by creating a new C<Iterator> PMC, and passing the array to C<new> as
 an additional parameter:
 
-      new P1, .Iterator, P2
+      new P1, "Iterator", P2
 
 The include file F<iterator.pasm> defines some constants for working
 with iterators. The C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END>
@@ -1337,11 +1337,11 @@ from the array. An iterator PMC is true as long as it still has values
 to be retrieved (tested by C<unless> below).
 
   .include "iterator.pasm"
-      new P2, .Array
+      new P2, "Array"
       push P2, "a"
       push P2, "b"
       push P2, "c"
-      new P1, .Iterator, P2
+      new P1, "Iterator", P2
       set P1, .ITERATE_FROM_START
 
   iter_loop:
@@ -1357,11 +1357,11 @@ keys. With hashes it's only meaningful to iterate in one direction,
 since they don't define any order for their keys.
 
   .include "iterator.pasm"
-      new P2, .Hash
+      new P2, "Hash"
       set P2["a"], 10
       set P2["b"], 20
       set P2["c"], 30
-      new P1, .Iterator, P2
+      new P1, "Iterator", P2
       set P1, .ITERATE_FROM_START_KEYS
 
   iter_loop:
@@ -1384,8 +1384,8 @@ operation, so PASM provides a way to do it in a single instruction.
 Complex keys specify a series of nested data structures, with each
 individual key separated by a semicolon:
 
-  new P0, .Hash
-  new P1, .Array
+  new P0, "Hash"
+  new P1, "Array"
   set P1[2], 42
   set P0["answer"], P1
   set I1, 2
@@ -1413,8 +1413,8 @@ and that C<clone> creates a complete duplicate object. But if you just
 want to assign the value of one PMC to another PMC, you need the
 C<assign>X<assign opcode (PASM)> opcode:
 
-  new P0, .Int
-  new P1, .Int
+  new P0, "Int"
+  new P1, "Int"
   set P0, 42
   set P2, P0
   assign P1, P0     # note: P1 has to exist already
@@ -1454,9 +1454,9 @@ returns the value of a property. It also takes three arguments: the
 PMC to store the property's value, the name of the property, and the
 PMC from which the property value is to be retrieved:
 
-  new P0, .String
+  new P0, "String"
   set P0, "Zaphod"
-  new P1, .Int
+  new P1, "Int"
   set P1, 1
   setprop P0, "constant", P1        # set a property on P0
   getprop P3, "constant", P0        # retrieve a property on P0
@@ -1918,7 +1918,7 @@ Global variables are stored in a C<Hash>, so every variable name
 must be unique.  PASM has two opcodes for globals, C<store_global> and
 C<find_global>:
 
-  new P10, .Int
+  new P10, "Int"
   set P10, 42
   store_global "$foo", P10
   # ...
@@ -1985,7 +1985,7 @@ C<find_lex> to retrieve a variable from a pad, C<push_pad> to push a
 pad onto the pad stack, and C<pop_pad> to remove a pad from the stack:
 
   new_pad 0                # create and push a pad with depth 0
-  new P0, .Int         # create a variable
+  new P0, "Int"            # create a variable
   set P0, 10               # assign value to it
   store_lex 0, "$foo", P0  # store the var at depth 0 by name
   # ...
@@ -2043,10 +2043,10 @@ the stack:
 
   new_pad 0                  # outer scope
   new_pad 1                  # inner scope
-  new P0, .Int
+  new P0, "Int"
   set P0, 10
   store_lex -1, "$foo", P0   # store in top pad
-  new P1, .Int
+  new P1, "Int"
   set P1, 20
   store_lex -2, "$foo", P1   # store in next outer scope
   find_lex P2, "$foo"        # find in all scopes
@@ -2582,7 +2582,7 @@ snippet:
 
     # call _foo
     newsub P16, .Sub, _foo  # new subroutine object at address _foo
-    new P17, .Int       # value for $n
+    new P17, "Int"          # value for $n
     set P17, 10             # we use local vars from P16 ...
     set P0, P16             # the subroutine
     set P5, P17             # first argument
@@ -2592,7 +2592,7 @@ snippet:
     set P18, P5             # the returned closure
 
     # call _closure
-    new P19, .Int       # argument to closure
+    new P19, "Int"          # argument to closure
     set P19, 3
     set P0, P18             # the closure
     set P5, P19             # one argument
@@ -2664,7 +2664,7 @@ swapping all stacks). The next time the coroutine is invoked, it
 continues to execute from the point at which it previously returned:
 
     new_pad 0                # push a new lexical pad on stack
-    new P0, .Int         # save one variable in it
+    new P0, "Int"            # save one variable in it
     set P0, 10
     store_lex -1, "var", P0
 
@@ -2723,7 +2723,7 @@ A continuation is a subroutine that gets a complete copy of the
 caller's context, including its own copy of the call stack. Invoking a
 continuation starts or restarts it at the entry point:
 
-    new P1, .Int
+    new P1, "Int"
     set P1, 5
 
     newsub P0, .Continuation, _con
@@ -2975,16 +2975,16 @@ threads (no-one really wants to spawn two threads just to print out a
 simple string).
 
     find_global P5, "_th1"              # locate thread function
-    new P2, .ParrotThread               # create a new thread
+    new P2, "ParrotThread"              # create a new thread
     find_method P0, P2, "thread3"       # a shared thread's entry
-    new P7, .TQueue                     # create a Queue object
-    new P8, .Int                        # and a Int
+    new P7, "TQueue"                    # create a Queue object
+    new P8, "Int"                       # and a Int
     push P7, P8                         # push the Int onto queue
-    new P6, .String                     # create new string
+    new P6, "String"                    # create new string
     set P6, "Js nte artHce\n"
     set I3, 3                           # thread function gets 3 args
     invoke                              # _th1.run(P5,P6,P7)
-    new P2, .ParrotThread               # same for a second thread
+    new P2, "ParrotThread"              # same for a second thread
     find_global P5, "_th2"
     set P6, "utaohrPro akr"             # set string to 2nd thread's
     invoke                              # ... data, run 2nd thread too
@@ -3010,7 +3010,7 @@ simple string).
     substr S0, S5, I0, 1                # if not print next char
     print S0
     inc I0
-    new P8, .Int                        # and put a defined entry
+    new P8, "Int"                       # and put a defined entry
     push P7, P8                         # onto the queue so that
     if S0, w2                           # the other thread will run
     invoke P1                           # done with string
@@ -3077,7 +3077,7 @@ method belongs to the C<ParrotThread> class. When it's called on a
 C<ParrotThread> object, the calling code waits until the thread
 terminates.
 
-    new P2, .ParrotThread       # create a new thread
+    new P2, "ParrotThread"      # create a new thread
     set I5, P2                  # get thread ID
 
     find_method P0, P2, "join"  # get the join method...
@@ -3224,7 +3224,7 @@ attribute, creates a C<Int> PMC, and stores it as the first
 attribute:
 
     classoffset I0, P2, "Foo"     # first "Foo" attribute of object P2
-    new P6, .Int              # create storage for the attribute
+    new P6, "Int"                 # create storage for the attribute
     setattribute P2, I0, P6       # store the first attribute
 
 The C<classoffset> opcodeX<classoffset opcode (PASM)> takes a PMC
@@ -3243,7 +3243,7 @@ There is also support for named parameters with fully qualified
 parameter names (although this is a little bit slower than getting
 the class offset once and accessing several attributes by index):
 
-    new P6, .Int
+    new P6, "Int"
     setattribute P2, "Foo\x0.i", P6   # store the attribute
 
 You use the same integer index to retrieve the value of an attribute.
@@ -3334,7 +3334,7 @@ the object with an integer:
 
   .pcc_sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
-    new P6, .Int              # create storage for the attribute
+    new P6, "Int"                 # create storage for the attribute
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 
@@ -3654,7 +3654,7 @@ Z<CHP-9-SECT-12.6>
 
   .pcc_sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
-    new P6, .Int              # create a store for the attribute
+    new P6, "Int"                 # create a store for the attribute
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 

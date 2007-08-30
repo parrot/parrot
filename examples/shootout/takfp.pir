@@ -22,7 +22,7 @@ argsok:
 	$N2 = n
 	$N2 *= 1
 	f = Tak($N0, $N1, $N2)
-	$P0 = new .FixedFloatArray
+	$P0 = new 'FixedFloatArray'
 	$P0 = 1
 	$P0[0] = f
 	$S0 = sprintf "%.1f\n", $P0

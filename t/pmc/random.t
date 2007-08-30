@@ -30,7 +30,7 @@ Tests random number generation
 
     plan(2)
 
-    new P0, .Random
+    new P0, 'Random'
     ok(1, 'Instantiated .Random')
     set I0, P0
     ok(1, 'Got (unknown) random int')

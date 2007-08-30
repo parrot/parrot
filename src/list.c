@@ -69,7 +69,7 @@ be created.
 To avoid this - and the performance penalty - set the array size
 before setting elements.
 
-    new P0, .Array
+    new P0, 'Array'
     set P0, 100000  # sets fixed sized, no sparse
 
 This is only meaningful, if a lot of the entries are used too.
@@ -95,7 +95,7 @@ range. See C<get_chunk> below for details.
 
 To save memory, List can handle sparse arrays. This code snippet:
 
-new P0, .IntList
+new P0, 'IntList'
 set P0[1000000], 42
 
 generates 3 List_chunks, one at the beginning of the array, a

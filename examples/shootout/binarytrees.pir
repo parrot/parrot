@@ -41,7 +41,7 @@ else:
 	null left
 	null right
 endif:
-	tree = new .FixedPMCArray
+	tree = new 'FixedPMCArray'
 	tree = 3
 	tree[0] = left
 	tree[1] = right

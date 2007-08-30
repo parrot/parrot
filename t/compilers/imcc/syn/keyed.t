@@ -15,9 +15,9 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<'OUTPUT', "add_keyed" );
 .sub test :main
-    new P0, .Array
-    new P1, .Array
-    new P2, .Array
+    new P0, 'Array'
+    new P1, 'Array'
+    new P2, 'Array'
     P0 = 1
     P1 = 2
     P2 = 11

@@ -36,7 +36,7 @@ lp:
 no_sym:
     $I0 = typeof $P0
     if $I0 != .NCI goto no_nci
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "NCI"
 no_nci:
     print spac

@@ -30,7 +30,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping array of sorted numbers" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 0
     push array, 1
     push array, 2
@@ -66,7 +66,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping unsorted numbers" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 6
     push array, 1
     push array, 8
@@ -102,7 +102,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping sorted strings" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "alpha"
     push array, "bravo"
     push array, "charlie"
@@ -133,7 +133,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "charlie"
     push array, "hotel"
     push array, "alpha"
@@ -165,7 +165,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping different types" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 0.1
     push array, "charlie"
     push array, 2
@@ -225,11 +225,11 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data" );
     .local pmc array1
     .local pmc array2
 
-    new hash1, .Hash
-    new hash2, .Hash
-    new hash3, .Hash
-    new array1, .ResizablePMCArray
-    new array2, .ResizablePMCArray
+    new hash1, 'Hash'
+    new hash2, 'Hash'
+    new hash3, 'Hash'
+    new array1, 'ResizablePMCArray'
+    new array2, 'ResizablePMCArray'
 
     _dumper( hash1,"hash1" )
 
@@ -325,15 +325,15 @@ pir_output_is( <<'CODE', <<'OUT', "properties" );
     .local pmc str
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "test1"
     push array, "test2"
 
-    new str, .String
+    new str, 'String'
     set str, "value1"
     setprop array, "key1", str
 
-    new str, .String
+    new str, 'String'
     set str, "value2"
     setprop array, "key2", str
 
@@ -362,10 +362,10 @@ pir_output_is( <<'CODE', <<'OUT', "indent string" );
     .local string name
     .local string indent
 
-    new hash1, .Hash
-    new hash2, .Hash
-    new array1, .ResizablePMCArray
-    new array2, .ResizablePMCArray
+    new hash1, 'Hash'
+    new hash2, 'Hash'
+    new array1, 'ResizablePMCArray'
+    new array2, 'ResizablePMCArray'
 
     set hash1["hash2"], hash2
     set hash2["array"], array1
@@ -425,7 +425,7 @@ pir_output_is( <<'CODE', <<'OUT', "back-referencing properties" );
 .sub test :main
     .local pmc hash
 
-    new hash, .Hash
+    new hash, 'Hash'
 
     set hash["hello"], "world"
     setprop hash, "backref", hash
@@ -447,7 +447,7 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (1)" );
     .local pmc hash
     .local pmc prop
 
-    new hash, .Hash
+    new hash, 'Hash'
 
     set hash["hello"], "world"
     setprop hash, "self", hash
@@ -473,9 +473,9 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (2)" );
     .local pmc hash2
     .local pmc prop
 
-    new array, .ResizablePMCArray
-    new hash1, .Hash
-    new hash2, .Hash
+    new array, 'ResizablePMCArray'
+    new hash1, 'Hash'
+    new hash2, 'Hash'
 
     set hash1["hello1"], "world1"
     set hash2["hello2"], "world2"
@@ -518,7 +518,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     newclass temp, "TestClass"
 
     find_type I0, "TestClass"
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     new temp, I0
     push array, temp
     new temp, I0
@@ -578,7 +578,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
     .local pmc array
     .local pmc temp
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
 
     push array, 0
 
@@ -587,11 +587,11 @@ pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
     null temp
     push array, temp
 
-    new temp, .Integer
+    new temp, 'Integer'
     set temp, 0
     push array, temp
 
-    new temp, .String
+    new temp, 'String'
     set temp, "0"
     push array, temp
 
@@ -649,10 +649,10 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data in Hash" );
     .local pmc hash3
     .local pmc array1
 
-    new hash1, .Hash
-    new hash2, .Hash
-    new hash3, .Hash
-    new array1, .ResizablePMCArray
+    new hash1, 'Hash'
+    new hash2, 'Hash'
+    new hash3, 'Hash'
+    new array1, 'ResizablePMCArray'
 
     _dumper( hash1,"hash1" )
 
@@ -748,7 +748,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping Integer PMC" );
 .sub test :main
     .local pmc int1
 
-    new int1, .Integer
+    new int1, 'Integer'
     int1 = 12345
     _dumper( int1, "Int:" )
 .end
@@ -763,7 +763,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping Float PMC" );
 .sub test :main
     .local pmc float1
 
-    new float1, .Float
+    new float1, 'Float'
     float1 = 12345.678
     _dumper( float1, "Float:" )
 .end
@@ -777,7 +777,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 12345
     push array, "hello"
     _dumper( array, "array:" )
@@ -795,7 +795,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizableStringArray
+    new array, 'ResizableStringArray'
     push array, "hello"
     push array, "world"
     _dumper( array, "array:" )
@@ -813,7 +813,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizableIntegerArray
+    new array, 'ResizableIntegerArray'
     push array, 12345
     push array, 67890
     _dumper( array, "array:" )
@@ -831,7 +831,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .ResizableFloatArray
+    new array, 'ResizableFloatArray'
     push array, 123.45
     push array, 67.89
     _dumper( array, "array:" )
@@ -849,7 +849,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .FixedPMCArray
+    new array, 'FixedPMCArray'
     array = 2
     array[0] = 12345
     array[1] = "hello"
@@ -868,7 +868,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .FixedStringArray
+    new array, 'FixedStringArray'
     array = 2
     array[0] = "hello"
     array[1] = "world"
@@ -887,7 +887,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .FixedIntegerArray
+    new array, 'FixedIntegerArray'
     array = 2
     array[0] = 12345
     array[1] = 67890
@@ -906,7 +906,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC" );
 .sub test :main
     .local pmc array
 
-    new array, .FixedFloatArray
+    new array, 'FixedFloatArray'
     array = 2
     array[0] = 123.45
     array[1] = 67.89

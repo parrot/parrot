@@ -41,7 +41,7 @@ is not subclassed further.
     addattribute $P0, "board"
 
     # set the BUILD method name
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'BUILD'
     setprop $P0, 'BUILD', $P1
 END:
@@ -71,35 +71,35 @@ The board the new block will belong to.
     .local int id
 
     classoffset id, self, "Tetris::Block"
-    
+
     #
     # set some properties
     #
 
     # xpos
-    new prop, .Integer
+    new prop, 'Integer'
     set prop, 0
     setattribute self, id, prop
     inc id
-    
+
     # xposdiff
-    new prop, .Integer
+    new prop, 'Integer'
     set prop, 0
     setattribute self, id, prop
     inc id
-    
+
     # ypos
-    new prop, .Integer
+    new prop, 'Integer'
     set prop, 0
     setattribute self, id, prop
     inc id
 
     # fall
-    new prop, .Integer
+    new prop, 'Integer'
     set prop, 0
     setattribute self, id, prop
     inc id
-    
+
     # set the board the block blongs to
     setattribute self, id, board
 
@@ -133,7 +133,7 @@ Returns whether the block is falling down fast.
     add $I0, Fall
     getattribute $P0, self, $I0
     $I0 = $P0
-        
+
     .return ($I0)
 .end
 
@@ -150,7 +150,7 @@ Returns the x and y position of the block.
     .local pmc xposP
     .local pmc xposdiffP
     .local pmc yposP
-    
+
     classoffset $I0, self, "Tetris::Block"
     add $I0, xPos
     getattribute xposP, self, $I0
@@ -163,7 +163,7 @@ Returns the x and y position of the block.
     add $I0, yPos
     getattribute yposP, self, $I0
     sub $I0, yPos
-    
+
     # calculate the ypos
     $I0 = self."vfree"()
     ypos = yposP
@@ -204,10 +204,10 @@ Returns 1 if the rotation was possible, 0 otherwise.
     .local int i
     .local int j
     .local int ret
-    
+
     size = self."size"()
     ret = self."validPosition"()
-    
+
     unless ret goto END
 
     # rotate the block
@@ -252,7 +252,7 @@ Returns the board associated with this block.
     classoffset $I0, self, "Tetris::Block"
     add $I0, Board
     getattribute $P0, self, $I0
-    
+
     .return ($P0)
 .end
 
@@ -264,7 +264,7 @@ Set the board associated with this block.
 
 .sub setBoard :method
     .param pmc board
-    
+
     # get the board
     classoffset $I0, self, "Tetris::Block"
     add $I0, Board
@@ -331,11 +331,11 @@ xLOOP:
     add yp, y
     if yp < 0 goto ERROR
     if yp >= height goto ERROR
-    
+
     i = board."offset"( xp, yp )
     i = board[i]
     if i goto ERROR
-    
+
 SKIP:
     inc x
     if x >= size goto yLOOP
@@ -375,7 +375,7 @@ This method returns 1 on success, 0 otherwise.
 
     add $I0, yPos
     getattribute ypos, self, $I0
-    
+
     set xold, xpos
     set yold, ypos
     add xpos, xval
@@ -437,11 +437,11 @@ This method returns nothing.
     .local pmc app
     .local pmc rect
 
-    rect = new .Hash
-    
+    rect = new 'Hash'
+
     # get the application
     app = self."application"()
-    
+
     # get the block's width/height
     size = self."size"()
     # get the block's id
@@ -471,19 +471,19 @@ This method returns nothing.
     mul yp, extent
     add xp, xshift
     add yp, yshift
-    
+
     i = app."flag"( "show blocksize" )
     unless i goto NO_BLOCKSIZE
     set i, size
     mul i, extent
-    
+
     rect["x"] = xp
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
     find_type $I0, "SDL::Rect"
     temp = new $I0, rect
-    
+
     surface."fill_rect"( temp, color )
     sub i, 2
     inc xp
@@ -516,7 +516,7 @@ LOOPx:
 
     $I0 = self[i]
     if $I0 == 0 goto SKIP
-    
+
     dec extent
     rect["x"] = xp
     rect["y"] = yp
@@ -557,7 +557,7 @@ Returns 1 if the screen has to be redrawn.
     redraw = 0
     app = self."application"()
     board = self."board"()
-    
+
     fall = self."falling"()
     if fall goto FALL
 
@@ -572,13 +572,13 @@ FALL:
     diff = board."fallInterval"()
     add curtime, diff
     board."setNextFallTime"( curtime )
-    
+
     # let the block fall down one unit
     self."moveDown"()
-    
+
     # is it not falling fast?
     unless fall goto NOFALL
-    
+
     # let the block fall down fast
 AGAIN:
     app."drawScreen"( 0 )
@@ -606,7 +606,7 @@ the C<next block> has been prepared.
 
     okay = self."move"( 0, +1 )
     if okay goto BLOCK_MOVEDOWN_OKAY
-    
+
     # get the board
     board = self."board"()
     # lock the block
@@ -637,7 +637,7 @@ Returns the application object assosicated with the block's board.
 
 .sub setXPosition :method
     .param int pos
-    
+
     getprop $P0, "xpos", self
     $P0 = pos
 .end

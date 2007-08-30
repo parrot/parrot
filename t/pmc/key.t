@@ -23,12 +23,12 @@ Tests the C<Key> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUT', 'traverse key chain' );
-    new P0, .Key
+    new P0, 'Key'
     set P0, "1"
-    new P1, .Key
+    new P1, 'Key'
     set P1, "2"
     push P0, P1
-    new P2, .Key
+    new P2, 'Key'
     set P2, "3"
     push P1, P2
 
@@ -58,7 +58,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', 'extract int from string keys' );
-new P0, .ResizableStringArray
+new P0, 'ResizableStringArray'
 push P0, "ok 1\n"
 push P0, "ok 2\n"
 set S0, 0
@@ -73,7 +73,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', 'extract string from int keys' );
-new P0, .Hash
+new P0, 'Hash'
 set P0['1'], "ok 1\n"
 set P0['2'], "ok 2\n"
 set I0, 1

@@ -68,7 +68,7 @@ ENDOFMACRO
 
 pasm_output_is( <<"CODE", <<OUTPUT, "basic assignment" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 
 	set P0, 0.001
  	.fp_eq( P0, 0.001, EQ1)
@@ -121,7 +121,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "add number to self" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.001
 	add P0, P0, P0
 	.fp_eq( P0, 0.002, EQ1)
@@ -135,7 +135,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sub number from self" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, -1000.2
 	sub P0, P0, P0
 	.fp_eq( P0, 0.0, EQ1)
@@ -149,7 +149,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "multiply number by self" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 123.4
 	mul P0, P0, P0
 	.fp_eq( P0, 15227.56, EQ1)
@@ -163,7 +163,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "divide number by self" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 1829354.988
 	div P0, P0, P0
 	.fp_eq( P0, 1.0, EQ1)
@@ -307,7 +307,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: addition" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.001
 	add P0, 1
 	.fp_eq(P0, 1.001, EQ1)
@@ -328,7 +328,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 103.45
 	sub P0, 77
 	.fp_eq(P0, 26.45, EQ1)
@@ -349,7 +349,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.001
 	mul P0, 10000
 	.fp_eq(P0, 10.0, EQ1)
@@ -377,7 +377,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 1e8
 	div P0, 10000
 	.fp_eq(P0, 10000.0, EQ1)
@@ -398,7 +398,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.001
 	add P0, 1.2
 	.fp_eq(P0, 1.201, EQ1)
@@ -419,7 +419,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 103.45
 	sub P0, 3.46
 	.fp_eq(P0, 99.99, EQ1)
@@ -440,7 +440,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.001
 	mul P0, 123.5
 	.fp_eq(P0, 0.1235, EQ1)
@@ -468,7 +468,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: division" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 1e8
 	div P0, 0.5
 	.fp_eq(P0, 2e8, EQ1)
@@ -489,7 +489,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Increment & decrement" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.5
 	inc P0
 	.fp_eq(P0, 1.5, EQ1)
@@ -524,7 +524,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.5
 	neg P0
 	.fp_eq(P0, -0.5, EQ1)
@@ -532,7 +532,7 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
 	print "not "
 EQ1:	print "ok 1\\n"
 
-        new P1, .Float
+        new P1, 'Float'
 	neg P1, P0
 	.fp_eq(P1, 0.5, EQ2)
 	print P1
@@ -545,7 +545,7 @@ ok 2
 OUTPUT
 
 pasm_output_like( << 'CODE', << 'OUTPUT', "neg 0" );
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 0.0
 	neg P0
         print P0
@@ -555,11 +555,11 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Equality" );
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 1e8
-        new P1, .Float
+        new P1, 'Float'
         set P1, 1e8
-        new P2, .Float
+        new P2, 'Float'
         set P2, 2.4
 
         eq P0, P1, OK1
@@ -634,7 +634,7 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Abs" );
 @{[ $fp_equality_macro ]}
-	new P0, .Float
+	new P0, 'Float'
 	set P0, 1.0
 	abs P0
         eq P0, P0, OK1
@@ -649,7 +649,7 @@ OK1:	print "ok 1\\n"
 	print "not "
 OK2:	print "ok 2\\n"
 
-        new P1, .Float
+        new P1, 'Float'
         set P0, -5.0
         abs P1, P0
         .fp_eq(P1, 5.0, OK3)
@@ -664,7 +664,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: lt" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 111.1
         set N1, P1
 
@@ -689,13 +689,13 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: lt_num" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 1.1
-        new P2, .Float
+        new P2, 'Float'
         set P2, 1.2
-        new P3, .Float
+        new P3, 'Float'
         set P3, 1.0
-        new P4, .Float
+        new P4, 'Float'
         set P4, P1
 
         lt_num P1, P2, OK1
@@ -719,7 +719,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: le" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 111.1
         set N1, P1
 
@@ -743,13 +743,13 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: le_num" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 1.1
-        new P2, .Float
+        new P2, 'Float'
         set P2, 1.2
-        new P3, .Float
+        new P3, 'Float'
         set P3, 1.0
-        new P4, .Float
+        new P4, 'Float'
         set P4, P1
 
         le_num P1, P2, OK1
@@ -772,7 +772,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: gt" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 111.1
         set N1, P1
 
@@ -797,13 +797,13 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: gt_num" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 1.1
-        new P2, .Float
+        new P2, 'Float'
         set P2, 1.2
-        new P3, .Float
+        new P3, 'Float'
         set P3, 1.0
-        new P4, .Float
+        new P4, 'Float'
         set P4, P1
 
         gt_num P1, P2, BAD1
@@ -827,7 +827,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: ge" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 111.1
         set N1, P1
 
@@ -851,13 +851,13 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: ge_num" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 1.1
-        new P2, .Float
+        new P2, 'Float'
         set P2, 1.2
-        new P3, .Float
+        new P3, 'Float'
         set P3, 1.0
-        new P4, .Float
+        new P4, 'Float'
         set P4, P1
 
         ge_num P1, P2, BAD1
@@ -880,7 +880,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: cmp_p_n" );
-        new P1, .Float
+        new P1, 'Float'
         set P1, 123.45
         set N1, 123.45
         set N2, -1.0
@@ -903,12 +903,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isgt" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
-        new P5, .Integer
-        new P6, .Float
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
+        new P5, 'Integer'
+        new P6, 'Float'
 
         set P1, 10.0
         set P2, 20.0
@@ -946,12 +946,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isge" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
-        new P5, .Integer
-        new P6, .Float
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
+        new P5, 'Integer'
+        new P6, 'Float'
 
         set P1, 10.0
         set P2, 20.0
@@ -989,12 +989,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: islt" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
-        new P5, .Integer
-        new P6, .Float
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
+        new P5, 'Integer'
+        new P6, 'Float'
 
         set P1, 10.0
         set P2, 20.0
@@ -1032,12 +1032,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isle" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
-        new P5, .Integer
-        new P6, .Float
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
+        new P5, 'Integer'
+        new P6, 'Float'
 
         set P1, 10.0
         set P2, 20.0
@@ -1075,10 +1075,10 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: iseq" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
 
         set P1, 2.5
         set P2, 2.6
@@ -1106,10 +1106,10 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "comparison ops: isne" );
-        new P1, .Float
-        new P2, .Float
-        new P3, .Float
-        new P4, .Integer
+        new P1, 'Float'
+        new P2, 'Float'
+        new P3, 'Float'
+        new P4, 'Integer'
 
         set P1, 2.5
         set P2, 2.6
@@ -1138,7 +1138,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "new_from_string" );
 .sub main :main
-    .const .Float pi = "3.1"
+    .const Float pi = "3.1"
     print pi
     print "\n"
 .end

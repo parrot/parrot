@@ -149,7 +149,7 @@ endfor:
 .end
 
 .macro InitStruct (iub, i, char, num)
-	$P0 = new .FixedPMCArray
+	$P0 = new 'FixedPMCArray'
 	$P0 = 2
 	.iub[.i] = $P0
 	.iub[.i;0] = .char
@@ -172,7 +172,7 @@ argsok:
 	n = $S0
 argsdone:
 	.local pmc iub
-	iub = new .FixedPMCArray
+	iub = new 'FixedPMCArray'
 	iub = 15
 	.InitStruct(iub, 0, "a", 0.27)
 	.InitStruct(iub, 1, "c", 0.12)
@@ -192,7 +192,7 @@ argsdone:
 	.InitStruct(iub, 14, "Y", 0.02)
 
 	.local pmc homosapiens
-	homosapiens = new .FixedPMCArray
+	homosapiens = new 'FixedPMCArray'
 	homosapiens = 4
 	.InitStruct(homosapiens, 0, "a", 0.3029549426680)
 	.InitStruct(homosapiens, 1, "c", 0.1979883004921)

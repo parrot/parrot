@@ -25,8 +25,8 @@ Tests the C<Env> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<OUT, "all Envs are ident" );
-    new P0, .Env
-    new P1, .Env
+    new P0, 'Env'
+    new P1, 'Env'
     eq_addr P0, P1, ok
     print "not the same "
 ok: print "ok\n"
@@ -37,7 +37,7 @@ OUT
 
 $ENV{"PARROT_TMP"} = "riding a ponie";
 pasm_output_like( <<'CODE', <<OUT, "getenv" );
-    new P0, .Env
+    new P0, 'Env'
     set S0, P0["PARROT_TMP"]
     print S0
     end
@@ -47,7 +47,7 @@ OUT
 
 delete $ENV{"PARROT_TMP"};
 pasm_output_like( <<'CODE', <<OUT, "setenv/getenv" );
-    new P0, .Env
+    new P0, 'Env'
     set P0["PARROT_TMP"], "hello polly"
     set S0, P0["PARROT_TMP"]
     print S0
@@ -57,10 +57,10 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "envs are all the same" );
-    new P0, .Env
+    new P0, 'Env'
     set P0["PARROT_TMP"], "hello polly"
     set S0, P0["PARROT_TMP"]
-    new P1, .Env
+    new P1, 'Env'
     set S1, P1["PARROT_TMP"]
     eq S0, S1, ok
     print "not ok\n"
@@ -73,7 +73,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "gone/delete" );
-    new P0, .Env
+    new P0, 'Env'
     set P0["PARROT_TMP"], "hello polly"
     exists I0, P0["PARROT_TMP"]
     if I0, ok1
@@ -93,7 +93,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "iterate" );
-    new P0, .Env
+    new P0, 'Env'
     set P0["PARROT_1"], "hello"
     set P0["PARROT_2"], "polly"
     iter P1, P0
@@ -122,7 +122,7 @@ SKIP: {
     # This will not work on our unsetenv implementation
     skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
     pasm_output_is( <<'CODE', <<OUT, "exists/delete" );
-    new P0, .Env
+    new P0, 'Env'
     set P0["PARROT_TMP"], "hello polly"
     exists I0, P0["PARROT_TMP"]
     if I0, ok1
@@ -210,7 +210,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "getenv - null key" );
-    new P0, .Env
+    new P0, 'Env'
     set S0, P0[""]
     eq S0, "", OK
     print "not "
@@ -221,12 +221,12 @@ ok
 OUT
 
 pasm_output_like( <<'CODE', <<OUT, "setenv/getenv - PMC key" );
-    new P0, .Env
-    new P1, .Key
+    new P0, 'Env'
+    new P1, 'Key'
     set P1, "PARROT_TMP"
-    new P2, .String
+    new P2, 'String'
     set P2, "Foobar"
-    new P3, .String
+    new P3, 'String'
     set P0[P1], P2
     set P3, P0[P1]
     print P3

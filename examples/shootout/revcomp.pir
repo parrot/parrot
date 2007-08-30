@@ -12,7 +12,7 @@
 
 .sub tr_00_init :immediate
     .local pmc tr_array
-    tr_array = new .FixedIntegerArray   # Todo char array
+    tr_array = new 'FixedIntegerArray'  # Todo char array
     tr_array = 256                      # Python compat ;)
     .local string from, to
     from = 'wsatugcyrkmbdhvnATUGCYRKMBDHVN'

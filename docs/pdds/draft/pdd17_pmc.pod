@@ -1407,7 +1407,7 @@ variable, while writing to it sets the value of a process environment variable.
 For example, to retrieve the current value of TERM (the terminal type on most
 Unix systems):
 
-   new P1, .Env
+   new P1, 'Env'
    set S1, P1['TERM']
 
 Note that an embedding system may override this behavior.

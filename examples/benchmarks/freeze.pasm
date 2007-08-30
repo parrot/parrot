@@ -15,7 +15,7 @@ Freeze/thaw an ResizablePMCArray.
 
 =cut
 
-    new P0, .ResizablePMCArray
+    new P0, 'ResizablePMCArray'
     set I0, 100000
     time N0
 lp1:

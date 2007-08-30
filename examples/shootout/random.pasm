@@ -24,7 +24,7 @@ while_1:
 	bsr gen_random
 	dec I1 
 	if I1, while_1 
-	new P0, .FixedFloatArray
+	new P0, 'FixedFloatArray'
 	set P0, 1 
 	set P0[0], N3
 	sprintf S0, "%.9f\n", P0 

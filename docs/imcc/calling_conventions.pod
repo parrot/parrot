@@ -37,7 +37,7 @@ subroutines.
 =head2 Explicitly Calling PASM Subroutines
 
   .const .Sub $P0 = "_sub_label" 
-  $P1 = new .Continuation
+  $P1 = new 'Continuation'
   set_addr $P1, ret_addr
   ...
   .local int x

@@ -24,7 +24,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting ManagedStruct size" );
-    new P0,.ManagedStruct
+    new P0, 'ManagedStruct'
     set I0,P0
     eq I0,0,OK_1
     print "not "
@@ -47,7 +47,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
-    new P2, .ResizablePMCArray
+    new P2, 'ResizablePMCArray'
     .include "datatypes.pasm"
     push P2, .DATATYPE_FLOAT
     push P2, 2	# 2 elem array
@@ -55,7 +55,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
     push P2, .DATATYPE_DOUBLE
     push P2, 0
     push P2, 0
-    new P0, .ManagedStruct, P2
+    new P0, 'ManagedStruct', P2
     # must have set size automatically
     # this is hopefully 2*4+8 everywhere
     set I0, P0
@@ -83,12 +83,12 @@ CODE
 OUTPUT
 
 pasm_output_like( <<'CODE', <<'OUTPUT', "element access - char, short" );
-    new P2, .ResizablePMCArray
+    new P2, 'ResizablePMCArray'
     .include "datatypes.pasm"
     push P2, .DATATYPE_CHAR
     push P2, 2	# 2 elem char array
     push P2, 0
-    new P0, .ManagedStruct, P2
+    new P0, 'ManagedStruct', P2
     set I0, P0
     ge I0, 2, ok1
     print "not "
@@ -102,7 +102,7 @@ ok1:
     print I0
     print " "
     # now acces that as a short
-    new P2, .ResizablePMCArray
+    new P2, 'ResizablePMCArray'
     push P2, .DATATYPE_SHORT
     push P2, 1
     push P2, 0
@@ -120,7 +120,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
 .include "datatypes.pasm"
 
 .sub _main
-    new $P1, .OrderedHash
+    new $P1, 'OrderedHash'
     set  $P1['x'], .DATATYPE_INT16
     push $P1, 0
     push $P1, 0
@@ -130,7 +130,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named element access int16" );
     push $P1, 0
 
     # need a ManagedStruct to allocate data memory
-    new $P2, .ManagedStruct, $P1
+    new $P2, 'ManagedStruct', $P1
 
     # calc allocation size
     set $I0, 0
@@ -180,16 +180,16 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
   # the nested structure
   .include "datatypes.pasm"
-  new P3, .ResizablePMCArray
+  new P3, 'ResizablePMCArray'
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
-  new P4, .UnManagedStruct, P3
+  new P4, 'UnManagedStruct', P3
   # outer structure
-  new P2, .ResizablePMCArray
+  new P2, 'ResizablePMCArray'
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -203,7 +203,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
   push P2, 0
   push P2, 0
   # attach struct initializer
-  new P5, .UnManagedStruct, P2
+  new P5, 'UnManagedStruct', P2
 
   # now check offsets
   set I0, P2[2]

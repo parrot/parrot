@@ -30,7 +30,7 @@ Tests the ParrotClass PMC.
 
     plan(1)
 
-    new P0, .ParrotClass
+    new P0, 'ParrotClass'
     ok(1, 'Instantiated .ParrotClass')
 .end
 

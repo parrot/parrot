@@ -22,7 +22,7 @@ DOD runs made.
 mloop:
 
 	set I0, 10
-	new P0, .ResizablePMCArray
+	new P0, 'ResizablePMCArray'
 
 ol:	bsr buildarray
 	set P0[I0], P1
@@ -30,7 +30,7 @@ ol:	bsr buildarray
 	if I0, ol
 
 	set I0, 20
-	new P2, .ResizablePMCArray
+	new P2, 'ResizablePMCArray'
 
 ol1:	bsr buildarray
 	set P2[I0], P1
@@ -38,7 +38,7 @@ ol1:	bsr buildarray
 	if I0, ol1
 
 	set I0, 20
-	new P3, .ResizablePMCArray
+	new P3, 'ResizablePMCArray'
 
 ol2:	bsr buildarray
 	set P3[I0], P1
@@ -64,9 +64,9 @@ ol2:	bsr buildarray
 	# Our inner loop, 20000 times
 buildarray:
 	set I1, 20000
-	new P1, .ResizablePMCArray
+	new P1, 'ResizablePMCArray'
 	set P1, I1	# set length => fixed sized array
-loop1:	new P9, .Integer
+loop1:	new P9, 'Integer'
 	set P9, I1
 	set P1[I1], P9
 	dec I1

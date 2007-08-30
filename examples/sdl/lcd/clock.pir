@@ -30,20 +30,20 @@ The main function.
     load_bytecode "library/SDL/Event.pir"
     load_bytecode "library/SDL/EventHandler.pir"
     load_bytecode "library/SDL/LCD.pir"
-    
+
     # set some screen properties
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0["height"] = 21
     $P0["width"]  = 94
     $P0["bpp"]    = 16
     $P0["flags"]  =  5
-    
+
     # create the SDL application object
     $I0 = find_type "SDL::App"
     $P0 = new $I0, $P0
     $P0 = $P0."surface"()
     global "screen" = $P0
-    
+
     # create the LCD
     $I0 = find_type "SDL::LCD"
     $P0 = new $I0
@@ -51,10 +51,10 @@ The main function.
 
     # draw the watch
     drawWatch()
-    
+
     # create the timer
     $P1 = global "drawWatch"
-    $P0 = new .Timer
+    $P0 = new 'Timer'
     $P0[.PARROT_TIMER_NSEC] = 0.5
     $P0[.PARROT_TIMER_HANDLER] = $P1
     $P0[.PARROT_TIMER_REPEAT] = -1
@@ -62,7 +62,7 @@ The main function.
     # store the timer somewhere, it will be
     # collected and destroyed otherwise
     global "timer" = $P0
-    
+
     #
     # event loop
     #
@@ -94,7 +94,7 @@ Creates, sets and redraws the LCD display content.
     if $N0 < 0.5 goto USE_DOTS
     $S2 = " "
 USE_DOTS:
-    
+
     # hours
     $I0 = $P0[.TM_HOUR]
     $I0 /= 10

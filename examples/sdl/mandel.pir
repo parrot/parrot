@@ -14,7 +14,7 @@ To run this file, run the following command from the Parrot directory:
 =head2 Options
 
   --quit, -q      ... quit immediately (useful for benchmarking)
-  --threads       ... non-working code to run 2 calculation threads 
+  --threads       ... non-working code to run 2 calculation threads
 
 =head1 KEYBOARD/MOUSE COMMANDS
 
@@ -42,10 +42,10 @@ To run this file, run the following command from the Parrot directory:
     event.'process_events'(handler, app)
 ex:
     app.'quit'()
-.end    
+.end
 
 # utils
-.sub 'load_libs'    
+.sub 'load_libs'
     # load the necessary libraries
     load_bytecode "library/SDL/App.pir"
     load_bytecode "library/SDL/Rect.pir"
@@ -88,7 +88,7 @@ ex:
     app = new 'Mandel'
     setattribute app, 'opts', opts
     .return (app)
-.end    
+.end
 
 .namespace ['Mandel']
 
@@ -104,22 +104,22 @@ ex:
     w = 600
     h = 400
     self.'init'( 'height' => h, 'width' => w, 'bpp' => 0, 'flags' => 1 )
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = xstart
     setattribute self, 'xstart', $P0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = ystart
     setattribute self, 'ystart', $P0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 1.0 # XXX calc from above
     setattribute self, 'xend', $P0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = 1.0
     setattribute self, 'yend', $P0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = scale
     setattribute self, 'scale', $P0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = 200
     setattribute self, 'limit', $P0
 
@@ -231,7 +231,7 @@ get:
     pixels = main_screen.'pixels'()
     # start calculation
     .local pmc args
-    args = new .FixedPMCArray
+    args = new 'FixedPMCArray'
     set args, 10
     args[0] = w
     args[1] = xstart
@@ -250,7 +250,7 @@ get:
     .local pmc thr
     .local int h2
     h2 = h / 2
-    thr = new .ParrotThread
+    thr = new 'ParrotThread'
     .const .Sub raw_calc_f = 'raw_calc'
     .include 'cloneflags.pasm'
     .local int flags
@@ -294,7 +294,7 @@ loop_y:
     x = 0
 loop_x:
     c = x / scale   # re c part
-    c += xstart 
+    c += xstart
     z = 0.0
     Z = 0.0   # Z(0) = 0
     k = 0
@@ -328,7 +328,7 @@ set_pix:
     $I0 = k % pal_elems
     raw_c = raw_palette[$I0]
     $I0 = offs_y + x
-    # main_screen.'draw_pixel'(x, y, raw_c) --> 
+    # main_screen.'draw_pixel'(x, y, raw_c) -->
     pixels[0; $I0] = raw_c
     inc x
     if x < w goto loop_x
@@ -376,7 +376,7 @@ set_pix:
     if but == 2 goto done
     ds = 0.5
     goto done
-zoom_in:    
+zoom_in:
     ds = 2.0
 done:
     dx2 /= ds
@@ -438,13 +438,13 @@ done:
     main_screen = self.'surface'()
     .local int r, g, b, color_type
     find_type  color_type, 'SDL::Color'
-    palette = new .ResizablePMCArray
+    palette = new 'ResizablePMCArray'
     r = 0
 loop_r:
     g = 0
-loop_g:    
+loop_g:
     b = 0
-loop_b:    
+loop_b:
     col = new color_type
     col.'init'( 'r' => r, 'g' => g, 'b' => b )
     push palette, col
@@ -466,10 +466,10 @@ loop_b:
     .local pmc raw_palette, col, main_screen
     main_screen = self.'surface'()
     n = elements palette
-    raw_palette = new .FixedIntegerArray
+    raw_palette = new 'FixedIntegerArray'
     raw_palette = n
     i = 0
-loop:    
+loop:
     col = palette[i]
     raw_c = col.'color_for_surface'( main_screen )
     raw_palette[i] = raw_c
@@ -549,8 +549,8 @@ Plain runcore and unoptimized parrot:
   Original version based on sdl/raw_pixels   21s
   Create raw_palette                         12s
   Prefetch raw_surface                       10s        [1]
-  Optimize calculation loop (zz, ZZ)          9s        [2] 
-  use raw pixels array                                  [3]  
+  Optimize calculation loop (zz, ZZ)          9s        [2]
+  use raw pixels array                                  [3]
 
 =head2 Parrot based optimizations
 

@@ -53,7 +53,7 @@ names in nested namespace, as well as by integer - you should do this for
 compatibility, to avoid problems if the base types get reassigned. For
 example:
 
-  new P0, .ResizableBooleanArray
+  new P0, 'ResizableBooleanArray'
 
 Optionally a PMC may be passed to the constructor. It's up to the class what
 to do with the intializer.  See PDD02 for more.

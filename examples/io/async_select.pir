@@ -29,7 +29,7 @@ available.
 
     pio = getstdin
     $S0 = pop pio   # unbuffer
-    data = new .Integer
+    data = new 'Integer'
     data = 42
     .const .Sub handler = "io_handler"
     pio_out = getstdout

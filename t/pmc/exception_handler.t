@@ -30,7 +30,7 @@ Tests the Exception_Handler PMC.
 
     plan(1)
 
-    new P0, .Exception_Handler
+    new P0, 'Exception_Handler'
     ok(1, 'Instantiated .Exception_Handler')
 .end
 

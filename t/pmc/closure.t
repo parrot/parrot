@@ -25,7 +25,7 @@ Tests the Closure PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, .Closure
+    new P0, 'Closure'
     print "ok 1\n"
 .end
 CODE

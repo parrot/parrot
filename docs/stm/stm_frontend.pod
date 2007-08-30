@@ -105,11 +105,11 @@ STMVars are safe to pass between threads.
 
 =over 4
 
-=item new .STMVar
+=item new 'STMVar'
 
 Creates a new variable. Its initial value will be the NULL PMC.
 
-=item new .STMVar, Px
+=item new 'STMVar', Px
 
 If Px is an STMRef, creates an STMVar instance referring to the same variable
 as the STMRef. Otherwise, creates a new variable whose initial value Px.
@@ -154,12 +154,12 @@ STMRefs are safe to pass between threads.
 
 =over 4
 
-=item new Px, .STMRef
+=item new Px, 'STMRef'
 
 Creates a new transactionally managed variable which initially contains
 a clone of Px.
 
-=item new Px, .STMRef, Py
+=item new Px, 'STMRef', Py
 
 If Py is an STMVar, creates an STMRef referring the same variable as Py.
 Otherwise, creates a new STM-managed variable which initially contains
@@ -193,7 +193,7 @@ supported.
 
 =over 4
 
-=item new Px, .STMLog
+=item new Px, 'STMLog'
 
 Copies the current transaction into C<Px>. If there is no active transaction, 
 C<Px> holds an empty transaction.

@@ -32,7 +32,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting already sorted numbers" );
     .local pmc tmp
     .local pmc sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 0
     push array, 1
     push array, 2
@@ -78,7 +78,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 9
     push array, 8
     push array, 7
@@ -124,7 +124,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted numbers (2)" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 4
     push array, 7
     push array, 8
@@ -171,7 +171,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting sorted strings" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "alpha"
     push array, "bravo"
     push array, "charlie"
@@ -214,7 +214,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "charlie"
     push array, "hotel"
     push array, "alpha"
@@ -257,7 +257,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting different types" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, 0.1
     push array, "charlie"
     push array, 2
@@ -324,7 +324,7 @@ pir_output_is( <<'CODE', <<'OUT', "sorting letters" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
+    new array, 'ResizablePMCArray'
     push array, "w"
     push array, "x"
     push array, "h"
@@ -359,20 +359,20 @@ pir_output_is( <<'CODE', <<'OUT', "sorting String letters" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
-    new tmp, .String
+    new array, 'ResizablePMCArray'
+    new tmp, 'String'
     set tmp, "w"
     push array, tmp
 
-    new tmp, .String
+    new tmp, 'String'
     set tmp, "x"
     push array, tmp
 
-    new tmp, .String
+    new tmp, 'String'
     set tmp, "h"
     push array, tmp
 
-    new tmp, .String
+    new tmp, 'String'
     set tmp, "y"
     push array, tmp
 
@@ -405,8 +405,8 @@ pir_output_is( <<'CODE', <<'OUT', "sorting strings" );
     .local int j
     .local pmc tmp, sort
 
-    new array, .ResizablePMCArray
-    new tmp, .String
+    new array, 'ResizablePMCArray'
+    new tmp, 'String'
     push array, "hello"
     push array, "hash2"
     push array, "hello2"

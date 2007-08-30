@@ -358,7 +358,7 @@ cgi_1:
 no_query:
     file = url
     query = ''
-    query_hash = new .Hash
+    query_hash = new 'Hash'
 have_query:
     # escape %
     file = urldecode(file)
@@ -391,7 +391,7 @@ cgi_file:
     .param string query		# the unescapced one
     .local pmc query_hash, items
     .local string kv, k, v
-    query_hash = new .Hash
+    query_hash = new 'Hash'
     items = split '+', query
     .local int i, n
     i = 0

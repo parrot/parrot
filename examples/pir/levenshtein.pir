@@ -43,10 +43,10 @@
         if n == 0 goto return_m
         if m == 0 goto return_n
 
-        new matrix, .ResizablePMCArray
+        new matrix, 'ResizablePMCArray'
         i = 0
 init_matrix:
-        new $P0, .ResizableIntegerArray
+        new $P0, 'ResizableIntegerArray'
         matrix[i] = $P0
         i += 1
         if i <= m goto init_matrix

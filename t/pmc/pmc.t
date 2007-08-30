@@ -71,7 +71,7 @@ ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "newpmc" );
 	print "starting\n"
-	new P0, .Integer
+	new P0, 'Integer'
 	print "ending\n"
 	end
 CODE
@@ -94,7 +94,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'typeof' );
-    new P0,.Integer
+    new P0, 'Integer'
     typeof S0,P0
     eq     S0, "Integer", OK_1
     print  "not "
@@ -118,7 +118,7 @@ while ( my ( $type, $id ) = each %pmc_types ) {
         deleg_pmc BigInt LexInfo LexPad Slice Object
         /;    # these need an initializer
     my $set_ro = ( $type =~ /^Const\w+/ ) ? <<EOPASM : '';
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 1
     setprop P0, "_ro", P10
 EOPASM
@@ -135,8 +135,8 @@ CHECK
 }
 
 pasm_output_like( <<"CODE", <<OUTPUT, "PMC type check" );
-    new P10, .Hash # Type id hash
-    new P11, .Hash # Type name hash
+    new P10, 'Hash'
+    new P11, 'Hash'
 $checkTypes
     print "All names and ids ok.\\n"
     end
@@ -170,7 +170,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', 'find_method' );
-    new P1, .Integer
+    new P1, 'Integer'
     find_method P0, P1, "no_such_meth"
     end
 CODE
@@ -178,7 +178,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
-        new P1, .INTVAL
+    new P1, .INTVAL
     print "never\n"
     end
 CODE
@@ -186,7 +186,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eq_addr same" );
-      new P0, .Integer
+      new P0, 'Integer'
       set P1, P0
       eq_addr P0, P1, OK1
       print "not "
@@ -202,8 +202,8 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eq_addr diff" );
-      new P0, .Integer
-      new P1, .Integer
+      new P0, 'Integer'
+      new P1, 'Integer'
       ne_addr P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
@@ -222,7 +222,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "if_null" );
       if_null P0, OK1
       print "not "
 OK1:  print "ok 1\n"
-      new P0, .Integer
+      new P0, 'Integer'
       if_null P0, BAD2
       branch OK2
 BAD2: print "not "
@@ -234,8 +234,8 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Random PMCs are singletons" );
-    new P0, .Random
-    new P1, .Random
+    new P0, 'Random'
+    new P1, 'Random'
     eq_addr P0, P1, ok
     print "not the same "
 ok: print "ok\n"
@@ -245,14 +245,14 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "issame" );
-    new P0, .Undef
-    new P1, .Undef
+    new P0, 'Undef'
+    new P1, 'Undef'
     set P1, P0
     issame I0, P0, P1
     print I0
     isntsame I0, P0, P1
     print I0
-    new P2, .Undef
+    new P2, 'Undef'
     issame I0, P0, P2
     print I0
     isntsame I0, P0, P2
@@ -329,9 +329,9 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "logical or, and, xor" );
-    new P0, .Integer
+    new P0, 'Integer'
     set P0, 2
-    new P1, .Undef
+    new P1, 'Undef'
     or P2, P0, P1
     eq_addr P2, P0, ok1
     print "not "
@@ -370,7 +370,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pmcinfo_i_p_ic" );
 .include "pmcinfo.pasm"
-    new P0, .Integer
+    new P0, 'Integer'
     pmcinfo I0, P0, .PMCINFO_FLAGS
     shl I2, 1, 9	# PObj_is_PMC_FLAG s. pobj.h
     band I1, I0, I2

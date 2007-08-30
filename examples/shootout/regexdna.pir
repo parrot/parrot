@@ -6,7 +6,7 @@
 	p6rule_compile = compreg "PGE::P6Regex"
 	
 	# Store the regexes we need...
-	variants = new .FixedStringArray
+	variants = new 'FixedStringArray'
 	variants = 9
 	variants[0] = '      agggtaaa|tttaccct      '
 	variants[1] = '<[cgt]>gggtaaa|tttaccc<[acg]>'
@@ -18,7 +18,7 @@
 	variants[7] = 'agggta<[cgt]>a|t<[acg]>taccct'
 	variants[8] = 'agggtaa<[cgt]>|<[acg]>ttaccct'
 	# and store the p5regex style for printing
-	variants_p5 = new .Hash
+	variants_p5 = new 'Hash'
 	variants_p5['      agggtaaa|tttaccct      '] = 'agggtaaa|tttaccct'
 	variants_p5['<[cgt]>gggtaaa|tttaccc<[acg]>'] = '[cgt]gggtaaa|tttaccc[acg]'
 	variants_p5['a<[act]>ggtaaa|tttacc<[agt]>t'] = 'a[act]ggtaaa|tttacc[agt]t'
@@ -29,7 +29,7 @@
 	variants_p5['agggta<[cgt]>a|t<[acg]>taccct'] = 'agggta[cgt]a|t[acg]taccct'
 	variants_p5['agggtaa<[cgt]>|<[acg]>ttaccct'] = 'agggtaa[cgt]|[acg]ttaccct'
 
-	iub = new .Hash
+	iub = new 'Hash'
 	iub['b'] = '(c|g|t)'
 	iub['d'] = '(a|g|t)'
 	iub['h'] = '(a|c|t)'
@@ -118,9 +118,9 @@ endfor:
 	#####################################################
 	# Final replace to make the sequence a p5 style regex
 	.include "iterator.pasm"
-	iter = new .Iterator, iub
+	iter = new 'Iterator', iub
 	set iter, .ITERATE_FROM_START
-	matches = new .ResizablePMCArray
+	matches = new 'ResizablePMCArray'
 iter_loop:
 	unless iter goto iter_end
 	key = shift iter
@@ -147,7 +147,7 @@ switch:
 	$I0 = match."from"()
 	$I1 = match."to"()
 	$I1 -= $I0
-	$P0 = new .FixedIntegerArray
+	$P0 = new 'FixedIntegerArray'
 	$P0 = 2
 	$P0[0] = $I0
 	$P0[1] = $I1

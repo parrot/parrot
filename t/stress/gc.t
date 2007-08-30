@@ -26,7 +26,7 @@ use Parrot::PMC qw(%pmc_types);
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "arraystress" );
     print "starting\n"
-    new P0, .Integer
+    new P0, 'Integer'
     print "ending\n"
     end
 CODE

@@ -257,7 +257,7 @@ it call back into Parrot.
     .local pmc sub, userdata
     sub = get_global "foo_callback"  # get the sub to act as a callback sub
 
-    userdata = new .Integer               # set up some userdata
+    userdata = new 'Integer'         # set up some userdata
     userdata = 42
 
     .local pmc callback_sub

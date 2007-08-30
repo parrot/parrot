@@ -330,7 +330,7 @@ objects, or an Iterator role applied to I/O objects.]
 
 =item new
 
-    new $P0, .Iterator, $P1
+    new $P0, 'Iterator', $P1
 
 Create a new iterator object $P0 from I/O object $P1.
 

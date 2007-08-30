@@ -299,7 +299,7 @@ a higher score and spills the variables with a lower score. In this
 example it picks C<$I1> and C<$I2>. Behind the scenes, Parrot
 generates code to store the values:
 
-  new P31, .PerlArray
+  new P31, "PerlArray"
   ...
   set I0, 1           # I0 allocated to $I1
   set P31[0], I0      # spill $I1

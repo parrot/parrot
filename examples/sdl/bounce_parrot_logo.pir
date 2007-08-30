@@ -82,7 +82,7 @@ Use the Escape key or close the window when you've had enough.
 	event.'init'()
 
 	.local pmc handler_args
-	handler_args = new .Hash
+	handler_args = new 'Hash'
 	handler_args[ 'screen' ] = main_screen
 	handler_args[ 'sprite' ] = sprite
 

@@ -36,15 +36,15 @@ F<examples/benchmarks/arriter.pir>.
 .include "iterator.pasm"
 
 # declaration of lexicals
-    $P20 = new .Hash
+    $P20 = new 'Hash'
     .lex "%ha", $P20
-    $P21 = new .Undef
+    $P21 = new 'Undef'
     .lex "$i", $P21
-    $P22 = new .ResizablePMCArray
+    $P22 = new 'ResizablePMCArray'
     .lex "@k", $P22
-    $P23 = new .ResizablePMCArray
+    $P23 = new 'ResizablePMCArray'
     .lex "@nk", $P23
-    $P24 = new .Undef
+    $P24 = new 'Undef'
     .lex "$s", $P24
 
 # same as @k = qw( A B C D E F G H I J ); 
@@ -52,14 +52,14 @@ F<examples/benchmarks/arriter.pir>.
     $P29 = 0
 for_1_start:
     unless $P29 < 10 goto for_1_end
-        $P26 = new .Undef
+        $P26 = new 'Undef'
         $P26 = 65
-        $P27 = new .Undef
+        $P27 = new 'Undef'
         $P27 = add $P26, $P29
         $I0 = $P27
         $S0 = chr $I0
         find_lex $P28 , "$s"
-        $P28 = new .Undef
+        $P28 = new 'Undef'
         $P28 = $S0
         push $P22, $P28
         inc $P29
@@ -67,7 +67,7 @@ for_1_start:
 for_1_end:
 
 # set up all 5 element permutations of qw( A B C D E F G H I J )
-    $P29 = new .Undef
+    $P29 = new 'Undef'
     .lex "e", P29
     $P29 = 0
 for_2_start:
@@ -81,23 +81,23 @@ for_3_start:
             $P32 = .ITERATE_FROM_START
 
             # start of opt: invariant may go out of loop
-            $P33 = new .Undef
+            $P33 = new 'Undef'
             $P33 = 65
             $P38 = find_lex "@nk"
             # end of opt
 
 iter_1_start:
             unless $P32 goto iter_1_end
-                $P34 = new .Undef
+                $P34 = new 'Undef'
                 add $P34, $P33, $P30        # 65 + $i
                 $I0 = $P34
                 $S0 = chr $I0
-                $P35 = new .Undef
+                $P35 = new 'Undef'
                 $P35 = $S0
                 shift $P36, $P32                # $s
                 # $P37 goes into the aggregate and can not be
                 # pulled out of loop
-                $P37 = new .Undef
+                $P37 = new 'Undef'
                 concat $P37, $P36, $P35
                 push $P38, $P37
                 branch iter_1_start

@@ -15,12 +15,12 @@
 loop:
     $P4 = o."i"()
     .local pmc x
-    x = new .Integer
+    x = new 'Integer'
     assign x, $P4
 
     $P5 = o."j"()
     .local pmc y
-    y = new .Integer
+    y = new 'Integer'
     assign y, $P5
     inc i
     if i <= 500000 goto loop
@@ -35,11 +35,11 @@ loop:
 .sub __init method
     .local int ofs
     ofs = classoffset self, "Foo"
-    new $P10, .Integer
+    new $P10, 'Integer'
     set $P10, 10
     setattribute self, ofs, $P10
     inc ofs
-    new $P10, .Integer
+    new $P10, 'Integer'
     set $P10, 20
     setattribute self, ofs, $P10
 .end

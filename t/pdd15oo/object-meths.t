@@ -144,7 +144,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "disabling the constructor" );
     newpdd15class P1, "Foo"
-    new P0, .String
+    new P0, 'String'
     setprop P1, "BUILD", P0
     new P3, "Foo"
     print "ok 1\n"

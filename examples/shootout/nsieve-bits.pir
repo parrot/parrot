@@ -42,7 +42,7 @@ not_p:
     $S0 = argv[1]
 	N = $S0
 default:
-    flags = new .FixedBooleanArray
+    flags = new 'FixedBooleanArray'
 	M = 1 << N
 	M *= 10000
 	flags = M
@@ -54,7 +54,7 @@ loop:
     $I1 = 1 << $I0
     M = $I1 * 10000
     count = primes_in_range(M, flags)
-    $P0 = new .FixedIntegerArray
+    $P0 = new 'FixedIntegerArray'
     $P0 = 2
     $P0[0] = M
     $P0[1] = count

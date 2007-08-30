@@ -24,7 +24,7 @@ type combinations.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Initialization, and integer tests" );
-    new P0,.Boolean
+    new P0, 'Boolean'
 
     set I0, P0
     eq I0,0,OK_1
@@ -52,7 +52,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Number tests" );
-        new P0, .Boolean
+        new P0, 'Boolean'
 
         set N0, 0
         set P0, N0
@@ -76,7 +76,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "String tests" );
-        new P0, .Boolean
+        new P0, 'Boolean'
 
         set S0, "0"
         set P0, S0
@@ -108,8 +108,8 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PMC to PMC" );
-        new P0, .Boolean
-        new P1, .Boolean
+        new P0, 'Boolean'
+        new P1, 'Boolean'
 
         set P0, 1
         clone P1, P0
@@ -138,7 +138,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "As boolean" );
-        new P0, .Boolean
+        new P0, 'Boolean'
 
         set P0, 1
         if P0, OK_1
@@ -151,9 +151,9 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Logic operations" );
-        new P0, .Boolean
-        new P1, .Boolean
-        new P2, .Boolean
+        new P0, 'Boolean'
+        new P1, 'Boolean'
+        new P2, 'Boolean'
 
         set P0, 1
         set P1, 0
@@ -230,8 +230,8 @@ ok 9
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "neg" );
-    new P0, .Boolean
-        new P1, .Boolean
+        new P0, 'Boolean'
+        new P1, 'Boolean'
 
         set P0, 1
         neg P1, P0

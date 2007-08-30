@@ -297,17 +297,17 @@ C<set> (pass by reference).
 =item *
 
 When the target is a P register and the source is an integer, the P will be
-set to a new .Integer[1] which has been C<assign>ed the given integer.
+set to a new Integer[1] which has been C<assign>ed the given integer.
 
 =item *
 
 When the target is a P register and the source is a number, the P will be set
-to a new .Float[1] which has been C<assign>ed the given number.
+to a new Float[1] which has been C<assign>ed the given number.
 
 =item *
 
 When the target is a P register and the source is a string, the P will be set
-to a new .String[1] which has been C<assign>ed the given string.
+to a new String[1] which has been C<assign>ed the given string.
 
 =back
 

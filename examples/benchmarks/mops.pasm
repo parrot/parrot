@@ -16,11 +16,11 @@ C<Integer> PMCs.
 
 =cut
 
-        new    P1, .Integer
-        new    P2, .Integer
-        new    P3, .Integer
-        new    P4, .Integer
-        new    P5, .Integer
+        new    P1, 'Integer'
+        new    P2, 'Integer'
+        new    P3, 'Integer'
+        new    P4, 'Integer'
+        new    P5, 'Integer'
 
         set    P2, 0
         set    P3, 1

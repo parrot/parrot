@@ -281,7 +281,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P1, .Integer
+    new P1, 'Integer'
     set P1, 3
     n_bxor P9, P1, 2	# create new result
     print P9
@@ -292,7 +292,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
-    new P6, .Integer
+    new P6, 'Integer'
     set P6, I11
     set_returns "(0)", P6
     returncc
@@ -308,8 +308,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P0, .Integer
-    new P1, .Integer
+    new P0, 'Integer'
+    new P1, 'Integer'
     set P1, 3
     bxor P0, P1, 2	# use result
     print P0
@@ -335,8 +335,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     find_global P10, "Integer_bxor_Intval"
     mmdvtregister .MMD_BXOR, .Integer, .DATATYPE_INTVAL, P10
 
-    new P0, .Integer
-    new P1, .Integer
+    new P0, 'Integer'
+    new P1, 'Integer'
     set P1, 3
     bxor P0, P1, 2      # reuse destination
     print P0
@@ -352,7 +352,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     set I10, P5
     bxor I11, I10, I5
     if I7, has_dest
-    new P6, .Integer
+    new P6, 'Integer'
 has_dest:
     set P6, I11
     set_returns "(0)", P6

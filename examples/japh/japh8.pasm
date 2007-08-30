@@ -1,11 +1,11 @@
 # $Id$
 
 # Little Endian only using struct
-    new P1, .ResizablePMCArray
+    new P1, 'ResizablePMCArray'
     push P1, -100
     push P1, 28
     push P1, I0
-    new P0, .ManagedStruct, P1
+    new P0, 'ManagedStruct', P1
     set P0[0], 1953723722
     set P0[0;1], 1869504800
     set P0[0;2], 1919248500

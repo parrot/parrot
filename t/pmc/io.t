@@ -39,11 +39,11 @@ TODO: {
 .sub main
     $P0 = null
     test($P0, "Undef")
-    new $P0, .Integer
+    new $P0, 'Integer'
     test($P0, "null")
-    new $P0, .Undef
+    new $P0, 'Undef'
     test($P0, "Integer")
-    new $P0, .String
+    new $P0, 'String'
     test($P0, "String")
 .end
 .sub test
@@ -269,7 +269,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "open & print" );
        set I0, -12
        set N0, 2.2
        set S0, "Foo"
-       new P0, .String
+       new P0, 'String'
        set P0, "Bar\n"
 
        open P1, "temp.file"
@@ -477,7 +477,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'printerr' );
-       new P0, .String
+       new P0, 'String'
        set P0, "This is a test\n"
        printerr 10
        printerr "\n"

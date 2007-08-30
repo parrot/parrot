@@ -23,12 +23,12 @@ Tests property access on PMCs.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set/getprop" );
-    new P0, .Integer
+    new P0, 'Integer'
     set P0, 10
-    new P1, .String
+    new P1, 'String'
     set P1, "ten"
     setprop P0, "en", P1
-    new P2, .String
+    new P2, 'String'
     set P2, "zehn"
     setprop P0, "de", P2
     print P0
@@ -47,8 +47,8 @@ zehn
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Property values are references" );
-    new P0, .String
-    new P1, .String
+    new P0, 'String'
+    new P1, 'String'
     set P0, "Dog"
 
     set S0, "Brown"
@@ -59,7 +59,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Property values are references" );
     set P1, "No"
     setprop P0, S0, P1
 
-    new P2, .String
+    new P2, 'String'
     getprop P2, "Black", P0
     print P2
     print "\n"
@@ -75,10 +75,10 @@ No
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "resetting a property" );
-    new P0, .ResizablePMCArray
-    new P1, .String
-    new P2, .String
-    new P3, .String
+    new P0, 'ResizablePMCArray'
+    new P1, 'String'
+    new P2, 'String'
+    new P3, 'String'
 
     set S0, "Type"
     set P1, "Integer"
@@ -100,8 +100,8 @@ Float
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "getting a unset property" );
-    new P1, .Float
-    new P2, .Integer
+    new P1, 'Float'
+    new P2, 'Integer'
 
     getprop P2, "Wibble", P1
     defined I2, P2
@@ -114,12 +114,12 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delprop" );
-    new P0, .Integer
+    new P0, 'Integer'
     set P0, 10
-    new P1, .String
+    new P1, 'String'
     set P1, "ten"
     setprop P0, "en", P1
-    new P2, .String
+    new P2, 'String'
     set P2, "zehn"
     setprop P0, "de", P2
     print P0
@@ -145,12 +145,12 @@ zehn
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "prophash" );
-    new P0, .Integer
+    new P0, 'Integer'
     set P0, 10
-    new P1, .String
+    new P1, 'String'
     set P1, "ten"
     setprop P0, "en", P1
-    new P2, .String
+    new P2, 'String'
     set P2, "zehn"
     setprop P0, "de", P2
     prophash P3, P0

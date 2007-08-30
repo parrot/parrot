@@ -226,7 +226,7 @@ same for the rest):
 
         .local pmc dog
         dog = new "Dog"
-        $P0 = new .String
+        $P0 = new "String"
         $P0 = "Phideaux"
         setattribute dog, "name", $P0
 
@@ -253,7 +253,7 @@ the value, it does nothing more.
 
 Next, I create a new Dog and give it a name. Because
 attributes may only be PMCs, in order to give the Dog a
-name, I first have to create a new .String PMC (this is one
+name, I first have to create a new String PMC (this is one
 of the PMCs builtin to Parrot) and assign the name I wish
 to give the dog to this PMC.  Then I can pass this PMC as a
 parameter to C<setattribute> to give my Dog a name.
@@ -336,7 +336,7 @@ Jonathan Scott Duff
 
     .sub setname :method
         .param string name
-        $P0 = new .String
+        $P0 = new 'String'
         $P0 = name
         setattribute self, "name", $P0
     .end

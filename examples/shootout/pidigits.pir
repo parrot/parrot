@@ -30,7 +30,7 @@ loop:
     $P1 = k * 4
     inc $P1
     inc $P1
-    $P2 = new .Integer
+    $P2 = new 'Integer'
     $P3 = k * 2
     inc $P3
     .yield ($P0, $P1, $P2, $P3)
@@ -89,17 +89,17 @@ loop:
 
 .sub pi_digits
     .local pmc x0,x1,x2,x3, y, z0,z1,z2,z3, one, three, four
-    z0 = new .Integer
+    z0 = new 'Integer'
     z0 = 1
-    z1 = new .Integer
-    z2 = new .Integer
-    z3 = new .Integer
+    z1 = new 'Integer'
+    z2 = new 'Integer'
+    z3 = new 'Integer'
     z3 = 1
-    one = new .Integer
+    one = new 'Integer'
     one = 1
-    three = new .Integer
+    three = new 'Integer'
     three = 3
-    four = new .Integer
+    four = new 'Integer'
     four = 4
 #    while 1:
 #        y = extract(z, 3)
@@ -121,13 +121,13 @@ loop2:
 end_loop2:
 #        z = compose((10, -10*y, 0, 1), z)
 #        yield y
-	$P5 = new .Integer
+	$P5 = new 'Integer'
 	$P5 = 10
-	$P6 = new .Integer
+	$P6 = new 'Integer'
 	$P6 = -10
 	$P6 = $P6 * y
-	$P7 = new .Integer
-	$P8 = new .Integer
+	$P7 = new 'Integer'
+	$P8 = new 'Integer'
 	$P8 = 1
 	(z0, z1, z2, z3) = "compose"($P5, $P6, $P7, $P8, z0, z1, z2, z3)
 	.yield (y)

@@ -35,7 +35,7 @@ not_p:
 	.local pmc flags
 	.local int argc, i, j, N, M, count
 
-	flags = new .FixedBooleanArray
+	flags = new 'FixedBooleanArray'
 	N = 2
 	argc = argv
 	if argc == 1 goto default 
@@ -53,7 +53,7 @@ loop:
     $I1 = 1 << $I0
     M = $I1 * 10000
 	count = primes_in_range(M, flags)
-    $P0 = new .FixedIntegerArray
+    $P0 = new 'FixedIntegerArray'
     $P0 = 2
     $P0[0] = M
     $P0[1] = count

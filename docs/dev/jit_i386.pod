@@ -38,7 +38,7 @@ opcode gets executed:
 	                     end (ret)
   inc:
 	inc I0               inc_i
-	new P0, .PerlString  new_p_ic
+	new P0, 'String'     new_p_sc
 	set P0, I0           set_p_i
 	print P0             (call)               print_p
 	print "\n"                                print_sc

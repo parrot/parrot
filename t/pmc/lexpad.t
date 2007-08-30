@@ -25,7 +25,7 @@ Tests the LexPad PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, .LexPad
+    new P0, 'LexPad'
     print "ok 1\n"
 .end
 CODE

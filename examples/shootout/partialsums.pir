@@ -10,7 +10,7 @@
 	.local int k, n
 	.local float sum, a
 	.local pmc parray
-	parray = new .FixedFloatArray
+	parray = new 'FixedFloatArray'
 	parray = 1
 	$I0 = argv
 	n = 25000

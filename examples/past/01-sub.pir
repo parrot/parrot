@@ -44,7 +44,7 @@
     .param pmc args :slurpy
     if null args goto end
     .local pmc iter
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
   loop:
     unless iter goto end
     $P0 = shift iter

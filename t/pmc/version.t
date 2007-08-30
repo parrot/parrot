@@ -30,7 +30,7 @@ Tests the Version PMC.
 
     plan(1)
 
-    new P0, .Version
+    new P0, 'Version'
     ok(1, 'Instantiated .Version')
 .end
 

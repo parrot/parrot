@@ -66,7 +66,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting sarray size" );
-    new P0, .SArray
+    new P0, 'SArray'
     set I0, P0
     eq I0, 0, OK_1
     print "not "
@@ -85,7 +85,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "attempt resize" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
     set P0[0], 100
     set I0, P0
@@ -104,7 +104,7 @@ OUTPUT
 # '
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "indexed access" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 3
     set P0[0], 100
     set P0[1], 200
@@ -144,7 +144,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 3
     push P0, 100
     push P0, 200
@@ -184,7 +184,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push / indexed" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 3
     push P0, 100
     set P0[1], 200
@@ -224,14 +224,14 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mixed indexed" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 4
     set P0[0], 1000
     set N0, 222.22
     set P0[1], N0
     set S0, "string\n"
     set P0[2], S0
-    new P1, .Undef
+    new P1, 'Undef'
     set P1, 42
     set P0[3], P1
 
@@ -257,14 +257,14 @@ string
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mixed push" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 4
     push P0, 1000
     set N0, 222.22
     push P0, N0
     set S0, "string\n"
     push P0, S0
-    new P1, .Undef
+    new P1, 'Undef'
     set P1, 42
     push P0, P1
 
@@ -290,14 +290,14 @@ string
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mixed push - clone" );
-    new P2, .SArray
+    new P2, 'SArray'
     set P2, 4
     push P2, 1000
     set N0, 222.22
     push P2, N0
     set S0, "string\n"
     push P2, S0
-    new P1, .Undef
+    new P1, 'Undef'
     set P1, 42
     push P2, P1
 
@@ -325,7 +325,7 @@ string
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "shift_integer" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 3
     set P0[0], 100
     set P0[1], 200
@@ -365,14 +365,14 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mixed shift" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 4
     push P0, 1000
     set N0, 222.22
     push P0, N0
     set S0, "string\n"
     push P0, S0
-    new P1, .Undef
+    new P1, 'Undef'
     set P1, 42
     push P0, P1
 
@@ -399,25 +399,25 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "iterator" );
     .include "iterator.pasm"
-    new P0, .SArray        # empty array
-    new P2, .SArray        # array with 2 elements
+    new P0, 'SArray'       # empty array
+    new P2, 'SArray'       # array with 2 elements
     set P2, 2
     push P2, 10
     push P2, 20
     set I0, P2
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == array.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, .Iterator, P0
+    new P1, 'Iterator', P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, .Iterator, P2
+    new P1, 'Iterator', P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -499,36 +499,36 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Access via Key PMC" );
 @{[ $fp_equality_macro ]}
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 4
     set P0[0], 100
     set P0[1], 12.298
     set P0[2], "yarrAS"
-        new P31, .Hash
-        set P31["Test"], "ok"
-        set P0[3], P31
-        new P1, .Key
-        set P1, 0
+    new P31, 'Hash'
+    set P31["Test"], "ok"
+    set P0[3], P31
+    new P1, 'Key'
+    set P1, 0
     set I0, P0[P1]
     eq I0, 100, ok1
     print "not "
 ok1:    print "ok 1\\n"
-        new P2, .Key
-        set P2, 1
+    new P2, 'Key'
+    set P2, 1
     set N0, P0[P2]
     .fp_eq(N0, 12.298, ok2)
     print "not "
 ok2:    print "ok 2\\n"
-        new P3, .Key
-        set P3, 2
+    new P3, 'Key'
+    set P3, 2
     set S0, P0[P3]
     eq S0, "yarrAS", ok3
     print "not "
 ok3:    print "ok 3\\n"
-        new P4, .Key
-        set P4, 3
+    new P4, 'Key'
+    set P4, 3
     set P5, P0[P4]
-        set S1, P5["Test"]
+    set S1, P5["Test"]
     eq S1, "ok", ok4
     print "not "
 ok4:    print "ok 4\\n"
@@ -541,12 +541,12 @@ ok 4
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Store PMC, get int" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 2
-        new P1, .Integer
-        set P1, 11
-        new P2, .Float
-        set P2, 1.1
+    new P1, 'Integer'
+    set P1, 11
+    new P2, 'Float'
+    set P2, 1.1
     set P0[0], P1
     set P0[1], P2
     set I0, P0[0]
@@ -564,7 +564,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store num, get int" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], 4.2
         set I0, P0[0]
@@ -575,7 +575,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store string, get int" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], "Non-numeric string"
         set I0, P0[0]
@@ -587,12 +587,12 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Store PMC, get num" );
 @{[ $fp_equality_macro ]}
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 2
-        new P1, .Integer
-        set P1, 11
-        new P2, .Float
-        set P2, 1.1
+    new P1, 'Integer'
+    set P1, 11
+    new P2, 'Float'
+    set P2, 1.1
     set P0[0], P1
     set P0[1], P2
     set N0, P0[0]
@@ -610,7 +610,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store int, get num" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], 12
         set N0, P0[0]
@@ -621,7 +621,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store string, get num" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], "Non-numeric string"
         set N0, P0[0]
@@ -632,12 +632,12 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Store PMC, get string" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 2
-        new P1, .String
-        set P1, "Hello"
-        new P2, .Integer
-        set P2, 1010
+    new P1, 'String'
+    set P1, "Hello"
+    new P2, 'Integer'
+    set P2, 1010
     set P0[0], P1
     set P0[1], P2
     set S0, P0[0]
@@ -655,7 +655,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store int, get string" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], 12
         set S0, P0[0]
@@ -666,7 +666,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Store num, get string" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[0], 12.5
         set S0, P0[0]
@@ -678,19 +678,19 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Store num, get PMC" );
 @{[ $fp_equality_macro ]}
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 2
     set P0[0], 12.239
     set P0[1], -1.9742
-        new P1, .Float
-        set P1, P0[0]
-        set N0, P1
+    new P1, 'Float'
+    set P1, P0[0]
+    set N0, P1
     .fp_eq(N0, 12.239, ok1)
     print "not "
 ok1:    print "ok 1\\n"
-        new P2, .Integer
-        set P2, P0[1]
-        set N0, P2
+    new P2, 'Integer'
+    set P2, P0[1]
+    set N0, P2
     .fp_eq(N0, -1.9742, ok2)
     print "not "
 ok2:    print "ok 2\\n"
@@ -701,7 +701,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: int" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[5], 12
         set I0, P0[5]
@@ -712,7 +712,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: num" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[5], 12.5
         set N0, P0[5]
@@ -723,7 +723,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: string" );
-    new P0, .SArray
+    new P0, 'SArray'
     set P0, 1
         set P0[5], "asdf"
         set S0, P0[5]
@@ -734,7 +734,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: push int" );
-    new P0, .SArray
+    new P0, 'SArray'
         push P0, 12
         set I0, P0[0]
         print I0
@@ -744,7 +744,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: push num" );
-    new P0, .SArray
+    new P0, 'SArray'
         push P0, 12.09
         set N0, P0[0]
         print N0
@@ -754,7 +754,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: push string" );
-    new P0, .SArray
+    new P0, 'SArray'
         push P0, "Ygnve"
         set S0, P0[0]
         print S0
@@ -764,13 +764,13 @@ CODE
 OUTPUT
 
 pasm_error_output_like( << 'CODE', << 'OUTPUT', "Out-of-bounds access: push pmc" );
-    new P0, .SArray
-        new P1, .Integer
-        set P1, 1234
-        push P0, P1
-        set I0, P0[0]
-        print I0
-        end
+    new P0, 'SArray'
+    new P1, 'Integer'
+    set P1, 1234
+    push P0, P1
+    set I0, P0[0]
+    print I0
+    end
 CODE
 /SArray index out of bounds/
 OUTPUT

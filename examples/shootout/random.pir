@@ -12,7 +12,7 @@ while_1:
 	dec $I0
 	if $I0 > 1 goto while_1
 	$N0 = gen_random(100.0)
-	$P0 = new .FixedFloatArray
+	$P0 = new 'FixedFloatArray'
 	$P0 = 1
 	$P0[0] = $N0
 	$S0 = sprintf "%.9f\n", $P0

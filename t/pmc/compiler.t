@@ -30,8 +30,8 @@ Tests the Compiler PMC.
 
     plan(1)
 
-    new P0, .Compiler
-    ok(1, 'Instantiated .Compiler')
+    new P0, 'Compiler'
+    ok(1, "Instantiated 'Compiler'")
 .end
 
 # Local Variables:

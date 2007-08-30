@@ -657,7 +657,7 @@ I need a shower.
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
-    #new P0, .IntList
+    #new P0, 'IntList'
     new P0, 'ResizableBooleanArray'
     set I10, 550000
     set I0, 1

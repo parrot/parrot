@@ -193,7 +193,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
 .HLL "Fool", "foo"
 .sub main :main
-    new $P1, .Foo       # load by index
+    new $P1, 'Foo'       # load by index
     $I1 = $P1
     print $I1
     print "\n"

@@ -11,7 +11,7 @@
 	.local num sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8, sum9, a
 	.local pmc parray
 	.local string result
-	parray = new .FixedFloatArray
+	parray = new 'FixedFloatArray'
 	parray = 9
 	$I0 = argv
 	n = 25000

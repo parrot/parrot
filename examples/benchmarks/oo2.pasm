@@ -49,11 +49,11 @@ loop:
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 10
     setattribute P2, I0, P10
     inc I0
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 20
     setattribute P2, I0, P10
     returncc

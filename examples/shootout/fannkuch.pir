@@ -8,9 +8,9 @@
 .sub fannkuch
 	.param int n
 	.local pmc perm, perm1, count
-	perm  = new .FixedIntegerArray
-	perm1 = new .FixedIntegerArray
-	count = new .FixedIntegerArray
+	perm  = new 'FixedIntegerArray'
+	perm1 = new 'FixedIntegerArray'
+	count = new 'FixedIntegerArray'
 	.local int flips, flipsMax, r, i, k, didpr
 	.local int n1
 	n1 = n

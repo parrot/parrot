@@ -29,7 +29,7 @@ board.pir - a tetris board class.
     subclass $P0, $P0, "Tetris::Board"
 
     # set the BUILD method name
-    $P1 = new .String
+    $P1 = new 'String'
     $P1 = 'BUILD'
     setprop $P0, 'BUILD', $P1
 END:
@@ -93,27 +93,27 @@ Returns the created board.
     i = app."registerBoard"( self )
     
     # set the 'next fall time'
-    new temp, .Float
+    new temp, 'Float'
     set temp, 0
     setprop self, "NextFallTime", temp
     
     # set the 'fall interval'
-    new temp, .Float
+    new temp, 'Float'
     set temp, 0.5
     setprop self, "FallInterval", temp
     
     # xpos
-    new temp, .Integer
+    new temp, 'Integer'
     set temp, 10
     setprop self, "xpos", temp
 
     # ypos
-    new temp, .Integer
+    new temp, 'Integer'
     set temp, 10
     setprop self, "ypos", temp
     
     # set the blocksize
-    new temp, .Integer
+    new temp, 'Integer'
     set temp, blocksize
     setprop self, "blocksize", temp
     
@@ -608,7 +608,7 @@ This method returns nothing.
     .local int yp
     .local pmc rect
     
-    rect = new .Hash
+    rect = new 'Hash'
     
     # get the app's palette
     $P0 = self."application"()
@@ -889,7 +889,7 @@ TDB
     $I0 = blocks
 
     # get a random block id
-    $P0 = new .Random
+    $P0 = new 'Random'
     $N0 = $P0
     $N0 = $N0 * $I0
     id = $N0

@@ -39,7 +39,7 @@ at the moment:
 	set I11, 0
 noarg:
 	set I0, 100
-	new P0, .ResizablePMCArray
+	new P0, 'ResizablePMCArray'
 
 ol:	bsr buildarray
 	set P0[I0], P1
@@ -48,12 +48,12 @@ ol:	bsr buildarray
 
 # now check reusage, destroy them depending on I11
 	unless I11, no_dest
-	new P0, .Undef
+	new P0, 'Undef'
 no_dest:
 	set I0, 5000000
-	new P3, .ResizablePMCArray
+	new P3, 'ResizablePMCArray'
 l2:
-	new P1, .Integer
+	new P1, 'Integer'
 	set P3[0], P1
 	dec I0
 	if I0, l2
@@ -75,8 +75,8 @@ l2:
 	# Our inner loop, 10000 times
 buildarray:
 	set I1, 10000
-	new P1, .ResizablePMCArray
-loop1:	new P9, .Integer
+	new P1, 'ResizablePMCArray'
+loop1:	new P9, 'Integer'
 	set P9, I1
 	set P1[I1], P9
 	dec I1

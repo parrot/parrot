@@ -30,10 +30,10 @@ Tests the Enumerate PMC.
 
     plan(1)
 
-    new P1, .Array
-    new P0, .Enumerate, P1
+    new P1, 'Array'
+    new P0, 'Enumerate', P1
 
-    ok(1, 'Instantiated .Enumerate')
+    ok(1, "Instantiated 'Enumerate'")
 .end
 
 # Local Variables:

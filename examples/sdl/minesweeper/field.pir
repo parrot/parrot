@@ -7,7 +7,7 @@ Mines::Field - A minesweeper field
 =head1 SYNOPSIS
 
     # setup field properties
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['width']  = 40
     $P0['height'] = 28
     $P0['mines']  = 0.1075
@@ -130,8 +130,8 @@ SDL surface to use for drawing.
     mines  = args['mines']
     screen = args['screen']
     debug  = args['debug']
-    field  = new .ResizablePMCArray
-    cache  = new .ResizablePMCArray
+    field  = new 'ResizablePMCArray'
+    cache  = new 'ResizablePMCArray'
 
     $I0 = find_type 'SDL::StopWatch'
     watch = new $I0, screen
@@ -162,31 +162,31 @@ SDL surface to use for drawing.
 
     # width
     inc $I0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = width
     setattribute self, $I0, $P0
-    
+
     # height
     inc $I0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = height
     setattribute self, $I0, $P0
 
     # mines
     inc $I0
-    $P0 = new .Float
+    $P0 = new 'Float'
     $P0 = mines
     setattribute self, $I0, $P0
 
     # markpos
     inc $I0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = -1
     setattribute self, $I0, $P0
 
     # debug
     inc $I0
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     $P0 = debug
     setattribute self, $I0, $P0
 
@@ -200,19 +200,19 @@ SDL surface to use for drawing.
 
     # button
     inc $I0
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/smiley.png"
     $I1 = find_type "SDL::Button"
     $P0 = new $I1, $P0
     $P0.'states'( 5 )
     $P0.'pos'( 305, 2 )
     $P0.'size'( 30, 30 )
-    
+
     $P1 = find_global 'Mines::Field', '_button_clicked'
     $P0.'setAction'( STATUS_PLAYING, $P1 )
     $P0.'setAction'( STATUS_WON, $P1 )
     $P0.'setAction'( STATUS_LOST, $P1 )
-    
+
     setattribute self, $I0, $P0
 
     self.'newLevel'( level )
@@ -248,7 +248,7 @@ Creates a new level, with the given number as initial seed for the PRNG.
     add $I0, 2
     $P0 = getattribute self, $I0
     width = $P0
-    
+
     # height
     inc $I0
     $P0 = getattribute self, $I0
@@ -263,15 +263,15 @@ Creates a new level, with the given number as initial seed for the PRNG.
 
     field = 0
     cache = 0
-    
+
     # fill the field
 LOOP:
     level += size
-    
+
     $I0 = level
     shl $I0, 13
     $I0 = or $I0, level
-    
+
     $I1 = $I0 * $I0
     $I1 *= 15731
     $I1 += 789221
@@ -286,7 +286,7 @@ LOOP:
     $I0 = $N0
     $N0 = $N0 - $I0
     level += $I0
-    
+
     val = VAL_UNEXPLORED_NO_MINE
     ge $N0, mines, NO_MINE
     val = VAL_UNEXPLORED_MINE
@@ -294,7 +294,7 @@ NO_MINE:
 
     push field, val
     push cache, VAL_INVALID
-        
+
     dec size
     if size <= 0 goto END
     branch LOOP
@@ -349,7 +349,7 @@ Draws the field, then the LCDs and the smiley button.
     # screen
     inc $I0
     screen = getattribute self, $I0
-    
+
     # width
     inc $I0
     $P0 = getattribute self, $I0
@@ -377,7 +377,7 @@ DEBUG:
     image = find_global "Mines::Field", "field_debug"
 IMAGE_OK:
     $I0 = find_type "SDL::Rect"
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     $P0['x'] = 0
     $P0['y'] = 0
     $P0['width']  = 0
@@ -398,7 +398,7 @@ LOOP:
     $I0 = $P0
     $P0 = shift cacheit
     $I1 = $P0
-    
+
     # current field already drawn?
     if $I0 == $I1 goto NEXT
 
@@ -406,10 +406,10 @@ LOOP:
 
     $I1 = cmod i, width
     $I2 = div i, width
-    
+
     mul $I1, FIELD_WIDTH
     mul $I2, FIELD_HEIGHT
-    
+
     add $I1, 0
     add $I2, 32
 
@@ -431,16 +431,16 @@ SKIP3:
     if $I2 < maxy goto SKIP4
     maxy = $I2
 SKIP4:
-    
+
     $I1 = cmod $I0, 5
     $I2 = div $I0, 5
 
     mul $I1, FIELD_WIDTH
     mul $I2, FIELD_HEIGHT
-    
+
     src_rect.'x'( $I1 )
     src_rect.'y'( $I2 )
-    
+
     screen.'blit'( image, src_rect, dest_rect )
 NEXT:
     inc i
@@ -452,7 +452,7 @@ END:
 
     if maxx <= minx goto NO_SCREEN_UPDATE
     if maxy <= miny goto NO_SCREEN_UPDATE
-    
+
     dest_rect.'x'( minx )
     dest_rect.'y'( miny )
     $I0 = maxx - minx
@@ -492,7 +492,7 @@ Returns 1 if successful, 0 otherwise.
     .local pmc watch
 
     self."undo_mark"()
-            
+
     $I0 = classoffset self, 'Mines::Field'
 
     # width
@@ -508,21 +508,21 @@ Returns 1 if successful, 0 otherwise.
     # watch
     add $I0, 5
     watch = getattribute self, $I0
-    
+
     # status
     inc $I0
     $P0 = getattribute self, $I0
     if $P0 > STATUS_CHOOSING goto END
-    
+
     x -= 0
     y -= 32
 
     if x < 0 goto END
     if y < 0 goto END
-    
+
     x /= FIELD_WIDTH
-    y /= FIELD_HEIGHT    
-        
+    y /= FIELD_HEIGHT
+
     watch.'start'()
     self.'reveal_recursive'( x, y, width, height )
     self.'check_end'()
@@ -552,7 +552,7 @@ Returns 1 if successful, 0 otherwise.
     .local int v
 
     self."undo_mark"()
-    
+
     $I0 = classoffset self, 'Mines::Field'
 
     # field
@@ -567,7 +567,7 @@ Returns 1 if successful, 0 otherwise.
     # watch
     add $I0, 6
     watch = getattribute self, $I0
-    
+
     # status
     inc $I0
     $P0 = getattribute self, $I0
@@ -581,10 +581,10 @@ Returns 1 if successful, 0 otherwise.
 
     x /= FIELD_WIDTH
     y /= FIELD_HEIGHT
-    
+
     pos = y * width
     pos += x
-    
+
     v = field[pos]
 
     if v == VAL_FLAG_NO_MINE goto PLUS2
@@ -598,10 +598,10 @@ Returns 1 if successful, 0 otherwise.
 PLUS2:
     v += 2
     branch DRAW
-    
+
 MINUS4:
     v -= 4
-    
+
 DRAW:
     field[pos] = v
 
@@ -646,8 +646,8 @@ This method returns nothing.
     .local pmc markpos
     .local pmc field
     .local pmc status
-    
-    
+
+
     $I0 = classoffset self, 'Mines::Field'
 
     # field
@@ -694,9 +694,9 @@ removed if you call this method.
     .local pmc watch
     .local int pos
     .local int v
-    
+
     self."undo_mark"()
-    
+
     $I0 = classoffset self, 'Mines::Field'
 
     # field
@@ -718,7 +718,7 @@ removed if you call this method.
     # watch
     add $I0, 3
     watch = getattribute self, $I0
-    
+
     # status
     inc $I0
     $P0 = getattribute self, $I0
@@ -729,7 +729,7 @@ removed if you call this method.
 
     x /= FIELD_WIDTH
     y /= FIELD_HEIGHT
-    
+
     pos = y * width
     pos += x
 
@@ -788,16 +788,16 @@ The horizontal mouse position.
     if y > 32 goto END
 
     $I0 = classoffset self, 'Mines::Field'
-    
+
     add $I0, 10
     $P0 = getattribute self, $I0
     $I0 = $P0.'click'( x, y, b, self )
     unless $I0 goto END
-    
+
     $I0 = classoffset self, 'Mines::Field'
     add $I0, 2
     $P1 = getattribute self, $I0
-    
+
     $P0.draw( $P1 )
 END:
 
@@ -824,16 +824,16 @@ have to be specified for performance reasons.
     if y < 0 goto END
     if x >= width goto END
     if y >= height goto END
-    
+
     pos = y * width
     pos += x
 
     $I0 = classoffset self, 'Mines::Field'
-    
+
     # field
     $P0 = getattribute self, $I0
     field = $P0
-    
+
     $I0 = field[pos]
     if $I0 == VAL_FREE goto END
     if $I0 == VAL_UNEXPLORED_NO_MINE goto UNEXPLORED
@@ -891,7 +891,7 @@ Shows the position of all mines on the field.
     .local pmc field
     .local int i
     .local int max
-    
+
     self."setStatus"( STATUS_LOST )
 
     classoffset $I0, self, "Mines::Field"
@@ -901,7 +901,7 @@ Shows the position of all mines on the field.
     i = 0
 LOOP:
     if i >= max goto END
-    
+
     $I1 = field[i]
 
     if $I1 == VAL_UNEXPLORED_MINE goto MINE
@@ -909,14 +909,14 @@ LOOP:
     if $I1 == VAL_FLAG_NO_MINE goto NO_MINE
     branch NEXT
 
-MINE:    
+MINE:
     $I1 = VAL_MINE
     branch NEXT
 
-NO_MINE:    
+NO_MINE:
     $I1 = VAL_NO_MINE
     branch NEXT
-    
+
 NEXT:
     field[i] = $I1
     inc i
@@ -942,18 +942,18 @@ Checks if you have won.
 
 .sub check_end :method
     .local pmc field
-    
+
     classoffset $I0, self, "Mines::Field"
     getattribute field, self, $I0
-    field = new .Iterator, field
+    field = new 'Iterator', field
     field = .ITERATE_FROM_START
 LOOP:
     unless field goto WON
-    
+
     $I0 = shift field
 
     if $I0 <= 8 goto LOOP
-    
+
     if $I0 == VAL_MINE goto END
     if $I0 == VAL_MINE_EXPLODED goto END
     if $I0 == VAL_UNSURE_MINE goto END
@@ -980,7 +980,7 @@ Sets a new game status.
     .local pmc screen
     .local pmc watch
     .local pmc status
-    
+
     classoffset $I0, self, "Mines::Field"
 
     # screen
@@ -994,7 +994,7 @@ Sets a new game status.
     # status
     inc $I0
     status = getattribute self, $I0
-    
+
     if s == STATUS_PLAYING goto OK
     if s == STATUS_CHOOSING goto OK
     # not playing at the moment, stop the watch
@@ -1002,10 +1002,10 @@ Sets a new game status.
 OK:
     # no need to start the watch here
 
-    status = s    
+    status = s
     self."undo_mark"( 1 )
     watch.'draw'( screen )
-    
+
 DONE:
 .end
 
@@ -1020,16 +1020,16 @@ Counts the unrevealed mines and updates the LCD.
     .local int size
     .local pmc count
     .local pmc mines_lcd
-    
+
     classoffset $I0, self, "Mines::Field"
     getattribute field, self, $I0
     add $I0, 8
     getattribute mines_lcd, self, $I0
-    
+
     size = field
-    field = new .Iterator, field
+    field = new 'Iterator' field
     field = .ITERATE_FROM_START
-    count = new .ResizablePMCArray
+    count = new 'ResizablePMCArray'
 
 LOOP:
     unless field goto END
@@ -1046,7 +1046,7 @@ END:
     $I3 = count[VAL_MINE]
     $I4 = count[VAL_MINE_EXPLODED]
     $I5 = count[VAL_MARK_MINE]
-    
+
     $I0 += $I1
     $I0 -= $I2
     $I0 += $I3
@@ -1089,13 +1089,13 @@ This method is called automatically when this module is loaded.
     # XXX: remove
     load_bytecode "library/Data/Dumper.pir"
 
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines.png"
-    $I0 = find_type "SDL::Image"    
+    $I0 = find_type "SDL::Image"
     image = new $I0, $P0
     store_global "Mines::Field", "field", image
 
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines_debug.png"
     image = new $I0, $P0
     store_global "Mines::Field", "field_debug", image
@@ -1137,9 +1137,9 @@ The width and height are the dimensions of the board.
     .local int j
     .local int j2
     .local int pos
-    
+
     mines = 0
-    
+
     set i1, x
     dec i1
     set i2, x
@@ -1161,10 +1161,10 @@ LOOPi:
 
     pos = j * width
     pos += i
-    
+
     $I0 = _mine_at( field, pos )
     unless $I0 goto NEXTi
-    
+
     inc mines
 
 NEXTi:
@@ -1173,7 +1173,7 @@ NEXTi:
 ENDi:
     inc j
     if j <= j2 goto LOOPj
-    
+
     .return (mines)
 .end
 
@@ -1188,7 +1188,7 @@ at the specified position, 0 otherwise.
     .param pmc field
     .param int pos
     .local int v
-    
+
     v = field[pos]
     if v == VAL_MINE goto MINE
     if v == VAL_MINE_EXPLODED goto MINE

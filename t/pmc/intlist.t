@@ -24,7 +24,7 @@ F<t/dynpmc/sparse_perlarray.t>.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "creation" );
-        new P0, .IntList
+        new P0, 'IntList'
         set I0, P0
         print "Created IntList with "
         print I0
@@ -37,7 +37,7 @@ OUTPUT
 # This test just runs way too slowly with GC_DEBUG turned on, so lets
 # turn it off for make test runs.
 pasm_output_is( <<'CODE', <<'OUTPUT', "aerobics" );
-        new P0, .IntList
+        new P0, 'IntList'
         set I10, 10000
 
         set I1, 0
@@ -169,7 +169,7 @@ I need a shower.
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
-        new P0, .IntList
+    new P0, 'IntList'
     set I10, 1100000
     set I0, 1
 lp1:
@@ -223,7 +223,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sparse access" );
-        new P0, .IntList
+    new P0, 'IntList'
     set I10, 110000
     set I0, 1
 lp1:
@@ -292,7 +292,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
-        new P0, .IntList
+    new P0, 'IntList'
     set I10, 100
     set I0, 0
     # push some values at start
@@ -357,7 +357,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "clone" );
-        new P0, .IntList
+    new P0, 'IntList'
     set P0[0], 100
     set P0[5000], 200
     clone P1, P0
@@ -394,8 +394,8 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "access via a PMC key" );
-        new P0, .IntList
-        new P1, .Key
+        new P0, 'IntList'
+        new P1, 'Key'
         set I0, 0
 
 L1:     set P1, I0
@@ -413,8 +413,8 @@ L2:     set I3, P0[I2]
         print "ok 1\n"
 
 GET:
-        new P2, .IntList
-        new P3, .Key
+        new P2, 'IntList'
+        new P3, 'Key'
 
         set I0, 0
 L3:     set P2[I0], I0

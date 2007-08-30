@@ -9,9 +9,9 @@
 
 _main:
 	loadlib P1, "subproxy"
-	new P3, .Key
+	new P3, 'Key'
 	set P3, "src/dynpmc/ext.pir"	# file - FIXME path handling
-	new P4, .Key
+	new P4, 'Key'
 	set P4, "_ext_main"	# sub label
 	push P3, P4
 	find_type I0, "SubProxy"

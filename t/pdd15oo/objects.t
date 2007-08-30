@@ -1700,7 +1700,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
-    new P0, .ParrotObject
+    new P0, 'ParrotObject'
     end
 CODE
 /Can't create new ParrotObject/

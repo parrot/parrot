@@ -38,7 +38,7 @@ NREDO:	$N1 = 1 / i
 	dec n
 	if n goto NREDO
 
-      	$P0 = new .FixedFloatArray
+      	$P0 = new 'FixedFloatArray'
 	$P0 = 1
 	$P0[0] = sum
 	$S0 = sprintf "%.9f\n", $P0

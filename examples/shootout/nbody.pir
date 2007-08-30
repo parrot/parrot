@@ -20,7 +20,7 @@
 	$N1 = .num5 * 365.24
 	$N2 = .num6 * 365.24
 	$N3 = .num7 * 39.478417604357428
-	$P0 = new .FixedFloatArray
+	$P0 = new 'FixedFloatArray'
 	$P0 = 7
 	.bodies[.i] = $P0
 	.bodies[.i; x] = .num1
@@ -42,7 +42,7 @@
 	n = $S0
 argsok:
 	.local pmc bodies
-	bodies = new .FixedPMCArray
+	bodies = new 'FixedPMCArray'
 	bodies = 5
 	# Sun
 	.InitBodies(bodies, 0, 0, 0, 0, 0, 0, 0, 1)
@@ -87,7 +87,7 @@ argsok:
 	offset_momentum(nbodies, bodies)
 	$N0 = energy(nbodies, bodies)
 	.local pmc spf
-	spf = new .FixedFloatArray
+	spf = new 'FixedFloatArray'
 	spf = 1
 	spf[0] = $N0
 	$S0 = sprintf "%.9f\n", spf

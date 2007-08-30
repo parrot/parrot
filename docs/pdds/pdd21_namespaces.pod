@@ -600,7 +600,7 @@ PIR (without error checking):
     .local pmc tcl
     .local pmc ns
     tcl = compreg "tcl"
-    ns = new .Array
+    ns = new 'Array'
     ns = 2
     ns[0] = "Some"
     ns[1] = "Module"

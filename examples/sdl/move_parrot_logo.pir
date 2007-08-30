@@ -77,7 +77,7 @@ To run this file, run the following command from the Parrot directory:
 	event.'init'()
 
 	.local pmc handler_args
-	handler_args = new .Hash
+	handler_args = new 'Hash'
 	handler_args[ 'screen' ] = main_screen
 	handler_args[ 'sprite' ] = sprite
 

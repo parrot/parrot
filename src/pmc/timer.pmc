@@ -8,7 +8,7 @@ src/pmc/timer.pmc - Timer
 
 =head1 SYNOPSIS
 
-    new P0, .Timer
+    new P0, 'Timer'
     set P0[.PARROT_TIMER_SEC], I_seconds        # whole seconds
     set P0[.PARROT_TIMER_USEC], I_micro seconds # and/or micro seconds
     set P0[.PARROT_TIMER_NSEC], N_seconds_frac  # or fraction in seconds
@@ -17,7 +17,7 @@ src/pmc/timer.pmc - Timer
     invoke P0                                   # start timer
     set P0[.PARROT_TIMER_RUNNING], 1            # same
 
-    new P0, .Timer, P1                          # set everything
+    new P0, 'Timer', P1                         # set everything
 
     set I0, P0[.PARROT_TIMER_SEC]               # query current timer status
     set N0, P0[.PARROT_TIMER_NSEC]

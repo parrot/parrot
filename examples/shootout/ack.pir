@@ -30,7 +30,7 @@ go:
     $P0.'recursion_limit'(100000)
     r = ack(x, y)
     .local pmc args
-    args = new .ResizableIntegerArray
+    args = new 'ResizableIntegerArray'
     push args, x
     push args, y
     push args, r

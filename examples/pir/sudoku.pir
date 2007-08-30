@@ -215,7 +215,7 @@ nc_stop:
 nok:
     # need backtracking
     .local pmc tries, all
-    tries = new .ResizablePMCArray
+    tries = new 'ResizablePMCArray'
     all = getattribute self, "all"
     push tries, all
     $I0 = self."back_track"(tries)
@@ -338,7 +338,7 @@ some:
     if name goto sel_name
 
 list_names:
-    new it, .Iterator, b
+    new it, 'Iterator', b
     it = .ITERATE_FROM_START
 loop:
     unless it goto fin
@@ -521,7 +521,7 @@ not_set:
     i = length raw
     if i != 81 goto len_err
     .local pmc ar
-    ar = new .FixedIntegerArray
+    ar = new 'FixedIntegerArray'
     ar = 81
     i = 0
 loop:
@@ -583,7 +583,7 @@ check_nc:
     .param string what
     .local pmc rcss, rcs, all
 
-    rcss = new .FixedPMCArray
+    rcss = new 'FixedPMCArray'
     rcss = 9
     setattribute self, what, rcss
     all = getattribute self, "all"
@@ -593,7 +593,7 @@ check_nc:
     # create arrays
     y = 0
 ly1:
-    rcs = new .FixedPMCArray
+    rcs = new 'FixedPMCArray'
     rcs = 9
     rcss[y] = rcs
     inc y
@@ -634,9 +634,9 @@ lx2:
     c = ar[p]
 
     # the entries 'e' and 'inv' are common to all 3 views of the sudoku
-    e = new .Integer
+    e = new 'Integer'
     e = c
-    inv = new .Integer
+    inv = new 'Integer'
 
     # set row
     row = rows[y]
@@ -867,7 +867,7 @@ err:
     y = 0
 lpy:
     one = rcss[y]
-    seen = new .Hash
+    seen = new 'Hash'
     x = 0
 lpx:
     e = one[x]
@@ -900,7 +900,7 @@ ret_0:
 .sub check_seen
     .param pmc seen
     .local pmc it
-    new it, .Iterator, seen
+    new it, 'Iterator', seen
     it = .ITERATE_FROM_START
 loop:
     unless it goto ok
@@ -985,12 +985,12 @@ nxt_n:
     # transpose into a digit-base array with positions as bits
     # this should simplify the test for 2 empty squares with
     # same digit
-    digs = new .FixedPMCArray
+    digs = new 'FixedPMCArray'
     digs = 9
     n = 0
 lpn:
     msk = 2 << n
-    d = new .Integer
+    d = new 'Integer'
     digs[n] = d
     x = 0
     # don't bother looking further if n is already set
@@ -1013,7 +1013,7 @@ nxt_n:
 
     x1 = 0
 lpx1:
-    empty_2 = new .ResizablePMCArray
+    empty_2 = new 'ResizablePMCArray'
     e1 = digs[x1]
     n = bits0(e1)
     if n != 2 goto nxt_x1
@@ -1604,7 +1604,7 @@ lpn:
     # when scanning cols, sx is horizontal
     # need 3 cols at a time
 lpsx:
-    bits = new .FixedIntegerArray
+    bits = new 'FixedIntegerArray'
     bits = 3
     x = 0
 lpx:

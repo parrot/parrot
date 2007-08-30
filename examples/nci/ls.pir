@@ -28,7 +28,7 @@ List the content of the directory 'docs'.
      .local OrderedHash entry
 
      .include "datatypes.pasm"
-     new $P2, .OrderedHash
+     new $P2, 'OrderedHash'
      set $P2["d_fileno"], .DATATYPE_INT64
      push $P2, 0
      push $P2, 0

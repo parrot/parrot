@@ -14,7 +14,7 @@ blocks.pir - tetris block classes
 
     getclass $P1, "Tetris::Block"
 
-    $P2 = new .String
+    $P2 = new 'String'
     $P2 = "__init"
 
     subclass $P0, $P1, "Tetris::Block::0"
@@ -22,27 +22,27 @@ blocks.pir - tetris block classes
 
     subclass $P0, $P1, "Tetris::Block::1"
     setprop $P0, "BUILD", $P2
-    
+
     subclass $P0, $P1, "Tetris::Block::2"
     setprop $P0, "BUILD", $P2
-    
+
     subclass $P0, $P1, "Tetris::Block::3"
     setprop $P0, "BUILD", $P2
-    
+
     subclass $P0, $P1, "Tetris::Block::4"
     setprop $P0, "BUILD", $P2
-    
+
     subclass $P0, $P1, "Tetris::Block::5"
     setprop $P0, "BUILD", $P2
-    
+
     subclass $P0, $P1, "Tetris::Block::6"
     setprop $P0, "BUILD", $P2
-    
+
     .local pmc blocks
     .local pmc block
-    
+
     blocks = new IntList
-    
+
     find_type $I0, "Tetris::Block::0"
     push blocks, $I0
     find_type $I0, "Tetris::Block::1"
@@ -57,7 +57,7 @@ blocks.pir - tetris block classes
     push blocks, $I0
     find_type $I0, "Tetris::Block::6"
     push blocks, $I0
-    
+
     store_global "Tetris::Block", "blocks", blocks
 END:
 .end
@@ -113,7 +113,7 @@ END:
 # ...
 .sub __init :method
     .local pmc block
-    
+
     block = new IntList
     push block, 1
     push block, 1
@@ -138,7 +138,7 @@ END:
 # ...
 .sub __init :method
     .local pmc block
-    
+
     block = new IntList
     push block, 1
     push block, 1
@@ -163,7 +163,7 @@ END:
 # ...
 .sub __init :method
     .local pmc block
-    
+
     block = new IntList
     push block, 0
     push block, 1
@@ -188,7 +188,7 @@ END:
 # ...
 .sub __init :method
     .local pmc block
-    
+
     block = new IntList
     push block, 1
     push block, 1
@@ -214,7 +214,7 @@ END:
 # ....
 .sub __init :method
     .local pmc block
-    
+
     block = new IntList
     push block, 1
     push block, 1

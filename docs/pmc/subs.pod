@@ -41,7 +41,7 @@ F<imcc/docs/calling_conventions.pod>
 
 Create a subroutine of class C<Sub> and assign the subroutine address to it:
 
-  new P0, .Sub
+  new P0, 'Sub'
   set_addr P0, _sub_label
 
 This can be done with one opcode:

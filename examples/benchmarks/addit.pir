@@ -20,22 +20,22 @@ using Parrot calling conventions (PDD 3). It calls an "add it" function
 
 .sub addit :main
         .local pmc a0
-	a0 = new .Integer
+	a0 = new 'Integer'
 	a0 = 1000
         .local pmc a1
-	a1 = new .Float
+	a1 = new 'Float'
 	a1 = 7.100
         .local pmc a2
-	a2 = new .Integer
+	a2 = new 'Integer'
 	a2 = 87
         .local pmc a3
-	a3 = new .String
+	a3 = new 'String'
 	a3 = "3.87"
         .local pmc a4
-	a4 = new .String
+	a4 = new 'String'
         a4 = "21000000"
 	.local pmc x
-	x = new .Integer
+	x = new 'Integer'
         x = 500000
 AGAIN:
         dec x
@@ -56,7 +56,7 @@ FIN:
 	.param pmc a3
 	.param pmc a4
         .local pmc sum
-	sum = new .Float
+	sum = new 'Float'
         add sum, a0
         add sum, a1
         add sum, a2

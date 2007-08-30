@@ -12,11 +12,11 @@
     new P3, I12
 loop:
     classoffset I0, P3, "Foo"
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, I10
     setattribute P3, I0, P4
     inc I0
-    new P4, .Integer
+    new P4, 'Integer'
     set P4, I10
     setattribute P3, I0, P4
     inc I10
@@ -33,11 +33,11 @@ loop:
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 10
     setattribute P2, I0, P10
     inc I0
-    new P10, .Integer
+    new P10, 'Integer'
     set P10, 20
     setattribute P2, I0, P10
     returncc

@@ -90,7 +90,7 @@ endfor_i:
 	.param pmc AtAu
 
 	.local pmc v
-	v = new .FixedFloatArray
+	v = new 'FixedFloatArray'
 	v = N
 
 	eval_A_times_u(N,u,v)
@@ -109,9 +109,9 @@ endfor_i:
 	N = $S0
 default:
 	.local pmc u, v
-	u = new .FixedFloatArray
+	u = new 'FixedFloatArray'
 	u = N
-	v = new .FixedFloatArray
+	v = new 'FixedFloatArray'
 	v = N
 
 	.local int i
@@ -157,7 +157,7 @@ endfor_calc:
 	$N0 = vBv / vv
 	$N0 = sqrt $N0
 	.local pmc spf
-	spf = new .FixedFloatArray
+	spf = new 'FixedFloatArray'
 	spf = 1
 	spf[0] = $N0
 	$S0 = sprintf "%.9f\n", spf

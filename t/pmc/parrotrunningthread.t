@@ -30,7 +30,7 @@ Tests the ParrotRunningThread PMC.
 
     plan(1)
 
-    new P0, .ParrotRunningThread
+    new P0, 'ParrotRunningThread'
     ok(1, 'Instantiated .ParrotRunningThread')
 .end
 

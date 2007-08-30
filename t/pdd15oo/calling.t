@@ -1724,7 +1724,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
 .pcc_sub main:
-    new P0, .Hash
+    new P0, 'Hash'
     set P0['a'], 20
     set P0['b'], 10
     set_args "(0x220)", P0            # :flatten :named

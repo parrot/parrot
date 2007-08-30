@@ -23,8 +23,8 @@ Tests mainly morphing undef to other types.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "morph to string" );
-        new P0, .String
-        new P1, .Undef
+        new P0, 'String'
+        new P1, 'Undef'
         set P0, "foo"
         concat  P1, P0, P0
     print P1
