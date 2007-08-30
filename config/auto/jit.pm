@@ -36,10 +36,16 @@ sub runstep {
     }
 
     my $verbose = $conf->options->get('verbose');
+    $verbose and print $/;
 
     my $jitbase  = 'src/jit';                      # base path for jit sources
     my $archname = $conf->data->get('archname');
     my ( $cpuarch, $osname ) = split( /-/, $archname );
+
+    if ( $verbose ) {
+        print "determining operating system and cpu architecture$/";
+        print "archname: <$archname>$/";
+    }
 
     if ( !defined $osname ) {
         ( $osname, $cpuarch ) = ( $cpuarch, q{} );
@@ -59,8 +65,9 @@ sub runstep {
             $cpuarch = 'ppc';
         }
     }
+    # cpuarch and osname are reversed in archname on windows
     elsif ( $cpuarch =~ /MSWin32/ ) {
-        $cpuarch = 'i386';
+        $cpuarch = ( $osname =~ /x64/ ) ? 'amd64' : 'i386';
         $osname  = 'MSWin32';
     }
     elsif ( $osname =~ /cygwin/i || $cpuarch =~ /cygwin/i ) {
@@ -75,6 +82,8 @@ sub runstep {
     $cpuarch =~ s/armv[34]l?/arm/i;
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
+
+    warn "osname: $osname\ncpuarch: $cpuarch\n" if $verbose;
 
     $conf->data->set(
         archname => $archname,
