@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -9,11 +9,11 @@ src/pmc/tqueue.pmc - Threadsafe Queue
 =head1 DESCRIPTION
 
 Threadsafe queue class for inter thread communication. If you have an
-unthreaded program then please use a PerlArray.
+unthreaded program then please use an Array-like PMC.
 
-     new P0, .TQueue
+     new P0, 'TQueue'
      push P0, some
-     new P2, .ParrotThread
+     new P2, 'ParrotThread'
      ...
 
 and in other thread (at least, when shared PMCs work :)
@@ -46,7 +46,7 @@ Initializes the queue.
 
     void init() {
         PMC_int_val(SELF) = 0;
-        PMC_data(SELF) = queue_init(0);
+        PMC_data(SELF)    = queue_init(0);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -83,9 +83,11 @@ Marks all the threads in the queue as live.
         entry = queue->head;
 
         while (entry) {
-            pobject_lives(INTERP, (PObj*) entry->data);
+            pobject_lives(INTERP, (PObj *)entry->data);
+
             if (entry == queue->tail)
                 break;
+
             entry = entry->next;
         }
 
@@ -185,21 +187,26 @@ Adds the thread C<*item> to the end of the queue.
             VTABLE_share(INTERP, item);
 
         DOD_WRITE_BARRIER(INTERP, SELF, NULL, item);
+
         entry->data = item;
         entry->type = QUEUE_ENTRY_TYPE_NONE;
+
         /* s. tsq.c:queue_push */
         queue_lock(queue);
         ++PMC_int_val(SELF);
+
         /* Is there something in the queue? */
         if (queue->tail) {
             queue->tail->next = entry;
-            queue->tail = entry;
+            queue->tail       = entry;
         }
         else {
             queue->head = entry;
             queue->tail = entry;
         }
-        queue_broadcast(queue);        /* signal all waiters */
+
+        /* signal all waiters */
+        queue_broadcast(queue);
         queue_unlock(queue);
     }
 
@@ -214,18 +221,21 @@ Removes the first thread from the start of the queue.
 */
 
     PMC *shift_pmc() {
-        QUEUE_ENTRY *entry;
         QUEUE       *queue = PMC_data_typed(SELF, QUEUE *);
+        QUEUE_ENTRY *entry;
         PMC         *ret;
 
         queue_lock(queue);
+
         while (queue->head == NULL) {
             queue_wait(queue);
         }
 
         entry = nosync_pop_entry(queue);
         --PMC_int_val(SELF);
+
         queue_unlock(queue);
+
         ret   = (PMC *)entry->data;
         mem_sys_free(entry);
 

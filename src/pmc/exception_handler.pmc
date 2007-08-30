@@ -27,11 +27,13 @@ static opcode_t *
 pass_exception_args(PARROT_INTERP, const char *sig,
         opcode_t *dest, parrot_context_t * old_ctx, ...)
 {
-    va_list ap;
+    va_list   ap;
     opcode_t *next;
+
     va_start(ap, old_ctx);
     next = parrot_pass_args_fromc(interp, sig, dest, old_ctx, ap);
     va_end(ap);
+
     return next;
 }
 
@@ -50,13 +52,11 @@ Initializes the exception handler.
     void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
         PMC_pmc_val(SELF)    = PMCNULL;
-        /*
-         * an exception handler has no separate context, its
-         * only a snapshot of an "earlier" context, which is
-         * contained in the interpreter's context - the stacks
-         * can only be deeper in the interpreter - so no
-         * mark of context is needed
-         */
+
+        /* an exception handler has no separate context; it's only a snapshot
+         * of an "earlier" context, which is contained in the interpreter's
+         * context - the stacks can only be deeper in the interpreter - so no
+         * mark of context is needed */
         PObj_active_destroy_SET(SELF);
     }
 
@@ -65,12 +65,13 @@ Initializes the exception handler.
      * XXX fix ref_count handling for exception_handlers first
      *
      * An Exception_Handler is kind of a limited Continuation
-     * (can only call 'up the stack') Therefore we probably don't
+     * (can only call 'up the stack').  Therefore we probably don't
      * have to convert all RetContinuations to real Continuations
      */
 
     void destroy() {
-        struct Parrot_cont *cc = PMC_cont(SELF);
+        Parrot_cont *cc = PMC_cont(SELF);
+
         if (cc) {
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;
@@ -84,7 +85,7 @@ Initializes the exception handler.
     }
 
     opcode_t *invoke(void *ex) {
-        struct Parrot_cont *cc        = PMC_cont(SELF);
+        Parrot_cont        *cc        = PMC_cont(SELF);
         PMC                *exception = (PMC *)ex;
         opcode_t           *next      = NULL;
         parrot_context_t   *ex_ctx;
@@ -96,9 +97,8 @@ Initializes the exception handler.
         results = cc->current_results;
 
         /* clear all results, so that continuation.invoke
-         * doesn't pass any args #'
-         */
-        cc->to_ctx->current_results = cc->current_results= NULL;
+         * doesn't pass any args #' */
+        cc->to_ctx->current_results = cc->current_results = NULL;
         ex_ctx                      = CONTEXT(INTERP->ctx);
         next                        = SUPER(next);
 

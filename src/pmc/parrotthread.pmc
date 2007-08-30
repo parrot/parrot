@@ -11,12 +11,12 @@ src/pmc/parrotthread.pmc - Threaded Interpreter
 ParrotThread extends ParrotInterpreter to provide a threaded interpreter
 which supports:
 
-    new P2, .ParrotThread     # create new threaded interp
-    find_method P0, P2, "thread3"       # thread-run function
-    find_global P5, "_th1"    # locate thread function
-    invoke                    # run thread
+    new P2, "ParrotThread"        # create new threaded interp
+    find_method P0, P2, "thread3" # thread-run function
+    find_global P5, "_th1"        # locate thread function
+    invoke                        # run thread
 
-    set I0, P2                # get thread id
+    set I0, P2                    # get thread id
 
 and these methods:
 
@@ -60,18 +60,20 @@ stop_GC(Interp *parent, Interp *thread)
 
 static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
-    INTVAL tid;
+    INTVAL tid = VTABLE_get_integer(interp, thread);
 
-    tid = VTABLE_get_integer(interp, thread);
     clone_interpreter(PMC_data_typed(thread, Parrot_Interp),
                       interp, clone_flags);
+
     interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
     pt_thread_run(interp, thread, sub, args);
 
     pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
+
     PObj_active_destroy_CLEAR(thread);
     PObj_custom_mark_CLEAR(thread);
     PMC_int_val(thread) = tid;
+
     return tid;
 }
 
@@ -105,6 +107,7 @@ Equivalent to calling run with PARROT_CLONE_DEFAULT.
         if (pass) {
             register_nci_method(INTERP, typ,
                     F2DPTR(do_thread_run), "run", "IJOIP@");
+
             /* XXX appropriate name given that this won't clone globals? */
             register_nci_method(INTERP, typ,
                     F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");
@@ -149,7 +152,7 @@ Create a new thread by cloning the passed interpreter.
         SUPER(parent);
 
         pt_add_to_interpreters(PMC_data_typed(parent, Parrot_Interp),
-                               PMC_data_typed(SELF, Parrot_Interp));
+                               PMC_data_typed(SELF,   Parrot_Interp));
 
         UNLOCK(interpreter_array_mutex);
 

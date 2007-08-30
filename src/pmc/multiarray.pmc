@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -18,8 +18,8 @@ Algorithm:
 
     i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
 
-where i,j,k,l... are coordinates in a multidimensional space and
-Ni,Nj,Nk... are the lengths of the dimensions.
+where i, j, k, l... are coordinates in a multidimensional space and
+Ni, Nj, Nk... are the lengths of the dimensions.
 
 Limitations: the array can only expand in the last dimension The first
 (n-1) dimensions of a n-dimensional array are fixed and layed out at
@@ -47,19 +47,20 @@ Calculates the offset for C<*key>.
 
 static INTVAL calc_offset(PARROT_INTERP, List*list, PMC *key)
 {
-    INTVAL l;
-    INTVAL ninj;
-    PMC *dim = VTABLE_get_pmc_keyed_int(interp, list->user_data, 1);
+    PMC   *dim  = VTABLE_get_pmc_keyed_int(interp, list->user_data, 1);
+    INTVAL l    = key_integer(interp, key);
+    INTVAL ninj = 1;
 
-    l = key_integer(interp, key);
-    ninj = 1;
     for (; dim ; dim = key_next(interp, dim)) {
         key = key_next(interp, key);
+
         if (!key)
             break;
+
         ninj *= key_integer(interp, dim);
-        l += key_integer(interp, key) * ninj;
+        l    += key_integer(interp, key) * ninj;
     }
+
     return l;
 }
 
@@ -90,7 +91,7 @@ Returns the integer value for C<*key>.
 */
 
     INTVAL get_integer_keyed(PMC *key) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         return DYNSELF.get_integer_keyed_int(ix);
     }
 
@@ -105,7 +106,7 @@ Returns the floating-point number value for C<*key>.
 */
 
     FLOATVAL get_number_keyed(PMC *key) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         return DYNSELF.get_number_keyed_int(ix);
     }
 
@@ -120,7 +121,7 @@ Returns the Parrot string value for C<*key>.
 */
 
     STRING *get_string_keyed(PMC *key) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         return DYNSELF.get_string_keyed_int(ix);
     }
 
@@ -135,7 +136,7 @@ Returns the PMC value for C<*key>.
 */
 
     PMC *get_pmc_keyed(PMC *key) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         return DYNSELF.get_pmc_keyed_int(ix);
     }
 
@@ -150,7 +151,7 @@ Sets the integer value C<value> at C<*key>.
 */
 
     void set_integer_keyed(PMC *key, INTVAL value) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         DYNSELF.set_integer_keyed_int(ix, value);
     }
 
@@ -165,7 +166,7 @@ Sets the floating-point number value C<value> at C<*key>.
 */
 
     void set_number_keyed(PMC *key, FLOATVAL value) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         DYNSELF.set_number_keyed_int(ix, value);
     }
 
@@ -180,7 +181,7 @@ Sets the Parrot string value C<value> at C<*key>.
 */
 
     void set_string_keyed(PMC *key, STRING *value) {
-        INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
+        INTVAL ix = calc_offset(INTERP, (List *)PMC_data(SELF), key);
         DYNSELF.set_string_keyed_int(ix, value);
     }
 

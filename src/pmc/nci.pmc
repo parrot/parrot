@@ -66,7 +66,7 @@ Initializes the NCI with a C<NULL> function pointer.
 
     void init() {
         PMC_struct_val(SELF) = NULL;
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF)    = PMCNULL;
         PObj_flag_CLEAR(private2, SELF);
     }
 
@@ -83,7 +83,7 @@ Sets the specified function pointer and signature (C<*key>).
     void set_pointer_keyed_str(STRING *key, void *func) {
         /* key = signature */
         PMC_struct_val(SELF) = func;
-        PMC_data(SELF) = build_call_func(INTERP, SELF, key);
+        PMC_data(SELF)       = build_call_func(INTERP, SELF, key);
     }
 
 /*
@@ -112,15 +112,17 @@ Creates and returns a clone of the NCI.
 */
 
     PMC *clone() {
-        PMC * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
-        PMC_pmc_val(ret) = NULL;
+        PMC_pmc_val(ret)    = PMCNULL;
+
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
          * ManagedStruct or Buffer?
          */
-        PMC_data(ret) = PMC_data(SELF);
+        PMC_data(ret)        = PMC_data(SELF);
         PObj_get_FLAGS(ret) |= (PObj_get_FLAGS(SELF) & 0x7);
+
         return ret;
     }
 
@@ -135,7 +137,7 @@ Returns whether the NCI is defined.
 */
 
     INTVAL defined() {
-        return PMC_data(SELF) != NULL;
+        return PMC_data(SELF) ? !PMC_IS_NULL(PMC_data(SELF)) : 0;
     }
 
 /*
@@ -152,16 +154,20 @@ shifted down.
 
     opcode_t *invoke(void *next) {
         typedef INTVAL(*nci_sub_t)(PARROT_INTERP, PMC *);
+
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)
             : PMC_data_typed(SELF, nci_sub_t);
+
         PMC *cont;
 
         if (!func)
             real_exception(INTERP, NULL, INVALID_OPERATION,
                 "attempt to call NULL function");
+
         func(INTERP, SELF);
         cont = INTERP->current_cont;
+
         /*
          * If the NCI function was tailcalled, the return result
          * is already passed back to the caller of this frame
@@ -174,6 +180,7 @@ shifted down.
             cont = CONTEXT(interp->ctx)->current_cont;
             next = VTABLE_invoke(INTERP, cont, next);
         }
+
         return (opcode_t *)next;
     }
 
@@ -188,7 +195,7 @@ Returns the function pointer as an integer.
 */
 
     INTVAL get_integer() {
-        return ((INTVAL)PMC_data(SELF));
+        return (INTVAL)PMC_data(SELF);
     }
 
 /*
