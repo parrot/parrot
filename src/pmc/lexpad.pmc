@@ -32,7 +32,7 @@ pmclass LexPad does hash no_ro {
 
     void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,
-                "don't create me like this");
+                "Cannot create a LexPad PMC without an initializer");
     }
 
 /*
@@ -93,7 +93,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     INTVAL exists_keyed_str(STRING *name) {
         PMC * const info = PMC_pmc_val(SELF);
         return parrot_hash_get_bucket(INTERP,
-            (Hash*) PMC_struct_val(info), name) != 0;
+            (Hash *)PMC_struct_val(info), name) != 0;
     }
 
     INTVAL exists_keyed(PMC *name) {
@@ -144,7 +144,6 @@ Return the LexInfo PMC, if any or a Null PMC.
     METHOD PMC *get_lexinfo() {
         return PMC_pmc_val(SELF);
     }
-
 }
 
 

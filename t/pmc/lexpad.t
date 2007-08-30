@@ -29,7 +29,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'new' );
     print "ok 1\n"
 .end
 CODE
-/don't create me like this
+/Cannot create a LexPad PMC without an initializer
 current instr\.:.*/
 OUT
 
