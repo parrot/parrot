@@ -1416,7 +1416,7 @@ parrot_build_asm(PARROT_INTERP, opcode_t *code_start, opcode_t *code_end,
      * See imcc/jit.c for more
      */
 #if 0
-    /* XXX
+    /* RT#45055
      * JIT segs are currently not built
      * the find_segments also segfaults on PPC eval_2
      * maybe something not initialized correctly
