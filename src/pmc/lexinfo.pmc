@@ -21,17 +21,6 @@ These are the vtable functions for the lexinfo PMC.
 #include "parrot/parrot.h"
 #include "pmc_hash.h"
 
-static size_t
-key_hash_STRING(PARROT_INTERP, void *value, size_t seed)
-{
-    STRING * const s = (STRING *)value;
-
-    if (s->hashval)
-        return s->hashval;
-
-    return string_hash(interp, s, seed);
-}
-
 /*
  * LexInfo contains a constant Hash with constant string
  * keys and integer indices - no marking and no pmc_ext
@@ -58,25 +47,27 @@ subroutine.
 */
 
     void class_init() {
-        if (pass == 1) {
-            /* there is no pmclass const_pmc flag yet */
+
+        /* there is no pmclass const_pmc flag yet */
+        if (pass == 1)
             interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
-        }
 
     }
+
     void init() {
         real_exception(INTERP, NULL, INVALID_OPERATION,
-                "don't create me like this");
+                "Cannot create a LexInfo PMC without an initializer");
     }
 
     void init_pmc(PMC *sub) {
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
+
         parrot_new_pmc_hash_x(INTERP, SELF,
             (PARROT_DATA_TYPE)enum_hash_int,
             Hash_key_type_STRING,
             (hash_comp_fn)string_equal,     /* STRING compare */
-            key_hash_STRING);    /*        hash */
+            string_hash);                   /*        hash */
     }
 
 /*
@@ -129,10 +120,10 @@ The implementation of the Hash PMC is called.
         IMAGE_IO * const io = info->image_io;
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems = io->vtable->shift_integer(INTERP, io);
+            const INTVAL elems  = io->vtable->shift_integer(INTERP, io);
             const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
             const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
-            Hash *hash;
+            Hash        *hash;
 
             UNUSED(k_type);
             UNUSED(v_type);

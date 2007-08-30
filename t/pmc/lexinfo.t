@@ -25,11 +25,11 @@ Tests the LexInfo PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, .LexInfo
+    new P0, 'LexInfo'
     print "ok 1\n"
 .end
 CODE
-/don't create me like this
+/Cannot create a LexInfo PMC without an initializer
 current instr\.:.*/
 OUT
 
