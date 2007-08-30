@@ -18,6 +18,8 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
+use File::Basename qw/basename/;
+
 use Parrot::Configure::Step ':inter';
 
 our $description = 'Determining what pmc files should be compiled in';
@@ -97,7 +99,7 @@ sub runstep {
 
     my @pmc = (
         sort
-            map { m{\./src/pmc/(.*)} } glob "./src/pmc/*.pmc"
+            map { basename($_) } glob "./src/pmc/*.pmc"
     );
 
     @pmc = sort_pmcs(@pmc);

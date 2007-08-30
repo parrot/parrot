@@ -19,6 +19,8 @@ use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
+use File::Basename qw/basename/;
+
 use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what encoding files should be compiled in';
@@ -30,7 +32,7 @@ sub runstep {
 
     my @encoding = (
         sort
-            map { m{\./src/encodings/(.*)} } glob "./src/encodings/*.c"
+            map { basename($_) } glob "./src/encodings/*.c"
     );
 
     my $encoding_list = $conf->options->get('encoding')

@@ -17,6 +17,8 @@ use strict;
 use warnings;
 use vars qw($description @args);
 
+use File::Basename qw/basename/;
+
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
@@ -30,7 +32,7 @@ sub runstep {
 
     my @charset = (
         sort
-            map { m{\./src/charset/(.*)} } glob "./src/charset/*.c"
+            map { basename($_) } glob "./src/charset/*.c"
     );
 
     my $charset_list = $conf->options->get('charset')
