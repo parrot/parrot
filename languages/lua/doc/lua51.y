@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2005-2007, The Perl Foundation.
+$Id$
+*/
 
 %token NAME
 /* Literal */

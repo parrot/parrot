@@ -1,4 +1,7 @@
 #! perl
+# Copyright (C) 2005-2007, The Perl Foundation.
+# $Id$
+
 use strict;
 use warnings;
 use Getopt::Std;

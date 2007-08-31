@@ -1,3 +1,6 @@
+# Copyright (C) 2005-2007, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
 lua51.bnf - The Complete Syntax of Lua
