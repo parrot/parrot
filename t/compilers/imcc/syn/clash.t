@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
@@ -171,12 +171,22 @@ OUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type");
 .sub test :main
-        $P1 = new 'INTVAL'
+        $P1 = new INTVAL
     print "never\n"
     end
 .end
 CODE
 /error:\w+:Unknown PMC type 'INTVAL'/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "new with an unknown class");
+.sub test :main
+        $P1 = new 'INTVAL'
+    print "never\n"
+    end
+.end
+CODE
+/Class 'INTVAL' not found/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "setline w comment" );
