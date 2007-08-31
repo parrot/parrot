@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) , The Perl Foundation.
+ */
+
 #ifndef PARROT_PLATFORM_GENERIC_THREADS_H_GUARD
 #define PARROT_PLATFORM_GENERIC_THREADS_H_GUARD
 /*

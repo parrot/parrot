@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) , The Perl Foundation.
+ */
+
 #ifndef PARROT_PLATFORM_WIN32_SIGNAL_H_GUARD
 #define PARROT_PLATFORM_WIN32_SIGNAL_H_GUARD
 
