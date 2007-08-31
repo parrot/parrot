@@ -88,8 +88,13 @@ internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
             if (! pmc_key)
                 n = i + 1;      /* now we know how big the key is */
         }
-        else
+        else {
+            if (!pmc_key) {
+                real_exception(interp, NULL, 1,
+                        "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
+            }
             part = VTABLE_get_string_keyed_int(interp, pmc_key, i);
+        }
 
         sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
 
