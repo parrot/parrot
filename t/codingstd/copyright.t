@@ -62,7 +62,7 @@ foreach my $file (@files) {
     }
 
     # does there exist a copyright statement at all?
-    if ( $buf !~ m{Copyright \(C\) }m ) {
+    if ( $buf !~ m{Copyright \(C\) \d{4}}m ) {
         push @no_copyright_files, $path;
         next;
     }

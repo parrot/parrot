@@ -6,7 +6,17 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 2;
+
+BEGIN {
+    eval { require Test::More };
+    if ($@) {
+        die "Test::More not installed\nYou might want to get Parrot::Bundle";
+    }
+    else {
+        use Test::More tests => 2;
+    }
+}
+
 use Parrot::Distribution;
 
 =head1 NAME
