@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2001-2007, The Perl Foundation.
+ */
+
+/*
  * jit.h
  *
  * $Id$

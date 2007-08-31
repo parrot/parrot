@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_STM_INTERNAL_H_GUARD
 #define PARROT_STM_INTERNAL_H_GUARD
 

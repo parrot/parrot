@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
+/*
 ** classobject.h
 **
 ** structs, typedefs and macros for the Class and Object PMCs. This header
