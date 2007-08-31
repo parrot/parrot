@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
+/*
   On Windows there are two ways to access the environment.  Either through the
   Windows environment block, using GetEnvironmentVariable,
   SetEnvironmentVariable and GetEnvironmentStrings, or the C runtime using

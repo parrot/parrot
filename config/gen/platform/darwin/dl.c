@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
 #import <mach-o/dyld.h>
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY

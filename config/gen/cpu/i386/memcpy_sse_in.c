@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
 #include <stdlib.h>
 void*
 Parrot_memcpy_aligned_sse(void *dest, const void *src, size_t n)

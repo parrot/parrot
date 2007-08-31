@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
 #undef environ
 #undef bool
 

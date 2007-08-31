@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
 #ifdef PARROT_HAS_EXEC_PROTECT
 /*
  * Allocate executable memory

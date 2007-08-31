@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2004-2006, The Perl Foundation.
+ */
+
+/*
  * empty to prevent inclusion of generic/signal.c
  */
 
