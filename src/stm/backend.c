@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation
+ */
+
 #include <parrot/parrot.h>
 #include <parrot/atomic.h>
 

@@ -1,6 +1,8 @@
 /* malloc-trace.c
  *
  * by Wolfram Gloger 1995.
+ *
+ * Copyright (C) 2002-2007, The Perl Foundation.
  */
 
 #include <stdio.h>
