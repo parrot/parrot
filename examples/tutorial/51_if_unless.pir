@@ -1,3 +1,29 @@
+=head1 if and unless
+
+Both the if and unless conditionals are supported in PIR.  When the
+tested condition matches the sense of the conditional (true for if,
+false for unless), then the following C<goto> statement is executed.
+
+Truth is fairly simple to determine.
+
+=item Integers
+
+0 is false, any other number is true.
+
+=item Strings
+
+The empty string is false, all other strings are true.
+
+=item Numbers
+
+0.0 is false, whether it is positive or negative.  All other numbers are true, including NaN.
+
+=item PMCs
+
+The "truthiness" of a PMC depends on how it implements its vtable method C<get_boolean>.
+
+=cut
+
 .sub main :main
 
     say "before if"
@@ -16,6 +42,16 @@
   dont_branch_to_here:
 
     say "after unless"
+
+    $N0 = -0.0
+    if $N0 goto branch1
+    say "-0.0 was false"
+    branch1:
+
+    $N0 = 'NaN'
+    if $N0 goto branch2
+    say "NaN was false"
+    branch2:
 
 .end
 
