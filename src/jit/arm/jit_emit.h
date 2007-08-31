@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2003-2007, The Perl Foundation.
+ */
+
+/*
  * jit_emit.h
  *
  * ARM (I think this is all ARM2 or later, although it is APCS-32)

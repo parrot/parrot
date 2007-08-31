@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2003-2007, The Perl Foundation.
+ */
+
+/*
  * jit_emit.h
  *
  * SVN Info

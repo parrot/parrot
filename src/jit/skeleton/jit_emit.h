@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2005-2007, The Perl Foundation.
+ */
+
+/*
  * jit_emit.h
  *
  * skeleton example - a stripped down jit/ppc/jit_emit.h

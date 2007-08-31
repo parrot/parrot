@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
+/*
  * jit_emit.h
  *
  * PPC
