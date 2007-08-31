@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2006, The Perl Foundation.
+ */
+
+/*
  * Sample class used to verify read-only variant
  * generation. For testing only.
  */
