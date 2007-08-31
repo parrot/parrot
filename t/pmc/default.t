@@ -25,7 +25,7 @@ Tests the default PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not implemeted' );
 .sub 'test' :main
-    new P0, .default
+    new P0, 'default'
     print "ok 1\n"
 .end
 CODE

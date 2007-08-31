@@ -37,10 +37,10 @@ Tests the Object PMC.
     push_eh cant_instantiate
       new P0, 'Object'
     clear_eh
-    ok(0, 'Able to instantiate .Object')
+    ok(0, 'Able to instantiate Object')
     goto done_1
 cant_instantiate:
-    ok(1, 'Unable to Instantiate .Object')
+    ok(1, 'Unable to Instantiate Object')
 done_1:
 .end
 
