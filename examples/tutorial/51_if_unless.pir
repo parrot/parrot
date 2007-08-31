@@ -6,6 +6,8 @@ false for unless), then the following C<goto> statement is executed.
 
 Truth is fairly simple to determine.
 
+=over 4
+
 =item Integers
 
 0 is false, any other number is true.
@@ -21,6 +23,8 @@ The empty string is false, all other strings are true.
 =item PMCs
 
 The "truthiness" of a PMC depends on how it implements its vtable method C<get_boolean>.
+
+=back
 
 =cut
 
