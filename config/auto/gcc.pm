@@ -280,11 +280,12 @@ sub runstep {
             #3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked "
             #    . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
             #    . "-Wno-shadow -falign-functions=16 ",
-            4.0 => " -Wfatal-errors"
+            4.0 => ""
+                #. " -Wfatal-errors"
                 . " -Wmissing-field-initializers"
                 . " -Wmissing-include-dirs"
                 . " -Wvariadic-macros"
-                . " -Wno-discard-qual"
+                #. " -Wno-discard-qual"
                 . " -Wno-pointer-sign",
             4.1 => " -Wc++-compat",
             4.2 => "",
