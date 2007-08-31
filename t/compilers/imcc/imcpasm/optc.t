@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
@@ -237,7 +237,7 @@ pir_2_pasm_like( <<'CODE', <<'OUT', "in P param" );
 .end
 CODE
 /_main:
-  new (P\d+), \d+ # \.Undef
+  new (P\d), 'Undef'
   set \1, 42
 @pcc_sub_call_\d:
   set_args
