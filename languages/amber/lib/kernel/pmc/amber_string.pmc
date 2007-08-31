@@ -1,5 +1,5 @@
 /* amber_string.pmc
- *  Copyright: same as Parrot.
+ *  Copyright (C) 2005-2007, The Perl Foundation.
  *  Overview:
  *     The Amber_STRING PMC, which implementes the Amber kernel class STRING
  */
