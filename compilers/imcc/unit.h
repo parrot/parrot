@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2003-2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_IMCC_UNIT_H_GUARD
 #define PARROT_IMCC_UNIT_H_GUARD
 
