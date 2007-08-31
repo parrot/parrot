@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 43;
 use Test::More;
 
 # these tests are run with -Oc by TestCompiler and show
