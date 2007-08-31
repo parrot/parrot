@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2003-2007, The Perl Foundation
+ */
+
 /* dynext.h
 *
 * $Id$
