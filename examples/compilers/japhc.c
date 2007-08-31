@@ -1,6 +1,10 @@
 /* $Id$ */
 
 /*
+ * Copyright (C) 2004-2007, The Perl Foundation.
+ */
+
+/*
  * example compiler used by japh16.pasm
  *
  * $ make -C examples/compilers/
