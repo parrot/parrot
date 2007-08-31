@@ -1,5 +1,5 @@
 /*
- * Copyright (C) , The Perl Foundation.
+ * Copyright (C) 2007, The Perl Foundation.
  */
 
 #ifndef PARROT_PLATFORM_WIN32_STRING_H_GUARD

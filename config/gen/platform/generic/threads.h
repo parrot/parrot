@@ -1,5 +1,5 @@
 /*
- * Copyright (C) , The Perl Foundation.
+ * Copyright (C) 2004-2007, The Perl Foundation.
  */
 
 #ifndef PARROT_PLATFORM_GENERIC_THREADS_H_GUARD
