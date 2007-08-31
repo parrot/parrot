@@ -1,6 +1,6 @@
 =head1 String Operations (continued)
 
-PIR has a string repeat operation.
+PIR has a string repeat operator, that concatenates a string with itself N times.
 
 =cut
 
@@ -9,7 +9,7 @@ PIR has a string repeat operation.
     $S0 = "Hello "
     $S1 = repeat $S0, 3
 
-    say $S1
+    say $S1 # prints "Hello Hello Hello \n"
 
 .end
 
