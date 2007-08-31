@@ -264,6 +264,10 @@ trace_op_dump(PARROT_INTERP, NOTNULL(const opcode_t *code_start), NOTNULL(const 
             *pc == PARROT_OP_get_params_pc ||
             *pc == PARROT_OP_set_returns_pc) {
         sig = interp->code->const_table->constants[pc[1]]->u.key;
+        if (!sig) {
+            real_exception(interp, NULL, 1,
+                    "NULL sig PMC detected in trace_op_dump");
+        }
         var_args = VTABLE_elements(interp, sig);
         n += var_args;
     }
@@ -274,11 +278,17 @@ trace_op_dump(PARROT_INTERP, NOTNULL(const opcode_t *code_start), NOTNULL(const 
         /* pass 1 print arguments */
         for (i = s; i < n; i++) {
             const opcode_t o = pc[i];
-            if (i < info->op_count)
+            if (i < info->op_count) {
                 type = info->types[i - 1];
-            else
+            }
+            else {
+                if (!sig) {
+                    real_exception(interp, NULL, 1,
+                            "NULL sig PMC detected in trace_op_dump");
+                }
                 type = SIG_ITEM(sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
+            }
             if (i > s &&
                     type != PARROT_ARG_KC &&
                     type != PARROT_ARG_KIC &&
