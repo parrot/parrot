@@ -27,10 +27,10 @@ Test the NameSpace PMC as described in PDD21.
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new $P0, 'NameSpace'
-    say 'ok 1 - $P0 = new NameSpace'
+    say "ok 1 - $P0 = new 'NameSpace'"
 .end
 CODE
-ok 1 - $P0 = new NameSpace
+ok 1 - $P0 = new 'NameSpace'
 OUT
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>

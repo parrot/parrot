@@ -53,23 +53,23 @@ done:
     .local pmc tmpint
     .local pmc stmv
 
-    tmpint = new Integer
+    tmpint = new 'Integer'
     tmpint = 0
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'head', stmv
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'used', stmv
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'tail', stmv
 
     # create array
     .local pmc array
-    array = new Array
+    array = new 'Array'
     array = length
     .local int i
     i = 0
 loop:
-    stmv = new STMVar
+    stmv = new 'STMVar'
     array[i] = stmv
     inc i
     if i < length goto loop
@@ -120,7 +120,7 @@ skip_remove:
     branch normal_return
 
 no_block:
-    ret = new Undef
+    ret = new 'Undef'
     stm_abort
 normal_return:
     .return (ret)
@@ -184,7 +184,7 @@ do_ret:
 
     $P0 = getattribute self, 'array'
     $I0 = $P0
-    length = new Integer
+    length = new 'Integer'
     length = $I0
     $I1 = find_type 'STMQueue'
     result = new $I1, length
@@ -211,7 +211,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Single-threaded case" );
     $P0()
 
     $I0 = find_type 'STMQueue'
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 10
     queue = new $I0, $P0
 
@@ -290,10 +290,10 @@ not_okay:
     _add = global "adder"
     _remove = global "remover"
 
-    addThread = new ParrotThread
-    removeThread = new ParrotThread
+    addThread = new 'ParrotThread'
+    removeThread = new 'ParrotThread'
     $I0 = find_type 'STMQueue'
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = SIZE
     queue = new $I0, $P0
 
@@ -362,10 +362,10 @@ no_sleep:
     _add = global "adder"
     _remove = global "remover"
 
-    addThread = new ParrotThread
-    removeThread = new ParrotThread
+    addThread = new 'ParrotThread'
+    removeThread = new 'ParrotThread'
     $I0 = find_type 'STMQueue'
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     queue = new $I0, $P0
 
@@ -449,10 +449,10 @@ no_sleep:
     _add = global "adder"
     _remove = global "remover"
 
-    addThread = new ParrotThread
-    removeThread = new ParrotThread
+    addThread = new 'ParrotThread'
+    removeThread = new 'ParrotThread'
     $I0 = find_type 'STMQueue'
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     queue = new $I0, $P0
 

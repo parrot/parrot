@@ -103,7 +103,7 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     # find the global minimum and propagate it back down the tree
     transform gmin (ROOT) :language('PIR') {
         .local pmc gmin
-        gmin = new Integer
+        gmin = new 'Integer'
         gmin = tree.get('min', node)
         .return (gmin)
     }
@@ -240,7 +240,7 @@ GRAMMAR
     .param int value
     .local pmc newnode
     newnode = new 'Leaf'
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = value
     setattribute newnode, 'value', $P1
     .return(newnode)

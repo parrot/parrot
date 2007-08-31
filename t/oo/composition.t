@@ -24,8 +24,8 @@ Tests role composition in the OO implementation.
 
 pir_output_is( <<'CODE', <<'OUT', 'role with no methods' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
     $P1.'add_role'($P0)
     print "ok 1 - added role\n"
@@ -48,8 +48,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'role with one method, no methods in class' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
     $P2 = find_global "badger"
     $P0.'add_method'("badger", $P2)
@@ -86,9 +86,9 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'two roles and a class, a method each, no conflict' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Role
-    $P2 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Role'
+    $P2 = new 'Class'
 
     $P3 = find_global "snake"
     $P2.'add_method'("snake", $P3)
@@ -141,9 +141,9 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'two roles that conflict' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Role
-    $P2 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Role'
+    $P2 = new 'Class'
 
     $P3 = find_global "badger"
     $P0.'add_method'("badger", $P3)
@@ -173,8 +173,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'role that conflicts with a class method' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)
@@ -203,8 +203,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)
@@ -214,7 +214,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
     $P0.'add_method'("badger", $P2)
     $P2 = find_global "snake"
     $P0.'add_method'("snake", $P2)
-    $P3 = new ResizableStringArray
+    $P3 = new 'ResizableStringArray'
     push $P3, "badger"
     $P1.'add_role'($P0, 'exclude_method' => $P3)
     print "ok 2 - composition worked due to exclusion\n"
@@ -247,8 +247,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing and exclude' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
     $P2 = find_global "badger"
     $P1.'add_method'("badger", $P2)
@@ -258,9 +258,9 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing and exclude' 
     $P0.'add_method'("badger", $P2)
     $P2 = find_global "snake"
     $P0.'add_method'("snake", $P2)
-    $P3 = new Hash
+    $P3 = new 'Hash'
     $P3["badger"] = "role_badger"
-    $P4 = new ResizableStringArray
+    $P4 = new 'ResizableStringArray'
     $P4[0] = "badger"
     $P1.'add_role'($P0, 'alias_method' => $P3, 'exclude_method' => $P4)
     print "ok 2 - composition worked due to aliasing and exclude\n"
@@ -298,10 +298,10 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by resolve' );
 .sub 'test' :main
-    $P0 = new Role
-    $P1 = new Class
+    $P0 = new 'Role'
+    $P1 = new 'Class'
 
-    $P3 = new ResizableStringArray
+    $P3 = new 'ResizableStringArray'
     push $P3, "badger"
     $P1.resolve_method($P3)
     print "ok 1 - set resolve list\n"
@@ -356,17 +356,17 @@ pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
 .sub 'test' :main
     .local pmc PHB, Manage, FirePeople
 
-    FirePeople = new Role
+    FirePeople = new 'Role'
     $P0 = find_global 'fire'
     FirePeople.'add_method'("fire", $P0)
 
-    Manage = new Role
+    Manage = new 'Role'
     $P0 = find_global 'give_payrise'
     FirePeople.'add_method'("give_payrise", $P0)
     Manage.'add_role'(FirePeople)
     print "ok 1 - adding one role to another happens\n"
 
-    PHB = new Class
+    PHB = new 'Class'
     PHB.'add_role'(Manage)
     print "ok 2 - added one rule that does another role to the class\n"
 
@@ -397,21 +397,21 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict from indirect role' );
 .sub 'test' :main
     .local pmc BurninatorBoss, Manage, FirePeople, Burninator
 
-    FirePeople = new Role
+    FirePeople = new 'Role'
     $P0 = find_global 'fire'
     FirePeople.'add_method'("fire", $P0)
 
-    Manage = new Role
+    Manage = new 'Role'
     $P0 = find_global 'give_payrise'
     FirePeople.'add_method'("give_payrise", $P0)
     Manage.'add_role'(FirePeople)
 
-    Burninator = new Role
+    Burninator = new 'Role'
     $P0 = find_global 'fire2'
     Burninator.'add_method'("fire", $P0)
     print "ok 1 - all roles created\n"
 
-    BurninatorBoss = new Class
+    BurninatorBoss = new 'Class'
     BurninatorBoss.'add_role'(Manage)
     print "ok 2 - added first role with indirect role\n"
 

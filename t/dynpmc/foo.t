@@ -141,9 +141,9 @@ SKIP: {
     print "ok\n"
     l = new "Foo"
     l = 42
-    r = new BigInt
+    r = new 'BigInt'
     r = 0x7ffffff
-    d = new Undef
+    d = new 'Undef'
     add d, l, r
     print d
     print "\n"
@@ -165,8 +165,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Foo subclass isa Integer" );
     loadlib F, "foo"
     f = new "Foo"
     f = 1
-    d = new Integer
-    r = new Integer
+    d = new 'Integer'
+    r = new 'Integer'
     r = 2
     d = f - r
     print d

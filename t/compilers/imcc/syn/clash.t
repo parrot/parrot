@@ -171,7 +171,7 @@ OUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type");
 .sub test :main
-        $P1 = new INTVAL
+        $P1 = new 'INTVAL'
     print "never\n"
     end
 .end

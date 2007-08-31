@@ -16,9 +16,9 @@ $ENV{TEST_PROG_ARGS} = '-Oc';
 
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
 .sub _main :main
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = 20
-    $P2 = new Integer
+    $P2 = new 'Integer'
     $P2 = 3
     .const .Sub f = "_floor"
     .const .Sub c = "_funcall"
@@ -67,12 +67,12 @@ doit:
     .local pmc arg1
     .local pmc arg2
     get_params "(0,0)", arg1, arg2
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = arg1 / arg2
     ## truncate.
     $I1 = $P1
     $P1 = $I1
-    $P2 = new Integer
+    $P2 = new 'Integer'
     $P2 = arg1 % arg2
     set_returns "(0,0)", $P1, $P2
     returncc
@@ -83,7 +83,7 @@ doit:
     .local pmc arg1
     .local pmc arg2
     get_params "(0,0)", arg1, arg2
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = arg1 + arg2
     set_returns "(0,0,0)", $P1, arg1, arg2
     returncc
@@ -98,9 +98,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position" );
 
 .sub _main :main
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = 20
-	$P2 = new Integer
+	$P2 = new 'Integer'
 	$P2 = 3
 	.const .Sub f = "_floor"
 	.const .Sub s = "_fib_step"
@@ -143,12 +143,12 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = arg1 / arg2
 	## truncate.
 	$I1 = $P1
 	$P1 = $I1
-	$P2 = new Integer
+	$P2 = new 'Integer'
 	$P2 = arg1 % arg2
 	.return($P1, $P2)
 .end
@@ -158,7 +158,7 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = arg1 + arg2
 	.return ($P1, arg1,  arg2)
 .end
@@ -173,9 +173,9 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
 
 .sub _main :main
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = 20
-	$P2 = new Integer
+	$P2 = new 'Integer'
 	$P2 = 3
 	.const .Sub f = "_floor"
 	.const .Sub s = "_fib_step"
@@ -218,12 +218,12 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = arg1 / arg2
 	## truncate.
 	$I1 = $P1
 	$P1 = $I1
-	$P2 = new Integer
+	$P2 = new 'Integer'
 	$P2 = arg1 % arg2
 	.return($P1, $P2)
 .end
@@ -233,7 +233,7 @@ doit:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = arg1 + arg2
 	.pcc_begin_return
 	.return $P1
@@ -252,9 +252,9 @@ pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
 
 .sub _main :main
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = 20
-	$P2 = new Integer
+	$P2 = new 'Integer'
 	$P2 = 3
 	.const .Sub s = "_fib_step"
 	($P3, $P4, $P5) = _funcall(s, $P1, $P2)
@@ -292,7 +292,7 @@ bad_func:
 	.param pmc arg1
 	.param pmc arg2
 
-	$P1 = new Integer
+	$P1 = new 'Integer'
 	$P1 = arg1 + arg2
 	.return ($P1, arg1,  arg2)
 .end
@@ -325,7 +325,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
     cl = newclass "Foo"
     addattribute cl, "n"
     o = new "Foo"
-    n = new Integer
+    n = new 'Integer'
     n = 2000   # beyond recursion limit of 1000
     setattribute o, "Foo\0n", n
     o."go"()

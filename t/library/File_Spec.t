@@ -76,7 +76,7 @@ OUT
 
 pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', "isa" );
         .local pmc class
-        class= new String
+        class= new 'String'
 
         class= spec.'__isa'()
         print class

@@ -456,7 +456,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "todo #34660 hash" );
 .sub main :main
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 42
     store_global "Foo", unicode:"Bar", $P0
     print "ok 1\n"

@@ -614,7 +614,7 @@ pir_output_is( << 'CODE', << 'OUT', "dumping strings" );
 .include "library/dumper.pir"
 .sub _test :main
     .local pmc array
-    array = new ResizablePMCArray
+    array = new 'ResizablePMCArray'
 
     .local pmc pmc_string, pmc_perl_string
     .local string string_1

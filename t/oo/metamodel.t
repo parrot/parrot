@@ -110,7 +110,7 @@ get_attr:
     .param pmc init_args
   # Iterate over the constructor arguments, calling the accessor for each
     .local pmc iter
-    iter = new Iterator, init_args
+    iter = new 'Iterator', init_args
     iter = 0
   iter_loop:
     unless iter goto iter_end

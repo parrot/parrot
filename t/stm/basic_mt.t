@@ -69,18 +69,18 @@ loop:
 
     .local pmc a
 
-    a = new Integer
+    a = new 'Integer'
     a = 0
-    a = new STMRef, a
+    a = new 'STMRef', a
 
     _incr = global "incr"
     _waiter = global "waiter"
 
-    wThr = new ParrotThread
+    wThr = new 'ParrotThread'
     wThr.'run_clone'(_waiter, a)
 
     sleep 1 # let it really wait
-    iThr = new ParrotThread
+    iThr = new 'ParrotThread'
     iThr.'run_clone'(_incr, a)
 
     wThr.'join'()
@@ -132,18 +132,18 @@ loop:
 
     .local pmc a
 
-    a = new String
+    a = new 'String'
     a = ""
-    a = new STMRef, a
+    a = new 'STMRef', a
 
     _incr = global "incr"
     _waiter = global "waiter"
 
-    wThr = new ParrotThread
+    wThr = new 'ParrotThread'
     wThr.'run_clone'(_waiter, a)
 
     sleep 1 # let it really wait
-    iThr = new ParrotThread
+    iThr = new 'ParrotThread'
     iThr.'run_clone'(_incr, a)
 
     iThr.'join'()
@@ -193,15 +193,15 @@ loop:
     .local pmc t1
     .local pmc t2
 
-    a = new Integer
-    a = new STMRef, a
-    b = new Integer
-    b = new STMRef, b
+    a = new 'Integer'
+    a = new 'STMRef', a
+    b = new 'Integer'
+    b = new 'STMRef', b
 
     _task = global "thread_task"
 
-    t1 = new ParrotThread
-    t2 = new ParrotThread
+    t1 = new 'ParrotThread'
+    t2 = new 'ParrotThread'
     t1.'run_clone'(_task, a, b)
     t2.'run_clone'(_task, b, a)
 
@@ -262,18 +262,18 @@ loop:
 
     .local pmc a
 
-    a = new Integer
+    a = new 'Integer'
     a = 0
-    a = new STMRef, a
+    a = new 'STMRef', a
 
     _incr = global "incr"
     _waiter = global "waiter"
 
-    wThr = new ParrotThread
+    wThr = new 'ParrotThread'
     wThr.'run_clone'(_waiter, a)
 
     sleep 1 # let it really wait
-    iThr = new ParrotThread
+    iThr = new 'ParrotThread'
     iThr.'run_clone'(_incr, a)
 
     wThr.'join'()

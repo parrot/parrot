@@ -225,7 +225,7 @@ OUT
 
 pir_2_pasm_like( <<'CODE', <<'OUT', "in P param" );
 .sub _main
-    $P0 = new Undef
+    $P0 = new 'Undef'
     $P0 = 42
     foo($P0)
     noop

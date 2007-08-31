@@ -73,7 +73,7 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
     $P0.'astgrammar'('NoneGrammar')
 
     .local pmc args
-    args = new ResizableStringArray
+    args = new 'ResizableStringArray'
     push args, "dummy"
     push args, "t/compilers/past-pm/script.source"
     $P1 = $P0.'command_line'(args)

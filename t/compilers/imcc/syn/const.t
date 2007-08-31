@@ -77,9 +77,9 @@ pir_output_is( <<'CODE', <<'OUT', "array/hash consts" );
    .const string key2 = "key2"
    .local int idx1
    .const int idx2 = 2
-   ar = new Array
+   ar = new 'Array'
    ar = 3
-   ha = new Hash
+   ha = new 'Hash'
    key1 = "key1"
    idx1 = 1
    ha[key1] = idx1

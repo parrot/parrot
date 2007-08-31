@@ -221,7 +221,7 @@ OUT
 
 pir_output_is( $PRE . <<'CODE', <<'OUT', "escape_string: freeze a simple pmc" );
     .local pmc original_pmc
-    original_pmc = new String
+    original_pmc = new 'String'
     original_pmc = "ok\n"
 
     .local string frozen_pmc

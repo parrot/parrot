@@ -206,7 +206,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "x = defined" );
 .sub test :main
     .local pmc a
-    a = new ResizablePMCArray
+    a = new 'ResizablePMCArray'
     push a, 10
     $I0 = defined a
     print $I0
@@ -224,7 +224,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "x = clone" );
 .sub test :main
     .local pmc a
-    a = new Integer
+    a = new 'Integer'
     a = 10
     .local pmc b
     b = clone a
@@ -268,7 +268,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "x = can" );
 .sub test :main
-    $P0 = new ParrotIO
+    $P0 = new 'ParrotIO'
     $I0 = can $P0, "puts"
     print $I0
     print "\n"
@@ -280,7 +280,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "x = isa" );
 .sub test :main
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $I0 = isa $P0, "scalar"
     print $I0
     print "\n"

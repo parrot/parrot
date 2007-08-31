@@ -40,7 +40,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide", todo => 'RT #41374' );
     mmdvtregister .MMD_DIVIDE, .Integer, type_perl_int, divide
 
     $P0 = new type_perl_int
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P2 = new type_perl_int
     $P1 = 10
     $P2 = 3
@@ -74,9 +74,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3" );
     add = global "add"
     mmdvtregister .MMD_ADD, .Integer, .Integer, add
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 1
     $P2 = 1
     $P0 = $P1 + $P2
@@ -110,9 +110,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin" );
     divide = global "Integer_divide_Integer"
     mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
@@ -142,8 +142,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
     comp = global "Float_cmp_Integer"
     mmdvtregister .MMD_CMP, .Float, .Integer, comp
 
-    $P1 = new Float
-    $P2 = new Integer
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
     $P1 = 47.11
     $P2 = 47
     $I0 = cmp $P1, $P2   # XXX cmp calls cmp_num
@@ -209,8 +209,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "mmdvtfind - invoke it" );
     print "ok 1\n"
     ne_addr $P0, comp, nok
     print "ok 2\n"
-    $P1 = new Float
-    $P2 = new Integer
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
     $P1 = 47.11
     $P2 = 47
     $I0 = $P0($P1, $P2)
@@ -260,9 +260,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub" );
     divide = global "Integer_divide_Integer"
     mmdvtregister .MMD_DIVIDE, .Integer, .Integer, divide
 
-    $P0 = new Integer
-    $P1 = new Integer
-    $P2 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
+    $P2 = new 'Integer'
     $P1 = 10
     $P2 = 3
     $P0 = $P1 / $P2
@@ -515,7 +515,7 @@ pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types', todo => 'RT #41374' );
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -556,7 +556,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted", todo => 'RT #41374'
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -597,7 +597,7 @@ pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid", todo => 'RT #41
     .local  int  type_perl_string
     type_perl_string  = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -611,7 +611,7 @@ pir_output_like( <<'CODE', <<'OUT', "MMD on PMC types, invalid", todo => 'RT #41
     $P1 = "ok 4\n"
     p($P0)
     p($P1)
-    $P0 = new Integer
+    $P0 = new 'Integer'
     p($P0)
 .end
 
@@ -643,7 +643,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -698,7 +698,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace", todo => 
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -744,7 +744,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace", todo =>
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -788,7 +788,7 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo => 'RT #41374' 
     .local  int  type_perl_int
     type_perl_int     = find_type 'PerlInt'
 
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new type_perl_string
     $P1 = "ok 2\n"
@@ -840,9 +840,9 @@ OUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as function - Int, Float" );
 .sub main :main
     .local pmc d, l, r, a
-    d = new Integer
-    l = new Integer
-    r = new Float
+    d = new 'Integer'
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     a = get_root_global ["__parrot_core"], "__add"
@@ -858,8 +858,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as method" );
 .sub main :main
     .local pmc d, l, r
-    l = new Integer
-    r = new Integer
+    l = new 'Integer'
+    r = new 'Integer'
     l = 3
     r = 39
     d = l."__add"(r)
@@ -896,8 +896,8 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__add as method - Int, Float" );
 .sub main :main
     .local pmc d, l, r
-    l = new Integer
-    r = new Float
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     d = l."__add"(r)
@@ -912,16 +912,16 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "bound __add method" );
 .sub main :main
     .local pmc d, l, r, m
-    d = new Integer
-    l = new Integer
-    r = new Float
+    d = new 'Integer'
+    l = new 'Integer'
+    r = new 'Float'
     l = 3
     r = 39.42
     m = find_global 'Float', "__add"
     d = m(r, l)
     print d
     print "\n"
-    r = new Integer
+    r = new 'Integer'
     r = 39
     m = find_global 'Integer', "__add"
     d = m(r, l)
@@ -972,7 +972,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, n_add" );
 .sub main :main
     $P0 = subclass "Integer", "AInt"
     $P0 = new "AInt"
-    $P1 = new Integer
+    $P1 = new 'Integer'
     set $P0, 6
     set $P1, 2
 
@@ -987,7 +987,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, n_add" );
     print l
     print r
     print "\n"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     .return($P0)
 .end
@@ -1007,7 +1007,7 @@ print $P <<'EOF';
     print l
     print r
     print "\n"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 2
     .return($P0)
 .end
@@ -1017,8 +1017,8 @@ close $P;
 pir_output_is( <<'CODE', <<'OUTPUT', "override builtin n_add" );
 .sub main
     load_bytecode "temp.pir"
-    $P0 = new Integer
-    $P1 = new Integer
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
     set $P0, 6
     set $P1, 2
 
@@ -1095,7 +1095,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object" );
 .end
 .namespace ["AInt"]
 .sub init :vtable :method
-    $P0 = new Integer
+    $P0 = new 'Integer'
     setattribute self, ".i", $P0
 .end
 .sub set_integer_native :vtable :method

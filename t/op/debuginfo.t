@@ -87,7 +87,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found
 .end
 .sub foo
     print "ok 2\n"
-    $P0 = new Integer
+    $P0 = new 'Integer'
     print "ok 3\n"
     $P0."nosuchmethod"()
     print "not ok 4\n"

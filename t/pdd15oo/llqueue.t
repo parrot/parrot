@@ -105,14 +105,14 @@ loop:
     load_bytecode 'STMLLQueue.pir'
     queue = new 'STMLLQueue'
 
-    threads = new ResizablePMCArray
+    threads = new 'ResizablePMCArray'
 
     .local int i
     .local int max
     max = ADD_THREADS
     i = 0
 adders_loop:
-    $P0 = new ParrotThread
+    $P0 = new 'ParrotThread'
     $I0 = i * ADD_BLOCK
     $I1 = i + 1
     $I1 = $I1 * ADD_BLOCK
@@ -125,7 +125,7 @@ adders_loop:
     max = REMOVE_THREADS
     i = 0
 removers_loop:
-    $P0 = new ParrotThread
+    $P0 = new 'ParrotThread'
     $P0.'run_clone'(remove_thread, queue, REMOVE_BLOCK)
     push threads, $P0
     inc i
@@ -162,17 +162,17 @@ __DATA__
 .end
 
 .sub init :vtable :method
-    $P1 = new Undef
+    $P1 = new 'Undef'
 
     setattribute self, 'value', $P1
 
-    $P1 = new Undef
-    $P2 = new STMVar, $P1
+    $P1 = new 'Undef'
+    $P2 = new 'STMVar', $P1
 
     setattribute self, 'prev', $P2
 
-    $P1 = new Undef
-    $P2 = new STMVar, $P1
+    $P1 = new 'Undef'
+    $P2 = new 'STMVar', $P1
 
     setattribute self, 'next', $P2
 .end
@@ -232,12 +232,12 @@ __DATA__
 .end
 
 .sub init :vtable :method
-    $P1 = new Undef
-    $P2 = new STMVar, $P1
+    $P1 = new 'Undef'
+    $P2 = new 'STMVar', $P1
     setattribute self, 'head', $P2
 
-    $P1 = new Undef
-    $P2 = new STMVar, $P1
+    $P1 = new 'Undef'
+    $P2 = new 'STMVar', $P1
     setattribute self, 'tail', $P2
 .end
 
@@ -256,7 +256,7 @@ __DATA__
     if $I0 == 1 goto got_head
     $P2 = getattribute self, 'tail'
     $P2.'set'(new_node)
-    $P3 = new Undef
+    $P3 = new 'Undef'
     new_node.'set_prev'($P3)
     .return ()
 got_head:
@@ -290,7 +290,7 @@ got_head:
     $P2.'set'(tail_tail_node) # which is Undef
     branch do_return
 skip_head:
-    $P3 = new Undef
+    $P3 = new 'Undef'
     tail_tail_node.'set_next'($P3)
 do_return:
     .return tail_node.'get_value'()

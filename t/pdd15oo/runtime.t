@@ -66,7 +66,7 @@ need_retry:
     what = values[1]
     the_value = what.'get_read'()
     if the_value == 1 goto need_retry
-    the_value = new Integer
+    the_value = new 'Integer'
     the_value = 1
     what.'set'(the_value)
     .return (2)
@@ -83,21 +83,21 @@ pir_output_is( $choice_test . <<'CODE', <<'OUTPUT', "choice (one thread)" );
 .sub main :main
     .local pmc thread_one
     .local pmc thread_two
-    thread_one = new ParrotThread
-    thread_two = new ParrotThread
+    thread_one = new 'ParrotThread'
+    thread_two = new 'ParrotThread'
 
     load_bytecode 'STM.pbc'
 
     .local pmc values
-    values = new FixedPMCArray
+    values = new 'FixedPMCArray'
     values = 2
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 0
-    $P0 = new STMVar, $P0
+    $P0 = new 'STMVar', $P0
     values[0] = $P0
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 0
-    $P0 = new STMVar, $P0
+    $P0 = new 'STMVar', $P0
     values[1] = $P0
     .local pmc _thread_main
     _thread_main = global 'do_choice'
@@ -151,23 +151,23 @@ SKIP: {
     .local pmc thread_two
     .local pmc thread_three
     .local pmc wakeup_thread
-    thread_one = new ParrotThread
-    thread_two = new ParrotThread
-    thread_three = new ParrotThread
-    wakeup_thread = new ParrotThread
+    thread_one = new 'ParrotThread'
+    thread_two = new 'ParrotThread'
+    thread_three = new 'ParrotThread'
+    wakeup_thread = new 'ParrotThread'
 
     load_bytecode 'STM.pbc'
 
     .local pmc values
-    values = new FixedPMCArray
+    values = new 'FixedPMCArray'
     values = 2
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 0
-    $P0 = new STMVar, $P0
+    $P0 = new 'STMVar', $P0
     values[0] = $P0
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 0
-    $P0 = new STMVar, $P0
+    $P0 = new 'STMVar', $P0
     values[1] = $P0
     .local pmc _thread_main
     _thread_main = global 'do_choice'
@@ -299,14 +299,14 @@ do_retry:
 
     load_bytecode 'STM.pbc'
 
-    value = new Integer
+    value = new 'Integer'
     value = -1
-    value = new STMVar, value
+    value = new 'STMVar', value
 
     .const .Sub wakeup = 'wakeup_func'
     .const .Sub choice = 'choice_thread'
-    $P0 = new ParrotThread
-    $P1 = new ParrotThread
+    $P0 = new 'ParrotThread'
+    $P1 = new 'ParrotThread'
     $P0.'run_clone'(choice, value)
     sleep 0.5
     $P1.'run_clone'(wakeup, value)
@@ -357,23 +357,23 @@ done:
     .local pmc tmpint
     .local pmc stmv
 
-    tmpint = new Integer
+    tmpint = new 'Integer'
     tmpint = 0
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'head', stmv
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'used', stmv
-    stmv = new STMVar, tmpint
+    stmv = new 'STMVar', tmpint
     setattribute self, 'tail', stmv
 
     # create array
     .local pmc array
-    array = new Array
+    array = new 'Array'
     array = length
     .local int i
     i = 0
 loop:
-    stmv = new STMVar
+    stmv = new 'STMVar'
     array[i] = stmv
     inc i
     if i < length goto loop
@@ -428,7 +428,7 @@ skip_remove:
     branch normal_return
 
 no_block:
-    ret = new Undef
+    ret = new 'Undef'
     $P0 = get_hll_global ['STM'], 'give_up'
     $P0()
 normal_return:
@@ -546,9 +546,9 @@ not_okay:
     _add = global "adder"
     _remove = global "remover"
 
-    addThread = new ParrotThread
-    removeThread = new ParrotThread
-    $P0 = new Integer
+    addThread = new 'ParrotThread'
+    removeThread = new 'ParrotThread'
+    $P0 = new 'Integer'
     $P0 = SIZE
     queue = new 'STMQueue', $P0
 
@@ -595,7 +595,7 @@ fail:
     $P0 = get_hll_global ['STMQueue'], '__onload'
     $P0()
 
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = SIZE
     queue = new 'STMQueue', $P0
 

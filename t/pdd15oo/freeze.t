@@ -606,7 +606,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray" );
 .sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
-    original_arr = new ResizableBooleanArray
+    original_arr = new 'ResizableBooleanArray'
     set original_arr, 666
     original_arr[555] = 777
 
