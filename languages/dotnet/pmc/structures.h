@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2006-2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_DOTNET_PMC_STRUCTURES_H_GUARD
 #define PARROT_DOTNET_PMC_STRUCTURES_H_GUARD
 
