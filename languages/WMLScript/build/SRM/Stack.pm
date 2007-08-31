@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 # WMLSscript To PIR Translator
 # Stack emulation stack to register mapper. Simple and stupid.
 

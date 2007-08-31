@@ -1,4 +1,7 @@
 #! perl
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 # WMLScript => PIR Translator Generator
 # Script to generate the instruction translator from a rules file and a
 # stack to register mapping algorithm.

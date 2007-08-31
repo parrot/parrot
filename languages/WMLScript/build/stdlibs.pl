@@ -1,4 +1,6 @@
 #! perl
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
 
 use strict;
 use warnings;

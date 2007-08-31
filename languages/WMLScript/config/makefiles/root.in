@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@

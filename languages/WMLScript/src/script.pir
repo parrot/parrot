@@ -1,3 +1,5 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
 
 .sub '__onload' :anon :load
 #    print "__onload (script.pir)\n"

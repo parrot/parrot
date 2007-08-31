@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
+
 # WMLSscript To PIR Translator
 # This SRM algorithm keeps track of the current stack depth and assigns to
 # virtual registers numbered by depth. This eliminates the need for a stack.
