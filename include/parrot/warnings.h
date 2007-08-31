@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2002-2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_WARNINGS_H_GUARD
 #define PARROT_WARNINGS_H_GUARD
 
