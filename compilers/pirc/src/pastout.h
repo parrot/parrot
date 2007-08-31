@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_PIRC_PASTOUT_H_GUARD
 #define PARROT_PIRC_PASTOUT_H_GUARD
 
