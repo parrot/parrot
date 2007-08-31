@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 20;
 use Carp;
 use Data::Dumper;
 use lib qw( lib t/configure/testlib );
@@ -15,9 +15,9 @@ use_ok('config::init::hints');
 use_ok('config::inter::progs');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::IO::Capture::Mini;
+#use Parrot::IO::Capture::Mini;
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Tie::Filehandle::Preempt::Stdin;
+#use Tie::Filehandle::Preempt::Stdin;
 
 =for hints_for_testing Testing and refactoring of inter::progs should
 entail understanding of issues discussed in the following RT tickets:
@@ -42,9 +42,9 @@ test_step_thru_runstep($conf, q{init::hints}, $args);
 my (@prompts, $object, @entered);
 @prompts = map { q{foo_} . $_ } 
     qw| alpha beta gamma delta epsilon zeta eta theta iota |;
-$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
-can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));
-isa_ok($object, 'Tie::Filehandle::Preempt::Stdin');
+#$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
+#can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));
+#isa_ok($object, 'Tie::Filehandle::Preempt::Stdin');
 
 my ($task, $step_name, @step_params, $step, $ret);
 my $pkg = q{inter::progs};
@@ -61,19 +61,19 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-# need to capture the --verbose output, because the fact that it does not end
-# in a newline confuses Test::Harness
-{
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $ret = $step->runstep($conf);
-    my @more_lines = $tie_out->READLINE;
-    ok(@more_lines, "prompts were captured");
-    ok(defined $ret, "$step_name runstep() returned defined value");
-}
+## need to capture the --verbose output, because the fact that it does not end
+## in a newline confuses Test::Harness
+#{
+#    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
+#        or croak "Unable to tie";
+#    $ret = $step->runstep($conf);
+#    my @more_lines = $tie_out->READLINE;
+#    ok(@more_lines, "prompts were captured");
+#    ok(defined $ret, "$step_name runstep() returned defined value");
+#}
 
-$object = undef;
-untie *STDIN;
+#$object = undef;
+#untie *STDIN;
 
 pass("Completed all tests in $0");
 
