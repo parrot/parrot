@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
 #ifndef PARROT_TCL_BINARY_H_GUARD
 #define PARROT_TCL_BINARY_H_GUARD
 
