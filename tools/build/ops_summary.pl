@@ -1,10 +1,12 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
+
 use warnings;
 use strict;
 
 package OpsSummary;
+
 use base 'Pod::Parser';
 
 my $current_file;

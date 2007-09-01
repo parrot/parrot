@@ -80,6 +80,9 @@ foreach my $file (@files) {
     # skip files without POD
     next unless Pod::Find::contains_pod( $file, 0 );
 
+    # skip POD generating scripts
+    next if $file =~ m/ops_summary\.pl/;
+
     # skip files with valid POD
     next if file_pod_ok($file);
     push @failed, $file;
