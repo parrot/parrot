@@ -16,7 +16,7 @@ Parrot::Configure::Data - Configuration data container
     $data->set($key1 => $value1, $key2 => $value2);
     $data->add($delimiter, $key1 => $value1, $key2 => $value2);
     my @keys = $data->keys;
-    my $serialized = $data->dump;
+    my $serialized = $data->dump(q{c}, q{*PConfig});
     $data->clean;
     $data->settrigger($key, $trigger, $cb);
     $data->gettriggers($key);
@@ -217,10 +217,28 @@ EVAL_CONFIG_TEMP
 =item C<dump()>
 
 Provides a L<Data::Dumper> serialized string of the objects key/value pairs
-suitable for being C<eval>ed.  The variable name of the structure is
-C<PConfig>.
+suitable for being C<eval>ed.  
 
-Accepts no arguments and returns a string.
+Takes two arguments:
+
+=over 4
+
+=item 1
+
+Key in Parrot::Configure object's data structure which is being dumped.
+
+=item 2
+
+Name of the dumped structure.
+
+=back
+
+Example:
+
+    $conf->data->dump(q{c}, q{*PConfig});
+    $conf->data->dump(q{c_temp}, q{*PConfig_Temp});
+
+Returns a string.
 
 =cut
 
@@ -230,41 +248,15 @@ Accepts no arguments and returns a string.
     if ( defined eval { Data::Dumper->can('Sortkeys') } ) {
         *dump = sub {
             my $self = shift;
-            Data::Dumper->new( [ $self->{c} ], ['*PConfig'] )->Sortkeys(1)->Dump();
+            my ($key, $structure) = @_;
+            Data::Dumper->new( [ $self->{$key} ], [$structure] )->Sortkeys(1)->Dump();
         };
     }
     else {
         *dump = sub {
             my $self = shift;
-            Data::Dumper->new( [ $self->{c} ], ['*PConfig'] )->Dump();
-        };
-    }
-}
-
-=item C<dump_temp()>
-
-Provides a L<Data::Dumper> serialized string of the objects key/value pairs
-suitable for being C<eval>ed.  The variable name of the structure is
-C<PConfig_Temp>.
-
-Accepts no arguments and returns a string.
-
-=cut
-
-# Data::Dumper supports Sortkeys since 2.12
-# older versions will work but obviously not sorted
-{
-
-    if ( defined eval { Data::Dumper->can( 'Sortkeys' ) } ) {
-        *dump_temp = sub {
-            my $self = shift;
-            Data::Dumper->new( [ $self->{c_temp} ], ['*PConfig_Temp'] )->Sortkeys(1)->Dump();
-        };
-    }
-    else {
-        *dump_temp = sub {
-            my $self = shift;
-            Data::Dumper->new( [ $self->{c_temp} ], ['*PConfig_Temp'] )->Dump();
+            my ($key, $structure) = @_;
+            Data::Dumper->new( [ $self->{$key} ], [$structure] )->Dump();
         };
     }
 }

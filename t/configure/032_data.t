@@ -164,7 +164,7 @@ can_ok(
 {
     my $pcd = Parrot::Configure::Data->new;
 
-    my $data = $pcd->dump;
+    my $data = $pcd->dump(q{c}, q{*PConfig});
 
     like( $data, qr/\%PConfig = \(\);/, "->dump() returns nothing if no keys are set" );
 }
@@ -178,7 +178,8 @@ can_ok(
         'b' => 2,
         'c' => 3,
     );
-    my $data = $pcd->dump;
+    my $data = $pcd->dump(q{c}, q{*PConfig});
+ 
 
     like(
         $data,
