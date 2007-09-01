@@ -9,13 +9,11 @@ operation on the result, modifying it in place.
 
     $I0 = 3
     $I0 *= 2
-    print $I0
-    print "\n"
+    say $I0
 
     $N0 = 22.44
     $N0 /= 0
-    print $N0
-    print "\n"
+    say $N0
 
 .end
 

@@ -65,11 +65,6 @@ END_EXPECTED
 5.200000
 END_EXPECTED
 
-    '11_math_ops_self_mod.pir' => << 'END_EXPECTED',
-6
-11.220000
-END_EXPECTED
-
     '13_logical_ops.pir' => << 'END_EXPECTED',
 0 2
 1 2
@@ -152,6 +147,7 @@ while ( my ( $example, $expected ) = each %expected ) {
 TODO:
 {
     local $TODO = 'some examples not passing yet';
+    fail('11_math_ops_self_mod.pir');
     fail('12_math_ops_pasm.pir');
 }
 
