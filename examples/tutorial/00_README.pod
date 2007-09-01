@@ -10,4 +10,8 @@ If you'd like to execute the code from files, build parrot and then type:
 
  ../../parrot example.pir
 
+The parrot test suite also checks the output of these examples, via this test:
+
+ t/examples/tutorial.t
+
 =cut
