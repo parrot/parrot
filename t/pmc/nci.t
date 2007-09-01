@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 64;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -34,6 +34,86 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         skip( "Please make libnci_test$PConfig{load_ext}", Test::Builder->expected_tests() );
     }
+
+    pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
+.sub test :main
+  .local pmc libnci_test
+  .local int lib_defined
+  libnci_test = loadlib "no_such_library"
+  lib_defined = defined libnci_test
+  if lib_defined goto LIB_DEFINED
+  branch LIB_UNDEFINED
+
+LIB_DEFINED:
+  print "defined\n"
+  branch LIB_END
+
+LIB_UNDEFINED:
+  print "undefined\n"
+  branch LIB_END
+
+LIB_END:
+.end
+CODE
+undefined
+OUTPUT
+
+    pir_output_is( << 'CODE', << 'OUTPUT', 'dlfunc on undef' );
+.sub test :main
+  .local pmc libnci_test
+  .local pmc func
+  .local int func_defined
+  libnci_test = loadlib "no_such_library"
+  dlfunc func, libnci_test, "no_such_function", "v"
+  func_defined = defined func
+  if func_defined goto FUNC_DEFINED
+  branch FUNC_UNDEFINED
+FUNC_DEFINED:
+  print "defined\n"
+  branch FUNC_END
+
+FUNC_UNDEFINED:
+  print "undefined\n"
+  branch FUNC_END
+
+FUNC_END:
+.end
+CODE
+undefined
+OUTPUT
+
+    pir_output_is( << 'CODE', << 'OUTPUT', 'dlfunc function not found' );
+.sub test :main
+  .local pmc libnci_test
+  .local pmc func
+  .local int func_defined
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
+
+  dlfunc func, libnci_test, "no_such_function", "v"
+  func_defined = defined func
+  if func_defined goto FUNC_DEFINED
+  branch FUNC_UNDEFINED
+
+FUNC_DEFINED:
+  print "defined\n"
+  branch FUNC_END
+
+FUNC_UNDEFINED:
+  print "undefined\n"
+  branch FUNC_END
+
+NOT_LOADED:
+  print "Could not load libnci_test\n" 
+  branch FUNC_END
+
+FUNC_END:
+.end
+CODE
+libnci_test was successfully loaded
+undefined
+OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register" );
 

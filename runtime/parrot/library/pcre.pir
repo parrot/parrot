@@ -47,6 +47,7 @@ and is additionally stored as global 'PCRE', 'lib'.
     .local pmc pcre_function
     .local pmc config
     .local string osname
+    .local int loaded
 
     config = _config()
     osname = config['osname']
@@ -56,14 +57,26 @@ and is additionally stored as global 'PCRE', 'lib'.
 
 LIB_DEFAULT:
     loadlib libpcre, 'libpcre'
-    branch LIB_LOADED
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+    branch LIB_RETURN
 
 LIB_WIN32:
+    # Usually it's pcre.dll
     loadlib libpcre, 'pcre'
-    branch LIB_LOADED
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+    # But maybe you have GnuWin32 pcre3.dll?
+    loadlib libpcre, 'pcre3'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+    branch LIB_RETURN
 
 LIB_CYGWIN:
     loadlib libpcre, 'cygpcre-0'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+    branch LIB_RETURN
 
 LIB_LOADED:
     store_global 'PCRE', 'lib', libpcre
@@ -88,6 +101,7 @@ LIB_LOADED:
     dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
     store_global 'PCRE::NCI', 'PCRE_copy_substring', pcre_function
 
+LIB_RETURN:
     .return( libpcre )
 .end
 

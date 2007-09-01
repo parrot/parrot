@@ -1191,8 +1191,11 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc (out PMC, invar PMC, in STR, in STR) {
     char * const name = string_to_cstring(interp, ($3));
-    void *ptr         = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2),
-        name);
+    void *ptr         = Parrot_dlsym(
+                            PMC_IS_NULL($2) ? NULL :
+                            $2->vtable->defined(interp, $2) ? PMC_data($2) :
+                            NULL,
+                            name);
 
     funcptr_t p = D2FPTR(ptr);
 
@@ -1213,7 +1216,6 @@ op dlfunc (out PMC, invar PMC, in STR, in STR) {
 
 op dlvar (out PMC, invar PMC, in STR) {
     char * const name = string_to_cstring(interp, ($3));
-
     void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
     string_cstring_free(name);
     if (p == NULL) {
