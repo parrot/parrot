@@ -40,7 +40,7 @@ test_step_thru_runstep($conf, q{init::install}, $args);
 test_step_thru_runstep($conf, q{init::hints}, $args);
 
 my (@prompts, $object, @entered);
-@prompts = map { q{foo_} . $_ } 
+@prompts = map { q{foo_} . $_ }
     qw| alpha beta gamma delta epsilon zeta eta theta iota kappa |;
 #$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 #can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));

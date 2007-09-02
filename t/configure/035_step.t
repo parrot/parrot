@@ -32,7 +32,7 @@ $command = q{echo Hello world};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -50,7 +50,7 @@ $command = q{echo Hello world};
     is($rv, 0, "Got expected exit code of 0");
 #    my @lines = $tie_out->READLINE;
 #    ok(@lines, "verbose output was captured");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 untie *STDOUT;
@@ -65,7 +65,7 @@ $command = q{echo Hello world};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -79,7 +79,7 @@ $command = q{echo Hello world};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -93,7 +93,7 @@ $command = q{date};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -107,7 +107,7 @@ $command = q{date};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -121,7 +121,7 @@ $command = q{date};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
@@ -135,7 +135,7 @@ $command = q{date};
     my $rv = Parrot::Configure::Step::_run_command(
         $command, $out, $err, $verbose);
     is($rv, 0, "Got expected exit code of 0");
-    
+
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 

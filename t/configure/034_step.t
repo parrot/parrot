@@ -156,7 +156,7 @@ untie *STDERR;
     chdir $tdir or croak "Unable to change to temporary directory";
     my $dummy = 'dummy';
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
-    my $line = q{$(basename   morgan/lefay/abra.ca.dabra src/foo.c		hacks)};
+    my $line = q{$(basename   morgan/lefay/abra.ca.dabra src/foo.c              hacks)};
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
     ok( genfile(
@@ -172,7 +172,7 @@ untie *STDERR;
     chdir $tdir or croak "Unable to change to temporary directory";
     my $dummy = 'dummy';
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
-    my $line = q{$(notdir morgan/lefay/abra.ca.dabra src/foo.c		hacks)};
+    my $line = q{$(notdir morgan/lefay/abra.ca.dabra src/foo.c          hacks)};
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
@@ -189,7 +189,7 @@ untie *STDERR;
     chdir $tdir or croak "Unable to change to temporary directory";
     my $dummy = 'dummy';
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
-    my $line = q{$(addprefix src/,morgan/lefay/abra.ca.dabra foo		bar)};
+    my $line = q{$(addprefix src/,morgan/lefay/abra.ca.dabra foo                bar)};
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
@@ -206,7 +206,7 @@ untie *STDERR;
     chdir $tdir or croak "Unable to change to temporary directory";
     my $dummy = 'dummy';
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
-    my $line = q{$(wildcard *.c		*.o)};
+    my $line = q{$(wildcard *.c         *.o)};
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
