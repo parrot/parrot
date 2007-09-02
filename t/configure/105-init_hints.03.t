@@ -48,7 +48,7 @@ my $cwd = cwd();
     my $tdir = tempdir( CLEANUP => 1 );
     File::Path::mkpath( qq{$tdir/init/hints} )
         or croak "Unable to create directory for local hints";
-    my $localhints = qq{$tdir/local.pm};
+    my $localhints = qq{$tdir/init/hints/local.pm};
     open my $FH, '>', $localhints
         or croak "Unable to open temp file for writing";
     print $FH <<END;
