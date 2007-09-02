@@ -1,11 +1,11 @@
 .sub main :main
     .local pmc fileout, filein
 
-    fileout = open "data.txt", ">"
+    fileout = open "40_file_ops_data.txt", ">"
     print fileout, "The quick brown fox jumps over the lazy dog.\n"
     close fileout
 
-    filein = open "data.txt", "<"
+    filein = open "40_file_ops_data.txt", "<"
     $S0 = readline filein
     say $S0
     close filein

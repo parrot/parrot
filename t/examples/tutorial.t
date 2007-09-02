@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 
 =head1 NAME
@@ -124,8 +124,88 @@ END_EXPECTED
 42
 END_EXPECTED
 
-#    '' => << 'END_EXPECTED',
-#END_EXPECTED
+    '40_file_ops.pir' => << 'END_EXPECTED',
+The quick brown fox jumps over the lazy dog.
+
+END_EXPECTED
+
+    '50_goto.pir' => << 'END_EXPECTED',
+before branch
+after branch
+END_EXPECTED
+
+    '51_if_unless.pir' => << 'END_EXPECTED',
+before if
+after if
+
+before unless
+is printed
+after unless
+END_EXPECTED
+
+    '52_if_compare.pir' => << 'END_EXPECTED',
+before if
+after if
+END_EXPECTED
+
+    '53_loop.pir' => << 'END_EXPECTED',
+120
+END_EXPECTED
+
+   '55_iterator.pir' => << 'END_EXPECTED',
+foo
+bar
+baz
+boz
+END_EXPECTED
+
+    '56_defined.pir' => << 'END_EXPECTED',
+$P1 is defined
+$P3 is undefined
+END_EXPECTED
+
+    '60_subroutines.pir' => << 'END_EXPECTED',
+Hello, Zaphod
+END_EXPECTED
+
+    '61_namespaces.pir' => << 'END_EXPECTED',
+Hello
+END_EXPECTED
+
+    '62_namespaces.pir' => << 'END_EXPECTED',
+Hello, Zaphod
+END_EXPECTED
+
+    '70_class_object.pir' => << 'END_EXPECTED',
+Hello
+5
+END_EXPECTED
+
+    '80_closure.pir' => << 'END_EXPECTED',
+27
+END_EXPECTED
+
+    '81_continuation.pir' => << 'END_EXPECTED',
+got argument: 4
+continuation called
+END_EXPECTED
+
+    '82_coroutine.pir' => << 'END_EXPECTED',
+2
+3
+END_EXPECTED
+
+    '83_external_libraries.pir' => << 'END_EXPECTED',
+22
+END_EXPECTED
+
+    '90_writing_tests.pir' => << 'END_EXPECTED',
+1..4
+ok 1 - first test
+ok 2 - second test
+ok 3 #skip skipped test
+ok 4 # TODO 42
+END_EXPECTED
 
 );
 
@@ -149,6 +229,12 @@ TODO:
     local $TODO = 'some examples not passing yet';
     fail('11_math_ops_self_mod.pir');
     fail('12_math_ops_pasm.pir');
+}
+
+# cleanup
+{
+  # The example '40_file_ops.pir' leave a temporary file.
+  unlink '40_file_ops_data.txt';
 }
 
 # Local Variables:

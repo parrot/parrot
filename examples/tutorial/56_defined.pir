@@ -25,7 +25,7 @@ PMC, returns false (0) for C<defined>.
 
 =cut
 
-  end_defined_P2:
+  end_defined_P1:
     $P3 = new 'Undef'
     $I0 = defined $P3
     if $I0 goto defined_P3
