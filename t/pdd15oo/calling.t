@@ -1004,10 +1004,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     .return ($S0)
 .end
 CODE
-parrot;Foo ok 1
-parrot;Foo ok 2
-parrot;Foo ok 3
-parrot;Foo ok 4
+Foo ok 1
+Foo ok 2
+Foo ok 3
+Foo ok 4
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 2" );
@@ -1038,7 +1038,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 2" );
     .return ($S0)
 .end
 CODE
-parrot;Foo ok 1
+Foo ok 1
 ok 2
 ok 1
 OUTPUT
@@ -1065,7 +1065,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing - 3" );
 .end
 
 CODE
-parrot;Foo ok 1
+Foo ok 1
 OUTPUT
 
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005

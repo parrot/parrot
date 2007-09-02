@@ -1268,7 +1268,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );
     end
 .end
 CODE
-Type: parrot;Some;Class
+Type: Some;Class
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "keyed class name and multi" );

@@ -118,9 +118,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get classname from class" );
     print "\n"
     end
 CODE
-parrot;Foo
-parrot;Bar
-parrot;Baz
+Foo
+Bar
+Baz
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "getclass" );
@@ -139,8 +139,8 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "getclass" );
     getclass P3, "NoSuch"
     end
 CODE
-/parrot;Foo
-parrot;FooBar
+/Foo
+FooBar
 Class 'NoSuch' doesn't exist/
 OUTPUT
 
@@ -248,6 +248,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "new object - classname" );
     set S0, P2	# object
     print S0
     print "\n"
+# XXX
 
     class P3, P1
     set S0, P1	# class
@@ -256,13 +257,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "new object - classname" );
     class P3, P1
     set S0, P2	# object
     print S0
-    print "\n"
+#    print "\n"
     end
 CODE
-parrot;Foo
-parrot;Foo
-parrot;Foo
-parrot;Foo
+Foo
+
+Foo
+
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "isa subclass" );
@@ -350,7 +351,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "addattribute" );
     print "ok 1\n"
 # Check that P1 is still the same ParrotClass PMC
     set S0, P1
-    eq S0, "parrot;Foo", ok2
+    eq S0, "Foo", ok2
     print "not "
 ok2:
     print "ok 2\n"
@@ -661,7 +662,7 @@ i
 j
 k
 l
-parrot;Bar
+Bar
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meths " );
@@ -996,8 +997,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "typeof objects" );
     print "\n"
     end
 CODE
-parrot;A
-parrot;B
+A
+B
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiple inheritance, with attributes" );
@@ -1090,7 +1091,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "class op test" );
     print "\n"
     end
 CODE
-parrot;City
+City
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "subclassing a non-existent class" );

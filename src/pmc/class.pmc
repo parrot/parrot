@@ -556,7 +556,7 @@ Free the memory associated with the object's underlying struct.
 
 =item C<STRING *get_string()>
 
-Return the fully qualified name of the class.
+Return the name of the class (without the HLL namespace).
 
 =cut
 
@@ -575,6 +575,8 @@ Return the fully qualified name of the class.
             names = Parrot_NameSpace_nci_get_name(interp, _namespace);
 
             if (!PMC_IS_NULL(names))
+                /* remove the HLL namespace name */
+                VTABLE_shift_string(INTERP, names);
                 return string_join(interp, CONST_STRING(interp, ";"), names);
         }
 

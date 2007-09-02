@@ -333,7 +333,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
 CODE
 Class
 Class
-parrot;Foo
+Foo
 ok 1
 ok 2
 OUTPUT
@@ -359,7 +359,7 @@ ok1:
 CODE
 ok 1
 ok 2
-parrot;Foo
+Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
@@ -376,9 +376,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
     print "\n"
     end
 CODE
-parrot;Foo
+Foo
 ok
-parrot;Foo
+Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
@@ -395,7 +395,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     print "ok 2\n"
     end
 CODE
-parrot;Foo
+Foo
 ok 1
 ok 2
 OUTPUT
@@ -432,7 +432,7 @@ ok1:
 CODE
 ok 1
 ok 2
-parrot;Foo
+Foo
 ok 3
 ok 4
 ok 5
@@ -476,10 +476,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
 
 
 CODE
-parrot;Foo
+Foo
 ok 1
 ok 2
-parrot;Foo
+Foo
 ok 3
 ok 4
 ok 5
@@ -520,7 +520,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
 CODE
 ok 1
 ok 2
-parrot;Foo
+Foo
 ok 3
 ok 4
 ok 5
@@ -561,7 +561,7 @@ ok1:
     end
 CODE
 ok 2
-parrot;Foo
+Foo
 ok 3
 ok 4
 ok 5
