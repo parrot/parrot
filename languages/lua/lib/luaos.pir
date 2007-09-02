@@ -98,14 +98,13 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
 Returns an approximation of the amount in seconds of CPU time used by the
 program.
 
-NOT YET IMPLEMENTED (no clock).
-
 =cut
 
 .sub 'clock' :anon
     .local pmc res
-    new res, 'LuaNumber'
-    not_implemented()
+    new $P0, 'Lua'
+    res = $P0.'clock'()
+    .return (res)
 .end
 
 
@@ -391,17 +390,18 @@ C<"all">, C<"collate">, C<"ctype">, C<"monetary">, C<"numeric">, or C<"time">;
 the default category is C<"all">. The function returns the name of the new
 locale, or B<nil> if the request cannot be honored.
 
-NOT YET IMPLEMENTED (no setlocale).
-
 =cut
 
 .sub 'setlocale' :anon
     .param pmc locale :optional
     .param pmc category :optional
-    $S1 = lua_optstring(1, locale, '')
+    .local pmc res
+    $S1 = lua_optstring(1, locale)
     $S2 = lua_optstring(2, category, 'all')
     $I2 = lua_checkoption(2, $S2, 'all collate ctype monetary numeric time')
-    not_implemented()
+    new $P0, 'Lua'
+    res = $P0.'setlocale'($I2, $S1)
+    .return (res)
 .end
 
 
@@ -418,8 +418,6 @@ seconds since some given start time (the "epoch"). In other systems, the
 meaning is not specified, and the number returned by C<time> can be used only
 as an argument to C<date> and C<difftime>.
 
-STILL INCOMPLETE (no mktime).
-
 =cut
 
 .sub 'time' :anon
@@ -435,16 +433,27 @@ STILL INCOMPLETE (no mktime).
     .return (res)
   L2:
     lua_checktype(1, table, 'table')
-    $I1 = getfield(table, 'sec', 0)
-    $I2 = getfield(table, 'min', 0)
-    $I3 = getfield(table, 'hour', 12)
-    $I4 = getfield(table, 'day', -1)
-    $I5 = getfield(table, 'month', -1)
-    $I5 -= 1
-    $I6 = getfield(table, 'year', -1)
-    $I6 -= 1900
-    $I7 = getboolfield(table, 'isdst')
-    not_implemented()
+    new $P0, 'FixedIntegerArray'
+    set $P0, 9
+    $I0 = getfield(table, 'sec', 0)
+    set $P0[.TM_SEC], $I0
+    $I0 = getfield(table, 'min', 0)
+    set $P0[.TM_MIN], $I0
+    $I0 = getfield(table, 'hour', 12)
+    set $P0[.TM_HOUR], $I0
+    $I0 = getfield(table, 'day', -1)
+    set $P0[.TM_MDAY], $I0
+    $I0 = getfield(table, 'month', -1)
+    $I0 -= 1
+    set $P0[.TM_MON], $I0
+    $I0 = getfield(table, 'year', -1)
+    $I0 -= 1900
+    set $P0[.TM_YEAR], $I0
+    $I0 = getboolfield(table, 'isdst')
+    set $P0[.TM_ISDST], $I0
+    new $P1, 'Lua'
+    res = $P1.'mktime'($P0)
+    .return (res)
 .end
 
 .sub 'getfield' :anon
@@ -493,14 +502,13 @@ Returns a string with a file name that can be used for a temporary file.
 The file must be explicitly opened before its use and explicitly removed
 when no longer needed.
 
-NOT YET IMPLEMENTED (no tmpname).
-
 =cut
 
 .sub 'tmpname' :anon
     .local pmc res
-    new res, 'LuaString'
-    not_implemented()
+    new $P0, 'Lua'
+    res = $P0.'tmpname'()
+    .return (res)
 .end
 
 =back
