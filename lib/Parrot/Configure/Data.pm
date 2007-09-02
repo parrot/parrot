@@ -217,7 +217,7 @@ EVAL_CONFIG_TEMP
 =item C<dump()>
 
 Provides a L<Data::Dumper> serialized string of the objects key/value pairs
-suitable for being C<eval>ed.  
+suitable for being C<eval>ed.
 
 Takes two arguments:
 

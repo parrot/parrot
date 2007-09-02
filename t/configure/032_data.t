@@ -179,7 +179,7 @@ can_ok(
         'c' => 3,
     );
     my $data = $pcd->dump(q{c}, q{*PConfig});
- 
+
 
     like(
         $data,

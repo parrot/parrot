@@ -17,7 +17,7 @@ my %blurbs_for_op;
 my %ops_in_file;
 
 sub command
-{ 
+{
   my ($parser, $command, $paragraph, $line_num) = @_;
   1 while chomp $paragraph;
 
@@ -35,7 +35,7 @@ sub command
 }
 
 sub verbatim
-{ 
+{
   my ($parser, $paragraph, $line_num) = @_;
   1 while chomp $paragraph;
 
@@ -46,7 +46,7 @@ sub verbatim
 }
 
 sub interior_sequence
-{ 
+{
   my ($parser, $seq_command, $seq_argument) = @_;
 }
 
