@@ -101,6 +101,7 @@ program.
 =cut
 
 .sub 'clock' :anon
+    .param pmc extra :slurpy
     .local pmc res
     new $P0, 'Lua'
     res = $P0.'clock'()
@@ -138,6 +139,7 @@ representation that depends on the host system and on the current locale
 .sub 'date' :anon
     .param pmc format :optional
     .param pmc time_ :optional
+    .param pmc extra :slurpy
     .local pmc res
     .local int t
     $S1 = lua_optstring(1, format, '%c')
@@ -236,6 +238,7 @@ Windows, and some other systems, this value is exactly C<t2-t1>.
 .sub 'difftime' :anon
     .param pmc t2 :optional
     .param pmc t1 :optional
+    .param pmc extra :slurpy
     .local pmc res
     $I2 = lua_checknumber(1, t2)
     $I1 = lua_optint(2, t1, 0)
@@ -261,6 +264,7 @@ shell is available and zero otherwise.
 
 .sub 'execute' :anon
     .param pmc command :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_optstring(1, command, '')
     unless $S1 == '' goto L1
@@ -285,6 +289,7 @@ program. The default value for C<code> is the success code.
 
 .sub 'exit' :anon
     .param pmc code :optional
+    .param pmc extra :slurpy
     $I1 = lua_optint(1, code, 0)
     exit $I1
 .end
@@ -299,6 +304,7 @@ if the variable is not defined.
 
 .sub 'getenv' :anon
     .param pmc varname :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, varname)
     new $P0, 'Env'
@@ -323,6 +329,7 @@ describing the error.
 
 .sub 'remove' :anon
     .param pmc filename :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, filename)
     $S0 = $S1
@@ -357,6 +364,7 @@ fails, it returns B<nil>, plus a string describing the error.
 .sub 'rename' :anon
     .param pmc oldname :optional
     .param pmc newname :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, oldname)
     $S0 = $S1
@@ -395,6 +403,7 @@ locale, or B<nil> if the request cannot be honored.
 .sub 'setlocale' :anon
     .param pmc locale :optional
     .param pmc category :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_optstring(1, locale)
     $S2 = lua_optstring(2, category, 'all')
@@ -422,6 +431,7 @@ as an argument to C<date> and C<difftime>.
 
 .sub 'time' :anon
     .param pmc table :optional
+    .param pmc extra :slurpy
     .local pmc res
     if null table goto L1
     $I0 = isa table, 'LuaNil'
@@ -505,6 +515,7 @@ when no longer needed.
 =cut
 
 .sub 'tmpname' :anon
+    .param pmc extra :slurpy
     .local pmc res
     new $P0, 'Lua'
     res = $P0.'tmpname'()

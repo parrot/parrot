@@ -405,6 +405,7 @@ any loader for the module, then C<require> signals an error.
 
 .sub 'require' :anon
     .param pmc modname :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, modname)
     .local pmc _lua__REGISTRY
@@ -551,6 +552,7 @@ environment. To be used as an option to function C<module>.
 
 .sub 'seeall' :anon
     .param pmc module :optional
+    .param pmc extra :slurpy
     .local pmc mt
     lua_checktype(1, module, 'table')
     mt = module.'get_metatable'()

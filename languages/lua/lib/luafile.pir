@@ -84,6 +84,7 @@ are garbage collected, but that takes an unpredictable amount of time to happen.
 =cut
 
 .sub 'close' :method :anon
+    .param pmc extra :slurpy
     .local pmc res
     $P0 = get_hll_global ['Lua::io'], 'tofile'
     $P0(self)
@@ -100,6 +101,7 @@ Saves any written data to C<file>.
 =cut
 
 .sub 'flush' :method :anon
+    .param pmc extra :slurpy
     .local pmc f
     .local pmc res
     $P0 = get_hll_global ['Lua::io'], 'tofile'
@@ -124,6 +126,7 @@ does not close the file when the loop ends.)
 =cut
 
 .sub 'lines' :method :anon
+    .param pmc extra :slurpy
     $P0 = get_hll_global ['Lua::io'], 'tofile'
     $P0(self)
     $P0 = get_hll_global ['Lua::io'], 'aux_lines'
@@ -276,6 +279,7 @@ position to the end of the file, and returns its size.
 .sub 'seek' :method :anon
     .param pmc whence :optional
     .param pmc offset :optional
+    .param pmc extra :slurpy
     .local pmc f
     .local pmc res
     $P0 = get_hll_global ['Lua::io'], 'tofile'
@@ -324,6 +328,7 @@ NOT YET IMPLEMENTED.
 .sub 'setvbuf' :method :anon
     .param pmc mode :optional
     .param pmc size :optional
+    .param pmc extra :slurpy
     .local pmc mode
     .local pmc f
     .local pmc res

@@ -404,6 +404,7 @@ file.
 
 .sub 'close' :anon
     .param pmc file
+    .param pmc extra :slurpy
     .local pmc res
     unless null file goto L1
     file = getiofile(IO_OUTPUT)
@@ -421,6 +422,7 @@ Equivalent to C<file:flush> over the default output file.
 =cut
 
 .sub 'flush' :anon
+    .param pmc extra :slurpy
     .local pmc file
     .const .LuaString key = 'flush'
     file = getiofile(IO_OUTPUT)
@@ -443,6 +445,7 @@ error code.
 
 .sub 'input' :anon
     .param pmc file :optional
+    .param pmc extra :slurpy
     .local pmc f
     .local pmc res
     if null file goto L1
@@ -488,6 +491,7 @@ input file. In this case it does not close the file when the loop ends.
 
 .sub 'lines' :anon
     .param pmc filename :optional
+    .param pmc extra :slurpy
     .local pmc file
     .local pmc f
     unless null filename goto L1
@@ -552,6 +556,7 @@ in the standard C function C<fopen>.
 .sub 'open' :anon
     .param pmc filename :optional
     .param pmc mode :optional
+    .param pmc extra :slurpy
     .local pmc f
     .local pmc res
     $S1 = lua_checkstring(1, filename)
@@ -583,6 +588,7 @@ Similar to C<io.input>, but operates over the default output file.
 
 .sub 'output' :anon
     .param pmc file :optional
+    .param pmc extra :slurpy
     .local pmc f
     .local pmc res
     if null file goto L1
@@ -622,6 +628,7 @@ NOT YET IMPLEMENTED.
 .sub 'popen' :anon
     .param pmc prog :optional
     .param pmc mode :optional
+    .param pmc extra :slurpy
     $S1 = lua_checkstring(1, prog)
     $S2 = lua_optstring(2, mode, 'r')
     not_implemented()
@@ -673,6 +680,7 @@ handle, and B<nil> if C<obj> is not a file handle.
 
 .sub 'type' :anon
     .param pmc obj :optional
+    .param pmc extra :slurpy
     .local pmc mt
     .local pmc mt_file
     .local pmc f

@@ -211,6 +211,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'abs' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = abs $N1
@@ -222,6 +223,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'acos' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = acos $N1
@@ -233,6 +235,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'asin' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = asin $N1
@@ -244,6 +247,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'atan' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = atan $N1
@@ -256,6 +260,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 .sub 'atan2' :anon
     .param pmc y :optional
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, y)
     $N2 = lua_checknumber(2, x)
@@ -268,6 +273,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'ceil' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ceil $N1
@@ -279,6 +285,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'cos' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = cos $N1
@@ -290,6 +297,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'deg' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
@@ -302,6 +310,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'exp' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = exp $N1
@@ -313,6 +322,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'floor' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = floor $N1
@@ -325,6 +335,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 .sub 'fmod' :anon
     .param pmc x :optional
     .param pmc y :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(1, y)
@@ -337,6 +348,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'frexp' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checknumber(1, x)
     new $P0, 'Lua'
@@ -348,6 +360,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 .sub 'ldexp' :anon
     .param pmc x :optional
     .param pmc nexp :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checknumber(1, x)
     lua_checknumber(2, nexp)
@@ -359,6 +372,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'log' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = ln $N1
@@ -370,6 +384,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'log10' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = log10 $N1
@@ -433,6 +448,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'modf' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checknumber(1, x)
     new $P0, 'Lua'
@@ -444,6 +460,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 .sub 'pow' :anon
     .param pmc x :optional
     .param pmc y :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N2 = lua_checknumber(2, y)
@@ -456,6 +473,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'rad' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = 3.14159265358979323846 / 180.0
@@ -511,6 +529,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'randomseed' :anon
     .param pmc seed :optional
+    .param pmc extra :slurpy
     $I1 = lua_checknumber(1, seed)
     new $P0, 'Random'
     set $P0, $I1
@@ -519,6 +538,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'sin' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sin $N1
@@ -530,6 +550,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'sqrt' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = sqrt $N1
@@ -541,6 +562,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 .sub 'tan' :anon
     .param pmc x :optional
+    .param pmc extra :slurpy
     .local pmc res
     $N1 = lua_checknumber(1, x)
     $N0 = tan $N1

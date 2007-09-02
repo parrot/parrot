@@ -210,13 +210,14 @@ message; when absent, it defaults to "assertion failed!"
 .sub 'assert' :anon
     .param pmc v :optional
     .param pmc message :optional
+    .param pmc extra :slurpy
     lua_checkany(1, v)
     $I0 = istrue v
     if $I0 goto L1
     $S2 = lua_optstring(2, message, "assertion failed!")
     lua_error($S2)
   L1:
-    .return (v, message)
+    .return (v, message, extra :flat)
 .end
 
 
@@ -267,6 +268,7 @@ STILL INCOMPLETE (see lua_gc).
 .sub 'collectgarbage' :anon
     .param pmc opt :optional
     .param pmc arg :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_optstring(1, opt, 'collect')
     lua_checkoption(1, $S1, 'stop restart collect count step setpause setstepmul')
@@ -297,6 +299,7 @@ protected mode).
 
 .sub 'dofile' :anon
     .param pmc filename :optional
+    .param pmc extra :slurpy
     $S1 = lua_optstring(1, filename, '')
     ($P0, $S0) = lua_loadfile($S1)
     if null $P0 goto L1
@@ -325,6 +328,7 @@ STILL INCOMPLETE.
 .sub 'error' :anon
     .param pmc message :optional
     .param pmc level :optional
+    .param pmc extra :slurpy
     $I2 = lua_optint(2, level, 1)
     lua_checkany(1, message)
     #
@@ -345,6 +349,7 @@ default for C<f> is 1.
 
 .sub 'getfenv' :anon
     .param pmc f :optional
+    .param pmc extra :slurpy
     .local pmc res
     if null f goto L1
     .const .LuaNumber zero = '0'
@@ -399,6 +404,7 @@ Otherwise, returns the metatable of the given object.
 
 .sub 'getmetatable' :anon
     .param pmc obj :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, obj)
     res = obj.'get_metatable'()
@@ -432,6 +438,7 @@ See C<next> for the caveats of modifying the table during its traversal.
 .sub 'ipairs' :anon
     .param pmc t :optional
     .param pmc i :optional
+    .param pmc extra :slurpy
     lua_checktype(1, t, 'table')
     unless null i goto L1
     .local pmc _G
@@ -476,6 +483,7 @@ NOT YET IMPLEMENTED.
 .sub 'load' :anon
     .param pmc func :optional
     .param pmc chunkname :optional
+    .param pmc extra :slurpy
     lua_checktype(1, func, 'function')
     $S2 = lua_optstring(2, chunkname, '=(load)')
     not_implemented()
@@ -505,6 +513,7 @@ standard input, if no file name is given.
 
 .sub 'loadfile' :anon
     .param pmc filename :optional
+    .param pmc extra :slurpy
     $S1 = lua_optstring(1, filename, '')
     ($P0, $S0) = lua_loadfile($S1)
     .return load_aux($P0, $S0)
@@ -524,6 +533,7 @@ To load and run a given string, use the idiom
 .sub 'loadstring' :anon
     .param pmc s :optional
     .param pmc chunkname :optional
+    .param pmc extra :slurpy
     $S1 = lua_checkstring(1, s)
     $S2 = lua_optstring(2, chunkname, $S1)
     ($P0, $S0) = lua_loadbuffer($S1, $S2)
@@ -557,6 +567,7 @@ existing fields. In particular, you may clear existing fields.
 .sub 'next' :anon
     .param pmc table :optional
     .param pmc idx :optional
+    .param pmc extra :slurpy
     lua_checktype(1, table, 'table')
     $P0 = table.'next'(idx)
     unless $P0 goto L1
@@ -581,6 +592,7 @@ See C<next> for the caveats of modifying the table during its traversal.
 
 .sub 'pairs' :anon
     .param pmc t :optional
+    .param pmc extra :slurpy
     lua_checktype(1, t, 'table')
     .local pmc _G
     _G = get_hll_global '_G'
@@ -667,6 +679,7 @@ Returns a boolean.
 .sub 'rawequal' :anon
     .param pmc v1 :optional
     .param pmc v2 :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, v1)
     lua_checkany(2, v2)
@@ -685,6 +698,7 @@ C<table> must be a table; C<index> is any value different from B<nil>.
 .sub 'rawget' :anon
     .param pmc table :optional
     .param pmc idx :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, table, 'table')
     lua_checkany(2, idx)
@@ -707,6 +721,7 @@ This function returns C<table>.
     .param pmc table :optional
     .param pmc idx :optional
     .param pmc value :optional
+    .param pmc extra :slurpy
     lua_checktype(1, table, 'table')
     lua_checkany(2, idx)
     lua_checkany(3, value)
@@ -785,6 +800,7 @@ STILL INCOMPLETE.
 .sub 'setfenv' :anon
     .param pmc f :optional
     .param pmc table :optional
+    .param pmc extra :slurpy
     .const .LuaNumber zero = '0'
     lua_checktype(2, table, 'table')
     unless f == zero goto L1
@@ -817,6 +833,7 @@ This function returns C<table>.
 .sub 'setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
+    .param pmc extra :slurpy
     lua_checktype(1, table, 'table')
     if null metatable goto L1
     $I0 = isa metatable, 'LuaNil'
@@ -858,6 +875,7 @@ unsigned integers are accepted.
 .sub 'tonumber' :anon
     .param pmc e :optional
     .param pmc base :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, e)
     $I2 = lua_optint(2, base, 10)
@@ -890,6 +908,7 @@ as its result.
 
 .sub 'tostring' :anon
     .param pmc e :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, e)
     res = e.'tostring'()
@@ -908,6 +927,7 @@ C<"userdata">.
 
 .sub 'type' :anon
     .param pmc v :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, v)
     $S0 = typeof v
@@ -933,6 +953,7 @@ length operator.
     .param pmc list :optional
     .param pmc i :optional
     .param pmc j :optional
+    .param pmc extra :slurpy
     .local pmc res
     .local pmc index_
     .local int idx
@@ -979,6 +1000,7 @@ error, C<xpcall> returns false plus the result from C<err>.
 .sub 'xpcall' :anon
     .param pmc f :optional
     .param pmc err_ :optional
+    .param pmc extra :slurpy
     .local pmc res
     .local pmc status
     new status, 'LuaBoolean'

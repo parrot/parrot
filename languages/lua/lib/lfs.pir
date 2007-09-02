@@ -199,6 +199,7 @@ optimal file system I/O blocksize; (Unix only)
 .sub 'attributes' :anon
     .param pmc filepath :optional
     .param pmc aname :optional
+    .param pmc extra :slurpy
     .local pmc res
     .local pmc members
     $S1 = lua_checkstring(1, filepath)
@@ -440,6 +441,7 @@ Returns C<true> in case of success or C<nil> plus an error string.
 
 .sub 'chdir' :anon
     .param pmc path :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, path)
     $S0 = $S1
@@ -474,6 +476,7 @@ string.
 =cut
 
 .sub 'currentdir' :anon
+    .param pmc extra :slurpy
     .local pmc res
     new $P0, 'OS'
     push_eh _handler
@@ -504,6 +507,7 @@ when there is no more entries. Raises an error if C<path> is not a directory.
 
 .sub 'dir' :anon
     .param pmc path :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, path)
     $S0 = $S1
@@ -555,6 +559,7 @@ NOT YET IMPLEMENTED.
     .param pmc mode :optional
     .param pmc start :optional
     .param pmc length_ :optional
+    .param pmc extra :slurpy
     $P1 = check_file(1, filehandle, 'lock')
     $S2 = lua_checkstring(2, mode)
     $I3 = lua_optint(3, start, 0)
@@ -574,6 +579,7 @@ C<nil> plus an error string.
 
 .sub 'mkdir' :anon
     .param pmc dirname :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, dirname)
     new $P0, 'OS'
@@ -607,6 +613,7 @@ C<nil> plus an error string.
 
 .sub 'rmdir' :anon
     .param pmc dirname :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, dirname)
     new $P0, 'OS'
@@ -649,6 +656,7 @@ NOT YET IMPLEMENTED.
     .param pmc filepath :optional
     .param pmc atime :optional
     .param pmc mtime :optional
+    .param pmc extra :slurpy
     $S1 = lua_checkstring(1, filepath)
     not_implemented()
 .end
@@ -672,6 +680,7 @@ NOT YET IMPLEMENTED.
     .param pmc filehandle :optional
     .param pmc start :optional
     .param pmc length_ :optional
+    .param pmc extra :slurpy
     $P1 = check_file(1, filehandle, 'unlock')
     $I2 = lua_optint(2, start, 0)
     $I3 = lua_optint(3, length_, 0)

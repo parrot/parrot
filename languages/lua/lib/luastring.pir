@@ -154,6 +154,7 @@ Note that numerical codes are not necessarily portable across platforms.
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
+    .param pmc extra :slurpy
     $S1 = lua_checkstring(1, s)
     .local int l
     l = length $S1
@@ -244,6 +245,7 @@ NOT YET IMPLEMENTED.
 
 .sub 'dump' :anon
     .param pmc function :optional
+    .param pmc extra :slurpy
     lua_checktype(1, function, 'function')
     not_implemented()
 .end
@@ -276,6 +278,7 @@ are also returned, after the two indices.
     .param pmc pattern :optional
     .param pmc init :optional
     .param pmc plain :optional
+    .param pmc extra :slurpy
     $S1 = lua_checkstring(1, s)
     $I1 = length $S1
     $S2 = lua_checkstring(2, pattern)
@@ -637,6 +640,7 @@ table:
 .sub 'gmatch' :anon :lex
     .param pmc s :optional
     .param pmc pattern :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkstring(1, s)
     $S2 = lua_checkstring(2, pattern)
@@ -701,6 +705,7 @@ is replaced.
     .param pmc pat :optional
     .param pmc repl :optional
     .param pmc max :optional
+    .param pmc extra :slurpy
     .local string src
     src = lua_checkstring(1, s)
     $I1 = length src
@@ -869,6 +874,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 .sub 'len' :anon
     .param pmc s :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     $I0 = length $S1
@@ -888,6 +894,7 @@ of what is an uppercase letter depends on the current locale.
 
 .sub 'lower' :anon
     .param pmc s :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     downcase $S1
@@ -922,6 +929,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 .sub 'rep' :anon
     .param pmc s :optional
     .param pmc n
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     $I2 = lua_checknumber(2, n)
@@ -943,6 +951,7 @@ Returns a string that is the string C<s> reversed.
 
 .sub 'reverse' :anon
     .param pmc s :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     $I0 = 0
@@ -980,6 +989,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     $I1 = length $S1
@@ -1017,6 +1027,7 @@ of what is a lowercase letter depends on the current locale.
 
 .sub 'upper' :anon
     .param pmc s :optional
+    .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, s)
     upcase $S1

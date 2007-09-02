@@ -104,6 +104,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
     .param pmc sep :optional
     .param pmc i :optional
     .param pmc j :optional
+    .param pmc extra :slurpy
     .local pmc idx
     .local pmc value
     .local string res
@@ -155,6 +156,7 @@ B<DEPRECATED>
 .sub 'foreach' :anon
     .param pmc table :optional
     .param pmc f :optional
+    .param pmc extra :slurpy
     .local pmc idx
     .local pmc value
     .local pmc res
@@ -190,6 +192,7 @@ B<DEPRECATED>
 .sub 'foreachi' :anon
     .param pmc table :optional
     .param pmc f :optional
+    .param pmc extra :slurpy
     .local pmc idx
     .local pmc value
     .local pmc res
@@ -224,6 +227,7 @@ B<DEPRECATED>
 
 .sub 'getn' :anon
     .param pmc table :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, table, 'table')
     res = table.'len'()
@@ -244,6 +248,7 @@ inserts C<x> at the end of table C<t>.
     .param pmc table :optional
     .param pmc arg2 :optional
     .param pmc arg3 :optional
+    .param pmc extra :slurpy
     .local pmc value
     .local pmc idx
     .local int e
@@ -286,6 +291,7 @@ does a linear traversal of the whole table.)
 
 .sub 'maxn' :anon
     .param pmc table :optional
+    .param pmc extra :slurpy
     .local pmc idx
     .local pmc max
     lua_checktype(1, table, 'table')
@@ -319,6 +325,7 @@ table C<t>.
 .sub 'remove' :anon
     .param pmc table :optional
     .param pmc pos :optional
+    .param pmc extra :slurpy
     .local pmc idx
     .local pmc res
     .local int e
@@ -359,6 +366,7 @@ B<OBSOLETE>
 .sub 'setn' :anon
     .param pmc table :optional
     .param pmc n :optional
+    .param pmc extra :slurpy
     lua_checktype(1, table, 'table')
     lua_error("'setn' is obsolete")
 .end
@@ -381,6 +389,7 @@ the given order may have their relative positions changed by the sort.
 .sub 'sort' :anon
     .param pmc table :optional
     .param pmc comp :optional
+    .param pmc extra :slurpy
     .local int n
     lua_checktype(1, table, 'table')
     n = table.'len'()

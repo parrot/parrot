@@ -54,6 +54,7 @@ inside C<f>.
 .sub 'alarm' :anon
     .param pmc s :optional
     .param pmc func :optional
+    .param pmc extra :slurpy
     .local pmc res
     $I1 = lua_checknumber(1, s)
     $P0 = get_hll_global '_REGISTRY'

@@ -82,6 +82,7 @@ Returns this new coroutine, an object with type C<"thread">.
 
 .sub 'create' :anon
     .param pmc f :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, f, 'function')
     $I0 = isa f, 'LuaClosure'
@@ -157,6 +158,7 @@ Returns the running coroutine, or B<nil> when called by the main thread.
 =cut
 
 .sub 'running' :anon
+    .param pmc extra :slurpy
     .local pmc co_stack
     .local pmc res
     co_stack = get_hll_global '_COROUTINE_STACK'
@@ -187,6 +189,7 @@ STILL INCOMPLETE.
 
 .sub 'status' :anon
     .param pmc co :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, co, 'thread')
     new res, 'LuaString'

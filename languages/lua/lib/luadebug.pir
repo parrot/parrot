@@ -131,6 +131,7 @@ function, and so have no direct access to local variables.
 =cut
 
 .sub 'debug' :anon
+    .param pmc extra :slurpy
     .local string buffer
     .local pmc stdin
     stdin = getstdin
@@ -168,6 +169,7 @@ Returns the environment of object C<o>.
 
 .sub 'getfenv' :anon
     .param pmc o :optional
+    .param pmc extra :slurpy
     .return lua_getfenv(o)
 .end
 
@@ -245,6 +247,7 @@ metatable.
 
 .sub 'getmetatable' :anon
     .param pmc obj :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checkany(1, obj)
     res = obj.'get_metatable'()
@@ -259,6 +262,7 @@ Returns the registry table.
 =cut
 
 .sub 'getregistry' :anon
+    .param pmc extra :slurpy
     .local pmc res
     res = get_hll_global '_REGISTRY'
     .return (res)
@@ -289,6 +293,7 @@ Sets the environment of the given C<object> to the given C<table>.
 .sub 'setfenv' :anon
     .param pmc o :optional
     .param pmc table :optional
+    .param pmc extra :slurpy
     lua_checktype(2, table, 'table')
     $I0 = lua_setfenv(o, table)
     unless $I0 goto L1
@@ -370,6 +375,7 @@ be B<nil>).
 .sub 'setmetatable' :anon
     .param pmc table :optional
     .param pmc metatable :optional
+    .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, table, 'table')
     if null metatable goto L1
@@ -415,7 +421,8 @@ STILL INCOMPLETE (see traceback in lua.pmc).
 .sub 'traceback' :anon
     .param pmc message :optional
     .param pmc level :optional
-    .param pmc res
+    .param pmc extra :slurpy
+    .local pmc res
     $S1 = optstring(message, '')
     $I2 = optint(level, 1)
     new $P0, 'Lua'
