@@ -1,6 +1,9 @@
 package Tie::Filehandle::Preempt::Stdin;
+
 $VERSION = "0.01";
+
 use strict;
+use warnings;
 use Carp;
 
 sub TIEHANDLE {
@@ -37,10 +40,10 @@ Tie::Filehandle::Preempt::Stdin - Preempt STDIN during testing.
 Suppose a program requires manual input from the keyboard operator.
 How do we test that we have properly handled operator input?  More
 specifically, how do we incorporate testing for user input in files
-built on Perl's standard testing apparatus (C<Test::Simple>, 
+built on Perl's standard testing apparatus (C<Test::Simple>,
 C<Test::More>, etc.)?
 
-Tie::Filehandle::Preempt::Stdin offers one way to do it -- a relatively 
+Tie::Filehandle::Preempt::Stdin offers one way to do it -- a relatively
 simple and unsophisticated todo it.  The most difficult part is
 analyzing the program to be tested so that you recognize all the points
 at which input is needed via STDIN.  This in turn requires an
@@ -73,7 +76,7 @@ filehandle STDIN; hence, the module's name.
 
 Should the number of elements in C<@prompts> be less than the number of
 points at which a given test prompts for operator input, you will get an
-error message: 
+error message:
 
     "List of prompt responses has been exhausted"
 
@@ -81,13 +84,13 @@ and the program will C<croak>.
 
 =head1 BUGS
 
-Tie::Filehandle::Preempt::Stdin does not work properly when the source 
+Tie::Filehandle::Preempt::Stdin does not work properly when the source
 code being tested uses only the Perl diamond operator for standard input.
 
     print "Enter room whose data you wish to enter:  ";
     chomp ($try = <>);
 
-This doesn't work; your program will hang.  You have to hard-code 
+This doesn't work; your program will hang.  You have to hard-code
 C<STDIN> instead.
 
     chomp ($try = <STDIN>);
@@ -115,7 +118,7 @@ questions on the perl.qa mailing list.
 
 =head1 COPYRIGHT
 
-Copyright 2005 James E Keenan.  
+Copyright 2005 James E Keenan.
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
@@ -135,8 +138,15 @@ Variables:  section on ''Tying Filehandles,'' p. 384 ff.
 Perlmonks discussion starting at:
 L<http://www.perlmonks.org/index.pl?node_id=430997>.
 
-Postings on perl.qa at:  
+Postings on perl.qa at:
 L<http://www.nntp.perl.org/group/perl.qa/4074> and
 L<http://www.nntp.perl.org/group/perl.qa/4076>.
 
 =cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
