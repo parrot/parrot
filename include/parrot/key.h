@@ -36,6 +36,9 @@ typedef enum {
 
 } KEY_flags;
 
+#define KEY_IS_HASH_ITERATOR(k) \
+    ((PObj_get_FLAGS((k)) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
+
 /* HEADERIZER BEGIN: src/key.c */
 
 PARROT_API

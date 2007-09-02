@@ -189,6 +189,14 @@ PARROT_API
 void parrot_new_pointer_hash( SHIM_INTERP, NOTNULL(Hash **hptr) )
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+int int_compare( SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b) );
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t key_hash_int( SHIM_INTERP, NULLOK(void *value), size_t seed );
+
 void parrot_chash_destroy( PARROT_INTERP, NOTNULL(Hash *hash) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

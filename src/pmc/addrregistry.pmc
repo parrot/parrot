@@ -28,18 +28,6 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "parrot/parrot.h"
 #include "pmc_hash.h"
 
-static size_t
-key_hash_int(SHIM_INTERP, void *value, size_t seed)
-{
-    return (size_t)value ^ seed;
-}
-
-static int
-int_compare(SHIM_INTERP, const void * const a, const void * const b)
-{
-    return a != b;
-}
-
 pmclass AddrRegistry need_ext does hash {
 /*
 
@@ -106,10 +94,10 @@ Returns true if the hash size is not zero.
         Hash       *hash = (Hash *)PMC_struct_val(SELF);
         HashBucket *b    = parrot_hash_get_bucket(INTERP, hash, key);
 
-        if (b == NULL)
-            return 0;
+        if (b)
+            return (INTVAL)b->value;
 
-        return (INTVAL) b->value;
+        return 0;
     }
 
     INTVAL elements() {
@@ -145,13 +133,13 @@ reaches 0, delete the entry.
         HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
 
         if (b)
-            LVALUE_CAST(char *, b->value) ++;
+            LVALUE_CAST(char *, b->value)++;
         else
             parrot_hash_put(INTERP, hash, key, (void *)1);
     }
 
     void set_integer_keyed(PMC *key, INTVAL value) {
-        Hash * hash = (Hash *)PMC_struct_val(SELF);
+        Hash *hash = (Hash *)PMC_struct_val(SELF);
         parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
@@ -188,10 +176,8 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
     PMC *get_pmc_keyed(PMC *key) {
         Hash * const hash = (Hash *)PMC_struct_val(SELF);
 
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
-                KEY_hash_iterator_FLAGS) {
+        if (KEY_IS_HASH_ITERATOR(key))
             return (PMC *)parrot_hash_get_idx(INTERP, hash, key);
-        }
 
         return PMCNULL;
     }

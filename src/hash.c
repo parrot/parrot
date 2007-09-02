@@ -71,20 +71,10 @@ static void init_hash(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int int_compare( SHIM_INTERP,
-    NULLOK(const void *a),
-    NULLOK(const void *b) );
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
 static size_t key_hash_cstring( SHIM_INTERP,
     NOTNULL(const void *value),
     size_t seed )
         __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static size_t key_hash_int( SHIM_INTERP, NULLOK(void *value), size_t seed );
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -221,7 +211,7 @@ Custom C<key_hash> function.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t
+size_t
 key_hash_int(SHIM_INTERP, NULLOK(void *value), size_t seed)
 {
     return (size_t)value ^ seed;
@@ -236,7 +226,7 @@ Custom C<compare> function.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int
+int
 int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 {
     return a != b;
