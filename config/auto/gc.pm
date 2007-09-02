@@ -20,15 +20,19 @@ The default. Use the memory allocator in F<src/recources.c>.
 
 =item C<libc>
 
-Use the C library C<malloc>.
+Use the C library C<malloc> along with F<src/gc/res_lea.c>.
+This doesn't work.  See [perl #42774].
 
 =item C<malloc>
 
-Use the malloc in F<src/res_lea.c>.
+Use the malloc in F<src/malloc.c> along with F<src/gc/res_lea.c>.
+Since this uses res_lea.c, it doesn't work either.  See [perl #42774].
 
 =item C<malloc-trace>
 
-Use the malloc in F<src/res_lea.c> with tracing enabled.
+Use the malloc in F<src/malloc-trace.c> with tracing enabled, along
+with F<src/gc/res_lea.c>.
+Since this uses res_lea.c, it doesn't work either.  See [perl #42774].
 
 =back
 
@@ -92,9 +96,9 @@ sub runstep {
         $conf->data->set(
             TEMP_gc_c => <<"EOF",
 \$(SRC_DIR)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/$gc.c
-\$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
+\$(SRC_DIR)/gc/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/gc/res_lea.c
 EOF
-            TEMP_gc_o => "\$(SRC_DIR)\/$gc\$(O) \$(SRC_DIR)/res_lea\$(O)",
+            TEMP_gc_o => "\$(SRC_DIR)\/$gc\$(O) \$(SRC_DIR)/gc/res_lea\$(O)",
             gc_flag   => '-DGC_IS_MALLOC',
         );
     }
