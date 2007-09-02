@@ -55,10 +55,12 @@ Marks the closure as live.
 */
 
     void mark() {
-        struct Parrot_sub *sub = PMC_sub(SELF);
+        Parrot_sub *sub = PMC_sub(SELF);
         SUPER();
+
         if (sub->outer_sub)
             pobject_lives(INTERP, (PObj*)sub->outer_sub);
+
         if (sub->outer_ctx)
             mark_context(INTERP, sub->outer_ctx);
     }
@@ -79,28 +81,24 @@ Invokes the closure.
 */
 
     void set_pointer(void *value) {
-        struct Parrot_sub *sub = PMC_sub(SELF);
-        opcode_t *addr = (opcode_t *)value;
-        sub->start_offs = addr -  sub->seg->base.data;
+        Parrot_sub *sub  = PMC_sub(SELF);
+        opcode_t   *addr = (opcode_t *)value;
+        sub->start_offs  = addr -  sub->seg->base.data;
     }
 
     opcode_t *invoke(void *in_next) {
-        struct Parrot_sub *sub = PMC_sub(SELF);
-        PMC *cont, *outer_sub;
-        opcode_t *next         = SUPER(in_next);
-        outer_sub              = sub->outer_sub;
+        Parrot_sub *sub       = PMC_sub(SELF);
+        opcode_t   *next      = SUPER(in_next);
+        PMC        *outer_sub = sub->outer_sub;
 
         if (sub->outer_ctx) {
-            /* during newclosure, outer's ctx was stored in
-             * sub->outer_ctx
-             */
+            /* during newclosure, outer's ctx was stored in sub->outer_ctx */
             sub->ctx->outer_ctx = sub->outer_ctx;
         }
         else if ((PObj_get_FLAGS(outer_sub) & SUB_FLAG_IS_OUTER) &&
             PMC_sub(outer_sub)->ctx) {
             /* the sub was invoked earlier - it still has the context
-             * due to the SUB_FLAG_IS_OUTER flag
-             */
+             * due to the SUB_FLAG_IS_OUTER flag */
             sub->outer_ctx = sub->ctx->outer_ctx = PMC_sub(outer_sub)->ctx;
         }
         else {
@@ -108,21 +106,23 @@ Invokes the closure.
             parrot_context_t *caller = sub->ctx->caller_ctx;
             while (caller) {
                 if (caller->current_sub == outer_sub) {
-                    cont = caller->current_cont;
-                    cont->vtable =
-                        interp->vtables[enum_class_Continuation];
+                    PMC *cont      = caller->current_cont;
+                    cont->vtable   = interp->vtables[enum_class_Continuation];
                     sub->outer_ctx = sub->ctx->outer_ctx = caller;
+
                     caller->ref_count++;
                     return next;
                 }
+
                 caller = caller->caller_ctx;
             }
             if (!caller) {
                 /* outer has never been invoked, we fake a subroutine call
                  * which builds the LexPad and return immediately
                  * this will usually just lead to a Null PMC access
-                 * exception
-                 */
+                 * exception */
+
+                PMC *cont;
                 INTERP->current_cont = NEED_CONTINUATION;
 
                 (void)VTABLE_invoke(INTERP, sub->outer_sub, next);
@@ -136,13 +136,13 @@ Invokes the closure.
                 (void)VTABLE_invoke(INTERP, cont, next);
             }
         }
+
         return next;
     }
 
     void thawfinish(visit_info *info) {
-        struct Parrot_sub *sub = PMC_sub(SELF);
-        PMC *outer;
-        opcode_t i, ci;
+        Parrot_sub *sub = PMC_sub(SELF);
+        opcode_t    i;
         PackFile_FixupTable *ft;
         PackFile_ConstTable *ct;
 
@@ -167,19 +167,30 @@ Invokes the closure.
 
         if (PMC_IS_NULL(sub->outer_sub))
             return;
+
         ft = sub->seg->fixups;
         ct = sub->seg->const_table;
+
         for (i = 0; i < ft->fixup_count; i++) {
             switch (ft->fixups[i]->type) {
+                opcode_t ci;
+                PMC     *outer;
                 case enum_fixup_sub:
                     ci = ft->fixups[i]->offset;
+
+                    /* not yet thawed */
                     if (ci < 0 || ci >= ct->const_count - 1)
-                        return; /* not yet thawed */
+                        return;
+
+                    /* same */
                     if (ct->constants[ci]->type != PFC_PMC)
-                        return; /* same */
+                        return;
+
                     outer = ct->constants[ci]->u.key;
+
                     if (PMC_IS_NULL(outer))
                         continue;
+
                     if (0 == string_equal(INTERP, PMC_sub(outer)->name,
                                 PMC_sub(sub->outer_sub)->name)) {
                         sub->outer_sub = outer;
@@ -200,7 +211,8 @@ Destroys the closure.  This is necessary in order to reclaim the context.
 */
 
     void destroy() {
-        struct Parrot_sub *sub = PMC_sub(SELF);
+        Parrot_sub *sub = PMC_sub(SELF);
+
 #if CTX_LEAK_DEBUG
         if (Interp_debug_TEST(INTERP, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
             fprintf(stderr, "[destroy closure %p, context %p with %d refs]\n",
@@ -208,10 +220,12 @@ Destroys the closure.  This is necessary in order to reclaim the context.
                     (sub->outer_ctx ? sub->outer_ctx->ref_count : 0));
         }
 #endif
+
         if (sub->outer_ctx) {
             Parrot_free_context(interp, sub->outer_ctx, 0);
             sub->outer_ctx = NULL;
         }
+
         SUPER();
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -33,10 +33,10 @@ Creates and returns a clone of the list.
 */
 
     PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_struct_val(dest) = intlist_clone(INTERP,
-                                             (IntList *) PMC_struct_val(SELF));
+                                             (IntList *)PMC_struct_val(SELF));
         return dest;
     }
 
@@ -66,7 +66,7 @@ Marks the list as live.
 */
 
     void mark() {
-        intlist_mark(INTERP, (IntList *) PMC_struct_val(SELF));
+        intlist_mark(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
 /*
@@ -80,11 +80,11 @@ Sets C<value> at index C<key>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        intlist_assign(INTERP, (IntList*) PMC_struct_val(SELF), key, value);
+        intlist_assign(INTERP, (IntList *)PMC_struct_val(SELF), key, value);
     }
 
     void set_integer_native(INTVAL len) {
-        list_set_length(INTERP, (List*) PMC_struct_val(SELF), len);
+        list_set_length(INTERP, (List *)PMC_struct_val(SELF), len);
     }
 /*
 
@@ -99,10 +99,11 @@ Sets C<value> at index C<*key>.
     void set_integer_keyed(PMC *key, INTVAL value) {
         INTVAL ix;
 
-        if (!key) return;
+        if (!key)
+            return;
 
         ix = key_integer(INTERP, key);
-        intlist_assign(INTERP, (IntList*) PMC_struct_val(SELF), ix, value);
+        intlist_assign(INTERP, (IntList *)PMC_struct_val(SELF), ix, value);
     }
 
 /*
@@ -116,10 +117,11 @@ Returns the number of elements in the list.
 */
 
     INTVAL get_integer() {
-        return intlist_length(INTERP, (IntList*) PMC_struct_val(SELF));
+        return intlist_length(INTERP, (IntList *)PMC_struct_val(SELF));
     }
+
     INTVAL elements() {
-        return intlist_length(INTERP, (IntList*) PMC_struct_val(SELF));
+        return intlist_length(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
 /*
@@ -133,7 +135,7 @@ Returns the value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        return intlist_get(INTERP, (IntList*) PMC_struct_val(SELF), key);
+        return intlist_get(INTERP, (IntList *)PMC_struct_val(SELF), key);
     }
 
 /*
@@ -164,7 +166,7 @@ Adds C<value> to the end of the list.
 */
 
     void push_integer(INTVAL value) {
-        intlist_push(INTERP, (IntList*) PMC_struct_val(SELF), value);
+        intlist_push(INTERP, (IntList *)PMC_struct_val(SELF), value);
     }
 
 /*
@@ -178,7 +180,7 @@ Removes and returns the last element in the list.
 */
 
     INTVAL pop_integer() {
-        return intlist_pop(INTERP, (IntList*) PMC_struct_val(SELF));
+        return intlist_pop(INTERP, (IntList *)PMC_struct_val(SELF));
     }
 
 /*
@@ -215,36 +217,36 @@ Removes and returns the first element in the list.
         if (SELF->vtable->base_type != value->vtable->base_type)
             real_exception(INTERP, NULL, E_TypeError,
                     "Type mismatch in splice");
-        list_splice(INTERP, (List*) PMC_struct_val(SELF),
+
+        list_splice(INTERP, (List *)PMC_struct_val(SELF),
             (List *)PMC_struct_val(value), offset, count);
     }
 
     PMC *slice(PMC *key, INTVAL f) {
-        switch (f) {
-            case 0:
-                {
-                    PMC * const iter = pmc_new_init(INTERP,
-                            enum_class_Iterator, SELF);
-                    PMC_struct_val(iter) = key;
-                    return iter;
-                }
-        }
-        real_exception(INTERP, NULL, E_IndexError,
+        if (f) {
+            real_exception(INTERP, NULL, E_IndexError,
                 "IntList: Unknown slice type");
+        }
+        else {
+            PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+            PMC_struct_val(iter) = key;
+            return iter;
+        }
     }
 
     PMC *get_iter() {
-        PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC * const key =  pmc_new(INTERP, enum_class_Key);
+        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC * const key      = pmc_new(INTERP, enum_class_Key);
 
         PMC_struct_val(iter) = key;
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-        PMC_int_val(key) = 0;
-        if (!((List *) PMC_struct_val(SELF))->length)
+        PMC_int_val(key)     = 0;
+
+        if (!((List *)PMC_struct_val(SELF))->length)
             PMC_int_val(key) = -1;
+
         return iter;
     }
-
 }
 
 /*

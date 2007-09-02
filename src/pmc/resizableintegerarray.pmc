@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -37,9 +37,11 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL *data;
+
         if (key < 0)
             real_exception(INTERP, NULL, E_IndexError,
                 "ResizableIntegerArray: index out of bounds!");
+
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -59,13 +61,15 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
         INTVAL *data;
+
         if (key < 0)
             real_exception(INTERP, NULL, E_IndexError,
                 "ResizableIntegerArray: index out of bounds!");
+
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        data = (INTVAL *)PMC_data(SELF);
+        data      = (INTVAL *)PMC_data(SELF);
         data[key] = value;
     }
 
@@ -88,7 +92,7 @@ Resizes the array to C<size> elements.
             /* empty - used fixed routine */
             if (size < 8) {
                 SUPER(8);
-                PMC_int_val(SELF) = size;
+                PMC_int_val(SELF)  = size;
                 PMC_int_val2(SELF) = 8;
             }
             else {
@@ -97,24 +101,25 @@ Resizes the array to C<size> elements.
             }
         }
         else if (size <= PMC_int_val2(SELF)) {
-            PMC_int_val(SELF) = size;
             /* we could shrink here if necessary */
+            PMC_int_val(SELF) = size;
             return;
         }
         else {
-            INTVAL cur, needed;
-            cur = PMC_int_val2(SELF);
+            INTVAL cur = PMC_int_val2(SELF);
+
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
             else {
-                needed = size - cur;
-                cur += needed + 4096;
-                cur &= ~0xfff;
+                INTVAL needed = size - cur;
+                cur          += needed + 4096;
+                cur          &= ~0xfff;
             }
+
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
                     cur * sizeof (INTVAL));
             PMC_int_val2(SELF) = cur;
-            PMC_int_val(SELF) = size;
+            PMC_int_val(SELF)  = size;
         }
     }
 
@@ -145,14 +150,13 @@ Removes and returns the last element in the array.
 */
 
     INTVAL pop_integer() {
-        INTVAL size;
         INTVAL value;
+        INTVAL size = PMC_int_val(SELF);
 
-        size = PMC_int_val(SELF);
-        if (size == 0) {
+        if (size == 0)
             real_exception(INTERP, NULL, E_IndexError,
                     "ResizableIntegerArray: Can't pop from an empty array!");
-        }
+
         value = DYNSELF.get_integer_keyed_int(size-1);
         DYNSELF.set_integer_native(size - 1);
         return value;
@@ -168,16 +172,16 @@ Removes and returns an item from the start of the array.
 */
 
     INTVAL shift_integer() {
-        INTVAL size;
         INTVAL value, *data;
+        INTVAL size = PMC_int_val(SELF);
 
-        size = PMC_int_val(SELF);
-        if (size == 0) {
+        if (size == 0)
             real_exception(INTERP, NULL, E_IndexError,
                     "ResizableIntegerArray: Can't shift from an empty array!");
-        }
-        data = (INTVAL *)PMC_data(SELF);
+
+        data  = (INTVAL *)PMC_data(SELF);
         value = data[0];
+
         PMC_int_val(SELF) = --size;
         mem_sys_memmove(data, data + 1, size * sizeof (INTVAL));
         return value;
@@ -194,11 +198,11 @@ Add and integer to the start of the array.
 */
 
     void unshift_integer(INTVAL value) {
-        INTVAL size, *data;
+        INTVAL  size = PMC_int_val(SELF);
+        INTVAL *data;
 
-        size = PMC_int_val(SELF);
         DYNSELF.set_integer_native(size + 1);
-        data = (INTVAL *)PMC_data(SELF);
+        data    = (INTVAL *)PMC_data(SELF);
         mem_sys_memmove(data + 1, data, size * sizeof (INTVAL));
         data[0] = value;
     }
@@ -213,9 +217,11 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC *copy = SUPER();
+        PMC *copy          = SUPER();
+
         /* copy trimmed extra space */
         PMC_int_val2(copy) = PMC_int_val(SELF);
+
         return copy;
     }
 
