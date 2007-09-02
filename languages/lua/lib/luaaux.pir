@@ -445,7 +445,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .sub 'lua_optstring'
     .param int narg
     .param pmc arg
-    .param string default
+    .param string default :optional
     if null arg goto L1
     unless arg goto L1
     $S0 = arg

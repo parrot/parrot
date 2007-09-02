@@ -19,6 +19,7 @@ This singleton PMC holds some static methods.
 */
 
 #include "parrot/parrot.h"
+#include <locale.h>
 
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaNumber;
@@ -114,6 +115,20 @@ information see F<src/pmc.c>.
 
 /*
 
+=item C<PMC* clock()>
+
+=cut
+
+*/
+    METHOD PMC* clock() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        FLOATVAL f = ((FLOATVAL)clock())/(FLOATVAL)CLOCKS_PER_SEC;
+        VTABLE_set_number_native(INTERP, retval, f);
+        return retval;
+    }
+
+/*
+
 =item C<PMC* frexp(PMC* x)>
 
 =cut
@@ -154,6 +169,35 @@ information see F<src/pmc.c>.
 
 /*
 
+=item C<PMC* mktime(PMC* tm)>
+
+=cut
+
+*/
+    METHOD PMC* mktime(PMC* tm) {
+        PMC *retval;
+        time_t t;
+        struct tm ts;
+        ts.tm_sec = VTABLE_get_integer_keyed_int(INTERP, tm, 0);
+        ts.tm_min = VTABLE_get_integer_keyed_int(INTERP, tm, 1);
+        ts.tm_hour = VTABLE_get_integer_keyed_int(INTERP, tm, 2);
+        ts.tm_mday = VTABLE_get_integer_keyed_int(INTERP, tm, 3);
+        ts.tm_mon = VTABLE_get_integer_keyed_int(INTERP, tm, 4);
+        ts.tm_year = VTABLE_get_integer_keyed_int(INTERP, tm, 5);
+        ts.tm_isdst = VTABLE_get_integer_keyed_int(INTERP, tm, 8);
+        t = mktime(&ts);
+        if (t == -1) {
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        }
+        else {
+            retval = pmc_new(INTERP, dynpmc_LuaNumber);
+            VTABLE_set_integer_native(INTERP, retval, t);
+        }
+        return retval;
+    }
+
+/*
+
 =item C<PMC* modf(PMC* x)>
 
 =cut
@@ -174,6 +218,31 @@ information see F<src/pmc.c>.
         VTABLE_set_integer_native(INTERP, retval, 2);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 0, d);
         VTABLE_set_pmc_keyed_int(INTERP, retval, 1, y);
+        return retval;
+    }
+
+/*
+
+=item C<PMC* setlocale(INTVAL category, STRING* locale)>
+
+=cut
+
+*/
+    METHOD PMC* setlocale(INTVAL category, STRING* locale) {
+        PMC *retval;
+        static const int cat[] = {
+            LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_NUMERIC, LC_TIME
+        };
+        char *loc = (locale != NULL) ? string_to_cstring(INTERP, locale) : NULL;
+        char *p = setlocale(cat[category], loc);
+        if (p == NULL) {
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
+        }
+        else {
+            retval = pmc_new(INTERP, dynpmc_LuaString);
+            VTABLE_set_string_native(INTERP, retval,
+                                     string_from_cstring(INTERP, p, 0));
+        }
         return retval;
     }
 
@@ -202,6 +271,36 @@ information see F<src/pmc.c>.
 
         reslen = strftime(b, sizeof b, s, &stm);
         return string_from_cstring(INTERP, b, reslen);
+    }
+
+/*
+
+=item C<PMC* tmpname()>
+
+=cut
+
+*/
+    METHOD PMC* tmpname() {
+        PMC *retval;
+        char buff[32];
+        int e;
+#ifdef WIN32
+        e = (tmpnam(buff) == NULL);
+#else
+        strcpy(buff, "/tmp/lua_XXXXXX");
+        e = mkstemp(buff);
+        if (e != -1) close(e);
+        e = (e == -1);
+#endif
+        if (e) {
+            real_exception(INTERP, NULL, 1,
+                           "unable to generate a unique filename");
+            return NULL;
+        }
+        retval = pmc_new(INTERP, dynpmc_LuaString);
+        VTABLE_set_string_native(INTERP, retval,
+                                 string_from_cstring(INTERP, buff, 0));
+        return retval;
     }
 
 /*

@@ -27,8 +27,16 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 25;
 use Test::More;
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.clock' );
+clk = os.clock()
+print(type(clk))
+assert(clk <= os.clock())
+CODE
+number
+OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.date' );
 d = os.date("!*t", 0)
@@ -144,6 +152,26 @@ nil
 file.old: No such file or directory
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.setlocale' );
+print(os.setlocale('C', 'all'))
+print(os.setlocale())
+CODE
+C
+C
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.setlocale (unknown locale)' );
+print(os.setlocale('unk_loc', 'all'))
+CODE
+nil
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.setlocale (bad category)' );
+print(os.setlocale('C', 'bad_cat'))
+CODE
+/^[^:]+: [^:]+:\d+: bad argument #2 to 'setlocale' \(invalid option 'bad_cat'\)\nstack traceback:\n/
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time())
 CODE
@@ -156,10 +184,42 @@ CODE
 /^\d+/
 OUTPUT
 
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
+print(os.time({
+    sec = 0,
+    min = 0,
+    hour = 0,
+    day = 1,
+    month = 1,
+    year = 2000,
+    isdst = 0,
+}))
+print(os.time({
+    sec = 0,
+    min = 0,
+    hour = 0,
+    day = 1,
+    month = 1,
+    year = 2100,
+    isdst = 0,
+}))
+CODE
+946677600
+nil
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time (missing field)' );
 print(os.time({}))
 CODE
 /^[^:]+: [^:]+:\d+: field 'day' missing in date table\nstack traceback:\n/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.tmpname' );
+fname = os.tmpname()
+print(type(fname))
+assert(fname ~= os.tmpname())
+CODE
+string
 OUTPUT
 
 # Local Variables:

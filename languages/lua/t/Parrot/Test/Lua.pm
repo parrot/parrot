@@ -61,7 +61,7 @@ foreach my $func ( keys %language_test_map ) {
         my $src = (defined $code) ? 'languages/' . $lang_fn : q{};
         if ( $lua_test eq 'lua' ) {
             @test_prog = (
-                "$ENV{PARROT_LUA_TEST_PROG} $test_prog_args $src $params",
+                "lua $test_prog_args $src $params",
             );
         }
         elsif ( $lua_test eq 'luac.pl' ) {
