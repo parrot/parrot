@@ -167,8 +167,8 @@ EOF
             }
         }
     }
-    $conf->data->set(TEMP_gen_pasm_includes => join("\t\\\n\t", @generated)); 
-    
+    $conf->data->set(TEMP_gen_pasm_includes => join("\t\\\n\t", @generated));
+
     return $self
 }
 
