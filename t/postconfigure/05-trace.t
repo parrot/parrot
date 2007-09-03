@@ -5,6 +5,7 @@
 
 use strict;
 use warnings;
+no warnings 'once';
 use Carp;
 use Data::Dumper;
 use Test::More;
