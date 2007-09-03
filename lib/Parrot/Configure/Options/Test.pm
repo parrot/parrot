@@ -39,7 +39,7 @@ sub run_configure_tests {
     if ($self->{run_configure_tests}) {
         print "As you requested, we'll start with some tests of the configuration tools.\n\n";
         system(qq{prove @preconfiguration_tests})
-            and die "Unable to execute configuration tests";
+            and die "Pre-configuration tests did not complete successfully; Configure.pl will not continue.";
         print <<"TEST";
 
 I just ran some tests to demonstrate that
@@ -56,7 +56,7 @@ sub run_build_tests {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
         system(qq{prove @postconfiguration_tests})
-            and die "Unable to execute post-configuration and build tools tests";
+            and die "Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
     }
     return 1;
 }
