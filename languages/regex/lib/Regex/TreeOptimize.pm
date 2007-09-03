@@ -2,6 +2,8 @@
 # as List ops. Most optimizations should go here, since the List form
 # is really suitable only for peephole optimization.
 
+# Copyright (C) 2004-2006, The Perl Foundation.
+
 package Regex::TreeOptimize;
 use Regex::Ops::Tree qw(rop);
 use Carp qw(croak);

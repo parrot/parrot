@@ -1,5 +1,7 @@
 package Regex::Parse;
 
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 use Regex::Grammar;
 use strict;
 use warnings;

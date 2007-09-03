@@ -1,4 +1,7 @@
 package Regex::CodeGen::IMCC;
+
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 use Regex::Ops::Tree ();    # For mark()
 use base 'Regex::CodeGen';
 use strict;

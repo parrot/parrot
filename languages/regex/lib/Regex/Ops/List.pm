@@ -1,5 +1,7 @@
 # This file is rotting and needs a cleanup desperately.
 
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 package Regex::Ops::List;
 use Regex::Grammar;
 use base 'Exporter';

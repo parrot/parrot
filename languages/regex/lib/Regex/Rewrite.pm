@@ -1,6 +1,9 @@
 package Regex::Rewrite;
 use Regex::Ops::Tree;
 use Regex::Ops::List;
+
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 require 'Regex.pm';
 use strict;
 use warnings;

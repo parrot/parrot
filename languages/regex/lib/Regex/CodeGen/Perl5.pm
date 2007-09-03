@@ -1,4 +1,7 @@
 package Regex::CodeGen::Perl5;
+
+# Copyright (C) 2004-2006, The Perl Foundation.
+
 use Regex::Ops::Tree ();    # For mark()
 use base 'Regex::CodeGen';
 use strict;

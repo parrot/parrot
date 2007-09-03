@@ -1,4 +1,7 @@
 package Regex::Ops::Tree;
+
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 use base 'Exporter';
 use strict;
 use warnings;

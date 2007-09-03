@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 package Regex::CodeGen::Re;
 use Regex::RegexOps ();
 use base 'Regex::CodeGen';

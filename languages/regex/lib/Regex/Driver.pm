@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2004-2006, The Perl Foundation.
+
 package Regex::Driver;
 use strict;
 use warnings;

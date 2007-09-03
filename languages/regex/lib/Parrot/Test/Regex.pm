@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2005-2007, The Perl Foundation.
+
 require Parrot::Test;
 
 package Parrot::Test::Regex;
