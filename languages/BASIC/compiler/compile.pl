@@ -1,5 +1,7 @@
 #! perl
 
+# Copyright (C) 2003-2007, The Perl Foundation.
+
 # Remember, this is BAD PERL later to be translated to PASM
 # First tokenize the input stream into:
 #          @tokens and @tokdsc

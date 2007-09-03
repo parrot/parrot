@@ -1,5 +1,7 @@
 #! perl
 
+# Copyright (C) 2003-2007, The Perl Foundation.
+
 # Variable name may have a SIGIL and is in S1
 #    % &   INT
 #    ! #   FLO

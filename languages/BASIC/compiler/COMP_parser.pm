@@ -1,5 +1,7 @@
 #! perl
 
+# Copyright (C) 2003-2007, The Perl Foundation.
+
 use constant VERSION => 2.3;
 
 use constant PREV => 2;

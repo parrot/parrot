@@ -1,5 +1,6 @@
 # Aux. functions needed by the parser.  (For cleanliness)
 #
+# Copyright (C) 2003-2007, The Perl Foundation.
 
 use vars qw( %usertypes );
 use vars qw( %arrays );
