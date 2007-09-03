@@ -1,5 +1,7 @@
 package Parrot::Test::Tcl;
 
+# Copyright (C) 2004-2007, The Perl Foundation.
+
 use warnings;
 use File::Basename;
 

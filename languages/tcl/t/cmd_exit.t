@@ -1,5 +1,7 @@
 #!perl
 
+# Copyright (C) 2004-2006, The Perl Foundation.
+
 use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
@@ -27,7 +29,7 @@ TCL
 wrong # args: should be "exit ?returnCode?"
 OUT
 
-# TODO (#40777): should check return value of exit, also
+# (RT#40777): should check return value of exit, also
 
 # Local Variables:
 #   mode: cperl

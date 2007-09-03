@@ -1,4 +1,7 @@
 package Tcl::Test;
+
+# Copyright (C) 2006-2007, The Perl Foundation.
+
 use warnings;
 use strict;
 
