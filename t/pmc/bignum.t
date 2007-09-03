@@ -1,6 +1,8 @@
 #!perl
 # $Id$
 
+# Copyright (C) 2002-2007, The Perl Foundation.
+
 =head1 NAME
 
 t/pmc/bignum.t - Test the non-implemented BigNum PMC.
