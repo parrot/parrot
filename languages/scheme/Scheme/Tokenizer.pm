@@ -1,5 +1,7 @@
 package Scheme::Tokenizer;
 
+# Copyright (C) 2001-2006, The Perl Foundation.
+
 use strict;
 use warnings;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);

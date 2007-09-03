@@ -1,5 +1,7 @@
 package Scheme::Builtins;
 
+# Copyright (C) 2002-2006, The Perl Foundation.
+
 use strict;
 use warnings;
 

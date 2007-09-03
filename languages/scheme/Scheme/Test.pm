@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2001-2006, The Perl Foundation.
+
 package Scheme::Test;
 
 use strict;
