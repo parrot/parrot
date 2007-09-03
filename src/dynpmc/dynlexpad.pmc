@@ -19,8 +19,6 @@ lexicals at runtime.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass DynLexPad dynpmc does lexpad need_ext {
 
     void init() {

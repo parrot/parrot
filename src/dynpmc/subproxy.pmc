@@ -8,8 +8,6 @@
  * s. src/dynpmc/main.pasm for usage
  */
 
-#include "parrot/parrot.h"
-
 /*
  * the real class enum is created at load time
  */

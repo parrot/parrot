@@ -7,8 +7,6 @@
  * proper inheritance - used for testing only
  */
 
-#include "parrot/parrot.h"
-
 pmclass Foo dynpmc does scalar extends Integer {
 
     INTVAL get_integer() {

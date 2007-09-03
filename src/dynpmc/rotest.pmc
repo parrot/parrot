@@ -7,8 +7,6 @@
  * generation. For testing only.
  */
 
-#include "parrot/parrot.h"
-
 pmclass ROTest dynpmc does scalar extends Integer {
     void set_integer_native(INTVAL value) :read {
     }

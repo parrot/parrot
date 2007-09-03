@@ -45,7 +45,6 @@ TODO: return None PMC for nonexisting keys.
 
  */
 
-#include "parrot/parrot.h"
 #include <gdbm.h>
 
 /*
