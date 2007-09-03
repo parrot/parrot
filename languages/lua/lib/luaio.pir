@@ -46,9 +46,6 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .local pmc _io_env
     new _io_env, 'LuaTable'
 
-    .local pmc _popen_env
-    new _popen_env, 'LuaTable'
-
     .local pmc _file
     $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
     _file = $P0(_io_env)
@@ -91,7 +88,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     _io[$P1] = _io_output
 
     .const .Sub _io_popen = 'popen'
-    _io_popen.'setfenv'(_popen_env)
+    _io_popen.'setfenv'(_io_env)
     set $P1, 'popen'
     _io[$P1] = _io_popen
 
@@ -127,12 +124,6 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     # create (and set) default files
     createstdfiles(_file, _io, _io_env)
-
-    # environment for 'popen'
-    .const .Sub _io_pclose = 'pclose'
-    _io_pclose.'setfenv'(_io_env)
-    set $P1, '__close'
-    _popen_env[$P1] = _io_pclose
 
 .end
 
@@ -217,6 +208,23 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     res = '+>>'
     goto L9
   L6:
+    res = ''
+  L9:
+    .return (res)
+.end
+
+
+.sub 'pgetmode' :anon
+    .param string mode
+    .local string res
+    unless mode == 'r' goto L1
+    res = '-|'
+    goto L9
+  L1:
+    unless mode == 'w' goto L2
+    res = '|-'
+    goto L9
+  L2:
     res = ''
   L9:
     .return (res)
@@ -621,22 +629,32 @@ or to write data to this program (if C<mode> is C<"w">).
 
 This function is system dependent and is not available on all platforms.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub 'popen' :anon
     .param pmc prog :optional
     .param pmc mode :optional
     .param pmc extra :slurpy
+    .local pmc f
+    .local pmc res
     $S1 = lua_checkstring(1, prog)
     $S2 = lua_optstring(2, mode, 'r')
-    not_implemented()
-.end
-
-.sub 'pclose' :anon
-    .param pmc file
-    not_implemented()
+    $S0 = pgetmode($S2)
+    if $S0 == '' goto L1
+    f = open $S1, $S0
+    unless f goto L1
+    res = newfile()
+    setattribute res, 'data', f
+    .return (res)
+  L1:
+    new res, 'LuaNil'
+    .local pmc msg
+    new msg, 'LuaString'
+    $S0 = err
+    concat $S1, ': '
+    concat $S1, $S0
+    set msg, $S1
+    .return (res, msg)
 .end
 
 
@@ -661,12 +679,30 @@ Equivalent to C<io.input():read>.
 Returns a handle for a temporary file. This file is open in update mode and
 it is automatically removed when the program ends.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub 'tmpfile' :anon
-    not_implemented()
+    .param pmc extra :slurpy
+    .local pmc f
+    .local pmc res
+    new $P0, 'Lua'
+    $S0 = $P0.'tmpname'()
+    f = open $S0, '+>'
+    unless f goto L1
+    res = newfile()
+    setattribute res, 'data', f
+    new $P0, 'OS'
+    $P0.'rm'($S0)
+    .return (res)
+  L1:
+    new res, 'LuaNil'
+    .local pmc msg
+    new msg, 'LuaString'
+    $S0 = err
+    concat $S1, ': '
+    concat $S1, $S0
+    set msg, $S1
+    .return (res, msg)
 .end
 
 

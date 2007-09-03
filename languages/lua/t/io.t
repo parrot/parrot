@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 41;
 use Test::More;
 
 my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
@@ -38,10 +38,7 @@ local env = debug.getfenv(io.lines)
 print(type(env.__close))
 assert(env[1] == io.stdin)
 assert(env[2] == io.stdout)
-env = debug.getfenv(io.popen)
-print(type(env.__close))
 CODE
-function
 function
 OUTPUT
 
@@ -153,7 +150,21 @@ CODE
 OUTPUT
 unlink('../output.new') if ( -f '../output.new' );
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read *l', params => "< file.txt"  );
+SKIP: {
+    skip('pipe not yet implemented on Win32', 1) if ($^O eq 'MSWin32');
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.popen' );
+f = io.popen("perl -e \"print 'standard output'\"")
+print(io.type(f))
+print(f:read())
+f:close()
+CODE
+file
+standard output
+OUTPUT
+}
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.read *l', params => '< file.txt' );
 print(io.read("*l"))
 print(io.read("*l"))
 print(io.type(io.stdin))
@@ -172,7 +183,7 @@ print {$Y} << 'DATA';
 DATA
 close $Y;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io:read *number', params => "< number.txt" );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io:read *number', params => '< number.txt' );
 while true do
     local n1, n2, n3 = io.read("*number", "*number", "*number")
     if not n1 then break end
@@ -193,12 +204,21 @@ CODE
 file with text
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines', params => "< file.txt" );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.lines', params => '< file.txt' );
 for line in io.lines() do
     print(line)
 end
 CODE
 file with text
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.tmpfile' );
+f = io.tmpfile()
+print(io.type(f))
+f:write("some text")
+f:close()
+CODE
+file
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.write' );
