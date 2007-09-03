@@ -2,6 +2,8 @@
 
 # $Id$
 
+# Copyright (C) 2004-2006, The Perl Foundation.
+
 =head1 DESCRIPTION
 
 =head1 SYNTAX

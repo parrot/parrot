@@ -1,6 +1,8 @@
 #! perl
 # $Id$
 
+# Copyright (C) 2005-2007, The Perl Foundation.
+
 =head1 NAME
 
 ook/t/basic.t - testing ook

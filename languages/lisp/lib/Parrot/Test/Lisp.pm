@@ -2,6 +2,8 @@
 
 package Parrot::Test::Lisp;
 
+# Copyright (C) 2007, The Perl Foundation.
+
 use strict;
 use warnings;
 

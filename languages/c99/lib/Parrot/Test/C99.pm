@@ -1,4 +1,6 @@
 # $Id$
+# Copyright (C) 2006, The Perl Foundation.
+
 
 package Parrot::Test::C99;
 
