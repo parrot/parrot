@@ -3,6 +3,8 @@
 # Script to take a file containing internal methods and spit out a chunk of
 # PIR that can look up the built-in that's needed and return its PIR.
 
+# Copyright (C) 2006, The Perl Foundation.
+
 use strict;
 use warnings;
 use Getopt::Long;

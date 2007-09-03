@@ -5,6 +5,8 @@
 # better code.
 # Inherits from SRM::Base.
 
+# Copyright (C) 2006, The Perl Foundation.
+
 package SRM::OptRegister;
 use strict;
 use warnings;

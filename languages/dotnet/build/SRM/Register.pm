@@ -3,6 +3,8 @@
 # virtual registers numbered by depth. This eliminates the need for a stack.
 # Inherits from SRM::Base.
 
+# Copyright (C) 2006, The Perl Foundation.
+
 package SRM::Register;
 use strict;
 use warnings;

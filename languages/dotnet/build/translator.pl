@@ -3,6 +3,8 @@
 # Script to generate the instruction translator from a rules file and a
 # stack to register mapping algorithm.
 
+# Copyright (C) 2006, The Perl Foundation.
+
 use strict;
 use warnings;
 use Getopt::Long;

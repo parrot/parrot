@@ -2,6 +2,8 @@
 # Stack emulation stack to register mapper. Simple and stupid.
 # Inherits from SRM::Base.
 
+# Copyright (C) 2006, The Perl Foundation.
+
 package SRM::Stack;
 use strict;
 use warnings;

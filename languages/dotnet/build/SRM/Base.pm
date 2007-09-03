@@ -1,5 +1,6 @@
 # .NET CLI To PIR Translator
 # Base class for implementing stack to register mapping algorithms.
+# Copyright (C) 2006, The Perl Foundation.
 
 package SRM::Base;
 use strict;
