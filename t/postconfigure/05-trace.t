@@ -20,6 +20,7 @@ if (
 }
 use lib qw( lib );
 use_ok( 'Parrot::Configure::Trace' );
+$Storable::Eval = 1;
 use Parrot::Configure::Step::List qw( get_steps_list );
 
 my $obj;
