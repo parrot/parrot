@@ -319,11 +319,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     push_eh _handler
     $P0 = lua_comp.'compile'(buff)
     $P0 = $P0[1]
-    new $P1, 'LuaClosure', $P0
     .local pmc env
     env = get_hll_global '_G'
-    $P1.'setfenv'(env)
-    .return ($P1)
+    $P0.'setfenv'(env)
+    .return ($P0)
   _handler:
     .get_results ($P0, $S0)
     null $P0
@@ -354,11 +353,10 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     push_eh _handler
     $P0 = lua_comp.'compile'($S0)
     $P0 = $P0[1]
-    new $P1, 'LuaClosure', $P0
     .local pmc env
     env = get_hll_global '_G'
-    $P1.'setfenv'(env)
-    .return ($P1)
+    $P0.'setfenv'(env)
+    .return ($P0)
   _handler:
     .get_results ($P0, $S0)
     goto L5
