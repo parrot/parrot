@@ -83,7 +83,7 @@ $command = q{echo Hello world};
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
-$command = q{date};
+$command = $^O eq 'MSWin32' ? q{dir} : q{date};
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
@@ -97,7 +97,7 @@ $command = q{date};
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
-$command = q{date};
+$command = $^O eq 'MSWin32' ? q{dir} : q{date};
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
@@ -111,7 +111,7 @@ $command = q{date};
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
-$command = q{date};
+$command = $^O eq 'MSWin32' ? q{dir} : q{date};
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
@@ -125,7 +125,7 @@ $command = q{date};
     chdir $cwd or croak "Unable to change back to starting directory";
 }
 
-$command = q{date};
+$command = $^O eq 'MSWin32' ? q{dir} : q{date};
 {
     my $tdir = tempdir( CLEANUP => 1 );
     chdir $tdir or croak "Unable to change to temporary directory";
