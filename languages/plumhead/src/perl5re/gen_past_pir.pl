@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2007, The Perl Foundation.
+
 =head1 NAME
 
 gen_past_pir.pl - A PHP compiler based on Perl5.10 regexes

@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2006-2007, The Perl Foundation.
+
 package Parrot::Test::Plumhead::Antlr3;
 
 # pragmata

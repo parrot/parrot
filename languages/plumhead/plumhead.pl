@@ -2,6 +2,8 @@
 
 # $Id$
 
+# Copyright (C) 2006-2007, The Perl Foundation.
+
 # A workaround for run-tests.php
 
 use strict;

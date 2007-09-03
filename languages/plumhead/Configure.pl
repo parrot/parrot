@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2006, The Perl Foundation.
+
 # pragmata
 use strict;
 use warnings;
