@@ -1,4 +1,6 @@
 package Parrot::Pmc2c::Object;
+# Copyright (C) 2007, The Perl Foundation.
+
 use base 'Parrot::Pmc2c';
 use strict;
 use warnings;

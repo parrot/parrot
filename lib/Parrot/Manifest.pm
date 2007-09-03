@@ -1,4 +1,6 @@
 # $Id$
+# Copyright (C) 2007, The Perl Foundation.
+
 package Parrot::Manifest;
 use strict;
 use warnings;

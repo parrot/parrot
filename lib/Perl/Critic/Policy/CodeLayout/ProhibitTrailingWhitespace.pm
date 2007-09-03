@@ -1,6 +1,8 @@
 # $Id$
 package Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace;
 
+# Copyright (C) 2007-2007, The Perl Foundation.
+
 use strict;
 use warnings;
 use Perl::Critic::Utils;

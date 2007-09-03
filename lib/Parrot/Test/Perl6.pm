@@ -1,5 +1,7 @@
 # $Id$
 
+# Copyright (C) 2006-2007, The Perl Foundation.
+
 =head1 NAME
 
 Parrot::Test::Perl6 -- testing routines for languages/perl6

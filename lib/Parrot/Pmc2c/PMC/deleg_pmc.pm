@@ -1,4 +1,6 @@
 package Parrot::Pmc2c::PMC::deleg_pmc;
+# Copyright (C) 2007, The Perl Foundation.
+
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;

@@ -1,4 +1,6 @@
 package Parrot::Pmc2c::PMC::STMRef;
+# Copyright (C) 2007, The Perl Foundation.
+
 use base 'Parrot::Pmc2c::PMC::Ref';
 use strict;
 use warnings;

@@ -1,3 +1,5 @@
+# Copyright (C) 2007, The Perl Foundation.
+
 =head1 Parrot::Pmc2c::delegate Instance Methods
 
 =over 4

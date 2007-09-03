@@ -1,3 +1,5 @@
+# Copyright (C) 2007, The Perl Foundation.
+
 =head1 NAME
 
 Parrot::Pmc2c::PMCEmitter - PMC to C Code Generation
