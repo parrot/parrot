@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -22,6 +22,7 @@ A Pair PMC represents one key => value mapping like a one element hash.
 
 #define PObj_key_is_string_SET(p) \
     PObj_get_FLAGS(p) |= PObj_private0_FLAG
+
 #define PObj_key_is_string_TEST(p) \
     PObj_get_FLAGS(p) & PObj_private0_FLAG
 
@@ -84,9 +85,10 @@ Marks the hash as live.
 
     void mark() {
         if (PMC_struct_val(SELF))
-            pobject_lives(INTERP, (PObj*)PMC_struct_val(SELF));
+            pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
+
         if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj*)PMC_pmc_val(SELF));
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
 
 /*
@@ -108,7 +110,6 @@ Marks the hash as live.
         /* check key ? */
         return PMC_pmc_val(SELF);
     }
-
 
 /*
 
@@ -230,14 +231,16 @@ Used to unarchive the Pair.
         PMC **pos;
 
         io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
+
         if (PObj_key_is_string_TEST(SELF)) {
             io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
         }
         else {
-            PMC ** const temp_pos = (PMC**)&PMC_struct_val(SELF);
+            PMC ** const temp_pos = (PMC **)&PMC_struct_val(SELF);
             info->thaw_ptr        = temp_pos;
             (info->visit_pmc_now)(INTERP, *temp_pos, info);
         }
+
         pos            = &PMC_pmc_val(SELF);
         info->thaw_ptr = pos;
 
@@ -250,15 +253,16 @@ Used to unarchive the Pair.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
-        if (PObj_key_is_string_TEST(SELF)) {
+
+        if (PObj_key_is_string_TEST(SELF))
             io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
-        }
     }
 
     void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         SUPER(info);
+
         if (info->extra_flags == EXTRA_IS_NULL) {
             const INTVAL flag = io->vtable->shift_integer(INTERP, io);
             if (flag) {
@@ -296,16 +300,20 @@ Return the key, the value, or a tuple of (key, value) respectively.
 
             return k;
         }
+
         return (PMC *)PMC_struct_val(SELF);
     }
 
     METHOD PMC *value() {
         return PMC_pmc_val(SELF);
     }
+
     METHOD PMC *kv() {
         PMC * const t = pmc_new(INTERP,
             Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
+
         VTABLE_set_integer_native(INTERP, t, 2);
+
         if (PObj_key_is_string_TEST(SELF))
             VTABLE_set_string_keyed_int(INTERP, t, 0,
                 (STRING *)PMC_struct_val(SELF));
@@ -315,7 +323,6 @@ Return the key, the value, or a tuple of (key, value) respectively.
         VTABLE_set_pmc_keyed_int(INTERP, t, 1, PMC_pmc_val(SELF));
         return t;
     }
-
 }
 
 /*

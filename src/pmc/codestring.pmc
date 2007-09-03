@@ -62,15 +62,14 @@ A newline is automatically added to the end of the fmt.
 */
 
   PCCMETHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
-    INTVAL pos = 0;
-    INTVAL replen = 0;
-    STRING *key, *repl;
-    STRING *percent       = string_from_literal(INTERP, "%");
-    STRING *comma         = string_from_literal(INTERP, ",");
-    STRING *comma_space   = string_from_literal(INTERP, ", ");
-    STRING *newline       = string_from_literal(INTERP, "\n");
+    INTVAL pos          = 0;
+    INTVAL replen       = 0;
+    STRING *percent     = string_from_literal(INTERP, "%");
+    STRING *comma       = string_from_literal(INTERP, ",");
+    STRING *comma_space = string_from_literal(INTERP, ", ");
+    STRING *newline     = string_from_literal(INTERP, "\n");
+    STRING *key, *repl, *S0, *S1;
     INTVAL I0, I1;
-    STRING *S0, *S1;
 
     fmt = Parrot_make_COW_reference(INTERP, fmt);
 
@@ -84,16 +83,17 @@ A newline is automatically added to the end of the fmt.
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
         }
         else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt, pos+1)) {
-            I0 = string_to_int(INTERP, key);
+            I0   = string_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
         else if (0 == string_equal(INTERP, key, comma)) {
             repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
             repl = Parrot_make_COW_reference(INTERP, repl);
-            I1 = VTABLE_elements(INTERP, args);
-            I0 = 1;
+            I1   = VTABLE_elements(INTERP, args);
+            I0   = 1;
+
             while (I0 < I1) {
-                S0 = VTABLE_get_string_keyed_int(INTERP, args, I0);
+                S0   = VTABLE_get_string_keyed_int(INTERP, args, I0);
                 repl = string_append(INTERP, repl, comma_space);
                 repl = string_append(INTERP, repl, S0);
                 I0++;
@@ -111,6 +111,7 @@ A newline is automatically added to the end of the fmt.
         (void) string_replace(INTERP, fmt, pos, 2, repl, NULL);
         replen = string_length(INTERP, repl);
     }
+
     S1 = string_concat(INTERP, DYNSELF.get_string(), fmt, 0);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
@@ -152,9 +153,8 @@ counting at 10 (so that the values 0..9 can be considered "safe").
         PCCRETURN(STRING *counter_as_string);
     }
     else {
-        STRING *result;
-        result = Parrot_make_COW_reference(INTERP, format);
-        result = string_concat(INTERP, result, counter_as_string, 1);
+        STRING *result = string_copy(INTERP, format);
+        result         = string_concat(INTERP, result, counter_as_string, 1);
         PCCRETURN(STRING *result);
     }
   }
@@ -181,23 +181,22 @@ prefixed with 'unicode:'.
 
     escaped_str = string_concat(INTERP, quote, escaped_str, 1);
     escaped_str = string_concat(INTERP, escaped_str, quote, 1);
+    x_pos       = string_str_index(INTERP, escaped_str, x, 0);
 
-    x_pos  = string_str_index(INTERP, escaped_str, x, 0);
     if (x_pos != -1) {
-      is_unicode = 1;
+        is_unicode = 1;
     }
     else
     {
-      STRING *u = string_from_literal (INTERP, "\\u");
-      INTVAL u_pos = string_str_index (INTERP, escaped_str, u, 0);
-      if (u_pos != -1) {
-        is_unicode = 1;
-      }
+        STRING *u = string_from_literal (INTERP, "\\u");
+        INTVAL u_pos = string_str_index (INTERP, escaped_str, u, 0);
+        if (u_pos != -1)
+            is_unicode = 1;
     }
 
     if (is_unicode) {
-      STRING *unicode = string_from_literal (INTERP, "unicode:");
-      escaped_str = string_concat(INTERP, unicode, escaped_str, 1);
+        STRING *unicode = string_from_literal(INTERP, "unicode:");
+        escaped_str     = string_concat(INTERP, unicode, escaped_str, 1);
     }
 
     PCCRETURN(STRING *escaped_str);
@@ -218,19 +217,19 @@ For example, C<key('Foo', 'Bar')> returns C<[ "Foo" ; "Bar" ]>.
     STRING *open_bracket  = string_from_literal(INTERP, "[ ");
     STRING *semi          = string_from_literal(INTERP, " ; ");
     STRING *close_bracket = string_from_literal(INTERP, " ]");
+    STRING *S0            = VTABLE_get_string_keyed_int(INTERP, args, 0);
+    STRING *out;
     INTVAL elements, index;
-    STRING *out, *S0;
 
-    S0 = VTABLE_get_string_keyed_int(INTERP, args, 0);
     (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-    out = string_append(INTERP, open_bracket, S0);
+    out          = string_append(INTERP, open_bracket, S0);
+    elements     = VTABLE_elements(INTERP, args);
 
-    elements = VTABLE_elements(INTERP, args);
     for(index = 1; index < elements; index++) {
-        out = string_append(INTERP, out, semi);
-        S0 = VTABLE_get_string_keyed_int(INTERP, args, index);
+        out          = string_append(INTERP, out, semi);
+        S0           = VTABLE_get_string_keyed_int(INTERP, args, index);
         (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-        out = string_append(INTERP, out, S0);
+        out          = string_append(INTERP, out, S0);
     }
 
     out = string_append(INTERP, out, close_bracket);

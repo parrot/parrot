@@ -108,13 +108,11 @@ Creates an instance of the PMC.
 */
     PMC *instantiate(PMC *init) {
         Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
-        PMC *created;
-        if (!PMC_IS_NULL(init))
-            created = pmc_new_init(interp, _pmc->id, init);
-        else
-            created = pmc_new(interp, _pmc->id);
 
-        return created;
+        if (!PMC_IS_NULL(init))
+            return pmc_new_init(interp, _pmc->id, init);
+
+        return pmc_new(interp, _pmc->id);
     }
 
 /*
@@ -128,7 +126,7 @@ Free the memory associated with the object's underlying struct.
 */
 
     void destroy() {
-            mem_sys_free(PMC_data(SELF));
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -143,6 +141,7 @@ Mark any referenced strings and PMCs in the structure as live.
 
     void mark() {
         Parrot_PMCProxy * const _pmc = PARROT_PMCPROXY(SELF);
+
         if (_pmc->name)
             pobject_lives(interp, (PObj*)_pmc->name);
         if (_pmc->_namespace)
@@ -190,7 +189,7 @@ Array of PMCProxy PMCs representing the direct parents of this class.
         Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
 
         /* What should we return? */
-        PMC          *found  = PMCNULL;
+        PMC          *found   = PMCNULL;
 
         if (string_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
             found = pmc_new(interp, enum_class_String);
@@ -251,8 +250,8 @@ Gets the name of the PMC.
 
 */
     PCCMETHOD name() {
-        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
-        STRING *ret_name = _pmc->name;
+        Parrot_PMCProxy *_pmc     = PARROT_PMCPROXY(SELF);
+        STRING          *ret_name = _pmc->name;
         PCCRETURN(STRING *ret_name);
     }
 
@@ -266,8 +265,8 @@ Gets the namespace that this class is attached to.
 
 */
     PCCMETHOD pmc_namespace() {
-        Parrot_PMCProxy *_pmc = PARROT_PMCPROXY(SELF);
-        PMC *ret_namespace = _pmc->_namespace;
+        Parrot_PMCProxy *_pmc          = PARROT_PMCPROXY(SELF);
+        PMC             *ret_namespace = _pmc->_namespace;
         PCCRETURN(PMC *ret_namespace);
     }
 
