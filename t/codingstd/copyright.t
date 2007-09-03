@@ -92,7 +92,7 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
 
 SKIP:
 {
-skip("Waiting for decision as to whether copyright dates are necessary");
+skip("Waiting for decision as to whether copyright dates are necessary", 1);
 ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
     or diag(
     join
