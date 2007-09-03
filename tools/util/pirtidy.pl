@@ -1,6 +1,8 @@
 #! perl
 # $Id$
 
+# Copyright (C) 2006-2007, The Perl Foundation.
+
 use strict;
 use warnings;
 use Fatal qw( open close );

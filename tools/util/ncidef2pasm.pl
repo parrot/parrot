@@ -1,5 +1,7 @@
 #! perl
 
+# Copyright (C) 2003-2007, The Perl Foundation.
+
 =head1 ncidef2asm.pl
 
 Take an NCI library definition file and turn it into a

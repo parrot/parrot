@@ -1,6 +1,8 @@
 #! perl
 # $Id$
 
+# Copyright (C) 2004-2007, The Perl Foundation.
+
 =head1 NAME
 
 tools/build/c2str.pl - constant string support
