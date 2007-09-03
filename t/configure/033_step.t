@@ -227,7 +227,7 @@ untie *STDOUT;
     my $line = join "\n", @lines;
     like($line, qr/checking for program/s,
         "Got expected verbose output");
-    like($line, qr/$prog is executable/s,
+    like($line, qr/$prog(\.EXE)? is executable/s,
         "Got expected verbose output for executable program");
 }
 untie *STDOUT;
