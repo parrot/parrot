@@ -1,4 +1,7 @@
 #! perl
+
+# Copyright (C) 2003-2006, The Perl Foundation.
+
 use strict;
 use warnings;
 

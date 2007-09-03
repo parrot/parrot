@@ -1,5 +1,7 @@
 #! perl
 
+# Copyright (C) 2003-2006, The Perl Foundation.
+
 # Create Kate syntax highlighting XML file for IMCC
 # Language:     Parrot IMCC
 # Maintainer:   Andy Bussey <andybussey@yahoo.co.uk>, Parrot Team
