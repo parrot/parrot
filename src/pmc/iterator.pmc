@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -47,7 +47,7 @@ The C<new> can alteratively be written as:
     iterator = new 'Iterator', hash
   iter_loop:
     unless iterator, iter_end  # while (more values)
-    key = shift iterator       # get the key..
+    key   = shift iterator     # get the key..
     entry = hash[key]
     ...
     goto iter_loop
@@ -101,9 +101,10 @@ Defaults iteration mode to iterate from start.
 */
 
     void init_pmc(PMC *aggregate) {
-        PMC_pmc_val(SELF) = aggregate;
+        PMC_pmc_val(SELF)    = aggregate;
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_SET(SELF);
+
         /* by default, iterate from start */
         DYNSELF.set_integer_native(ITERATE_FROM_START);
     }
@@ -121,11 +122,11 @@ Marks the current idx/key and the aggregate as live.
     void mark() {
         /* the KEY */
         if (PMC_struct_val(SELF))
-             pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
+             pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
 
         /* the aggregate */
         if (PMC_pmc_val(SELF))
-             pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
     }
 
 /*
@@ -139,8 +140,9 @@ Make a clone of the iterator.
 */
 
     PMC *clone() {
-        PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const res = pmc_new_init(INTERP, SELF->vtable->base_type, PMC_pmc_val(SELF));
+        PMC * const key     = (PMC *)PMC_struct_val(SELF);
+        PMC * const res     = pmc_new_init(INTERP, SELF->vtable->base_type,
+                                           PMC_pmc_val(SELF));
         PMC_struct_val(res) = VTABLE_clone(interp, key);
         return res;
     }
@@ -339,8 +341,10 @@ Reset the Iterator. C<value> must be one of
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
             real_exception(INTERP, NULL, E_TypeError,
                     "Illegal set_integer on iterator");
+
         /* reset iterator on aggregate */
-        agg = (PMC*) PMC_pmc_val(SELF);
+        agg = (PMC *)PMC_pmc_val(SELF);
+
         if (agg->vtable->base_type == enum_class_Slice) {
             /* it's an xrange serving as its own aggregate */
             PMC_struct_val(SELF) =
@@ -467,39 +471,44 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
     opcode_t *invoke(void *next) {
         PMC *agg;
 
-        if (REG_INT(interp, 3) == 1) {       /* iterator constructor */
-            PMC *iter, *arg = REG_PMC(interp, 5);
+        /* iterator constructor */
+        if (REG_INT(interp, 3) == 1) {
+            PMC *arg = REG_PMC(interp, 5);
+            PMC *iter;
+
             if (PObj_is_object_TEST(arg)) {
                 REG_PMC(interp, 5) = VTABLE_get_iter(INTERP, arg);
                 return (opcode_t *)next;
             }
+
             REG_PMC(interp, 5) = iter = pmc_new_init(INTERP,
                     enum_class_Iterator, arg);
             VTABLE_set_integer_native(INTERP, iter, 0);
             return (opcode_t *)next;
         }
-        else if (REG_INT(interp, 3) == 2)   /* TODO function+sentinel */
+        /* TODO function + sentinel */
+        else if (REG_INT(interp, 3) == 2)
             real_exception(INTERP, NULL, E_AssertionError,
                     "Iterator: invoke 2 args");
 
-        REG_INT(interp, 1) = REG_INT(interp, 2) = REG_INT(interp, 3) = REG_INT(interp, 4) = 0;
+        REG_INT(interp, 1) =
+            REG_INT(interp, 2) =
+            REG_INT(interp, 3) =
+            REG_INT(interp, 4) = 0;
+
         agg        = (PMC *)PMC_pmc_val(SELF);
 
-        switch (agg->vtable->base_type) {
-            case enum_class_IntList:
-                {
-                const INTVAL ires = DYNSELF.shift_integer();
-                REG_INT(interp, 1) = 1;
-                REG_INT(interp, 5) = ires;
-                return (opcode_t *)next;
-                }
-            default:
-                {
-                PMC * const res = DYNSELF.shift_pmc();
-                REG_INT(interp, 3) = 1;
-                REG_PMC(interp, 5) = res;
-                return (opcode_t *)next;
-                }
+        if (agg->vtable->base_type == enum_class_IntList) {
+            const INTVAL ires  = DYNSELF.shift_integer();
+            REG_INT(interp, 1) = 1;
+            REG_INT(interp, 5) = ires;
+            return (opcode_t *)next;
+        }
+        else {
+            PMC * const res    = DYNSELF.shift_pmc();
+            REG_INT(interp, 3) = 1;
+            REG_PMC(interp, 5) = res;
+            return (opcode_t *)next;
         }
     }
 
@@ -606,7 +615,7 @@ Returns whether the iterator contains an aggregate.
 */
 
     INTVAL defined() {
-        return (INTVAL) (PMC_pmc_val(SELF) != 0);
+        return (INTVAL)(PMC_pmc_val(SELF) != 0);
     }
 
 /*
