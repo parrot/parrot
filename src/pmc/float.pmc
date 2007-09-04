@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2006, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -53,6 +53,7 @@ Class method to construct an Integer from the string representation C<rep>.
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
+
         PMC_num_val(res) = string_to_num(INTERP, rep);
         return res;
     }
@@ -117,9 +118,9 @@ Returns a Parrot string representation of the number.
     }
 
     STRING *get_repr() {
-        double d = (double) PMC_num_val(SELF);
+        double d                = (double)PMC_num_val(SELF);
         const char * const sign = signbit(PMC_num_val(SELF)) ? "-" : "";
-        d = fabs(d);
+        d                       = fabs(d);
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }
 
@@ -230,15 +231,17 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     PMC *neg(PMC *dest) {
-        const FLOATVAL a = - DYNSELF.get_number();
+        const FLOATVAL a = -DYNSELF.get_number();
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
     }
 
     void i_neg() {
-        const FLOATVAL a = - DYNSELF.get_number();
+        const FLOATVAL a = -DYNSELF.get_number();
         VTABLE_set_number_native(INTERP, SELF, a);
     }
 
@@ -274,7 +277,7 @@ MMD_DEFAULT: {
 
 =item C<INTVAL cmp(PMC *value)>
 
-
+The C<cmp> operation.
 
 =cut
 
@@ -325,7 +328,7 @@ Increments the number.
 */
 
     void increment() {
-        PMC_num_val(SELF) ++;
+        PMC_num_val(SELF)++;
     }
 
 /*
@@ -339,7 +342,7 @@ Decrements the number.
 */
 
     void decrement() {
-        PMC_num_val(SELF) --;
+        PMC_num_val(SELF)--;
     }
 /*
 
@@ -355,8 +358,10 @@ Sets C<dest> to the absolute value of SELF.
 
     PMC *absolute(PMC *dest) {
         const FLOATVAL a = fabs(DYNSELF.get_number());
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
     }
@@ -443,98 +448,113 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 */
 
     METHOD PMC *acos() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = acos(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *cos() {
-        PMC * const d = pmc_new(INTERP,
+        PMC * const d  = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
         PMC_num_val(d) = cos(VTABLE_get_number(interp, SELF));
         return d;
     }
+
     METHOD PMC *asec() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = acos(1.0 / PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *asin() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = asin(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *atan() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = atan(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *atan2(PMC *val) {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = atan2(PMC_num_val(SELF), PMC_num_val(val));
         return d;
     }
+
     METHOD PMC *cosh() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = cosh(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *exp() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = exp(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *ln() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = log(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *log10() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = log10(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *log2() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = log(PMC_num_val(SELF)) / log(2.0);
         return d;
     }
+
     METHOD PMC *sec() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = 1.0 / cos(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *sech() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = 1.0 / cosh(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *sin() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = sin(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *sinh() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = sinh(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *tan() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = tan(PMC_num_val(SELF));
         return d;
     }
+
     METHOD PMC *tanh() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = tanh(PMC_num_val(SELF));
         return d;
     }
 
     METHOD PMC *sqrt() {
-        PMC * const d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const d  = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_num_val(d) = sqrt(PMC_num_val(SELF));
         return d;
     }
-
 }
 
 /*

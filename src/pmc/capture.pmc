@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -64,7 +64,8 @@ Free structures.
             mem_sys_free(PMC_data(SELF));
             PMC_data(SELF) = NULL;
         }
-        PMC_int_val(SELF) = 0;
+
+        PMC_int_val(SELF)  = 0;
     }
 
 /*

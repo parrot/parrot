@@ -44,8 +44,8 @@ class method.
     METHOD INTVAL say(STRING *s) {
         PMC *out = SELF == interp->vtables[enum_class_ParrotIO]->pmc_class ?
             PIO_STDOUT(INTERP) : SELF;
-        INTVAL r = PIO_putps(INTERP, out, s);
-        r  += PIO_puts(INTERP, out, "\n");
+        INTVAL r = PIO_putps(INTERP, out, s) +
+                   PIO_puts(INTERP, out, "\n");
         return r;
     }
 /*
@@ -59,15 +59,11 @@ Opens the file with the given mode, using the given IO layer.
 */
 
     METHOD PMC *open(STRING *file, STRING *mode, STRING *layer) {
-        ParrotIOLayer *l;
-        char *c_file, *c_mode, *c_layer;
-        PMC *pio;
-
-        c_file  = string_to_cstring(INTERP, file);
-        c_mode  = string_to_cstring(INTERP, mode);
-        c_layer = string_to_cstring(INTERP, layer);
-        l       = PIO_get_layer(INTERP, c_layer);
-        pio     = PIO_open(INTERP, l, c_file, c_mode);
+        char          *c_file  = string_to_cstring(INTERP, file);
+        char          *c_mode  = string_to_cstring(INTERP, mode);
+        char          *c_layer = string_to_cstring(INTERP, layer);
+        ParrotIOLayer *l       = PIO_get_layer(INTERP, c_layer);
+        PMC           *pio     = PIO_open(INTERP, l, c_file, c_mode);
 
         string_cstring_free(c_file);
         string_cstring_free(c_mode);
@@ -75,28 +71,32 @@ Opens the file with the given mode, using the given IO layer.
 
         if (!pio || !PMC_struct_val(pio))
             return pmc_new(INTERP, enum_class_Undef);
+
         if (l) {
             ParrotIO * const io = (ParrotIO *)PMC_data(pio);
-            const int is_mmap = strcmp(c_layer, "mmap") == 0;
-            /*
-             * XXX move this into the layer
-             */
+            const int is_mmap   = strcmp(c_layer, "mmap") == 0;
+
+            /* XXX move this into the layer */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
                 l = interp->piodata->default_stack;
+
                 if (strcmp(l->name, "buf") == 0)
                     l = l->down;
+
                 /* XXX layer is stored twice - which is used when */
                 io->stack           = l;
                 PMC_struct_val(pio) = l;
+
                 /* push the layer */
                 PIO_push_layer_str(INTERP, pio, layer);
             }
             else {
-                l = interp->piodata->default_stack;
+                l                   = interp->piodata->default_stack;
                 io->stack           = l;
                 PMC_struct_val(pio) = l;
             }
         }
+
         /* XXX leaks as in ops/io.ops: open */
         return pio;
     }
@@ -171,16 +171,19 @@ SYNOPSIS
 #endif
         if (!io)
             return -2;
+
         if (!(io->flags & PIO_F_READ))
             return -2;
 #ifdef PARROT_HAS_READLINE
         if (on && !(io->flags & PIO_F_CONSOLE))
             return -2;
         flag = !!(io->flags & PIO_F_READLINE);
+
         if (on)
             io->flags |= PIO_F_READLINE;
         else
             io->flags &= ~PIO_F_READLINE;
+
         return flag;
 #else
         return -1;
@@ -188,13 +191,14 @@ SYNOPSIS
     }
 
     METHOD PMC *readline(STRING *prompt) {
-        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
-        PMC *pmc_res = NULL;
-        STRING *res = NULL;
-        UINTVAL len;
+        ParrotIO *io      = (ParrotIO *)PMC_data(SELF);
+        PMC      *pmc_res = PMCNULL;
+        STRING   *res     = NULL;
+        UINTVAL   len;
 
         if (!io)
-            return NULL;
+            return PMCNULL;
+
 #ifdef PARROT_HAS_READLINE
         if (io->flags & PIO_F_READLINE) {
             char *r;
@@ -203,12 +207,14 @@ SYNOPSIS
             if (r) {
                 if (*r)
                     add_history(r);
-                res = string_from_cstring(INTERP, r, 0);
+
+                res                  = string_from_cstring(INTERP, r, 0);
                 free(r);
-                pmc_res = pmc_new(INTERP, enum_class_String);
+                pmc_res              = pmc_new(INTERP, enum_class_String);
                 PMC_str_val(pmc_res) = res;
                 return pmc_res;
             }
+
             return PMCNULL;
         }
         else
@@ -216,9 +222,12 @@ SYNOPSIS
         {
             if (!(io->flags & PIO_F_LINEBUF))
                 PIO_setlinebuf(interp, SELF);
+
             res = PIO_reads(interp, SELF, 0);
+
             if (!res)
                 return PMCNULL;
+
             /* readline should better return the string w/o NL */
             len = string_length(INTERP, res);
             while (len && (((char*)res->strstart)[len-1] == '\n'
@@ -227,7 +236,8 @@ SYNOPSIS
                 --res->strlen;
                 --res->bufused;
             }
-            pmc_res = pmc_new(INTERP, enum_class_String);
+
+            pmc_res              = pmc_new(INTERP, enum_class_String);
             PMC_str_val(pmc_res) = res;
             return pmc_res;
         }
@@ -262,12 +272,16 @@ This does B<not> close the file.
 
     METHOD STRING *slurp(STRING *name) {
         STRING *result;
+
         if (!PMC_data0(SELF)) {
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interp, name);
-            INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
-            PMC *pio = PIO_open(INTERP, NULL, path, "<");
+            PMC         *pio  = PIO_open(INTERP, NULL, path, "<");
+            INTVAL       size = Parrot_stat_info_intval(INTERP, name,
+                                    STAT_FILESIZE);
+
             string_cstring_free(path);
+
             /* TODO handle stdin */
             result = PIO_reads(INTERP, pio, size);
             PIO_close(INTERP, pio);
@@ -276,17 +290,22 @@ This does B<not> close the file.
         else {
             /* slurp open file */
             STRING *part;
+
             if (!PMC_data(SELF))
                 real_exception(interp, NULL, PIO_ERROR,
                         "Cannot slurp from empty filehandle");
+
             result = NULL;
+
             do {
-                part = PIO_reads(INTERP, SELF, 4096);
+                part   = PIO_reads(INTERP, SELF, 4096);
+
                 if (string_length(INTERP, part) == 0)
                     break;
                 result = string_append(INTERP, result, part);
             } while (1);
         }
+
         return result;
     }
 
@@ -317,7 +336,6 @@ XXX TBD
 */
 
     void class_init() {
-
         if (pass) {
             register_nci_method(INTERP, enum_class_ParrotIO,
                     F2DPTR(PIO_flush), "flush", "vJO");
@@ -358,16 +376,17 @@ Destroys the IO PMC, flushing and closing as necessary.
 
     void destroy() {
         ParrotIO *io = (ParrotIO *)PMC_data(SELF);
-        if (io) {
-            /* shared filehandles will only get flushed */
-            if (io->flags & PIO_F_SHARED) {
-                PIO_flush(INTERP, SELF);
-            }
-            else {
-                PIO_close(INTERP, SELF);
-            }
-            PIO_destroy(interp, SELF);
-        }
+
+        if (!io)
+            return;
+
+        /* shared filehandles will only get flushed */
+        if (io->flags & PIO_F_SHARED)
+            PIO_flush(INTERP, SELF);
+        else
+            PIO_close(INTERP, SELF);
+
+        PIO_destroy(interp, SELF);
     }
 
 /*
@@ -384,8 +403,8 @@ IO layers, we might copy C<data> and C<struct_val>.
 */
 
     PMC *clone() {
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_data(dest) = PMC_data(SELF);
+        PMC *dest            = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_data(dest)       = PMC_data(SELF);
         PMC_struct_val(dest) = PMC_struct_val(SELF);
         return dest;
     }
@@ -417,26 +436,34 @@ non-existent layers, returns an empty string.
 */
 
     STRING *get_string_keyed_int(INTVAL n) {
-        ParrotIO *io = (ParrotIO *)PMC_data(SELF);
+        ParrotIO      *io = (ParrotIO *)PMC_data(SELF);
         ParrotIOLayer *layer;
+
         if (!io)
             return const_string(INTERP, "");
+
         layer = io->stack;
+
         if (n >= 0) {
-            ParrotIOLayer *last;
-            last = layer;
+            ParrotIOLayer *last = layer;
             for (; layer; layer = layer->down)
                 last = layer;
+
             for (; n && last; --n, last = last->up)
                 ;
+
             if (last)
                 return string_from_cstring(INTERP, last->name, 0);
+
             return const_string(INTERP, "");
         }
+
         for (++n; n && layer; layer = layer->down, ++n)
             ;
+
         if (layer)
             return string_from_cstring(INTERP, layer->name, 0);
+
         return const_string(INTERP, "");
     }
 /*

@@ -30,36 +30,6 @@ PMC>.
 
 #define BITS_PER_CHAR 8
 
-static void
-booleanarray_init(PARROT_INTERP, PMC *self) {
-    PMC_int_val(self) = 0;
-    PMC_int_val2(self) = 0;
-    PMC_data(self) = NULL;
-}
-
-static void
-booleanarray_clone(PARROT_INTERP, PMC *self, PMC *dest) {
-    PMC_int_val(dest)  = PMC_int_val(self);
-    PMC_int_val2(dest) = PMC_int_val2(self);
-    if (PMC_data(self)) {
-        PMC_data(dest) = malloc(PMC_int_val2(self) / BITS_PER_CHAR);
-        mem_sys_memcopy(PMC_data(dest),
-                        PMC_data(self), PMC_int_val2(self) / BITS_PER_CHAR);
-    }
-    else
-        PMC_data(dest) = NULL;
-}
-
-static void
-booleanarray_clear(PARROT_INTERP, PMC *self) {
-    PMC_int_val(self) = 0;
-    PMC_int_val2(self) = 0;
-    if (PMC_data(self)) {
-        mem_sys_free(PMC_data(self));
-        PMC_data(self) = NULL;
-    }
-}
-
 pmclass FixedBooleanArray need_ext does array {
 
 /*
@@ -79,10 +49,11 @@ Initializes the array.
 */
 
     void init() {
-        booleanarray_init(INTERP, SELF);
+        PMC_int_val(SELF)  = 0;
+        PMC_int_val2(SELF) = 0;
+        PMC_data(SELF)     = NULL;
         PObj_active_destroy_SET(SELF);
     }
-
 
 /*
 
@@ -98,7 +69,6 @@ Const PMCs must have a C<morph()>.
         SUPER(type);
     }
 
-
 /*
 
 =item C<void destroy()>
@@ -110,7 +80,13 @@ Destroys the array.
 */
 
     void destroy() {
-        booleanarray_clear(INTERP, SELF);
+        PMC_int_val(SELF)  = 0;
+        PMC_int_val2(SELF) = 0;
+
+        if (PMC_data(SELF)) {
+            mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+        }
     }
 
 /*
@@ -124,8 +100,18 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
-        booleanarray_clone(INTERP, SELF, dest);
+        PMC *dest          = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_int_val(dest)  = PMC_int_val(SELF);
+        PMC_int_val2(dest) = PMC_int_val2(SELF);
+
+        if (PMC_data(SELF)) {
+            PMC_data(dest) = malloc(PMC_int_val2(SELF) / BITS_PER_CHAR);
+            mem_sys_memcopy(PMC_data(dest),
+                        PMC_data(SELF), PMC_int_val2(SELF) / BITS_PER_CHAR);
+        }
+        else
+            PMC_data(dest) = NULL;
+
         PObj_active_destroy_SET(dest);
         return dest;
     }
@@ -170,7 +156,6 @@ Returns the number of elements in the array.
         return SELF.elements();
     }
 
-
 /*
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
@@ -188,7 +173,7 @@ Returns the integer value of the element at index C<key>.
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedBooleanArray: index out of bounds!");
 
-        return (sd[key/BITS_PER_CHAR] & (1 << (key % BITS_PER_CHAR))) ? 1:0;
+        return (sd[key / BITS_PER_CHAR] & (1 << (key % BITS_PER_CHAR))) ? 1 : 0;
     }
 
 /*
@@ -280,7 +265,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC *ret = pmc_new(INTERP, enum_class_Boolean);
+        PMC   *ret = pmc_new(INTERP, enum_class_Boolean);
         INTVAL val = DYNSELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
@@ -316,9 +301,9 @@ Resizes the array to C<size> elements.
             real_exception(INTERP, NULL, E_IndexError,
                     "FixedBooleanArray: Can't resize!");
 
-        PMC_int_val(SELF) = size;
+        PMC_int_val(SELF)  = size;
         PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
-        PMC_data(SELF) =
+        PMC_data(SELF)     =
             mem_sys_allocate_zeroed(PMC_int_val2(SELF) / BITS_PER_CHAR);
     }
 
@@ -340,9 +325,9 @@ Sets the integer value of the element at index C<key> to C<value>.
                 "FixedBooleanArray: index out of bounds!");
 
         if (value)
-            sd[key/BITS_PER_CHAR] |= (1 << (key % BITS_PER_CHAR));
+            sd[key/BITS_PER_CHAR] |=  (1 << (key % BITS_PER_CHAR));
         else
-            sd[key/BITS_PER_CHAR] &= (~ (1 << (key % BITS_PER_CHAR)));
+            sd[key/BITS_PER_CHAR] &= ~(1 << (key % BITS_PER_CHAR));
     }
 
 /*
@@ -403,11 +388,11 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
-        PMC *tempPMC;
+        PMC   *tempPMC = pmc_new(INTERP, enum_class_Boolean);
 
-        tempPMC = pmc_new(INTERP, enum_class_Boolean);
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempInt = VTABLE_get_integer(INTERP, tempPMC);
+
         DYNSELF.set_integer_keyed_int(key, tempInt);
     }
 
@@ -438,9 +423,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC *src) {
-        INTVAL tempInt;
-
-        tempInt = VTABLE_get_integer(INTERP, src);
+        INTVAL tempInt = VTABLE_get_integer(INTERP, src);
         DYNSELF.set_integer_keyed_int(key, tempInt);
     }
 
@@ -456,8 +439,7 @@ C<value>.
 */
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 
@@ -494,12 +476,11 @@ Used to archive the string.
 */
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        STRING   *s;
-
-        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
-        s = string_from_cstring(INTERP,
+        STRING   *s  = string_from_cstring(INTERP,
                                 PMC_data_typed(SELF, char *),
                                 PMC_int_val2(SELF) / BITS_PER_CHAR);
+
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
         io->vtable->push_string(INTERP, io, s);
     }
 
@@ -515,12 +496,13 @@ Used to unarchive the string.
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
+
         if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL size = io->vtable->shift_integer(INTERP, io);
-            STRING *s   = io->vtable->shift_string(INTERP, io);
+            INTVAL size       = io->vtable->shift_integer(INTERP, io);
+            STRING *s         = io->vtable->shift_string(INTERP, io);
             PMC_int_val(SELF) = size;
             PMC_int_val2(pmc) = s->bufused * BITS_PER_CHAR;
-            PMC_data(pmc) = mem_sys_allocate_zeroed(s->bufused);
+            PMC_data(pmc)     = mem_sys_allocate_zeroed(s->bufused);
             mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
         }
     }
@@ -538,8 +520,8 @@ sets them all to false.
 
     METHOD void fill(INTVAL fill) {
         Parrot_UInt1 *sd = PMC_data_typed(SELF, Parrot_UInt1 *);
-        INTVAL j;
-        j = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
+        INTVAL        j  = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
+
         if (fill)
             memset(sd, 0xff, j);
         else

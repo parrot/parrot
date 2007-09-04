@@ -65,21 +65,21 @@ next_range:
 
         /* integer key */
         if ((PObj_get_FLAGS(key) &
-                    (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
-                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
+                (KEY_start_slice_FLAG | KEY_end_slice_FLAG)) ==
+                (KEY_start_slice_FLAG | KEY_end_slice_FLAG)) {
             /* start == end */
-            RVal_int(range->start) =
+            RVal_int(range->start)   =
                 RVal_int(range->end) = key_integer(interp, key);
         }
         else if ((PObj_get_FLAGS(key) &
-                    (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
-                (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) {
+                    (KEY_inf_slice_FLAG | KEY_end_slice_FLAG)) ==
+                (KEY_inf_slice_FLAG | KEY_end_slice_FLAG)) {
             /*
              * first range is ".. end"
              * start at index 0
              * */
             RVal_int(range->start) = 0;
-            RVal_int(range->end) = key_integer(interp, key);
+            RVal_int(range->end)   = key_integer(interp, key);
         }
         else {
             /*
@@ -87,8 +87,8 @@ next_range:
              */
             RVal_int(range->start) = key_integer(interp, key);
             if ((PObj_get_FLAGS(key) &
-                    (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
-                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
+                (KEY_inf_slice_FLAG | KEY_start_slice_FLAG)) ==
+                (KEY_inf_slice_FLAG | KEY_start_slice_FLAG)) {
                 /* last range "start .." */
                 RVal_int(range->end) = VTABLE_elements(interp, agg) - 1;
                 if (PMC_data(key))
@@ -127,16 +127,18 @@ range_end:
                                "not implemented");
         }
         range->type = enum_type_STRING;
+
         /*
          * string assumed
          * start at value
          */
-        RVal_str(range->start) =
+        RVal_str(range->start)   =
             RVal_str(range->cur) =
             key_string(interp, key);
+
         if ((PObj_get_FLAGS(key) &
-                    (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
-                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
+                    (KEY_start_slice_FLAG | KEY_end_slice_FLAG)) ==
+                    (KEY_start_slice_FLAG | KEY_end_slice_FLAG)) {
             /* start == end */
             RVal_str(range->end) = RVal_str(range->start);
         }
@@ -200,7 +202,7 @@ pmclass Slice need_ext extends Key {
 
     void init() {
         PMC_struct_val(SELF) = NULL;
-        PMC_pmc_val(SELF) = NULL;
+        PMC_pmc_val(SELF)    = NULL;
     }
 
     void mark() {
@@ -221,14 +223,13 @@ pmclass Slice need_ext extends Key {
 
     void destroy() {
         parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
-        parrot_range_t *n;
 
         /* iteration ended - all is freed */
         if ((INTVAL) r == -1)
             return;
 
         while (r) {
-            n = r->next;
+            parrot_range_t *n = r->next;
             mem_sys_free(r);
             r = n;
         }
@@ -281,19 +282,19 @@ This is used for implementing Pythons xrange()
 */
 
     PMC *slice(PMC *key, INTVAL f) {
-        if (f) {
+        PMC *iter;
+
+        if (f)
             real_exception(INTERP, NULL, E_ValueError,
                     "Slice: Unknown slice type");
-        }
-        else {
-            PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            PMC_struct_val(iter) = key;
-            return iter;
-        }
+
+        iter                 = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC_struct_val(iter) = key;
+        return iter;
     }
 
     PMC *get_iter() {
-        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC *iter            = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = SELF;
         return iter;
     }
@@ -303,8 +304,7 @@ This is used for implementing Pythons xrange()
         /* only start .. end supported so:
          * TODO check flags somewhere
          * */
-        INTVAL n = RVal_int(r->start) - RVal_int(r->end);
-        return n;
+        return RVal_int(r->start) - RVal_int(r->end);
     }
 
     INTVAL get_integer_keyed(PMC *key) {
@@ -340,16 +340,14 @@ advance to next position in the range, depending on what.
         switch (what) {
             case ITERATE_FROM_START:
             case ITERATE_FROM_START_KEYS:    /* reset key */
-                if (!agg) {
-                    /* xrange implementation - the slice PMC
-                     * itself serves as the aggregate. It's already
-                     * initialized
-                     */
+
+                /* xrange implementation - the slice PMC itself serves as the
+                 * aggregate. It's already initialized. */
+                if (!agg)
                     return SELF;
-                }
 
                 /*
-                 * need a new Slice PMC that hold's the state
+                 * need a new Slice PMC that holds the state
                  * especially PMC_data() must be zero
                  *
                  * aggregate call get_integer/get_string on this
@@ -357,14 +355,12 @@ advance to next position in the range, depending on what.
                  */
                 ret = pmc_new(INTERP, enum_class_Slice);
                 PObj_get_FLAGS(ret) |= KEY_pmc_FLAG;
-                /*
-                 * set start value
-                 */
+
+                /* set start value */
                 set_slice_start(INTERP, ret, SELF, agg);
                 break;
-                /*
-                 * we are passed now the new PMC, we had created above
-                 */
+
+                /* we are passed now the new PMC we created above */
             case ITERATE_GET_NEXT:
                 set_slice_next(INTERP, SELF, agg);
                 break;
@@ -373,6 +369,7 @@ advance to next position in the range, depending on what.
                         "No backward iteration on slices yet");
                 break;
         }
+
         return ret;
     }
 }
