@@ -7,6 +7,8 @@
 PARROT        = ../../parrot@exe@
 PERL          = @perl@
 RM_F          = @rm_f@
+O             = @o@
+LOAD_EXT      = @load_ext@
 YAPP          = yapp
 BUILD_DIR     = @build_dir@
 PMC_DIR       = pmc
