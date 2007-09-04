@@ -831,8 +831,14 @@ Array of Class PMCs representing the direct parents of this class.
         else if (string_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
             found = _class->methods;
         }
+        else if (string_equal(interp, what, CONST_STRING(interp, "vtable_overrides")) == 0) {
+            found = _class->vtable_overrides;
+        }
         else if (string_equal(interp, what, CONST_STRING(interp, "parents")) == 0) {
             found = _class->parents;
+        }
+        else if (string_equal(interp, what, CONST_STRING(interp, "all_parents")) == 0) {
+            found = _class->all_parents;
         }
         else if (string_equal(interp, what, CONST_STRING(interp, "roles")) == 0) {
             found = _class->roles;
