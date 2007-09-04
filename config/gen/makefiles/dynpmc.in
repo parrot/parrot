@@ -15,8 +15,6 @@ PMCS = \
   foo \
   rotest \
 #CONDITIONED_LINE(has_gdbm):gdbmhash \
-  match \
-  matchrange \
   rational \
   subproxy 
 
