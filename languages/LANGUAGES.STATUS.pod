@@ -422,6 +422,38 @@ C<languages/jako>
 =back
 
 
+=head2 Kea Common Lisp
+
+=over 4
+
+=item Description
+
+Kea Common Lisp is an implementation of ANSI Common Lisp for the
+Parrot bytecode virtual machine (see http://www.parrotcode.org/) that is
+based on CMU Common Lisp (see http://www.cons.org/cmucl/).
+The chief goal of the Kea Common Lisp project is
+to provide easy interoperability between Lisp and the other dynamic
+languages hosted on Parrot.
+
+=item Status
+
+The runtime is incomplete, being at the level of a simple desk
+calculator with an eccentric syntax, but the cross-compiler already
+supports most of the core semantic repertoire.  The cross-compiler is
+almost capable of compiling itself; when that happens, EVAL will become
+suddenly much more powerful, and Kea will be able to grow rapidly.
+
+=item Last verified with parrot version
+
+0.4.15
+
+=item Location
+
+http://rgrjr.dyndns.org/lisp/kea-cl/
+
+=back
+
+
 =head2 lazy-k
 
 =over 4
