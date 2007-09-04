@@ -132,8 +132,7 @@ Sets the pointer to the actual subroutine.
 
     void set_pointer(void *value) {
         real_exception(INTERP, NULL, E_NotImplementedError,
-                "Don't set the address of a sub\n"
-                "use .Sub constants instead");
+                "Don't set the address of a sub\nuse .Sub constants instead");
     }
 
 /*
@@ -256,11 +255,9 @@ Invokes the subroutine.
         context->current_cont = ccont;
 
         /* check recursion/call depth */
-        if (++context->recursion_depth >
-                INTERP->recursion_limit) {
+        if (++context->recursion_depth > INTERP->recursion_limit)
             real_exception(INTERP, next, E_RuntimeError,
                     "maximum recursion depth exceeded");
-        }
 
         /* and copy set context variables */
         PMC_cont(ccont)->from_ctx = context;
@@ -277,7 +274,7 @@ Invokes the subroutine.
 
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
-            INTERP->current_object = NULL;
+            INTERP->current_object  = NULL;
         }
 
         context->current_HLL       = sub->HLL_id;
@@ -563,7 +560,6 @@ Return the MMD signature PMC, if any or a Null PMC.
 
     METHOD PMC *get_namespace() {
         Parrot_sub * const sub = PMC_sub(SELF);
-
         return sub->namespace_stash;
     }
 

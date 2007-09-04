@@ -362,7 +362,7 @@ Introspection interface. C<key> can be:
 
     PMC *get_pmc_keyed(PMC *key) {
         PMC    *nextkey, *cont;
-        STRING *outer;
+        STRING *outer = NULL;
         STRING *item  = key_string(interp, key);
         STRING *s     = CONST_STRING(interp, "globals");
         int     level = 0;
@@ -372,7 +372,6 @@ Introspection interface. C<key> can be:
         if (string_equal(interp, item, s) == 0)
             return interp->root_namespace;
 
-        outer = NULL;
         s     = CONST_STRING(interp, "outer");
 
         if (string_equal(interp, item, s) == 0) {
@@ -461,12 +460,10 @@ Returns the interpreter info for C<key>.
     INTVAL get_integer_keyed_int(INTVAL key) {
         Interp *new_interp = PMC_data_typed(SELF, Interp *);
 
-        switch (key) {
-            case -1:
-                return (INTVAL) new_interp->flags;
-            default:
-                return interpinfo(new_interp, key);
-        }
+        if (key == -1)
+            return (INTVAL)new_interp->flags;
+
+        return interpinfo(new_interp, key);
     }
 
 /*
@@ -594,15 +591,11 @@ Finish thawing.
         /*  HLL_info */
         if (info->what == VISIT_THAW_NORMAL ||
                 info->what == VISIT_THAW_CONSTANTS) {
-#if 0
-            if (PMC_pmc_val(SELF))
-                real_exception(INTERP, NULL, UNIMPLEMENTED,
-                        "Can't deal with recursive load_bytecode");
-#endif
             pos = &PMC_pmc_val(SELF);
         }
         else
             pos = &INTERP->HLL_info;
+
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
@@ -623,6 +616,7 @@ Finish thawing.
         INTVAL  i, id;
 
         PMC_pmc_val(SELF) = NULL;
+
         /* merge new_info */
         /* TODO compare old entries */
 
@@ -652,7 +646,6 @@ Finish thawing.
                 UNUSED(ignored);
             }
         }
-
     }
 
     METHOD void run_gc() {
