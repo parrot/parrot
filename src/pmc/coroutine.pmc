@@ -33,10 +33,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/*
- * XXX put these into exceptions.h
- */
-
+/* XXX put these into exceptions.h */
 
 #define TRY \
     do { \
@@ -71,12 +68,13 @@ print_sub_name(PARROT_INTERP, PMC *sub)
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
         Parrot_full_sub_name(interp, sub));
-    if (co->ctx &&
-        (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
+
+    if (co->ctx && (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
         PIO_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interp,
                     co->ctx->caller_ctx->current_sub));
     }
+
     PIO_eprintf(tracer, "\n# ");
     print_pbc_location(interp);
 }
@@ -99,7 +97,7 @@ Clone the couroutine.
 
     void init() {
         PMC_struct_val(SELF) = new_coroutine(INTERP);
-        PMC_pmc_val(SELF)    = NULL;
+        PMC_pmc_val(SELF)    = PMCNULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -113,6 +111,7 @@ Destroys the coroutine.
 
     void destroy () {
         Parrot_coro *sub = PMC_coro(SELF);
+
         if (sub->ctx)
             Parrot_free_context(interp, sub->ctx, 0);
 
@@ -120,14 +119,13 @@ Destroys the coroutine.
     }
 
     PMC *clone() {
-        Parrot_coro *sub;
+        Parrot_coro *sub    = mem_allocate_typed(Parrot_coro);
         PMC         *ret    = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        sub                 = mem_allocate_typed(Parrot_coro);
         PMC_struct_val(ret) = sub;
-        PMC_pmc_val(ret)    = NULL;
+        PMC_pmc_val(ret)    = PMCNULL;
 
         memcpy(sub, PMC_sub(SELF), sizeof (Parrot_coro));
 
@@ -159,10 +157,9 @@ Swaps the "context".
             print_sub_name(INTERP, SELF);
 
         if (!co->ctx) {
-            /* TODO factor out common code with Sub.invoke
-             *      and inherit it
-             */
+            /* TODO factor out common code with Sub.invoke and inherit it */
             ccont = INTERP->current_cont;
+
             if (ccont == NEED_CONTINUATION)
                 ccont = (PMC *)new_ret_continuation_pmc(interp,
                                                        (opcode_t *)next);
@@ -190,8 +187,7 @@ Swaps the "context".
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
                 ctx->lex_pad = pmc_new_init(INTERP,
-                        Parrot_get_ctx_HLL_type(interp,
-                            enum_class_LexPad),
+                        Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
                         co->lex_info);
                 VTABLE_set_pointer(INTERP, ctx->lex_pad, ctx);
             }
@@ -213,7 +209,9 @@ Swaps the "context".
 
             /* and the recent call context */
             ccont                 = ctx->current_cont;
-            ctx->caller_ctx       = PMC_cont(ccont)->to_ctx = CONTEXT(INTERP->ctx);
+            ctx->caller_ctx       = PMC_cont(ccont)->to_ctx
+                                  = CONTEXT(INTERP->ctx);
+
             /* set context to coro context */
             state                 = interp->dynamic_env;
             interp->dynamic_env   = co->dynamic_state;
@@ -270,10 +268,12 @@ Marks the coroutine as live.
 
     void mark() {
         Parrot_coro *c = PMC_coro(SELF);
+
         if (c && c->ctx)
             mark_context(INTERP, c->ctx);
         if (c && c->dynamic_state)
             mark_stack(INTERP, c->dynamic_state);
+
         SUPER();
     }
 }

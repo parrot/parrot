@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2005, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,10 +8,9 @@ src/pmc/resizablebooleanarray.pmc - resizable array for booleans only
 
 =head1 DESCRIPTION
 
-The C<ResizableBooleanArray PMC> implements an array of resizable size,
-which stores booleans.
-It uses the C<Boolean PMC> for all conversions.
-The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
+The C<ResizableBooleanArray PMC> implements an array of resizable size, which
+stores booleans.  It uses the C<Boolean PMC> for all conversions.  The
+C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 =head2 Functions
 
@@ -55,6 +54,7 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL offsetkey;
+
         /* Try to make negative index into a real index */
         if (key < 0) {
             key = SELF.elements() + key;
@@ -67,6 +67,7 @@ Returns the integer value of the element at index C<key>.
 
         /* Check if key is greater than allocated size */
         offsetkey = key + PMC_int_val2(SELF);
+
         if (offsetkey >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -98,6 +99,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
         /* Check if key is greater than allocated size */
         offsetkey = key + PMC_int_val2(SELF);
+
         if (offsetkey >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -137,7 +139,7 @@ Resizes the array to C<size> elements.
         old_bytesize  = ROUND_BYTES(oldsize);
 
         /* Nothing allocated yet */
-        if (! PMC_data(SELF))
+        if (!PMC_data(SELF))
             PMC_data(SELF) = mem_sys_allocate_zeroed(new_bytesize);
 
         /* The size is different, and doesn't fit within the current
@@ -188,7 +190,7 @@ Removes and returns the last element.
             real_exception(interp, NULL, E_IndexError,
                 "ResizableBooleanArray: Can't pop from an empty array!");
 
-        size = PMC_int_val(SELF) - PMC_int_val2(SELF);
+        size  = PMC_int_val(SELF) - PMC_int_val2(SELF);
         value = DYNSELF.get_integer_keyed_int(size - 1);
         DYNSELF.set_integer_native(size - 1);
 
@@ -342,13 +344,15 @@ Used to archive the string.
             and use it during thaw?
         */
 
-        IMAGE_IO * const io = info->image_io;
-        STRING *s;
-        const INTVAL size = ROUND_BYTES(PMC_int_val(SELF));
+        IMAGE_IO * const io   = info->image_io;
+        const INTVAL     size = ROUND_BYTES(PMC_int_val(SELF));
+        STRING           *s;
 
         io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+
         s = string_from_cstring(INTERP, PMC_data_typed(SELF, char *), size);
+
         io->vtable->push_string(INTERP, io, s);
     }
 
@@ -362,15 +366,15 @@ Used to unarchive the string.
 
 */
     void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        const INTVAL headPos = io->vtable->shift_integer(INTERP, io);
-        const INTVAL tailPos = io->vtable->shift_integer(INTERP, io);
-        STRING * const s = io->vtable->shift_string(INTERP, io);
+        IMAGE_IO * const io      = info->image_io;
+        const INTVAL     headPos = io->vtable->shift_integer(INTERP, io);
+        const INTVAL     tailPos = io->vtable->shift_integer(INTERP, io);
+        STRING * const   s       = io->vtable->shift_string(INTERP, io);
 
-        PMC_data(SELF) = mem_sys_allocate_zeroed(s->bufused);
+        PMC_data(SELF)           = mem_sys_allocate_zeroed(s->bufused);
         mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
-        PMC_int_val2(SELF) = headPos;
-        PMC_int_val(SELF) = tailPos;
+        PMC_int_val2(SELF)       = headPos;
+        PMC_int_val(SELF)        = tailPos;
     }
 
 }  /* pmclass */

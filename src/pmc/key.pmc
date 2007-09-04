@@ -20,15 +20,6 @@ These are the vtable functions for the Key PMC class.
 
 #include "parrot/parrot.h"
 
-static int
-is_hash_iter(PMC *key /*NN*/)
-{
-    if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) ==
-        KEY_hash_iterator_FLAGS)
-        return 1;
-    return 0;
-}
-
 pmclass Key need_ext {
 
 /*
@@ -57,39 +48,43 @@ Creates and returns a clone of the key.
 
     PMC *clone() {
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PMC *dkey = dest;
-        PMC *key = SELF;
+        PMC *dkey        = dest;
+        PMC *key         = SELF;
         PMC *p;
 
         PObj_custom_mark_SET(dest);
+
         for (; key ;) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
                 case KEY_integer_FLAG:
-                case KEY_integer_FLAG|KEY_register_FLAG:
+                case KEY_integer_FLAG | KEY_register_FLAG:
                     key_set_integer(INTERP, dkey, key_integer(INTERP, key));
                     break;
                 case KEY_number_FLAG:
-                case KEY_number_FLAG|KEY_register_FLAG:
+                case KEY_number_FLAG | KEY_register_FLAG:
                     key_set_number(INTERP, dkey, key_number(INTERP, key));
                     break;
                 case KEY_string_FLAG:
-                case KEY_string_FLAG|KEY_register_FLAG:
+                case KEY_string_FLAG | KEY_register_FLAG:
                     key_set_string(INTERP, dkey,
                         string_copy(INTERP, key_string(INTERP, key)));
                     break;
                 case KEY_pmc_FLAG:
-                case KEY_pmc_FLAG|KEY_register_FLAG:
+                case KEY_pmc_FLAG | KEY_register_FLAG:
                     p = key_pmc(INTERP, key);
                     key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
                     break;
             }
+
             key = key_next(INTERP, key);
+
             if (key) {
-                p = key_new(INTERP);
+                p    = key_new(INTERP);
                 key_append(INTERP, dkey, p);
                 dkey = p;
             }
         }
+
         return dest;
     }
 
@@ -230,6 +225,7 @@ Appends C<*value> to the key.
         if (value->vtable->base_type != enum_class_Key)
             real_exception(interp, NULL, INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
+
         key_append(INTERP, SELF, value);
     }
 
@@ -294,12 +290,15 @@ PMC_int_val(-1) means end of iteration.
                  */
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+
                 if (agg->vtable->base_type == enum_class_OrderedHash)
                     PObj_get_FLAGS(ret) |= KEY_number_FLAG;
+
                 goto init;
             case ITERATE_FROM_START:    /* reset key */
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+
                 /*
                  * KEY_hash_iterator_FLAGS, which is the same as
                  * KEY_integer_FLAG | KEY_number_FLAG
@@ -307,6 +306,7 @@ PMC_int_val(-1) means end of iteration.
                  * KEY_integer_FLAG alone is an indexed hash lookup
                  * with an Integer KEY
                  */
+
                  _hash = CONST_STRING(interp, "Hash");
                 if (VTABLE_isa(INTERP, agg, _hash) &&
                      agg->vtable->base_type != enum_class_OrderedHash)
@@ -315,19 +315,18 @@ PMC_int_val(-1) means end of iteration.
                 PMC_int_val(ret) = 0;
                 if (!n)
                     PMC_int_val(ret) = -1;
-                /*
-                 * iterating over a hash needs additionally the
-                 * Bucket index
-                 */
-                if (is_hash_iter(ret))
+
+                /* iterating over a hash additionally needs the Bucket index */
+                if (KEY_IS_HASH_ITERATOR(ret))
                     PMC_data(ret) = (void *)INITBucketIndex;
+
                 break;
             case ITERATE_GET_NEXT:
                 /*
                  * src/hash.c:parrot_hash_get_idx() advances to next
                  * so, if we are iterating over a hash do nothing
                  * */
-                if (!is_hash_iter(ret)) {
+                if (!KEY_IS_HASH_ITERATOR(ret)) {
                     if (PMC_int_val(ret) < n - 1)
                         ++PMC_int_val(ret);
                     else
@@ -370,34 +369,37 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
     void visit(visit_info *info) {
         /*
-         * at end a PMC_NULL is written during thaw,
+         * at end a PMCNULL is written during thaw,
          * which should stop visiting the key
          */
-        PMC ** const pos = (PMC**)&PMC_data(SELF);
+        PMC ** const pos = (PMC **)&PMC_data(SELF);
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
     void freeze(visit_info *info /*NN*/) {
         IMAGE_IO * const io = info->image_io;
+
         /* write flags */
-        const INTVAL flags = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
+        const INTVAL flags  = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
+
         /* write the contents of a register - else thaw can't restore
          * the register state
          */
         io->vtable->push_integer(INTERP, io, flags & ~KEY_register_FLAG);
+
         /* and contents of this key component */
         switch (flags) {
             case KEY_integer_FLAG:
-            case KEY_integer_FLAG|KEY_register_FLAG:
+            case KEY_integer_FLAG | KEY_register_FLAG:
                 io->vtable->push_integer(INTERP, io, key_integer(INTERP, SELF));
                 break;
             case KEY_number_FLAG:
-            case KEY_number_FLAG|KEY_register_FLAG:
+            case KEY_number_FLAG | KEY_register_FLAG:
                 io->vtable->push_float(INTERP, io, key_number(INTERP, SELF));
                 break;
             case KEY_string_FLAG:
-            case KEY_string_FLAG|KEY_register_FLAG:
+            case KEY_string_FLAG | KEY_register_FLAG:
                 io->vtable->push_string(INTERP, io, key_string(INTERP, SELF));
                 break;
             default:

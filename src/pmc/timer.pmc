@@ -9,20 +9,20 @@ src/pmc/timer.pmc - Timer
 =head1 SYNOPSIS
 
     new P0, 'Timer'
-    set P0[.PARROT_TIMER_SEC], I_seconds        # whole seconds
-    set P0[.PARROT_TIMER_USEC], I_micro seconds # and/or micro seconds
-    set P0[.PARROT_TIMER_NSEC], N_seconds_frac  # or fraction in seconds
-    set P0[.PARROT_TIMER_REPEAT], I_repeat      # 0 = one shot ...
-    set P0[.PARROT_TIMER_HANDLER], P_sub        # set handler sub PMC
-    invoke P0                                   # start timer
-    set P0[.PARROT_TIMER_RUNNING], 1            # same
+    set P0[.PARROT_TIMER_SEC],     I_seconds       # whole seconds
+    set P0[.PARROT_TIMER_USEC],    I_micro seconds # and/or micro seconds
+    set P0[.PARROT_TIMER_NSEC],    N_seconds_frac  # or fraction in seconds
+    set P0[.PARROT_TIMER_REPEAT],  I_repeat        # 0 = one shot ...
+    set P0[.PARROT_TIMER_HANDLER], P_sub           # set handler sub PMC
+    invoke P0                                      # start timer
+    set P0[.PARROT_TIMER_RUNNING], 1               # same
 
-    new P0, 'Timer', P1                         # set everything
+    new P0, 'Timer', P1                            # set everything
 
-    set I0, P0[.PARROT_TIMER_SEC]               # query current timer status
+    set I0, P0[.PARROT_TIMER_SEC]                  # query current timer status
     set N0, P0[.PARROT_TIMER_NSEC]
     ...
-    set P0[.PARROT_TIMER_RUNNING], 0            # turn timer off
+    set P0[.PARROT_TIMER_RUNNING], 0               # turn timer off
 
 
 =head1 DESCRIPTION
@@ -37,7 +37,7 @@ code.
 The Timer resolution is operating system dependent. It's only guaranteed
 that the Timer will fire some time after the programmed interval.
 
-The Timer stops after invoking the handler (repeat+1) times. To create a
+The Timer stops after invoking the handler (repeat + 1) times. To create a
 Timer that will run forever, set "repeat" to -1. Turning the Timer off
 preserves set values; the Timer is not destroyed.
 
@@ -84,7 +84,7 @@ Adds a new timer event to the event queue.
 static void
 add_timer(PARROT_INTERP, PMC *pmc)
 {
-    const parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(pmc);
+    const parrot_timer_event * const t = (parrot_timer_event *)PMC_data(pmc);
 
     if (!PMC_IS_NULL(t->sub))
         Parrot_new_timer_event(interp, pmc, t->abs_time,
@@ -109,7 +109,7 @@ del_timer(PARROT_INTERP, PMC *pmc)
 }
 
 
-pmclass Timer does event {
+pmclass Timer does event need_ext {
 
 /*
 
@@ -127,7 +127,7 @@ Initializes the timer.
          * absolute time, when the timer is started
          */
         parrot_timer_event * const t = mem_allocate_zeroed_typed(parrot_timer_event);
-        PMC_struct_val(SELF)  = t;
+        PMC_data(SELF)               = t;
         PObj_active_destroy_SET(SELF);
         ++INTERP->arena_base->num_early_DOD_PMCs;
     }
@@ -144,9 +144,10 @@ See F<docs/pdds/pdd02_vtables.pod> for initializers.
 
     void init_pmc(PMC *init) {
         const INTVAL n = VTABLE_get_integer(INTERP, init);
-        INTVAL i;
+        INTVAL       i;
 
         SELF.init();
+
         for (i = 0; i < n; i += 2) {
             const INTVAL key = VTABLE_get_integer_keyed_int(INTERP, init, i);
             switch (key) {
@@ -186,7 +187,7 @@ Destroys the timer.
 */
 
     void destroy() {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
         del_timer(INTERP, SELF);
         mem_sys_free(t);
     }
@@ -202,7 +203,7 @@ Returns the timer info for C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -214,6 +215,7 @@ Returns the timer info for C<key>.
             case PARROT_TIMER_RUNNING:
                 return 0;
         }
+
         return -1;
     }
 
@@ -228,12 +230,10 @@ Returns the PMC associated with C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
-        switch (key) {
-            case PARROT_TIMER_HANDLER:
-                return t->sub;
-        }
+        if (key == PARROT_TIMER_HANDLER)
+            return t->sub;
 
         return PMCNULL;
     }
@@ -249,12 +249,10 @@ Returns the number associated with C<key>.
 */
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
-        switch (key) {
-            case PARROT_TIMER_NSEC:
-                return t->abs_time;
-        }
+        if (key == PARROT_TIMER_NSEC)
+            return t->abs_time;
 
         return -1.0;
     }
@@ -270,7 +268,7 @@ Sets the value associated with C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
         switch (key) {
             case PARROT_TIMER_SEC:
@@ -283,12 +281,10 @@ Sets the value associated with C<key> to C<value>.
                 t->repeat = value;
                 break;
             case PARROT_TIMER_RUNNING:
-                if (value) {
+                if (value)
                     add_timer(INTERP, SELF);
-                }
-                else {
+                else
                     del_timer(INTERP, SELF);
-                }
                 break;
         }
     }
@@ -304,13 +300,10 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
-        switch (key) {
-            case PARROT_TIMER_HANDLER:
-                t->sub = value;
-                break;
-        }
+        if (key == PARROT_TIMER_HANDLER)
+            t->sub = value;
     }
 
 /*
@@ -339,13 +332,10 @@ Sets the floating-point value associated with C<key> to C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        parrot_timer_event * const t = (parrot_timer_event *)PMC_struct_val(SELF);
+        parrot_timer_event * const t = (parrot_timer_event *)PMC_data(SELF);
 
-        switch (key) {
-            case PARROT_TIMER_NSEC:
-                t->abs_time = value;
-                break;
-        }
+        if (key == PARROT_TIMER_NSEC)
+            t->abs_time = value;
     }
 }
 

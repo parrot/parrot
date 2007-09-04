@@ -118,7 +118,7 @@ Returns the fully qualified name of the object's class.
 */
 
     STRING *name() {
-        PMC * const _class = VTABLE_get_class(interp, SELF);
+        PMC    * const _class     = VTABLE_get_class(interp, SELF);
         STRING * const class_name = VTABLE_get_string(interp, _class);
 
         return class_name;
@@ -135,6 +135,7 @@ Mark any referenced strings and PMCs.
 */
     void mark() {
         Parrot_Object * const obj = PARROT_OBJECT(SELF);
+
         if (obj->_class)
             pobject_lives(interp, (PObj*)obj->_class);
         if (obj->attrib_store)
@@ -158,10 +159,9 @@ of the given name walking up the inheritance tree.
         const INTVAL index = get_attrib_index(interp, obj->_class, name);
 
         /* If lookup failed, exception. */
-        if (index == -1) {
+        if (index == -1)
             real_exception(interp, NULL, ATTRIB_NOT_FOUND,
                 "No such attribute '%S'", name);
-        }
 
         return VTABLE_get_pmc_keyed_int(interp, obj->attrib_store, index);
     }
@@ -198,18 +198,22 @@ Queries this object's class to find the method with the given name.
 
 */
     PMC *find_method(STRING *name) {
-        Parrot_Object * const obj = PARROT_OBJECT(SELF);
-        Parrot_Class * const _class = PARROT_CLASS(obj->_class);
-        PMC *method = PMCNULL;
+        Parrot_Object * const obj    = PARROT_OBJECT(SELF);
+        Parrot_Class  * const _class = PARROT_CLASS(obj->_class);
+        PMC           *method        = PMCNULL;
 
         /* Walk and search. One day, we'll use the cache first. */
-        const int num_classes = VTABLE_elements(interp, _class->all_parents);
-        const int all_in_universe = !PObj_HasAlienParents_TEST(obj->_class);
-        int alien_parents_pos = VTABLE_elements(interp, _class->attrib_metadata);
+        const int num_classes        = VTABLE_elements(interp,
+                                                      _class->all_parents);
+        const int all_in_universe    = !PObj_HasAlienParents_TEST(obj->_class);
+        int       alien_parents_pos  = VTABLE_elements(interp,
+                                                      _class->attrib_metadata);
         int i;
+
         for (i = 0; i < num_classes; i++) {
             /* Get the class. */
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            PMC * const cur_class =
+                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
             /* If it's from this universe or the class doesn't inherit from
              * anything outside of it... */
@@ -233,7 +237,7 @@ Queries this object's class to find the method with the given name.
                      * passed. Therefore, we need to close the NCI and make it
                      * into a BoundNCI. */
                     if (method->vtable->base_type == enum_class_NCI) {
-                        method = VTABLE_clone(interp, method);
+                        method         = VTABLE_clone(interp, method);
                         method->vtable = interp->vtables[enum_class_Bound_NCI];
                         VTABLE_set_pmc(interp, method, del_class);
                     }
@@ -258,8 +262,7 @@ Get the class PMC representing the class that this object is an instance of.
 =cut
 
 */
-    PMC *get_class()
-    {
+    PMC *get_class() {
         return PARROT_OBJECT(SELF)->_class;
     }
 
@@ -273,8 +276,7 @@ non-zero value if it does.
 =cut
 
 */
-    INTVAL can(STRING *method_name)
-    {
+    INTVAL can(STRING *method_name) {
         /* Just use find_method and see it if finds anything. */
         const PMC * const method = VTABLE_find_method(interp, SELF, method_name);
         return !PMC_IS_NULL(method);
@@ -289,8 +291,7 @@ Returns whether the class is or inherits from C<*classname>.
 =cut
 
 */
-    INTVAL isa(STRING *classname)
-    {
+    INTVAL isa(STRING *classname) {
         PMC   *_class;
 
         if (SUPER(classname))

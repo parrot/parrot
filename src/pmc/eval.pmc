@@ -88,10 +88,10 @@ get_sub(PARROT_INTERP, PMC *self, int idx)
 static void
 mark_subs(PARROT_INTERP, PMC *self)
 {
-    INTVAL i;
-    PackFile_ConstTable *ct;
-    PackFile_ByteCode * const seg = PMC_sub(self)->seg;
+    PackFile_ByteCode   * const seg = PMC_sub(self)->seg;
     PackFile_FixupTable *ft;
+    PackFile_ConstTable *ct;
+    INTVAL               i;
 
     if (!seg)
         return;
@@ -219,27 +219,31 @@ for writing to disc and later loading via C<load_bytecode>.
 */
 
     STRING *get_string() {
-        STRING *res;
-        PackFile *pf;
-        size_t size, aligned_size;
-        PackFile_ByteCode *seg;
+        PackFile          *pf  = PackFile_new(INTERP, 0);
+        PackFile_ByteCode *seg = PMC_sub(SELF)->seg;
+        STRING            *res;
+        size_t             size, aligned_size;
 
-        pf = PackFile_new(INTERP, 0);
-        seg = PMC_sub(SELF)->seg;
         PackFile_add_segment(INTERP, &pf->directory, (PackFile_Segment *)seg);
+
         if (seg->const_table)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->const_table);
+
         if (seg->debugs)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->debugs);
+
         if (seg->fixups)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->fixups);
+
         if (seg->pic_index)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->pic_index);
+
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
+
         /*
          * work around packfile bug:
          * as far as I have checked it the story is:
@@ -251,13 +255,16 @@ for writing to disc and later loading via C<load_bytecode>.
          * effect
          */
         aligned_size = size + 15;
-        res = string_make_empty(INTERP, enum_stringrep_one, aligned_size);
-        res->strlen = res->bufused = size;
+        res          = string_make_empty(INTERP, enum_stringrep_one,
+                                         aligned_size);
+        res->strlen  = res->bufused = size;
+
         if ((size_t)(res->strstart) & 0xf) {
-            char *adr = res->strstart;
-            adr += 16 - ((size_t)adr & 0xf);
+            char *adr     = res->strstart;
+            adr          += 16 - ((size_t)adr & 0xf);
             res->strstart = adr;
         }
+
         /* We block DOD while doing the packing, since GC run during a pack
            has been observed to cause problems. There may be a Better Fix.
            See RT #40410 for example of the problem (note on line that
@@ -265,11 +272,12 @@ for writing to disc and later loading via C<load_bytecode>.
         Parrot_block_DOD(INTERP);
         PackFile_pack(INTERP, pf, (opcode_t *)res->strstart);
         Parrot_unblock_DOD(INTERP);
+
         /* now remove all segments from directory again and destroy
-         * the packfile
-         */
+         * the packfile */
         pf->directory.num_segments = 0;
         PackFile_destroy(INTERP, pf);
+
         return res;
     }
 
@@ -302,35 +310,41 @@ Unarchives the code.
 */
 
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        STRING *packed = SELF.get_string();
+        IMAGE_IO *io     = info->image_io;
+        STRING   *packed = SELF.get_string();
         io->vtable->push_string(INTERP, io, packed);
+
         SUPER(info);
     }
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
-        PackFile *pf;
-        STRING *packed;
-        size_t i;
+        IMAGE_IO         *io     = info->image_io;
+        STRING           *packed = io->vtable->shift_string(INTERP, io);
+        PackFile         *pf;
         PackFile_Segment *seg;
+        size_t            i;
 
-        packed = io->vtable->shift_string(INTERP, io);
         SUPER(info);
         pf = PackFile_new(INTERP, 0);
+
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))
             real_exception(INTERP, NULL, E_IOError,
                     "couldn't unpack packfile");
+
         do_sub_pragmas(INTERP, pf->cur_cs, PBC_PBC, SELF);
+
         for (i = 0; i < pf->directory.num_segments; ++i) {
             seg = pf->directory.segments[i];
+
             if (seg->type == PF_BYTEC_SEG) {
                 PMC_sub(SELF)->seg = (PackFile_ByteCode *)seg;
                 break;
             }
         }
+
         pf->directory.num_segments = 0;
+
         /*
          * XXX this isn't ok - it seems that the packfile
          *     gets attached to interp->code and is

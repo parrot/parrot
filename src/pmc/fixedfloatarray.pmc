@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,8 +8,8 @@ src/pmc/fixedfloatarray.pmc - fixed size array for floating point numbers only
 
 =head1 DESCRIPTION
 
-This class, FixedFloatArray, implements an array of fixed size, which
-stored FLOATVALs, it uses Float PMCs to do all necessary conversions
+This class, FixedFloatArray, implements an array of fixed size which
+stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 =head2 Functions
 
@@ -41,7 +41,7 @@ Initializes the array.
 
     void init() {
         PMC_int_val(SELF) = 0;
-        PMC_data(SELF) = NULL;
+        PMC_data(SELF)    = NULL;
     }
 
 /*
@@ -72,7 +72,8 @@ Destroys the array.
     void destroy() {
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+
+        PMC_data(SELF)    = NULL;
         PMC_int_val(SELF) = 0;
     }
 
@@ -88,16 +89,19 @@ Creates and returns a copy of the array.
 
     PMC *clone() {
         INTVAL size;
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC   *dest     = pmc_new(INTERP, SELF->vtable->base_type);
+        size_t mem_size = size * sizeof (FLOATVAL);
 
         if (!PMC_data(SELF))
             return dest;
-        size = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
 
-        PMC_data(dest) = mem_sys_allocate(size * sizeof (FLOATVAL));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof (FLOATVAL));
+        size              = PMC_int_val(SELF);
+        PMC_int_val(dest) = size;
+        PMC_data(dest)    = mem_sys_allocate(mem_size);
+
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
         PObj_active_destroy_SET(dest);
+
         return dest;
     }
 
@@ -187,6 +191,7 @@ Returns the floating-point value of the element at index C<key>.
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
         FLOATVAL *data;
+
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedFloatArray: index out of bounds!");
@@ -221,9 +226,8 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     STRING *get_string_keyed_int(INTVAL key) {
-        PMC *temp;
-        temp = DYNSELF.get_pmc_keyed_int(key);
-        return VTABLE_get_string(INTERP, temp);
+        PMC *e = DYNSELF.get_pmc_keyed_int(key);
+        return VTABLE_get_string(INTERP, e);
     }
 
 /*
@@ -253,11 +257,9 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC *ret;
-        FLOATVAL val;
+        PMC     *ret = pmc_new(INTERP, enum_class_Float);
+        FLOATVAL val = DYNSELF.get_number_keyed_int(key);
 
-        ret = pmc_new(INTERP, enum_class_Float);
-        val = DYNSELF.get_number_keyed_int(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
     }
@@ -291,8 +293,9 @@ Resizes the array to C<size> elements.
         if (PMC_int_val(SELF) || size < 1)
             real_exception(INTERP, NULL, E_IndexError,
                     "FixedFloatArray: Can't resize!");
+
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof (FLOATVAL));
+        PMC_data(SELF)    = mem_sys_allocate(size * sizeof (FLOATVAL));
         PObj_active_destroy_SET(SELF);
     }
 
@@ -321,8 +324,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed(PMC *key, INTVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_integer_keyed_int(k, value);
     }
 
@@ -343,7 +345,7 @@ C<value>.
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedFloatArray: index out of bounds!");
 
-        data = (FLOATVAL*)PMC_data(SELF);
+        data      = (FLOATVAL *)PMC_data(SELF);
         data[key] = value;
     }
 
@@ -359,8 +361,7 @@ C<value>.
 */
 
     void set_number_keyed(PMC *key, FLOATVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
 
@@ -376,9 +377,8 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
         FLOATVAL tempNum;
-        PMC *tempPMC;
+        PMC     *tempPMC = pmc_new(INTERP, enum_class_Float);
 
-        tempPMC = pmc_new(INTERP, enum_class_Float);
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempNum = VTABLE_get_number(INTERP, tempPMC);
         DYNSELF.set_number_keyed_int(key, tempNum);
@@ -396,8 +396,7 @@ C<value>.
 */
 
     void set_string_keyed(PMC *key, STRING *value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_string_keyed_int(k, value);
     }
 
@@ -412,8 +411,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 */
 
     void set_pmc_keyed_int(INTVAL key, PMC *src) {
-        FLOATVAL tempNum;
-        tempNum = VTABLE_get_number(INTERP, src);
+        FLOATVAL tempNum = VTABLE_get_number(INTERP, src);
         DYNSELF.set_number_keyed_int(key, tempNum);
     }
 
@@ -429,8 +427,7 @@ C<value>.
 */
 
     void set_pmc_keyed(PMC *key, PMC *value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);
     }
 

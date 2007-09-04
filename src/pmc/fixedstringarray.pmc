@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ src/pmc/fixedstringarray.pmc - fixed size array for strings only
 
 =head1 DESCRIPTION
 
-This class, FixedStringArray, implements an array of fixed size, which
+This class, FixedStringArray, implements an array of fixed size which
 stores Parrot strings.
 
 =head2 Functions
@@ -41,7 +41,7 @@ Initializes the array.
 
     void init() {
         PMC_int_val(SELF) = 0;
-        PMC_data(SELF) = NULL;
+        PMC_data(SELF)    = NULL;
     }
 
 /*
@@ -72,7 +72,8 @@ Destroys the array.
     void destroy() {
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+
+        PMC_data(SELF)    = NULL;
         PMC_int_val(SELF) = 0;
     }
 
@@ -87,17 +88,20 @@ Creates and returns a copy of the array.
 */
 
     PMC *clone() {
-        INTVAL size;
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
+        INTVAL      mem_size, size;
 
         if (!PMC_data(SELF))
             return dest;
-        size = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
 
-        PMC_data(dest) = mem_sys_allocate(size * sizeof (STRING*));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof (STRING*));
+        size              = PMC_int_val(SELF);
+        PMC_int_val(dest) = size;
+        mem_size          = size * sizeof (STRING *);
+
+        PMC_data(dest)    = mem_sys_allocate(mem_size);
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
         PObj_custom_mark_destroy_SETALL(dest);
+
         return dest;
     }
 
@@ -112,16 +116,18 @@ Marks the array as live.
 */
 
     void mark() {
-        int i, end;
+        int      i, end;
         STRING **data;
+
         if (!PMC_data(SELF))
             return;
+
         data = (STRING **) PMC_data(SELF);
-        end = PMC_int_val(SELF);
+        end  = PMC_int_val(SELF);
+
         for (i = 0; i < end; i++) {
-            if (data[i]) {
+            if (data[i])
                 pobject_lives(INTERP, (PObj *) data[i]);
-            }
         }
     }
 
@@ -245,6 +251,7 @@ Returns the Parrot string value of the element at index C<key>.
 
     STRING *get_string_keyed_int(INTVAL key) {
         STRING **data;
+
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedStringArray: index out of bounds!");
@@ -280,7 +287,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC * const ret = pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = pmc_new(INTERP, enum_class_String);
         STRING * const val = DYNSELF.get_string_keyed_int(key);
 
         VTABLE_set_string_native(INTERP, ret, val);
@@ -318,8 +325,10 @@ cause an exception to be thrown.
         if (PMC_int_val(SELF) || size < 1)
             real_exception(INTERP, NULL, E_IndexError,
                     "FixedStringArray: Can't resize!");
+
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_allocate_zeroed(size * sizeof (STRING*));
+        PMC_data(SELF)    = mem_sys_allocate_zeroed(size * sizeof (STRING*));
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -334,7 +343,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC * const ret = pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_integer_native(INTERP, ret, value);
@@ -369,7 +378,7 @@ C<value>.
 */
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC * const ret = pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_number_native(INTERP, ret, value);
@@ -405,11 +414,12 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
         STRING **data;
+
         if (key < 0 || key >= PMC_int_val(SELF))
             real_exception(INTERP, NULL, E_IndexError,
                 "FixedStringArray: index out of bounds!");
 
-        data = (STRING**)PMC_data(SELF);
+        data      = (STRING **)PMC_data(SELF);
         DOD_WRITE_BARRIER(INTERP, SELF, data[key], value);
         data[key] = value;
     }
@@ -477,15 +487,15 @@ Used to archive the string.
 
 */
     void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        STRING ** const data = (STRING**)PMC_data(SELF);
-        const INTVAL n = PMC_int_val(SELF);
-        INTVAL i;
+        IMAGE_IO *  const io   = info->image_io;
+        STRING   ** const data = (STRING**)PMC_data(SELF);
+        const INTVAL n         = PMC_int_val(SELF);
+        INTVAL       i;
 
         io->vtable->push_integer(INTERP, io, n);
-        for (i = 0; i < n; ++i) {
+
+        for (i = 0; i < n; ++i)
             io->vtable->push_string(INTERP, io, data[i]);
-        }
     }
 
 /*

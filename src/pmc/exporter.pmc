@@ -12,9 +12,11 @@ You can use Exporter in PIR to import subs from a library. At its simplest:
 
  .sub main :main
      load_bytecode 'Test/More.pir'
+
      .local pmc exporter, test_ns
-     test_ns = get_namespace [ 'Test'; 'More' ]
+     test_ns  = get_namespace [ 'Test'; 'More' ]
      exporter = new 'Exporter'
+
      exporter.'import'( test_ns :named('source'), 'plan ok' :named('globals') )
      plan(1)
      ok(1, 'exporter has imported the requested functions')
@@ -98,11 +100,11 @@ Initializes an Exporter PMC.
         Parrot_Exporter *exp = NULL;
 
         /* Set up the object. */
-        exp            = mem_allocate_zeroed_typed(Parrot_Exporter);
-        exp->ns_src    = PMCNULL;
-        exp->ns_dest   = CONTEXT(interp->ctx)->current_namespace;
-        exp->globals   = PMCNULL;
-        PMC_data(SELF) = exp;
+        exp                  = mem_allocate_zeroed_typed(Parrot_Exporter);
+        exp->ns_src          = PMCNULL;
+        exp->ns_dest         = CONTEXT(interp->ctx)->current_namespace;
+        exp->globals         = PMCNULL;
+        PMC_data(SELF)       = exp;
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -121,7 +123,7 @@ Free the memory associated with the object's underlying struct.
 */
 
     void destroy() {
-            mem_sys_free(PMC_data(SELF));
+        mem_sys_free(PMC_data(SELF));
     }
 
 
@@ -137,12 +139,13 @@ Mark referenced strings and PMCs in the structure as live.
 
     void mark() {
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+
         if (exp->ns_src)
-            pobject_lives(interp, (PObj*)exp->ns_src);
+            pobject_lives(interp, (PObj *)exp->ns_src);
         if (exp->ns_dest)
-            pobject_lives(interp, (PObj*)exp->ns_dest);
+            pobject_lives(interp, (PObj *)exp->ns_dest);
         if (exp->globals)
-            pobject_lives(interp, (PObj*)exp->globals);
+            pobject_lives(interp, (PObj *)exp->globals);
     }
 
 
@@ -155,7 +158,7 @@ Mark referenced strings and PMCs in the structure as live.
 =over 4
 
 =item C<PCCMETHOD
-    source(PMC *src :optional, int got_src :opt_flag)>
+source(PMC *src :optional, int got_src :opt_flag)>
 
 Accessor for the source NameSpace object (C<ns_src>.)
 Sets the value if C<src> is passed, otherwise returns the value.
@@ -176,8 +179,7 @@ Throws an exception if a non-NameSpace PMC is passed.
             exp->ns_src = src;
         }
         else {
-            PMC *tmp_ns_src;
-            tmp_ns_src = exp->ns_src;
+            PMC *tmp_ns_src = exp->ns_src;
             PCCRETURN(PMC *tmp_ns_src);
         }
     }
@@ -207,8 +209,7 @@ Throws an exception if a non-NameSpace PMC is passed.
             exp->ns_dest = dest;
         }
         else {
-            PMC *tmp_ns_dest;
-            tmp_ns_dest = exp->ns_dest;
+            PMC *tmp_ns_dest = exp->ns_dest;
             PCCRETURN(PMC *tmp_ns_dest);
         }
     }
@@ -284,8 +285,7 @@ Throws an exception if an unknown PMC type is passed.
                 PCCRETURN(PMC *PMCNULL);
             }
             else {
-                PMC *tmp_globals;
-                tmp_globals = exp->globals;
+                PMC *tmp_globals = exp->globals;
                 PCCRETURN(PMC *tmp_globals);
             }
         }
@@ -295,9 +295,9 @@ Throws an exception if an unknown PMC type is passed.
 /*
 
 =item C<PCCMETHOD
-    import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
-        PMC *src     :optional :named["source"],  int got_src :opt_flag,
-        PMC *globals :optional :named["globals"], int got_globals :opt_flag)>
+    import(PMC *dest    :optional :named["destination"], int got_dest :opt_flag,
+        PMC    *src     :optional :named["source"],      int got_src  :opt_flag,
+        PMC    *globals :optional :named["globals"], int got_globals  :opt_flag)>
 
 Import C<globals> from the C<src> namespace to the C<dest> namespace.
 If C<src>, C<dest>, or C<globals> are passed, they override the current value.
@@ -311,7 +311,7 @@ Throws an exception upon error.
 */
 
     PCCMETHOD import(PMC *dest :optional :named["destination"], int got_dest :opt_flag,
-            PMC *src     :optional :named["source"],  int got_src :opt_flag,
+            PMC *src     :optional :named["source"],  int got_src     :opt_flag,
             PMC *globals :optional :named["globals"], int got_globals :opt_flag) {
 
         Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
@@ -319,17 +319,18 @@ Throws an exception upon error.
 
         if (got_src)
             PCCINVOKE(interp, SELF, "source", PMC *src);
+
         if (got_dest)
             PCCINVOKE(interp, SELF, "destination", PMC *dest);
+
         if (got_globals)
             PCCINVOKE(interp, SELF, "globals", PMC *globals);
 
-        if (PMC_IS_NULL(exp->ns_src)) {
+        if (PMC_IS_NULL(exp->ns_src))
             real_exception(interp, NULL, 0, "source namespace not set");
-        }
-        if (PMC_IS_NULL(exp->ns_dest)) {
+
+        if (PMC_IS_NULL(exp->ns_dest))
             real_exception(interp, NULL, 0, "destination namespace not set");
-        }
 
         ns_src     = exp->ns_src;
         ns_dest    = exp->ns_dest;
