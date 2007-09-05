@@ -1986,7 +1986,7 @@ tags: tags.dummy
 		--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 		-I NOTNULL NULLOK \
 		$(CUR_DIR)
-	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_DIR)/*.ops
+	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.dummy:
 
