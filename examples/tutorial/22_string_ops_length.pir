@@ -1,6 +1,7 @@
 =head1 String Operations (continued)
 
-To find the length of a string in PIR, use the length function.
+To find the length of a string in PIR, use the length opcode.  It works on any
+register containing a basic Parrot string, but not the String PMC.
 
 =cut
 
@@ -9,8 +10,12 @@ To find the length of a string in PIR, use the length function.
 
     $S0 = "Hello"
     $I0 = length $S0
-    print $I0
-    print "\n"
+    say $I0
+
+    .local string text
+    text = "longer string"
+    $I1 = length text
+    say $I1
 
 .end
 

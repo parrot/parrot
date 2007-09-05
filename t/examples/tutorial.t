@@ -81,6 +81,7 @@ END_EXPECTED
 
     '22_string_ops_length.pir' => << 'END_EXPECTED',
 5
+13
 END_EXPECTED
 
     '23_string_ops_substr.pir' => << 'END_EXPECTED',
