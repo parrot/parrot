@@ -24,16 +24,13 @@ but those starting with => are the ones used
 
 #include "parrot/parrot.h"
 
-
 #define RE(obj) (((FLOATVAL*)PMC_struct_val(obj))[0])
 #define IM(obj) (((FLOATVAL*)PMC_struct_val(obj))[1])
-
 
 /*
 
 =item C<static void
-complex_parse_string(PARROT_INTERP,
-        FLOATVAL *re, FLOATVAL *im, STRING *value)>
+complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
 by the real (C<*re>) and imaginary (C<*im>) parts. Raises an exception
@@ -46,18 +43,18 @@ use C<j> instead of C<i>.
 */
 
 static void
-complex_parse_string(PARROT_INTERP,
-        FLOATVAL *re, FLOATVAL *im, STRING *value) {
-    char *str;
+complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
     INTVAL first_num_length, second_num_length;
-    INTVAL first_num_minus, second_num_minus, i;
-    char *first_num_offset, *second_num_offset = NULL, *t;
     STRING *S;
 
-    t = str = string_to_cstring(interp, value);
-    i = 0;
-    first_num_offset = str;
-    first_num_minus = second_num_minus = 0;
+    char  *str               = string_to_cstring(interp, value);
+    char  *t                 = str;
+    char  *first_num_offset  = str;
+    char  *second_num_offset = NULL;
+
+    INTVAL i                 = 0;
+    INTVAL first_num_minus   = 0;
+    INTVAL second_num_minus  = 0;
 
     /* walk the string and identify the real and imaginary parts */
 
@@ -65,54 +62,83 @@ complex_parse_string(PARROT_INTERP,
         /* first number is negative */
         t++;
         first_num_minus = 1;
-        if (*t == ' ') t++; /* allow for an optional space */
+
+        /* allow for an optional space */
+        if (*t == ' ')
+            t++;
         first_num_offset = t;
     }
-    while (*t >= '0' && *t <= '9') t++; /* skip digits */
+
+    /* skip digits */
+    while (*t >= '0' && *t <= '9')
+        t++;
+
     if (*t == '.') {
         /* this number has a decimal point */
         t++;
-        while (*t >= '0' && *t <= '9') t++; /* skip digits */
+
+        /* skip digits */
+        while (*t >= '0' && *t <= '9')
+            t++;
     }
+
     /* save the length of the real part */
     first_num_length = t - first_num_offset;
 
+    /* end of string; we only have a real part */
     if (*t == 0) {
-        /* end of string; we only have a real part */
         second_num_length = 0;
     }
     else if ((*t == 'i' || *t == 'j') && *(t+1) == 0) {
         /* there is only an imaginary part, so the first number was
             actually the imaginary part */
         second_num_length = first_num_length;
-        first_num_length = 0;
+        first_num_length  = 0;
         second_num_offset = first_num_offset;
-        second_num_minus = first_num_minus;
-        first_num_minus = 0;
+        second_num_minus  = first_num_minus;
+        first_num_minus   = 0;
+
         /* this is useful if there is no number for
             the imaginary part, like in "-i" */
         i = 1;
     }
     else {
-        if (*t == ' ') t++; /* skip an optional space */
+        /* skip an optional space */
+        if (*t == ' ')
+            t++;
+
         /* expect "+" or "-" and the imaginary part */
         if (*t == '+' || *t == '-') {
-            second_num_minus = (*t == '-'); /* save the sign */
+            /* save the sign */
+            second_num_minus = (*t == '-');
             t++;
-            if (*t == ' ') t++; /* skip another optional space */
+
+            /* skip another optional space */
+            if (*t == ' ')
+                t++;
 
             /* save the beginning of the imaginary part */
             second_num_offset = t;
-            while (*t >= '0' && *t <= '9') t++; /* skip digits */
+
+            /* skip digits */
+            while (*t >= '0' && *t <= '9')
+                t++;
+
             if (*t == '.') {
                 /* this number has a decimal point */
                 t++;
-                while (*t >= '0' && *t <= '9') t++; /* skip digits */
+
+                /* skip digits */
+                while (*t >= '0' && *t <= '9')
+                    t++;
             }
+
             /* save the length of the imaginary part */
             second_num_length = t - second_num_offset;
 
-            if (*t == ' ') t++; /* allow for one more optional space */
+            /* allow for one more optional space */
+            if (*t == ' ')
+                t++;
 
             /* verify that the string ends properly */
             if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {
@@ -120,6 +146,7 @@ complex_parse_string(PARROT_INTERP,
                 real_exception(interp, NULL, E_ValueError,
                     "Complex: malformed string");
             }
+
             /* this is useful if there is no number for the
                 imaginary part, like in "2+i" */
             i = 1;
@@ -133,13 +160,11 @@ complex_parse_string(PARROT_INTERP,
         }
     }
 
-    /* now we have the offsets and the lengths;
-        we turn them into float values */
+    /* now we have the offsets and the lengths we turn them into float values */
 
     if (first_num_length) {
         /* there is a real part, interpret it */
-        S = string_from_cstring(interp,
-                first_num_offset, first_num_length);
+        S   = string_from_cstring(interp, first_num_offset, first_num_length);
         *re = string_to_num(interp, S);
     }
     else {
@@ -149,8 +174,7 @@ complex_parse_string(PARROT_INTERP,
 
     if (second_num_length) {
         /* there is an imaginary part, interpret it */
-        S = string_from_cstring(interp,
-                second_num_offset, second_num_length);
+        S   = string_from_cstring(interp, second_num_offset, second_num_length);
         *im = string_to_num(interp, S);
     }
     else {
@@ -160,8 +184,12 @@ complex_parse_string(PARROT_INTERP,
         else
             *im = 0.0;
     }
-    if (first_num_minus) *re = - *re;
-    if (second_num_minus) *im = - *im;
+
+    if (first_num_minus)
+        *re = -*re;
+
+    if (second_num_minus)
+        *im = -*im;
 
     string_cstring_free(str);
 }
@@ -186,39 +214,33 @@ complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key) {
 
     if (0 == string_equal(interp, key, imag))
         return &IM(self);
+
     real = string_from_cstring(interp, "real", 4);
+
     if (0 == string_equal(interp, key, real))
         return &RE(self);
+
     real_exception(interp, NULL, E_KeyError,
         "Complex: key is neither 'real' or 'imag'");
 }
 
 static void
-int_check_divide_zero(PARROT_INTERP, INTVAL value)
-{
-    if (value == 0) {
-        real_exception(interp, NULL, E_ZeroDivisionError,
-                       "Divide by zero");
-    }
+int_check_divide_zero(PARROT_INTERP, INTVAL value) {
+    if (value == 0)
+        real_exception(interp, NULL, E_ZeroDivisionError, "Divide by zero");
 }
 
 static void
-float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
-{
-    if (FLOAT_IS_ZERO(value)) {
-        real_exception(interp, NULL, E_ZeroDivisionError,
-                       "Divide by zero");
-    }
+float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
+    if (FLOAT_IS_ZERO(value))
+        real_exception(interp, NULL, E_ZeroDivisionError, "Divide by zero");
 }
 
 static void
-complex_check_divide_zero(PARROT_INTERP, PMC *value)
-{
+complex_check_divide_zero(PARROT_INTERP, PMC *value) {
     /* Throw an exception if we are dividing by zero. */
-    if (FLOAT_IS_ZERO(RE(value)) && FLOAT_IS_ZERO(IM(value))) {
-        real_exception(interp, NULL, E_ZeroDivisionError,
-                       "Divide by zero");
-    }
+    if (FLOAT_IS_ZERO(RE(value)) && FLOAT_IS_ZERO(IM(value)))
+        real_exception(interp, NULL, E_ZeroDivisionError, "Divide by zero");
 }
 
 
@@ -240,11 +262,12 @@ Create a new complex PMC with passed arguments according to pdd03.
         /* TODO -- really build this thing */
 #if 0
         PMC *res = pmc_new(INTERP, enum_class_Complex);
-        FLOATVAL re = 0.0, im = 0.0;
-        int argcI = REG_INT(interp, 1);
-        int argcS = REG_INT(interp, 2);
-        int argcP = REG_INT(interp, 3);
-        int argcN = REG_INT(interp, 4);
+        FLOATVAL re    = 0.0;
+        FLOATVAL im    = 0.0;
+        int      argcI = REG_INT(interp, 1);
+        int      argcS = REG_INT(interp, 2);
+        int      argcP = REG_INT(interp, 3);
+        int      argcN = REG_INT(interp, 4);
 
         /*
          * we can only allow 0..2 arguments of one kind. For
@@ -252,19 +275,20 @@ Create a new complex PMC with passed arguments according to pdd03.
          */
         if (argcP) {
             re = VTABLE_get_number(INTERP, REG_PMC(interp, 5));
+
             if (argcP == 2)
                 im = VTABLE_get_number(INTERP, REG_PMC(interp, 6));
-            /*
-             * TODO throw exception if argument mismatch
-             */
+            /* TODO throw exception if argument mismatch */
         }
         else if (argcN) {
             re = REG_NUM(interp, 5);
+
             if (argcN == 2)
                 im = REG_NUM(interp, 6);
         }
         else if (argcI) {
             re = REG_INT(interp, 5);
+
             if (argcI == 2)
                 im = REG_INT(interp, 6);
         }
@@ -272,6 +296,7 @@ Create a new complex PMC with passed arguments according to pdd03.
             complex_parse_string(INTERP, &RE(res), &IM(res), REG_STR(interp, 5));
             return res;
         }
+
         RE(res) = re;
         IM(res) = im;
         return res;
@@ -289,8 +314,8 @@ C<complex> object according to 2.1. Built-in Functions.
 
 */
     opcode_t *invoke(void *next) {
-        const int argcP = REG_INT(interp, 3);
-        PMC * const res  = pmc_new(INTERP, enum_class_Complex);
+        const int   argcP = REG_INT(interp, 3);
+        PMC * const res   = pmc_new(INTERP, enum_class_Complex);
 
         if (argcP == 1) {
             PMC * const arg = REG_PMC(interp, 5);
@@ -340,10 +365,13 @@ Creates an identical copy of the complex number.
 
     void init() {
         /* XXX should check if mem_sys_allocate failed */
-        FLOATVAL *data = (FLOATVAL*)mem_sys_allocate(2 * sizeof (FLOATVAL));
+        FLOATVAL *data       =
+            (FLOATVAL *)mem_sys_allocate(2 * sizeof (FLOATVAL));
         PMC_struct_val(SELF) = data;
-        PObj_active_destroy_SET(SELF);
+
         RE(SELF) = IM(SELF) = 0.0;
+
+        PObj_active_destroy_SET(SELF);
     }
 
     void init_pmc(PMC *initializer) {
@@ -363,12 +391,14 @@ Creates an identical copy of the complex number.
     }
 
     PMC *clone() {
-        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        FLOATVAL *data = (FLOATVAL*)mem_sys_allocate(2 * sizeof (FLOATVAL));
+        PMC           *dest  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        FLOATVAL      *data  =
+            (FLOATVAL *)mem_sys_allocate(2 * sizeof (FLOATVAL));
         PMC_struct_val(dest) = data;
+        RE(dest)             = RE(SELF);
+        IM(dest)             = IM(SELF);
+
         PObj_active_destroy_SET(dest);
-        RE(dest) = RE(SELF);
-        IM(dest) = IM(SELF);
         return dest;
     }
 
@@ -400,14 +430,11 @@ Returns true if the complex number is non-zero.
     }
 
     FLOATVAL get_number() {
-        return sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
+        return sqrt(RE(SELF) * RE(SELF) + IM(SELF) * IM(SELF));
     }
 
     STRING *get_string() {
-        STRING *s;
-            s = Parrot_sprintf_c(INTERP,
-                    "%vg%+vgi", RE(SELF), IM(SELF));
-        return s;
+        return Parrot_sprintf_c(INTERP, "%vg%+vgi", RE(SELF), IM(SELF));
     }
 
     INTVAL get_bool() {
@@ -453,6 +480,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         const FLOATVAL * const num = complex_locate_keyed_num(INTERP, SELF, key);
         if (num)
             return *num;
+
         return 0.0;
     }
 
@@ -462,7 +490,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     PMC *get_pmc_keyed_str(STRING *key) {
-        PMC * const ret = pmc_new(INTERP, enum_class_Float);
+        PMC * const    ret = pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = DYNSELF.get_number_keyed_str(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
@@ -479,7 +507,7 @@ Returns the requested number (real part for C<0> and imaginary for C<1>).
 */
 
     PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC * const ret = pmc_new(INTERP, enum_class_Float);
+        PMC * const    ret = pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = DYNSELF.get_number_keyed_int(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
@@ -642,21 +670,23 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 MMD_Complex: {
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = RE(SELF) + RE(value);
             IM(dest) = IM(SELF) + IM(value);
+
             return dest;
         }
 MMD_DEFAULT: {
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
             IM(dest) = IM(SELF);
+
             return dest;
         }
     }
@@ -664,23 +694,25 @@ MMD_DEFAULT: {
     PMC *add_int(INTVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) + value;
         IM(dest) = IM(SELF);
+
         return dest;
     }
 
     PMC *add_float(FLOATVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         RE(dest) = RE(SELF) + value;
         IM(dest) = IM(SELF);
+
         return dest;
     }
 
@@ -697,6 +729,7 @@ MMD_DEFAULT: {
     void i_add_int(INTVAL value) {
         RE(SELF) += (FLOATVAL)value;
     }
+
     void i_add_float(FLOATVAL value) {
         RE(SELF) += value;
     }
@@ -719,21 +752,23 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 MMD_Complex: {
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = RE(SELF) - RE(value);
             IM(dest) = IM(SELF) - IM(value);
+
             return dest;
         }
 MMD_DEFAULT: {
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
             IM(dest) = IM(SELF);
+
             return dest;
         }
     }
@@ -741,22 +776,24 @@ MMD_DEFAULT: {
     PMC *subtract_int(INTVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) - value;
         IM(dest) = IM(SELF);
+
         return dest;
     }
 
     PMC *subtract_float(FLOATVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) - value;
         IM(dest) = IM(SELF);
+
         return dest;
     }
 
@@ -773,6 +810,7 @@ MMD_DEFAULT: {
     void i_subtract_int(INTVAL value) {
         RE(SELF) -= (FLOATVAL)value;
     }
+
     void i_subtract_float(FLOATVAL value) {
         RE(SELF) -= value;
     }
@@ -812,11 +850,12 @@ MMD_Complex: {
             FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = re;
             IM(dest) = im;
+
             return dest;
         }
 MMD_DEFAULT: {
@@ -824,11 +863,12 @@ MMD_DEFAULT: {
             FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = re;
             IM(dest) = im;
+
             return dest;
         }
     }
@@ -836,22 +876,24 @@ MMD_DEFAULT: {
     PMC *multiply_int(INTVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
+
         return dest;
     }
 
     PMC *multiply_float(FLOATVAL value, PMC *dest) {
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
+
         return dest;
     }
 
@@ -859,8 +901,8 @@ MMD_DEFAULT: {
 MMD_Complex: {
             FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
             FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-            RE(SELF) = re;
-            IM(SELF) = im;
+            RE(SELF)    = re;
+            IM(SELF)    = im;
         }
 MMD_DEFAULT: {
             RE(SELF) *= VTABLE_get_number(INTERP, value);
@@ -915,16 +957,18 @@ MMD_Complex: {
             complex_check_divide_zero(INTERP, value);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             /* a little speed optimisation: cache an intermediate number;
                 I'm not sure the compiler does this */
-            mod = (RE(value) * RE(value) + IM(value) * IM(value));
-            re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
-            im = (IM(SELF) * RE(value) - RE(SELF) * IM(value)) / mod;
+
+            mod      = (RE(value) * RE(value) + IM(value) * IM(value));
+            re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
+            im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
             RE(dest) = re;
             IM(dest) = im;
+
             return dest;
         }
 MMD_DEFAULT: {
@@ -932,11 +976,12 @@ MMD_DEFAULT: {
             float_check_divide_zero(INTERP, d);
             if (dest)
                 VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else {
+            else
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
-            }
+
             RE(dest) = RE(SELF) / d;
             IM(dest) = IM(SELF) / d;
+
             return dest;
         }
     }
@@ -945,11 +990,12 @@ MMD_DEFAULT: {
         int_check_divide_zero(INTERP, value);
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
+
         return dest;
     }
 
@@ -957,11 +1003,12 @@ MMD_DEFAULT: {
         float_check_divide_zero(INTERP, value);
         if (dest)
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else {
+        else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        }
+
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
+
         return dest;
     }
 
@@ -972,9 +1019,9 @@ MMD_Complex: {
             complex_check_divide_zero(INTERP, value);
             /* a little speed optimisation: cache an intermediate number;
                 I'm not sure the compiler does this */
-            mod = (RE(value) * RE(value) + IM(value) * IM(value));
-            re = (RE(SELF) * RE(value) + IM(SELF) * IM(value)) / mod;
-            im = (IM(SELF) * RE(value) - RE(SELF) * IM(value)) / mod;
+            mod      = (RE(value) * RE(value) + IM(value) * IM(value));
+            re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
+            im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
             RE(SELF) = re;
             IM(SELF) = im;
         }
@@ -998,7 +1045,6 @@ MMD_DEFAULT: {
         IM(SELF) /= value;
     }
 
-
 /*
 
 =item C<PMC *neg(PMC *dest)>
@@ -1016,14 +1062,16 @@ Set C<dest> to the negated value of C<SELF>.
             dest = pmc_new(INTERP, SELF->vtable->base_type);
         else
             VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        RE(dest) = - RE(SELF);
-        IM(dest) = - IM(SELF);
+
+        RE(dest) = -RE(SELF);
+        IM(dest) = -IM(SELF);
+
         return dest;
     }
 
     void i_neg() {
-        RE(SELF) = - RE(SELF);
-        IM(SELF) = - IM(SELF);
+        RE(SELF) = -RE(SELF);
+        IM(SELF) = -IM(SELF);
     }
 
 /*
@@ -1038,13 +1086,12 @@ Compares the complex number with C<value> and returns true if they are equal.
 
     INTVAL is_equal(PMC *value) {
 MMD_Complex: {
-            return (INTVAL)(
-                    RE(SELF) == RE(value) &&
-                    IM(SELF) == IM(value));
+            return (INTVAL)(RE(SELF) == RE(value) && IM(SELF) == IM(value));
         }
 MMD_DEFAULT: {
             if (IM(SELF) != 0.0)
                 return (INTVAL)0;
+
             return (RE(SELF) == VTABLE_get_number(INTERP, value));
         }
     }
@@ -1075,9 +1122,11 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
     PMC *absolute(PMC *dest) {
         FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
+
         if (!dest)
             dest = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+
         VTABLE_set_number_native(INTERP, dest, d);
         return dest;
     }
@@ -1110,14 +1159,17 @@ ln(+-i) = +- (pi i)/2
 */
 
     METHOD PMC *ln() {
-        FLOATVAL re, im;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        re = RE(SELF);
-        im = IM(SELF);
+        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL re = RE(SELF);
+        FLOATVAL im = IM(SELF);
+
         /* This is necessary for atan2 to behave */
-        if (im == -0.0) im = 0.0;
+        if (im == -0.0)
+            im = 0.0;
+
         RE(d) = log(sqrt(re*re + im*im));
         IM(d) = atan2(im, re);
+
         return d;
     }
 
@@ -1134,17 +1186,19 @@ exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 */
 
     METHOD PMC *exp() {
-        FLOATVAL re, im, f;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        re = RE(SELF);
-        im = IM(SELF);
-        f = exp(re);
-        RE(d) = f * cos(im);
+        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL re = RE(SELF);
+        FLOATVAL im = IM(SELF);
+        FLOATVAL f  = exp(re);
+
+        RE(d)       = f * cos(im);
+
         /* If only sin(pi) worked. */
         if (im == 4.0 * atan(1.0))
             IM(d) = 0.0;
         else
             IM(d) = f * sin(im);
+
         return d;
     }
 
@@ -1191,16 +1245,20 @@ Returns C<FUNC>(SELF).
             IM(d) = 0.0;
             return d;
         }
+
         if (FLOAT_IS_ZERO(re)) {
             RE(d) = 0.0;
             IM(d) = sinh(im);
             return d;
         }
+
         RE(d) = sin(re) * cosh(im);
+
         if (FLOAT_IS_ZERO(im))
             IM(d) = im;
         else
             IM(d) = cos(re) * sinh(im);
+
         return d;
     }
 
@@ -1220,46 +1278,56 @@ Returns C<FUNC>(SELF).
             IM(d) = 0.0;
             return d;
         }
+
         RE(d) = cos(re) * cosh(im);
         IM(d) = -1.0 * sin(re) * sinh(im);
+
         return d;
     }
 
     METHOD PMC *tan() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_sin(INTERP, SELF);
-        e = Parrot_Complex_nci_cos(INTERP, SELF);
+        d      = Parrot_Complex_nci_sin(INTERP, SELF);
+        e      = Parrot_Complex_nci_cos(INTERP, SELF);
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
+
         return d;
     }
 
     METHOD PMC *cot() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_cos(INTERP, SELF);
-        e = Parrot_Complex_nci_sin(INTERP, SELF);
+        d      = Parrot_Complex_nci_cos(INTERP, SELF);
+        e      = Parrot_Complex_nci_sin(INTERP, SELF);
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
+
         return d;
     }
 
     METHOD PMC *sec() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = 1.0;
-        IM(d) = 0.0;
-        e = Parrot_Complex_nci_cos(INTERP, SELF);
+        RE(d)  = 1.0;
+        IM(d)  = 0.0;
+        e      = Parrot_Complex_nci_cos(INTERP, SELF);
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
+
         return d;
     }
 
     METHOD PMC *csc() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = 1.0;
-        IM(d) = 0.0;
-        e = Parrot_Complex_nci_sin(INTERP, SELF);
+        RE(d)  = 1.0;
+        IM(d)  = 0.0;
+        e      = Parrot_Complex_nci_sin(INTERP, SELF);
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
+
         return d;
     }
 
@@ -1299,82 +1367,91 @@ Returns the inverse function of SELF.
     METHOD PMC *asin() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        e = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
-        RE(e) = 1.0 - RE(e);
-        IM(e) = -IM(e);
-        d = Parrot_Complex_nci_sqrt(INTERP, e);
+
+        e      = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        RE(e)  = 1.0 - RE(e);
+        IM(e)  = -IM(e);
+
+        d      = Parrot_Complex_nci_sqrt(INTERP, e);
         RE(d) -= IM(SELF);
         IM(d) += RE(SELF);
-        d = Parrot_Complex_nci_ln(INTERP, d);
-        RE(e) = IM(d);
-        IM(e) = -RE(d);
+
+        d      = Parrot_Complex_nci_ln(INTERP, d);
+        RE(e)  = IM(d);
+        IM(e)  = -RE(d);
+
         return e;
     }
 
     METHOD PMC *acos() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        e = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
-        RE(e) = 1.0 - RE(e);
-        IM(e) = -IM(e);
-        d = Parrot_Complex_nci_sqrt(INTERP, e);
+
+        e      = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        RE(e)  = 1.0 - RE(e);
+        IM(e)  = -IM(e);
+
+        d      = Parrot_Complex_nci_sqrt(INTERP, e);
         RE(d) += IM(SELF);
         IM(d) -= RE(SELF);
-        e = Parrot_Complex_nci_ln(INTERP, d);
-        RE(d) = IM(e) + 2.0 * atan(1);
-        IM(d) = -RE(e);
+
+        e      = Parrot_Complex_nci_ln(INTERP, d);
+        RE(d)  = IM(e) + 2.0 * atan(1);
+        IM(d)  = -RE(e);
+
         return d;
     }
 
     METHOD PMC *atan() {
-        FLOATVAL re, im;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        re = RE(SELF);
-        im = IM(SELF);
-        RE(d) = re;
-        IM(d) = 1 + im;
-        RE(e) = -re;
-        IM(e) = 1 - im;
+        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *e  = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL re = RE(SELF);
+        FLOATVAL im = IM(SELF);
+
+        RE(d)       = re;
+        IM(d)       = 1 + im;
+        RE(e)       = -re;
+        IM(e)       = 1 - im;
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
-        d = Parrot_Complex_nci_ln(INTERP, d);
-        RE(e) = IM(d) / -2.0;
-        IM(e) = RE(d) / 2.0;
+
+        d           = Parrot_Complex_nci_ln(INTERP, d);
+        RE(e)       = IM(d) / -2.0;
+        IM(e)       = RE(d) / 2.0;
+
         return e;
     }
 
-
     METHOD PMC *acot() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_atan(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+        return Parrot_Complex_nci_atan(INTERP, d);
     }
 
     METHOD PMC *acsc() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_asin(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+
+        return Parrot_Complex_nci_asin(INTERP, d);
     }
 
     METHOD PMC *asec() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_acos(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+
+        return Parrot_Complex_nci_acos(INTERP, d);
     }
 
 /*
@@ -1398,64 +1475,76 @@ tanh(z) = sinh(z) / cosh(z)
 */
 
     METHOD PMC *sinh() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = sinh(a) * cos(b);
-        IM(d) = cosh(a) * sin(b);
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      = sinh(a) * cos(b);
+        IM(d)      = cosh(a) * sin(b);
+
         return d;
     }
 
     METHOD PMC *cosh() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = cosh(a) * cos(b);
-        IM(d) = sinh(a) * sin(b);
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      = cosh(a) * cos(b);
+        IM(d)      = sinh(a) * sin(b);
+
         return d;
     }
 
     METHOD PMC *tanh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_sinh(INTERP, SELF);
-        e = Parrot_Complex_nci_cosh(INTERP, SELF);
+
+        d      = Parrot_Complex_nci_sinh(INTERP, SELF);
+        e      = Parrot_Complex_nci_cosh(INTERP, SELF);
+
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
+
         return d;
     }
 
     METHOD PMC *coth() {
         FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_tanh(INTERP, SELF);
-        a = RE(d);
-        b = IM(d);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
+
+        d      = Parrot_Complex_nci_tanh(INTERP, SELF);
+        a      = RE(d);
+        b      = IM(d);
+        RE(d)  =  a / (a * a + b * b);
+        IM(d)  = -b / (a * a + b * b);
+
         return d;
     }
 
     METHOD PMC *csch() {
         FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_sinh(INTERP, SELF);
-        a = RE(d);
-        b = IM(d);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
+
+        d      = Parrot_Complex_nci_sinh(INTERP, SELF);
+        a      = RE(d);
+        b      = IM(d);
+
+        RE(d)  =  a / (a * a + b * b);
+        IM(d)  = -b / (a * a + b * b);
+
         return d;
     }
 
     METHOD PMC *sech() {
         FLOATVAL a, b;
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_cosh(INTERP, SELF);
-        a = RE(d);
-        b = IM(d);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
+
+        d      = Parrot_Complex_nci_cosh(INTERP, SELF);
+        a      = RE(d);
+        b      = IM(d);
+        RE(d)  =  a / (a * a + b * b);
+        IM(d)  = -b / (a * a + b * b);
+
         return d;
     }
 
@@ -1490,65 +1579,73 @@ atanh = i atan(-ix)
     METHOD PMC *asinh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = IM(SELF);
-        IM(d) = -RE(SELF);
-        d = Parrot_Complex_nci_asin(INTERP, d);
-        RE(e) = -IM(d);
-        IM(e) = RE(d);
+
+        RE(d)  = IM(SELF);
+        IM(d)  = -RE(SELF);
+
+        d      = Parrot_Complex_nci_asin(INTERP, d);
+        RE(e)  = -IM(d);
+        IM(e)  = RE(d);
+
         return e;
     }
 
     METHOD PMC *acosh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_acos(INTERP, SELF);
-        RE(e) = -IM(d);
-        IM(e) = RE(d);
+
+        d      = Parrot_Complex_nci_acos(INTERP, SELF);
+        RE(e)  = -IM(d);
+        IM(e)  = RE(d);
+
         return e;
     }
 
     METHOD PMC *atanh() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
-        RE(d) = IM(SELF);
-        IM(d) = -RE(SELF);
-        d = Parrot_Complex_nci_atan(INTERP, d);
-        RE(e) = -IM(d);
-        IM(e) = RE(d);
+
+        RE(d)  = IM(SELF);
+        IM(d)  = -RE(SELF);
+
+        d      = Parrot_Complex_nci_atan(INTERP, d);
+        RE(e)  = -IM(d);
+        IM(e)  = RE(d);
+
         return e;
     }
 
     METHOD PMC *acoth() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_atanh(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+
+        return Parrot_Complex_nci_atanh(INTERP, d);
     }
 
     METHOD PMC *acsch() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_asinh(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+
+        return Parrot_Complex_nci_asinh(INTERP, d);
     }
 
     METHOD PMC *asech() {
-        FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        a = RE(SELF);
-        b = IM(SELF);
-        RE(d) = a/(a*a + b*b);
-        IM(d) = -b/(a*a + b*b);
-        d = Parrot_Complex_nci_acosh(INTERP, d);
-        return d;
+        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL a = RE(SELF);
+        FLOATVAL b = IM(SELF);
+
+        RE(d)      =  a / (a * a + b * b);
+        IM(d)      = -b / (a * a + b * b);
+
+        return Parrot_Complex_nci_acosh(INTERP, d);
     }
 
 /*
@@ -1573,24 +1670,30 @@ x ^ y = exp(y * ln x))
     PMC *pow(PMC *value, PMC *dest) {
 MMD_Complex: {
                  PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+
                  if (dest)
                      VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
-                 l = Parrot_Complex_multiply_Complex(INTERP,
+
+                 l    = Parrot_Complex_multiply_Complex(INTERP,
                          Parrot_Complex_nci_ln(INTERP, SELF), value, l);
                  dest = Parrot_Complex_nci_exp(INTERP, l);
+
                  return dest;
              }
 MMD_DEFAULT: {
                  PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+
                  if (dest)
                      VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
-                 l = Parrot_Complex_multiply(INTERP,
+
+                 l    = Parrot_Complex_multiply(INTERP,
                          Parrot_Complex_nci_ln(INTERP, SELF), value, l);
                  dest = Parrot_Complex_nci_exp(INTERP, l);
+
                  return dest;
              }
     }
@@ -1598,11 +1701,12 @@ MMD_DEFAULT: {
     /* sqrt(x) = exp(ln(x)/2) */
     METHOD PMC *sqrt() {
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        d = Parrot_Complex_nci_ln(INTERP, SELF);
+
+        d      = Parrot_Complex_nci_ln(INTERP, SELF);
         RE(d) *= 0.5;
         IM(d) *= 0.5;
-        d = Parrot_Complex_nci_exp(INTERP, d);
-        return d;
+
+        return Parrot_Complex_nci_exp(INTERP, d);
     }
 
 }

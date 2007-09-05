@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2006, The Perl Foundation.
+Copyright (C) 2003-2007, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -8,9 +8,8 @@ src/pmc/integer.pmc - Integer PMC class
 
 =head1 DESCRIPTION
 
-C<Integer> provides an integer for languages
-that want a value-restricted integer type without going to an I
-register.
+C<Integer> provides an integer for languages that want a value-restricted
+integer type without going to an I register.
 
 =head2 Functions
 
@@ -28,14 +27,12 @@ extern PMC *Parrot_BigInt_multiply_int(PARROT_INTERP,
         PMC *pmc, INTVAL value, PMC *dest) ;
 
 static PMC*
-overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, int mmd)
-{
+overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, int mmd) {
     const INTVAL a = VTABLE_get_integer(interp, self);
 
-    if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG)) {
-        real_exception(interp, NULL, ERR_OVERFLOW,
-                "Integer overflow");
-    }
+    if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG))
+        real_exception(interp, NULL, ERR_OVERFLOW, "Integer overflow");
+
     if (self == dest) {
         /* TODO preserve type system */
         VTABLE_morph(interp, self, enum_class_BigInt);
@@ -49,14 +46,12 @@ overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, int mmd)
 }
 
 static PMC*
-overflow_p(PARROT_INTERP, PMC *self, PMC *val, PMC *dest, int mmd)
-{
+overflow_p(PARROT_INTERP, PMC *self, PMC *val, PMC *dest, int mmd) {
     const INTVAL a = VTABLE_get_integer(interp, self);
 
-    if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG)) {
-        real_exception(interp, NULL, ERR_OVERFLOW,
-                "Integer overflow");
-    }
+    if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG))
+        real_exception(interp, NULL, ERR_OVERFLOW, "Integer overflow");
+
     if (self == dest) {
         VTABLE_morph(interp, self, enum_class_BigInt);
         VTABLE_set_integer_native(interp, self, a);
@@ -75,7 +70,6 @@ pmclass Integer extends scalar does integer does scalar {
 
 Create a new Integer with arguments passed according to pdd03.
 
-
 =item C<void init()>
 
 Initializes the integer with a default value of C<0>.
@@ -84,12 +78,12 @@ Initializes the integer with a default value of C<0>.
 
 */
     PMC *instantiate(PMC *sig) {
-        PMC * const ret = new_pmc_header(INTERP, 0);
-        opcode_t *arg_op;
-        INTVAL init = 0;
+        PMC * const ret    = new_pmc_header(INTERP, 0);
+        opcode_t   *arg_op = interp->current_args;
+        INTVAL      init   = 0;
 
-        ret->vtable = INTERP->vtables[SELF->vtable->base_type];
-        arg_op = interp->current_args;
+        ret->vtable        = interp->vtables[SELF->vtable->base_type];
+
         if (SIG_ELEMS(sig) == 2) {
             switch (SIG_ITEM(sig, 1)) {
                 case PARROT_ARG_I:
@@ -104,6 +98,7 @@ Initializes the integer with a default value of C<0>.
                     break;
             }
         }
+
         PMC_int_val(ret) = init;
         return ret;
     }
@@ -129,6 +124,7 @@ Class method to construct an Integer from the string representation C<rep>.
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
+
         /* TODO bigint overflow */
         PMC_int_val(res) = string_to_int(INTERP, rep);
         return res;
@@ -152,7 +148,7 @@ Sets the value of the integer to the value in C<*value>.
 
 =item C<void share()>
 
-
+Sets this PMC as shared and read-only.
 
 =cut
 
@@ -220,7 +216,7 @@ Return a new BigInt PMC with the value of C<SELF>.
 */
     PMC *get_bignum() {
         const INTVAL val = DYNSELF.get_integer();
-        PMC * const ret = pmc_new(INTERP, enum_class_BigInt);
+        PMC * const  ret = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
     }
@@ -237,6 +233,7 @@ Returns the string value of the integer.
     STRING *get_string() {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
+
     STRING *get_repr() {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
@@ -259,8 +256,6 @@ Sets the value of the integer to the value of the C<Integer> C<*value>.
     void set_integer_native(INTVAL value) {
         PMC_int_val(SELF) = value;
     }
-
-
 
 /*
 
@@ -336,9 +331,11 @@ MMD_Integer: {
             const INTVAL a = DYNSELF.get_integer();
             const INTVAL b = VTABLE_get_integer(INTERP, value);
             const INTVAL c = a + b;
+
             if ((c^a) >= 0 || (c^b) >= 0) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+
                 /* need this for e.g. Undef PMC */
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
@@ -352,10 +349,12 @@ MMD_Complex: {
                 VTABLE_morph(INTERP, dest, value->vtable->base_type);
             else
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                     a + VTABLE_get_number_keyed_int(INTERP, value, 0));
             VTABLE_set_number_keyed_int(INTERP, dest, 1,
                     VTABLE_get_number_keyed_int(INTERP, value, 1));
+
             return dest;
         }
 MMD_BigInt: {
@@ -364,6 +363,7 @@ MMD_BigInt: {
 MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_integer() + VTABLE_get_number(INTERP, value));
             return dest;
@@ -371,12 +371,13 @@ MMD_DEFAULT: {
     }
 
     PMC *add_int(INTVAL b, PMC *dest) {
-        /* INTVAL a = PMC_int_val(SELF); */
         const INTVAL a = VTABLE_get_integer(INTERP, SELF);
         const INTVAL c = a + b;
+
         if ((c^a) >= 0 || (c^b) >= 0) {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
         }
@@ -404,6 +405,7 @@ MMD_Integer: {
         }
 MMD_Complex: {
             const INTVAL a = DYNSELF.get_integer();
+
             VTABLE_morph(INTERP, SELF, value->vtable->base_type);
             VTABLE_set_number_native(INTERP, SELF,
                     (FLOATVAL)a +
@@ -420,9 +422,9 @@ MMD_DEFAULT: {
     void i_add_int(INTVAL b) {
         const INTVAL a = DYNSELF.get_integer();
         const INTVAL c = a + b;
-        if ((c^a) >= 0 || (c^b) >= 0) {
+
+        if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
-        }
         else
             overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
     }
@@ -449,9 +451,11 @@ MMD_Integer: {
             const INTVAL a = DYNSELF.get_integer();
             const INTVAL b = VTABLE_get_integer(INTERP, value);
             const INTVAL c = a - b;
+
             if ((c^a) >= 0 || (c^~b) >= 0) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
             }
@@ -464,10 +468,12 @@ MMD_Complex: {
                 VTABLE_morph(INTERP, dest, value->vtable->base_type);
             else
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                     a - VTABLE_get_number_keyed_int(INTERP, value, 0));
             VTABLE_set_number_keyed_int(INTERP, dest, 1,
                     -VTABLE_get_number_keyed_int(INTERP, value, 1));
+
             return dest;
         }
 MMD_BigInt: {
@@ -476,6 +482,7 @@ MMD_BigInt: {
 MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_integer() - VTABLE_get_number(INTERP, value));
             return dest;
@@ -494,9 +501,11 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
     PMC *subtract_int(INTVAL b, PMC *dest) {
         const INTVAL a = DYNSELF.get_integer();
         const INTVAL c = a - b;
+
         if ((c^a) >= 0 || (c^~b) >= 0) {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
         }
@@ -523,14 +532,15 @@ MMD_Integer: {
             const INTVAL a = DYNSELF.get_integer();
             const INTVAL b = VTABLE_get_integer(INTERP, value);
             const INTVAL c = a - b;
-            if ((c^a) >= 0 || (c^~b) >= 0) {
+
+            if ((c^a) >= 0 || (c^~b) >= 0)
                 VTABLE_set_integer_native(INTERP, SELF, c);
-            }
             else
                 overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
         }
 MMD_Complex: {
             const INTVAL a = DYNSELF.get_integer();
+
             VTABLE_morph(INTERP, SELF, value->vtable->base_type);
             VTABLE_set_number_native(INTERP, SELF,
                     (FLOATVAL)a -
@@ -547,9 +557,9 @@ MMD_DEFAULT: {
     void i_subtract_int(INTVAL b) {
         const INTVAL a = DYNSELF.get_integer();
         const INTVAL c = a - b;
-        if ((c^a) >= 0 || (c^~b) >= 0) {
+
+        if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
-        }
         else
             overflow(INTERP, SELF, b, SELF, MMD_SUBTRACT);
     }
@@ -580,6 +590,7 @@ MMD_Integer: {
             if ((double) c == cf) {
                 if (!dest)
                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+
                 VTABLE_set_integer_native(INTERP, dest, c);
                 return dest;
             }
@@ -601,18 +612,21 @@ MMD_DEFAULT: {
             const FLOATVAL valf = VTABLE_get_number(INTERP, value);
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest, valf * PMC_int_val(SELF));
             return dest;
         }
     }
 
     PMC *multiply_int(INTVAL b, PMC *dest) {
-        const INTVAL a = DYNSELF.get_integer();
+        const INTVAL a  = DYNSELF.get_integer();
         const double cf = (double)a * (double)b;
-        const INTVAL c = a * b;
+        const INTVAL c  = a * b;
+
         if ((double) c == cf) {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
         }
@@ -653,12 +667,12 @@ MMD_DEFAULT: {
     }
 
     void i_multiply_int(INTVAL b) {
-        const INTVAL a = DYNSELF.get_integer();
+        const INTVAL a  = DYNSELF.get_integer();
         const double cf = (double)a * (double)b;
-        const INTVAL c = a * b;
-        if ((double) c == cf) {
+        const INTVAL c  = a * b;
+
+        if ((double) c == cf)
             DYNSELF.set_integer_native(c);
-        }
         else
             overflow(INTERP, SELF, b, SELF, MMD_MULTIPLY);
     }
@@ -870,6 +884,7 @@ MMD_DEFAULT: {
                         "int cmodulus by zero");
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, dest,
                     DYNSELF.get_integer() % d);
             return dest;
@@ -970,8 +985,10 @@ MMD_DEFAULT: {
             if (d == 0)
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int modulus by zero");
+
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_integer_native(INTERP, dest,
                     intval_mod(DYNSELF.get_integer(), d));
             return dest;
@@ -982,8 +999,10 @@ MMD_DEFAULT: {
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(DYNSELF.get_integer(), value));
         return dest;
@@ -993,8 +1012,10 @@ MMD_DEFAULT: {
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(DYNSELF.get_integer(), (INTVAL)value));
         return dest;
@@ -1009,6 +1030,7 @@ MMD_DEFAULT: {
             if (d == 0)
                 real_exception(INTERP, NULL, E_ZeroDivisionError,
                         "int modulus by zero");
+
             VTABLE_set_integer_native(INTERP, SELF,
                     intval_mod(DYNSELF.get_integer(), d));
         }
@@ -1018,6 +1040,7 @@ MMD_DEFAULT: {
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
+
         VTABLE_set_integer_native(INTERP, SELF,
                 intval_mod(DYNSELF.get_integer() , value));
     }
@@ -1026,6 +1049,7 @@ MMD_DEFAULT: {
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "int modulus by zero");
+
         VTABLE_set_integer_native(INTERP, SELF,
                 intval_mod(DYNSELF.get_integer() , (INTVAL)value));
     }
@@ -1055,35 +1079,40 @@ TODO Complex and BigInt rhs.
     }
 
     PMC *pow_int(INTVAL b, PMC *dest) {
-        const INTVAL a = DYNSELF.get_integer();
+        const INTVAL a      = DYNSELF.get_integer();
         const INTVAL orig_b = b;
-        INTVAL r;
+        INTVAL       r;
 
         if (b < 0)
             return SUPER(b, dest);
+
         r = 1;
+
         if (a) {
             INTVAL temp = a;
             while (b > 0) {
                 INTVAL prev = r;
                 if (b & 1) {
                     r *= temp;
-                    if (r / temp != prev) {
+                    if (r / temp != prev)
                         return overflow(INTERP, SELF, orig_b, dest, MMD_POW);
-                    }
                 }
+
                 b >>= 1;
                 if (!b)
                     break;
-                prev = temp;
+
+                prev  = temp;
                 temp *= temp;
-                if (prev != 0 && temp / prev != prev) {
+
+                if (prev != 0 && temp / prev != prev)
                     return overflow(INTERP, SELF, orig_b, dest, MMD_POW);
-                }
             }
         }
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, r);
         return dest;
 
@@ -1096,7 +1125,6 @@ TODO Complex and BigInt rhs.
     void i_pow_int(INTVAL value) {
         SELF.pow_int(value, SELF);
     }
-
 
 /*
 
@@ -1167,6 +1195,7 @@ Returns the result of numerically comparing the integer with C<*value>.
 MMD_String: {
             FLOATVAL fdiff =
                 PMC_int_val(SELF) - VTABLE_get_number(INTERP, value);
+
             if (FLOAT_IS_ZERO(fdiff)) {
                 const INTVAL idiff =
                     PMC_int_val(SELF) - VTABLE_get_integer(INTERP, value);
@@ -1230,9 +1259,11 @@ Sets C<dest> to the absolute value of SELF.
 
     PMC *absolute(PMC *dest) {
         const INTVAL a = abs(DYNSELF.get_integer());
+
         /* XXX overlflow for -maxint */
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
 

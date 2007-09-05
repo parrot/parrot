@@ -77,9 +77,11 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
              */
             dest = pmc_new(interp, enum_class_BigInt);
         }
+
         VTABLE_set_integer_native(interp, dest, base);
         Parrot_BigInt_bitwise_shl_int(interp, dest, shift_amount, dest);
     }
+
     return dest;
 }
 
@@ -113,17 +115,19 @@ according to the type of C<*value>.
 
     void assign_pmc(PMC *value) {
         STRING * const s_int = CONST_STRING(INTERP, "Integer");
-        STRING *s_num;
-        STRING *s_str;
+        STRING        *s_num;
+        STRING        *s_str;
+
         if (SELF->vtable->base_type == enum_class_Boolean) {
             /* doesn't morph */
             DYNSELF.morph(value->vtable->base_type);
         }
-        if (value->vtable->base_type == enum_class_Undef ||
-                value->vtable->base_type == enum_class_Undef) {
+
+        if (value->vtable->base_type == enum_class_Undef) {
             DYNSELF.morph(value->vtable->base_type);
             return;
         }
+
         if (VTABLE_isa(INTERP, value, s_int)) {
             const INTVAL v = VTABLE_get_integer(INTERP, value);
             DYNSELF.set_integer_native(v);
@@ -131,6 +135,7 @@ according to the type of C<*value>.
         }
 
         s_num = CONST_STRING(INTERP, "Float");
+
         if (VTABLE_isa(INTERP, value, s_num)) {
             const FLOATVAL v = VTABLE_get_number(INTERP, value);
             DYNSELF.set_number_native(v);
@@ -138,6 +143,7 @@ according to the type of C<*value>.
         }
 
         s_str = CONST_STRING(INTERP, "String");
+
         if (VTABLE_isa(INTERP, value, s_str)) {
             STRING * const v = VTABLE_get_string(INTERP, value);
             DYNSELF.set_string_native(v);
@@ -204,10 +210,12 @@ Adds C<value> to C<SELF> inplace.
     PMC *add(PMC *value, PMC *dest) {
 MMD_Complex: {
             const FLOATVAL a = DYNSELF.get_number();
+
             if (dest)
                 VTABLE_morph(INTERP, dest, value->vtable->base_type);
             else
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                     a + VTABLE_get_number_keyed_int(INTERP, value, 0));
             VTABLE_set_number_keyed_int(INTERP, dest, 1,
@@ -217,6 +225,7 @@ MMD_Complex: {
 MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                     DYNSELF.get_number() + VTABLE_get_number(INTERP, value));
             return dest;
@@ -226,6 +235,7 @@ MMD_DEFAULT: {
     PMC *add_int(INTVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_number() + (FLOATVAL)value);
         return dest;
@@ -234,6 +244,7 @@ MMD_DEFAULT: {
     PMC *add_float(FLOATVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_number() + value);
         return dest;
@@ -242,6 +253,7 @@ MMD_DEFAULT: {
     void i_add(PMC *value) {
 MMD_Complex: {
             const FLOATVAL a = DYNSELF.get_number();
+
             VTABLE_morph(INTERP, SELF, value->vtable->base_type);
             VTABLE_set_number_native(INTERP, SELF,
                     a + VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -294,6 +306,7 @@ MMD_Complex: {
                 VTABLE_morph(INTERP, dest, value->vtable->base_type);
             else
                 dest = pmc_new(INTERP, value->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                     a - VTABLE_get_number_keyed_int(INTERP, value, 0));
             VTABLE_set_number_keyed_int(INTERP, dest, 1,
@@ -312,6 +325,7 @@ MMD_DEFAULT: {
     PMC *subtract_int(INTVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_number() - (FLOATVAL)value);
         return dest;
@@ -320,6 +334,7 @@ MMD_DEFAULT: {
     PMC *subtract_float(FLOATVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_number() - value);
         return dest;
@@ -328,6 +343,7 @@ MMD_DEFAULT: {
     void i_subtract(PMC *value) {
 MMD_Complex: {
             const FLOATVAL a = DYNSELF.get_number();
+
             VTABLE_morph(INTERP, SELF, value->vtable->base_type);
             VTABLE_set_number_native(INTERP, SELF,
                     a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -349,7 +365,6 @@ MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,
             DYNSELF.get_number() - value);
     }
-
 
 /*
 
@@ -373,6 +388,7 @@ MMD_Complex: {
 MMD_DEFAULT: {
             if (!dest)
                 dest = pmc_new(INTERP, SELF->vtable->base_type);
+
             VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_number() * VTABLE_get_number(INTERP, value));
             return dest;
@@ -382,6 +398,7 @@ MMD_DEFAULT: {
     PMC *multiply_int(INTVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
             DYNSELF.get_number() * value);
         return dest;
@@ -390,6 +407,7 @@ MMD_DEFAULT: {
     PMC *multiply_float(FLOATVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
             DYNSELF.get_number() * value);
         return dest;
@@ -412,8 +430,7 @@ MMD_DEFAULT: {
     }
 
     void i_multiply_float(FLOATVAL value) {
-        VTABLE_set_number_native(INTERP, SELF,
-            DYNSELF.get_number() * value);
+        VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() * value);
     }
 
 /*
@@ -444,8 +461,10 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest, DYNSELF.get_number() / d);
         return dest;
     }
@@ -454,8 +473,10 @@ Divides C<SELF> by C<value> inplace.
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest, DYNSELF.get_number() / value);
         return dest;
     }
@@ -464,8 +485,10 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest, DYNSELF.get_number() / value);
         return dest;
     }
@@ -476,6 +499,7 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() / d);
     }
 
@@ -483,6 +507,7 @@ Divides C<SELF> by C<value> inplace.
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() / value);
     }
 
@@ -490,6 +515,7 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF, DYNSELF.get_number() / value);
     }
 
@@ -521,8 +547,10 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floor(DYNSELF.get_number() / d));
         return dest;
@@ -532,8 +560,10 @@ Divides C<SELF> by C<value> inplace.
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floor(DYNSELF.get_number() / value));
         return dest;
@@ -543,8 +573,10 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floor(DYNSELF.get_number() / value));
         return dest;
@@ -556,6 +588,7 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floor(DYNSELF.get_number() / d));
     }
@@ -564,6 +597,7 @@ Divides C<SELF> by C<value> inplace.
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floor(DYNSELF.get_number() / value));
     }
@@ -572,10 +606,10 @@ Divides C<SELF> by C<value> inplace.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float division by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floor(DYNSELF.get_number() / value));
     }
-
 
 /*
 
@@ -607,19 +641,23 @@ the result in C<dest>.
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 fmod(DYNSELF.get_number(), d));
         return dest;
     }
 
     PMC *cmodulus_float(FLOATVAL value, PMC *dest) {
-        if (value == 0.0)
+        if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 fmod(DYNSELF.get_number(), value));
         return dest;
@@ -629,18 +667,22 @@ the result in C<dest>.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 fmod(DYNSELF.get_number(), value));
         return dest;
     }
+
     void i_cmodulus(PMC *value) {
         FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 fmod(DYNSELF.get_number() , d));
     }
@@ -649,6 +691,7 @@ the result in C<dest>.
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 fmod(DYNSELF.get_number() , value));
     }
@@ -657,6 +700,7 @@ the result in C<dest>.
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float cmodulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 fmod(DYNSELF.get_number() , value));
     }
@@ -690,8 +734,10 @@ Calculates modulus inplace
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(DYNSELF.get_number(), d));
         return dest;
@@ -701,8 +747,10 @@ Calculates modulus inplace
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(DYNSELF.get_number(), value));
         return dest;
@@ -712,8 +760,10 @@ Calculates modulus inplace
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(DYNSELF.get_number(), value));
         return dest;
@@ -725,6 +775,7 @@ Calculates modulus inplace
         if (FLOAT_IS_ZERO(d))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floatval_mod(DYNSELF.get_number() , d));
     }
@@ -733,6 +784,7 @@ Calculates modulus inplace
         if (value == 0)
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floatval_mod(DYNSELF.get_number() , value));
     }
@@ -741,6 +793,7 @@ Calculates modulus inplace
         if (FLOAT_IS_ZERO(value))
             real_exception(INTERP, NULL, E_ZeroDivisionError,
                     "float modulus by zero");
+
         VTABLE_set_number_native(INTERP, SELF,
                 floatval_mod(DYNSELF.get_number() , value));
     }
@@ -773,22 +826,25 @@ Calculates pow inplace
 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest,
-                pow(DYNSELF.get_number(), d));
+
+        VTABLE_set_number_native(INTERP, dest, pow(DYNSELF.get_number(), d));
         return dest;
     }
 
     PMC *pow_int(INTVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 pow(DYNSELF.get_number(), value));
+
         return dest;
     }
 
     PMC *pow_float(FLOATVAL value, PMC *dest) {
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_number_native(INTERP, dest,
                 pow(DYNSELF.get_number(), value));
         return dest;
@@ -825,8 +881,10 @@ Set C<dest> to the negated value of C<SELF>.
 
     PMC *neg(PMC *dest) {
         const INTVAL a = -DYNSELF.get_integer();
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
     }
@@ -864,6 +922,7 @@ Inplace bitwise or.
 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
@@ -871,14 +930,18 @@ Inplace bitwise or.
 
     PMC *bitwise_or_int(INTVAL value, PMC *dest) {
         const INTVAL result = DYNSELF.get_integer() | value;
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     void i_bitwise_or(PMC *value) {
-        const INTVAL result = DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+        const INTVAL result =
+            DYNSELF.get_integer() | VTABLE_get_integer(INTERP, value);
+
         DYNSELF.set_integer_native(result);
     }
 
@@ -907,23 +970,29 @@ Inplace bitwise and.
 */
 
     PMC *bitwise_and(PMC *value, PMC *dest) {
-        const INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+        const INTVAL result =
+            DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     PMC *bitwise_and_int(INTVAL value, PMC *dest) {
         const INTVAL result = DYNSELF.get_integer() & value;
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     void i_bitwise_and(PMC *value) {
-        const INTVAL result = DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
+        const INTVAL result =
+            DYNSELF.get_integer() & VTABLE_get_integer(INTERP, value);
         DYNSELF.set_integer_native(result);
     }
 
@@ -952,23 +1021,29 @@ Inplace bitwise and.
 */
 
     PMC *bitwise_xor(PMC *value, PMC *dest) {
-        const INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+        const INTVAL result =
+            DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
         const INTVAL result = DYNSELF.get_integer() ^ value;
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     void i_bitwise_xor(PMC *value) {
-        const INTVAL result = DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
+        const INTVAL result =
+            DYNSELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
         DYNSELF.set_integer_native(result);
     }
 
@@ -991,8 +1066,10 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
 
     PMC *bitwise_not(PMC *dest) {
         const INTVAL a = ~DYNSELF.get_integer();
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
     }
@@ -1000,7 +1077,6 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
     void i_bitwise_not() {
         VTABLE_set_integer_native(INTERP, SELF, ~DYNSELF.get_integer());
     }
-
 
 /*
 
@@ -1064,16 +1140,20 @@ Inplace shift right.
     PMC *bitwise_lsr(PMC *value, PMC *dest) {
         const INTVAL result = (UINTVAL)DYNSELF.get_integer() >>
             VTABLE_get_integer(INTERP, value);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
 
     PMC *bitwise_lsr_int(INTVAL value, PMC *dest) {
         const INTVAL result = (UINTVAL)DYNSELF.get_integer() >> value;
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
     }
@@ -1152,11 +1232,12 @@ Concatenate the string C<value> in place.
 */
 
     PMC *concatenate(PMC *value,  PMC *dest) {
-        STRING * const s = string_concat(INTERP,
-            DYNSELF.get_string(),
+        STRING * const s = string_concat(INTERP, DYNSELF.get_string(),
             VTABLE_get_string(INTERP, value), 0);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_string_native(INTERP, dest, s);
         return dest;
     }
@@ -1164,8 +1245,10 @@ Concatenate the string C<value> in place.
     PMC *concatenate_str(STRING *value,  PMC *dest) {
         STRING * const s = string_concat(INTERP,
             DYNSELF.get_string(), value, 0);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_string_native(INTERP, dest, s);
         return dest;
     }
@@ -1201,9 +1284,11 @@ Repeat the string C<SELF> in place C<value> times.
 
     PMC *repeat(PMC *value,  PMC *dest) {
         STRING * const s = DYNSELF.get_string();
-        const UINTVAL n = (UINTVAL)VTABLE_get_integer(INTERP, value);
+        const UINTVAL  n = (UINTVAL)VTABLE_get_integer(INTERP, value);
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_string_native(INTERP, dest,
             string_repeat(INTERP, s, n, NULL));
         return dest;
@@ -1211,9 +1296,11 @@ Repeat the string C<SELF> in place C<value> times.
 
     PMC *repeat_int(INTVAL value, PMC *dest) {
         STRING * const s = DYNSELF.get_string();
-        const UINTVAL n = value;
+        const UINTVAL  n = value;
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_string_native(INTERP, dest,
             string_repeat(INTERP, s, n, NULL));
         return dest;
@@ -1222,13 +1309,13 @@ Repeat the string C<SELF> in place C<value> times.
 
     void i_repeat(PMC *value) {
         STRING * const s = DYNSELF.get_string();
-        const UINTVAL n = (UINTVAL)VTABLE_get_integer(INTERP, value);
+        const UINTVAL  n = (UINTVAL)VTABLE_get_integer(INTERP, value);
         DYNSELF.set_string_native(string_repeat(INTERP, s, n, NULL));
     }
 
     void i_repeat_int(INTVAL value) {
         STRING * const s = DYNSELF.get_string();
-        const UINTVAL n = value;
+        const UINTVAL  n = value;
         DYNSELF.set_string_native(string_repeat(INTERP, s, n, NULL));
     }
 
@@ -1293,9 +1380,9 @@ C<SELF> it is true or C<value>: C<dest> is alway ignored.
 */
 
     PMC *logical_or(PMC *value,  PMC *dest) {
-        if (DYNSELF.get_bool()) {
+        if (DYNSELF.get_bool())
             return SELF;
-        }
+
         return value;
     }
 
@@ -1311,9 +1398,9 @@ returns C<value> if C<SELF> is true else C<SELF>. C<dest> is always ignored.
 */
 
     PMC *logical_and(PMC *value,  PMC *dest) {
-        if (DYNSELF.get_bool()) {
+        if (DYNSELF.get_bool())
             return value;
-        }
+
         return SELF;
     }
 
@@ -1328,15 +1415,14 @@ Returns the result of the logical C<XOR> of C<SELF> and C<*value>.
 */
 
     PMC *logical_xor(PMC *value,  PMC *dest) {
-        const INTVAL my_bool = DYNSELF.get_bool();
+        const INTVAL my_bool    = DYNSELF.get_bool();
         const INTVAL value_bool = VTABLE_get_bool(INTERP, value);
 
-        if (my_bool && ! value_bool) {
+        if (my_bool && ! value_bool)
             return SELF;
-        }
-        else if (value_bool && ! my_bool) {
+        else if (value_bool && ! my_bool)
             return value;
-        }
+
         dest = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_bool(INTERP, dest, 0);
         return dest;
@@ -1357,8 +1443,10 @@ C<*value>.
 
     PMC *logical_not(PMC *dest) {
         const INTVAL a = ! DYNSELF.get_bool();
+
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
+
         VTABLE_set_bool(INTERP, dest, a);
         return dest;
     }
@@ -1381,7 +1469,6 @@ Always returns true.
         return 1;
     }
 
-
 /*
 
 =item C<STRING *substr_str(INTVAL offset, INTVAL length)>
@@ -1394,7 +1481,7 @@ C<offset>.
 */
 
     STRING *substr_str(INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, VTABLE_get_string(INTERP,SELF),
+        return string_substr(INTERP, VTABLE_get_string(INTERP, SELF),
             offset, length, NULL, 0);
     }
 
@@ -1408,16 +1495,13 @@ Sets this PMC as shared and read-only.
 
 */
     PMC *share_ro() {
-        PMC *ret;
-
+        PMC         *ret  = pt_shared_fixup(INTERP, SELF);
         PMC * const _true = pmc_new(INTERP, enum_class_Integer);
-        VTABLE_set_integer_native(INTERP, _true, 1);
 
-        ret = pt_shared_fixup(INTERP, SELF);
+        VTABLE_set_integer_native(INTERP, _true, 1);
 
         /* first set readonly */
         VTABLE_setprop(INTERP, ret, const_string(INTERP, "_ro"), _true);
-
 
         /* now share; we add a PMC_EXT so we can identify the owning interp */
         add_pmc_sync(INTERP, ret);
