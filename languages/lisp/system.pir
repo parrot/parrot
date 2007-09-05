@@ -25,6 +25,17 @@ Used in bootstrapping.
     .local pmc dummy_2
     .local pmc dummy_3
     .local pmc dummy_4
+    .local pmc dummy_5
+    .local pmc dummy_6
+    .local pmc dummy_7
+    .local pmc dummy_8
+    .local pmc dummy_9
+    .local pmc dummy_10
+    .local pmc dummy_11
+    .local pmc dummy_12
+    .local pmc dummy_13
+    .local pmc dummy_14
+    .local pmc dummy_15
 
     _init_reader_macros( package )
 

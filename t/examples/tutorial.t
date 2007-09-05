@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Parrot::Config;
 
 =head1 NAME
@@ -163,6 +163,12 @@ END_EXPECTED
     '56_defined.pir' => << 'END_EXPECTED',
 $P1 is defined
 $P3 is undefined
+END_EXPECTED
+
+
+    '57_exists.pir' => << 'END_EXPECTED',
+my_array[0] is defined and it exists
+my_array[1] exists
 END_EXPECTED
 
     '60_subroutines.pir' => << 'END_EXPECTED',
