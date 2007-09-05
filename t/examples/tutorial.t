@@ -135,14 +135,18 @@ before branch
 after branch
 END_EXPECTED
 
-    '51_if_unless.pir' => << 'END_EXPECTED',
-before if
-after if
-
-before unless
-is printed
-after unless
-END_EXPECTED
+##
+## Output for when the test is not marked as TODO anymore.
+##
+#    '51_if_unless.pir' => << 'END_EXPECTED',
+#before if
+#after if
+#
+#before unless
+#is printed
+#after unless
+#-0.0 was false
+#END_EXPECTED
 
     '52_if_compare.pir' => << 'END_EXPECTED',
 before if
@@ -238,6 +242,20 @@ TODO:
     local $TODO = 'some examples not passing yet';
     fail('11_math_ops_self_mod.pir');
     fail('12_math_ops_pasm.pir');
+}
+
+TODO:
+{
+    local $TODO = 'RT#45209 parrot considers -0.0 true';
+    example_output_is( "examples/tutorial/51_if_unless.pir", << 'END_EXPECTED' );
+before if
+after if
+
+before unless
+is printed
+after unless
+-0.0 was false
+END_EXPECTED
 }
 
 # cleanup
