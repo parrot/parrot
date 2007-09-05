@@ -18,9 +18,10 @@ use_ok('Parrot::Configure::Step::List', qw|
 $| = 1;
 is($|, 1, "output autoflush is set");
 
-my $CC = "/usr/bin/gcc-3.3";
+my $testopt     = q{bindir};
+my $testoptval  = q{mybindir};
 my $localargv = [
-    qq{--cc=$CC},
+    qq{--$testopt=$testoptval},
 ];
 my $args = process_options( {
     mode            => q{configure},
@@ -36,11 +37,11 @@ isa_ok($conf, "Parrot::Configure");
 $conf->add_steps(get_steps_list());
 
 $conf->options->set(%args);
-is($conf->options->{c}->{cc}, $CC,
-    "command-line option '--cc' has been stored in object");
+is($conf->options->{c}->{$testopt}, $testoptval,
+    "command-line option '--$testopt' has been stored in object");
 
-my $val = $conf->option_or_data('cc');
-is($val, $CC, 'option_or_data() returned expected value');
+my $val = $conf->option_or_data($testopt);
+is($val, $testoptval, 'option_or_data() returned expected value');
 
 pass("Completed all tests in $0");
 
@@ -58,7 +59,10 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-This file tests C<Parrot::Configure::option_or_data()>.
+This file tests C<Parrot::Configure::option_or_data()> in the case where
+a value for the tested option has been set on the command line but
+where no value for the tested option has been located internally by a
+configuration step.
 
 =head1 AUTHOR
 

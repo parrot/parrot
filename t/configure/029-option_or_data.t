@@ -6,13 +6,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 15;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
 use_ok('config::init::install');
-use_ok('config::init::hints');
-use_ok('config::inter::progs');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
@@ -23,9 +21,10 @@ use_ok('Parrot::Configure::Step::List', qw|
 $| = 1;
 is($|, 1, "output autoflush is set");
 
-my $CC = "/usr/bin/gcc-3.3";
+my $testopt     = q{bindir};
+my $testoptval  = q{mybindir};
 my $localargv = [
-    qq{--cc=$CC},
+    qq{--$testopt=$testoptval},
 ];
 my $args = process_options( {
     mode            => q{configure},
@@ -36,16 +35,14 @@ ok(defined $args, "process_options returned successfully");
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep($conf, q{init::defaults}, $args);
-test_step_thru_runstep($conf, q{init::install}, $args);
-test_step_thru_runstep($conf, q{init::hints}, $args);
 
 my ($task, $step_name, @step_params, $step, $ret);
-my $pkg = q{inter::progs};
+my $pkg = q{init::install};
 
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
 
-$task = $conf->steps->[3];
+$task = $conf->steps->[1];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
@@ -53,14 +50,12 @@ $step = $step_name->new();
 ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
-$ret = $step->runstep($conf);
-ok(defined $ret, "$step_name runstep() returned defined value");
 
-TODO: {
-    local $TODO = 'not working for all C compilers';
-    my $val = $conf->option_or_data('cc');
-    is($val, $CC, 'option_or_data() returned expected value');
-}
+is($conf->options->{c}->{$testopt}, $testoptval,
+    "command-line option '--$testopt' has been stored in object");
+
+my $val = $conf->option_or_data($testopt);
+is($val, $testoptval, 'option_or_data() returned expected value');
 
 pass("Completed all tests in $0");
 
@@ -78,7 +73,10 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-This file tests C<Parrot::Configure::option_or_data()>.
+This file tests C<Parrot::Configure::option_or_data()> in the case where
+a value for the tested option has been set on the command line and a
+value for the tested option has been located internally by a
+configuration step.
 
 =head1 AUTHOR
 

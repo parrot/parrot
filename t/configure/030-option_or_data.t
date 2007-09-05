@@ -20,6 +20,8 @@ use_ok('Parrot::Configure::Step::List', qw|
 $| = 1;
 is($|, 1, "output autoflush is set");
 
+my $testopt     = q{bindir};
+my $testoptval  = q{mybindir};
 my $localargv = [ ];
 my $args = process_options( {
     mode            => q{configure},
@@ -48,7 +50,7 @@ my $bigmsg = join q{}, @lines;
 like($bigmsg,
     qr/$description/s,
     "Got message expected upon running $step");
-ok(! defined ($conf->option_or_data('cc') ),
+ok(! defined ($conf->option_or_data($testopt) ),
     "option_or_data returned undef; neither option nor data had been defined");
 
 pass("Completed all tests in $0");
@@ -67,7 +69,10 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-This file tests C<Parrot::Configure::option_or_data()>.
+This file tests C<Parrot::Configure::option_or_data()> in the case where
+no value for the tested option has been set on the command line but
+where no value for the tested option has been located internally by a
+configuration step.
 
 =head1 AUTHOR
 
