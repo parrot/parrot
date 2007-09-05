@@ -171,7 +171,9 @@ END_EXPECTED
 
 
     '57_exists.pir' => << 'END_EXPECTED',
-my_array[0] is defined and it exists
+my_array[0] is defined
+my_array[0] exists
+my_array[1] is not defined
 my_array[1] exists
 my_array[2] is not defined
 my_array[2] does not exist
