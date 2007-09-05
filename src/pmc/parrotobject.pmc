@@ -44,7 +44,7 @@ C<Parrot_instantiate_object()>.
 
     void init() {
         real_exception(interp, NULL, E_NotImplementedError,
-                "Can't create new ParrotObjects - "
+            "Can't create new ParrotObjects - "
             "use the registered class instead");
     }
 
@@ -75,31 +75,33 @@ TODO
 */
 
     void destroy() {
-        PMC *_class;
-        PMC *meth, *ns;
+        PMC    *_class, *meth, *ns;
         STRING *fin;
 
         /* XXX have a better way to check for dead objects or classes
          */
         if ((UINTVAL)SELF->vtable == 0xdeadbeef)
             return;
+
         _class = SELF->vtable->pmc_class;
+
         if ((UINTVAL)_class->vtable == 0xdeadbeef)
             return;
+
         if (PObj_get_FLAGS(SELF) & PObj_need_finalize_FLAG) {
-            fin = CONST_STRING(INTERP, "__finalize");
-            ns = VTABLE_pmc_namespace(interp, _class);
+            fin  = CONST_STRING(INTERP, "__finalize");
+            ns   = VTABLE_pmc_namespace(interp, _class);
             meth = VTABLE_get_pmc_keyed_str(interp, ns, fin);
-            if (!PMC_IS_NULL(meth)) {
-                /*
-                   TODO
-                   - catch exceptions
-                   - run some safe mode
-                   - run all finalizers in mro order?
-                 */
+
+            /* TODO
+             *  - catch exceptions
+             *  - run some safe mode
+             *  - run all finalizers in mro order?
+             */
+            if (!PMC_IS_NULL(meth))
                 Parrot_runops_fromc_args_event(interp, meth, "vP", SELF);
-            }
         }
+
         SUPER();
     }
 
@@ -158,7 +160,8 @@ Return the class of this object.
 
         if (PMC_IS_NULL(sub))
             return VTABLE_find_method(INTERP, _class, name);
-        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
+
+        return (PMC *)Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PS", name);
     }
 
@@ -168,7 +171,8 @@ Return the class of this object.
 
         if (PMC_IS_NULL(sub))
             return Parrot_get_attrib_by_num(INTERP, SELF, idx);
-        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
+
+        return (PMC *)Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PI", idx);
     }
 
@@ -179,7 +183,7 @@ Return the class of this object.
         if (PMC_IS_NULL(sub))
             return Parrot_get_attrib_by_str(INTERP, SELF, idx);
 
-        return (PMC *) Parrot_run_meth_fromc_args(interp, sub,
+        return (PMC *)Parrot_run_meth_fromc_args(interp, sub,
             SELF, meth, "PS", idx);
     }
 
@@ -223,7 +227,8 @@ Return the class of this object.
                 return INTERP->vtables[type_num]->pmc_class;
             }
         }
-        return (PMC *) Parrot_run_meth_fromc_args(interp, sub, SELF, meth, "P");
+
+        return (PMC *)Parrot_run_meth_fromc_args(interp, sub, SELF, meth, "P");
     }
 
 /*
@@ -280,6 +285,7 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
+
         return Parrot_run_meth_fromc_args_reti(INTERP, sub,
                                                pmc, meth, "II", key);
     }
@@ -303,6 +309,7 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
+
         return Parrot_run_meth_fromc_args_retf(INTERP, sub,
                                                pmc, meth, "NI", key);
     }
@@ -326,6 +333,7 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
+
         return (STRING*)Parrot_run_meth_fromc_args(INTERP, sub,
                                                    pmc, meth, "SI", key);
     }
@@ -349,7 +357,8 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
-        return (PMC*)Parrot_run_meth_fromc_args(INTERP, sub,
+
+        return (PMC *)Parrot_run_meth_fromc_args(INTERP, sub,
                                                 pmc, meth, "PI", key);
     }
 
@@ -396,9 +405,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-        else
-            Parrot_run_meth_fromc_args(INTERP, sub,
-                                       pmc, meth, "vIN", key, value);
+
+        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIN", key, value);
     }
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
@@ -420,9 +428,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-        else
-            Parrot_run_meth_fromc_args(INTERP, sub,
-                                       pmc, meth, "vIS", key, value);
+
+        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIS", key, value);
     }
 
     void set_pmc_keyed_int(INTVAL key, PMC *value) {
@@ -444,9 +451,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-        else
-            Parrot_run_meth_fromc_args(INTERP, sub,
-                                       pmc, meth, "vIP", key, value);
+
+        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIP", key, value);
     }
 
     void delete_keyed_int(INTVAL key) {
@@ -468,9 +474,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key);
             }
         }
-        else
-            Parrot_run_meth_fromc_args(INTERP, sub,
-                                       pmc, meth, "vI", key);
+
+        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vI", key);
     }
 
     INTVAL defined_keyed_int(INTVAL key) {
@@ -492,6 +497,7 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
+
         return Parrot_run_meth_fromc_args_reti(INTERP, sub,
                                                pmc, meth, "II", key);
     }
@@ -515,14 +521,13 @@ it's just SUPER aka the default implementation.
                 return deleg_pmc.SUPER(key);
             }
         }
+
         return Parrot_run_meth_fromc_args_reti(INTERP, sub,
                                                pmc, meth, "II", key);
     }
 
     PMC *share_ro() {
-        PMC *ret;
-        PMC *_true;
-        PMC **data;
+        PMC   *ret, *_true, **data;
         INTVAL i, n;
 
         if (PObj_is_PMC_shared_TEST(SELF))
@@ -536,7 +541,7 @@ it's just SUPER aka the default implementation.
         PObj_is_PMC_shared_SET(SELF);
 
         n    = PMC_int_val(ret);
-        data = (PMC **) PMC_data(ret);
+        data = (PMC **)PMC_data(ret);
 
         for (i = 0; i < n; ++i)
             data[i] = VTABLE_share_ro(INTERP, data[i]);
@@ -551,6 +556,7 @@ it's just SUPER aka the default implementation.
             PARROT_ASSERT(ret->vtable->share_ro == Parrot_ParrotObject_share_ro);
             SET_CLASS((SLOTTYPE *) PMC_data(ret), ret, new_class);
         }
+
         return ret;
     }
 
@@ -577,23 +583,23 @@ Used to unarchive the object.
 */
 
     void visit(visit_info *info) {
-        PMC **class_data, **pos;
         INTVAL i, n;
-
-        class_data = (PMC **)PMC_data(SELF);
+        PMC  **class_data = (PMC **)PMC_data(SELF);
 
         /* 1) visit class */
-        pos = &SELF->vtable->pmc_class;
+        PMC **pos      = &SELF->vtable->pmc_class;
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
 
         /* 2) visit the attributes */
         n = PMC_int_val(SELF);
+
         for (i = 0; i < n; ++i) {
             info->thaw_ptr = class_data + i;
             (info->visit_pmc_now)(INTERP, class_data[i], info);
         }
     }
+
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));

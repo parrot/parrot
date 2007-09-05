@@ -42,7 +42,7 @@ static const char *
 caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
-    VTABLE_name(interp, pmc)->strstart : "(null)";
+        VTABLE_name(interp, pmc)->strstart : "(null)";
 }
 
 /*
@@ -100,11 +100,11 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
     /*
      * s2 in string_compare is freed here
      */
-    if (!string_compare(interp, key,
-        string_from_cstring(interp, "_ro", 3))) {
+    if (!string_compare(interp, key, string_from_cstring(interp, "_ro", 3))) {
 #endif
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
+
         /* morph to Const/normal class or readonly class */
         /* XXX warn when this fails? */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
@@ -121,6 +121,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
 
         return 1;
     }
+
     return 0;
 }
 
@@ -138,7 +139,7 @@ Set pending standard properties in C<prop_hash>.
 static void
 propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
-        PMC * const pmc_true = pmc_new(interp, enum_class_Integer);
+        PMC * const pmc_true  = pmc_new(interp, enum_class_Integer);
         PMC_int_val(pmc_true) = 1;
         VTABLE_set_pmc_keyed_str(interp, prop_hash,
             string_from_cstring(interp, "_ro", 3), pmc_true);
@@ -179,9 +180,8 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!string_compare(interp, key,
-                          string_from_cstring(interp, "_ro", 3))) {
-        PMC * const ret_val = pmc_new(interp, enum_class_Integer);
+        &&!string_compare(interp, key, string_from_cstring(interp, "_ro", 3))) {
+        PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
         PMC_int_val(ret_val) = 1;
         return ret_val;
     }
@@ -232,15 +232,20 @@ static INTVAL
 does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
 {
     INTVAL pos = 0;
+
     do {
         INTVAL len;
 
         pos = string_str_index(interp, what, method, pos);
+
         if (pos < 0)
             return 0;
+
         if (pos >= (INTVAL)string_length(interp, what))
             return 0;
+
         len = string_length(interp, method);
+
         if (pos && string_index(interp, what, pos - 1) != 32) {
             pos += len;
             continue;
@@ -251,8 +256,10 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
             pos += len;
             continue;
         }
+
         return 1;
     } while (1);
+
     return 0;
 }
 
@@ -309,7 +316,7 @@ calls init().
 
     PMC *instantiate(PMC *sig) {
         const INTVAL type = SELF->vtable->base_type;
-        PMC *const ret = pmc_new_noinit(INTERP, type);
+        PMC *const   ret  = pmc_new_noinit(INTERP, type);
         VTABLE_init(INTERP, ret);
         return ret;
     }
@@ -340,12 +347,10 @@ NULL PMC is returned.
 */
 
     PMC *getprop(STRING *key) {
-        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+        if (SELF->pmc_ext && PMC_metadata(SELF))
             return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
-        }
-        else {
+        else
             return check_get_std_props(interp, SELF, key);
-        }
     }
 
 /*
@@ -359,9 +364,9 @@ Sets the property for C<*key> to C<*value>.
 */
 
     void setprop(STRING *key, PMC *value) {
-        if (check_set_std_props(INTERP, SELF, key, value)) {
+        if (check_set_std_props(INTERP, SELF, key, value))
             return;
-        }
+
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
             VTABLE_set_pmc_keyed_str(INTERP,
                 PMC_metadata(SELF), key, value);
@@ -371,11 +376,7 @@ Sets the property for C<*key> to C<*value>.
 
             /* XXX is this too late for --gc-debug? */
             VTABLE_set_pmc_keyed_str(INTERP, prop, key, value);
-#if 0
-    PObj_report_SET(PMC_metadata(SELF));
-#endif
         }
-        return;
     }
 
 /*
@@ -389,10 +390,8 @@ Deletes the property for C<*key>.
 */
 
     void delprop(STRING *key) {
-        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+        if (SELF->pmc_ext && PMC_metadata(SELF))
             VTABLE_delete_keyed_str(INTERP, PMC_metadata(SELF), key);
-        }
-        return;
     }
 
 /*
@@ -408,12 +407,14 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
     PMC *getprops() {
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
+
         if (!PMC_metadata(SELF)) {
             if (has_pending_std_props(SELF))
                 return make_prop_hash(INTERP, SELF);
             else
                 return PMCNULL;
         }
+
         return PMC_metadata(SELF);
     }
 
@@ -491,8 +492,7 @@ Store the method as a global in the namespace of this class.
     }
 
     void add_method(STRING *method_name, PMC *sub_pmc) {
-        VTABLE_set_pmc_keyed_str(INTERP,
-                                 SELF->vtable->_namespace,
+        VTABLE_set_pmc_keyed_str(INTERP, SELF->vtable->_namespace,
                                  method_name, sub_pmc);
     }
 /*
@@ -692,7 +692,6 @@ and C<value>.
         DYNSELF.set_number_keyed(r_key, value);
     }
 
-
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *string)>
@@ -752,9 +751,9 @@ Returns whether the PMC is equal to C<*value>.
 */
 
     INTVAL is_equal(PMC *value) {
-        return (SELF->vtable == value->vtable
-            && PMC_struct_val(SELF) == PMC_struct_val(value)
-            && PMC_data(SELF) == PMC_data(value));
+        return (SELF->vtable         == value->vtable
+            &&  PMC_struct_val(SELF) == PMC_struct_val(value)
+            &&  PMC_data(SELF)       == PMC_data(value));
     }
 
 /*
@@ -784,7 +783,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
     INTVAL is_equal_str(PMC *value) {
         return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
-                                       VTABLE_get_string(INTERP, value)));
+                                          VTABLE_get_string(INTERP, value)));
     }
 
 /*
@@ -818,7 +817,6 @@ Returns true.
     INTVAL defined() {
         return 1;
     }
-
 
 /*
 
@@ -867,7 +865,6 @@ C<nextkey_keyed()> with it.
         return DYNSELF.nextkey_keyed(r_key, w);
     }
 
-
 /*
 
 =item C<INTVAL can(STRING *method)>
@@ -884,7 +881,6 @@ true (1) is returned; otherwise, false (0) is returned.
         return !PMC_IS_NULL(VTABLE_find_method(INTERP, SELF, method));
     }
 
-
 /*
 
 =item C<INTVAL does(STRING *interface)>
@@ -900,7 +896,6 @@ true (1) is returned; otherwise, false (0) is returned.
     INTVAL does(STRING *_interface) {
         return does_isa(INTERP, _interface, SELF->vtable->does_str);
     }
-
 
 /*
 
@@ -952,14 +947,15 @@ Look for NCI methods and properties.
     }
 
     PMC *get_attr_str(STRING *name) {
-        PMC        *p = NULL;
+        PMC *p = NULL;
 
         /* let's look for props first
          * XXX do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
              const HashBucket * const b =
-                 parrot_hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
+                parrot_hash_get_bucket(INTERP, (Hash *)PMC_metadata(SELF),name);
+
              if (b)
                  p = (PMC *)b->value;
         }
@@ -973,7 +969,7 @@ Look for NCI methods and properties.
         }
         else if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
             PMC * const bound_meth = VTABLE_clone(INTERP, p);
-            bound_meth->vtable = interp->vtables[enum_class_Bound_NCI];
+            bound_meth->vtable     = interp->vtables[enum_class_Bound_NCI];
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
 
             return bound_meth;
@@ -1020,9 +1016,11 @@ Used by DOD to mark the PMC.
         if (SELF->pmc_ext && PMC_metadata(SELF) &&
             info->extra_flags != EXTRA_IS_PROP_HASH) {
             info->extra_flags = EXTRA_IS_PROP_HASH;
-            info->extra = PMC_metadata(SELF);
+            info->extra       = PMC_metadata(SELF);
+
             /* place escape mark */
             (info->visit_pmc_now)(INTERP, SELF, info);
+
             /* place and the prop hash */
             (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
         }
@@ -1057,8 +1055,10 @@ Initializes the PMC during unarchiving.
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             if (!SELF->pmc_ext)
                 add_pmc_ext(INTERP, SELF);
-            info->thaw_ptr = &PMC_metadata(SELF);
+
+            info->thaw_ptr  = &PMC_metadata(SELF);
             info->container = SELF;
+
             (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
         }
         else
