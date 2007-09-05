@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 78;
+use Parrot::Test tests => 80;
 
 =head1 NAME
 
@@ -449,6 +449,41 @@ CODE
 ok 1
 Foo.i Foo.j Bar.j Bar.k
 Foo.i Foo.j Bar.j Bar.k
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "addmethod" );
+
+.sub main :main
+
+		newclass $P0, 'Foo'
+		$P2 = get_global  'sayFoo'
+
+		# add a method BEFORE creating a Foo object
+		addmethod $P0, 'foo', $P2
+		$P1 = new 'Foo'
+		$P1.'foo'()
+		
+		# get a method from some other namespace
+		$P2 = get_global ['Bar'], 'sayBar'
+				
+		# add a method AFTER creating	the object	
+		addmethod $P0, 'bar', $P2
+		$P1.'bar'()		
+.end
+
+.sub sayFoo
+	print "foo\n"
+.end
+
+.namespace ['Bar']
+
+.sub sayBar 
+	print "bar\n"
+.end
+
+CODE
+foo
+bar
 OUTPUT
 
 pasm_output_like( <<'CODE', <<'OUTPUT', "classoffset: normal operation" );
@@ -2193,6 +2228,37 @@ pir_output_is( <<'CODE', <<'OUTPUT', "vtable override once removed (#39056)" );
 CODE
 ok bar
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', ":vtable fails for subclasses of core classes - (#40626)" );
+.sub main :main
+	$P0 = subclass 'Hash', 'Foo'
+	$P0 = subclass 'Hash', 'Bar'
+	
+	$P1 = new 'Foo'
+	$S1 = $P1
+	say $S1
+	
+	$P1 = new 'Bar'
+	$S1 = $P1
+	say $S1
+.end
+
+.namespace [ 'Foo' ]
+
+.sub '__get_string' :method
+	.return('Hello world')
+.end
+
+.namespace [ 'Bar' ]
+
+.sub 'get_string' :method :vtable
+	.return('Hello world')
+.end
+CODE
+Hello world
+Hello world
+OUTPUT
+
 
 pir_output_is( <<'CODE', <<'OUTPUT', "super __init called twice (#39081)" );
 .sub main :main
