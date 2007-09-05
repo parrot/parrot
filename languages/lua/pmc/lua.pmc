@@ -275,13 +275,12 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<PMC* tmpname()>
+=item C<STRING* tmpname()>
 
 =cut
 
 */
-    METHOD PMC* tmpname() {
-        PMC *retval;
+    METHOD STRING* tmpname() {
         char buff[32];
         int e;
 #ifdef WIN32
@@ -297,10 +296,7 @@ information see F<src/pmc.c>.
                            "unable to generate a unique filename");
             return NULL;
         }
-        retval = pmc_new(INTERP, dynpmc_LuaString);
-        VTABLE_set_string_native(INTERP, retval,
-                                 string_from_cstring(INTERP, buff, 0));
-        return retval;
+        return string_from_cstring(INTERP, buff, 0);
     }
 
 /*

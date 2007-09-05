@@ -518,7 +518,9 @@ when no longer needed.
     .param pmc extra :slurpy
     .local pmc res
     new $P0, 'Lua'
-    res = $P0.'tmpname'()
+    $S0 = $P0.'tmpname'()
+    new res, 'LuaString'
+    set res, $S0
     .return (res)
 .end
 
