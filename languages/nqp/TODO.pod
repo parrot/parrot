@@ -1,0 +1,49 @@
+## $Id: README.pod 20863 2007-08-26 18:47:04Z coke $
+
+=head1 Things that NQP needs
+
+This list is based on discussions with pmichaud and unimplemented
+items in the grammar, C<src/Grammar.pg>.
+
+=head2 Code
+
+=over 4
+
+=item * return
+
+Return needs to work on an exception model, and may require PAST/POST changes
+to support it.
+
+=item * $( ... )
+
+Scalar context
+
+=item * @( ... )
+
+List/array context
+
+=item * Namespace support
+
+=item * Named argument (not param) support
+
+This is kind of in there via colonpair.
+
+=back
+
+=head2 Tests
+
+=over 4
+
+=item * Method ops
+
+This may be very hard since we don't have any methods!
+
+=item * Hash key access C<$E<lt>someKeyE<gt>>
+
+=item * List member access C<$[index]>
+
+=item * Match variable access C<$/>
+
+=item * Logical operators C<&&> and C<||>
+
+=back
