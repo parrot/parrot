@@ -163,33 +163,27 @@ void
 parrot_global_setup_2(PARROT_INTERP)
 {
     PMC *classname_hash, *iglobals;
-    int i;
-    PMC *parrot_ns;
+    int  i;
 
     /* create the namespace root stash */
     interp->root_namespace = pmc_new(interp, enum_class_NameSpace);
+    Parrot_init_HLL(interp);
 
-    interp->HLL_info = constant_pmc_new(interp,
-                                             enum_class_ResizablePMCArray);
-    interp->HLL_namespace = constant_pmc_new(interp,
-                                                  enum_class_ResizablePMCArray);
-
-    Parrot_register_HLL(interp, const_string(interp, "parrot"));
-
-    parrot_ns = VTABLE_get_pmc_keyed_int(interp,
-                                         interp->HLL_namespace, 0);
-    CONTEXT(interp->ctx)->current_namespace = parrot_ns;
+    CONTEXT(interp->ctx)->current_namespace =
+        VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0);
 
     /* We need a class hash */
-    interp->class_hash = classname_hash =
-        pmc_new(interp, enum_class_NameSpace);
+    interp->class_hash = classname_hash = pmc_new(interp, enum_class_NameSpace);
     Parrot_register_core_pmcs(interp, classname_hash);
+
     /* Also a PMC array to store PMC Proxy objects. */
     interp->pmc_proxies = pmc_new(interp, enum_class_ResizablePMCArray);
+
     /* init the interpreter globals array */
-    iglobals = pmc_new(interp, enum_class_SArray);
+    iglobals         = pmc_new(interp, enum_class_SArray);
     interp->iglobals = iglobals;
     VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
+
     /* clear the array */
     for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
         VTABLE_set_pmc_keyed_int(interp, iglobals, i, NULL);

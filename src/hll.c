@@ -104,6 +104,17 @@ new_hll_entry(PARROT_INTERP)
     return entry;
 }
 
+void
+Parrot_init_HLL(PARROT_INTERP)
+{
+    interp->HLL_info      =
+        constant_pmc_new(interp, enum_class_ResizablePMCArray);
+    interp->HLL_namespace =
+        constant_pmc_new(interp, enum_class_ResizablePMCArray);
+
+    Parrot_register_HLL(interp, const_string(interp, "parrot"));
+}
+
 PARROT_API
 INTVAL
 Parrot_register_HLL(PARROT_INTERP, NOTNULL(STRING *hll_name))
