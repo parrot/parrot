@@ -405,8 +405,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-
-        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIN", key, value);
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIN", key, value);
     }
 
     void set_string_keyed_int(INTVAL key, STRING *value) {
@@ -428,8 +428,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-
-        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIS", key, value);
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIS", key, value);
     }
 
     void set_pmc_keyed_int(INTVAL key, PMC *value) {
@@ -451,8 +451,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key, value);
             }
         }
-
-        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIP", key, value);
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vIP", key, value);
     }
 
     void delete_keyed_int(INTVAL key) {
@@ -474,8 +474,8 @@ it's just SUPER aka the default implementation.
                     deleg_pmc.SUPER(key);
             }
         }
-
-        Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vI", key);
+        else
+            Parrot_run_meth_fromc_args(INTERP, sub, pmc, meth, "vI", key);
     }
 
     INTVAL defined_keyed_int(INTVAL key) {
