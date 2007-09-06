@@ -515,8 +515,11 @@ hll_def: HLL STRINGC COMMA STRINGC
          {
             STRING *hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
             STRING *hll_lib  = string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            PMC    *ignored;
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
-                Parrot_register_HLL(interp, hll_name, hll_lib);
+                Parrot_register_HLL(interp, hll_name);
+            ignored = Parrot_load_lib(interp, hll_lib, NULL);
+            Parrot_register_HLL_lib(interp, hll_lib);
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
          }

@@ -174,7 +174,7 @@ parrot_global_setup_2(PARROT_INTERP)
     interp->HLL_namespace = constant_pmc_new(interp,
                                                   enum_class_ResizablePMCArray);
 
-    Parrot_register_HLL(interp, const_string(interp, "parrot"), NULL);
+    Parrot_register_HLL(interp, const_string(interp, "parrot"));
 
     parrot_ns = VTABLE_get_pmc_keyed_int(interp,
                                          interp->HLL_namespace, 0);

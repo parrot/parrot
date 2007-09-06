@@ -629,7 +629,7 @@ Finish thawing.
                 STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 PObj_constant_SET(hll_name);
-                id               = Parrot_register_HLL(INTERP, hll_name, NULL);
+                id               = Parrot_register_HLL(INTERP, hll_name);
             }
 
             if (!PMC_IS_NULL(lib_pmc)) {
