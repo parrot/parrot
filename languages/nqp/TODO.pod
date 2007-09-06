@@ -1,4 +1,4 @@
-## $Id: README.pod 20863 2007-08-26 18:47:04Z coke $
+## $Id$
 
 =head1 Things that NQP needs
 
