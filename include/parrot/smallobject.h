@@ -8,19 +8,19 @@
 #  include "parrot/parrot.h"
 
 typedef struct Small_Object_Arena {
-    size_t used;
-    size_t total_objects;
+    size_t                     used;
+    size_t                     total_objects;
     struct Small_Object_Arena *prev;
     struct Small_Object_Arena *next;
-    void *start_objects;
+    void                      *start_objects;
 } Small_Object_Arena;
-
 
 struct Small_Object_Pool;
 
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
 typedef PObj * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
+typedef void (*dod_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
 
 #if PARROT_GC_GMS
 /*
@@ -96,6 +96,7 @@ typedef struct Small_Object_Pool {
     get_free_object_fn_type     get_free_object;
     alloc_objects_fn_type       alloc_objects;
     alloc_objects_fn_type       more_objects;
+    dod_object_fn_type          dod_object;
     /* gets and removes a free object from the pool's free list */
     /* allocates more objects */
     struct Memory_Pool *mem_pool;

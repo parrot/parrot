@@ -228,7 +228,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_append_arrena_in_pool
+FUNCDOC: Parrot_append_arena_in_pool
 
 insert the new arena into the pool's structure, update stats
 

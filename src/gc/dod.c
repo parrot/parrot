@@ -551,6 +551,7 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
     UINTVAL object_size   = pool->object_size;
 
     Small_Object_Arena *cur_arena;
+    dod_object_fn_type dod_object = pool->dod_object;
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
@@ -606,27 +607,8 @@ Parrot_dod_sweep(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
                     }
                 }
 
-                /* if object is a PMC and needs destroying */
-                if (PObj_is_PMC_TEST(b)) {
-                    Parrot_dod_free_pmc(interp, (PMC *)b);
-                }
-                /* else object is a buffer(like) */
-                else if (PObj_sysmem_TEST(b)) {
-                    Parrot_dod_free_sysmem(interp, b);
-                }
-                else {
-#ifdef GC_IS_MALLOC
-
-                    /* free allocated space at (int*)bufstart - 1, but not if
-                     * it used COW or is external */
-                    if ( PObj_bufstart(b) &&
-                        !PObj_is_external_or_free_TESTALL(b))
-                        Parrot_dod_free_buffer_malloc(interp, b);
-#else
-                    Parrot_dod_free_buffer(interp, pool, b);
-#endif
-                    PObj_buflen(b) = 0;
-                }
+                assert(dod_object);
+                dod_object(interp, pool, b);
 
                 pool->add_free_object(interp, pool, b);
             }
@@ -639,7 +621,8 @@ next:
 }
 
 void
-Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(PMC * const p))
+Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(PMC * const p))
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -692,10 +675,11 @@ Parrot_free_pmc_ext(PARROT_INTERP, NOTNULL(PMC *p))
 }
 
 void
-Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(PObj *b))
+Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(PObj *b))
 {
     /* has sysmem allocated, e.g. string_pin */
-    if (PObj_bufstart(b))
+    if (PObj_sysmem_TEST(b) && PObj_bufstart(b))
         mem_sys_free(PObj_bufstart(b));
 
     PObj_bufstart(b) = NULL;
@@ -703,8 +687,17 @@ Parrot_dod_free_sysmem(PARROT_INTERP, NOTNULL(PObj *b))
 }
 
 void
-Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(PObj *b))
+Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+    NOTNULL(PObj *b))
 {
+
+    /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
+     * external */
+    PObj_buflen(b) = 0;
+
+    if (!PObj_bufstart(b) || PObj_is_external_or_free_TESTALL(b))
+        return;
+
     if (PObj_COW_TEST(b)) {
         INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
 
@@ -731,6 +724,8 @@ Parrot_dod_free_buffer( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 
          mem_pool->possibly_reclaimable += PObj_buflen(b);
     }
+
+    PObj_buflen(b)        = 0;
 }
 
 #ifndef PLATFORM_STACK_WALK

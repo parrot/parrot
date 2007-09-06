@@ -118,7 +118,9 @@ new_pmc_pool(PARROT_INTERP)
     Small_Object_Pool * const pmc_pool =
         new_small_object_pool(sizeof (PMC), num_headers);
 
-    pmc_pool->mem_pool = NULL;
+    pmc_pool->mem_pool   = NULL;
+    pmc_pool->dod_object = Parrot_dod_free_pmc;
+
     (interp->arena_base->init_pool)(interp, pmc_pool);
     return pmc_pool;
 }
@@ -143,7 +145,8 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
     Small_Object_Pool * const pool =
             new_small_object_pool(buffer_size, num_headers);
 
-    pool->mem_pool = interp->arena_base->memory_pool;
+    pool->dod_object = Parrot_dod_free_sysmem;
+    pool->mem_pool   = interp->arena_base->memory_pool;
     (interp->arena_base->init_pool)(interp, pool);
     return pool;
 }
@@ -161,7 +164,15 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_buffer_pool(PARROT_INTERP)
 {
-    return make_bufferlike_pool(interp, sizeof (Buffer));
+    Small_Object_Pool *pool = make_bufferlike_pool(interp, sizeof (Buffer));
+
+#ifdef GC_IS_MALLOC
+    pool->dod_object        = Parrot_dod_free_buffer_malloc;
+#else
+    pool->dod_object        = Parrot_dod_free_buffer;
+#endif
+
+    return pool;
 }
 
 /*
