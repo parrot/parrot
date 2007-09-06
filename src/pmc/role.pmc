@@ -335,7 +335,7 @@ Adds the given sub PMC as a method with the given name.
         Parrot_Role *role = PARROT_ROLE(SELF);
 
         /* If we have already added a method with this name... */
-        if (!VTABLE_exists_keyed_str(interp, role->methods, name)) {
+        if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
             /* XXX Need to handle multi methods here. */
             real_exception(interp, NULL, E_NotImplementedError,
                 "Currently, adding multiple methods of the same name"
