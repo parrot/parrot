@@ -3,6 +3,8 @@
 package Parrot::Configure::Options::Test;
 use strict;
 use warnings;
+use Config;      # to find the correct $Config{scriptdir}/prove
+use File::Spec;  # to construct the path to the correct 'prove'
 
 our @preconfiguration_tests = qw(
     t/configure/*.t
@@ -38,7 +40,9 @@ sub run_configure_tests {
     my $self = shift;
     if ($self->{run_configure_tests}) {
         print "As you requested, we'll start with some tests of the configuration tools.\n\n";
-        system(qq{prove @preconfiguration_tests})
+        # Find the 'prove' command associated with *this* version of perl.
+        my $prove = File::Spec->catfile($Config{'scriptdir'} , 'prove');
+        system(qq{$prove @preconfiguration_tests})
             and die "Pre-configuration tests did not complete successfully; Configure.pl will not continue.";
         print <<"TEST";
 
@@ -55,7 +59,8 @@ sub run_build_tests {
     if ($self->{run_build_tests}) {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
-        system(qq{prove @postconfiguration_tests})
+        my $prove = File::Spec->catfile($Config{'scriptdir'} , 'prove');
+        system(qq{$prove @postconfiguration_tests})
             and die "Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
     }
     return 1;
