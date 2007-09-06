@@ -11,22 +11,25 @@ items in the grammar, C<src/Grammar.pg>.
 
 =item * return
 
-Return needs to work on an exception model, and may require PAST/POST changes
-to support it.
+Return needs to work on an exception model, and will likely require 
+PAST/POST changes to support it.
 
 =item * $( ... )
 
-Scalar context
+Scalar context.  This needs to be translated into a C<get_scalar> 
+method call on its argument.
 
 =item * @( ... )
 
-List/array context
+List/array context.  This needs to be translated into a C<get_array>
+method call on its argument.
 
 =item * Namespace support
 
 =item * Named argument (not param) support
 
-This is kind of in there via colonpair.
+This will be added to PAST::Var by allowing parameter nodes to
+have a 'named' attribute.
 
 =back
 
