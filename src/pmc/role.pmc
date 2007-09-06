@@ -50,7 +50,6 @@ An empty Hash PMC is allocated during initialization.
 
 #include "parrot/parrot.h"
 #define PARROT_ROLE(o) ((Parrot_Role *) PMC_data(o))
-#define NAME CONST_STRING(interp, "name"), name);
 
 /* This is the underlying structure of this PMC. */
 typedef struct Parrot_Role {
