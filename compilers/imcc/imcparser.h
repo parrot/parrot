@@ -157,7 +157,7 @@
      CONCAT = 373,
      POINTY = 374
    };
-#endif /* YYTOKENTYPE */
+#endif
 /* Tokens.  */
 #define LOW_PREC 258
 #define PARAM 259
@@ -282,7 +282,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 390 "compilers/imcc/imcc.y"
+#line 384 "compilers/imcc/imcc.y"
 {
     IdList * idlist;
     int t;
@@ -290,13 +290,13 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 1529 of yacc.c.  */
+/* Line 1489 of yacc.c.  */
 #line 295 "compilers/imcc/imcparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
-#endif /* !YYSTYPE && !YYSTYPE_IS_DECLARED */
+#endif
 
 
 

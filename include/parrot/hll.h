@@ -63,6 +63,11 @@ INTVAL Parrot_register_HLL( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+INTVAL Parrot_register_HLL_lib( PARROT_INTERP, NOTNULL(STRING *hll_lib) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_register_HLL_type( PARROT_INTERP,
     INTVAL hll_id,
     INTVAL core_type,

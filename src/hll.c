@@ -113,49 +113,8 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
 
     /* TODO LOCK or disallow in threads */
 
-    if (!hll_name) {
-        INTVAL nelements, i;
-
-        /* .loadlib pragma */
-        hll_info = interp->HLL_info;
-
-        START_WRITE_HLL_INFO(interp, hll_info);
-
-        nelements = VTABLE_elements(interp, hll_info);
-
-        for (i = 0; i < nelements; ++i) {
-            STRING      *name;
-            PMC * const  entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
-            PMC * const  lib_name = VTABLE_get_pmc_keyed_int(interp, entry,
-                e_HLL_lib);
-
-            if (PMC_IS_NULL(lib_name))
-                continue;
-
-            name = VTABLE_get_string(interp, lib_name);
-
-            if (!string_equal(interp, name, hll_lib))
-                break;
-        }
-
-        if (i < nelements)
-            return i;
-
-        entry    = new_hll_entry(interp);
-
-        VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
-
-        /* register dynlib */
-        name    = constant_pmc_new_noinit(interp, enum_class_String);
-        ASSERT_CONST_STRING(hll_lib);
-
-        VTABLE_set_string_native(interp, name, hll_lib);
-        VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
-
-        END_WRITE_HLL_INFO(interp, hll_info);
-
-        return 0;
-    }
+    if (!hll_name)
+        return Parrot_register_HLL_lib(interp, hll_lib);
 
     idx = Parrot_get_HLL_id(interp, hll_name);
 
@@ -216,6 +175,52 @@ Parrot_register_HLL(PARROT_INTERP, NULLOK(STRING *hll_name), NULLOK(STRING *hll_
     END_WRITE_HLL_INFO(interp, hll_info);
 
     return idx;
+}
+
+PARROT_API
+INTVAL
+Parrot_register_HLL_lib(PARROT_INTERP, NOTNULL(STRING *hll_lib))
+{
+    PMC   *hll_info = interp->HLL_info;
+    PMC   *entry, *name;
+    INTVAL nelements, i;
+
+    START_WRITE_HLL_INFO(interp, hll_info);
+
+    nelements = VTABLE_elements(interp, hll_info);
+
+    for (i = 0; i < nelements; ++i) {
+        STRING      *name;
+        PMC * const  entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
+        PMC * const  lib_name = VTABLE_get_pmc_keyed_int(interp, entry,
+            e_HLL_lib);
+
+        if (PMC_IS_NULL(lib_name))
+            continue;
+
+        name = VTABLE_get_string(interp, lib_name);
+
+        if (!string_equal(interp, name, hll_lib))
+            break;
+    }
+
+    if (i < nelements)
+        return i;
+
+    entry    = new_hll_entry(interp);
+
+    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
+
+    /* register dynlib */
+    name    = constant_pmc_new_noinit(interp, enum_class_String);
+    ASSERT_CONST_STRING(hll_lib);
+
+    VTABLE_set_string_native(interp, name, hll_lib);
+    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
+
+    END_WRITE_HLL_INFO(interp, hll_info);
+
+    return 0;
 }
 
 PARROT_API

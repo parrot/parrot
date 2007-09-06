@@ -625,24 +625,23 @@ Finish thawing.
             PMC *lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
             PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
 
-            STRING *lib_name = NULL;
-            STRING *hll_name = NULL;
+            if (!PMC_IS_NULL(name_pmc)) {
+                STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
+
+                PObj_constant_SET(hll_name);
+                id               = Parrot_register_HLL(INTERP, hll_name, NULL);
+            }
 
             if (!PMC_IS_NULL(lib_pmc)) {
-                lib_name = VTABLE_get_string(INTERP, lib_pmc);
-                PObj_constant_SET(lib_name);
-            }
+                STRING *lib_name = VTABLE_get_string(INTERP, lib_pmc);
+                PMC    *ignored;
 
-            if (!PMC_IS_NULL(name_pmc)) {
-                hll_name = VTABLE_get_string(INTERP, name_pmc);
-                PObj_constant_SET(hll_name);
-            }
+                if (!STRING_IS_EMPTY(lib_name)) {
+                    PObj_constant_SET(lib_name);
+                    ignored      = Parrot_load_lib(INTERP, lib_name, NULL);
+                    id           = Parrot_register_HLL_lib(INTERP, lib_name);
+                }
 
-            /* yes, id goes unused, but this API will get an overhaul soon */
-            id = Parrot_register_HLL(INTERP, hll_name, lib_name);
-
-            if (!STRING_IS_EMPTY(lib_name)) {
-                PMC *ignored = Parrot_load_lib(INTERP, lib_name, NULL);
                 UNUSED(ignored);
             }
         }

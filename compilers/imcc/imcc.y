@@ -376,7 +376,7 @@ do_loadlib(Interp *interp, char *lib)
 {
     STRING *s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     Parrot_load_lib(interp, s, NULL);
-    Parrot_register_HLL(interp, NULL, s);
+    Parrot_register_HLL_lib(interp, s);
 }
 
 %}
@@ -513,9 +513,8 @@ pragma_1:  N_OPERATORS INTC
 
 hll_def: HLL STRINGC COMMA STRINGC
          {
-            STRING *hll_name, *hll_lib;
-            hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
-            hll_lib =  string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            STRING *hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING *hll_lib  = string_unescape_cstring(interp, $4 + 1, '"', NULL);
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name, hll_lib);
             IMCC_INFO(interp)->cur_namespace = NULL;
