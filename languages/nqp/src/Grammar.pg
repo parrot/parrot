@@ -26,7 +26,7 @@ token ws {
     }}
     [ \s+
     | ^^ [ \# \N*
-         | <?pod_comment>
+         | <+pod_comment>
          ]
     | \# \N*
     ]*
@@ -62,7 +62,7 @@ regex pod_comment {
 ##  Parse a list of statements.
 rule statement_list {
     [ <statement>
-        [  <?statement_end> || <panic: Statement not terminated properly> ]
+        [  <+statement_end> || <panic: Statement not terminated properly> ]
     ]*
     {*}
 }
@@ -140,7 +140,7 @@ token block {
             $P0 = clone $P0
             set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
         }}
-        <?ws>
+        <+ws>
     ]?
     {*}                                                    #= close
 }
@@ -187,14 +187,14 @@ token postfix {
 token methodop {
     '.' <ident>
     '(' <arglist>
-    [ <?ws> ')' | <panic: Missing ')'> ]
+    [ <+ws> ')' | <panic: Missing ')'> ]
     {*}                                                    #= methodop
 }
 
 token postcircumfix {
     | '(' <arglist> ')' {*}                                #= ( )
-    | '[' <EXPR> <?ws> ']' {*}                             #= [ ]
-    | '{' <EXPR> <?ws> '}' {*}                             #= { }
+    | '[' <EXPR> <+ws> ']' {*}                             #= [ ]
+    | '{' <EXPR> <+ws> '}' {*}                             #= { }
     | '<' <string_literal: \>> '>' {*}                     #= < >
 }
 
@@ -217,7 +217,7 @@ token noun {
 
 
 token colonpair {
-    | ':' <ident> [ '(' <EXPR> <?ws> ')' ] {*}
+    | ':' <ident> [ '(' <EXPR> <+ws> ')' ] {*}
 }
 
 
@@ -229,9 +229,9 @@ rule scope_declarator {
 
 
 token circumfix {
-    | '(' <EXPR>? <?ws> ')' {*}                            #= ( )
-    | '$(' <EXPR>? <?ws> ')' {*}                           #= $( )
-    | '@(' <EXPR>? <?ws> ')' {*}                           #= @( )
+    | '(' <EXPR>? <+ws> ')' {*}                            #= ( )
+    | '$(' <EXPR>? <+ws> ')' {*}                           #= $( )
+    | '@(' <EXPR>? <+ws> ')' {*}                           #= @( )
 }
 
 
