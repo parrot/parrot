@@ -47,7 +47,7 @@ $1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 # todo :pugs<feature>
 [(.)$0]+				bookkeeper	y			backreference
 # todo :pugs<feature>
-(\w+) <?ws> $0				hello hello	y			backreference at end of string
+(\w+) <+ws> $0				hello hello	y			backreference at end of string
 # todo :pugs<feature>
 [(.)$0]+				bookkeeper	/mob 0 0: <o @ 1>/	backref $1
 # todo :pugs<feature>
