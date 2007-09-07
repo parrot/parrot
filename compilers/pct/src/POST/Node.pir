@@ -34,6 +34,7 @@ for compiling programs in Parrot.
     pirtable['n_sub'] = '%rP+'
     pirtable['n_mul'] = '%rP+'
     pirtable['n_div'] = '%rP+'
+    pirtable['n_mod'] = '%rP+'
     pirtable['n_neg'] = '%rP'
     pirtable['concat'] = '%tP~'
     pirtable['abs'] = '%t'
