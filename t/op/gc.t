@@ -294,7 +294,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     newclass $P0, "b"
     $I0 = find_type "b"
     $P0 = new $I0
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = 0
     n = $P0."b11"($P1)
     print "ok 1\n"
@@ -307,7 +307,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     .local pmc n1
     # new_pad -1
     # store_lex -1, "n", n
-    n1 = new Integer
+    n1 = new 'Integer'
     n1 = n + 1
     push_eh catch
     n = self."b11"(n1)
@@ -571,11 +571,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "verify deleg_pmc object marking" );
     addattribute cl, "o3"
     addattribute cl, "o4"
     s = new "X"
-    $P0 = new String
+    $P0 = new 'String'
     $S0 = "ok" . " 3\n"
     $P0 = $S0
     setattribute s, "X\0o3", $P0
-    $P0 = new String
+    $P0 = new 'String'
     $S0 = "ok" . " 4\n"
     $P0 = $S0
     setattribute s, "X\0o4", $P0

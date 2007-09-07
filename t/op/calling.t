@@ -257,7 +257,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -329,7 +329,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -346,7 +346,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - autobox" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
@@ -434,7 +434,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0)", $P0
@@ -483,7 +483,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0,0)", $P0,77
@@ -501,7 +501,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0,0)", $P0,77
@@ -525,7 +525,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0)", $P0
@@ -549,7 +549,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     .local pmc ar
-    ar = new ResizableIntegerArray
+    ar = new 'ResizableIntegerArray'
     push ar, 1
     push ar, 2
     push ar, 3
@@ -683,7 +683,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "empty args" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "()"
@@ -702,7 +702,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional args" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
     set_args "(0x0)", $P0
@@ -836,7 +836,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - PIR const" );
 .const int MYCONST = -2
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     "foo"(MYCONST)
 .end
 .sub "foo"
@@ -851,7 +851,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional args, :opt_flag" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "hello\n"
     foo($P0)
     foo()
@@ -874,7 +874,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "optional multiple :opt_flag" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
     foo($P0, "ok 2\n", "ok 3\n")
 .end
@@ -938,9 +938,9 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 5 - arg/param conflict" );
 .sub main :main
     .local pmc a, b
-    a = new Integer
+    a = new 'Integer'
     a = 1
-    b = new Integer
+    b = new 'Integer'
     b = 2
     .local pmc c, d
     (c, d) = foo(a, b)
@@ -957,7 +957,7 @@ ok2:
 .sub foo
     .param pmc a
     .param pmc b
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 3
     .return bar($P0, a, b)
 .end
@@ -1069,9 +1069,9 @@ OUTPUT
 # see also tcl in leo-ctx5 by Coke; Date 28.08.2005
 pir_output_is( <<'CODE', <<'OUTPUT', "bug - :slurpy promotes to :flatten" );
 .sub main :main
-    $P0 = new String
+    $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new String
+    $P1 = new 'String'
     $P1 = "ok 2\n"
     $P0 = foo($P0, $P1)
     print $P0
@@ -1101,7 +1101,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call :slurpy with :flat" );
         print "\n"
 .end
 .sub main :main
-        $P34 = new Array
+        $P34 = new 'Array'
         $P34 = 0
         ## normal flattening direct call, non-slurpy returns
         $P35 = _fn1($P34 :flat)
@@ -1127,11 +1127,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call with :flat in the middle" );
     print "\n"
 .end
 .sub main :main
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1160,11 +1160,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "right number of args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 3
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1193,11 +1193,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 4
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1227,11 +1227,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
 .sub main :main
     .include "errors.pasm"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
-    $P30 = new Integer
+    $P30 = new 'Integer'
     $P30 = 2
-    $P31 = new Integer
+    $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new Array
+    $P34 = new 'Array'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31

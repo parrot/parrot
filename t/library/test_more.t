@@ -400,13 +400,13 @@
 	test_test( 'passing isa_ok for PMC/string (super)')
 
 	test_pass( 'Sossy isa daschund' )
-	$P1 = new String
+	$P1 = new 'String'
         $P1 = "daschund"
 	isa_ok(Sossy, $P1, "Sossy")
 	test_test( 'passing isa_ok for PMC/PMC (class =)' )
 
 	test_pass( 'Sossy isa dog' )
-	$P2 = new String
+	$P2 = new 'String'
         $P2 = "dog"
 	isa_ok(Sossy, $P2, "Sossy")
 	test_test( 'passing isa_ok for PMC/PMC (super)')

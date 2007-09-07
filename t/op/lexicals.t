@@ -555,11 +555,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 4' );
      .const .Sub choose_sub = "_choose"
      .const .Sub fail_sub = "_fail"
      fail = newclosure fail_sub
-     arr1 = new ResizablePMCArray
+     arr1 = new 'ResizablePMCArray'
      arr1[0] = 1
      arr1[1] = 3
      arr1[2] = 5
-     arr2 = new ResizablePMCArray
+     arr2 = new 'ResizablePMCArray'
      arr2[0] = 1
      arr2[1] = 5
      arr2[2] = 9
@@ -674,7 +674,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 5' );
 
 .sub foo
     .lex 'a', $P0
-    $P0 = new Integer
+    $P0 = new 'Integer'
     $P0 = 0
 
     .const .Sub bar_sub = "bar"
@@ -726,7 +726,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 6' );
 .sub foo
     .param int i
     .lex 'a', $P0
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = i
     store_lex 'a', $P1
     print "foo: "
@@ -784,7 +784,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 7 - evaled' );
 .sub foo
     .param int i
     .lex 'a', $P0
-    $P1 = new Integer
+    $P1 = new 'Integer'
     $P1 = i
     store_lex 'a', $P1
     print "foo: "

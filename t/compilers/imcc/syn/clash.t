@@ -62,7 +62,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "new" );
 .sub test :main
-    $P1 = new String
+    $P1 = new 'String'
     $P1 = "ok 1\n"
     new P1, 'String'
     set P1, "ok 2\n"
@@ -77,7 +77,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "clone" );
 .sub test :main
-    $P1 = new String
+    $P1 = new 'String'
     $P1 = "ok 1\n"
     $P0 = clone $P1
     new P1, 'String'
@@ -94,7 +94,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "defined" );
 .sub test :main
-    $P1 = new Hash
+    $P1 = new 'Hash'
     $I0 = defined $P1
     new P1, 'Hash'
     defined I0, P1
@@ -111,7 +111,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "defined keyed" );
 .sub test :main
-    $P1 = new Hash
+    $P1 = new 'Hash'
     $P1["a"] = "ok 1\n"
     $I0 = defined $P1["a"]
     new P1, 'Hash'
