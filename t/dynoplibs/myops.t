@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 
 =head1 NAME
@@ -218,6 +218,40 @@ CODE
 65535
 0
 65535
+OUTPUT
+
+
+pasm_output_is( <<'CODE', <<OUTPUT, "conv_i2_i" );
+
+.loadlib "myops_ops"
+
+    set I0, 32767       # 2 ^ 15 -1
+    conv_i2 I0
+    print I0
+    print "\n"
+    inc I0              # 2 ^ 15 
+    conv_i2 I0
+    print I0
+    print "\n"
+    set I0, 65535       # 2 ^ 16 -1
+    conv_i2 I0
+    print I0
+    print "\n"
+    inc I0              # -1 + 1
+    conv_i2 I0
+    print I0
+    print "\n"
+    dec I0              # 0 - 1
+    conv_i2 I0
+    print I0
+    print "\n"
+    end
+CODE
+32767
+-32768
+-1
+0
+-1
 OUTPUT
 
 # Local Variables:

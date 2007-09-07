@@ -1,10 +1,5 @@
-/*
- * Copyright (C) 2003-2007, The Perl Foundation.
- */
-
-/*
-** myops.ops - sample
-*/
+/* Copyright (C) 2003-2007, The Perl Foundation.
+/* $Id$ */
 
 #include "parrot/dynext.h"
 VERSION = PARROT_VERSION;
