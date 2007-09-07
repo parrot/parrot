@@ -38,7 +38,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_bool" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     print "A PMC Undef created by new is"
     if pmc1 goto PMC1_IS
       print " not"
@@ -54,7 +54,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int is_defined
     is_defined = defined pmc1
     print "A PMC Undef is"
@@ -72,7 +72,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "get_string" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     print "before"
     print pmc1
     print "after\n"
@@ -86,7 +86,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "morph to integer" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int int1
     int1 = pmc1
     .local int int2
@@ -104,7 +104,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int int1
     int1 = pmc1
     .local num float1
@@ -122,7 +122,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int int1
     int1 = pmc1
     .local num float1
@@ -140,7 +140,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_integer_native" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     pmc1 = -88888888
     print pmc1
     print "\n"
@@ -164,7 +164,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "isa" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int pmc1_is_a
 
     pmc1_is_a = isa pmc1, "Undef"
@@ -216,7 +216,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Undef
+    pmc1 = new 'Undef'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -234,7 +234,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "verify clone works." );
 
 .sub _main
-    $P1 = new Undef
+    $P1 = new 'Undef'
     $P2 = clone $P1
     $S0 = typeof $P2
     print $S0
@@ -247,8 +247,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "Undef == Undef (RT#33603)" );
 
 .sub _main
-    $P1 = new Undef
-    $P2 = new Undef
+    $P1 = new 'Undef'
+    $P2 = new 'Undef'
     if $P1 == $P2 goto ok
     print "not "
   ok:

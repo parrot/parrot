@@ -146,7 +146,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub main
     .local pmc pmc1
-    pmc1 = new Env
+    pmc1 = new 'Env'
     .local int bool1
 
     does bool1, pmc1, "hash"
@@ -173,7 +173,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "get_integer()" );
     .local int num_before, num_after, num_diff
 
     # add three more keys in env
-    env = new Env
+    env = new 'Env'
     num_before = env
     env["PARROT_TMP_ADD_1"] = "tmp_add_1"
     env["PARROT_TMP_ADD_2"] = "tmp_add_2"
@@ -194,7 +194,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "get_number()" );
     .local num num_before, num_after, num_diff
 
     # add three more keys in env
-    env = new Env
+    env = new 'Env'
     num_before = env
     env["PARROT_TMP_ADD_1"] = "tmp_add_1"
     env["PARROT_TMP_ADD_2"] = "tmp_add_2"

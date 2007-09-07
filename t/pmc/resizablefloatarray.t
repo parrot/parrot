@@ -415,7 +415,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new ResizableFloatArray
+    pmc1 = new 'ResizableFloatArray'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -438,7 +438,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push float" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new ResizableFloatArray
+    pmc1 = new 'ResizableFloatArray'
     pmc1[9999] = 10000.10000
     push pmc1, 123.123
     .local int elements
@@ -459,7 +459,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "shift float" );
 .sub test :main
     .local pmc ar
-    ar = new ResizableFloatArray
+    ar = new 'ResizableFloatArray'
     ar[0] = 10.1
     ar[1] = 20.2
     $I0 = elements ar
@@ -485,7 +485,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
 .sub test :main
     .local pmc ar
-    ar = new ResizableFloatArray
+    ar = new 'ResizableFloatArray'
     unshift ar, 10.1
     unshift ar, 20.2
     $I0 = elements ar

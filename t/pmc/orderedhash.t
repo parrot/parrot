@@ -377,9 +377,9 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     .local pmc val_in
-    val_in = new String
+    val_in = new 'String'
     val_in = "U"
     hash1["X"] = val_in
 
@@ -398,7 +398,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     hash1["X"] = 14
 
     .local pmc val_out
@@ -416,7 +416,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     .local string val1
     val1 = 'U'
     set hash1["X"], val1
@@ -436,7 +436,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     hash1["X"] = '14'
 
     .local pmc val_out
@@ -455,7 +455,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     .local string key1
     key1 = 'X'
 
@@ -476,7 +476,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
     .local string key1
     key1 = 'X'
 
@@ -497,7 +497,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_integer" );
 
 .sub _main
     .local pmc hash1
-    hash1 = new OrderedHash
+    hash1 = new 'OrderedHash'
 
     .local int hash_size
     hash_size = hash1
@@ -557,7 +557,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new OrderedHash
+    pmc1 = new 'OrderedHash'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1

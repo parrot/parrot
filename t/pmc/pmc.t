@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Parrot::PMC qw(%pmc_types);
 
 =head1 NAME
@@ -367,6 +367,26 @@ CODE
 Integer
 42
 OUTPUT
+
+TODO: {
+
+    local $TODO = 'This test requires an obscure opcode that does not exist with a stringy class';
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
+    new P3, 'Integer', "42"
+    typeof S0, P3
+    print S0
+    print "\n"
+    set I0, P3
+    print I0
+    print "\n"
+    end
+CODE
+Integer
+42
+OUTPUT
+
+}
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pmcinfo_i_p_ic" );
 .include "pmcinfo.pasm"

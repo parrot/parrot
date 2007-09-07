@@ -165,11 +165,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Array
+    pmc1 = new 'Array'
     .local pmc pmc2
-    pmc2 = new Ref, pmc1
+    pmc2 = new 'Ref', pmc1
     .local pmc pmc3
-    pmc3 = new SharedRef, pmc1
+    pmc3 = new 'SharedRef', pmc1
     .local int bool1
     does bool1, pmc2, "scalar"
     print bool1

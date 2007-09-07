@@ -177,10 +177,10 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "divide by zero" );
 .sub _main :main
-    P0 = new Float
+    P0 = new 'Float'
     set P0, "12.0"
-    P1 = new Float
-    P2 = new Float
+    P1 = new 'Float'
+    P2 = new 'Float'
     set P2, "0.0"
     push_eh OK
     P1 = P0 / P2
@@ -201,7 +201,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a positive float" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = 123.123
     print float_1
     if float_1 goto IS_TRUE
@@ -219,7 +219,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a negative float" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = -123.123
     print float_1
     if float_1 goto IS_TRUE
@@ -237,7 +237,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a positive integer" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = 1
     print float_1
     if float_1 goto IS_TRUE
@@ -255,7 +255,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Truth of a negative integer" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = -1
     print float_1
     if float_1 goto IS_TRUE
@@ -273,7 +273,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Falseness of 0" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = 0
     print float_1
     if float_1 goto IS_TRUE
@@ -291,7 +291,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Falseness of 0.000" );
 
 .sub _main
     .local pmc float_1
-    float_1 = new Float
+    float_1 = new 'Float'
     float_1 = 0.000
     print float_1
     if float_1 goto IS_TRUE
@@ -613,7 +613,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Float
+    pmc1 = new 'Float'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1

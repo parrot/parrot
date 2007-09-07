@@ -25,7 +25,7 @@ Tests the scalar PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet working' );
 .sub 'test' :main
-    new P0, .scalar
+    new P0, 'scalar'
     print "ok 1\n"
 .end
 CODE

@@ -269,7 +269,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new Boolean
+    pmc1 = new 'Boolean'
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1

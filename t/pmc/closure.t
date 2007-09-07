@@ -38,7 +38,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'Make sure we can sweep closures.' );
 ## had ever been called.
 .sub _test_1 :main
     .lex "X", $P40
-    $P40 = new Integer
+    $P40 = new 'Integer'
     $P40 = 22
     .const .Sub $P43 = "___internal_test_1_0_"
     newclosure $P44, $P43

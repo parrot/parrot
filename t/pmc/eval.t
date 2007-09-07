@@ -119,7 +119,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #31467" );
 
   .sub main :main
-     $P1 = new Hash
+     $P1 = new 'Hash'
      $P0 = find_name "_builtin"
      $P1['builtin'] = $P0
 
@@ -202,7 +202,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PIR" );
 
 .sub register_compiler
  .local pmc counter
- counter = new Integer
+ counter = new 'Integer'
  counter = 0
  store_global "counter", counter
 
