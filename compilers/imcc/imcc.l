@@ -178,7 +178,7 @@ SP              [ ]
             valp->s = IMCC_INFO(interp)->heredoc_content;
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
-            return(STRINGC); /* RT#42382 delete quotes, -> emit, pbc */
+            return STRINGC; /* RT#42382 delete quotes, -> emit, pbc */
         }
         else
         {
@@ -243,7 +243,7 @@ SP              [ ]
 
 ^".emit"\n {
     BEGIN(emit);
-    return(EMIT);
+    return EMIT;
     }
 
 <emit>^".eom"\n {
@@ -263,107 +263,107 @@ SP              [ ]
 <pod>.*         { /*ignore*/ }
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
-".sym"          return(LOCAL);
-<INITIAL,emit>".lex"          return(LEXICAL);
-".arg"          return(ARG);
-".sub"          return(SUB);
-".end"          return(ESUB);
-".pcc_begin"    return(PCC_BEGIN);
-".pcc_end"      return(PCC_END);
-".pcc_call"     return(PCC_CALL);
-".nci_call"     return(NCI_CALL);
-".meth_call"    return(METH_CALL);
-".invocant"     return(INVOCANT);
-<emit,INITIAL>".pcc_sub"      return(PCC_SUB);
-".pcc_begin_return"    return(PCC_BEGIN_RETURN);
-".pcc_end_return"      return(PCC_END_RETURN);
-".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
-".pcc_end_yield"      return(PCC_END_YIELD);
+".sym"          return LOCAL;
+<INITIAL,emit>".lex"          return LEXICAL;
+".arg"          return ARG;
+".sub"          return SUB;
+".end"          return ESUB;
+".pcc_begin"    return PCC_BEGIN;
+".pcc_end"      return PCC_END;
+".pcc_call"     return PCC_CALL;
+".nci_call"     return NCI_CALL;
+".meth_call"    return METH_CALL;
+".invocant"     return INVOCANT;
+<emit,INITIAL>".pcc_sub"      return PCC_SUB;
+".pcc_begin_return"    return PCC_BEGIN_RETURN;
+".pcc_end_return"      return PCC_END_RETURN;
+".pcc_begin_yield"    return PCC_BEGIN_YIELD;
+".pcc_end_yield"      return PCC_END_YIELD;
 
-"method"        return(METHOD); /* old compat cruft -
+"method"        return METHOD; /* old compat cruft -
                                   the canonical colon names are below */
 
-":method"        return(METHOD);
-<emit,INITIAL>":multi"   return(MULTI);
-<emit,INITIAL>":main"    return(MAIN);
-<emit,INITIAL>":load"    return(LOAD);
-<emit,INITIAL>":init"    return(INIT);
-<emit,INITIAL>":immediate"    return(IMMEDIATE);
-<emit,INITIAL>":postcomp"    return(POSTCOMP);
-<emit,INITIAL>":anon"    return(ANON);
-<emit,INITIAL>":outer"   return(OUTER);
-<emit,INITIAL>":lex"     return(NEED_LEX);
-<emit,INITIAL>":vtable"  return(VTABLE_METHOD);
-":unique_reg"  return(UNIQUE_REG);
+":method"        return METHOD;
+<emit,INITIAL>":multi"   return MULTI;
+<emit,INITIAL>":main"    return MAIN;
+<emit,INITIAL>":load"    return LOAD;
+<emit,INITIAL>":init"    return INIT;
+<emit,INITIAL>":immediate"    return IMMEDIATE;
+<emit,INITIAL>":postcomp"    return POSTCOMP;
+<emit,INITIAL>":anon"    return ANON;
+<emit,INITIAL>":outer"   return OUTER;
+<emit,INITIAL>":lex"     return NEED_LEX;
+<emit,INITIAL>":vtable"  return VTABLE_METHOD;
+":unique_reg"  return UNIQUE_REG;
 
-".result"       return(RESULT);
-".get_results"       return(GET_RESULTS);
-".yield"        return(YIELDT);
-".return"       return(RETURN);
-<emit,INITIAL>".loadlib"      return(LOADLIB);
+".result"       return RESULT;
+".get_results"       return GET_RESULTS;
+".yield"        return YIELDT;
+".return"       return RETURN;
+<emit,INITIAL>".loadlib"      return LOADLIB;
 
-":flat"         return(ADV_FLAT);
-":slurpy"       return(ADV_SLURPY);
-":optional"     return(ADV_OPTIONAL);
-":opt_flag"     return(ADV_OPT_FLAG);
-":named"        return(ADV_NAMED);
-"=>"            return(ADV_ARROW);
+":flat"         return ADV_FLAT;
+":slurpy"       return ADV_SLURPY;
+":optional"     return ADV_OPTIONAL;
+":opt_flag"     return ADV_OPT_FLAG;
+":named"        return ADV_NAMED;
+"=>"            return ADV_ARROW;
 
-<emit,INITIAL>".namespace"    return(NAMESPACE);
-<emit,INITIAL>".HLL"          return(HLL);
-<emit,INITIAL>".HLL_map"      return(HLL_MAP);
-".endnamespace" return(ENDNAMESPACE);
-".local"        return(LOCAL);
-".global"       return(GLOBAL);
-<emit,INITIAL>".const"        return(CONST);
-".globalconst"  return(GLOBAL_CONST);
-".param"        return(PARAM);
-<*>".pragma"    return(PRAGMA);
-<*>"n_operators"   return(N_OPERATORS);
-"goto"          return(GOTO);
-"if"            return(IF);
-"unless"        return(UNLESS);
-"null"          return(PNULL);
-"int"           return(INTV);
-"num"           return(FLOATV);
-"float"         return(FLOATV);
-"new"           return(NEW);
-"addr"          return(ADDR);
-"global"        return(GLOBALOP);
-"object"        return(OBJECTV);
-"pmc"           return(PMCV);
-"string"        return(STRINGV);
-"<<"            return(SHIFT_LEFT);
-">>"            return(SHIFT_RIGHT);
-">>>"           return(SHIFT_RIGHT_U);
-"&&"            return(LOG_AND);
-"||"            return(LOG_OR);
-"~~"            return(LOG_XOR);
-"<"             return(RELOP_LT);
-"<="            return(RELOP_LTE);
-">"             return(RELOP_GT);
-">="            return(RELOP_GTE);
-"=="            return(RELOP_EQ);
-"!="            return(RELOP_NE);
-"**"            return(POW);
-"->"            return(POINTY);
-{WS}+"."{WS}+   return(CONCAT);
-"."             return(DOT);
-<emit,INITIAL>".."     return(DOTDOT);
-"+="            return(PLUS_ASSIGN);
-"-="            return(MINUS_ASSIGN);
-"*="            return(MUL_ASSIGN);
-"/="            return(DIV_ASSIGN);
-"%="            return(MOD_ASSIGN);
-"//"            return(FDIV);
-"//="           return(FDIV_ASSIGN);
-"&="            return(BAND_ASSIGN);
-"|="            return(BOR_ASSIGN);
-"~="            return(BXOR_ASSIGN);
-">>="           return(SHR_ASSIGN);
-"<<="           return(SHL_ASSIGN);
-">>>="          return(SHR_U_ASSIGN);
-".="            return(CONCAT_ASSIGN);
+<emit,INITIAL>".namespace"    return NAMESPACE;
+<emit,INITIAL>".HLL"          return HLL;
+<emit,INITIAL>".HLL_map"      return HLL_MAP;
+".endnamespace" return ENDNAMESPACE;
+".local"        return LOCAL;
+".global"       return GLOBAL;
+<emit,INITIAL>".const"        return CONST;
+".globalconst"  return GLOBAL_CONST;
+".param"        return PARAM;
+<*>".pragma"    return PRAGMA;
+<*>"n_operators"   return N_OPERATORS;
+"goto"          return GOTO;
+"if"            return IF;
+"unless"        return UNLESS;
+"null"          return PNULL;
+"int"           return INTV;
+"num"           return FLOATV;
+"float"         return FLOATV;
+"new"           return NEW;
+"addr"          return ADDR;
+"global"        return GLOBALOP;
+"object"        return OBJECTV;
+"pmc"           return PMCV;
+"string"        return STRINGV;
+"<<"            return SHIFT_LEFT;
+">>"            return SHIFT_RIGHT;
+">>>"           return SHIFT_RIGHT_U;
+"&&"            return LOG_AND;
+"||"            return LOG_OR;
+"~~"            return LOG_XOR;
+"<"             return RELOP_LT;
+"<="            return RELOP_LTE;
+">"             return RELOP_GT;
+">="            return RELOP_GTE;
+"=="            return RELOP_EQ;
+"!="            return RELOP_NE;
+"**"            return POW;
+"->"            return POINTY;
+{WS}+"."{WS}+   return CONCAT;
+"."             return DOT;
+<emit,INITIAL>".."     return DOTDOT;
+"+="            return PLUS_ASSIGN;
+"-="            return MINUS_ASSIGN;
+"*="            return MUL_ASSIGN;
+"/="            return DIV_ASSIGN;
+"%="            return MOD_ASSIGN;
+"//"            return FDIV;
+"//="           return FDIV_ASSIGN;
+"&="            return BAND_ASSIGN;
+"|="            return BOR_ASSIGN;
+"~="            return BXOR_ASSIGN;
+">>="           return SHR_ASSIGN;
+"<<="           return SHL_ASSIGN;
+">>>="          return SHR_U_ASSIGN;
+".="            return CONCAT_ASSIGN;
 
 <emit,INITIAL>".macro" {
         return read_macro(valp, interp, yyscanner);
@@ -442,7 +442,7 @@ SP              [ ]
         return IDENTIFIER;
      }
 
-<emit,INITIAL>","             return(COMMA);
+<emit,INITIAL>","             return COMMA;
 
 <emit,INITIAL>{ID}":" {
     YYCHOP();  /* trim last ':' */
@@ -491,7 +491,7 @@ SP              [ ]
         }
     }
     valp->s = str_dup(yytext);
-    return(!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
+    return (!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 
 <*>{FLOATNUM}         DUP_AND_RET(valp, FLOATC);
@@ -503,12 +503,12 @@ SP              [ ]
 <*>{BIGINT}         {
     valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
-        return(STRINGC); /* no BIGINT native format yet */
+        return STRINGC; /* no BIGINT native format yet */
     }
 
 <*>{STRINGCONSTANT} {
     valp->s = str_dup(yytext);
-        return(STRINGC); /* RT#42382 delete quotes, -> emit, pbc */
+        return STRINGC; /* RT#42382 delete quotes, -> emit, pbc */
     }
 
 <*>"<<"{STRINGCONSTANT} {
@@ -535,7 +535,7 @@ SP              [ ]
 <*>{UNICODE} {
     valp->s = str_dup(yytext);    /* charset:"..." */
         /* this is actually not unicode but a string with a charset */
-        return(USTRINGC);
+        return USTRINGC;
     }
 
 
@@ -1212,13 +1212,13 @@ FILE* imc_yyin_set(FILE* new_yyin, void *yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     yyg->yyin_r = new_yyin;
-    return(yyg->yyin_r);
+    return yyg->yyin_r;
 }
 
 FILE* imc_yyin_get(void *yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
-    return(yyg->yyin_r);
+    return yyg->yyin_r;
 }
 
 /* return true if scanner is at EOF */
