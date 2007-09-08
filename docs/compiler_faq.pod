@@ -109,13 +109,14 @@ This searches the sub C<foo> in the C<Foo> namespace.
 
 =head2 How do I create a Closure or Coroutine?
 
-Both carry dynamic state, therefore you use one of the above ways to
-locate the sub object, then you just clone it to get a distinct copy
-of it:
+Closure and Coroutine carry both a dynamic state.
+Therefore you need to perform two steps.
+First use one of the above ways to locate the Sub object.
+Then use the op C<newclosure> to capture the environment.
 
   .local pmc coro
   coro = find_name 'my_coro'
-  coro = clone coro
+  coro = newclosure coro
 
 Any subroutine that contains a C<.yield> directive is automatically
 created as a Coroutine PMC:
