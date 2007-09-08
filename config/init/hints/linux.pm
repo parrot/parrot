@@ -35,6 +35,9 @@ sub runstep {
         # suppress sprintf warnings that don't apply
         $cc_flags .= ' -wd269';
 
+        # suppress remarks about floating point comparisons
+        $cc_flags .= ' -wd1572';
+
         $cc_flags .= ' -Wall -Wcheck -w2';
 
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
