@@ -169,7 +169,7 @@ make_interpreter(NULLOK(Interp *parent), INTVAL flags)
 
     /* initialize classes - this needs mmd func table */
     interp->HLL_info = NULL;
-    Parrot_init(interp);
+    init_world_once(interp);
 
     /* context data */
     /* Initialize interpreter's flags */

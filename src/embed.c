@@ -80,16 +80,11 @@ extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
 
 FUNCDOC: Parrot_init
 
-Initializes the new interpreter. This function only has effect the first
-time it is called. Therefore Parrot_init() doesn't have to be called
-on an interpreter returned from Parrot_new().
-
-Use this function when you intend to enter the run loop,
-which automatically sets the top of stack pointer.
-
 FUNCDOC: Parrot_init_stacktop
 
-Like above. Additionally sets the stack top, so that Parrot objects created
+Initializes the new interpreter when it hasn't been initialized before.
+
+Additionally sets the stack top, so that Parrot objects created
 in inner stack frames will be visible during DODs stack walking code.
 B<stack_top> should be the address of an automatic variable in the caller's
 stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
@@ -99,27 +94,12 @@ Use this function when you call into Parrot before entering a run loop.
 
 */
 
-/* XXX Parrot_init() should be removed, no longer required for embedders */
-PARROT_API
-void
-Parrot_init(PARROT_INTERP)
-{
-    if (!interp->world_inited) {
-        /* global_setup.c:init_world sets up some vtable stuff.
-         * It must only be called once.
-         */
-
-        interp->world_inited = 1;
-        init_world(interp);
-    }
-}
-
 PARROT_API
 void
 Parrot_init_stacktop(PARROT_INTERP, void *stack_top)
 {
     interp->lo_var_ptr = stack_top;
-    Parrot_init(interp);
+    init_world_once(interp);
 }
 
 /*

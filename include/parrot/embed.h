@@ -24,8 +24,6 @@ typedef int Parrot_warnclass;
 
 PARROT_API Parrot_Interp Parrot_new(Parrot_Interp parent);
 
-/* XXX Parrot_init() should be removed, no longer required for embedders */
-PARROT_API void Parrot_init(Parrot_Interp);
 PARROT_API void Parrot_init_stacktop(Parrot_Interp, void *);
 
 PARROT_API void Parrot_set_flag(Parrot_Interp, Parrot_Int);

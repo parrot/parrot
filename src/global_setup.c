@@ -8,8 +8,8 @@ src/global_setup.c - Global setup
 
 =head1 DESCRIPTION
 
-Performs all the global setting up of things. This includes the (very
-few) global variables that Parrot totes around.
+Performs all the global setting up of things. This includes the very
+few global variables that Parrot totes around.
 
 I<What are these global variables?>
 
@@ -44,7 +44,7 @@ static void parrot_set_config_hash_interpreter( PARROT_INTERP )
 FUNCDOC: Parrot_set_config_hash_internal
 
 Called by Parrot_set_config_hash with the serialised hash which
-will be used in subsequently created Interpreters
+will be used in subsequently created Interpreters.
 
 */
 
@@ -90,18 +90,41 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
                              (INTVAL) IGLOBALS_CONFIG_HASH, config_hash);
 }
 
+/*
+
+FUNCDOC: init_world_once(PARROT_INTERP)>
+
+Call init_world() if it hasn't been called before.
+
+C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
+
+*/
+
+void
+init_world_once(PARROT_INTERP)
+{
+    if (!interp->world_inited) {
+        /* init_world() sets up some vtable stuff.
+         * It must only be called once.
+         */
+
+        interp->world_inited = 1;
+        init_world(interp);
+    }
+}
+
 
 /*
 
 FUNCDOC: init_world(PARROT_INTERP)>
 
-This is the actual initialization code called by C<Parrot_init()>.
+This is the actual initialization code called by C<init_world_once()>.
 
 It sets up the Parrot system, running any platform-specific init code if
 necessary, then initializing the string subsystem, and setting up the
 base vtables and core PMCs.
 
-C<interp> should be the root interpreter returned by C<Parrot_new(NULL)>.
+C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
 
 */
 

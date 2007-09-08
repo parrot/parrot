@@ -358,7 +358,7 @@ struct parrot_interp_t {
     Interp * parent_interpreter;
 
     /* per interpreter global vars */
-    INTVAL world_inited;                      /* Parrot_init is done */
+    INTVAL world_inited;                      /* world_init_once() is done */
 
     PMC *iglobals;                            /* SArray of PMCs, containing: */
     /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
@@ -483,9 +483,6 @@ VAR_SCOPE native_func_t run_native;
 
 typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
                                        const char * program );
-
-/* embed.c */
-PARROT_API void Parrot_init(PARROT_INTERP);
 
 /* HEADERIZER BEGIN: src/inter_create.c */
 

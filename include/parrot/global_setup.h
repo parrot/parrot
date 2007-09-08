@@ -28,6 +28,9 @@ void Parrot_set_config_hash_internal(
 void init_world( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+void init_world_once( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 void parrot_global_setup_2( PARROT_INTERP )
         __attribute__nonnull__(1);
 
