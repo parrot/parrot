@@ -137,7 +137,7 @@ Returns the list as a string
         if (string_length(INTERP, retval))
             string_chopn_inplace(INTERP, retval, 1);
 
-        return(retval);
+        return retval;
     }
 
 /*

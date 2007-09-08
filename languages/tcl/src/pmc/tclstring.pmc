@@ -27,7 +27,7 @@ pmclass TclString
         PMC* P0;
         STRING* S0;
 
-        if (! str) return(SELF);
+        if (! str) return SELF;
 
         len = string_length(INTERP, str);
 
@@ -149,7 +149,7 @@ pmclass TclString
 
 
       done:
-        return(retval);
+        return retval;
     }
 }
 
