@@ -124,7 +124,7 @@ const struct _data_types data_types[] = {
 };
 #else
 extern const struct _data_types data_types[];
-#endif
+#endif /* INSIDE_GLOBAL_SETUP */
 
 /* HEADERIZER BEGIN: src/datatypes.c */
 
