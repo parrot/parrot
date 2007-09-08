@@ -71,7 +71,7 @@ is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
 is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
 TODO:
 {
-    local $TODO = '--trace behaves not like -t';
+    local $TODO = 'RT# 45267 --trace behaves not like -t';
     is( `"$PARROT" --trace "$first_pir_file" $redir`, "first\n", 'option --trace' );
 }
 is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`,      "second\n", 'option -t with flags' );
