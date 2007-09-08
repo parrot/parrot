@@ -34,51 +34,51 @@ RANKSPEC        \[[,]*\]
 [\n]            line++;
 \/\/.*\n        line++;    /* COMMENT */
 
-"__asm"         return(ASM);
-"bool"          return(BOOL);
-"break"         return(BREAK);
-"byte"          return(BYTE);
-"const"         return(CONST);
-"continue"      return(CONTINUE);
-"char"          return(CHAR);
-"class"         return(CLASS);
-"decimal"       return(DECIMAL);
-"double"        return(DOUBLE);
-"else"          return(ELSE);
-"false"         return(FALSE);
-"float"         return(FLOAT);
-"get"           return(GET);
-"goto"          return(GOTO);
-"for"           return(FOR);
-"if"            return(IF);
-"int"           return(INT);
-"long"          return(LONG);
-"namespace"     return(NAMESPACE);
-"new"           return(NEW);
-"null"          return(NULLVAL);
-"out"           return(OUT);
-"object"        return(OBJECT);
-"override"      return(OVERRIDE);
-"public"        return(PUBLIC);
-"private"       return(PRIVATE);
-"protected"     return(PROTECTED);
-"readonly"      return(READONLY);
-"ref"           return(REF);
-"return"        return(RETURN);
-"set"           return(SET);
-"sbyte"         return(SBYTE);
-"short"         return(SHORT);
-"static"        return(STATIC);
-"string"        return(STRING);
-"this"          return(THIS);
-"true"          return(TRUE);
-"uint"          return(UINT);
-"ulong"         return(ULONG);
-"ushort"        return(USHORT);
-"using"         return(USING);
-"virtual"       return(VIRTUAL);
-"void"          return(VOID);
-"while"         return(WHILE);
+"__asm"         return ASM;
+"bool"          return BOOL;
+"break"         return BREAK;
+"byte"          return BYTE;
+"const"         return CONST;
+"continue"      return CONTINUE;
+"char"          return CHAR;
+"class"         return CLASS;
+"decimal"       return DECIMAL;
+"double"        return DOUBLE;
+"else"          return ELSE;
+"false"         return FALSE;
+"float"         return FLOAT;
+"get"           return GET;
+"goto"          return GOTO;
+"for"           return FOR;
+"if"            return IF;
+"int"           return INT;
+"long"          return LONG;
+"namespace"     return NAMESPACE;
+"new"           return NEW;
+"null"          return NULLVAL;
+"out"           return OUT;
+"object"        return OBJECT;
+"override"      return OVERRIDE;
+"public"        return PUBLIC;
+"private"       return PRIVATE;
+"protected"     return PROTECTED;
+"readonly"      return READONLY;
+"ref"           return REF;
+"return"        return RETURN;
+"set"           return SET;
+"sbyte"         return SBYTE;
+"short"         return SHORT;
+"static"        return STATIC;
+"string"        return STRING;
+"this"          return THIS;
+"true"          return TRUE;
+"uint"          return UINT;
+"ulong"         return ULONG;
+"ushort"        return USHORT;
+"using"         return USING;
+"virtual"       return VIRTUAL;
+"void"          return VOID;
+"while"         return WHILE;
 
 
 {LETTER}{LETTERDIGIT}* {
@@ -86,7 +86,7 @@ RANKSPEC        \[[,]*\]
         s = new_identifier_symbol(yytext);
         s->line = line;
         yylval.sym = s;
-        return(IDENTIFIER);
+        return IDENTIFIER;
     }
 
 {SIGN}?{DIGIT}+"."{DIGIT}+ {
@@ -94,7 +94,7 @@ RANKSPEC        \[[,]*\]
         s->type = t_float;
         s->typename = t_float->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 
 {SIGN}?{DIGIT}+ {
@@ -102,7 +102,7 @@ RANKSPEC        \[[,]*\]
         s->type = t_int32;
         s->typename = t_int32->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 
 {STRINGCONSTANT} {
@@ -110,7 +110,7 @@ RANKSPEC        \[[,]*\]
         s->type = t_string;
         s->typename = t_string->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 
 {RANKSPEC}    {
@@ -121,19 +121,19 @@ RANKSPEC        \[[,]*\]
         Symbol * s = new_literal_symbol(yytext);
         fprintf(stderr, "Rank spec /%s/\n", s->name);
         yylval.sym = s;
-        return(RANKSPEC);
+        return RANKSPEC;
     }
 
-"++"            return(INC);
-"--"            return(DEC);
-"||"            return(LOGICAL_OR);
-"&&"            return(LOGICAL_AND);
-"=="            return(LOGICAL_EQ);
-"!="            return(LOGICAL_NE);
-"<<"            return(LEFT_SHIFT);
-">>"            return(RIGHT_SHIFT);
-"<="            return(LOGICAL_LTE);
-">="            return(LOGICAL_GTE);
+"++"            return INC;
+"--"            return DEC;
+"||"            return LOGICAL_OR;
+"&&"            return LOGICAL_AND;
+"=="            return LOGICAL_EQ;
+"!="            return LOGICAL_NE;
+"<<"            return LEFT_SHIFT;
+">>"            return RIGHT_SHIFT;
+"<="            return LOGICAL_LTE;
+">="            return LOGICAL_GTE;
 [\t\f\r ]+        ;
 .               return yytext[0];
 %%

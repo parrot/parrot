@@ -866,227 +866,227 @@ line++;    /* COMMENT */
 case 3:
 YY_RULE_SETUP
 #line 37 "cola.l"
-return(ASM);
+return ASM;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 38 "cola.l"
-return(BOOL);
+return BOOL;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 39 "cola.l"
-return(BREAK);
+return BREAK;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 40 "cola.l"
-return(BYTE);
+return BYTE;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 41 "cola.l"
-return(CONST);
+return CONST;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 42 "cola.l"
-return(CONTINUE);
+return CONTINUE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 43 "cola.l"
-return(CHAR);
+return CHAR;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 44 "cola.l"
-return(CLASS);
+return CLASS;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 45 "cola.l"
-return(DECIMAL);
+return DECIMAL;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 46 "cola.l"
-return(DOUBLE);
+return DOUBLE;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 47 "cola.l"
-return(ELSE);
+return ELSE;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 48 "cola.l"
-return(FALSE);
+return FALSE;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 49 "cola.l"
-return(FLOAT);
+return FLOAT;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 50 "cola.l"
-return(GET);
+return GET;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 51 "cola.l"
-return(GOTO);
+return GOTO;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 52 "cola.l"
-return(FOR);
+return FOR;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 53 "cola.l"
-return(IF);
+return IF;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 54 "cola.l"
-return(INT);
+return INT;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 55 "cola.l"
-return(LONG);
+return LONG;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 56 "cola.l"
-return(NAMESPACE);
+return NAMESPACE;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 57 "cola.l"
-return(NEW);
+return NEW;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 58 "cola.l"
-return(NULLVAL);
+return NULLVAL;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 59 "cola.l"
-return(OUT);
+return OUT;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 60 "cola.l"
-return(OBJECT);
+return OBJECT;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 61 "cola.l"
-return(OVERRIDE);
+return OVERRIDE;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 62 "cola.l"
-return(PUBLIC);
+return PUBLIC;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 63 "cola.l"
-return(PRIVATE);
+return PRIVATE;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 64 "cola.l"
-return(PROTECTED);
+return PROTECTED;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 65 "cola.l"
-return(READONLY);
+return READONLY;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 66 "cola.l"
-return(REF);
+return REF;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 67 "cola.l"
-return(RETURN);
+return RETURN;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 68 "cola.l"
-return(SET);
+return SET;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 69 "cola.l"
-return(SBYTE);
+return SBYTE;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 70 "cola.l"
-return(SHORT);
+return SHORT;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 71 "cola.l"
-return(STATIC);
+return STATIC;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 72 "cola.l"
-return(STRING);
+return STRING;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 73 "cola.l"
-return(THIS);
+return THIS;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 74 "cola.l"
-return(TRUE);
+return TRUE;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 75 "cola.l"
-return(UINT);
+return UINT;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 76 "cola.l"
-return(ULONG);
+return ULONG;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 77 "cola.l"
-return(USHORT);
+return USHORT;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 78 "cola.l"
-return(USING);
+return USING;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 79 "cola.l"
-return(VIRTUAL);
+return VIRTUAL;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 80 "cola.l"
-return(VOID);
+return VOID;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 81 "cola.l"
-return(WHILE);
+return WHILE;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
@@ -1096,7 +1096,7 @@ YY_RULE_SETUP
         s = new_identifier_symbol(yytext);
         s->line = line;
         yylval.sym = s;
-        return(IDENTIFIER);
+        return IDENTIFIER;
     }
 	YY_BREAK
 case 49:
@@ -1107,7 +1107,7 @@ YY_RULE_SETUP
         s->type = t_float;
         s->typename = t_float->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 	YY_BREAK
 case 50:
@@ -1118,7 +1118,7 @@ YY_RULE_SETUP
         s->type = t_int32;
         s->typename = t_int32->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 	YY_BREAK
 case 51:
@@ -1130,7 +1130,7 @@ YY_RULE_SETUP
         s->type = t_string;
         s->typename = t_string->sym;
         yylval.sym = s;
-        return(LITERAL);
+        return LITERAL;
     }
 	YY_BREAK
 case 52:
@@ -1144,58 +1144,58 @@ YY_RULE_SETUP
         Symbol * s = new_literal_symbol(yytext);
         fprintf(stderr, "Rank spec /%s/\n", s->name);
         yylval.sym = s;
-        return(RANKSPEC);
+        return RANKSPEC;
     }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 127 "cola.l"
-return(INC);
+return INC;
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 128 "cola.l"
-return(DEC);
+return DEC;
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 129 "cola.l"
-return(LOGICAL_OR);
+return LOGICAL_OR;
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 130 "cola.l"
-return(LOGICAL_AND);
+return LOGICAL_AND;
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 131 "cola.l"
-return(LOGICAL_EQ);
+return LOGICAL_EQ;
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 132 "cola.l"
-return(LOGICAL_NE);
+return LOGICAL_NE;
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 133 "cola.l"
-return(LEFT_SHIFT);
+return LEFT_SHIFT;
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 134 "cola.l"
-return(RIGHT_SHIFT);
+return RIGHT_SHIFT;
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
 #line 135 "cola.l"
-return(LOGICAL_LTE);
+return LOGICAL_LTE;
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
 #line 136 "cola.l"
-return(LOGICAL_GTE);
+return LOGICAL_GTE;
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
@@ -1960,10 +1960,10 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
  * @note If you want to scan bytes that may contain NUL values, then use
  *       yy_scan_bytes() instead.
  */
-YY_BUFFER_STATE yy_scan_string (yyconst char * __yystr )
+YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 {
     
-	return yy_scan_bytes(__yystr,strlen(__yystr) );
+	return yy_scan_bytes(yystr,strlen(yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
@@ -2213,7 +2213,7 @@ void yyfree (void * ptr )
 
 
 #ifdef yywrap
-#undef yywrap
+#  undef yywrap
 #endif
 
 int yywrap() {
