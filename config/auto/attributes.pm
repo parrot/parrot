@@ -71,7 +71,7 @@ sub try_attr {
         $disable_warnings = '-wd4101';
     }
 
-    my $ccflags = $conf->option_or_data( 'ccflags');
+    my $ccflags = $conf->data->get( 'ccflags' );
     my $tryflags = "$ccflags -D$attr $disable_warnings";
 
     my $command_line = Parrot::Configure::Step::_build_compile_command( $cc, $tryflags );
@@ -91,6 +91,8 @@ sub try_attr {
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );
+        my $ccflags = $conf->data->get( "ccflags" );
+        $verbose and print "  ccflags: $ccflags$/";
     }
 
     return;
