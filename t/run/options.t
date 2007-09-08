@@ -19,8 +19,8 @@ Tests C<parrot> command line options.
 use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 12;
+
+use Test::More tests => 12;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -45,22 +45,27 @@ is( `"$PARROT" "$first_pir_file" "$second_pir_file"`, "first\n", 'ignore a pir-f
 is( `"$PARROT" "$first_pir_file" "asdf"`,    "first\n", 'ignore nonsense' );
 
 # redirect STDERR to avoid warnings
-my $redir = '2>' . File::Spec->devnull;
+my $redir = '2>' . File::Spec->devnull();
 
 # --pre-process-only
 # This is just sanity testing
-# Coredumps after the output has been written are ignored
-is( `"$PARROT" -E "$first_pir_file" $redir`, <<'END_EXPECTED', 'option -E' );
-.sub main :main
-print "first\n" 
-.end
-END_EXPECTED
+my $expected_preprocesses_pir = <<'END_PIR';
 
-is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`, <<'END_EXPECTED', 'option --pre-process-only' );
+.macro 
+
 .sub main :main
-print "first\n" 
+
+say "first" 
+
 .end
-END_EXPECTED
+
+END_PIR
+is( `"$PARROT" -E "$first_pir_file" $redir`,
+    $expected_preprocesses_pir,
+    'option -E' );
+is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
+    $expected_preprocesses_pir,
+    'option --pre-process-only' );
 
 # Test the trace option
 is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
@@ -80,7 +85,16 @@ sub create_pir_file {
     my $word = shift;
 
     my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir' );
-    print $fh qq{.sub main :main\n\tprint "$word\\n"\n.end};
+    print $fh <<"END_PIR";
+
+.macro println(word)
+   say .word
+.endm
+
+.sub main :main
+  .println( "$word" )
+.end
+END_PIR
     close $fh;
 
     return $filename;
