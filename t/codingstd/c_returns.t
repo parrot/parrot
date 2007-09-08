@@ -28,7 +28,7 @@ than C<return (foo);>
 
 =head1 NOTES
 
-This test was hacked from the C<check_returns> sub in 
+This test was hacked from the C<check_returns> sub in
 C<tools/dev/check_source_standards.pl>
 
 =head1 SEE ALSO
@@ -66,11 +66,11 @@ foreach my $file (@files) {
 
     # look for instances of return(
     push @paren_return => "$path\n"
-        if ($buf =~ m/return\(/);
+        if ($buf =~ m/[^_.]return\(/);
 }
 
 ok( !scalar(@paren_return), 'Correctly formed return statement' )
-    or diag( "Possible use of C<return(foo);> rather than C<return foo;> in " . 
+    or diag( "Possible use of C<return(foo);> rather than C<return foo;> in " .
         scalar @paren_return . " files:\n@paren_return" );
 
 
