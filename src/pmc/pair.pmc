@@ -230,10 +230,10 @@ Used to unarchive the Pair.
         IMAGE_IO * const io = info->image_io;
         PMC **pos;
 
-        io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
+        VTABLE_push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
 
         if (PObj_key_is_string_TEST(SELF)) {
-            io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
+            VTABLE_push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
         }
         else {
             PMC ** const temp_pos = (PMC **)&PMC_struct_val(SELF);
@@ -252,10 +252,10 @@ Used to unarchive the Pair.
     void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        io->vtable->push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
+        VTABLE_push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
 
         if (PObj_key_is_string_TEST(SELF))
-            io->vtable->push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
+            VTABLE_push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
     }
 
     void thaw(visit_info *info) {
@@ -264,10 +264,10 @@ Used to unarchive the Pair.
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL flag = io->vtable->shift_integer(INTERP, io);
+            const INTVAL flag = VTABLE_shift_integer(INTERP, io);
             if (flag) {
                 PObj_key_is_string_SET(SELF);
-                PMC_struct_val(SELF) = io->vtable->shift_string(INTERP, io);
+                PMC_struct_val(SELF) = VTABLE_shift_string(INTERP, io);
             }
         }
     }

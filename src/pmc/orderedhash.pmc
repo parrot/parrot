@@ -609,7 +609,7 @@ preserve key/value order.
                     if (!key)
                         continue;
 
-                    io->vtable->push_string(interp, io, key);
+                    VTABLE_push_string(interp, io, key);
                     (info->visit_pmc_now)(interp, (PMC *)b->value, info);
                 }
                 break;

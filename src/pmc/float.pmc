@@ -383,7 +383,7 @@ Used to archive the number.
     void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        io->vtable->push_float(INTERP, io, PMC_num_val(SELF));
+        VTABLE_push_float(INTERP, io, PMC_num_val(SELF));
     }
 
 /*
@@ -399,7 +399,7 @@ Used to unarchive the number.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+            PMC_num_val(SELF) = VTABLE_shift_float(INTERP, io);
     }
 /*
 

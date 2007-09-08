@@ -1308,7 +1308,7 @@ Used to archive the integer.
     void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
     }
 
 /*
@@ -1324,7 +1324,7 @@ Used to unarchive the integer.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_int_val(SELF) = io->vtable->shift_integer(INTERP, io);
+            PMC_int_val(SELF) = VTABLE_shift_integer(INTERP, io);
     }
 }
 

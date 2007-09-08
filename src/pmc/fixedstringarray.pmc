@@ -492,10 +492,10 @@ Used to archive the string.
         const INTVAL n         = PMC_int_val(SELF);
         INTVAL       i;
 
-        io->vtable->push_integer(INTERP, io, n);
+        VTABLE_push_integer(INTERP, io, n);
 
         for (i = 0; i < n; ++i)
-            io->vtable->push_string(INTERP, io, data[i]);
+            VTABLE_push_string(INTERP, io, data[i]);
     }
 
 /*
@@ -517,12 +517,12 @@ Used to unarchive the string.
 
             DYNSELF.init();
 
-            n    = io->vtable->shift_integer(INTERP, io);
+            n    = VTABLE_shift_integer(INTERP, io);
             DYNSELF.set_integer_native(n);
             data = PMC_data_typed(SELF, STRING **);
 
             for (i = 0; i < n; ++i)
-                data[i] = io->vtable->shift_string(INTERP, io);
+                data[i] = VTABLE_shift_string(INTERP, io);
         }
     }
 }

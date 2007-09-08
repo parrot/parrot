@@ -582,18 +582,18 @@ Used to unarchive the array.
         SUPER(info);
 
         n  = VTABLE_elements(INTERP, SELF);
-        io->vtable->push_integer(INTERP, io, n);
+        VTABLE_push_integer(INTERP, io, n);
         ar = (INTVAL *)PMC_data(SELF);
 
         for (i = 0; i < n; ++i)
-            io->vtable->push_integer(INTERP, io, ar[i]);
+            VTABLE_push_integer(INTERP, io, ar[i]);
     }
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL  n = io->vtable->shift_integer(INTERP, io);
+            INTVAL  n = VTABLE_shift_integer(INTERP, io);
             INTVAL  i;
             INTVAL *ar;
 
@@ -607,7 +607,7 @@ Used to unarchive the array.
             ar = (INTVAL *)PMC_data(SELF);
 
             for (i = 0; i < n; ++i)
-                ar[i] = io->vtable->shift_integer(INTERP, io);
+                ar[i] = VTABLE_shift_integer(INTERP, io);
         }
         else
             SUPER(info);

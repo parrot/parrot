@@ -1048,9 +1048,9 @@ Used to archive the hash.
         Hash * const     hash = (Hash *)PMC_struct_val(SELF);;
 
         SUPER(info);
-        io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
-        io->vtable->push_integer(INTERP, io, hash->key_type);
-        io->vtable->push_integer(INTERP, io, hash->entry_type);
+        VTABLE_push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
+        VTABLE_push_integer(INTERP, io, hash->key_type);
+        VTABLE_push_integer(INTERP, io, hash->entry_type);
     }
 
 /*
@@ -1068,9 +1068,9 @@ Used to unarchive the hash.
 
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems  = io->vtable->shift_integer(INTERP, io);
-            const INTVAL k_type = io->vtable->shift_integer(INTERP, io);
-            const INTVAL v_type = io->vtable->shift_integer(INTERP, io);
+            const INTVAL elems  = VTABLE_shift_integer(INTERP, io);
+            const INTVAL k_type = VTABLE_shift_integer(INTERP, io);
+            const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
             Hash        *hash;
 
             /* TODO make a better interface for hash creation

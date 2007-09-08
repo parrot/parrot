@@ -388,7 +388,7 @@ Create the class from the thawed parents and attributes array.
 
         /* 1) freeze class name */
         pos = class_data + PCD_CLASS_NAME;
-        io->vtable->push_string(INTERP, io,
+        VTABLE_push_string(INTERP, io,
                 VTABLE_get_string(INTERP, *pos));
     }
 
@@ -414,7 +414,7 @@ Create the class from the thawed parents and attributes array.
             PMC    *real_class;
 
             /* thaw class name */
-            STRING *class_name = io->vtable->shift_string(INTERP, io);
+            STRING *class_name = VTABLE_shift_string(INTERP, io);
 
             /* if class exists in this interpreter, check if the
              * thawed class is the same, if not bail out, if yes

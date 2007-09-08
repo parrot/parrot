@@ -348,12 +348,12 @@ Used to archive the string.
         const INTVAL     size = ROUND_BYTES(PMC_int_val(SELF));
         STRING           *s;
 
-        io->vtable->push_integer(INTERP, io, PMC_int_val2(SELF));
-        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        VTABLE_push_integer(INTERP, io, PMC_int_val2(SELF));
+        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
 
         s = string_from_cstring(INTERP, PMC_data_typed(SELF, char *), size);
 
-        io->vtable->push_string(INTERP, io, s);
+        VTABLE_push_string(INTERP, io, s);
     }
 
 /*
@@ -367,9 +367,9 @@ Used to unarchive the string.
 */
     void thaw(visit_info *info) {
         IMAGE_IO * const io      = info->image_io;
-        const INTVAL     headPos = io->vtable->shift_integer(INTERP, io);
-        const INTVAL     tailPos = io->vtable->shift_integer(INTERP, io);
-        STRING * const   s       = io->vtable->shift_string(INTERP, io);
+        const INTVAL     headPos = VTABLE_shift_integer(INTERP, io);
+        const INTVAL     tailPos = VTABLE_shift_integer(INTERP, io);
+        STRING * const   s       = VTABLE_shift_string(INTERP, io);
 
         PMC_data(SELF)           = mem_sys_allocate_zeroed(s->bufused);
         mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);

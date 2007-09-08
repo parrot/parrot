@@ -809,7 +809,7 @@ Used to archive the string.
     void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        io->vtable->push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
+        VTABLE_push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
     }
 
 /*
@@ -825,7 +825,7 @@ Used to unarchive the string.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            DYNSELF.set_string_native(io->vtable->shift_string(INTERP, io));
+            DYNSELF.set_string_native(VTABLE_shift_string(INTERP, io));
     }
 /*
 

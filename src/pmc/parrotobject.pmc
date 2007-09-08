@@ -602,7 +602,7 @@ Used to unarchive the object.
 
     void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
     }
 
     void thaw(visit_info *info) {
@@ -611,7 +611,7 @@ Used to unarchive the object.
             SUPER(info);
         }
         else if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL n = io->vtable->shift_integer(INTERP, io);
+            INTVAL n = VTABLE_shift_integer(INTERP, io);
             set_attrib_array_size(SELF, n);
         }
     }

@@ -475,20 +475,20 @@ Archives the subroutine.
          * - vtable_index
          */
 
-        io->vtable->push_integer(INTERP, io, (INTVAL) sub->start_offs);
-        io->vtable->push_integer(INTERP, io, (INTVAL) sub->end_offs);
-        io->vtable->push_integer(INTERP, io,
+        VTABLE_push_integer(INTERP, io, (INTVAL) sub->start_offs);
+        VTABLE_push_integer(INTERP, io, (INTVAL) sub->end_offs);
+        VTABLE_push_integer(INTERP, io,
             PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK);
 
-        io->vtable->push_string(INTERP, io, sub->name);
-        io->vtable->push_string(INTERP, io,
+        VTABLE_push_string(INTERP, io, sub->name);
+        VTABLE_push_string(INTERP, io,
             Parrot_get_HLL_name(INTERP, sub->HLL_id));
 
-        io->vtable->push_integer(INTERP, io, sub->comp_flags);
-        io->vtable->push_integer(INTERP, io, sub->vtable_index);
+        VTABLE_push_integer(INTERP, io, sub->comp_flags);
+        VTABLE_push_integer(INTERP, io, sub->vtable_index);
 
         for (i = 0; i < 4; ++i)
-            io->vtable->push_integer(INTERP, io, sub->n_regs_used[i]);
+            VTABLE_push_integer(INTERP, io, sub->n_regs_used[i]);
     }
 
 /*
@@ -511,20 +511,20 @@ Unarchives the subroutine.
             int    i;
 
             /* we get relative offsets */
-            sub->start_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
-            sub->end_offs     = (size_t) io->vtable->shift_integer(INTERP, io);
-            flags             = io->vtable->shift_integer(INTERP, io);
+            sub->start_offs   = (size_t) VTABLE_shift_integer(INTERP, io);
+            sub->end_offs     = (size_t) VTABLE_shift_integer(INTERP, io);
+            flags             = VTABLE_shift_integer(INTERP, io);
 
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
 
-            sub->name         = io->vtable->shift_string(INTERP, io);
+            sub->name         = VTABLE_shift_string(INTERP, io);
             sub->HLL_id       = Parrot_get_HLL_id(INTERP,
-                io->vtable->shift_string(INTERP, io));
-            sub->comp_flags   = io->vtable->shift_integer(INTERP, io);
-            sub->vtable_index = io->vtable->shift_integer(INTERP, io);
+                VTABLE_shift_string(INTERP, io));
+            sub->comp_flags   = VTABLE_shift_integer(INTERP, io);
+            sub->vtable_index = VTABLE_shift_integer(INTERP, io);
 
             for (i = 0; i < 4; ++i)
-                sub->n_regs_used[i] = io->vtable->shift_integer(INTERP, io);
+                sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, io);
         }
     }
 

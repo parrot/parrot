@@ -480,8 +480,8 @@ Used to archive the string.
                                 PMC_data_typed(SELF, char *),
                                 PMC_int_val2(SELF) / BITS_PER_CHAR);
 
-        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
-        io->vtable->push_string(INTERP, io, s);
+        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
+        VTABLE_push_string(INTERP, io, s);
     }
 
 /*
@@ -498,8 +498,8 @@ Used to unarchive the string.
         SUPER(info);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            INTVAL size       = io->vtable->shift_integer(INTERP, io);
-            STRING *s         = io->vtable->shift_string(INTERP, io);
+            INTVAL size       = VTABLE_shift_integer(INTERP, io);
+            STRING *s         = VTABLE_shift_string(INTERP, io);
             PMC_int_val(SELF) = size;
             PMC_int_val2(pmc) = s->bufused * BITS_PER_CHAR;
             PMC_data(pmc)     = mem_sys_allocate_zeroed(s->bufused);

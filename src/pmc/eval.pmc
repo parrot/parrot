@@ -312,14 +312,14 @@ Unarchives the code.
     void freeze(visit_info *info) {
         IMAGE_IO *io     = info->image_io;
         STRING   *packed = SELF.get_string();
-        io->vtable->push_string(INTERP, io, packed);
+        VTABLE_push_string(INTERP, io, packed);
 
         SUPER(info);
     }
 
     void thaw(visit_info *info) {
         IMAGE_IO         *io     = info->image_io;
-        STRING           *packed = io->vtable->shift_string(INTERP, io);
+        STRING           *packed = VTABLE_shift_string(INTERP, io);
         PackFile         *pf;
         PackFile_Segment *seg;
         size_t            i;

@@ -386,21 +386,21 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         /* write the contents of a register - else thaw can't restore
          * the register state
          */
-        io->vtable->push_integer(INTERP, io, flags & ~KEY_register_FLAG);
+        VTABLE_push_integer(INTERP, io, flags & ~KEY_register_FLAG);
 
         /* and contents of this key component */
         switch (flags) {
             case KEY_integer_FLAG:
             case KEY_integer_FLAG | KEY_register_FLAG:
-                io->vtable->push_integer(INTERP, io, key_integer(INTERP, SELF));
+                VTABLE_push_integer(INTERP, io, key_integer(INTERP, SELF));
                 break;
             case KEY_number_FLAG:
             case KEY_number_FLAG | KEY_register_FLAG:
-                io->vtable->push_float(INTERP, io, key_number(INTERP, SELF));
+                VTABLE_push_float(INTERP, io, key_number(INTERP, SELF));
                 break;
             case KEY_string_FLAG:
             case KEY_string_FLAG | KEY_register_FLAG:
-                io->vtable->push_string(INTERP, io, key_string(INTERP, SELF));
+                VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
                 break;
             default:
                 real_exception(INTERP, NULL, E_KeyError,
@@ -411,7 +411,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
     void thaw(visit_info *info /*NN*/) {
         IMAGE_IO * const io    = info->image_io;
-        INTVAL     const flags = io->vtable->shift_integer(INTERP, io)
+        INTVAL     const flags = VTABLE_shift_integer(INTERP, io)
                                     & KEY_type_FLAGS;
 
         PObj_get_FLAGS(SELF) |= flags;
@@ -420,13 +420,13 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         /* get contents */
         switch (flags) {
             case KEY_integer_FLAG:
-                PMC_int_val(SELF) = io->vtable->shift_integer(INTERP, io);
+                PMC_int_val(SELF) = VTABLE_shift_integer(INTERP, io);
                 break;
             case KEY_number_FLAG:
-                PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+                PMC_num_val(SELF) = VTABLE_shift_float(INTERP, io);
                 break;
             case KEY_string_FLAG:
-                PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+                PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);
                 break;
             default:
                 real_exception(INTERP, NULL, E_KeyError,
