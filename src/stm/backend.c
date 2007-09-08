@@ -246,13 +246,13 @@ void
 Parrot_freeze_STM_PMC_handle(PARROT_INTERP, NOTNULL(IMAGE_IO *io),
             NOTNULL(Parrot_STM_PMC_handle handle))
 {
-    io->vtable->push_pmc(interp, io, (PMC*) handle);
+    VTABLE_push_pmc(interp, io, (PMC*) handle);
 }
 
 Parrot_STM_PMC_handle
 Parrot_thaw_STM_PMC_handle(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 {
-    Parrot_STM_PMC_handle handle = (Parrot_STM_PMC_handle) io->vtable->shift_pmc(interp, io);
+    Parrot_STM_PMC_handle handle = (Parrot_STM_PMC_handle) VTABLE_shift_pmc(interp, io);
     return handle;
 }
 

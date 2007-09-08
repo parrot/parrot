@@ -922,7 +922,7 @@ freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
 
     if (PMC_IS_NULL(pmc)) {
         /* NULL + seen bit */
-        io->vtable->push_pmc(interp, io, (PMC*) 1);
+        VTABLE_push_pmc(interp, io, (PMC*) 1);
         return;
     }
     type = pmc->vtable->base_type;
@@ -932,8 +932,8 @@ freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
     if (seen) {
         if (info->extra_flags) {
             id |= 3;
-            io->vtable->push_pmc(interp, io, (PMC*)id);
-            io->vtable->push_integer(interp, io, info->extra_flags);
+            VTABLE_push_pmc(interp, io, (PMC*)id);
+            VTABLE_push_integer(interp, io, info->extra_flags);
             return;
         }
         id |= 1;         /* mark bit 0 if this PMC is known */
@@ -941,9 +941,9 @@ freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
     else if (type == info->last_type) {
         id |= 2;         /* mark bit 1 and don't write type */
     }
-    io->vtable->push_pmc(interp, io, (PMC*)id);
+    VTABLE_push_pmc(interp, io, (PMC*)id);
     if (! (id & 3)) {    /* else write type */
-        io->vtable->push_integer(interp, io, type);
+        VTABLE_push_integer(interp, io, type);
         info->last_type = type;
     }
 }
@@ -978,10 +978,10 @@ thaw_pmc(PARROT_INTERP, NOTNULL(visit_info *info),
     int seen = 0;
 
     info->extra_flags = EXTRA_IS_NULL;
-    n = io->vtable->shift_pmc(interp, io);
+    n = VTABLE_shift_pmc(interp, io);
     if (((UINTVAL) n & 3) == 3) {
         /* pmc has extra data */
-        info->extra_flags = io->vtable->shift_integer(interp, io);
+        info->extra_flags = VTABLE_shift_integer(interp, io);
     }
     else if ((UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
         seen = 1;
@@ -990,7 +990,7 @@ thaw_pmc(PARROT_INTERP, NOTNULL(visit_info *info),
         *type = info->last_type;
     }
     else {                       /* type follows */
-        info->last_type = *type = io->vtable->shift_integer(interp, io);
+        info->last_type = *type = VTABLE_shift_integer(interp, io);
         if (*type <= 0)
             real_exception(interp, NULL, 1, "Unknown PMC type to thaw %d", (int) *type);
         if (*type >= interp->n_vtable_max ||

@@ -318,13 +318,13 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
         switch (hash->key_type) {
             case Hash_key_type_STRING:
                 {
-                STRING * const s_key = io->vtable->shift_string(interp, io);
+                STRING * const s_key = VTABLE_shift_string(interp, io);
                 b = parrot_hash_put(interp, hash, s_key, NULL);
                 }
                 break;
             case Hash_key_type_int:
                 {
-                const INTVAL i_key = io->vtable->shift_integer(interp, io);
+                const INTVAL i_key = VTABLE_shift_integer(interp, io);
                 b = parrot_hash_put(interp, hash, (void*)i_key, NULL);
                 }
                 break;
@@ -339,7 +339,7 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
                 (info->visit_pmc_now)(interp, NULL, info);
                 break;
             case enum_hash_int:
-                i        = io->vtable->shift_integer(interp, io);
+                i        = VTABLE_shift_integer(interp, io);
                 b->value = (void *)i;
                 break;
             default:
@@ -361,10 +361,10 @@ hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info*
         while (b) {
             switch (hash->key_type) {
                 case Hash_key_type_STRING:
-                    io->vtable->push_string(interp, io, (STRING *)b->key);
+                    VTABLE_push_string(interp, io, (STRING *)b->key);
                     break;
                 case Hash_key_type_int:
-                    io->vtable->push_integer(interp, io, (INTVAL)b->key);
+                    VTABLE_push_integer(interp, io, (INTVAL)b->key);
                     break;
                 default:
                     real_exception(interp, NULL, 1, "unimplemented key type");
@@ -375,7 +375,7 @@ hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info*
                     (info->visit_pmc_now)(interp, (PMC *)b->value, info);
                     break;
                 case enum_hash_int:
-                    io->vtable->push_integer(interp, io, (INTVAL)b->value);
+                    VTABLE_push_integer(interp, io, (INTVAL)b->value);
                     break;
                 default:
                     real_exception(interp, NULL, 1, "unimplemented value type");
