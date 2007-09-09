@@ -8,13 +8,18 @@ use warnings;
 
 use Config;
 
+our $verbose;
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs        = $conf->option_or_data('libs');
-    my $ccflags    = $conf->option_or_data('ccflags');
+    my $ccflags     = $conf->option_or_data('ccflags');
     my $cc          = $conf->option_or_data('cc');
     my $linkflags   = $conf->option_or_data('linkflags');
+
+    $verbose = $conf->options->get( 'verbose' );
+    print $/ if $verbose;
 
     # should find g++ in most cases
     my $link = $conf->data->get('link') || 'c++';
@@ -42,6 +47,8 @@ sub runstep {
 
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
+
+        $verbose and print " ccflags: $ccflags\n";
     }
     elsif ( $cc =~ /suncc/ ) {
         $link = 'sunCC';

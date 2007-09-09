@@ -28,8 +28,13 @@ $description = 'Determining what C compiler and linker to use';
 @args = qw(ask cc cxx link ld ccflags ccwarn linkflags ldflags libs debugging
     lex yacc maintainer);
 
+our $verbose;
+
 sub runstep {
     my ( $self, $conf ) = @_;
+
+    $verbose = $conf->options->get( 'verbose' );
+    print $/ if $verbose;
 
     my ( $cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex, $yacc );
 
@@ -73,6 +78,8 @@ END
     $ccflags = prompt( "What flags should your C compiler receive?", $ccflags )
         if $ask;
     $conf->data->set( ccflags => $ccflags );
+
+    $verbose and print " ccflags: $ccflags\n";
 
     $linkflags = $conf->data->get('linkflags');
     $linkflags =~ s/-libpath:\S+//g;    # RT#43174 No idea why.
