@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2007, The Perl Foundation.
+/* Copyright (C) 2003-2007, The Perl Foundation. */
 /* $Id$ */
 
 #include "parrot/dynext.h"
