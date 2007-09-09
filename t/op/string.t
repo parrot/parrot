@@ -2031,7 +2031,7 @@ ok 4
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'substr_r_s_s|sc_i|ic_i|ic' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'experimental opcode substr_r_s_s|sc_i|ic_i|ic' );
 	set	S4, "12345JAPH01"
 	set	I4, 5
 	set	I5, 4

@@ -240,21 +240,6 @@ character).
 The third form is optimized for replace only, ignoring the replaced
 substring and does not waste a register to do the string replace.
 
-=item B<substr_r>(out STR, in STR, in INT, in INT)
-
-Make $1 refer to the given part of $2, basically like above, but it
-is reusing the given destination string and doesn't care if the
-source string is changed later. This I<is changed> includes
-also GC runs, which will move the referenced string. This also
-means that $1 has to be reset before any GC may happen.
-
-This opcode should really be just used to quickly refer to a substring of
-another part, e.g. for printing and is a temporary hack.
-
-B<Handle with care>
-
-=cut
-
 inline op substr(out STR, in STR, in INT) :base_core {
   const INTVAL len = string_length(interp, $2);
   $1 = string_substr(interp, $2, $3, len, &$1, 0);
@@ -263,14 +248,6 @@ inline op substr(out STR, in STR, in INT) :base_core {
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
   $1 = string_substr(interp, $2, $3, $4, &$1, 0);
-  goto NEXT();
-}
-
-inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
-  STRING *dest = $1;
-  if (!dest)
-    dest = new_string_header(interp, 0);
-  $1 = string_substr(interp, $2, $3, $4, &dest, 1);
   goto NEXT();
 }
 

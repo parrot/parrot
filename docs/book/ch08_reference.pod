@@ -2691,7 +2691,7 @@ X<substr_r opcode (PASM)>
   substr_r R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>
 
 Acts like C<substr>, but reuses the destination string instead of
-creating a new string.
+creating a new string. Deprecated.
 
 I<Arguments: SR, S, I, I>
 

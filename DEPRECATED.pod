@@ -41,6 +41,10 @@ deprecated:
 
 =item find_name
 
+=item substr_r
+
+See RT#41749.
+
 =back
 
 There are several variants of some of the above ops; all are deprecated,

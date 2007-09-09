@@ -470,7 +470,8 @@ implement a string class.
 Most operations on string registers generate new strings in the
 destination register. Some operations have an optimized form that
 modifies an existing string in place. These are denoted by an C<_r>
-suffix, as in C<substr_r>.
+suffix, as in C<substr_r>. Please note that C<substr_r> has been
+deprecated.
 
 String operations on PMC registers require all their string arguments
 to be PMCs.
