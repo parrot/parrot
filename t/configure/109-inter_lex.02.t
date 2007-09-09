@@ -41,7 +41,7 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
-my $result_expected = q{user defined}; 
+my $result_expected = q{user defined};
 is($step->result(), $result_expected,
     "Result was $result_expected because environmental variable was set");
 

@@ -25,7 +25,7 @@ my $conf = Parrot::Configure->new();
 test_step_thru_runstep($conf, q{init::defaults}, $args);
 
 my (@prompts, $object, @entered);
-@prompts = map { q{foo_} . $_ } 
+@prompts = map { q{foo_} . $_ }
     qw| alpha |;
 #@prompts = ( q{lex} );
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
@@ -48,10 +48,10 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
-my $result_expected = q{user defined}; 
+my $result_expected = q{user defined};
 is($step->result(), $result_expected,
     "Result was $result_expected");
-    
+
 $object = undef;
 untie *STDIN;
 

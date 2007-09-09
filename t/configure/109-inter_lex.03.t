@@ -40,7 +40,7 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 $ret = $step->runstep($conf);
 is($ret, undef, "$step_name runstep() returned undefined value");
-my $result_expected = q{no lex program was found}; 
+my $result_expected = q{no lex program was found};
 is($step->result(), $result_expected,
     "Result was $result_expected");
 
