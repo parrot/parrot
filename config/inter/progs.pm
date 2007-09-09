@@ -74,7 +74,6 @@ END
     $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
     $ccflags =~ s/-fno-strict-aliasing//g;
     $ccflags =~ s/-fnative-struct//g;
-    $ccflags = integrate( $ccflags, $conf->options->get('ccflags') );
     $ccflags = prompt( "What flags should your C compiler receive?", $ccflags )
         if $ask;
     $conf->data->set( ccflags => $ccflags );
