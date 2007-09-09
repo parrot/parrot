@@ -18,8 +18,6 @@ Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
 
 can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
 
-# RT#44455 add verbose tests with some Test::Warn like mechanism
-
 my $cwd = cwd();
 
 my $nonexistent = 'config/gen/makefiles/foobar';
