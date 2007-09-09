@@ -7,9 +7,9 @@ lib/Parrot/BuildUtil.pm - Utilities for building Parrot
 
 =head1 DESCRIPTION
 
-For now, this package contains only one subroutine:  C<parrot_version()>.
-This subroutine is not exported and so must be requested with a fully
-qualified path.
+This package holds two subroutines:  C<parrot_version()> and
+<slurp_file>.  Neither subroutine is exported and so each must be
+requested with a fully qualified path.
 
 =cut
 
@@ -69,7 +69,8 @@ sub parrot_version {
 
 =item C<slurp_file($filename)>
 
-Slurps up the filename and returns the content as one string.
+Slurps up the filename and returns the content as one string.  While
+doing so, it converts all DOS-style line endings to newlines.
 
 =cut
 
