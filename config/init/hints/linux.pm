@@ -47,6 +47,11 @@ sub runstep {
         # for the time being (this will reduce the noise somewhat)
         $ccflags .= ' -wd869';
 
+        # ignore warnings springing from problems with computed goto
+        # statements.  If someone can find out how to make icc play nicely
+        # in these situations, that would be good.
+        $ccflags .= ' -wd1296';
+
         $ccflags .= ' -Wall -Wcheck -w2';
 
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
