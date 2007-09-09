@@ -98,20 +98,25 @@ sub runstep {
         -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" )
         if $verbose;
 
-    # RT#43145 disable all but i386, ppc
-    my %jit_is_working = (
-        i386 => 1,
-        ppc  => 1,
-
-        # all others are seriously b0rked
-    );
-
-    if ( -e "$jitbase/$cpuarch/core.jit" && $jit_is_working{$cpuarch} ) {
-        $jitcapable = 1;
-    }
-
-    if ( $cpuarch eq 'i386' and $osname eq 'darwin' ) {
-        $jitcapable = 0;
+    if ( -e "$jitbase/$cpuarch/core.jit" ) { 
+        # Just because there is a "$jitbase/$cpuarch/core.jit" file,
+        # doesn't mean the JIT is working on that platform.
+        # So build JIT per default only on platforms where JIT in known
+        # to work. Building JIT on other platform most likely breaks the build.
+        # Developer can always call: Configure.pl --jitcapable
+        # See also RT#43145
+        my %jit_is_working = (
+            i386 => 1,
+            ppc  => 1,
+        );
+        if ( $jit_is_working{$cpuarch} ) {
+            $jitcapable = 1;
+        }
+ 
+        # Another exception
+        if ( $cpuarch eq 'i386' && $osname eq 'darwin' ) {
+            $jitcapable = 0;
+        }
     }
 
     if ( -e "$jitbase/$cpuarch/$jitarchname.s" ) {
@@ -126,6 +131,7 @@ sub runstep {
         $conf->data->set( asmfun_o => '' );
     }
 
+    # let developers override the default JIT capability
     $jitcapable = $conf->options->get('jitcapable')
         if defined $conf->options->get('jitcapable');
 
