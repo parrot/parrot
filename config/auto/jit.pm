@@ -98,7 +98,7 @@ sub runstep {
         -e "$jitbase/$cpuarch/core.jit" ? 'yes' : 'no', "\n" )
         if $verbose;
 
-    if ( -e "$jitbase/$cpuarch/core.jit" ) { 
+    if ( -e "$jitbase/$cpuarch/core.jit" ) {
         # Just because there is a "$jitbase/$cpuarch/core.jit" file,
         # doesn't mean the JIT is working on that platform.
         # So build JIT per default only on platforms where JIT in known
@@ -112,7 +112,7 @@ sub runstep {
         if ( $jit_is_working{$cpuarch} ) {
             $jitcapable = 1;
         }
- 
+
         # Another exception
         if ( $cpuarch eq 'i386' && $osname eq 'darwin' ) {
             $jitcapable = 0;
