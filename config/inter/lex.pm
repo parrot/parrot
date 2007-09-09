@@ -31,7 +31,7 @@ $prompt      = "Do you have a lexical analyzer generator like flex or lex?";
 my @lex_defaults = defined($ENV{TEST_LEX})
     ? $ENV{TEST_LEX}
     : qw( flex lex );
-   
+
 my $default_required = '2.5.33';
 
 sub runstep {
@@ -76,7 +76,7 @@ sub runstep {
             }
             my ( $stdout, $stderr, $ret ) =
                 capture_output( $prog, '--version' );
-            # don't override the user even if the program they provided 
+            # don't override the user even if the program they provided
             # appears to be broken
             if ( $ret == -1 and !$conf->options->get('ask') ) {
                 # fall back to default
@@ -84,18 +84,18 @@ sub runstep {
                 return;
             } elsif ( $stdout =~ /f?lex .*? (\d+) \. (\d+) \. (\d+)/x ) {
                 # if '--version' returns a string assume that this is flex.
-                # flex calls it self by $0 so it will claim to be lex 
+                # flex calls it self by $0 so it will claim to be lex
                 # if invoked as `lex`
                 my ( $prog_major, $prog_minor, $prog_patch ) = ( $1, $2, $3 );
                 my $prog_version = "$1.$2.$3";
-        
+
                 # is there a version requirement?
                 my $req = $conf->options->get('flex_required');
                 unless ( defined $req ) {
                     $req = $default_required;
                 }
                 if ($req) {
-                    my ( $rmajor, $rminor, $rpatch ) = 
+                    my ( $rmajor, $rminor, $rpatch ) =
                         ( $req =~ / ^ (\d+) \. (\d+) \. (\d+) $ /x );
                     if  (! defined $rmajor ) {
                         $self->set_result(
