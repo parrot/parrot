@@ -12,7 +12,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs        = $conf->option_or_data('libs');
-    my $cc_flags    = $conf->option_or_data('ccflags');
+    my $ccflags    = $conf->option_or_data('ccflags');
     my $cc          = $conf->option_or_data('cc');
     my $linkflags   = $conf->option_or_data('linkflags');
 
@@ -30,15 +30,15 @@ sub runstep {
         $link = $cc;
 
         # don't allow icc to pretend it's gcc
-        $cc_flags .= ' -no-gcc';
+        $ccflags .= ' -no-gcc';
 
         # suppress sprintf warnings that don't apply
-        $cc_flags .= ' -wd269';
+        $ccflags .= ' -wd269';
 
         # suppress remarks about floating point comparisons
-        $cc_flags .= ' -wd1572';
+        $ccflags .= ' -wd1572';
 
-        $cc_flags .= ' -Wall -Wcheck -w2';
+        $ccflags .= ' -Wall -Wcheck -w2';
 
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
@@ -64,16 +64,16 @@ sub runstep {
         $linkflags .= ' -Wl,-E';
     }
 
-    if ( $cc_flags !~ /-D_GNU_SOURCE/ ) {
+    if ( $ccflags !~ /-D_GNU_SOURCE/ ) {
 
         # Request visibility of all POSIX symbols
         # _XOPEN_SOURCE=600 doesn't work with glibc 2.1.3
         # _XOPEN_SOURCE=500 gives 2 undefined warns (setenv, unsetenv) on 2.1.3
-        $cc_flags .= ' -D_GNU_SOURCE';
+        $ccflags .= ' -D_GNU_SOURCE';
     }
 
     $conf->data->set(
-        ccflags        => $cc_flags,
+        ccflags        => $ccflags,
         libs           => $libs,
         ld_share_flags => $ld_share_flags,
         ld_load_flags  => $ld_share_flags,
