@@ -68,7 +68,7 @@ Remarks:
 *2 some tests fail intermittently when building x86 on xeon processor
 *3 t/stm/basic_mt.t hangs. kill it for tests to complete. 1 other test fails.
    7 unexpected todos succeed.
-*4 You must run Configure.pl with --cgoto=0
+*4 You must run Configure.pl with --cgoto=0, see RT#43191
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
