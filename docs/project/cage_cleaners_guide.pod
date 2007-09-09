@@ -46,22 +46,13 @@ C<icc> is the Intel C/C++ Compiler and is available for free for
 non-commercial use.  To use C<icc> to build parrot, use the following
 arguments to C<Configure.pl>:
 
-  perl Configure.pl --cc=icc --link=icc --ld=icc --ccflags=-I<icc-header-path>
+  perl Configure.pl --cc=icc --ccflags=-I<icc-header-path>
 
 (courtesy of Steve Peters, C<steve at fisharerojo dot org>).
 
 For example, those using icc version 9.1 series, the configure line is:
 
-  perl Configure.pl --cc=icc --link=icc --ld=icc --ccflags=-I/opt/intel/compiler91/include/
-
-Because of the way configure works, the extra C<ccflags> added inside
-F<config/init/hints/linux.pm> for C<icc> get replaced by the C<ccflags>
-specifed at the C<Configure.pl> command line.  Therefore, to use the current
-(as of r19709) settings provided in F<config/init/hints/linux.pm>, you need
-to use the following configure options:
-
-  perl Configure.pl --cc=icc --link=icc --ld=icc \
-    --ccflags="<icc-header-path> -no-gcc" --ccwarn="-wd269 -Wall -Wcheck -w2"
+  perl Configure.pl --cc=icc --ccflags=-I/opt/intel/compiler91/include/
 
 =head2 Compiler pickiness
 
