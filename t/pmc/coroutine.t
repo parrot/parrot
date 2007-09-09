@@ -52,11 +52,11 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
 
 .sub __main__
-    .local object return
-    .local object counter
+    .local pmc return
+    .local pmc counter
     .const .Sub itr = "_iterator"
 
-    .local object zero
+    .local pmc zero
     zero = new 'Integer'
     zero = 0
 
@@ -81,7 +81,7 @@ return_here:
 .end
 
 .pcc_sub _iterator
-    .local object x
+    .local pmc x
     x = new 'Integer'
     x = 0
     iloop:

@@ -88,74 +88,73 @@
      FLOATV = 304,
      STRINGV = 305,
      PMCV = 306,
-     OBJECTV = 307,
-     LOG_XOR = 308,
-     RELOP_EQ = 309,
-     RELOP_NE = 310,
-     RELOP_GT = 311,
-     RELOP_GTE = 312,
-     RELOP_LT = 313,
-     RELOP_LTE = 314,
-     GLOBAL = 315,
-     GLOBALOP = 316,
-     ADDR = 317,
-     RESULT = 318,
-     RETURN = 319,
-     YIELDT = 320,
-     GET_RESULTS = 321,
-     POW = 322,
-     SHIFT_RIGHT_U = 323,
-     LOG_AND = 324,
-     LOG_OR = 325,
-     COMMA = 326,
-     ESUB = 327,
-     DOTDOT = 328,
-     PCC_BEGIN = 329,
-     PCC_END = 330,
-     PCC_CALL = 331,
-     PCC_SUB = 332,
-     PCC_BEGIN_RETURN = 333,
-     PCC_END_RETURN = 334,
-     PCC_BEGIN_YIELD = 335,
-     PCC_END_YIELD = 336,
-     NCI_CALL = 337,
-     METH_CALL = 338,
-     INVOCANT = 339,
-     MAIN = 340,
-     LOAD = 341,
-     INIT = 342,
-     IMMEDIATE = 343,
-     POSTCOMP = 344,
-     METHOD = 345,
-     ANON = 346,
-     OUTER = 347,
-     NEED_LEX = 348,
-     MULTI = 349,
-     VTABLE_METHOD = 350,
-     LOADLIB = 351,
-     UNIQUE_REG = 352,
-     LABEL = 353,
-     EMIT = 354,
-     EOM = 355,
-     IREG = 356,
-     NREG = 357,
-     SREG = 358,
-     PREG = 359,
-     IDENTIFIER = 360,
-     REG = 361,
-     MACRO = 362,
-     ENDM = 363,
-     STRINGC = 364,
-     INTC = 365,
-     FLOATC = 366,
-     USTRINGC = 367,
-     PARROT_OP = 368,
-     VAR = 369,
-     LINECOMMENT = 370,
-     FILECOMMENT = 371,
-     DOT = 372,
-     CONCAT = 373,
-     POINTY = 374
+     LOG_XOR = 307,
+     RELOP_EQ = 308,
+     RELOP_NE = 309,
+     RELOP_GT = 310,
+     RELOP_GTE = 311,
+     RELOP_LT = 312,
+     RELOP_LTE = 313,
+     GLOBAL = 314,
+     GLOBALOP = 315,
+     ADDR = 316,
+     RESULT = 317,
+     RETURN = 318,
+     YIELDT = 319,
+     GET_RESULTS = 320,
+     POW = 321,
+     SHIFT_RIGHT_U = 322,
+     LOG_AND = 323,
+     LOG_OR = 324,
+     COMMA = 325,
+     ESUB = 326,
+     DOTDOT = 327,
+     PCC_BEGIN = 328,
+     PCC_END = 329,
+     PCC_CALL = 330,
+     PCC_SUB = 331,
+     PCC_BEGIN_RETURN = 332,
+     PCC_END_RETURN = 333,
+     PCC_BEGIN_YIELD = 334,
+     PCC_END_YIELD = 335,
+     NCI_CALL = 336,
+     METH_CALL = 337,
+     INVOCANT = 338,
+     MAIN = 339,
+     LOAD = 340,
+     INIT = 341,
+     IMMEDIATE = 342,
+     POSTCOMP = 343,
+     METHOD = 344,
+     ANON = 345,
+     OUTER = 346,
+     NEED_LEX = 347,
+     MULTI = 348,
+     VTABLE_METHOD = 349,
+     LOADLIB = 350,
+     UNIQUE_REG = 351,
+     LABEL = 352,
+     EMIT = 353,
+     EOM = 354,
+     IREG = 355,
+     NREG = 356,
+     SREG = 357,
+     PREG = 358,
+     IDENTIFIER = 359,
+     REG = 360,
+     MACRO = 361,
+     ENDM = 362,
+     STRINGC = 363,
+     INTC = 364,
+     FLOATC = 365,
+     USTRINGC = 366,
+     PARROT_OP = 367,
+     VAR = 368,
+     LINECOMMENT = 369,
+     FILECOMMENT = 370,
+     DOT = 371,
+     CONCAT = 372,
+     POINTY = 373
    };
 #endif
 /* Tokens.  */
@@ -208,74 +207,73 @@
 #define FLOATV 304
 #define STRINGV 305
 #define PMCV 306
-#define OBJECTV 307
-#define LOG_XOR 308
-#define RELOP_EQ 309
-#define RELOP_NE 310
-#define RELOP_GT 311
-#define RELOP_GTE 312
-#define RELOP_LT 313
-#define RELOP_LTE 314
-#define GLOBAL 315
-#define GLOBALOP 316
-#define ADDR 317
-#define RESULT 318
-#define RETURN 319
-#define YIELDT 320
-#define GET_RESULTS 321
-#define POW 322
-#define SHIFT_RIGHT_U 323
-#define LOG_AND 324
-#define LOG_OR 325
-#define COMMA 326
-#define ESUB 327
-#define DOTDOT 328
-#define PCC_BEGIN 329
-#define PCC_END 330
-#define PCC_CALL 331
-#define PCC_SUB 332
-#define PCC_BEGIN_RETURN 333
-#define PCC_END_RETURN 334
-#define PCC_BEGIN_YIELD 335
-#define PCC_END_YIELD 336
-#define NCI_CALL 337
-#define METH_CALL 338
-#define INVOCANT 339
-#define MAIN 340
-#define LOAD 341
-#define INIT 342
-#define IMMEDIATE 343
-#define POSTCOMP 344
-#define METHOD 345
-#define ANON 346
-#define OUTER 347
-#define NEED_LEX 348
-#define MULTI 349
-#define VTABLE_METHOD 350
-#define LOADLIB 351
-#define UNIQUE_REG 352
-#define LABEL 353
-#define EMIT 354
-#define EOM 355
-#define IREG 356
-#define NREG 357
-#define SREG 358
-#define PREG 359
-#define IDENTIFIER 360
-#define REG 361
-#define MACRO 362
-#define ENDM 363
-#define STRINGC 364
-#define INTC 365
-#define FLOATC 366
-#define USTRINGC 367
-#define PARROT_OP 368
-#define VAR 369
-#define LINECOMMENT 370
-#define FILECOMMENT 371
-#define DOT 372
-#define CONCAT 373
-#define POINTY 374
+#define LOG_XOR 307
+#define RELOP_EQ 308
+#define RELOP_NE 309
+#define RELOP_GT 310
+#define RELOP_GTE 311
+#define RELOP_LT 312
+#define RELOP_LTE 313
+#define GLOBAL 314
+#define GLOBALOP 315
+#define ADDR 316
+#define RESULT 317
+#define RETURN 318
+#define YIELDT 319
+#define GET_RESULTS 320
+#define POW 321
+#define SHIFT_RIGHT_U 322
+#define LOG_AND 323
+#define LOG_OR 324
+#define COMMA 325
+#define ESUB 326
+#define DOTDOT 327
+#define PCC_BEGIN 328
+#define PCC_END 329
+#define PCC_CALL 330
+#define PCC_SUB 331
+#define PCC_BEGIN_RETURN 332
+#define PCC_END_RETURN 333
+#define PCC_BEGIN_YIELD 334
+#define PCC_END_YIELD 335
+#define NCI_CALL 336
+#define METH_CALL 337
+#define INVOCANT 338
+#define MAIN 339
+#define LOAD 340
+#define INIT 341
+#define IMMEDIATE 342
+#define POSTCOMP 343
+#define METHOD 344
+#define ANON 345
+#define OUTER 346
+#define NEED_LEX 347
+#define MULTI 348
+#define VTABLE_METHOD 349
+#define LOADLIB 350
+#define UNIQUE_REG 351
+#define LABEL 352
+#define EMIT 353
+#define EOM 354
+#define IREG 355
+#define NREG 356
+#define SREG 357
+#define PREG 358
+#define IDENTIFIER 359
+#define REG 360
+#define MACRO 361
+#define ENDM 362
+#define STRINGC 363
+#define INTC 364
+#define FLOATC 365
+#define USTRINGC 366
+#define PARROT_OP 367
+#define VAR 368
+#define LINECOMMENT 369
+#define FILECOMMENT 370
+#define DOT 371
+#define CONCAT 372
+#define POINTY 373
 
 
 
@@ -291,7 +289,7 @@ typedef union YYSTYPE
     Instruction *i;
 }
 /* Line 1489 of yacc.c.  */
-#line 295 "compilers/imcc/imcparser.h"
+#line 293 "compilers/imcc/imcparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 # 1 ##########################
 pir_error_output_like( <<'CODE', <<'OUT', "register names with one letter only are invalid" );
@@ -42,6 +42,17 @@ pir_error_output_like( <<'CODE', <<'OUT', "register names with more than letter 
 .end
 CODE
 /^error:imcc:'\$str' is not a valid register name.*\n.*in file .*? line 2.*\n/
+OUT
+
+# 5 ##########################
+pir_output_is( <<'CODE', <<'OUT', "RT#42769 register name 'object' is valid" );
+.sub main :main
+    .local int object
+    object = 1
+    say object
+.end
+CODE
+1
 OUT
 
 # Local Variables:

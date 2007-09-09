@@ -330,7 +330,6 @@ SP              [ ]
 "new"           return NEW;
 "addr"          return ADDR;
 "global"        return GLOBALOP;
-"object"        return OBJECTV;
 "pmc"           return PMCV;
 "string"        return STRINGV;
 "<<"            return SHIFT_LEFT;
