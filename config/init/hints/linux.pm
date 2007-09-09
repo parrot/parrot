@@ -43,6 +43,10 @@ sub runstep {
         # suppress remarks about floating point comparisons
         $ccflags .= ' -wd1572';
 
+        # gcc is currently not looking for unused variables, so should icc
+        # for the time being (this will reduce the noise somewhat)
+        $ccflags .= ' -wd869';
+
         $ccflags .= ' -Wall -Wcheck -w2';
 
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
