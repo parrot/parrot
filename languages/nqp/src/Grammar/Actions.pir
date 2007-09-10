@@ -373,6 +373,39 @@
 .end
 
 
+##method circumfix($/, $key) {
+##    my $expr := $($<EXPR>[0]);
+##    if $key eq '@( )' {
+##        return PAST::Op.new( $expr,
+##                             :name('get_array'),
+##                             :pasttype('callmethod'),
+##                             :node($/) );
+##    }
+##    if $key eq '$( )' {
+##        return PAST::Op.new( $expr,
+##                             :name('get_scalar'),
+##                             :pasttype('callmethod'),
+##                             :node($/) );
+##    }
+##    return $expr;
+##}
+.sub 'circumfix' :method
+    .param pmc match
+    .param string key
+    .local pmc past
+    $P0 = match['EXPR']
+    unless null $P0 goto have_expr
+    $P1 = match
+    goto get_past
+  have_expr:
+    $P1 = $P0[0]
+  get_past:
+    $P1 = $P1.'get_scalar'()
+    $P0 = getclass 'PAST::Op'
+    .return ($P1)
+.end
+
+
 ##    method arglist($/) {
 ##        sub callarg($arg) {
 ##            if $arg.returns() eq 'Pair' {
