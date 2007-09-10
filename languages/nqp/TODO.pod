@@ -14,16 +14,6 @@ items in the grammar, C<src/Grammar.pg>.
 Return needs to work on an exception model, and will likely require 
 PAST/POST changes to support it.
 
-=item * $( ... )
-
-Scalar context.  This needs to be translated into a C<get_scalar> 
-method call on its argument.
-
-=item * @( ... )
-
-List/array context.  This needs to be translated into a C<get_array>
-method call on its argument.
-
 =item * Namespace support
 
 =item * Named argument (not param) support
@@ -47,6 +37,8 @@ This may be very hard since we don't have any methods!
 
 =item * Match variable access C<$/>
 
-=item * Logical operators C<&&> and C<||>
+=item * Scalar context $( ... )
+
+=item * List context @( ... )
 
 =back
