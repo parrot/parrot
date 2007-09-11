@@ -69,7 +69,7 @@ C code that makes assumptions beyond these must depend on the configuration
 system, either to not compile an entire non-portable source where it will not
 work, or to provide an appropriate #ifdef macro.
 
-{{ TODO: Enumerate all other non-C89 assumptions that Parrot depends on. }}
+{{ RT#45359: Enumerate all other non-C89 assumptions that Parrot depends on. }}
 
 =item *
 
@@ -202,7 +202,7 @@ Return values should not be parenthesized without need.  It may be necessary
 to parenthesize a long return expression so that a smart editor will properly
 indent it.
 
-{{ TODO: Modify parrot.el so this rule is no longer required. }}
+{{ RT#45365: Modify parrot.el so this rule is no longer required. }}
 
 =item *
 

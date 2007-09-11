@@ -63,7 +63,7 @@ comma-separated integers.  Integers may be specified either in decimal, or if
 prefixed with "0b"/"0x", in binary/hexadecimal.  There must be exactly one
 integer for each value or register given.
 
-(DEPRECATED: The list as a whole may be surrounded by parentheses.)
+(RT#45363 DEPRECATED: The list as a whole may be surrounded by parentheses.)
 
 For documentation purposes we'll number the bits 0 (low) through 30 (high).
 Bit 31 (and higher, where available) will not be used.
@@ -117,7 +117,7 @@ contents of the aggregate, rather than the aggregate itself, will be passed.
 
 If the C<NAMED> bit is also set, the aggregate will be used as a hash; its
 contents, as key/value pairs, will be passed as named parameters.  The PMC
-must implement the full hash interface.  {{ TODO: Limit the required
+must implement the full hash interface.  {{ RT#45367: Limit the required
 interface. }}
 
 If the C<NAMED> bit is not set, the aggregate will be used as an array; its
@@ -226,7 +226,7 @@ If too many values are provided to fit into the given target registers, Parrot
 will throw an exception.  Note that if the final target is a P register with
 FLAT set, then this exception can never occur.
 
-XXX - FIXME - which exception?  We really could use an exception subsystem. 
+RT#45357 - which exception?  We really could use an exception subsystem. 
 Oh, wait, that's my job.  Never mind.  --Chip
 
 =head3 Underflow
