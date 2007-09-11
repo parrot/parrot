@@ -52,12 +52,7 @@ targeting I<lex>/I<yacc> and reimplementing low-level features such as
 garbage collection and dynamic types, designers can write a parser
 that targets the Parrot virtual machine.
 
-X<Randal, Allison>
-X<Salzenberg, Chip>
-X<Coleda, Will>
-Allison Randal leads the Parrot project as chief architect, Chip
-Salzenberg is the current pumpking, and Will Coleda is the project
-manager. As is typical of open source development projects, managing the
+As is typical of open source development projects, managing the
 Parrot project is quite different from managing a commercial project of
 the same size and complexity.  There are no schedules, no deadlines, no
 hiring and firing, and no salaries, bonuses, or stock options. There are
@@ -65,7 +60,158 @@ no employees or bosses; there is very little hierarchy whatsoever.
 Management in this context isn't about giving orders, it's about making
 sure everyone has what they need to keep moving forward.
 
-[Insert info about release managers, cage cleaners, patch monsters, etc.]
+This is a list of project roles, with a partial list of the folks who have
+taken responsibility for them.
+
+=head2 Project Team
+X<Project Team>
+
+=over 4
+
+=item Architect
+
+The architect has primary responsibility for setting overall direction of the
+project, and to facilitate team communication and understanding of
+architectural issues. The architect is primarily but not solely responsible
+for making design decisions and documenting them in Parrot Design Documents;
+responsibility for design and design documentation of project subcomponents
+may be given to other members of the Project Team, or may be held jointly.
+The Architect also works with the Pumpking and Release Managers to develop and
+maintain the release schedule. Allison RandalX<Randal, Allison> leads the 
+Parrot project as chief architect.
+
+=item Pumpking
+
+The Pumpking has primary responsibility for the project source. The Pumpking
+is the lead developer, and as such reviews patches, defines coding standards,
+and assists the efforts of Committers and Contributors. The Pumpking also
+develops and maintains the release schedule with the Architect and Release
+Managers. Chip SalzenbergX<Salzenberg, Chip> is the current pumpking.
+
+=item Release Managers
+
+Release managers have responsibility for executing a product release,
+according to the release schedule. The release schedule is developed and
+maintained jointly with the Architect and the Pumpking.
+
+Current release managers are, in this order:
+
+    Jerry Gay
+X<Gay, Jerry>
+    Patrick Michaud
+X<Michaud, Patrick>
+    Matt Diephouse
+X<Diephouse, Matt>
+    Will Coleda
+X<Coleda, Will>
+    chromatic
+X<chromatic>
+    Allison Randal
+X<Randal, Allison>
+
+Information on the release procedure can be found in 
+F<docs/project/release_manager_guide.pod>.
+
+=item Metacommitter
+
+All Metacommitters are responsible for managing commit access to the Parrot
+repository. Once the Architect or Pumpking approves a request for a
+Contributor to be given commit access, a Metacommitter provides that access.
+The Architect and Pumpking are Metacommitters, but other Project Team members
+may also hold this role.
+
+Current metacommitters are:
+
+    Allison Randal
+X<Randal, Allison>
+    Chip Salzenberg
+X<Salzenberg, Chip>
+    Jerry Gay
+X<Gay, Jerry>
+    Will Coleda
+X<Coleda, Will>
+    Jesse Vincent
+X<Vincent, Jesse>
+
+The procedure on how to manage the list of Parrot committers can be found in 
+F<docs/project/metacommiter_guide.pod>.
+
+=back
+
+=head2 Committers
+
+X<Committers>
+Contributors who submit numerous, high-quality patches may be considered to
+become a Committer. Committers have commit access to the full Parrot
+repository, but generally work only on one or more subprojects; Committer
+categories are described below. Contributors may considered for commit access
+either by being nominated by another Committer, or by asking for it.
+
+=over 4
+
+=item Core Developer
+
+Develops and maintains core subsystems (e.g. IO, Exceptions).
+
+=item Compiler Developer
+
+Develops and maintains one or more Parrot compilers (e.g. IMCC, PGE, TGE).
+
+=item High Level Language Developer
+
+Develops and maintains one or more High Level Languages (e.g. Tcl, Lua, 
+Perl 6).
+
+=item Build Manager
+
+Maintains and extends configure and build subsystems. Reviews smoke reports
+and attempts to extend platform support.
+
+=item Lead Tester
+
+Develops, maintains, and extends test suite and testing tools. Responsible
+for testing goals, including complete coverage of core components on targeted
+platforms.
+
+=item Platform Porter
+
+Develops and maintains installation packages on various platforms.
+
+=item Patch Monsters
+
+Reviews and applies patches submitted by general contributors, keeping an eye
+on conformance with coding standards and desirability of features.
+
+=back
+
+A list of committers that have a role they've taken responsibility for can
+be found in F<RESPONSIBLE_PARTIES>.
+
+=head2 Contributors
+X<Contributors>
+
+=over 4
+
+=item Cage Cleaners
+
+Fixes failing tests, makes sure coding standards are implemented, reviews
+documentation and examples. A class of tickets in the tracking system (RT) has
+been created for use by this group. This position encompasses tasks from entry
+level to advanced, and is a good way to get familiar with Parrot internals.
+
+=item General Contributor
+
+Contributors are volunteers who write code or documentation patches, take
+part in email or online conversations, or contribute to the project in other
+ways. All volunteer contributions are appreciated and recognized. All
+volunteers who contribute to a file in the Parrot repository may add their
+name to the F<CREDITS> file.
+
+=back
+
+The list of general contributors can be found in F<CREDITS>.
+
+=head2 Furthermore
 
 X<Hansen, Ask BjE<oslash>rn>
 X<Spier, Robert>
@@ -83,10 +229,27 @@ duplicated effort minimal, and making sure the job gets done.
 =head2 Where to go
 
 X<Parrot;mailing lists>
-The core communication line for the Parrot project is the mailing list,
-U<parrot-porters@perl.org>, otherwise known as "p2." Workflow in Parrot takes
-the form of submitted patches. Anyone is free to submit a patch, and
-contributors who consistently submit valuable patches over a long period of
-time are granted check-in access to the CVS repository.
+The mailing list for parrot is parrot-porters.  Subscribe by sending mail to
+U<perl6-internals-subscribe@perl.org>. It is archived at
+U<http://www.nntp.perl.org/group/perl.perl6.internals>
+and available via NNTP at U<nntp://nntp.perl.org/perl.perl6.internals>.
+
+You can also read the list via Google Groups at
+U<http://groups-beta.google.com/group/perl.perl6.internals>
+
+X<Parrot;sites>
+The following web sites have all the Parrot information you need:
+
+=over 4
+
+=item * U<http://www.parrotcode.org>
+
+=item * U<http://dev.perl.org/perl6>
+
+=item * U<http://bugs6.perl.org>
+
+=item * U<http://pugscode.org>
+
+=back
 
 =cut
