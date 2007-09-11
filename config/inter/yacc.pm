@@ -28,6 +28,10 @@ $description = "Determining whether $util is installed";
 $prompt      = "Do you have a parser generator, like bison or yacc?";
 @args        = qw( yacc ask maintainer );
 
+my @yacc_defaults = defined($ENV{TEST_YACC})
+    ? $ENV{TEST_YACC}
+    : ('bison -v -y', 'yacc', 'byacc');
+
 my $default_required = '2.1';
 
 sub runstep {
@@ -44,12 +48,12 @@ sub runstep {
         return $self;
     }
 
-    my $prog;
-
     # precedence of sources for the program:
     # default -> probe -> environment -> option -> ask
-    $prog ||= $conf->options->get($util);
-    $prog ||= $ENV{ uc($util) };
+    my $prog = $conf->options->get($util);
+    unless ($prog) {
+        $prog = $ENV{ uc($util) };
+    }
 
     # never override the user.  If a non-existent program is specified then
     # the user is responsible for the consequences.
@@ -57,76 +61,72 @@ sub runstep {
         $conf->data->set( $util => $prog );
         $self->set_result('user defined');
         return $self;
-    }
-
-    $prog = check_progs( [ 'bison -v -y', 'yacc', 'byacc' ], $verbose );
-
-    unless ($prog) {
-        $self->set_result('no yacc program was found');
-        return;
-    }
-
-    # RT#43170 should --ask be handled like the other user defines or
-    # checked for version requirements?
-    if ( $conf->options->get('ask') ) {
-        $prog = prompt( $prompt, $prog ? $prog : $conf->data->get($util) );
-    }
-
-    my ( $stdout, $stderr, $ret ) = capture_output( $prog, '--version' );
-
-    # don't override the user even if the program they provided appears to be
-    # broken
-    if ( $ret == -1 and !$conf->options->get('ask') ) {
-
-        # fall back to default
-        $self->set_result('yacc program does not exist or does not understand --version');
-        return;
-    }
-
-    # if '--version' returns a string assume that this is bison.
-    # if this is bison pretending to be yacc '--version' doesn't work
-    if ( $stdout =~ /Bison .*? (\d+) \. (\d+) (\w)?/x ) {
-
-        # someday we might need to check $3 also.
-        my ( $prog_major, $prog_minor, $prog_patch ) = ( $1, $2, $3 );
-        my $prog_version = "$1.$2";
-        $prog_version .= $3 if $3;
-
-        # is there a version requirement?
-        my $req = $conf->options->get('bison_required');
-        unless ( defined $req ) {
-            $req = $default_required;
-        }
-        if ($req) {
-            my ( $rmajor, $rminor ) = ( $req =~ / ^ (\d+) \. (\d+) (\w)? $ /x );
-            unless ( defined $rmajor ) {
-                $self->set_result("could not understand bison version requirement");
+    } else {
+    #    $prog = check_progs( [ 'bison -v -y', 'yacc', 'byacc' ], $verbose );
+        $prog = check_progs( [ @yacc_defaults ], $verbose );
+        if (! $prog) {
+            $self->set_result('no yacc program was found');
+            return;
+        } else {
+            # RT#43170 should --ask be handled like the other user defines or
+            # checked for version requirements?
+            if ( $conf->options->get('ask') ) {
+                $prog = prompt(
+                    $prompt, $prog ? $prog : $conf->data->get($util) );
+            }
+            my ( $stdout, $stderr, $ret ) =
+                capture_output( $prog, '--version' );
+            # don't override the user even if the program they provided 
+            # appears to be broken
+            if ( $ret == -1 and !$conf->options->get('ask') ) {
+                # fall back to default
+                $self->set_result('yacc program does not exist or does not understand --version');
+                return;
+            } elsif ( $stdout =~ /Bison .*? (\d+) \. (\d+) (\w)?/x ) {
+                # if '--version' returns a string assume that this is bison.
+                # if this is bison pretending to be yacc 
+                # '--version' doesn't work
+                # someday we might need to check $3 also.
+                my ( $prog_major, $prog_minor, $prog_patch ) = ( $1, $2, $3 );
+                my $prog_version = "$1.$2";
+                $prog_version .= $3 if $3;
+        
+                # is there a version requirement?
+                my $req = $conf->options->get('bison_required');
+                unless ( defined $req ) {
+                    $req = $default_required;
+                }
+                if ($req) {
+                    my ( $rmajor, $rminor ) =
+                        ( $req =~ / ^ (\d+) \. (\d+) (\w)? $ /x );
+                    if (! defined $rmajor ) {
+                        $self->set_result(
+                            "could not understand bison version requirement");
+                        return;
+                    } elsif (
+#                            $prog_major >= $rmajor
+                        $prog_major < $rmajor
+                        or (    $prog_major == $rmajor
+                            and $prog_minor < $rminor )
+                        ) {
+                        $self->set_result(
+                            "found bison version $prog_version"
+                            . " but at least $rmajor.$rminor is required" );
+                        return;
+                    } else {
+                       1;  # lack an explicit 'else' here
+                    }
+                }
+                $conf->data->set( bison_version => $prog_version );
+                $self->set_result("bison $prog_version");
+                $conf->data->set( $util => $prog );
+                return $self;
+            } else {
+                $self->set_result('yacc program does not exist or does not understand --version');
                 return;
             }
-
-            unless (
-                $prog_major >= $rmajor
-
-                or (    $prog_major == $rmajor
-                    and $prog_minor >= $rminor )
-                )
-            {
-                $self->set_result( "found bison version $prog_version"
-                        . " but at least $rmajor.$rminor is required" );
-                return;
-            }
         }
-
-        $conf->data->set( bison_version => $prog_version );
-        $self->set_result("bison $prog_version");
-        $conf->data->set( $util => $prog );
     }
-    else {
-        $self->set_result('yacc program does not exist or does not understand --version');
-        return;
-    }
-
-    return $self;
 }
 
 1;
