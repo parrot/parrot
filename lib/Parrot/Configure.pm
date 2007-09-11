@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -257,12 +257,9 @@ sub _run_this_step {
             $conftrace = retrieve($sto);
         }
     }
-    my $step = $step_name->new;
+    my $step = $step_name->new();
 
-    # RT#43675 This works. but is probably not a good design.
-    # Using $step->description() would be nicer
-    my $description = $step->description();
-    $description = "" unless defined $description;
+    my $description = $step->description() || q{};
 
     # set per step verbosity
     if ( defined $args->{verbose_step} ) {
