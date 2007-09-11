@@ -157,6 +157,38 @@
 .end
 
 
+##    method for_statement($/) {
+##        my $block := $<block>;
+##        $block.blocktype('sub');
+##        $block.symbol('$_', scope => 'lexical');
+##        my $topic_var := PAST::Var.new(name => '$_', scope => 'parameter');
+##        push @($block[0]), $topic_var;
+##        my $past := PAST::Op.new($($<EXPR>),
+##                                 $($<block>),
+##                                 pasttype => $<sym>,
+##                                 node => $/);
+##        return $past;
+.sub 'for_statement' :method
+    .param pmc match
+    .local pmc block, past
+    $P0  = match['EXPR']
+    $P0  = $P0.'get_scalar'()
+    $P1  = match['block']
+    block = $P1.'get_scalar'()
+    block.'blocktype'('sub')
+    .local pmc params, topic_var
+    params = block[0]
+    $P3 = getclass 'PAST::Var'
+    topic_var = $P3.'new'('name'=>'$_', 'scope'=>'parameter')
+    params.'push'(topic_var)
+    block.'symbol'('$_', 'scope'=>'lexical')
+    $P2  = getclass 'PAST::Op'
+    $S1  = match['sym']
+    past = $P2.'new'($P0, block, 'pasttype'=>$S1, 'node'=>match)
+    .return (past)
+.end
+
+
 ##    method block($/, $key) {
 ##        our $?BLOCK, @?BLOCK;
 ##        if ($key ne 'close') {
