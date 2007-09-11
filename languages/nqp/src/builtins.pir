@@ -79,7 +79,7 @@ the internal test counter and handles making test output.
     .return (1)
 .end
 
-=item C<ok(...)>
+=item C<plan(...)>
 
 Internal implementation of the Test::More 'plan'.  It sets the internal
 test counter to 0 and outputs the TAP plan line.
