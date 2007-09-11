@@ -89,16 +89,17 @@ Creates and returns a copy of the array.
 
     PMC *clone() {
         INTVAL size;
+        size_t mem_size;
         PMC   *dest     = pmc_new(INTERP, SELF->vtable->base_type);
-        size_t mem_size = size * sizeof (FLOATVAL);
 
         if (!PMC_data(SELF))
             return dest;
 
         size              = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        PMC_data(dest)    = mem_sys_allocate(mem_size);
+        mem_size          = size * sizeof (FLOATVAL);
 
+        PMC_data(dest)    = mem_sys_allocate(mem_size);
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
         PObj_active_destroy_SET(dest);
 
