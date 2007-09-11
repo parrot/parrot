@@ -23,11 +23,7 @@ See also: F<languages/lua/pmc/luaclosure.pmc>
 
 */
 
-#include "parrot/parrot.h"
-
-static STRING *luafunction_name;
-extern INTVAL dynpmc_LuaBoolean;
-extern INTVAL dynpmc_LuaNil;
+#include "lua_private.h"
 
 
 pmclass LuaFunction
@@ -40,14 +36,6 @@ pmclass LuaFunction
     group lua_group
     hll Lua
     maps Sub {
-
-/* Class initialization. Caches constant strings that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            luafunction_name = const_string(INTERP, "function");
-        }
-    }
 
 /*
 
@@ -74,7 +62,7 @@ Return the string "function".
 
 */
     STRING* name () {
-        return luafunction_name;
+        return const_string(INTERP, "function");
     }
 
 /*

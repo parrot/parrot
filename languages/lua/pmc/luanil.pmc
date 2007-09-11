@@ -28,9 +28,9 @@ troublesome (if not possible?).
 
 */
 
-#include "parrot/parrot.h"
+#include "lua_private.h"
 
-static STRING *string_representation;
+
 INTVAL dynpmc_LuaBoolean;
 INTVAL dynpmc_LuaClosure;
 INTVAL dynpmc_LuaFunction;
@@ -45,29 +45,6 @@ pmclass LuaNil
     dynpmc
     group lua_group
     hll Lua {
-
-/*
-* Class initialization. Caches constant strings that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            string_representation = const_string(INTERP, "nil");
-            dynpmc_LuaBoolean = pmc_type(INTERP,
-              const_string(INTERP, "LuaBoolean"));
-            dynpmc_LuaClosure = pmc_type(INTERP,
-              const_string(INTERP, "LuaClosure"));
-            dynpmc_LuaFunction = pmc_type(INTERP,
-              const_string(INTERP, "LuaFunction"));
-            dynpmc_LuaNil = pmc_type(INTERP,
-              const_string(INTERP, "LuaNil"));
-            dynpmc_LuaNumber = pmc_type(INTERP,
-              const_string(INTERP, "LuaNumber"));
-            dynpmc_LuaString = pmc_type(INTERP,
-              const_string(INTERP, "LuaString"));
-            dynpmc_LuaTable = pmc_type(INTERP,
-              const_string(INTERP, "LuaTable"));
-        }
-    }
 
 /*
 
@@ -100,7 +77,7 @@ Return the string "nil".
 
 */
     STRING* name () {
-        return string_representation;
+        return const_string(INTERP, "nil");
     }
 
 /*
@@ -128,7 +105,7 @@ Return the string "nil".
 
 */
     STRING* get_string () {
-        return string_representation;
+        return const_string(INTERP, "nil");
     }
 
 /*

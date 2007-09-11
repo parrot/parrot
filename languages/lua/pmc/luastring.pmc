@@ -19,16 +19,8 @@ the Lua C<String> type.
 
 */
 
-#include "parrot/parrot.h"
+#include "lua_private.h"
 #include "pmc_luanumber.h"
-
-static STRING *luastring_name;
-extern INTVAL dynpmc_LuaBoolean;
-extern INTVAL dynpmc_LuaNil;
-extern INTVAL dynpmc_LuaNumber;
-extern INTVAL dynpmc_LuaString;
-
-extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
 
 
 pmclass LuaString
@@ -39,14 +31,6 @@ pmclass LuaString
     group lua_group
     hll Lua
     maps String {
-
-/* Class initialization. Caches constant strings that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            luastring_name = const_string(INTERP, "string");
-        }
-    }
 
 /*
 
@@ -111,7 +95,7 @@ Creates a copy of the string.
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
+        PMC_str_val(dest) = string_copy(INTERP, PMC_str_val(SELF));
         return dest;
     }
 
@@ -138,7 +122,7 @@ Return the string "string".
 
 */
     STRING* name () {
-        return luastring_name;
+        return const_string(INTERP, "string");
     }
 
 /*

@@ -20,10 +20,7 @@ This implementation is based on C<Parrot::Coroutine>.
 
 */
 
-#include "parrot/parrot.h"
-
-static STRING *luathread_name;
-extern INTVAL dynpmc_LuaBoolean;
+#include "lua_private.h"
 
 
 pmclass LuaThread
@@ -31,14 +28,6 @@ pmclass LuaThread
     dynpmc
     group lua_group
     hll Lua {
-
-/* Class initialization. Caches constant strings that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            luathread_name = const_string(INTERP, "thread");
-        }
-    }
 
 /*
 
@@ -81,7 +70,7 @@ Return the string "thread".
 
 */
     STRING* name () {
-        return luathread_name;
+        return const_string(INTERP, "thread");
     }
 
 /*

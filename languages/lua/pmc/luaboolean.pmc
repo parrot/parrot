@@ -21,12 +21,8 @@ The value is stored as an Integer.
 
 */
 
-#include "parrot/parrot.h"
+#include "lua_private.h"
 
-static STRING *false_string;
-static STRING *true_string;
-static STRING *luaboolean_name;
-extern INTVAL dynpmc_LuaBoolean;
 
 pmclass LuaBoolean
     extends LuaAny
@@ -37,16 +33,6 @@ pmclass LuaBoolean
     group lua_group
     hll Lua
     maps Boolean {
-
-/* Class initialization. Caches constant strings that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            false_string = const_string(INTERP, "false");
-            true_string = const_string(INTERP, "true");
-            luaboolean_name = const_string(INTERP, "boolean");
-        }
-    }
 
 /*
 
@@ -91,7 +77,7 @@ Return the string "boolean".
 
 */
     STRING* name () {
-        return luaboolean_name;
+        return const_string(INTERP, "boolean");
     }
 
 /*
@@ -133,9 +119,9 @@ Return the string "true" or "false".
 */
     STRING* get_string () {
         if (PMC_int_val(SELF))
-            return true_string;
+            return const_string(INTERP, "true");
         else
-            return false_string;
+            return const_string(INTERP, "false");
     }
 
 

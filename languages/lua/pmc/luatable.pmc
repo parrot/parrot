@@ -22,18 +22,7 @@ Now, Lua 5.0 uses a hybrid data structure with a Hash part and an Array part.
 
 */
 
-#include "parrot/parrot.h"
-
-static STRING *luatable_name;
-extern INTVAL dynpmc_LuaBoolean;
-extern INTVAL dynpmc_LuaClosure;
-extern INTVAL dynpmc_LuaFunction;
-extern INTVAL dynpmc_LuaNil;
-extern INTVAL dynpmc_LuaNumber;
-extern INTVAL dynpmc_LuaString;
-extern INTVAL dynpmc_LuaTable;
-
-extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
+#include "lua_private.h"
 
 
 static STRING* _make_key(Interp* interp, PMC* key)
@@ -93,14 +82,6 @@ pmclass LuaTable
     group lua_group
     hll Lua {
 
-/* Class initialization. Caches constant strings & PMC that will be used later.
-*/
-    void class_init() {
-        if (pass) {
-            luatable_name = const_string(INTERP, "table");
-        }
-    }
-
 /*
 
 =item C<void init()>
@@ -111,10 +92,14 @@ Initializes the instance.
 
 */
     void init () {
+        Hash* hash;
         PMC_struct_val(SELF) = NULL;
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         parrot_new_pmc_hash(INTERP, SELF);
+        /* hack for GC */
+        hash = PMC_struct_val(SELF);
+        hash->entry_type = enum_hash_pmc;
     }
 
 /*
@@ -159,7 +144,7 @@ Return the string "table".
 
 */
     STRING* name () {
-        return luatable_name;
+        return const_string(INTERP, "table");
     }
 
 /*

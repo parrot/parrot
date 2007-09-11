@@ -203,7 +203,8 @@ BUILD_CLEANERS = \
  "*.pbc" \
  "$(PMCDIR)/*.dump" \
  "$(PMCDIR)/*.c" \
- "$(PMCDIR)/*.h" \
+ "$(PMCDIR)/pmc_*.h" \
+ "$(PMCDIR)/*_group.h" \
  "$(PMCDIR)/*$(LOAD_EXT)" \
  "$(PMCDIR)/*$(O)" \
  "$(LIBPATH)/*.pbc"

@@ -18,16 +18,8 @@ C<LuaAny> provides an abstract base class for some Lua types.
 
 */
 
-#include "parrot/parrot.h"
+#include "lua_private.h"
 
-extern INTVAL dynpmc_LuaBoolean;
-extern INTVAL dynpmc_LuaClosure;
-extern INTVAL dynpmc_LuaFunction;
-extern INTVAL dynpmc_LuaNil;
-extern INTVAL dynpmc_LuaString;
-extern INTVAL dynpmc_LuaTable;
-
-extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
 
 PMC *
 find_meth(Interp* interp, PMC *obj, const char *name) {
