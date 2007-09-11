@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2007, The Perl Foundation.
-$Id: lua_internals.h $
+$Id$
 */
 
 #include "parrot/parrot.h"
