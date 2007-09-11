@@ -90,7 +90,7 @@ Don't set these bits yourself; the assembler will do it.
 =head2 Passing Arguments, Returning Values
 
 Just before calling a subroutine with C<invokecc> or calling a method with
-<call_methodcc>, use the C<set_args> opcode to tell Parrot where the
+C<call_methodcc>, use the C<set_args> opcode to tell Parrot where the
 subroutine's or method's arguments will come from and how they should be
 expanded by the target.
 
@@ -143,7 +143,7 @@ specifying the name of the next argument (or returned value).
 =head2 Accepting Parameters, Accepting Return Values
 
 As the I<first opcode> in a subroutine that will be called with C<invokecc> or
-a method that will be called with <call_methodcc>, use the C<get_params> opcode
+a method that will be called with C<call_methodcc>, use the C<get_params> opcode
 to tell Parrot where the subroutine's or method's arguments should be stored
 and how they should be expanded.
 
@@ -273,8 +273,8 @@ NAMED SLURPY hash        (optional)
 
 Positional targets can only be filled with positional values.
 
-Named targets can be filled with either positional or named values.  However,
-if a named target was already filled by an positional (positional) value, and
+Named targets can be filled with either positional or named values.
+However, if a named target was already filled by a positional value, and
 then a named value is also given, this is an overflow error.
 
 =head3 Type Conversions
