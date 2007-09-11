@@ -47,6 +47,21 @@ sub runstep {
         # for the time being (this will reduce the noise somewhat)
         $ccflags .= ' -wd869';
 
+        # ignore "operands are evaluated in unspecified order" warning
+        $ccflags .= ' -wd981';
+
+        # ignore "external declaration in primary source file"
+        # (only done temporarily to reduce noise)
+        $ccflags .= ' -wd1419';
+
+        # ignore "function 'xxx' was declared but never referenced"
+        # (only done temporarily to reduce noise)
+        $ccflags .= ' -wd117';
+
+        # ignore "missing return statement at end of non-void function"
+        # warnings (only done temporarily to reduce noise)
+        $ccflags .= ' -wd1011';
+
         # ignore warnings springing from problems with computed goto
         # statements.  If someone can find out how to make icc play nicely
         # in these situations, that would be good.
