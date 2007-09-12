@@ -1,5 +1,7 @@
 package Parrot::PMC;
 
+# $Id$
+
 use strict;
 use warnings;
 our $VERSION = '0.02';
