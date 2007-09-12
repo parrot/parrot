@@ -333,7 +333,7 @@ C<:flat>.
 
 Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
 value(s) should be stored.  Available flags:
-C<:slurpy>, C<:optional>, and C<:opt_count>.
+C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =back
 
