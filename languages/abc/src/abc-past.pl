@@ -1,6 +1,7 @@
 # class ABC::Grammar::Actions;
 
 # Copyright (C) 2007, The Perl Foundation.
+# $Id$
 
 method TOP($/) {
     return $($<program>);
