@@ -23,9 +23,11 @@ t/codingstd/c_header_guards.t - checks for rules related to guards in C header f
 
 =head1 DESCRIPTION
 
-Checks that all C language header files have an #ifndef PARROT_WHATEVER_H_GUARD
-definition, and an #endif /* PARROT_WHATEVER_H_GUARD */ at the end, as
-specified in PDD07.
+Checks that all C language header files have an
+#ifndef PARROT_WHATEVER_H_GUARD definition, then they
+#define PARROT_WHATEVER_H_GUARD and add an
+#endif /* PARROT_WHATEVER_H_GUARD */ at the end, of the file as specified
+in PDD07.
 
 =head1 AUTHOR
 
@@ -127,15 +129,21 @@ L:          foreach my $line (@source) {
         if scalar keys %redundants;
 
     ok(!(scalar %missing_guard), "missing or misspelled PARROT_*_GUARD ifndef in headers");
-    diag("missing guard: \n" . join(", \n", sort keys %missing_guard))
+    diag("missing guard: \n" . join(", \n", sort keys %missing_guard) .
+        "\nyou need to add a line like:\n" .
+        "  #ifndef PARROT_*_GUARD\n" . "at the top of the header.")
         if scalar keys %missing_guard;
 
     ok(!(scalar %missing_define), "missing or misspelled PARROT_*_GUARD define in headers");
-    diag("missing define: \n" . join(", \n", sort keys %missing_define))
+    diag("missing define: \n" . join(", \n", sort keys %missing_define) .
+        "\nyou need to add a line like:\n" .
+        "  #define PARROT_*_GUARD\n" . "at the top of the header.")
         if scalar keys %missing_define;
 
     ok(!(scalar %missing_comment), "missing or misspelled PARROT_*_GUARD comment after the endif in headers");
-    diag("missing endif comment: \n" . join(", \n", sort keys %missing_comment))
+    diag("missing endif comment: \n" . join(", \n", sort keys %missing_comment) .
+        "\nyou need to add a line like:\n" .
+        "  #endif /* PARROT_*_GUARD */\n" . "at the end of the header.")
         if scalar keys %missing_comment;
 
     return 0;
