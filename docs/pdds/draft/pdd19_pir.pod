@@ -1,47 +1,519 @@
+# Copyright (C) 2007, The Perl Foundation.
+
 =head1 NAME
 
 docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
 =head1 ABSTRACT
 
-This PDD describes PIR, a stable, middle-level language for both compiler and
-human to target on.
-
-=head1 DESCRIPTION
-
-XXX - Currently under-specified.  We need to move the actively supported parts
-of F<docs/imcc/syntax.pod> here.
+This document describes PIR, a stable, middle-level language for both 
+compiler and human to target on.
 
 =head1 VERSION
 
-=head2 CURRENT
+$Revision$
 
-    Maintainer: Chip SalzenBerg
-    Class: Internal
-    PDD Number: 19
-    Version: 1.0
-    Status: Developing
-    Last Modified: 15 June 2005
-    PDD Format: 1
-    Language: English
+=head1 DESCRIPTION
 
-=head2 HISTORY
+=head1 Comments and empty lines
+
+Comments start with B<#> and last until the following newline. These
+and empty lines are ignored.
+
+=head1 Statements
+
+A valid imcc program consists of a sequence of I<statements>. A
+I<statement> is terminated by a newline (<NL>).
+
+=head2 General statement format
+
+  [label:] [instruction] <NL>
+
+=head2 Labels
+
+Optional label for the given instruction, can stand on its own line.
+Global labels start with an underscore, local labels shouldn't. A label must
+conform to the syntax of B<identifier> described below.
+
+=head1 INSTRUCTIONS
+
+=head2 Terms used here
 
 =over 4
 
-=item version 1
+=item <identifier>
 
-None. First version
+Start with a letter or underscore, then may contain additionally
+digits and B<::>.
+
+Example:
+
+    a
+    _a
+    A42
+    a::b_c
+
+=item <type>
+
+B<int>, B<float>, B<string>, B<pmc> or a valid parrot PMC type like
+B<Array>.
+
+=item <reg>
+
+A PASM register In, Sn, Nn, Pn, or a IMCC temporary
+register $In, $Sn, $Nn, $Pn, where B<n> consists of digit(s) only.
+
+=item <var>
+
+A local B<identifier> or a B<reg> or a constant (when allowed).
 
 =back
 
-=head1 CHANGES
+=head2 Constants
 
 =over 4
 
-=item Version 1.0
+=item 'char constant'
 
-None. First version
+Are delimited by B<'>. They are taken to be C<ascii> encoded. No escape
+sequences are processed.
+
+=item "string constants"
+
+Are delimited by B<">. A B<"> inside a string must be escaped by
+B<\">.  Only 7-bit ASCII is accepted in string constants; to use
+characters outside thar range, specify an encoding in the way below.
+
+=item <<"heredoc",  <<'heredoc'
+
+Heredocs work like single or double quoted strings. All lines up to
+the terminating delimiter is slurped into the string. The delimiter
+has to be on its own line with no trailing whitespace.
+
+Assignment of a heredoc:
+
+A heredoc as an argument:
+
+  function(<<"END_OF_HERE", arg)
+  ...
+ END_OF_HERE
+
+  .return(<<'EOS')
+  ...
+ EOS
+
+  .yield(<<'EOS')
+  ...
+ EOS
+
+Only one heredoc can be active per statement line.
+
+=item charset:"string constant"
+
+Like above with a chracter set attached to the string. Valid character
+sets are currently: C<ascii> (the default), C<binary>, C<unicode>
+(with UTF-8 as the default encoding), and C<iso-8859-1>.
 
 =back
 
+=head2 String escape sequences
+
+Inside double-quoted strings the following escape sequences are processed.
+
+  \xhh        1..2 hex digits
+  \ooo        1..3 oct digits
+  \cX         control char X
+  \x{h..h}    1..8 hex digits
+  \uhhhh      4 hex digits
+  \Uhhhhhhhh  8 hex digits
+  \a, \b, \t, \n, \v, \f, \r, \e, \\
+
+=over 4
+
+=item encoding:charset:"string constant"
+
+Like above with an extra encoding attached to the string. For example:
+
+  set S0, utf8:unicode:"«"
+
+The encoding and charset gets attached to the string, no further processing
+is done, specifically escape sequences are not honored.
+
+=item numeric constants
+
+B<0x> and B<0b> denote hex and binary constants respectively.
+
+=back
+
+=head2 Directive instructions
+
+=over 4
+
+=item .pragma n_operators
+
+Convert arithmethic infix operators to n_infix operations. The unary opcodes
+C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a B<n_>
+prefix.
+
+ .pragma n_operators 1
+ .sub foo
+   ...
+   $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
+   $P2 = abs $P0             # n_abs $P2, $P0
+
+=item .loadlib "lib_name"
+
+Load the given library at B<compile time>, that is, as soon that line is
+parsed.  See also the C<loadlib> opcode, which does the same at run time.
+
+A library loaded this way is also available at runtime, as if it has been
+loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
+
+=item .HLL "hll_name", "hll_lib"
+
+Define the HLL for the current file. If the string C<hll_lib> isn't empty
+this B<compile time pragma> also loads the shared lib for the HLL, so that
+integer type constants are working for creating new PMCs.
+
+=item .HLL_map .CoreType, .UserType
+
+Whenever Parrot has to create PMCs inside C code on behalf of the
+running user program it consults the current type mapping for the
+executing HLL and creates a PMC of type I<.UserType> instead of
+I<.CoreType>, if such a mapping is defined.
+
+E.g. with this code snippet ...
+
+  .loadlib 'dynlexpad'
+
+  .HLL "Foo", ""
+  .HLL_map .LexPad, .DynLexPad
+
+  .sub main :main
+    ...
+
+... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
+
+=item .sub <identifier> [:<flag> ...]
+
+=item .end
+
+Define a I<compilation unit> with the label B<identifier:>. See
+L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
+
+=item .emit
+
+=item .eom
+
+Define a I<compilation unit> containing PASM code.
+
+=item .local <type> <identifier> [:unique_reg]
+
+=item .sym <type> <identifier> [:unique_reg]
+
+Define a local name B<identifier> for this I<compilation unit> and of the
+given B<type>. You can define multiple identifiers of the same type by
+separating them with commas:
+
+  .sym int i, j
+
+The optional C<:unique_reg> modifier will force the register allocator to
+associate the identifier with a unique register for the duration of the
+compilation unit.
+
+=item .lex <identifier>, <reg>
+
+Declare a lexical variable that is an alias for a PMC register. The
+PIR compiler calls this method in response to a .lex STRING, PREG
+directive. For example, given this preamble:
+
+    .lex "$a", $P0
+    $P1 = new Integer
+
+    These two opcodes have an identical effect:
+
+    $P0 = $P1
+    store_lex "$a", $P1
+
+    And these two opcodes also have an identical effect:
+
+    $P1 = $P0
+    $P1 = find_lex "$a"
+
+=item .const <type> <identifier> = <const>
+
+=item .globalconst <type> <identifier> = <const>
+
+Define a named constant of style I<type> and value I<const> restricted
+to one sub or globally. If I<type> denotes a PMC type, I<const> must be
+a string constant.
+
+=item .namespace <identifier>
+
+Open a new scope block. This "namespace" is not the same as the
+.namespace [ <identifier> ] syntax, which is used for storing subroutines
+in a particular namespace in the global symboltable.
+This directive is useful in cases such as (pseudocode):
+
+  local x = 1;
+  print(x);       # prints 1
+  do              # open a new namespace/scope block
+    local x = 2;  # this x hides the previous x
+    print(x);     # prints 2
+  end             # close the current namespace
+  print(x);       # prints 1 again
+
+All types of common language constructs such as if, for, while, repeat and such
+that have nested scopes, can use this directive.
+
+=item .endnamespace <identifier>
+
+Closes the scope block that was opened with .namespace <identifier>.
+
+=item .namespace [ <identifier> ; <identifier> ]
+
+Defines the namespace from this point onwards.  By default the program is not
+in any namespace.  If you specify more than one, separated by semicolons, it
+creates nested namespaces, by storing the inner namespace object with a C<\0>
+prefix in the outer namespace's global pad.
+
+=item .pcc_*
+
+Directives used for Parrot Calling Conventions.
+
+=back
+
+=head2 Directives for subroutine parameters and return
+
+=over 4
+
+=item .param <type> <identifier> [:<flag> ...]
+
+At the top of a subroutine, declare a local variable, in the mannter
+of B<.local>, into which parameter(s) of the current subroutine should
+be stored. Available flags:
+C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
+
+=item .param <reg> [:<flag> ...]
+
+At the top of a subroutine, specify where parameter(s) of the current
+subroutine should be stored.  Available flags:
+C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
+
+=item .return <var> [:<flag> ...]
+
+Between B<.pcc_begin_return> and B<.pcc_end_return>, specify one or
+more of the return value(s) of the current subroutine.  Available
+flags:
+C<:flat>.
+
+=back
+
+=head2 Directives for making a PCC call
+
+=over 4
+
+=item .arg <var> [:<flag> ...]
+
+Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
+passed.  Available flags:
+C<:flat>.
+
+=item .result <var> [:<flag> ...]
+
+Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
+value(s) should be stored.  Available flags:
+C<:slurpy>, C<:optional>, and C<:opt_count>.
+
+=back
+
+=head2 Shorthand directives for PCC call and return
+
+=over 4
+
+=item ([<var> [:<flag> ...], ...]) = <var>([arg [:<flag> ...], ...])
+
+=item <var> = <var>([arg [:<flag> ...], ...])
+
+=item <var>([arg [:<flag> ...], ...])
+
+=item <var>."_method"([arg [:<flag> ...], ...])
+
+=item <var>._method([arg [:<flag> ...], ...])
+
+Function or method call. These notations are shorthand for a longer
+PCC function call with B<.pcc_*> directives. I<var> can denote a
+global subroutine, a local B<identifier> or a B<reg>.
+
+=item .return ([<var> [:<flag> ...], ...])
+
+Return from the current compilation unit with zero or more values.
+
+The surrounded parentheses are mandatory. Besides making sequence
+break more conspicuous, this is necessary to distinguish this syntax
+from other uses of the B<.return> directive that will be probably
+deprecated.
+
+=item .return <var>(args)
+
+=item .return <var>."somemethod"(args)
+
+=item .return <var>.somemethod(args)
+
+Tail call: call a function or method and return from the sub with the
+function or method call return values.
+
+Internally, the call stack doesn't increase because of a tail call, so
+you can write recursive functions and not have stack overflows.
+
+=back
+
+=head2 Parameter Passing and Getting Flags
+
+See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
+the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
+and C<FLAT>, which correspond to the calling convention flags
+C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
+
+[TODO - once these flag bits are solidified by long-term use, then we
+may choose to copy appropriate bits of the documentation to here.]
+
+=head2 Instructions
+
+Instructions may be a valid PASM instruction or anything listed here
+below:
+
+=over 4
+
+=item goto <identifier>
+
+B<branch> <identifier>.
+
+=item if <var> goto <identifier>
+
+=item unless <var> goto <identifier>
+
+Translate to B<if x, identifier> or B<unless ..>.
+
+=item if null <var> goto <identifier>
+
+=item unless null <var> goto <identifier>
+
+Translate to B<if_null x, identifier> or B<unless_null ..>.
+
+=item if <var> <relop> <var> goto <identifier>
+
+The B<relop> B<<, <=, ==, != E<gt>= E<gt>> translate to the PASM opcodes
+B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt> B<var>, B<var>,
+B<identifier>.
+
+=item unless <var> <relop> <var> goto <identifier>
+
+Like above, but branch if condition isn't met.
+
+=item <var> = <var>
+
+B<set var, var>
+
+=item <var> = <unary> <var>
+
+The B<unary>s B<!>, B<-> and B<~> generate B<not>, B<neg> and B<bnot> ops.
+
+=item <var> = <var> <binary> <var>
+
+The B<binary>s B<+>, B<->, B<*>, B</>, B<%> and B<**> generate
+B<add>, B<sub>, B<mul>, B<div>, B<mod> and B<pow> arithmetic ops.
+B<binary> B<.> is B<concat> and valid for string arguments.
+
+B<<<> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
+B<E<gt>E<gt>E<gt>> is the logical shift B<lsr>.
+
+B<&&>, B<||> and B<~~> are logic B<and>, B<or> and B<xor>.
+
+B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
+
+=item <var> = <var> [ <var> ]
+
+This generates either a keyed B<set> operation or B<substr var, var,
+var, 1> for string arguments and an integer key.
+
+=item <var> = <var> [ <key> ]
+
+where C<key> is:
+
+ <var1> .. <var2>
+
+returns a slice defined starting at C<var1> and ending at C<var2>.
+
+ .. <var2>
+
+returns a slice starting at the first element, and ending at C<var2>.
+
+ <var1> ..
+
+returns a slice starting at C<var1> to the end of the array.
+
+see src/pmc/slice.pmc
+and t/pmc/slice.t.
+
+=item <var> [ <var> ] = <var>
+
+A keyed B<set> operation or the assign B<substr> op with a length of
+1.
+
+=item <var> = new <type>
+
+B<new var, .type>
+
+=item <var> = new <type>, <var>
+
+B<new var, .type, var>
+
+=item <var> = defined <var>
+
+B<defined var, var>
+
+=item <var> = defined <var> [ <var> ]
+
+B<defined var, var[var]> the keyed op.
+
+=item global "string" = <var>
+
+B<store_global "string", var>
+
+=item <var> = global "string"
+
+B<find_global var, "string">
+
+=item <var> = clone <var>
+
+B<clone var, var>
+
+=item <var> = addr <var>
+
+B<set_addr var, var>
+
+=item <var> = null
+
+B<null <var>>
+
+=back
+
+=head1 ATTACHMENTS
+
+N/A
+
+=head1 FOOTNOTES
+
+N/A
+
+=head1 REFERENCES
+
+N/A
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
