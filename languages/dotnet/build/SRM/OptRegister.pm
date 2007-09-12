@@ -1,4 +1,5 @@
 # .NET CLI To PIR Translator
+# $Id$
 # This SRM algorithm keeps track of the current stack depth and assigns to
 # virtual registers numbered by depth. This eliminates the need for a stack.
 # In addition, it does "lazy" moves as far as are possible so as to produce
