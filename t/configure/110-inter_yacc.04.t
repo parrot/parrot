@@ -40,7 +40,7 @@ isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
 my (@prompts, $object);
-@prompts = map { q{foo_} . $_ } 
+@prompts = map { q{foo_} . $_ }
     qw| alpha |;
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));
@@ -48,10 +48,10 @@ isa_ok($object, 'Tie::Filehandle::Preempt::Stdin');
 
 $ret = $step->runstep($conf);
 ok(defined $ret, "$step_name runstep() returned defined value");
-my $result_expected = q{user defined}; 
+my $result_expected = q{user defined};
 is($step->result(), $result_expected,
     "Result was $result_expected");
-    
+
 $object = undef;
 untie *STDIN;
 
