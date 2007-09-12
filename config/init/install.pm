@@ -66,7 +66,9 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $prefix  = $conf->options->get('prefix')      || "/usr/local";
+    $prefix =~ s{/\z}{};
     my $ep = $conf->options->get('exec-prefix');
+    $ep =~ s{/\z}{} if defined $ep;
     my $eprefix = $ep ? $ep : $prefix;
 
     #  --bindir=DIR           user executables [EPREFIX/bin]
