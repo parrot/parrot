@@ -76,7 +76,7 @@ sub runstep {
             }
             my ( $stdout, $stderr, $ret ) =
                 capture_output( $prog, '--version' );
-            # don't override the user even if the program they provided 
+            # don't override the user even if the program they provided
             # appears to be broken
             if ( $ret == -1 and !$conf->options->get('ask') ) {
                 # fall back to default
@@ -84,13 +84,13 @@ sub runstep {
                 return;
             } elsif ( $stdout =~ /Bison .*? (\d+) \. (\d+) (\w)?/x ) {
                 # if '--version' returns a string assume that this is bison.
-                # if this is bison pretending to be yacc 
+                # if this is bison pretending to be yacc
                 # '--version' doesn't work
                 # someday we might need to check $3 also.
                 my ( $prog_major, $prog_minor, $prog_patch ) = ( $1, $2, $3 );
                 my $prog_version = "$1.$2";
                 $prog_version .= $3 if $3;
-        
+
                 # is there a version requirement?
                 my $req = $conf->options->get('bison_required');
                 unless ( defined $req ) {
