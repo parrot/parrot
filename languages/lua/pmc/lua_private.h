@@ -3,6 +3,9 @@
  * $Id$
  */
 
+#ifndef PARROT_LUA_PRIVATE_H_GUARD
+#define PARROT_LUA_PRIVATE_H_GUARD
+
 #include "parrot/parrot.h"
 
 extern INTVAL dynpmc_LuaBoolean;
@@ -14,6 +17,8 @@ extern INTVAL dynpmc_LuaString;
 extern INTVAL dynpmc_LuaTable;
 
 extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
+
+#endif /* PARROT_LUA_PRIVATE_H_GUARD */
 
 /*
  * Local variables:
