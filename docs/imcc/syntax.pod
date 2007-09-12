@@ -59,8 +59,7 @@ Example:
 
 =item <type>
 
-B<int>, B<float>, B<string>, B<pmc> or a valid parrot PMC type like
-B<Array>.
+B<int>, B<float>, B<string> and B<pmc>.
 
 =item <reg>
 
@@ -341,8 +340,18 @@ C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =over 4
 
-=item ([<var> [:<flag> ...], ...]) = <var>([arg [:<flag> ...], ...])
+=item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
 
+This is short for:
+
+ .pcc_begin
+ .pcc_arg <arg1> <flag2>
+ ...
+ .pcc_call <var2>
+ .result <var1> <flag1>
+ ...
+ .pcc_end
+ 
 =item <var> = <var>([arg [:<flag> ...], ...])
 
 =item <var>([arg [:<flag> ...], ...])
