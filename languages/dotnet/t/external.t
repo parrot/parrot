@@ -1,6 +1,7 @@
 #!perl
 
 # Copyright (C) 2006-2007, The Perl Foundation.
+# $Id$
 
 use strict;
 use warnings;
@@ -106,6 +107,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'monkey_talk' );
 PIR
 Ook! Ook! Banana! Banana!
 OUTPUT
+
+# clean up temporary files
+#map { unlink "$_" or warn "$! $_" } qw( external.dll external.pbc t.dll t.pbc );
+
 
 # Local Variables:
 #   mode: cperl
