@@ -1,6 +1,7 @@
 #! perl
 
 # Copyright (C) 2003-2007, The Perl Foundation.
+# $Id$
 
 use subs qw(fetchvar);
 use vars qw(@builtins @keywords);

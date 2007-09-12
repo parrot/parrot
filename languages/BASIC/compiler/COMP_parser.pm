@@ -1,6 +1,7 @@
 #! perl
 
 # Copyright (C) 2003-2007, The Perl Foundation.
+# $Id$
 
 use constant VERSION => 2.3;
 

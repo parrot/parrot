@@ -1,6 +1,7 @@
 #! perl
 
 # Copyright (C) 2003-2007, The Perl Foundation.
+# $Id$
 
 # Relies on "testrun.pl" being setup correctly.
 #
