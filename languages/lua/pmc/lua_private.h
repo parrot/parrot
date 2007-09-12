@@ -1,7 +1,7 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
-$Id$
-*/
+ *  Copyright (C) 2007, The Perl Foundation.
+ * $Id$
+ */
 
 #include "parrot/parrot.h"
 
