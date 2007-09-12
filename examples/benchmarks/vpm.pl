@@ -1,6 +1,7 @@
 # perl program by Thomas Klausner posted on Vienna-PM list
 #
 # Copyright (C) 2004-2006, The Perl Foundation.
+# $Id$
 
 use strict;
 use warnings;
