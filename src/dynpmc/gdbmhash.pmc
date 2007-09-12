@@ -62,7 +62,6 @@ static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC * key))
 {
     if (key == NULL) {
         real_exception(interp, NULL, OUT_OF_BOUNDS, "Hash: Cannot use NULL key");
-        return NULL;
     }
     return key_string(interp, key);
 }
