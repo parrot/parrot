@@ -213,12 +213,12 @@ Parrot_add_to_free_list(PARROT_INTERP,
     object = (PObj *)((char *)arena->start_objects);
 
     for (i = 0; i < num_objects; i++) {
-        PObj_flags_SETTO((PObj *)object, PObj_on_free_list_FLAG);
+        PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
         /*
          * during GC buflen is used to check for objects on the
          * free_list
          */
-        PObj_buflen((PObj*)object) = 0;
+        PObj_buflen(object) = 0;
         pool->add_free_object(interp, pool, object);
         object = (PObj *)((char *)object + pool->object_size);
     }
