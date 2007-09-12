@@ -1,4 +1,5 @@
 /* amber_character.pmc
+ * $Id$
  *  Copyright (C) 2005-2007, The Perl Foundation.
  *  Overview:
  *     The Amber_CHARACTER PMC, which implementes the Amber kernel class CHARACTER

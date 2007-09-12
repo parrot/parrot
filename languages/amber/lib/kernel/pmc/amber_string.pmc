@@ -1,4 +1,5 @@
 /* amber_string.pmc
+ * $Id$
  *  Copyright (C) 2005-2007, The Perl Foundation.
  *  Overview:
  *     The Amber_STRING PMC, which implementes the Amber kernel class STRING
