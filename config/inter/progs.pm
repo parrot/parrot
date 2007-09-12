@@ -21,7 +21,7 @@ use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Parrot::Configure::Step ':inter';
+use Parrot::Configure::Step ':inter', ':auto';
 
 $description = 'Determining what C compiler and linker to use';
 
@@ -124,7 +124,32 @@ END
     $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
     $conf->data->set( ccwarn => $ccwarn );
 
+    test_compiler( $cc );
+
     return $self;
+}
+
+sub test_compiler
+{
+    my $cc = shift;
+
+    open( my $out_fh, '>', 'test.c' ) or die "Unable to open 'test.c': $@\n";
+    print {$out_fh} <<END_C;
+int main() {
+    return 0;
+}
+END_C
+    close $out_fh;
+
+    unless ( eval { cc_build(); 1 } ) {
+        warn "Compilation failed with '$cc'\n";
+        exit 1;
+    }
+
+    unless ( eval { cc_run(); 1 } ) {
+        warn $@ if $@;
+        exit 1;
+    }
 }
 
 1;
