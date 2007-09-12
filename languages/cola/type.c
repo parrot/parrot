@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * type.c
  *
  * Cola compiler for Parrot

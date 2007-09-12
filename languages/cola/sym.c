@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * sym.c
  *
  * Cola compiler for Parrot
