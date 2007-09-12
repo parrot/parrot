@@ -22,7 +22,7 @@ Generate character set tables.
 my ($svnid) =
     '$Id$' =~
     /^\$[iI][dD]:\s(.*) \$$/;
-my $fileid      = '$' . 'id $';
+my $fileid      = '$' . 'Id $';
 my $charset_dir = File::Spec->catdir(qw/ src charset /);
 
 my $coda = <<'EOF';
