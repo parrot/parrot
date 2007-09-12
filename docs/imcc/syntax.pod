@@ -235,7 +235,7 @@ PIR compiler calls this method in response to a .lex STRING, PREG
 directive. For example, given this preamble:
 
     .lex "$a", $P0
-    $P1 = new Integer
+    $P1 = new 'Integer'
 
     These two opcodes have an identical effect:
 
@@ -481,13 +481,13 @@ and t/pmc/slice.t.
 A keyed B<set> operation or the assign B<substr> op with a length of
 1.
 
-=item <var> = new <type>
+=item <var> = new '<type>'
 
-B<new var, .type>
+B<new var, 'type'>
 
-=item <var> = new <type>, <var>
+=item <var> = new '<type>', <var>
 
-B<new var, .type, var>
+B<new var, 'type', var>
 
 =item <var> = defined <var>
 
