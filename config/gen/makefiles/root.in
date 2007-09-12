@@ -1516,6 +1516,7 @@ clean : \
     imcc-clean \
     compilers-clean \
     smoke-clean \
+    cover-clean \
     editor-clean
 	@TEMP_cg_r@
 	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
@@ -1890,7 +1891,25 @@ splint-andy :
 		src/nci.c \
 		src/inte*.c \
 
+COVER_FLAGS = -fprofile-arcs -ftest-coverage
+COVERABLE_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.c/g@PQ@`
+GCDA_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcda/g@PQ@`
+GCNO_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcno/g@PQ@`
+GCOV_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcov/g@PQ@`
 
+cover:
+	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
+		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+	@make@ fulltest
+	gcov $(COVERABLE_FILES)
+	gcov2perl $(GCOV_FILES)
+	cover
+
+cover-clean:
+	$(RM_F) $(GCDA_FILES) $(GCNO_FILES) $(GCOV_FILES)
+
+
+###############################################################################
 #
 # installation
 #
