@@ -1,6 +1,10 @@
-#
-# RT#41226 - everything in here should have a ticket associated with it.
-#
+# $Id$
+
+=head1 Deprecation in Parrot
+
+This is a list of currently deprecated features of Parrot.
+Every deprecation should have an associated RT ticket, but this
+is not the case yet [RT#41226].
 
 =head1 .imc file extension
 
@@ -39,21 +43,21 @@ deprecated:
 
 =over 4
 
-=item store_global
+=item B<store_global>
 
-=item find_global
+=item B<find_global>
 
-=item find_name
-
-=item substr_r
-
-See RT#41749.
-
-=back
+=item B<find_name>
 
 There are several variants of some of the above ops; all are deprecated,
 and are replaced by the ops {set,get}_[hll,root]_global. See also
 http://www.parrotcode.org/docs/ops/var.html.
+
+=item B<substr_r>
+
+For now this op will stay available as an experimental op [RT#41749].
+
+=back
 
 From L<http://www.parrotcode.org/docs/ops/experimental.html>, the following ops
 are deprecated:
@@ -103,6 +107,21 @@ been updated.
 
 =back
 
+=head1 deprecated PIR syntax
+
+=over 4
+
+=item type names
+
+As of Parrot 0.4.16 all type names for .local other than string, num, int, and pmc
+are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array> for C<pmc>
+will no longer be possible in Parrot 0.4.17.
+[RT#42769]. 
+
+=head1 Deprecated compiler tools
+
+Currently no compiler tools are deprecated.
+
 =head1 FUTURE changes
 
 Not yet deprecated, but it's recommended to use the new syntax and
@@ -124,7 +143,7 @@ we are moving to use:
 
   $P0 = new 'Integer'
 
-=item Assignment syntax with opcodes [#36283]
+=item Assignment syntax with opcodes [RT#36283]
 
 When the first argument of an opcode is C<OUT>, then the assignment syntax
 will be allowed, as it is today.
@@ -141,7 +160,3 @@ Will have to be:
     substr $P0, 1, 2, "x"
 
 =back
-
-=head1 Deprecated compiler tools
-
-Currently no compiler tools are deprecated.
