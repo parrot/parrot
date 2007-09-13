@@ -3,6 +3,7 @@ use Regex::Ops::Tree;
 use Regex::Ops::List;
 
 # Copyright (C) 2002-2006, The Perl Foundation.
+# $Id$
 
 require 'Regex.pm';
 use strict;

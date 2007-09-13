@@ -1,6 +1,7 @@
 package Regex::Parse;
 
 # Copyright (C) 2002-2006, The Perl Foundation.
+# $Id$
 
 use Regex::Grammar;
 use strict;

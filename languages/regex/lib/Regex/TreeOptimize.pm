@@ -3,6 +3,7 @@
 # is really suitable only for peephole optimization.
 
 # Copyright (C) 2004-2006, The Perl Foundation.
+# $Id$
 
 package Regex::TreeOptimize;
 use Regex::Ops::Tree qw(rop);

@@ -1,6 +1,7 @@
 package Regex::State;
 
 # Copyright (C) 2002-2007, The Perl Foundation.
+# $Id$
 
 use strict;
 use warnings;
