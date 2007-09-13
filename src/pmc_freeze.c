@@ -619,14 +619,15 @@ Pushes the number C<v> onto the end of the C<*io> "stream".
 static void
 push_opcode_number(PARROT_INTERP, NOTNULL(IMAGE_IO *io), FLOATVAL v)
 {
-    const size_t len = PF_size_number() * sizeof (opcode_t);
-    STRING * const s = io->image;
-    const size_t used = s->bufused;
+    const size_t   len  = PF_size_number() * sizeof (opcode_t);
+    STRING * const s    = io->image;
+    const size_t   used = s->bufused;
 
     op_check_size(interp, s, len);
     PF_store_number((opcode_t *)((ptrcast_t)s->strstart + used), &v);
+
     s->bufused += len;
-    s->strlen += len;
+    s->strlen  += len;
 }
 
 /*

@@ -149,6 +149,7 @@ describe them as well.\n\n");
     fprintf(stderr, "\nDumping Core...\n");
 
     dumpcore();
+    exit(EXIT_FAILURE);
 }
 
 /*

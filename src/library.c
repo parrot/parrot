@@ -425,8 +425,9 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 {
     STRING *prefix;
     STRING *full_name;
-    INTVAL i, n;
-    PMC *paths;
+    PMC    *paths;
+    char   *ignored;
+    INTVAL  i, n;
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(file))
@@ -439,8 +440,11 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
     else
         paths = get_search_paths(interp, PARROT_LIB_PATH_INCLUDE);
 
-    Parrot_get_runtime_prefix(interp, &prefix);
-    n = VTABLE_elements(interp, paths);
+    ignored = Parrot_get_runtime_prefix(interp, &prefix);
+    n       = VTABLE_elements(interp, paths);
+
+    UNUSED(ignored);
+
     for (i = 0; i < n; ++i) {
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
 
