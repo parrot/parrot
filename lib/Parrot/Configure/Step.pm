@@ -513,12 +513,18 @@ sub cc_build {
         );
 
     my $compile_command = _build_compile_command( $cc, $ccflags, $cc_args );
-    _run_command( $compile_command, 'test.cco', 'test.cco', $verbose )
+    my $compile_result = _run_command( $compile_command, 'test.cco', 'test.cco', $verbose )
         and confess "C compiler failed (see test.cco)";
+    if ( $compile_result ) {
+        return $compile_result;
+    }
 
-    _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs",
+    my $link_result = _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe $libs",
         'test.ldo', 'test.ldo', $verbose )
         and confess "Linker failed (see test.ldo)";
+    if ( $link_result ) {
+        return $link_result;
+    }
 }
 
 =item C<cc_run()>
@@ -532,13 +538,20 @@ sub cc_run {
     my $exe     = $conf->data->get('exe');
     my $slash   = $conf->data->get('slash');
     my $verbose = $conf->options->get('verbose');
+    my $test_exe = ".${slash}test${exe}";
 
+    my $run_error;
     if ( defined( $_[0] ) && length( $_[0] ) ) {
         local $" = ' ';
-        _run_command( ".${slash}test${exe} @_", './test.out', undef, $verbose );
+        $run_error = _run_command( "$test_exe @_", './test.out', undef, $verbose );
     }
     else {
-        _run_command( ".${slash}test${exe}", './test.out', undef, $verbose );
+        $run_error = _run_command( "$test_exe", './test.out', undef, $verbose );
+    }
+
+    if ( $run_error ) {
+        confess "Running the test executable ($test_exe) failed.  Error code: $run_error\n";
+        exit 1;
     }
 
     my $output = _slurp('./test.out');
