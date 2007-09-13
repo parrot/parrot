@@ -39,27 +39,27 @@
 
 static void add_pcc_named_arg( PARROT_INTERP,
     NOTNULL(SymReg *cur_call),
-    char *name,
-    SymReg *value )
+    const char     *name,
+    SymReg         *value )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void add_pcc_named_param( PARROT_INTERP,
-    SymReg *cur_call,
-    char *name,
-    SymReg *value )
+    SymReg     *cur_call,
+    const char *name,
+    SymReg     *value )
         __attribute__nonnull__(1);
 
 static void add_pcc_named_result( PARROT_INTERP,
-    SymReg *cur_call,
-    char *name,
-    SymReg *value )
+    SymReg     *cur_call,
+    const char *name,
+    SymReg     *value )
         __attribute__nonnull__(1);
 
 static void add_pcc_named_return( PARROT_INTERP,
-    SymReg *cur_call,
-    char *name,
-    SymReg *value )
+    SymReg     *cur_call,
+    const char *name,
+    SymReg     *value )
         __attribute__nonnull__(1);
 
 static void begin_return_or_yield( PARROT_INTERP, int yield )
@@ -447,7 +447,7 @@ set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
 }
 
 static void
-add_pcc_named_arg(PARROT_INTERP, NOTNULL(SymReg *cur_call), char *name,
+add_pcc_named_arg(PARROT_INTERP, NOTNULL(SymReg *cur_call), const char *name,
                   SymReg *value)
 {
     SymReg *r = mk_const(interp, name, 'S');
@@ -458,7 +458,8 @@ add_pcc_named_arg(PARROT_INTERP, NOTNULL(SymReg *cur_call), char *name,
 }
 
 static void
-add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, char *name, SymReg *value)
+add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, const char *name,
+                     SymReg *value)
 {
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
@@ -468,7 +469,8 @@ add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, char *name, SymReg *value)
 }
 
 static void
-add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, char *name, SymReg *value)
+add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, const char *name,
+                    SymReg *value)
 {
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
@@ -478,7 +480,8 @@ add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, char *name, SymReg *value)
 }
 
 static void
-add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, char *name, SymReg *value)
+add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, const char *name,
+                     SymReg *value)
 {
     SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
