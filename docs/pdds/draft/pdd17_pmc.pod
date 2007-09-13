@@ -238,6 +238,106 @@ running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
 more) types of PMC, while particular Python datatypes will map onto different
 types of PMC.
 
+=head2 Interaction between PMCs and high-level objects
+
+{{ Address the problem of high-level objects inheriting from low-level PMCs,
+and any structural changes to low-level PMCs that might require. }}
+
+High-level objects, as specified in PDD15, need to be able to inherit from
+PMCs. This is achieved through the combination of a C<PMCProxy> PMC and
+delegation.
+
+For PDD15 objects, there is a corresponding instance of the C<Class> PMC. For
+a PMC, however, the class definition is written in C and compiled away. There
+needs to be something that can be placed in the parents list for a PDD15
+class. That something is the C<PMCProxy> PMC. Like a PDD15 class, it is
+stored as the C<class> element in the namespace associated with a PMC, provides
+introspection facilities and can sit in an inheritance hierarchy.
+
+The PMCProxy PMCs are only created when needed for subclassing a low-level
+PMC, to avoid a large load of unused PMCProxy objects. When created, they are
+cached in the class slot of the namespace corresponding to the low-level PMC,
+so they are only created once.
+
+Therefore, subclassing a PMC looks, at a PIR level, like subclassing a high
+level class.
+
+  $P0 = get_class 'Hash'
+  $P1 = newclass 'MyClass'
+  addparent $P1, $P0     # The new class inherits from the Hash PMC
+
+Or, more briefly:
+
+  $P1 = subclass 'Hash', 'MyClass'
+
+PMCs store state in a very different way to PDD15 objects. When a method
+inherited from a PMC is called on a PDD15 object, that method needs to get
+a chunk of state that it can use as it wishes. Further to this, if multiple
+PMCs are inherited from, they may use the state in different ways. Users of
+Parrot at a PIR level should not have to care about such issues.
+
+(AR: I'm willing to make some changes in how low-level PMCs store state in
+order to make this easier.)
+
+Therefore, when a PDD15 object is instantiated and it inherits from PMCs, an
+instance of each of the PMCs that it inherits from is also created. These are
+stored at the end of the object's attributes store.
+
+When a method is called on an object whose class has PMC parents, the call is
+delegated up to each of the PMC parents, in MRO order. The invocant must be
+the appropriate PMC instance from the object's attribute store. For v-table
+calls, this is just a case of passing the correct thing. For other methods
+that are located by C<find_method>, a C<Bound_NCI> PMC is used to ensure that
+the method from the PMC is invoked with the correct instance, so it has access
+to the correct state.
+
+(AR: Why isn't it called directly on the delegated PMC stored in the delegating
+object's data store?)
+
+When a PMC calls a method on itself, it may have been overridden in a high
+level class. Therefore dynamic dispatches of method calls need to be done with
+the vtable of the high level class, not the vtable of the PMC itself.
+
+For PMCs that are instantiated and not overridden, the C<real_self> pointer in
+the PMC structure is a reference to the PMC instance itself. If, however, it
+is just acting to provide the state a PMC needs but is not the real instance,
+this pointer will point to the instance of the high level class (an instance
+of the C<Object> PMC). Method dispatches using C<DYNSELF> will always go
+through this mechanism.
+
+(AR: See comment above about delegated calls. Better to have the delegator
+object only exist for delegated PMCs, and have DYNSELF check for it.)
+
+Attribute access is, like method access, delegated upwards. Since attribute
+lookup is a vtable method, the down case is covered by the previous paragraph.
+
+(AR: What about overriding a low-level attribute with a high-level attribute?
+Can you override the core data store of a Hash? The core struct members of an
+STMLog? This would be a lot easier if low-level PMCs had a standard way of
+defining their attributes (core struct members), which could be used to
+generate struct declarations, to automatically fill a PMC's C<inspect>,
+C<get_attr>, and C<set_attr> vtable functions, to annotate PMCProxy objects,
+and to allow state for compile-time roles to be generated in the same struct as
+state from the PMC itself.)
+
+}}
+
+If a low-level PMC expects to be overridden by high-level classes (which means
+all the core low-level PMC types), it must respect a standard interface. It
+must implement the C<get_attr> and C<set_attr> vtable entries for any core
+attributes it expects to be accessible to subclasses.
+
+Subclassing a low-level class from a high-level class makes an entry in the
+high-level class's list of parents. This entry is a proxy class object for the
+low-level PMC class that provides access to the low-level PMC's vtable
+(including the implementations of get_attr and set_attr), and defines the
+storage that the low-level object will need within the high-level object (this
+could be as simple as a single integer attribute that gives an index into the
+object's data store where an instance of the low-level class is stored).
+
+
+=head1 REFERENCE
+
 =head2 Vtable Functions
 
 Vtables decouple the interface and implementation of various object functions. 
@@ -255,12 +355,16 @@ their behavior.
 
 =over 4
 
-=item void init(INTERP, PMC* self)
+=item init
+
+  void init(INTERP, PMC* self)
 
 Called when a PMC is first instantiated. It takes an unused PMC parameter and
 turns it into a PMC of the appropriate class.
 
-=item void init_pmc(INTERP, PMC* self, PMC* initializer)
+=item init_pmc
+
+  void init_pmc(INTERP, PMC* self, PMC* initializer)
 
 Alternative entry point called when a PMC is first instantiated.  Accepts a PMC
 parameter used to initialize the given object.  Interpretation of the PMC
@@ -270,7 +374,9 @@ NULL value passed as the initializer parameter is allowed.
 NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
 init(), though there will of necessity be exceptions.
 
-=item void morph(INTERP, PMC* self, INTVAL type)
+=item morph
+
+  void morph(INTERP, PMC* self, INTVAL type)
 
 Turn the PMC into a PMC of type I<type>. If the morphing can't be done in any
 reasonable way -- for instance if an integer is asked to turn into an Array --
@@ -281,7 +387,9 @@ This method is primarily used when the interpreter has need of coercing a PMC
 to a particular type, and isn't meant as a general purpose casting tool.
 Compilers should only emit valid morphing operations.
 
-=item void mark(INTERP, PMC* self)
+=item mark
+
+  void mark(INTERP, PMC* self)
 
 Called when the DOD is tracing live PMCs. If this method is called then the
 code must mark all strings and PMCs that it contains as live, otherwise they
@@ -301,7 +409,9 @@ This method may allocate no memory from Parrot, nor may it alter Parrot's
 internal structures. It should have no side-effects from the C level either.
 This routine may not throw an exception.
 
-=item void destroy(INTERP, PMC* self)
+=item destroy
+
+  void destroy(INTERP, PMC* self)
 
 Called when the PMC is destroyed. This method is called by the DOD when it
 determines that a PMC is dead and that the PMC has marked itself as having a
@@ -313,11 +423,17 @@ by the end of the method.
 
 This method may not throw an exception. It will be ignored if it does.
 
-=item PMC* clone(INTERP, PMC* self)
+=item clone
+
+  PMC* clone(INTERP, PMC* self)
 
 Return a clone of a PMC.
 
 =item defined
+
+  INTVAL defined(INTERP, PMC* self)
+
+Return a true value if the PMC is defined, false otherwise.
 
 =back
 
@@ -325,32 +441,45 @@ Return a clone of a PMC.
 
 =over 4
 
-=item PMC* getprop(INTERP, PMC* self, STRING* key)
+=item getprop
+
+  PMC* getprop(INTERP, PMC* self, STRING* key)
 
 Return the value from the property hash of I<self> keyed by I<key>. The key
 should not be NULL.
 
-=item void setprop(INTERP, PMC* self, STRING* key, PMC* value)
+=item setprop
+
+  void setprop(INTERP, PMC* self, STRING* key, PMC* value)
 
 Set the value in the property hash of I<self> that is keyed by I<key> to the
 value of I<value>. The key should not be NULL.
 
-=item void delprop(INTERP, PMC* self, STRING* key)
+=item delprop
+
+  void delprop(INTERP, PMC* self, STRING* key)
 
 Delete the value from the property hash of I<self> keyed by I<key>. The key
 should not be NULL.
 
-=item PMC* getprops(INTERP, PMC* self)
+=item getprops
+
+  PMC* getprops(INTERP, PMC* self)
 
 Return the entire property hash for I<self>.
 
-=item INTVAL type(INTERP, PMC* self)
+=item type
+
+  INTVAL type(INTERP, PMC* self)
 
 Return the type of the PMC. Type is a unique number associated with the PMC when
 the PMC's class is loaded. Negative numbers are considered
-interpreter-specific, non-public types.
+interpreter-specific, non-public types. [NOTE: will be deprecated when type IDs
+are deprecated.]
 
-=item UINTVAL subtype(INTERP, PMC* self, INTVAL type) [deprecated]
+=item subtype
+
+  UINTVAL subtype(INTERP, PMC* self, INTVAL type) [deprecated]
 
 Return the subtype of a PMC. (Note that this may be unimplemented, and may go
 away). This is intended to return information about the PMC--what type of
@@ -359,7 +488,9 @@ suchlike things.
 
 [This can be adequately handled by C<does> and C<inspect>.]
 
-=item STRING* name(INTERP, PMC* self)
+=item name
+
+  STRING* name(INTERP, PMC* self)
 
 Return the name of the class for the PMC.
 
@@ -747,20 +878,29 @@ Set the pointer value of the element indexed by an integer key.
 
 Set the pointer value of the element indexed by a string key.
 
-=item INTVAL type_keyed(INTERP, PMC* self, PMC* key)
+=item type_keyed
+
+  INTVAL type_keyed(INTERP, PMC* self, PMC* key)
 
 Return the type number of the PMC indexed by a PMC key.  The I<key> parameter
-is guaranteed not to be NULL for this method.
+is guaranteed not to be NULL for this method. [NOTE: To be deprecated when type
+IDs are deprecated.]
 
-=item INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
+=item type_keyed_int
+
+  INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
 
 Return the type number of the PMC indexed by an integer key.  The I<key>
-parameter is guaranteed not to be NULL for this method.
+parameter is guaranteed not to be NULL for this method. [NOTE: To be deprecated
+when type IDs are deprecated.]
 
-=item INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
+=item type_keyed_str
+
+  INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the type number of the PMC indexed by a string key.  The I<key>
-parameter is guaranteed not to be NULL for this method.
+parameter is guaranteed not to be NULL for this method. [NOTE: To be deprecated
+when type IDs are deprecated.]
 
 =item pop_integer
 
@@ -862,7 +1002,7 @@ Add the passed in PMC to the beginning of the list.
 
 =item splice
 
-=item void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
+  void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
 
 Replace the I<count> PMCs at offset I<offset> from the beginning of I<self>
 with the PMCs in the aggregate I<value>.
@@ -1103,101 +1243,6 @@ generate methods on the fly?]
 
 =back
 
-
-=head2 Interaction between PMCs and high-level objects
-
-{{ Address the problem of high-level objects inheriting from low-level PMCs,
-and any structural changes to low-level PMCs that might require. }}
-
-{{ PROPOSED:
-
-High-level objects, as specified in PDD15, need to be able to inherit from
-PMCs. This is achieved through the combination of a C<PMCProxy> PMC and
-delegation.
-
-For PDD15 objects, there is a corresponding instance of the C<Class> PMC. For
-a PMC, however, the class definition is written in C and compiled away. There
-needs to be something that can be placed in the parents list for a PDD15
-class. That something is the C<PMCProxy> PMC. Like a PDD15 class, it is
-attached to the namespace that a PMC is attached to, provides introspection
-facilities and can sit in an inheritance hierarchy.
-
-AR: The PMCProxy PMCs are only created when needed for subclassing a low-level
-PMC, to avoid a large load of unused PMCProxy objects. When created, they are
-cached in the class slot of the namespace corresponding to the low-level PMC,
-so they are only created once.
-
-Therefore, subclassing a PMC looks, at a PIR level, like subclassing a high
-level class.
-
-  $P0 = get_class 'Hash'
-  $P1 = new 'Class'
-  addparent $P1, $P0     # The new class inherits from the Hash PMC
-
-PMCs store state in a very different way to PDD15 objects. When a method
-inherited from a PMC is called on a PDD15 object, that method needs to get
-a chunk of state that it can use as it wishes. Further to this, if multiple
-PMCs are inherited from, they may use the state in different ways. Users of
-Parrot at a PIR level should not have to care about such issues.
-
-(AR: I'm willing to make some changes in how low-level PMCs store state in
-order to make this easier.)
-
-Therefore, when a PDD15 object is instantiated and it inherits from PMCs, an
-instance of each of the PMCs that it inherits from is also created. These are
-stored at the end of the object's attributes store.
-
-When a method is called on an object whose class has PMC parents, the call is
-delegated up to each of the PMC parents, in MRO order. The invocant must be
-the appropriate PMC instance from the object's attribute store. For v-table
-calls, this is just a case of passing the correct thing. For other methods
-that are located by C<find_method>, a C<Bound_NCI> PMC is used to ensure that
-the method from the PMC is invoked with the correct instance, so it has access
-to the correct state.
-
-(AR: Why isn't it called directly on the delegated PMC stored in the delegating
-object's data store?)
-
-When a PMC calls a method on itself, it may have been overridden in a high
-level class. Therefore dynamic dispatches of method calls need to be done with
-the vtable of the high level class, not the vtable of the PMC itself.
-
-For PMCs that are instantiated and not overridden, the C<real_self> pointer in
-the PMC structure is a reference to the PMC instance itself. If, however, it
-is just acting to provide the state a PMC needs but is not the real instance,
-this pointer will point to the instance of the high level class (an instance
-of the C<Object> PMC). Method dispatches using C<DYNSELF> will always go
-through this mechanism.
-
-(AR: See comment above about delegated calls. Better to have the delegator
-object only exist for delegated PMCs, and have DYNSELF check for it.)
-
-Attribute access is, like method access, delegated upwards. Since attribute
-lookup is a vtable method, the down case is covered by the previous paragraph.
-
-(AR: What about overriding a low-level attribute with a high-level attribute?
-Can you override the core data store of a Hash? The core struct members of an
-STMLog? This would be a lot easier if low-level PMCs had a standard way of
-defining their attributes (core struct members), which could be used to
-generate struct declarations, to automatically fill a PMC's C<inspect>,
-C<get_attr>, and C<set_attr> vtable functions, to annotate PMCProxy objects,
-and to allow state for compile-time roles to be generated in the same struct as
-state from the PMC itself.)
-
-}}
-
-If a low-level PMC expects to be overridden by high-level classes (which means
-all the core low-level PMC types), it must respect a standard interface. It
-must implement the C<get_attr> and C<set_attr> vtable entries for any core
-attributes it expects to be accessible to subclasses.
-
-Subclassing a low-level class from a high-level class makes an entry in the
-high-level class's list of parents. This entry is a proxy class object for the
-low-level PMC class that provides access to the low-level PMC's vtable
-(including the implementations of get_attr and set_attr), and defines the
-storage that the low-level object will need within the high-level object (this
-could be as simple as a single integer attribute that gives an index into the
-object's data store where an instance of the low-level class is stored).
 
 
 =head2 Core PMCs
