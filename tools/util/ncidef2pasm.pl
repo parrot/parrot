@@ -1,6 +1,7 @@
 #! perl
 
 # Copyright (C) 2003-2007, The Perl Foundation.
+# $Id$
 
 =head1 ncidef2asm.pl
 

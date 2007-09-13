@@ -1,6 +1,7 @@
 #! perl -s
 
 # Copyright (C) 2004-2007, The Perl Foundation.
+# $Id$
 
 #
 # Create a symlink tree shadowing the Parrot source tree.  Nifty for
