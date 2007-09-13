@@ -434,7 +434,16 @@
   get_past:
     $P1 = $P1.'get_scalar'()
     $P0 = getclass 'PAST::Op'
+    if key == '@( )' goto list_context
+    if key == '$( )' goto scalar_context
+  parenthetical:
     .return ($P1)
+  list_context:
+    past = $P0.'new'($P1, 'name' => 'get_array',  'pasttype'=>'callmethod', 'node'=>match)
+    .return (past)
+  scalar_context:
+    past = $P0.'new'($P1, 'name' => 'get_scalar', 'pasttype'=>'callmethod', 'node'=>match)
+    .return (past)
 .end
 
 
