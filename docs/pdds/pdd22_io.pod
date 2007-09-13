@@ -106,14 +106,14 @@ bare minimum.]
 
 =over 4
 
-=item new
+=item C<new>
 
   $P0 = new ParrotIO
 
 Creates a new I/O stream object. [Note that this is usually performed
 via the C<open> opcode.]
 
-=item open
+=item C<open>
 
   $P0 = $P1.open()
   $P0 = $P1.open($S2)
@@ -133,7 +133,7 @@ argument. When the open operation is complete, it invokes the callback
 with a single argument: a status object containing the opened stream
 object.
 
-=item close
+=item C<close>
 
   $P0 = $P1.close()
   $P0 = $P1.close($P2)
@@ -147,7 +147,7 @@ passing it a status object. [There's not really much advantage in this
 over just leaving the object for the GC to clean-up, but it does give
 you the option of executing an action when the stream has been closed.]
 
-=item print
+=item C<print>
 
   $P0 = $P1.print($I2)
   $P0 = $P1.print($N2)
@@ -165,7 +165,7 @@ The asynchronous version takes an additional final PMC callback
 argument $P2. When the print operation is complete, it invokes the callback,
 passing it a status object.
 
-=item read
+=item C<read>
 
   $S0 = $P1.read($I2)
   $P0 = $P1.read($I2, $P3)
@@ -187,7 +187,7 @@ callback doesn't need to know the read mode of the original operation,
 as the information about the character encoding of the return value is
 contained in the string.]
 
-=item readline
+=item C<readline>
 
   $S0 = $P1.readline()
   $P0 = $P1.readline($P2)
@@ -203,7 +203,7 @@ $P2, and only returns a status object $P0. When the readline operation
 is complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
-=item record_separator
+=item C<record_separator>
 
   $S0 = $P1.record_separator()
   $P0.record_separator($S1)
@@ -212,7 +212,7 @@ Accessor (get and set) for the I/O stream's record separator attribute.
 The default value is a newline (CR, LF, CRLF, etc. depending on the
 platform).
 
-=item buffer_type
+=item C<buffer_type>
 
   $I0 = $P1.buffer_type()
   $S0 = $P1.buffer_type()
@@ -235,7 +235,7 @@ constants, or a string value of 'unbuffered', 'line-buffered', or
            sent as a block, but line buffering also sends them as a
            block, so changed to "FULLBUF".]
 
-=item buffer_size
+=item C<buffer_size>
 
   $I0 = $P1.buffer_size()
   $P0.buffer_size($I1)
@@ -257,7 +257,7 @@ operations, or after flushing the buffer. If the new size is larger than
 the existing data in the buffer, a size change is non-disruptive, but if
 the new size is smaller, it will truncate the buffer with a warning.
 
-=item get_fd
+=item C<get_fd>
 
   $I0 = $P1.get_fd()
 
@@ -269,7 +269,7 @@ the method before calling it.
 
 No asynchronous version.
 
-{{ NOTE: use a config probe (behind does or can) to determine support }}
+{{ NOTE: use a config probe (behind C<does> or C<can>) to determine support }}
 
 =back
 
@@ -277,7 +277,7 @@ No asynchronous version.
 
 =over 4
 
-=item get_integer (vtable)
+=item C<get_integer> (vtable)
 
   $I0 = $P1
 
@@ -286,14 +286,14 @@ completion, -1 for an error, and 0 while still running. [Discuss: This
 is largely to preserve current expectations of -1 for an error. If we
 move away from that, is there a better representation?]
 
-=item get_bool (vtable)
+=item C<get_bool> (vtable)
 
   if $P0 goto ...
 
 Returns a boolean status for the status object, C<true> for successful
 completion or while still running, C<false> for an error.
 
-=item return
+=item C<return>
 
   $P0 = $P1.return()
 
@@ -301,7 +301,7 @@ Retrieves the return value of the asynchronous operation from the status
 object. Returns a NULL PMC while still running, or if the operation had
 no return value.
 
-=item error
+=item C<error>
 
   $P0 = $P1.error()
 
@@ -311,7 +311,7 @@ derived from Exception, and can be thrown from the callback. If there
 was no error, or the asynchronous operation is still running, returns a
 null PMC.
 
-=item throw
+=item C<throw>
 
   $P0.throw()
 
@@ -328,13 +328,13 @@ objects, or an Iterator role applied to I/O objects.]
 
 =over 4
 
-=item new
+=item C<new>
 
     new $P0, 'Iterator', $P1
 
 Create a new iterator object $P0 from I/O object $P1.
 
-=item shift
+=item C<shift>
 
       shift $S0, $P1
 
@@ -342,7 +342,7 @@ Retrieve the next line/block $S0 from the I/O iterator $P1. The amount
 of data retrieved in each iteration is determined by the I/O object's
 C<buffer_type> setting: unbuffered, line-buffered, or fully-buffered.
 
-=item get_bool (vtable)
+=item C<get_bool> (vtable)
 
   unless $P0 goto iter_end
 
@@ -373,7 +373,7 @@ L<Error Handling>.
 
 =over 4
 
-=item open
+=item C<open>
 
   $P0 = open $S1
   $P0 = open $S1, $S2
@@ -393,7 +393,7 @@ argument. When the open operation is complete, it invokes the callback
 with a single argument: a status object containing the opened stream
 object.
 
-=item close
+=item C<close>
 
   close $P0
   close $P0, $P1
@@ -416,7 +416,7 @@ These opcodes do not have asynchronous variants.
 =item *
 
 C<getstdin>, C<getstdout>, and C<getstderr> return a stream object for
-standard input, standard output, and standard error.
+standard input, standard output, and standard error, respectively.
 
 =item *
 
@@ -430,7 +430,7 @@ specify the mode.
 
 =over 4
 
-=item print
+=item C<print>
 
   print $I0
   print $N0
@@ -453,7 +453,7 @@ The asynchronous version takes an additional final PMC callback
 argument. When the print operation is complete, it invokes the callback,
 passing it a status object.
 
-=item printerr
+=item C<printerr>
 
   printerr $I0
   printerr $N0
@@ -471,7 +471,7 @@ If they want an asynchronous version, they can use C<print>.]
 
 =over 4
 
-=item read
+=item C<read>
 
   $S0 = read $I1
   $S0 = read $P1, $I2
@@ -487,7 +487,7 @@ argument, and only returns a status object. When the read operation is
 complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
-=item readline
+=item C<readline>
 
   $S0 = readline $P1
   $P0 = readline $P1, $P2
@@ -501,7 +501,7 @@ argument, and only returns a status object. When the readline operation
 is complete, it invokes the callback, passing it a status object and a
 string of bytes.
 
-=item peek
+=item C<peek>
 
   $S0 = peek
   $S0 = peek $P1
@@ -523,7 +523,7 @@ to be a synchronous one.]
 
 =over 4
 
-=item seek
+=item C<seek>
 
   seek $P0, $I1, $I2
   seek $P0, $I1, $I2, $I3
@@ -542,7 +542,7 @@ The asynchronous version takes an additional final PMC callback
 argument. When the seek operation is complete, it invokes the callback,
 passing it a status object and the stream object it was called on.
 
-=item tell
+=item C<tell>
 
   $I0 = tell $P1
   ($I0, $I1) = tell $P2
@@ -555,7 +555,7 @@ future.]
 
 No asynchronous version.
 
-=item poll
+=item C<poll>
 
   $I0 = poll $P1, $I2, $I3, $I4
 
@@ -640,12 +640,12 @@ buffer-type commands:
 [Okay, I'm seriously considering moving most of these to methods on the
 ParrotIO object. More than that, moving them into a role that is
 composed into the ParrotIO object when needed. For the ones that have
-the form 'opcodename parrotIOobject, arguments', I can't see that it's
-much less effort than 'parrotIOobject.methodname(arguments)' for either
+the form 'C<opcodename parrotIOobject, arguments>', I can't see that it's
+much less effort than 'C<parrotIOobject.methodname(arguments)>' for either
 manually writing PIR or generating PIR. The slowest thing about I/O is
 I/O, so I can't see that we're getting much speed gain out of making
-them opcodes. The ones to keep as opcodes are 'unlink', 'rmdir', and
-'opendir'.]
+them opcodes. The ones to keep as opcodes are 'C<unlink>', 'C<rmdir>', and
+'C<opendir>'.]
 
 =over 4
 
