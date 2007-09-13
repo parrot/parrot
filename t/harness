@@ -180,6 +180,7 @@ my @coding_std_tests = map { "t/codingstd/$_" } qw(
     cuddled_else.t
     gmt_utc.t
     pir_code_coda.t
+    svn_id.t
     tabs.t
     trailing_space.t
 );
