@@ -31,14 +31,6 @@ troublesome (if not possible?).
 #include "lua_private.h"
 
 
-INTVAL dynpmc_LuaBoolean;
-INTVAL dynpmc_LuaClosure;
-INTVAL dynpmc_LuaFunction;
-INTVAL dynpmc_LuaNil;
-INTVAL dynpmc_LuaNumber;
-INTVAL dynpmc_LuaString;
-INTVAL dynpmc_LuaTable;
-
 pmclass LuaNil
     extends LuaAny
     does scalar

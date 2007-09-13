@@ -21,6 +21,14 @@ This singleton PMC holds some static methods.
 #include "lua_private.h"
 #include <locale.h>
 
+INTVAL dynpmc_LuaBoolean;
+INTVAL dynpmc_LuaClosure;
+INTVAL dynpmc_LuaFunction;
+INTVAL dynpmc_LuaNil;
+INTVAL dynpmc_LuaNumber;
+INTVAL dynpmc_LuaString;
+INTVAL dynpmc_LuaTable;
+INTVAL dynpmc_LuaUserdata;
 
 static PMC * Lua_PMC;
 
@@ -70,6 +78,8 @@ pmclass Lua
               const_string(INTERP, "LuaString"));
             dynpmc_LuaTable = pmc_type(INTERP,
               const_string(INTERP, "LuaTable"));
+            dynpmc_LuaUserdata = pmc_type(INTERP,
+              const_string(INTERP, "LuaUserdata"));
         }
     }
 

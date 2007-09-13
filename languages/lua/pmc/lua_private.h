@@ -15,6 +15,7 @@ extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaNumber;
 extern INTVAL dynpmc_LuaString;
 extern INTVAL dynpmc_LuaTable;
+extern INTVAL dynpmc_LuaUserdata;
 
 extern PMC * find_meth(Interp* interp, PMC *obj, const char *name);
 

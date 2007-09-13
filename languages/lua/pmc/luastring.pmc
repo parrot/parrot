@@ -109,7 +109,7 @@ Returns the string itself.
 
 */
     STRING* get_string () {
-        return (STRING*) PMC_str_val(SELF);
+        return PMC_str_val(SELF);
     }
 
 /*
