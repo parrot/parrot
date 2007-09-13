@@ -113,10 +113,11 @@ been updated.
 
 =item type names
 
-As of Parrot 0.4.16 all type names for .local other than string, num, int, and pmc
-are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array> for C<pmc>
-will no longer be possible in Parrot 0.4.17.
-[RT#42769]. 
+As of Parrot 0.4.16 all type names for .local other than string, num, int, and
+pmc are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array>
+for C<pmc> will no longer be possible in Parrot 0.4.17.  [RT#42769].
+
+=back
 
 =head1 Deprecated compiler tools
 
