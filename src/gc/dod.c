@@ -622,8 +622,9 @@ next:
 
 void
 Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PMC * const p))
+    NOTNULL(PObj *p))
 {
+    PMC           *pmc        = (PMC *)p;
     Arenas * const arena_base = interp->arena_base;
 
     /* TODO collect objects with finalizers */
@@ -631,17 +632,16 @@ Parrot_dod_free_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         --arena_base->num_early_DOD_PMCs;
 
     if (PObj_active_destroy_TEST(p))
-        VTABLE_destroy(interp, p);
+        VTABLE_destroy(interp, pmc);
 
     if (PObj_is_PMC_EXT_TEST(p))
-         Parrot_free_pmc_ext(interp, p);
+         Parrot_free_pmc_ext(interp, pmc);
 
 #ifndef NDEBUG
 
-    /* invalidate the PMC */
-    p->pmc_ext     = (PMC_EXT *)0xdeadbeef;
-    p->vtable      = (VTABLE  *)0xdeadbeef;
-    PMC_pmc_val(p) = (PMC     *)0xdeadbeef;
+    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
+    pmc->vtable      = (VTABLE  *)0xdeadbeef;
+    PMC_pmc_val(pmc) = (PMC     *)0xdeadbeef;
 
 #endif
 

@@ -82,7 +82,7 @@ void Parrot_dod_free_buffer_malloc( PARROT_INTERP,
 
 void Parrot_dod_free_pmc( PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PMC * const p) )
+    NOTNULL(PObj *p) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
