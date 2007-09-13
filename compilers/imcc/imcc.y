@@ -25,9 +25,17 @@
 #include "parser.h"
 #include "optimizer.h"
 
-/* HEADERIZER TARGET: compilers/imcc/imc.h */
+/* HEADERIZER HFILE: compilers/imcc/imc.h */
 
 /* HEADERIZER BEGIN: static */
+
+#ifndef YYENABLE_NLS
+#  define YYENABLE_NLS 0
+#endif
+
+#ifndef YYLTYPE_IS_TRIVIAL
+#  define YYLTYPE_IS_TRIVIAL 0
+#endif
 
 static void add_pcc_named_arg( PARROT_INTERP,
     NOTNULL(SymReg *cur_call),
@@ -178,7 +186,7 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
         fmt = NULL;
     else
         fmt = ++q;
-#if OPDEBUG
+#ifdef OPDEBUG
     fprintf(stderr, "op '%s' format '%s' (%d)\n", opname, fmt?:"",n);
 #endif
     va_start(ap, n);
