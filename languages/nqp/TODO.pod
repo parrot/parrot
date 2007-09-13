@@ -21,10 +21,6 @@ PAST/POST changes to support it.
 This will be added to PAST::Var by allowing parameter nodes to
 have a 'named' attribute.
 
-=item * Scalar context $( ... )
-
-=item * List context @( ... )
-
 =back
 
 =head2 Tests
@@ -40,5 +36,9 @@ This may be very hard since we don't have any methods!
 =item * List member access C<$[index]>
 
 =item * Match variable access C<$/>
+
+=item * Scalar context $( ... )
+
+=item * List context @( ... )
 
 =back
