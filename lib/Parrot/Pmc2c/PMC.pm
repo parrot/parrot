@@ -1,5 +1,5 @@
 # Copyright (C) 2004-2006, The Perl Foundation.
-# $Id: PMC
+# $Id$
 # PMC.pm 18503 2007-05-11 07:39:22Z paultcochrane $
 #
 =head1 NAME
