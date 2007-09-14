@@ -20,20 +20,37 @@ $Revision$
 Comments start with B<#> and last until the following newline. These
 and empty lines are ignored.
 
+PIR allows POD blocks.
+
 =head1 Statements
 
-A valid imcc program consists of a sequence of I<statements>. A
-I<statement> is terminated by a newline (<NL>).
+A valid PIR program consists of a sequence of I<statements>. A
+I<statement> is terminated by a newline (<NL>). So, each statement has to be 
+on its own line.
 
 =head2 General statement format
+
+Any statement can start with a optional label and is terminated by a
+newline:
 
   [label:] [instruction] <NL>
 
 =head2 Labels
 
-Optional label for the given instruction, can stand on its own line.
-Global labels start with an underscore, local labels shouldn't. A label must
-conform to the syntax of B<identifier> described below.
+PIR code has both local and global labels. Global labels start with an
+underscore, local labels shouldn't.  Optional label for the given 
+instruction, can stand on its own line. A label must conform to the syntax 
+of B<identifier> described below.
+
+The name of a global label has to be unique, since it can be called at any 
+point in the program. A local label is accessible only in the compilation 
+unit where it's defined. A local label name must be unique within a 
+compilation unit, but it can be reused in other compilation units.
+
+Examples:
+
+  branch L1   # local label
+  bsr    _L2  # global label
 
 =head1 INSTRUCTIONS
 
@@ -43,8 +60,11 @@ conform to the syntax of B<identifier> described below.
 
 =item <identifier>
 
-Start with a letter or underscore, then may contain additionally
-digits and B<::>.
+Identifiers start with a letter or underscore, then may contain additionally
+letters, digits, underscores and B<::>. Identifiers don't have any limit on
+length.
+
+{{ REVIEW: length limit }}
 
 Example:
 
@@ -55,13 +75,16 @@ Example:
 
 =item <type>
 
-B<int>, B<float>, B<string>, B<pmc> or a valid parrot PMC type like
-B<Array>.
+Can be B<int>, B<float>, B<string> or B<pmc>.
+
+{{ REFERENCE: RT#42769 }}
 
 =item <reg>
 
-A PASM register In, Sn, Nn, Pn, or a IMCC temporary
-register $In, $Sn, $Nn, $Pn, where B<n> consists of digit(s) only.
+A PASM register In, Sn, Nn, Pn, or a PIR temporary register $In, $Sn, $Nn, 
+$Pn, where B<n> consists of digit(s) only. B<n> must be between 1 and 99.
+
+{{ REVIEW: n limit }}
 
 =item <var>
 
@@ -196,30 +219,41 @@ E.g. with this code snippet ...
 
 =item .sub <identifier> [:<flag> ...]
 
-=item .end
-
 Define a I<compilation unit> with the label B<identifier:>. See
 L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
+Always paired with C<.end>.
+
+=item .end
+
+End a compilation unit. Always paired with C<.sub>.
 
 =item .emit
 
+Define a I<compilation unit> containing PASM code. Always paired with
+C<.eom>.
+
 =item .eom
 
-Define a I<compilation unit> containing PASM code.
+End a I<compilation unit> containing PASM code. Always paired with
+C<.emit>.
 
 =item .local <type> <identifier> [:unique_reg]
-
-=item .sym <type> <identifier> [:unique_reg]
 
 Define a local name B<identifier> for this I<compilation unit> and of the
 given B<type>. You can define multiple identifiers of the same type by
 separating them with commas:
 
-  .sym int i, j
+  .local int i, j
 
 The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
 compilation unit.
+
+=item .sym <type> <identifier> [:unique_reg]
+
+Same as C<.local>.
+
+{{ PROPOSAL: remove .sym, see RT#45405 }}
 
 =item .lex <identifier>, <reg>
 
@@ -228,7 +262,7 @@ PIR compiler calls this method in response to a .lex STRING, PREG
 directive. For example, given this preamble:
 
     .lex "$a", $P0
-    $P1 = new Integer
+    $P1 = new 'Integer'
 
     These two opcodes have an identical effect:
 
@@ -244,15 +278,13 @@ directive. For example, given this preamble:
 
 =item .globalconst <type> <identifier> = <const>
 
-Define a named constant of style I<type> and value I<const> restricted
-to one sub or globally. If I<type> denotes a PMC type, I<const> must be
-a string constant.
+{{ PROPOSAL: to be removed, see RT#45407 }}
 
 =item .namespace <identifier>
 
 Open a new scope block. This "namespace" is not the same as the
 .namespace [ <identifier> ] syntax, which is used for storing subroutines
-in a particular namespace in the global symboltable.
+in a particular namespace in the global symbol table.
 This directive is useful in cases such as (pseudocode):
 
   local x = 1;
@@ -316,14 +348,13 @@ C<:flat>.
 =item .arg <var> [:<flag> ...]
 
 Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
-passed.  Available flags:
-C<:flat>.
+passed.  Available flags: C<:flat>.
 
 =item .result <var> [:<flag> ...]
 
 Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
 value(s) should be stored.  Available flags:
-C<:slurpy>, C<:optional>, and C<:opt_count>.
+C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =back
 
@@ -331,7 +362,17 @@ C<:slurpy>, C<:optional>, and C<:opt_count>.
 
 =over 4
 
-=item ([<var> [:<flag> ...], ...]) = <var>([arg [:<flag> ...], ...])
+=item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
+
+This is short for:
+
+  .pcc_begin
+  .pcc_arg <arg1> <flag2>
+  ...
+  .pcc_call <var2>
+  .result <var1> <flag1>
+  ...
+  .pcc_end
 
 =item <var> = <var>([arg [:<flag> ...], ...])
 
@@ -375,8 +416,8 @@ the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
 and C<FLAT>, which correspond to the calling convention flags
 C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
-[TODO - once these flag bits are solidified by long-term use, then we
-may choose to copy appropriate bits of the documentation to here.]
+{{ TODO: once these flag bits are solidified by long-term use, then we
+may choose to copy appropriate bits of the documentation to here. }}
 
 =head2 Instructions
 
@@ -387,13 +428,21 @@ below:
 
 =item goto <identifier>
 
-B<branch> <identifier>.
+B<branch> to <identifier> (label or subroutine name).
+
+Examples:
+
+  goto END
 
 =item if <var> goto <identifier>
 
+If <var> evaluates as true, jump to the named identifier. Translate to 
+B<if x, identifier>>.
+
 =item unless <var> goto <identifier>
 
-Translate to B<if x, identifier> or B<unless ..>.
+Unless <var> evaluates as true, jump to the named identifier. Translate to
+B<unless x, identifier>.
 
 =item if null <var> goto <identifier>
 
@@ -413,7 +462,7 @@ Like above, but branch if condition isn't met.
 
 =item <var> = <var>
 
-B<set var, var>
+Assign a value. Translates to B<set var, var>.
 
 =item <var> = <unary> <var>
 
@@ -461,13 +510,13 @@ and t/pmc/slice.t.
 A keyed B<set> operation or the assign B<substr> op with a length of
 1.
 
-=item <var> = new <type>
+=item <var> = new '<type>'
 
-B<new var, .type>
+B<new var, 'type'>
 
-=item <var> = new <type>, <var>
+=item <var> = new '<type>', <var>
 
-B<new var, .type, var>
+B<new var, 'type', var>
 
 =item <var> = defined <var>
 
@@ -479,23 +528,40 @@ B<defined var, var[var]> the keyed op.
 
 =item global "string" = <var>
 
-B<store_global "string", var>
+{{ DEPRECATED: op store_global was deprecated }}
 
 =item <var> = global "string"
 
-B<find_global var, "string">
+{{ DEPRECATED: op find_global was deprecated }}
 
 =item <var> = clone <var>
 
 B<clone var, var>
 
-=item <var> = addr <var>
+=item <var> = addr <identifier>
 
-B<set_addr var, var>
+Set <var> to the addressof label identified by <identifier>. Translates to
+B<set_addr var, var>.
 
 =item <var> = null
 
-B<null <var>>
+Set <var> to null. Translates to B<null <var>>.
+
+=item <<, <<=
+
+TODO
+
+=item >>, >>=
+
+TODO
+
+=item >>>,>>>=
+
+TODO
+
+=item addr
+
+Return the address of a label.
 
 =back
 
