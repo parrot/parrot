@@ -549,11 +549,6 @@ sub cc_run {
         $run_error = _run_command( "$test_exe", './test.out', undef, $verbose );
     }
 
-    if ( $run_error ) {
-        confess "Running the test executable ($test_exe) failed.  Error code: $run_error\n";
-        exit 1;
-    }
-
     my $output = _slurp('./test.out');
 
     return $output;
