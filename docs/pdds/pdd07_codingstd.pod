@@ -212,7 +212,11 @@ e.g. C<if (a && (b = c)) ...> or C<if ((a = b)) ...>.
 =item *
 
 When splitting a long line at a binary operator (other than comma), the split
-should be I<before> the operator, so that the continued line looks like one.
+should be I<before> the operator, so that the continued line looks like one,
+e.g.:
+
+    something_long_here = something_very_long + something_else_also_long
+            - something_which_also_could_be_long;
 
 =item *
 
