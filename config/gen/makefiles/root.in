@@ -1689,7 +1689,7 @@ status :
 patch :
 	svn diff
 
-LINTABLE_CFILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.c/g@PQ@`
+LINTABLE_CFILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 lint : sunlint
 
@@ -1876,7 +1876,7 @@ SPLINTFLAGS_TEST   =
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | sed @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
 splint-andy :
@@ -1891,10 +1891,10 @@ splint-andy :
 		src/inte*.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
-COVERABLE_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.c/g@PQ@`
-GCDA_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcda/g@PQ@`
-GCNO_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcno/g@PQ@`
-GCOV_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | sed @PQ@s/\.o/\.gcov/g@PQ@`
+COVERABLE_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+GCDA_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.gcda/g@PQ@`
+GCNO_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.gcno/g@PQ@`
+GCOV_FILES = `echo $(SRC_DIR)/main$(O) $(O_FILES) $(SRC_DIR)/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.gcov/g@PQ@`
 
 cover:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
