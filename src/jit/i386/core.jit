@@ -1328,7 +1328,7 @@ Parrot_ord_i_s_i {
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_ECX, emit_None, 1,
             offsetof(STRING, strlen));
     /* L1: */
-    L1[1] = NATIVECODE - L1 - 2;
+    L1[1] = (char)(NATIVECODE - L1 - 2);
     /*
      * cmpl #0, %eax
      * je  L2
@@ -1352,7 +1352,7 @@ Parrot_ord_i_s_i {
     L3a = NATIVECODE;
     emitm_jxs(NATIVECODE, emitm_js, 0);
     /* LPos: */
-    Lpos[1] = NATIVECODE - Lpos - 2;
+    Lpos[1] = (char)(NATIVECODE - Lpos - 2);
 
     jit_emit_cmp_rr_i(NATIVECODE, emit_EDX, emit_EAX);
     L3 = NATIVECODE;
@@ -1383,7 +1383,7 @@ Parrot_ord_i_s_i {
     L5 = NATIVECODE;
     emitm_jumps(NATIVECODE, 0);
 
-    L3a[1] = NATIVECODE - L3a - 2;
+    L3a[1] = (char)(NATIVECODE - L3a - 2);
     /*
      * L3a:
      */
@@ -1394,9 +1394,9 @@ Parrot_ord_i_s_i {
      * L3:
      * L4:
      */
-    L2[1] = NATIVECODE - L2 - 2;
-    L3[1] = NATIVECODE - L3 - 2;
-    L4[1] = NATIVECODE - L4 - 2;
+    L2[1] = (char)(NATIVECODE - L2 - 2);
+    L3[1] = (char)(NATIVECODE - L3 - 2);
+    L4[1] = (char)(NATIVECODE - L4 - 2);
     emitm_pushl_r(NATIVECODE, emit_EDX);        /* offs */
     emitm_pushl_r(NATIVECODE, emit_ECX);        /* string */
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_EAX);
@@ -1406,7 +1406,7 @@ Parrot_ord_i_s_i {
     /*
      * L5:
      */
-    L5[1] = NATIVECODE - L5 - 2;
+    L5[1] = (char)(NATIVECODE - L5 - 2);
     if (MAP[1] && MAP[1] != emit_ECX && MAP[1] != emit_EDX) {
         jit_emit_mov_rr_i(NATIVECODE, MAP[1], emit_EAX);
     }
@@ -1724,13 +1724,13 @@ Parrot_pow_n_n_i {
         emitm_jxs(NATIVECODE, emitm_jz, 0);                 /* jz L5 */
         jit_emit_mul_rr_n(interp, NATIVECODE, 1, 0);        /* res *= n2 */
         /* L5: */
-        L5[1] = NATIVECODE - L5 - 2;
+        L5[1] = (char)(NATIVECODE - L5 - 2);
         jit_emit_lsr_ri_i(interp, NATIVECODE, emit_EAX, 1);  /* e >>= 1 */
         jit_emit_mul_rr_n(interp, NATIVECODE, 0, 0);         /* n2 *= n2 */
         /* lsr is setting flags - branch past test at L3 */
         emitm_jxs(NATIVECODE, emitm_jnz, (L3 - NATIVECODE - 1)); /* jmp L3 */
     /* endwhile */
-    L4[1] = NATIVECODE - L4 - 2;
+    L4[1] = (char)(NATIVECODE - L4 - 2);
     /* L4:  */
     jit_emit_test_r_i(NATIVECODE, emit_ECX);               /* s ? */
     L6 = NATIVECODE;
@@ -1738,10 +1738,10 @@ Parrot_pow_n_n_i {
     emitm_fld1(NATIVECODE);                                /* push 1.0 */
     emitm_fxch(NATIVECODE, 2);
     emitm_fdivp(NATIVECODE, 2);                            /* res = 1.0/res */
-    L6[1] = NATIVECODE - L6 - 2;
+    L6[1] = (char)(NATIVECODE - L6 - 2);
     /* L6:  */
     emitm_fstp(NATIVECODE, 0);                             /* pop n2 */
-    L1[1] = NATIVECODE - L1 - 2;
+    L1[1] = (char)(NATIVECODE - L1 - 2);
     /* L1:  */
     if (MAP[1]) {
         emitm_fstp(NATIVECODE, (MAP[1] + 1));              /* store res */
