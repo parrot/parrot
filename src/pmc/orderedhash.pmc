@@ -602,9 +602,12 @@ preserve key/value order.
 
             case VISIT_FREEZE_NORMAL:
             case VISIT_FREEZE_AT_DESTRUCT:
-                for (i = 0; i <= hash->mask; i++) {
+                for (i = 0; i <= hash->entries; i++) {
                     HashBucket *b   = hash->bs + i;
-                    STRING     *key = (STRING *)b->key;
+                    STRING     *key;
+
+                    if (b)
+                        key = (STRING *)b->key;
 
                     if (!key)
                         continue;
