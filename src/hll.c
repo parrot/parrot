@@ -17,7 +17,7 @@ feature.
    interp->HLL_info
 
    @HLL_info = [
-     [ hll_name, hll_lib, { core_type => HLL_type, ... }, namespace ],
+     [ hll_name, hll_lib, { core_type => HLL_type, ... }, namespace, hll_id ],
      ...
      ]
 
@@ -63,7 +63,7 @@ the context.  If no type is registered, returns C<core_type>.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* new_hll_entry( PARROT_INTERP )
+static PMC* new_hll_entry( PARROT_INTERP, NULLOK(STRING *hll_name) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -88,9 +88,12 @@ static PMC* new_hll_entry( PARROT_INTERP )
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-new_hll_entry(PARROT_INTERP)
+new_hll_entry(PARROT_INTERP, NULLOK(STRING *entry_name))
 {
     PMC * const hll_info = interp->HLL_info;
+    INTVAL      id       = VTABLE_elements(interp, hll_info);
+    PMC        *entry_id;
+
     /*
      * ATT: all items that are owned by the HLL_info structure
      *      have to be created as constant objects, because
@@ -98,8 +101,16 @@ new_hll_entry(PARROT_INTERP)
      */
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 
-    VTABLE_push_pmc(interp, hll_info, entry);
+    if (entry_name && !STRING_IS_EMPTY(entry_name))
+        VTABLE_set_pmc_keyed_str(interp, hll_info, entry_name, entry);
+    else
+        VTABLE_push_pmc(interp, hll_info, entry);
+
     VTABLE_set_integer_native(interp, entry, e_HLL_MAX);
+
+    entry_id = constant_pmc_new(interp, enum_class_Integer);
+    VTABLE_set_integer_native(interp, entry_id, id);
+    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_id, entry_id);
 
     return entry;
 }
@@ -108,7 +119,7 @@ void
 Parrot_init_HLL(PARROT_INTERP)
 {
     interp->HLL_info      =
-        constant_pmc_new(interp, enum_class_ResizablePMCArray);
+        constant_pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =
         constant_pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -134,7 +145,7 @@ Parrot_register_HLL(PARROT_INTERP, NOTNULL(STRING *hll_name))
     START_WRITE_HLL_INFO(interp, hll_info);
 
     idx      = VTABLE_elements(interp, hll_info);
-    entry    = new_hll_entry(interp);
+    entry    = new_hll_entry(interp, hll_name);
 
     /* register HLL name */
     name     = constant_pmc_new_noinit(interp, enum_class_String);
@@ -201,7 +212,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, NOTNULL(STRING *hll_lib))
     if (i < nelements)
         return i;
 
-    entry    = new_hll_entry(interp);
+    entry    = new_hll_entry(interp, NULL);
 
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
 
@@ -222,31 +233,22 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
 {
-    INTVAL i, nelements;
-
     PMC * const hll_info = interp->HLL_info;
+    INTVAL      i;
 
     START_READ_HLL_INFO(interp, hll_info);
 
-    nelements = VTABLE_elements(interp, hll_info);
-
-    for (i = 0; i < nelements; ++i) {
-        STRING      *name;
-        PMC * const  entry    = VTABLE_get_pmc_keyed_int(interp, hll_info, i);
-        PMC * const  name_pmc = VTABLE_get_pmc_keyed_int(interp, entry,
-                e_HLL_name);
-
-        if (PMC_IS_NULL(name_pmc))
-            continue;
-
-        name = VTABLE_get_string(interp, name_pmc);
-        if (!string_equal(interp, name, hll_name))
-            break;
+    if (!hll_name || !VTABLE_exists_keyed_str(interp, hll_info, hll_name))
+        i = -1;
+    else {
+        PMC *entry    = VTABLE_get_pmc_keyed_str(interp, hll_info, hll_name);
+        PMC *entry_id = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_id);
+        i = VTABLE_get_integer(interp, entry_id);
     }
 
     END_READ_HLL_INFO(interp, hll_info);
 
-    return i < nelements ? i : -1;
+    return i;
 }
 
 PARROT_WARN_UNUSED_RESULT

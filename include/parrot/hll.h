@@ -82,6 +82,7 @@ typedef enum HLL_enum_t {
     e_HLL_name,
     e_HLL_lib,
     e_HLL_typemap,
+    e_HLL_id,
     e_HLL_MAX
 } HLL_enum_t;
 
