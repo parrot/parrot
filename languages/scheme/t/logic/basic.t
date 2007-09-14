@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin/../..";
+use lib "$FindBin::Bin/../../lib";
 
 #use Scheme::Test tests => 7;
 use Scheme::Test skip_all => 'Using obsolete calling conventions';
