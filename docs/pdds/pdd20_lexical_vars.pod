@@ -87,7 +87,7 @@ variables will omit the LexPad.
 From the interface perspective, LexPads are basically Hashes, with strings as
 keys and PMCs as values.  They extend the basic Hash interface with
 specialized initialization (requiring a reference to an associated LexInfo)
-and the query METHOD "get_lexinfo()" (to return it).
+and the query METHOD C<get_lexinfo()> (to return it).
 
 LexPad keys are unique.  Therefore, in each subroutine, there can be only one
 lexical variable with a given name.
@@ -175,8 +175,8 @@ steps, starting with $sub set to the running Subroutine (which is a Closure):
      But if $sub has no outer sub, END LOOP.
 
 NOTE: The C<newclosure> opcode should check to make sure that the target
-Subroutine has a :outer() attribute that points back to the currently running
-Subroutine.  This is a requirement for closures.
+Subroutine has an C<:outer()> attribute that points back to the currently
+running Subroutine.  This is a requirement for closures.
 
 =head3 Closure runtime: Using the lexical environment
 
@@ -223,14 +223,14 @@ given the Perl 6 code:
       return &a;
    }
 
-The &foo subroutine is the outer subroutine of &a, but it is not the caller
-of &a.
+The C<&foo> subroutine is the outer subroutine of C<&a>, but it is not the
+caller of C<&a>.
 
-In the above example, the definition of the Parrot subroutine implementing &a
-must include a notation that it is textually enclosed within &foo.  This is a
-static attribute of a Subroutine, set at compile time and never changed
-thereafter.  (Unless you're evil, or Damian.  But I repeat myself.)  This
-information is given through an ":outer()" subroutine attribute, e.g.:
+In the above example, the definition of the Parrot subroutine implementing
+&a must include a notation that it is textually enclosed within C<&foo>.
+This is a static attribute of a Subroutine, set at compile time and never
+changed thereafter.  (Unless you're evil, or Damian.  But I repeat myself.)
+This information is given through an C<:outer()> subroutine attribute, e.g.:
 
     .sub a :outer(foo)
 
@@ -296,7 +296,7 @@ In addition, LexPads must implement the following methods:
 Called exactly once.  Note that Parrot guarantees that this method will be
 called after the new Context object is made current.  It is recommended that
 any LexPad that aliases registers take a pointer to the current Context at
-init_pmc() time.
+C<init_pmc()> time.
 
 =item B<PMC *get_lexinfo()>
 
@@ -320,7 +320,7 @@ Array) of LexPads captured at C<newclosure> time.
 =head2 Default Parrot LexPad and LexInfo
 
 The default LexInfo supports lexicals only as aliases for PMC registers.  It
-therefore implements declare_lex_preg().  (Internally, it could be a Hash of
+therefore implements C<declare_lex_preg()>.  (Internally, it could be a Hash of
 some kind, where keys are String variable names and values are integer
 register numbers.)
 
