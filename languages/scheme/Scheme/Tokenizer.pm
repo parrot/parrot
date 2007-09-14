@@ -16,90 +16,101 @@ use Data::Dumper;
 
 sub tokenize {
     my $file = shift;
+
+    # read file and throw away comments
     my $text;
-    my $tokref;
-    my $token = '';
-
-    open SOURCE, "<", "$file";
-    while (<SOURCE>) {
-        next if /^\s*;/;
-        s/;.*$//;
-        $text .= $_;
+    {
+        open my $source, '<', $file;
+        while (<$source>) {
+            next if / \A \s* ; /xms;
+            s/ ; .* \z //xms;
+            $text .= $_;
+        }
+        close $source;
     }
-    close SOURCE;
 
-    for my $ch ( split //, $text ) {
-        if (   $ch eq '('
-            or $ch eq ')' )
-        {
-            push @$tokref, $token;
-            $token = $ch;
-        }
-        elsif (
-            $ch eq '-'
-            and (
-                $token =~ /^[a-z]/ or    # Dashes can be in an ident
-                $token =~ /^[-]\d+(\.\d+)?[eE]/
-            )
-            )
-        {                                # Dashes could be a neg. expt
-            $token .= $ch;
-        }
-        elsif ( $ch eq '?'
-            and $token =~ /^[a-z]/ )
-        {                                # Question marks can follow an identifier
-            $token .= $ch;
-        }
-        elsif ( $ch eq '!'
-            and $token =~ /^[a-z]/ )
-        {                                # Exclamation marks can follow an identifier
-            $token .= $ch;
-        }
-        elsif ( $ch eq '='
-            and $token =~ /^[<>]/ )
-        {                                # Equal sign can follow '<','>'
-            $token .= $ch;
-        }
-        elsif ( $ch eq '.'
-            and $token =~ /^\d+$/ )
-        {                                # Equal sign can follow '<','>'
-            $token .= $ch;
-        }
-        elsif (
-            $ch =~ /\d/
-            and (
-                $token =~ /^[-]/ or      # Digits can follow a dash
-                $token =~ /^\./  or      # Digits can follow a decimal point
-                $token =~ /^\d/
-            )
-            )
-        {                                # Digits can follow other digits
-            $token .= $ch;
-        }
-        elsif ( $ch =~ /[a-zA-Z]/
-            and $token =~ /^\w/ )
-        {                                # Letters can follow other letters
-            $token .= $ch;
-        }
-        elsif ( $ch =~ /\s/
-            and $token =~ /^\s/ )
-        {                                # White can follow white
-            $token .= $ch;
-        }
-        elsif ( $ch =~ /@/
-            and $token =~ /^,$/ )
-        {                                # token ,@
-            $token .= $ch;
-        }
-        else {
-            push @$tokref, $token;
-            $token = $ch;
+    my @tokens;
+    {
+        my $token = q{};
+        for my $ch ( split m//, $text ) {
+            if (    $ch eq '('
+                 || $ch eq ')'
+               )
+            {
+                push @tokens, $token;
+                $token = $ch;
+            }
+            elsif (    $ch eq '-'
+                    && (    $token =~ m/^[a-z]/ # Dashes can be in an ident
+                         || $token =~ m/^[-]\d+(\.\d+)?[eE]/
+                       )
+                  )
+            {                                # Dashes could be a neg. expt
+                $token .= $ch;
+            }
+            elsif (    $ch eq '?'
+                    && $token =~ /^[a-z]/
+                  )
+            {                                # Question marks can follow an identifier
+                $token .= $ch;
+            }
+            elsif (    $ch eq '!'
+                    && $token =~ m/^[a-z]/
+                  )
+            {                                # Exclamation marks can follow an identifier
+                $token .= $ch;
+            }
+            elsif (    $ch eq '='
+                    && $token =~ m/^[<>]/
+                  )
+            {                                # Equal sign can follow '<','>'
+                $token .= $ch;
+            }
+            elsif (    $ch eq '.'
+                    && $token =~ m/^\d+$/
+                  )
+            {                                # Equal sign can follow '<','>'
+                $token .= $ch;
+            }
+            elsif (    $ch =~ /\d/
+                    && (    $token =~ m/^[-]/       # Digits can follow a dash
+                         || $token =~ m/^\./        # Digits can follow a decimal point
+                         || $token =~ m/^\d/
+                       )
+                  )
+            {                                # Digits can follow other digits
+                $token .= $ch;
+            }
+            elsif (    $ch =~ /[a-zA-Z]/
+                    && $token =~ m/^\w/
+                  )
+            {                                # Letters can follow other letters
+                $token .= $ch;
+            }
+            elsif (    $ch =~ /\s/
+                    && $token =~ m/^\s/
+                  )
+            {                                # White can follow white
+                $token .= $ch;
+            }
+            elsif (    $ch =~ m/@/
+                    && $token =~ m/^,$/
+                  )
+            {                                # token ,@
+                $token .= $ch;
+            }
+            else {
+                push @tokens, $token;
+                $token = $ch;
+            }
         }
     }
-    return [ grep { /\S/ } @$tokref ];
+
+    return [ grep { m/ \S /xms } @tokens ];
 }
 
 1;
+
 __END__
 
 =head1 NAME
