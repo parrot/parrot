@@ -1,11 +1,12 @@
 # $Id$
-
 # Copyright (C) 2001-2006, The Perl Foundation.
 
 package Scheme;
 
+# pramata
 use strict;
 use warnings;
+use 5.008;
 
 use Data::Dumper;
 
