@@ -1516,7 +1516,6 @@ clean : \
     imcc-clean \
     compilers-clean \
     smoke-clean \
-    cover-clean \
     editor-clean
 	@TEMP_cg_r@
 	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
