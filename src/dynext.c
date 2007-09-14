@@ -235,7 +235,7 @@ get_path(PARROT_INTERP, NOTNULL(STRING *lib), NOTNULL(void **handle),
      * [shouldn't this happen in Parrot_locate_runtime_file instead?]
      */
 #ifdef WIN32
-    if (memcmp(lib->strstart, "lib", 3) == 0) {
+    if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
         *handle = Parrot_dlopen((char*)lib->strstart + 3);
         if (*handle) {
             path = string_substr(interp, lib, 3, lib->strlen - 3, NULL, 0);
