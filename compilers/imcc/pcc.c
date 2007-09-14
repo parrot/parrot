@@ -409,12 +409,12 @@ move_regs(PARROT_INTERP, IMC_Unit * unit,
             SymReg * const rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
                 PARROT_ASSERT(j < 255);
-                move_list[i] = j;
+                move_list[i] = (unsigned char)j;
                 goto done;
             }
         }
         PARROT_ASSERT(i < 255);
-        move_list[i] = i;
+        move_list[i] = (unsigned char)i;
 done:
         ;
     }

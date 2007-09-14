@@ -1639,34 +1639,6 @@ loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 }
 #endif
 
-PARROT_WARN_UNUSED_RESULT
-static int
-check_clone(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
-{
-    SymReg * rl = ins->r[0];
-    SymReg * rr = ins->r[1];
-    if (0 && is_ins_save(interp, unit, ins, rl, CHK_CLONE) &&
-        is_ins_save(interp, unit, ins, rr, CHK_CLONE)) {
-        IMCC_debug(interp, DEBUG_OPT2, "clone %I removed\n", ins);
-        free(ins->op);
-        ins->op = str_dup("set");
-        return 1;
-    }
-    return 0;
-}
-
-static int
-clone_remove(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
-{
-    Instruction *ins;
-    int changes = 0;
-    IMCC_debug(interp, DEBUG_OPT2, "clone_remove\n");
-    for (ins = unit->instructions; ins; ins = ins->next)
-        if (!strcmp(ins->op, "clone"))
-            changes |= check_clone(interp, unit, ins);
-    return changes;
-}
-
 /*
  * Local variables:
  *   c-file-style: "parrot"

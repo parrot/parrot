@@ -557,8 +557,8 @@ _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
     if (uniq == U_add_uniq_sub)
         name = add_ns(interp, name);
 
-    if (uniq && (r = _get_sym(hsh, name)) &&
-            r->type == VTADDRESS &&
+    r = _get_sym(hsh, name);
+    if (uniq && r && r->type == VTADDRESS &&
             r->lhs_use_count            /* we use this for labels/subs */
       ) {
         if (uniq == U_add_uniq_label) {

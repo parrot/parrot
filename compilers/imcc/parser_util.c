@@ -201,7 +201,7 @@ op_fullname(NOTNULL(char *dest), NOTNULL(const char *name), NOTNULL(SymReg *args
         if (args[i]->set == 'K')
             *dest++ = 'p';
         else
-            *dest++ = tolower((unsigned char)args[i]->set);
+            *dest++ = (char)tolower((unsigned char)args[i]->set);
 
         if (args[i]->type & (VTCONST|VT_CONSTP)) {
 #if IMC_TRACE_HIGH
@@ -254,7 +254,7 @@ maybe_builtin(PARROT_INTERP, NOTNULL(const char *name),
 
     PARROT_ASSERT(n < 15);
     for (i = 0; i < n; ++i) {
-        sig[i] = r[i]->set;
+        sig[i] = (char)r[i]->set;
         rr[i] = r[i];
     }
     sig[i] = '\0';
@@ -876,7 +876,8 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
         real_exception(interp, NULL, E_IOError,
                 "imcc_compile_file: '%s' is a directory\n", fullname);
 
-    if (!(fp = fopen(fullname, "r")))
+    fp = fopen(fullname, "r");
+    if (!fp)
         IMCC_fatal(interp, E_IOError,
                 "imcc_compile_file: couldn't open '%s'\n", fullname);
 
@@ -1244,16 +1245,17 @@ imcc_fprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *fmt), ...)
 int
 imcc_vfprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *format), va_list ap)
 {
-    int len;
+    int len = 0;
     const char *cp;
-    const char *fmt;
+    const char *fmt = format;
     char buf[128];
 
-    for (len = 0, fmt = format ; ; ) {
-        int ch, n;
+    for (;;) {
+        int ch = 0;
+        int n = 0;
 
-        for (n = 0, cp = fmt; (ch = *fmt) && ch != '%'; fmt++)
-            n++;
+        for (n = 0, cp = fmt; (ch = *fmt) && ch != '%'; fmt++, n++);
+
         /* print prev string */
         if (n) {
             fwrite(cp, 1, n, fd);
