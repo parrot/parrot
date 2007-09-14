@@ -12,10 +12,9 @@ our $VERSION   = '0.01';
 
 use Data::Dumper;
 
-my $ind = 0;
-
 sub _build_tree {
     my ( $tokens, $count ) = @_;
+
     my $temp = {};
 
     die "EOF reached" if $count >= $#$tokens;
@@ -24,38 +23,33 @@ sub _build_tree {
         $temp->{children} = [];
         $count++;
         while ( $tokens->[$count] ne ')' ) {
-            my $expr;
-            ( $count, $expr ) = _build_tree( $tokens, $count );
+            ( $count, my $expr ) = _build_tree( $tokens, $count );
             push @{ $temp->{children} }, $expr;
         }
         $count++;
     }
     elsif ( $tokens->[$count] eq "'" ) {
         $temp = { children => [ { value => 'quote' } ] };
-        my $expr;
         $count++;
-        ( $count, $expr ) = _build_tree( $tokens, $count );
+        ( $count, my $expr ) = _build_tree( $tokens, $count );
         push @{ $temp->{children} }, $expr;
     }
     elsif ( $tokens->[$count] eq "`" ) {
         $temp = { children => [ { value => 'quasiquote' } ] };
-        my $expr;
         $count++;
-        ( $count, $expr ) = _build_tree( $tokens, $count );
+        ( $count, my $expr ) = _build_tree( $tokens, $count );
         push @{ $temp->{children} }, $expr;
     }
     elsif ( $tokens->[$count] eq "," ) {
         $temp = { children => [ { value => 'unquote' } ] };
-        my $expr;
         $count++;
-        ( $count, $expr ) = _build_tree( $tokens, $count );
+        ( $count, my $expr ) = _build_tree( $tokens, $count );
         push @{ $temp->{children} }, $expr;
     }
     elsif ( $tokens->[$count] eq ",@" ) {
         $temp = { children => [ { value => 'unquote-splicing' } ] };
-        my $expr;
         $count++;
-        ( $count, $expr ) = _build_tree( $tokens, $count );
+        ( $count, my $expr ) = _build_tree( $tokens, $count );
         push @{ $temp->{children} }, $expr;
     }
     else {
@@ -69,11 +63,11 @@ sub _dataflow {
     my $node = shift;
 
     if ( exists $node->{children} ) {
-        for ( @{ $node->{children} } ) {
+        foreach ( @{ $node->{children} } ) {
             _dataflow($_);
         }
         my $cur_type = $node->{children}[0]{type};
-        for ( @{ $node->{children} } ) {
+        foreach ( @{ $node->{children} } ) {
             $cur_type = $_->{type} if $_->{type} eq 'REAL';
         }
         $node->{type} = $cur_type;    #$node->{children}[0]{type};
@@ -88,12 +82,13 @@ sub _dataflow {
 
 sub parse {
     my $tokens = shift;
+
     my @tree;
     my $tree;
 
     my $count = 0;
 
-    while ( $count < scalar @$tokens ) {
+    while ( $count < scalar @{$tokens} ) {
 
         #print Dumper $tokens;
         ( $count, $tree ) = _build_tree( $tokens, $count );
@@ -107,10 +102,12 @@ sub parse {
     if ( @tree > 1 ) {
         $tree = { children => [ { value => 'begin' }, @tree ] };
     }
+
     return $tree;
 }
 
 1;
+
 __END__
 
 =head1 NAME
@@ -119,9 +116,9 @@ Scheme::Parser - The Scheme token parser
 
 =head1 SYNOPSIS
 
-  use Scheme::Parser qw(parse);
+  use Scheme::Parser;
 
-  my @code = parse($tokens);
+  my @code = Scheme::Parser::parse($tokens);
 
 =head1 DESCRIPTION
 
