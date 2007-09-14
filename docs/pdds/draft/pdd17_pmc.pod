@@ -48,10 +48,9 @@ constructed out of these fundamental building blocks.
 All PMCs have the form:
 
     struct PMC {
-        UnionVal cache;
         Parrot_UInt flags;
+        UnionVal cache;
         VTABLE *vtable;
-        PMC *real_self;
         DPOINTER *data;
         struct PMC_EXT *pmc_ext;
     };
@@ -87,33 +86,8 @@ to a set of functions, with interfaces described in
 L<Vtable Functions> that implement the basic behaviour of the PMC
 (i.e. how it behaves under addition, subtraction, cloning etc.)
 
-{{ PROPOSED:
-C<real_self> holds a pointer to the PMC that dynamically dispatched method
-calls should be made on. Normally this will be a pointer directly back to the
-PMC itself. However, in the case that the PMC has been subclassed by a non-PMC
-it will hold a pointer to the real object. This is so DYNSELF.method() style
-calls will dispatch correctly, calling any methods and/or v-table methods that
-have been overridden in PIR.
-
-AR: Problem is, not all low-level PMCs have a PMCProxy that could be stored in
-real_self to handle these method calls (they're only created when the subclass
-is created). So, rather than storing real_self for all PMCs, we should only
-store the delegator for objects that are delegated to (whether they're proxied
-or otherwise delegated).
-
-AR: Alternatively, this magic could all live in the PMCProxy: look up the
-method object, and then invoke it passing in the delegator as the invocant.
-(Not practical, because the code from the delegated class will expect to be
-poking into the internals of the object, but will have the wrong object.)
-Alternatively, we could say that PMCProxies must create PDD15 style storage for
-the delegated class. (Not practical, because the delegated class methods will
-expect to be poking into the internals of the object, but will have the wrong
-object.)
-
-}}
-
-C<data> (if present) holds a pointer to any additional data associated  with
-the PMC. This may be NULL.
+C<data> holds a pointer to the core data associated with the PMC. This
+may be NULL.
 
 C<pmc_ext> points to an extended PMC structure. This has the form:
 
@@ -122,8 +96,6 @@ C<pmc_ext> points to an extended PMC structure. This has the form:
         struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
         PMC *_next_for_GC;
     };
-
-C<data> is a generic data pointer, as described above.
 
 C<_metadata> holds internal PMC metadata. The specification for this has not
 yet been finalized.
@@ -145,7 +117,7 @@ types of PMC.
 
 PMCs are declared by the C<pmclass> keyword:
 
-  pmclass <name> <modifiers> {
+  pmclass <name> [ <modifier> ... ] {
   }
 
 The modifiers specify core features, such as:
@@ -201,7 +173,8 @@ The PMC satisfies a particular low-level interface, which gives some assurances
 on how and where a PMC can be used.
 
 Roles composed with C<does> may also define C<provides> for one or more
-interfaces.
+interfaces. (They generally define at least a C<provides> corresponding
+to their own name.)
 
 =over 4
 
