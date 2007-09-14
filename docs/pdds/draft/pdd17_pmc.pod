@@ -148,7 +148,7 @@ PMCs are declared by the C<pmclass> keyword:
   pmclass <name> <modifiers> {
   }
 
-The modifiers specify core features such as:
+The modifiers specify core features, such as:
 
 =over 4
 
@@ -178,7 +178,7 @@ The PMC is a singleton, created in the constant PMC pool.
 =item no_ro
 
 Don't create a second read-only vtable for the PMC. (Used, for example,
-by STMs C<share_ro()>.)
+by STM's C<share_ro()>.)
 
 =item is_shared
 
@@ -193,12 +193,15 @@ from.
 
 Compose a role. Takes one argument, the name of the role to compose. [NOTE:
 this modifier has been taken from the older feature C<does> which is now called
-C<provides> (fulfills|supplies|satisfies).]
+C<provides>.]
 
 =item provides
 
 The PMC satisfies a particular low-level interface, which gives some assurances
 on how and where a PMC can be used.
+
+Roles composed with C<does> may also define C<provides> for one or more
+interfaces.
 
 =over 4
 
@@ -243,16 +246,20 @@ struct for the PMC, stored in the C<data> member of the C<PMC> struct.
 The standard way of declaring attributes is with C<ATTR> within the body
 of a C<pmclass> or C<prole> declaration.
 
-  ATTR <type> <name> [:<modifier>];
+  ATTR <type> <name> [ :<modifier> ... ];
 
 This declaration is used to generate the data struct for the PMC
-(named "Parrot_<pmcname>_Data"), including any attributes declared in a
-composed role.
+(named "Parrot_<pmcname>_Data"). The data struct incorporates any
+attributes declared in a composed role. The declaration is also used to
+generate accessor macros for the class, in the form of
+GET_ATTR_<attrname> and SET_ATTR_<attrname>, and to set up helper
+information for the C<inspect> vtable function, and to provide attribue
+access throught the default C<get_attr> and C<set_attr> vtable functions.
 
 It's also possible to define and store the PMC's data struct manually,
 but the standard declaration syntax must be used in roles, in PMCs that
-compose roles, and in PMCs that will be subclassed by high-level
-classes.
+compose roles, and in PMCs that will be subclassed by high-level classes
+(this means all core PMCs, and most non-core PMCs).
 
 =head3 Defining vtable functions
 
@@ -300,11 +307,12 @@ type of C<SELF>.
 =head3 Methods
 
 Methods are declared in the body of the C<pmclass> or C<prole>
-declaration with C<PCCMETHOD>.
+declaration with C<METHOD>.
 
-  PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
+  METHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
 
-[NOTE: There is also an older C<METHOD> keyword, which is deprecated.]
+[NOTE: There is an older C<METHOD> keyword, which is deprecated. The
+current C<PCCMETHOD> will be renamed to C<METHOD>.]
 
 =head2 PMCs and Namespaces
 
@@ -342,13 +350,14 @@ core structs, though they define attributes to be added to the PMC they are
 composed into. 
 
 When a PMC that uses a role is translated to C, the role provides vtable
-functions, methods, and attributes that will be added to the generated C code
-for that PMC. Composed vtable functions, methods, and attributes may not have
-the same name as corresponding features defined in the composing PMC. This is
-called a conflict, and must be explicitly resolved in the composing PMC. When
-composed features have the same name as inherited vtable functions, methods, or
-attributes, the composed feature overrides the inherited feature, just as it
-would if defined in the composing PMC.
+functions, methods, and attributes that will be added to the generated C
+code for that PMC. Composed vtable functions, methods, and attributes
+are not permitted to have the same name as corresponding features
+defined in the composing PMC. This is called a conflict, and must be
+explicitly resolved in the composing PMC. When composed features have
+the same name as inherited vtable functions, methods, or attributes, the
+composed feature overrides the inherited feature, just as it would if
+defined in the composing PMC.
 
 Roles are defined using the C<prole> keyword. 
 
@@ -359,23 +368,25 @@ Roles can compose other roles, but they can't inherit.
 
 Role attributes are defined using the same format as PMC attributes.
 
-Core roles live in src/pmc along with the core PMCs, but they have a file
-extension of C<.pr>.
+Core roles live in src/role and have a file extension of C<.pr>.
 
 Roles are composed into a PMC with the C<does> modifier.
 
-=head2 Interaction between PMCs and high-level objects
+=head2 PMCs and high-level objects
 
-High-level objects, as specified in PDD15, need to be able to inherit from
-PMCs. This is achieved through the combination of a C<PMCProxy> PMC and
-delegation.
+High-level objects, as specified in PDD15, need to be able to inherit
+from PMCs. Subclassing a low-level PMC from a high-level class makes an
+entry in the high-level class's list of parents.
 
-For PDD15 objects, there is a corresponding instance of the C<Class> PMC. For
-a PMC, however, the class definition is written in C and compiled away. There
-needs to be something that can be placed in the parents list for a PDD15
-class. That something is the C<PMCProxy> PMC. Like a PDD15 class, it is
-stored as the C<class> element in the namespace associated with a PMC, provides
-introspection facilities and can sit in an inheritance hierarchy.
+For PDD15 objects, there is a corresponding instance of the C<Class>
+PMC. For a low-level PMC, however, the class definition is written in C
+and compiled away. There needs to be something placed in the parents
+list for a PDD15 class, that can provide access to the low-level PMC's
+vtable and methods, and define the storage that the low-level PMC will
+need within the high-level object. That something is the C<PMCProxy>
+PMC. Like a PDD15 class, it is stored as the C<class> element in the
+namespace associated with a PMC, provides introspection facilities and
+can sit in an inheritance hierarchy.
 
 The PMCProxy PMCs are only created when needed for subclassing a low-level
 PMC, to avoid a large load of unused PMCProxy objects. When created, they are
@@ -394,69 +405,49 @@ Or, more briefly:
   $P1 = subclass 'Hash', 'MyClass'
 
 PMCs store state in a very different way to PDD15 objects. When a method
-inherited from a PMC is called on a PDD15 object, that method needs to get
-a chunk of state that it can use as it wishes. Further to this, if multiple
-PMCs are inherited from, they may use the state in different ways. Users of
-Parrot at a PIR level should not have to care about such issues.
+inherited from a PMC is called on a PDD15 object, that method needs to
+access the attributes of the inherited low-level PMC. Further, if
+multiple PMCs are inherited from, they may each have attributes with the
+same name, that need to be correctly "visible" to the PDD 15 object
+according to the laws of inheritance. Users of Parrot at a PIR level
+should not have to care about such issues.
 
-(AR: I'm willing to make some changes in how low-level PMCs store state in
-order to make this easier.)
+To enable attributes from the low-level PMC to act as full inherited
+attributes in the child class, the PMCProxy class will create a set of
+PDD 15 attributes that correspond in type and name to the attributes
+declared with C<ATTR> in the declaration body of the low-level PMC, as
+if each had been added with C<add_attribute>. It will also override the
+C<GET_ATTR_attrname> and C<SET_ATTR_attrname> functions to point to the
+PDD 15 attributes (with automatic boxing and unboxing for the PMC
+values) rather than to members of a C struct.
 
-Therefore, when a PDD15 object is instantiated and it inherits from PMCs, an
-instance of each of the PMCs that it inherits from is also created. These are
-stored at the end of the object's attributes store.
+The PMCProxy will also scan the low-level PMC for methods declared with
+C<METHOD> and insert them in the proxy class as if each had been
+declared with C<add_method> (possibly with a shim to standardize calling
+conventions, but hopefully the calling conventions are similar enough
+between C-defined and PIR-defined methods not to need a shim). The
+PMCProxy will maintain a link to the low-level PMC's vtable, and use it
+for any vtable calls that aren't overridden by the proxy class itself.
 
-When a method is called on an object whose class has PMC parents, the call is
-delegated up to each of the PMC parents, in MRO order. The invocant must be
-the appropriate PMC instance from the object's attribute store. For v-table
-calls, this is just a case of passing the correct thing. For other methods
-that are located by C<find_method>, a C<Bound_NCI> PMC is used to ensure that
-the method from the PMC is invoked with the correct instance, so it has access
-to the correct state.
+As a result, a low-level PMC used as a parent of a PDD 15 class will
+never be instantiated directly. It will only be used as a source for
+attribute names and types, methods, and a vtable.
 
-(AR: Why isn't it called directly on the delegated PMC stored in the delegating
-object's data store?)
+When a method is called on an object whose class has low-level PMC
+parents, the call is made exactly as it would be for PDD 15 parents. The
+invocant is always the PDD 15 object. Any method or vtable calls made
+within the low-level PMC are dispatched on the PDD 15 object invocant.
+This allows the PDD 15 object to intelligently handle method and vtable
+overrides within multiple parents and itself.
 
-When a PMC calls a method on itself, it may have been overridden in a high
-level class. Therefore dynamic dispatches of method calls need to be done with
-the vtable of the high level class, not the vtable of the PMC itself.
+(This will likely require changing the C<SELF> shortcut to be equivalent
+to C<DYNSELF>, which is what it probably should have been in the first
+place. We can create an alternative C<STATICSELF> for the rare cases
+when we really need it.)
 
-For PMCs that are instantiated and not overridden, the C<real_self> pointer in
-the PMC structure is a reference to the PMC instance itself. If, however, it
-is just acting to provide the state a PMC needs but is not the real instance,
-this pointer will point to the instance of the high level class (an instance
-of the C<Object> PMC). Method dispatches using C<DYNSELF> will always go
-through this mechanism.
-
-(AR: See comment above about delegated calls. Better to have the delegator
-object only exist for delegated PMCs, and have DYNSELF check for it.)
-
-Attribute access is, like method access, delegated upwards. Since attribute
-lookup is a vtable method, the down case is covered by the previous paragraph.
-
-(AR: What about overriding a low-level attribute with a high-level attribute?
-Can you override the core data store of a Hash? The core struct members of an
-STMLog? This would be a lot easier if low-level PMCs had a standard way of
-defining their attributes (core struct members), which could be used to
-generate struct declarations, to automatically fill a PMC's C<inspect>,
-C<get_attr>, and C<set_attr> vtable functions, to annotate PMCProxy objects,
-and to allow state for compile-time roles to be generated in the same struct as
-state from the PMC itself.)
-
-}}
-
-If a low-level PMC expects to be overridden by high-level classes (which means
-all the core low-level PMC types), it must respect a standard interface. It
-must implement the C<get_attr> and C<set_attr> vtable entries for any core
-attributes it expects to be accessible to subclasses.
-
-Subclassing a low-level class from a high-level class makes an entry in the
-high-level class's list of parents. This entry is a proxy class object for the
-low-level PMC class that provides access to the low-level PMC's vtable
-(including the implementations of get_attr and set_attr), and defines the
-storage that the low-level object will need within the high-level object (this
-could be as simple as a single integer attribute that gives an index into the
-object's data store where an instance of the low-level class is stored).
+If a low-level PMC expects to be overridden by high-level classes (which
+means all the core low-level PMC types), it must respect the standard
+interface.
 
 
 =head1 REFERENCE
