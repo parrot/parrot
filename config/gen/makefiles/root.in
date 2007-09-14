@@ -1915,7 +1915,6 @@ cover:
 		pwd=$$PWD; cd $$dir; gcov *.c; cd $$pwd; \
 		gcov2perl $$dir/*.gcov; \
 	done
-	gcov2perl $(GCOV_FILES)
 	cover
 
 cover-clean:
