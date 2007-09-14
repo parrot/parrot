@@ -11,10 +11,9 @@ use 5.008;
 use Carp;
 
 our $VERSION   = '0.01';
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(generate);
 
 use Data::Dumper;
+
 use Scheme::Builtins;
 
 sub _gensym {

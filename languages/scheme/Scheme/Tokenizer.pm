@@ -9,8 +9,6 @@ use warnings;
 use 5.008;
 
 our $VERSION   = '0.01';
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(tokenize);
 
 use Data::Dumper;
 
