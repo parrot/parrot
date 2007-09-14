@@ -604,7 +604,7 @@ preserve key/value order.
             case VISIT_FREEZE_AT_DESTRUCT:
                 for (i = 0; i <= hash->entries; i++) {
                     HashBucket *b   = hash->bs + i;
-                    STRING     *key;
+                    STRING     *key = NULL;
 
                     if (b)
                         key = (STRING *)b->key;

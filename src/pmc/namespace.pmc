@@ -619,7 +619,7 @@ does not delete the PMC.
                 "Invalid type %d for '%s' in del_namespace()",
                 ns->vtable->base_type, item_name);
 
-            /* not reached... leak? */
+            /* leak! */
             string_cstring_free(item_name);
         }
 
@@ -652,7 +652,7 @@ delete the PMC.
                 "Invalid type %d for '%s' in del_sub()",
                 sub->vtable->base_type, item_name);
 
-            /* not reached... leak? */
+            /* leak! */
             string_cstring_free(item_name);
         }
 
