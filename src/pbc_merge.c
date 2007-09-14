@@ -873,7 +873,6 @@ main(int argc, char **argv)
 
     /* Finally, we're done. */
     Parrot_exit(interp, 0);
-    return 0;
 }
 
 
