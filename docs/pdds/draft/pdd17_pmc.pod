@@ -56,7 +56,7 @@ All PMCs have the form:
         struct PMC_EXT *pmc_ext;
     };
 
-where C<cache> is a pointer to a C<UnionVal> union:
+where C<cache> is a C<UnionVal> union:
 
     typedef union UnionVal {
         struct {
@@ -821,6 +821,8 @@ key. The key is guaranteed not to be NULL for this function.
 
 =item get_number_keyed_str
 
+  FLOATVAL get_number_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the native floating-point value for the element indexed by a string key.
 The key is guaranteed not to be NULL for this function.
 
@@ -845,15 +847,15 @@ The key is guaranteed not to be NULL for this function.
 Return the string value for the element indexed by a string key.
 The key is guaranteed not to be NULL for this function.
 
-=item get_bool_keyed
+=item get_bool_keyed [deprecated?]
 
 Return the boolean value for the element indexed by a PMC key.
 
-=item get_bool_keyed_int
+=item get_bool_keyed_int [deprecated?]
 
 Return the boolean value for the element indexed by an integer key.
 
-=item get_bool_keyed_str
+=item get_bool_keyed_str [deprecated?]
 
 Return the boolean value for the element indexed by a string key.
 
@@ -986,20 +988,10 @@ of another PMC.
 =item set_pointer_keyed
 
   void set_pointer_keyed(INTERP, PMC* self, PMC* key, void* value)
-
-Set the pointer value of the element indexed by a PMC key.
-
-=item set_pointer_keyed_int
-
   void set_pointer_keyed_int(INTERP, PMC* self, INTVAL key, void* value)
-
-Set the pointer value of the element indexed by an integer key.
-
-=item set_pointer_keyed_str
-
   void set_pointer_keyed_str(INTERP, PMC* self, STRING* key, void* value)
 
-Set the pointer value of the element indexed by a string key.
+Set the pointer value of the element indexed by a PMC, integer, or string key.
 
 =item type_keyed
 
@@ -1132,21 +1124,36 @@ with the PMCs in the aggregate I<value>.
 
 =item exists_keyed
 
-=item exists_keyed_int
+  INTVAL exists_keyed(INTERP, PMC* self, PMC* key)
+  INTVAL exists_keyed_int(INTERP, PMC* self, INTVAL key)
+  INTVAL exists_keyed_str(INTERP, PMC* self, STRING* key)
 
-=item exists_keyed_str
+Check if the element indexed by a PMC, integer, or string key exists.
 
 =item defined_keyed
 
-=item defined_keyed_int
+  INTVAL defined_keyed(INTERP, PMC* self, PMC* key)
+  INTVAL defined_keyed_int(INTERP, PMC* self, INTVAL key)
+  INTVAL defined_keyed_str(INTERP, PMC* self, STRING* key)
 
-=item defined_keyed_str
+Check if the element indexed by a PMC, integer, or string key is defined.
 
-=item dtem delete_keyed_str
+=item delete_keyed
+
+  void delete_keyed(INTERP, PMC* self, PMC* key)
+  void delete_keyed_int(INTERP, PMC* self, INTVAL key)
+  void delete_keyed_str(INTERP, PMC* self, STRING* key)
+
+Delete the element indexed by a PMC, integer, or string key.
 
 =item nextkey_keyed
 
-=item nextkey_keyed_itr_str
+  PMC* nextkey_keyed(INTERP, PMC* self, PMC* key, INTVAL what)
+  PMC* nextkey_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL what)
+  PMC* nextkey_keyed_str(INTERP, PMC* self, STRING* key, INTVAL what)
+
+Advance to the next position while iterating through an aggregate. [NOTE: this
+feature needs review together with the Iterator PMC.]
 
 =back
 
@@ -1186,7 +1193,15 @@ number from the value of a PMC and store the result back in the same PMC.
 
 =item increment
 
+  void increment(INTERP, PMC* self)
+
+Increment the value of a PMC by 1.
+
 =item decrement
+
+  void decrement(INTERP, PMC* self)
+
+Decrement the value of a PMC by 1.
 
 =item multiply
 
@@ -1249,41 +1264,128 @@ made.
 
   void bitwise_or(INTERP, PMC* self, PMC* value, PMC* dest)
   void bitwise_or_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_or(INTERP, PMC* self, PMC* value)
+  void i_bitwise_or_int(INTERP, PMC* self, INTVAL value)
 
 Calculate the bitwise-OR of the value of the I<self> PMC and the value of a PMC
 or native integer and store the result in I<dest>. Note that I<dest> may be the
 same PMC as I<self>; in that case optimizations may be made.
 [Question: what happens when the I<self> and I<value> PMCs aren't integers?]
 
+The C<i_> variants perform an implace operation and store the result in
+C<self>.
+
 =item bitwise_and
 
-=item bitwise_and_int
+  PMC* bitwise_and(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_and_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_and(INTERP, PMC* self, PMC* value)
+  void i_bitwise_and_int(INTERP, PMC* self, INTVAL value)
+
+Return the result of a bitwise AND on the passed in C<value> and the C<self>
+PMC. The C<i_> variants perform an implace operation and store the result in
+C<self>.
 
 =item bitwise_xor
 
-=item bitwise_xor_int
+  PMC* bitwise_xor(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_xor_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_xor(INTERP, PMC* self, PMC* value)
+  void i_bitwise_xor_int(INTERP, PMC* self, INTVAL value)
+
+Return the result of a bitwise XOR on the passed in C<value> and the C<self>
+PMC. The C<i_> variants perform an implace operation and store the result in
+C<self>.
 
 =item bitwise_ors
 
-=item bitwise_ors_str
+  PMC* bitwise_ors(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_ors_str(INTERP, PMC* self, STRING* value, PMC* dest)
+  void i_bitwise_ors(INTERP, PMC* self, PMC* value)
+  void i_bitwise_ors_str(INTERP, PMC* self, STRING* value)
+
+Return the result of a bitwise OR over an entire string on the passed in
+C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
+and store the result in C<self>.
 
 =item bitwise_ands
 
-=item bitwise_ands_str
+  PMC* bitwise_ands(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_ands_str(INTERP, PMC* self, STRING* value, PMC* dest)
+  void i_bitwise_ands(INTERP, PMC* self, PMC* value)
+  void i_bitwise_ands_str(INTERP, PMC* self, STRING* value)
+
+Return the result of a bitwise AND over an entire string on the passed in
+C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
+and store the result in C<self>.
 
 =item bitwise_xors
 
-=item bitwise_xors_str
+  PMC* bitwise_xors(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_xors_str(INTERP, PMC* self, STRING* value, PMC* dest)
+  void i_bitwise_xors(INTERP, PMC* self, PMC* value)
+  void i_bitwise_xors_str(INTERP, PMC* self, STRING* value)
+
+Return the result of a bitwise XOR over an entire string on the passed in
+C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
+and store the result in C<self>.
 
 =item bitwise_not
 
+  PMC* bitwise_not(INTERP, PMC* self, PMC* dest)
+  void i_bitwise_not(INTERP, PMC* self)
+
+Returns the bitwise negation of the C<self> PMC. The C<i_> variant performs an
+implace operation, storing the result in C<self>.
+
+=item bitwise_nots
+
+  PMC* bitwise_nots(INTERP, PMC* self, PMC* dest)
+  void i_bitwise_nots(INTERP, PMC* self)
+
+Returns the bitwise negation of the string C<self> PMC. The C<i_> variant
+performs an implace operation, storing the result in C<self>.
+
 =item bitwise_shl
 
-=item bitwise_shl_int
+  PMC* bitwise_shl(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_shl_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_shl(INTERP, PMC* self, PMC* value)
+  void i_bitwise_shl_int(INTERP, PMC* self, INTVAL value)
+
+Return the value of the C<self> PMC bitwise shifted left by the amount
+specified in C<value>, shifting in zeroes on the right (arithmetic/logical
+bitwise shift). A negative C<value> shifts right. The C<i_> variants perform an
+implace operation, storing the result in C<self>.
+
+The result may be promoted to a C<BigInt>.
 
 =item bitwise_shr
 
-=item bitwise_shr_int
+  PMC* bitwise_shr(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_shr_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_shr(INTERP, PMC* self, PMC* value)
+  void i_bitwise_shr_int(INTERP, PMC* self, INTVAL value)
+
+Return the value of the C<self> PMC bitwise shifted right by the amount
+specified in C<value>, shifting in copies of the sign bit on the left
+(arithmetic bitwise shift). A negative C<value> shifts left. The C<i_> variants
+perform an implace operation, storing the result in C<self>.
+
+The result may be promoted to a C<BigInt> (when C<value> is negative).
+
+=item bitwise_lsr
+
+  PMC* bitwise_lsr(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* bitwise_lsr_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_bitwise_lsr(INTERP, PMC* self, PMC* value)
+  void i_bitwise_lsr_int(INTERP, PMC* self, INTVAL value)
+
+Return the value of the C<self> PMC bitwise shifted right by the amount
+specified in C<value>, shifting in zeroes on the left (logical bitwise shift).
+A negative C<value> shifts left. The C<i_> variants perform an implace
+operation, storing the result in C<self>.
+
 
 =item is_equal
 
@@ -1355,7 +1457,9 @@ same PMC as I<self>; in that case optimizations may be made.
 
 =item add_role
 
-=item PMC* find_method(INTERP, PMC* self, STRING* method_name)
+=item find_method
+
+  PMC* find_method(INTERP, PMC* self, STRING* method_name)
 
 Return a subroutine PMC for the passed method name. This subroutine PMC may be
 cached, so the method I<must> return an equivalent sub PMC each time, or be
@@ -1451,12 +1555,12 @@ A complex number, consisting of a real part and an imaginary part.
 {{ NOTE: is this a complete and useful implementation of complex
 numbers? }}
 
-=item ParrotClass
+=item ParrotClass [deprecated]
 
 The PMC for Parrot's class. (Note that this may go away if we ultimately make
 all classes just objects)
 
-=item ParrotObject
+=item ParrotObject [deprecated]
 
 The PMC for Parrot's base object type.
 
