@@ -18,7 +18,7 @@ to the HLL language name
 
 =item - Namespaces should be hierarchical
 
-=item - The get_namespace opcode takes a multidimensional hash key or an
+=item - The C<get_namespace> opcode takes a multidimensional hash key or an
 array of name strings
 
 =item - Namespaces follow the semantics of the HLL in which they're defined
@@ -83,9 +83,9 @@ via the C<get_root_namespace> opcode. For example:
 =item HLL Root Namespaces
 
 Each HLL must store public items in a namespace named with the lowercased
-name of the HLL.  This is the HLL root namespace.  For instance, Tcl's user-
-created namespaces should live in the C<tcl> namespace.  This eliminates any
-accidental collisions between languages.
+name of the HLL.  This is the HLL root namespace.  For instance, Tcl's
+user-created namespaces should live in the C<tcl> namespace.  This
+eliminates any accidental collisions between languages.
 
 An HLL root namespace must be stored at the first level in Parrot's namespace
 hierarchy.  These top-level namespaces should also be specified in a standard
@@ -101,10 +101,10 @@ C<_tcl> namespace.
 
 =item HLL User-Created Namespaces
 
-Each HLL must store all user-created namespaces under the HLL root namespace.
-It is suggested that HLLs use hierarchical namespaces to the extent
-practical.  A single flat namespace can be made to work, but it complicates
-symbol exportation.
+Each HLL must store all user-created namespaces under the HLL root
+namespace.  It is suggested that HLLs use hierarchical namespaces to
+practical extent.  A single flat namespace can be made to work, but it
+complicates symbol exportation.
 
 =back
 
@@ -123,7 +123,7 @@ Each HLL may, when working with its own namespace objects, use the I<untyped
 interface>, which allows direct naming in the native style of the namespace's
 HLL.
 
-This interface consists of standard Parrot hash interface, with all its
+This interface consists of the standard Parrot hash interface, with all its
 keys, values, lookups, deletions, etc.  Just treat the namespace like a
 hash.  (It probably is one, really, deep down.)
 
@@ -131,7 +131,7 @@ The untyped interface also has one method:
 
 =over 4
 
-=item get_name
+=item C<get_name>
 
     $P1 = $P2.get_name()
 
@@ -164,19 +164,19 @@ overwriting one type with another.
 
 =over 4
 
-=item add_namespace
+=item C<add_namespace>
 
     $P1.add_namespace($S2, $P3)
 
 Store $P3 as a namespace under the namespace $P1, with the name of $S2.
 
-=item add_sub
+=item C<add_sub>
 
     $P1.add_sub($S2, $P3)
 
 Store $P3 as a subroutine with the name of $S2 in the namespace $P1.
 
-=item add_var
+=item C<add_var>
 
     $P1.add_var($S2, $P3)
 
@@ -187,7 +187,7 @@ add_var() by checking which parts of the variable interface are
 implemented by $P0 (scalar, array, and/or hash) so it can decide on an
 appropriate sigil.
 
-=item del_namespace, del_sub, del_var
+=item C<del_namespace>, C<del_sub>, C<del_var>
 
     $P1.del_namespace($S2)
     $P1.del_sub($S2)
@@ -195,7 +195,7 @@ appropriate sigil.
 
 Delete the sub, namespace, or variable named $S2 from the namespace $P1.
 
-=item find_namespace, find_sub, find_var
+=item C<find_namespace>, C<find_sub>, C<find_var>
 
     $P1 = $P2.find_namespace($S3)
     $P1 = $P2.find_sub($S3)
@@ -209,7 +209,7 @@ by users.  If you're planning to let Python code see your module, you should
 avoid exporting both C<our $A> and C<our @A>.  (Well, you might want to
 consider not exporting variables at all, but that's a style issue.)
 
-=item export_to
+=item C<export_to>
 
     $P1.export_to($P2, $P3)
 
@@ -219,9 +219,9 @@ If $P3 is an array of strings, interpretation of items in an array follows
 the conventions of the source (exporting) namespace.
 If $P3 is a hash, the keys correspond to the names in the source namespace,
 and the values correspond to the names in the destination namespace.
-if a hash value is null or an empty string, the name in the hash key is used.
+If a hash value is null or an empty string, the name in the hash key is used.
 A null $P3 requests the 'default' set of items.
-Any other type passed in $P3 throws an exception.
+Any other type passed into $P3 throws an exception.
 
 The base Parrot namespace export_to() function interprets item names as
 literals -- no wildcards or other special meaning.  There is no default list
@@ -258,18 +258,19 @@ base namespace PMC.  Maybe a standard method "expand_export_list()"?
 
 =over 4
 
-=item parse_name
+=item C<parse_name>
 
     $P1 = $P2.parse_name($S3)
 
 Parse the name in $S3 using the rules specific to the compiler $P2, and
 return an array of individual name elements.
 
-For example, a Java compiler would turn 'a.b.c' to ['a','b','c'], while a Perl
-compiler would turn 'a::b::c' into the same result.  Meanwhile, due to Perl's
-sigil rules, '$a::b::c' would become ['a','b','$c'].
+For example, a Java compiler would turn 'C<a.b.c>' to C<['a','b','c']>,
+while a Perl compiler would turn 'C<a::b::c>' into the same result.
+Meanwhile, due to Perl's sigil rules, 'C<$a::b::c>' would become
+C<['a','b','$c']>.
 
-=item get_namespace
+=item C<get_namespace>
 
     $P1 = $P2.get_namespace($P3)
 
@@ -289,7 +290,7 @@ zero or more calls to <namespace>.get_namespace().  However, any compiler is
 free to cheat if it doesn't get caught, e.g. to use the untyped namespace
 interface if the language doesn't mangle namespace names.
 
-=item load_library
+=item C<load_library>
 
     $P1.load_library($P2, $P3)
 
@@ -317,7 +318,7 @@ behavior about namespaces.
 
 =over 4
 
-=item get_namespace
+=item C<get_namespace>
 
     $P1 = $P2.get_namespace()
 
@@ -336,7 +337,7 @@ true root namespace (identified by "root" in the name).
 
 =over 4
 
-=item set_namespace
+=item C<set_namespace>
 
     set_namespace [key], $P1
     set_hll_namespace [key], $P1
@@ -352,12 +353,12 @@ hash key.
 Add the namespace PMC $P2 under the name denoted by an array of name
 strings $P1.
 
-=item del_namespace
+=item C<del_namespace>
 
 {{ NOTE: this opcode has been removed from the spec. The del_namespace
 method on the namespace object is sufficient.}}
 
-=item get_namespace
+=item C<get_namespace>
 
     $P1 = get_namespace
     $P1 = get_hll_namespace
@@ -392,7 +393,7 @@ namespace with an array instead:
   $P1 = split "::", "Foo::Bar"
   $P0 = get_hll_namespace $P1
 
-=item make_namespace
+=item C<make_namespace>
 
     $P1 = make_namespace [key]
     $P1 = make_hll_namespace [key]
@@ -409,7 +410,7 @@ it.
 Create and retrieve the namespace denoted by the array of names $P2 and
 store it in C<$P1>. If the namespace already exists, only retrieve it.
 
-=item get_global
+=item C<get_global>
 
     $P1 = get_global $S2
     $P1 = get_hll_global $S2
@@ -432,7 +433,7 @@ to the current namespace, HLL root namespace, or true root namespace.
 Retrieve the symbol named $S3 by the array of names $P2 relative to the
 current namespace, HLL root namespace, or true root namespace.
 
-=item set_global
+=item C<set_global>
 
     set_global $S1, $P2
     set_hll_global $S1, $P2
@@ -497,7 +498,7 @@ Consider the following Perl 5 program:
   $a = 'x';
   ${"Foo::$a"} = 5;
 
-The Foo:: namespace is created at run-time (without any optimizations).  In
+The C<Foo::> namespace is created at run-time (without any optimizations).  In
 these cases, Parrot should create the namespace based on the HLL of the PIR
 subroutine that calls the store function.
 
@@ -535,10 +536,10 @@ is certainly possible, even with subroutines and methods.  It's not important
 that a HLL use the typed namespace API, it is only important that it provides
 it for others to use.
 
-So Perl 6 may implement get_keyed and set_keyed VTABLE slots that allow the
-namespace PMC to be used as a hash.  The C<find_sub> method would, in this
-case, append a "&" sigil to the front of the sub/method name and search
-in the internal hash.
+So Perl 6 may implement C<get_keyed> and C<set_keyed> VTABLE slots that
+allow the namespace PMC to be used as a hash.  The C<find_sub> method would,
+in this case, append a "&" sigil to the front of the sub/method name and
+search in the internal hash.
 
 =head2 Python
 
