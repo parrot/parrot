@@ -109,7 +109,7 @@ Ook! Ook! Banana! Banana!
 OUTPUT
 
 # clean up temporary files
-#map { unlink "$_" or warn "$! $_" } qw( external.dll external.pbc t.dll t.pbc );
+map { unlink "$_" or warn "$! $_" } qw( external.dll external.pbc t.dll t.pbc );
 
 
 # Local Variables:
