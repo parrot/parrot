@@ -6,8 +6,6 @@
 
 Implementing a Perl 6 style print statement.
 
-=back
-
 =cut
 
 .sub 'print'
@@ -24,14 +22,11 @@ Implementing a Perl 6 style print statement.
     .return (1)
 .end
 
-=over 4
 
 =item C<say(...)>
 
 Implementing a Perl 6 style say statement, which automatically appends
 a newline to the end of what is printed.
-
-=back
 
 =cut
 
@@ -42,13 +37,10 @@ a newline to the end of what is printed.
     .return (1)
 .end
 
-=over 4
 
-=item C<infix:,(...)>
+=item C<infix:,>
 
 Build a list from the arguments sent to the operator.
-
-=back
 
 =cut
 
@@ -65,14 +57,10 @@ Build a list from the arguments sent to the operator.
     .return (list)
 .end
 
-=over 4
-
 =item C<ok(...)>
 
 Internal implementation of the Test::More 'ok'.  It increments
 the internal test counter and handles making test output.
-
-=back
 
 =cut
 
@@ -95,14 +83,11 @@ the internal test counter and handles making test output.
     .return (1)
 .end
 
-=over 4
 
 =item C<plan(...)>
 
 Internal implementation of the Test::More 'plan'.  It sets the internal
 test counter to 0 and outputs the TAP plan line.
-
-=back
 
 =cut
 
@@ -122,6 +107,11 @@ test counter to 0 and outputs the TAP plan line.
     $P0 = 0
     set_global "$test_counter", $P0
 .end
+
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir
