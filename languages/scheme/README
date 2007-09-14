@@ -1,7 +1,30 @@
 # $Id$
 
-Scheme
+=head1 NAME
 
-No documentation available.
+Scheme - an implementation of Scheme on Parrot
 
-Also see ../LANGUAGES.STATUS.pod
+=head1 Description
+
+Compile Scheme to PASM.
+
+=head1 Implementation
+
+Lexing is done in Scheme::Tokenizer, parsing is done Scheme::Parser,
+PASM is generated in Scheme::Generator.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<../LANGUAGES.STATUS.pod>
+
+=item L<http://www.schemers.org/>
+
+=item L<http://www.schemers.org/Documents/Standards/R5RS/>
+
+=item L<http://en.wikipedia.org/wiki/Scheme_%28programming_language%29>
+
+=item L<http://www.ccs.neu.edu/home/dorai/t-y-scheme/t-y-scheme.html>
+
+=back
