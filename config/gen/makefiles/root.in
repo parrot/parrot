@@ -1516,7 +1516,7 @@ clean : \
     imcc-clean \
     compilers-clean \
     smoke-clean \
-    cover-clean \
+#INVERSE_CONDITIONED_LINE(win32): cover-clean \
     editor-clean
 	@TEMP_cg_r@
 	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
