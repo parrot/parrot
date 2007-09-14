@@ -14,7 +14,6 @@ $Revision$
 This PDD describes the internal structure and behavior of the Parrot Magic
 Cookie (PMC) data type. 
 
-
 =head1 DESCRIPTION
 
 PMCs implement all internal data types more complex than a simple integer,
@@ -22,108 +21,23 @@ float, or string, and also the data types of high-level languages.  Nothing
 outside the core of Parrot (in fact, nothing outside the data type's vtable
 routines) should infer anything about a PMC (hence the Magic part).
 
-This does mean, though, that you need to either know
-what functions are available and what they do, or have some method of finding
-out. 
-
-It's faster if you know which vtable entry does what, so that's the method
-parrot uses.
-
-
-=head1 QUESTIONS
-
-=over 4
-
-=item *
-
-Where should c-level role implementations live? In src/pmc? What naming
-convention should we use for the files? Singleton role goes to rsingleton.pmc?
-
-=item *
-
-Should we create a pmrole keyword like pmclass? And pmr2c to translate them to
-C? How different are classes and roles at the PMC level?
-
-=item *
-
-<particle> pmclass needs a keyword to specify what roles a class is composed
-from.  We're already using 'does', but in an ad hoc way, from what I can see in
-the little docs there are about 'does'.
-
-=item *
-
-<particle> Do c-level roles have custom flags like PMCs? Class PMC has a custom
-flag for 'instantiated', right now it uses a full int, which I think is a waste
-of space. <allison> 8 bits is pretty limited, and IIRC we've already run into
-the limitation. This runs back to Leo's proposal to make PMCs a little more
-flexible, so we wouldn't have to hold all PMCs to the same 8 bits
-
-=item *
-
-<pmichaud> there is a question about when 'Integer' is not really .Integer
-e.g., in a HLL, the meaning of 'Integer' can be different, and using C<new
-'Integer'> is safe only if in the root of the parrot HLL namespace
-
-<allison> true, the only way to guarantee that you're getting a built-in PMC
-under the type id-less system is to look in the 'parrot' HLL, and even that
-isn't a total guarantee, because it could have been replaced in the 'parrot'
-HLL
-
-<pmichaud> the closest we have at the moment is
-
-  $P0 = get_root_namespace ['parrot'; 'Integer']
-  $P1 = new $P0
-
-but even this assumes that the 'Integer' namespace is tied to the Integer
-class, which also hasn't been specced
-
-<allison> builtin PMCs will be tied to a corresponding spot in the 'parrot' HLL
-namespace
-
-<pmichaud> according to pdd15: C<$P0 = new .Integer> can be replaced by C<$P0 =
-new 'Integer'> only in the parrot root namespace. in all other
-namespaces, one would need to get the namespace for the 'Integer' class and use
-that
-
-  $P0 = new 'Integer' # works in parrot HLL, root namespace
-  $P0 = new ['Integer'] # works in parrot HLL, any namespace
-
-<pmichaud> even easier, HLLs can set their notion of 'Integer' to point to the
-parrot class :-)
-
-<allison> yes, aliasing across namespaces is allowed
-
-=item *
-
-<particle> we can design a decoration for core pmcs with something that doesn't
-allow override in 'parrot' namespace, if it's wanted.
-
-<pmichaud> particle: I'm not sure it's entirely necessary to have the
-decoration i.e., I'd wait until we find we need it :-)
-
-<particle> sure, it's mostly a change for pmc2c i suspect
-
-  pmclass Foo does bar extends baz is_core {
-
-=item *
-
-ResizablePMCArray returns Undef for unset elements (so does the new object
-model, because it uses ResizablePMCArray for storage), but Hash returns null.
-Various other PMCs return different values for undefinedness.  Pick a standard.
-The current favorite is a singleton Null PMC. Check the implementation of
-PMCNULL.
-
-=item *
-
-<chromatic> How does COW work and why doesn't COW work? (docs/glossary.pod)
-
-=back
+This does mean, though, that you need to either know what functions are
+available and what they do, or have some method of finding out. Parrot defines
+a standard set of functions that each PMC provides. More complex features are
+constructed out of these fundamental building blocks.
 
 =head1 DESCRIPTION
 
 =over 4
 
+=item - PMCs contain both state and behavior
+
+=item - PMCs can inherit from other PMCs
+
+=item - PMCs can be composed of low-level roles
+
 =item - High-level objects can subclass low-level PMCs
+
 
 =back
 
@@ -134,23 +48,15 @@ PMCNULL.
 All PMCs have the form:
 
     struct PMC {
-        pobj_t obj;
+        UnionVal cache;
+        Parrot_UInt flags;
         VTABLE *vtable;
         PMC *real_self;
- #if ! PMC_DATA_IN_EXT
         DPOINTER *data;
- #endif
         struct PMC_EXT *pmc_ext;
     };
 
-where C<obj> is a pointer to a C<pobj_t> structure:
-
-    typedef struct pobj_t {
-        UnionVal u;
-        Parrot_UInt flags;
-    } pobj_t;
-
-and where:
+where C<cache> is a pointer to a C<UnionVal> union:
 
     typedef union UnionVal {
         struct {
@@ -212,10 +118,7 @@ the PMC. This may be NULL.
 C<pmc_ext> points to an extended PMC structure. This has the form:
 
     struct PMC_EXT {
- #if PMC_DATA_IN_EXT
-        DPOINTER *data;
- #endif
-        PMC *_metadata;             # [Note: replaced by roles]
+        PMC *_metadata;
         struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
         PMC *_next_for_GC;
     };
@@ -238,10 +141,230 @@ running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
 more) types of PMC, while particular Python datatypes will map onto different
 types of PMC.
 
-=head2 Interaction between PMCs and high-level objects
+=head2 Defining PMCs
 
-{{ Address the problem of high-level objects inheriting from low-level PMCs,
-and any structural changes to low-level PMCs that might require. }}
+PMCs are declared by the C<pmclass> keyword:
+
+  pmclass <name> <modifiers> {
+  }
+
+The modifiers specify core features such as:
+
+=over 4
+
+=item need_ext
+
+Adds the C<PMC_EXT> structure when instantiating the PMC.
+
+=item abstract
+
+The PMC cannot be instantiated. (By convention, abstract classes are given
+lower-case names.)
+
+=item noinit
+
+Don't generate class initialization code (don't set up a vtable for the PMC).
+Used with C<abstract>.
+
+=item dynpmc
+
+The PMC is a dynamic PMC, so generate special class initialization code
+suitable for dynamic loading at runtime.
+
+=item singleton
+
+The PMC is a singleton, created in the constant PMC pool.
+
+=item no_ro
+
+Don't create a second read-only vtable for the PMC. (Used, for example,
+by STMs C<share_ro()>.)
+
+=item is_shared
+
+The PMC is shared (across threads).
+
+=item extends
+
+Inherit from another PMC. Takes one argument, the name of the PMC to inherit
+from.
+
+=item does
+
+Compose a role. Takes one argument, the name of the role to compose. [NOTE:
+this modifier has been taken from the older feature C<does> which is now called
+C<provides> (fulfills|supplies|satisfies).]
+
+=item provides
+
+The PMC satisfies a particular low-level interface, which gives some assurances
+on how and where a PMC can be used.
+
+=over 4
+
+=item * C<array> is an aggregate PMC with numerically-keyed elements
+
+=item * C<hash> is an aggregate PMC with string-keyed elements
+
+=item * C<library> corresponds to a dynamic library
+
+=item * C<ref> references another PMC
+
+=item * C<string> behaves similarly to the base string type
+
+=item * C<integer> behaves similarly to the base int type
+
+=item * C<float> behaves similarly to the base number type
+
+=item * C<boolean> does true/false only.
+
+=item * C<scalar> (only used by the sample src/dynpmc/foo.pmc)
+
+=item * C<event> can be used with event queue
+
+=back
+
+=item hll
+
+Declare the PMC in an HLL namespace other than the default HLL 'parrot'.
+Takes one argument, the name of the HLL.
+
+=item maps
+
+Map the current PMC to a core PMC type for code declared in a particular
+HLL. May only be used together with the C<hll> modifier.
+
+=back
+
+=head3 Defining attributes
+
+The attributes of a PMC (both public and private) live in a custom
+struct for the PMC, stored in the C<data> member of the C<PMC> struct.
+The standard way of declaring attributes is with C<ATTR> within the body
+of a C<pmclass> or C<prole> declaration.
+
+  ATTR <type> <name> [:<modifier>];
+
+This declaration is used to generate the data struct for the PMC
+(named "Parrot_<pmcname>_Data"), including any attributes declared in a
+composed role.
+
+It's also possible to define and store the PMC's data struct manually,
+but the standard declaration syntax must be used in roles, in PMCs that
+compose roles, and in PMCs that will be subclassed by high-level
+classes.
+
+=head3 Defining vtable functions
+
+Vtable functions are defined as C functions within the body of the C<pmclass>
+declaration.
+
+  STRING *get_string() {...}
+  void set_string_native(STRING *value) {...}
+
+{{ PROPOSAL: I'd like to require that all vtable functions be declared
+with "VTABLE" at the beginning of the declaration, similar to "METHOD"
+and "PCCMETHOD". At the very least it's self-documentation. It might
+also be a useful hook for future pmc2c preprocessing. }}
+
+Within the body of vtable functions, several shortcuts are provided:
+
+=over 4
+
+=item INTERP
+
+The current interpreter object.
+
+=item SELF
+
+The current static invocant.
+
+=item DYNSELF
+
+The current dynamic invocant. [NOTE: it seems that this is actually what
+most people mean when they say C<SELF>.]
+
+=item SUPER
+
+Calls the current method in the nearest superclass, using the static
+type of C<SELF>. [NOTE: again, seems that this should be the dynamic
+type, not static type.]
+
+=item DYNSUPER
+
+Calls the current method in the nearest superclass, using the dynamic
+type of C<SELF>.
+
+=back
+
+=head3 Methods
+
+Methods are declared in the body of the C<pmclass> or C<prole>
+declaration with C<PCCMETHOD>.
+
+  PCCMETHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
+
+[NOTE: There is also an older C<METHOD> keyword, which is deprecated.]
+
+=head2 PMCs and Namespaces
+
+Like high-level classes, low-level PMCs are tied to a corresponding
+namespace. By default this is a namespace with the same name as the PMC
+in the 'parrot' HLL, but the C<hll> modifier in the C<pmclass>
+declaration selects a different HLL.
+
+Accessing a core PMC type from within an HLL other than 'parrot'
+requires the same steps as accessing a class from another HLL, first
+retrieving the namespace object, and then instantiating from that
+namespace.
+
+  $P0 = get_root_namespace ['parrot'; 'Integer']
+  $P1 = new $P0
+
+HLLs can choose to provide direct access to Parrot's core PMC types by
+aliasing them within the HLL namespace.
+
+=head2 Inheritance
+
+PMCs can inherit behavior and state from other PMCs. Inheritance is performed
+in the C<pmclass> declaration using the C<extends> keyword.
+
+  pmclass Foo extends Bar {
+  }
+
+=head2 Composition
+
+Composition is another form of code reuse in PMCs. Unlike inheritance, composed
+roles aren't complete stand-alone PMCs, they are just bundles of behavior and
+state that can be used within the composing PMC. As such, roles are never
+instantiated directly, and are never translated to C directly. They have no
+core structs, though they define attributes to be added to the PMC they are
+composed into. 
+
+When a PMC that uses a role is translated to C, the role provides vtable
+functions, methods, and attributes that will be added to the generated C code
+for that PMC. Composed vtable functions, methods, and attributes may not have
+the same name as corresponding features defined in the composing PMC. This is
+called a conflict, and must be explicitly resolved in the composing PMC. When
+composed features have the same name as inherited vtable functions, methods, or
+attributes, the composed feature overrides the inherited feature, just as it
+would if defined in the composing PMC.
+
+Roles are defined using the C<prole> keyword. 
+
+  prole <name> <modifiers> {
+  }
+
+Roles can compose other roles, but they can't inherit.
+
+Role attributes are defined using the same format as PMC attributes.
+
+Core roles live in src/pmc along with the core PMCs, but they have a file
+extension of C<.pr>.
+
+Roles are composed into a PMC with the C<does> modifier.
+
+=head2 Interaction between PMCs and high-level objects
 
 High-level objects, as specified in PDD15, need to be able to inherit from
 PMCs. This is achieved through the combination of a C<PMCProxy> PMC and
@@ -1382,6 +1505,11 @@ whole sets the array to that size.
 Size-changing operations (such as push, pop, shift, unshift, and splice)
 on statically-sized arrays will throw an exception.
 
+ResizablePMCArray returns Undef for unset elements (so does the new
+object model, because it uses ResizablePMCArray for storage), but Hash
+returns PMCNULL. Standardize all core aggregate PMC types on the
+singleton PMCNULL.
+
 =over 4
 
 =item Array
@@ -1515,7 +1643,7 @@ None.
 
 =head1 REFERENCES
 
-None.
+  docs/pmc2c.pod
 
 =cut
 
