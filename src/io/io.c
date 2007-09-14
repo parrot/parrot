@@ -574,8 +574,6 @@ PIO_pioctl(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL cmd, INTVAL arg)
              else return -1;
        default: return -1;
     }
-
-    return 0;
 }
 
 /*

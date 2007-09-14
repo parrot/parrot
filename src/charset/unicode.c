@@ -181,12 +181,11 @@ get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
-    charset_converter_t conversion_func;
-
-    if ((conversion_func = Parrot_find_charset_converter(interp,
-                    src->charset, Parrot_unicode_charset_ptr))) {
+    const charset_converter_t conversion_func =
+            Parrot_find_charset_converter(interp, src->charset,
+                    Parrot_unicode_charset_ptr);
+    if (conversion_func)
          return conversion_func(interp, src, dest);
-    }
     return Parrot_utf8_encoding_ptr->to_encoding(interp, src, dest);
 }
 
