@@ -1,20 +1,20 @@
 # $Id$
-
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 
 package Scheme::Test;
 
+# pragmata
 use strict;
 use warnings;
-use vars qw(@EXPORT @ISA);
+use 5.008;
 
 use Parrot::Config;
 
 require Exporter;
 require Parrot::Test;
 
-@EXPORT = ( qw(output_is output_like output_isnt), @Test::More::EXPORT );
-@ISA = qw(Exporter Test::More);
+our @EXPORT = ( qw(output_is output_like output_isnt), @Test::More::EXPORT );
+our @ISA = qw(Exporter Test::More);
 
 sub import {
     my ( $class, $plan, @args ) = @_;

@@ -1,10 +1,12 @@
+# $Id$
+# Copyright (C) 2002-2007, The Perl Foundation.
+
 package Scheme::Builtins;
 
-# Copyright (C) 2002-2006, The Perl Foundation.
-# $Id$
-
+# pragmata
 use strict;
 use warnings;
+use 5.008;
 
 # nice for debugging
 use Data::Dumper;

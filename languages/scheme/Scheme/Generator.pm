@@ -1,17 +1,18 @@
 # $Id$
-
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 
 package Scheme::Generator;
 
+# pragmata
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use 5.008;
+
 use Carp;
 
-$VERSION   = '0.01';
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(generate);
+our $VERSION   = '0.01';
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(generate);
 
 use Data::Dumper;
 use Scheme::Builtins;

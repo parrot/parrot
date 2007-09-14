@@ -1,15 +1,16 @@
+# $Id$
+# Copyright (C) 2001-2007, The Perl Foundation.
+
 package Scheme::Tokenizer;
 
-# Copyright (C) 2001-2006, The Perl Foundation.
-# $Id$
-
+# pragmata
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use 5.008;
 
-$VERSION   = '0.01';
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(tokenize);
+our $VERSION   = '0.01';
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(tokenize);
 
 use Data::Dumper;
 
