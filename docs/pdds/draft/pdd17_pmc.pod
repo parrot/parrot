@@ -461,6 +461,35 @@ NULL value passed as the initializer parameter is allowed.
 NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to
 init(), though there will of necessity be exceptions.
 
+=item instantiate
+
+  PMC* instantiate(INTERP, PMC* self, PMC* init)
+
+Creates a new PMC object of the type of the class and calls init_pmc(),
+passing in the initialization argument, I<init>, which is usually a
+hash. This opcode is most often used with high-level classes, but
+low-level PMCs may instantiate an object of their own type.
+
+=item new_from_string [deprecated]
+
+  PMC* new_from_string(INTERP, PMC* self, STRING* rep, INTVAL flags)
+
+Construct a PMC initializing it from a string representation and integer
+flags. [NOTE: this has been replaced by C<instantiate>. Any
+initialization arguments can be passed in the I<init> hash.]
+
+=item inspect
+
+  PMC* inspect(INTERP, PMC* self)
+
+Return a hash of all characteristics of the I<self> PMC available for
+introspection.
+
+  PMC* inspect_str(INTERP, PMC* self, STRING* what)
+
+Return a PMC value for one characteristic of the I<self> PMC, selected
+by string name. Returns PMCNULL if the characteristic doesn't exist.
+
 =item morph
 
   void morph(INTERP, PMC* self, INTVAL type)
@@ -522,6 +551,71 @@ Return a clone of a PMC.
 
 Return a true value if the PMC is defined, false otherwise.
 
+=item get_class
+
+  PMC* get_class(INTERP, PMC* self)
+
+Return the class object for this PMC. For high-level objects, this is a
+C<Class> object (or other high-level class object). For low-level PMCs,
+this returns a C<PMCProxy> object.
+
+=item class_type
+
+  INTVAL class_type(INTERP, PMC* self)
+
+Return the integer type of the PMC. [NOTE: will be deprecated when type
+IDs are deprecated.]
+
+=item pmc_namespace [deprecated]
+
+  PMC* pmc_namespace(INTERP, PMC* self)
+
+Return the namespace object for this PMC. [NOTE: replaced by
+C<get_namespace>.]
+
+=item get_namespace
+
+  PMC* get_namespace(INTERP, PMC* self)
+
+Return the namespace object for this PMC.
+
+=item freeze
+
+  void freeze(INTERP, PMC* self, visit_info* info)
+
+Freeze the PMC to an archived string format (a bytecode string constant
+that can be saved in a packfile).
+
+=item thaw
+
+  void thaw  (INTERP, PMC* self, visit_info* info)
+
+Thaw a PMC from an archived string format (a bytecode string constant
+that can be saved in a packfile).
+
+=item thawfinish
+
+  void thawfinish (INTERP, PMC* self, visit_info* info)
+
+Called after the PMC has been thawed to perform any finalization steps.
+
+=item visit
+
+  void visit (INTERP, PMC* self, visit_info* info)
+
+Used by C<freeze> and C<thaw> to visit the contents of the PMC.
+
+=item share
+
+  void share(INTERP, PMC* self)
+
+  PMC* share_ro(INTERP, PMC* self)
+
+Mark a PMC as shared and read-only.
+
+[NOTE: these seem to be used interchangably, should be distinguished or
+merged.]
+
 =back
 
 =head3 Accessors
@@ -564,9 +658,9 @@ the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types. [NOTE: will be deprecated when type IDs
 are deprecated.]
 
-=item subtype
+=item subtype [deprecated]
 
-  UINTVAL subtype(INTERP, PMC* self, INTVAL type) [deprecated]
+  UINTVAL subtype(INTERP, PMC* self, INTVAL type)
 
 Return the subtype of a PMC. (Note that this may be unimplemented, and may go
 away). This is intended to return information about the PMC--what type of
@@ -605,6 +699,13 @@ Return the extended precision numeric value of the PMC as a new bignum PMC.
 
 Return the native string value of the PMC. This may be in any encoding, chosen
 by the PMC.
+
+=item get_repr
+
+  STRING* get_repr(INTERP, PMC* self)
+
+Return a string representation of the PMC. [NOTE: redundant with
+C<get_string>, candidate for deprecation.]
 
 =item get_bool
 
@@ -721,6 +822,13 @@ Set the pointer value of the PMC Useful for PMCs that hold pointers to
 arbitrary data. The details of the data (type, location etc.) depend on the
 PMC.
 
+=item hash [deprecated]
+
+  INTVAL hash(INTERP, PMC* self, size_t seed)
+
+Create a hashed integer value for the PMC, given a particular seed.
+[NOTE: not really used and not really useful.]
+
 =back
 
 =head3 Aggregate Vtable Functions
@@ -751,203 +859,97 @@ Return the number of elements in the PMC.
 =item get_integer_keyed
 
   INTVAL get_integer_keyed(INTERP, PMC* self, PMC* key)
-
-Return the integer value for the element indexed by a PMC key.  The key is
-guaranteed not to be NULL for this function.
-
-=item get_integer_keyed_int
-
   INTVAL get_integer_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the integer value for the element indexed by an integer key.  The key is
-guaranteed not to be NULL for this function.
-
-=item get_integer_keyed_str
-
   INTVAL get_integer_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the integer value for the element indexed by a string key.  The key is
-guaranteed not to be NULL for this function.
+Return the integer value for the element indexed by a PMC, integer, or string
+key. The key is guaranteed not to be NULL for this function.
 
 =item get_number_keyed
 
   FLOATVAL get_number_keyed(INTERP, PMC* self, PMC* key)
-
-Return the native floating-point value for the element indexed by a PMC key.
-The key is guaranteed not to be NULL for this function.
-
-=item get_number_keyed_int
-
   FLOATVAL get_number_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the native floating-point value for the element indexed by an integer
-key. The key is guaranteed not to be NULL for this function.
-
-=item get_number_keyed_str
-
   FLOATVAL get_number_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the native floating-point value for the element indexed by a string key.
-The key is guaranteed not to be NULL for this function.
+Return the native floating-point value for the element indexed by a PMC,
+integer, or string key. The key is guaranteed not to be NULL for this
+function.
 
 =item get_string_keyed
 
   STRING* get_string_keyed(INTERP, PMC* self, PMC* key)
-
-Return the string value for the element indexed by a PMC key.
-The key is guaranteed not to be NULL for this function.
-
-=item get_string_keyed_int
-
   STRING* get_string_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the string value for the element indexed by an integer key.
-The key is guaranteed not to be NULL for this function.
-
-=item get_string_keyed_str
-
   STRING* get_string_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the string value for the element indexed by a string key.
-The key is guaranteed not to be NULL for this function.
+Return the string value for the element indexed by a PMC, integer, or string
+key. The key is guaranteed not to be NULL for this function.
 
-=item get_bool_keyed [deprecated?]
+=item get_bool_keyed [deprecated]
 
 Return the boolean value for the element indexed by a PMC key.
 
-=item get_bool_keyed_int [deprecated?]
+=item get_bool_keyed_int [deprecated]
 
 Return the boolean value for the element indexed by an integer key.
 
-=item get_bool_keyed_str [deprecated?]
+=item get_bool_keyed_str [deprecated]
 
 Return the boolean value for the element indexed by a string key.
 
 =item get_pmc_keyed
 
   PMC* get_pmc_keyed(INTERP, PMC* self, PMC* key)
-
-Return the PMC value for the element indexed by a PMC key.
-The key is guaranteed not to be NULL for this function.
-
-=item get_pmc_keyed_int
-
   PMC* get_pmc_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the PMC value for the element indexed by an integer key.
-The key is guaranteed not to be NULL for this function.
-
-=item get_pmc_keyed_str
-
   PMC* get_pmc_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the PMC value for the element indexed by a string key.
-The key is guaranteed not to be NULL for this function.
+Return the PMC value for the element indexed by a PMC, integer, or
+string key. The key is guaranteed not to be NULL for this function.
 
 =item get_pointer_keyed
 
   void* get_pointer_keyed(INTERP, PMC* self, PMC* key)
-
-Return the pointer value for the element indexed by a PMC key. The details of
-the data (type, location etc.) depend on the PMC.
-
-=item get_pointer_keyed_int
-
   void* get_pointer_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the pointer value for the element indexed by an integer key. The
-details of the data (type, location etc.) depend on the PMC.
-
-=item get_pointer_keyed_str
-
   void* get_pointer_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the pointer value for the element indexed by a string key. The details
-of the data (type, location etc.) depend on the PMC.
+Return the pointer value for the element indexed by a PMC, integer, or
+string key. The details of the data (type, location etc.) depend on the
+PMC.
 
 =item set_integer_keyed
 
   void set_integer_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
-
-Set the integer value of the element indexed by a PMC key. The key is
-guaranteed not to be NULL for this function.
-
-=item set_integer_keyed_int
-
   void set_integer_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
-
-Set the integer value of the element indexed by an integer key. The key is
-guaranteed not to be NULL for this function.
-
-=item set_integer_keyed_str
-
   void set_integer_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
-Set the integer value of the element indexed by a string key. The key is
-guaranteed not to be NULL for this function.
+Set the integer value of the element indexed by a PMC, integer, or
+string key. The key is guaranteed not to be NULL for this function.
 
 =item set_number_keyed
 
   void set_number_keyed(INTERP, PMC* self, PMC* key, FLOATVAL value)
-
-Set the floating-point value of the element indexed by a PMC key. The key is
-guaranteed not to be NULL for this function.
-
-=item set_number_keyed_int
-
   void set_number_keyed_int(INTERP, PMC* self, INTVAL key, FLOATVAL value)
-
-Set the floating-point value of the element indexed by an integer key. The key
-is guaranteed not to be NULL for this function.
-
-=item set_number_keyed_str
-
   void set_number_keyed_str(INTERP, PMC* self, STRING* key, FLOATVAL value)
 
-Set the floating-point value of the element indexed by a string key. The key
-is guaranteed not to be NULL for this function.
+Set the floating-point value of the element indexed by a PMC, integer,
+or string key. The key is guaranteed not to be NULL for this function.
 
 =item set_string_keyed
 
   void set_string_keyed(INTERP, PMC* self, PMC* key, STRING* value)
-
-Set the string value of the element indexed by a PMC key.  The key is
-guaranteed not to be NULL for this function.
-
-=item set_string_keyed_int
-
   void set_string_keyed_int(INTERP, PMC* self, INTVAL key, STRING* value)
-
-Set the string value of the element indexed by an integer key.  The key is
-guaranteed not to be NULL for this function.
-
-=item set_string_keyed_str
-
   void set_string_keyed_str(INTERP, PMC* self, STRING* key, STRING* value)
 
-Set the string value of the element indexed by a string key.  The key is
-guaranteed not to be NULL for this function.
+Set the string value of the element indexed by a PMC, integer, or string
+key. The key is guaranteed not to be NULL for this function.
 
 =item set_pmc_keyed
 
   void set_pmc_keyed(INTERP, PMC* self, PMC* key, PMC* value)
-
-Set the value of the element indexed by a PMC key, by copying the value of
-another PMC.
-
-=item set_pmc_keyed_int
-
   void set_pmc_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value)
-
-Set the PMC value of the element indexed by an integer key, by copying the
-value of another PMC.
-
-=item set_pmc_keyed_str
-
   void set_pmc_keyed_str(INTERP, PMC* self, STRING* key, PMC* value)
 
-Set the PMC value of the element indexed by a string key, by copying the value
-of another PMC.
+Set the PMC value of the element indexed by a PMC, integer, or string key by
+copying the value of another PMC.
 
 =item set_pointer_keyed
 
@@ -960,26 +962,12 @@ Set the pointer value of the element indexed by a PMC, integer, or string key.
 =item type_keyed
 
   INTVAL type_keyed(INTERP, PMC* self, PMC* key)
-
-Return the type number of the PMC indexed by a PMC key.  The I<key> parameter
-is guaranteed not to be NULL for this method. [NOTE: To be deprecated when type
-IDs are deprecated.]
-
-=item type_keyed_int
-
   INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the type number of the PMC indexed by an integer key.  The I<key>
-parameter is guaranteed not to be NULL for this method. [NOTE: To be deprecated
-when type IDs are deprecated.]
-
-=item type_keyed_str
-
   INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
 
-Return the type number of the PMC indexed by a string key.  The I<key>
-parameter is guaranteed not to be NULL for this method. [NOTE: To be deprecated
-when type IDs are deprecated.]
+Return the type number of the PMC indexed by a PMC, integer, or string key.
+The I<key> parameter is guaranteed not to be NULL for this method. [NOTE: To be
+deprecated when type IDs are deprecated.]
 
 =item pop_integer
 
@@ -1083,8 +1071,9 @@ Add the passed in PMC to the beginning of the list.
 
   void splice(INTERP, PMC* self, PMC* value, INTVAL offset, INTVAL count)
 
-Replace the I<count> PMCs at offset I<offset> from the beginning of I<self>
-with the PMCs in the aggregate I<value>.
+Replace some number of PMCs (specified by the integer I<count>) at
+offset I<offset> from the beginning of I<self> with the PMCs in the
+aggregate I<value>.
 
 =item exists_keyed
 
@@ -1131,9 +1120,15 @@ feature needs review together with the Iterator PMC.]
   void add_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   void add_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
+  void i_add(INTERP, PMC* self, PMC* value)
+  void i_add_int(INTERP, PMC* self, INTVAL value)
+  void i_add_float(INTERP, PMC* self, FLOATVAL value)
+
 Add the value of I<self> to the value of a PMC, native integer, or native
 floating-point number and store the result in a PMC I<dest>. Note that I<dest>
 may be the same PMC as I<self>; in that case optimizations may be made.
+The C<i_> variants perform an inplace operation, modifying the value of
+I<self>.
 
 =item subtract
 
@@ -1141,19 +1136,15 @@ may be the same PMC as I<self>; in that case optimizations may be made.
   PMC* subtract_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   PMC* subtract_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
-Subtract the value of a PMC, native integer, or native floating-point number
-from a PMC and store the result in I<dest>. If I<dest> is NULL create a result
-PMC of an appropriate type.  Note that I<dest> may be the same PMC as I<self>;
-in that case optimizations may be made.
-
-=item i_subtract
-
   void i_subtract(INTERP, PMC* self, PMC* value)
   void i_subtract_int(INTERP, PMC* self, INTVAL value)
   void i_subtract_float(INTERP, PMC* self, FLOATVAL value)
 
-Inplace operation: subtract a PMC, native integer, or native floating-point
-number from the value of a PMC and store the result back in the same PMC.
+Subtract the value of a PMC, native integer, or native floating-point number
+from a PMC and store the result in I<dest>. If I<dest> is NULL create a result
+PMC of an appropriate type.  Note that I<dest> may be the same PMC as I<self>;
+in that case optimizations may be made. The C<i_> variants perform an
+inplace operation, modifying the value of I<self>.
 
 =item increment
 
@@ -1173,9 +1164,14 @@ Decrement the value of a PMC by 1.
   void multiply_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   void multiply_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
+  void i_multiply(INTERP, PMC* self, PMC* value)
+  void i_multiply_int(INTERP, PMC* self, INTVAL value)
+  void i_multiply_float(INTERP, PMC* self, FLOATVAL value)
+
 Multiply a PMC, native integer, or floating-point value by the value of the PMC
 I<self> and store the result in the I<dest> PMC. Note that I<dest> may be the
-same PMC as I<self>; in that case optimizations may be made.
+same PMC as I<self>; in that case optimizations may be made. The C<i_>
+variants perform an inplace operation, modifying the value of I<self>.
 
 =item divide
 
@@ -1183,9 +1179,31 @@ same PMC as I<self>; in that case optimizations may be made.
   void divide_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   void divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
+  void i_divide(INTERP, PMC* self, PMC* value)
+  void i_divide_int(INTERP, PMC* self, INTVAL value)
+  void i_divide_float(INTERP, PMC* self, FLOATVAL value)
+
 Divide the value of the I<self> PMC by a PMC, native integer, or native
 floating-point number and store the result in I<dest>.  Note that I<dest> may
-be the same PMC as I<self>; in that case optimizations may be made.
+be the same PMC as I<self>; in that case optimizations may be made. The
+C<i_> variants perform an inplace operation, modifying the value of
+I<self>.
+
+=item floor_divide
+
+  PMC* floor_divide(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* floor_divide_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  PMC* floor_divide_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+  void i_floor_divide(INTERP, PMC* self, PMC* value)
+  void i_floor_divide_int(INTERP, PMC* self, INTVAL value)
+  void i_floor_divide_float(INTERP, PMC* self, FLOATVAL value)
+
+Divide the PMC's value number by I<value> and return the result in
+I<dest>. The result is the C<floor()> of the division i.e. the next
+whole integer towards -inf. If the denominator is zero, a 'Divide by
+zero' exception is thrown. The C<i_> variants perform an inplace
+operation, modifying the value of I<self>.
 
 =item modulus
 
@@ -1193,9 +1211,15 @@ be the same PMC as I<self>; in that case optimizations may be made.
   void modulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   void modulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
+  void i_modulus(INTERP, PMC* self, PMC* value)
+  void i_modulus_int(INTERP, PMC* self, INTVAL value)
+  void i_modulus_float(INTERP, PMC* self, FLOATVAL value)
+
 Divide the value of the I<self> PMC by the value of a PMC, native integer, or
 native floating-point number and store the remainder in I<dest>.  Note that
 I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
+The C<i_> variants perform an inplace operation, modifying the value of
+I<self>.
 
 =item cmodulus
 
@@ -1203,20 +1227,49 @@ I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
   void cmodulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
   void cmodulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
 
+  void i_cmodulus(INTERP, PMC* self, PMC* value)
+  void i_cmodulus_int(INTERP, PMC* self, INTVAL value)
+  void i_cmodulus_float(INTERP, PMC* self, FLOATVAL value)
+
 Divide the value of the I<self> PMC by the value of a PMC, native integer, or
 native floating-point number and store the remainder in I<dest>.  Note that
 I<dest> may be the same PMC as I<self>; in that case optimizations may be made.
+The C<i_> variants perform an inplace operation, modifying the value of
+I<self>.
 
 Note that C<modulus> uses Knuth's "corrected mod" algorithm, as implemented in
 F<src/utils.c>, while C<cmodulus> uses the C-style fmod function.
 
+=item pow
+
+  PMC* pow(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* pow_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  PMC* pow_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+  void i_pow(INTERP, PMC* self, PMC* value)
+  void i_pow_int(INTERP, PMC* self, INTVAL value)
+  void i_pow_float(INTERP, PMC* self, FLOATVAL value)
+
+Return the value of I<self> raised to the power of I<value>. The C<i_>
+variants perform an inplace operation, modifying the value of I<self>.
+
+=item absolute
+
+  PMC* absolute(INTERP, PMC* self, PMC* dest)
+  void i_absolute(INTERP, PMC* self)
+
+Return the absolute value of I<self>. The C<i_> variant performs an
+inplace operation, modifying the value of I<self>.
+
 =item neg
 
   void neg(INTERP, PMC* self, PMC* dest)
+  void i_neg(INTERP, PMC* self)
 
-Negate the sign of I<self> and store the result in I<dest>. Note that I<self>
-and I<dest> may refer to the same PMC, in which case optimizations may be
-made.
+Negate the sign of I<self> and store the result in I<dest>. Note that
+I<self> and I<dest> may refer to the same PMC, in which case
+optimizations may be made. The C<i_> variant performs an inplace
+operation, modifying the value of I<self>.
 
 =back
 
@@ -1236,8 +1289,8 @@ or native integer and store the result in I<dest>. Note that I<dest> may be the
 same PMC as I<self>; in that case optimizations may be made.
 [Question: what happens when the I<self> and I<value> PMCs aren't integers?]
 
-The C<i_> variants perform an implace operation and store the result in
-C<self>.
+The C<i_> variants perform an inplace operation and store the result in
+I<self>.
 
 =item bitwise_and
 
@@ -1246,9 +1299,9 @@ C<self>.
   void i_bitwise_and(INTERP, PMC* self, PMC* value)
   void i_bitwise_and_int(INTERP, PMC* self, INTVAL value)
 
-Return the result of a bitwise AND on the passed in C<value> and the C<self>
-PMC. The C<i_> variants perform an implace operation and store the result in
-C<self>.
+Return the result of a bitwise AND on the passed in I<value> and the I<self>
+PMC. The C<i_> variants perform an inplace operation and store the result in
+I<self>.
 
 =item bitwise_xor
 
@@ -1257,9 +1310,9 @@ C<self>.
   void i_bitwise_xor(INTERP, PMC* self, PMC* value)
   void i_bitwise_xor_int(INTERP, PMC* self, INTVAL value)
 
-Return the result of a bitwise XOR on the passed in C<value> and the C<self>
-PMC. The C<i_> variants perform an implace operation and store the result in
-C<self>.
+Return the result of a bitwise XOR on the passed in I<value> and the I<self>
+PMC. The C<i_> variants perform an inplace operation and store the result in
+I<self>.
 
 =item bitwise_ors
 
@@ -1269,8 +1322,8 @@ C<self>.
   void i_bitwise_ors_str(INTERP, PMC* self, STRING* value)
 
 Return the result of a bitwise OR over an entire string on the passed in
-C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
-and store the result in C<self>.
+I<value> and the I<self> PMC. The C<i_> variants perform an inplace operation
+and store the result in I<self>.
 
 =item bitwise_ands
 
@@ -1280,8 +1333,8 @@ and store the result in C<self>.
   void i_bitwise_ands_str(INTERP, PMC* self, STRING* value)
 
 Return the result of a bitwise AND over an entire string on the passed in
-C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
-and store the result in C<self>.
+I<value> and the I<self> PMC. The C<i_> variants perform an inplace operation
+and store the result in I<self>.
 
 =item bitwise_xors
 
@@ -1291,24 +1344,24 @@ and store the result in C<self>.
   void i_bitwise_xors_str(INTERP, PMC* self, STRING* value)
 
 Return the result of a bitwise XOR over an entire string on the passed in
-C<value> and the C<self> PMC. The C<i_> variants perform an implace operation
-and store the result in C<self>.
+I<value> and the I<self> PMC. The C<i_> variants perform an inplace operation
+and store the result in I<self>.
 
 =item bitwise_not
 
   PMC* bitwise_not(INTERP, PMC* self, PMC* dest)
   void i_bitwise_not(INTERP, PMC* self)
 
-Returns the bitwise negation of the C<self> PMC. The C<i_> variant performs an
-implace operation, storing the result in C<self>.
+Returns the bitwise negation of the I<self> PMC. The C<i_> variant performs an
+inplace operation, storing the result in I<self>.
 
 =item bitwise_nots
 
   PMC* bitwise_nots(INTERP, PMC* self, PMC* dest)
   void i_bitwise_nots(INTERP, PMC* self)
 
-Returns the bitwise negation of the string C<self> PMC. The C<i_> variant
-performs an implace operation, storing the result in C<self>.
+Returns the bitwise negation of the string I<self> PMC. The C<i_> variant
+performs an inplace operation, storing the result in I<self>.
 
 =item bitwise_shl
 
@@ -1317,10 +1370,10 @@ performs an implace operation, storing the result in C<self>.
   void i_bitwise_shl(INTERP, PMC* self, PMC* value)
   void i_bitwise_shl_int(INTERP, PMC* self, INTVAL value)
 
-Return the value of the C<self> PMC bitwise shifted left by the amount
-specified in C<value>, shifting in zeroes on the right (arithmetic/logical
-bitwise shift). A negative C<value> shifts right. The C<i_> variants perform an
-implace operation, storing the result in C<self>.
+Return the value of the I<self> PMC bitwise shifted left by the amount
+specified in I<value>, shifting in zeroes on the right (arithmetic/logical
+bitwise shift). A negative I<value> shifts right. The C<i_> variants perform an
+inplace operation, storing the result in I<self>.
 
 The result may be promoted to a C<BigInt>.
 
@@ -1331,12 +1384,12 @@ The result may be promoted to a C<BigInt>.
   void i_bitwise_shr(INTERP, PMC* self, PMC* value)
   void i_bitwise_shr_int(INTERP, PMC* self, INTVAL value)
 
-Return the value of the C<self> PMC bitwise shifted right by the amount
-specified in C<value>, shifting in copies of the sign bit on the left
-(arithmetic bitwise shift). A negative C<value> shifts left. The C<i_> variants
-perform an implace operation, storing the result in C<self>.
+Return the value of the I<self> PMC bitwise shifted right by the amount
+specified in I<value>, shifting in copies of the sign bit on the left
+(arithmetic bitwise shift). A negative I<value> shifts left. The C<i_> variants
+perform an inplace operation, storing the result in I<self>.
 
-The result may be promoted to a C<BigInt> (when C<value> is negative).
+The result may be promoted to a C<BigInt> (when I<value> is negative).
 
 =item bitwise_lsr
 
@@ -1345,29 +1398,72 @@ The result may be promoted to a C<BigInt> (when C<value> is negative).
   void i_bitwise_lsr(INTERP, PMC* self, PMC* value)
   void i_bitwise_lsr_int(INTERP, PMC* self, INTVAL value)
 
-Return the value of the C<self> PMC bitwise shifted right by the amount
-specified in C<value>, shifting in zeroes on the left (logical bitwise shift).
-A negative C<value> shifts left. The C<i_> variants perform an implace
-operation, storing the result in C<self>.
-
+Return the value of the I<self> PMC bitwise shifted right by the amount
+specified in I<value>, shifting in zeroes on the left (logical bitwise shift).
+A negative I<value> shifts left. The C<i_> variants perform an inplace
+operation, storing the result in I<self>.
 
 =item is_equal
 
+  INTVAL is_equal(INTERP, PMC* self, PMC* value)
+  INTVAL is_equal_num(INTERP, PMC* self, PMC* value)
+  INTVAL is_equal_string(INTERP, PMC* self, PMC* value)
+
+Return an integer value (1/0) indicating if the I<self> PMC is equal to
+the I<value> PMC. The C<_num> version tests for numeric equality, while
+the C<_string> version tests for string equality.
+
 =item is_same
+
+  INTVAL is_same(INTERP, PMC* self, PMC* value)
+
+Return an integer value (1/0) indicating if I<self> is the same as
+I<value> (with "sameness" determined by each PMC).
 
 =item cmp
 
-=item cmp_num
+  INTVAL cmp(INTERP, PMC* self, PMC* value)
+  INTVAL cmp_num(INTERP, PMC* self, PMC* value)
+  INTVAL cmp_string(INTERP, PMC* self, PMC* value)
 
-=item cmp_string
+Returns the integer result of comparing the values of I<self> and
+I<value> (0 for equal, 1 if I<self> is greater, -1 if I<value> is
+greater). The C<_num> version performs a numeric comparison, while the
+C<_string> version performs a string comparison.
 
 =item logical_or
 
+  PMC* logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Performs a logical OR, returning I<self> if it is true, and I<value>
+otherwise.
+
 =item logical_and
+
+  PMC* logical_and(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Performs a logical AND, returning a true value if both I<self> and
+I<value> are true, and a false value otherwise. (Currently implemented
+as: If I<self> is false, return it, since the entire expression is
+false. If I<self> is true, return value, since the truth or falsehood of
+I<value> will determine the truth or falsehood of the whole expression.)
 
 =item logical_xor
 
+  PMC* logical_xor(INTERP, PMC* self, PMC* value, PMC* dest)
+
+Performs a logical XOR, returning I<self> if it is true and I<value> is
+false, returning I<value> if it is true and I<self> is false, and
+returning a false value (PMC of the same type as I<self>, with the
+boolean value 0) if both are true or neither are true.
+
 =item logical_not
+
+  PMC* logical_not(INTERP, PMC* self, PMC* dest)
+  void i_logical_not(INTERP, PMC* self)
+
+Returns the logical negation of I<self>. The C<i_> variant performs an
+inplace negation, modifying the value of I<self>.
 
 =back
 
@@ -1377,11 +1473,33 @@ operation, storing the result in C<self>.
 
 =item concatenate
 
-=item concatenate_native
+  PMC* concatenate(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* concatenate_str(INTERP, PMC* self, STRING* value, PMC* dest)
+  void i_concatenate(INTERP, PMC* self, PMC* value)
+  void i_concatenate_str(INTERP, PMC* self, STRING* value)
+
+Concatenate I<self> with a PMC or string value and return the result.
+The C<i_> variant performs an inplace concatenation, modifying the value
+of I<self>.
 
 =item repeat
 
-=item repeat_int
+  PMC* repeat(INTERP, PMC* self, PMC* value, PMC* dest)
+  PMC* repeat_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+  void i_repeat(INTERP, PMC* self, PMC* value)
+  void i_repeat_int(INTERP, PMC* self, INTVAL value)
+
+Return the result of repeating the value in I<self> the number of times
+indicated in I<value>. The C<i_> variants perform an inplace operation,
+modifying the value of I<self>.
+
+=item substr
+
+  void substr(INTERP, PMC* self, INTVAL offset, INTVAL length, PMC* dest)
+  STRING* substr_str(INTERP, PMC* self, INTVAL offset, INTVAL length)
+
+Extracts the string starting at I<offset> with size I<length> and return
+it as a PMC in I<dest> or as a string return value.
 
 =back
 
@@ -1391,11 +1509,9 @@ operation, storing the result in C<self>.
 
 =item invoke
 
-=item fsh
+  opcode_t* invoke(INTERP, PMC* self, void* next)
 
-=item visit
-
-=item share
+Invoke the code object I<self>.
 
 =back
 
@@ -1405,21 +1521,123 @@ operation, storing the result in C<self>.
 
 =item can
 
-=item does
+  INTVAL can(INTERP, PMC* self, STRING* method)
+
+Return a true value if the PMC has a method named I<method>, return 0
+otherwise.
 
 =item isa
 
-=item add_method
+  INTVAL isa(INTERP, PMC* self, STRING* classname)
 
-=item add_attribute
+Return a true value if the PMC inherits from  the class named
+I<classname>, return 0 otherwise.
+
+=item does
+
+  INTVAL does(INTERP, PMC* self, STRING* role)
+
+Return a true value if the PMC C<does> (composes) or C<performs>
+(satisfies the interface of) the role named I<role>, return 0 otherwise.
 
 =item get_attr
 
+  PMC* get_attr(INTERP, PMC* self, INTVAL idx) [deprecated]
+  PMC* get_attr_str(INTERP, PMC* self, STRING* idx)
+
+Retrieve an attribute value from the PMC (instance object).
+
+[NOTE: Integer index lookups for attributes are deprecated with the new
+object metamodel.]
+
 =item set_attr
+
+  void set_attr(INTERP, PMC* self, INTVAL idx, PMC* value) [deprecated]
+  void set_attr_str(INTERP, PMC* self, STRING* idx, PMC* value)
+
+Store an attribute value in the PMC (instance object).
+
+[NOTE: Integer index lookups for attributes are deprecated with the new
+object metamodel.]
 
 =item add_parent
 
+  void add_parent(INTERP, PMC* self, PMC* parent)
+
+Add a parent to the PMC (class object), establishing an inheritance relation.
+
+=item remove_parent
+
+  void remove_parent(INTERP, PMC* self, PMC* parent)
+
+Remove a parent from a PMC (class object).
+
+Not all object metamodels will support removing parents.
+
 =item add_role
+
+  void add_role(INTERP, PMC* self, PMC* role)
+
+Add a role to the PMC (class object), establishing a composition relation.
+
+=item remove_role
+
+  void remove_role(INTERP, PMC* self, PMC* role)
+
+Remove a role from the PMC (class object).
+
+Not all object metamodels will support removing roles.
+
+=item add_attribute
+
+  void add_attribute(INTERP, PMC* self, STRING* name, PMC* type)
+
+Add an attribute to the PMC (class object).
+
+=item remove_attribute
+
+  void remove_attribute(INTERP, PMC* self, STRING* name)
+
+Remove an attribute from the PMC (class object).
+
+Not all object metamodels will support removing attributes.
+
+=item add_method
+
+  void add_method(INTERP, PMC* self, STRING* method_name, PMC* sub_pmc)
+
+Add a method to the PMC (class object).
+
+=item remove_method
+
+  void remove_method(INTERP, PMC* self, STRING* method_name)
+
+Remove a method from the PMC (class object).
+
+Not all object metamodels will support removing methods.
+
+=item add_vtable_override
+
+  void add_vtable_override(INTERP, PMC* self, STRING* vtable_name, PMC* sub_pmc)
+
+Add a vtable override to the PMC (class object).
+
+  void remove_vtable_override(INTERP, PMC* self, STRING* vtable_name)
+
+Remove a vtable override from the PMC (class object).
+
+=item subclass [deprecated]
+
+  PMC* subclass(INTERP, PMC* self, PMC* name)
+
+Create a subclass of a PMC (class object) with the name given in
+I<name>.
+
+[NOTE: this operation can be performed by creating a new class and
+adding a parent to it. We will keep the C<subclass> opcode, but
+implement it using this more direct route. (With the added advantage of
+increased abstraction, allowing multiple object metamodels more
+easily.)]
 
 =item find_method
 
@@ -1430,7 +1648,6 @@ cached, so the method I<must> return an equivalent sub PMC each time, or be
 capable of dealing with the returned sub PMCs being reused. [Why should it be
 cached? Can you turn off caching? What if you want to override find_method to
 generate methods on the fly?]
-
 
 =back
 
@@ -1521,10 +1738,17 @@ numbers? }}
 
 =item ParrotClass [deprecated]
 
-The PMC for Parrot's class. (Note that this may go away if we ultimately make
-all classes just objects)
+The PMC for Parrot's class. 
 
 =item ParrotObject [deprecated]
+
+The PMC for Parrot's base object type.
+
+=item Class
+
+The PMC for Parrot's class. 
+
+=item Object
 
 The PMC for Parrot's base object type.
 
@@ -1561,6 +1785,11 @@ in that register. This is not the same behaviour as the Ref PMC.
 
 A singleton PMC that generates a random number. {{ NOTE: Why do we have
 this? }}
+
+=item Exception
+
+The base class for all exceptions. Currently based on
+C<ResizablePMCArray>, but that's likely to change.
 
 =back
 
@@ -1627,8 +1856,6 @@ A statically sized array which holds only String values.
 
 A dynamically sized array which holds only String values.
 
-=item Exception
-
 =back
 
 =head3 Hash types
@@ -1653,9 +1880,16 @@ Unix systems):
 
 Note that an embedding system may override this behavior.
 
-=item Namespace
+=item NameSpace
+
+Stores one level of a namespace. Every slot in a namespace contains
+either another namespace (the next level down), or a variable or
+subroutine/method.
 
 =item OrderedHash
+
+A hash that also preserves the order of elements, providing the
+interface of both a hash and an array.
 
 =item AddrRegistry
 
@@ -1670,21 +1904,36 @@ collection.
 
 =item Sub
 
+A fundamental subroutine object, and base class for other subroutine
+PMC types.
+
 =item Closure
 
 A closure: subroutine object plus captured lexical scope.
 
-=item Coroutine
-
 =item Continuation
 
-=item CSub
+A continuation: a subroutine object that captures the interpreter's
+context at the point where the continuation was constructed.
+
+=item Coroutine
+
+A coroutine: a continuation object that can stop part way through
+execution and restart at the point where it left off the next time it's
+called.
 
 =item Eval
 
+An extension of C<Sub> that provides dynamic code evaluation and
+execution.
+
 =item Exception_Handler
 
+A code object for handling exceptions.
+
 =item MultiSub
+
+A container for multiply dispatched subroutines.
 
 =item NCI
 
@@ -1693,7 +1942,6 @@ A native call interface wrapper around a C function.
 =item Bound_NCI
 
 An internal NCI method call bound to a particular call instance. 
-{{ NOTE: where are these used? }}
 
 =item Compiler
 
