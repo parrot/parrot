@@ -1414,7 +1414,7 @@ Instance Variables map to what we call attributes
 
 =head1 ATTACHMENTS
 
-None.
+  docs/pdds/pdd15_object_metamodel.png
 
 =head1 FOOTNOTES
 
