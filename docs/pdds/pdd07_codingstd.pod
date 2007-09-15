@@ -951,7 +951,7 @@ code which gets exposed.
 
 =head2 Performance
 
-We want Perl to be fast. Very fast. But we also want it to be portable and
+We want Parrot to be fast. Very fast. But we also want it to be portable and
 extensible. Based on the 90/10 principle, (or 80/20, or 95/5, depending on who
 you speak to), most performance is gained or lost in a few small but critical
 areas of code. Concentrate your optimization efforts there.
@@ -961,44 +961,6 @@ choosing the correct algorithms and data structures in the first place. Any
 subsequent tweaking of code is secondary to this. Also, any tweaking that is
 done should as far as possible be platform independent, or at least likely to
 cause speed-ups in a wide variety of environments, and do no harm elsewhere.
-Only in exceptional circumstances should assembly ever even be considered, and
-then only if generic fallback code is made available that can still be used by
-all other non-optimized platforms.
-
-Probably the dominant factor (circa 2001) that effects processor performance is
-the cache. Processor clock rates have increased far in excess of main memory
-access rates, and the only way for the processor to proceed without stalling is
-for most of the data items it needs to be found to hand in the cache. It is
-reckoned that even a 2% cache miss rate can cause a slowdown in the region of
-50%. It is for this reason that algorithms and data structures must be designed
-to be 'cache-friendly'.
-
-A typical cache may have a block size of anywhere between 4 and 256 bytes. 
-When a program attempts to read a word from memory and the word is already in
-the cache, then processing continues unaffected. Otherwise, the processor is
-typically stalled while a whole contiguous chunk of main memory is read in and
-stored in a cache block. Thus, after incurring the initial time penalty, you
-then get all the memory adjacent to the initially read data item for free. 
-Algorithms that make use of this fact can experience quite dramatic speedups. 
-For example, the following pathological code ran four times faster on my
-machine by simply swapping C<i> and C<j>.
-
-    int a[1000][1000];
-
-    ... (a gets populated) ...
-
-    int i,j,k;
-    for (i=0; i<1000; i++) {
-        for (j=0; j<1000; j++) {
-            k += a[j][i];
-        }
-    }
-
-This all boils down to: keep things near to each other that get accessed at
-around the same time. (This is why the important optimizations occur in data
-structure and algorithm design rather than in the detail of the code.) This
-rule applies both to the layout of different objects relative to each other,
-and to the relative positioning of individual fields within a single structure.
 
 If you do put an optimization in, time it on as many architectures as you can,
 and be suspicious of it if it slows down on any of them! Perhaps it will be
@@ -1008,10 +970,6 @@ put it in a platform-specific function in a platform-specific file, rather than
 cluttering the main source with zillions of #ifdefs.
 
 And remember to document it.
-
-Loosely speaking, Perl tends to optimize for speed rather than space, so you
-may want to code for speed first, then tweak to reclaim some space while not
-affecting performance.
 
 =head1 EXEMPTIONS
 
