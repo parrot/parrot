@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Scheme::Test tests => 22;
+use Parrot::Test::Scheme tests => 22;
 
 ###
 ### Add

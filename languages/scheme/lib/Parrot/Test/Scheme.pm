@@ -1,7 +1,7 @@
 # $Id$
 # Copyright (C) 2001-2007, The Perl Foundation.
 
-package Scheme::Test;
+package Parrot::Test::Scheme;
 
 # pragmata
 use strict;
@@ -29,7 +29,7 @@ my $count;
 foreach my $meth ( qw(is isnt like) ) {
     no strict 'refs';
 
-    *{"Scheme::Test::output_$meth"} = sub ($$;$) {
+    *{"Parrot::Test::Scheme::output_$meth"} = sub ($$;$) {
         my ( $lang_code, $output, $desc ) = @_;
 
         ++$count;

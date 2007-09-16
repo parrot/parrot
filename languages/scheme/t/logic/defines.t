@@ -8,8 +8,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-# use Scheme::Test tests => 12;
-use Scheme::Test skip_all => 'Using obsolete calling conventions';
+# use Parrot::Test::Scheme tests => 12;
+use Parrot::Test::Scheme skip_all => 'Using obsolete calling conventions';
 
 output_is( <<'CODE', 'a', 'a symbol' );
 (write 'a) ; for emacs ')
