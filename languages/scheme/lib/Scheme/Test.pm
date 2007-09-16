@@ -37,7 +37,7 @@ foreach my $meth ( qw(is isnt like) ) {
             my $t = $0;
             $t =~ s/\.t$/_$count\.$_/;
             $t
-        } qw(scheme pasm pbc out); 
+        } qw(scheme pasm out); 
 
         # STDERR is written into same output file
         open LANG, '>', $lang_f or die "Unable to open '$lang_f':$!"; 
