@@ -9,12 +9,11 @@ use warnings;
 use 5.008;
 
 use Carp;
+use Data::Dumper;
+use Scheme::Builtins;
 
 our $VERSION   = '0.01';
 
-use Data::Dumper;
-
-use Scheme::Builtins;
 
 sub _gensym {
     return sprintf "G%04d", shift->{gensym}++;
@@ -22,7 +21,10 @@ sub _gensym {
 
 sub _add_inst {
     my $self = shift;
+
     push @{ $self->{instruction} }, [@_];
+
+    return;
 }
 
 #------------------------------------
@@ -53,11 +55,13 @@ sub _save {
         $self->{regs}->{$type}{$_} = 1;
         $count--;
     }
-    @temp;
+
+    return @temp;
 }
 
 sub _save_set {
     my $self = shift;
+
     my %regs = %{ $self->{regs} };
     for my $type ( keys %regs ) {
         for my $count ( 0 .. 31 ) {
@@ -65,13 +69,17 @@ sub _save_set {
                 if $regs{$type}->{$count};
         }
     }
+
+    return;
 }
 
 sub _save_1 {
     my $self = shift;
     my $type = shift || 'I';
+
     my @temp = $self->_save( 1, $type );
-    $temp[0];
+
+    return $temp[0];
 }
 
 sub _restore {
@@ -88,10 +96,13 @@ sub _restore {
             $self->{regs}->{$1}{$2} = 0;
         }
     }
+
+    return;
 }
 
 sub _restore_set {
     my $self = shift;
+
     my %regs = %{ $self->{regs} };
 
     for my $type ( reverse keys %regs ) {
@@ -100,6 +111,8 @@ sub _restore_set {
                 if $regs{$type}->{$count};
         }
     }
+
+    return;
 }
 
 sub _num_arg {
@@ -113,7 +126,8 @@ sub _num_arg {
 
 sub _get_arg {
     my ( $node, $num ) = @_;
-    $node->{children}->[$num];
+
+    return $node->{children}->[$num];
 }
 
 sub _get_args {
@@ -128,6 +142,7 @@ sub _get_args {
 # until there is a working find_lex/store_lex
 sub _find_lex {
     my ( $self, $symbol ) = @_;
+
     my $return = $self->_save_1('P');
     $self->_add_inst( '', 'find_lex', [ $return, "\"$symbol\"" ] );
 
@@ -136,17 +151,22 @@ sub _find_lex {
 
 sub _store_lex {
     my ( $self, $symbol, $value ) = @_;
-    $self->_add_inst( '', 'store_lex', [ "\"$symbol\"", $value ] );
+
+    return $self->_add_inst( '', 'store_lex', [ "\"$symbol\"", $value ] );
 }
 
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
+
     $self->_add_inst( '', 'store_lex', [ -1, "\"$symbol\"", $value ] );
     $self->{scope}->{$symbol} = $value;
+
+    return;
 }
 
 sub _new_pair {
     my ($self) = @_;
+
     my $return = $self->_save_1('P');
 
     $self->_add_inst( '', 'new', [ $return, '.Array' ] );
@@ -169,6 +189,7 @@ my $type_map = {
 
 sub _constant {
     my ( $self, $value ) = @_;
+
     my $return;
 
     if ( $value =~ /^[-+]?\d+$/ ) {
@@ -203,6 +224,8 @@ sub _morph {
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
     }
+
+    return;
 }
 
 #---- Section 4 ----
@@ -259,6 +282,7 @@ sub __quoted {
 
 sub _op_quote {
     my ( $self, $node ) = @_;
+
     my $return = $self->_save_1('P');
 
     _num_arg( $node, 1, 'quote' );
@@ -270,6 +294,7 @@ sub _op_quote {
 
 sub _op_quasiquote {
     my ( $self, $node ) = @_;
+
     my $return  = $self->_save_1('P');
     my $special = {
         unquote            => \&_qq_unquote,
@@ -280,7 +305,7 @@ sub _op_quasiquote {
 
     my $item = _get_arg( $node, 1 );
 
-    __quoted( $self, $item, $return, $special );
+    return __quoted( $self, $item, $return, $special );
 }
 
 # helper functions for quasiquote
@@ -346,11 +371,13 @@ sub _qq_unquote_splicing {
     $self->_add_inst("DONE_$label");
 
     $self->_restore( $list, $copy, $head, $type );
+
     return $return;
 }
 
 sub _op_lambda {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
     my $temp;
@@ -402,6 +429,7 @@ sub _op_lambda {
 
 sub _op_if {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -421,6 +449,7 @@ sub _op_if {
     $self->_restore($false);
 
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
@@ -508,7 +537,7 @@ sub _op_cond {
         };
     }
 
-    $self->_generate($transnode);
+    return $self->_generate($transnode);
 }
 
 sub _op_case {
@@ -516,6 +545,7 @@ sub _op_case {
 
 sub _op_and {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -527,11 +557,13 @@ sub _op_and {
     }
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
 sub _op_or {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -543,11 +575,13 @@ sub _op_or {
     }
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
 sub _op_let {
     my ( $self, $node ) = @_;
+
     my $return;
 
     my ( $locals, @body ) = _get_args( $node, 1 );
@@ -578,6 +612,7 @@ sub _op_letrec {
 
 sub _op_begin {
     my ( $self, $node ) = @_;
+
     my $temp = 'none';
 
     my @args = _get_args($node);
@@ -586,6 +621,7 @@ sub _op_begin {
         $self->_restore($temp);
         $temp = $self->_generate($_);
     }
+
     return $temp;
 }
 
@@ -621,6 +657,7 @@ sub _op_equal_p {
 
 sub _op_pair_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -649,6 +686,7 @@ sub _op_pair_p {
 
 sub _op_cons {
     my ( $self, $node ) = @_;
+
     my $return;
 
     _num_arg( $node, 2, 'cons' );
@@ -722,6 +760,7 @@ sub _op_set_cdr_bang {
 
 sub _op_null_p {
     my ( $self, $node ) = @_;
+
     my $return = $self->_save_1('I');
     my $label  = $self->_gensym();
 
@@ -744,6 +783,7 @@ sub _op_list_p {
 
 sub _op_list {
     my ( $self, $node ) = @_;
+
     my $label  = $self->_gensym();
     my $return = $self->_save_1('P');
 
@@ -769,6 +809,7 @@ sub _op_list {
 
 sub _op_length {
     my ( $self, $node ) = @_;
+
     my $label  = $self->_gensym();
     my $return = $self->_save_1('I');
 
@@ -852,6 +893,7 @@ sub _op_inexact_p {
 
 sub _op_eq {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -871,11 +913,13 @@ sub _op_eq {
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp_0);
+
     return $return;
 }
 
 sub _op_lt {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -889,11 +933,13 @@ sub _op_lt {
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp_0);
+
     return $return;
 }
 
 sub _op_gt {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -907,11 +953,13 @@ sub _op_gt {
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp_0);
+
     return $return;
 }
 
 sub _op_leq {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -925,11 +973,13 @@ sub _op_leq {
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp_0);
+
     return $return;
 }
 
 sub _op_geq {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -943,11 +993,13 @@ sub _op_geq {
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp_0);
+
     return $return;
 }
 
 sub _op_zero_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -959,11 +1011,13 @@ sub _op_zero_p {
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
 sub _op_positive_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -973,11 +1027,13 @@ sub _op_positive_p {
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
 sub _op_negative_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -987,11 +1043,13 @@ sub _op_negative_p {
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
 sub _op_odd_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -1003,11 +1061,13 @@ sub _op_odd_p {
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore( $temp_0, $temp_1 );
+
     return $return;
 }
 
 sub _op_even_p {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -1019,11 +1079,13 @@ sub _op_even_p {
     $self->_add_inst( '', 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore( $temp_0, $temp_1 );
+
     return $return;
 }
 
 sub _op_max {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -1036,11 +1098,13 @@ sub _op_max {
         $self->_add_inst("NEXT_$label");
         $self->_restore($temp);
     }
+
     return $return;
 }
 
 sub _op_min {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -1053,11 +1117,13 @@ sub _op_min {
         $self->_add_inst("NEXT_$label");
         $self->_restore($temp);
     }
+
     return $return;
 }
 
 sub _op_plus {
     my ( $self, $node ) = @_;
+
     my $return;
     my $num_children = defined $node->{children} ? @{ $node->{children} } - 1 : 0;
     if ( $num_children == 0 ) {
@@ -1086,11 +1152,13 @@ sub _op_plus {
             $self->_restore($temp);
         }
     }
+
     return $return;
 }
 
 sub _op_minus {
     my ( $self, $node ) = @_;
+
     my $return;
     my $num_children = defined $node->{children} ? @{ $node->{children} } - 1 : 0;
 
@@ -1123,11 +1191,13 @@ sub _op_minus {
             $self->_restore($temp);
         }
     }
+
     return $return;
 }
 
 sub _op_times {
     my ( $self, $node ) = @_;
+
     my $return;
     my $num_children = defined $node->{children} ? @{ $node->{children} } - 1 : 0;
 
@@ -1157,11 +1227,13 @@ sub _op_times {
             $self->_restore($temp);
         }
     }
+
     return $return;
 }
 
 sub _op_divide {
     my ( $self, $node ) = @_;
+
     my $return;
     my $num_children = defined $node->{children} ? @{ $node->{children} } - 1 : 0;
 
@@ -1194,11 +1266,13 @@ sub _op_divide {
             $self->_restore($temp);
         }
     }
+
     return $return;
 }
 
 sub _op_abs {
     my ( $self, $node ) = @_;
+
     my $return;
     my $label = $self->_gensym();
 
@@ -1208,6 +1282,7 @@ sub _op_abs {
     $self->_add_inst( '', 'mul', [ $return, $return, $temp ] );
     $self->_restore($temp);
     $self->_add_inst("DONE_$label");
+
     return $return;
 }
 
@@ -1462,6 +1537,7 @@ sub _op_vector_fill_bang {
 
 sub _op_procedure_p {
     my ( $self, $node ) = @_;
+
     my $return;
 
     _check_num_arg( $node, 1, 'procedure?' );
@@ -1477,6 +1553,7 @@ sub _op_procedure_p {
 
 sub _op_apply {
     my ( $self, $node ) = @_;
+
     my $return;
 
     my $func = $self->_generate( _get_arg( $node, 1 ) );
@@ -1553,6 +1630,7 @@ sub _op_char_ready_p {
 
 sub _op_write {
     my ( $self, $node ) = @_;
+
     my $temp = 'none';
 
     for ( _get_args($node) ) {
@@ -1565,6 +1643,7 @@ sub _op_write {
             $self->_call_function_sym( 'write', $temp );
         }
     }
+
     return $temp;    # We need to return something
 }
 
@@ -1915,18 +1994,21 @@ my %global_ops = (
 
 sub __max_lengths {
     my $colref  = shift;
+
     my @max_len = (0) x 3;
     for my $row (@$colref) {
         for ( 0 .. $#{$row} ) {
             $max_len[$_] = length( $row->[$_] ) if length $row->[$_] > $max_len[$_];
         }
     }
-    @max_len;
+
+    return @max_len;
 }
 
 sub _call_function_sym {
     my $self     = shift;
     my $symbol   = shift;
+
     my $func_obj = $self->_find_lex($symbol);
 
     my $scope = $self->{scope};
@@ -1995,6 +2077,7 @@ sub _call_function_obj {
 
 sub _format_columns {
     my $self    = shift;
+
     my $colref  = $self->{instruction};
     my @max_len = __max_lengths($colref);
 
@@ -2013,11 +2096,14 @@ sub _format_columns {
         }
         $self->{code} .= "\n";
     }
+
+    return;
 }
 
 sub new {
     my $class = shift;
     my $tree  = shift;
+
     my $self  = {
         tree      => $tree,
         regs      => _new_regs,
@@ -2026,7 +2112,8 @@ sub new {
         functions => [],
         scope     => {},
     };
-    bless $self, $class;
+
+    return bless $self, $class;
 }
 
 sub prettyprint {
@@ -2042,6 +2129,8 @@ sub prettyprint {
     }
     print ' ' x $depth;
     print ")\n";
+
+    return;
 }
 
 sub _generate {

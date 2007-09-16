@@ -112,13 +112,18 @@ my %built_ins = (
 
 sub new {
     my $class = shift;
+
     my $self = { instruction => [] };
-    bless $self, $class;
+    
+    return bless $self, $class;
 }
 
 sub _add_inst {
     my $self = shift;
+
     push @{ $self->{instruction} }, [@_];
+
+    return;
 }
 
 sub generate {
@@ -129,11 +134,11 @@ sub generate {
     my $self = Scheme::Builtins->new();
 
     for ( @{ $built_ins{$name} } ) {
-        my ( $label, $op, @args ) = @$_;
+        my ( $label, $op, @args ) = @{$_};
         $self->_add_inst( $label, $op, [@args] );
     }
 
-    $self;
+    return $self;
 }
 
 1;
