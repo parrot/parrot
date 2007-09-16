@@ -6,6 +6,11 @@ This is a list of currently deprecated features of Parrot.
 Every deprecation should have an associated RT ticket, but this
 is not the case yet [RT#41226].
 
+=head1 new object system
+
+The object system of Parrot is being overhauled. This touches some opcode
+and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
+
 =head1 .imc file extension
 
 http://xrl.us/jc4u
