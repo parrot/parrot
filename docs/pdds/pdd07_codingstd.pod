@@ -550,15 +550,6 @@ Set the C<svn:eol-style> property to C<LF> with the command:
 The F<t/distro/file_metadata.t> test checks that the files needing
 this property have it set.
 
-
-=head2 CHIP HAS EDITED THIS FAR INTO THE FILE
-
-  +-------------------------------------------------------+
-    Everything below this point must still be reviewed
-  +-------------------------------------------------------+
-
-
-
 =head2 Naming conventions
 
 =over 4
