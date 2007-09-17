@@ -552,7 +552,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <t> type ptr pragma_1 hll_def
 %type <i> program
 %type <i> class_namespace
-%type <i> global constdef sub emit pcc_sub  pcc_ret
+%type <i> constdef sub emit pcc_sub  pcc_ret
 %type <i> compilation_units compilation_unit pmc_const pragma
 %type <s> classname relop any_string
 %type <i> labels _labels label  statement sub_call
@@ -613,7 +613,6 @@ compilation_units:
 compilation_unit:
      class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
-   | global        { $$ = $1; }
    | sub           { $$ = $1;
                      imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                      IMCC_INFO(interp)->cur_unit = 0; }
@@ -658,21 +657,6 @@ hll_def: HLL STRINGC COMMA STRINGC
              Parrot_register_HLL_type(interp,
                 CONTEXT(((Interp*)interp)->ctx)->current_HLL, atoi($2), atoi($4));
              $$ = 0;
-         }
-   ;
-
-global:
-     GLOBAL type IDENTIFIER
-         {
-            IMCC_fataly(interp, E_SyntaxError,
-                ".global not implemented yet\n");
-            $$ = 0;
-         }
-   | GLOBAL type IDENTIFIER '=' const
-         {
-            IMCC_fataly(interp, E_SyntaxError,
-                ".global not implemented yet\n");
-            $$ = 0;
          }
    ;
 
