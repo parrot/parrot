@@ -20,7 +20,7 @@ Tests C<table> type
 use strict;
 use warnings;
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -251,6 +251,102 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .end
 CODE
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check len' );
+.HLL 'Lua', 'lua_group'
+.sub _main
+    .local pmc pmc1
+    pmc1 = new 'LuaTable'
+    .local pmc key1
+    key1 = new 'LuaNumber'
+    set key1, 1
+    .local pmc val1
+    val1 = new 'LuaString'
+    set val1, "value1"
+    pmc1[key1] = val1
+    inc key1
+    .local pmc val2
+    val2 = new 'LuaString'
+    set val2, "value2"
+    pmc1[key1] = val2
+    inc key1
+    .local pmc val3
+    val3 = new 'LuaString'
+    set val3, "value3"
+    pmc1[key1] = val3
+    inc key1
+    .local pmc val4
+    val4 = new 'LuaString'
+    set val4, "value4"
+    pmc1[key1] = val4
+    .local pmc len
+    len = pmc1.'len'()
+    print len
+    print "\n"
+    val3 = new 'LuaNil'
+    dec key1
+    pmc1[key1] = val3
+    len = pmc1.'len'()
+    print len
+    print "\n"
+    end
+.end
+CODE
+4
+2
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check next' );
+.HLL 'Lua', 'lua_group'
+.sub _main
+    .local pmc pmc1
+    pmc1 = new 'LuaTable'
+    .local pmc key1
+    key1 = new 'LuaNumber'
+    set key1, 1
+    .local pmc val1
+    val1 = new 'LuaString'
+    set val1, "value1"
+    pmc1[key1] = val1
+    inc key1
+    .local pmc val2
+    val2 = new 'LuaString'
+    set val2, "value2"
+    pmc1[key1] = val2
+    inc key1
+    .local pmc val3
+    val3 = new 'LuaString'
+    set val3, "value3"
+    pmc1[key1] = val3
+    .local pmc nil
+    nil = new 'LuaNil'
+    .local pmc pmc2, key
+    $P0 = pmc1.'next'(nil)
+    key = $P0[0]
+    pmc2 = $P0[1]
+    print pmc2
+    print "\n"
+    $P0 = pmc1.'next'(key)
+    key = $P0[0]
+    pmc2 = $P0[1]
+    print pmc2
+    print "\n"
+    $P0 = pmc1.'next'(key)
+    key = $P0[0]
+    pmc2 = $P0[1]
+    print pmc2
+    print "\n"
+    $P0 = pmc1.'next'(key)
+    print $P0
+    print "\n"
+    end
+.end
+CODE
+value1
+value2
+value3
+nil
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );

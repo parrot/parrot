@@ -173,11 +173,9 @@ So, use the option C<--no-gc>.
 
 Arguments passing in C<invoke> method of C<table>. Where are there ?
 
-Weak table, weak reference.
-
 =head2 IMPROVEMENT
 
-C<table> with a mixed array and hash (and with an efficient C<next> method).
+C<table> with a mixed array and hash (like Lua 5).
 
 =head1 Lua Standard Libraries
 
@@ -211,7 +209,7 @@ F<languages/lua/lib/luaregex.pir> implements a regex compiler using PGE.
 
 =head2 TODO
 
-Except math & table libraries, all of these libraries are incomplete.
+Complete some of these libraries.
 
 =head2 IMPROVEMENT
 
