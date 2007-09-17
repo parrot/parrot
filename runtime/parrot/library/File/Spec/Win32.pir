@@ -18,12 +18,12 @@
 .end
 
 
-.sub 'devnull' method
+.sub 'devnull' :method
     .return( 'nul' )
 .end
 
 
-.sub 'tmpdir' method
+.sub 'tmpdir' :method
     .local pmc tmpdir
     tmpdir= new 'ResizableStringArray'
 
@@ -79,12 +79,12 @@ return_cached:
 .end
 
 
-.sub case_tolerant method
+.sub case_tolerant :method
     .return( 1 )
 .end
 
 
-.sub 'file_name_is_absolute' method
+.sub 'file_name_is_absolute' :method
     .param string file
 
     .local pmc p6rule
@@ -101,7 +101,7 @@ return_cached:
 .end
 
 
-.sub 'catfile' method
+.sub 'catfile' :method
     _E_not_yet_implemented()
 
 =for later development
@@ -149,7 +149,7 @@ return:
 .end
 
 
-.sub 'catdir' method
+.sub 'catdir' :method
     .param pmc dirs :slurpy
 
     .local int num_args
@@ -206,13 +206,13 @@ return:
 .end
 
 
-.sub 'path' method
+.sub 'path' :method
 ##TODO
     '_E_not_yet_implemented'()
 .end
 
 
-.sub 'canonpath' method
+.sub 'canonpath' :method
     .param string path
 
     .local pmc p6rule, rulesub, match
@@ -438,7 +438,7 @@ return:
 
 
 ## TODO probably broken
-.sub 'splitpath' method
+.sub 'splitpath' :method
     .param string path
     .param int no_file
     .local string volume, directory, file
@@ -496,7 +496,7 @@ return:
 
 
 ## TODO unfinished
-.sub 'splitdir' method
+.sub 'splitdir' :method
     .param string directories
     '_E_not_yet_implemented'()
 
@@ -528,7 +528,7 @@ return:
 
 
 ## TODO unfinished
-.sub 'catpath' method
+.sub 'catpath' :method
     .param string volume
     .param string directory
     .param string file
@@ -539,18 +539,18 @@ return:
 
 
 ## TODO unfinished
-.sub 'abs2rel' method
+.sub 'abs2rel' :method
     '_E_not_yet_implemented'()
 .end
 
 
 ## TODO unfinished
-.sub 'rel2abs' method
+.sub 'rel2abs' :method
     '_E_not_yet_implemented'()
 .end
 
 
-.sub 'VERSION' method
+.sub 'VERSION' :method
     .local pmc version
     version= global 'VERSION'
     .return( version )

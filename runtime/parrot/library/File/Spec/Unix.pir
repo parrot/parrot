@@ -5,94 +5,94 @@
 	newclass self, 'File::Spec::Unix'
 .end
 
-.sub 'curdir' method
+.sub 'curdir' :method
 	.return( '.' )
 .end
 
 
-.sub 'devnull' method
+.sub 'devnull' :method
 	.return( '/dev/null' )
 .end
 
 
-.sub 'rootdir' method
+.sub 'rootdir' :method
 	.return( '/' )
 .end
 
 
-.sub 'tmpdir' method
+.sub 'tmpdir' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'updir' method
+.sub 'updir' :method
 	.return( '..' )
 .end
 
 
-.sub 'no_upwards' method
+.sub 'no_upwards' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'case_tolerant' method
+.sub 'case_tolerant' :method
 	.return( 1 )
 .end
 
 
-.sub 'file_name_is_absolute' method
+.sub 'file_name_is_absolute' :method
 	.return( 0 )
 .end
 
 
-.sub 'VERSION' method
+.sub 'VERSION' :method
 	.local pmc version
 	version= global 'VERSION'
 	.return( version )
 .end
 
 
-.sub 'catfile' method
+.sub 'catfile' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'catdir' method
+.sub 'catdir' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'path' method
+.sub 'path' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'canonpath' method
+.sub 'canonpath' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'splitpath' method
+.sub 'splitpath' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'splitdir' method
+.sub 'splitdir' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'catpath' method
+.sub 'catpath' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'abs2rel' method
+.sub 'abs2rel' :method
 	'_E_not_yet_implemented'()
 .end
 
 
-.sub 'rel2abs' method
+.sub 'rel2abs' :method
 	'_E_not_yet_implemented'()
 .end
 

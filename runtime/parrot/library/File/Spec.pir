@@ -54,7 +54,7 @@ called as object methods.
 .namespace [ 'File::Spec' ]
 
 
-.sub VERSION method
+.sub VERSION :method
     .local string version
     version= '0.1'
     .return( version )
@@ -145,7 +145,7 @@ found_module:
 .end
 
 
-.sub '__isa' method
+.sub '__isa' :method
     .local pmc sub
     .local string name
     
