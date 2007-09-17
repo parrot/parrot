@@ -1,5 +1,29 @@
 # $Id$
 
+New in 0.4.16
+- Implementation:
+ + Lots of PMC code cleanups.
+ + Parrot now uses Storable for .dump files.  This speeds up the build by quite a bit.
+ + An official pdd15 branch was created for pdd15 development.
+ + PMC creation was changed from constant syntax to string style in code and tests.
+ + Bareword method in PIR sub declarations is now deprecated.  The ":method" adverbial
+   syntax is preferred.
+ + Lots of source code maintenance, due to coding standard tests for trailing whitespace,
+   svn Id keyword, return statements and copyright dates.
+ + Parrot got a cover target in the Makefile, to generate coverage tests of parrot itself with
+   gcov and Devel::Cover.
+ + Due to the behavior of certain compilers(icc), any function calling the CONST_STRING macro
+   should not span more than one line.
+ + FUNCDOC has been replaced with POD.  The long term plan is to use Perl 6's POD.
+- Languages:
+ + NQP got lists, for loops, operators, comparisons and multiplcative operators.
+ + An ANSI Common Lisp implementation, Kea Common Lisp, is in development.  The repository
+   is available at https://rgrjr.dyndns.org/svn/kea-cl/trunk/
+- Documentation
+ + The PMC PDD was launched.
+ + More PIR tutorial examples.  The tutorials can now be run through the test
+   suite (see t/examples/tutorial.t)
+
 New in 0.4.15
 - Implementation:
  + Lots of code review, many bugs fixed
