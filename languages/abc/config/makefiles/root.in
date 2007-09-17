@@ -5,6 +5,8 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
+BUILD_DIR= @build_dir@
+RECONFIGURE= $(PERL) @build_dir@/tools/dev/reconfigure.pl
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 TOOL_DIR = ../..
 PGE_DIR  = ../../compilers/pge
@@ -53,6 +55,10 @@ help:
 
 test: abc.pbc
 	prove -r t
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=abc
 
 # this target has nothing to do
 testclean:
