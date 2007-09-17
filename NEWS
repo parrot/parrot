@@ -2,27 +2,20 @@
 
 New in 0.4.16
 - Implementation:
- + Lots of PMC code cleanups.
- + Parrot now uses Storable for .dump files.  This speeds up the build by quite a bit.
- + An official pdd15 branch was created for pdd15 development.
- + PMC creation was changed from constant syntax to string style in code and tests.
- + Bareword method in PIR sub declarations is now deprecated.  The ":method" adverbial
-   syntax is preferred.
- + Lots of source code maintenance, due to coding standard tests for trailing whitespace,
-   svn Id keyword, return statements and copyright dates.
- + Parrot got a cover target in the Makefile, to generate coverage tests of parrot itself with
-   gcov and Devel::Cover.
- + Due to the behavior of certain compilers(icc), any function calling the CONST_STRING macro
-   should not span more than one line.
- + FUNCDOC has been replaced with POD.  The long term plan is to use Perl 6's POD.
+ + Performed code review on every PMC
+ + Modified PMC code generation to use Storable, reducing compile times
+ + Added a makefile target to generate test coverage data of C sources
 - Languages:
- + NQP got lists, for loops, operators, comparisons and multiplcative operators.
- + An ANSI Common Lisp implementation, Kea Common Lisp, is in development.  The repository
-   is available at https://rgrjr.dyndns.org/svn/kea-cl/trunk/
+ + NQP: added lists, for loops, operators, comparison and multiplcative operators
+ + Announced Kea-CL, Kea Common Lisp, an ANSI Common Lisp implementation
+   The repository is available at https://rgrjr.dyndns.org/svn/kea-cl/trunk/
 - Documentation
- + The PMC PDD was launched.
- + More PIR tutorial examples.  The tutorials can now be run through the test
-   suite (see t/examples/tutorial.t)
+ + PDD17 "PMCs" - draft approved, the design is complete
+ + Added more PIR tutorials, see examples/tutorial/00_README.pod
+- Miscellaneous:
+ + Many bugfixes, enhancements, documentation, and coding standard updates
+ + Deprecated PMC constants and other crufty syntax, see DEPRECATED.pod
+ + Improved icc compiler compatibility for error line reporting
 
 New in 0.4.15
 - Implementation:
