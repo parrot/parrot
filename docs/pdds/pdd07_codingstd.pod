@@ -69,8 +69,6 @@ C code that makes assumptions beyond these must depend on the configuration
 system, either to not compile an entire non-portable source where it will not
 work, or to provide an appropriate #ifdef macro.
 
-{{ RT#45359: Enumerate all other non-C89 assumptions that Parrot depends on. }}
-
 =item *
 
 Perl code must be written for Perl 5.8.0 and all later versions.
@@ -312,8 +310,10 @@ macro, unfortunately leading to violations of the double-negative rule.)
 
 =item *
 
-Avoid dependency on "FIXME" and "TODO" labels; if a bug must be fixed soon,
-use "XXX", else use the external bug tracking system.
+Avoid dependency on "FIXME" and "TODO" labels: use the external bug tracking
+system.  If a bug must be fixed soon, use "XXX" B<and> put a ticket in the
+bug tracking system.  This means that each "XXX" should have an RT ticket
+number next to it.
 
 =back
 
@@ -563,14 +563,6 @@ this property have it set.
 
 =over 4
 
-=item Subsystems and APIs
-
-The Parrot core will be split into a number of subsystems, each with an
-associated API. For the purposes of naming files, data structures, etc., each
-subsystem will be assigned a short nickname, e.g. I<pmc>, I<gc>, I<io>. All code
-within the core will belong to a subsystem; miscellaneous code with no obvious
-home will be placed in the special subsystem called I<misc>.
-
 =item Filenames
 
 Filenames must be assumed to be case-insensitive, in the sense that that you
@@ -603,13 +595,13 @@ This contains all the declarations needed for external users of that API (and
 nothing more), i.e. it defines the API. It is permissible for the API to include
 different or extra functionality when used by other parts of the core, compared
 with its use in extensions and embeddings. In this case, the extra stuff within
-the file is enabled by testing for the macro C<PERL_IN_CORE>.
+the file is enabled by testing for the macro C<PARROT_IN_CORE>.
 
 =item C<foo_private.h>
 
 This contains declarations used internally by that subsystem, and which must
 only be included within source files associated the subsystem. This file
-defines the macro C<PERL_IN_FOO> so that code knows when it is being used
+defines the macro C<PARROT_IN_FOO> so that code knows when it is being used
 within that subsystem. The file will also contain all the 'convenience' macros
 used to define shorter working names for functions without the perl prefix (see
 below).
@@ -619,13 +611,6 @@ below).
 This file contains the declaration of a single structure containing the private
 global variables used by the subsystem (see the section on globals below for
 more details).
-
-=item C<foo.sym>
-
-This file (format and contents TBD) contains information about global symbols
-associated with the subsystem, and may be used by scripts to auto-generate such
-stuff as the include files mentioned above, linker map tables, documentation
-etc., based upon portability and extensibility requirements.
 
 =item C<foo_bar.[ch]> etc.
 
@@ -726,14 +711,15 @@ e.g. C<HAS_BROKEN_FLOCK>, C<HAS_EBCDIC>.
 
 =item *
 
-A macro indicating the compilation 'location' should be prefixed with C<IN_>,
-e.g. C<PERL_IN_CORE>, C<PERL_IN_PMC>, C<PERL_IN_X2P>. Individual include file
-visitations should be marked with C<PERL_IN_FOO_H> for file C<foo.h>
+A macro indicating the compilation 'location' should be prefixed with
+C<IN_>, e.g. C<PARROT_IN_CORE>, C<PARROT_IN_PMC>, C<PARROT_IN_X2P>.
+Individual include file visitations should be marked with C<PARROT_IN_FOO_H>
+for file C<foo.h>
 
 =item *
 
 A macro indicating major compilation switches should be prefixed with C<USE_>,
-e.g. C<PERL_USE_STDIO>, C<USE_MULTIPLICITY>.
+e.g. C<PARROT_USE_STDIO>, C<USE_MULTIPLICITY>.
 
 =item *
 
@@ -778,7 +764,7 @@ example have the following macros:
     #ifdef HAS_THREADS
     #  define GLOBALS_BASE (aTHX_->globals)
     #else
-    #  define GLOBALS_BASE (Perl_globals)
+    #  define GLOBALS_BASE (Parrot_globals)
     #endif
 
     /* pmc_private.h */
