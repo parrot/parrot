@@ -33,7 +33,7 @@ INTVAL dynpmc_LuaUserdata;
 static PMC * Lua_PMC;
 
 static STRING*
-context_infostr(Interp *interp, parrot_context_t *ctx)
+context_infostr(PARROT_INTERP, parrot_context_t *ctx)
 {
     struct Parrot_Context_info info;
     STRING *res = NULL;

@@ -22,7 +22,7 @@ C<LuaAny> provides an abstract base class for some Lua types.
 
 
 PMC *
-find_meth(Interp* interp, PMC *obj, const char *name) {
+find_meth(PARROT_INTERP, PMC *obj, const char *name) {
     PMC *meta = NULL;
     INTVAL type = obj->vtable->base_type;
 
