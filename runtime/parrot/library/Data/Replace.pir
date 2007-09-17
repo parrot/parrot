@@ -145,7 +145,7 @@ END:
     .pcc_end_return
 .end
 
-.sub Hash method
+.sub Hash :method
     .param pmc where
     .param pmc oldVal
     .param pmc newVal
@@ -179,7 +179,7 @@ END:
     .pcc_end_return
 .end
 
-.sub Hash method
+.sub Hash :method
     .param pmc where
     .param pmc oldVal
     .param pmc newVal

@@ -32,7 +32,7 @@ loop:
 .end
 
 .namespace ["Foo"]
-.sub __init method
+.sub __init :method
     .local int ofs
     ofs = classoffset self, "Foo"
     new $P10, 'Integer'
@@ -44,7 +44,7 @@ loop:
     setattribute self, ofs, $P10
 .end
 
-.pcc_sub i method
+.pcc_sub i :method
     .local int ofs
     ofs = classoffset self, "Foo"
     .local pmc r
@@ -54,7 +54,7 @@ loop:
     .pcc_end_return
 .end
 
-.pcc_sub j method
+.pcc_sub j :method
     .local int ofs
     ofs = classoffset self, "Foo"
     inc ofs

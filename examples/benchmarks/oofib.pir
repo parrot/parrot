@@ -42,7 +42,7 @@ noarg:
 
 .namespace ["A"]
 
-.sub fib method
+.sub fib :method
     .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
@@ -66,7 +66,7 @@ rec:
     .pcc_end_return
 .end
 
-.sub fibA method
+.sub fibA :method
     .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
@@ -92,7 +92,7 @@ rec:
 
 .namespace ["B"]
 
-.sub fibB method
+.sub fibB :method
     .param pmc n
     if n >= 2 goto rec
     .pcc_begin_return
