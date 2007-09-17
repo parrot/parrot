@@ -1212,7 +1212,7 @@ change_op(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg **r), int num, 
 
 =item C<try_find_op()>
 
-Try to find valid op doing the same operation e.g. 
+Try to find valid op doing the same operation e.g.
 
    add_n_i_n => add_n_n_i
    div_n_ic_n => div_n_nc_n
