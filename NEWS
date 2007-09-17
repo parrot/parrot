@@ -6,7 +6,7 @@ New in 0.4.16
  + Modified PMC code generation to use Storable, reducing compile times
  + Added a makefile target to generate test coverage data of C sources
 - Languages:
- + NQP: added lists, for loops, operators, comparison and multiplcative operators
+ + NQP: added lists, for loops, operators, comparison and multiplicative operators
  + Announced Kea-CL, Kea Common Lisp, an ANSI Common Lisp implementation
    The repository is available at https://rgrjr.dyndns.org/svn/kea-cl/trunk/
 - Documentation
