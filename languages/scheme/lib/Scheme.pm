@@ -3,7 +3,7 @@
 
 package Scheme;
 
-# pramata
+# pragmata
 use strict;
 use warnings;
 use 5.008;
