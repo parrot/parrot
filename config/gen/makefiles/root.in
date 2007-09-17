@@ -1656,7 +1656,8 @@ imcc-clean:
 realclean : clean
 	$(RM_RF) \
     $(STICKY_FILES) \
-    blib
+    blib \
+    cover_db
 
 distclean : realclean
 
