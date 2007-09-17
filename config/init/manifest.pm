@@ -45,7 +45,7 @@ files and then try running Configure again.
 
 END
 
-        return;
+        exit 1;
     }
 
     return $self;
