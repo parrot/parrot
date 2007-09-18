@@ -167,10 +167,6 @@ Removes unreachable code
 
 Does conservative constant propagation, i.e. replaces "1 + 2" with "3"
 
-=item clone_remove()
-
-Removes a clone, TURNED OFF
-
 =item used_once()
 
 Removes an instruction when the register written is only used once (only
