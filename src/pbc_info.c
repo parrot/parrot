@@ -86,7 +86,6 @@ main(int argc, char * argv[])
     PackFile_map_segments(interp, &pf->directory, iter, (void*)2);
 
     Parrot_exit(interp, 0);
-    return 0;
 }
 
 /*

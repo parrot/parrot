@@ -70,8 +70,6 @@ main(int argc, char *argv[])
     do_dis(interp);
 
     Parrot_exit(interp, 0);
-
-    return 0;
 }
 
 /*

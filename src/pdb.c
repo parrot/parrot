@@ -202,8 +202,6 @@ main(int argc, char *argv[])
 
     Parrot_runcode(interp, argc - 1, argv + 1);
     Parrot_exit(interp, 0);
-
-    return 0;
 }
 
 /*

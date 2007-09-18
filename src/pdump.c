@@ -200,7 +200,7 @@ main(int argc, char **argv)
     int disas = 0;
     int convert = 0;
     int header = 0;
-    const char *file;
+    const char *file = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
 
@@ -289,7 +289,6 @@ main(int argc, char **argv)
     PackFile_Segment_dump(interp, &pf->directory.base);
 
     Parrot_exit(interp, 0);
-    return 0;
 }
 
 
