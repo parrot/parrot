@@ -54,16 +54,14 @@ opcodes.  But for now, certain efficiency hacks are easier with four opcodes.)
 
 The common syntax of these opcodes is:
 
- <set_opcode> "(flags0, flags1, ..., flagsN)", VAL0, VAL1, ... VALN
- <get_opcode> "(flags0, flags1, ..., flagsN)", REG0, REG1, ... REGN
- <get_opcode> "(..., 0x200, flags0, ...)", ..., "name", REG0, ...
+ <set_opcode> "flags0, flags1, ..., flagsN", VAL0, VAL1, ... VALN
+ <get_opcode> "flags0, flags1, ..., flagsN", REG0, REG1, ... REGN
+ <get_opcode> "..., 0x200, flags0, ...", ..., "name", REG0, ...
 
 The flags string is a literal quoted string denoting a list of zero or more
 comma-separated integers.  Integers may be specified either in decimal, or if
 prefixed with "0b"/"0x", in binary/hexadecimal.  There must be exactly one
 integer for each value or register given.
-
-(RT#45363 DEPRECATED: The list as a whole may be surrounded by parentheses.)
 
 For documentation purposes we'll number the bits 0 (low) through 30 (high).
 Bit 31 (and higher, where available) will not be used.
