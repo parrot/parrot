@@ -1492,13 +1492,13 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
             if (PObj_bufstart(obj) &&
                     !PObj_is_external_or_free_TESTALL(obj)) {
                 if (PObj_COW_TEST(obj)) {
-                    INTVAL *refcount = ((INTVAL *)PObj_bufstart(obj) - 1);
+                    INTVAL *refcount = PObj_bufrefcountptr(obj);
 
                     if (!--(*refcount))
                         free(refcount); /* the actual bufstart */
                 }
                 else
-                    free((INTVAL*)PObj_bufstart(obj) - 1);
+                    free(PObj_bufrefcountptr(obj));
             }
 #  else
             /*

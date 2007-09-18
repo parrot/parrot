@@ -422,7 +422,7 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
                     if (PObj_is_COWable_TEST(b)) {
-                        ref_count = ((INTVAL*) PObj_bufstart(b)) - 1;
+                        ref_count = PObj_bufrefcountptr(b);
 
                         if (PObj_is_string_TEST(b)) {
                             offset = (ptrdiff_t)((STRING *)b)->strstart -

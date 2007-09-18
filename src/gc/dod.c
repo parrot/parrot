@@ -769,7 +769,7 @@ Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         return;
 
     if (PObj_COW_TEST(b)) {
-        INTVAL *refcount = ((INTVAL *)PObj_bufstart(b) - 1);
+        INTVAL *refcount = PObj_bufrefcountptr(b);
 
         if (!--(*refcount)) {
             free(refcount); /* the actual bufstart */
@@ -777,7 +777,7 @@ Parrot_dod_free_buffer_malloc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         }
     }
     else
-        free((INTVAL *)PObj_bufstart(b) - 1);
+        free(PObj_bufrefcountptr(b));
 }
 
 /*
