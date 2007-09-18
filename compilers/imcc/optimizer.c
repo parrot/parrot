@@ -99,18 +99,6 @@ static int branch_cond_loop_swap( PARROT_INTERP,
 static int branch_reorg( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-static int check_clone( PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction *ins) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-static int clone_remove( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static int constant_propagation( PARROT_INTERP, IMC_Unit * unit )
         __attribute__nonnull__(1);
 
@@ -235,8 +223,6 @@ optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
         IMCC_info(interp, 2, "optimize\n");
         any = constant_propagation(interp, unit);
-        if (0 && clone_remove(interp, unit)) /* XXX Why is this commented out? */
-            return 1;
         if (used_once(interp, unit))
             return 1;
 #if DO_LOOP_OPTIMIZATION
