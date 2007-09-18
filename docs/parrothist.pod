@@ -102,4 +102,6 @@ the strings?).
 
  Patrick   0.4.15         2007-Aug-22     "Augean Stable"
 
+ Jerry     0.4.16         2007-Sep-18     "A Farewell to Alex"
+
 =cut

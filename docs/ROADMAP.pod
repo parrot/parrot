@@ -34,9 +34,9 @@ This is the B<highest> priority.
 
 =back
 
-=head1 CURRENT RELEASE (0.4.15)
+=head1 CURRENT RELEASE (0.4.16)
 
-Parrot 0.4.15 was released on August 22, 2007. For a list of new and fixed
+Parrot 0.4.16 was released on September 18, 2007. For a list of new and fixed
 feature see L<NEWS>.
 
 =head1 OVERVIEW
