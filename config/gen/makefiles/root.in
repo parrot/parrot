@@ -1621,6 +1621,7 @@ test-clean :
     "t/compilers/*/*/*.pir" \
     "t/compilers/*/*/*.stabs.s"
 	$(RM_F) \
+    "t/dynoplibs/*.pbc" \
     "t/examples/*.pbc" \
     "t/examples/*_pbcexe*" \
     "t/examples/*.past"
