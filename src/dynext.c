@@ -142,7 +142,7 @@ is_loaded(PARROT_INTERP, NOTNULL(STRING *path))
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
     if (!VTABLE_exists_keyed_str(interp, dyn_libs, path))
-        return NULL;
+        return PMCNULL;
     return VTABLE_get_pmc_keyed_str(interp, dyn_libs, path);
 }
 
@@ -469,7 +469,7 @@ Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
         lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
     }
     lib_pmc = is_loaded(interp, wo_ext);
-    if (lib_pmc) {
+    if (!PMC_IS_NULL(lib_pmc)) {
         /* UNLOCK() */
         return lib_pmc;
     }
