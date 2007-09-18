@@ -1172,6 +1172,8 @@ $(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(SRC_DIR)/jit_emit.h \
 
 $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h : $(IMCC_DIR)/imcc.y
 	$(YACC) $(IMCC_DIR)/imcc.y -d -o $(IMCC_DIR)/imcparser.c
+	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcc.y
+	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl $(IMCC_DIR)/imcparser.h $(IMCC_DIR)/imcc.y
 	$(TOUCH) $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h
 
 $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
