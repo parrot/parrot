@@ -12,6 +12,10 @@ Handles the accessing of small object pools (header pools).
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -61,7 +65,7 @@ static void more_traceable_objects( PARROT_INTERP,
 
 /*
 
-FUNCDOC: contained_in_pool
+=item C<contained_in_pool>
 
 Returns whether C<pool> contains C<*ptr>.
 
@@ -92,7 +96,7 @@ contained_in_pool(NOTNULL(const Small_Object_Pool *pool), NOTNULL(const void *pt
 
 /*
 
-FUNCDOC: Parrot_is_const_pmc
+=item C<Parrot_is_const_pmc>
 
 Returns whether C<*pmc> is a constant PMC.
 
@@ -113,7 +117,7 @@ Parrot_is_const_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-FUNCDOC: more_traceable_objects
+=item C<more_traceable_objects>
 
 We're out of traceable objects. Try a DOD, then get some more if needed.
 
@@ -143,7 +147,7 @@ more_traceable_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: gc_ms_add_free_object
+=item C<gc_ms_add_free_object>
 
 Add an unused object back to the free pool for later reuse.
 
@@ -159,7 +163,7 @@ gc_ms_add_free_object(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(POb
 
 /*
 
-FUNCDOC: gc_ms_get_free_object
+=item C<gc_ms_get_free_object>
 
 Get a new object from the free pool and return it.
 
@@ -191,7 +195,7 @@ gc_ms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: Parrot_add_to_free_list
+=item C<Parrot_add_to_free_list>
 
 Adds the objects in the newly allocated C<arena> to the free list.
 
@@ -228,7 +232,7 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_append_arena_in_pool
+=item C<Parrot_append_arena_in_pool>
 
 insert the new arena into the pool's structure, update stats
 
@@ -262,7 +266,7 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
 
 /*
 
-FUNCDOC: gc_ms_alloc_objects
+=item C<gc_ms_alloc_objects>
 
 We have no more headers on the free header pool. Go allocate more
 and put them on.
@@ -313,7 +317,7 @@ gc_ms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: new_small_object_pool
+=item C<new_small_object_pool>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
 
@@ -336,6 +340,16 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
     return pool;
 }
 
+/*
+
+=item C<gc_pmc_ext_pool_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
 {
@@ -344,6 +358,16 @@ gc_pmc_ext_pool_init(NOTNULL(Small_Object_Pool *pool))
     pool->alloc_objects   = gc_ms_alloc_objects;
     pool->more_objects    = gc_ms_alloc_objects;
 }
+
+/*
+
+=item C<gc_ms_pool_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
@@ -356,7 +380,7 @@ gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: Parrot_gc_ms_init
+=item C<Parrot_gc_ms_init>
 
 Initialize the state structures of the gc system. Called immediately before
 creation of memory pools. This function must set the function pointers
@@ -377,7 +401,7 @@ Parrot_gc_ms_init(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_small_object_pool_merge
+=item C<Parrot_small_object_pool_merge>
 
 Merge C<source> into C<dest>.
 
@@ -444,6 +468,8 @@ Parrot_small_object_pool_merge(PARROT_INTERP,
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

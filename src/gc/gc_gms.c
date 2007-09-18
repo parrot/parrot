@@ -106,6 +106,8 @@ A chained list of headers used e.g. for the IGP list.
 
 =back
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -324,49 +326,54 @@ static int trace_igp_cb( PARROT_INTERP,
 
 
 /*
+
+=pod
+
  * XXX
- *
- * Main problem TODO 1):
- *
- * [ PCont ]       ... continuation object in old generation
- *    |
- *    v
- * [ Stack chunk ] --> [ e.g. P register frame ]  ... new generation
- *
- * By pushing a new stack chunk onto the (old) existing stack frame,
- * we'd need a WRITE_BARRIER that promotes the stack chunk to the old
- * generation of the continuation.
- * This would also need an IGP entry for the stack chunk buffer. But -
- * as buffers aren't really containers in Parrot - this isn't possible.
- *
- * To get that right, the code needs better support by the running
- * interpreter.
- * - never promote continuations (and stacks) in the current stack frame
- *   to an old generation
- * - create scope_enter / scope_exit opcodes
- *
- * A scope_enter happens on a subroutine call *and' with new_pad /
- * push_pad opcodes. Each lexical scope must have its distinct register
- * frame, else timely destruction can't work.
- * If the frame needs active destruction, the old frame should be
- * converted to the (new-1) generation, the inner frame is the nursery.
- * On scope exit the newest (nursery) generation is collected and the
- * current generation number is reset back to (new-1).
- *
- * If the scope_enter doesn't indicate timely destruction, generation
- * promoting should be done only, if object statistics indicate the
- * presence of a fair amount of live objects.
- *
- * TODO 2) in lazy sweep
- * If timely destruction didn't find (all) eager objects, go back to
- * older generations, until all these objects have been seen.
- *
- * TODO 3) interpreter startup
- * After all internal structures are created, promote interpreter state
- * into initial first old generation by running one GC cycle before
- * program execution begins (or just treat all objects as being alive).
- *
- */
+
+Main problem TODO 1):
+
+ [ PCont ]       ... continuation object in old generation
+    |
+    v
+ [ Stack chunk ] --> [ e.g. P register frame ]  ... new generation
+
+By pushing a new stack chunk onto the (old) existing stack frame,
+we'd need a WRITE_BARRIER that promotes the stack chunk to the old
+generation of the continuation.
+This would also need an IGP entry for the stack chunk buffer. But -
+as buffers aren't really containers in Parrot - this isn't possible.
+
+To get that right, the code needs better support by the running
+interpreter.
+ - never promote continuations (and stacks) in the current stack frame
+   to an old generation
+ - create scope_enter / scope_exit opcodes
+
+A scope_enter happens on a subroutine call *and' with new_pad /
+push_pad opcodes. Each lexical scope must have its distinct register
+frame, else timely destruction can't work.
+If the frame needs active destruction, the old frame should be
+converted to the (new-1) generation, the inner frame is the nursery.
+On scope exit the newest (nursery) generation is collected and the
+current generation number is reset back to (new-1).
+
+If the scope_enter doesn't indicate timely destruction, generation
+promoting should be done only, if object statistics indicate the
+presence of a fair amount of live objects.
+
+TODO 2) in lazy sweep
+If timely destruction didn't find (all) eager objects, go back to
+older generations, until all these objects have been seen.
+
+TODO 3) interpreter startup
+After all internal structures are created, promote interpreter state
+into initial first old generation by running one GC cycle before
+program execution begins (or just treat all objects as being alive).
+
+=cut
+
+*/
 
 /*
  * call code to verify chain of pointers after each change
@@ -381,21 +388,13 @@ static int trace_igp_cb( PARROT_INTERP,
 
 =head2 Initialization functions
 
-FUNCDOC: parrot_gc_gms_deinit
+=over 4
+
+=item C<parrot_gc_gms_deinit>
 
 Free used resources.
 
-FUNCDOC: gc_gms_pool_init
-
-Initialize pool variables. This function must set the pool function pointers
-for C<add_free_object>, C<get_free_object>, C<alloc_objects>, and
-C<more_objects>.
-
-
-FUNCDOC: Parrot_gc_gms_init
-
-Initialize the state structures of the gc system. Called immediately before
-creation of memory pools.
+=cut
 
 */
 
@@ -411,6 +410,16 @@ parrot_gc_gms_deinit(PARROT_INTERP)
     arena_base->gc_private = NULL;
 }
 
+/*
+
+=item C<gc_gms_pool_init>
+
+Initialize pool variables. This function must set the pool function pointers
+for C<add_free_object>, C<get_free_object>, C<alloc_objects>, and
+C<more_objects>.
+
+*/
+
 static void
 gc_gms_pool_init(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
 {
@@ -425,6 +434,17 @@ gc_gms_pool_init(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
 
     pool->object_size += sizeof (Gc_gms_hdr);
 }
+
+/*
+
+=item C<Parrot_gc_gms_init>
+
+Initialize the state structures of the gc system. Called immediately before
+creation of memory pools.
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -445,23 +465,17 @@ Parrot_gc_gms_init(PARROT_INTERP)
 
 /*
 
+=back
+
 =head2 Interface functions
 
-FUNCDOC: gc_gms_add_free_object
+=over 4
+
+=item C<gc_gms_add_free_object>
 
 Unused. White (dead) objects are added in a bunch to the free_list.
 
-FUNCDOC: gc_gms_get_free_object
-
-Get a new object off the free_list in the given pool.
-
-FUNCDOC: gc_gms_alloc_objects
-
-Allocate new objects for the given pool.
-
-FUNCDOC: gc_gms_more_objects
-
-Run a GC cycle or allocate new objects for the given pool.
+=cut
 
 */
 
@@ -474,13 +488,16 @@ gc_gms_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 
 
 /*
- * TODO: interfere active_destroy and put these items into a
- * separate white area, so that a sweep has just to run through these
- * objects
- *
- * Header chain layout:
- * - all objects are chained together forming a circular list
- * - pool->marker is the "anchor" of the circle (shown twice below)
+
+=item C<gc_gms_chain_objects>
+
+TODO: interfere active_destroy and put these items into a
+separate white area, so that a sweep has just to run through these
+objects
+
+Header chain layout:
+- all objects are chained together forming a circular list
+- pool->marker is the "anchor" of the circle (shown twice below)
 
  1) object allocation
 
@@ -507,7 +524,7 @@ gc_gms_add_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
        |                   |                   |
        white               free                marker
 
- */
+*/
 
 static void
 gc_gms_chain_objects(PARROT_INTERP,
@@ -558,6 +575,16 @@ gc_gms_chain_objects(PARROT_INTERP,
     PARROT_ASSERT(p != marker);
 }
 
+/*
+
+=item C<gc_gms_alloc_objects>
+
+Allocate new objects for the given pool.
+
+=cut
+
+*/
+
 static void
 gc_gms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
@@ -580,6 +607,16 @@ gc_gms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
     }
 }
 
+/*
+
+=item C<gc_gms_more_objects>
+
+Run a GC cycle or allocate new objects for the given pool.
+
+=cut
+
+*/
+
 static void
 gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
@@ -597,9 +634,17 @@ gc_gms_more_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 }
 
 /*
- * 2) object consumption
- *    the free ptr moves towards the marker
- */
+
+=item C<gc_gms_get_free_object>
+
+Get a new object off the free_list in the given pool.
+
+2) object consumption
+   the free ptr moves towards the marker
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -623,36 +668,35 @@ gc_gms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
+=back
+
 =head2 Generation handling functions
 
-FUNCDOC: gc_gms_create_gen
-
-Create a generation structure for the given generation number.
-
-FUNCDOC: gc_gms_init_gen
-
-Initalize the generation system by creating the first two generations.
-
-*/
-
-/*
- * overall header chain layout
+overall header chain layout
 
            gen 0         gen 1      ...    gen N
   marker [first last) [first last)  ...   [first last)  marker
 
-  The last (youngest) generation N holds these (pool) pointers:
+The last (youngest) generation N holds these (pool) pointers:
 
   [ black ... gray )          during marking
   [ gray ... white )          during marking
   [ white ... free_list )     allocated items
   [ free_list ... marker )    free items
 
-  The black, white, and generation ranges have additionally (TODO)
-  *fin variants, which refer to PMCs that need destruction/finalization.
-  These are always in front of the ranges to be processed first.
+The black, white, and generation ranges have additionally (TODO)
+*fin variants, which refer to PMCs that need destruction/finalization.
+These are always in front of the ranges to be processed first.
 
- */
+=over 4
+
+=item C<gc_gms_create_gen>
+
+Create a generation structure for the given generation number.
+
+=cut
+
+*/
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -673,6 +717,16 @@ gc_gms_create_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), size_t gen_no
 
     return gen;
 }
+
+/*
+
+=item C<gc_gms_init_gen>
+
+Initalize the generation system by creating the first two generations.
+
+=cut
+
+*/
 
 static void
 gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
@@ -695,12 +749,14 @@ gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: parrot_gc_gms_wb
+=item C<parrot_gc_gms_wb>
 
 Called by the write barrier. The aggregate belongs to an older generation
 then the I<new> value written into it. Put the header of the new value
 onto the IGP list for the current generation, if it contains pointers
 to other items, and promote it to the old generation.
+
+=cut
 
 */
 
@@ -965,25 +1021,13 @@ gc_gms_set_gen(PARROT_INTERP)
 
 /*
 
+=back
 
 =head2 Marking functions
 
-FUNCDOC: gc_gms_setto_gray
+Header chain layout
 
-Set the white header C<h> to gray.
-
-FUNCDOC: void gc_gms_setto_black
-
-Set the white header C<h> to black.
-
-*/
-
-
-/*
- *
- * Header chain layout
- *
- * Init: gray := black := white
+Init: gray := black := white
 
  3) marking the root set
 
@@ -1015,8 +1059,46 @@ Set the white header C<h> to black.
    |       |               |
    black   gray            white
 
- */
+ 3d) the white is a scalar and immediately blackened
 
+
+ +---+---+---+---+---+---+---+->
+ | b | b | h | g | g | g | w
+ +---+---+---+---+---+---+---+
+   ^           ^           ^
+   |           |           |
+   black       gray        white
+
+ 3e) blacken the gray 'h' during trace_children
+
+ +---+---+---+---+---+---+---+->
+ | b | b | h | g | g | g | w
+ +---+---+---+---+---+---+---+
+   ^       ^               ^
+   |       |               |
+   black   gray            white
+
+
+ +---+---+---+---+---+---+---+->
+ | b | b | h | g | g | g | w
+ +---+---+---+---+---+---+---+
+   ^           ^           ^
+   |           |           |
+   black       gray        white
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<gc_gms_setto_gray>
+
+Set the white header C<h> to gray.
+
+*/
 
 static void
 gc_gms_setto_gray(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
@@ -1072,15 +1154,11 @@ gc_gms_setto_gray(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
 
 /*
 
- 3d) the white is a scalar and immediately blackened
+=item C<void gc_gms_setto_black>
 
+Set the white header C<h> to black.
 
- +---+---+---+---+---+---+---+->
- | b | b | h | g | g | g | w
- +---+---+---+---+---+---+---+
-   ^           ^           ^
-   |           |           |
-   black       gray        white
+=cut
 
 */
 
@@ -1135,26 +1213,9 @@ gc_gms_setto_black(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
 
 /*
 
-FUNCDOC: parrot_gc_gms_pobject_lives
+=item C<parrot_gc_gms_pobject_lives>
 
 Set the object live - called by the pobject_lives macro
-
-FUNCDOC: static void gc_gms_init_mark
-
-Initialize the mark phase of GC.
-
-FUNCDOC: static int gc_gms_trace_root
-
-Trace the root set. If C<trace_stack> is true, trace system areas.
-
-FUNCDOC: static int gc_gms_trace_children
-
-Traverse gray objects: mark and blacken. Returns 0 if the trace was aborted
-lazily.
-
-FUNCDOC: static int gc_gms_sweep
-
-Free unused resources, put white objects onto free_list.
 
 */
 
@@ -1177,6 +1238,16 @@ parrot_gc_gms_pobject_lives(PARROT_INTERP, NOTNULL(PObj *obj))
         gc_gms_setto_black(interp, h, priority);
 }
 
+/*
+
+=item C<init_mark_cb>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 init_mark_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
 {
@@ -1186,6 +1257,16 @@ init_mark_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
 #  endif
     return 0;
 }
+
+/*
+
+=item C<static void gc_gms_init_mark>
+
+Initialize the mark phase of GC.
+
+=cut
+
+*/
 
 static void
 gc_gms_init_mark(PARROT_INTERP)
@@ -1199,6 +1280,16 @@ gc_gms_init_mark(PARROT_INTERP)
 
     Parrot_forall_header_pools(interp, POOL_ALL, 0, init_mark_cb);
 }
+
+/*
+
+=item C<trace_igp_cb>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 trace_igp_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
@@ -1217,6 +1308,16 @@ trace_igp_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
     return 0;
 }
 
+/*
+
+=item C<static int gc_gms_trace_root>
+
+Trace the root set. If C<trace_stack> is true, trace system areas.
+
+=cut
+
+*/
+
 static int
 gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 {
@@ -1230,22 +1331,11 @@ gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 
 /*
 
- 3e) blacken the gray 'h' during trace_children
+=item C<trace_children_cb>
 
- +---+---+---+---+---+---+---+->
- | b | b | h | g | g | g | w
- +---+---+---+---+---+---+---+
-   ^       ^               ^
-   |       |               |
-   black   gray            white
+TODO: Not yet documented!!!
 
-
- +---+---+---+---+---+---+---+->
- | b | b | h | g | g | g | w
- +---+---+---+---+---+---+---+
-   ^           ^           ^
-   |           |           |
-   black       gray        white
+=cut
 
 */
 
@@ -1302,6 +1392,17 @@ trace_children_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOT
     return 0;
 }
 
+/*
+
+=item C<static int gc_gms_trace_children>
+
+Traverse gray objects: mark and blacken. Returns 0 if the trace was aborted
+lazily.
+
+=cut
+
+*/
+
 static int
 gc_gms_trace_children(PARROT_INTERP)
 {
@@ -1310,9 +1411,15 @@ gc_gms_trace_children(PARROT_INTERP)
 }
 
 /*
- * move everything from white up to the free_list to the free_list
- * scan for active destroy objects
- * TODO put these in front of the pool at pool->white_fin
+
+=item C<sweep_cb_pmc()>
+
+move everything from white up to the free_list to the free_list
+scan for active destroy objects
+TODO put these in front of the pool at pool->white_fin
+
+=cut
+
  */
 static int
 sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
@@ -1340,6 +1447,16 @@ sweep_cb_pmc(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
     pool->free_list = pool->white;
     return 0;
 }
+
+/*
+
+=item C<sweep_cb_buf>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
@@ -1398,12 +1515,30 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
     return 0;
 }
 
+/*
+
+=item C<static int gc_gms_sweep>
+
+Free unused resources, put white objects onto free_list.
+
+*/
+
 static void
 gc_gms_sweep(PARROT_INTERP)
 {
     Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
     Parrot_forall_header_pools(interp, POOL_BUFFER, 0, sweep_cb_buf);
 }
+
+/*
+
+=item C<end_cycle_cb>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 end_cycle_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
@@ -1421,22 +1556,39 @@ end_cycle_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
     return 0;
 }
 
+/*
+
+=item C<gc_gms_end_cycle>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_end_cycle(PARROT_INTERP)
 {
     Parrot_forall_header_pools(interp, POOL_ALL, 0, end_cycle_cb);
 }
+
 /*
+
+=back
 
 =head2 Interface function main entry
 
-FUNCDOC: parrot_gc_gms_run
+=over 4
+
+=item C<parrot_gc_gms_run>
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
   DOD_lazy_FLAG   ... timely destruction
   DOD_finish_FLAG ... run a final sweep to destruct objects at
                       interpreter shutdown
+
+=cut
 
 */
 
@@ -1480,6 +1632,16 @@ parrot_gc_gms_run(PARROT_INTERP, int flags)
     gc_gms_end_cycle(interp);
     --arena_base->DOD_block_level;
 }
+
+/*
+
+=item C<gms_debug_verify>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 #  if GC_GMS_DEBUG
 static void
@@ -1527,6 +1689,8 @@ gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(const 
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
@@ -1535,6 +1699,8 @@ F<src/gc_ims.c>
 =head1 HISTORY
 
 Initial version by leo (2005.01.12 - 2005.01.30)
+
+=cut
 
 */
 

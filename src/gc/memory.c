@@ -15,6 +15,10 @@ setup function to initialize the memory pools.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -24,9 +28,11 @@ setup function to initialize the memory pools.
 
 /*
 
-FUNCDOC: mem_sys_allocate
+=item C<mem_sys_allocate>
 
 Uses C<malloc> to allocate system memory.
+
+=cut
 
 */
 
@@ -44,6 +50,16 @@ mem_sys_allocate(size_t size)
         PANIC(NULL, "Out of mem");
     return ptr;
 }
+
+/*
+
+=item C<mem__internal_allocate>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -65,9 +81,11 @@ mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)
 
 /*
 
-FUNCDOC: mem_sys_allocate_zeroed
+=item C<mem_sys_allocate_zeroed>
 
 Uses C<calloc> to allocate system memory.
+
+=cut
 
 */
 
@@ -85,6 +103,16 @@ mem_sys_allocate_zeroed(size_t size)
         PANIC(NULL, "Out of mem");
     return ptr;
 }
+
+/*
+
+=item C<mem__internal_allocate_zeroed>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -106,9 +134,11 @@ mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
 
 /*
 
-FUNCDOC: mem_sys_realloc
+=item C<mem_sys_realloc>
 
 Resize a chunk of system memory.
+
+=cut
 
 */
 
@@ -134,9 +164,11 @@ mem__sys_realloc(NULLOK(void *from), size_t size)
 
 /*
 
-FUNCDOC: mem_sys_realloc_zeroed
+=item C<mem_sys_realloc_zeroed>
 
 Resize a chunk of system memory. Fill the newly allocated space with zeroes.
+
+=cut
 
 */
 
@@ -163,6 +195,16 @@ mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
     return ptr;
 }
 
+/*
+
+=item C<mem__internal_realloc>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -186,9 +228,11 @@ mem__internal_realloc(NOTNULL(void *from), size_t size,
 
 /*
 
-FUNCDOC: mem_sys_free
+=item C<mem_sys_free>
 
 Free a chunk of memory back to the system.
+
+=cut
 
 */
 
@@ -202,6 +246,16 @@ mem_sys_free(NULLOK(void *from))
     if (from)
         free(from);
 }
+
+/*
+
+=item C<mem__internal_free>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)
@@ -217,9 +271,11 @@ mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)
 
 /*
 
-FUNCDOC: mem_setup_allocator
+=item C<mem_setup_allocator>
 
 Initializes the allocator.
+
+=cut
 
 */
 
@@ -242,6 +298,14 @@ mem_setup_allocator(PARROT_INTERP)
     Parrot_initialize_memory_pools(interp);
     Parrot_initialize_header_pools(interp);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
