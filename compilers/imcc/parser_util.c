@@ -36,6 +36,8 @@
 
 ParserUtil - Parser support functions.
 
+=cut
+
 */
 
 PARROT_WARN_UNUSED_RESULT
@@ -1652,6 +1654,8 @@ imcc_destroy(PARROT_INTERP)
 /*
 
 =back
+
+=cut
 
 */
 
