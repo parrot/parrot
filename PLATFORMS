@@ -37,8 +37,8 @@ win32-x86-cygwin_1.5.21           -    -    -     -   -   -    -     -  20070221
 win32-x86-mingw-gcc3.4.2          Y    Y    -     -   -   Y    Y/21  Y  20070821
 win32-x86-mingw_gcc4.2.1          Y    Y    -     -   -   Y    Y/31  ?  20070914
 win32-x86-msvc_7.1                -    Y    -     -   -   Y    Y     ?  20070821
-win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y*2   ?  20070821
-win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20070821
+win32-x86-msvc_8.0                -    Y    -     -   -   Y    Y*2   ?  20070918
+win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20070918
 win32-x86-msvc_9.0                -    Y    -     -   -   Y    Y     ?  20070806
 
 ?   ... unknown or untested
