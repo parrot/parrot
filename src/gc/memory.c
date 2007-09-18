@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/memory.c - Memory allocation
+src/gc/memory.c - Memory allocation
 
 =head1 DESCRIPTION
 

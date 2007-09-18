@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/dod.c - Dead object destruction of the various headers
+src/gc/dod.c - Dead object destruction of the various headers
 
 =head1 DESCRIPTION
 

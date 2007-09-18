@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/gc_gms.c - Generational mark and sweep garbage collection
+src/gc/gc_gms.c - Generational mark and sweep garbage collection
 
 =head1 OVERVIEW
 
@@ -418,6 +418,8 @@ Initialize pool variables. This function must set the pool function pointers
 for C<add_free_object>, C<get_free_object>, C<alloc_objects>, and
 C<more_objects>.
 
+=cut
+
 */
 
 static void
@@ -523,6 +525,8 @@ Header chain layout:
        ^                   ^                   ^
        |                   |                   |
        white               free                marker
+
+=cut
 
 */
 
@@ -1098,6 +1102,8 @@ Init: gray := black := white
 
 Set the white header C<h> to gray.
 
+=cut
+
 */
 
 static void
@@ -1216,6 +1222,8 @@ gc_gms_setto_black(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), int priority)
 =item C<parrot_gc_gms_pobject_lives>
 
 Set the object live - called by the pobject_lives macro
+
+=cut
 
 */
 
@@ -1521,6 +1529,8 @@ sweep_cb_buf(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(
 
 Free unused resources, put white objects onto free_list.
 
+=cut
+
 */
 
 static void
@@ -1693,8 +1703,8 @@ gms_debug_verify(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(const 
 
 =head1 SEE ALSO
 
-F<src/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
-F<src/gc_ims.c>
+F<src/gc/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
+F<src/gc/gc_ims.c>
 
 =head1 HISTORY
 

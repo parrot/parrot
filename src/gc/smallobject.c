@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/resources.c - Handling Small Object Pools
+src/gc/resources.c - Handling Small Object Pools
 
 =head1 DESCRIPTION
 
@@ -71,6 +71,8 @@ Returns whether C<pool> contains C<*ptr>.
 
 XXX If ever there is a function that ought to be consted, this is it.
 
+=cut
+
 */
 
 PARROT_WARN_UNUSED_RESULT
@@ -100,6 +102,8 @@ contained_in_pool(NOTNULL(const Small_Object_Pool *pool), NOTNULL(const void *pt
 
 Returns whether C<*pmc> is a constant PMC.
 
+=cut
+
 */
 
 int
@@ -120,6 +124,8 @@ Parrot_is_const_pmc(PARROT_INTERP, NOTNULL(PMC *pmc))
 =item C<more_traceable_objects>
 
 We're out of traceable objects. Try a DOD, then get some more if needed.
+
+=cut
 
 */
 
@@ -151,6 +157,8 @@ more_traceable_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 Add an unused object back to the free pool for later reuse.
 
+=cut
+
 */
 
 static void
@@ -166,6 +174,8 @@ gc_ms_add_free_object(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool), NOTNULL(POb
 =item C<gc_ms_get_free_object>
 
 Get a new object from the free pool and return it.
+
+=cut
 
 */
 
@@ -198,6 +208,8 @@ gc_ms_get_free_object(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 =item C<Parrot_add_to_free_list>
 
 Adds the objects in the newly allocated C<arena> to the free list.
+
+=cut
 
 */
 
@@ -236,6 +248,8 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 insert the new arena into the pool's structure, update stats
 
+=cut
+
 */
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
@@ -270,6 +284,8 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
 
 We have no more headers on the free header pool. Go allocate more
 and put them on.
+
+=cut
 
 */
 
@@ -320,6 +336,8 @@ gc_ms_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 =item C<new_small_object_pool>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
+
+=cut
 
 */
 
@@ -387,6 +405,8 @@ creation of memory pools. This function must set the function pointers
 for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_object_fn>, and
 C<more_object_fn>.
 
+=cut
+
 */
 
 void
@@ -404,6 +424,8 @@ Parrot_gc_ms_init(PARROT_INTERP)
 =item C<Parrot_small_object_pool_merge>
 
 Merge C<source> into C<dest>.
+
+=cut
 
 */
 

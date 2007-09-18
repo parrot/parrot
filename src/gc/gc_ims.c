@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/gc_ims.c - Incremental mark and sweep garbage collection
+src/gc/gc_ims.c - Incremental mark and sweep garbage collection
 
 =head1 DESCRIPTION
 
@@ -327,6 +327,10 @@ a sleep opcode.
 
 =head1 FUNCTIONS
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -464,8 +468,6 @@ typedef struct Gc_ims_private {
 
 
 /*
-
-=over 4
 
 =item C<gc_ims_add_free_object()>
 
@@ -1054,11 +1056,13 @@ Parrot_dod_ims_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(PMC *_new))
 
 =head1 SEE ALSO
 
-F<src/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
+F<src/gc/dod.c>, F<include/parrot/dod.h>, F<include/parrot/pobj.h>,
 
 =head1 HISTORY
 
 Initial version by leo (2004.08.12 - 2004.08.15)
+
+=cut
 
 */
 

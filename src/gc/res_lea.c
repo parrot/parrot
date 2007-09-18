@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/res_lea.c - Resource allocation using malloc
+src/gc/res_lea.c - Resource allocation using malloc
 
 =head1 DESCRIPTION
 

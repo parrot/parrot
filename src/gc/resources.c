@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/resources.c - Allocate and deallocate tracked resources
+src/gc/resources.c - Allocate and deallocate tracked resources
 
 =head1 DESCRIPTION
 
@@ -183,6 +183,8 @@ Buffer memory layout:
 
  * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
  * obj->buflen is the usable length excluding the optional GC part.
+
+=cut
 
 */
 
@@ -1037,7 +1039,7 @@ Parrot_merge_memory_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_i
 
 =head1 SEE ALSO
 
-F<include/parrot/resources.h>, F<src/memory.c>.
+F<include/parrot/resources.h>, F<src/gc/memory.c>.
 
 =head1 HISTORY
 
