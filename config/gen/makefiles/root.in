@@ -1910,7 +1910,7 @@ COVER_DIRS = \
 cover:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
 		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
-	-PERL5OPT=-MDevel::Cover @make@ fulltest
+	-PERL5OPT="-MDevel::Cover" @make@ fulltest
 	for dir in $(COVER_DIRS); \
 	do \
 		pwd=$$PWD; cd $$dir; gcov *.c; cd $$pwd; \
