@@ -235,7 +235,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (SELF->vtable->base_type == value->vtable->base_type
+        if (PMC_type(SELF) == PMC_type(value)
          && SELF == value)
             PMC_int_val(retval) = 1;
         else
@@ -251,7 +251,7 @@ MMD_DEFAULT: {
 
 */
     METHOD void set_metatable(PMC *meta) {
-        if (dynpmc_LuaNil == meta->vtable->base_type) {
+        if (dynpmc_LuaNil == PMC_type(meta)) {
             PMC_metadata(SELF) = NULL;
         }
         else {

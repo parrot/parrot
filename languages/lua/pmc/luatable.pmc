@@ -60,7 +60,6 @@ typedef struct Hash {
 } Hash;
 
 #define node(t,i)       (&(t)->node[i])
-#define ttype(o)        ((o)->vtable->base_type)
 
 /******************************************************************************/
 
@@ -68,13 +67,13 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 {
     if (NULL == t2)
         return 0;
-    if (ttype(t1) != ttype(t2))
+    if (PMC_type(t1) != PMC_type(t2))
         return 0;
-    if (ttype(t1) == dynpmc_LuaNumber)
+    if (PMC_type(t1) == dynpmc_LuaNumber)
         return PMC_num_val(t1) == PMC_num_val(t2);
-    if (ttype(t1) == dynpmc_LuaBoolean)
+    if (PMC_type(t1) == dynpmc_LuaBoolean)
         return PMC_int_val(t1) == PMC_int_val(t2);
-    if (ttype(t1) == dynpmc_LuaString)
+    if (PMC_type(t1) == dynpmc_LuaString)
         return 0 == string_compare(interp, PMC_str_val(t1), PMC_str_val(t2));
     return PMC_struct_val(t1) == PMC_struct_val(t2);
 }
@@ -86,16 +85,16 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 static Node *mainposition (PARROT_INTERP, const Hash *t, const PMC *key)
 {
     unsigned long h;
-    if (ttype(key) == dynpmc_LuaNil) {
+    if (PMC_type(key) == dynpmc_LuaNil) {
         return NULL;
     }
-    if (ttype(key) == dynpmc_LuaNumber) {
+    if (PMC_type(key) == dynpmc_LuaNumber) {
         h = (unsigned long)(long)PMC_num_val(key);
     }
-    else if (ttype(key) == dynpmc_LuaBoolean) {
+    else if (PMC_type(key) == dynpmc_LuaBoolean) {
         h = PMC_int_val(key);
     }
-    else if (ttype(key) == dynpmc_LuaString) {
+    else if (PMC_type(key) == dynpmc_LuaString) {
         h = string_hash(interp, PMC_str_val(key), 3793);
         /* h = PMC_str_val(key)->hashval; */
     }
@@ -114,7 +113,7 @@ static PMC** lua_getstr(PARROT_INTERP, const Hash *t, STRING *key)
     unsigned long h = string_hash(interp, key, 3793);
     Node *n = &t->node[h&(t->size-1)];
     do {
-        if (ttype(n->key) == dynpmc_LuaString
+        if (PMC_type(n->key) == dynpmc_LuaString
             && 0 == string_compare(interp, PMC_str_val(n->key), key))
             return &n->val;
         n = n->next;
@@ -138,7 +137,7 @@ static PMC** lua_get(PARROT_INTERP, const Hash *t, const PMC* key)
 static Node* lua_next(PARROT_INTERP, const Hash *t, const PMC *key)
 {
     int i;
-    if (key == NULL || ttype(key) == dynpmc_LuaNil)
+    if (key == NULL || PMC_type(key) == dynpmc_LuaNil)
         i = 0;  /* first iteration */
     else {
         PMC **v = lua_get(interp, t, key);
@@ -431,8 +430,8 @@ C<table> accessor.
         if (pvalue == NULL) {
             PMC* meth = find_meth(INTERP, SELF, "__index");
             if (meth != NULL) {
-                if (dynpmc_LuaClosure == meth->vtable->base_type
-                 || dynpmc_LuaFunction == meth->vtable->base_type) {
+                if (dynpmc_LuaClosure == PMC_type(meth)
+                 || dynpmc_LuaFunction == PMC_type(meth)) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                      SELF, key);
                 }
@@ -462,8 +461,8 @@ C<table> mutator.
         if (NULL == lua_get(INTERP, PMC_struct_val(SELF), key)) {
             PMC* meth = find_meth(INTERP, SELF, "__newindex");
             if (meth != NULL) {
-                if (dynpmc_LuaClosure == meth->vtable->base_type
-                 || dynpmc_LuaFunction == meth->vtable->base_type) {
+                if (dynpmc_LuaClosure == PMC_type(meth)
+                 || dynpmc_LuaFunction == PMC_type(meth)) {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP",
                                              SELF, key, value);
                 }
@@ -473,7 +472,7 @@ C<table> mutator.
                 return;
             }
         }
-        if (dynpmc_LuaNil == value->vtable->base_type) {
+        if (dynpmc_LuaNil == PMC_type(value)) {
             value = NULL;
         }
         else {
@@ -699,7 +698,7 @@ MMD_DEFAULT: {
 
 */
     METHOD void rawset (PMC* key, PMC* value) {
-        if (dynpmc_LuaNil == value->vtable->base_type) {
+        if (dynpmc_LuaNil == PMC_type(value)) {
             value = NULL;
         }
         else {
@@ -717,7 +716,7 @@ MMD_DEFAULT: {
 
 */
     METHOD void set_metatable(PMC *meta) {
-        if (dynpmc_LuaNil == meta->vtable->base_type) {
+        if (dynpmc_LuaNil == PMC_type(meta)) {
             PMC_metadata(SELF) = NULL;
         }
         else {

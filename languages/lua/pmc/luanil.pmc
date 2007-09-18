@@ -51,7 +51,7 @@ Allow :
 */
     PMC* new_from_string (STRING *rep, INTVAL flags) {
         PMC *res;
-        INTVAL type = SELF->vtable->base_type;
+        INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
             res = constant_pmc_new(INTERP, type);
         else
@@ -82,7 +82,7 @@ Creates and returns a clone of the scalar.
 
 */
     PMC* clone () {
-        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC* dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
     }
@@ -163,7 +163,7 @@ MMD_DEFAULT: {
 */
     METHOD PMC* rawequal (PMC* value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (SELF->vtable->base_type == value->vtable->base_type)
+        if (PMC_type(SELF) == PMC_type(value))
             PMC_int_val(retval) = 1;
         else
             PMC_int_val(retval) = 0;

@@ -24,7 +24,7 @@ C<LuaAny> provides an abstract base class for some Lua types.
 PMC *
 find_meth(PARROT_INTERP, PMC *obj, const char *name) {
     PMC *meta = NULL;
-    INTVAL type = obj->vtable->base_type;
+    INTVAL type = PMC_type(obj);
 
     if (dynpmc_LuaString == type) {
         meta = Parrot_find_global_s(interp,
@@ -35,7 +35,7 @@ find_meth(PARROT_INTERP, PMC *obj, const char *name) {
         if (obj->pmc_ext != NULL) {
             meta = PMC_metadata(obj);
         }
-        if (meta != NULL && dynpmc_LuaTable != meta->vtable->base_type) {
+        if (meta != NULL && dynpmc_LuaTable != PMC_type(meta)) {
             return meta;
         }
     }
@@ -45,7 +45,7 @@ find_meth(PARROT_INTERP, PMC *obj, const char *name) {
         PMC *key = pmc_new(interp, dynpmc_LuaString);
         PMC_str_val(key) = const_string(interp, name);
         method = VTABLE_get_pmc_keyed(interp, meta, key);
-        if (dynpmc_LuaNil != method->vtable->base_type) {
+        if (dynpmc_LuaNil != PMC_type(method)) {
             return method;
         }
     }
@@ -68,7 +68,7 @@ Changes the PMC to a PMC of a new type
 
 */
     void morph (INTVAL type) {
-        if (SELF->vtable->base_type == type)
+        if (PMC_type(SELF) == type)
             return;
         pmc_reuse(INTERP, SELF, type, 0);
     }
@@ -107,8 +107,8 @@ Returns the address of the PMC.
 
 */
     void assign_pmc(PMC* value) {
-        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
-        if (value->vtable->base_type != dynpmc_LuaNil)
+        VTABLE_morph(INTERP, SELF, PMC_type(value));
+        if (PMC_type(value) != dynpmc_LuaNil)
             DYNSELF.set_pmc(value);
     }
 
@@ -124,8 +124,8 @@ Throws an exception.
     PMC* get_pmc_keyed (PMC* key) {
         PMC *meth = find_meth(INTERP, SELF, "__index");
         if (meth != NULL) {
-            if (dynpmc_LuaClosure == meth->vtable->base_type
-             || dynpmc_LuaFunction == meth->vtable->base_type) {
+            if (dynpmc_LuaClosure == PMC_type(meth)
+             || dynpmc_LuaFunction == PMC_type(meth)) {
                 PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, key);
                 if (NULL == retval) {
@@ -155,8 +155,8 @@ Throws an exception.
     void set_pmc_keyed (PMC* key, PMC* value) {
         PMC* meth = find_meth(INTERP, SELF, "__newindex");
         if (meth != NULL) {
-            if (dynpmc_LuaClosure == meth->vtable->base_type
-             || dynpmc_LuaFunction == meth->vtable->base_type) {
+            if (dynpmc_LuaClosure == PMC_type(meth)
+             || dynpmc_LuaFunction == PMC_type(meth)) {
                 Parrot_runops_fromc_args(INTERP, meth, "vPPP",
                                          SELF, key, value);
             }
