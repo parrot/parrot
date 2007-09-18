@@ -48,10 +48,8 @@ my $cwd = cwd();
     chdir $tdir or croak "Unable to change to tempdir";
     copy (qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST}) or croak "Unable to copy MANIFEST";
     {
-    warn "t1$/";
         my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
-    warn "t2$/";
         my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
         my $ret = $step->runstep($conf);
