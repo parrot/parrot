@@ -54,7 +54,7 @@ static void init_context( PARROT_INTERP,
     ctx.state  opt
                padding
 
-egisters are addressed as usual via the register base pointer ctx.bp.
+Registers are addressed as usual via the register base pointer ctx.bp.
 
 The macro CONTEXT() hides these details
 
