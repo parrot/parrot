@@ -18,22 +18,23 @@ or examining them.
 
 =cut
 
-###############################################################################
 
 =item B<ord>(out INT, in STR)
 
-Two-argument form returns the 0th character of string $2 in register $1.
-If $2 is empty, throws an exception.
+The codepoint in the current character set of the first character of string $2
+is returned in integer $1.
+If $2 is empty, an exception is thrown.
 
 =item B<ord>(out INT, in STR, in INT)
 
-Three-argument form returns character $3 of string $2 in register $1.
-If $2 is empty, throws an exception.
-If $3 is greater than the length of string $2, throws an exception.
-If $3 is less then zero but greater than the negative of the length, counts
-backwards through the string, such that -1 is the last character, -2 is the
-second-to-last character, and so on.
-If $3 is less than the negative of the length, throws an exception.
+The codepoint in the current character set of the character at integer index $3
+of string $2 is returned in integer $1.
+If $2 is empty, an exception is thrown.
+If $3 is greater than the length of $2, an exception is thrown.
+If $3 is less then zero but greater than the negative of the length of $2,
+counts backwards through $2, such that -1 is the last character,
+-2 is the second-to-last character, and so on.
+If $3 is less than the negative of the length of $2, an exception is thrown.
 
 =cut
 
@@ -47,9 +48,11 @@ inline op ord (out INT, in STR, in INT) :base_core {
   goto NEXT();
 }
 
+
 =item B<chr>(out STR, in INT)
 
-Returns the character specified by the $2 number.
+The character specified by codepoint integer $2 in the current character set
+is returned in string $1.
 
 =cut
 
@@ -61,17 +64,16 @@ inline op chr (out STR, in INT) :base_core {
 }
 
 
-########################################
-
 =item B<chopn>(inout STR, in INT)
 
-Remove $2 characters from the end of the string in $1. If $2 is negative,
-cut the string after -$2 characters.
+Remove n characters specified by integer $2 from the tail of string $1.
+If $2 is negative, cut the string after -$2 characters.
 
 =item B<chopn>(out STR, in STR, in INT)
 
-Removes $3 characters from the end of the string in $2 and returns the result
-in $1. If $3 is negative, cut the string after -$3 characters.
+Remove n characters specified by integer $3 from the tail of string $2,
+and returns the characters not chopped in string $1.
+If $3 is negative, cut the string after -$3 characters.
 
 =cut
 
@@ -85,7 +87,6 @@ inline op chopn(out STR, in STR, in INT) :base_core {
   goto NEXT();
 }
 
-########################################
 
 =item B<concat>(inout STR, in STR)
 
@@ -93,8 +94,8 @@ inline op chopn(out STR, in STR, in INT) :base_core {
 
 =item B<concat>(in PMC, in PMC)
 
-Append the string in $2 to the string in $1. The C<PMC> versions are
-MMD operations.
+Modify string $1 in place, appending string $2.
+The C<PMC> versions are MMD operations.
 
 =item B<concat>(out STR, in STR, in STR)
 
@@ -106,10 +107,10 @@ MMD operations.
 
 =item B<n_concat>(out PMC, in PMC, in PMC)
 
-Concatenate the strings $3 to $2 and places the result into $1.
-The C<PMC> versions are MMD operations. The C<n_> variants are
-creating a new result as usual. See also F<src/ops/math.ops> for
-the general C<infix> and C<n_infix> syntax.
+Append strings $3 to string $2 and place the result into string $1.
+The C<PMC> versions are MMD operations.
+The C<n_> variants create a new PMC $1 to store the result.
+See F<src/ops/math.ops> for the general C<infix> and C<n_infix> syntax.
 
 =cut
 
@@ -123,7 +124,6 @@ inline op concat(out STR, in STR, in STR) :base_mem {
   goto NEXT();
 }
 
-#######################################
 
 =item B<repeat>(out STR, in STR, in INT)
 
@@ -135,7 +135,7 @@ inline op concat(out STR, in STR, in STR) :base_mem {
 
 =item B<n_repeat>(out PMC, in PMC, in PMC)
 
-Repeats string $2 $3 times and stores result in $1.
+Repeat string $2 integer $3 times and return result in string $1.
 The C<PMC> versions are MMD operations.
 
 =cut
@@ -148,16 +148,15 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
   goto NEXT();
 }
 
-########################################
 
 =item B<length>(out INT, in STR)
 
-Set result $1 to the length (in characters) of string $2.
+Calculate the length (in characters) of string $2 and return as integer $1.
 If $2 is NULL or zero length, zero is returned.
 
 =item B<bytelength>(out INT, in STR)
 
-Set result $1 to the length (in bytes) of the string $2.
+Calculate the length (in bytes) of string $2 and return as integer $1.
 If $2 is NULL or zero length, zero is returned.
 
 =cut
@@ -180,14 +179,14 @@ inline op bytelength(out INT, in STR) :base_mem {
   goto NEXT();
 }
 
+
 =item B<pin>(inout STR)
 
-Make the memory in $1 immobile. This memory will I<not> be moved by
-the GC, and may be safely passed to external libraries. (Well, as long
-as they don't free it) Pinning a string will move the contents.
+Make the memory in string $1 immobile. This memory will I<not> be moved
+by the Garbage Collector, and may be safely passed to external libraries.
+(Well, as long as they don't free it) Pinning a string will move the contents.
 
-The memory only need be unpinned if you plan on using it for any
-length of time after its pinning is no longer necessary.
+$1 should be unpinned if it is used after pinning is no longer necessary.
 
 =cut
 
@@ -199,8 +198,8 @@ op pin(inout STR) :base_mem {
 
 =item B<unpin>(inout STR)
 
-Make the memory in $1 movable again. This will make the memory in $1
-move.
+Make the memory in string $1 movable again.
+This will make the memory in $1 move.
 
 =cut
 
@@ -209,8 +208,6 @@ op unpin(inout STR) :base_mem {
    goto NEXT();
 }
 
-
-########################################
 
 =item B<substr>(out STR, in STR, in INT)
 
@@ -267,7 +264,6 @@ inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
   goto NEXT();
 }
 
-########################################
 
 =item B<index>(out INT, in STR, in STR)
 
@@ -294,7 +290,6 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
     goto NEXT();
 }
 
-########################################
 
 =item B<sprintf>(out STR, in STR, invar PMC)
 
@@ -330,6 +325,7 @@ inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
     goto NEXT();
 }
 
+
 =item B<new>(out STR)
 
 =item B<new>(out STR, in INT)
@@ -349,6 +345,7 @@ inline op new(out STR, in INT) :base_mem {
   goto NEXT();
 }
 
+
 #=item B<find_encoding>(out INT, in STR)
 #
 #Find the encoding named in $2 and return its number in $1
@@ -362,7 +359,6 @@ inline op new(out STR, in INT) :base_mem {
 #  goto NEXT();
 #}
 
-########################################
 
 =item B<stringinfo>(out INT, in STR, in INT)
 
@@ -421,7 +417,6 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
     goto NEXT();
 }
 
-########################################
 
 =item B<upcase>(out STR, in STR)
 
@@ -443,6 +438,7 @@ inline op upcase(inout STR) :base_core {
   goto NEXT();
 }
 
+
 =item B<downcase>(out STR, in STR)
 
 Downcase $2 and put the result in $1
@@ -462,6 +458,7 @@ inline op downcase(inout STR) :base_core {
   string_downcase_inplace(interp, $1);
   goto NEXT();
 }
+
 
 =item B<titlecase>(out STR, in STR)
 
@@ -483,7 +480,6 @@ inline op titlecase(inout STR) :base_core {
   goto NEXT();
 }
 
-###############################################################################
 
 =item B<join>(out STR, in STR, invar PMC)
 
@@ -511,6 +507,7 @@ op split(out PMC, in STR, in STR) :base_core {
     $1 = string_split(interp, $2, $3);
     goto NEXT();
 }
+
 
 =item B<charset>(out INT, in STR)
 
@@ -569,6 +566,7 @@ op trans_charset(out STR, in STR, in INT) {
   goto NEXT();
 }
 
+
 =item B<encoding>(out INT, in STR)
 
 Return the encoding number $1 of string $2.
@@ -626,6 +624,7 @@ op trans_encoding(out STR, in STR, in INT) {
   goto NEXT();
 }
 
+
 =item B<is_cclass>(out INT, in INT, in STR, in INT)
 
 Set $1 to 1 if the codepoint of $3 at position $4 is in
@@ -637,6 +636,7 @@ inline op is_cclass(out INT, in INT, in STR, in INT) {
   $1 = Parrot_string_is_cclass(interp, $2, $3, $4);
   goto NEXT();
 }
+
 
 =item B<find_cclass>(out INT, in INT, in STR, in INT, in INT)
 
@@ -652,6 +652,7 @@ inline op find_cclass(out INT, in INT, in STR, in INT, in INT) {
   goto NEXT();
 }
 
+
 =item B<find_not_cclass>(out INT, in INT, in STR, in INT, in INT)
 
 Set $1 to the offset of the first codepoint not matching
@@ -666,7 +667,6 @@ $1 = Parrot_string_find_not_cclass(interp, $2, $3, $4, $5);
   goto NEXT();
 }
 
-########################################
 
 =item B<escape>(out STR, invar STR)
 
@@ -689,11 +689,12 @@ op compose(out STR, in STR) {
   goto NEXT();
 }
 
+
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2004, The Perl Foundation.
+Copyright (C) 2001-2007, The Perl Foundation.
 
 =head1 LICENSE
 
