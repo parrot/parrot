@@ -410,13 +410,13 @@ first method:
 
   .namespace [ "Foo" ]          # start namespace "Foo"
 
-  .sub _meth method             # define Foo::_meth global
+  .sub _meth :method            # define Foo::_meth global
      print "in meth\n"
      $S0 = "_other_meth"        # method names can be in a register too
      self.$S0()                 # self is the invocant
   .end
 
-  .sub _other_meth method       # define another method
+  .sub _other_meth :method      # define another method
      print "in other_meth\n"    # as above Parrot provides a return
   .end                          # statement
 
