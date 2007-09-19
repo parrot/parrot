@@ -203,7 +203,7 @@ value "Hello, Polly.\n", and then prints the value.
 
 X<types;variable (PIR)>
 X<variables;types (PIR)>
-The valid types are C<int>, C<float>, C<string>, and C<pmc> or any
+The valid types are C<int>, C<num>, C<string>, and C<pmc> or any
 Parrot class name (like C<PerlInt> or C<PerlString>). It should come
 as no surprise that these are the same divisions as Parrot's four
 register types. Named variables are valid from the point of their
@@ -267,7 +267,7 @@ but have to be declared beforehand:
 
   .const int the_answer = 42        # integer constant
   .const string mouse = "Mouse"     # string constant
-  .const float pi = 3.14159         # floating point constant
+  .const num pi = 3.14159           # floating point constant
 
 =head2 Register Spilling
 

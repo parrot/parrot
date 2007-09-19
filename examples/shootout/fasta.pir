@@ -213,9 +213,9 @@ argsdone:
 	makeRandomFasta ("THREE", "Homo sapiens frequency", homosapiens, 4, $I0)
 .end
 
-.const float IM = 139968.0
-.const float IA = 3877.0
-.const float IC = 29573.0
+.const num IM = 139968.0
+.const num IA = 3877.0
+.const num IC = 29573.0
 
 .sub gen_random
 	.param num max

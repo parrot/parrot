@@ -13,7 +13,7 @@
 .end
 
 .sub gen_random
-    .param float max
+    .param num max
     .local pmc last
     last = global "_last_seed"
         $I0 = last
