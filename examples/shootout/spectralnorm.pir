@@ -81,7 +81,7 @@ beginfor_i:
 	inc i
 	goto beginfor_i
 endfor_i:
-.end	
+.end
 
 
 .sub eval_AtA_times_u
@@ -134,7 +134,7 @@ beginfor_eval:
 	goto beginfor_eval
 endfor_eval:
 
-	.local float vBv, vv
+	.local num vBv, vv
   	vBv = 0.0
   	vv = 0.0
 
@@ -152,7 +152,7 @@ beginfor_calc:
 	inc i
 	goto beginfor_calc
 endfor_calc:
-  	
+
 	# print "%0.9f" % (sqrt(vBv/vv))
 	$N0 = vBv / vv
 	$N0 = sqrt $N0

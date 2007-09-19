@@ -3,7 +3,7 @@
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom
 
-# use less registers (leo) 
+# use less registers (leo)
 # time ./parrot -Oc -Cj recursive-2.pir 11
 # real 2.32 s   (AMD X2@2000)
 # modified default value to n=3. Karl Forner
@@ -13,7 +13,7 @@
     .param pmc argv
     .local int argc, n
     argc = argv
-    n = 3 
+    n = 3
     unless argc == 2 goto argsok
     $S0 = argv[1]
     n = $S0
@@ -113,7 +113,7 @@ endif:
     unless y >= x goto endif
     .return(z)
 endif:
-    .local float tmp
+    .local num tmp
     tmp = x - 1
     $N0 = TakNum(tmp, y, z)
     tmp = y - 1

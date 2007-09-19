@@ -26,7 +26,7 @@ while_1:
 
 .sub gen_random
 	.param float max
-	.local float last
+	.local num last
 	last = 42.0
 loop:
 	$N0 = last

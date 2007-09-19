@@ -8,7 +8,7 @@
 .sub main :main
 	.param pmc argv
 	.local int k, n
-	.local float sum, a
+	.local num sum, a
 	.local pmc parray
 	parray = new 'FixedFloatArray'
 	parray = 1
@@ -107,7 +107,7 @@ beginfor_6:
 	inc k
 	goto beginfor_6
 endfor_6:
-	parray[0] = sum 
+	parray[0] = sum
 	$S0 = sprintf "%.9f\tHarmonic\n", parray
 	print $S0
 

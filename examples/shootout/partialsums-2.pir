@@ -30,7 +30,7 @@ argok:
 	sum8 = 0.0
 	sum9 = 0.0
 	a = -1.0
-	.local float div23, k2, k3
+	.local num div23, k2, k3
 	div23 = 2.0 / 3.0
 	# sum1 starts at zero - k := 0 case unrolled
 	$N1 = pow div23, 0
@@ -78,7 +78,7 @@ beginfor:
 	parray[2] = sum3
 	parray[3] = sum4
 	parray[4] = sum5
-	parray[5] = sum6 
+	parray[5] = sum6
 	parray[6] = sum7
 	parray[7] = sum8
 	parray[8] = sum9
