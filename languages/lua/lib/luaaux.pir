@@ -226,7 +226,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 .sub 'lua_gc'
     .param string what
     .param int data :optional
-    .local float res
+    .local num res
     res = 0
   L_stop:
     unless what == 'stop' goto L_restart
