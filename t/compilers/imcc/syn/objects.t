@@ -21,7 +21,6 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
     find_type $I0, "Foo"
     new obj, $I0
     obj._meth()
-    obj->_meth()
     print "done\n"
     end
 .end
@@ -31,7 +30,6 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
     print "in meth\n"
 .end
 CODE
-in meth
 in meth
 done
 OUT
@@ -101,11 +99,11 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
     find_type $I0, "Foo"
     new obj, $I0
     obj."_meth"()
-    obj->meth()
+    obj._meth()
     set S10, "_meth"
-    obj->S10()
+    obj.S10()
     set $S10, "_meth"
-    obj->$S10()
+    obj.$S10()
     print "done\n"
     end
 .end

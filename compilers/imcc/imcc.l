@@ -342,7 +342,7 @@ SP              [ ]
 "=="            return RELOP_EQ;
 "!="            return RELOP_NE;
 "**"            return POW;
-"->"            return POINTY;
+
 {WS}+"."{WS}+   return CONCAT;
 "."             return DOT;
 <emit,INITIAL>".."     return DOTDOT;
