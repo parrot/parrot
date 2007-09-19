@@ -108,7 +108,7 @@ whole thing may be taken out or refactored away at any moment.
     goto end_match
 
   match_error:
-    get_results "(0, 0)", match, out
+    get_results "0, 0", match, out
 
   end_match:
     out .= "\n"
