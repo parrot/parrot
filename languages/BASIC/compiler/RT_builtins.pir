@@ -94,7 +94,7 @@ DISPERR:
 .end
 
 .sub _NORMALIZE_FLOAT	# string normalize_flo(float number)
-	.param float number	# INTERNAL, no argc!
+	.param num number	# INTERNAL, no argc!
 	set $S0, number
 FLO_NORM:
 	length $I0, $S0
@@ -116,7 +116,7 @@ FLO_END:
 #
 .sub _BUILTIN_ABS   		# float abs(float arg)
 	.param int argc
-	.param float arg
+	.param num arg
 	.local num res
 	abs res, arg
 	.return(res)
@@ -125,7 +125,7 @@ FLO_END:
 #       or equal to a numeric-expression
 .sub _BUILTIN_INT   		# float int(float arg)
 	.param int argc
-	.param float arg
+	.param num arg
 	.local num res
 	.local int truncate
 	set truncate, arg
@@ -136,7 +136,7 @@ ENDINT:	.return(res)
 .end
 .sub _BUILTIN_CHR_STRING	# string chr(float arg)
 	.param int argc
-	.param float arg
+	.param num arg
 	.local string res
 	.local int truncate
 	set truncate, arg
@@ -154,7 +154,7 @@ ENDINT:	.return(res)
 .end
 .sub _BUILTIN_STR_STRING	# string str(float arg)
 	.param int argc
-	.param float arg
+	.param num arg
 	.local string res
 	set res, arg
 	.return(res)
@@ -178,8 +178,8 @@ ENDINT:	.return(res)
 .sub _BUILTIN_MID_STRING	# string mid(string targ, float start [, float extent])
 	.param int argc
 	.param string target
-	.param float start
-        .param float extent :optional
+	.param num start
+        .param num extent :optional
 	.param int has_extent :opt_flag
 
 	.local string res
@@ -218,7 +218,7 @@ MIDDONE:
 .sub _BUILTIN_LEFT_STRING	# string left(string targ, float extent)
 	.param int argc
 	.param string targ
-	.param float extent
+	.param num extent
 	.local string res
 
 	res = _BUILTIN_MID_STRING(3, targ, 1.0, extent)
@@ -227,7 +227,7 @@ MIDDONE:
 .sub _BUILTIN_RIGHT_STRING	# string right(string targ, float extent)
 	.param int argc
 	.param string targ
-	.param float extent
+	.param num extent
 	.local string res
 	.local int conv
 
@@ -277,7 +277,7 @@ RND_BAIL:
 # float instr(float start, string full, string substring);
 .sub _BUILTIN_INSTR :multi(int, float, string, string)
 	.param int argc
-	.param float start
+	.param num start
 	.param string full
 	.param string substring
 
@@ -346,7 +346,7 @@ XCASE_DONE:
 .end
 .sub _BUILTIN_SGN	# float sgn(float number)
 	.param int argc
-	.param float number
+	.param num number
 	set $N0, 0.0
 	eq number, 0.0, FINISHED
 	set $N0, -1.0
@@ -357,7 +357,7 @@ FINISHED:
 .end
 .sub _BUILTIN_STRING_STRING	# string string(float repeat, float ascii)
 	.param int argc
-	.param float repeatf
+	.param num repeatf
 
 	.local int repeat
 	set repeat, repeatf
@@ -381,44 +381,44 @@ BAIL:	.return(target)
 .end
 .sub _BUILTIN_LOG		# float log(float op)
 	.param int argc
-	.param float op
+	.param num op
 	ln op, op
 	.return(op)
 .end
 .sub _BUILTIN_EXP		# float exp(float op)
 	.param int argc
-	.param float op
+	.param num op
 	exp op, op
 	.return(op)
 .end
 .sub _BUILTIN_SIN		# float sin(float op)
 	.param int argc
-	.param float op
+	.param num op
 	sin op, op
 	.return(op)
 .end
 .sub _BUILTIN_COS		# float cos(float op)
 	.param int argc
-	.param float op
+	.param num op
 	cos op, op
 	.return(op)
 .end
 .sub _BUILTIN_TAN		# float tan(float op)
 	.param int argc
-	.param float op
+	.param num op
 	tan op, op
 	.return(op)
 .end
 .sub _BUILTIN_ATN		# float atn(float op)
 	.param int argc
-	.param float op
+	.param num op
 	atan op, op
 	.return(op)
 .end
 .const float EPSILON = 0.000001
 .sub _BUILTIN_SQR		# float sqr(float operand)
 	.param int argc
-	.param float op
+	.param num op
         if op < 0 goto ERR_RANGE
 	sqrt op, op
 	.return(op)
@@ -428,7 +428,7 @@ ERR_RANGE:
 .end
 .sub _BUILTIN_TAB_STRING		# string tab(float cols)
 	.param int argc
-	.param float cols
+	.param num cols
 	.local int PRINTCOL
 	find_global $P0, "PRINTCOL"
 	set PRINTCOL, $P0["value"]
@@ -482,7 +482,7 @@ RTRIM_END:
 .end
 .sub _BUILTIN_INPUT_STRING 	# string input$(float numchars[, string fdinfo])
 	.param int argc
-	.param float numcharsf
+	.param num numcharsf
 	.local int numchars
 	.local string res
 	set numchars, numcharsf

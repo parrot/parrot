@@ -253,7 +253,7 @@ AR_LOOP_END:
     .local int flags, is_interface, is_abstract, num_interfaces, done_init
 
     done_init = 0
-    
+
     # Get class name and namespace and build combo of them.
     name = class
     namespace = class.get_namespace()
@@ -438,7 +438,7 @@ PARENT_NO_NS:
     pclass_ns = concat tmp
     pclass_ns = namespace_to_key(pclass_ns)
     pir_output = concat pclass_ns
-    
+
     # Finally, do code to add parent to the class and return.
 PARENT_DONE:
     pir_output = concat "\n    addparent type, parent\n"
@@ -464,7 +464,7 @@ PARENT_DONE:
     pir_output = "    addattribute type, \""
     pir_output = concat name
     pir_output = concat "\"\n"
-    
+
     # Return generated string.
 STATIC:
     .return (pir_output)
@@ -501,12 +501,12 @@ ILOOP:
     if i == 0 goto ILOOP_END
     dec i
     field = fields[i]
-    
+
     # Skip if field is static.
     flags = field.get_flags()
     static = band flags, 0x10
     if static != 0 goto ILOOP
-    
+
     # For clone, emit code to just copy the attribute.
     name = field
     clone_body = concat "$P0 = getattribute self, \""
@@ -514,7 +514,7 @@ ILOOP:
     clone_body = concat "\"\n$P0 = clone $P0\nsetattribute cpy, \""
     clone_body = concat name
     clone_body = concat "\", $P0\n"
-    
+
     # Need to look at signature to initialize attributes by type.
     sig_id = field.get_signature()
     sig_data = assembly.get_blob(sig_id)
@@ -604,7 +604,7 @@ PIR
 .end
 .sub __set_number_native
     .param pmc s
-    .param float i
+    .param num i
     $P0 = new Float
     $P0 = i
     setattribute s, "value__", $P0

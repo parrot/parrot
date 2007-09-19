@@ -163,15 +163,15 @@ no_v1:
 	read op, F, 10000	# TODO use stat
 	close F
 op_is_op:
-    .local float empty
+    .local num empty
     empty = _bench(times, verbose, '', '')
     unless verbose goto no_v2
         print "Empty "
         print empty
         print "\n"
 no_v2:
-    .local float test
-    .local float diff
+    .local num test
+    .local num diff
     test = _bench(times, verbose, op, preops)
     diff = test - empty
     unless verbose goto no_v3
@@ -218,12 +218,12 @@ no_v3:
 	print "#---------\n"
 no_v2:
     compiled = compiler(prog)
-    .local float now
+    .local num now
     time now
     .local pmc entry
     find_global entry, entry_label
     entry(n)
-    .local float later
+    .local num later
     time later
     later = later - now
 

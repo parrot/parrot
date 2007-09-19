@@ -42,8 +42,8 @@ END:	noop
 #
 #	# X in P7, Y in P6
 .sub _screen_locate		# void screen_locate(float x, float y)
-	.param float xf
-	.param float yf
+	.param num xf
+	.param num yf
 	.local int x
 	.local int y
 	.local string sys
@@ -58,8 +58,8 @@ NOTWIN: _ANSI_SCREEN_LOCATE(x,y)
 END:	noop
 .end
 .sub _screen_color	# void screen_color(float fore, float back)
-	.param float foref
-	.param float backf
+	.param num foref
+	.param num backf
 	.local int fore
 	.local int back
 	.local string sys
