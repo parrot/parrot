@@ -549,7 +549,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type ptr pragma_1 hll_def
+%type <t> type pragma_1 hll_def
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_sub  pcc_ret
@@ -579,7 +579,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <idlist> id_list id_list_id
 
 %nonassoc CONCAT DOT
-%nonassoc  <t> POINTY
+
 
  /* %locations */
 %pure_parser
@@ -1409,14 +1409,11 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
                             IMCC_fataly(interp, E_SyntaxError,
                                   "Sub isn't a PMC");
                      }
-       | target ptr sub_label_op  { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
-       | target ptr STRINGC    { IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
-       | target ptr target     { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
+       | target DOT sub_label_op  { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
+       | target DOT STRINGC    { IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
+       | target DOT target     { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
    ;
 
-ptr:    POINTY { $$=0; }
-      | DOT    { $$=0; }
-   ;
 
 sub_call:
      the_sub
