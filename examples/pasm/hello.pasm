@@ -12,7 +12,7 @@ for showing how to create an executable from PASM.
 =cut
 
     # Get @ARGV as a ResizableStringArray
-    get_params "(0)", P0
+    get_params "0", P0
 
     # Discard the program name
     shift S0, P0

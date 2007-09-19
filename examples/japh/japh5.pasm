@@ -7,7 +7,7 @@
     end
 .namespace ["Japh"]
 .pcc_sub __set_string_keyed:
-	get_params "(0,0,0)", P5, I5, S5
+	get_params "0,0,0", P5, I5, S5
     print S5
     if I5, sp
     print "\n"

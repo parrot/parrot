@@ -38,7 +38,7 @@ loop:
 	$N1 /= IM
 	last = $N0
 	.yield($N1)
-	get_params "(0)", max
+	get_params "0", max
 	goto loop
 .end
 

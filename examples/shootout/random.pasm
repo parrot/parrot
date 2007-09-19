@@ -8,7 +8,7 @@
 # N2 is the argument for gen_random
 # N3 is the return from gen_random
 main:
-	get_params "(0)", P0
+	get_params "0", P0
 	elements I0, P0
 	eq I0, 2, hasargs
 	set I1, 900000
