@@ -224,7 +224,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
 
 .namespace ["Source"]
 .pcc_sub __get_string:  # buffer
-    get_params "(0)", P2
+    get_params "0", P2
     getprop P12, "buffer", P2
     sweep 1
     unless_null P12, buffer_ok
@@ -234,16 +234,16 @@ pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     setprop P12, "buf", P14
     setprop P2, "buffer", P12
 buffer_ok:
-    set_returns "(0)", P12
+    set_returns "0", P12
     returncc
 
 .namespace ["Source::Buffer"]
 .pcc_sub __get_string:
-    get_params "(0)", P2
+    get_params "0", P2
     sweep 1
     getprop P12, "buf", P2
     set S16, P12
-    set_returns "(0)", S16
+    set_returns "0", S16
     returncc
 CODE
 hello

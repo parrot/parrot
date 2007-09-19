@@ -170,7 +170,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "specified constructor method does not exi
     end
 
 _handler:
-    get_results "(0,0)", P0, S0
+    get_results "0,0", P0, S0
     print "catched it\n"
     print S0
     print "\n"
@@ -195,17 +195,17 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - init attr" );
     end
 .namespace ["Foo"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "ok 1\n"
     new P10, 'Integer'
     set P10, 42
     setattribute P2, ".i", P10
-    set_returns "()"
+    set_returns ""
     returncc
 .pcc_sub __get_string:
-    get_params "(0)", P2
+    get_params "0", P2
     getattribute P10, P2, ".i"
-    set_returns "(0)", P10
+    set_returns "0", P10
     returncc
 CODE
 ok 1
@@ -226,7 +226,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
 
     .namespace ["Foo"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "foo_init\n"
     classname S0, P2
     print S0
@@ -235,13 +235,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
 
     .namespace ["Bar"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "bar_init\n"
     returncc
 
     .namespace ["Baz"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "baz_init\n"
     returncc
 
@@ -581,32 +581,32 @@ _check_isa:
 
 .namespace ["A"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "A init\n"
     returncc
 .namespace ["B"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "B init\n"
     returncc
 .namespace ["C"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "C init\n"
     returncc
 .namespace ["D"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "D init\n"
     returncc
 .namespace ["E"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "E init\n"
     returncc
 .namespace ["F"]
 .pcc_sub __init:
-    get_params "(0)", P2
+    get_params "0", P2
     print "F init\n"
     returncc
 CODE
@@ -652,7 +652,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
 
     .namespace ["Foo"]
 .pcc_sub _new:
-    get_params "(0)", P2
+    get_params "0", P2
     print "foo_init\n"
     classname S0, P2
     print S0
@@ -661,13 +661,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents BUILD" );
 
     .namespace ["Bar"]
 .pcc_sub _new:
-    get_params "(0)", P2
+    get_params "0", P2
     print "bar_init\n"
     returncc
 
     .namespace ["Baz"]
 .pcc_sub _new:
-    get_params "(0)", P2
+    get_params "0", P2
     print "baz_init\n"
     returncc
 

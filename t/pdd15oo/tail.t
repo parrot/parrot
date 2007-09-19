@@ -22,8 +22,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     $P2 = 3
     .const .Sub f = "_floor"
     .const .Sub c = "_funcall"
-    set_args "(0,0,0)", f, $P1, $P2
-    get_results "(0,0)", $P3, $P4
+    set_args "0,0,0", f, $P1, $P2
+    get_results "0,0", $P3, $P4
     invokecc c
     print "_floor returned "
     print 2      # TODO argcP
@@ -33,8 +33,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     print $P4
     print ".\n"
     .const .Sub s = "_fib_step"
-    set_args "(0,0,0)", s, $P1, $P2
-    get_results "(0,0,0)", $P3, $P4, $P5
+    set_args "0,0,0", s, $P1, $P2
+    get_results "0,0,0", $P3, $P4, $P5
     invokecc c
     print "_fib_step returned "
     print 3    # TODO argcP
@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
 .sub _funcall
     .local pmc function
     .local pmc argv
-    get_params "(0,0x20)", function, argv
+    get_params "0,0x20", function, argv
     print "[doing _funcall]\n"
     $I33 = defined function
     if $I33 goto doit
@@ -58,7 +58,7 @@ bad_func:
     printerr "_funcall:  Bad function.\n"
     exit 0
 doit:
-    set_args "(0x20)", argv
+    set_args "0x20", argv
     tailcall function
 .end
 
@@ -66,7 +66,7 @@ doit:
 .sub _floor
     .local pmc arg1
     .local pmc arg2
-    get_params "(0,0)", arg1, arg2
+    get_params "0,0", arg1, arg2
     $P1 = new 'Integer'
     $P1 = arg1 / arg2
     ## truncate.
@@ -74,7 +74,7 @@ doit:
     $P1 = $I1
     $P2 = new 'Integer'
     $P2 = arg1 % arg2
-    set_returns "(0,0)", $P1, $P2
+    set_returns "0,0", $P1, $P2
     returncc
 .end
 
@@ -82,10 +82,10 @@ doit:
 .sub _fib_step
     .local pmc arg1
     .local pmc arg2
-    get_params "(0,0)", arg1, arg2
+    get_params "0,0", arg1, arg2
     $P1 = new 'Integer'
     $P1 = arg1 + arg2
-    set_returns "(0,0,0)", $P1, arg1, arg2
+    set_returns "0,0,0", $P1, arg1, arg2
     returncc
 .end
 CODE

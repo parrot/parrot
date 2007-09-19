@@ -59,7 +59,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "not reached\n"
     end
 handler:
-    get_results "(0,0)", P0, S0
+    get_results "0,0", P0, S0
     print "caught it\n"
     typeof S1, P0
     print S1
@@ -87,7 +87,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" )
     print "not reached\n"
     end
 handler:
-    get_results "(0,0)", P1, S0
+    get_results "0,0", P1, S0
     inc P0
     print "ok\n"
     end
@@ -135,7 +135,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     print "not reached\n"
     end
 _handler:
-    get_results "(0,0)", P5, S0
+    get_results "0,0", P5, S0
     print "caught it\n"
     print S0
     print "\n"
@@ -189,13 +189,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     print "not reached\n"
     end
 _handler1:
-    get_results "(0,0)", P5, S0
+    get_results "0,0", P5, S0
     print "caught it in 1\n"
     print S0
     print "\n"
     end
 _handler2:
-    get_results "(0,0)", P0, S0
+    get_results "0,0", P0, S0
     print "caught it in 2\n"
     print S0
     print "\n"
@@ -217,13 +217,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     print "not reached\n"
     end
 _handler1:
-    get_results "(0,0)", P5, S0
+    get_results "0,0", P5, S0
     print "caught it in 1\n"
     print S0
     print "\n"
     end
 _handler2:
-    get_results "(0,0)", P5, S0
+    get_results "0,0", P5, S0
     print "caught it in 2\n"
     print S0
     print "\n"
@@ -255,7 +255,7 @@ pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
     print "not reached\n"
     end
 _handler:
-    get_results "(0,0)", P5, S0
+    get_results "0,0", P5, S0
     print "caught it\n"
     set I0, P5["_type"]
     print "error "
@@ -355,7 +355,7 @@ handler:
     print "ok 3\n"
     end
 .pcc_sub action:
-    get_params "(0)", I5
+    get_params "0", I5
     print "in action I5 = "
     print I5
     print "\n"

@@ -41,14 +41,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     .const .Sub P0 = "func"
 
     set I5, 3
-    set_args "(0)", I5
+    set_args "0", I5
     invokecc P0
     print I5
     print "\n"
     end
 
 .pcc_sub func:
-    get_params "(0)", I5
+    get_params "0", I5
     print I5
     print "\n"
 
@@ -57,7 +57,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
 
 .include "interpinfo.pasm"
     interpinfo P0, .INTERPINFO_CURRENT_SUB
-    set_args "(0)", I5
+    set_args "0", I5
     invokecc P0  # recursive invoke
 
 endfunc:

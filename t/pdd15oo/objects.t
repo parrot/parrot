@@ -690,83 +690,83 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, subclassing access meth
     # Foo and Bar have attribute accessor methods
     new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
-    set_args "(0,0)", P5, "i"
-    get_results "()"
+    set_args "0,0", P5, "i"
+    get_results ""
     callmethodcc P13, "Foo::set"
 
     new P5, 'String'
     set P5, "j\n"
-    set_args "(0,0)", P5, "j"
-    get_results "()"
+    set_args "0,0", P5, "j"
+    get_results ""
     callmethodcc  P13,"Foo::set"
 
     new P5, 'String'
     set P5, "k\n"
-    set_args "(0,0)", P5, "k"
-    get_results "()"
+    set_args "0,0", P5, "k"
+    get_results ""
     callmethodcc  P13,"Bar::set"
 
     new P5, 'String'
     set P5, "l\n"
-    set_args "(0,0)", P5, "l"
-    get_results "()"
+    set_args "0,0", P5, "l"
+    get_results ""
     callmethodcc  P13,"Bar::set"
 
     # now retrieve attributes
-    set_args "(0)",  "i"
-    get_results "(0)", P5
+    set_args "0",  "i"
+    get_results "0", P5
     callmethodcc  P13,"Foo::get"
     print P5			# return result
 
-    set_args "(0)",  "j"
-    get_results "(0)", P5
+    set_args "0",  "j"
+    get_results "0", P5
     callmethodcc  P13,"Foo::get"
     print P5
 
-    set_args "(0)",  "k"
-    get_results "(0)", P5
+    set_args "0",  "k"
+    get_results "0", P5
     callmethodcc  P13,"Bar::get"
     print P5			# return result
 
-    set_args "(0)",  "l"
-    get_results "(0)", P5
+    set_args "0",  "l"
+    get_results "0", P5
     callmethodcc  P13,"Bar::get"
     print P5
     end
 
 # set(obj: Pvalue, Iattr_idx)
 .pcc_sub Foo::set:
-    get_params "(0,0)", P5, S4
+    get_params "0,0", P5, S4
     print "in Foo::set\n"
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     setattribute P2, S4, P5	# so always put new PMCs in
-    set_returns "()"
+    set_returns ""
     returncc
 
 # Pattr = get(obj: Iattr_idx)
 .pcc_sub Foo::get:
-    get_params "(0)", S4
+    get_params "0", S4
     print "in Foo::get\n"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getattribute P5, P2, S4
-    set_returns "(0)", P5
+    set_returns "0", P5
     returncc
 
 .pcc_sub Bar::set:
-    get_params "(0,0)", P5, S4
+    get_params "0,0", P5, S4
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in Bar::set\n"
     setattribute P2, S4, P5	# so always put new PMCs in
-    set_returns "()"
+    set_returns ""
     returncc
 
 .pcc_sub Bar::get:
-    get_params "(0)", S4
+    get_params "0", S4
     print "in Bar::get\n"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getattribute P5, P2, S4
-    set_returns "(0)", P5
+    set_returns "0", P5
     returncc
 CODE
 in Foo::set
@@ -811,58 +811,58 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
     # Foo and Bar have attribute accessor methods
     new P5, 'String'		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
-    set_args "(0,0,0)", P5, "Foo", "i"
-    get_results "()"
+    set_args "0,0,0", P5, "Foo", "i"
+    get_results ""
     callmethodcc P2, "set"
 
     new P5, 'String'
     set P5, "j\n"
-    set_args "(0,0,0)", P5, "Foo", "j"
-    get_results "()"
+    set_args "0,0,0", P5, "Foo", "j"
+    get_results ""
     callmethodcc P2, "set"
 
     new P5, 'String'
     set P5, "k\n"
-    set_args "(0,0,0)", P5, "Bar", "k"
-    get_results "()"
+    set_args "0,0,0", P5, "Bar", "k"
+    get_results ""
     callmethodcc P2, "set"
 
     new P5, 'String'
     set P5, "l\n"
-    set_args "(0,0,0)", P5, "Bar", "l"
-    get_results "()"
+    set_args "0,0,0", P5, "Bar", "l"
+    get_results ""
     callmethodcc P2, "set"
 
     new P5, 'String'
     set P5, "m\n"
-    set_args "(0,0,0)", P5, "Bar", "m"
-    get_results "()"
+    set_args "0,0,0", P5, "Bar", "m"
+    get_results ""
     callmethodcc P2, "set"
 
     # now retrieve attributes
-    set_args "(0,0)", "Foo", "i"
-    get_results "(0)", P5
+    set_args "0,0", "Foo", "i"
+    get_results "0", P5
     callmethodcc P2, "get"
     print P5			# return result
 
-    set_args "(0,0)", "Foo", "j"
-    get_results "(0)", P5
+    set_args "0,0", "Foo", "j"
+    get_results "0", P5
     callmethodcc P2, "get"
     print P5
 
 
-    set_args "(0,0)", "Bar", "k"
-    get_results "(0)", P5
+    set_args "0,0", "Bar", "k"
+    get_results "0", P5
     callmethodcc P2, "get"
     print P5
 
-    set_args "(0,0)", "Bar", "l"
-    get_results "(0)", P5
+    set_args "0,0", "Bar", "l"
+    get_results "0", P5
     callmethodcc P2, "get"
     print P5
 
-    set_args "(0,0)", "Bar", "m"
-    get_results "(0)", P5
+    set_args "0,0", "Bar", "m"
+    get_results "0", P5
     callmethodcc P2, "get"
     print P5
     end
@@ -873,19 +873,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "attribute values, inherited access meths"
 # set(obj: Pvalue, SClass, Sattr)
 .pcc_sub set:
 .include "interpinfo.pasm"
-    get_params "(0,0,0)", P5, S4, S5
+    get_params "0,0,0", P5, S4, S5
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     setattribute P2, S4, P5
-    set_returns "()"
+    set_returns ""
     returncc
 
 # Pattr = get(obj: SClass, Sattr)
 .pcc_sub get:
-    get_params "(0,0)", S5, S4
+    get_params "0,0", S5, S4
 .include "interpinfo.pasm"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getattribute P5, P2, S4
-    set_returns "(0)", P5
+    set_returns "0", P5
     returncc
 
 CODE
