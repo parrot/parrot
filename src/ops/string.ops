@@ -12,7 +12,7 @@ string.ops - String Operations
 =head1 DESCRIPTION
 
 Operations that work on strings, whether constructing, modifying
-or examining them.  See also F<rx.ops>.
+or examining them.
 
 =over 4
 
