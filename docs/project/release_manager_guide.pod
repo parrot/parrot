@@ -279,7 +279,7 @@ Tuesday of the month.
  - Jun 19th (0.4.13) Allison Randal
  - Jul 17th (0.4.14) Jerry Gay (particle)
  - Aug 21st (0.4.15) Patrick Michaud (pmichaud)
- - Sep 18th, Matt Diephouse (mdiep)
+ - Sep 18th (0.4.16) Jerry Gay (particle)
  - Oct 16th, Will Coleda (Coke)
  - Nov 20th, chromatic
  - Dec 18th, Allison Randal
