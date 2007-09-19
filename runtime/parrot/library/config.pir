@@ -45,7 +45,7 @@ undefined values) is undefined, and may be rather funky.
 
 .include "interpinfo.pasm"
 
-.pcc_sub _config
+.sub _config
     .local pmc CONF
     .local string conf_file
     conf_file = interpinfo .INTERPINFO_RUNTIME_PREFIX
