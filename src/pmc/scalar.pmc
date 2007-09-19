@@ -85,7 +85,7 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
     return dest;
 }
 
-pmclass scalar abstract noinit {
+pmclass scalar abstract no_init {
 
 /*
 

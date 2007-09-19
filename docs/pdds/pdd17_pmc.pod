@@ -133,7 +133,7 @@ Adds the C<PMC_EXT> structure when instantiating the PMC.
 The PMC cannot be instantiated. (By convention, abstract classes are given
 lower-case names.)
 
-=item noinit
+=item no_init
 
 Don't generate class initialization code (don't set up a vtable for the PMC).
 Used with C<abstract>.

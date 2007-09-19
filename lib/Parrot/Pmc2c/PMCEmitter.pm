@@ -461,7 +461,7 @@ string if the PMC has a C<no_init> flag.
 
 sub init_func {
     my ($self) = @_;
-    return "" if $self->noinit;
+    return "" if $self->no_init;
 
     my $cout = "";
     my $classname = $self->name;

@@ -123,9 +123,9 @@ True if pmc generates code for vtable method C<$method>.
 
 =cut
 
-sub noinit {
+sub no_init {
     my ( $self ) = @_;
-    return $self->flag('noinit');
+    return $self->flag('no_init');
 }
 
 sub singleton {

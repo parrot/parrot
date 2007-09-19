@@ -30,7 +30,7 @@ getting replaced by their appropriate values.
 Finally, the .c and .h files are generated. The appropriate base class
 header files are included.
 
-If the C<noinit> flag was used, then no init function is generated.
+If the C<no_init> flag was used, then no init function is generated.
 Otherwise, one is generated which sets up the vtable and enters it into
 the C<vtables> array.
 
@@ -67,7 +67,7 @@ If no parent class is defined, methods from F<default.pmc> are used.
 This class cannot be instantiated. Abstract classes are shown with lower
 case class names in the class tree.
 
-=item C<noinit>
+=item C<no_init>
 
 Used with C<abstract>: No C<class_init> code is generated.
 

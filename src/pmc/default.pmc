@@ -263,7 +263,7 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
     return 0;
 }
 
-pmclass default abstract noinit {
+pmclass default abstract no_init {
 
 /*
 
