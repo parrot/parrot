@@ -593,7 +593,7 @@ OUT
 pir_output_is( << 'CODE', << 'OUTPUT', "push and pop" );
 
 .sub test :main
-    .local float f, f_elem
+    .local num f, f_elem
     .local int i, i_elem, elements
     .local pmc p, p_elem, pmc_arr
     .local string s, s_elem
@@ -687,7 +687,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
 
 .sub test :main
-    .local float f, f_elem
+    .local num f, f_elem
     .local int i, i_elem, elements
     .local pmc p, p_elem, pmc_arr
     .local string s, s_elem

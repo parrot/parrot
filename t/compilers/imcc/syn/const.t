@@ -163,7 +163,7 @@ pir_output_is( <<'CODE', <<'OUT', "const I/N mismatch 2" );
     .const int i = 2.0
     print i
     print "\n"
-    .const float n = 2
+    .const num n = 2
     print n
     print "\nok\n"
     .const string s = ascii:"ok 2\n"
@@ -563,7 +563,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', ".const in mixed opcodes" );
 .sub main :main
     .const int I = 5
-    .local float f
+    .local num f
     f = 2.0
     f *= I
     print f
@@ -576,7 +576,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
 .const int c = 12
 .sub test
-    .local float a
+    .local num a
     a = 96
     # Uncomment this line, and the c symbol is 'forgotten'
     a += c

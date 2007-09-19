@@ -538,7 +538,7 @@ done:
     ok = get_hll_global [ 'Test'; 'More' ], 'ok'
 
     .local pmc   array
-    .local float elem
+    .local num elem
     array = new 'ResizableStringArray'
 
     array = 1

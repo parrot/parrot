@@ -393,7 +393,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Index access for Iterator on String" );
     iter_1 = .ITERATE_FROM_START
 
     .local int    code_point_1
-    .local float  code_point_2
+    .local num  code_point_2
     .local string code_point_3
     .local pmc    code_point_4
 
@@ -506,7 +506,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
     iter_2 = .ITERATE_FROM_END
 
     print 'Iterator shift_float: '
-    .local float felem_2
+    .local num felem_2
     shift felem_2, iter_2
     print felem_2
     print "\n"

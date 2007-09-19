@@ -228,7 +228,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n" );
 .sub test :main
     .local int i
-    .local float j
+    .local num j
     i = 1
     j = 1.0
     eq_num j, i, ok1

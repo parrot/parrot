@@ -1104,7 +1104,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object" );
     $P0 = i
 .end
 .sub set_number_native :vtable :method
-    .param float f
+    .param num f
     $P0 = getattribute self, ".i"
     $P0 = f
 .end
