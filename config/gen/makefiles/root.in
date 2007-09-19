@@ -1936,57 +1936,44 @@ cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
 		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
 
-cover-testb:
-	@echo "make cover-testb"
-	-PERL5OPT="-MDevel::Cover" @make@ testb
+cover-testb: cover.dummy
+	-@make@ testb
 
-cover-testC:
-	@echo "make cover-testC"
-	-PERL5OPT="-MDevel::Cover" @make@ testC
+cover-testC: cover.dummy
+	-@make@ testC
 
-cover-testf:
-	@echo "make cover-testf"
-	-PERL5OPT="-MDevel::Cover" @make@ testf
+cover-testf: cover.dummy
+	-@make@ testf
 
-cover-testg:
-	@echo "make cover-testg"
-	-PERL5OPT="-MDevel::Cover" @make@ testg
+cover-testg: cover.dummy
+	-@make@ testg
 
-cover-testj:
-	@echo "make cover-testj"
-	-PERL5OPT="-MDevel::Cover" @make@ testj
+cover-testj: cover.dummy
+	-@make@ testj
 
-cover-testr:
-	@echo "make cover-testr"
-	-PERL5OPT="-MDevel::Cover" @make@ testr
+cover-testr: cover.dummy
+	-@make@ testr
 
-cover-testS:
-	@echo "make cover-testS"
-	-PERL5OPT="-MDevel::Cover" @make@ testS
+cover-testS: cover.dummy
+	-@make@ testS
 
-cover-src:
-	@echo "make cover-src"
-	-PERL5OPT="-MDevel::Cover" @make@ src_tests
+cover-src: cover.dummy
+	-@make@ src_tests
 
-cover-perl:
-	@echo "make cover-perl"
-	-PERL5OPT="-MDevel::Cover" @make@ perl_tests
+cover-perl: cover.dummy
+	-@make@ perl_tests
 
-cover-codingstd:
-	@echo "make cover-codingstd"
-	-PERL5OPT="-MDevel::Cover" @make@ codingstd_tests
+cover-codingstd: cover.dummy
+	-@make@ codingstd_tests
 
-cover-benchmark:
-	@echo "make cover-benchmark"
-	-PERL5OPT="-MDevel::Cover" @make@ benchmark_tests
+cover-benchmark: cover.dummy
+	-@make@ benchmark_tests
 
-cover-doc:
-	@echo "make cover-doc"
-	-PERL5OPT="-MDevel::Cover" @make@ doc_tests
+cover-doc: cover.dummy
+	-@make@ doc_tests
 
-cover-distro:
-	@echo "make cover-distro"
-	-PERL5OPT="-MDevel::Cover" @make@ distro_tests
+cover-distro: cover.dummy
+	-@make@ distro_tests
 
 cover-clean:
 	for dir in $(COVER_DIRS); \
