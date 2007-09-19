@@ -268,15 +268,15 @@ add more.
 	goto string_compare
 
   num_compare:
- 	.local float l_val
- 	.local float r_val
+ 	.local num l_val
+ 	.local num r_val
 	l_val = left
 	r_val = right
 
     if l_val == r_val goto pass_it
 
 	# XXX - significant places?  I don't care :)
-	.local float diff
+	.local num diff
 	diff = l_val - r_val
 
 	if diff < 0.000000000001 goto pass_it

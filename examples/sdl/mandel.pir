@@ -146,7 +146,7 @@ ex:
 
 # accessors for some attribs
 .sub 'xstart' :method
-    .param float x     :optional
+    .param num x     :optional
     .param int has_x   :opt_flag
     $P0 = getattribute self, 'xstart'
     unless has_x goto get
@@ -157,7 +157,7 @@ get:
 .end
 
 .sub 'ystart' :method
-    .param float y     :optional
+    .param num y     :optional
     .param int has_y   :opt_flag
     $P0 = getattribute self, 'ystart'
     unless has_y goto get
@@ -168,7 +168,7 @@ get:
 .end
 
 .sub 'xend' :method
-    .param float x     :optional
+    .param num x     :optional
     .param int has_x   :opt_flag
     $P0 = getattribute self, 'xend'
     unless has_x goto get
@@ -179,7 +179,7 @@ get:
 .end
 
 .sub 'yend' :method
-    .param float y     :optional
+    .param num y     :optional
     .param int has_y   :opt_flag
     $P0 = getattribute self, 'yend'
     unless has_y goto get
@@ -190,7 +190,7 @@ get:
 .end
 
 .sub 'scale' :method
-    .param float s     :optional
+    .param num s     :optional
     .param int has_s   :opt_flag
     $P0 = getattribute self, 'scale'
     unless has_s goto get

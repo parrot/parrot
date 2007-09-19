@@ -103,13 +103,13 @@ endif:
 .end
 
 .sub TakNum
-	.param float x
-	.param float y
-	.param float z
+	.param num x
+	.param num y
+	.param num z
 	unless y >= x goto endif
 	.return(z)
 endif:
-	.local float tmp
+	.local num tmp
 	tmp = x - 1
 	$N0 = TakNum(tmp, y, z)
 	tmp = y - 1
