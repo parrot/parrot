@@ -13,7 +13,7 @@ of the object's class.
 
 =head1 SYNOPSIS
 
-  .sub meth method
+  .sub meth :method
       .local pmc s
       s = new 'Super', self
       s."meth"()
