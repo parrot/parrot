@@ -1910,16 +1910,83 @@ COVER_DIRS = \
 	     $(IO_DIR) \
 	     $(IMCC_DIR)
 
-cover:
-	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
-		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
-	-PERL5OPT="-MDevel::Cover" @make@ fulltest
+cover: \
+    cover.dummy \
+    cover-testb \
+#CONDITIONED_LINE(cg_flag): cover-testC \
+    cover-testf \
+#CONDITIONED_LINE(cg_flag): cover-testg \
+#CONDITIONED_LINE(jitcapable): cover-testj \
+    cover-testr \
+    cover-testS \
+    cover-src \
+    cover-perl \
+    cover-codingstd \
+    cover-benchmark \
+    cover-doc \
+    cover-distro
 	for dir in $(COVER_DIRS); \
 	do \
 		pwd=$$PWD; cd $$dir; gcov *.c; cd $$pwd; \
 		gcov2perl $$dir/*.gcov; \
 	done
 	cover -ignore_re '^\/usr\/local\/bin'
+
+cover.dummy:
+	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
+		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+
+cover-testb:
+	@echo "make cover-testb"
+	-PERL5OPT="-MDevel::Cover" @make@ testb
+
+cover-testC:
+	@echo "make cover-testC"
+	-PERL5OPT="-MDevel::Cover" @make@ testC
+
+cover-testf:
+	@echo "make cover-testf"
+	-PERL5OPT="-MDevel::Cover" @make@ testf
+
+cover-testg:
+	@echo "make cover-testg"
+	-PERL5OPT="-MDevel::Cover" @make@ testg
+
+cover-testj:
+	@echo "make cover-testj"
+	-PERL5OPT="-MDevel::Cover" @make@ testj
+
+cover-testr:
+	@echo "make cover-testr"
+	-PERL5OPT="-MDevel::Cover" @make@ testr
+
+cover-testS:
+	@echo "make cover-testS"
+	-PERL5OPT="-MDevel::Cover" @make@ testS
+
+cover-src:
+	@echo "make cover-src"
+	-PERL5OPT="-MDevel::Cover" @make@ src_tests
+
+cover-perl:
+	@echo "make cover-perl"
+	-PERL5OPT="-MDevel::Cover" @make@ perl_tests
+
+cover-codingstd:
+	@echo "make cover-codingstd"
+	-PERL5OPT="-MDevel::Cover" @make@ codingstd_tests
+
+cover-benchmark:
+	@echo "make cover-benchmark"
+	-PERL5OPT="-MDevel::Cover" @make@ benchmark_tests
+
+cover-doc:
+	@echo "make cover-doc"
+	-PERL5OPT="-MDevel::Cover" @make@ doc_tests
+
+cover-distro:
+	@echo "make cover-distro"
+	-PERL5OPT="-MDevel::Cover" @make@ distro_tests
 
 cover-clean:
 	for dir in $(COVER_DIRS); \
