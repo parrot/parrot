@@ -89,14 +89,13 @@ true
 $cwd
 OUT
 
-language_output_is( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
+language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
 require "lfs"
 for file in lfs.dir("xpto") do
     print(file)
 end
 CODE
-.
-..
+/^(\.\n\.\.\n|\.\.\n\.\n)/
 OUT
 
 rmdir '../xpto' if (-d '../xpto');
