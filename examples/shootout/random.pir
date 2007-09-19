@@ -25,7 +25,7 @@ while_1:
 .const float IC = 29573.0
 
 .sub gen_random
-	.param float max
+	.param num max
 	.local num last
 	last = 42.0
 loop:

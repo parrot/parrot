@@ -107,9 +107,9 @@ endif:
 .end
 
 .sub TakNum
-    .param float x
-    .param float y
-    .param float z
+    .param num x
+    .param num y
+    .param num z
     unless y >= x goto endif
     .return(z)
 endif:
