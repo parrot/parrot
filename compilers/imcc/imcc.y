@@ -552,7 +552,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <t> type pragma_1 hll_def
 %type <i> program
 %type <i> class_namespace
-%type <i> constdef sub emit pcc_sub  pcc_ret
+%type <i> constdef sub emit pcc_ret
 %type <i> compilation_units compilation_unit pmc_const pragma
 %type <s> classname relop any_string
 %type <i> labels _labels label  statement sub_call
@@ -614,9 +614,6 @@ compilation_unit:
      class_namespace  { $$ = $1; }
    | constdef      { $$ = $1; }
    | sub           { $$ = $1;
-                     imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
-                     IMCC_INFO(interp)->cur_unit = 0; }
-   | pcc_sub       { $$ = $1;
                      imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
                      IMCC_INFO(interp)->cur_unit = 0; }
    | emit          { $$ = $1;
@@ -866,14 +863,6 @@ multi_type:
 sub_body:
      /* empty */
    |  statements
-   ;
-
-pcc_sub:
-     PCC_SUB        { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
-     IDENTIFIER     { iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, mk_sub_label(interp, $3)); }
-     sub_proto '\n' { IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; }
-     sub_params
-     sub_body  ESUB { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    ;
 
 pcc_sub_call:
