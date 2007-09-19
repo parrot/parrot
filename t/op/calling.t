@@ -25,9 +25,9 @@ Tests Parrot calling conventions.
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set_args - parsing" );
     noop
-    set_args "(0, 0)", P0, I0
+    set_args "0, 0", P0, I0
     print "Ok 1\n"
-    set_args "()"
+    set_args ""
     print "Ok 2\n"
     end
 CODE
@@ -38,17 +38,17 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "var_args - parsing" );
 .pcc_sub main:
     print "Ok 1\n"
-    set_args "(0, 0)", P0, I0
-    get_results "(0)", I0
+    set_args "0, 0", P0, I0
+    get_results "0", I0
     find_name P1, "foo"
     print "Ok 2\n"
     invokecc P1
     print "Ok 5\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0)", P0, I0
+    get_params "0, 0", P0, I0
     print "Ok 3\n"
-    set_returns "(0)", 42
+    set_returns "0", 42
     print "Ok 4\n"
     returncc
 CODE
@@ -62,13 +62,13 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic" );
 .pcc_sub main:
     set I16, 77
-    set_args "(0, 0)", 42, I16
+    set_args "0, 0", 42, I16
     find_name P1, "foo"
     invokecc P1
     print "back\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0)", I16, I17
+    get_params "0, 0", I16, I17
     print I16
     print "\n"
     print I17
@@ -83,8 +83,8 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic" );
 .pcc_sub main:
     set I16, 77
-    set_args "(0, 0)", 42, I16
-    get_results "(0, 0)", I16, I17
+    set_args "0, 0", 42, I16
+    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
     print I16
@@ -93,13 +93,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic" );
     print "\nback\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0)", I16, I17
+    get_params "0, 0", I16, I17
     print I16
     print "\n"
     print I17
     print "\n"
     set I16, 88
-    set_returns "(0, 0)", 99, I16
+    set_returns "0, 0", 99, I16
     returncc
 CODE
 42
@@ -112,8 +112,8 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig" );
 .pcc_sub main:
     set I16, 77
-    set_args "(0, 0)", 42, I16
-    get_results "(0, 0)", I16, I17
+    set_args "0, 0", 42, I16
+    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
     print I16
@@ -122,13 +122,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call - i, ic, return i, ic - adjust sig" 
     print "\nback\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0)", I16, I17
+    get_params "0, 0", I16, I17
     print I16
     print "\n"
     print I17
     print "\n"
     set I16, 88
-    set_returns "(0, 0)", 99, I16
+    set_returns "0, 0", 99, I16
     returncc
 CODE
 42
@@ -145,8 +145,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set S16, "ok 1\n"
     new P16, 'Integer'
     set P16, 101
-    set_args "(0, 0, 0, 0, 0, 0, 0)", 42, I16, 4.5, N16, S16, "ok 2\n", P16
-    get_results "(0, 0, 0, 0)", I16, N16, S16, P16
+    set_args "0, 0, 0, 0, 0, 0, 0", 42, I16, 4.5, N16, S16, "ok 2\n", P16
+    get_results "0, 0, 0, 0", I16, N16, S16, P16
     find_name P1, "foo"
     invokecc P1
     print I16
@@ -157,7 +157,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     print P16
     end
 .pcc_sub foo:
-    get_params "(0, 0, 0, 0, 0, 0, 0)", I16, I17, N16, N17, S16, S17, P16
+    get_params "0, 0, 0, 0, 0, 0, 0", I16, I17, N16, N17, S16, S17, P16
     print I16
     print "\n"
     print I17
@@ -175,7 +175,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
     set S16, "ok 3\n"
     new P16, 'String'
     set P16, "ok 4\n"
-    set_returns "(0, 0, 0, 0)", I16, N16, S16, P16
+    set_returns "0, 0, 0, 0", I16, N16, S16, P16
     returncc
 CODE
 42
@@ -201,13 +201,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "flatten arg" );
     push P17, "ok 4\n"
     new P18, 'String'
     set P18, "ok 5\n"
-    set_args "(0, 0x20, 0)", P16, P17, P18
+    set_args "0, 0x20, 0", P16, P17, P18
     find_name P1, "foo"
     invokecc P1
     print "back\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0, 0, 0, 0)", P1, P2, P3, P4, P5
+    get_params "0, 0, 0, 0, 0", P1, P2, P3, P4, P5
     print P1
     print P2
     print P3
@@ -231,13 +231,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "slurpy param" );
     set P17, "ok 2\n"
     new P18, 'String'
     set P18, "ok 3\n"
-    set_args "(0, 0, 0)", P16, P17, P18
+    set_args "0, 0, 0", P16, P17, P18
     find_name P1, "foo"
     invokecc P1
     print "back\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0x20)", P1, P2
+    get_params "0, 0x20", P1, P2
     print P1
     set I0, P2
     print I0
@@ -261,11 +261,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
-    set_args "(0)", $P0
+    set_args "0", $P0
     invokecc $P1
 .end
 .sub foo
-    get_params "(0)", $P0
+    get_params "0", $P0
     print $P0
 .end
 CODE
@@ -292,13 +292,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "flatten + slurpy param" );
     push P20, P18
     new P21, 'String'
     set P21, "ok 6\n"
-    set_args "(0, 0x20, 0x20, 0)", P16, P19, P20, P21
+    set_args "0, 0x20, 0x20, 0", P16, P19, P20, P21
     find_name P1, "foo"
     invokecc P1
     print "back\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0x20)", P1, P2
+    get_params "0, 0x20", P1, P2
     print P1
     set I0, P2
     print I0
@@ -333,11 +333,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
     $P0 = "hello\n"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
-    set_args "(0)", $P0
+    set_args "0", $P0
     invokecc $P1
 .end
 .sub foo
-    get_params "(0)", $P0
+    get_params "0", $P0
     print $P0
 .end
 CODE
@@ -350,11 +350,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - autobox" );
     $P0 = "hello"
     find_name $P1, "foo"
     # set_args and invoke must be adjacent
-    set_args "(0,0,0)", $P0, 42, "bar"
+    set_args "0,0,0", $P0, 42, "bar"
     invokecc $P1
 .end
 .sub foo
-    get_params "(0x20)", $P0
+    get_params "0x20", $P0
     $S0 = $P0[0]
     print $S0
     print ' '
@@ -411,11 +411,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
     $P3 = 47.11
     find_name $P10, "foo"
     # set_args and invoke must be adjacent
-    set_args "(0,0,0,0)", $P0, $P1, $P2, $P3
+    set_args "0,0,0,0", $P0, $P1, $P2, $P3
     invokecc $P10
 .end
 .sub foo
-    get_params "(0,0,0,0)", $P0, $I0, $S0, $N0
+    get_params "0,0,0,0", $P0, $I0, $S0, $N0
     print $P0
     print ' '
     print $I0
@@ -437,11 +437,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "(0)", $P0
+    set_args "0", $P0
     invokecc $P1
 .end
 .sub foo
-    get_params "(0,0)", $P0, $P1
+    get_params "0,0", $P0, $P1
     print $P0
 .end
 CODE
@@ -486,11 +486,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "(0,0)", $P0,77
+    set_args "0,0", $P0,77
     invokecc $P1
 .end
 .sub foo
-    get_params "(0)", $P0
+    get_params "0", $P0
     print $P0
 .end
 CODE
@@ -504,16 +504,16 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "(0,0)", $P0,77
+    set_args "0,0", $P0,77
     invokecc $P1
 .end
 .sub foo
     push_eh arg_handler
-    get_params "(0)", $P0
+    get_params "0", $P0
     print $P0
     print "never\n"
 arg_handler:
-    get_results "(0,0)", $P1, $S0
+    get_results "0,0", $P1, $S0
     print "catched: "
     print $S0
 .end
@@ -528,11 +528,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "(0)", $P0
+    set_args "0", $P0
     invokecc $P1
 .end
 .sub foo
-    get_params "(0,0x80,0x100)", $P0, $P1, $I0
+    get_params "0,0x80,0x100", $P0, $P1, $I0
     print $P0
     if_null $P1, ok
     print "not "
@@ -571,8 +571,8 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_param later" );
 .pcc_sub main:
     set I16, 77
-    set_args "(0, 0)", 42, I16
-    get_results "(0, 0)", I16, I17
+    set_args "0, 0", 42, I16
+    get_results "0, 0", I16, I17
     find_name P1, "foo"
     invokecc P1
     print I16
@@ -582,13 +582,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_param later" );
     end
 .pcc_sub foo:
     noop
-    get_params "(0, 0)", I16, I17
+    get_params "0, 0", I16, I17
     print I16
     print "\n"
     print I17
     print "\n"
     set I16, 88
-    set_returns "(4, 0)", 99, I16
+    set_returns "4, 0", 99, I16
     returncc
 CODE
 42
@@ -602,7 +602,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 1" );
 .sub main :main
     .const .Sub f = "foo"
     print "main\n"
-    get_results "(0)", $S0
+    get_results "0", $S0
     invokecc f
     print $S0
 .end
@@ -613,7 +613,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 1" );
 .end
 .sub bar
     print "bar\n"
-    set_returns "(0)", "bar_ret\n"
+    set_returns "0", "bar_ret\n"
     returncc
 .end
 CODE
@@ -627,21 +627,21 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 2 - pass arg" );
 .sub main :main
     .const .Sub f = "foo"
     print "main\n"
-    get_results "(0)", $S0
+    get_results "0", $S0
     invokecc f
     print $S0
 .end
 .sub foo
     .const .Sub b = "bar"
     print "foo\n"
-    set_args "(0)", "from_foo\n"
+    set_args "0", "from_foo\n"
     tailcall b
 .end
 .sub bar
-    get_params "(0)", $S0
+    get_params "0", $S0
     print "bar\n"
     print $S0
-    set_returns "(0)", "bar_ret\n"
+    set_returns "0", "bar_ret\n"
     returncc
 .end
 CODE
@@ -656,21 +656,21 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 3 - pass arg" );
 .sub main :main
     .const .Sub f = "foo"
     print "main\n"
-    get_results "(0)", $S0
+    get_results "0", $S0
     invokecc f
     print $S0
 .end
 .sub foo
     .const .Sub b = "bar"
     print "foo\n"
-    set_args "(0)", "from_foo\n"
+    set_args "0", "from_foo\n"
     tailcall b
 .end
 .sub bar
-    get_params "(0)", $S0
+    get_params "0", $S0
     print "bar\n"
     print $S0
-    set_returns "(0)", "bar_ret\n"
+    set_returns "0", "bar_ret\n"
     returncc
 .end
 CODE
@@ -686,11 +686,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "empty args" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "()"
+    set_args ""
     invokecc $P1
 .end
 .sub foo
-    get_params "(0x80, 0x100)", $P1, $I0
+    get_params "0x80, 0x100", $P1, $I0
     if_null $P1, ok
     print "not "
 ok:
@@ -705,11 +705,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional args" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "(0x0)", $P0
+    set_args "0x0", $P0
     invokecc $P1
 .end
 .sub foo
-    get_params "(0x80, 0x100)", $P1, $I0
+    get_params "0x80, 0x100", $P1, $I0
     unless_null $P1, ok
     print "not "
 ok:
@@ -728,12 +728,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
 
 .emit
 .pcc_sub foo:
-    get_params "(0, 0)", I16, I17
+    get_params "0, 0", I16, I17
     print I16
     print "\n"
     print I17
     print "\n"
-    set_returns "()"
+    set_returns ""
     returncc
 .eom
 CODE
@@ -801,7 +801,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     foo_string(42, "42", 42.20)
 .end
 .sub foo_int
-    get_params "(0,0,0)", $I0, $I1, $I2
+    get_params "0,0,0", $I0, $I1, $I2
     print $I0
     print ' '
     print $I1
@@ -810,7 +810,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     print_newline
 .end
 .sub foo_float
-    get_params "(0,0,0)", $N0, $N1, $N2
+    get_params "0,0,0", $N0, $N1, $N2
     print $N0
     print ' '
     print $N1
@@ -819,7 +819,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
     print_newline
 .end
 .sub foo_string
-    get_params "(0,0,0)", $S0, $S1, $S2
+    get_params "0,0,0", $S0, $S1, $S2
     print $S0
     print ' '
     print $S1
@@ -1328,11 +1328,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - overlapping Ix" );
     .const .Sub b = "bar"
     I0 = 10
     I1 = 20
-    set_args "(0,0)", I1, I0
+    set_args "0,0", I1, I0
     tailcall b
 .end
 .sub bar
-    get_params "(0,0)", I0, I1
+    get_params "0,0", I0, I1
     .return (I0, I1)
 .end
 CODE
@@ -1700,14 +1700,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 1" );
 .pcc_sub main:
-    set_args "(0x200, 0, 0x200, 0)", "b", 10, "a", 20
-    get_results "()"
+    set_args "0x200, 0, 0x200, 0", "b", 10, "a", 20
+    get_results ""
     find_name P1, "foo"
     invokecc P1
     print "ok\n"
     end
 .pcc_sub foo:
-    get_params "(0x200, 0, 0x200, 0)", "a", I0, "b", I1
+    get_params "0x200, 0, 0x200, 0", "a", I0, "b", I1
     print I1
     print ' '
     print I0
@@ -1723,14 +1723,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "named - 2 flatten" );
     new P0, 'Hash'
     set P0['a'], 20
     set P0['b'], 10
-    set_args "(0x220)", P0            # :flatten :named
-    get_results "()"
+    set_args "0x220", P0            # :flatten :named
+    get_results ""
     find_name P1, "foo"
     invokecc P1
     print "ok\n"
     end
 .pcc_sub foo:
-    get_params "(0x200, 0, 0x200, 0)", "a", I0, "b", I1
+    get_params "0x200, 0, 0x200, 0", "a", I0, "b", I1
     print I1
     print ' '
     print I0
@@ -1743,14 +1743,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 3 slurpy hash" );
 .pcc_sub main:
-    set_args "(0x200, 0, 0x200, 0,0x200, 0)", "a", 10, "b", 20, 'c', 30
-    get_results "()"
+    set_args "0x200, 0, 0x200, 0,0x200, 0", "a", 10, "b", 20, 'c', 30
+    get_results ""
     find_name P1, "foo"
     invokecc P1
     print "ok\n"
     end
 .pcc_sub foo:
-    get_params "(0x200, 0, 0x220)", "a", I0, P0
+    get_params "0x200, 0, 0x220", "a", I0, P0
     print I0
     print ' '
     elements I1, P0
@@ -1774,14 +1774,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 4 positional -> named" );
 .pcc_sub main:
-    set_args  "(0, 0, 0)", 10, 20, 30
-    get_results "()"
+    set_args  "0, 0, 0", 10, 20, 30
+    get_results ""
     find_name P1, "foo"
     invokecc P1
     print "ok\n"
     end
 .pcc_sub foo:
-    get_params "(0x200, 0, 0x200, 0, 0x200, 0)", "a", I0, "b", I1, 'c', I2
+    get_params "0x200, 0, 0x200, 0, 0x200, 0", "a", I0, "b", I1, 'c', I2
     print I0
     print ' '
     print I1
@@ -1796,14 +1796,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "named - 5 slurpy array -> named" );
 .pcc_sub main:
-    set_args  "(0, 0, 0, 0x200, 0, 0x200, 0)", 10, 20, 30, 'a', 40, 'b', 50
-    get_results "()"
+    set_args  "0, 0, 0, 0x200, 0, 0x200, 0", 10, 20, 30, 'a', 40, 'b', 50
+    get_results ""
     find_name P1, "foo"
     invokecc P1
     print "ok\n"
     end
 .pcc_sub foo:
-    get_params "(0, 0x20, 0x200, 0, 0x200, 0)", I0, P0, "b", I1, "a", I2
+    get_params "0, 0x20, 0x200, 0, 0x200, 0", I0, P0, "b", I1, "a", I2
     print I0
     print ' '
     set I0, P0[0]

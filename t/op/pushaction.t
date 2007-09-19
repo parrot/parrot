@@ -37,7 +37,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "pushaction" );
     print "ok 3\n"
     end
 .pcc_sub action:
-    get_params "(0)", I5
+    get_params "0", I5
     print "in action I5 = "
     print I5
     print "\n"
