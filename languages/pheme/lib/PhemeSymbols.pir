@@ -196,7 +196,7 @@
 
 	result = __evaluate( action )
 	.return( result )
-	
+
   iter_end:
 	.return()
 .end
@@ -320,17 +320,17 @@
 .end
 
 .sub '+' :multi( _ )
-	.param float first
+	.param num first
 	.param pmc   rest   :slurpy
 
-	.local float result
+	.local num result
 	result   = first
 
 	.local pmc iter
 	iter = new .Iterator, rest
 
 	.local pmc   next
-	.local float next_val
+	.local num next_val
 
   loop:
  	unless iter goto end_loop
@@ -344,17 +344,17 @@
 .end
 
 .sub '*' :multi( _ )
-	.param float first
+	.param num first
 	.param pmc   rest   :slurpy
 
-	.local float result
+	.local num result
 	result   = first
 
 	.local pmc iter
 	iter = new .Iterator, rest
 
 	.local pmc   next
-	.local float next_val
+	.local num next_val
 
   loop:
  	unless iter goto end_loop
@@ -368,17 +368,17 @@
 .end
 
 .sub '-' :multi( _ )
-	.param float first
+	.param num first
 	.param pmc   rest :slurpy
 
-	.local float result
+	.local num result
 	result   = first
 
 	.local pmc iter
 	iter = new .Iterator, rest
 
 	.local pmc   next
-	.local float next_val
+	.local num next_val
 
   loop:
  	unless iter goto end_loop
@@ -392,10 +392,10 @@
 .end
 
 .sub '/'
-	.param float l
-	.param float r
+	.param num l
+	.param num r
 
-	.local float result
+	.local num result
 	result = l / r
 
 	.return( result )
