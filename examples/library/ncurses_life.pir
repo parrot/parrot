@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+s# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -72,10 +72,10 @@ Run faster.
         .const int COLLIDE = 1
 
 	.local int GEN_COUNT
-	.local float START_TIME
-	.local float CUR_TIME
-	.local float TIME_DIFF
-	.local float GPS
+	.local num START_TIME
+	.local num CUR_TIME
+	.local num TIME_DIFF
+	.local num GPS
 	.local int SUPRESS_PRINT
 	.local pmc CURS_SET
 	.local pmc ENDWIN
@@ -315,18 +315,18 @@ dumpend:
 	STDSCR = INITSCR()
 
 	START_COLOR()
-	
+
 	# Color pair 1, dark green fg, black background
 	INIT_PAIR(1, 2, 0)
 	$I0 = COLOR_PAIR(1)
-	
+
 	# We pass what's returned from COLOR_PAIR straight on
 	WATTRON(STDSCR, $I0)
 
 	CURS_SET(0)			# turn off cursor
 	NODELAY(STDSCR, 1)	# set nodelay mode
 	KEYPAD(STDSCR, 1)	# set keypad mode
-	
+
 	.return(STDSCR)
 .end
 

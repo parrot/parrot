@@ -8,7 +8,7 @@ To run this file, run the following command from the Parrot directory:
 
 	$ ./parrot examples/sdl/anim_image.pir
 	Drew 1080 frames in 0.948230 seconds (1138.964142 fps)
-	$ 
+	$
 
 =cut
 
@@ -66,21 +66,21 @@ To run this file, run the following command from the Parrot directory:
 	sprite = new sprite_type
 	sprite.'init'( 'surface' => image, 'source_x' => 0, 'source_y' => 0, 'dest_x' => 0, 'dest_y' => 190, 'bgcolor' => black )
 
-	.local float start_time
+	.local num start_time
 	time start_time
 
 	_animate_on_x_axis( main_screen, sprite,   0, 540,  1)
 	sleep 1
 	_animate_on_x_axis( main_screen, sprite, 540,   0, -1)
 
-	.local float end_time
+	.local num end_time
 	time end_time
 
-	.local float total_time
+	.local num total_time
 	total_time = end_time - start_time
 	dec total_time
 
-	.local float fps
+	.local num fps
 	fps = 1080/total_time
 
 	print "Drew 1080 frames in "

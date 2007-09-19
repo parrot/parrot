@@ -111,7 +111,7 @@ endfor:
 .sub offset_momentum
 	.param int nbodies
 	.param pmc bodies
-	.local float px, py, pz
+	.local num px, py, pz
 	px = 0.0
 	py = 0.0
 	pz = 0.0
@@ -146,7 +146,7 @@ endfor:
 .sub energy
 	.param int nbodies
 	.param pmc bodies
-	.local float e, tmp
+	.local num e, tmp
 	.local int i, j
 	e = 0.0
 	i = 0
@@ -175,7 +175,7 @@ beginfor_0:
 	j = i + 1
 beginfor_1:
 	unless j < nbodies goto endfor_1
-	.local float dx, dy, dz, distance
+	.local num dx, dy, dz, distance
 
 	# dx = b->x - b2->x;
 	$N0 = bodies[i; x]
@@ -222,9 +222,9 @@ endfor_0:
 	.param pmc bodies
 	.param float dt
 	.local int i, j
-	.local float dx, dy, dz, distance, mag
-	.local float bx, by, bz, bm, bvx, bvy, bvz
-	.local float b2x, b2y, b2z, b2m
+	.local num dx, dy, dz, distance, mag
+	.local num bx, by, bz, bm, bvx, bvy, bvz
+	.local num b2x, b2y, b2z, b2m
 	.local pmc bi, bj
 	i = 0
 beginfor_0:

@@ -95,7 +95,7 @@ ex:
 # init the Mandel app instance
 .sub __init :method
     .local int w, h
-    .local float scale, xstart, ystart
+    .local num scale, xstart, ystart
     # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
     # round up, scale *200
     xstart = -2.0
@@ -214,7 +214,7 @@ get:
 .sub 'calc' :method
     .local pmc main_screen, raw_palette, rect, pixels
     .local int w, h, x, y, pal_elems, raw_c, k, limit
-    .local float xstart, ystart, scale
+    .local num xstart, ystart, scale
     # fetch the SDL::Surface representing the main window
     main_screen = self.'surface'()
     h = main_screen.'height'()
@@ -273,9 +273,9 @@ plain:
     .param pmc args
 
     .local int w, x, y, pal_elems, raw_c, k, limit, offs_y
-    .local float xstart, ystart, scale
+    .local num xstart, ystart, scale
     .local pmc raw_palette, pixels, main_screen, rect
-    .local float z, Z, t, c, C, zz, ZZ
+    .local num z, Z, t, c, C, zz, ZZ
     w = args[0]
     xstart = args[1]
     ystart = args[2]
@@ -344,8 +344,8 @@ set_pix:
     .param int y
     .param int but
     .local int w, h
-    .local float xstart, ystart, xend, yend, scale, fx, fy, dx, dy
-    .local float ds, mx, my, dx2, dy2
+    .local num xstart, ystart, xend, yend, scale, fx, fy, dx, dy
+    .local num ds, mx, my, dx2, dy2
     .local pmc main_screen
     main_screen = self.'surface'()
     h = main_screen.'height'()

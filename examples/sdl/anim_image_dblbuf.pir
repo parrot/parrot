@@ -8,7 +8,7 @@ To run this file, run the following command from the Parrot root directory:
 
 	$ ./parrot examples/sdl/anim_image_dblbuf.pir
 	Drew 540 frames in 2.200484 seconds (245.400580 fps)
-	$ 
+	$
 
 =cut
 
@@ -66,21 +66,21 @@ To run this file, run the following command from the Parrot root directory:
 	sprite = new sprite_type
 	sprite.'init'( 'surface' => image, 'source_x' => 0, 'source_y' => 0, 'dest_x' => 0, 'dest_y' => 190, 'bgcolor' => black )
 
-	.local float start_time
+	.local num start_time
 	time start_time
 
 	_animate_on_x_axis( main_screen, sprite,   0, 540,  2)
 	sleep 1
 	_animate_on_x_axis( main_screen, sprite, 540,   0, -2)
 
-	.local float end_time
+	.local num end_time
 	time end_time
 
-	.local float total_time
+	.local num total_time
 	total_time = end_time - start_time
 	dec total_time
 
-	.local float fps
+	.local num fps
 	fps = 540/total_time
 
 	print "Drew 540 frames in "

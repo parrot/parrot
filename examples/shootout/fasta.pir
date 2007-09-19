@@ -10,16 +10,16 @@
 .sub makeCumulative
 	.param pmc genelist
 	.param int count
-	.local float cp
+	.local num cp
 	.local int i
 	cp = 0.0
-	i = 0 
+	i = 0
 beginfor:
 	unless i < count goto endfor
 	$N0 = genelist[i;1]
 	cp += $N0
 	genelist[i;1] = cp
-	inc i 
+	inc i
 	goto beginfor
 endfor:
 .end
@@ -27,7 +27,7 @@ endfor:
 .sub selectRandom
 	.param pmc genelist
 	.param int count
-	.local float r
+	.local num r
 	r = gen_random(1.0)
 	.local int i, lo, hi
 
@@ -72,7 +72,7 @@ endwhile:
 	print " "
 	print desc
 	print "\n"
-	
+
 	.local string pick
 beginfor:
 	unless todo > 0 goto endfor
@@ -83,7 +83,7 @@ beginfor:
 	else:
 		m = LINE_LENGTH
 	endif:
-	
+
 	i = 0
 beginfor_1:
 	unless i < m goto endfor_1
@@ -116,7 +116,7 @@ endfor:
 	print " "
 	print desc
 	print "\n"
-	
+
 beginfor:
 	unless todo > 0 goto endfor
 
@@ -204,7 +204,7 @@ argsdone:
 
 	makeCumulative(iub, 15)
 	makeCumulative(homosapiens, 4)
-	
+
 	$I0 = n * 2
 	makeRepeatFasta("ONE", "Homo sapiens alu", alu, $I0)
 	$I0 = n * 3
@@ -219,7 +219,7 @@ argsdone:
 
 .sub gen_random
 	.param float max
-	.local float last
+	.local num last
 	last = 42.0
 loop:
 	$N0 = last

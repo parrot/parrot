@@ -19,7 +19,7 @@ Inspired by computer language shootout.
     .param pmc argv
 
     load_bytecode "Getopt/Obj.pbc"
-    
+
     # name of the program
     .local string program_name
     program_name = shift argv
@@ -57,7 +57,7 @@ use_default_arr_size:
 
 =cut
 
-.sub _bench 
+.sub _bench
     .param int arr_class
     .param int arr_size
 
@@ -68,7 +68,7 @@ use_default_arr_size:
     arr_2 = new arr_class
     arr_2 = arr_size
 
-    .local float start_time
+    .local num start_time
     start_time = time
 
     # initialize arr_1 and arr_2
@@ -87,7 +87,7 @@ X_DONE:
     .local int max_index, z_index, y_index
     max_index = arr_size - 1
     y_index = 0
-Y_LOOP:   # 1000 iterations 
+Y_LOOP:   # 1000 iterations
     if y_index >= 1000 goto Y_DONE
     z_index = max_index
 Z_LOOP:   # arr_size iterations
@@ -115,7 +115,7 @@ Y_DONE:
     print value
     print "\n"
 
-    .local float start_time, end_time, span_time
+    .local num start_time, end_time, span_time
     end_time = time
     span_time = end_time - start_time
     .local string arr_type
