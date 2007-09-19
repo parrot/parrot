@@ -122,39 +122,6 @@ As of Parrot 0.4.16 all type names for .local other than string, num, int, and
 pmc are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array>
 for C<pmc> will no longer be possible in Parrot 0.4.17.  [RT#42769].
 
-=item method vs :method sub flag
-
-Currently a sub can be tagged as a method using the C<method> keyword, besides
-the more consistent C<:method>. IMCC currently supports both, but will be
-updated to only accept C<:method>. [RT#45399].
-
-=item C<.pcc_begin/end_return/yield> made stricter
-
-Currently you can write:
-
- .pcc_begin_return
- .return 1
- .return 2
- .pcc_end_yield
-
-It is not very clear whether this is a return or yield block. It's also possible
-to start a block with C<.pcc_begin_yield> and end with C<.pcc_end_return>. IMCC
-will be made more stricter, to only allow proper pairs: begin/end should match.
-[RT#45411].
-
-=item C<.global> directive
-
-Although the C<.global> directive was never implemented, this directive will be
-removed. [RT#45407].
-
-
-=item C<.pcc_sub> in PIR mode
-
-IMCC allows for defining a sub using both the C<.pcc_sub> and C<.sub> keyword.
-In earlier days there was a semantic difference between the two, but not anymore.
-Therefore, the C<.pcc_sub> directive is removed from PIR mode. It will still be
-possible to use it in PASM mode. [RT#45409].
-
 =back
 
 =head1 Deprecated compiler tools
