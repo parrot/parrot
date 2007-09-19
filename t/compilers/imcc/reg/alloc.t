@@ -22,12 +22,12 @@ lab:
     new $P1, 'Continuation'
     set_addr $P1, lab
     $P2 = find_name "alligator"
-    set_args "(0)", $P1
+    set_args "0", $P1
     invokecc $P2
 ex:
 .end
 .sub alligator
-    get_params "(0)", $P0
+    get_params "0", $P0
     invokecc $P0
 .end
 CODE
