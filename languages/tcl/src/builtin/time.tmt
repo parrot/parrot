@@ -8,7 +8,7 @@
   goto time_end
 
 time_something:
-  .local float t
+  .local num t
   t = time
 time_loop:
   if $I0 == 0 goto time_done
