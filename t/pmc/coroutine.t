@@ -80,7 +80,7 @@ return_here:
     end
 .end
 
-.pcc_sub _iterator
+.sub _iterator
     .local pmc x
     x = new 'Integer'
     x = 0

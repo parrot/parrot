@@ -148,7 +148,7 @@ OUT
 # write sub2
 open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
     end
 .end
@@ -160,7 +160,7 @@ close $FOO;
 system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
@@ -180,7 +180,7 @@ OUT
 # write sub2
 open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -194,7 +194,7 @@ close $FOO;
 system_or_die( $PARROT, qw( -o temp.pbc temp.pir ) );
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc, return' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
@@ -216,12 +216,12 @@ OUT
 # write sub2
 open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
-.pcc_sub _not_sub2
+.sub _not_sub2
     print "not sub2\n"
     end
 .end
 
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
     end
 .end
@@ -233,7 +233,7 @@ close $FOO;
 system("$PARROT -o temp.pbc temp.pir");
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc with 2 subs' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
@@ -253,7 +253,7 @@ OUT
 # write sub2
 open $FOO, '>', "temp.pir" or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -265,7 +265,7 @@ close $FOO;
 # compile it
 
 pir_output_is( <<'CODE', <<'OUT', 'call sub in external pir, return' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     load_bytecode "temp.pir"
     print "loaded\n"
@@ -285,7 +285,7 @@ back
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
     .pcc_begin
@@ -296,7 +296,7 @@ pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
     end
 .end
 
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
    .pcc_begin_return
    .pcc_end_return
@@ -311,7 +311,7 @@ OUT
 # write subs
 open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
     .pcc_begin
@@ -322,7 +322,7 @@ print $FOO <<'ENDF';
     end
 .end
 
-.pcc_sub _sub2
+.sub _sub2
     print "sub2\n"
     .pcc_begin_return
     .pcc_end_return
@@ -401,7 +401,7 @@ SKIP:
     skip( 'multiple loading not speced - failing', 1 );
 
     pir_output_is( <<'CODE', <<'OUT', 'twice call sub in external pir, return' );
-.pcc_sub _sub1
+.sub _sub1
     print "sub1\n"
     load_bytecode "temp.pir"
     print "loaded\n"

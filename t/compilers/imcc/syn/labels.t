@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 5;
 
 ##############################
 pir_output_is( <<'CODE', <<'OUT', "goto 1" );
@@ -58,16 +58,6 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "perlish func label" );
 .sub _main::test
-	print "ok 1\n"
-	end
-.end
-
-CODE
-ok 1
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "perlish func label - .pcc_sub" );
-.pcc_sub _main::test
 	print "ok 1\n"
 	end
 .end

@@ -26,7 +26,7 @@ pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
     print z
     end
 .end
-.pcc_sub _sub
+.sub _sub
     .param int a
     .param int b
     print a
@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', <<'OUT', "func() syntax" );
     print z
     end
 .end
-.pcc_sub _sub
+.sub _sub
     .param int a
     .param int b
     print a
@@ -130,7 +130,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail recursive sub" );
     end
 .end
 
-.pcc_sub _fact
+.sub _fact
    .param int product
    .param int count
    if count > 1 goto recur
