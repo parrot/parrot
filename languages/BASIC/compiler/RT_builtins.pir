@@ -6,7 +6,7 @@
 	#.param int argc
 	#.param string display
 	#.local string buf
-         
+
         # XXX pass along whatever arguments were given.
 
 	#buf = _BUILTIN_DISPLAY_WORK(showme)
@@ -31,13 +31,13 @@
 	PRINTCOL = $P0["value"]
 
 	buf = ""
-NEXT:	
+NEXT:
 	if argc==0 goto END_DISPLAY
 	dec argc
 	$I0 = typeof printme
 	if $I0 == .String goto DISPSTRING
 	if $I0 != .Float  goto DISPERR
-	
+
 	# Now, do floats
 	intver = printme
 	$N0 = intver
@@ -46,7 +46,7 @@ NEXT:
 	s = _NORMALIZE_FLOAT(printme)
 	if printme < 0 goto NEGFLO
         buf .= " "
-NEGFLO:	
+NEGFLO:
 	buf .= s
 	buf .= " "
 	goto NEXT
@@ -57,7 +57,7 @@ DISPINT:
 	$S0 = intver
 	if intver <0 goto NEGINT
 	buf .= " "
-NEGINT: 	
+NEGINT:
 	buf .= $S0
 	buf .= " "
 	goto NEXT
@@ -80,7 +80,7 @@ DISPTAB:
 	inc PRINTCOL
         inc $I1
         goto DISPTAB
-DISPNL:	
+DISPNL:
 	PRINTCOL = 0
 	goto NEXT
 END_DISPLAY:
@@ -117,7 +117,7 @@ FLO_END:
 .sub _BUILTIN_ABS   		# float abs(float arg)
 	.param int argc
 	.param float arg
-	.local float res
+	.local num res
 	abs res, arg
 	.return(res)
 .end
@@ -126,7 +126,7 @@ FLO_END:
 .sub _BUILTIN_INT   		# float int(float arg)
 	.param int argc
 	.param float arg
-	.local float res
+	.local num res
 	.local int truncate
 	set truncate, arg
 	set res, truncate
@@ -147,7 +147,7 @@ ENDINT:	.return(res)
 	.param int argc
 	.param string arg
 	.local int conv
-	.local float res
+	.local num res
 	ord conv, arg
 	set res, conv
 	.return(res)
@@ -162,14 +162,14 @@ ENDINT:	.return(res)
 .sub _BUILTIN_VAL 		# float val(string arg)
 	.param int argc
 	.param string arg
-	.local float res
+	.local num res
 	set res, arg
 	.return(res)
 .end
 .sub _BUILTIN_LEN 		# float len(string arg)
 	.param int argc
 	.param string arg
-	.local float res
+	.local num res
 	.local int conv
 	length conv, arg
 	set res, conv
@@ -200,8 +200,8 @@ MIDLOOP:ge pos, strlen, MIDDONE
 	branch MIDLOOP
 
 MID3ARG:
-	.local float count
-	.local float extent
+	.local num count
+	.local num extent
 	set count, 0.0
 MID3L:
 	ge pos, strlen, MIDDONE
@@ -211,7 +211,7 @@ MID3L:
 	inc count
 	ge count, extent, MIDDONE
 	branch MID3L
-	
+
 MIDDONE:
 	.return(res)
 .end
@@ -220,7 +220,7 @@ MIDDONE:
 	.param string targ
 	.param float extent
 	.local string res
-	
+
 	res = _BUILTIN_MID_STRING(3, targ, 1.0, extent)
 	.return(res)
 .end
@@ -248,7 +248,7 @@ MIDDONE:
 	find_global $P0, "RANDSEED"
 	set RANDSEED, $P0["value"]
 	eq argc, 0, RND_GEN
-	.local float repeat
+	.local num repeat
 
 	eq repeat, 0.0, RND_REPEAT
 RND_GEN:
@@ -370,7 +370,7 @@ FINISHED:
 	.local string thing
 	set repeater, thing
 	branch REP
-FLOATB:	.local float ascii
+FLOATB:	.local num ascii
 	set $I0, ascii
 	chr repeater, $I0
 REP: 	ge $I1, repeat, BAIL
@@ -498,7 +498,7 @@ DOREAD: res = _READCHARS(numchars,fd)
 	.return(res)
 .end
 .sub _BUILTIN_INKEY_STRING	# string inkey$(void)
-	.param int argc		
+	.param int argc
 	.local string res
 	_scan_read()		# Put terminal in char-at-a-time mode
 	res = _inkey_string()
