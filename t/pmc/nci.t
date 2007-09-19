@@ -449,8 +449,8 @@ OUTPUT
   print "loaded\n"
   dlfunc P0, P1, "nci_dd", "dd"
   print "dlfunced\n"
-  set_args "(0)", 4.0
-  get_results "(0)", N5
+  set_args "0", 4.0
+  get_results "0", N5
   invokecc P0
   ne N5, 8.0, nok_1
   print "ok 1\n"
@@ -520,8 +520,8 @@ OUTPUT
   print "dlfunced\n"
   set N5, 12.0
   set N6, 3.0
-  set_args "(0,0)", N5, N6
-  get_results "(0)", N5
+  set_args "0,0", N5, N6
+  get_results "0", N5
   invokecc P0
   ne N5, 4.0, nok_1
   print "ok 1\n"
@@ -543,8 +543,8 @@ OUTPUT
   print "dlfunced\n"
   set I5, 2
   set I6, 3
-  set_args "(0,0)", I5, I6
-  get_results "(0)", I5
+  set_args "0,0", I5, I6
+  get_results "0", I5
   invokecc P0
   ne I5, 6, nok_1
   print "ok 1\n"
@@ -566,8 +566,8 @@ OUTPUT
   print "dlfunced\n"
   set I5, 2
   set I6, 3
-  set_args "(0,0)", I5, I6
-  get_results "(0)", I5
+  set_args "0,0", I5, I6
+  get_results "0", I5
   invokecc P0
   ne I5, 6, nok_1
   print "ok 1\n"
@@ -589,8 +589,8 @@ OUTPUT
   print "dlfunced\n"
   set I5, 6
   set I6, 7
-  set_args "(0,0)", I5, I6
-  get_results "(0)", I5
+  set_args "0,0", I5, I6
+  get_results "0", I5
   invokecc P0
   ne I5, 42, nok_1
   print "ok 1\n"
@@ -611,8 +611,8 @@ OUTPUT
   dlfunc P0, P1, "nci_it", "it"
   printerr "dlfunced\n"
   set S5, "ko\n"
-  set_args "(0)", S5
-  get_results "(0)", I5
+  set_args "0", S5
+  get_results "0", I5
   invokecc P0
   ne I5, 2, nok_1
   printerr "ok 2\n"
@@ -666,8 +666,8 @@ OUTPUT
   dlfunc P0, P1, "nci_tt", "tt"
   print "dlfunced\n"
   set S5, "ko\n"
-  set_args "(0)", S5
-  get_results "(0)", S5
+  set_args "0", S5
+  get_results "0", S5
   invokecc P0
   print S5
   end
@@ -691,8 +691,8 @@ OUTPUT
 loop:
   dlfunc P0, P1, "nci_dd", "dd"
   set N5, 77.0
-  set_args "(0)", 4.0
-  get_results "(0)", N5
+  set_args "0", 4.0
+  get_results "0", N5
   invokecc P0
   ne N5, 8.0, nok_1
   dec I10
@@ -718,13 +718,13 @@ OUTPUT
   print "dlfunced\n"
   clone P2, P0
   print "ok 1\n"
-  set_args "(0)", 4.0
-  get_results "(0)", N5
+  set_args "0", 4.0
+  get_results "0", N5
   invokecc P0
   ne N5, 8.0, nok_1
   print "ok 2\n"
-  set_args "(0)", 4.0
-  get_results "(0)", N5
+  set_args "0", 4.0
+  get_results "0", N5
   invokecc P2
   ne N5, 8.0, nok_1
   end
@@ -745,8 +745,8 @@ OUTPUT
   set I5, 10
   set I6, 20
   set I7, 30
-  set_args "(0,0,0)", I5,I6,I7
-  get_results "(0)", I5
+  set_args "0,0,0", I5,I6,I7
+  get_results "0", I5
   invokecc P0
   print I5
   print "\n"
@@ -762,8 +762,8 @@ OUTPUT
   new P5, 'Integer'
   set P5, -6
   set I5, -7
-  set_args "(0,0)", P5,I5
-  get_results "(0)", I5
+  set_args "0,0", P5,I5
+  get_results "0", I5
   invokecc P0
   print I5
   print "\n"
@@ -781,8 +781,8 @@ OUTPUT
   new P5, 'Integer'
   set P5, -7
 
-  set_args "(0,0)", I5,P5
-  get_results "(0)", I5
+  set_args "0,0", I5,P5
+  get_results "0", I5
   invokecc P0
 
   print I5
@@ -799,8 +799,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tb", "tb"
   set S5, "ko\n"
-  set_args "(0)", S5
-  get_results "(0)", S5
+  set_args "0", S5
+  get_results "0", S5
   invokecc P0
   print S5
   end
@@ -812,8 +812,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tB", "tB"
   set S5, "ko\n"
-  set_args "(0)", S5
-  get_results "(0)", S5
+  set_args "0", S5
+  get_results "0", S5
   invokecc P0
   print S5
   end
@@ -826,8 +826,8 @@ OUTPUT
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int[2]; char }
   set I5, 0
-  set_args "(0)", I5
-  get_results "(0)", P5
+  set_args "0", I5
+  get_results "0", P5
   invokecc P0
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
@@ -858,8 +858,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { float[2]; double }
-  set_args "(0)", 1
-  get_results "(0)", P5
+  set_args "0", 1
+  get_results "0", P5
   invokecc P0
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
@@ -890,8 +890,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; int }
-  set_args "(0)", 2
-  get_results "(0)", P5
+  set_args "0", 2
+  get_results "0", P5
   invokecc P0
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
@@ -924,8 +924,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char*; int }
-  set_args "(0)", 3
-  get_results "(0)", P5
+  set_args "0", 3
+  get_results "0", P5
   invokecc P0
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
@@ -952,8 +952,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; x->{int, double} }
-  set_args "(0)", 4
-  get_results "(0)", P5
+  set_args "0", 4
+  get_results "0", P5
   invokecc P0
 .include "datatypes.pasm"
   # the contained structure
@@ -1006,8 +1006,8 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
-  set_args "(0)", 8
-  get_results "(0)", P5
+  set_args "0", 8
+  get_results "0", P5
   invokecc P0
 .include "datatypes.pasm"
   # the contained structure pointer
@@ -1077,8 +1077,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int (*f)(char *) }
-  set_args "(0)", 5
-  get_results "(0)", P5
+  set_args "0", 5
+  get_results "0", P5
   invokecc P0
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
@@ -1093,8 +1093,8 @@ OUTPUT
   assign P5, P2
   # now we get a callable NCI PMC
   set P0, P5[0]
-  set_args "(0)", "hello call_back"
-  get_results "(0)", I5
+  set_args "0", "hello call_back"
+  get_results "0", I5
   invokecc P0
   print I5
   print "\n"
@@ -1108,8 +1108,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { int; {int; int} int }
-  set_args "(0)", 6
-  get_results "(0)", P5
+  set_args "0", 6
+  get_results "0", P5
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
@@ -1163,8 +1163,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
-  set_args "(0)", 7
-  get_results "(0)", P5
+  set_args "0", 7
+  get_results "0", P5
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
@@ -1218,8 +1218,8 @@ OUTPUT
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_pi", "pi"
   # this test function returns a struct { char; {char; int} char }
-  set_args "(0)", 7
-  get_results "(0)", P5
+  set_args "0", 7
+  get_results "0", P5
   invokecc P0
 .include "datatypes.pasm"
   # the nested structure
@@ -1342,8 +1342,8 @@ OUTPUT
   set P5[2], 17
   set P5[3], "hello from Parrot\x0"
   set I5, 1
-  set_args "(0)", P5
-  get_results "(0)", I5
+  set_args "0", P5
+  get_results "0", I5
   invokecc P0
   print I5
   print "\n"
@@ -1358,10 +1358,10 @@ OUTPUT
   dlfunc P0, P1, "nci_vP", "vP"
   new P5, 'String'
   set P5, "ok\n"
-  set_args "(0)", P5
+  set_args "0", P5
   invokecc P0
   null P5
-  set_args "(0)", P5
+  set_args "0", P5
   invokecc P0
   end
 CODE
@@ -1389,7 +1389,7 @@ OUTPUT
   print "ok 2\n"
   # P5 is the cb
   # P7 is user_data
-  set_args "(0,0)", P5, P7
+  set_args "0,0", P5, P7
   invokecc P0
   # call_back will be called at any time
   # so spin a bit
@@ -1409,7 +1409,7 @@ err:
   end
 
 .pcc_sub _call_back:
-  get_params "(0,0)", P5, S5
+  get_params "0,0", P5, S5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1521,7 +1521,7 @@ OUTPUT
   print "ok 2\n"
   # P5 is the cb
   # P7 is user_data
-  set_args "(0,0)", P5, P7
+  set_args "0,0", P5, P7
   invokecc P0
   # call_back will be called at any time
   # so spin a bit
@@ -1541,7 +1541,7 @@ err:
   end
 
 .pcc_sub _call_back:
-  get_params "(0,0)", P5, I5
+  get_params "0,0", P5, I5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1617,7 +1617,7 @@ ERROR:
 .end
 
 .sub _call_back
-  get_params "(0,0)", P5, P6
+  get_params "0,0", P5, P6
   print "in callback\n"
   print "user data: "
   print P5
@@ -1668,7 +1668,7 @@ OUTPUT
   print "ok 2\n"
   # P5 is the cb
   # P7 is user_data
-  set_args "(0,0)", P5, P7
+  set_args "0,0", P5, P7
   invokecc P0
   # call_back will be called at any time
   # so spin a bit
@@ -1688,7 +1688,7 @@ err:
   end
 
 .pcc_sub _call_back:
-  get_params "(0,0)", P5, S5
+  get_params "0,0", P5, S5
   print "in callback\n"
   print "user data: "
   print P5
@@ -1726,7 +1726,7 @@ OUTPUT
   print "ok 2\n"
   # P5 is the cb
   # P7 is user_data
-  set_args "(0,0)", P5, P7
+  set_args "0,0", P5, P7
   invokecc P0
   # call_back will be called at any time
   # so spin a bit
@@ -1746,7 +1746,7 @@ err:
   end
 
 .pcc_sub _call_back:
-  get_params "(0,0)", P5, I5
+  get_params "0,0", P5, I5
   print "in callback\n"
   print "user data: "
   print P5
@@ -2076,7 +2076,7 @@ OUTPUT
   set P5[0;3;'h'], 430
 
   loadlib P1, "libnci_test"
-  set_args "(0,0)", 4, P5
+  set_args "0,0", 4, P5
   dlfunc P0, P1, "nci_pip", "pip"
   invokecc P0
   end
@@ -2110,8 +2110,8 @@ OUTPUT
   set P3, 2
 
   loadlib P1, "libnci_test"
-  set_args "(0,0)", P2, P3
-  get_results "(0)", I5
+  set_args "0,0", P2, P3
+  get_results "0", I5
   dlfunc P0, P1, "nci_i33", "i33"
   invokecc P0
 
@@ -2163,7 +2163,7 @@ OUTPUT
   print I1
   print "\n"
 
-  set_args "(0,0,0)", P5, 1, 2
+  set_args "0,0,0", P5, 1, 2
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vpii", "vpii"
   invokecc P0
@@ -2195,8 +2195,8 @@ OUTPUT
 
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_piiii", "piiii"
-  set_args "(0,0,0,0)", 100,200,400,800
-  get_results "(0)", P5
+  set_args "0,0,0,0", 100,200,400,800
+  get_results "0", P5
   invokecc P0
 
   new  P6, 'OrderedHash'

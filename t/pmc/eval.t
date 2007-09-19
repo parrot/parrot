@@ -24,8 +24,8 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
     compreg P1, "PASM"	# get compiler
-    set_args "(0)", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
-    get_results "(0)", P0
+    set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
+    get_results "0", P0
     invokecc P1			# compile
     invokecc P0			# eval code P0
     print "back again\n"
@@ -41,7 +41,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
     concat S5, "set_returns \"()\"\n"
     concat S5, "returncc\n"
     compreg P1, "PASM"
-    set_args "(0)", S5
+    set_args "0", S5
     invokecc P1
     find_global P0, "_foo"
     invokecc P0
@@ -62,8 +62,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
     concat S5, "set_returns \"()\"\n"
     concat S5, "returncc\n"
     compreg P1, "PASM"
-    set_args "(0)", S5
-    get_results "(0)", P6
+    set_args "0", S5
+    get_results "0", P6
     invokecc P1
     find_global P2, "_foo"
     invokecc P2

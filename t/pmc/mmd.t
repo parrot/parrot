@@ -289,13 +289,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - new result" );
     print "\n"
     end
 .pcc_sub Integer_bxor_Intval:
-    get_params "(0,0)", P5, I5
+    get_params "0,0", P5, I5
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
     new P6, 'Integer'
     set P6, I11
-    set_returns "(0)", P6
+    set_returns "0", P6
     returncc
 CODE
 ok
@@ -317,12 +317,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - existing result" );
     print "\n"
     end
 .pcc_sub Integer_bxor_Intval:
-    get_params "(0,0,0)", P5, I5, P6
+    get_params "0,0,0", P5, I5, P6
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
     set P6, I11
-    set_returns "(0)", P6
+    set_returns "0", P6
     returncc
 CODE
 ok
@@ -348,7 +348,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     end
 .pcc_sub Integer_bxor_Intval:
     # the destination is optional, depending on the infix op used
-    get_params "(0,0,0x80,0x100)", P5, I5, P6, I7
+    get_params "0,0,0x80,0x100", P5, I5, P6, I7
     print "ok\n"
     set I10, P5
     bxor I11, I10, I5
@@ -356,7 +356,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM INTVAL - mixed" );
     new P6, 'Integer'
 has_dest:
     set P6, I11
-    set_returns "(0)", P6
+    set_returns "0", P6
     returncc
 
 CODE

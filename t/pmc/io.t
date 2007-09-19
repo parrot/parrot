@@ -500,7 +500,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
        if I0, ok1
        print "not "
 ok1:   print "ok 1\n"
-       set_args "(0,0)", P2, "ok 2\n"
+       set_args "0,0", P2, "ok 2\n"
        callmethodcc P2, "puts"
        end
 CODE
@@ -531,10 +531,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
        getstderr P2	# the object
        set S0, "puts"	# method
        set S5, "ok 1\n"	# 2nd param
-       set_args "(0,0)", P2, S5
+       set_args "0,0", P2, S5
        callmethodcc P2, S0
        set S5, "ok 2\n"
-       set_args "(0,0)", P2, S5
+       set_args "0,0", P2, S5
        callmethodcc P2, S0
        end
 CODE
