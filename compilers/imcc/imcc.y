@@ -552,7 +552,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <t> type pragma_1 hll_def
 %type <i> program
 %type <i> class_namespace
-%type <i> constdef sub emit pcc_ret
+%type <i> constdef sub emit pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit pmc_const pragma
 %type <s> classname relop any_string
 %type <i> labels _labels label  statement sub_call
@@ -573,7 +573,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <sr> pasm_args
 %type <i> var_returns
 %token <sr> VAR
-%type <t> begin_ret_or_yield end_ret_or_yield
+
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
 %type <idlist> id_list id_list_id
@@ -1005,26 +1005,23 @@ paramtype:
    ;
 
 
-begin_ret_or_yield:
-     PCC_BEGIN_RETURN { $$ = 0; }
-   | PCC_BEGIN_YIELD  { $$ = 1; }
-   ;
-
-end_ret_or_yield:
-     PCC_END_RETURN
-   | PCC_END_YIELD
-   ;
-
 pcc_ret:
-    begin_ret_or_yield   '\n'
-    { begin_return_or_yield(interp, $1); }
+    PCC_BEGIN_RETURN   '\n'
+    { begin_return_or_yield(interp, 0); }
      pcc_returns
-     end_ret_or_yield
+     PCC_END_RETURN
          { $$ = 0;   IMCC_INFO(interp)->asm_state = AsmDefault; }
    | pcc_return_many {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
 
    ;
 
+pcc_yield:
+     PCC_BEGIN_YIELD '\n'
+     { begin_return_or_yield(interp, 1); }
+     pcc_returns
+     PCC_END_YIELD
+     { $$ = 0; IMCC_INFO(interp)->asm_state = AsmDefault; }
+     ;
 
 pcc_returns:
      /* empty */   {  $$ = 0; }
@@ -1213,6 +1210,7 @@ labeled_inst:
    | sub_call      {  $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
+   | pcc_yield
    | /* none */                        { $$ = 0;}
    ;
 
