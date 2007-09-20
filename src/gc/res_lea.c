@@ -33,8 +33,7 @@ handle "external" strings.
 
 /*
 
-=item C<void
-Parrot_go_collect(PARROT_INTERP)>
+=item C<void Parrot_go_collect(PARROT_INTERP)>
 
 Does nothing other than increment the interpreter's C<collect_runs>
 count.
@@ -54,8 +53,7 @@ Parrot_go_collect(PARROT_INTERP)
 
 /*
 
-=item C<static PARROT_INLINE void*
-xmalloc(size_t size)>
+=item C<static PARROT_INLINE void* xmalloc(size_t size)>
 
 Obtains the memory from C<malloc()> and returns it. Panics if there is
 no memory available.
@@ -75,8 +73,7 @@ xmalloc(size_t size)
 
 /*
 
-=item C<static PARROT_INLINE void*
-xcalloc(size_t n, size_t size)>
+=item C<static PARROT_INLINE void* xcalloc(size_t n, size_t size)>
 
 Obtains the memory from C<calloc()> and returns it. Panics if there is
 no memory available.
@@ -96,8 +93,7 @@ xcalloc(size_t n, size_t size)
 
 /*
 
-=item C<static PARROT_INLINE void*
-xrealloc(void *p, size_t size)>
+=item C<static PARROT_INLINE void* xrealloc(void *p, size_t size)>
 
 Reallocates the memory with C<realloc()> and returns it. Panics if there
 is no memory available.
@@ -117,8 +113,7 @@ xrealloc(void *p, size_t size)
 
 /*
 
-=item C<void
-Parrot_reallocate(PARROT_INTERP, Buffer *from, size_t tosize)>
+=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *from, size_t tosize)>
 
 COWable objects (strings or Buffers) use an INTVAL before C<bufstart> for
 refcounting in DOD.
@@ -155,8 +150,7 @@ Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t tosize)
 
 /*
 
-=item C<void
-Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
+=item C<void Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
 
 Allocate buffer memory for the given Buffer pointer. The C<size>
 has to be a multiple of the word size.
@@ -165,8 +159,7 @@ See the comments and diagram in resources.c.
 
 This was never called anyway, so it isn't implemented here.
 
-=item C<void
-Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)>
+=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)>
 
 Like above, except the address of the buffer is guaranteed to be
 suitably aligned for holding anything contained in UnionVal
@@ -188,8 +181,7 @@ Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 
 /*
 
-=item C<void
-Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)>
+=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)>
 
 Reallocates the string buffer in C<*str> and returns it. C<tosize> is the
 number of bytes memory required.
@@ -217,8 +209,7 @@ Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t tosize)
 
 /*
 
-=item C<void
-Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
+=item C<void Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
 
 Allocates the string buffer in C<*str> and returns it. C<size> is the
 number bytes of memory required.
@@ -239,8 +230,7 @@ Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)
 
 /*
 
-=item C<void
-Parrot_initialize_memory_pools(PARROT_INTERP)>
+=item C<void Parrot_initialize_memory_pools(PARROT_INTERP)>
 
 Does nothing.
 
@@ -255,8 +245,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<void
-Parrot_merge_memory_pools(Interp *dest, Interp *source)>
+=item C<void Parrot_merge_memory_pools(Interp *dest, Interp *source)>
 
 Does nothing.
 
@@ -270,8 +259,7 @@ Parrot_merge_memory_pools(Interp *dest, Interp *source)
 
 /*
 
-=item C<void
-Parrot_destroy_memory_pools(PARROT_INTERP)>
+=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
 
 Does nothing.
 

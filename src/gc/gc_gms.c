@@ -753,12 +753,9 @@ gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<parrot_gc_gms_wb>
+=item C<gc_gms_find_gen>
 
-Called by the write barrier. The aggregate belongs to an older generation
-then the I<new> value written into it. Put the header of the new value
-onto the IGP list for the current generation, if it contains pointers
-to other items, and promote it to the old generation.
+TODO: Not yet documented!!!
 
 =cut
 
@@ -790,6 +787,16 @@ gc_gms_find_gen(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
     real_exception(interp, NULL, 1, "generation %d not found for hdr %p",
             gen_no, h);
 }
+
+/*
+
+=item C<gc_gms_promote>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
@@ -828,6 +835,16 @@ gc_gms_promote(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h), UINTVAL gen_no)
 #  endif
 }
 
+/*
+
+=item C<gc_gms_store_hdr_list>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms_hdr *h))
 {
@@ -851,6 +868,16 @@ gc_gms_store_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l), NOTNULL(Gc_gms
     *(s->ptr)++ = h;
 }
 
+/*
+
+=item C<gc_gms_clear_hdr_list>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_clear_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l))
 {
@@ -863,6 +890,16 @@ gc_gms_clear_hdr_list(PARROT_INTERP, NOTNULL(Gc_gms_hdr_list *l))
     l->first = l->last = NULL;
 }
 
+/*
+
+=item C<gc_gms_store_igp>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
 {
@@ -872,6 +909,16 @@ gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
     gc_gms_store_hdr_list(interp, igp, h);
 }
 
+/*
+
+=item C<gc_gms_clear_igp>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
 {
@@ -879,6 +926,19 @@ gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
 
     gc_gms_clear_hdr_list(interp, igp);
 }
+
+/*
+
+=item C<parrot_gc_gms_wb>
+
+Called by the write barrier. The aggregate belongs to an older generation
+then the I<new> value written into it. Put the header of the new value
+onto the IGP list for the current generation, if it contains pointers
+to other items, and promote it to the old generation.
+
+=cut
+
+*/
 
 void
 parrot_gc_gms_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(void *old), NOTNULL(void *new))
@@ -901,6 +961,16 @@ parrot_gc_gms_wb(PARROT_INTERP, NOTNULL(PMC *agg), NOTNULL(void *old), NOTNULL(v
      * increment overwrite count by elements
      */
 }
+
+/*
+
+=item C<parrot_gc_gms_wb_key>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 parrot_gc_gms_wb_key(PARROT_INTERP, NOTNULL(PMC *agg),
@@ -927,6 +997,16 @@ typedef struct Gc_gms_plan {
     int gen_no;
 } Gc_gms_plan;
 
+/*
+
+=item C<gc_gms_merge_gen>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 gc_gms_merge_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
         int flag, NOTNULL(Gc_gms_plan *plan))
@@ -950,6 +1030,16 @@ gc_gms_merge_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
      */
     gc_gms_clear_igp(interp, gen);
 }
+
+/*
+
+=item C<gc_gms_use_gen>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
@@ -977,6 +1067,16 @@ gc_gms_use_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
 
 }
 
+/*
+
+=item C<set_gen_cb>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void *arg))
@@ -989,6 +1089,16 @@ set_gen_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(vo
         gc_gms_use_gen(interp, pool, flag, plan);
     return 0;
 }
+
+/*
+
+=item C<gc_gms_set_gen>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 gc_gms_set_gen(PARROT_INTERP)

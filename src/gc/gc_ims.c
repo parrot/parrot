@@ -563,7 +563,7 @@ gc_ims_alloc_objects(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<()>
+=item C<gc_ims_pool_init()>
 
 Not yet documented!!!
 
@@ -582,7 +582,7 @@ gc_ims_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-=item C<()>
+=item C<parrot_gc_ims_deinit()>
 
 Not yet documented!!!
 
@@ -704,11 +704,9 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
 /*
 
-=item C<parrot_gc_ims_sweep()>
+=item C<sweep_cb()>
 
-Free unused objects in all header pools.
-
-TODO split work per pool.
+Not yet documented!!!
 
 =cut
 
@@ -728,9 +726,11 @@ sweep_cb(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool), int flag, NOTNULL(void
 
 /*
 
-=item C<()>
+=item C<parrot_gc_ims_sweep()>
 
-Not yet documented!!!
+Free unused objects in all header pools.
+
+TODO split work per pool.
 
 =cut
 
@@ -772,7 +772,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
 /*
 
-=item C<()>
+=item C<collect_cb()>
 
 Not yet documented!!!
 

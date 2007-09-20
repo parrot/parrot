@@ -134,7 +134,7 @@ mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
 
 /*
 
-=item C<mem_sys_realloc>
+=item C<mem__sys_realloc>
 
 Resize a chunk of system memory.
 
@@ -164,7 +164,7 @@ mem__sys_realloc(NULLOK(void *from), size_t size)
 
 /*
 
-=item C<mem_sys_realloc_zeroed>
+=item C<mem__sys_realloc_zeroed>
 
 Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 
