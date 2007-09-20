@@ -7,7 +7,7 @@ ook.pasm - An implementation of ook in PASM
 =cut
 
 # First, read the file.
-        get_params "(0)", P5
+        get_params "0", P5
         set S20, P5[1]      # Name of the Ook source.
         open P20, S20, "<"  # P20 = file descriptor
         set S21, ""         # S21 = accumulator
@@ -114,8 +114,8 @@ LOOP_END:
 
 # Execute the generated code in S24
         compreg P1, "PASM"
-        set_args "(0)", S24
-        get_results "(0)", P0
+        set_args "0", S24
+        get_results "0", P0
         invokecc P1
         invokecc P0
         end

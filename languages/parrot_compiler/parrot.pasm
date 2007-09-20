@@ -8,8 +8,8 @@
   compreg P1, "PASM"
 
   # compile the code
-  set_args "(0)", S0
-  get_results "(0)", P0
+  set_args "0", S0
+  get_results "0", P0
   invokecc P1	
 
   # evaluate the compiled code
