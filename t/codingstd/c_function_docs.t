@@ -72,7 +72,11 @@ foreach my $file (@files) {
         if ( $function_name =~ m/for|if|switch|NOTNULL/ ) {
             next;
         }
-        #print $function_name, "\n";
+
+        # if analysing a single file or set of files, print out the function
+        # names found until the first failing function is found
+        print $function_name, "\n" if scalar @ARGV;
+
         # look for matching documentation.  This means the text
         # '=item C<\w+\s+function_name'
         if ($buf !~ m/=item .*$function_name/) {
