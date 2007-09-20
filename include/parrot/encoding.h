@@ -123,7 +123,7 @@ const ENCODING* Parrot_get_encoding( PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
-PARROT_DOES_NOT_RETURN
+PARROT_WARN_UNUSED_RESULT
 const ENCODING * Parrot_load_encoding( PARROT_INTERP,
     NOTNULL(const char *encodingname) )
         __attribute__nonnull__(1)

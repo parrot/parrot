@@ -63,7 +63,7 @@ the context.  If no type is registered, returns C<core_type>.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* new_hll_entry( PARROT_INTERP, NULLOK(STRING *hll_name) )
+static PMC* new_hll_entry( PARROT_INTERP, NULLOK(STRING *entry_name) )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

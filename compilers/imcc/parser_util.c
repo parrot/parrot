@@ -26,10 +26,6 @@
 #include "parser.h"
 #include "optimizer.h"
 
-/* HEADERIZER HFILE: compilers/imcc/imc.h */
-
-/* HEADERIZER BEGIN: static */
-
 /*
 
 =head1 NAME
@@ -39,6 +35,10 @@ ParserUtil - Parser support functions.
 =cut
 
 */
+
+/* HEADERIZER HFILE: compilers/imcc/imc.h */
+
+/* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
 static int change_op( PARROT_INTERP,

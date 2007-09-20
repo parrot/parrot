@@ -151,9 +151,11 @@ extern int CONSERVATIVE_POINTER_CHASING;
 /* GC subsystem init functions */
 /* HEADERIZER BEGIN: src/gc/gc_gms.c */
 
+PARROT_API
 void Parrot_gc_gms_init( PARROT_INTERP )
         __attribute__nonnull__(1);
 
+PARROT_API
 void parrot_gc_gms_pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -161,7 +163,7 @@ void parrot_gc_gms_pobject_lives( PARROT_INTERP, NOTNULL(PObj *obj) )
 void parrot_gc_gms_wb( PARROT_INTERP,
     NOTNULL(PMC *agg),
     NOTNULL(void *old),
-    NOTNULL(void *_new) )
+    NOTNULL(void *new) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -171,7 +173,7 @@ void parrot_gc_gms_wb_key( PARROT_INTERP,
     NOTNULL(PMC *agg),
     NOTNULL(void *old),
     NOTNULL(void *old_key),
-    NOTNULL(void *_new),
+    NOTNULL(void *new),
     NOTNULL(void *new_key) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

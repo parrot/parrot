@@ -54,14 +54,6 @@ static ParrotIO * PIO_unix_accept( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-INTVAL PIO_unix_async( PARROT_INTERP,
-    NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io),
-    INTVAL b )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static INTVAL PIO_unix_bind( SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),

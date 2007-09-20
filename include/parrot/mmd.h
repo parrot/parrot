@@ -215,6 +215,12 @@ PMC * Parrot_mmd_sort_candidate_list( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void mmd_create_builtin_multi_stub( PARROT_INTERP,
+    NOTNULL(PMC *ns),
+    INTVAL func_nr )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 /* HEADERIZER END: src/mmd.c */
 
 

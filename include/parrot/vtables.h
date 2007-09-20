@@ -31,6 +31,9 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE * Parrot_new_vtable( SHIM_INTERP );
 
+void mark_vtables( PARROT_INTERP )
+        __attribute__nonnull__(1);
+
 void parrot_alloc_vtables( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -38,9 +41,6 @@ void parrot_free_vtables( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 void parrot_realloc_vtables( PARROT_INTERP )
-        __attribute__nonnull__(1);
-
-void mark_vtables( PARROT_INTERP )
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/vtables.c */

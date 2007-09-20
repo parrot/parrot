@@ -14,6 +14,10 @@ int cfg_optimize( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+Basic_block * find_outer( NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *blk) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 const char * get_neg_op( NOTNULL(const char *op), NOTNULL(int *n) )
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -37,6 +41,33 @@ Instruction * IMCC_subst_constants_umix( PARROT_INTERP,
     int n )
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
+
+int is_invariant( PARROT_INTERP,
+    NOTNULL(IMC_Unit * unit),
+    NOTNULL(Instruction *ins) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+int loop_one( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int bnr )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int loop_optimization( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int max_loop_depth( NOTNULL(IMC_Unit *unit) )
+        __attribute__nonnull__(1);
+
+int move_ins_out( PARROT_INTERP,
+    NOTNULL(IMC_Unit *unit),
+    NOTNULL(Instruction **ins),
+    NOTNULL(Basic_block *bb) )
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 int optimize( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
         __attribute__nonnull__(1)

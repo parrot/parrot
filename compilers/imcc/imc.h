@@ -124,15 +124,11 @@ typedef void* yyscan_t;
 Instruction * IMCC_create_itcall_label( PARROT_INTERP )
         __attribute__nonnull__(1);
 
-void IMCC_itcall_sub( PARROT_INTERP, SymReg* sub )
+void IMCC_itcall_sub( PARROT_INTERP, SymReg *sub )
         __attribute__nonnull__(1);
 
-Instruction * INS_LABEL( PARROT_INTERP,
-    NOTNULL(IMC_Unit *unit),
-    SymReg *r0,
-    int emit )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+Instruction * INS_LABEL( PARROT_INTERP, IMC_Unit *unit, SymReg *r0, int emit )
+        __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/imcparser.c */
 

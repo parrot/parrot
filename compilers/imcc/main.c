@@ -24,8 +24,6 @@
 
 /* HEADERIZER BEGIN: static */
 
-extern int yydebug;
-
 static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
     const char * const sourcefile) );
 
@@ -33,13 +31,6 @@ static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
     int *obj_file),
     NOTNULL(const char *output_file) )
         __attribute__nonnull__(2);
-
-void
-compile_to_bytecode(PARROT_INTERP,
-                    NOTNULL(const char * const sourcefile),
-                    NOTNULL(const char * const output_file))
-    __attribute__nonnull__(2)
-    __attribute__nonnull__(3);
 
 static void do_pre_process( PARROT_INTERP )
         __attribute__nonnull__(1);

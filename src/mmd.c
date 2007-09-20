@@ -92,12 +92,6 @@ static void mmd_create_builtin_multi_meth_2( PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mmd_create_builtin_multi_stub( PARROT_INTERP,
-    NOTNULL(PMC *ns),
-    INTVAL func_nr )
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_cvt_to_types( PARROT_INTERP, NOTNULL(PMC *multi_sig) )
