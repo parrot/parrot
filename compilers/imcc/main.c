@@ -20,6 +20,8 @@
 #include "pbc.h"
 #include "parser.h"
 
+extern int yydebug;
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
