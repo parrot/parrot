@@ -395,14 +395,14 @@ loop_two_end:
 
 .sub unicode:"dyadic:\u2373" :multi(APLVector, Float) # index of
     .param pmc op1
-    .param float op2
+    .param num op2
 
     .local pmc result
     result = new 'APLVector'
 
     .local int pos
     pos = 0
-    .local float value_at
+    .local num value_at
     .local int not_there
     not_there = op1
     inc not_there
