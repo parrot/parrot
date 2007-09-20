@@ -12,6 +12,8 @@ This is used by C<parrot>.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -282,6 +284,8 @@ longopt_get_shortopt(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
 =head1 SEE ALSO
 
 F<include/parrot/longopt.h> and F<docs/dev/longopt.dev>.
+
+=cut
 
 */
 

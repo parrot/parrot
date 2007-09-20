@@ -24,6 +24,8 @@ Define the internal interpreter exceptions.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -838,6 +840,8 @@ Parrot_print_backtrace(void)
 =head1 SEE ALSO
 
 F<include/parrot/exceptions.h>.
+
+=cut
 
 */
 

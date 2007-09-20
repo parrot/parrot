@@ -15,6 +15,8 @@ called by C<Parrot_exit()> when the interpreter exits.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include <stdlib.h>
@@ -94,6 +96,8 @@ F<include/parrot/exit.h> and F<t/src/exit.t>.
 =head1 HISTORY
 
 Initial version by Josh Wilmes.
+
+=cut
 
 */
 

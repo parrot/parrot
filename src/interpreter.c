@@ -26,6 +26,8 @@ have the same number of elements because there is a one-to-one mapping.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -872,6 +874,8 @@ FUNCDOC: dynop_register
 
 Register a dynamic oplib.
 
+=cut
+
 */
 
 void
@@ -1174,6 +1178,8 @@ enable_event_checking(PARROT_INTERP)
 
 F<include/parrot/interpreter.h>, F<src/inter_cb.c>, F<src/inter_create.c>,
  F<src/inter_misc.c>, F<src/inter_run.c>.
+
+=cut
 
 */
 

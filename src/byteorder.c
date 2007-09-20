@@ -19,6 +19,8 @@ it in.
 
 Configure will have checked for supported word sizes.
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -331,6 +333,8 @@ fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 =head1 HISTORY
 
 Initial version by Melvin on 2002/05/01
+
+=cut
 
 */
 

@@ -12,6 +12,8 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 =head2 Functions
 
+=cut
+
 */
 
 

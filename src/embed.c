@@ -12,6 +12,8 @@ This file implements the Parrot embedding interface.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -949,6 +951,8 @@ F<include/parrot/embed.h> and F<docs/embed.pod>.
 =head1 HISTORY
 
 Initial version by Brent Dax on 2002.1.28.
+
+=cut
 
 */
 

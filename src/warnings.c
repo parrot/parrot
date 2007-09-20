@@ -11,6 +11,8 @@ src/warnings.c - Warning and error reporting
 Parrot C<STRING> and C string versions of a function to print warning/error
 messages.
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -79,6 +81,8 @@ Returns 2 on error, 1 on success.
 
 C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 
+=cut
+
 */
 
 PARROT_API
@@ -136,6 +140,8 @@ Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
 =head1 SEE ALSO
 
 F<include/parrot/warnings.h>.
+
+=cut
 
 */
 

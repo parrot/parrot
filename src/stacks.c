@@ -13,6 +13,8 @@ where each chunk has room for one entry.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -78,8 +80,6 @@ mark_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk))
 FUNCDOC: stack_destroy
 
 stack_destroy() doesn't need to do anything, since GC does it all.
-
-=cut
 
 */
 

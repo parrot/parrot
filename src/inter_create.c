@@ -464,6 +464,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 F<include/parrot/interpreter.h>, F<src/interpreter.c>.
 
+=cut
+
 */
 
 /*

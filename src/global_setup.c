@@ -15,6 +15,8 @@ I<What are these global variables?>
 
 =head2 Functions
 
+=cut
+
 */
 
 #define INSIDE_GLOBAL_SETUP

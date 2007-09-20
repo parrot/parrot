@@ -15,6 +15,8 @@ the faster dispatch of operations.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "runops_cores.h"

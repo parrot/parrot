@@ -12,6 +12,8 @@ Various functions that call the run loop.
 
 =head2 Functions
 
+=cut
+
 */
 
 
@@ -484,6 +486,8 @@ Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/interpreter.c>.
+
+=cut
 
 */
 

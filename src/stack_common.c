@@ -15,6 +15,8 @@ These stacks all differ only in the size of items.
 
 =head2 Functions
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
