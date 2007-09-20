@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: c_returns.t 21134 2007-09-08 11:00:43Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;
