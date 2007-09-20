@@ -60,14 +60,23 @@ foreach my $file (@files) {
     }
     close $fh;
 
+    # get rid of if's and for's etc]
+    $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
+
     # look for function definitions
-    my @function_names = $buf =~ m/(\w+)\(.*\)\s+{/g;
+    my @function_names = $buf =~ m/[^\s]\s(\w+)\(.*\)\s+{/g;
 
     for my $function_name ( @function_names ) {
+        # if the function name matches a known C construct, go to the next
+        # one
+        if ( $function_name =~ m/for|if|switch|NOTNULL/ ) {
+            next;
+        }
+        #print $function_name, "\n";
         # look for matching documentation.  This means the text 
         # '=item C<\w+\s+function_name'
         if ($buf !~ m/=item .*$function_name/) {
-            push @missing_docs, $path, "\n";
+            push @missing_docs, "$path\n";
             last;
         }
     }
