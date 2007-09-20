@@ -9,60 +9,56 @@ use warnings;
 use 5.008;
 
 use Parrot::Config;
+use Parrot::Test;
 
-require Exporter;
-require Parrot::Test;
+# Generate output_is(), output_isnt() and output_like() in current package.
+Parrot::Test::generate_languages_functions(); 
 
-our @EXPORT = ( qw(output_is output_like output_isnt), @Test::More::EXPORT );
-our @ISA = qw(Exporter Test::More);
-
-sub import {
-    my ( $class, $plan, @args ) = @_;
-
-    Test::More->import( $plan, @args );
-
-    __PACKAGE__->_export_to_level( 2, __PACKAGE__ );
+sub new {
+    my $class = shift;
+ 
+    return bless {}, $class;
 }
 
-my $count;
 
-foreach my $meth ( qw(is isnt like) ) {
-    no strict 'refs';
+sub get_cd {
+    my $self = shift;
+    my ( $options ) = @_;
 
-    *{"Parrot::Test::Scheme::output_$meth"} = sub ($$;$) {
-        my ( $lang_code, $output, $desc ) = @_;
+    return $self->{relpath};
+}
 
-        ++$count;
-        my ( $lang_f, $pasm_f, $out_f ) = map {
-            my $t = $0;
-            $t =~ s/\.t$/_$count\.$_/;
-            $t
-        } qw(scheme pasm out); 
+sub get_lang_fn {
+    my $self = shift;
+    my ( $count, $options ) = @_;
 
-        # STDERR is written into same output file
-        open LANG, '>', $lang_f or die "Unable to open '$lang_f':$!"; 
-        binmode LANG;
-        print LANG $lang_code;
-        close LANG;
+    return Parrot::Test::per_test( '.scheme', $count );
+}
 
-        Parrot::Test::run_command(
-            "$PConfig{perl} languages/scheme/schemec languages/$lang_f",
-            CD     => '..',                                             # $self->{relpath},
-            STDOUT => $pasm_f,
-            STDERR => $pasm_f,
-        );
-        Parrot::Test::run_command(
-            "./parrot languages/$pasm_f",
-            CD     => '..',                                             # $self->{relpath},
-            STDOUT => $out_f,
-            STDERR => $out_f,
-        );
-        my $prog_output = Parrot::Test::slurp_file($out_f);
 
-        @_ = ( $prog_output, $output, $desc );
+sub get_out_fn {
+    my $self = shift;
+    my ( $count, $options ) = @_;
 
-        my $ok = &{"Test::More::$meth"}(@_);
-    }
+    return Parrot::Test::per_test( '.out', $count );
+}
+
+sub get_test_prog {
+    my $self = shift;
+    my ( $count, $options ) = @_;
+
+    my $lang_fn = Parrot::Test::per_test( '.scheme', $count );
+    my $pasm_fn = Parrot::Test::per_test( '.pasm', $count );
+
+    return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pasm_fn && ./parrot languages/$pasm_fn",    
+}
+
+# never skip the reference implementation
+sub skip_why {
+    my $self = shift;
+    my ($options) = @_;
+
+    return;
 }
 
 1;

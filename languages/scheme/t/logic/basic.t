@@ -8,8 +8,9 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-#use Parrot::Test::Scheme tests => 7;
-use Parrot::Test::Scheme skip_all => 'Using obsolete calling conventions';
+#use Test::More tests => 7;
+use Test::More skip_all => 'Using obsolete calling conventions';
+use Parrot::Test;
 
 ###
 ### If
