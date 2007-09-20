@@ -67,7 +67,7 @@ foreach my $file (@files) {
         # look for matching documentation.  This means the text 
         # '=item C<\w+\s+function_name'
         if ($buf !~ m/=item .*$function_name/) {
-            push @missing_docs, $path;
+            push @missing_docs, $path, "\n";
             last;
         }
     }
