@@ -323,7 +323,6 @@ SP              [ ]
 "null"          return PNULL;
 "int"           return INTV;
 "num"           return FLOATV;
-"float"         return FLOATV;
 "new"           return NEW;
 "addr"          return ADDR;
 "global"        return GLOBALOP;
