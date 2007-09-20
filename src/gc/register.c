@@ -326,8 +326,8 @@ Duplicate the passed context
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Context *
-Parrot_dup_context(PARROT_INTERP, NOTNULL(const Parrot_Context *old) )
+struct Parrot_Context *
+Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
 {
     size_t          diff;
     Parrot_Context *ctx;
@@ -373,7 +373,7 @@ C<Parrot_pop_context>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Context *
+struct Parrot_Context *
 Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp->ctx);
@@ -428,7 +428,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Parrot_Context *
+struct Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
@@ -534,7 +534,7 @@ return continuation invoke, else from the destructor of a continuation.
 
 PARROT_API
 void
-Parrot_free_context(PARROT_INTERP, NOTNULL(Parrot_Context *ctxp), int re_use)
+Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_use)
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
@@ -588,7 +588,7 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(PARROT_INTERP, NULLOK(Parrot_Context *ctxp))
+Parrot_set_context_threshold(PARROT_INTERP, NULLOK(struct Parrot_Context *ctxp))
 {
     UNUSED(interp);
     UNUSED(ctxp);
