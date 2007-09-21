@@ -10,6 +10,8 @@ src/charset/binary.c
 
 This file implements the charset functions for binary data
 
+=over 4
+
 =cut
 
 */
@@ -118,6 +120,16 @@ static UINTVAL validate( PARROT_INTERP, SHIM(STRING *source_string) )
 #define EXCEPTION(err, str) \
     real_exception(interp, NULL, err, str)
 
+/*
+
+=item C<set_graphemes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
@@ -125,6 +137,16 @@ set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
     ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
 }
+
+/*
+
+=item C<to_charset>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
@@ -137,12 +159,32 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
     real_exception(interp, NULL, UNIMPLEMENTED, "to_charset for binary not implemented");
 }
 
+/*
+
+=item C<compose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 /* A err. can't compose binary */
 static STRING*
 compose(PARROT_INTERP, SHIM(STRING *source_string))
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't compose binary data");
 }
+
+/*
+
+=item C<decompose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 /* A err. can't decompose binary */
 static STRING*
@@ -151,11 +193,31 @@ decompose(PARROT_INTERP, SHIM(STRING *source_string))
     EXCEPTION(INVALID_CHARTYPE, "Can't decompose binary data");
 }
 
+/*
+
+=item C<upcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 upcase(PARROT_INTERP, SHIM(STRING *source_string))
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
+
+/*
+
+=item C<downcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 downcase(PARROT_INTERP, SHIM(STRING *source_string))
@@ -163,11 +225,31 @@ downcase(PARROT_INTERP, SHIM(STRING *source_string))
     EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
+/*
+
+=item C<titlecase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
+
+/*
+
+=item C<upcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
@@ -175,11 +257,31 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
     EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
+/*
+
+=item C<downcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
     EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
+
+/*
+
+=item C<titlecase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
@@ -187,11 +289,31 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
     EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
+/*
+
+=item C<compare>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 compare(PARROT_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
 {
     return 0;
 }
+
+/*
+
+=item C<cs_index>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 cs_index(PARROT_INTERP, SHIM(STRING *source_string),
@@ -200,12 +322,32 @@ cs_index(PARROT_INTERP, SHIM(STRING *source_string),
     return -1;
 }
 
+/*
+
+=item C<cs_rindex>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)
 {
     return -1;
 }
+
+/*
+
+=item C<validate>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 /* Binary's always valid */
 static UINTVAL
@@ -214,11 +356,31 @@ validate(PARROT_INTERP, SHIM(STRING *source_string))
     return 1;
 }
 
+/*
+
+=item C<is_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags, SHIM(STRING *source_string), UINTVAL offset)
 {
     return 0;
 }
+
+/*
+
+=item C<find_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
@@ -227,12 +389,32 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     return offset + count;
 }
 
+/*
+
+=item C<find_not_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
                 NOTNULL(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     return offset + count;
 }
+
+/*
+
+=item C<string_from_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
@@ -243,6 +425,16 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
     return return_string;
 }
 
+
+/*
+
+=item C<Parrot_charset_binary_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 const CHARSET *

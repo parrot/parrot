@@ -19,6 +19,8 @@ it in.
 
 Configure will have checked for supported word sizes.
 
+=over 4
+
 =cut
 
 */
@@ -30,11 +32,13 @@ Configure will have checked for supported word sizes.
 
 /*
 
-FUNCDOC: fetch_iv_le
+=item C<fetch_iv_le>
 
 This function converts a 4 or 8 byte C<INTVAL> into little endian
 format. If the native format is already little endian, then no
 conversion is done.
+
+=cut
 
 */
 
@@ -66,10 +70,12 @@ fetch_iv_le(INTVAL w)
 
 /*
 
-FUNCDOC: fetch_iv_be
+=item C<fetch_iv_be>
 
 This function converts a 4 or 8 byte C<INTVAL> into big endian format.
 If the native format is already big endian, then no conversion is done.
+
+=cut
 
 */
 
@@ -100,9 +106,11 @@ fetch_iv_be(INTVAL w)
 
 /*
 
-FUNCDOC: fetch_op_be
+=item C<fetch_op_be>
 
 Same as C<fetch_iv_be> for opcode_t
+
+=cut
 
 */
 
@@ -135,9 +143,11 @@ fetch_op_be(opcode_t w)
 
 /*
 
-FUNCDOC: fetch_op_le
+=item C<fetch_op_le>
 
 Same as C<fetch_iv_le> for opcode_t
+
+=cut
 
 */
 
@@ -170,9 +180,23 @@ fetch_op_le(opcode_t w)
 
 /*
 
+=pod
+
 Unrolled routines for swapping various sizes from 32-128 bits. These
 should only be used if alignment is unknown or we are pulling something
 out of a padded buffer.
+
+=cut
+
+*/
+
+/*
+
+=item C<fetch_buf_be_4>
+
+TODO: Not yet documented!!!
+
+=cut
 
 */
 
@@ -189,6 +213,16 @@ fetch_buf_be_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 #endif
 }
 
+/*
+
+=item C<fetch_buf_le_4>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
@@ -201,6 +235,16 @@ fetch_buf_le_4(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
     rb[3] = b[0];
 #endif
 }
+
+/*
+
+=item C<fetch_buf_be_8>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
@@ -219,6 +263,16 @@ fetch_buf_be_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 #endif
 }
 
+/*
+
+=item C<fetch_buf_le_8>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
@@ -235,6 +289,16 @@ fetch_buf_le_8(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
     rb[7] = b[0];
 #endif
 }
+
+/*
+
+=item C<fetch_buf_le_12>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
@@ -257,6 +321,16 @@ fetch_buf_le_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 #endif
 }
 
+/*
+
+=item C<fetch_buf_be_12>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 {
@@ -277,6 +351,16 @@ fetch_buf_be_12(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
     rb[11] = b[0];
 #endif
 }
+
+/*
+
+=item C<fetch_buf_le_16>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
@@ -302,6 +386,16 @@ fetch_buf_le_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
     rb[15] = b[0];
 #endif
 }
+
+/*
+
+=item C<fetch_buf_be_16>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
@@ -329,6 +423,8 @@ fetch_buf_be_16(NOTNULL(unsigned char *rb), NOTNULL(const unsigned char *b))
 }
 
 /*
+
+=back
 
 =head1 HISTORY
 

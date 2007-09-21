@@ -10,6 +10,10 @@ src/charset/unicode.c
 
 This file implements the charset functions for unicode data
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -155,6 +159,16 @@ static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
 
 #define UNIMPL EXCEPTION(UNIMPLEMENTED, "unimplemented unicode")
 
+/*
+
+=item C<set_graphemes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, NOTNULL(STRING *insert_string))
@@ -163,12 +177,32 @@ set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
             replace_count, insert_string);
 }
 
+/*
+
+=item C<get_graphemes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_CODEPOINTS(interp, source_string, offset, count);
 }
+
+/*
+
+=item C<get_graphemes_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -177,6 +211,16 @@ get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
     return ENCODING_GET_CODEPOINTS_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
+
+/*
+
+=item C<to_charset>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
@@ -189,6 +233,16 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
     return Parrot_utf8_encoding_ptr->to_encoding(interp, src, dest);
 }
 
+
+/*
+
+=item C<compose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))
@@ -235,11 +289,31 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 #endif
 }
 
+/*
+
+=item C<decompose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<upcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 upcase(PARROT_INTERP, NOTNULL(STRING *src))
@@ -313,6 +387,16 @@ upcase(PARROT_INTERP, NOTNULL(STRING *src))
 #endif
 }
 
+/*
+
+=item C<downcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 downcase(PARROT_INTERP, NOTNULL(STRING *src))
 {
@@ -359,6 +443,16 @@ u_strToLower(UChar *dest, int32_t destCapacity,
             "no ICU lib loaded");
 #endif
 }
+
+/*
+
+=item C<titlecase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 titlecase(PARROT_INTERP, NOTNULL(STRING *src))
@@ -408,11 +502,31 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 #endif
 }
 
+/*
+
+=item C<upcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<downcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
@@ -420,11 +534,31 @@ downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
     UNIMPL;
 }
 
+/*
+
+=item C<titlecase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<compare>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))
@@ -454,12 +588,32 @@ compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *rhs))
 }
 
 
+/*
+
+=item C<cs_rindex>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)
 {
     UNIMPL;
 }
+
+/*
+
+=item C<validate>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static UINTVAL
 validate(PARROT_INTERP, NOTNULL(STRING *src))
@@ -476,6 +630,16 @@ validate(PARROT_INTERP, NOTNULL(STRING *src))
     }
     return 1;
 }
+
+/*
+
+=item C<u_iscclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
@@ -544,6 +708,16 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 #endif
 }
 
+/*
+
+=item C<is_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags,
           NOTNULL(STRING *source_string), UINTVAL offset)
@@ -558,6 +732,16 @@ is_cclass(PARROT_INTERP, INTVAL flags,
     }
     return (Parrot_iso_8859_1_typetable[codepoint] & flags) ? 1 : 0;
 }
+
+/*
+
+=item C<find_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
@@ -583,6 +767,16 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     }
     return end;
 }
+
+/*
+
+=item C<find_not_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
@@ -613,6 +807,16 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     return end;
 }
 
+/*
+
+=item C<string_from_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
@@ -626,6 +830,16 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
     return dest;
 }
+
+/*
+
+=item C<compute_hash>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static size_t
 compute_hash(PARROT_INTERP, NOTNULL(const STRING *src), size_t seed)
@@ -642,6 +856,16 @@ compute_hash(PARROT_INTERP, NOTNULL(const STRING *src), size_t seed)
     }
     return hashval;
 }
+
+/*
+
+=item C<Parrot_charset_unicode_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 const CHARSET *

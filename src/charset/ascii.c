@@ -11,6 +11,8 @@ src/charset/ascii.c
 This file implements the charset functions for ascii data and common
 charset functionality for similar charsets like iso-8859-1.
 
+=over 4
+
 =cut
 
 */
@@ -130,6 +132,16 @@ static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
 
 /* HEADERIZER END: static */
 
+/*
+
+=item C<ascii_get_graphemes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 STRING *
 ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -137,6 +149,16 @@ ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 {
     return ENCODING_GET_BYTES(interp, source_string, offset, count);
 }
+
+/*
+
+=item C<set_graphemes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -147,6 +169,16 @@ set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 }
 
+/*
+
+=item C<ascii_get_graphemes_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -156,6 +188,16 @@ ascii_get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
     return ENCODING_GET_BYTES_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
+
+/*
+
+=item C<to_ascii>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
@@ -188,6 +230,16 @@ to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
     return dest;
 }
 
+/*
+
+=item C<to_unicode>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -204,6 +256,16 @@ to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
     }
 }
 
+/*
+
+=item C<to_charset>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -219,6 +281,16 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 }
 
 /* A noop. can't compose ascii */
+/*
+
+=item C<compose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))
 {
@@ -226,11 +298,31 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 }
 
 /* A noop. can't decompose ascii */
+/*
+
+=item C<decompose>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING*
 decompose(PARROT_INTERP, NOTNULL(STRING *src))
 {
     return string_copy(interp, src);
 }
+
+/*
+
+=item C<upcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
@@ -248,6 +340,16 @@ upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
     }
 }
 
+/*
+
+=item C<downcase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
@@ -263,6 +365,16 @@ downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         }
     }
 }
+
+/*
+
+=item C<titlecase>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
@@ -281,6 +393,16 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
     }
 }
 
+/*
+
+=item C<upcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
@@ -291,6 +413,16 @@ upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         buffer[0] = (char)toupper(buffer[0]);
     }
 }
+
+/*
+
+=item C<downcase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
@@ -303,6 +435,16 @@ downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
     }
 }
 
+/*
+
+=item C<titlecase_first>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 {
@@ -313,6 +455,16 @@ titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         buffer[0] = (char)toupper(buffer[0]);
     }
 }
+
+/*
+
+=item C<ascii_compare>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
@@ -348,6 +500,16 @@ ascii_compare(PARROT_INTERP, NOTNULL(const STRING *lhs), NOTNULL(const STRING *r
     return 0;
 }
 
+/*
+
+=item C<mixed_cs_index>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 mixed_cs_index(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *search), UINTVAL offs)
@@ -381,6 +543,16 @@ mixed_cs_index(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *search), UIN
     return -1;
 }
 
+/*
+
+=item C<ascii_cs_index>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -398,6 +570,16 @@ ascii_cs_index(PARROT_INTERP, NOTNULL(STRING *source_string),
     return retval;
 }
 
+/*
+
+=item C<ascii_cs_rindex>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -413,6 +595,16 @@ ascii_cs_rindex(PARROT_INTERP, NOTNULL(STRING *source_string),
             search_string, offset);
     return retval;
 }
+
+/*
+
+=item C<validate>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
@@ -430,6 +622,16 @@ validate(PARROT_INTERP, NOTNULL(STRING *src))
     return 1;
 }
 
+/*
+
+=item C<string_from_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
@@ -438,6 +640,16 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
     STRING * const return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
     return return_string;
 }
+
+/*
+
+=item C<is_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
@@ -455,6 +667,16 @@ is_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string), UINTVAL o
     }
     return (Parrot_ascii_typetable[codepoint] & flags) ? 1 : 0;
 }
+
+/*
+
+=item C<find_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
@@ -475,6 +697,16 @@ find_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
     return end;
 }
 
+/*
+
+=item C<find_not_cclass>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
                 UINTVAL offset, UINTVAL count)
@@ -494,6 +726,16 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, NOTNULL(STRING *source_string),
 }
 
 /*
+
+=item C<ascii_compute_hash>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+/*
  * TODO pass in the Hash's seed value as initial hashval
  */
 PARROT_PURE_FUNCTION
@@ -511,6 +753,16 @@ ascii_compute_hash(SHIM_INTERP, NOTNULL(const STRING *source_string), size_t see
     }
     return hashval;
 }
+
+/*
+
+=item C<Parrot_charset_ascii_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 const CHARSET *
@@ -549,6 +801,16 @@ Parrot_charset_ascii_init(PARROT_INTERP)
     return return_set;
 }
 
+/*
+
+=item C<charset_cvt_ascii_to_binary>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -567,6 +829,16 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *
     src->charset = Parrot_binary_charset_ptr;
     return src;
 }
+
+/*
+
+=item C<charset_cvt_ascii_to_iso_8859_1>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))

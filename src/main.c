@@ -31,6 +31,8 @@ Start Parrot
 
 The entry point from the command line into Parrot.
 
+=cut
+
 */
 
 int
