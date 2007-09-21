@@ -48,8 +48,8 @@ constructed out of these fundamental building blocks.
 All PMCs have the form:
 
     struct PMC {
-        Parrot_UInt flags;
         UnionVal cache;
+        Parrot_UInt flags;
         VTABLE *vtable;
         DPOINTER *data;
         struct PMC_EXT *pmc_ext;
@@ -64,9 +64,12 @@ where C<cache> is a C<UnionVal> union:
         } _b;
         struct {
             DPOINTER* _struct_val;
-            PMC* _pmc_val;
+            PMC*      _pmc_val;
         } _ptrs;
-        INTVAL _int_val;
+        struct _i {
+            INTVAL _int_val;
+            INTVAL _int_val2;
+        } _i;
         FLOATVAL _num_val;
         struct parrot_string_t * _string_val;
     } UnionVal;
