@@ -36,12 +36,11 @@ use Getopt::Long;
 use lib 'lib';
 use Parrot::BuildUtil;
 
-GetOptions(\my %opts,
-    "noheaderizer",
-) or die "error processing options";
+GetOptions( \my %opts, "noheaderizer", ) or die "error processing options";
 
-my ($gen_file, $source) = @ARGV;
-my $contents            = -e $gen_file
+my ( $gen_file, $source ) = @ARGV;
+my $contents =
+    -e $gen_file
     ? Parrot::BuildUtil::slurp_file($gen_file)
     : die "Cannot find '$gen_file': $!\n";
 
@@ -66,7 +65,7 @@ my $noheaderizer = <<END_NOHEADERIZER;
 END_NOHEADERIZER
 
 # if the generated file exists, make sure the header isn't there already
-open( my($gen_fh), '<', $gen_file )
+open( my ($gen_fh), '<', $gen_file )
     or die "Cannot read '$gen_file': $!\n";
 read $gen_fh, my $block, length $header;
 exit if $block eq $header;
@@ -74,8 +73,7 @@ exit if $block eq $header;
 open( my $dest_fh, '>', $gen_file )
     or die "Cannot write to '$gen_file': $!\n";
 
-print {$dest_fh}
-    $header, (exists $opts{noheaderizer} ? $noheaderizer : ()), $contents;
+print {$dest_fh} $header, ( exists $opts{noheaderizer} ? $noheaderizer : () ), $contents;
 
 close $dest_fh;
 

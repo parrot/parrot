@@ -120,7 +120,7 @@ sub describe_file {
         if $path =~ /\.([chlyC]|cpp|cola|xs|pmc)$|[_\.][ch]\.in$/;
     return describe_perl_file( $info, $text )
         if $path =~ /\.(pl|pm|t|PL|pod|pasm)$|_pm\.in$/
-        or $text =~ /^\#/;
+            or $text =~ /^\#/;
     return describe_misc_file( $info, $text );
 }
 

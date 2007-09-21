@@ -76,8 +76,7 @@ exit;
 sub check_opcodes {
     my ( $file, $opcodes ) = @_;
     my @data = qx/$disassemble $file/
-        or warn "<$disassemble $file> failed: $!$/"
-        and return;
+        or warn "<$disassemble $file> failed: $!$/" and return;
     for (@data) {
         s/L\w+\:\s+//;     # Remove the Lxx marks
         s/^(\w+).*/$1/;    # Extract the opcode

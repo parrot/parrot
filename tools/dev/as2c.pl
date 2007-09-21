@@ -25,7 +25,7 @@ use warnings;
 
 my $src = $ARGV[0];
 my $cmd = "cc -c $src.c -Wall -O3 -fomit-frame-pointer -DNDEBUG -Wa,-a > $src.s";
-my ( $func );
+my ($func);
 
 print_header($src);
 create_s($cmd);

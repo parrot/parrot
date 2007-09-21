@@ -286,7 +286,7 @@ my %Type;
 @Type{qw(bsd long)} = ();
 $Type = 'bsd'
     if $BSD
-    || ( defined $Type && $Type eq '1' );    # So they used --t.
+        || ( defined $Type && $Type eq '1' );    # So they used --t.
 $Type = 'long' if $Long;
 die "$ME: --type=$Type unknown\n"
     if defined $Type && $Type ne '' && !exists $Type{$Type};
@@ -298,7 +298,7 @@ for my $f (@ARGV) {
         warn "$ME: No such file: $f\n";
         next;
     }
-    if ( open( my $NM, '<',  "$nm_cmd $nm_opt $f |" ) ) {
+    if ( open( my $NM, '<', "$nm_cmd $nm_opt $f |" ) ) {
         my $o = '?';
         $o = $f if $f =~ /\.o$/;
         my $file;

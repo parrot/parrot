@@ -74,7 +74,7 @@ my %proto_type = (
     v   => "void",
     J   => "PARROT_INTERP",
     P   => "PMC *",
-    O   => "PMC *",      # object
+    O   => "PMC *",           # object
     S   => "STRING *",
     I   => "INTVAL",
     N   => "FLOATVAL",
@@ -82,7 +82,7 @@ my %proto_type = (
     B   => "void **",
     L   => "long *",
     T   => "char **",
-    '@' => "PMC *",      # slurpy array
+    '@' => "PMC *",           # slurpy array
 );
 
 # to fix up signatures that don't translate directly
@@ -228,7 +228,8 @@ while (<>) {
         foreach ( split //, $args ) {
             die "Invalid argument signature char '$_' on line $. of $ARGV"
                 unless exists $sig_char{$_};
-            push @arg, make_arg( $_, $reg_num++, \$temp_cnt, \@temps, \@extra_preamble,
+            push @arg,
+                make_arg( $_, $reg_num++, \$temp_cnt, \@temps, \@extra_preamble,
                 \@extra_postamble );
             $sig .= $sig_char{$_};
             $_ eq 'J' && $reg_num--;

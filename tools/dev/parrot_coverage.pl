@@ -333,7 +333,7 @@ sub filter_gcov {
 
     my $outfile = "$outfile_base.lines.html";
     print "Writing $outfile..\n" if $DEBUG;
-    our ($IN, $OUT);
+    our ( $IN, $OUT );
     open( $IN,  "<", "$infile" )  or die "Can't read $infile: $!\n";
     open( $OUT, ">", "$outfile" ) or die "Can't write $outfile: $!\n";
 

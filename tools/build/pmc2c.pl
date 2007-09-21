@@ -13,13 +13,16 @@ use Parrot::Pmc2c::Pmc2cMain;
 my ( %action, %options, @pmc_include_paths );
 
 GetOptions(
+
     #pmc include paths
     "include=s" => \@pmc_include_paths,
+
     #program actions
-    "vtable"    => \$action{default},
-    "dump"      => \$action{dump},
-    "c|gen-c"   => \$action{gen_c},
-    "tree"      => \$action{tree},
+    "vtable"  => \$action{default},
+    "dump"    => \$action{dump},
+    "c|gen-c" => \$action{gen_c},
+    "tree"    => \$action{tree},
+
     #command line options
     "no-lines"  => \$options{nolines},
     "library=s" => \$options{library},
@@ -56,7 +59,7 @@ if ( $action{tree} ) {
 }
 
 if ( $options{library} ) {
-    $self->gen_library($options{library});
+    $self->gen_library( $options{library} );
     exit;
 }
 

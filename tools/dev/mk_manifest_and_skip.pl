@@ -4,20 +4,18 @@
 
 use strict;
 use warnings;
-use lib ( qw| lib | );
+use lib (qw| lib |);
 use Parrot::Manifest;
 
 my $script = $0;
 
-my $mani = Parrot::Manifest->new( {
-    script          => $script,
-} );
+my $mani = Parrot::Manifest->new( { script => $script, } );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
-my $need_for_files = $mani->determine_need_for_manifest($manifest_lines_ref);
+my $need_for_files     = $mani->determine_need_for_manifest($manifest_lines_ref);
 $mani->print_manifest($manifest_lines_ref) if $need_for_files;
 
-my $print_str = $mani->prepare_manifest_skip();
+my $print_str     = $mani->prepare_manifest_skip();
 my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
 $mani->print_manifest_skip($print_str) if $need_for_skip;
 

@@ -49,8 +49,8 @@ else {
 my @toolsrcdir = File::Spec->splitdir($toolsrcdir);
 die "$self: not in tools/dev\n"
     unless @toolsrcdir >= 2
-    && lc( $toolsrcdir[-1] ) eq 'dev'
-    && lc( $toolsrcdir[-2] ) eq 'tools';
+        && lc( $toolsrcdir[-1] ) eq 'dev'
+        && lc( $toolsrcdir[-2] ) eq 'tools';
 my @topsrcdir = @toolsrcdir[ 0 .. $#toolsrcdir - 2 ];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
 my $manifest  = File::Spec->catfile( $topsrcdir, "MANIFEST" );

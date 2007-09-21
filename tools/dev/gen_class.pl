@@ -72,8 +72,9 @@ for (@$vtbl) {
     print "    $retval $methname ($args) {\n";
 
     if ( $retval ne 'void' ) {
-        print $retval eq 'PMC*' ? "        return PMCNULL;\n"
-                                : "        return ($retval)0;\n";
+        print $retval eq 'PMC*'
+            ? "        return PMCNULL;\n"
+            : "        return ($retval)0;\n";
     }
     print "    }\n\n";
 }

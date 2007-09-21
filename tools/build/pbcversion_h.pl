@@ -22,22 +22,21 @@ use warnings;
 use strict;
 use lib 'lib';
 
-my ($major, $minor);
+my ( $major, $minor );
 
 my $compat_file = 'PBC_COMPAT';
 open my $IN, '<', $compat_file or die "Can't read $compat_file";
 while (<$IN>) {
     if (/^(\d+)\.(\d+)/) {
-        ($major, $minor) = ($1, $2);
+        ( $major, $minor ) = ( $1, $2 );
         last;
     }
 }
 close $IN;
 
-unless (defined $major && defined $minor) {
+unless ( defined $major && defined $minor ) {
     die "No bytecode version found in '$compat_file'.";
 }
-
 
 print << "EOF";
 /* ex: set ro:

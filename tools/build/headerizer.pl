@@ -69,7 +69,7 @@ use Parrot::Config;
 my %warnings;
 my %opt;
 
-my %valid_macros = map {($_,1)} qw(
+my %valid_macros = map { ( $_, 1 ) } qw(
     PARROT_API
     PARROT_INLINE
     PARROT_CAN_RETURN_NULL
@@ -141,7 +141,7 @@ sub extract_function_declarations {
 }
 
 sub function_components_from_declaration {
-    my $file = shift;
+    my $file  = shift;
     my $proto = shift;
 
     my @lines = split( /\n/, $proto );
@@ -155,18 +155,19 @@ sub function_components_from_declaration {
         my $macro = shift @lines;
         if ( $macro eq 'PARROT_API' ) {
             $parrot_api = 1;
-        } elsif ( $macro eq 'PARROT_INLINE' ) {
+        }
+        elsif ( $macro eq 'PARROT_INLINE' ) {
             $parrot_inline = 1;
         }
         push( @macros, $macro );
     }
 
     my $return_type = shift @lines;
-    my $args      = join( " ", @lines );
+    my $args = join( " ", @lines );
 
     $args =~ s/\s+/ /g;
-    $args =~ s{([^(]+)\s*\((.+)\);?}{$2} or
-        die qq{Couldn't handle "$proto"};
+    $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
+        or die qq{Couldn't handle "$proto"};
 
     my $name = $1;
     $args = $2;
@@ -175,7 +176,10 @@ sub function_components_from_declaration {
 
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
-        /\S+\s+\S+/ || ( $_ eq '...' ) || ( $_ eq 'void' ) || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
+        /\S+\s+\S+/
+            || ( $_ eq '...' )
+            || ( $_ eq 'void' )
+            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
             or die "Bad args in $proto";
     }
 
@@ -185,7 +189,7 @@ sub function_components_from_declaration {
     die "$file $name: Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
 
     my %macros;
-    for my $macro ( @macros ) {
+    for my $macro (@macros) {
         $macros{$macro} = 1;
         if ( not $valid_macros{$macro} ) {
             squawk( $file, $name, "Invalid macro $macro" );
@@ -193,10 +197,12 @@ sub function_components_from_declaration {
     }
     if ( $return_type =~ /\*/ ) {
         if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name, "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
+            squawk( $file, $name,
+                "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
         }
         elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name, "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
+            squawk( $file, $name,
+                "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
         }
     }
 
@@ -212,7 +218,6 @@ sub function_components_from_declaration {
     };
 }
 
-
 sub attrs_from_args {
     my $func = shift;
     my @args = @_;
@@ -220,7 +225,7 @@ sub attrs_from_args {
     my @attrs = ();
 
     my $n = 0;
-    for my $arg ( @args ) {
+    for my $arg (@args) {
         ++$n;
         if ( $arg =~ m{(ARGOUT|ARGINOUT|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
@@ -235,24 +240,23 @@ sub attrs_from_args {
     return @attrs;
 }
 
-
 sub make_function_decls {
     my @funcs = @_;
 
     my @decls;
-    foreach my $func ( @funcs ) {
+    foreach my $func (@funcs) {
         my $multiline = 0;
 
         my $decl = sprintf( "%s %s(", $func->{return_type}, $func->{name} );
         $decl = "static $decl" if $func->{is_static};
 
-        my @args = @{$func->{args}};
+        my @args = @{ $func->{args} };
         my @attrs = attrs_from_args( $func, @args );
 
-        for my $arg ( @args ) {
+        for my $arg (@args) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {
                 $arg = $1;
-                if ( $func->{is_static} || ($arg =~ /\*/) ) {
+                if ( $func->{is_static} || ( $arg =~ /\*/ ) ) {
                     $arg = "SHIM($arg)";
                 }
                 else {
@@ -262,25 +266,25 @@ sub make_function_decls {
         }
 
         my $argline = join( ", ", @args );
-        if ( length($decl.$argline) <= 75 ) {
+        if ( length( $decl . $argline ) <= 75 ) {
             $decl = "$decl $argline )";
         }
         else {
             if ( $args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
-                $decl .= " " . (shift @args);
+                $decl .= " " . ( shift @args );
                 $decl .= "," if @args;
             }
-            $argline = join( ",", map { "\n\t$_" } @args );
-            $decl = "$decl$argline )";
+            $argline   = join( ",", map { "\n\t$_" } @args );
+            $decl      = "$decl$argline )";
             $multiline = 1;
         }
 
         my $attrs = join( "", map { "\n\t\t$_" } @attrs );
-        if ( $attrs ) {
+        if ($attrs) {
             $decl .= $attrs;
             $multiline = 1;
         }
-        my @macros = @{$func->{macros}};
+        my @macros = @{ $func->{macros} };
         $multiline = 1 if @macros;
 
         $decl .= $multiline ? ";\n" : ";";
@@ -293,11 +297,11 @@ sub make_function_decls {
 }
 
 sub squawk {
-    my $file = shift;
-    my $func = shift;
+    my $file  = shift;
+    my $func  = shift;
     my $error = shift;
 
-    push( @{$warnings{$file}->{$func}}, $error );
+    push( @{ $warnings{$file}->{$func} }, $error );
 }
 
 sub main {
@@ -306,7 +310,7 @@ sub main {
     my %ofiles;
     ++$ofiles{$_} for @ARGV;
     my @ofiles = sort keys %ofiles;
-    for ( @ofiles ) {
+    for (@ofiles) {
         print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
     }
     my %cfiles;
@@ -326,21 +330,21 @@ sub main {
 
         my $sourcefile = -f $pmcfile ? $pmcfile : $cfile;
 
-        my $source = read_file( $cfile );
+        my $source = read_file($cfile);
 
         die "can't find HEADERIZER HFILE directive in '$cfile'"
             unless $source =~ m#/\*\s+HEADERIZER HFILE:\s+([^*]+?)\s+\*/#s;
         my $hfile = $1;
 
-        if ( ($hfile ne 'none') && (not -f $hfile) ) {
+        if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
             die "'$hfile' not found (referenced from '$cfile')";
         }
 
         my @decls = extract_function_declarations($source);
         for my $decl (@decls) {
-            my $components = function_components_from_declaration($cfile, $decl);
+            my $components = function_components_from_declaration( $cfile, $decl );
             push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
-            push( @{ $cfiles_with_statics{ $cfile } }, $components ) if $components->{is_static};
+            push( @{ $cfiles_with_statics{$cfile} }, $components ) if $components->{is_static};
         }
     }    # for @cfiles
 
@@ -348,11 +352,11 @@ sub main {
     for my $hfile ( sort keys %cfiles ) {
         my $cfiles = $cfiles{$hfile};
 
-        my $header = read_file( $hfile );
+        my $header = read_file($hfile);
 
         for my $cfile ( sort keys %{$cfiles} ) {
-            my @funcs = @{$cfiles->{$cfile}};
-            @funcs = grep { not $_->{is_static} } @funcs; # skip statics
+            my @funcs = @{ $cfiles->{$cfile} };
+            @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
             $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
         }
 
@@ -361,10 +365,10 @@ sub main {
 
     # Update all the .c files in place
     for my $cfile ( sort keys %cfiles_with_statics ) {
-        my @funcs = @{$cfiles_with_statics{ $cfile }};
+        my @funcs = @{ $cfiles_with_statics{$cfile} };
         @funcs = grep { $_->{is_static} } @funcs;
 
-        my $source = read_file( $cfile );
+        my $source = read_file($cfile);
         $source = replace_headerized_declarations( $source, 'static', $cfile, @funcs );
 
         write_file( $cfile, $source );
@@ -372,7 +376,7 @@ sub main {
 
     print "Headerization complete.\n";
     if ( keys %warnings ) {
-        my $nwarnings = 0;
+        my $nwarnings     = 0;
         my $nwarningfuncs = 0;
         my $nwarningfiles = 0;
         for my $file ( sort keys %warnings ) {
@@ -381,7 +385,7 @@ sub main {
             my $funcs = $warnings{$file};
             for my $func ( sort keys %{$funcs} ) {
                 ++$nwarningfuncs;
-                for my $error ( @{$funcs->{$func}} ) {
+                for my $error ( @{ $funcs->{$func} } ) {
                     print "    $func: $error\n";
                     ++$nwarnings;
                 }
@@ -406,7 +410,7 @@ sub read_file {
 
 sub write_file {
     my $filename = shift;
-    my $text = shift;
+    my $text     = shift;
 
     open my $fh, '>', $filename or die "couldn't write '$filename': $!";
     print {$fh} $text;
@@ -415,9 +419,9 @@ sub write_file {
 
 sub replace_headerized_declarations {
     my $source_code = shift;
-    my $cfile = shift;
-    my $hfile = shift;
-    my @funcs = @_;
+    my $cfile       = shift;
+    my $hfile       = shift;
+    my @funcs       = @_;
 
     # Allow a way to not headerize statics
     if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
@@ -426,11 +430,11 @@ sub replace_headerized_declarations {
 
     @funcs = sort api_first_then_alpha @funcs;
 
-    my @function_decls = make_function_decls( @funcs );
+    my @function_decls = make_function_decls(@funcs);
 
     my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER   = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-    my $ENDMARKER     = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+    my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
+    my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
     $source_code =~ s#($STARTMARKER)(?:.*?)($ENDMARKER)#$1\n$function_decls\n$2#s
         or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
 
@@ -438,11 +442,8 @@ sub replace_headerized_declarations {
 }
 
 sub api_first_then_alpha {
-    return
-        ( ($b->{is_api}||0) <=> ($a->{is_api}||0) )
-            ||
-        ( lc $a->{name} cmp lc $b->{name} )
-    ;
+    return ( ( $b->{is_api} || 0 ) <=> ( $a->{is_api} || 0 ) )
+        || ( lc $a->{name} cmp lc $b->{name} );
 }
 
 =head1 NAME
