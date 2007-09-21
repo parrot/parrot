@@ -16,6 +16,10 @@ Win32 System Programming, 2nd Edition.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #ifdef WIN32
@@ -169,9 +173,11 @@ ParrotIOLayer pio_win32_layer = {
 
 /*
 
-FUNCDOC: flags_to_win32
+=item C<flags_to_win32>
 
 Convert to platform-specific bit open flags.
+
+=cut
 
 */
 
@@ -221,9 +227,11 @@ flags_to_win32(INTVAL flags, NOTNULL(DWORD * fdwAccess),
 
 /*
 
-FUNCDOC: PIO_win32_init
+=item C<PIO_win32_init>
 
 Sets up the standard C<std*> IO handles.
+
+=cut
 
 */
 
@@ -273,9 +281,11 @@ PIO_win32_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-FUNCDOC: PIO_win32_getblksize
+=item C<PIO_win32_getblksize>
 
 Returns C<PIO_BLKSIZE>.
+
+=cut
 
 */
 
@@ -288,10 +298,12 @@ PIO_win32_getblksize(SHIM(PIOHANDLE fd))
 
 /*
 
-FUNCDOC: PIO_win32_open
+=item C<PIO_win32_open>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
+
+=cut
 
 */
 
@@ -340,9 +352,11 @@ PIO_win32_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_win32_fdopen
+=item C<PIO_win32_fdopen>
 
 Returns a new C<ParrotIO> with C<fd> as its file descriptor.
+
+=cut
 
 */
 
@@ -368,9 +382,11 @@ PIO_win32_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL
 
 /*
 
-FUNCDOC: PIO_win32_close
+=item C<PIO_win32_close>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
+
+=cut
 
 */
 
@@ -386,9 +402,11 @@ PIO_win32_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-FUNCDOC: PIO_win32_isatty
+=item C<PIO_win32_isatty>
 
 Returns whether C<fd> is a console/tty.
+
+=cut
 
 */
 
@@ -402,9 +420,11 @@ PIO_win32_isatty(PIOHANDLE fd)
 
 /*
 
-FUNCDOC: PIO_win32_flush
+=item C<PIO_win32_flush>
 
 Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
+
+=cut
 
 */
 
@@ -428,10 +448,12 @@ PIO_win32_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-FUNCDOC: PIO_win32_read
+=item C<PIO_win32_read>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
+
+=cut
 
 */
 
@@ -466,10 +488,12 @@ PIO_win32_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_win32_write
+=item C<PIO_win32_write>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor.
+
+=cut
 
 */
 
@@ -503,13 +527,15 @@ PIO_win32_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), 
 
 /*
 
-FUNCDOC: PIO_win32_seek
+=item C<PIO_win32_seek>
 
 Hard seek.
 
 Calls C<SetFilePointer()> to move the read/write position of C<*io>'s
 file descriptor to C<off> bytes relative to the location specified by
 C<whence>.
+
+=cut
 
 */
 
@@ -533,9 +559,11 @@ PIO_win32_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_win32_tell
+=item C<PIO_win32_tell>
 
 Returns the current read/write position of C<*io>'s file descriptor.
+
+=cut
 
 */
 
@@ -554,12 +582,14 @@ PIO_win32_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-FUNCDOC: PIO_sockaddr_in
+=item C<PIO_sockaddr_in>
 
 C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
 XXX: We can probably just write our own routines (C<htons()>,
 C<inet_aton()>, etc.) and take this out of platform specific compilation
+
+=cut
 
 */
 
@@ -601,10 +631,12 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 
 /*
 
-FUNCDOC: PIO_win32_socket
+=item C<PIO_win32_socket>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
+
+=cut
 
 */
 
@@ -627,9 +659,11 @@ PIO_win32_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, i
 
 /*
 
-FUNCDOC: PIO_win32_connect
+=item C<PIO_win32_connect>
 
 Connects C<*io>'s socket to address C<*r>.
+
+=cut
 
 */
 
@@ -657,9 +691,11 @@ PIO_win32_connect(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *i
 
 /*
 
-FUNCDOC: PIO_win32_send
+=item C<PIO_win32_send>
 
 Send the message C<*s> to C<*io>'s connected socket.
+
+=cut
 
 */
 
@@ -708,9 +744,11 @@ AGAIN:
 
 /*
 
-FUNCDOC: PIO_win32_recv
+=item C<PIO_win32_recv>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
+
+=cut
 
 */
 
@@ -767,9 +805,11 @@ AGAIN:
 
 /*
 
-FUNCDOC: PIO_win32_bind
+=item C<PIO_win32_bind>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
+
+=cut
 
 */
 
@@ -798,10 +838,12 @@ PIO_win32_bind(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_win32_listen
+=item C<PIO_win32_listen>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
+
+=cut
 
 */
 
@@ -818,9 +860,11 @@ PIO_win32_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_win32_accept
+=item C<PIO_win32_accept>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
+
+=cut
 
 */
 
@@ -914,6 +958,8 @@ const ParrotIOLayerAPI pio_win32_layer_api = {
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/io/io_buf.c>,
@@ -926,6 +972,8 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by Melvin Smith.
+
+=cut
 
 */
 

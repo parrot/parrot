@@ -13,6 +13,10 @@ representation.
 
 =head2 utf8 layer functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -86,6 +90,16 @@ ParrotIOLayer pio_utf8_layer = {
     NULL, NULL
 };
 
+/*
+
+=item C<PIO_utf8_register_layer>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
@@ -93,6 +107,16 @@ PIO_utf8_register_layer(void)
 {
     return &pio_utf8_layer;
 }
+
+/*
+
+=item C<PIO_utf8_read>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static size_t
 PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
@@ -147,6 +171,16 @@ ok:
     return len;
 }
 
+/*
+
+=item C<PIO_utf8_write>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static size_t
 PIO_utf8_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
 {
@@ -162,6 +196,8 @@ PIO_utf8_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io), 
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/io/io_passdown.c>,
@@ -172,6 +208,8 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by Leo.
+
+=cut
 
 */
 

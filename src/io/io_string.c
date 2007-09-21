@@ -12,6 +12,10 @@ Capture output to a string PMC.
 
 =head2 String Layer Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -81,6 +85,16 @@ ParrotIOLayer pio_string_layer = {
     NULL, NULL
 };
 
+/*
+
+=item C<PIO_string_register_layer>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
@@ -88,6 +102,16 @@ PIO_string_register_layer(void)
 {
     return &pio_string_layer;
 }
+
+/*
+
+=item C<PIO_string_read>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static size_t
 PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING **buf))
@@ -100,6 +124,16 @@ PIO_string_read(SHIM_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTN
 
     return (*buf)->strlen;
 }
+
+/*
+
+=item C<PIO_string_write>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static size_t
 PIO_string_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), NOTNULL(STRING *s))
@@ -117,6 +151,8 @@ PIO_string_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), SHIM(ParrotIO *io), N
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/io/io_passdown.c>,
@@ -127,6 +163,8 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by chromatic.
+
+=cut
 
 */
 

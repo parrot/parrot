@@ -21,6 +21,10 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -179,11 +183,13 @@ static size_t PIO_unix_write( SHIM_INTERP,
 
 /*
 
-FUNCDOC: flags_to_unix
+=item C<flags_to_unix>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
 to C<open()> and C<fopen()> in C<PIO_unix_open()> and
 C<PIO_unix_fdopen()> respectively.
+
+=cut
 
 */
 
@@ -214,10 +220,12 @@ flags_to_unix(INTVAL flags)
 
 /*
 
-FUNCDOC: PIO_unix_init
+=item C<PIO_unix_init>
 
 Sets up the interpreter's standard C<std*> IO handles. Returns C<0> on
 success and C<-1> on error.
+
+=cut
 
 */
 
@@ -250,10 +258,12 @@ PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-FUNCDOC: PIO_unix_open
+=item C<PIO_unix_open>
 
 Opens C<*spath>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 values.
+
+=cut
 
 */
 
@@ -345,7 +355,7 @@ PIO_unix_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_unix_async
+=item C<PIO_unix_async>
 
 Experimental asynchronous IO.
 
@@ -354,6 +364,8 @@ This is available if C<PARROT_ASYNC_DEVEL> is defined.
 Only works on Linux at the moment.
 
 Toggles the C<O_ASYNC> flag on the IO file descriptor.
+
+=cut
 
 */
 
@@ -379,9 +391,11 @@ PIO_unix_async(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *i
 
 /*
 
-FUNCDOC: PIO_unix_fdopen
+=item C<PIO_unix_fdopen>
 
 Returns a new C<ParrotIO> with file descriptor C<fd>.
+
+=cut
 
 */
 
@@ -429,9 +443,11 @@ PIO_unix_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL 
 
 /*
 
-FUNCDOC: PIO_unix_close
+=item C<PIO_unix_close>
 
 Closes C<*io>'s file descriptor.
+
+=cut
 
 */
 
@@ -446,9 +462,11 @@ PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-FUNCDOC: PIO_unix_isatty
+=item C<PIO_unix_isatty>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
+
+=cut
 
 */
 
@@ -460,7 +478,7 @@ PIO_unix_isatty(PIOHANDLE fd)
 
 /*
 
-FUNCDOC: PIO_unix_getblksize
+=item C<PIO_unix_getblksize>
 
 Various ways of determining block size.
 
@@ -469,6 +487,8 @@ used if available.
 
 If called without an argument then the C<BLKSIZE> constant is returned
 if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
+
+=cut
 
 */
 
@@ -503,12 +523,14 @@ PIO_unix_getblksize(PIOHANDLE fd)
 
 /*
 
-FUNCDOC: PIO_unix_flush
+=item C<PIO_unix_flush>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
 
 XXX: Is it necessary to C<sync()> here?
+
+=cut
 
 */
 
@@ -520,10 +542,12 @@ PIO_unix_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-FUNCDOC: PIO_unix_read
+=item C<PIO_unix_read>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
+
+=cut
 
 */
 
@@ -563,10 +587,12 @@ PIO_unix_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_unix_write
+=item C<PIO_unix_write>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
+
+=cut
 
 */
 
@@ -608,12 +634,14 @@ PIO_unix_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), N
 
 /*
 
-FUNCDOC: PIO_unix_seek
+=item C<PIO_unix_seek>
 
 Hard seek.
 
 Calls C<lseek()> to advance the read/write position on C<*io>'s file
 descriptor to C<offset> bytes from the location indicated by C<whence>.
+
+=cut
 
 */
 
@@ -649,9 +677,11 @@ PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_unix_tell
+=item C<PIO_unix_tell>
 
 Returns the current read/write position on C<*io>'s file discriptor.
+
+=cut
 
 */
 
@@ -665,6 +695,8 @@ PIO_unix_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
+=back
+
 =head2 Networking
 
 Define C<PARROT_NET_DEVEL> to enable networking.
@@ -674,12 +706,16 @@ wish to make them integrated with the async IO system.
 
 Very minimal stubs for now, maybe someone will run with these.
 
-FUNCDOC: PIO_sockaddr_in
+=over 4
+
+=item C<PIO_sockaddr_in>
 
 C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
 XXX: We can probably just write our own routines (C<htons()>,
 C<inet_aton()>, etc.) and take this out of platform specific compilation
+
+=cut
 
 */
 
@@ -734,10 +770,12 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 
 /*
 
-FUNCDOC: PIO_unix_socket
+=item C<PIO_unix_socket>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
+
+=cut
 
 */
 
@@ -760,9 +798,11 @@ PIO_unix_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, in
 
 /*
 
-FUNCDOC: PIO_unix_connect
+=item C<PIO_unix_connect>
 
 Connects C<*io>'s socket to address C<*r>.
+
+=cut
 
 */
 
@@ -792,9 +832,11 @@ AGAIN:
 
 /*
 
-FUNCDOC: PIO_unix_bind
+=item C<PIO_unix_bind>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
+
+=cut
 
 */
 
@@ -817,10 +859,12 @@ PIO_unix_bind(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_unix_listen
+=item C<PIO_unix_listen>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
+
+=cut
 
 */
 
@@ -836,9 +880,11 @@ PIO_unix_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_unix_accept
+=item C<PIO_unix_accept>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
+
+=cut
 
 */
 
@@ -872,9 +918,11 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io)
 
 /*
 
-FUNCDOC: PIO_unix_send
+=item C<PIO_unix_send>
 
 Send the message C<*s> to C<*io>'s connected socket.
+
+=cut
 
 */
 
@@ -922,9 +970,11 @@ AGAIN:
 
 /*
 
-FUNCDOC: PIO_unix_recv
+=item C<PIO_unix_recv>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
+
+=cut
 
 */
 
@@ -971,7 +1021,7 @@ AGAIN:
 
 /*
 
-FUNCDOC: PIO_unix_poll
+=item C<PIO_unix_poll>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -984,6 +1034,8 @@ Not at all usefule --leo.
 
 Also, a buffering layer above this may choose to reimpliment by checking
 the read buffer.
+
+=cut
 
 */
 
@@ -1020,11 +1072,13 @@ AGAIN:
 #  endif
 /*
 
-FUNCDOC: PIO_unix_pipe
+=item C<PIO_unix_pipe>
 
 Very limited C<exec> for now.
 
 XXX: Where does this fit, should it belong in the ParrotIOLayerAPI?
+
+=cut
 
 */
 
@@ -1166,6 +1220,8 @@ const ParrotIOLayerAPI pio_unix_layer_api = {
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/io/io_buf.c>,
@@ -1179,6 +1235,8 @@ F<src/io/io_private.h>.
 =head1 HISTORY
 
 Initially written by Melvin Smith (mrjoltcola@mindspring.com).
+
+=cut
 
 */
 

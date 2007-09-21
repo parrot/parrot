@@ -12,6 +12,10 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -154,9 +158,11 @@ ParrotIOLayer pio_buf_layer = {
 
 /*
 
-FUNCODC: PIO_buf_init
+=item C<PIO_buf_init>
 
 The buffer layer's C<Init> function. Initializes buffering.
+
+=cut
 
 */
 
@@ -176,9 +182,11 @@ PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-FUNCDOC: PIO_buf_open
+=item C<PIO_buf_open>
 
 The buffer layer's C<Open> function.
+
+=cut
 
 */
 
@@ -205,7 +213,7 @@ PIO_buf_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_setbuf
+=item C<PIO_buf_setbuf>
 
 The buffer layer's C<SetBuf> function.
 
@@ -213,6 +221,8 @@ Don't pass C<SetBuf> calls down the stack, top layer wins. This doesn't
 mean other layers can't buffer, I just need to think about the mechanism
 for buffer control or if it even makes sense this way. Most layers will
 not implement C<SetBuf>.
+
+=cut
 
 */
 
@@ -266,9 +276,11 @@ PIO_buf_setbuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_setlinebuf
+=item C<PIO_buf_setlinebuf>
 
 The buffer layer's C<SetLineBuf> function.
+
+=cut
 
 */
 
@@ -296,9 +308,11 @@ PIO_buf_setlinebuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_fdopen
+=item C<PIO_buf_fdopen>
 
 The buffer layer's C<FDOpen> function.
+
+=cut
 
 */
 
@@ -322,9 +336,11 @@ PIO_buf_fdopen(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), PIOHANDLE fd, INTVA
 
 /*
 
-FUNCDOC: PIO_buf_close
+=item C<PIO_buf_close>
 
 The buffer layer's C<Close> function.
+
+=cut
 
 */
 
@@ -339,9 +355,11 @@ PIO_buf_close(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io
 
 /*
 
-FUNCDOC: PIO_buf_flush
+=item C<PIO_buf_flush>
 
 The buffer layer's C<Flush> function.
+
+=cut
 
 */
 
@@ -391,9 +409,11 @@ PIO_buf_flush(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io
 
 /*
 
-FUNCDOC: PIO_buf_fill_readbuf
+=item C<PIO_buf_fill_readbuf>
 
 The buffer layer's C<Fill> function.
+
+=cut
 
 */
 
@@ -427,9 +447,11 @@ PIO_buf_fill_readbuf(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_read
+=item C<PIO_buf_read>
 
 The buffer layer's C<Read> function.
+
+=cut
 
 */
 
@@ -530,6 +552,16 @@ PIO_buf_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io)
     return current + len;
 }
 
+/*
+
+=item C<PIO_buf_peek>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static size_t
 PIO_buf_peek(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
@@ -578,13 +610,14 @@ ret_string:
 
 /*
 
-FUNCDOC: PIO_buf_readline
+=item C<PIO_buf_readline>
 
 This is called from C<PIO_buf_read()> to do line buffered reading if
 that is what is required.
 
-*/
+=cut
 
+*/
 
 static size_t
 PIO_buf_readline(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
@@ -664,9 +697,11 @@ PIO_buf_readline(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_write
+=item C<PIO_buf_write>
 
 The buffer layer's C<Write> function.
+
+=cut
 
 */
 
@@ -752,9 +787,11 @@ PIO_buf_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
 /*
 
-FUNCDOC: PIO_buf_seek
+=item C<PIO_buf_seek>
 
 The buffer layer's C<Seek> function.
+
+=cut
 
 */
 
@@ -800,9 +837,11 @@ PIO_buf_seek(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io),
 
 /*
 
-FUNCDOC: PIO_buf_tell
+=item C<PIO_buf_tell>
 
 The buffer layer's C<Tell> function.
+
+=cut
 
 */
 
@@ -849,6 +888,8 @@ const ParrotIOLayerAPI pio_buf_layer_api = {
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/io/io_passdown.c>,
@@ -863,6 +904,8 @@ F<src/io/io_private.h>.
 Initially written by Melvin Smith.
 
 Some ideas from AT&T SFIO.
+
+=cut
 
 */
 
