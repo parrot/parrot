@@ -35,6 +35,7 @@ Paul Cochrane <paultcochrane at gmail dot com>
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @missing_docs;
+my $docs_are_missing = 0;
 
 foreach my $file (@files) {
     my $buf;
@@ -80,7 +81,8 @@ foreach my $file (@files) {
             # if passed in a single file at the command line, print out
             # boilerplate docs for undocumented functions
             if ( scalar @ARGV ) {
-                print <<"END"
+                $docs_are_missing = 1;
+                print <<"END";
 /*
 
  =item C<$function_name>
@@ -98,6 +100,9 @@ END
                 last;
             }
         }
+    }
+    if ( scalar @ARGV and $docs_are_missing ) {
+        push @missing_docs, "$path\n";
     }
 }
 
