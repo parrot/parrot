@@ -296,7 +296,7 @@ use Parrot::Configure::Messages qw(
 );
 use Parrot::Configure::Step::List qw( get_steps_list );
 
-$| = 1; # $OUTPUT_AUTOFLUSH = 1;
+$| = 1;    # $OUTPUT_AUTOFLUSH = 1;
 
 # Install Option text was taken from:
 #
@@ -308,28 +308,32 @@ $| = 1; # $OUTPUT_AUTOFLUSH = 1;
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # from Parrot::Configure::Options
-my $args = process_options( {
-    mode    => 'configure',
-    argv    => [ @ARGV ],
-} );
+my $args = process_options(
+    {
+        mode => 'configure',
+        argv => [@ARGV],
+    }
+);
 exit(1) unless defined $args;
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
+
 # configuration tests will only be run if you requested them
 # as command-line option
 $opttest->run_configure_tests();
 
 my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
+
 # from Parrot::Configure::Messages
 print_introduction($parrot_version);
 
 my $conf = Parrot::Configure->new;
 
 # from Parrot::Configure::Step::List
-$conf->add_steps(get_steps_list());
+$conf->add_steps( get_steps_list() );
 
 # from Parrot::Configure::Data
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
 # Run the actual steps
 # from Parrot::Configure
@@ -340,11 +344,10 @@ $conf->runsteps or exit(1);
 $opttest->run_build_tests();
 
 # from Parrot::Configure::Messages
-print_conclusion($conf->data->get('make'));
+print_conclusion( $conf->data->get('make') );
 exit(0);
 
 ################### DOCUMENTATION ###################
-
 
 # Local Variables:
 #   mode: cperl

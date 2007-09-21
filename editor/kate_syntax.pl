@@ -36,7 +36,7 @@ my @imcc_basic_types  = qw(int float string pmc);
 my $parrot_pmcsh_file = "include/parrot/core_pmcs.h";
 my $date              = localtime(time);
 
-my $ops_dir="$parrot/src/ops";
+my $ops_dir = "$parrot/src/ops";
 opendir my $PARROT, "$ops_dir" or die "Supply Parrot directory as argument!";
 my @ops_files = map { "$ops_dir/$_" } grep /\.ops$/, readdir $PARROT;
 closedir $PARROT;
