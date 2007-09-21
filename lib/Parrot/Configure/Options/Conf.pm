@@ -78,20 +78,20 @@ our @valid_options = qw{
     yacc
 };
 
-our $script = q{Configure.pl};
+our $script         = q{Configure.pl};
 our $parrot_version = Parrot::BuildUtil::parrot_version();
-our $svnid = '$Id$',
+our $svnid          = '$Id$',
 
-my %short_circuits = (
-    help        => \&print_help,
-    version     => \&print_version,
-);
+    my %short_circuits = (
+    help    => \&print_help,
+    version => \&print_version,
+    );
 
 our %options_components = (
-    'valid_options'     => \@valid_options,
-    'script'            => $script,
-    'short_circuits'    => \%short_circuits,
-    'conditionals'      => \&conditional_assignments,
+    'valid_options'  => \@valid_options,
+    'script'         => $script,
+    'short_circuits' => \%short_circuits,
+    'conditionals'   => \&conditional_assignments,
 );
 
 sub conditional_assignments {
@@ -99,7 +99,8 @@ sub conditional_assignments {
     $argsref->{debugging} = 1
         unless ( ( exists $argsref->{debugging} ) && !$argsref->{debugging} );
     $argsref->{maintainer} = 1
-        if defined $argsref->{lex} or defined $argsref->{yacc};
+        if defined $argsref->{lex}
+            or defined $argsref->{yacc};
     return $argsref;
 }
 

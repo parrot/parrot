@@ -21,20 +21,23 @@ The C<delegate> PMC redirects all methods to bytecode.
 =cut
 
 sub pre_method_gen {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     my $selfname = $self->name;
+
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
-        my $new_default_method = $method->clone({
+        my $new_default_method = $method->clone(
+            {
                 parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
-          });
+            }
+        );
         my ( $func_ret, $ret_suffix, $args, $sig ) = $new_default_method->signature;
 
-        $new_default_method->body(Parrot::Pmc2c::Emitter->text(<<"EOC"));
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
 
     STRING *meth = CONST_STRING(interp, "$vt_method_name");
     PMC *sub = Parrot_find_vtable_meth(interp, pmc, meth);

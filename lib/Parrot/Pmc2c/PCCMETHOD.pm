@@ -74,15 +74,15 @@ use constant REGNO_PMC => 3;
 
 # TODO: refactor to a simple module import, RT#42286
 BEGIN {
-    my $bits = 'Parrot/Pmc2c/PCCMETHOD_BITS.pl';
+    my $bits   = 'Parrot/Pmc2c/PCCMETHOD_BITS.pl';
     my %consts = do $bits;
     unless (%consts) {
         die $@ if $@;
         die "$bits: $!";
     }
     require constant;
-    while (my ($k, $v) = each %consts) {
-        constant->import($k, $v);
+    while ( my ( $k, $v ) = each %consts ) {
+        constant->import( $k, $v );
     }
 }
 
@@ -198,7 +198,7 @@ Rewrites the method body performing the various macro substitutions for PCCRETUR
 =cut
 
 sub rewrite_PCCRETURNs {
-    my ( $self, $pmc) = @_;
+    my ( $self, $pmc ) = @_;
     my $method_name  = $self->name;
     my $body         = $self->body;
     my $regs_used    = [];
@@ -213,11 +213,10 @@ sub rewrite_PCCRETURNs {
     croak "return not allowed in pccmethods, use PCCRETURN instead $body"
         if ( $body and $body =~ m/\breturn\b/ );
 
-
     while ($body) {
         my $matched = undef;
-        if ( $body ) {
-            $matched = $body->find( $signature_re );
+        if ($body) {
+            $matched = $body->find($signature_re);
             last unless $matched;
         }
 
@@ -230,9 +229,9 @@ sub rewrite_PCCRETURNs {
         $returns_indexes = "0" unless $returns_indexes;
 
         push @$regs_used, $returns_n_regs_used;
-        my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
+        my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
 
-        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     {
     /*BEGIN PCCRETURN $returns */
     /*BEGIN GENERATED ACCESSORS */
@@ -240,7 +239,7 @@ END
         $e->emit(<<"END");
 $returns_accessors
 END
-        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     /*END GENERATED ACCESSORS */
     {
         opcode_t temp_return_indexes[] = { $returns_indexes };
@@ -252,7 +251,7 @@ END
     /*END PCCRETURN $returns */
     }
 END
-        $matched->replace($match, $e);
+        $matched->replace( $match, $e );
     }
 
     return $regs_used, $qty_returns;
@@ -263,8 +262,8 @@ sub parse_p_args_string {
     my $linear_args = [];
     for my $x ( split /,/, $parameters ) {
         my ( $type, $name, $rest ) = split / /, trim($x), 3;
-        if (!defined($name)) {
-          die "invalid PCC arg '$x': did you forget to specify a type?\n";
+        if ( !defined($name) ) {
+            die "invalid PCC arg '$x': did you forget to specify a type?\n";
         }
 
         $name =~ /[\**]?(\"?[\w_]+\"?)/;
@@ -343,10 +342,10 @@ sub find_max_regs {
 =cut
 
 sub rewrite_pccmethod {
-    my ($self, $pmc) = @_;
+    my ( $self, $pmc ) = @_;
 
-    my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
-    my $e_post = Parrot::Pmc2c::Emitter->new($pmc->filename);
+    my $e      = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+    my $e_post = Parrot::Pmc2c::Emitter->new( $pmc->filename );
 
     # parse pccmethod parameters, then unshift the a PMC arg for the invocant
     my $linear_args = parse_p_args_string( $self->parameters );
@@ -360,12 +359,12 @@ sub rewrite_pccmethod {
     my ( $params_n_regs_used, $params_indexes, $params_flags, $params_accessors, $named_names ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
-    my ($n_regs, $qty_returns) = rewrite_PCCRETURNs( $self, $pmc );
+    my ( $n_regs, $qty_returns ) = rewrite_PCCRETURNs( $self, $pmc );
     rewrite_pccinvoke( $self, $pmc );
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
-    $e->emit(<<"END", __FILE__, __LINE__ + 1);
+    $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     INTVAL   n_regs_used[]   = { $n_regs_used };
     opcode_t param_indexes[] = { $params_indexes };
     opcode_t *return_indexes;
@@ -400,7 +399,7 @@ END
     $e->emit(<<"END");
 $named_names
 END
-    $e->emit(<<"END", __FILE__, __LINE__ + 1);
+    $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     interp->params_signature     = param_sig;
     parrot_pass_args(interp, caller_ctx, ctx, current_args, param_indexes,
@@ -419,14 +418,14 @@ END
     $e->emit(<<"END");
 $params_accessors
 END
-    $e->emit(<<"END", __FILE__, __LINE__ + 1);
+    $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     /* BEGIN PMETHOD BODY */
     {
 END
 
     my $method_returns = $self->name . "_returns:";
-    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
+    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     }
     goto no_return;
@@ -434,7 +433,7 @@ END
 
 END
     if ($qty_returns) {
-    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
+        $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
 $method_returns
 
     if (! caller_ctx) {
@@ -447,8 +446,8 @@ $method_returns
     parrot_pass_args(interp, ctx, caller_ctx, return_indexes,
         caller_ctx->current_results, PARROT_PASS_RESULTS);
 END
-}
-    $e_post->emit(<<"END", __FILE__, __LINE__ + 1);
+    }
+    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     /* END PARAMS SCOPE */
     }
@@ -460,9 +459,9 @@ END
 END
     $self->return_type('void');
     $self->parameters('');
-    my $e_body = Parrot::Pmc2c::Emitter->new($pmc->filename);
+    my $e_body = Parrot::Pmc2c::Emitter->new( $pmc->filename );
     $e_body->emit($e);
-    $e_body->emit($self->body);
+    $e_body->emit( $self->body );
     $e_body->emit($e_post);
     $self->body($e_body);
     $self->{PCCMETHOD} = 1;
@@ -476,7 +475,7 @@ sub isquoted {
 
 sub rewrite_pccinvoke {
     my ( $method, $pmc ) = @_;
-    my $body = $method->body;
+    my $body         = $method->body;
     my $signature_re = qr{
       (
       (
@@ -494,13 +493,14 @@ sub rewrite_pccinvoke {
 
     while ($body) {
         my $matched = undef;
-        if ( $body ) {
-            $matched = $body->find( $signature_re );
+        if ($body) {
+            $matched = $body->find($signature_re);
             last unless $matched;
         }
 
         $matched =~ /$signature_re/;
         my ( $match, $result_clause, $results, $parameters ) = ( $1, $2, $3, $4 );
+
         #optional results portion of pccinvoke statement
         my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors ) =
             ( defined $results )
@@ -519,8 +519,8 @@ sub rewrite_pccinvoke {
         $method_name = "string_from_literal(interp, $method_name)"
             if isquoted($method_name);
 
-        my $e = Parrot::Pmc2c::Emitter->new($pmc->filename);
-        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+        my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
     /*BEGIN PCCINVOKE $invocant */
     {
@@ -553,7 +553,7 @@ $named_names
 
 $arg_accessors
 END
-        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
       interp->current_object       = $invocant;
       interp->current_cont         = NEED_CONTINUATION;
@@ -571,7 +571,7 @@ END
         $e->emit(<<"END");
 $result_accessors
 END
-        $e->emit(<<"END", __FILE__, __LINE__ + 1);
+        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
       PObj_live_CLEAR(_type);
       PObj_live_CLEAR(args_sig);
@@ -585,8 +585,8 @@ END
     /*END PCCINVOKE $method_name */
 END
 
-        $matched->replace($match, $e);
-    };
+        $matched->replace( $match, $e );
+    }
     return 1;
 }
 

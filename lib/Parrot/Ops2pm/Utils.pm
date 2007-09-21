@@ -232,7 +232,7 @@ stepping stone on the path to building F<lib/Parrot/OpLib/core.pm>.
 sub renum_op_map_file {
     my $self = shift;
 
-    my $file = scalar(@_) ? shift: $NUM_FILE;
+    my $file = scalar(@_) ? shift : $NUM_FILE;
     my ( $name, $number, @lines, %seen, %fixed, $fix );
     $fix = 1;
     open my $OP, '<', $file

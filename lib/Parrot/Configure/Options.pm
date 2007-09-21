@@ -9,7 +9,7 @@ our @EXPORT_OK = qw(
 );
 use Carp;
 use lib qw( lib );
-use Parrot::Configure::Options::Conf ();
+use Parrot::Configure::Options::Conf   ();
 use Parrot::Configure::Options::Reconf ();
 
 sub process_options {
@@ -17,23 +17,24 @@ sub process_options {
     my %options_components;
     croak "'mode' argument not provided to process_options()"
         unless defined $argsref->{mode};
-    if ($argsref->{mode} =~ /^reconfigure$/i) {
-        %options_components =
-            %Parrot::Configure::Options::Reconf::options_components;
-    } elsif ($argsref->{mode} =~ /^configure$/i) {
-        %options_components =
-            %Parrot::Configure::Options::Conf::options_components;
-    } else {
+    if ( $argsref->{mode} =~ /^reconfigure$/i ) {
+        %options_components = %Parrot::Configure::Options::Reconf::options_components;
+    }
+    elsif ( $argsref->{mode} =~ /^configure$/i ) {
+        %options_components = %Parrot::Configure::Options::Conf::options_components;
+    }
+    else {
         croak "Invalid value for 'mode' argument to process_options()";
     }
     $argsref->{argv} = [] unless defined $argsref->{argv};
 
-    my $script = $options_components{script}
+    my $script =
+          $options_components{script}
         ? $options_components{script}
         : croak "Must provide value for 'script'";
 
-    my %valid_opts = map {$_, 1} @{ $options_components{valid_options} };
-    my $data = {};
+    my %valid_opts          = map { $_, 1 } @{ $options_components{valid_options} };
+    my $data                = {};
     my @short_circuits_seen = ();
     for ( @{ $argsref->{argv} } ) {
         my ( $key, $value ) = m/--([-\w]+)(?:=(.*))?/;
@@ -43,19 +44,21 @@ sub process_options {
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
         }
-        if ($options_components{short_circuits}{$key}) {
+        if ( $options_components{short_circuits}{$key} ) {
             push @short_circuits_seen, $key;
         }
         $data->{$key} = $value;
     }
     if (@short_circuits_seen) {
+
         # run all the short circuits
         foreach my $sc (@short_circuits_seen) {
-            &{$options_components{short_circuits}{$sc}};
+            &{ $options_components{short_circuits}{$sc} };
         }
         return;
-    } else {
-        $data = &{$options_components{conditionals}}($data);
+    }
+    else {
+        $data = &{ $options_components{conditionals} }($data);
         return $data;
     }
 }

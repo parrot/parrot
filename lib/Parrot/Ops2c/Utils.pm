@@ -198,9 +198,9 @@ sub new {
     $argsref->{opsarraytype} = $argsref->{trans}->opsarraytype();
 
     # Invoked as:  ${defines}
-    $argsref->{defines}      = $argsref->{trans}->defines();
+    $argsref->{defines} = $argsref->{trans}->defines();
 
-    $argsref->{flag}         = $flagref;
+    $argsref->{flag} = $flagref;
     my $self = bless $argsref, $class;
     $self->_iterate_over_ops();
     return $self;
@@ -346,17 +346,17 @@ sub _print_run_core_func_decl_header {
 # returns a string like "PARROT_OPLIB_CORE_OPS_H_GUARD"
 sub _generate_guard_macro_name {
     my $self = shift;
-    my $fn = $$self{header};
+    my $fn   = $$self{header};
     $fn =~ s/\.h$//;
     my @path = File::Spec->splitdir($fn);
     shift @path if $path[0] eq 'include';
     shift @path if $path[0] eq 'parrot';
-    return uc(join('_', 'parrot', @path, 'h', 'guard'));
+    return uc( join( '_', 'parrot', @path, 'h', 'guard' ) );
 
 }
 
 sub _print_guard_prefix {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
     my $guardname = $self->_generate_guard_macro_name();
     print $fh <<END_C;
 #ifndef $guardname
@@ -366,7 +366,7 @@ END_C
 }
 
 sub _print_guard_suffix {
-    my ($self, $fh) = @_;
+    my ( $self, $fh ) = @_;
     my $guardname = $self->_generate_guard_macro_name();
     print $fh <<END_C;
 
@@ -546,7 +546,7 @@ sub _iterate_over_ops {
         }
         else {
             $one_op .= "$definition $comment {\n$src}\n\n";
-            push @op_funcs, $one_op;
+            push @op_funcs,  $one_op;
             push @op_protos, $prototype;
             $prev_src = $src if ( $self->{suffix} eq '_cgp' || $self->{suffix} eq '_switch' );
             $prev_index = $index;

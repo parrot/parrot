@@ -42,7 +42,7 @@ sub prep_for_emit {
 }
 
 sub generate {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $emitter = $self->{emitter} = Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
     $self->generate_c_file;
     $emitter->write_to_file;
@@ -52,7 +52,6 @@ sub generate {
     $emitter->write_to_file;
 }
 
-
 =item C<generate_c_file()>
 
 Generates the C implementation file code for the PMC.
@@ -60,16 +59,16 @@ Generates the C implementation file code for the PMC.
 =cut
 
 sub generate_c_file {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $c = $self->{emitter};
 
     $c->emit( dont_edit( $self->filename ) );
-    $c->emit( "#define PARROT_IN_EXTENSION\n" ) if ( $self->is_dynamic );
+    $c->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
     $c->emit( $self->preamble );
     $self->gen_includes;
     $self->gen_methods;
     my $ro = $self->ro;
-    if ( $ro ) {
+    if ($ro) {
         $ro->{emitter} = $self->{emitter};
         $ro->gen_methods;
     }
@@ -86,9 +85,9 @@ Generates the C header file code for the PMC.
 =cut
 
 sub generate_h_file {
-    my ( $self ) = @_;
-    my $h = $self->{emitter};
-    my $name = uc $self->name;
+    my ($self) = @_;
+    my $h      = $self->{emitter};
+    my $name   = uc $self->name;
 
     $h->emit( dont_edit( $self->filename ) );
     $h->emit(<<"EOH");
@@ -98,15 +97,15 @@ sub generate_h_file {
 
 EOH
 
-    $h->emit( "#define PARROT_IN_EXTENSION\n" ) if ( $self->is_dynamic );
-    $h->emit($self->hdecls);
-    $h->emit($self->{ro}->hdecls)             if ( $self->{ro} );
+    $h->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
+    $h->emit( $self->hdecls );
+    $h->emit( $self->{ro}->hdecls ) if ( $self->{ro} );
     $h->emit(<<"EOH");
 
 #endif /* PARROT_PMC_${name}_H_GUARD */
 
 EOH
-    $h->emit(c_code_coda());
+    $h->emit( c_code_coda() );
     return 1;
 }
 
@@ -120,15 +119,15 @@ TODO include MMD variants.
 =cut
 
 sub hdecls {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     my $hout;
     my $name = $self->name;
 
     # generate decls for all vtable methods in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
-        if ( $self->implements_vtable( $vt_method_name) ) {
-            $hout .= $self->get_method( $vt_method_name )->generate_headers($self);
+        if ( $self->implements_vtable($vt_method_name) ) {
+            $hout .= $self->get_method($vt_method_name)->generate_headers($self);
         }
     }
 
@@ -138,10 +137,9 @@ sub hdecls {
         $hout .= $method->generate_headers($self);
     }
 
-
     # class init decl
     $hout .= 'PARROT_DYNEXT_EXPORT ' if ( $self->is_dynamic );
-    $hout .= "void Parrot_${name}_class_init(PARROT_INTERP, int, int);\n";
+    $hout           .= "void Parrot_${name}_class_init(PARROT_INTERP, int, int);\n";
     $self->{hdecls} .= $hout;
     $self->{hdecls};
 }
@@ -162,8 +160,9 @@ sub init {
     my ($self) = @_;
 
     $self->fixup_singleton if $self->singleton;
+
     #!( singleton or abstract ) everything else gets readonly version of methods too.
-    $self->ro(Parrot::Pmc2c::PMC::RO->new($self)) unless ( $self->abstract or $self->singleton );
+    $self->ro( Parrot::Pmc2c::PMC::RO->new($self) ) unless ( $self->abstract or $self->singleton );
 }
 
 sub fixup_singleton {
@@ -175,18 +174,24 @@ sub fixup_singleton {
     # Note that this trick won't work if the singleton inherits from something else
     # (because the MRO will still be shared).
     unless ( $self->implements_vtable('pmc_namespace')
-            or $self->super_method('pmc_namespace') ne 'default' ) {
-        my $body = Parrot::Pmc2c::Emitter->text("  return INTERP->vtables[SELF->vtable->base_type]->_namespace;\n");
-        $self->add_method( Parrot::Pmc2c::Method->new( {
-            name        => 'pmc_namespace',
-            parent_name => $self->name,
-            parameters  => '',
-            body        => $body,
-            type        => Parrot::Pmc2c::Method::VTABLE,
-            mmds        => [],
-            return_type => 'PMC*',
-            attrs       => {},
-        }));
+        or $self->super_method('pmc_namespace') ne 'default' )
+    {
+        my $body = Parrot::Pmc2c::Emitter->text(
+            "  return INTERP->vtables[SELF->vtable->base_type]->_namespace;\n");
+        $self->add_method(
+            Parrot::Pmc2c::Method->new(
+                {
+                    name        => 'pmc_namespace',
+                    parent_name => $self->name,
+                    parameters  => '',
+                    body        => $body,
+                    type        => Parrot::Pmc2c::Method::VTABLE,
+                    mmds        => [],
+                    return_type => 'PMC*',
+                    attrs       => {},
+                }
+            )
+        );
     }
 }
 
@@ -197,7 +202,7 @@ Returns the C C<#include> for the header file of each of the PMC's superclasses.
 =cut
 
 sub gen_includes {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $c = $self->{emitter};
 
     $c->emit(<<"EOC");
@@ -209,14 +214,13 @@ EOC
     $c->emit(qq{#include "pmc_fixedintegerarray.h"\n}) if ( $self->flag('need_fia_header') );
 
     foreach my $parent_name ( $self->name, @{ $self->parents } ) {
-        $c->emit('#include "pmc_' . lc $parent_name . ".h\"\n");
+        $c->emit( '#include "pmc_' . lc $parent_name . ".h\"\n" );
     }
     foreach my $mixin_name ( @{ $self->mixins } ) {
-        $c->emit('#include "pmc_' . lc $mixin_name . ".h\"\n");
+        $c->emit( '#include "pmc_' . lc $mixin_name . ".h\"\n" );
     }
-    $c->emit('#include "' . lc $self->name . ".str\"\n") unless $self->is_dynamic;
+    $c->emit( '#include "' . lc $self->name . ".str\"\n" ) unless $self->is_dynamic;
 }
-
 
 =item C<proto($type,$parameters)>
 
@@ -281,7 +285,7 @@ Returns the C code for the pmc methods.
 =cut
 
 sub gen_methods {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
@@ -299,19 +303,17 @@ sub gen_methods {
     }
 }
 
-
 # RT#43737 quick hack - to get MMD variants
 sub get_super_mmds {
     my ( $self, $vt_method_name, $right, $mmd_prefix ) = @_;
     my @mmds;
 
     my $super_mmd_rights = $self->{super_mmd_rights}{$vt_method_name};
-    if ($super_mmd_rights)
-    {
-        while ( my ($super_pmc_name, $mmd_rights) = each %{$super_mmd_rights} ) {
-            for my $x ( @{ $mmd_rights} ) {
+    if ($super_mmd_rights) {
+        while ( my ( $super_pmc_name, $mmd_rights ) = each %{$super_mmd_rights} ) {
+            for my $x ( @{$mmd_rights} ) {
                 next if $x eq "DEFAULT";
-                my $right = "enum_class_$x";
+                my $right      = "enum_class_$x";
                 my $super_name = "Parrot_${super_pmc_name}_${vt_method_name}_$x";
                 push @mmds, [ $mmd_prefix, 0, $right, $super_name ];
             }
@@ -335,7 +337,7 @@ in the MMD table that will need to be resolved at runtime.
 =cut
 
 sub find_mmd_methods {
-    my $self      = shift;
+    my $self    = shift;
     my $pmcname = $self->name;
     my ( @mmds, @init_mmds, %init_mmds );
 
@@ -343,26 +345,26 @@ sub find_mmd_methods {
         my $vt_method_name = $vt_method->name;
         next unless $vt_method->is_mmd;
 
-
         my $implementor;
         if ( !$self->implements_vtable($vt_method_name) ) {
             my $class = $self->{super}{$vt_method_name};
-            next if $class =~ /^[A-Z]/
-                 or $class eq 'default'
-                 or $class eq 'delegate';
+            next
+                if $class =~ /^[A-Z]/
+                    or $class eq 'default'
+                    or $class eq 'delegate';
             $implementor = $class;
         }
         else {
             $implementor = $pmcname;
         }
 
-        my ( $mmd_method_name, $func, $left, $right);
+        my ( $mmd_method_name, $func, $left, $right );
         $mmd_method_name = "Parrot_${implementor}_$vt_method_name";
-        $func = $vt_method->mmd_prefix;
-        # dynamic PMCs need the runtime type which is passed in entry to class_init
-        $left  = 0;                 # set to 'entry' below in initialization loop.
-        $right = $vt_method->right;
+        $func            = $vt_method->mmd_prefix;
 
+        # dynamic PMCs need the runtime type which is passed in entry to class_init
+        $left  = 0;                   # set to 'entry' below in initialization loop.
+        $right = $vt_method->right;
 
         if ( exists $self->{super}{$vt_method_name} ) {
             push @mmds, $self->get_super_mmds( $vt_method_name, $right, $func );
@@ -371,10 +373,10 @@ sub find_mmd_methods {
         push @mmds, [ $func, $left, $right, $mmd_method_name ];
 
         my $pmc_method = $self->get_method($vt_method_name);
-        if ( $pmc_method ) {
+        if ($pmc_method) {
             foreach my $mmd ( @{ $pmc_method->mmds } ) {
                 my $right = $mmd->right;
-                if ( $self->is_dynamic( $right ) ) {
+                if ( $self->is_dynamic($right) ) {
                     $right = 0;
                     push @init_mmds, [ $#mmds + 1, $mmd->right ];
                     $init_mmds{ $mmd->right } = 1;
@@ -385,6 +387,7 @@ sub find_mmd_methods {
                 $mmd_method_name = "Parrot_" . $self->name . "_" . $mmd->name;
                 push @mmds, [ $func, $left, $right, $mmd_method_name ];
             }
+
             #$self->{mmds} = @mmds;    # RT#43739
         }
     }
@@ -392,22 +395,21 @@ sub find_mmd_methods {
 }
 
 sub build_full_c_vt_method_name {
-    my ($self, $vt_method_name) = @_;
+    my ( $self, $vt_method_name ) = @_;
 
     my $implementor;
     if ( $self->implements_vtable($vt_method_name) ) {
-        return $self->get_method($vt_method_name)->
-            full_method_name($self->name . $self->{variant});
+        return $self->get_method($vt_method_name)
+            ->full_method_name( $self->name . $self->{variant} );
     }
     elsif ( $self->{super}{$vt_method_name} ) {
         $implementor = $self->{super}{$vt_method_name};
     }
     else {
-        $implementor = "default"
+        $implementor = "default";
     }
     return "Parrot_${implementor}_$vt_method_name";
 }
-
 
 =item C<vtable_decl($name)>
 
@@ -430,7 +432,7 @@ sub vtable_decl {
     my @vt_methods;
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         next if $vt_method->is_mmd;
-        push @vt_methods, $self->build_full_c_vt_method_name($vt_method->name);
+        push @vt_methods, $self->build_full_c_vt_method_name( $vt_method->name );
     }
 
     my $methlist = join( ",\n        ", @vt_methods );
@@ -463,11 +465,11 @@ sub init_func {
     my ($self) = @_;
     return "" if $self->no_init;
 
-    my $cout = "";
+    my $cout      = "";
     my $classname = $self->name;
     my ( $mmds, $init_mmds, $dyn_mmds ) = $self->find_mmd_methods();
     my $enum_name = $self->is_dynamic ? -1 : "enum_class_$classname";
-    my $vtable_decl = $self->vtable_decl('temp_base_vtable', $enum_name);
+    my $vtable_decl = $self->vtable_decl( 'temp_base_vtable', $enum_name );
 
     my $mmd_list =
         join( ",\n        ", map { "{ $_->[0], $_->[1], $_->[2], (funcptr_t) $_->[3] }" } @$mmds );
@@ -475,9 +477,9 @@ sub init_func {
     $isa =~ s/\s?default$//;
     my $does = join( " ", keys( %{ $self->{flags}{does} } ) );
     my $class_init_code = "";
-    $class_init_code =  $self->get_method('class_init')->body if $self->has_method('class_init');
+    $class_init_code = $self->get_method('class_init')->body if $self->has_method('class_init');
     $class_init_code =~ s/INTERP/interp/g;
-    $class_init_code =~ s/^/        /mg;  #fix indenting
+    $class_init_code =~ s/^/        /mg;     #fix indenting
 
     my %extra_vt;
 
@@ -493,7 +495,7 @@ $vtable_decl
 EOC
 
     for my $k ( keys %extra_vt ) {
-        $cout .= $extra_vt{$k}->vtable_decl("temp_${k}_vtable", $enum_name);
+        $cout .= $extra_vt{$k}->vtable_decl( "temp_${k}_vtable", $enum_name );
     }
 
     my $const = ( $self->{flags}{dynpmc} ) ? " " : " const ";
@@ -590,7 +592,7 @@ EOC
     # declare each nci method for this class
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
-        my $proto = proto( $method->return_type, $method->parameters );
+        my $proto       = proto( $method->return_type, $method->parameters );
         my $method_name = $method->name;
         my $symbol_name = defined $method->symbol ? $method->symbol : $method->name;
         if ( exists $method->{PCCMETHOD} ) {
@@ -668,7 +670,7 @@ EOC
     } /* pass */
 } /* Parrot_${classname}_class_init */
 EOC
-    if ( $self->is_dynamic) {
+    if ( $self->is_dynamic ) {
         $cout .= dynext_load_code( $classname, $classname => {} );
     }
 
@@ -682,7 +684,7 @@ sub is_vtable_method {
 }
 
 sub vtable {
-    my ( $self, $value) = @_;
+    my ( $self, $value ) = @_;
     $self->{vtable} = $value if $value;
     return $self->{vtable};
 }

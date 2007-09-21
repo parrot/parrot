@@ -139,10 +139,7 @@ sub new {
         $self->new_group(
             'Registers and Stacks',
             '',
-            $self->c_item(
-                '',
-                'pairs'   => ['register'],
-            ),
+            $self->c_item( '', 'pairs' => ['register'], ),
             $self->c_item(
                 '',
                 'pairs'   => ['stacks'],

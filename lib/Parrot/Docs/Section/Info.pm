@@ -59,9 +59,7 @@ sub new {
         ),
         $self->new_group(
             'Legal', '',
-            $self->new_item(
-                'The licence under which Parrot is distributed.', 'LICENSE'
-            ),
+            $self->new_item( 'The licence under which Parrot is distributed.', 'LICENSE' ),
         ),
         $self->new_group(
             'Status', '',
@@ -69,14 +67,19 @@ sub new {
                 'A table showing which aspects of Parrot run on various platforms.', 'PLATFORMS'
             ),
             $self->new_item( 'Contains the version number of the distribution.', 'VERSION' ),
-            do { -e '../DEVELOPING' ?  $self->new_item(
+            do {
+                -e '../DEVELOPING'
+                    ? $self->new_item(
 'The presence of this file indicates that the distribution is a development version.',
-                'DEVELOPING' ) : ()
+                    'DEVELOPING'
+                    )
+                    : ();
             },
             $self->new_item( 'The status of the Parrot test suite.', 't/TESTS.STATUS.pod' ),
         ),
         $self->new_group(
-            'People', '',
+            'People',
+            '',
             $self->new_item(
                 'A list of some of the Parrot developers with SVN commit access.',
                 'RESPONSIBLE_PARTIES'

@@ -36,10 +36,9 @@ use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew)
 sub generate_library {
     my ( $class, $library_name, $pmcs ) = @_;
 
-    spew("$library_name.c", gen_c($library_name, $pmcs));
-    spew("$library_name.h", gen_h($library_name));
+    spew( "$library_name.c", gen_c( $library_name, $pmcs ) );
+    spew( "$library_name.h", gen_h($library_name) );
 }
-
 
 =item C<gen_h>
 
@@ -49,7 +48,7 @@ Writes the header file for the library.
 
 sub gen_h {
     my $lc_library_name = lc shift;
-    my $guardname  = uc(join('_', 'PARROT_LIB', $lc_library_name, 'H_GUARD'));
+    my $guardname = uc( join( '_', 'PARROT_LIB', $lc_library_name, 'H_GUARD' ) );
 
     my $hout = dont_edit('various files');
     $hout .= <<"EOH";
@@ -61,7 +60,7 @@ Parrot_PMC Parrot_lib_${lc_library_name}_load(PARROT_INTERP);
 EOH
     $hout .= c_code_coda;
 
-#endif $guardname
+    #endif $guardname
 
     return $hout;
 }
@@ -82,7 +81,7 @@ sub gen_c {
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 EOC
-    my %pmcs = ( map { $_->{name} => $_ } @{ $pmcs } );
+    my %pmcs = ( map { $_->{name} => $_ } @{$pmcs} );
 
     foreach my $name ( keys %pmcs ) {
         my $lcname = lc $name;

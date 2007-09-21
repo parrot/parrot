@@ -56,18 +56,20 @@ our @dont_delegate = qw(
 our $dont_delegate = { map { $_, 1 } (@dont_delegate) };
 
 sub pre_method_gen {
-    my ( $self ) = @_;
+    my ($self) = @_;
+
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
-        next if exists $dont_delegate->{ $vt_method_name };
+        next if exists $dont_delegate->{$vt_method_name};
         next unless $self->normal_unimplemented_vtable($vt_method_name);
         my $composed_method = Parrot::Pmc2c::ComposedMethod->new(
-          {
-            name => $vt_method_name,
-            parent_name => 'delegate',
-            type => Parrot::Pmc2c::Method::VTABLE,
-          });
+            {
+                name        => $vt_method_name,
+                parent_name => 'delegate',
+                type        => Parrot::Pmc2c::Method::VTABLE,
+            }
+        );
         $self->add_method($composed_method);
     }
     $self->add_mixin('delegate');

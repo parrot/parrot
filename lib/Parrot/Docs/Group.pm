@@ -55,7 +55,7 @@ relative paths.
 =cut
 
 sub new {
-    my $self = ref $_[0] ? ref shift: shift;
+    my $self = ref $_[0] ? ref shift : shift;
     my $name     = shift || die "No name.\n";
     my $text     = shift;
     my @contents = @_;

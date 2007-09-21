@@ -2,6 +2,7 @@
 # $Id$
 # PMC.pm 18503 2007-05-11 07:39:22Z paultcochrane $
 #
+
 =head1 NAME
 
 Parrot::Pmc2c::PMC - PMC model object
@@ -46,51 +47,59 @@ sub create {
 sub new {
     my ( $class, $self ) = @_;
     $self = {} unless $self;
-    $self = { (
-        methods => [],
-        super => {},
-        variant => '',
-        mixins => [],
-        %{ $self } ) } ;
-    bless $self, (ref($class) || $class);
+    $self = {
+        (
+            methods => [],
+            super   => {},
+            variant => '',
+            mixins  => [],
+            %{$self}
+        )
+    };
+    bless $self, ( ref($class) || $class );
     $self;
 }
 
 sub dump {
-    my ( $self ) = @_;
+    my ($self) = @_;
+
     #gen_parent_lookup_info( $self, $pmc2cMain, $pmcs );
     #gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
 
-    store($self, $self->filename('.dump'));
+    store( $self, $self->filename('.dump') );
 }
 
 #methods
 sub add_method {
     my ( $self, $method ) = @_;
-    $self->{has_method}->{$method->name} = scalar @{ $self->{methods} };
+    $self->{has_method}->{ $method->name } = scalar @{ $self->{methods} };
     push @{ $self->{methods} }, $method;
 }
+
 sub has_method {
     my ( $self, $methodname ) = @_;
     return exists $self->{has_method}->{$methodname};
 }
+
 sub method_index {
     my ( $self, $methodname ) = @_;
     return $self->{has_method}->{$methodname};
 }
+
 sub get_method {
     my ( $self, $methodname ) = @_;
     my $method_index = $self->method_index($methodname);
     return unless defined $method_index;
     return $self->{methods}->[$method_index];
 }
+
 sub inherits_method {
-    my ( $self, $vt_meth) = @_;
+    my ( $self, $vt_meth ) = @_;
     return $self->super_method($vt_meth);
 }
 
 sub parent_has_method {
-    my ( $self, $parent_name, $vt_meth) = @_;
+    my ( $self, $parent_name, $vt_meth ) = @_;
     return exists $self->{'has_parent'}{$parent_name}{$vt_meth};
 }
 
@@ -112,7 +121,6 @@ sub add_mixin {
     push @{ $self->{mixins} }, $mixin_name unless grep /$mixin_name/, @{ $self->{mixins} };
 }
 
-
 =item C<is_dynpmc>
 
 Determines if a given PMC type is dynamically loaded or not.
@@ -124,27 +132,27 @@ True if pmc generates code for vtable method C<$method>.
 =cut
 
 sub no_init {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->flag('no_init');
 }
 
 sub singleton {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->flag('singleton');
 }
 
 sub abstract {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->flag('abstract');
 }
 
 sub is_const {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->flag('const');
 }
 
 sub is_ro {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->flag('ro');
 }
 
@@ -153,15 +161,15 @@ our $dynpmc_list = { map { $_ => 1 } ( 'default', 'delegate', 'deleg_pmc', 'scal
 sub is_dynamic {
     my ( $self, $pmcname ) = @_;
     return $self->flag('dynpmc') unless $pmcname;
-    return 0 if exists $dynpmc_list->{ $pmcname };
-    return 0 if exists $Parrot::PMC::pmc_types{ $pmcname };
+    return 0 if exists $dynpmc_list->{$pmcname};
+    return 0 if exists $Parrot::PMC::pmc_types{$pmcname};
     return 1;
 }
 
 sub implements_vtable {
     my ( $self, $vt_meth ) = @_;
     return 0 unless $self->has_method($vt_meth);
-    return get_method($self, $vt_meth)->is_vtable;
+    return get_method( $self, $vt_meth )->is_vtable;
 }
 
 sub unimplemented_vtable {
@@ -181,25 +189,29 @@ sub normal_unimplemented_vtable {
 
 #getters
 sub parents {
-    my ( $self) = @_;
-    return $self->{parents}
+    my ($self) = @_;
+    return $self->{parents};
 }
+
 sub mixins {
-    my ( $self) = @_;
-    return $self->{mixins}
+    my ($self) = @_;
+    return $self->{mixins};
 }
+
 sub methods {
-    my ( $self) = @_;
-    return $self->{methods}
+    my ($self) = @_;
+    return $self->{methods};
 }
+
 sub filename {
     my ( $self, $type ) = @_;
     return $self->{filename} unless $type;
-    return Parrot::Pmc2c::UtilFunctions::filename($self->{filename}, $type);
+    return Parrot::Pmc2c::UtilFunctions::filename( $self->{filename}, $type );
 }
+
 sub get_flags {
-    my ( $self ) = @_;
-    return $self->{flags}
+    my ($self) = @_;
+    return $self->{flags};
 }
 
 #setters
@@ -210,17 +222,20 @@ sub set_parents {
     $self->{parents} = $value;
     return 1;
 }
+
 sub set_flag {
     my ( $self, $name, $value ) = @_;
-    $self->{flags}{$name} = ($value or 1);
+    $self->{flags}{$name} = ( $value or 1 );
     return $self->flag($name);
 }
+
 sub set_flags {
     my ( $self, $flags ) = @_;
-    while ( my ($name, $value) = each( %{ $flags } ) ) {
-        $self->set_flag($name, $value);
+    while ( my ( $name, $value ) = each( %{$flags} ) ) {
+        $self->set_flag( $name, $value );
     }
 }
+
 sub set_filename {
     my ( $self, $value ) = @_;
     $self->{filename} = $value if $value;
@@ -231,44 +246,48 @@ sub set_filename {
 sub name {
     my ( $self, $value ) = @_;
     $self->{name} = $value if $value;
-    return $self->{name}
+    return $self->{name};
 }
+
 sub ro {
     my ( $self, $value ) = @_;
     $self->{ro} = $value if $value;
-    return $self->{ro}
+    return $self->{ro};
 }
+
 sub flag {
     my ( $self, $name ) = @_;
     return $self->{flags}{$name};
 }
+
 sub preamble {
     my ( $self, $value ) = @_;
     $self->{preamble} = $value if $value;
-    return $self->{preamble}
+    return $self->{preamble};
 }
+
 sub postamble {
     my ( $self, $value ) = @_;
     $self->{postamble} = $value if $value;
-    return $self->{postamble}
+    return $self->{postamble};
 }
+
 sub super_attrs {
     my ( $self, $vt_name, $value ) = @_;
     $self->{super_attrs}{$vt_name} = $value if $value;
-    return $self->{super_attrs}{$vt_name}
+    return $self->{super_attrs}{$vt_name};
 }
-
-
-
 
 #applies to vtable entires only
 sub method_attrs {
-    my ( $self, $methodname) = @_;
+    my ( $self, $methodname ) = @_;
     my $attrs;
+
     #try self
     if ( $self->has_method($methodname) ) {
         $attrs = $self->get_method($methodname)->attrs;
     }
+
     #try parent
     elsif ( $self->inherits_method($methodname) ) {
         $attrs = $self->super_attrs($methodname);
@@ -294,15 +313,15 @@ sub vtable_method_does_write {
 }
 
 sub super_method {
-    my ($self, $vt_meth, $super_pmc) = @_;
+    my ( $self, $vt_meth, $super_pmc ) = @_;
     if ($super_pmc) {
         my $super_pmc_name;
-        if (ref($super_pmc)) {
+        if ( ref($super_pmc) ) {
             my $super_method = $super_pmc->get_method($vt_meth);
             $super_pmc_name = $super_method->parent_name;
             $self->add_mixin($super_pmc_name) unless $self->is_parent($super_pmc_name);
 
-            $self->super_attrs($vt_meth, $super_method->attrs);
+            $self->super_attrs( $vt_meth, $super_method->attrs );
 
             $self->inherit_attrs($vt_meth) if $self->get_method($vt_meth);
 
@@ -351,10 +370,10 @@ sub inherit_attrs {
     if ( ( $super_attrs->{read} or $super_attrs->{write} )
         and not( $attrs->{read} or $attrs->{write} ) )
     {
-        $attrs->{read} = $super_attrs->{read} if exists $super_attrs->{read};
+        $attrs->{read}  = $super_attrs->{read}  if exists $super_attrs->{read};
         $attrs->{write} = $super_attrs->{write} if exists $super_attrs->{write};
     }
-    return $;
+    return $;;
 }
 
 =head2 These are auxiliary subroutines called inside the methods described above.
@@ -376,13 +395,12 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub dump_is_current {
-    my ( $self ) = @_;
+    my ($self)   = @_;
     my $dumpfile = $self->filename('.dump');
     my $pmcfile  = $self->filename('.pmc');
     return 0 unless -e $dumpfile;
     return ( stat $dumpfile )[9] > ( stat $pmcfile )[9];
 }
-
 
 1;
 

@@ -9,7 +9,7 @@ use Data::Dumper;
 sub new {
     my ( $class, $self_hash ) = @_;
     my $self = Parrot::Pmc2c::Method->new($self_hash);
-    bless $self, (ref($class) || $class);
+    bless $self, ( ref($class) || $class );
     $self;
 }
 

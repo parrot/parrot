@@ -7,29 +7,27 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( @valid_options $script %options_components );
 
 our @valid_options = qw{
-        ask
-        debugging
-        help
-        languages
-        lex
-        maintainer
-        step
-        target
-        verbose
-        yacc
+    ask
+    debugging
+    help
+    languages
+    lex
+    maintainer
+    step
+    target
+    verbose
+    yacc
 };
 
 our $script = q{tools/dev/reconfigure.pl};
 
-my %short_circuits = (
-    help        => \&print_help,
-);
+my %short_circuits = ( help => \&print_help, );
 
 our %options_components = (
-    'valid_options'     => \@valid_options,
-    'script'            => $script,
-    'short_circuits'    => \%short_circuits,
-    'conditionals'      => \&conditional_assignments,
+    'valid_options'  => \@valid_options,
+    'script'         => $script,
+    'short_circuits' => \%short_circuits,
+    'conditionals'   => \&conditional_assignments,
 );
 
 sub conditional_assignments {
@@ -37,7 +35,8 @@ sub conditional_assignments {
     $argsref->{debugging} = 1
         unless ( ( exists $argsref->{debugging} ) && !$argsref->{debugging} );
     $argsref->{maintainer} = 1
-        if defined $argsref->{lex} or defined $argsref->{yacc};
+        if defined $argsref->{lex}
+            or defined $argsref->{yacc};
     return $argsref;
 }
 

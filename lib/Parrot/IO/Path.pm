@@ -40,7 +40,7 @@ created and cached. A relative path is made absolute.
 =cut
 
 sub new {
-    my $self = ref $_[0] ? ref shift: shift;
+    my $self = ref $_[0] ? ref shift : shift;
     my $path = shift;
 
     return unless defined $path;

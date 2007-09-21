@@ -96,7 +96,7 @@ If called with no args, run the suite.
 
         # Someone specified tests for me to run.
         my @files = ();
-        foreach my $arg (@{ $options{arguments} }) {
+        foreach my $arg ( @{ $options{arguments} } ) {
             -f $arg && push @files, glob $arg;
             -d $arg && push @files, glob( File::Spec->catfile( $arg, '*.t' ) );
         }
@@ -127,7 +127,8 @@ sub import {
     local $Test::Harness::Switches = '';
 
     no warnings 'redefine';
-    local *Test::Harness::Straps::_INC2PERL5LIB = sub { @INC }  ## no critic Variables::ProhibitConditionalDeclarations
+    local *Test::Harness::Straps::_INC2PERL5LIB =
+        sub { @INC }    ## no critic Variables::ProhibitConditionalDeclarations
         if $options{compiler};
 
     runtests(@files);

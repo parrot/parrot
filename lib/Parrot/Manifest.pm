@@ -8,41 +8,43 @@ use Carp;
 use Data::Dumper;
 
 sub new {
-    my $class = shift;
+    my $class   = shift;
     my $argsref = shift;
 
     my $self = bless( {}, $class );
 
     my %data = (
-        id      => '$' . 'Id$',
-        time    => scalar gmtime,
-        cmd     => -d '.svn' ? 'svn' : 'svk',
-        script  => $argsref->{script},
-        file    => $argsref->{file} ? $argsref->{file} : q{MANIFEST},
-        skip    => $argsref->{skip} ? $argsref->{skip} : q{MANIFEST.SKIP},
+        id     => '$' . 'Id$',
+        time   => scalar gmtime,
+        cmd    => -d '.svn' ? 'svn' : 'svk',
+        script => $argsref->{script},
+        file   => $argsref->{file} ? $argsref->{file} : q{MANIFEST},
+        skip   => $argsref->{skip} ? $argsref->{skip} : q{MANIFEST.SKIP},
     );
 
-    my $status_output_ref = [ qx($data{cmd} status -v) ];
+    my $status_output_ref = [qx($data{cmd} status -v)];
 
     # grab the versioned resources:
-    my @versioned_files = ();
-    my @dirs = ();
-    my @versioned_output = grep !/^[?D]/, @{ $status_output_ref };
+    my @versioned_files  = ();
+    my @dirs             = ();
+    my @versioned_output = grep !/^[?D]/, @{$status_output_ref};
     for my $line (@versioned_output) {
         my @line_info = split( /\s+/, $line );
 
         # the file is the last item in the @line_info array
         my $filename = $line_info[-1];
         $filename =~ s/\\/\//g;
+
         # ignore the debian directory
         next if $filename =~ m[/\.svn|blib|debian];
         if ( -d $filename ) {
             push @dirs, $filename;
-        } else {
+        }
+        else {
             push @versioned_files, $filename;
         }
     }
-    $data{dirs} = \@dirs;
+    $data{dirs}            = \@dirs;
     $data{versioned_files} = \@versioned_files;
 
     # initialize the object from the prepared values (Damian, p. 98)
@@ -54,24 +56,25 @@ sub prepare_manifest {
     my $self = shift;
     my %manifest_lines;
 
-    for my $file (@{ $self->{versioned_files} }) {
+    for my $file ( @{ $self->{versioned_files} } ) {
         $manifest_lines{$file} = _get_manifest_entry($file);
     }
     return \%manifest_lines;
 }
 
 sub determine_need_for_manifest {
-    my $self = shift;
+    my $self               = shift;
     my $proposed_files_ref = shift;
-    if  ( ! -f $self->{file} ) {
+    if ( !-f $self->{file} ) {
         return 1;
-    } else {
-        my $current_files_ref = $self->_get_current_files();
+    }
+    else {
+        my $current_files_ref        = $self->_get_current_files();
         my $different_patterns_count = 0;
-        foreach my $cur (keys %{ $current_files_ref }) {
+        foreach my $cur ( keys %{$current_files_ref} ) {
             $different_patterns_count++ unless $proposed_files_ref->{$cur};
         }
-        foreach my $pro (keys %{ $proposed_files_ref }) {
+        foreach my $pro ( keys %{$proposed_files_ref} ) {
             $different_patterns_count++ unless $current_files_ref->{$pro};
         }
         $different_patterns_count ? return 1 : return;
@@ -79,9 +82,9 @@ sub determine_need_for_manifest {
 }
 
 sub print_manifest {
-    my $self = shift;
+    my $self               = shift;
     my $manifest_lines_ref = shift;
-    my $print_str = <<"END_HEADER";
+    my $print_str          = <<"END_HEADER";
 # ex: set ro:
 # $self->{id}
 #
@@ -93,8 +96,8 @@ sub print_manifest {
 # has been told about new or deleted files.
 END_HEADER
 
-    for my $k ( sort keys %{ $manifest_lines_ref } ) {
-        $print_str .= sprintf "%- 59s %s\n", ($k, $manifest_lines_ref->{$k});
+    for my $k ( sort keys %{$manifest_lines_ref} ) {
+        $print_str .= sprintf "%- 59s %s\n", ( $k, $manifest_lines_ref->{$k} );
     }
     open my $MANIFEST, '>', $self->{file}
         or croak "Unable to open $self->{file} for writing";
@@ -104,18 +107,18 @@ END_HEADER
 }
 
 sub _get_manifest_entry {
-    my $file = shift;
+    my $file    = shift;
     my $special = _get_special();
-    my $loc  = '[]';
+    my $loc     = '[]';
     for ($file) {
         $loc =
               exists( $special->{$_} ) ? $special->{$_}
-            : !m[/]                  ? '[]'
-            : m[^LICENSE/]           ? '[main]doc'
-            : m[^docs/]              ? '[main]doc'
-            : m[^editor/]            ? '[devel]'
-            : m[^examples/]          ? '[main]doc'
-            : m[^include/]           ? '[main]include'
+            : !m[/]                    ? '[]'
+            : m[^LICENSE/]             ? '[main]doc'
+            : m[^docs/]                ? '[main]doc'
+            : m[^editor/]              ? '[devel]'
+            : m[^examples/]            ? '[main]doc'
+            : m[^include/]             ? '[main]include'
             : ( m[^languages/(\w+)/] and $1 ne 'conversion' ) ? "[$1]"
             : m[^lib/]        ? '[devel]'
             : m[^runtime/]    ? '[library]'
@@ -173,24 +176,25 @@ sub _get_special {
 }
 
 sub _get_current_files {
-    my $self = shift;
+    my $self          = shift;
     my %current_files = ();
     open my $FILE, "<", $self->{file}
         or die "Unable to open $self->{file} for reading";
-    while (my $line = <$FILE>) {
+    while ( my $line = <$FILE> ) {
         chomp $line;
         next if $line =~ /^\s*$/o;
         next if $line =~ /^#/o;
         my @els = split /\s+/, $line;
-        $current_files{$els[0]}++;
+        $current_files{ $els[0] }++;
     }
     close $FILE or die "Unable to close $self->{file} after reading";
     return \%current_files;
 }
 
 sub prepare_manifest_skip {
-    my $self = shift;
+    my $self      = shift;
     my $svnignore = `$self->{cmd} propget svn:ignore @{ $self->{dirs} }`;
+
     # cope with trailing newlines in svn:ignore output
     $svnignore =~ s/\n{3,}/\n\n/g;
     my %ignore;
@@ -213,18 +217,19 @@ sub prepare_manifest_skip {
 }
 
 sub determine_need_for_manifest_skip {
-    my $self = shift;
+    my $self      = shift;
     my $print_str = shift;
-    if  ( ! -f $self->{skip} ) {
+    if ( !-f $self->{skip} ) {
         return 1;
-    } else {
-        my $current_skips_ref = $self->_get_current_skips();
-        my $proposed_skips_ref = _get_proposed_skips($print_str);
+    }
+    else {
+        my $current_skips_ref        = $self->_get_current_skips();
+        my $proposed_skips_ref       = _get_proposed_skips($print_str);
         my $different_patterns_count = 0;
-        foreach my $cur (keys %{ $current_skips_ref }) {
+        foreach my $cur ( keys %{$current_skips_ref} ) {
             $different_patterns_count++ unless $proposed_skips_ref->{$cur};
         }
-        foreach my $pro (keys %{ $proposed_skips_ref }) {
+        foreach my $pro ( keys %{$proposed_skips_ref} ) {
             $different_patterns_count++ unless $current_skips_ref->{$pro};
         }
         $different_patterns_count ? return 1 : return;
@@ -232,7 +237,7 @@ sub determine_need_for_manifest_skip {
 }
 
 sub print_manifest_skip {
-    my $self = shift;
+    my $self      = shift;
     my $print_str = shift;
     open my $MANIFEST_SKIP, '>', $self->{skip}
         or die "Unable to open $self->{skip} for writing";
@@ -243,10 +248,10 @@ sub print_manifest_skip {
 }
 
 sub _compose_print_str {
-    my $self = shift;
+    my $self       = shift;
     my $ignore_ref = shift;
-    my %ignore = %{ $ignore_ref };
-    my $print_str = <<"END_HEADER";
+    my %ignore     = %{$ignore_ref};
+    my $print_str  = <<"END_HEADER";
 # ex: set ro:
 # $self->{id}
 # generated by $self->{script} $self->{time} UT
@@ -272,7 +277,8 @@ END_HEADER
         foreach ( sort split /\n/, $ignore{$directory} ) {
             s/\./\\./g;
             s/\*/.*/g;
-            $print_str .= ($dir ne '.')
+            $print_str .=
+                ( $dir ne '.' )
                 ? "^$dir/$_\$\n^$dir/$_/\n"
                 : "^$_\$\n^$_/\n";
         }
@@ -281,11 +287,11 @@ END_HEADER
 }
 
 sub _get_current_skips {
-    my $self = shift;
+    my $self          = shift;
     my %current_skips = ();
     open my $SKIP, "<", $self->{skip}
         or die "Unable to open $self->{skip} for reading";
-    while (my $line = <$SKIP>) {
+    while ( my $line = <$SKIP> ) {
         chomp $line;
         next if $line =~ /^\s*$/o;
         next if $line =~ /^#/o;
@@ -296,7 +302,7 @@ sub _get_current_skips {
 }
 
 sub _get_proposed_skips {
-    my $print_str = shift;
+    my $print_str      = shift;
     my @proposed_lines = split /\n/, $print_str;
     my %proposed_skips = ();
     for my $line (@proposed_lines) {

@@ -278,7 +278,7 @@ our @EXPORT = qw( plan run_command skip slurp_file );
 use base qw( Exporter );
 
 # Memoize functions with a fixed output
-Memoize::memoize( 'path_to_parrot' );
+Memoize::memoize('path_to_parrot');
 
 # Tell parrot it's being tested--disables searching of installed libraries.
 # (see Parrot_get_runtime_prefix in src/library.c).
@@ -321,16 +321,23 @@ sub run_command {
         $err = "&STDOUT";
     }
 
-    local *OLDOUT if $out;  ## no critic Variables::ProhibitConditionalDeclarations
-    local *OLDERR if $err;  ## no critic Variables::ProhibitConditionalDeclarations
+    local *OLDOUT if $out;    ## no critic Variables::ProhibitConditionalDeclarations
+    local *OLDERR if $err;    ## no critic Variables::ProhibitConditionalDeclarations
 
     # Save the old filehandles; we must not let them get closed.
-    open OLDOUT, '>&STDOUT' or die "Can't save     stdout" if $out;  ## no critic InputOutput::ProhibitBarewordFileHandles
-    open OLDERR, '>&STDERR' or die "Can't save     stderr" if $err;  ## no critic InputOutput::ProhibitBarewordFileHandles
+    open OLDOUT, '>&STDOUT'
+        or die "Can't save     stdout"
+        if $out;              ## no critic InputOutput::ProhibitBarewordFileHandles
+    open OLDERR, '>&STDERR'
+        or die "Can't save     stderr"
+        if $err;              ## no critic InputOutput::ProhibitBarewordFileHandles
 
     open STDOUT, '>', $out or die "Can't redirect stdout to $out" if $out;
+
     # See 'Obscure Open Tricks' in perlopentut
-    open STDERR, ">$err"  or die "Can't redirect stderr to $err"  if $err;  ## no critic InputOutput::ProhibitTwoArgOpen
+    open STDERR, ">$err"
+        or die "Can't redirect stderr to $err"
+        if $err;              ## no critic InputOutput::ProhibitTwoArgOpen
 
     # If $command isn't already an arrayref (because of a multi-command
     # test), make it so now so the code below can treat everybody the
@@ -371,7 +378,7 @@ sub run_command {
     return (
           ( $exit_code < 0 )    ? $exit_code
         : ( $exit_code & 0xFF ) ? "[SIGNAL $exit_code]"
-        :                         ( $? >> 8 )
+        : ( $? >> 8 )
     );
 }
 
@@ -426,21 +433,20 @@ sub path_to_parrot {
 
     my $path = $INC{'Parrot/Config.pm'};
     $path =~ s{ /lib/Parrot/Config.pm \z}{}xms;
-    return $path eq q{} ?
-               File::Spec->curdir()
-               :
-               $path;
+    return $path eq q{}
+        ? File::Spec->curdir()
+        : $path;
 }
 
 sub generate_languages_functions {
 
     my %test_map = (
-        output_is          => 'is_eq',
-        error_output_is    => 'is_eq',
-        output_like        => 'like',
-        error_output_like  => 'like',
-        output_isnt        => 'isnt_eq',
-        error_output_isnt  => 'isnt_eq',
+        output_is         => 'is_eq',
+        error_output_is   => 'is_eq',
+        output_like       => 'like',
+        error_output_like => 'like',
+        output_isnt       => 'isnt_eq',
+        error_output_isnt => 'isnt_eq',
     );
 
     foreach my $func ( keys %test_map ) {
@@ -454,14 +460,15 @@ sub generate_languages_functions {
 
             no strict 'refs';
 
-            local *{ $call_pkg . '::TODO' } = \$options{todo}  ## no critic Variables::ProhibitConditionalDeclarations
+            local *{ $call_pkg . '::TODO' } =
+                \$options{todo}    ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $options{todo};
 
             my $count = $self->{builder}->current_test() + 1;
 
             # These are the thing that depend on the actual language implementation
             my $out_f     = $self->get_out_fn( $count,    \%options );
-            my $lang_f    = $self->get_lang_fn( $count,    \%options );
+            my $lang_f    = $self->get_lang_fn( $count,   \%options );
             my $cd        = $self->get_cd( \%options );
             my @test_prog = $self->get_test_prog( $count, \%options );
 
@@ -483,26 +490,21 @@ sub generate_languages_functions {
                 );
                 my $real_output = slurp_file($out_f);
 
-                if ($func =~ m/^ error_/xms ) {
-                    return _handle_error_output(
-                        $self->{builder}, $real_output, $expected, $desc
-                    ) unless $exit_code;
+                if ( $func =~ m/^ error_/xms ) {
+                    return _handle_error_output( $self->{builder}, $real_output, $expected, $desc )
+                        unless $exit_code;
                 }
-                elsif ( $exit_code ) {
+                elsif ($exit_code) {
                     $self->{builder}->ok( 0, $desc );
 
                     my $test_prog = join ' && ', @test_prog;
-                    $self->{builder}->diag( "'$test_prog' failed with exit code $exit_code." );
+                    $self->{builder}->diag("'$test_prog' failed with exit code $exit_code.");
 
                     return 0;
                 }
 
                 my $meth = $test_map{$func};
-                $self->{builder}->$meth(
-                    $real_output,
-                    $expected,
-                    $desc
-                );
+                $self->{builder}->$meth( $real_output, $expected, $desc );
             }
 
             # The generated files are left in the t/* directories.
@@ -511,7 +513,7 @@ sub generate_languages_functions {
             return;
         };
 
-        my ( $package ) = caller();
+        my ($package) = caller();
 
         no strict 'refs';
 
@@ -526,26 +528,24 @@ sub _handle_error_output {
     my ( $builder, $real_output, $expected, $desc ) = @_;
 
     $builder->ok( 0, $desc );
-    $builder->diag( "Expected error but exited cleanly\n" .
-    "Received:\n$real_output\nExpected:\n$expected\n" );
+    $builder->diag(
+        "Expected error but exited cleanly\n" . "Received:\n$real_output\nExpected:\n$expected\n" );
 
     return 0;
 }
 
 sub _run_test_file {
-    local $SIG{__WARN__}                          = \&_report_odd_hash;
+    local $SIG{__WARN__} = \&_report_odd_hash;
     my ( $func, $code, $expected, $desc, %extra ) = @_;
 
-    my $path_to_parrot   = path_to_parrot();
-    my $parrot           = File::Spec->join(
-        File::Spec->curdir(), 'parrot' . $PConfig{exe} );
+    my $path_to_parrot = path_to_parrot();
+    my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 
     # Strange Win line endings
     convert_line_endings($expected);
 
     # set up default description
-    unless ($desc)
-    {
+    unless ($desc) {
         ( undef, my $file, my $line ) = caller();
         $desc = "($file line $line)";
     }
@@ -560,27 +560,22 @@ sub _run_test_file {
     # Name of the file with test code.
     # This depends on which kind of code we are testing.
     my $code_f;
-    if ( $func =~ m/^pir_.*?output/ )
-    {
+    if ( $func =~ m/^pir_.*?output/ ) {
         $code_f = per_test( '.pir', $test_no );
     }
-    elsif ( $func =~ m/^pasm_.*?output_/ )
-    {
+    elsif ( $func =~ m/^pasm_.*?output_/ ) {
         $code_f = per_test( '.pasm', $test_no );
     }
-    elsif ( $func =~ m/^pbc_.*?output_/ )
-    {
+    elsif ( $func =~ m/^pbc_.*?output_/ ) {
         $code_f = per_test( '.pbc', $test_no );
     }
-    else
-    {
+    else {
         die "Unknown test function: $func";
     }
     $code_f = File::Spec->rel2abs($code_f);
 
     # native tests are just run, others need to write code first
-    if ( $code_f !~ /\.pbc$/ )
-    {
+    if ( $code_f !~ /\.pbc$/ ) {
         write_code_to_file( $code, $code_f );
     }
 
@@ -590,17 +585,14 @@ sub _run_test_file {
     $args .= " $opt";
 
     my $run_exec = 0;
-    if ( $args =~ s/--run-exec// )
-    {
+    if ( $args =~ s/--run-exec// ) {
         $run_exec = 1;
         my $pbc_f = per_test( '.pbc', $test_no );
         my $o_f = per_test( '_pbcexe' . $PConfig{o}, $test_no );
         my $exe_f =
             per_test( '_pbcexe' . $PConfig{exe}, $test_no )
             ;    # Make cleanup and svn:ignore more simple
-        my $exec_f =
-            per_test( '_pbcexe', $test_no )
-            ;    # Make cleanup and svn:ignore more simple
+        my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
         # RT#43751 put this into sub generate_pbc()
@@ -610,24 +602,21 @@ sub _run_test_file {
             STDOUT => $out_f,
             STDERR => $out_f
         );
-        if ( -e $pbc_f )
-        {
+        if ( -e $pbc_f ) {
             run_command(
                 qq{$parrot $args -o $o_f "$pbc_f"},
                 CD     => $path_to_parrot,
                 STDOUT => $out_f,
                 STDERR => $out_f
             );
-            if ( -e $o_f )
-            {
+            if ( -e $o_f ) {
                 run_command(
                     qq{$PConfig{make} EXEC=$exec_f exec},
                     CD     => $path_to_parrot,
                     STDOUT => $out_f,
                     STDERR => $out_f
                 );
-                if ( -e $exe_f )
-                {
+                if ( -e $exe_f ) {
                     run_command(
                         $exe_f,
                         CD     => $path_to_parrot,
@@ -646,10 +635,8 @@ sub _run_test_file {
     }
 
     my ( $exit_code, $cmd );
-    unless ($run_exec)
-    {
-        if ( $args =~ s/--run-pbc// || $args =~ s/-r // )
-        {
+    unless ($run_exec) {
+        if ( $args =~ s/--run-pbc// || $args =~ s/-r // ) {
             my $pbc_f = per_test( '.pbc', $test_no );
             $args = qq{$args -o "$pbc_f"};
 
@@ -657,8 +644,7 @@ sub _run_test_file {
             # of a single scalar, build an array of commands.
             $cmd = [ qq{$parrot $args "$code_f"}, qq{$parrot "$pbc_f"}, ];
         }
-        else
-        {
+        else {
             $cmd = qq{$parrot $args "$code_f"};
         }
         $exit_code = run_command(
@@ -689,27 +675,26 @@ sub _report_odd_hash {
 
 sub _generate_test_functions {
 
-    my $package = 'Parrot::Test';
+    my $package        = 'Parrot::Test';
     my $path_to_parrot = path_to_parrot();
-    my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
+    my $parrot         = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 
-    my %parrot_test_map
-         = map { $_ . '_output_is'            => 'is_eq',
-                 $_ . '_error_output_is'      => 'is_eq',
-                 $_ . '_output_isnt'          => 'isnt_eq',
-                 $_ . '_error_output_isnt'    => 'isnt_eq',
-                 $_ . '_output_like'          => 'like',
-                 $_ . '_error_output_like'    => 'like',
-                 $_ . '_output_unlike'        => 'unlike',
-                 $_ . '_error_output_unlike'  => 'unlike',
-               }
-               qw( pasm pbc pir );
+    my %parrot_test_map = map {
+        $_ . '_output_is'               => 'is_eq',
+            $_ . '_error_output_is'     => 'is_eq',
+            $_ . '_output_isnt'         => 'isnt_eq',
+            $_ . '_error_output_isnt'   => 'isnt_eq',
+            $_ . '_output_like'         => 'like',
+            $_ . '_error_output_like'   => 'like',
+            $_ . '_output_unlike'       => 'unlike',
+            $_ . '_error_output_unlike' => 'unlike',
+    } qw( pasm pbc pir );
     for my $func ( keys %parrot_test_map ) {
         push @EXPORT, $func;
 
         my $test_sub = sub {
             my ( $code, $expected, $desc, %extra ) = @_;
-            my ( $out_f, $cmd, $exit_code )        = _run_test_file( $func, @_ );
+            my ( $out_f, $cmd, $exit_code ) = _run_test_file( $func, @_ );
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
@@ -720,18 +705,18 @@ sub _generate_test_functions {
             my $call_pkg = $builder->exported_to() || '';
 
             no strict 'refs';
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
+            local *{ $call_pkg . '::TODO' } =
+                \$extra{todo}    ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};
 
-            if ($func =~ /_error_/) {
-                return _handle_error_output(
-                    $builder, $real_output, $expected, $desc
-                ) unless $exit_code;
+            if ( $func =~ /_error_/ ) {
+                return _handle_error_output( $builder, $real_output, $expected, $desc )
+                    unless $exit_code;
             }
             elsif ($exit_code) {
                 $builder->ok( 0, $desc );
-                $builder->diag( "Exited with error code: $exit_code\n" .
-                    "Received:\n$real_output\nExpected:\n$expected\n" );
+                $builder->diag( "Exited with error code: $exit_code\n"
+                        . "Received:\n$real_output\nExpected:\n$expected\n" );
 
                 return 0;
             }
@@ -810,14 +795,15 @@ sub _generate_test_functions {
             # set a todo-item for Test::Builder to find
             my $call_pkg = $builder->exported_to() || '';
 
-            local *{ $call_pkg . '::TODO' } = \$extra{todo}  ## no critic Variables::ProhibitConditionalDeclarations
+            local *{ $call_pkg . '::TODO' } =
+                \$extra{todo}    ## no critic Variables::ProhibitConditionalDeclarations
                 if defined $extra{todo};
 
             my $pass = $builder->$meth( $real_output, $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if $exit_code and not $pass;
 
-            if ( ! $ENV{POSTMORTEM} ) {
+            if ( !$ENV{POSTMORTEM} ) {
                 unlink $out_f;
             }
 
@@ -835,12 +821,12 @@ sub _generate_test_functions {
     );
 
     my %language_test_map = (
-        language_output_is          => 'output_is',
-        language_error_output_is    => 'error_output_is',
-        language_output_like        => 'output_like',
-        language_error_output_like  => 'error_output_like',
-        language_output_isnt        => 'output_isnt',
-        language_error_output_isnt  => 'error_output_isnt',
+        language_output_is         => 'output_is',
+        language_error_output_is   => 'error_output_is',
+        language_output_like       => 'output_like',
+        language_error_output_like => 'error_output_like',
+        language_output_isnt       => 'output_isnt',
+        language_error_output_isnt => 'error_output_isnt',
     );
 
     foreach my $func ( keys %language_test_map ) {
@@ -917,7 +903,7 @@ sub _generate_test_functions {
                                                \z                     # at end of string
                                              }ixms or Usage();
             if ( defined $extension ) {
-                my $code      = slurp_file($example_f);
+                my $code = slurp_file($example_f);
                 my $test_func = join( '::', $package, $example_test_map{$func} );
 
                 no strict 'refs';
@@ -954,16 +940,15 @@ sub _generate_test_functions {
 
             convert_line_endings($expected);
 
-            my $obj_f    = per_test( $PConfig{o},   $test_no );
-            my $exe_f    = per_test( $PConfig{exe}, $test_no );
-            $exe_f       =~ s@[\\/:]@$PConfig{slash}@g;
-            my $out_f    = per_test( '.out',   $test_no );
-            my $build_f  = per_test( '.build', $test_no );
+            my $obj_f = per_test( $PConfig{o},   $test_no );
+            my $exe_f = per_test( $PConfig{exe}, $test_no );
+            $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
+            my $out_f   = per_test( '.out',   $test_no );
+            my $build_f = per_test( '.build', $test_no );
 
             # set todo-option before trying to compile or link
             local *main::TODO;
             *main::TODO = \$options{todo} if $options{todo};
-
 
             # compile the source
             {
@@ -994,14 +979,16 @@ sub _generate_test_functions {
             # link the compiled source, get an executable
             {
                 my $cfg = File::Spec->join( 'src', "parrot_config$PConfig{o}" );
-                my $iculibs  = $PConfig{has_icu} ? $PConfig{icu_shared} : q{};
-                my $libparrot
-                    = $PConfig{parrot_is_shared}
-                        ? "$PConfig{rpath_blib} -L$PConfig{blib_dir} "
-                            . ( $^O =~ m/MSWin32/
-                                ? $PConfig{libparrot_ldflags}
-                                : "-lparrot" )
-                        : File::Spec->join( $PConfig{blib_dir}, $PConfig{libparrot_static} );
+                my $iculibs = $PConfig{has_icu} ? $PConfig{icu_shared} : q{};
+                my $libparrot =
+                    $PConfig{parrot_is_shared}
+                    ? "$PConfig{rpath_blib} -L$PConfig{blib_dir} "
+                    . (
+                      $^O =~ m/MSWin32/
+                    ? $PConfig{libparrot_ldflags}
+                    : "-lparrot"
+                    )
+                    : File::Spec->join( $PConfig{blib_dir}, $PConfig{libparrot_static} );
                 my $cmd =
                       "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} "
                     . "$obj_f $cfg $PConfig{ld_out}$exe_f "
@@ -1026,7 +1013,7 @@ sub _generate_test_functions {
             # run the generated executable
             my $pass;
             {
-                my $cmd       = File::Spec->join( File::Spec->curdir(), $exe_f );
+                my $cmd = File::Spec->join( File::Spec->curdir(), $exe_f );
                 my $exit_code = run_command(
                     $cmd,
                     'STDOUT' => $out_f,
@@ -1035,13 +1022,13 @@ sub _generate_test_functions {
                 my $output = slurp_file($out_f);
 
                 if ($exit_code) {
-                    $pass = $builder->ok(0, $desc);
-                    $builder->diag("Exited with error code: $exit_code\n" .
-                        "Received:\n$output\nExpected:\n$expected\n" );
+                    $pass = $builder->ok( 0, $desc );
+                    $builder->diag( "Exited with error code: $exit_code\n"
+                            . "Received:\n$output\nExpected:\n$expected\n" );
                 }
                 else {
                     my $meth = $c_test_map{$func};
-                    $pass    = $builder->$meth($output, $expected, $desc);
+                    $pass = $builder->$meth( $output, $expected, $desc );
                     $builder->diag("'$cmd' failed with exit code $exit_code")
                         unless $pass;
                 }

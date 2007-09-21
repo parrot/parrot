@@ -36,9 +36,9 @@ use FileHandle;
 our @EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_macros vtbl_embed);
 
 sub make_re {
-    my $re = shift;
+    my $re      = shift;
     my $comp_re = qr/$re/;
-    return (defined $comp_re)
+    return ( defined $comp_re )
         ? $comp_re
         : "(?:$re)";
 }
@@ -47,10 +47,10 @@ my $ident_re   = make_re('[A-Za-z_][A-Za-z0-9_]*');
 my $type_re    = make_re( '(?:(?:struct\s+)|(?:union\s+))?' . $ident_re . '\**' );
 my $param_re   = make_re( $type_re . '\s+' . $ident_re );
 my $arglist_re = make_re( '(?:' . $param_re . '(?:\s*,\s*' . $param_re . ')*)?' );
-my $method_re  =
+my $method_re =
     make_re( '^\s*(' . $type_re . ')\s+(' . $ident_re . ')\s*\((' . $arglist_re . ')\)\s*$' );
-my $attrs_re   = make_re('(?::(\w+)\s*)*');
-my $attr_re    = make_re(':(\w+)\s*');
+my $attrs_re = make_re('(?::(\w+)\s*)*');
+my $attr_re  = make_re(':(\w+)\s*');
 
 sub parse_attrs {
     my $attrs = shift;
@@ -101,7 +101,7 @@ sub parse_vtable {
             my $mmdop = defined $4 ? $4 : -1;
             my $entry = [ $1, $2, $3, $section, $mmdop, parse_attrs( $5, $default_attrs ) ];
 
-            if (defined $4) {
+            if ( defined $4 ) {
                 push @{$mmd}, $entry;
             }
             else {
@@ -115,7 +115,7 @@ sub parse_vtable {
 
     # We probably should sort on insert, but this is easier for now. And it's
     # compile time, so it's not all that important.
-    return [@$mmd, sort { $a->[1] cmp $b->[1] } @$vtable];
+    return [ @$mmd, sort { $a->[1] cmp $b->[1] } @$vtable ];
 }
 
 =item C<vtbl_defs($vtable)>
@@ -359,8 +359,8 @@ sub vtbl_embed {
 
         my $ret_type = find_type($return_type);
 
-        $protos .= sprintf "extern PARROT_API %s Parrot_PMC_%s( %s );\n",
-            $ret_type, $name, $signature;
+        $protos .= sprintf "extern PARROT_API %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
+            $signature;
 
         $funcs .= sprintf "/*
 

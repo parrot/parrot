@@ -1,4 +1,5 @@
 package Parrot::Pmc2c::PMC::deleg_pmc;
+
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
@@ -21,28 +22,30 @@ the PMC in the first attribute slot.
 =cut
 
 sub pre_method_gen {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
-        my $new_method = $method->clone({
+        my $new_method = $method->clone(
+            {
                 parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
-          });
+            }
+        );
 
         my $n    = 0;
         my @args = grep { $n++ & 1 ? $_ : 0 } split / /, $method->parameters;
         my $arg  = @args ? ", " . join( ' ', @args ) : '';
         my $ret  = gen_ret( $method, "VTABLE_$vt_method_name(interp, attr$arg)" );
-        $new_method->body(Parrot::Pmc2c::Emitter->text(<<"EOC"));
+        $new_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     PMC *attr = get_attrib_num(PMC_data_typed(pmc, SLOTTYPE *), 0);
     $ret
 EOC
         $self->add_method($new_method);
     }
-  return 1;
+    return 1;
 }
 
 1;

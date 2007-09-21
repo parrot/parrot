@@ -49,9 +49,7 @@ sub new {
             ),
         ),
         $self->new_group(
-            'PMCs', '',
-            'lib/Parrot/Pmc2c',
-            'lib/Parrot/Pmc2c/PMC',
+            'PMCs', '', 'lib/Parrot/Pmc2c', 'lib/Parrot/Pmc2c/PMC',
             $self->new_item( '', 'lib/Parrot/Vtable.pm' ),
         ),
         $self->new_group( 'IO', '', 'lib/Parrot/Distribution.pm', 'lib/Parrot/IO' ),

@@ -274,7 +274,7 @@ sub process_item_text_or_head_start_token {
 
         last
             if $to_unget[-1]->is_end
-            and $to_unget[-1]->tagname eq $tagname;
+                and $to_unget[-1]->tagname eq $tagname;
     }
 
     # Convert them into an anchor name;
@@ -338,8 +338,8 @@ sub process_other_start_token {
 
     ++$self->{DONT_WRAP}
         if $tagname eq 'Verbatim'
-        or $tagname eq "VerbatimFormatted"
-        or $tagname eq 'X';
+            or $tagname eq "VerbatimFormatted"
+            or $tagname eq 'X';
 }
 
 =item C<process_end_token($token)>

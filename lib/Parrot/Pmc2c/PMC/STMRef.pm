@@ -1,4 +1,5 @@
 package Parrot::Pmc2c::PMC::STMRef;
+
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 

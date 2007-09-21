@@ -26,7 +26,6 @@ use Carp;
 
 $SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
 
-
 =head1 NAME
 
 Parrot::Pmc2c::Pmc2cMain - Functions called within F<tools/build/pmc2c.pl>
@@ -126,7 +125,7 @@ When the caller is F<make>, that directory is the top-level Parrot directory.
 
 sub dump_vtable {
     my ( $self, $file ) = @_;
-    return Parrot::Pmc2c::VTable->new( $file )->dump;
+    return Parrot::Pmc2c::VTable->new($file)->dump;
 }
 
 =head3 C<dump_pmc()>
@@ -208,7 +207,7 @@ sub print_tree {
         my $class = $self->read_dump($f);
         print "    " x $depth, $class->{name}, "\n";
         for my $k ( @{ $class->parents } ) {
-            unless ($k eq $class->{name}) {
+            unless ( $k eq $class->{name} ) {
                 $self->print_tree(
                     {
                         depth => $depth + 1,
@@ -246,7 +245,7 @@ C<dump_pmc()>.
 
 sub read_dump {
     my ( $self, $filename ) = @_;
-    $filename = $self->find_file( filename($filename, '.dump'), 1 );
+    $filename = $self->find_file( filename( $filename, '.dump' ), 1 );
 
     return unless -f $filename;
     return retrieve($filename);
@@ -275,7 +274,7 @@ sub gen_c {
     my $vtable_dump = $self->read_dump("vtable.pmc");
 
     foreach my $filename ( @{ $self->{args} } ) {
-        Parrot::Pmc2c::PMC->prep_for_emit($self->read_dump($filename), $vtable_dump)->generate;
+        Parrot::Pmc2c::PMC->prep_for_emit( $self->read_dump($filename), $vtable_dump )->generate;
     }
     return 1;
 }

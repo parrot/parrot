@@ -19,23 +19,25 @@ any PMCs in the MRO.
 =cut
 
 sub pre_method_gen {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->normal_unimplemented_vtable($vt_method_name);
-        my $new_default_method = $method->clone({
+        my $new_default_method = $method->clone(
+            {
                 parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
-          });
+            }
+        );
 
-      my ( $return_prefix, $ret_suffix, $args, $sig, $return_type_char, $null_return ) = $new_default_method->signature;
-      my $void_return = $return_type_char eq 'v' ? 'return;' : '';
-      my $return = $return_type_char eq 'v' ? '' : $return_prefix;
+        my ( $return_prefix, $ret_suffix, $args, $sig, $return_type_char, $null_return ) =
+            $new_default_method->signature;
+        my $void_return = $return_type_char eq 'v' ? 'return;' : '';
+        my $return      = $return_type_char eq 'v' ? ''        : $return_prefix;
 
-
-        $new_default_method->body(Parrot::Pmc2c::Emitter->text(<<"EOC"));
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     Parrot_Object * const obj = PARROT_OBJECT(pmc);
     Parrot_Class * const _class = PARROT_CLASS(obj->_class);
 

@@ -40,15 +40,13 @@ foreach my $func ( keys %language_test_map ) {
 
         my $count = $self->{builder}->current_test + 1;
 
-        my $lang_f
-            = File::Spec->rel2abs( Parrot::Test::per_test( '.pir', $count ) );
+        my $lang_f = File::Spec->rel2abs( Parrot::Test::per_test( '.pir', $count ) );
         Parrot::Test::write_code_to_file( $code, $lang_f );
 
         my $args = $ENV{TEST_PROG_ARGS} || '';
         my $cmd = "$self->{parrot} $args languages/PIR/pir.pbc $lang_f";
 
-        my $out_f
-             = File::Spec->rel2abs( Parrot::Test::per_test( '.out', $count ) );
+        my $out_f = File::Spec->rel2abs( Parrot::Test::per_test( '.out', $count ) );
         my $exit_code = Parrot::Test::run_command(
             $cmd,
             CD     => $self->{relpath},
@@ -62,7 +60,8 @@ foreach my $func ( keys %language_test_map ) {
         {
             no strict 'refs';
 
-            $pass = $self->{builder}->$builder_func( Parrot::Test::slurp_file($out_f), $output, $desc );
+            $pass =
+                $self->{builder}->$builder_func( Parrot::Test::slurp_file($out_f), $output, $desc );
             $self->{builder}->diag("'$cmd' failed with exit code $exit_code")
                 if $exit_code and not $pass;
         }

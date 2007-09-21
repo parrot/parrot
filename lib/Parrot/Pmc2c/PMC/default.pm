@@ -21,19 +21,21 @@ Always true.
 =cut
 
 sub pre_method_gen {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # vtable methods
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->unimplemented_vtable($vt_method_name);
-        my $new_default_method = $method->clone({
+        my $new_default_method = $method->clone(
+            {
                 parent_name => $self->name,
                 type        => Parrot::Pmc2c::Method::VTABLE,
-          });
+            }
+        );
 
         my $ret = gen_ret($method);
-        $new_default_method->body(Parrot::Pmc2c::Emitter->text(<<"EOC"));
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     cant_do_method(interp, pmc, "$vt_method_name");
     $ret
 EOC

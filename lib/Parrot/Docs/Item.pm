@@ -63,7 +63,7 @@ path otherwise an exception is raised.
 =cut
 
 sub new {
-    my $self     = ref $_[0] ? ref shift: shift;
+    my $self     = ref $_[0] ? ref shift : shift;
     my $text     = shift;
     my @contents = @_;
 

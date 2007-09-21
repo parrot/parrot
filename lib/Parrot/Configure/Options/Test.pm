@@ -3,8 +3,8 @@
 package Parrot::Configure::Options::Test;
 use strict;
 use warnings;
-use Config;      # to find the correct $Config{scriptdir}/prove
-use File::Spec;  # to construct the path to the correct 'prove'
+use Config;        # to find the correct $Config{scriptdir}/prove
+use File::Spec;    # to construct the path to the correct 'prove'
 
 our @preconfiguration_tests = qw(
     t/configure/*.t
@@ -18,18 +18,21 @@ our @postconfiguration_tests = qw(
 );
 
 sub new {
-    my ($class, $argsref) = @_;
+    my ( $class, $argsref ) = @_;
     my $self = {};
-    my ($run_configure_tests, $run_build_tests);
-    if (defined $argsref->{test}) {
-        if ($argsref->{test} eq '1') {
+    my ( $run_configure_tests, $run_build_tests );
+    if ( defined $argsref->{test} ) {
+        if ( $argsref->{test} eq '1' ) {
             $self->{run_configure_tests} = 1;
-            $self->{run_build_tests} = 1;
-        } elsif ($argsref->{test} eq 'configure') {
+            $self->{run_build_tests}     = 1;
+        }
+        elsif ( $argsref->{test} eq 'configure' ) {
             $self->{run_configure_tests} = 1;
-        } elsif ($argsref->{test} eq 'build') {
+        }
+        elsif ( $argsref->{test} eq 'build' ) {
             $self->{run_build_tests} = 1;
-        } else {
+        }
+        else {
             die "'$argsref->{test}' is a bad value for command-line option 'test'";
         }
     }
@@ -38,12 +41,14 @@ sub new {
 
 sub run_configure_tests {
     my $self = shift;
-    if ($self->{run_configure_tests}) {
+    if ( $self->{run_configure_tests} ) {
         print "As you requested, we'll start with some tests of the configuration tools.\n\n";
+
         # Find the 'prove' command associated with *this* version of perl.
-        my $prove = File::Spec->catfile($Config{'scriptdir'} , 'prove');
+        my $prove = File::Spec->catfile( $Config{'scriptdir'}, 'prove' );
         system(qq{$prove @preconfiguration_tests})
-            and die "Pre-configuration tests did not complete successfully; Configure.pl will not continue.";
+            and die
+"Pre-configuration tests did not complete successfully; Configure.pl will not continue.";
         print <<"TEST";
 
 I just ran some tests to demonstrate that
@@ -56,12 +61,13 @@ TEST
 
 sub run_build_tests {
     my $self = shift;
-    if ($self->{run_build_tests}) {
+    if ( $self->{run_build_tests} ) {
         print "\n\n";
         print "As you requested, I will now run some tests of the build tools.\n\n";
-        my $prove = File::Spec->catfile($Config{'scriptdir'} , 'prove');
+        my $prove = File::Spec->catfile( $Config{'scriptdir'}, 'prove' );
         system(qq{$prove @postconfiguration_tests})
-            and die "Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
+            and die
+"Post-configuration and build tools tests did not complete successfully; running 'make' might be dubious.";
     }
     return 1;
 }

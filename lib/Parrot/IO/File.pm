@@ -263,10 +263,9 @@ sub is_generated {
 
     return 1
         if $self->suffix =~ /^(?:dump|html|flag|o)$/o
-        or $self->name =~
+            or $self->name =~
 /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
-        or $self->parent->name eq 'ops'
-        and $self->suffix =~ /^(?:c|pod)$/;
+            or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
 
     return 0;
 }

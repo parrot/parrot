@@ -9,34 +9,35 @@ our ( @ISA, @EXPORT_OK );
     test_step_thru_runstep
 );
 use Carp;
-*ok = *Test::More::ok;
+*ok     = *Test::More::ok;
 *isa_ok = *Test::More::isa_ok;
 use lib qw( lib );
 use Parrot::Configure;
 
 my $stepnum = -1;
+
 sub stepnum {
     $stepnum++;
     return $stepnum;
 }
 
 sub test_step_thru_runstep {
-    my ($conf, $pkg, $args) = @_;
-    my ($task, $step_name, @step_params, $step, $ret);
+    my ( $conf, $pkg, $args ) = @_;
+    my ( $task, $step_name, @step_params, $step, $ret );
 
     $conf->add_steps($pkg);
-    $conf->options->set(%{$args});
+    $conf->options->set( %{$args} );
 
-    $task = $conf->steps->[ stepnum() ];
+    $task        = $conf->steps->[ stepnum() ];
     $step_name   = $task->step;
     @step_params = @{ $task->params };
 
     $step = $step_name->new();
-    ok(defined $step, "$step_name constructor returned defined value");
-    isa_ok($step, $step_name);
-    ok($step->description(), "$step_name has description");
+    ok( defined $step, "$step_name constructor returned defined value" );
+    isa_ok( $step, $step_name );
+    ok( $step->description(), "$step_name has description" );
     $ret = $step->runstep($conf);
-    ok(defined $ret, "$step_name runstep() returned defined value");
+    ok( defined $ret, "$step_name runstep() returned defined value" );
     return $stepnum;
 }
 

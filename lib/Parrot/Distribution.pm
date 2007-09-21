@@ -213,8 +213,7 @@ BEGIN {
                 : ();
             my $method = join '_' => $type, $class;
             my $filter_ext = join '|' => map { "\\.${_}\$" } @exts;
-            my $filter_dir = join
-                '|' => map { qr{\b$_\b} }
+            my $filter_dir = join '|' => map { qr{\b$_\b} }
                 map { quotemeta($_) } @ignore_dirs,
                 @exceptions;
 
@@ -389,7 +388,7 @@ sub get_perl_language_files {
     }
 
     # return only those files which aren't exempt
-    return grep { ! $self->is_perl_exemption($_) } @perl_files;
+    return grep { !$self->is_perl_exemption($_) } @perl_files;
 }
 
 =item C<is_perl_exemption()>
@@ -423,7 +422,7 @@ coding-standard-exempt Perl files within Parrot
 sub get_perl_exemption_regexp {
     my $self = shift;
 
-    my $parrot_dir  = $self->path();
+    my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
         languages/lua/Lua/parser.pm
         languages/regex/lib/Regex/Grammar.pm
@@ -693,7 +692,7 @@ values are the comments.
 =cut
 
 sub generated_files {
-    my $self      = shift;
+    my $self = shift;
 
     my $generated = ExtUtils::Manifest::maniread('MANIFEST.generated');
     my $path      = $dist->path();

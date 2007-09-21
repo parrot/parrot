@@ -189,7 +189,6 @@ EVAL_CONFIG
     $self->{c} = $res;
 }
 
-
 =item C<slurp_temp()>
 
 Slurps in L<Parrot::Config> temporary data from previous configure.
@@ -210,8 +209,7 @@ EVAL_CONFIG_TEMP
     if ( not defined $res ) {
         die "You cannot use --step until you have completed the full configure process\n";
     }
-    $self->{c}{$_} = $res->{$_}
-        for CORE::keys %$res;
+    $self->{c}{$_} = $res->{$_} for CORE::keys %$res;
 }
 
 =item C<dump()>
@@ -248,14 +246,14 @@ Returns a string.
     if ( defined eval { Data::Dumper->can('Sortkeys') } ) {
         *dump = sub {
             my $self = shift;
-            my ($key, $structure) = @_;
+            my ( $key, $structure ) = @_;
             Data::Dumper->new( [ $self->{$key} ], [$structure] )->Sortkeys(1)->Dump();
         };
     }
     else {
         *dump = sub {
             my $self = shift;
-            my ($key, $structure) = @_;
+            my ( $key, $structure ) = @_;
             Data::Dumper->new( [ $self->{$key} ], [$structure] )->Dump();
         };
     }
@@ -276,8 +274,7 @@ Accepts no arguments and returns a L<Parrot::Configure::Data> object.
 sub clean {
     my $self = shift;
 
-    $self->{c_temp}{$_} = delete $self->{c}{$_}
-        for grep { /^TEMP_/ } CORE::keys %{ $self->{c} };
+    $self->{c_temp}{$_} = delete $self->{c}{$_} for grep { /^TEMP_/ } CORE::keys %{ $self->{c} };
 
     return $self;
 }
@@ -343,7 +340,7 @@ sub gettrigger {
 
     return
         unless defined $self->{triggers}{$key}
-        and defined $self->{triggers}{$key}{$trigger};
+            and defined $self->{triggers}{$key}{$trigger};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
@@ -367,7 +364,7 @@ sub deltrigger {
 
     return
         unless defined $self->{triggers}{$key}
-        and defined $self->{triggers}{$key}{$trigger};
+            and defined $self->{triggers}{$key}{$trigger};
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 

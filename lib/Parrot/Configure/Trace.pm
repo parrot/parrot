@@ -16,7 +16,8 @@ sub new {
     eval { @{$self} = @{ retrieve($sto) }; };
     if ($@) {
         croak "Unable to retrieve storable file of configuration step data";
-    } else {
+    }
+    else {
         return $self;
     }
 }
@@ -27,24 +28,25 @@ sub list_steps {
 }
 
 sub index_steps {
-    my $self = shift;
+    my $self  = shift;
     my @steps = @{ $self->list_steps() };
     my %index = ();
-    for (my $i = 0; $i <= $#steps; $i++) {
-        $index{$steps[$i]} = $i + 1;
+    for ( my $i = 0 ; $i <= $#steps ; $i++ ) {
+        $index{ $steps[$i] } = $i + 1;
     }
     return \%index;
 }
 
 sub trace_options_c {
-    my ($self, $argsref) = @_;
+    my ( $self, $argsref ) = @_;
     my @data = @{$self};
-    my @c = ();
-    for (my $step = 1; $step <= $#data; $step++) {
-        my $value = $data[$step]->{options}->{c}->{$argsref->{attr}};
-        if ($argsref->{verbose}) {
-            push @c, { $self->[0]->[$step - 1] => $value };
-        } else {
+    my @c    = ();
+    for ( my $step = 1 ; $step <= $#data ; $step++ ) {
+        my $value = $data[$step]->{options}->{c}->{ $argsref->{attr} };
+        if ( $argsref->{verbose} ) {
+            push @c, { $self->[0]->[ $step - 1 ] => $value };
+        }
+        else {
             push @c, $value;
         }
     }
@@ -52,15 +54,15 @@ sub trace_options_c {
 }
 
 sub trace_options_triggers {
-    my ($self, $argsref) = @_;
-    my @data = @{$self};
+    my ( $self, $argsref ) = @_;
+    my @data     = @{$self};
     my @triggers = ();
-    for (my $step = 1; $step <= $#data; $step++) {
-        my $value =
-            $data[$step]->{options}->{triggers}->{$argsref->{trig}};
-        if ($argsref->{verbose}) {
-            push @triggers, { $self->[0]->[$step - 1] => $value };
-        } else {
+    for ( my $step = 1 ; $step <= $#data ; $step++ ) {
+        my $value = $data[$step]->{options}->{triggers}->{ $argsref->{trig} };
+        if ( $argsref->{verbose} ) {
+            push @triggers, { $self->[0]->[ $step - 1 ] => $value };
+        }
+        else {
             push @triggers, $value;
         }
     }
@@ -68,14 +70,15 @@ sub trace_options_triggers {
 }
 
 sub trace_data_c {
-    my ($self, $argsref) = @_;
+    my ( $self, $argsref ) = @_;
     my @data = @{$self};
-    my @c = ();
-    for (my $step = 1; $step <= $#data; $step++) {
-        my $value = $data[$step]->{data}->{c}->{$argsref->{attr}};
-        if ($argsref->{verbose}) {
-            push @c, { $self->[0]->[$step - 1] => $value };
-        } else {
+    my @c    = ();
+    for ( my $step = 1 ; $step <= $#data ; $step++ ) {
+        my $value = $data[$step]->{data}->{c}->{ $argsref->{attr} };
+        if ( $argsref->{verbose} ) {
+            push @c, { $self->[0]->[ $step - 1 ] => $value };
+        }
+        else {
             push @c, $value;
         }
     }
@@ -83,15 +86,15 @@ sub trace_data_c {
 }
 
 sub trace_data_triggers {
-    my ($self, $argsref) = @_;
-    my @data = @{$self};
+    my ( $self, $argsref ) = @_;
+    my @data     = @{$self};
     my @triggers = ();
-    for (my $step = 1; $step <= $#data; $step++) {
-        my $value =
-            $data[$step]->{data}->{triggers}->{$argsref->{trig}};
-        if ($argsref->{verbose}) {
-            push @triggers, { $self->[0]->[$step - 1] => $value };
-        } else {
+    for ( my $step = 1 ; $step <= $#data ; $step++ ) {
+        my $value = $data[$step]->{data}->{triggers}->{ $argsref->{trig} };
+        if ( $argsref->{verbose} ) {
+            push @triggers, { $self->[0]->[ $step - 1 ] => $value };
+        }
+        else {
             push @triggers, $value;
         }
     }
@@ -102,15 +105,16 @@ sub get_state_at_step {
     my $self = shift;
     my $step = shift;
     my $state;
-    if ($step =~ /^\d+$/) {
+    if ( $step =~ /^\d+$/ ) {
         croak "Must supply positive integer as step number"
-            unless $step > 0 and $step <= $#{$self->[0]};
+            unless $step > 0 and $step <= $#{ $self->[0] };
         return $self->[$step];
-    } else {
+    }
+    else {
         my $index = $self->index_steps();
         croak "Must supply valid step name"
             unless $index->{$step};
-        return $self->[$index->{$step}];
+        return $self->[ $index->{$step} ];
     }
 }
 

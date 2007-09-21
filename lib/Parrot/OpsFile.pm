@@ -335,7 +335,7 @@ sub read_ops {
 
                 die "Unrecognized arg format '$arg' in '$_'!"
                     unless defined($use)
-                    and defined($type);
+                        and defined($type);
 
                 if ( $type =~ /^INTKEY$/i ) {
                     $type = "ki";

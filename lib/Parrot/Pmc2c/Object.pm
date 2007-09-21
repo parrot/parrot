@@ -1,4 +1,5 @@
 package Parrot::Pmc2c::Object;
+
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
@@ -54,7 +55,7 @@ sub body {
     my $decl = $self->decl( $self->{class}, $method, 0 );
 
     # Need to build signature and work out what return type we expect.
-    my $ret_sig = ctype_to_sigchar($method->{type});
+    my $ret_sig = ctype_to_sigchar( $method->{type} );
 
     my $ret_type = '';
     $ret_type = "_reti" if $ret_sig eq 'I';
@@ -67,7 +68,7 @@ sub body {
     }
 
     # Do we have a return value?
-    my $return = $method->{type} =~ /void/ ? '' : 'return ';
+    my $return      = $method->{type} =~ /void/ ? ''        : 'return ';
     my $void_return = $method->{type} =~ /void/ ? 'return;' : '';
 
     # work out what the null return should be so that we can quieten the "no
@@ -78,17 +79,18 @@ sub body {
     # icc), so we add a workaround for the null return from a FLOATVAL
     # function
     my $null_return;
-    if ($method->{type} eq 'void') {
+    if ( $method->{type} eq 'void' ) {
         $null_return = '';
     }
-    elsif ($method->{type} eq 'void*') {
+    elsif ( $method->{type} eq 'void*' ) {
         $null_return = 'return NULL;';
     }
-    elsif ($method->{type} =~ /PMC|INTVAL|STRING|opcode_t/) {
+    elsif ( $method->{type} =~ /PMC|INTVAL|STRING|opcode_t/ ) {
         $null_return = "return ($method->{type})NULL;";
     }
+
     # workaround for gcc because the general case doesn't work there
-    elsif ($method->{type} =~ /FLOATVAL/) {
+    elsif ( $method->{type} =~ /FLOATVAL/ ) {
         $null_return = 'return (FLOATVAL) 0;';
     }
     else {
@@ -118,7 +120,7 @@ EOC
 
     # We shouldn't allow overrides of get_pointer and friends,
     # since it's unsafe.
-    if ($meth !~ /get_pointer/) {
+    if ( $meth !~ /get_pointer/ ) {
         $generated .= <<EOC;
             const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
             if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, string_from_literal(interp, "$meth"))) {
@@ -147,22 +149,27 @@ EOC
     return $generated;
 }
 
-
 sub ctype_to_sigchar($) {
     my $ctype = shift;
     $ctype =~ s/\s//g;
-    if (!$ctype || $ctype =~ /void/) {
+    if ( !$ctype || $ctype =~ /void/ ) {
         return "v";
-    } elsif ($ctype =~ /opcode_t\*/) {
+    }
+    elsif ( $ctype =~ /opcode_t\*/ ) {
+
         # Only invoke's return needs this; we'll get away with this.
         return "P";
-    } elsif ($ctype =~ /PMC/) {
+    }
+    elsif ( $ctype =~ /PMC/ ) {
         return "P";
-    } elsif ($ctype =~ /STRING/) {
+    }
+    elsif ( $ctype =~ /STRING/ ) {
         return "S";
-    } elsif ($ctype =~ /int(val)?/i) {
+    }
+    elsif ( $ctype =~ /int(val)?/i ) {
         return "I";
-    } else {
+    }
+    else {
         return "N";
     }
 }

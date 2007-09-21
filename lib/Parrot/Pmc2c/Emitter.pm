@@ -6,28 +6,26 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew escape_filename);
-use overload '""' => \&stringify;
+use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
 use Data::Dumper;
 
 sub new {
     my ( $class, $filename ) = @_;
-    my $self = {
-        filename => $filename,
-    };
-    bless $self, (ref($class) || $class);
+    my $self = { filename => $filename, };
+    bless $self, ( ref($class) || $class );
     $self;
 }
 
 sub text {
-    my ( $class, $data, $filename, $bline) = @_;
+    my ( $class, $data, $filename, $bline ) = @_;
     $filename ||= "";
-    $bline ||= -1;
+    $bline    ||= -1;
     my $self = {
-        data => $data,
+        data     => $data,
         filename => $filename,
-        bline => $bline,
-        eline => $bline + count_newlines($data),
+        bline    => $bline,
+        eline    => $bline + count_newlines($data),
     };
     bless $self, ref($class) || $class;
     $self;
@@ -42,7 +40,7 @@ sub find {
         }
     }
     else {
-        return $self if ($self->{data} =~ /$regex/);
+        return $self if ( $self->{data} =~ /$regex/ );
     }
     return 0;
 }
@@ -51,7 +49,7 @@ sub subst {
     my ( $self, $regex, $replacement ) = @_;
     if ( $self->{items} ) {
         for my $x ( @{ $self->{items} } ) {
-            $x->subst($regex, $replacement);
+            $x->subst( $regex, $replacement );
         }
     }
     else {
@@ -67,9 +65,9 @@ sub replace {
     my ( $self, $regex, $replacement ) = @_;
     my $m = $self->{data} =~ /((.*)\Q$regex\E)(.*)/s;
     my ( $all, $pre, $post ) = ( $1, $2, $3 );
-    $self->emit($pre, $self->filename, $self->{bline});
+    $self->emit( $pre, $self->filename, $self->{bline} );
     $self->add_fragment($replacement);
-    $self->emit($post, $self->filename, $self->{bline} + count_newlines($all));
+    $self->emit( $post, $self->filename, $self->{bline} + count_newlines($all) );
 
     for my $x qw( data bline eline ) {
         delete $self->{$x};
@@ -78,7 +76,7 @@ sub replace {
 }
 
 sub stringify {
-    my ( $self ) = @_;
+    my ($self) = @_;
     my $out = "";
 
     if ( $self->{items} ) {
@@ -93,13 +91,13 @@ sub stringify {
 }
 
 sub boolify {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self;
 }
 
 sub annotate {
-    my ( $self ) = @_;
-    $self->{output} = "";
+    my ($self) = @_;
+    $self->{output}       = "";
     $self->{current_file} = $self->filename;
     $self->{current_line} = 1;
 
@@ -129,7 +127,7 @@ sub annotate_worker {
 
         #no need to emit uneccessary #line directive
         if ( $line == -1 and $self->filename eq $self->{current_file} ) {
-          $data = $it->{data};
+            $data = $it->{data};
         }
         else {
             $line = $self->{current_line} if $line == -1;
@@ -148,25 +146,25 @@ sub emit {
     unless ( ref($item) eq 'Parrot::Pmc2c::Emitter' ) {
         $file ||= $self->filename;
         $line ||= -1;
-        $item = $self->text($item, $file, $line)
+        $item = $self->text( $item, $file, $line );
     }
     $self->add_fragment($item);
 }
 
 sub add_fragment {
-    my ( $self, $item) = @_;
+    my ( $self, $item ) = @_;
     push @{ $self->{items} }, $item;
 }
 
 sub filename {
     my ( $self, $value ) = @_;
     $self->{filename} = $value if $value;
-    return $self->{filename}
+    return $self->{filename};
 }
 
 sub write_to_file {
-    my ( $self) = @_;
-    spew($self->filename, $self->annotate);
+    my ($self) = @_;
+    spew( $self->filename, $self->annotate );
 }
 
 1;

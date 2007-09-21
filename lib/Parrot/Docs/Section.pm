@@ -71,7 +71,7 @@ C<@contents> is one or more sections, groups and/or items.
 =cut
 
 sub new {
-    my $self       = ref $_[0] ? ref shift: shift;
+    my $self       = ref $_[0] ? ref shift : shift;
     my $name       = shift;
     my $index_path = shift || 'index.html';
     my $text       = shift;
