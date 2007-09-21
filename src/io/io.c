@@ -781,6 +781,7 @@ PIO_flush(PARROT_INTERP, NOTNULL(PMC *pmc))
         return;
 
     ignored = PIO_flush_down(interp, l, io);
+    UNUSED(ignored);
 }
 
 /*
@@ -818,6 +819,7 @@ PIO_reads(PARROT_INTERP, NOTNULL(PMC *pmc), size_t len)
 
     res->bufused = len;
     ignored      = PIO_read_down(interp, l, io, &res);
+    UNUSED(ignored);
 
     return res;
 }

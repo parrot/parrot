@@ -761,6 +761,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
     n_objects = 0;
     ignored   = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
             (void*)&n_objects, sweep_cb);
+    UNUSED(ignored);
 
     if (interp->profile)
         Parrot_dod_profile_end(interp, PARROT_PROF_DOD_cb);

@@ -1136,6 +1136,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
         /* Now put unused PMCs and Buffers on the free list */
         ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
             (void*)&total_free, sweep_cb);
+        UNUSED(ignored);
 
         if (interp->profile)
             Parrot_dod_profile_end(interp, PARROT_PROF_DOD_cb);

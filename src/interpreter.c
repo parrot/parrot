@@ -566,6 +566,7 @@ prepare_for_run(PARROT_INTERP)
     switch (interp->run_core) {
         case PARROT_JIT_CORE:
             ignored = init_jit(interp, interp->code->base.data);
+            UNUSED(ignored);
             break;
         case PARROT_SWITCH_CORE:
         case PARROT_SWITCH_JIT_CORE:
@@ -652,6 +653,7 @@ runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
         Parrot_exec_run = 0;
         Interp_core_SET(interp, PARROT_JIT_CORE);
         ignored = runops_jit(interp, pc);
+        UNUSED(ignored);
         Interp_core_SET(interp, PARROT_EXEC_CORE);
     }
     else if (Parrot_exec_run == 1) {

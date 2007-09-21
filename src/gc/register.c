@@ -195,6 +195,7 @@ create_initial_context(PARROT_INTERP)
     /* For now create context with 32 regs each. Some src tests (and maybe
      * other extenders) assume the presence of these registers */
     ignored = Parrot_alloc_context(interp, num_regs);
+    UNUSED(ignored);
 }
 
 /*
