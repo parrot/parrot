@@ -64,7 +64,7 @@ foreach my $file (@files) {
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
 
     # look for function definitions
-    my @function_names = $buf =~ m/[^\s\W]\s(\w+)\(.*\)\s+{/g;
+    my @function_names = $buf =~ m/[^\s(|]\s(\w+)\(.*\)\s+{/g;
 
     for my $function_name (@function_names) {
 
@@ -83,11 +83,11 @@ foreach my $file (@files) {
                 print <<"END"
 /*
 
-=item C<$function_name>
+ =item C<$function_name>
 
 TODO: Not yet documented!!!
 
-=cut
+ =cut
 
 */
 
