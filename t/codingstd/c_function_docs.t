@@ -74,15 +74,29 @@ foreach my $file (@files) {
             next;
         }
 
-        # if analysing a single file or set of files, print out the function
-        # names found until the first failing function is found
-        print $function_name, "\n" if scalar @ARGV;
-
         # look for matching documentation.  This means the text
         # '=item C<\w+\s+function_name'
         if ( $buf !~ m/=item .*$function_name/ ) {
-            push @missing_docs, "$path\n";
-            last;
+            # if passed in a single file at the command line, print out
+            # boilerplate docs for undocumented functions
+            if ( scalar @ARGV ) {
+                print <<"END"
+/*
+
+=item C<$function_name>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+END
+            }
+            else {
+                push @missing_docs, "$path\n";
+                last;
+            }
         }
     }
 }
