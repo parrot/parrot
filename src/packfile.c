@@ -3385,7 +3385,12 @@ Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))
             wo_ext, path);
     filename = string_to_cstring(interp, path);
     if (file_type == PARROT_RUNTIME_FT_PBC) {
-        PackFile_append_pbc(interp, filename);
+        PackFile *pf;
+        pf = PackFile_append_pbc(interp, filename);
+        if (!pf) {
+            real_exception(interp, NULL, 1,
+                    "Unable to append PBC to the current directory");
+        }
     }
     else {
         STRING *err;
