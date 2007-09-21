@@ -81,11 +81,10 @@ sub parse_pmc {
 
         ((?:PARROT_\w+\s+)+)? #decorators
 
-        # no return type for PCCMETHOD
-        (
-          (PCC)?METHOD\s+)?   #method marker
-          (?(4) | (\w+\s*?\**) #return type
-        )
+        # attribute|vtable|method marker
+        (ATTR|VTABLE|(PCC)?METHOD\s+)?
+        # return type (no return type for PCCMETHOD)
+        (?(4) | (\w+\s*?\**))
         \s*
         (\w+)                 #method name
         \s*
@@ -141,7 +140,7 @@ sub parse_pmc {
         else {
 
             # Name-mangle NCI methods to avoid conflict with vtable methods.
-            if ($marker) {
+            if ( $marker and $marker !~ /ATTR|VTABLE/ ) {
                 $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
                 $method->name("nci_$methodname");
                 $method->symbol($methodname);
@@ -392,7 +391,7 @@ sub extract_balanced {
     my $unbalanced = 0;
 
     die "Unexpected whitespace, expecting" if $code =~ /^\s+/;
-    die "bad block open: ", substr( $code, 0, 10 ), "..." unless $code =~ /^\{/;
+    die "bad block open: ", substr( $code, 0, 40 ), "..." unless $code =~ /^\{/;
 
     # create a copy and remove strings and comments so that
     # unbalanced {} can be used in them in PMCs, being careful to

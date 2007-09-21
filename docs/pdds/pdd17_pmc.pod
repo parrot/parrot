@@ -240,15 +240,10 @@ compose roles, and in PMCs that will be subclassed by high-level classes
 =head3 Defining vtable functions
 
 Vtable functions are defined as C functions within the body of the C<pmclass>
-declaration.
+declaration, and are marked with C<VTABLE>.
 
-  STRING *get_string() {...}
-  void set_string_native(STRING *value) {...}
-
-{{ PROPOSAL: I'd like to require that all vtable functions be declared
-with "VTABLE" at the beginning of the declaration, similar to "METHOD"
-and "PCCMETHOD". At the very least it's self-documentation. It might
-also be a useful hook for future pmc2c preprocessing. }}
+  VTABLE STRING *get_string() {...}
+  VTABLE void set_string_native(STRING *value) {...}
 
 Within the body of vtable functions, several shortcuts are provided:
 
