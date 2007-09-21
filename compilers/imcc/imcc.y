@@ -502,8 +502,9 @@ adv_named_set(PARROT_INTERP, char *name) {
 static void
 do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 {
+    PMC *ignored;
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
-    Parrot_load_lib(interp, s, NULL);
+    ignored = Parrot_load_lib(interp, s, NULL);
     Parrot_register_HLL_lib(interp, s);
 }
 
@@ -869,7 +870,7 @@ pcc_sub_call:
      PCC_BEGIN '\n'
          {
             char name[128];
-            SymReg * r, *r1;
+            SymReg *r, *r1;
             Instruction *i;
 
             sprintf(name, "%cpcc_sub_call_%d",
@@ -981,10 +982,11 @@ pcc_result:
    | LOCAL { is_def=1; } type id_list_id
      {
          IdList* l = $4;
+         SymReg *ignored;
          if (l->unique_reg)
-                 mk_ident_ur(interp, l->id, $3);
+                 ignored = mk_ident_ur(interp, l->id, $3);
              else
-                 mk_ident(interp, l->id, $3);
+                 ignored = mk_ident(interp, l->id, $3);
          is_def=0;
          $$=0;
      }
@@ -1175,10 +1177,11 @@ labeled_inst:
          IdList* l = $4;
          while (l) {
              IdList* l1;
+             SymReg *ignored;
              if (l->unique_reg)
-                 mk_ident_ur(interp, l->id, $3);
+                 ignored = mk_ident_ur(interp, l->id, $3);
              else
-                 mk_ident(interp, l->id, $3);
+                 ignored = mk_ident(interp, l->id, $3);
              l1 = l;
              l = l->next;
              free(l1);
