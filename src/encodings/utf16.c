@@ -198,7 +198,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 #if PARROT_HAS_ICU
     if (in_place) {
         /* need intermediate memory */
-        p = mem_sys_allocate(src_len * sizeof (UChar));
+        p = (UChar *)mem_sys_allocate(src_len * sizeof (UChar));
     }
     else {
         Parrot_reallocate_string(interp, dest, sizeof (UChar) * src_len);
@@ -219,7 +219,7 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
              * have to resize - required len in UChars is in dest_len
              */
             if (in_place)
-                p = mem_sys_realloc(p, dest_len * sizeof (UChar));
+                p = (UChar *)mem_sys_realloc(p, dest_len * sizeof (UChar));
             else {
                 result->bufused = dest_len * sizeof (UChar);
                 Parrot_reallocate_string(interp, dest,
