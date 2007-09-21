@@ -42,14 +42,13 @@ our @potential_attributes = qw(
 
 our $verbose;
 
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get( 'verbose' );
+    $verbose = $conf->options->get('verbose');
     print $/ if $verbose;
 
-    for my $maybe_attr ( @potential_attributes ) {
+    for my $maybe_attr (@potential_attributes) {
         $self->try_attr( $conf, $maybe_attr );
     }
     return $self;
@@ -62,36 +61,37 @@ sub try_attr {
 
     $verbose and print "trying attribute '$attr'$/";
 
-    my $cc = $conf->option_or_data( 'cc' );
+    my $cc = $conf->option_or_data('cc');
     cc_gen('config/auto/attributes/test_c.in');
 
     my $disable_warnings = '';
+
     # work around msvc warning for unused variable
-    if ( defined $conf->option_or_data( 'msvcversion' ) ) {
+    if ( defined $conf->option_or_data('msvcversion') ) {
         $disable_warnings = '-wd4101';
     }
 
-    my $ccflags = $conf->data->get( 'ccflags' );
+    my $ccflags  = $conf->data->get('ccflags');
     my $tryflags = "$ccflags -D$attr $disable_warnings";
 
     my $command_line = Parrot::Configure::Step::_build_compile_command( $cc, $tryflags );
     $verbose and print "  ", $command_line, $/;
 
     # Don't use cc_build, because failure is expected.
-    my $exit_code = Parrot::Configure::Step::_run_command(
-        $command_line, $output_file, $output_file );
+    my $exit_code =
+        Parrot::Configure::Step::_run_command( $command_line, $output_file, $output_file );
     $verbose and print "  exit code: $exit_code$/";
 
     $conf->data->set( $attr => !$exit_code | 0 );
 
     return if $exit_code;
 
-    my $output = Parrot::BuildUtil::slurp_file( $output_file );
+    my $output = Parrot::BuildUtil::slurp_file($output_file);
     $verbose and print "  output: $output$/";
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );
-        my $ccflags = $conf->data->get( "ccflags" );
+        my $ccflags = $conf->data->get("ccflags");
         $verbose and print "  ccflags: $ccflags$/";
     }
 

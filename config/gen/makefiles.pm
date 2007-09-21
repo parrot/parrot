@@ -23,49 +23,47 @@ use Parrot::Configure::Step ':gen';
 our $description = 'Generating makefiles and other build files';
 our @args        = qw(target);
 
-
 my %makefiles = (
-    'Makefile' => {  SOURCE => 'config/gen/makefiles/root.in' },
+    'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
 
     'ext/Makefile' => {
-        SOURCE              => 'config/gen/makefiles/ext.in',
-        commentType         => '#',
-        replace_slashes     => 1,
-        conditioned_lines   => 1,
+        SOURCE            => 'config/gen/makefiles/ext.in',
+        commentType       => '#',
+        replace_slashes   => 1,
+        conditioned_lines => 1,
     },
     'ext/Parrot-Embed/Makefile.PL' => {
-        SOURCE              => 'config/gen/makefiles/parrot_embed.in',
-        replace_slashes     => 0,
-        conditioned_lines   => 1,
+        SOURCE            => 'config/gen/makefiles/parrot_embed.in',
+        replace_slashes   => 0,
+        conditioned_lines => 1,
     },
 
-     'compilers/past-pm/Makefile' => { SOURCE => 'config/gen/makefiles/past-pm.in' },
-     'compilers/pct/Makefile'     => { SOURCE => 'config/gen/makefiles/pct.in' },
-     'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },
-     'compilers/tge/Makefile'     => { SOURCE => 'config/gen/makefiles/tge.in' },
-     'compilers/bcg/Makefile'     => { SOURCE => 'config/gen/makefiles/bcg.in' },
-     'compilers/json/Makefile'    => { SOURCE => 'config/gen/makefiles/json.in' },
-     'compilers/pirc/Makefile'    => { SOURCE => 'config/gen/makefiles/pirc.in' },
-     'src/dynpmc/Makefile'        => { SOURCE => 'config/gen/makefiles/dynpmc.in' },
-     'src/dynoplibs/Makefile'     => { SOURCE => 'config/gen/makefiles/dynoplibs.in' },
-     'editor/Makefile'            => { SOURCE => 'config/gen/makefiles/editor.in' },
+    'compilers/past-pm/Makefile' => { SOURCE => 'config/gen/makefiles/past-pm.in' },
+    'compilers/pct/Makefile'     => { SOURCE => 'config/gen/makefiles/pct.in' },
+    'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },
+    'compilers/tge/Makefile'     => { SOURCE => 'config/gen/makefiles/tge.in' },
+    'compilers/bcg/Makefile'     => { SOURCE => 'config/gen/makefiles/bcg.in' },
+    'compilers/json/Makefile'    => { SOURCE => 'config/gen/makefiles/json.in' },
+    'compilers/pirc/Makefile'    => { SOURCE => 'config/gen/makefiles/pirc.in' },
+    'src/dynpmc/Makefile'        => { SOURCE => 'config/gen/makefiles/dynpmc.in' },
+    'src/dynoplibs/Makefile'     => { SOURCE => 'config/gen/makefiles/dynoplibs.in' },
+    'editor/Makefile'            => { SOURCE => 'config/gen/makefiles/editor.in' },
 
-     'tools/build/dynpmc.pl' => {
-        SOURCE              => 'config/gen/makefiles/dynpmc_pl.in',
-        comment_type        => '#',
-        replace_slashes     => 0,
-        conditioned_lines   => 1,
+    'tools/build/dynpmc.pl' => {
+        SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
+        comment_type      => '#',
+        replace_slashes   => 0,
+        conditioned_lines => 1,
     },
     'tools/build/dynoplibs.pl' => {
-        SOURCE              => 'config/gen/makefiles/dynoplibs_pl.in',
-        comment_type        => '#',
-        replace_slashes     => 0,
-        conditioned_lines   => 1,
+        SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
+        comment_type      => '#',
+        replace_slashes   => 0,
+        conditioned_lines => 1,
     },
-    'parrot.pc'                  => { SOURCE => 'config/gen/makefiles/parrot.pc.in' },
-    'docs/Makefile'              => { SOURCE => 'config/gen/makefiles/docs.in' },
+    'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot.pc.in' },
+    'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
 );
-
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -75,7 +73,6 @@ sub runstep {
 
     return $self;
 }
-
 
 sub cflags {
     my ( $self, $conf ) = @_;
@@ -103,12 +100,12 @@ EOF
     return;
 }
 
-
 sub makefiles {
     my ( $self, $conf ) = @_;
 
     my $targets = $conf->options->get('targets');
-    my @targets = defined $targets
+    my @targets =
+        defined $targets
         ? split ' ', $targets
         : keys %makefiles;
 

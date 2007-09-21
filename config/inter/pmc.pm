@@ -134,7 +134,7 @@ END
 
 E_NOTE
 
-        $TEMP_pmc_build .= <<END;
+    $TEMP_pmc_build .= <<END;
 PMC2C_FILES = \\
 \t\tlib/Parrot/Pmc2c/Pmc2cMain.pm \\
 \t\tlib/Parrot/Pmc2c/Parser.pm \\

@@ -10,10 +10,9 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $conf->data->set(
-        ccflags =>
-            qq{/Prefix=All/Obj=.obj/NoList/include="./include"/nowarn},
-        perl => "MCR $^X",
-        exe  => ".exe"
+        ccflags => qq{/Prefix=All/Obj=.obj/NoList/include="./include"/nowarn},
+        perl    => "MCR $^X",
+        exe     => ".exe"
     );
 
     {

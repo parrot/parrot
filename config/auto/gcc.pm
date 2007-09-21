@@ -90,7 +90,7 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-            0 => " -W"
+                  0 => " -W" 
                 . " -Wall"
                 . " -Wundef"
                 . " -Wmissing-declarations"
@@ -153,12 +153,13 @@ sub runstep {
             # us -Wpadded may prove interesting, or even noisy.
             # -Wunreachable-code might be useful in a non debugging version
             4.0 => "-fvisibility=hidden",
+
             # Needed to prevent C++ compatibility issues
             4.1 => " -Wc++-compat",
         );
 
         my @cage_opt_and_vers = (
-            0 => " -std=c89"
+                  0 => " -std=c89" 
                 . " -Wall"
                 . " -Wextra"
                 . " -Wundef"
@@ -185,6 +186,7 @@ sub runstep {
                 . " -Wno-div-by-zero"
                 . " -Wno-endif-labels"
                 . " -Werror-implicit-function-declaration"
+
                 #. " -Wfloat-equal"
                 . " -Wformat"
                 . " -Wformat=2"
@@ -237,9 +239,7 @@ sub runstep {
                 #."-Wmost (APPLE ONLY)"
 
                 #C-only Warning Options
-                . " -Wmissing-prototypes"
-                . " -Wold-style-definition"
-                . " -Wstrict-prototypes"
+                . " -Wmissing-prototypes" . " -Wold-style-definition" . " -Wstrict-prototypes"
 
                 #. " -Wtraditional "
                 . " -Wdeclaration-after-statement",
@@ -281,10 +281,10 @@ sub runstep {
             #    . "-Wdisabled-optimization -mno-accumulate-outgoing-args "
             #    . "-Wno-shadow -falign-functions=16 ",
             4.0 => ""
+
                 #. " -Wfatal-errors"
-                . " -Wmissing-field-initializers"
-                . " -Wmissing-include-dirs"
-                . " -Wvariadic-macros"
+                . " -Wmissing-field-initializers" . " -Wmissing-include-dirs" . " -Wvariadic-macros"
+
                 #. " -Wno-discard-qual"
                 . " -Wno-pointer-sign",
             4.1 => " -Wc++-compat",

@@ -33,7 +33,7 @@ our $verbose;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get( 'verbose' );
+    $verbose = $conf->options->get('verbose');
     print $/ if $verbose;
 
     my ( $cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex, $yacc );
@@ -108,7 +108,7 @@ END
     $debug = 'y' if $conf->options->get('debugging');
     $debug = prompt( "Do you want a debugging build of Parrot?", $debug )
         if $ask;
-    unless ($debug =~ /^[yn]$/i) {
+    unless ( $debug =~ /^[yn]$/i ) {
         return;
     }
 
@@ -124,13 +124,12 @@ END
     $ccwarn = integrate( $conf->data->get('ccwarn'), $conf->options->get('ccwarn') );
     $conf->data->set( ccwarn => $ccwarn );
 
-    test_compiler( $cc );
+    test_compiler($cc);
 
     return $self;
 }
 
-sub test_compiler
-{
+sub test_compiler {
     my $cc = shift;
 
     open( my $out_fh, '>', 'test.c' ) or die "Unable to open 'test.c': $@\n";

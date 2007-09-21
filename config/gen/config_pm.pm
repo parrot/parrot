@@ -25,10 +25,8 @@ use Parrot::Configure::Step qw(genfile);
 use Cwd qw(cwd);
 use File::Spec::Functions qw(catdir);
 
-
 $description = "Recording configuration data for later retrieval";
-@args = ();
-
+@args        = ();
 
 sub runstep {
     my ( $self, $conf ) = @_;

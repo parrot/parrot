@@ -29,9 +29,7 @@ sub runstep {
 
     my $revision = $Parrot::Revision::current;
 
-    $conf->data->set(
-        revision    => $revision,
-    );
+    $conf->data->set( revision => $revision, );
 
     if ( $revision >= 1 ) {
         $self->set_result("r$revision");

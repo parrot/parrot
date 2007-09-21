@@ -32,26 +32,23 @@ sub runstep {
 
     cc_gen("config/auto/backtrace/test_c.in");
 
-# If the program builds (e.g. the linker found backtrace* in libc) then we have
-# the glibc backtrace symbols.  If the program fails to build for whatever
-# reason we're just going to assume that the build failure is because these
-# symbols are missing.
+    # If the program builds (e.g. the linker found backtrace* in libc) then we have
+    # the glibc backtrace symbols.  If the program fails to build for whatever
+    # reason we're just going to assume that the build failure is because these
+    # symbols are missing.
     my $glibc_backtrace;
-    eval {
-        cc_build();
-    };
-    if (not $@) {
+    eval { cc_build(); };
+    if ( not $@ ) {
         $glibc_backtrace = 1;
     }
     cc_clean();
 
-    $conf->data->set(
-            glibc_backtrace => $glibc_backtrace,
-    );
+    $conf->data->set( glibc_backtrace => $glibc_backtrace, );
 
     if ($glibc_backtrace) {
         $self->set_result("yes");
-    } else {
+    }
+    else {
         $self->set_result("no");
     }
 

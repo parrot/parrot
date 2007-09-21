@@ -50,6 +50,7 @@ sub runstep {
         $ccflags =~ s/-W\d/-W4/;
 
         my $ccwarn = '';
+
         # disable certain very noisy warnings
         $ccwarn .= "-wd4127 ";    # conditional expression is constant
         $ccwarn .= "-wd4054 ";    # type cast from function ptr to data ptr

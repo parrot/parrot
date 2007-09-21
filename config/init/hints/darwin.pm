@@ -47,8 +47,8 @@ sub runstep {
         parrot_is_shared       => 0,
         libparrot_shared       => 'libparrot.$(SOVERSION)$(SHARE_EXT)',
         libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
-        rpath            => "-L",
-        libparrot_soname => "-install_name "
+        rpath                  => "-L",
+        libparrot_soname       => "-install_name "
             . $conf->data->get('lib_dir')
             . $conf->data->get('slash')
             . "libparrot"

@@ -35,7 +35,7 @@ sub runstep {
         pugs punie pynie regex scheme tap urm WMLScript Zcode
     } unless defined $languages;
 
-    foreach my $language (split ' ', $languages) {
+    foreach my $language ( split ' ', $languages ) {
         genfile( "languages/$language/config/makefiles/root.in" => "languages/$language/Makefile" );
     }
 

@@ -13,12 +13,12 @@ our $verbose;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $libs        = $conf->option_or_data('libs');
-    my $ccflags     = $conf->option_or_data('ccflags');
-    my $cc          = $conf->option_or_data('cc');
-    my $linkflags   = $conf->option_or_data('linkflags');
+    my $libs      = $conf->option_or_data('libs');
+    my $ccflags   = $conf->option_or_data('ccflags');
+    my $cc        = $conf->option_or_data('cc');
+    my $linkflags = $conf->option_or_data('linkflags');
 
-    $verbose = $conf->options->get( 'verbose' );
+    $verbose = $conf->options->get('verbose');
     print $/ if $verbose;
 
     # should find g++ in most cases
@@ -31,6 +31,7 @@ sub runstep {
     my $cc_shared      = $conf->data->get('cc_shared');
 
     if ( $cc =~ /icc/ ) {
+
         # Intel C++ compiler has the same name as its C compiler
         $link = $cc;
 

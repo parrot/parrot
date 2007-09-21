@@ -23,59 +23,62 @@ use Parrot::Configure::Step ':gen';
 use vars qw($description @args);
 
 $description = 'Generating runtime/parrot/include';
-@args = qw(verbose);
+@args        = qw(verbose);
 
 sub const_to_parrot {
-    map ".constant $_->[0]\t$_->[1]", @_
+    map ".constant $_->[0]\t$_->[1]", @_;
 }
 
 # TODO: refactor to generate 'use constant' statements, RT#42286
 sub const_to_perl {
-    map "$_->[0] => $_->[1],", @_
+    map "$_->[0] => $_->[1],", @_;
 }
 
 sub transform_name {
     my $action = shift;
-    map [$action->($_->[0]), $_->[1]], @_
+    map [ $action->( $_->[0] ), $_->[1] ], @_;
 }
 
 sub prepend_prefix {
     my $prefix = shift;
-    transform_name sub { $prefix . $_[0] }, @_
+    transform_name sub { $prefix . $_[0] }, @_;
 }
 
 sub perform_directive {
     my ($d) = @_;
-    my @defs = prepend_prefix $d->{prefix}, @{$d->{defs}};
-    if (my $subst = $d->{subst}) {
+    my @defs = prepend_prefix $d->{prefix}, @{ $d->{defs} };
+    if ( my $subst = $d->{subst} ) {
         @defs = transform_name sub { local $_ = shift; eval $subst; $_ }, @defs;
     }
-    @defs
+    @defs;
 }
 
 sub parse_file {
-    my ($file, $fh) = @_;
+    my ( $file, $fh ) = @_;
     my @d;
 
     my %values;
     my $last_val;
     my $cur;
-    while (my $line = <$fh>) {
-        if ($line =~ m!
+    while ( my $line = <$fh> ) {
+        if (
+            $line =~ m!
             &gen_from_(enum|def) \( ( [^)]* ) \)
             (?: \s+ prefix \( (\w+) \) )?
             (?: \s+ subst \( (s/.*?/.*?/[eig]?) \) )?
-            !x) {
+            !x
+            )
+        {
             $cur and die "Missing '&end_gen' in $file\n";
             $cur = {
-                type => $1,
-                files => [split ' ', $2],
+                type   => $1,
+                files  => [ split ' ', $2 ],
                 prefix => defined $3 ? $3 : '',
-                defined $4 ? (subst => $4) : (),
+                defined $4 ? ( subst => $4 ) : (),
             };
             $last_val = -1;
         }
-        elsif ($line =~ /&end_gen\b/) {
+        elsif ( $line =~ /&end_gen\b/ ) {
             $cur or die "Missing &gen_from_(enum|def) in $file\n";
             push @d, $cur;
             $cur = undef;
@@ -83,29 +86,31 @@ sub parse_file {
 
         $cur or next;
 
-        if ($cur->{type} eq 'def' && $line =~ /^\s*#define\s+(\w+)\s+(-?\w+|"[^"]*")/) {
-            push @{$cur->{defs}}, [$1, $2];
+        if ( $cur->{type} eq 'def' && $line =~ /^\s*#define\s+(\w+)\s+(-?\w+|"[^"]*")/ ) {
+            push @{ $cur->{defs} }, [ $1, $2 ];
         }
-        elsif ($cur->{type} eq 'enum') {
-            if ($line =~ /^\s*(\w+)\s*=\s*(-?\w+)/) {
-                my ($k, $v) = ($1, $2);
-                if (defined $values{$v}) {
+        elsif ( $cur->{type} eq 'enum' ) {
+            if ( $line =~ /^\s*(\w+)\s*=\s*(-?\w+)/ ) {
+                my ( $k, $v ) = ( $1, $2 );
+                if ( defined $values{$v} ) {
                     $v = $values{$v};
-                } elsif ($v =~ /^0/) {
+                }
+                elsif ( $v =~ /^0/ ) {
                     $v = oct $v;
                 }
                 $values{$k} = $last_val = $v;
-                push @{$cur->{defs}}, [$k, $v];
-            } elsif ($line =~ m!^\s*(\w+)\s*(?:,\s*)?(?:/\*|$)!) {
+                push @{ $cur->{defs} }, [ $k, $v ];
+            }
+            elsif ( $line =~ m!^\s*(\w+)\s*(?:,\s*)?(?:/\*|$)! ) {
                 my $k = $1;
                 my $v = $values{$k} = ++$last_val;
-                push @{$cur->{defs}}, [$k, $v];
+                push @{ $cur->{defs} }, [ $k, $v ];
             }
         }
     }
     $cur and die "Missing '&end_gen' in $file\n";
 
-    return @d
+    return @d;
 }
 
 my @files = qw(
@@ -131,7 +136,7 @@ my @files = qw(
 my $destdir = 'runtime/parrot/include';
 
 sub runstep {
-    my ($self, $conf) = @_;
+    my ( $self, $conf ) = @_;
 
     # need vtable.h now
     system( $^X, "tools/build/vtable_h.pl" );
@@ -143,11 +148,13 @@ sub runstep {
         close $fh;
         for my $d (@directives) {
             my @defs = perform_directive $d;
-            for my $target (@{$d->{files}}) {
+            for my $target ( @{ $d->{files} } ) {
                 $conf->options->get('verbose') and print "$target ";
-                my $gen = join "\n", ($target =~ /\.pl$/ ? \&const_to_perl : \&const_to_parrot)->(@defs);
+                my $gen = join "\n",
+                    ( $target =~ /\.pl$/ ? \&const_to_perl : \&const_to_parrot )->(@defs);
                 my $target_tmp = "$target.tmp";
                 open my $out, '>', $target_tmp or die "Can't open $target_tmp: $!\n";
+
                 # TODO: refactor to include package declarations and Export
                 # declarations for generated Perl constant modules, RT#42286
                 print $out <<"EOF";
@@ -162,14 +169,14 @@ $gen
 EOF
                 close $out or die "Can't write $target_tmp: $!\n";
                 $target =~ m[/] or $target = "$destdir/$target";
-                move_if_diff($target_tmp, $target);
+                move_if_diff( $target_tmp, $target );
                 push @generated, $target;
             }
         }
     }
-    $conf->data->set(TEMP_gen_pasm_includes => join("\t\\\n\t", @generated));
+    $conf->data->set( TEMP_gen_pasm_includes => join( "\t\\\n\t", @generated ) );
 
-    return $self
+    return $self;
 }
 
 1;

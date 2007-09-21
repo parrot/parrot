@@ -42,7 +42,7 @@ sub runstep {
     my $archname = $conf->data->get('archname');
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
-    if ( $verbose ) {
+    if ($verbose) {
         print "determining operating system and cpu architecture$/";
         print "archname: <$archname>$/";
     }
@@ -65,10 +65,11 @@ sub runstep {
             $cpuarch = 'ppc';
         }
     }
+
     # cpuarch and osname are reversed in archname on windows
     elsif ( $cpuarch =~ /MSWin32/ ) {
         $cpuarch = ( $osname =~ /x64/ ) ? 'amd64' : 'i386';
-        $osname  = 'MSWin32';
+        $osname = 'MSWin32';
     }
     elsif ( $osname =~ /cygwin/i || $cpuarch =~ /cygwin/i ) {
         $cpuarch = 'i386';
@@ -99,6 +100,7 @@ sub runstep {
         if $verbose;
 
     if ( -e "$jitbase/$cpuarch/core.jit" ) {
+
         # Just because there is a "$jitbase/$cpuarch/core.jit" file,
         # doesn't mean the JIT is working on that platform.
         # So build JIT per default only on platforms where JIT in known
