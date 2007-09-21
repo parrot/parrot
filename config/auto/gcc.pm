@@ -90,7 +90,7 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-                  0 => " -W" 
+                  0 => " -W"
                 . " -Wall"
                 . " -Wundef"
                 . " -Wmissing-declarations"
@@ -159,7 +159,7 @@ sub runstep {
         );
 
         my @cage_opt_and_vers = (
-                  0 => " -std=c89" 
+                  0 => " -std=c89"
                 . " -Wall"
                 . " -Wextra"
                 . " -Wundef"
