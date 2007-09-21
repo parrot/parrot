@@ -38,19 +38,18 @@ use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
 # a list of languages where we want to test line length
-my %lang_is_checked = map { $_ => 1 }
-                          qw{ APL
-                              WMLScript
-                              amber
-                              cardinal
-                              dotnet
-                              lua
-                              perl6
-                              pugs
-                              python
-                              plumhead
-                              tcl
-                            };
+my %lang_is_checked = map { $_ => 1 } qw{ APL
+    WMLScript
+    amber
+    cardinal
+    dotnet
+    lua
+    perl6
+    pugs
+    python
+    plumhead
+    tcl
+};
 
 # RT#44437 this should really be using src_dir instead of build_dir but it
 # doesn't exist (yet)
@@ -71,16 +70,17 @@ my @files = @ARGV ? @ARGV : source_files();
 
 # check all the files and keep a list of those failing
 my @lines_too_long;
-foreach ( @files ) {
+foreach (@files) {
     my $lineinfo = info_for_first_long_line($_);
     next unless $lineinfo;
     push @lines_too_long => $lineinfo;
 }
 
 ## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
-ok( ! @lines_too_long, 'Line length ok' )
+ok( !@lines_too_long, 'Line length ok' )
     or diag( "Lines longer than coding standard limit ($num_col_limit columns) in "
-        . scalar @lines_too_long . " files:\n"
+        . scalar @lines_too_long
+        . " files:\n"
         . join( "\n", @lines_too_long ) );
 
 sub info_for_first_long_line {
@@ -89,7 +89,7 @@ sub info_for_first_long_line {
     open my $fh, '<', $file or die "Can't open file '$file'";
     while ( my $line = <$fh> ) {
         chomp $line;
-        $line =~ s/\t/' ' x (1 + length($`) % 8)/eg; # expand \t
+        $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;    # expand \t
         return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $num_col_limit;
     }
@@ -108,7 +108,7 @@ sub source_files {
         next if exists $skip_files{$file};
 
         # skip languages files, unless specifically included above
-        next if $file =~ m{^languages/([^/]+)/} && ! $lang_is_checked{$1};
+        next if $file =~ m{^languages/([^/]+)/} && !$lang_is_checked{$1};
 
         push @files => $full_path
             if $file =~ m{\.(c|pmc|ops|pod)$};

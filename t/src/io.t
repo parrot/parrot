@@ -27,8 +27,8 @@ Tests the IO subsystem.
 $/ = undef;    # slurp mode
 
 sub setup {
-    my $name    = @_ ? shift: "temp.file";
-    my $content = @_ ? shift: "This is a test\n";
+    my $name    = @_ ? shift : "temp.file";
+    my $content = @_ ? shift : "This is a test\n";
 
     open( my $FILE, '>', "$name" ) or die "Failed to create $name";
     binmode $FILE;
@@ -39,7 +39,7 @@ sub setup {
 }
 
 sub teardown {
-    my $name = @_ ? shift: "temp.file";
+    my $name = @_ ? shift : "temp.file";
 
     my $delete_counter;
     unlink($name) while ( -e $name and 3 > $delete_counter++ and sleep 1 );

@@ -14,40 +14,31 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-my $args = process_options( {
-    argv            => [ q{--miniparrot} ],
-    mode            => q{configure},
-} );
+my $args = process_options(
+    {
+        argv => [q{--miniparrot}],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new;
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-is($conf->data->get('miniparrot'), undef,
-    "miniparrot is not yet enabled");
-is($conf->data->get('jitarchname'), undef,
-    "jitarchname undef as expected");
-is($conf->data->get('jitcpuarch'), undef,
-    "jitcpuarch undef as expected");
-is($conf->data->get('jitcpu'), undef,
-    "jitcpu undef as expected");
-is($conf->data->get('jitosname'), undef,
-    "jitosname undef as expected");
+is( $conf->data->get('miniparrot'),  undef, "miniparrot is not yet enabled" );
+is( $conf->data->get('jitarchname'), undef, "jitarchname undef as expected" );
+is( $conf->data->get('jitcpuarch'),  undef, "jitcpuarch undef as expected" );
+is( $conf->data->get('jitcpu'),      undef, "jitcpu undef as expected" );
+is( $conf->data->get('jitosname'),   undef, "jitosname undef as expected" );
 
-test_step_thru_runstep($conf, q{init::miniparrot}, $args);
+test_step_thru_runstep( $conf, q{init::miniparrot}, $args );
 
-ok($conf->data->get('miniparrot'),
-    "miniparrot is enabled");
-is($conf->data->get('jitarchname'), 'nojit',
-    "jitarchname as expected");
-is($conf->data->get('jitcpuarch'), 'i386',
-    "jitcpuarch as expected");
-is($conf->data->get('jitcpu'), 'I386',
-    "jitcpu as expected");
-is($conf->data->get('jitosname'), 'nojit',
-    "jitosname as expected");
-ok(! $conf->data->get('jitcapable'),
-    "jitcapable as expected");
+ok( $conf->data->get('miniparrot'), "miniparrot is enabled" );
+is( $conf->data->get('jitarchname'), 'nojit', "jitarchname as expected" );
+is( $conf->data->get('jitcpuarch'),  'i386',  "jitcpuarch as expected" );
+is( $conf->data->get('jitcpu'),      'I386',  "jitcpu as expected" );
+is( $conf->data->get('jitosname'),   'nojit', "jitosname as expected" );
+ok( !$conf->data->get('jitcapable'), "jitcapable as expected" );
 
 pass("Completed all tests in $0");
 

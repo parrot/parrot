@@ -12,19 +12,17 @@ use Cwd;
 use File::Copy;
 use File::Temp qw( tempdir );
 use Tie::File;
-use lib ( qw| lib | );
+use lib (qw| lib |);
 use_ok('Parrot::Manifest');
 
 my $script = $0;
-my $mani = Parrot::Manifest->new( {
-    script      => $script,
-} );
-isa_ok($mani, 'Parrot::Manifest');
+my $mani = Parrot::Manifest->new( { script => $script, } );
+isa_ok( $mani, 'Parrot::Manifest' );
 
-my $cwd = cwd();
-my $sk = q{MANIFEST.SKIP};
+my $cwd       = cwd();
+my $sk        = q{MANIFEST.SKIP};
 my $print_str = $mani->prepare_manifest_skip();
-ok($print_str, "prepare_manifest_skip() returned");
+ok( $print_str, "prepare_manifest_skip() returned" );
 
 # 1:  Copy the real MANIFEST.SKIP unaltered to the tempdir.
 # Assuming the real MANIFEST.SKIP was correct going in to this test, the
@@ -32,15 +30,15 @@ ok($print_str, "prepare_manifest_skip() returned");
 # regenerate it.
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or
-        croak "Unable to change to temporary directory for testing";
-    copy(qq{$cwd/$sk}, qq{$tdir/$sk})
+    chdir $tdir
+        or croak "Unable to change to temporary directory for testing";
+    copy( qq{$cwd/$sk}, qq{$tdir/$sk} )
         or croak "Unable to copy $sk to tempdir";
-    ok(-f $sk, "$sk found in tempdir");
+    ok( -f $sk, "$sk found in tempdir" );
     my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
-    ok(! $need_for_skip, "No need to regenerate $sk");
-    chdir $cwd or
-        croak "Unable to change back from temporary directory after testing";
+    ok( !$need_for_skip, "No need to regenerate $sk" );
+    chdir $cwd
+        or croak "Unable to change back from temporary directory after testing";
 }
 
 # 2:  Copy the real MANIFEST.SKIP to the tempdir but mangle it there.
@@ -48,32 +46,29 @@ ok($print_str, "prepare_manifest_skip() returned");
 # regeneration of MANIFEST.SKIP.
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or
-        croak "Unable to change to temporary directory for testing";
-    copy(qq{$cwd/$sk}, qq{$tdir/$sk})
+    chdir $tdir
+        or croak "Unable to change to temporary directory for testing";
+    copy( qq{$cwd/$sk}, qq{$tdir/$sk} )
         or croak "Unable to copy $sk to tempdir";
-    ok(-f $sk, "$sk found in tempdir");
+    ok( -f $sk, "$sk found in tempdir" );
     my @lines;
     tie @lines, 'Tie::File', qq{$tdir/$sk}
         or croak "Unable to tie to $sk in tempdir";
-    for (1..10) {
-        if ( defined($lines[-1]) ) {
+    for ( 1 .. 10 ) {
+        if ( defined( $lines[-1] ) ) {
             pop @lines;
         }
     }
     untie @lines or croak "Unable to untie from $sk";
     my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
-    ok($need_for_skip, "Need to regenerate $sk");
-    ok( $mani->print_manifest_skip($print_str),
-        "print_manifest_skip() returned true");
-    ok(  -f $sk,
-        "$sk has been created in tempdir");
-    chdir $cwd or
-        croak "Unable to change back from temporary directory after testing";
+    ok( $need_for_skip,                         "Need to regenerate $sk" );
+    ok( $mani->print_manifest_skip($print_str), "print_manifest_skip() returned true" );
+    ok( -f $sk,                                 "$sk has been created in tempdir" );
+    chdir $cwd
+        or croak "Unable to change back from temporary directory after testing";
 }
 
 pass("Completed all tests in $0");
-
 
 ################### DOCUMENTATION ###################
 

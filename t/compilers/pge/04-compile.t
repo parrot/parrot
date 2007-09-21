@@ -23,7 +23,7 @@ Tests various arguments to the compiler.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'basic compile, no name/grammar');
+pir_output_is( <<'CODE', <<'OUTPUT', 'basic compile, no name/grammar' );
 .namespace
 
 .sub main :main
@@ -39,7 +39,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'compile into current namespace');
+pir_output_is( <<'CODE', <<'OUTPUT', 'compile into current namespace' );
 .namespace
 
 .sub main :main
@@ -55,7 +55,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar');
+pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar' );
 .sub main :main
     load_bytecode 'PGE.pbc'
 
@@ -70,7 +70,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar, 2x');
+pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar, 2x' );
 .sub main :main
     load_bytecode 'PGE.pbc'
 

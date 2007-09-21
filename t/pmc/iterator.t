@@ -1393,7 +1393,8 @@ OUTPUT
 
 TODO: {
     local $TODO = "cloned iterator doesn't copy the array to which it 'points'";
-pir_output_is( <<'CODE', <<'OUTPUT', "cloned iterator doesn't copy the array to which it 'points'" );
+    pir_output_is(
+        <<'CODE', <<'OUTPUT', "cloned iterator doesn't copy the array to which it 'points'" );
 .sub main :main
     .local pmc ar, i1, i2
     .local Integer temp
@@ -1423,6 +1424,7 @@ CODE
 ok
 OUTPUT
 }
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

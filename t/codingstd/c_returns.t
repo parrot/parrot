@@ -66,13 +66,13 @@ foreach my $file (@files) {
 
     # look for instances of return(
     push @paren_return => "$path\n"
-        if ($buf =~ m/[^_.]return\(/);
+        if ( $buf =~ m/[^_.]return\(/ );
 }
 
 ok( !scalar(@paren_return), 'Correctly formed return statement' )
-    or diag( "Possible use of C<return(foo);> rather than C<return foo;> in " .
-        scalar @paren_return . " files:\n@paren_return" );
-
+    or diag( "Possible use of C<return(foo);> rather than C<return foo;> in "
+        . scalar @paren_return
+        . " files:\n@paren_return" );
 
 # Local Variables:
 #   mode: cperl

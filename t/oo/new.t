@@ -22,7 +22,7 @@ Tests OO features related to instantiating new objects.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     $S1 = typeof $P1
@@ -53,7 +53,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object');
+pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object' );
 .sub main :main
     $P1 = new "Class"
     $S1 = typeof $P1
@@ -86,7 +86,7 @@ Class
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create named class object');
+pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
 .sub main :main
     $P1 = new "Class"
     $P1.name("Foo")
@@ -118,7 +118,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     $P2 = $P1.'new'()
@@ -140,7 +140,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     $P2 = new 'Foo'
@@ -162,7 +162,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     $S1 = 'Foo'
@@ -185,7 +185,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     $P3 = new 'String'
@@ -209,7 +209,7 @@ parrot;Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name' );
 .sub main :main
     $P1 = newpdd15class ['Foo';'Bar']
     $S1 = typeof $P1
@@ -240,7 +240,8 @@ parrot;Foo;Bar
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key PMC name', todo=>'create non-constant key');
+pir_output_is(
+    <<'CODE', <<'OUT', 'instantiate from key PMC name', todo => 'create non-constant key' );
 .sub main :main
     $P1 = newpdd15class ['Foo';'Bar']
     $S1 = typeof $P1
@@ -274,7 +275,7 @@ parrot;Foo;Bar
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     addattribute $P1, 'data'
@@ -306,7 +307,7 @@ parrot;Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     addattribute $P1, 'data'
@@ -338,7 +339,7 @@ parrot;Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     addattribute $P1, 'data'
@@ -371,7 +372,7 @@ parrot;Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init' );
 .sub main :main
     $P1 = newpdd15class "Foo"
     addattribute $P1, 'data'
@@ -405,7 +406,7 @@ parrot;Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo=>'init keyed');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo => 'init keyed' );
 .sub main :main
     $P1 = newpdd15class ['Foo';'Bar']
     addattribute $P1, 'data'
@@ -437,7 +438,6 @@ parrot;Foo;Bar
 1
 data for Foo;Bar
 OUT
-
 
 # Local Variables:
 #   mode: cperl

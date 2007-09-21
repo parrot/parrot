@@ -25,7 +25,7 @@ tree of the specified type.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars');
+pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' );
 
 .sub _main :main
     load_bytecode 'TGE.pbc'

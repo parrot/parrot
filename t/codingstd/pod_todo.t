@@ -95,7 +95,7 @@ foreach my $file (@files) {
 }
 
 my $bad_files = join( "\n", @failed );
-is( $bad_files, q{}, 'No todo items found' );  # only ok if everything passed
+is( $bad_files, q{}, 'No todo items found' );    # only ok if everything passed
 
 # Pulled from Test::Pod
 sub no_pod_todo {

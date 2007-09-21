@@ -58,8 +58,8 @@ foreach my $file (@files) {
 
 ## L<PDD07/Code Formatting/"Indentation must consist only of spaces">
 ok( !scalar(@tabs), "tabs in leading whitespace" )
-    or diag(
-    "Found tab in leading whitespace " . scalar(@tabs) . " instances.  Lines found:\n@tabs" );
+    or
+    diag( "Found tab in leading whitespace " . scalar(@tabs) . " instances.  Lines found:\n@tabs" );
 
 # Local Variables:
 #   mode: cperl

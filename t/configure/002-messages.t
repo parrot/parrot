@@ -48,8 +48,7 @@ my $make_version   = 'gnu make';
     $msg = $tie->READLINE;
 
     # Following test is definitive.
-    like( $msg, qr/$make_version/,
-        "Message included make version supplied as argument" );
+    like( $msg, qr/$make_version/, "Message included make version supplied as argument" );
 
     undef $tie;
 }

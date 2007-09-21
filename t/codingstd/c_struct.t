@@ -30,10 +30,13 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST  = Parrot::Distribution->new;
-my @files = @ARGV
-    ? $^O eq 'MSWin32' ? <@ARGV> : @ARGV
-    :   $DIST->get_c_language_files();
+my $DIST = Parrot::Distribution->new;
+my @files =
+      @ARGV
+    ? $^O eq 'MSWin32'
+        ? <@ARGV>
+        : @ARGV
+    : $DIST->get_c_language_files();
 my @struct;
 
 for my $file (@files) {
@@ -45,6 +48,7 @@ for my $file (@files) {
     my $count   = 0;
     my $message = qq<  $path:>;
     while (<$fh>) {
+
         # we're only interested in lines with structs
         next unless /\btypedef\s+struct\s+{/;
 

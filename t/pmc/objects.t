@@ -2259,7 +2259,6 @@ Hello world
 Hello world
 OUTPUT
 
-
 pir_output_is( <<'CODE', <<'OUTPUT', "super __init called twice (#39081)" );
 .sub main :main
     $P0 = newclass 'Foo'

@@ -72,7 +72,7 @@ for my $c_args ( 0 .. 1 ) {
                 my $testhead = create_test_header( $c_args, $c_results, $c_params, $c_returns, );
 
                 ## execute tests
-                if ($expbody eq "ok\n") {
+                if ( $expbody eq "ok\n" ) {
                     pir_output_like( $testbody, "/$expbody/", $testhead );
                 }
                 else {
@@ -168,7 +168,8 @@ sub create_func {
     my ( $c_args, $c_params, $c_returns, $c_results ) = @_;
 
     $self->{FUNC} =
-          'args' . $c_args
+          'args' 
+        . $c_args
         . '_results'
         . $c_results
         . '__params'

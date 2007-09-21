@@ -37,7 +37,7 @@ CODE
 \d/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main
     print "ok 1\n"
     a()
@@ -78,7 +78,7 @@ called from Sub 'a' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - method not found" );
 .namespace ["Test1"]
 .sub main
     print "ok 1\n"
@@ -101,7 +101,7 @@ current instr.: 'parrot;Test1;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test1;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - fetch of unknown lexical" );
 .namespace ["Test2"]
 .sub main
     print "ok 1\n"
@@ -137,7 +137,7 @@ called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)
 \.\.\. call repeated 1000 times/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2" );
 .sub main
     rec(91)
 .end
@@ -159,7 +159,7 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269" );
 .sub main :main
     setfile "xyz.pir"
     setline 123
@@ -171,7 +171,7 @@ CODE
 /\(xyz.foo:123\)/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269" );
 .sub main :main
     setfile "foo.p6"
     setline 123
@@ -188,7 +188,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT
 CODE
 /\(foo.p6:124\)/
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

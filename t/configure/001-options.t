@@ -17,11 +17,12 @@ use Carp;
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
-    |
+        |
 );
-use_ok("Parrot::Configure::Options::Conf", qw|
+use_ok(
+    "Parrot::Configure::Options::Conf", qw|
         @valid_options
-    |
+        |
 );
 use_ok("Parrot::IO::Capture::Mini");
 
@@ -38,8 +39,8 @@ ok( defined $valid{help},        "help option found" );
 ok( defined $valid{version},     "version option found" );
 ok( defined $valid{verbose},     "verbose option found" );
 ok( !defined $valid{$badoption}, "invalid option not found" );
-ok( !defined $valid{step}, "invalid 'step' option not found" );
-ok( !defined $valid{target}, "invalid 'target' option not found" );
+ok( !defined $valid{step},       "invalid 'step' option not found" );
+ok( !defined $valid{target},     "invalid 'target' option not found" );
 
 open my $FH, '<', "$main::topdir/Configure.pl"
     or croak "Unable to open handle to $main::topdir/Configure.pl:  $!";
@@ -73,8 +74,8 @@ ok( !$invalid, "No invalid methods described in POD" );
 my $args;
 $args = process_options(
     {
-        argv           => [],
-        mode            => q{configure},
+        argv => [],
+        mode => q{configure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -96,7 +97,8 @@ like(
 
 $args = process_options(
     {
-        mode => q{configure},,
+        mode => q{configure},
+        ,
     }
 );
 ok( defined $args,
@@ -115,14 +117,7 @@ $args = process_options(
 );
 ok( defined $args, "process_options() returned successfully when options were specified" );
 
-eval {
-    $args = process_options(
-        {
-            argv    => [qq<--${badoption}=72>],
-            mode    => q{configure},
-        }
-    );
-};
+eval { $args = process_options( { argv => [qq<--${badoption}=72>], mode => q{configure}, } ); };
 like(
     $@,
     qr/^Invalid option.*$badoption/,
@@ -130,14 +125,7 @@ like(
 );
 
 $badoption = q{step};
-eval {
-    $args = process_options(
-        {
-            argv    => [qq<--${badoption}>],
-            mode    => q{configure},
-        }
-    );
-};
+eval { $args = process_options( { argv => [qq<--${badoption}>], mode => q{configure}, } ); };
 like(
     $@,
     qr/^Invalid option.*$badoption/,
@@ -145,14 +133,7 @@ like(
 );
 
 $badoption = q{target};
-eval {
-    $args = process_options(
-        {
-            argv    => [qq<--${badoption}>],
-            mode    => q{configure},
-        }
-    );
-};
+eval { $args = process_options( { argv => [qq<--${badoption}>], mode => q{configure}, } ); };
 like(
     $@,
     qr/^Invalid option.*$badoption/,
@@ -165,12 +146,11 @@ like(
         or croak "Unable to tie";
     $args = process_options(
         {
-            argv    => [q{--help}],
-            mode    => q{configure},
+            argv => [q{--help}],
+            mode => q{configure},
         }
     );
-    ok( !defined $args,
-        "process_options() returned undef after 'help' option" );
+    ok( !defined $args, "process_options() returned undef after 'help' option" );
     $msg = $tie->READLINE;
     like( $msg, qr/--help/i, "got correct message after 'help' option" );
 }
@@ -181,14 +161,14 @@ like(
         or croak "Unable to tie";
     $args = process_options(
         {
-            argv    => [q{--}],
-            mode    => q{configure},
+            argv => [q{--}],
+            mode => q{configure},
         }
     );
     ok( !defined $args,
         "process_options() returned undef after '--' option triggered help message" );
     $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got help message as expected");
+    like( $msg, qr/--help/i, "got help message as expected" );
 }
 
 {
@@ -197,40 +177,37 @@ like(
         or croak "Unable to tie";
     $args = process_options(
         {
-            argv    => [q{--version}],
-            mode    => q{configure},
+            argv => [q{--version}],
+            mode => q{configure},
         }
     );
-    ok( !defined $args,
-        "process_options() returned undef after 'version' option" );
+    ok( !defined $args, "process_options() returned undef after 'version' option" );
     $msg = $tie->READLINE;
     like( $msg, qr/Parrot Version/i, "got correct message after 'version' option" );
 }
 
 $args = process_options(
     {
-        argv        => [ q{--lex}, ],
-        mode        => q{configure},
+        argv => [ q{--lex}, ],
+        mode => q{configure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully after 'lex' option" );
+ok( defined $args, "process_options() returned successfully after 'lex' option" );
 ok( $args->{maintainer}, "'maintainer' attribute is true after 'lex' option" );
 
 $args = process_options(
     {
-        argv        => [ q{--yacc}, ],
-        mode        => q{configure},
+        argv => [ q{--yacc}, ],
+        mode => q{configure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully after 'yacc' option" );
+ok( defined $args, "process_options() returned successfully after 'yacc' option" );
 ok( $args->{maintainer}, "'maintainer' attribute is true after 'yacc' option" );
 
 $args = process_options(
     {
-        argv        => [q{--debugging=1}],
-        mode        => q{configure},
+        argv => [q{--debugging=1}],
+        mode => q{configure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -238,8 +215,8 @@ ok( $args->{debugging}, "debugging turned on explicitly" );
 
 $args = process_options(
     {
-        argv        => [q{--debugging=0}],
-        mode        => q{configure},
+        argv => [q{--debugging=0}],
+        mode => q{configure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );

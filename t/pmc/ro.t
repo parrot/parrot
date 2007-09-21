@@ -202,7 +202,8 @@ CODE
     }
 }
 
-pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
+pir_error_output_unlike(
+    $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
 .sub main :main
     .local pmc foo
     .local pmc three

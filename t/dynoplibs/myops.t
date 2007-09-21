@@ -63,7 +63,7 @@ OUTPUT
 {
     my @todo;
 
-    if ($ENV{TEST_PROG_ARGS}) {
+    if ( $ENV{TEST_PROG_ARGS} ) {
         @todo = ( todo => 'broken with -j' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
     }
 
@@ -219,7 +219,6 @@ CODE
 0
 65535
 OUTPUT
-
 
 pasm_output_is( <<'CODE', <<OUTPUT, "conv_i2_i" );
 

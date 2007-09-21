@@ -22,7 +22,8 @@ sub READLINE {
     my $self = shift;
     if (@$self) {
         shift @$self;
-    } else {
+    }
+    else {
         croak "List of prompt responses has been exhausted: $!";
     }
 }

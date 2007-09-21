@@ -34,7 +34,7 @@ Note: These tests would benefit from judicial application of Iterators.
 =cut
 
 my $cmd = -d '.svn' ? 'svn' : 'svk';
-my @git_svn_metadata; # set in BEGIN block
+my @git_svn_metadata;    # set in BEGIN block
 
 # how many files to check at a time. May have to lower this when we run
 # this on systems with finicky command lines.
@@ -224,11 +224,12 @@ COPYRIGHT: {
 BEGIN {
     if ( -d '.git' ) {
         my $git_svn_metadata = catfile(qw/.git svn git-svn unhandled.log/);
-        if ( -e  $git_svn_metadata ) {
+        if ( -e $git_svn_metadata ) {
             diag 'Checking git svn metadata';
             plan tests => 4;
+
             # Read the file once and store lines
-            if (! open my $git_svn_metadata_fh, '<', $git_svn_metadata ) {
+            if ( !open my $git_svn_metadata_fh, '<', $git_svn_metadata ) {
                 diag "trouble opening metadata file: $git_svn_metadata";
             }
             else {
@@ -240,7 +241,7 @@ BEGIN {
             plan skip_all => q{git svn file metadata not retained};
         }
     }
-    elsif ( !($Parrot::Revision::current or `svk ls .`) ) {
+    elsif ( !( $Parrot::Revision::current or `svk ls .` ) ) {
         plan skip_all => 'not a working copy';
     }
     else { plan tests => 4 }
@@ -286,13 +287,13 @@ sub get_attribute {
     map { $results{$_} = undef } @list;
 
     if ( -d '.git' ) {
-        return git_svn_metadata($attribute, \%results);
+        return git_svn_metadata( $attribute, \%results );
     }
 
     # choose a chunk size such that we don't end calling svn on
     # a single file (which causes the output format to change).
     my $csize = $chunk_size;
-    $csize-- while ( ($csize > 1) && (@list % $csize == 1) );
+    $csize-- while ( ( $csize > 1 ) && ( @list % $csize == 1 ) );
 
     at_a_time(
         $csize,
@@ -310,11 +311,9 @@ sub get_attribute {
                     my @directories = splitdir $directories;
 
                     # put it back together as a unix path (to match MANIFEST)
-                    $full_path = File::Spec::Unix->catpath(
-                        $volume,
-                        File::Spec::Unix->catdir(@directories),
-                        $file
-                    );
+                    $full_path =
+                        File::Spec::Unix->catpath( $volume, File::Spec::Unix->catdir(@directories),
+                        $file );
 
                     # store the attribute into the results hash
                     $results{$full_path} = $attribute;
@@ -368,11 +367,11 @@ sub git_svn_metadata {
     my $attribute   = shift;
     my $results_ref = shift;
 
-    GIT_SVN:
+GIT_SVN:
     for my $line (@git_svn_metadata) {
 
         # Determine file name and attribute value for the files we want
-        my ($filename, $value) = $line =~ m/prop: (\S+) $attribute (\S+)/;
+        my ( $filename, $value ) = $line =~ m/prop: (\S+) $attribute (\S+)/;
         next GIT_SVN unless $filename && exists $results_ref->{$filename};
 
         # Unescape hex values that are in git-svn log and remove any newlines

@@ -33,20 +33,21 @@ my ( $list_policies_flag, $list_files_flag, @input_policies );
 my $policy_group = 'default';
 
 GetOptions(
-    'list'           => \$list_policies_flag,
-    'listfiles'      => \$list_files_flag,
-    'policy=s'       => \@input_policies,
-    'group=s'        => \$policy_group,  # all, default, extra
+    'list'      => \$list_policies_flag,
+    'listfiles' => \$list_files_flag,
+    'policy=s'  => \@input_policies,
+    'group=s'   => \$policy_group,         # all, default, extra
 );
 
 # if we we're given a policy (or policies), set it to the policies hash
 # this still doesn't implement passing options to policies though...
 # i.e. need to be able to handle --policy=foo=>{'bar'=>baz}
-if ( @input_policies ) {
-    foreach my $input_policy ( @input_policies ) {
+if (@input_policies) {
+    foreach my $input_policy (@input_policies) {
+
         # now split on commas if that's been used as well
-        my @sub_policies = split(/,/, $input_policy);
-        foreach my $sub_policy ( @sub_policies ) {
+        my @sub_policies = split( /,/, $input_policy );
+        foreach my $sub_policy (@sub_policies) {
             $policies{$sub_policy} = 1;
         }
     }
@@ -103,14 +104,26 @@ if ($list_files_flag) {
 
 # Add in the few cases we should care about.
 # For a list of available policies, perldoc Perl::Critic
-if ( !keys %policies ) {
+if ( keys %policies ) {
+
+    # if the policy is passed in on the command line, and it's one of the
+    # ones where we require certain config arguments, then set them to the
+    # ones we want here.
+    if ( grep /CodeLayout::RequireTidyCode/, @input_policies ) {
+        $policies{'CodeLayout::RequireTidyCode'} = { perltidyrc => $perl_tidy_conf };
+    }
+    elsif ( grep /CodeLayout::ProhibitHardTabs/, @input_policies ) {
+        $policies{'CodeLayout::ProhibitHardTabs'} = { allow_leading_tabs => 0 };
+    }
+}
+else {
+
+    # otherwise, just run perlcritic.t normally
     my %default_policies = (
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
-        'CodeLayout::ProhibitHardTabs'                    =>
-            { allow_leading_tabs => 0 },
+        'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::RequireTidyCode'                     =>
-            { perltidyrc => $perl_tidy_conf },
+        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
         'CodeLayout::UseParrotCoda'                       => 1,
         'InputOutput::ProhibitBarewordFileHandles'        => 1,
         'InputOutput::ProhibitTwoArgOpen'                 => 1,
@@ -125,10 +138,10 @@ if ( !keys %policies ) {
 
     # add other policies which aren't yet passing consistently see RT#42427
     my %extra_policies = (
-        'NamingConventions::ProhibitAmbiguousNames'  => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'       => 1,
-        'Subroutines::ProhibitSubroutinePrototypes'  => 1,
-        'Subroutines::RequireFinalReturn'            => 1,
+        'NamingConventions::ProhibitAmbiguousNames' => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'      => 1,
+        'Subroutines::ProhibitSubroutinePrototypes' => 1,
+        'Subroutines::RequireFinalReturn'           => 1,
     );
 
     # Add Perl::Critic::Bangs if it exists
@@ -164,7 +177,7 @@ if ( !keys %policies ) {
 if ($list_policies_flag) {
     use Data::Dumper;
     $Data::Dumper::Indent = 1;
-    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Terse  = 1;
     foreach my $policy ( sort keys %policies ) {
         if ( $policies{$policy} == 1 ) {
             print $policy, "\n";

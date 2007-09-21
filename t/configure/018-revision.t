@@ -6,31 +6,28 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  7;
+use Test::More tests => 7;
 use Carp;
-use_ok( 'Cwd' );
-use_ok( 'File::Copy' );
+use_ok('Cwd');
+use_ok('File::Copy');
 use_ok( 'File::Temp', qw| tempdir | );
 use lib qw( lib );
 use Parrot::Revision;
 
-my ($current, $config);
+my ( $current, $config );
 
 # Case 1:  DEVELOPING exists; Parrot::Config not yet available.
 my $reason =
-    'Either file DEVELOPING does not exist or configuration has completed (as evidenced by existence of Parrot::Config::Generated';
+'Either file DEVELOPING does not exist or configuration has completed (as evidenced by existence of Parrot::Config::Generated';
 SKIP: {
-    skip $reason, 3 if (
-        (not -e 'DEVELOPING')
-        or
-        ( -e q{lib/Parrot/Config/Generated.pm} )
-    );
+    skip $reason, 3 if ( ( not -e 'DEVELOPING' )
+        or ( -e q{lib/Parrot/Config/Generated.pm} ) );
     $current = $Parrot::Revision::current;
-    like($current, qr/^\d+$/, "current revision is all numeric");
+    like( $current, qr/^\d+$/, "current revision is all numeric" );
     $config = $Parrot::Revision::config;
-    like($config, qr/^\d+$/, "current revision is all numeric");
-    is($current, $config, "current and config are identical");
-} # end SKIP block
+    like( $config, qr/^\d+$/, "current revision is all numeric" );
+    is( $current, $config, "current and config are identical" );
+}    # end SKIP block
 
 pass("Completed all tests in $0");
 

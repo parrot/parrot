@@ -40,7 +40,7 @@ ok 2
 OUT
 
 ##############################
-pir_error_output_like( <<'CODE', <<'OUT', "illegal label");
+pir_error_output_like( <<'CODE', <<'OUT', "illegal label" );
 .sub bogus
          bsr _function
          print "never\n"

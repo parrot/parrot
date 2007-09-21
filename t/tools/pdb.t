@@ -41,9 +41,9 @@ use File::Spec;
 my $path_to_pdb;
 
 BEGIN {
-    $path_to_pdb = File::Spec->catfile(".", "pdb");
+    $path_to_pdb = File::Spec->catfile( ".", "pdb" );
     my $exefile = $path_to_pdb . $PConfig{exe};
-    unless(-f $exefile) {
+    unless ( -f $exefile ) {
         plan skip_all => "pdb hasn't been built";
         exit(0);
     }
@@ -51,24 +51,23 @@ BEGIN {
 
 my $tests = 0;
 
-ok(pdb_output_like(<<PIR, "pir", "help", 'List of commands:'), "help page");
+ok( pdb_output_like( <<PIR, "pir", "help", 'List of commands:' ), "help page" );
 .sub main :main
     \$N3 = 3.14159
     print \$N3
     print "\\n"
 .end
 PIR
-ok(pdb_output_like(<<PIR, "pir", "r", '3\.14159'), "running the program");
+ok( pdb_output_like( <<PIR, "pir", "r", '3\.14159' ), "running the program" );
 .sub main :main
     \$N3 = 3.14159
     print \$N3
     print "\\n"
 .end
 PIR
-BEGIN { $tests += 2 };
+BEGIN { $tests += 2 }
 
-BEGIN { plan tests => $tests; };
-
+BEGIN { plan tests => $tests; }
 
 =head1 HELPER SUBROUTINES
 
@@ -83,13 +82,14 @@ input, and a regex string to match within pdb's output.
 =cut
 
 my $testno = 0;
+
 sub pdb_output_like {
-    my ($file, $ext, $input, $check) = @_;
+    my ( $file, $ext, $input, $check ) = @_;
     $testno++;
-    my $codefn    = "$0.$testno.$ext";
-    my $stdinfn   = "$0.$testno.stdin";
-    my $stdoutfn  = "$0.$testno.stdout";
-    my $f = IO::File->new(">$codefn");
+    my $codefn   = "$0.$testno.$ext";
+    my $stdinfn  = "$0.$testno.stdin";
+    my $stdoutfn = "$0.$testno.stdout";
+    my $f        = IO::File->new(">$codefn");
     $f->print($file);
     $f->close();
     $f = IO::File->new(">$stdinfn");
@@ -98,10 +98,9 @@ sub pdb_output_like {
     $f->close();
     system("$path_to_pdb $codefn <$stdinfn >$stdoutfn 2>&1");
     $f = IO::File->new($stdoutfn);
-    my $output = join("", <$f>);
+    my $output = join( "", <$f> );
     return $output =~ /$check/;
 }
-
 
 =head1 TODO
 

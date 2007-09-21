@@ -15,42 +15,43 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Tie::Filehandle::Preempt::Stdin;
 
-my $args = process_options( {
-    argv            => [ q{--ask}, q{--maintainer}, q{--lex=flex} ],
-    mode            => q{configure},
-} );
+my $args = process_options(
+    {
+        argv => [ q{--ask}, q{--maintainer}, q{--lex=flex} ],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new();
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my (@prompts, $object, @entered);
-@prompts = map { q{foo_} . $_ }
-    qw| alpha |;
+my ( @prompts, $object, @entered );
+@prompts = map { q{foo_} . $_ } qw| alpha |;
+
 #@prompts = ( q{lex} );
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
-can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));
-isa_ok($object, 'Tie::Filehandle::Preempt::Stdin');
+can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
+isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
-my ($task, $step_name, @step_params, $step, $ret);
+my ( $task, $step_name, @step_params, $step, $ret );
 my $pkg = q{inter::lex};
 
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-$task = $conf->steps->[1];
+$task        = $conf->steps->[1];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
 $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
 $ret = $step->runstep($conf);
-ok(defined $ret, "$step_name runstep() returned defined value");
+ok( defined $ret, "$step_name runstep() returned defined value" );
 my $result_expected = q{user defined};
-is($step->result(), $result_expected,
-    "Result was $result_expected");
+is( $step->result(), $result_expected, "Result was $result_expected" );
 
 $object = undef;
 untie *STDIN;

@@ -360,8 +360,8 @@ END_PIR
         close $FOO;
         my $OLDERR;
         open $OLDERR, '>&', 'STDERR' or die "Can't save STDERR: $!\n";
-        open STDERR, '>',  'temp.out' or die "Can't write temp.out: $!\n";
-        system( $PARROT, 'temp.pir' ); # We expect an error here.
+        open STDERR, '>', 'temp.out' or die "Can't write temp.out: $!\n";
+        system( $PARROT, 'temp.pir' );    # We expect an error here.
         open $FOO, '<', 'temp.out' or die "Can't read temp.out: $!\n";
         { local $/; $err_msg = <$FOO>; }
         close $FOO;
@@ -491,7 +491,7 @@ sub system_or_die {
     my @args = @_;
 
     print "# Running @args\n";
-    my $rc = system( @args );
+    my $rc = system(@args);
     if ( $rc != 0 ) {
         die "Couldn't run: @args\n";
     }

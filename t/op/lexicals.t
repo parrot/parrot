@@ -1104,7 +1104,6 @@ CODE
 42
 OUTPUT
 
-
 pir_output_is( <<'CODE', <<'OUTPUT', 'Example for RT 44395' );
 
 =for never

@@ -41,13 +41,14 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new();
 my @files;
-if(@ARGV) {
+if (@ARGV) {
     @files = @ARGV;
-} else {
+}
+else {
     my %files = map { $_->path() => 1 } $DIST->c_header_files();
     my $href = $DIST->generated_files();
-    foreach my $file (keys %$href) {
-        if($file =~ /\.h$/) {
+    foreach my $file ( keys %$href ) {
+        if ( $file =~ /\.h$/ ) {
             $files{$file} = 1 if -f $file;
         }
     }
@@ -59,18 +60,17 @@ check_header_guards(@files);
 exit;
 
 sub check_header_guards {
-    my (%guardnames, %redundants, %collisions,
-        %missing_guard, %missing_define, %missing_comment);
+    my ( %guardnames, %redundants, %collisions, %missing_guard, %missing_define, %missing_comment );
 
-F:  foreach my $file (@_) {
+F: foreach my $file (@_) {
         open my $fh, '<', $file
             or die "Cannot open '$file' for reading!\n";
         my @source = <$fh>;
         close $fh;
         chomp @source;
 
-        my ($ifndef, $define, $endif);
-L:          foreach my $line (@source) {
+        my ( $ifndef, $define, $endif );
+    L: foreach my $line (@source) {
             $line =~ s/\s+/ /;
             $line =~ s/^ //;
 
@@ -78,24 +78,25 @@ L:          foreach my $line (@source) {
             next F if $line =~ /A Bison parser/;
 
             # skip the non-preprocessor lines
-            next L unless substr($line,0,1) eq '#';
+            next L unless substr( $line, 0, 1 ) eq '#';
 
             # skip the "#", and any leading whitespace
-            $line = substr($line, 1);
+            $line = substr( $line, 1 );
             $line =~ s/^ //;
 
-            if($line =~ m{ifndef (PARROT_.+_GUARD)$}) {
+            if ( $line =~ m{ifndef (PARROT_.+_GUARD)$} ) {
+
                 # allow include/parrot/platform.h to have redundant guards;
                 # it contains verbatim copies of other header files (which
                 # have their own guards).
-                next L if(defined($ifndef) && $ifndef eq 'PARROT_PLATFORM_H_GUARD');
+                next L if ( defined($ifndef) && $ifndef eq 'PARROT_PLATFORM_H_GUARD' );
 
                 # check for multiple guards in the same file
                 $redundants{$file} = $1 if defined $ifndef;
 
                 # check for the same guard-name in multiple files
-                if(exists($guardnames{$1})) {
-                    if(!duplicate_files($file, $guardnames{$1})) {
+                if ( exists( $guardnames{$1} ) ) {
+                    if ( !duplicate_files( $file, $guardnames{$1} ) ) {
                         $collisions{$file} = $guardnames{$1};
                     }
                 }
@@ -104,14 +105,14 @@ L:          foreach my $line (@source) {
                 $guardnames{$1} = $file;
             }
 
-            if($line =~ m{define (PARROT_.+_GUARD)$}) {
+            if ( $line =~ m{define (PARROT_.+_GUARD)$} ) {
                 $define = $1
-                    if(defined($ifndef) && $ifndef eq $1);
+                    if ( defined($ifndef) && $ifndef eq $1 );
             }
 
-            if($line =~ m{endif /\* (PARROT_.+_GUARD) \*/$}) {
+            if ( $line =~ m{endif /\* (PARROT_.+_GUARD) \*/$} ) {
                 $endif = $1
-                    if(defined($ifndef) && $ifndef eq $1);
+                    if ( defined($ifndef) && $ifndef eq $1 );
             }
         }
 
@@ -120,37 +121,44 @@ L:          foreach my $line (@source) {
         $missing_comment{$file} = 1 unless defined $endif;
     }
 
-    ok(!(scalar %collisions), "identical PARROT_*_GUARD macro names used in headers");
-    diag("collisions: \n" . join(", \n", %collisions))
+    ok( !( scalar %collisions ), "identical PARROT_*_GUARD macro names used in headers" );
+    diag( "collisions: \n" . join( ", \n", %collisions ) )
         if scalar keys %collisions;
 
-    ok(!(scalar %redundants), "multiple PARROT_*_GUARD macros found in headers");
-    diag("redundants: \n" . join(", \n", keys %redundants))
+    ok( !( scalar %redundants ), "multiple PARROT_*_GUARD macros found in headers" );
+    diag( "redundants: \n" . join( ", \n", keys %redundants ) )
         if scalar keys %redundants;
 
-    ok(!(scalar %missing_guard), "missing or misspelled PARROT_*_GUARD ifndef in headers");
-    diag("missing guard: \n" . join(", \n", sort keys %missing_guard) .
-        "\nyou need to add a line like:\n" .
-        "  #ifndef PARROT_*_GUARD\n" . "at the top of the header.")
+    ok( !( scalar %missing_guard ), "missing or misspelled PARROT_*_GUARD ifndef in headers" );
+    diag(     "missing guard: \n"
+            . join( ", \n", sort keys %missing_guard )
+            . "\nyou need to add a line like:\n"
+            . "  #ifndef PARROT_*_GUARD\n"
+            . "at the top of the header." )
         if scalar keys %missing_guard;
 
-    ok(!(scalar %missing_define), "missing or misspelled PARROT_*_GUARD define in headers");
-    diag("missing define: \n" . join(", \n", sort keys %missing_define) .
-        "\nyou need to add a line like:\n" .
-        "  #define PARROT_*_GUARD\n" . "at the top of the header.")
+    ok( !( scalar %missing_define ), "missing or misspelled PARROT_*_GUARD define in headers" );
+    diag(     "missing define: \n"
+            . join( ", \n", sort keys %missing_define )
+            . "\nyou need to add a line like:\n"
+            . "  #define PARROT_*_GUARD\n"
+            . "at the top of the header." )
         if scalar keys %missing_define;
 
-    ok(!(scalar %missing_comment), "missing or misspelled PARROT_*_GUARD comment after the endif in headers");
-    diag("missing endif comment: \n" . join(", \n", sort keys %missing_comment) .
-        "\nyou need to add a line like:\n" .
-        "  #endif /* PARROT_*_GUARD */\n" . "at the end of the header.")
+    ok( !( scalar %missing_comment ),
+        "missing or misspelled PARROT_*_GUARD comment after the endif in headers" );
+    diag(     "missing endif comment: \n"
+            . join( ", \n", sort keys %missing_comment )
+            . "\nyou need to add a line like:\n"
+            . "  #endif /* PARROT_*_GUARD */\n"
+            . "at the end of the header." )
         if scalar keys %missing_comment;
 
     return 0;
 }
 
 sub duplicate_files {
-    my ($file1, $file2) = @_;
+    my ( $file1, $file2 ) = @_;
     open my $fh1, '<', $file1
         or die "Cannot open '$file1' for reading!\n";
     open my $fh2, '<', $file2
@@ -167,5 +175,4 @@ sub duplicate_files {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
 

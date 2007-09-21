@@ -102,13 +102,14 @@ for my $cmd ( sort keys %cmds ) {
         ## retrieve the test commands, and trick IMCC to parse only
         join( $/ => 'end', sort( keys %{ $cmds{$cmd} } ), '' ),
         qr/^(?!error:imcc:syntax error,)/,
-        "parsing: $cmd" );
+        "parsing: $cmd"
+    );
 
-    if ($parse_errors{ $cmd }) {
-        pasm_error_output_like( @args )
+    if ( $parse_errors{$cmd} ) {
+        pasm_error_output_like(@args);
     }
     else {
-        pasm_output_like( @args );
+        pasm_output_like(@args);
     }
 }
 

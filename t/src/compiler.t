@@ -9,8 +9,8 @@ use Test::More;
 use Parrot::Test;
 
 plan $^O =~ m/MSWin32|cygwin/
-   ? ( skip_all => 'broken on win32 && cygwin' )
-   : ( tests => 6 );
+    ? ( skip_all => 'broken on win32 && cygwin' )
+    : ( tests => 6 );
 
 =head1 NAME
 

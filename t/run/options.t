@@ -42,7 +42,7 @@ is( `"$PARROT" "$second_pir_file"`, "second\n", 'running second.pir' );
 
 # Ignore further arguments
 is( `"$PARROT" "$first_pir_file" "$second_pir_file"`, "first\n", 'ignore a pir-file' );
-is( `"$PARROT" "$first_pir_file" "asdf"`,    "first\n", 'ignore nonsense' );
+is( `"$PARROT" "$first_pir_file" "asdf"`,             "first\n", 'ignore nonsense' );
 
 # redirect STDERR to avoid warnings
 my $redir = '2>' . File::Spec->devnull();
@@ -60,12 +60,9 @@ say "first"
 .end
 
 END_PIR
-is( `"$PARROT" -E "$first_pir_file" $redir`,
-    $expected_preprocesses_pir,
-    'option -E' );
+is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
 is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
-    $expected_preprocesses_pir,
-    'option --pre-process-only' );
+    $expected_preprocesses_pir, 'option --pre-process-only' );
 
 # Test the trace option
 is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
@@ -74,8 +71,10 @@ TODO:
     local $TODO = 'RT# 45267 --trace behaves not like -t';
     is( `"$PARROT" --trace "$first_pir_file" $redir`, "first\n", 'option --trace' );
 }
-is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`,      "second\n", 'option -t with flags' );
-is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`, "second\n", 'option --trace with flags' );
+is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`, "second\n",
+    'option -t with flags' );
+is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
+    "second\n", 'option --trace with flags' );
 
 # clean up temporary files
 unlink $first_pir_file;

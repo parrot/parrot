@@ -13,45 +13,50 @@ use lib qw( lib );
 use Parrot::BuildUtil;
 
 {
-    my ($fh, $tempfile) = tempfile();
+    my ( $fh, $tempfile ) = tempfile();
     open $fh, ">", $tempfile
         or croak "Unable to open tempfile for writing";
     print $fh "Testing Parrot::BuildUtil::slurp_file()\n";
     close $fh or croak "Unable to close tempfile after writing";
 
-    ok(-f $tempfile, "tempfile created for testing");
+    ok( -f $tempfile, "tempfile created for testing" );
     my $str = Parrot::BuildUtil::slurp_file($tempfile);
-    ok($str, "slurpfile() returned true value");
-    like($str, qr/Testing Parrot::BuildUtil::slurp_file/,
-        "Main content of tempfile correctly slurped");
+    ok( $str, "slurpfile() returned true value" );
+    like(
+        $str,
+        qr/Testing Parrot::BuildUtil::slurp_file/,
+        "Main content of tempfile correctly slurped"
+    );
 }
 
 {
-    my ($fh, $tempfile) = tempfile();
+    my ( $fh, $tempfile ) = tempfile();
     open $fh, ">", $tempfile
         or croak "Unable to open tempfile for writing";
     print $fh "Testing Parrot::BuildUtil::slurp_file()\cM\cJ\n";
     close $fh or croak "Unable to close tempfile after writing";
 
-    ok(-f $tempfile, "tempfile created for testing");
+    ok( -f $tempfile, "tempfile created for testing" );
     my $str = Parrot::BuildUtil::slurp_file($tempfile);
-    ok($str, "slurpfile() returned true value");
-    like($str, qr/Testing Parrot::BuildUtil::slurp_file/,
-        "Main content of tempfile correctly slurped");
-    like($str, qr/\n{2}/m,
-        "DOS line endings correctly converted during slurp_file");
+    ok( $str, "slurpfile() returned true value" );
+    like(
+        $str,
+        qr/Testing Parrot::BuildUtil::slurp_file/,
+        "Main content of tempfile correctly slurped"
+    );
+    like( $str, qr/\n{2}/m, "DOS line endings correctly converted during slurp_file" );
 }
-
-
 
 {
     my $phony = q{foobar};
     my $str;
     eval { $str = Parrot::BuildUtil::slurp_file($phony); };
-    like($@, qr/open '$phony'/,
-        "Got error message expected upon attempting to slurp non-existent file");
+    like(
+        $@,
+        qr/open '$phony'/,
+        "Got error message expected upon attempting to slurp non-existent file"
+    );
 }
-
 
 pass("Completed all tests in $0");
 

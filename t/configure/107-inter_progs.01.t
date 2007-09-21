@@ -5,8 +5,9 @@
 
 use strict;
 use warnings;
+
 # Please leave as 'no_plan'; see 'BUG' in POD.
-use Test::More qw(no_plan); # tests => 24;
+use Test::More qw(no_plan);    # tests => 24;
 use Carp;
 use Data::Dumper;
 use lib qw( lib t/configure/testlib );
@@ -28,56 +29,61 @@ determine a way to test a user response to a prompt.
 
 =cut
 
-my $args = process_options( {
-    argv            => [ q{--ask} ],
-    mode            => q{configure},
-} );
+my $args = process_options(
+    {
+        argv => [q{--ask}],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new;
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
-test_step_thru_runstep($conf, q{init::install}, $args);
-test_step_thru_runstep($conf, q{init::hints}, $args);
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
+test_step_thru_runstep( $conf, q{init::install},  $args );
+test_step_thru_runstep( $conf, q{init::hints},    $args );
 
-my ($task, $step_name, @step_params, $step, $ret);
+my ( $task, $step_name, @step_params, $step, $ret );
 my $pkg = q{inter::progs};
 
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-$task = $conf->steps->[3];
+$task        = $conf->steps->[3];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
 $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
 
-my (@prompts, $object);
-foreach my $p ( qw|
-        cc
-        link
-        ld
-        ccflags
-        linkflags
-        ldflags
-        libs
-        cxx
-    | ) {
+my ( @prompts, $object );
+foreach my $p (
+    qw|
+    cc
+    link
+    ld
+    ccflags
+    linkflags
+    ldflags
+    libs
+    cxx
+    |
+    )
+{
     push @prompts, $conf->data->get($p);
 }
 push @prompts, q{y};
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
-can_ok('Tie::Filehandle::Preempt::Stdin', ('READLINE'));
-isa_ok($object, 'Tie::Filehandle::Preempt::Stdin');
+can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
+isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 {
     open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
     $ret = $step->runstep($conf);
     close STDOUT or croak "Unable to close after myout";
-    ok(defined $ret, "$step_name runstep() returned defined value");
+    ok( defined $ret, "$step_name runstep() returned defined value" );
 }
 
 $object = undef;

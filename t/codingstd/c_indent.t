@@ -32,10 +32,10 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my @files = @ARGV ?
-                @ARGV
-                :
-                map { $_->path() } Parrot::Distribution->new()->get_c_language_files();
+my @files =
+      @ARGV
+    ? @ARGV
+    : map { $_->path() } Parrot::Distribution->new()->get_c_language_files();
 
 check_indent(@files);
 
@@ -49,7 +49,7 @@ sub check_indent {
             or die "Can not open '$path' for reading!\n";
         @source = <$fh>;
 
-        my @stack;                   # for tracking indention level
+        my @stack;    # for tracking indention level
         my $line_cnt       = 0;
         my $f              = undef;
         my $prev_last_char = '';
@@ -62,7 +62,7 @@ sub check_indent {
             chomp;
 
             $prev_last_char = $last_char;
-            $last_char = substr($_, -1, 1);
+            $last_char = substr( $_, -1, 1 );
 
             # ignore multi-line comments (except the first line)
             $in_comment = 0, next if $in_comment && m{\*/} && $' !~ m{/\*};
@@ -70,12 +70,15 @@ sub check_indent {
             $in_comment = 1 if m{/\*} && $' !~ m{\*/};
 
             ## preprocessor scan
-            if ( m/ ^ \s* \#
+            if (
+                m/ ^ \s* \#
                     (\s*)
                     ( ifndef | ifdef | if )
                     \s+(.*)
-                  /x ) {
-                next if ( m/PARROT_IN_CORE|_GUARD/ );
+                  /x
+                )
+            {
+                next if (m/PARROT_IN_CORE|_GUARD/);
 
                 my $indent = q{  } x @stack;
                 if ( $1 ne $indent ) {
@@ -87,10 +90,13 @@ sub check_indent {
                 push @stack, "#$2 $3";
                 next;
             }
-            if ( m/ ^ \s* \#
+            if (
+                m/ ^ \s* \#
                     (\s*)
                     ( else | elif )
-                  /x ) {
+                  /x
+                )
+            {
 
                 # stay where we are, but indenting should be
                 # back even with the opening brace.
@@ -104,10 +110,13 @@ sub check_indent {
                 }
                 next;
             }
-            if ( m/ ^ \s* \#
+            if (
+                m/ ^ \s* \#
                     (\s*)
                     (endif)
-                  /x ) {
+                  /x
+                )
+            {
                 my $indent = q{  } x ( @stack - 1 );
                 if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line_cnt\n"
@@ -121,10 +130,13 @@ sub check_indent {
             }
             next unless @stack;
 
-            if ( m/ ^ \s* \#
+            if (
+                m/ ^ \s* \#
                     (\s*)
                     (.*)
-                  /x ) {
+                  /x
+                )
+            {
                 my $indent = q{  } x (@stack);
                 if ( $1 ne $indent ) {
                     push @pp_indent => "$path:$line_cnt\n"
@@ -183,12 +195,10 @@ sub check_indent {
             # The indentation of the previous line is not considered.
             # Check sanity by verifying that the indentation of the current line
             # is divisible by four.
-            if ($indent % 4 && !$in_comment && $prev_last_char eq ';')
-            {
+            if ( $indent % 4 && !$in_comment && $prev_last_char eq ';' ) {
                 push @c_indent => "$path:$line_cnt\n"
                     . "    apparent non-4 space indenting ($indent space"
-                    . ($indent == 1 ? '' : 's')
-                    . ")\n";
+                    . ( $indent == 1 ? '' : 's' ) . ")\n";
                 $c_failed{"$path\n"} = 1;
             }
         }

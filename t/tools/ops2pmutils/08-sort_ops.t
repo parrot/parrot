@@ -207,8 +207,8 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( copy( qq{$cwd/$skip},      qq{$tdir/$skip} ),      "copied ops.skip file" );
         ok( copy( qq{$cwd/DEVELOPING}, qq{$tdir/DEVELOPING} ), "copied DEVELOPING file" );
         my $dummyops = "./src/ops/dummy.ops";
-        open my $FH, ">", $dummyops or
-            croak "Unable to open handle to create dummy ops file: $!";
+        open my $FH, ">", $dummyops
+            or croak "Unable to open handle to create dummy ops file: $!";
         print $FH <<DUMMYOPS;
 /*
 ** dummy.ops

@@ -5,20 +5,22 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  4;
+use Test::More tests => 4;
 use Carp;
 use lib qw( lib );
-use_ok('Parrot::Configure::Step::List', qw|
-    get_steps_list
-| );
+use_ok(
+    'Parrot::Configure::Step::List', qw|
+        get_steps_list
+        |
+);
 
 my @steps;
-ok(@steps = get_steps_list(), "non-zero number of steps located");
+ok( @steps = get_steps_list(), "non-zero number of steps located" );
 my $badsteps = 0;
 foreach my $s (@steps) {
     $badsteps++ unless $s =~ /^(init|inter|auto|gen)::\w+$/;
 }
-is($badsteps, 0, "no bad entries found in \@steps");
+is( $badsteps, 0, "no bad entries found in \@steps" );
 
 pass("Completed all tests in $0");
 

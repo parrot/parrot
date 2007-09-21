@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  6;
+use Test::More tests => 6;
 use Carp;
 use Data::Dumper;
 use lib qw( lib );
@@ -13,33 +13,36 @@ use_ok('config::init::defaults');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
-my $pkg = q{init::defaults};
-my $args = process_options( {
-    argv            => [q{--debugging=0}, q{--profile}, q{--m=32}],
-                        # These 3 options are non-default and inside
-                        # init::defaults::runsteps() they create what, from a
-                        # testing coverage perspective, create branches or
-                        # conditions.  The regular run of Configure.pl during
-                        # coverage analysis will cover the default
-                        # branches/conditions.  Hence, we supply the
-                        # non-default options here to increase coverage.
-    mode            => q{configure},
-} );
+my $pkg  = q{init::defaults};
+my $args = process_options(
+    {
+        argv => [ q{--debugging=0}, q{--profile}, q{--m=32} ],
+
+        # These 3 options are non-default and inside
+        # init::defaults::runsteps() they create what, from a
+        # testing coverage perspective, create branches or
+        # conditions.  The regular run of Configure.pl during
+        # coverage analysis will cover the default
+        # branches/conditions.  Hence, we supply the
+        # non-default options here to increase coverage.
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new;
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-my $task = $conf->steps->[0];
+my $task        = $conf->steps->[0];
 my $step_name   = $task->step;
 my @step_params = @{ $task->params };
 
 my $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
 my $ret = $step->runstep($conf);
-ok(defined $ret, "$step_name runstep() returned defined value");
+ok( defined $ret, "$step_name runstep() returned defined value" );
 
 # RT#44451:  Write a SKIP block which will test the one OS-specific branch in
 # init::defaults.

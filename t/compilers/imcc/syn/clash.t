@@ -169,7 +169,7 @@ CODE
 ok
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
 .sub test :main
         $P1 = new INTVAL
     print "never\n"
@@ -179,7 +179,7 @@ CODE
 /error:\w+:Unknown PMC type 'INTVAL'/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "new with an unknown class");
+pir_error_output_like( <<'CODE', <<'OUTPUT', "new with an unknown class" );
 .sub test :main
         $P1 = new 'INTVAL'
     print "never\n"
@@ -241,7 +241,7 @@ CODE
 ok 1
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "undefined ident");
+pir_error_output_like( <<'CODE', <<'OUT', "undefined ident" );
 .sub test :main
     print no_such
 .end

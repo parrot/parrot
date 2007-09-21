@@ -63,8 +63,7 @@ foreach my $file (@files) {
 # check the file
 ok( !scalar(@failed_files), 'No trailing spaces or tabs' )
     or diag(
-    join
-        $/ => "Trailing space or tab char found in " . scalar @failed_files . " files:",
+    join $/ => "Trailing space or tab char found in " . scalar @failed_files . " files:",
     @failed_files
     );
 

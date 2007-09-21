@@ -6,30 +6,30 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  6;
+use Test::More tests => 6;
 use Carp;
-use lib ( qw| lib | );
+use lib (qw| lib |);
 use_ok('Parrot::Manifest');
 
 my $script = $0;
-my $g = q{something_other_than_MANIFEST};
+my $g      = q{something_other_than_MANIFEST};
 
-my $mani = Parrot::Manifest->new( {
-    script      => $script,
-    file        => $g,
-} );
-isa_ok($mani, 'Parrot::Manifest');
+my $mani = Parrot::Manifest->new(
+    {
+        script => $script,
+        file   => $g,
+    }
+);
+isa_ok( $mani, 'Parrot::Manifest' );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
-ok($manifest_lines_ref, "prepare_manifest_skip() returned");
+ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
 
-ok(! -f $g, "No $g found");
-my $need_for_file =
-  $mani->determine_need_for_manifest($manifest_lines_ref);
-ok($need_for_file, "Need to regenerate $g");
+ok( !-f $g, "No $g found" );
+my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
+ok( $need_for_file, "Need to regenerate $g" );
 
 pass("Completed all tests in $0");
-
 
 ################### DOCUMENTATION ###################
 

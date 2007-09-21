@@ -66,7 +66,8 @@ foreach my $file (@files) {
     # look for function definitions
     my @function_names = $buf =~ m/[^\s]\s(\w+)\(.*\)\s+{/g;
 
-    for my $function_name ( @function_names ) {
+    for my $function_name (@function_names) {
+
         # if the function name matches a known C construct, go to the next
         # one
         if ( $function_name =~ m/for|if|switch|NOTNULL/ ) {
@@ -79,7 +80,7 @@ foreach my $file (@files) {
 
         # look for matching documentation.  This means the text
         # '=item C<\w+\s+function_name'
-        if ($buf !~ m/=item .*$function_name/) {
+        if ( $buf !~ m/=item .*$function_name/ ) {
             push @missing_docs, "$path\n";
             last;
         }
@@ -87,9 +88,8 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@missing_docs), 'Functions documented' )
-    or diag( "Functions lacking documentation in " .
-        scalar @missing_docs . " files:\n@missing_docs" );
-
+    or
+    diag( "Functions lacking documentation in " . scalar @missing_docs . " files:\n@missing_docs" );
 
 # Local Variables:
 #   mode: cperl

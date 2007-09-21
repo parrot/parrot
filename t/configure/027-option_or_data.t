@@ -6,42 +6,44 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  8;
+use Test::More tests => 8;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use_ok('Parrot::Configure::Step::List', qw|
-    get_steps_list
-| );
+use_ok(
+    'Parrot::Configure::Step::List', qw|
+        get_steps_list
+        |
+);
 
 $| = 1;
-is($|, 1, "output autoflush is set");
+is( $|, 1, "output autoflush is set" );
 
-my $testopt     = q{bindir};
-my $testoptval  = q{mybindir};
-my $localargv = [
-    qq{--$testopt=$testoptval},
-];
-my $args = process_options( {
-    mode            => q{configure},
-    argv            => $localargv,
-} );
-ok(defined $args, "process_options returned successfully");
+my $testopt    = q{bindir};
+my $testoptval = q{mybindir};
+my $localargv  = [ qq{--$testopt=$testoptval}, ];
+my $args       = process_options(
+    {
+        mode => q{configure},
+        argv => $localargv,
+    }
+);
+ok( defined $args, "process_options returned successfully" );
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
-ok(defined $conf, "Parrot::Configure->new() returned okay");
-isa_ok($conf, "Parrot::Configure");
+ok( defined $conf, "Parrot::Configure->new() returned okay" );
+isa_ok( $conf, "Parrot::Configure" );
 
-$conf->add_steps(get_steps_list());
+$conf->add_steps( get_steps_list() );
 
 $conf->options->set(%args);
-is($conf->options->{c}->{$testopt}, $testoptval,
-    "command-line option '--$testopt' has been stored in object");
+is( $conf->options->{c}->{$testopt},
+    $testoptval, "command-line option '--$testopt' has been stored in object" );
 
 my $val = $conf->option_or_data($testopt);
-is($val, $testoptval, 'option_or_data() returned expected value');
+is( $val, $testoptval, 'option_or_data() returned expected value' );
 
 pass("Completed all tests in $0");
 

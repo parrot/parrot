@@ -17,30 +17,33 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::IO::Capture::Mini;
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-my $args = process_options( {
-    argv            => [ q{--verbose} ],
-    mode            => q{configure},
-} );
+my $args = process_options(
+    {
+        argv => [q{--verbose}],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new;
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
-test_step_thru_runstep($conf, q{init::install}, $args);
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
+test_step_thru_runstep( $conf, q{init::install},  $args );
 
-my ($task, $step_name, @step_params, $step, $ret);
+my ( $task, $step_name, @step_params, $step, $ret );
 my $pkg = q{init::hints};
 
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-$task = $conf->steps->[2];
+$task        = $conf->steps->[2];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
 $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
+
 # need to capture the --verbose output, because the fact that it does not end
 # in a newline confuses Test::Harness
 {
@@ -48,8 +51,8 @@ ok($step->description(), "$step_name has description");
         or croak "Unable to tie";
     $ret = $step->runstep($conf);
     my @more_lines = $tie_out->READLINE;
-    ok(@more_lines, "verbose output:  hints were captured");
-    ok(defined $ret, "$step_name runstep() returned defined value");
+    ok( @more_lines, "verbose output:  hints were captured" );
+    ok( defined $ret, "$step_name runstep() returned defined value" );
 }
 
 pass("Completed all tests in $0");

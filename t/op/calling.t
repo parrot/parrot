@@ -2408,7 +2408,8 @@ CODE
 Have bar: 2
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "Tail call without arguments should not free the context when a closure depends on it" );
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "Tail call without arguments should not free the context when a closure depends on it" );
 .sub main :main
     $P0 = create_closure_and_run_it()
 .end
@@ -2447,7 +2448,6 @@ CODE
 3
 OUTPUT
 
-
 pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
 .sub main :main
     foo(0, 'abc' => 1)
@@ -2474,7 +2474,6 @@ ok 2
 ok 3
 ok 4
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

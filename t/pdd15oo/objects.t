@@ -1350,7 +1350,7 @@ CODE
 MyInt(42)
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods");
+pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" );
 
 .sub main :main
   .local pmc MyInt

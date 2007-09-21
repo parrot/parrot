@@ -2531,7 +2531,8 @@ CODE
 42
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'nested structs should be independent', todo => 'RT #31292' );
+pir_output_is(
+    << 'CODE', << 'OUTPUT', 'nested structs should be independent', todo => 'RT #31292' );
 .include 'datatypes.pasm'
 
 .sub 'test' :main

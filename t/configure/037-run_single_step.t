@@ -6,40 +6,43 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  5;
+use Test::More tests => 5;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::IO::Capture::Mini;
 
-
-my $args = process_options( {
-    argv            => [ ],
-    mode            => q{configure},
-} );
-ok(defined $args, "process_options returned successfully");
+my $args = process_options(
+    {
+        argv => [],
+        mode => q{configure},
+    }
+);
+ok( defined $args, "process_options returned successfully" );
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
-ok(defined $conf, "Parrot::Configure->new() returned okay");
+ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
 my $step = q{init::defaults};
 $conf->add_step($step);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-my ($tie, @lines);
+my ( $tie, @lines );
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    eval { $conf->run_single_step( $step ); };
-    ok(! $@, "run_single_step() completed without error");
+    eval { $conf->run_single_step($step); };
+    ok( !$@, "run_single_step() completed without error" );
     @lines = $tie->READLINE;
 }
 my $bigmsg = join q{}, @lines;
-like($bigmsg,
+like(
+    $bigmsg,
     qr/Setting up Configure's default values.*done./s,
-    "Got message expected upon running $step");
+    "Got message expected upon running $step"
+);
 
 pass("Completed all tests in $0");
 

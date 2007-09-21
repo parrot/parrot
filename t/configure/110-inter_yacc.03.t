@@ -15,34 +15,35 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-my $args = process_options( {
-    argv            => [ q{--ask}, q{--maintainer} ],
-    mode            => q{configure},
-} );
+my $args = process_options(
+    {
+        argv => [ q{--ask}, q{--maintainer} ],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new();
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my ($task, $step_name, @step_params, $step, $ret);
+my ( $task, $step_name, @step_params, $step, $ret );
 my $pkg = q{inter::yacc};
 
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-$task = $conf->steps->[1];
+$task        = $conf->steps->[1];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
 $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
 $ret = $step->runstep($conf);
-is($ret, undef, "$step_name runstep() returned undefined value");
+is( $ret, undef, "$step_name runstep() returned undefined value" );
 my $result_expected = q{no yacc program was found};
-is($step->result(), $result_expected,
-    "Result was $result_expected");
+is( $step->result(), $result_expected, "Result was $result_expected" );
 
 pass("Completed all tests in $0");
 

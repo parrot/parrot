@@ -53,13 +53,14 @@ foreach my $file (@files) {
         $buf = <$fh>;
     }
 
-    my @buffer_lines = split(/\n/, $buf);
+    my @buffer_lines = split( /\n/, $buf );
 
     # find out if toxxx() functions appear in the file
     my $num_toxxx = grep m/($toxxx_functions)\(/, @buffer_lines;
 
     # if so, check if the args are cast to unsigned char
-    if ( $num_toxxx ) {
+    if ($num_toxxx) {
+
         # get the lines just matching toxxx
         my @toxxx_lines = grep m/($toxxx_functions)\(/, @buffer_lines;
 
@@ -75,7 +76,9 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@no_explicit_cast), 'toxxx() functions cast correctly' )
-    or diag( "toxxx() function not cast to unsigned char " . scalar @no_explicit_cast . " files:\n@no_explicit_cast" );
+    or diag( "toxxx() function not cast to unsigned char "
+        . scalar @no_explicit_cast
+        . " files:\n@no_explicit_cast" );
 
 # Local Variables:
 #   mode: cperl

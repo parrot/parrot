@@ -22,7 +22,6 @@ Tests the Exporter PMC.
 
 =cut
 
-
 # L<PDD17/Exporter PMC>
 # TODO fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
@@ -40,7 +39,6 @@ CODE
 ok 1 - $P0 = new 'Exporter'
 ok 2 - isa $P0, 'Exporter'
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'source' );
 .sub 'test' :main
@@ -93,7 +91,6 @@ ok 2 - source() with args sets source namespace
 ok 3 - source() with too many args fails
 ok 4 - source() with non-namespace arg throws exception
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'test' :main
@@ -153,7 +150,6 @@ ok 3 - destination() with args sets destination namespace
 ok 4 - destination() with too many args fails
 ok 5 - destination() with non-namespace arg throws exception
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'globals' );
 .sub 'test' :main
@@ -248,7 +244,6 @@ ok 5 - globals() with hash arg sets globals hash (hash with two keys)
 ok 6 - globals() with too many args fails
 OUT
 
-
 pir_error_output_like( <<'CODE', <<'OUT', 'import - no args' );
 .sub 'test' :main
     $P0 = new 'Exporter'
@@ -287,7 +282,6 @@ CODE
 ok 1
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as string' );
 .sub 'test' :main
     load_bytecode 'Test/More.pir'
@@ -304,7 +298,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals with source passed separately' );
 .sub 'test' :main
@@ -323,7 +316,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
 .sub 'test' :main
@@ -344,7 +336,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - null + empty string' );
 .sub 'test' :main
@@ -367,7 +358,6 @@ CODE
 ok 1
 OUT
 
-
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - with dest names (latin)' );
 .sub 'test' :main
     load_bytecode 'Test/More.pir'
@@ -387,7 +377,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
 .sub 'test' :main
@@ -416,7 +405,6 @@ CODE
 1..1
 ok 1
 OUT
-
 
 pir_output_is( <<'CODE', <<'OUT', 'PIR subclass' );
 .sub 'test' :main
@@ -474,9 +462,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PIR subclass' );
 CODE
 OUT
 
-
 # TODO test exporting mmd subs
-
 
 # Local Variables:
 #   mode: cperl

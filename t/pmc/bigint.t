@@ -833,7 +833,7 @@ CODE
 100000000000
 OUT
 
-pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint");
+pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint" );
 ## The result on the second line is a BigInt on 32-bit systems and still an
 ## Integer on 64-bit systems.
 .sub main :main
@@ -872,7 +872,7 @@ BigInt 1152922657528351582846976
 /
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled");
+pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled" );
 .include "errors.pasm"
 .sub main :main
    errorson .PARROT_ERRORS_OVERFLOW_FLAG
@@ -902,7 +902,7 @@ Integer overflow
 current instr/
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint");
+pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint" );
 ## The C << and >> ops take the right arg modulo the word size in bits (at least
 ## on all the systems I have available), so both 32- and 64-bit systems treat
 ## shifting by 64 bits as shifting by zero.
@@ -921,7 +921,8 @@ CODE
 BigInt 18446762520453625325551616
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint");
+pir_output_is(
+    <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint" );
 .sub main :main
    new $P0, 'Integer'
    set $P0, 1000001

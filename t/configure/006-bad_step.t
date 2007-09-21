@@ -13,49 +13,50 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::IO::Capture::Mini;
 
-
 $| = 1;
-is($|, 1, "output autoflush is set");
+is( $|, 1, "output autoflush is set" );
 
-my $args = process_options( {
-    argv            => [],
-    mode            => q{configure},
-} );
-ok(defined $args, "process_options returned successfully");
+my $args = process_options(
+    {
+        argv => [],
+        mode => q{configure},
+    }
+);
+ok( defined $args, "process_options returned successfully" );
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
-ok(defined $conf, "Parrot::Configure->new() returned okay");
+ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $badstep = q{bad::step};
+my $badstep     = q{bad::step};
 my $badsteppath = q{bad/step.pm};
 
-$conf->add_steps( $badstep );
-my @confsteps = @{$conf->steps};
-isnt(scalar @confsteps, 0,
-    "Parrot::Configure object 'steps' key holds non-empty array reference");
-is(scalar @confsteps, 1,
-    "Parrot::Configure object 'steps' key holds ref to 1-element array");
+$conf->add_steps($badstep);
+my @confsteps = @{ $conf->steps };
+isnt( scalar @confsteps, 0,
+    "Parrot::Configure object 'steps' key holds non-empty array reference" );
+is( scalar @confsteps, 1, "Parrot::Configure object 'steps' key holds ref to 1-element array" );
 my $nontaskcount = 0;
 foreach my $k (@confsteps) {
     $nontaskcount++ unless $k->isa("Parrot::Configure::Task");
 }
-is($nontaskcount, 0, "Each step is a Parrot::Configure::Task object");
-is($confsteps[0]->step, $badstep,
-    "'step' element of Parrot::Configure::Task struct identified");
-is(ref($confsteps[0]->params), 'ARRAY',
-    "'params' element of Parrot::Configure::Task struct is array ref");
-ok(! ref($confsteps[0]->object),
-    "'object' element of Parrot::Configure::Task struct is not yet a ref");
+is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
+is( $confsteps[0]->step, $badstep, "'step' element of Parrot::Configure::Task struct identified" );
+is( ref( $confsteps[0]->params ),
+    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
+ok( !ref( $confsteps[0]->object ),
+    "'object' element of Parrot::Configure::Task struct is not yet a ref" );
 
 $conf->options->set(%args);
-is($conf->options->{c}->{debugging}, 1,
-    "command-line option '--debugging' has been stored in object");
+is( $conf->options->{c}->{debugging},
+    1, "command-line option '--debugging' has been stored in object" );
 
 my $rv;
 eval { $rv = $conf->runsteps; };
-like($@, qr/Can't locate $badsteppath in \@INC/,  #'
-    "Got expected die message when runsteps() called with nonexistent step");
+like(
+    $@, qr/Can't locate $badsteppath in \@INC/,    #'
+    "Got expected die message when runsteps() called with nonexistent step"
+);
 
 pass("Completed all tests in $0");
 

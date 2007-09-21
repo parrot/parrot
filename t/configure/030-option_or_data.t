@@ -6,52 +6,54 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  7;
+use Test::More tests => 7;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Parrot::IO::Capture::Mini;
-use_ok('Parrot::Configure::Step::List', qw|
-    get_steps_list
-| );
+use_ok(
+    'Parrot::Configure::Step::List', qw|
+        get_steps_list
+        |
+);
 
 $| = 1;
-is($|, 1, "output autoflush is set");
+is( $|, 1, "output autoflush is set" );
 
-my $testopt     = q{bindir};
-my $testoptval  = q{mybindir};
-my $localargv = [ ];
-my $args = process_options( {
-    mode            => q{configure},
-    argv            => $localargv,
-} );
-ok(defined $args, "process_options returned successfully");
+my $testopt    = q{bindir};
+my $testoptval = q{mybindir};
+my $localargv  = [];
+my $args       = process_options(
+    {
+        mode => q{configure},
+        argv => $localargv,
+    }
+);
+ok( defined $args, "process_options returned successfully" );
 
 my $conf = Parrot::Configure->new;
-ok(defined $conf, "Parrot::Configure->new() returned okay");
+ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $step = q{init::foobar};
+my $step        = q{init::foobar};
 my $description = 'Determining if your computer does foobar';
 
-$conf->add_steps( $step );
-$conf->options->set(%{$args});
+$conf->add_steps($step);
+$conf->options->set( %{$args} );
 
 my $rv;
-my ($tie, @lines);
+my ( $tie, @lines );
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    $rv = $conf->runsteps;
+    $rv    = $conf->runsteps;
     @lines = $tie->READLINE;
 }
 my $bigmsg = join q{}, @lines;
-like($bigmsg,
-    qr/$description/s,
-    "Got message expected upon running $step");
-ok(! defined ($conf->option_or_data($testopt) ),
-    "option_or_data returned undef; neither option nor data had been defined");
+like( $bigmsg, qr/$description/s, "Got message expected upon running $step" );
+ok( !defined( $conf->option_or_data($testopt) ),
+    "option_or_data returned undef; neither option nor data had been defined" );
 
 pass("Completed all tests in $0");
 

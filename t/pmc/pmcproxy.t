@@ -256,7 +256,8 @@ No, you can't add a role by v-table either!
 ok 8 - overridden add_role v-table method called
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'DYNSELF in a PMC will call methods overridden in high level classes' );
+pir_output_is(
+    <<'CODE', <<'OUT', 'DYNSELF in a PMC will call methods overridden in high level classes' );
 .sub 'test' :main
     $P0 = new 'Class'
     print "ok 1 - created a PDD15 class\n"

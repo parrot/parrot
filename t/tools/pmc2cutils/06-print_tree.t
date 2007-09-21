@@ -83,8 +83,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         select($currfh);
     }
     ok( $rv, "tree printed for default.dump" );
-    like( $msg, qr/^default$/,
-        "print_tree() correctly reported which .dump was printed" );
+    like( $msg, qr/^default$/, "print_tree() correctly reported which .dump was printed" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -228,7 +227,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
-    my ($tie, @lines);
+    my ( $tie, @lines );
     {
         $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
@@ -277,7 +276,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
     ### $self->dump_pmc();
-    my ($tie, @lines);
+    my ( $tie, @lines );
     {
         $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";

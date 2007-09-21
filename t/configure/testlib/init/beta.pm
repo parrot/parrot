@@ -17,7 +17,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 
 $description = 'Determining if your computer does beta';
-@args = qw( verbose );
+@args        = qw( verbose );
 
 sub runstep {
     my ( $self, $conf ) = @_;

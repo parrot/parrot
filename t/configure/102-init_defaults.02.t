@@ -7,8 +7,8 @@ use strict;
 use warnings;
 use Test::More tests => 12;
 use Carp;
-use_ok( 'Cwd' );
-use_ok( 'File::Copy' );
+use_ok('Cwd');
+use_ok('File::Copy');
 use_ok( 'File::Temp', qw| tempdir | );
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -21,34 +21,35 @@ use base qw(Parrot::Configure::Step::Base);
 
 my $cwd = cwd();
 {
-    my $tdir = tempdir(CLEANUP => 1);
-    ok(chdir $tdir, "Changed to temporary directory for testing");
-    ok(copy ("$cwd/VERSION", "$tdir/VERSION"),
-        "Able to copy VERSION for testing");
+    my $tdir = tempdir( CLEANUP => 1 );
+    ok( chdir $tdir, "Changed to temporary directory for testing" );
+    ok( copy( "$cwd/VERSION", "$tdir/VERSION" ), "Able to copy VERSION for testing" );
 
-    my $pkg = q{init::defaults};
-    my $args = process_options( {
-        argv            => [],
-        mode            => q{configure},
-    } );
+    my $pkg  = q{init::defaults};
+    my $args = process_options(
+        {
+            argv => [],
+            mode => q{configure},
+        }
+    );
 
     my $conf = Parrot::Configure->new;
     $conf->add_steps($pkg);
-    $conf->options->set(%{$args});
+    $conf->options->set( %{$args} );
 
-    my $task = $conf->steps->[0];
+    my $task        = $conf->steps->[0];
     my $step_name   = $task->step;
     my @step_params = @{ $task->params };
 
     my $step = $step_name->new();
-    ok(defined $step, "$step_name constructor returned defined value");
-    isa_ok($step, $step_name);
-    ok($step->description(), "$step_name has description");
+    ok( defined $step, "$step_name constructor returned defined value" );
+    isa_ok( $step, $step_name );
+    ok( $step->description(), "$step_name has description" );
 
     my $ret = $step->runstep($conf);
-    ok(defined $ret, "$step_name runstep() returned defined value");
+    ok( defined $ret, "$step_name runstep() returned defined value" );
 
-    ok(chdir $cwd, "Able to change back to directory after testing");
+    ok( chdir $cwd, "Able to change back to directory after testing" );
 }
 
 pass("Completed all tests in $0");

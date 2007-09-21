@@ -17,7 +17,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 
 $description = undef;
-@args = ();
+@args        = ();
 
 sub runstep {
     my ( $self, $conf ) = @_;

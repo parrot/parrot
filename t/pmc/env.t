@@ -119,6 +119,7 @@ ok
 OUT
 
 SKIP: {
+
     # This will not work on our unsetenv implementation
     skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
     pasm_output_is( <<'CODE', <<OUT, "exists/delete" );

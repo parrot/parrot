@@ -17,11 +17,12 @@ use Carp;
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
-    |
+        |
 );
-use_ok("Parrot::Configure::Options::Reconf", qw|
+use_ok(
+    "Parrot::Configure::Options::Reconf", qw|
         @valid_options
-    |
+        |
 );
 use_ok("Parrot::IO::Capture::Mini");
 
@@ -41,8 +42,8 @@ ok( !defined $valid{$badoption}, "invalid option not found" );
 my $args;
 $args = process_options(
     {
-        argv           => [],
-        mode            => q{reconfigure},
+        argv => [],
+        mode => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -62,11 +63,7 @@ like(
     "process_options() failed due to invalid 'mode' argument"
 );
 
-$args = process_options(
-    {
-        mode => q{reconfigure},
-    }
-);
+$args = process_options( { mode => q{reconfigure}, } );
 ok( defined $args,
     "process_options() returned successfully even though no explicit 'argv' key was provided" );
 
@@ -76,8 +73,7 @@ $args = process_options(
         mode => q{reconfigure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully when options were specified" );
+ok( defined $args, "process_options() returned successfully when options were specified" );
 
 $args = process_options(
     {
@@ -90,14 +86,7 @@ ok( defined $args,
 
 $badoption = q{cc};
 my $CC = "/usr/bin/gcc-3.3";
-eval {
-    $args = process_options(
-        {
-            argv => [ qq{--$badoption=$CC} ],
-            mode => q{reconfigure},
-        }
-    );
-};
+eval { $args = process_options( { argv => [qq{--$badoption=$CC}], mode => q{reconfigure}, } ); };
 like(
     $@,
     qr/^Invalid option "$badoption"/,
@@ -110,12 +99,11 @@ like(
         or croak "Unable to tie";
     $args = process_options(
         {
-            argv    => [q{--help}],
-            mode    => q{reconfigure},
+            argv => [q{--help}],
+            mode => q{reconfigure},
         }
     );
-    ok( !defined $args,
-        "process_options() returned undef after 'help' option" );
+    ok( !defined $args, "process_options() returned undef after 'help' option" );
     $msg = $tie->READLINE;
     like( $msg, qr/--help/i, "got correct message after 'help' option" );
 }
@@ -126,25 +114,18 @@ like(
         or croak "Unable to tie";
     $args = process_options(
         {
-            argv    => [q{--}],
-            mode    => q{reconfigure},
+            argv => [q{--}],
+            mode => q{reconfigure},
         }
     );
     ok( !defined $args,
         "process_options() returned undef after '--' option triggered help message" );
     $msg = $tie->READLINE;
-    like( $msg, qr/--help/i, "got help message as expected");
+    like( $msg, qr/--help/i, "got help message as expected" );
 }
 
 $badoption = q{version};
-eval {
-    $args = process_options(
-        {
-            argv => [ qq{--$badoption} ],
-            mode => q{reconfigure},
-        }
-    );
-};
+eval { $args = process_options( { argv => [qq{--$badoption}], mode => q{reconfigure}, } ); };
 like(
     $@,
     qr/^Invalid option "$badoption"/,
@@ -153,28 +134,26 @@ like(
 
 $args = process_options(
     {
-        argv        => [ q{--lex}, ],
-        mode        => q{reconfigure},
+        argv => [ q{--lex}, ],
+        mode => q{reconfigure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully after 'lex' option" );
+ok( defined $args, "process_options() returned successfully after 'lex' option" );
 ok( $args->{maintainer}, "'maintainer' attribute is true after 'lex' option" );
 
 $args = process_options(
     {
-        argv        => [ q{--yacc}, ],
-        mode        => q{reconfigure},
+        argv => [ q{--yacc}, ],
+        mode => q{reconfigure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully after 'yacc' option" );
+ok( defined $args, "process_options() returned successfully after 'yacc' option" );
 ok( $args->{maintainer}, "'maintainer' attribute is true after 'yacc' option" );
 
 $args = process_options(
     {
-        argv        => [q{--debugging=1}],
-        mode        => q{reconfigure},
+        argv => [q{--debugging=1}],
+        mode => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );
@@ -182,8 +161,8 @@ ok( $args->{debugging}, "debugging turned on explicitly" );
 
 $args = process_options(
     {
-        argv        => [q{--debugging=0}],
-        mode        => q{reconfigure},
+        argv => [q{--debugging=0}],
+        mode => q{reconfigure},
     }
 );
 ok( defined $args, "process_options() returned successfully" );

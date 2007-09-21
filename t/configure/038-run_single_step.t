@@ -6,30 +6,30 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  4;
+use Test::More tests => 4;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
-
-my $args = process_options( {
-    argv            => [ ],
-    mode            => q{configure},
-} );
-ok(defined $args, "process_options returned successfully");
+my $args = process_options(
+    {
+        argv => [],
+        mode => q{configure},
+    }
+);
+ok( defined $args, "process_options returned successfully" );
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
-ok(defined $conf, "Parrot::Configure->new() returned okay");
+ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
 my $step = q{phony::step};
 $conf->add_step($step);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-eval { $conf->run_single_step( $step ); };
-like($@, qr/Can't locate phony\/step\.pm in \@INC/,
-    "Got expected error message");
+eval { $conf->run_single_step($step); };
+like( $@, qr/Can't locate phony\/step\.pm in \@INC/, "Got expected error message" );
 
 pass("Completed all tests in $0");
 

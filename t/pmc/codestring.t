@@ -144,7 +144,6 @@ CODE
 $P11
 OUTPUT
 
-
 pir_output_is( <<'CODE', <<'OUTPUT', 'namespace keys' );
 .sub main :main
     .local pmc code
@@ -162,7 +161,6 @@ CODE
 [ "abc" ; "def" ]
 [ "abc" ; "def" ; unicode:"T\x{e9}st" ]
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

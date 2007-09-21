@@ -790,7 +790,6 @@ ok 1
 ok 2
 OUTPUT
 
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "check for zeroedness" );
     new P0, 'ResizableBooleanArray'
     set I0, 0

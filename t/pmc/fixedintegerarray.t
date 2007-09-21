@@ -356,7 +356,7 @@ OUTPUT
 TODO: {
     local $TODO = 'These tests require an obscure opcode that does not exist';
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
     new P0, 'FixedIntegerArray', "(1, 17,42,0,77,0b111,    0Xff)"
     set I0, P0
     print I0
@@ -382,7 +382,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_repr" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "get_repr" );
 .sub main
     new $P0, 'FixedIntegerArray', "(1, 17,42,0,77,0b111,    0Xff)"
     set $I0, $P0

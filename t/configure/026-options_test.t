@@ -15,33 +15,31 @@ use_ok('Parrot::IO::Capture::Mini');
 use_ok(
     'Parrot::Configure::Options', qw|
         process_options
-    |
+        |
 );
 use_ok("Parrot::Configure::Options::Test");
 
-my ($args, $opttest);
+my ( $args, $opttest );
 
 $args = process_options(
     {
-        argv            => [ ],
-        mode            => q{configure},
+        argv => [],
+        mode => q{configure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully when no options were specified" );
+ok( defined $args, "process_options() returned successfully when no options were specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
-ok(defined $opttest, "Constructor returned successfully");
+ok( defined $opttest, "Constructor returned successfully" );
 
-my ($tie, @lines);
+my ( $tie, @lines );
 {
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     $opttest->run_configure_tests();
     @lines = $tie->READLINE;
 }
-ok(! scalar(@lines),
-    "Nothing captured because no pre-configuration tests were run.");
+ok( !scalar(@lines), "Nothing captured because no pre-configuration tests were run." );
 
 @lines = ();
 {
@@ -50,46 +48,43 @@ ok(! scalar(@lines),
     $opttest->run_build_tests();
     @lines = $tie->READLINE;
 }
-ok(! scalar(@lines),
-    "Nothing captured because no pre-build tests were run.");
+ok( !scalar(@lines), "Nothing captured because no pre-build tests were run." );
 
 $args = process_options(
     {
-        argv            => [ q{--test=configure} ],
-        mode            => q{configure},
+        argv => [q{--test=configure}],
+        mode => q{configure},
     }
 );
 ok( defined $args,
     "process_options() returned successfully when '--test=configure' was specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
-ok(defined $opttest, "Constructor returned successfully");
+ok( defined $opttest, "Constructor returned successfully" );
 
 $args = process_options(
     {
-        argv            => [ q{--test=build} ],
-        mode            => q{configure},
+        argv => [q{--test=build}],
+        mode => q{configure},
     }
 );
-ok( defined $args,
-    "process_options() returned successfully when '--test=build' was specified" );
+ok( defined $args, "process_options() returned successfully when '--test=build' was specified" );
 
 $opttest = Parrot::Configure::Options::Test->new($args);
-ok(defined $opttest, "Constructor returned successfully");
+ok( defined $opttest, "Constructor returned successfully" );
 
 my $badoption = q{foobar};
 $args = process_options(
     {
-        argv            => [ qq{--test=$badoption} ],
-        mode            => q{configure},
+        argv => [qq{--test=$badoption}],
+        mode => q{configure},
     }
 );
 ok( defined $args,
     "process_options() returned successfully when '--test=$badoption' was specified" );
 
 eval { $opttest = Parrot::Configure::Options::Test->new($args); };
-like($@, qr/'$badoption' is a bad value/,
-    "Bad option to '--test' correctly detected");
+like( $@, qr/'$badoption' is a bad value/, "Bad option to '--test' correctly detected" );
 
 pass("Completed all tests in $0");
 

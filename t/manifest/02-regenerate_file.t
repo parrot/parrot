@@ -12,20 +12,18 @@ use Cwd;
 use File::Copy;
 use File::Temp qw( tempdir );
 use Tie::File;
-use lib ( qw| lib | );
+use lib (qw| lib |);
 use_ok('Parrot::Manifest');
 
 my $script = $0;
-my $mani = Parrot::Manifest->new( {
-    script      => $script,
-} );
-isa_ok($mani, 'Parrot::Manifest');
+my $mani = Parrot::Manifest->new( { script => $script, } );
+isa_ok( $mani, 'Parrot::Manifest' );
 
 my $cwd = cwd();
-my $f = q{MANIFEST};
+my $f   = q{MANIFEST};
 
 my $manifest_lines_ref = $mani->prepare_manifest();
-ok($manifest_lines_ref, "prepare_manifest_skip() returned");
+ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
 
 # 1:  Copy the real MANIFEST unaltered to the tempdir.
 # Assuming the real MANIFEST was correct going in to this test, the
@@ -33,16 +31,15 @@ ok($manifest_lines_ref, "prepare_manifest_skip() returned");
 # regenerate it.
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or
-        croak "Unable to change to temporary directory for testing";
-    copy(qq{$cwd/$f}, qq{$tdir/$f})
+    chdir $tdir
+        or croak "Unable to change to temporary directory for testing";
+    copy( qq{$cwd/$f}, qq{$tdir/$f} )
         or croak "Unable to copy $f to tempdir";
-    ok(-f $f, "$f found in tempdir");
-    my $need_for_file =
-        $mani->determine_need_for_manifest($manifest_lines_ref);
-    ok(! $need_for_file, "No need to regenerate $f");
-    chdir $cwd or
-        croak "Unable to change back from temporary directory after testing";
+    ok( -f $f, "$f found in tempdir" );
+    my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
+    ok( !$need_for_file, "No need to regenerate $f" );
+    chdir $cwd
+        or croak "Unable to change back from temporary directory after testing";
 }
 
 # 2:  Copy the real MANIFEST to the tempdir but mangle it there.
@@ -51,49 +48,44 @@ ok($manifest_lines_ref, "prepare_manifest_skip() returned");
 # whitespace to demonstrate that it is correctly skipped.
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or
-        croak "Unable to change to temporary directory for testing";
-    copy(qq{$cwd/$f}, qq{$tdir/$f})
+    chdir $tdir
+        or croak "Unable to change to temporary directory for testing";
+    copy( qq{$cwd/$f}, qq{$tdir/$f} )
         or croak "Unable to copy $f to tempdir";
-    ok(-f $f, "$f found in tempdir");
+    ok( -f $f, "$f found in tempdir" );
     my @lines;
     tie @lines, 'Tie::File', qq{$tdir/$f}
         or croak "Unable to tie to $f in tempdir";
-    for (1..10) {
-        if ( defined($lines[-1]) ) {
+    for ( 1 .. 10 ) {
+        if ( defined( $lines[-1] ) ) {
             pop @lines;
         }
     }
     push @lines, q{   };
     push @lines, q{};
     untie @lines or croak "Unable to untie from $f";
-    my $need_for_file =
-        $mani->determine_need_for_manifest($manifest_lines_ref);
-    ok($need_for_file, "Need to regenerate $f");
-    ok( $mani->print_manifest($manifest_lines_ref),
-        "print_manifest() returned true");
-    ok(  -f $f,
-        "$f has been created in tempdir");
-    chdir $cwd or
-        croak "Unable to change back from temporary directory after testing";
+    my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
+    ok( $need_for_file,                             "Need to regenerate $f" );
+    ok( $mani->print_manifest($manifest_lines_ref), "print_manifest() returned true" );
+    ok( -f $f,                                      "$f has been created in tempdir" );
+    chdir $cwd
+        or croak "Unable to change back from temporary directory after testing";
 }
 
 # 3:  Go to a tempdir which lacks a MANIFEST.  Confirm that you need to
 # regenerate MANIFEST (but do not bother to actually do it there).
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or
-        croak "Unable to change to temporary directory for testing";
-    ok(! -f $f, "$f found in tempdir");
-    my $need_for_file =
-        $mani->determine_need_for_manifest($manifest_lines_ref);
-    ok($need_for_file, "We would need to regenerate $f");
-    chdir $cwd or
-        croak "Unable to change back from temporary directory after testing";
+    chdir $tdir
+        or croak "Unable to change to temporary directory for testing";
+    ok( !-f $f, "$f found in tempdir" );
+    my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
+    ok( $need_for_file, "We would need to regenerate $f" );
+    chdir $cwd
+        or croak "Unable to change back from temporary directory after testing";
 }
 
 pass("Completed all tests in $0");
-
 
 ################### DOCUMENTATION ###################
 

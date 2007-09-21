@@ -22,7 +22,8 @@ Tests OO features related to names and namespaces.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'Create HLL class same-named as Parrot class', todo=>'RT#43419');
+pir_output_is(
+    <<'CODE', <<'OUT', 'Create HLL class same-named as Parrot class', todo => 'RT#43419' );
     .HLL "perl6", ""
 
     .namespace

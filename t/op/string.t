@@ -1165,9 +1165,11 @@ CODE
 
 SKIP: {
 
-skip("RT#45503: broken test in jit runcore",1) if (defined $ENV{TEST_PROG_ARGS}) and ($ENV{TEST_PROG_ARGS} =~ /-j/);
+    skip( "RT#45503: broken test in jit runcore", 1 )
+        if ( defined $ENV{TEST_PROG_ARGS} )
+        and ( $ENV{TEST_PROG_ARGS} =~ /-j/ );
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'if_s_ic' );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'if_s_ic' );
 	set	S0, "I've told you once, I've told you twice..."
 	if	S0, OK1
 	print	"not "

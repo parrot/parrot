@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  6;
+use Test::More tests => 6;
 use Carp;
 use Cwd;
 use Data::Dumper;
@@ -22,40 +22,43 @@ thinks there are files missing from those listed in the MANIFEST.
 
 =cut
 
-my $pkg = q{init::manifest};
-my $args = process_options( {
-    argv            => [ ],
-    mode            => q{configure},
-} );
+my $pkg  = q{init::manifest};
+my $args = process_options(
+    {
+        argv => [],
+        mode => q{configure},
+    }
+);
 
 my $conf = Parrot::Configure->new;
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
+$conf->options->set( %{$args} );
 
-my $task = $conf->steps->[0];
+my $task        = $conf->steps->[0];
 my $step_name   = $task->step;
 my @step_params = @{ $task->params };
 
 my $step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
+
 # Lets see if we can trick ExtUtils::Manifest into thinking there are missing
 # files.
 my $cwd = cwd();
 {
     my $tdir = tempdir();
     chdir $tdir or croak "Unable to change to tempdir";
-    copy (qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST}) or croak "Unable to copy MANIFEST";
+    copy( qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST} ) or croak "Unable to copy MANIFEST";
     {
         my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
         my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";
-        my $ret = $step->runstep($conf);
-        my @lines = $tie_err->READLINE;
+        my $ret        = $step->runstep($conf);
+        my @lines      = $tie_err->READLINE;
         my @more_lines = $tie_out->READLINE;
-        is($ret, undef, "$step_name runstep returned undef");
+        is( $ret, undef, "$step_name runstep returned undef" );
     }
     chdir $cwd or croak "Unable to change back";
 }

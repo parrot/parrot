@@ -82,7 +82,7 @@ sub check_parens {
     }
 
 ## L<PDD07/Code Formatting/"there should be at least one space between a C keyword and any subsequent open parenthesis">
-    ok( !scalar(@keyword_paren), 'Spacing between C keyword and following open parenthesis'  )
+    ok( !scalar(@keyword_paren), 'Spacing between C keyword and following open parenthesis' )
         or diag( "incorrect spacing between C keyword and following open parenthesis found in "
             . scalar @keyword_paren
             . " files:\n@keyword_paren" );

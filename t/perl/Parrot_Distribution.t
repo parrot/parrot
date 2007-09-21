@@ -78,24 +78,22 @@ for my $dir (@old_directory_list) {
     my $perl_exemption_regexp = $d->get_perl_exemption_regexp();
     ok( $perl_exemption_regexp, 'Got perl exemption regexp' );
 
-    my $exempted_file     = Parrot::IO::File->new( '../../lib/SmartLink.pm' );
-    ok( $d->is_perl_exemption( $exempted_file ), 'SmartLink.pm is exempted' );
+    my $exempted_file = Parrot::IO::File->new('../../lib/SmartLink.pm');
+    ok( $d->is_perl_exemption($exempted_file), 'SmartLink.pm is exempted' );
     like( $exempted_file->path(), $perl_exemption_regexp, 'SmartLink.pm is matched' );
 
     # we are in 't/perl'
-    my $not_exempted_file = Parrot::IO::File->new( '../../lib/DumbLink.pm' );
-    ok( ! $d->is_perl_exemption( $not_exempted_file ), 'DumbLink.pm is not exempted' );
+    my $not_exempted_file = Parrot::IO::File->new('../../lib/DumbLink.pm');
+    ok( !$d->is_perl_exemption($not_exempted_file), 'DumbLink.pm is not exempted' );
     unlike( $not_exempted_file->path(), $perl_exemption_regexp, 'DumbLink.pm is not matched' );
 
     # check that no exemptions turn up in the main file list
-    my @exemptions_in_perl_list
-         = grep { $_ =~ $perl_exemption_regexp }
-                map { $_->path }
-                    @perl_files;
+    my @exemptions_in_perl_list = grep { $_ =~ $perl_exemption_regexp }
+        map { $_->path } @perl_files;
 
-    ok( ! @exemptions_in_perl_list, 'No exemptions in Perl source list' );
+    ok( !@exemptions_in_perl_list, 'No exemptions in Perl source list' );
     foreach (@exemptions_in_perl_list) {
-        diag( "got exempted perl file: $_" );
+        diag("got exempted perl file: $_");
     }
 }
 

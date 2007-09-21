@@ -138,15 +138,15 @@ END_EXPECTED
 ##
 ## Output for when the test is not marked as TODO anymore.
 ##
-#    '51_if_unless.pir' => << 'END_EXPECTED',
-#before if
-#after if
-#
-#before unless
-#is printed
-#after unless
-#-0.0 was false
-#END_EXPECTED
+    #    '51_if_unless.pir' => << 'END_EXPECTED',
+    #before if
+    #after if
+    #
+    #before unless
+    #is printed
+    #after unless
+    #-0.0 was false
+    #END_EXPECTED
 
     '52_if_compare.pir' => << 'END_EXPECTED',
 before if
@@ -157,7 +157,7 @@ END_EXPECTED
 120
 END_EXPECTED
 
-   '55_iterator.pir' => << 'END_EXPECTED',
+    '55_iterator.pir' => << 'END_EXPECTED',
 foo
 bar
 baz
@@ -168,7 +168,6 @@ END_EXPECTED
 $P1 is defined
 $P3 is undefined
 END_EXPECTED
-
 
     '57_exists.pir' => << 'END_EXPECTED',
 my_array[0] is defined
@@ -224,8 +223,7 @@ END_EXPECTED
 
 );
 
-my %skips = (
-);
+my %skips = ();
 
 while ( my ( $example, $expected ) = each %expected ) {
     my $skip = $skips{$example};
@@ -262,8 +260,9 @@ END_EXPECTED
 
 # cleanup
 {
-  # The example '40_file_ops.pir' leave a temporary file.
-  unlink '40_file_ops_data.txt';
+
+    # The example '40_file_ops.pir' leave a temporary file.
+    unlink '40_file_ops_data.txt';
 }
 
 # Local Variables:

@@ -21,14 +21,11 @@ can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
 my $cwd = cwd();
 
 my $nonexistent = 'config/gen/makefiles/foobar';
-eval {
-    genfile(
-        $nonexistent    => 'CFLAGS',
-        comment_type    => '#',
-    );
-};
-like($@, qr/Can't open $nonexistent/, #'
-    "Got expected error message when non-existent file provided as argument to genfile().");
+eval { genfile( $nonexistent => 'CFLAGS', comment_type => '#', ); };
+like(
+    $@, qr/Can't open $nonexistent/,    #'
+    "Got expected error message when non-existent file provided as argument to genfile()."
+);
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
@@ -37,12 +34,15 @@ like($@, qr/Can't open $nonexistent/, #'
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN qq{Hello world\n};
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy            => 'CFLAGS',
-        makefile          => 1,
-    ), "genfile() returned true value with 'makefile' option");
+    ok(
+        genfile(
+            $dummy   => 'CFLAGS',
+            makefile => 1,
+        ),
+        "genfile() returned true value with 'makefile' option"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -52,17 +52,14 @@ like($@, qr/Can't open $nonexistent/, #'
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN qq{Hello world\n};
     close $IN or croak "Unable to close temp file";
-    eval {
-        genfile(
-            $dummy            => 'CFLAGS',
-            makefile          => 1,
-            comment_type      => q{<!--},
-        );
-    };
-    like($@, qr/^Unknown comment type/,
-        "genfile() failed due to unrecognized comment type with expected message");
+    eval { genfile( $dummy => 'CFLAGS', makefile => 1, comment_type => q{<!--}, ); };
+    like(
+        $@,
+        qr/^Unknown comment type/,
+        "genfile() failed due to unrecognized comment type with expected message"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -72,13 +69,16 @@ like($@, qr/Can't open $nonexistent/, #'
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN qq{#perl Hello world\n};
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy          => 'CFLAGS',
-        makefile        => 1,
-        feature_file    => 0,
-    ), "genfile() returned true value with false value for 'feature_file' option");
+    ok(
+        genfile(
+            $dummy       => 'CFLAGS',
+            makefile     => 1,
+            feature_file => 0,
+        ),
+        "genfile() returned true value with false value for 'feature_file' option"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -94,18 +94,13 @@ END_DUMMY
     close $IN or croak "Unable to close temp file";
     my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    eval {
-        genfile(
-            $dummy          => 'CFLAGS',
-            feature_file    => 1,
-        );
-    };
+    eval { genfile( $dummy => 'CFLAGS', feature_file => 1, ); };
     my @lines = $tie_err->READLINE;
-    ok(@lines, "Error message caught");
-    ok($@, "Bad Perl code caught by genfile()");
+    ok( @lines, "Error message caught" );
+    ok( $@,     "Bad Perl code caught by genfile()" );
 
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 untie *STDERR;
 
@@ -118,14 +113,12 @@ untie *STDERR;
     close $IN or croak "Unable to close temp file";
     my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    ok(genfile( $dummy => 'CFLAGS' ),
-        "genfile() returned true when warning expected");
+    ok( genfile( $dummy => 'CFLAGS' ), "genfile() returned true when warning expected" );
     my $line = $tie_err->READLINE;
-    like($line, qr/value for 'foobar'/,
-        "got expected warning");
+    like( $line, qr/value for 'foobar'/, "got expected warning" );
 
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 untie *STDERR;
 
@@ -136,17 +129,13 @@ untie *STDERR;
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN q{This line ends in a slash/}, qq{\n};
     close $IN or croak "Unable to close temp file";
-    eval {
-        genfile(
-            $dummy          => 'CFLAGS',
-            replace_slashes => 1,
-        );
-    };
-    like($@, qr//,
-        "genfile() died as expected with replace_slashes option and line ending in trailing slash");
+    eval { genfile( $dummy => 'CFLAGS', replace_slashes => 1, ); };
+    like( $@, qr//,
+        "genfile() died as expected with replace_slashes option and line ending in trailing slash"
+    );
 
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -157,12 +146,15 @@ untie *STDERR;
     my $line = q{$(basename   morgan/lefay/abra.ca.dabra src/foo.c              hacks)};
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy            => 'CFLAGS',
-        expand_gmake_syntax => 1,
-    ), "genfile() did transformation of 'make' 'basename' as expected");
+    ok(
+        genfile(
+            $dummy              => 'CFLAGS',
+            expand_gmake_syntax => 1,
+        ),
+        "genfile() did transformation of 'make' 'basename' as expected"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -174,12 +166,15 @@ untie *STDERR;
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy            => 'CFLAGS',
-        expand_gmake_syntax => 1,
-    ), "genfile() did transformation of 'make' 'notdir' as expected");
+    ok(
+        genfile(
+            $dummy              => 'CFLAGS',
+            expand_gmake_syntax => 1,
+        ),
+        "genfile() did transformation of 'make' 'notdir' as expected"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -191,12 +186,15 @@ untie *STDERR;
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy            => 'CFLAGS',
-        expand_gmake_syntax => 1,
-    ), "genfile() did transformation of 'make' 'addprefix' as expected");
+    ok(
+        genfile(
+            $dummy              => 'CFLAGS',
+            expand_gmake_syntax => 1,
+        ),
+        "genfile() did transformation of 'make' 'addprefix' as expected"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 {
@@ -208,12 +206,15 @@ untie *STDERR;
 
     print $IN $line, "\n";
     close $IN or croak "Unable to close temp file";
-    ok( genfile(
-        $dummy            => 'CFLAGS',
-        expand_gmake_syntax => 1,
-    ), "genfile() did transformation of 'make' 'wildcard' as expected");
+    ok(
+        genfile(
+            $dummy              => 'CFLAGS',
+            expand_gmake_syntax => 1,
+        ),
+        "genfile() did transformation of 'make' 'wildcard' as expected"
+    );
     unlink $dummy or croak "Unable to delete file after testing";
-    chdir $cwd or croak "Unable to change back to starting directory";
+    chdir $cwd    or croak "Unable to change back to starting directory";
 }
 
 ################### DOCUMENTATION ###################

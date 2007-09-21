@@ -84,7 +84,9 @@ like(
     "Constructor correctly failed due to lack of 'opt' key"
 );
 
-eval { $self = Parrot::Pmc2c::Pmc2cMain->new( { include => \@include, opt => [], args => [@args], } ); };
+eval {
+    $self = Parrot::Pmc2c::Pmc2cMain->new( { include => \@include, opt => [], args => [@args], } );
+};
 like(
     $@,
     qr/Must have key 'opt' which is a reference to a hash of option values/,
@@ -98,7 +100,9 @@ like(
     "Constructor correctly failed due to lack of 'args' key"
 );
 
-eval { $self = Parrot::Pmc2c::Pmc2cMain->new( { include => \@include, opt => \%opt, args => {}, } ); };
+eval {
+    $self = Parrot::Pmc2c::Pmc2cMain->new( { include => \@include, opt => \%opt, args => {}, } );
+};
 like(
     $@,
     qr/Must have key 'args' which is a reference to a list of the remaining arguments/,

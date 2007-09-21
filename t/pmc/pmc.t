@@ -114,9 +114,9 @@ OUTPUT
 my $checkTypes;
 while ( my ( $type, $id ) = each %pmc_types ) {
     next if grep { $type eq $_ } qw/
-        Null Iterator Enumerate Ref STMRef SharedRef ParrotObject ParrotThread
-        deleg_pmc BigInt LexInfo LexPad Slice Object
-        /;    # these need an initializer
+            Null Iterator Enumerate Ref STMRef SharedRef ParrotObject ParrotThread
+            deleg_pmc BigInt LexInfo LexPad Slice Object
+            /;    # these need an initializer
     my $set_ro = ( $type =~ /^Const\w+/ ) ? <<EOPASM : '';
     new P10, 'Integer'
     set P10, 1
@@ -372,7 +372,7 @@ TODO: {
 
     local $TODO = 'This test requires an obscure opcode that does not exist with a stringy class';
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
     new P3, 'Integer', "42"
     typeof S0, P3
     print S0

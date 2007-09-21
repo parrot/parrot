@@ -46,13 +46,10 @@ my ( $tie, $msg, @lines );
 
     my $temppmcdir = qq{$tdir/src/pmc};
     for ( qq{$tdir/src}, $temppmcdir ) {
-        ok( mkdir( $_ ), "created $_ under tempdir" );
+        ok( mkdir($_), "created $_ under tempdir" );
     }
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc"
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc" );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -81,7 +78,6 @@ my ( $tie, $msg, @lines );
     $rv = $self->gen_c();
     ok( $rv, "gen_c completed successfully; args:  default.pmc" );
 
-
     ok( chdir $cwd, "changed back to original directory" );
 }
 
@@ -94,10 +90,7 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc"
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc" );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -139,10 +132,7 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/array.pmc"
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/array.pmc" );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {
@@ -191,10 +181,7 @@ my ( $tie, $msg, @lines );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
-    my @pmcfiles = (
-        "$main::topdir/src/pmc/default.pmc",
-        "$main::topdir/src/pmc/class.pmc"
-    );
+    my @pmcfiles = ( "$main::topdir/src/pmc/default.pmc", "$main::topdir/src/pmc/class.pmc" );
     my $pmcfilecount = scalar(@pmcfiles);
     my $copycount;
     foreach my $pmcfile (@pmcfiles) {

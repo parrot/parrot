@@ -79,9 +79,9 @@ can_ok( 'Parrot::Test', $_ ) for qw/
 # TODO test run_command()
 
 # per_test
-is( Parrot::Test::per_test(),               undef, 'per_test() no args' );
+is( Parrot::Test::per_test(), undef, 'per_test() no args' );
 is( Parrot::Test::per_test( undef, 0 ),     undef, 'per_test() invalid first arg' );
-is( Parrot::Test::per_test( 0, undef ),     undef, 'per_test() invalid second arg' );
+is( Parrot::Test::per_test( 0,     undef ), undef, 'per_test() invalid second arg' );
 is( Parrot::Test::per_test( undef, undef ), undef, 'per_test() two invalid args' );
 
 # TODO test write_code_to_file(), plan(), skip(), slurp_file()
@@ -92,18 +92,18 @@ my ( $desc, $err, $line );
 
 ## PASM
 $desc = 'pasm_output_is: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pasm_output_is( <<'CODE', <<'OUTPUT', $desc );
     print "ok\n"
     end
 CODE
 ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pasm_output_is: failure';
 $line = line_num(+11);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #          got: 'ok
@@ -112,28 +112,28 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err( $err );
+test_err($err);
 pasm_output_is( <<'CODE', <<"OUTPUT", $desc );
     print "ok\n"
     end
 CODE
 not ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pasm_output_isnt: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pasm_output_isnt( <<'CODE', <<"OUTPUT", $desc );
     print "ok\n"
     end
 CODE
 not ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pasm_output_isnt: failure';
 $line = line_num(+12);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #     'ok
@@ -150,21 +150,21 @@ pasm_output_isnt( <<'CODE', <<'OUTPUT', $desc );
 CODE
 ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pasm_output_like: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pasm_output_like( <<'CODE', <<'OUTPUT', $desc );
     print "ok\n"
     end
 CODE
 /ok/
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pasm_output_like: failure';
 $line = line_num(+11);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #                   'ok
@@ -173,18 +173,18 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err( $err );
+test_err($err);
 pasm_output_like( <<'CODE', <<"OUTPUT", $desc );
     print "ok\n"
     end
 CODE
 /not ok/
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 ## PIR
 $desc = 'pir_output_is: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pir_output_is( <<'CODE', <<'OUTPUT', $desc );
 .sub 'test' :main
     print "ok\n"
@@ -192,11 +192,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', $desc );
 CODE
 ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pir_output_is: failure';
 $line = line_num(+11);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #          got: 'ok
@@ -205,7 +205,7 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err( $err );
+test_err($err);
 pir_output_is( <<'CODE', <<"OUTPUT", $desc );
 .sub 'test' :main
     print "ok\n"
@@ -213,10 +213,10 @@ pir_output_is( <<'CODE', <<"OUTPUT", $desc );
 CODE
 not ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pir_output_isnt: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pir_output_isnt( <<'CODE', <<"OUTPUT", $desc );
 .sub 'test' :main
     print "ok\n"
@@ -224,11 +224,11 @@ pir_output_isnt( <<'CODE', <<"OUTPUT", $desc );
 CODE
 not ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pir_output_isnt: failure';
 $line = line_num(+12);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #     'ok
@@ -238,7 +238,7 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err( $err );
+test_err($err);
 pir_output_isnt( <<'CODE', <<'OUTPUT', $desc );
 .sub 'test' :main
     print "ok\n"
@@ -246,10 +246,10 @@ pir_output_isnt( <<'CODE', <<'OUTPUT', $desc );
 CODE
 ok
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pir_output_like: success';
-test_out( "ok 1 - $desc" );
+test_out("ok 1 - $desc");
 pir_output_like( <<'CODE', <<'OUTPUT', $desc );
 .sub 'test' :main
     print "ok\n"
@@ -257,11 +257,11 @@ pir_output_like( <<'CODE', <<'OUTPUT', $desc );
 CODE
 /ok/
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 $desc = 'pir_output_like: failure';
 $line = line_num(+11);
-test_out( "not ok 1 - $desc" );
+test_out("not ok 1 - $desc");
 $err = <<"ERR";
 #     Failed test ($0 at line $line)
 #                   'ok
@@ -270,7 +270,7 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err( $err );
+test_err($err);
 pir_output_like( <<'CODE', <<"OUTPUT", $desc );
 .sub 'test' :main
     print "ok\n"
@@ -278,7 +278,7 @@ pir_output_like( <<'CODE', <<"OUTPUT", $desc );
 CODE
 /not ok/
 OUTPUT
-test_test( $desc );
+test_test($desc);
 
 # remember to change the number of tests
 BEGIN { plan tests => 63; }

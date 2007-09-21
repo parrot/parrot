@@ -35,7 +35,7 @@ my $rv;
 my $cwd = cwd();
 
 my $file = q{sample.txt};
-my ( $direction );
+my ($direction);
 my $fh;
 
 {
@@ -71,7 +71,7 @@ my $fh;
 
     $direction = '<';
     eval { $fh = Parrot::Pmc2c::UtilFunctions::open_file( $direction, $file ); };
-    like( $@,   qr/^Reading sample.txt/, "correctly failed to read nonexistent file" );
+    like( $@, qr/^Reading sample.txt/, "correctly failed to read nonexistent file" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
