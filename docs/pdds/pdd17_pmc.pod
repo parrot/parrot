@@ -825,13 +825,6 @@ Set the pointer value of the PMC Useful for PMCs that hold pointers to
 arbitrary data. The details of the data (type, location etc.) depend on the
 PMC.
 
-=item hash [deprecated]
-
-  INTVAL hash(INTERP, PMC* self, size_t seed)
-
-Create a hashed integer value for the PMC, given a particular seed.
-[NOTE: not really used and not really useful.]
-
 =back
 
 =head3 Aggregate Vtable Functions

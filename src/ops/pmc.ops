@@ -740,17 +740,6 @@ op unregister(invar PMC) {
   goto NEXT();
 }
 
-=item B<hash>(out INT, invar PMC)
-
-Set $1 to the hash value of $2.
-
-=cut
-
-op hash(out INT, invar PMC) {
-  $1 = VTABLE_hash(interp, $2, 0);   /* RT#42352 */
-  goto NEXT();
-}
-
 =item B<get_mro>(out PMC, invar PMC)
 
 Set $1 to the mro array of the PMC $2. Please note that this is a
