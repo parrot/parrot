@@ -505,6 +505,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
     PMC *ignored;
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     ignored = Parrot_load_lib(interp, s, NULL);
+    UNUSED(ignored);
     Parrot_register_HLL_lib(interp, s);
 }
 
@@ -646,6 +647,7 @@ hll_def: HLL STRINGC COMMA STRINGC
             CONTEXT(((Interp*)interp)->ctx)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
             ignored = Parrot_load_lib(interp, hll_lib, NULL);
+            UNUSED(ignored);
             Parrot_register_HLL_lib(interp, hll_lib);
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
@@ -987,6 +989,7 @@ pcc_result:
                  ignored = mk_ident_ur(interp, l->id, $3);
              else
                  ignored = mk_ident(interp, l->id, $3);
+         UNUSED(ignored);
          is_def=0;
          $$=0;
      }
@@ -1182,6 +1185,7 @@ labeled_inst:
                  ignored = mk_ident_ur(interp, l->id, $3);
              else
                  ignored = mk_ident(interp, l->id, $3);
+             UNUSED(ignored);
              l1 = l;
              l = l->next;
              free(l1);
