@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -406,61 +406,6 @@ CODE
 ok 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'PIR subclass' );
-.sub 'test' :main
-    .local pmc exp, ns
-    exp = new 'MyExporter'
-    ns  = get_namespace ['foo']
-    exp.'import'( 'foo' :named('source'), 'bar' :named('globals') )
-    'bar'()
-.end
-
-.namespace ['MyExporter']
-
-.sub 'onload' :load :init
-    .local pmc class
-    class = subclass 'Exporter', 'MyExporter'
-    .return (class)
-.end
-
-# this multi variant is enough to handle this case
-# real code needs a default multi to deal with does(hash) and does(array)
-.sub 'globals' :method :multi(String)
-    .param string globals     :optional
-    .param int    has_globals :opt_flag
-
-    unless has_globals goto returns
-    .local pmc glb_pre, glb_post
-    glb_pre  = new 'ResizableStringArray'
-    glb_post = new 'ResizableStringArray'
-    glb_pre  = split ' ', globals
-
-    .local pmc iter
-    iter = new 'Iterator', glb_pre
-  lp:
-    unless iter goto ex
-    .local string glb
-    glb = shift iter
-    glb = concat '&', glb
-    push glb_post, glb
-  ex:
-    globals = glb_post
-    callmethodsupercc
-
-  returns:
-    .return 'globals'()
-  end:
-    .return ()
-.end
-
-
-.namespace ['foo']
-
-.sub '&bar'
-    print 'ok'
-.end
-CODE
-OUT
 
 # TODO test exporting mmd subs
 
