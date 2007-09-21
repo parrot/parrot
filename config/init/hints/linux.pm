@@ -63,6 +63,10 @@ sub runstep {
         # warnings (only done temporarily to reduce noise)
         $ccflags .= ' -wd1011';
 
+        # ignore "conversion from "" to "" may lose significant bits"
+        # warnings (only done temporarily to reduce noise)
+        $ccflags .= ' -wd810';
+
         # ignore warnings springing from problems with computed goto
         # statements.  If someone can find out how to make icc play nicely
         # in these situations, that would be good.
