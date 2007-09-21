@@ -10,6 +10,10 @@ src/encoding.c - global encoding functions
 
 These are parrot's generic encoding handling functions
 
+=over 4
+
+=cut
+
 */
 
 #define PARROT_NO_EXTERN_ENCODING_PTRS
@@ -46,6 +50,16 @@ typedef struct All_encodings {
 
 static All_encodings *all_encodings;
 
+/*
+
+=item C<parrot_init_encodings_2>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 parrot_init_encodings_2(void)
 {
@@ -56,6 +70,16 @@ parrot_init_encodings_2(void)
         all_encodings->enc[i].name->charset = Parrot_default_charset_ptr;
     }
 }
+
+/*
+
+=item C<parrot_deinit_encodings>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 parrot_deinit_encodings(void)
@@ -71,6 +95,16 @@ parrot_deinit_encodings(void)
     all_encodings = NULL;
 }
 
+/*
+
+=item C<Parrot_new_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_MALLOC
 ENCODING *
@@ -78,6 +112,16 @@ Parrot_new_encoding(SHIM_INTERP)
 {
     return mem_allocate_typed(ENCODING);
 }
+
+/*
+
+=item C<Parrot_find_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -94,6 +138,16 @@ Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
     return NULL;
 }
 
+/*
+
+=item C<Parrot_load_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 /* Yep, this needs to be a char * parameter -- it's tough to load in
    encodings and such for strings if we can't be sure we've got enough
    info set up to actually build strings... */
@@ -109,9 +163,11 @@ Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 
 /*
 
-FUNCDOC: INTVAL Parrot_encoding_number
+=item C<INTVAL Parrot_encoding_number>
 
 Return the number of the encoding or -1 if not found.
+
+=cut
 
 */
 
@@ -133,9 +189,11 @@ Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
 
 /*
 
-FUNCDOC: Parrot_encoding_number_of_str
+=item C<Parrot_encoding_number_of_str>
 
 Return the number of the encoding of the given string or -1 if not found.
+
+=cut
 
 */
 
@@ -154,6 +212,16 @@ Parrot_encoding_number_of_str(SHIM_INTERP, NOTNULL(const STRING *src))
     return -1;
 }
 
+/*
+
+=item C<Parrot_encoding_name>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -164,6 +232,16 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
         return NULL;
     return all_encodings->enc[number_of_encoding].name;
 }
+
+/*
+
+=item C<Parrot_get_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -176,6 +254,16 @@ Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
     return all_encodings->enc[number_of_encoding].encoding;
 }
 
+/*
+
+=item C<Parrot_encoding_c_name>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -186,6 +274,16 @@ Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding->name;
 }
+
+/*
+
+=item C<register_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
@@ -214,6 +312,16 @@ register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
 
     return 1;
 }
+
+/*
+
+=item C<Parrot_register_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 INTVAL
@@ -248,6 +356,16 @@ Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
     return 0;
 }
 
+/*
+
+=item C<Parrot_make_default_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
@@ -257,12 +375,32 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
     return 1;
 }
 
+/*
+
+=item C<Parrot_default_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)
 {
     return Parrot_default_encoding_ptr;
 }
+
+/*
+
+=item C<Parrot_find_encoding_converter>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 encoding_converter_t

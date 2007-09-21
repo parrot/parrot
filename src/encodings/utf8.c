@@ -12,6 +12,10 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -182,9 +186,11 @@ typedef unsigned char utf8_t;
 
 /*
 
-FUNCDOC: utf8_characters
+=item C<utf8_characters>
 
 Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
+
+=cut
 
 */
 
@@ -209,9 +215,11 @@ utf8_characters(PARROT_INTERP, NOTNULL(const utf8_t *ptr), UINTVAL byte_len)
 
 /*
 
-FUNCDOC: utf8_decode
+=item C<utf8_decode>
 
 Returns the integer for the UTF-8 character found at C<*ptr>.
+
+=cut
 
 */
 
@@ -247,9 +255,11 @@ utf8_decode(PARROT_INTERP, NOTNULL(const utf8_t *ptr))
 
 /*
 
-FUNCDOC: utf8_encode
+=item C<utf8_encode>
 
 Returns the UTF-8 encoding of integer C<c>.
+
+=cut
 
 */
 
@@ -277,9 +287,11 @@ utf8_encode(PARROT_INTERP, NOTNULL(void *ptr), UINTVAL c)
 
 /*
 
-FUNCDOC: utf8_skip_forward
+=item C<utf8_skip_forward>
 
 Moves C<ptr> C<n> characters forward.
+
+=cut
 
 */
 
@@ -297,9 +309,11 @@ utf8_skip_forward(NOTNULL(const void *ptr), UINTVAL n)
 
 /*
 
-FUNCDOC: utf8_skip_backward
+=item C<utf8_skip_backward>
 
 Moves C<ptr> C<n> characters back.
+
+=cut
 
 */
 
@@ -319,16 +333,21 @@ utf8_skip_backward(NOTNULL(const void *ptr), UINTVAL n)
 
 /*
 
+=back
+
 =head2 Iterator Functions
 
-FUNCDOC: utf8_decode_and_advance
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<utf8_decode_and_advance>
 
 The UTF-8 implementation of the string iterator's C<get_and_advance>
-function.
-
-FUNCDOC: utf8_encode_and_advance
-
-The UTF-8 implementation of the string iterator's C<set_and_advance>
 function.
 
 */
@@ -367,6 +386,17 @@ utf8_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
     return c;
 }
 
+/*
+
+=item C<utf8_encode_and_advance>
+
+The UTF-8 implementation of the string iterator's C<set_and_advance>
+function.
+
+=cut
+
+*/
+
 static void
 utf8_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 {
@@ -382,10 +412,12 @@ utf8_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 
 /*
 
-FUNCDOC: utf8_set_position
+=item C<utf8_set_position>
 
 The UTF-8 implementation of the string iterator's C<set_position>
 function.
+
+=cut
 
 */
 
@@ -402,6 +434,16 @@ utf8_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL pos)
     i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
 }
 
+
+/*
+
+=item C<to_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
@@ -478,12 +520,32 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
     return result;
 }
 
+/*
+
+=item C<get_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
     const utf8_t * const start = (const utf8_t *)utf8_skip_forward(src->strstart, offset);
     return utf8_decode(interp, start);
 }
+
+/*
+
+=item C<set_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 set_codepoint(PARROT_INTERP, NOTNULL(STRING *src),
@@ -498,6 +560,16 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *src),
     utf8_encode(interp, p, codepoint);
 }
 
+/*
+
+=item C<get_byte>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static UINTVAL
 get_byte(SHIM_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
@@ -511,6 +583,16 @@ get_byte(SHIM_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
     return contents[offset];
 }
 
+/*
+
+=item C<set_byte>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_byte(PARROT_INTERP, NOTNULL(const STRING *src),
         UINTVAL offset, UINTVAL byte)
@@ -522,6 +604,16 @@ set_byte(PARROT_INTERP, NOTNULL(const STRING *src),
     contents = (unsigned char *)src->strstart;
     contents[offset] = (unsigned char)byte;
 }
+
+/*
+
+=item C<get_codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -541,6 +633,16 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
     return return_string;
 }
 
+/*
+
+=item C<get_bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)
@@ -558,6 +660,16 @@ get_bytes(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)
 
     return return_string;
 }
+
+/*
+
+=item C<get_codepoints_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -578,12 +690,32 @@ get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *src),
     return return_string;
 }
 
+/*
+
+=item C<get_bytes_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<set_codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
@@ -592,12 +724,32 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
     UNIMPL;
 }
 
+/*
+
+=item C<set_bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<become_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 /* Unconditionally makes the string be in this encoding, if that's valid */
 static void
@@ -606,6 +758,16 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
     UNIMPL;
 }
 
+
+/*
+
+=item C<codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static UINTVAL
 codepoints(PARROT_INTERP, NOTNULL(STRING *src))
@@ -621,12 +783,32 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
     return iter.charpos;
 }
 
+/*
+
+=item C<bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_PURE_FUNCTION
 static UINTVAL
 bytes(SHIM_INTERP, NOTNULL(STRING *src))
 {
     return src->bufused;
 }
+
+/*
+
+=item C<iter_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
@@ -638,6 +820,16 @@ iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
     iter->set_and_advance = utf8_encode_and_advance;
     iter->set_position =    utf8_set_position;
 }
+
+/*
+
+=item C<Parrot_encoding_utf8_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 ENCODING *
 Parrot_encoding_utf8_init(PARROT_INTERP)
@@ -670,12 +862,16 @@ Parrot_encoding_utf8_init(PARROT_INTERP)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/encodings/fixed_8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.
+
+=cut
 
 */
 

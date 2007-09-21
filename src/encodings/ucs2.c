@@ -12,6 +12,10 @@ UCS-2 encoding with the help of the ICU library.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -139,6 +143,16 @@ static void ucs2_set_position( SHIM_INTERP,
 
 
 
+/*
+
+=item C<to_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
@@ -154,6 +168,16 @@ to_encoding(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
     return result;
 }
 
+/*
+
+=item C<get_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
 {
@@ -165,6 +189,16 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *src), UINTVAL offset)
             "no ICU lib loaded");
 #endif
 }
+
+/*
+
+=item C<set_codepoint>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codepoint)
@@ -179,17 +213,47 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL codep
 #endif
 }
 
+/*
+
+=item C<get_byte>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static UINTVAL
 get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 {
     UNIMPL;
 }
 
+/*
+
+=item C<set_byte>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 {
     UNIMPL;
 }
+
+/*
+
+=item C<get_codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL count)
@@ -216,12 +280,32 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *src), UINTVAL offset, UINTVAL coun
     return return_string;
 }
 
+/*
+
+=item C<get_bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     UNIMPL;
 }
 
+
+/*
+
+=item C<get_codepoints_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
@@ -231,12 +315,32 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
     UNIMPL;
 }
 
+/*
+
+=item C<get_bytes_inplace>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<set_codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
@@ -245,12 +349,32 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
     UNIMPL;
 }
 
+/*
+
+=item C<set_bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
 {
     UNIMPL;
 }
+
+/*
+
+=item C<become_encoding>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 /* Unconditionally makes the string be in this encoding, if that's
    valid */
@@ -260,6 +384,16 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
     UNIMPL;
 }
 
+
+/*
+
+=item C<codepoints>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static UINTVAL
 codepoints(PARROT_INTERP, NOTNULL(STRING *src))
@@ -272,11 +406,31 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *src))
 #endif
 }
 
+/*
+
+=item C<bytes>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static UINTVAL
 bytes(PARROT_INTERP, NOTNULL(STRING *src))
 {
     return src->bufused;
 }
+
+/*
+
+=item C<ucs2_decode_and_advance>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 #if PARROT_HAS_ICU
 static UINTVAL
@@ -294,6 +448,16 @@ ucs2_decode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i))
     return c;
 }
 
+/*
+
+=item C<ucs2_encode_and_advance>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
 {
@@ -304,6 +468,16 @@ ucs2_encode_and_advance(PARROT_INTERP, NOTNULL(String_iter *i), UINTVAL c)
     i->bytepos = pos * sizeof (UChar);
 }
 
+/*
+
+=item C<ucs2_set_position>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 {
@@ -312,6 +486,17 @@ ucs2_set_position(SHIM_INTERP, NOTNULL(String_iter *i), UINTVAL n)
 }
 
 #endif
+
+/*
+
+=item C<iter_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 {
@@ -327,6 +512,16 @@ iter_init(PARROT_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
             "no ICU lib loaded");
 #endif
 }
+
+/*
+
+=item C<Parrot_encoding_ucs2_init>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 ENCODING *
@@ -360,6 +555,8 @@ Parrot_encoding_ucs2_init(PARROT_INTERP)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/encodings/fixed_8.c>,
@@ -367,6 +564,8 @@ F<src/encodings/utf8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.
+
+=cut
 
 */
 
