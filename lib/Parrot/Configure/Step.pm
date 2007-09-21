@@ -437,9 +437,9 @@ sub _run_command {
     open STDOUT, '>', $out or die "Can't redirect stdout" if $out;
 
     # See 'Obscure Open Tricks' in perlopentut
-    open STDERR, ">$err"
+    open STDERR, ">$err" ## no critic InputOutput::ProhibitTwoArgOpen
         or die "Can't redirect stderr"
-        if $err;    ## no critic InputOutput::ProhibitTwoArgOpen
+        if $err;
 
     system $command;
     my $exit_code = $? >> 8;
