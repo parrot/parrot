@@ -23,8 +23,9 @@ feature.
 
 =head2 Functions
 
+=over 4
 
-FUNCDOC: Parrot_register_HLL
+=item C<Parrot_register_HLL>
 
 Register HLL C<hll_name> within Parrot core.  If C<hll_lib> isn't a NULL
 STRING, load the shared language support library.  Creates a root namespace for
@@ -33,24 +34,26 @@ the HLL named C<hll_name>.  Returns a type id for this HLL or 0 on error.
 If C<hll_name> is NULL, only the library is loaded.  The C<.loadlib> pragma
 uses this.
 
-FUNCDOC: Parrot_get_HLL_id
+=item C<Parrot_get_HLL_id>
 
 Return the id of the given HLL name or -1 on error. C<parrot> has id 0.
 
-FUNCDOC: Parrot_register_HLL_type
+=item C<Parrot_register_HLL_type>
 
 Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
-FUNCDOC: Parrot_get_HLL_type
+=item C<Parrot_get_HLL_type>
 
 Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
 doesn't remap the given type, or if C<hll_id> is the special value
 C<PARROT_HLL_NONE>, returns C<core_type> unchanged.
 
-FUNCDOC: Parrot_get_ctx_HLL_type
+=item C<Parrot_get_ctx_HLL_type>
 
 Return an equivalent PMC type number according to the current HLL setings in
 the context.  If no type is registered, returns C<core_type>.
+
+=cut
 
 */
 
@@ -371,9 +374,11 @@ Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 
 /*
 
-FUNCDOC: Parrot_get_ctx_HLL_namespace
+=item C<Parrot_get_ctx_HLL_namespace>
 
 Return root namespace of the current HLL.
+
+=cut
 
 */
 
@@ -388,10 +393,12 @@ Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_get_HLL_namespace
+=item C<Parrot_get_HLL_namespace>
 
 Return root namespace of the HLL with the id of I<hll_id>.  If C<hll_id> is the
 special value C<PARROT_HLL_NONE>, return the global root namespace.
+
+=cut
 
 */
 
@@ -412,10 +419,12 @@ Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
 
 /*
 
-FUNCDOC: Parrot_regenerate_HLL_namespaces
+=item C<Parrot_regenerate_HLL_namespaces>
 
 Create all HLL namespaces that don't already exist. This is necessary when
 creating a new interpreter which shares an old interpreter's HLL_info.
+
+=cut
 
 */
 
@@ -458,9 +467,13 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
 
 /*
 
+=back
+
 =head1 AUTHOR
 
 Leopold Toetsch
+
+=cut
 
 */
 

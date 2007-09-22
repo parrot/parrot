@@ -24,6 +24,8 @@ Define the internal interpreter exceptions.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -64,7 +66,7 @@ static void run_cleanup_action( PARROT_INTERP, NOTNULL(Stack_Entry_t *e) )
 
 /*
 
-FUNCDOC: internal_exception
+=item C<internal_exception>
 
 Signal a fatal exception.  This involves printing an error message to stderr,
 and calling C<Parrot_exit> to invoke exit handlers and exit the process with the
@@ -72,6 +74,8 @@ given exitcode.  No error handlers are used, so it is not possible for Parrot
 bytecode to intercept a fatal error (cf. C<real_exception>).  Furthermore, no
 stack unwinding is done, so the exit handlers run in the current dynamic
 environment.
+
+=cut
 
 */
 
@@ -106,9 +110,11 @@ internal_exception(int exitcode, NOTNULL(const char *format), ...)
 
 /*
 
-FUNCDOC: do_panic
+=item C<do_panic>
 
 Panic handler.
+
+=cut
 
 */
 
@@ -156,21 +162,23 @@ describe them as well.\n\n");
 
 /*
 
-FUNCDOC: push_exception
+=item C<push_exception>
 
 Add the exception handler on the stack.
 
-FUNCDOC: Parrot_push_action
+=item C<Parrot_push_action>
 
 Push an action handler onto the dynamic environment.
 
-FUNCDOC: Parrot_push_mark
+=item C<Parrot_push_mark>
 
 Push a cleanup mark onto the dynamic environment.
 
-FUNCDOC: Parrot_pop_mark
+=item C<Parrot_pop_mark>
 
 Pop items off the dynamic environment up to the mark.
+
+=cut
 
 */
 
@@ -236,9 +244,11 @@ Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
 
 /*
 
-FUNCDOC: find_exception_handler
+=item C<find_exception_handler>
 
 Find the exception handler for C<exception>.
+
+=cut
 
 */
 
@@ -326,9 +336,11 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
 
 /*
 
-FUNCDOC: pop_exception
+=item C<pop_exception>
 
 Pops the topmost exception handler off the stack.
+
+=cut
 
 */
 
@@ -359,11 +371,13 @@ pop_exception(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_c_exception_handler
+=item C<new_c_exception_handler>
 
 Generate an exception handler, that catches PASM level exceptions inside
 a C function. This could be a separate class too, for now just a private
 flag bit is set.
+
+=cut
 
 */
 
@@ -383,9 +397,11 @@ new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
 
 /*
 
-FUNCDOC: push_new_c_exception_handler
+=item C<push_new_c_exception_handler>
 
 Pushes an new C exception handler onto the stack.
+
+=cut
 
 */
 
@@ -398,9 +414,11 @@ push_new_c_exception_handler(PARROT_INTERP, Parrot_exception *jb)
 
 /*
 
-FUNCDOC: throw_exception
+=item C<throw_exception>
 
 Throw the exception.
+
+=cut
 
 */
 
@@ -428,9 +446,11 @@ throw_exception(PARROT_INTERP, PMC *exception, SHIM(void *dest))
 
 /*
 
-FUNCDOC: rethrow_exception
+=item C<rethrow_exception>
 
 Rethrow the exception.
+
+=cut
 
 */
 
@@ -452,10 +472,12 @@ rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
 
 /*
 
-FUNCDOC: rethrow_c_exception
+=item C<rethrow_c_exception>
 
 Return back to runloop, assumes exception is still in C<TODO> and
 that this is called from within a handler setup with C<new_c_exception>.
+
+=cut
 
 */
 
@@ -484,10 +506,12 @@ rethrow_c_exception(PARROT_INTERP)
 
 /*
 
-FUNCDOC: dest2offset
+=item C<dest2offset>
 
 Translate an absolute bytecode location to an offset used for resuming
 after an exception had occurred.
+
+=cut
 
 */
 
@@ -513,9 +537,11 @@ dest2offset(PARROT_INTERP, NOTNULL(const opcode_t *dest))
 
 /*
 
-FUNCDOC: create_exception
+=item C<create_exception>
 
 Create an exception.
+
+=cut
 
 */
 
@@ -558,9 +584,11 @@ create_exception(PARROT_INTERP)
 
 /*
 
-FUNCDOC: handle_exception
+=item C<handle_exception>
 
 Handle an exception.
+
+=cut
 
 */
 
@@ -576,10 +604,12 @@ handle_exception(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_internal_exception
+=item C<new_internal_exception>
 
 Create a new internal exception buffer, either by allocating it or by
 getting one from the free list.
+
+=cut
 
 */
 
@@ -603,9 +633,11 @@ new_internal_exception(PARROT_INTERP)
 
 /*
 
-FUNCDOC: free_internal_exception
+=item C<free_internal_exception>
 
 Place internal exception buffer back on the free list.
+
+=cut
 
 */
 
@@ -638,11 +670,13 @@ really_destroy_exception_list(NULLOK(Parrot_exception *e))
 
 /*
 
-FUNCDOC: do_exception
+=item C<do_exception>
 
 Called from interrupt code. Does a C<longjmp> in front of the runloop,
 which calls C<handle_exception()>, returning the handler address where
 execution then resumes.
+
+=item
 
 */
 
@@ -662,7 +696,7 @@ do_exception(PARROT_INTERP, INTVAL severity, long error)
 
 /*
 
-FUNCDOC: real_exception
+=item C<real_exception>
 
 Throws a real exception, with an error message constructed from the format
 string and arguments.  C<ret_addr> is the address from which to resume, if some
@@ -671,6 +705,8 @@ C<exitcode> is a C<exception_type_enum> value.
 
 See also C<internal_exception()>, which signals fatal errors, and
 C<throw_exception>, which calls the handler.
+
+=cut
 
 */
 
@@ -739,9 +775,11 @@ real_exception(PARROT_INTERP, NULLOK(void *ret_addr),
 
 /*
 
-FUNCDOC: Parrot_init_exceptions
+=item C<Parrot_init_exceptions>
 
 Create exception objects.
+
+=cut
 
 */
 
@@ -762,9 +800,11 @@ Parrot_init_exceptions(PARROT_INTERP) {
 
 /*
 
-FUNCDOC: Parrot_confess
+=item C<Parrot_confess>
 
 A better version of assert() that gives a backtrace if possible.
+
+=cut
 
 */
 
@@ -836,6 +876,8 @@ Parrot_print_backtrace(void)
 
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

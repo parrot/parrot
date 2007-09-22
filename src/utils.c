@@ -14,6 +14,10 @@ Opcode helper functions that don't really fit elsewhere.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -62,7 +66,7 @@ static void rec_climb_back_and_mark(
 
 /*
 
-FUNCDOC: intval_mod
+=item C<intval_mod>
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of the built-in mod operator (%) with
@@ -81,6 +85,8 @@ Millennium* Springer, 1999.
 
 [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
 Mathematics*, Second Edition. Addison-Wesley, 1994.
+
+=cut
 
 */
 
@@ -117,11 +123,13 @@ intval_mod(INTVAL i2, INTVAL i3)
 
 /*
 
-FUNCDOC: floatval_mod
+=item C<floatval_mod>
 
 Returns C<n2 mod n3>.
 
 Includes a workaround for buggy code generation in the C<lcc> compiler.
+
+=cut
 
 */
 
@@ -149,9 +157,15 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
 
 /*
 
+=back
+
 =head2 Random Number Generator
 
 Based on the C<rand48()> family of functions.
+
+=over 4
+
+=cut
 
 */
 
@@ -178,9 +192,11 @@ static unsigned short c = C;
 
 /*
 
-FUNCDOC: next_rand
+=item C<next_rand>
 
 Returns the next random number in C<X>.
+
+=cut
 
 */
 
@@ -208,9 +224,11 @@ next_rand(_rand_buf X)
 
 /*
 
-FUNCDOC: _erand48
+=item C<_erand48>
 
 Returns a C<double> in the interval C<[0.0, 1.0)>.
+
+=cut
 
 */
 
@@ -225,9 +243,11 @@ _erand48(_rand_buf buf)
 
 /*
 
-FUNCDOC: _drand48
+=item C<_drand48>
 
 Returns a C<double> in the interval C<[0.0, 1.0)>.
+
+=cut
 
 */
 
@@ -239,9 +259,11 @@ _drand48(void)
 
 /*
 
-FUNCDOC: _jrand48
+=item C<_jrand48>
 
 Returns a C<long> in the interval C<[-2^31, 2^31)>.
+
+=cut
 
 */
 
@@ -256,9 +278,11 @@ _jrand48(_rand_buf buf)
 
 /*
 
-FUNCDOC: _nrand48
+=item C<_nrand48>
 
 Returns a C<long> in the interval C<[0, 2^31)>.
+
+=cut
 
 */
 
@@ -270,9 +294,11 @@ _nrand48(_rand_buf buf)
 
 /*
 
-FUNCDOC: _lrand48
+=item C<_lrand48>
 
 Returns a C<long> in the interval C<[0, 2^31)>.
+
+=cut
 
 */
 
@@ -284,9 +310,11 @@ _lrand48(void)
 
 /*
 
-FUNCDOC: _mrand48
+=item C<_mrand48>
 
 Returns a C<long> in the interval C<[-2^31, 2^31)>.
+
+=cut
 
 */
 
@@ -298,10 +326,12 @@ _mrand48(void)
 
 /*
 
-FUNCDOC: _srand48
+=item C<_srand48>
 
 Sets the high order 32 bits to the argument C<seed>. The low order 16
 bits are set to the arbitrary value 0x330e.
+
+=cut
 
 */
 
@@ -338,11 +368,13 @@ _srand48(long seed)
 
 /*
 
-FUNCDOC: Parrot_float_rand
+=item C<Parrot_float_rand>
 
 Returns a C<FLOATVAL> in the interval C<[0.0, 1.0)>.
 
 C<how_random> is ignored.
+
+=cut
 
 */
 
@@ -357,11 +389,13 @@ Parrot_float_rand(INTVAL how_random)
 
 /*
 
-FUNCDOC: Parrot_uint_rand
+=item C<Parrot_uint_rand>
 
 Returns an C<INTVAL> in the interval C<[0, 2^31)>.
 
 C<how_random> is ignored.
+
+=cut
 
 */
 
@@ -376,11 +410,13 @@ Parrot_uint_rand(INTVAL how_random)
 
 /*
 
-FUNCDOC: Parrot_int_rand
+=item C<Parrot_int_rand>
 
 Returns an C<INTVAL> in the interval C<[-2^31, 2^31)>.
 
 C<how_random> is ignored.
+
+=cut
 
 */
 
@@ -395,11 +431,13 @@ Parrot_int_rand(INTVAL how_random)
 
 /*
 
-FUNCDOC: Parrot_range_rand
+=item C<Parrot_range_rand>
 
 Returns an C<INTVAL> in the range C<[from, to]>.
 
 C<how_random> is ignored.
+
+=cut
 
 */
 
@@ -413,9 +451,11 @@ Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 
 /*
 
-FUNCDOC: Parrot_srand
+=item C<Parrot_srand>
 
 Seeds the random number generator with C<seed>.
+
+=cut
 
 */
 
@@ -428,15 +468,21 @@ Parrot_srand(INTVAL seed)
 
 /*
 
+=back
+
 =head2 Array Functions
 
-FUNCDOC: Parrot_make_la
+=over 4
+
+=item C<Parrot_make_la>
 
 Creates a C array of C<long>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
 the new array, and the last (extra) element is set to 0.
 
 Used in C<src/nci.c>.
+
+=cut
 
 */
 
@@ -466,9 +512,11 @@ Parrot_make_la(PARROT_INTERP, NOTNULL(PMC *array))
 
 /*
 
-FUNCDOC: Parrot_destroy_la
+=item C<Parrot_destroy_la>
 
 Use this to destroy an array created with C<Parrot_make_la()>.
+
+=cut
 
 */
 
@@ -480,7 +528,7 @@ Parrot_destroy_la(NULLOK(long *array)) {
 
 /*
 
-FUNCDOC: Parrot_make_cpa
+=item C<Parrot_make_cpa>
 
 Creates a C array of C<char *>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
@@ -489,6 +537,8 @@ the new array, and the last (extra) element is set to 0.
 Currently unused.
 
 Note that you need to free this array with C<Parrot_destroy_cpa()>.
+
+=cut
 
 */
 
@@ -524,9 +574,11 @@ Parrot_make_cpa(PARROT_INTERP, NOTNULL(PMC *array))
 
 /*
 
-FUNCDOC: Parrot_destroy_cpa
+=item C<Parrot_destroy_cpa>
 
 Use this to destroy an array created with C<Parrot_make_cpa()>.
+
+=cut
 
 */
 
@@ -559,9 +611,11 @@ typedef enum {
 
 /*
 
-FUNCDOC: tm_to_array
+=item C<tm_to_array>
 
 Helper to convert a B<struct tm *> to an Array
+
+=cut
 
 */
 
@@ -636,7 +690,7 @@ Parrot_byte_rindex(SHIM_INTERP, NOTNULL(const STRING *base),
 
 /*
 
-FUNCDOC: rec_climb_back_and_mark
+=item C<rec_climb_back_and_mark>
 
 Recursive function, used by Parrot_register_move to
 climb back the graph of register moves operations.
@@ -654,6 +708,8 @@ case marks it, and set node_index as its backup.
 
   node_index  ... the index of a destination (i.e. with a pred.) register
   c           ... the graph and all the needed params : the context
+
+=cut
 
 */
 
@@ -683,7 +739,7 @@ rec_climb_back_and_mark(int node_index, NOTNULL(parrot_prm_context* c))
 
 /*
 
-FUNCDOC: process_cycle_without_exit
+=item C<process_cycle_without_exit>
 
 Recursive function, used by Parrot_register_move to handle the case
 of cycles without exits, that are cycles of move ops between registers
@@ -693,6 +749,8 @@ For instance: 1-->2, 2-->3, 3-->1
 
   node_index  ... the index of a destination (i.e. with a pred.) register
   c           ... the graph and all the needed params : the context
+
+=cut
 
 */
 
@@ -867,9 +925,13 @@ Parrot_register_move(PARROT_INTERP, int n_regs,
 
 /*
 
+=back
+
 =head1 HISTORY
 
 Initial version by leo 2003.09.09.
+
+=cut
 
 */
 

@@ -13,6 +13,10 @@ retrieve arguments.
 
 =head2 Var args Functions
 
+=over 4
+
+=cut
+
 */
 
 #define IN_SPF_SYSTEM
@@ -120,12 +124,14 @@ static UHUGEINTVAL getuint_va( PARROT_INTERP,
 
 /*
 
-FUNCDOC: getchr_va
+=item C<getchr_va>
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
 
 C<size> is unused.
+
+=cut
 
 */
 
@@ -144,13 +150,15 @@ getchr_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getint_va
+=item C<getint_va>
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
 
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the integer.
+
+=cut
 
 */
 
@@ -191,13 +199,15 @@ getint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getuint_va
+=item C<getuint_va>
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
 
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the integer.
+
+=cut
 
 */
 
@@ -238,13 +248,15 @@ getuint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getfloat_va
+=item C<getfloat_va>
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
 
 C<size> is an C<enum spf_type_t> value which indicates the storage type of
 the number.
+
+=cut
 
 */
 
@@ -285,13 +297,15 @@ getfloat_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getstring_va
+=item C<getstring_va>
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
 
 C<size> is an C<enum spf_type_t> value which indicates the storage type
 of the string.
+
+=cut
 
 */
 
@@ -334,11 +348,13 @@ getstring_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getptr_va
+=item C<getptr_va>
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
 C<size> is unused.
+
+=cut
 
 */
 
@@ -359,12 +375,18 @@ SPRINTF_OBJ va_core = {
 
 /*
 
+=back
+
 =head2 PMC Functions
 
-FUNCDOC: getchr_pmc
+=over 4
+
+=item C<getchr_pmc>
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -386,10 +408,12 @@ getchr_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getint_pmc
+=item C<getint_pmc>
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -422,10 +446,12 @@ getint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getuint_pmc
+=item C<getuint_pmc>
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -458,10 +484,12 @@ getuint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getfloat_pmc
+=item C<getfloat_pmc>
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -491,10 +519,12 @@ getfloat_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getstring_pmc
+=item C<getstring_pmc>
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -515,10 +545,12 @@ getstring_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-FUNCDOC: getptr_pmc
+=item C<getptr_pmc>
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.
+
+=cut
 
 */
 
@@ -544,6 +576,8 @@ SPRINTF_OBJ pmc_core = {
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/misc.h>, F<src/misc.c>, F<src/spf_render.c>.
@@ -565,6 +599,8 @@ In the future, it may be deemed desirable to similarly vtable-ize
 appending things to the string, allowing for faster C<PIO_printf()> &c,
 as well as a version that writes directly to a C string. However, at
 this point neither of those is needed.
+
+=cut
 
 */
 

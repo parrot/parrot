@@ -12,6 +12,10 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -21,9 +25,11 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-FUNCDOC: mark_context
+=item C<mark_context>
 
 Marks the context C<*ctx>.
+
+=cut
 
 */
 
@@ -76,9 +82,11 @@ mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
 
 /*
 
-FUNCDOC: new_sub
+=item C<new_sub>
 
 Returns a new C<Parrot_sub>.
+
+=cut
 
 */
 
@@ -95,11 +103,13 @@ new_sub(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_closure
+=item C<new_closure>
 
 Returns a new C<Parrot_sub> with its own sctatchpad.
 
 XXX: Need to document semantics in detail.
+
+=cut
 
 */
 
@@ -114,11 +124,13 @@ new_closure(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_continuation
+=item C<new_continuation>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
 current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
 to the current context.
+
+=cut
 
 */
 
@@ -149,9 +161,11 @@ new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
 
 /*
 
-FUNCDOC: new_ret_continuation
+=item C<new_ret_continuation>
 
 Returns a new C<Parrot_cont> pointing to the current context.
+
+=cut
 
 */
 
@@ -174,11 +188,13 @@ new_ret_continuation(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_coroutine
+=item C<new_coroutine>
 
 Returns a new C<Parrot_coro>.
 
 XXX: Need to document semantics in detail.
+
+=cut
 
 */
 
@@ -197,10 +213,12 @@ new_coroutine(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_ret_continuation_pmc
+=item C<new_ret_continuation_pmc>
 
 Returns a new C<RetContinuation> PMC. Uses one from the cache,
 if possible; otherwise, creates a new one.
+
+=cut
 
 */
 
@@ -217,9 +235,11 @@ new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
 
 /*
 
-FUNCDOC: invalidate_retc_context
+=item C<invalidate_retc_context>
 
 Make true Continuation from all RetContinuations up the call chain.
+
+=cut
 
 */
 
@@ -252,9 +272,11 @@ extern PMC* Parrot_NameSpace_nci_get_name(PARROT_INTERP, PMC* pmc);
 
 /*
 
-FUNCDOC: Parrot_full_sub_name
+=item C<Parrot_full_sub_name>
 
 Return namespace, name, and location of subroutine.
+
+=cut
 
 */
 
@@ -405,9 +427,11 @@ Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-FUNCDOC: Parrot_find_pad
+=item C<Parrot_find_pad>
 
 Locate the LexPad containing the given name. Return NULL on failure.
+
+=cut
 
 */
 
@@ -491,6 +515,8 @@ parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/sub.h>.
@@ -498,6 +524,8 @@ F<include/parrot/sub.h>.
 =head1 HISTORY
 
 Initial version by Melvin on 2002/06/6.
+
+=cut
 
 */
 

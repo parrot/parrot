@@ -28,6 +28,10 @@ segments from the input PBC files.
 
 =back
 
+=head2 Functions
+
+=over 4
+
 =cut
 
 */
@@ -163,9 +167,11 @@ help(PARROT_INTERP)
 
 /*
 
-FUNCDOC: str_dup
+=item C<str_dup>
 
 Duplicate a C string
+
+=cut
 
 */
 
@@ -185,11 +191,13 @@ str_dup(NOTNULL(const char *old))
 
 /*
 
-FUNCDOC: pbc_merge_loadpbc
+=item C<pbc_merge_loadpbc>
 
 This function loads a PBC file and unpacks it. We can't
 use Parrot_readbc because that is specified to also
 fixup the segments, which we don't want.
+
+=cut
 
 */
 PARROT_WARN_UNUSED_RESULT
@@ -273,10 +281,12 @@ pbc_merge_loadpbc(PARROT_INTERP, NOTNULL(const char *fullname))
 
 /*
 
-FUNCDOC: pbc_merge_bytecode
+=item C<pbc_merge_bytecode>
 
 This function merges the bytecode from the input packfiles, storing the
 offsets that each bit of bytecode now exists at.
+
+=cut
 
 */
 PARROT_WARN_UNUSED_RESULT
@@ -336,9 +346,11 @@ pbc_merge_bytecode(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_constants
+=item C<pbc_merge_constants>
 
 This function merges the constants tables from the input PBC files.
+
+=cut
 
 */
 PARROT_WARN_UNUSED_RESULT
@@ -429,9 +441,11 @@ pbc_merge_constants(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_fixups
+=item C<pbc_merge_fixups>
 
 This function merges the fixups tables from the input PBC files.
+
+=cut
 
 */
 static void
@@ -521,9 +535,11 @@ pbc_merge_fixups(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_debugs
+=item C<pbc_merge_debugs>
 
 This function merges the debug segments from the input PBC files.
+
+=cut
 
 */
 static void
@@ -587,9 +603,11 @@ pbc_merge_debugs(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_pic_index
+=item C<pbc_merge_pic_index>
 
 This function merges the pic_index segments from the input PBC files.
+
+=cut
 
 */
 
@@ -636,10 +654,12 @@ pbc_merge_pic_index(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_ctpointers
+=item C<pbc_merge_ctpointers>
 
 This function corrects the pointers into the constants table found in the
 bytecode.
+
+=cut
 
 */
 static void
@@ -712,9 +732,11 @@ pbc_merge_ctpointers(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
 
 /*
 
-FUNCDOC: pbc_merge_begin
+=item C<pbc_merge_begin>
 
 This is the function that drives PBC merging process.
+
+=cut
 
 */
 PARROT_WARN_UNUSED_RESULT
@@ -751,9 +773,11 @@ pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs
 
 /*
 
-FUNCDOC: pbc_merge_write
+=item C<pbc_merge_write>
 
 This functions writes out the merged packfile.
+
+=cut
 
 */
 static void
@@ -788,11 +812,13 @@ pbc_merge_write(PARROT_INTERP, NOTNULL(PackFile *pf), NOTNULL(const char *filena
 
 /*
 
-FUNCDOC: main(int argc, char **argv)
+=item C<main(int argc, char **argv)>
 
 The main function that grabs console input, reads in the packfiles
 provided they exist, hands them to another function that runs the
 merge process and finally writes out the produced packfile.
+
+=cut
 
 */
 

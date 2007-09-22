@@ -16,6 +16,10 @@ src/test_main.c
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "trace.h"
@@ -35,9 +39,11 @@ static STRING* trace_class_name( NOTNULL(const PMC* pmc) )
 
 /*
 
-FUNCDOC: trace_pmc_dump
+=item C<trace_pmc_dump>
 
 Prints a PMC to C<stderr>.
+
+=cut
 
 */
 
@@ -139,9 +145,11 @@ trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-FUNCDOC: trace_key_dump
+=item C<trace_key_dump>
 
 Prints a key to C<stderr>, returns the length of the output.
+
+=cut
 
 */
 
@@ -215,11 +223,13 @@ trace_key_dump(PARROT_INTERP, NOTNULL(const PMC *key))
 
 /*
 
-FUNCDOC: trace_op_dump
+=item C<trace_op_dump>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
 Prints the PC, OP and ARGS. Used by C<trace_op()>.
+
+=cut
 
 */
 
@@ -422,12 +432,14 @@ done:
 
 /*
 
-FUNCDOC: trace_op
+=item C<trace_op>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
 Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
 checking.
+
+=cut
 
 */
 
@@ -447,9 +459,13 @@ trace_op(PARROT_INTERP, NOTNULL(const opcode_t *code_start),
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/trace.h>
+
+=cut
 
 */
 

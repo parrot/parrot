@@ -10,6 +10,10 @@ src/tsq.c - Thread-safe queues
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -18,9 +22,11 @@ src/tsq.c - Thread-safe queues
 
 /*
 
-FUNCDOC: pop_entry
+=item C<pop_entry>
 
 Does a synchronized removal of the head entry off the queue and returns it.
+
+=cut
 
 */
 
@@ -37,11 +43,13 @@ pop_entry(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: peek_entry
+=item C<peek_entry>
 
 This does no locking, so the result might have changed by the time you
 get the entry, but a synchronized C<pop_entry()> will check again and
 return C<NULL> if the queue is empty.
+
+=cut
 
 */
 
@@ -55,11 +63,13 @@ peek_entry(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: nosync_pop_entry
+=item C<nosync_pop_entry>
 
 Grab an entry off the queue with no synchronization. Internal only,
 because it's darned evil and shouldn't be used outside the module. It's
 in here so we don't have to duplicate pop code.
+
+=cut
 
 */
 
@@ -85,10 +95,12 @@ nosync_pop_entry(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: wait_for_entry
+=item C<wait_for_entry>
 
 Does a synchronized removal of the head entry off the queue, waiting if
 necessary until there is an entry, and then returns it.
+
+=cut
 
 */
 
@@ -110,9 +122,11 @@ wait_for_entry(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: push_entry
+=item C<push_entry>
 
 Does a synchronized insertion of C<entry> onto the tail of the queue.
+
+=cut
 
 */
 
@@ -135,9 +149,11 @@ push_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: unshift_entry
+=item C<unshift_entry>
 
 Does a synchronized insertion of C<entry> into the head of the queue.
+
+=cut
 
 */
 
@@ -163,10 +179,12 @@ unshift_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: nosync_insert_entry
+=item C<nosync_insert_entry>
 
 Inserts a timed event according to C<abstime>. The caller has to hold the
 queue mutex.
+
+=cut
 
 */
 
@@ -213,9 +231,11 @@ nosync_insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: insert_entry
+=item C<insert_entry>
 
 Does a synchronized insert of C<entry>.
+
+=cut
 
 */
 
@@ -230,9 +250,11 @@ insert_entry(NOTNULL(QUEUE *queue), NOTNULL(QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: queue_lock
+=item C<queue_lock>
 
 Locks the queue's mutex.
+
+=cut
 
 */
 
@@ -244,9 +266,11 @@ queue_lock(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: queue_unlock
+=item C<queue_unlock>
 
 Unlocks the queue's mutex.
+
+=cut
 
 */
 
@@ -258,9 +282,11 @@ queue_unlock(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: queue_broadcast
+=item C<queue_broadcast>
 
 This function wakes up I<every> thread waiting on the queue.
+
+=cut
 
 */
 
@@ -272,9 +298,11 @@ queue_broadcast(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: queue_signal
+=item C<queue_signal>
 
 XXX Needs a description
+
+=cut
 
 */
 
@@ -286,9 +314,11 @@ queue_signal(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: queue_wait
+=item C<queue_wait>
 
 Instructs the queue to wait.
+
+=cut
 
 */
 
@@ -300,9 +330,11 @@ queue_wait(NOTNULL(QUEUE *queue))
 
 /*
 
-FUNCDOC: queue_timedwait
+=item C<queue_timedwait>
 
 Instructs the queue to wait for C<abs_time> seconds (?).
+
+=cut
 
 */
 
@@ -314,9 +346,11 @@ queue_timedwait(NOTNULL(QUEUE *queue), NOTNULL(struct timespec *abs_time))
 
 /*
 
-FUNCDOC: queue_init
+=item C<queue_init>
 
 Initializes the queue, setting C<prio> as the queue's priority.
+
+=cut
 
 */
 
@@ -336,9 +370,11 @@ queue_init(UINTVAL prio)
 
 /*
 
-FUNCDOC: queue_destroy
+=item C<queue_destroy>
 
 Destroys the queue, raising an exception if it is not empty.
+
+=cut
 
 */
 
@@ -355,9 +391,13 @@ queue_destroy(NOTNULL(QUEUE *queue))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/tsq.h>.
+
+=cut
 
 */
 

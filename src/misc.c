@@ -34,7 +34,7 @@ Takes a Parrot string format, returns a Parrot string.
 So the C<_> means "returns Parrot string" and the other letter indicates
 the type for the format.
 
-=back
+=cut
 
 */
 
@@ -46,11 +46,13 @@ the type for the format.
 
 /*
 
-FUNCDOC: Parrot_vsprintf_s
+=item C<Parrot_vsprintf_s>
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
 in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
+
+=cut
 
 */
 
@@ -68,9 +70,11 @@ Parrot_vsprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), va_list args)
 
 /*
 
-FUNCDOC: Parrot_vsprintf_c
+=item C<Parrot_vsprintf_c>
 
 C string version of C<Parrot_vsprintf_s()>.
+
+=cut
 
 */
 
@@ -89,10 +93,12 @@ Parrot_vsprintf_c(PARROT_INTERP, NOTNULL(const char *pat), va_list args)
 
 /*
 
-FUNCDOC: Parrot_vsnprintf
+=item C<Parrot_vsnprintf>
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
+
+=cut
 
 */
 
@@ -120,9 +126,11 @@ Parrot_vsnprintf(PARROT_INTERP, NOTNULL(char *targ),
 
 /*
 
-FUNCDOC: Parrot_sprintf_s
+=item C<Parrot_sprintf_s>
 
 Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
+
+=cut
 
 */
 
@@ -146,9 +154,11 @@ Parrot_sprintf_s(PARROT_INTERP, NOTNULL(STRING *pat), ...)
 
 /*
 
-FUNCDOC: Parrot_sprintf_c
+=item C<Parrot_sprintf_c>
 
 C string version of C<Parrot_sprintf_s()>.
+
+=cut
 
 */
 
@@ -172,10 +182,12 @@ Parrot_sprintf_c(PARROT_INTERP, NOTNULL(const char *pat), ...)
 
 /*
 
-FUNCDOC: Parrot_snprintf
+=item C<Parrot_snprintf>
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
+
+=cut
 
 */
 
@@ -195,10 +207,12 @@ Parrot_snprintf(PARROT_INTERP, NOTNULL(char *targ), size_t len,
 
 /*
 
-FUNCDOC: Parrot_psprintf
+=item C<Parrot_psprintf>
 
 Calls C<Parrot_sprintf_format()> with the insertion arguments in an
 C<Array> PMC.
+
+=cut
 
 */
 
@@ -216,6 +230,8 @@ Parrot_psprintf(PARROT_INTERP, NOTNULL(STRING *pat), NOTNULL(PMC *ary))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
@@ -225,6 +241,8 @@ F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
 This was once a simple, vararg-based implementation that existed
 completely within this file.  When the file grew to be nearly 1,000
 lines long, I split it into three. --BD
+
+=cut
 
 */
 

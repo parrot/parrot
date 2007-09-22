@@ -13,6 +13,8 @@ where each chunk has room for one entry.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -24,10 +26,12 @@ where each chunk has room for one entry.
 
 /*
 
-FUNCDOC: new_stack
+=item C<new_stack>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
+
+=cut
 
 */
 
@@ -43,9 +47,11 @@ new_stack(PARROT_INTERP, NOTNULL(const char *name))
 
 /*
 
-FUNCDOC: mark_stack
+=item C<mark_stack>
 
 Mark entries in a stack structure during DOD.
+
+=cut
 
 */
 
@@ -77,9 +83,11 @@ mark_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t *chunk))
 
 /*
 
-FUNCDOC: stack_destroy
+=item C<stack_destroy>
 
 stack_destroy() doesn't need to do anything, since GC does it all.
+
+=cut
 
 */
 
@@ -92,9 +100,11 @@ stack_destroy(SHIM(Stack_Chunk_t *top))
 
 /*
 
-FUNCDOC: stack_height
+=item C<stack_height>
 
 Returns the height of the stack. The maximum "depth" is height - 1.
+
+=cut
 
 */
 
@@ -117,12 +127,14 @@ stack_height(SHIM_INTERP, NOTNULL(const Stack_Chunk_t *chunk))
 
 /*
 
-FUNCDOC: stack_entry
+=item C<stack_entry>
 
 If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
 entry C<|depth|> entries from the bottom of the stack. Returns C<NULL>
 if C<|depth| > number> of entries in stack.
+
+=cut
 
 */
 
@@ -159,7 +171,7 @@ stack_entry(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack), INTVAL depth)
 
 /*
 
-FUNCDOC: rotate_entries
+=item C< rotate_entries>
 
 Rotate the top N entries by one.  If C<< N > 0 >>, the rotation is bubble
 up, so the top most element becomes the Nth element.  If C<< N < 0 >>, the
@@ -217,7 +229,7 @@ rotate_entries(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),  INTVAL num_entr
 
 /*
 
-FUNCDOC: stack_push
+=item C<stack_push>
 
 Push something on the generic stack.
 
@@ -269,7 +281,7 @@ stack_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
 
 /*
 
-FUNCDOC: stack_pop
+=item C<stack_pop>
 
 Pop off an entry and return a pointer to the contents.
 
@@ -327,9 +339,11 @@ stack_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p),
 
 /*
 
-FUNCDOC: pop_dest
+=item C<pop_dest>
 
 Pop off a destination entry and return a pointer to the contents.
+
+=cut
 
 */
 
@@ -349,9 +363,11 @@ pop_dest(PARROT_INTERP)
 
 /*
 
-FUNCDOC: stack_peek
+=item C<stack_peek>
 
 Peek at stack and return pointer to entry and the type of the entry.
+
+=cut
 
 */
 
@@ -380,9 +396,11 @@ stack_peek(PARROT_INTERP, NOTNULL(Stack_Chunk_t *stack_base),
 
 /*
 
-FUNCDOC: get_entry_type
+=item C<get_entry_type>
 
 Returns the stack entry type of C<entry>.
+
+=cut
 
 */
 
@@ -397,9 +415,12 @@ get_entry_type(SHIM_INTERP, NOTNULL(const Stack_Entry_t *entry))
 
 /*
 
-FUNCDOC:
+=item C<Parrot_dump_dynamic_environment>
+
 Print a representation of the dynamic stack to the standard error (using
 C<PIO_eprintf>).  This is used only temporarily for debugging.
+
+=cut
 
 */
 
@@ -439,6 +460,8 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, NOTNULL(Stack_Chunk_t *dynamic_en
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 
