@@ -176,7 +176,9 @@ handle_flags(PARROT_INTERP, NOTNULL(SpfInfo *info), NOTNULL(STRING *str),
                 && (string_ord(interp, str,0) == '-' ||
                     string_ord(interp, str,0) == '+')) {
                 STRING *temp = NULL;
-                string_substr(interp, str, 1, len-1, &temp, 0);
+                STRING *ignored;
+                ignored = string_substr(interp, str, 1, len-1, &temp, 0);
+                UNUSED(ignored);
                 string_chopn_inplace(interp, str, -1);
                 str = string_append(interp, str, fill);
                 str = string_append(interp, str, temp);
@@ -291,7 +293,9 @@ Parrot_sprintf_format(PARROT_INTERP,
     for (i = old = len = 0; i < (INTVAL) string_length(interp, pat); i++) {
         if (string_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
-                string_substr(interp, pat, old, len, &substr, 1);
+                STRING *ignored;
+                ignored =  string_substr(interp, pat, old, len, &substr, 1);
+                UNUSED(ignored);
                 /* XXX This shouldn't modify targ the pointer */
                 targ = string_append(interp, targ, substr);
             }
@@ -804,7 +808,9 @@ do_sprintf:
         }
     }
     if (len) {
-        string_substr(interp, pat, old, len, &substr, 1);
+        STRING *ignored;
+        ignored = string_substr(interp, pat, old, len, &substr, 1);
+        UNUSED(ignored);
         targ = string_append(interp, targ, substr);
     }
 

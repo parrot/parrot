@@ -622,9 +622,11 @@ push_opcode_number(PARROT_INTERP, NOTNULL(IMAGE_IO *io), FLOATVAL v)
     const size_t   len  = PF_size_number() * sizeof (opcode_t);
     STRING * const s    = io->image;
     const size_t   used = s->bufused;
+    opcode_t      *ignored;
 
     op_check_size(interp, s, len);
-    PF_store_number((opcode_t *)((ptrcast_t)s->strstart + used), &v);
+    ignored = PF_store_number((opcode_t *)((ptrcast_t)s->strstart + used), &v);
+    UNUSED(ignored);
 
     s->bufused += len;
     s->strlen  += len;
@@ -644,9 +646,12 @@ push_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(STRING *v))
     const size_t len = PF_size_string(v) * sizeof (opcode_t);
     STRING * const s = io->image;
     const size_t used = s->bufused;
+    opcode_t      *ignored;
 
     op_check_size(interp, s, len);
-    PF_store_string((opcode_t *)((ptrcast_t)s->strstart + used), v);
+    ignored = PF_store_string((opcode_t *)((ptrcast_t)s->strstart + used), v);
+    UNUSED(ignored);
+
     s->bufused += len;
     s->strlen += len;
 }

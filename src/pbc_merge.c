@@ -723,6 +723,7 @@ static PackFile*
 pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs)
 {
     PackFile_ByteCode   *bc;
+    PackFile_ConstTable *ct;
 
     /* Create a new empty packfile. */
     PackFile * const merged = PackFile_new(interp, 0);
@@ -733,7 +734,8 @@ pbc_merge_begin(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs), int num_inputs
 
     /* Merge the various stuff. */
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
+    ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
+    UNUSED(ct);
 
     pbc_merge_fixups(interp, inputs, num_inputs, merged, bc);
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
