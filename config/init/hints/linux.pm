@@ -44,6 +44,9 @@ sub runstep {
         # suppress remarks about floating point comparisons
         $ccflags .= ' -wd1572';
 
+        # supress remarks about hiding of parameter declarations
+        $ccflags .= ' -wd1599';
+
         # gcc is currently not looking for unused variables, so should icc
         # for the time being (this will reduce the noise somewhat)
         $ccflags .= ' -wd869';
@@ -66,6 +69,10 @@ sub runstep {
         # ignore "conversion from "" to "" may lose significant bits"
         # warnings (only done temporarily to reduce noise)
         $ccflags .= ' -wd810';
+
+        # ignore "function "" was declared but never referenced"
+        # warnings (only done temporarily to reduce noise)
+        $ccflags .= ' -wd177';
 
         # ignore warnings springing from problems with computed goto
         # statements.  If someone can find out how to make icc play nicely
