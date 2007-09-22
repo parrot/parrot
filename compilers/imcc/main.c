@@ -34,6 +34,11 @@ static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
     NOTNULL(const char *output_file) )
         __attribute__nonnull__(2);
 
+static void
+compile_to_bytecode(PARROT_INTERP,
+                    NOTNULL(const char * const sourcefile),
+                    NOTNULL(const char * const output_file));
+
 static void do_pre_process( PARROT_INTERP )
         __attribute__nonnull__(1);
 
@@ -701,7 +706,7 @@ static void determine_output_file_type(PARROT_INTERP,
     }
 }
 
-void
+static void
 compile_to_bytecode(PARROT_INTERP,
                     NOTNULL(const char * const sourcefile),
                     NOTNULL(const char * const output_file))
