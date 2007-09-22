@@ -26,7 +26,6 @@ rule program {
 
 token compilation_unit {
     | <expansion>
-    | <global_def>
     | <sub_def>
     | <const_def>
     | <pragma>
@@ -231,9 +230,6 @@ rule lexical_decl {
 }
 
 
-rule global_def {
-    <'.global'> [ <id> | <syntax_error: identifier expected> ]
-}
 
 =head2 Const definition
 
@@ -401,9 +397,7 @@ rule invocant {
 }
 
 rule short_sub_call {
-    [ [ <target>\. ]
-    | [ <target> <'->'> ]
-    ]?                               # optional invocant
+    [ <target>\.]?                   # optional invocant
     [ <target> | <string_constant> ] # method or sub name/id
     <parenthesized_args>             # sub args
     <process_heredocs>                           # process the list of heredoc labels, if any

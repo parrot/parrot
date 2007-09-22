@@ -28,8 +28,8 @@ CODE
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, '' );
 
 .sub main			
-	x->hello()
-	x->'hello'()
+	x.hello()
+	x.'hello'()
 .end
 
 CODE
