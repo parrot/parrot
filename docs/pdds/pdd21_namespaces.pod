@@ -304,8 +304,7 @@ The meaning of $P3 is compiler-specific.  The only universal legal value is
 Null, which requests a "normal" load.  The meaning of "normal" varies, but
 the ideal would be to perform only the minimal actions required.
 
-On failure, an exception is thrown.  {XXX - I'd settle for a universal error
-pmc interface.  Hm, sounds like a new pdd.  >>TODO}
+On failure, an exception is thrown.  
 
 =back
 
@@ -352,11 +351,6 @@ hash key.
 
 Add the namespace PMC $P2 under the name denoted by an array of name
 strings $P1.
-
-=item C<del_namespace>
-
-{{ NOTE: this opcode has been removed from the spec. The del_namespace
-method on the namespace object is sufficient.}}
 
 =item C<get_namespace>
 
