@@ -30,7 +30,7 @@ this is as simple as returning the list.
 
   # The PMC method only throws a regular exception, we need to tcl-ify it.
   convert_to_tcl_error:
-    get_results '(0,0)', $P0, $S0
+    get_results '0,0', $P0, $S0
     tcl_error $S0
 
 .end
@@ -172,7 +172,7 @@ not_integer:
   tcl_error $S0
 
 not_integer_eh:
-  get_results '(0,0)', $P99, $S99
+  get_results '0,0', $P99, $S99
   $I0 = index $S99, 'expected integer'
   if $I0 == -1 goto not_integer # got some other exception, rewrap it.
   rethrow $P99 # preserves the invalid octal message.
@@ -225,7 +225,7 @@ end:
   .return($I0)
 
 bad_index:
-  get_results '(0,0)', $P99, $S99
+  get_results '0,0', $P99, $S99
   $S0 = 'bad index "'
   $S0 .= idx
   $S0 .= '": must be integer?[+-]integer? or end?[+-]integer?'

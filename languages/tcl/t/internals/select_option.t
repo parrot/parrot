@@ -67,7 +67,7 @@ done_1:
     $S2 = ''
     goto check_3
 eh_3:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_3:
     $S3 = 'bad option "punk": must be dank, dark, or dunk'
     is($S2,$S3,message)
@@ -80,7 +80,7 @@ check_3:
     $S2 = ''
     goto check_4
 eh_4:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_4:
     $S3 = 'ambiguous option "da": must be dank, dark, or dunk'
     is($S2,$S3,message)
@@ -93,7 +93,7 @@ check_4:
     $S2 = ''
     goto check_5
 eh_5:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_5:
     $S3 = 'bad coke "punk": must be dank, dark, or dunk'
     is($S2,$S3,message)
@@ -106,7 +106,7 @@ check_5:
     $S2 = ''
     goto check_6
 eh_6:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_6:
     $S3 = 'ambiguous particle "da": must be dank, dark, or dunk'
     is($S2,$S3,message)
@@ -122,7 +122,7 @@ check_6:
     $S2 = ''
     goto check_7
 eh_7:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_7:
     $S3 = 'bad option "frank": must be bill or bob'
     is($S2,$S3,message)
@@ -138,7 +138,7 @@ check_7:
     $S2 = ''
     goto check_8
 eh_8:
-    get_results '(0,0)', $P2, $S2
+    get_results '0,0', $P2, $S2
 check_8:
     $S3 = 'ambiguous option "b": must be bill or bob'
     is($S2,$S3,message)

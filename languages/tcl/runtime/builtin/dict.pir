@@ -81,7 +81,7 @@ no_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -436,7 +436,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -526,7 +526,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -733,7 +733,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -815,7 +815,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -876,7 +876,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
@@ -998,7 +998,7 @@ bad_args:
   goto got_dict
 
 dict_error:
-  get_results '(0,0)', $P0, $S0
+  get_results '0,0', $P0, $S0
   $I0 = index $S0, 'variable is array'
   if $I0 != -1 goto cant_dict_array
   dictionary = new 'TclDict'
