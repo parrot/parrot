@@ -38,7 +38,7 @@ token compilation_unit {
 =cut
 
 rule sub_def {
-    [ <'.sub'> | <'.pcc_sub'> ]
+    <'.sub'>
     [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
     <sub_pragmas>?
     [ <?nl>    | <syntax_error: newline expected> ]

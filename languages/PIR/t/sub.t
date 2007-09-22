@@ -128,8 +128,8 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'parameter fla
 .end
 CODE
 
-language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'pcc_sub' );
-.pcc_sub x
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'sub' );
+.sub x
 	.param int i                    # positional parameter
   .param pmc argv :slurpy         # slurpy array
   .param pmc value :named('key')  # named parameter
