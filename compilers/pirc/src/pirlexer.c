@@ -84,12 +84,12 @@ lexer.
 The following are PIR directives.
 
   .arg               .const      .constant    .emit             .end
-  .endnamespace      .endm       .eom         .get_results      .global
+  .endnamespace      .endm       .eom         .get_results
   .globalconst       .HLL        .HLL_map     .include          .invocant
   .lex               .loadlib    .local       .macro            .meth_call
   .namespace         .nci_call   .param       .pcc_begin        .pcc_begin_return
   .pcc_begin_yield   .pcc_call   .pcc_end     .pcc_end_return   .pcc_end_yield
-  .pcc_sub           .pragma     .result      .return           .sub
+  .pragma     .result      .return           .sub
   .sym               .yield
 
 
@@ -149,7 +149,6 @@ static char const * dictionary[] = {
     ".endm",                    /* T_ENDM,                  */
     ".eom",                     /* T_EOM,                   */
     ".get_results",             /* T_GET_RESULTS            */
-    ".global",                  /* T_GLOBAL_DECL,           */
     ".globalconst",             /* T_GLOBALCONST            */
     ".HLL",                     /* T_HLL                    */
     ".HLL_map",                 /* T_HLL_MAP                */
@@ -170,7 +169,6 @@ static char const * dictionary[] = {
     ".pcc_end",                 /* T_PCC_END                */
     ".pcc_end_return",          /* T_PCC_END_RETURN         */
     ".pcc_end_yield",           /* T_PCC_END_YIELD          */
-    ".pcc_sub",                 /* T_PCC_SUB                */
     ".pragma",                  /* T_PRAGMA                 */
     ".result",                  /* T_RESULT,                */
     ".return",                  /* T_RETURN,                */

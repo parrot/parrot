@@ -1867,21 +1867,6 @@ instructions(parser_state *p) {
 
 =item *
 
-  global_definition -> '.global' IDENTIFIER
-
-=cut
-
-*/
-static void
-global_definition(parser_state *p) {
-    match(p, T_GLOBAL_DECL);
-    match(p, T_IDENTIFIER);
-}
-
-/*
-
-=item *
-
   multi-type-list -> '(' [multi-type {',' multi-type } ] ')'
 
   multi-type -> IDENTIFIER | STRINGC | keylist | type
@@ -2092,7 +2077,7 @@ static void
 sub_definition(parser_state *p) {
     /* call emit method */
     emit_sub_start(p);
-    next(p); /* skip '.sub' or '.pcc_sub' */
+    next(p); /* skip '.sub' */
 
     switch (p->curtoken) { /* subname -> IDENTIFIER | STRINGC */
         case T_IDENTIFIER:
@@ -2319,8 +2304,7 @@ loadlib(parser_state *p) {
 
 =item *
 
-  compilation_unit -> global_definition
-                    | sub_definition
+  compilation_unit -> sub_definition
                     | '.const' const_definition
                     | emit_block
                     | include
@@ -2337,11 +2321,7 @@ loadlib(parser_state *p) {
 static void
 compilation_unit(parser_state *p) {
     switch (p->curtoken) {
-        case T_GLOBAL_DECL: /* compilation_unit -> global_definition */
-            global_definition(p);
-            break;
         case T_SUB: /* compilation_unit -> sub_definition */
-        case T_PCC_SUB:
             sub_definition(p);
             break;
         case T_CONST: /* compilation_unit -> '.const' const_definition */

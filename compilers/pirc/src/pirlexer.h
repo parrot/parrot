@@ -27,7 +27,6 @@ typedef enum tokens {
     T_ENDM,                             /* ".endm",                   */
     T_EOM,                              /* ".eom",                    */
     T_GET_RESULTS,                      /* ".get_results",            */
-    T_GLOBAL_DECL,                      /* ".global",                 */
     T_GLOBALCONST,                      /* ".globalconst",            */
     T_HLL,                              /* ".HLL",                    */
     T_HLL_MAP,                          /* ".HLL_map",                */
@@ -48,7 +47,6 @@ typedef enum tokens {
     T_PCC_END,                          /* ".pcc_end",                */
     T_PCC_END_RETURN,                   /* ".pcc_end_return",         */
     T_PCC_END_YIELD,                    /* ".pcc_end_yield",          */
-    T_PCC_SUB,                          /* ".pcc_sub",                */
     T_PRAGMA,                           /* ".pragma",                 */
     T_RESULT,                           /* ".result",                 */
     T_RETURN,                           /* ".return",                 */

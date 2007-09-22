@@ -4,7 +4,7 @@
 # test .HLL statement
 .HLL "PIRC", "pircgroup"
 .pragma n_operators 1
-.global x
+
 
 .sub main
 # test local declarations
