@@ -44,8 +44,12 @@ sub runstep {
         # suppress remarks about floating point comparisons
         $ccflags .= ' -wd1572';
 
-        # supress remarks about hiding of parameter declarations
+        # suppress remarks about hiding of parameter declarations
         $ccflags .= ' -wd1599';
+
+        # suppress remarks about "argument is incompatible with corresponding
+        # format string conversion"
+        $ccflags .= ' -wd181';
 
         # gcc is currently not looking for unused variables, so should icc
         # for the time being (this will reduce the noise somewhat)
