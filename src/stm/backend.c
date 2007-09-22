@@ -477,6 +477,7 @@ merge_transactions(PARROT_INTERP, NOTNULL(STM_tx_log *log),
             PARROT_ATOMIC_PTR_CAS(successp, write->handle->owner_or_version,
                                   outer, inner);
             /* doesn't matter if it fails */
+            UNUSED(successp);
         }
 
         PARROT_ATOMIC_INT_SET(inner->status, STM_STATUS_ABORTED);
@@ -1115,6 +1116,7 @@ wait_for_version(PARROT_INTERP,
             PARROT_ATOMIC_INT_SET(curlog->wait_length, 0);
             PARROT_ATOMIC_PTR_CAS(successp, *in_what, other,
                 handle->last_version);
+            UNUSED(successp);
                    continue;
         }
 
@@ -1512,18 +1514,15 @@ Parrot_STM_replay_extracted(PARROT_INTERP, NULLOK(void *saved_log_data))
         STM_tx_log * const       log   = Parrot_STM_tx_log_get(interp);
 
         STM_tx_log_sub *sublog;
-        int i, start;
+        int i;
 
         if (log->depth == 0)
             real_exception(interp, NULL, 1, "replay_extracted outside of transaction");
 
         sublog = get_sublog(log, log->depth);
-        start  = log->last_read;
 
         for (i = 0; i < saved->num_reads; ++i)
             *(alloc_read(interp, log)) = saved->reads[i];
-
-        start = log->last_write;
 
         for (i = 0; i < saved->num_writes; ++i) {
             int successp;

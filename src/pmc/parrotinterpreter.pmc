@@ -613,7 +613,7 @@ Finish thawing.
     void thawfinish(visit_info *info) {
         PMC    *new_info = PMC_pmc_val(SELF);
         INTVAL  m        = VTABLE_elements(INTERP, new_info);
-        INTVAL  i, id;
+        INTVAL  i;
 
         PMC_pmc_val(SELF) = NULL;
 
@@ -626,10 +626,12 @@ Finish thawing.
             PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
 
             if (!PMC_IS_NULL(name_pmc)) {
+                INTVAL id;
                 STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 PObj_constant_SET(hll_name);
                 id               = Parrot_register_HLL(INTERP, hll_name);
+                UNUSED(id);
             }
 
             if (!PMC_IS_NULL(lib_pmc)) {
@@ -637,9 +639,11 @@ Finish thawing.
                 PMC    *ignored;
 
                 if (!STRING_IS_EMPTY(lib_name)) {
+                    INTVAL id;
                     PObj_constant_SET(lib_name);
                     ignored      = Parrot_load_lib(INTERP, lib_name, NULL);
                     id           = Parrot_register_HLL_lib(INTERP, lib_name);
+                    UNUSED(id);
                 }
 
                 UNUSED(ignored);

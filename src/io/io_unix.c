@@ -1094,7 +1094,8 @@ PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), NOTNULL(const char *cmd), i
 #  ifdef PARROT_HAS_HEADER_UNISTD
     int pid, err, fds[2];
 
-    if ((err = pipe(fds)) < 0) {
+    err = pipe(fds);
+    if (err < 0) {
         return NULL;
     }
 

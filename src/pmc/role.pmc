@@ -618,6 +618,8 @@ Compose the given role into this one, using the given exclusions and aliases.
 
         (STRING *s_name) = PCCINVOKE( interp, SELF, "name" );
         (STRING *r_name) = PCCINVOKE( interp, role, "name" );
+        UNUSED(s_name);
+        UNUSED(r_name);
 
         Parrot_ComposeRole(interp, role, exclude_method, got_exclude_method,
                            alias_method, got_alias_method,

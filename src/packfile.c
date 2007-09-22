@@ -765,6 +765,7 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     padding = PF_fetch_opcode(self, &cursor);
     padding = PF_fetch_opcode(self, &cursor);
     padding = PF_fetch_opcode(self, &cursor);
+    UNUSED(padding);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_unpack: Directory read, offset %d.\n",

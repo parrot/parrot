@@ -305,16 +305,16 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 static void
 hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
 {
-    size_t i;
+    size_t entry_index;
     IMAGE_IO * const io = info->image_io;
     HashBucket *b = NULL;
 
     /* during thaw info->extra is the key/value count */
-    const size_t n = (size_t) hash->entries;
+    const size_t num_entries = (size_t) hash->entries;
 
     hash->entries = 0;
 
-    for (i = 0; i < n; ++i) {
+    for (entry_index = 0; entry_index < num_entries; ++entry_index) {
         switch (hash->key_type) {
             case Hash_key_type_STRING:
                 {
