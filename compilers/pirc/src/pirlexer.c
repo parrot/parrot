@@ -1436,7 +1436,6 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
         else if (c == '-') {
             c = read_char(lexer->curfile);
             switch (c) {
-                case '>': return T_PTR;         /* -> */
                 case '=': return T_MINUS_ASSIGN; /* -= */
                 case EOF_MARKER: return T_EOF;
                 default:

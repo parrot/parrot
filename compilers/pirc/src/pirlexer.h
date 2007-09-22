@@ -99,7 +99,6 @@ typedef enum tokens {
     T_EQ,                               /* "==",                      */
     T_NE,                               /* "!=",                      */
     T_ARROW,                            /* "=>",                      */
-    T_PTR,                              /* "->",                      */
     T_COMMA,                            /* ",",                       */
     T_SEMICOLON,                        /* ";",                       */
     T_LPAREN,                           /* "(",                       */

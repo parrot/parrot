@@ -819,7 +819,7 @@ parrot_instruction(parser_state *p) {
 
   assignment -> '=' ( unop expression
                     | expression arith_expr
-                    | target ( keylist | [ '->' method ] arguments )
+                    | target ( keylist | arguments )
                     | STRINGC arguments
                     | 'global' STRINGC
                     | heredocstring
@@ -875,15 +875,7 @@ assignment(parser_state *p) {
                     emit_invokable(p, obj);
                     arguments(p);
                     emit_invocation_end(p);
-                    break;
-                case T_PTR: /* method call; foo '->' method arguments */
-                    emit_invocation_start(p);
-                    emit_invocant(p, obj);
-                    next(p);
-                    method(p);
-                    arguments(p);
-                    emit_invocation_end(p);
-                    break;
+                    break;                
                 case T_LBRACKET: /* target '=' target '[' expression ']' */
                     emit_target(p, obj);
                     keylist(p);
@@ -930,7 +922,7 @@ assignment(parser_state *p) {
 =item *
 
   return_statement -> '.return' ( arguments
-                                | target ['->' method] arguments
+                                | target arguments
                                 | methodcall
                                 )
                                 '\n'
@@ -951,10 +943,6 @@ return_statement(parser_state *p) {
             break;
         default: /* '.return' target ['->' method] arguments */
             target(p);
-            if (p->curtoken == T_PTR) { /* optional '->' method */
-                next(p);
-                method(p);
-            }
             arguments(p);
             break;
     }
@@ -1520,8 +1508,7 @@ long_yield_statement(parser_state *p) {
 
   target_statement -> target ( '=' assignment
                              | augmented_op expression
-                             | keylist '=' expression
-                             | '->' method arguments
+                             | keylist '=' expression                
                              | arguments
                              )
                              '\n'
@@ -1560,11 +1547,6 @@ target_statement(parser_state *p) {
             keylist(p);
             match(p, T_ASSIGN);
             expression(p);
-            break;
-        case T_PTR:  /* target '->' method arguments '\n' */
-            next(p); /* skip '->' */
-            method(p);
-            arguments(p);
             break;
         case T_LPAREN:  /* target '(' arguments ')' */
             arguments(p);
