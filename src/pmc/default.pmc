@@ -259,8 +259,6 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
 
         return 1;
     } while (1);
-
-    return 0;
 }
 
 pmclass default abstract no_init {

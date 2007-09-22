@@ -782,7 +782,6 @@ PIO_buf_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         io->fpos += diff;
         return len;
     }
-    return (size_t)-1;
 }
 
 /*
