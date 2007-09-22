@@ -875,7 +875,7 @@ assignment(parser_state *p) {
                     emit_invokable(p, obj);
                     arguments(p);
                     emit_invocation_end(p);
-                    break;                
+                    break;
                 case T_LBRACKET: /* target '=' target '[' expression ']' */
                     emit_target(p, obj);
                     keylist(p);
@@ -1508,7 +1508,7 @@ long_yield_statement(parser_state *p) {
 
   target_statement -> target ( '=' assignment
                              | augmented_op expression
-                             | keylist '=' expression                
+                             | keylist '=' expression
                              | arguments
                              )
                              '\n'
