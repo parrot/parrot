@@ -551,12 +551,12 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type pragma_1 hll_def
+%type <t> type pragma_1 hll_def return_or_yield comma_or_goto
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit pmc_const pragma
-%type <s> classname relop any_string
+%type <s> classname relop any_string assign_op  bin_op  un_op
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
@@ -565,7 +565,8 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types opt_comma outer
 %type <t> vtable
-%type <i> instruction assignment if_statement labeled_inst opt_label op_assign
+%type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
+%type <i> if_statement unless_statement
 %type <i> func_assign get_results
 %type <i> opt_invocant
 %type <sr> target targetlist reg const var string result
@@ -1043,21 +1044,19 @@ pcc_return:
    ;
 
 pcc_return_many:
-    RETURN  '('
+    return_or_yield  '('
         {
             if ( IMCC_INFO(interp)->asm_state == AsmDefault)
-                begin_return_or_yield(interp, 0);
-        }
-    var_returns  ')'
-        {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
-  | YIELDT  '('
-        {
-            if ( IMCC_INFO(interp)->asm_state == AsmDefault)
-                begin_return_or_yield(interp, 1);
+                begin_return_or_yield(interp, $1);
         }
     var_returns  ')'
         {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
   ;
+
+return_or_yield:
+     RETURN   { $$ = 0; }
+   | YIELDT   { $$ = 1; }
+   ;
 
 var_returns:
     /* empty */ { $$ = 0; }
@@ -1172,7 +1171,7 @@ id_list_id :
 
 labeled_inst:
      assignment
-   | if_statement
+   | conditional_statement
    | NAMESPACE IDENTIFIER            { push_namespace($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
    | LOCAL           { is_def=1; } type id_list
@@ -1242,59 +1241,11 @@ classname:
 
 assignment:
      target '=' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, $1, $3);      }
-   | target '=' '!' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "not", 2, $1, $4);      }
-   | target '=' '-' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "neg", 2, $1, $4);      }
-   | target '=' '~' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bnot", 2, $1, $4);     }
-   | target '=' var '+' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "add", 3, $1, $3, $5);  }
-   | target '=' var '-' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "sub", 3, $1, $3, $5);  }
-   | target '=' var '*' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mul", 3, $1, $3, $5);  }
-   | target '=' var POW var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "pow", 3, $1, $3, $5);  }
-   | target '=' var '/' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "div", 3, $1, $3, $5);  }
-   | target '=' var FDIV var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "fdiv", 3, $1, $3, $5); }
-   | target '=' var '%' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mod", 3, $1, $3, $5);  }
-   | target '=' var CONCAT var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 3, $1,$3,$5); }
-   | target '=' var RELOP_EQ var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "iseq", 3, $1, $3, $5); }
-   | target '=' var RELOP_NE var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isne", 3, $1, $3, $5); }
-   | target '=' var RELOP_GT var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isgt", 3, $1, $3, $5); }
-   | target '=' var RELOP_LT var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "islt", 3, $1, $3, $5); }
-   | target '=' var RELOP_LTE var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isle", 3, $1, $3, $5); }
-   | target '=' var RELOP_GTE var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "isge", 3, $1, $3, $5); }
-   | target '=' var SHIFT_LEFT var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shl", 3, $1, $3, $5);  }
-   | target '=' var SHIFT_RIGHT var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shr", 3, $1, $3, $5);  }
-   | target '=' var SHIFT_RIGHT_U var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "lsr", 3, $1, $3, $5);  }
-   | target '=' var LOG_AND var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "and", 3, $1, $3, $5);  }
-   | target '=' var LOG_OR var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "or", 3, $1, $3, $5);   }
-   | target '=' var LOG_XOR var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "xor", 3, $1, $3, $5);  }
-   | target '=' var '&' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "band", 3, $1, $3, $5); }
-   | target '=' var '|' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bor", 3, $1, $3, $5);  }
-   | target '=' var '~' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bxor", 3, $1, $3, $5); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, $1, $3);  }
+   | target '=' un_op var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $3, 2, $1, $4);  }
+   | target '=' var bin_op var
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $4, 3, $1, $3, $5);  }
    | target '=' var '[' keylist ']'
             { $$ = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
@@ -1351,39 +1302,67 @@ assignment:
         {  $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, $1); }
    ;
 
+un_op:
+     '!'    { $$ = "not"; }
+   | '~'    { $$ = "bnot"; }
+   | '-'    { $$ = "neg"; }
+   ;
+
+bin_op:
+     '-'    { $$ = "sub"; }
+   | '+'    { $$ = "add"; }
+   | '*'    { $$ = "mul"; }
+   | '/'    { $$ = "div"; }
+   | '%'    { $$ = "mod"; }
+   | FDIV   { $$ = "fdiv"; }
+   | POW    { $$ = "pow"; }
+   | CONCAT { $$ = "concat"; }
+   | RELOP_EQ      {  $$ = "iseq"; }
+   | RELOP_NE      {  $$ = "isne"; }
+   | RELOP_GT      {  $$ = "isgt"; }
+   | RELOP_GTE     {  $$ = "isge"; }
+   | RELOP_LT      {  $$ = "islt"; }
+   | RELOP_LTE     {  $$ = "isle"; }
+   | SHIFT_LEFT  { $$ = "shl"; }
+   | SHIFT_RIGHT { $$ = "shr"; }
+   | SHIFT_RIGHT_U { $$ = "lsr"; }
+   | LOG_AND     { $$ = "and"; }
+   | LOG_OR      { $$ = "xor"; }
+   | LOG_XOR     { $$ = "xor"; }
+   | '&'         { $$ = "band"; }
+   | '|'         { $$ = "bor"; }
+   | '~'         { $$ = "bxor"; }
+   ;
+
+
 get_results: GET_RESULTS { $$ = IMCC_create_itcall_label(interp);
                            $$->type &= ~ITCALL; $$->type |= ITRESULT; }
     '(' targetlist  ')' {  $$ = 0; }
    ;
 
+
+
 op_assign:
-     target PLUS_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "add", 2, $1, $3); }
-   | target MINUS_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "sub", 2, $1, $3); }
-   | target MUL_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mul", 2, $1, $3); }
-   | target DIV_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "div", 2, $1, $3); }
-   | target MOD_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "mod", 2, $1, $3); }
-   | target FDIV_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "fdiv", 2, $1, $3); }
-   | target CONCAT_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "concat", 2, $1, $3); }
-   | target BAND_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "band", 2, $1, $3); }
-   | target BOR_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bor", 2, $1, $3); }
-   | target BXOR_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "bxor", 2, $1, $3); }
-   | target SHR_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shr", 2, $1, $3); }
-   | target SHL_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "shl", 2, $1, $3); }
-   | target SHR_U_ASSIGN var
-        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "lsr", 2, $1, $3); }
+     target assign_op var
+        { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3); }
    ;
+
+assign_op:
+     PLUS_ASSIGN   { $$ = "add"; }
+   | MINUS_ASSIGN  { $$ = "sub"; }
+   | MUL_ASSIGN    { $$ = "mul"; }
+   | DIV_ASSIGN    { $$ = "div"; }
+   | MOD_ASSIGN    { $$ = "mod"; }
+   | FDIV_ASSIGN   { $$ = "fdiv"; }
+   | CONCAT_ASSIGN { $$ = "concat"; }
+   | BAND_ASSIGN   { $$ = "band"; }
+   | BOR_ASSIGN    { $$ = "bor"; }
+   | BXOR_ASSIGN   { $$ = "bxor"; }
+   | SHR_ASSIGN    { $$ = "shr"; }
+   | SHL_ASSIGN    { $$ = "shl"; }
+   | SHR_U_ASSIGN  { $$ = "lsr"; }
+   ;
+
 
 func_assign:
    target '=' PARROT_OP pasm_args
@@ -1479,23 +1458,32 @@ targetlist:
    | /* empty */             {  $$ = 0; }
    ;
 
-if_statement:
-     IF var relop var GOTO label_op
-      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, $3, 3, $2, $4, $6); }
-   | UNLESS var relop var GOTO label_op
+conditional_statement:
+     if_statement     { $$ = $1; }
+   | unless_statement { $$ = $1; }
+   ;
+
+unless_statement:
+     UNLESS var relop var GOTO label_op
       { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, inv_op($3), 3, $2,$4, $6); }
-   | IF PNULL var GOTO label_op
-      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if_null", 2, $3, $5); }
    | UNLESS PNULL var GOTO label_op
       { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless_null", 2, $3, $5); }
-   | IF var GOTO label_op
-      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if", 2, $2, $4); }
-   | UNLESS var GOTO label_op
+   | UNLESS var comma_or_goto label_op
       { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless",2, $2, $4); }
-   | IF var COMMA label_op
+   ;
+
+if_statement:
+     IF var comma_or_goto label_op
       { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if", 2, $2, $4); }
-   | UNLESS var COMMA label_op
-      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless", 2, $2, $4); }
+   | IF var relop var GOTO label_op
+      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, $3, 3, $2, $4, $6); }
+   | IF PNULL var GOTO label_op
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if_null", 2, $3, $5); }
+   ;
+
+comma_or_goto:
+     COMMA  { $$ = 0; }
+   | GOTO   { $$ = 0; }
    ;
 
 relop:
