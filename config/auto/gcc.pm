@@ -90,21 +90,37 @@ sub runstep {
         # determined in a non-strict environment.  An example is Solaris 8.
 
         my @opt_and_vers = (
-                  0 => " -W"
+                  0 => ""
+                . " -W"
                 . " -Wall"
-                . " -Wundef"
-                . " -Wmissing-declarations"
-                . " -Wstrict-prototypes"
-                . " -Wmissing-prototypes"
-                . " -Winline"
-                . " -Wshadow"
-                . " -Wpointer-arith"
-                . " -Wcast-qual"
-                . " -Wwrite-strings"
                 . " -Waggregate-return"
+                . " -Wbad-function-cast"
+                . " -Wcast-align"
+                . " -Wcast-qual"
+                . " -Wchar-subscripts "
+                . " -Wcomment"
+                . " -Wdisabled-optimization"
+                . " -Wformat-nonliteral"
+                . " -Wformat-security"
+                . " -Wformat-y2k"
+                . " -Wimplicit"
+                . " -Wimplicit-function-declaration"
+                . " -Wimplicit-int"
+                . " -Wimport"
+                . " -Winit-self"
                 . " -Winline"
+                . " -Wmissing-declarations"
+                . " -Wmissing-prototypes"
                 . " -Wno-unused"
+                . " -Wnonnull"
+                . " -Wpacked"
+                . " -Wparentheses"
+                . " -Wpointer-arith"
+                . " -Wshadow"
+                . " -Wstrict-prototypes"
                 . " -Wnested-externs"
+                . " -Wundef"
+                . " -Wwrite-strings"
                 . ( $maint ? " -Wlarger-than-4096" : "" ),
 
             # others; ones we might like marked with ?
@@ -134,18 +150,22 @@ sub runstep {
             # 3.x  does not align functions per default, its turned on with
             #      -O2 and -O3
             #      -falign-functions=16 is the real alignment, no exponent
-            3.0 => "-falign-functions=16"
+            3.0 => ""
+                . " -falign-functions=16"
+                . " -Wdisabled-optimization"
                 . " -Wformat-nonliteral"
                 . " -Wformat-security"
-                . " -Wpacked"
-                . " -Wdisabled-optimization"
                 . " -mno-accumulate-outgoing-args"
-                . " -Wno-shadow",
+                . " -Wno-shadow"
+                . " -Wpacked"
+                . "",
 
-            3.4 => " -Wextra"
+            3.4 => ""
+                . " -Wbad-function-cast"
                 . " -Wdeclaration-after-statement"
+                . " -Wextra"
                 . " -Wold-style-definition"
-                . " -Wbad-function-cast",
+                . "",
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
@@ -161,36 +181,18 @@ sub runstep {
         my @cage_opt_and_vers = (
                   0 => " -std=c89"
                 . " -Wall"
-                . " -Wextra"
-                . " -Wundef"
-                . " -Wbad-function-cast"
-                . " -Wmissing-declarations"
-                . " -Wredundant-decls"
-                . " -Wnested-externs"
-                . " -Wlong-long"
-                . " -Wpadded"
-                . " -Wunreachable-code"
-
-                #. "-fsyntax-only "
-                #. "-pedantic -pedantic-errors "
-                #. " -w "
-                #. " -Werror "
                 . " -Waggregate-return"
+                . " -Wextra"
+                . " -Wbad-function-cast"
                 . " -Wcast-align"
                 . " -Wcast-qual"
                 . " -Wchar-subscripts "
                 . " -Wcomment"
                 . " -Wconversion"
-                . " -Wno-deprecated-declarations"
+                . " -Wdeclaration-after-statement"
                 . " -Wdisabled-optimization"
-                . " -Wno-div-by-zero"
-                . " -Wno-endif-labels"
-                . " -Werror-implicit-function-declaration"
-
-                #. " -Wfloat-equal"
                 . " -Wformat"
                 . " -Wformat=2"
-                . " -Wno-format-extra-args"
                 . " -Wformat-nonliteral"
                 . " -Wformat-security"
                 . " -Wformat-y2k"
@@ -198,37 +200,40 @@ sub runstep {
                 . " -Wimplicit-function-declaration"
                 . " -Wimplicit-int"
                 . " -Wimport"
-                . " -Wno-import"
                 . " -Winit-self"
                 . " -Winline"
                 . " -Winvalid-pch"
                 . " -Wlarger-than-4096"
+                . " -Wlong-long"
                 . " -Wmain"
                 . " -Wmissing-braces"
+                . " -Wmissing-declarations"
                 . " -Wmissing-format-attribute"
                 . " -Wmissing-noreturn"
-                . " -Wno-multichar"
+                . " -Wmissing-prototypes"
+                . " -Wnested-externs"
                 . " -Wnonnull"
+                . " -Wold-style-definition"
                 . " -Wpacked"
+                . " -Wpadded"
                 . " -Wparentheses"
                 . " -Wpointer-arith"
+                . " -Wredundant-decls"
                 . " -Wreturn-type"
                 . " -Wsequence-point"
                 . " -Wshadow"
                 . " -Wsign-compare"
                 . " -Wstrict-aliasing"
                 . " -Wstrict-aliasing=2"
+                . " -Wstrict-prototypes"
                 . " -Wswitch"
                 . " -Wswitch-default"
                 . " -Wswitch-enum"
                 . " -Wsystem-headers"
                 . " -Wtrigraphs"
-                . " -Wundef"
-
-                #. " -Wuninitialized "
-                #     requires -O
                 . " -Wunknown-pragmas"
-                . " -Wunused"
+                . " -Wunreachable-code"
+                . " -Wundef"
                 . " -Wunused-function"
                 . " -Wunused-label"
                 . " -Wunused-parameter"
@@ -236,13 +241,28 @@ sub runstep {
                 . " -Wunused-variable"
                 . " -Wwrite-strings"
 
+                #. "-fsyntax-only "
+                #. "-pedantic -pedantic-errors "
+                #. " -w "
+                #. " -Werror "
+                . " -Wno-deprecated-declarations"
+                . " -Wno-div-by-zero"
+                . " -Wno-endif-labels"
+                . " -Werror-implicit-function-declaration"
+
+                #. " -Wfloat-equal"
+                . " -Wno-format-extra-args"
+                . " -Wno-import"
+                . " -Wno-multichar"
+
+                #. " -Wuninitialized "
+                #     requires -O
                 #."-Wmost (APPLE ONLY)"
 
                 #C-only Warning Options
-                . " -Wmissing-prototypes" . " -Wold-style-definition" . " -Wstrict-prototypes"
 
                 #. " -Wtraditional "
-                . " -Wdeclaration-after-statement",
+                . "",
 
 #"-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
 
