@@ -38,7 +38,6 @@ empty_string:
 .end
 
 # unary minus
-# XXX This breaks on -"2"; returns -2.0
 .sub 'prefix:-' :multi(String)
     .param pmc a
 
