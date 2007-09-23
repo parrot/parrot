@@ -551,7 +551,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type pragma_1 hll_def return_or_yield comma_or_goto
+%type <t> type pragma_1 hll_def return_or_yield comma_or_goto opt_unique_reg
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -1152,23 +1152,21 @@ id_list :
    ;
 
 id_list_id :
-     IDENTIFIER UNIQUE_REG
+     IDENTIFIER opt_unique_reg
      {
          IdList* l = (IdList*)malloc(sizeof(IdList));
          l->id = $1;
-         l->unique_reg = 1;
-         $$ = l;
-     }
-
-   | IDENTIFIER
-     {
-         IdList* l = (IdList*)malloc(sizeof(IdList));
-         l->id = $1;
-         l->unique_reg = 0;
+         l->unique_reg = $2;
          $$ = l;
      }
    ;
 
+opt_unique_reg:
+     /* empty */  { $$ = 0; }
+   | UNIQUE_REG   { $$ = 1; }
+   ;
+   
+   
 labeled_inst:
      assignment
    | conditional_statement
