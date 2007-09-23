@@ -15,6 +15,10 @@ F<include/parrot/datatypes.h>.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -23,8 +27,11 @@ F<include/parrot/datatypes.h>.
 
 /*
 
-FUNCDOC: Parrot_get_datatype_enum
+=item C<Parrot_get_datatype_enum>
+
 Return datatype C<enum> for C<STRING*> type_name.
+
+=cut
 
 */
 
@@ -50,8 +57,11 @@ Parrot_get_datatype_enum(PARROT_INTERP, NOTNULL(const STRING *type_name))
 
 /*
 
-FUNCDOC:
+=item C<Parrot_get_datatype_name>
+
 Return datatype name for C<type>.
+
+=cut
 
 */
 
@@ -71,9 +81,13 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/datatypes.h>.
+
+=cut
 
 */
 

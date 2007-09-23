@@ -128,6 +128,10 @@ Of course, a check for valid pointers could be added here.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -136,9 +140,11 @@ Of course, a check for valid pointers could be added here.
 
 /*
 
-FUNCDOC: intlist_mark
+=item C<intlist_mark>
 
 Marks the list as live.
+
+=cut
 
 */
 
@@ -150,9 +156,11 @@ intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
 
 /*
 
-FUNCDOC: intlist_clone
+=item C<intlist_clone>
 
 Returns a clone of the list.
+
+=cut
 
 */
 
@@ -166,9 +174,11 @@ intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))
 
 /*
 
-FUNCDOC: intlist_new
+=item C<intlist_new>
 
 Returns a new list.
+
+=cut
 
 */
 
@@ -182,9 +192,11 @@ intlist_new(PARROT_INTERP)
 
 /*
 
-FUNCDOC: intlist_length
+=item C<intlist_length>
 
 Returns the length of the list.
+
+=cut
 
 */
 
@@ -198,9 +210,11 @@ intlist_length(SHIM_INTERP, NOTNULL(const IntList *list))
 
 /*
 
-FUNCDOC: intlist_assign
+=item C<intlist_assign>
 
 Assigns <val> to the item at C<idx>.
+
+=cut
 
 */
 
@@ -212,9 +226,11 @@ intlist_assign(PARROT_INTERP, NOTNULL(IntList *l), INTVAL idx, INTVAL val)
 
 /*
 
-FUNCDOC: intlist_push
+=item C<intlist_push>
 
 Pushes C<val> on the end of the list.
+
+=cut
 
 */
 
@@ -226,9 +242,11 @@ intlist_push(PARROT_INTERP, NOTNULL(IntList *l), INTVAL val)
 
 /*
 
-FUNCDOC: intlist_unshift
+=item C<intlist_unshift>
 
 Pushes C<val> on the front of the list.
+
+=cut
 
 */
 
@@ -240,9 +258,11 @@ intlist_unshift(PARROT_INTERP, NOTNULL(IntList **l), INTVAL val)
 
 /*
 
-FUNCDOC: intlist_pop
+=item C<intlist_pop>
 
 Popping/shifting into a sparse hole returns 0.
+
+=cut
 
 */
 
@@ -256,9 +276,11 @@ intlist_pop(PARROT_INTERP, NOTNULL(IntList *l))
 
 /*
 
-FUNCDOC: intlist_shift
+=item C<intlist_shift>
 
 Removes and returns the first item on the list.
+
+=cut
 
 */
 
@@ -272,9 +294,11 @@ intlist_shift(PARROT_INTERP, NOTNULL(IntList **l))
 
 /*
 
-FUNCDOC: intlist_get
+=item C<intlist_get>
 
 Returns the item at C<idx>.
+
+=cut
 
 */
 
@@ -289,9 +313,11 @@ intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
 
 /*
 
-FUNCDOC: intlist_dump
+=item C<intlist_dump>
 
 Prints out the list in human-readable form.
+
+=cut
 
 */
 
@@ -309,9 +335,13 @@ intlist_dump(NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/intlist.h>, F<src/list.c> and F<include/parrot/list.h>.
+
+=cut
 
 */
 

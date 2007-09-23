@@ -65,10 +65,12 @@ extern PARROT_API int Parrot_exec_rel_count;
 
 /*
 
-FUNCDOC: Parrot_exec
+=item C<Parrot_exec>
 
 Call the jit to get the program code. Adds the members of the data
 section. And emits the executable.
+
+=cut
 
 */
 
@@ -133,10 +135,12 @@ Parrot_exec(PARROT_INTERP, opcode_t *pc,
 
 /*
 
-FUNCDOC: add_data_member
+=item C<add_data_member>
 
 Adds a member to the data section, storing the size of it at
 C<< obj->data_size[N] >>.
+
+=cut
 
 */
 
@@ -169,9 +173,11 @@ add_data_member(NOTNULL(Parrot_exec_objfile_t *obj), NULLOK(void *src), size_t l
 
 /*
 
-FUNCDOC: exec_init
+=item C<exec_init>
 
 Initialize the obj structure.
+
+=cut
 
 */
 
@@ -205,9 +211,11 @@ exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
 
 /*
 
-FUNCDOC: Parrot_exec_add_symbol
+=item C<Parrot_exec_add_symbol>
 
 Adds a symbol to the object file.
+
+=cut
 
 */
 
@@ -267,9 +275,11 @@ Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
 
 /*
 
-FUNCDOC: Parrot_exec_add_text_rellocation
+=item C<Parrot_exec_add_text_rellocation>
 
 Adds a text rellocation to the object file.
+
+=cut
 
 */
 
@@ -312,12 +322,14 @@ Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr
 
 /*
 
-FUNCDOC: symbol_list_find
+=item C<symbol_list_find>
 
 Returns the index of C<symbol> in the symbol list. Returns -1 if it is
 not in the list.
 
 Used by C<Parrot_exec_add_symbol()>.
+
+=cut
 
 */
 

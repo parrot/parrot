@@ -15,6 +15,8 @@ These stacks all differ only in the size of items.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -26,9 +28,12 @@ These stacks all differ only in the size of items.
 
 /*
 
-FUNCDOC:
+=item C<stack_system_init>
+
 Called from C<make_interpreter()> to initialize the interpreter's
 register stacks.
+
+=cut
 
 */
 
@@ -41,9 +46,12 @@ stack_system_init(SHIM_INTERP)
 
 /*
 
-FUNCDOC:
+=item C<register_new_stack>
+
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
+
+=cut
 
 */
 
@@ -67,8 +75,11 @@ register_new_stack(PARROT_INTERP, NOTNULL(const char *name), size_t item_size)
 
 /*
 
-FUNCDOC:
+=item C<cst_new_stack_chunk>
+
 Get a new chunk either from the freelist or allocate one.
+
+=cut
 
 */
 
@@ -92,8 +103,11 @@ cst_new_stack_chunk(PARROT_INTERP, NOTNULL(const Stack_Chunk_t *chunk))
 
 /*
 
-FUNCDOC:
+=item C<stack_prepare_push>
+
 Return a pointer, where new entries go for push.
+
+=cut
 
 */
 
@@ -114,8 +128,11 @@ stack_prepare_push(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))
 
 /*
 
-FUNCDOC:
+=item C<stack_prepare_pop>
+
 Return a pointer, where new entries are popped off.
+
+=cut
 
 */
 
@@ -139,6 +156,8 @@ stack_prepare_pop(PARROT_INTERP, NOTNULL(Stack_Chunk_t **stack_p))
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

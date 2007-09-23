@@ -16,6 +16,10 @@ space left beyond C<bufused>. This is the I<only> valid usage of these
 two data members, beside setting C<bufstart>/C<buflen> for external
 strings.
 
+=head2 Functions
+
+=over 4
+
 =cut
 
 */
@@ -62,10 +66,12 @@ static void make_writable( PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_unmake_COW
+=item C<Parrot_unmake_COW>
 
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
+
+=cut
 
 */
 
@@ -112,10 +118,12 @@ Parrot_unmake_COW(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: Parrot_make_COW_reference
+=item C<Parrot_make_COW_reference>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
+
+=cut
 
 */
 PARROT_API
@@ -162,11 +170,13 @@ Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: Parrot_reuse_COW_reference
+=item C<Parrot_reuse_COW_reference>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer. Doesn't allocate a new string header, instead
 using the one passed in and returns it.
+
+=cut
 
 */
 
@@ -193,10 +203,12 @@ Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
 
 /*
 
-FUNCDOC: string_set
+=item C<string_set>
 
 Makes the contents of first Parrot string a copy of the contents of
 second.
+
+=cut
 
 */
 PARROT_API
@@ -223,13 +235,19 @@ string_set(PARROT_INTERP, NULLOK(STRING *dest), NOTNULL(STRING *src))
 
 /*
 
+=back
+
 =head2 Basic String Functions
 
 Creation, enlargement, etc.
 
-FUNCDOC: string_init
+=over 4
+
+=item C<string_init>
 
 Initializes the Parrot string subsystem.
+
+=cut
 
 */
 
@@ -271,8 +289,11 @@ string_init(PARROT_INTERP)
 
 /*
 
-FUNCDOC: string_deinit
+=item C<string_deinit>
+
 De-Initializes the Parrot string subsystem.
+
+=cut
 
 */
 
@@ -290,9 +311,12 @@ string_deinit(PARROT_INTERP)
 
 /*
 
-FUNCDOC: string_capacity
+=item C<string_capacity>
+
 Returns the capacity of the specified Parrot string in bytes, that
 is how many bytes can be appended onto strstart.
+
+=cut
 
 */
 
@@ -310,8 +334,11 @@ string_capacity(SHIM_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_make_empty
+=item C<string_make_empty>
+
 Creates and returns an empty Parrot string.
+
+=cut
 
 */
 
@@ -342,13 +369,16 @@ string_make_empty(PARROT_INTERP,
 
 /*
 
-FUNCDOC: string_rep_compatible
+=item C<string_rep_compatible>
+
 Find the "lowest" possible charset and encoding for the given string. E.g.
 
   ascii <op> utf8 => utf8
                   => ascii, B<if> C<STRING *b> has ascii chars only.
 
 Returs NULL, if no compatible string representation can be found.
+
+=cut
 
 */
 
@@ -405,11 +435,14 @@ string_rep_compatible(SHIM_INTERP,
 
 /*
 
-FUNCDOC: string_append
+=item C<string_append>
+
 Take in two Parrot strings and append the second to the first.
 NOTE THAT RETURN VALUE MAY NOT BE THE FIRST STRING,
   if the first string is COW'd or read-only.
 So make sure to _use_ the return value.
+
+=cut
 
 */
 
@@ -483,8 +516,11 @@ string_append(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b))
 
 /*
 
-FUNCDOC: string_from_cstring
+=item C<string_from_cstring>
+
 Make a Parrot string from a specified C string.
+
+=cut
 
 */
 
@@ -504,11 +540,14 @@ string_from_cstring(PARROT_INTERP, NULLOK(const char * const buffer), const UINT
 
 /*
 
-FUNCDOC: string_primary_encoding_for_representation
+=item C<string_primary_encoding_for_representation>
+
 Returns the primary encoding for the specified representation.
 
 This is needed for packfile unpacking, unless we just always use UTF-8
 or BOCU.
+
+=cut
 
 */
 
@@ -528,8 +567,11 @@ string_primary_encoding_for_representation(PARROT_INTERP,
 
 /*
 
-FUNCDOC: const_string
+=item C<const_string>
+
 Creates and returns a constant Parrot string.
+
+=cut
 
 */
 
@@ -549,7 +591,7 @@ const_string(PARROT_INTERP, NOTNULL(const char *buffer))
 
 /*
 
-FUNCDOC: string_make
+=item C<string_make>
 
 Creates and returns a new Parrot string using C<len> bytes of string
 data read from C<buffer>.
@@ -570,6 +612,8 @@ used.
 
 The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
 together.
+
+=cut
 
 */
 
@@ -647,9 +691,11 @@ string_make_direct(PARROT_INTERP, NULLOK(const char *buffer), UINTVAL len,
 
 /*
 
-FUNCDOC: string_grow
+=item C<string_grow>
 
 Grows the Parrot string's buffer by the specified number of characters.
+
+=cut
 
 */
 
@@ -668,11 +714,17 @@ string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
 
 /*
 
+=back
+
 =head2 Ordinary user-visible string operations
 
-FUNCDOC: string_length
+=over 4
+
+=item C<string_length>
 
 Returns the number of characters in the specified Parrot string.
+
+=cut
 
 */
 
@@ -688,7 +740,7 @@ string_length(SHIM_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_index
+=item C<string_index>
 
 Returns the character (or glyph, depending upon the string's encoding)
 This is to abstract the process of finding the Nth character in a
@@ -697,6 +749,8 @@ encoding functions are fleshed out, this function can do the right
 thing.
 
 Note that this is not range-checked.
+
+=cut
 
 */
 
@@ -711,12 +765,14 @@ string_index(PARROT_INTERP, NOTNULL(const STRING *s), UINTVAL idx)
 
 /*
 
-FUNCDOC: string_str_index
+=item C<string_str_index>
 
 Returns the character position of the second Parrot string in the first
 at or after C<start>. The return value is a (0 based) offset in
 characters, not bytes. If second string is not specified, then return
 -1.
+
+=cut
 
 */
 
@@ -748,10 +804,12 @@ string_str_index(PARROT_INTERP, NOTNULL(const STRING *s),
 
 /*
 
-FUNCDOC: string_ord
+=item C<string_ord>
 
 Returns the codepoint at a given index into a string. Negative indexes
 are treated as counting from the end of the string.
+
+=cut
 
 */
 
@@ -791,11 +849,13 @@ string_ord(PARROT_INTERP, NOTNULL(const STRING *s), INTVAL idx)
 
 /*
 
-FUNCDOC: string_chr
+=item C<string_chr>
 
 Returns a single character Parrot string.
 
 TODO - Allow this to take an array of characters?
+
+=cut
 
 */
 
@@ -818,9 +878,11 @@ string_chr(PARROT_INTERP, UINTVAL character)
 
 /*
 
-FUNCDOC: string_copy
+=item C<string_copy>
 
 Creates and returns a copy of the specified Parrot string.
+
+=cut
 
 */
 
@@ -836,12 +898,18 @@ string_copy(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
+=back
+
 =head2 Vtable Dispatch Functions
 
-FUNCDOC: string_compute_strlen
+=over 4
+
+=item C<string_compute_strlen>
 
 Calculates and returns the number of characters in the specified Parrot
 string.
+
+=cut
 
 */
 
@@ -858,10 +926,12 @@ string_compute_strlen(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_max_bytes
+=item C<string_max_bytes>
 
 Returns the number of bytes required to safely contain the specified number
 of characters in the specified Parrot string's representation.
+
+=cut
 
 */
 
@@ -876,13 +946,15 @@ string_max_bytes(SHIM_INTERP, NOTNULL(const STRING *s), INTVAL nchars)
 
 /*
 
-FUNCDOC: string_concat
+=item C<string_concat>
 
 Concatenates two Parrot strings. If necessary, converts the second
 string's encoding and/or type to match those of the first string. If
 either string is C<NULL>, then a copy of the non-C<NULL> string is
 returned. If both strings are C<NULL>, then a new zero-length string is
 created and returned.
+
+=cut
 
 */
 
@@ -925,11 +997,13 @@ string_concat(PARROT_INTERP, NULLOK(STRING *a), NULLOK(STRING *b), UINTVAL Uflag
 
 /*
 
-FUNCDOC: string_repeat
+=item C<string_repeat>
 
 Repeats the specified Parrot string I<num> times and stores the result
 in the second string, and returns it. The second string is created if
 necessary.
+
+=cut
 
 */
 
@@ -965,11 +1039,13 @@ string_repeat(PARROT_INTERP, NOTNULL(const STRING *s),
 
 /*
 
-FUNCDOC: string_substr
+=item C<string_substr>
 
 Copies the substring of length C<length> from C<offset> from the
 specified Parrot string and stores it in C<**d>, allocating memory if
 necessary. The substring is also returned.
+
+=cut
 
 */
 
@@ -1029,7 +1105,7 @@ string_substr(PARROT_INTERP, NOTNULL(STRING *src), INTVAL offset, INTVAL length,
 
 /*
 
-FUNCDOC: string_replace
+=item C<string_replace>
 
 This should follow the Perl semantics for:
 
@@ -1046,6 +1122,8 @@ Replacing 2 past the end of the string is undefined. However replacing 1
 past the end of the string concatenates the two strings.
 
 A negative offset is allowed to replace from the end.
+
+=cut
 
 */
 
@@ -1183,11 +1261,13 @@ string_replace(PARROT_INTERP, NOTNULL(STRING *src),
 
 /*
 
-FUNCDOC: string_chopn
+=item C<string_chopn>
 
 Chops off the last C<n> characters of the specified Parrot string. If
 C<n> is negative, cuts the string after C<+n> characters. The returned
 string is a copy of the one passed in.
+
+=cut
 
 */
 
@@ -1203,11 +1283,13 @@ string_chopn(PARROT_INTERP, NOTNULL(STRING *s), INTVAL n)
 
 /*
 
-FUNCDOC: string_chopn_inplace
+=item C<string_chopn_inplace>
 
 Chops off the last C<n> characters of the specified Parrot string. If
 C<n> is negative, cuts the string after C<+n> characters. The string
 passed in is modified and returned.
+
+=cut
 
 */
 
@@ -1281,13 +1363,15 @@ string_compare(PARROT_INTERP, NULLOK(const STRING *s1), NULLOK(const STRING *s2)
 
 /*
 
-FUNCDOC: string_equal
+=item C<string_equal>
 
 Compares two Parrot strings, performing type and encoding conversions if
 necessary.
 
 Note that this function returns 0 if the strings are equal and 1
 otherwise.
+
+=cut
 
 */
 
@@ -1330,11 +1414,13 @@ string_equal(PARROT_INTERP, NULLOK(const STRING *s1), NULLOK(const STRING *s2))
 
 /*
 
-FUNCDOC: make_writable
+=item C<make_writable>
 
 Makes the specified Parrot string writable with minimum length C<len>.
 The C<representation> argument is required in case a new Parrot string
 has to be created.
+
+=cut
 
 */
 
@@ -1352,11 +1438,13 @@ make_writable(PARROT_INTERP, ARGINOUT(STRING **s),
 
 /*
 
-FUNCDOC: string_bitwise_and
+=item C<string_bitwise_and>
 
 Performs a bitwise C<AND> on two Parrot string, performing type and
 encoding conversions if necessary. If the second string is not C<NULL>
 then it is reused, otherwise a new Parrot string is created.
+
+=cut
 
 */
 
@@ -1464,11 +1552,13 @@ do { \
 
 /*
 
-FUNCDOC: string_bitwise_or
+=item C<string_bitwise_or>
 
 Performs a bitwise C<OR> on two Parrot strings, performing type and
 encoding conversions if necessary. If the third string is not C<NULL>
 then it is reused, otherwise a new Parrot string is created.
+
+=cut
 
 */
 
@@ -1534,11 +1624,13 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
 
 /*
 
-FUNCDOC: string_bitwise_xor
+=item C<string_bitwise_xor>
 
 Performs a bitwise C<XOR> on two Parrot strings, performing type and
 encoding conversions if necessary. If the second string is not C<NULL>
 then it is reused, otherwise a new Parrot string is created.
+
+=cut
 
 */
 
@@ -1618,10 +1710,12 @@ do { \
 
 /*
 
-FUNCDOC: string_bitwise_not
+=item C<string_bitwise_not>
 
 Performs a bitwise C<NOT> on a Parrot string. If the second string is
 not C<NULL> then it is reused, otherwise a new Parrot string is created.
+
+=cut
 
 */
 
@@ -1677,10 +1771,12 @@ string_bitwise_not(PARROT_INTERP, NULLOK(STRING *s), ARGOUT_NULLOK(STRING **dest
 
 /*
 
-FUNCDOC: string_bool
+=item C<string_bool>
 
 Returns whether the specified Parrot string is true. A string is true
 if it is equal to anything other than C<0>, C<""> or C<"0">.
+
+=cut
 
 */
 
@@ -1710,7 +1806,7 @@ string_bool(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_nprintf
+=item C<string_nprintf>
 
 This is like C<Parrot_snprintf()> except that it writes to and returns a
 Parrot string.
@@ -1720,6 +1816,8 @@ trailing C<'\0'>. C<dest> may be a C<NULL> pointer, in which case a new
 native string will be created. If C<bytelen> is 0, the behaviour becomes
 more C<sprintf>-ish than C<snprintf>-like. C<bytelen> is measured in the
 encoding of C<*dest>.
+
+=cut
 
 */
 
@@ -1752,9 +1850,11 @@ string_nprintf(PARROT_INTERP,
 
 /*
 
-FUNCDOC: string_printf
+=item C<string_printf>
 
 Writes and returns a Parrot string.
+
+=cut
 
 */
 
@@ -1776,7 +1876,7 @@ string_printf(PARROT_INTERP, NOTNULL(const char *format), ...)
 
 /*
 
-FUNCDOC: string_to_int
+=item C<string_to_int>
 
 Converts a numeric Parrot string to an integer value.
 
@@ -1792,6 +1892,8 @@ A number is such that:
 
 The integer value is the appropriate integer representation of such a
 number, rounding towards zero.
+
+=cut
 
 */
 
@@ -1843,10 +1945,12 @@ string_to_int(SHIM_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_to_num
+=item C<string_to_num>
 
 Same as C<string_to_int()> except that a floating-point value is
 returned.
+
+=cut
 
 */
 
@@ -1890,9 +1994,11 @@ string_to_num(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_from_int
+=item C<string_from_int>
 
 Returns a Parrot string representation of the specified integer value.
+
+=cut
 
 */
 
@@ -1908,10 +2014,12 @@ string_from_int(PARROT_INTERP, INTVAL i)
 
 /*
 
-FUNCDOC: string_from_num
+=item C<string_from_num>
 
 Returns a Parrot string representation of the specified floating-point
 value.
+
+=cut
 
 */
 
@@ -1929,11 +2037,13 @@ string_from_num(PARROT_INTERP, FLOATVAL f)
 
 /*
 
-FUNCDOC: string_to_cstring
+=item C<string_to_cstring>
 
 Returns a C string for the specified Parrot string. Use
 C<string_cstring_free()> to free the string. Failure to do this will
 result in a memory leak.
+
+=cut
 
 */
 
@@ -1955,12 +2065,14 @@ string_to_cstring(SHIM_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_cstring_free
+=item C<string_cstring_free>
 
 Free a string created by C<string_to_cstring()>.
 
 TODO - Hopefully this can go away at some point, as it's got all
 sorts of leak potential otherwise.
+
+=cut
 
 */
 
@@ -1973,10 +2085,12 @@ string_cstring_free(NULLOK(char *p))
 
 /*
 
-FUNCDOC: string_pin
+=item C<string_pin>
 
 Replace the specified Parrot string's managed buffer memory by system
 memory.
+
+=cut
 
 */
 
@@ -2006,10 +2120,12 @@ string_pin(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_unpin
+=item C<string_unpin>
 
 Undo a C<string_pin()> so that the string once again uses managed
 memory.
+
+=cut
 
 */
 
@@ -2052,10 +2168,12 @@ string_unpin(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_hash
+=item C<string_hash>
 
 Returns the hash value for the specified Parrot string, caching it in
 C<< s->hashval >>.
+
+=cut
 
 */
 
@@ -2080,13 +2198,15 @@ string_hash(PARROT_INTERP, NULLOK(STRING *s), size_t seed)
 
 /*
 
-FUNCDOC: string_escape_string
+=item C<string_escape_string>
 
 Escape all non-ascii chars to backslash sequences. Control chars that
 C<string_unescape_cstring> can handle are esacped as I<\x>, as well
 as a double quote character. Other control chars and codepoints < 0x100 are
 escaped as I<\xhh>, codepoints up to 0xffff, as I<\uhhhh>, and codepoints
 greater than this as I<\x{hh...hh}>.
+
+=cut
 
 */
 
@@ -2101,9 +2221,11 @@ string_escape_string(PARROT_INTERP, NULLOK(const STRING *src))
 
 /*
 
-FUNCDOC: string_escape_string_delimited
+=item C<string_escape_string_delimited>
 
 Like above but limit output to len chars (used for trace output of strings).
+
+=cut
 
 */
 
@@ -2221,7 +2343,7 @@ string_escape_string_delimited(PARROT_INTERP,
 
 /*
 
-FUNCDOC: string_unescape_cstring
+=item C<string_unescape_cstring>
 
 Unescapes the specified C string. These sequences are covered:
 
@@ -2232,6 +2354,8 @@ Unescapes the specified C string. These sequences are covered:
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
   \a, \b, \t, \n, \v, \f, \r, \e
+
+=cut
 
 */
 
@@ -2337,12 +2461,14 @@ string_unescape_cstring(PARROT_INTERP,
 
 /*
 
-FUNCDOC: string_upcase
+=item C<string_upcase>
 
 Returns a copy of the specified Parrot string converted to upper case.
 Non-caseable characters are left unchanged.
 
 TODO - implemented only for ASCII.
+
+=cut
 
 */
 
@@ -2360,9 +2486,11 @@ string_upcase(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_upcase_inplace
+=item C<string_upcase_inplace>
 
 Converts the specified Parrot string to upper case.
+
+=cut
 
 */
 
@@ -2376,10 +2504,12 @@ string_upcase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_downcase
+=item C<string_downcase>
 
 Returns a copy of the specified Parrot string converted to lower case.
 Non-caseable characters are left unchanged.
+
+=cut
 
 */
 
@@ -2397,9 +2527,11 @@ string_downcase(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_downcase_inplace
+=item C<string_downcase_inplace>
 
 Converts the specified Parrot string to lower case.
+
+=cut
 
 */
 
@@ -2419,10 +2551,12 @@ string_downcase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_titlecase
+=item C<string_titlecase>
 
 Returns a copy of the specified Parrot string converted to title case.
 Non-caseable characters are left unchanged.
+
+=cut
 
 */
 
@@ -2440,9 +2574,11 @@ string_titlecase(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: string_titlecase_inplace
+=item C<string_titlecase_inplace>
 
 Converts the specified Parrot string to title case.
+
+=cut
 
 */
 
@@ -2456,8 +2592,11 @@ string_titlecase_inplace(PARROT_INTERP, NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: string_increment
+=item C<string_increment>
+
 Perl5ish increment the string. Currently single char only.
+
+=cut
 
 */
 
@@ -2488,9 +2627,12 @@ string_increment(PARROT_INTERP, NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: Parrot_string_cstring
+=item C<Parrot_string_cstring>
+
 Returns a C string from a Parrot string.  Both sides are treated
 as constants -- i.e. do not resize the result.
+
+=cut
 
 */
 
@@ -2507,11 +2649,13 @@ Parrot_string_cstring(SHIM_INTERP, NOTNULL(const STRING *str))
 
 /*
 
-FUNCDOC: Parrot_string_is_cclass
+=item C<Parrot_string_is_cclass>
 
 Returns 1 if the codepoint of string C<s> at given offset is in the given
 character class C<flags>. See also F<include/parrot/cclass.h> for possible
 character classes. Returns 0 otherwise, or if the string is empty or NULL.
+
+=cut
 
 */
 
@@ -2552,10 +2696,12 @@ Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags, NULLOK(STRING *s),
 
 /*
 
-FUNCDOC: Parrot_string_trans_charset
+=item C<Parrot_string_trans_charset>
 
 If C<dest> == NULL, converts C<src> to the given charset or encoding inplace,
 else returns a copy of C<src> with the charset/encoding in dest.
+
+=cut
 
 */
 
@@ -2606,10 +2752,12 @@ Parrot_string_trans_charset(PARROT_INTERP, NULLOK(STRING *src),
 
 /*
 
-FUNCDOC: Parrot_string_trans_encoding
+=item C<Parrot_string_trans_encoding>
 
 If C<dest> == NULL, converts C<src> to the given charset or encoding inplace,
 else returns a copy of C<src> with the charset/encoding in dest.
+
+=cut
 
 */
 
@@ -2753,7 +2901,7 @@ string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))
 
 /*
 
-FUNCDOC: uint_to_str
+=item C<uint_to_str>
 
 Returns C<num> converted to a Parrot C<STRING>.
 
@@ -2762,6 +2910,8 @@ caller has to verify that C<< base >= 2 && base <= 36 >>
 The buffer C<tc> must be at least C<sizeof (UHUGEINTVAL)*8 + 1> chars big.
 
 If C<minus> is true then C<-> is prepended to the string representation.
+
+=cut
 
 */
 
@@ -2795,13 +2945,15 @@ uint_to_str(PARROT_INTERP,
 
 /*
 
-FUNCDOC: int_to_str
+=item C<int_to_str>
 
 Returns C<num> converted to a Parrot C<STRING>.
 
 Note that C<base> must be defined, a default of 10 is not assumed.
 
 If C<< num < 0 >> then C<-> is prepended to the string representation.
+
+=cut
 
 */
 
@@ -2821,6 +2973,8 @@ int_to_str(PARROT_INTERP, NOTNULL(char *tc), HUGEINTVAL num, char base)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 =over
@@ -2834,6 +2988,8 @@ int_to_str(PARROT_INTERP, NOTNULL(char *tc), HUGEINTVAL num, char base)
 =item F<docs/strings.pod>
 
 =back
+
+=cut
 
 */
 

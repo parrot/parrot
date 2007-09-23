@@ -10,6 +10,10 @@ src/pmc.c - The base vtable calling functions
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -40,12 +44,15 @@ PARROT_API PMC * PMCNULL;
 
 /*
 
-FUNCDOC: pmc_new
+=item C<pmc_new>
+
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
 F<include/parrot/pmc.h>). Once the PMC has been successfully created and
 its vtable pointer initialized, we call its C<init> method to perform
 any other necessary initialization.
+
+=cut
 
 */
 
@@ -62,13 +69,16 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-FUNCDOC: pmc_reuse
+=item C<pmc_reuse>
+
 Reuse an existing PMC, turning it into an empty PMC of the new
 type. Any required internal structure will be put in place (such as
 the extension area) and the PMC will be ready to go. This will throw
 an exception if the PMC is constant or of a singleton type (such as
 the environment PMC) or is being turned into a PMC of a singleton
 type.
+
+=cut
 
 */
 
@@ -147,8 +157,11 @@ pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
 
 /*
 
-FUNCDOC: get_new_pmc_header
+=item C<get_new_pmc_header>
+
 Gets a new PMC header.
+
+=cut
 
 */
 
@@ -238,12 +251,15 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
 /*
 
-FUNCDOC: pmc_new_noinit
+=item C<pmc_new_noinit>
+
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
 F<include/parrot/pmc.h>). Unlike C<pmc_new()>, C<pmc_new_noinit()> does
 not call its C<init> method.  This allows separate allocation and
 initialization for continuations.
+
+=cut
 
 */
 
@@ -259,8 +275,11 @@ pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-FUNCDOC: constant_pmc_new_noinit
+=item C<constant_pmc_new_noinit>
+
 Creates a new constant PMC of type C<base_type>.
+
+=cut
 
 */
 
@@ -276,8 +295,11 @@ constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-FUNCDOC: constant_pmc_new
+=item C<constant_pmc_new>
+
 Creates a new constant PMC of type C<base_type>, the call C<init>.
+
+=cut
 
 */
 
@@ -294,8 +316,11 @@ constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-FUNCDOC: pmc_new_init
+=item C<pmc_new_init>
+
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
+
+=cut
 
 */
 
@@ -313,8 +338,11 @@ pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 
 /*
 
-FUNCDOC: constant_pmc_new_init
+=item C<constant_pmc_new_init>
+
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
+
+=cut
 
 */
 
@@ -330,8 +358,11 @@ constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 
 /*
 
-FUNCDOC: pmc_register
+=item C<pmc_register>
+
 This segment handles PMC registration and such.
+
+=cut
 
 */
 
@@ -367,8 +398,11 @@ pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-FUNCDOC: pmc_type
+=item C<pmc_type>
+
 Returns the PMC type for C<name>.
+
+=cut
 
 */
 
@@ -391,8 +425,11 @@ pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-FUNCDOC: pmc_type_p
+=item C<pmc_type_p>
+
 Returns the PMC type for C<name>.
+
+=cut
 
 */
 
@@ -447,8 +484,11 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
 
 /*
 
-FUNCDOC: Parrot_create_mro
+=item C<Parrot_create_mro>
+
 Create the MRO (method resolution order) array for this type.
+
+=cut
 
 */
 
@@ -508,10 +548,17 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 /*
 
+=back
+
 =head2 DOD registry interface
 
-FUNCDOC: dod_register_pmc
+=over 4
+
+=item C<dod_register_pmc>
+
 Registers the PMC with the interpreter's DOD registery.
+
+=cut
 
 */
 
@@ -531,8 +578,11 @@ dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
-FUNCDOC: dod_unregister_pmc
+=item C<dod_unregister_pmc>
+
 Unregisters the PMC from the interpreter's DOD registry.
+
+=cut
 
 */
 
@@ -547,11 +597,18 @@ dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
+=back
+
 =head2 PMC Proxy related things
 
-FUNCDOC: Parrot_create_pmc_proxy
+=over 4
+
+=item C<Parrot_create_pmc_proxy>
+
 Creates a PMC Proxy for the supplied class number and puts it into the array
 of proxies.
+
+=cut
 
 */
 
@@ -585,6 +642,8 @@ Parrot_create_pmc_proxy(PARROT_INTERP, int type_num)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/vtable.h>.
@@ -595,6 +654,8 @@ C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
 =head1 HISTORY
 
 Initial version by Simon on 2001.10.20.
+
+=cut
 
 */
 

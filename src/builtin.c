@@ -12,6 +12,10 @@ src/builtin.c - Builtin Methods
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -103,17 +107,19 @@ static int find_builtin_s( PARROT_INTERP, NOTNULL(STRING *func) )
 
 /*
 
-FUNCDOC: Parrot_init_builtins
+=item C<Parrot_init_builtins>
 
 Initialize the builtins structure.
 
-FUNCDOC: Parrot_is_builtin
+=item C<Parrot_is_builtin>
 
 Return the index of the builtin or -1 on failure.
 
-FUNCDOC: Parrot_find_builtin
+=item C<Parrot_find_builtin>
 
 Return the NCI PMC of the builtin or NULL.
+
+=cut
 
 */
 
@@ -306,9 +312,13 @@ Parrot_builtin_is_void(int bi)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<ops/math.ops>
+
+=cut
 
 */
 

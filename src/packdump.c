@@ -14,6 +14,10 @@ This is only used by the PBC dumper C<pdump>.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -35,9 +39,11 @@ static void PackFile_Constant_dump( PARROT_INTERP,
 
 /*
 
-FUNCDOC: PackFile_ConstTable_dump
+=item C<PackFile_ConstTable_dump>
 
 Dumps the constant table C<self>.
+
+=cut
 
 */
 
@@ -55,9 +61,11 @@ PackFile_ConstTable_dump(PARROT_INTERP, NOTNULL(const PackFile_ConstTable *self)
 
 /*
 
-FUNCDOC: PackFile_Constant_dump
+=item C<PackFile_Constant_dump>
 
 Dumps the constant C<self>.
+
+=cut
 
 */
 
@@ -273,9 +281,11 @@ PackFile_Constant_dump(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct),
 
 /*
 
-FUNCDOC: PackFile_Fixup_dump
+=item C<PackFile_Fixup_dump>
 
 Dumps the fix-up table C<ft>.
+
+=cut
 
 */
 
@@ -306,9 +316,13 @@ PackFile_Fixup_dump(PARROT_INTERP, NOTNULL(const PackFile_FixupTable *ft))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/pdump.c>.
+
+=cut
 
 */
 

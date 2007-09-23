@@ -12,6 +12,8 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -28,10 +30,12 @@ void Parrot_NCI_nci_make_raw_nci(PARROT_INTERP, PMC *method, void *func);
 
 /*
 
-FUNCDOC: register_nci_method
+=item C<register_nci_method>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
+
+=cut
 
 */
 
@@ -88,9 +92,11 @@ register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void *func,
 
 /*
 
-FUNCDOC: Parrot_mark_method_writes
+=item C<Parrot_mark_method_writes>
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
+
+=cut
 
 */
 
@@ -109,9 +115,11 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, NOTNULL(const char *name))
 
 /*
 
-FUNCDOC: Parrot_compreg
+=item C<Parrot_compreg>
 
 Register a parser/compiler function.
+
+=cut
 
 */
 
@@ -141,9 +149,11 @@ Parrot_compreg(PARROT_INTERP, STRING *type,
 
 /*
 
-FUNCDOC: Parrot_compile_string
+=item C<Parrot_compile_string>
 
 Compile code string.
+
+=cut
 
 */
 
@@ -166,9 +176,11 @@ Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
 
 /*
 
-FUNCDOC: Parrot_compile_file
+=item C<Parrot_compile_file>
 
 Compile code file.
+
+=cut
 
 */
 
@@ -201,15 +213,17 @@ extern struct mallinfo mallinfo(void);
 
 /*
 
-FUNCDOC: interpinfo
+=item C<interpinfo>
 
 C<what> specifies the type of information you want about the
 interpreter.
 
-FUNCDOC: interpinfo_p
+=item C<interpinfo_p>
 
 C<what> specifies the type of information you want about the
 interpreter.
+
+=cut
 
 */
 
@@ -357,7 +371,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
 /*
 
-FUNCDOC: sysinfo_i
+=item C<sysinfo_i>
 
 Returns the system info.
 
@@ -368,6 +382,8 @@ C<info_wanted> is one of:
     PARROT_POINTERSIZE
 
 In unknown info is requested then -1 is returned.
+
+=cut
 
 */
 
@@ -389,7 +405,7 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 
 /*
 
-FUNCDOC: sysinfo_s
+=item C<sysinfo_s>
 
 Returns the system info string.
 
@@ -402,6 +418,8 @@ C<info_wanted> is one of:
     CPU_TYPE
 
 If unknown info is requested then and empty string is returned.
+
+=cut
 
 */
 

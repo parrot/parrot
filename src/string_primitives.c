@@ -13,6 +13,10 @@ API.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 /* HEADERIZER HFILE: include/parrot/string_primitives.h */
@@ -29,10 +33,12 @@ API.
 
 /*
 
-FUNCDOC: string_set_data_directory
+=item C<string_set_data_directory>
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
+
+=cut
 
 */
 
@@ -271,9 +277,13 @@ string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
 
 /*
 
+=back
+
 =head2 Character Property Functions
 
-FUNCDOC: Parrot_char_digit_value
+=over 4
+
+=item C<Parrot_char_digit_value>
 
 Returns the decimal digit value of the specified character if it is a decimal
 digit character. If not, then -1 is returned.
@@ -281,6 +291,8 @@ digit character. If not, then -1 is returned.
 Note that as currently written, C<Parrot_char_digit_value()> can
 correctly return the decimal digit value of characters for which
 C<Parrot_char_is_digit()> returns false.
+
+=cut
 
 */
 
@@ -300,9 +312,11 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
-=over
+=over 4
 
 =item F<include/parrot/string_primitives.h>
 
@@ -311,6 +325,8 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 =item F<src/string.c>
 
 =back
+
+=cut
 
 */
 

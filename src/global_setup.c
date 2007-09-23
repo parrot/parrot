@@ -15,6 +15,8 @@ I<What are these global variables?>
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -43,10 +45,12 @@ static void parrot_set_config_hash_interpreter( PARROT_INTERP )
 
 /*
 
-FUNCDOC: Parrot_set_config_hash_internal
+=item C<Parrot_set_config_hash_internal>
 
 Called by Parrot_set_config_hash with the serialised hash which
 will be used in subsequently created Interpreters.
+
+=cut
 
 */
 
@@ -61,10 +65,12 @@ Parrot_set_config_hash_internal(NOTNULL(const unsigned char* parrot_config),
 
 /*
 
-FUNCDOC: parrot_set_config_hash_interpreter
+=item C<parrot_set_config_hash_interpreter>
 
 Used internally to associate the config hash with an Interpreter
 using the last registered config data.
+
+=cut
 
 */
 
@@ -94,11 +100,13 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 /*
 
-FUNCDOC: init_world_once(PARROT_INTERP)>
+=item C<init_world_once(PARROT_INTERP)>
 
 Call init_world() if it hasn't been called before.
 
 C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
+
+=cut
 
 */
 
@@ -118,7 +126,7 @@ init_world_once(PARROT_INTERP)
 
 /*
 
-FUNCDOC: init_world(PARROT_INTERP)>
+=item C<init_world(PARROT_INTERP)>
 
 This is the actual initialization code called by C<init_world_once()>.
 
@@ -127,6 +135,8 @@ necessary, then initializing the string subsystem, and setting up the
 base vtables and core PMCs.
 
 C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
+
+=cut
 
 */
 

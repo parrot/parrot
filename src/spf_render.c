@@ -13,6 +13,10 @@ and its utility functions.
 
 =head2 Utility Functions
 
+=over 4
+
+=cut
+
 */
 
 #define IN_SPF_SYSTEM
@@ -92,9 +96,11 @@ static STRING* str_append_w_flags( PARROT_INTERP,
 
 /*
 
-FUNCDOC: handle_flags
+=item C<handle_flags>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
+
+=cut
 
 */
 
@@ -203,11 +209,13 @@ str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
 
 /*
 
-FUNCDOC: gen_sprintf_call
+=item C<gen_sprintf_call>
 
 Turn the info structure back into an sprintf format. Far from being
 pointless, this is used to call C<snprintf()> when we're confronted with
 a float.
+
+=cut
 
 */
 
@@ -263,9 +271,11 @@ gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo *info), int thingy)
 
 /*
 
-FUNCDOC: Parrot_sprintf_format
+=item C<Parrot_sprintf_format>
 
 This is the engine that does all the formatting.
+
+=cut
 
 */
 
@@ -819,9 +829,13 @@ do_sprintf:
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>.
+
+=cut
 
 */
 

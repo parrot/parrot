@@ -20,6 +20,10 @@ Remember you read something about it in F<docs/infant.dev>?
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -43,9 +47,11 @@ extern void *flush_reg_store(void);
 
 /*
 
-FUNCDOC: trace_system_areas
+=item C<trace_system_areas>
 
 Traces the system stack and any additional CPU-specific areas.
+
+=cut
 
 */
 
@@ -101,9 +107,11 @@ trace_system_areas(PARROT_INTERP)
 
 /*
 
-FUNCDOC: trace_system_stack
+=item C<trace_system_stack>
 
 Traces the memory block starting at C<< interp->lo_var_ptr >>.
+
+=cut
 
 */
 
@@ -118,9 +126,13 @@ trace_system_stack(PARROT_INTERP)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<src/dod.c>, F<include/parrot/dod.h> and F<docs/infant.dev>.
+
+=cut
 
 */
 

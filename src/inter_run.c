@@ -12,6 +12,8 @@ Various functions that call the run loop.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -47,9 +49,11 @@ runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 /*
 
-FUNCDOC: runops
+=item C<runops>
 
 Run parrot ops. Set exception handler and/or resume after exception.
+
+=cut
 
 */
 
@@ -124,11 +128,13 @@ runops(PARROT_INTERP, size_t offs)
 
 /*
 
-FUNCDOC: Parrot_runops_fromc
+=item C<Parrot_runops_fromc>
 
 Runs the Parrot ops, called from C code. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
 is an invocable C<Sub> PMC.
+
+=cut
 
 */
 
@@ -219,7 +225,7 @@ runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
 
 /*
 
-FUNCDOC: Parrot_run_meth_fromc
+=item C<Parrot_run_meth_fromc>
 
 Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -256,6 +262,8 @@ Signatures are similar to NCI:
     N ... NUMVAL
     S ... STRING*
     P ... PMC*
+
+=cut
 
 */
 
@@ -296,11 +304,13 @@ Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const char *s
 
 /*
 
-FUNCDOC: Parrot_runops_fromc_args_event
+=item C<Parrot_runops_fromc_args_event>
 
 Run code from within event handlers. This variant deals with some reentrency
 issues. It also should do sanity checks, if e.g. the handler subroutine
 didn't return properly.
+
+=cut
 
 */
 
@@ -482,6 +492,8 @@ Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

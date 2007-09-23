@@ -10,6 +10,10 @@ src/vtables.c - Functions to build and manipulate vtables
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -19,9 +23,11 @@ src/vtables.c - Functions to build and manipulate vtables
 
 /*
 
-FUNCDOC: Parrot_new_vtable
+=item C<Parrot_new_vtable>
 
 Creates and returns a pointer to the new C<VTABLE>.
+
+=cut
 
 */
 
@@ -36,9 +42,11 @@ Parrot_new_vtable(SHIM_INTERP)
 
 /*
 
-FUNCDOC: Parrot_clone_vtable
+=item C<Parrot_clone_vtable>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
+
+=cut
 
 */
 
@@ -59,9 +67,11 @@ Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))
 
 /*
 
-FUNCDOC: Parrot_destroy_vtable
+=item C<Parrot_destroy_vtable>
 
 Destroys C<*vtable>.
+
+=cut
 
 */
 

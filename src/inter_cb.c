@@ -18,6 +18,10 @@ the C-library.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -43,9 +47,11 @@ static void verify_CD( NOTNULL(char *external_data), NOTNULL(PMC *user_data) )
 
 /*
 
-FUNCDOC: Parrot_make_cb
+=item C<Parrot_make_cb>
 
 Create a callback function according to pdd16.
+
+=cut
 
 */
 
@@ -132,9 +138,11 @@ Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data,
 
 /*
 
-FUNCDOC: verify_CD
+=item C<verify_CD>
 
 Verify user_data PMC then continue with callback_CD
+
+=cut
 
 */
 
@@ -192,9 +200,11 @@ verify_CD(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
 
 /*
 
-FUNCDOC: callback_CD
+=item C<callback_CD>
 
 Common callback function handler. See pdd16.
+
+=cut
 
 */
 
@@ -249,10 +259,12 @@ callback_CD(PARROT_INTERP, NOTNULL(char *external_data), NOTNULL(PMC *user_data)
 
 /*
 
-FUNCDOC: Parrot_run_callback
+=item C<Parrot_run_callback>
 
 Run a callback function. The PMC* user_data holds all
 necessary items in its properties.
+
+=cut
 
 */
 
@@ -342,11 +354,13 @@ case_I:
 }
 /*
 
-FUNCDOC: Parrot_callback_C
+=item C<Parrot_callback_C>
 
-FUNCDOC: Parrot_callback_D
+=item C<Parrot_callback_D>
 
 NCI callback functions. See pdd16.
+
+=cut
 
 */
 

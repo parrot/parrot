@@ -10,6 +10,8 @@ src/headers.c - Header management functions
 
 Handles getting of various headers, and pool creation.
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -73,12 +75,15 @@ static int sweep_cb_pmc( PARROT_INTERP,
 
 /*
 
-
 =head2 Buffer Header Functions for small-object lookup table
 
-FUNCDOC: get_free_buffer
+=over 4
+
+=item C<get_free_buffer>
 
 Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
+
+=cut
 
 */
 
@@ -101,11 +106,17 @@ get_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 
 /*
 
+=back
+
 =head2 Header Pool Creation Functions
 
-FUNCDOC: new_pmc_pool
+=over 4
+
+=item C<new_pmc_pool>
 
 Creates an new pool for PMCs and returns it.
+
+=cut
 
 */
 
@@ -127,10 +138,12 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_bufferlike_pool
+=item C<new_bufferlike_pool>
 
 Creates a new pool for buffer-like structures. Usually you would need
 C<make_bufferlike_pool()>.
+
+=cut
 
 */
 
@@ -153,9 +166,11 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 
 /*
 
-FUNCDOC: new_buffer_pool
+=item C<new_buffer_pool>
 
 Non-constant strings and plain Buffers are in the sized header pools.
+
+=cut
 
 */
 
@@ -177,9 +192,11 @@ new_buffer_pool(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_string_pool
+=item C<new_string_pool>
 
 Creates a new pool for C<STRINGS> and returns it.
+
+=cut
 
 */
 
@@ -201,9 +218,11 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 /*
 
-FUNCDOC: make_bufferlike_pool
+=item C<make_bufferlike_pool>
 
 Make and return a bufferlike header pool.
+
+=cut
 
 */
 
@@ -238,9 +257,11 @@ make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 /*
 
-FUNCDOC: get_bufferlike_pool
+=item C<get_bufferlike_pool>
 
 Return a bufferlike header pool, it must exist.
+
+=cut
 
 */
 
@@ -257,9 +278,11 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 /*
 
-FUNCDOC: new_pmc_header
+=item C<new_pmc_header>
 
 Get a header.
+
+=cut
 
 */
 
@@ -294,9 +317,11 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-FUNCDOC: new_pmc_ext
+=item C<new_pmc_ext>
 
 Creates a new C<PMC_EXT> and returns it.
+
+=cut
 
 */
 
@@ -321,9 +346,11 @@ new_pmc_ext(PARROT_INTERP)
 
 /*
 
-FUNCDOC: add_pmc_ext
+=item C<add_pmc_ext>
 
 Adds a new C<PMC_EXT> to C<pmc>.
+
+=cut
 
 */
 
@@ -346,9 +373,11 @@ add_pmc_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-FUNCDOC: add_pmc_sync
+=item C<add_pmc_sync>
 
 Adds a PMC_sync field to C<pmc>.
+
+=cut
 
 */
 
@@ -365,9 +394,11 @@ add_pmc_sync(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-FUNCDOC: new_string_header
+=item C<new_string_header>
 
 Returns a new C<STRING> header.
+
+=cut
 
 */
 
@@ -391,9 +422,11 @@ new_string_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-FUNCDOC: new_buffer_header
+=item C<new_buffer_header>
 
 Creates and returns a new C<Buffer>.
+
+=cut
 
 */
 
@@ -409,9 +442,11 @@ new_buffer_header(PARROT_INTERP)
 
 /*
 
-FUNCDOC: new_bufferlike_header
+=item C<new_bufferlike_header>
 
 Creates and returns a new buffer-like header.
+
+=cut
 
 */
 
@@ -427,9 +462,11 @@ new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-FUNCDOC: get_max_buffer_address
+=item C<get_max_buffer_address>
 
 Calculates the maximum buffer address and returns it.
+
+=cut
 
 */
 
@@ -453,9 +490,11 @@ get_max_buffer_address(PARROT_INTERP)
 
 /*
 
-FUNCDOC: get_min_buffer_address
+=item C<get_min_buffer_address>
 
 Calculates the minimum buffer address and returns it.
+
+=cut
 
 */
 
@@ -479,9 +518,11 @@ get_min_buffer_address(PARROT_INTERP)
 
 /*
 
-FUNCDOC: get_max_pmc_address
+=item C<get_max_pmc_address>
 
 Calculates the maximum PMC address and returns it.
+
+=cut
 
 */
 
@@ -494,9 +535,11 @@ get_max_pmc_address(PARROT_INTERP)
 
 /*
 
-FUNCDOC: get_min_pmc_address
+=item C<get_min_pmc_address>
 
 Calculates the maximum PMC address and returns it.
+
+=cut
 
 */
 
@@ -509,9 +552,11 @@ get_min_pmc_address(PARROT_INTERP)
 
 /*
 
-FUNCDOC: is_buffer_ptr
+=item C<is_buffer_ptr>
 
 Checks that C<ptr> is actually a C<Buffer>.
+
+=cut
 
 */
 
@@ -533,9 +578,11 @@ is_buffer_ptr(PARROT_INTERP, NOTNULL(const void *ptr))
 
 /*
 
-FUNCDOC: is_pmc_ptr
+=item C<is_pmc_ptr>
 
 Checks that C<ptr> is actually a PMC.
+
+=cut
 
 */
 
@@ -549,9 +596,11 @@ is_pmc_ptr(PARROT_INTERP, NOTNULL(const void *ptr))
 
 /*
 
-FUNCDOC: Parrot_initialize_header_pools
+=item C<Parrot_initialize_header_pools>
 
 Initialize the pools for the tracked resources.
+
+=cut
 
 */
 
@@ -602,7 +651,7 @@ Parrot_initialize_header_pools(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_forall_header_pools
+=item C<Parrot_forall_header_pools>
 
 Iterate through all header pools by calling the passed function. Returns
 zero if the iteration didn't stop or the returned value.
@@ -628,6 +677,8 @@ It is called with C<Interp*, Small_Object_Pool *, int flag, void *arg)>
 If the function returns a non-zero value iteration will stop.
 
 =back
+
+=cut
 
 */
 
@@ -670,9 +721,11 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, NULLOK(void *arg), NOTNULL(p
 
 /*
 
-FUNCDOC: Parrot_destroy_header_pools
+=item C<Parrot_destroy_header_pools>
 
 Destroys the header pools.
+
+=cut
 
 */
 
@@ -789,10 +842,12 @@ fix_pmc_syncs(NOTNULL(Interp *dest_interp), NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: Parrot_merge_header_pools
+=item C<Parrot_merge_header_pools>
 
 Merge the header pools of C<source_interp> into those of C<dest_interp>.
 (Used to deal with shared objects left after interpreter destruction.)
+
+=cut
 
 */
 
@@ -873,6 +928,8 @@ Parrot_initialize_header_pool_names(PARROT_INTERP)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/headers.h>.
@@ -880,6 +937,8 @@ F<include/parrot/headers.h>.
 =head1 HISTORY
 
 Initial version by Mike Lambert on 2002.05.27.
+
+=cut
 
 */
 

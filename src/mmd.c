@@ -34,6 +34,10 @@ not highest type in table.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/compiler.h"
@@ -319,9 +323,12 @@ get_mmd_dispatcher(PARROT_INTERP, NOTNULL(PMC *left), NOTNULL(PMC *right),
 
 /*
 
-FUNCDOC:
+=item C<mmd_deref>
+
 If C<value> is a reference-like PMC, dereference it so we can make an MMD
 call on the 'real' value.
+
+=cut
 
 */
 
@@ -337,8 +344,11 @@ mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
 
 /*
 
-FUNCDOC:
+=item C<mmd_ensure_writable>
+
 Make sure C<pmc> is writable enough for C<function>.
+
+=cut
 
 */
 
@@ -353,7 +363,7 @@ mmd_ensure_writable(PARROT_INTERP, INTVAL function, NULLOK(PMC *pmc))
 
 /*
 
-FUNCDOC: mmd_dispatch_p_ppp
+=item C<mmd_dispatch_p_ppp>
 
 Dispatch to a multimethod that returns a PMC. C<left>, C<right>, and
 C<dest> are all PMC pointers, while C<func_num> is the MMD table that
@@ -365,27 +375,29 @@ The MMD system will figure out which function should be called based on
 the types of C<left> and C<right> and call it, passing in C<left>,
 C<right>, and possibly C<dest> like any other binary vtable function.
 
-FUNCDOC: mmd_dispatch_p_pip
+=item C<mmd_dispatch_p_pip>
 
 Like above, right argument is a native INTVAL.
 
-FUNCDOC: mmd_dispatch_p_pnp
+=item C<mmd_dispatch_p_pnp>
 
 Like above, right argument is a native FLOATVAL.
 
-FUNCDOC: mmd_dispatch_p_psp
+=item C<mmd_dispatch_p_psp>
 
 Like above, right argument is a native STRING *.
 
-FUNCDOC: mmd_dispatch_v_pp
+=item C<mmd_dispatch_v_pp>
 
-FUNCDOC: mmd_dispatch_v_pi
+=item C<mmd_dispatch_v_pi>
 
-FUNCDOC: mmd_dispatch_v_pn
+=item C<mmd_dispatch_v_pn>
 
-FUNCDOC: mmd_dispatch_v_ps
+=item C<mmd_dispatch_v_ps>
 
 Inplace dispatch functions for C<< left <op=> right >>.
+
+=cut
 
 */
 
@@ -610,9 +622,12 @@ mmd_dispatch_v_ps(PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+=item C<mmd_dispatch_i_pp>
+
 Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
 by MMD compare functions.
+
+=cut
 
 */
 
@@ -644,11 +659,14 @@ mmd_dispatch_i_pp(PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+=item C<mmd_add_function>
+
 Add a new binary MMD function to the list of functions the MMD system knows
 of. C<func_num> is the number of the new function. C<function> is ignored.
 
 TODO change this to a MMD register interface that takes a function *name*.
+
+=cut
 
 */
 
@@ -683,8 +701,11 @@ mmd_add_function(PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+=item C<mmd_expand_x>
+
 Expands the function table in the X dimension to include C<new_x>.
+
+=cut
 
 */
 
@@ -738,8 +759,11 @@ mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
 
 /*
 
-FUNCDOC:
+=item C<mmd_expand_y>
+
 Expands the function table in the Y direction.
+
+=cut
 
 */
 
@@ -765,7 +789,8 @@ mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
 
 /*
 
-FUNCDOC:
+=item C<mmd_add_by_class>
+
 Add a function to the MMD table by class name, rather than class number.
 Handles the case where the named class isn't loaded yet.
 
@@ -785,6 +810,8 @@ installed when it's needed.
 
 The function table must exist, but if it is too small, it will
 automatically be expanded.
+
+=cut
 
 */
 
@@ -811,7 +838,8 @@ mmd_add_by_class(PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+=item C<mmd_register>
+
 Register a function C<funcptr> for MMD function table C<func_num> for classes
 C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
 represent the class ID numbers.
@@ -831,6 +859,8 @@ TODO - Currently the MMD system doesn't handle inheritance and best match
 searching, as it assumes that all PMC types have no parent type. This
 can be considered a bug, and will be resolved at some point in the
 future.
+
+=cut
 
 */
 
@@ -886,8 +916,11 @@ mmd_register_sub(PARROT_INTERP,
 
 /*
 
-FUNCDOC:
+=item C<mmd_destroy>
+
 Frees all the memory allocated used the MMD subsystem.
+
+=cut
 
 */
 
@@ -910,10 +943,13 @@ mmd_destroy(PARROT_INTERP)
 
 /*
 
-FUNCDOC:
+=item C<mmd_vtfind>
+
 Return an MMD PMC function for the given data types. The return result is
 either a Sub PMC (for PASM MMD functions) or a NCI PMC holding the
 C function pointer in PMC_struct_val.
+
+=cut
 
 */
 
@@ -955,10 +991,12 @@ Parrot_MMD_search_default_infix(PARROT_INTERP, NOTNULL(STRING *meth),
 
 /*
 
-FUNCDOC: Parrot_mmd_sort_candidate_list
+=item C<Parrot_mmd_sort_candidate_list>
 
 Given an array PMC (usually a MultiSub) sort the mmd candidates by their
 manhatten distance to the current args.
+
+=cut
 
 */
 
@@ -990,15 +1028,17 @@ Parrot_mmd_sort_candidate_list(PARROT_INTERP, NOTNULL(PMC *candidates))
 
 /*
 
-FUNCDOC: mmd_arg_tuple_inline
+=item C<mmd_arg_tuple_inline>
 
 Return a list of argument types. PMC arguments are specified as function
 arguments.
 
-FUNCDOC: mmd_arg_tuple_func
+=item C<mmd_arg_tuple_func>
 
 Return a list of argument types. PMC arguments are take from registers
 according to calling conventions.
+
+=cut
 
 */
 
@@ -1134,11 +1174,13 @@ mmd_arg_tuple_func(PARROT_INTERP)
 
 /*
 
-FUNCDOC: mmd_search_default
+=item C<mmd_search_default>
 
 Default implementation of MMD search. Search scopes for candidates, walk the
 class hierarchy, sort all candidates by their Manhattan distance, and return
 result
+
+=cut
 
 */
 
@@ -1191,11 +1233,13 @@ mmd_search_default(PARROT_INTERP, NOTNULL(STRING *meth), NOTNULL(PMC *arg_tuple)
 
 /*
 
-FUNCDOC: mmd_search_classes
+=item C<mmd_search_classes>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates. C<start_at_parent> is 0 to start at the class itself
 or 1 to search from the first parent class.
+
+=cut
 
 */
 
@@ -1394,9 +1438,11 @@ mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *arg_tuple))
 
 /*
 
-FUNCDOC: mmd_sort_candidates
+=item C<mmd_sort_candidates>
 
 Sort the candidate list C<cl> by Manhattan Distance
+
+=cut
 
 */
 
@@ -1458,10 +1504,12 @@ mmd_sort_candidates(PARROT_INTERP, NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl))
 
 /*
 
-FUNCDOC: mmd_search_scopes
+=item C<mmd_search_scopes>
 
 Search all scopes for MMD candidates matching the arguments given in
 C<arg_tuple>.
+
+=cut
 
 */
 
@@ -1480,10 +1528,12 @@ mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))
 
 /*
 
-FUNCDOC: mmd_is_hidden
+=item C<mmd_is_hidden>
 
 Check if the given multi sub is hidden by any inner multi sub (already in
 the candidate list C<cl>.
+
+=cut
 
 */
 
@@ -1505,13 +1555,15 @@ mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))
 
 /*
 
-FUNCDOC: mmd_maybe_candidate
+=item C<mmd_maybe_candidate>
 
 If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
 return TRUE to stop further search.
 
 If the candidate is a MultiSub remember all matching Subs and return FALSE
 to continue searching outer scopes.
+
+=cut
 
 */
 
@@ -1549,10 +1601,12 @@ mmd_maybe_candidate(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *cl))
 
 /*
 
-FUNCDOC: mmd_search_cur_namespace
+=item C<mmd_search_cur_namespace>
 
 Search the current package namespace for matching candidates. Return
 TRUE if the MMD search should stop.
+
+=cut
 
 */
 
@@ -1588,10 +1642,12 @@ mmd_make_ns(PARROT_INTERP)
 
 /*
 
-FUNCDOC: mmd_search_builtin
+=item C<mmd_search_builtin>
 
 Search the builtin namespace for matching candidates. This is the last
 search in all the namespaces.
+
+=cut
 
 */
 
@@ -1714,8 +1770,11 @@ mmd_create_builtin_multi_meth(PARROT_INTERP, NOTNULL(PMC *ns), INTVAL type,
 
 /*
 
-FUNCDOC:
+=item C<Parrot_mmd_register_table>
+
 Register MMD functions for this PMC type.
+
+=cut
 
 */
 
@@ -1759,11 +1818,13 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
 
 /*
 
-FUNCDOC: Parrot_mmd_rebuild_table
+=item C<Parrot_mmd_rebuild_table>
 
 Rebuild the static MMD_table for the given class type and MMD function
 number. If C<type> is negative all classes are rebuilt. If C<func_nr> is
 negative all MMD functions are rebuilt.
+
+=cut
 
 */
 
@@ -1792,11 +1853,15 @@ Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/mmd.h>,
 F<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
 F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
+
+=cut
 
 */
 

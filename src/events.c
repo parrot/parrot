@@ -15,6 +15,10 @@ handled then by the C<check_event*> opcodes.
 IO events and signals are caught in the io_thread, which again
 dispatches these to one or all interpreters.
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -179,13 +183,19 @@ typedef struct io_thread_msg {
 
 /*
 
+=back
+
 =head2 Signal Handling
 
-FUNCDOC: sig_handler
+=over 4
+
+=item C<sig_handler>
 
 Handle signal C<signum>.
 
 TODO - Only C<SIGHUP> is handled at the moment for testing
+
+=cut
 
 */
 
@@ -204,11 +214,13 @@ sig_handler(int signum)
 
 /*
 
-FUNCDOC: Parrot_sigaction
+=item C<Parrot_sigaction>
 
 Signal handlers are common to all threads, signal block masks are
 specific, so we install one handler then block that signal and unblock
 it in the thread, that will receive that signal.
+
+=cut
 
 */
 
@@ -267,11 +279,17 @@ Parrot_init_signals(void)
 
 /*
 
+=back
+
 =head2 Initialization
 
-FUNCDOC: init_events_first
+=over 4
+
+=item C<init_events_first>
 
 Init event system for first interpreter.
+
+=cut
 
 */
 
@@ -326,9 +344,11 @@ init_events_first(PARROT_INTERP)
 
 /*
 
-FUNCDOC: init_events_all
+=item C<init_events_all>
 
 Init events for all interpreters.
+
+=cut
 
 */
 
@@ -343,9 +363,11 @@ init_events_all(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_init_events
+=item C<Parrot_init_events>
 
 Initialize the event system.
+
+=cut
 
 */
 
@@ -363,11 +385,17 @@ Parrot_init_events(PARROT_INTERP)
 
 /*
 
+=back
+
 =head2 Event Handler Functions
 
-FUNCDOC: Parrot_schedule_event
+=over 4
+
+=item C<Parrot_schedule_event>
 
 Create queue entry and insert event into task queue.
+
+=cut
 
 */
 
@@ -420,10 +448,12 @@ schedule_signal_event(int signum)
 
 /*
 
-FUNCDOC: Parrot_new_timer_event
+=item C<Parrot_new_timer_event>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>
 and running the passed C<sub>.
+
+=cut
 
 */
 
@@ -451,9 +481,11 @@ Parrot_new_timer_event(PARROT_INTERP, NOTNULL(PMC *timer), FLOATVAL diff,
 
 /*
 
-FUNCDOC: Parrot_new_cb_event
+=item C<Parrot_new_cb_event>
 
 Prepare and schedule a callback event.
+
+=cut
 
 */
 
@@ -475,9 +507,11 @@ Parrot_new_cb_event(PARROT_INTERP, NOTNULL(PMC *cbi), NOTNULL(char *ext))
 
 /*
 
-FUNCDOC: Parrot_del_timer_event
+=item C<Parrot_del_timer_event>
 
 Deactivate the timer identified by C<timer>.
+
+=cut
 
 */
 
@@ -507,10 +541,12 @@ Parrot_del_timer_event(PARROT_INTERP, NOTNULL(PMC *timer))
 
 /*
 
-FUNCDOC: Parrot_new_terminate_event
+=item C<Parrot_new_terminate_event>
 
 Create a terminate event, interpreter will leave the run-loop when this
 event arrives.
+
+=cut
 
 */
 
@@ -525,10 +561,12 @@ Parrot_new_terminate_event(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_new_suspend_for_gc_event
+=item C<Parrot_new_suspend_for_gc_event>
 
 Create a suspend-for-GC event, interpreter will wait on a condition
 variable for GC to finish when the event arrives.
+
+=cut
 
 */
 
@@ -551,9 +589,11 @@ Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_kill_event_loop
+=item C<Parrot_kill_event_loop>
 
 Schedule event-loop terminate event. This shuts down the event thread.
+
+=cut
 
 */
 
@@ -568,10 +608,12 @@ Parrot_kill_event_loop(void)
 
 /*
 
-FUNCDOC: Parrot_schedule_interp_qentry
+=item C<Parrot_schedule_interp_qentry>
 
 Put a queue entry into the interpreters task queue and enable event
 checking for the interpreter.
+
+=cut
 
 */
 
@@ -606,9 +648,11 @@ Parrot_schedule_interp_qentry(PARROT_INTERP, NOTNULL(struct QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: Parrot_schedule_broadcast_qentry
+=item C<Parrot_schedule_broadcast_qentry>
 
 Broadcast an event.
+
+=cut
 
 */
 
@@ -669,14 +713,20 @@ Parrot_schedule_broadcast_qentry(NOTNULL(struct QUEUE_ENTRY *entry))
 
 /*
 
+=back
+
 =head2 IO Thread Handling
 
-FUNCDOC: io_thread
+=over 4
+
+=item C<io_thread>
 
 The IO thread uses select/poll to handle IO events and signals.
 
 It waits on input from the message pipe to insert file descriptors in
 the wait sets.
+
+=cut
 
 */
 
@@ -836,9 +886,11 @@ io_thread(SHIM(void *data))
 
 /*
 
-FUNCDOC: stop_io_thread
+=item C<stop_io_thread>
 
 Tell the IO thread to stop.
+
+=cut
 
 */
 
@@ -887,11 +939,17 @@ Parrot_event_add_io_event(PARROT_INTERP,
 
 /*
 
+=back
+
 =head2 Event Handler Thread Functions
 
-FUNCDOC: dup_entry
+=over 4
+
+=item C<dup_entry>
 
 Duplicate queue entry.
+
+=cut
 
 */
 
@@ -912,9 +970,11 @@ dup_entry(NOTNULL(const QUEUE_ENTRY *entry))
 
 /*
 
-FUNCDOC: dup_entry_interval
+=item C<dup_entry_interval>
 
 Duplicate timed entry and add interval to C<abs_time>.
+
+=cut
 
 */
 
@@ -933,10 +993,12 @@ dup_entry_interval(NOTNULL(QUEUE_ENTRY *entry), FLOATVAL now)
 
 /*
 
-FUNCDOC: process_events
+=item C<process_events>
 
 Do something, when an event arrived caller has locked the mutex returns
 0 if event thread terminates.
+
+=cut
 
 */
 
@@ -1013,10 +1075,12 @@ process_events(NOTNULL(QUEUE *event_q))
 
 /*
 
-FUNCDOC: event_thread
+=item C<event_thread>
 
 The event thread is started by the first interpreter. It handles all
 events for all interpreters.
+
+=cut
 
 */
 
@@ -1077,12 +1141,18 @@ event_thread(NOTNULL(void *data))
 
 /*
 
+=back
+
 =head2 Sleep Handling
 
-FUNCDOC: wait_for_wakeup
+=over 4
+
+=item C<wait_for_wakeup>
 
 Sleep on the event queue condition. If an event arrives, the event
 is processed. Terminate the loop if sleeping is finished.
+
+=cut
 
 */
 
@@ -1124,9 +1194,11 @@ wait_for_wakeup(PARROT_INTERP, NULLOK(opcode_t *next))
 
 /*
 
-FUNCDOC: Parrot_sleep_on_event
+=item C<Parrot_sleep_on_event>
 
 Go to sleep. This is called from the C<sleep> opcode.
+
+=cut
 
 */
 
@@ -1158,11 +1230,17 @@ Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, NULLOK(opcode_t *next))
 
 /*
 
+=back
+
 =head2 Event Handling for Run-Loops
 
-FUNCDOC: Parrot_do_check_events
+=over 4
+
+=item C<Parrot_do_check_events>
 
 Explicitly C<sync> called by the check_event opcode from run loops.
+
+=cut
 
 */
 
@@ -1180,9 +1258,11 @@ Parrot_do_check_events(PARROT_INTERP, NULLOK(opcode_t *next))
 
 /*
 
-FUNCDOC: event_to_exception
+=item C<event_to_exception>
 
 Convert event to exception and throw it.
+
+=cut
 
 */
 
@@ -1208,9 +1288,11 @@ event_to_exception(PARROT_INTERP, NOTNULL(const parrot_event* event))
 
 /*
 
-FUNCDOC: do_event
+=item C<do_event>
 
 Run user code or such.
+
+=cut
 
 */
 
@@ -1265,11 +1347,13 @@ do_event(PARROT_INTERP, NOTNULL(parrot_event* event), NULLOK(opcode_t *next))
 
 /*
 
-FUNCDOC: Parrot_do_handle_events
+=item C<Parrot_do_handle_events>
 
 Called by the C<check_event__> opcode from run loops or from above. When
 called from the C<check_events__> opcode, we have to restore the
 C<op_func_table>.
+
+=cut
 
 */
 
@@ -1300,9 +1384,13 @@ Parrot_do_handle_events(PARROT_INTERP, int restore, NULLOK(opcode_t *next))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/events.h> and F<docs/dev/events.pod>.
+
+=cut
 
 */
 

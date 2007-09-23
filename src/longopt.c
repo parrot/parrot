@@ -12,6 +12,8 @@ This is used by C<parrot>.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -49,7 +51,7 @@ static char longopt_error_buffer[512];
 
 /*
 
-FUNCDOC: longopt_get
+=item C<longopt_get>
 
 Gets long or short options, specified in C<options[]> (see
 F<docs/dev/longopt.dev>).
@@ -61,6 +63,8 @@ Call it iteratively with the same C<info_buf> until it returns 0 or -1.
 -1 means a parse error, with error put in C<< info_buf->opt_error >>.
 
 Any other value is a valid option identifier.
+
+=cut
 
 */
 
@@ -101,7 +105,7 @@ longopt_get(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
 
 /*
 
-FUNCDOC: longopt_get_longopt
+=item C<longopt_get_longopt>
 
 Find the option identifier of a long option.
 
@@ -109,6 +113,8 @@ Fill C<info_buf> appropriately, and return the option identifier.
 
 C<argv[info_buf->opt_index]> is guaranteed to have at least three
 characters and start with C<-->.
+
+=cut
 
 */
 
@@ -192,7 +198,7 @@ longopt_get_longopt(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
 
 /*
 
-FUNCDOC: longopt_get_shortopt
+=item C<longopt_get_shortopt>
 
 Find the option identifier of the next short option.
 
@@ -201,6 +207,8 @@ C<< info_buf->_shortopt_pos >> maintains a pointer into that bundle.
 
 C<< argv[info_buf->opt_index] >> is guaranteed to be at least two
 characters long and start with a dash.
+
+=cut
 
 */
 
@@ -280,6 +288,8 @@ longopt_get_shortopt(PARROT_INTERP, int argc, NOTNULL(char* argv[]),
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

@@ -13,6 +13,10 @@ subroutines.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 
@@ -148,13 +152,15 @@ static void too_many( PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_init_arg_nci
+=item C<Parrot_init_arg_nci>
 
 Initialize the argument passing state C<call_state> for the given NCI signature.
 
-FUNCDOC: Parrot_init_ret_nci
+=item C<Parrot_init_ret_nci>
 
 Initialize the return value passing state C<call_state> for the given NCI signature.
+
+=cut
 
 */
 
@@ -193,17 +199,17 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), NOTNULL(const char *s
 
 /*
 
-FUNCDOC: Parrot_init_arg_indexes_and_sig_pmc
+=item C<Parrot_init_arg_indexes_and_sig_pmc>
 
 Initialize argument transfer with given context registers, register indexes, and
 a signature pmc.
 
-FUNCDOC: Parrot_init_arg_sig
+=item C<Parrot_init_arg_sig>
 
 Initialize argument transfer with given code segment (holding the
 const_table), registers, function signature, and arguments.
 
-FUNCDOC: Parrot_init_arg_op
+=item C<Parrot_init_arg_op>
 
 Initialize argument transfer with given context registers, and opcode
 location of a get_ or set_ argument opcode.
@@ -212,6 +218,8 @@ All functions can be used for either source or destination, by passing
 either C<&st.src> or C<&st.dest> of a C<call_state> structure.
 
 These functions return 0, if no arguments are present, or 1 on success.
+
+=cut
 
 */
 
@@ -830,7 +838,7 @@ null_val(int sig, NOTNULL(call_state *st))
 
 /*
 
-FUNCDOC: check_named
+=item C<check_named>
 
 Makes sure that all required named args are set and that all optional
 args and flags are set to null and false if not present.
@@ -842,6 +850,8 @@ A named arg takes the form of
 or
 
     STRING* name, [INPS] actual_arg, int opt_arg_flag
+
+=cut
 
 */
 
@@ -1127,7 +1137,7 @@ Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))
 
 /*
 
-FUNCDOC: parrot_pass_args
+=item C<parrot_pass_args>
 
 Main argument passing routine.
 
@@ -1139,6 +1149,8 @@ context. C<dst_seg> has the constants of the destination.
 C<what> is either C<PARROT_OP_get_params_pc> or C<PARROT_OP_get_results_pc>.
 With the former arguments are passed from the caller into a subroutine,
 the latter handles return values and yields.
+
+=cut
 
 */
 
@@ -1175,10 +1187,12 @@ parrot_pass_args(PARROT_INTERP, NOTNULL(parrot_context_t *src_ctx), NOTNULL(parr
 
 /*
 
-FUNCDOC: parrot_pass_args_fromc
+=item C<parrot_pass_args_fromc>
 
 Pass arguments from C code with given signature to a Parrot Sub.
 Prerequisites are like above.
+
+=cut
 
 */
 
@@ -1368,7 +1382,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur, NOTNULL(opcode_t *n_regs_used
 
 /*
 
-FUNCDOC: Parrot_PCCINVOKE
+=item C<Parrot_PCCINVOKE>
 
 pmc is the invocant.
 method_name is the method_name used in the find_method VTABLE call
@@ -1403,6 +1417,8 @@ Example signature
     a slurpy PMC: Ps
 
 invokes a PMC method
+
+=cut
 
 */
 
@@ -1672,9 +1688,13 @@ Parrot_PCCINVOKE(PARROT_INTERP, NULLOK(PMC* pmc), NOTNULL(STRING *method_name),
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/inter_run.c>, F<src/pmc/sub.pmc>.
+
+=cut
 
 */
 

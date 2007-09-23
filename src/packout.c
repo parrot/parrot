@@ -12,6 +12,10 @@ src/packout.c - Functions for writing out packfiles
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -51,7 +55,7 @@ PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
 
 /*
 
-FUNCDOC: PackFile_pack
+=item C<PackFile_pack>
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -62,6 +66,8 @@ This means that you MUST call C<PackFile_pack_size()> before
 C<PackFile_pack()>
 
 Other pack routines are in F<src/packfile.c>.
+
+=cut
 
 */
 
@@ -145,7 +151,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, NOTNULL(PackFile_Segment *seg))
 
 /*
 
-FUNCDOC: PackFile_ConstTable_pack
+=item C<PackFile_ConstTable_pack>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -154,6 +160,8 @@ indicated by C<PackFile_pack_size()>.
 
 This means that you MUST call C<PackFile_pack_size()> before
 C<PackFile_ConstTable_pack()>
+
+=cut
 
 */
 
@@ -177,10 +185,12 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
 /*
 
-FUNCDOC: find_in_const
+=item C<find_in_const>
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
+
+=cut
 
 */
 
@@ -203,7 +213,7 @@ PackFile_find_in_const(PARROT_INTERP,
 
 /*
 
-FUNCDOC: PackFile_Constant_pack
+=item C<PackFile_Constant_pack>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -215,6 +225,8 @@ C<PackFile_Constant_pack()>
 
 The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 (Note this padding is not yet implemented for FLOATVALs.)
+
+=cut
 
 */
 
@@ -320,12 +332,16 @@ PackFile_Constant_pack(PARROT_INTERP,
 
 /*
 
+=back
+
 =head1 HISTORY
 
 Rework by Melvin; new bytecode format, make bytecode portable. (Do
 endian conversion and wordsize transforms on the fly.)
 
 leo: rewrite to use new directory-based format.
+
+=cut
 
 */
 

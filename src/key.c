@@ -12,6 +12,10 @@ The base vtable calling functions.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -21,8 +25,11 @@ The base vtable calling functions.
 
 /*
 
-FUNCDOC: key_new
+=item C<key_new>
+
 Returns a new C<Key> PMC.
+
+=cut
 
 */
 
@@ -39,8 +46,11 @@ key_new(PARROT_INTERP)
 
 /*
 
-FUNCDOC: key_new_integer
+=item C<key_new_integer>
+
 Returns a new integer C<Key> PMC with value C<value>.
+
+=cut
 
 */
 
@@ -60,8 +70,11 @@ key_new_integer(PARROT_INTERP, INTVAL value)
 
 /*
 
-FUNCDOC: key_new_number
+=item C<key_new_number>
+
 Returns a new number C<Key> PMC with value C<value>.
+
+=cut
 
 */
 
@@ -81,8 +94,11 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
 
 /*
 
-FUNCDOC: key_new_string
+=item C<key_new_string>
+
 Returns a new string C<Key> PMC with value C<value>.
+
+=cut
 
 */
 
@@ -102,9 +118,12 @@ key_new_string(PARROT_INTERP, NOTNULL(STRING *value))
 
 /*
 
-FUNCDOC: key_new_cstring
+=item C<key_new_cstring>
+
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
+
+=cut
 
 */
 
@@ -120,8 +139,11 @@ key_new_cstring(PARROT_INTERP, NULLOK(const char *value))
 
 /*
 
-FUNCDOC: key_new_pmc
+=item C<key_new_pmc>
+
 Returns a new PMC C<Key> PMC with value C<value>.
+
+=cut
 
 */
 
@@ -139,8 +161,11 @@ key_new_pmc(PARROT_INTERP, NOTNULL(PMC *value))
 
 /*
 
-FUNCDOC: key_set_integer
+=item C<key_set_integer>
+
 Set the integer C<value> in C<key>.
+
+=cut
 
 */
 
@@ -157,8 +182,11 @@ key_set_integer(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value)
 
 /*
 
-FUNCDOC: key_set_register
+=item C<key_set_register>
+
 Set the register C<value> in C<key>.
+
+=cut
 
 */
 
@@ -176,8 +204,11 @@ key_set_register(SHIM_INTERP, NOTNULL(PMC *key), INTVAL value,
 
 /*
 
-FUNCDOC: key_set_number
+=item C<key_set_number>
+
 Set the number C<value> in C<key>.
+
+=cut
 
 */
 
@@ -194,8 +225,11 @@ key_set_number(SHIM_INTERP, NOTNULL(PMC *key), FLOATVAL value)
 
 /*
 
-FUNCDOC: key_set_string
+=item C<key_set_string>
+
 Set the string C<value> in C<key>.
+
+=cut
 
 */
 
@@ -212,8 +246,11 @@ key_set_string(SHIM_INTERP, NOTNULL(PMC *key), NOTNULL(STRING *value))
 
 /*
 
-FUNCDOC: key_set_pmc
+=item C<key_set_pmc>
+
 Set the PMC C<value> in C<key>.
+
+=cut
 
 */
 
@@ -232,8 +269,11 @@ key_set_pmc(PARROT_INTERP, NOTNULL(PMC *key), NOTNULL(PMC *value))
 
 /*
 
-FUNCDOC: key_type
+=item C<key_type>
+
 Returns the type of C<key>.
+
+=cut
 
 */
 
@@ -326,9 +366,12 @@ key_string(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-FUNCDOC: key_pmc
+=item C<key_pmc>
+
 These functions return the integer/number/string/PMC values of C<key> if
 possible. Otherwise they throws an exceptions.
+
+=cut
 
 */
 
@@ -348,8 +391,11 @@ key_pmc(PARROT_INTERP, NOTNULL(PMC *key))
 
 /*
 
-FUNCDOC: key_next
+=item C<key_next>
+
 Returns the next key if C<key> is in a sequence of linked keys.
+
+=cut
 
 */
 
@@ -364,13 +410,16 @@ key_next(SHIM_INTERP, NOTNULL(PMC *key))
 
 /*
 
-FUNCDOC: key_append
+=item C<key_append>
+
 Appends C<key2> to C<key1>.
 
 Note that if C<key1> is not the last key in a sequence linked keys then
 the last key will be found and C<key2> appended to that.
 
 Returns C<key1>.
+
+=cut
 
 */
 
@@ -393,8 +442,11 @@ key_append(SHIM_INTERP, NOTNULL(PMC *key1), NOTNULL(PMC *key2))
 
 /*
 
-FUNCDOC: key_mark
+=item C<key_mark>
+
 Marks C<key> as live.
+
+=cut
 
 */
 
@@ -470,6 +522,8 @@ key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
 
 /*
 
+=back
+
 =head1 SEE ALSO
 
 F<include/parrot/key.h>.
@@ -477,6 +531,8 @@ F<include/parrot/key.h>.
 =head1 HISTORY
 
 Initial version by Jeff G. on 2001.12.05.
+
+=cut
 
 */
 

@@ -23,6 +23,10 @@ C<opcode_t> units.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -309,9 +313,11 @@ fetch_op_le_8(NOTNULL(unsigned char *b))
 
 /*
 
-FUNCDOC: PF_fetch_opcode
+=item C<PF_fetch_opcode>
 
 Fetch an C<opcode_t> from the stream, converting byteorder if needed.
+
+=cut
 
 */
 
@@ -332,9 +338,11 @@ PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-FUNCDOC: PF_store_opcode
+=item C<PF_store_opcode>
 
 Store an C<opcode_t> to stream as is.
+
+=cut
 
 */
 
@@ -349,10 +357,12 @@ PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
 
 /*
 
-FUNCDOC: PF_size_opcode
+=item C<PF_size_opcode>
 
 Return size of an item in C<opcode_t> units, which is 1 I<per
 definitionem>.
+
+=cut
 
 */
 
@@ -365,12 +375,14 @@ PF_size_opcode(void)
 
 /*
 
-FUNCDOC: PF_fetch_integer
+=item C<PF_fetch_integer>
 
 Fetch an C<INTVAL> from the stream, converting byteorder if needed.
 
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
+
+=cut
 
 */
 
@@ -392,9 +404,11 @@ PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-FUNCDOC: PF_store_integer
+=item C<PF_store_integer>
 
 Store an C<INTVAL> to stream as is.
+
+=cut
 
 */
 
@@ -409,9 +423,11 @@ PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
 
 /*
 
-FUNCDOC: PF_size_integer
+=item C<PF_size_integer>
 
 Return store size of C<INTVAL> in C<opcode_t> units.
+
+=cut
 
 */
 
@@ -425,10 +441,12 @@ PF_size_integer(void)
 
 /*
 
-FUNCDOC: PF_fetch_number
+=item C<PF_fetch_number>
 
 Fetch a C<FLOATVAL> from the stream, converting byteorder if needed.
 Then advance stream pointer by amount of packfile float size.
+
+=cut
 
 */
 
@@ -470,9 +488,11 @@ PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
 
 /*
 
-FUNCDOC: PF_store_number
+=item C<PF_store_number>
 
 Write a C<FLOATVAL> to the opcode stream as is.
+
+=cut
 
 */
 
@@ -490,9 +510,11 @@ PF_store_number(NOTNULL(opcode_t *cursor), NOTNULL(const FLOATVAL *val))
 
 /*
 
-FUNCDOC: PF_size_number
+=item C<PF_size_number>
 
 Return store size of FLOATVAL in opcode_t units.
+
+=cut
 
 */
 
@@ -505,7 +527,7 @@ PF_size_number(void)
 
 /*
 
-FUNCDOC: PF_fetch_string
+=item C<PF_fetch_string>
 
 Fetch a C<STRING> from bytecode and return a new C<STRING>.
 
@@ -516,6 +538,8 @@ Opcode format is:
     opcode_t type
     opcode_t size
     * data
+
+=cut
 
 */
 
@@ -568,9 +592,11 @@ PF_fetch_string(PARROT_INTERP, NULLOK(PackFile *pf), NOTNULL(opcode_t **cursor))
 
 /*
 
-FUNCDOC: PF_store_string
+=item C<PF_store_string>
 
 Write a STRING to the opcode stream.
+
+=cut
 
 */
 
@@ -624,9 +650,11 @@ PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: PF_size_string
+=item C<PF_size_string>
 
 Report store size of C<STRING> in C<opcode_t> units.
+
+=cut
 
 */
 
@@ -646,9 +674,11 @@ PF_size_string(NOTNULL(const STRING *s))
 
 /*
 
-FUNCDOC: PF_fetch_cstring
+=item C<PF_fetch_cstring>
 
 Fetch a cstring from bytecode and return an allocated copy
+
+=cut
 
 */
 
@@ -670,9 +700,11 @@ PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
 
 /*
 
-FUNCDOC: PF_store_cstring
+=item C<PF_store_cstring>
 
 Write a 0-terminated string to the stream.
+
+=cut
 
 */
 
@@ -687,9 +719,11 @@ PF_store_cstring(NOTNULL(opcode_t *cursor), NOTNULL(const char *s))
 
 /*
 
-FUNCDOC: PF_size_cstring
+=item C<PF_size_cstring>
 
 Return store size of a C-string in C<opcode_t> units.
+
+=cut
 
 */
 
@@ -706,9 +740,11 @@ PF_size_cstring(NOTNULL(const char *s))
 
 /*
 
-FUNCDOC: PackFile_assign_transforms
+=item C<PackFile_assign_transforms>
 
 Assign transform functions to vtable.
+
+=cut
 
 */
 
@@ -770,6 +806,8 @@ PackFile_assign_transforms(NOTNULL(PackFile *pf))
 
 /*
 
+=back
+
 =head1 HISTORY
 
 Initial review by leo 2003.11.21
@@ -787,6 +825,8 @@ C<<PF_fetch_<type>()>> - read items and possibly convert the foreign
 format.
 
 C<<PF_size_<type>()>> - return the needed size in C<opcode_t> units.
+
+=cut
 
 */
 

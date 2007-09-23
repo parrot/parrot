@@ -26,6 +26,8 @@ have the same number of elements because there is a one-to-one mapping.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -126,11 +128,13 @@ static void turn_ev_check( PARROT_INTERP, int on )
 
 /*
 
-FUNCDOC: prederef_args
+=item C<prederef_args>
 
 Called from C<do_prederef()> to deal with any arguments.
 
 C<pc_prederef> is the current opcode.
+
+=cut
 
 */
 
@@ -222,12 +226,14 @@ prederef_args(NOTNULL(void **pc_prederef), PARROT_INTERP,
 
 /*
 
-FUNCDOC: do_prederef
+=item C<do_prederef>
 
 This is called from within the run cores to predereference the current
 opcode.
 
 C<pc_prederef> is the current opcode, and C<type> is the run core type.
+
+=cut
 
 */
 
@@ -290,7 +296,7 @@ do_prederef(void **pc_prederef, PARROT_INTERP, int type)
 
 /*
 
-FUNCDOC: turn_ev_check
+=item C<turn_ev_check>
 
 Turn on or off event checking for prederefed cores.
 
@@ -299,6 +305,8 @@ branch locations of the opcode stream.
 
 Note that when C<on> is true, this is being called from the event
 handler thread.
+
+=cut
 
 */
 
@@ -324,7 +332,7 @@ turn_ev_check(PARROT_INTERP, int on)
 
 /*
 
-FUNCDOC: get_op_lib_init
+=item C<get_op_lib_init>
 
 Returns an opcode's library C<op_lib> init function.
 
@@ -334,6 +342,8 @@ C<which> is the run core type.
 
 For dynamic oplibs C<core_op> will be 0 and C<lib> will be a
 C<ParrotLibrary> PMC.
+
+=cut
 
 */
 
@@ -374,9 +384,11 @@ get_op_lib_init(PARROT_INTERP, int core_op, int which, NULLOK(PMC *lib))
 
 /*
 
-FUNCDOC: load_prederef
+=item C<load_prederef>
 
 C<< interp->op_lib >> = prederefed oplib.
+
+=cut
 
 */
 
@@ -398,9 +410,11 @@ load_prederef(PARROT_INTERP, int which)
 
 /*
 
-FUNCDOC: init_prederef
+=item C<init_prederef>
 
 Initialize: load prederef C<func_table>, file prederef.code.
+
+=cut
 
 */
 
@@ -458,11 +472,13 @@ init_prederef(PARROT_INTERP, int which)
 
 /*
 
-FUNCDOC: stop_prederef
+=item C<stop_prederef>
 
 Restore the interpreter's op function tables to their initial state.
 Also recreate the event function pointers. This is only necessary
 for run-core changes, but we don't know the old run core.
+
+=cut
 
 */
 
@@ -481,13 +497,15 @@ stop_prederef(PARROT_INTERP)
 
 /*
 
-FUNCDOC: exec_init_prederef
+=item C<exec_init_prederef>
 
 C<< interp->op_lib >> = prederefed oplib
 
 The "normal" C<op_lib> has a copy in the interpreter structure - but get
 the C<op_code> lookup function from standard core prederef has no
 C<op_info_table>
+
+=cut
 
 */
 
@@ -507,9 +525,11 @@ exec_init_prederef(PARROT_INTERP, void *prederef_arena)
 
 /*
 
-FUNCDOC: init_jit
+=item C<init_jit>
 
 Initializes JIT function for the specified opcode and returns it.
+
+=cut
 
 */
 
@@ -553,9 +573,11 @@ init_jit(PARROT_INTERP, NULLOK(opcode_t *pc))
 
 /*
 
-FUNCDOC: prepare_for_run
+=item C<prepare_for_run>
 
 Prepares to run the interpreter's run core.
+
+=cut
 
 */
 
@@ -585,9 +607,11 @@ extern void* aix_get_toc();
 
 /*
 
-FUNCDOC: runops_jit
+=item C<runops_jit>
 
 Runs the JIT code for the specified opcode.
+
+=cut
 
 */
 
@@ -622,9 +646,11 @@ runops_jit(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-FUNCDOC: runops_exec
+=item C<runops_exec>
 
 Runs the native executable version of the specified opcode.
+
+=cut
 
 */
 
@@ -672,9 +698,11 @@ runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-FUNCDOC: runops_cgp
+=item C<runops_cgp>
 
 Runs the C C<goto>, predereferenced core.
+
+=cut
 
 */
 
@@ -699,9 +727,11 @@ runops_cgp(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-FUNCDOC: runops_switch
+=item C<runops_switch>
 
 Runs the C<switch> core.
+
+=cut
 
 */
 
@@ -720,12 +750,14 @@ runops_switch(PARROT_INTERP, NOTNULL(opcode_t *pc))
 
 /*
 
-FUNCDOC: runops_int
+=item C<runops_int>
 
 Run Parrot operations of loaded code segment until an end opcode is
 reached.  Run core is selected depending on the C<Interp_flags>.  When a
 C<restart> opcode is encountered, a different core may be selected and
 evaluation of opcode continues.
+
+=cut
 
 */
 
@@ -834,12 +866,14 @@ runops_int(PARROT_INTERP, size_t offset)
 
 /*
 
-FUNCDOC: Parrot_setup_event_func_ptrs
+=item C<Parrot_setup_event_func_ptrs>
 
 Setup a C<func_table> containing pointers (or addresses) of the
 C<check_event__> opcode.
 
 TODO: Free it at destroy. Handle run-core changes.
+
+=cut
 
 */
 
@@ -870,9 +904,13 @@ Parrot_setup_event_func_ptrs(PARROT_INTERP)
 
 /*
 
+=back
+
 =head2 Dynamic Loading Functions
 
-FUNCDOC: dynop_register
+=over 4
+
+=item C<dynop_register>
 
 Register a dynamic oplib.
 
@@ -990,9 +1028,11 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
 
 /*
 
-FUNCDOC: dynop_register_xx
+=item C<dynop_register_xx>
 
 Register C<op_lib> with other cores.
+
+=cut
 
 */
 
@@ -1101,9 +1141,11 @@ dynop_register_switch(size_t n_old, size_t n_new)
 
 /*
 
-FUNCDOC: notify_func_table
+=item C<notify_func_table>
 
 Tell the interpreter's running core about the new function table.
+
+=cut
 
 */
 
@@ -1131,11 +1173,13 @@ notify_func_table(PARROT_INTERP, NOTNULL(op_func_t* table), int on)
 
 /*
 
-FUNCDOC: disable_event_checking
+=item C<disable_event_checking>
 
 Restore old function table.
 
 XXX This is only implemented for the function core at present.
+
+=cut
 
 */
 
@@ -1152,7 +1196,7 @@ disable_event_checking(PARROT_INTERP)
 
 /*
 
-FUNCDOC: enable_event_checking
+=item C<enable_event_checking>
 
 Replace func table with one that does event checking for all opcodes.
 
@@ -1160,6 +1204,8 @@ NOTE: C<enable_event_checking()> is called async by the event handler
 thread. All action done from here has to be async safe.
 
 XXX This is only implemented for the function core at present.
+
+=cut
 
 */
 
@@ -1175,6 +1221,8 @@ enable_event_checking(PARROT_INTERP)
 
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

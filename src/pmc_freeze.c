@@ -27,6 +27,8 @@ In the current implementation C<IMAGE_IO> is a stand-in for some kind of
 serializer PMC which will eventually be written. It associates a Parrot
 C<STRING> with a vtable.
 
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -327,7 +329,9 @@ static void visit_todo_list_thaw( PARROT_INTERP,
 
 =head2 Image Stream Functions
 
-FUNCDOC: str_append
+=over 4
+
+=item C<str_append>
 
 Appends C<len> bytes from buffer C<*b> to string C<*s>.
 
@@ -336,6 +340,8 @@ Plain ascii - for testing only:
 For speed reasons we mess around with the string buffers directly.
 
 No encoding of strings, no transcoding.
+
+=cut
 
 */
 
@@ -361,10 +367,12 @@ str_append(PARROT_INTERP, NOTNULL(STRING *s), NOTNULL(const void *b), size_t len
 
 /*
 
-FUNCDOC: push_ascii_integer
+=item C<push_ascii_integer>
 
 Pushes an ASCII version of the integer C<v> onto the end of the C<*io>
 "stream".
+
+=cut
 
 */
 
@@ -378,10 +386,12 @@ push_ascii_integer(PARROT_INTERP, NOTNULL(IMAGE_IO *io), INTVAL v)
 
 /*
 
-FUNCDOC: push_ascii_number
+=item C<push_ascii_number>
 
 Pushes an ASCII version of the number C<v> onto the end of the C<*io>
 "stream".
+
+=cut
 
 */
 
@@ -395,7 +405,7 @@ push_ascii_number(PARROT_INTERP, NOTNULL(IMAGE_IO *io), FLOATVAL v)
 
 /*
 
-FUNCDOC: push_ascii_string
+=item C<push_ascii_string>
 
 Pushes an ASCII version of the string C<*s> onto the end of the C<*io>
 "stream".
@@ -403,6 +413,8 @@ Pushes an ASCII version of the string C<*s> onto the end of the C<*io>
 For testing only - no encodings and such.
 
 XXX no string delimiters - so no space allowed.
+
+=cut
 
 */
 
@@ -427,10 +439,12 @@ push_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(STRING *s))
 
 /*
 
-FUNCDOC: push_ascii_pmc
+=item C<push_ascii_pmc>
 
 Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 "stream".
+
+=cut
 
 */
 
@@ -444,9 +458,11 @@ push_ascii_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(const PMC* v))
 
 /*
 
-FUNCDOC: shift_ascii_integer
+=item C<shift_ascii_integer>
 
 Removes and returns an integer from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -467,9 +483,11 @@ shift_ascii_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_ascii_number
+=item C<shift_ascii_number>
 
 Removes and returns an number from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -490,9 +508,11 @@ shift_ascii_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_ascii_string
+=item C<shift_ascii_string>
 
 Removes and returns an string from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -520,9 +540,11 @@ shift_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_ascii_pmc
+=item C<shift_ascii_pmc>
 
 Removes and returns a PMC from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -544,12 +566,18 @@ shift_ascii_pmc(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
+=back
+
 =head2 C<opcode_t> IO Functions
 
-FUNCDOC: op_check_size
+=over 4
+
+=item C<op_check_size>
 
 Checks the size of the "stream" buffer to see if it can accommodate
 C<len> more bytes. If not then the buffer is expanded.
+
+=cut
 
 */
 
@@ -576,9 +604,11 @@ op_check_size(PARROT_INTERP, NOTNULL(STRING *s), size_t len)
 
 /*
 
-FUNCDOC: op_append
+=item C<op_append>
 
 Appends the opcode C<b> to the string C<*s>.
+
+=cut
 
 */
 
@@ -593,11 +623,13 @@ op_append(PARROT_INTERP, NOTNULL(STRING *s), opcode_t b, size_t len)
 
 /*
 
-FUNCDOC: push_opcode_integer
+=item C<push_opcode_integer>
 
 Pushes the integer C<v> onto the end of the C<*io> "stream".
 
 XXX assumes sizeof (opcode_t) == sizeof (INTVAL).
+
+=cut
 
 */
 
@@ -610,9 +642,11 @@ push_opcode_integer(PARROT_INTERP, NOTNULL(IMAGE_IO *io), INTVAL v)
 
 /*
 
-FUNCDOC: push_opcode_number
+=item C<push_opcode_number>
 
 Pushes the number C<v> onto the end of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -634,9 +668,11 @@ push_opcode_number(PARROT_INTERP, NOTNULL(IMAGE_IO *io), FLOATVAL v)
 
 /*
 
-FUNCDOC: push_opcode_string
+=item C<push_opcode_string>
 
 Pushes the string C<*v> onto the end of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -658,9 +694,11 @@ push_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(STRING *v))
 
 /*
 
-FUNCDOC: push_opcode_pmc
+=item C<push_opcode_pmc>
 
 Pushes the PMC C<*v> onto the end of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -672,12 +710,14 @@ push_opcode_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io), NOTNULL(PMC* v))
 
 /*
 
-FUNCDOC: shift_opcode_integer
+=item C<shift_opcode_integer>
 
 Removes and returns an integer from the start of the C<*io> "stream".
 
 TODO - The shift functions aren't portable yet. We need to have a
 packfile header for wordsize and endianess.
+
+=cut
 
 */
 
@@ -695,11 +735,13 @@ shift_opcode_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_opcode_pmc
+=item C<shift_opcode_pmc>
 
 Removes and returns an PMC from the start of the C<*io> "stream".
 
 Note that this actually reads a PMC id, not a PMC.
+
+=cut
 
 */
 
@@ -714,9 +756,11 @@ shift_opcode_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_opcode_number
+=item C<shift_opcode_number>
 
 Removes and returns an number from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -734,9 +778,11 @@ shift_opcode_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
-FUNCDOC: shift_opcode_string
+=item C<shift_opcode_string>
 
 Removes and returns a string from the start of the C<*io> "stream".
+
+=cut
 
 */
 
@@ -756,11 +802,17 @@ shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
 
 /*
 
+=back
+
 =head2 Helper Functions
 
-FUNCDOC: pmc_add_ext
+=over 4
+
+=item C<pmc_add_ext>
 
 Adds a C<PMC_EXT> to C<*pmc>.
+
+=cut
 
 */
 
@@ -773,9 +825,11 @@ pmc_add_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-FUNCDOC: cleanup_next_for_GC_pool
+=item C<cleanup_next_for_GC_pool>
 
 Sets all the C<next_for_GC> pointers to C<NULL>.
+
+=cut
 
 */
 
@@ -800,9 +854,11 @@ cleanup_next_for_GC_pool(NOTNULL(Small_Object_Pool *pool))
 
 /*
 
-FUNCDOC: cleanup_next_for_GC
+=item C<cleanup_next_for_GC>
 
 Cleans up the C<next_for_GC> pointers.
+
+=cut
 
 */
 
@@ -845,9 +901,11 @@ static image_funcs opcode_funcs = {
 
 /*
 
-FUNCDOC: ft_init
+=item C<ft_init>
 
 Initializes the freeze/thaw subsystem.
+
+=cut
 
 */
 
@@ -899,9 +957,11 @@ ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
 
 /*
 
-FUNCDOC: todo_list_init
+=item C<todo_list_init>
 
 Initializes the C<*info> lists.
+
+=cut
 
 */
 
@@ -956,7 +1016,7 @@ freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
 
 /*
 
-FUNCDOC: thaw_pmc
+=item C<thaw_pmc>
 
 Freeze and thaw a PMC (id).
 
@@ -971,6 +1031,8 @@ may look like this:
 where 30 is C<class_enum_Array>, 33 is C<class_enum_Integer>, the
 type of the second C<Integer> is suppressed, the repeated P0 has bit 0
 set.
+
+=cut
 
 */
 
@@ -1011,12 +1073,14 @@ thaw_pmc(PARROT_INTERP, NOTNULL(visit_info *info),
 
 /*
 
-FUNCDOC: do_action
+=item C<do_action>
 
 Called from C<visit_next_for_GC()> and C<visit_todo_list()> to perform
 the action specified in C<< info->what >>.
 
 Currently only C<VISIT_FREEZE_NORMAL> is implemented.
+
+=cut
 
 */
 
@@ -1039,9 +1103,11 @@ do_action(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
 
 /*
 
-FUNCDOC: thaw_create_pmc
+=item C<thaw_create_pmc>
 
 Called from C<do_thaw()> to attach the vtable etc. to C<*pmc>.
+
+=cut
 
 */
 
@@ -1067,11 +1133,13 @@ thaw_create_pmc(PARROT_INTERP, NOTNULL(const visit_info *info),
 
 /*
 
-FUNCDOC: do_thaw
+=item C<do_thaw>
 
 Called by C<visit_todo_list_thaw()> to thaw and return a PMC.
 
 C<seen> is false if this is the first time the PMC has been encountered.
+
+=cut
 
 */
 
@@ -1198,9 +1266,11 @@ id_from_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
-FUNCDOC: add_pmc_next_for_GC
+=item C<add_pmc_next_for_GC>
 
 Remembers the PMC for later processing.
+
+=cut
 
 */
 
@@ -1215,12 +1285,14 @@ add_pmc_next_for_GC(SHIM_INTERP, NOTNULL(PMC *pmc), NOTNULL(visit_info *info))
 
 /*
 
-FUNCDOC: next_for_GC_seen
+=item C<next_for_GC_seen>
 
 Remembers next child to visit via the C<next_for_GC pointer> generate a
 unique ID per PMC and freeze the ID (not the PMC address) so thaw the
 hash-lookup can be replaced by an array lookup then which is a lot
 faster.
+
+=cut
 
 */
 
@@ -1257,9 +1329,11 @@ skip:
 
 /*
 
-FUNCDOC: add_pmc_todo_list
+=item C<add_pmc_todo_list>
 
 Remembers the PMC to be processed later.
+
+=cut
 
 */
 
@@ -1271,11 +1345,13 @@ add_pmc_todo_list(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info))
 
 /*
 
-FUNCDOC: todo_list_seen
+=item C<todo_list_seen>
 
 Returns true if the PMC was seen, otherwise it put it on the todo list,
 generates an ID (tag) for PMC, offset by 4 as are addresses, low bits
 are flags.
+
+=cut
 
 */
 
@@ -1303,12 +1379,14 @@ todo_list_seen(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(visit_info *info),
 
 /*
 
-FUNCDOC: visit_next_for_GC
+=item C<visit_next_for_GC>
 
 C<visit_child> callbacks:
 
 Checks if the PMC was seen, generate an ID for it if not, then do the
 appropriate action.
+
+=cut
 
 */
 
@@ -1332,9 +1410,11 @@ visit_next_for_GC(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info* info))
 
 /*
 
-FUNCDOC: visit_todo_list
+=item C<visit_todo_list>
 
 Checks the seen PMC via the todo list.
+
+=cut
 
 */
 
@@ -1357,11 +1437,13 @@ visit_todo_list(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info* info))
 
 /*
 
-FUNCDOC: visit_todo_list_thaw
+=item C<visit_todo_list_thaw>
 
 Callback for thaw - action first.
 
 Todo-list and seen handling is all in C<do_thaw()>.
+
+=cut
 
 */
 
@@ -1373,10 +1455,12 @@ visit_todo_list_thaw(PARROT_INTERP, NOTNULL(PMC* old), NOTNULL(visit_info* info)
 
 /*
 
-FUNCDOC: visit_loop_next_for_GC
+=item C<visit_loop_next_for_GC>
 
 Put first item on todo list, then run as long as there are items to be
 done.
+
+=cut
 
 */
 
@@ -1398,9 +1482,11 @@ visit_loop_next_for_GC(PARROT_INTERP, NOTNULL(PMC *current),
 
 /*
 
-FUNCDOC: visit_loop_todo_list
+=item C<visit_loop_todo_list>
 
 The thaw loop.
+
+=cut
 
 */
 
@@ -1476,9 +1562,11 @@ again:
 
 /*
 
-FUNCDOC: create_image
+=item C<create_image>
 
 Allocate image to some estimated size.
+
+=cut
 
 */
 
@@ -1504,7 +1592,7 @@ create_image(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info))
 
 /*
 
-FUNCDOC: run_thaw
+=item C<run_thaw>
 
 Performs thawing. C<what> indicates what to be thawed.
 
@@ -1517,6 +1605,8 @@ aggregates. We could of course decide dynamically, which strategy to
 use, e.g.: given a big image, the first thawed item is a small
 aggregate. This implies, it probably contains (or some big strings) more
 nested containers, for which the C<next_for_GC> approach could be a win.
+
+=cut
 
 */
 
@@ -1577,13 +1667,19 @@ run_thaw(PARROT_INTERP, NOTNULL(STRING* image), visit_enum_type what)
 
 /*
 
+=back
+
 =head2 Public Interface
 
-FUNCDOC: Parrot_freeze_at_destruct
+=over 4
+
+=item C<Parrot_freeze_at_destruct>
 
 This function must not consume any resources (except the image itself).
 It uses the C<next_for_GC> pointer, so its not reentrant and must not be
 interrupted by a DOD run.
+
+=cut
 
 */
 
@@ -1615,9 +1711,11 @@ Parrot_freeze_at_destruct(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
-FUNCDOC: Parrot_freeze
+=item C<Parrot_freeze>
 
 Freeze using either method.
+
+=cut
 
 */
 
@@ -1654,9 +1752,11 @@ Parrot_freeze(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
-FUNCDOC: Parrot_thaw
+=item C<Parrot_thaw>
 
 Thaw a PMC, called from the C<thaw> opcode.
+
+=cut
 
 */
 
@@ -1671,10 +1771,12 @@ Parrot_thaw(PARROT_INTERP, NOTNULL(STRING* image))
 
 /*
 
-FUNCDOC: Parrot_thaw_constants
+=item C<Parrot_thaw_constants>
 
 Thaw the constants. This is used by PackFile for unpacking PMC
 constants.
+
+=cut
 
 */
 
@@ -1689,11 +1791,13 @@ Parrot_thaw_constants(PARROT_INTERP, NOTNULL(STRING* image))
 
 /*
 
-FUNCDOC: Parrot_clone
+=item C<Parrot_clone>
 
 There are for sure shortcuts to clone faster, e.g. always thaw the image
 immediately or use a special callback. But for now we just thaw a frozen
 PMC.
+
+=cut
 
 */
 
@@ -1708,6 +1812,8 @@ Parrot_clone(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
+=back
+
 =head1 TODO
 
 The seen-hash version for freezing might go away sometimes.
@@ -1719,6 +1825,8 @@ Lot of discussion on p6i and F<docs/dev/pmc_freeze.pod>.
 =head1 HISTORY
 
 Initial version by leo 2003.11.03 - 2003.11.07.
+
+=cut
 
 */
 

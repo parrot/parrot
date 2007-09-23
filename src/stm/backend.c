@@ -19,6 +19,10 @@ the low-level synchronization.
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 
@@ -180,9 +184,11 @@ static void * wait_for_version( PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_STM_destroy
+=item C<Parrot_STM_destroy>
 
 Free all resources associated with STM in the interpreter C<interp>.
+
+=cut
 
 */
 
@@ -205,10 +211,12 @@ Parrot_STM_destroy(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_alloc
+=item C<Parrot_STM_alloc>
 
 Create a new handle that will wrap a STM-managed PMC. The initial value
 of the PMC will be a copy of C<pmc>.
+
+=cut
 
 */
 
@@ -374,10 +382,12 @@ is_aborted(NOTNULL(STM_tx_log *log))
 
 /*
 
-FUNCDOC: Parrot_STM_start_transaction
+=item C<Parrot_STM_start_transaction>
 
 Start a new transaction for the interpreter C<interp>. If there is
 already a transaction in progress, starts a nested transaction.
+
+=cut
 
 */
 
@@ -721,12 +731,14 @@ replay_writes(PARROT_INTERP, NOTNULL(STM_tx_log *log), int from, int to)
 
 /*
 
-FUNCDOC: Parrot_STM_commit
+=item C<Parrot_STM_commit>
 
 Tries to commit the currently active transaction. Returns true if the commit
 succeeds. If it returns false, the transaction was aborted instead.
 
 Throws an exception if there is no active transaction.
+
+=cut
 
 */
 
@@ -771,11 +783,13 @@ Parrot_STM_commit(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_abort
+=item C<Parrot_STM_abort>
 
 Aborts the currently active transaction.
 
 Throws an exception if there is no active transaction.
+
+=cut
 
 */
 
@@ -804,7 +818,7 @@ Parrot_STM_abort(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_wait
+=item C<Parrot_STM_wait>
 
 Abort the currently active transaction, and then wait
 for something the transaction was dependent on to change, including
@@ -815,11 +829,13 @@ for verifying that any outer transaction is invalid after calling this.
 
 (Not yet implemented. Right now just aborts.)
 
+returns true if we still need to wait, false if we're already done.
+assumes transcation is _not_ yet aborted.
+
+=cut
+
 */
 
-/* returns true if we still need to wait, false if we're already done.
- * assumes transcation is _not_ yet aborted.
- */
 static int
 setup_wait(PARROT_INTERP, NOTNULL(STM_tx_log *log))
 {
@@ -908,11 +924,13 @@ Parrot_STM_wait(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_validate
+=item C<Parrot_STM_validate>
 
 Return true if the currently active transaction might commit;
 false otherwise. Always returns true in the special case of no
 active transaction.
+
+=cut
 
 */
 
@@ -939,10 +957,12 @@ Parrot_STM_validate(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_mark_transaction
+=item C<Parrot_STM_mark_transaction>
 
 Mark items in our transaction log as living so the GC doesn't
 collect them from us.
+
+=cut
 
 */
 
@@ -983,10 +1003,12 @@ Parrot_STM_mark_transaction(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_mark_pmc_handle
+=item C<Parrot_STM_mark_pmc_handle>
 
 Mark items associated with the corresponding PMC handle as reachable so the GC
 doesn't collect the handle or objects it refers to as reachable.
+
+=cut
 
 */
 
@@ -1013,10 +1035,11 @@ Parrot_STM_mark_pmc_handle(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 
 /*
 
-FUNCDOC: Parrot_STM_transaction_depth
+=item C<Parrot_STM_transaction_depth>
 
 Return the number of active transactions in this thread.
 
+=cut
 
 */
 
@@ -1151,9 +1174,11 @@ wait_for_version(PARROT_INTERP,
 
 /*
 
-FUNCDOC: Parrot_STM_read
+=item C<Parrot_STM_read>
 
 Read the value stored in the PMC wrapped by C<handle>.
+
+=cut
 
 */
 
@@ -1408,12 +1433,14 @@ find_write_record(PARROT_INTERP, NOTNULL(STM_tx_log *log),
 
 /*
 
-FUNCDOC: Parrot_STM_begin_update
+=item C<Parrot_STM_begin_update>
 
 Get a editable copy of the PMC wrapped by C<handle>. The updates will be visible
 to other threads after a successful commit. The PMC should not be used after
 the transaction commits (and especially not be written to, as other threads may
 be given it when they read the value).
+
+=cut
 
 */
 
@@ -1437,9 +1464,11 @@ Parrot_STM_begin_update(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 
 /*
 
-FUNCDOC: Parrot_STM_write
+=item C<Parrot_STM_write>
 
 Write C<new_value> into the PMC wrapped by C<handle>.
+
+=cut
 
 */
 
@@ -1459,10 +1488,12 @@ Parrot_STM_write(PARROT_INTERP, Parrot_STM_PMC_handle handle, NULLOK(PMC* new_va
 
 /*
 
-FUNCDOC: Parrot_STM_extract
+=item C<Parrot_STM_extract>
 
 Return an opaque pointer representing enough information to replay a transaction
 enough to wait() for it to become valid. User access through STMLog PMC class.
+
+=cut
 
 */
 
@@ -1496,7 +1527,7 @@ Parrot_STM_extract(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_STM_replay_extracted
+=item C<Parrot_STM_replay_extracted>
 
 Replay a transaction log extracted with C<Parrot_STM_extract>. At the moment
 this is only guaranteed to work well enough to use STM_wait(). If one
@@ -1504,6 +1535,8 @@ attempts to use it to replay transactions to commit them, it is likely to
 produce wrong results if the recorded transaction had dependencies on its outer
 transactions and it is not replayed inside the same transactions it was recorded
 in.
+
+=cut
 
 */
 
@@ -1543,9 +1576,11 @@ Parrot_STM_replay_extracted(PARROT_INTERP, NULLOK(void *saved_log_data))
 
 /*
 
-FUNCDOC: Parrot_STM_mark_extracted
+=item C<Parrot_STM_mark_extracted>
 
 Mark GC-managed objects reachable through an extracted transaction log.
+
+=cut
 
 */
 
@@ -1566,9 +1601,11 @@ Parrot_STM_mark_extracted(PARROT_INTERP, NULLOK(void *saved_log_data))
 
 /*
 
-FUNCDOC: Parrot_STM_destroy_extracted
+=item C<Parrot_STM_destroy_extracted>
 
 Free memory associated with an extracted transaction log.
+
+=cut
 
 */
 
@@ -1588,10 +1625,12 @@ Parrot_STM_destroy_extracted(PARROT_INTERP, NULLOK(void *saved_log_data))
 
 /*
 
-FUNCDOC: Parrot_STM_dump_profile
+=item C<Parrot_STM_dump_profile>
 
 Dump profiling information (num failed commits, time spent waiting
 for a lock, etc.)
+
+=cut
 
 */
 

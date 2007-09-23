@@ -12,6 +12,8 @@ Create or destroy a Parrot interpreter
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
@@ -46,9 +48,11 @@ Interp interpre;
 
 /*
 
-FUNCDOC: is_env_var_set
+=item C<is_env_var_set>
 
 Checks whether the specified environment variable is set.
+
+=cut
 
 */
 
@@ -71,9 +75,11 @@ is_env_var_set(NOTNULL(const char* var))
 
 /*
 
-FUNCDOC: setup_default_compreg
+=item C<setup_default_compreg>
 
 Setup default compiler for PASM.
+
+=cut
 
 */
 
@@ -88,9 +94,11 @@ setup_default_compreg(PARROT_INTERP)
 
 /*
 
-FUNCDOC: make_interpreter
+=item C<make_interpreter>
 
 Create the Parrot interpreter. Allocate memory and clear the registers.
+
+=cut
 
 */
 
@@ -264,12 +272,14 @@ make_interpreter(NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-FUNCDOC: Parrot_destroy
+=item C<Parrot_destroy>
 
 Does nothing if C<ATEXIT_DESTROY> is defined. Otherwise calls
 C<Parrot_really_destroy()> with exit code 0.
 
 This function is not currently used.
+
+=cut
 
 */
 
@@ -286,12 +296,14 @@ Parrot_destroy(PARROT_INTERP)
 
 /*
 
-FUNCDOC: Parrot_really_destroy
+=item C<Parrot_really_destroy>
 
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
 Note that C<exit_code> is ignored.
+
+=cut
 
 */
 
@@ -459,6 +471,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 
