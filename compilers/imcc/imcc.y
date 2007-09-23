@@ -1165,8 +1165,8 @@ opt_unique_reg:
      /* empty */  { $$ = 0; }
    | UNIQUE_REG   { $$ = 1; }
    ;
-   
-   
+
+
 labeled_inst:
      assignment
    | conditional_statement
