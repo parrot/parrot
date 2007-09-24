@@ -65,7 +65,7 @@
 #define IMCC_FATAL_EXCEPTION      1
 #define IMCC_FATALY_EXCEPTION     2
 
-#define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
+#define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))
 
 
 /*

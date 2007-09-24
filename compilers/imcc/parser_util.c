@@ -660,8 +660,8 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         len -= 2;
     format[len] = '\0';
     if (fmt && *fmt) {
-        strncpy(format, fmt, sizeof(format) - 1);
-        format[sizeof(format) - 1] = '\0';
+        strncpy(format, fmt, sizeof (format) - 1);
+        format[sizeof (format) - 1] = '\0';
     }
 #if 1
     IMCC_debug(interp, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);

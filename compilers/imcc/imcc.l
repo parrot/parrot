@@ -782,7 +782,7 @@ read_params (YYSTYPE *valp, Interp *interp, params_t *params,
     params->num_param = 0;
     c = yylex_skip(&val, interp, " \n", yyscanner);
 
-    while(c != ')') {
+    while (c != ')') {
         if (YYSTATE == heredoc2)
             IMCC_fataly(interp, E_SyntaxError,
                         "Heredoc in macro '%s' not allowed",
@@ -871,7 +871,7 @@ read_macro (YYSTYPE *valp, Interp *interp, void *yyscanner)
                         IMCC_INFO(interp)->cur_macro_name);
 
         if (strlen(IMCC_INFO(interp)->temp_buffer) + strlen(valp->s) >=
-            sizeof(IMCC_INFO(interp)->temp_buffer))
+            sizeof (IMCC_INFO(interp)->temp_buffer))
             IMCC_fataly(interp, E_SyntaxError,
                         "Macro '%s' is too big",
                         IMCC_INFO(interp)->cur_macro_name);
@@ -1161,7 +1161,7 @@ compile_file(Interp *interp, FILE *file, void *yyscanner)
     }
     IMCC_END_TRY;
 
-    if(buffer != NULL) {
+    if (buffer != NULL) {
         yy_switch_to_buffer(buffer, yyscanner);
     }
 }
@@ -1190,7 +1190,7 @@ compile_string(Interp *interp, char *s, void *yyscanner)
     }
     IMCC_END_TRY;
 
-    if(buffer != NULL) {
+    if (buffer != NULL) {
         yy_switch_to_buffer(buffer, yyscanner);
     }
 }

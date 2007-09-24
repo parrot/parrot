@@ -341,7 +341,7 @@ imc_stat_init(NOTNULL(IMC_Unit *unit))
         unit->first_avail[j] = 0;
     }
 
-    memset(&(unit->ostat), 0, sizeof(unit->ostat));
+    memset(&(unit->ostat), 0, sizeof (unit->ostat));
 }
 
 /* and final */
