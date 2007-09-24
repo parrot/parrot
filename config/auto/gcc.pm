@@ -325,7 +325,7 @@ sub runstep {
             4.1 => ""
                 . " -Wc++-compat"
                 . " -Wlogical-op"
-                . ""
+                . "",
             4.2 => "",
 
             # -Wsequence-point is part of -Wall
