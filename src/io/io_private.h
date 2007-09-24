@@ -362,7 +362,7 @@ size_t PIO_write_down( PARROT_INTERP,
 struct _ParrotIOLayerAPI {
     INTVAL          (*Init)(PARROT_INTERP, ParrotIOLayer * l);
     ParrotIOLayer * (*New)(ParrotIOLayer * proto);
-    void            (*Delete)(ParrotIOLayer * l);
+    void (*Delete)(ParrotIOLayer * l);
     INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
     INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
     ParrotIO *      (*Open)(PARROT_INTERP, ParrotIOLayer * l,

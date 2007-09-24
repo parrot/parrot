@@ -704,7 +704,7 @@ PIO_win32_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), N
 {
     int error, bytes, byteswrote, maxwrite;
 
-    bytes = sizeof(s); /* XXX This can't be correct, to send the size of a pointer */
+    bytes = sizeof (s); /* XXX This can't be correct, to send the size of a pointer */
     byteswrote = 0;
     maxwrite = 2048;
 AGAIN:

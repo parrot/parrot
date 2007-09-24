@@ -389,7 +389,7 @@ try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
       loop control. This is so the array can easily be processed in reverse.
      */
 
-    for( guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++ ) {
+    for (guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++) {
         with_ext = string_copy(interp, path);
         with_ext = string_append(interp,
                                  with_ext, const_string(interp, load_ext_code[guess]));

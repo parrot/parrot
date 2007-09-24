@@ -450,13 +450,13 @@ PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
         return;
     }
 
-    while(!feof(fd)) {
+    while (!feof(fd)) {
         line++;
         buf[0]='\0';
         fgets(buf, 1024, fd);
 
         /* skip spaces */
-        for(ptr=(char *)&buf;*ptr&&isspace((unsigned char)*ptr);ptr=ptr+1);
+        for (ptr=(char *)&buf;*ptr&&isspace((unsigned char)*ptr);ptr=ptr+1);
 
         /* avoid null blank and commented lines */
         if (*buf == '\0' || *buf == '#')

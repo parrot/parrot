@@ -225,7 +225,7 @@ For example, C<key('Foo', 'Bar')> returns C<[ "Foo" ; "Bar" ]>.
     out          = string_append(INTERP, open_bracket, S0);
     elements     = VTABLE_elements(INTERP, args);
 
-    for(index = 1; index < elements; index++) {
+    for (index = 1; index < elements; index++) {
         out          = string_append(INTERP, out, semi);
         S0           = VTABLE_get_string_keyed_int(INTERP, args, index);
         (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);

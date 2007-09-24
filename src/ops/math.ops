@@ -1045,7 +1045,7 @@ inline op gcd(out INT, in INT, in INT) :advanced_math {
  }
 
  while (a>0) {
-   if      (!(a & 1)) a>>=1;
+   if (!(a & 1)) a>>=1;
    else if (!(b & 1)) b>>=1;
    else if (a<b)      b = (b-a)>>1;
    else               a = (a-b)>>1;
@@ -1080,7 +1080,7 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
  }
 
  while (a>0) {
-   if      (!(a & 1)) a>>=1;
+   if (!(a & 1)) a>>=1;
    else if (!(b & 1)) b>>=1;
    else if (a<b)      b = (b-a)>>1;
    else               a = (a-b)>>1;

@@ -764,7 +764,7 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
     header_read_length = PACKFILE_HEADER_BYTES + header->uuid_size;
     header_read_length += header_read_length % 16 ?
         16 - header_read_length % 16 : 0;
-    cursor = packed + (header_read_length / sizeof(opcode_t));
+    cursor = packed + (header_read_length / sizeof (opcode_t));
 
     /* Set what transforms we need to do when reading the rest of
      * the file. */

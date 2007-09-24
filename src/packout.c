@@ -107,7 +107,7 @@ PackFile_pack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *cursor))
 
     /* Set cursor. */
     cursor += (PACKFILE_HEADER_BYTES + self->header->uuid_size + padding_size)
-        / sizeof(opcode_t);
+        / sizeof (opcode_t);
 
     /* Directory format and padding. */
     *cursor++ = PF_DIR_FORMAT;

@@ -1366,7 +1366,7 @@ pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
         interpreter_array[0] = interp;
         n_interpreters       = 1;
 
-        shared_gc_info = (Shared_gc_info *)mem_sys_allocate_zeroed(sizeof(*shared_gc_info));
+        shared_gc_info = (Shared_gc_info *)mem_sys_allocate_zeroed(sizeof (*shared_gc_info));
         COND_INIT(shared_gc_info->gc_cond);
         PARROT_ATOMIC_INT_INIT(shared_gc_info->gc_block_level);
         PARROT_ATOMIC_INT_SET(shared_gc_info->gc_block_level, 0);

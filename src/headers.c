@@ -340,7 +340,7 @@ new_pmc_ext(PARROT_INTERP)
         (*pool->more_objects) (interp, pool);
     ptr = (PMC_EXT *)pool->free_list;
     pool->free_list = *(void **)ptr;
-    memset(ptr, 0, sizeof(*ptr));
+    memset(ptr, 0, sizeof (*ptr));
     return ptr;
 }
 

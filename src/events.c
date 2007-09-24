@@ -832,7 +832,7 @@ io_thread(SHIM(void *data))
                              * a command arrived
                              */
                             edebug((stderr, "msg arrived\n"));
-                            if (read(PIPE_READ_FD, &buf, sizeof(buf)) != sizeof(buf))
+                            if (read(PIPE_READ_FD, &buf, sizeof (buf)) != sizeof (buf))
                                 internal_exception(1,
                                         "read error from msg pipe");
                             switch (buf.command) {
@@ -902,9 +902,9 @@ stop_io_thread(void)
     /*
      * tell IO thread to stop
      */
-    memset(&buf, 0, sizeof(buf));
+    memset(&buf, 0, sizeof (buf));
     buf.command = IO_THR_MSG_TERMINATE;
-    if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
+    if (write(PIPE_WRITE_FD, &buf, sizeof (buf)) != sizeof (buf))
         internal_exception(1, "msg pipe write failed");
 #endif
 }
@@ -931,7 +931,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
     buf.command = which;
     buf.ev      = event;
 #ifndef WIN32
-    if (write(PIPE_WRITE_FD, &buf, sizeof(buf)) != sizeof(buf))
+    if (write(PIPE_WRITE_FD, &buf, sizeof (buf)) != sizeof (buf))
         real_exception(interp, NULL, 1, "msg pipe write failed");
 #endif
 }
