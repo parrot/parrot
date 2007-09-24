@@ -33,12 +33,19 @@ The Parrot FAQ : http://www.parrotcode.org/faq/
 
 IMC stands for Intermediate Code; IMCC stands for Intermediate Code Compiler.
 You will also see the term PIR which is for Parrot Intermediate Representation
-and means the same thing as IMC.
+and means the same thing as IMC. The extension C<.imc> is deprecated, instead
+you should use the C<.pir> extension for PIR files.
 
 It is an intermediate language that compiles either directly to Parrot Byte
 code, or translates to Parrot Assembly language. It is the preferred target
 language for compilers for the Parrot Virtual Machine. PIR is halfway between
 a High Level Language (HLL) and Parrot Assembly (PASM).
+
+IMCC is the current implementation of the PIR language. A PGE-based implementation
+can be found in languages/PIR. A completely handwritten, recursive-descent parser
+in C can be found in compilers/pirc. Both the PGE-based parser and pirc are
+a bit different, as it is very difficult to implement the exact language that IMCC
+implements. Note too, that they are merely parsers, and not finished compilers.
 
 =head2 What is the history of IMCC?
 
@@ -89,7 +96,7 @@ You must track your register usage and take care of saving/restoring values
 in cases where you run out of registers. This is called spilling.
 
 IMC is medium level and a bit more friendly to write or debug. IMCC also has
-a builtin register allocator and spiller. IMC has the concept of a
+a builtin register allocator and spiller. PIR has the concept of a
 "subroutine" unit, complete with local variables and high-level sub call
 syntax. IMCC also allows unlimited symbolic registers. It will take care of
 assigning the appropriate register to your variables and will usually find the
@@ -99,20 +106,20 @@ will generate instructions to save/restore (spill) the registers for you.
 This is a significant piece of every compiler.
 
 While it is possible to write more efficient code by hand directly in PASM,
-it is rare. IMC is still very close to PASM as far as granularity. It is also
+it is rare. PIR is still very close to PASM as far as granularity. It is also
 common for IMCC to generate instructions that use less registers than
 handwritten PASM. This is good for cache performance.
 
-=head2 Why should I target IMC instead of PASM?
+=head2 Why should I target PIR instead of PASM?
 
-Several reasons. IMC is so much easier to read, understand and debug. When
+Several reasons. PIR is so much easier to read, understand and debug. When
 passing snippets back and forth on the Parrot internals list, IMC is preferred
 since the code is much shorter than the equivalent PASM. In some cases it is
 necessary to debug the PASM code as bugs in IMCC are found.
 
-Hand writing and debugging of code aside, most IMC code will be mostly
+Hand writing and debugging of code aside, most PIR code will be mostly
 compiler generated. In this respect, the most important technical reason to
-use IMC is the amount of abstraction it provides. IMC now completely hides
+use PIR is the amount of abstraction it provides. PIR now completely hides
 the Parrot calling conventions and allows different call conventions to be
 selected via .pragma without changes to the high-level code emitter. This
 allows Parrot to change somewhat without impacting existing compilers. The
@@ -122,7 +129,7 @@ workload is balanced between the IMCC team and the compiler authors. The term
 Since development on the old assembler has stopped, IMCC will be the best way
 to compile bytecode classes complete with metadata and externally linkable
 symbols. It will still be possible to construct classes on the fly with PASM,
-but IMC's higher level directives allow it to do compile time construction of
+but PIR's higher level directives allow it to do compile time construction of
 certain things and pack them into the bytecode in a way that does not have an
 equivalent set of Parrot instructions. The PASM assembler may or may not ever
 catch up with these features.
@@ -158,7 +165,7 @@ bytecode file (.pbc).
 	parrot hello.pir
 
 
-=head2 How do I see the assembly code that IMC generates?
+=head2 How do I see the assembly code that PIR generates?
 
 Use the -o option for Parrot. You can provide an output filename, or the -
 character which indicates standard output. If the filename has a .pbc
@@ -168,7 +175,7 @@ Examples:
 
 =over 4
 
-=item Create the PASM source from IMC.
+=item Create the PASM source from PIR.
 
 	parrot -o hello.pasm hello.pir
 
@@ -184,12 +191,12 @@ Examples:
 
 =head2 Does IMCC do variable interpolation in strings?
 
-No, and it shouldn't. IMC is an intermediate language for compiling high level
+No, and it shouldn't. PIR is an intermediate language for compiling high level
 languages. Interpolation (print "$count items") is a high level concept and
 the specifics are unique to each language. Perl6 already does interpolation
 without special support from IMCC.
 
-=head2 What are IMC variables?
+=head2 What are PIR variables?
 
 IMC has 2 classes of variables, symbolic registers and named variables. Both
 are mapped to real registers, but there are a few minor differences. Named
@@ -197,16 +204,14 @@ variables must be declared. They may be global or local, and may be qualified
 by a namespace. Symbolic registers, on the other hand, do not need declaration,
 but their scope never extends outside of a subroutine unit. Symbolic registers
 basically give compiler front ends an easy way to generate code from their
-parse trees or abstract syntax tree (AST). To generate expressions compilers 
-have to create temporaries. 
+parse trees or abstract syntax tree (AST). To generate expressions compilers
+have to create temporaries.
 
 =head2 Symbolic Registers (or Temporaries)
 
 Symbolic registers have a $ sign for the first character, have a single letter
 representing the register type [S(tring), N(umber), I(nteger) or P(MC)] for
-the second character, and one or more digits for the rest. Although Parrot has
-only 32 real registers of each type, IMCC can handle an arbitrarily large
-number of symbolic registers of a given type.
+the second character, and one or more digits for the rest.
 
 Example:
 
@@ -220,11 +225,11 @@ the typical sort of code that compilers generate from the syntax tree.
 
 =head2 Named Variables
 
-Named variables are either local, global or namespace qualified. Currently
+Named variables are either local or namespace qualified. Currently
 IMCC only supports locals transparently. However, globals are supported with
 explicit syntax. The way to declare locals in a subroutine is with the
 B<.local> directive. The B<.local> directive also requires a type (B<int>,
-B<num>, B<string> or a classname such as B<ResizablePMCArray>).
+B<num>, B<string> or B<pmc>).
 
 Example:
 
