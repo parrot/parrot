@@ -155,7 +155,7 @@ typedef struct parrot_interp_t Interp;
 #define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL,p)
 
 /* Use similar macros for casting between pointers and opcode_t.
-   (We can't assume that sizeof(opcode_t) == sizeof(intval).
+   (We can't assume that sizeof (opcode_t) == sizeof (intval).
 */
 #if (OPCODE_T_SIZE == PTR_SIZE)
 #  define OPCODE_T2PTR(any,d)    (any)(d)
@@ -242,7 +242,7 @@ typedef void (*funcptr_t)(void);
 
 /* Hide our struct copying behind macros */
 #define STRUCT_COPY(d,s)    (PARROT_ASSERT(d),PARROT_ASSERT(s),*(d)=*(s))
-#define STRUCT_COPY_N(d,s,n) (PARROT_ASSERT(d),PARROT_ASSERT(s),PARROT_ASSERT(sizeof(*d)==sizeof(*s)),memcpy((d),(s),sizeof(*d)*(n)))
+#define STRUCT_COPY_N(d,s,n) (PARROT_ASSERT(d),PARROT_ASSERT(s),PARROT_ASSERT(sizeof (*d)==sizeof (*s)),memcpy((d),(s),sizeof (*d)*(n)))
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"

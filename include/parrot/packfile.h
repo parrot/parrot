@@ -237,11 +237,11 @@ typedef struct PackFile {
 
     PackFile_ByteCode  * cur_cs;   /* used during PF loading */
 
-    INTVAL                       need_wordsize;
-    INTVAL                       need_endianize;
-    opcode_t                     (*fetch_op)(unsigned char *);
-    INTVAL                       (*fetch_iv)(unsigned char *);
-    void                         (*fetch_nv)(unsigned char *, const unsigned char *);
+    INTVAL    need_wordsize;
+    INTVAL    need_endianize;
+    opcode_t  (*fetch_op)(unsigned char *);
+    INTVAL    (*fetch_iv)(unsigned char *);
+    void (*fetch_nv)(unsigned char *, const unsigned char *);
 } PackFile;
 
 

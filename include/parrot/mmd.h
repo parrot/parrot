@@ -23,10 +23,10 @@ typedef PMC*    (*mmd_f_p_pip)(PARROT_INTERP, PMC *, INTVAL, PMC *);
 typedef PMC*    (*mmd_f_p_pnp)(PARROT_INTERP, PMC *, FLOATVAL, PMC *);
 typedef PMC*    (*mmd_f_p_psp)(PARROT_INTERP, PMC *, STRING *, PMC *);
 
-typedef void    (*mmd_f_v_pp)(PARROT_INTERP, PMC *, PMC *);
-typedef void    (*mmd_f_v_pi)(PARROT_INTERP, PMC *, INTVAL);
-typedef void    (*mmd_f_v_pn)(PARROT_INTERP, PMC *, FLOATVAL);
-typedef void    (*mmd_f_v_ps)(PARROT_INTERP, PMC *, STRING *);
+typedef void (*mmd_f_v_pp)(PARROT_INTERP, PMC *, PMC *);
+typedef void (*mmd_f_v_pi)(PARROT_INTERP, PMC *, INTVAL);
+typedef void (*mmd_f_v_pn)(PARROT_INTERP, PMC *, FLOATVAL);
+typedef void (*mmd_f_v_ps)(PARROT_INTERP, PMC *, STRING *);
 
 typedef INTVAL  (*mmd_f_i_pp)(PARROT_INTERP, PMC *, PMC *);
 

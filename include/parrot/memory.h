@@ -35,8 +35,8 @@
 #define mem_sys_memcopy memcpy
 #define mem_sys_memmove memmove
 
-#define mem_allocate_typed(type)    (type *)mem_sys_allocate(sizeof(type))
-#define mem_allocate_zeroed_typed(type) (type *)mem_sys_allocate_zeroed(sizeof(type))
+#define mem_allocate_typed(type)    (type *)mem_sys_allocate(sizeof (type))
+#define mem_allocate_zeroed_typed(type) (type *)mem_sys_allocate_zeroed(sizeof (type))
 
 /* HEADERIZER BEGIN: src/gc/memory.c */
 

@@ -103,7 +103,7 @@ typedef struct Buffer_alloc_unit {
 #  define PObj_bufrefcount(b)    (((Buffer_alloc_unit *)PObj_bufallocstart(b))->ref_count)
 #  define PObj_bufrefcountptr(b) (&PObj_bufrefcount(b))
 #else                     /* see src/gc/resources.c */
-#  define Buffer_alloc_offset sizeof(INTVAL)
+#  define Buffer_alloc_offset sizeof (INTVAL)
 #  define PObj_bufallocstart(b)  ((char *)PObj_bufstart(b) - Buffer_alloc_offset)
 #  define PObj_bufrefcount(b)    (*(INTVAL *)PObj_bufallocstart(b))
 #  define PObj_bufrefcountptr(b) ((INTVAL *)PObj_bufallocstart(b))

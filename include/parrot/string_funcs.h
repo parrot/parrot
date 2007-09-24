@@ -19,7 +19,7 @@
 
 /* Declarations of accessors */
 
-#define CSTRING_WITH_LEN(s) (s ""), (sizeof(s)-1)
+#define CSTRING_WITH_LEN(s) (s ""), (sizeof (s)-1)
 #define string_from_literal(i,s) string_from_cstring((i),CSTRING_WITH_LEN(s))
 
 /* HEADERIZER BEGIN: src/string.c */
