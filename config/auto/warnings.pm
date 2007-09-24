@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: attributes.pm 21448 2007-09-21 09:29:23Z paultcochrane $
+# $Id$
 
 =head1 NAME
 
