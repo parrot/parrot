@@ -2083,16 +2083,16 @@ sub _format_columns {
 
     $self->{code} = '';
 
-    for my $row (@$colref) {
+    for my $row (@{$colref}) {
         my $label;
         $label = $row->[0];
-        $label .= ":" if $label;
+        $label .= ':' if $label;
         $self->{code} .= $label . ' ' x ( $max_len[0] - length($label) + 2 );
         if ( defined $row->[1] ) {
             $label = $row->[1];
             $self->{code} .= $label . ' ' x ( $max_len[1] - length($label) + 2 );
             $label = $row->[2];
-            $self->{code} .= join ", ", @$label if $label;
+            $self->{code} .= join ', ', @{$label} if $label;
         }
         $self->{code} .= "\n";
     }
@@ -2174,16 +2174,17 @@ sub generate {
     my $tree = shift;
 
     my $self = Scheme::Generator->new( {} );
-    my $temp;
 
     $self->{scope} = {};
 
-    $temp = $self->_generate($tree);
+    $self->_add_inst( '', ".sub main :main" );
 
+    my $temp = $self->_generate($tree);
     $self->_restore($temp);
-    $self->_add_inst( '', "end" );
 
-    $self->_format_columns;
+    $self->_add_inst( '', '.end' );
+
+    $self->_format_columns();
 
     # not need any more
     $self->{instruction} = undef;
@@ -2193,6 +2194,7 @@ sub generate {
 }
 
 1;
+
 __END__
 
 =head1 NAME

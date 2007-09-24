@@ -7,12 +7,8 @@
 PERL       = @perl@
 RM_F       = @rm_f@
 
-DIR        = languages/scheme
-TOOL_DIR   = ../..
-ASM        = ../../parrot
-SCHEMEC    = $(PERL) schemec
-INTERP     = ./@test_prog@
 
+# The default target
 default: build
 
 help :
@@ -30,53 +26,19 @@ help :
 	@echo ""
 	@echo "  help:              print this help message"
 
-foo: foo.scheme schemec
-	$(SCHEMEC) foo.scheme > foo.pasm
-	$(ASM) -o foo.pbc foo.pasm
-	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
-	cat foo.pasm
-
-#
 # Compilation:
-#
-
 build:
 	$(PERL) -c schemec
 
-test.pasm: test.scheme schemec
-	$(SCHEMEC) test.scheme > test.pasm
-
-and.pasm: and.scheme schemec
-	$(SCHEMEC) and.scheme > and.pasm
-
-foo.pasm: foo.scheme schemec
-	$(SCHEMEC) foo.scheme > foo.pasm
-
-#
-# Assembly:
-#
-
-test.pbc: test.pasm
-	$(ASM) -o $@ $?
-
-and.pbc: and.pasm
-	$(ASM) -o $@ $?
-
-foo.pbc: foo.pasm
-	$(ASM) -o $@ $?
-
-#
-# Other targets:
-#
-
-all: test.pbc and.pbc foo.pbc
+# cleaning up
 
 clean:
 	$(RM_F) foo.pasm foo.pbc \
-	        "t/*/*.pasm" \
-	        "t/*/*.pbc" \
-	        "t/*/*.scheme" \
-	        "t/*/*.out"
+  "t/*/*.pasm" \
+  "t/*/*.pir" \
+  "t/*/*.pbc" \
+  "t/*/*.scheme" \
+  "t/*/*.out"
 
 realclean: clean
 	$(RM_RF) Makefile
@@ -85,12 +47,6 @@ over:
 	@$(MAKE) clean
 	@$(MAKE) all
 
+# testing
 test:
 	cd .. && $(PERL) scheme/t/harness
-#	cd $(TOOL_DIR); $(INTERP) $(DIR)/test.pbc
-#	cd $(TOOL_DIR); $(INTERP) $(DIR)/and.pbc
-#	cd $(TOOL_DIR); $(INTERP) $(DIR)/foo.pbc
-
-#
-# End of file.
-#

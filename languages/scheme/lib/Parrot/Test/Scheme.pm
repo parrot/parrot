@@ -48,9 +48,9 @@ sub get_test_prog {
     my ( $count, $options ) = @_;
 
     my $lang_fn = Parrot::Test::per_test( '.scheme', $count );
-    my $pasm_fn = Parrot::Test::per_test( '.pasm', $count );
+    my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
 
-    return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pasm_fn && ./parrot languages/$pasm_fn",    
+    return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pir_fn && ./parrot languages/$pir_fn",    
 }
 
 # never skip the reference implementation
