@@ -34,8 +34,6 @@ GMT or UTC.
 
 L<docs/pdds/pdd07_codingstd.pod>
 
-CAGE task #39878
-
 =cut
 
 my $DIST = Parrot::Distribution->new;
