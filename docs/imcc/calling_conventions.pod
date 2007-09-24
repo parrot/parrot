@@ -36,7 +36,7 @@ subroutines.
 
 =head2 Explicitly Calling PASM Subroutines
 
-  .const .Sub $P0 = "_sub_label" 
+  .const .Sub $P0 = "_sub_label"
   $P1 = new 'Continuation'
   set_addr $P1, ret_addr
   ...
@@ -132,10 +132,35 @@ name to be reused.
 
 Engage in multiple dispatch with the listed types.
 
-=item :immediate or :postcomp
+=item :immediate
 
 This subroutine is executed immediately after being compiled. (Analagous to
 C<BEGIN> in perl5.)
+
+=item :postcomp
+
+Same as C<:immediate>, except that the subroutine is B<not> executed when
+the compilation of the file that contains the subroutine is triggered by
+a C<load_bytecode> instruction in another file.
+
+An example. File C<main.pir> contains:
+
+ .sub main
+ load_bytecode "foo.pir"
+ .end
+
+The file C<foo.pir> contains:
+
+ .sub foo :immediate
+   print "42"
+ .end
+
+ .sub bar :postcomp
+   print "43"
+ .end
+
+When executing file C<foo.pir>, it will execute both C<foo> and C<bar>.
+However, when executing the file C<main.pir>, only C<foo> will be executed.
 
 =item :method
 
