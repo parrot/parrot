@@ -194,7 +194,6 @@ sub runstep {
             # Needed to prevent C++ compatibility issues
             4.1 => ""
                 . " -Wc++-compat"
-                . " -Wlogical-op"
                 . "",
         );
 
@@ -324,9 +323,10 @@ sub runstep {
                 . "",
             4.1 => ""
                 . " -Wc++-compat"
+                . "",
+            4.2 => ""
                 . " -Wlogical-op"
                 . "",
-            4.2 => "",
 
             # -Wsequence-point is part of -Wall
             # -Wfloat-equal may not be what we want
