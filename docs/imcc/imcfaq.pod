@@ -241,11 +241,10 @@ Example:
 	.end
 
 
-=head2 How do I declare global or package variables in IMC?
+=head2 How do I declare global or package variables in PIR?
 
-You can't yet. IMCC still lacks a few features and this is one of those
-features. You can explicitly create global variables at runtime, however,
-but currently it only works for PMC types, like so:
+You can't. You can explicitly create global variables at runtime, however,
+but it only works for PMC types, like so:
 
 	.sub _main
 	   .local pmc i
