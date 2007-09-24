@@ -11,9 +11,9 @@ Automagically detect what warning flags, like -Wall, -Wextra,
 -Wchar-subscripts, etc., that the compiler can support.  Directly hacked
 from F<config/auto/attributes.pm>.
 
-=head1 AUTHOR
+=head1 SUBROUTINES
 
-Paul Cochrane <paultcochrane at gmail dot com>
+=over 4
 
 =cut
 
@@ -147,6 +147,14 @@ sub try_warning {
 
     return;
 }
+
+=back
+
+=head1 AUTHOR
+
+Paul Cochrane <paultcochrane at gmail dot com>
+
+=cut
 
 1;
 
