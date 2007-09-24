@@ -49,21 +49,13 @@ my $copyright_text =
     "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), The Perl Foundation.";
 
 foreach my $file (@files) {
-    my $buf;
-
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
     next if exists $skip_files->{$path};
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
+    my $buf = $DIST->slurp( $path );
 
     # does there exist a copyright statement at all?
     if ( $buf !~ m{Copyright \(C\) \d{4}}m ) {

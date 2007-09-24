@@ -39,19 +39,11 @@ my @no_explicit_cast;
 my $toxxx_functions = "toupper|tolower";
 
 foreach my $file (@files) {
-    my $buf;
-
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
+    my $buf = $DIST->slurp( $path );
 
     my @buffer_lines = split( /\n/, $buf );
 

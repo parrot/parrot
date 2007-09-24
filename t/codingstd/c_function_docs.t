@@ -37,7 +37,6 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @missing_docs;
 
 foreach my $file (@files) {
-    my $buf;
     my $path;
 
     ## get the full path of the file
@@ -51,14 +50,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
-    close $fh;
+    my $buf = $DIST->slurp( $path );
 
     # get rid of if's and for's etc]
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;

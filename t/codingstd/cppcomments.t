@@ -41,14 +41,8 @@ sub check_cppcomments {
 
     my @comments;
     foreach my $file (@files) {
-        my $buf;
         my $path = @ARGV ? $file : $file->path();
-        open my $fh, '<', $path
-            or die "Can not open '$path' for reading!\n";
-        {
-            local $/;
-            $buf = <$fh>;
-        }
+        my $buf = $DIST->slurp( $path );
         $buf =~ s{ (?:
                        (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                      | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string

@@ -8,6 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use ExtUtils::Manifest qw(maniread);
+use Parrot::Distribution;
 
 # set up how many tests to run
 plan tests => 1;
@@ -37,19 +38,12 @@ CAGE task #39878
 
 =cut
 
+my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : source_files();
 my @failures;
 
 foreach my $file (@files) {
-    my $buf;
-
-    # slurp in the file
-    open( my $fh, '<', $file )
-        or die "Cannot open '$file' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
+    my $buf = $DIST->slurp( $file );
 
     # trim out svn and svk Id lines
     $buf =~ s{\$Id:.*}{}g;

@@ -46,21 +46,13 @@ my @no_id_files;
 my $id_line = '\$Id.*\$';
 
 foreach my $file (@files) {
-    my $buf;
-
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
     next if exists $skip_files->{$path};
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
+    my $buf = $DIST->slurp( $path );
 
     if ( $buf !~ m{$id_line}m ) {
         push @no_id_files, $path;

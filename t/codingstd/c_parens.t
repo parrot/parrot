@@ -55,14 +55,9 @@ sub check_parens {
     my @space_between_parens;
 
     foreach my $file (@_) {
-        my $buf;
         my $path = @ARGV ? $file : $file->path();
-        open my $fh, '<', $path
-            or die "Can not open '$path' for reading!\n";
-        {
-            local $/;
-            $buf = <$fh>;
-        }
+
+        my $buf = $DIST->slurp( $path );
         $buf =~ s{ (?:
                        (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
                      | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string

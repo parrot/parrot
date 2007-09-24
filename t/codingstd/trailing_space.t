@@ -39,7 +39,6 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @failed_files;
 
 foreach my $file (@files) {
-    my $buf;
 
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
@@ -47,13 +46,7 @@ foreach my $file (@files) {
 
     next if exists $skip_files->{$path};
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
+    my $buf = $DIST->slurp( $path );
 
     if ( $buf =~ m{.?[ \t]+$}m ) {
         push @failed_files, $path;

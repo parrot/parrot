@@ -53,7 +53,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    my $buf = slurp( $path );
+    my $buf = $DIST->slurp( $path );
 
     # get rid of if's and for's etc]
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
@@ -91,23 +91,6 @@ $cut_line
 END
         }
     }
-}
-
-sub slurp
-{
-    my $path = shift;
-    my $buf;
-
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
-    close $fh;
-
-    return $buf;
 }
 
 # Local Variables:
