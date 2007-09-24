@@ -33,8 +33,55 @@ $description = 'Detecting supported compiler warnings (-Wxxx)';
 @args = qw( cc verbose define );
 
 our @potential_warnings = qw(
+    -falign-functions=16
+    -fvisibility=hidden
+    -mno-accumulate-outgoing-args
     -W
     -Wall
+    -Waggregate-return
+    -Wbad-function-cast
+    -Wc++-compat
+    -Wcast-align
+    -Wcast-qual
+    -Wchar-subscripts
+    -Wcomment
+    -Wdeclaration-after-statement
+    -Wdisabled-optimization
+    -Wextra
+    -Wformat-nonliteral
+    -Wformat-security
+    -Wformat-y2k
+    -Wimplicit
+    -Wimplicit-function-declaration
+    -Wimplicit-int
+    -Wimport
+    -Winit-self"
+    -Winline
+    -Winvalid-pch
+    -Wmain
+    -Wmissing-braces
+    -Wmissing-declarations
+    -Wmissing-field-initializers
+    -Wmissing-prototypes
+    -Wnested-externs
+    -Wno-unused
+    -Wnonnull
+    -Wold-style-definition
+    -Wpacked
+    -Wparentheses
+    -Wpointer-arith
+    -Wreturn-type
+    -Wsequence-point
+    -Wshadow
+    -Wsign-compare
+    -Wstrict-aliasing
+    -Wstrict-aliasing=2
+    -Wstrict-prototypes
+    -Wswitch
+    -Wnested-externs
+    -Wundef
+    -Wunknown-pragmas
+    -Wwrite-strings
     -Wnot-a-real-warning
 );
 
