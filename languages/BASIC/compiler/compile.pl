@@ -68,7 +68,7 @@ END_PIR
                 push @debdecl, "\t\t\$P1[\"$var\"]=$var\n";
             }
             else {
-                print CODE "\t.local float $var\n";
+                print CODE "\t.local num $var\n";
                 push @init,    qq{\t\t$var=0.0\n};
                 push @debdecl, "\t\t\$S0=$var\n\t\t\$P1[\"$var\"]= \$S0\n";
             }

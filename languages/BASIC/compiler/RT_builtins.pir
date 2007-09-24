@@ -15,7 +15,7 @@
 # Prepares stuff for printing.  Side effect: edits the global PRINTCOL
 #  for the current column.
 #
-.sub _BUILTIN_DISPLAY  #_WORK	 	# string display_work(string|float thingy[, string|float thingy2])
+.sub _BUILTIN_DISPLAY  #_WORK	 	# string display_work(string|num thingy[, string|num thingy2])
 	.param int argc
 	.param pmc printme
 
@@ -38,7 +38,7 @@ NEXT:
 	if $I0 == .String goto DISPSTRING
 	if $I0 != .Float  goto DISPERR
 
-	# Now, do floats
+	# Now, do num
 	intver = printme
 	$N0 = intver
 	$N1 = printme
@@ -93,7 +93,7 @@ DISPERR:
 	end
 .end
 
-.sub _NORMALIZE_FLOAT	# string normalize_flo(float number)
+.sub _NORMALIZE_FLOAT	# string normalize_flo(num number)
 	.param num number	# INTERNAL, no argc!
 	set $S0, number
 FLO_NORM:
@@ -114,7 +114,7 @@ FLO_END:
 
 #  Builtin functions for BASIC
 #
-.sub _BUILTIN_ABS   		# float abs(float arg)
+.sub _BUILTIN_ABS   		# num abs(num arg)
 	.param int argc
 	.param num arg
 	.local num res
@@ -123,7 +123,7 @@ FLO_END:
 .end
 # INT - a math function that returns the largest integer less than
 #       or equal to a numeric-expression
-.sub _BUILTIN_INT   		# float int(float arg)
+.sub _BUILTIN_INT   		# num int(num arg)
 	.param int argc
 	.param num arg
 	.local num res
@@ -134,7 +134,7 @@ FLO_END:
 	dec res
 ENDINT:	.return(res)
 .end
-.sub _BUILTIN_CHR_STRING	# string chr(float arg)
+.sub _BUILTIN_CHR_STRING	# string chr(num arg)
 	.param int argc
 	.param num arg
 	.local string res
@@ -143,7 +143,7 @@ ENDINT:	.return(res)
 	chr res, truncate
 	.return(res)
 .end
-.sub _BUILTIN_ASC 		# float asc(string arg)
+.sub _BUILTIN_ASC 		# num asc(string arg)
 	.param int argc
 	.param string arg
 	.local int conv
@@ -152,21 +152,21 @@ ENDINT:	.return(res)
 	set res, conv
 	.return(res)
 .end
-.sub _BUILTIN_STR_STRING	# string str(float arg)
+.sub _BUILTIN_STR_STRING	# string str(num arg)
 	.param int argc
 	.param num arg
 	.local string res
 	set res, arg
 	.return(res)
 .end
-.sub _BUILTIN_VAL 		# float val(string arg)
+.sub _BUILTIN_VAL 		# num val(string arg)
 	.param int argc
 	.param string arg
 	.local num res
 	set res, arg
 	.return(res)
 .end
-.sub _BUILTIN_LEN 		# float len(string arg)
+.sub _BUILTIN_LEN 		# num len(string arg)
 	.param int argc
 	.param string arg
 	.local num res
@@ -175,7 +175,7 @@ ENDINT:	.return(res)
 	set res, conv
 	.return(res)
 .end
-.sub _BUILTIN_MID_STRING	# string mid(string targ, float start [, float extent])
+.sub _BUILTIN_MID_STRING	# string mid(string targ, num start [, num extent])
 	.param int argc
 	.param string target
 	.param num start
@@ -215,7 +215,7 @@ MID3L:
 MIDDONE:
 	.return(res)
 .end
-.sub _BUILTIN_LEFT_STRING	# string left(string targ, float extent)
+.sub _BUILTIN_LEFT_STRING	# string left(string targ, num extent)
 	.param int argc
 	.param string targ
 	.param num extent
@@ -224,7 +224,7 @@ MIDDONE:
 	res = _BUILTIN_MID_STRING(3, targ, 1.0, extent)
 	.return(res)
 .end
-.sub _BUILTIN_RIGHT_STRING	# string right(string targ, float extent)
+.sub _BUILTIN_RIGHT_STRING	# string right(string targ, num extent)
 	.param int argc
 	.param string targ
 	.param num extent
@@ -242,7 +242,7 @@ MIDDONE:
 .end
 # Modifies the system-wide RANDSEED
 # Produces 16-bit pseudo-random numbers.
-.sub _BUILTIN_RND	# float rnd([float seed])
+.sub _BUILTIN_RND	# num rnd([num seed])
 	.param int argc
 	.local int RANDSEED
 	find_global $P0, "RANDSEED"
@@ -268,14 +268,14 @@ RND_BAIL:
 
 	.return($N0)
 .end
-.sub _BUILTIN_TIMER	# float timer()
+.sub _BUILTIN_TIMER	# num timer()
 	.param int argc
 	time $N0
 	.return($N0)
 .end
 
-# float instr(float start, string full, string substring);
-.sub _BUILTIN_INSTR :multi(int, float, string, string)
+# num instr(num start, string full, string substring);
+.sub _BUILTIN_INSTR :multi(int, num, string, string)
 	.param int argc
 	.param num start
 	.param string full
@@ -292,7 +292,7 @@ ENDINSTR:
 	.return($I0)
 .end
 
-# float instr(string full, string substring);
+# num instr(string full, string substring);
 .sub _BUILTIN_INSTR :multi(int, string, string)
 	.param int argc
 	.param string full
@@ -344,7 +344,7 @@ XCASE_INSERT:
 XCASE_DONE:
 	.return($S3)
 .end
-.sub _BUILTIN_SGN	# float sgn(float number)
+.sub _BUILTIN_SGN	# num sgn(num number)
 	.param int argc
 	.param num number
 	set $N0, 0.0
@@ -355,7 +355,7 @@ XCASE_DONE:
 FINISHED:
 	.return($N0)
 .end
-.sub _BUILTIN_STRING_STRING	# string string(float repeat, float ascii)
+.sub _BUILTIN_STRING_STRING	# string string(num repeat, num ascii)
 	.param int argc
 	.param num repeatf
 
@@ -379,44 +379,44 @@ REP: 	ge $I1, repeat, BAIL
 	branch REP
 BAIL:	.return(target)
 .end
-.sub _BUILTIN_LOG		# float log(float op)
+.sub _BUILTIN_LOG		# num log(num op)
 	.param int argc
 	.param num op
 	ln op, op
 	.return(op)
 .end
-.sub _BUILTIN_EXP		# float exp(float op)
+.sub _BUILTIN_EXP		# num exp(num op)
 	.param int argc
 	.param num op
 	exp op, op
 	.return(op)
 .end
-.sub _BUILTIN_SIN		# float sin(float op)
+.sub _BUILTIN_SIN		# num sin(num op)
 	.param int argc
 	.param num op
 	sin op, op
 	.return(op)
 .end
-.sub _BUILTIN_COS		# float cos(float op)
+.sub _BUILTIN_COS		# num cos(num op)
 	.param int argc
 	.param num op
 	cos op, op
 	.return(op)
 .end
-.sub _BUILTIN_TAN		# float tan(float op)
+.sub _BUILTIN_TAN		# num tan(num op)
 	.param int argc
 	.param num op
 	tan op, op
 	.return(op)
 .end
-.sub _BUILTIN_ATN		# float atn(float op)
+.sub _BUILTIN_ATN		# num atn(num op)
 	.param int argc
 	.param num op
 	atan op, op
 	.return(op)
 .end
-.const float EPSILON = 0.000001
-.sub _BUILTIN_SQR		# float sqr(float operand)
+.const num EPSILON = 0.000001
+.sub _BUILTIN_SQR		# num sqr(num operand)
 	.param int argc
 	.param num op
         if op < 0 goto ERR_RANGE
@@ -426,7 +426,7 @@ ERR_RANGE:
 	print "Number out of range\n"
 	.return(-1.0)
 .end
-.sub _BUILTIN_TAB_STRING		# string tab(float cols)
+.sub _BUILTIN_TAB_STRING		# string tab(num cols)
 	.param int argc
 	.param num cols
 	.local int PRINTCOL
@@ -480,7 +480,7 @@ BI_RTRIM:
 RTRIM_END:
 	.return($S0)
 .end
-.sub _BUILTIN_INPUT_STRING 	# string input$(float numchars[, string fdinfo])
+.sub _BUILTIN_INPUT_STRING 	# string input$(num numchars[, string fdinfo])
 	.param int argc
 	.param num numcharsf
 	.local int numchars
