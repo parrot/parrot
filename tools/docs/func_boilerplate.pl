@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
 use Parrot::Distribution;
 
 =head1 NAME
@@ -41,7 +40,6 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my $cut_line = "=cut";  # stops t/doc/pod.t from complaining.
 
 foreach my $file (@files) {
-    my $buf;
     my $path;
 
     ## get the full path of the file
@@ -55,14 +53,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
-    close $fh;
+    my $buf = slurp( $path );
 
     # get rid of if's and for's etc]
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
@@ -100,6 +91,23 @@ $cut_line
 END
         }
     }
+}
+
+sub slurp
+{
+    my $path = shift;
+    my $buf;
+
+    # slurp in the file
+    open( my $fh, '<', $path )
+        or die "Cannot open '$path' for reading: $!\n";
+    {
+        local $/;
+        $buf = <$fh>;
+    }
+    close $fh;
+
+    return $buf;
 }
 
 # Local Variables:
