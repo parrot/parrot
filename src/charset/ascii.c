@@ -335,7 +335,7 @@ upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         UINTVAL offset;
 
         for (offset = 0; offset < n; offset++) {
-            buffer[offset] = (char)toupper(buffer[offset]);
+            buffer[offset] = (char)toupper((unsigned char)buffer[offset]);
         }
     }
 }
@@ -361,7 +361,7 @@ downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         UINTVAL offset;
 
         for (offset = 0; offset < n; offset++) {
-            buffer[offset] = (char)tolower(buffer[offset]);
+            buffer[offset] = (char)tolower((unsigned char)buffer[offset]);
         }
     }
 }
@@ -386,9 +386,9 @@ titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
         char * const buffer = source_string->strstart;
         UINTVAL offset;
 
-        buffer[0] = (char)toupper(buffer[0]);
+        buffer[0] = (char)toupper((unsigned char)buffer[0]);
         for (offset = 1; offset < n; offset++) {
-            buffer[offset] = (char)tolower(buffer[offset]);
+            buffer[offset] = (char)tolower((unsigned char)buffer[offset]);
         }
     }
 }
@@ -410,7 +410,7 @@ upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 
     if (source_string->strlen) {
         char * const buffer = source_string->strstart;
-        buffer[0] = (char)toupper(buffer[0]);
+        buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 }
 
@@ -431,7 +431,7 @@ downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 
     if (source_string->strlen) {
         char * const buffer = source_string->strstart;
-        buffer[0] = (char)tolower(buffer[0]);
+        buffer[0] = (char)tolower((unsigned char)buffer[0]);
     }
 }
 
@@ -452,7 +452,7 @@ titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
 
     if (source_string->strlen) {
         char * const buffer = source_string->strstart;
-        buffer[0] = (char)toupper(buffer[0]);
+        buffer[0] = (char)toupper((unsigned char)buffer[0]);
     }
 }
 
