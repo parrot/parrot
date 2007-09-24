@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2006, The Perl Foundation.
-# $Id: c_function_docs.t 21467 2007-09-21 17:25:33Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;
