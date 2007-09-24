@@ -111,7 +111,7 @@ dedent(emit_data *data) {
 */
 static target *
 new_target(char *name) {
-    target *t = (target *)malloc(sizeof(target));
+    target *t = (target *)malloc(sizeof (target));
     t->name = name;
     t->next = NULL;
     return t;
@@ -407,7 +407,7 @@ init_json_vtable(char *outputfile) {
     vtable->invocation_start = json_invocation_start;
     vtable->invocation_end   = json_invocation_end;
 
-    vtable->data = (emit_data *)malloc(sizeof(emit_data));
+    vtable->data = (emit_data *)malloc(sizeof (emit_data));
     if (vtable->data == NULL) {
         fprintf(stderr, "Failed to allocate memory for vtable data\n");
         exit(EXIT_FAILURE);

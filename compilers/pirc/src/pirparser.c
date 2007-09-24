@@ -166,7 +166,7 @@ client code.
 parser_state *
 new_parser(char const * filename, pirvtable *vtable) {
 
-    parser_state *p = (parser_state *)malloc(sizeof(parser_state));
+    parser_state *p = (parser_state *)malloc(sizeof (parser_state));
 
     if (p == NULL) {
         fprintf(stderr, "no parser");
@@ -179,7 +179,7 @@ new_parser(char const * filename, pirvtable *vtable) {
     p->vtable        = vtable;
 
     /* allocate array to store heredoc arguments */
-    p->heredoc_ids      = (char **)calloc(MAX_HEREDOC_ARGS, sizeof(char *));
+    p->heredoc_ids      = (char **)calloc(MAX_HEREDOC_ARGS, sizeof (char *));
     p->heredoc_ids_size = MAX_HEREDOC_ARGS;
     return p;
 }
@@ -232,7 +232,7 @@ it's 2 times MAX_HEREDOC_ARGS, after the second time it's 2 * 2 * MAX_HEREDOC_AR
 static void
 resize_heredoc_args(parser_state *p) {
     /* allocate a new buffer*/
-    char **newbuffer = (char **)calloc(p->heredoc_ids_size << 1, sizeof(char **));
+    char **newbuffer = (char **)calloc(p->heredoc_ids_size << 1, sizeof (char **));
     if (newbuffer == NULL) {
         fprintf(stderr, "Failed to reallocate memory for heredoc arguments\n");
     }

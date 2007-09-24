@@ -612,7 +612,7 @@ read_file(char const * filename) {
 
     PARROT_ASSERT(filename != NULL);
 
-    filebuff = (file_buffer *)malloc(sizeof(file_buffer));
+    filebuff = (file_buffer *)malloc(sizeof (file_buffer));
 
     if (filebuff == NULL) {
         fprintf(stderr, "Error in read_file(): failed to allocate memory for file buffer\n");
@@ -630,7 +630,7 @@ read_file(char const * filename) {
 
     /* printf("file size: %ld\n", filebuff->filesize); */
 
-    filebuff->buffer = (char *)calloc(filebuff->filesize + 1, sizeof(char));
+    filebuff->buffer = (char *)calloc(filebuff->filesize + 1, sizeof (char));
 
     if (filebuff->buffer == NULL) {
         fprintf(stderr, "Error in read_file(): failed to allocate memory for file contents\n");
@@ -642,7 +642,7 @@ read_file(char const * filename) {
     filebuff->line = 1;
 
     /* read file contents into buffer */
-    fread(filebuff->buffer, sizeof(char), filebuff->filesize, fileptr);
+    fread(filebuff->buffer, sizeof (char), filebuff->filesize, fileptr);
     fclose(fileptr);
 
     /* set EOF marker at last position of buffer */
@@ -924,13 +924,13 @@ Constructor for the lexer.
 */
 lexer_state *
 new_lexer(char const * filename) {
-    lexer_state *lexer = (lexer_state *)malloc(sizeof(lexer_state));
+    lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
     if (lexer == NULL) {
         fprintf(stderr, "Error in new_lexer(): failed to allocate memory for lexer\n");
         exit(EXIT_FAILURE);
     }
 
-    lexer->token_chars = (char *)calloc(MAX_ID_LENGTH, sizeof(char));
+    lexer->token_chars = (char *)calloc(MAX_ID_LENGTH, sizeof (char));
     lexer->charptr = lexer->token_chars;
     lexer->curfile = NULL;
 

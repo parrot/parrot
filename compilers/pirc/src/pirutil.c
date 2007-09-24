@@ -45,7 +45,7 @@ clone_string(NOTNULL(char const * src))
     /* dest is used as an iterator, ptr - still pointing to the beginning
      * of the string - is returned
      */
-    dest = ptr = (char *)calloc(srclen + 1, sizeof(char));
+    dest = ptr = (char *)calloc(srclen + 1, sizeof (char));
     while (*src) {
         *dest++ = *src++;
     }

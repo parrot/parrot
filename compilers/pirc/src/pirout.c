@@ -57,7 +57,7 @@ typedef struct emit_data {
 */
 static target *
 new_target(char *name) {
-    target *t = (target *)malloc(sizeof(target));
+    target *t = (target *)malloc(sizeof (target));
     t->name = clone_string(name);
     t->next = NULL;
     return t;
@@ -280,7 +280,7 @@ init_pir_vtable(char *outputfile) {
     vtable->binary_op      = pir_bin_op;
     vtable->comparison_op  = pir_comp_op;
 
-    vtable->data = (emit_data *)malloc(sizeof(emit_data));
+    vtable->data = (emit_data *)malloc(sizeof (emit_data));
     if (vtable->data == NULL) {
         fprintf(stderr, "Failed to allocate memory for vtable data\n");
         exit(EXIT_FAILURE);

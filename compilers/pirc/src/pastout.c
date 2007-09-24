@@ -285,7 +285,7 @@ init_past_vtable(char *outputfile) {
     vtable->op_end       = past_close;
 
     /* allocate the emit_data structure and initialize it */
-    vtable->data = (emit_data *)malloc(sizeof(emit_data));
+    vtable->data = (emit_data *)malloc(sizeof (emit_data));
     if (vtable->data == NULL) {
         fprintf(stderr, "Failed to allocate memory for vtable data\n");
         exit(EXIT_FAILURE);
