@@ -81,7 +81,7 @@ inline op typeof(out PMC, invar PMC) :base_core {
     INTVAL type = VTABLE_type(interp, $2);
     INTVAL result;
 
-    if      (type == dynpmc_WmlsInteger) {
+    if (type == dynpmc_WmlsInteger) {
         result = 0;
     }
     else if (type == dynpmc_WmlsFloat) {

@@ -144,7 +144,7 @@ static Node* lua_next(PARROT_INTERP, const Hash *t, const PMC *key)
         if (NULL == v || NULL == *v)
             real_exception(interp, NULL, 1, "invalid key to 'next'");
         i = (int)(((const char *)v -
-                   (const char *)(&t->node[0].val)) / sizeof(Node)) + 1;
+                   (const char *)(&t->node[0].val)) / sizeof (Node)) + 1;
     }
     for (; i<t->size; i++) {
         Node *n = node(t, i);
@@ -213,7 +213,7 @@ static void setnodevector(PARROT_INTERP, Hash *t, int size)
     int i;
     if (size > MAX_INT)
         real_exception(interp, NULL, 1, "table overflow");
-    t->node = mem_sys_allocate_zeroed(size * sizeof(Node));
+    t->node = mem_sys_allocate_zeroed(size * sizeof (Node));
     t->size = size;
     t->firstfree = &t->node[size-1];  /* first free position to be used */
 }

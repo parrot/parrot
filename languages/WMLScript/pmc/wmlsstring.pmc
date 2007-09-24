@@ -61,7 +61,7 @@ pmclass WmlsString
 */
     void increment () {
         PMC * trans = SELF.parseNumber();
-        if      (trans->vtable->base_type == dynpmc_WmlsInvalid) {
+        if (trans->vtable->base_type == dynpmc_WmlsInvalid) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsInteger) {
@@ -86,7 +86,7 @@ pmclass WmlsString
 */
     void decrement () {
         PMC * trans = SELF.parseNumber();
-        if      (trans->vtable->base_type == dynpmc_WmlsInvalid) {
+        if (trans->vtable->base_type == dynpmc_WmlsInvalid) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
         }
         else if (trans->vtable->base_type == dynpmc_WmlsInteger) {
