@@ -355,38 +355,38 @@
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
 
-static void add_pcc_named_arg( PARROT_INTERP,
+static void add_pcc_named_arg(PARROT_INTERP,
     NOTNULL(SymReg *cur_call),
     const char     *name,
-    SymReg         *value )
+    SymReg         *value)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void add_pcc_named_param( PARROT_INTERP,
+static void add_pcc_named_param(PARROT_INTERP,
     SymReg     *cur_call,
     const char *name,
-    SymReg     *value )
+    SymReg     *value)
         __attribute__nonnull__(1);
 
-static void add_pcc_named_result( PARROT_INTERP,
+static void add_pcc_named_result(PARROT_INTERP,
     SymReg     *cur_call,
     const char *name,
-    SymReg     *value )
+    SymReg     *value)
         __attribute__nonnull__(1);
 
-static void add_pcc_named_return( PARROT_INTERP,
+static void add_pcc_named_return(PARROT_INTERP,
     SymReg     *cur_call,
     const char *name,
-    SymReg     *value )
+    SymReg     *value)
         __attribute__nonnull__(1);
 
-static void begin_return_or_yield( PARROT_INTERP, int yield )
+static void begin_return_or_yield(PARROT_INTERP, int yield)
         __attribute__nonnull__(1);
 
-static void clear_state( PARROT_INTERP )
+static void clear_state(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void do_loadlib( PARROT_INTERP, NOTNULL(const char *lib) )
+static void do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -399,43 +399,43 @@ static Instruction* func_ins(
     NOTNULL(SymReg **r),
     int n,
     int keyv,
-    int emit )
+    int emit)
         __attribute__nonnull__(5);
 
-static Instruction * iINDEXFETCH( PARROT_INTERP,
+static Instruction * iINDEXFETCH(PARROT_INTERP,
     IMC_Unit *unit,
     SymReg *r0,
     SymReg *r1,
-    SymReg *r2 )
+    SymReg *r2)
         __attribute__nonnull__(1);
 
-static Instruction * iINDEXSET( PARROT_INTERP,
+static Instruction * iINDEXSET(PARROT_INTERP,
     IMC_Unit *unit,
     SymReg *r0,
     SymReg *r1,
-    SymReg *r2 )
+    SymReg *r2)
         __attribute__nonnull__(1);
 
-static Instruction * iLABEL( PARROT_INTERP, IMC_Unit *unit, SymReg *r0 )
+static Instruction * iLABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0)
         __attribute__nonnull__(1);
 
-static const char * inv_op( const char *op );
-static Instruction * iSUBROUTINE( PARROT_INTERP,
+static const char * inv_op(const char *op);
+static Instruction * iSUBROUTINE(PARROT_INTERP,
     IMC_Unit *unit,
-    NOTNULL(SymReg *r) )
+    NOTNULL(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static Instruction * MK_I( PARROT_INTERP,
+static Instruction * MK_I(PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *fmt),
     int n,
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static Instruction* mk_pmc_const( PARROT_INTERP,
+static Instruction* mk_pmc_const(PARROT_INTERP,
     IMC_Unit *unit,
     NOTNULL(const char *type),
     NOTNULL(SymReg *left),
@@ -445,13 +445,13 @@ static Instruction* mk_pmc_const( PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static SymReg * mk_sub_address_fromc( PARROT_INTERP, char *name )
+static SymReg * mk_sub_address_fromc(PARROT_INTERP, char *name)
         __attribute__nonnull__(1);
 
-static SymReg * mk_sub_address_u( PARROT_INTERP, char *name )
+static SymReg * mk_sub_address_u(PARROT_INTERP, char *name)
         __attribute__nonnull__(1);
 
-static void set_lexical( PARROT_INTERP, NOTNULL(SymReg *r), char *name )
+static void set_lexical(PARROT_INTERP, NOTNULL(SymReg *r), char *name)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -497,7 +497,7 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
     SymReg *r[IMCC_MAX_FIX_REGS];
     int i;
 
-    for (p = opname, q = fmt; *q && *q != ' '; )
+    for (p = opname, q = fmt; *q && *q != ' ';)
         *p++ = *q++;
     *p = 0;
     if (!*q)
@@ -538,7 +538,7 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
         left->set = 'P';
     }
     r[0] = left;
-    ascii = (*constant == '\'' || *constant == '"' );
+    ascii = (*constant == '\'' || *constant == '"');
     if (ascii) {
         /* strip delimiters */
         const size_t len  = strlen(constant);
@@ -3392,7 +3392,7 @@ yyreduce:
   case 131:
 #line 1048 "compilers/imcc/imcc.y"
     {
-            if ( IMCC_INFO(interp)->asm_state == AsmDefault)
+            if (IMCC_INFO(interp)->asm_state == AsmDefault)
                 begin_return_or_yield(interp, (yyvsp[(1) - (2)].t));
         }
     break;
@@ -3672,7 +3672,7 @@ yyreduce:
   case 185:
 #line 1231 "compilers/imcc/imcc.y"
     {
-             if (( IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
+             if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
                   string_from_cstring(interp, (yyvsp[(1) - (1)].s), 0))) <= 0) {
                 IMCC_fataly(interp, E_SyntaxError,
                    "Unknown PMC type '%s'\n", (yyvsp[(1) - (1)].s));
@@ -4682,7 +4682,7 @@ yyreturn:
 
 
 /* I need this prototype somewhere... */
-char *yyget_text (yyscan_t yyscanner );
+char *yyget_text(yyscan_t yyscanner);
 
 /* I do not like this function, but, atm, it is the only way I can
  * make the code in yyerror work without segfault on some specific

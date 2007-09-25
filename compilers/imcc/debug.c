@@ -104,7 +104,7 @@ IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
 {
     va_list ap;
 
-    if ( !(level & IMCC_INFO(interp)->debug))
+    if (!(level & IMCC_INFO(interp)->debug))
         return;
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
@@ -248,8 +248,7 @@ dump_symreg(NOTNULL(const IMC_Unit *unit))
                 (int)r->color, r->want_regno,
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
-                (UINTVAL)r->usage
-               );
+                (UINTVAL)r->usage);
     }
     fprintf(stderr, "\n");
     dump_liveness_status(unit);

@@ -27,46 +27,46 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void allocate_lexicals( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void allocate_lexicals(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void allocate_non_volatile( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void allocate_non_volatile(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void allocate_uniq( PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage )
+static void allocate_uniq(PARROT_INTERP, NOTNULL(IMC_Unit *unit), int usage)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void build_interference_graph( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void build_interference_graph(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void build_reglist( Parrot_Interp interp, NOTNULL(IMC_Unit *unit) )
+static void build_reglist(Parrot_Interp interp, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(2);
 
-static void compute_du_chain( NOTNULL(IMC_Unit *unit) )
+static void compute_du_chain(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 static void compute_one_du_chain(
     NOTNULL(SymReg *r),
-    NOTNULL(IMC_Unit *unit) )
+    NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int first_avail(
     NOTNULL(IMC_Unit *unit),
     int reg_set,
-    NULLOK(Set **avail) )
+    NULLOK(Set **avail))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static unsigned int* ig_allocate( int N );
+static unsigned int* ig_allocate(int N);
 
 static int ig_find_color(
     NOTNULL(const IMC_Unit *unit),
-    NOTNULL(const char *avail) )
+    NOTNULL(const char *avail))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -76,20 +76,20 @@ static unsigned int* ig_get_word(
     int j,
     int N,
     NOTNULL(unsigned int *graph),
-    NOTNULL(int* bit_ofs) )
+    NOTNULL(int* bit_ofs))
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static void ig_set( int i, int j, int N, NOTNULL(unsigned int *graph) )
+static void ig_set(int i, int j, int N, NOTNULL(unsigned int *graph))
         __attribute__nonnull__(4);
 
-static void imc_stat_init( NOTNULL(IMC_Unit *unit) )
+static void imc_stat_init(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static int interferes( PARROT_INTERP,
+static int interferes(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(SymReg *r0),
-    NOTNULL(SymReg *r1) )
+    NOTNULL(SymReg *r1))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -98,7 +98,7 @@ static int interferes( PARROT_INTERP,
 static void make_stat(
     NOTNULL(IMC_Unit *unit),
     NULLOK(int *sets),
-    NULLOK(int *cols) )
+    NULLOK(int *cols))
         __attribute__nonnull__(1);
 
 static void map_colors(
@@ -107,30 +107,30 @@ static void map_colors(
     NOTNULL(unsigned int *graph),
     NOTNULL(char *avail),
     int typ,
-    int already_allocated )
+    int already_allocated)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void print_stat( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void rebuild_reglist( NOTNULL(IMC_Unit *unit) )
+static void rebuild_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static int reg_sort_f( NOTNULL(const void *a), NOTNULL(const void *b) )
+static int reg_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void sort_reglist( NOTNULL(IMC_Unit *unit) )
+static void sort_reglist(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static int try_allocate( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static int try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void vanilla_reg_alloc( SHIM_INTERP, NOTNULL(IMC_Unit *unit) )
+static void vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -745,7 +745,7 @@ try_allocate(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                 int color;
 
                 memset(avail, 1, n);
-                map_colors(unit, x, graph, avail, typ, already_allocated );
+                map_colors(unit, x, graph, avail, typ, already_allocated);
                 color = ig_find_color(unit, avail);
                 if (color >= 0) {
                     color += already_allocated;
@@ -783,7 +783,7 @@ map_colors(NOTNULL(IMC_Unit* unit), int x, NOTNULL(unsigned int *graph), NOTNULL
     for (y = 0; y < n_symbols; y++) {
         if (ig_test(x, y, n_symbols, graph)) {
             const SymReg * const r = unit->reglist[y];
-            if (   r
+            if (r
                     && r->color != -1
                     && r->set == typ) {
                 PARROT_ASSERT(r->color - already_allocated >= 0);
@@ -904,7 +904,7 @@ vanilla_reg_alloc(SHIM_INTERP, NOTNULL(IMC_Unit *unit))
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
-                if (REG_NEEDS_ALLOC(r) && (r->color == -1 )) {
+                if (REG_NEEDS_ALLOC(r) && (r->color == -1)) {
                     if (set_contains(avail, first_reg))
                         first_reg = first_avail(unit, reg_set, NULL);
 

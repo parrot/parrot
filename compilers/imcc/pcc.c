@@ -20,61 +20,61 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void insert_tail_call( PARROT_INTERP,
+static void insert_tail_call(PARROT_INTERP,
     NOTNULL(IMC_Unit * unit),
     NOTNULL(NOTNULL(Instruction *ins)),
     NOTNULL(SymReg *sub),
-    NULLOK(SymReg *meth) )
+    NULLOK(SymReg *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static Instruction * insINS( PARROT_INTERP,
+static Instruction * insINS(PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(Instruction *ins),
     char *name,
     SymReg **regs,
-    int n )
+    int n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static Instruction * move_regs( PARROT_INTERP,
+static Instruction * move_regs(PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(Instruction *ins),
     int n,
     SymReg **dest,
-    SymReg **src )
+    SymReg **src)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static Instruction* pcc_get_args( PARROT_INTERP,
+static Instruction* pcc_get_args(PARROT_INTERP,
     IMC_Unit * unit,
     NOTNULL(Instruction *ins),
     char *op_name,
     int n,
     SymReg **args,
-    int *arg_flags )
+    int *arg_flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static int pcc_reg_mov( PARROT_INTERP,
+static int pcc_reg_mov(PARROT_INTERP,
     unsigned char d,
     unsigned char s,
-    NOTNULL(void *vinfo) )
+    NOTNULL(void *vinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int recursive_tail_call( PARROT_INTERP,
+static int recursive_tail_call(PARROT_INTERP,
     NOTNULL(NOTNULL(IMC_Unit *unit)),
     NOTNULL(NOTNULL(Instruction *ins)),
-    NOTNULL(SymReg *sub) )
+    NOTNULL(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void unshift_self( NOTNULL(SymReg *sub), SymReg *obj )
+static void unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -243,7 +243,7 @@ expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(
      */
     if (unit->last_ins->type & (ITPCCSUB) &&
             unit->last_ins->n_r == 1 &&
-            ( sub = unit->last_ins->r[0] ) &&
+            (sub = unit->last_ins->r[0]) &&
             sub->pcc_sub &&
             !sub->pcc_sub->object && /* s. src/inter_call.c:119 */
             (sub->pcc_sub->flags & isTAIL_CALL))
@@ -255,8 +255,7 @@ expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(
             strcmp(unit->last_ins->op, "end") &&
             strcmp(unit->last_ins->op, "branch") &&
             /* was adding rets multiple times... */
-            strcmp(unit->last_ins->op, "returncc")
-       ) {
+            strcmp(unit->last_ins->op, "returncc")) {
         Instruction *tmp;
 
         /* check to make sure the sub is ok before we try to use it */
@@ -465,7 +464,7 @@ recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
     buf = (char *)malloc(strlen(this_sub->name) + 3);
     sprintf(buf, "%s@0", this_sub->name);
 
-    if ( (label = find_sym(interp, buf)) == NULL) {
+    if ((label = find_sym(interp, buf)) == NULL) {
         label = mk_local_label(interp, str_dup(buf));
         tmp_ins = INS_LABEL(interp, unit, label, 0);
         insert_ins(unit, get_params, tmp_ins);
@@ -603,7 +602,7 @@ expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction 
         meth = arg;
 
         if (arg->set != 'P') {
-            if ( !(arg->type == VTIDENTIFIER ||
+            if (!(arg->type == VTIDENTIFIER ||
                         arg->type == VTPASM ||
                         arg->type == VTREG))
                 meth = mk_const(interp, str_dup(arg->name), 'S');

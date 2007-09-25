@@ -41,45 +41,45 @@ ParserUtil - Parser support functions.
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static int change_op( PARROT_INTERP,
+static int change_op(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(SymReg **r),
     int num,
-    int emit )
+    int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static void * imcc_compile_file( PARROT_INTERP,
+static void * imcc_compile_file(PARROT_INTERP,
     NOTNULL(const char *fullname),
-    NOTNULL(STRING **error_message) )
+    NOTNULL(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int is_infix( NOTNULL(const char *name), int n, NOTNULL(SymReg **r) )
+static int is_infix(NOTNULL(const char *name), int n, NOTNULL(SymReg **r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static Instruction * maybe_builtin( PARROT_INTERP,
+static Instruction * maybe_builtin(PARROT_INTERP,
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
-    int n )
+    int n)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static const char * to_infix( PARROT_INTERP,
+static const char * to_infix(PARROT_INTERP,
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
     NOTNULL(int *n),
-    int mmd_op )
+    int mmd_op)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -89,17 +89,17 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const char * try_rev_cmp(
     NOTNULL(const char *name),
-    NOTNULL(SymReg **r) )
+    NOTNULL(SymReg **r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static Instruction * var_arg_ins( PARROT_INTERP,
+static Instruction * var_arg_ins(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(const char *name),
     NOTNULL(SymReg **r),
     int n,
-    int emit )
+    int emit)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -783,7 +783,7 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
     void *yyscanner;
     Parrot_Context *ignored;
 
-    do_yylex_init( interp, &yyscanner );
+    do_yylex_init(interp, &yyscanner);
 
     /*
      * we create not yet anchored PMCs - e.g. Subs: turn off DOD
@@ -872,7 +872,7 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
         imc_cleanup(interp, yyscanner);
     Parrot_unblock_DOD(interp);
 
-    yylex_destroy( yyscanner );
+    yylex_destroy(yyscanner);
     return sub;
 }
 
@@ -966,7 +966,7 @@ imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))
     STRING *error_message;
 
     PMC * const sub = imcc_compile(interp, s, 1, &error_message);
-    if (sub == NULL ) {
+    if (sub == NULL) {
         char * const error_str = string_to_cstring(interp, error_message);
         real_exception(interp, NULL, E_Exception, error_str);
         string_cstring_free(error_str);
@@ -1065,23 +1065,23 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
 
     if (ext && strcmp(ext, ".pasm") == 0) {
         void *yyscanner;
-        do_yylex_init( interp, &yyscanner );
+        do_yylex_init(interp, &yyscanner);
 
 
         IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
         compile_file(interp, fp, yyscanner);
 
-        yylex_destroy( yyscanner );
+        yylex_destroy(yyscanner);
     }
     else {
         void *yyscanner;
-        do_yylex_init( interp, &yyscanner );
+        do_yylex_init(interp, &yyscanner);
 
         IMCC_INFO(interp)->state->pasm_file = 0;
         compile_file(interp, fp, yyscanner);
 
-        yylex_destroy( yyscanner );
+        yylex_destroy(yyscanner);
     }
     Parrot_unblock_DOD(interp);
     Parrot_pop_context(interp);
@@ -1327,8 +1327,8 @@ static const char *
 try_rev_cmp(NOTNULL(const char *name), NOTNULL(SymReg **r))
 {
     static struct br_pairs {
-        NOTNULL( const char * const op );
-        NOTNULL( const char * const nop );
+        NOTNULL(const char * const op);
+        NOTNULL(const char * const nop);
         const int to_swap;
     } br_pairs[] = {
         { "gt", "lt", 0 },
@@ -1523,7 +1523,7 @@ imcc_vfprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *format), va_
             continue;
         }
         /* look for end of format spec */
-        for ( ; ch && strchr("diouxXeEfFgGcspI", ch) == NULL; ch = *++fmt)
+        for (; ch && strchr("diouxXeEfFgGcspI", ch) == NULL; ch = *++fmt)
             ;
         if (!ch) {
             /* no fatal here, else we get recursion */

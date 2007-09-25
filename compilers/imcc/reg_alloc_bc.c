@@ -71,7 +71,7 @@ static int spill_registers(Interp *, IMC_Unit *, graph*);
 
 /*providing input of 0 forces the below dynamic function to kick in.*/
 #ifndef BITS_PER_INT
-#  define BITS_PER_INT (sizeof (int)*8)
+#  define BITS_PER_INT(sizeof (int)*8)
 #endif
 #define Bits_per_int() ((BITS_PER_INT) ? BITS_PER_INT : bits_per_int())
 /*#define VALIDATE_COLORING*/
@@ -716,7 +716,7 @@ allocate_wanted_regs(IMC_Unit * unit)
             if (! ig_test(i, y, n_symbols, unit->interference_graph))
                 continue;
             s = unit->reglist[y];
-            if (   s
+            if (s
                 && s->color == r->want_regno
                 && s->set == r->set) {
                 interf = 1;
@@ -1129,13 +1129,13 @@ ig_init_graph(PARROT_INTERP, IMC_Unit* unit, graph* G) {
         for (j = 0; j < num_nodes; j++) {
             node* u = &G->V[j];
             int k;
-            printf( "node %d/%d d(%d):", j, u->id, u->deg);
+            printf("node %d/%d d(%d):", j, u->id, u->deg);
             for (k = 0; k < G->n; k++) {
                 if (G->V[k].in && ig_test(x, G->V[k].id, G->n, G->E)) {
-                    printf( " %d/%d", k, G->V[k].id);
+                    printf(" %d/%d", k, G->V[k].id);
                 }
             }
-            printf( "\n");
+            printf("\n");
         }
     }
 #endif

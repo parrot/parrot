@@ -19,11 +19,11 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void imc_free_unit( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static IMC_Unit * imc_new_unit( IMC_Unit_Type t );
+static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
 /* HEADERIZER END: static */
 
 #define COMPILE_IMMEDIATE 1
@@ -38,7 +38,7 @@ imc_compile_all_units(PARROT_INTERP)
 {
     IMC_Unit *unit;
 #if ! COMPILE_IMMEDIATE
-    for (unit = IMCC_INFO(interp)->imc_units; unit; ) {
+    for (unit = IMCC_INFO(interp)->imc_units; unit;) {
         IMC_Unit * const unit_next = unit->next;
         imc_compile_unit(interp, unit);
         unit = unit_next;
@@ -51,7 +51,7 @@ imc_compile_all_units(PARROT_INTERP)
         IMC_Unit * const unit_next = unit->next;
         Instruction *ins;
 
-        for (ins = unit->instructions; ins; ) {
+        for (ins = unit->instructions; ins;) {
             Instruction * const ins_next = ins->next;
             free_ins(ins);
             ins = ins_next;

@@ -36,17 +36,17 @@ int n_comp_units;
 
 /* HEADERIZER BEGIN: static */
 
-static int e_file_close( PARROT_INTERP, SHIM(void *param) )
+static int e_file_close(PARROT_INTERP, SHIM(void *param))
         __attribute__nonnull__(1);
 
-static int e_file_emit( PARROT_INTERP,
+static int e_file_emit(PARROT_INTERP,
     SHIM(void *param),
     SHIM(IMC_Unit *unit),
-    NOTNULL(const Instruction *ins) )
+    NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open( SHIM_INTERP, NOTNULL(void *param) )
+static int e_file_open(SHIM_INTERP, NOTNULL(void *param))
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */
@@ -194,7 +194,7 @@ instruction_reads(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
             ins->opnum == PARROT_OP_set_returns_pc) {
         int i;
         for (i = 0; i < ins->n_r; i++)
-            if (r ==ins->r[i] )
+            if (r ==ins->r[i])
                 return 1;
         return 0;
     }
@@ -534,7 +534,7 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
             regstr[i] = regb[i];
         }
         else if (p->type == VTCONST && p->set == 'S' &&
-                *p->name != '"' && *p->name != '\'' ) {
+                *p->name != '"' && *p->name != '\'') {
             /* unquoted string const */
             sprintf(regb[i], "\"%s\"", p->name);      /* XXX */
             regstr[i] = regb[i];

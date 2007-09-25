@@ -27,11 +27,11 @@ extern int yydebug;
 /* HEADERIZER BEGIN: static */
 
 static void determine_input_file_type(PARROT_INTERP,  NOTNULL(
-    const char * const sourcefile) );
+    const char * const sourcefile));
 
 static void determine_output_file_type(PARROT_INTERP,  NOTNULL(
     int *obj_file),
-    NOTNULL(const char *output_file) )
+    NOTNULL(const char *output_file))
         __attribute__nonnull__(2);
 
 static void
@@ -39,39 +39,39 @@ compile_to_bytecode(PARROT_INTERP,
                     NOTNULL(const char * const sourcefile),
                     NOTNULL(const char * const output_file));
 
-static void do_pre_process( PARROT_INTERP )
+static void do_pre_process(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void help( void );
-static void help_debug( void );
+static void help(void);
+static void help_debug(void);
 static void imcc_get_optimization_description(
     const PARROT_INTERP,
     int opt_level,
-    NOTNULL(char *opt_desc) )
+    NOTNULL(char *opt_desc))
         __attribute__nonnull__(3);
 
-static void imcc_run_pbc( PARROT_INTERP,
+static void imcc_run_pbc(PARROT_INTERP,
     int obj_file,
     NOTNULL(const char *output_file),
     int argc,
-    NOTNULL(char *argv[]) )
+    NOTNULL(char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
-static void imcc_write_pbc( PARROT_INTERP, NOTNULL(const char *output_file) )
+static void imcc_write_pbc(PARROT_INTERP, NOTNULL(const char *output_file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int is_all_hex_digits( NOTNULL(const char *s) )
+static int is_all_hex_digits(NOTNULL(const char *s))
         __attribute__nonnull__(1);
 
-static void Parrot_version( PARROT_INTERP )
+static void Parrot_version(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void usage( NOTNULL(FILE* fp) )
+static void usage(NOTNULL(FILE* fp))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -175,11 +175,11 @@ Parrot_version(PARROT_INTERP)
     printf(" built for " PARROT_ARCHNAME ".\n");
     rev = Parrot_revision();
     if (PARROT_REVISION != rev) {
-        printf( "Warning: runtime has revision %d!\n", rev);
+        printf("Warning: runtime has revision %d!\n", rev);
     }
     rev = Parrot_config_revision();
     if (PARROT_REVISION != rev) {
-        printf( "Warning: used Configure.pl revision %d!\n", rev);
+        printf("Warning: used Configure.pl revision %d!\n", rev);
     }
     printf("Copyright (C) 2001-2007, The Perl Foundation.\n\
 \n\

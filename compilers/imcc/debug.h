@@ -27,88 +27,88 @@
 /* HEADERIZER BEGIN: compilers/imcc/debug.c */
 
 PARROT_API
-void IMCC_debug( PARROT_INTERP, int level, NOTNULL(const char *fmt), ... )
+void IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void IMCC_fatal( PARROT_INTERP,
+void IMCC_fatal(PARROT_INTERP,
     NULLOK(int code),
     NOTNULL(const char *fmt),
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void IMCC_fatal_standalone( PARROT_INTERP,
+void IMCC_fatal_standalone(PARROT_INTERP,
     int code,
     NOTNULL(const char *fmt),
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void IMCC_fataly( PARROT_INTERP,
+void IMCC_fataly(PARROT_INTERP,
     NULLOK(int code),
     NOTNULL(const char *fmt),
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void IMCC_fataly_standalone( PARROT_INTERP,
+void IMCC_fataly_standalone(PARROT_INTERP,
     int code,
     NOTNULL(const char *fmt),
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-void IMCC_info( PARROT_INTERP, int level, NOTNULL(const char *fmt), ... )
+void IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-void IMCC_warning( PARROT_INTERP, NOTNULL(const char *fmt), ... )
+void IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dump_cfg( NOTNULL(const IMC_Unit *unit) )
+void dump_cfg(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_dominance_frontiers( NOTNULL(const IMC_Unit *unit) )
+void dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_dominators( NOTNULL(const IMC_Unit *unit) )
+void dump_dominators(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_instructions( PARROT_INTERP, NOTNULL(const IMC_Unit *unit) )
+void dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dump_interference_graph( NOTNULL(const IMC_Unit *unit) )
+void dump_interference_graph(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_labels( NOTNULL(const IMC_Unit *unit) )
+void dump_labels(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_liveness_status( NOTNULL(const IMC_Unit *unit) )
+void dump_liveness_status(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 void dump_liveness_status_var(
     NOTNULL(const IMC_Unit *unit),
-    NOTNULL(const SymReg* r) )
+    NOTNULL(const SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dump_loops( NOTNULL(const IMC_Unit *unit) )
+void dump_loops(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void dump_symreg( NOTNULL(const IMC_Unit *unit) )
+void dump_symreg(NOTNULL(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: compilers/imcc/debug.c */

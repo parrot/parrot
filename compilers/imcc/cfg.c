@@ -23,81 +23,81 @@
 
 /* HEADERIZER BEGIN: static */
 
-static void analyse_life_block( NOTNULL(Basic_block* bb), NOTNULL(SymReg* r) )
+static void analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void analyse_life_symbol(
     NOTNULL(const struct _IMC_Unit *unit),
-    NOTNULL(SymReg* r) )
+    NOTNULL(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void bb_add_edge(
     NOTNULL(IMC_Unit *unit),
     NOTNULL(Basic_block *from),
-    NOTNULL(Basic_block *to) )
+    NOTNULL(Basic_block *to))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void bb_check_set_addr( PARROT_INTERP,
+static void bb_check_set_addr(PARROT_INTERP,
     NOTNULL(IMC_Unit * unit),
     NOTNULL(Basic_block *bb),
-    NOTNULL(SymReg *label) )
+    NOTNULL(SymReg *label))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void bb_findadd_edge( PARROT_INTERP,
+static void bb_findadd_edge(PARROT_INTERP,
     NOTNULL(IMC_Unit * unit),
     NOTNULL(Basic_block *from),
-    NOTNULL(SymReg *label) )
+    NOTNULL(SymReg *label))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void bb_remove_edge( NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge) )
+static void bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int check_invoke_type( PARROT_INTERP,
+static int check_invoke_type(PARROT_INTERP,
     NOTNULL(const IMC_Unit * unit),
-    NOTNULL(const Instruction *ins) )
+    NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void free_dominance_frontiers( NOTNULL(IMC_Unit *unit) )
+static void free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static void free_dominators( NOTNULL(IMC_Unit *unit) )
+static void free_dominators(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static void free_edge( NOTNULL(IMC_Unit *unit) )
+static void free_edge(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static void free_loops( NOTNULL(IMC_Unit *unit) )
+static void free_loops(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-static void init_basic_blocks( NOTNULL(IMC_Unit *unit) )
+static void init_basic_blocks(NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static Basic_block* make_basic_block( PARROT_INTERP,
+static Basic_block* make_basic_block(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    NOTNULL(Instruction* ins) )
+    NOTNULL(Instruction* ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mark_loop( PARROT_INTERP,
+static void mark_loop(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
-    NOTNULL(const Edge *e) )
+    NOTNULL(const Edge *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -105,11 +105,11 @@ static void mark_loop( PARROT_INTERP,
 static void propagate_need(
     NOTNULL(Basic_block *bb),
     NOTNULL(SymReg* r),
-    int i )
+    int i)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void sort_loops( PARROT_INTERP, NOTNULL(IMC_Unit *unit) )
+static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -213,7 +213,7 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
          */
         if (nu)
             nu = 0;
-        else if ( (ins->type & ITLABEL)) {
+        else if ((ins->type & ITLABEL)) {
             bb->end = ins->prev;
             bb = make_basic_block(interp, unit, ins);
         }
@@ -754,7 +754,7 @@ propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
                 if (pred->index == 0) {
                     Instruction *ins = r->life_info[i]->first_ins;
                     int bbi = ins->bbindex;
-                    for ( ; ins && ins->bbindex == bbi; ins = ins->next)
+                    for (; ins && ins->bbindex == bbi; ins = ins->next)
                         if (instruction_reads(ins, r))
                             break;
                     IMCC_warning("propagate_need",

@@ -54,65 +54,65 @@ struct _IMC_Unit;
 PARROT_WARN_UNUSED_RESULT
 int blocks_are_connected(
     NOTNULL(const Basic_block *from),
-    NOTNULL(const Basic_block *to) )
+    NOTNULL(const Basic_block *to))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void build_cfg( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
+void build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void clear_basic_blocks( NOTNULL(struct _IMC_Unit *unit) )
+void clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void compute_dominance_frontiers( PARROT_INTERP,
-    NOTNULL(struct _IMC_Unit *unit) )
+void compute_dominance_frontiers(PARROT_INTERP,
+    NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void compute_dominators( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
+void compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-int edge_count( NOTNULL(const struct _IMC_Unit *unit) )
+int edge_count(NOTNULL(const struct _IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void find_basic_blocks( PARROT_INTERP,
+void find_basic_blocks(PARROT_INTERP,
     NOTNULL(struct _IMC_Unit *unit),
-    int first )
+    int first)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void find_loops( PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit) )
+void find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void free_life_info(
     NOTNULL(const struct _IMC_Unit *unit),
-    NOTNULL(SymReg *r) )
+    NOTNULL(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void life_analysis( PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit) )
+void life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Life_range * make_life_range( NOTNULL(SymReg *r), int idx )
+Life_range * make_life_range(NOTNULL(SymReg *r), int idx)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
     NOTNULL(const struct _IMC_Unit *unit),
-    NOTNULL(const Loop_info* loop_info) )
+    NOTNULL(const Loop_info* loop_info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void search_predecessors_not_in(
     NOTNULL(const Basic_block *node),
-    NOTNULL(Set* s) )
+    NOTNULL(Set* s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

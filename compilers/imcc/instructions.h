@@ -104,18 +104,18 @@ enum Emitter_type { EMIT_FILE, EMIT_PBC };
 /* HEADERIZER BEGIN: compilers/imcc/instructions.c */
 
 PARROT_API
-int emit_close( PARROT_INTERP, NULLOK(void *param) )
+int emit_close(PARROT_INTERP, NULLOK(void *param))
         __attribute__nonnull__(1);
 
 PARROT_API
-int emit_flush( PARROT_INTERP,
+int emit_flush(PARROT_INTERP,
     NULLOK(void *param),
-    NOTNULL(struct _IMC_Unit *unit) )
+    NOTNULL(struct _IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-int emit_open( PARROT_INTERP, int type, NULLOK(void *param) )
+int emit_open(PARROT_INTERP, int type, NULLOK(void *param))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -124,70 +124,70 @@ Instruction * _mk_instruction(
     NOTNULL(const char *fmt),
     int n,
     SymReg ** r,
-    int flags )
+    int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 Instruction * delete_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NOTNULL(Instruction *ins),
-    int needs_freeing )
+    int needs_freeing)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-Instruction * emitb( PARROT_INTERP,
+Instruction * emitb(PARROT_INTERP,
     NULLOK(struct _IMC_Unit *unit),
-    NULLOK(Instruction *i) )
+    NULLOK(Instruction *i))
         __attribute__nonnull__(1);
 
-void free_ins( NOTNULL(Instruction *ins) )
+void free_ins(NOTNULL(Instruction *ins))
         __attribute__nonnull__(1);
 
-SymReg * get_branch_reg( NOTNULL(const Instruction *ins) )
+SymReg * get_branch_reg(NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1);
 
-int get_branch_regno( NOTNULL(const Instruction *ins) )
+int get_branch_regno(NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1);
 
-void imcc_init_tables( PARROT_INTERP )
+void imcc_init_tables(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-int ins_print( PARROT_INTERP,
+int ins_print(PARROT_INTERP,
     NOTNULL(FILE *fd),
-    NOTNULL(const Instruction *ins) )
+    NOTNULL(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-int ins_reads2( NOTNULL(const Instruction *ins), int t )
+int ins_reads2(NOTNULL(const Instruction *ins), int t)
         __attribute__nonnull__(1);
 
-int ins_writes2( NOTNULL(const Instruction *ins), int t )
+int ins_writes2(NOTNULL(const Instruction *ins), int t)
         __attribute__nonnull__(1);
 
 void insert_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NULLOK(Instruction *ins),
-    NOTNULL(Instruction *tmp) )
+    NOTNULL(Instruction *tmp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 int instruction_reads(
     NOTNULL(const Instruction *ins),
-    NOTNULL(const SymReg *r) )
+    NOTNULL(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 int instruction_writes(
     NOTNULL(const Instruction *ins),
-    NOTNULL(const SymReg *r) )
+    NOTNULL(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 Instruction * move_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NOTNULL(Instruction *ins),
-    NOTNULL(Instruction *to) )
+    NOTNULL(Instruction *to))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -195,7 +195,7 @@ Instruction * move_ins(
 void prepend_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NULLOK(Instruction *ins),
-    NOTNULL(Instruction *tmp) )
+    NOTNULL(Instruction *tmp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -203,7 +203,7 @@ void subst_ins(
     NOTNULL(struct _IMC_Unit *unit),
     NOTNULL(Instruction *ins),
     NOTNULL(Instruction *tmp),
-    int needs_freeing )
+    int needs_freeing)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

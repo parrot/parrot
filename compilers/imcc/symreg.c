@@ -23,29 +23,28 @@
 
 /* HEADERIZER BEGIN: static */
 
-static SymReg * _get_sym_typed(
-    NOTNULL(const SymHash *hsh),
+static SymReg * _get_sym_typed(NOTNULL(const SymHash *hsh),
     NOTNULL(const char *name),
-    int t )
+    int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static char * add_ns( PARROT_INTERP, NOTNULL(char *name) )
+static char * add_ns(PARROT_INTERP, NOTNULL(char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static SymReg* mk_pmc_const_2( PARROT_INTERP,
+static SymReg* mk_pmc_const_2(PARROT_INTERP,
     NOTNULL(IMC_Unit *unit),
     NOTNULL(SymReg *left),
-    NOTNULL(SymReg *rhs) )
+    NOTNULL(SymReg *rhs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void resize_symhash( NOTNULL(SymHash *hsh) )
+static void resize_symhash(NOTNULL(SymHash *hsh))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -225,7 +224,7 @@ add_namespace(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         g->reg           = ns;
         g->type          = VT_CONSTP;
 
-        if (!r || r->type != VT_CONSTP )
+        if (!r || r->type != VT_CONSTP)
             _store_symreg(&IMCC_INFO(interp)->ghash, g);
     }
 }
@@ -559,8 +558,7 @@ _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
 
     r = _get_sym(hsh, name);
     if (uniq && r && r->type == VTADDRESS &&
-            r->lhs_use_count            /* we use this for labels/subs */
-      ) {
+            r->lhs_use_count) {      /* we use this for labels/subs */
         if (uniq == U_add_uniq_label) {
             IMCC_fataly(interp, E_SyntaxError,
                    "Label '%s' already defined\n", name);
@@ -963,7 +961,7 @@ clear_sym_hash(NOTNULL(SymHash *hsh))
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *p;
-        for (p = hsh->data[i]; p; ) {
+        for (p = hsh->data[i]; p;) {
             SymReg * const next = p->next;
             free_sym(p);
             p = next;
@@ -1000,7 +998,7 @@ clear_locals(NULLOK(struct _IMC_Unit *unit))
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *p;
-        for (p = hsh->data[i]; p; ) {
+        for (p = hsh->data[i]; p;) {
             SymReg * const next = p->next;
 
             if (unit && p->life_info)
