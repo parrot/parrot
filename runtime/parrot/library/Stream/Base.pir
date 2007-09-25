@@ -28,7 +28,7 @@ TBD
 .const int aIncludes = 1
 .const int aBuffer = 2
 
-.sub onload :load, :anon
+.sub onload :load :anon
     find_type $I0, "Stream::Base"
     if $I0 > 1 goto END
 
