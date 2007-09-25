@@ -13,6 +13,8 @@ from F<config/auto/attributes.pm>.
 
 =head1 SUBROUTINES
 
+=over 4
+
 =cut
 
 package auto::warnings;
