@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/make.pm - make utility
+config/inter/make.pm - make utility
 
 =head1 DESCRIPTION
 
