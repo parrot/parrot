@@ -13,8 +13,6 @@ from F<config/auto/attributes.pm>.
 
 =head1 SUBROUTINES
 
-=over 4
-
 =cut
 
 package auto::warnings;
@@ -55,7 +53,7 @@ our @potential_warnings = qw(
     -Wimplicit-function-declaration
     -Wimplicit-int
     -Wimport
-    -Winit-self"
+    -Winit-self
     -Winline
     -Winvalid-pch
     -Wmain
@@ -72,7 +70,6 @@ our @potential_warnings = qw(
     -Wpointer-arith
     -Wreturn-type
     -Wsequence-point
-    -Wshadow
     -Wsign-compare
     -Wstrict-aliasing
     -Wstrict-aliasing=2
