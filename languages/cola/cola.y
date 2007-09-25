@@ -992,12 +992,12 @@ int main(int argc, char * argv[])
     fprintf(stderr, "colac version %s\n\n", COLA_VERSION);
     if (argc > 1) {
         if (!(yyin = fopen(argv[1], "r")))    {
-            printf( "Error reading source file %s.\n", argv[1] );
+            printf("Error reading source file %s.\n", argv[1]);
             exit(0);
         }
     }
     else {
-        printf( "No source file specified.\n" );
+        printf("No source file specified.\n");
         exit(0);
     }
 
@@ -1034,7 +1034,7 @@ int main(int argc, char * argv[])
     freopen("a.pir", "w", stdout);
     fprintf(stderr, "Compiling intermediate code to a.pir\n");
 /*
-    printf( "#Dump of global namespace:\n" );
+    printf("#Dump of global namespace:\n");
     indent = 0;
     dump_namespace(current_namespace);
 */
@@ -1062,8 +1062,8 @@ int yyerror(char * s)
 /*
     fprintf(stderr, "last token = [%s]\n", yylval.sym->name);
 */
-    fprintf(stderr, "(error) line %ld: %s\n", line, s );
-    fprintf(stderr, "Didn't create output asm.\n" );
+    fprintf(stderr, "(error) line %ld: %s\n", line, s);
+    fprintf(stderr, "Didn't create output asm.\n");
     exit(0);
 }
 

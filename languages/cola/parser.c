@@ -211,6 +211,8 @@
 /*
  * cola.y
  *
+ * $Id$
+ *
  * Cola compiler for Parrot
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
@@ -260,7 +262,7 @@ AST         *ast_start = NULL;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 34 "cola.y"
+#line 36 "cola.y"
 {
     int ival;
     Symbol * sym;
@@ -268,8 +270,8 @@ typedef union YYSTYPE
     AST * ast;
     void * p;
 }
-/* Line 193 of yacc.c.  */
-#line 273 "parser.c"
+/* Line 187 of yacc.c.  */
+#line 275 "parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -282,7 +284,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 286 "parser.c"
+#line 288 "parser.c"
 
 #ifdef short
 # undef short
@@ -633,23 +635,23 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   108,   108,   109,   113,   123,   124,   131,   133,   141,
-     145,   154,   173,   175,   183,   192,   194,   203,   204,   208,
-     219,   220,   224,   226,   230,   232,   234,   236,   238,   243,
-     248,   265,   266,   274,   275,   290,   292,   308,   327,   346,
-     347,   355,   366,   378,   386,   408,   435,   436,   445,   446,
-     454,   476,   481,   494,   498,   500,   502,   504,   506,   508,
-     510,   515,   516,   518,   524,   525,   527,   535,   540,   545,
-     547,   549,   558,   560,   565,   570,   571,   579,   580,   582,
-     584,   589,   593,   598,   605,   606,   610,   617,   629,   634,
-     635,   639,   641,   643,   645,   649,   651,   656,   666,   674,
-     684,   685,   686,   687,   688,   689,   693,   707,   715,   723,
-     731,   739,   746,   755,   759,   766,   775,   779,   780,   781,
-     782,   783,   784,   789,   791,   793,   795,   797,   799,   800,
-     804,   818,   827,   838,   846,   857,   858,   862,   866,   873,
-     874,   878,   885,   886,   894,   895,   902,   903,   910,   911,
-     918,   919,   926,   927,   934,   936,   938,   940,   945,   946,
-     954,   955,   960,   968,   969,   973
+       0,   110,   110,   111,   115,   125,   126,   133,   135,   143,
+     147,   156,   175,   177,   185,   194,   196,   205,   206,   210,
+     221,   222,   226,   228,   232,   234,   236,   238,   240,   245,
+     250,   267,   268,   276,   277,   292,   294,   310,   329,   348,
+     349,   357,   368,   380,   388,   410,   437,   438,   447,   448,
+     456,   478,   483,   496,   500,   502,   504,   506,   508,   510,
+     512,   517,   518,   520,   526,   527,   529,   537,   542,   547,
+     549,   551,   560,   562,   567,   572,   573,   581,   582,   584,
+     586,   591,   595,   600,   607,   608,   612,   619,   631,   636,
+     637,   641,   643,   645,   647,   651,   653,   658,   668,   676,
+     686,   687,   688,   689,   690,   691,   695,   709,   717,   725,
+     733,   741,   748,   757,   761,   768,   777,   781,   782,   783,
+     784,   785,   786,   791,   793,   795,   797,   799,   801,   802,
+     806,   820,   829,   840,   848,   859,   860,   864,   868,   875,
+     876,   880,   887,   888,   896,   897,   904,   905,   912,   913,
+     920,   921,   928,   929,   936,   938,   940,   942,   947,   948,
+     956,   957,   962,   970,   971,   975
 };
 #endif
 
@@ -1804,7 +1806,7 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 114 "cola.y"
+#line 116 "cola.y"
     {
             unshift_ast(&ast_start, (yyvsp[(1) - (3)].ast));
             unshift_ast(&ast_start, (yyvsp[(2) - (3)].ast));
@@ -1814,24 +1816,24 @@ yyreduce:
     break;
 
   case 5:
-#line 123 "cola.y"
+#line 125 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 6:
-#line 125 "cola.y"
+#line 127 "cola.y"
     {
             unshift_ast(&((yyval.ast)), (yyvsp[(1) - (2)].ast));
         }
     break;
 
   case 7:
-#line 132 "cola.y"
+#line 134 "cola.y"
     {    printf("using_alias_directive\n");    }
     break;
 
   case 8:
-#line 134 "cola.y"
+#line 136 "cola.y"
     {
             printf("using_directive\n");
             /*load_module($2->name);*/
@@ -1839,12 +1841,12 @@ yyreduce:
     break;
 
   case 9:
-#line 141 "cola.y"
+#line 143 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 10:
-#line 146 "cola.y"
+#line 148 "cola.y"
     {
             pop_namespace();
             (yyval.ast) = new_ast(KIND_DECL, ASTT_NAMESPACE_DECL, (yyvsp[(2) - (2)].ast), NULL);
@@ -1853,14 +1855,14 @@ yyreduce:
     break;
 
   case 11:
-#line 155 "cola.y"
+#line 157 "cola.y"
     {
             Symbol *n, *t, *last = current_namespace;
-            if(lookup_type_symbol((yyvsp[(2) - (2)].sym))) {
+            if (lookup_type_symbol((yyvsp[(2) - (2)].sym))) {
                 printf("Error, redefinition of [%s]\n", (yyvsp[(2) - (2)].sym)->name);
-                exit(EXIT_SUCCESS);
+                exit(0);
             }
-            for(n = split(".", (yyvsp[(2) - (2)].sym)->name); n; n = n->tnext) {
+            for (n = split(".", (yyvsp[(2) - (2)].sym)->name); n; n = n->tnext) {
                 n->kind = (yyvsp[(2) - (2)].sym)->kind;
                 t = mk_namespace_symbol(n);
                 store_symbol(last->table, t);
@@ -1872,12 +1874,12 @@ yyreduce:
     break;
 
   case 12:
-#line 174 "cola.y"
+#line 176 "cola.y"
     { (yyval.sym) = (yyvsp[(1) - (1)].sym); fprintf(stderr, "qualified_name <- IDENTIFIER\n"); }
     break;
 
   case 13:
-#line 176 "cola.y"
+#line 178 "cola.y"
     {
             (yyval.sym) = symbol_join3((yyvsp[(1) - (3)].sym), new_symbol("."), (yyvsp[(3) - (3)].sym));
             fprintf(stderr, "qualified_name <- qualified_name . IDENTIFIER\n");
@@ -1885,30 +1887,30 @@ yyreduce:
     break;
 
   case 14:
-#line 184 "cola.y"
+#line 186 "cola.y"
     {
             (yyval.ast) = (yyvsp[(2) - (4)].ast);
-            if((yyvsp[(3) - (4)].ast))
+            if ((yyvsp[(3) - (4)].ast))
                 unshift_ast(&((yyval.ast)), (yyvsp[(3) - (4)].ast));
         }
     break;
 
   case 15:
-#line 192 "cola.y"
+#line 194 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 16:
-#line 195 "cola.y"
+#line 197 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (2)].ast);
-            if((yyvsp[(2) - (2)].ast))
+            if ((yyvsp[(2) - (2)].ast))
                 unshift_ast(&((yyval.ast)), (yyvsp[(2) - (2)].ast));
         }
     break;
 
   case 19:
-#line 209 "cola.y"
+#line 211 "cola.y"
     {
             pop_namespace();
             (yyval.ast) = new_ast(KIND_DECL, ASTT_CLASS_DECL, NULL, NULL);
@@ -1919,47 +1921,47 @@ yyreduce:
     break;
 
   case 20:
-#line 219 "cola.y"
+#line 221 "cola.y"
     { (yyval.ival) = 0; }
     break;
 
   case 22:
-#line 225 "cola.y"
+#line 227 "cola.y"
     { (yyval.ival) = (yyvsp[(1) - (2)].ival) | (yyvsp[(2) - (2)].ival); }
     break;
 
   case 24:
-#line 231 "cola.y"
+#line 233 "cola.y"
     { (yyval.ival) = MOD_PUBLIC; }
     break;
 
   case 25:
-#line 233 "cola.y"
+#line 235 "cola.y"
     { (yyval.ival) = MOD_PRIVATE; }
     break;
 
   case 26:
-#line 235 "cola.y"
+#line 237 "cola.y"
     { (yyval.ival) = MOD_PROTECTED; }
     break;
 
   case 27:
-#line 237 "cola.y"
+#line 239 "cola.y"
     { (yyval.ival) = MOD_STATIC; }
     break;
 
   case 28:
-#line 239 "cola.y"
+#line 241 "cola.y"
     { (yyval.ival) = MOD_VIRTUAL; }
     break;
 
   case 29:
-#line 244 "cola.y"
+#line 246 "cola.y"
     { (yyval.ast) = (yyvsp[(2) - (3)].ast); }
     break;
 
   case 30:
-#line 249 "cola.y"
+#line 251 "cola.y"
     {
             /* Create a new namespace for class and put it in effect */
             Symbol * c;
@@ -1976,12 +1978,12 @@ yyreduce:
     break;
 
   case 31:
-#line 265 "cola.y"
+#line 267 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 32:
-#line 267 "cola.y"
+#line 269 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (2)].ast);
             unshift_ast(&((yyval.ast)), (yyvsp[(2) - (2)].ast));
@@ -1989,12 +1991,12 @@ yyreduce:
     break;
 
   case 35:
-#line 291 "cola.y"
+#line 293 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (2)].ast); }
     break;
 
   case 36:
-#line 293 "cola.y"
+#line 295 "cola.y"
     {
             (yyvsp[(3) - (6)].sym)->typename = (yyvsp[(2) - (6)].sym);
             (yyvsp[(3) - (6)].sym)->literal = (yyvsp[(5) - (6)].sym);
@@ -2002,7 +2004,7 @@ yyreduce:
             store_symbol(current_symbol_table, (yyvsp[(3) - (6)].sym));
             (yyval.ast) = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
             (yyval.ast)->typename = (yyvsp[(2) - (6)].sym);
-            if(lookup_symbol_in_tab(current_symbol_table, (yyval.ast)->sym->name)) {
+            if (lookup_symbol_in_tab(current_symbol_table, (yyval.ast)->sym->name)) {
                     printf("Warning: declaration of '%s' shadows previous instance.\n",
                             (yyval.ast)->sym->name);
             }
@@ -2010,14 +2012,14 @@ yyreduce:
     break;
 
   case 37:
-#line 309 "cola.y"
+#line 311 "cola.y"
     {
             AST * decl;
-            if((yyvsp[(1) - (2)].sym) == NULL) {
+            if ((yyvsp[(1) - (2)].sym) == NULL) {
                 printf("Internal compiler error: local_var_decl: type is NULL\n");
                 abort();
             }
-            for(decl=(yyvsp[(2) - (2)].ast); decl; decl = decl->next) {
+            for (decl=(yyvsp[(2) - (2)].ast); decl; decl = decl->next) {
 #if DEBUG
                 fprintf(stderr, "local_var: [%s] typename [%s]\n",
                         decl->arg1->sym->name, (yyvsp[(1) - (2)].sym)->name);
@@ -2029,14 +2031,14 @@ yyreduce:
     break;
 
   case 38:
-#line 328 "cola.y"
+#line 330 "cola.y"
     {
             AST * decl;
-            if((yyvsp[(2) - (4)].sym) == NULL) {
+            if ((yyvsp[(2) - (4)].sym) == NULL) {
                 printf("Internal compiler error: field_decl: type is NULL\n");
                 abort();
             }
-            for(decl=(yyvsp[(3) - (4)].ast); decl; decl = decl->next) {
+            for (decl=(yyvsp[(3) - (4)].ast); decl; decl = decl->next) {
 #if DEBUG
                 fprintf(stderr, "field: [%s] typename [%s]\n",
                         decl->arg1->sym->name, (yyvsp[(2) - (4)].sym)->name);
@@ -2048,7 +2050,7 @@ yyreduce:
     break;
 
   case 40:
-#line 348 "cola.y"
+#line 350 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (3)].ast);
             unshift_ast(&((yyval.ast)), (yyvsp[(3) - (3)].ast));
@@ -2056,7 +2058,7 @@ yyreduce:
     break;
 
   case 41:
-#line 356 "cola.y"
+#line 358 "cola.y"
     {
             AST * decl, * init;
             decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
@@ -2070,7 +2072,7 @@ yyreduce:
     break;
 
   case 42:
-#line 367 "cola.y"
+#line 369 "cola.y"
     {
             AST * decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
             decl->sym = (yyvsp[(1) - (1)].sym);
@@ -2082,7 +2084,7 @@ yyreduce:
     break;
 
   case 43:
-#line 379 "cola.y"
+#line 381 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (2)].ast);
             (yyval.ast)->Attr.Method.body = (yyvsp[(2) - (2)].ast);
@@ -2090,7 +2092,7 @@ yyreduce:
     break;
 
   case 44:
-#line 387 "cola.y"
+#line 389 "cola.y"
     {
             Symbol * param;
             (yyval.ast) = new_statement(ASTT_METHOD_DECL, NULL, NULL);
@@ -2103,9 +2105,9 @@ yyreduce:
              * We can store these at parse time.
              */
             store_symbol(current_symbol_table, (yyval.ast)->sym);
-            if((yyvsp[(1) - (6)].ival) & MOD_STATIC) {
-                if(!strcmp((yyvsp[(3) - (6)].sym)->name, "Main")) {
-                    if(main_method)
+            if ((yyvsp[(1) - (6)].ival) & MOD_STATIC) {
+                if (!strcmp((yyvsp[(3) - (6)].sym)->name, "Main")) {
+                    if (main_method)
                         fprintf(stderr,
                         "Warning: multiple definitions of a static Main()\n");
                     main_method = (yyvsp[(3) - (6)].sym);
@@ -2115,7 +2117,7 @@ yyreduce:
     break;
 
   case 45:
-#line 409 "cola.y"
+#line 411 "cola.y"
     {
             Symbol * param;
             (yyval.ast) = new_statement(ASTT_METHOD_DECL, NULL, NULL);
@@ -2128,9 +2130,9 @@ yyreduce:
              * We can store these at parse time.
              */
             store_symbol(current_symbol_table, (yyval.ast)->sym);
-            if((yyvsp[(1) - (6)].ival) & MOD_STATIC) {
-                if(!strcmp((yyvsp[(3) - (6)].sym)->name, "Main")) {
-                    if(main_method)
+            if ((yyvsp[(1) - (6)].ival) & MOD_STATIC) {
+                if (!strcmp((yyvsp[(3) - (6)].sym)->name, "Main")) {
+                    if (main_method)
                         fprintf(stderr,
                         "Warning: multiple definitions of a static Main()\n");
                     main_method = (yyvsp[(3) - (6)].sym);
@@ -2140,17 +2142,17 @@ yyreduce:
     break;
 
   case 46:
-#line 435 "cola.y"
+#line 437 "cola.y"
     { (yyval.sym) = NULL; }
     break;
 
   case 47:
-#line 437 "cola.y"
+#line 439 "cola.y"
     { (yyval.sym) = (yyvsp[(1) - (1)].sym); }
     break;
 
   case 49:
-#line 447 "cola.y"
+#line 449 "cola.y"
     {
             (yyval.sym) = (yyvsp[(1) - (3)].sym);
             tunshift_sym(&((yyval.sym)), (yyvsp[(3) - (3)].sym));
@@ -2158,7 +2160,7 @@ yyreduce:
     break;
 
   case 50:
-#line 455 "cola.y"
+#line 457 "cola.y"
     {
 #if DEBUG
             fprintf(stderr, " fixed_param <- type IDENTIFIER(%s)\n", (yyvsp[(2) - (2)].sym)->name);
@@ -2169,15 +2171,15 @@ yyreduce:
     break;
 
   case 51:
-#line 477 "cola.y"
+#line 479 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 52:
-#line 482 "cola.y"
+#line 484 "cola.y"
     {
             (yyval.ast) = (yyvsp[(3) - (4)].ast);
-            if((yyval.ast)) {
+            if ((yyval.ast)) {
                 (yyval.ast)->vars = pop_scope();
             }
             else {
@@ -2187,67 +2189,67 @@ yyreduce:
     break;
 
   case 53:
-#line 494 "cola.y"
+#line 496 "cola.y"
     { push_scope(); }
     break;
 
   case 54:
-#line 499 "cola.y"
+#line 501 "cola.y"
     {(yyval.ast) = (yyvsp[(1) - (1)].ast);}
     break;
 
   case 55:
-#line 501 "cola.y"
+#line 503 "cola.y"
     { fprintf(stderr, "##End of expr_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 56:
-#line 503 "cola.y"
+#line 505 "cola.y"
     { fprintf(stderr, "##End of selection_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 57:
-#line 505 "cola.y"
+#line 507 "cola.y"
     { fprintf(stderr, "##End of iteration_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 58:
-#line 507 "cola.y"
+#line 509 "cola.y"
     { fprintf(stderr, "##End of jump_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 59:
-#line 509 "cola.y"
+#line 511 "cola.y"
     { fprintf(stderr, "##End of return_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 60:
-#line 511 "cola.y"
+#line 513 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 62:
-#line 517 "cola.y"
+#line 519 "cola.y"
     { fprintf(stderr, "##End of decl_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 63:
-#line 519 "cola.y"
+#line 521 "cola.y"
     { fprintf(stderr, "##End of labeled_statement\n\n"); (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 64:
-#line 524 "cola.y"
+#line 526 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 65:
-#line 526 "cola.y"
+#line 528 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 66:
-#line 528 "cola.y"
+#line 530 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (2)].ast);
             unshift_ast(&((yyval.ast)), (yyvsp[(2) - (2)].ast));
@@ -2255,51 +2257,51 @@ yyreduce:
     break;
 
   case 67:
-#line 536 "cola.y"
+#line 538 "cola.y"
     { (yyval.ast) = (yyvsp[(3) - (3)].ast); (yyval.ast)->sym = (yyvsp[(1) - (3)].sym); }
     break;
 
   case 68:
-#line 541 "cola.y"
+#line 543 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (2)].ast); }
     break;
 
   case 69:
-#line 546 "cola.y"
+#line 548 "cola.y"
     { (yyval.ast) = new_statement(ASTT_BREAK, NULL, NULL); }
     break;
 
   case 70:
-#line 548 "cola.y"
+#line 550 "cola.y"
     { (yyval.ast) = new_statement(ASTT_CONTINUE, NULL, NULL); }
     break;
 
   case 71:
-#line 550 "cola.y"
+#line 552 "cola.y"
     {
             (yyval.ast) = NULL;
             printf("GOTO not supported yet.\n");
-            exit(EXIT_SUCCESS);
+            exit(0);
         }
     break;
 
   case 72:
-#line 559 "cola.y"
+#line 561 "cola.y"
     {    (yyval.ast) = new_statement(ASTT_RETURN, (yyvsp[(2) - (3)].ast), NULL); }
     break;
 
   case 73:
-#line 561 "cola.y"
+#line 563 "cola.y"
     {    (yyval.ast) = new_statement(ASTT_RETURN, NULL, NULL); }
     break;
 
   case 74:
-#line 566 "cola.y"
+#line 568 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 76:
-#line 572 "cola.y"
+#line 574 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (3)].ast);
             unshift_ast(&((yyval.ast)), (yyvsp[(3) - (3)].ast));
@@ -2307,59 +2309,59 @@ yyreduce:
     break;
 
   case 77:
-#line 579 "cola.y"
+#line 581 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
   case 78:
-#line 581 "cola.y"
+#line 583 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (1)].ast);   }
     break;
 
   case 79:
-#line 583 "cola.y"
-    { (yyval.ast) = NULL; }
-    break;
-
-  case 80:
 #line 585 "cola.y"
     { (yyval.ast) = NULL; }
     break;
 
+  case 80:
+#line 587 "cola.y"
+    { (yyval.ast) = NULL; }
+    break;
+
   case 82:
-#line 595 "cola.y"
+#line 597 "cola.y"
     {
             (yyval.ast) = new_if((yyvsp[(3) - (7)].ast), (yyvsp[(5) - (7)].ast), (yyvsp[(7) - (7)].ast));
         }
     break;
 
   case 83:
-#line 599 "cola.y"
+#line 601 "cola.y"
     {
             (yyval.ast) = new_if((yyvsp[(3) - (5)].ast), (yyvsp[(5) - (5)].ast), NULL);
         }
     break;
 
   case 86:
-#line 611 "cola.y"
+#line 613 "cola.y"
     {
             (yyval.ast) = new_while((yyvsp[(3) - (5)].ast), (yyvsp[(5) - (5)].ast));
         }
     break;
 
   case 87:
-#line 619 "cola.y"
+#line 621 "cola.y"
     {
-            if((yyvsp[(3) - (9)].ast) == NULL) {
+            if ((yyvsp[(3) - (9)].ast) == NULL) {
                 printf("for_statement: NULL init statement\n");
-                exit(EXIT_SUCCESS);
+                exit(0);
             }
             (yyval.ast) = new_for((yyvsp[(3) - (9)].ast), (yyvsp[(5) - (9)].ast), (yyvsp[(7) - (9)].ast), (yyvsp[(9) - (9)].ast));
         }
     break;
 
   case 88:
-#line 630 "cola.y"
+#line 632 "cola.y"
     {
             fprintf(stderr, "!TYPE[%s]\n", (yyvsp[(1) - (1)].sym)->name);
             (yyval.sym) = (yyvsp[(1) - (1)].sym);
@@ -2367,32 +2369,32 @@ yyreduce:
     break;
 
   case 91:
-#line 640 "cola.y"
+#line 642 "cola.y"
     { (yyval.sym) = new_type_symbol("bool"); }
     break;
 
   case 92:
-#line 642 "cola.y"
+#line 644 "cola.y"
     { (yyval.sym) = new_type_symbol("string"); }
     break;
 
   case 93:
-#line 644 "cola.y"
+#line 646 "cola.y"
     { (yyval.sym) = new_type_symbol("float"); }
     break;
 
   case 95:
-#line 650 "cola.y"
+#line 652 "cola.y"
     { (yyval.sym) = new_type_symbol("int"); }
     break;
 
   case 96:
-#line 652 "cola.y"
+#line 654 "cola.y"
     { (yyval.sym) = new_type_symbol("byte"); }
     break;
 
   case 97:
-#line 657 "cola.y"
+#line 659 "cola.y"
     {
             (yyval.sym) = symbol_concat((yyvsp[(1) - (2)].sym), (yyvsp[(2) - (2)].sym));
 #if DEBUG
@@ -2402,7 +2404,7 @@ yyreduce:
     break;
 
   case 98:
-#line 667 "cola.y"
+#line 669 "cola.y"
     {
             /* $1 is the dimension of the current rank */
             (yyval.sym) = (yyvsp[(1) - (1)].sym);
@@ -2413,19 +2415,19 @@ yyreduce:
     break;
 
   case 99:
-#line 675 "cola.y"
+#line 677 "cola.y"
     {
             (yyval.sym) = symbol_concat((yyvsp[(1) - (2)].sym), (yyvsp[(2) - (2)].sym));
         }
     break;
 
   case 106:
-#line 694 "cola.y"
+#line 696 "cola.y"
     {   (yyval.ast) = new_expr(ASTT_ASSIGN, (yyvsp[(1) - (3)].ast), (yyvsp[(3) - (3)].ast));   }
     break;
 
   case 107:
-#line 708 "cola.y"
+#line 710 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_PREINC, (yyvsp[(2) - (2)].ast), NULL);
             (yyval.ast)->op = INC;
@@ -2433,7 +2435,7 @@ yyreduce:
     break;
 
   case 108:
-#line 716 "cola.y"
+#line 718 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_PREINC, (yyvsp[(2) - (2)].ast), NULL);
             (yyval.ast)->op = DEC;
@@ -2441,7 +2443,7 @@ yyreduce:
     break;
 
   case 109:
-#line 724 "cola.y"
+#line 726 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_POSTINC, (yyvsp[(1) - (2)].ast), NULL);
             (yyval.ast)->op = INC;
@@ -2449,7 +2451,7 @@ yyreduce:
     break;
 
   case 110:
-#line 732 "cola.y"
+#line 734 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_POSTINC, (yyvsp[(1) - (2)].ast), NULL);
             (yyval.ast)->op = DEC;
@@ -2457,7 +2459,7 @@ yyreduce:
     break;
 
   case 111:
-#line 740 "cola.y"
+#line 742 "cola.y"
     {
             (yyval.ast) = (yyvsp[(1) - (1)].ast);
 #if DEBUG
@@ -2467,7 +2469,7 @@ yyreduce:
     break;
 
   case 114:
-#line 760 "cola.y"
+#line 762 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_LITERAL, NULL, NULL); (yyval.ast)->sym = (yyvsp[(1) - (1)].sym);
 #if DEBUG
@@ -2477,7 +2479,7 @@ yyreduce:
     break;
 
   case 115:
-#line 767 "cola.y"
+#line 769 "cola.y"
     {
             Symbol * orig;
             (yyval.ast) = new_expr(ASTT_IDENTIFIER, NULL, NULL);
@@ -2489,48 +2491,48 @@ yyreduce:
     break;
 
   case 116:
-#line 776 "cola.y"
+#line 778 "cola.y"
     {
             (yyval.ast) = (yyvsp[(2) - (3)].ast);
         }
     break;
 
   case 122:
-#line 785 "cola.y"
+#line 787 "cola.y"
     { (yyval.ast) = new_expr(ASTT_IDENTIFIER, NULL, NULL); (yyval.ast)->sym = (yyvsp[(1) - (1)].sym); }
     break;
 
   case 123:
-#line 790 "cola.y"
+#line 792 "cola.y"
     { (yyval.ast) = (yyvsp[(1) - (1)].ast); }
     break;
 
   case 124:
-#line 792 "cola.y"
+#line 794 "cola.y"
     { (yyval.ast) = (yyvsp[(2) - (2)].ast); (yyval.ast)->op = '+'; }
     break;
 
   case 125:
-#line 794 "cola.y"
+#line 796 "cola.y"
     { (yyval.ast) = (yyvsp[(2) - (2)].ast); (yyval.ast)->op = '-'; }
     break;
 
   case 126:
-#line 796 "cola.y"
+#line 798 "cola.y"
     { (yyval.ast) = (yyvsp[(2) - (2)].ast); (yyval.ast)->op = '!'; }
     break;
 
   case 127:
-#line 798 "cola.y"
+#line 800 "cola.y"
     { (yyval.ast) = (yyvsp[(2) - (2)].ast); (yyval.ast)->op = '~'; }
     break;
 
   case 130:
-#line 805 "cola.y"
+#line 807 "cola.y"
     {
-            if((yyvsp[(1) - (4)].ast)->asttype != ASTT_IDENTIFIER) {
+            if ((yyvsp[(1) - (4)].ast)->asttype != ASTT_IDENTIFIER) {
                 fprintf(stderr, "Error (line %d), method call must be a simple name or member access.\n", line);
-                exit(EXIT_SUCCESS);
+                exit(0);
             }
             (yyval.ast) = new_expr(ASTT_METHOD_CALL, (yyvsp[(1) - (4)].ast), (yyvsp[(3) - (4)].ast));
 #if DEBUG
@@ -2540,7 +2542,7 @@ yyreduce:
     break;
 
   case 131:
-#line 819 "cola.y"
+#line 821 "cola.y"
     { (yyval.sym) = (yyvsp[(1) - (1)].sym);
 #if DEBUG
             fprintf(stderr, " member_access <- qualified_name\n");
@@ -2549,7 +2551,7 @@ yyreduce:
     break;
 
   case 132:
-#line 828 "cola.y"
+#line 830 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_INDEX, (yyvsp[(1) - (4)].ast), (yyvsp[(3) - (4)].ast));
             (yyval.ast)->op = INDEX;
@@ -2560,7 +2562,7 @@ yyreduce:
     break;
 
   case 134:
-#line 847 "cola.y"
+#line 849 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_NEW_OBJECT, (yyvsp[(4) - (5)].ast), NULL);
             /* $2 is a Symbol of a typename, will resolve to a real type
@@ -2571,42 +2573,42 @@ yyreduce:
     break;
 
   case 136:
-#line 859 "cola.y"
+#line 861 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '*', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 137:
-#line 863 "cola.y"
+#line 865 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '/', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 138:
-#line 867 "cola.y"
+#line 869 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '%', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 140:
-#line 875 "cola.y"
+#line 877 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '+', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 141:
-#line 879 "cola.y"
+#line 881 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '-', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 143:
-#line 887 "cola.y"
+#line 889 "cola.y"
     {
         /* Ternary is just a if/then/else statement which can return a value */
         (yyval.ast) = new_conditional((yyvsp[(1) - (5)].ast), (yyvsp[(3) - (5)].ast), (yyvsp[(5) - (5)].ast));
@@ -2614,62 +2616,62 @@ yyreduce:
     break;
 
   case 145:
-#line 896 "cola.y"
+#line 898 "cola.y"
     {
         (yyval.ast) = new_logical_expr((yyvsp[(1) - (3)].ast), LOGICAL_AND, (yyvsp[(3) - (3)].ast));
     }
     break;
 
   case 147:
-#line 904 "cola.y"
+#line 906 "cola.y"
     {
         (yyval.ast) = new_logical_expr((yyvsp[(1) - (3)].ast), LOGICAL_OR, (yyvsp[(3) - (3)].ast));
     }
     break;
 
   case 149:
-#line 912 "cola.y"
+#line 914 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '&', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 151:
-#line 920 "cola.y"
+#line 922 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '~', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 153:
-#line 928 "cola.y"
+#line 930 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), '|', (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 154:
-#line 935 "cola.y"
+#line 937 "cola.y"
     {(yyval.ival) = '<';}
     break;
 
   case 155:
-#line 937 "cola.y"
+#line 939 "cola.y"
     {(yyval.ival) = '>';}
     break;
 
   case 156:
-#line 939 "cola.y"
+#line 941 "cola.y"
     {(yyval.ival) = LOGICAL_LTE;}
     break;
 
   case 157:
-#line 941 "cola.y"
+#line 943 "cola.y"
     {(yyval.ival) = LOGICAL_GTE;}
     break;
 
   case 159:
-#line 947 "cola.y"
+#line 949 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_COMPARISON, (yyvsp[(1) - (3)].ast), (yyvsp[(3) - (3)].ast));
             (yyval.ast)->op = (yyvsp[(2) - (3)].ival);
@@ -2677,7 +2679,7 @@ yyreduce:
     break;
 
   case 161:
-#line 956 "cola.y"
+#line 958 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_COMPARISON, (yyvsp[(1) - (3)].ast), (yyvsp[(3) - (3)].ast));
             (yyval.ast)->op = LOGICAL_EQ;
@@ -2685,7 +2687,7 @@ yyreduce:
     break;
 
   case 162:
-#line 961 "cola.y"
+#line 963 "cola.y"
     {
             (yyval.ast) = new_expr(ASTT_COMPARISON, (yyvsp[(1) - (3)].ast), (yyvsp[(3) - (3)].ast));
             (yyval.ast)->op = LOGICAL_NE;
@@ -2693,14 +2695,14 @@ yyreduce:
     break;
 
   case 164:
-#line 970 "cola.y"
+#line 972 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), LEFT_SHIFT, (yyvsp[(3) - (3)].ast));
         }
     break;
 
   case 165:
-#line 974 "cola.y"
+#line 976 "cola.y"
     {
             (yyval.ast) = new_op_expr((yyvsp[(1) - (3)].ast), RIGHT_SHIFT, (yyvsp[(3) - (3)].ast));
         }
@@ -2708,7 +2710,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 2712 "parser.c"
+#line 2714 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2922,7 +2924,7 @@ yyreturn:
 }
 
 
-#line 980 "cola.y"
+#line 982 "cola.y"
 
 
 
@@ -2934,15 +2936,15 @@ int main(int argc, char * argv[])
 {
     fprintf(stderr, "Cola - Copyright (C) 2002 Melvin Smith <melvins@us.ibm.com>\n");
     fprintf(stderr, "colac version %s\n\n", COLA_VERSION);
-    if(argc > 1) {
-        if(!(yyin = fopen(argv[1], "r")))    {
-            printf( "Error reading source file %s.\n", argv[1] );
-            exit(EXIT_SUCCESS);
+    if (argc > 1) {
+        if (!(yyin = fopen(argv[1], "r")))    {
+            printf("Error reading source file %s.\n", argv[1]);
+            exit(0);
         }
     }
     else {
-        printf( "No source file specified.\n" );
-        exit(EXIT_SUCCESS);
+        printf("No source file specified.\n");
+        exit(0);
     }
 
     line = 1;
@@ -2978,7 +2980,7 @@ int main(int argc, char * argv[])
     freopen("a.pir", "w", stdout);
     fprintf(stderr, "Compiling intermediate code to a.pir\n");
 /*
-    printf( "#Dump of global namespace:\n" );
+    printf("#Dump of global namespace:\n");
     indent = 0;
     dump_namespace(current_namespace);
 */
@@ -2986,7 +2988,7 @@ int main(int argc, char * argv[])
 
     fprintf(stderr, "Pass 4: Code generation...\n");
 
-    if(ast_start) {
+    if (ast_start) {
         gen_ast(ast_start);
     }
 
@@ -3006,9 +3008,9 @@ int yyerror(char * s)
 /*
     fprintf(stderr, "last token = [%s]\n", yylval.sym->name);
 */
-    fprintf(stderr, "(error) line %ld: %s\n", line, s );
-    fprintf(stderr, "Didn't create output asm.\n" );
-    exit(EXIT_SUCCESS);
+    fprintf(stderr, "(error) line %ld: %s\n", line, s);
+    fprintf(stderr, "Didn't create output asm.\n");
+    exit(0);
 }
 
 
@@ -3018,5 +3020,4 @@ int yyerror(char * s)
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
 
