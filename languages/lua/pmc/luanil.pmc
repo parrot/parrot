@@ -49,7 +49,7 @@ Allow :
 =cut
 
 */
-    PMC* new_from_string (STRING *rep, INTVAL flags) {
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
@@ -68,7 +68,7 @@ Return the string "nil".
 =cut
 
 */
-    STRING* name () {
+    STRING* name() {
         return const_string(INTERP, "nil");
     }
 
@@ -81,7 +81,7 @@ Creates and returns a clone of the scalar.
 =cut
 
 */
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
@@ -89,14 +89,14 @@ Creates and returns a clone of the scalar.
 
 /*
 
-=item C<STRING* get_string ()>
+=item C<STRING* get_string()>
 
 Return the string "nil".
 
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return const_string(INTERP, "nil");
     }
 
@@ -109,7 +109,7 @@ Return always C<false>.
 =cut
 
 */
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return (INTVAL)0;
     }
 
@@ -134,12 +134,12 @@ Return always C<false>.
 
 =over 4
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_LuaNil: {
             return (INTVAL)1;
         }
@@ -156,12 +156,12 @@ MMD_DEFAULT: {
 
 =over 4
 
-=item C<PMC* rawequal (PMC* value)>
+=item C<PMC* rawequal(PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal (PMC* value) {
+    METHOD PMC* rawequal(PMC* value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (PMC_type(SELF) == PMC_type(value))
             PMC_int_val(retval) = 1;

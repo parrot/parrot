@@ -82,7 +82,7 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
 ** returns the `main' position of an element in a table (that is, the index
 ** of its hash value)
 */
-static Node *mainposition (PARROT_INTERP, const Hash *t, const PMC *key)
+static Node *mainposition(PARROT_INTERP, const Hash *t, const PMC *key)
 {
     unsigned long h;
     if (PMC_type(key) == dynpmc_LuaNil) {
@@ -218,7 +218,7 @@ static void setnodevector(PARROT_INTERP, Hash *t, int size)
     t->firstfree = &t->node[size-1];  /* first free position to be used */
 }
 
-static int numuse (const Hash *t) {
+static int numuse(const Hash *t) {
     Node *v = t->node;
     int size = t->size;
     int realuse = 0;
@@ -230,7 +230,7 @@ static int numuse (const Hash *t) {
     return realuse;
 }
 
-static void rehash (PARROT_INTERP, Hash *t)
+static void rehash(PARROT_INTERP, Hash *t)
 {
     int oldsize = t->size;
     Node *nold = t->node;
@@ -306,7 +306,7 @@ Initializes the instance.
 =cut
 
 */
-    void init () {
+    void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -322,7 +322,7 @@ Marks the hash as live.
 =cut
 
 */
-    void mark () {
+    void mark() {
         STRING* mode = NULL;
         PMC* meta = PMC_metadata(SELF);
         if (meta) {
@@ -352,7 +352,7 @@ Free hash structure.
 =cut
 
 */
-    void destroy () {
+    void destroy() {
         if (PMC_struct_val(SELF)) {
             lua_destroy_table(INTERP, PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
@@ -368,7 +368,7 @@ Return the string "table".
 =cut
 
 */
-    STRING* name () {
+    STRING* name() {
         return const_string(INTERP, "table");
     }
 
@@ -399,7 +399,7 @@ therefore only clone the reference to themselves, not make a deep copy.
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
     }
 
@@ -424,7 +424,7 @@ C<table> accessor.
 =cut
 
 */
-    PMC* get_pmc_keyed (PMC* key) {
+    PMC* get_pmc_keyed(PMC* key) {
         PMC* value = NULL;
         PMC** pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
         if (pvalue == NULL) {
@@ -450,14 +450,14 @@ C<table> accessor.
 
 /*
 
-=item C<void set_pmc_keyed (PMC* key, PMC* value)>
+=item C<void set_pmc_keyed(PMC* key, PMC* value)>
 
 C<table> mutator.
 
 =cut
 
 */
-    void set_pmc_keyed (PMC* key, PMC* value) {
+    void set_pmc_keyed(PMC* key, PMC* value) {
         if (NULL == lua_get(INTERP, PMC_struct_val(SELF), key)) {
             PMC* meth = find_meth(INTERP, SELF, "__newindex");
             if (meth != NULL) {
@@ -491,7 +491,7 @@ Returns the number of elements in the table.
 =cut
 
 */
-    INTVAL elements () {
+    INTVAL elements() {
         return numuse(PMC_struct_val(SELF));
     }
 
@@ -503,14 +503,14 @@ Returns the number of elements in the table.
 
 =over 4
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 The C<==> operation. Compares reference (not in depth).
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_LuaTable: {
             PMC* meth = find_meth(INTERP, SELF, "__eq");
             if (meth != NULL) {
@@ -533,12 +533,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<INTVAL cmp (PMC *value)>
+=item C<INTVAL cmp(PMC *value)>
 
 =cut
 
 */
-    INTVAL cmp (PMC* value) {
+    INTVAL cmp(PMC* value) {
 MMD_LuaTable: {
 #if 0
             PMC* meth = find_meth(INTERP, SELF, "__cmp");
@@ -627,7 +627,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    METHOD PMC* len () {
+    METHOD PMC* len() {
         PMC** pvalue;
         PMC* key = pmc_new(INTERP, dynpmc_LuaNumber);
         INTVAL idx = 1;
@@ -649,7 +649,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    METHOD PMC* next (PMC* index) {
+    METHOD PMC* next(PMC* index) {
         Node* n = lua_next(INTERP, PMC_struct_val(SELF), index);
         if (NULL == n) {
             return pmc_new(INTERP, dynpmc_LuaNil);
@@ -665,12 +665,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* rawequal (PMC* value)>
+=item C<PMC* rawequal(PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal (PMC* value) {
+    METHOD PMC* rawequal(PMC* value) {
         PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         PMC_int_val(retval) = (SELF == value) ? 1 : 0;
         return retval;
@@ -678,12 +678,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* rawget (PMC* key)>
+=item C<PMC* rawget(PMC* key)>
 
 =cut
 
 */
-    METHOD PMC* rawget (PMC* key) {
+    METHOD PMC* rawget(PMC* key) {
         PMC** pvalue = lua_get(INTERP, PMC_struct_val(SELF), key);
         if (NULL == pvalue || NULL == *pvalue)
             return pmc_new(INTERP, dynpmc_LuaNil);
@@ -692,12 +692,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<void rawset (PMC* key, PMC* value)>
+=item C<void rawset(PMC* key, PMC* value)>
 
 =cut
 
 */
-    METHOD void rawset (PMC* key, PMC* value) {
+    METHOD void rawset(PMC* key, PMC* value) {
         if (dynpmc_LuaNil == PMC_type(value)) {
             value = NULL;
         }

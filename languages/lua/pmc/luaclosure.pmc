@@ -43,8 +43,8 @@ pmclass LuaClosure
 =cut
 
 */
-    void init_pmc (PMC* sub) {
-        if ( VTABLE_isa(INTERP, sub, const_string(INTERP, "Closure")) ) {
+    void init_pmc(PMC* sub) {
+        if (VTABLE_isa(INTERP, sub, const_string(INTERP, "Closure"))) {
             PMC_struct_val(SELF) = mem_allocate_typed(struct Parrot_sub);
             PMC_pmc_val(SELF)    = PMCNULL;
             PMC_metadata(SELF)   = PMCNULL;
@@ -82,7 +82,7 @@ Return the string "function".
 =cut
 
 */
-    STRING* name () {
+    STRING* name() {
         return const_string(INTERP, "function");
     }
 
@@ -106,7 +106,7 @@ Return the string "function".
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "function: %08X", SELF);
     }
 
@@ -124,12 +124,12 @@ Return the string "function".
 
 /*
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_LuaClosure: {
             return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
                 && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg;
@@ -162,16 +162,16 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* rawequal (PMC* value)>
+=item C<PMC* rawequal(PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal (PMC* value) {
+    METHOD PMC* rawequal(PMC* value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if ( PMC_type(SELF) == PMC_type(value)
+        if (PMC_type(SELF) == PMC_type(value)
          && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-         && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg )
+         && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg)
             PMC_int_val(retval) = 1;
         else
             PMC_int_val(retval) = 0;

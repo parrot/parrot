@@ -43,7 +43,7 @@ Initializes the Boolean with a default value of C<false>.
 =cut
 
 */
-    void init () {
+    void init() {
         PMC_int_val(SELF) = 0;
     }
 
@@ -56,7 +56,7 @@ Class method to construct an Boolean from the string representation C<rep>.
 =cut
 
 */
-    PMC* new_from_string (STRING *rep, INTVAL flags) {
+    PMC* new_from_string(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
@@ -76,7 +76,7 @@ Return the string "boolean".
 =cut
 
 */
-    STRING* name () {
+    STRING* name() {
         return const_string(INTERP, "boolean");
     }
 
@@ -89,7 +89,7 @@ Creates and returns a clone of the scalar.
 =cut
 
 */
-    PMC* clone () {
+    PMC* clone() {
         PMC* dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
@@ -104,20 +104,20 @@ Returns the integer value of the Boolean.
 =cut
 
 */
-    INTVAL get_integer () {
+    INTVAL get_integer() {
         return PMC_int_val(SELF);
     }
 
 /*
 
-=item C<STRING* get_string ()>
+=item C<STRING* get_string()>
 
 Return the string "true" or "false".
 
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         if (PMC_int_val(SELF))
             return const_string(INTERP, "true");
         else
@@ -127,31 +127,31 @@ Return the string "true" or "false".
 
 /*
 
-=item C<INTVAL get_bool ()>
+=item C<INTVAL get_bool()>
 
 Returns the boolean value of the Boolean.
 
 =cut
 
 */
-    INTVAL get_bool () {
+    INTVAL get_bool() {
         return PMC_int_val(SELF) ? 1 : 0;
     }
 
 /*
 
-=item C<void set_integer_native (INTVAL value)>
+=item C<void set_integer_native(INTVAL value)>
 
-=item C<void set_bool (INTVAL value)>
+=item C<void set_bool(INTVAL value)>
 
 =cut
 
 */
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
-    void set_bool (INTVAL value) {
+    void set_bool(INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
@@ -177,7 +177,7 @@ Used to archive the boolean.
 =cut
 
 */
-    void freeze (visit_info *info) {
+    void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
@@ -192,7 +192,7 @@ Used to unarchive the boolean.
 =cut
 
 */
-    void thaw (visit_info *info) {
+    void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
@@ -207,12 +207,12 @@ Used to unarchive the boolean.
 
 =over 4
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_LuaBoolean: {
             return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
         }
@@ -229,12 +229,12 @@ MMD_DEFAULT: {
 
 =over 4
 
-=item C<PMC* rawequal (PMC* value)>
+=item C<PMC* rawequal(PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal (PMC* value) {
+    METHOD PMC* rawequal(PMC* value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (PMC_type(SELF) == PMC_type(value)
          && PMC_int_val(SELF) == PMC_int_val(value))

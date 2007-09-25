@@ -39,7 +39,7 @@ Initializes the userdata.
 =cut
 
 */
-    void init () {
+    void init() {
         PMC_pmc_val(SELF) = NULL;
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -54,7 +54,7 @@ Marks the userdata as live.
 =cut
 
 */
-    void mark () {
+    void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
         if (PMC_metadata(SELF))
@@ -70,7 +70,7 @@ Call finalizer and free the userdata.
 =cut
 
 */
-    void destroy () {
+    void destroy() {
         PMC* meth = find_meth(INTERP, SELF, "__gc");
         if (meth != NULL) {
             (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
@@ -87,7 +87,7 @@ Call finalizer and free the userdata.
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "userdata: %08X", SELF);
     }
 
@@ -100,7 +100,7 @@ Return the string "userdata".
 =cut
 
 */
-    STRING* name () {
+    STRING* name() {
         return const_string(INTERP, "userdata");
     }
 
@@ -157,14 +157,14 @@ Return the string "userdata".
 
 =over 4
 
-=item C<INTVAL is_equal (PMC* value)>
+=item C<INTVAL is_equal(PMC* value)>
 
 The C<==> operation. Compares reference (not in depth).
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_LuaUserdata: {
             PMC *meth = find_meth(INTERP, SELF, "__eq");
             if (meth != NULL) {
@@ -187,12 +187,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<INTVAL cmp (PMC *value)>
+=item C<INTVAL cmp(PMC *value)>
 
 =cut
 
 */
-    INTVAL cmp (PMC* value) {
+    INTVAL cmp(PMC* value) {
 MMD_LuaUserdata: {
             real_exception(INTERP, NULL, ILL_INHERIT,
                     "attempt to compare two userdata values");
@@ -228,12 +228,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* rawequal (PMC* value)>
+=item C<PMC* rawequal(PMC* value)>
 
 =cut
 
 */
-    METHOD PMC* rawequal (PMC* value) {
+    METHOD PMC* rawequal(PMC* value) {
         PMC* retval = pmc_new(INTERP, dynpmc_LuaBoolean);
         if (PMC_type(SELF) == PMC_type(value)
          && SELF == value)
