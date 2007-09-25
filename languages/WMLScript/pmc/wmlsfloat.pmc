@@ -74,7 +74,7 @@ pmclass WmlsFloat
 =cut
 
 */
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         PMC_num_val(SELF) = (FLOATVAL)value;
     }
 
@@ -82,18 +82,18 @@ pmclass WmlsFloat
 
 =item C<PMC* neg(PMC *dest)>
 
-=item C<void i_neg ()>
+=item C<void i_neg()>
 
 =cut
 
 */
-    PMC* neg (PMC* dest) {
+    PMC* neg(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsFloat);
         PMC_num_val(dest) = - DYNSELF.get_number();
         return dest;
     }
 
-    void i_neg () {
+    void i_neg() {
         FLOATVAL result = - DYNSELF.get_number();
         DYNSELF.set_number_native(result);
     }
@@ -102,16 +102,16 @@ pmclass WmlsFloat
 
 =item C<PMC* bitwise_not(PMC *dest)>
 
-=item C<void i_bitwise_not ()>
+=item C<void i_bitwise_not()>
 
 =cut
 
 */
-    PMC* bitwise_not (PMC* dest) {
+    PMC* bitwise_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_not () {
+    void i_bitwise_not() {
         DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -119,18 +119,18 @@ pmclass WmlsFloat
 
 =item C<PMC* logical_not(PMC *dest)>
 
-=item C<void i_logical_not ()>
+=item C<void i_logical_not()>
 
 =cut
 
 */
-    PMC* logical_not (PMC* dest) {
+    PMC* logical_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
         VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
         return dest;
     }
 
-    void i_logical_not () {
+    void i_logical_not() {
         INTVAL result = ! DYNSELF.get_bool();
         DYNSELF.morph(dynpmc_WmlsBoolean);
         DYNSELF.set_integer_native(result);
@@ -151,7 +151,7 @@ pmclass WmlsFloat
 =cut
 
 */
-    PMC* add (PMC* value, PMC* dest) {
+    PMC* add(PMC* value, PMC* dest) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             + VTABLE_get_number(INTERP, value);
@@ -186,7 +186,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_add (PMC* value) {
+    void i_add(PMC* value) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             + VTABLE_get_number(INTERP, value);
@@ -223,7 +223,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* subtract (PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             - VTABLE_get_number(INTERP, value);
@@ -261,7 +261,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_subtract (PMC* value) {
+    void i_subtract(PMC* value) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             - VTABLE_get_number(INTERP, value);
@@ -302,7 +302,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* multiply (PMC* value, PMC* dest) {
+    PMC* multiply(PMC* value, PMC* dest) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             * VTABLE_get_number(INTERP, value);
@@ -340,7 +340,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_multiply (PMC* value) {
+    void i_multiply(PMC* value) {
 MMD_WmlsFloat: {
             FLOATVAL result = DYNSELF.get_number()
                             * VTABLE_get_number(INTERP, value);
@@ -381,7 +381,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* divide (PMC* value, PMC* dest) {
+    PMC* divide(PMC* value, PMC* dest) {
 MMD_WmlsFloat: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
             if (d != 0.0) {
@@ -430,7 +430,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_divide (PMC* value) {
+    void i_divide(PMC* value) {
 MMD_WmlsFloat: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
             if (d != 0.0) {
@@ -491,11 +491,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* floor_divide (PMC* value, PMC* dest) {
+    PMC* floor_divide(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_floor_divide (PMC* value) {
+    void i_floor_divide(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -508,11 +508,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* cmodulus (PMC* value, PMC* dest) {
+    PMC* cmodulus(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_cmodulus (PMC* value) {
+    void i_cmodulus(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -525,11 +525,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_or (PMC* value, PMC* dest) {
+    PMC* bitwise_or(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_or (PMC* value) {
+    void i_bitwise_or(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -542,11 +542,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_and (PMC* value, PMC* dest) {
+    PMC* bitwise_and(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_and (PMC* value) {
+    void i_bitwise_and(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -559,11 +559,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_xor (PMC* value, PMC* dest) {
+    PMC* bitwise_xor(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_xor (PMC* value) {
+    void i_bitwise_xor(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -576,11 +576,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shr (PMC* value, PMC* dest) {
+    PMC* bitwise_shr(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shr (PMC* value) {
+    void i_bitwise_shr(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -593,11 +593,11 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+    PMC* bitwise_lsr(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_lsr (PMC* value) {
+    void i_bitwise_lsr(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -610,22 +610,22 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shl (PMC* value, PMC* dest) {
+    PMC* bitwise_shl(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shl (PMC* value) {
+    void i_bitwise_shl(PMC* value) {
             DYNSELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
 
-=item C<PMC* is_equal (PMC* value)>
+=item C<PMC* is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_WmlsFloat: {
             return DYNSELF.get_number() == VTABLE_get_number(INTERP, value);
         }
@@ -646,12 +646,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* cmp (PMC *value)>
+=item C<PMC* cmp(PMC *value)>
 
 =cut
 
 */
-    INTVAL cmp (PMC* value) {
+    INTVAL cmp(PMC* value) {
 MMD_WmlsFloat: {
             return num_cmp(DYNSELF.get_number(),
                            VTABLE_get_number(INTERP, value));

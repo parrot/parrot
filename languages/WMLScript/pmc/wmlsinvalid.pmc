@@ -52,20 +52,20 @@ pmclass WmlsInvalid
 =cut
 
 */
-    PMC* clone () {
+    PMC* clone() {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
 /*
 
-=item C<STRING* get_string ()>
+=item C<STRING* get_string()>
 
 Return the string "invalid".
 
 =cut
 
 */
-    STRING* get_string () {
+    STRING* get_string() {
         return const_string(INTERP, "invalid");
     }
 
@@ -76,18 +76,18 @@ Return the string "invalid".
 =cut
 
 */
-    void increment () {
+    void increment() {
         return;
     }
 
 /*
 
-=item C<void decrement ()>
+=item C<void decrement()>
 
 =cut
 
 */
-    void decrement () {
+    void decrement() {
         return;
     }
 
@@ -95,16 +95,16 @@ Return the string "invalid".
 
 =item C<PMC* absolute(PMC *dest)>
 
-=item C<void i_absolute ()>
+=item C<void i_absolute()>
 
 =cut
 
 */
-    PMC* absolute (PMC* dest) {
+    PMC* absolute(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_absolute () {
+    void i_absolute() {
         return;
     }
 
@@ -112,16 +112,16 @@ Return the string "invalid".
 
 =item C<PMC* neg(PMC *dest)>
 
-=item C<void i_neg ()>
+=item C<void i_neg()>
 
 =cut
 
 */
-    PMC* neg (PMC* dest) {
+    PMC* neg(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_neg () {
+    void i_neg() {
         return;
     }
 
@@ -129,16 +129,16 @@ Return the string "invalid".
 
 =item C<PMC* bitwise_not(PMC *dest)>
 
-=item C<void i_bitwise_not ()>
+=item C<void i_bitwise_not()>
 
 =cut
 
 */
-    PMC* bitwise_not (PMC* dest) {
+    PMC* bitwise_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_not () {
+    void i_bitwise_not() {
         return;
     }
 
@@ -146,16 +146,16 @@ Return the string "invalid".
 
 =item C<PMC* logical_not(PMC *dest)>
 
-=item C<void i_logical_not ()>
+=item C<void i_logical_not()>
 
 =cut
 
 */
-    PMC* logical_not (PMC* dest) {
+    PMC* logical_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_logical_not () {
+    void i_logical_not() {
         return;
     }
 
@@ -174,11 +174,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* add (PMC* value, PMC* dest) {
+    PMC* add(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_add (PMC* value) {
+    void i_add(PMC* value) {
             return;
     }
 
@@ -191,11 +191,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* subtract (PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_subtract (PMC* value) {
+    void i_subtract(PMC* value) {
             return;
     }
 
@@ -208,11 +208,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* multiply (PMC* value, PMC* dest) {
+    PMC* multiply(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_multiply (PMC* value) {
+    void i_multiply(PMC* value) {
             return;
     }
 
@@ -225,11 +225,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* divide (PMC* value, PMC* dest) {
+    PMC* divide(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_divide (PMC* value) {
+    void i_divide(PMC* value) {
             return;
     }
 
@@ -242,11 +242,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* floor_divide (PMC* value, PMC* dest) {
+    PMC* floor_divide(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_floor_divide (PMC* value) {
+    void i_floor_divide(PMC* value) {
             return;
     }
 
@@ -259,11 +259,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* cmodulus (PMC* value, PMC* dest) {
+    PMC* cmodulus(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_cmodulus (PMC* value) {
+    void i_cmodulus(PMC* value) {
             return;
     }
 
@@ -276,11 +276,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_or (PMC* value, PMC* dest) {
+    PMC* bitwise_or(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_or (PMC* value) {
+    void i_bitwise_or(PMC* value) {
             return;
     }
 
@@ -293,11 +293,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_and (PMC* value, PMC* dest) {
+    PMC* bitwise_and(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_and (PMC* value) {
+    void i_bitwise_and(PMC* value) {
             return;
     }
 
@@ -310,11 +310,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_xor (PMC* value, PMC* dest) {
+    PMC* bitwise_xor(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_xor (PMC* value) {
+    void i_bitwise_xor(PMC* value) {
             return;
     }
 
@@ -327,11 +327,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_shr (PMC* value, PMC* dest) {
+    PMC* bitwise_shr(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shr (PMC* value) {
+    void i_bitwise_shr(PMC* value) {
             return;
     }
 
@@ -344,11 +344,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+    PMC* bitwise_lsr(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_lsr (PMC* value) {
+    void i_bitwise_lsr(PMC* value) {
             return;
     }
 
@@ -361,33 +361,33 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_shl (PMC* value, PMC* dest) {
+    PMC* bitwise_shl(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shl (PMC* value) {
+    void i_bitwise_shl(PMC* value) {
             return;
     }
 
 /*
 
-=item C<PMC* is_equal (PMC* value)>
+=item C<PMC* is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
             return 4;
     }
 
 /*
 
-=item C<PMC* cmp (PMC *value)>
+=item C<PMC* cmp(PMC *value)>
 
 =cut
 
 */
-    INTVAL cmp (PMC* value) {
+    INTVAL cmp(PMC* value) {
             return 4;
     }
 

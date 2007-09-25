@@ -23,7 +23,7 @@ pmclass RubyString
         hll Ruby
         maps String
 {
-    void class_init () {
+    void class_init() {
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;
         if (pass) {
@@ -44,7 +44,7 @@ pmclass RubyString
         }
     }
 
-    INTVAL get_bool () {
+    INTVAL get_bool() {
 
         STRING* s = (STRING*) PMC_str_val(SELF);
         if (!string_compare(INTERP,s,true)) {

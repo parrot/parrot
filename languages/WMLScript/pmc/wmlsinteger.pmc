@@ -84,18 +84,18 @@ pmclass WmlsInteger
 
 =item C<PMC* neg(PMC *dest)>
 
-=item C<void i_neg ()>
+=item C<void i_neg()>
 
 =cut
 
 */
-    PMC* neg (PMC* dest) {
+    PMC* neg(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
         PMC_int_val(dest) = - DYNSELF.get_integer();
         return dest;
     }
 
-    void i_neg () {
+    void i_neg() {
         INTVAL result = - DYNSELF.get_integer();
         DYNSELF.set_integer_native(result);
     }
@@ -104,18 +104,18 @@ pmclass WmlsInteger
 
 =item C<PMC* bitwise_not(PMC *dest)>
 
-=item C<void i_bitwise_not ()>
+=item C<void i_bitwise_not()>
 
 =cut
 
 */
-    PMC* bitwise_not (PMC* dest) {
+    PMC* bitwise_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
         PMC_int_val(dest) = ~ DYNSELF.get_integer();
         return dest;
     }
 
-    void i_bitwise_not () {
+    void i_bitwise_not() {
         INTVAL result = ~ DYNSELF.get_integer();
         DYNSELF.set_integer_native(result);
     }
@@ -124,18 +124,18 @@ pmclass WmlsInteger
 
 =item C<PMC* logical_not(PMC *dest)>
 
-=item C<void i_logical_not ()>
+=item C<void i_logical_not()>
 
 =cut
 
 */
-    PMC* logical_not (PMC* dest) {
+    PMC* logical_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
         VTABLE_set_bool(INTERP, dest, ! DYNSELF.get_bool());
         return dest;
     }
 
-    void i_logical_not () {
+    void i_logical_not() {
         INTVAL result = ! DYNSELF.get_bool();
         DYNSELF.morph(dynpmc_WmlsBoolean);
         DYNSELF.set_integer_native(result);
@@ -156,7 +156,7 @@ pmclass WmlsInteger
 =cut
 
 */
-    PMC* add (PMC* value, PMC* dest) {
+    PMC* add(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           + VTABLE_get_integer(INTERP, value);
@@ -191,7 +191,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_add (PMC* value) {
+    void i_add(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           + VTABLE_get_integer(INTERP, value);
@@ -229,7 +229,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* subtract (PMC* value, PMC* dest) {
+    PMC* subtract(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           - VTABLE_get_integer(INTERP, value);
@@ -267,7 +267,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_subtract (PMC* value) {
+    void i_subtract(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           - VTABLE_get_integer(INTERP, value);
@@ -309,7 +309,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* multiply (PMC* value, PMC* dest) {
+    PMC* multiply(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           * VTABLE_get_integer(INTERP, value);
@@ -347,7 +347,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_multiply (PMC* value) {
+    void i_multiply(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           * VTABLE_get_integer(INTERP, value);
@@ -389,7 +389,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* divide (PMC* value, PMC* dest) {
+    PMC* divide(PMC* value, PMC* dest) {
 MMD_WmlsFloat: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
             if (d != 0.0) {
@@ -438,7 +438,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_divide (PMC* value) {
+    void i_divide(PMC* value) {
 MMD_WmlsFloat: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
             if (d != 0.0) {
@@ -503,7 +503,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* floor_divide (PMC* value, PMC* dest) {
+    PMC* floor_divide(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL d = VTABLE_get_integer(INTERP, value);
             if (d != 0) {
@@ -542,7 +542,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_floor_divide (PMC* value) {
+    void i_floor_divide(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL d = VTABLE_get_integer(INTERP, value);
             if (d != 0) {
@@ -593,7 +593,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* cmodulus (PMC* value, PMC* dest) {
+    PMC* cmodulus(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL d = VTABLE_get_integer(INTERP, value);
             if (d != 0) {
@@ -632,7 +632,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_cmodulus (PMC* value) {
+    void i_cmodulus(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL d = VTABLE_get_integer(INTERP, value);
             if (d != 0) {
@@ -683,7 +683,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_or (PMC* value, PMC* dest) {
+    PMC* bitwise_or(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           | VTABLE_get_integer(INTERP, value);
@@ -714,7 +714,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_or (PMC* value) {
+    void i_bitwise_or(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           | VTABLE_get_integer(INTERP, value);
@@ -750,7 +750,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_and (PMC* value, PMC* dest) {
+    PMC* bitwise_and(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           & VTABLE_get_integer(INTERP, value);
@@ -781,7 +781,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_and (PMC* value) {
+    void i_bitwise_and(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           & VTABLE_get_integer(INTERP, value);
@@ -817,7 +817,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_xor (PMC* value, PMC* dest) {
+    PMC* bitwise_xor(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           ^ VTABLE_get_integer(INTERP, value);
@@ -848,7 +848,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_xor (PMC* value) {
+    void i_bitwise_xor(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           ^ VTABLE_get_integer(INTERP, value);
@@ -884,7 +884,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shr (PMC* value, PMC* dest) {
+    PMC* bitwise_shr(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
@@ -915,7 +915,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_shr (PMC* value) {
+    void i_bitwise_shr(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
@@ -951,7 +951,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_lsr (PMC* value, PMC* dest) {
+    PMC* bitwise_lsr(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
@@ -982,7 +982,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_lsr (PMC* value) {
+    void i_bitwise_lsr(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
@@ -1018,7 +1018,7 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shl (PMC* value, PMC* dest) {
+    PMC* bitwise_shl(PMC* value, PMC* dest) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           << VTABLE_get_integer(INTERP, value);
@@ -1049,7 +1049,7 @@ MMD_DEFAULT: {
         }
     }
 
-    void i_bitwise_shl (PMC* value) {
+    void i_bitwise_shl(PMC* value) {
 MMD_WmlsInteger: {
             INTVAL result = DYNSELF.get_integer()
                           << VTABLE_get_integer(INTERP, value);
@@ -1078,12 +1078,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* is_equal (PMC* value)>
+=item C<PMC* is_equal(PMC* value)>
 
 =cut
 
 */
-    INTVAL is_equal (PMC* value) {
+    INTVAL is_equal(PMC* value) {
 MMD_WmlsFloat: {
             return DYNSELF.get_number() == VTABLE_get_number(INTERP, value);
         }
@@ -1104,12 +1104,12 @@ MMD_DEFAULT: {
 
 /*
 
-=item C<PMC* cmp (PMC *value)>
+=item C<PMC* cmp(PMC *value)>
 
 =cut
 
 */
-    INTVAL cmp (PMC* value) {
+    INTVAL cmp(PMC* value) {
 MMD_WmlsFloat: {
             return num_cmp(DYNSELF.get_number(),
                            VTABLE_get_number(INTERP, value));

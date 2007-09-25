@@ -545,7 +545,7 @@ inline op addattribute(invar PMC, in STR) :object_classes {
         Parrot_add_attribute(interp, $1, $2);
     else
         real_exception(interp, NULL, INVALID_OPERATION,
-            "Cannot add attribute to non-class" );
+            "Cannot add attribute to non-class");
 
     goto NEXT();
 }

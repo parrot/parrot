@@ -12,7 +12,7 @@
 
 #include "parrot/parrot.h"
 
-#define RUBY_NUMBER_FMT		("%.14g")
+#define RUBY_NUMBER_FMT ("%.14g")
 
 pmclass RubyFloat
         extends Float
@@ -22,7 +22,7 @@ pmclass RubyFloat
         hll Cardinal
         maps Float {
 
-    STRING* get_string () {
+    STRING* get_string() {
         UINTVAL buflen;
         STRING * buff;
 

@@ -71,21 +71,21 @@ eval_error;
 
 
 /* declarations */
-static eval_error          logical_or_term( eval_token, eval_t * );
-static eval_error          logical_and_term( eval_token, eval_t * );
-static eval_error          or_term( eval_token, eval_t * );
-static eval_error          xor_term( eval_token, eval_t * );
-static eval_error          and_term( eval_token, eval_t * );
-static eval_error          not_term( eval_token, eval_t * );
-static eval_error          logical_not_term( eval_token, eval_t * );
-static eval_error          cmp_term( eval_token, eval_t * );
-static eval_error          shift_term( eval_token, eval_t * );
-static eval_error          add_term( eval_token, eval_t * );
-static eval_error          mult_term( eval_token, eval_t * );
-static eval_error          exp_term( eval_token, eval_t * );
-static eval_error          unary_term( eval_token, eval_t * );
-static eval_error          simple_term( eval_token, eval_t * );
-boolean_for_m4             evaluate (const char *, eval_t *);
+static eval_error          logical_or_term(eval_token, eval_t *);
+static eval_error          logical_and_term(eval_token, eval_t *);
+static eval_error          or_term(eval_token, eval_t *);
+static eval_error          xor_term(eval_token, eval_t *);
+static eval_error          and_term(eval_token, eval_t *);
+static eval_error          not_term(eval_token, eval_t *);
+static eval_error          logical_not_term(eval_token, eval_t *);
+static eval_error          cmp_term(eval_token, eval_t *);
+static eval_error          shift_term(eval_token, eval_t *);
+static eval_error          add_term(eval_token, eval_t *);
+static eval_error          mult_term(eval_token, eval_t *);
+static eval_error          exp_term(eval_token, eval_t *);
+static eval_error          unary_term(eval_token, eval_t *);
+static eval_error          simple_term(eval_token, eval_t *);
+boolean_for_m4             evaluate(const char *, eval_t *);
 PARROT_DYNEXT_EXPORT int   m4_evaluate(void *);
 
 /*--------------------.
@@ -95,33 +95,33 @@ PARROT_DYNEXT_EXPORT int   m4_evaluate(void *);
 /* Pointer to next character of input text.  */
 static const char *eval_text;
 
-/* Value of eval_text, from before last call of eval_lex ().  This is so we
+/* Value of eval_text, from before last call of eval_lex().  This is so we
    can back up, if we have read too much.  */
 static const char *last_text;
 
-static void eval_init_lex( const char *text )
+static void eval_init_lex(const char *text)
 {
   eval_text = text;
   last_text = NULL;
 }
 
 static void
-eval_undo (void)
+eval_undo(void)
 {
   eval_text = last_text;
 }
 
 /* VAL is numerical value, if any.  */
 
-static eval_token eval_lex( eval_t *val )
+static eval_token eval_lex(eval_t *val)
 {
-  while ( isspace((unsigned char)*eval_text) ) eval_text++;
+  while (isspace((unsigned char)*eval_text)) eval_text++;
 
   last_text = eval_text;
 
   if (*eval_text == '\0') return M4_EOTEXT;
 
-  if (isdigit (*eval_text))
+  if (isdigit(*eval_text))
   {
       int base, digit;
 
@@ -146,7 +146,7 @@ static eval_token eval_lex( eval_t *val )
             case 'R':
               base = 0;
               eval_text++;
-              while (isdigit (*eval_text) && base <= 36)
+              while (isdigit(*eval_text) && base <= 36)
                 base = 10 * base + *eval_text++ - '0';
               if (base == 0 || base > 36 || *eval_text != ':')
                 return M4_ERROR;
@@ -163,11 +163,11 @@ static eval_token eval_lex( eval_t *val )
       (*val) = 0;
       for (; *eval_text; eval_text++)
         {
-          if (isdigit (*eval_text))
+          if (isdigit(*eval_text))
             digit = *eval_text - '0';
-          else if (islower (*eval_text))
+          else if (islower(*eval_text))
             digit = *eval_text - 'a' + 10;
-          else if (isupper (*eval_text))
+          else if (isupper(*eval_text))
             digit = *eval_text - 'A' + 10;
           else
             break;
@@ -270,14 +270,14 @@ static eval_token eval_lex( eval_t *val )
 `---------------------------------------*/
 
 boolean_for_m4
-evaluate (const char *expr, eval_t *val)
+evaluate(const char *expr, eval_t *val)
 {
     eval_token et;
     eval_error err;
 
-    eval_init_lex (expr);
-    et = eval_lex (val);
-    err = logical_or_term( et, val );
+    eval_init_lex(expr);
+    et = eval_lex(val);
+    err = logical_or_term(et, val);
 
   if (err == M4_NO_ERROR && *eval_text != '\0')
     err = M4_EXCESS_INPUT;
@@ -288,33 +288,33 @@ evaluate (const char *expr, eval_t *val)
       break;
 
     case M4_MISSING_RIGHT:
-      fprintf( stderr, "Bad expression in eval (missing right parenthesis): %s",
+      fprintf(stderr, "Bad expression in eval (missing right parenthesis): %s",
                 expr);
       break;
 
     case M4_SYNTAX_ERROR:
-      fprintf( stderr, "Bad expression in eval: %s", expr);
+      fprintf(stderr, "Bad expression in eval: %s", expr);
       break;
 
     case M4_UNKNOWN_INPUT:
-      fprintf( stderr, "Bad expression in eval (bad input): %s", expr);
+      fprintf(stderr, "Bad expression in eval (bad input): %s", expr);
       break;
 
     case M4_EXCESS_INPUT:
-      fprintf( stderr, "Bad expression in eval (excess input): %s", expr);
+      fprintf(stderr, "Bad expression in eval (excess input): %s", expr);
       break;
 
     case M4_DIVIDE_ZERO:
-      fprintf( stderr, "Divide by zero in eval: %s", expr);
+      fprintf(stderr, "Divide by zero in eval: %s", expr);
       break;
 
     case M4_MODULO_ZERO:
-      fprintf( stderr, "Modulo by zero in eval: %s", expr);
+      fprintf(stderr, "Modulo by zero in eval: %s", expr);
       break;
 
     default:
-      fprintf( stderr, "INTERNAL ERROR: Bad error code in evaluate ()");
-      abort ();
+      fprintf(stderr, "INTERNAL ERROR: Bad error code in evaluate()");
+      abort();
     }
 
   return (boolean_for_m4) (err != M4_NO_ERROR);
@@ -325,21 +325,21 @@ evaluate (const char *expr, eval_t *val)
 `---------------------------*/
 
 static eval_error
-logical_or_term (eval_token et, eval_t *v1)
+logical_or_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
 
-  if ((er = logical_and_term (et, v1)) != M4_NO_ERROR)
+  if ((er = logical_and_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((et = eval_lex (&v2)) == M4_LOR)
+  while ((et = eval_lex(&v2)) == M4_LOR)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = logical_and_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = logical_and_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       *v1 = *v1 || v2;
@@ -347,26 +347,26 @@ logical_or_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-logical_and_term (eval_token et, eval_t *v1)
+logical_and_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
 
-  if ((er = or_term (et, v1)) != M4_NO_ERROR)
+  if ((er = or_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((et = eval_lex (&v2)) == M4_LAND)
+  while ((et = eval_lex(&v2)) == M4_LAND)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = or_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = or_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       *v1 = *v1 && v2;
@@ -374,26 +374,26 @@ logical_and_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-or_term (eval_token et, eval_t *v1)
+or_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
 
-  if ((er = xor_term (et, v1)) != M4_NO_ERROR)
+  if ((er = xor_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((et = eval_lex (&v2)) == M4_OR)
+  while ((et = eval_lex(&v2)) == M4_OR)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = xor_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = xor_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       *v1 = *v1 | v2;
@@ -401,26 +401,26 @@ or_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-xor_term (eval_token et, eval_t *v1)
+xor_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
 
-  if ((er = and_term (et, v1)) != M4_NO_ERROR)
+  if ((er = and_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((et = eval_lex (&v2)) == M4_XOR)
+  while ((et = eval_lex(&v2)) == M4_XOR)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = and_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = and_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       *v1 = *v1 ^ v2;
@@ -428,26 +428,26 @@ xor_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-and_term (eval_token et, eval_t *v1)
+and_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
 
-  if ((er = not_term (et, v1)) != M4_NO_ERROR)
+  if ((er = not_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((et = eval_lex (&v2)) == M4_AND)
+  while ((et = eval_lex(&v2)) == M4_AND)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = not_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = not_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       *v1 = *v1 & v2;
@@ -455,74 +455,74 @@ and_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-not_term (eval_token et, eval_t *v1)
+not_term(eval_token et, eval_t *v1)
 {
   eval_error er;
 
   if (et == M4_NOT)
     {
-      et = eval_lex (v1);
+      et = eval_lex(v1);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = not_term (et, v1)) != M4_NO_ERROR)
+      if ((er = not_term(et, v1)) != M4_NO_ERROR)
         return er;
       *v1 = ~*v1;
     }
   else
-    if ((er = logical_not_term (et, v1)) != M4_NO_ERROR)
+    if ((er = logical_not_term(et, v1)) != M4_NO_ERROR)
       return er;
 
   return M4_NO_ERROR;
 }
 
 static eval_error
-logical_not_term (eval_token et, eval_t *v1)
+logical_not_term(eval_token et, eval_t *v1)
 {
   eval_error er;
 
   if (et == M4_LNOT)
     {
-      et = eval_lex (v1);
+      et = eval_lex(v1);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = logical_not_term (et, v1)) != M4_NO_ERROR)
+      if ((er = logical_not_term(et, v1)) != M4_NO_ERROR)
         return er;
       *v1 = !*v1;
     }
   else
-    if ((er = cmp_term (et, v1)) != M4_NO_ERROR)
+    if ((er = cmp_term(et, v1)) != M4_NO_ERROR)
       return er;
 
   return M4_NO_ERROR;
 }
 
 static eval_error
-cmp_term (eval_token et, eval_t *v1)
+cmp_term(eval_token et, eval_t *v1)
 {
   eval_token op;
   eval_t v2;
   eval_error er;
 
-  if ((er = shift_term (et, v1)) != M4_NO_ERROR)
+  if ((er = shift_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((op = eval_lex (&v2)) == M4_EQ || op == M4_NOTEQ
+  while ((op = eval_lex(&v2)) == M4_EQ || op == M4_NOTEQ
          || op == M4_GT || op == M4_GTEQ
          || op == M4_LS || op == M4_LSEQ)
     {
 
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = shift_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = shift_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       switch (op)
@@ -552,35 +552,35 @@ cmp_term (eval_token et, eval_t *v1)
           break;
 
         default:
-          fprintf( stderr, "INTERNAL ERROR: Bad comparison operator in cmp_term ()");
-          abort ();
+          fprintf(stderr, "INTERNAL ERROR: Bad comparison operator in cmp_term()");
+          abort();
         }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-shift_term (eval_token et, eval_t *v1)
+shift_term(eval_token et, eval_t *v1)
 {
   eval_token op;
   eval_t v2;
   eval_error er;
 
-  if ((er = add_term (et, v1)) != M4_NO_ERROR)
+  if ((er = add_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((op = eval_lex (&v2)) == M4_LSHIFT || op == M4_RSHIFT)
+  while ((op = eval_lex(&v2)) == M4_LSHIFT || op == M4_RSHIFT)
     {
 
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = add_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = add_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       switch (op)
@@ -594,34 +594,34 @@ shift_term (eval_token et, eval_t *v1)
           break;
 
         default:
-          fprintf( stderr, "INTERNAL ERROR: Bad shift operator in shift_term ()");
-          abort ();
+          fprintf(stderr, "INTERNAL ERROR: Bad shift operator in shift_term()");
+          abort();
         }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-add_term (eval_token et, eval_t *v1)
+add_term(eval_token et, eval_t *v1)
 {
   eval_token op;
   eval_t v2;
   eval_error er;
 
-  if ((er = mult_term (et, v1)) != M4_NO_ERROR)
+  if ((er = mult_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((op = eval_lex (&v2)) == M4_PLUS || op == M4_MINUS)
+  while ((op = eval_lex(&v2)) == M4_PLUS || op == M4_MINUS)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = mult_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = mult_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       if (op == M4_PLUS)
@@ -632,27 +632,27 @@ add_term (eval_token et, eval_t *v1)
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-mult_term (eval_token et, eval_t *v1)
+mult_term(eval_token et, eval_t *v1)
 {
   eval_token op;
   eval_t v2;
   eval_error er;
 
-  if ((er = exp_term (et, v1)) != M4_NO_ERROR)
+  if ((er = exp_term(et, v1)) != M4_NO_ERROR)
     return er;
 
-  while ((op = eval_lex (&v2)) == M4_TIMES || op == M4_DIVIDE || op == M4_MODULO)
+  while ((op = eval_lex(&v2)) == M4_TIMES || op == M4_DIVIDE || op == M4_MODULO)
     {
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = exp_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = exp_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       switch (op)
@@ -676,35 +676,34 @@ mult_term (eval_token et, eval_t *v1)
           break;
 
         default:
-          fprintf( stderr, "INTERNAL ERROR: Bad operator in mult_term ()");
-          abort ();
+          fprintf(stderr, "INTERNAL ERROR: Bad operator in mult_term()");
+          abort();
         }
     }
   if (op == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-exp_term (eval_token et, eval_t *v1)
+exp_term(eval_token et, eval_t *v1)
 {
   register eval_t result;
   eval_t v2;
   eval_error er;
 
-  if ((er = unary_term (et, v1)) != M4_NO_ERROR)
+  if ((er = unary_term(et, v1)) != M4_NO_ERROR)
     return er;
   result = *v1;
 
-  while ((et = eval_lex (&v2)) == M4_EXPONENT)
-    {
-      et = eval_lex (&v2);
+  while ((et = eval_lex(&v2)) == M4_EXPONENT) {
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = exp_term (et, &v2)) != M4_NO_ERROR)
+      if ((er = exp_term(et, &v2)) != M4_NO_ERROR)
         return er;
 
       result = 1;
@@ -715,37 +714,37 @@ exp_term (eval_token et, eval_t *v1)
   if (et == M4_ERROR)
     return M4_UNKNOWN_INPUT;
 
-  eval_undo ();
+  eval_undo();
   return M4_NO_ERROR;
 }
 
 static eval_error
-unary_term (eval_token et, eval_t *v1)
+unary_term(eval_token et, eval_t *v1)
 {
   eval_token et2 = et;
   eval_error er;
 
   if (et == M4_PLUS || et == M4_MINUS)
     {
-      et2 = eval_lex (v1);
+      et2 = eval_lex(v1);
       if (et2 == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = simple_term (et2, v1)) != M4_NO_ERROR)
+      if ((er = simple_term(et2, v1)) != M4_NO_ERROR)
         return er;
 
       if (et == M4_MINUS)
         *v1 = -*v1;
     }
   else
-    if ((er = simple_term (et, v1)) != M4_NO_ERROR)
+    if ((er = simple_term(et, v1)) != M4_NO_ERROR)
       return er;
 
   return M4_NO_ERROR;
 }
 
 static eval_error
-simple_term (eval_token et, eval_t *v1)
+simple_term(eval_token et, eval_t *v1)
 {
   eval_t v2;
   eval_error er;
@@ -753,14 +752,14 @@ simple_term (eval_token et, eval_t *v1)
   switch (et)
     {
     case M4_LEFTP:
-      et = eval_lex (v1);
+      et = eval_lex(v1);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
-      if ((er = logical_or_term (et, v1)) != M4_NO_ERROR)
+      if ((er = logical_or_term(et, v1)) != M4_NO_ERROR)
         return er;
 
-      et = eval_lex (&v2);
+      et = eval_lex(&v2);
       if (et == M4_ERROR)
         return M4_UNKNOWN_INPUT;
 
@@ -820,14 +819,14 @@ unescape(char *string)
  * This one is called from PIR using NCI with the signature 'it'.
  */
 int
-m4_evaluate( void *program )
+m4_evaluate(void *program)
 {
     eval_t value;                        /* will be returned to caller */
 
     /*
      * The real work is done here
      */
-    evaluate( (const char *)program, &value );
+    evaluate((const char *)program, &value);
 
     return value;
 }

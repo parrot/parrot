@@ -22,6 +22,7 @@ my @steps = qw(
     auto::backtrace
     auto::msvc
     auto::attributes
+    auto::warnings
     init::optimize
     inter::shlibs
     inter::libparrot
