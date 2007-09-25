@@ -565,6 +565,18 @@ Return the address of a label.
 
 =back
 
+=head1 QUESTIONS
+
+=over 4
+
+=item * morph
+
+	<pmichaud>	I don't think that 'morph' as a method call is a good idea
+	<pmichaud>	we need something that says "assign to value" versus "assign to container"
+	<pmichaud>	we can't eliminate the existing 'morph' opcode until we have a replacement 
+
+=back
+
 =head1 ATTACHMENTS
 
 N/A
