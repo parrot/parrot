@@ -37,7 +37,7 @@ By using C<clone>, you can read data from a stream as often as you want.
 
 .namespace ["Stream::Replay"]
 
-.sub onload :load, :anon
+.sub onload :load :anon
     find_type $I0, "Stream::Replay"
     if $I0 > 1 goto END
     

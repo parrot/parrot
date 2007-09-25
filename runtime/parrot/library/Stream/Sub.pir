@@ -54,7 +54,7 @@ The stream will be disconnected automatically if the provided sub returns.
 
 =cut
 
-.sub onload :load, :anon
+.sub onload :load :anon
     .local int i
     .local pmc base
     .local pmc sub

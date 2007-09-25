@@ -20,7 +20,7 @@ TBD
 
 =cut
 
-.sub onload :load, :anon
+.sub onload :load :anon
     .local pmc base
     .local pmc coro
     .local int i
