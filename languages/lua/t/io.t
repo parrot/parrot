@@ -150,8 +150,8 @@ CODE
 OUTPUT
 unlink('../output.new') if ( -f '../output.new' );
 
-SKIP: {
-    skip('pipe not yet implemented on Win32', 1) if ($^O eq 'MSWin32');
+TODO: {
+    local $TODO = 'pipe not yet implemented';
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io.popen' );
 f = io.popen("perl -e \"print 'standard output'\"")
