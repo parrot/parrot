@@ -29,7 +29,7 @@ int
 purefunc(int x);
 
 
-int
+static int
 useless(void) { int x __attribute__unused__; return 0; }
 
 
