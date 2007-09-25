@@ -18,12 +18,11 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
         }
     }
 
-    PMC* neg (PMC* dest) {
+    PMC* neg(PMC* dest) {
         INTVAL a = -DYNSELF.get_integer();
         /* if (!dest)  --TODO: can we reinstate this if we generate n_neg instead of neg? */
             dest = pmc_new(
-                INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-            );
+                INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
     }
@@ -33,16 +32,14 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
     METHOD PMC* abs() {
         /* XXX overflow for -maxint */
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, result, abs(PMC_int_val(SELF)));
         return result;
     }
 
     METHOD PMC* boolean() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, PMC_int_val(SELF));
         return result;
     }
@@ -56,11 +53,9 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
 
     METHOD PMC* classname() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
-            INTERP, result, string_from_cstring(INTERP, "INTEGER", 7)
-        );
+            INTERP, result, string_from_cstring(INTERP, "INTEGER", 7));
         return result;
     }
 
@@ -70,8 +65,7 @@ pmclass Amber_INTEGER extends Integer extends Amber_DEFAULT does integer dynpmc 
 
     METHOD PMC* integer() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF));
         return result;
     }

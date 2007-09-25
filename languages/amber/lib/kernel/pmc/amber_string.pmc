@@ -22,29 +22,24 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
 
     METHOD PMC* boolean() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, PMC_int_val(SELF));
         return result;
     }
 
     METHOD PMC* count() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
-            INTERP, result, string_compute_strlen(INTERP, PMC_str_val(SELF))
-        );
+            INTERP, result, string_compute_strlen(INTERP, PMC_str_val(SELF)));
         return result;
     }
 
     METHOD PMC* classname() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
-            INTERP, result, string_from_cstring(INTERP, "STRING", 6)
-        );
+            INTERP, result, string_from_cstring(INTERP, "STRING", 6));
         return result;
     }
 
@@ -52,18 +47,15 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
         /* XXX reject if count = 0 */
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
-            INTERP, PMC_str_val(SELF), (INTVAL) 0
-        ));
+            INTERP, PMC_str_val(SELF), (INTVAL) 0));
         return result;
     }
 
     METHOD PMC* integer() {  /* XXX OVERFLOW */
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
-            INTERP, result, string_to_int(INTERP, PMC_str_val(SELF))
-        );
+            INTERP, result, string_to_int(INTERP, PMC_str_val(SELF)));
         return result;
     }
 
@@ -74,8 +66,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
         if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
         result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
-            INTERP, PMC_str_val(SELF), adjusted_index
-        ));
+            INTERP, PMC_str_val(SELF), adjusted_index));
         return result;
     }
 
@@ -84,9 +75,7 @@ pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc gro
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(INTERP, result, string_ord(
             INTERP, PMC_str_val(SELF), string_compute_strlen(
-                INTERP, PMC_str_val(SELF)
-            ) - 1
-        ));
+                INTERP, PMC_str_val(SELF)) - 1));
         return result;
     }
 

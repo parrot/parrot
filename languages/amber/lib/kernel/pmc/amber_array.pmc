@@ -19,29 +19,24 @@ pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynp
 
     METHOD PMC* boolean() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, VTABLE_get_integer(INTERP, SELF));
         return result;
     }
 
     METHOD PMC* classname() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
-            INTERP, result, string_from_cstring(INTERP, "ARRAY", 5)
-        );
+            INTERP, result, string_from_cstring(INTERP, "ARRAY", 5));
         return result;
     }
 
     METHOD PMC* count() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
-            INTERP, result, VTABLE_get_integer(INTERP, SELF)
-        );
+            INTERP, result, VTABLE_get_integer(INTERP, SELF));
         return result;
     }
 
@@ -52,14 +47,12 @@ pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynp
 
     METHOD PMC* has(PMC* index) {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         INTVAL adjusted_index = PMC_int_val(index);
         if (adjusted_index) {
             if (adjusted_index > 0) adjusted_index = adjusted_index - 1;
             VTABLE_set_bool(INTERP, result, VTABLE_exists_keyed_int(
-                INTERP, SELF, adjusted_index
-            ));
+                INTERP, SELF, adjusted_index));
         }
         return result;
     }
@@ -74,14 +67,12 @@ pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynp
     METHOD PMC* last() {
         /* XXX reject if count = 0 */
         return VTABLE_get_pmc_keyed_int(
-            INTERP, SELF, VTABLE_get_integer(INTERP, SELF) - 1
-        );
+            INTERP, SELF, VTABLE_get_integer(INTERP, SELF) - 1);
     }
 
     METHOD void set_count(PMC* new_count) {
         VTABLE_set_integer_native(
-            INTERP, SELF, VTABLE_get_integer(INTERP, new_count)
-        );
+            INTERP, SELF, VTABLE_get_integer(INTERP, new_count));
     }
 
     METHOD void set_item(PMC* index, PMC* value) {

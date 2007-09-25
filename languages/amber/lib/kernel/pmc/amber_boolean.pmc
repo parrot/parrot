@@ -18,7 +18,7 @@ pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc 
         }
     }
 
-    STRING* get_string () {
+    STRING* get_string() {
         return PMC_int_val(SELF)
                 ? string_from_cstring(INTERP, "true", 4)
                 : string_from_cstring(INTERP, "false", 5);
@@ -29,28 +29,22 @@ pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc 
     METHOD PMC* character() {
         PMC* result = pmc_new(INTERP, class_CHARACTER);
         VTABLE_set_integer_native(
-            INTERP, result, PMC_int_val(SELF) ? 't' : 'f'
-        );
+            INTERP, result, PMC_int_val(SELF) ? 't' : 'f');
         return result;
     }
 
     METHOD PMC* classname() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
-            INTERP, result, string_from_cstring(INTERP, "BOOLEAN", 7)
-        );
+            INTERP, result, string_from_cstring(INTERP, "BOOLEAN", 7));
         return result;
     }
 
     METHOD PMC* integer() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
-        VTABLE_set_integer_native(
-            INTERP, result, PMC_int_val(SELF) ? 1 : 0
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
+        VTABLE_set_integer_native(INTERP, result, PMC_int_val(SELF) ? 1 : 0);
         return result;
     }
 

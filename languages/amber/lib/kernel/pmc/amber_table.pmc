@@ -13,29 +13,24 @@ pmclass Amber_TABLE need_ext extends Hash extends Amber_DEFAULT does hash dynpmc
 
     METHOD PMC* boolean() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(INTERP, result, VTABLE_get_bool(INTERP, SELF));
         return result;
     }
 
     METHOD PMC* classname() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
         VTABLE_set_string_native(
-            INTERP, result, string_from_cstring(INTERP, "TABLE", 5)
-        );
+            INTERP, result, string_from_cstring(INTERP, "TABLE", 5));
         return result;
     }
 
     METHOD PMC* count() {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Integer));
         VTABLE_set_integer_native(
-            INTERP, result, VTABLE_get_integer(INTERP, SELF)
-        );
+            INTERP, result, VTABLE_get_integer(INTERP, SELF));
         return result;
     }
 
@@ -45,11 +40,9 @@ pmclass Amber_TABLE need_ext extends Hash extends Amber_DEFAULT does hash dynpmc
 
     METHOD PMC* has(PMC* key) {
         PMC* result = pmc_new(
-            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean)
-        );
+            INTERP, Parrot_get_ctx_HLL_type(INTERP, enum_class_Boolean));
         VTABLE_set_bool(
-            INTERP, result, VTABLE_exists_keyed(INTERP, SELF, key)
-        );
+            INTERP, result, VTABLE_exists_keyed(INTERP, SELF, key));
         return result;
     }
 
