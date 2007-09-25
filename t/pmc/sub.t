@@ -923,14 +923,14 @@ OUTPUT
     #                running emts 'main'
 
     my $code = <<'CODE';
-.sub optc :immediate, :postcomp
+.sub optc :immediate :postcomp
     print "initial\n"
 .end
 .sub _main :main
     print "main\n"
 .end
 CODE
-    my $descr = ':immediate, :postcomp';
+    my $descr = ':immediate :postcomp';
     if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ ) {
         pir_output_is( $code, <<'OUT', $descr );
 initial
