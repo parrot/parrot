@@ -336,8 +336,8 @@ sub runstep {
         );
 
         $warns = "";
-        if (0) {
         my @warning_options = ( \@opt_and_vers );
+        #my @warning_options = ( );
         push @warning_options, \@cage_opt_and_vers
             if $conf->options->get('cage');
 
@@ -354,7 +354,6 @@ sub runstep {
                 }
                 $warns .= " $opt";
             }
-        }
         }
 
         # if the user overwrites the warnings remove it from $warns
