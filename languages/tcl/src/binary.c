@@ -107,7 +107,7 @@ binary_scan_number_slurpy(PARROT_INTERP, char field, char *binstr, int *_pos, in
     PMC *elem;
     PMC *values = pmc_new(interp, class_TclList);
 
-    while ( (elem = binary_scan_number_field(interp, field, binstr, _pos, length)) )
+    while ((elem = binary_scan_number_field(interp, field, binstr, _pos, length)))
         VTABLE_push_pmc(interp, values, elem);
 
     return values;

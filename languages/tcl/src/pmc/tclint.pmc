@@ -27,7 +27,7 @@ pmclass TclInt
         if (VTABLE_isa(INTERP, value, undef))
             pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
         else
-            DYNSELF.set_integer_native( VTABLE_get_integer(INTERP, value) );
+            DYNSELF.set_integer_native(VTABLE_get_integer(INTERP, value));
     }
 
 
