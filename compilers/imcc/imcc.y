@@ -805,7 +805,7 @@ sub_param_type_def:
 
 opt_comma:
      /* empty */              { $$ = 0;  }
-   | COMMA
+   | COMMA                    { $$ = 0; fprintf(stderr, "IMCC Warning: optional comma is deprecated.\n"); }
    ;
 
 
