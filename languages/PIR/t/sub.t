@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 21;
 use Test::More;
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'basic sub' );
@@ -99,13 +99,6 @@ CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'combine flags without commas' );
 .sub main :main :load :immediate :init
-.end
-CODE
-
-
-
-language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'combine flags with commas' );
-.sub main :main, :load, :immediate, :init
 .end
 CODE
 
