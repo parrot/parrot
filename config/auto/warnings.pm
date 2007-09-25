@@ -34,7 +34,6 @@ $description = 'Detecting supported compiler warnings (-Wxxx)';
 
 our @potential_warnings = qw(
     -falign-functions=16
-    -fvisibility=hidden
     -mno-accumulate-outgoing-args
     -W
     -Wall
