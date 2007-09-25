@@ -39,7 +39,7 @@ loop:
     setattribute self, ofs, $P10
 .end
 
-.pcc_sub i :method
+.sub i :method
     .param pmc v     :optional
     .param int has_v :opt_flag
     .local int ofs
@@ -54,7 +54,7 @@ get:
     .pcc_end_return
 .end
 
-.pcc_sub j :method
+.sub j :method
     .param pmc v     :optional
     .param int has_v :opt_flag
     .local int ofs
