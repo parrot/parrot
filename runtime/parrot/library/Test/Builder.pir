@@ -90,9 +90,6 @@ the same state.
 
 =cut
 
-.sub __fake_init :method
-.end
-
 .sub init :vtable :method
     .local pmc args
     .local pmc output
@@ -165,15 +162,8 @@ This probably doesn't work correctly yet, but you will probably never use it.
     .local int test_builder_type
 
     find_type test_builder_type, 'Test::Builder'
-    .local pmc real_init
-    .local pmc blank_init
-    real_init  = find_global 'Test::Builder', 'init'
-    blank_init = find_global 'Test::Builder', 'fake_init'
-    store_global 'Test::Builder', 'init', blank_init
-
     .local pmc test
     test       = new test_builder_type
-    store_global 'Test::Builder', '__init', real_init
 
     test.'_assign_args'( output, testplan, results )
     .return( test )
