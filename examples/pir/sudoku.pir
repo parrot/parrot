@@ -2096,7 +2096,7 @@ out:
     print s
 .end
 
-.sub "print" :multi(_, int), :method
+.sub "print" :multi(_, int) :method
     .param int s
     print s
 .end
