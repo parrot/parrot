@@ -72,7 +72,7 @@ main(int argc, char *argv[])
     /*                          */
   REDO:                        /* REDO:                    */
     I4 = I4 - I3;               /* sub    I4, I4, I3        */
-    if ( I4 )
+    if (I4)
         goto REDO;              /* if     I4, REDO          */
     /*                          */
   DONE:                        /* DONE:                    */

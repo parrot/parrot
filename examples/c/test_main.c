@@ -234,8 +234,7 @@ usage(void)
         Enable garbage collection debugging mode. This may also be enabled\n\
         by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
 \n",
-            cgoto_info
-    );
+            cgoto_info);
 
     Parrot_exit(interp, 0);
 }

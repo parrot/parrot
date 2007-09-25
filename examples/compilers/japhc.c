@@ -105,7 +105,7 @@ add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
     consts->constants[--k] = PackFile_Constant_new(interp);
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string =
-        string_make(interp, buf, (UINTVAL) l, "iso-8859-1", 0 );
+        string_make(interp, buf, (UINTVAL) l, "iso-8859-1", 0);
     free(o);
     return k;
 }
