@@ -93,29 +93,29 @@ PARROT_DYNEXT_EXPORT int   m4_evaluate(void *);
 `--------------------*/
 
 /* Pointer to next character of input text.  */
-static const char *eval_text;
+static const unsigned char *eval_text;
 
 /* Value of eval_text, from before last call of eval_lex().  This is so we
    can back up, if we have read too much.  */
-static const char *last_text;
+static const unsigned char *last_text;
 
 static void eval_init_lex(const char *text)
 {
-  eval_text = text;
+  eval_text = (const unsigned char *)text;
   last_text = NULL;
 }
 
 static void
 eval_undo(void)
 {
-  eval_text = last_text;
+  eval_text = (const unsigned char *)last_text;
 }
 
 /* VAL is numerical value, if any.  */
 
 static eval_token eval_lex(eval_t *val)
 {
-  while (isspace((unsigned char)*eval_text)) eval_text++;
+  while (isspace(*eval_text)) eval_text++;
 
   last_text = eval_text;
 
