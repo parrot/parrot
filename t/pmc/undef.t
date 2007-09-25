@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -134,6 +134,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', "morph to float" );
 .end
 CODE
 -7777.777000
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "morph to undef" );
+.sub _main
+    .local pmc pmc1
+    pmc1 = new 'String'
+    morph pmc1, 'Undef'
+    $S1 = typeof pmc1
+    print $S1
+    print "\n"
+.end
+CODE
+Undef
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "set_integer_native" );
