@@ -2,7 +2,7 @@
 
 .end
 
-.sub foo :load, :init
+.sub foo :load :init
 
 .end
 

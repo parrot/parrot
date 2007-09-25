@@ -1920,7 +1920,7 @@ multi_type_list(parser_state *p) {
 
 =item *
 
-  sub_flags -> [sub_flag { [','] sub_flag } ]
+  sub_flags -> [sub_flag { sub_flag } ]
 
   sub_flag  -> ':anon'
              | ':init'
@@ -1940,11 +1940,10 @@ multi_type_list(parser_state *p) {
 static void
 sub_flags(parser_state *p) {
     int ok = 1;
-    int wantmore = 0; /* flag that is set when a ',' is parsed */
 
     emit_sub_flag_start(p);
 
-    while (ok || wantmore) {
+    while (ok) {
         switch (p->curtoken) {
             case T_ANON_FLAG:
             case T_INIT_FLAG:
@@ -1985,7 +1984,6 @@ sub_flags(parser_state *p) {
                 break;
             case T_NEWLINE:
                 ok = 0; /* stop loop; wantmore is always cleared, so loop will stop */
-                if (wantmore) syntax_error(p, 1, "sub flag expected after ','");
                 break;
             default:
                 syntax_error(p, 3, "sub flag expected, but got '",
@@ -1994,13 +1992,6 @@ sub_flags(parser_state *p) {
                 next(p);
                 ok = 0;
                 break;
-        }
-
-        wantmore = 0; /* clear wantmore flag */
-
-        if (p->curtoken == T_COMMA) {
-            next(p); /* skip the comma */
-            wantmore = 1;  /* after the optional comma we expect another sub flag */
         }
     }
 
