@@ -690,7 +690,7 @@ arguments(parser_state *p) {
     }
 
     /* check whether there are any heredocs to be parsed */
-    if ( p->heredoc_index > 0) {
+    if (p->heredoc_index > 0) {
         unsigned i;
         for (i = 0; i < p->heredoc_index; i++) {
             char *heredocid = p->heredoc_ids[i];
@@ -2377,7 +2377,7 @@ program(parser_state *p) {
 
     compilation_unit(p);
 
-    while (p->curtoken != T_EOF ) {
+    while (p->curtoken != T_EOF) {
         match(p, T_NEWLINE);
         compilation_unit(p);
     }

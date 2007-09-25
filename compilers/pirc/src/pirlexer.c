@@ -479,7 +479,7 @@ print_error_context(struct lexer_state *s) {
     char *end          = s->curfile->curchar;
 
     /* print all characters from start to end */
-    while (start < end ) {
+    while (start < end) {
         /* print tab characters as spaces to make the "^" indicator fit nicely */
         if (*start == '\t') fprintf(stderr, " ");
         else fprintf(stderr, "%c", *start);
@@ -774,7 +774,7 @@ read_digits(lexer_state *lexer) {
     int count = 0;
     char c    = read_char(lexer->curfile);
 
-    while ( isdigit((unsigned char)c) ) {
+    while (isdigit((unsigned char)c)) {
         buffer_char(lexer, c);
         c = read_char(lexer->curfile);
         count++;
@@ -1128,7 +1128,7 @@ is indicated explicitly.
 
 */
 
-        if (isalpha((unsigned char)c) || c == '_' ) {  /* check for identifier, op, invocant or label */
+        if (isalpha((unsigned char)c) || c == '_') {  /* check for identifier, op, invocant or label */
 
             /* handle pasm registers */
             if (c == 'P' || c == 'I' || c == 'N' || c == 'S') {
@@ -1211,12 +1211,12 @@ is indicated explicitly.
             if (c == '=') return T_CONCAT_ASSIGN;
             if (c == '.') return T_DOTDOT;  /* ".." */
 
-            if ( isspace((unsigned char)c) ) { /* a dot followed by a space */
+            if (isspace((unsigned char)c)) { /* a dot followed by a space */
                 unread_char(lexer->curfile);
                 return T_CONCAT;
             }
 
-            while ( isalnum((unsigned char)c) || c == '_') {
+            while (isalnum((unsigned char)c) || c == '_') {
                 buffer_char(lexer, c);
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) break;
@@ -1232,7 +1232,7 @@ is indicated explicitly.
                 return tmp;
             }
         }
-        else if (isdigit((unsigned char)c) ) { /* check for numbers */
+        else if (isdigit((unsigned char)c)) { /* check for numbers */
             buffer_char(lexer, c);
             c = read_char(lexer->curfile);
 
@@ -1604,7 +1604,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
                 c = read_char(lexer->curfile);
                 if (c == EOF_MARKER) return T_EOF;
             }
-            while ( isalnum((unsigned char)c) || c == '_' );
+            while (isalnum((unsigned char)c) || c == '_');
 
             unread_char(lexer->curfile); /* push back last character not needed */
             tmp = check_dictionary(lexer, dictionary);
