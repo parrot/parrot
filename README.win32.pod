@@ -159,7 +159,8 @@ have to compile your own perl.
 =item MinGW32 with GCC
 
 The latest release of MinGW package at the time of writing is 5.1.3,
-which contains gcc-3.4.2. It can be downloaded here:
+which contains gcc-3.4.2 as current release (and 3.4.5 as candidate release).
+It can be downloaded here:
 L<http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe>
 
 The HomePage is on L<http://www.mingw.org/>.
