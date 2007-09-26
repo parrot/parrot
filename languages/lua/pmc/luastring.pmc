@@ -132,9 +132,9 @@ Return the string "string".
 =cut
 
 */
-    void set_number_native(FLOATVAL value) {
+    void set_integer_native (INTVAL value) {
         DYNSELF.morph(dynpmc_LuaNumber);
-        DYNSELF.set_number_native(value);
+        DYNSELF.set_integer_native(value);
     }
 
 /*
