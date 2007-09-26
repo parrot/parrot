@@ -664,13 +664,10 @@ hll_def: HLL STRINGC COMMA STRINGC
             int built_in_type = 0;
             int language_type = 0;
 
-            /* suppose that $X (where X is 2 or 4) looks like: "Integer"
-             * then we are interested in the string characters, not the quotes;
-             * therefore, create a string starting at $X + 1 (1 character beyond start of string,
-             * which points to first quote, and copy strlen($X) - 2 quote characters
-             */
-            built_in_type = pmc_type(interp, string_from_cstring(interp, $2 + 1, strlen($2) - 2));
-            language_type = pmc_type(interp, string_from_cstring(interp, $4 + 1, strlen($4) - 2));
+            STRING *built_in_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING *language_name = string_unescape_cstring(interp, $4 + 1, '"', NULL);
+            built_in_type = pmc_type(interp, built_in_name);
+            language_type = pmc_type(interp, language_name);
 
             /*
             fprintf(stderr, "built in type is: %d, language type is: %d\n", built_in_type, language_type);
