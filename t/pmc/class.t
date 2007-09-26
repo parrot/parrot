@@ -196,14 +196,13 @@ Tests the Class PMC.
 .end
 
 
-## NOTE i think this belongs in the Object PMC tests
 # L<PDD15/Class PMC API>
 .sub 'set_attr/get_attr'
     .local pmc class, class_instance, attrib_in, attrib_out
     new class, 'Class'
     class.'name'("Test")
     class.'add_attribute'("foo")
-    ok(1, 'created a class with two attributes')
+    ok(1, 'created a class with one attribute')
 
     class_instance = class.'new'()
     ok(1, 'instantiated the class')
