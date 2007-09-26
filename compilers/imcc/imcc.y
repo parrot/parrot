@@ -25,10 +25,6 @@
 #include "parser.h"
 #include "optimizer.h"
 
-/* HEADERIZER HFILE: compilers/imcc/imc.h */
-
-/* HEADERIZER BEGIN: static */
-
 #ifndef YYENABLE_NLS
 #  define YYENABLE_NLS 0
 #endif
@@ -36,6 +32,10 @@
 #ifndef YYLTYPE_IS_TRIVIAL
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
+
+/* HEADERIZER HFILE: compilers/imcc/imc.h */
+
+/* HEADERIZER BEGIN: static */
 
 static void add_pcc_named_arg(PARROT_INTERP,
     NOTNULL(SymReg *cur_call),
