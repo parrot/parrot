@@ -496,7 +496,7 @@ See details in F<languages/lua/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.15
+0.4.16
 
 =item Location
 
@@ -1173,7 +1173,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.15
+0.4.16
 
 =item Location
 
