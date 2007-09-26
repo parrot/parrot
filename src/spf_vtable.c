@@ -32,91 +32,91 @@ retrieve arguments.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING * getchr_pmc( PARROT_INTERP,
+static STRING * getchr_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING * getchr_va( PARROT_INTERP,
+static STRING * getchr_va(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static HUGEFLOATVAL getfloat_pmc( PARROT_INTERP,
+static HUGEFLOATVAL getfloat_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static HUGEFLOATVAL getfloat_va( PARROT_INTERP,
+static HUGEFLOATVAL getfloat_va(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static HUGEINTVAL getint_pmc( PARROT_INTERP,
+static HUGEINTVAL getint_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static HUGEINTVAL getint_va( PARROT_INTERP,
+static HUGEINTVAL getint_va(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * getptr_pmc( PARROT_INTERP,
+static void * getptr_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static void * getptr_va( PARROT_INTERP,
+static void * getptr_va(PARROT_INTERP,
     SHIM(INTVAL size),
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING * getstring_pmc( PARROT_INTERP,
+static STRING * getstring_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING * getstring_va( PARROT_INTERP,
+static STRING * getstring_va(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static UHUGEINTVAL getuint_pmc( PARROT_INTERP,
+static UHUGEINTVAL getuint_pmc(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static UHUGEINTVAL getuint_va( PARROT_INTERP,
+static UHUGEINTVAL getuint_va(PARROT_INTERP,
     INTVAL size,
-    NOTNULL(SPRINTF_OBJ *obj) )
+    NOTNULL(SPRINTF_OBJ *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

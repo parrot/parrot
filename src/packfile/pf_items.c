@@ -37,41 +37,41 @@ C<opcode_t> units.
 
 static void cvt_num12_num8(
     NOTNULL(unsigned char *dest),
-    NOTNULL(const unsigned char *src) )
+    NOTNULL(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void cvt_num12_num8_be(
     NOTNULL(unsigned char *dest),
-    NOTNULL(const unsigned char *src) )
+    NOTNULL(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void cvt_num12_num8_le(
     NOTNULL(unsigned char *dest),
-    NOTNULL(unsigned char *src) )
+    NOTNULL(unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static opcode_t fetch_op_be_4( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_be_4(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_be_8( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_be_8(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_le_4( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_le_4(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_le_8( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_le_8(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_mixed_be( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_mixed_be(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_mixed_le( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_mixed_le(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
-static opcode_t fetch_op_test( NOTNULL(unsigned char *b) )
+static opcode_t fetch_op_test(NOTNULL(unsigned char *b))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -104,7 +104,7 @@ cvt_num12_num8(NOTNULL(unsigned char *dest), NOTNULL(const unsigned char *src))
     int expo2;
 #endif
 
-    memset (dest, 0, 8);
+    memset(dest, 0, 8);
     /* exponents 15 -> 11 bits */
     s = src[9] & 0x80; /* sign */
     expo = ((src[9] & 0x7f)<< 8 | src[8]);
@@ -687,7 +687,7 @@ PARROT_CANNOT_RETURN_NULL
 char *
 PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
 {
-    const size_t str_len = strlen ((char *)(*cursor)) + 1;
+    const size_t str_len = strlen((char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
 
     const int wordsize = pf->header->wordsize;

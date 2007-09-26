@@ -413,7 +413,7 @@ Parrot_Context_infostr(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
             info.fullname, info.pc, file, info.line);
 
         /* free the non-constant string, but not the constant one */
-        if (strncmp( "(unknown file)", file, 14 ) < 0 )
+        if (strncmp("(unknown file)", file, 14) < 0)
             string_cstring_free((char *)const_cast(info.file));
         /* XXX This is probably a source of mis-freeing. */
     }

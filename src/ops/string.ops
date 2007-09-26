@@ -38,12 +38,12 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 
 =cut
 
-inline op ord (out INT, in STR) :base_core {
+inline op ord(out INT, in STR) :base_core {
   $1 = string_ord(interp,$2,0);
   goto NEXT();
 }
 
-inline op ord (out INT, in STR, in INT) :base_core {
+inline op ord(out INT, in STR, in INT) :base_core {
   $1 = string_ord(interp,$2,$3);
   goto NEXT();
 }
@@ -56,7 +56,7 @@ is returned in string $1.
 
 =cut
 
-inline op chr (out STR, in INT) :base_core {
+inline op chr(out STR, in INT) :base_core {
   STRING *s;
   s = string_chr(interp, (UINTVAL)$2);
   $1 = s;

@@ -30,13 +30,13 @@ to the previous values and the allocated register memory is discarded.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_regs( PARROT_INTERP, NOTNULL(parrot_context_t *ctx) )
+static void clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void init_context( PARROT_INTERP,
+static void init_context(PARROT_INTERP,
     NOTNULL(parrot_context_t *ctx),
-    NULLOK(const parrot_context_t *old) )
+    NULLOK(const parrot_context_t *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -328,7 +328,7 @@ Duplicate the passed context
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 struct Parrot_Context *
-Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old) )
+Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old))
 {
     size_t          diff;
     Parrot_Context *ctx;
@@ -551,7 +551,7 @@ Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_
         int slot;
 
 #ifndef NDEBUG
-        if (   Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
+        if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
             && ctxp->current_sub) {
             /* can't probably PIO_eprintf here */
             const Parrot_sub * const doomed = PMC_sub(ctxp->current_sub);

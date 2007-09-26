@@ -37,7 +37,7 @@ static unsigned int parrot_config_size_stored = 0;
 
 /* HEADERIZER BEGIN: static */
 
-static void parrot_set_config_hash_interpreter( PARROT_INTERP )
+static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

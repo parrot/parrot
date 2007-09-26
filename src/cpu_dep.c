@@ -32,7 +32,7 @@ Remember you read something about it in F<docs/infant.dev>?
 
 /* HEADERIZER BEGIN: static */
 
-static void trace_system_stack( PARROT_INTERP )
+static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

@@ -36,7 +36,7 @@ the faster dispatch of operations.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_trace_core( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+static opcode_t * runops_trace_core(PARROT_INTERP, NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -115,7 +115,7 @@ operations, with tracing and bounds checking enabled.
 #endif
 
 #define  code_start interp->code->base.data
-#define  code_end   (interp->code->base.data + interp->code->base.size)
+#define  code_end (interp->code->base.data + interp->code->base.size)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL

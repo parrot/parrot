@@ -30,72 +30,72 @@ Win32), this is I<buffered> IO, out of necessity.
 
 PARROT_CONST_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-static const char * flags_to_stdio( INTVAL flags );
+static const char * flags_to_stdio(INTVAL flags);
 
-static INTVAL PIO_stdio_close( SHIM_INTERP,
+static INTVAL PIO_stdio_close(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static ParrotIO * PIO_stdio_fdopen( PARROT_INTERP,
+static ParrotIO * PIO_stdio_fdopen(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     PIOHANDLE fptr,
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1);
 
-static INTVAL PIO_stdio_flush( SHIM_INTERP,
+static INTVAL PIO_stdio_flush(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static INTVAL PIO_stdio_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
+static INTVAL PIO_stdio_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL PIO_stdio_isatty( PIOHANDLE fptr );
+static INTVAL PIO_stdio_isatty(PIOHANDLE fptr);
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static ParrotIO * PIO_stdio_open( PARROT_INTERP,
+static ParrotIO * PIO_stdio_open(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(const char *spath),
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static size_t PIO_stdio_peek( PARROT_INTERP,
+static size_t PIO_stdio_peek(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t PIO_stdio_read( PARROT_INTERP,
+static size_t PIO_stdio_read(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static PIOOFF_T PIO_stdio_seek( SHIM_INTERP,
+static PIOOFF_T PIO_stdio_seek(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
-    INTVAL whence )
+    INTVAL whence)
         __attribute__nonnull__(3);
 
-static PIOOFF_T PIO_stdio_tell( SHIM_INTERP,
+static PIOOFF_T PIO_stdio_tell(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static size_t PIO_stdio_write( SHIM_INTERP,
+static size_t PIO_stdio_write(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 

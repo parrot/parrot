@@ -23,123 +23,123 @@ This file implements the encoding functions for fixed-width 8-bit codepoints
 
 /* HEADERIZER BEGIN: static */
 
-static void become_encoding( PARROT_INTERP, SHIM(STRING *source_string) )
+static void become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
-static UINTVAL bytes( SHIM_INTERP, NOTNULL(STRING *source_string) )
+static UINTVAL bytes(SHIM_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(2);
 
-static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static UINTVAL codepoints(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL fixed8_get_next( PARROT_INTERP, NOTNULL(String_iter *iter) )
+static UINTVAL fixed8_get_next(PARROT_INTERP, NOTNULL(String_iter *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixed8_set_next( PARROT_INTERP,
+static void fixed8_set_next(PARROT_INTERP,
     NOTNULL(String_iter *iter),
-    UINTVAL c )
+    UINTVAL c)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void fixed8_set_position( SHIM_INTERP,
+static void fixed8_set_position(SHIM_INTERP,
     NOTNULL(String_iter *iter),
-    UINTVAL pos )
+    UINTVAL pos)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL get_byte( PARROT_INTERP,
+static UINTVAL get_byte(PARROT_INTERP,
     NOTNULL(const STRING *source_string),
-    UINTVAL offset )
+    UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static STRING * get_bytes( PARROT_INTERP,
+static STRING * get_bytes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static STRING * get_bytes_inplace( PARROT_INTERP,
+static STRING * get_bytes_inplace(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    NOTNULL(STRING *return_string) )
+    NOTNULL(STRING *return_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL get_codepoint( PARROT_INTERP,
+static UINTVAL get_codepoint(PARROT_INTERP,
     NOTNULL(const STRING *source_string),
-    UINTVAL offset )
+    UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static STRING * get_codepoints( PARROT_INTERP,
+static STRING * get_codepoints(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static STRING * get_codepoints_inplace( PARROT_INTERP,
+static STRING * get_codepoints_inplace(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    NOTNULL(STRING *dest_string) )
+    NOTNULL(STRING *dest_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
-static void iter_init( SHIM_INTERP,
+static void iter_init(SHIM_INTERP,
     NOTNULL(const STRING *src),
-    NOTNULL(String_iter *iter) )
+    NOTNULL(String_iter *iter))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void set_byte( PARROT_INTERP,
+static void set_byte(PARROT_INTERP,
     NOTNULL(const STRING *source_string),
     UINTVAL offset,
-    UINTVAL byte )
+    UINTVAL byte)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void set_bytes( PARROT_INTERP,
+static void set_bytes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    NOTNULL(STRING *new_bytes) )
+    NOTNULL(STRING *new_bytes))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
-static void set_codepoint( PARROT_INTERP,
+static void set_codepoint(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
-    UINTVAL codepoint )
+    UINTVAL codepoint)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void set_codepoints( PARROT_INTERP,
+static void set_codepoints(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL count,
-    NOTNULL(STRING *new_codepoints) )
+    NOTNULL(STRING *new_codepoints))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
 PARROT_DOES_NOT_RETURN
-static STRING * to_encoding( PARROT_INTERP,
+static STRING * to_encoding(PARROT_INTERP,
     SHIM(STRING *src),
-    SHIM(STRING *dest) )
+    SHIM(STRING *dest))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

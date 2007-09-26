@@ -54,10 +54,10 @@ strings.
 
 /* HEADERIZER BEGIN: static */
 
-static void make_writable( PARROT_INTERP,
+static void make_writable(PARROT_INTERP,
     ARGINOUT(STRING **s),
     const size_t len,
-    parrot_string_representation_t representation )
+    parrot_string_representation_t representation)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -26,26 +26,26 @@ This file implements the Parrot embedding interface.
 
 /* HEADERIZER BEGIN: static */
 
-static FLOATVAL calibrate( PARROT_INTERP )
+static FLOATVAL calibrate(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static const char * op_name( PARROT_INTERP, int k )
+static const char * op_name(PARROT_INTERP, int k)
         __attribute__nonnull__(1);
 
-static void print_debug( PARROT_INTERP, SHIM(int status), SHIM(void *p) )
+static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
-static void print_profile( PARROT_INTERP, SHIM(int status), SHIM(void *p) )
+static void print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
-static int prof_sort_f( NOTNULL(const void *a), NOTNULL(const void *b) )
+static int prof_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PMC* set_current_sub( PARROT_INTERP )
+static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static PMC* setup_argv( PARROT_INTERP, int argc, char ** argv )
+static PMC* setup_argv(PARROT_INTERP, int argc, char ** argv)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -897,7 +897,7 @@ Parrot_disassemble(PARROT_INTERP)
 
     PIO_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
 
-    if ( debugs ) {
+    if (debugs) {
         PIO_printf(interp, " %6s:\n","SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
     }
@@ -913,7 +913,7 @@ Parrot_disassemble(PARROT_INTERP)
          * interp->code->debugs->mappings[curr_mapping]->offset); */
 
         if (debugs && curr_mapping < num_mappings) {
-            if ( op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
+            if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
                 const int filename_const_offset = interp->code->debugs->mappings[curr_mapping]->u.filename;
                 PIO_printf(interp, "Current Source Filename %Ss\n", interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
@@ -922,7 +922,7 @@ Parrot_disassemble(PARROT_INTERP)
 
         PIO_printf(interp, "%012i-%012i", op_code_seq_num, line->opcode - interp->code->base.data);
 
-        if ( debugs )
+        if (debugs)
             PIO_printf(interp, " %06i: ",interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */

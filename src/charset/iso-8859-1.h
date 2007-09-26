@@ -16,14 +16,14 @@
 /* HEADERIZER BEGIN: src/charset/iso-8859-1.c */
 
 PARROT_WARN_UNUSED_RESULT
-STRING * charset_cvt_iso_8859_1_to_ascii( PARROT_INTERP,
+STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP,
     NOTNULL(STRING *src),
-    NULLOK(STRING *dest) )
+    NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-const CHARSET * Parrot_charset_iso_8859_1_init( PARROT_INTERP )
+const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/charset/iso-8859-1.c */

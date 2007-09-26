@@ -41,63 +41,63 @@ extern void imcc_init(PARROT_INTERP);
 
 /* HEADERIZER BEGIN: static */
 
-static void dump_string( PARROT_INTERP, NULLOK(const STRING *s) )
+static void dump_string(PARROT_INTERP, NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
-static int GDB_B( PARROT_INTERP, NOTNULL(char *s) )
+static int GDB_B(PARROT_INTERP, NOTNULL(char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static const char* GDB_P( PARROT_INTERP, NOTNULL(const char *s) )
+static const char* GDB_P(PARROT_INTERP, NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char const * nextarg( NOTNULL(char const *command) )
+static char const * nextarg(NOTNULL(char const *command))
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * parse_command(
     NOTNULL(const char *command),
-    NOTNULL(unsigned long *cmdP) )
+    NOTNULL(unsigned long *cmdP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * parse_int( NOTNULL(const char *str), NOTNULL(int *intP) )
+static const char * parse_int(NOTNULL(const char *str), NOTNULL(int *intP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char* parse_key( PARROT_INTERP,
+static const char* parse_key(PARROT_INTERP,
     NOTNULL(const char *str),
-    NOTNULL(PMC **keyP) )
+    NOTNULL(PMC **keyP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * parse_string( PARROT_INTERP,
+static const char * parse_string(PARROT_INTERP,
     NOTNULL(const char *str),
-    NOTNULL(STRING **strP) )
+    NOTNULL(STRING **strP))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static const char * skip_command( NOTNULL(const char *str) )
+static const char * skip_command(NOTNULL(const char *str))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * skip_ws( NOTNULL(const char *str) )
+static const char * skip_ws(NOTNULL(const char *str))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

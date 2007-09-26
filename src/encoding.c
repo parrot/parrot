@@ -23,9 +23,9 @@ These are parrot's generic encoding handling functions
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL register_encoding( PARROT_INTERP,
+static INTVAL register_encoding(PARROT_INTERP,
     NOTNULL(const char *encodingname),
-    NOTNULL(ENCODING *encoding) )
+    NOTNULL(ENCODING *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

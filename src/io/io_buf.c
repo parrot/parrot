@@ -24,111 +24,111 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 
-static INTVAL PIO_buf_close( PARROT_INTERP,
+static INTVAL PIO_buf_close(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static ParrotIO * PIO_buf_fdopen( PARROT_INTERP,
+static ParrotIO * PIO_buf_fdopen(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     PIOHANDLE fd,
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static size_t PIO_buf_fill_readbuf( PARROT_INTERP,
+static size_t PIO_buf_fill_readbuf(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(ParrotIOBuf *b) )
+    NOTNULL(ParrotIOBuf *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static INTVAL PIO_buf_flush( PARROT_INTERP,
+static INTVAL PIO_buf_flush(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_buf_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
+static INTVAL PIO_buf_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_buf_open( PARROT_INTERP,
+static ParrotIO * PIO_buf_open(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(const char *path),
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t PIO_buf_peek( PARROT_INTERP,
+static size_t PIO_buf_peek(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t PIO_buf_read( PARROT_INTERP,
+static size_t PIO_buf_read(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t PIO_buf_readline( PARROT_INTERP,
+static size_t PIO_buf_readline(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static PIOOFF_T PIO_buf_seek( PARROT_INTERP,
+static PIOOFF_T PIO_buf_seek(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *l),
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
-    INTVAL whence )
+    INTVAL whence)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_buf_setbuf( PARROT_INTERP,
+static INTVAL PIO_buf_setbuf(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    size_t bufsize )
+    size_t bufsize)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_buf_setlinebuf( PARROT_INTERP,
+static INTVAL PIO_buf_setlinebuf(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static PIOOFF_T PIO_buf_tell( SHIM_INTERP,
+static PIOOFF_T PIO_buf_tell(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static size_t PIO_buf_write( PARROT_INTERP,
+static size_t PIO_buf_write(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

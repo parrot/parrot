@@ -50,17 +50,17 @@ not highest type in table.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL distance_cmp( SHIM_INTERP, INTVAL a, INTVAL b );
-static void dump_mmd( PARROT_INTERP, INTVAL function )
+static INTVAL distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b);
+static void dump_mmd(PARROT_INTERP, INTVAL function)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static funcptr_t get_mmd_dispatcher( PARROT_INTERP,
+static funcptr_t get_mmd_dispatcher(PARROT_INTERP,
     NOTNULL(PMC *left),
     NOTNULL(PMC *right),
     INTVAL function,
-    NOTNULL(int *is_pmc) )
+    NOTNULL(int *is_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -68,130 +68,130 @@ static funcptr_t get_mmd_dispatcher( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* mmd_arg_tuple_func( PARROT_INTERP )
+static PMC* mmd_arg_tuple_func(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_arg_tuple_inline( PARROT_INTERP,
+static PMC* mmd_arg_tuple_inline(PARROT_INTERP,
     NOTNULL(STRING *signature),
-    va_list args )
+    va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mmd_create_builtin_multi_meth( PARROT_INTERP,
+static void mmd_create_builtin_multi_meth(PARROT_INTERP,
     NOTNULL(PMC *ns),
     INTVAL type,
-    NOTNULL(const MMD_init *entry) )
+    NOTNULL(const MMD_init *entry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void mmd_create_builtin_multi_meth_2( PARROT_INTERP,
+static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
     NOTNULL(PMC *ns),
     INTVAL func_nr,
     INTVAL type,
     INTVAL right,
-    funcptr_t func_ptr )
+    funcptr_t func_ptr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_cvt_to_types( PARROT_INTERP, NOTNULL(PMC *multi_sig) )
+static PMC* mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * mmd_deref( PARROT_INTERP, NOTNULL(PMC *value) )
+static PMC * mmd_deref(PARROT_INTERP, NOTNULL(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL mmd_distance( PARROT_INTERP,
+static UINTVAL mmd_distance(PARROT_INTERP,
     NOTNULL(PMC *pmc),
-    NOTNULL(PMC *arg_tuple) )
+    NOTNULL(PMC *arg_tuple))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_ensure_writable( PARROT_INTERP,
+static void mmd_ensure_writable(PARROT_INTERP,
     INTVAL function,
-    NULLOK(PMC *pmc) )
+    NULLOK(PMC *pmc))
         __attribute__nonnull__(1);
 
-static void mmd_expand_x( PARROT_INTERP, INTVAL func_nr, INTVAL new_x )
+static void mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
         __attribute__nonnull__(1);
 
-static void mmd_expand_y( PARROT_INTERP, INTVAL func_nr, INTVAL new_y )
+static void mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_get_ns( PARROT_INTERP )
+static PMC* mmd_get_ns(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int mmd_is_hidden( PARROT_INTERP,
+static int mmd_is_hidden(PARROT_INTERP,
     NOTNULL(PMC *multi),
-    NOTNULL(PMC *cl) )
+    NOTNULL(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_make_ns( PARROT_INTERP )
+static PMC* mmd_make_ns(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int mmd_maybe_candidate( PARROT_INTERP,
+static int mmd_maybe_candidate(PARROT_INTERP,
     NOTNULL(PMC *pmc),
-    NOTNULL(PMC *cl) )
+    NOTNULL(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_search_builtin( PARROT_INTERP,
+static void mmd_search_builtin(PARROT_INTERP,
     NOTNULL(STRING *meth),
-    NOTNULL(PMC *cl) )
+    NOTNULL(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_search_classes( PARROT_INTERP,
+static void mmd_search_classes(PARROT_INTERP,
     NOTNULL(STRING *meth),
     NOTNULL(PMC *arg_tuple),
     NOTNULL(PMC *cl),
-    INTVAL start_at_parent )
+    INTVAL start_at_parent)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int mmd_search_cur_namespace( PARROT_INTERP,
+static int mmd_search_cur_namespace(PARROT_INTERP,
     NOTNULL(STRING *meth),
-    NOTNULL(PMC *cl) )
+    NOTNULL(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_search_default( PARROT_INTERP,
+static PMC* mmd_search_default(PARROT_INTERP,
     NOTNULL(STRING *meth),
-    NOTNULL(PMC *arg_tuple) )
+    NOTNULL(PMC *arg_tuple))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_search_scopes( PARROT_INTERP, NOTNULL(STRING *meth) )
+static PMC* mmd_search_scopes(PARROT_INTERP, NOTNULL(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mmd_sort_candidates( PARROT_INTERP,
+static void mmd_sort_candidates(PARROT_INTERP,
     NOTNULL(PMC *arg_tuple),
-    NOTNULL(PMC *cl) )
+    NOTNULL(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

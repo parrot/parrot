@@ -207,7 +207,7 @@ Returns the PMC value of the element at index C<key>.
 
         data = PMC_data_typed(SELF, PMC **);
 
-        if ( PMC_IS_NULL(data[key]) )
+        if (PMC_IS_NULL(data[key]))
             data[key] = pmc_new(INTERP, enum_class_Undef);
 
         return data[key];

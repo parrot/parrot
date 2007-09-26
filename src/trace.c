@@ -31,7 +31,7 @@ src/test_main.c
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* trace_class_name( NOTNULL(const PMC* pmc) )
+static STRING* trace_class_name(NOTNULL(const PMC* pmc))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -73,7 +73,7 @@ trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
         PIO_eprintf(debugger, "(null)");
         return;
     }
-    if ( PMC_IS_NULL(pmc) )  {
+    if (PMC_IS_NULL(pmc))  {
         PIO_eprintf(debugger, "PMCNULL");
         return;
     }

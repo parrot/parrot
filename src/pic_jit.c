@@ -38,7 +38,7 @@ PARROT_WARN_UNUSED_RESULT
 static int args_match_params(
     NOTNULL(const PMC *sig_args),
     NOTNULL(PackFile_ByteCode *seg),
-    NOTNULL(opcode_t *start) )
+    NOTNULL(opcode_t *start))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -46,23 +46,23 @@ static int args_match_params(
 PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(
     NOTNULL(const PMC *sub),
-    NOTNULL(opcode_t **set_args) )
+    NOTNULL(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int jit_can_compile_sub( PARROT_INTERP, NOTNULL(PMC *sub) )
+static int jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int ops_jittable( PARROT_INTERP,
+static int ops_jittable(PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(const PMC *sig_results),
     NOTNULL(PackFile_ByteCode *seg),
     NOTNULL(opcode_t *pc),
     NOTNULL(opcode_t *end),
-    NOTNULL(int *flags) )
+    NOTNULL(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -73,16 +73,16 @@ static int ops_jittable( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * pic_test_func( PARROT_INTERP,
+static opcode_t * pic_test_func(PARROT_INTERP,
     SHIM(INTVAL *sig_bits),
-    NOTNULL(void **args) )
+    NOTNULL(void **args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 static int returns_match_results(
     NOTNULL(const PMC *sig_ret),
-    NOTNULL(const PMC *sig_result) )
+    NOTNULL(const PMC *sig_result))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -221,7 +221,7 @@ returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result
     if (!n)
         return 0;
 
-    switch (type & ~PARROT_ARG_CONSTANT ) {
+    switch (type & ~PARROT_ARG_CONSTANT) {
         case PARROT_ARG_INTVAL:
         case PARROT_ARG_FLOATVAL:
             return 1;

@@ -25,7 +25,7 @@ messages.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL print_warning( PARROT_INTERP, NULLOK(STRING *msg) )
+static INTVAL print_warning(PARROT_INTERP, NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

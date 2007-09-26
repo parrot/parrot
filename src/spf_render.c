@@ -59,26 +59,26 @@ enum {
 static void gen_sprintf_call(
     NOTNULL(char *out),
     NOTNULL(SpfInfo *info),
-    int thingy )
+    int thingy)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * handle_flags( PARROT_INTERP,
+static STRING * handle_flags(PARROT_INTERP,
     NOTNULL(SpfInfo *info),
     NOTNULL(STRING *str),
     INTVAL is_int_type,
-    NULLOK(STRING* prefix) )
+    NULLOK(STRING* prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* str_append_w_flags( PARROT_INTERP,
+static STRING* str_append_w_flags(PARROT_INTERP,
     NOTNULL(STRING* dest),
     NOTNULL(SpfInfo *info),
     NOTNULL(STRING* src),
-    NULLOK(STRING *prefix) )
+    NULLOK(STRING *prefix))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -335,7 +335,7 @@ Parrot_sprintf_format(PARROT_INTERP,
  *
  *  grammar Parrot::PrintF_Format {
  *      rule format {
- *          <other_stuff> ( <field> <other_stuff> )*
+ *          <other_stuff> (<field> <other_stuff>)*
  *      }
  *
  *      rule other_stuff {
@@ -683,7 +683,7 @@ do_sprintf:
                             STRING *ts;
                             const HUGEFLOATVAL thefloat = obj->getfloat(interp, info.type, obj);
                             /* turn -0.0 into 0.0 */
-                            /* WTF if( thefloat == 0.0 ) { thefloat = 0.0; } */
+                            /* WTF if(thefloat == 0.0) { thefloat = 0.0; } */
                             gen_sprintf_call(tc, &info, ch);
                             ts = cstr2pstr(tc);
                             /* XXX lost precision if %Hg or whatever

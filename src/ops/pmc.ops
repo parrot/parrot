@@ -180,12 +180,12 @@ Return the type of the entry in aggregate PMC in $2 at key $3.
 
 =cut
 
-inline op typeof (out STR, invar PMC) {
+inline op typeof(out STR, invar PMC) {
   $1 = VTABLE_name(interp, $2);
   goto NEXT();
 }
 
-inline op typeof (out INT, invar PMC) {
+inline op typeof(out INT, invar PMC) {
   if (VTABLE_isa(interp, $2, string_from_literal(interp, "Object")))
       real_exception(interp, NULL, INVALID_OPERATION,
          "Numeric 'typeof' will not be supported in new object model");
@@ -194,12 +194,12 @@ inline op typeof (out INT, invar PMC) {
   goto NEXT();
 }
 
-inline op typeof (out INT, invar PMC, in KEY) {
+inline op typeof(out INT, invar PMC, in KEY) {
   $1 = $2->vtable->type_keyed(interp, $2, $3);
   goto NEXT();
 }
 
-inline op typeof (out INT, invar PMC, in INTKEY) {
+inline op typeof(out INT, invar PMC, in INTKEY) {
   $1 = $2->vtable->type_keyed_int(interp, $2, $3);
   goto NEXT();
 }
@@ -431,22 +431,22 @@ Push $2 onto the end of the aggregate PMC $1, if that operation is defined.
 
 =cut
 
-inline op push (invar PMC, in INT) {
+inline op push(invar PMC, in INT) {
     $1->vtable->push_integer(interp, $1, $2);
     goto NEXT();
 }
 
-inline op push (invar PMC, in NUM) {
+inline op push(invar PMC, in NUM) {
     $1->vtable->push_float(interp, $1, $2);
     goto NEXT();
 }
 
-inline op push (invar PMC, in STR) {
+inline op push(invar PMC, in STR) {
     $1->vtable->push_string(interp, $1, $2);
     goto NEXT();
 }
 
-inline op push (invar PMC, invar PMC) {
+inline op push(invar PMC, invar PMC) {
     $1->vtable->push_pmc(interp, $1, $2);
     goto NEXT();
 }
@@ -465,22 +465,22 @@ Pop off last entry in the aggregate $2, placing the result in $1.
 
 =cut
 
-inline op pop (out INT, invar PMC) {
+inline op pop(out INT, invar PMC) {
     $1 = $2->vtable->pop_integer(interp, $2);
     goto NEXT();
 }
 
-inline op pop (out NUM, invar PMC) {
+inline op pop(out NUM, invar PMC) {
     $1 = $2->vtable->pop_float(interp, $2);
     goto NEXT();
 }
 
-inline op pop (out STR, invar PMC) {
+inline op pop(out STR, invar PMC) {
     $1 = $2->vtable->pop_string(interp, $2);
     goto NEXT();
 }
 
-inline op pop (out PMC, invar PMC) {
+inline op pop(out PMC, invar PMC) {
     $1 = $2->vtable->pop_pmc(interp, $2);
     goto NEXT();
 }
@@ -499,22 +499,22 @@ Unshift $2 onto the front of the aggregate PMC $1.
 
 =cut
 
-inline op unshift (invar PMC, in INT) {
+inline op unshift(invar PMC, in INT) {
     $1->vtable->unshift_integer(interp, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (invar PMC, in NUM) {
+inline op unshift(invar PMC, in NUM) {
     $1->vtable->unshift_float(interp, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (invar PMC, in STR) {
+inline op unshift(invar PMC, in STR) {
     $1->vtable->unshift_string(interp, $1, $2);
     goto NEXT();
 }
 
-inline op unshift (invar PMC, invar PMC) {
+inline op unshift(invar PMC, invar PMC) {
     $1->vtable->unshift_pmc(interp, $1, $2);
     goto NEXT();
 }
@@ -533,22 +533,22 @@ Shift off the first entry in the aggregate $2 and places it in $1.
 
 =cut
 
-inline op shift (out INT, invar PMC) {
+inline op shift(out INT, invar PMC) {
     $1 = $2->vtable->shift_integer(interp, $2);
     goto NEXT();
 }
 
-inline op shift (out NUM, invar PMC) {
+inline op shift(out NUM, invar PMC) {
     $1 = $2->vtable->shift_float(interp, $2);
     goto NEXT();
 }
 
-inline op shift (out STR, invar PMC) {
+inline op shift(out STR, invar PMC) {
     $1 = $2->vtable->shift_string(interp, $2);
     goto NEXT();
 }
 
-inline op shift (out PMC, invar PMC) {
+inline op shift(out PMC, invar PMC) {
     $1 = $2->vtable->shift_pmc(interp, $2);
     goto NEXT();
 }

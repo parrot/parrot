@@ -26,58 +26,58 @@ This file contains a C function to access Parrot's bytecode library functions.
 
 /* HEADERIZER BEGIN: static */
 
-static void cnv_to_win32_filesep( NOTNULL(STRING *path) )
+static void cnv_to_win32_filesep(NOTNULL(STRING *path))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* get_search_paths( PARROT_INTERP, enum_lib_paths which )
+static PMC* get_search_paths(PARROT_INTERP, enum_lib_paths which)
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
-static int is_abs_path( NOTNULL(const STRING *file) )
+static int is_abs_path(NOTNULL(const STRING *file))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* path_append( PARROT_INTERP,
+static STRING* path_append(PARROT_INTERP,
     NOTNULL(STRING *l_path),
-    NOTNULL(STRING *r_path) )
+    NOTNULL(STRING *r_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* path_concat( PARROT_INTERP,
+static STRING* path_concat(PARROT_INTERP,
     NOTNULL(STRING *l_path),
-    NOTNULL(STRING *r_path) )
+    NOTNULL(STRING *r_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* path_finalize( PARROT_INTERP, NOTNULL(STRING *path) )
+static STRING* path_finalize(PARROT_INTERP, NOTNULL(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* path_guarantee_trailing_separator( PARROT_INTERP,
-    NOTNULL(STRING *path) )
+static STRING* path_guarantee_trailing_separator(PARROT_INTERP,
+    NOTNULL(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING* try_bytecode_extensions( PARROT_INTERP, NOTNULL(STRING* path) )
+static STRING* try_bytecode_extensions(PARROT_INTERP, NOTNULL(STRING* path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING* try_load_path( PARROT_INTERP, NOTNULL(STRING* path) )
+static STRING* try_load_path(PARROT_INTERP, NOTNULL(STRING* path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -465,19 +465,19 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, NOTNULL(STRING *file),
 
         full_name = path_append(interp, full_name , file);
 
-        full_name = ( type & PARROT_RUNTIME_FT_DYNEXT )
+        full_name = (type & PARROT_RUNTIME_FT_DYNEXT)
             ? try_load_path(interp, full_name)
             : try_bytecode_extensions(interp, full_name);
 
-        if ( full_name )
+        if (full_name)
             return full_name;
     }
 
-     full_name = ( type & PARROT_RUNTIME_FT_DYNEXT )
+     full_name = (type & PARROT_RUNTIME_FT_DYNEXT)
         ? try_load_path(interp, file)
         : try_bytecode_extensions(interp, file);
 
-     if ( full_name )
+     if (full_name)
          return full_name;
 
     return NULL;

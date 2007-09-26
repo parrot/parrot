@@ -1304,7 +1304,7 @@ PIO_poll(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec
     ParrotIOLayer *l;
     ParrotIO *io;
 
-    if ( PMC_IS_NULL(pmc) ) {
+    if (PMC_IS_NULL(pmc)) {
         real_exception(interp, NULL, E_ValueError, "Can't poll NULL pmc");
     }
 

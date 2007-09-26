@@ -190,89 +190,89 @@ Also all array usage depends on list.
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-static List_chunk * add_chunk( PARROT_INTERP,
+static List_chunk * add_chunk(PARROT_INTERP,
     NOTNULL(List *list),
     int where,
-    UINTVAL idx )
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static List_chunk * alloc_next_size( PARROT_INTERP,
+static List_chunk * alloc_next_size(PARROT_INTERP,
     NOTNULL(List *list),
     int where,
-    UINTVAL idx )
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static List_chunk * allocate_chunk( PARROT_INTERP,
+static List_chunk * allocate_chunk(PARROT_INTERP,
     NOTNULL(List *list),
     UINTVAL items,
-    UINTVAL size )
+    UINTVAL size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static List_chunk * get_chunk( PARROT_INTERP,
+static List_chunk * get_chunk(PARROT_INTERP,
     NOTNULL(List *list),
-    NOTNULL(UINTVAL *idx) )
+    NOTNULL(UINTVAL *idx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void list_append( PARROT_INTERP,
+static void list_append(PARROT_INTERP,
     NOTNULL(List *list),
     NULLOK(void *item),
     int type,
-    UINTVAL idx )
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void list_dump( NOTNULL(const List *list), INTVAL type )
+static void list_dump(NOTNULL(const List *list), INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * list_item( PARROT_INTERP,
+static void * list_item(PARROT_INTERP,
     NOTNULL(List *list),
     int type,
-    INTVAL idx )
+    INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void list_set( PARROT_INTERP,
+static void list_set(PARROT_INTERP,
     NOTNULL(List *list),
     NULLOK(void *item),
     INTVAL type,
-    INTVAL idx )
+    INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL rebuild_chunk_list( PARROT_INTERP, NOTNULL(List *list) )
+static UINTVAL rebuild_chunk_list(PARROT_INTERP, NOTNULL(List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void rebuild_chunk_ptrs( NOTNULL(List *list), int cut )
+static void rebuild_chunk_ptrs(NOTNULL(List *list), int cut)
         __attribute__nonnull__(1);
 
-static void rebuild_fix_ends( NOTNULL(List *list) )
+static void rebuild_fix_ends(NOTNULL(List *list))
         __attribute__nonnull__(1);
 
-static void rebuild_other( PARROT_INTERP, NOTNULL(List *list) )
+static void rebuild_other(PARROT_INTERP, NOTNULL(List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void rebuild_sparse( NOTNULL(List *list) )
+static void rebuild_sparse(NOTNULL(List *list))
         __attribute__nonnull__(1);
 
-static void split_chunk( PARROT_INTERP,
+static void split_chunk(PARROT_INTERP,
     NOTNULL(List *list),
     NOTNULL(List_chunk *chunk),
-    UINTVAL ix )
+    UINTVAL ix)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

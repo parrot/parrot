@@ -35,15 +35,15 @@ src/exec.c - Generate an object file
 static void add_data_member(
     NOTNULL(Parrot_exec_objfile_t *obj),
     NULLOK(void *src),
-    size_t len )
+    size_t len)
         __attribute__nonnull__(1);
 
-static void exec_init( NOTNULL(Parrot_exec_objfile_t *obj) )
+static void exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
         __attribute__nonnull__(1);
 
 static int symbol_list_find(
     NOTNULL(Parrot_exec_objfile_t *obj),
-    NOTNULL(const char *symbol) )
+    NOTNULL(const char *symbol))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

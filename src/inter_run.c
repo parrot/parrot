@@ -28,12 +28,12 @@ Various functions that call the run loop.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static parrot_context_t * runops_args( PARROT_INTERP,
+static parrot_context_t * runops_args(PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *obj),
     SHIM(STRING *meth),
     NOTNULL(const char *sig),
-    va_list ap )
+    va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

@@ -13,41 +13,41 @@
 
 static void add_entry(
     NOTNULL(STM_waitlist *waitlist),
-    NOTNULL(struct waitlist_entry *entry) )
+    NOTNULL(struct waitlist_entry *entry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static struct waitlist_entry * alloc_entry( PARROT_INTERP )
+static struct waitlist_entry * alloc_entry(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static struct waitlist_thread_data * get_thread( PARROT_INTERP )
+static struct waitlist_thread_data * get_thread(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static struct waitlist_thread_data * get_thread_noalloc( PARROT_INTERP )
+static struct waitlist_thread_data * get_thread_noalloc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static STM_tx_log * Parrot_STM_tx_log_alloc( PARROT_INTERP, size_t size )
+static STM_tx_log * Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 static int remove_first(
     NOTNULL(STM_waitlist *waitlist),
-    NOTNULL(struct waitlist_entry *expect_first) )
+    NOTNULL(struct waitlist_entry *expect_first))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void waitlist_remove(
     STM_waitlist *waitlist,
-    struct waitlist_entry *what );
+    struct waitlist_entry *what);
 
 static void waitlist_remove_check(
     STM_waitlist *waitlist,
-    struct waitlist_entry *what );
+    struct waitlist_entry *what);
 
-static void waitlist_signal_all( STM_waitlist *list );
-static void waitlist_signal_one( struct waitlist_entry *who );
+static void waitlist_signal_all(STM_waitlist *list);
+static void waitlist_signal_one(struct waitlist_entry *who);
 /* HEADERIZER END: static */
 
 #define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really

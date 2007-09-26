@@ -25,14 +25,14 @@ src/pmc.c - The base vtable calling functions
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* create_class_pmc( PARROT_INTERP, INTVAL type )
+static PMC* create_class_pmc(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* get_new_pmc_header( PARROT_INTERP,
+static PMC* get_new_pmc_header(PARROT_INTERP,
     INTVAL base_type,
-    UINTVAL flags )
+    UINTVAL flags)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

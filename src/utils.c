@@ -41,25 +41,25 @@ typedef struct parrot_prm_context {
 /* HEADERIZER HFILE: include/parrot/misc.h */
 /* HEADERIZER BEGIN: static */
 
-static FLOATVAL _drand48( void );
-static FLOATVAL _erand48( _rand_buf buf );
-static long _jrand48( _rand_buf buf );
-static long _lrand48( void );
-static long _mrand48( void );
-static long _nrand48( _rand_buf buf );
-static void _srand48( long seed );
-static void move_reg( int from, int dest, NOTNULL(parrot_prm_context* c) )
+static FLOATVAL _drand48(void);
+static FLOATVAL _erand48(_rand_buf buf);
+static long _jrand48(_rand_buf buf);
+static long _lrand48(void);
+static long _mrand48(void);
+static long _nrand48(_rand_buf buf);
+static void _srand48(long seed);
+static void move_reg(int from, int dest, NOTNULL(parrot_prm_context* c))
         __attribute__nonnull__(3);
 
-static void next_rand( _rand_buf X );
+static void next_rand(_rand_buf X);
 static void process_cycle_without_exit(
     int node_index,
-    NOTNULL(parrot_prm_context* c) )
+    NOTNULL(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
 static void rec_climb_back_and_mark(
     int node_index,
-    NOTNULL(parrot_prm_context* c) )
+    NOTNULL(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */

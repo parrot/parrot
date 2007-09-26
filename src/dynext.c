@@ -25,11 +25,11 @@ src/dynext.c - Dynamic extensions to Parrot
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING * get_path( PARROT_INTERP,
+static STRING * get_path(PARROT_INTERP,
     NOTNULL(STRING *lib),
     NOTNULL(void **handle),
     NOTNULL(STRING *wo_ext),
-    NOTNULL(STRING *ext) )
+    NOTNULL(STRING *ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -38,39 +38,39 @@ static STRING * get_path( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* is_loaded( PARROT_INTERP, NOTNULL(STRING *path) )
+static PMC* is_loaded(PARROT_INTERP, NOTNULL(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC * make_string_pmc( PARROT_INTERP, NOTNULL(STRING *string) )
+static PMC * make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PMC * run_init_lib( PARROT_INTERP,
+static PMC * run_init_lib(PARROT_INTERP,
     NOTNULL(void *handle),
     NOTNULL(STRING *lib_name),
-    NOTNULL(STRING *wo_ext) )
+    NOTNULL(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void set_cstring_prop( PARROT_INTERP,
+static void set_cstring_prop(PARROT_INTERP,
     NOTNULL(PMC *lib_pmc),
     NOTNULL(const char *what),
-    NOTNULL(STRING *name) )
+    NOTNULL(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void store_lib_pmc( PARROT_INTERP,
+static void store_lib_pmc(PARROT_INTERP,
     NOTNULL(NOTNULL(PMC *lib_pmc)),
     NOTNULL(STRING *path),
     NOTNULL(STRING *type),
-    NOTNULL(STRING *lib_name) )
+    NOTNULL(STRING *lib_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

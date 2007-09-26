@@ -37,96 +37,96 @@ charset functionality for similar charsets like iso-8859-1.
 
 /* HEADERIZER BEGIN: static */
 
-static STRING* compose( PARROT_INTERP, NOTNULL(STRING *src) )
+static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING* decompose( PARROT_INTERP, NOTNULL(STRING *src) )
+static STRING* decompose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void downcase( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void downcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void downcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void downcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL find_cclass( PARROT_INTERP,
+static INTVAL find_cclass(PARROT_INTERP,
     INTVAL flags,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL find_not_cclass( PARROT_INTERP,
+static INTVAL find_not_cclass(PARROT_INTERP,
     INTVAL flags,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL is_cclass( PARROT_INTERP,
+static INTVAL is_cclass(PARROT_INTERP,
     INTVAL flags,
     NOTNULL(STRING *source_string),
-    UINTVAL offset )
+    UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void set_graphemes( PARROT_INTERP,
+static void set_graphemes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
     UINTVAL replace_count,
-    NOTNULL(STRING *insert_string) )
+    NOTNULL(STRING *insert_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
-static STRING * string_from_codepoint( PARROT_INTERP, UINTVAL codepoint )
+static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
-static void titlecase( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void titlecase(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void titlecase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_ascii( PARROT_INTERP,
+static STRING * to_ascii(PARROT_INTERP,
     NOTNULL(STRING *src),
-    NULLOK(STRING *dest) )
+    NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_charset( PARROT_INTERP,
+static STRING * to_charset(PARROT_INTERP,
     NOTNULL(STRING *src),
-    NULLOK(STRING *dest) )
+    NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * to_unicode( PARROT_INTERP,
+static STRING * to_unicode(PARROT_INTERP,
     NOTNULL(STRING *src),
-    NULLOK(STRING *dest) )
+    NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void upcase( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void upcase(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void upcase_first( PARROT_INTERP, NOTNULL(STRING *source_string) )
+static void upcase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL validate( PARROT_INTERP, NOTNULL(STRING *src) )
+static UINTVAL validate(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

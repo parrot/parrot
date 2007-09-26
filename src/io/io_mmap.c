@@ -25,27 +25,27 @@ Open mmaps the file.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL PIO_mmap_close( PARROT_INTERP,
+static INTVAL PIO_mmap_close(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_mmap_open( PARROT_INTERP,
+static ParrotIO * PIO_mmap_open(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(const char *path),
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t PIO_mmap_read( PARROT_INTERP,
+static size_t PIO_mmap_read(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

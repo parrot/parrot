@@ -616,8 +616,8 @@ Compose the given role into this one, using the given exclusions and aliases.
         Parrot_Role *role_info = PARROT_ROLE(SELF);
         STRING *s_name, *r_name;
 
-        (STRING *s_name) = PCCINVOKE( interp, SELF, "name" );
-        (STRING *r_name) = PCCINVOKE( interp, role, "name" );
+        (STRING *s_name) = PCCINVOKE(interp, SELF, "name");
+        (STRING *r_name) = PCCINVOKE(interp, role, "name");
         UNUSED(s_name);
         UNUSED(r_name);
 

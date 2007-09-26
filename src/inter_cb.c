@@ -32,14 +32,14 @@ the C-library.
 
 /* HEADERIZER BEGIN: static */
 
-static void callback_CD( PARROT_INTERP,
+static void callback_CD(PARROT_INTERP,
     NOTNULL(char *external_data),
-    NOTNULL(PMC *user_data) )
+    NOTNULL(PMC *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void verify_CD( NOTNULL(char *external_data), NOTNULL(PMC *user_data) )
+static void verify_CD(NOTNULL(char *external_data), NOTNULL(PMC *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

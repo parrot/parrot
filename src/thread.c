@@ -25,65 +25,65 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 
 /* HEADERIZER BEGIN: static */
 
-static Parrot_Interp detach( UINTVAL tid );
-static Shared_gc_info * get_pool( PARROT_INTERP )
+static Parrot_Interp detach(UINTVAL tid);
+static Shared_gc_info * get_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int is_suspended_for_gc( PARROT_INTERP )
+static int is_suspended_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static PMC * make_local_args_copy( PARROT_INTERP,
+static PMC * make_local_args_copy(PARROT_INTERP,
     Parrot_Interp old_interp,
-    PMC *args )
+    PMC *args)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static PMC * make_local_copy( PARROT_INTERP,
+static PMC * make_local_copy(PARROT_INTERP,
     NOTNULL(Parrot_Interp from),
-    NULLOK(PMC *arg) )
+    NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mutex_unlock( void *arg );
-static Parrot_Interp pt_check_tid( UINTVAL tid, NOTNULL(const char *from) )
+static void mutex_unlock(void *arg);
+static Parrot_Interp pt_check_tid(UINTVAL tid, NOTNULL(const char *from))
         __attribute__nonnull__(2);
 
-static int pt_gc_count_threads( PARROT_INTERP )
+static int pt_gc_count_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void pt_gc_wait_for_stage( PARROT_INTERP,
+static void pt_gc_wait_for_stage(PARROT_INTERP,
     thread_gc_stage_enum from_stage,
-    thread_gc_stage_enum to_stage )
+    thread_gc_stage_enum to_stage)
         __attribute__nonnull__(1);
 
-static void pt_gc_wakeup_check( PARROT_INTERP )
+static void pt_gc_wakeup_check(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void pt_ns_clone(
     Parrot_Interp d,
     PMC *dest_ns,
     Parrot_Interp s,
-    PMC *source_ns );
+    PMC *source_ns);
 
-static void pt_suspend_all_for_gc( PARROT_INTERP )
+static void pt_suspend_all_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void pt_suspend_one_for_gc( PARROT_INTERP )
+static void pt_suspend_one_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void pt_thread_signal( NOTNULL(Parrot_Interp self), PARROT_INTERP )
+static void pt_thread_signal(NOTNULL(Parrot_Interp self), PARROT_INTERP)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void pt_thread_wait( PARROT_INTERP )
+static void pt_thread_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static QUEUE_ENTRY * remove_queued_suspend_gc( PARROT_INTERP )
+static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static void* thread_func( void *arg );
+static void* thread_func(void *arg);
 
 /* HEADERIZER END: static */
 

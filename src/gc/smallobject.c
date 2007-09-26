@@ -25,29 +25,29 @@ Handles the accessing of small object pools (header pools).
 
 /* HEADERIZER BEGIN: static */
 
-static void gc_ms_add_free_object( SHIM_INTERP,
+static void gc_ms_add_free_object(SHIM_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *to_add) )
+    NOTNULL(PObj *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void gc_ms_alloc_objects( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static void gc_ms_alloc_objects(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PObj * gc_ms_get_free_object( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static PObj * gc_ms_get_free_object(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms_pool_init( SHIM_INTERP, NOTNULL(Small_Object_Pool *pool) )
+static void gc_ms_pool_init(SHIM_INTERP, NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(2);
 
-static void more_traceable_objects( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static void more_traceable_objects(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

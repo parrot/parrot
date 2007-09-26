@@ -15,7 +15,7 @@ src/pmc/pmethod_test.pmc - PCCMETHOD_Test PMC
 pmclass PCCMETHOD_Test need_ext does hash {
 
 
-    METHOD void test_method ()
+    METHOD void test_method()
     {
         UNUSED(SELF);
         PIO_printf(interp, "test_method\n");

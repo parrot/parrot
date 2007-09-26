@@ -1352,7 +1352,7 @@ Walks the MRO of the class and finds the method with the given name.
         PMC                  *_namespace = _class->_namespace;
         int num_classes, i;
 
-        if (  ! PMC_IS_NULL(_namespace)
+        if (! PMC_IS_NULL(_namespace)
             &&  VTABLE_exists_keyed_str(interp, _namespace, name)) {
             PMC *ret = VTABLE_get_pmc_keyed_str(interp, _namespace, name);
             PCCRETURN(PMC *ret);

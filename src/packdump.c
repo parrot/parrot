@@ -27,9 +27,9 @@ This is only used by the PBC dumper C<pdump>.
 
 /* HEADERIZER BEGIN: static */
 
-static void PackFile_Constant_dump( PARROT_INTERP,
+static void PackFile_Constant_dump(PARROT_INTERP,
     NOTNULL(PackFile_ConstTable *ct),
-    NOTNULL(PackFile_Constant *self) )
+    NOTNULL(PackFile_Constant *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

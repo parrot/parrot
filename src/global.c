@@ -24,23 +24,23 @@ src/global.c - Access to global PMCs
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * get_namespace_pmc( PARROT_INTERP, NOTNULL(PMC *sub) )
+static PMC * get_namespace_pmc(PARROT_INTERP, NOTNULL(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * internal_ns_keyed( PARROT_INTERP,
+static PMC * internal_ns_keyed(PARROT_INTERP,
     NOTNULL(PMC *base_ns),
     NULLOK(PMC *pmc_key),
     NULLOK(STRING *str_key),
-    int flags )
+    int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void store_sub_in_multi( PARROT_INTERP,
+static void store_sub_in_multi(PARROT_INTERP,
     NOTNULL(PMC *sub),
-    NOTNULL(PMC *ns) )
+    NOTNULL(PMC *ns))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -28,117 +28,117 @@ Handles class and object manipulation.
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL attr_str_2_num( PARROT_INTERP,
+static INTVAL attr_str_2_num(PARROT_INTERP,
     NOTNULL(PMC *object),
-    NOTNULL(STRING *attr) )
+    NOTNULL(STRING *attr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* C3_merge( PARROT_INTERP, NOTNULL(PMC *merge_list) )
+static PMC* C3_merge(PARROT_INTERP, NOTNULL(PMC *merge_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* class_mro_merge( PARROT_INTERP, NOTNULL(PMC *seqs) )
+static PMC* class_mro_merge(PARROT_INTERP, NOTNULL(PMC *seqs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* create_class_mro( PARROT_INTERP, NOTNULL(PMC *_class) )
+static PMC* create_class_mro(PARROT_INTERP, NOTNULL(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void create_deleg_pmc_vtable( PARROT_INTERP,
+static void create_deleg_pmc_vtable(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    int full )
+    int full)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void debug_trace_find_meth( PARROT_INTERP,
+static void debug_trace_find_meth(PARROT_INTERP,
     NOTNULL(PMC *_class),
     NOTNULL(STRING *name),
-    NULLOK(PMC *sub) )
+    NULLOK(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void do_initcall( PARROT_INTERP,
+static void do_initcall(PARROT_INTERP,
     NULLOK(PMC* _class),
     NULLOK(PMC *object),
-    NULLOK(PMC *init) )
+    NULLOK(PMC *init))
         __attribute__nonnull__(1);
 
-static void fail_if_exist( PARROT_INTERP, NOTNULL(PMC *name) )
+static void fail_if_exist(PARROT_INTERP, NOTNULL(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * find_method_direct_1( PARROT_INTERP,
+static PMC * find_method_direct_1(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(STRING *method_name) )
+    NOTNULL(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* find_vtable_meth_ns( PARROT_INTERP,
+static PMC* find_vtable_meth_ns(PARROT_INTERP,
     NOTNULL(PMC *ns),
-    INTVAL vtable_index )
+    INTVAL vtable_index)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* get_init_meth( PARROT_INTERP,
+static PMC* get_init_meth(PARROT_INTERP,
     NOTNULL(PMC *_class),
     NOTNULL(STRING *prop_str),
-    NOTNULL(STRING **meth_str) )
+    NOTNULL(STRING **meth_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void instantiate_object( PARROT_INTERP,
+static void instantiate_object(PARROT_INTERP,
     NOTNULL(PMC *object),
-    NULLOK(PMC *init) )
+    NULLOK(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void invalidate_all_caches( PARROT_INTERP )
+static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void invalidate_type_caches( PARROT_INTERP, UINTVAL type )
+static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC* not_empty( PARROT_INTERP, NOTNULL(PMC *seqs) )
+static PMC* not_empty(PARROT_INTERP, NOTNULL(PMC *seqs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void parrot_class_register( PARROT_INTERP,
+static void parrot_class_register(PARROT_INTERP,
     NOTNULL(PMC *name),
     NOTNULL(PMC *new_class),
     NULLOK(PMC *parent),
-    NOTNULL(PMC *mro) )
+    NOTNULL(PMC *mro))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
-static void rebuild_attrib_stuff( PARROT_INTERP, NOTNULL(PMC *_class) )
+static void rebuild_attrib_stuff(PARROT_INTERP, NOTNULL(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL register_type( PARROT_INTERP, NOTNULL(PMC *name) )
+static INTVAL register_type(PARROT_INTERP, NOTNULL(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -16,7 +16,7 @@
 /* HEADERIZER BEGIN: src/charset/binary.c */
 
 PARROT_CANNOT_RETURN_NULL
-const CHARSET * Parrot_charset_binary_init( PARROT_INTERP )
+const CHARSET * Parrot_charset_binary_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/charset/binary.c */

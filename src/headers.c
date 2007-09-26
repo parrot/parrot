@@ -23,37 +23,37 @@ Handles getting of various headers, and pool creation.
 
 static void fix_pmc_syncs(
     NOTNULL(Interp *dest_interp),
-    NOTNULL(Small_Object_Pool *pool) )
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void free_pool( NOTNULL(Small_Object_Pool *pool) )
+static void free_pool(NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static void * get_free_buffer( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static void * get_free_buffer(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC_EXT * new_pmc_ext( PARROT_INTERP )
+static PMC_EXT * new_pmc_ext(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int sweep_cb_buf( PARROT_INTERP,
+static int sweep_cb_buf(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     SHIM(int flag),
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int sweep_cb_pmc( PARROT_INTERP,
+static int sweep_cb_pmc(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);

@@ -41,26 +41,26 @@ don't apply.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int cstring_compare( SHIM_INTERP,
+static int cstring_compare(SHIM_INTERP,
     NOTNULL(const char *a),
-    NOTNULL(const char *b) )
+    NOTNULL(const char *b))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void expand_hash( PARROT_INTERP, NOTNULL(Hash *hash) )
+static void expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void hash_freeze( PARROT_INTERP,
+static void hash_freeze(PARROT_INTERP,
     NOTNULL(const Hash * const hash),
-    NOTNULL(visit_info* info) )
+    NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void hash_thaw( PARROT_INTERP,
+static void hash_thaw(PARROT_INTERP,
     NOTNULL(Hash *hash),
-    NOTNULL(visit_info* info) )
+    NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -70,39 +70,39 @@ static void init_hash(
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     hash_comp_fn compare,
-    hash_hash_key_fn keyhash )
+    hash_hash_key_fn keyhash)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_cstring( SHIM_INTERP,
+static size_t key_hash_cstring(SHIM_INTERP,
     NOTNULL(const void *value),
-    size_t seed )
+    size_t seed)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static size_t key_hash_pointer( SHIM_INTERP,
+static size_t key_hash_pointer(SHIM_INTERP,
     NULLOK(void *value),
-    size_t seed );
+    size_t seed);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t key_hash_STRING( PARROT_INTERP,
+static size_t key_hash_STRING(PARROT_INTERP,
     NOTNULL(STRING *value),
-    size_t seed )
+    size_t seed)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int pointer_compare( SHIM_INTERP,
+static int pointer_compare(SHIM_INTERP,
     NULLOK(const void *a),
-    NULLOK(const void *b) );
+    NULLOK(const void *b));
 
 PARROT_WARN_UNUSED_RESULT
-static int STRING_compare( PARROT_INTERP,
+static int STRING_compare(PARROT_INTERP,
     NOTNULL(const void *search_key),
-    NOTNULL(const void *bucket_key) )
+    NOTNULL(const void *bucket_key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -32,26 +32,26 @@ There's also a verbose mode for garbage collection.
 
 /* HEADERIZER BEGIN: static */
 
-static void clear_live_bits( NOTNULL(Small_Object_Pool *pool) )
+static void clear_live_bits(NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
-static size_t find_common_mask( PARROT_INTERP, size_t val1, size_t val2 )
+static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
         __attribute__nonnull__(1);
 
-static void mark_special( PARROT_INTERP, NOTNULL(PMC *obj) )
+static void mark_special(PARROT_INTERP, NOTNULL(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int sweep_cb( PARROT_INTERP,
+static int sweep_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int trace_active_PMCs( PARROT_INTERP, int trace_stack )
+static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -791,7 +791,7 @@ TODO: Not yet documented!!!
 */
 
 void
-Parrot_dod_free_buffer( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
+Parrot_dod_free_buffer(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *b))
 {
     Memory_Pool *mem_pool = (Memory_Pool *)pool->mem_pool;

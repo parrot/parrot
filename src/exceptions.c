@@ -42,21 +42,21 @@ Define the internal interpreter exceptions.
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
-static opcode_t * create_exception( PARROT_INTERP )
+static opcode_t * create_exception(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t dest2offset( PARROT_INTERP, NOTNULL(const opcode_t *dest) )
+static size_t dest2offset(PARROT_INTERP, NOTNULL(const opcode_t *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * find_exception_handler( PARROT_INTERP, NOTNULL(PMC *exception) )
+static PMC * find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void run_cleanup_action( PARROT_INTERP, NOTNULL(Stack_Entry_t *e) )
+static void run_cleanup_action(PARROT_INTERP, NOTNULL(Stack_Entry_t *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -834,10 +834,10 @@ Parrot_print_backtrace(void)
     size_t j;
 #  endif
 
-    const size_t size = backtrace (array, BACKTRACE_DEPTH);
-    char ** const strings = backtrace_symbols (array, size);
+    const size_t size = backtrace(array, BACKTRACE_DEPTH);
+    char ** const strings = backtrace_symbols(array, size);
 
-    fprintf (stderr, "Backtrace - Obtained %zd stack frames (max trace depth is %d).\n", size, BACKTRACE_DEPTH);
+    fprintf(stderr, "Backtrace - Obtained %zd stack frames (max trace depth is %d).\n", size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
     for (i = 0; i < size; i++) {
         /* always ident */
@@ -865,10 +865,10 @@ Parrot_print_backtrace(void)
     }
 #  else
     for (i = 0; i < size; i++)
-        fprintf (stderr, "%s\n", strings[i]);
+        fprintf(stderr, "%s\n", strings[i]);
 #  endif
 
-    free (strings);
+    free(strings);
 
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_GLIBC_BACKTRACE */

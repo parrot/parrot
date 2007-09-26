@@ -109,7 +109,7 @@ Destroys the coroutine.
 
 */
 
-    void destroy () {
+    void destroy() {
         Parrot_coro *sub = PMC_coro(SELF);
 
         if (sub->ctx)

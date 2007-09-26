@@ -123,201 +123,201 @@ typedef struct Gc_gms_private {
 
 /* HEADERIZER BEGIN: static */
 
-static int end_cycle_cb( PARROT_INTERP,
+static int end_cycle_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void gc_gms_add_free_object( PARROT_INTERP,
+static void gc_gms_add_free_object(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(PObj *to_add) )
+    NOTNULL(PObj *to_add))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void gc_gms_alloc_objects( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static void gc_gms_alloc_objects(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_chain_objects( PARROT_INTERP,
+static void gc_gms_chain_objects(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     NOTNULL(Small_Object_Arena *new_arena),
-    size_t real_size )
+    size_t real_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void gc_gms_clear_hdr_list( PARROT_INTERP,
-    NOTNULL(Gc_gms_hdr_list *l) )
+static void gc_gms_clear_hdr_list(PARROT_INTERP,
+    NOTNULL(Gc_gms_hdr_list *l))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_clear_igp( PARROT_INTERP, NOTNULL(Gc_gms_gen *gen) )
+static void gc_gms_clear_igp(PARROT_INTERP, NOTNULL(Gc_gms_gen *gen))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static Gc_gms_gen * gc_gms_create_gen( PARROT_INTERP,
+static Gc_gms_gen * gc_gms_create_gen(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    size_t gen_no )
+    size_t gen_no)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_end_cycle( PARROT_INTERP )
+static void gc_gms_end_cycle(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Gc_gms_gen * gc_gms_find_gen( PARROT_INTERP,
+static Gc_gms_gen * gc_gms_find_gen(PARROT_INTERP,
     NOTNULL(Gc_gms_hdr *h),
-    UINTVAL gen_no )
+    UINTVAL gen_no)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PObj * gc_gms_get_free_object( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static PObj * gc_gms_get_free_object(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_init_gen( PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
+static void gc_gms_init_gen(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_init_mark( PARROT_INTERP )
+static void gc_gms_init_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_merge_gen( PARROT_INTERP,
+static void gc_gms_merge_gen(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(Gc_gms_plan *plan) )
+    NOTNULL(Gc_gms_plan *plan))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void gc_gms_more_objects( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool) )
+static void gc_gms_more_objects(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_pool_init( PARROT_INTERP,
-    NOTNULL(Small_Object_Pool *pool)  )
+static void gc_gms_pool_init(PARROT_INTERP,
+    NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_promote( PARROT_INTERP,
+static void gc_gms_promote(PARROT_INTERP,
     NOTNULL(Gc_gms_hdr *h),
-    UINTVAL gen_no )
+    UINTVAL gen_no)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_set_gen( PARROT_INTERP )
+static void gc_gms_set_gen(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_setto_black( PARROT_INTERP,
+static void gc_gms_setto_black(PARROT_INTERP,
     NOTNULL(Gc_gms_hdr *h),
-    int priority )
+    int priority)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_setto_gray( PARROT_INTERP,
+static void gc_gms_setto_gray(PARROT_INTERP,
     NOTNULL(Gc_gms_hdr *h),
-    int priority )
+    int priority)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_store_hdr_list( PARROT_INTERP,
+static void gc_gms_store_hdr_list(PARROT_INTERP,
     NOTNULL(Gc_gms_hdr_list *l),
-    NOTNULL(Gc_gms_hdr *h) )
+    NOTNULL(Gc_gms_hdr *h))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void gc_gms_store_igp( PARROT_INTERP, NOTNULL(Gc_gms_hdr *h) )
+static void gc_gms_store_igp(PARROT_INTERP, NOTNULL(Gc_gms_hdr *h))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_sweep( PARROT_INTERP )
+static void gc_gms_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int gc_gms_trace_children( PARROT_INTERP )
+static int gc_gms_trace_children(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int gc_gms_trace_root( PARROT_INTERP, int trace_stack )
+static int gc_gms_trace_root(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
-static void gc_gms_use_gen( PARROT_INTERP,
+static void gc_gms_use_gen(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(Gc_gms_plan *plan) )
+    NOTNULL(Gc_gms_plan *plan))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void gms_debug_verify( PARROT_INTERP,
+static void gms_debug_verify(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
-    NOTNULL(const char *action) )
+    NOTNULL(const char *action))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static int init_mark_cb( PARROT_INTERP,
+static int init_mark_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void parrot_gc_gms_deinit( PARROT_INTERP )
+static void parrot_gc_gms_deinit(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void parrot_gc_gms_run( PARROT_INTERP, int flags )
+static void parrot_gc_gms_run(PARROT_INTERP, int flags)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int set_gen_cb( PARROT_INTERP,
+static int set_gen_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int sweep_cb_buf( PARROT_INTERP,
+static int sweep_cb_buf(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int sweep_cb_pmc( PARROT_INTERP,
+static int sweep_cb_pmc(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int trace_children_cb( PARROT_INTERP,
+static int trace_children_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static int trace_igp_cb( PARROT_INTERP,
+static int trace_igp_cb(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     int flag,
-    NOTNULL(void *arg) )
+    NOTNULL(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -423,7 +423,7 @@ C<more_objects>.
 */
 
 static void
-gc_gms_pool_init(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool) )
+gc_gms_pool_init(PARROT_INTERP, NOTNULL(Small_Object_Pool *pool))
 {
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;

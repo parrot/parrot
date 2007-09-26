@@ -173,8 +173,8 @@ prefixed with 'unicode:'.
 
   PCCMETHOD escape(STRING *str) {
     STRING *escaped_str = string_escape_string(INTERP, str);
-    STRING *quote       = string_from_literal (INTERP, "\"");
-    STRING *x           = string_from_literal (INTERP, "\\x");
+    STRING *quote       = string_from_literal(INTERP, "\"");
+    STRING *x           = string_from_literal(INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
     UNUSED(SELF);
@@ -188,8 +188,8 @@ prefixed with 'unicode:'.
     }
     else
     {
-        STRING *u = string_from_literal (INTERP, "\\u");
-        INTVAL u_pos = string_str_index (INTERP, escaped_str, u, 0);
+        STRING *u = string_from_literal(INTERP, "\\u");
+        INTVAL u_pos = string_str_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }

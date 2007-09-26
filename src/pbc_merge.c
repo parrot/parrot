@@ -56,62 +56,62 @@ typedef struct pbc_merge_input {
 
 /* HEADERIZER BEGIN: static */
 
-static void help( PARROT_INTERP )
+static void help(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile* pbc_merge_begin( PARROT_INTERP,
+static PackFile* pbc_merge_begin(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
-    int num_inputs )
+    int num_inputs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_ByteCode* pbc_merge_bytecode( PARROT_INTERP,
+static PackFile_ByteCode* pbc_merge_bytecode(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
-    NOTNULL(PackFile *pf) )
+    NOTNULL(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_ConstTable* pbc_merge_constants( PARROT_INTERP,
+static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
     NOTNULL(PackFile *pf),
-    NOTNULL(PackFile_ByteCode *bc) )
+    NOTNULL(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static void pbc_merge_ctpointers( PARROT_INTERP,
+static void pbc_merge_ctpointers(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
-    NOTNULL(PackFile_ByteCode *bc) )
+    NOTNULL(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-static void pbc_merge_debugs( PARROT_INTERP,
+static void pbc_merge_debugs(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
     NOTNULL(PackFile *pf),
-    NOTNULL(PackFile_ByteCode *bc) )
+    NOTNULL(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static void pbc_merge_fixups( PARROT_INTERP,
+static void pbc_merge_fixups(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
     NOTNULL(PackFile *pf),
-    NOTNULL(PackFile_ByteCode *bc) )
+    NOTNULL(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -119,31 +119,31 @@ static void pbc_merge_fixups( PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile* pbc_merge_loadpbc( PARROT_INTERP,
-    NOTNULL(const char *fullname) )
+static PackFile* pbc_merge_loadpbc(PARROT_INTERP,
+    NOTNULL(const char *fullname))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void pbc_merge_pic_index( PARROT_INTERP,
+static void pbc_merge_pic_index(PARROT_INTERP,
     NOTNULL(pbc_merge_input **inputs),
     int num_inputs,
     NOTNULL(PackFile *pf),
-    NOTNULL(PackFile_ByteCode *bc) )
+    NOTNULL(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static void pbc_merge_write( PARROT_INTERP,
+static void pbc_merge_write(PARROT_INTERP,
     NOTNULL(PackFile *pf),
-    NOTNULL(const char *filename) )
+    NOTNULL(const char *filename))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static char * str_dup( NOTNULL(const char *old) )
+static char * str_dup(NOTNULL(const char *old))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

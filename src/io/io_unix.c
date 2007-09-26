@@ -48,133 +48,133 @@ ParrotIOLayer pio_unix_layer = {
 /* HEADERIZER BEGIN: static */
 
 PARROT_CONST_FUNCTION
-static INTVAL flags_to_unix( INTVAL flags );
+static INTVAL flags_to_unix(INTVAL flags);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_unix_accept( PARROT_INTERP,
+static ParrotIO * PIO_unix_accept(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_bind( SHIM_INTERP,
+static INTVAL PIO_unix_bind(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *l) )
+    NOTNULL(STRING *l))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static INTVAL PIO_unix_close( SHIM_INTERP,
+static INTVAL PIO_unix_close(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_connect( SHIM_INTERP,
+static INTVAL PIO_unix_connect(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NULLOK(STRING *r) )
+    NULLOK(STRING *r))
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static ParrotIO * PIO_unix_fdopen( PARROT_INTERP,
+static ParrotIO * PIO_unix_fdopen(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     PIOHANDLE fd,
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1);
 
-static INTVAL PIO_unix_flush( SHIM_INTERP,
+static INTVAL PIO_unix_flush(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_init( PARROT_INTERP, NOTNULL(ParrotIOLayer *layer) )
+static INTVAL PIO_unix_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL PIO_unix_isatty( PIOHANDLE fd );
-static INTVAL PIO_unix_listen( SHIM_INTERP,
+static INTVAL PIO_unix_isatty(PIOHANDLE fd);
+static INTVAL PIO_unix_listen(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    INTVAL sec )
+    INTVAL sec)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_unix_open( PARROT_INTERP,
+static ParrotIO * PIO_unix_open(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(const char *spath),
-    INTVAL flags )
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_unix_pipe( PARROT_INTERP,
+static ParrotIO * PIO_unix_pipe(PARROT_INTERP,
     SHIM(ParrotIOLayer *l),
     NOTNULL(const char *cmd),
-    int flags )
+    int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_poll( SHIM_INTERP,
+static INTVAL PIO_unix_poll(SHIM_INTERP,
     SHIM(ParrotIOLayer *l),
     NOTNULL(ParrotIO *io),
     int which,
     int sec,
-    int usec )
+    int usec)
         __attribute__nonnull__(3);
 
-static size_t PIO_unix_read( PARROT_INTERP,
+static size_t PIO_unix_read(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static INTVAL PIO_unix_recv( PARROT_INTERP,
+static INTVAL PIO_unix_recv(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **s) )
+    NOTNULL(STRING **s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static PIOOFF_T PIO_unix_seek( SHIM_INTERP,
+static PIOOFF_T PIO_unix_seek(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
     PIOOFF_T offset,
-    INTVAL whence )
+    INTVAL whence)
         __attribute__nonnull__(3);
 
-static INTVAL PIO_unix_send( SHIM_INTERP,
+static INTVAL PIO_unix_send(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static ParrotIO * PIO_unix_socket( PARROT_INTERP,
+static ParrotIO * PIO_unix_socket(PARROT_INTERP,
     SHIM(ParrotIOLayer *layer),
     int fam,
     int type,
-    int proto )
+    int proto)
         __attribute__nonnull__(1);
 
-static PIOOFF_T PIO_unix_tell( SHIM_INTERP,
+static PIOOFF_T PIO_unix_tell(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
-    NOTNULL(ParrotIO *io) )
+    NOTNULL(ParrotIO *io))
         __attribute__nonnull__(3);
 
-static size_t PIO_unix_write( SHIM_INTERP,
+static size_t PIO_unix_write(SHIM_INTERP,
     SHIM(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
@@ -659,7 +659,7 @@ PIO_unix_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
             case SEEK_CUR:
                 {
                 const PIOOFF_T avail = io->b.next - io->b.startb + offset;
-                io->fsize = ( avail > io->fsize) ? avail : io->fsize;
+                io->fsize = (avail > io->fsize) ? avail : io->fsize;
                 }
                 break;
             case SEEK_END:
@@ -899,7 +899,7 @@ PIO_unix_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io)
 
     const int newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
                           &addrlen);
-    if (newsock == -1 ) {
+    if (newsock == -1) {
         mem_sys_free(newio);
         return NULL;
     }

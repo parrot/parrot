@@ -53,30 +53,30 @@ have the same number of elements because there is a one-to-one mapping.
 
 /* HEADERIZER BEGIN: static */
 
-static void dynop_register_switch( size_t n_old, size_t n_new );
-static void dynop_register_xx( PARROT_INTERP,
+static void dynop_register_switch(size_t n_old, size_t n_new);
+static void dynop_register_xx(PARROT_INTERP,
     size_t n_old,
     size_t n_new,
-    oplib_init_f init_func )
+    oplib_init_f init_func)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static oplib_init_f get_op_lib_init( PARROT_INTERP,
+static oplib_init_f get_op_lib_init(PARROT_INTERP,
     int core_op,
     int which,
-    NULLOK(PMC *lib) )
+    NULLOK(PMC *lib))
         __attribute__nonnull__(1);
 
-static void init_prederef( PARROT_INTERP, int which )
+static void init_prederef(PARROT_INTERP, int which)
         __attribute__nonnull__(1);
 
-static void load_prederef( PARROT_INTERP, int which )
+static void load_prederef(PARROT_INTERP, int which)
         __attribute__nonnull__(1);
 
-static void notify_func_table( PARROT_INTERP,
+static void notify_func_table(PARROT_INTERP,
     NOTNULL(op_func_t* table),
-    int on )
+    int on)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -84,7 +84,7 @@ static void prederef_args(
     NOTNULL(void **pc_prederef),
     PARROT_INTERP,
     NOTNULL(opcode_t *pc),
-    NOTNULL(const op_info_t *opinfo) )
+    NOTNULL(const op_info_t *opinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -92,32 +92,32 @@ static void prederef_args(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * runops_cgp( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+static opcode_t * runops_cgp(PARROT_INTERP, NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_exec( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+static opcode_t * runops_exec(PARROT_INTERP, NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_jit( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+static opcode_t * runops_jit(PARROT_INTERP, NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * runops_switch( PARROT_INTERP, NOTNULL(opcode_t *pc) )
+static opcode_t * runops_switch(PARROT_INTERP, NOTNULL(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void stop_prederef( PARROT_INTERP )
+static void stop_prederef(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void turn_ev_check( PARROT_INTERP, int on )
+static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */
@@ -958,7 +958,7 @@ dynop_register(PARROT_INTERP, PMC* lib_pmc)
      */
     if (interp->n_libs >= 2 &&
             (strcmp(interp->all_op_libs[interp->n_libs-2]->name,
-                lib->name) == 0) ) {
+                lib->name) == 0)) {
         /* registering is handled below */
         return;
     }

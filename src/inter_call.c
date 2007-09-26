@@ -28,18 +28,18 @@ subroutines.
 
 /* HEADERIZER BEGIN: static */
 
-static void check_for_opt_flag( NOTNULL(call_state *st), int has_arg )
+static void check_for_opt_flag(NOTNULL(call_state *st), int has_arg)
         __attribute__nonnull__(1);
 
-static void check_named( PARROT_INTERP, NOTNULL(call_state *st) )
+static void check_named(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void clone_key_arg( PARROT_INTERP, NOTNULL(call_state *st) )
+static void clone_key_arg(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void commit_last_arg( PARROT_INTERP,
+static void commit_last_arg(PARROT_INTERP,
     int index,
     int cur,
     NOTNULL(opcode_t *n_regs_used),
@@ -48,7 +48,7 @@ static void commit_last_arg( PARROT_INTERP,
     NOTNULL(opcode_t **indexes),
     NOTNULL(parrot_context_t *ctx),
     NULLOK(PMC *pmc),
-    NOTNULL(va_list *list) )
+    NOTNULL(va_list *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(6)
@@ -56,79 +56,79 @@ static void commit_last_arg( PARROT_INTERP,
         __attribute__nonnull__(8)
         __attribute__nonnull__(10);
 
-static void convert_arg_from_int( PARROT_INTERP, NOTNULL(call_state *st) )
+static void convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void convert_arg_from_num( PARROT_INTERP, NOTNULL(call_state *st) )
+static void convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void convert_arg_from_pmc( PARROT_INTERP, NOTNULL(call_state *st) )
+static void convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void convert_arg_from_str( PARROT_INTERP, NOTNULL(call_state *st) )
+static void convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int fetch_arg_op( PARROT_INTERP, NOTNULL(call_state *st) )
+static int fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int fetch_arg_sig( PARROT_INTERP, NOTNULL(call_state *st) )
+static int fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void init_call_stats( NOTNULL(call_state *st) )
+static void init_call_stats(NOTNULL(call_state *st))
         __attribute__nonnull__(1);
 
-static void init_first_dest_named( PARROT_INTERP, NOTNULL(call_state *st) )
+static void init_first_dest_named(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int locate_named_named( PARROT_INTERP, NOTNULL(call_state *st) )
+static int locate_named_named(PARROT_INTERP, NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void next_arg_sig( NOTNULL(call_state_item *sti) )
+static void next_arg_sig(NOTNULL(call_state_item *sti))
         __attribute__nonnull__(1);
 
-static void null_val( int sig, NOTNULL(call_state *st) )
+static void null_val(int sig, NOTNULL(call_state *st))
         __attribute__nonnull__(2);
 
-static int set_retval_util( PARROT_INTERP,
+static int set_retval_util(PARROT_INTERP,
     NOTNULL(const char *sig),
     NOTNULL(parrot_context_t *ctx),
-    NOTNULL(call_state *st) )
+    NOTNULL(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void start_flatten( PARROT_INTERP,
+static void start_flatten(PARROT_INTERP,
     NOTNULL(call_state *st),
-    NOTNULL(PMC *p_arg) )
+    NOTNULL(PMC *p_arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void store_arg( NOTNULL(call_state *st), INTVAL idx )
+static void store_arg(NOTNULL(call_state *st), INTVAL idx)
         __attribute__nonnull__(1);
 
-static int store_current_arg( NOTNULL(call_state *st) )
+static int store_current_arg(NOTNULL(call_state *st))
         __attribute__nonnull__(1);
 
-static void too_few( PARROT_INTERP,
+static void too_few(PARROT_INTERP,
     NOTNULL(const call_state *st),
-    NOTNULL(const char *action) )
+    NOTNULL(const char *action))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void too_many( PARROT_INTERP,
+static void too_many(PARROT_INTERP,
     NOTNULL(const call_state *st),
-    NOTNULL(const char *action) )
+    NOTNULL(const char *action))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -37,44 +37,44 @@ void * IMCC_compile_file(PARROT_INTERP, const char *s);
 
 /* HEADERIZER BEGIN: static */
 
-static void byte_code_destroy( SHIM_INTERP, NOTNULL(PackFile_Segment *self) )
+static void byte_code_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * byte_code_new( SHIM_INTERP,
+static PackFile_Segment * byte_code_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    SHIM(int add) );
+    SHIM(int add));
 
-static void const_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+static void const_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * const_new( SHIM_INTERP,
+static PackFile_Segment * const_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    SHIM(int add) );
+    SHIM(int add));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * create_seg( PARROT_INTERP,
+static PackFile_Segment * create_seg(PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     pack_file_types t,
     NOTNULL(const char *name),
     NOTNULL(const char *file_name),
-    int add )
+    int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-static void default_destroy( NOTNULL(PackFile_Segment *self) )
+static void default_destroy(NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1);
 
-static void default_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+static void default_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -82,78 +82,78 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t * default_pack(
     NOTNULL(const PackFile_Segment *self),
-    NOTNULL(opcode_t *dest) )
+    NOTNULL(opcode_t *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static size_t default_packed_size( NOTNULL(const PackFile_Segment *self) )
+static size_t default_packed_size(NOTNULL(const PackFile_Segment *self))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * default_unpack(
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void directory_destroy( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+static void directory_destroy(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void directory_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+static void directory_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * directory_new( SHIM_INTERP,
+static PackFile_Segment * directory_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    SHIM(int add) );
+    SHIM(int add));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * directory_pack( PARROT_INTERP,
+static opcode_t * directory_pack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t directory_packed_size( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+static size_t directory_packed_size(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * directory_unpack( PARROT_INTERP,
+static opcode_t * directory_unpack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *segp),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* do_1_sub_pragma( PARROT_INTERP,
+static PMC* do_1_sub_pragma(PARROT_INTERP,
     NOTNULL(PMC *sub_pmc),
-    int action )
+    int action)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL find_const_iter( PARROT_INTERP,
+static INTVAL find_const_iter(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    NULLOK(void *user_data) )
+    NULLOK(void *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Constant ** find_constants( PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *ct) )
+static PackFile_Constant ** find_constants(PARROT_INTERP,
+    NOTNULL(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -162,126 +162,126 @@ PARROT_CAN_RETURN_NULL
 static PackFile_FixupEntry * find_fixup(
     NOTNULL(PackFile_FixupTable *ft),
     INTVAL type,
-    NOTNULL(const char *name) )
+    NOTNULL(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static INTVAL find_fixup_iter( PARROT_INTERP,
+static INTVAL find_fixup_iter(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    NOTNULL(void *user_data) )
+    NOTNULL(void *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void fixup_destroy( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+static void fixup_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * fixup_new( SHIM_INTERP,
+static PackFile_Segment * fixup_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    SHIM(int add) );
+    SHIM(int add));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * fixup_pack( PARROT_INTERP,
+static opcode_t * fixup_pack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t fixup_packed_size( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+static size_t fixup_packed_size(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * fixup_unpack( PARROT_INTERP,
+static opcode_t * fixup_unpack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    NULLOK(opcode_t *cursor) )
+    NULLOK(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void make_code_pointers( NOTNULL(PackFile_Segment *seg) )
+static void make_code_pointers(NOTNULL(PackFile_Segment *seg))
         __attribute__nonnull__(1);
 
-static void mark_1_seg( PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct) )
+static void mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PackFile * PackFile_append_pbc( PARROT_INTERP,
-    NULLOK(const char *filename) )
+static PackFile * PackFile_append_pbc(PARROT_INTERP,
+    NULLOK(const char *filename))
         __attribute__nonnull__(1);
 
-static void PackFile_set_header( NOTNULL(PackFile *self) )
+static void PackFile_set_header(NOTNULL(PackFile *self))
         __attribute__nonnull__(1);
 
-static void pf_debug_destroy( SHIM_INTERP, NOTNULL(PackFile_Segment *self) )
+static void pf_debug_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(2);
 
-static void pf_debug_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+static void pf_debug_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PackFile_Segment * pf_debug_new( SHIM_INTERP,
+static PackFile_Segment * pf_debug_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    SHIM(int add) );
+    SHIM(int add));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * pf_debug_pack( SHIM_INTERP,
+static opcode_t * pf_debug_pack(SHIM_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static size_t pf_debug_packed_size( SHIM_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+static size_t pf_debug_packed_size(SHIM_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * pf_debug_unpack( PARROT_INTERP,
+static opcode_t * pf_debug_unpack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static INTVAL pf_register_standard_funcs( PARROT_INTERP,
-    NOTNULL(PackFile *pf) )
+static INTVAL pf_register_standard_funcs(PARROT_INTERP,
+    NOTNULL(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* run_sub( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
+static PMC* run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void segment_init(
     NOTNULL(PackFile_Segment *self),
     NOTNULL(PackFile *pf),
-    NOTNULL(const char *name) )
+    NOTNULL(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void sort_segs( NOTNULL(PackFile_Directory *dir) )
+static void sort_segs(NOTNULL(PackFile_Directory *dir))
         __attribute__nonnull__(1);
 
-static int sub_pragma( PARROT_INTERP,
+static int sub_pragma(PARROT_INTERP,
     int action,
-    NOTNULL(const PMC *sub_pmc) )
+    NOTNULL(const PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

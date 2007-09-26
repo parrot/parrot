@@ -25,110 +25,110 @@ UCS-2 encoding with the help of the ICU library.
 
 /* HEADERIZER BEGIN: static */
 
-static void become_encoding( PARROT_INTERP, SHIM(STRING *src) )
+static void become_encoding(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
-static UINTVAL bytes( PARROT_INTERP, NOTNULL(STRING *src) )
+static UINTVAL bytes(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL codepoints( PARROT_INTERP, NOTNULL(STRING *src) )
+static UINTVAL codepoints(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL get_byte( PARROT_INTERP,
+static UINTVAL get_byte(PARROT_INTERP,
     SHIM(const STRING *src),
-    UINTVAL offset )
+    UINTVAL offset)
         __attribute__nonnull__(1);
 
-static STRING * get_bytes( PARROT_INTERP,
+static STRING * get_bytes(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1);
 
-static STRING * get_bytes_inplace( PARROT_INTERP,
+static STRING * get_bytes_inplace(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *return_string) )
+    SHIM(STRING *return_string))
         __attribute__nonnull__(1);
 
-static UINTVAL get_codepoint( PARROT_INTERP,
+static UINTVAL get_codepoint(PARROT_INTERP,
     NOTNULL(const STRING *src),
-    UINTVAL offset )
+    UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * get_codepoints( PARROT_INTERP,
+static STRING * get_codepoints(PARROT_INTERP,
     NOTNULL(STRING *src),
     UINTVAL offset,
-    UINTVAL count )
+    UINTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static STRING * get_codepoints_inplace( PARROT_INTERP,
+static STRING * get_codepoints_inplace(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *dest_string) )
+    SHIM(STRING *dest_string))
         __attribute__nonnull__(1);
 
-static void iter_init( PARROT_INTERP,
+static void iter_init(PARROT_INTERP,
     NOTNULL(const STRING *src),
-    NOTNULL(String_iter *iter) )
+    NOTNULL(String_iter *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void set_byte( PARROT_INTERP,
+static void set_byte(PARROT_INTERP,
     SHIM(const STRING *src),
     UINTVAL offset,
-    UINTVAL byte )
+    UINTVAL byte)
         __attribute__nonnull__(1);
 
-static void set_bytes( PARROT_INTERP,
+static void set_bytes(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *new_bytes) )
+    SHIM(STRING *new_bytes))
         __attribute__nonnull__(1);
 
-static void set_codepoint( PARROT_INTERP,
+static void set_codepoint(PARROT_INTERP,
     NOTNULL(STRING *src),
     UINTVAL offset,
-    UINTVAL codepoint )
+    UINTVAL codepoint)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void set_codepoints( PARROT_INTERP,
+static void set_codepoints(PARROT_INTERP,
     SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count,
-    SHIM(STRING *new_codepoints) )
+    SHIM(STRING *new_codepoints))
         __attribute__nonnull__(1);
 
-static STRING * to_encoding( PARROT_INTERP,
+static STRING * to_encoding(PARROT_INTERP,
     NOTNULL(STRING *src),
-    NOTNULL(STRING *dest) )
+    NOTNULL(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static UINTVAL ucs2_decode_and_advance( PARROT_INTERP,
-    NOTNULL(String_iter *i) )
+static UINTVAL ucs2_decode_and_advance(PARROT_INTERP,
+    NOTNULL(String_iter *i))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void ucs2_encode_and_advance( PARROT_INTERP,
+static void ucs2_encode_and_advance(PARROT_INTERP,
     NOTNULL(String_iter *i),
-    UINTVAL c )
+    UINTVAL c)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void ucs2_set_position( SHIM_INTERP,
+static void ucs2_set_position(SHIM_INTERP,
     NOTNULL(String_iter *i),
-    UINTVAL n )
+    UINTVAL n)
         __attribute__nonnull__(2);
 
 /* HEADERIZER END: static */

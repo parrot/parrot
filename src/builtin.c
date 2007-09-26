@@ -24,11 +24,11 @@ src/builtin.c - Builtin Methods
 
 
 typedef struct _builtin {
-    NOTNULL( const char * const c_name );       /* short name 'cos' */
-    NOTNULL( const char * const signature );    /* e.g. PP */
-    NOTNULL( const char * const c_ns );         /* namespace */
-    NULLOK(  STRING *meth_name );               /* internal name e.g. '__cos' */
-    NULLOK(  STRING *_namespace );              /* same */
+    NOTNULL(const char * const c_name);       /* short name 'cos' */
+    NOTNULL(const char * const signature);    /* e.g. PP */
+    NOTNULL(const char * const c_ns);         /* namespace */
+    NULLOK(STRING *meth_name);               /* internal name e.g. '__cos' */
+    NULLOK(STRING *_namespace);              /* same */
 } Builtins;
 
 #define N_BUILTINS (int)(sizeof (builtins) / sizeof (builtins[0]))
@@ -91,15 +91,15 @@ PARROT_WARN_UNUSED_RESULT
 static int check_builtin_sig(
     size_t i,
     NOTNULL(const char *sig),
-    int convert_pmcs )
+    int convert_pmcs)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int find_builtin( NOTNULL(const char *func) )
+static int find_builtin(NOTNULL(const char *func))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int find_builtin_s( PARROT_INTERP, NOTNULL(STRING *func) )
+static int find_builtin_s(PARROT_INTERP, NOTNULL(STRING *func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

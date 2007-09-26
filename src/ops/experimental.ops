@@ -207,17 +207,17 @@ Return a new Iterator PMC $1 for aggregate $2.
 
 =cut
 
-inline op slice (out PMC, invar PMC, in KEY) :base_core {
+inline op slice(out PMC, invar PMC, in KEY) :base_core {
     $1 = $2->vtable->slice(interp, $2, $3, 0);
     goto NEXT();
 }
 
-inline op slice (out PMC, invar PMC, in KEY, inconst INT) :python {
+inline op slice(out PMC, invar PMC, in KEY, inconst INT) :python {
     $1 = $2->vtable->slice(interp, $2, $3, $4);
     goto NEXT();
 }
 
-inline op iter (out PMC, invar PMC) :base_core {
+inline op iter(out PMC, invar PMC) :base_core {
     $1 = $2->vtable->get_iter(interp, $2);
     goto NEXT();
 }

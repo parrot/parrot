@@ -62,14 +62,14 @@ static All_charsets *all_charsets;
 
 /* HEADERIZER BEGIN: static */
 
-static INTVAL register_charset( PARROT_INTERP,
+static INTVAL register_charset(PARROT_INTERP,
     NOTNULL(const char *charsetname),
-    NOTNULL(CHARSET *charset) )
+    NOTNULL(CHARSET *charset))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void register_static_converters( PARROT_INTERP )
+static void register_static_converters(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: static */

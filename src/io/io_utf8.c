@@ -27,19 +27,19 @@ representation.
 
 /* HEADERIZER BEGIN: static */
 
-static size_t PIO_utf8_read( PARROT_INTERP,
+static size_t PIO_utf8_read(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *layer),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING **buf) )
+    NOTNULL(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static size_t PIO_utf8_write( PARROT_INTERP,
+static size_t PIO_utf8_write(PARROT_INTERP,
     NOTNULL(ParrotIOLayer *l),
     NOTNULL(ParrotIO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

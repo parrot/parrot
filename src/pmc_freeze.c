@@ -44,254 +44,254 @@ Parrot_default_thawfinish(PARROT_INTERP, PMC* pmc, visit_info *info);
 /* HEADERIZER HFILE: include/parrot/pmc_freeze.h */
 /* HEADERIZER BEGIN: static */
 
-static void add_pmc_next_for_GC( SHIM_INTERP,
+static void add_pmc_next_for_GC(SHIM_INTERP,
     NOTNULL(PMC *pmc),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void add_pmc_todo_list( PARROT_INTERP,
+static void add_pmc_todo_list(PARROT_INTERP,
     NULLOK(PMC *pmc),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void cleanup_next_for_GC( PARROT_INTERP )
+static void cleanup_next_for_GC(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void cleanup_next_for_GC_pool( NOTNULL(Small_Object_Pool *pool) )
+static void cleanup_next_for_GC_pool(NOTNULL(Small_Object_Pool *pool))
         __attribute__nonnull__(1);
 
-static void create_image( PARROT_INTERP,
+static void create_image(PARROT_INTERP,
     NULLOK(PMC *pmc),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
-static void do_action( PARROT_INTERP,
+static void do_action(PARROT_INTERP,
     NULLOK(PMC *pmc),
     NOTNULL(visit_info *info),
     int seen,
-    UINTVAL id )
+    UINTVAL id)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
-static void do_thaw( PARROT_INTERP,
+static void do_thaw(PARROT_INTERP,
     NOTNULL(PMC* pmc),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
-static void freeze_pmc( PARROT_INTERP,
+static void freeze_pmc(PARROT_INTERP,
     NULLOK(PMC *pmc),
     NOTNULL(visit_info *info),
     int seen,
-    UINTVAL id )
+    UINTVAL id)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void ft_init( PARROT_INTERP, NOTNULL(visit_info *info) )
+static void ft_init(PARROT_INTERP, NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL id_from_pmc( PARROT_INTERP, NOTNULL(PMC* pmc) )
+static UINTVAL id_from_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-static int next_for_GC_seen( PARROT_INTERP,
+static int next_for_GC_seen(PARROT_INTERP,
     NULLOK(PMC *pmc),
     NOTNULL(visit_info *info),
-    NOTNULL(UINTVAL *id) )
+    NOTNULL(UINTVAL *id))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void op_append( PARROT_INTERP,
+static void op_append(PARROT_INTERP,
     NOTNULL(STRING *s),
     opcode_t b,
-    size_t len )
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-static void op_check_size( PARROT_INTERP, NOTNULL(STRING *s), size_t len )
+static void op_check_size(PARROT_INTERP, NOTNULL(STRING *s), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void pmc_add_ext( PARROT_INTERP, NOTNULL(PMC *pmc) )
+static void pmc_add_ext(PARROT_INTERP, NOTNULL(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_ascii_integer( PARROT_INTERP,
+static void push_ascii_integer(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    INTVAL v )
+    INTVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_ascii_number( PARROT_INTERP,
+static void push_ascii_number(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    FLOATVAL v )
+    FLOATVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_ascii_pmc( PARROT_INTERP,
+static void push_ascii_pmc(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    NOTNULL(const PMC* v) )
+    NOTNULL(const PMC* v))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void push_ascii_string( PARROT_INTERP,
+static void push_ascii_string(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    NOTNULL(STRING *s) )
+    NOTNULL(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void push_opcode_integer( PARROT_INTERP,
+static void push_opcode_integer(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    INTVAL v )
+    INTVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_opcode_number( PARROT_INTERP,
+static void push_opcode_number(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    FLOATVAL v )
+    FLOATVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_opcode_pmc( PARROT_INTERP,
+static void push_opcode_pmc(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    NOTNULL(PMC* v) )
+    NOTNULL(PMC* v))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void push_opcode_string( PARROT_INTERP,
+static void push_opcode_string(PARROT_INTERP,
     NOTNULL(IMAGE_IO *io),
-    NOTNULL(STRING *v) )
+    NOTNULL(STRING *v))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* run_thaw( PARROT_INTERP,
+static PMC* run_thaw(PARROT_INTERP,
     NOTNULL(STRING* image),
-    visit_enum_type what )
+    visit_enum_type what)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL shift_ascii_integer( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
+static INTVAL shift_ascii_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
-static FLOATVAL shift_ascii_number( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* shift_ascii_pmc( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
+static FLOATVAL shift_ascii_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static STRING* shift_ascii_string( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
+static PMC* shift_ascii_pmc(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static STRING* shift_ascii_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL shift_opcode_integer( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
+static INTVAL shift_opcode_integer(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
-static FLOATVAL shift_opcode_number( SHIM_INTERP, NOTNULL(IMAGE_IO *io) )
+static FLOATVAL shift_opcode_number(SHIM_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* shift_opcode_pmc( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
+static PMC* shift_opcode_pmc(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* shift_opcode_string( PARROT_INTERP, NOTNULL(IMAGE_IO *io) )
+static STRING* shift_opcode_string(PARROT_INTERP, NOTNULL(IMAGE_IO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void str_append( PARROT_INTERP,
+static void str_append(PARROT_INTERP,
     NOTNULL(STRING *s),
     NOTNULL(const void *b),
-    size_t len )
+    size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static PMC* thaw_create_pmc( PARROT_INTERP,
+static PMC* thaw_create_pmc(PARROT_INTERP,
     NOTNULL(const visit_info *info),
-    INTVAL type )
+    INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-static int thaw_pmc( PARROT_INTERP,
+static int thaw_pmc(PARROT_INTERP,
     NOTNULL(visit_info *info),
     NOTNULL(UINTVAL *id),
-    NOTNULL(INTVAL *type) )
+    NOTNULL(INTVAL *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void todo_list_init( PARROT_INTERP, NOTNULL(visit_info *info) )
+static void todo_list_init(PARROT_INTERP, NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_INLINE
-static int todo_list_seen( PARROT_INTERP,
+static int todo_list_seen(PARROT_INTERP,
     NOTNULL(PMC *pmc),
     NOTNULL(visit_info *info),
-    NOTNULL(UINTVAL *id) )
+    NOTNULL(UINTVAL *id))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void visit_loop_next_for_GC( PARROT_INTERP,
+static void visit_loop_next_for_GC(PARROT_INTERP,
     NOTNULL(PMC *current),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void visit_loop_todo_list( PARROT_INTERP,
+static void visit_loop_todo_list(PARROT_INTERP,
     NULLOK(PMC *current),
-    NOTNULL(visit_info *info) )
+    NOTNULL(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void visit_next_for_GC( PARROT_INTERP,
+static void visit_next_for_GC(PARROT_INTERP,
     NOTNULL(PMC* pmc),
-    NOTNULL(visit_info* info) )
+    NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void visit_todo_list( PARROT_INTERP,
+static void visit_todo_list(PARROT_INTERP,
     NOTNULL(PMC* pmc),
-    NOTNULL(visit_info* info) )
+    NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void visit_todo_list_thaw( PARROT_INTERP,
+static void visit_todo_list_thaw(PARROT_INTERP,
     NOTNULL(PMC* old),
-    NOTNULL(visit_info* info) )
+    NOTNULL(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
