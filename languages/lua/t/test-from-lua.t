@@ -148,7 +148,7 @@ language_output_is( 'lua', $code, $out, 'life' );
 $ENV{USER} = "user";
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'printf.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'printf' );
-/^Hello user from Lua 5\.1( \(on Parrot\))? on \d\d\/\d\d\/\d\d \d\d\:\d\d\:\d\d/
+/^Hello user from Lua 5\.1( \(on Parrot\))? on /
 OUTPUT
 
 #
