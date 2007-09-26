@@ -140,6 +140,11 @@ Instead, you should write:
  #
  .end
 
+=item C<.HLL_map INTC, INTC> will become C<.HLL_map STRINGC, STRINGC>
+
+As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
+C<.HLL_map> syntax will also be updated to take strings to indicate the types.
+[RT#45453].
 
 =back
 
