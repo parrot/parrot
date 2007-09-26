@@ -71,8 +71,6 @@ are deprecated:
 
 =item B<new>(out PMC, in INT, in STR)
 
-=item B<instantiate>(out PMC)
-
 =back
 
 They will be removed in the 0.5.0 release.
@@ -103,9 +101,14 @@ the "new" opcode for the PMCs that use it.)
   PMC* subclass(PMC *name)
 
 The subclass vtable method is deprecated and will be removed in the 0.5.0
-release.
+release. The subclass opcode stays.
 
 =item 5
+
+The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
+will be removed in the 0.5.0 release.
+
+=item 6
 
 The PMC union struct is deprecated and will be removed once all core PMCs have
 been updated.
