@@ -23,7 +23,8 @@
 
 /* HEADERIZER BEGIN: static */
 
-static SymReg * _get_sym_typed(NOTNULL(const SymHash *hsh),
+static SymReg * _get_sym_typed(
+    NOTNULL(const SymHash *hsh),
     NOTNULL(const char *name),
     int t)
         __attribute__nonnull__(1)

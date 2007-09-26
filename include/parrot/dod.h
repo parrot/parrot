@@ -66,10 +66,10 @@ void Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 void Parrot_dod_clear_live_bits(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_dod_free_buffer(
-     PARROT_INTERP,
+void Parrot_dod_free_buffer(PARROT_INTERP,
     NOTNULL(Small_Object_Pool *pool),
     NOTNULL(PObj *b))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 

@@ -267,15 +267,15 @@ sub make_function_decls {
 
         my $argline = join( ", ", @args );
         if ( length( $decl . $argline ) <= 75 ) {
-            $decl = "$decl $argline )";
+            $decl = "$decl$argline)";
         }
         else {
             if ( $args[0] =~ /^((SHIM|PARROT)_INTERP|Interp)\b/ ) {
-                $decl .= " " . ( shift @args );
+                $decl .= ( shift @args );
                 $decl .= "," if @args;
             }
             $argline   = join( ",", map { "\n\t$_" } @args );
-            $decl      = "$decl$argline )";
+            $decl      = "$decl$argline)";
             $multiline = 1;
         }
 
