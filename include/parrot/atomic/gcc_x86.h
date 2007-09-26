@@ -48,7 +48,7 @@ inline static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 
 #define PARROT_ATOMIC_PTR_SET(a, b) ((a).val = b)
 
-#define PARROT_ATOMIC_PTR_CAS(result, a, expect, update)  \
+#define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
         if (expect == parrot_i386_cmpxchg(&(a).val, expect, update)) { \
             result = 1; \
@@ -72,8 +72,7 @@ inline static void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 
 #define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
-        void *res = parrot_i386_cmpxchg( \
-                (void * volatile *) &(a).val, \
+        void *res = parrot_i386_cmpxchg((void * volatile *) &(a).val, \
                 (void *) expect, (void *) update); \
         if (expect == (long)res) { \
             result = 1; \
@@ -88,12 +87,10 @@ inline static long parrot_i386_xadd(volatile long *l, long amount)
     long result = amount;
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
     __asm__ __volatile__("lock\n" "xaddq %0, %1" : "=r"(result), "=m"(*l) :
-            "0"(result), "m"(*l)
-        );
+            "0"(result), "m"(*l));
 #else
     __asm__ __volatile__("lock\n" "xaddl %0, %1" : "=r"(result), "=m"(*l) :
-            "0"(result), "m"(*l)
-        );
+            "0"(result), "m"(*l));
 #endif
     return result + amount;
 }

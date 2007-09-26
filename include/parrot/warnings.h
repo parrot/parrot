@@ -56,10 +56,10 @@ typedef enum {
 /* HEADERIZER BEGIN: src/warnings.c */
 
 PARROT_API
-INTVAL Parrot_warn( PARROT_INTERP,
+INTVAL Parrot_warn(PARROT_INTERP,
     INTVAL warnclass,
     NOTNULL(const char *message),
-    ... )
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -68,10 +68,10 @@ INTVAL Parrot_warn_s(
     NULLOK_INTERP,
     INTVAL warnclass,
     NOTNULL(STRING *message),
-    ... )
+    ...)
         __attribute__nonnull__(3);
 
-void print_pbc_location( PARROT_INTERP )
+void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/warnings.c */

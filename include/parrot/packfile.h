@@ -259,10 +259,10 @@ typedef enum {
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-opcode_t * PackFile_Constant_pack( PARROT_INTERP,
+opcode_t * PackFile_Constant_pack(PARROT_INTERP,
     NOTNULL(const PackFile_ConstTable *const_table),
     NOTNULL(const PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -271,38 +271,38 @@ opcode_t * PackFile_Constant_pack( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_ConstTable_pack( PARROT_INTERP,
+opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-size_t PackFile_ConstTable_pack_size( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *seg) )
+size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-int PackFile_find_in_const( PARROT_INTERP,
+int PackFile_find_in_const(PARROT_INTERP,
     NOTNULL(const PackFile_ConstTable *ct),
     NOTNULL(const PMC *key),
-    int type )
+    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_pack( PARROT_INTERP,
+void PackFile_pack(PARROT_INTERP,
     NOTNULL(PackFile *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-opcode_t PackFile_pack_size( PARROT_INTERP, NOTNULL(PackFile *self) )
+opcode_t PackFile_pack_size(PARROT_INTERP, NOTNULL(PackFile *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -311,42 +311,42 @@ opcode_t PackFile_pack_size( PARROT_INTERP, NOTNULL(PackFile *self) )
 /* HEADERIZER BEGIN: src/packfile.c */
 
 PARROT_API
-void do_sub_pragmas( PARROT_INTERP,
+void do_sub_pragmas(PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *self),
     int action,
-    NULLOK(PMC *eval_pmc) )
+    NULLOK(PMC *eval_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_add_segment( SHIM_INTERP,
+INTVAL PackFile_add_segment(SHIM_INTERP,
     NOTNULL(PackFile_Directory *dir),
-    NOTNULL(PackFile_Segment *seg) )
+    NOTNULL(PackFile_Segment *seg))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_Constant_destroy( SHIM_INTERP, NULLOK(PackFile_Constant *self) );
+void PackFile_Constant_destroy(SHIM_INTERP, NULLOK(PackFile_Constant *self));
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-PackFile_Constant * PackFile_Constant_new( SHIM_INTERP );
+PackFile_Constant * PackFile_Constant_new(SHIM_INTERP);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-size_t PackFile_Constant_pack_size( PARROT_INTERP,
-    NOTNULL(PackFile_Constant *self) )
+size_t PackFile_Constant_pack_size(PARROT_INTERP,
+    NOTNULL(PackFile_Constant *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_Constant_unpack( PARROT_INTERP,
+opcode_t * PackFile_Constant_unpack(PARROT_INTERP,
     NOTNULL(PackFile_ConstTable *constt),
     NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -355,10 +355,10 @@ opcode_t * PackFile_Constant_unpack( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Constant_unpack_key( PARROT_INTERP,
+opcode_t * PackFile_Constant_unpack_key(PARROT_INTERP,
     NOTNULL(PackFile_ConstTable *constt),
     NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -367,138 +367,138 @@ opcode_t * PackFile_Constant_unpack_key( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Constant_unpack_pmc( PARROT_INTERP,
+opcode_t * PackFile_Constant_unpack_pmc(PARROT_INTERP,
     NOTNULL(PackFile_ConstTable *constt),
     NOTNULL(PackFile_Constant *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_API
-void PackFile_ConstTable_clear( PARROT_INTERP,
-    NOTNULL(PackFile_ConstTable *self) )
+void PackFile_ConstTable_clear(PARROT_INTERP,
+    NOTNULL(PackFile_ConstTable *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_ConstTable_unpack( PARROT_INTERP,
+opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *seg),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_destroy( PARROT_INTERP, NULLOK(PackFile *pf) )
+void PackFile_destroy(PARROT_INTERP, NULLOK(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile_FixupEntry * PackFile_find_fixup_entry( PARROT_INTERP,
+PackFile_FixupEntry * PackFile_find_fixup_entry(PARROT_INTERP,
     INTVAL type,
-    char *name )
+    char *name)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile_Segment * PackFile_find_segment( PARROT_INTERP,
+PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     NOTNULL(const char *name),
-    int sub_dir )
+    int sub_dir)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_fixup_subs( PARROT_INTERP,
+void PackFile_fixup_subs(PARROT_INTERP,
     pbc_action_enum_t what,
-    NULLOK(PMC *eval) )
+    NULLOK(PMC *eval))
         __attribute__nonnull__(1);
 
 PARROT_API
-void PackFile_FixupTable_clear( PARROT_INTERP,
-    NOTNULL(PackFile_FixupTable *self) )
+void PackFile_FixupTable_clear(PARROT_INTERP,
+    NOTNULL(PackFile_FixupTable *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_FixupTable_new_entry( PARROT_INTERP,
+void PackFile_FixupTable_new_entry(PARROT_INTERP,
     NOTNULL(const char *label),
     INTVAL type,
-    opcode_t offs )
+    opcode_t offs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_funcs_register( SHIM_INTERP,
+INTVAL PackFile_funcs_register(SHIM_INTERP,
     NOTNULL(PackFile *pf),
     UINTVAL type,
-    PackFile_funcs funcs )
+    PackFile_funcs funcs)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL PackFile_map_segments( PARROT_INTERP,
+INTVAL PackFile_map_segments(PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
-    NULLOK(void *user_data) )
+    NULLOK(void *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile * PackFile_new( PARROT_INTERP, INTVAL is_mapped )
+PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile * PackFile_new_dummy( PARROT_INTERP, NOTNULL(const char *name) )
+PackFile * PackFile_new_dummy(PARROT_INTERP, NOTNULL(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile_Segment * PackFile_remove_segment_by_name( SHIM_INTERP,
+PackFile_Segment * PackFile_remove_segment_by_name(SHIM_INTERP,
     NOTNULL(PackFile_Directory *dir),
-    NOTNULL(const char *name) )
+    NOTNULL(const char *name))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void PackFile_Segment_destroy( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+void PackFile_Segment_destroy(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_Segment_dump( PARROT_INTERP, NOTNULL(PackFile_Segment *self) )
+void PackFile_Segment_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Segment_new( SHIM_INTERP,
+PackFile_Segment * PackFile_Segment_new(SHIM_INTERP,
     SHIM(PackFile *pf),
     SHIM(const char *name),
-    NULLOK(int add) );
+    NULLOK(int add));
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Segment_new_seg( PARROT_INTERP,
+PackFile_Segment * PackFile_Segment_new_seg(PARROT_INTERP,
     NOTNULL(PackFile_Directory *dir),
     UINTVAL type,
     NOTNULL(const char *name),
-    int add )
+    int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -506,46 +506,46 @@ PackFile_Segment * PackFile_Segment_new_seg( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Segment_pack( PARROT_INTERP,
+opcode_t * PackFile_Segment_pack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-size_t PackFile_Segment_packed_size( PARROT_INTERP,
-    NOTNULL(PackFile_Segment *self) )
+size_t PackFile_Segment_packed_size(PARROT_INTERP,
+    NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-opcode_t * PackFile_Segment_unpack( PARROT_INTERP,
+opcode_t * PackFile_Segment_unpack(PARROT_INTERP,
     NOTNULL(PackFile_Segment *self),
-    NOTNULL(opcode_t *cursor) )
+    NOTNULL(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-opcode_t PackFile_unpack( PARROT_INTERP,
+opcode_t PackFile_unpack(PARROT_INTERP,
     NOTNULL(PackFile *self),
     NOTNULL(opcode_t *packed),
-    size_t packed_size )
+    size_t packed_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_debug_add_mapping( PARROT_INTERP,
+void Parrot_debug_add_mapping(PARROT_INTERP,
     NOTNULL(PackFile_Debug *debug),
     opcode_t offset,
     int mapping_type,
     NOTNULL(const char *filename),
-    int source_seg )
+    int source_seg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
@@ -553,58 +553,58 @@ void Parrot_debug_add_mapping( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_debug_pc_to_filename( PARROT_INTERP,
+STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
     NOTNULL(PackFile_Debug *debug),
-    opcode_t pc )
+    opcode_t pc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_destroy_constants( PARROT_INTERP )
+void Parrot_destroy_constants(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_load_bytecode( PARROT_INTERP, NOTNULL(STRING *file_str) )
+void Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Debug * Parrot_new_debug_seg( PARROT_INTERP,
+PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *cs),
-    size_t size )
+    size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * Parrot_switch_to_cs( PARROT_INTERP,
+PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
     NOTNULL(PackFile_ByteCode *new_cs),
-    int really )
+    int really)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_switch_to_cs_by_nr( PARROT_INTERP, opcode_t seg )
+void Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * PF_create_default_segs( PARROT_INTERP,
+PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
     NOTNULL(const char *file_name),
-    int add )
+    int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void default_dump_header( PARROT_INTERP,
-    NOTNULL(const PackFile_Segment *self) )
+void default_dump_header(PARROT_INTERP,
+    NOTNULL(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_const_subs( PARROT_INTERP )
+void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/packfile.c */
@@ -613,14 +613,14 @@ void mark_const_subs( PARROT_INTERP )
 /* HEADERIZER BEGIN: src/packdump.c */
 
 PARROT_API
-void PackFile_ConstTable_dump( PARROT_INTERP,
-    NOTNULL(const PackFile_ConstTable *self) )
+void PackFile_ConstTable_dump(PARROT_INTERP,
+    NOTNULL(const PackFile_ConstTable *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void PackFile_Fixup_dump( PARROT_INTERP,
-    NOTNULL(const PackFile_FixupTable *ft) )
+void PackFile_Fixup_dump(PARROT_INTERP,
+    NOTNULL(const PackFile_FixupTable *ft))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -630,11 +630,11 @@ void PackFile_Fixup_dump( PARROT_INTERP,
 
 PARROT_API
 PARROT_PURE_FUNCTION
-int PackFile_check_fingerprint( NOTNULL(const void *cursor) )
+int PackFile_check_fingerprint(NOTNULL(const void *cursor))
         __attribute__nonnull__(1);
 
 PARROT_API
-size_t PackFile_write_fingerprint( NOTNULL(void *cursor) )
+size_t PackFile_write_fingerprint(NOTNULL(void *cursor))
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/fingerprint.c */
@@ -642,81 +642,81 @@ size_t PackFile_write_fingerprint( NOTNULL(void *cursor) )
 
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
 
-void PackFile_assign_transforms( NOTNULL(PackFile *pf) )
+void PackFile_assign_transforms(NOTNULL(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * PF_fetch_cstring( NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor) )
+char * PF_fetch_cstring(NOTNULL(PackFile *pf), NOTNULL(opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL PF_fetch_integer( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
+INTVAL PF_fetch_integer(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-FLOATVAL PF_fetch_number( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
+FLOATVAL PF_fetch_number(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-opcode_t PF_fetch_opcode( NULLOK(PackFile *pf), NOTNULL(opcode_t **stream) )
+opcode_t PF_fetch_opcode(NULLOK(PackFile *pf), NOTNULL(opcode_t **stream))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * PF_fetch_string( PARROT_INTERP,
+STRING * PF_fetch_string(PARROT_INTERP,
     NULLOK(PackFile *pf),
-    NOTNULL(opcode_t **cursor) )
+    NOTNULL(opcode_t **cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_PURE_FUNCTION
-size_t PF_size_cstring( NOTNULL(const char *s) )
+size_t PF_size_cstring(NOTNULL(const char *s))
         __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
-size_t PF_size_integer( void );
+size_t PF_size_integer(void);
 
 PARROT_CONST_FUNCTION
-size_t PF_size_number( void );
+size_t PF_size_number(void);
 
 PARROT_CONST_FUNCTION
-size_t PF_size_opcode( void );
+size_t PF_size_opcode(void);
 
 PARROT_PURE_FUNCTION
-size_t PF_size_string( NOTNULL(const STRING *s) )
+size_t PF_size_string(NOTNULL(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_cstring(
     NOTNULL(opcode_t *cursor),
-    NOTNULL(const char *s) )
+    NOTNULL(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_integer( NOTNULL(opcode_t *cursor), INTVAL val )
+opcode_t* PF_store_integer(NOTNULL(opcode_t *cursor), INTVAL val)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_number(
     NOTNULL(opcode_t *cursor),
-    NOTNULL(const FLOATVAL *val) )
+    NOTNULL(const FLOATVAL *val))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_opcode( NOTNULL(opcode_t *cursor), opcode_t val )
+opcode_t* PF_store_opcode(NOTNULL(opcode_t *cursor), opcode_t val)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t* PF_store_string( NOTNULL(opcode_t *cursor), NOTNULL(STRING *s) )
+opcode_t* PF_store_string(NOTNULL(opcode_t *cursor), NOTNULL(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -732,67 +732,67 @@ opcode_t* PF_store_string( NOTNULL(opcode_t *cursor), NOTNULL(STRING *s) )
 
 void fetch_buf_be_12(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_16(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_4(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_be_8(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_12(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_16(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_4(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void fetch_buf_le_8(
     NOTNULL(unsigned char *rb),
-    NOTNULL(const unsigned char *b) )
+    NOTNULL(const unsigned char *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-INTVAL fetch_iv_be( INTVAL w );
+INTVAL fetch_iv_be(INTVAL w);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-INTVAL fetch_iv_le( INTVAL w );
+INTVAL fetch_iv_le(INTVAL w);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-opcode_t fetch_op_be( opcode_t w );
+opcode_t fetch_op_be(opcode_t w);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-opcode_t fetch_op_le( opcode_t w );
+opcode_t fetch_op_le(opcode_t w);
 
 /* HEADERIZER END: src/byteorder.c */
 

@@ -43,7 +43,7 @@
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem__sys_realloc( NULLOK(void *from), size_t size );
+void * mem__sys_realloc(NULLOK(void *from), size_t size);
 
 PARROT_API
 PARROT_MALLOC
@@ -51,27 +51,27 @@ PARROT_CANNOT_RETURN_NULL
 void * mem__sys_realloc_zeroed(
     NULLOK(void *from),
     size_t size,
-    size_t old_size );
+    size_t old_size);
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem_sys_allocate( size_t size );
+void * mem_sys_allocate(size_t size);
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem_sys_allocate_zeroed( size_t size );
+void * mem_sys_allocate_zeroed(size_t size);
 
 PARROT_API
-void mem_sys_free( NULLOK(void *from) );
+void mem_sys_free(NULLOK(void *from));
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem__internal_allocate(
     size_t size,
     NOTNULL(const char *file),
-    int line )
+    int line)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
@@ -79,13 +79,13 @@ PARROT_CANNOT_RETURN_NULL
 void * mem__internal_allocate_zeroed(
     size_t size,
     NOTNULL(const char *file),
-    int line )
+    int line)
         __attribute__nonnull__(2);
 
 void mem__internal_free(
     NULLOK(void *from),
     NOTNULL(const char *file),
-    int line )
+    int line)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
@@ -94,11 +94,11 @@ void * mem__internal_realloc(
     NOTNULL(void *from),
     size_t size,
     NOTNULL(const char *file),
-    int line )
+    int line)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void mem_setup_allocator( PARROT_INTERP )
+void mem_setup_allocator(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/gc/memory.c */

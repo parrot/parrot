@@ -28,13 +28,13 @@ typedef struct _handler_node_t {
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
-void Parrot_exit( PARROT_INTERP, int status )
+void Parrot_exit(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_on_exit( PARROT_INTERP,
+void Parrot_on_exit(PARROT_INTERP,
     NOTNULL(exit_handler_f function),
-    NULLOK(void *arg) )
+    NULLOK(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -212,13 +212,13 @@ typedef struct Parrot_Context_info {
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-PMC * new_ret_continuation_pmc( PARROT_INTERP, NULLOK(opcode_t *address) )
+PMC * new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
         __attribute__nonnull__(1);
 
 PARROT_API
-int Parrot_Context_get_info( PARROT_INTERP,
+int Parrot_Context_get_info(PARROT_INTERP,
     NOTNULL(parrot_context_t *ctx),
-    NOTNULL(Parrot_Context_info *info) )
+    NOTNULL(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -226,62 +226,62 @@ int Parrot_Context_get_info( PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_Context_infostr( PARROT_INTERP,
-    NOTNULL(parrot_context_t *ctx) )
+STRING* Parrot_Context_infostr(PARROT_INTERP,
+    NOTNULL(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_full_sub_name( PARROT_INTERP, NULLOK(PMC* sub) )
+STRING* Parrot_full_sub_name(PARROT_INTERP, NULLOK(PMC* sub))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* parrot_new_closure( PARROT_INTERP, NOTNULL(PMC *sub_pmc) )
+PMC* parrot_new_closure(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void invalidate_retc_context( PARROT_INTERP, NOTNULL(PMC *cont) )
+void invalidate_retc_context(PARROT_INTERP, NOTNULL(PMC *cont))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void mark_context( PARROT_INTERP, NOTNULL(parrot_context_t* ctx) )
+void mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_closure( PARROT_INTERP )
+Parrot_sub * new_closure(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_continuation( PARROT_INTERP, NULLOK(Parrot_cont *to) )
+Parrot_cont * new_continuation(PARROT_INTERP, NULLOK(Parrot_cont *to))
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_coro * new_coroutine( PARROT_INTERP )
+Parrot_coro * new_coroutine(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_cont * new_ret_continuation( PARROT_INTERP )
+Parrot_cont * new_ret_continuation(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_sub( PARROT_INTERP )
+Parrot_sub * new_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* Parrot_find_pad( PARROT_INTERP,
+PMC* Parrot_find_pad(PARROT_INTERP,
     NOTNULL(STRING *lex_name),
-    NOTNULL(parrot_context_t *ctx) )
+    NOTNULL(parrot_context_t *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -174,152 +174,152 @@ typedef struct PDB {
 long PDB_add_label(
     NOTNULL(PDB_file_t *file),
     NOTNULL(opcode_t *cur_opcode),
-    opcode_t offset )
+    opcode_t offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_backtrace( PARROT_INTERP )
+void PDB_backtrace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-char PDB_break( PARROT_INTERP )
+char PDB_break(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-char PDB_check_condition( PARROT_INTERP, NOTNULL(PDB_condition_t *condition) )
+char PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-opcode_t * PDB_compile( PARROT_INTERP, NOTNULL(const char *command) )
+opcode_t * PDB_compile(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-PDB_condition_t * PDB_cond( PARROT_INTERP, NOTNULL(const char *command) )
+PDB_condition_t * PDB_cond(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_continue( PARROT_INTERP, NULLOK(const char *command) )
+void PDB_continue(PARROT_INTERP, NULLOK(const char *command))
         __attribute__nonnull__(1);
 
-void PDB_delete_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_delete_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_delete_condition( SHIM_INTERP,
-    NOTNULL(PDB_breakpoint_t *breakpoint) )
+void PDB_delete_condition(SHIM_INTERP,
+    NOTNULL(PDB_breakpoint_t *breakpoint))
         __attribute__nonnull__(2);
 
-void PDB_disable_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_disable_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_disassemble( PARROT_INTERP, SHIM(const char *command) )
+void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
 
-size_t PDB_disassemble_op( PARROT_INTERP,
+size_t PDB_disassemble_op(PARROT_INTERP,
     NOTNULL(char *dest),
     int space,
     NOTNULL(op_info_t *info),
     NOTNULL(opcode_t *op),
     NULLOK(PDB_file_t *file),
     NULLOK(opcode_t *code_start),
-    int full_name )
+    int full_name)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-void PDB_enable_breakpoint( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_enable_breakpoint(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-char * PDB_escape( NOTNULL(const char *string), INTVAL length )
+char * PDB_escape(NOTNULL(const char *string), INTVAL length)
         __attribute__nonnull__(1);
 
-void PDB_eval( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_eval(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-int PDB_extend_const_table( PARROT_INTERP )
+int PDB_extend_const_table(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PDB_breakpoint_t * PDB_find_breakpoint( PARROT_INTERP,
-    NOTNULL(const char *command) )
+PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP,
+    NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_free_file( PARROT_INTERP )
+void PDB_free_file(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PDB_get_command( PARROT_INTERP )
+void PDB_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-char PDB_hasinstruction( NOTNULL(const char *c) )
+char PDB_hasinstruction(NOTNULL(const char *c))
         __attribute__nonnull__(1);
 
-void PDB_help( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_help(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_info( PARROT_INTERP )
+void PDB_info(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PDB_init( PARROT_INTERP, SHIM(const char *command) )
+void PDB_init(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
 
-void PDB_list( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_list(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_load_source( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_load_source(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_next( PARROT_INTERP, NULLOK(const char *command) )
+void PDB_next(PARROT_INTERP, NULLOK(const char *command))
         __attribute__nonnull__(1);
 
-void PDB_print( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_print(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_print_user_stack( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_print_user_stack(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-char PDB_program_end( PARROT_INTERP )
+char PDB_program_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
-int PDB_run_command( PARROT_INTERP, NOTNULL(const char *command) )
+int PDB_run_command(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_script_file( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_set_break( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_set_break(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_skip_breakpoint( PARROT_INTERP, long i )
+void PDB_skip_breakpoint(PARROT_INTERP, long i)
         __attribute__nonnull__(1);
 
-void PDB_trace( PARROT_INTERP, NULLOK(const char *command) )
+void PDB_trace(PARROT_INTERP, NULLOK(const char *command))
         __attribute__nonnull__(1);
 
-int PDB_unescape( NOTNULL(char *string) )
+int PDB_unescape(NOTNULL(char *string))
         __attribute__nonnull__(1);
 
-void PDB_watchpoint( PARROT_INTERP, NOTNULL(const char *command) )
+void PDB_watchpoint(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

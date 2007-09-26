@@ -81,130 +81,130 @@ typedef enum {
 PARROT_API
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-UINTVAL ld( UINTVAL x );
+UINTVAL ld(UINTVAL x);
 
 PARROT_API
-void list_assign( PARROT_INTERP,
+void list_assign(PARROT_INTERP,
     NOTNULL(List *list),
     INTVAL idx,
     NULLOK(void *item),
-    int type )
+    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-List * list_clone( PARROT_INTERP, NOTNULL(const List *other) )
+List * list_clone(PARROT_INTERP, NOTNULL(const List *other))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_delete( PARROT_INTERP,
+void list_delete(PARROT_INTERP,
     NOTNULL(List *list),
     INTVAL idx,
-    INTVAL n_items )
+    INTVAL n_items)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-void * list_get( PARROT_INTERP, NOTNULL(List *list), INTVAL idx, int type )
+void * list_get(PARROT_INTERP, NOTNULL(List *list), INTVAL idx, int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_insert( PARROT_INTERP,
+void list_insert(PARROT_INTERP,
     NOTNULL(List *list),
     INTVAL idx,
-    INTVAL n_items )
+    INTVAL n_items)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL list_length( SHIM_INTERP, NOTNULL(const List *list) )
+INTVAL list_length(SHIM_INTERP, NOTNULL(const List *list))
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_mark( PARROT_INTERP, NOTNULL(List *list) )
+void list_mark(PARROT_INTERP, NOTNULL(List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-List * list_new( PARROT_INTERP, PARROT_DATA_TYPE type )
+List * list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-List * list_new_init( PARROT_INTERP,
+List * list_new_init(PARROT_INTERP,
     PARROT_DATA_TYPE type,
-    NOTNULL(PMC *init) )
+    NOTNULL(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
-void list_pmc_new( PARROT_INTERP, NOTNULL(PMC *container) )
+void list_pmc_new(PARROT_INTERP, NOTNULL(PMC *container))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_pmc_new_init( PARROT_INTERP,
+void list_pmc_new_init(PARROT_INTERP,
     NOTNULL(PMC *container),
-    NOTNULL(PMC *init) )
+    NOTNULL(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-void * list_pop( PARROT_INTERP, NOTNULL(List *list), int type )
+void * list_pop(PARROT_INTERP, NOTNULL(List *list), int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_push( PARROT_INTERP,
+void list_push(PARROT_INTERP,
     NOTNULL(List *list),
     NULLOK(void *item),
-    int type )
+    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_set_length( PARROT_INTERP, NOTNULL(List *list), INTVAL len )
+void list_set_length(PARROT_INTERP, NOTNULL(List *list), INTVAL len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-void * list_shift( PARROT_INTERP, NOTNULL(List *list), int type )
+void * list_shift(PARROT_INTERP, NOTNULL(List *list), int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_splice( PARROT_INTERP,
+void list_splice(PARROT_INTERP,
     NOTNULL(List *list),
     NULLOK(List *value_list),
     INTVAL offset,
-    INTVAL count )
+    INTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_unshift( PARROT_INTERP,
+void list_unshift(PARROT_INTERP,
     NOTNULL(List *list),
     NULLOK(void *item),
-    int type )
+    int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void list_visit( PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo) )
+void list_visit(PARROT_INTERP, NOTNULL(List *list), NOTNULL(void *pinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

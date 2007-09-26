@@ -23,76 +23,76 @@
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * constant_pmc_new( PARROT_INTERP, INTVAL base_type )
+PMC * constant_pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * constant_pmc_new_init( PARROT_INTERP,
+PMC * constant_pmc_new_init(PARROT_INTERP,
     INTVAL base_type,
-    NULLOK(PMC *init) )
+    NULLOK(PMC *init))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * constant_pmc_new_noinit( PARROT_INTERP, INTVAL base_type )
+PMC * constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_API
-void dod_register_pmc( PARROT_INTERP, NOTNULL(PMC* pmc) )
+void dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_create_mro( PARROT_INTERP, INTVAL type )
+void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_create_pmc_proxy( PARROT_INTERP, int type_num )
+void Parrot_create_pmc_proxy(PARROT_INTERP, int type_num)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-PMC * pmc_new( PARROT_INTERP, INTVAL base_type )
+PMC * pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * pmc_new_init( PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init) )
+PMC * pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC * pmc_new_noinit( PARROT_INTERP, INTVAL base_type )
+PMC * pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL pmc_register( PARROT_INTERP, NOTNULL(STRING *name) )
+INTVAL pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-PMC* pmc_reuse( PARROT_INTERP,
+PMC* pmc_reuse(PARROT_INTERP,
     NOTNULL(PMC *pmc),
     INTVAL new_type,
-    NULLOK(UINTVAL flags) )
+    NULLOK(UINTVAL flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL pmc_type( PARROT_INTERP, NOTNULL(STRING *name) )
+INTVAL pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL pmc_type_p( PARROT_INTERP, NOTNULL(PMC *name) )
+INTVAL pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dod_unregister_pmc( PARROT_INTERP, NOTNULL(PMC* pmc) )
+void dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

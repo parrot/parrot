@@ -76,79 +76,79 @@ typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *r
 /* HEADERIZER BEGIN: src/encoding.c */
 
 PARROT_API
-const ENCODING * Parrot_default_encoding( SHIM_INTERP );
+const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const char * Parrot_encoding_c_name( PARROT_INTERP,
-    INTVAL number_of_encoding )
+const char * Parrot_encoding_c_name(PARROT_INTERP,
+    INTVAL number_of_encoding)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING* Parrot_encoding_name( SHIM_INTERP, INTVAL number_of_encoding );
+STRING* Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_encoding_number( PARROT_INTERP, NOTNULL(STRING *encodingname) )
+INTVAL Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_encoding_number_of_str( SHIM_INTERP,
-    NOTNULL(const STRING *src) )
+INTVAL Parrot_encoding_number_of_str(SHIM_INTERP,
+    NOTNULL(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const ENCODING * Parrot_find_encoding( SHIM_INTERP,
-    NOTNULL(const char *encodingname) )
+const ENCODING * Parrot_find_encoding(SHIM_INTERP,
+    NOTNULL(const char *encodingname))
         __attribute__nonnull__(2);
 
 PARROT_API
-encoding_converter_t Parrot_find_encoding_converter( PARROT_INTERP,
+encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
     ENCODING *lhs,
-    ENCODING *rhs )
+    ENCODING *rhs)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const ENCODING* Parrot_get_encoding( PARROT_INTERP,
-    INTVAL number_of_encoding )
+const ENCODING* Parrot_get_encoding(PARROT_INTERP,
+    INTVAL number_of_encoding)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-const ENCODING * Parrot_load_encoding( PARROT_INTERP,
-    NOTNULL(const char *encodingname) )
+const ENCODING * Parrot_load_encoding(PARROT_INTERP,
+    NOTNULL(const char *encodingname))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL Parrot_make_default_encoding( SHIM_INTERP,
+INTVAL Parrot_make_default_encoding(SHIM_INTERP,
     SHIM(const char *encodingname),
-    NOTNULL(ENCODING *encoding) )
+    NOTNULL(ENCODING *encoding))
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_MALLOC
-ENCODING * Parrot_new_encoding( SHIM_INTERP );
+ENCODING * Parrot_new_encoding(SHIM_INTERP);
 
 PARROT_API
-INTVAL Parrot_register_encoding( PARROT_INTERP,
+INTVAL Parrot_register_encoding(PARROT_INTERP,
     NOTNULL(const char *encodingname),
-    NOTNULL(ENCODING *encoding) )
+    NOTNULL(ENCODING *encoding))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void parrot_deinit_encodings( void );
-void parrot_init_encodings_2( void );
+void parrot_deinit_encodings(void);
+void parrot_init_encodings_2(void);
 /* HEADERIZER END: src/encoding.c */
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(i, src) \

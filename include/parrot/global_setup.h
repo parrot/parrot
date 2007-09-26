@@ -22,16 +22,16 @@
 PARROT_API
 void Parrot_set_config_hash_internal(
     NOTNULL(const unsigned char* parrot_config),
-    unsigned int parrot_config_size )
+    unsigned int parrot_config_size)
         __attribute__nonnull__(1);
 
-void init_world( PARROT_INTERP )
+void init_world(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void init_world_once( PARROT_INTERP )
+void init_world_once(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void parrot_global_setup_2( PARROT_INTERP )
+void parrot_global_setup_2(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/global_setup.c */

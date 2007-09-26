@@ -74,33 +74,33 @@ typedef int (*arg_pass_f)(PARROT_INTERP, PMC *sig,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_MIC* parrot_PIC_alloc_mic( const PARROT_INTERP, size_t n );
+Parrot_MIC* parrot_PIC_alloc_mic(const PARROT_INTERP, size_t n);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Parrot_PIC* parrot_PIC_alloc_pic( PARROT_INTERP )
+Parrot_PIC* parrot_PIC_alloc_pic(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void parrot_PIC_alloc_store( NOTNULL(struct PackFile_ByteCode *cs), size_t n )
+void parrot_PIC_alloc_store(NOTNULL(struct PackFile_ByteCode *cs), size_t n)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_check_sig(
     NOTNULL(const PMC *sig1),
     NOTNULL(const PMC *sig2),
-    NOTNULL(int *type) )
+    NOTNULL(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void parrot_PIC_destroy( NOTNULL(struct PackFile_ByteCode *cs) )
+void parrot_PIC_destroy(NOTNULL(struct PackFile_ByteCode *cs))
         __attribute__nonnull__(1);
 
-void parrot_pic_find_infix_v_pp( PARROT_INTERP,
+void parrot_pic_find_infix_v_pp(PARROT_INTERP,
     NOTNULL(PMC *left),
     NOTNULL(PMC *right),
     NOTNULL(Parrot_MIC *mic),
-    NOTNULL(opcode_t *cur_opcode) )
+    NOTNULL(opcode_t *cur_opcode))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -108,17 +108,17 @@ void parrot_pic_find_infix_v_pp( PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_CONST_FUNCTION
-int parrot_PIC_op_is_cached( int op_code );
+int parrot_PIC_op_is_cached(int op_code);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * parrot_pic_opcode( PARROT_INTERP, INTVAL op )
+void * parrot_pic_opcode(PARROT_INTERP, INTVAL op)
         __attribute__nonnull__(1);
 
-void parrot_PIC_prederef( PARROT_INTERP,
+void parrot_PIC_prederef(PARROT_INTERP,
     opcode_t op,
     NOTNULL(void **pc_pred),
-    int core )
+    int core)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -128,18 +128,18 @@ void parrot_PIC_prederef( PARROT_INTERP,
 /* HEADERIZER BEGIN: src/pic_jit.c */
 
 PARROT_WARN_UNUSED_RESULT
-int parrot_pic_is_safe_to_jit( PARROT_INTERP,
+int parrot_pic_is_safe_to_jit(PARROT_INTERP,
     NOTNULL(PMC *sub),
     NOTNULL(PMC *sig_args),
     NOTNULL(PMC *sig_results),
-    NOTNULL(int *flags) )
+    NOTNULL(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-funcptr_t parrot_pic_JIT_sub( PARROT_INTERP, NOTNULL(PMC *sub), int flags )
+funcptr_t parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

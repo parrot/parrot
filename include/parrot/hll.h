@@ -24,56 +24,56 @@
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_get_ctx_HLL_namespace( PARROT_INTERP )
+PMC* Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_ctx_HLL_type( PARROT_INTERP, INTVAL core_type )
+INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_get_HLL_id( PARROT_INTERP, NULLOK(STRING *hll_name) )
+INTVAL Parrot_get_HLL_id(PARROT_INTERP, NULLOK(STRING *hll_name))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_API
-STRING * Parrot_get_HLL_name( PARROT_INTERP, INTVAL id )
-        __attribute__nonnull__(1);
-
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_get_HLL_namespace( PARROT_INTERP, int hll_id )
+PARROT_API
+STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_get_HLL_type( PARROT_INTERP, INTVAL hll_id, INTVAL core_type )
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_regenerate_HLL_namespaces( PARROT_INTERP )
+INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
         __attribute__nonnull__(1);
 
 PARROT_API
-INTVAL Parrot_register_HLL( PARROT_INTERP, NOTNULL(STRING *hll_name) )
+void Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_API
+INTVAL Parrot_register_HLL(PARROT_INTERP, NOTNULL(STRING *hll_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL Parrot_register_HLL_lib( PARROT_INTERP, NOTNULL(STRING *hll_lib) )
+INTVAL Parrot_register_HLL_lib(PARROT_INTERP, NOTNULL(STRING *hll_lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_register_HLL_type( PARROT_INTERP,
+void Parrot_register_HLL_type(PARROT_INTERP,
     INTVAL hll_id,
     INTVAL core_type,
-    INTVAL hll_type )
+    INTVAL hll_type)
         __attribute__nonnull__(1);
 
-void Parrot_init_HLL( PARROT_INTERP )
+void Parrot_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 /* HEADERIZER END: src/hll.c */

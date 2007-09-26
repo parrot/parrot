@@ -31,17 +31,17 @@ typedef enum {
 /* HEADERIZER BEGIN: src/objects.c */
 
 PARROT_API
-INTVAL Parrot_add_attribute( PARROT_INTERP,
+INTVAL Parrot_add_attribute(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(STRING *attr) )
+    NOTNULL(STRING *attr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_add_parent( PARROT_INTERP,
+void Parrot_add_parent(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(PMC *parent) )
+    NOTNULL(PMC *parent))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -49,27 +49,27 @@ void Parrot_add_parent( PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_class_lookup( PARROT_INTERP, NOTNULL(STRING *class_name) )
+PMC * Parrot_class_lookup(PARROT_INTERP, NOTNULL(STRING *class_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-INTVAL Parrot_class_offset( PARROT_INTERP,
+INTVAL Parrot_class_offset(PARROT_INTERP,
     NOTNULL(PMC *object),
-    NOTNULL(STRING *_class) )
+    NOTNULL(STRING *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_ComposeRole( PARROT_INTERP,
+void Parrot_ComposeRole(PARROT_INTERP,
     NOTNULL(PMC *role),
     NOTNULL(PMC *exclude),
     int got_exclude,
     NOTNULL(PMC *alias),
     int got_alias,
     NOTNULL(PMC *methods_hash),
-    NOTNULL(PMC *roles_list) )
+    NOTNULL(PMC *roles_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -80,40 +80,40 @@ void Parrot_ComposeRole( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_ComputeMRO_C3( PARROT_INTERP, NOTNULL(PMC *_class) )
+PMC* Parrot_ComputeMRO_C3(PARROT_INTERP, NOTNULL(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_class_constructor( PARROT_INTERP,
+PMC * Parrot_find_class_constructor(PARROT_INTERP,
     NOTNULL(STRING *_class),
-    INTVAL classtoken )
+    INTVAL classtoken)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_class_destructor( PARROT_INTERP,
+PMC * Parrot_find_class_destructor(PARROT_INTERP,
     NOTNULL(STRING *_class),
-    INTVAL classtoken )
+    INTVAL classtoken)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_find_class_fallback( PARROT_INTERP,
+PMC * Parrot_find_class_fallback(PARROT_INTERP,
     NOTNULL(STRING *_class),
-    INTVAL classtoken )
+    INTVAL classtoken)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_find_method_direct( PARROT_INTERP,
+PMC * Parrot_find_method_direct(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(STRING *method_name) )
+    NOTNULL(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -121,18 +121,18 @@ PMC * Parrot_find_method_direct( PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_find_method_with_cache( PARROT_INTERP,
+PMC * Parrot_find_method_with_cache(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(STRING *method_name) )
+    NOTNULL(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_find_vtable_meth( PARROT_INTERP,
+PMC* Parrot_find_vtable_meth(PARROT_INTERP,
     NOTNULL(PMC *pmc),
-    NOTNULL(STRING *meth) )
+    NOTNULL(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -140,71 +140,71 @@ PMC* Parrot_find_vtable_meth( PARROT_INTERP,
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_get_attrib_by_num( PARROT_INTERP,
+PMC * Parrot_get_attrib_by_num(PARROT_INTERP,
     NOTNULL(PMC *object),
-    INTVAL attrib )
+    INTVAL attrib)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_get_attrib_by_str( PARROT_INTERP,
+PMC * Parrot_get_attrib_by_str(PARROT_INTERP,
     NOTNULL(PMC *object),
-    NOTNULL(STRING *attr) )
+    NOTNULL(STRING *attr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-INTVAL Parrot_get_vtable_index( PARROT_INTERP, NOTNULL(const STRING *name) )
+INTVAL Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_instantiate_object( PARROT_INTERP, NOTNULL(PMC *object) )
+void Parrot_instantiate_object(PARROT_INTERP, NOTNULL(PMC *object))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_instantiate_object_init( PARROT_INTERP,
+void Parrot_instantiate_object_init(PARROT_INTERP,
     NOTNULL(PMC *object),
-    NOTNULL(PMC *init) )
+    NOTNULL(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_invalidate_method_cache( PARROT_INTERP,
+void Parrot_invalidate_method_cache(PARROT_INTERP,
     NULLOK(STRING *_class),
-    NOTNULL(STRING *meth) )
+    NOTNULL(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_PURE_FUNCTION
-INTVAL Parrot_MMD_method_idx( SHIM_INTERP, NOTNULL(const char *name) )
+INTVAL Parrot_MMD_method_idx(SHIM_INTERP, NOTNULL(const char *name))
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-const char* Parrot_MMD_method_name( SHIM_INTERP, INTVAL idx );
+const char* Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_multi_subclass( PARROT_INTERP,
+PMC * Parrot_multi_subclass(PARROT_INTERP,
     NOTNULL(PMC *base_class_array),
-    NOTNULL(STRING *child_class_name) )
+    NOTNULL(STRING *child_class_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_new_class( PARROT_INTERP,
+void Parrot_new_class(PARROT_INTERP,
     NOTNULL(PMC *_class),
-    NOTNULL(PMC *name) )
+    NOTNULL(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -212,21 +212,21 @@ void Parrot_new_class( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_new_method_cache( PARROT_INTERP )
+PMC * Parrot_new_method_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_note_method_offset( PARROT_INTERP,
+void Parrot_note_method_offset(PARROT_INTERP,
     UINTVAL offset,
-    NOTNULL(PMC *method) )
+    NOTNULL(PMC *method))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_object_isa( PARROT_INTERP,
+INTVAL Parrot_object_isa(PARROT_INTERP,
     NOTNULL(PMC *pmc),
-    NOTNULL(PMC *_class) )
+    NOTNULL(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -234,55 +234,55 @@ INTVAL Parrot_object_isa( PARROT_INTERP,
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_remove_parent( PARROT_INTERP,
+PMC * Parrot_remove_parent(PARROT_INTERP,
     NOTNULL(PMC *removed_class),
-    NOTNULL(PMC *existing_class) )
+    NOTNULL(PMC *existing_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_set_attrib_by_num( PARROT_INTERP,
+void Parrot_set_attrib_by_num(PARROT_INTERP,
     NOTNULL(PMC *object),
     INTVAL attrib,
-    NOTNULL(PMC *value) )
+    NOTNULL(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_API
-void Parrot_set_attrib_by_str( PARROT_INTERP,
+void Parrot_set_attrib_by_str(PARROT_INTERP,
     NOTNULL(PMC *object),
     NOTNULL(STRING *attr),
-    NOTNULL(PMC *value) )
+    NOTNULL(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 PARROT_API
-void Parrot_set_class_constructor( PARROT_INTERP,
+void Parrot_set_class_constructor(PARROT_INTERP,
     NOTNULL(STRING *_class),
     INTVAL classtoken,
-    NOTNULL(STRING *method) )
+    NOTNULL(STRING *method))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_API
-void Parrot_set_class_destructor( PARROT_INTERP,
+void Parrot_set_class_destructor(PARROT_INTERP,
     NOTNULL(STRING *_class),
     INTVAL classtoken,
-    NOTNULL(STRING *method) )
+    NOTNULL(STRING *method))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
 PARROT_API
-void Parrot_set_class_fallback( PARROT_INTERP,
+void Parrot_set_class_fallback(PARROT_INTERP,
     NOTNULL(STRING *_class),
     INTVAL classtoken,
-    NOTNULL(STRING *method) )
+    NOTNULL(STRING *method))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
@@ -290,31 +290,31 @@ void Parrot_set_class_fallback( PARROT_INTERP,
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_single_subclass( PARROT_INTERP,
+PMC * Parrot_single_subclass(PARROT_INTERP,
     NOTNULL(PMC *base_class),
-    NULLOK(PMC *name) )
+    NULLOK(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING* readable_name( PARROT_INTERP, NOTNULL(PMC *name) )
+STRING* readable_name(PARROT_INTERP, NOTNULL(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void destroy_object_cache( PARROT_INTERP )
+void destroy_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void init_object_cache( PARROT_INTERP )
+void init_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void mark_object_cache( PARROT_INTERP )
+void mark_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_class_lookup_p( PARROT_INTERP, NOTNULL(PMC *class_name) )
+PMC * Parrot_class_lookup_p(PARROT_INTERP, NOTNULL(PMC *class_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

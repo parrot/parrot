@@ -38,36 +38,36 @@ typedef enum {
 PARROT_API
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-char* Parrot_get_runtime_prefix( PARROT_INTERP, NULLOK(STRING **prefix_str) )
+char* Parrot_get_runtime_prefix(PARROT_INTERP, NULLOK(STRING **prefix_str))
         __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-char* Parrot_locate_runtime_file( PARROT_INTERP,
+char* Parrot_locate_runtime_file(PARROT_INTERP,
     NOTNULL(const char *file_name),
-    enum_runtime_ft type )
+    enum_runtime_ft type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING* Parrot_locate_runtime_file_str( PARROT_INTERP,
+STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
     NOTNULL(STRING *file),
-    enum_runtime_ft type )
+    enum_runtime_ft type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void parrot_init_library_paths( PARROT_INTERP )
+void parrot_init_library_paths(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * parrot_split_path_ext( PARROT_INTERP,
+STRING * parrot_split_path_ext(PARROT_INTERP,
     NOTNULL(STRING *in),
     NOTNULL(STRING **wo_ext),
-    NOTNULL(STRING **ext) )
+    NOTNULL(STRING **ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

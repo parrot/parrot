@@ -105,14 +105,14 @@ void Parrot_exec_add_text_rellocation(
     char *nptr,
     int type,
     const char *symbol,
-    int disp )
+    int disp)
         __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_exec_add_text_rellocation_func(
     NOTNULL(Parrot_exec_objfile_t *obj),
     char *nptr,
-    const char *func_name )
+    const char *func_name)
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -121,19 +121,19 @@ int * Parrot_exec_add_text_rellocation_reg(
     char *nptr,
     const char *var,
     int offset,
-    int disp )
+    int disp)
         __attribute__nonnull__(1);
 
-void Parrot_exec( PARROT_INTERP,
+void Parrot_exec(PARROT_INTERP,
     opcode_t *pc,
     opcode_t *code_start,
-    opcode_t *code_end )
+    opcode_t *code_end)
         __attribute__nonnull__(1);
 
 int Parrot_exec_add_symbol(
     NOTNULL(Parrot_exec_objfile_t *obj),
     NOTNULL(const char *symbol),
-    int stype )
+    int stype)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
