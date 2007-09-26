@@ -146,6 +146,24 @@ As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
 C<.HLL_map> syntax will also be updated to take strings to indicate the types.
 [RT#45453].
 
+=item .sym directive
+
+The C<.sym> directive will be removed, as there is already the C<.local> directive
+to declare a variable.
+
+See [RT#45405]
+
+=item .local macro labels will become C<.label>
+
+In macros you can declare a unique label by writing:
+
+ .local $myLabel:
+
+This will be automagically translated into some magic that generates
+a unique label. The C<.local> directive will be changed into C<.label>.
+
+See [RT#45405]
+
 =back
 
 =head1 Deprecated compiler tools
