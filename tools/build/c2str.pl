@@ -19,6 +19,21 @@ use Getopt::Long;
 
 my $outfile          = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';
+my $lockfile         = "$outfile.lck";
+my $max_lock_wait    = 120;
+
+my $start_time = time;
+while ( -e $lockfile ) {
+    sleep 1;
+    if ( time - $start_time > $max_lock_wait ) {
+        die "Lock still held after $max_lock_wait seconds -- something is wrong!";
+    }
+}
+open my $lock, '>', $lockfile or die "Can't write '$lockfile': $!";
+print $lock "$$\n";
+close $lock;
+
+$SIG{'__DIE__'} = sub { unlink $lockfile };
 
 my ( $result, $do_all, $do_init, $file );
 $result = GetOptions(
@@ -29,10 +44,12 @@ $result = GetOptions(
 $do_all and do {
     &read_all;
     &create_c_include;
+    unlink $lockfile;
     exit;
 };
 $do_init and do {
     unlink $outfile;
+    unlink $lockfile;
     exit;
 };
 
@@ -48,6 +65,8 @@ my @all_strings;
 open my $ALL, '>>', $outfile or die "Can't write '$outfile': $!";
 process_cfile();
 close $ALL;
+
+unlink $lockfile;
 
 sub hash_val {
     my $h = Math::BigInt->new('+0');

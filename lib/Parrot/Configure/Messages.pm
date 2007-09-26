@@ -35,7 +35,6 @@ sub print_conclusion {
 Okay, we're done!
 
 You can now use `$make' to build your Parrot.
-(NOTE: do not use `$make -j <n>'!)
 After that, you can use `$make test' to run the test suite.
 
 Happy Hacking,
