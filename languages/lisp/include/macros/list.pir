@@ -35,11 +35,11 @@ Puts the car of A into R.  A is assumed to be a valid list.
 
   goto .$DONE
 
-.local $IS_NULL:
+.label $IS_NULL:
   .NIL(.R)
   goto .$DONE
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 .APPEND(R,A,B)
@@ -57,7 +57,7 @@ Appends B to list A, placing the result into R.  A is assumed to be a valid list
 
   _listptr1p = .A
 
-.local $APPEND_LOOP:            # Loop until we reach the end of the list.
+.label $APPEND_LOOP:            # Loop until we reach the end of the list.
   .NULL(_listptr1p,.$DONE_LOOP)
 
   _listptr2p = _listptr1p
@@ -65,15 +65,15 @@ Appends B to list A, placing the result into R.  A is assumed to be a valid list
   .CDR(_listptr1p,_listptr1p)
   goto .$APPEND_LOOP
 
-.local $DONE_LOOP:              # At the EOL, replace the list end (NIL)
+.label $DONE_LOOP:              # At the EOL, replace the list end (NIL)
   .LIST_1(_listtmpp, .B)        # with a new cons containing the new element.
   _listptr2p[1] = _listtmpp  
   goto .$DONE
 
-.local $EMPTY_LIST:
+.label $EMPTY_LIST:
   .LIST_1(.R,.B)
  
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 .CDR(R,A) 
@@ -88,11 +88,11 @@ Puts the cdr of A into R.  A is assumed to be a valid list.
   .R = .A[1]
   goto .$DONE
 
-.local $IS_NULL:
+.label $IS_NULL:
   .NIL(.R)
   goto .$DONE
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 .SECOND(R,A) 

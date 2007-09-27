@@ -20,11 +20,11 @@ Asserts that A is of type T, throwing a error of type "type-error" on failure
    if _testi == 1 goto .$DONE
    goto .$WRONG_TYPE
 
-.local $WRONG_TYPE:
+.label $WRONG_TYPE:
   .ERROR_2("type-error", "%s is not of type %s", .A, .T)
   goto .$DONE
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 ASSERT_TYPE_AND_BRANCH(A,T,B)
@@ -41,7 +41,7 @@ Asserts that A is of type T, branching to B on failure.
    if _testi == 1 goto .$DONE
    goto .B
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 ASSERT_LENGTH(A,L,B)
@@ -57,7 +57,7 @@ Asserts that list A is of length L, branching to B on failure.
    if _leni == .L goto .$DONE                   # Branch on success
    goto .B                                      # Branch on failure
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 ASSERT_MINIMUM_LENGTH(A,L,B)
@@ -73,7 +73,7 @@ Asserts that list A is at least of length L, branching to B on failure.
    if _leni >= .L goto .$DONE                   # Branch on success
    goto .B                                      # Branch on failure
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 ASSERT_LENGTH_BETWEEN(A,L,M,B)
@@ -90,7 +90,7 @@ Asserts that list A is at least of length L and at most of length M, branching t
    if _leni <= .M goto .$DONE                   # Branch on success (max bound)
    goto .B                                      # Branch on failure
 
-.local $DONE:
+.label $DONE:
 .endm
 
 =head2 ASSERT_EVEN_LENGTH(A,B)
@@ -108,7 +108,7 @@ Asserts that list A is composed of an even number of elements, branching to B on
    if _modi == 0 goto .$DONE                    # Branch on success
    goto .B                                      # Branch on failure
 
-.local $DONE:
+.label $DONE:
 .endm
 
 # Local Variables:
