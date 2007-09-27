@@ -107,9 +107,7 @@ sub runstep {
                 . " -Wimplicit-function-declaration"
                 . " -Wimplicit-int"
                 . " -Wimport"
-                . " -Winit-self"
                 . " -Winline"
-                . " -Winvalid-pch"
                 . " -Wmain"
                 . " -Wmissing-braces"
                 . " -Wmissing-declarations"
@@ -117,7 +115,6 @@ sub runstep {
                 . " -Wnested-externs"
                 . " -Wno-unused"
                 . " -Wnonnull"
-                . " -Wold-style-definition"
                 . " -Wpacked"
                 . " -Wparentheses"
                 . " -Wpointer-arith"
@@ -126,7 +123,6 @@ sub runstep {
                 . " -Wshadow"
                 . " -Wsign-compare"
                 . " -Wstrict-aliasing"
-                . " -Wstrict-aliasing=2"
                 . " -Wstrict-prototypes"
                 . " -Wswitch"
                 #. " -Wswitch-default"
@@ -178,7 +174,10 @@ sub runstep {
                 . " -Wbad-function-cast"
                 . " -Wdeclaration-after-statement"
                 . " -Wextra"
+                . " -Winit-self"
+                . " -Winvalid-pch"
                 . " -Wold-style-definition"
+                . " -Wstrict-aliasing=2"
                 . "",
 
             # -Wsequence-point is part of -Wall
@@ -337,7 +336,6 @@ sub runstep {
 
         $warns = "";
         my @warning_options = ( \@opt_and_vers );
-        #my @warning_options = ( );
         push @warning_options, \@cage_opt_and_vers
             if $conf->options->get('cage');
 
