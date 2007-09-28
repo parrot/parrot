@@ -27,7 +27,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'debug.getfenv' );
@@ -93,6 +93,18 @@ assert(getmetatable(t) == t1)
 print "ok"
 CODE
 ok
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'debug.traceback' );
+print(debug.traceback())
+CODE
+/^stack traceback:\n/
+OUT
+
+language_output_like( 'lua', <<'CODE', <<'OUT', 'debug.traceback with message' );
+print(debug.traceback("message\n"))
+CODE
+/^message\n\nstack traceback:\n/
 OUT
 
 # Local Variables:

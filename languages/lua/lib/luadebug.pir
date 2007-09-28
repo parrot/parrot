@@ -423,8 +423,11 @@ STILL INCOMPLETE (see traceback in lua.pmc).
     .param pmc level :optional
     .param pmc extra :slurpy
     .local pmc res
-    $S1 = optstring(message, '')
-    $I2 = optint(level, 1)
+    $S1 = lua_optstring(1, message, '')
+    $I2 = lua_optint(2, level, 1)
+    unless $S1 goto L1
+    $S1 .= "\n"
+  L1:
     new $P0, 'Lua'
     $S0 = $P0.'traceback'($I2)
     $S1 .= $S0
