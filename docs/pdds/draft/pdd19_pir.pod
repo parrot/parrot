@@ -64,7 +64,7 @@ Identifiers start with a letter or underscore, then may contain additionally
 letters, digits, underscores and B<::>. Identifiers don't have any limit on
 length.
 
-{{ REVIEW: length limit }}
+{{ REVIEW: identifier length limit }}
 
 Example:
 
@@ -88,7 +88,10 @@ $Pn, where B<n> consists of digit(s) only. B<n> must be between 1 and 99.
 
 =item <var>
 
-A local B<identifier> or a B<reg> or a constant (when allowed).
+A local B<identifier>, a B<reg> or a constant (when allowed). A constant
+is not allowed on the left side of an assignment.
+
+{{ REVIEW: any other places where constant is not allowed }}
 
 =back
 
@@ -104,14 +107,15 @@ sequences are processed.
 =item "string constants"
 
 Are delimited by B<">. A B<"> inside a string must be escaped by
-B<\">.  Only 7-bit ASCII is accepted in string constants; to use
+B<\>.  Only 7-bit ASCII is accepted in string constants; to use
 characters outside thar range, specify an encoding in the way below.
 
 =item <<"heredoc",  <<'heredoc'
 
 Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter is slurped into the string. The delimiter
-has to be on its own line with no trailing whitespace.
+has to be on its own line, at the begging of the line and with no trailing 
+whitespace.
 
 Assignment of a heredoc:
 
@@ -198,29 +202,37 @@ Define the HLL for the current file. If the string C<hll_lib> isn't empty
 this B<compile time pragma> also loads the shared lib for the HLL, so that
 integer type constants are working for creating new PMCs.
 
-=item .HLL_map .CoreType, .UserType
+=item .HLL_map 'CoreType', 'UserType'
 
-Whenever Parrot has to create PMCs inside C code on behalf of the
-running user program it consults the current type mapping for the
-executing HLL and creates a PMC of type I<.UserType> instead of
-I<.CoreType>, if such a mapping is defined.
+Whenever Parrot has to create PMCs inside C code on behalf of the running 
+user program it consults the current type mapping for the executing HLL 
+and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such 
+a mapping is defined.
 
 E.g. with this code snippet ...
 
   .loadlib 'dynlexpad'
 
   .HLL "Foo", ""
-  .HLL_map .LexPad, .DynLexPad
+  .HLL_map 'LexPad', 'DynLexPad'
 
   .sub main :main
     ...
 
 ... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
 
+{{ PROPOSAL: stop using integer constants for types RT#45453 }}
+
 =item .sub <identifier> [:<flag> ...]
 
-Define a I<compilation unit> with the label B<identifier:>. See
+Define a I<compilation unit> with the label B<identifier>. All code in a
+PIR source file must be defined in a compilation unit. See
 L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
+Optional flags are a list of B<flag>, separated by empty spaces, and empty
+spaces only.
+
+{{ PROPOSAL: remove the optional comma in flag list RT#45697 }}
+
 Always paired with C<.end>.
 
 =item .end
@@ -229,12 +241,12 @@ End a compilation unit. Always paired with C<.sub>.
 
 =item .emit
 
-Define a I<compilation unit> containing PASM code. Always paired with
+Define a I<compilation unit> containing PASM code. Always paired with 
 C<.eom>.
 
 =item .eom
 
-End a I<compilation unit> containing PASM code. Always paired with
+End a I<compilation unit> containing PASM code. Always paired with 
 C<.emit>.
 
 =item .local <type> <identifier> [:unique_reg]
@@ -275,6 +287,9 @@ directive. For example, given this preamble:
     $P1 = find_lex "$a"
 
 =item .const <type> <identifier> = <const>
+
+Define a constant named B<identifier> of type B<type> and assign value
+B<const> to it.
 
 =item .globalconst <type> <identifier> = <const>
 
@@ -428,7 +443,7 @@ below:
 
 =item goto <identifier>
 
-B<branch> to <identifier> (label or subroutine name).
+B<branch> to B<identifier> (label or subroutine name).
 
 Examples:
 
@@ -437,42 +452,48 @@ Examples:
 =item if <var> goto <identifier>
 
 If <var> evaluates as true, jump to the named identifier. Translate to 
-B<if x, identifier>>.
+B<if var, identifier>>.
 
 =item unless <var> goto <identifier>
 
 Unless <var> evaluates as true, jump to the named identifier. Translate to
-B<unless x, identifier>.
+B<unless var, identifier>.
 
 =item if null <var> goto <identifier>
 
+If B<var> evaluates as null, jump to the named B<identifier>. Translate to 
+B<if_null var, identifier>.
+
 =item unless null <var> goto <identifier>
 
-Translate to B<if_null x, identifier> or B<unless_null ..>.
+Unless B<var> evaluates as null, jump to the named B<identifier>. Translate 
+to B<unless_null var, identifier>.
 
-=item if <var> <relop> <var> goto <identifier>
+=item if <var1> <relop> <var2> goto <identifier>
 
-The B<relop> B<<, <=, ==, != E<gt>= E<gt>> translate to the PASM opcodes
-B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt> B<var>, B<var>,
-B<identifier>.
+The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the 
+PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1> B<relop>
+B<var2> evaluates as true, jump to the named B<identifier>.
 
-=item unless <var> <relop> <var> goto <identifier>
+=item unless <var1> <relop> <var2> goto <identifier>
 
-Like above, but branch if condition isn't met.
+The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the 
+PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1> 
+B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
-=item <var> = <var>
+=item <var1> = <var2>
 
-Assign a value. Translates to B<set var, var>.
+Assign a value. Translates to B<set var1, var2>.
 
-=item <var> = <unary> <var>
+=item <var1> = <unary> <var2>
 
 The B<unary>s B<!>, B<-> and B<~> generate B<not>, B<neg> and B<bnot> ops.
 
-=item <var> = <var> <binary> <var>
+=item <var1> = <var2> <binary> <var3>
 
 The B<binary>s B<+>, B<->, B<*>, B</>, B<%> and B<**> generate
 B<add>, B<sub>, B<mul>, B<div>, B<mod> and B<pow> arithmetic ops.
-B<binary> B<.> is B<concat> and valid for string arguments.
+B<binary> B<.> is B<concat> and only valid for string arguments.
 
 B<<<> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
 B<E<gt>E<gt>E<gt>> is the logical shift B<lsr>.
@@ -512,19 +533,22 @@ A keyed B<set> operation or the assign B<substr> op with a length of
 
 =item <var> = new '<type>'
 
-B<new var, 'type'>
+Create a new PMC of type B<type> stored in B<var>. Translate to 
+B<new var, 'type'>.
 
-=item <var> = new '<type>', <var>
+=item <var1> = new '<type>', <var2>
 
-B<new var, 'type', var>
+Create a new PMC of type B<type> stored in B<var1> and using B<var2> as PMC
+containing initialization data. Translate to B<new var1, 'type', var2>
 
-=item <var> = defined <var>
+=item <var1> = defined <var2>
 
-B<defined var, var>
+Assign to B<var1> the value for definedness of B<var2>. Translate to
+B<defined var1, var2>.
 
-=item <var> = defined <var> [ <var> ]
+=item <var1> = defined <var2> [ <var3> ]
 
-B<defined var, var[var]> the keyed op.
+B<defined var1, var2[var3]> the keyed op.
 
 =item global "string" = <var>
 
@@ -534,18 +558,18 @@ B<defined var, var[var]> the keyed op.
 
 {{ DEPRECATED: op find_global was deprecated }}
 
-=item <var> = clone <var>
+=item <var1> = clone <var2>
 
-B<clone var, var>
+Assing to B<var1> a clone of B<var2>. Translate to B<clone var1, var2>.
 
 =item <var> = addr <identifier>
 
-Set <var> to the addressof label identified by <identifier>. Translates to
-B<set_addr var, var>.
+Assign to B<var> the address of label identified by <identifier>. Translate 
+to B<set_addr var, var>.
 
 =item <var> = null
 
-Set <var> to null. Translates to B<null <var>>.
+Set B<var> to null. Translate to B<null <var>.
 
 =item <<, <<=
 
