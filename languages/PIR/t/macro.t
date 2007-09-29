@@ -17,7 +17,7 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'macro pasring
 
 .macro X(a, b)	
 	.a = .b
-	.local $a:		
+	.label $a:		
 .endm
 
 
@@ -27,9 +27,9 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'macro pasring
 .end
 
 .macro X(a,b)
-	.local $x: foo()
+	.label $x: foo()
 	
-	.local $y:
+	.label $y:
 	.a = .b
 
 .endm
