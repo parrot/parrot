@@ -25,7 +25,7 @@ PIR in C (using Lex/Yacc).
 
 =head1 VERSION
 
-0.1.4
+0.2.0
 
 =head1 LEXICAL CONVENTIONS
 
