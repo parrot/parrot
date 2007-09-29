@@ -247,7 +247,7 @@ rule conditional_stat {
 }
 
 rule conditional_expr {
-    | 'null' <target>
+    | <'null'> <target>
     | <simple_expr> [ <relational_operator> <simple_expr> ]?
 }
 
@@ -311,8 +311,8 @@ rule assignment_stat {
     | <target> <'='> <heredoc>
     | <target> <assign_operator> <simple_expr>
     | <target> <keylist> <'='> <simple_expr>
-    | <result_var_list> 
-      [ <'='> | <syntax_error: '=' expected> ] 
+    | <result_var_list>
+      [ <'='> | <syntax_error: '=' expected> ]
       <short_sub_call>
 }
 
@@ -494,9 +494,8 @@ token return_stat {
 }
 
 rule long_return_stat {
-    <'.pcc_begin_return'>
-    [ <?nl> | <syntax_error: newline expected after '.pcc_begin_return'> ]
-    [ <return_directive> ]*
+    <'.pcc_begin_return'> <?nl1>
+    [ <'.return'> <return_value> ]*
     [ <'.pcc_end_return'> | <syntax_error: '.pcc_end_return' expected> ]
 }
 
@@ -505,21 +504,16 @@ rule short_return_stat {
 }
 
 rule long_yield_stat {
-    <'.pcc_begin_yield'>
-    [ <?nl> | <syntax_error: newline expected after '.pcc_begin_yield'> ]
-    [ <yield_directive> ]*
+    <'.pcc_begin_yield'> <?nl1>
+    [ <'.yield'> <return_value> ]*
     [ <'.pcc_end_yield'> | <syntax_error: '.pcc_end_yield' expected> ]
 }
 
-rule return_directive {
-    <'.return'>
-    <return_value>
-}
 
 rule return_value {
     [ <simple_expr> | <syntax_error: simple expression expected> ]
     <set_flags>?
-    [ <?nl> | <syntax_error: newline expected after return directive> ]
+    <?nl1>
 }
 
 rule yield_directive {
@@ -789,6 +783,10 @@ token nl {
     [ \n <?ws> ]+
 }
 
+token nl1 {
+    <nl> | <syntax_error: newline expected>
+}
+
 regex pod_comment {
     ^^ = [ [ cut \h*: | end [\h\N*]? ]
          | for [ \h\N+: ] \n [ \N+\n ]*:
@@ -809,11 +807,15 @@ identifiers.
 token keyword {
     | <pir_type>
     | <pir_directive>
+    | <pir_keyword>
     | <pasm_instruction> # pasm instructions may be identifiers in IMCC
 }
 
 
-
+# TODO: find out if we need to do this: I think so..
+token pir_keyword {
+    <'goto'>
+}
 
 =head2 PIR directives
 
