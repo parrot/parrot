@@ -1095,9 +1095,10 @@ not PIR instructions.
 
 
 Note that before a macro body will be parsed, some grammar rules
-will be changed. In a macro body, local variable declaration can
-B<only> be done using the C<.sym> directive. The C<.local> directive
-is only available for declaring labels.
+will be changed. In a macro body, local variable declarations are
+done using the C<.macro_local> directive. B<TODO: decide on keyword for this>.
+
+The C<.label> directive is available for declaring unique labels.
 
   macro_label:
     ".label" "$"identifier":"
@@ -1322,6 +1323,18 @@ docs/imcc/syntax.pod - official syntax for IMCC/PIR.
 
 =head1 CHANGES
 
+0.2.0
+
+=over 4
+
+=item *
+
+Many clean ups; remove experimental C<:wrap> flag, remove C<.global> directive,
+remove C<.sym> directive, add C<.label> directive for macros, remove C<.pcc_sub>;
+remove some comments that are not true any more. In all, it's getting much cleaner!
+
+=back
+
 0.1.4
 
 =over 4
@@ -1358,19 +1371,6 @@ Added some remarks at section for Macros.
 Added some remarks here and there, and fixed some style issues.
 
 =back
-
-0.2.0
-
-=over 4
-
-=item *
-
-Many clean ups; remove experimental C<:wrap> flag, remove C<.global> directive,
-remove C<.sym> directive, add C<.label> directive for macros, remove C<.pcc_sub>;
-remove some comments that are not true any more. In all, it's getting much cleaner!
-
-=back
-
 
 0.1.2
 
