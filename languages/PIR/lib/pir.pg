@@ -42,7 +42,9 @@ rule sub_def {
     [ <sub_id> | <syntax_error: sub identifier (id or string constant) expected> ]
     <sub_pragmas>?
     [ <?nl>    | <syntax_error: newline expected> ]
-    <body>
+    <param_decl>*
+    <labeled_pir_instr>*
+    [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
 }
 
 rule sub_id {
@@ -57,7 +59,7 @@ rule sub_pragmas {
     <sub_pragma>*
 }
 
-token sub_pragma {
+rule sub_pragma {
     | <':load'>
     | <':init'>
     | <':immediate'>
@@ -107,12 +109,6 @@ rule multi_type {
     | <keylist>
     | <id>
     | <string_constant>
-}
-
-rule body {
-    <param_decl>*
-    <labeled_pir_instr>*
-    [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
 }
 
 rule param_decl {
@@ -241,7 +237,7 @@ rule conditional_stat {
 }
 
 rule conditional_expr {
-    | <'null'> <target>
+    | 'null' <target>
     | <simple_expr> [ <relational_operator> <simple_expr> ]?
 }
 
@@ -371,12 +367,32 @@ rule invocant {
     <'.invocant'> <target> <?nl>
 }
 
+#
+# in case of a method call, these options are allowed:
+# - foo.bar()
+# - foo. bar()
+# - foo .bar()
+#
+# where the method ('bar') can also be a quoted string.
+# it's important to recognize that the dot can NOT be written as
+# a separate token, it must be glued to either the invocant or the method.
+# otherwise it's recognized as a concatentation.
+#
 rule short_sub_call {
+    [
     [ <target>\.]?                   # optional invocant
     [ <target> | <string_constant> ] # method or sub name/id
+    |
+    <target> <method>
+    ]
     <parenthesized_args>             # sub args
     <process_heredocs>                           # process the list of heredoc labels, if any
     <clear_heredocs>
+}
+
+token method {
+    | \.<target>
+    | \.<string_constant>
 }
 
 rule sub_invocation {
