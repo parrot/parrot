@@ -27,30 +27,8 @@ extend PIR with non-features.
 	 
 	 Proposal: remove them.
 	 
-2. The optional comma between sub pragmas.
-	 Sub definitions allow for pragmas after the sub id, like so:
-	 	
-	 	.sub main :main :load :init
-	 	.end
-	 	
-	 However, the pragmas *may* be separated by a comma, like so:
 	 
-	 	.sub main :main, :load, :init
-	 	.end
-	 	
-	 Proposal: remove the optional comma from the grammar. Parameter
-	 flags are not separated by commas neither, so it would look more
-	 consistent. An optional comma is kinda strange; either demand it,
-	 or not.
-	 
-3. :postcomp and :immediate
-	 
-	 According to the documentation, both flags indicate the same
-	 behaviour. This is both unnecessary and unclear to new users.
-	 
-	 Proposal: deprecate one of these flags and remove it afterwards.
-	 
-4. Macro parameter list.
+2. Macro parameter list.
 
 	 Macro definitions may have parameters. However, if they don't take
 	 parameters, the parentheses are optional. So either of these examples
@@ -75,24 +53,7 @@ extend PIR with non-features.
 	 uniform than having both forms in the PIR source code.
 		 
 		 
-5. .pcc_sub vs .sub
-		
-	 What's the difference? Are both directives needed? Are there clear
-	 advantages to have both?
-	 
-	 Proposal: remove '.pcc_sub', and stick to '.sub'
-	 
-6. Disallow .pcc_begin_yield + .pcc_end_return
-
-	 Currently, IMCC allows:
-	 	
-	 	.pcc_begin_yield
-	 	.return 1
-	 	.pcc_end_return
-	 	
-	 It would be more consistent to demand '.pcc_begin_yield' to match '.pcc_end_yield'.
-	 
-7. Change #line into .line
+4. Change #line into .line
 	
 	 IMHO, it would be nicer to have the #line directive spelled as ".line". This way,
 	 it's more clear it's not a comment but rather a directive saying to the assembler
