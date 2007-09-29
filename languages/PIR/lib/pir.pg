@@ -51,8 +51,6 @@ rule sub_id {
 
 =head3 sub_pragmas
 
-The comma to separate the sub pragmas is optional.
-
 =cut
 
 rule sub_pragmas {
@@ -63,23 +61,13 @@ token sub_pragma {
     | <':load'>
     | <':init'>
     | <':immediate'>
+    | <':postcomp'>
     | <':main'>
     | <':anon'>
     | <':lex'>
-    | <wrap_pragma>
     | <vtable_pragma>
     | <multi_pragma>
     | <outer_pragma>
-}
-
-=head3 wrap_pragma
-
-This one is not sure yet
-
-=cut
-
-rule wrap_pragma {
-    <':wrap'> <parenthesized_string>
 }
 
 rule vtable_pragma {
@@ -205,7 +193,7 @@ rule local_id {
     <id> <local_flag>?
 }
 
-rule local_flag {
+token local_flag {
     <':unique_reg'>
 }
 
@@ -315,11 +303,11 @@ rule assignment_stat {
     | <target> <'='> <'new'> <keylist>
     | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
     | <target> <'='> <heredoc>
-    | <target> <'='> <'global'> <string_constant> # deprecated?
     | <target> <assign_operator> <simple_expr>
     | <target> <keylist> <'='> <simple_expr>
-    | <'global'> <string_constant> <'='> <target> # deprecated?
-    | <result_var_list> [ <'='> | <syntax_error: '=' expected> ] <short_sub_call>
+    | <result_var_list> 
+      [ <'='> | <syntax_error: '=' expected> ] 
+      <short_sub_call>
 }
 
 
@@ -658,7 +646,7 @@ token macro_label {
 }
 
 rule macro_label_decl {
-    | <'.local'> [ <macro_label> | <syntax_error: $LABEL: expected> ]
+    | <'.label'> [ <macro_label> | <syntax_error: $LABEL: expected> ]
     | <normal_label>
 }
 
@@ -816,6 +804,7 @@ token pir_directive {
     | <'.HLL'>
     | <'.include'>
     | <'.invocant'>
+    | <'.label'>
     | <'.lex'>
     | <'.line'>
     | <'.loadlib'>
