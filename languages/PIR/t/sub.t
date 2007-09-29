@@ -100,6 +100,7 @@ CODE
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'combine flags without commas' );
 .sub main :main :load :immediate :init
 .end
+
 CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'parameters' );

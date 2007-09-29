@@ -31,7 +31,7 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'macro pasring
 	
 	.local $y:
 	.a = .b
-	.sym int i
+
 .endm
 
 .sub main

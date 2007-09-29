@@ -75,7 +75,7 @@ CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'HLL map' );
 
-.HLL_map 42, 10
+.HLL_map "Integer", "FooNumber"
 
 CODE
 

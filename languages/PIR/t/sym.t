@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 4;
 use Test::More;
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'local decls 1' );
@@ -38,16 +38,6 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'local decls -
 	.local int a :unique_reg, b, c
 	.local num e, f :unique_reg, g
 	.local pmc h, i, j :unique_reg
-.end
-
-CODE
-
-language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'sym decls - unique_reg' );
-
-.sub main
-	.sym int a :unique_reg, b, c
-	.sym num e, f :unique_reg, g
-	.sym pmc h, i, j :unique_reg
 .end
 
 CODE

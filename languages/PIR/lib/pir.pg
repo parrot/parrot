@@ -165,7 +165,6 @@ rule instr {
 
 token pir_instr {
     | <local_decl>
-    | <sym_decl>
     | <lexical_decl>
     | <const_def>
     | <globalconst_def>
@@ -187,9 +186,8 @@ rule macro_invocation {
 
 =head2 Local declarations
 
-Local declarations can be done using C<.sym> or C<.local> in normal context.
-In macro context however, only C<.sym> is allowed, and the C<.local> keyword
-indicates a label declaration.
+Local declarations can be done using C<.local> in normal context.
+TODO: how to declare locals in a macro? this needs to be fixed.
 
 =cut
 
@@ -198,13 +196,6 @@ rule local_decl {
     [ <type> | <syntax_error: type for local symbol expected> ]
     <local_id_list>
 }
-
-rule sym_decl {
-    <'.sym'>
-    [ <type> | <syntax_error: type for local symbol expected> ]
-    <local_id_list>
-}
-
 
 rule local_id_list {
     <local_id> [ <','> <local_id> ]*
@@ -623,9 +614,9 @@ rule hll_specifier {
 
 rule hll_mapping {
     <'.HLL_map'>
-    [ <int_constant>    | <syntax_error: Parrot Core type expected> ]
+    [ <string_constant> | <syntax_error: Parrot Core type expected> ]
     [ <','>             | <syntax_error: ',' expected> ]
-    [ <int_constant>    | <syntax_error: HLL type expected> ]
+    [ <string_constant> | <syntax_error: HLL type expected> ]
 }
 
 rule namespace_id {
@@ -705,8 +696,6 @@ token type {
     | <'object'>
     | <'string'>
     | <macro_id>
-    | <'Array'>
-    | <'Hash'>
 }
 
 token normal_target {
@@ -803,7 +792,6 @@ token reserved {
     | <'num'>
     | <'pmc'>
     | <'string'>
-    | <'self'>
 }
 
 
@@ -824,7 +812,6 @@ token pir_directive {
     | <'.eom'>
     | <'.get_results'>
     | <'.globalconst'>
-    | <'.global'>
     | <'.HLL_map'>
     | <'.HLL'>
     | <'.include'>
@@ -848,7 +835,6 @@ token pir_directive {
     | <'.pragma'>
     | <'.return'>
     | <'.sub'>
-    | <'.sym'>
     | <'.result'>
     | <'.yield'>
 }
