@@ -2229,7 +2229,7 @@ static void
 hll_mapping(parser_state *p) {
     match(p, T_HLL_MAP);
     match(p, T_STRING_CONSTANT);
-    match(p, T_COMMA);    
+    match(p, T_COMMA);
     match(p, T_STRING_CONSTANT);
 }
 
