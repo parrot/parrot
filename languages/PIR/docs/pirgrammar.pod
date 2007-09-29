@@ -860,10 +860,7 @@ Or a method call:
   obj.x() # call the method whose name is stored in 'x'.
 
 Note that no spaces are allowed between the invocant and the dot;
-C<"obj . 'toString'"> is not valid. IMCC also allows the "->" instead of a dot,
-to make it readable for C++ programmers:
-
-  obj->'toString'()
+C<"obj . 'toString'"> is not valid, this will be interpreted as a concatenation.
 
 And of course, using the short version, passing arguments can be done as well,
 including all flags that were defined for the long version. The same example
