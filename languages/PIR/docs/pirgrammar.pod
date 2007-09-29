@@ -37,18 +37,18 @@ identifiers (when using a macro, on expansion) also start with a dot
 (see below). Therefore, it is important not to use any of the PIR directives
 as a macro identifier. The PIR directives are:
 
-  .arg            .invocant          .pcc_call
-  .const          .lex               .pcc_end_return
-  .emit           .line              .pcc_end_yield
-  .end            .loadlib           .pcc_end
-  .endnamespace   .local             .pcc_sub
+  .arg            .invocant          .pcc_begin
+  .const          .lex               .pcc_call
+  .emit           .line              .pcc_end_return
+  .end            .loadlib           .pcc_end_yield
+  .endnamespace   .local             .pcc_end
   .eom            .meth_call         .pragma
   .get_results    .namespace         .return
   .globalconst    .nci_call          .result
   .HLL_map        .param             .sub
   .HLL            .pcc_begin_return  .yield
   .include        .pcc_begin_yield
-                  .pcc_begin
+                  
 
 
 =head2 Registers
@@ -290,11 +290,10 @@ is necessary to tell Parrot the subroutine will store or find lexicals.
 
 =back
 
-The sub flags are listed after the sub name. They may be separated by a comma,
-but this is not necessary. The subroutine name can also be a string instead of
-a bareword, as is shown in this example:
+The sub flags are listed after the sub name. The subroutine name can also be 
+a string instead of a bareword, as is shown in this example:
 
-  .sub 'foo' :load, :init :anon
+  .sub 'foo' :load :init :anon
   # PIR body
   .end
 
@@ -1101,7 +1100,7 @@ B<only> be done using the C<.sym> directive. The C<.local> directive
 is only available for declaring labels.
 
   macro_label:
-    ".local" "$"identifier":"
+    ".label" "$"identifier":"
 
 =head3 Example Macros
 
@@ -1166,8 +1165,8 @@ includes the source from the file "myLib.pir" at the point of this directive.
 makes Parrot automatically create new PMCs when using arithmetic operators,
 like:
 
-  $P1 = new .Integer
-  $P2 = new .Integer
+  $P1 = new 'Integer'
+  $P2 = new 'Integer'
   $P1 = 42
   $P2 = 43
   $P0 = $P1 * $P2
@@ -1180,15 +1179,16 @@ like:
 NOTE: currently, the line directive is implemented in IMCC as #line.
 See the PROPOSALS document for more information on this.
 
-
+  
   .namespace ['Foo'] # namespace Foo
+  
   .namespace ['Object';'Foo'] # nested namespace
 
   .namespace # no [ id ] means the root namespace is activated
 
-opens the namespace 'Foo'. When doing Object Oriented programming, this would
-indicate that sub or method definitions belong to the class 'Foo'. Of course,
-you can also define namespaces without doing OO-programming.
+The first line opens the namespace 'Foo'. When doing Object Oriented programming, 
+this would indicate that sub or method definitions belong to the class 'Foo'. 
+Of course, you can also define namespaces without doing OO-programming.
 
 Please note that this C<.namespace> directive is I<different> from the
 C<.namespace> directive
