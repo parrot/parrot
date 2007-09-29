@@ -14,7 +14,7 @@ contain error handling and other issues unimportant for this PIR reference.
 For a bugs and issues, see the section KNOWN ISSUES AND BUGS.
 
 The grammar includes some constructs that B<are> in the IMCC parser,
-but are not implemented. An example of this is the C<.global> directive.
+but are not implemented.
 
 Please note that languages/PIR is B<not> the official definition of the
 PIR language. The reference implementation of PIR is IMCC, located
@@ -44,11 +44,11 @@ as a macro identifier. The PIR directives are:
   .endnamespace   .local             .pcc_sub
   .eom            .meth_call         .pragma
   .get_results    .namespace         .return
-  .global         .nci_call          .result
-  .globalconst    .param             .sub
-  .HLL_map        .pcc_begin_return  .sym
-  .HLL            .pcc_begin_yield   .yield
-  .include        .pcc_begin
+  .globalconst    .nci_call          .result
+  .HLL_map        .param             .sub
+  .HLL            .pcc_begin_return  .yield
+  .include        .pcc_begin_yield
+                  .pcc_begin
 
 
 =head2 Registers
@@ -133,14 +133,10 @@ document.
 
 
   sub_def:
-    [ ".sub" | ".pcc_sub" ] sub_id sub_pragmas nl body
+    ".sub" sub_id sub_pragmas* nl body
 
   sub_id:
     identifier | string_constant
-
-  sub_pragmas:
-    sub_pragma [ ","? sub_pragma ]*
-
 
   sub_pragma:
       ":load"
@@ -150,13 +146,9 @@ document.
     | ":main"
     | ":anon"
     | ":lex"
-    | wrap_pragma
     | vtable_pragma
     | multi_pragma
     | outer_pragma
-
-  wrap_pragma:
-    ":wrap" parenthesized_string
 
   vtable_pragma:
     ":vtable" parenthesized_string?
@@ -234,7 +226,8 @@ library is being loaded. To get both behaviours, use B<:init :load>.
 
  :postcomp
 
-Same as C<:immediate>.
+Same as C<:immediate>, except that the sub is not executed when compilation was
+triggered by a C<load_bytecode> instruction (in a different file).
 
 =item *
 
@@ -294,17 +287,6 @@ Indicates the sub being defined needs to store lexical variables. This flag
 is not necessary if any lexical declarations are done (see below), the PIR
 compiler will figure this out by itself. The C<:lex> attribute
 is necessary to tell Parrot the subroutine will store or find lexicals.
-
-
-=item *
-
- :wrap('bar')
-
-This flag is not (yet?) implemented in IMCC. It would indicate that this sub
-is I<wrapping> the sub "bar". That means that when "bar" is invoked, this sub
-is called I<before> and I<after>. It is undecided yet whether this flag will
-be implemented. If so, its syntax may change.
-
 
 =back
 
@@ -409,7 +391,7 @@ pasm_instr defines the syntax for pure PASM instructions.
 =head2 Local declarations
 
   local_decl:
-    [ ".local" | ".sym" ] type local_id_list
+    ".local" type local_id_list
 
   local_id_list:
     local_id [ "," local_id ]*
@@ -420,14 +402,10 @@ pasm_instr defines the syntax for pure PASM instructions.
 
 =head3 Examples local declarations
 
-Local temporary variables can be declared by the directives C<.local> or
-C<.sym>. There is no difference between these directives, except within
-macro definitions. (See Macros).
+Local temporary variables can be declared by the directives C<.local>.
 
   .local int i
   .local num a, b, c
-  .sym string s1, s2
-  .sym pmc obj
 
 The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
@@ -450,7 +428,7 @@ indicates that the value in $P0 is stored as a lexical variable,
 named by 'i'. Once the above lexical declaration is written, and
 given the following statement:
 
-  $P1 = new .Integer
+  $P1 = new 'Integer'
 
 then the following two statements have an identical effect:
 
@@ -494,23 +472,6 @@ So, now it is also clear why C<.lex 'i', p> is B<not> a declaration of p:
 it needs a separate declaration, because it may either be a C<.local> or
 a C<.param>. The C<.lex> directive merely is a shortcut for saving and
 retrieving lexical variables.
-
-=head2 Global definitions
-
-  global_def:
-    ".global" identifier
-
-=head3 Example global declarations
-
-This syntax is defined in the parser of IMCC, but its functionality is not
-implemented. The goal is to allow for global definitions outside of
-subroutines. That way, the variable can be accessed by all subroutines without
-doing a global lookup. It is unclear whether this feature will be implemented.
-
-An example is:
-
-  .global my_global_var
-
 
 =head2 Constant definitions
 
@@ -646,14 +607,12 @@ only allowed on strings. These checks are B<not> done by the PIR parser.
       target "=" short_sub_call
     | target "=" target keylist
     | target "=" expression
-    | target "=" "new" [ int_constant | string_constant | macro_id ]
+    | target "=" "new" [ int_constant | string_constant]
     | target "=" "new" keylist
     | target "=" "find_type" [ string_constant | string_reg | id ]
     | target "=" heredoc
-    | target "=" "global" string_constant
     | target assign_op simple_expr
     | target keylist "=" simple_expr
-    | "global" string_constant "=" target
     | result_var_list "=" short_sub_call
 
 NOTE: the definition of assignment statements is B<not> complete yet.
@@ -698,9 +657,6 @@ As languages/PIR evolves, this will be completed.
   $S0 = <<'HELLO'
   ...
   HELLO
-
-  $P0 = global "X"
-  global "X" = $P0
 
   .local int a, b, c
   (a, b, c) = foo()
@@ -889,7 +845,7 @@ it uses C<.nci_call> instead of C<.pcc_call>.
     invocant? [ target | string_constant ] parenthesized_args
 
   invocant:
-    [ target"." | target "->" ]
+    target"."
 
 
 =head3 Example short subroutine call
@@ -1018,14 +974,6 @@ invoked again. Returning values is identical to I<normal> return statements.
   # when invoking twice:
   foo() # returns 42
   foo() # returns 43
-
-NOTE: IMCC allows for writing:
-
-  .pcc_begin_yield
-  ...
-  .pcc_end_return
-
-which is of course not consistent; languages/PIR does B<not> allow this.
 
 =head2 Short yield statements
 
@@ -1196,7 +1144,7 @@ then one can write in a subroutine:
     ".HLL" string_constant "," string_constant
 
   hll_mapping:
-    ".HLL_map" int_constant "," int_constant
+    ".HLL_map" string_constant "," string_constant
 
   namespace_id:
     string_constant [ ";" string_constant ]*
@@ -1252,7 +1200,7 @@ is an example of specifying the High Level Language (HLL) for which the PIR
 is being generated. It is a shortcut for setting the namespace to 'Lua', and
 for loading the PMCs in the lua_group library.
 
-  .HLL_map .Integer, .LuaNumber
+  .HLL_map "Integer", "LuaNumber"
 
 is a way of telling Parrot, that whenever an Integer is created somewhere
 in the system (C code), instead a LuaNumber object is created.
@@ -1286,10 +1234,7 @@ TODO: check flags and syntax for this.
       "int"
     | "num"
     | "pmc"
-    | "object"
     | "string"
-    | "Array"
-    | "Hash"
 
   target:
     identifier | register
@@ -1331,11 +1276,6 @@ Some work should be done on:
 =item *
 
 Heredoc parsing
-
-=item *
-
-The rule 'type' does currently not include custom types (user defined).
-Probably it needs an alternative "identifier". Not sure yet at this point.
 
 =item *
 
@@ -1416,6 +1356,18 @@ Added some remarks at section for Macros.
 =item *
 
 Added some remarks here and there, and fixed some style issues.
+
+=back
+
+0.2.0
+
+=over 4
+
+=item *
+
+Many clean ups; remove experimental C<:wrap> flag, remove C<.global> directive,
+remove C<.sym> directive, add C<.label> directive for macros, remove C<.pcc_sub>;
+remove some comments that are not true any more. In all, it's getting much cleaner!
 
 =back
 
