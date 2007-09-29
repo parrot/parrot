@@ -173,7 +173,6 @@ static char const * dictionary[] = {
     ".result",                  /* T_RESULT,                */
     ".return",                  /* T_RETURN,                */
     ".sub",                     /* T_SUB,                   */
-    ".sym",                     /* T_SYM,                   */
     ".yield",                   /* T_YIELD                  */
    /* NULL,  */                 /* flags                    */
     ":anon",                    /* T_ANON_FLAG              */

@@ -51,7 +51,6 @@ typedef enum tokens {
     T_RESULT,                           /* ".result",                 */
     T_RETURN,                           /* ".return",                 */
     T_SUB,                              /* ".sub",                    */
-    T_SYM,                              /* ".sym",                    */
     T_YIELD,                            /* ".yield",                  */
                                         /* NULL,                      */
     T_ANON_FLAG,                        /* ":anon",                   */

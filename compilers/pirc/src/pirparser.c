@@ -1059,21 +1059,6 @@ declaration_list(parser_state *p) {
     emit_op_end(p);
 }
 
-/*
-
-=item *
-
-  sym_declaration -> '.sym' declaration_list
-
-=cut
-
-*/
-static void
-sym_declaration(parser_state *p) {
-    emit_op_start(p, ".sym");
-    match(p, T_SYM);
-    declaration_list(p);
-}
 
 /*
 
@@ -1720,7 +1705,6 @@ global_assignment(parser_state *p) {
   instr -> if_statement
          | unless_statement
          | local_declaration
-         | sym_declaration
          | lex_declaration
          | '.globalconst' const_definition
          | '.const' const_definition
@@ -1769,9 +1753,6 @@ instructions(parser_state *p) {
                 break;
             case T_LEX: /* instruction -> lex_declaration */
                 lex_declaration(p);
-                break;
-            case T_SYM: /* instruction -> sym_declaration */
-                sym_declaration(p);
                 break;
             case T_GLOBALCONST:
                 next(p);
@@ -2239,7 +2220,7 @@ hll_specifier(parser_state *p) {
 
 =item *
 
-  hll_mapping -> '.HLL_map' INTC ',' INTC
+  hll_mapping -> '.HLL_map' STRINGC ',' STRINGC
 
 =cut
 
@@ -2247,8 +2228,9 @@ hll_specifier(parser_state *p) {
 static void
 hll_mapping(parser_state *p) {
     match(p, T_HLL_MAP);
-    match(p, T_INTEGER_CONSTANT);
-    match(p, T_COMMA);    match(p, T_INTEGER_CONSTANT);
+    match(p, T_STRING_CONSTANT);
+    match(p, T_COMMA);    
+    match(p, T_STRING_CONSTANT);
 }
 
 /*

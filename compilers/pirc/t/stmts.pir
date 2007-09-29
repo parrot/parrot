@@ -12,11 +12,7 @@
     .local string a, b, c
     .local int i, j
     .local num pi
-    .sym int ii
-    .sym num nn
-    .sym pmc pp
-    .sym string ss
-
+    
 # test simple expressions
     i = 42
     pi = 3.14
