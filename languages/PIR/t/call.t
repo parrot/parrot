@@ -80,9 +80,9 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long yield' )
 
 .sub main :main
 	.pcc_begin_yield
-	.return 1
-	.return 2
-	.return 3
+	.yield 1
+	.yield 2
+	.yield 3
 	.pcc_end_yield	
 .end
 

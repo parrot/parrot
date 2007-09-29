@@ -1,7 +1,7 @@
 #
 # specify a different namespace than "PIR", as "PIR" is a built-in language
 #
-.namespace [ 'PIR-lang' ]
+.namespace [ 'languages;PIR' ]
 
 .include "errors.pasm"
 
@@ -331,7 +331,7 @@ depending on the context.
 
 .sub init_macro_rules        	
 		.local pmc macro_context
-		macro_context = new .Integer
+		macro_context = new 'Integer'
 		macro_context = 1
 		set_global 'macro_context', macro_context
 .end

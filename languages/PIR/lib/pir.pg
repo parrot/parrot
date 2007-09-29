@@ -195,12 +195,22 @@ token local_flag {
 
 rule lexical_decl {
     <'.lex'>
-    [ <string_constant> | <syntax_error: string constant expected> ]
-    [ <','>             | <syntax_error: ',' expected> ]
-    [ <target>          | <syntax_error: register expected> ]
+    <string_constant1>
+    <comma>
+    <target1>
 }
 
+rule comma {
+    <','> | <syntax_error: ',' expected>
+}
 
+rule string_constant1 {
+    <string_constant> | <syntax_error: string constant expected>
+}
+
+rule target1 {
+    <target> | <syntax_error: register or identifier expected>
+}
 
 =head2 Const definition
 
@@ -497,15 +507,24 @@ rule short_return_stat {
 rule long_yield_stat {
     <'.pcc_begin_yield'>
     [ <?nl> | <syntax_error: newline expected after '.pcc_begin_yield'> ]
-    [ <return_directive> ]*
+    [ <yield_directive> ]*
     [ <'.pcc_end_yield'> | <syntax_error: '.pcc_end_yield' expected> ]
 }
 
 rule return_directive {
     <'.return'>
+    <return_value>
+}
+
+rule return_value {
     [ <simple_expr> | <syntax_error: simple expression expected> ]
     <set_flags>?
     [ <?nl> | <syntax_error: newline expected after return directive> ]
+}
+
+rule yield_directive {
+    <'.yield'>
+    <return_value>
 }
 
 rule short_yield_stat {
@@ -692,14 +711,16 @@ token charset_specifier {
 regex stringdouble { <PGE::Text::bracketed: "> }
 regex stringsingle { <PGE::Text::bracketed: '> }
 
-## TODO: add other built-in types
 token type {
+    | <pir_type>
+    | <macro_id>
+}
+
+token pir_type {
     | <'int'>
     | <'num'>
     | <'pmc'>
-    | <'object'>
     | <'string'>
-    | <macro_id>
 }
 
 token normal_target {
@@ -786,16 +807,9 @@ identifiers.
 =cut
 
 token keyword {
+    | <pir_type>
     | <pir_directive>
     | <pasm_instruction> # pasm instructions may be identifiers in IMCC
-    | <reserved>
-}
-
-token reserved {
-    | <'int'>
-    | <'num'>
-    | <'pmc'>
-    | <'string'>
 }
 
 

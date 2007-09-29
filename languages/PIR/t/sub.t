@@ -108,7 +108,6 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'parameters' )
 	.param int iarg
 	.param string sarg
 	.param num narg
-	.param object oargs
 .end
 CODE
 
