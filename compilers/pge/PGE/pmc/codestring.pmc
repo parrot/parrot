@@ -132,7 +132,8 @@ A newline is automatically added to the end of the fmt.
                 int size = VTABLE_elements(interp, args);
                 repl = string_copy(interp, VTABLE_get_string_keyed_int(interp, args, 0));
                 for ( i=1; i<size; i++ ) {
-                    repl = Parrot_sprintf_c(interp, "%Ss, %Ss", repl, VTABLE_get_string_keyed_int(interp, args, i));
+                    repl = Parrot_sprintf_c(interp, "%Ss, %Ss", repl,
+                            VTABLE_get_string_keyed_int(interp, args, i));
                 }
             }
             /* %% */

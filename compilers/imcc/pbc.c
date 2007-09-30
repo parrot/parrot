@@ -1376,7 +1376,10 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
 
 /* now let the fun begin, actually emit code for one ins */
 int
-e_pbc_emit(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit), NOTNULL(const Instruction *ins))
+e_pbc_emit(PARROT_INTERP,
+        SHIM(void *param),
+        NOTNULL(IMC_Unit *unit),
+        NOTNULL(const Instruction *ins))
 {
     int        op, i;
     int        ok = 0;
