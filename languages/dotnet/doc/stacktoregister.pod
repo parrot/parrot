@@ -311,11 +311,13 @@ a non-store instruction.
 
 In addition to this, without analysing the basic blocks[2] that make up the
 code to determine when it can be avoided, it is necesary to push all cached
-items onto the stack before a branch or a conditional branch takes place or a
-label is found. While this and a full set of optimizations to minimize stack
-use are possible, this path will not be explored. Given that there are essentially unlimited registers available to use, it would be desirable to 
+items onto the stack before a branch or a conditional branch takes place or
+a label is found. While this and a full set of optimizations to minimize
+stack use are possible, this path will not be explored. Given that there are
+essentially unlimited registers available to use, it would be desirable to
 completely do away with having a stack. Doing stack operations costs v-table
-calls, which harms performance and makes poor use of the Parrot execution model.
+calls, which harms performance and makes poor use of the Parrot execution
+model.
 
 =head3 Mapping Stack Locations To Registers
 

@@ -20,11 +20,13 @@ VERSION = PARROT_VERSION;
 #define MIN_INT8 (-MAX_INT8 -1)
 
 #define CHECK_ADD_OVERFLOW(a,b) \
-        (Parrot_Int4)(b) >= 0 ? (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0  \
+        (Parrot_Int4)(b) >= 0 ? \
+            (Parrot_Int4)(MAX_INT4) - (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0  \
         : (Parrot_Int4)(MIN_INT4) - (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
 
 #define CHECK_SUB_OVERFLOW(a,b) \
-        (Parrot_Int4)(b) < 0 ? (Parrot_Int4)(MAX_INT4) + (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0   \
+        (Parrot_Int4)(b) < 0 ? \
+            (Parrot_Int4)(MAX_INT4) + (Parrot_Int4)(b) < (Parrot_Int4)(a) ? -1 : 0   \
         : (Parrot_Int4)(MIN_INT4) + (Parrot_Int4)(b) > (Parrot_Int4)(a) ? +1 : 0
 
 #define CHECK_ADD_OVERFLOW_UN(a,b) \
@@ -34,11 +36,11 @@ VERSION = PARROT_VERSION;
         (Parrot_UInt4)(a) < (Parrot_UInt4)(b) ? -1 : 0
 
 #define CHECK_ADD_OVERFLOW64(a,b) \
-        (HUGEINTVAL)(b) >= 0 ? (HUGEINTVAL)(MAX_INT8) - (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0      \
+        (HUGEINTVAL)(b) >= 0 ? (HUGEINTVAL)(MAX_INT8) - (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0 \
         : (HUGEINTVAL)(MIN_INT8) - (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_SUB_OVERFLOW64(a,b) \
-        (HUGEINTVAL)(b) < 0 ? (HUGEINTVAL)(MAX_INT8) + (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0       \
+        (HUGEINTVAL)(b) < 0 ? (HUGEINTVAL)(MAX_INT8) + (HUGEINTVAL)(b) < (HUGEINTVAL)(a) ? -1 : 0 \
         : (HUGEINTVAL)(MIN_INT8) + (HUGEINTVAL)(b) > (HUGEINTVAL)(a) ? +1 : 0
 
 #define CHECK_ADD_OVERFLOW64_UN(a,b) \
@@ -51,9 +53,12 @@ VERSION = PARROT_VERSION;
         ((Parrot_Int4)(a) == 0) || ((Parrot_Int4)(b) == 0) ? 0 : \
         (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) == -1)) ? FALSE : \
         (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) == -1)) ? (a == - MAX_INT4) : \
-        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
-        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? (Parrot_Int4)(a) > ((MIN_INT4) / (Parrot_Int4)(b)) : \
-        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) > 0)) ? (Parrot_Int4)(a) < ((MIN_INT4) / (Parrot_Int4)(b)) : \
+        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) > 0)) ? \
+            (Parrot_Int4)(a) > ((MAX_INT4) / (Parrot_Int4)(b)) : \
+        (((Parrot_Int4)(a) > 0) && ((Parrot_Int4)(b) < 0)) ? \
+            (Parrot_Int4)(a) > ((MIN_INT4) / (Parrot_Int4)(b)) : \
+        (((Parrot_Int4)(a) < 0) && ((Parrot_Int4)(b) > 0)) ? \
+            (Parrot_Int4)(a) < ((MIN_INT4) / (Parrot_Int4)(b)) : \
         (Parrot_Int4)(a) < ((MAX_INT4) / (Parrot_Int4)(b))
 
 #define CHECK_MUL_OVERFLOW_UN(a,b) \
@@ -64,9 +69,12 @@ VERSION = PARROT_VERSION;
         ((HUGEINTVAL)(a) == 0) || ((HUGEINTVAL)(b) == 0) ? 0 : \
         (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) == -1)) ? FALSE : \
         (((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) == -1)) ? (a == - MAX_INT8) : \
-        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) > ((MAX_INT8) / (HUGEINTVAL)(b)) : \
-        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) < 0)) ? (HUGEINTVAL)(a) > ((MIN_INT8) / (HUGEINTVAL)(b)) : \
-        (((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) > 0)) ? (HUGEINTVAL)(a) < ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) > 0)) ? \
+            (HUGEINTVAL)(a) > ((MAX_INT8) / (HUGEINTVAL)(b)) : \
+        (((HUGEINTVAL)(a) > 0) && ((HUGEINTVAL)(b) < 0)) ? \
+            (HUGEINTVAL)(a) > ((MIN_INT8) / (HUGEINTVAL)(b)) : \
+        (((HUGEINTVAL)(a) < 0) && ((HUGEINTVAL)(b) > 0)) ? \
+            (HUGEINTVAL)(a) < ((MIN_INT8) / (HUGEINTVAL)(b)) : \
         (HUGEINTVAL)(a) < ((MAX_INT8) / (HUGEINTVAL)(b))
 
 #define CHECK_MUL_OVERFLOW64_UN(a,b) \
