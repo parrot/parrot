@@ -458,7 +458,10 @@ descriptor to the memory starting at C<buffer>.
 */
 
 static size_t
-PIO_win32_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_win32_read(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **buf))
 {
     DWORD countread;
     void *buffer;
@@ -668,7 +671,10 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 static INTVAL
-PIO_win32_connect(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *r))
+PIO_win32_connect(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *r))
 {
     if (r) {
         struct sockaddr_in sa;
@@ -753,7 +759,10 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 static INTVAL
-PIO_win32_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING **s))
+PIO_win32_recv(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **s))
 {
     int error;
     int err;

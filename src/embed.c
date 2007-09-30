@@ -914,8 +914,10 @@ Parrot_disassemble(PARROT_INTERP)
 
         if (debugs && curr_mapping < num_mappings) {
             if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
-                const int filename_const_offset = interp->code->debugs->mappings[curr_mapping]->u.filename;
-                PIO_printf(interp, "Current Source Filename %Ss\n", interp->code->const_table->constants[filename_const_offset]->u.string);
+                const int filename_const_offset =
+                    interp->code->debugs->mappings[curr_mapping]->u.filename;
+                PIO_printf(interp, "Current Source Filename %Ss\n",
+                        interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
             }
         }

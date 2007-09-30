@@ -94,7 +94,8 @@ op new(out PMC, in STR) {
     if (!PMC_IS_NULL(ns))
         classobj = VTABLE_get_class(interp, ns);
 
-    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj, string_from_literal(interp, "PMCProxy")))
+    if (!PMC_IS_NULL(classobj) &&
+        !VTABLE_isa(interp, classobj, string_from_literal(interp, "PMCProxy")))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
         INTVAL type = pmc_type(interp, _class);

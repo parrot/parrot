@@ -495,7 +495,8 @@ key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
                 value = string_append(interp, value, VTABLE_get_string(interp, key));
                 break;
             case KEY_integer_FLAG | KEY_register_FLAG:
-                value = string_append(interp, value, string_from_int(interp, REG_INT(interp, PMC_int_val(key))));
+                value = string_append(interp, value,
+                        string_from_int(interp, REG_INT(interp, PMC_int_val(key))));
                 break;
             case KEY_string_FLAG | KEY_register_FLAG:
                 value = string_append(interp, value, quote);
@@ -509,7 +510,8 @@ key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
                 }
                 break;
             default:
-                value = string_append(interp, value, string_from_literal(interp, "Key type unknown"));
+                value = string_append(interp, value,
+                        string_from_literal(interp, "Key type unknown"));
                 break;
         }
 

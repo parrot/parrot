@@ -1156,8 +1156,12 @@ the latter handles return values and yields.
 
 PARROT_API
 void
-parrot_pass_args(PARROT_INTERP, NOTNULL(parrot_context_t *src_ctx), NOTNULL(parrot_context_t *dest_ctx),
-        NOTNULL(opcode_t *src_indexes), NOTNULL(opcode_t *dest_indexes), arg_pass_t param_or_result)
+parrot_pass_args(PARROT_INTERP,
+        NOTNULL(parrot_context_t *src_ctx),
+        NOTNULL(parrot_context_t *dest_ctx),
+        NOTNULL(opcode_t *src_indexes),
+        NOTNULL(opcode_t *dest_indexes),
+        arg_pass_t param_or_result)
 {
     call_state st;
     PMC* src_signature;

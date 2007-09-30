@@ -524,7 +524,8 @@ providing a set of key/value pairs describing the attribute.
 
 */
     PCCMETHOD attributes() {
-        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
+        PMC *ret_attrib_metadata =
+            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
         PCCRETURN(PMC *ret_attrib_metadata);
     }
 

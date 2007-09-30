@@ -101,7 +101,8 @@ static size_t PIO_stdio_write(SHIM_INTERP,
 
 /* HEADERIZER END: static */
 
-extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd); /* XXX Use a declaration in a header file */
+/* XXX Use a declaration in a header file */
+extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 
 /* Defined at bottom */
 extern const ParrotIOLayerAPI pio_stdio_layer_api;
@@ -320,7 +321,10 @@ TODO: Not yet documented!!!
 */
 
 static size_t
-PIO_stdio_peek(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_stdio_peek(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **buf))
 {
     FILE * const fptr = (FILE *)io->fd;
     STRING * const s = PIO_make_io_string(interp, buf, 1);

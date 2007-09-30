@@ -117,7 +117,10 @@ TODO: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 size_t
-PIO_peek_down(PARROT_INTERP, NULLOK(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))
+PIO_peek_down(PARROT_INTERP,
+        NULLOK(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **buf))
 {
     while (layer) {
         if (layer->api->Peek)
