@@ -92,7 +92,7 @@ $(GENERATED_INLINES) : tools/gen_inline.pl
 	$(PARROT) $(PGE_DIR)/pgc.pir --output=$@ $<
 
 .pir.pbc :
-    $(PARROT) --output=$@ $<
+	$(PARROT) --output=$@ $<
 
 .tcl.pir :
 	$(PARROT) tcl.pbc $< --pir > $@
