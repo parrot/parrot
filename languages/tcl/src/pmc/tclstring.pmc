@@ -62,7 +62,9 @@ pmclass TclString
                     I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
                     I0 = I0 - I1;
                     S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
-                    real_exception(INTERP, NULL, 1, "list element in braces followed by \"%s\" instead of space", string_to_cstring(INTERP, S0));
+                    real_exception(INTERP, NULL, 1,
+                            "list element in braces followed by \"%s\" instead of space",
+                            string_to_cstring(INTERP, S0));
                 }
 
               found_close_bracket:
@@ -144,7 +146,9 @@ pmclass TclString
             I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
             I0 = I0 - I1;
             S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
-            real_exception(INTERP, NULL, 1, "list element in quotes followed by \"%s\" instead of space", string_to_cstring(INTERP, S0));
+            real_exception(INTERP, NULL, 1,
+                    "list element in quotes followed by \"%s\" instead of space",
+                    string_to_cstring(INTERP, S0));
         }
 
 

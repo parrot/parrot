@@ -106,20 +106,34 @@ Returns the list as a string
             P0 = pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, P0, str);
 
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\\"), string_from_literal(INTERP,"\\\\"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\t"), string_from_literal(INTERP,"\\t"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\f"), string_from_literal(INTERP,"\\f"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\n"), string_from_literal(INTERP,"\\n"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\r"), string_from_literal(INTERP,"\\r"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\v"), string_from_literal(INTERP,"\\v"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,";"), string_from_literal(INTERP,"\\;"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"$"), string_from_literal(INTERP,"\\$"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"}"), string_from_literal(INTERP,"\\}"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"{"), string_from_literal(INTERP,"\\{"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP," "), string_from_literal(INTERP,"\\ "));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"["), string_from_literal(INTERP,"\\["));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"]"), string_from_literal(INTERP,"\\]"));
-            Parrot_String_nci_replace(INTERP, P0, string_from_literal(INTERP,"\""), string_from_literal(INTERP,"\\\""));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\\"), string_from_literal(INTERP,"\\\\"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\t"), string_from_literal(INTERP,"\\t"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\f"), string_from_literal(INTERP,"\\f"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\n"), string_from_literal(INTERP,"\\n"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\r"), string_from_literal(INTERP,"\\r"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\v"), string_from_literal(INTERP,"\\v"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,";"), string_from_literal(INTERP,"\\;"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"$"), string_from_literal(INTERP,"\\$"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"}"), string_from_literal(INTERP,"\\}"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"{"), string_from_literal(INTERP,"\\{"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP," "), string_from_literal(INTERP,"\\ "));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"["), string_from_literal(INTERP,"\\["));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"]"), string_from_literal(INTERP,"\\]"));
+            Parrot_String_nci_replace(INTERP, P0,
+                    string_from_literal(INTERP,"\""), string_from_literal(INTERP,"\\\""));
 
             str = VTABLE_get_string(INTERP, P0);
             goto append_elem;
