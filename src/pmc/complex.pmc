@@ -963,6 +963,11 @@ MMD_Complex: {
             /* a little speed optimisation: cache an intermediate number;
                 I'm not sure the compiler does this */
 
+            if (IM(SELF) == 0.0 && IM(value) == 0.0) {
+                RE(dest) = RE(SELF) / RE(value);
+                IM(dest) = 0.0;
+                return dest;
+            }
             mod      = (RE(value) * RE(value) + IM(value) * IM(value));
             re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
             im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
@@ -1017,13 +1022,20 @@ MMD_Complex: {
             FLOATVAL mod, re, im;
 
             complex_check_divide_zero(INTERP, value);
-            /* a little speed optimisation: cache an intermediate number;
-                I'm not sure the compiler does this */
-            mod      = (RE(value) * RE(value) + IM(value) * IM(value));
-            re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
-            im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
-            RE(SELF) = re;
-            IM(SELF) = im;
+            if (IM(SELF) == 0.0 && IM(value) == 0.0) {
+                RE(SELF) = RE(SELF) / RE(value);
+                IM(SELF) = 0.0;
+            }
+            else {
+                /* a little speed optimisation: cache an intermediate number;
+                   I'm not sure the compiler does this */
+
+                mod      = (RE(value) * RE(value) + IM(value) * IM(value));
+                re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
+                im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
+                RE(SELF) = re;
+                IM(SELF) = im;
+            }
         }
 MMD_DEFAULT: {
             FLOATVAL d = VTABLE_get_number(INTERP, value);
@@ -1254,8 +1266,8 @@ Returns C<FUNC>(SELF).
 
         RE(d) = sin(re) * cosh(im);
 
-        if (FLOAT_IS_ZERO(im))
-            IM(d) = im;
+        if (im == -0.0)
+            IM(d) = 0.0;
         else
             IM(d) = cos(re) * sinh(im);
 
@@ -1378,7 +1390,7 @@ Returns the inverse function of SELF.
 
         d      = Parrot_Complex_nci_ln(INTERP, d);
         RE(e)  = IM(d);
-        IM(e)  = -RE(d);
+        IM(e)  = RE(d) ? -RE(d) : 0.0;
 
         return e;
     }
@@ -1397,7 +1409,7 @@ Returns the inverse function of SELF.
 
         e      = Parrot_Complex_nci_ln(INTERP, d);
         RE(d)  = IM(e) + 2.0 * atan(1);
-        IM(d)  = -RE(e);
+        IM(d)  = RE(e) ? -RE(e) : 0.0;
 
         return d;
     }
@@ -1416,7 +1428,7 @@ Returns the inverse function of SELF.
         Parrot_Complex_i_divide_Complex(INTERP, d, e);
 
         d           = Parrot_Complex_nci_ln(INTERP, d);
-        RE(e)       = IM(d) / -2.0;
+        RE(e)       = (IM(d) ? IM(d) : -0.0) / -2.0;
         IM(e)       = RE(d) / 2.0;
 
         return e;
@@ -1479,8 +1491,8 @@ tanh(z) = sinh(z) / cosh(z)
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
 
-        RE(d)      = sinh(a) * cos(b);
-        IM(d)      = cosh(a) * sin(b);
+        RE(d) = sinh(a) * cos(b);
+        IM(d) = b ? cosh(a) * sin(b) : 0.0;
 
         return d;
     }
@@ -1491,7 +1503,10 @@ tanh(z) = sinh(z) / cosh(z)
         FLOATVAL b = IM(SELF);
 
         RE(d)      = cosh(a) * cos(b);
-        IM(d)      = sinh(a) * sin(b);
+        if (a == 0.0 || b == 0.0)
+            IM(d)  = 0.0;
+        else
+            IM(d)  = sinh(a) * sin(b);
 
         return d;
     }
@@ -1515,8 +1530,9 @@ tanh(z) = sinh(z) / cosh(z)
         d      = Parrot_Complex_nci_tanh(INTERP, SELF);
         a      = RE(d);
         b      = IM(d);
-        RE(d)  =  a / (a * a + b * b);
-        IM(d)  = -b / (a * a + b * b);
+
+        RE(d)  = a ?  a / (a * a + b * b) : 0.0;
+        IM(d)  = b ? -b / (a * a + b * b) : 0.0;
 
         return d;
     }
@@ -1529,8 +1545,8 @@ tanh(z) = sinh(z) / cosh(z)
         a      = RE(d);
         b      = IM(d);
 
-        RE(d)  =  a / (a * a + b * b);
-        IM(d)  = -b / (a * a + b * b);
+        RE(d)  = a ?  a / (a * a + b * b) : 0.0;
+        IM(d)  = b ? -b / (a * a + b * b) : 0.0;
 
         return d;
     }
@@ -1542,8 +1558,9 @@ tanh(z) = sinh(z) / cosh(z)
         d      = Parrot_Complex_nci_cosh(INTERP, SELF);
         a      = RE(d);
         b      = IM(d);
-        RE(d)  =  a / (a * a + b * b);
-        IM(d)  = -b / (a * a + b * b);
+
+        RE(d)  = a ?  a / (a * a + b * b) : 0.0;
+        IM(d)  = b ? -b / (a * a + b * b) : 0.0;
 
         return d;
     }
