@@ -182,8 +182,8 @@ int_compare(Parrot_Interp interp, void *a, void *b)
 
 
 
-/* rhs and lhs versions needed to avoid the msg "warning: use of cast expressions as lvalues is deprecated"
-   Is there a better way?
+/* rhs and lhs versions needed to avoid the msg "warning: use of cast
+ * expressions as lvalues is deprecated" Is there a better way?
  */
 #define siva_int(a) ((INTVAL) PMC_struct_val(a))
 #define siva_set_int(a,v)  (PMC_struct_val(a) = (DPOINTER*) v)
@@ -197,8 +197,10 @@ int_compare(Parrot_Interp interp, void *a, void *b)
 
 #define siva_siva(a)  ((PMC*) PMC_pmc_val(a))
 #define siva_set_siva(a,v)  (PMC_pmc_val(a)) = ((PMC*) v)
-#define siva_ary_create_if_void(i,a) { if (!siva_ary(a)) siva_set_ary(a, list_new(i, enum_type_PMC)); }
-#define siva_hash_create_if_void(i,a) {  \
+#define siva_ary_create_if_void(i,a) { \
+    if (!siva_ary(a)) siva_set_ary(a, list_new(i, enum_type_PMC)); \
+}
+#define siva_hash_create_if_void(i,a) { \
     if (!siva_hash(a)) parrot_new_hash_x(i, &siva_hash(a), enum_type_ptr, Hash_key_type_int, int_compare, key_hash_int); \
 }
 #define siva_str_create_if_void(i,a) { \
