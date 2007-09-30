@@ -9,7 +9,10 @@
 
 static INTVAL class_CHARACTER;
 
-pmclass Amber_STRING extends String extends Amber_DEFAULT does string dynpmc group amber_kernel hll Amber maps String {
+pmclass Amber_STRING
+    extends String
+    extends Amber_DEFAULT
+    does string dynpmc group amber_kernel hll Amber maps String {
 
     void class_init() {
         if (pass) {

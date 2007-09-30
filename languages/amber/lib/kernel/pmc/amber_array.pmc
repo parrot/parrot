@@ -7,7 +7,10 @@
 
 #include "parrot/parrot.h"
 
-pmclass Amber_ARRAY need_ext extends Array extends Amber_DEFAULT does array dynpmc group amber_kernel hll Amber maps Array {
+pmclass Amber_ARRAY need_ext
+    extends Array
+    extends Amber_DEFAULT
+    does array dynpmc group amber_kernel hll Amber maps Array {
 
 /* non-vtable methods follow */
 

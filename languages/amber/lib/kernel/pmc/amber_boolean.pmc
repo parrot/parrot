@@ -9,7 +9,10 @@
 
 static INTVAL class_CHARACTER;
 
-pmclass Amber_BOOLEAN extends Boolean extends Amber_DEFAULT does boolean dynpmc group amber_kernel hll Amber maps Boolean {
+pmclass Amber_BOOLEAN
+    extends Boolean
+    extends Amber_DEFAULT
+    does boolean dynpmc group amber_kernel hll Amber maps Boolean {
 
     void class_init() {
         if (pass) {

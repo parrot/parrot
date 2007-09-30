@@ -10,7 +10,9 @@
 
 static INTVAL class_PATHNAME;
 
-pmclass Amber_PATHNAME extends Amber_STRING extends Amber_DEFAULT does string dynpmc group amber_kernel {
+pmclass Amber_PATHNAME
+    extends Amber_STRING
+    extends Amber_DEFAULT does string dynpmc group amber_kernel {
 
     void class_init() {
         if (pass) {
