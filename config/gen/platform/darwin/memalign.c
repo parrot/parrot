@@ -96,7 +96,9 @@ Parrot_memalign(size_t align, size_t size)
 
                 if ( status != KERN_SUCCESS )
                 {
-                    fprintf(stderr, "Parrot_memalign(%zx, %zx) failed to deallocate extra header space.\n", align, size);
+                    fprintf(stderr,
+                            "Parrot_memalign(%zx, %zx) failed to deallocate extra header space.\n",
+                            align, size);
                 }
             }
 
@@ -109,7 +111,9 @@ Parrot_memalign(size_t align, size_t size)
 
                 if ( status != KERN_SUCCESS )
                 {
-                    fprintf(stderr, "Parrot_memalign(%zx, %zx) failed to deallocate extra footer space.\n", align, size);
+                    fprintf(stderr,
+                            "Parrot_memalign(%zx, %zx) failed to deallocate extra footer space.\n",
+                            align, size);
                 }
             }
 
