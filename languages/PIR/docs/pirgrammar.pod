@@ -48,7 +48,7 @@ as a macro identifier. The PIR directives are:
   .HLL_map        .param             .sub
   .HLL            .pcc_begin_return  .yield
   .include        .pcc_begin_yield
-                  
+
 
 
 =head2 Registers
@@ -290,7 +290,7 @@ is necessary to tell Parrot the subroutine will store or find lexicals.
 
 =back
 
-The sub flags are listed after the sub name. The subroutine name can also be 
+The sub flags are listed after the sub name. The subroutine name can also be
 a string instead of a bareword, as is shown in this example:
 
   .sub 'foo' :load :init :anon
@@ -606,7 +606,7 @@ only allowed on strings. These checks are B<not> done by the PIR parser.
       target "=" short_sub_call
     | target "=" target keylist
     | target "=" expression
-    | target "=" "new" [ int_constant | string_constant]
+    | target "=" "new" string_constant
     | target "=" "new" keylist
     | target "=" "find_type" [ string_constant | string_reg | id ]
     | target "=" heredoc
@@ -633,7 +633,7 @@ As languages/PIR evolves, this will be completed.
     | simple_expr ".." simple_expr
 
   result_var_list:
-    "(" result_vars ")"
+    "(" result_vars? ")"
 
   result_vars:
     result_var [ "," result_var ]*
@@ -725,17 +725,17 @@ B<Currently, this is not working.>
   long_sub_call:
     ".pcc_begin" nl
     arguments
-    [ method_call | non_method_call] target nl
+    [ method_call | non_method_call] nl
     [ local_decl nl ]*
     result_values
     ".pcc_end"
 
   non_method_call:
-    ".pcc_call" | ".nci_call"
+    [ ".pcc_call" | ".nci_call" ] target
 
   method_call:
     ".invocant" target nl
-    ".meth_call"
+    ".meth_call" [ target | string_constant ]
 
   parenthesized_args:
     "(" args ")"
@@ -1177,15 +1177,15 @@ like:
 NOTE: currently, the line directive is implemented in IMCC as #line.
 See the PROPOSALS document for more information on this.
 
-  
+
   .namespace ['Foo'] # namespace Foo
-  
+
   .namespace ['Object';'Foo'] # nested namespace
 
   .namespace # no [ id ] means the root namespace is activated
 
-The first line opens the namespace 'Foo'. When doing Object Oriented programming, 
-this would indicate that sub or method definitions belong to the class 'Foo'. 
+The first line opens the namespace 'Foo'. When doing Object Oriented programming,
+this would indicate that sub or method definitions belong to the class 'Foo'.
 Of course, you can also define namespaces without doing OO-programming.
 
 Please note that this C<.namespace> directive is I<different> from the
@@ -1274,10 +1274,6 @@ Some work should be done on:
 =item *
 
 Heredoc parsing
-
-=item *
-
-Clean up grammar, remove never-used features.
 
 =item *
 
