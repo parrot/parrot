@@ -16,8 +16,9 @@ t/codingstd/linelength.t - Test code lines length
 
 =head1 DESCRIPTION
 
-Tests source files for the line length limit as defined in F<pdd07_codingstd.pod>.
-Only files for some language implementations are checked.
+Tests source files for the line length limit as defined in
+F<pdd07_codingstd.pod>.  Only files for some language implementations are
+checked.
 
 =head1 SEE ALSO
 
@@ -38,7 +39,8 @@ use Parrot::Config;
 use ExtUtils::Manifest qw( maniread );
 
 # a list of languages where we want to test line length
-my %lang_is_checked = map { $_ => 1 } qw{ APL
+my %lang_is_checked = map { $_ => 1 } qw{
+    APL
     WMLScript
     amber
     cardinal
@@ -76,7 +78,7 @@ foreach (@files) {
     push @lines_too_long => $lineinfo;
 }
 
-## L<PDD07/Code Formatting/"Source line width is limited to 100 characters">
+## L<PDD07/Code Formatting/"Source line length is limited to 100 characters">
 ok( !@lines_too_long, 'Line length ok' )
     or diag( "Lines longer than coding standard limit ($num_col_limit columns) in "
         . scalar @lines_too_long
@@ -90,6 +92,7 @@ sub info_for_first_long_line {
     while ( my $line = <$fh> ) {
         chomp $line;
         $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;    # expand \t
+        next if $line =~ m/https?:\/\//;  # skip long web addresses
         return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $num_col_limit;
     }
