@@ -146,7 +146,7 @@ None.
 
 =head1 REFERENCES
 
-None.
+http://www.seas.upenn.edu/~lipeng/homepage/unify.html
 
 =cut
 
