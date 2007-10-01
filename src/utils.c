@@ -655,11 +655,11 @@ Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
 
     /* looking for the first character of the search string can avoid having to
      * inch along, comparing everything.  However, if the base string has
-     * embedded nulls, index() will stop at the first one, so inching along is
+     * embedded nulls, strchr() will stop at the first one, so inching along is
      * the only good solution */
-    char *start_pos = index(base_start + start_offset, *search_start);
+    char *start_pos = strchr(base_start + start_offset, *search_start);
 
-    /* index() returns NULL for no match, so start at the start position */
+    /* strchr() returns NULL for no match, so start at the start position */
     if (!start_pos)
         start_pos = base_start + start_offset;
 
