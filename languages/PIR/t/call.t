@@ -142,6 +142,15 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long method c
 	.pcc_end
 .end
 
+.sub foo
+	.local pmc x
+	.pcc_begin
+	.invocant obj
+	.meth_call 'meth'
+	.pcc_end
+.end
+
+
 CODE
 
 
@@ -157,11 +166,15 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'short sub cal
 	foo(a, b, c :flat, 'x' => 3, 'y' => 4, z :flat :named('z'))
 	
 	x = foo()                       # single result
-  (i, j :optional, ar :slurpy, value :named('key') ) = foo()
+    (i, j :optional, ar :slurpy, value :named('key') ) = foo()
 .end
 
 .sub foo
 	.return (i, ar :flat, value :named('key') )
+.end
+
+.sub bar
+    () = baz()
 .end
 
 CODE

@@ -37,10 +37,10 @@ CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'set keyed assignments' );
 .sub main			
-	x[1]				= 1
-	x[1.1]			= 2.222
+	x[1]        = 1
+	x[1.1]      = 2.222
 	x["hello"]	= "hello"
-	x[e]				= f
+	x[e]        = f
 .end
 CODE
 
