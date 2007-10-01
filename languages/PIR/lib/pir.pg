@@ -18,10 +18,10 @@ token TOP {
 }
 
 rule program {
-    <?nl>*
+    <?NL>*
     <compilation_unit>
-    [ <?nl> <compilation_unit> ]*
-    [ <?nl> | <warning: no newline at end of file> ]
+    [ <?NL> <compilation_unit> ]*
+    [ <?NL> | <warning: no newline at end of file> ]
 }
 
 token compilation_unit {
@@ -41,15 +41,15 @@ rule sub_def {
     <'.sub'>
     <sub_id>
     <sub_pragmas>?
-    <?NL>
+    <?nl>
     <param_decl>*
     <labeled_pir_instr>*
     [ <'.end'> | <syntax_error: '.end' expected to close method/sub body> ]
 }
 
 rule sub_id {
-    | <id> 
-    | <string_constant>
+    | <IDENT> 
+    | <STRING_CONST>
     | <syntax_error: subroutine identifier expected>
 }
 
@@ -80,22 +80,30 @@ rule vtable_pragma {
 
 rule parenthesized_string {
     <'('>
-    [ <string_constant> | <syntax_error: string constant expected> ]
-    [ <')'>             | <syntax_error: ')' expected> ]
+    <string_constant>
+    <?right_paren>
 }
 
 rule multi_pragma {
     <':multi'>
-    [ <'('>    | <syntax_error: '(' expected after ':multi' flag> ]
+    <?left_paren>
     <multi_types>?
-    [ <')'>    | <syntax_error: ')' expected to close ':multi' flag> ]
+    <?right_paren>
+}
+
+rule left_paren {
+    <'('> | <syntax_error: '(' expected>
+}
+
+rule right_paren {
+    <')'> | <syntax_error: ')' expected>
 }
 
 rule outer_pragma {
     <':outer'>
-    [ <'('>    | <syntax_error: '(' expected after ':outer' flag> ]
+    <?left_paren>
     <sub_id>
-    [ <')'>    | <syntax_error: ')' expected to close ':outer' flag> ]
+    <?right_paren>
 }
 
 rule multi_types {
@@ -106,18 +114,18 @@ rule multi_type {
     | <type>
     | <'_'>
     | <keylist>
-    | <id>
-    | <string_constant>
+    | <IDENT>
+    | <STRING_CONST>
 }
 
 rule param_decl {
     <'.param'>
     [ [ <type> <id> ]
-    | <reg>
+    | <REGISTER>
     | <syntax_error: parameter type or register expected>
     ]
     [ <get_flags> | <':unique_reg'> ]*
-    <?NL>
+    <?nl>
 }
 
 
@@ -132,14 +140,14 @@ rule labeled_pir_instr {
     [ <label> <instr>?
     | <instr>
     ]
-    <?NL>
+    <?nl>
 }
 
 rule labeled_pasm_instr {
     [ <label> <pasm_instr>?
     | <pasm_instr>
     ]
-    <?NL>
+    <?nl>
 }
 
 rule instr {
@@ -195,8 +203,8 @@ token local_flag {
 
 rule lexical_decl {
     <'.lex'>
-    <string_constant1>
-    <comma>
+    <string_constant>
+    <?comma>
     <target1>
 }
 
@@ -204,9 +212,6 @@ rule comma {
     <','> | <syntax_error: ',' expected>
 }
 
-rule string_constant1 {
-    <string_constant> | <syntax_error: string constant expected>
-}
 
 rule target1 {
     <target> | <syntax_error: register or identifier expected>
@@ -227,16 +232,20 @@ rule globalconst_def {
 }
 
 rule const_def_tail {
-    | <'int'> <const_assign>    [ <int_constant>    | <syntax_error: integer constant expected> ]
-    | <'num'> <const_assign>    [ <float_constant>  | <syntax_error: floating point constant expected> ]
-    | <'pmc'> <const_assign>    [ <string_constant> | <syntax_error: string constant expected> ]
-    | <'string'> <const_assign> [ <string_constant> | <syntax_error: string constant expected> ]
+    | <'int'>    <const_assign> <int_constant>
+    | <'num'>    <const_assign> <float_constant>
+    | <'pmc'>    <const_assign> <string_constant> 
+    | <'string'> <const_assign> <string_constant> 
     | <syntax_error: type expected for constant>
 }
 
 rule const_assign {
-    [ <id>  | <syntax_error: constant identifier expected> ]
-    [ <'='> | <syntax_error: '=' expected after constant identifier> ]
+    <id>
+    <?assign_token>
+}
+
+rule assign_token {
+    <'='> | <syntax_error: '=' expected>
 }
 
 rule conditional_stat {
@@ -248,7 +257,7 @@ rule conditional_stat {
 }
 
 token label_identifier {
-    | <id>
+    | <IDENT>
     | <pasm_instr>
 }
 
@@ -294,7 +303,7 @@ token simple_expr {
 rule keylist {
     <'['>
     <key> [ <separator> <key> ]*
-    [ <']'> | <syntax_error: ']' expected> ]
+    <right_bracket>
 }
 
 token separator {
@@ -318,7 +327,7 @@ rule key {
 #    #| <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
 #    | <target> <'='> <'new'> <string_constant>
 #    | <target> <'='> <'new'> <keylist>
-#    | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <id> ]
+#    | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <IDENT> ]
 #    | <target> <'='> <heredoc>
 #    | <target> <assign_operator> <simple_expr>
 #    | <target> <keylist> <'='> <simple_expr>
@@ -341,8 +350,7 @@ rule rhs {
     | <expression>
     | <pasm_instruction> \N*
     | <heredoc>
-    | <'new'> <string_constant>
-    | <'new'> <keylist>
+    | <'new'> [ <STRING_CONST> | <keylist> ]
 }
 
 
@@ -371,15 +379,15 @@ rule rhs {
 
 rule heredoc {
     <'<<'>
-    [ <string_constant> | <syntax_error: heredoc label identifier expected> ]
-    [ <?nl> | <syntax_error: newline expected after heredoc label> ]
+    <string_constant>
+    <?nl>
     <heredoc_string>
     [ <heredoc_label> | <syntax_error: heredoc label expected> ]
 }
 
 token heredoc_label {
     [ ^^ | <syntax_error: no whitespace allowed in front of a heredoc label> ]
-    <id>
+    <IDENT>
     [ $$ | <syntax_error: no whitespace allowed after a heredoc> ]
 }
 
@@ -390,7 +398,7 @@ rule heredoc_string {
 
 rule long_sub_call {
     <'.pcc_begin'>
-    [ <?nl>  | <syntax_error: newline after '.pcc_begin' expected> ]
+    <?nl>
     <arguments>
     [ 
       [ <'.pcc_call'> 
@@ -398,8 +406,8 @@ rule long_sub_call {
       ]
     | [ <invocant> <'.meth_call'> ]
     ]
-    [ <target> | <syntax_error: id or register expected that holds the sub object> ]
-    [ <?nl>    | <syntax_error: newline after '.pcc_call sub' expected> ]
+    [ <target> | <syntax_error: IDENT or register expected that holds the sub object> ]
+    <?nl>
     [ <local_decl> <?nl> ]*
     <result_values>
     [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]
@@ -423,7 +431,7 @@ rule invocant {
 rule short_sub_call {
     [
       [ <target>\.]?                   # optional invocant
-      [ <target> | <string_constant> ] # method or sub name/id
+      [ <target> | <STRING_CONST> ] # method or sub name/IDENT
     |
       <target> <method>
     ]
@@ -434,11 +442,12 @@ rule short_sub_call {
 
 token method {
     | \.<target>
-    | \.<string_constant>
+    | \.<STRING_CONST>
 }
 
 rule sub_invocation {
-    <long_sub_call> | <short_sub_call>
+    | <long_sub_call> 
+    | <short_sub_call>
 }
 
 rule result_var_list {
@@ -449,7 +458,7 @@ rule result_var_list {
         [ <result_var> | <syntax_error: target to store result expected after ','> ]
       ]*
     ]?
-    [ <')'> | <syntax_error: ')' expected to close result target list> ]
+    <right_paren>
 }
 
 rule result_var {
@@ -464,13 +473,13 @@ rule parenthesized_args {
         [ <arg> | <syntax_error: argument expected after ','> ]
       ]*
     ]?
-    [ <')'> | <syntax_error: ')' expected to close argument list> ]
+    <right_paren>
 }
 
 rule arg {
-    [ <float_constant>
-    | <int_constant>
-    | <string_constant>
+    [ <FLOAT_CONST>
+    | <INT_CONST>
+    | <STRING_CONST>
       [ <'=>'>
         [ <target> | <syntax_error: target for named argument expected> ]
       ]?
@@ -491,7 +500,7 @@ rule arguments {
     [ <'.arg'>
       [ <simple_expr> | <syntax_error: argument expression expected> ]
       <set_flags>?
-      [ <?nl> | <syntax_error: newline expected after .arg statement> ]
+      <?nl>
     ]*
 }
 
@@ -499,7 +508,7 @@ rule result_values {
     [ <'.result'>
       [ <target> | <syntax_error: target expected to hold the result> ]
       <get_flags>?
-      [ <?nl>  | <syntax_error: newline expected after .result statement> ]
+      <?nl>
     ]*
 }
 
@@ -516,7 +525,7 @@ rule get_flags {
 }
 
 rule named_flag {
-  <':named'> <parenthesized_string>?
+    <':named'> <parenthesized_string>?
 }
 
 token return_stat {
@@ -528,7 +537,7 @@ token return_stat {
 }
 
 rule long_return_stat {
-    <'.pcc_begin_return'> <?NL>
+    <'.pcc_begin_return'> <?nl>
     [ <'.return'> <return_value> ]*
     [ <'.pcc_end_return'> | <syntax_error: '.pcc_end_return' expected> ]
 }
@@ -538,7 +547,7 @@ rule short_return_stat {
 }
 
 rule long_yield_stat {
-    <'.pcc_begin_yield'> <?NL>
+    <'.pcc_begin_yield'> <?nl>
     [ <'.yield'> <return_value> ]*
     [ <'.pcc_end_yield'> | <syntax_error: '.pcc_end_yield' expected> ]
 }
@@ -547,7 +556,7 @@ rule long_yield_stat {
 rule return_value {
     [ <simple_expr> | <syntax_error: simple expression expected> ]
     <set_flags>?
-    <?NL>
+    <?nl>
 }
 
 rule short_yield_stat {
@@ -559,36 +568,32 @@ rule tail_call {
 }
 
 rule open_namespace {
-    <'.namespace'> <scope_id>
+    <'.namespace'> <id>
 }
 
 rule close_namespace {
-    <'.endnamespace'> <scope_id>
-}
-
-rule scope_id {
-    <id> | <syntax_error: namespace identifier expected>
+    <'.endnamespace'> <id>
 }
 
 rule emit {
     <'.emit'>
-    <?NL>
+    <?nl>
     <labeled_pasm_instr>*
     [ <'.eom'>     | <syntax_error: '.eom' expected> ]
 }
 
 rule macro_def {
     <'.macro'>
-    [ <id>  | <syntax_error: macro identifier expected> ]
+    <id>
     <macro_parameters>?
-    <?NL>
+    <?nl>
     <macro_body>
 }
 
 rule macro_parameters {
     <'('>
     <id_list>?
-    [ <')'>   | <syntax_error: ')' expected> ]
+    <?right_paren>
 }
 
 =head2 Macro body
@@ -613,19 +618,22 @@ token expansion {
 }
 
 rule pasm_constant {
-    <'.constant'> <id> [ <creg> | <constant> ]
+    <'.constant'> <IDENT> 
+    [ <pasm_register> 
+    | <constant> 
+    ]
 }
 
 token constant {
-    | <float_constant>
-    | <int_constant>
-    | <string_constant>
+    | <FLOAT_CONST>
+    | <INT_CONST>
+    | <STRING_CONST>
 }
 
 
 # only a PASM register is allowed for pasm_constant
 #
-token creg {
+token pasm_register {
     [P|I|N|S]\d\d?
 }
 
@@ -643,43 +651,47 @@ token pragma {
 }
 
 rule include {
-    <'.include'> [ <string_constant> | <syntax_error: string constant expected> ]
+    <'.include'> <string_constant>
 }
 
 rule new_operators {
-    <'.pragma'> <'n_operators'> [ <int_constant> | <syntax_error: integer constant expected> ]
+    <'.pragma'> <'n_operators'> <int_constant>
 }
 
 rule loadlib {
-    <'.loadlib'> [ <string_constant> | <syntax_error: library name expected> ]
+    <'.loadlib'> <string_constant>
 }
 
 rule namespace {
     <'.namespace'>
     [ <'['>
       [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
-      [ <']'>             | <syntax_error: ']' expected> ]
+      <right_bracket>
     ]?
+}
+
+rule right_bracket {
+    <']'> | <syntax_error: ']' expected>
 }
 
 rule hll_specifier {
     <'.HLL'>
-    [ <string_constant> | <syntax_error: HLL name expected> ]
-    [ <','>             | <syntax_error: ',' expected> ]
-    [ <string_constant> | <syntax_error: HLL type library expected> ]
+    <string_constant>
+    <?comma>
+    <string_constant>
 }
 
 rule hll_mapping {
     <'.HLL_map'>
-    [ <string_constant> | <syntax_error: Parrot Core type expected> ]
-    [ <','>             | <syntax_error: ',' expected> ]
-    [ <string_constant> | <syntax_error: HLL type expected> ]
+    <string_constant>
+    <?comma>
+    <string_constant>
 }
 
 rule namespace_id {
-    <string_constant>
+    <STRING_CONST>
     [ <';'>
-      [ <string_constant> | <syntax_error: string constant expected> ]
+      <string_constant>
     ]*
 }
 
@@ -688,10 +700,10 @@ rule source_info {
 }
 
 rule id_list {
-    <id>
+    <IDENT>
     [
       <','>
-      [ <id> | <syntax_error: identifier expected> ]
+      <id>
     ]*
 }
 
@@ -701,35 +713,50 @@ rule id_list {
 
 =head3 normal_label
 
-this is a token, because no spaces are allowed between the id and the colon.
+this is a token, because no spaces are allowed between the IDENT and the colon.
 
 =cut
 
 token normal_label {
-    <id> <':'>
+    <IDENT> <':'>
 }
 
+rule macro_label {
+    <MACRO_LABEL> | <syntax_error: $LABEL: expected>
+}
 
-token macro_label {
-    <'$'> <id> <':'>
+token MACRO_LABEL {
+    <'$'> <IDENT> <':'>
 }
 
 rule macro_label_decl {
-    | <'.label'> [ <macro_label> | <syntax_error: $LABEL: expected> ]
+    | <'.label'> <macro_label>
     | <normal_label>
 }
 
-token int_constant {
+rule int_constant {
+    <INT_CONST> | <syntax_error: int constant expected>
+}
+
+token INT_CONST {
     | 0b\d+
     | 0x\d+
     | [-]? \d+
 }
 
-token float_constant {
+rule float_constant {
+    <FLOAT_CONST> | <syntax_error: float constant expected>
+}
+
+token FLOAT_CONST {
     [-]? \d+\.\d+
 }
 
 rule string_constant {
+    <STRING_CONST> | <syntax_error: string constant expected>
+}
+
+rule STRING_CONST { 
     [ <encoding_specifier>? <charset_specifier> ]?
     [ <stringdouble> | <stringsingle> ]
 }
@@ -761,8 +788,8 @@ token pir_type {
 }
 
 token normal_target {
-    | <id> 
-    | <reg>
+    | <IDENT> 
+    | <REGISTER>
 }
 
 =head2 Macro_target
@@ -772,12 +799,16 @@ In a macro, a target can also be a macro_id
 =cut
 
 token macro_target {
-    | <id> 
-    | <reg> 
+    | <IDENT> 
+    | <REGISTER> 
     | <macro_id>
 }
 
 token id {
+    <IDENT> | <syntax_error: identifier expected> 
+}
+
+token IDENT {
     <!keyword> \w+
 }
 
@@ -785,30 +816,34 @@ token macro_id {
     <!keyword> \.\w+
 }
 
-token reg {
-    | <int_reg> 
-    | <num_reg> 
-    | <pmc_reg> 
-    | <string_reg>
+
+rule register {
+    <REGISTER> | <syntax_error: register expected>
 }
 
+token REGISTER {
+    | <INT_REG>
+    | <NUM_REG>
+    | <PMC_REG>
+    | <STRING_REG>
+}
 
-token int_reg {
+token INT_REG {
     | I\d<[\d]>?  # match I0 to I99
     | \$I\d+      # match $I0 to infinity
 }
 
-token string_reg {
+token STRING_REG {
     | S\d<[\d]>?
     | \$S\d+
 }
 
-token pmc_reg {
+token PMC_REG {
     | P\d<[\d]>?
     | \$P\d+
 }
 
-token num_reg {
+token NUM_REG {
     | N\d<[\d]>?
     | \$N\d+
 }
@@ -829,12 +864,12 @@ However, therefore it is also necessary to put the comments skipping here as wel
 
 =cut
 
-token nl {
+token NL {
     [ \n <?ws> ]+
 }
 
-token NL {
-    <nl> | <syntax_error: newline expected>
+token nl {
+    <NL> | <syntax_error: newline expected>
 }
 
 regex pod_comment {
