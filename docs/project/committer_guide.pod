@@ -24,7 +24,7 @@ by running:
 
   % perl tools/dev/mk_manifest_and_skip.pl
 
-=head1 svn properties setting (file endings text/binary $Id$)
+=head1 svn properties setting (file endings, text/binary, svn keywords)
 
 New files also need to have the appropriate svn properties set.  For most
 files this requires setting the C<svn:eol-style>, C<svn:keywords> and
