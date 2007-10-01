@@ -92,7 +92,7 @@ internal_exception(int exitcode, NOTNULL(const char *format), ...)
     fflush(stderr);
     va_end(arglist);
 /*
- * XXX TODO get rid of all the internal_exceptions or call them
+ * RT#45907 get rid of all the internal_exceptions or call them
  *          with an interpreter arg
     Parrot_exit(interp, exitcode);
  */
@@ -267,8 +267,8 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
      */
     STRING * const message = VTABLE_get_string_keyed_int(interp, exception, 0);
 
-    /* [TODO: replace quadratic search with something linear, hopefully without
-       trashing abstraction layers.  -- rgr, 17-Sep-06.] */
+    /* [RT#45909: replace quadratic search with something linear, hopefully 
+     * without trashing abstraction layers.  -- rgr, 17-Sep-06.] */
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
             PMC * const handler = UVal_pmc(e->entry);
@@ -319,7 +319,7 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * XXX this check should better be in Parrot_exit
+     * RT#45917 this check should better be in Parrot_exit
      */
     if (interp->thread_data && interp->thread_data->tid) {
         /*
@@ -474,7 +474,7 @@ rethrow_exception(PARROT_INTERP, NOTNULL(PMC *exception))
 
 =item C<rethrow_c_exception>
 
-Return back to runloop, assumes exception is still in C<TODO> and
+Return back to runloop, assumes exception is still in todo (see RT#45915) and
 that this is called from within a handler setup with C<new_c_exception>.
 
 =cut
@@ -487,10 +487,10 @@ rethrow_c_exception(PARROT_INTERP)
 {
     Parrot_exception * const the_exception = interp->exceptions;
 
-    PMC * const exception = PMCNULL;   /* TODO */
+    PMC * const exception = PMCNULL;   /* RT#45915 */
     PMC * const handler   = find_exception_handler(interp, exception);
 
-    /* XXX we should only peek for the next handler */
+    /* RT#45911 we should only peek for the next handler */
     push_exception(interp, handler);
     /*
      * if there was no user handler, interpreter is already shutdown
