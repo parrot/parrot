@@ -215,7 +215,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     end
 .end
 CODE
-/^thread: [0-9A-Fa-f]{8}\nthread: [0-9A-Fa-f]{8}\nstring/
+/^
+thread:\s[0-9A-Fa-f]{8}\n
+thread:\s[0-9A-Fa-f]{8}\n
+string\n
+/x
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );

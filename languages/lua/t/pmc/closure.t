@@ -216,7 +216,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     print "\n"
 .end
 CODE
-/^function: [0-9A-Fa-f]{8}\nfunction: [0-9A-Fa-f]{8}\nstring/
+/^
+function:\s[0-9A-Fa-f]{8}\n
+function:\s[0-9A-Fa-f]{8}\n
+string\n
+/x
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
@@ -275,7 +279,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
     tmp_1(tmp_1)
 .end
 CODE
-/function: [0-9A-Fa-f]{8}/
+/^function: [0-9A-Fa-f]{8}/
 OUTPUT
 }
 
@@ -295,7 +299,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
 .include 'languages/lua/lib/luaaux.pir'
 .include 'languages/lua/lib/luabasic.pir'
 CODE
-/function: [0-9A-Fa-f]{8}/
+/^function: [0-9A-Fa-f]{8}/
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from compilation' );
@@ -328,7 +332,11 @@ PIRCODE
     $P2()
 .end
 CODE
-/^function: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nf1/
+/^
+function:\s[0-9A-Fa-f]{8}\n
+table:\s[0-9A-Fa-f]{8}\n
+f1\n
+/x
 OUTPUT
 
 open my $X, '>', '../foo.pir';
@@ -362,7 +370,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from PIR load_bytecode' );
     $P2()
 .end
 CODE
-/^function: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nf1/
+/^
+function:\s[0-9A-Fa-f]{8}\n
+table:\s[0-9A-Fa-f]{8}\n
+f1\n
+/x
 OUTPUT
 
 system("parrot -o ../foo.pbc ../foo.pir");
@@ -381,7 +393,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from PBC load_bytecode' );
     $P2()
 .end
 CODE
-/^function: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nf1/
+/^
+function:\s[0-9A-Fa-f]{8}\n
+table:\s[0-9A-Fa-f]{8}\n
+f1\n
+/x
 OUTPUT
 
 unlink '../foo.pir';
@@ -409,7 +425,10 @@ PIRCODE
     $P2()
 .end
 CODE
-/^function: [0-9A-Fa-f]{8}\nf1/
+/^
+function:\s[0-9A-Fa-f]{8}\n
+f1\n
+/x
 OUTPUT
 
 # Local Variables:

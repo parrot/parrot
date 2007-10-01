@@ -151,7 +151,10 @@ $ENV{TEST_PROG_ARGS} = '-v';
 language_output_like( 'lua', <<'CODE', <<'OUT', '-v & script' );
 print(arg[-1])
 CODE
-/^Lua 5.1.*\n-v$/
+/^
+Lua\s5.1.*\n
+-v
+$/x
 OUT
 
 $ENV{TEST_PROG_ARGS} = '--';

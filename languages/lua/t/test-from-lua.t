@@ -85,7 +85,11 @@ language_output_is( 'lua', $code, $out, 'cf' );
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'echo.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'echo', params => 'arg1 arg2' );
-/^0\tlanguages.lua.t.test-from-lua_3\.lua\n1\targ1\n2\targ2\n/
+/^
+0\tlanguages.lua.t.test-from-lua_3\.lua\n
+1\targ1\n
+2\targ2\n
+/x
 OUTPUT
 
 #
@@ -104,7 +108,11 @@ language_output_is( 'lua', $code, $out, 'factorial' );
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fib.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'fib' );
-/^\tn\tvalue\ttime\tevals\nplain\t24\t46368\t\d+(\.\d+)?\t150049\ncached\t24\t46368\t\d+(\.\d+)?\t25\n/
+/^
+\tn\tvalue\ttime\tevals\n
+plain\t24\t46368\t\d+(\.\d+)?\t150049\n
+cached\t24\t46368\t\d+(\.\d+)?\t25\n
+/x
 OUTPUT
 
 #

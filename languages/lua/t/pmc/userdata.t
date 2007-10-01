@@ -184,7 +184,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     print "\n"
 .end
 CODE
-/^userdata: [0-9A-Fa-f]{8}\nuserdata: [0-9A-Fa-f]{8}\nstring/
+/^
+userdata:\s[0-9A-Fa-f]{8}\n
+userdata:\s[0-9A-Fa-f]{8}\n
+string\n
+/x
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );

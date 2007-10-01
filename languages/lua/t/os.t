@@ -204,7 +204,10 @@ print(os.time({
     isdst = 0,
 }))
 CODE
-/^946\d+\nnil\n$/
+/^
+946\d+\n
+nil\n
+$/x
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time (missing field)' );

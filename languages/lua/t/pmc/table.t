@@ -364,7 +364,11 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
     print "\n"
 .end
 CODE
-/^table: [0-9A-Fa-f]{8}\ntable: [0-9A-Fa-f]{8}\nstring/
+/^
+table:\s[0-9A-Fa-f]{8}\n
+table:\s[0-9A-Fa-f]{8}\n
+string\n
+/x
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );

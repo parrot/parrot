@@ -85,7 +85,12 @@ end
 print(a)
 print"bye"
 CODE
-/^hello\n(in alarm!\t\d\d:\d\d:\d\d\t\d+\t\d+%\n)+100000\nbye/gm
+/^
+hello\n
+(in\salarm!\t\d\d:\d\d:\d\d\t\d+\t\d+%\n)+
+100000\n
+bye
+/gmx
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function alarm (bad delay)' );
