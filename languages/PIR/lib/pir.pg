@@ -10,9 +10,9 @@ TODO:
 Some rules/tokens have names in capitals; these represent the C<pure> token.
 Each such token has also a rule with the same name in lowercase, which does
 reports a syntax error if the token was not read. For instance, <STRING_CONST>
-will match a string constant, but <string_constant> will report an error if 
-there was no STRING_CONST token.  
- 
+will match a string constant, but <string_constant> will report an error if
+there was no STRING_CONST token.
+
 =cut
 
 
@@ -399,9 +399,9 @@ rule long_call_invocation {
 }
 
 rule non_method_invocation {
-    [ <'.pcc_call'> 
-    | <'.nci_call'> 
-    ]    
+    [ <'.pcc_call'>
+    | <'.nci_call'>
+    ]
     [ <target> | <syntax_error: variable or register expected that holds the sub object> ]
 }
 
