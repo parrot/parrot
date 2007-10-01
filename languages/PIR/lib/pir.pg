@@ -7,6 +7,12 @@ TODO:
  1. fix Heredocs parsing
  2. Test and fix things
 
+Some rules/tokens have names in capitals; these represent the C<pure> token.
+Each such token has also a rule with the same name in lowercase, which does
+reports a syntax error if the token was not read. For instance, <STRING_CONST>
+will match a string constant, but <string_constant> will report an error if 
+there was no STRING_CONST token.  
+ 
 =cut
 
 
@@ -318,24 +324,6 @@ rule key {
     | <'..'> <simple_expr>
 }
 
-#rule assignment_stat {
-#    | <target> <'='> <short_sub_call>
-#    | <target> <'='> <target> <keylist>
-#    | <target> <'='> <expression>
-#    | <target> <'='> <pasm_instruction> \N*
-#    #| <target> <'='> <pasm_op_1> <simple_expr>
-#    #| <target> <'='> <pasm_op_2> <simple_expr> \, <simple_expr>
-#    | <target> <'='> <'new'> <string_constant>
-#    | <target> <'='> <'new'> <keylist>
-#    | <target> <'='> <'find_type'> [ <string_constant> | <string_reg> | <IDENT> ]
-#    | <target> <'='> <heredoc>
-#    | <target> <assign_operator> <simple_expr>
-#    | <target> <keylist> <'='> <simple_expr>
-#    | <result_var_list>
-#      [ <'='> | <syntax_error: '=' expected> ]
-#      <short_sub_call>
-#}
-
 
 rule assignment_stat {
     | <target> <'='> <rhs>
@@ -397,24 +385,29 @@ rule heredoc_string {
 }
 
 rule long_sub_call {
-    <'.pcc_begin'>
-    <?nl>
+    <'.pcc_begin'> <?nl>
     <arguments>
-    [
-      [ <'.pcc_call'>
-      | <'.nci_call'>
-      ]
-    | [ <invocant> <'.meth_call'> ]
-    ]
-    [ <target> | <syntax_error: IDENT or register expected that holds the sub object> ]
-    <?nl>
+    <long_call_invocation> <?nl>
     [ <local_decl> <?nl> ]*
     <result_values>
     [ <'.pcc_end'>  | <syntax_error: '.pcc_end' expected> ]
 }
 
-rule invocant {
+rule long_call_invocation {
+    | <method_invocation>
+    | <non_method_invocation>
+}
+
+rule non_method_invocation {
+    [ <'.pcc_call'> 
+    | <'.nci_call'> 
+    ]    
+    [ <target> | <syntax_error: variable or register expected that holds the sub object> ]
+}
+
+rule method_invocation {
     <'.invocant'> <target> <?nl>
+    <'.meth_call'> <method>
 }
 
 #
@@ -428,21 +421,25 @@ rule invocant {
 # a separate token, it must be glued to either the invocant or the method.
 # otherwise it's recognized as a concatentation.
 #
+
 rule short_sub_call {
-    [
-      [ <target>\.]?                   # optional invocant
-      [ <target> | <STRING_CONST> ] # method or sub name/IDENT
-    |
-      <target> <method>
-    ]
+    <short_call_invocant>
     <parenthesized_args>             # sub args
     <process_heredocs>               # process the list of heredoc labels, if any
     <clear_heredocs>
 }
 
-token method {
-    | \.<target>
-    | \.<STRING_CONST>
+rule short_call_invocant {
+    | <target>
+      [ \.<target>
+      | \.<STRING_CONST>
+      ]
+    | [ <target>\. ]? <method>
+}
+
+rule method {
+    | <target>
+    | <STRING_CONST>
 }
 
 rule sub_invocation {
