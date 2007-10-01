@@ -201,7 +201,8 @@ int_compare(Parrot_Interp interp, void *a, void *b)
     if (!siva_ary(a)) siva_set_ary(a, list_new(i, enum_type_PMC)); \
 }
 #define siva_hash_create_if_void(i,a) { \
-    if (!siva_hash(a)) parrot_new_hash_x(i, &siva_hash(a), enum_type_ptr, Hash_key_type_int, int_compare, key_hash_int); \
+    if (!siva_hash(a)) parrot_new_hash_x(i, &siva_hash(a), \
+            enum_type_ptr, Hash_key_type_int, int_compare, key_hash_int); \
 }
 #define siva_str_create_if_void(i,a) { \
 }
