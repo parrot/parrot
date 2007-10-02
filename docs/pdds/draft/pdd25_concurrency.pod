@@ -1029,6 +1029,8 @@ Concurrency as Futures -
 
 Io language - <http://www.iolanguage.com/about/>
 
+Java memory and concurrency - http://www.cs.umd.edu/~pugh/java/memoryModel/
+
 =cut
 
 __END__
