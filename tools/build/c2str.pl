@@ -13,6 +13,7 @@ use warnings;
 use strict;
 use lib 'lib';
 
+use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
 use Math::BigInt;
 use Getopt::Long;
@@ -20,20 +21,12 @@ use Getopt::Long;
 my $outfile          = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';
 my $lockfile         = "$outfile.lck";
-my $max_lock_wait    = 120;
 
-my $start_time = time;
-while ( -e $lockfile ) {
-    sleep 1;
-    if ( time - $start_time > $max_lock_wait ) {
-        die "Lock still held after $max_lock_wait seconds -- something is wrong!";
-    }
-}
-open my $lock, '>', $lockfile or die "Can't write '$lockfile': $!";
-print $lock "$$\n";
-close $lock;
+sysopen( my $lock, $lockfile, O_CREAT ) or die "Can't write '$lockfile': $!\n";
 
-$SIG{'__DIE__'} = sub { unlink $lockfile };
+flock($lock, LOCK_EX) or die "Can't lock '$lockfile': $!\n";
+
+END { close $lock; unlink $lockfile; }
 
 my ( $result, $do_all, $do_init, $file );
 $result = GetOptions(
@@ -42,14 +35,12 @@ $result = GetOptions(
 );
 
 $do_all and do {
-    &read_all;
-    &create_c_include;
-    unlink $lockfile;
+    read_all();
+    create_c_include();
     exit;
 };
 $do_init and do {
     unlink $outfile;
-    unlink $lockfile;
     exit;
 };
 
@@ -61,12 +52,10 @@ die "$0: $infile: $!" unless -e $infile;
 my %known_strings = ();
 my @all_strings;
 
-&read_all;
+read_all();
 open my $ALL, '>>', $outfile or die "Can't write '$outfile': $!";
 process_cfile();
 close $ALL;
-
-unlink $lockfile;
 
 sub hash_val {
     my $h = Math::BigInt->new('+0');
