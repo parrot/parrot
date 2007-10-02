@@ -664,7 +664,7 @@ mmd_dispatch_i_pp(PARROT_INTERP,
 Add a new binary MMD function to the list of functions the MMD system knows
 of. C<func_num> is the number of the new function. C<function> is ignored.
 
-TODO change this to a MMD register interface that takes a function *name*.
+RT#45941 change this to a MMD register interface that takes a function *name*.
 
 =cut
 
@@ -855,7 +855,7 @@ it means that we have to expand the table. Making Y larger is simple --
 just realloc with some more rows. Making X larger is less simple. In
 either case, we punt to other functions.
 
-TODO - Currently the MMD system doesn't handle inheritance and best match
+RT#45943 - Currently the MMD system doesn't handle inheritance and best match
 searching, as it assumes that all PMC types have no parent type. This
 can be considered a bug, and will be resolved at some point in the
 future.
@@ -964,7 +964,7 @@ mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)
     const funcptr_t func = get_mmd_dispatch_type(interp,
             func_nr, left, right, &is_pmc);
     if (func && is_pmc) {
-        /* TODO if is_pmc == 2 a Bound_NCI is returned, which actually
+        /* RT#45945 if is_pmc == 2 a Bound_NCI is returned, which actually
          * should be filled with one of the wrapper functions
          */
         return (PMC*)F2DPTR(func);
@@ -1257,7 +1257,7 @@ mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
     type1 = VTABLE_get_integer_keyed_int(interp, arg_tuple, 0);
     if (type1 < 0) {
         return;
-        /* TODO create some class namespace */
+        /* RT#45947 create some class namespace */
     }
     else {
         PMC * const mro = interp->vtables[type1]->mro;
@@ -1270,7 +1270,7 @@ mmd_search_classes(PARROT_INTERP, NOTNULL(STRING *meth),
             if (!PMC_IS_NULL(pmc)) {
                 /*
                  * mmd_is_hidden would consider all previous candidates
-                 * XXX pass current n so that only candidates from this
+                 * RT#45949 pass current n so that only candidates from this
                  *     mro are used?
                  */
                 if (mmd_maybe_candidate(interp, pmc, cl))
@@ -1324,7 +1324,7 @@ mmd_cvt_to_types(PARROT_INTERP, NOTNULL(PMC *multi_sig))
         if (sig_elem->vtable->base_type == enum_class_String) {
             STRING * const sig = VTABLE_get_string(interp, sig_elem);
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
-                PMC_int_val(ar)--;  /* XXX */
+                PMC_int_val(ar)--;  /* RT#45951 */
                 break;
             }
             type = pmc_type(interp, sig);
@@ -1373,7 +1373,7 @@ mmd_distance(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *arg_tuple))
         return MMD_BIG_DISTANCE;
     dist = 0;
     if (args > n)
-        dist = 1000;   /* XXX arbitrary > max_class_depth * n */
+        dist = 1000;   /* RT#45953 arbitrary > max_class_depth * n */
     /*
      * now go through args
      */
@@ -1460,7 +1460,7 @@ mmd_sort_candidates(PARROT_INTERP, NOTNULL(PMC *arg_tuple), NOTNULL(PMC *cl))
      * bits 0..15  = distance
      * bits 16..31 = idx in candidate list
      *
-     * TODO use half of available INTVAL bits
+     * RT#45955 use half of available INTVAL bits
      */
     PMC * const sort = pmc_new(interp, enum_class_FixedIntegerArray);
     VTABLE_set_integer_native(interp, sort, n);
@@ -1545,7 +1545,7 @@ mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))
      * if the candidate list already has the a sub with the same
      * signature (long name), the outer multi is hidden
      *
-     * TODO
+     * RT#45957 
      */
     UNUSED(interp);
     UNUSED(multi);
@@ -1577,7 +1577,7 @@ mmd_maybe_candidate(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(PMC *cl))
 
     if (VTABLE_isa(interp, pmc, _sub)) {
         /* a plain sub stops outer searches */
-        /* TODO check arity of sub */
+        /* RT#45959 check arity of sub */
 
         VTABLE_push_pmc(interp, cl, pmc);
         return 1;
@@ -1752,7 +1752,7 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
 
     /*
      * push method onto core multi_sub
-     * TODO cache the namespace
+     * RT#45961 cache the namespace
      */
     multi = Parrot_find_global_n(interp, ns,
                                  const_string(interp, short_name));
@@ -1843,7 +1843,7 @@ Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
     if (!table)
         return;
 
-    /* TODO specific parts of table
+    /* RT#45963 specific parts of table
      * the type and it's mro and
      * all classes that inherit from type
      */
