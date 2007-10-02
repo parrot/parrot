@@ -401,6 +401,10 @@ Function or method call. These notations are shorthand for a longer
 PCC function call with B<.pcc_*> directives. I<var> can denote a
 global subroutine, a local B<identifier> or a B<reg>.
 
+{{We should review the (currently inconsistent) specification of the 
+method name. Currently it can be a bare word, a quoted string or a 
+string register. See #45859.}}
+
 =item .return ([<var> [:<flag> ...], ...])
 
 Return from the current compilation unit with zero or more values.
