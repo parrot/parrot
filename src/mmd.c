@@ -1545,7 +1545,7 @@ mmd_is_hidden(PARROT_INTERP, NOTNULL(PMC *multi), NOTNULL(PMC *cl))
      * if the candidate list already has the a sub with the same
      * signature (long name), the outer multi is hidden
      *
-     * RT#45957 
+     * RT#45957
      */
     UNUSED(interp);
     UNUSED(multi);
