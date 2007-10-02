@@ -267,7 +267,7 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
      */
     STRING * const message = VTABLE_get_string_keyed_int(interp, exception, 0);
 
-    /* [RT#45909: replace quadratic search with something linear, hopefully 
+    /* [RT#45909: replace quadratic search with something linear, hopefully
      * without trashing abstraction layers.  -- rgr, 17-Sep-06.] */
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
