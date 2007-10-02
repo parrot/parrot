@@ -324,7 +324,7 @@ sub _run_this_step {
 
     print "..." if $args->{verbose} && $args->{verbose} == 2;
     print "." x ( 71 - length($description) - length($result) );
-    print "$result." unless $step =~ m{^inter/} && $args->{ask};
+    print "$result." unless $step =~ m{^inter} && $args->{ask};
 
     # reset verbose value for the next step
     $conf->options->set( verbose => $args->{verbose} );
