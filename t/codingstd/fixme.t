@@ -38,6 +38,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my @fixme;
+my %failed_files;
 
 foreach my $file (@files) {
 
@@ -52,12 +53,15 @@ foreach my $file (@files) {
         next unless /(FIXME|XXX|TODO)/;
 
         push @fixme, "file '$path', line $.: $1\n";
+        $failed_files{$path}++;
     }
     close $fh;
 }
 
+my $num_failed_files = scalar keys %failed_files;
 ok( !scalar(@fixme), 'FIXME strings' )
-    or diag( "FIXME strings found in " . scalar @fixme . " files:\n@fixme" );
+    or diag( "FIXME strings found in " . scalar @fixme 
+        . " instances in " . $num_failed_files . " files:\n@fixme" );
 
 # Local Variables:
 #   mode: cperl
