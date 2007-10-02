@@ -135,6 +135,17 @@ A heredoc as an argument:
 
 Only one heredoc can be active per statement line.
 
+{{ REVIEW: it would be useful to have multiple heredocs per statement, 
+   which allows for writing:
+   
+   function(<<'INPUT', <<'OUTPUT', 'some test')
+   ...
+ INPUT
+   ...
+ OUTPUT
+ 
+}}
+
 =item charset:"string constant"
 
 Like above with a chracter set attached to the string. Valid character
@@ -326,7 +337,19 @@ prefix in the outer namespace's global pad.
 
 =item .pcc_*
 
-Directives used for Parrot Calling Conventions.
+Directives used for Parrot Calling Conventions. These are:
+
+=over 4
+
+=item .pcc_begin and .pcc_end
+
+=item .pcc_begin_return and .pcc_end_return
+
+=item .pcc_begin_yield and .pcc_end_yield
+
+=item .pcc_call
+
+=back
 
 =back
 
