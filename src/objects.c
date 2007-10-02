@@ -169,7 +169,7 @@ Parrot_get_vtable_index(PARROT_INTERP, NOTNULL(const STRING *name))
         const INTVAL       mid    = (low + high) / 2;
         const char * const meth_c = Parrot_vtable_slot_names[mid];
 
-        /* XXX slot_names still have __ in front */
+        /* RT#45965 slot_names still have __ in front */
         const INTVAL cmp = strcmp(name_c, meth_c + 2);
 
         if (cmp == 0) {
@@ -262,7 +262,7 @@ Parrot_find_vtable_meth(PARROT_INTERP, NOTNULL(PMC *pmc), NOTNULL(STRING *meth))
 
 Given a String or Key PMC return the STRING* representation
 
-XXX this function, key_set_to_string, and the key PMC get_repr should be consolidated
+RT#45967 this function, key_set_to_string, and the key PMC get_repr should be consolidated
 
 =cut
 
@@ -299,7 +299,7 @@ readable_name(PARROT_INTERP, NOTNULL(PMC *name))
 
 Throws an exception if a PMC or class with the same name already exists.
 
-XXX uses global class registry
+RT#45969 uses global class registry
 
 =cut
 
@@ -320,7 +320,7 @@ fail_if_exist(PARROT_INTERP, NOTNULL(PMC *name))
         type = VTABLE_get_integer(interp, type_pmc);
 
     if (type > enum_type_undef) {
-        /* TODO get printable name */
+        /* RT#45971 get printable name */
         real_exception(interp, NULL, INVALID_OPERATION,
                 "Class %Ss already registered!\n",
                 VTABLE_get_string(interp, name));
@@ -504,7 +504,7 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 
 Return the MMD function number for method name or -1 on failure.
 
-TODO allow dynamic expansion at runtime.
+RT#45973 allow dynamic expansion at runtime.
 
 =cut
 
@@ -553,7 +553,7 @@ Parrot_single_subclass(PARROT_INTERP, NOTNULL(PMC *base_class), NULLOK(PMC *name
         fail_if_exist(interp, name);
     }
     else {
-        /* XXX not really threadsafe but good enough for now */
+        /* RT#45975 not really threadsafe but good enough for now */
         static int anon_count;
         STRING * const child_class_name =
             Parrot_sprintf_c(interp, "%c%canon_%d", 0, 0, ++anon_count);
@@ -666,7 +666,7 @@ Parrot_new_class(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(PMC *name))
     set_attrib_num(_class, class_array, PCD_PARENTS,
                    pmc_new(interp, enum_class_ResizablePMCArray));
 
-    /* TODO create all class structures in constant PMC pool */
+    /* RT#45977 create all class structures in constant PMC pool */
 
     /*
      * create MRO (method resolution order) array
@@ -825,9 +825,9 @@ parrot_class_register(PARROT_INTERP, NOTNULL(PMC *name),
     top = CONTEXT(interp->ctx)->current_namespace;
     ns  = VTABLE_get_pmc_keyed(interp, top, name);
 
-    /* XXX nested, use current as base ? */
+    /* RT#45979 nested, use current as base ? */
     if (PMC_IS_NULL(ns)) {
-        /* XXX try HLL namespace too XXX */
+        /* RT#45983 try HLL namespace too */
         top = Parrot_get_ctx_HLL_namespace(interp);
         ns  = VTABLE_get_pmc_keyed(interp, top, name);
     }
@@ -935,7 +935,7 @@ do_initcall(PARROT_INTERP, NULLOK(PMC* _class), NULLOK(PMC *object),
      * 1) if class has a CONSTRUCT property run it on the object
      *    no redispatch
      *
-     * XXX isn't CONSTRUCT for creating new objects?
+     * RT#45985 isn't CONSTRUCT for creating new objects?
      */
     STRING *meth_str;
     PMC    *meth = get_init_meth(interp, _class,
@@ -1466,7 +1466,7 @@ Parrot_invalidate_method_cache(PARROT_INTERP, NULLOK(STRING *_class), NOTNULL(ST
 
 /*
  * quick'n'dirty method cache
- * TODO: use a hash if method_name is not constant
+ * RT#45987: use a hash if method_name is not constant
  *       i.e. from obj.$Sreg(args)
  *       If this hash is implemented mark it during DOD
  */
@@ -1708,16 +1708,16 @@ Parrot_add_attribute(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(STRING *attr))
 
     full_attr_name = string_concat(interp, full_attr_name, attr, 0);
 
-    /* TODO escape NUL char */
+    /* RT#45989 escape NUL char */
     if (VTABLE_exists_keyed_str(interp, attr_hash, full_attr_name)) {
         char * const c_error = string_to_cstring(interp, full_attr_name);
         real_exception(interp, NULL, 1, "Attribute '%s' already exists", c_error);
-        /* XXX leak! */
+        /* RT#45991 leak! */
         string_cstring_free(c_error);
     }
 
     /*
-     * TODO check if someone is trying to add attributes to a parent class
+     * RT#45993 check if someone is trying to add attributes to a parent class
      * while there are already child class attrs
      */
     idx = CLASS_ATTRIB_COUNT(_class)++;
@@ -1773,7 +1773,7 @@ attr_str_2_num(PARROT_INTERP, NOTNULL(PMC *object), NOTNULL(STRING *attr))
 
     _class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
 
-    /* XXX Shared objects have the 'wrong' class stored in them
+    /* RT#45997 Shared objects have the 'wrong' class stored in them
     * (because of the reference to the namespace and because it
     * references PMCs that may go away),
     * since we actually want one from the current interpreter. */
@@ -2229,7 +2229,7 @@ Parrot_ComposeRole(PARROT_INTERP, NOTNULL(PMC *role),
         /* If we weren't excluded... */
         if (!excluded) {
             /* Is there a method with this name already in the class?
-             * XXX TODO: multi-method handling. */
+             * RT#45999 multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, method_name)) {
                 /* Conflicts with something already in the class. */
                 real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
@@ -2262,7 +2262,7 @@ Parrot_ComposeRole(PARROT_INTERP, NOTNULL(PMC *role),
                 alias, method_name);
 
             /* Is there a method with this name already in the class?
-             * XXX TODO: multi-method handling. */
+             * RT#45999: multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name)) {
                 /* Conflicts with something already in the class. */
                 real_exception(interp, NULL, ROLE_COMPOSITION_METH_CONFLICT,
