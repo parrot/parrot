@@ -351,6 +351,8 @@ Directives used for Parrot Calling Conventions. These are:
 
 =back
 
+{{ REVIEW: Do we still want/need the "pcc_" prefix? See #45925. }}
+
 =back
 
 =head2 Directives for subroutine parameters and return
