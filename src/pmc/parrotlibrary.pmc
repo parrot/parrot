@@ -47,7 +47,23 @@ Initializes the library with a C<NULL> oplib init function.
 */
 
     void init() {
+        PObj_active_destroy_SET(SELF);
         PMC_struct_val(SELF) = NULL;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the library, closing the shared library.
+
+=cut
+
+*/
+
+    void destroy() {
+        if (PMC_data(SELF))
+            Parrot_dlclose(PMC_data(SELF));
     }
 
 /*
@@ -116,6 +132,19 @@ Returns the name of the loaded library.
         return VTABLE_get_string(INTERP, prop);
     }
 
+/*
+
+=item C<void set_pointer(void *handle)>
+
+Set the pointer to the shared library handle.
+
+=cut
+
+*/
+
+    void set_pointer(void *handle) {
+        PMC_data(SELF) = handle;
+    }
 }
 
 /*

@@ -334,8 +334,8 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
     Parrot_block_DOD(interp);
     /* get load_func */
     if (lib_name != NULL) {
-        STRING * const load_func_name = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_load",
-                                          lib_name);
+        STRING * const load_func_name = Parrot_sprintf_c(interp,
+                                        "Parrot_lib_%Ss_load", lib_name);
         char * const cload_func_name = string_to_cstring(interp, load_func_name);
         STRING *init_func_name;
 
@@ -358,20 +358,18 @@ run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
     }
 
     lib_pmc = Parrot_init_lib(interp, load_func, init_func);
+    VTABLE_set_pointer(interp, lib_pmc, handle);
 
-    PMC_data(lib_pmc) = handle;
     if (!load_func)
         type = const_string(interp, "NCI");
     else {
         /* we could set a private flag in the PMC header too
          * but currently only ops files have struct_val set
          */
-        type = const_string(interp,
-                               PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+        type = const_string(interp, PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
     }
-    /*
-     * remember lib_pmc in iglobals
-     */
+
+    /* remember lib_pmc in iglobals */
     store_lib_pmc(interp, lib_pmc, wo_ext, type, lib_name);
     /* UNLOCK */
     Parrot_unblock_DOD(interp);
@@ -463,8 +461,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
 {
-    void * handle;
-    PMC *lib_pmc;
+    void   *handle;
+    PMC    *lib_pmc;
     STRING *path;
     STRING *lib_name, *wo_ext, *ext;    /* library stem without path
                                          * or extension.  */
@@ -474,19 +472,21 @@ Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
      *
      * LOCK()
      */
-    if (lib == NULL) {
+    if (lib) {
+        lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
+    }
+    else {
         wo_ext   = string_from_literal(interp, "");
         lib_name = NULL;
         ext      = NULL;
     }
-    else {
-        lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
-    }
+
     lib_pmc = is_loaded(interp, wo_ext);
     if (!PMC_IS_NULL(lib_pmc)) {
         /* UNLOCK() */
         return lib_pmc;
     }
+
     path = get_path(interp, lib, &handle, wo_ext, ext);
     if (!path || !handle) {
         /*
@@ -496,8 +496,7 @@ Parrot_load_lib(PARROT_INTERP, NULLOK(STRING *lib), SHIM(PMC *initializer))
         return pmc_new(interp, enum_class_Undef);
     }
 
-    lib_pmc = run_init_lib(interp, handle, lib_name, wo_ext);
-    return lib_pmc;
+    return run_init_lib(interp, handle, lib_name, wo_ext);
 }
 
 /*
