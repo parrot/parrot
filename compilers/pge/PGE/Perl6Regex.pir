@@ -124,8 +124,8 @@ or the resulting PIR code (target='PIR').
 
 =item C<regex(PMC mob, PMC adverbs :slurpy :named)>
 
-Parses a regex according to Perl 6 regex syntax, and returns 
-the corresponding parse tree.  
+Parses a regex according to Perl 6 regex syntax, and returns
+the corresponding parse tree.
 
 =cut
 
@@ -281,7 +281,7 @@ needed for compiling regexes.
 
 =item C<parse_term(PMC mob [, PMC adverbs :slurpy :named])>
 
-Parses literal strings and whitespace.  
+Parses literal strings and whitespace.
 Return a failed match if the stoptoken is found.
 
 =cut
@@ -439,7 +439,7 @@ Parses terms beginning with backslash.
   err_negated_brackets:
     parse_error(mob, pos, 'Cannot use comma in \\X[...] or \\O[...]')
 .end
-    
+
 
 =item C<parse_term_ws(PMC mob)>
 
@@ -455,7 +455,7 @@ Parses a whitespace term.
     (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::WS')
     pos = mfrom
     lastpos = length target
-  
+
   term_ws_loop:
     ##   scan for the next non-whitespace character
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -507,7 +507,7 @@ combinations.
 
     #   The postfix:<::> operator may bring us here when it's really a
     #   term:<::> term.  So, we check for that here and fail this match
-    #   if we really have a cut term.  
+    #   if we really have a cut term.
     if key != ':' goto quant
     $S0 = substr target, pos, 1
     if $S0 == ':' goto end
@@ -574,14 +574,14 @@ combinations.
     mob['max'] = max
     mpos = pos
   end:
-    .return (mob) 
+    .return (mob)
 
   err_closure:
     parse_error(mob, pos, "Error in closure quantifier")
 .end
 
 
-=item parse_quant_error(mob)
+=item C<parse_quant_error(mob)>
 
 Throw an exception for quantifiers in term position.
 
@@ -807,19 +807,19 @@ Extract an enumerated character list.
     op = mob['KEY']
 
     ##   handle the case of <[, <+[, <-[, and <![ as the token
-    ##   by converting to <, <+, <-, or <! 
+    ##   by converting to <, <+, <-, or <!
     $S0 = substr op, -1, 1
     if $S0 != '[' goto parse_loop
     chopn op, 1
     goto enum
 
-  parse_loop: 
+  parse_loop:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     if pos >= lastpos goto err_close
     $S0 = substr target, pos, 1
     if $S0 != '[' goto subrule
     inc pos
-  
+
   enum:
     .local string charlist
     .local int isrange
@@ -1086,7 +1086,7 @@ Parse a modifier.
     mob.'to'(pos)
     .return (mob)
 .end
-    
+
 
 .sub 'parse_error'
     .param pmc mob
@@ -1332,7 +1332,7 @@ Parse a modifier.
 
 .namespace [ 'PGE::Exp::WS' ]
 
-.sub 'perl6exp' :method 
+.sub 'perl6exp' :method
     .param pmc pad
 
     $I0 = pad['sigspace']
@@ -1409,7 +1409,7 @@ Parse a modifier.
     exp1 = self[1]
 
     ##   If we're aliasing a capture group or a quantified capture
-    ##   group, then we just move the alias name to that group.  
+    ##   group, then we just move the alias name to that group.
     ##   Otherwise, we need to create a capture group for this
     ##   alias and return that.
 

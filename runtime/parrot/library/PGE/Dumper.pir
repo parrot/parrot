@@ -328,7 +328,7 @@ obsoleted in favor of a Data::Dumper method.
     print "CharClass "
     $S0 = self["charmatch"]
     print $S0
-    print " <<" 
+    print " <<"
     $S0 = self["charclass"]
     print $S0
     print ">> "
@@ -437,7 +437,7 @@ obsoleted in favor of a Data::Dumper method.
     print " cscope"
   dump_3:
     print "\n"
-    exp = self["exp1"] 
+    exp = self["exp1"]
     indent += 4
     exp."dump"(indent)
     .return ()
@@ -494,6 +494,8 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
 .end
 
 =back
+
+=cut
 
 # Local Variables:
 #   mode: pir

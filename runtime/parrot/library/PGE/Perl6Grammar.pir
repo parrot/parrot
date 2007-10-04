@@ -9,6 +9,7 @@ Command-line:
     parrot Perl6Grammar.pir [options] file ...
 
 From PIR:
+
     .local string grammar_source
     .local pmc pgc
 
@@ -25,7 +26,7 @@ From PIR:
 This program takes a set of parser rules (i.e., a parser grammar)
 specified in the input C<FILE>s, and compiles it into the PIR code
 needed to execute the grammar.  This PIR code is then suitable for
-inclusion or compilation into other larger programs. 
+inclusion or compilation into other larger programs.
 
 =head2 Options
 
@@ -108,7 +109,7 @@ the output to the correct output file.
 
     $S0 = <<'      STMT_PARSE'
         $<cmd>:=(grammar) <name> [ 'is' $<inherit>:=<name> ]? ';'?
-      | $<cmd>:=(regex|token|rule) 
+      | $<cmd>:=(regex|token|rule)
           $<name>:=<arg>
           $<optable>:=(is optable)?
           [ \{<regex>\} | <?PGE::Util::die: unable to parse regex> ]
@@ -144,7 +145,7 @@ the output to the correct output file.
     nstable[''] = $P0
 
     # get our initial match object
-    .local pmc match 
+    .local pmc match
     $P0 = get_hll_global ['PGE::Match'], 'newfrom'
     match = $P0(source, 0, 'PGE::Perl6Grammar')
 
