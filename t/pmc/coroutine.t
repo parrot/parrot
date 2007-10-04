@@ -125,7 +125,7 @@ lp:
     print "done\n"
     end
 _catchm:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch main\n"
     end
 
@@ -137,7 +137,7 @@ corolp:
     yield
     branch corolp
 _catchc:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch coro\n"
     end
 CODE
@@ -162,7 +162,7 @@ lp:
     print "done\n"
     end
 _catchm:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch main\n"
     end
 
@@ -176,7 +176,7 @@ corolp:
     find_global P17, S0
     branch corolp
 _catchc:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch coro\n"
     end
 CODE
@@ -201,7 +201,7 @@ lp:
     print "done\n"
     end
 _catchm:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch main\n"
     end
 .pcc_sub _coro:
@@ -237,7 +237,7 @@ lp:
     print "done\n"
     end
 _catchm:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch main\n"
     end
 
@@ -251,7 +251,7 @@ corolp:
     find_global P17, S0
     branch corolp
 _catchc:
-    get_results '(0, 0)' , P5, S0
+    get_results '0, 0' , P5, S0
     print "catch coro\n"
     rethrow P5
     end
