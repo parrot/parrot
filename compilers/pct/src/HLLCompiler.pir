@@ -436,7 +436,7 @@ specifies the encoding to use for the input (e.g., "utf8").
   target_pir:
     goto interactive_loop
   interactive_trap:
-    get_results '(0,0)', $P0, $S0
+    get_results '0,0', $P0, $S0
     $S1 = substr $S0, -1, 1
     $I0 = is_cclass .CCLASS_NEWLINE, $S1, 0
     if $I0 goto have_newline
