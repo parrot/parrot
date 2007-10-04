@@ -1626,7 +1626,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
         set_addr $P41, L2
         goto L3
 L2:
-        get_results '(0)', $P45
+        get_results '0', $P45
         print "got "
         print $P45
         print ".\n"
