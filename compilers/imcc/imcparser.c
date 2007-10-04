@@ -4718,14 +4718,14 @@ int yyerror(void *yyscanner, PARROT_INTERP, char * s)
         if (*chr == '\n') {
             IMCC_INFO(interp)->line--;
         }
-        
+
         IMCC_warning(interp, "error:imcc:%s", s);
         /* don't print the current token if it is a newline */
         if (*chr != '\n') {
             IMCC_warning(interp, " ('%s')", chr);
-        }    
-        IMCC_print_inc(interp);            
-        
+        }
+        IMCC_print_inc(interp);
+
         if (*chr == '\n') {
             IMCC_INFO(interp)->line++;
         }
