@@ -66,6 +66,8 @@ length.
 
 {{ REVIEW: identifier length limit }}
 
+{{ REVIEW: can op-names be used as identifiers? See #24251. }}
+
 Example:
 
     a
