@@ -580,16 +580,13 @@ rule emit {
 }
 
 rule macro_def {
-    <'.macro'>
-    <id>
-    <macro_parameters>?
-    <?nl>
+    <'.macro'> <id>
+    <macro_parameters>? <?nl>
     <macro_body>
 }
 
 rule macro_parameters {
-    <'('>
-    <id_list>?
+    <'('> <id_list>?
     <?right_paren>
 }
 
@@ -698,10 +695,7 @@ rule source_info {
 
 rule id_list {
     <IDENT>
-    [
-      <','>
-      <id>
-    ]*
+    [ <','> <id> ]*
 }
 
 
@@ -810,7 +804,7 @@ token IDENT {
 }
 
 token macro_id {
-    <!keyword> \.\w+
+    <!pir_directive> \.\w+
 }
 
 
@@ -888,7 +882,6 @@ identifiers.
 
 token keyword {
     | <pir_type>
-    | <pir_directive>
     | <pir_keyword>
     | <pasm_instruction> # pasm instructions may be identifiers in IMCC
 }
