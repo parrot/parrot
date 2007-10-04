@@ -1650,18 +1650,30 @@ int yyerror(void *yyscanner, PARROT_INTERP, char * s)
     /* --- This was called before, not sure if I should call some
            similar function that does not die like this one. */
 
-
     /* Basically, if current token is a newline, it mean the error was
      * before the newline, and thus, line is the line *after* the
-     * error.
+     * error. Instead of duplicating code for both cases (the 'newline' and
+     * non-newline case, do the test twice; efficiency is not important when
+     * we have an error anyway.
      */
-    if (!at_eof(yyscanner) && *chr == '\n') {
-        IMCC_INFO(interp)->line--;
+    if (!at_eof(yyscanner)) {
+        if (*chr == '\n') {
+            IMCC_INFO(interp)->line--;
+        }
+        
         IMCC_warning(interp, "error:imcc:%s", s);
-        IMCC_print_inc(interp);
-        IMCC_INFO(interp)->line++;
+        /* don't print the current token if it is a newline */
+        if (*chr != '\n') {
+            IMCC_warning(interp, " ('%s')", chr);
+        }    
+        IMCC_print_inc(interp);            
+        
+        if (*chr == '\n') {
+            IMCC_INFO(interp)->line++;
+        }
+
     }
-    else {
+    else { /* scanner is at end of file; just to be sure, do not print "current" token. */
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
     }
