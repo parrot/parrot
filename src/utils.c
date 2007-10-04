@@ -647,32 +647,29 @@ INTVAL
 Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
         NOTNULL(const STRING *search), UINTVAL start_offset)
 {
-    const INTVAL       searchlen    = search->strlen;
-    const char * const search_start = search->strstart;
-    const char * const base_start   = base->strstart;
-    const INTVAL       max_offset   = base->strlen - searchlen;
-    const char * const max_pos      = base_start + max_offset;
+    const char * const str_start  = base->strstart;
+    const INTVAL       str_len    = base->strlen;
+    const char * const search_str = search->strstart;
+    const INTVAL       search_len = search->strlen;
+    char              *str_pos    = str_start + start_offset;
+    INTVAL             len_remain = str_len   - start_offset;
+    char              *search_pos;
 
-    /* looking for the first character of the search string can avoid having to
-     * inch along, comparing everything.  However, if the base string has
-     * embedded nulls, strchr() will stop at the first one, so inching along is
-     * the only good solution */
-    char *start_pos = strchr(base_start + start_offset, *search_start);
+    /* find the next position of the first character in the search string
+     * Parrot strings can have NULLs, so strchr() won't work here */
+    while ((search_pos = (char *)memchr(str_pos, *search_str, len_remain))) {
+        const INTVAL offset = search_pos - str_start;
 
-    /* strchr() returns NULL for no match, so start at the start position */
-    if (!start_pos)
-        start_pos = base_start + start_offset;
+        /* now look for the entire string */
+        if (memcmp(search_pos, search_str, search_len) == 0)
+            return offset;
 
-    while (start_pos <= max_pos) {
-        /* only do the memcmp() if the first character matches */
-        if (  *start_pos == *search_start
-            && memcmp(start_pos, search_start, searchlen) == 0)
+        /* otherwise loop and memchr() with the rest of the string */
+        len_remain = str_len    - offset;
+        str_pos    = search_pos + 1;
 
-            /* return the offset, not the pointer to the position */
-            return start_pos - base_start;
-
-        /* walking is necessary in case of embedded null bytes */
-        start_pos++;
+        if (len_remain < search_len)
+            return -1;
     }
 
     return -1;
