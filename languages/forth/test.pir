@@ -113,7 +113,7 @@ missing_output:
 
 exception:
     .local pmc except
-    get_results '(0,0)', except, $S0
+    get_results '0,0', except, $S0
     output = except[0]
 
 compare:

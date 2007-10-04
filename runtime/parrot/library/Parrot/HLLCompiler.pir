@@ -415,7 +415,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     say $P0
     goto interactive_loop
   interactive_trap:
-    get_results '(0,0)', $P0, $S0
+    get_results '0,0', $P0, $S0
     .local int severity
     severity = $P0[2]
     if severity == .EXCEPT_EXIT goto interactive_end
