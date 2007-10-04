@@ -441,7 +441,7 @@ for my $type ( "Complex", "Float", "Integer" ) {
     print "fail\\n"
     clear_eh
 OK:
-    get_results '(0,0)', \$P0, \$S0
+    get_results '0,0', \$P0, \$S0
     print "ok\\n"
     print \$S0
     print "\\n"
