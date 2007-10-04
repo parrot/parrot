@@ -168,13 +168,11 @@ set to the decoded literal.
     .param pmc adverbs         :slurpy :named
 
     .local string target
-    .local pmc mfrom, mpos
     .local int pos
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Literal')
-    pos = mfrom
-    ($S0, $I0) = 'scan_literal'(target, mfrom, '*?[')
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
+    ($S0, $I0) = 'scan_literal'(target, pos, '*?[')
     if $I0 <= pos goto end
-    mpos = $I0
+    mob.'to'($I0)
     mob.'result_object'($S0)
   end:
     .return (mob)
@@ -191,10 +189,10 @@ return a CCShortcut that is set to '.'
 .sub 'glob_quest'
     .param pmc mob
     .param pmc adverbs         :slurpy :named
-    .local pmc mtarget, mfrom, mpos
+    .local int pos
     ##   The '?' is already in mob['KEY'], so we don't need to find it here.
-    (mob, mtarget, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
-    assign mpos, mfrom
+    (mob, pos) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
+    mob.'to'(pos)
     mob.'result_object'('.')
     .return (mob)
 .end
@@ -210,15 +208,15 @@ bit more complex, as we have to return a quantified '.'.
 .sub 'glob_star'
     .param pmc mob
     .param pmc adverbs         :slurpy :named
-    .local pmc mtarget, mfrom, mpos
+    .local int pos
     ##   The '*' is already in mob['KEY'], so we don't need to find it here.
     ##   We create a Quant object, then a CCShortcut inside of it.
-    (mob, mtarget, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Quant')
-    assign mpos, mfrom
+    (mob, pos) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
+    mob.'to'(pos)
     mob['min'] = 0
     mob['max'] = GLOB_INF
-    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::CCShortcut')
-    assign $P3, $P2
+    ($P0, $I0) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
+    $P0.'to'($I0)
     $P0.'result_object'('.')
     mob[0] = $P0
     .return (mob)
@@ -236,11 +234,8 @@ Parse an enumerated character list, such as [abcd],
     .param pmc adverbs         :slurpy :named
 
     .local string target
-    .local pmc mfrom, mpos
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::EnumCharList')
-
     .local int pos, lastpos
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     lastpos = length target
     $S0 = substr target, pos, 1
     mob['isnegated'] = 0
@@ -277,12 +272,12 @@ Parse an enumerated character list, such as [abcd],
     charlist .= '-'
   scan_end:
     inc pos
-    mpos = pos
+    mob.'to'(pos)
     mob.'result_object'(charlist)
     .return (mob)
 
   err_noclose:
-    mpos = -1
+    mob.'to'(-1)
     .return (mob)
 .end
 
@@ -299,31 +294,30 @@ Parse an enumerated character list, such as [abcd],
 
     .local string target
     .local int pos, lastpos
-    (mob, target, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Literal')
-    pos = $P2
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     lastpos = length target
 
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     mob.'result_object'($S0)
-    $P3 = pos
+    mob.'to'(pos)
   alt_loop:
     if pos >= lastpos goto err_noclose
     $S0 = substr target, pos, 1
     if $S0 == '}' goto end
-    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Alt')
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Alt')
     inc pos
-    $P3 = pos
+    $P0.'to'(pos)
     $P0[0] = mob
     mob = $P0
-    ($P0, $P1, $P2, $P3) = mob.newfrom(0, 'PGE::Exp::Literal')
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
-    $P3 = pos
+    $P0.'to'(pos)
     $P0.'result_object'($S0)
     mob[1] = $P0
     goto alt_loop
   end:
     inc pos
-    mob.to(pos)
+    mob.'to'(pos)
     .return (mob)
 
   err_noclose:
