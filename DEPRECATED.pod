@@ -11,6 +11,17 @@ is not the case yet [RT#41226].
 The object system of Parrot is being overhauled. This touches some opcode
 and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
 
+=head1 PGE::P6Regex and pgc.pir
+
+In early 2007 there were a number of changes made to the Perl 6
+regular expression syntax (as given by Synopsis 5).  The new
+syntax is implemented via the PGE::Perl6Regex compiler, and the
+PGE::P6Regex compiler is now deprecated in favor of the new
+syntax.
+
+Similarly, the pgc.pir compiler (for grammars) is deprecated
+in favor of runtime/parrot/library/PGE/Perl6Grammar.{pir|pbc} .
+
 =head1 .imc file extension
 
 http://xrl.us/jc4u
@@ -28,18 +39,7 @@ Currently no C APIs are deprecated.
 
 =head1 Deprecated methods
 
-=over 4
-
-=item PGE
-
-PGE::P6Regex is now a registered compiler, and should be used like so:
-
- <@pmichaud> it's easy; instead of  $P0 = find_global "PGE", "p6rule"
-   one now does  $P0 = compreg "PGE::P6Regex"
-
-This syntax is also true for PGE::Glob and PGE::P5Regex
-
-=back
+Currently no methods are deprecated.
 
 =head1 Deprecated ops
 
