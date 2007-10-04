@@ -15,8 +15,6 @@ Project Team
 
 Architect                       Allison Randal
 
-Pumpking                        Chip Salzenberg
-
 Release Manager                 Jerry Gay
                                 Patrick Michaud
                                 Matt Diephouse
@@ -25,7 +23,6 @@ Release Manager                 Jerry Gay
                                 Allison Randal
 
 Metacommitter                   Allison Randal
-                                Chip Salzenberg
                                 Jerry Gay
                                 Will Coleda
                                 Jesse Vincent
@@ -42,6 +39,7 @@ Core Developer                  -
                                 Bob Rogers
                                 Nuno Carvalho
                                 chromatic
+                                Chip Salzenberg
                                 Allison Randal
 
 Compiler Developer              -
