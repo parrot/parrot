@@ -77,7 +77,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
     new P1, 'Continuation'
     set_addr P1, endcont
 endcont:
-    find_global P4, "foo"
+    get_global P4, "foo"
     print "here "
     print P4
     print "\n"
@@ -123,7 +123,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub" );
-    find_global P0, "_the_sub"
+    get_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
     print "not "
@@ -142,7 +142,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub, tail call" );
-    find_global P0, "_the_sub"
+    get_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
     print "not "
@@ -154,7 +154,7 @@ ok:
 
 .pcc_sub _the_sub:
     print "in sub\n"
-    find_global P0, "_next_sub"
+    get_global P0, "_next_sub"
     get_addr I0, P0
     jump I0
     print "never here\n"
@@ -172,7 +172,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax" );
-    find_global P0, "_the::sub::some::where"
+    get_global P0, "_the::sub::some::where"
     defined I0, P0
     if I0, ok
     print "not "
@@ -203,7 +203,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode call sub" );
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     defined I0, P0
     if I0, ok1
     print "not "
@@ -232,7 +232,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode call sub, ret" );
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     defined I0, P0
     if I0, ok1
     print "not "
@@ -265,7 +265,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret" )
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     defined I0, P0
     if I0, ok1
     print "not "
@@ -274,7 +274,7 @@ ok1:
     set P10, P0
     invokecc P0
     print "back\n"
-    find_global P0, "_sub2"
+    get_global P0, "_sub2"
     defined I0, P0
     if I0, ok2
     print "not "
@@ -320,7 +320,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, re
     print "main\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     defined I0, P0
     if I0, ok1
     print "not "
@@ -329,7 +329,7 @@ ok1:
     set P10, P0
     invokecc P0
     print "back\n"
-    find_global P0, "_sub2"
+    get_global P0, "_sub2"
     defined I0, P0
     if I0, ok2
     print "not "
@@ -490,7 +490,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun first" );
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub2"
+    get_global P0, "_sub2"
     invokecc P0
     print "back\n"
     end
@@ -509,7 +509,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun first in pbc" );
     print "main\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
-    find_global P0, "_sub2"
+    get_global P0, "_sub2"
     invokecc P0
     print "back\n"
     end
@@ -537,7 +537,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun second" );
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     invokecc P0
     print "back\n"
     end
@@ -556,7 +556,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun second in pbc" );
     print "main\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     invokecc P0
     print "back\n"
     end
@@ -584,7 +584,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun both" );
     print "main\n"
     load_bytecode "temp.pasm"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     invokecc P0
     print "back\n"
     end
@@ -604,7 +604,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "load_bytecode autorun both in pbc" );
     print "main\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
-    find_global P0, "_sub1"
+    get_global P0, "_sub1"
     invokecc P0
     print "back\n"
     end
@@ -651,9 +651,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', ':main pragma call subs' );
     returncc
 .pcc_sub :main _main:
     print "main\n"
-    find_global P0, "_first"
+    get_global P0, "_first"
     invokecc P0
-    find_global P0, "_second"
+    get_global P0, "_second"
     invokecc P0
     end
 CODE
@@ -815,7 +815,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
-    find_global P0, "the_sub"
+    get_global P0, "the_sub"
     invokecc P0
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
@@ -842,7 +842,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
-    find_global P0, "the_sub"
+    get_global P0, "the_sub"
     invokecc P0
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
@@ -866,13 +866,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
     # this test will fail when run with -Oc
     # as the call chain is cut down with tail calls
     foo()
-    $P0 = find_global "Bar", "foo"
+    
+    $P0 = get_hll_global ["Bar"], "foo"
     $P0()
     print "ok\n"
 .end
 .sub foo
     print "main foo\n"
-    $P0 = find_global "Bar", "bar"
+    $P0 = get_hll_global ["Bar"], "bar"
     $P0()
 .end
 .namespace ["Bar"]
