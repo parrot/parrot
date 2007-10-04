@@ -241,7 +241,7 @@ Description of the test.
   thrown:
     .sym pmc exception
     .sym string message
-    get_results '(0,0)', exception, message
+    get_results '0,0', exception, message
     # remove /'s
     $S0 = substr result, 0, 1
     if $S0 != "/" goto bad_error

@@ -260,15 +260,15 @@ pasm_output_is( <<'CODE', <<OUTPUT, "coro context and invalid return continuatio
     .const .Sub P0 = "co1"
     set I20, 0
 l:
-    get_results '()'
-    set_args '()'
+    get_results ''
+    set_args ''
     invokecc P0
     inc I20
     lt I20, 3, l
     print "done\n"
     end
 .pcc_sub co1:
-    get_params '()'
+    get_params ''
     set P17, P1
 col:
     print "coro\n"

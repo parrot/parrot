@@ -272,7 +272,7 @@ Description of the test.
   thrown:
     .sym pmc exception
     .sym string message
-    get_results '(0,0)', exception, message
+    get_results '0,0', exception, message
     say message
     # remove /'s
     $S0 = substr result, 0, 1
