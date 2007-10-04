@@ -20,6 +20,9 @@ This file implements match objects returned by the Parrot Grammar Engine.
     addattribute base, '@!capt'                    # subpattern captures
     addattribute base, '$!result'                  # result object
 
+    $P0 = new 'PGE::Match'
+    set_hll_global ['PGE'], 'Match', $P0
+
     .return ()
 .end
 

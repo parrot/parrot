@@ -40,10 +40,9 @@ Match an identifier.
     .local pmc mfrom, mpos
     .local int pos, lastpos
 
-    $P0 = get_hll_global ["PGE::Match"], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(mob)
 
-    pos = mfrom
     lastpos = length target
     $S0 = substr target, pos, 1
     if $S0 == '_' goto ident_1
@@ -51,7 +50,7 @@ Match an identifier.
     if $I0 == 0 goto end
   ident_1:
     pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
-    mpos = pos
+    mob.'to'(pos)
   end:
     .return (mob)
 .end
@@ -65,11 +64,11 @@ Match a null string (always returns true on first match).
 
 .sub "null"
     .param pmc mob
-    .local pmc target, mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    assign mpos, mfrom
-    .return (mob)    
+    .local int pos
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos) = $P0.'new'(mob)
+    mob.'to'(pos)
+    .return (mob)
 .end
 
 =item C<fail()>
@@ -80,9 +79,10 @@ Force a backtrack.  (Taken from A05.)
 
 .sub "fail"
     .param pmc mob
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    .return $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    .return $P0.'new'(mob)
 .end
+
 
 =item C<upper()>
 
@@ -90,19 +90,11 @@ Match a single uppercase character.
 
 =cut
 
-.sub "upper"
+.sub 'upper'
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_UPPERCASE, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_UPPERCASE)
 .end
+
 
 =item C<lower()>
 
@@ -112,17 +104,9 @@ Match a single lowercase character.
 
 .sub "lower"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_LOWERCASE, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_LOWERCASE)
 .end
+
 
 =item C<alpha()>
 
@@ -132,16 +116,7 @@ Match a single alphabetic character.
 
 .sub "alpha"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_ALPHABETIC, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_ALPHABETIC)
 .end
 
 =item C<digit()>
@@ -152,16 +127,7 @@ Match a single digit.
 
 .sub "digit"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_NUMERIC, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_NUMERIC)
 .end
 
 =item C<xdigit()>
@@ -172,16 +138,7 @@ Match a single alphanumeric character.
 
 .sub "xdigit"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_HEXADECIMAL, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_HEXADECIMAL)
 .end
 
 =item C<space()>
@@ -192,16 +149,7 @@ Match a single whitespace character.
 
 .sub "space"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_WHITESPACE, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_WHITESPACE)
 .end
 
 =item C<print()>
@@ -212,16 +160,7 @@ Match a single printable character.
 
 .sub "print"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_PRINTING, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_PRINTING)
 .end
 
 =item C<graph()>
@@ -232,16 +171,7 @@ Match a single "graphical" character.
 
 .sub "graph"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_GRAPHICAL, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_GRAPHICAL)
 .end
 
 =item C<blank()>
@@ -252,16 +182,7 @@ Match a single "blank" character.
 
 .sub "blank"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_BLANK, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_BLANK)
 .end
 
 =item C<cntrl()>
@@ -272,16 +193,7 @@ Match a single "control" character.
 
 .sub "cntrl"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_CONTROL, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_CONTROL)
 .end
 
 =item C<punct()>
@@ -292,16 +204,7 @@ Match a single punctuation character.
 
 .sub "punct"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_PUNCTUATION, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_PUNCTUATION)
 .end
 
 =item C<alnum()>
@@ -312,16 +215,7 @@ Match a single alphanumeric character.
 
 .sub "alnum"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $I1 = is_cclass .CCLASS_ALPHANUMERIC, target, $I0
-    unless $I1 goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!cclass'(mob, .CCLASS_ALPHANUMERIC)
 .end
 
 =item C<sp()>
@@ -332,16 +226,7 @@ Match a single space character.  (Taken from E05.)
 
 .sub "sp"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $S0 = substr target, $I0, 1
-    if $S0 != " " goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!literal'(mob, ' ')
 .end
 
 =item C<lt()>
@@ -352,16 +237,7 @@ Match a single left angle bracket.  (Taken from E05.)
 
 .sub "lt"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $S0 = substr target, $I0, 1
-    if $S0 != "<" goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!literal'(mob, '<')
 .end
 
 =item C<gt()>
@@ -372,16 +248,7 @@ Match a single right angle bracket. (Taken from E05.)
 
 .sub "gt"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $S0 = substr target, $I0, 1
-    if $S0 != ">" goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!literal'(mob, '>')
 .end
 
 =item C<dot()>
@@ -392,16 +259,7 @@ Match a single dot ('.').  (Taken from E05.)
 
 .sub "dot"
     .param pmc mob
-    .local string target
-    .local pmc mfrom, mpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    $I0 = mfrom
-    $S0 = substr target, $I0, 1
-    if $S0 != "." goto end
-    mpos = mfrom + 1
-  end:
-    .return (mob)
+    .return '!literal'(mob, '.')
 .end
 
 =item C<ws()>
@@ -419,8 +277,8 @@ Match whitespace between tokens.
     .const .Sub corou = "ws_corou"
     nextchars = ""
   ws_1:
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target, mfrom, mpos) = $P0.'new'(mob)
     lastpos = length target
     pos = mfrom
     if pos >= lastpos goto found
@@ -443,7 +301,7 @@ Match whitespace between tokens.
     mpos = pos
     $P0 = corou
     $P0 = clone $P0
-    setattribute mob, "PGE::Match\x0&!corou", $P0
+    setattribute mob, '&!corou', $P0
     $P0(mob, mfrom, mpos)
     .return (mob)
   nobacktrack:
@@ -465,7 +323,7 @@ Match whitespace between tokens.
     dec mpos
     if mpos > mfrom goto loop
     null $P0
-    setattribute mob, "PGE::Match\x0&!corou", $P0
+    setattribute mob, '&!corou', $P0
     goto loop
 .end
 
@@ -482,18 +340,17 @@ Perl 5's \b regex).
     .local string target
     .local pmc mfrom, mpos
     .local int pos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob)
-    pos = mfrom
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(mob)
     if pos == 0 goto succeed
     $I0 = length target
     if pos == $I0 goto succeed
-    $I1 = is_cclass .CCLASS_WORD, target, pos
-    dec pos
-    $I0 = is_cclass .CCLASS_WORD, target, pos
-    if $I0 == $I1 goto end    
+    $I0 = pos - 1
+    $I1 = is_cclass .CCLASS_WORD, target, $I0
+    $I2 = is_cclass .CCLASS_WORD, target, pos
+    if $I1 == $I2 goto end
   succeed:
-    assign mpos, mfrom
+    mob.'to'(pos)
   end:
     .return (mob)
 .end
@@ -515,7 +372,7 @@ success.
     .local pmc cache, rule
 
     if has_pattern goto lookahead
-    mob = fail(mob)
+    mob = 'fail'(mob)
     .return (mob)
   lookahead:
     cache = get_global '%!cache'
@@ -534,7 +391,7 @@ success.
     $P1 = getattribute mob, '$.pos'
     assign $P1, $P0
     null $P0
-    setattribute mob, "PGE::Match\x0&!corou", $P0
+    setattribute mob, '&!corou', $P0
   end:
     .return (mob)
 .end
@@ -546,7 +403,7 @@ current position matches <pattern> (anchored at the end).
 Returns a zero-width Match object on success.
 
 XXX: Note that this implementation cheats in a big way.
-S05 says that C<after> is implemented by reversing the 
+S05 says that C<after> is implemented by reversing the
 syntax tree and looking for things in opposite order going
 to the left.  This implementation just grabs the (sub)string
 up to the current match position and tests that, anchoring
@@ -597,7 +454,56 @@ potentially very inefficient, but it "works" for now.
 .end
 
 =back
-    
+
+=head2  Support subroutines
+
+=over 4
+
+=item C<!cclass(mob, cclass)>
+
+Match according to character class C<cclass>.
+
+=cut
+
+.sub '!cclass'
+    .param pmc mob
+    .param int cclass
+
+    .local string target
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, $I0, target) = $P0.'new'(mob)
+    $I1 = is_cclass cclass, target, $I0
+    unless $I1 goto end
+    inc $I0
+    mob.'to'($I0)
+  end:
+    .return (mob)
+.end
+
+=item C<!literal(mob, literal)>
+
+Match according to C<literal>.
+
+=cut
+
+.sub '!literal'
+    .param pmc mob
+    .param string literal
+    .local string target
+    .local int pos
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(mob)
+    $I0 = length literal
+    $S0 = substr target, pos, $I0
+    if $S0 != literal goto end
+    pos += $I0
+    mob.'to'(pos)
+  end:
+    .return (mob)
+.end
+
+=back
+
 =head1 AUTHOR
 
 Patrick Michaud (pmichaud@pobox.com) is the author and maintainer.
