@@ -33,7 +33,6 @@ multi
 line 
 comment
 )no comment
-eval(   `4')
 CODE
 Hello World
 Hallo Welt
@@ -52,7 +51,6 @@ f o o 2 is not defined
 the first two arguments are equal
 the first two arguments are not equal
 no comment
-4
 OUT
 }
 

@@ -5,8 +5,8 @@ use warnings;
 use lib qw( lib ../lib ../../lib m4/lib );
 
 use Parrot::Config;
-use Parrot::Test tests => 1; 
-use Test::More;
+use Parrot::Test;
+use Test::More skip_all => 'eval is not implemented';
 
 my $real_out;
 my $path_to_parrot = Parrot::Test::path_to_parrot();

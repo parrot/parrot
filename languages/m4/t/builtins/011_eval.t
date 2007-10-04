@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use lib qw( lib ../lib ../../lib m4/lib );
 
-use Parrot::Test tests => 3;
+use Parrot::Test;
+use Test::More skip_all => 'eval is not implemented';
 
 # Test the m4-Builtin function 'eval'
 
