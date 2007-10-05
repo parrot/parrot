@@ -80,12 +80,11 @@
 	.param pmc source
 
 	.local pmc start_rule
-	.local pmc newfrom
 	.local pmc match
 
 	start_rule = find_global 'Pheme::Grammar', 'prog'
-	newfrom    = find_global 'PGE::Match', 'newfrom'
-	source     = newfrom(source, 0, 'Pheme::Grammar')
+        $P0        = get_root_global ['parrot';'PGE'], 'Match'
+        source     = $P0.'new'(source, 'grammar'=>'Pheme::Grammar')
 	match      = start_rule( source )
 
 	.return( match )
