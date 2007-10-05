@@ -167,7 +167,7 @@ fail_if_type_exists(PARROT_INTERP, PMC *name)
         type = VTABLE_get_integer(interp, type_pmc);
 
     if (type > enum_type_undef) {
-        /* TODO get printable name */
+        /* RT#46091 get printable name */
         real_exception(interp, NULL, INVALID_OPERATION,
                 "Class %Ss already registered!\n",
                 VTABLE_get_string(interp, name));
@@ -640,7 +640,7 @@ Returns an error if an attribute of C<name> already exists.
 
         /* If we've been instantiated already, need a new class. */
         if (_class->instantiated) {
-            /* XXX Unimplemented! */
+            /* RT#46093 Unimplemented! */
             real_exception(interp, NULL, E_NotImplementedError,
                 "Modifications to already instantiated classes not allowed yet.");
         }
@@ -676,7 +676,7 @@ Adds the given sub PMC as a method with the given name.
 
         /* If we have already added a method with this name... */
         if (VTABLE_exists_keyed_str(interp, _class->methods, name)) {
-            /* XXX Need to handle multi methods here. */
+            /* RT46095 Need to handle multi methods here. */
             real_exception(interp, NULL, E_NotImplementedError,
                 "A method of this name already exists. It may have been supplied by a role.");
         }
@@ -736,7 +736,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* If we've been instantiated already, need a new class. */
         if (_class->instantiated) {
-            /* XXX Unimplemented! */
+            /* RT46097 Unimplemented! */
             real_exception(interp, NULL, E_NotImplementedError,
                 "Modifications to already instantiated classes not allowed yet.");
             return;
@@ -748,7 +748,7 @@ Adds the supplied PMC to the list of parents for the class.
             return;
         }
 
-        /* XXX Check we don't already have this parent. */
+        /* RT46099 Check we don't already have this parent. */
 
         /* Add to the list of our immediate parents. */
         VTABLE_push_pmc(interp, _class->parents, parent);
@@ -1036,7 +1036,7 @@ Creates a new PMC object of the type of the class and calls init().
             }
 
             /* Build full parents list.
-             * XXX Need pluggable MRO, for now always do C3. */
+             * RT#46101 Need pluggable MRO, for now always do C3. */
             _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
             build_attrib_index(interp, SELF);
