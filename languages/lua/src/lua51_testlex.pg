@@ -28,68 +28,68 @@ Used by F<languages/lua/test_lex.pir>.
 grammar Lua::TestLex
 
 rule TOP {
-        (^ <shebang>)? <token>* [ $ | <die>]
+    (^ <shebang>)? <token>* [ $ | <die>]
 }
 
 rule token {
-        | <Name>
-        | <keyword>
-        | <String>
-        | <Number>
-        | <punctuator>
+    | <Name>
+    | <keyword>
+    | <String>
+    | <Number>
+    | <punctuator>
 }
 
 token keyword {
-        | and
-        | break
-        | do
-        | elseif
-        | else
-        | end
-        | false
-        | for
-        | function
-        | if
-        | in
-        | local
-        | nil
-        | not
-        | or
-        | repeat
-        | return
-        | then
-        | true
-        | until
-        | while
+    | and
+    | break
+    | do
+    | elseif
+    | else
+    | end
+    | false
+    | for
+    | function
+    | if
+    | in
+    | local
+    | nil
+    | not
+    | or
+    | repeat
+    | return
+    | then
+    | true
+    | until
+    | while
 }
 
 token punctuator {
-        | \+
-        | \-
-        | \#
-        | \*
-        | \/
-        | \%
-        | \^
-        | \.\.\.
-        | \.\.
-        | \.
-        | \<\=
-        | \<
-        | \>\=
-        | \>
-        | \=\=
-        | \~\=
-        | \=
-        | \,
-        | \;
-        | \:
-        | \(
-        | \)
-        | \{
-        | \}
-        | \[
-        | \]
+    | \+
+    | \-
+    | \#
+    | \*
+    | \/
+    | \%
+    | \^
+    | \.\.\.
+    | \.\.
+    | \.
+    | \<\=
+    | \<
+    | \>\=
+    | \>
+    | \=\=
+    | \~\=
+    | \=
+    | \,
+    | \;
+    | \:
+    | \(
+    | \)
+    | \{
+    | \}
+    | \[
+    | \]
 }
 
 =head1 AUTHOR

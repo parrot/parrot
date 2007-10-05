@@ -5,7 +5,7 @@ RM_F    = @rm_f@
 PERL    = @perl@
 PARROT  = ../../parrot@exe@
 PBC_MERGE = ../../pbc_merge@exe@
-PGE      = $(PARROT) ../../compilers/pge/pgc.pir
+PGE      = $(PARROT) ../../runtime/parrot/library/PGE/Perl6Grammar.pir
 TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl

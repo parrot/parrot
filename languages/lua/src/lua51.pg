@@ -17,189 +17,189 @@ in the lua distribution.
 grammar Lua::Grammar;
 
 token TOP {
-  ^ <shebang>? <block> <eof>
+    ^ <shebang>? <block> <eof>
 }
 
 rule block {
-  [ <statement> <';'>? ]*
+    [ <statement> ';'? ]*
 }
 
 rule statement {
-  | <expression_stat>
-  | <if_stat>
-  | <while_stat>
-  | <do_block>
-  | <for_stat>
-  | <repeat_stat>
-  | <function_stat>
-  | <local_stat>
-  | <return_statement>
-  | <break_statement>
-  | <unexpected>
+    | <expression_stat>
+    | <if_stat>
+    | <while_stat>
+    | <do_block>
+    | <for_stat>
+    | <repeat_stat>
+    | <function_stat>
+    | <local_stat>
+    | <return_statement>
+    | <break_statement>
+    | <unexpected>
 }
 
 
 rule expression_stat {
-  <primary_expression> <assignment>?
+    <primary_expression> <assignment>?
 }
 
 rule assignment {
-  | <','> <primary_expression> <assignment>
-  | <'='> <expression_list>
+    | ',' <primary_expression> <assignment>
+    | '=' <expression_list>
 }
 
 rule expression_list {
-  <expression> [ <','> <expression> ]*
+    <expression> [ ',' <expression> ]*
 }
 
 
 rule if_stat {
-  <'if'> <expression> <?then> <block> <elseif_block>* <else_block>? <?end>
+    'if' <expression> <?then> <block> <elseif_block>* <else_block>? <?end>
 }
 
 rule elseif_block {
-  <'elseif'> <expression> <?then> <block>
+    'elseif' <expression> <?then> <block>
 }
 
 rule else_block {
-  <'else'> <block>
+    'else' <block>
 }
 
 
 rule while_stat {
-  <'while'> <expression> <?do> <block> <?end>
+    'while' <expression> <?do> <block> <?end>
 }
 
 
 rule do_block {
-  <'do'> <block> <?end>
+    'do' <block> <?end>
 }
 
 
 rule for_stat {
-  <'for'> [ <fornum> | <forlist> ] <for_body>
+    'for' [ <fornum> | <forlist> ] <for_body>
 }
 
 rule fornum {
-  <name> <'='> <expression> <?comma> <expression> [ <','> <expression> ]?
+    <name> '=' <expression> <?comma> <expression> [ ',' <expression> ]?
 }
 
 rule forlist {
-  <name_list> <?in> <expression_list>
+    <name_list> <?in> <expression_list>
 }
 
 rule for_body {
-  <?do> <block> <?end>
+    <?do> <block> <?end>
 }
 
 
 rule repeat_stat {
-  <'repeat'> <block> <?until> <expression>
+    'repeat' <block> <?until> <expression>
 }
 
 
 rule function_stat {
-  <'function'> <functionname> <function_body>
+    'function' <functionname> <function_body>
 }
 
 rule functionname {
-  <name> [ <'.'> <name> ]* [ <':'> <name> ]?
+    <name> [ '.' <name> ]* [ ':' <name> ]?
 }
 
 rule function_body {
-  <'('> <parameter_list> <?closeparen> <block> <?end>
+    '(' <parameter_list> <?closeparen> <block> <?end>
 }
 
 rule parameter_list {
-  | <name_list> [ <','> <vararg> ]?
-  | <vararg>?
+    | <name_list> [ ',' <vararg> ]?
+    | <vararg>?
 }
 
 rule name_list {
-  <name> [ <','> <name> ]*
+    <name> [ ',' <name> ]*
 }
 
 
 rule local_stat {
-  <'local'> [ <local_function> | <local_declaration> ]
+    'local' [ <local_function> | <local_declaration> ]
 }
 
 rule local_function {
-  <'function'> <name> <function_body>
+    'function' <name> <function_body>
 }
 
 rule local_declaration {
-  <name> [ <','> <name> ]* [ <'='> <expression_list> ]?
+    <name> [ ',' <name> ]* [ '=' <expression_list> ]?
 }
 
 
 rule return_statement {
-  <'return'> <expression_list>?
+    'return' <expression_list>?
 }
 
 
 token break_statement {
-  <'break'>
+    'break'
 }
 
 
 rule constructor {
-  <'{'> <tablefieldlist>? <?closebrace>
+    '{' <tablefieldlist>? <?closebrace>
 }
 
 rule tablefieldlist {
-  <tablefield> [ <[,;]> <tablefield> ]* <[,;]>?
+    <tablefield> [ <[,;]> <tablefield> ]* <[,;]>?
 }
 
 rule tablefield {
-  <record_field> | <expression>
+    <record_field> | <expression>
 }
 
 rule record_field {
-  [ <name> | <index> ] <'='> <expression>
+    [ <name> | <index> ] '=' <expression>
 }
 
 rule index {
-  <'['> <expression> <?closebracket>
+    '[' <expression> <?closebracket>
 }
 
 
 rule primary_expression {
-  <prefix_expression> <slice_expression>*
+    <prefix_expression> <slice_expression>*
 }
 
 rule prefix_expression {
-  | <parenthesed_expression>
-  | <name>
+    | <parenthesed_expression>
+    | <name>
 }
 
 rule parenthesed_expression {
-  <'('> <expression> <?closeparen>
+    '(' <expression> <?closeparen>
 }
 
 rule slice_expression {
-  | <'.'> <name>
-  | <index>
-  | <':'> <name> <function_args>
-  | <function_args>
+    | '.' <name>
+    | <index>
+    | ':' <name> <function_args>
+    | <function_args>
 }
 
 rule function_args {
-  | <'('> <expression_list>? <?closeparen>
-  | <constructor>
-  | <string>
+    | '(' <expression_list>? <?closeparen>
+    | <constructor>
+    | <string>
 }
 
 rule simple_expression {
-  | <number>
-  | <string>
-  | <nil>
-  | <true>
-  | <false>
-  | <vararg>
-  | <constructor>
-  | <'function'> <function_body>
-  | <primary_expression>
+    | <number>
+    | <string>
+    | <nil>
+    | <true>
+    | <false>
+    | <vararg>
+    | <constructor>
+    | 'function' <function_body>
+    | <primary_expression>
 }
 
 
@@ -212,39 +212,39 @@ not all over the grammar, but only in these rules.
 =cut
 
 rule do {
-  <'do'> | <syntaxerror: 'do' expected>
+    'do' | <syntaxerror: 'do' expected>
 }
 
 rule then {
-  <'then'> | <syntaxerror: 'then' expected>
+    'then' | <syntaxerror: 'then' expected>
 }
 
 rule end {
-  <'end'> | <syntaxerror: 'end' expected>
+    'end' | <syntaxerror: 'end' expected>
 }
 
 rule until {
-  <'until'> | <syntaxerror: 'until' expected>
+    'until' | <syntaxerror: 'until' expected>
 }
 
 rule comma {
-  <','> | <syntaxerror: ',' expected>
+    ',' | <syntaxerror: ',' expected>
 }
 
 rule in {
-  <'in'> | <syntaxerror: 'in' expected>
+    'in' | <syntaxerror: 'in' expected>
 }
 
 rule closebracket {
-  <']'>  | <syntaxerror: ']' expected>
+    ']'  | <syntaxerror: ']' expected>
 }
 
 rule closebrace {
-  <'}'> | <syntaxerror: '}' expected>
+    '}' | <syntaxerror: '}' expected>
 }
 
 rule closeparen {
-  <')'> | <syntaxerror: ')' expected>
+    ')' | <syntaxerror: ')' expected>
 }
 
 
@@ -256,40 +256,40 @@ F<languages/lua/src/lua51.pir>.
 =cut
 
 token string {
-  | \" <quoted_literal: "> \"
-  | \' <quoted_literal: '> \'
-  | <long_string>
+    | \" <quoted_literal: "> \"
+    | \' <quoted_literal: '> \'
+    | <long_string>
 }
 
 token nil {
-  <'nil'>
+    'nil'
 }
 
 token true {
-  <'true'>
+    'true'
 }
 
 token false {
-  <'false'>
+    'false'
 }
 
 token vararg {
-  <'...'>
+    '...'
 }
 
 token ws {
     [ \s+
-    | <'--'> <long_comment>
-    | <'--'> \N*
+    | '--' <long_comment>
+    | '--' \N*
     ]*
 }
 
 token eof {
-  $ | <syntaxerror: 'eof' expected>
+    $ | <syntaxerror: 'eof' expected>
 }
 
 token shebang {
-    <'#'> \N*
+    '#' \N*
 }
 
 =head2 EXPRESSIONS
