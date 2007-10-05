@@ -75,14 +75,14 @@ Opens the file with the given mode, using the given IO layer.
             ParrotIO * const io = (ParrotIO *)PMC_data(pio);
             const int is_mmap   = strcmp(c_layer, "mmap") == 0;
 
-            /* XXX move this into the layer */
+            /* RT#46079 move this into the layer */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
                 l = interp->piodata->default_stack;
 
                 if (strcmp(l->name, "buf") == 0)
                     l = l->down;
 
-                /* XXX layer is stored twice - which is used when */
+                /* RT#46081 layer is stored twice - which is used when */
                 io->stack           = l;
                 PMC_struct_val(pio) = l;
 
@@ -96,9 +96,9 @@ Opens the file with the given mode, using the given IO layer.
             }
         }
 
+        /* RT#46083 leaks as in ops/io.ops: open */
         string_cstring_free(c_layer);
 
-        /* XXX leaks as in ops/io.ops: open */
         return pio;
     }
 
@@ -283,7 +283,7 @@ This does B<not> close the file.
 
             string_cstring_free(path);
 
-            /* TODO handle stdin */
+            /* RT#46085 handle stdin */
             result = PIO_reads(INTERP, pio, size);
             PIO_close(INTERP, pio);
             return result;
@@ -326,11 +326,11 @@ Flushes pending writes.
 
 =item C<METHOD INTVAL setbuf(INTVAL)>
 
-XXX TBD
+RT#46087 TBD
 
 =item C<METHOD INTVAL setlinebuf()>
 
-XXX TBD
+RT#46089 TBD
 
 =cut
 
