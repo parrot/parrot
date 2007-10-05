@@ -7,23 +7,12 @@ RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
 CP       = @cp@
-BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-O        = @o@
-LOAD_EXT = @load_ext@
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
-PMCDIR   = PGE/pmc
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
 
 # the default target
-all: $(PMCDIR)/pge_group$(LOAD_EXT) $(PARROT_LIBRARY)/PGE.pbc 
-
-PMCS = \
-	codestring
-
-PMC_SOURCES = \
-	$(PMCDIR)/codestring.pmc
+all: $(PARROT_LIBRARY)/PGE.pbc
 
 SOURCES = PGE.pir \
   PGE/Exp.pir \
@@ -45,12 +34,6 @@ PGE.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
 	$(PARROT) pgc.pir  --output=PGE/builtins_gen.pir PGE/builtins.pg
 	$(PARROT) -o PGE.pbc --output-pbc PGE.pir
-
-$(PMCDIR)/pge_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
-	(cd $(PMCDIR) && $(BUILD) generate $(PMCS))
-	(cd $(PMCDIR) && $(BUILD) compile $(PMCS))
-	(cd $(PMCDIR) && $(BUILD) linklibs $(PMCS))
-	(cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS))
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -87,17 +70,7 @@ clean: testclean
 	$(RM_RF) \
     PGE.pbc \
     $(PARROT_LIBRARY)/PGE.pbc \
-    PGE/builtins_gen.pir \
-    $(PMCDIR)/*.h \
-    $(PMCDIR)/*.c \
-    $(PMCDIR)/*.dump \
-    $(PMCDIR)/*.pdb \
-    $(PMCDIR)/*.lib \
-    $(PMCDIR)/*.exp \
-    $(PMCDIR)/*.ilk \
-    $(PMCDIR)/*.manifest \
-    $(PMCDIR)/*$(O) \
-    $(PMCDIR)/*$(LOAD_EXT)
+    PGE/builtins_gen.pir
 
 realclean: clean
 	$(RM_RF) Makefile
