@@ -146,7 +146,6 @@ tree as a PIR code object that can be compiled.
       .sub '%0_corou'
           .param pmc mob       :unique_reg
           .param pmc adverbs   :unique_reg
-          .local pmc newfrom   :unique_reg
           .local string target :unique_reg
           .local pmc mfrom, mpos :unique_reg
           .local int cpos, iscont :unique_reg
@@ -164,7 +163,6 @@ tree as a PIR code object that can be compiled.
       .sub '%0'
           .param pmc mob          :unique_reg
           .param pmc adverbs      :unique_reg :slurpy :named
-          .local pmc newfrom      :unique_reg
           .local string target    :unique_reg
           .local pmc mfrom, mpos  :unique_reg
           .local int cpos, iscont :unique_reg
@@ -690,8 +688,7 @@ tree as a PIR code object that can be compiled.
     code.emit(<<"        CODE", captgen, captsave, captback, 'E'=>explabel, args :flat :named)
         %L: # capture 
           %0
-          (captob, $S99, $P1) = captscope.'newfrom'(pos)
-          $P1 = pos
+          captob = captscope.'new'(captscope, 'pos'=>pos)
           push gpad, captscope
           push gpad, captob
           %Xcaptscope = captob
@@ -771,8 +768,8 @@ tree as a PIR code object that can be compiled.
     grammar = substr subname, 0, $I0
     code.emit(<<"        CODE", grammar, rname, args :flat :named)
         %L: # grammar subrule %0::%1
-          (captob, $P9, $P9, $P0) = captscope.'newfrom'(pos, '%0')
-          $P0 = pos
+          captob = captscope.'new'(captscope, 'grammar'=>'%0')
+          captob.'to'(pos)
           $P0 = get_hll_global ['%0'], '%1'
         CODE
     goto subrule_match
