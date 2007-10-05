@@ -47,18 +47,17 @@ of the match.
   iter_end:
 
     # get a copy of the match object
-    .local pmc newfrom, mfrom, mpos
     .local string target
-    newfrom = find_global 'PGE::Match', 'newfrom'
-    (mob, target, mfrom, mpos) = newfrom(mob, 0)
+    .local int pos
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(mob)
     $I0 = length message
     dec $I0
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
     if $I0 goto throw_message
 
-    .local int pos, lines
+    .local int lines
     .local pmc line_number
-    pos = mfrom
     #  FIXME: use 'line_number' method instead?
     line_number = get_hll_global ['PGE::Util'], 'line_number'
     (lines) = mob.line_number(pos)
@@ -82,7 +81,7 @@ of the match.
     $P0['_message'] = message
     throw $P0
 
-    mpos = -3
+    mob.'to'(-3)
     .return (mob)
 .end
 
@@ -109,18 +108,17 @@ Emits the list of messages to stderr.
   iter_end:
 
     # get a copy of the match object
-    .local pmc newfrom, mfrom, mpos
     .local string target
-    newfrom = find_global 'PGE::Match', 'newfrom'
-    (mob, target, mfrom, mpos) = newfrom(mob, 0)
+    .local int pos
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(mob)
     $I0 = length message
     dec $I0
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
     if $I0 goto emit_message
 
-    .local int pos, lines
+    .local int lines
     .local pmc line_number
-    pos = mfrom
     #  FIXME: use 'line_number' method instead?
     line_number = get_hll_global ['PGE::Util'], 'line_number'
     (lines) = mob.line_number(pos)
@@ -132,7 +130,7 @@ Emits the list of messages to stderr.
   emit_message:
     printerr message
 
-    assign mpos, mfrom
+    mob.'to'(pos)
     .return (mob)
 .end
 
