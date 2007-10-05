@@ -39,7 +39,18 @@ Currently no C APIs are deprecated.
 
 =head1 Deprecated methods
 
-Currently no methods are deprecated.
+=over 4
+
+=item C<newfrom> sub/method in PGE
+
+The C<newfrom> method in PGE is now deprecated.  Use C<new> instead.
+To get access to the C<new> method when a Match object isn't available,
+use the PGE::Match protoobject (available in the C<PGE> namespace):
+
+    $P0 = get_hll_global ['PGE'], 'Match'
+    object = $P0.'new'(...)
+
+=back
 
 =head1 Deprecated ops
 
