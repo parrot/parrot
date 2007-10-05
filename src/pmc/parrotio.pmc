@@ -68,8 +68,10 @@ Opens the file with the given mode, using the given IO layer.
         string_cstring_free(c_file);
         string_cstring_free(c_mode);
 
-        if (!pio || !PMC_struct_val(pio))
+        if (!pio || !PMC_struct_val(pio)) {
+            string_cstring_free(c_layer);
             return pmc_new(INTERP, enum_class_Undef);
+        }
 
         if (l) {
             ParrotIO * const io = (ParrotIO *)PMC_data(pio);
