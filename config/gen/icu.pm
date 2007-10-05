@@ -31,7 +31,15 @@ $description = "Determining whether ICU is installed";
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $icushared, $icuheaders, $icuconfig, $without ) = $conf->options->get(@args);
+    my ( $verbose, $icushared, $icuheaders, $icuconfig, $without ) =
+        $conf->options->get( qw|
+            verbose
+            icushared
+            icuheaders
+            icu-config
+            without-icu
+        |
+    );
 
     my @icu_headers = qw(ucnv.h utypes.h uchar.h);
     my $autodetect  = !defined($icushared)
