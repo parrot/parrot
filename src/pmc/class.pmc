@@ -714,6 +714,9 @@ Adds the given sub PMC as a vtable override with the given name.
                 break;
             }
         }
+
+        string_cstring_free(c_name);
+
         if (!found)
             real_exception(interp, NULL, METH_NOT_FOUND,
                 "'%S' is not a valid vtable function name.", name);
