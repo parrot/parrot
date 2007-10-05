@@ -146,8 +146,8 @@ the output to the correct output file.
 
     # get our initial match object
     .local pmc match
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    match = $P0(source, 0, 'PGE::Perl6Grammar')
+    $P0 = get_hll_global ['PGE'], 'Match'
+    match = $P0.'new'(source, 'grammar'=>'PGE::Perl6Grammar')
 
     .local pmc stmtrule
     stmtrule = get_hll_global ['PGE::Perl6Grammar'], 'statement'
