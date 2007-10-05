@@ -65,7 +65,7 @@ sub _save_set {
     my %regs = %{ $self->{regs} };
     for my $type ( keys %regs ) {
         for my $count ( 0 .. 31 ) {
-            $self->_add_inst( '', 'save', ["$type$count"] )
+            $self->_add_inst( '#', 'save', ["$type$count"] )
                 if $regs{$type}->{$count};
         }
     }
@@ -107,7 +107,7 @@ sub _restore_set {
 
     for my $type ( reverse keys %regs ) {
         for ( my $count = 31 ; $count >= 0 ; $count-- ) {
-            $self->_add_inst( '', 'restore', ["$type$count"] )
+            $self->_add_inst( '#', 'restore', ["$type$count"] )
                 if $regs{$type}->{$count};
         }
     }
@@ -145,6 +145,15 @@ sub _find_lex {
 
     my $return = $self->_save_1('P');
     $self->_add_inst( '', 'find_lex', [ $return, "\"$symbol\"" ] );
+
+    return $return;
+}
+
+sub _find_name {
+    my ( $self, $symbol ) = @_;
+
+    my $return = $self->_save_1('P');
+    $self->_add_inst( '', 'find_name', [ $return, qq{"$symbol"} ] );
 
     return $return;
 }
@@ -2009,7 +2018,7 @@ sub _call_function_sym {
     my $self     = shift;
     my $symbol   = shift;
 
-    my $func_obj = $self->_find_lex($symbol);
+    my $func_obj = $self->_find_name($symbol);
 
     my $scope = $self->{scope};
 
@@ -2037,6 +2046,7 @@ sub _call_function_obj {
 
     my $count = 5;
     my $empty = $return;
+    my @args;
     while ( my $arg = shift ) {
         if ( $arg ne "P$count" ) {
             if ( $arg =~ /^[INS]/ ) {
@@ -2054,18 +2064,17 @@ sub _call_function_obj {
                 }
             }
             if ($moved) {
-                $self->_add_inst( '', 'set', [ $empty, "P$count" ] );
+                push @args, $count;
                 $empty = $moved;
             }
             $self->_add_inst( '', 'set', [ "P$count", $arg ] );
+            push @args, $count;
         }
         $count++;
     }
 
-    $self->_add_inst( '', 'set', [ 'P0', $func_obj ] ) unless $func_obj eq 'P0';
-    $self->_add_inst( '', 'set', [ 'I0', 0 ] );             # Pass all args in Px registers
-    $self->_add_inst( '', 'set', [ 'I3', $count - 5 ] );    # Tell about number of registers
-    $self->_add_inst( '', 'invokecc' );
+    $self->_add_inst( '', 'set_args', [ q{"} . join( q{,}, q{0} x scalar(@args) ) . q{"}, join( q{,}, map { "P$_" } @args ) ] );    
+    $self->_add_inst( '', 'invokecc', [ $func_obj ] );
     $self->_add_inst( '', 'set', [ $return, 'P5' ] ) unless $return eq 'P5';
     $self->_restore_set;
 
@@ -2184,6 +2193,7 @@ sub generate {
 
     $self->_add_inst( '', '.end' );
 
+    # die Dumper( $self );
     $self->_format_columns();
 
     # not need any more

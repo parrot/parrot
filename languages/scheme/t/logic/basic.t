@@ -8,23 +8,28 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-#use Test::More tests => 7;
-use Test::More skip_all => 'Using obsolete calling conventions';
+use Test::More tests => 7;
+
 use Parrot::Test;
 
 ###
 ### If
 ###
 
-output_is( <<'CODE', 1, 'basic if - Fail' );
+language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Fail' );
 (write (if (= 1 1) 1 0))
 CODE
 
-output_is( <<'CODE', 1, 'basic if - Pass' );
+
+SKIP:
+{
+  skip( "adaption to calling converions is underway", 6 );
+
+language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Pass' );
 (write (if (= 0 1) 0 1))
 CODE
 
-output_is( <<'CODE', 7, 'slightly more complex if' );
+language_output_is( 'Scheme', <<'CODE', 7, 'slightly more complex if' );
 (write (if (= 9 9) 7 -23))
 CODE
 
@@ -32,11 +37,11 @@ CODE
 ### And
 ###
 
-output_is( <<'CODE', 1, 'basic and - Pass' );
+language_output_is( 'Scheme', <<'CODE', 1, 'basic and - Pass' );
 (write (and 1 1))
 CODE
 
-output_is( <<'CODE', 0, 'basic and - Fail' );
+language_output_is( 'Scheme', <<'CODE', 0, 'basic and - Fail' );
 (write (and 0 1))
 CODE
 
@@ -44,13 +49,15 @@ CODE
 ### Or
 ###
 
-output_is( <<'CODE', 1, 'basic or - Pass' );
+language_output_is( 'Scheme', <<'CODE', 1, 'basic or - Pass' );
 (write (or 1 1))
 CODE
 
-output_is( <<'CODE', 0, 'basic or - Fail' );
+language_output_is( 'Scheme', <<'CODE', 0, 'basic or - Fail' );
 (write (or 0 0))
 CODE
+
+}
 
 
 # Local Variables:
