@@ -324,7 +324,7 @@ Return a failed match if the stoptoken is found.
   term_literal:
     $S0 = substr target, pos, litlen
     pos += litlen
-    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     mob.'result_object'($S0)
     mob.'to'(pos)
     .return (mob)
@@ -333,7 +333,7 @@ Return a failed match if the stoptoken is found.
     .return 'parse_term_ws'(mob)
 
   end_noterm:
-    (mob) = mob.newfrom(0, 'PGE::Exp::Literal')
+    (mob) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     .return (mob)
 .end
 
@@ -362,7 +362,7 @@ Parses terms beginning with backslash.
     if $I0 goto term_metachar
   quoted_metachar:
     inc pos
-    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     mob.'result_object'(initchar)
     mob.'to'(pos)
     .return (mob)
@@ -384,13 +384,13 @@ Parses terms beginning with backslash.
     if $I0 > 1 goto term_charlist
 
   term_literal:
-    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::Literal')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     mob.'result_object'(charlist)
     mob.'to'(pos)
     .return (mob)
 
   term_charlist:
-    (mob, $S99, $P99, $P0) = mob.'newfrom'(0, 'PGE::Exp::EnumCharList')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     mob.'result_object'(charlist)
     mob['isnegated'] = isnegated
     mob.'to'(pos)
@@ -450,10 +450,8 @@ Parses a whitespace term.
 .sub 'parse_term_ws'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::WS')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
     lastpos = length target
 
   term_ws_loop:
@@ -475,7 +473,7 @@ Parses a whitespace term.
     if pos > 0 goto term_ws_loop
     pos = lastpos
   end:
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
@@ -490,14 +488,11 @@ combinations.
 .sub 'parse_quant'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local pmc key
     .local int pos, lastpos
     key = mob['KEY']
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Quant')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
     lastpos = length target
-
 
     .local int min, max, suffixpos
     .local string suffix
@@ -572,7 +567,7 @@ combinations.
   quant_set:
     mob['min'] = min
     mob['max'] = max
-    mpos = pos
+    mob.'to'(pos)
   end:
     .return (mob)
 
@@ -606,9 +601,7 @@ anchors, and match subscripts.
     .param pmc mob
     .local string target
     .local int pos, lastpos
-    .local pmc newfrom, mfrom, mpos
     .local string cname
-    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
     $P0 = getattribute mob, '$.target'
     target = $P0
     $P0 = getattribute mob, '$.pos'
@@ -622,32 +615,32 @@ anchors, and match subscripts.
     if $I0 > pos goto scalar
 
   eos_anchor:
-    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Anchor')
-    mpos = pos
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Anchor')
+    mob.'to'(pos)
     .return (mob)
 
   scalar:
-    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Scalar')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Scalar')
     dec pos
     $I1 = $I0 - pos
     cname = substr target, pos, $I1
     cname = concat '"', cname
     cname = concat cname, '"'
     mob["cname"] = cname
-    mpos = $I0
+    mob.'to'($I0)
     .return (mob)
 
   numeric:
-    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Scalar')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Scalar')
     $I1 = $I0 - pos
     cname = substr target, pos, $I1
     mob["cname"] = cname
-    mpos = $I0
+    mob.'to'($I0)
     .return (mob)
 
   name:
     inc pos
-    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, "PGE::Exp::Scalar")
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Scalar')
     $I0 = index target, ">", pos
     if $I0 < pos goto err_close
   name_1:
@@ -658,7 +651,7 @@ anchors, and match subscripts.
     cname = concat cname, '"'
     mob["cname"] = cname
     pos = $I0 + 1
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 
   err_close:
@@ -708,13 +701,12 @@ Parses a subrule token.
 .sub 'parse_subrule'
     .param pmc mob
     .local string target
-    .local pmc mobsave, mfrom, mpos
+    .local pmc mobsave
     .local int pos, lastpos
     .local string key
     key = mob['KEY']
     mobsave = mob
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Subrule')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
     lastpos = length target
 
     .local string subname
@@ -741,15 +733,15 @@ Parses a subrule token.
     if $S0 != ' ' goto subrule_end
   subrule_pattern_arg:
     inc pos
-    mpos = pos
+    mob.'to'(pos)
     .local pmc regex
     regex = get_global 'regex'
     $P1 = regex(mob, 'stop'=>'>')
     unless $P1 goto end
     $S0 = $P1
     mob['arg'] = $S0
-    pos = $P1.to()
-    mpos = -1
+    pos = $P1.'to'()
+    mob.'to'(-1)
     goto subrule_end
   subrule_text_arg:
     pos += 2
@@ -774,7 +766,7 @@ Parses a subrule token.
     $S0 = substr target, pos, 1
     if $S0 != '>' goto end
     inc pos
-    mpos = pos
+    mob.'to'(pos)
     $I0 = mob['iscapture']
     if $I0 == 0 goto end
     $S0 = escape subname
@@ -870,7 +862,7 @@ Extract an enumerated character list.
   enum_close:
     inc pos
     ##   create a node for the charlist
-    (term) = mob.'newfrom'(0, 'PGE::Exp::EnumCharList')
+    term = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     term.'to'(pos)
     term.'result_object'(charlist)
     goto combine
@@ -880,7 +872,7 @@ Extract an enumerated character list.
     .local string subname
     (subname, pos) = 'parse_subname'(target, $I0)
     if pos == $I0 goto err
-    (term) = mob.'newfrom'(0, 'PGE::Exp::Subrule')
+    term = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
     term.'from'($I0)
     term.'to'(pos)
     term['subname'] = subname
@@ -897,10 +889,10 @@ Extract an enumerated character list.
     term['iszerowidth'] = 1
     if op == '<!' goto combine_init
     ##   token is '<-', we need to match a char by concat dot
-    $P0 = mob.'newfrom'(0, 'PGE::Exp::CCShortcut')
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     $P0.'to'(pos)
     $P0.'result_object'('.')
-    mob = mob.'newfrom'(0, 'PGE::Exp::Concat')
+    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
     mob.'to'(pos)
     mob[0] = term
     mob[1] = $P0
@@ -912,7 +904,7 @@ Extract an enumerated character list.
 
   combine_plus:
     ##   <a+b>  ==>   <a> | <b>
-    ($P0) = mob.'newfrom'(0, 'PGE::Exp::Alt')
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Alt')
     $P0.'to'(pos)
     $P0[0] = mob
     $P0[1] = term
@@ -923,7 +915,7 @@ Extract an enumerated character list.
     ##   <a-b> ==>   <!b> <a>
     term['isnegated'] = 1
     term['iszerowidth'] = 1
-    ($P0) = mob.'newfrom'(0, 'PGE::Exp::Concat')
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
     $P0.'to'(pos)
     $P0[0] = term
     $P0[1] = mob
@@ -965,7 +957,7 @@ Parses '...' literals.
     .param pmc mob
     .local int pos, lastpos
     .local string target
-    (mob, target, pos) = mob.newfrom(0, 'PGE::Exp::Literal')
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     lastpos = length target
     lastpos -= 1
     .local string lit
@@ -1002,11 +994,9 @@ Parse a modifier.
     .param pmc mob
     .local int pos, lastpos
     .local string target, value
-    .local pmc mfrom, mpos
     .local string key
     key = mob['KEY']
-    (mob, target, mfrom, mpos) = mob.newfrom(0, 'PGE::Exp::Modifier')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Modifier')
     lastpos = length target
     value = "1"
     $I0 = pos
@@ -1031,20 +1021,16 @@ Parse a modifier.
     inc pos
   end:
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
 
 .sub 'parse_closure'
     .param pmc mob
-    .local pmc newfrom
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, len
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Closure")
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Closure')
     len = 2
   init:
     $S0 = substr target, pos, 1
@@ -1060,7 +1046,7 @@ Parse a modifier.
     $S1 = substr target, pos, $I1
     mob.'result_object'($S1)
     pos = $I0 + len
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
  err_noclose:
     parse_error(mob, pos, "Missing closing braces for closure")
@@ -1426,12 +1412,12 @@ Parse a modifier.
     goto end
 
   add_cgroup:
-    .local pmc cexp, mfrom, mpos
-    (cexp, $P99, mfrom, mpos) = self.newfrom(0, 'PGE::Exp::CGroup')
+    .local pmc cexp
+    cexp = self.'new'(self, 'grammar'=>'PGE::Exp::CGroup')
     $I0 = self.from()
-    mfrom = $I0
+    cexp.'from'($I0)
     $I0 = self.to()
-    mpos = $I0
+    cexp.'to'($I0)
     cexp[0] = exp1
     cexp['isscope'] = 0
     cexp['iscapture'] = 1
