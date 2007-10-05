@@ -53,8 +53,8 @@ documentation at L<http://www.json.org/>.
    .local pmc parse, match
    parse = get_root_global ['parrot'; 'JSON'], 'thing'
 
-   $P0 = get_root_global ['parrot'; 'PGE::Match'], 'newfrom'
-   match = $P0(json_string)
+   $P0 = get_root_global ['parrot'; 'PGE'], 'Match'
+   match = $P0.'new'(json_string)
    match.to(0)
    match = parse(match)
    unless match goto failed
