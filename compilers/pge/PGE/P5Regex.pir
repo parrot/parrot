@@ -127,14 +127,11 @@
 
 .sub "parse_lit"
     .param pmc mob
-    .local pmc newfrom
     .local string target
     .local int pos, lastpos
     .local int litstart, litlen
     .local string initchar
-    newfrom = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, $P0, $P1) = newfrom(mob, 0, "PGE::Exp::Literal")
-    pos = $P0
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     lastpos = length target
     initchar = substr target, pos, 1
     unless initchar == '*' goto initchar_ok
@@ -175,8 +172,7 @@
     mob.'result_object'($S0)
     goto end
   end:
-    $P0 = getattribute mob, "PGE::Match\x0$.pos"
-    $P0 = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
@@ -185,12 +181,9 @@
     .local string target
     .local int min, max, backtrack
     .local int pos, lastpos
-    .local pmc mfrom, mpos
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::Quant")
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
     lastpos = length target
     min = 0
     max = PGE_INF
@@ -232,7 +225,7 @@
     mob["min"] = min
     mob["max"] = max
     mob["backtrack"] = backtrack
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
   err_range:
     parse_error(mob, pos, "Error in quantified range")
@@ -242,11 +235,8 @@
 .sub parse_group
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::CGroup")
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CGroup')
     inc pos
     $S0 = substr target, pos, 2
     if $S0 == "?:" goto nocapture
@@ -254,22 +244,19 @@
   nocapture:
     pos += 2
   end:
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
 .sub "parse_enumclass"
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
     .local int isrange
     .local string charlist
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ["PGE::Match"], "newfrom"
-    (mob, target, mfrom, mpos) = $P0(mob, 0, "PGE::Exp::EnumCharList")
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     if key == '.' goto dot
     lastpos = length target
     charlist = ""
@@ -325,7 +312,7 @@
     charlist = "\n"
     mob["isnegated"] = 1
   end:
-    mpos = pos
+    mob.'to'(pos)
     mob.'result_object'(charlist)
     .return (mob)
 
