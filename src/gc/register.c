@@ -556,11 +556,17 @@ Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_
             /* can't probably PIO_eprintf here */
             const Parrot_sub * const doomed = PMC_sub(ctxp->current_sub);
 
-            fprintf(stderr, "[free  ctx %p of sub '%s']\n",
-                    (void *)ctxp,
-                    (doomed && doomed->name == (void*)0xdeadbeef
-                     ? "???"
-                     : (char*)doomed->name->strstart));
+            if (doomed) {
+                fprintf(stderr, "[free  ctx %p of sub '%s']\n",
+                        (void *)ctxp,
+                        (doomed->name == (void*)0xdeadbeef
+                        ? "???"
+                        : (char*)doomed->name->strstart));
+            }
+            else {
+                real_exception(interp, NULL, 1,
+                        "NULL doomed sub detected in Parrot_free_context");
+            }
         }
 #endif
         if (ctxp->n_regs_used) {
