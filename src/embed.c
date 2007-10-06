@@ -316,7 +316,7 @@ Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))
             return NULL;
         }
         /*
-         * TODO check for regular file
+         * RT#46153 check for regular file
          */
 
         program_size = Parrot_stat_info_intval(interp, fs, STAT_FILESIZE);
@@ -439,7 +439,7 @@ again:
         close(fd);   /* the man page states, it's ok to close a mmaped file */
     }
 #else
-/* XXX Parrot_exec uses this
+/* RT#46155 Parrot_exec uses this
     mem_sys_free(program_code); */
 #endif
 
