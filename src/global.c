@@ -87,6 +87,10 @@ internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
         if (str_key)
             part = str_key;
         else if (n == max_intval) {
+            if (!pmc_key) {
+                real_exception(interp, NULL, 1,
+                        "Passing a NULL pmc_key into key_string()");
+            }
             part = key_string(interp, pmc_key);
             pmc_key = key_next(interp, pmc_key);
             if (! pmc_key)
