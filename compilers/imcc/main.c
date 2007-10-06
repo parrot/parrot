@@ -832,6 +832,10 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
 
     /* Produce a PBC output file, if one was requested */
     if (write_pbc) {
+        if (!output_file) {
+            IMCC_fatal_standalone(interp, 1,
+                    "main: NULL output_file when trying to write .pbc\n");
+        }
         imcc_write_pbc(interp, output_file);
 
         /* If necessary, load the file written above */
