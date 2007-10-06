@@ -60,7 +60,7 @@ foreach my $file (@files) {
 
 my $num_failed_files = scalar keys %failed_files;
 ok( !scalar(@fixme), 'FIXME strings' )
-    or diag( "FIXME strings found in " . scalar @fixme 
+    or diag( "FIXME strings found in " . scalar @fixme
         . " instances in " . $num_failed_files . " files:\n@fixme" );
 
 # Local Variables:
