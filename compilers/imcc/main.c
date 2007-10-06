@@ -461,7 +461,7 @@ do_pre_process(PARROT_INTERP)
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            /* TODO: print out more information about the macro */
+            /* RT#46147: print out more information about the macro */
             /* case MACRO:         yylex(&val, interp, yyscanner);
                                 break; */ /* swallow nl */
             case MACRO:         printf(".macro "); break;
@@ -623,7 +623,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, NOTNULL(const char *output_file),
     /* runs :init functions */
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
-    /* XXX no return value :-( */
+    /* RT#46149 no return value :-( */
     Parrot_runcode(interp, argc, argv);
 }
 
