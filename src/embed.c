@@ -378,6 +378,12 @@ again:
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 
+        /* check that fullname isn't NULL, just in case */
+        if (!fullname) {
+            real_exception(interp, NULL, 1,
+                    "About to try and open a NULL filename");
+        }
+
         fd = open(fullname, O_RDONLY | O_BINARY);
         if (!fd) {
             PIO_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
