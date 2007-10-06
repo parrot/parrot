@@ -103,13 +103,13 @@ internal_ns_keyed(PARROT_INTERP, NOTNULL(PMC *base_ns), NULLOK(PMC *pmc_key),
         sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
 
         if (PMC_IS_NULL(sub_ns)
-            /* TODO - stop depending on typed namespace */
+            /* RT#46157 - stop depending on typed namespace */
             || sub_ns->vtable->base_type != enum_class_NameSpace)
         {
             if (!(flags & INTERN_NS_CREAT))
                 return PMCNULL;
 
-            /* TODO - match HLL of enclosing namespace? */
+            /* RT#46159 - match HLL of enclosing namespace? */
             sub_ns = pmc_new(interp,
                              Parrot_get_ctx_HLL_type(interp,
                                                      enum_class_NameSpace));
@@ -303,7 +303,7 @@ Parrot_set_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname), NU
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
 
-XXX - For now this function prefers non-namespaces, it will eventually
+RT#46161 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =item C<Parrot_find_global_k>
@@ -312,7 +312,7 @@ Search the namespace designated by C<pmc_key>, which may be a key PMC,
 an array of namespace name strings, or a string PMC, for an object
 with name C<globalname>.  Return the object, or NULL if not found.
 
-XXX - For now this function prefers non-namespaces, it will eventually
+RT#46161 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =item C<Parrot_find_global_s>
@@ -321,7 +321,7 @@ Search the namespace designated by C<str_key>, or the HLL root if
 C<str_key> is NULL, for an object with name C<globalname>.  Return the
 object, or NULL if not found.
 
-XXX - For now this function prefers non-namespaces, it will eventually
+RT#46161 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =cut
@@ -345,7 +345,7 @@ Parrot_find_global_n(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))
         res = PMCNULL;
     else {
         /*
-         * XXX - we should be able to use 'get_pmc_keyed' here,
+         * RT#46163 - we should be able to use 'get_pmc_keyed' here,
          * but we can't because Parrot's default namespaces are not
          * fully typed and there's a pseudo-typed interface that
          * distinguishes 'get_pmc_keyed' from 'get_pointer_keyed';
@@ -405,7 +405,7 @@ Store the PMC C<val> into the namespace designated by C<pmc_key>,
 which may be a key PMC, an array of namespace name strings, or a
 string PMC, with name C<globalname>.
 
-XXX - For now this function prefers non-namespaces, it will eventually
+RT#46161 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =item C<Parrot_store_global_s>
@@ -441,7 +441,7 @@ Parrot_store_global_cur(PARROT_INTERP, NULLOK(STRING *globalname), NULLOK(PMC *v
                           CONTEXT(interp->ctx)->current_namespace,
                           globalname, val);
 
-    /* FIXME - method cache invalidation should occur */
+    /* RT#46165 - method cache invalidation should occur */
 }
 
 PARROT_API
@@ -452,7 +452,7 @@ Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
     PMC *ns;
 
     /*
-     * XXX - temporary hack to notice when key is actually a string, so that
+     * RT#46167 - temporary hack to notice when key is actually a string, so that
      * the legacy logic for invalidating method cache will be called; this is
      * not good enough but it avoids regressesions for now
      */
@@ -468,7 +468,7 @@ Parrot_store_global_k(PARROT_INTERP, NOTNULL(PMC *pmc_key),
 
     Parrot_store_global_n(interp, ns, globalname, val);
 
-    /* FIXME - method cache invalidation should occur */
+    /* RT#46165 - method cache invalidation should occur */
 }
 
 PARROT_API
@@ -482,7 +482,7 @@ Parrot_store_global_s(PARROT_INTERP, NULLOK(STRING *str_key),
 
     Parrot_store_global_n(interp, ns, globalname, val);
 
-    /* FIXME - method cache invalidation should be a namespace function */
+    /* RT#46169 - method cache invalidation should be a namespace function */
     Parrot_invalidate_method_cache(interp, str_key, globalname);
 }
 
@@ -523,7 +523,7 @@ Parrot_find_global_op(PARROT_INTERP, NOTNULL(PMC *ns),
 
 =item C<Parrot_find_name_op>
 
-TODO - THIS IS BROKEN - it doesn't walk up the scopes yet - TODO
+RT#46171 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
@@ -548,7 +548,7 @@ Parrot_find_name_op(PARROT_INTERP, NOTNULL(STRING *name), SHIM(void *next))
     else
         g = PMCNULL;
 
-    /* TODO TODO TODO - walk up the scopes!  duh!! */
+    /* RT#46171 - walk up the scopes!  duh!! */
 
     if (PMC_IS_NULL(g))
         g = Parrot_find_global_cur(interp, name);
