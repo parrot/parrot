@@ -398,7 +398,7 @@ PDB_get_command(PARROT_INTERP)
 
     i = 0;
 
-    /* XXX who frees that */
+    /* RT#46109 who frees that */
     /* need to allocate 256 chars as string is null-terminated i.e. 255 + 1*/
     c = (char *)mem_sys_allocate(256);
 
@@ -464,10 +464,10 @@ PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
             continue;
 
         buf[strlen(buf)-1]='\0';
-        /* TODO: handle command error and print out script line
+        /* RT#46117: handle command error and print out script line
          *       PDB_run_command should return non-void value?
          *       stop execution of script if fails
-         * TODO: avoid this verbose output? add -v flag? */
+         * RT#46115: avoid this verbose output? add -v flag? */
         if (PDB_run_command(interp, buf)) {
             IMCC_warning(interp, "script_file: "
                 "Error interpreting command at line %d (%s).\n",
@@ -628,7 +628,7 @@ PDB_next(PARROT_INTERP, NULLOK(const char *command))
     /* If program ended */
 
     /*
-     * FIXME this doesn't handle resume opcodes
+     * RT#46119 this doesn't handle resume opcodes
      */
     if (!pdb->cur_opcode)
         (void)PDB_program_end(interp);
@@ -739,7 +739,7 @@ PDB_cond(PARROT_INTERP, NOTNULL(const char *command))
      * condition. */
     command++;
 
-    /* XXX Does /this/ have to do with the fact that PASM registers used to have
+    /* RT#46121 Does /this/ have to do with the fact that PASM registers used to have
      * maximum of 2 digits? If so, there should be a while loop, I think.
      */
     if (condition->reg > 9)
@@ -862,7 +862,7 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_pmc) {
-        /* XXX Need to figure out what to do in this case.
+        /* RT#46123 Need to figure out what to do in this case.
          * For the time being, we just bail. */
         PIO_eprintf(interp, "Can't compare PMC with constant\n");
         mem_sys_free(condition);
@@ -1284,7 +1284,7 @@ PDB_check_condition(PARROT_INTERP, NOTNULL(PDB_condition_t *condition))
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
         /*
-         * TODO verify register is in range
+         * RT#46125 verify register is in range
          */
         i = REG_INT(interp, condition->reg);
 
@@ -1845,7 +1845,7 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         if (!(pline)) {
             PIO_eprintf(interp,
                         "Label number %li out of bounds.\n", label->number);
-            /* TODO: free allocated memory */
+            /* RT#46127: free allocated memory */
             return;
         }
 
@@ -2045,7 +2045,7 @@ PDB_load_source(PARROT_INTERP, NOTNULL(const char *command))
 
 Return true if the line has an instruction.
 
-XXX TODO:
+RT#46129:
 
 =over 4
 
@@ -2075,7 +2075,7 @@ PDB_hasinstruction(NOTNULL(const char *c))
             h = 1;
         }
         else if (*c == ':') {
-            /* this is a label. XXX right? */
+            /* this is a label. RT#46137 right? */
             h = 0;
         }
 
@@ -2615,7 +2615,7 @@ PDB_backtrace(PARROT_INTERP)
  *
  * GDB_P  gdb> pp $I0   print register I0 value
  *
- * TODO more, more
+ * RT46139 more, more
  */
 
 PARROT_WARN_UNUSED_RESULT
@@ -2653,14 +2653,14 @@ GDB_P(PARROT_INTERP, NOTNULL(const char *s))
     return "no such reg";
 }
 
-/* TODO move these to debugger interpreter
+/* RT#46141 move these to debugger interpreter
  */
 static PDB_breakpoint_t *gdb_bps;
 
 /*
  * GDB_pb   gdb> pb 244     # set breakpoint at opcode 244
  *
- * XXX We can't remove the breakpoint yet, executing the next ins
+ * RT#46143 We can't remove the breakpoint yet, executing the next ins
  * most likely fails, as the length of the debug-brk stmt doesn't
  * match the old opcode
  * Setting a breakpoint will also fail, if the bytecode os r/o
@@ -2674,7 +2674,7 @@ GDB_B(PARROT_INTERP, NOTNULL(char *s)) {
 
     if ((unsigned long)s < 0x10000) {
         /* HACK alarm  pb 45 is passed as the integer not a string */
-        /* TODO check if in bounds */
+        /* RT#46145 check if in bounds */
         pc = interp->code->base.data + (unsigned long)s;
 
         if (!gdb_bps) {
