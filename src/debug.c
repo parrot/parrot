@@ -399,7 +399,8 @@ PDB_get_command(PARROT_INTERP)
     i = 0;
 
     /* XXX who frees that */
-    c = (char *)mem_sys_allocate(255);
+    /* need to allocate 256 chars as string is null-terminated i.e. 255 + 1*/
+    c = (char *)mem_sys_allocate(256);
 
     PIO_eprintf(interp, "\n(pdb) ");
 
