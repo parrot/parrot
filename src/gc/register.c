@@ -78,7 +78,7 @@ of all active continuations.
 [the code for this is incomplete; it had suffered some bit-rot and was
 getting in the way of maintaining the other case.  -- rgr, 4-Feb-06.]
 
-TODO GC has to lower this threshold when collecting continuations.
+RT#46177 GC has to lower this threshold when collecting continuations.
 
  CHUNKED_CTX_MEM = 0
 
@@ -219,7 +219,7 @@ parrot_gc_context(PARROT_INTERP)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
         sizeof (parrot_regs_t);
-    /* TODO */
+    /* RT#46187 */
 #else
     UNUSED(interp);
 #endif
@@ -255,7 +255,7 @@ clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40 we set int, num to garbage different garbage
-         * TODO remove this code for parrot 1.0
+         * RT#46179 remove this code for parrot 1.0
          */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -999;
@@ -288,20 +288,20 @@ static void
 init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
         NULLOK(const parrot_context_t *old))
 {
-    ctx->ref_count = 0;                 /* TODO 1 - Exceptions !!! */
+    ctx->ref_count = 0;                 /* RT#46191 1 - Exceptions !!! */
     ctx->current_results = NULL;
     ctx->results_signature = NULL;
     ctx->lex_pad = PMCNULL;
     ctx->outer_ctx = NULL;
     ctx->current_cont = NULL;
-    ctx->current_object = NULL; /* XXX who clears it?  */
+    ctx->current_object = NULL; /* RT#46181 who clears it?  */
     ctx->current_HLL = 0;
 
     if (old) {
         /* some items should better be COW copied */
         ctx->constants = old->constants;
-        ctx->reg_stack = old->reg_stack;     /* XXX move into interpreter? */
-        ctx->user_stack = old->user_stack;   /* XXX move into interpreter? */
+        ctx->reg_stack = old->reg_stack;     /* RT#46183 move into interpreter? */
+        ctx->user_stack = old->user_stack;   /* RT#46183 move into interpreter? */
         ctx->warns = old->warns;
         ctx->errors = old->errors;
         ctx->trace_flags = old->trace_flags;
@@ -436,7 +436,7 @@ Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
     void *ptr, *p;
 
     /*
-     * TODO (OPT) if we allocate a new context due to a self-recursive call
+     * RT#46185 (OPT) if we allocate a new context due to a self-recursive call
      *      create a specialized version that just uses caller's size
      */
     const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
