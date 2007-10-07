@@ -161,13 +161,14 @@ sub _find_name {
 sub _store_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    return $self->_add_inst( '', 'store_lex', [ "\"$symbol\"", $value ] );
+    return $self->_add_inst( '', 'store_lex', [ qq{"$symbol"}, $value ] );
 }
 
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    $self->_add_inst( '', 'store_lex', [ -1, "\"$symbol\"", $value ] );
+    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, 'P22' ] );
+    $self->_add_inst( '', 'store_lex', [ qq{"$symbol"}, $value ] );
     $self->{scope}->{$symbol} = $value;
 
     return;
