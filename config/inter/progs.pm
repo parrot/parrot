@@ -126,7 +126,7 @@ END
 
     test_compiler($cc);
 
-    return $self;
+    return 1;
 }
 
 sub test_compiler {

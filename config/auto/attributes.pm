@@ -51,7 +51,7 @@ sub runstep {
     for my $maybe_attr (@potential_attributes) {
         $self->try_attr( $conf, $maybe_attr );
     }
-    return $self;
+    return 1;
 }
 
 sub try_attr {

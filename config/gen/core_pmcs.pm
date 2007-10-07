@@ -30,7 +30,7 @@ sub runstep {
     $self->generate_c($conf);
     $self->generate_pm($conf);
 
-    return $self;
+    return 1;
 }
 
 sub generate_h {

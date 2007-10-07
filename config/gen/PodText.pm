@@ -87,7 +87,7 @@ sub runstep {
 
     $self->set_result( $count ? 'done' : 'no files to process' );
 
-    return $self;
+    return 1;
 }
 
 1;

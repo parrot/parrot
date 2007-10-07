@@ -62,7 +62,7 @@ END
 
     $conf->data->set( ops => $ops );
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -139,7 +139,7 @@ EOF
 
     move_if_diff( "$hh.tmp", $hh );
 
-    return $self;
+    return 1;
 }
 
 1;

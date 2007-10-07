@@ -31,7 +31,7 @@ sub runstep {
 
     if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     # perl5's Configure system doesn't call this by its full name, which may
@@ -96,7 +96,7 @@ sub runstep {
         $conf->data->set( $flag => $pass ? 'define' : undef );
     }
 
-    return $self;
+    return 1;
 }
 
 1;

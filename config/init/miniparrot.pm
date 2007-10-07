@@ -35,7 +35,7 @@ sub runstep {
 
     unless ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     $conf->data->set(
@@ -80,7 +80,7 @@ sub runstep {
         $conf->data->set( "i_$_" => 1 );
     }
 
-    return $self;
+    return 1;
 }
 
 1;

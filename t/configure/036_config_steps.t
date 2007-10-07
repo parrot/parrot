@@ -32,10 +32,15 @@ if ( $^O !~ /win32/i ) {
     @steps = grep { $_ !~ /win32/i } @steps;
 }
 
-plan tests => scalar @steps;
+my $testcount = @steps + 1;
+# my $testcount = @steps;
+
+plan tests => $testcount;
 foreach my $step (@steps) {
     require_ok($step);
 }
+
+pass("Completed all tests in $0");
 
 # Local Variables:
 #   mode: cperl

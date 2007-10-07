@@ -50,7 +50,7 @@ sub runstep {
     }
     $conf->data->set( has_python_2_4 => $has_python_2_4 );
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -36,7 +36,7 @@ sub runstep {
     $self->set_result( $has_socklen_t ? 'yes' : 'no' );
     $conf->data->set( has_socklen_t => $has_socklen_t, );
 
-    return $self;
+    return 1;
 }
 
 1;

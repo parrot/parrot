@@ -78,7 +78,7 @@ END
         TEMP_encoding_build => $TEMP_encoding_build,
     );
 
-    return $self;
+    return 1;
 }
 
 1;

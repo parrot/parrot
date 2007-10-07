@@ -62,6 +62,8 @@ my $cwd = cwd();
     }
     chdir $cwd or croak "Unable to change back";
 }
+untie *STDERR;
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

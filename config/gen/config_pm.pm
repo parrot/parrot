@@ -94,7 +94,7 @@ END
     close $IN  or die "Can't close config_lib.in: $!";
     close $OUT or die "Can't close config_lib.pasm: $!";
 
-    return $self;
+    return 1;
 }
 
 1;

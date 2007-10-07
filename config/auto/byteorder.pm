@@ -52,7 +52,7 @@ sub runstep {
         die "Unsupported byte-order [$byteorder]!";
     }
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -31,7 +31,7 @@ sub runstep {
 
     if ( $conf->options->get('nomanicheck') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     my @missing = ExtUtils::Manifest::manicheck();
@@ -48,7 +48,7 @@ END
         return;
     }
 
-    return $self;
+    return 1;
 }
 
 1;

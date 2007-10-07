@@ -29,7 +29,7 @@ sub runstep {
 
     if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     my ( $cgoto, $verbose ) = $conf->options->get(qw(cgoto verbose));
@@ -84,7 +84,7 @@ EOF
         $self->set_result('no');
     }
 
-    return $self;
+    return 1;
 }
 
 1;

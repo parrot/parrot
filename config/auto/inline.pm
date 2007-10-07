@@ -64,7 +64,7 @@ sub runstep {
 
     $conf->data->set( inline => $test );
 
-    return $self;
+    return 1;
 }
 
 1;

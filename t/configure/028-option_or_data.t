@@ -6,11 +6,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib );
-use_ok('config::init::defaults');
-use_ok('config::init::install');
+use config::init::defaults;
+use config::init::install;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);

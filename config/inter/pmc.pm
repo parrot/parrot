@@ -229,7 +229,7 @@ PMC: foreach my $pmc_file ( split( /\s+/, $pmc_list ) ) {
         TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
     );
 
-    return $self;
+    return 1;
 }
 
 1;

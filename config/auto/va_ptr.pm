@@ -46,7 +46,7 @@ sub runstep {
     $self->set_result($va_type);
     $conf->data->set( va_ptr_type => $va_type );
 
-    return $self;
+    return 1;
 }
 
 1;

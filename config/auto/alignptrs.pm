@@ -31,7 +31,7 @@ sub runstep {
 
     if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     $self->set_result('');
@@ -67,7 +67,7 @@ sub runstep {
     $self->set_result( $self->result . " $align byte" );
     $self->set_result( $self->result . 's' ) unless $align == 1;
 
-    return $self;
+    return 1;
 }
 
 1;

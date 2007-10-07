@@ -38,7 +38,7 @@ sub runstep {
     if ($without) {
         $conf->data->set( has_gdbm => 0 );
         $self->set_result('no');
-        return $self;
+        return 1;
     }
 
     my $cc        = $conf->data->get('cc');
@@ -93,7 +93,7 @@ sub runstep {
     }
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
 
-    return $self;
+    return 1;
 }
 
 1;

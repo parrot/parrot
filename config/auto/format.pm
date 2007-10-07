@@ -67,7 +67,7 @@ sub runstep {
         nvsize      => $nvsize
     );
 
-    return $self;
+    return 1;
 }
 
 1;

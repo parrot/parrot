@@ -44,7 +44,7 @@ sub runstep {
         TEMP_nongen_headers => $TEMP_nongen_headers,
     );
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -54,7 +54,7 @@ END
         $self->set_result('yes');
     }
 
-    return $self;
+    return 1;
 }
 
 1;

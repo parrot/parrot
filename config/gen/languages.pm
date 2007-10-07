@@ -46,7 +46,7 @@ sub runstep {
         expand_gmake_syntax                      => 1,
     );
 
-    return $self;
+    return 1;
 }
 
 1;

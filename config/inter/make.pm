@@ -56,7 +56,7 @@ sub runstep {
 
             # fall back to default
             $self->set_result('no');
-            return $self;
+            return 1;
         }
     }
 
@@ -72,7 +72,7 @@ sub runstep {
 
         # fall back to default
         $self->set_result('no');
-        return $self;
+        return 1;
     }
 
     # if '--version' returns a string assume that this is gmake.
@@ -100,7 +100,7 @@ sub runstep {
         $conf->data->set( make_c => $make_c );
     }
 
-    return $self;
+    return 1;
 }
 
 1;

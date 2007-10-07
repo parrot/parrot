@@ -130,7 +130,7 @@ sub runstep {
         doc_dir => $datadir . "/doc/parrot",
     );
 
-    return $self;
+    return 1;
 }
 
 sub assign_dir {

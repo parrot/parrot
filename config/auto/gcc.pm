@@ -48,7 +48,7 @@ sub runstep {
     # which should have been caught by the 'die' above.
     unless ( exists $gnuc{__GNUC__} ) {
         $conf->data->set( gccversion => undef );
-        return $self;
+        return 1;
     }
 
     my $major = $gnuc{__GNUC__};
@@ -59,7 +59,7 @@ sub runstep {
         print " (no) " if $verbose;
         $self->set_result('no');
         $conf->data->set( gccversion => undef );
-        return $self;
+        return 1;
     }
     if ( $major =~ tr/0-9//c ) {
         undef $major;    # Don't use it
@@ -378,7 +378,7 @@ sub runstep {
             gccversion => undef
         );
 
-        return $self;
+        return 1;
     }
 
     $conf->data->set(
@@ -390,7 +390,7 @@ sub runstep {
     $conf->data->set( HAS_aligned_funcptr => 0 )
         if $^O eq 'hpux';
 
-    return $self;
+    return 1;
 }
 
 1;

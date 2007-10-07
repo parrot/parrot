@@ -72,7 +72,7 @@ sub runstep {
 
     $self->set_result( $parrot_is_shared ? 'yes' : 'no' );
 
-    return $self;
+    return 1;
 }
 
 1;

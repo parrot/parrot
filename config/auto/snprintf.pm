@@ -44,7 +44,7 @@ sub runstep {
     }
     print " ($res) " if $conf->options->get('verbose');
 
-    return $self;
+    return 1;
 }
 
 1;

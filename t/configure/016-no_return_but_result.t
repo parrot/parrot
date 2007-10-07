@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More qw(no_plan); # tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -14,72 +14,74 @@ use Parrot::Configure::Options qw( process_options );
 use Parrot::IO::Capture::Mini;
 
 $| = 1;
-is( $|, 1, "output autoflush is set" );
+is($|, 1, "output autoflush is set");
 
-my $args = process_options(
-    {
-        argv => [],
-        mode => q{configure},
-    }
-);
-ok( defined $args, "process_options returned successfully" );
+my $args = process_options( {
+    argv            => [ ],
+    mode            => q{configure},
+} );
+ok(defined $args, "process_options returned successfully");
 my %args = %$args;
 
 my $conf = Parrot::Configure->new;
-ok( defined $conf, "Parrot::Configure->new() returned okay" );
+ok(defined $conf, "Parrot::Configure->new() returned okay");
 
-my $step        = q{init::epsilon};
-my $description = 'Determining if your computer does epsilon';
+my $step = q{init::zeta};
+my $description = 'Determining if your computer does zeta';
 
-$conf->add_steps($step);
-my @confsteps = @{ $conf->steps };
-isnt( scalar @confsteps, 0,
-    "Parrot::Configure object 'steps' key holds non-empty array reference" );
-is( scalar @confsteps, 1, "Parrot::Configure object 'steps' key holds ref to 1-element array" );
+$conf->add_steps( $step );
+my @confsteps = @{$conf->steps};
+isnt(scalar @confsteps, 0,
+    "Parrot::Configure object 'steps' key holds non-empty array reference");
+is(scalar @confsteps, 1,
+    "Parrot::Configure object 'steps' key holds ref to 1-element array");
 my $nontaskcount = 0;
 foreach my $k (@confsteps) {
     $nontaskcount++ unless $k->isa("Parrot::Configure::Task");
 }
-is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
-is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-is( ref( $confsteps[0]->params ),
-    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
-ok( !ref( $confsteps[0]->object ),
-    "'object' element of Parrot::Configure::Task struct is not yet a ref" );
+is($nontaskcount, 0, "Each step is a Parrot::Configure::Task object");
+is($confsteps[0]->step, $step,
+    "'step' element of Parrot::Configure::Task struct identified");
+is(ref($confsteps[0]->params), 'ARRAY',
+    "'params' element of Parrot::Configure::Task struct is array ref");
+ok(! ref($confsteps[0]->object),
+    "'object' element of Parrot::Configure::Task struct is not yet a ref");
 
 $conf->options->set(%args);
-is( $conf->options->{c}->{debugging},
-    1, "command-line option '--debugging' has been stored in object" );
+is($conf->options->{c}->{debugging}, 1,
+    "command-line option '--debugging' has been stored in object");
 
 my $rv;
-my ( $tie, @lines, $errstr );
-
-#{
-#    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
-#        or croak "Unable to tie";
-##    local $SIG{__WARN__} = \&_capture;
-#    $rv = $conf->runsteps;
-#    @lines = $tie->READLINE;
-#}
-#ok($rv, "runsteps successfully ran $step");
-#my $bigmsg = join q{}, @lines;
-#like($bigmsg,
-#    qr/$description/s,
-#    "Got message expected upon running $step");
-#like($errstr,
-#    qr/step $step failed:\s*Hello world/s,
-#    "Got error message expected when config module did not return object");
+my ($tie, @lines, $errtie, @errlines);
+{
+    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+        or croak "Unable to tie";
+    $errtie = tie *STDERR, "Parrot::IO::Capture::Mini"
+        or croak "Unable to tie";
+    $rv = $conf->runsteps;
+    @lines = $tie->READLINE;
+    @errlines = $errtie->READLINE;
+}
+untie *STDOUT;
+untie *STDERR;
+ok($rv, "runsteps successfully ran $step");
+my $bigmsg = join q{}, @lines;
+like($bigmsg,
+    qr/$description/s,
+    "Got correct description for $step");
+my $errmsg = join q{}, @errlines;
+like($errmsg,
+    qr/step $step failed:\sGoodbye, cruel world/,
+    "Got error message expected upon running $step");
 
 pass("Completed all tests in $0");
-
-sub _capture { $errstr = $_[0]; }
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
 016-no_return_but_result.t - see what happens when configuration step returns
-something other than object but has a defined result method
+undefined value but has a defined result method
 
 =head1 SYNOPSIS
 

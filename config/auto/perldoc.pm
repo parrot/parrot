@@ -64,7 +64,7 @@ sub runstep {
         new_perldoc => $version == 2 ? 1 : 0
     );
 
-    return $self;
+    return 1;
 }
 
 1;

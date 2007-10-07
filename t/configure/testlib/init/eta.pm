@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-t/configure/testlib/init/zeta.pm - Module used in configuration tests
+t/configure/testlib/init/eta.pm - Module used in configuration tests
 
 =cut
 
-package init::zeta;
+package init::eta;
 use strict;
 use warnings;
 use vars qw($description @args);
@@ -16,15 +16,14 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = 'Determining if your computer does zeta';
-@args        = ();
+$description = 'Determining if your computer does eta';
+@args = ();
 
-my $result = q|Goodbye, cruel world|;
-
+my $result = q|Hello world|;
 
 sub runstep {
     my ( $self, $conf ) = @_;
-    $self->set_result($result);
+    $self->set_result( $result );
     return;
 }
 
@@ -36,3 +35,4 @@ sub runstep {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+

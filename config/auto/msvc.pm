@@ -45,7 +45,7 @@ sub runstep {
     unless ( defined $msvc{_MSC_VER} ) {
         $self->set_result('no');
         $conf->data->set( msvcversion => undef );
-        return $self;
+        return 1;
     }
 
     my $major = int( $msvc{_MSC_VER} / 100 );
@@ -54,7 +54,7 @@ sub runstep {
         print " (no) " if $verbose;
         $self->set_result('no');
         $conf->data->set( msvcversion => undef );
-        return $self;
+        return 1;
     }
 
     my $msvcversion = "$major.$minor";
@@ -75,7 +75,7 @@ sub runstep {
         $conf->data->add( " ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE" );
     }
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -231,7 +231,7 @@ sub runstep {
     # remember corrected archname - jit.pm was using $Config('archname')
     $conf->data->set( 'archname', $archname );
 
-    return $self;
+    return 1;
 }
 
 sub find_perl_headers {

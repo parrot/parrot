@@ -60,7 +60,7 @@ sub runstep {
 
     print "]" if $verbose;
 
-    return $self;
+    return 1;
 }
 
 1;

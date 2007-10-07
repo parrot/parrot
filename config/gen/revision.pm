@@ -38,7 +38,7 @@ sub runstep {
         $self->set_result("done");
     }
 
-    return $self;
+    return 1;
 }
 
 1;

@@ -41,7 +41,7 @@ sub runstep {
     print( $test ? " (Yep) " : " (no) " ) if $conf->options->get('verbose');
     $self->set_result( $test ? 'yes' : 'no' );
 
-    return $self;
+    return 1;
 }
 
 1;

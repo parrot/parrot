@@ -66,7 +66,7 @@ sub runstep {
         $self->set_result('no');
     }
 
-    return $self;
+    return 1;
 }
 
 1;

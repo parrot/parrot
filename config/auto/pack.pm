@@ -100,7 +100,7 @@ Configure.pl:  Unable to find an integer type that fits a pointer.
 AARGH
     }
 
-    return $self;
+    return 1;
 }
 
 1;

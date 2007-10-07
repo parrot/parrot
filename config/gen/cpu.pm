@@ -31,7 +31,7 @@ sub runstep {
 
     if ( $conf->options->get('miniparrot') ) {
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     my $verbose = $conf->options->get('verbose');
@@ -48,7 +48,7 @@ sub runstep {
         print "(no cpu specific hints)" if $verbose;
     }
 
-    return $self;
+    return 1;
 }
 
 1;

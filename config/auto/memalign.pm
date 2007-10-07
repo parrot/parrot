@@ -33,14 +33,14 @@ sub runstep {
     if ( $conf->options->get('miniparrot') ) {
         $conf->data->set( memalign => '' );
         $self->set_result('skipped');
-        return $self;
+        return 1;
     }
 
     if ( defined $conf->data->get('memalign') ) {
 
         # already set; leave it alone
         $self->set_result('already set');
-        return $self;
+        return 1;
     }
     my $test = 0;
 
@@ -84,7 +84,7 @@ sub runstep {
     print( $test ? " (Yep:$f) " : " (no) " ) if $verbose;
     $self->set_result( $test ? 'yes' : 'no' );
 
-    return $self;
+    return 1;
 }
 
 1;

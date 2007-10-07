@@ -46,7 +46,7 @@ sub runstep {
         opcode_t => $opcode
     );
 
-    return $self;
+    return 1;
 }
 
 1;

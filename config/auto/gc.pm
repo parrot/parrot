@@ -123,7 +123,7 @@ EOF
     }
     print(" ($gc) ") if $conf->options->get('verbose');
 
-    return $self;
+    return 1;
 }
 
 1;
