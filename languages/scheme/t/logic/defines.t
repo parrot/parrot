@@ -8,8 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-# use Test::More tests => 12;
-use Test::More skip_all => 'Using obsolete calling conventions';
+use Test::More tests => 12;
 use Parrot::Test;
 
 language_output_is( 'Scheme', <<'CODE', 'a', 'a symbol' );

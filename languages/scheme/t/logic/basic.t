@@ -20,11 +20,6 @@ language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Fail' );
 (write (if (= 1 1) 1 0))
 CODE
 
-
-SKIP:
-{
-  skip( "adaption to calling converions is underway", 6 );
-
 language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Pass' );
 (write (if (= 0 1) 0 1))
 CODE
@@ -56,9 +51,6 @@ CODE
 language_output_is( 'Scheme', <<'CODE', 0, 'basic or - Fail' );
 (write (or 0 0))
 CODE
-
-}
-
 
 # Local Variables:
 #   mode: cperl
