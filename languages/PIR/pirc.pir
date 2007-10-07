@@ -7,16 +7,17 @@
 
 .sub '__onload' :load :init
     load_bytecode 'PGE.pbc'
-    load_bytecode 'Parrot/HLLCompiler.pbc'
-    load_bytecode 'PAST-pm.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'PGE/Text.pbc'
-				    
+    load_bytecode 'PCT.pbc'
+   
     load_bytecode 'languages/PIR/lib/ASTGrammar.pbc'
 
-    $P0 = new [ 'HLLCompiler' ]
+    $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('languages-PIR')
     $P0.'parsegrammar'('PIR::Grammar')
+    
+    # currently working on this:
+    #$P0.'parseactions'('PIR::Grammar::Actions')
+    
     $P0.'astgrammar'('ASTGrammar')
 
 .end
