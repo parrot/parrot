@@ -8,124 +8,124 @@
 .sub '__onload' :load :init
     load_bytecode 'PGE.pbc'
     load_bytecode 'PCT.pbc'
-   
+
     load_bytecode 'languages/PIR/lib/ASTGrammar.pbc'
 
     $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('languages-PIR')
     $P0.'parsegrammar'('PIR::Grammar')
-    
+
     # currently working on this:
     #$P0.'parseactions'('PIR::Grammar::Actions')
-    
+
     $P0.'astgrammar'('ASTGrammar')
 
 .end
 
 .sub 'main' :main
     .param pmc args
-   
-   	# get program name for error reporting		
+
+   	# get program name for error reporting
 		.local string prog
 		prog = shift args
-						
+
 		# Sanity check parameters
     $I0 = args
     unless $I0 >= 1 goto ERR_TOO_FEW_ARGS
-		
-		# Register the PIR compiler		
+
+		# Register the PIR compiler
     $P0 = compreg 'languages-PIR'
-    
+
     # set up a global variable to keep track of syntax errors
     .local pmc errs
     errs = new .Integer
     set_root_global 'errors', errs
 
 		.local pmc labels
-		labels = new .ResizablePMCArray		
+		labels = new .ResizablePMCArray
 		set_root_global 'heredoc', labels
-		
-		# Process command line options				
+
+		# Process command line options
 		load_bytecode "Getopt/Obj.pir"
-		
+
     .local pmc getopts
     getopts = new "Getopt::Obj"
     getopts."notOptStop"(1)
     push getopts, "output|o=s"
-    push getopts, "help|h"    
+    push getopts, "help|h"
     .local pmc opts
     opts = getopts."get_options"( args )
-    
-    # put back the program name    
-    unshift args, prog    
-        
+
+    # put back the program name
+    unshift args, prog
+
     # handle help option
     .local string help
     help = opts['help']
-    if help goto USAGE    
-    
+    if help goto USAGE
+
     # handle target option
   	.local string output
-    output = opts['output']    
-    unless output goto OPTIONS_DONE        
-    if output == "PARSE" goto TARGET_PARSE 
-    if output == "PAST" goto TARGET_PAST    
+    output = opts['output']
+    unless output goto OPTIONS_DONE
+    if output == "PARSE" goto TARGET_PARSE
+    if output == "PAST" goto TARGET_PAST
     if output == "PIRTIDY" goto TARGET_PIR
     if output == "PARSETREE" goto TARGET_PARSETREE
     goto ERR_UNKNOWN_TARGET
-    
-  OPTIONS_DONE:  	  	    		
-    
+
+  OPTIONS_DONE:
+
   TARGET_PARSE:
     $P1 = $P0.'command_line'(args, 'target' => 'parse')
-    goto DONE    
-    
+    goto DONE
+
   TARGET_PARSETREE:
   	load_bytecode 'PGE/Dumper.pbc'
-    load_bytecode 'dumper.pbc'  
+    load_bytecode 'dumper.pbc'
     $P1 = $P0.'command_line'(args, 'target' => 'parse')
     goto DONE
-    
+
   TARGET_PAST:
     $P1 = $P0.'command_line'(args, 'target' => 'past')
     goto DONE
-    
-  TARGET_PIR:   
+
+  TARGET_PIR:
     $P1 = $P0.'command_line'(args, 'target' => 'PIR')
     goto DONE
-    
-  ##COMPILE_AND_RUN:   
+
+  ##COMPILE_AND_RUN:
   ##  $P1 = $P0.'command_line'(args)
- 		
-  DONE:    
+
+  DONE:
     if errs > 0 goto ERR_MSG
-    print "Parse successful!\n"    
+    print "Parse successful!\n"
     .return($P1)
 
-  ERR_MSG: 		
-    if errs == 1 goto ONE_ERROR    
-    printerr "There were "           
+  ERR_MSG:
+    if errs == 1 goto ONE_ERROR
+    printerr "There were "
     printerr errs
-    printerr " errors.\n"    
+    printerr " errors.\n"
     end
 
-  ONE_ERROR: 		
+  ONE_ERROR:
     printerr "There was 1 error.\n"
     end
-    
+
   USAGE:
  		printerr "Usage: "
     printerr prog
     printerr " [OPTIONS] FILE\n"
     printerr <<"OPTIONS"
- 	Options:  	
+ 	Options:
   	--help            -- print this message
-  	--output=TARGET   -- specify target 
+  	--output=TARGET   -- specify target
   	  possible targets are:
   	     PARSE     -- parse only (default)
   	     PAST      -- print Parrot AST
   	     PIRTIDY   -- print generated PIR code
-  	     PARSETREE -- parse and print parse tree 
+  	     PARSETREE -- parse and print parse tree
 OPTIONS
     exit 1
 
@@ -135,8 +135,8 @@ OPTIONS
 	ERR_UNKNOWN_TARGET:
 		printerr "Error: "
 		printerr output
-		printerr " is an unknown target\n"		
-		exit 1		
+		printerr " is an unknown target\n"
+		exit 1
 .end
 
 
@@ -167,25 +167,25 @@ OPTIONS
 
 .sub process_heredocs
 		.param pmc mob
-		
-	
+
+
 		.local pmc labels
 		labels = get_root_global "heredoc"
 		.local pmc id
 		.local int count, i
-		
+
 		count = labels
 		i = 0
-	
-	loop:	
+
+	loop:
 		if i >= count goto endloop
-		id = shift labels		
+		id = shift labels
 		i += 1
-		
+
 		printerr id
 		#mob = heredoc_label(mob)
 		#heredoc_label()
-								
+
 		goto loop
 	endloop:
 
@@ -196,14 +196,14 @@ OPTIONS
 .sub store_heredoc_label
 	.param pmc mob
 	.param pmc heredocid
-	
+
 	printerr heredocid
 	printerr "\n"
-		
+
 	.local pmc labels
 	labels = get_root_global "heredoc"
 	push labels, heredocid
-	
+
 #	.local pmc iter, obj
 #	iter = new .Iterator, labels
 #	printerr "\n===============\n"
@@ -216,7 +216,7 @@ OPTIONS
 #	goto loop
 #endloop:
 #	printerr "\n===============\n"
-#	.return (mob, adverbs :flat :named)	
+#	.return (mob, adverbs :flat :named)
 .end
 
 #
@@ -233,7 +233,7 @@ OPTIONS
 		delete labels[i]
 		i += 1
 		goto loop
-	endloop:	
+	endloop:
 		#printerr "=============\n"
 .end
 
@@ -245,10 +245,10 @@ OPTIONS
 .sub warning
 	  .param pmc self
 	  .param string message
-		
+
 	  if null self goto NO_SELF
 	  if null message goto NO_MSG
-	
+
 	  printerr "Warning: "
 	  $P0 = get_hll_global ['PGE::Util'], 'warn'
 	  if null $P0 goto NO_WARN
@@ -262,34 +262,34 @@ OPTIONS
 	  .return()
 	NO_SELF:
 	  printerr "No 'self' in warning()\n"
-	  
-	  .return()	  
+
+	  .return()
 .end
 
 .sub syntax_error
   	.param pmc self
   	.param string message
-  	
+
   	$P0 = get_hll_global ['PGE::Util'], 'line_number'
   	if null $P0 goto NO_LINE_NR_METHOD
   	$I0 = self.$P0()
-  	
+
   	# line_number() starts counting at line 0, so increment:
   	inc $I0
-  	
+
   	printerr "Syntax error (line "
   	printerr $I0
   	printerr "): "
   	printerr message
   	printerr "\n\n"
-  	
+
   	# increment parse errors
   	.local pmc errs
   	errs = get_root_global 'errors'
   	inc errs
-  	
+
   	.return()
-  	
+
 	NO_LINE_NR_METHOD:
 	  printerr "can't find PGE::Util::line_number"
 	  exit 1
@@ -299,7 +299,7 @@ OPTIONS
 
 =head2 Custom parse methods
 
-The rules C<target> and C<label> need to be redefined when parsing 
+The rules C<target> and C<label> need to be redefined when parsing
 macros. These wrapper rules invoke the appropiate rules in pir.pg
 depending on the context.
 
@@ -311,9 +311,9 @@ depending on the context.
 		$P0 = get_global 'macro_context'
 		if null $P0 goto do_normal
 		if $P0 > 0 goto do_macro
-	do_normal:				
+	do_normal:
 		.return normal_target(mob, adverbs :flat :named)
-	do_macro:			
+	do_macro:
 		.return macro_target(mob, adverbs :flat :named)
 .end
 
@@ -324,20 +324,20 @@ depending on the context.
 		$P0 = get_global 'macro_context'
 		if null $P0 goto do_normal
 		if $P0 > 0 goto do_macro
-	do_normal:				
+	do_normal:
 		.return normal_label(mob, adverbs :flat :named)
-	do_macro:			
+	do_macro:
 		.return macro_label_decl(mob, adverbs :flat :named)
 .end
 
-.sub init_macro_rules        	
+.sub init_macro_rules
 		.local pmc macro_context
 		macro_context = new 'Integer'
 		macro_context = 1
 		set_global 'macro_context', macro_context
 .end
 
-.sub close_macro_rules	
+.sub close_macro_rules
 		$P0 = get_global 'macro_context'
 		$P0 = 0
 .end
