@@ -42,7 +42,7 @@
     set_root_global 'errors', errs
 
 		.local pmc labels
-		labels = new .ResizablePMCArray
+		labels = new 'ResizablePMCArray'
 		set_root_global 'heredoc', labels
 
 		# Process command line options
