@@ -119,6 +119,11 @@ release. The subclass opcode stays.
 The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
 will be removed in the 0.5.0 release.
 
+=item 5
+
+The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
+removed in the 0.5.0 release.
+
 =item 6
 
 The PMC union struct is deprecated and will be removed once all core PMCs have
