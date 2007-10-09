@@ -127,16 +127,15 @@ for internal global variables used by Lua.
 .include 'cclass.pasm'
 
 .sub 'name'
-    .param pmc mob
+    .param pmc tgt
     .param pmc adverbs         :slurpy :named
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
+    .local pmc mob
 
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
 
-    pos = mfrom
     lastpos = length target
     $S0 = substr target, pos, 1
     if $S0 == '_' goto L1
@@ -155,7 +154,7 @@ for internal global variables used by Lua.
   L3:
     $I0 = exists kw[$S0]
     if $I0 goto L2
-    mpos = pos
+    mob.'to'(pos)
   L2:
     .return (mob)
 .end
@@ -265,16 +264,15 @@ by prefixing them with C<0x>. Examples of valid numerical constants are
 
 
 .sub 'read_numeral' :anon
-    .param pmc mob
+    .param pmc tgt
     .param pmc adverbs         :slurpy :named
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
+    .local pmc mob
 
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
 
-    pos = mfrom
     lastpos = length target
     $S0 = substr target, pos, 1
     unless $S0 == '.' goto L1
@@ -308,7 +306,7 @@ by prefixing them with C<0x>. Examples of valid numerical constants are
   L6:
     $I0 = .CCLASS_NUMERIC | .CCLASS_WORD
     pos = find_not_cclass $I0, target, pos, lastpos
-    mpos = pos
+    mob.'to'(pos)
   L2:
     .return (mob)
 .end
@@ -338,33 +336,34 @@ no problem with them.)
 =cut
 
 .sub 'quoted_literal'
-    .param pmc mob
+    .param pmc tgt
     .param string delim
     .param pmc adv :slurpy :named
 
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
-    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
-    pos = mfrom
+    .local pmc mob
+
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
     lastpos = length target
 
     .local string literal
     literal = ''
   LOOP:
     if pos < lastpos goto L1
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "unfinished string")
   L1:
     $S0 = substr target, pos, 1
     if $S0 != delim goto L2
     mob.'result_object'(literal)
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
   L2:
     $I0 = index "\n\r", $S0
     if $I0 < 0 goto L3
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "unfinished string")
   L3:
     if $S0 != "\\" goto CONCAT
@@ -400,7 +399,7 @@ no problem with them.)
     dec pos
   L7:
     if $I0 < 256 goto L8
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "escape sequence too large")
   L8:
     $S0 = chr $I0
@@ -443,14 +442,15 @@ and C<'1'> is coded as 49), the five literals below denote the same string:
 =cut
 
 .sub 'long_string'
-    .param pmc mob
+    .param pmc tgt
     .param pmc adv :slurpy :named
 
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
-    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
-    pos = mfrom
+    .local pmc mob
+
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
     lastpos = length target
 
     .local int sep
@@ -461,7 +461,7 @@ and C<'1'> is coded as 49), the five literals below denote the same string:
     (pos, sep) = _skip_sep(target, pos, '[')
     if sep >= 0 goto L1
     if sep == -1 goto END
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "invalid long string delimiter")
   L1:
     inc pos
@@ -483,7 +483,7 @@ and C<'1'> is coded as 49), the five literals below denote the same string:
     $S0 = substr target, pos, 1
     if $S0 != '[' goto L5
     inc pos
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "nesting of [[...]] is deprecated")
   L5:
     dec pos
@@ -495,7 +495,7 @@ and C<'1'> is coded as 49), the five literals below denote the same string:
     if $I1 != sep goto L7
     pos = $I0 + 1
     mob.'result_object'(literal)
-    mpos = pos
+    mob.'to'(pos)
     goto END
   L7:
     dec pos
@@ -528,14 +528,15 @@ long bracket. Long comments are frequently used to disable code temporarily.
 =cut
 
 .sub 'long_comment'
-    .param pmc mob
+    .param pmc tgt
     .param pmc adv :slurpy :named
 
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
-    (mob, target, mfrom, mpos) = mob.'newfrom'(mob)
-    pos = mfrom
+    .local pmc mob
+
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
     lastpos = length target
 
     .local int sep
@@ -564,7 +565,7 @@ long bracket. Long comments are frequently used to disable code temporarily.
     $S0 = substr target, pos, 1
     if $S0 != '[' goto L5
     inc pos
-    mpos = pos
+    mob.'to'(pos)
     lexerror(mob, "nesting of [[...]] is deprecated")
   L5:
     dec pos
@@ -576,7 +577,7 @@ long bracket. Long comments are frequently used to disable code temporarily.
     if $I1 != sep goto L7
     pos = $I0 + 1
 #    mob.'result_object'(literal)
-    mpos = pos
+    mob.'to'(pos)
     goto END
   L7:
     dec pos
@@ -623,16 +624,15 @@ long bracket. Long comments are frequently used to disable code temporarily.
 =cut
 
 .sub 'unexpected'
-    .param pmc mob
+    .param pmc tgt
     .param pmc adverbs         :slurpy :named
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
+    .local pmc mob
 
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob)
+    $P0 = get_hll_global ['PGE'], 'Match'
+    (mob, pos, target) = $P0.'new'(tgt)
 
-    pos = mfrom
     $I0 = index target, ';', pos
     unless $I0 > 1 goto L1
     lastpos = length target
@@ -646,7 +646,7 @@ long bracket. Long comments are frequently used to disable code temporarily.
     if $S0 == 'until' goto L1
     $I0 = $I1
   L2:
-    mpos = $I0
+    mob.'to'($I0)
     lexerror(mob, "unexpected symbol")
   L1:
     .return (mob)

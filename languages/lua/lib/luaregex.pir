@@ -346,14 +346,11 @@ Francois Perrad
 
 .sub 'parse_literal'
     .param pmc mob
-    .local pmc newfrom
     .local string target
     .local int pos, lastpos
     .local int litstart, litlen
     .local string initchar
-    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, $P0, $P1) = newfrom(mob, 0, 'PGE::Exp::Literal')
-    pos = $P0
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     lastpos = length target
     initchar = substr target, pos, 1
     if initchar == ')' goto end
@@ -387,8 +384,7 @@ Francois Perrad
     mob.'result_object'($S0)
     goto end
   end:
-    $P0 = getattribute mob, "PGE::Match\x0$.pos"
-    $P0 = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
@@ -401,12 +397,9 @@ Francois Perrad
     .local string target
     .local int min, max, backtrack
     .local int pos, lastpos
-    .local pmc mfrom, mpos
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::Quant')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
     lastpos = length target
     min = 0
     max = PGE_INF
@@ -423,7 +416,7 @@ Francois Perrad
     mob['min'] = min
     mob['max'] = max
     mob['backtrack'] = backtrack
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
@@ -431,15 +424,12 @@ Francois Perrad
 .sub 'parse_enumclass'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
     .local int isrange
     .local string charlist
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::EnumCharList')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     lastpos = length target
     charlist = ''
     mob['isnegated'] = 0
@@ -487,7 +477,7 @@ Francois Perrad
     if isrange == 0 goto end
     charlist .= '-'
   end:
-    mpos = pos
+    mob.'to'(pos)
     mob.'result_object'(charlist)
     .return (mob)
 
@@ -508,14 +498,11 @@ Francois Perrad
 .sub 'parse_enumclass2'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos
     .local string charlist
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::EnumCharList')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     unless key == '.' goto zero
     charlist = ''
     mob['isnegated'] = 1
@@ -526,7 +513,7 @@ Francois Perrad
     unless key == '%Z' goto end
     mob['isnegated'] = 1
   end:
-    mpos = pos
+    mob.'to'(pos)
     mob.'result_object'(charlist)
     .return (mob)
 .end
@@ -535,17 +522,14 @@ Francois Perrad
 .sub 'parse_balanced'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
     .local string xy
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::LuaBalanced')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::LuaBalanced')
     lastpos = length target
     if lastpos < 2 goto err
     xy = substr target, pos, 2
     pos += 2
-    mpos = pos
+    mob.'to'(pos)
     mob.'result_object'(xy)
     .return (mob)
 
@@ -558,20 +542,18 @@ Francois Perrad
     .param pmc mob
     .local string target
     .local int pos
-    .local pmc newfrom, mfrom, mpos
     .local string cname
-    newfrom = get_hll_global ['PGE::Match'], 'newfrom'
     $P0 = getattribute mob, '$.target'
     target = $P0
     $P0 = getattribute mob, '$.pos'
     pos = $P0
     $I0 = pos - 1
     $S0 = substr target, $I0, 1
-    (mob, $P0, mfrom, mpos) = newfrom(mob, 0, 'PGE::Exp::Scalar')
+    (mob, $I1, $S1) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Scalar')
     $I0 = $S0
     dec $I0
     mob['cname'] = $I0
-    mpos = pos
+    mob.'to'(pos)
     .return (mob)
 .end
 
@@ -579,20 +561,17 @@ Francois Perrad
 .sub 'parse_anchor'
     .param pmc mob
     .local string target
-    .local pmc mfrom, mpos
     .local int pos, lastpos
     .local string key
     key = mob['KEY']
-    $P0 = get_hll_global ['PGE::Match'], 'newfrom'
-    (mob, target, mfrom, mpos) = $P0(mob, 0, 'PGE::Exp::Anchor')
-    pos = mfrom
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Anchor')
     lastpos = length target
     unless key == '$' goto start
     unless pos == lastpos goto end
-    mpos = pos
+    mob.'to'(pos)
   start:
     unless pos == 1 goto end
-    mpos = pos
+    mob.'to'(pos)
   end:
     .return (mob)
 .end
