@@ -47,7 +47,7 @@
  * cfg_optimize may be called multiple times during the construction of the
  * CFG depending on whether or not it finds anything to optimize.
  *
- * XXX: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
+ * RT#46277: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
  *
  * optimizer
  * ---------
@@ -56,7 +56,7 @@
  *
  * used_once ... deletes assignments, when LHS is unused
  * loop_optimization ... pulls invariants out of loops
- * TODO e.g. constant_propagation
+ * RT#46279 e.g. constant_propagation
  *
  * post_optimizer: currently pcc_optimize in pcc.c
  * ---------------
@@ -148,7 +148,7 @@ pre_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
         IMCC_info(interp, 2, "pre_optimize\n");
-        /* TODO integrate all in one pass */
+        /* RT#46281 integrate all in one pass */
         changed += strength_reduce(interp, unit);
         if (!IMCC_INFO(interp)->dont_optimize)
             changed += if_branch(interp, unit);
@@ -174,7 +174,7 @@ cfg_optimize(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
             return 1;
         if (branch_reorg(interp, unit))
             return 1;
-        /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
+        /* RT#46283 cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interp, unit))
             return 1;
         if (dead_code_remove(interp, unit))
@@ -1166,7 +1166,7 @@ branch_cond_loop(PARROT_INTERP, IMC_Unit * unit)
 }
 
 /*
- * Removes unused labels. A label is unused if ... [XXX: finish this].
+ * Removes unused labels. A label is unused if ... [RT#46287: finish this].
  *
  * Returns TRUE if any optimizations were performed. Otherwise, returns
  * FALSE.
@@ -1402,7 +1402,7 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
                 return reason=4,0;
             if (!strcmp(ins->op, "clone"))
                 return reason=4,0;
-            /* indexed set/get ??? XXX, as index is ok */
+            /* indexed set/get ??? RT#46289, as index is ok */
             if (0 && ! strcmp(ins->op, "set") && nregs != 2)
                 return reason=5,0;
             /*
@@ -1527,7 +1527,7 @@ move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
         insert_ins(unit, (*ins)->prev, tmp);
     }
     ostat.invariants_moved++;
-    /* XXX CFG is changed here, which also means
+    /* RT#46291 CFG is changed here, which also means
      * that the life_info is wrong now
      * so, currently we calc CFG and life again */
     return 1;
