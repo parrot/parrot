@@ -186,7 +186,7 @@ L<Parrot::Configure> object is passed as the first argument to each step's
 C<runstep()> method, followed by any parameters that were registered for that
 step.
 
-Accepts no arguments and modifies the data structure within the 
+Accepts no arguments and modifies the data structure within the
 L<Parrot::Configure> object.
 
 =cut
@@ -227,7 +227,7 @@ sub run_single_step {
 
     my ( $verbose, $verbose_step, $ask ) =
         $conf->options->get(qw( verbose verbose-step ask ));
- 
+
     my $task = ( $conf->steps() )[0];
     if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
         $conf->_run_this_step( {
@@ -321,7 +321,7 @@ sub _run_this_step {
             } );
             # reset verbose value for the next step
             $conf->options->set( verbose => $args->{verbose} );
-        
+ 
             if ($conf->options->get(q{configure_trace}) ) {
                 _update_conftrace( {
                     conftrace   => $conftrace,
