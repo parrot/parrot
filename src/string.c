@@ -61,6 +61,9 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static const char *
+nonnull_encoding_name(STRING *s);
+
 /* HEADERIZER END: static */
 
 
@@ -1438,6 +1441,31 @@ make_writable(PARROT_INTERP, ARGINOUT(STRING **s),
 
 /*
 
+=item C<nonnull_encoding_name(STRING *s)>
+
+Returns the string's encoding name if the string pointer is non-null, if the
+string pointer is null it simply returns the string "null string".  This
+function prevents problems whereby the string used in C<real_exception>
+to print the exception message could potentially be null.
+
+=cut
+
+*/
+
+static const char *
+nonnull_encoding_name(STRING *s)
+{
+    char *string;
+    if (!s)
+        strcpy(string, "null string");
+    else
+        strcpy(string, s->encoding->name);
+
+    return string;
+}
+
+/*
+
 =item C<string_bitwise_and>
 
 Performs a bitwise C<AND> on two Parrot string, performing type and
@@ -1458,15 +1486,17 @@ string_bitwise_and(PARROT_INTERP, NULLOK(STRING *s1),
     size_t minlen;
 
     /* we could also trans_charset to iso-8859-1 */
-    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr)
+    if (s1 && s1->encoding != Parrot_fixed_8_encoding_ptr) {
         real_exception(interp, NULL, INVALID_ENCODING,
                 "string bitwise_and (%s/%s) unsupported",
-                s1->encoding->name, s2->encoding->name);
+                s1->encoding->name, nonnull_encoding_name(s2));
+    }
 
-    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr)
+    if (s2 && s2->encoding != Parrot_fixed_8_encoding_ptr) {
         real_exception(interp, NULL, INVALID_ENCODING,
                 "string bitwise_and (%s/%s) unsupported",
-                s1->encoding->name, s2->encoding->name);
+                nonnull_encoding_name(s1), s2->encoding->name);
+    }
 
     /* think about case of dest string is one of the operands */
     if (s1 && s2)
@@ -1575,7 +1605,7 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
         if (s1->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_or (%s/%s) unsupported",
-                    s1->encoding->name, s2->encoding->name);
+                    s1->encoding->name, nonnull_encoding_name(s2));
         maxlen = s1->bufused;
     }
 
@@ -1583,7 +1613,7 @@ string_bitwise_or(PARROT_INTERP, NULLOK(STRING *s1),
         if (s2->encoding != Parrot_fixed_8_encoding_ptr)
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_or (%s/%s) unsupported",
-                    s1->encoding->name, s2->encoding->name);
+                    nonnull_encoding_name(s1), s2->encoding->name);
 
         if (s2->bufused > maxlen)
             maxlen = s2->bufused;
@@ -1647,7 +1677,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
         if (s1->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_xor (%s/%s) unsupported",
-                    s1->encoding->name, s2->encoding->name);
+                    s1->encoding->name, nonnull_encoding_name(s2));
         }
         maxlen = s1->bufused;
     }
@@ -1656,7 +1686,7 @@ string_bitwise_xor(PARROT_INTERP, NULLOK(STRING *s1),
         if (s2->encoding != Parrot_fixed_8_encoding_ptr) {
             real_exception(interp, NULL, INVALID_ENCODING,
                     "string bitwise_xor (%s/%s) unsupported",
-                    s1->encoding->name, s2->encoding->name);
+                    nonnull_encoding_name(s1), s2->encoding->name);
         }
 
         if (s2->bufused > maxlen)
