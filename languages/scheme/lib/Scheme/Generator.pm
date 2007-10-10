@@ -342,7 +342,7 @@ sub _qq_unquote {
         $self->_restore($item);
         $item = $temp;
     }
-    my $pair = $self->_new_pair;
+    my $pair = $self->_new_pair();
     $self->_add_inst( '', 'set', [ $pair . '[0]', $item ] );
     $self->_add_inst( '', 'set', [ $pair . '[1]', $return ] );
     $self->_add_inst( '', 'set', [ $return,       $pair ] );
@@ -366,7 +366,7 @@ sub _qq_unquote_splicing {
     $self->_add_inst( '', 'typeof', [ $type, $list ] );
     $self->_add_inst( '', 'eq', [ $type, q{'Undef'}, "DONE_$label" ] );
 
-    my $copy = $self->_new_pair;
+    my $copy = $self->_new_pair();
 
     $self->_add_inst( '', 'set', [ $head, $copy ] );
 
@@ -380,7 +380,7 @@ sub _qq_unquote_splicing {
     $self->_add_inst( '', 'typeof', [ $type, $list ] );
     $self->_add_inst( '', 'eq',     [ $type, q{'Undef'}, "FINISH_$label" ] );
 
-    $temp = $self->_new_pair;
+    $temp = $self->_new_pair();
     $self->_add_inst( '', 'set', [ $copy . '[1]', $temp ] );
     $self->_add_inst( '', 'set', [ $copy, $temp ] );
     $self->_add_inst( '', 'branch', ["ITER_$label"] );
@@ -687,30 +687,30 @@ sub _op_equal_p {
 sub _op_pair_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
     _num_arg( $node, 1, 'pair?' );
 
     my $item = $self->_generate( _get_arg( $node, 1 ) );
 
-    $return = $self->_save_1('S');
+    my $tmp_i = $self->_save_1('I');
+    my $tmp_s = $self->_save_1('S');
 
     if ( $item =~ /^[INS]/ ) {
-        $self->_add_inst( '', 'set', [ $return, 0 ] );
+        $self->_add_inst( '',            'set', [ $tmp_i, 0 ] );
     }
     else {
-        $self->_add_inst( '', 'typeof', [ $return, $item ] );
-        $self->_add_inst( '', 'ne',     [ $return, q{'Array'}, "FAIL_$label" ] );
-        $self->_add_inst( '', 'set',    [ $return, $item ] );
-        $self->_add_inst( '', 'ne',     [ $return, 2, "FAIL_$label" ] );
-        $self->_add_inst( '', 'set',    [ $return, 1 ] );
-        $self->_add_inst( '', 'branch', ["DONE_$label"] );
-        $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
+        $self->_add_inst( '',            'typeof', [ $tmp_s, $item ] );
+        $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Array'}, "FAIL_$label" ] );
+        $self->_add_inst( '',            'set',    [ $tmp_i, $item ] );
+        $self->_add_inst( '',            'ne',     [ $tmp_i, 2, "FAIL_$label" ] );
+        $self->_add_inst( '',            'set',    [ $tmp_i, 1 ] );
+        $self->_add_inst( '',            'branch', ["DONE_$label"] );
+        $self->_add_inst( "FAIL_$label", 'set', [ $tmp_i, 0 ] );
         $self->_add_inst("DONE_$label");
     }
 
-    return $return;
+    return $tmp_i;
 }
 
 sub _op_cons {
