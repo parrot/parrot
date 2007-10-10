@@ -65,7 +65,7 @@ This method destroys BCG_info PMC instance.
     void destroy()
     {
         if (PMC_struct_val(SELF)) {
-            BCG_destroy( (BCG_info*) PMC_struct_val(SELF));
+            BCG_destroy((BCG_info*) PMC_struct_val(SELF));
             PMC_struct_val(SELF) = NULL;
         }
     }
@@ -357,7 +357,7 @@ This method generates bytecode for label.
     }
 
 
-    METHOD void printPASM( )
+    METHOD void printPASM()
     {
         BCG_info *bcg_info;
 
