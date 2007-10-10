@@ -28,7 +28,7 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
 {
     void *tmp;
     /* see http://www-128.ibm.com/developerworks/linux/library/pa-atom/ */
-    __asm__ __volatile__(       /*%0 = tmp, %1 = ptr, %2 = old, %3 = new */
+    __asm__ __volatile__(/*%0 = tmp, %1 = ptr, %2 = old, %3 = new */
                             "1:  lwarx %0, 0, %1\n"     /* tmp = *ptr, with reservation */
                             "    cmpw %2, %0\n" /* tmp == old ? */
                             "    bne 2f\n"      /* no, goto flush reservation, end */
@@ -50,7 +50,7 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
 inline static long parrot_ppc_add(volatile long *val, long what)
 {
     long tmp;
-    __asm__ __volatile__(       /*%0 = tmp, %1 = val, %2 = what */
+    __asm__ __volatile__(/*%0 = tmp, %1 = val, %2 = what */
                             "1:  lwarx %0, 0, %1\n"     /* tmp = *val, with reservation */
                             "    add %0, %0, %2\n"      /* tmp += what */
                             /* "    sync\n" -- XXX needed on PPC 405, see
@@ -95,7 +95,7 @@ typedef struct Parrot_atomic_integer {
 
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
-        if (parrot_ppc_cmpset( \
+        if (parrot_ppc_cmpset(\
                 (void * volatile *) &(a).val, (void *) expect, \
                 (void *) update) == (void *) expect) { \
             result = 1; \
