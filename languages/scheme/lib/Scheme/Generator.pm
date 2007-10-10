@@ -27,6 +27,14 @@ sub _add_inst {
     return;
 }
 
+sub _add_comment {
+    my $self    = shift;
+    my $comment = shift;
+
+    return
+        $self->_add_inst( '', '#', [ $comment ] );
+}
+
 #------------------------------------
 
 sub _new_regs {
@@ -38,6 +46,8 @@ sub _new_regs {
     };
 }
 
+# save a number of registers on the stack
+# Mark it only in $self->{_regs}, _save_set() emits the PIR code 
 sub _save {
     my $self  = shift;
     my $count = shift;
@@ -46,7 +56,7 @@ sub _save {
     die "No registers to save"
         unless $count and $count > 0;
     die "Illegal register type"
-        unless $type and $type =~ /^[INPS]$/;
+        unless $type and $type =~ m/^[INPS]$/;
     my @temp;
     for ( 0 .. 31 ) {
         next if $self->{regs}->{$type}{$_} == 1;
@@ -62,17 +72,22 @@ sub _save {
 sub _save_set {
     my $self = shift;
 
+    $self->_add_comment( 'start of _save_set()' );
+
     my %regs = %{ $self->{regs} };
     for my $type ( keys %regs ) {
         for my $count ( 0 .. 31 ) {
-            $self->_add_inst( '#', 'save', ["$type$count"] )
+            $self->_add_inst( '', 'save', ["$type$count"] )
                 if $regs{$type}->{$count};
         }
     }
 
+    $self->_add_comment( 'end of _save_set()' );
+
     return;
 }
 
+# save a single register on the stack
 sub _save_1 {
     my $self = shift;
     my $type = shift || 'I';
@@ -82,18 +97,20 @@ sub _save_1 {
     return $temp[0];
 }
 
+# say that a register should not be saved by _save_set()
 sub _restore {
     my $self = shift;
 
-    die "Nothing to restore"
-        unless defined @_;
+    die "Nothing to restore" unless @_;
+
     foreach my $reg (@_) {
         next if grep { $_ eq $reg } qw (none);
-        $reg =~ /^(\w)(\d+)/;
-        die "Missing register type"
-            unless defined $1;
-        if ( $self->{regs}->{$1}{$2} ) {
-            $self->{regs}->{$1}{$2} = 0;
+
+        my ( $reg_type, $reg_num ) = $reg =~ m/^(\w)(\d+)/;
+        die 'Missing register type'
+            unless defined $reg_type;
+        if ( $self->{regs}->{$reg_type}{$reg_num} ) {
+            $self->{regs}->{$reg_type}{$reg_num} = 0;
         }
     }
 
@@ -105,12 +122,14 @@ sub _restore_set {
 
     my %regs = %{ $self->{regs} };
 
+    $self->_add_comment( 'start of _restore_set()' );
     for my $type ( reverse keys %regs ) {
         for ( my $count = 31 ; $count >= 0 ; $count-- ) {
-            $self->_add_inst( '#', 'restore', ["$type$count"] )
+            $self->_add_inst( '', 'restore', [ "$type$count" ] )
                 if $regs{$type}->{$count};
         }
     }
+    $self->_add_comment( 'end of _restore_set()' );
 
     return;
 }
@@ -130,23 +149,22 @@ sub _get_arg {
     return $node->{children}->[$num];
 }
 
+# first child is the function, the args are after that
 sub _get_args {
     my ( $node, $num ) = @_;
     $num = 1 unless defined $num;
 
-    my @args = splice @{ $node->{children} }, $num;
-
-    return @args;
+    return splice @{ $node->{children} }, $num;
 }
 
 # until there is a working find_lex/store_lex
 sub _find_lex {
     my ( $self, $symbol ) = @_;
 
-    my $return = $self->_save_1('P');
-    $self->_add_inst( '', 'find_lex', [ $return, "\"$symbol\"" ] );
+    my $return_reg = $self->_save_1('P');
+    $self->_add_inst( '', 'find_lex', [ $return_reg, qq{"$symbol"} ] );
 
-    return $return;
+    return $return_reg;
 }
 
 sub _find_name {
@@ -167,8 +185,7 @@ sub _store_lex {
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, 'P22' ] );
-    $self->_add_inst( '', 'store_lex', [ qq{"$symbol"}, $value ] );
+    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, $value ] );
     $self->{scope}->{$symbol} = $value;
 
     return;
@@ -388,16 +405,14 @@ sub _qq_unquote_splicing {
 sub _op_lambda {
     my ( $self, $node ) = @_;
 
-    my $return;
-    my $label = $self->_gensym();
-    my $temp;
+    $self->_add_comment( 'start of _op_lambda()' );
 
-    $return = $self->_save_1('P');
+    my $sub_name
+        = join( q{_}, 'LAMBDA', $self->_gensym() );
 
-    $self->_add_inst( '', 'newsub', [ $return, '.Closure', "LAMBDA_$label" ] );
+    my $return = $self->_save_1('P');
 
-    $self->_add_inst( '', 'branch', ["DONE_$label"] );
-    $self->_add_inst("LAMBDA_$label");
+    $self->_add_inst( '', '.const', [ qq{.Sub $return = "$sub_name"} ] );
 
     # caller saved => start a new frame
     push @{ $self->{frames} }, $self->{regs};
@@ -407,10 +422,10 @@ sub _op_lambda {
     $self->{regs}{P}{1} = 1;
 
     # expand the lexical scope
-    $self->_add_inst( '', '# new_pad', [-1] );
     my $oldscope = $self->{scope};
     $self->{scope} = { '*UP*' => $oldscope };
 
+    # parameters
     my $num = 5;
     my @args = @{ _get_arg( $node, 1 )->{children} };
     for (@args) {
@@ -419,20 +434,30 @@ sub _op_lambda {
         $num++;
     }
 
-    $temp = 'none';
+    # lambda body
+    # Another ugly hack. Move the generated code to 'lambda_instructions'
+    $self->_add_comment( 'start: lambda body in $sub_name' );
+    my $ins_count = scalar @{ $self->{instruction} };
+    $self->_add_inst( '', '' );
+    $self->_add_comment( 'generated for lambda' );
+    $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('main')} ] );
+
+    my $temp = 'none';
     for ( _get_args( $node, 2 ) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
     }
 
-    $self->_add_inst( '', 'set', [ 'P5', $temp ] );
+    $self->_add_inst( '', 'set_returns', [ '"0"', $temp ] );
 
-    $self->_add_inst( '', '# pop_pad' );
-    $self->_add_inst( '', 'returncc' );
-    $self->_add_inst("DONE_$label");
+    $self->_add_inst( '', '.end' );
+    push @{ $self->{lambda_instructions} }, splice @{ $self->{instruction} }, $ins_count;
+    $self->_add_comment( "end: lambda body in $sub_name" );
 
     $self->{regs}  = pop @{ $self->{frames} };
     $self->{scope} = $self->{scope}->{'*UP*'};
+
+    $self->_add_comment( 'end of _op_lambda()' );
 
     return $return;
 }
@@ -794,27 +819,28 @@ sub _op_list_p {
 sub _op_list {
     my ( $self, $node ) = @_;
 
-    my $label  = $self->_gensym();
-    my $return = $self->_save_1('P');
+    $self->_add_comment( 'start of _op_list()' );
 
-    $self->_add_inst( '', 'new', [ $return, '.Undef' ] );
+    my $ret_reg = $self->_save_1('P');   # need a single register
+    $self->_add_inst( '', new => [ $ret_reg, q{'Undef'} ] );
 
-    my @reverse = reverse _get_args($node);
-
-    for (@reverse) {
+    # build up the list in reverse order
+    foreach ( reverse _get_args($node) ) {
         my $item = $self->_generate($_);
         my $pair = $self->_save_1('P');
 
         $self->_add_inst( '', 'new', [ $pair,         '.Array' ] );
         $self->_add_inst( '', 'set', [ $pair,         2 ] );
         $self->_add_inst( '', 'set', [ $pair . '[0]', $item ] );
-        $self->_add_inst( '', 'set', [ $pair . '[1]', $return ] );
-        $self->_add_inst( '', 'set', [ $return,       $pair ] );
+        $self->_add_inst( '', 'set', [ $pair . '[1]', $ret_reg ] );
+        $self->_add_inst( '', 'set', [ $ret_reg,       $pair ] );
 
         $self->_restore( $item, $pair );
     }
 
-    return $return;
+    $self->_add_comment( 'end of _op_list()' );
+
+    return $ret_reg;
 }
 
 sub _op_length {
@@ -1096,10 +1122,9 @@ sub _op_even_p {
 sub _op_max {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_generate( $node->{children}[1] );
+    my $return = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp  = $self->_generate( $node->{children}[$_] );
         my $label = $self->_gensym();
@@ -2006,7 +2031,7 @@ sub __max_lengths {
     my $colref  = shift;
 
     my @max_len = (0) x 3;
-    for my $row (@$colref) {
+    foreach my $row (@{$colref}) {
         for ( 0 .. $#{$row} ) {
             $max_len[$_] = length( $row->[$_] ) if length $row->[$_] > $max_len[$_];
         }
@@ -2043,7 +2068,7 @@ sub _call_function_obj {
 
     my $return = $self->_save_1('P');
     $self->_restore($return);    # dont need to save this
-    $self->_save_set;
+    $self->_save_set();
 
     my $count = 5;
     my $empty = $return;
@@ -2065,7 +2090,6 @@ sub _call_function_obj {
                 }
             }
             if ($moved) {
-                push @args, $count;
                 $empty = $moved;
             }
             $self->_add_inst( '', 'set', [ "P$count", $arg ] );
@@ -2074,9 +2098,16 @@ sub _call_function_obj {
         $count++;
     }
 
-    $self->_add_inst( '', 'set_args', [ q{"} . join( q{,}, q{0} x scalar(@args) ) . q{"}, join( q{,}, map { "P$_" } @args ) ] );    
+    if ( @args )
+    {
+        $self->_add_inst( '', 'set_args', [ q{"} . join( q{,}, q{0} x scalar(@args) ) . q{"}, join( q{,}, map { "P$_" } @args ) ] );    
+    }
+    else
+    {
+        $self->_add_inst( '', 'set_args', [ q{""} ] );
+    }
+    $self->_add_inst( '', 'get_results', [ "0", $return ] );
     $self->_add_inst( '', 'invokecc', [ $func_obj ] );
-    $self->_add_inst( '', 'set', [ $return, 'P5' ] ) unless $return eq 'P5';
     $self->_restore_set;
 
     $return =~ /(\w)(\d+)/;
@@ -2088,12 +2119,11 @@ sub _call_function_obj {
 sub _format_columns {
     my $self    = shift;
 
-    my $colref  = $self->{instruction};
-    my @max_len = __max_lengths($colref);
+    my @max_len = __max_lengths($self->{instruction});
 
     $self->{code} = '';
 
-    for my $row (@{$colref}) {
+    for my $row (@{$self->{instruction}}) {
         my $label;
         $label = $row->[0];
         $label .= ':' if $label;
@@ -2115,12 +2145,14 @@ sub new {
     my $tree  = shift;
 
     my $self  = {
-        tree      => $tree,
-        regs      => _new_regs,
-        frames    => [],
-        gensym    => 0,
-        functions => [],
-        scope     => {},
+        tree         => $tree,
+        regs         => _new_regs,
+        frames       => [],
+        gensym       => 0,                # used for creating unique labels and symbols
+        functions    => [],               # List of needed builtin functions
+        scope        => {},
+	instruction  => [],
+	lambda_instructions      => [],
     };
 
     return bless $self, $class;
@@ -2187,6 +2219,7 @@ sub generate {
 
     $self->{scope} = {};
 
+    $self->_add_inst( '', ".include 'library/dumper.pir'" );
     $self->_add_inst( '', ".sub main :main" );
 
     my $temp = $self->_generate($tree);
@@ -2195,11 +2228,12 @@ sub generate {
     $self->_add_inst( '', '.end' );
 
     # die Dumper( $self );
+    push @{ $self->{instruction} }, @{ $self->{lambda_instructions} };
     $self->_format_columns();
 
-    # not need any more
-    $self->{instruction} = undef;
-    $self->{regs}        = undef;
+    # not needed any more
+    undef $self->{instruction};
+    undef $self->{regs};
 
     return $self;
 }
