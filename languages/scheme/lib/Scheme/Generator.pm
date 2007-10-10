@@ -687,6 +687,8 @@ sub _op_equal_p {
 sub _op_pair_p {
     my ( $self, $node ) = @_;
 
+    $self->_add_comment( 'start of _op_pair_p()' );
+
     my $label = $self->_gensym();
 
     _num_arg( $node, 1, 'pair?' );
@@ -709,6 +711,8 @@ sub _op_pair_p {
         $self->_add_inst( "FAIL_$label", 'set', [ $tmp_i, 0 ] );
         $self->_add_inst("DONE_$label");
     }
+
+    $self->_add_comment( 'end of _op_pair_p()' );
 
     return $tmp_i;
 }
@@ -790,21 +794,26 @@ sub _op_set_cdr_bang {
 sub _op_null_p {
     my ( $self, $node ) = @_;
 
-    my $return = $self->_save_1('I');
+    $self->_add_comment( 'start of _op_null_p()' );
+
+    my $temp_i = $self->_save_1('I');
+    my $temp_s = $self->_save_1('S');
     my $label  = $self->_gensym();
 
     _num_arg( $node, 1, 'null?' );
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
-    $self->_add_inst( '', 'typeof', [ $return, $temp ] );
-    $self->_add_inst( '', 'ne',     [ $return, q{'Undef'}, "FAIL_$label" ] );
-    $self->_add_inst( '', 'set',    [ $return, 1 ] );
+    $self->_add_inst( '', 'typeof', [ $temp_s, $temp ] );
+    $self->_add_inst( '', 'ne',     [ $temp_s, q{'Undef'}, "FAIL_$label" ] );
+    $self->_add_inst( '', 'set',    [ $temp_i, 1 ] );
     $self->_add_inst( '', 'branch', ["DONE_$label"] );
-    $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
+    $self->_add_inst( "FAIL_$label", 'set', [ $temp_i, 0 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp);
 
-    return $return;
+    $self->_add_comment( 'end of _op_null_p()' );
+
+    return $temp_i;
 }
 
 sub _op_list_p {
