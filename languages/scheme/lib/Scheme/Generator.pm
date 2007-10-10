@@ -194,7 +194,7 @@ sub _new_pair {
 
     my $return = $self->_save_1('P');
 
-    $self->_add_inst( '', 'new', [ $return, '.Array' ] );
+    $self->_add_inst( '', 'new', [ $return, q{'Array'} ] );
     $self->_add_inst( '', 'set', [ $return, 2 ] );
 
     return $return;
@@ -237,11 +237,11 @@ sub _morph {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
         }
         elsif ( $from =~ /I/ ) {
-            $self->_add_inst( '', 'new', [ $to, '.Integer' ] );
+            $self->_add_inst( '', 'new', [ $to, q{'Integer'} ] );
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
         elsif ( $from =~ /N/ ) {
-            $self->_add_inst( '', 'new', [ $to, '.Float' ] );
+            $self->_add_inst( '', 'new', [ $to, q{'Float'} ] );
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
     }
@@ -257,22 +257,22 @@ sub __quoted {
     if ( exists $node->{value} ) {
         my $value = $node->{value};
         if ( $value =~ /^[-+]?\d+$/ ) {
-            $self->_add_inst( '', 'new', [ $return, '.Integer' ] );
+            $self->_add_inst( '', 'new', [ $return, q{'Integer'} ] );
             $self->_add_inst( '', 'set', [ $return, $value ] );
         }
         elsif ( $value =~ /^[-+]?((\d+\.\d*)|(\.d+))([eE][-+]?\d+)?$/ ) {
-            $self->_add_inst( '', 'new', [ $return, '.Float' ] );
+            $self->_add_inst( '', 'new', [ $return, q{'Float'} ] );
             $self->_add_inst( '', 'set', [ $return, $value ] );
         }
         else {    # assume its a symbol
-            $self->_add_inst( '', 'new', [ $return, '.String' ] );
+            $self->_add_inst( '', 'new', [ $return, q{'String'} ] );
             $self->_add_inst( '', 'set', [ $return, "\"$value\"" ] );
         }
     }
     elsif ( exists $node->{children} ) {
         my $children = $node->{children};
 
-        $self->_add_inst( '', 'new', [ $return, '.Undef' ] );
+        $self->_add_inst( '', 'new', [ $return, q{'Undef'} ] );
         for ( reverse @$children ) {
             if ( exists $_->{children} ) {
                 my $arg0 = _get_arg( $_, 0 );
@@ -358,13 +358,13 @@ sub _qq_unquote_splicing {
 
     die "unquote-splicing called on no list" if ( $list =~ /^[INS]/ );
 
-    my $type  = $self->_save_1('I');
+    my $type  = $self->_save_1('S');
     my $head  = $self->_save_1('P');
     my $label = $self->_gensym;
 
     # check for empty list
     $self->_add_inst( '', 'typeof', [ $type, $list ] );
-    $self->_add_inst( '', 'eq', [ $type, '.Undef', "DONE_$label" ] );
+    $self->_add_inst( '', 'eq', [ $type, q{'Undef'}, "DONE_$label" ] );
 
     my $copy = $self->_new_pair;
 
@@ -378,7 +378,7 @@ sub _qq_unquote_splicing {
 
     $self->_add_inst( '', 'set',    [ $list, $list . '[1]' ] );
     $self->_add_inst( '', 'typeof', [ $type, $list ] );
-    $self->_add_inst( '', 'eq',     [ $type, '.Undef', "FINISH_$label" ] );
+    $self->_add_inst( '', 'eq',     [ $type, q{'Undef'}, "FINISH_$label" ] );
 
     $temp = $self->_new_pair;
     $self->_add_inst( '', 'set', [ $copy . '[1]', $temp ] );
@@ -694,14 +694,14 @@ sub _op_pair_p {
 
     my $item = $self->_generate( _get_arg( $node, 1 ) );
 
-    $return = $self->_save_1('I');
+    $return = $self->_save_1('S');
 
     if ( $item =~ /^[INS]/ ) {
         $self->_add_inst( '', 'set', [ $return, 0 ] );
     }
     else {
         $self->_add_inst( '', 'typeof', [ $return, $item ] );
-        $self->_add_inst( '', 'ne',     [ $return, '.Array', "FAIL_$label" ] );
+        $self->_add_inst( '', 'ne',     [ $return, q{'Array'}, "FAIL_$label" ] );
         $self->_add_inst( '', 'set',    [ $return, $item ] );
         $self->_add_inst( '', 'ne',     [ $return, 2, "FAIL_$label" ] );
         $self->_add_inst( '', 'set',    [ $return, 1 ] );
@@ -723,7 +723,7 @@ sub _op_cons {
     my $car = $self->_generate( _get_arg( $node, 1 ) );
     $return = $self->_save_1('P');
 
-    $self->_add_inst( '', 'new', [ $return,         '.Array' ] );
+    $self->_add_inst( '', 'new', [ $return,         q{'Array'} ] );
     $self->_add_inst( '', 'set', [ $return,         2 ] );
     $self->_add_inst( '', 'set', [ $return . '[0]', $car ] );
     $self->_restore($car);
@@ -797,7 +797,7 @@ sub _op_null_p {
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'typeof', [ $return, $temp ] );
-    $self->_add_inst( '', 'ne',     [ $return, '.Undef', "FAIL_$label" ] );
+    $self->_add_inst( '', 'ne',     [ $return, q{'Undef'}, "FAIL_$label" ] );
     $self->_add_inst( '', 'set',    [ $return, 1 ] );
     $self->_add_inst( '', 'branch', ["DONE_$label"] );
     $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
@@ -823,7 +823,7 @@ sub _op_list {
         my $item = $self->_generate($_);
         my $pair = $self->_save_1('P');
 
-        $self->_add_inst( '', 'new', [ $pair,         '.Array' ] );
+        $self->_add_inst( '', 'new', [ $pair,         q{'Array'} ] );
         $self->_add_inst( '', 'set', [ $pair,         2 ] );
         $self->_add_inst( '', 'set', [ $pair . '[0]', $item ] );
         $self->_add_inst( '', 'set', [ $pair . '[1]', $ret_reg ] );
@@ -848,10 +848,10 @@ sub _op_length {
     my $list = $self->_generate( _get_arg( $node, 1 ) );
 
     $self->_add_inst( '', 'set', [ $return, '0' ] );
-    my $type = $self->_save_1('I');
+    my $type = $self->_save_1('S');
     $self->_add_inst( "NEXT_$label", 'typeof', [ $type, $list ] );
-    $self->_add_inst( '',            'eq',     [ $type, '.Undef', "DONE_$label" ] );
-    $self->_add_inst( '',            'ne',     [ $type, '.Array', "ERR_$label" ] );
+    $self->_add_inst( '',            'eq',     [ $type, q{'Undef'}, "DONE_$label" ] );
+    $self->_add_inst( '',            'ne',     [ $type, q{'Array'}, "ERR_$label" ] );
     $self->_add_inst( '', 'inc',    [$return] );
     $self->_add_inst( '', 'set',    [ $list, $list . '[1]' ] );
     $self->_add_inst( '', 'branch', ["NEXT_$label"] );
