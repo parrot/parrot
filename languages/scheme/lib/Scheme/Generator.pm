@@ -35,8 +35,6 @@ sub _add_comment {
         $self->_add_inst( '', '#', [ $comment ] );
 }
 
-#------------------------------------
-
 sub _new_regs {
     return {
         I => { map { $_ => 0 } ( 0 .. 31 ) },
@@ -202,8 +200,6 @@ sub _new_pair {
     return $return;
 }
 
-#------------------------------------
-
 my $type_map = {
     INTEGER  => [ 1, 'I' ],
     RATIONAL => [ 2, 'I' ],
@@ -211,8 +207,6 @@ my $type_map = {
     COMPLEX  => [ 2, 'I' ],
     STRING   => [ 1, 'S' ],
 };
-
-#------------------------------------
 
 sub _constant {
     my ( $self, $value ) = @_;
@@ -1735,8 +1729,6 @@ sub _op_generate_identifier {
 
 sub _op_construct_identifier {
 }
-
-#------------------------------------------------------------------------------
 
 my %global_ops = (
 
