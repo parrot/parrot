@@ -183,7 +183,7 @@ sub _store_lex {
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, $value ] );
+    $self->_add_inst( '', '# .lex', [ qq{"$symbol"}, $value ] );
     $self->{scope}->{$symbol} = $value;
 
     return;
@@ -232,6 +232,8 @@ sub _constant {
 sub _morph {
     my ( $self, $to, $from ) = @_;
 
+    $self->_add_comment( 'start of _morph' );
+
     if ( $to =~ /P/ ) {
         if ( $from =~ /P/ ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
@@ -245,6 +247,8 @@ sub _morph {
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
     }
+
+    $self->_add_comment( 'end of _morph' );
 
     return;
 }
@@ -412,19 +416,17 @@ sub _op_lambda {
     push @{ $self->{frames} }, $self->{regs};
     $self->{regs} = _new_regs;
 
-    # P1 is the return contination
-    $self->{regs}{P}{1} = 1;
-
     # expand the lexical scope
     my $oldscope = $self->{scope};
     $self->{scope} = { '*UP*' => $oldscope };
 
     # parameters
     my $num = 5;
+    # die Dumper( $node );
     my @args = @{ _get_arg( $node, 1 )->{children} };
     for (@args) {
         my $arg = $_->{value};
-        $self->_new_lex( $arg, "P$num" );
+        $self->_store_lex( $arg, "P$num" );
         $num++;
     }
 
@@ -435,7 +437,7 @@ sub _op_lambda {
     $self->_add_inst( '', '' );
     $self->_add_comment( 'generated for lambda' );
     my $outer = $self->{outer}->[-1];
-    $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('$outer')} ] );
+    $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('$outer') :lex} ] );
     push @{ $self->{outer} }, $sub_name;
 
     my $temp = 'none';
@@ -615,7 +617,6 @@ sub _op_let {
     my ( $self, $node ) = @_;
 
     $self->_add_comment( 'start of _op_let()' );
-    my $return;
 
     my ( $locals, @body ) = _get_args( $node, 1 );
     my ( @variables, @values );
@@ -627,12 +628,16 @@ sub _op_let {
     }
 
     my $let = {
-        children => [
-            { children => [ { value => 'lambda' }, { children => [@variables] }, @body ] }, @values
-        ]
+        children => [ { children => [ { value => 'lambda' },
+                                      { children => [@variables] },
+                                      @body
+                                    ]
+                      },
+                      @values
+                    ]
     };
 
-    $return = $self->_generate($let);
+    my $return = $self->_generate($let);
 
     $self->_add_comment( 'end of _op_let()' );
 
@@ -2051,6 +2056,8 @@ sub _call_function_sym {
     my $self     = shift;
     my $symbol   = shift;
 
+    $self->_add_comment( 'start of _call_function_sym' );
+
     my $func_obj = $self->_find_name($symbol);
 
     my $scope = $self->{scope};
@@ -2066,6 +2073,8 @@ sub _call_function_sym {
     my $return = $self->_call_function_obj( $func_obj, @_ );
     $self->_restore($func_obj);
 
+    $self->_add_comment( 'end of _call_function_sym' );
+
     return $return;
 }
 
@@ -2073,17 +2082,21 @@ sub _call_function_obj {
     my $self     = shift;
     my $func_obj = shift;
 
+    $self->_add_comment( 'start of _call_function_obj' );
+
     my $return = $self->_save_1('P');
     $self->_restore($return);    # dont need to save this
     $self->_save_set();
+            $self->_add_comment( 'OK1' );
 
     my $count = 5;
     my $empty = $return;
     my @args;
     while ( my $arg = shift ) {
         if ( $arg ne "P$count" ) {
-            if ( $arg =~ /^[INS]/ ) {
+            if ( $arg =~ m/^[INS]/ ) {
                 $self->_morph( "P$count", $arg );
+            $self->_add_comment( 'OK2' );
                 $count++;
                 next;
             }
@@ -2100,6 +2113,7 @@ sub _call_function_obj {
                 $empty = $moved;
             }
             $self->_add_inst( '', 'set', [ "P$count", $arg ] );
+            $self->_add_comment( 'OK3' );
             push @args, $count;
         }
         $count++;
@@ -2111,6 +2125,7 @@ sub _call_function_obj {
     }
     else
     {
+            $self->_add_comment( 'OK4' );
         $self->_add_inst( '', 'set_args', [ q{""} ] );
     }
     $self->_add_inst( '', 'get_results', [ q{"0"}, $return ] );
@@ -2119,6 +2134,8 @@ sub _call_function_obj {
 
     $return =~ /(\w)(\d+)/;
     $self->{regs}->{$1}->{$2} = 1;
+
+    $self->_add_comment( 'end of _call_function_obj' );
 
     return $return;
 }
@@ -2183,6 +2200,7 @@ sub prettyprint {
     return;
 }
 
+# generate PIR with recursive descent below $node
 sub _generate {
     my ( $self, $node ) = @_;
 
@@ -2228,7 +2246,7 @@ sub generate {
     $self->{scope} = {};
 
     $self->_add_inst( '', ".include 'library/dumper.pir'" );
-    $self->_add_inst( '', ".sub main :main" );
+    $self->_add_inst( '', ".sub main :main :lex" );
 
     my $temp = $self->_generate($tree);
     $self->_restore($temp);
