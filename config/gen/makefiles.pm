@@ -103,7 +103,7 @@ EOF
 sub makefiles {
     my ( $self, $conf ) = @_;
 
-    my $targets = $conf->options->get('targets');
+    my $targets = $conf->options->get('target');
     my @targets =
         defined $targets
         ? split ' ', $targets

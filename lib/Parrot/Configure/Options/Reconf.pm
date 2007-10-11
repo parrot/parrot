@@ -48,9 +48,9 @@ General Options:
 
    --help               Show this text
    --verbose            Output extra information
-   --step=(gen::languages)
+   --step=(gen::makefiles)
                         Execute a single configure step
-   --target=(Makefile)  Needed if --step=gen::makefiles
+   --target=(Makefile)  Regenerate a specific makefile
    --languages="list of languages"
                         Specify a list of languages to process
 
