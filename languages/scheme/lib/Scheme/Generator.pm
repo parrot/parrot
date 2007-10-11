@@ -430,11 +430,13 @@ sub _op_lambda {
 
     # lambda body
     # Another ugly hack. Move the generated code to 'lambda_instructions'
-    $self->_add_comment( 'start: lambda body in $sub_name' );
+    $self->_add_comment( "start: body of lambda is in $sub_name" );
     my $ins_count = scalar @{ $self->{instruction} };
     $self->_add_inst( '', '' );
     $self->_add_comment( 'generated for lambda' );
-    $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('main')} ] );
+    my $outer = $self->{outer}->[-1];
+    $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('$outer')} ] );
+    push @{ $self->{outer} }, $sub_name;
 
     my $temp = 'none';
     for ( _get_args( $node, 2 ) ) {
@@ -442,14 +444,15 @@ sub _op_lambda {
         $temp = $self->_generate($_);
     }
 
-    $self->_add_inst( '', 'set_returns', [ '"0"', $temp ] );
+    $self->_add_inst( '', 'set_returns', [ q{"0"}, $temp ] );
 
     $self->_add_inst( '', '.end' );
-    push @{ $self->{lambda_instructions} }, splice @{ $self->{instruction} }, $ins_count;
-    $self->_add_comment( "end: lambda body in $sub_name" );
+    unshift @{ $self->{lambda_instructions} }, splice @{ $self->{instruction} }, $ins_count;
+    $self->_add_comment( "end:   body of lambda is in $sub_name" );
 
     $self->{regs}  = pop @{ $self->{frames} };
     $self->{scope} = $self->{scope}->{'*UP*'};
+    pop @{ $self->{outer} };
 
     $self->_add_comment( 'end of _op_lambda()' );
 
@@ -611,6 +614,7 @@ sub _op_or {
 sub _op_let {
     my ( $self, $node ) = @_;
 
+    $self->_add_comment( 'start of _op_let()' );
     my $return;
 
     my ( $locals, @body ) = _get_args( $node, 1 );
@@ -629,6 +633,8 @@ sub _op_let {
     };
 
     $return = $self->_generate($let);
+
+    $self->_add_comment( 'end of _op_let()' );
 
     return $return;
 }
@@ -2107,7 +2113,7 @@ sub _call_function_obj {
     {
         $self->_add_inst( '', 'set_args', [ q{""} ] );
     }
-    $self->_add_inst( '', 'get_results', [ "0", $return ] );
+    $self->_add_inst( '', 'get_results', [ q{"0"}, $return ] );
     $self->_add_inst( '', 'invokecc', [ $func_obj ] );
     $self->_restore_set;
 
@@ -2146,14 +2152,15 @@ sub new {
     my $tree  = shift;
 
     my $self  = {
-        tree         => $tree,
-        regs         => _new_regs,
-        frames       => [],
-        gensym       => 0,                # used for creating unique labels and symbols
-        functions    => [],               # List of needed builtin functions
-        scope        => {},
-	instruction  => [],
-	lambda_instructions      => [],
+        tree                 => $tree,
+        regs                 => _new_regs,
+        frames               => [],
+        gensym               => 0,                # used for creating unique labels and symbols
+        functions            => [],               # List of needed builtin functions
+        scope                => {},
+        outer                => ['main'],         # a stack of the current outer sub
+        instruction          => [],
+        lambda_instructions  => [],
     };
 
     return bless $self, $class;
