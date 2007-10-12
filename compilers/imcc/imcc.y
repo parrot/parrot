@@ -680,7 +680,12 @@ hll_def: HLL STRINGC COMMA STRINGC
 
 constdef:
      CONST { is_def=1; } type IDENTIFIER '=' const
-                { mk_const_ident(interp, $4, $3, $6, 1); is_def=0; }
+                {
+                    SymReg *ignored;
+                    ignored = mk_const_ident(interp, $4, $3, $6, 1);
+                    UNUSED(ignored);
+                    is_def=0;
+                }
    ;
 
 pmc_const:
@@ -1211,10 +1216,21 @@ labeled_inst:
                        set_lexical(interp, $4, $2); $$ = 0;
                     }
    | CONST { is_def=1; } type IDENTIFIER '=' const
-                    { mk_const_ident(interp, $4, $3, $6, 0);is_def=0; }
+                    {
+                        SymReg *ignored;
+                        ignored = mk_const_ident(interp, $4, $3, $6, 0);
+                        UNUSED(ignored);
+                        is_def=0;
+                    }
+
    | pmc_const
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
-                    { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
+                    {
+                        SymReg *ignored;
+                        ignored = mk_const_ident(interp, $4, $3, $6, 1);
+                        UNUSED(ignored);
+                        is_def=0;
+                    }
    | RETURN  sub_call   { $$ = NULL;
                            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
                            IMCC_INFO(interp)->cur_call = NULL;
