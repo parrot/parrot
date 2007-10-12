@@ -1,5 +1,5 @@
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: Actions.pir 21264 2007-09-13 23:04:36Z colink $
+# $Id$
 
 .sub '__onload' :init :load
     $P0 = newclass 'PIR::Grammar::Actions'
