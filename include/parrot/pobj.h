@@ -189,7 +189,7 @@ typedef struct PMC_EXT {
 #  define PMC_data(pmc)                   PMC_ext_checked(pmc)->data
 #  define PMC_data_typed(pmc, type) (type)PMC_ext_checked(pmc)->data
 #  define PMC_data0(pmc)      ((pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
-#  define PMC_data0_typed(pmc, type) (type)(pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
+#  define PMC_data0_typed(pmc, type) (type)((pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
 #else
 #  define PMC_data(pmc)                   (pmc)->data
 #  define PMC_data_typed(pmc, type) (type)(pmc)->data
