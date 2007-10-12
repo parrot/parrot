@@ -65,14 +65,20 @@ sub check_parens {
                    )
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
-        if ( $buf =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
-            push @keyword_paren => "$path: $1\n";
-        }
-        if ( $buf =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
-            push @non_keyword_paren => "$path: $1\n";
-        }
-        if ( $buf =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {
-            push @space_between_parens => "$path: $1\n";
+        my @lines = split(/\n/, $buf);
+        for my $line ( @lines ) {
+            next if $line =~ m{#\s*define};  # skip #defines
+            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
+                # ops use the same names as some C keywords, so skip
+                next if $line =~ m{^op};
+                push @keyword_paren => "$path: $1\n";
+            }
+            if ( $line =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }x ) {
+                push @non_keyword_paren => "$path: $1\n";
+            }
+            if ( $line =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {
+                push @space_between_parens => "$path: $1\n";
+            }
         }
     }
 
