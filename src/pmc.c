@@ -380,9 +380,16 @@ pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
         return type;
     }
     if (type < enum_type_undef) {
-        real_exception(interp, NULL, 1, "native type with name '%s' already exists - "
-                "can't register PMC", data_types[type].name);
-        return 0;
+        char *type_name;
+        if (type < 0) {
+            strcpy(type_name, "undefined type");
+        }
+        else {
+            strcpy(type_name, data_types[type].name);
+        }
+        real_exception(interp, NULL, 1,
+                "native type with name '%s' already exists - "
+                "can't register PMC", type_name);
     }
 
     classname_hash = interp->class_hash;
