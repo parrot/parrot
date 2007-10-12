@@ -420,28 +420,34 @@ sub _op_lambda {
     my $oldscope = $self->{scope};
     $self->{scope} = { '*UP*' => $oldscope };
 
-    # parameters
-    my $num = 5;
-    # die Dumper( $node );
-    my @args = @{ _get_arg( $node, 1 )->{children} };
-    for (@args) {
-        my $arg = $_->{value};
-        $self->_store_lex( $arg, "P$num" );
-        $num++;
-    }
-
     # lambda body
     # Another ugly hack. Move the generated code to 'lambda_instructions'
     $self->_add_comment( "start: body of lambda is in $sub_name" );
     my $ins_count = scalar @{ $self->{instruction} };
     $self->_add_inst( '', '' );
+
     $self->_add_comment( 'generated for lambda' );
     my $outer = $self->{outer}->[-1];
     $self->_add_inst( '', '.sub', [ qq{$sub_name :outer('$outer') :lex} ] );
     push @{ $self->{outer} }, $sub_name;
 
+    # loop over parameters
+    my $cnt = 0;
+    my @store_lex;
+    for ( @{ _get_arg( $node, 1 )->{children} } ) {
+        my $param_name = "param_$cnt";
+        $self->_add_inst( '', '.param pmc', [ $param_name ] );
+        push @store_lex, [ '', '.lex', [ qq{"$_->{value}"}, $param_name ]]; 
+        $cnt++;
+    }
+    foreach ( @store_lex ) {
+        $self->_add_inst( @{$_} );
+    }
+  
+    # generate code for the body
     my $temp = 'none';
     for ( _get_args( $node, 2 ) ) {
+        # die Dumper( $_, $node );
         $self->_restore($temp);
         $temp = $self->_generate($_);
     }
@@ -2087,7 +2093,6 @@ sub _call_function_obj {
     my $return = $self->_save_1('P');
     $self->_restore($return);    # dont need to save this
     $self->_save_set();
-            $self->_add_comment( 'OK1' );
 
     my $count = 5;
     my $empty = $return;
@@ -2096,43 +2101,35 @@ sub _call_function_obj {
         if ( $arg ne "P$count" ) {
             if ( $arg =~ m/^[INS]/ ) {
                 $self->_morph( "P$count", $arg );
-            $self->_add_comment( 'OK2' );
-                $count++;
-                next;
             }
-
-            # Check if any later argument needs the old value of P$count
-            my $moved;
-            for (@_) {
-                if ( $_ eq "P$count" ) {
-                    $moved = $_;
-                    $_     = $empty;
+            else {
+                # Check if any later argument needs the old value of P$count
+                my $moved;
+                for (@_) {
+                    if ( $_ eq "P$count" ) {
+                        $moved = $_;
+                        $_     = $empty;
+                    }
                 }
+                if ($moved) {
+                    $empty = $moved;
+                }
+                $self->_add_inst( '', 'set', [ "P$count", $arg ] );
             }
-            if ($moved) {
-                $empty = $moved;
-            }
-            $self->_add_inst( '', 'set', [ "P$count", $arg ] );
-            $self->_add_comment( 'OK3' );
-            push @args, $count;
         }
+        push @args, "P$count";
         $count++;
     }
 
-    if ( @args )
     {
-        $self->_add_inst( '', 'set_args', [ q{"} . join( q{,}, q{0} x scalar(@args) ) . q{"}, join( q{,}, map { "P$_" } @args ) ] );    
-    }
-    else
-    {
-            $self->_add_comment( 'OK4' );
-        $self->_add_inst( '', 'set_args', [ q{""} ] );
+        my $spec = q{"} . join( q{,}, ( q{0} ) x scalar(@args) ) . q{"};    
+        $self->_add_inst( '', 'set_args', [ $spec, @args ] );    
     }
     $self->_add_inst( '', 'get_results', [ q{"0"}, $return ] );
     $self->_add_inst( '', 'invokecc', [ $func_obj ] );
-    $self->_restore_set;
+    $self->_restore_set();
 
-    $return =~ /(\w)(\d+)/;
+    $return =~ m/(\w)(\d+)/;
     $self->{regs}->{$1}->{$2} = 1;
 
     $self->_add_comment( 'end of _call_function_obj' );
