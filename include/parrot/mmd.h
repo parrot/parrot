@@ -28,7 +28,7 @@ typedef void (*mmd_f_v_pi)(PARROT_INTERP, PMC *, INTVAL);
 typedef void (*mmd_f_v_pn)(PARROT_INTERP, PMC *, FLOATVAL);
 typedef void (*mmd_f_v_ps)(PARROT_INTERP, PMC *, STRING *);
 
-typedef INTVAL  (*mmd_f_i_pp)(PARROT_INTERP, PMC *, PMC *);
+typedef INTVAL (*mmd_f_i_pp)(PARROT_INTERP, PMC *, PMC *);
 
 typedef struct _MMD_init {
         INTVAL func_nr;

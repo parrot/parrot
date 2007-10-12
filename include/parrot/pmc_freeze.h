@@ -32,10 +32,10 @@ typedef void (*push_integer_f)       (PARROT_INTERP, IMAGE_IO*, INTVAL);
 typedef void (*push_pmc_f)           (PARROT_INTERP, IMAGE_IO*, PMC*);
 typedef void (*push_string_f)        (PARROT_INTERP, IMAGE_IO*, STRING*);
 typedef void (*push_number_f)        (PARROT_INTERP, IMAGE_IO*, FLOATVAL);
-typedef INTVAL  (*shift_integer_f)      (PARROT_INTERP, IMAGE_IO*);
+typedef INTVAL (*shift_integer_f)      (PARROT_INTERP, IMAGE_IO*);
 typedef PMC*    (*shift_pmc_f)          (PARROT_INTERP, IMAGE_IO*);
 typedef STRING* (*shift_string_f)       (PARROT_INTERP, IMAGE_IO*);
-typedef FLOATVAL(*shift_number_f)       (PARROT_INTERP, IMAGE_IO*);
+typedef FLOATVAL (*shift_number_f)       (PARROT_INTERP, IMAGE_IO*);
 
 typedef struct _image_funcs {
     push_integer_f      push_integer;

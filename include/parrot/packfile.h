@@ -239,8 +239,8 @@ typedef struct PackFile {
 
     INTVAL    need_wordsize;
     INTVAL    need_endianize;
-    opcode_t  (*fetch_op)(unsigned char *);
-    INTVAL    (*fetch_iv)(unsigned char *);
+    opcode_t (*fetch_op)(unsigned char *);
+    INTVAL (*fetch_iv)(unsigned char *);
     void (*fetch_nv)(unsigned char *, const unsigned char *);
 } PackFile;
 
