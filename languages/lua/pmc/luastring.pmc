@@ -132,7 +132,7 @@ Return the string "string".
 =cut
 
 */
-    void set_integer_native (INTVAL value) {
+    void set_integer_native(INTVAL value) {
         DYNSELF.morph(dynpmc_LuaNumber);
         DYNSELF.set_integer_native(value);
     }
