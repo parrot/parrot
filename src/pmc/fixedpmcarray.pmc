@@ -34,7 +34,7 @@ swap(void **x, void **y)
     *y = t;
 }
 
-typedef INTVAL(*sort_func_t)(PARROT_INTERP, void*, void*);
+typedef INTVAL (*sort_func_t)(PARROT_INTERP, void*, void*);
 
 static INTVAL
 COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)

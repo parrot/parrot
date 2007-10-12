@@ -1307,7 +1307,7 @@ void ppc_sync(void);
 void
 ppc_flush_line(char *_sync)
 {
-    __asm__ __volatile__ (
+    __asm__ __volatile__(
     "dcbf 0,%0"
     :
     : "r" ((long)_sync));
@@ -1316,13 +1316,13 @@ ppc_flush_line(char *_sync)
 void
 ppc_sync(void)
 {
-    __asm__ __volatile__ ("sync");
+    __asm__ __volatile__("sync");
 }
 
 #  endif
 
 static void
-ppc_sync_cache (void *_start, void *_end)
+ppc_sync_cache(void *_start, void *_end)
 {
     char *start = (char*)(((int)_start) &~(CACHELINESIZE - 1));
     char *end = (char *)((((int)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));

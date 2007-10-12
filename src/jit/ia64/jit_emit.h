@@ -752,14 +752,14 @@ char intval_map[INT_REGISTERS_TO_MAP] =
       48, 49, 50, 51, 52, 53, 54, 55, 56, 57 };
 
 static void
-ia64_sync_cache (void *_start, void *_end)
+ia64_sync_cache(void *_start, void *_end)
 {
     char *start = (char*)(((long)_start) &~(CACHELINESIZE - 1));
     char *end = (char *)((((long)_end)+CACHELINESIZE-1) &~(CACHELINESIZE - 1));
     char *_sync;
 
     for (_sync = start; _sync < end; _sync += CACHELINESIZE) {
-        __asm__ __volatile__ (
+        __asm__ __volatile__(
         "fc %0\n"
         ";;\n"
         "sync.i\n"

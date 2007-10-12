@@ -153,7 +153,7 @@ shifted down.
 */
 
     opcode_t *invoke(void *next) {
-        typedef INTVAL(*nci_sub_t)(PARROT_INTERP, PMC *);
+        typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 
         nci_sub_t func = PObj_flag_TEST(private2, SELF)
             ? (nci_sub_t) PMC_struct_val(SELF)

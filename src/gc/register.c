@@ -679,7 +679,7 @@ Parrot_push_regs(PARROT_INTERP)
         (INTVAL *) ((char*) ptr + _SIZEOF_NUMS);
     chunk = *chunk_p;
     PObj_bufstart(chunk) = ptr;
-    PObj_buflen  (chunk) = size_nips;
+    PObj_buflen(chunk) = size_nips;
     PObj_sysmem_SET(chunk);
 }
 

@@ -360,11 +360,11 @@ size_t PIO_write_down(PARROT_INTERP,
  * the specific call.
  */
 struct _ParrotIOLayerAPI {
-    INTVAL          (*Init)(PARROT_INTERP, ParrotIOLayer * l);
+    INTVAL (*Init)(PARROT_INTERP, ParrotIOLayer * l);
     ParrotIOLayer * (*New)(ParrotIOLayer * proto);
     void (*Delete)(ParrotIOLayer * l);
-    INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
-    INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
+    INTVAL (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
+    INTVAL (*Popped)(ParrotIOLayer * l, ParrotIO * io);
     ParrotIO *      (*Open)(PARROT_INTERP, ParrotIOLayer * l,
                             const char * name, INTVAL flags);
     ParrotIO *      (*Open2_Unused)(PARROT_INTERP);
@@ -374,43 +374,43 @@ struct _ParrotIOLayerAPI {
                                   DummyCodeRef *);
     ParrotIO *      (*FDOpen)(PARROT_INTERP, ParrotIOLayer * l,
                               PIOHANDLE fd, INTVAL flags);
-    INTVAL          (*Close)(PARROT_INTERP, ParrotIOLayer * l,
+    INTVAL (*Close)(PARROT_INTERP, ParrotIOLayer * l,
                                 ParrotIO * io);
-    size_t          (*Write)(PARROT_INTERP, ParrotIOLayer * l,
+    size_t (*Write)(PARROT_INTERP, ParrotIOLayer * l,
                              ParrotIO * io, STRING *);
-    size_t          (*Write_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
+    size_t (*Write_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
                                    ParrotIO * io, STRING *, DummyCodeRef *);
-    size_t          (*Read)(PARROT_INTERP, ParrotIOLayer * layer,
+    size_t (*Read)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, STRING **);
-    size_t          (*Read_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
+    size_t (*Read_ASync)(PARROT_INTERP, ParrotIOLayer * layer,
                                   ParrotIO * io, STRING **, DummyCodeRef *);
-    INTVAL          (*Flush)(PARROT_INTERP, ParrotIOLayer * layer,
+    INTVAL (*Flush)(PARROT_INTERP, ParrotIOLayer * layer,
                              ParrotIO * io);
-    size_t          (*Peek)(PARROT_INTERP, ParrotIOLayer * layer,
+    size_t (*Peek)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, STRING ** buf);
-    PIOOFF_T        (*Seek)(PARROT_INTERP, ParrotIOLayer * layer,
+    PIOOFF_T (*Seek)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io, PIOOFF_T offset, INTVAL whence);
-    PIOOFF_T        (*Tell)(PARROT_INTERP, ParrotIOLayer * layer,
+    PIOOFF_T (*Tell)(PARROT_INTERP, ParrotIOLayer * layer,
                             ParrotIO * io);
-    INTVAL          (*SetBuf)(PARROT_INTERP, ParrotIOLayer * layer,
+    INTVAL (*SetBuf)(PARROT_INTERP, ParrotIOLayer * layer,
                               ParrotIO * io, size_t bufsize);
-    INTVAL          (*SetLineBuf)(PARROT_INTERP, ParrotIOLayer * layer,
+    INTVAL (*SetLineBuf)(PARROT_INTERP, ParrotIOLayer * layer,
                                   ParrotIO * io);
-    INTVAL          (*GetCount)(PARROT_INTERP, ParrotIOLayer * layer);
-    INTVAL          (*Fill)(PARROT_INTERP, ParrotIOLayer * layer);
-    INTVAL          (*Eof)(PARROT_INTERP, ParrotIOLayer * l,
+    INTVAL (*GetCount)(PARROT_INTERP, ParrotIOLayer * layer);
+    INTVAL (*Fill)(PARROT_INTERP, ParrotIOLayer * layer);
+    INTVAL (*Eof)(PARROT_INTERP, ParrotIOLayer * l,
                            ParrotIO * io);
     /* Network API */
-    INTVAL          (*Poll)(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io,
+    INTVAL (*Poll)(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io,
                             int which, int sec, int usec);
     ParrotIO *      (*Socket)(PARROT_INTERP, ParrotIOLayer *,
                             int dom, int type, int proto);
-    INTVAL          (*Connect)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *,
+    INTVAL (*Connect)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *,
                             STRING *);
-    INTVAL          (*Send)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
-    INTVAL          (*Recv)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING **);
-    INTVAL          (*Bind)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
-    INTVAL          (*Listen)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, INTVAL);
+    INTVAL (*Send)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL (*Recv)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING **);
+    INTVAL (*Bind)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *);
+    INTVAL (*Listen)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, INTVAL);
     ParrotIO *      (*Accept)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *);
 };
 
