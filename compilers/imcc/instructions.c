@@ -361,10 +361,13 @@ insert_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(In
 
         unit->instructions = tmp;
         tmp->next = next;
-        next->prev = tmp;
-        tmp->line = next->line;
-        if (!next)
+        if (next) {
+            next->prev = tmp;
+            tmp->line = next->line;
+        }
+        else {
             unit->last_ins = tmp;
+        }
     }
     else {
         Instruction * const next = ins->next;
