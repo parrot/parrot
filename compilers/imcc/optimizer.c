@@ -934,11 +934,16 @@ branch_branch(PARROT_INTERP, NOTNULL(IMC_Unit * unit))
                       (next->type & IF_goto) &&
                       !strcmp(next->op, "branch") &&
                       strcmp(next->r[0]->name, get_branch_reg(ins)->name)) {
+                    const int regno = get_branch_regno(ins);
                     IMCC_debug(interp, DEBUG_OPT1,
                             "found branch to branch '%s' %I\n",
                             r->first_ins->r[0]->name, next);
                     unit->ostat.branch_branch++;
-                    ins->r[get_branch_regno(ins)] = next->r[0];
+                    if (regno < 0) {
+                        real_exception(interp, NULL, 1,
+                                "Register number determination failed in branch_branch()");
+                    }
+                    ins->r[regno] = next->r[0];
                     changed = 1;
                 }
             }
