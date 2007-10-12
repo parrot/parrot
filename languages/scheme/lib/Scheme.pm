@@ -19,7 +19,7 @@ use Scheme::Builtins;
 
 =head2 new
 
-A constructor
+A constructor.
 
 =cut
 
@@ -89,11 +89,10 @@ This is called in schemec.
 sub compile {
     my $self = shift;
 
-    $self->{tokens} = Scheme::Tokenizer::tokenize( $self->{file} );
-    $self->{tree}   = Scheme::Parser::parse( $self->{tokens} );
-    $self->{code}   = link_functions( Scheme::Generator::generate( $self->{tree} ) );
+    my $tokens = Scheme::Tokenizer::tokenize( $self->{file} );
+    my $tree   = Scheme::Parser::parse( $tokens );
 
-    return $self->{code};
+    return link_functions( Scheme::Generator::generate( $tree ) );
 }
 
 1;

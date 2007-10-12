@@ -20,7 +20,7 @@ sub tokenize {
     {
         open my $source, '<', $file;
         while (<$source>) {
-            next if / \A \s* ; /xms;
+            next if m/ \A \s* ; /xms;
             s/ ; .* \z //xms;
             $text .= $_;
         }
@@ -70,7 +70,7 @@ sub tokenize {
             {                                # Equal sign can follow '<','>'
                 $token .= $ch;
             }
-            elsif (    $ch =~ /\d/
+            elsif (    $ch =~ m/\d/
                     && (    $token =~ m/^[-]/       # Digits can follow a dash
                          || $token =~ m/^\./        # Digits can follow a decimal point
                          || $token =~ m/^\d/
@@ -79,13 +79,13 @@ sub tokenize {
             {                                # Digits can follow other digits
                 $token .= $ch;
             }
-            elsif (    $ch =~ /[a-zA-Z]/
+            elsif (    $ch =~ m/[a-zA-Z]/
                     && $token =~ m/^\w/
                   )
             {                                # Letters can follow other letters
                 $token .= $ch;
             }
-            elsif (    $ch =~ /\s/
+            elsif (    $ch =~ m/\s/
                     && $token =~ m/^\s/
                   )
             {                                # White can follow white
