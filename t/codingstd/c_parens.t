@@ -33,14 +33,14 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $keywords = join '|' => sort { length $a cmp length $b } qw/
-    auto      double    int       struct
-    break     else      long      switch
-    case      enum      register  typedef
-    char      extern    return    union
+    auto      double    int       struct    INTVAL
+    break     else      long      switch    UINTVAL
+    case      enum      register  typedef   FLOATVAL
+    char      extern    return    union     PIOOFF_T
     const     float     short     unsigned
     continue  for       signed    void
-    default   goto      sizeof    volatile
-    do        if        static    while
+    default   goto      sizeof    volatile  opcode_t
+    do        if        static    while     size_t
     /;
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
