@@ -22,7 +22,9 @@ my $outfile          = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';
 my $lockfile         = "$outfile.lck";
 
-sysopen( my $lock, $lockfile, O_CREAT ) or die "Can't write '$lockfile': $!\n";
+# add read/write permissions even if we don't read/write the file
+# for example, Solaris requires write permissions for exclusive locks
+sysopen( my $lock, $lockfile, O_CREAT | O_RDWR ) or die "Can't write '$lockfile': $!\n";
 
 flock($lock, LOCK_EX) or die "Can't lock '$lockfile': $!\n";
 
