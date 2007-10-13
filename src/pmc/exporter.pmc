@@ -13,18 +13,34 @@ You can use Exporter in PIR to import subs from a library. At its simplest:
  .sub main :main
      load_bytecode 'Test/More.pir'
 
-     .local pmc exporter, test_ns
-     test_ns  = get_namespace [ 'Test'; 'More' ]
+     .local pmc exporter, src_ns, dest_ns
+     src_ns   = get_namespace [ 'Test'; 'More' ]
      exporter = new 'Exporter'
 
-     exporter.'import'( test_ns :named('source'), 'plan ok' :named('globals') )
+     exporter.'import'( src_ns :named('source') 'plan ok' :named('globals') )
      plan(1)
      ok(1, 'exporter has imported the requested functions')
  .end
 
-Fancier options exist which allow you to import to an alternate namespace,
-or export globals so they can be called using a different name. See
-F<t/pmc/exporter.t> for examples.
+You can also specify the exporter attributes before making the import call,
+for example to import into the alternate namespace 'Foo' you could use the
+following code:
+
+    src_ns   = get_namespace [ 'Test'; 'More' ]
+    dest_ns  = get_namespace [ 'Foo' ]
+    exporter.'source'(src_ns)
+    exporter.'destination'(dest_ns)
+    exporter.'import'('plan ok' :named('globals'))
+
+You can even import subroutines under different names if globals is a hash:
+
+    globals         = new 'Hash'
+    globals['plan'] = 'steps'
+    globals['ok']   = 'passed'
+    exporter.'import'(globals :named('globals'))
+    steps(1)
+    passed(1)
+
 
 =head1 DESCRIPTION
 
@@ -53,7 +69,9 @@ A PMC representing the current namespace is allocated upon initialization.
 
 =item C<globals>
 
-The globals to export -- a PMC that implements the hash interface, or Null.
+The globals to export -- a PMC that implements a hash, an array, a String
+containing a list of space-separated subroutine names or Null.
+
 A Null PMC is allocated during initialization.
 
 =cut
