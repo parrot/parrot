@@ -35,9 +35,6 @@ sub runstep {
         # Intel C++ compiler has the same name as its C compiler
         $link = $cc;
 
-        # don't allow icc to pretend it's gcc
-        $ccflags .= ' -no-gcc';
-
         # suppress sprintf warnings that don't apply
         $ccflags .= ' -wd269';
 
@@ -65,10 +62,6 @@ sub runstep {
         # ignore "function 'xxx' was declared but never referenced"
         # (only done temporarily to reduce noise)
         $ccflags .= ' -wd117';
-
-        # ignore "missing return statement at end of non-void function"
-        # warnings (only done temporarily to reduce noise)
-        $ccflags .= ' -wd1011';
 
         # ignore "conversion from "" to "" may lose significant bits"
         # warnings (only done temporarily to reduce noise)
