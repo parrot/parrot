@@ -154,7 +154,7 @@ PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
                 s2->charset  = Parrot_unicode_charset_ptr;
                 s2->encoding = Parrot_utf8_encoding_ptr;
 
-                /* XXX need to check the amount read here? */
+                /* RT#46413 need to check the amount read here? */
                 read         = PIO_read_down(interp, layer->down, io, &s2);
                 UNUSED(read);
 

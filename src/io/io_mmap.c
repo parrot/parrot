@@ -146,7 +146,7 @@ PIO_mmap_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
     }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     {
-        /* XXX assume fstat exists too
+        /* RT#46407 assume fstat exists too
         */
         struct stat statbuf;
         int status;
@@ -155,7 +155,7 @@ PIO_mmap_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         status = fstat(io->fd, &statbuf); /* We're ignoring this return value. */
         UNUSED(status);
         file_size = statbuf.st_size;
-        /* TODO verify flags */
+        /* RT#46049 verify flags */
         io->b.startb = (unsigned char *)mmap(0, file_size, PROT_READ, MAP_SHARED, io->fd, 0);
         io->b.size = (size_t)file_size;  /* XXX */
         io->b.endb = io->b.startb + io->b.size;
@@ -190,7 +190,7 @@ PIO_mmap_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer), NOTNULL(ParrotIO *io
         *buf = new_string_header(interp, 0);
     }
     s = *buf;
-    /* TODO create string_free API for reusing string headers */
+    /* RT#46411 create string_free API for reusing string headers */
     if (s->strstart && PObj_sysmem_TEST(s))
         mem_sys_free(PObj_bufstart(s));
     PObj_get_FLAGS(s) |= PObj_external_FLAG;
