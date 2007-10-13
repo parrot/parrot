@@ -183,7 +183,7 @@ sub _store_lex {
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    $self->_add_inst( '', '# .lex', [ qq{"$symbol"}, $value ] );
+    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, $value ] );
     $self->{scope}->{$symbol} = $value;
 
     return;
@@ -496,13 +496,14 @@ sub _op_if {
 sub _op_define {
     my ( $self, $node ) = @_;
 
+    $self->_add_comment( 'start of _op_define()' );
+
     _num_arg( $node, 2, 'define' );
 
-    my ( $symbol, $lambda, $value );
+    my ( $symbol, $lambda );
 
     if ( exists _get_arg( $node, 1 )->{children} ) {
-        my @formals;
-        ( $symbol, @formals ) = @{ _get_arg( $node, 1 )->{children} };
+        ( $symbol, my @formals ) = @{ _get_arg( $node, 1 )->{children} };
         $symbol = $symbol->{value};
         $lambda =
             { children =>
@@ -520,9 +521,9 @@ sub _op_define {
         $self->{scope}->{$symbol} = '*unknown*';
     }
 
-    $value = $self->_generate($lambda);
+    my $value = $self->_generate($lambda);
 
-    if ( $value !~ /^P/ ) {
+    if ( $value !~ m/^P/ ) {
         my $pmc = $self->_save_1('P');
         $self->_morph( $pmc, $value );
         $self->_restore($value);
@@ -530,6 +531,8 @@ sub _op_define {
     }
 
     $self->_new_lex( $symbol, $value );
+
+    $self->_add_comment( 'end of _op_define()' );
 
     return $value;
 }
