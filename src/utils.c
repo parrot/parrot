@@ -651,7 +651,7 @@ Parrot_byte_index(SHIM_INTERP, NOTNULL(const STRING *base),
     const INTVAL       str_len    = base->strlen;
     const char * const search_str = search->strstart;
     const INTVAL       search_len = search->strlen;
-    char              *str_pos    = str_start + start_offset;
+    const char        *str_pos    = str_start + start_offset;
     INTVAL             len_remain = str_len   - start_offset;
     char              *search_pos;
 
