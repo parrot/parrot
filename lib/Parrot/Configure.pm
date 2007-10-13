@@ -321,7 +321,7 @@ sub _run_this_step {
             } );
             # reset verbose value for the next step
             $conf->options->set( verbose => $args->{verbose} );
- 
+
             if ($conf->options->get(q{configure_trace}) ) {
                 _update_conftrace( {
                     conftrace   => $conftrace,
