@@ -1,3 +1,9 @@
+=head1 Subroutines
+
+This example demonstrates a simple subroutine defined and called.
+
+=cut
+
 .sub main :main
 
    $S0 = foo("Zaphod")

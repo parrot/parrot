@@ -1,3 +1,9 @@
+=head1 File Operations
+
+This example demonstrates basic file operations. Note the readmode.
+
+=cut
+
 .sub main :main
     .local pmc fileout, filein
 

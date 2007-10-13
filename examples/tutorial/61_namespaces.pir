@@ -1,3 +1,9 @@
+=head1 Namespaces
+
+This example demonstrates storing and retrieving a global variable in a namespace.
+
+=cut
+
 .sub main :main
 
    $P0 = new 'String'

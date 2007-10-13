@@ -1,3 +1,15 @@
+=head1
+
+This code example illustrates cloning with PMC strings. A simple copy is just
+another way of accessing the same variable, while a true clone creates a deep
+copy.
+
+  Ford
+  Zaphod
+  Zaphod
+
+=cut
+
 .sub main :main
     .local pmc firstname
 

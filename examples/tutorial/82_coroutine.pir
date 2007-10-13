@@ -1,3 +1,11 @@
+=head1 Coroutines
+
+This example demonstrates creating a coroutine, and using it as an auto
+increment (every time you call the coroutine it increments its internal
+variable by one).
+
+=cut
+
 .sub main :main
     $I0 = autoincrement()
     print $I0

@@ -1,3 +1,10 @@
+=head1
+
+This demonstrates sprintf (provide some description of the options).
+Particularly note the options for printing PMCs which C doesn't have.
+
+=cut
+
 .sub main :main
 
     .local pmc myarray

@@ -1,3 +1,11 @@
+=head1 Multi-Level Keys
+
+This example demonstrates multiple keys with array and hash access. Note that
+the keys aren't auto instantiating, so the objects at each level have to be
+created.
+
+=cut
+
 .sub main :main
 
     .local pmc myhash, innerarray

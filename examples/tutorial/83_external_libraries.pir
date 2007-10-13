@@ -1,3 +1,9 @@
+=head1 External C Function Call
+
+This example demonstrates using NCI to load a C library and call a C function.
+
+=cut
+
 .sub main :main
   .local pmc library
   library = loadlib "libnci_test"

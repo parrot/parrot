@@ -1,3 +1,10 @@
+=head1 Classes
+
+This example demstrates creating a class in PIR, adding attributes, defining
+methods, calling methods, and setting attributes.
+
+=cut
+
 .sub main :main
     .local pmc myclass, myobj
 

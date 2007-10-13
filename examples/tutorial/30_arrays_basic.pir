@@ -1,3 +1,10 @@
+=head1
+
+Shows how to create arrays, keyed access to arrays, and the basic array
+operations (which are similar to Perl).
+
+=cut
+
 .sub main :main
 
     .local pmc myarray

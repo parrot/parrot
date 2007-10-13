@@ -1,3 +1,9 @@
+=head1 Continuations
+
+This example demonstrates creating a continuation, and using it as your own form of return.
+
+=cut
+
 .sub main :main
     .local pmc cont
     cont = new 'Continuation'

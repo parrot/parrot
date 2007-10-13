@@ -1,3 +1,9 @@
+=head1 
+
+Demonstrate the simplest form of control flow, 'goto' a label.
+
+=cut
+
 .sub main :main
 
     say "before branch"

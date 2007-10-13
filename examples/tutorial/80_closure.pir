@@ -1,3 +1,9 @@
+=head1 Closures
+
+This example demonstrates creating a closure.
+
+=cut
+
 .sub main :main
     .lex "$n", $P0
     $P0 = new 'Integer'

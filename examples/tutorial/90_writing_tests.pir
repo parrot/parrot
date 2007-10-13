@@ -1,3 +1,13 @@
+=head1 Writing Tests
+
+This example demonstrates writing tests using the PIR version of Test::More.
+(Worth explaining a little of how ok, is, skip, and todo work.)
+
+Also demonstrates exporting from one namespace to another (should be updated
+to use particle's Exporter).
+
+=cut
+
 .sub _main :main
     load_bytecode 'library/Test/More.pir'
 

@@ -1,3 +1,10 @@
+=head1 Hashes
+
+This example demonstrates using hashes, keyed access, and automatic conversion
+of low-level types to pmc types in keyed access.
+
+=cut
+
 .sub main :main
 
     .local pmc myhash

@@ -1,3 +1,9 @@
+=head1
+
+This example demonstrates the split opcode.
+
+=cut
+
 .sub main :main
     .local pmc words
 
