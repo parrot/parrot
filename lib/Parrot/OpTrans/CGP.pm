@@ -118,7 +118,7 @@ code.
 sub goto_pop {
     my ($self) = @_;
 
-    return "goto *(opcode_t *)(cur_opcode = opcode_to_prederef(interp,
+    return "goto **(opcode_t *)(cur_opcode = opcode_to_prederef(interp,
         (opcode_t*)pop_dest(interp)))";
 }
 
