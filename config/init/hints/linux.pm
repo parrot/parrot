@@ -78,6 +78,21 @@ sub runstep {
 
         $ccflags .= ' -Wall -Wcheck -w2';
 
+        $ccflags .= ' -Wabi';
+        $ccflags .= ' -Wcomment';
+        $ccflags .= ' -Wdeprecated';
+        $ccflags .= ' -Wmain';
+        $ccflags .= ' -Wmissing-prototypes';
+        #$ccflags .= ' -Wp64';
+        $ccflags .= ' -Wpointer-arith';
+        $ccflags .= ' -Wreturn-type';
+        $ccflags .= ' -Wstrict-prototypes';
+        #$ccflags .= ' -Wtrigraphs';
+        $ccflags .= ' -Wuninitialized';
+        $ccflags .= ' -Wunknown-pragmas';
+        $ccflags .= ' -Wunused-function';
+        $ccflags .= ' -Wunused-variable';
+
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
 
