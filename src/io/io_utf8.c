@@ -156,6 +156,7 @@ PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
 
                 /* XXX need to check the amount read here? */
                 read         = PIO_read_down(interp, layer->down, io, &s2);
+                UNUSED(read);
 
                 s->strlen    = iter.charpos;
                 s            = string_append(interp, s, s2);

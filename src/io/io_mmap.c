@@ -152,7 +152,8 @@ PIO_mmap_open(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
         int status;
         PIOOFF_T file_size;
 
-        status = fstat(io->fd, &statbuf); /* XXX We're ignoring this return value. */
+        status = fstat(io->fd, &statbuf); /* We're ignoring this return value. */
+        UNUSED(status);
         file_size = statbuf.st_size;
         /* TODO verify flags */
         io->b.startb = (unsigned char *)mmap(0, file_size, PROT_READ, MAP_SHARED, io->fd, 0);
