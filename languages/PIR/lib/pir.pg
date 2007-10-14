@@ -21,6 +21,7 @@ grammar PIR::Grammar;
 
 token TOP {
     ^ <program> [ $ | <syntax_error: end of file expected> ]
+   {*}
 }
 
 rule program {
@@ -28,14 +29,15 @@ rule program {
     <compilation_unit>
     [ <?NL> <compilation_unit> ]*
     [ <?NL> | <warning: no newline at end of file> ]
+    {*}
 }
 
 token compilation_unit {
-    | <expansion>
-    | <sub_def>
-    | <const_def>
-    | <pragma>
-    | <emit>
+    | <expansion>  {*} #= expansion
+    | <sub_def>    {*} #= sub_def
+    | <const_def>  {*} #= const_def
+    | <pragma>     {*} #= pragma
+    | <emit>       {*} #= emit
 }
 
 
@@ -51,11 +53,12 @@ rule sub_def {
     <param_decl>*
     <labeled_pir_instr>*
     [ '.end' | <syntax_error: '.end' expected to close method/sub body> ]
+    {*}
 }
 
 rule sub_id {
-    | <IDENT>
-    | <STRING_CONST>
+    | <IDENT>            {*} #= IDENT
+    | <STRING_CONST>     {*} #= STRING_CONST
     | <syntax_error: subroutine identifier expected>
 }
 
@@ -75,26 +78,26 @@ rule sub_pragma {
     | ':main'
     | ':anon'
     | ':lex'
-    | <vtable_pragma>
-    | <multi_pragma>
-    | <outer_pragma>
+    | <vtable_pragma>  {*} #= vtable_pragma
+    | <multi_pragma>   {*} #= multi_pragma
+    | <outer_pragma>   {*} #= outer_pragma
 }
 
 rule vtable_pragma {
     ':vtable' <parenthesized_string>?
+    {*}
 }
 
 rule parenthesized_string {
     '('
     <string_constant>
     <?right_paren>
+    {*}
 }
 
 rule multi_pragma {
-    ':multi'
-    <?left_paren>
-    <multi_types>?
-    <?right_paren>
+    ':multi' <?left_paren> <multi_types>? <?right_paren>
+    {*}
 }
 
 rule left_paren {
@@ -110,6 +113,7 @@ rule outer_pragma {
     <?left_paren>
     <sub_id>
     <?right_paren>
+    {*}
 }
 
 rule multi_types {
@@ -117,11 +121,11 @@ rule multi_types {
 }
 
 rule multi_type {
-    | <pir_type>
-    | '_'
-    | <keylist>
-    | <IDENT>
-    | <STRING_CONST>
+    | <pir_type>       {*} #= pir_type
+    | '_'              {*} #= any_type
+    | <keylist>        {*} #= keylist
+    | <IDENT>          {*} #= ident
+    | <STRING_CONST>   {*} #= string_constant
 }
 
 rule param_decl {
@@ -132,6 +136,7 @@ rule param_decl {
     ]
     [ <get_flags> | ':unique_reg' ]*
     <?nl>
+    {*}
 }
 
 
@@ -147,6 +152,7 @@ rule labeled_pir_instr {
     | <instr>
     ]
     <?nl>
+    {*}
 }
 
 rule labeled_pasm_instr {
@@ -154,27 +160,28 @@ rule labeled_pasm_instr {
     | <pasm_instr>
     ]
     <?nl>
+    {*}
 }
 
 rule instr {
-    | <pir_instr>
-    | <pasm_instr>
+    | <pir_instr>    {*} #= pir_instr
+    | <pasm_instr>   {*} #= pasm_instr
 }
 
 token pir_instr {
-    | <local_decl>
-    | <lexical_decl>
-    | <const_def>
-    | <globalconst_def>
-    | <conditional_stat>
-    | <assignment_stat>
-    | <open_namespace>
-    | <close_namespace>
-    | <return_stat>
-    | <sub_invocation>
-    | <macro_invocation>
-    | <goto_stat>
-    | <source_info>
+    | <local_decl>         {*} #= local_decl
+    | <lexical_decl>       {*} #= lexical_decl
+    | <const_def>          {*} #= const_def
+    | <globalconst_def>    {*} #= globalconst_def
+    | <conditional_stat>   {*} #= conditional_stat
+    | <assignment_stat>    {*} #= assignment_stat
+    | <open_namespace>     {*} #= open_namespace
+    | <close_namespace>    {*} #= close_namespace
+    | <return_stat>        {*} #= return_stat
+    | <sub_invocation>     {*} #= sub_invocation
+    | <macro_invocation>   {*} #= macro_invocation
+    | <goto_stat>          {*} #= goto_stat
+    | <source_info>        {*} #= source_info
 }
 
 rule macro_invocation {
@@ -193,6 +200,7 @@ rule local_decl {
     '.local'
     [ <pir_type> | <syntax_error: type for local symbol expected> ]
     <local_id_list>
+    {*}
 }
 
 rule local_id_list {
@@ -200,18 +208,14 @@ rule local_id_list {
 }
 
 rule local_id {
-    <id> <local_flag>?
-}
-
-token local_flag {
-    ':unique_reg'
+    <id> ':unique_reg'?
+    {*}
 }
 
 rule lexical_decl {
-    '.lex'
-    <string_constant>
-    <?comma>
-    <target1>
+    '.lex' <string_constant> <?comma>
+    [ <target> | <syntax_error: register or identifier expected> ]
+    {*}
 }
 
 rule comma {
@@ -219,9 +223,6 @@ rule comma {
 }
 
 
-rule target1 {
-    <target> | <syntax_error: register or identifier expected>
-}
 
 =head2 Const definition
 
@@ -231,23 +232,25 @@ Const definitions, a check is done for the constant type and the type of the con
 
 rule const_def {
     '.const' <const_def_tail>
+    {*}
 }
 
 rule globalconst_def {
     '.globalconst' <const_def_tail>
+    {*}
 }
 
 rule const_def_tail {
-    | 'int'    <const_assign> <int_constant>
-    | 'num'    <const_assign> <float_constant>
-    | 'pmc'    <const_assign> <string_constant>
-    | 'string' <const_assign> <string_constant>
+    | 'int'    <const_assign> <int_constant>     {*} #= int_const_def
+    | 'num'    <const_assign> <float_constant>   {*} #= num_const_def
+    | 'pmc'    <const_assign> <string_constant>  {*} #= pmc_const_def
+    | 'string' <const_assign> <string_constant>  {*} #= string_const_def
     | <syntax_error: type expected for constant>
 }
 
 rule const_assign {
-    <id>
-    <?assign_token>
+    <id> <?assign_token>
+    {*}
 }
 
 rule assign_token {
@@ -258,6 +261,7 @@ rule conditional_stat {
     [ 'if' | 'unless' ]
     <conditional_expr>
     <?goto> <label_identifier>
+    {*}
 }
 
 rule goto {
@@ -265,18 +269,19 @@ rule goto {
 }
 
 token label_identifier {
-    | <IDENT>
-    | <pasm_instr>
+    | <IDENT>          {*} #= id
+    | <pasm_instr>     {*} #= pasm_instr
     | <syntax_error: label identifier expected>
 }
 
 rule conditional_expr {
-    | 'null' <target>
-    | <simple_expr> [ <relational_operator> <simple_expr> ]?
+    | 'null' <target>                                          {*} #= null_expr
+    | <simple_expr> [ <relational_operator> <simple_expr> ]?   {*} #= rel_expr
 }
 
 rule goto_stat {
     'goto' <label_identifier>
+    {*}
 }
 
 
@@ -304,13 +309,13 @@ token unary_operator {
 }
 
 rule expression {
-    | <simple_expr> [ <binary_operator> <simple_expr> ]?
-    | <unary_operator> <simple_expr>
+    | <simple_expr> [ <binary_operator> <simple_expr> ]?  {*} #= binary_expr
+    | <unary_operator> <simple_expr>                      {*} #= unary_expr
 }
 
 token simple_expr {
-    | <constant>
-    | <target>
+    | <constant>  {*} #= constant
+    | <target>    {*} #= target
 }
 
 
@@ -330,23 +335,24 @@ rule key {
     | <simple_expr> '..'
     | <simple_expr>
     | '..' <simple_expr>
+    {*}
 }
 
 
 rule assignment_stat {
-    | <target> '=' <rhs>
-    | <target> <assign_operator> <simple_expr>
-    | <target> <keylist> '=' <simple_expr>
-    | <result_var_list> '=' <short_sub_call>
+    | <target> '=' <rhs>                        {*} #= simple_assign
+    | <target> <assign_operator> <simple_expr>  {*} #= augment_assign
+    | <target> <keylist> '=' <simple_expr>      {*} #= key_assign
+    | <result_var_list> '=' <short_sub_call>    {*} #= subcall_assign
 }
 
 rule rhs {
-    | <short_sub_call>
-    | <target> <keylist>
-    | <expression>
-    | <pasm_instruction> \N*
-    | <heredoc>
-    | 'new' [ <STRING_CONST> | <keylist> ]
+    | <short_sub_call>                        {*} #= short_sub_call
+    | <target> <keylist>                      {*} #= target_keylist
+    | <expression>                            {*} #= expression
+    | <pasm_instruction> \N*                  {*} #= pasm_instr
+    | <heredoc>                               {*} #= heredoc
+    | 'new' [ <STRING_CONST> | <keylist> ]    {*} #= instantiation
 }
 
 
@@ -399,23 +405,24 @@ rule long_sub_call {
     [ <local_decl> <?nl> ]*
     <result_values>
     [ '.pcc_end'  | <syntax_error: '.pcc_end' expected> ]
+    {*}
 }
 
 rule long_call_invocation {
-    | <method_invocation>
-    | <non_method_invocation>
+    | <method_invocation>        {*} #= method_invocation
+    | <non_method_invocation>    {*} #= non_method_invocation
 }
 
 rule non_method_invocation {
-    [ '.pcc_call'
-    | '.nci_call'
-    ]
+    [ '.pcc_call' | '.nci_call' ]
     [ <target> | <syntax_error: variable or register expected that holds the sub object> ]
+    {*}
 }
 
 rule method_invocation {
     '.invocant' <target> <?nl>
     '.meth_call' <method>
+    {*}
 }
 
 #
@@ -435,24 +442,23 @@ rule short_sub_call {
     <parenthesized_args>             # sub args
     <process_heredocs>               # process the list of heredoc labels, if any
     <clear_heredocs>
+    {*}
 }
 
 rule short_call_invocant {
-    | <target>
-      [ \.<target>
-      | \.<STRING_CONST>
-      ]
+    | <target> [ \.<method> ]
     | [ <target>\. ]? <method>
+    {*}
 }
 
 rule method {
-    | <target>
-    | <STRING_CONST>
+    | <target>        {*} #= target
+    | <STRING_CONST>  {*} #= string_constant
 }
 
 rule sub_invocation {
-    | <long_sub_call>
-    | <short_sub_call>
+    | <long_sub_call>    {*} #= long_sub_call
+    | <short_sub_call>   {*} #= short_sub_call
 }
 
 rule result_var_list {
@@ -464,10 +470,12 @@ rule result_var_list {
       ]*
     ]?
     <right_paren>
+    {*}
 }
 
 rule result_var {
     <target> <get_flags>?
+    {*}
 }
 
 rule parenthesized_args {
@@ -479,18 +487,20 @@ rule parenthesized_args {
       ]*
     ]?
     <right_paren>
+    {*}
 }
 
 rule arg {
-    [ <FLOAT_CONST>
-    | <INT_CONST>
-    | <STRING_CONST>
+    [ <FLOAT_CONST>   {*} #= float_constant
+    | <INT_CONST>     {*} #= int_constant
+    | <STRING_CONST>  {*} #= string_constant
       [ '=>'
         [ <target> | <syntax_error: target for named argument expected> ]
       ]?
-    | <target>
-    | <heredoc_id>
+    | <target>        {*} #= target
+    | <heredoc_id>    {*} #= heredoc_id
     ] <set_flags>?
+    {*}
 }
 
 token heredoc_id {
@@ -507,6 +517,7 @@ rule arguments {
       <set_flags>?
       <?nl>
     ]*
+    {*}
 }
 
 rule result_values {
@@ -515,6 +526,7 @@ rule result_values {
       <get_flags>?
       <?nl>
     ]*
+    {*}
 }
 
 rule set_flags {
@@ -531,30 +543,34 @@ rule get_flags {
 
 rule named_flag {
     ':named' <parenthesized_string>?
+    {*}
 }
 
 token return_stat {
-    | <long_return_stat>
-    | <short_return_stat>
-    | <long_yield_stat>
-    | <short_yield_stat>
-    | <tail_call>
+    | <long_return_stat>   {*} #= long_return_stat
+    | <short_return_stat>  {*} #= short_return_stat
+    | <long_yield_stat>    {*} #= long_yield_stat
+    | <short_yield_stat>   {*} #= short_yield_stat
+    | <tail_call>          {*} #= tail_call
 }
 
 rule long_return_stat {
     '.pcc_begin_return' <?nl>
     [ '.return' <return_value> ]*
     [ '.pcc_end_return' | <syntax_error: '.pcc_end_return' expected> ]
+    {*}
 }
 
 rule short_return_stat {
     '.return' <parenthesized_args>
+    {*}
 }
 
 rule long_yield_stat {
     '.pcc_begin_yield' <?nl>
     [ '.yield' <return_value> ]*
     [ '.pcc_end_yield' | <syntax_error: '.pcc_end_yield' expected> ]
+    {*}
 }
 
 
@@ -566,36 +582,39 @@ rule return_value {
 
 rule short_yield_stat {
     '.yield' <parenthesized_args>
+    {*}
 }
 
 rule tail_call {
     '.return' <short_sub_call>
+    {*}
 }
 
 rule open_namespace {
     '.namespace' <id>
+    {*}
 }
 
 rule close_namespace {
     '.endnamespace' <id>
+    {*}
 }
 
 rule emit {
-    '.emit'
-    <?nl>
+    '.emit' <?nl>
     <labeled_pasm_instr>*
-    [ '.eom'     | <syntax_error: '.eom' expected> ]
+    [ '.eom' | <syntax_error: '.eom' expected> ]
 }
 
 rule macro_def {
-    '.macro' <id>
-    <macro_parameters>? <?nl>
+    '.macro' <id> <macro_parameters>? <?nl>
     <macro_body>
+    {*}
 }
 
 rule macro_parameters {
-    '(' <id_list>?
-    <?right_paren>
+    '(' <id_list>? ')'
+    {*}
 }
 
 =head2 Macro body
@@ -611,25 +630,25 @@ regex macro_body {
     <labeled_pir_instr>*
     '.endm'
     <close_macro_rules>
+    {*}
 }
 
 token expansion {
-    | <macro_def>
-    | <include>
-    | <pasm_constant>
+    | <macro_def>     {*} #= macro_def
+    | <include>       {*} #= include
+    | <pasm_constant> {*} #= pasm_constant
 }
 
 rule pasm_constant {
     '.constant' <IDENT>
-    [ <pasm_register>
-    | <constant>
-    ]
+    [ <pasm_register> | <constant> ]
+    {*}
 }
 
 token constant {
-    | <FLOAT_CONST>
-    | <INT_CONST>
-    | <STRING_CONST>
+    | <FLOAT_CONST>  {*} #= float_const
+    | <INT_CONST>    {*} #= int_const
+    | <STRING_CONST> {*} #= string_constant
 }
 
 
@@ -644,32 +663,36 @@ token pasm_register {
 =cut
 
 token pragma {
-    | <new_operators>
-    | <loadlib>
-    | <namespace>
-    | <hll_mapping>
-    | <hll_specifier>
-    | <source_info>
+    | <new_operators>   {*} #= new_operators
+    | <loadlib>         {*} #= loadlib
+    | <namespace>       {*} #= namespace
+    | <hll_mapping>     {*} #= hll_mapping
+    | <hll_specifier>   {*} #= hll_specifier
+    | <source_info>     {*} #= source_info
 }
 
 rule include {
     '.include' <string_constant>
+    {*}
 }
 
 rule new_operators {
     '.pragma' 'n_operators' <int_constant>
+    {*}
 }
 
 rule loadlib {
     '.loadlib' <string_constant>
+    {*}
 }
 
 rule namespace {
     '.namespace'
     [ '['
-      [ <namespace_id>    | <syntax_error: namespace identifier expected> ]
-      <right_bracket>
+      [ <namespace_id> | <syntax_error: namespace identifier expected> ]
+      <?right_bracket>
     ]?
+    {*}
 }
 
 rule right_bracket {
@@ -677,17 +700,13 @@ rule right_bracket {
 }
 
 rule hll_specifier {
-    '.HLL'
-    <string_constant>
-    <?comma>
-    <string_constant>
+    '.HLL' <string_constant> <?comma> <string_constant>
+    {*}
 }
 
 rule hll_mapping {
-    '.HLL_map'
-    <string_constant>
-    <?comma>
-    <string_constant>
+    '.HLL_map' <string_constant> <?comma> <string_constant>
+    {*}
 }
 
 rule namespace_id {
@@ -697,11 +716,11 @@ rule namespace_id {
 
 rule source_info {
     '.line' <int_constant> [ ',' <string_constant> ]?
+    {*}
 }
 
 rule id_list {
-    <IDENT>
-    [ ',' <id> ]*
+    <IDENT> [ ',' <id> ]*
 }
 
 
@@ -770,7 +789,7 @@ token charset_specifier {
 }
 
 token stringsingle {
-    \'  <string_literal: '> \'
+    \' <string_literal: '> \'
 }
 
 token stringdouble {
@@ -790,8 +809,8 @@ token pir_type {
 }
 
 token normal_target {
-    | <IDENT>
-    | <REGISTER>
+    | <IDENT>      {*} #= id
+    | <REGISTER>   {*} #= register
 }
 
 =head2 Macro_target
@@ -918,8 +937,9 @@ token pir_directive {
     | '.const'
     | '.constant'
     | '.emit'
-    | '.end'
+    | '.endm'
     | '.endnamespace'
+    | '.end'
     | '.eom'
     | '.get_results'
     | '.globalconst'

@@ -9,16 +9,17 @@
     load_bytecode 'PGE.pbc'
     load_bytecode 'PCT.pbc'
 
-    load_bytecode 'languages/PIR/lib/ASTGrammar.pbc'
-
+    ##load_bytecode 'languages/PIR/lib/ASTGrammar.pbc'
+    load_bytecode 'languages/PIR/lib/Grammar/Actions.pbc'
+    
     $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('languages-PIR')
     $P0.'parsegrammar'('PIR::Grammar')
 
     # currently working on this:
-    #$P0.'parseactions'('PIR::Grammar::Actions')
+    $P0.'parseactions'('PIR::Grammar::Actions')
 
-    $P0.'astgrammar'('ASTGrammar')
+    ##$P0.'astgrammar'('ASTGrammar')
 
 .end
 
@@ -77,7 +78,7 @@
   OPTIONS_DONE:
 
   TARGET_PARSE:
-    $P1 = $P0.'command_line'(args, 'target' => 'parse')
+    $P1 = $P0.'command_line'(args)
     goto DONE
 
   TARGET_PARSETREE:
