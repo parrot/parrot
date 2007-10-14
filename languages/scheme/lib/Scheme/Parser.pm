@@ -12,51 +12,47 @@ our $VERSION   = '0.01';
 
 use Data::Dumper;
 
+# walk over the tokens
 sub _build_tree {
     my ( $tokens, $count ) = @_;
-
-    my $temp = {};
 
     die "EOF reached" if $count >= $#$tokens;
 
     if ( $tokens->[$count] eq '(' ) {
-        $temp->{children} = [];
-        $count++;
+        my $tree = { children => []
+                   };
+        $count++;                                   # consume the '('
         while ( $tokens->[$count] ne ')' ) {
             ( $count, my $expr ) = _build_tree( $tokens, $count );
-            push @{ $temp->{children} }, $expr;
+            push @{ $tree->{children} }, $expr;
         }
-        $count++;
-    }
-    elsif ( $tokens->[$count] eq "'" ) {
-        $temp = { children => [ { value => 'quote' } ] };
-        $count++;
-        ( $count, my $expr ) = _build_tree( $tokens, $count );
-        push @{ $temp->{children} }, $expr;
-    }
-    elsif ( $tokens->[$count] eq "`" ) {
-        $temp = { children => [ { value => 'quasiquote' } ] };
-        $count++;
-        ( $count, my $expr ) = _build_tree( $tokens, $count );
-        push @{ $temp->{children} }, $expr;
-    }
-    elsif ( $tokens->[$count] eq "," ) {
-        $temp = { children => [ { value => 'unquote' } ] };
-        $count++;
-        ( $count, my $expr ) = _build_tree( $tokens, $count );
-        push @{ $temp->{children} }, $expr;
-    }
-    elsif ( $tokens->[$count] eq ",@" ) {
-        $temp = { children => [ { value => 'unquote-splicing' } ] };
+        $count++;                                   # consume the ')'
+
+        return ( $count, $tree );
+    } 
+
+    my %function = (
+	    q{'}      => 'quote',
+	    q{`}      => 'quasiquote',
+	    q{,}      => 'unquote',
+            q{,@}     => 'unquote-splicing',
+    );
+    if ( exists $function{$tokens->[$count]}  ) {
+        my $tree = { children => [ { value => $function{$tokens->[$count]} 
+                                   }
+                                 ]
+                   };
         $count++;
         ( $count, my $expr ) = _build_tree( $tokens, $count );
-        push @{ $temp->{children} }, $expr;
-    }
-    else {
-        $temp->{value} = $tokens->[ $count++ ];
+        push @{ $tree->{children} }, $expr;
+
+	return ( $count, $tree );
     }
 
-    return ( $count, $temp );
+    # the atomic case
+    my $tree = { value => $tokens->[ $count++ ] };
+
+    return ( $count, $tree );
 }
 
 sub _dataflow {
@@ -83,27 +79,26 @@ sub _dataflow {
 sub parse {
     my $tokens = shift;
 
-    my @tree;
-    my $tree;
-
+    my @trees;
     my $count = 0;
 
     while ( $count < scalar @{$tokens} ) {
 
-        #print Dumper $tokens;
-        ( $count, $tree ) = _build_tree( $tokens, $count );
-
+        ( $count, my $tree ) = _build_tree( $tokens, $count );
+    
         #_dataflow($tree);
-        #print Data::Dumper->Dump ([$count, $tree]);
-        push @tree, $tree;
+        push @trees, $tree;
     }
+
+    return undef unless @trees;
+
+    return $trees[0] if scalar(@trees) == 1;
 
     # Implicit begin at toplevel
-    if ( @tree > 1 ) {
-        $tree = { children => [ { value => 'begin' }, @tree ] };
-    }
-
-    return $tree;
+    return { children => [ { value => 'begin' },
+                           @trees
+                         ]
+           };
 }
 
 1;
@@ -118,11 +113,13 @@ Scheme::Parser - The Scheme token parser
 
   use Scheme::Parser;
 
-  my @code = Scheme::Parser::parse($tokens);
+  my $tree = Scheme::Parser::parse($tokens);
 
 =head1 DESCRIPTION
 
 The parser reads a list of tokens and turns it into a tree structure.
+The Nodes of the tree are hash references with either the attribute C<value>
+or the attribute C<children>. C<children> is an array reference with subbnodes. 
 
 =head1 AUTHOR
 
