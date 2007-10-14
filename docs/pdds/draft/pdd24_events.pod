@@ -16,78 +16,109 @@ $Revision$
 
 =head1 DESCRIPTION
 
-Description of the subject.
+=over 4
+
+=item - Events are objects
+
+=item - Events are typed
+
+=item - Events can be fatal or non-fatal
+
+=item - Event handlers are code objects
+
+=item - Event handlers can be final or non-final
+
+=back
 
 =head1 DEFINITIONS
-
-Definitions of important terms. (optional)
-
-=head1 IMPLEMENTATION
-
-[Excerpt from Perl 6 and Parrot Essentials to seed discussion.]
 
 An event is a notification that something has happened: the user has
 manipulated a GUI element, an I/O request has completed, a signal has
 been triggered, or a timer has expired.  Most systems these days have an
 event handler (often two or three, which is something of a problem),
 because handling events is so fundamental to modern GUI programming.
-Unfortunately, the event handling system is not integrated, or poorly
-integrated, with the I/O system, leading to nasty code and unpleasant
-workarounds to try and make a program responsive to network, file, and
-GUI events simultaneously. Parrot presents a unified event handling
-system, integrated with its I/O system, which makes it possible to write
-cross-platform programs that work well in a complex environment.
 
-Parrot's events are fairly simple. An event has an event type, some
-event data, an event handler, and a priority. Each thread has an event
-queue, and when an event happens it's put into the right thread's
-queue (or the default thread queue in those cases where we can't tell
-which thread an event was destined for) to wait for something to
-process it.
+=head1 IMPLEMENTATION
 
-Any operation that would potentially block drains the event queue
-while it waits, as do a number of the cleanup opcodes that Parrot uses
-to tidy up on scope exit. Parrot doesn't check each opcode for an
-outstanding event for pure performance reasons, as that check gets
-expensive quickly. Still, Parrot generally ensures timely event
-handling, and events shouldn't sit in a queue for more than a few
-milliseconds unless event handling has been explicitly disabled.
+Parrot's event handling system is integrated with the central concurrency
+scheduler. When an event is created (by a GUI element, etc), it is added to
+concurrency task list. By default, events have a higher priority in the task
+list than asynchronous I/O operations or threaded code operations. At
+predetermined points in the execution cycle (between low-level discrete
+operations for safety, behind the scenes during "blocking" operations, at the
+same operational lulls where GC runs are performed, etc), the task list is
+queried, and tasks are dispatched.  Events are dispatched to event handlers.
 
-When Parrot does extract an event from the event queue, it calls that
-event's event handler, if it has one. If an event doesn't have a
-handler, Parrot instead looks for a generic handler for the event type
-and calls it instead. If for some reason there's no handler for the
-event type, Parrot falls back to the generic event handler, which
-throws an exception when it gets an event it doesn't know how to
-handle.  You can override the generic event handler if you want Parrot
-to do something else with unhandled events, perhaps silently
-discarding them instead.
+Event handlers are registered with the concurrency scheduler. When dispatching
+an event, the concurrency scheduler compares the type of the event to the type
+of the event handler and selects the closest match. An exact type match is
+always highest ranked, then a parent type, and finally a general handler
+designed to handle all types. (A parent type may be something like a category
+"key press" as a parent type to "key 'a' press".)
 
-Because events are handled in mainline code, they don't have the
-restrictions commonly associated with interrupt-level code. It's safe
-and acceptable for an event handler to throw an exception, allocate
-memory, or manipulate thread or global state safely. Event handlers
-can even acquire locks if they need to, though it's not a good idea to
-have an event handler blocking on lock acquisition.
+In the simple case, the concurrency scheduler runs within the single
+interpreter thread. In more complex cases (particularly on multi-processor
+machines), the concurrency scheduler runs in its own thread. In the
+multi-threaded case, each individual thread may register an event handler with
+the concurrency scheduler, and the event that matches the registered handler
+will be dispatched to the thread that registered it. In the most complex case,
+each thread runs a lightweight concurrency scheduler that coordinates with the
+central scheduler (so, for example, the mini-scheduler can decide when to run
+an event handler dispatched by the central scheduler).
 
-Parrot uses the priority on events for two purposes. First, the
-priority is used to order the events in the event queue. Events for a
-particular priority are handled in a FIFO manner, but higher-priority
-events are always handled before lower-priority events. Parrot also
-allows a user program or event handler to set a minimum event priority
-that it will handle. If an event with a priority lower than the
-current minimum arrives, it won't be handled, instead sitting in the
-queue until the minimum priority level is dropped. This allows an
-event handler that's dealing with a high-priority event to ignore
-lower-priority events.
+An event handler may mark itself as a final event handler, removing the event
+from the task list, or it may be a non-final handler, leaving the event in the
+task list for another thread to collect.
 
-User code generally doesn't need to deal with prioritized events, so
-programmers should adjust event priorities with care. Adjusting the
-default priority of an event, or adjusting the current minimum
-priority level, is a rare occurrence.  It's almost always a mistake to
-change them, but the capability is there for those rare occasions
-where it's the correct thing to
-do.
+Most events are non-fatal, so if a handler isn't found for them when they're
+extracted from the task list, they just expire and drop out of the task list.
+Events can also be fatal, in which case the interpreter will exit if a handler
+isn't found (essentially the same effect as an exception). When a non-final
+event handler leaves an event in the task list, it will expire if no further
+relevant event handlers can be found for the event.
+
+The operation to query the concurrency scheduler and find if it has any tasks
+to process is as cheap as possible, so it may be queried at regular intervals.
+
+=head2 Event API
+
+An event is a PMC object that contains a type, data for the event, and a
+priority.
+
+The type of an event is only used to match the event with an event handler, but
+is notionally similar to the class of an object.
+
+The data for the event is a PMC and could be any data passed to the event
+handler by the code that originates the event.
+
+The priority of an event affects when it is processed by the task list. Higher
+priority events are processed before lower priority events. Age is also a
+relevant factor, when two events have the same priority, the older one is
+processed first. An event handler or the scheduler may also be set to ignore
+events below a certain threshold of priority. When the central scheduler
+ignores an event because of its priority level, the event remains in the task
+list until the priority threshold changes.
+
+=head2 Event Handler API
+
+An event handler contains a code object, as well as some meta information about
+where it was registered. More specifically, it contains a continuation object,
+capturing the full state of the interpreter where it was created. In many
+cases, this has no more effect than guaranteeing that the event handler code
+executes within the appropriate context of the thread that registered the
+handler.
+
+Because events are handled in mainline code, they don't have the restrictions
+commonly associated with interrupt-level code. It's safe and acceptable for an
+event handler to throw an exception, allocate memory, or manipulate thread or
+global state safely. Event handlers can even acquire locks if they need to,
+though it's not a good idea to have an event handler blocking on lock
+acquisition.
+
+=head2 Event Type Hierarchy
+
+Parrot defines a core set of event types. Users may also define their own event
+types.
 
 =head2 Signals
 
@@ -146,7 +177,9 @@ None.
 
 =head1 REFERENCES
 
-http://www.seas.upenn.edu/~lipeng/homepage/unify.html
+  src/events.c
+
+  http://www.seas.upenn.edu/~lipeng/homepage/unify.html
 
 =cut
 
