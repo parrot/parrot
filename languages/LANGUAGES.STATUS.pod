@@ -1041,13 +1041,13 @@ Scheme
 
 =item Status
 
-Functioning, as far as implemented. Lists and functions are working but many
-functions are missing implementation. 70% pass ratio due to recent deprecations.
+Functioning, as far as implemented. Lists, functions and closures are working but many
+functions are missing implementation. Works with the current calling conventions.
 Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.4.16
 
 =item Location
 
