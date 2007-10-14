@@ -67,7 +67,6 @@ sub parrot_version {
     return wantarray ? @parrot_version : $parrot_version;
 }
 
-
 =item C<slurp_file($filename)>
 
 Slurps up the filename and returns the content as one string.  While
@@ -87,7 +86,6 @@ sub slurp_file {
     return $file;
 }
 
-
 =item C<generated_file_header($filename, $style)>
 
 Returns a comment to mark a generated file and detail how it was created.
@@ -98,7 +96,7 @@ values produce an error.
 =cut
 
 sub generated_file_header {
-    my ($filename, $style) = @_;
+    my ( $filename, $style ) = @_;
 
     die "unknown style '$style'"
         if $style !~ m/\A(perl|c)\z/;
@@ -127,7 +125,6 @@ END_HEADER
 
     return $header;
 }
-
 
 1;
 

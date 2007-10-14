@@ -213,7 +213,8 @@ BEGIN {
                 : ();
             my $method = join '_' => $type, $class;
             my $filter_ext = join '|' => map { "\\.${_}\$" } @exts;
-            my $filter_dir = join '|' => map { qr{\b$_\b} }
+            my $filter_dir = join
+                '|' => map { qr{\b$_\b} }
                 map { quotemeta($_) } @ignore_dirs,
                 @exceptions;
 
@@ -709,8 +710,7 @@ Returns the text of the file at the given path
 
 =cut
 
-sub slurp
-{
+sub slurp {
     my $self = shift;
     my $path = shift;
     my $buf;
@@ -726,8 +726,6 @@ sub slurp
 
     return $buf;
 }
-
-
 
 1;
 

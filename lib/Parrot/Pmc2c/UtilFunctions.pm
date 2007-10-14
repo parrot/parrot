@@ -36,8 +36,7 @@ sub dont_edit {
     my ($pmcfilename) = @_;
 
     require Parrot::BuildUtil;
-    return Parrot::BuildUtil::generated_file_header($pmcfilename, 'c')
-        . <<"EOC";
+    return Parrot::BuildUtil::generated_file_header( $pmcfilename, 'c' ) . <<"EOC";
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
