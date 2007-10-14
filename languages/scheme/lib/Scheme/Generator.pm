@@ -99,7 +99,7 @@ sub _save_1 {
 sub _restore {
     my $self = shift;
 
-    die "Nothing to restore" unless @_;
+    # die "Nothing to restore" unless @_;
 
     foreach my $reg (@_) {
         next if grep { $_ eq $reg } qw (none);
@@ -138,7 +138,7 @@ sub _num_arg {
     my $args = scalar @{ $node->{children} } - 1;
 
     confess "$name: Wrong number of arguments (expected $expected, got $args).\n"
-        if ( $args != $expected );
+        unless $args == $expected;
 }
 
 sub _get_arg {
@@ -183,8 +183,12 @@ sub _store_lex {
 sub _new_lex {
     my ( $self, $symbol, $value ) = @_;
 
-    $self->_add_inst( '', '.lex', [ qq{"$symbol"}, $value ] );
+    $self->_add_comment( 'start of _new_lex' );
+
+    $self->_add_inst( '', 'store_lex', [ qq{"$symbol"}, $value ] );
     $self->{scope}->{$symbol} = $value;
+
+    $self->_add_comment( 'end of _new_lex' );
 
     return;
 }
@@ -449,7 +453,6 @@ sub _op_lambda {
     # generate code for the body
     my $temp = 'none';
     for ( _get_args( $node, 2 ) ) {
-        # die Dumper( $_, $node );
         $self->_restore($temp);
         $temp = $self->_generate($_);
     }
@@ -2254,7 +2257,6 @@ sub generate {
 
     $self->_add_inst( '', '.end' );
 
-    # die Dumper( $self );
     push @{ $self->{instruction} }, @{ $self->{lambda_instructions} };
     $self->_format_columns();
 
