@@ -1979,7 +1979,7 @@ cover-distro: cover.dummy
 	-@make@ distro_tests
 
 cover-clean:
-	$(PERL) -MCwd -e 'for my $$dir qw ( $(COVER_DIRS) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink qw( *.gcda *.gcno *.gcov ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir qw ( $(COVER_DIRS) ) {my $$cwd = cwd(); chdir $$dir; print "Deleting gcov-generated files in $$dir\n"; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
