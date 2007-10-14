@@ -408,9 +408,11 @@ sub _op_lambda {
     my $sub_name
         = join( q{_}, 'LAMBDA', $self->_gensym() );
 
+    my $sub_reg = $self->_save_1('P');
     my $return = $self->_save_1('P');
 
-    $self->_add_inst( '', '.const', [ qq{.Sub $return = "$sub_name"} ] );
+    $self->_add_inst( '', '.const', [ qq{.Sub $sub_reg = "$sub_name"} ] );
+    $self->_add_inst( '', 'newclosure', [ $return, $sub_reg ] );
 
     # caller saved => start a new frame
     push @{ $self->{frames} }, $self->{regs};
@@ -2245,7 +2247,6 @@ sub generate {
 
     $self->{scope} = {};
 
-    $self->_add_inst( '', ".include 'library/dumper.pir'" );
     $self->_add_inst( '', ".sub main :main :lex" );
 
     my $temp = $self->_generate($tree);
