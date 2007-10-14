@@ -26,7 +26,7 @@ my $lockfile         = "$outfile.lck";
 # for example, Solaris requires write permissions for exclusive locks
 sysopen( my $lock, $lockfile, O_CREAT | O_RDWR ) or die "Can't write '$lockfile': $!\n";
 
-flock($lock, LOCK_EX) or die "Can't lock '$lockfile': $!\n";
+flock( $lock, LOCK_EX ) or die "Can't lock '$lockfile': $!\n";
 
 END { close $lock; unlink $lockfile; }
 

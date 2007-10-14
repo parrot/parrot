@@ -47,7 +47,7 @@ my $contents =
 # fix slashies in source filename for display in header
 $source =~ s/\\/\//g;
 
-my $header = Parrot::BuildUtil::generated_file_header($source, 'c');
+my $header = Parrot::BuildUtil::generated_file_header( $source, 'c' );
 
 my $noheaderizer = <<END_NOHEADERIZER;
 /* HEADERIZER HFILE: none */

@@ -37,7 +37,7 @@ Paul Cochrane <paultcochrane at gmail dot com>
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
-my $cut_line = "=cut";  # stops t/doc/pod.t from complaining.
+my $cut_line = "=cut";    # stops t/doc/pod.t from complaining.
 
 foreach my $file (@files) {
     my $path;
@@ -53,7 +53,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     # get rid of if's and for's etc]
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
@@ -72,6 +72,7 @@ foreach my $file (@files) {
         # look for matching documentation.  This means the text
         # '=item C<\w+\s+function_name'
         if ( $buf !~ m/=item .*$function_name/ ) {
+
             # if passed in files at the command line, print out
             # boilerplate docs for undocumented functions
 
