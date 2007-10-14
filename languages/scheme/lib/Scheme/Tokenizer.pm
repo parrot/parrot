@@ -47,7 +47,7 @@ sub tokenize {
                 $token .= $ch;
             }
             elsif (    $ch eq '?'
-                    && $token =~ /^[a-z]/
+                    && $token =~ m/^[a-z]/
                   )
             {                                # Question marks can follow an identifier
                 $token .= $ch;
@@ -119,7 +119,7 @@ Scheme::Tokenizer - The Scheme tokenizer
 
   use Scheme:Tokenizer;
 
-  my @code = Scheme::Tokenizer->new($file_name)->tokenize();
+  my $tokens = Scheme::Tokenizer->new($file_name)->tokenize();
 
 =head1 DESCRIPTION
 
