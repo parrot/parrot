@@ -21,7 +21,6 @@ $description = 'Determining if your computer does zeta';
 
 my $result = q|Goodbye, cruel world|;
 
-
 sub runstep {
     my ( $self, $conf ) = @_;
     $self->set_result($result);

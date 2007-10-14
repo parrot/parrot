@@ -20,7 +20,7 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step ':inter';
 
 $description = 'Determining if your computer does theta';
-@args = qw(ask theta);
+@args        = qw(ask theta);
 
 sub runstep {
     my ( $self, $conf ) = @_;

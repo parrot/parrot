@@ -1050,7 +1050,7 @@ done
 OUTPUT
 }
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "exp of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "exp of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'exp'()
@@ -1093,7 +1093,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sqrt of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'sqrt'()
@@ -1136,7 +1136,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sin of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sin of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'sin'()
@@ -1179,7 +1179,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cos of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cos of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'cos'()
@@ -1222,7 +1222,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "tan of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "tan of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'tan'()
@@ -1265,7 +1265,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cot of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cot of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'cot'()
@@ -1307,7 +1307,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sec of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sec of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'sec'()
@@ -1350,7 +1350,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "csc of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "csc of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'csc'()
@@ -1392,7 +1392,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "asin of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "asin of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'asin'()
@@ -1435,7 +1435,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acos of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acos of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'acos'()
@@ -1478,7 +1478,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "atan of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "atan of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'atan'()
@@ -1519,7 +1519,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acot of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acot of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'acot'()
@@ -1559,7 +1559,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "asec of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "asec of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'asec'()
@@ -1601,7 +1601,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "acsc of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "acsc of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'acsc'()
@@ -1643,7 +1643,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sinh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'sinh'()
@@ -1686,7 +1686,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "cosh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "cosh of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'cosh'()
@@ -1729,7 +1729,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "tanh of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "tanh of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'tanh'()
@@ -1772,7 +1772,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "coth of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "coth of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'coth'()
@@ -1814,7 +1814,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "sech of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "sech of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'sech'()
@@ -1857,7 +1857,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "csch of complex numbers");
+pir_output_is( << 'CODE', << 'OUTPUT', "csch of complex numbers" );
 .macro DoIt(val, res)
     c  = .val
     c2 = c.'csch'()

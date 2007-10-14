@@ -168,8 +168,7 @@ sub create_func {
     my ( $c_args, $c_params, $c_returns, $c_results ) = @_;
 
     $self->{FUNC} =
-          'args'
-        . $c_args
+          'args' . $c_args
         . '_results'
         . $c_results
         . '__params'

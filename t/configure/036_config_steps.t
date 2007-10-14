@@ -33,6 +33,7 @@ if ( $^O !~ /win32/i ) {
 }
 
 my $testcount = @steps + 1;
+
 # my $testcount = @steps;
 
 plan tests => $testcount;

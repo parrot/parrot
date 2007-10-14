@@ -17,13 +17,13 @@ use base qw(Parrot::Configure::Step::Base);
 use Parrot::Configure::Step;
 
 $description = 'Determining if your computer does eta';
-@args = ();
+@args        = ();
 
 my $result = q|Hello world|;
 
 sub runstep {
     my ( $self, $conf ) = @_;
-    $self->set_result( $result );
+    $self->set_result($result);
     return;
 }
 
