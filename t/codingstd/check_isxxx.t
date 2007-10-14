@@ -33,7 +33,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 =cut
 
-my $DIST  = Parrot::Distribution->new;
+my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 
 my @no_explicit_cast;
@@ -55,11 +55,12 @@ my @isxxx_functions_list = qw(
 my $isxxx_functions = join '|', @isxxx_functions_list;
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     my @buffer_lines = split( /\n/, $buf );
 
@@ -73,14 +74,13 @@ foreach my $file (@files) {
 
     # find the instances without the explicit cast
     my @no_cast =
-        grep { $_->[0] !~ /[^_]($isxxx_functions)\(\(unsigned char\)/ }
-        @isxxx_lines;
+        grep { $_->[0] !~ /[^_]($isxxx_functions)\(\(unsigned char\)/ } @isxxx_lines;
 
-    push @no_explicit_cast, $path . ' ('
-        . join(", ", map { $_->[1] } @isxxx_lines) . ")\n" if @no_cast;
+    push @no_explicit_cast, $path . ' (' . join( ", ", map { $_->[1] } @isxxx_lines ) . ")\n"
+        if @no_cast;
 }
 
-ok( ! @no_explicit_cast, 'isxxx() functions cast correctly' )
+ok( !@no_explicit_cast, 'isxxx() functions cast correctly' )
     or diag( "isxxx() function not cast to unsigned char "
         . scalar @no_explicit_cast
         . " files:\n@no_explicit_cast" );

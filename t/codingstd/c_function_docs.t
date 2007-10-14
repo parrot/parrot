@@ -50,7 +50,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     # get rid of if's and for's etc]
     $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
@@ -59,6 +59,7 @@ foreach my $file (@files) {
     my @function_names = $buf =~ m/[^\s(\|]\s(\w+)\(.*\s?.*\)\s+{/g;
 
     for my $function_name (@function_names) {
+
         # if the function name matches a known C construct, go to the next
         # one
         if ( $function_name =~ m/for|if|switch|NOTNULL/ ) {
@@ -75,10 +76,10 @@ foreach my $file (@files) {
 }
 
 ok( !scalar(@missing_docs), 'Functions documented' )
-    or
-    diag( "Functions lacking documentation in " . scalar @missing_docs .
-        " files:\n@missing_docs\n" .
-        "Use tools/docs/func_boilerplate.pl to add missing documentation\n");
+    or diag( "Functions lacking documentation in "
+        . scalar @missing_docs
+        . " files:\n@missing_docs\n"
+        . "Use tools/docs/func_boilerplate.pl to add missing documentation\n" );
 
 # Local Variables:
 #   mode: cperl

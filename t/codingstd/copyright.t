@@ -49,13 +49,14 @@ my $copyright_text =
     "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), The Perl Foundation.";
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
     next if exists $skip_files->{$path};
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     # does there exist a copyright statement at all?
     if ( $buf !~ m{Copyright \(C\) \d{4}}m ) {
@@ -72,7 +73,8 @@ foreach my $file (@files) {
 # run the tests
 ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
     or diag(
-    join $/ => "No copyright statement found in " . scalar @no_copyright_files . " files:",
+    join
+        $/ => "No copyright statement found in " . scalar @no_copyright_files . " files:",
     @no_copyright_files,
     "The copyright statement should read something like:",
     "  Copyright (C) C<start-year>-$current_year, The Perl Foundation.",
@@ -85,7 +87,8 @@ SKIP:
     skip( "Waiting for decision as to whether copyright dates are necessary", 1 );
     ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
         or diag(
-        join $/ => "Outdated copyright statement found in "
+        join
+            $/ => "Outdated copyright statement found in "
             . scalar @outdated_copyright_files
             . " files:",
         @outdated_copyright_files,

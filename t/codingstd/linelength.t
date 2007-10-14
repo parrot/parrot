@@ -92,7 +92,7 @@ sub info_for_first_long_line {
     while ( my $line = <$fh> ) {
         chomp $line;
         $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;    # expand \t
-        next if $line =~ m/https?:\/\//;  # skip long web addresses
+        next if $line =~ m/https?:\/\//;                # skip long web addresses
         return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $num_col_limit;
     }

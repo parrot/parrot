@@ -57,7 +57,7 @@ sub check_parens {
     foreach my $file (@_) {
         my $path = @ARGV ? $file : $file->path();
 
-        my $buf = $DIST->slurp( $path );
+        my $buf = $DIST->slurp($path);
         $buf =~ s{ (?:
                        (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
                      | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
@@ -65,10 +65,11 @@ sub check_parens {
                    )
                 }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
 
-        my @lines = split(/\n/, $buf);
-        for my $line ( @lines ) {
-            next if $line =~ m{#\s*define};  # skip #defines
+        my @lines = split( /\n/, $buf );
+        for my $line (@lines) {
+            next if $line =~ m{#\s*define};    # skip #defines
             if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }x ) {
+
                 # ops use the same names as some C keywords, so skip
                 next if $line =~ m{^op};
                 push @keyword_paren => "$path: $1\n";

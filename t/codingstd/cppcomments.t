@@ -42,7 +42,7 @@ sub check_cppcomments {
     my @comments;
     foreach my $file (@files) {
         my $path = @ARGV ? $file : $file->path();
-        my $buf = $DIST->slurp( $path );
+        my $buf = $DIST->slurp($path);
         $buf =~ s{ (?:
                        (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                      | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string

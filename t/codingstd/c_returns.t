@@ -55,7 +55,7 @@ foreach my $file (@files) {
         $path = $file->path;
     }
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     # look for instances of return(
     push @paren_return => "$path\n"

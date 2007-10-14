@@ -49,11 +49,12 @@ my @no_coda;
 my @extra_coda;
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     # append to the no_coda array if the code doesn't match
     push @no_coda => "$path\n"

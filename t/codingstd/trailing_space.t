@@ -46,7 +46,7 @@ foreach my $file (@files) {
 
     next if exists $skip_files->{$path};
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     if ( $buf =~ m{.?[ \t]+$}m ) {
         push @failed_files, $path;
@@ -56,7 +56,8 @@ foreach my $file (@files) {
 # check the file
 ok( !scalar(@failed_files), 'No trailing spaces or tabs' )
     or diag(
-    join $/ => "Trailing space or tab char found in " . scalar @failed_files . " files:",
+    join
+        $/ => "Trailing space or tab char found in " . scalar @failed_files . " files:",
     @failed_files
     );
 

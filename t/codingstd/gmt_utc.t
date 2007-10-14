@@ -41,7 +41,7 @@ my @files = @ARGV ? @ARGV : source_files();
 my @failures;
 
 foreach my $file (@files) {
-    my $buf = $DIST->slurp( $file );
+    my $buf = $DIST->slurp($file);
 
     # trim out svn and svk Id lines
     $buf =~ s{\$Id:.*}{}g;

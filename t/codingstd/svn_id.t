@@ -46,13 +46,14 @@ my @no_id_files;
 my $id_line = '\$Id.*\$';
 
 foreach my $file (@files) {
+
     # if we have command line arguments, the file is the full path
     # otherwise, use the relevant Parrot:: path method
     my $path = @ARGV ? $file : $file->path;
 
     next if exists $skip_files->{$path};
 
-    my $buf = $DIST->slurp( $path );
+    my $buf = $DIST->slurp($path);
 
     if ( $buf !~ m{$id_line}m ) {
         push @no_id_files, $path;
@@ -63,7 +64,8 @@ foreach my $file (@files) {
 # run the tests
 ok( !scalar(@no_id_files), 'Id keyword line exists' )
     or diag(
-    join $/ => "No Id keyword line found in " . scalar @no_id_files . " files:",
+    join
+        $/ => "No Id keyword line found in " . scalar @no_id_files . " files:",
     @no_id_files
     );
 
