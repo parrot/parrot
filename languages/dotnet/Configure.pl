@@ -68,6 +68,9 @@ sub generate_makefile(%) {
 
     # Sub in config data.
     for ( keys %config ) {
+        # warnings flags aren't substituted in Makefile.in; skip them
+        next if m/^-W/g;
+
         $makefile =~ s/\${$_}/$config{$_}/g;
     }
     $makefile =~ s/\$\{build_dir\}/$parrot_path/g;
@@ -94,6 +97,8 @@ sub generate_config_pm(%) {
 
     # Sub in config data.
     for ( keys %config ) {
+        # warnings flags aren't substituted in config/N2PConfig.pm.in; skip them
+        next if m/^-W/g;
         $config_pm =~ s/\${$_}/$config{$_}/g;
     }
 
