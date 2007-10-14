@@ -83,10 +83,12 @@ sub runstep {
         $ccflags .= ' -Wdeprecated';
         $ccflags .= ' -Wmain';
         $ccflags .= ' -Wmissing-prototypes';
+
         #$ccflags .= ' -Wp64';
         $ccflags .= ' -Wpointer-arith';
         $ccflags .= ' -Wreturn-type';
         $ccflags .= ' -Wstrict-prototypes';
+
         #$ccflags .= ' -Wtrigraphs';
         $ccflags .= ' -Wuninitialized';
         $ccflags .= ' -Wunknown-pragmas';

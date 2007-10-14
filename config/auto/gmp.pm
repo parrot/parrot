@@ -29,10 +29,12 @@ $description = 'Determining if your platform supports GMP';
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $verbose, $without ) = $conf->options->get( qw|
-        verbose
-        without-gmp
-    | );
+    my ( $verbose, $without ) = $conf->options->get(
+        qw|
+            verbose
+            without-gmp
+            |
+    );
 
     if ($without) {
         $conf->data->set( has_gmp => 0 );
