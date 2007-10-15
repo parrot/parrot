@@ -99,9 +99,51 @@ events below a certain threshold of priority. When the central scheduler
 ignores an event because of its priority level, the event remains in the task
 list until the priority threshold changes.
 
+An instance of the Event PMC has 3 internal attributes, which are:
+
+=over 4
+
+=item 1
+
+The type of the event
+
+=item 2
+
+The priority of the event
+
+=item 3
+
+A PMC containing any additional data associated with the event, which may be
+used by the event handler.
+
+=back
+
+In addition to the attributes, an event uses a private PMC flag to mark itself
+as fatal or non-fatal.
+
+=head3 Event Vtable Entries
+
+=over 4
+
+=item get_string(STRING *)
+
+Returns a simple string name for the event, suitable for printing in error
+messages.
+
+=item get_pmc(PMC *)
+
+Returns the data attribute of the event, or PMCNULL if the event has no data.
+
+=item isa(INTVAL *, STRING *)
+
+Returns true or false if the event is of the type passed in the string
+parameter, or has a parent of that type.
+
+=back
+
 =head2 Event Handler API
 
-An event handler contains a code object, as well as some meta information about
+An event handler contains a code object, as well as metainformation about
 where it was registered. More specifically, it contains a continuation object,
 capturing the full state of the interpreter where it was created. In many
 cases, this has no more effect than guaranteeing that the event handler code
@@ -114,6 +156,80 @@ event handler to throw an exception, allocate memory, or manipulate thread or
 global state safely. Event handlers can even acquire locks if they need to,
 though it's not a good idea to have an event handler blocking on lock
 acquisition.
+
+An instance of the EventHandler PMC has 3 internal attributes, which are:
+
+=over 4
+
+=item 1
+
+The type of event it handles
+
+=item 2
+
+A minimum threshhold of priority, below which it will ignore the event even if
+it is the right type. The default threshhold is 0, accepting all event
+priorities.
+
+=item 3
+
+The core code object of the event handler.
+
+=item 4
+
+A pointer to the interpreter that registered the event handler. The default is
+the interpreter in which the event handler was created.
+
+=back
+
+The interpreter pointer may be a proxy that simply provides the interface of an
+interpreter object, and knows how to communicate with its remote interpreter
+object (in threaded or clustering concurrency).
+
+=head3 Event Handler Vtable Entries
+
+=over 4
+
+=item init_pmc(PMC *)
+
+Initializes the PMC, either with a single sub object for the core code, or with
+a hash object containing arguments for the code object, type, priority
+threshold, and interpreter object for the handler.
+
+=item set_string(STRING *)
+
+Set the type of event this handler responds to. {{NOTE: These basic attribute
+setting operations could be set_attr_str and get_attr_str instead.}}
+
+=item set_integer_native(INTVAL)
+
+Set the minimum threshhold of priority.
+
+=item set_pmc(PMC *)
+
+Set the interpreter object for this event handler.
+
+=item invoke (opcode_t *, void*)
+
+Invoke the event handler.
+
+=back
+
+=head2 Opcodes
+
+The following opcodes are used with the event system:
+
+=over 4
+
+=item new
+
+  $P1 = new 'Event'
+  $P1 = new 'EventHandler'
+  $P1 = new 'EventHandler', $P2
+
+Creates a new event or event handler.
+
+=back
 
 =head2 Event Type Hierarchy
 
