@@ -46,10 +46,7 @@ token compilation_unit {
 =cut
 
 rule sub_def {
-    '.sub'
-    <sub_id>
-    <sub_pragmas>?
-    <?nl>
+    '.sub' <sub_id> <sub_pragma>* <?nl>
     <param_decl>*
     <labeled_pir_instr>*
     [ '.end' | <syntax_error: '.end' expected to close method/sub body> ]
@@ -65,10 +62,6 @@ rule sub_id {
 =head3 sub_pragmas
 
 =cut
-
-rule sub_pragmas {
-    <sub_pragma>*
-}
 
 rule sub_pragma {
     | ':load'
@@ -199,13 +192,10 @@ TODO: how to declare locals in a macro? this needs to be fixed.
 rule local_decl {
     '.local'
     [ <pir_type> | <syntax_error: type for local symbol expected> ]
-    <local_id_list>
+    <local_id> [ ',' <local_id> ]*
     {*}
 }
 
-rule local_id_list {
-    <local_id> [ ',' <local_id> ]*
-}
 
 rule local_id {
     <id> ':unique_reg'?
@@ -232,12 +222,12 @@ Const definitions, a check is done for the constant type and the type of the con
 
 rule const_def {
     '.const' <const_def_tail>
-    {*}
+
 }
 
 rule globalconst_def {
     '.globalconst' <const_def_tail>
-    {*}
+
 }
 
 rule const_def_tail {
@@ -269,7 +259,7 @@ rule goto {
 }
 
 token label_identifier {
-    | <IDENT>          {*} #= id
+    | <IDENT>          {*} #= IDENT
     | <pasm_instr>     {*} #= pasm_instr
     | <syntax_error: label identifier expected>
 }
@@ -380,9 +370,7 @@ rule rhs {
 #
 
 rule heredoc {
-    '<<'
-    <string_constant>
-    <?nl>
+    '<<' <string_constant> <?nl>
     <heredoc_string>
     [ <heredoc_label> | <syntax_error: heredoc label expected> ]
 }
@@ -646,9 +634,9 @@ rule pasm_constant {
 }
 
 token constant {
-    | <FLOAT_CONST>  {*} #= float_const
-    | <INT_CONST>    {*} #= int_const
-    | <STRING_CONST> {*} #= string_constant
+    | <FLOAT_CONST>  {*} #= FLOAT_CONST
+    | <INT_CONST>    {*} #= INT_CONST
+    | <STRING_CONST> {*} #= STRING_CONST
 }
 
 
@@ -758,14 +746,17 @@ token INT_CONST {
     | '0b' \d+
     | '0x' \d+
     | ['-']? \d+
+    {*}
 }
 
 rule float_constant {
     <FLOAT_CONST> | <syntax_error: float constant expected>
+
 }
 
 token FLOAT_CONST {
     ['-']? \d+\.\d+
+    {*}
 }
 
 rule string_constant {
