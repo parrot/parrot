@@ -1,5 +1,5 @@
 #! perl
-# $Id: basic.t 21430 2007-09-20 16:39:38Z bernhard $
+# $Id$
 
 # Copyright (C) 2007, The Perl Foundation.
 
