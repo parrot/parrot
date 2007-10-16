@@ -362,14 +362,12 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
                 break;
         }
         switch (hash->entry_type) {
-            INTVAL i;
             case enum_hash_pmc:
                 info->thaw_ptr = (PMC**)&b->value;
                 (info->visit_pmc_now)(interp, NULL, info);
                 break;
             case enum_hash_int:
-                i        = VTABLE_shift_integer(interp, io);
-                b->value = (void *)i;
+                b->value = (void *)VTABLE_shift_integer(interp, io);
                 break;
             default:
                 real_exception(interp, NULL, 1, "unimplemented value type");
