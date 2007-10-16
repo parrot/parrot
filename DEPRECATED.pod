@@ -10,6 +10,13 @@ is not the case yet [RT#41226].
 The object system of Parrot is being overhauled. This touches some opcode
 and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
 
+=head1 nonexisting array elements
+
+As of the 0.5.0 release, fetching an element that doesn't exist from an array
+will return a null PMC, instead of Undef. (Returning a null PMC can be
+considered the standard behavior for Parrot aggregates when accessing an
+element that doesn't exist. HLL aggregates define their own behavior.)
+
 =head1 PGE::P6Regex and pgc.pir
 
 In early 2007 there were a number of changes made to the Perl 6
