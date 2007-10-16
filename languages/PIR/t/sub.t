@@ -140,7 +140,8 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'more paramete
 .sub x
   .param $P0
   .param $P1 :slurpy
-  .param int "x" => b
+  .param string "y" => a
+  .param int "x" => b :slurpy
 .end
 
 CODE

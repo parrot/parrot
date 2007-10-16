@@ -122,17 +122,17 @@ rule multi_type {
 }
 
 rule param_decl {
-    '.param' <parameter> <?nl>
+    '.param' <parameter> <parameter_flags> <?nl>
     {*}
 }
 
 rule parameter {
     [ <pir_type>
         [ [ <STRING_CONST> '=>' <IDENT> ]
-        | <IDENT> <parameter_flags>
+        | <IDENT>
         ]
     ]
-    | <REGISTER> <parameter_flags>
+    | <REGISTER>
     | <syntax_error: parameter type or register expected>
 }
 
