@@ -1,5 +1,9 @@
 # $Id$
 
+New in 0.4.17
+- Languages
+ + Make 'languages/scheme' work with the current calling conventions
+
 New in 0.4.16
 - Implementation:
  + Performed code review on every PMC
