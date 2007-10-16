@@ -82,6 +82,9 @@ D: Pugs, a Perl6->Parrot implementation.
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
+N: Bernd Ulmann
+D: Fixes for VMS
+
 N: Bernhard Schmalhofer
 D: Bugfixes
 D: Parrot m4
