@@ -20,7 +20,7 @@ linux-x86-gcc3.3.5.2005013        Y    Y    Y     Y   Y   Y    Y     ?  20060618
 linux-x86-gcc4.0.2                Y    Y    Y     Y   Y   Y    Y     ?  20060514
 linux-x86-gcc4.0.3                Y    Y    Y     Y   Y   Y    Y     ?  20060707
 linux-x86-gcc4.1.0                Y    Y    Y     Y   Y   Y    Y     Y  20060306
-linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20070918
+linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20071016
 linux-x86-gcc4.1.3                Y    Y    ?     Y   Y   Y    Y     ?  20071001
 linux-x86-icc9.1                  Y    Y    Y     ?   ?   Y    Y     ?  20071014
 linux-x86_64-gcc3.4.3         8   Y    -    -     Y   Y   Y    Y     ?  20060618
