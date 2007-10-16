@@ -1986,8 +1986,10 @@ sub_flags(parser_state *p) {
 
 =item *
 
-  parameters -> { '.param' (register | type IDENTIFIER) [param_flag] '\n' }
+  parameters -> { '.param' parameter[param_flag] '\n' }
 
+  parameter -> register
+                  | type [ STRING_CONSTANT '=>' ] IDENTIFIER
 =cut
 
 */
@@ -2003,6 +2005,10 @@ parameters(parser_state *p) {
             case T_STRING:
                 emit_type(p, get_current_token(p->lexer));
                 next(p); /*we know what it is; just skip it! */
+                if (p->curtoken == T_STRING_CONSTANT) { /* [ STRING_CONSTANT '=>' ] */
+                    next(p);
+                    match(p, T_ARROW);
+                }
                 emit_name(p, get_current_token(p->lexer));
                 match(p, T_IDENTIFIER);
                 param_flags(p);
