@@ -303,9 +303,12 @@ other event handlers in a final way.
   windowevent
       blur
       focus
-      resize
       scroll
       textselect
+      resize
+          minimize
+          maximize
+          restore
 
   signal
       alarm
