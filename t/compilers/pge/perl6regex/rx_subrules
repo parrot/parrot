@@ -1,6 +1,12 @@
 ##  builtin subrules
 abc <fail> def	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	n				<fail>
 
+<ident>			2+3 ab2		/mob<ident>: <ab2 @ 4>/		capturing builtin <ident>
+<name>			ab::cd::x3::42	/mob<name>: <ab::cd::x3 @ 0>/	capturing builtin <name>
+
+<.ident>			2+3 ab2		y		non-capturing builtin <.ident>
+<.name>			ab::cd::x3::42	y	non-capturing builtin <.name>
+
 <?wb>def		abc\ndef\n-==\nghi	y	word boundary \W\w
 abc<?wb>		abc\ndef\n-==\nghi	y	word boundary \w\W
 <?wb>abc		abc\ndef\n-==\nghi	y	BOS word boundary
@@ -52,8 +58,6 @@ a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
 <+gt>+		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <> @ 23>/	<+gt>+
 <dot>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<dot>: <. @ 17>/	<dot>
 <+dot>+		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <. @ 17>/	<+dot>+
-<ident>			2+3 ab2		/mob<ident>: <ab2 @ 4>/		capturing builtin <ident>
-<name>			ab::cd::x3::42	/mob<name>: <ab::cd::x3 @ 0>/	capturing builtin <name>
 <+alnum+[_]>	ident_1				y	union of character classes
 <+[ab]+[\-]>+	aaa-bbb				y	enumerated character classes
 <+  [ a  b ]+[\-]>+		aaa-bbb		y	whitespace is ignored within square brackets and after the initial +
