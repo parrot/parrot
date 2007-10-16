@@ -1,0 +1,247 @@
+# Copyright (C) 2007, The Perl Foundation
+# $Id$
+
+=head1 NAME
+
+docs/pdds/pdd26_ast.pod - Parrot Abstract Syntax Tree
+
+=head1 ABSTRACT
+
+This PDD describes the node types and semantics of the Parrot
+Abstract Syntax Tree representation.
+
+=head1 VERSION
+
+$Revision$
+
+=head1 DESCRIPTION
+
+The Parrot Abstract Syntax Tree (PAST) is a set of Parrot
+classes useful for generating an abstract semantic representation
+of a program written in a high level language such as Perl or
+Python.  Once a program has been translated into its equivalent
+PAST representation, the Parrot Compiler Toolkit can be used to
+generate executable PIR or bytecode from the abstract syntax
+tree representation.
+
+PAST is designed to provide the common operations and semantics
+needed by many of the high level languages targeted by Parrot,
+while also being extensible to support the unique needs of
+specific languages.
+
+=head1 IMPLEMENTATION
+
+=head2 PAST::Node
+
+C<PAST::Node> is the base class for all nodes in an abstract
+syntax tree.  Each C<PAST::Node> element has an array of
+children nodes (which may be empty), as well as a number of
+attributes and accessor methods for the node.
+
+Every PAST node has C<name>, C<source>, and C<pos> attributes.
+The C<name> attribute is the node's name, if any, while
+C<source> and C<pos> are used to identify the location of the
+node in the original source code.
+
+=over 4
+
+=item init([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
+
+Initialize a PAST node with the given children and attributes.
+Adds each child to the node (using the C<push> method, below)
+and calls the appropriate accessor method for each attribute.
+
+=item new([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
+
+Create a new PAST node with the same type as the invocant
+and initialized with the given children and attributes.
+Returns the newly created node.
+
+=item push(child)
+
+Add C<child> to the end of the node's array of children.
+
+=item unshift(child)
+
+Add C<child> to the beginning of the node's array of children.
+
+=item iterator( )
+
+Return a newly initialized C<Iterator> for the node's list
+of children.
+
+=item node(val)
+
+Set the invocant's C<source> and C<pos> attributes to be the
+same as C<val>.  If C<val> is another PAST node, then C<source>
+and C<pos> are simply copied from that node.  Otherwise, C<val>
+is assumed to be a C<Match> object (e.g., from PGE) and the
+source and position information are obtained from that.
+
+=item name([value])
+
+Accessor method -- sets/returns the C<name> attribute of the node.
+
+=item named([value])
+
+Accessor method -- for nodes that are being used as named arguments,
+sets/returns the name to be associated with the argument.
+
+=item flat([value])
+
+Accessor method -- sets/returns the "flatten" flag on nodes being
+used as arguments.
+
+=item attr(STR attrname, PMC value, INT has_value)
+
+Helper method for writing accessors -- if C<has_value> is true
+then set the node's value of C<attrname> to C<value>.  Returns
+the (resulting) value of C<attrname> for the invocant.
+
+=back
+
+=head2 PAST::Stmts
+
+C<PAST::Stmts> is simply a C<PAST::Node> used to contain a
+sequence of other PAST nodes to be evaluated.  It has no
+specific methods or attributes.
+
+=head2 PAST::Val
+
+C<PAST::Val> nodes represent constant values in the abstract
+syntax tree.  The C<value> attribute represents the value of
+the node itself.
+
+=over 4
+
+=item value([value])
+
+Accessor method to get/set the constant value for this node.
+
+=back
+
+=head2 PAST::Var
+
+C<PAST::Var> nodes represent variable-like items within the
+abstract syntax tree.  The C<name> attribute (inherited from
+C<PAST::Node>) identifies the name of the variable as given
+by the high level language program.  The other attributes for
+C<PAST::Var> nodes provide the details of how the variable
+is defined and accessed.
+
+=over 4
+
+=item scope([value])
+
+A variable node's "scope" indicates how the variable is to be
+defined or accessed within the program.  The available scopes
+include:
+
+=over 4
+
+=item "lexical"
+
+Lexical variables are scoped to the C<PAST::Block> in which
+they are declared, including any nested blocks.  If the
+node's C<isdecl> attribute is true, then this node defines
+a new lexical variable within the current block.  Otherwise,
+the node refers to a lexical variable already declared in the current
+or outer block.
+
+=item "package"
+
+Package variables represent global or namespace-managed
+variables in the program.  The node's C<namespace> attribute
+may be used to explicitly identify the namespace of the variable,
+otherwise it is assumed to be within the namespace of the
+C<PAST::Block> containing the node.
+
+=item "parameter"
+
+Parameter variables are the formal arguments to subroutine and
+methods, typically represented as C<PAST::Block> nodes.  The
+parameter's lexical name is given by the node's C<name> attribute.
+Positional parameters are defined by the order in which they
+appear in the C<PAST::Block> node, named parameters have values
+for the C<named> attribute.  Optional parameters are identified
+via the C<viviself> attribute (see below) indicating how the parameter
+is to be initialized if not supplied by the caller.  Slurpy parameters
+are indicated via the node's C<isslurpy> attribute.
+
+=item "keyed"
+
+Keyed variables represent the elements of aggregates such as
+arrays and hashes.  Nodes representing keyed elements have two
+children; the first child is the PAST representation of the
+aggregate, and the second child is the PAST representation of
+the key or index.  The C<vivibase> attribute below may be used
+to specify how to generate the aggregate if it doesn't already
+exist.
+
+=back
+
+=item viviself([value])
+
+Accessor method for the C<viviself> attribute, which specifies
+how uninitialized variables are to be initialized when first
+used.  The C<viviself> attribute may be either a string or array
+representing a type (e.g., C<Integer>), or it may be a PAST
+representation for generating the variable's initial value.
+
+=item vivibase([value])
+
+Accessor method for the C<vivibase> attribute, which specifies
+how the base portion of aggregate variables (see "keyed scope" above)
+is to be created if it doesn't already exist.  C<Vivibase>
+may either be a string or array representing the type of the
+newly created aggregate, or it may be a PAST representation for
+generating the aggregate.
+
+=item isdecl([flag])
+
+Accessor method for the C<isdecl> attribute.  A true value
+of C<isdecl> indicates that the variable given by this node
+is being created at this point within the current lexical
+scope.  Otherwise, the node refers to a pre-existing variable
+(possibly from an outer scope).
+
+=item islvalue([flag])
+
+Accessor method for the C<islvalue> attribute, which indicates
+whether this variable is being used in an lvalue context.
+
+=item isslurpy([flag])
+
+Accessor method for the C<isslurpy> attribute of parameter variables.
+A true value of C<isslurpy> indicates that the parameter variable
+given by this node is to be created as a slurpy parameter (consuming
+all remaining arguments passed in).  Named slurpy parameters are
+indicated by having a non-empty C<named> attribute and a true value of
+C<isslurpy>.
+
+=back
+
+=head2 PAST::Op
+
+Coming soon.
+
+=head2 PAST::Block
+
+Coming soon.
+
+=head2 PAST::CompUnit
+
+Coming soon.
+
+=head1
+
+Copyright (C) 2007, The Perl Foundation.
+
+=cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
+
