@@ -16,6 +16,7 @@ sub tokenize {
     my $file = shift;
 
     # read file and throw away comments
+    # XXX probably broken WRT to strings with embedded comments
     my $text;
     {
         open my $source, '<', $file;
@@ -31,68 +32,79 @@ sub tokenize {
     {
         my $token = q{};
         for my $ch ( split m//, $text ) {
-            if (    $ch eq '('
-                 || $ch eq ')'
-               )
+            if (    $token =~ m/ \A " /xms )                             # in string
+            {
+              if (    $ch ne q{"}                                        # not a string delimiter
+                   || $token =~ m/ \\ \z/xms                             # or an escaped delimiter
+                 )
+              {
+                $token .= $ch;
+              }
+              else                                                       # end of string
+              {
+                $token .= $ch;
+                push @tokens, $token;
+                $token = q{};
+              }
+            }
+            elsif (    $ch eq '('
+                    || $ch eq ')'
+                  )
             {
                 push @tokens, $token;
                 $token = $ch;
             }
             elsif (    $ch eq '-'
-                    && (    $token =~ m/^[a-z]/ # Dashes can be in an ident
-                         || $token =~ m/^[-]\d+(\.\d+)?[eE]/
+                    && (    $token =~ m/ \A [a-z]/xms                    # Dashes can be in an ident
+                         || $token =~ m/ \A [-] \d+ (\.\d+)? [eE] /xms   # Dashes could be a neg. expt
                        )
                   )
-            {                                # Dashes could be a neg. expt
+            {
                 $token .= $ch;
             }
-            elsif (    $ch eq '?'
-                    && $token =~ m/^[a-z]/
+            elsif (    (    $ch eq '?'                                   # Question mark
+                         || $ch eq '!'                                   # or exclamaition mark
+                       )
+                    && $token =~ m/ \A [a-z]/xms                         # can follow an identifier
                   )
-            {                                # Question marks can follow an identifier
-                $token .= $ch;
-            }
-            elsif (    $ch eq '!'
-                    && $token =~ m/^[a-z]/
-                  )
-            {                                # Exclamation marks can follow an identifier
+            {                         
                 $token .= $ch;
             }
             elsif (    $ch eq '='
-                    && $token =~ m/^[<>]/
+                    && $token =~ m/ \A [<>] /xms
                   )
             {                                # Equal sign can follow '<','>'
                 $token .= $ch;
             }
             elsif (    $ch eq '.'
-                    && $token =~ m/^\d+$/
+                    && $token =~ m/\A \d+ \z/xms
                   )
-            {                                # Equal sign can follow '<','>'
+            {                                       # a decimal point can follow digits
                 $token .= $ch;
             }
-            elsif (    $ch =~ m/\d/
-                    && (    $token =~ m/^[-]/       # Digits can follow a dash
-                         || $token =~ m/^\./        # Digits can follow a decimal point
-                         || $token =~ m/^\d/
+            elsif (    $ch =~ m/ \d /xms
+                    && (    $token =~ m/ \A [-] /xms       # Digits can follow a dash
+                         || $token =~ m/ \A \.  /xms       # Digits can follow a decimal point
+                         || $token =~ m/ \A \d  /xms
                        )
                   )
             {                                # Digits can follow other digits
                 $token .= $ch;
             }
-            elsif (    $ch =~ m/[a-zA-Z]/
-                    && $token =~ m/^\w/
+            elsif (    $ch =~ m/ [a-zA-Z] /xms
+                    && $token =~ m/ \A \w /xms
                   )
             {                                # Letters can follow other letters
                 $token .= $ch;
             }
-            elsif (    $ch =~ m/\s/
-                    && $token =~ m/^\s/
+            elsif (    $ch =~ m/ \s /xms
+                    && $token =~ m/ \A \s /xms
                   )
             {                                # White can follow white
                 $token .= $ch;
             }
-            elsif (    $ch =~ m/@/
-                    && $token =~ m/^,$/
+            elsif (    $ch =~ m/ @ /xms
+                    && $token eq q{,}
                   )
             {                                # token ,@
                 $token .= $ch;
