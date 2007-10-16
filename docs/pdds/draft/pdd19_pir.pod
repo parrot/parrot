@@ -115,7 +115,7 @@ characters outside thar range, specify an encoding in the way below.
 =item <<"heredoc",  <<'heredoc'
 
 Heredocs work like single or double quoted strings. All lines up to
-the terminating delimiter is slurped into the string. The delimiter
+the terminating delimiter are slurped into the string. The delimiter
 has to be on its own line, at the beginning of the line and with no 
 trailing whitespace.
 
