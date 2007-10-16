@@ -127,13 +127,13 @@ rule param_decl {
 }
 
 rule parameter {
-    [ <pir_type> 
-        [ [ <STRING_CONST> '=>' <IDENT> ] 
-        | <IDENT> <parameter_flags> 
+    [ <pir_type>
+        [ [ <STRING_CONST> '=>' <IDENT> ]
+        | <IDENT> <parameter_flags>
         ]
     ]
     | <REGISTER> <parameter_flags>
-    | <syntax_error: parameter type or register expected>     
+    | <syntax_error: parameter type or register expected>
 }
 
 rule parameter_flags {
@@ -524,7 +524,7 @@ rule result_values {
 }
 
 rule set_flags {
-    | ':flat' 
+    | ':flat'
     | <named_flag>
 }
 

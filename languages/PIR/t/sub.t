@@ -10,12 +10,12 @@ use Parrot::Test tests => 22;
 use Test::More;
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'basic sub' );
-.sub main			
+.sub main
 .end
 CODE
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'main flag' );
-.sub main :main	
+.sub main :main
 .end
 CODE
 
