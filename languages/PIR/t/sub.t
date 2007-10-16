@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 22;
 use Test::More;
 
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'basic sub' );
@@ -92,6 +92,11 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 7'
 .end
 CODE
 
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'multi flag 8' );
+.sub main :multi('Integer', 'Foo')
+.end
+CODE
+
 language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'vtable flag' );
 .sub main :vtable('__set_int')
 .end
@@ -126,8 +131,17 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'sub' );
   .param pmc argv :slurpy         # slurpy array
   .param pmc value :named('key')  # named parameter
   .param int x :optional          # optional parameter
-  .param int has_x :opt_flag      # flag 0/1 x was passed
+  .param int has_x :opt_flag          # flag 0/1 x was passed
   .param pmc kw :slurpy :named    # slurpy hash
 .end
+CODE
+
+language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'more parameters' );
+.sub x
+  .param $P0
+  .param $P1 :slurpy
+  .param int "x" => b
+.end
+
 CODE
 

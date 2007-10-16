@@ -122,17 +122,23 @@ rule multi_type {
 }
 
 rule param_decl {
-    '.param'
-    [ [ <pir_type> <id> ]
-    | <REGISTER>
-    | <syntax_error: parameter type or register expected>
-    ]
-    [ <get_flags> | ':unique_reg' ]*
-    <?nl>
+    '.param' <parameter> <?nl>
     {*}
 }
 
+rule parameter {
+    [ <pir_type> 
+        [ [ <STRING_CONST> '=>' <IDENT> ] 
+        | <IDENT> <parameter_flags> 
+        ]
+    ]
+    | <REGISTER> <parameter_flags>
+    | <syntax_error: parameter type or register expected>     
+}
 
+rule parameter_flags {
+    [ <get_flags> | ':unique_reg' ]*
+}
 
 
 
@@ -462,7 +468,7 @@ rule result_var_list {
 }
 
 rule result_var {
-    <target> <get_flags>?
+    <target> <get_flags>*
     {*}
 }
 
@@ -487,7 +493,7 @@ rule arg {
       ]?
     | <target>        {*} #= target
     | <heredoc_id>    {*} #= heredoc_id
-    ] <set_flags>?
+    ] <set_flags>*
     {*}
 }
 
@@ -502,7 +508,7 @@ token heredoc_id {
 rule arguments {
     [ '.arg'
       [ <simple_expr> | <syntax_error: argument expression expected> ]
-      <set_flags>?
+      <set_flags>*
       <?nl>
     ]*
     {*}
@@ -511,22 +517,22 @@ rule arguments {
 rule result_values {
     [ '.result'
       [ <target> | <syntax_error: target expected to hold the result> ]
-      <get_flags>?
+      <get_flags>*
       <?nl>
     ]*
     {*}
 }
 
 rule set_flags {
-    [ ':flat' | <named_flag> ]+
+    | ':flat' 
+    | <named_flag>
 }
 
 rule get_flags {
-    [ ':slurpy'
+    | ':slurpy'
     | ':optional'
     | ':opt_flag'
     | <named_flag>
-    ]+
 }
 
 rule named_flag {
@@ -564,7 +570,7 @@ rule long_yield_stat {
 
 rule return_value {
     [ <simple_expr> | <syntax_error: simple expression expected> ]
-    <set_flags>?
+    <set_flags>*
     <?nl>
 }
 
