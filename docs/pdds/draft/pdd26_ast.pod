@@ -223,7 +223,185 @@ C<isslurpy>.
 
 =head2 PAST::Op
 
-Coming soon.
+C<PAST::Op> nodes represent the operations in an abstract
+syntax tree.  The primary function of the node is given by
+its C<pasttype> attribute, secondary functions may be indicated
+by the node's C<name>, C<pirop>, or other attributes as given
+below.
+
+=over 4
+
+=item pasttype([value])
+
+Accessor method for the node's C<pasttype> attribute.  The
+C<pasttype> is the primary indicator of the type of operation
+to be performed, the operands are typically given as the
+children of the node.  Defined values of C<pasttype> are:
+
+=over 4
+
+=item assign
+
+Copy the value of the node's second child into the variable
+expression given by its first child.
+
+=item bind
+
+Bind the variable given by the node's first child to the
+value given by its second child.
+
+=item if
+
+The first, second, and third children represent the
+"condition", "then", and "else" parts of a conditional
+expression.  The first child is evaluated; if the result
+is true then the second child is evaluated and returned
+as the result of the C<PAST::Op> node, otherwise the
+third child is evaluated and returned as the result.
+This implements the standard if-then-else logic needed
+by most higher level languages, and can also be used
+for implementing the ternary operator.
+
+If the node is missing its second ("then") or third ("else")
+child, then the result of the condition is used as the
+corresponding result of the operation.  This makes it easy
+to implement the "short-circuit and" operator commonly used in many
+high level languages.  For example, the standard C<&&> operator
+may be implemented using an "if" node, where the left operand is
+the first (condition) child, the right operand is the
+second (then) child, and the third child is left as null
+or uninitialized.
+
+It's also possible to build a "short-circuit or" (C<||>)
+operator using this pasttype, by setting the left operand to
+C<||> as the first child and the right operand as the I<third>
+child (leaving the second child as null).  However, it's probably
+simpler to use the "unless" type as described below.
+
+=item unless
+
+Same as C<if> above, except that the second child is evaluated
+if the first child evaluates to false and the third child is
+evaluated if the first child evaluates to true.
+
+The C<unless> type can be used to implement "short-circuit or"
+semantics; simply set the first child to the left operand and
+the second child to the right operand, leaving the third
+child empty or uninitialized.  If the first child evaluates to
+true it is returned as the result of the operation, otherwise the 
+second child is evaluated and returned as the result.
+
+=item while
+
+Evaluate the first child (condition), if the result is true
+then evaluate the second child (body) and repeat.
+
+=item until
+
+Evaluate the first child (condition), if the result is false then evaluate
+the second child (body) and repeat.
+
+=item repeat_while, repeat_until
+
+Same as C<while> and C<until> above, except the second child is evaluated
+before the conditional first child is evaluated for continuation of
+the loop.
+
+=item for
+
+Iterate over the first child in groups of elements given by
+C<arity> (default 1).  For each iteration, invoke the second
+child, passing the elements as parameters.
+
+=item call
+
+Call the subroutine given by the C<name> attribute, passing
+the results of any child nodes as arguments.  If the node
+has no C<name> attribute, then the first child is assumed
+to evaluate to a callable subroutine, and any remaining
+children are used as arguments.
+
+=item callmethod
+
+Invoke the method given by C<name> on the first child,
+passing the results of any child nodes as arguments.  If the
+node has no C<name> attribute, then the first child is
+evaluated as a method to be called, the second child is
+the invocant, and any remaining children are arguments to
+the method call.
+
+=item pirop
+
+Execute the PIR opcode given by the C<pirop> attribute.  See the
+C<pirop> method below for details.  This is also the default
+behavior when a C<pirop> attribute is set and C<pasttype> is
+not.
+
+=item inline
+
+Execute the sequence of PIR statements given by the
+node's C<inline> attribute (a string).  See the C<inline>
+method below for details.
+
+=item try
+
+Evaluates the first child, if any exceptions occur then they
+are handled by the code given by the second child (if any).
+
+=item xor
+
+Evaluate the child nodes looking for exactly one true result
+to be returned.  If two true results are encountered, the
+operation immediately short-circuits and returns false.
+Otherwise, after all children have been evaluated the result
+of any true child is used as the result of the operation, or
+the result of the last child if none of the children evaluated
+to true.
+
+=back
+
+=item pirop([opcode])
+
+Get/set the PIR opcode to be executed for this node.  Internally
+the PAST and POST (Parrot Opcode Syntax Tree) implementations
+understand the register types available for common PIR operations
+and will handle any needed register or constant conversion of
+operands automatically.  Note that except for the C<assign>
+opcode, any destination is typically generated automatically
+and should not be explicitly given as a child operand to the node.
+The table of PIR opcodes that PAST "knows" about is given in
+F<compilers/pct/src/POST/Node.pir> .
+
+=item islvalue([flag])
+
+Get/set whether this node is an lvalue, or treats its first
+child as an lvalue (e.g., for assignment).
+
+=item inline([STRING code])
+
+Get/set the code to be used for inline PIR when C<pasttype> is
+set to "inline".  The C<code> argument is PIR text to be inserted in
+the final generated code sequence.  Sequences of "%0", "%1",
+"%2", ... "%9" in C<code> are replaced with the evaluated
+results of the first, second, third, ..., tenth children nodes.
+(If you need more than ten arguments to your inline PIR, consider
+making it a subroutine call instead.)
+
+The register to hold the result of the inline PIR operation is
+given by "%r", "%t", or "%u" in the C<code> string:
+
+  %r   - Generate a unique PMC register for the result.
+  %t   - Generate a unique PMC register for the result,
+         and initialize it with an object of type C<returns>
+         {{Pm: or possibly C<viviself> }}
+         before the execution of the inline PIR.
+  %u   - Re-use the first child's PMC (%0) if it's a temporary
+         result, otherwise same as %t above.
+
+If none of %r, %t, or %u appear in C<code>, then the first
+child's (%0) is used as the result of this operation.
+
+=back
 
 =head2 PAST::Block
 
@@ -233,7 +411,7 @@ Coming soon.
 
 Coming soon.
 
-=head1
+=head1 COPYRIGHT
 
 Copyright (C) 2007, The Perl Foundation.
 
