@@ -127,11 +127,7 @@ rule param_decl {
 }
 
 rule parameter {
-    [ <pir_type>
-        [ [ <STRING_CONST> '=>' <IDENT> ]
-        | <IDENT>
-        ]
-    ]
+    | <pir_type> [ <STRING_CONST> '=>' ]? <IDENT>
     | <REGISTER>
     | <syntax_error: parameter type or register expected>
 }
