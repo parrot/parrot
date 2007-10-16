@@ -6,7 +6,7 @@ docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
 =head1 ABSTRACT
 
-This document describes PIR, a stable, middle-level language for both 
+This document describes PIR, a stable, middle-level language for both
 compiler and human to target on.
 
 =head1 VERSION
@@ -25,7 +25,7 @@ PIR allows POD blocks.
 =head1 Statements
 
 A valid PIR program consists of a sequence of I<statements>. A
-I<statement> is terminated by a newline (<NL>). So, each statement has to be 
+I<statement> is terminated by a newline (<NL>). So, each statement has to be
 on its own line.
 
 =head2 General statement format
@@ -38,13 +38,13 @@ newline:
 =head2 Labels
 
 PIR code has both local and global labels. Global labels start with an
-underscore, local labels shouldn't.  Optional label for the given 
-instruction, can stand on its own line. A label must conform to the syntax 
+underscore, local labels shouldn't.  Optional label for the given
+instruction, can stand on its own line. A label must conform to the syntax
 of B<identifier> described below.
 
-The name of a global label has to be unique, since it can be called at any 
-point in the program. A local label is accessible only in the compilation 
-unit where it's defined. A local label name must be unique within a 
+The name of a global label has to be unique, since it can be called at any
+point in the program. A local label is accessible only in the compilation
+unit where it's defined. A local label name must be unique within a
 compilation unit, but it can be reused in other compilation units.
 
 Examples:
@@ -83,7 +83,7 @@ Can be B<int>, B<float>, B<string> or B<pmc>.
 
 =item <reg>
 
-A PASM register In, Sn, Nn, Pn, or a PIR temporary register $In, $Sn, $Nn, 
+A PASM register In, Sn, Nn, Pn, or a PIR temporary register $In, $Sn, $Nn,
 $Pn, where B<n> consists of digit(s) only. B<n> must be between 1 and 99.
 
 {{ REVIEW: n limit }}
@@ -116,7 +116,7 @@ characters outside thar range, specify an encoding in the way below.
 
 Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter is slurped into the string. The delimiter
-has to be on its own line, at the begging of the line and with no trailing 
+has to be on its own line, at the begging of the line and with no trailing
 whitespace.
 
 Assignment of a heredoc:
@@ -137,15 +137,15 @@ A heredoc as an argument:
 
 Only one heredoc can be active per statement line.
 
-{{ REVIEW: it would be useful to have multiple heredocs per statement, 
+{{ REVIEW: it would be useful to have multiple heredocs per statement,
    which allows for writing:
-   
+
    function(<<'INPUT', <<'OUTPUT', 'some test')
    ...
  INPUT
    ...
  OUTPUT
- 
+
 }}
 
 =item charset:"string constant"
@@ -217,9 +217,9 @@ integer type constants are working for creating new PMCs.
 
 =item .HLL_map 'CoreType', 'UserType'
 
-Whenever Parrot has to create PMCs inside C code on behalf of the running 
-user program it consults the current type mapping for the executing HLL 
-and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such 
+Whenever Parrot has to create PMCs inside C code on behalf of the running
+user program it consults the current type mapping for the executing HLL
+and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such
 a mapping is defined.
 
 E.g. with this code snippet ...
@@ -254,12 +254,12 @@ End a compilation unit. Always paired with C<.sub>.
 
 =item .emit
 
-Define a I<compilation unit> containing PASM code. Always paired with 
+Define a I<compilation unit> containing PASM code. Always paired with
 C<.eom>.
 
 =item .eom
 
-End a I<compilation unit> containing PASM code. Always paired with 
+End a I<compilation unit> containing PASM code. Always paired with
 C<.emit>.
 
 =item .local <type> <identifier> [:unique_reg]
@@ -306,7 +306,8 @@ B<const> to it.
 
 =item .globalconst <type> <identifier> = <const>
 
-{{ PROPOSAL: to be removed, see RT#45407 }}
+As C<.const> above, but the defined constant is globally accessible.
+
 
 =item .namespace <identifier>
 
@@ -361,14 +362,22 @@ Directives used for Parrot Calling Conventions. These are:
 
 =over 4
 
-=item .param <type> <identifier> [:<flag> ...]
+=item .param <type> <identifier> [:<flag>]*
 
 At the top of a subroutine, declare a local variable, in the mannter
 of B<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
 C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
-=item .param <reg> [:<flag> ...]
+=item .param <type> "<identifier>" => <identifier> [:<flag>]*
+
+Define a named parameter. This is syntactic sugar for:
+
+ .param <type> <identifier> :named("<identifier>")
+
+=item .param <reg> [:<flag>]*
+
+{{ Specifying a register for a parameter does not work. See. RT#46455. }}
 
 At the top of a subroutine, specify where parameter(s) of the current
 subroutine should be stored.  Available flags:
@@ -428,8 +437,8 @@ Function or method call. These notations are shorthand for a longer
 PCC function call with B<.pcc_*> directives. I<var> can denote a
 global subroutine, a local B<identifier> or a B<reg>.
 
-{{We should review the (currently inconsistent) specification of the 
-method name. Currently it can be a bare word, a quoted string or a 
+{{We should review the (currently inconsistent) specification of the
+method name. Currently it can be a bare word, a quoted string or a
 string register. See #45859.}}
 
 =item .return ([<var> [:<flag> ...], ...])
@@ -482,7 +491,7 @@ Examples:
 
 =item if <var> goto <identifier>
 
-If <var> evaluates as true, jump to the named identifier. Translate to 
+If <var> evaluates as true, jump to the named identifier. Translate to
 B<if var, identifier>>.
 
 =item unless <var> goto <identifier>
@@ -492,24 +501,24 @@ B<unless var, identifier>.
 
 =item if null <var> goto <identifier>
 
-If B<var> evaluates as null, jump to the named B<identifier>. Translate to 
+If B<var> evaluates as null, jump to the named B<identifier>. Translate to
 B<if_null var, identifier>.
 
 =item unless null <var> goto <identifier>
 
-Unless B<var> evaluates as null, jump to the named B<identifier>. Translate 
+Unless B<var> evaluates as null, jump to the named B<identifier>. Translate
 to B<unless_null var, identifier>.
 
 =item if <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the 
+The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the
 PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1> B<relop>
 B<var2> evaluates as true, jump to the named B<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the 
-PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1> 
+The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the
+PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1>
 B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
 =item <var1> = <var2>
@@ -564,7 +573,7 @@ A keyed B<set> operation or the assign B<substr> op with a length of
 
 =item <var> = new '<type>'
 
-Create a new PMC of type B<type> stored in B<var>. Translate to 
+Create a new PMC of type B<type> stored in B<var>. Translate to
 B<new var, 'type'>.
 
 =item <var1> = new '<type>', <var2>
@@ -595,7 +604,7 @@ Assing to B<var1> a clone of B<var2>. Translate to B<clone var1, var2>.
 
 =item <var> = addr <identifier>
 
-Assign to B<var> the address of label identified by <identifier>. Translate 
+Assign to B<var> the address of label identified by <identifier>. Translate
 to B<set_addr var, var>.
 
 =item <var> = null
@@ -628,7 +637,7 @@ Return the address of a label.
 
 	<pmichaud>	I don't think that 'morph' as a method call is a good idea
 	<pmichaud>	we need something that says "assign to value" versus "assign to container"
-	<pmichaud>	we can't eliminate the existing 'morph' opcode until we have a replacement 
+	<pmichaud>	we can't eliminate the existing 'morph' opcode until we have a replacement
 
 =back
 
