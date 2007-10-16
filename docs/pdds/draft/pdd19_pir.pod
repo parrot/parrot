@@ -116,8 +116,8 @@ characters outside thar range, specify an encoding in the way below.
 
 Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter is slurped into the string. The delimiter
-has to be on its own line, at the begging of the line and with no trailing
-whitespace.
+has to be on its own line, at the beginning of the line and with no 
+trailing whitespace.
 
 Assignment of a heredoc:
 
@@ -150,7 +150,7 @@ Only one heredoc can be active per statement line.
 
 =item charset:"string constant"
 
-Like above with a chracter set attached to the string. Valid character
+Like above with a character set attached to the string. Valid character
 sets are currently: C<ascii> (the default), C<binary>, C<unicode>
 (with UTF-8 as the default encoding), and C<iso-8859-1>.
 
@@ -491,13 +491,13 @@ Examples:
 
 =item if <var> goto <identifier>
 
-If <var> evaluates as true, jump to the named identifier. Translate to
-B<if var, identifier>>.
+If B<var> evaluates as true, jump to the named B<identifier>. Translate to
+B<if var, identifier>.
 
 =item unless <var> goto <identifier>
 
-Unless <var> evaluates as true, jump to the named identifier. Translate to
-B<unless var, identifier>.
+Unless B<var> evaluates as true, jump to the named B<identifier>. Translate 
+to B<unless var, identifier>.
 
 =item if null <var> goto <identifier>
 
@@ -511,14 +511,14 @@ to B<unless_null var, identifier>.
 
 =item if <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the
-PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1> B<relop>
-B<var2> evaluates as true, jump to the named B<identifier>.
+The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate 
+to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1> 
+B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<<, <=, ==, != E<gt>= E<gt>> which translate to the
-PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1>
+The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate 
+to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1>
 B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
 =item <var1> = <var2>
@@ -535,12 +535,20 @@ The B<binary>s B<+>, B<->, B<*>, B</>, B<%> and B<**> generate
 B<add>, B<sub>, B<mul>, B<div>, B<mod> and B<pow> arithmetic ops.
 B<binary> B<.> is B<concat> and only valid for string arguments.
 
-B<<<> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
+B<E<lt>E<lt>> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
 B<E<gt>E<gt>E<gt>> is the logical shift B<lsr>.
 
 B<&&>, B<||> and B<~~> are logic B<and>, B<or> and B<xor>.
 
 B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
+
+=item <var1> <op>= <var2>
+
+This is equivalent to 
+B<E<lt>var1E<gt> = E<lt>var1E<gt> E<lt>opE<gt> E<lt>var2E<gt>>. Where
+B<op> is called an assignment operator and can be any of the following
+binary operators described earlier: B<+>, B<->, B<*>, B</>, B<%>, B<.>, 
+B<&>, B<|>, B<~>, B<E<lt>E<lt>>, B<E<gt>E<gt>> or B<E<gt>E<gt>E<gt>>.
 
 =item <var> = <var> [ <var> ]
 
@@ -604,24 +612,12 @@ Assing to B<var1> a clone of B<var2>. Translate to B<clone var1, var2>.
 
 =item <var> = addr <identifier>
 
-Assign to B<var> the address of label identified by <identifier>. Translate
+Assign to B<var> the address of label identified by B<identifier>. Translate
 to B<set_addr var, var>.
 
 =item <var> = null
 
 Set B<var> to null. Translate to B<null <var>.
-
-=item <<, <<=
-
-TODO
-
-=item >>, >>=
-
-TODO
-
-=item >>>,>>>=
-
-TODO
 
 =item addr
 
