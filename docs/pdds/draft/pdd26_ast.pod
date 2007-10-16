@@ -180,6 +180,11 @@ exist.
 
 =back
 
+If C<scope> is not explicitly provided in the node, then PAST will
+look at the local symbol tables of any outer C<PAST::Block> nodes
+to try to determine the scope of the named variable.  If this still
+does not result in a scope, then 'lexical' is assumed.
+
 =item viviself([value])
 
 Accessor method for the C<viviself> attribute, which specifies
@@ -405,11 +410,81 @@ child's (%0) is used as the result of this operation.
 
 =head2 PAST::Block
 
-Coming soon.
+C<PAST::Block> nodes represent lexical scopes within an abstract
+syntax tree, and roughly translate to individual Parrot subroutines.
+A C<PAST::Block> node nested within another C<PAST::Block> node
+acts like a nested lexical scope.
+
+If the block has a C<name> attribute, that becomes the name of
+the resulting Parrot sub.  Otherwise, a unique name is automatically
+generated for the block.
+
+Each PAST::Block node can maintain its own local symbol table, see
+the C<symbol> method below.
+
+=over 4
+
+=item blocktype([type])
+
+Get/set the type of the block to C<type>.  The currently
+understood values are 'declaration' and 'immediate'.  'Declaration'
+indicates that a block is simply being defined at this point, the
+result of the node is a reference to the block.  A C<blocktype>
+of 'immediate' indicates a block that is to be immediately
+executed when it is evaluated in the AST, and the result of the
+last operation is used as the return value for the block.
+
+=item namespace([value])
+
+Get/set the namespace for this particular block (and any nested
+blocks that do not explicitly provide a namespace).  C<Value>
+may either be a simple string or an array of strings representing
+a nested namespace.
+
+=item symbol(name, [attr1 => val1, attr2 => val2, ...])
+
+Each PAST::Block node can use the C<symbol> method to maintain
+its own compile-time notion of a local symbol table.  Each value
+of C<name> is given its own hash to hold information about that
+symbol for the block (i.e., the symbol table acts like a hash of
+hashes indexed by symbol name).  If the C<symbol> method is called
+with named arguments, then the method sets the entries in the hash
+corresponding to C<name> in the block's symbol table.  If C<symbol>
+is called with just a single C<name> argument, then the current hash
+for local symbol C<name> is returned.
+
+HLLs are free to place any values in the symbol hashes that
+may be useful.  However, the C<scope> entry for a symbol is
+typically used to provide the C<scope> attribute for any nested
+C<PAST::Var> nodes that do not provide an explicit C<scope> attribute.
+
+=item pir_pragma([value])
+
+Get/set any PIR pragmas to be used when generating the block.
+
+=item compiler([compiler_name])
+
+Specify that the children nodes of this block are to be compiled
+using C<compiler_name> instead of being treated as standard PAST
+nodes.  This is useful when a program may contain components of
+code written in other HLLs.  For example, the C<perl6> compiler
+uses this feature to use PGE to compile pre-parsed Perl 6 regular
+expressions, rather than trying to represent the semantics of
+those expressions in PAST itself.
+
+When code is generated from a C<PAST::Block> node having a
+C<compiler> attribute, the compiler is invoked with C<name>
+and C<outer> arguments so that any generated subs can have
+names and lexical scoping appropriate to the block (it's the
+responsibility of the external compiler to support this).
+
+=back
 
 =head2 PAST::CompUnit
 
-Coming soon.
+C<PAST::CompUnit> nodes are used for the abstract representation
+of compilation units.  Specific attributes and semantics are
+yet to be determined.
 
 =head1 COPYRIGHT
 
@@ -422,4 +497,3 @@ Copyright (C) 2007, The Perl Foundation.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
