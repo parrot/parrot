@@ -1694,6 +1694,9 @@ sub _op_char_ready_p {
 sub _op_write {
     my ( $self, $node ) = @_;
 
+    $self->_add_comment( 'start of _op_write' );
+    # die Dumper( $self, $node );
+
     my $temp = 'none';
 
     for ( _get_args($node) ) {
@@ -1707,13 +1710,30 @@ sub _op_write {
         }
     }
 
+    $self->_add_comment( 'end of _op_write' );
+
     return $temp;    # We need to return something
 }
 
 sub _op_display {
+    my ( $self, $node ) = @_;
+
+    return _op_write( @_ );
 }
 
 sub _op_newline {
+    my ( $self, $node ) = @_;
+
+    _num_arg( $node, 0, 'newline' );
+
+    return $self->_generate(
+        { children => [ { value => 'write' },
+                        { children => [ { value => q{"\n"}  },
+                                      ]
+                        },
+                      ],
+        }
+    );
 }
 
 sub _op_write_char {
