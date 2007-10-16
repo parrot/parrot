@@ -624,14 +624,15 @@ Finish thawing.
             PMC *entry    = VTABLE_get_pmc_keyed_int(INTERP, new_info, i);
             PMC *lib_pmc  = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_lib);
             PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
+            PMC *typemap  =
+                VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
+            INTVAL hll_id;
 
             if (!PMC_IS_NULL(name_pmc)) {
-                INTVAL id;
                 STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
 
                 PObj_constant_SET(hll_name);
-                id               = Parrot_register_HLL(INTERP, hll_name);
-                UNUSED(id);
+                hll_id           = Parrot_register_HLL(INTERP, hll_name);
             }
 
             if (!PMC_IS_NULL(lib_pmc)) {
@@ -647,6 +648,22 @@ Finish thawing.
                 }
 
                 UNUSED(ignored);
+            }
+
+            if (hll_id && !PMC_IS_NULL(typemap)) {
+                PMC   *iter = VTABLE_get_iter(INTERP, typemap);
+                INTVAL e    = VTABLE_get_integer(INTERP, typemap);
+                INTVAL i;
+
+                for ( i = 0; i < e; ++i ) {
+                    PMC   *key       = VTABLE_shift_pmc(INTERP, iter);
+                    INTVAL core_type = VTABLE_get_integer(INTERP, key);
+                    INTVAL hll_type  =
+                        VTABLE_get_integer_keyed_int(INTERP, typemap,core_type);
+
+                    Parrot_register_HLL_type(INTERP, hll_id,
+                        core_type, hll_type);
+                }
             }
         }
     }
