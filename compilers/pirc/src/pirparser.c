@@ -1990,6 +1990,7 @@ sub_flags(parser_state *p) {
 
   parameter -> register
                   | type [ STRING_CONSTANT '=>' ] IDENTIFIER
+
 =cut
 
 */
