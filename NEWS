@@ -1,6 +1,10 @@
 # $Id$
 
 New in 0.4.17
+- Documentation
+ + PDD19 "PIR" - early review started
+ + PDD24 "Events" - draft approved
+ + PIR tutorials updated
 - Languages
  + Make 'languages/scheme' work with the current calling conventions
 
