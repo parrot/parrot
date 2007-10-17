@@ -54,7 +54,7 @@ sub link_functions {
 # is parsed, therefore the .DynLexPad constant is already available
 .loadlib "dynlexpad"
 .HLL "SomethingWithScheme", "dynlexpad"
-.HLL_map .LexPad, .DynLexPad
+.HLL_map 'LexPad', 'DynLexPad'
 
 # builtin functions used by this program:
 END_HEADER
