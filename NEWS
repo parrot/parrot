@@ -2,16 +2,29 @@
 
 New in 0.4.17
 - Implementation
+ + Bug fixes (including Coverity IDs 20, 22, 30, 119-122, 124-126, 129-131)
+   Also various GC, memory, and segfault issues
+ + Fix & reenable CGP core  
  + Parrot's -r flag now works again (compile to and execute bytecode)
+ + Updates to pmc2c & PIR syntaxes
+ + Fix Complex PMC
  + Minor performance improvements, especially in PGE
- + Minor GC improvements and bugsquashings
- + build now parallelizable with 'make -j' on appropriate platforms
 - Documentation
+ + PDD02 "Vtables" - superceded by PDD17
+ + PDD06 "PASM" - minor updates
+ + PDD17 "PMC" - add VTABLE syntax, update core PMC struct, restore UnionVal
  + PDD19 "PIR" - early review started
+ + PDD21 "Namespaces" - cleanup
  + PDD24 "Events" - draft approved
+ + PDD25 "Concurrency" - minor updates
+ + PDD26 "AST" - draft version begun
  + PIR tutorials updated
-- Languages
- + Make 'languages/scheme' work with the current calling conventions
+- Languages/Compilers
+ + Make scheme work with the current calling conventions, other major work.
+ + Updates to m4, lua, compilers/pirc, languages/PIR, dotnet, tcl
+- Miscellaneous:
+ + make -j functional again
+ + Code cleanup (refactoring, optimizations)
 
 New in 0.4.16
 - Implementation:
