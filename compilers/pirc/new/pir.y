@@ -52,7 +52,7 @@
 program: opt_nl
          compilation_units
 		 opt_nl
-         
+
        ;
 
 opt_nl: /* empty */
@@ -220,7 +220,7 @@ assignment_expression: unop expression
                      | methodcall
                      | TK_NULL
                      | TK_NEW TK_STRINGC /* fix other variants */
-                     | parrot_instruction                     
+                     | parrot_instruction
                      ;
 
 
@@ -304,7 +304,7 @@ long_invocation_statement: TK_PCC_BEGIN TK_NL
                            long_results
                            TK_PCC_END TK_NL
                          ;
-                         
+
 long_arguments: /* empty */
               | long_arguments long_argument
               ;
@@ -443,7 +443,7 @@ opt_paren_string: /* empty */
 
 paren_string: '(' TK_STRINGC ')'
             ;
-            
+
 const_declaration: TK_GLOBALCONST const_tail TK_NL
                  | TK_CONST const_tail TK_NL
                  ;
@@ -518,9 +518,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         exit(1);
     }
-    yyin = fopen(argv[1], "r");
-    yyparse();
 
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        fprintf(stderr, "Failed to open file '%s'\n", argv[1]);
+        exit(1);
+    }
+    yyparse();
     fclose(yyin);
 
     return 0;

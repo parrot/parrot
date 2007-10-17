@@ -12,7 +12,7 @@ typedef struct heredoc_info {
    char *contents;  /* contents of heredoc */
    char *delimiter; /* delimiter of heredoc */
    struct heredoc_info *next; /* this is a linked list, ptr to next */
-   
+
 } heredoc_info;
 
 
@@ -24,7 +24,7 @@ typedef struct file_info {
    int line_pos;
    YY_BUFFER_STATE buffer;
    struct file_info *prev;
-   
+
 } file_info;
 
 /* global! */
@@ -39,7 +39,7 @@ Store a file_info structure on a stack.
 =cut
 
 */
-static void 
+static void
 push_file_info(file_info *info) {
     info->prev = current_file;
     current_file = info;
@@ -57,10 +57,10 @@ Pop a file_info structure from a stack.
 
 */
 static file_info *
-pop_file_info(void) {    
+pop_file_info(void) {
     if (current_file == NULL) {
         //fprintf(stderr, "pop_file_info(): returning NULL\n");
-        return NULL; 
+        return NULL;
     }
     else {
         file_info *returning = current_file;
@@ -77,42 +77,68 @@ switch_to_file(file_info *info) {
 
     /* restore the buffer info */
     yylineno = info->line_nr;
-       
+
     /* delete the current buffer (of the included file *)
     yy_delete_buffer(YY_CURRENT_BUFFER);
-
+    /* close current file */
     fclose(yyin);
-    
+
     /* switch back to previous file */
-    yy_switch_to_buffer(info->buffer);       
-       
-    /* and free all resources of the buffer */       
-    
+    yy_switch_to_buffer(info->buffer);
+
+    /* and free all resources of the buffer */
+
     /*free(info->filename);
     */
-    
+
     free(info);
-    info = NULL;             
+    info = NULL;
 }
 
 /*
 
 */
 static heredoc_info *
-new_heredoc() {
+new_heredoc(void) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof(heredoc_info));
     /* do stuff */
     return heredoc;
 }
 
+static void
+read_macro(void) {
+    int next_token;
 
+    /* get next token, this must be macro id */
+    next_token = yylex();
 
+    if (next_token != TK_IDENT) {
+        yyerror("macro identifier expected after '.macro'");
+    }
+
+    /* read macro parameters, if any */
+
+    /* read macro body */
+
+    /* TODO */ ;
+
+}
 
 %}
 
 ALPHA	       [a-zA-Z@_]
 DIGIT          [0-9]
-ALNUM          [a-zA-Z@_0-9]
+DIGITS         {DIGIT}+
+ALNUM          {ALPHA}|{DIGIT}
+DOT            [.]
+HEX            0[xX][0-9A-Fa-f]+
+OCT            0[oO][0-7]+
+BIN            0[bB][01]+
+
+SIGN           [-+]
+BIGINT         {SIGN}?{DIGITS}"L"
+FLOATNUM       {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
+
 DQ_STRING       \"(\\.|[^"\\\n])*\"
 SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
@@ -120,6 +146,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 %x HEREDOC
+%x MACRO
 
 /* use built-in line counter */
 %option yylineno
@@ -132,7 +159,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 [\t\r ]                    { /* ignore */; }
 \n([\t\r\n ]|#.*\n)*       { return TK_NL; }
 
-                   
+
 #.*\n          { /* skip line comments */ ; }
 
 "<<"{Q_STRING} {
@@ -142,9 +169,9 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                     heredoc_id[strlen(heredoc_id) - 1] = '\0';
                     printf("heredoc id: '%s'\n", heredoc_id);
                     //return TK_HEREDOC;
-                    
+
                     yy_push_state(HEREDOC);
-                    /* 
+                    /*
                     - read line by line
                     - each time, check whether line == delimiter
                     -- check for ^ start of line?
@@ -153,13 +180,13 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                     */
                }
 
-               
-<HEREDOC>^.*$   { fprintf(stderr, "Heredoc delimiter: '%s'\n", yytext); 
 
-                          /* is this the heredoc delimiter? */                           
+<HEREDOC>^.*$   { fprintf(stderr, "Heredoc delimiter: '%s'\n", yytext);
+
+                          /* is this the heredoc delimiter? */
                           yy_pop_state();
                           return TK_STRINGC;
-                        }               
+                        }
 
 <HEREDOC>.*\n  { fprintf(stderr, "heredoc: '%s'\n", yytext); }
 
@@ -291,84 +318,141 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 {ALPHA}{ALNUM}*":"    { return TK_LABEL; }
 {ALPHA}{ALNUM}*       { return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
-{DIGIT}+              { return TK_INTC; }
 
 
+{FLOATNUM}        { return TK_NUMC; }
+{SIGN}?{DIGITS}   { return TK_INTC; }
+{HEX}             { return TK_INTC; }
+{BIN}             { return TK_INTC; }
+{OCT}             { return TK_INTC; }
 
 ".include"   { int next_token, file_name_length;
-               FILE *incl_file_ptr   = NULL;               
-               char *incl_file_name  = NULL;               
+               FILE *incl_file_ptr   = NULL;
+               char *incl_file_name  = NULL;
                file_info *file_state = NULL;
                YY_BUFFER_STATE incl_file_buffer;
-               
-               /* get next token containing name of file being included */             
-               next_token = yylex(); 
+
+               /* get next token containing name of file being included */
+               next_token = yylex();
                /* check that it's a string, if not return to parser */
                if (next_token != TK_STRINGC) {
                    return next_token;
                }
-               
+
                /* retrieve name of file, remove quotes */
                file_name_length = yyleng - 2;
                incl_file_name = (char *)calloc(file_name_length + 1, sizeof(char));
                /* copy current token's characters, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
-               
+
                /* open the file */
                fprintf(stderr, "Opening file '%s'\n", incl_file_name);
                incl_file_ptr = fopen(incl_file_name, "r");
-               
+
                /* after an include statement a newline is expected */
                next_token = yylex();
                if (next_token != TK_NL) {
                    yyerror("newline expected after \".include '<string>'\"\n");
                }
-               
+
                /* save current file info */
                file_state = (file_info *)malloc(sizeof(file_info));
                file_state->buffer   = YY_CURRENT_BUFFER;
                file_state->filename = NULL; /* FIX */
                file_state->line_pos = 0; /* FIX */
                file_state->line_nr  = yylineno;
-               file_state->prev     = NULL;
-               
+               file_state->prev     = NULL; /* initialize to NULL */
+
                /* store the info structure on the stack */
                push_file_info(file_state);
-               
+
                /* a new file is being scanned, reset line number */
                yylineno = 1;
-               
+
                if (incl_file_ptr == NULL) { /* opening file went wrong */
-                   fprintf(stderr, "Error including file '%s'\n", incl_file_name);               
+                   fprintf(stderr, "Error including file '%s'\n", incl_file_name);
                }
                else {
                    /* create a new buffer for the included file and switch to that file */
                    incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
                    yy_switch_to_buffer(incl_file_buffer);
-                   
-               }                             
+
+               }
              }
-             
-".constant"  { /* TODO */ ; }
 
-".macro"     { /* TODO */ ; }
-".endm"      { /* TODO */ ; }
+".constant"  { int next_token;
+               char *constant_id;
 
-.	{ yyerror("Unexpected character"); }
+               next_token = yylex();
+               if (next_token != TK_IDENT) {
+                  yyerror("identifier expected after '.constant'.");
+               }
+               /* store identifier */
+               constant_id = strdup(yytext);
+
+               /* read value */
+               next_token = yylex();
+
+               switch (next_token) {
+                   case TK_INTC:
+                   case TK_NUMC:
+                   case TK_STRINGC:
+                   case TK_SYM_PREG:
+                   case TK_SYM_NREG:
+                   case TK_SYM_IREG:
+                   case TK_SYM_SREG:
+                   case TK_PASM_PREG:
+                   case TK_PASM_NREG:
+                   case TK_PASM_IREG:
+                   case TK_PASM_SREG:
+                       /* store value by this constant's name */
+                       /* copy yytext into some buffer */
+                       break;
+                   default:
+                       yyerror("Constant value of '%s' must be a number, "
+                               "string literal or register", constant_id);
+                       break;
+               }
+
+               /* after the .constant declaration, a newline must be read */
+               next_token = yylex();
+               if (next_token != TK_NL) {
+                   yyerror("newline expected after constant declaration");
+               }
+
+             }
+
+".macro"            {  read_macro(); }
 
 
+<MACRO>".endm"      { /* TODO */ ;
+
+                      yy_pop_state();
+                    }
+
+
+
+
+[.]{ALNUM}    { /* check whether this token is a constant or a macro */
+                /* TODO */
+
+                /* not found, this is an unknown constant or macro. */
+                yyerror("Undefined constant or macro");
+              }
 
 
 <<EOF>>		{  file_info *info = pop_file_info();
-    
-               if (info == NULL) { 
+
+               if (info == NULL) {
                    /* this was the initial file given to Parrot */
                    yyterminate();
                }
                else { /* this file was included */
                    switch_to_file(info);
-               }    
+               }
             }
+
+.	{ yyerror("Unexpected character"); }
 
 
 %%
