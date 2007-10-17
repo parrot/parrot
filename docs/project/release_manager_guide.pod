@@ -102,11 +102,16 @@ Make sure everything works:
  $ make -s all world fulltest html
  # Note that fulltest runs separate harnesses..
 
+It is not necessary to quiet all the codingstd tests for a release.
+
 =back
 
 =item 3.
 
  svn commit
+
+Presuming everything goes well later, you'll need the revision number
+from this commit, write it down.
 
 =item 4.
 
@@ -173,8 +178,8 @@ release date.
 Use F<tools/util/crow.pir> to make this part easier. You can specify the
 format of your announcments like so:
 
-  $ parrot tools/util/crow.pir --type=text
-  $ parrot tools/util/crow.pir --type=html
+  $ ./parrot tools/util/crow.pir --type=text
+  $ ./parrot tools/util/crow.pir --type=html
 
 Take the screen output and paste it into the application you need. HTML
 works well for use Perl and PerlMonks, and text for the rest.
@@ -278,7 +283,7 @@ Tuesday of the month.
  - Jul 17th (0.4.14) Jerry Gay (particle)
  - Aug 21st (0.4.15) Patrick Michaud (pmichaud)
  - Sep 18th (0.4.16) Jerry Gay (particle)
- - Oct 16th, Will Coleda (Coke)
+ - Oct 16th (0.4.17) Will Coleda (Coke)
  - Nov 20th, chromatic
  - Dec 18th, Allison Randal
 
