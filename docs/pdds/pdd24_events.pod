@@ -257,6 +257,8 @@ concurrency scheduler, this will pass along the event to the primary. All
 details about the event (its type, whether it's fatal or non-fatal, whether
 it's a timer, etc) are stored within the event PMC.
 
+{{NOTE: other possibilities 'raise' and 'fire' by KJS}}
+
 =item addhandler
 
   $P0 = new 'EventHandler'
