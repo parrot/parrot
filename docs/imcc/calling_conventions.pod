@@ -112,9 +112,8 @@ are marked as B<:main>, the B<last> marked subroutine is entered.
 
 =item :load
 
-Run this subroutine during the B<load_library> opcode.
-B<:load> is ignored, if another subroutine in that file is marked with
-B<:main>. If multiple subs have the B<:load> pragma, the subs are
+Run this subroutine during the B<load_bytecode> opcode.
+If multiple subs have the B<:load> pragma, the subs are
 run in source code order.
 
 =item :init
