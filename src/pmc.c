@@ -621,8 +621,6 @@ dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 =back
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/vtable.h>.
