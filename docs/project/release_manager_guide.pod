@@ -48,7 +48,9 @@ and F<docs/ROADMAP.pod>
 
 Update F<ChangeLog>, F<NEWS> with the new version number and any other
 changes that have occurred since the last release: Hopefully these files
-are being updated as committers work.
+are being updated as committers work. If not, it's probably a good idea
+to gather the updates weekly rather than waiting until the day of the
+monthly release.
 
 =item c
 
