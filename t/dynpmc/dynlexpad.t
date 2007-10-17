@@ -46,7 +46,7 @@ my $loadlib = <<'EOC';
 .loadlib "dynlexpad"
 
 .HLL "Some", "dynlexpad"
-.HLL_map .LexPad, .DynLexPad
+.HLL_map "LexPad", "DynLexPad"
 
 EOC
 
