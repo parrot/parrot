@@ -1988,8 +1988,7 @@ sub_flags(parser_state *p) {
 
   parameters -> { '.param' parameter[param_flag] '\n' }
 
-  parameter -> register
-                  | type [ STRING_CONSTANT '=>' ] IDENTIFIER
+  parameter -> type [ STRING_CONSTANT '=>' ] IDENTIFIER
 
 =cut
 
@@ -2014,28 +2013,8 @@ parameters(parser_state *p) {
                 match(p, T_IDENTIFIER);
                 param_flags(p);
                 break;
-            case T_PREG:
-            case T_PASM_PREG:
-                next(p);
-                emit_type(p, "pmc");
-                break;
-            case T_NREG:
-            case T_PASM_NREG:
-                next(p);
-                emit_type(p, "num");
-                break;
-            case T_SREG:
-            case T_PASM_SREG:
-                next(p);
-                emit_type(p, "string");
-                break;
-            case T_IREG:
-            case T_PASM_IREG:
-                next(p);
-                emit_type(p, "int");
-                break;
             default:
-                syntax_error(p, 1, "type or register expected");
+                syntax_error(p, 1, "type expected");
                 break;
         }
         match(p, T_NEWLINE);
