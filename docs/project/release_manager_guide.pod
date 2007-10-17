@@ -44,10 +44,6 @@ Also update the version number, date, and your name in the
 following files: F<DEVELOPING>, F<docs/parrothist.pod>,
 and F<docs/ROADMAP.pod>
 
-Also update the URL in F<parrot.spec> for "Source0" to point to the
-current release manager's CPAN directory. [Really, we should provide a
-more standard location for the release tarball.]
-
 =item b
 
 Update F<ChangeLog>, F<NEWS> with the new version number and any other
@@ -206,7 +202,7 @@ L<https://svn.perl.org/perl.org/docs/live/parrotcode>.
 
 Add a release announcement to news/[year]/Parrot-[release].html.
 Update C</index.html> (The old mini-announcement may be commented out).
-Update C</source.html>. Make sure all urls are updated appropriately.
+Update C</.htredirects> to point to the proper CPAN URL. 
 
 Test locally in combust before pushing update out.
 
