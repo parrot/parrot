@@ -72,13 +72,24 @@ Find the method for C<*name> in the parent class of the bound object.
     }
 
     void set_pmc(PMC *obj) {
-        PMC *mro;
+        PMC *mro, *classobj;
         PMC_pmc_val(SELF) = obj;
 
         if (PMC_IS_NULL(obj))
             return;
 
-        mro = obj->vtable->mro;
+        if (PObj_is_object_TEST(obj)) {
+            classobj = VTABLE_get_class(interp, obj);
+            if (PMC_IS_NULL(classobj))
+                return;
+            mro = VTABLE_inspect_str(interp, classobj, CONST_STRING(interp, "all_parents"));
+        }
+        else {
+            mro = obj->vtable->mro;
+        }
+
+        if (PMC_IS_NULL(mro))
+            return;
 
         if (VTABLE_elements(INTERP, mro) <= 1)
             real_exception(INTERP, NULL, E_TypeError, "object has no parent");
@@ -99,7 +110,8 @@ Find the method for C<*name> in the parent class of the bound object.
     }
 
     PMC *find_method(STRING *name) {
-        PMC *mro, *_class;
+        PMC *mro, *classobj, *parent_class, *parent_methods;
+        PMC *method = PMCNULL;
 
         PMC * const obj = PMC_pmc_val(SELF);
 
@@ -107,11 +119,19 @@ Find the method for C<*name> in the parent class of the bound object.
             real_exception(INTERP, NULL, E_TypeError,
                 "no object bound to super");
 
-        interp->current_object = obj;
-        mro                    = obj->vtable->mro;
+        classobj = VTABLE_get_class(interp, obj);
 
-        _class = VTABLE_get_pmc_keyed_int(INTERP, mro, 1);
-        return VTABLE_find_method(INTERP, _class, name);
+        mro = VTABLE_inspect_str(interp, classobj, CONST_STRING(interp, "all_parents"));
+
+        parent_class = VTABLE_get_pmc_keyed_int(INTERP, mro, 1);
+        parent_methods = VTABLE_inspect_str(interp, parent_class, CONST_STRING(interp, "methods"));
+
+        if (VTABLE_exists_keyed_str(interp, parent_methods, name)) {
+            method = VTABLE_get_pmc_keyed_str(interp, parent_methods,
+                name);
+        }
+
+        return method;
     }
 }
 

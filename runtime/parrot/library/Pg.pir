@@ -8,7 +8,7 @@ Pg.pir - OO interface to libpq
 =head1 SYNOPSIS
 
   .local pmc pg, con, res
-  pg = getclass 'Pg'
+  pg = get_class 'Pg'
   con = pg.'connectdb'('dbname = db')
   res = con.'exec'('SELECT * from tab')
   n = res.'ntuples'()
@@ -74,8 +74,8 @@ A class method that returns a new connection object.
     .local pmc con, connectdb, o_con
     connectdb = get_global 'PQconnectdb' 
     con = connectdb(args)
-    $I0 = find_type ['Pg';'Conn']
-    o_con = new  $I0, con
+    $P0 = get_class ['Pg';'Conn']
+    o_con = new $P0, con
     # verify success
     .local int ok
     ok = o_con.'status'()
@@ -166,8 +166,8 @@ Execute the SQL command and return a Pg;Result object.
 .sub mk_res
     .param pmc res
     .local pmc o_res
-    $I0 = find_type ['Pg';'Result']
-    o_res = new $I0, res
+    $P0 = get_class ['Pg';'Result']
+    o_res = new $P0, res
     .return (o_res)
 .end
 

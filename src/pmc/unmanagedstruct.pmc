@@ -277,9 +277,13 @@ ret_int(PARROT_INTERP, const char *p, int type)
         case enum_type_short:
             return *(const short *)p;
         case enum_type_uint8:
+        case enum_type_uchar:
+        {
+            unsigned char *uc = (unsigned char *)p;
+            return (INTVAL)*uc;
+        }
         case enum_type_int8:
         case enum_type_char:
-        case enum_type_uchar:
             return *p;
         default:
             real_exception(interp, NULL, 1,

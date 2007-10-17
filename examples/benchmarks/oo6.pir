@@ -9,9 +9,8 @@
     .local int typ
     .local int i
     i = 1
-    typ = find_type "Foo"
     .local pmc o
-    o = new  typ
+    o = new "Foo"
 loop:
     $P4 = new 'Integer'
     $P4 = i

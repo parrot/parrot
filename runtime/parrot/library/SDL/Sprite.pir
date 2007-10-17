@@ -14,10 +14,7 @@ SDL::Sprite - Parrot class representing sprites in Parrot SDL
 
     # create a new SDL::Sprite object
     .local pmc sprite
-    .local int sprite_type
-
-    find_type sprite_type, 'SDL::Sprite'
-    sprite = new sprite_type
+    sprite = new 'SDL::Sprite'
 
     # set the sprite's arguments
     sprite.'init'( 'surface'  => image, 'source_x' =>     0, 'source_y' =>     0, 'dest_x'   =>   270, 'dest_y'   =>   212, 'bgcolor'  => black )
@@ -136,9 +133,6 @@ slightly.
     setattribute self, 'surface', surface
 
     # set all of the rect attributes
-    .local int rect_type
-    find_type rect_type, 'SDL::Rect'
-
     if has_width goto set_height
     width = surface.'width'()
 
@@ -149,15 +143,14 @@ set_height:
 done:
     # first the source rectangle
     .local pmc source_rect
-
-    source_rect = new rect_type
+    source_rect = new 'SDL::Rect'
     source_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
     setattribute self, 'source_rect', source_rect
 
     # now the dest rectangle
     .local pmc rect
-    rect = new rect_type
+    rect = new 'SDL::Rect'
     rect.'init'( 'x' => dest_x, 'y' => dest_y )
 
     setattribute self, 'rect', rect
@@ -165,7 +158,7 @@ done:
 
     # and now the previous rect
     .local pmc prev_rect
-    prev_rect = new rect_type
+    prev_rect = new 'SDL::Rect'
     prev_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
 
     setattribute self, 'prev_rect', prev_rect
@@ -177,13 +170,13 @@ done:
 
     # the drawn rect
     .local pmc drawn_rect
-    drawn_rect = new rect_type
+    drawn_rect = new 'SDL::Rect'
     drawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
     setattribute self, 'drawn_rect', drawn_rect
 
     # the undrawn rect
     .local pmc undrawn_rect
-    undrawn_rect = new rect_type
+    undrawn_rect = new 'SDL::Rect'
     undrawn_rect.'init'( 'x' => source_x, 'y' => source_y, 'height' => height, 'width' => width )
     setattribute self, 'undrawn_rect', undrawn_rect
 
@@ -309,11 +302,8 @@ functions.
 =cut
 
 .sub surface :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-
     .local pmc surface
-    getattribute surface, self, offset
+    getattribute surface, self, 'surface'
 
     .return( surface )
 .end
@@ -328,12 +318,8 @@ You should never need to call this directly.
 =cut
 
 .sub source_rect :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-    add offset, 1
-
     .local pmc source_rect
-    getattribute source_rect, self, offset
+    getattribute source_rect, self, 'source_rect'
 
     .return( source_rect )
 .end
@@ -348,12 +334,8 @@ You should never need to call this directly.
 =cut
 
 .sub prev_rect :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-    add offset, 2
-
     .local pmc prev_rect
-    getattribute prev_rect, self, offset
+    getattribute prev_rect, self, 'prev_rect'
 
     .return( prev_rect )
 .end
@@ -384,12 +366,8 @@ You should never need to call this directly.
 =cut
 
 .sub bgcolor :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-    add offset, 4
-
     .local pmc bgcolor
-    getattribute bgcolor, self, offset
+    getattribute bgcolor, self, 'bgcolor'
 
     .return( bgcolor )
 .end
@@ -405,12 +383,8 @@ suddenly in a brilliant flash of insight.
 =cut
 
 .sub drawn_rect :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-    add offset, 5
-
     .local pmc drawn_rect
-    getattribute drawn_rect, self, offset
+    getattribute drawn_rect, self, 'drawn_rect'
 
     .return( drawn_rect )
 .end
@@ -426,12 +400,8 @@ suddenly in a brilliant flash of insight.
 =cut
 
 .sub undrawn_rect :method
-    .local int offset
-    classoffset offset, self, 'SDL::Sprite'
-    add offset, 6
-
     .local pmc undrawn_rect
-    getattribute undrawn_rect, self, offset
+    getattribute undrawn_rect, self, 'undrawn_rect'
 
     .return( undrawn_rect )
 .end
@@ -548,7 +518,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

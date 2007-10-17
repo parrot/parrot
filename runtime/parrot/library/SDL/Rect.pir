@@ -7,26 +7,23 @@ SDL::Rect - Parrot class representing rectangles in Parrot SDL
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/SDL/Rect.pir'
+    # load this library
+    load_bytecode 'library/SDL/Rect.pir'
 
-	# create a new SDL::Rect object
-	.local pmc rect
-	.local int rect_type
+    # create a new SDL::Rect object
+    .local pmc rect
+    rect = new 'SDL::Rect'
 
-	find_type rect_type, 'SDL::Rect'
-	rect = new rect_type
+    # now set the arguments on the object
+    rect.'init'( 'x' => 270, 'y' => 190, 'height' => 100, 'width'=> 100 )
 
-	# now set the arguments on the object
-	rect.'init'( 'x' => 270, 'y' => 190, 'height' => 100, 'width'=> 100 )
-
-	# ... and blit to or fill surfaces with this object!
+    # ... and blit to or fill surfaces with this object!
 
 =head1 DESCRIPTION
 
 The SDL::Rect class represents rects in SDL.  SDL::Rect objects represent
 sources and destinations for filling and blitting to and from SDL::Surface
-objects. 
+objects.
 
 =head1 METHODS
 
@@ -39,16 +36,15 @@ An SDL::Rect object has the following methods:
 .namespace [ 'SDL::Rect' ]
 
 .sub _initialize :load
+    .local pmc class
+    class = get_class 'SDL::Rect'
+    if_null class, create_class
+    .return()
 
-	$I0 = find_type 'SDL::Rect'
-	if $I0 > 1 goto END
-	
-	.local   pmc rect_class
-	newclass     rect_class, 'SDL::Rect'
-	addattribute rect_class, '_rect'
-
-END:
-	.return ()
+  create_class:
+    newclass     class, 'SDL::Rect'
+    addattribute class, '_rect'
+    .return ()
 .end
 
 =item init( arg => value )
@@ -83,50 +79,48 @@ The name of this method may change, as per discussion on p6i.
 =cut
 
 .sub 'init' :method
-	.param int x           :named( 'x' ) :optional
-	.param int have_x      :opt_flag
-	.param int y           :named( 'y' ) :optional
-	.param int have_y      :opt_flag
-	.param int width       :named( 'width' ) :optional
-	.param int have_width  :opt_flag
-	.param int height      :named( 'height' ) :optional
-	.param int have_height :opt_flag
+    .param int x           :named( 'x' ) :optional
+    .param int have_x      :opt_flag
+    .param int y           :named( 'y' ) :optional
+    .param int have_y      :opt_flag
+    .param int width       :named( 'width' ) :optional
+    .param int have_width  :opt_flag
+    .param int height      :named( 'height' ) :optional
+    .param int have_height :opt_flag
 
-	if have_x goto check_y
-	x = 0
+    if have_x goto check_y
+    x = 0
 
   check_y:
-	if have_y goto check_width
-	y = 0
+    if have_y goto check_width
+    y = 0
 
   check_width:
-	if have_width goto check_height
-	width = 0
+    if have_width goto check_height
+    width = 0
 
   check_height:
-	if have_height goto check_done
-	height = 0
+    if have_height goto check_done
+    height = 0
 
   check_done:
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    .local pmc  fetch_layout
+    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
-	.local pmc layout
-	layout = fetch_layout( 'Rect' )
+    .local pmc layout
+    layout = fetch_layout( 'Rect' )
 
-	.local pmc rect
-	new rect, .ManagedStruct, layout
+    .local pmc rect
+    new rect, 'ManagedStruct', layout
 
-	set rect['height'], height
-	set rect['width'], width
-	set rect['x'], x
-	set rect['y'], y
+    set rect['height'], height
+    set rect['width'], width
+    set rect['x'], x
+    set rect['y'], y
 
-	.local int offset
-	classoffset  offset,   self, 'SDL::Rect'
-	setattribute   self, offset, rect
+    setattribute self, '_rect', rect
 
-	.return()
+    .return()
 .end
 
 =item rect()
@@ -137,13 +131,10 @@ call this directly, unless you're using raw SDL functions.
 =cut
 
 .sub rect :method
-	.local pmc rect 
-	.local int offset
+    .local pmc rect
+    getattribute rect, self, '_rect'
 
-	classoffset  offset, self, 'SDL::Rect'
-	getattribute   rect, self, offset
-
-	.return( rect )
+    .return( rect )
 .end
 
 =item height()
@@ -154,21 +145,20 @@ the value.
 =cut
 
 .sub height :method
-	.param int new_height     :optional
-	.param int has_new_height :opt_flag
+    .param int new_height     :optional
+    .param int has_new_height :opt_flag
 
-	.local pmc rect 
-	.local int result
+    .local pmc rect
+    rect             = self.'rect'()
 
-	rect             = self.'rect'()
-
-	unless has_new_height goto getter
-	rect[ 'height' ] = new_height
+    unless has_new_height goto getter
+    rect[ 'height' ] = new_height
 
 getter:
-	result           = rect[ 'height' ]
+    .local int result
+    result           = rect[ 'height' ]
 
-	.return( result )
+    .return( result )
 .end
 
 =item width()
@@ -179,21 +169,20 @@ value.
 =cut
 
 .sub width :method
-	.param int new_width     :optional
-	.param int has_new_width :optional
+    .param int new_width     :optional
+    .param int has_new_width :optional
 
-	.local pmc rect 
-	.local int result
+    .local pmc rect
+    rect            = self.'rect'()
 
-	rect            = self.'rect'()
-
-	unless has_new_width goto getter
-	rect[ 'width' ] = new_width
+    unless has_new_width goto getter
+    rect[ 'width' ] = new_width
 
 getter:
-	result          = rect[ 'width' ]
+    .local int result
+    result          = rect[ 'width' ]
 
-	.return( result )
+    .return( result )
 .end
 
 =item x( [ new_x_coordinate ] )
@@ -204,21 +193,20 @@ integer.
 =cut
 
 .sub x :method
-	.param int new_x     :optional
-	.param int has_new_x :opt_flag
+    .param int new_x     :optional
+    .param int has_new_x :opt_flag
 
-	.local pmc rect 
+    .local pmc rect
+    rect           = self.'rect'()
 
-	rect           = self.'rect'()
-
-	unless has_new_x goto getter
-	rect[ 'x' ]    = new_x
+    unless has_new_x goto getter
+    rect[ 'x' ]    = new_x
 
 getter:
-	.local int result
-	result         = rect[ 'x' ]
+    .local int result
+    result         = rect[ 'x' ]
 
-	.return( result )
+    .return( result )
 .end
 
 =item y( [ new_y_coordinate ] )
@@ -229,21 +217,20 @@ integer.
 =cut
 
 .sub y :method
-	.param int new_y     :optional
-	.param int has_new_y :opt_flag
+    .param int new_y     :optional
+    .param int has_new_y :opt_flag
 
-	.local pmc rect 
+    .local pmc rect
+    rect           = self.'rect'()
 
-	rect           = self.'rect'()
-
-	unless has_new_y goto _getter
-	rect[ 'y' ]    = new_y
+    unless has_new_y goto _getter
+    rect[ 'y' ]    = new_y
 
 _getter:
-	.local int result
-	result         = rect[ 'y' ]
+    .local int result
+    result         = rect[ 'y' ]
 
-	.return( result )
+    .return( result )
 .end
 
 =back
@@ -256,7 +243,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

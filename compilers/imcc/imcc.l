@@ -296,7 +296,7 @@ SP              [ ]
 ".pcc_begin_yield"    return PCC_BEGIN_YIELD;
 ".pcc_end_yield"      return PCC_END_YIELD;
 
-":method"        return METHOD;
+<emit,INITIAL>":method"        return METHOD;
 <emit,INITIAL>":multi"   return MULTI;
 <emit,INITIAL>":main"    return MAIN;
 <emit,INITIAL>":load"    return LOAD;

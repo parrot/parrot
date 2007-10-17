@@ -39,24 +39,20 @@ NO_NAME:
     load_bytecode "library/Stream/Combiner.pir"
 
     # create a file stream
-    find_type $I0, "Stream::ParrotIO"
-    new file, $I0
+    file = new "Stream::ParrotIO"
     file."open"( name, "<" )
 
     # process it one line per read
-    find_type $I0, "Stream::Lines"
-    new lines, $I0
+    lines = new "Stream::Lines"
     assign lines, file
 
     # endless counter
-    find_type $I0, "Stream::Sub"
-    new counter, $I0
+    counter = new "Stream::Sub"
     .const .Sub temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines
-    find_type $I0, "Stream::Combiner"
-    new combiner, $I0
+    combiner = new "Stream::Combiner"
     assign combiner, counter
     assign combiner, lines
 

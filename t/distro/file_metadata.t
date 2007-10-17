@@ -257,19 +257,13 @@ sub at_a_time {
     my $sub   = shift;
     my @list  = @_;
 
-    return unless $count;
     return unless $sub;
     return unless @list;
 
-    my $pos = 0;
-
-    while ( $pos < @list ) {
-        my $start = $pos;
-        my $end   = $pos + $count - 1;
-        if ( $end >= @list ) { $end = @list - 1 }
-        my @sublist = @list[ $start .. $end ];
+    while ( @list ) {
+        $count      = @list if $count > @list;
+        my @sublist = splice @list, 0, $count;
         $sub->(@sublist);
-        $pos += $count;
     }
 
     return;
@@ -283,8 +277,7 @@ sub get_attribute {
 
     diag "Collecting $attribute attributes...\n";
 
-    my %results;
-    map { $results{$_} = undef } @list;
+    my %results = map { $_ => undef } @list;
 
     if ( -d '.git' ) {
         return git_svn_metadata( $attribute, \%results );
@@ -326,7 +319,7 @@ sub get_attribute {
     return \%results;
 }
 
-sub verify_attributes {
+sub  verify_attributes {
     my $attribute = shift;    # name of the attribute
     my $expected  = shift;    # the expected value
     my $exact     = shift;    # should this be an exact match?

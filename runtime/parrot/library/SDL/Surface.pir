@@ -7,15 +7,14 @@ SDL::Surface - Parrot class representing surfaces in Parrot SDL
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/SDL/Surface.pir'
+    # load this library
+    load_bytecode 'library/SDL/Surface.pir'
 
-	# create a new SDL::Surface object
-	find_type surface_type, 'SDL::Surface'
-	surface = new surface_type
-	surface.'init'( 'height' => 480, 'width' => 640 )
+    # create a new SDL::Surface object
+    surface = new 'SDL::Surface'
+    surface.'init'( 'height' => 480, 'width' => 640 )
 
-	# ... blit to, fill, update, and flip this surface as necessary
+    # ... blit to, fill, update, and flip this surface as necessary
 
 =head1 DESCRIPTION
 
@@ -36,15 +35,14 @@ All SDL::Surface objects have the following methods:
 .namespace [ 'SDL::Surface' ]
 
 .sub _initialize :load
-	.local pmc   surface_class
+    .local pmc class
+    class = get_class 'SDL::Surface'
+    if_null class, create_class
+    .return()
 
-	$I0 = find_type 'SDL::Surface'
-	if $I0 > 1 goto END
-
-	newclass     surface_class, 'SDL::Surface'
-	addattribute surface_class, 'surface'
-END:
-
+  create_class:
+    newclass     class, 'SDL::Surface'
+    addattribute class, 'surface'
 .end
 
 =item init( surface_args )
@@ -58,49 +56,49 @@ depth of each component.
 =cut
 
 .sub init :method
-	.param int height :named( 'height' )
-	.param int width  :named( 'width'  )
-	.param int depth  :named( 'depth'  ) :optional
-	.param int flags  :named( 'flags'  ) :optional
-	.param int have_flags :opt_flag
-	.param int red    :named( 'Rmask' )  :optional
-	.param int have_red :opt_flag
-	.param int green  :named( 'Gmask' )  :optional
-	.param int have_green :opt_flag
-	.param int blue   :named( 'Bmask' )  :optional
-	.param int have_blue :opt_flag
-	.param int alpha  :named( 'Amask' )  :optional
-	.param int have_alpha :opt_flag
+    .param int height :named( 'height' )
+    .param int width  :named( 'width'  )
+    .param int depth  :named( 'depth'  ) :optional
+    .param int flags  :named( 'flags'  ) :optional
+    .param int have_flags :opt_flag
+    .param int red    :named( 'Rmask' )  :optional
+    .param int have_red :opt_flag
+    .param int green  :named( 'Gmask' )  :optional
+    .param int have_green :opt_flag
+    .param int blue   :named( 'Bmask' )  :optional
+    .param int have_blue :opt_flag
+    .param int alpha  :named( 'Amask' )  :optional
+    .param int have_alpha :opt_flag
 
-	.local pmc SDL_CreateRGBSurface
+    .local pmc SDL_CreateRGBSurface
 
-	if have_flags goto check_red
-	flags = 0
+    if have_flags goto check_red
+    flags = 0
 
   check_red:
-	if have_red goto check_green
-	red = 5
+    if have_red goto check_green
+    red = 5
 
   check_green:
-	if have_blue goto check_blue
-	green = 6
+    if have_blue goto check_blue
+    green = 6
 
   check_blue:
-	if have_blue goto check_alpha
-	blue = 5
+    if have_blue goto check_alpha
+    blue = 5
 
   check_alpha:
-	if have_alpha goto create_surface
-	alpha = 0
+    if have_alpha goto create_surface
+    alpha = 0
 
   create_surface:
-	SDL_CreateRGBSurface = find_global 'SDL::NCI', 'CreateRGBSurface'
+    SDL_CreateRGBSurface = find_global 'SDL::NCI', 'CreateRGBSurface'
 
-	.local pmc surface
-	surface = SDL_CreateRGBSurface( flags, width, height, depth, red, green, blue, alpha )
-	self."wrap_surface"( surface )
+    .local pmc surface
+    surface = SDL_CreateRGBSurface( flags, width, height, depth, red, green, blue, alpha )
+    self."wrap_surface"( surface )
 
-	.return()
+    .return()
 .end
 
 =item new_from_surface( raw_surface )
@@ -114,56 +112,54 @@ you have little reason to use it directly.
 =cut
 
 .sub wrap_surface :method
-	.param pmc surface_struct
+    .param pmc surface_struct
 
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    .local pmc  fetch_layout
+    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
-	.local pmc layout
-	layout = fetch_layout( 'Surface' )
+    .local pmc layout
+    layout = fetch_layout( 'Surface' )
 
-	# assign it once to find out the height and width
-	assign surface_struct, layout
+    # assign it once to find out the height and width
+    assign surface_struct, layout
 
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
-	setattribute self, offset, surface_struct
+    setattribute self, 'surface', surface_struct
 
-	.local int bpp
-	.local int height
-	.local int width
-	.local int num_pixels
+    .local int bpp
+    .local int height
+    .local int width
+    .local int num_pixels
 
-	bpp          = self.'bpp'()
-	height       = self.'height'()
-	width        = self.'width'()
-	num_pixels   = height * width
+    bpp          = self.'bpp'()
+    height       = self.'height'()
+    width        = self.'width'()
+    num_pixels   = height * width
 
-	.local pmc pixels_struct
-	.local pmc pixels_layout
-	.local pmc pixels_entry
+    .local pmc pixels_struct
+    .local pmc pixels_layout
+    .local pmc pixels_entry
 
-	pixels_entry  = layout[ 'pixels' ]
-	pixels_struct = getprop '_struct', pixels_entry
-	pixels_layout = new OrderedHash
+    pixels_entry  = layout[ 'pixels' ]
+    pixels_struct = getprop '_struct', pixels_entry
+    pixels_layout = new OrderedHash
 
-	if bpp ==  8 goto eight_bits
-	if bpp == 16 goto sixteen_bits
-	set  pixels_layout[ 'array' ], .DATATYPE_INT
-	goto bits_set
+    if bpp ==  8 goto eight_bits
+    if bpp == 16 goto sixteen_bits
+    set  pixels_layout[ 'array' ], .DATATYPE_INT
+    goto bits_set
 
 eight_bits:
-	set  pixels_layout[ 'array' ], .DATATYPE_UINT8
-	goto bits_set
+    set  pixels_layout[ 'array' ], .DATATYPE_UINT8
+    goto bits_set
 
 sixteen_bits:
-	set  pixels_layout[ 'array' ], .DATATYPE_UINT16
+    set  pixels_layout[ 'array' ], .DATATYPE_UINT16
 
 bits_set:
-	push pixels_layout, num_pixels
-	push pixels_layout, 0
+    push pixels_layout, num_pixels
+    push pixels_layout, 0
 
-	assign pixels_struct, pixels_layout
+    assign pixels_struct, pixels_layout
 .end
 
 =item height()
@@ -174,13 +170,13 @@ value.
 =cut
 
 .sub height :method
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local int height
-	height = surface['h']
+    .local int height
+    height = surface['h']
 
-	.return( height )
+    .return( height )
 .end
 
 =item width()
@@ -190,13 +186,13 @@ Returns the width of this surface, in pixels.  This is always an integer value.
 =cut
 
 .sub width :method
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local int width
-	width = surface['w']
+    .local int width
+    width = surface['w']
 
-	.return( width )
+    .return( width )
 .end
 
 =item fill_rect( rect, color )
@@ -207,24 +203,22 @@ representing a color, fills a portion of this surface with the given color.
 =cut
 
 .sub fill_rect :method
-	.param pmc rect
-	.param pmc color_object
+    .param pmc rect
+    .param pmc color_object
 
-	.local pmc SDL_FillRect
-	SDL_FillRect = find_global 'SDL::NCI', 'FillRect'
+    .local pmc SDL_FillRect
+    SDL_FillRect = find_global 'SDL::NCI', 'FillRect'
 
-	.local pmc surface
-	.local int offset
-	classoffset   offset, self, 'SDL::Surface'
-	getattribute surface, self, offset
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local int color
-	color = color_object
+    .local int color
+    color = color_object
 
-	.local pmc dest_rect
-	dest_rect = rect.'rect'()
+    .local pmc dest_rect
+    dest_rect = rect.'rect'()
 
-	SDL_FillRect( surface, dest_rect, color )
+    SDL_FillRect( surface, dest_rect, color )
 .end
 
 =item update_rect( rect )
@@ -238,25 +232,25 @@ Do this on the main surface to see your changes.
 =cut
 
 .sub update_rect :method
-	.param pmc rect
+    .param pmc rect
 
-	.local pmc surface
-	getattribute surface, self, 'surface'
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local int x
-	.local int y
-	.local int width
-	.local int height
+    .local int x
+    .local int y
+    .local int width
+    .local int height
 
-	x      = rect.'x'()
-	y      = rect.'y'()
-	height = rect.'height'()
-	width  = rect.'width'()
+    x      = rect.'x'()
+    y      = rect.'y'()
+    height = rect.'height'()
+    width  = rect.'width'()
 
-	.local pmc SDL_UpdateRect
-	SDL_UpdateRect = find_global 'SDL::NCI', 'UpdateRect'
+    .local pmc SDL_UpdateRect
+    SDL_UpdateRect = find_global 'SDL::NCI', 'UpdateRect'
 
-	SDL_UpdateRect( surface, x, y, width, height )
+    SDL_UpdateRect( surface, x, y, width, height )
 .end
 
 =item update_rects( array_of_rects )
@@ -267,61 +261,57 @@ at once.  Pass in an C<Array> of rects to update.
 =cut
 
 .sub update_rects :method
-	.param pmc rects
+    .param pmc rects
 
-	.local int count
-	set count, rects
+    .local int count
+    set count, rects
 
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    .local pmc  fetch_layout
+    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
-	.local pmc rect_array_layout
+    .local pmc rect_array_layout
 
-	# don't forget to update the number of elements in this array
-	rect_array_layout    = fetch_layout( 'Rect_Array' )
-	rect_array_layout[1] = count
+    # don't forget to update the number of elements in this array
+    rect_array_layout    = fetch_layout( 'Rect_Array' )
+    rect_array_layout[1] = count
 
-	.local pmc rect_array
-	rect_array = new ManagedStruct, rect_array_layout
+    .local pmc rect_array
+    rect_array = new ManagedStruct, rect_array_layout
 
-	.local int iterator
-	iterator = 0
+    .local int iterator
+    iterator = 0
 
 loop:
-	.local pmc rect
-	.local pmc rect_struct
-	rect        = rects[ iterator ]
-	rect_struct = rect.'rect'()
+    .local pmc rect
+    .local pmc rect_struct
+    rect        = rects[ iterator ]
+    rect_struct = rect.'rect'()
 
-	.local int x
-	.local int y
-	.local int w
-	.local int h
+    .local int x
+    .local int y
+    .local int w
+    .local int h
 
-	x = rect_struct[ 'x'      ]
-	y = rect_struct[ 'y'      ]
-	w = rect_struct[ 'width'  ]
-	h = rect_struct[ 'height' ]
+    x = rect_struct[ 'x'      ]
+    y = rect_struct[ 'y'      ]
+    w = rect_struct[ 'width'  ]
+    h = rect_struct[ 'height' ]
 
-	set rect_array[ 'RectArray'; iterator; 'x'      ], x
-	set rect_array[ 'RectArray'; iterator; 'y'      ], y
-	set rect_array[ 'RectArray'; iterator; 'width'  ], w
-	set rect_array[ 'RectArray'; iterator; 'height' ], h
+    set rect_array[ 'RectArray'; iterator; 'x'      ], x
+    set rect_array[ 'RectArray'; iterator; 'y'      ], y
+    set rect_array[ 'RectArray'; iterator; 'width'  ], w
+    set rect_array[ 'RectArray'; iterator; 'height' ], h
 
-	inc iterator
-	if iterator < count goto loop
+    inc iterator
+    if iterator < count goto loop
 
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local pmc surface
-	getattribute surface, self, offset
+    .local pmc UpdateRects
+    UpdateRects = find_global 'SDL::NCI', 'UpdateRects'
 
-	.local pmc UpdateRects
-	UpdateRects = find_global 'SDL::NCI', 'UpdateRects'
-
-	UpdateRects( surface, count, rect_array )
-
+    UpdateRects( surface, count, rect_array )
 .end
 
 =item flip()
@@ -333,16 +323,13 @@ case) to the main buffer, so you can see it.
 =cut
 
 .sub flip :method
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local pmc surface
-	getattribute surface, self, offset
+    .local pmc SDL_Flip
+    SDL_Flip = find_global 'SDL::NCI', 'Flip'
 
-	.local pmc SDL_Flip
-	SDL_Flip = find_global 'SDL::NCI', 'Flip'
-
-	SDL_Flip( surface )
+    SDL_Flip( surface )
 
 .end
 
@@ -359,27 +346,27 @@ understand.
 =cut
 
 .sub blit :method
-	.param pmc surface
-	.param pmc source
-	.param pmc dest
+    .param pmc surface
+    .param pmc source
+    .param pmc dest
 
-	.local pmc SDL_BlitSurface
-	SDL_BlitSurface = find_global 'SDL::NCI', 'BlitSurface'
+    .local pmc SDL_BlitSurface
+    SDL_BlitSurface = find_global 'SDL::NCI', 'BlitSurface'
 
-	.local pmc source_surface
-	.local pmc dest_surface
+    .local pmc source_surface
+    .local pmc dest_surface
 
-	source_surface = surface.'surface'()
-	dest_surface   = self.'surface'()
+    source_surface = surface.'surface'()
+    dest_surface   = self.'surface'()
 
-	.local pmc source_rect
-	.local pmc dest_rect
+    .local pmc source_rect
+    .local pmc dest_rect
 
-	source_rect    = source.'rect'()
-	dest_rect      = dest.'rect'()
+    source_rect    = source.'rect'()
+    dest_rect      = dest.'rect'()
 
-	SDL_BlitSurface( source_surface, source_rect, dest_surface, dest_rect )
-	.return()
+    SDL_BlitSurface( source_surface, source_rect, dest_surface, dest_rect )
+    .return()
 .end
 
 =item surface()
@@ -390,13 +377,10 @@ to use this directly.
 =cut
 
 .sub surface :method
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local pmc surface
-	getattribute surface, self, offset
-
-	.return( surface )
+    .return( surface )
 .end
 
 =item color_key( color )
@@ -407,21 +391,18 @@ if I add flag options.
 =cut
 
 .sub color_key :method
-	.param pmc color
+    .param pmc color
 
-	.local int color_value
-	color_value = color.'color'()
+    .local int color_value
+    color_value = color.'color'()
 
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
+    .local pmc surface
+    getattribute surface, self, 'surface'
 
-	.local pmc surface
-	getattribute surface, self, offset
+    .local pmc SetColorKey
+    SetColorKey = find_global 'SDL::NCI', 'SetColorKey'
 
-	.local pmc SetColorKey
-	SetColorKey = find_global 'SDL::NCI', 'SetColorKey'
-
-	SetColorKey( surface, 8, color_value )
+    SetColorKey( surface, 8, color_value )
 .end
 
 =item bpp()
@@ -431,14 +412,14 @@ Returns the bitdepth of the current surface.
 =cut
 
 .sub bpp :method
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local int bpp
+    .local int bpp
 
-	bpp    = surface[ 'format'; 'BitsPerPixel' ]
+    bpp    = surface[ 'format'; 'BitsPerPixel' ]
 
-	.return( bpp )
+    .return( bpp )
 .end
 
 =item lock()
@@ -450,15 +431,15 @@ while you hold the lock.
 =cut
 
 .sub lock :method
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local pmc  LockSurface
-	find_global LockSurface, 'SDL::NCI', 'LockSurface'
+    .local pmc  LockSurface
+    find_global LockSurface, 'SDL::NCI', 'LockSurface'
 
-	LockSurface( surface )
+    LockSurface( surface )
 
-	.return()
+    .return()
 .end
 
 =item unlock()
@@ -468,15 +449,15 @@ Unlocks the surface after you've finished raw pixel operations.
 =cut
 
 .sub unlock :method
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local pmc  UnlockSurface
-	find_global UnlockSurface, 'SDL::NCI', 'UnlockSurface'
+    .local pmc  UnlockSurface
+    find_global UnlockSurface, 'SDL::NCI', 'UnlockSurface'
 
-	UnlockSurface( surface )
+    UnlockSurface( surface )
 
-	.return()
+    .return()
 .end
 
 =item draw_pixel( x, y, color )
@@ -493,32 +474,32 @@ heart.
 =cut
 
 .sub draw_pixel :method
-	.param int x
-	.param int y
-	.param int raw_color
-	.param pmc color_pmc     :optional
-	.param int has_color_pmc :opt_flag
+    .param int x
+    .param int y
+    .param int raw_color
+    .param pmc color_pmc     :optional
+    .param int has_color_pmc :opt_flag
 
-	.local int color
+    .local int color
 
-	if has_color_pmc goto convert_color
-	color = raw_color
-	goto draw
+    if has_color_pmc goto convert_color
+    color = raw_color
+    goto draw
 
 convert_color:
-	color = color_pmc.'color_for_surface'( self )
-	
+    color = color_pmc.'color_for_surface'( self )
+
 draw:
-	.local pmc surface
-	surface = self.'surface'()
+    .local pmc surface
+    surface = self.'surface'()
 
-	.local int offset
-	offset  = surface[ 'w' ]
+    .local int offset
+    offset  = surface[ 'w' ]
 
-	mul offset, y
-	add offset, x
+    mul offset, y
+    add offset, x
 
-	surface[ 'pixels'; 'array'; offset ] = color
+    surface[ 'pixels'; 'array'; offset ] = color
 .end
 
 =item pixels()
@@ -547,7 +528,7 @@ how to fetch raw colors.
     .param pmc new_pixels   :optional
     .param int has_pixels   :opt_flag
 
-    .local pmc surface, fetch_layout, pixels_entry, pixels_struct 
+    .local pmc surface, fetch_layout, pixels_entry, pixels_struct
     surface = self.'surface'()
     $P0 = surface['pixels']
     .return ($P0)
@@ -561,15 +542,15 @@ surface.
 =cut
 
 .sub convert_red :method
-	.local pmc surface
-	.local int rloss
-	.local int rshift
+    .local pmc surface
+    .local int rloss
+    .local int rshift
 
-	surface  = self.'surface'()
-	rloss    = surface[ 'format'; 'Rloss'  ]
-	rshift   = surface[ 'format'; 'Rshift' ]
+    surface  = self.'surface'()
+    rloss    = surface[ 'format'; 'Rloss'  ]
+    rshift   = surface[ 'format'; 'Rshift' ]
 
-	.return( rloss, rshift )
+    .return( rloss, rshift )
 .end
 
 =item convert_green()
@@ -580,15 +561,15 @@ surface.
 =cut
 
 .sub convert_green :method
-	.local pmc surface
-	.local int gloss
-	.local int gshift
+    .local pmc surface
+    .local int gloss
+    .local int gshift
 
-	surface  = self.'surface'()
-	gloss    = surface[ 'format'; 'Gloss'  ]
-	gshift   = surface[ 'format'; 'Gshift' ]
+    surface  = self.'surface'()
+    gloss    = surface[ 'format'; 'Gloss'  ]
+    gshift   = surface[ 'format'; 'Gshift' ]
 
-	.return( gloss, gshift )
+    .return( gloss, gshift )
 .end
 
 =item convert_blue()
@@ -599,15 +580,15 @@ surface.
 =cut
 
 .sub convert_blue :method
-	.local pmc surface
-	.local int bloss
-	.local int bshift
+    .local pmc surface
+    .local int bloss
+    .local int bshift
 
-	surface  = self.'surface'()
-	bloss    = surface[ 'format'; 'Bloss'  ]
-	bshift   = surface[ 'format'; 'Bshift' ]
+    surface  = self.'surface'()
+    bloss    = surface[ 'format'; 'Bloss'  ]
+    bshift   = surface[ 'format'; 'Bshift' ]
 
-	.return( bloss, bshift )
+    .return( bloss, bshift )
 .end
 
 =back
@@ -620,7 +601,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, 2006 The Perl Foundation.
+Copyright (c) 2004-2007 The Perl Foundation.
 
 =cut
 

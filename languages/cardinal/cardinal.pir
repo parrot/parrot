@@ -209,7 +209,7 @@ compiler, see:
     match = start_rule(source, 'grammar'=> 'Cardinal::Grammar')
 
     # Verify the match
-    $I0 = match.__get_bool()
+    $I0 = match.get_bool()
     unless $I0 goto err_match_fail # if match fails stop
 
     unless dump_pge goto after_pge_dump

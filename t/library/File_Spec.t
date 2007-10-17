@@ -32,8 +32,7 @@ my $PRE = <<'PRE';
         .local int classtype
         .local pmc spec
 
-        find_type classtype, 'File::Spec'
-        new spec, classtype
+        spec = new 'File::Spec'
 
 PRE
 my $POST = <<'POST';

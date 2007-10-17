@@ -597,7 +597,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not
 .namespace [ 'main' ]
 
 .sub init
-    $P1 = newpdd15class 'Foo'
+    $P1 = newclass 'Foo'
     addattribute $P1, 'foo1'
     addattribute $P1, 'foo2'
     $P2 = subclass $P1, 'Bar'
@@ -681,7 +681,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass bui
 .namespace [ 'main' ]
 
 .sub init
-    $P0 = getclass .Integer
+    $P0 = getclass 'Integer'
     $P1 = subclass $P0, 'Foo'
     addattribute $P1, 'foo1'
     addattribute $P1, 'foo2'

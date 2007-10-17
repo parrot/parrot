@@ -17,8 +17,12 @@ This module provides the default output style of C<Data::Dumper>.
 =cut
 
 .sub __library_data_dumper_default_onload :load
-    find_type $I0, "Data::Dumper::Default"
-    if $I0 > 1 goto END
+    .local pmc ddb_class
+    ddb_class = get_class "Data::Dumper::Default"
+    if null ddb_class goto create_ddb
+    goto END
+
+  create_ddb:
     load_bytecode "library/Data/Dumper/Base.pir"
     getclass $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
@@ -117,8 +121,8 @@ Dumps a 'generic' Hash.
 
     print " {"
 
-    new keys, .ResizablePMCArray
-    new iter, .Iterator, hash
+    new keys, "ResizablePMCArray"
+    new iter, "Iterator", hash
     set iter, 0
 
 iter_loop:
@@ -139,7 +143,7 @@ dump_loop:
 
     shift key, keys
 
-    new val, .ResizablePMCArray
+    new val, "ResizablePMCArray"
     push val, name
     push val, key
     sprintf name2, "%s[\"%s\"]", val
@@ -186,15 +190,17 @@ Escape any characters in a string so we can re-use it as a literal.
 
 .sub pmcDefault :method
     .param string name
-    .param pmc dump
+    .param pmc    dump
+    .local pmc    class
     .local string type
 
-    typeof type, dump
+    type  = typeof dump
+
     print "PMC '"
     print type
     print "' "
 
-    can $I0, dump, "__dump"
+    $I0 = can dump, "__dump"
     if $I0 goto CAN_DUMP
     print "{ ... }"
     branch END
@@ -240,7 +246,7 @@ iter_loop:
 
     print subindent
 
-    new val, .ResizablePMCArray
+    new val, "ResizablePMCArray"
     push val, name
     push val, pos
     sprintf name2, "%s[%d]", val
@@ -408,7 +414,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

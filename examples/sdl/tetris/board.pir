@@ -8,8 +8,7 @@ board.pir - a tetris board class.
     app = global "Tetris::App"
 
     # create a new board
-    find_type $I0, "Tetris::Board"
-    board = new $I0, app
+    board = new "Tetris::Board", app
 
     # let the current block of the board fall down fast
     board."fall"()
@@ -21,8 +20,9 @@ board.pir - a tetris board class.
 .namespace ["Tetris::Board"]
 
 .sub __onload :load
-    find_type $I0, "Tetris::Board"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::Board"
+    unless null $P0 goto END
+
     load_bytecode "examples/sdl/tetris/boarddata.pir"
     load_bytecode "examples/sdl/tetris/blocks.pir"
     getclass $P0, "Tetris::BoardData"
@@ -77,8 +77,7 @@ Returns the created board.
     self."fill"( 0 )
 
     # setup the cache
-    find_type $I0, "Tetris::BoardData"
-    new temp, $I0
+    temp = new "Tetris::BoardData"
     temp."init"( w, h )
     temp."fill"( -1 )
     setprop self, "cache", temp
@@ -252,8 +251,8 @@ SKIP_SET_ID:
     getprop block, "nextblock", self
     
     # create a new 'next block'
-    $I0 = self."blockID"( id )
-    temp = new $I0, self
+    $P0 = self."blockID"( id )
+    temp = new $P0, self
     setprop self, "nextblock", temp
 
     # new currently falling block created, activate it
@@ -647,8 +646,7 @@ NO_CLEAR_CACHE:
     rect["y"] = ypos
     rect["width"] = xp
     rect["height"] = yp
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     color = palette[15]
     surface."fill_rect"( temp, color )
 NO_FIELDBACKGROUND:
@@ -682,8 +680,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = $I0
     rect["height"] = $I0
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
 
     $I0 = self[i]
     $I1 = cache[i]
@@ -735,8 +732,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     color = palette[15]
     surface."fill_rect"( temp, color )
     inc xp
@@ -747,8 +743,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     color = palette[0]
     surface."fill_rect"( temp, color )
     getprop temp, "nextblock", self
@@ -879,7 +874,7 @@ TDB
 .sub blockID :method
     .param int id
     .local pmc blocks
-    .local int ret
+    .local pmc ret
     
     blocks = find_global "Tetris::Block", "blocks"
     

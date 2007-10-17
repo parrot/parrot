@@ -100,7 +100,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
     /*
      * s2 in string_compare is freed here
      */
-    if (!string_compare(interp, key, string_from_cstring(interp, "_ro", 3))) {
+    if (!string_compare(interp, key, string_from_literal(interp, "_ro"))) {
 #endif
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
@@ -142,7 +142,7 @@ propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
         PMC * const pmc_true  = pmc_new(interp, enum_class_Integer);
         PMC_int_val(pmc_true) = 1;
         VTABLE_set_pmc_keyed_str(interp, prop_hash,
-            string_from_cstring(interp, "_ro", 3), pmc_true);
+            string_from_literal(interp, "_ro"), pmc_true);
     }
 }
 
@@ -180,7 +180,7 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!string_compare(interp, key, string_from_cstring(interp, "_ro", 3))) {
+        &&!string_compare(interp, key, string_from_literal(interp, "_ro"))) {
         PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
         PMC_int_val(ret_val) = 1;
         return ret_val;
@@ -303,7 +303,7 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
 
 /*
 
-=item C<PMC *instantiate(PMC *sig)>
+=item C<PMC *instantiate(PMC *init)>
 
 Default fallback. Creates a new PMC of the type of the class SELF and
 calls init().
@@ -312,11 +312,19 @@ calls init().
 
 */
 
-    PMC *instantiate(PMC *sig) {
-        const INTVAL type = SELF->vtable->base_type;
-        PMC *const   ret  = pmc_new_noinit(INTERP, type);
-        VTABLE_init(INTERP, ret);
-        return ret;
+    PMC *instantiate(PMC *init) {
+        const INTVAL type = VTABLE_type(INTERP, SELF);
+
+        /* Ensure no looping, as pmc_new calls the instantiate vtable entry for
+         * classes. */
+        if (PObj_is_class_TEST(SELF))
+            real_exception(interp, NULL, 1,
+                    "All high-level classes should override instantiate");
+
+        if (!PMC_IS_NULL(init))
+            return pmc_new_init(INTERP, type, init);
+
+        return pmc_new(INTERP, type);
     }
 
 /*
@@ -632,7 +640,7 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
 */
 
     void assign_pmc(PMC *value) {
-        STRING * const undef = string_from_cstring(INTERP, "Undef", 5);
+        STRING * const undef = string_from_literal(INTERP, "Undef");
 
         if (VTABLE_isa(INTERP, value, undef))
             pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
@@ -897,6 +905,24 @@ true (1) is returned; otherwise, false (0) is returned.
 
 /*
 
+=item C<INTVAL isa_pmc(PMC *_class)>
+
+Reports whether the PMC "isa" C<_class>.
+If the class C<_class> is found in the PMC's class hierarchy,
+true (1) is returned; otherwise, false (0) is returned.
+
+=cut
+
+*/
+
+    INTVAL isa_pmc(PMC *lookup) {
+        /* TODO FIXME - walk mro */
+        return does_isa(INTERP, VTABLE_get_string(INTERP, lookup),
+                SELF->vtable->isa_str);
+    }
+
+/*
+
 =item C<INTVAL isa(STRING *_class)>
 
 Reports whether the PMC "isa" C<_class>.
@@ -931,7 +957,7 @@ Creates a subclass, optionally with a given C<name>.
 
 =item C<PMC *get_class()>
 
-Returns SELF. A PMC is it's own class.
+Returns SELF. A PMC is its own class.
 
 =item C<PMC *get_attr_str(STRING *attr)>
 
@@ -941,7 +967,11 @@ Look for NCI methods and properties.
 
 */
     PMC *get_class() {
-        return SELF;
+        /* Create a proxy */
+        INTVAL type = VTABLE_type(interp, SELF);
+        PMC *type_num = pmc_new(interp, enum_class_Integer);
+        VTABLE_set_integer_native(interp, type_num, type);
+        return pmc_new_init(interp, enum_class_PMCProxy, type_num);
     }
 
     PMC *get_attr_str(STRING *name) {
@@ -987,6 +1017,29 @@ Look for NCI methods and properties.
 
 /*
 
+=item C<PMC *get_attr_keyed(PMC *key, STRING *name)>
+
+Default version of keyed attribute lookups. Discards the key and does a lookup
+by the string name passed in.
+
+=item C<void set_attr_keyed(PMC *key, STRING *name, PMC *value)>
+
+Default version of keyed attribute set. Discards the key and does a set by
+the string name passed in.
+
+=cut
+
+*/
+    PMC *get_attr_keyed(PMC *key, STRING *name) {
+        return VTABLE_get_attr_str(INTERP, SELF, name);
+    }
+
+    void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
+        VTABLE_set_attr_str(INTERP, SELF, name, value);
+    }
+
+/*
+
 =item C<void add_parent(PMC *parent)>
 
 Add class C<parent> to the list of our parents.
@@ -996,7 +1049,10 @@ Add class C<parent> to the list of our parents.
 */
 
     void add_parent(PMC *parent) {
-        Parrot_add_parent(INTERP, SELF, parent);
+        if (!PObj_is_class_TEST(SELF))
+            real_exception(interp, NULL, 1, "Only classes can be subclassed");
+
+        real_exception(interp, NULL, 1, "All classes should override add_parent");
     }
 
 /*

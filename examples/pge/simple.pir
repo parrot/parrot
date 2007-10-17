@@ -6,8 +6,7 @@
     .local pmc p6rule
     .local string op
 
-    $I0 = find_type "PGE::OPTable"
-    optable = new $I0
+    optable = new "PGE::OPTable"
     store_global "Simple", "$optable", optable
 
     p6rule = compreg "PGE::P6Rule"

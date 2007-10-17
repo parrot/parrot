@@ -9,10 +9,8 @@ Test::Builder - Parrot extension for building test modules
 
     # create a new Test::Builder object
     .local pmc test
-    .local int test_type
 
-    find_type test_type, 'Test::Builder'
-    test = new test_type
+    test = new Test::Builder'
 
     # plan to run ten tests
     test.'plan'( 10 )
@@ -138,12 +136,11 @@ This probably doesn't work correctly yet, but you will probably never use it.
 
     .local int is_defined
     output     = args['output']
-    is_defined = defined output
+    is_defined = exists args['output']
     if is_defined goto OUTPUT_DEFINED
 
     .local int output_class
-    find_type output_class, 'Test::Builder::Output'
-    output = new output_class
+    output = new 'Test::Builder::Output'
 
   OUTPUT_DEFINED:
     is_defined = exists args['testplan']
@@ -159,11 +156,9 @@ This probably doesn't work correctly yet, but you will probably never use it.
   TESTPLAN_DEFINED:
 
     results    = new 'ResizablePMCArray'
-    .local int test_builder_type
 
-    find_type test_builder_type, 'Test::Builder'
     .local pmc test
-    test       = new test_builder_type
+    test       = new 'Test::Builder'
 
     test.'_assign_args'( output, testplan, results )
     .return( test )
@@ -199,12 +194,9 @@ This probably doesn't work correctly yet, but you will probably never use it.
 
   CREATE_OUTPUT:
     # create a Test::Builder::Output object
-    .local int output_type
-    find_type  output_type, 'Test::Builder::Output'
-
     .local pmc args_hash
     args_hash  = new Hash
-    output     = new output_type, args_hash
+    output     = new 'Test::Builder::Output', args_hash
 
   OUTPUT_DEFINED:
     # now try in the args hash
@@ -337,23 +329,19 @@ declared a plan or if you pass an invalid argument.
 
     unless num_tests goto PLAN_FAILURE
 
-    .local int plan_type
     .local pmc args
 
     args = new 'Hash'
     args['expect'] = num_tests
 
-    find_type plan_type, 'Test::Builder::TestPlan'
-    testplan = new plan_type, args
+    testplan = new 'Test::Builder::TestPlan', args
     goto FINISH_PLAN
 
   CHECK_EXPLANATION:
     goto PLAN_FAILURE
 
   PLAN_NULL:
-    .local int null_type
-    find_type null_type, 'Test::Builder::NullPlan'
-    testplan = new null_type
+    testplan = new 'Test::Builder::NullPlan'
     goto FINISH_PLAN
 
   PLAN_FAILURE:

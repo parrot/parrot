@@ -33,15 +33,14 @@ Match an identifier.
 
 =cut
 
-.sub 'ident'
-    .param pmc mob
+.sub 'ident' :method
     .param pmc adverbs         :slurpy :named
     .local string target
-    .local pmc mfrom, mpos
+    .local pmc mob, mfrom, mpos
     .local int pos, lastpos
 
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target) = $P0.'new'(mob)
+    (mob, pos, target) = $P0.'new'(self)
 
     lastpos = length target
     $S0 = substr target, pos, 1
@@ -62,11 +61,11 @@ Match a null string (always returns true on first match).
 
 =cut
 
-.sub "null"
-    .param pmc mob
+.sub "null" :method
+    .local pmc mob
     .local int pos
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos) = $P0.'new'(mob)
+    (mob, pos) = $P0.'new'(self)
     mob.'to'(pos)
     .return (mob)
 .end
@@ -77,10 +76,9 @@ Force a backtrack.  (Taken from A05.)
 
 =cut
 
-.sub "fail"
-    .param pmc mob
+.sub "fail" :method
     $P0 = get_hll_global ['PGE'], 'Match'
-    .return $P0.'new'(mob)
+    .return $P0.'new'(self)
 .end
 
 
@@ -90,9 +88,8 @@ Match a single uppercase character.
 
 =cut
 
-.sub 'upper'
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_UPPERCASE)
+.sub 'upper' :method
+    .return '!cclass'(self, .CCLASS_UPPERCASE)
 .end
 
 
@@ -102,9 +99,8 @@ Match a single lowercase character.
 
 =cut
 
-.sub "lower"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_LOWERCASE)
+.sub "lower" :method
+    .return '!cclass'(self, .CCLASS_LOWERCASE)
 .end
 
 
@@ -114,9 +110,8 @@ Match a single alphabetic character.
 
 =cut
 
-.sub "alpha"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_ALPHABETIC)
+.sub "alpha" :method
+    .return '!cclass'(self, .CCLASS_ALPHABETIC)
 .end
 
 =item C<digit()>
@@ -125,9 +120,8 @@ Match a single digit.
 
 =cut
 
-.sub "digit"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_NUMERIC)
+.sub "digit" :method
+    .return '!cclass'(self, .CCLASS_NUMERIC)
 .end
 
 =item C<xdigit()>
@@ -136,9 +130,8 @@ Match a single alphanumeric character.
 
 =cut
 
-.sub "xdigit"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_HEXADECIMAL)
+.sub "xdigit" :method
+    .return '!cclass'(self, .CCLASS_HEXADECIMAL)
 .end
 
 =item C<space()>
@@ -147,9 +140,8 @@ Match a single whitespace character.
 
 =cut
 
-.sub "space"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_WHITESPACE)
+.sub "space" :method
+    .return '!cclass'(self, .CCLASS_WHITESPACE)
 .end
 
 =item C<print()>
@@ -158,9 +150,8 @@ Match a single printable character.
 
 =cut
 
-.sub "print"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_PRINTING)
+.sub "print" :method
+    .return '!cclass'(self, .CCLASS_PRINTING)
 .end
 
 =item C<graph()>
@@ -169,9 +160,8 @@ Match a single "graphical" character.
 
 =cut
 
-.sub "graph"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_GRAPHICAL)
+.sub "graph" :method
+    .return '!cclass'(self, .CCLASS_GRAPHICAL)
 .end
 
 =item C<blank()>
@@ -180,9 +170,8 @@ Match a single "blank" character.
 
 =cut
 
-.sub "blank"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_BLANK)
+.sub "blank" :method
+    .return '!cclass'(self, .CCLASS_BLANK)
 .end
 
 =item C<cntrl()>
@@ -191,9 +180,8 @@ Match a single "control" character.
 
 =cut
 
-.sub "cntrl"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_CONTROL)
+.sub "cntrl" :method
+    .return '!cclass'(self, .CCLASS_CONTROL)
 .end
 
 =item C<punct()>
@@ -202,9 +190,8 @@ Match a single punctuation character.
 
 =cut
 
-.sub "punct"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_PUNCTUATION)
+.sub "punct" :method
+    .return '!cclass'(self, .CCLASS_PUNCTUATION)
 .end
 
 =item C<alnum()>
@@ -213,9 +200,8 @@ Match a single alphanumeric character.
 
 =cut
 
-.sub "alnum"
-    .param pmc mob
-    .return '!cclass'(mob, .CCLASS_ALPHANUMERIC)
+.sub "alnum" :method
+    .return '!cclass'(self, .CCLASS_ALPHANUMERIC)
 .end
 
 =item C<sp()>
@@ -224,9 +210,8 @@ Match a single space character.  (Taken from E05.)
 
 =cut
 
-.sub "sp"
-    .param pmc mob
-    .return '!literal'(mob, ' ')
+.sub "sp" :method
+    .return '!literal'(self, ' ')
 .end
 
 =item C<lt()>
@@ -235,9 +220,8 @@ Match a single left angle bracket.  (Taken from E05.)
 
 =cut
 
-.sub "lt"
-    .param pmc mob
-    .return '!literal'(mob, '<')
+.sub "lt" :method
+    .return '!literal'(self, '<')
 .end
 
 =item C<gt()>
@@ -246,9 +230,8 @@ Match a single right angle bracket. (Taken from E05.)
 
 =cut
 
-.sub "gt"
-    .param pmc mob
-    .return '!literal'(mob, '>')
+.sub "gt" :method
+    .return '!literal'(self, '>')
 .end
 
 =item C<dot()>
@@ -257,9 +240,8 @@ Match a single dot ('.').  (Taken from E05.)
 
 =cut
 
-.sub "dot"
-    .param pmc mob
-    .return '!literal'(mob, '.')
+.sub "dot" :method
+    .return '!literal'(self, '.')
 .end
 
 =item C<ws()>
@@ -268,17 +250,16 @@ Match whitespace between tokens.
 
 =cut
 
-.sub "ws"
-    .param pmc mob
+.sub "ws" :method
     .local string target
-    .local pmc mfrom, mpos
+    .local pmc mob, mfrom, mpos
     .local int rep, pos, lastpos
     .local string nextchars
     .const .Sub corou = "ws_corou"
     nextchars = ""
   ws_1:
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target, mfrom, mpos) = $P0.'new'(mob)
+    (mob, pos, target, mfrom, mpos) = $P0.'new'(self)
     lastpos = length target
     pos = mfrom
     if pos >= lastpos goto found
@@ -335,13 +316,12 @@ Perl 5's \b regex).
 
 =cut
 
-.sub "wb"
-    .param pmc mob
+.sub "wb" :method
     .local string target
-    .local pmc mfrom, mpos
+    .local pmc mob
     .local int pos
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target) = $P0.'new'(mob)
+    (mob, pos, target) = $P0.'new'(self)
     if pos == 0 goto succeed
     $I0 = length target
     if pos == $I0 goto succeed
@@ -364,15 +344,14 @@ success.
 
 =cut
 
-.sub "before"
-    .param pmc mob
+.sub "before" :method
     .param string pattern      :optional
     .param int has_pattern     :opt_flag
     .param pmc adverbs         :slurpy :named
-    .local pmc cache, rule
+    .local pmc mob, cache, rule
 
     if has_pattern goto lookahead
-    mob = 'fail'(mob)
+    mob = 'fail'(self)
     .return (mob)
   lookahead:
     cache = get_global '%!cache'
@@ -385,7 +364,7 @@ success.
     rule = $P0(pattern)
     cache[pattern] = rule
   match:
-    mob = rule(mob)
+    mob = rule(self)
     unless mob goto end
     $P0 = getattribute mob, '$.from'
     $P1 = getattribute mob, '$.pos'
@@ -412,14 +391,14 @@ potentially very inefficient, but it "works" for now.
 
 =cut
 
-.sub "after"
-    .param pmc mob
+.sub "after" :method
     .param string pattern      :optional
     .param int has_pattern     :opt_flag
     .param pmc adverbs         :slurpy :named
-    .local pmc cache, rule
+    .local pmc mob, cache, rule
     .local int from
 
+    mob = self
     if has_pattern goto lookbehind
     mob = fail(mob)
     .return (mob)

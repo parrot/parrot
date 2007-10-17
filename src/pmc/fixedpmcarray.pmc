@@ -283,6 +283,8 @@ Returns the integer value of the element at index C<key>.
 
     INTVAL get_integer_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
+        if (PMC_IS_NULL(tempPMC))
+                return 0;
         return VTABLE_get_integer(INTERP, tempPMC);
     }
 
@@ -343,6 +345,8 @@ Returns the Parrot string value of the element at index C<key>.
 
     STRING *get_string_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
+        if (PMC_IS_NULL(tempPMC))
+                return string_from_literal(interp, "");
         return VTABLE_get_string(INTERP, tempPMC);
     }
 

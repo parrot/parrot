@@ -17,8 +17,7 @@ Creates a C<Stream::Sub> and dumps it.
 
     load_bytecode "library/Stream/Sub.pir"
 
-    find_type $I0, "Stream::Sub"
-    new stream, $I0
+    stream = new "Stream::Sub"
 
     # set the stream's source sub
     .const .Sub temp = "_hello"

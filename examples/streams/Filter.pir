@@ -25,15 +25,13 @@ Creates a counter stream that generates numbers from 0 to 9.
     load_bytecode "library/Stream/Filter.pir"
     
     # create the counter stream
-    find_type $I0, "Stream::Sub"
-    new stream, $I0
+    stream = new "Stream::Sub"
     # assign its source
     .const .Sub temp = "_counter"
     assign stream, temp
 
     # create the filter stream
-    find_type $I0, "Stream::Filter"
-    new filter, $I0
+    filter = new "Stream::Filter"
     # assign its source
     assign filter, stream
     # set the filter sub

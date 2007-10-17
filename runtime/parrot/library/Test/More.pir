@@ -67,10 +67,7 @@ This class defines the following functions:
     load_bytecode 'library/Test/Builder.pir'
 
     .local pmc test
-    .local int test_type
-
-    find_type test_type, 'Test::Builder'
-    test = new test_type
+    test = new 'Test::Builder'
 
     store_global [ 'Test'; 'More' ], '_test', test
 .end

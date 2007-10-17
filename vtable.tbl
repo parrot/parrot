@@ -340,12 +340,15 @@ INTVAL can(STRING* method)
 
 INTVAL does(STRING* method)
 
+INTVAL isa_pmc(PMC* lookup)
 INTVAL isa(STRING* _class)
 
 PMC* get_attr(INTVAL idx)
 PMC* get_attr_str(STRING* idx)
+PMC* get_attr_keyed(PMC* key, STRING* idx)
 void set_attr(INTVAL idx, PMC* value) :write
 void set_attr_str(STRING* idx, PMC* value) :write
+void set_attr_keyed(PMC* key, STRING* idx, PMC* value) :write
 
 PMC* get_class()
 INTVAL class_type()

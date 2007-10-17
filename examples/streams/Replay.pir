@@ -4,8 +4,7 @@
     load_bytecode "library/Stream/Writer.pir"
     load_bytecode "library/Stream/Replay.pir"
     
-    find_type $I0, "Stream::Writer"
-    new stream, $I0
+    stream = new "Stream::Writer"
     $P0 = global "_reader"
     assign stream, $P0
     
@@ -26,8 +25,7 @@
     .local pmc stream3
     .local string str
 
-    find_type $I0, "Stream::Replay"
-    new stream1, $I0
+    stream1 = new "Stream::Replay"
     assign stream1, self
     
     print "reader start\n"

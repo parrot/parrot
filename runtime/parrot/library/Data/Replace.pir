@@ -45,8 +45,8 @@ Replaces every "old" with "new" inside the aggregate "where".
     .param pmc oldVal
     .param pmc newVal
     .local pmc cache
-    
-    new cache, .ResizablePMCArray
+
+    new cache, 'ResizablePMCArray'
     __do_replace( where, oldVal, newVal, cache )
 .end
 
@@ -56,7 +56,7 @@ Replaces every "old" with "new" inside the aggregate "where".
     .param pmc cache
     .local int i
     .local pmc temp
-    
+
     set i, cache
 LOOP:
     dec i
@@ -73,7 +73,7 @@ IS:
     .return 1
     .pcc_end_return
 .end
-    
+
 .sub __do_replace
     .param pmc where
     .param pmc oldVal
@@ -81,9 +81,9 @@ IS:
     .param pmc cache
     .local pmc temp
     .local string name
-    
+
     if_null where, END
-    
+
     # call __replace if the PMC supports it
     can $I0, where, "__replace"
     unless $I0 goto CANT_REPLACE
@@ -123,20 +123,20 @@ END:
     .param pmc cache
     .local int i
     .local pmc val
-    
+
     set i, where
 LOOP:
     dec i
     if i < 0 goto END
 
     val = where[i]
-    
+
     ne_addr val, oldVal, SKIP
     where[i] = newVal
 SKIP:
     I0 = __in_cache( val, cache )
     if I0 goto LOOP
-    
+
     push cache, val
     __do_replace( val, oldVal, newVal, cache )
     branch LOOP
@@ -153,27 +153,27 @@ END:
     .local pmc iter
     .local string key
     .local pmc val
-    
-    new iter, .Iterator, where
+
+    new iter, 'Iterator', where
     set iter, 0
-    
+
 LOOP:
     unless iter, END
 
     shift key, iter
-    
+
     val = where[key]
-    
+
     ne_addr val, oldVal, SKIP
     where[key] = newVal
 SKIP:
     I0 = __in_cache( val, cache )
     if I0 goto LOOP
-    
+
     push cache, val
     __do_replace( val, oldVal, newVal, cache )
     branch LOOP
-    
+
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -187,27 +187,27 @@ END:
     .local pmc iter
     .local string key
     .local pmc val
-    
-    new iter, .Iterator, where
+
+    new iter, 'Iterator', where
     set iter, 0
-    
+
 LOOP:
     unless iter, END
 
     shift key, iter
-    
+
     val = where[key]
-    
+
     ne_addr val, oldVal, SKIP
     where[key] = newVal
 SKIP:
     I0 = __in_cache( val, cache )
     if I0 goto LOOP
-    
+
     push cache, val
     __do_replace( val, oldVal, newVal, cache )
     branch LOOP
-    
+
 END:
     .pcc_begin_return
     .pcc_end_return
@@ -223,7 +223,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

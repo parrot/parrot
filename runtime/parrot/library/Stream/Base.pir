@@ -24,14 +24,9 @@ TBD
 
 .namespace ["Stream::Base"]
 
-.const int aSource = 0
-.const int aIncludes = 1
-.const int aBuffer = 2
-
 .sub onload :load :anon
-    find_type $I0, "Stream::Base"
-    if $I0 > 1 goto END
-
+    $P0 = get_class 'Stream::Base'
+    unless null $P0 goto END
     load_bytecode "library/Data/Escape.pir"
 
     newclass $P0, "Stream::Base"
@@ -56,16 +51,14 @@ END:
 .sub set_pmc :vtable :method
     .param pmc source
 
-    classoffset $I0, self, "Stream::Base"
-    setattribute self, $I0, source
+    setattribute self, 'source', source
     null source
 .end
 
 .sub setSource :method
     .param pmc source
 
-    classoffset $I0, self, "Stream::Base"
-    setattribute self, $I0, source
+    setattribute self, 'source', source
     null source
 .end
 
@@ -77,14 +70,12 @@ END:
     .local pmc temp
 
     # reset source
-    classoffset $I0, self, "Stream::Base"
     new temp, .Undef
-    setattribute self, $I0, temp
+    setattribute self, 'source', temp
 
     # reset includes
-    inc $I0
     new temp, .ResizablePMCArray
-    setattribute self, $I0, temp
+    setattribute self, 'includes', temp
 .end
 
 =item stream."dump"() (debug aid)
@@ -142,9 +133,7 @@ Returns the currently set source.
 .sub source :method
     .local pmc ret
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aSource
-    getattribute ret, self, $I0
+    getattribute ret, self, 'source'
 
     .return(ret)
 ERROR:
@@ -163,9 +152,7 @@ It is connected until the source sub returns.
 .sub connected :method
     .local pmc stream
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aSource
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'source'
     typeof $I0, $P0
     if $I0 == .Undef goto NOT
 
@@ -189,19 +176,15 @@ Returns the read string, or a null string if the stream end has been reached.
     .local string ret
     .local pmc includes
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aBuffer
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'buffer'
     if_null $P0, NO_BUFFER
     ret = $P0
     null $P0
-    setattribute self, $I0, $P0
+    setattribute self, 'buffer', $P0
     branch DONE
 NO_BUFFER:
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aIncludes
-    getattribute includes, self, $I0
+    getattribute includes, self, 'includes'
     if_null includes, SELF
 
     $I0 = includes
@@ -250,9 +233,7 @@ Please have a look at F<examples/streams/Include.pir> to see how it works.
     .param pmc stream
     .local pmc includes
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aIncludes
-    getattribute includes, self, $I0
+    getattribute includes, self, 'includes'
     push includes, stream
 
     self."flush"()
@@ -272,9 +253,7 @@ Used to flush the stream when including another stream.
     can i, self, "write"
     unless i goto CANT
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aIncludes
-    getattribute includes, self, $I0
+    getattribute includes, self, 'includes'
 
     i = includes
     if i == 0 goto CANT
@@ -297,19 +276,16 @@ Reads the specified number of bytes from the stream.
     .local string ret
     .local pmc buffer
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aBuffer
-
     # get buffer
-    getattribute buffer, self, $I0
+    getattribute buffer, self, 'buffer'
 
     # no buffer set?
     if_null buffer, CREATE
 
     # unset buffer
     null $P0
-    setattribute self, $I0, $P0
-    branch OK
+    setattribute self, 'buffer', $P0
+    goto OK
 
 CREATE:
     buffer = new 'String'
@@ -323,7 +299,7 @@ LOOP:
     $S0 = self."read"()
     if_null $S0, DONE
     concat ret, $S0
-    branch LOOP
+    goto LOOP
 DONE:
 
     $I0 = length ret
@@ -337,9 +313,7 @@ DONE:
     unless $I0 goto END
 
     assign buffer, $S0
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aBuffer
-    setattribute self, $I0, buffer
+    setattribute self, 'buffer', buffer
 
 END:
     .return(ret)
@@ -355,17 +329,14 @@ Returns or sets the byte buffer.
     .param pmc buf :optional
     .param int has_buf :opt_flag
 
-    classoffset $I0, self, "Stream::Base"
-    add $I0, aBuffer
-
     if has_buf goto SET
 
-    getattribute $P0, self, $I0
+    getattribute $P0, self, 'buffer'
 
     if_null $P0, END
     branch END
 SET:
-    setattribute self, $I0, buf
+    setattribute self, 'buffer', buf
 END:
     .return($P0)
 .end

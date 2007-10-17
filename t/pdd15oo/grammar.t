@@ -212,11 +212,11 @@ GRAMMAR
 # ----------------------------------
 .sub buildtree
     # Create Leaf class
-    newpdd15class $P1, "Leaf"
+    newclass $P1, "Leaf"
     addattribute $P1, "value"   # the value of the leaf node
 
     # Create Branch class
-    newpdd15class $P2, "Branch"
+    newclass $P2, "Branch"
     addattribute $P2, "left"            # left child
     addattribute $P2, "right"           # right child
 

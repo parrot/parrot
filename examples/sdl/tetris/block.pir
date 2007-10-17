@@ -5,8 +5,7 @@ block.pir - a tetris block class
 =head1 SYNOPSIS
 
     # create a new block
-    find_type $I0, "Tetris::Block"
-    new block, $I0
+    block = new "Tetris::Block"
     block."init"( board )
 
     # let the block fall down fast
@@ -28,8 +27,8 @@ is not subclassed further.
 .const int Board     = 4
 
 .sub __onload :load
-    find_type $I0, "Tetris::Block"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::Block"
+    unless null $P0 goto END
     load_bytecode "examples/sdl/tetris/blockdata.pir"
     getclass $P0, "Tetris::BlockData"
     subclass $P0, $P0, "Tetris::Block"
@@ -481,8 +480,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
 
     surface."fill_rect"( temp, color )
     sub i, 2
@@ -493,8 +491,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
 
     # lookup the color value
     $P0 = app."color"( 0 )
@@ -522,8 +519,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = extent
     rect["height"] = extent
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     inc extent
     surface."fill_rect"( temp, color )
 SKIP:

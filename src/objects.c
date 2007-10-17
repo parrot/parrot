@@ -1211,46 +1211,6 @@ create_class_mro(PARROT_INTERP, NOTNULL(PMC *_class))
     return class_mro_merge(interp, lall);
 }
 
-PARROT_API
-void
-Parrot_add_parent(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(PMC *parent))
-{
-    PMC *current_parent_array;
-
-    if (!PObj_is_class_TEST(_class))
-        real_exception(interp, NULL, 1, "Class isn't a ParrotClass");
-
-    if (!PObj_is_class_TEST(parent) && parent == parent->vtable->pmc_class) {
-        /* Permit inserting non-classes so at least thaw'ing classes
-         * is easy. Adding these parents after classes have been
-         * subclassed is dangerous, however.
-         */
-        PMC *class_name;
-
-        if (CLASS_ATTRIB_COUNT(_class) != 0)
-            real_exception(interp, NULL, 1, "Subclassing built-in type too late");
-
-        Parrot_add_attribute(interp, _class, CONST_STRING(interp, "__value"));
-
-        class_name = pmc_new(interp, enum_class_String);
-
-        VTABLE_set_string_native(interp, class_name,
-            VTABLE_name(interp, _class));
-
-        create_deleg_pmc_vtable(interp, _class, 1);
-    }
-    else if (!PObj_is_class_TEST(parent)) {
-        real_exception(interp, NULL, 1, "Parent isn't a ParrotClass");
-    }
-
-    current_parent_array = get_attrib_num(PMC_data(_class), PCD_PARENTS);
-    VTABLE_push_pmc(interp, current_parent_array, parent);
-
-    _class->vtable->mro  = create_class_mro(interp, _class);
-
-    rebuild_attrib_stuff(interp, _class);
-}
-
 /*
 
 =item C<Parrot_remove_parent>

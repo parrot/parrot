@@ -416,6 +416,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/misc$(O) \
     $(SRC_DIR)/mmd$(O) \
     $(SRC_DIR)/nci$(O) \
+    $(SRC_DIR)/oo$(O) \
     $(SRC_DIR)/objects$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/packout$(O) \
@@ -579,6 +580,7 @@ STR_FILES = \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/mmd.str \
     $(SRC_DIR)/pmc.str \
+    $(SRC_DIR)/oo.str \
     $(SRC_DIR)/objects.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \

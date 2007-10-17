@@ -8,8 +8,7 @@
 
     set I10, 1
     set I11, 500000
-    find_type I12, "Foo"
-    new P3, I12
+    P3 = new "Foo"
 loop:
     classoffset I0, P3, "Foo"
     new P4, 'Integer'

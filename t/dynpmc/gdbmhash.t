@@ -35,10 +35,8 @@ my $new_hash_1 = << 'CODE';
 .sub test :main
     .local pmc gdbmhash_lib
     gdbmhash_lib = loadlib "gdbmhash"
-    .local int gdbmhash_type
-    gdbmhash_type = find_type "GDBMHash"
     .local pmc hash_1
-    hash_1 = new gdbmhash_type
+    hash_1 = new "GDBMHash"
 CODE
 
 pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "typeof" );

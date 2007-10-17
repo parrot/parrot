@@ -12,6 +12,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .sub '__onload' :load
     .local pmc base
+    load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
     base = subclass 'Hash', 'PGE::Match'
     addattribute base, '$.target'                  # target
     addattribute base, '$.from'                    # start of match

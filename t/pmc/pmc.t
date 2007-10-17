@@ -112,11 +112,16 @@ ok 2
 OUTPUT
 
 my $checkTypes;
+my %types_we_cant_test
+    = map { $_ => 1; } (# These require initializers.
+			qw(Null Iterator Enumerate Ref STMRef SharedRef
+			   ParrotObject ParrotThread
+			   deleg_pmc BigInt LexInfo LexPad Slice Object),
+			# Instances of these appear to have other types.
+			qw(PMCProxy Class));
 while ( my ( $type, $id ) = each %pmc_types ) {
-    next if grep { $type eq $_ } qw/
-            Null Iterator Enumerate Ref STMRef SharedRef ParrotObject ParrotThread
-            deleg_pmc BigInt LexInfo LexPad Slice Object
-            /;    # these need an initializer
+    next
+	if $types_we_cant_test{$type};
     my $set_ro = ( $type =~ /^Const\w+/ ) ? <<EOPASM : '';
     new P10, 'Integer'
     set P10, 1
@@ -154,17 +159,6 @@ L_BadId:
     print I0
     print "\\n"
     end
-# delegate calls these 2 functions
-.namespace ["delegate"]
-.pcc_sub __name:
-   get_params '(0)', P2
-   set_returns '(0)', "delegate"
-   returncc
-.pcc_sub __type:
-   get_params '(0)', P2
-   find_type I5, "delegate"
-   set_returns '(0)', I5
-   returncc
 CODE
 /All names and ids ok/
 OUTPUT

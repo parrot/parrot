@@ -343,19 +343,21 @@ my $queue_test = <<'CODE';
 
 .sub __onload
     .local pmc class
-    $I0 = find_type 'STMQueue'
-    if $I0 goto done
+    $P0 = get_class 'STMQueue'
+    unless null $P0 goto done
+
     class = newclass 'STMQueue'
     addattribute class, 'head'
     addattribute class, 'tail'
     addattribute class, 'used'
     addattribute class, 'array'
+    addattribute class, 'length'
+  done:
     .return()
-done:
 .end
 
 .sub init_pmc :vtable :method
-    .param int length
+    .param pmc args
 
     .local pmc tmpint
     .local pmc stmv
@@ -368,6 +370,11 @@ done:
     setattribute self, 'used', stmv
     stmv = new 'STMVar', tmpint
     setattribute self, 'tail', stmv
+
+    # Length is set during initialization
+    .local int length
+    $P0 = getattribute self, 'length'
+    length = $P0
 
     # create array
     .local pmc array
@@ -551,10 +558,8 @@ not_okay:
 
     addThread = new 'ParrotThread'
     removeThread = new 'ParrotThread'
-    $I0 = find_type 'STMQueue'
-    $P0 = new 'Integer'
-    $P0 = SIZE
-    queue = new $I0, $P0
+    $P0 = get_class 'STMQueue'
+    queue = $P0.'new'('length' => SIZE)
 
     # addThreadId = addThread
     # removeThreadId = removeThread
@@ -599,10 +604,8 @@ fail:
     $P0 = get_hll_global ['STMQueue'], '__onload'
     $P0()
 
-    $I0 = find_type 'STMQueue'
-    $P0 = new 'Integer'
-    $P0 = SIZE
-    queue = new $I0, $P0
+    $P0 = get_class 'STMQueue'
+    queue = $P0.'new'('length' => SIZE)
 
     $P0 = get_hll_global ['STM'], 'transaction'
     $P1 = global '_test'

@@ -433,7 +433,7 @@ with appropriate prototypes.
 In C code, the first parameter to any vtable routine is the current
 interpreter. The second parameter is the PMC itself.
 
-The following list details each of the vtable methods, their prototypes, and
+The following list details each of the vtable functions, their prototypes, and
 their behavior.
 
 =head3 Core Vtable Functions

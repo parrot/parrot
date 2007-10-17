@@ -34,21 +34,18 @@ Creates the 3 Stream objects and dumps the combined stream.
     load_bytecode "library/Stream/Sub.pir"
 
     # create the counter stream
-    find_type $I0, "Stream::Sub"
-    new counter, $I0
+    counter = new "Stream::Sub"
     .const .Sub temp = "_counter"
     assign counter, temp
     
     # create the text stream
-    find_type $I0, "Stream::Sub"
-    new text, $I0
+    text = new "Stream::Sub"
     # set its source
     .const .Sub temp = "_text"
     assign text, temp
 
     # create a combiner stream
-    find_type $I0, "Stream::Combiner"
-    new combined, $I0
+    combined = new "Stream::Combiner"
     # add the streams
     assign combined, counter
     assign combined, text

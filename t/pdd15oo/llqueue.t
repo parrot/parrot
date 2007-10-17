@@ -155,7 +155,7 @@ __DATA__
 
 .sub __onload :load
     .local pmc class
-    class = newpdd15class 'STMLLQueue::Node'
+    class = newclass 'STMLLQueue::Node'
     addattribute class, 'value'
     addattribute class, 'prev'
     addattribute class, 'next'
@@ -226,7 +226,7 @@ __DATA__
 .sub __onload :load
     .local pmc class
     load_bytecode 'STM.pbc'
-    class = newpdd15class 'STMLLQueue'
+    class = newclass 'STMLLQueue'
     addattribute class, 'head'
     addattribute class, 'tail'
 .end

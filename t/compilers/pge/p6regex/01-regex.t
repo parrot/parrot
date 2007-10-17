@@ -17,7 +17,7 @@ columns (separated by one *or more* tabs):
 
 =item pattern
 
-The Perl6 regex to test.
+The Perl 6 regex to test.
 
 =item target
 
@@ -119,7 +119,7 @@ Description of the test.
 
     # how many tests to run?
     # XXX: this should be summed automatically from test_files data
-    #      until then, it's set to no plan
+    #      until then, it's set to 542 manually...
     test.'plan'(TESTS)
 
 

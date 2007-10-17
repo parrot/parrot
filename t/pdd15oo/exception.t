@@ -548,7 +548,7 @@ catch:
 .namespace ['Foo']
 
 .sub load
-    $P0 = newpdd15class 'Foo'
+    $P0 = newclass 'Foo'
 .end
 
 .sub get_string :vtable :method

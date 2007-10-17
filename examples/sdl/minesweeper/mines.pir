@@ -46,8 +46,7 @@ The main function.
     $P0["flags"]  =   5
 
     # create the SDL object
-    find_type $I0, "SDL::App"
-    $P0 = new $I0, $P0
+    $P0 = new "SDL::App", $P0
     screen = $P0."surface"()
     
     # choose a "random" field
@@ -64,17 +63,14 @@ The main function.
     $P0['debug']  = debug
     
     # create the field
-    $I0 = find_type "Mines::Field"
-    field = new $I0, $P0
+    field = new "Mines::Field", $P0
 
     # draw the field
     field.'draw'()
             
     # runloop
-    find_type $I0, "SDL::Event"
-    $P0 = new $I0
-    find_type $I0, "Mines::EventHandler"
-    $P1 = new $I0
+    $P0 = new "SDL::Event"
+    $P1 = new "Mines::EventHandler"
     $P0."process_events"( 0.1, $P1, field )
 
     end

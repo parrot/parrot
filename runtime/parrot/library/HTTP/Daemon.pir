@@ -11,8 +11,7 @@ HTTP;Daemon - A Simple HTTPD Server
   opts = new 'Hash'
   opts['LocalPort'] = 1234
   opts['LocalAddr'] = 'localhost'
-  clid = find_type ['HTTP'; 'Daemon']
-  d = new clid, opts
+  d = new ['HTTP';'Daemon'], opts
   unless d goto err
   d.'run'()
 
@@ -394,8 +393,7 @@ Return true, if the given connection is already active.
     .param pmc sock
     .local pmc active, conn
     active = getattribute self, 'active'
-    $I0 = find_type ['HTTP'; 'Daemon'; 'ClientConn']
-    conn = new $I0, sock
+    conn = new ['HTTP'; 'Daemon'; 'ClientConn'], sock
     conn.'server'(self)
     push active, conn
     self.'debug'("new conn\n")
@@ -584,8 +582,7 @@ supported.
     srv = self.'server'()
     srv.'debug'("reading from work\n")
     req_str = self.'_read'()
-    $I0 = find_type ['HTTP'; 'Request']
-    req = new $I0
+    req = new ['HTTP'; 'Request']
     req.'parse'(req_str)
     .return (req)
 .end
@@ -684,8 +681,7 @@ SERVE_GET:
 
     srv.'debug'("req url: ", url, "\n")
 
-    $I0 = find_type ['HTTP'; 'Response']
-    resp = new $I0
+    resp = new ['HTTP'; 'Response']
 
     opts = srv.'opts'()
     $I0 = opts['parrot-docs']

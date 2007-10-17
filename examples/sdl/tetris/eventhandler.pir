@@ -7,8 +7,8 @@ eventhandler.pir - a tetris event handler class
 .namespace ["Tetris::EventHandler"]
 
 .sub __onload :load
-    find_type $I0, "Tetris::EventHandler"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::EventHandler"
+    unless null $P0 goto END
     load_bytecode "library/SDL/EventHandler.pir"
     
     getclass $P0, "SDL::EventHandler"

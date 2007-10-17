@@ -237,7 +237,7 @@ CODE
 0 0
 1 1
 1 1
-0 1
+0 0
 0 1
 0 0
 0 0
@@ -275,7 +275,7 @@ CODE
 /get_number\(\) not implemented in class 'Capture'/
 OUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', '*_keyed_int delegation', todo => "Fix objects vs. vtables" );
+pir_output_is( <<'CODE', <<'OUTPUT', '*_keyed_int delegation' );
 .sub main :main
     $P99 = subclass 'Capture', 'Match'
     $P1 = new 'Match'

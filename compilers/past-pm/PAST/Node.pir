@@ -124,8 +124,7 @@ Create and returns a clone of a PAST node.
 .sub 'clone' :vtable :method
     .local pmc res
     $S0 = classname self
-    $I0 = find_type $S0
-    res = new $I0
+    res = new $S0
     .local pmc iter
     iter = self.'iterator'()
   iter_child_loop:

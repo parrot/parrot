@@ -3,14 +3,11 @@
 .sub _main :main
 	load_bytecode 'library/Test/Builder/Tester.pir'
 
-	.local int tb_type
-	find_type tb_type, 'Test::Builder'
-
 	.local pmc tb_args
 	tb_args = new 'Hash'
 
 	.local pmc test
-	test = new tb_type, tb_args
+	test = new 'Test::Builder', tb_args
 
 	.local pmc plan
 	.local pmc test_pass

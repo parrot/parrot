@@ -26,12 +26,6 @@ C<Continuation> PMCs.
 =cut
 
 my $temp       = "temp.pasm";
-my $load_types = <<'END_PASM';
-    loadlib P20, 'perl_group'
-    find_type I24, 'Integer'
-    find_type I25, 'Float'
-    find_type I28, 'Undef'
-END_PASM
 
 END {
     unlink( $temp, 'temp.pbc', 'temp.pasm' );
@@ -923,7 +917,7 @@ OUTPUT
     #                running emts 'main'
 
     my $code = <<'CODE';
-.sub optc :immediate, :postcomp
+.sub optc :immediate :postcomp
     print "initial\n"
 .end
 .sub _main :main
@@ -1027,7 +1021,7 @@ main 3
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
-.sub make_pi :immediate, :anon
+.sub make_pi :immediate :anon
     $N0 = atan 1.0, 1.0
     $N0 *= 4
     $P0 = new 'Float'
@@ -1045,9 +1039,9 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );
-.sub make_obj :immediate, :anon
+.sub make_obj :immediate :anon
     .local pmc cl, o
-    cl = newpdd15class "Foo"
+    cl = newclass "Foo"
     addattribute cl, 'x'
     o = new 'Foo'
     $P0 = new 'String'
@@ -1123,9 +1117,9 @@ pir_output_like(
     _f1()
 .end
 .sub _f1
-$load_types
+    loadlib P20, 'perl_group'
 
-    P0 = new I28
+    P0 = new 'Undef'
     print P0
 .end
 CODE
@@ -1134,10 +1128,10 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
 .sub 'test' :main
-$load_types
+    loadlib P20, 'perl_group'
 .include "warnings.pasm"
     _f1()
-    P0 = new I28
+    P0 = new 'Undef'
     print P0
     print "ok\\n"
 .end
@@ -1151,19 +1145,19 @@ OUTPUT
 pir_output_like(
     <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo => "XXX core undef doesn't warn here. Should it?" );
 .sub 'test' :main
-$load_types
+    loadlib P20, 'perl_group'
 .include "warnings.pasm"
     _f1()
-    P0 = new I28
+    P0 = new 'Undef'
     print "back\\n"
     print P0
     print "ok\\n"
 .end
 .sub _f1
-$load_types
+    loadlib P20, 'perl_group'
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
-    P0 = new I28
+    P0 = new 'Undef'
     print P0
 .end
 .sub _f2
@@ -1376,7 +1370,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_namespace()' );
 .end
 CODE
 parrot
-Foo;Bar
+parrot;Foo;Bar
 OUTPUT
 
 # Local Variables:

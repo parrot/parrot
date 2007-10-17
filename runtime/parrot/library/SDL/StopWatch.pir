@@ -8,8 +8,7 @@ SDL::StopWatch - A stopwatch using SDL::LCD
 =head1 SYNOPSIS
 
     # create the stopwatch
-    $I0 = find_type 'SDL::StopWatch'
-    watch = new $I0, screen
+    watch = new 'SDL::StopWatch', screen
 
     # set its position
     watch.'xpos'( 5 )
@@ -37,16 +36,19 @@ An SDL::StopWatch object has the following methods:
 .namespace ['SDL::StopWatch']
 
 .sub __onload :load
-    $I0 = find_type 'SDL::StopWatch'
-    if $I0 > 1 goto END
+    .local pmc class
+    class = get_class 'SDL::StopWatch'
+    if_null class, create_class
+    .return()
 
+  create_class:
     load_bytecode "library/SDL/LCD.pir"
-    $P0 = getclass 'SDL::LCD'
-    $P0 = subclass $P0, 'SDL::StopWatch'
-    addattribute $P0, "time"
-    addattribute $P0, "precision"
-    addattribute $P0, "start"
-    addattribute $P0, "screen"
+    class = getclass 'SDL::LCD'
+    class = subclass class, 'SDL::StopWatch'
+    addattribute $P0, 'time'
+    addattribute $P0, 'precision'
+    addattribute $P0, 'start'
+    addattribute $P0, 'screen'
 END:
 .end
 
@@ -348,7 +350,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

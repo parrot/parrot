@@ -26,9 +26,8 @@ use Test::More;
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaClosure'
     .local int bool1
     bool1 = isa pmc1, 'scalar'
     print bool1
@@ -54,9 +53,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaClosure'
     .local int bool1
     bool1 = does pmc1, 'scalar'
     print bool1
@@ -78,9 +76,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaClosure'
     .local string str1
     str1 = classname pmc1
     print str1
@@ -102,9 +99,8 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaClosure'
     print pmc1
     print "\n"
     end
@@ -116,9 +112,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaClosure'
     .local int bool1
     bool1 = istrue pmc1
     print bool1
@@ -142,12 +137,10 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib P1, 'lua_group'
-    find_type $I0, 'LuaClosure'
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, 'LuaBoolean'
+    pmc1 = new 'LuaClosure'
     .local pmc pmc2
-    pmc2 = new $I0
+    pmc2 = new 'LuaBoolean'
     pmc2 = not pmc1
     print pmc2
     print "\n"

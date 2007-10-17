@@ -680,14 +680,14 @@ sub _generate_test_functions {
     my $parrot         = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 
     my %parrot_test_map = map {
-        $_ . '_output_is'               => 'is_eq',
-            $_ . '_error_output_is'     => 'is_eq',
-            $_ . '_output_isnt'         => 'isnt_eq',
-            $_ . '_error_output_isnt'   => 'isnt_eq',
-            $_ . '_output_like'         => 'like',
-            $_ . '_error_output_like'   => 'like',
-            $_ . '_output_unlike'       => 'unlike',
-            $_ . '_error_output_unlike' => 'unlike',
+        $_ . '_output_is'           => 'is_eq',
+        $_ . '_error_output_is'     => 'is_eq',
+        $_ . '_output_isnt'         => 'isnt_eq',
+        $_ . '_error_output_isnt'   => 'isnt_eq',
+        $_ . '_output_like'         => 'like',
+        $_ . '_error_output_like'   => 'like',
+        $_ . '_output_unlike'       => 'unlike',
+        $_ . '_error_output_unlike' => 'unlike',
     } qw( pasm pbc pir );
     for my $func ( keys %parrot_test_map ) {
         push @EXPORT, $func;

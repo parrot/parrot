@@ -106,8 +106,7 @@ METHOD_END:
     # Get signature.
     sig_pos = meth.get_signature()
     sig_data = assembly.get_blob(sig_pos)
-    sig_type = find_type "DotNetSignature"
-    signature = new sig_type
+    signature = new "DotNetSignature"
     signature = sig_data
 
     # Get flags.
@@ -265,8 +264,7 @@ NOT_VARARG:
     sig_pos = bc.get_locals_sig()
     if sig_pos == 0 goto EXIT
     sig_data = assembly.get_blob(sig_pos)
-    sig_type = find_type "DotNetSignature"
-    signature = new sig_type
+    signature = new "DotNetSignature"
     signature = sig_data
 
     # Ensure it's a local sig. XXX Right thing to do when it's not?

@@ -27,12 +27,12 @@ TDB
     .local pmc base
     .local pmc io
 
-    find_type i, "Stream::ParrotIO"
-    if i > 1 goto END
+    $P0 = get_class 'Stream::ParrotIO'
+    unless null $P0 goto END
 
     load_bytecode "library/Stream/Base.pir"
 
-    getclass base, "Stream::Base"
+    get_class base, "Stream::Base"
     subclass io, base, "Stream::ParrotIO"
 
     addattribute io, "blocksize"
@@ -73,15 +73,14 @@ Sets or returns the current block size.
     .local pmc temp
     .local int ret
 
-    classoffset $I0, self, "Stream::ParrotIO"
     unless has_bs goto GET
 
     temp = new 'Integer'
     temp = bs
-    setattribute self, $I0, temp
+    setattribute self, 'blocksize', temp
     branch RET
 GET:
-    getattribute temp, self, $I0
+    getattribute temp, self, 'blocksize'
 RET:
     ret = temp
 

@@ -17,8 +17,7 @@ Creates a counter stream and dumps it.
 
     load_bytecode "library/Stream/Sub.pir"
     
-    find_type $I0, "Stream::Sub"
-    new stream, $I0
+    stream = new "Stream::Sub"
 
     # set the stream's source sub
     .const .Sub temp = "_counter"
@@ -55,8 +54,7 @@ LOOP:
     if i != 4 goto SKIP
     .local pmc temp
     
-    find_type $I0, "Stream::Sub"
-    new temp, $I0
+    temp = new "Stream::Sub"
 
     .const .Sub func = "_included"
     assign temp, func
@@ -85,8 +83,7 @@ writes "world".
     self."write"( "hello" )
 
     # create another stream
-    find_type $I0, "Stream::Sub"
-    new temp, $I0
+    temp = new "Stream::Sub"
     .const .Sub func = "_counter2"
     assign temp, func
     

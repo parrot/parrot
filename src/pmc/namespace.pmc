@@ -182,6 +182,7 @@ really a public API.
             Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
             PMC           *vtable    = nsinfo->vtable;
             Parrot_sub    *sub       = PMC_sub(value);
+            PMC * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Handle vtable methods with two underscores at the start. */
             if (sub->vtable_index == -1) {
@@ -195,30 +196,95 @@ really a public API.
             }
 
             if (sub->vtable_index != -1) {
-                /* If we don't have a place to hang vtable methods, make one. */
-                if (PMC_IS_NULL(vtable))
-                    nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
+                /* Insert it in class, if there is a class */
+                if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+                    VTABLE_add_vtable_override(interp, classobj, key, value);
 
-                /* Insert it. */
-                VTABLE_set_pmc_keyed_int(INTERP, vtable,
-                    sub->vtable_index, value);
+                /* Otherwise, store it in the namespace for the class to
+                 * retrieve later */
+                else {
+                    /* If we don't have a place to hang vtable methods, make one. */
+                    if (PMC_IS_NULL(vtable))
+                        nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
+
+                    /* Insert it. */
+                    VTABLE_set_pmc_keyed_int(INTERP, vtable,
+                        sub->vtable_index, value);
+                }
             }
 
             if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
+                /* Insert it in class, if there is a class */
+                if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+                    VTABLE_add_method(interp, classobj, key, value);
+
+                /* Otherwise, store it in the namespace for the class to
+                 * retrieve later */
+                else {
+                    /* If we don't have a place to hang methods, make one. */
+                    if (PMC_IS_NULL(nsinfo->methods))
+                        nsinfo->methods = pmc_new(interp, enum_class_Hash);
+
+                    /* Insert it. */
+                    VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
+                }
+            }
+
+            /* If it's anonymous, we're done. */
+            if (PObj_get_FLAGS(value) & SUB_FLAG_PF_ANON)
+                return;
+        }
+
+        /* If it's an NCI method */
+        if (value->vtable->base_type == enum_class_NCI) {
+            Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+            PMC * const classobj = VTABLE_get_class(interp, SELF);
+
+            /* Insert it in class, if there is a class */
+            if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+                VTABLE_add_method(interp, classobj, key, value);
+
+            /* Otherwise, store it in the namespace for the class to
+             * retrieve later */
+            else {
                 /* If we don't have a place to hang methods, make one. */
                 if (PMC_IS_NULL(nsinfo->methods))
                     nsinfo->methods = pmc_new(interp, enum_class_Hash);
 
                 /* Insert it. */
                 VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
-
-                /* insert it in the parent temporarily until PDD 15 lands */
-                SUPER(key, value);
             }
+        }
 
-            /* If it's anonymous, we're done. */
-            if (PObj_get_FLAGS(value) & SUB_FLAG_PF_ANON)
-                return;
+        /* If it's a multi-sub... */
+        if (value->vtable->base_type == enum_class_MultiSub) {
+
+            if (VTABLE_elements(interp, value) > 0) {
+                Parrot_NSInfo *nsinfo    = PARROT_NSINFO(SELF);
+                PMC * const classobj = VTABLE_get_class(interp, SELF);
+
+                /* Extract the first alternate and check if it is a method */
+                Parrot_sub *sub = PMC_sub(VTABLE_get_pmc_keyed_int(interp, value, 0));
+
+                if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
+                    /* Insert it in class, if there is a class */
+                    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+                        VTABLE_add_method(interp, classobj, key, value);
+
+                    /* Otherwise, store it in the namespace for the class to
+                     * retrieve later */
+                    else {
+                        /* If we don't have a place to hang methods, make one. */
+                        if (PMC_IS_NULL(nsinfo->methods))
+                            nsinfo->methods = pmc_new(interp, enum_class_Hash);
+
+                        /* Insert it. */
+                        VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
+                    }
+
+                    SUPER(key, value);
+                }
+            }
         }
 
         if (!b)
@@ -288,6 +354,21 @@ really a public API.
                 key  = key_next(INTERP, key);
 
                 if (!key) {
+                    Parrot_set_global(INTERP, ns, part, value);
+                    return;
+                }
+
+                ns = Parrot_make_namespace_keyed_str(INTERP, ns, part);
+            }
+        }
+
+        if (key->vtable->base_type == enum_class_ResizableStringArray) {
+            INTVAL elements = VTABLE_elements(interp, key);
+            INTVAL i;
+            for (i = 0; i < elements; ++i)  {
+                part = VTABLE_get_string_keyed_int(interp, key, i);
+
+                if ((i + 1) >= elements) { /* Last entry in the array */
                     Parrot_set_global(INTERP, ns, part, value);
                     return;
                 }
@@ -403,6 +484,23 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                     return PMCNULL;
             }
 
+            return ns;
+        }
+
+        if (key->vtable->base_type == enum_class_ResizableStringArray) {
+            INTVAL elements = VTABLE_elements(interp, key);
+            INTVAL i;
+            for (i = 0; i < elements; ++i)  {
+                part = VTABLE_get_string_keyed_int(interp, key, i);
+
+                if ((i + 1) >= elements) /* Last entry in the array */
+                    return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+
+                ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+
+                if (PMC_IS_NULL(ns))
+                    return PMCNULL;
+            }
             return ns;
         }
 

@@ -7,8 +7,8 @@ blocks.pir - tetris block classes
 .namespace ["Tetris::Blocks"]
 
 .sub __onload :load
-    find_type $I0, "Tetris::Block::1"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::Block::1"
+    unless null $P0 goto END
 
     load_bytecode "examples/sdl/tetris/block.pir"
 
@@ -43,20 +43,20 @@ blocks.pir - tetris block classes
 
     blocks = new IntList
 
-    find_type $I0, "Tetris::Block::0"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::1"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::2"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::3"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::4"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::5"
-    push blocks, $I0
-    find_type $I0, "Tetris::Block::6"
-    push blocks, $I0
+    $P0 = get_class "Tetris::Block::0"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::1"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::2"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::3"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::4"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::5"
+    push blocks, $P0
+    $P0 = get_class "Tetris::Block::6"
+    push blocks, $P0
 
     store_global "Tetris::Block", "blocks", blocks
 END:

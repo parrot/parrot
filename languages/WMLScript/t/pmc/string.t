@@ -25,9 +25,8 @@ use Test::More;
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     .local int bool1
     bool1 = isa pmc1, "String"
     print bool1
@@ -45,9 +44,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     .local int bool1
     bool1 = does pmc1, "scalar"
     print bool1
@@ -69,9 +67,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     .local string str1
     str1 = classname pmc1
     print str1
@@ -89,9 +86,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check clone' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     pmc1 = "str"
     .local pmc pmc2
     pmc2 = clone pmc1
@@ -118,9 +114,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     pmc1 = "str"
     .local int bool1
     bool1 = istrue pmc1
@@ -140,9 +135,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check embedded zero' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsString"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsString"
     pmc1 = "embe\0_dd\0_ed\0"
     .local int len1
     len1 = elements pmc1

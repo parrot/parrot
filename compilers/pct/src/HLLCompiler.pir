@@ -630,8 +630,7 @@ resulting ost.
     .local pmc ostgrammar, ostbuilder
     ostgrammar_name = self.'ostgrammar'()
     unless ostgrammar_name goto default_ostgrammar
-    $I0 = find_type ostgrammar_name
-    ostgrammar = new $I0
+    ostgrammar = new ostgrammar_name
     ostbuilder = ostgrammar.'apply'(source)
     .return ostbuilder.'get'('post')
 

@@ -81,6 +81,13 @@ applies to a child of the current node (generally inherited attributes).
 .namespace [ 'TGE' ]
 
 .sub '__onload' :load
+    # make sure we execute this sub only once
+    $P0 = get_global '$!tge_loaded'
+    unless null $P0 goto end
+    $P0 = new 'Integer'
+    assign $P0, 1
+    set_global '$!tge_loaded', $P0
+
     # use other modules
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
@@ -90,14 +97,14 @@ applies to a child of the current node (generally inherited attributes).
     load_bytecode 'compilers/tge/TGE/Grammar.pbc'
     load_bytecode 'compilers/tge/TGE/Compiler.pbc'
 
-    # import <die> rule from PGE::Util
-    $P0 = get_hll_global ['PGE::Util'], 'die'
-    set_hll_global ['TGE::Parser'], 'die', $P0
+    # import <die> and <line_number> rules from PGE::Util
+    $P0 = get_class ['TGE::Parser']
+    $P1 = get_hll_global ['PGE::Util'], 'die'
+    $P0.'add_method'('die', $P1)
+    $P1 = get_hll_global ['PGE::Util'], 'line_number'
+    $P0.'add_method'('line_number', $P1)
 
-    # import <line_number> method from PGE::Util
-    $P0 = get_hll_global ['PGE::Util'], 'line_number'
-    set_hll_global ['TGE::Parser'], 'line_number', $P0
-
+  end:
     .return ()
 .end
 

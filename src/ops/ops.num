@@ -1237,3 +1237,15 @@ find_global_p_p_sc             1206
 find_global_p_pc_sc            1207
 find_name_p_s                  1208
 find_name_p_sc                 1209
+getattribute_p_p_p_s           1210
+getattribute_p_p_p_sc          1211
+getattribute_p_p_pc_s          1212
+getattribute_p_p_pc_sc         1213
+setattribute_p_p_s_p           1214
+setattribute_p_p_sc_p          1215
+setattribute_p_pc_s_p          1216
+setattribute_p_pc_sc_p         1217
+typeof_p_p                     1218
+new_p_p                        1219
+new_p_p_p                      1220
+new_p_p_pc                     1221

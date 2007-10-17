@@ -27,8 +27,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
 
 .sub main :main
     loadlib P1, "rational"
-    find_type $I0, "Rational"
-    new $P1, $I0
+    $P1 = new "Rational"
 
     $I1 = $P1
     print $I1
@@ -46,8 +45,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" 
     loadlib P1, $S0
 
     ## ensure that we can still make Rational instances.
-    find_type $I0, "Rational"
-    new $P1, $I0
+    $P1 = new "Rational"
     $I1 = $P1
     print $I1
     print "\n"
@@ -71,8 +69,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     loadlib P1, $S0
 
     ## ensure that we can still make Rational instances.
-    find_type $I0, "Rational"
-    new $P1, $I0
+    $P1 = new "Rational"
     $I1 = $P1
     print $I1
     print "\n"
@@ -94,8 +91,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
     loadlib P1, $S0
 
     ## ensure that we can still make Rational instances.
-    find_type $I0, "Rational"
-    new $P1, $I0
+    $P1 = new "Rational"
     $I1 = $P1
     print $I1
     print "\n"
@@ -121,8 +117,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
     loadlib P1, $S0
 
     ## ensure that we can still make Rational instances.
-    find_type $I0, "Rational"
-    new $P1, $I0
+    $P1 = new "Rational"
     $I1 = $P1
     print $I1
     print "\n"

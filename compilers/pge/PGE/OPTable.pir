@@ -34,8 +34,7 @@ PGE::OPTable - PGE operator precedence table and parser
 .sub '__onload' :load
     .local pmc base
     .local pmc sctable
-    $P0 = getclass 'Hash'
-    base = subclass $P0, 'PGE::OPTable'
+    base = subclass 'Hash', 'PGE::OPTable'
     addattribute base, '%!key'
     addattribute base, '%!klen'
     addattribute base, '&!ws'
@@ -77,8 +76,8 @@ Adds (or replaces) a syntactic category's defaults.
     tokentable = self
     keytable = new 'Hash'
     klentable = new 'Hash'
-    setattribute self, "PGE::OPTable\x0%!key", keytable
-    setattribute self, "PGE::OPTable\x0%!klen", klentable
+    setattribute self, '%!key', keytable
+    setattribute self, '%!klen', klentable
 .end
 
 
@@ -173,8 +172,8 @@ Adds (or replaces) a syntactic category's defaults.
 
   add_key:
     .local pmc keytable, klentable
-    keytable = getattribute self, "PGE::OPTable\x0%!key"
-    klentable = getattribute self, "PGE::OPTable\x0%!klen"
+    keytable = getattribute self, '%!key'
+    klentable = getattribute self, '%!klen'
     $I1 = length key
     $S0 = substr key, 0, 1
     $I0 = klentable[$S0]
@@ -226,8 +225,8 @@ Adds (or replaces) a syntactic category's defaults.
     .local int circumnest
 
     tokentable = self
-    keytable = getattribute self, "PGE::OPTable\x0%!key"
-    klentable = getattribute self, "PGE::OPTable\x0%!klen"
+    keytable = getattribute self, '%!key'
+    klentable = getattribute self, '%!klen'
 
     unless null adverbs goto with_adverbs
     adverbs = new 'Hash'
@@ -279,7 +278,7 @@ Adds (or replaces) a syntactic category's defaults.
     tighter = token['precedence']
   with_tighter:
 
-    ws = getattribute self, "PGE::OPTable\x0&!ws"
+    ws = getattribute self, '&!ws'
     tokenstack = new 'ResizablePMCArray'
     operstack = new 'ResizablePMCArray'
     termstack = new 'ResizablePMCArray'

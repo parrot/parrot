@@ -31,9 +31,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .end
 .sub '_main'
     .const .Sub F1 = 'f1'
-    find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1
+    pmc1 = new 'LuaThread', F1
     .local int bool1
     bool1 = isa pmc1, 'scalar'
     print bool1
@@ -64,9 +63,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .end
 .sub '_main'
     .const .Sub F1 = 'f1'
-    find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1
+    pmc1 = new 'LuaThread', F1
     .local string str1
     str1 = classname pmc1
     print str1
@@ -93,9 +91,8 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .end
 .sub '_main'
     .const .Sub F1 = 'f1'
-    find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1
+    pmc1 = new 'LuaThread', F1
     print pmc1
     print "\n"
     end
@@ -116,9 +113,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .end
 .sub '_main'
     .const .Sub F1 = 'f1'
-    find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1
+    pmc1 = new 'LuaThread', F1
     .local int bool1
     bool1 = istrue pmc1
     print bool1
@@ -143,9 +139,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .end
 .sub '_main'
     .const .Sub F1 = 'f1'
-    find_type $I0, 'LuaThread'
     .local pmc pmc1
-    pmc1 = new $I0, F1
+    pmc1 = new 'LuaThread', F1
     .local pmc pmc2
     pmc2 = new 'LuaBoolean'
     pmc2 = not pmc1

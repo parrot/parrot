@@ -5,9 +5,8 @@
 .include 'languages/cardinal/src/OSTGrammar.pir'
 
 .sub '__onload' :load
-    $I0 = find_type 'Cardinal::OSTGrammar'
-    if $I0 == 0 goto error
-    $P0 = getclass 'Cardinal::OSTGrammar'
+    $P0 = get_class 'Cardinal::OSTGrammar'
+    if null $P0 goto error
     addattribute $P0, 'post_scope_stack'
     addattribute $P0, 'past_scope_stack'
     addattribute $P0, 'BEGIN_blocks'

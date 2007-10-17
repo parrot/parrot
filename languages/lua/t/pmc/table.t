@@ -26,9 +26,8 @@ use Test::More;
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaTable'
     .local int bool1
     bool1 = isa pmc1, 'scalar'
     print bool1
@@ -50,9 +49,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaTable'
     .local int bool1
     bool1 = does pmc1, 'scalar'
     print bool1
@@ -70,9 +68,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaTable'
     .local string str1
     str1 = classname pmc1
     print str1
@@ -90,9 +87,8 @@ OUTPUT
 pir_output_like( << 'CODE', << 'OUTPUT', 'check get_string' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaTable'
     print pmc1
     print "\n"
     end
@@ -104,9 +100,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new 'LuaTable'
     .local int bool1
     bool1 = istrue pmc1
     print bool1
@@ -124,12 +119,10 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, 'LuaBoolean'
+    pmc1 = new 'LuaTable'
     .local pmc pmc2
-    pmc2 = new $I0
+    pmc2 = new 'LuaBoolean'
     pmc2 = not pmc1
     print pmc2
     print "\n"
@@ -147,12 +140,10 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check key PMC' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, 'LuaString'
+    pmc1 = new 'LuaTable'
     .local pmc val1
-    val1 = new $I0
+    val1 = new 'LuaString'
     val1 = "value1"
     .local pmc val2
     val2 = new $I0
@@ -180,16 +171,13 @@ OUTPUT
 pir_error_output_like( << 'CODE', << 'OUTPUT', 'check key nil' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, 'LuaString'
+    pmc1 = new 'LuaTable'
     .local pmc val1
-    val1 = new $I0
+    val1 = new 'LuaString'
     val1 = "value1"
-    find_type $I0, 'LuaNil'
     .local pmc nil
-    nil = new $I0
+    nil = new 'LuaNil'
     pmc1[nil] = val1
     end
 .end
@@ -200,12 +188,10 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
 .sub _main
     loadlib $P0, 'lua_group'
-    find_type $I0, 'LuaTable'
     .local pmc pmc1
-    pmc1 = new $I0
-    find_type $I0, 'LuaString'
+    pmc1 = new 'LuaTable'
     .local pmc val1
-    val1 = new $I0
+    val1 = new 'LuaString'
     val1 = "value1"
     .local pmc val2
     val2 = new $I0
@@ -222,9 +208,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check deletion by assignment of nil' );
     nb1 = elements pmc1
     print nb1
     print "\n"
-    find_type $I0, 'LuaNil'
     .local pmc nil
-    nil = new $I0
+    nil = new 'LuaNil'
     pmc1[val1] = nil
     nb1 = elements pmc1
     print nb1

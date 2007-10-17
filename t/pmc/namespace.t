@@ -1323,7 +1323,7 @@ parrot
 parrot
 OUTPUT
 
-pir_output_like( <<'CODE', <<'OUTPUT', 'add_sub() with error' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'add_sub() with error', todo => 'needs full implementation of PDD 17' );
 .sub main :main
     .local pmc s_child
     s_child = subclass 'Sub', 'SubChild'

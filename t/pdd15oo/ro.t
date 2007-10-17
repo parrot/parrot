@@ -237,7 +237,7 @@ pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Objects" );
     $P0 = new 'Integer'
     $P0 = 1
 
-    fooclass = newpdd15class 'Foo'
+    fooclass = newclass 'Foo'
     addattribute fooclass, 'bar'
     foo = new 'Foo'
     setattribute foo, 'bar', $P0

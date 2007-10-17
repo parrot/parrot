@@ -39,14 +39,12 @@ The main function.
     $P0["flags"]  =  5
 
     # create the SDL application object
-    $I0 = find_type "SDL::App"
-    $P0 = new $I0, $P0
+    $P0 = new 'SDL::App', $P0
     $P0 = $P0."surface"()
     global "screen" = $P0
 
     # create the LCD
-    $I0 = find_type "SDL::LCD"
-    $P0 = new $I0
+    $P0 = new 'SDL::LCD'
     global "LCD" = $P0
 
     # draw the watch
@@ -69,10 +67,8 @@ The main function.
     .local pmc eh
     .local pmc loop
 
-    find_type $I0, "SDL::EventHandler"
-    eh = new $I0
-    find_type $I0, "SDL::Event"
-    loop = new $I0
+    eh = new "SDL::EventHandler"
+    loop = new "SDL::Event"
     loop."process_events"( 0.1, eh )
 .end
 

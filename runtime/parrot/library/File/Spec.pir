@@ -9,8 +9,7 @@ File::Spec - portably perform operations on file names
 
     load_bytecode 'File/Spec.pir'
 
-    find_type classtype, 'File::Spec'
-    new spec, classtype
+    new spec, 'File::Spec'
 
     .local pmc x
     .local String a, b, c

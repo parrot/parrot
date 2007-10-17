@@ -157,7 +157,7 @@ inline op set(out NUM, invar PMC) :base_core {
 }
 
 inline op set(out STR, invar PMC) :base_core {
-  $1 = $2->vtable->get_string(interp, $2);
+  $1 = VTABLE_get_string(interp, $2);
   goto NEXT();
 }
 

@@ -31,13 +31,12 @@
 
     set I10, 0
     set I11, 500000
-    find_type I12, "Foo"
 loop:
-    new P3, I12
+    P3 = new "Foo"
     inc I10
     lt I10, I11, loop
 
-    new P3, I12
+    P3 = new "Foo"
     classoffset I0, P3, "Foo"
     getattribute P2, P3, I0
     print P2

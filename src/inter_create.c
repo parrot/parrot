@@ -418,10 +418,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->initial_pf)
         PackFile_destroy(interp, interp->initial_pf);
 
-    /* free vtables */
-    parrot_free_vtables(interp);
-    mmd_destroy(interp);
-
     if (interp->profile) {
         mem_sys_free(interp->profile->data);
         interp->profile->data = NULL;
@@ -447,6 +443,11 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (!interp->parent_interpreter) {
         if (interp->thread_data)
             mem_sys_free(interp->thread_data);
+
+        /* free vtables */
+        parrot_free_vtables(interp);
+        mmd_destroy(interp);
+
         MUTEX_DESTROY(interpreter_array_mutex);
         mem_sys_free(interp);
         /*

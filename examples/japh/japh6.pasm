@@ -1,4 +1,5 @@
 	newclass P0, "Japh"
+	new P0, "Japh"
 	set I0, 0
 	set S0, P0[I0]
 	print S0
@@ -7,7 +8,7 @@
 	print S0
 	end
 .namespace ["Japh"]
-.pcc_sub __get_string_keyed:
+.pcc_sub :vtable get_string_keyed:
 	get_params "0,0", P1, I1
 	unless I1, x
 	set S1, "Parrot Hacker\n"

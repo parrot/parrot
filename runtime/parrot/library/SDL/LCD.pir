@@ -8,8 +8,7 @@ SDL::LCD - A LCD object
 =head1 SYNOPSIS
 
     # create an LCD
-    $I0 = find_type 'SDL::LCD'
-    lcd = new $I0
+    lcd = new 'SDL::LCD'
 
     # set the LCD position
     lcd."xpos"( 10 )
@@ -40,18 +39,20 @@ An SDL::LCD object has the following methods:
 .namespace ["SDL::LCD"]
 
 .sub __onload :load
-    $I0 = find_type 'SDL::LCD'
-    if $I0 > 1 goto END
-    
+    .local pmc class
+    class = get_class 'SDL::LCD'
+    if_null class, create_class
+    .return()
+
+  create_class:
     load_bytecode "library/SDL/Image.pir"
     load_bytecode "library/SDL/Rect.pir"
 
     $P0 = new 'String'
     $P0 = "runtime/parrot/library/SDL/LCD.png"
-    $I0 = find_type "SDL::Image"
-    $P0 = new $I0, $P0
+    $P0 = new 'SDL::Image', $P0
     store_global "SDL::LCD", "digits", $P0
-    
+
     $P0 = newclass 'SDL::LCD'
     addattribute $P0, "value"
     addattribute $P0, "numdigits"
@@ -141,11 +142,11 @@ Draws the LCD onto the specified screen.
     .local pmc digits
     .local int xpos
     .local int ypos
-    
+
     $I0 = classoffset self, "SDL::LCD"
     $P0 = getattribute self, $I0
     val = $P0
-    
+
     inc $I0
     $P0 = getattribute self, $I0
     len = $P0
@@ -173,32 +174,32 @@ NO_AUTOLEN:
     val = $S0
 LEN_OK:
 
-    rect = new 'Hash'
-    rect["width"] = 10
-    rect["height"] = 21
-    $I0 = find_type "SDL::Rect"
-    rect["x"] = 0
-    rect["y"] = 0
-    drect = new $I0, rect
-    rect["x"] = xpos
-    rect["y"] = ypos
-    rect = new $I0, rect
-    
-    digits = find_global "SDL::LCD", "digits"
-    
+    rect           = new 'Hash'
+    rect['width']  = 10
+    rect['height'] = 21
+    rect['x']      = 0
+    rect['y']      = 0
+
+    drect          = new 'SDL::Rect', rect
+    rect['x']      = xpos
+    rect['y']      = ypos
+    rect           = new 'SDL::Rect', rect
+
+    digits         = find_global 'SDL::LCD', 'digits'
+
     i = 0
 LOOP:
     if i >= len goto END
     $S0 = substr val, i, 1
-    
+
     $I0 = $S0
     if $I0 != 0 goto OK
-    
+
     $I1 = ord $S0
 
     $I0 = 0
     if $I1 == 48 goto OK
-    
+
     $I0 = 10
     if $I1 == 65 goto OK
     if $I1 == 97 goto OK
@@ -241,11 +242,11 @@ OK:
     $I0 = rect.'x'()
     add $I0, 12
     rect.'x'( $I0 )
-    
+
     inc i
     branch LOOP
 END:
-    
+
     $I0 = len * 12
     $I0 -= 2
     rect.'x'( xpos )
@@ -263,7 +264,7 @@ Sets the x position of the LCD.
 
 .sub xpos :method
     .param int val
-    
+
     $I0 = classoffset self, "SDL::LCD"
     add $I0, 2
     $P0 = getattribute self, $I0
@@ -278,7 +279,7 @@ Sets the y position of the LCD.
 
 .sub ypos :method
     .param int val
-    
+
     $I0 = classoffset self, "SDL::LCD"
     add $I0, 3
     $P0 = getattribute self, $I0
@@ -295,7 +296,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

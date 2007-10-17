@@ -344,7 +344,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
     newclass P10, "Foo"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S11, P10
@@ -374,7 +374,7 @@ ok1:
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
     end
@@ -386,14 +386,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
     newclass P10, "Foo"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S11, P10
 
     thaw P4, S11
     print "ok\n"
-    classname S12, P4
+    set S12, P4
     print S12
     print "\n"
     end
@@ -406,7 +406,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     newclass P10, "Foo"
     addattribute P10, ".aa"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S11, P10
@@ -438,19 +438,17 @@ ok1:
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
 
-    find_type I4, S10
-    new P5, I4
+    new P5, S10
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, I5, P6
+    setattribute P5, '.aa', P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, '.aa' 
     print P7
     end
 CODE
@@ -466,7 +464,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
-    classname S10, P10
+    set S10, P10
     print S10
     print "\n"
     freeze S3, P10
@@ -479,25 +477,22 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     print "ok 1\n"
     thaw P4, S3
     print "ok 2\n"
-    classname S10, P4
+    set S10, P4
     print S10
     print "\n"
 
-    find_type I4, S10
-    new P5, I4
+    new P5, S10
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, ["Foo"], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
-    inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".bb"
     print P7
     end
 
@@ -517,8 +512,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
-    find_type I4, "Foo"
-    new P10, I4
+    new P10, "Foo"
     print S10
     freeze S3, P10
     open P3, "temp.fpmc", ">"
@@ -528,23 +522,21 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
 
     thaw P5, S3
     print "ok 2\n"
-    classname S10, P5
+    typeof S10, P5
     print S10
     print "\n"
 
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, ["Foo"], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
-    inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".bb"
     print P7
     end
 CODE
@@ -571,23 +563,21 @@ ok1:
 
     thaw P5, S3
     print "ok 2\n"
-    classname S10, P5
+    typeof S10, P5
     print S10
     print "\n"
 
     print "ok 3\n"
-    classoffset I5, P5, S10
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, ["Foo"], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".aa"
     print P7
-    inc I5
-    getattribute P7, P5, I5
+    getattribute P7, P5, ".bb"
     print P7
     end
 CODE

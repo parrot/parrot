@@ -334,7 +334,7 @@ MMD_Integer: {
 
             if ((c^a) >= 0 || (c^b) >= 0) {
                 if (!dest)
-                    dest = pmc_new(INTERP, SELF->vtable->base_type);
+                    dest = pmc_new(INTERP, VTABLE_type(interp, SELF));
 
                 /* need this for e.g. Undef PMC */
                 VTABLE_set_integer_native(INTERP, dest, c);
@@ -346,9 +346,9 @@ MMD_Integer: {
 MMD_Complex: {
             const INTVAL a = DYNSELF.get_integer();
             if (dest)
-                VTABLE_morph(INTERP, dest, value->vtable->base_type);
+                VTABLE_morph(INTERP, dest, VTABLE_type(interp, value));
             else
-                dest = pmc_new(INTERP, value->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(interp, value));
 
             VTABLE_set_number_native(INTERP, dest,
                     a + VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -362,7 +362,7 @@ MMD_BigInt: {
         }
 MMD_DEFAULT: {
             if (!dest)
-                dest = pmc_new(INTERP, value->vtable->base_type);
+                dest = pmc_new(INTERP, VTABLE_type(interp, value));
 
             VTABLE_set_number_native(INTERP, dest,
                 DYNSELF.get_integer() + VTABLE_get_number(INTERP, value));

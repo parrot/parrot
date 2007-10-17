@@ -313,7 +313,7 @@ ok same
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
-    newpdd15class P10, "Foo"
+    newclass P10, "Foo"
     classname S10, P10
     print S10
     print "\n"
@@ -363,7 +363,7 @@ Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
-    newpdd15class P10, "Foo"
+    newclass P10, "Foo"
     set S10, P10
     print S10
     print "\n"
@@ -382,7 +382,7 @@ Foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
-    newpdd15class P10, "Foo"
+    newclass P10, "Foo"
     addattribute P10, ".aa"
     set S10, P10
     print S10
@@ -439,7 +439,7 @@ ok 5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
-    newpdd15class P10, "Foo"
+    newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
     set S10, P10
@@ -463,10 +463,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     print "ok 3\n"
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, [ "Foo"], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, [ "Foo" ], ".bb", P6
     print "ok 4\n"
     getattribute P7, P5, ".aa"
     print P7
@@ -487,7 +487,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
-    newpdd15class P10, "Foo"
+    newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
     new P10, "Foo"
@@ -506,10 +506,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     print "ok 3\n"
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, [ "Foo" ], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, [ "Foo" ], ".bb", P6
     print "ok 4\n"
     getattribute P7, P5, ".aa"
     print P7
@@ -548,10 +548,10 @@ ok1:
     print "ok 3\n"
     new P6, 'String'
     set P6, "ok 5\n"
-    setattribute P5, "Foo\0.aa", P6
+    setattribute P5, [ "Foo" ], ".aa", P6
     new P6, 'String'
     set P6, "ok 6\n"
-    setattribute P5, "Foo\0.bb", P6
+    setattribute P5, [ "Foo" ], ".bb", P6
     print "ok 4\n"
     getattribute P7, P5, ".aa"
     print P7
@@ -734,7 +734,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
 .sub main :main
     .local pmc cl, o
-    cl = newpdd15class 'Conure'
+    cl = newclass 'Conure'
     addattribute cl, 'temperature'
     o = new 'Conure'
     $S0 = freeze o
@@ -757,7 +757,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
 .sub main :main
     .local pmc cl, o
     #cl = subclass 'Hash', 'OPTable'
-    cl = newpdd15class 'OPTable'
+    cl = newclass 'OPTable'
     addattribute cl, '%!key'
     addattribute cl, '%!klen'
     addattribute cl, '&!ws'

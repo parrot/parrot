@@ -2668,8 +2668,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 
     new P0, 'ResizablePMCArray'
 
-    find_type I0, "Foo"
-    new P1, I0
+    P1 = new "Foo"
 
     push P0, P1
 

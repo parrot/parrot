@@ -11,10 +11,7 @@ SDL::Color - Parrot class representing colors in Parrot SDL
 
     # create a new SDL::Color object
     .local pmc color
-    .local int color_type
-
-    find_type color_type, 'SDL::Color'
-    color = new color_type
+    color = new 'SDL::Color'
 
     # set the color values; this one's blue
     color.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
@@ -95,11 +92,10 @@ is none and 255 is the maximum possible.
     layout = fetch_layout( 'Color' )
 
     .local pmc color
-    color     = new 'ManagedStruct', layout
-
-    set color['r'], red
-    set color['g'], green
-    set color['b'], blue
+    color      = new 'ManagedStruct', layout
+    color['r'] = red
+    color['g'] = green
+    color['b'] = blue
 
     setattribute self, 'color', color
 
@@ -126,7 +122,8 @@ is none and 255 is the maximum possible.
     .local int component
 
     component = color['r']
-    color_int = component << 16
+    component <<= 16
+    color_int = component
 
     component = color['g']
     component <<= 8
@@ -134,7 +131,6 @@ is none and 255 is the maximum possible.
 
     component = color['b']
     color_int += component
-    
     .return( color_int )
 .end
 
@@ -229,7 +225,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

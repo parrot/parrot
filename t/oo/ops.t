@@ -186,7 +186,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'new_p_s works with string register arg' );
 .sub main :main
-#    $P0 = newpdd15class "Foo"
+#    $P0 = newclass "Foo"
     $P0 = newclass "Foo"
     addattribute $P0, 'foo'
 
@@ -208,7 +208,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'can_i_p_s' );
 .sub main :main
-    $P0 = newpdd15class "Foo"
+    $P0 = newclass "Foo"
     $P1 = new $P0
 
     can $I0, $P1, "bar"

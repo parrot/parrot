@@ -37,11 +37,10 @@ for my $a (@streams) {
     load_bytecode "library/Stream/$a.pir"
     print "loaded\\n"
 
-    find_type \$I0, "Stream::$a"
-    \$P0 = new \$I0
+    \$P0 = new "Stream::$a"
 
-    \$S0 = classname \$P0
-    print "classname: '"
+    \$S0 = typeof \$P0
+    print "class name: '"
     print \$S0
     print "'\\ndone\\n"
     end
@@ -49,7 +48,7 @@ for my $a (@streams) {
 CODE
 loading '$a'...
 loaded
-classname: 'Stream::$a'
+class name: 'Stream::$a'
 done
 OUT
 
@@ -65,8 +64,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
 
     load_bytecode "library/Stream/Sub.pir"
 
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    stream = new "Stream::Sub"
 
     # set the stream's source sub   #'
     .const .Sub temp = "_hello"
@@ -113,14 +111,12 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::read_bytes" );
     load_bytecode "library/Stream/Sub.pir"
     load_bytecode "library/Stream/Replay.pir"
 
-    find_type $I0, "Stream::Sub"
-    new $P0, $I0
+    $P0 = new "Stream::Sub"
     # set the stream's source sub      #'
     .const .Sub temp = "_hello"
     assign $P0, temp
 
-    find_type $I0, "Stream::Replay"
-    stream = new $I0
+    stream = new "Stream::Replay"
     assign stream, $P0
 
     $S0 = stream."read_bytes"( 3 )
@@ -129,9 +125,9 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::read_bytes" );
     print "]\n"
 
     stream = clone stream
-    $P0 = clone stream
+    $P0    = clone stream
 
-    $S0 = stream."read_bytes"( 4 )
+    $S0    = stream."read_bytes"( 4 )
     print "2: ["
     print $S0
     print "] = "
@@ -194,21 +190,18 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
     load_bytecode "library/Stream/Sub.pir"
 
     # create the counter stream
-    find_type I0, "Stream::Sub"
-    new counter, I0
+    counter = new "Stream::Sub"
     .const .Sub ct = "_counter"
     assign counter, ct
 
     # create the text stream
-    find_type I0, "Stream::Sub"
-    new text, I0
+    text = new "Stream::Sub"
     # set its source
     .const .Sub src = "_text"
     assign text, src
 
     # create a combiner stream
-    find_type I0, "Stream::Combiner"
-    new combined, I0
+    combined = new "Stream::Combiner"
     # add the streams
     assign combined, counter
     assign combined, text
@@ -282,8 +275,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Coroutine" );
     load_bytecode "library/Stream/Coroutine.pir"
 
     # create the coroutine stream
-    find_type I0, "Stream::Coroutine"
-    new stream, I0
+    stream = new "Stream::Coroutine"
 
     # set the stream's source coroutine #'
     .const .Sub temp = "_coro"
@@ -357,24 +349,20 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     load_bytecode "library/Stream/Combiner.pir"
 
     # create a file stream
-    find_type $I0, "Stream::ParrotIO"
-    new file, $I0
+    file = new "Stream::ParrotIO"
     file."open"( name, "<" )
 
     # process it one line per read
-    find_type $I0, "Stream::Lines"
-    new lines, $I0
+    lines = new "Stream::Lines"
     assign lines, file
 
     # endless counter
-    find_type $I0, "Stream::Sub"
-    new counter, $I0
+    counter = new "Stream::Sub"
     .const .Sub temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines   #'
-    find_type $I0, "Stream::Combiner"
-    new combiner, $I0
+    combiner = new "Stream::Combiner"
     assign combiner, counter
     assign combiner, lines
 
@@ -720,15 +708,13 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
     load_bytecode "library/Stream/Filter.pir"
 
     # create the counter stream
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    stream = new "Stream::Sub"
     # assign its source
     .const .Sub temp = "_counter"
     assign stream, temp
 
     # create the filter stream
-    find_type I0, "Stream::Filter"
-    new filter, I0
+    filter = new "Stream::Filter"
     # assign its source
     assign filter, stream
     # set the filter sub
@@ -805,8 +791,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::include" );
 
     load_bytecode "library/Stream/Sub.pir"
 
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    stream = new "Stream::Sub"
 
     .const .Sub temp = "_counter"
     assign stream, temp
@@ -836,8 +821,7 @@ LOOP:
     if i != 4 goto SKIP
     .local pmc temp
 
-    find_type I0, "Stream::Sub"
-    new temp, I0
+    temp = new "Stream::Sub"
 
     .const .Sub func = "_included"
     assign temp, func
@@ -856,8 +840,7 @@ SKIP:
     self."write"( "hello" )
 
     # create another stream
-    find_type I0, "Stream::Sub"
-    new temp, I0
+    temp = new "Stream::Sub"
     .const .Sub func = "_counter2"
     assign temp, func
 
@@ -916,15 +899,13 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Lines" );
     load_bytecode "library/Stream/Lines.pir"
 
     # create a text stream
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    stream = new "Stream::Sub"
     # set the source
     .const .Sub temp = "_text"
     assign stream, temp
 
     # create a lines stream
-    find_type I0, "Stream::Lines"
-    new lines, I0
+    lines = new "Stream::Lines"
     # set the source
     assign lines, stream
 
@@ -964,8 +945,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     load_bytecode "library/Stream/ParrotIO.pir"
 
     # create the ParrotIO stream
-    find_type I0, "Stream::ParrotIO"
-    new stream, I0
+    stream = new "Stream::ParrotIO"
 
     # open this file
     stream."open"( "t/library/perlhist.txt", "<" )
@@ -1279,8 +1259,7 @@ SKIP:
     load_bytecode "library/Stream/Writer.pir"
     load_bytecode "library/Stream/Replay.pir"
 
-    find_type I0, "Stream::Writer"
-    new stream, I0
+    stream = new "Stream::Writer"
     P0 = global "_reader"
     assign stream, P0
 
@@ -1306,8 +1285,7 @@ SKIP:
     .local pmc stream3
     .local string str
 
-    find_type I0, "Stream::Replay"
-    new stream1, I0
+    stream1 = new "Stream::Replay"
     assign stream1, self
 
     print "reader start\n"
@@ -1383,8 +1361,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
     load_bytecode "library/Stream/Base.pir"
     load_bytecode "library/Stream/Sub.pir"
 
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    stream = new "Stream::Sub"
 
     .const .Sub temp = "_counter"
     assign stream, temp
@@ -1444,8 +1421,7 @@ SKIP:
 
     load_bytecode "library/Stream/Writer.pir"
 
-    find_type I0, "Stream::Writer"
-    new stream, I0
+    stream = new "Stream::Writer"
 
     # set the stream's source sub
     .const .Sub temp = "_reader"

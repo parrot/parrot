@@ -2101,7 +2101,7 @@ out:
     print s
 .end
 
-.sub wait
+.sub "wait" :method
 .end
 
 .namespace ["NCurses"]
@@ -2140,7 +2140,7 @@ out:
     f(win, s)
 .end
 
-.sub wait
+.sub "wait" :method
     .local pmc f
     .local int key
     f = global "ncurses::getch"

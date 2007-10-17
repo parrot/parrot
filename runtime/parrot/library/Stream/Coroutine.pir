@@ -24,15 +24,14 @@ TBD
     .local pmc base
     .local pmc coro
     .local int i
-    
-    find_type i, "Stream::Coroutine"
-    if i > 1 goto END
-    
+
+    $P0 = get_class "Stream::Coroutine"
+    unless null $P0 goto END
+
     load_bytecode "library/Stream/Base.pir"
 
-    getclass base, "Stream::Base"
+    get_class base, "Stream::Base"
     subclass coro, base, "Stream::Coroutine"
-    
 END:
 .end
 

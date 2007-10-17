@@ -144,16 +144,16 @@ done:
 	.param pmc tree1
 	.param pmc tree2
 
-	.local int coro_class
-	coro_class = find_type 'Parrot::Coroutine'
-	if coro_class goto found
+	.local pmc coro_class
+    coro_class = get_class 'Parrot::Coroutine'
+    unless null coro_class goto found
 	printerr "Bug:  Can't find 'Parrot::Coroutine' class.\n"
 	die 5, 1
 found:
 	.local pmc coro1, coro2
 	.const .Sub coro_sub = "coro_enumerate_tree"
-	coro1 = new coro_class, coro_sub
-	coro2 = new coro_class, coro_sub
+	coro1 = coro_class.'new'('initial_sub' => coro_sub)
+	coro2 = coro_class.'new'('initial_sub' => coro_sub)
 	($P0 :optional, $I0 :opt_flag) = coro1.'resume'(coro1, tree1)
 	($P1 :optional, $I1 :opt_flag) = coro2.'resume'(coro2, tree2)
 

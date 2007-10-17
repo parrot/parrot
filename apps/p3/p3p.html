@@ -47,8 +47,7 @@ file during idle time.</p>
 <p>Starting it with some options is as simple as this:</p>
 <pre>
   .local pmc d, opts
-  $I0 = find_type ['HTTP'; 'Daemon']
-  d = new $I0, opts
+  d = new ['HTTP'; 'Daemon'], opts
   d.'run'()
 </pre>
 <h1>CGI</h1>

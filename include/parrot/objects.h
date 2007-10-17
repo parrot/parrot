@@ -39,14 +39,6 @@ INTVAL Parrot_add_attribute(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
-void Parrot_add_parent(PARROT_INTERP,
-    NOTNULL(PMC *_class),
-    NOTNULL(PMC *parent))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_class_lookup(PARROT_INTERP, NOTNULL(STRING *class_name))

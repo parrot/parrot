@@ -20,15 +20,13 @@ Creates a stream and pipes it through a Stream::Lines stream.
     load_bytecode "library/Stream/Lines.pir"
     
     # create a text stream
-    find_type $I0, "Stream::Sub"
-    new stream, $I0
+    stream = new "Stream::Sub"
     # set the source
     .const .Sub temp = "_text"
     assign stream, temp
 
     # create a lines stream
-    find_type $I0, "Stream::Lines"
-    new lines, $I0
+    lines = new "Stream::Lines"
     # set the source
     assign lines, stream
     

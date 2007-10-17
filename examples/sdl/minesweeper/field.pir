@@ -16,8 +16,7 @@ Mines::Field - A minesweeper field
     $P0['debug']  = debug
 
     # create the field
-    $I0 = find_type "Mines::Field"
-    field = new $I0, $P0
+    field = new "Mines::Field", $P0
 
     # draw the field
     field.'draw'()
@@ -133,13 +132,11 @@ SDL surface to use for drawing.
     field  = new 'ResizablePMCArray'
     cache  = new 'ResizablePMCArray'
 
-    $I0 = find_type 'SDL::StopWatch'
-    watch = new $I0, screen
+    watch = new 'SDL::StopWatch', screen
     watch.'xpos'( 515 )
     watch.'ypos'( 5 )
 
-    $I0 = find_type 'SDL::LCD'
-    lcd = new $I0
+    lcd = new 'SDL::LCD'
     # This seems to call __init() with too many parameters
     # lcd = 0
     lcd.'_digits'( 4 )
@@ -202,8 +199,7 @@ SDL surface to use for drawing.
     inc $I0
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/smiley.png"
-    $I1 = find_type "SDL::Button"
-    $P0 = new $I1, $P0
+    $P0 = new "SDL::Button", $P0
     $P0.'states'( 5 )
     $P0.'pos'( 305, 2 )
     $P0.'size'( 30, 30 )
@@ -376,16 +372,15 @@ Draws the field, then the LCDs and the smiley button.
 DEBUG:
     image = find_global "Mines::Field", "field_debug"
 IMAGE_OK:
-    $I0 = find_type "SDL::Rect"
     $P0 = new 'Hash'
     $P0['x'] = 0
     $P0['y'] = 0
     $P0['width']  = 0
     $P0['height'] = 0
-    dest_rect = new $I0, $P0
+    dest_rect = new "SDL::Rect", $P0
     $P0['width']  = FIELD_WIDTH
     $P0['height'] = FIELD_HEIGHT
-    src_rect = new $I0, $P0
+    src_rect = new "SDL::Rect", $P0
 
     set size, width
     mul size, height
@@ -1069,8 +1064,9 @@ This method is called automatically when this module is loaded.
 =cut
 
 .sub __onload :load
-    $I0 = find_type "Mines::Field"
-    if $I0 > 1 goto END
+    .local pmc class
+    class = get_class "Mines::Field"
+    unless null class goto END
 
     .local pmc tmp
     .local pmc size
@@ -1091,8 +1087,7 @@ This method is called automatically when this module is loaded.
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines.png"
-    $I0 = find_type "SDL::Image"
-    image = new $I0, $P0
+    image = new "SDL::Image", $P0
     store_global "Mines::Field", "field", image
 
     $P0 = new 'String'

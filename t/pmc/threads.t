@@ -675,14 +675,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass bui
     print "called Bar's barmeth\n"
 .end
 
-.sub __get_string :method
+.sub get_string :vtable :method
     .return ("A Bar")
 .end
 
 .namespace [ 'main' ]
 
 .sub init
-    $P0 = getclass 'Integer'
+    $P0 = get_class 'Integer'
     $P1 = subclass $P0, 'Foo'
     addattribute $P1, 'foo1'
     addattribute $P1, 'foo2'

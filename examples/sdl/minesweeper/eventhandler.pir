@@ -4,11 +4,9 @@ eventhandler.pir - a minesweeper event handler
 
 =head1 SYNOPSIS
 
-    find_type $I0, "SDL::Event"
-    $P0 = new $I0
+    $P0 = new "SDL::Event"
 
-    find_type $I0, "Mines::EventHandler"
-    $P1 = new $I0
+    $P1 = new "Mines::EventHandler"
 
     $P0."process_events"( 0.1, $P1, field )
 
@@ -22,8 +20,8 @@ This is a simple SDL event handler class.
 
 .sub __onload :load
 
-    $I0 = find_type "Mines::EventHandler"
-    if $I0 > 1 goto END
+    $P0 = get_class "Mines::EventHandler"
+    unless null $P0 goto END
 
     newclass $P0, "Mines::EventHandler"
 

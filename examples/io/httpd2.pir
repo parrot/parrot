@@ -19,8 +19,7 @@ Leopold Toetsch <lt@toetsch.at> - some code base on httpd.pir.
     .local pmc d, opts
     .local int clid
     opts = 'get_config'(args)
-    clid = find_type ['HTTP'; 'Daemon']
-    d = new clid, opts
+    d = new ['HTTP'; 'Daemon'], opts
     unless d goto err
     push_eh ignore
     $S0 = opts['url']

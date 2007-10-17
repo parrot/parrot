@@ -15,8 +15,7 @@
 
     # Instantiate a new assembly class.
     loadlib $P0, "dotnet"
-    find_type $I0, "DotNetAssembly"
-    assembly = new $I0
+    assembly = new "DotNetAssembly"
 
     # Set filename and attempt to load.
     assembly = filename
@@ -49,30 +48,32 @@ NO_IMPORTS:
     # non-reference types Parrot doesn't recognize.
     pir_output = concat <<"PIR"
 .sub __CREATE_DOTNET_MMDBOXES :load
+    .local pmc class
+
     $P0 = getclass "Integer"
-    $I0 = find_type "@@DOTNET_MMDBOX_I1"
-    if $I0 goto EXISTS_I1
+    class = get_class "@@DOTNET_MMDBOX_I1"
+    unless null class goto EXISTS_I1
     subclass $P1, $P0, "@@DOTNET_MMDBOX_I1"
 EXISTS_I1:
-    $I0 = find_type "@@DOTNET_MMDBOX_I2"
-    if $I0 goto EXISTS_I2
+    class = get_class "@@DOTNET_MMDBOX_I2"
+    unless null class goto EXISTS_I2
     subclass $P1, $P0, "@@DOTNET_MMDBOX_I2"
 EXISTS_I2:
-    $I0 = find_type "@@DOTNET_MMDBOX_U1"
-    if $I0 goto EXISTS_U1
+    class = get_class "@@DOTNET_MMDBOX_U1"
+    unless null class goto EXISTS_U1
     subclass $P1, $P0, "@@DOTNET_MMDBOX_U1"
 EXISTS_U1:
-    $I0 = find_type "@@DOTNET_MMDBOX_U2"
-    if $I0 goto EXISTS_U2
+    class = get_class "@@DOTNET_MMDBOX_U2"
+    unless null class goto EXISTS_U2
     subclass $P1, $P0, "@@DOTNET_MMDBOX_U2"
 EXISTS_U2:
-    $I0 = find_type "@@DOTNET_MMDBOX_U4"
-    if $I0 goto EXISTS_U4
+    class = get_class "@@DOTNET_MMDBOX_U4"
+    unless null class goto EXISTS_U4
     subclass $P1, $P0, "@@DOTNET_MMDBOX_U4"
 EXISTS_U4:
     $P0 = getclass "Float"
-    $I0 = find_type "@@DOTNET_MMDBOX_R4"
-    if $I0 goto EXISTS_R4
+    class = get_class "@@DOTNET_MMDBOX_R4"
+    unless null class goto EXISTS_R4
     subclass $P1, $P0, "@@DOTNET_MMDBOX_R4"
 EXISTS_R4:
 .end
@@ -83,8 +84,8 @@ PIR
     pir_output = concat <<"PIR"
 .namespace [ "System"; "Object" ]
 .sub __FAKE_SYSTEM_OBJECT :load
-    $I0 = find_type [ "System" ; "Object" ]
-    if $I0 goto EXISTS
+    $P0 = get_class [ "System" ; "Object" ]
+    unless null $P0 goto EXISTS
     $P0 = newclass [ "System" ; "Object" ]
 EXISTS:
 .end
@@ -97,8 +98,8 @@ NO_STANDALONE_CLASSES:
     pir_output = concat <<"PIR"
 .namespace [ "System" ; "Exception" ]
 .sub __FAKE_SYSTEM_EXCEPTION :load
-    $I0 = find_type [ "System" ; "Exception" ]
-    if $I0 goto EXISTS
+    $P0 = get_class [ "System" ; "Exception" ]
+    unless null $P0 goto EXISTS
     $P0 = newclass [ "System" ; "Exception" ]
 EXISTS:
 .end
@@ -106,8 +107,8 @@ EXISTS:
 .end
 .namespace [ "System" ; "String" ]
 .sub __FAKE_SYSTEM_STRING :load
-    $I0 = find_type [ "System" ; "String" ]
-    if $I0 goto EXISTS
+    $P0 = get_class [ "System" ; "String" ]
+    unless null $P0 goto EXISTS
     $P0 = newclass [ "System" ; "String" ]
     addattribute $P0, "Chars"
 EXISTS:
@@ -125,15 +126,15 @@ EXISTS:
 .end
 .namespace [ "System" ; "ValueType" ]
 .sub __FAKE_SYSTEM_VALUETYPE :load
-    $I0 = find_type [ "System" ; "ValueType" ]
-    if $I0 goto EXISTS
+    $P0 = get_class [ "System" ; "ValueType" ]
+    unless null $P0 goto EXISTS
     $P0 = newclass [ "System" ; "ValueType" ]
 EXISTS:
 .end
 .namespace [ "System" ; "Enum" ]
 .sub __FAKE_SYSTEM_ENUM :load
-    $I0 = find_type [ "System" ; "Enum" ]
-    if $I0 goto EXISTS
+    $P0 = get_class [ "System" ; "Enum" ]
+    unless null $P0 goto EXISTS
     $P0 = newclass [ "System" ; "Enum" ]
 EXISTS:
 .end

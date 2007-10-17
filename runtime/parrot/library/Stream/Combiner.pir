@@ -29,12 +29,12 @@ TBD
     .local pmc base
     .local pmc comb
 
-    find_type i, "Stream::Combiner"
-    if i > 1 goto END
+    $P0 = get_class 'Stream::Combiner'
+    unless null $P0 goto END
 
     load_bytecode "library/Stream/Base.pir"
 
-    getclass base, "Stream::Base"
+    get_class base, "Stream::Base"
     subclass comb, base, "Stream::Combiner"
 
     addattribute comb, "combiner"
@@ -74,13 +74,12 @@ Sets (or just returns) the combiner sub.
     .param int has_combiner :opt_flag
     .local pmc ret
 
-    classoffset $I0, self, "Stream::Combiner"
     unless has_combiner goto GET
-    setattribute self, $I0, _combiner
+    setattribute self, 'combiner', _combiner
     ret = _combiner
     branch END
 GET:
-    getattribute ret, self, $I0
+    getattribute ret, self, 'combiner'
 END:
     .return(ret)
 .end
@@ -184,8 +183,7 @@ READ_LOOP:
     branch READ_LOOP
 
 CALL:
-    classoffset i, self, "Stream::Combiner"
-    getattribute combiner, self, i
+    getattribute combiner, self, 'combiner'
 
     ret = combiner( args )
     .return(ret)

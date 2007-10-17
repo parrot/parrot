@@ -1,8 +1,13 @@
 .sub __library_data_dumper_onload :load
-    find_type $I0, "Data::Dumper"
-    if $I0 > 1 goto END
-    load_bytecode "library/Data/Dumper/Default.pir"
-    newclass $P0, "Data::Dumper"
+    .local pmc dd_class
+    dd_class = get_class "Data::Dumper"
+    if null dd_class goto load_library
+
+    goto END
+
+  load_library:
+        load_bytecode "library/Data/Dumper/Default.pir"
+        newclass $P0, "Data::Dumper"
 END:
     .return ()
 .end
@@ -25,9 +30,12 @@ no_def_indent:
     set name, "VAR1"
 no_def_name:
     # XXX: support different output styles
-    find_type $I0, "Data::Dumper::Default"
-    if $I0 < 1 goto ERROR2
-    new style, $I0
+    .local pmc ddd_class
+
+    push_eh ERROR2
+        ddd_class = get_class "Data::Dumper::Default"
+        style     = ddd_class."new"()
+    clear_eh
 
     style."prepare"( self, indent )
     style."dumpWithName"( name, name, dump )

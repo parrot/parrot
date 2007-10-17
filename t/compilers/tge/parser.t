@@ -80,7 +80,7 @@ GRAMMAR
     .local pmc match
     .local pmc start_rule
     start_rule = find_global "TGE::Parser", "start"
-    match = start_rule(source) # should throw.
+    match = start_rule(source, 'grammar'=>'TGE::Parser') # should throw.
 .end
 
 CODE

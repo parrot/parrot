@@ -313,8 +313,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "flatten + slurpy param" );
     print S0
     set S0, P2[4]
     print S0
-    set S0, P2[5]
-    print S0
+    set P0, P2[5]
+    if_null P0, ok
+    print "not ok 7\n"
+ ok:
     returncc
 CODE
 ok 1
@@ -992,8 +994,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
     print " "
     print s
 .end
-.sub baz
-    .param pmc self
+.sub baz :method
     .param string s
     print self
     print " "
@@ -1680,12 +1681,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call evaled vtable code" );
     .local string s
     .local pmc cl, o
     cl = newclass "Foo"
-    s  = ".namespace ['Foo']\n"
-    s .= ".sub get_integer_keyed_int :vtable :method\n"
-    s .= ".param int i\n"
-    s .= "i += 5\n"
-    s .= ".return(i)\n"
-    s .= ".end\n"
+    s = <<"END_PIR"
+.namespace ['Foo']
+.sub get_integer_keyed_int :vtable :method
+    .param int i
+    i += 5
+    .return(i)
+.end
+END_PIR
     .local pmc comp
     comp = compreg "PIR"
     $P0 = comp(s)

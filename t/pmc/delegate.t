@@ -29,7 +29,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_integer_native" );
     set P0, 42
     end
 .namespace ["delegate"]
-.pcc_sub __set_integer_native:
+.pcc_sub :vtable set_integer_native:
     get_params "0,0", P2, I5
     # need a private store to keep state - we dont have that yet
     # for now check param passing
@@ -48,7 +48,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_integer" );
     print "\n"
     end
 .namespace ["delegate"]
-.pcc_sub __get_integer:
+.pcc_sub :vtable get_integer:
     get_params "0", P2
     set I5, 42
     set_returns "0", I5
@@ -62,7 +62,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_string_native" );
     set P0, "fortytwo"
     end
 .namespace ["delegate"]
-.pcc_sub __set_string_native:
+.pcc_sub :vtable set_string_native:
     get_params "0,0", P2, S5
     print S5
     print "\n"
@@ -78,7 +78,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_string" );
     print "\n"
     end
 .namespace ["delegate"]
-.pcc_sub __get_string:
+.pcc_sub :vtable get_string:
     get_params "0", P2
     set S5, "fortytwo"
     set_returns "0", S5
@@ -92,7 +92,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_number_native" );
     set P0, 47.11
     end
 .namespace ["delegate"]
-.pcc_sub __set_number_native:
+.pcc_sub :vtable set_number_native:
     get_params "0,0", P2,N5
     print N5
     print "\n"
@@ -108,7 +108,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_number" );
     print "\n"
     end
 .namespace ["delegate"]
-.pcc_sub __get_number:
+.pcc_sub :vtable get_number:
     get_params "0", P2
     set N5, 47.11
     set_returns "0", N5
@@ -124,7 +124,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate assign_pmc" );
     assign P0, P1
     end
 .namespace ["delegate"]
-.pcc_sub __assign_pmc:
+.pcc_sub :vtable assign_pmc:
     get_params "0,0", P2, P5
     print P5
     print "\n"

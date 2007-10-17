@@ -2656,7 +2656,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 
 .sub _main
-    newpdd15class P0, "Foo"
+    newclass P0, "Foo"
 
     new P0, 'ResizablePMCArray'
 

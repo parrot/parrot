@@ -143,7 +143,11 @@ make_local_copy(PARROT_INTERP, NOTNULL(Parrot_Interp from), NULLOK(PMC *arg))
          */
         ret_val               = Parrot_clone(interp, arg);
         PMC_sub(ret_val)->seg = PMC_sub(arg)->seg;
-        Parrot_store_sub_in_namespace(interp, ret_val);
+        /* Skip vtable overrides and methods. */
+        if (PMC_sub(ret_val)->vtable_index == -1
+                && !(PMC_sub(ret_val)->comp_flags & SUB_COMP_FLAG_METHOD)) {
+            Parrot_store_sub_in_namespace(interp, ret_val);
+        }
     }
     else {
         ret_val = Parrot_clone(interp, arg);
@@ -538,7 +542,12 @@ pt_ns_clone(Parrot_Interp d, PMC *dest_ns, Parrot_Interp s, PMC *source_ns)
             if (PMC_IS_NULL(dval)) {
                 PMC *copy;
                 copy = make_local_copy(d, s, val);
-                VTABLE_set_pmc_keyed_str(d, dest_ns, key, copy);
+                /* Vtable overrides and methods were already cloned, so don't reclone them. */
+                if (!(val->vtable->base_type == enum_class_Sub
+                        && (PMC_sub(val)->vtable_index != -1
+                        || PMC_sub(val)->comp_flags & SUB_COMP_FLAG_METHOD))) {
+                    VTABLE_set_pmc_keyed_str(d, dest_ns, key, copy);
+                }
             }
         }
     }

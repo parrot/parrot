@@ -436,8 +436,7 @@ done:
 .sub create_palette :method
     .local pmc palette, col, main_screen
     main_screen = self.'surface'()
-    .local int r, g, b, color_type
-    find_type  color_type, 'SDL::Color'
+    .local int r, g, b
     palette = new 'ResizablePMCArray'
     r = 0
 loop_r:
@@ -445,7 +444,7 @@ loop_r:
 loop_g:
     b = 0
 loop_b:
-    col = new color_type
+    col = new 'SDL::Color'
     col.'init'( 'r' => r, 'g' => g, 'b' => b )
     push palette, col
     b += 36

@@ -21,8 +21,7 @@ noarg:
     A = newclass "A"
     B = subclass  A, "B"
 
-    find_type $I0, "B"
-    b = new  $I0
+    b = new "B"
 
     .sym pmc r
     r = b."fib"(N)

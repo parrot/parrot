@@ -5,9 +5,8 @@
 .include "iterator.pasm"
 
 .sub '__onload' :load
-    $I0 = find_type 'C99::CPP::ASTGrammar'
-    if $I0 == 0 goto error
-    $P0 = getclass 'C99::CPP::ASTGrammar'
+    $P0 = get_class 'C99::CPP::ASTGrammar'
+    if null $P0 goto error
     addattribute $P0, 'scope_stack'
     .return ()
 error:

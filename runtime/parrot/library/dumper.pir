@@ -24,7 +24,7 @@ version 0.10
 
 =head1 DESCRIPTION
 
-    PIR implementation of Perl5's Data::Dumper module.
+    PIR implementation of Perl 5's Data::Dumper module.
 
 =cut
 
@@ -142,14 +142,20 @@ Returns the global dumper instance used by the non object interface.
 
 .sub _global_dumper
     .local pmc self
-    .local int mytype
-    .local int type
+    .local pmc dd_class
+    .local int is_defined
 
-    find_type mytype, "Data::Dumper"
-    if mytype != 0 goto TYPE_OK
+    get_class dd_class, "Data::Dumper"
+    if null dd_class goto load_dd_pir
+    goto TYPE_OK
+
+  load_dd_pir:
     load_bytecode "library/Data/Dumper.pir"
-    find_type mytype, "Data::Dumper"
-    if mytype != 0 goto TYPE_OK
+    get_class dd_class, "Data::Dumper"
+    if null dd_class goto no_class
+    goto TYPE_OK
+
+  no_class:
     print "fatal error: failure while loading library/Data/Dumper.pir\n"
     end
 TYPE_OK:
@@ -159,10 +165,8 @@ TYPE_OK:
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
-    typeof type, self
-    if type == mytype goto END
 create_type:
-    new self, mytype
+    new self, "Data::Dumper"
     store_global "Data::Dumper", "global", self
 
 END:
@@ -179,7 +183,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

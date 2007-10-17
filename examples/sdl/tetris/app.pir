@@ -6,8 +6,7 @@ B<Note:> The Tetris::App class is implemented as a singleton.
 
 =head1 SYNOPSIS
 
-    find_type $I0, "Tetris::App"
-    new app, $I0
+    app = new "Tetris::App"
 
     app."run"()
     app."shutdown"()
@@ -41,8 +40,8 @@ it parent classes nor is it subclassed.
 .const int tBoards            = 8
 
 .sub __onload :load
-    find_type $I0, "Tetris::App"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::App"
+    unless null $P0 goto END
 
     load_bytecode "library/SDL/App.pir"
     load_bytecode "library/SDL/Color.pir"
@@ -103,8 +102,7 @@ This method throws an exception if an error occurs.
     $P0["flags"]  =   1
 
     # create the SDL object
-    find_type $I0, "SDL::App"
-    $P0 = new $I0, $P0
+    $P0 = new "SDL::App", $P0
 
     # store the SDL object
     classoffset $I0, self, "Tetris::App"
@@ -118,8 +116,7 @@ This method throws an exception if an error occurs.
     self."initTimer"()
 
     # init the SDL event handler
-    find_type $I0, "Tetris::EventHandler"
-    $P0 = new $I0, self
+    $P0 = new "Tetris::EventHandler", self
     classoffset $I0, self, "Tetris::App"
     add $I0, tEventHandler
     setattribute self, $I0, $P0
@@ -201,8 +198,7 @@ An exeption is thrown if an error occurs.
     add $I0, tEventHandler
     getattribute eh, self, $I0
 
-    find_type $I0, "SDL::Event"
-    loop = new $I0
+    loop = new "SDL::Event"
 
     self."enableTimer"()
     loop."process_events"( 0.1, eh, self )
@@ -345,9 +341,7 @@ This method returns the created palette.
     .local int g
     .local int b
     .local int l
-    .local int color_id
 
-    color_id = find_type "SDL::Color"
     palette = new 'ResizablePMCArray'
     hash = new 'Hash'
 
@@ -371,7 +365,7 @@ NOT_BRIGHT:
     hash["r"] = r
     hash["g"] = g
     hash["b"] = b
-    color = new color_id, hash
+    color = new "SDL::Color", hash
 
     push palette, color
     inc i
@@ -887,8 +881,7 @@ FORCE:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     color = self."color"( 3 )
 
     screen."fill_rect"( temp, color )
@@ -907,8 +900,7 @@ NO_MAINBACKGROUND:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    find_type $I0, "SDL::Rect"
-    temp = new $I0, rect
+    temp = new "SDL::Rect", rect
     screen."update_rect"( temp )
 
     self."enableTimer"()
@@ -1083,9 +1075,8 @@ END_SET:
 
 NEWGAME_NEW_BOARD:
     if players <= 0 goto NEWGAME_END
-    find_type $I0, "Tetris::Board"
     print "new board...\n"
-    temp = new $I0, self
+    temp = new "Tetris::Board", self
     print "new board done.\n"
     temp."setPosition"( xpos, 10 )
     add xpos, 320

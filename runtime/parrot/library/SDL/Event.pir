@@ -7,23 +7,20 @@ SDL::Event - Parrot extension representing SDL Events
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/SDL/Event.pir'
+    # load this library
+    load_bytecode 'library/SDL/Event.pir'
 
-	# create a new SDL::Event object
-	.local pmc event
-	.local int event_type
+    # create a new SDL::Event object
+    .local pmc event
+    event = new 'SDL::Event'
 
-	find_type event_type, 'SDL::Event'
-	event = new event_type
+    # ... create a new event_handler and its hander_args
 
-	# ... create a new event_handler and its hander_args
+    # start the event loop
+    event.'process_events'( event_handler, handler_args )
 
-	# start the event loop
-	event.'process_events'( event_handler, handler_args )
-
-	# or handle one event at a time in your own loop
-	event.'handle_event'( event_handler, handler_args )
+    # or handle one event at a time in your own loop
+    event.'handle_event'( event_handler, handler_args )
 
 =head1 DESCRIPTION
 
@@ -45,10 +42,10 @@ The SDL::Event object has the following methods:
 .namespace [ 'SDL::Event' ]
 
 .sub _initialize :load
-	.local pmc   event_class
+    .local pmc   event_class
 
-	newclass     event_class, 'SDL::Event'
-	addattribute event_class, 'event'
+    newclass     event_class, 'SDL::Event'
+    addattribute event_class, 'event'
 .end
 
 =item init()
@@ -62,18 +59,18 @@ away.
 =cut
 
 .sub 'init' :method
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    .local pmc  fetch_layout
+    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
-	.local pmc layout
-	layout = fetch_layout( 'Event::Generic' )
+    .local pmc layout
+    layout = fetch_layout( 'Event::Generic' )
 
-	.local pmc event
-	new event, .ManagedStruct, layout
+    .local pmc event
+    new event, 'ManagedStruct', layout
 
-	setattribute self, 'event', event
+    setattribute self, 'event', event
 
-	.return()
+    .return()
 .end
 
 =item event()
@@ -84,32 +81,31 @@ this directly, unless you're working with raw SDL calls.
 =cut
 
 .sub event :method
-	.param string name      :optional
-	.param int    have_name :opt_flag 
-	
-	.local pmc event
-	getattribute event, self, 'event'
+    .param string name      :optional
+    .param int    have_name :opt_flag
 
-	if have_name == 1 goto assign_event
-	.return( event )
+    .local pmc event
+    getattribute event, self, 'event'
+
+    if have_name == 1 goto assign_event
+    .return( event )
 
   assign_event:
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    .local pmc  fetch_layout
+    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
 
-	.local pmc layout
-	.local string ename
-	
-	ename = 'Event::'
-	concat ename, name
+    .local pmc layout
+    .local string ename
 
-	layout = fetch_layout( ename )
-	#new event, .ManagedStruct, layout
-	assign event, layout
+    ename = 'Event::'
+    concat ename, name
 
-	setattribute self, 'event', event
+    layout = fetch_layout( ename )
+    assign event, layout
 
-	.return( event )
+    setattribute self, 'event', event
+
+    .return( event )
 .end
 
 =item event_type( event_type )
@@ -128,47 +124,47 @@ requiring an argument.  This may change in the future.
 =cut
 
 .sub event_type :method
-	.param int incoming_type
+    .param int incoming_type
 
-	.local pmc event_types
-	event_types = new OrderedHash
+    .local pmc event_types
+    event_types = new OrderedHash
 
-	event_types[  0 ] = 'no_event'
-	event_types[  1 ] = 'active_event'
-	event_types[  2 ] = 'key_down'
-	event_types[  3 ] = 'key_up'
-	event_types[  4 ] = 'mouse_motion'
-	event_types[  5 ] = 'mouse_button_down'
-	event_types[  6 ] = 'mouse_button_up'
-	event_types[  7 ] = 'joy_axis_motion'
-	event_types[  8 ] = 'joy_ball_motion'
-	event_types[  9 ] = 'joy_hat_motion'
-	event_types[ 10 ] = 'joy_button_down'
-	event_types[ 11 ] = 'joy_button_up'
-	event_types[ 12 ] = 'quit'
-	event_types[ 13 ] = 'sys_wm_event'
-	event_types[ 14 ] = 'event_reserved_a'
-	event_types[ 15 ] = 'event_reserved_b'
-	event_types[ 16 ] = 'video_resize'
-	event_types[ 17 ] = 'video_expose'
-	event_types[ 18 ] = 'event_reserved_2'
-	event_types[ 19 ] = 'event_reserved_3'
-	event_types[ 20 ] = 'event_reserved_4'
-	event_types[ 21 ] = 'event_reserved_5'
-	event_types[ 22 ] = 'event_reserved_6'
-	event_types[ 23 ] = 'event_reserved_7'
+    event_types[  0 ] = 'no_event'
+    event_types[  1 ] = 'active_event'
+    event_types[  2 ] = 'key_down'
+    event_types[  3 ] = 'key_up'
+    event_types[  4 ] = 'mouse_motion'
+    event_types[  5 ] = 'mouse_button_down'
+    event_types[  6 ] = 'mouse_button_up'
+    event_types[  7 ] = 'joy_axis_motion'
+    event_types[  8 ] = 'joy_ball_motion'
+    event_types[  9 ] = 'joy_hat_motion'
+    event_types[ 10 ] = 'joy_button_down'
+    event_types[ 11 ] = 'joy_button_up'
+    event_types[ 12 ] = 'quit'
+    event_types[ 13 ] = 'sys_wm_event'
+    event_types[ 14 ] = 'event_reserved_a'
+    event_types[ 15 ] = 'event_reserved_b'
+    event_types[ 16 ] = 'video_resize'
+    event_types[ 17 ] = 'video_expose'
+    event_types[ 18 ] = 'event_reserved_2'
+    event_types[ 19 ] = 'event_reserved_3'
+    event_types[ 20 ] = 'event_reserved_4'
+    event_types[ 21 ] = 'event_reserved_5'
+    event_types[ 22 ] = 'event_reserved_6'
+    event_types[ 23 ] = 'event_reserved_7'
 
-	.local string type_name
-	.local int known_type
+    .local string type_name
+    .local int known_type
 
-	type_name         = 'unknown'
-	exists known_type, event_types[ incoming_type ]
-	eq known_type, 0, return
+    type_name         = 'unknown'
+    exists known_type, event_types[ incoming_type ]
+    eq known_type, 0, return
 
-	type_name         = event_types[ incoming_type ]
+    type_name         = event_types[ incoming_type ]
 
 return:
-	.return( type_name )
+    .return( type_name )
 .end
 
 =item event_keyname()
@@ -186,25 +182,25 @@ C<unknown> instead.
 =cut
 
 .sub event_keyname :method
+    .local pmc event
+    event = self.'event'( 'Keyboard' )
 
-	.local pmc event
-	event = self.'event'( 'Keyboard' )
+    .local int key_sym
+    key_sym = event['sym']
 
-	.local int key_sym
-	key_sym = event['sym']
+    .local pmc key_names
+    find_global key_names, 'SDL::Constants', 'key_names'
 
-	.local pmc key_names
-	find_global key_names, 'SDL::Constants', 'key_names'
+    .local string key_name
+    key_name = key_names[ key_sym ]
+    say key_name
 
-	.local string key_name
+    length $I0, key_name
+    if $I0 > 0 goto return
+    key_name = 'unknown'
 
-	key_name = key_names[ key_sym ]
-	length $I0, key_name
-	if $I0 > 0 goto return
-	key_name = 'unknown'
-
-return:
-	.return( key_name )
+  return:
+    .return( key_name )
 .end
 
 =item process_events( event_handler, handler_args, [ check_interval ] )
@@ -230,43 +226,43 @@ should, somehow.
 =cut
 
 .sub process_events :method
-	.param pmc event_handler
-	.param pmc handler_args
-	.param num check_interval :optional
-	.param int argcN          :opt_flag
+    .param pmc event_handler
+    .param pmc handler_args
+    .param num check_interval :optional
+    .param int argcN          :opt_flag
 
-	.local int polling
+    .local int polling
 
-	.local int continue
-	.local pmc GetEvent
-	.local pmc event
+    .local int continue
+    .local pmc GetEvent
+    .local pmc event
 
-	if argcN == 0 goto use_wait
+    if argcN == 0 goto use_wait
 
-	if check_interval < 0.0001 goto use_wait
-	polling  = 1
-	GetEvent = find_global 'SDL::NCI', 'PollEvent'
+    if check_interval < 0.0001 goto use_wait
+    polling  = 1
+    GetEvent = find_global 'SDL::NCI', 'PollEvent'
 
-	branch loop
+    branch loop
 
 use_wait:
-	polling  = 0
-	GetEvent = find_global 'SDL::NCI', 'WaitEvent'
+    polling  = 0
+    GetEvent = find_global 'SDL::NCI', 'WaitEvent'
 
 loop:
-	event    = self.'event'( 'Generic' )
-	continue = GetEvent( event )
+    event    = self.'event'( 'Generic' )
+    continue = GetEvent( event )
 
-	if continue goto dispatch
-	unless polling goto loop
-	
-	# give parrot a chance to process its own events
-	sleep check_interval
-	branch loop
+    if continue goto dispatch
+    unless polling goto loop
+
+    # give parrot a chance to process its own events
+    sleep check_interval
+    branch loop
 
 dispatch:
-	continue = self.'dispatch_event'( event, event_handler, handler_args )
-	if continue goto loop
+    continue = self.'dispatch_event'( event, event_handler, handler_args )
+    if continue goto loop
 
 .end
 
@@ -285,23 +281,23 @@ Use this method inside your own loop structure.
 =cut
 
 .sub handle_event :method
-	.param pmc event_handler
-	.param pmc handler_args
+    .param pmc event_handler
+    .param pmc handler_args
 
-	.local pmc event
-	event = self.'event'()
+    .local pmc event
+    event = self.'event'()
 
-	.local pmc  PollEvent
-	find_global PollEvent, 'SDL::NCI', 'PollEvent'
+    .local pmc  PollEvent
+    find_global PollEvent, 'SDL::NCI', 'PollEvent'
 
-	.local int event_waiting
-	event_waiting = PollEvent( event )
+    .local int event_waiting
+    event_waiting = PollEvent( event )
 
-	eq event_waiting, 0, return
+    eq event_waiting, 0, return
 
-	self.'dispatch_event'( event, event_handler, handler_args )
+    self.'dispatch_event'( event, event_handler, handler_args )
 return:
-	.return()
+    .return()
 .end
 
 =item dispatch_event( event, event_handler, handler_args )
@@ -312,32 +308,32 @@ C<handle_event()> or C<process_events()>.
 =cut
 
 .sub dispatch_event :method
-	.param pmc event
-	.param pmc event_handler
-	.param pmc handler_args
+    .param pmc event
+    .param pmc event_handler
+    .param pmc handler_args
 
-	.local int incoming_type
-	incoming_type = event[ 'type' ]
+    .local int incoming_type
+    incoming_type = event[ 'type' ]
 
-	.local string event_type
-	event_type = self.'event_type'( incoming_type )
+    .local string event_type
+    event_type = self.'event_type'( incoming_type )
 
-	.local int continue
-	continue = 0
+    .local int continue
+    continue = 0
 
-	eq event_type, 'quit', return
-	continue = 1
+    eq event_type, 'quit', return
+    continue = 1
 
-	.local int can_handle
-	can can_handle, event_handler, event_type
+    .local int can_handle
+    can can_handle, event_handler, event_type
 
-	eq can_handle, 0, return
+    eq can_handle, 0, return
 
-	# this is a method call using a method name in the event_type string!
-	event_handler.event_type( self, handler_args )
+    # this is a method call using a method name in the event_type string!
+    event_handler.event_type( self, handler_args )
 
 return:
-	.return( continue )
+    .return( continue )
 .end
 
 =back
@@ -350,7 +346,7 @@ suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

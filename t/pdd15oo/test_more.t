@@ -381,7 +381,7 @@
 .sub test_isa_ok
 	.local pmc dog, terrier, daschund, Spot, Sossy
 
-	dog = newpdd15class "dog"
+	dog = newclass "dog"
 	terrier = subclass dog, "terrier"
 	daschund = subclass dog, "daschund"
 

@@ -92,7 +92,7 @@ Our nice little module.
 
 .namespace ["Getopt::Obj"]
 
-=item C<__init()>
+=item C<init()>
 
 Creates the Specs and notOptStop attribute, interal stuff.
 
@@ -563,7 +563,7 @@ This makes an easy holder for each possible match.
 
 .namespace ["Getopt::Obj::Spec"]
 
-=item C<__init()>
+=item C<init()>
 
 Set the defaults to all our attributes, more internal stuff.  Sets the default
 "type" to C<.Boolean>.

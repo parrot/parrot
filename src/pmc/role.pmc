@@ -453,6 +453,38 @@ inspect_str.
         return metadata;
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Return the name of the role (without the HLL namespace).
+
+=cut
+
+*/
+
+    STRING *get_string() {
+        Parrot_Role *role  = PARROT_ROLE(SELF);
+        PMC         *_namespace = role->_namespace;
+        PMC         *names;
+
+        if (!PMC_IS_NULL(_namespace)) {
+            /* Call the 'get_name' method on the role's associated namespace
+             * to retrieve a fully qualified list of names, then join the list
+             * with a semicolon.
+             */
+            names = Parrot_NameSpace_nci_get_name(interp, _namespace);
+
+            if (!PMC_IS_NULL(names))
+                /* remove the HLL namespace name */
+                VTABLE_shift_string(INTERP, names);
+                return string_join(interp, CONST_STRING(interp, ";"), names);
+        }
+
+        /* Otherwise, copy the stored string name of the class. */
+        return string_copy(interp, role->name);
+    }
+
     /*
      * Below here are non-vtable methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from

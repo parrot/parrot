@@ -15,8 +15,8 @@ blockdata.pir - a tetris block data class
 .namespace ["Tetris::BlockData"]
 
 .sub __onload :load
-    find_type $I0, "Tetris::BlockData"
-    if $I0 > 1 goto END
+    $P0 = get_class "Tetris::BlockData"
+    unless null $P0 goto END
     newclass $P0, "Tetris::BlockData"
     addattribute $P0, "data"
 END:

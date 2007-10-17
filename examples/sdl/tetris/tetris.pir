@@ -34,8 +34,7 @@ Array with commandline parameters.
     load_bytecode "examples/sdl/tetris/app.pir"
     
     # create the tetris app
-    find_type $I0, "Tetris::App"
-    new app, $I0
+    app = new "Tetris::App"
     
     app."flag"( "show blocksize", 1 )
     # run the tetris app

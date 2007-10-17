@@ -517,11 +517,11 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     newclass temp, "TestClass"
 
-    find_type I0, "TestClass"
     new array, 'ResizablePMCArray'
-    new temp, I0
+    temp = new "TestClass"
     push array, temp
-    new temp, I0
+    $P0 = get_class 'TestClass'
+    temp = new $P0
     push array, temp
 
     _dumper( array )
@@ -581,7 +581,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
     new array, 'ResizablePMCArray'
 
     push array, 0
-
     push array, "0"
 
     null temp
@@ -602,7 +601,7 @@ CODE
 "array" => ResizablePMCArray (size:5) [
     0,
     "0",
-    undef,
+    null,
     0,
     "0"
 ]
@@ -936,7 +935,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
 .namespace ["bar"]
 .sub __init :method
     .local pmc ar
-    ar = getattribute self, '__value'
+    ar = getattribute self, ['ResizablePMCArray'], 'proxy'
     push ar, 1
     push ar, 2
 .end
@@ -946,7 +945,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
     .param string label
     print " __value => {\n"
     .local pmc ar
-    ar = getattribute self, '__value'
+    ar = getattribute self, ['ResizablePMCArray'], 'proxy'
     dumper.'dump'('attr', ar)
     print "\n}"
 .end

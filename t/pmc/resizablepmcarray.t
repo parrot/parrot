@@ -228,10 +228,14 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, 'ResizablePMCArray'
-        set P0, 1
+    new P0, 'ResizablePMCArray'
+    set P0, 1
 
-    set I0, P0[1]
+    set P1, P0[1]
+    if_null P1, ok
+    print "not ok 1\n"
+    end
+  ok:
     print "ok 1\n"
     end
 CODE

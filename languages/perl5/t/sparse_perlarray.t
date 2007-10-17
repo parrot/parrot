@@ -39,8 +39,7 @@ lp:
 	ne I9, 0, lp1
 	# force GC => 142 DOD + 142 collects / 10^5 accesses
     loadlib P20, 'perl_group'
-    find_type I21, 'PerlArray'
-    new P1,I21
+    P1 = new 'PerlArray'
 	set P1[I0], I0
 	concat S0, S1, S1
 	set S2, S0
@@ -83,8 +82,7 @@ lp:
 	# force GC => 124 DOD + 124 collects / 10^5 accesses
 	# need .PerlArray here - it auto extends - intlist doesnt
     loadlib P20, 'perl_group'
-    find_type I21, 'PerlArray'
-    new P1,I21
+    P1 = new 'PerlArray'
 	set P1[I0], I0
 	concat S0, S1, S1
 	set S2, S0
@@ -130,8 +128,7 @@ lp:
     ne I9, 0, lp1
     # force GC => 142 DOD + 142 collects / 10^5 accesses
     loadlib P20, 'perl_group'
-    find_type I21, 'PerlArray'
-    new P1,I21
+    P1 = new 'PerlArray'
     set P1[I0], I0
     concat S0, S1, S1
     set S2, S0
@@ -175,8 +172,7 @@ lp:
     ne I9, 0, lp1
     # force GC => 142 DOD + 142 collects / 10^5 accesses
     loadlib P20, 'perl_group'
-    find_type I21, 'PerlArray'
-    new P1,I21
+    P1 = new 'PerlArray'
     set P1[I0], I0
     concat S0, S1, S1
     set S2, S0

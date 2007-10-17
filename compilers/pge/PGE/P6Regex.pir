@@ -40,12 +40,9 @@ or the resulting PIR code (target='PIR').
   with_grammar:
     $I0 = exists adverbs['name']
     if $I0 goto with_name
-    unless args goto adverb_name_1
+    unless args goto with_name
     $S0 = shift args
     adverbs['name'] = $S0
-    goto with_name
-  adverb_name_1:
-    adverbs['name'] = '_regex'
   with_name:
     $I0 = exists adverbs['lang']
     if $I0 goto with_lang
@@ -133,8 +130,7 @@ parse valid Perl 6 regular expressions.
 
 .namespace [ 'PGE::Grammar' ]
 
-.sub 'regex'
-    .param pmc mob
+.sub 'regex' :method
     .param pmc adverbs         :slurpy :named
 
     .local string stop
@@ -145,7 +141,7 @@ parse valid Perl 6 regular expressions.
 
     stop = adverbs['stop']
     push stopstack, stop
-    match = optable.'parse'(mob, 'stop'=>stop)
+    match = optable.'parse'(self, 'stop'=>stop)
     $S0 = pop stopstack
 
     .return (match)

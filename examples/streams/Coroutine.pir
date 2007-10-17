@@ -28,8 +28,7 @@ Creates a coroutine stream and dumps it.
     load_bytecode "library/Stream/Coroutine.pir"
 
     # create the coroutine stream    
-    find_type $I0, "Stream::Coroutine"
-    new stream, $I0
+    stream = new "Stream::Coroutine"
 
     # set the stream's source coroutine
     # A .Sub is a coroutine when there is a yield?

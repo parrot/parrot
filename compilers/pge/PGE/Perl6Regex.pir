@@ -40,12 +40,9 @@ or the resulting PIR code (target='PIR').
   with_grammar:
     $I0 = exists adverbs['name']
     if $I0 goto with_name
-    unless args goto adverb_name_1
+    unless args goto with_name
     $S0 = shift args
     adverbs['name'] = $S0
-    goto with_name
-  adverb_name_1:
-    adverbs['name'] = '_regex'
   with_name:
     $I0 = exists adverbs['lang']
     if $I0 goto with_lang

@@ -1,4 +1,3 @@
-
 # $Id$
 
 =head1 NAME
@@ -12,14 +11,13 @@ SDL::Button - A multi state SDL Button
     $P0 = "filename/to/image.png"
 
     # create the button
-    $I0 = find_type 'SDL::Button'
-    button = new $I0, $P0
+    button = new 'SDL::Button', $P0
 
     # set the position
     button.'xpos'( 10 )
     button.'ypos'( 10 )
 
-    # set the number of states    
+    # set the number of states
     button.'states'( 2 )
 
     # activate the second status (first is 0)
@@ -46,17 +44,19 @@ An SDL::Button object has the following methods:
 .namespace ['SDL::Button']
 
 .sub __onload :load
+    .local pmc class
+    class = get_class 'SDL::Button'
+    if_null class, define_class
+    .return()
 
-    $I0 = find_type 'SDL::Button'
-    if $I0 > 1 goto END
-    newclass $P0, 'SDL::Button'
-    addattribute $P0, "image"
-    addattribute $P0, "status"
-    addattribute $P0, "states"
-    addattribute $P0, "rect"
-    addattribute $P0, "clicked"
-    addattribute $P0, "actions"
-END:
+  define_class:
+    newclass     class, 'SDL::Button'
+    addattribute class, 'image'
+    addattribute class, 'status'
+    addattribute class, 'states'
+    addattribute class, 'rect'
+    addattribute class, 'clicked'
+    addattribute class, 'actions'
 .end
 
 =item button = new ID, name
@@ -65,14 +65,13 @@ END:
 
 .sub init_pmc :vtable :method
     .param pmc name
-    
+
     $I0 = classoffset self, 'SDL::Button'
-    
+
     # image
-    $I1 = find_type 'SDL::Image'
-    $P0 = new $I1, name
+    $P0 = new 'SDL::Image', name
     setattribute self, $I0, $P0
-    
+
     # status
     inc $I0
     $P0 = new 'Integer'
@@ -87,8 +86,7 @@ END:
 
     # rect
     inc $I0
-    $I1 = find_type 'SDL::Rect'
-    $P0 = new $I1
+    $P0 = new 'SDL::Rect'
     setattribute self, $I0, $P0
 
     # clicked
@@ -109,7 +107,7 @@ END:
 
 .sub set_integer_native :vtable :method
     .param int val
-    
+
     $I0 = classoffset self, 'SDL::Button'
     inc $I0
     $P0 = getattribute self, $I0
@@ -135,7 +133,7 @@ END:
 
 .sub states :method
     .param int count
-    
+
     $I0 = classoffset self, 'SDL::Button'
     add $I0, 2
     $P0 = getattribute self, $I0
@@ -169,7 +167,7 @@ END:
     $I0 = classoffset self, 'SDL::Button'
     add $I0, 3
     $P0 = getattribute self, $I0
-    
+
     $P0.'width'( w )
     $P0.'height'( h )
 .end
@@ -186,7 +184,7 @@ END:
     .local pmc drect
     .local pmc srect
     .local pmc clicked
-    
+
     $I0 = classoffset self, 'SDL::Button'
 
     image = getattribute self, $I0
@@ -204,9 +202,8 @@ END:
 
     inc $I0
     clicked = getattribute self, $I0
-    
-    $I1 = find_type 'SDL::Rect'
-    srect = new $I1
+
+    srect = new 'SDL::Rect'
 
     $I1 = drect.'height'()
     srect.'height'( $I1 )
@@ -216,7 +213,7 @@ END:
     cmod $I0, status, states
     $I0 *= $I1
     srect.'x'( $I0 )
-    
+
     $I1 = drect.'height'()
     $I0 = clicked
     $I0 *= $I1
@@ -287,18 +284,18 @@ END:
     .param pmc arg
     .local int status
     .local pmc action
-    
+
     $I0 = classoffset self, 'SDL::Button'
 
     inc $I0
     $P0 = getattribute self, $I0
     status = $P0
-    
+
     add $I0, 4
     action = getattribute self, $I0
 
     $P0 = action[status]
-    
+
     $P0( arg )
 .end
 
@@ -310,7 +307,7 @@ END:
     .param int status
     .param pmc cb
     .local pmc action
-    
+
     $I0 = classoffset self, 'SDL::Button'
     add $I0, 5
     action = getattribute self, $I0
@@ -328,7 +325,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

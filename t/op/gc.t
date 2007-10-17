@@ -55,8 +55,7 @@ CODE
 pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy" );
       interpinfo I1, 2   # How many DOD runs have we done already?
       new P0, 'Undef'
-      needs_destroy P0
-      new P0, 'Undef' # kill object
+      new P0, 'Undef'    # kill object
       sweep 0
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
@@ -178,8 +177,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
     .local pmc o, cl
     cl = newclass "Foo"
 
-    find_type $I1, "Foo"
-    new o, $I1
+    new o, "Foo"
     print "ok\n"
     end
 .end
@@ -215,8 +213,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     newclass P9, "Source"
     newclass P10, "Source::Buffer"
-    find_type I9,"Source"
-    new P12, I9
+    new P12, "Source"
 
     set S20, P12
     print S20
@@ -230,8 +227,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
     getprop P12, "buffer", P2
     sweep 1
     unless_null P12, buffer_ok
-    find_type I12, "Source::Buffer"
-    new P12, I12
+    new P12, "Source::Buffer"
     new P14, 'String'
     set P14, "hello\n"
     setprop P12, "buf", P14
@@ -292,8 +288,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     $P0 = getinterp
     $P0."recursion_limit"(10)
     newclass $P0, "b"
-    $I0 = find_type "b"
-    $P0 = new $I0
+    $P0 = new "b"
     $P1 = new 'Integer'
     $P1 = 0
     n = $P0."b11"($P1)
@@ -574,11 +569,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "verify deleg_pmc object marking" );
     $P0 = new 'String'
     $S0 = "ok" . " 3\n"
     $P0 = $S0
-    setattribute s, "X\0o3", $P0
+    setattribute s, "o3", $P0
     $P0 = new 'String'
     $S0 = "ok" . " 4\n"
     $P0 = $S0
-    setattribute s, "X\0o4", $P0
+    setattribute s, "o4", $P0
     null $P0
     null $S0
     null cl
@@ -594,9 +589,9 @@ lp:
     t = "ok 2\n"
     print s
     print t
-    $P0 = getattribute s, "X\0o3"
+    $P0 = getattribute s, "o3"
     print $P0
-    $P0 = getattribute s, "X\0o4"
+    $P0 = getattribute s, "o4"
     print $P0
 .end
 CODE

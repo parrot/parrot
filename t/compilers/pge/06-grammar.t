@@ -21,7 +21,12 @@ Test some simple grammars.
     load_bytecode 'PGE/P6Grammar.pbc'
     .include "iglobals.pasm"
 
-    .local pmc test, todo_tests, todo_desc, grammar, expr, description
+    .local pmc test, todo_tests, todo_desc, grammar, expr, description, test_num
+
+    # avoid name clashes in grammars with fatal method redefinition
+    test_num  = new 'Integer'
+    test_num  = 0
+    store_global 'test_num', test_num
 
     # the test builder
     test = new 'Test::Builder'
@@ -36,7 +41,7 @@ Test some simple grammars.
     expr        = new 'ResizablePMCArray'
     description = new 'ResizableStringArray'
 
-    .local int ok,n_grammars,n_tests
+    .local int ok, n_grammars, n_tests
 
     # plan tests to run
     test.'plan'(16)
@@ -50,7 +55,7 @@ Test some simple grammars.
     push targets, ' 1414 '                  # n2
 
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'simple token/rule match' )
-grammar Simple::Test;
+grammar Simple::Test1;
 rule main { <number> }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
@@ -61,7 +66,7 @@ EOF_SIMPLE_GRAMMAR
     push targets, '[ 1313 ]'                # n4
     push targets, '[    1313  ]'            # n5
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'simple token/rule match with constant chars' )
-grammar Simple::Test;
+grammar Simple::Test2;
 rule main { \[ <number> \] }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
@@ -73,7 +78,7 @@ EOF_SIMPLE_GRAMMAR
     push targets, '11 12 13'                # n8
     push targets, ' 11     12  13   14'     # n9
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'simple token/rule match with repetition using *' )
-grammar Simple::Test;
+grammar Simple::Test3;
 rule main { [<number> <?ws>]* }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
@@ -82,7 +87,7 @@ EOF_SIMPLE_GRAMMAR
     targets = new 'ResizableStringArray'
     push targets, '11 12 13'                # n10
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'another simple token/rule match with repetition using *' )
-grammar Simple::Test;
+grammar Simple::Test4;
 rule main { [<number> ]* }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
@@ -92,7 +97,7 @@ EOF_SIMPLE_GRAMMAR
     push targets, '11 12 13'                # n12
     push targets, ' 11     12  13   14'     # n13
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'simple token/rule match with repetition using +' )
-grammar Simple::Test;
+grammar Simple::Test5;
 rule main { [<number> <?ws>]+ }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
@@ -102,10 +107,11 @@ EOF_SIMPLE_GRAMMAR
     push targets, '11 12 13'                # n15
     push targets, '  11     12  13  '       # n16
     'test_grammar_against_targets'( <<'EOF_SIMPLE_GRAMMAR', targets, 'simple token/rule match with repetition using *' )
-grammar Simple::Test;
+grammar Simple::Test6;
 rule main { [ <number>]* }
 token number { \d+ }
 EOF_SIMPLE_GRAMMAR
+
 .end
 
 
@@ -120,36 +126,61 @@ EOF_SIMPLE_GRAMMAR
 
     .local int    ok
                   ok = 0
-    .local string target
+    .local pmc    compiler
+                  compiler = '_compile_grammar'(grammar)
+
+    .local pmc    test_num
+                  test_num  = find_global 'test_num'
+
+    # it starts at zero
+    inc test_num
+
+    .local string test_num_str
+                  test_num_str = test_num
+    .local string test_name
+                  test_name    = 'Simple::Test' . test_num_str
+
+    .local pmc parser
+               parser = find_global test_name, 'main'
 
   next_target:
-    target = shift targets
+    .local string target
+                  target = shift targets
 
-    ok = '_match_expr'( grammar, target )
+    ok = '_match_expr'( parser, target )
     test.'ok'( ok, description )
     $I0 = targets
     if $I0 goto next_target
 .end
 
+.sub '_compile_grammar'
+    .param string grammar
+
+    .local pmc p6grammar, code, pir_compiler, parser
+
+    p6grammar    = compreg 'PGE::P6Grammar'
+    code         = p6grammar.'compile'(grammar, 'target'=>'PIR')
+    pir_compiler = compreg 'PIR'
+    parser       = pir_compiler(code)
+
+    .return( parser )
+.end
+
 
 .sub '_match_expr'
-    .param string grammar
+    .param pmc    parser
     .param string expr
-    .local int ok
-    .local string result
-    .local pmc p6grammar, code, parse, match
 
+    .local int ok
+    .local string result, test_name, test_num_str
+    .local pmc p6grammar, code, parse, match, test_num
+
+  do_match:
     load_bytecode 'PGE.pbc'
     load_bytecode 'compilers/pge/pgc.pir'
 
-    ok = 1
-    p6grammar = compreg 'PGE::P6Grammar'
-    code = p6grammar.'compile'(grammar, 'target'=>'PIR')
-    $P0 = compreg 'PIR'
-    $P1 = $P0(code)
-    parse = find_global "Simple::Test", "main"
-    match = parse(expr)
-    result = match
+    match     = parser(expr)
+    result    = match
 
     if result == expr goto match_ok
     ok = 0

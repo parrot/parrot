@@ -89,7 +89,7 @@ do_initcall(PARROT_INTERP, PMC *_class, PMC *object, PMC *init)
      */
     STRING *meth_str;
     PMC    *meth = get_init_meth(interp, _class,
-            string_from_cstring(interp, "CONSTRUCT", 9), &meth_str);
+            string_from_literal(interp, "CONSTRUCT"), &meth_str);
     int     default_meth;
 
     if (!PMC_IS_NULL(meth)) {
@@ -473,7 +473,7 @@ Create the class from the thawed parents and attributes array.
                     parent_class = parent_class->vtable->pmc_class;
                 }
 
-                Parrot_add_parent(INTERP, _class, parent_class);
+/* removed function: Parrot_add_parent(INTERP, _class, parent_class); */
             }
         }
 

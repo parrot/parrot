@@ -346,11 +346,16 @@ associated with a namespace.) Just adding a sub to a namespace will not
 automatically make it a method of the class, you have to call add_method
 too.
 
-=item isa(class *)
+=item isa(pmc *)
 
-Returns true or false if the class passed in as a parameter is in the
-inheritance hierarchy of the object. {{This should also support type
-names and namespace names as a parameter, not just class objects.}}
+Returns true or false if the class object, namespace object, key, or
+string name PMC passed in as a parameter is a class in the inheritance
+hierarchy of the object.
+
+=item isa_str(string *)
+
+Returns true or false if the string passed in as a parameter is a
+class in the inheritance hierarchy of the object.
 
 =item can(string *)
 
@@ -641,11 +646,23 @@ composed into the class).
 
 =item get_attr(STRING*)
 
-Returns the attribute with the fully qualified name for the object.
+Returns the attribute with the string name for the object.
 
-=item set_attr(STRING*, PMC *)
+=item get_attr_keyed(PMC*, STRING*)
 
-Set the attribute with the fully qualified name for the object.
+Returns the attribute with the string name for the object. Lookup is on
+the attribute store of a particular parent of the object's class,
+identified by a classname, namespace, or key PMC.
+
+=item set_attr(STRING*, PMC*)
+
+Set the attribute with the string name for the object.
+
+=item set_attr_keyed(PMC*, STRING*, PMC*)
+
+Set the attribute with the string name for the object. The value is set
+in the attribute store of a particular parent of the object's class,
+identified by a classname, namespace, or key PMC.
 
 =item get_class
 
@@ -929,7 +946,7 @@ as an attribute in the child class, pass an optional class object or namespace
 key $P3 for the parent class.
 
 If the attribute doesn't exist, it will throw an exception. If the attribute
-exists, but the value hasn't been set, it will return an C<Undef> PMC.
+exists, but the value hasn't been set, it will return a null PMC.
 
 =item setattribute
 
@@ -945,43 +962,52 @@ If the attribute doesn't exist, it will throw an exception.
 
 =item callmethod
 
-  callmethod
-  callmethod $S1
+  callmethod $P1, $S1, $P2
 
-Call a method. If the method name is provided in $S1, we find the PMC
-for the named method and put it in the sub/method slot. If no name is
-provided we assume that all the calling conventions have already been
-set up and the method PMC is already in the proper place.
+Call the method specified in the attribute $S1 using $P1 as the invocant and
+using the continuation passed in $P2. If you need to create a new continuation
+use C<callmethodcc>.
+
+  callmethod $P1, $P2, $P3
+
+Call the method specified in the Sub object $P2 using $P1 as the invocant and
+using the continuation passed in $P3. If you need to create a new continuation
+use C<callmethodcc>.
+
 
 =item callmethodcc
 
-  callmethodcc
-  callmethodcc $S1
+  callmethodcc $P1, $S1
+  callmethodcc $P1, $P2
 
-Make a method call, automatically generating a return continuation. If a
-method name is passed in we look up the method PMC for the object and
-put it in the method slot. If a method name isn't provided then we
-assume that things are already properly set up.
+Call the method specified in the attribute $S1, or in the Sub object $P2, using
+$P1 as the invocant for method lookup and generate a new return continuation.
+
+Throws a Method_Not_Found_Exception for a non-existent method.
 
 =item callmethodsupercc
 
-  callmethodsupercc $S1
+  callmethodsupercc $P1, $S1
+  callmethodsupercc $P1, $P2
 
-Make a method call, automatically generating a return continuation.  A variant
-of C<callmethodcc> that skips over the current class when searching for the
-method, and only looks in the parent classes.  PIR may provide some syntactic
-sugar for this.
+Call the method specified in the attribute $S1, or in the Sub object $P2, using
+$P1 as the invocant for method lookup and generate a new return continuation.
+This is a variant of C<callmethodcc> that skips over the current class when
+searching for the method, and only looks in the parent classes.  PIR may
+provide some syntactical sugar for this.
 
 =item callmethodnextcc
 
-  callmethodnextcc $S1
+  callmethodnextcc $P1, $S1
+  callmethodnextcc $P1, $P2
 
-Make a method call, automatically generating a return continuation.  A variant
-of C<callmethodcc> that picks up an existing C<find_method> search where it
-left off for the current call. {{ Note: this depends on find_method being
-resumable, and on the context of a particular method including a pointer to the
-find_method call that found it. Neither may be feasible. }} PIR may provide
-some syntactic sugar for this.
+Call the method specified in the attribute $S1, or in the Sub object $P2, 
+using $P1 as the invocant for method lookup and generate a new return
+continuation. A variant of C<callmethodcc> that picks up an existing
+C<find_method> search where it left off for the current call. {{ Note: this
+depends on find_method being resumable, and on the context of a particular
+method including a pointer to the find_method call that found it. Neither may
+be feasible. }} PIR may provide some syntactic sugar for this.
 
 =item newclass
 
@@ -993,7 +1019,12 @@ optionally pass a hash of initialization parameters for the class in $P3.
 
 =item subclass
 
+  $P1 = subclass $S2
+  $P1 = subclass $P2
+  $P1 = subclass $S2, $S3
   $P1 = subclass $P2, $S3
+  $P1 = subclass $S2, $P3
+  $P1 = subclass $P2, $P3
 
 Create a new class, named $S3, which has $P2 as its immediate parent. $P2 may
 be either another high-level class based on the Class PMC, or it may be a
@@ -1011,6 +1042,18 @@ A string name looks for the class in a namespace with that name nested in the
 currently selected namespace. Passing in a namespace object looks for the class
 in that namespace object. A key looks for the class in the namespace identified
 by the multilevel key relative to the currently selected HLL.
+
+If the class doesn't exist, it returns a null PMC.
+
+=item typeof
+
+  $S1 = typeof $P2
+  $P1 = typeof $P2
+
+Lookup the type of the instance object in $P2. Return the string name if the
+destination is a string register or variable. If the destination is a PMC
+register or variable, return the class object for an instance of a high-level
+class, or the class proxy object for an instance of a low-level PMC.
 
 =item new
 

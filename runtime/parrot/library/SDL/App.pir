@@ -12,10 +12,8 @@ SDL::App - Parrot extension for SDL Applications
 
     # create a new SDL::App object
     .local pmc app
-    .local int app_type
 
-    find_type app_type, 'SDL::App'
-    app = new app_type
+    app = new 'SDL::App'
 
     # set the app's arguments
     .local pmc app_args
@@ -126,41 +124,30 @@ about the interface here.
     # XXX - need to check this here somehow
     # defined $I0, screen
 
-    .local int surface_type
     .local pmc main_surface
-
-    find_type surface_type, 'SDL::Surface'
-    new main_surface, surface_type
+    new main_surface, 'SDL::Surface'
 
     main_surface.'wrap_surface'( screen )
 
-    .local int offset
     .local pmc intvalue
-
-    # set all other offsets in self
-    classoffset offset, self, 'SDL::App'
 
     intvalue = new 'Integer'
     set intvalue, height
-    setattribute self, offset, intvalue
+    setattribute self, 'height', intvalue
 
     intvalue = new 'Integer'
     set intvalue, width
-    inc offset
-    setattribute self, offset, intvalue
+    setattribute self, 'width', intvalue
 
     intvalue = new 'Integer'
     set intvalue, bpp
-    inc offset
-    setattribute self, offset, intvalue
+    setattribute self, 'bpp', intvalue
 
     intvalue = new 'Integer'
     set intvalue, flags
-    inc offset
-    setattribute self, offset, intvalue
+    setattribute self, 'flags', intvalue
 
-    inc offset
-    setattribute self, offset, main_surface
+    setattribute self, 'surface', main_surface
 
     .return()
 .end
@@ -173,11 +160,7 @@ Returns the main surface.  This is an L<SDL::Surface>.
 
 .sub surface :method
     .local pmc surface
-    .local int offset
-
-    classoffset offset, self, 'SDL::App'
-    add offset, 4
-    getattribute surface, self, offset
+    getattribute surface, self, 'surface'
 
     .return( surface )
 .end
@@ -204,11 +187,9 @@ L<SDL::Surface>.
 
 .sub height :method
     .local pmc height
-    .local int offset
     .local int result
 
-    classoffset offset, self, 'SDL::App'
-    getattribute height, self, offset
+    getattribute height, self, 'height'
     set result, height
 
     .return( result )
@@ -223,12 +204,9 @@ L<SDL::Surface>.
 
 .sub width :method
     .local pmc width
-    .local int offset
     .local int result
 
-    classoffset offset, self, 'SDL::App'
-    add offset, 1
-    getattribute width, self, offset
+    getattribute width, self, 'width'
     set result, width
 
     .return( result )
@@ -242,12 +220,9 @@ Returns the bit depth of the main window, in pixels.
 
 .sub bpp :method
     .local pmc bpp
-    .local int offset
     .local int result
 
-    classoffset offset, self, 'SDL::App'
-    add offset, 3
-    getattribute bpp, self, offset
+    getattribute bpp, self, 'bpp'
     set result, bpp
 
     .return( result )
@@ -263,7 +238,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

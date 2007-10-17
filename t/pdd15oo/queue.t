@@ -36,9 +36,9 @@ my $library = <<'CODE';
 
 .sub __onload
     .local pmc class
-    $I0 = find_type 'STMQueue'
-    if $I0 goto done
-    class = newpdd15class 'STMQueue'
+    $P0 = get_class 'STMQueue'
+    unless null $P0 goto done
+    class = newclass 'STMQueue'
     addattribute class, 'head'
     addattribute class, 'tail'
     addattribute class, 'used'

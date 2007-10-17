@@ -1652,7 +1652,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'overriding find_method()' );
 .sub 'main' :main
-    $P0 = newpdd15class 'Override'
+    $P0 = newclass 'Override'
     $P1 = new 'Override'
     $P2 = find_method $P1, 'foo'
 .end

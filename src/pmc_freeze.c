@@ -994,7 +994,7 @@ freeze_pmc(PARROT_INTERP, NULLOK(PMC *pmc), NOTNULL(visit_info *info),
     type = pmc->vtable->base_type;
 
     if (PObj_is_object_TEST(pmc))
-        type = enum_class_ParrotObject;
+        type = enum_class_Object;
     if (seen) {
         if (info->extra_flags) {
             id |= 3;
@@ -1064,7 +1064,7 @@ thaw_pmc(PARROT_INTERP, NOTNULL(visit_info *info),
         if (*type >= interp->n_vtable_max ||
             !interp->vtables[*type]) {
             /* that ought to be a class */
-            *type = enum_class_ParrotClass;
+            *type = enum_class_Class;
         }
     }
     *id = (UINTVAL) n;

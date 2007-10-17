@@ -24,6 +24,8 @@ This class provides the following methods:
     addattribute tbtb_class, 'number'
     addattribute tbtb_class, 'diagnostic'
     addattribute tbtb_class, 'description'
+    addattribute tbtb_class, 'skip'
+    addattribute tbtb_class, 'todo'
 
     .local pmc tbtp_class
     subclass tbtp_class, tbtb_class, 'Test::Builder::Test::Pass'
@@ -82,32 +84,32 @@ The returned object is a subclass of Test::Builder::Test.
 .sub create
     .param pmc args
 
-    .local int test_class
+    .local string test_class
     .local int type_flag
 
   CHECK_TODO:
     type_flag = args['todo']
     unless type_flag goto CHECK_SKIP
 
-    find_type test_class, 'Test::Builder::Test::TODO'
+    test_class = 'Test::Builder::Test::TODO'
     goto CREATE_TEST
 
   CHECK_SKIP:
     type_flag = args['skip']
     unless type_flag goto CHECK_PASS
 
-    find_type test_class, 'Test::Builder::Test::Skip'
+    test_class = 'Test::Builder::Test::Skip'
     goto CREATE_TEST
 
   CHECK_PASS:
     type_flag = args['passed']
     unless type_flag goto CHECK_FAIL
 
-    find_type test_class, 'Test::Builder::Test::Pass'
+    test_class = 'Test::Builder::Test::Pass'
     goto CREATE_TEST
 
   CHECK_FAIL:
-    find_type test_class, 'Test::Builder::Test::Fail'
+    test_class = 'Test::Builder::Test::Fail'
     goto CREATE_TEST
 
   CREATE_TEST:

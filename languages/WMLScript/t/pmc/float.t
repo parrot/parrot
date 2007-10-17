@@ -25,9 +25,8 @@ use Test::More;
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsFloat"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsFloat"
     .local int bool1
     bool1 = isa pmc1, "Float"
     print bool1
@@ -45,9 +44,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check interface' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsFloat"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsFloat"
     .local int bool1
     bool1 = does pmc1, "scalar"
     print bool1
@@ -69,9 +67,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsFloat"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsFloat"
     .local string str1
     str1 = classname pmc1
     print str1
@@ -89,9 +86,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check clone' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsFloat"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsFloat"
     pmc1 = 3.14
     .local pmc pmc2
     pmc2 = clone pmc1
@@ -118,9 +114,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
 .sub _main
     loadlib P1, "wmls_group"
-    find_type $I0, "WmlsFloat"
     .local pmc pmc1
-    pmc1 = new $I0
+    pmc1 = new "WmlsFloat"
     pmc1 = 3.14
     .local int bool1
     bool1 = istrue pmc1

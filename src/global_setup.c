@@ -156,14 +156,6 @@ init_world(PARROT_INTERP)
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interp);
 
-    /* We have a Proxy PMC for each of the PMCs; now need to attach that to
-     * the class slot for the namespace each of the PMCs reference. */
-    for (i = 0; i <= interp->n_vtable_max; i++)
-        if (interp->vtables[i])
-            Parrot_PCCINVOKE(interp, interp->vtables[i]->_namespace,
-                string_from_literal(interp, "set_class"), "P->",
-                VTABLE_get_pmc_keyed_int(interp, interp->pmc_proxies, i));
-
     iglobals = interp->iglobals;
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_CLASSNAME_HASH, interp->class_hash);
@@ -210,9 +202,6 @@ parrot_global_setup_2(PARROT_INTERP)
     /* We need a class hash */
     interp->class_hash = classname_hash = pmc_new(interp, enum_class_NameSpace);
     Parrot_register_core_pmcs(interp, classname_hash);
-
-    /* Also a PMC array to store PMC Proxy objects. */
-    interp->pmc_proxies = pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* init the interpreter globals array */
     iglobals         = pmc_new(interp, enum_class_SArray);

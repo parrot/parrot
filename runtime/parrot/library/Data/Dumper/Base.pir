@@ -24,15 +24,13 @@ A Data::Dumper::Base object has the following methods:
 
 =cut
 
-.const int attrDumper = 0
-.const int attrLevel = 1
-.const int attrIndention = 2
-.const int attrCache = 3
-.const int attrCacheNames = 4
-
 .sub __library_data_dumper_base_onload :load
-    find_type $I0, "Data::Dumper::Base"
-    if $I0 > 1 goto END
+    .local pmc ddb_class
+    ddb_class = get_class "Data::Dumper::Base"
+    if null ddb_class goto create_ddb
+    goto END
+
+  create_ddb:
     newclass $P0, "Data::Dumper::Base"
     addattribute $P0, "dumper"
     addattribute $P0, "level"
@@ -57,18 +55,18 @@ END:
 
     setattribute self, "dumper", dumper
 
-    new temp, .Integer
+    new temp, "Integer"
     set temp, 0
     setattribute self, "level", temp
 
-    new temp, .String
+    new temp, "String"
     clone stemp, indent
     set temp, stemp
     setattribute self, "indention", temp
 
-    new temp, .AddrRegistry 
+    new temp, "AddrRegistry"
     setattribute self, "cache", temp
-    new temp, .ResizableStringArray 
+    new temp, "ResizableStringArray"
     setattribute self, "cachename", temp
 
     .return ()
@@ -100,7 +98,7 @@ NOTFOUND:
     inc i
     _cache[find] = i
     _names[i] = name
-    
+
     .return ( -1, name )
 .end
 
@@ -113,9 +111,7 @@ NOTFOUND:
     .local pmc temp
     .local string indent
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrIndention
-    getattribute temp, self, $I0
+    getattribute temp, self, "indention"
     set indent, temp
     clone indent, indent
     repeat indent, indent, level
@@ -132,9 +128,7 @@ NOTFOUND:
     .local string _indent
     .local int level
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrLevel
-    getattribute temp, self, $I0
+    getattribute temp, self, "level"
     set level, temp
 
     _indent = self."createIndent"( level )
@@ -152,9 +146,7 @@ NOTFOUND:
     .local string indent2
     .local int level
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrLevel
-    getattribute temp, self, $I0
+    getattribute temp, self, "level"
     set level, temp
     inc temp
 
@@ -174,9 +166,7 @@ NOTFOUND:
     .local string indent
     .local int level
 
-    classoffset $I0, self, "Data::Dumper::Base"
-    add $I0, attrLevel
-    getattribute temp, self, $I0
+    getattribute temp, self, "level"
     dec temp
     set level, temp
 
@@ -221,15 +211,20 @@ NOT_IN_CACHE:
 
     #is _dump undef?
     func = "genericUndef"
-    $I0 = defined _dump
+    $I0  = defined _dump
     unless $I0 goto DUMP
 
+    func = "pmcDefault"
+    $I0  = isa _dump, "Object"
+    if $I0 goto DUMP
+
+  TEST_GENERIC:
     # does a generic helper method exist?
-    func = "genericHash" 
+    func = "genericHash"
     $I0 = does _dump, "hash"
     if $I0 goto DUMP
 
-    func = "genericArray" 
+    func = "genericArray"
     $I0 = does _dump, "array"
     if $I0 goto DUMP
 
@@ -238,7 +233,7 @@ NOT_IN_CACHE:
     if $I0 goto DUMP
 
     func = "genericNumber"
-	$I0 = does _dump, "boolean"
+    $I0 = does _dump, "boolean"
     if $I0 goto DUMP
     $I0 = does _dump, "integer"
     if $I0 goto DUMP
@@ -267,7 +262,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

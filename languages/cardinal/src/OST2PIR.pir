@@ -4,9 +4,8 @@
 .include 'languages/cardinal/src/PIRGrammar.pir'
 
 .sub '__onload' :load
-    $I0 = find_type 'Cardinal::PIRGrammar'
-    if $I0 == 0 goto error
-    $P0 = getclass 'Cardinal::PIRGrammar'
+    $P0 = get_class 'Cardinal::PIRGrammar'
+    if null $P0 goto error
     addattribute $P0, 'scope_stack'
     addattribute $P0, 'subs'
     addattribute $P0, 'namespaces'

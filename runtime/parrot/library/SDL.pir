@@ -48,28 +48,30 @@ The subsystem initalizers include:
 
 .namespace [ 'SDL' ]
 
+.include 'datatypes.pasm'
+
 .macro store_nci_func( func_name, signature )
-	c_func_name = prefix . .func_name
-	dlfunc c_function, libsdl, c_func_name, .signature
-	store_global namespace, .func_name, c_function
+    c_func_name = prefix . .func_name
+    dlfunc c_function, libsdl, c_func_name, .signature
+    store_global namespace, .func_name, c_function
 .endm
 
 .sub _sdl_init :load
-	_init_video()
+    _init_video()
 
-	.local pmc layouts
-	layouts = new OrderedHash
-	store_global 'SDL::NCI', 'layouts', layouts
+    .local pmc layouts
+    layouts = new 'OrderedHash'
+    store_global 'SDL::NCI', 'layouts', layouts
 
-	# this order matters; trust me!
-	_set_Event_layout(        layouts )
-	_set_Rect_layout(         layouts )
-	_set_Rect_Array_layout(   layouts )
-	_set_Color_layout(        layouts )
-	_set_Palette_layout(      layouts )
-	_set_PixelFormat_layout(  layouts )
-	_set_Pixels_layout(       layouts )
-	_set_Surface_layout(      layouts )
+    # this order matters; trust me!
+    _set_Event_layout(        layouts )
+    _set_Rect_layout(         layouts )
+    _set_Rect_Array_layout(   layouts )
+    _set_Color_layout(        layouts )
+    _set_Palette_layout(      layouts )
+    _set_PixelFormat_layout(  layouts )
+    _set_Pixels_layout(       layouts )
+    _set_Surface_layout(      layouts )
 
 .end
 
@@ -81,83 +83,83 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 =cut
 
 .sub _init_video
-	.local pmc libsdl
-	.local pmc sdl_function
+    .local pmc libsdl
+    .local pmc sdl_function
 
-	loadlib libsdl, 'libSDL'
-	$I0 = typeof libsdl
-	if $I0 != .Undef goto OK
-	
-	# second try
-	loadlib libsdl, 'libSDL-1.2'
-	$I0 = typeof libsdl
-	if $I0 != .Undef goto OK_HINT1
+    loadlib libsdl, 'libSDL'
+    $I0 = typeof libsdl
+    if $I0 != .Undef goto OK
 
-	# third try
-	loadlib libsdl, 'libSDL-1.2.so.0'
-	$I0 = typeof libsdl
-	if $I0 != .Undef goto OK_HINT2
-	
-	# failed to load libSDL
-	$P0 = new Exception
-	$P0["_message"] = "libSDL not found!"
-	throw $P0
-	branch OK
-OK_HINT1:
-	printerr "Hint: create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
-	branch OK
-OK_HINT2:
-	printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
-OK:
-	.local string namespace
-	namespace = 'SDL::NCI'
+    # second try
+    loadlib libsdl, 'libSDL-1.2'
+    $I0 = typeof libsdl
+    if $I0 != .Undef goto OK_HINT1
 
-	.local string prefix
-	prefix    = 'SDL_'
+    # third try
+    loadlib libsdl, 'libSDL-1.2.so.0'
+    $I0 = typeof libsdl
+    if $I0 != .Undef goto OK_HINT2
 
-	.local string c_func_name
-	.local pmc    c_function
+    # failed to load libSDL
+    $P0 = new 'Exception'
+    $P0["_message"] = "libSDL not found!"
+    throw $P0
+    branch OK
+  OK_HINT1:
+    printerr "Hint: create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
+    branch OK
+  OK_HINT2:
+    printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
+  OK:
+    .local string namespace
+    namespace = 'SDL::NCI'
 
-	.store_nci_func( 'Init', 'ii' )
+    .local string prefix
+    prefix    = 'SDL_'
 
-#	dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
-#	store_global 'SDL::NCI', 'Init', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
-	store_global 'SDL::NCI', 'SetVideoMode', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_Quit', 'v'
-	store_global 'SDL::NCI', 'Quit', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_FillRect', 'ippi'
-	store_global 'SDL::NCI', 'FillRect', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_UpdateRect', 'vpiiii'
-	store_global 'SDL::NCI', 'UpdateRect', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_UpdateRects', 'vpip'
-	store_global 'SDL::NCI', 'UpdateRects', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_Flip', 'ip'
-	store_global 'SDL::NCI', 'Flip', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_FreeSurface', 'vp'
-	store_global 'SDL::NCI', 'FreeSurface', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_LoadBMP_RW', 'ppi'
-	store_global 'SDL::NCI', 'LoadBMP_RW', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_DisplayFormat', 'pp'
-	store_global 'SDL::NCI', 'DisplayFormat', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_UpperBlit', 'ipppp'
-	store_global 'SDL::NCI', 'BlitSurface', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_WaitEvent', 'ip'
-	store_global 'SDL::NCI', 'WaitEvent', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_PollEvent', 'ip'
-	store_global 'SDL::NCI', 'PollEvent', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'ti'
-	store_global 'SDL::NCI', 'GetKeyName', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_GetError', 'tv'
-	store_global 'SDL::NCI', 'GetError', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_SetColorKey', 'ipii'
-	store_global 'SDL::NCI', 'SetColorKey', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_LockSurface', 'ip'
-	store_global 'SDL::NCI', 'LockSurface', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_UnlockSurface', 'vp'
-	store_global 'SDL::NCI', 'UnlockSurface', sdl_function
-	dlfunc sdl_function, libsdl, 'SDL_CreateRGBSurface', 'piiiiiiii'
-	store_global 'SDL::NCI', 'CreateRGBSurface', sdl_function
+    .local string c_func_name
+    .local pmc    c_function
+
+    .store_nci_func( 'Init', 'ii' )
+
+#    dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
+#    store_global 'SDL::NCI', 'Init', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
+    store_global 'SDL::NCI', 'SetVideoMode', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_Quit', 'v'
+    store_global 'SDL::NCI', 'Quit', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_FillRect', 'ippi'
+    store_global 'SDL::NCI', 'FillRect', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_UpdateRect', 'vpiiii'
+    store_global 'SDL::NCI', 'UpdateRect', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_UpdateRects', 'vpip'
+    store_global 'SDL::NCI', 'UpdateRects', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_Flip', 'ip'
+    store_global 'SDL::NCI', 'Flip', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_FreeSurface', 'vp'
+    store_global 'SDL::NCI', 'FreeSurface', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_LoadBMP_RW', 'ppi'
+    store_global 'SDL::NCI', 'LoadBMP_RW', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_DisplayFormat', 'pp'
+    store_global 'SDL::NCI', 'DisplayFormat', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_UpperBlit', 'ipppp'
+    store_global 'SDL::NCI', 'BlitSurface', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_WaitEvent', 'ip'
+    store_global 'SDL::NCI', 'WaitEvent', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_PollEvent', 'ip'
+    store_global 'SDL::NCI', 'PollEvent', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'ti'
+    store_global 'SDL::NCI', 'GetKeyName', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_GetError', 'tv'
+    store_global 'SDL::NCI', 'GetError', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_SetColorKey', 'ipii'
+    store_global 'SDL::NCI', 'SetColorKey', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_LockSurface', 'ip'
+    store_global 'SDL::NCI', 'LockSurface', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_UnlockSurface', 'vp'
+    store_global 'SDL::NCI', 'UnlockSurface', sdl_function
+    dlfunc sdl_function, libsdl, 'SDL_CreateRGBSurface', 'piiiiiiii'
+    store_global 'SDL::NCI', 'CreateRGBSurface', sdl_function
 .end
 
 =item _init_image()
@@ -169,34 +171,34 @@ SDL::Image library anyway, which calls this for you.
 =cut
 
 .sub _init_image
-	.local pmc image_lib
-	.local pmc nci_sub
+    .local pmc image_lib
+    .local pmc nci_sub
 
-	loadlib image_lib, 'libSDL_image'
-	$I0 = typeof image_lib
-	if $I0 != .Undef goto OK
+    loadlib image_lib, 'libSDL_image'
+    $I0 = typeof image_lib
+    if $I0 != .Undef goto OK
 
-	loadlib image_lib, 'libSDL_image-1.2'
-	$I0 = typeof image_lib
-	if $I0 != .Undef goto OK_HINT1
+    loadlib image_lib, 'libSDL_image-1.2'
+    $I0 = typeof image_lib
+    if $I0 != .Undef goto OK_HINT1
 
-	loadlib image_lib, 'libSDL_image-1.2.so.0'
-	$I0 = typeof image_lib
-	if $I0 != .Undef goto OK_HINT2
+    loadlib image_lib, 'libSDL_image-1.2.so.0'
+    $I0 = typeof image_lib
+    if $I0 != .Undef goto OK_HINT2
 
-	# failed to load libSDL
-	$P0 = new Exception
-	$P0["_message"] = "libSDL_image not found!"
-	throw $P0
-	branch OK
-OK_HINT1:
-	printerr "Hint: create a link from libSDL_image-1.2.so to libSDL_image.so to disable the error messages.\n"
-	branch OK
-OK_HINT2:
-	printerr "Hint: create a link from libSDL_image-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
-OK:
-	dlfunc nci_sub, image_lib, 'IMG_Load', 'pt'
-	store_global 'SDL::NCI', 'IMG_Load', nci_sub
+    # failed to load libSDL
+    $P0 = new 'Exception'
+    $P0["_message"] = "libSDL_image not found!"
+    throw $P0
+    branch OK
+  OK_HINT1:
+    printerr "Hint: create a link from libSDL_image-1.2.so to libSDL_image.so to disable the error messages.\n"
+    branch OK
+  OK_HINT2:
+    printerr "Hint: create a link from libSDL_image-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
+  OK:
+    dlfunc nci_sub, image_lib, 'IMG_Load', 'pt'
+    store_global 'SDL::NCI', 'IMG_Load', nci_sub
 .end
 
 =item _init_ttf()
@@ -210,445 +212,446 @@ SDL::Font library anyway, which calls this for you.
 =cut
 
 .sub _init_ttf
-	.local pmc ttf_lib
-	.local pmc nci_sub
+    .local pmc ttf_lib
+    loadlib ttf_lib, 'libSDL_ttf'
+    unless ttf_lib goto error
 
-	loadlib ttf_lib, 'libSDL_ttf'
-	dlfunc nci_sub, ttf_lib, 'TTF_Init', 'iv'
-	store_global 'SDL::NCI::TTF', 'Init', nci_sub
-	
-	.local int initialized
-	initialized = nci_sub()
+    .local pmc nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_Init', 'iv'
+    store_global 'SDL::NCI::TTF', 'Init', nci_sub
+    unless nci_sub goto error
 
-	if initialized goto error
-	goto success
+    .local int initialized
+    initialized = nci_sub()
+    if initialized goto success
 
-	# XXX: wow, this is unspectacular error handling!
-error:
-	print "SDL_ttf not initialized\n"
-	end
+    # XXX: wow, this is unspectacular error handling!
+  error:
+    .local pmc e
+    e    = new 'Exception'
+    e[0] = "SDL_ttf not initialized\n"
+    throw e
 
-success:
+  success:
+    dlfunc nci_sub, ttf_lib, 'TTF_OpenFont', 'pti'
+    store_global 'SDL::NCI::TTF', 'OpenFont', nci_sub
 
-	dlfunc nci_sub, ttf_lib, 'TTF_OpenFont', 'pti'
-	store_global 'SDL::NCI::TTF', 'OpenFont', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'pptp'
+    store_global 'SDL::NCI::TTF', 'RenderText_Solid', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'pptp'
+    store_global 'SDL::NCI::TTF', 'RenderUTF8_Solid', nci_sub
 
-	dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'pptp'
-	store_global 'SDL::NCI::TTF', 'RenderText_Solid', nci_sub
-	dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'pptp'
-	store_global 'SDL::NCI::TTF', 'RenderUTF8_Solid', nci_sub
+    # this one could be wrong
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'pptp'
+    store_global 'SDL::NCI::TTF', 'RenderUNICODE_Solid', nci_sub
 
-	# this one could be wrong
-	dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'pptp'
-	store_global 'SDL::NCI::TTF', 'RenderUNICODE_Solid', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_SizeText', 'ipt33'
+    store_global 'SDL::NCI::TTF', 'SizeText', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_SizeUTF8', 'ipt33'
+    store_global 'SDL::NCI::TTF', 'SizeUTF8', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_SizeUNICODE', 'ipt33'
+    store_global 'SDL::NCI::TTF', 'SizeUNICODE', nci_sub
 
-	dlfunc nci_sub, ttf_lib, 'TTF_SizeText', 'ipt33'
-	store_global 'SDL::NCI::TTF', 'SizeText', nci_sub
-	dlfunc nci_sub, ttf_lib, 'TTF_SizeUTF8', 'ipt33'
-	store_global 'SDL::NCI::TTF', 'SizeUTF8', nci_sub
-	dlfunc nci_sub, ttf_lib, 'TTF_SizeUNICODE', 'ipt33'
-	store_global 'SDL::NCI::TTF', 'SizeUNICODE', nci_sub
-
-	dlfunc nci_sub, ttf_lib, 'TTF_CloseFont', 'vp'
-	store_global 'SDL::NCI::TTF', 'CloseFont', nci_sub
-	dlfunc nci_sub, ttf_lib, 'TTF_Quit', 'vv'
-	store_global 'SDL::NCI::TTF', 'Quit', nci_sub
-	dlfunc nci_sub, ttf_lib, 'TTF_WasInit', 'iv'
-	store_global 'SDL::NCI::TTF', 'WasInit', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_CloseFont', 'vp'
+    store_global 'SDL::NCI::TTF', 'CloseFont', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_Quit', 'vv'
+    store_global 'SDL::NCI::TTF', 'Quit', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_WasInit', 'iv'
+    store_global 'SDL::NCI::TTF', 'WasInit', nci_sub
 .end
 
 .sub _set_Event_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc layout
-	layout = new OrderedHash
+    .local pmc layout
+    layout = new 'OrderedHash'
 
-	# this is the only element in common in the SDL_Event union
-	set  layout[ 'type' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad0' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad1' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad2' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad3' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad4' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad5' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
+    # this is the only element in common in the SDL_Event union
+    set  layout[ 'type' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad0' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad1' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad2' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad3' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad4' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad5' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Event::Generic' ], layout
+    set  layouts[ 'Event::Generic' ], layout
 
-	# SDL_KeyboardEvent is the largest struct in the SDL_Event union
-	layout = new OrderedHash
-	set  layout[ 'type' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'which' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'state' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'padding' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'scancode' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'padding_a' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'padding_b' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'padding_c' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'sym' ], .DATATYPE_INT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'mod' ], .DATATYPE_INT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'unicode' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
+    # SDL_KeyboardEvent is the largest struct in the SDL_Event union
+    layout = new 'OrderedHash'
+    set  layout[ 'type' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'which' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'state' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'padding' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'scancode' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'padding_a' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'padding_b' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'padding_c' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'sym' ], .DATATYPE_INT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'mod' ], .DATATYPE_INT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'unicode' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Event::Keyboard' ], layout
+    set  layouts[ 'Event::Keyboard' ], layout
 
-	# SDL_MouseMotionEvent
-	layout = new OrderedHash
-	set  layout[ 'type' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pad0' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'state' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'x' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'y' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'xrel' ], .DATATYPE_INT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'yrel' ], .DATATYPE_INT16
-	push layout, 0
-	push layout, 0
+    # SDL_MouseMotionEvent
+    layout = new 'OrderedHash'
+    set  layout[ 'type' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pad0' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'state' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'x' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'y' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'xrel' ], .DATATYPE_INT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'yrel' ], .DATATYPE_INT16
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Event::MouseMotion' ], layout
+    set  layouts[ 'Event::MouseMotion' ], layout
 
-	# SDL_MouseButtonEvent
-	layout = new OrderedHash
-	set  layout[ 'type' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'button' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'state' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'x' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'y' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
+    # SDL_MouseButtonEvent
+    layout = new 'OrderedHash'
+    set  layout[ 'type' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'button' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'state' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'x' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'y' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Event::MouseButton' ], layout
+    set  layouts[ 'Event::MouseButton' ], layout
 .end
 
-.sub _set_Rect_layout 
-	.param pmc layouts
-	.local pmc layout
+.sub _set_Rect_layout
+    .param pmc layouts
+    .local pmc layout
 
-	layout = new OrderedHash
-	set  layout[ 'x' ],      .DATATYPE_INT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'y' ],      .DATATYPE_INT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'width' ],  .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
-	set  layout[ 'height' ], .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
+    layout = new 'OrderedHash'
+    set  layout[ 'x' ],      .DATATYPE_INT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'y' ],      .DATATYPE_INT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'width' ],  .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
+    set  layout[ 'height' ], .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Rect' ], layout
+    set  layouts[ 'Rect' ], layout
 .end
 
-.sub _set_Rect_Array_layout 
-	.param pmc layouts
+.sub _set_Rect_Array_layout
+    .param pmc layouts
 
-	.local pmc fetch_struct
-	fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    .local pmc fetch_struct
+    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
 
-	.local pmc rect
-	rect   = fetch_struct( 'Rect', 0 )
+    .local pmc rect
+    rect   = fetch_struct( 'Rect', 0 )
 
-	.local pmc layout
-	layout = new OrderedHash
+    .local pmc layout
+    layout = new 'OrderedHash'
 
-	set  layout[ 'RectArray' ], .DATATYPE_STRUCT
+    set  layout[ 'RectArray' ], .DATATYPE_STRUCT
 
-	set     $P1, layout[ -1 ]
-	setprop $P1, '_struct', rect
+    set     $P1, layout[ -1 ]
+    setprop $P1, '_struct', rect
 
-	# this is wrong; you need to reset it
-	push layout, 0
-	push layout, 0
+    # this is wrong; you need to reset it
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Rect_Array' ], layout
+    set  layouts[ 'Rect_Array' ], layout
 .end
 
 .sub _set_Surface_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc fetch_struct
-	fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    .local pmc fetch_struct
+    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
 
-	# SDL_PixelFormat struct pointer
-	.local pmc pixelformat
-	pixelformat = fetch_struct( 'PixelFormat', 0 )
+    # SDL_PixelFormat struct pointer
+    .local pmc pixelformat
+    pixelformat = fetch_struct( 'PixelFormat', 0 )
 
-	# SDL_Rect struct
-	.local pmc rect
-	rect        = fetch_struct( 'Rect', 0 )
+    # SDL_Rect struct
+    .local pmc rect
+    rect        = fetch_struct( 'Rect', 0 )
 
-	# SDL_Pixels struct (workaround?)
-	.local pmc pixels
-	rect        = fetch_struct( 'Pixels', 0 )
+    # SDL_Pixels struct (workaround?)
+    .local pmc pixels
+    rect        = fetch_struct( 'Pixels', 0 )
 
-	.local pmc layout
-	layout = new OrderedHash
-	set  layout[ 'flags' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
+    .local pmc layout
+    layout = new 'OrderedHash'
+    set  layout[ 'flags' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
 
-	set  layout[ 'format' ], .DATATYPE_STRUCT_PTR
+    set  layout[ 'format' ], .DATATYPE_STRUCT_PTR
 
-	# SDL_PixelFormat struct pointer
-	.local pmc format_pointer
-	set        format_pointer, layout[ -1 ]
-	setprop    format_pointer, '_struct', pixelformat
+    # SDL_PixelFormat struct pointer
+    .local pmc format_pointer
+    set        format_pointer, layout[ -1 ]
+    setprop    format_pointer, '_struct', pixelformat
 
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
 
-	set  layout[ 'w' ],      .DATATYPE_INT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'h' ],      .DATATYPE_INT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'pitch' ],  .DATATYPE_UINT16
-	push layout, 0
-	push layout, 0
+    set  layout[ 'w' ],      .DATATYPE_INT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'h' ],      .DATATYPE_INT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'pitch' ],  .DATATYPE_UINT16
+    push layout, 0
+    push layout, 0
 
-	.local pmc pixels_layout
-	.local pmc pixels_array
-	pixels_layout = new OrderedHash
+    .local pmc pixels_layout
+    .local pmc pixels_array
+    pixels_layout = new 'OrderedHash'
 
-	set  pixels_layout[ 'array' ], .DATATYPE_INT
-	push pixels_layout, 0
-	push pixels_layout, 0
-	pixels_array  = new UnManagedStruct, pixels_layout
+    set  pixels_layout[ 'array' ], .DATATYPE_INT
+    push pixels_layout, 0
+    push pixels_layout, 0
+    pixels_array  = new 'UnManagedStruct', pixels_layout
 
-	set  layout[ 'pixels' ], .DATATYPE_STRUCT_PTR
-	set        format_pointer, layout[ -1 ]
-	setprop    format_pointer, '_struct', pixels_array
+    set  layout[ 'pixels' ], .DATATYPE_STRUCT_PTR
+    set        format_pointer, layout[ -1 ]
+    setprop    format_pointer, '_struct', pixels_array
 
-	push layout, 0
-	push layout, 0
-	set  layout[ 'offset' ], .DATATYPE_INT
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
+    set  layout[ 'offset' ], .DATATYPE_INT
+    push layout, 0
+    push layout, 0
 
-	# private_hwdata struct pointer
-	set  layout[ 'hwdata' ], .DATATYPE_PTR
+    # private_hwdata struct pointer
+    set  layout[ 'hwdata' ], .DATATYPE_PTR
 
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
 
-	set layout[ 'clip_rect' ], .DATATYPE_STRUCT
+    set layout[ 'clip_rect' ], .DATATYPE_STRUCT
 
-	.local pmc rect_pointer
-	set        rect_pointer, layout[ -1 ]
-	setprop    rect_pointer, '_struct', rect
+    .local pmc rect_pointer
+    set        rect_pointer, layout[ -1 ]
+    setprop    rect_pointer, '_struct', rect
 
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
 
-	set  layout[ 'unused1' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'locked' ], .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
+    set  layout[ 'unused1' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'locked' ], .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
 
-	# SDL_BlitMap struct pointer
-	set  layout[ 'map' ], .DATATYPE_PTR
-	push layout, 0
-	push layout, 0
+    # SDL_BlitMap struct pointer
+    set  layout[ 'map' ], .DATATYPE_PTR
+    push layout, 0
+    push layout, 0
 
-	set  layout[ 'format_version' ], .DATATYPE_UINT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'refcount' ], .DATATYPE_INT
-	push layout, 0
-	push layout, 0
+    set  layout[ 'format_version' ], .DATATYPE_UINT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'refcount' ], .DATATYPE_INT
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Surface' ], layout
+    set  layouts[ 'Surface' ], layout
 .end
 
 .sub _set_PixelFormat_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc fetch_struct
-	fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    .local pmc fetch_struct
+    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
 
-	.local pmc palette
-	palette = fetch_struct( 'Palette', 0 )
+    .local pmc palette
+    palette = fetch_struct( 'Palette', 0 )
 
-	.local pmc layout
-	layout = new OrderedHash
-	set  layout[ 'palette' ], .DATATYPE_STRUCT_PTR
+    .local pmc layout
+    layout = new 'OrderedHash'
+    set  layout[ 'palette' ], .DATATYPE_STRUCT_PTR
 
-	.local pmc palette_pointer
-	set        palette_pointer, layout[ -1 ]
-	setprop    palette_pointer, '_struct', palette
+    .local pmc palette_pointer
+    set        palette_pointer, layout[ -1 ]
+    setprop    palette_pointer, '_struct', palette
 
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
 
-	set  layout[ 'BitsPerPixel' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'BytesPerPixel' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Rloss' ],         .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Gloss' ],         .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Bloss' ],         .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Aloss' ],         .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Rshift' ],        .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Gshift' ],        .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Bshift' ],        .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Ashift' ],        .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Rmask' ],         .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Gmask' ],         .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Bmask' ],         .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'Amask' ],         .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'colorkey' ],      .DATATYPE_UINT32
-	push layout, 0
-	push layout, 0
-	set  layout[ 'alpha' ],         .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
+    set  layout[ 'BitsPerPixel' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'BytesPerPixel' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Rloss' ],         .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Gloss' ],         .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Bloss' ],         .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Aloss' ],         .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Rshift' ],        .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Gshift' ],        .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Bshift' ],        .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Ashift' ],        .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Rmask' ],         .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Gmask' ],         .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Bmask' ],         .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'Amask' ],         .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'colorkey' ],      .DATATYPE_UINT32
+    push layout, 0
+    push layout, 0
+    set  layout[ 'alpha' ],         .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'PixelFormat' ], layout
+    set  layouts[ 'PixelFormat' ], layout
 .end
 
 .sub _set_Palette_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc fetch_struct
-	fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
+    .local pmc fetch_struct
+    fetch_struct = find_global 'SDL::NCI', 'fetch_struct'
 
-	.local pmc color
-	color  = fetch_struct( 'Color', 0 )
+    .local pmc color
+    color  = fetch_struct( 'Color', 0 )
 
-	.local pmc layout
-	layout = new OrderedHash
+    .local pmc layout
+    layout = new 'OrderedHash'
 
-	set  layout[ 'ncolors' ], .DATATYPE_INT
-	push layout, 0
-	push layout, 0
-	set  layout[ 'colors' ],  .DATATYPE_STRUCT_PTR
+    set  layout[ 'ncolors' ], .DATATYPE_INT
+    push layout, 0
+    push layout, 0
+    set  layout[ 'colors' ],  .DATATYPE_STRUCT_PTR
 
-	.local pmc color_pointer
-	set        color_pointer, layout[ -1 ]
-	setprop    color_pointer, '_struct', color
+    .local pmc color_pointer
+    set        color_pointer, layout[ -1 ]
+    setprop    color_pointer, '_struct', color
 
-	push layout, 0
-	push layout, 0
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Palette' ], layout
+    set  layouts[ 'Palette' ], layout
 .end
 
 .sub _set_Color_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc layout
-	layout = new OrderedHash
+    .local pmc layout
+    layout = new 'OrderedHash'
 
-	set  layout[ 'r'      ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'g'      ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'b'      ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
-	set  layout[ 'unused' ], .DATATYPE_UINT8
-	push layout, 0
-	push layout, 0
+    set  layout[ 'r'      ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'g'      ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'b'      ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
+    set  layout[ 'unused' ], .DATATYPE_UINT8
+    push layout, 0
+    push layout, 0
 
-	set  layouts[ 'Color' ], layout
+    layouts[ 'Color' ] = layout
 .end
 
 .sub _set_Pixels_layout
-	.param pmc layouts
+    .param pmc layouts
 
-	.local pmc layout
-	layout = new OrderedHash
-	push layout, .DATATYPE_UINT16
-	push layout, 2
-	push layout, 0
+    .local pmc layout
+    layout = new 'OrderedHash'
+    push layout, .DATATYPE_UINT16
+    push layout, 2
+    push layout, 0
 
-	set  layouts[ 'Pixels' ], layout
+    set  layouts[ 'Pixels' ], layout
 .end
 
 =head2 The SDL::NCI Namespace
@@ -688,49 +691,49 @@ felt when I wrote it!
 .namespace [ 'SDL::NCI' ]
 
 .sub fetch_struct
-	.param string struct_name
-	.param int    managed
+    .param string struct_name
+    .param int    managed
 
-	.local pmc initializer
-	.local pmc struct
+    .local pmc initializer
+    .local pmc struct
 
-	.local pmc fetch_layout
-	fetch_layout = find_global 'SDL::NCI', 'fetch_layout'
-	initializer  = fetch_layout( struct_name )
+    .local pmc fetch_layout
+    fetch_layout = find_global 'SDL::NCI', 'fetch_layout'
+    initializer  = fetch_layout( struct_name )
 
-	if managed == 1 goto build_managed
-	struct       = new UnManagedStruct, initializer
-	goto built_struct
+    if managed == 1 goto build_managed
+    struct       = new 'UnManagedStruct', initializer
+    goto built_struct
 
-build_managed:
-	struct       = new ManagedStruct,   initializer
+  build_managed:
+    struct       = new 'ManagedStruct',   initializer
 
-built_struct:
-	.return( struct )
+  built_struct:
+    .return( struct )
 .end
 
 .sub fetch_layout
-	.param string layout_name
+    .param string layout_name
 
-	.local pmc layouts
-	.local pmc layout
+    .local pmc layouts
+    .local pmc layout
 
-	layouts = find_global 'SDL::NCI', 'layouts'
+    layouts = find_global 'SDL::NCI', 'layouts'
 
-	exists $I0, layouts[ layout_name ]
-	if $I0 goto found
-	layout = new OrderedHash
+    exists $I0, layouts[ layout_name ]
+    if $I0 goto found
+    layout = new 'OrderedHash'
 
-	print "SDL::fetch_layout warning: layout '"
-	print layout_name
-	print "' not found!\n"
-	goto found_done
-	
-found:
-	layout = layouts[ layout_name ]
+    print "SDL::fetch_layout warning: layout '"
+    print layout_name
+    print "' not found!\n"
+    goto found_done
 
-found_done:
-	.return( layout )
+  found:
+    layout = layouts[ layout_name ]
+
+  found_done:
+    .return( layout )
 .end
 
 =head1 AUTHOR
@@ -741,7 +744,7 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, 2006 The Perl Foundation.
+Copyright (c) 2004-2007 The Perl Foundation.
 
 =cut
 

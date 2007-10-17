@@ -21,13 +21,11 @@ Test::Builder::Tester - Parrot extension for testing test modules
     test_test = find_global 'Test::Builder::Tester', 'test_test'
 
     # create a new Test::Builder object
-    .local int tb_type
     .local pmc tb_args
     .local pmc test
 
-    find_type tb_type, 'Test::Builder'
     tb_args = new 'Hash'
-    test    = new tb_type, tb_args
+    test    = new 'Test::Builder', tb_args
 
     # set your test plan
     plan( 4 )
@@ -164,30 +162,27 @@ This module defines the following public functions:
     .local pmc expect_out
     .local pmc expect_diag
     .local pmc default_test
-
-    .local int tb_class
-    .local int tbo_class
-    .local int tbto_class
     .local pmc args
 
     # set the default output for the Test::Builder singleton
-    find_type tbto_class, 'Test::Builder::Tester::Output'
-    test_output  = new tbto_class
+    test_output  = new 'Test::Builder::Tester::Output'
     args         = new 'Hash'
     set args['output'], test_output
 
-    find_type tb_class, 'Test::Builder'
-    default_test = new tb_class, args
+    default_test = new 'Test::Builder', args
     default_test.'plan'( 'no_plan' )
     test_output.'output'()
 
     # create the Test::Builder object that this uses
     .local pmc tb_create
     tb_create   = find_global 'Test::Builder', 'create'
-    find_type tbo_class, 'Test::Builder::Output'
 
     args        = new 'Hash'
-    output      = new tbo_class, args
+    output      = new 'Test::Builder::Output', args
+    .local pmc results, testplan
+    results    = new 'ResizablePMCArray'
+    testplan   = new 'String'
+    testplan   = ''
 
     set args['output'], output
     test        = tb_create( args )

@@ -84,10 +84,8 @@ exception:
 
     .local pmc code, stream, stack
     code   = new 'CodeString'
-    $I0    = find_type 'TokenStream'
-    stream = new $I0, input
-    $I0    = find_type 'VirtualStack'
-    stack  = new $I0
+    stream = new 'TokenStream', input
+    stack  = new 'VirtualStack'
 
     code.emit(<<"END_PIR")
 .sub code :anon

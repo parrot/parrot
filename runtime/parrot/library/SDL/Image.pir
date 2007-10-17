@@ -7,18 +7,15 @@ SDL::Image - Parrot class representing images in Parrot SDL
 
 =head1 SYNOPSIS
 
-	# load this library
-	load_bytecode 'library/SDL/Image.pir'
+    # load this library
+    load_bytecode 'library/SDL/Image.pir'
 
-	# create a new SDL::Image object
-	.local pmc image
-	.local int image_type
+    # create a new SDL::Image object
+    .local pmc image
+    image = new 'SDL::Image'
+    image.'init'( file => 'examples/sdl/parrot_small.png' )
 
-	find_type image_type, 'SDL::Image'
-	image = new image_type
-	image.'init'( file => 'examples/sdl/parrot_small.png' )
-
-	# blit and update this object as you like!
+    # blit and update this object as you like!
 
 =head1 DESCRIPTION
 
@@ -39,20 +36,19 @@ An SDL::Image object has the following methods:
 .namespace [ 'SDL::Image' ]
 
 .sub _initialize :load
-	.local pmc surface_type
-	.local pmc image_class
-	
-	$I0 = find_type 'SDL::Image'
-	if $I0 > 1 goto END
+    .local pmc image_class
 
-	.local pmc init_image
-	init_image = find_global 'SDL', '_init_image'
-	init_image()
+    image_class = get_class 'SDL::Image'
+    if_null image_class, create_class
+    .return()
 
-	getclass surface_type,        'SDL::Surface'
-	subclass image_class, surface_type, 'SDL::Image'
-END:
-	.return()
+  create_class:
+    .local pmc init_image
+    init_image = find_global 'SDL', '_init_image'
+    init_image()
+
+    subclass image_class, 'SDL::Surface', 'SDL::Image'
+    .return()
 .end
 
 =item init( file => 'xxx' )
@@ -63,18 +59,18 @@ image.
 =cut
 
 .sub 'init' :method
-	.param string filename :named( 'file' )
+    .param string filename :named( 'file' )
 
-	.local pmc IMG_Load
-	IMG_Load = find_global 'SDL::NCI', 'IMG_Load'
+    .local pmc IMG_Load
+    IMG_Load = find_global 'SDL::NCI', 'IMG_Load'
 
-	.local pmc image
+    .local pmc image
 
-	image = IMG_Load( filename )
+    image = IMG_Load( filename )
 
-	self.'wrap_surface'( image )
+    self.'wrap_surface'( image )
 
-	.return()
+    .return()
 .end
 
 =back
@@ -87,7 +83,7 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
 

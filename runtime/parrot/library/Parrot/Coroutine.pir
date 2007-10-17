@@ -57,10 +57,9 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
         .param pmc tree
 
         .local int coro_class, idx
-        coro_class = find_type 'Parrot::Coroutine'
         .local pmc coro
         .const .Sub coro_sub = "enumerate_tree"
-        coro = new coro_class, coro_sub
+        coro = new 'Parrot::Coroutine', coro_sub
         ($P0 :optional, $I0 :opt_flag) = coro.'resume'(coro, tree)
         idx = 0
 
@@ -83,19 +82,14 @@ in pure PIR using continuations.
 
 =cut
 
-.const int slot_state       = 0 ## State:  1 is new/valid, 0 is dead.
-.const int slot_initial_sub = 1 ## Initial sub.
-.const int slot_yield_cont  = 2 ## Continuation to for yielding.
-.const int slot_resume_cont = 3 ## Continuation from which to resume.
-
 .sub __loadtime_create_class :load
-    find_type $I0, "Parrot::Coroutine"
-    if $I0 > 1 goto END
-    newclass $P0, "Parrot::Coroutine"
-    addattribute $P0, "state"
-    addattribute $P0, "initial_sub"
-    addattribute $P0, "yield_cont"
-    addattribute $P0, "resume_cont"
+    $P0 = get_class "Parrot::Coroutine"
+    unless null $P0 goto END
+    $P0 = newclass "Parrot::Coroutine"
+    addattribute $P0, "state"       ## State:  1 is new/valid, 0 is dead.
+    addattribute $P0, "initial_sub" ## Initial sub.
+    addattribute $P0, "yield_cont"  ## Continuation to for yielding.
+    addattribute $P0, "resume_cont" ## Continuation from which to resume.
 END:
     .return ()
 .end
@@ -110,25 +104,23 @@ END:
 
 This method is normally called via the C<new> op:
 
-    .local int coro_class
-    coro_class = find_type 'Parrot::Coroutine'
     .local pmc coro
     .const .Sub coro_sub = "enumerate_tree"
-    coro = new coro_class, coro_sub
+    coro_class = get_class 'Parrot::Coroutine'
+    coro = coro_class.'new'('initial_sub' => coro_sub)
 
 Given a sub, it initializes a new C<Parrot::Coroutine> object.
 
 =cut
 
 .sub init_pmc :vtable :method
-    .param pmc sub
+    .param pmc init_args
 
     ## [should complain if sub is not a sub or closure.  -- rgr, 8-Oct-06.]
     .local pmc state
     state = new 'Undef'
     state = 1
-    setattribute self, slot_state, state
-    setattribute self, slot_initial_sub, sub
+    setattribute self, 'state', state
 .end
 
 ## [it would be nice to include a pointer value.  -- rgr, 8-Oct-06.]
@@ -158,21 +150,21 @@ marked as dead, in which case it is an error to attempt to resume it again.
 
     ## Decide whether we're dead.
     .local pmc state
-    state = getattribute self, slot_state
+    state = getattribute self, 'state'
     unless state goto dead
 
     ## Decide where to go.  If we've never been invoked before, we need to
     ## call the sub.
     .local pmc entry
-    entry = getattribute self, slot_resume_cont
+    entry = getattribute self, 'resume_cont'
     unless null entry goto doit
-    entry = getattribute self, slot_initial_sub
+    entry = getattribute self, 'initial_sub'
 
 doit:
     ## Remember where to return when we yield.
     .local pmc cc
     cc = interpinfo .INTERPINFO_CURRENT_CONT
-    setattribute self, slot_yield_cont, cc
+    setattribute self, 'yield_cont', cc
 
     ## Call the entry with our args.  Most of the time, it will yield (by
     ## calling our continuation for us) instead of returning directly.
@@ -183,7 +175,7 @@ doit:
     ## Note that the value of the yield_cont slot will normally have been
     ## changed magically behind our backs by a subsequent yield/resume, so
     ## we can't just return directly.
-    cc = getattribute self, slot_yield_cont
+    cc = getattribute self, 'yield_cont'
     .return cc(result :flat)
 
 dead:
@@ -211,10 +203,10 @@ passed to C<resume> are returned as the values from C<yield>.
     ## Remember where to go when we are resumed.
     .local pmc cc
     cc = interpinfo .INTERPINFO_CURRENT_CONT
-    setattribute self, slot_resume_cont, cc
+    setattribute self, 'resume_cont', cc
 
     ## Return to the coro caller.
-    cc = getattribute self, slot_yield_cont
+    cc = getattribute self, 'yield_cont'
     .return cc(args :flat)
 .end
 

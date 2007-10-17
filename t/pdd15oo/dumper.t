@@ -518,9 +518,9 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     load_bytecode "dumper.pbc"
 
-    temp = newpdd15class "TestClass"
-
+    temp  = newclass "TestClass"
     array = new 'ResizablePMCArray'
+
     o = temp.'new'()
     push array, o
     o = temp.'new'()
@@ -546,7 +546,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     print subindent
     print "_"
-    name = self
+    name = typeof self
     print name
     print "::__dump\n"
 
@@ -559,11 +559,11 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 .end
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
-    PMC 'Object' {
+    PMC 'TestClass' {
         this is
         _TestClass::__dump
     },
-    PMC 'Object' {
+    PMC 'TestClass' {
         this is
         _TestClass::__dump
     }
@@ -919,46 +919,48 @@ CODE
 ]
 OUTPUT
 
-# no. 26 - Deleted --leo
-
 # no. 27
 pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
 .sub main :main
     .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
-    .local int id
-    id = typeof cl
-    o = new id
+    o  = cl.'new'()
     _dumper(o)
 .end
 
 .namespace ["bar"]
-.sub __init :method
-    .local pmc ar
-    ar = getattribute self, '__value'
-    push ar, 1
-    push ar, 2
+.sub init :method :vtable
+    push self, 1
+    push self, 2
 .end
 
 .sub __dump :method
     .param pmc dumper
     .param string label
-    print " __value => {\n"
-    .local pmc ar
-    ar = getattribute self, '__value'
-    dumper.'dump'('attr', ar)
-    print "\n}"
+
+    .local int value
+    .local pmc iter
+    iter  = new 'Iterator', self
+    value = self
+
+    print " (size:"
+    print value
+    print ") => [\n"
+
+    .local string values
+    values = join ",\n    ", self
+    print "    "
+    print values
+    print "\n]"
 .end
 .namespace
 .include 'library/dumper.pir'
 
 CODE
-"VAR1" => PMC 'bar'  __value => {
-ResizablePMCArray (size:2) [
+"VAR1" => PMC 'bar'  (size:2) => [
     1,
     2
 ]
-}
 OUTPUT
 
 # pir_output_is(<<'CODE', <<'OUTPUT', "dumping IntegerArray PMC");

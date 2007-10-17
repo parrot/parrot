@@ -7,49 +7,43 @@ SDL::EventHandler - base class for application-specific SDL event handlers
 
 =head1 SYNOPSIS
 
-	# load the event class and this library
-	load_bytecode 'library/SDL/Event.pir'
-	load_bytecode 'library/SDL/EventHandler.pir'
+    # load the event class and this library
+    load_bytecode 'library/SDL/Event.pir'
+    load_bytecode 'library/SDL/EventHandler.pir'
 
-	# subclass this class
-	.local pmc parent_class
-	.local pmc class_type
+    # subclass this class
+    .local pmc parent_class
+    .local pmc class_type
 
-	getclass parent_class, 'SDL::EventHandler'
-	subclass class_type, parent_class, 'My::Event::Handler'
+    getclass parent_class, 'SDL::EventHandler'
+    subclass class_type, parent_class, 'My::Event::Handler'
 
-	# define your overridden methods
-	.sub key_down_down :method
-		.param pmc event
-		.param pmc event_args
+    # define your overridden methods
+    .sub key_down_down :method
+        .param pmc event
+        .param pmc event_args
 
-		# ...
+        # ...
 
-	.end
+    .end
 
-	# create an event handler object
-	.local pmc event_handler
-	.local int handler_type
+    # create an event handler object
+    .local pmc event_handler
+    event_handler = new 'My::Event::Handler'
 
-	find_type handler_type, 'My::Event::Handler'
-	event_handler = new handler_type
+    # create and populate some event_arguments
+    .local pmc event_args
 
-	# create and populate some event_arguments
-	.local pmc event_args
+    new event_args, 'Hash'
+    event_args[ 'main_surface' ] = main_surface
+    event_args[ 'sprite_list'  ] = sprites
 
-	new event_args, .Hash
-	event_args[ 'main_surface' ] = main_surface
-	event_args[ 'sprite_list'  ] = sprites
+    # create a new event object
+    .local pmc event
+    event = new 'SDL::Event'
 
-	# create a new event object
-	.local pmc event
-	.local int event_type
-
-	find_type event_type, 'SDL::Event'
-	event = new event_type
-
-	# ... and process events
-	event.'process_events'( event_handler, handler_args )
+    # ... and process events
+    event.'process_events'( event_handler, handler_args )
 
 =head1 DESCRIPTION
 
@@ -68,24 +62,24 @@ SDL::EventHandler provides the following methods:
 .namespace [ 'SDL::EventHandler' ]
 
 .sub _initialize :load
-	.local pmc   handler_class
+    .local pmc   handler_class
 
-	newclass     handler_class, 'SDL::EventHandler'
-	addattribute handler_class, 'args'
+    newclass     handler_class, 'SDL::EventHandler'
+    addattribute handler_class, 'args'
 
-	.return()
+    .return()
 .end
 
 # not documented now; could set default args here
 # maybe nice, maybe not
 
 .sub 'init' :method
-	.param pmc args
+    .param pmc args
 
-	.local int offset
-	classoffset offset, self, 'SDL::EventHandler'
+    .local int offset
+    classoffset offset, self, 'SDL::EventHandler'
 
-	setattribute self, offset, args
+    setattribute self, offset, args
 .end
 
 =item key_down( event, event_args )
@@ -113,22 +107,22 @@ remainder - sorry.
 =cut
 
 .sub key_down :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
-	.local string key_name
-	key_name = event.'event_keyname'()
+    .local string key_name
+    key_name = event.'event_keyname'()
 
-	.local string key_method_name
-	key_method_name = 'key_down_'
+    .local string key_method_name
+    key_method_name = 'key_down_'
 
-	concat key_method_name, key_name
+    concat key_method_name, key_name
 
     .local int can_handle
-	can can_handle, self, key_method_name
+    can can_handle, self, key_method_name
 
-	eq can_handle, 0, _return
-	self.key_method_name( event_args )
+    eq can_handle, 0, _return
+    self.key_method_name( event_args )
 
 _return:
 
@@ -148,22 +142,22 @@ want to override the C<key_up_*> methods instead.
 =cut
 
 .sub key_up :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
-	.local string key_name
-	key_name = event.'event_keyname'()
+    .local string key_name
+    key_name = event.'event_keyname'()
 
-	.local string key_method_name
-	key_method_name = 'key_up_'
+    .local string key_method_name
+    key_method_name = 'key_up_'
 
-	concat key_method_name, key_name
+    concat key_method_name, key_name
 
     .local int can_handle
-	can can_handle, self, key_method_name
+    can can_handle, self, key_method_name
 
-	eq can_handle, 0, _return
-	self.key_method_name( event_args )
+    eq can_handle, 0, _return
+    self.key_method_name( event_args )
 
 _return:
 
@@ -198,7 +192,7 @@ types.
 =item * mouse_button_up
 
 Synopsis for mouse event handler:
-  
+
   .sub mouse_button_up :method
     .param pmc event
     .param pmc args
@@ -255,127 +249,127 @@ At the very least, you should override C<quit()>.
 =cut
 
 .sub active_event :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub mouse_motion :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub mouse_button_down :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub mouse_button_up :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 .end
 
 .sub joy_axis_motion :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub joy_ball_motion :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub joy_hat_motion :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub joy_button_down :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub joy_button_up :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub quit :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub sys_wm_event :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_a :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_b :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub video_resize :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub video_expose :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_2 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_3 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_4 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_5 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_6 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
 .sub event_reserved_7 :method
-	.param pmc event
-	.param pmc event_args
+    .param pmc event
+    .param pmc event_args
 
 .end
 
@@ -387,10 +381,9 @@ the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2007, The Perl Foundation.
 
 =cut
-
 
 # Local Variables:
 #   mode: pir

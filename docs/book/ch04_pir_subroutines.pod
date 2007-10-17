@@ -401,8 +401,7 @@ first method:
     .local pmc class
     .local pmc obj
     newclass class, "Foo"       # create a new Foo class
-    find_type $I0, "Foo"        # find its dynamic type number
-    new obj, $I0                # instantiate a Foo object
+    new obj, "Foo"              # instantiate a Foo object
     obj."_meth"()               # call obj."_meth" which is actually
     print "done\n"              # "_meth" in the "Foo" namespace
     end

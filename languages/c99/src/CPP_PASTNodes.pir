@@ -102,8 +102,7 @@ needed for C99.  The currently defined ast nodes:
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    $I0 = find_type class
-    $P0 = new $I0
+    $P0 = new class
     $P0.'init'(children :flat, 'node'=>self, 'XXX'=>1, adverbs :flat :named)
     .return ($P0)
 .end

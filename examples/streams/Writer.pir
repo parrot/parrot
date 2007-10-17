@@ -17,8 +17,7 @@ Creates a C<Stream::Writer> and writes to it.
 
     load_bytecode "library/Stream/Writer.pir"
 
-    find_type $I0, "Stream::Writer"
-    new stream, $I0
+    stream = new "Stream::Writer"
 
     # set the stream's source sub
     .const .Sub temp = "_reader"

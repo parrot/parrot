@@ -41,17 +41,15 @@ type information.
 
 =item B<new>(out PMC, in STR, invar PMC)
 
-=item B<new>(out PMC, inconst PMC)
-
-=item B<new>(out PMC, inconst PMC, invar PMC)
-
 =item B<new>(out PMC, in PMC)
 
-Create a new PMC of class $2; look in F<core_pmcs.h> for the base vtable
-types.  The assembler allows you to specify PMCs by type name, by key for
-names in nested namespace, as well as by integer - you should do this for
-compatibility, to avoid problems if the base types get reassigned. For
-example:
+=item B<new>(out PMC, in PMC, invar PMC)
+
+Instantiate a new object from a string PMC or key name, or from a class object.
+For strings and keys, first check the namespace for a class object, then fall
+back to the type ID if no class object is stored in the namespace.
+
+Creating a new PMC by type ID is deprecated.
 
   new P0, 'ResizableBooleanArray'
 
@@ -66,11 +64,12 @@ op new(out PMC, in INT) {
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
 
-  /* Why?? If we're creating a continuation, the continuation PMC
-   * needs to be in the destination register before its init method
-   * copies the registers. */
+  /* Why separate init from pmc_new_noinit, instead of calling pmc_new? If
+   * we're creating a continuation, the continuation PMC needs to be in the
+   * destination register before its init method copies the registers. */
   $1 = pmc_new_noinit(interp, $2);
-  $1->vtable->init(interp, $1);
+  if ($2 <  enum_class_core_max)
+      $1->vtable->init(interp, $1);
   goto NEXT();
 }
 
@@ -84,84 +83,72 @@ op new(out PMC, in INT, in PMC) {
 }
 
 op new(out PMC, in STR) {
-    STRING *_class = $2;
-    PMC *classobj = PMCNULL;
+    PMC *hll_ns, *ns;
+    STRING *classname = $2;
+    PMC *classobj = Parrot_oo_get_class_str(interp, classname);
 
-    /* Look up a namespace with the given name within the current
-     * namespace and if we find it, get the class associated with it, if any. */
-    PMC *ns = Parrot_get_namespace_keyed_str(interp,
-      CONTEXT(interp->ctx)->current_namespace, _class);
-    if (!PMC_IS_NULL(ns))
-        classobj = VTABLE_get_class(interp, ns);
-
-    if (!PMC_IS_NULL(classobj) &&
-        !VTABLE_isa(interp, classobj, string_from_literal(interp, "PMCProxy")))
+    if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        INTVAL type = pmc_type(interp, _class);
+        INTVAL type = pmc_type(interp, classname);
         if (!type)
-            type = pmc_type(interp, _class);
+            type = pmc_type(interp, classname);
         if (type <= 0)
             real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", _class);
+                "Class '%Ss' not found", classname);
         $1 = pmc_new(interp, type);
     }
     goto NEXT();
 }
 
 op new(out PMC, in STR, in PMC) {
-    STRING *_class = $2;
-    PMC *classobj = PMCNULL;
+    PMC *hll_ns, *ns;
+    STRING *classname = $2;
+    PMC *classobj = Parrot_oo_get_class_str(interp, classname);
 
-    PMC *ns = Parrot_get_namespace_keyed_str(interp,
-      CONTEXT(interp->ctx)->current_namespace, _class);
-    if (!PMC_IS_NULL(ns))
-        classobj = VTABLE_get_class(interp, ns);
-
-    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
-            string_from_literal(interp, "PMCProxy")))
+    if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
-        INTVAL type = pmc_type(interp, _class);
+        INTVAL type = pmc_type(interp, classname);
         if (!type)
-            type = pmc_type(interp, _class);
+            type = pmc_type(interp, classname);
         if (type <= 0)
             real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", _class);
+                "Class '%Ss' not found", classname);
         $1 = pmc_new_init(interp, type, $3);
     }
     goto NEXT();
 }
 
-inline op new(out PMC, inconst PMC) :object_classes {
-    PMC *ns;
-    PMC *classobj = PMCNULL;
-    PMC *_class = $2;
-    /* Lookup namespace by key */
-    ns = Parrot_get_namespace_keyed(interp,
-        CONTEXT(interp->ctx)->current_namespace, $2);
-    if (!PMC_IS_NULL(ns))
-        classobj = VTABLE_get_class(interp, ns);
-    if (!PMC_IS_NULL(classobj) && !VTABLE_isa(interp, classobj,
-            string_from_literal(interp, "PMCProxy")))
+inline op new(out PMC, in PMC) :object_classes {
+    PMC *classname_key = $2;
+    PMC *classobj = Parrot_oo_get_class(interp, classname_key);
+
+    if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        INTVAL type = pmc_type_p(interp, _class);
+        INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
             real_exception(interp, NULL, NO_CLASS,
-                "Class '%Ss' not found", readable_name(interp, _class));
+                "Class '%Ss' not found", readable_name(interp, classname_key));
         $1 = pmc_new(interp, type);
     }
     goto NEXT();
 }
 
-op new(out PMC, inconst PMC, in PMC) {
-    PMC *_class = $2;
-    INTVAL type = pmc_type_p(interp, _class);
-    if (type <= 0)
-        real_exception(interp, NULL, NO_CLASS,
-            "Class '%Ss' not found", readable_name(interp, _class));
-    $1 = pmc_new_init(interp, type, $3);
+op new(out PMC, in PMC, in PMC) {
+    PMC *classname_key = $2;
+    PMC *classobj = Parrot_oo_get_class(interp, classname_key);
+
+    if (!PMC_IS_NULL(classobj))
+        $1 = VTABLE_instantiate(interp, classobj, $3);
+    else {
+        INTVAL type = pmc_type_p(interp, classname_key);
+        if (type <= 0)
+            real_exception(interp, NULL, NO_CLASS,
+                "Class '%Ss' not found", readable_name(interp, classname_key));
+        $1 = pmc_new_init(interp, type, $3);
+    }
     goto NEXT();
 }
 
@@ -170,6 +157,8 @@ op new(out PMC, inconst PMC, in PMC) {
 =item B<typeof>(out STR, invar PMC)
 
 =item B<typeof>(out INT, invar PMC)
+
+=item B<typeof>(out PMC, invar PMC)
 
 Return the type of PMC in $2.
 
@@ -186,11 +175,12 @@ inline op typeof(out STR, invar PMC) {
   goto NEXT();
 }
 
+inline op typeof(out PMC, invar PMC) {
+  $1 = VTABLE_get_class(interp, $2);
+  goto NEXT();
+}
+
 inline op typeof(out INT, invar PMC) {
-  if (VTABLE_isa(interp, $2, string_from_literal(interp, "Object")))
-      real_exception(interp, NULL, INVALID_OPERATION,
-         "Numeric 'typeof' will not be supported in new object model");
-  else
       $1 = $2->vtable->type(interp, $2);
   goto NEXT();
 }

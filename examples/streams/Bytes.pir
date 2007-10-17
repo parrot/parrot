@@ -17,14 +17,12 @@ This example shows the usage of C<Stream::read_bytes>.
     load_bytecode "library/Stream/Sub.pir"
     load_bytecode "library/Stream/Replay.pir"
 
-    find_type $I0, "Stream::Sub"
-    new $P0, $I0
+    $P0 = new "Stream::Sub"
     # set the stream's source sub
     .const .Sub temp = "_hello"
     assign $P0, $P1
 
-    find_type $I0,"Stream::Replay"
-    stream = new $I0
+    stream = new "Stream::Replay"
     assign stream, $P0
 
     $S0 = stream."read_bytes"( 3 )

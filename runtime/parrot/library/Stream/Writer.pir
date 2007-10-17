@@ -11,8 +11,7 @@ version 0.1
 =head1 SYNOPSIS
 
     # create the stream
-    find_type $I0, "Stream::Writer"
-    new stream, $I0
+    new stream, "Stream::Writer"
 
     # set the source sub
     .const .Sub temp = "_reader"
@@ -35,12 +34,12 @@ version 0.1
 .namespace ["Stream::Writer"]
 
 .sub __onload :load
-    find_type $I0, "Stream::Writer"
-    if $I0 > 1 goto END
+    $P0 = get_class "Stream::Writer"
+    unless null $P0 goto END
 
     load_bytecode "library/Stream/Base.pir"
 
-    getclass $P0, "Stream::Base"
+    get_class $P0, "Stream::Base"
     subclass $P1, $P0, "Stream::Writer"
 
     addattribute $P1, "writer"
@@ -69,11 +68,9 @@ END:
     self."setSource"()
 
     # mark it as closed
-    classoffset $I0, self, "Stream::Writer"
-    inc $I0
     .local pmc status
     interpinfo self, .INTERPINFO_CURRENT_OBJECT
-    getattribute status, self, $I0
+    getattribute status, self, 'status'
     status = 0
 .end
 
@@ -82,9 +79,7 @@ END:
 
     new status, .Integer
     set status, 0
-    classoffset $I0, self, "Stream::Writer"
-    inc $I0
-    setattribute self, $I0, status
+    setattribute self, 'status', status
 .end
 
 .sub set_pmc :vtable :method
@@ -95,9 +90,7 @@ END:
     setprop stub, "CALL", source
     self."setSource"( stub )
 
-    classoffset $I0, self, "Stream::Writer"
-    inc $I0
-    getattribute status, self, $I0
+    getattribute status, self, 'status'
     status = 1
 .end
 
@@ -117,9 +110,7 @@ END:
     .local pmc status
     .local int ret
 
-    classoffset $I0, self, "Stream::Writer"
-    inc $I0
-    getattribute status, self, $I0
+    getattribute status, self, 'status'
     ret = status
     .return(ret)
 .end
@@ -135,12 +126,10 @@ END:
     .local pmc source
     .local pmc status
 
-    classoffset $I0, self, "Stream::Writer"
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
-    setattribute self, $I0, $P0
-    inc $I0
-    getattribute status, self, $I0
+    setattribute self, 'writer', $P0
+    getattribute status, self, 'status'
 
     if status == 0 goto END
     if status == 2 goto WRITE
@@ -148,10 +137,9 @@ END:
     self."write"( "" )
 WRITE:
 
-    classoffset $I0, self, "Stream::Writer"
     .include "interpinfo.pasm"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
-    setattribute self, $I0, $P0
+    setattribute self, 'writer', $P0
 
     source = self."source"()
     if_null source, END
@@ -178,14 +166,12 @@ END:
     cont = self."source"()
     if_null cont, END_OF_STREAM
 
-    classoffset $I0, self, "Stream::Writer"
-    getattribute writer, self, $I0
+    getattribute writer, self, 'writer'
     str = self."_call_writer"(writer)
     .return(str)
 END_OF_STREAM:
     null writer
-    classoffset $I0, self, "Stream::Writer"
-    setattribute self, $I0, writer
+    setattribute self, 'writer', writer
     null str
 
     .return(str)

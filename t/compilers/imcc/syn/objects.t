@@ -18,8 +18,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     obj._meth()
     print "done\n"
     end
@@ -39,8 +38,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax m.o(arg)" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     $P0 = new 'String'
     $P0 = "ok\n"
     obj._meth($P0)
@@ -65,8 +63,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     $P0 = new 'String'
     $P0 = "ok\n"
     $S0 = obj._meth($P0)
@@ -96,8 +93,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
     .local string meth
     meth = "_meth"
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     obj."_meth"()
     obj._meth()
     set S10, "_meth"
@@ -124,8 +120,7 @@ pir_output_is( <<'CODE', <<'OUT', "initializer" );
     newclass P1, "Foo"
     subclass P2, P1, "Bar"
     subclass P3, P2, "Baz"
-    find_type I1, "Baz"
-    new P3, I1
+    P3 = new "Baz"
     find_global P0, "_sub"
     invokecc P0
     print "done\n"
@@ -165,8 +160,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax - method, self" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     obj._meth()
     print "done\n"
     end
@@ -193,8 +187,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     .pcc_begin
     .invocant obj
     .meth_call "_meth"
@@ -219,8 +212,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, meth var" );
     .local pmc obj
     .local string meth
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     meth = "_me"
     meth = meth . "th" 	# test concat to
     .pcc_begin
@@ -245,8 +237,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     .pcc_begin
     .arg "hello"
     .arg "\n"
@@ -283,8 +274,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     .pcc_begin
     .invocant obj
     .meth_call "_meth"
@@ -308,8 +298,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax - reserved word" );
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
-    find_type $I0, "Foo"
-    new obj, $I0
+    obj = new "Foo"
     obj.open()
     print "done\n"
     end

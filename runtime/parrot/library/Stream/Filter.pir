@@ -27,12 +27,12 @@ TBD
     .local pmc base
     .local pmc filter
 
-    find_type i, "Stream::Filter"
-    if i > 1 goto END
+    $P0 = get_class 'Stream::Filter'
+    unless null $P0 goto END
 
     load_bytecode "library/Stream/Base.pir"
 
-    getclass base, "Stream::Base"
+    get_class base, "Stream::Base"
     subclass filter, base, "Stream::Filter"
 
     addattribute filter, "filter"
@@ -52,13 +52,12 @@ Sets or returns the filter sub.
     .param int has_filter :opt_flag
     .local pmc ret
 
-    classoffset $I0, self, "Stream::Filter"
     unless has_filter goto GET
     ret = _filter
-    setattribute self, $I0, _filter
+    setattribute self, 'filter', _filter
     branch END
 GET:
-    getattribute ret, self, $I0
+    getattribute ret, self, 'filter'
 END:
     .return(ret)
 .end

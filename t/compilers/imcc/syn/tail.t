@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -327,9 +327,9 @@ pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
     o = new "Foo"
     n = new 'Integer'
     n = 2000   # beyond recursion limit of 1000
-    setattribute o, "Foo\0n", n
+    setattribute o, [ "Foo" ], "n", n
     o."go"()
-    n = getattribute o, "Foo\0n"
+    n = getattribute o, [ "Foo" ], "n"
     print n
     print "\n"
 .end
@@ -337,7 +337,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
 .namespace ["Foo"]
 .sub go :method
     .local pmc n
-    n = getattribute self, "Foo\0n"
+    n = getattribute self, [ "Foo" ], "n"
     dec n
     unless n goto done
     .return self."go"()
