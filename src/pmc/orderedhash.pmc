@@ -542,26 +542,20 @@ the clone via integers has different indices, if items were deleted.
 */
 
     PMC *clone() {
-        PMC        *dest = pmc_new(INTERP, SELF->vtable->base_type);
-        Hash       *hash = (Hash *)PMC_struct_val(SELF);
-        Hash       *h_dest;
+        PMC        *dest   = pmc_new(INTERP, SELF->vtable->base_type);
+        Hash       *hash   = (Hash *)PMC_struct_val(SELF);
+        Hash       *h_dest = (Hash *)PMC_struct_val(dest);
         UINTVAL     i;
-
-        parrot_new_pmc_hash_x(INTERP, dest, hash->entry_type,
-                hash->key_type, hash->compare, hash->hash_val);
-
-        h_dest = (Hash *)PMC_struct_val(dest);
 
         for (i = 0; i <= hash->mask; i++) {
             HashBucket *b      = hash->bs + i;
             void       *key    = b->key;
-            void       *valtmp = b->value;
 
             if (!key)
                 continue;
 
             parrot_hash_put(INTERP, h_dest, key,
-                (void *)VTABLE_clone(INTERP, (PMC *)valtmp));
+                (void *)VTABLE_clone(INTERP, (PMC *)b->value));
         }
 
         return dest;
