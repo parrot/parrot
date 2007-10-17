@@ -80,7 +80,7 @@ lib/ASTGrammar.pbc: lib/ASTGrammar.tg
 	$(PARROT) -o lib/ASTGrammar.pbc --output-pbc lib/ASTGrammar.pir
 
 lib/Grammar/Actions.pbc: lib/Grammar/Actions.pir
-    $(PARROT) -o lib/Grammar/Actions.pbc --output-pbc lib/Grammar/Actions.pir
+	$(PARROT) -o lib/Grammar/Actions.pbc --output-pbc lib/Grammar/Actions.pir
 
 test: all
 	$(PERL) -Ilib -I../../lib t/harness
