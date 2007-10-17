@@ -310,8 +310,11 @@ parrot_mark_hash(PARROT_INTERP, NOTNULL(Hash *hash))
                 real_exception(interp, NULL, 1,
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)hash->entries);
-            if (mark_key)
+
+            /* don't mark the key if it's not true */
+            if (mark_key && bucket->key)
                 pobject_lives(interp, (PObj *)bucket->key);
+
             if (mark_value)
                 pobject_lives(interp, (PObj *)bucket->value);
             bucket = bucket->next;
