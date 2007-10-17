@@ -125,7 +125,7 @@ C<_fact> is a separate compilation unit, assembled and processed after
 the C<_main> function.  Parrot resolves global symbols like the
 C<_fact> label between different units.
 
-  # factorial.imc
+  # factorial.pir
   .sub _main
      .local int count
      .local int product
@@ -166,7 +166,7 @@ returning results. The final printed result is 120.
 You may want to generate a PASM source file for the above example to
 look at the details of how the PIR code translates to PASM:
 
-  $ parrot -o- factorial.imc
+  $ parrot -o- factorial.pir
 
 =head2 Stack-Based Subroutine Calls
 

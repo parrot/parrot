@@ -19,9 +19,8 @@ unique to PIR.
 X<.pasm files> A file with a F<.pasm> extension is treated as pure
 PASM code, as is any file run with the C<-a> command-line option. This
 mode is mainly used for running pure PASM tests. Parrot treats any
-extension other than F<.pasm> as a PIR file. For historical reasons,
-files containing PIR code generally have a F<.imc>X<.imc files>
-extension, but this is gradually shifting to a F<.pir>X<.pir files>
+extension other than F<.pasm> as a PIR file.
+As a convention files containing PIR code generally have a  F<.pir>X<.pir files>
 extension.
 
 X<PIR (Parrot intermediate representation);documentation>
@@ -145,9 +144,9 @@ If you want to peek behind the curtain and see how Parrot is
 allocating registers, you can run it with the C<-d> switch to turn on
 debugging output.
 
-  $ parrot -d1000 hello.imc
+  $ parrot -d1000 hello.pir
 
-If F<hello.imc> contains this code from the second example above
+If F<hello.pir> contains this code from the second example above
 (wrapped in a subroutine definition so it will compile):
 
   .sub _main
@@ -172,11 +171,11 @@ That's probably a lot more information than you wanted if you're just
 starting out. You can also generate a PASM file with the C<-o> switch
 and have a look at how the PIR code translates:
 
-  $ parrot -o hello.pasm hello.imc
+  $ parrot -o hello.pasm hello.pir
 
 or just
 
-  $ parrot -o- hello.imc
+  $ parrot -o- hello.pir
 
 to see resulting PASM on I<stdout>.
 

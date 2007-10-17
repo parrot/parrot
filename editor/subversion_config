@@ -29,7 +29,6 @@ enable-auto-props = yes
 *.pod = svn:eol-style=native; svn:keywords=Author Date Id Revision
 *.t = svn:eol-style=native; svn:mime-type=text/plain; svn:keywords=Author Date Id Revision
 # Parrot
-*.imc = svn:eol-style=native; svn:keywords=Author Date Id Revision
 *.pasm = svn:eol-style=native; svn:keywords=Author Date Id Revision
 *.pir = svn:eol-style=native; svn:keywords=Author Date Id Revision
 *.pg = svn:eol-style=native; svn:keywords=Author Date Id Revision

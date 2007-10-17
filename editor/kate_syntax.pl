@@ -47,7 +47,7 @@ print <<END;
  <!-- Created automatically by kate_syntax.pl  $date -->
 
 <language name="IMCC" version="0.2" kateversion="2.0"
-          section="Sources" extensions="*.imc;*.pasm;*.pir" mimetype="">
+          section="Sources" extensions="*.pasm;*.pir" mimetype="">
 
   <highlighting>
 

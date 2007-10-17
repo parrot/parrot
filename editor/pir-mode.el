@@ -5,12 +5,12 @@
 ;; This package provides Emacs support for PIR.
 ;; It defines PIR mode, a major mode for editing PIR code.
 
-;; To begin using this mode for all `.imc' files that you edit,
+;; To begin using this mode for all `.pir' files that you edit,
 ;; put this file in your `load-path' and add the following lines
 ;; to your `.emacs' file:
 
 ;;   (autoload 'pir-mode "pir-mode" nil t)
-;;   (add-to-list 'auto-mode-alist '("\\.\\(imc\\|pir\\)\\'" . pir-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.pir\\'" . pir-mode))
 
 ;; If you have any problems with this, you're on your own,
 ;; You could always try asking on parrot-porters@perl.org.
@@ -399,11 +399,11 @@ pir-basic-indent
 
 Turning on PIR mode runs the hook `pir-mode-hook'.
 
-To begin using this mode for all `.imc' files that you edit, add the
+To begin using this mode for all `.pir' files that you edit, add the
 following lines to your `.emacs' file:
 
   (autoload 'pir-mode \"pir-mode\" nil t)
-  (add-to-list 'auto-mode-alist '(\"\\\\.imc\\\\'\" . pir-mode))
+  (add-to-list 'auto-mode-alist '(\"\\\\.pir\\\\'\" . pir-mode))
 
 If you have any problems with this, you're on your own. You could always
 try asking on parrot-porters@perl.org."

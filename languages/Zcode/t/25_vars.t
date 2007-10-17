@@ -16,7 +16,7 @@ my $Z3_Compiler = "z3.pir";
 my $parrot_exe  = "parrot" . $PConfig{"exe"};
 my $test_dir    = "t";
 
-# Figure out where z3.imc is and go there
+# Figure out where z3.pir is and go there
 my $compiler_dir = File::Spec->catdir( $FindBin::Bin, ".." );
 chdir($compiler_dir);
 

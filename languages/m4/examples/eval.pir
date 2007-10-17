@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-eval.imc - Integer arithmetic evaluation for Parrot m4
+eval.pir - Integer arithmetic evaluation for Parrot m4
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ ZiPIR - Z-machine in PIR
 
 v0.2
 
-The program z3.imc translates version 3 Z-code files into PIR, the compiles
+The program z3.pir translates version 3 Z-code files into PIR, the compiles
 and runs that PIR. In other words, it's a fancy Z-machine interpreter.
 
 Run it like:

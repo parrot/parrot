@@ -778,7 +778,7 @@ AGAIN:
         else {
             _close((SOCKET)io->fd);
         }
-        /* The charset should probably be 'binary', but right now httpd.imc
+        /* The charset should probably be 'binary', but right now httpd.pir
          * only works with 'ascii'
          */
         *s = string_make(interp, buf, bytesread, "ascii", 0);

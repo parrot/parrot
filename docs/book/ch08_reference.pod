@@ -3532,7 +3532,7 @@ Z<CHP-11-SECT-4.1>
 
   parrot [options] file [arguments]
 
-The R<file> is either an F<.imc> (F<.pir>) or F<.pasm> source file or a
+The R<file> is either an F<.pir> or F<.pasm> source file or a
 Parrot bytecode file. Parrot creates an C<Array> object to hold the
 command-line R<arguments> and stores it in C<P5> on program start.
 

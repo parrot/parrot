@@ -8,7 +8,7 @@ help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  build:             build bf.pbc and bfc.imc"
+	@echo "  build:             build bf.pbc and bfc.pir"
 	@echo "                     This is the default."
 	@echo ""
 	@echo "  test:              run the test suite,"

@@ -989,7 +989,7 @@ PIO_unix_recv(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
 AGAIN:
     if ((error = recv(io->fd, buf, 2048, 0)) >= 0) {
         bytesread += error;
-        /* The charset should probably be 'binary', but right now httpd.imc
+        /* The charset should probably be 'binary', but right now httpd.pir
          * only works with 'ascii'
          */
         *s = string_make(interp, buf, bytesread, "ascii", 0);
