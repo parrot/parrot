@@ -77,9 +77,6 @@ the output to the correct output file.
     .local pmc p6regex
     p6regex = compreg 'PGE::Perl6Regex'
 
-    $P0 = get_hll_global ['PGE::Perl6Regex'], 'regex'
-    set_hll_global ['PGE::Perl6Grammar'], 'regex', $P0
-
     $S0 = "<?ident> [ '::' <?ident> ]*"
     p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'name')
 
@@ -121,6 +118,10 @@ the output to the correct output file.
       STMT_PARSE
     $P0 = p6regex($S0, 'grammar'=>'PGE::Perl6Grammar', 'name'=>'statement', 'w'=>1)
 
+    ##  Add the PGE::Perl6Regex's regex method to PGE::Perl6Grammar
+    $P0 = get_hll_global ['PGE::Perl6Regex'], 'regex'
+    $P1 = get_class ['PGE::Perl6Grammar']
+    $P1.'add_method'('regex', $P0)
 
     ##   create the PGE::Perl6Grammar compiler object
     .local pmc pgc
