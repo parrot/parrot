@@ -83,14 +83,13 @@ lexer.
 
 The following are PIR directives.
 
-  .arg               .const      .constant    .emit             .end
-  .endnamespace      .endm       .eom         .get_results
-  .globalconst       .HLL        .HLL_map     .include          .invocant
-  .lex               .loadlib    .local       .macro            .meth_call
-  .namespace         .nci_call   .param       .pcc_begin        .pcc_begin_return
-  .pcc_begin_yield   .pcc_call   .pcc_end     .pcc_end_return   .pcc_end_yield
-  .pragma     .result      .return           .sub
-  .sym               .yield
+  .arg               .const      .constant         .emit              .end
+  .endnamespace      .endm       .eom              .get_results       .globalconst
+  .HLL               .HLL_map    .include          .invocant          .lex
+  .loadlib           .local      .macro            .meth_call         .namespace
+  .nci_call          .param      .pcc_begin        .pcc_begin_return  .pcc_begin_yield
+  .pcc_call          .pcc_end    .pcc_end_return   .pcc_end_yield     .pragma
+  .result            .return     .sub              .yield
 
 
 =head1 FLAGS
@@ -1372,7 +1371,7 @@ Due to PIR's simplicity, there are no different levels of precedence for operato
 
 =head3 Miscellaneous operators
 
-    ->   =>   ..
+    =>   ..
 
 =cut
 
