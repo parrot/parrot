@@ -178,7 +178,7 @@ document.
     ".end"
 
   param_decl:
-    ".param"  [ [ type identifier ] | register ] [ get_flags | ":unique_reg" ]* nl
+    ".param"  [ [ string_constant "=>" ] type identifier ] [ get_flags | ":unique_reg" ]* nl
 
   get_flags:
     [ ":slurpy"
@@ -304,8 +304,7 @@ Parameter definitions have the following syntax:
     .param int has_argc :optional
     .param num nParam
     .param pmc argv :slurpy
-    .param string sParam :named('foo')
-    .param $P0 :named('bar')
+    .param string sParam :named('foo')    
     # body
   .end
 
