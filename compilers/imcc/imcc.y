@@ -563,7 +563,7 @@ do_loadlib(PARROT_INTERP, NOTNULL(const char *lib))
 %type <sr> pcc_returns pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> proto sub_proto sub_proto_list multi multi_types opt_comma outer
+%type <t> proto sub_proto sub_proto_list multi multi_types outer
 %type <t> vtable
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
@@ -652,12 +652,6 @@ hll_def: HLL STRINGC COMMA STRINGC
             Parrot_register_HLL_lib(interp, hll_lib);
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
-         }
-   | HLL_MAP INTC COMMA INTC
-         {
-             Parrot_register_HLL_type(interp,
-                CONTEXT(((Interp*)interp)->ctx)->current_HLL, atoi($2), atoi($4));
-             $$ = 0;
          }
    | HLL_MAP STRINGC COMMA STRINGC
          {
@@ -825,10 +819,6 @@ sub_param_type_def:
                                          adv_named_set(interp,$2);}
    ;
 
-opt_comma:
-     /* empty */              { $$ = 0;  }
-   | COMMA                    { $$ = 0; fprintf(stderr, "IMCC Warning: optional comma is deprecated.\n"); }
-   ;
 
 
 multi: MULTI '(' multi_types ')'  { $$ = 0; }
@@ -942,7 +932,7 @@ sub_proto:
 
 sub_proto_list:
      proto                           { $$ = $1; }
-   | sub_proto_list opt_comma proto  { $$ = $1 | $3; }
+   | sub_proto_list proto            { $$ = $1 | $2; }
    ;
 
 proto:
