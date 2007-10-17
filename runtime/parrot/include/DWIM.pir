@@ -1,5 +1,5 @@
     .param pmc argv		# main is a sub, so we can use .param
-    .sym string me
+    .local string me
     me = argv[0]		# the filename of the calling prog
     .include "iterator.pasm"	# we need iterator constants
     _read(me)
@@ -9,14 +9,15 @@
 # utility to check if the program is already DWIMmed
 # returns (dwim, pos)
 .sub _check
-    .param PerlString pline
-    .sym int dwim
-    .sym int state
-    .sym Iterator ci
-    ci = new Iterator, pline
+    .param pmc pline
+
+    .local int dwim
+    .local int state
+    .local pmc ci
+    ci = new 'Iterator', pline
     ci = .ITERATE_FROM_START
-    .sym int c
-    .sym int pos
+    .local int c
+    .local int pos
 
     null dwim
     null state
@@ -47,17 +48,17 @@ iter_end:
 # DWIM the source
 .sub _dwim1
     .param string me
-    .param PerlArray ar
-    #concat me, "x" 		# test output is in source.imcx
-    .sym ParrotIO file
+    .param pmc ar
+    #concat me, "x" 		# test output is in source.pirx
+    .local pmc file
     open file, me, ">"
     unless file, err_write
-    .sym Iterator iter
-    iter = new Iterator, ar
+    .local pmc iter
+    iter = new 'Iterator', ar
     iter = .ITERATE_FROM_START
-    .sym int dwim
-    .sym int pos
-    .sym PerlString pline
+    .local int dwim
+    .local int pos
+    .local pmc pline
 iter_rep:
     unless iter goto iter_end
     shift pline, iter
@@ -67,11 +68,11 @@ iter_rep:
     print file, pline		# print .lines directly
     goto iter_rep
 do_dwim:			# DWIM ops lines, doesn't handle P0 = ...
-    .sym string r		# result string
+    .local string r		# result string
     r = "\t"
     print file, "   # DWIM "
-    .sym string word
-    .sym PerlArray p
+    .local string word
+    .local pmc p
 lp1:
     substr word, pline, pos, 1	# get chars
     length $I0, word
@@ -86,9 +87,9 @@ lp1:
     p = 1
     push p, $I0
     sprintf $S0, "%06b", p
-    .sym int l
+    .local int l
     l = 6
-    .sym int ix
+    .local int ix
     ix = 0
 l1:
     substr $S1, $S0, ix, 1	# convert binary string
@@ -126,13 +127,13 @@ err_write:
 # deDWIM a source file - lines in ar
 .sub _dwim2
     .param string me
-    .param PerlArray ar
-    .sym string r
+    .param pmc ar
+    .local string r
     r = ""
-    .sym Iterator iter
-    iter = new Iterator, ar
+    .local pmc iter
+    iter = new 'Iterator', ar
     iter = .ITERATE_FROM_START
-    .sym string line
+    .local string line
 iter_rep:
     unless iter goto iter_end
     shift line, iter
@@ -144,18 +145,18 @@ iter_rep:
     index $I1, line, "\t"	# start pos of DWIMmed
     $I3 = $I1
     sub $I2, $I1, $I0
-    .sym string p1
-    .sym string p2
+    .local string p1
+    .local string p2
     inc $I3
     substr p1, line, $I0, $I2
     substr p2, line, 0, $I3, ""	# extract DWIMmed
     # decode
     chopn line, 1		# the newline
     concat r, "    "		# result of decoded
-    .sym int i
-    .sym int p
-    .sym int c
-    .sym int l
+    .local int i
+    .local int p
+    .local int c
+    .local int l
     length l, line
     if l < 6 goto iter_rep
     p = 0
@@ -202,24 +203,24 @@ iter_end:
 
 .sub _read			# read in source code of script
     .param string me
-    .sym ParrotIO file
+    .local pmc file
     open file, me, "<"
     unless file, err_open
-    .sym PerlArray ar
-    .sym string line
-    .sym PerlString pline
-    ar = new PerlArray
+    .local pmc ar
+    .local string line
+    .local pmc pline
+    ar = new 'ResizablePMCArray'
 slurp:
     readline line, file
-    pline = new PerlString
+    pline = new 'String'
     pline = line
     push ar, pline		# and push everythin in Array
     if line goto slurp
     close file
-    .sym Iterator iter
-    iter = new Iterator, ar
+    .local pmc iter
+    iter = new 'Iterator', ar
     iter = .ITERATE_FROM_START
-    .sym int dwim, pos
+    .local int dwim, pos
 iter_rep:			# run over array
     unless iter goto iter_end
     shift pline, iter
