@@ -104,4 +104,6 @@ the strings?).
 
  Jerry     0.4.16         2007-Sep-18     "A Farewell to Alex"
 
+ Will      0.4.17         2007-Oct-17     "Two for Finching"
+
 =cut
