@@ -9,9 +9,10 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use ExtUtils::Manifest qw(maniread);
 use Parrot::Distribution;
+use File::Spec;
 
 # set up how many tests to run
-plan tests => 1;
+plan tests => 3;
 
 =head1 NAME
 
@@ -60,9 +61,9 @@ Paul Cochrane <paultcochrane at gmail dot com>
 my $DIST = Parrot::Distribution->new;
 my $manifest = maniread('MANIFEST');
 my @files = @ARGV ? @ARGV : sort keys %$manifest;
-my @multi_dots;
+my ( @multi_dots, @strange_chars, @too_long );
 
-foreach my $file (@files) {
+foreach my $file ( @files ) {
 
     # check for multiple dots in filenames
     my $num_dots = grep(m/\./g, split('', $file));
@@ -70,11 +71,34 @@ foreach my $file (@files) {
         push @multi_dots, $file . "\n";
     }
 
+    # check the characters used in filenames
+    push @strange_chars, $file . "\n"
+        if $file =~ m/[^\w\/.\-]/g;
+
+    # check for filenames that are too long
+    my ($volume, $directory, $filename) = File::Spec->splitpath( $file );
+    my @filename_chars = split '', $filename;
+    my $filename_len = scalar @filename_chars;
+    push @too_long, $file . "\n"
+        if $filename_len > 32;
+
 }
 
 ok( !scalar(@multi_dots), 'No multi-dot filenames' )
     or diag( "Multi-dot filename found in " . scalar @multi_dots
         . " files:\n@multi_dots" );
+
+ok( !scalar(@strange_chars), 'Portable characters in filenames' )
+    or diag( "Filename with non-portable character found in " 
+        . scalar @strange_chars . " files:\n@strange_chars" );
+
+TODO: {
+    local $TODO = "Filename length not yet a coding standard";
+    ok( !scalar(@too_long), 'Filenames length' )
+        or diag( "Filename with with more than 32 chars found in " 
+            . scalar @too_long . " files:\n@too_long" );
+}
+
 
 # Local Variables:
 #   mode: cperl
