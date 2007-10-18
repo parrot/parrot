@@ -1180,11 +1180,11 @@ Returns whether the class is or inherits from C<*classname>.
         if (PMC_IS_NULL(classobj))
             return 0;
 
-        classname = VTABLE_get_string(interp, classobj);
-
         /* Check if the class object is the same as self's class object */
         if (VTABLE_is_same(interp, SELF, classobj))
             return 1;
+
+        classname = VTABLE_get_string(interp, classobj);
 
         /* Check if the passed name is the same as the stored short name. */
         if (string_equal(interp, classname, _class->name) == 0)

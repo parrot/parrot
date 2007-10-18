@@ -226,18 +226,11 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override_for_class(PARROT_INTERP, NOTNULL(PMC *classobj), NOTNULL(STRING *name))
 {
-    if (VTABLE_isa(interp, classobj, string_from_literal(interp, "Class"))) {
-        Parrot_Class * const class_info = PARROT_CLASS(classobj);
-        if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides,
-                name)) {
-            /* Found it. */
-            PMC * const meth = VTABLE_get_pmc_keyed_str(interp,
-                class_info->vtable_overrides, name);
-            return meth;
-        }
-    }
+    Parrot_Class *class_info;
+    assert(PObj_is_class_TEST(classobj));
 
-    return PMCNULL;
+    class_info = PARROT_CLASS(classobj);
+    return VTABLE_get_pmc_keyed_str(interp, class_info->vtable_overrides, name);
 }
 
 /*
