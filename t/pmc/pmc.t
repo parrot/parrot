@@ -27,53 +27,53 @@ Contains a lot of PMC related tests.
 my $max_pmc = scalar( keys(%pmc_types) ) + 1;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (	J, K, L )
-	save	N0
-	save	N1
-	save	N2
+.macro fp_eq (  J, K, L )
+        save    N0
+        save    N1
+        save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+        set     N0, .J
+        set     N1, .K
+        sub     N2, N1,N0
+        abs     N2, N2
+        gt      N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
+        restore N2
+        restore N1
+        restore N0
+        branch  .L
 .local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+        restore N2
+        restore N1
+        restore N0
 .endm
-.macro fp_ne(	J,K,L)
-	save	N0
-	save	N1
-	save	N2
+.macro fp_ne(   J,K,L)
+        save    N0
+        save    N1
+        save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+        set     N0, .J
+        set     N1, .K
+        sub     N2, N1,N0
+        abs     N2, N2
+        lt      N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
+        restore N2
+        restore N1
+        restore N0
+        branch  .L
 .local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+        restore N2
+        restore N1
+        restore N0
 .endm
 ENDOFMACRO
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "newpmc" );
-	print "starting\n"
-	new P0, 'Integer'
-	print "ending\n"
-	end
+        print "starting\n"
+        new P0, 'Integer'
+        print "ending\n"
+        end
 CODE
 starting
 ending
@@ -114,14 +114,14 @@ OUTPUT
 my $checkTypes;
 my %types_we_cant_test
     = map { $_ => 1; } (# These require initializers.
-			qw(Null Iterator Enumerate Ref STMRef SharedRef
-			   ParrotObject ParrotThread
-			   deleg_pmc BigInt LexInfo LexPad Slice Object),
-			# Instances of these appear to have other types.
-			qw(PMCProxy Class));
+                        qw(Null Iterator Enumerate Ref STMRef SharedRef
+                           ParrotObject ParrotThread
+                           deleg_pmc BigInt LexInfo LexPad Slice Object),
+                        # Instances of these appear to have other types.
+                        qw(PMCProxy Class));
 while ( my ( $type, $id ) = each %pmc_types ) {
     next
-	if $types_we_cant_test{$type};
+        if $types_we_cant_test{$type};
     my $set_ro = ( $type =~ /^Const\w+/ ) ? <<EOPASM : '';
     new P10, 'Integer'
     set P10, 1
@@ -261,8 +261,8 @@ SKIP: {
     skip( "no instantiate", 1 );
     pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate - no args" );
     getclass P2, "Integer"
-    set I0, 0	# unproto
-    set I3, 0	# no P args
+    set I0, 0   # unproto
+    set I3, 0   # no P args
     instantiate P3
     typeof S0, P3
     print S0
@@ -386,7 +386,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "pmcinfo_i_p_ic" );
 .include "pmcinfo.pasm"
     new P0, 'Integer'
     pmcinfo I0, P0, .PMCINFO_FLAGS
-    shl I2, 1, 9	# PObj_is_PMC_FLAG s. pobj.h
+    shl I2, 1, 9        # PObj_is_PMC_FLAG s. pobj.h
     band I1, I0, I2
     if I1, ok
     print "PMC flag not set\n"
