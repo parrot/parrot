@@ -129,8 +129,12 @@ END_PRINT
 if (@inline@ ne '') {
     my $inl = @inline@;
     print OUT <<"END_PRINT";
-#define PARROT_INLINE $inl
-#define PARROT_HAS_INLINE
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#  define PARROT_INLINE inline
+#  define PARROT_HAS_INLINE
+#else
+#  define PARROT_INLINE
+#endif
 END_PRINT
 }
 else {
