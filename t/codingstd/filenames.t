@@ -79,7 +79,7 @@ foreach my $file ( @files ) {
     my ($volume, $directory, $filename) = File::Spec->splitpath( $file );
     my @filename_chars = split '', $filename;
     my $filename_len = scalar @filename_chars;
-    push @too_long, $file . "\n"
+    push @too_long, $file . ":$filename_len chars\n"
         if $filename_len > 32;
 
 }
