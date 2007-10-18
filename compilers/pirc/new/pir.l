@@ -103,14 +103,14 @@ Pop a file_info structure from a stack.
 static file_info *
 pop_file_info(void) {
     if (current_file == NULL) {
-        //fprintf(stderr, "pop_file_info(): returning NULL\n");
+        /* fprintf(stderr, "pop_file_info(): returning NULL\n"); */
         return NULL;
     }
     else {
         file_info *returning = current_file;
-        //fprintf(stderr, "pop_file_info(): returning info object\n");
+        /* fprintf(stderr, "pop_file_info(): returning info object\n"); */
         current_file = current_file->prev;
-        //fprintf(stderr, "current_file is now NULL\n");
+        /* fprintf(stderr, "current_file is now NULL\n"); */
         return returning;
     }
 }
@@ -221,7 +221,7 @@ read_macro(void) {
 
 %}
 
-ALPHA	       [a-zA-Z@_]
+ALPHA          [a-zA-Z@_]
 DIGIT          [0-9]
 DIGITS         {DIGIT}+
 ALNUM          {ALPHA}|{DIGIT}
@@ -268,7 +268,7 @@ LINECOMMENT    [#].*\n
                     /* remove the closing quote */
                     heredoc_id[strlen(heredoc_id) - 1] = '\0';
                     printf("heredoc id: '%s'\n", heredoc_id);
-                    //return TK_HEREDOC;
+                    /* return TK_HEREDOC; */
 
                     yy_push_state(HEREDOC);
                     /*
@@ -347,9 +347,9 @@ LINECOMMENT    [#].*\n
 "unless"          { return TK_UNLESS; }
 
 "int"             { return TK_INT; }
-"num"		      { return TK_NUM; }
-"pmc"		      { return TK_PMC; }
-"string"	      { return TK_STRING; }
+"num"             { return TK_NUM; }
+"pmc"             { return TK_PMC; }
+"string"          { return TK_STRING; }
 
 ".arg"            { return TK_ARG; }
 ".const"          { return TK_CONST; }
@@ -370,7 +370,7 @@ LINECOMMENT    [#].*\n
 ".meth_call"      { return TK_METH_CALL; }
 ".namespace"      { return TK_NAMESPACE; }
 ".nci_call"       { return TK_NCI_CALL; }
-".param"	      { return TK_PARAM; }
+".param"          { return TK_PARAM; }
 ".pcc_begin"      { return TK_PCC_BEGIN; }
 ".pcc_begin_return" { return TK_PCC_BEGIN_RETURN; }
 ".pcc_begin_yield"  { return TK_PCC_BEGIN_YIELD; }
@@ -384,7 +384,7 @@ LINECOMMENT    [#].*\n
 ".sub"            { return TK_SUB; }
 ".yield"          { return TK_YIELD; }
 
-":anon"		 { return TK_FLAG_ANON; }
+":anon"      { return TK_FLAG_ANON; }
 ":init"      { return TK_FLAG_INIT; }
 ":load"      { return TK_FLAG_LOAD; }
 ":postcomp"  { return TK_FLAG_POSTCOMP; }
@@ -582,7 +582,7 @@ LINECOMMENT    [#].*\n
                   }
 
 
-<<EOF>>		{  file_info *info = pop_file_info();
+<<EOF>>     {  file_info *info = pop_file_info();
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
@@ -593,7 +593,7 @@ LINECOMMENT    [#].*\n
                }
             }
 
-.	{ yyerror("Unexpected character"); }
+.   { yyerror("Unexpected character"); }
 
 
 %%
