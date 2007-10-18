@@ -111,8 +111,8 @@ KEYWORD_EXP: {
 ## files with LF are the ones we expect, and that the rest are native.
 
 our $lf_files_regexp = qr{
-    ^examples/shootout/.*\.input$ |
-    ^examples/shootout/.*\.output$ |
+    ^examples/shootout/.*\.pir_input$ |
+    ^examples/shootout/.*\.pir_output$ |
     ^t/compilers/pge/p5regex/re_tests$ |
     ^t/library/perlhist.txt$ |
     ^t/op/sprintf_tests$
