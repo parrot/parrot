@@ -89,11 +89,11 @@ ok( !@multi_dots, 'No multi-dot filenames' )
         . " files:\n@multi_dots" );
 
 ok( !@strange_chars, 'Portable characters in filenames' )
-    or diag( "Filename with non-portable character found in " 
+    or diag( "Filename with non-portable character found in "
         . @strange_chars . " files:\n@strange_chars" );
 
 ok( !@too_long, 'Filenames length' )
-    or diag( "Filename with with more than 32 chars found in " 
+    or diag( "Filename with with more than 32 chars found in "
         . @too_long . " files:\n@too_long" );
 
 # Local Variables:
