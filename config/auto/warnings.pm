@@ -145,9 +145,11 @@ sub try_warning {
         $conf->data->set( ccflags => $tryflags );
         my $ccflags = $conf->data->get("ccflags");
         $verbose and print "  ccflags: $ccflags$/";
+        return 1;
     }
-
-    return;
+    else {
+        return 0;
+    }
 }
 
 =back
