@@ -84,19 +84,19 @@ foreach my $file ( @files ) {
 
 }
 
-ok( !scalar(@multi_dots), 'No multi-dot filenames' )
-    or diag( "Multi-dot filename found in " . scalar @multi_dots
+ok( !@multi_dots, 'No multi-dot filenames' )
+    or diag( "Multi-dot filename found in " . @multi_dots
         . " files:\n@multi_dots" );
 
-ok( !scalar(@strange_chars), 'Portable characters in filenames' )
+ok( !@strange_chars, 'Portable characters in filenames' )
     or diag( "Filename with non-portable character found in " 
-        . scalar @strange_chars . " files:\n@strange_chars" );
+        . @strange_chars . " files:\n@strange_chars" );
 
 TODO: {
     local $TODO = "Filename length not yet a coding standard";
-    ok( !scalar(@too_long), 'Filenames length' )
+    ok( !@too_long, 'Filenames length' )
         or diag( "Filename with with more than 32 chars found in " 
-            . scalar @too_long . " files:\n@too_long" );
+            . @too_long . " files:\n@too_long" );
 }
 
 
