@@ -34,8 +34,8 @@
 
 %token TK_ARROW TK_NE TK_EQ TK_LT TK_LE TK_GT TK_GE
        TK_ASSIGN_USHIFT TK_ASSIGN_RSHIFT TK_ASSIGN_LSHIFT
-	   TK_USHIFT TK_RSHIFT TK_LSHIFT
-	   TK_FDIV TK_OR TK_AND TK_XOR
+       TK_USHIFT TK_RSHIFT TK_LSHIFT
+       TK_FDIV TK_OR TK_AND TK_XOR
 
 %token TK_ASSIGN_INC TK_ASSIGN_DEC TK_ASSIGN_MUL
        TK_ASSIGN_MOD TK_ASSIGN_POW TK_ASSIGN_DIV
@@ -44,8 +44,8 @@
 
 %token TK_FLAG_INIT TK_FLAG_LOAD TK_FLAG_MAIN
        TK_FLAG_ANON TK_FLAG_METHOD TK_FLAG_OUTER
-	   TK_FLAG_VTABLE TK_FLAG_LEX TK_FLAG_MULTI
-	   TK_FLAG_POSTCOMP TK_FLAG_IMMEDIATE
+       TK_FLAG_VTABLE TK_FLAG_LEX TK_FLAG_MULTI
+       TK_FLAG_POSTCOMP TK_FLAG_IMMEDIATE
 
 %token TK_FLAG_UNIQUE_REG TK_FLAG_NAMED TK_FLAG_SLURPY
        TK_FLAG_FLAT TK_FLAG_OPTIONAL TK_FLAG_OPT_FLAG
@@ -58,7 +58,7 @@
 
 program: opt_nl
          compilation_units
-		 opt_nl
+         opt_nl
 
        ;
 
@@ -71,7 +71,7 @@ compilation_units: compilation_unit
                  ;
 
 compilation_unit: sub_definition
-				| TK_CONST const_tail
+                | TK_CONST const_tail
                 | namespace_declaration
                 | emit_block
                 | hll_specifier
@@ -124,7 +124,7 @@ namespace_id: TK_STRINGC
 
 sub_definition: TK_SUB sub_id sub_flags TK_NL
                 parameters
-				instructions
+                instructions
                 TK_END
                 ;
 
@@ -134,20 +134,20 @@ sub_id: TK_IDENT
 
 sub_flags: /* empty */
          | sub_flags sub_flag
-		 ;
+         ;
 
 sub_flag: TK_FLAG_ANON
         | TK_FLAG_INIT
-		| TK_FLAG_LOAD
-		| TK_FLAG_MAIN
-		| TK_FLAG_METHOD
-		| TK_FLAG_LEX
-		| TK_FLAG_OUTER '(' sub_id ')'
-		| TK_FLAG_VTABLE paren_string
-		| TK_FLAG_MULTI '(' multi_type_list ')'
-		| TK_FLAG_POSTCOMP
-		| TK_FLAG_IMMEDIATE
-	    ;
+        | TK_FLAG_LOAD
+        | TK_FLAG_MAIN
+        | TK_FLAG_METHOD
+        | TK_FLAG_LEX
+        | TK_FLAG_OUTER '(' sub_id ')'
+        | TK_FLAG_VTABLE paren_string
+        | TK_FLAG_MULTI '(' multi_type_list ')'
+        | TK_FLAG_POSTCOMP
+        | TK_FLAG_IMMEDIATE
+        ;
 
 
 multi_type_list: /* empty */
@@ -160,9 +160,9 @@ multi_type: TK_IDENT
           | type
           ;
 
-parameters:	/* empty */
-		  | parameters parameter
-		  ;
+parameters:    /* empty */
+          | parameters parameter
+          ;
 
 parameter: TK_PARAM param_def param_flags TK_NL
          ;
@@ -177,7 +177,7 @@ param_def: type TK_IDENT
 
 instructions: /* empty */
             | instructions labeled_instruction
-			;
+            ;
 
 labeled_instruction: TK_LABEL TK_NL
                    | TK_LABEL instruction
@@ -463,19 +463,19 @@ const_tail: TK_INT TK_IDENT '=' TK_INTC
 
 condition: TK_NULL expression
          | expression
-	     | conditional_expression
-	     ;
+         | conditional_expression
+         ;
 
 conditional_expression: expression rel_op expression
 
 expression: TK_IDENT
           | constant
-		  | reg
+          | reg
           ;
 
 constant: TK_STRINGC
         | TK_INTC
-		| TK_NUMC
+        | TK_NUMC
         ;
 
 reg: TK_SYM_PREG
@@ -493,17 +493,17 @@ pasm_reg: TK_PASM_PREG
 
 rel_op: TK_NE
       | TK_EQ
-	  | TK_LT
-	  | TK_LE
-	  | TK_GE
-	  | TK_GT
-	  ;
+      | TK_LT
+      | TK_LE
+      | TK_GE
+      | TK_GT
+      ;
 
 type: TK_INT
     | TK_NUM
-	| TK_PMC
+    | TK_PMC
     | TK_STRING
-	;
+    ;
 
 target: reg
       | TK_IDENT
