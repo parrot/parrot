@@ -927,13 +927,13 @@ inspect_str.
     PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC    *metadata    = pmc_new(interp, enum_class_Hash);
-        STRING *name_str    = CONST_STRING(interp, "name");
-        STRING *ns_str      = CONST_STRING(interp, "namespace");
-        STRING *attrs_str   = CONST_STRING(interp, "attributes");
-        STRING *meths_str   = CONST_STRING(interp, "methods");
-        STRING *parents_str = CONST_STRING(interp, "parents");
-        STRING *roles_str   = CONST_STRING(interp, "roles");
+        PMC    *metadata           = pmc_new(interp, enum_class_Hash);
+        STRING * const name_str    = CONST_STRING(interp, "name");
+        STRING * const ns_str      = CONST_STRING(interp, "namespace");
+        STRING * const attrs_str   = CONST_STRING(interp, "attributes");
+        STRING * const meths_str   = CONST_STRING(interp, "methods");
+        STRING * const parents_str = CONST_STRING(interp, "parents");
+        STRING * const roles_str   = CONST_STRING(interp, "roles");
 
         VTABLE_set_pmc_keyed_str(interp, metadata, name_str,
             VTABLE_inspect_str(interp, SELF, name_str));
@@ -1029,17 +1029,14 @@ Creates a new PMC object of the type of the class and calls init().
     PMC *instantiate(PMC *init) {
         Parrot_Object *obj_guts  = NULL;
         Parrot_Class  *_class    = PARROT_CLASS(SELF);
-        STRING * const class_str = string_from_literal(interp, "Class");
-        PMC           *iter, *object;
-
+        STRING * const class_str = CONST_STRING(interp, "Class");
+        PMC           *object    = PMCNULL;
+        PMC           *iter;
         INTVAL         i, mro_length;
-
-        object = PMCNULL;
 
         /* If we've not been instantiated before... */
         if (!_class->instantiated) {
             int resolve_count;
-
 
             /* Check that we have all methods listed in resolve list. */
             resolve_count = VTABLE_elements(interp, _class->resolve_method);
@@ -1299,9 +1296,9 @@ Used to archive the class.
 */
 
     void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO     *io                = info->image_io;
         Parrot_Class * const class_data = PARROT_CLASS(SELF);
-        STRING *serial_namespace = string_from_literal(interp, "");
+        STRING       * serial_namespace = CONST_STRING(interp, "");
 
         /* 1) freeze class name */
         VTABLE_push_string(INTERP, io, class_data->name);
