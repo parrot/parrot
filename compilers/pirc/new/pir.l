@@ -44,8 +44,31 @@ typedef struct file_info {
 
 } file_info;
 
-/* global! */
+
+/* data structure to store .constant definitions */
+typedef struct constant_info {
+    int line_declared;  /* line where the constant was declared */
+    int token_type;     /* token type of the value */
+    char *name;         /* name of the constant */
+    char *value;        /* the value of the constant */
+
+    struct constant_info *next; /* for now, linked list impl. */
+
+} constant_info;
+
+
+typedef struct macro_info {
+    int line_declared;
+    char *name;
+
+} macro_info;
+
+
+/* globals! */
 static file_info *current_file = NULL;
+static constant_info *constant_defs = NULL;
+static heredoc_info *heredocs = NULL;
+static macro_info *macros = NULL;
 
 /*
 
@@ -99,7 +122,7 @@ switch_to_file(file_info *info) {
     /* restore the buffer info */
     yylineno = info->line_nr;
 
-    /* delete the current buffer (of the included file *)
+    /* delete the current buffer (of the included file *) */
     yy_delete_buffer(YY_CURRENT_BUFFER);
     /* close current file */
     fclose(yyin);
@@ -126,22 +149,73 @@ new_heredoc(void) {
     return heredoc;
 }
 
+static constant_info *
+find_constant(char *name) {
+
+    constant_info *iter = constant_defs;
+
+    while (iter != NULL) {
+        if (strcmp(iter->name, name) == 0) {
+            return iter;
+        }
+        iter = iter->next;
+    }
+    return NULL;
+}
+
+static void
+define_constant(char *name, char *value, int token_type, int line) {
+    constant_info *info = (constant_info *)malloc(sizeof(constant_info));
+    if (info == NULL) {
+        fprintf(stderr, "Failed to allocate memory for constant definition.\n");
+        exit(1);
+    }
+    /* create the constant definition */
+    info->line_declared = line;
+    info->name          = name;
+    info->value         = value;
+    info->token_type    = token_type;
+
+    /* for now, just use linked list. Later we'll use a hash */
+    info->next    = constant_defs;
+    constant_defs = info;
+}
+
+static macro_info *
+find_macro(char *name) {
+    return NULL;
+}
+
+
+
 static void
 read_macro(void) {
     int next_token;
+    int next_char;
+    macro_info *macro;
+
 
     /* get next token, this must be macro id */
     next_token = yylex();
 
+    /* check that there's a macro identifier token */
     if (next_token != TK_IDENT) {
         yyerror("macro identifier expected after '.macro'");
     }
 
     /* read macro parameters, if any */
+    /*
+    next_char = input();
+    if (next_char == '(') {
 
+
+    }
+    */
     /* read macro body */
 
-    /* TODO */ ;
+    macro = (macro_info *)malloc(sizeof(macro_info));
+    macro->name = strdup(yytext);
+
 
 }
 
@@ -155,6 +229,7 @@ DOT            [.]
 HEX            0[xX][0-9A-Fa-f]+
 OCT            0[oO][0-7]+
 BIN            0[bB][01]+
+WS             [\t ]
 
 SIGN           [-+]
 BIGINT         {SIGN}?{DIGITS}"L"
@@ -164,24 +239,28 @@ DQ_STRING       \"(\\.|[^"\\\n])*\"
 SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
 
+LINECOMMENT    [#].*\n
 
-
+/* start state for HEREDOC scanning */
 %x HEREDOC
+/* start state for macro scanning */
 %x MACRO
 
 /* use built-in line counter */
 %option yylineno
+/* support pushing/popping of start states */
 %option stack
 
 %%
 
 
 
-[\t\r ]                    { /* ignore */; }
-\n([\t\r\n ]|#.*\n)*       { return TK_NL; }
+[\t\r ]                            { /* ignore */; }
+\n([\t\r\n ]|{LINECOMMENT})*       { /* a set of continuous newlines yields a single newline token. */
+                                     return TK_NL;
+                                   }
 
-
-#.*\n          { /* skip line comments */ ; }
+{LINECOMMENT}          { /* skip line comments */ ; }
 
 "<<"{Q_STRING} {
                     /* skip the "<<" and the quote */
@@ -360,14 +439,15 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                    return next_token;
                }
 
-               /* retrieve name of file, remove quotes */
+               /* retrieve name of file, remove 2 quote characters. */
                file_name_length = yyleng - 2;
-               incl_file_name = (char *)calloc(file_name_length + 1, sizeof(char));
+               incl_file_name   = (char *)calloc(file_name_length + 1, sizeof(char));
+
                /* copy current token's characters, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
 
                /* open the file */
-               fprintf(stderr, "Opening file '%s'\n", incl_file_name);
+               fprintf(stderr, "Including file '%s'\n", incl_file_name);
                incl_file_ptr = fopen(incl_file_name, "r");
 
                /* after an include statement a newline is expected */
@@ -384,7 +464,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                file_state->line_nr  = yylineno;
                file_state->prev     = NULL; /* initialize to NULL */
 
-               /* store the info structure on the stack */
+               /* store the current file's info structure on the stack, we'll continue scanning it later. */
                push_file_info(file_state);
 
                /* a new file is being scanned, reset line number */
@@ -397,12 +477,12 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                    /* create a new buffer for the included file and switch to that file */
                    incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
                    yy_switch_to_buffer(incl_file_buffer);
-
                }
              }
 
 ".constant"  { int next_token;
                char *constant_id;
+               char *constant_value;
 
                next_token = yylex();
                if (next_token != TK_IDENT) {
@@ -427,7 +507,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                    case TK_PASM_IREG:
                    case TK_PASM_SREG:
                        /* store value by this constant's name */
-                       /* copy yytext into some buffer */
+                       constant_value = strdup(yytext);
+                       define_constant(constant_id, constant_value, next_token, yylineno);
                        break;
                    default:
                        yyerror("Constant value of '%s' must be a number, "
@@ -453,13 +534,52 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 
+{WS}[.]{ALNUM}    { /* Check whether this token is a constant or a macro.
+                           * Note that there must be whitespace before the dot, otherwise
+                           * in "x.y", ".y" is matched, which is wrong.
+                           */
 
-[.]{ALNUM}    { /* check whether this token is a constant or a macro */
-                /* TODO */
+                    /* because of the whitespace in front of this matched token, we need to skip this,
+                           * yytext contains 1 or more space characters, so find out how many these are.
+                           */
+                    constant_info *constant;
+                    int num_spaces = 1; /* there is at least one space, so we don't have to check that one */
 
-                /* not found, this is an unknown constant or macro. */
-                yyerror("Undefined constant or macro");
-              }
+                    /* as long as yytext + num_spaces points to a space character, increment num_spaces */
+                    while ( isspace( *(yytext + num_spaces)) ) {
+                        ++num_spaces;
+                    }
+                    /* give the name of the constant, skipping the whitespace prefix, and skip the prefix dot. */
+                    constant = find_constant(yytext + num_spaces + 1);
+
+                    if (constant != NULL) { /* found the constant */
+                        fprintf(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
+                                constant->name, constant->value, constant->token_type);
+
+                        /* make the value of the constant available to the parser */
+                        yytext = constant->value;
+                        /* return the type of token that the constant value represents */
+                        return constant->token_type;
+                    }
+                    else { /* not found, try macro */
+                        macro_info *macro;
+
+                        macro = find_macro(yytext + num_spaces + 1);
+
+                        if (macro != NULL) {
+                            /* read input for parameters */
+
+                            /* expand the macro into a string buffer */
+
+                            /* and scan that string buffer. */
+                        }
+                        else {
+                            /* not found, this is an unknown constant or macro. */
+                            yyerror("Undefined constant or macro");
+                        }
+                    }
+
+                  }
 
 
 <<EOF>>		{  file_info *info = pop_file_info();
