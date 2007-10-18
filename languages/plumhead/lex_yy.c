@@ -1700,5 +1700,9 @@ void yyfree (void * ptr )
 
 #line 10 "src/yacc/plumhead.l"
 
-
-
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

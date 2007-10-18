@@ -1623,4 +1623,9 @@ yyreturn:
 
 #line 127 "src/yacc/plumhead.y"
 
-
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
