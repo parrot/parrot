@@ -92,13 +92,9 @@ ok( !@strange_chars, 'Portable characters in filenames' )
     or diag( "Filename with non-portable character found in " 
         . @strange_chars . " files:\n@strange_chars" );
 
-TODO: {
-    local $TODO = "Filename length not yet a coding standard";
-    ok( !@too_long, 'Filenames length' )
-        or diag( "Filename with with more than 32 chars found in " 
-            . @too_long . " files:\n@too_long" );
-}
-
+ok( !@too_long, 'Filenames length' )
+    or diag( "Filename with with more than 32 chars found in " 
+        . @too_long . " files:\n@too_long" );
 
 # Local Variables:
 #   mode: cperl
