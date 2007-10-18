@@ -387,6 +387,7 @@ the_test(Interp *interp,
     UNUSED(start);
 
     parrot_new_hash(interp, &hash);
+    parrot_new_hash(interp, &hash2);
 
     if ( hash == NULL ) {
         PIO_eprintf(interp, "hash creation failed\n");
@@ -403,7 +404,7 @@ the_test(Interp *interp,
 
     PIO_eprintf(interp, "%i\n", (int)VTABLE_get_integer(interp, value));
 
-    parrot_hash_clone(interp, hash, &hash2);
+    parrot_hash_clone(interp, hash, hash2);
 
     value = parrot_hash_get(interp, hash2, key);
 

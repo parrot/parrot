@@ -1063,12 +1063,9 @@ Clones C<hash> to C<dest>.
 
 PARROT_API
 void
-parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash **dest))
+parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash *dest))
 {
     UINTVAL i;
-
-    parrot_new_hash_x(dest, hash->entry_type,
-            hash->key_type, hash->compare, hash->hash_val);
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *b = hash->bi[i];
@@ -1096,7 +1093,7 @@ parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash **dest))
                 real_exception(interp, NULL, -1, "hash corruption: type = %d\n",
                                    hash->entry_type);
             };
-            parrot_hash_put(interp, *dest, key, valtmp);
+            parrot_hash_put(interp, dest, key, valtmp);
             b = b->next;
         }
     }

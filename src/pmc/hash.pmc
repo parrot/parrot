@@ -194,11 +194,10 @@ Creates and returns a clone of the hash.
 */
 
     PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_destroy_SETALL(dest);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         parrot_hash_clone(INTERP, (Hash *)PMC_struct_val(SELF),
-                   (Hash **)&PMC_struct_val(dest));
+                   (Hash *)PMC_struct_val(dest));
 
         ((Hash *)PMC_struct_val(dest))->container = dest;
         return dest;

@@ -80,7 +80,7 @@ void parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))
 PARROT_API
 void parrot_hash_clone(PARROT_INTERP,
     NOTNULL(Hash *hash),
-    NOTNULL(Hash **dest))
+    NOTNULL(Hash *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
