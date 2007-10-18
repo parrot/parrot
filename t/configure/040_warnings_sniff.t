@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
@@ -13,9 +13,16 @@ use IO::Handle;
 use lib qw( lib );
 use Parrot::IO::Capture::Mini;
 
-BEGIN { use_ok('Parrot::Configure'); }
-BEGIN { use_ok('Parrot::Configure::Step'); }
-BEGIN { use_ok('auto::warnings'); }
+if ( $^O eq 'MSWin32' ) {
+    plan( skip_all => 'Not yet tested on Win32');
+}
+else {
+    plan( tests => 4 );
+}
+
+use_ok('Parrot::Configure');
+use_ok('Parrot::Configure::Step');
+use_ok('auto::warnings');
 
 #Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
 
