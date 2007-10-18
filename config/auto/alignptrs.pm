@@ -15,16 +15,21 @@ package auto::alignptrs;
 
 use strict;
 use warnings;
-use vars qw($description $result @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 use Config;
 
-$description = 'Determining your minimum pointer alignment';
 
-@args = qw(miniparrot);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining your minimum pointer alignment};
+    $data{args}        = [ qw( miniparrot ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );

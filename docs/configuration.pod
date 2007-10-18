@@ -99,11 +99,28 @@ namespace used depends on the step's relative path in the source tree sans the
 F<config> prefix.  For example, the step F<config/init/defaults.pm> uses the
 C<init::defaults> namespace.
 
-They should define the following methods:
+Each step inherits its constructor and some other methods from
+F<lib/Parrot/Configure/Step/Base.pm>.  Each step needs to define only
+two methods:  C<_init()> and C<runstep()>.
+
+The C<_init()> method should follow the following example, defining three
+elements within an internal hash:
+
+    sub _init {
+        my $self = shift;
+        my %data;
+        $data{description} = q{This is the step description};
+        $data{args}        = [ qw( optional arguments ) ];
+        $data{result}      = q{};
+        return \%data;
+    }
 
 =over 4
 
 =item C<description>
+
+Of these three elements, C<description> is the most important as it is
+used extensively within C<lib/Parrot/Configure.pm>.
 
 Returns a short descriptive message that should be printed before the step
 executes.  Usually, interactive steps have long, friendly descriptions and
@@ -146,6 +163,12 @@ I<XXX> Note that this method is currently unused but will be used in the futher
 to register acceptable CLI parameters.  New steps should continue to define
 this method.
 
+=item C<result>
+
+The C<result> is initialized to an empty string mainly to quiet
+'uninitialized variable' warnings.  Most configuration steps override
+the C<result> value inside their C<runstep()> method.
+
 =item L<_run_this_step>
 
 This method is called to actually execute the step.  The return
@@ -177,13 +200,29 @@ A template for a new step might look like this:
 
     use Parrot::Configure::Step;
 
-    $description = '<description>';
-    @args = qw(<args>);
+    sub _init {
+        my $self = shift;
+        my %data;
+        $data{description} = q{This is the step description};
+        $data{args}        = [ qw( optional arguments ) ];
+        $data{result}      = q{};
+        return \%data;
+    }
 
     sub runstep {
         my ($self, $conf) = @_
         ...
+        if ($success) {
+            $self->set_result('yes');
+            return 1;
+        } else {
+            $self->set_result('no');
+            return;
+        }
     }
+
+The step's C<runstep()> method should return C<1> upon success and do a
+bare return on failure (thereby returning an undefined value).
 
 =head2 Command-line Arguments
 

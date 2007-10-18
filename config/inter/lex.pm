@@ -17,16 +17,19 @@ package inter::lex;
 use strict;
 use warnings;
 
-use vars qw( $description @args $prompt $util );
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
-$util        = 'lex';
-$description = "Determining whether $util is installed";
-$prompt      = "Do you have a lexical analyzer generator like flex or lex?";
-@args        = qw( lex ask maintainer );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining whether lex is installed};
+    $data{args}        = [ qw( lex ask maintainer ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 my @lex_defaults =
     defined( $ENV{TEST_LEX} )
@@ -37,6 +40,8 @@ my $default_required = '2.5.33';
 
 sub runstep {
     my ( $self, $conf ) = @_;
+    my $util    = 'lex';
+    my $prompt  = "Do you have a lexical analyzer generator like flex or lex?";
 
     my $verbose = $conf->options->get('verbose');
 

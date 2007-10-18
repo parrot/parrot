@@ -16,16 +16,21 @@ package auto::m4;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use Parrot::Configure::Step ':auto', 'capture_output';
 
-$description = 'Determining whether GNU m4 is installed';
 
-@args = qw();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining whether GNU m4 is installed};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

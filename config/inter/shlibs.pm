@@ -20,15 +20,20 @@ package inter::shlibs;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining flags for building shared libraries';
 
-@args = qw(ask verbose cc_shared);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining flags for building shared libraries};
+    $data{args}        = [ qw( ask verbose cc_shared ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

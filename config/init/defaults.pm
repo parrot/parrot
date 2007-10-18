@@ -15,7 +15,6 @@ package init::defaults;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -26,9 +25,15 @@ use Parrot::BuildUtil;
 use Cwd qw(abs_path);
 use File::Spec;
 
-$description = q{Setting up Configure's default values};
 
-@args = qw(debugging optimize profile verbose m);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Setting up Configure's default values};
+    $data{args}        = [ qw( debugging optimize profile verbose m ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 my $parrot_version = Parrot::BuildUtil::parrot_version();
 my @parrot_version = Parrot::BuildUtil::parrot_version();

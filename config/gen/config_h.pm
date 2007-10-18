@@ -18,15 +18,20 @@ package gen::config_h;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-$description = 'Generating C headers';
 
-@args = ('define');
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Generating C headers};
+    $data{args}        = [ qw( define ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

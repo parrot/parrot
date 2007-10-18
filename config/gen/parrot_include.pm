@@ -20,10 +20,15 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-use vars qw($description @args);
 
-$description = 'Generating runtime/parrot/include';
-@args        = qw(verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Generating runtime/parrot/include};
+    $data{args}        = [ qw( verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub const_to_parrot {
     map ".constant $_->[0]\t$_->[1]", @_;

@@ -15,15 +15,20 @@ package auto::funcptr;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Verifying that the compiler supports function pointer casts';
 
-@args = qw(verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Verifying that the compiler supports function pointer casts};
+    $data{args}        = [ qw( verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

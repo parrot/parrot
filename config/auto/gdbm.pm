@@ -16,16 +16,21 @@ package auto::gdbm;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use Parrot::Configure::Step ':auto';
 
-$description = 'Determining if your platform supports gdbm';
 
-@args = qw(verbose without-gmp);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining if your platform supports gdbm};
+    $data{args}        = [ qw( verbose without-gmp ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

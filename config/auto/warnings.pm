@@ -21,16 +21,21 @@ package auto::warnings;
 
 use strict;
 use warnings;
-use vars qw($description @args);
+
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 use Parrot::BuildUtil;
 
-$description = 'Detecting supported compiler warnings (-Wxxx)';
-
-@args = qw( cc verbose define );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Detecting supported compiler warnings (-Wxxx)};
+    $data{args}        = [ qw( cc verbose define  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 our @potential_warnings = qw(
     -falign-functions=16
@@ -82,7 +87,6 @@ our @potential_warnings = qw(
     -Wwrite-strings
     -Wnot-a-real-warning
 );
-
 our $verbose;
 
 sub runstep {

@@ -13,15 +13,10 @@ Parrot::Configure::Step::Base - Configuration Step Base Class
 
 =head1 DESCRIPTION
 
-The C<Parrot::Configure::Step::Base> module contains utility methods that
-should be inherited by all configuration steps.
+The C<Parrot::Configure::Step::Base> module contains the constructor and
+utility methods that should be inherited by all configuration steps.
 
 =head1 USAGE
-
-=head2 Import Parameters
-
-This module accepts no arguments to it's C<import> method and exports no
-I<symbols>.
 
 =cut
 
@@ -32,8 +27,6 @@ use warnings;
 
 =head2 Methods
 
-=head3 Constructors
-
 =over 4
 
 =item * C<new()>
@@ -41,88 +34,77 @@ use warnings;
 Basic constructor.
 
 Accepts no arguments and returns a L<Parrot::Configure::Step::> object.
+Requires user to define an C<_init()> method in the inheriting configuration
+class.  This initializer sets a C<description> attribute in the object's data
+structure and may set other attributes as well.  Should the initializer fail
+to set a C<description> attribute, the constructor sets it to be an empty
+string.  Hence, when a configuration step is executed by L<Configure.pl>, the
+description for that step is always defined but may not be a true value.
 
 =cut
 
 sub new {
     my $class = shift;
-    return bless {}, $class;
+    my $self = bless {}, $class;
+    my $dataref = $self->_init($class);
+    %$self = %$dataref;
+    unless ( defined ($self->{description}) ) {
+        $self->{description} = q{};
+    }
+    return $self;
 }
 
-=back
+=item * C<description()>
 
-=head3 Object Methods
-
-=over 4
-
-=item * C<result()>
-
-Accepts no arguments and returns the value of C<$result> from the inheriting
-classes namespace.
+Accepts no arguments and returns the value of the description attribute.  The
+description ought to be set in the C<_init()> initializer in the inheriting
+class's namespace.  If it was not set there, the constructor sets it to an
+empty string.
 
 =cut
 
-sub result {
+sub description {
     my $self = shift;
+    return $self->{description};
+}
 
-    return $self->{result};
+=item * C<args()>
+
+Accepts no arguments.  In list context, returns a list of elements held in the
+C<args> attribute set in the C<_init()> initializer in the inheriting class's
+namespace.  In scalar context, returns a reference to an array holding that
+same list.
+
+=cut
+
+sub args {
+    my $self = shift;
+    return wantarray ? @{$self->{args}} : $self->{args};
 }
 
 =item * C<set_result()>
 
-Accepts a scalar values and assigns it to the inheriting classes C<$result>
-variable.  Returns the inheriting classes name.
+Accepts a scalar value and assigns it to the inheriting class's C<$result>
+variable.  Returns the inheriting class's name.
 
 =cut
 
 sub set_result {
     my ( $self, $result ) = @_;
-
     $self->{result} = $result;
-
     return $self;
 }
 
-=back
+=item * C<result()>
 
-=head3 Class Methods
-
-=over 4
-
-=item * C<description()>
-
-Accepts no arguments and returns the value of C<$description> from the
-inheriting classes namespace.
-
-This method also works as an object method.
+Accepts no arguments and returns the value of C<$result> from the inheriting
+class's namespace.
 
 =cut
 
-sub description {
-    my $class = shift;
-    $class = ( ref $class ) ? ref $class : $class;
-    {
-        no strict 'refs';
-        return ${ $class . "::description" };
-    }
-}
-
-=item * C<args()>
-
-Accepts no arguments and returns the value of C<@args> from the inheriting
-classes namespace.
-
-This method also works as an object method.
-
-=cut
-
-sub args {
-    my $class = shift;
-    $class = ( ref $class ) ? ref $class : $class;
-    {
-        no strict 'refs';
-        return @{ $class . "::args" };
-    }
+sub result {
+    my $self = shift;
+    return $self->{result};
 }
 
 =back

@@ -16,16 +16,21 @@ package auto::attributes;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 use Parrot::BuildUtil;
 
-$description = 'Detecting compiler attributes (-DHASATTRIBUTE_xxx)';
 
-@args = qw( cc verbose define );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Detecting compiler attributes (-DHASATTRIBUTE_xxx)};
+    $data{args}        = [ qw( cc verbose define ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 our @potential_attributes = qw(
     HASATTRIBUTE_CONST

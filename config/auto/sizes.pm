@@ -15,15 +15,20 @@ package auto::sizes;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Determining some sizes';
 
-@args = qw(miniparrot);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining some sizes};
+    $data{args}        = [ qw( miniparrot ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

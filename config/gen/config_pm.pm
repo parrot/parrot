@@ -17,7 +17,6 @@ package gen::config_pm;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -25,8 +24,14 @@ use Parrot::Configure::Step qw(genfile);
 use Cwd qw(cwd);
 use File::Spec::Functions qw(catdir);
 
-$description = "Recording configuration data for later retrieval";
-@args        = ();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Recording configuration data for later retrieval};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

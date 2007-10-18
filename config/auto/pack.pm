@@ -15,16 +15,21 @@ package auto::pack;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 use Config;
 
-$description = q{Figuring out how to pack() Parrot's types};
 
-@args = ();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Figuring out how to pack() Parrot's types};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

@@ -122,7 +122,7 @@ sub options {
 
 Provides a list of registered steps, where each step is represented by an
 L<Parrot::Configure::Task> object.  Steps are returned in the order in which
-they were registered in.
+they were registered.
 
 Accepts no arguments and returns a list in list context or an arrayref in
 scalar context.
@@ -133,6 +133,32 @@ sub steps {
     my $conf = shift;
 
     return wantarray ? @{ $conf->{steps} } : $conf->{steps};
+}
+
+=item * C<get_list_of_steps()>
+
+Provides a list of the B<names> of registered steps.
+
+C<steps()>, in contrast, provides a list of registered step B<objects>, of
+which the B<step name> is just a small part.  Step names are returned in the
+order in which their corresponding step objects were registered.
+
+Accepts no arguments and returns a list in list context or an arrayref in
+scalar context.
+
+B<Note:> The list of step names returned by C<get_list_of_steps()> will be the
+same as that returned by C<Parrot::Configure::Step::List::get_steps_list()>
+B<provided> that you have not used C<add_step()> or C<add_steps()> to add any
+configuration tasks other than those named in
+C<Parrot::Configure::Step::List::get_steps_list()>.
+
+=cut
+
+sub get_list_of_steps {
+    my $conf = shift;
+    die "list_of_steps not available until steps have been added"
+        unless defined $conf->{list_of_steps};
+    return wantarray ? @{ $conf->{list_of_steps} } : $conf->{list_of_steps};
 }
 
 =item * C<add_step()>
@@ -151,8 +177,8 @@ sub add_step {
 
     push @{ $conf->{steps} },
         Parrot::Configure::Task->new(
-        step   => $step,
-        params => \@params,
+            step   => $step,
+            params => \@params,
         );
 
     return 1;
@@ -265,37 +291,30 @@ sub _run_this_step {
     }
     my $step = $step_name->new();
 
-    my $description = $step->description() || q{};
-
     # set per step verbosity
     if ( defined $args->{verbose_step} ) {
         if (
-            (
-
-                # by step number
-                ( $args->{verbose_step} =~ /^\d+$/ ) and ( $args->{n} == $args->{verbose_step} )
-            )
-            or (
-
-                # by step name
-                ( ${ $conf->{hash_of_steps} }{ $args->{verbose_step} } )
-                and ( $args->{verbose_step} eq $step_name )
-            )
-            or (
-
-                # by description
-                $description =~ /$args->{verbose_step}/
-            )
+                (
+                    # by step number
+                    ( $args->{verbose_step} =~ /^\d+$/ )
+                        and ( $args->{n} == $args->{verbose_step} )
+                )
+                or (
+                    # by step name
+                    ( ${ $conf->{hash_of_steps} }{ $args->{verbose_step} } )
+                        and ( $args->{verbose_step} eq $step_name )
+                )
+                or (
+                    # by description
+                    $step->description =~ /$args->{verbose_step}/
+                )
             )
         {
             $conf->options->set( verbose => 2 );
         }
     }
 
-    # RT#43673 cc_build uses this verbose setting, why?
-    $conf->data->set( verbose => $args->{verbose} ) if $args->{n} > 2;
-
-    print "\n", $description, '...';
+    print "\n", $step->description, '...';
     print "\n" if $args->{verbose} && $args->{verbose} == 2;
 
     my $ret;
@@ -323,7 +342,7 @@ sub _run_this_step {
                 {
                     step        => $step,
                     args        => $args,
-                    description => $description,
+                    description => $step->description,
                 }
             );
 

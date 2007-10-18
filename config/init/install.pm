@@ -11,56 +11,23 @@ Sets up the installation paths
 
 =cut
 
-# taken from:
-#
-# autoconf (GNU Autoconf) 2.59
-# Written by David J. MacKenzie and Akim Demaille.
-#
-# Copyright (C) 2003 Free Software Foundation, Inc.
-# This is free software; see the source for copying conditions.  There is NO
-# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# Installation directories:
-#   --prefix=PREFIX         install architecture-independent files in PREFIX
-#                           [/usr/local]
-#   --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
-#                           [PREFIX]
-#
-# By default, `make install' will install all the files in
-# `/usr/local/bin', `/usr/local/lib' etc.  You can specify
-# an installation prefix other than `/usr/local' using `--prefix',
-# for instance `--prefix=$HOME'.
-#
-# For better control, use the options below.
-#
-# Fine tuning of the installation directories:
-#  --bindir=DIR           user executables [EPREFIX/bin]
-#  --sbindir=DIR          system admin executables [EPREFIX/sbin]
-#  --libexecdir=DIR       program executables [EPREFIX/libexec]
-#  --datadir=DIR          read-only architecture-independent data [PREFIX/share]
-#  --sysconfdir=DIR       read-only single-machine data [PREFIX/etc]
-#  --sharedstatedir=DIR   modifiable architecture-independent data [PREFIX/com]
-#  --localstatedir=DIR    modifiable single-machine data [PREFIX/var]
-#  --libdir=DIR           object code libraries [EPREFIX/lib]
-#  --includedir=DIR       C header files [PREFIX/include]
-#  --oldincludedir=DIR    C header files for non-gcc [/usr/include]
-#  --infodir=DIR          info documentation [PREFIX/info]
-#  --mandir=DIR           man documentation [PREFIX/man]
-
 package init::install;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = q{Setting up installation paths};
-
-@args = qw( prefix exec-prefix bindir sbindir libexecdir datadir sysconfdir
-    sharedstatedir localstatedir libdir includedir oldincludedir infodir
-    mandir );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Setting up installation paths};
+    $data{args}        = [ qw( prefix exec-prefix bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

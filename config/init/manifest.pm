@@ -15,16 +15,21 @@ package init::manifest;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 use ExtUtils::Manifest qw(manicheck);
 
-$description = 'Checking MANIFEST';
 
-@args = qw(nomanicheck);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Checking MANIFEST};
+    $data{args}        = [ qw( nomanicheck ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

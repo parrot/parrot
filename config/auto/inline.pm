@@ -15,15 +15,20 @@ package auto::inline;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Determining if your compiler supports inline';
 
-@args = qw(inline verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining if your compiler supports inline};
+    $data{args}        = [ qw( inline verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

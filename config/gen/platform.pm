@@ -16,14 +16,21 @@ package gen::platform;
 use strict;
 use warnings;
 
+
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 
 use Parrot::Configure::Step qw(copy_if_diff);
 
-our $description = 'Moving platform files into place';
-our @args        = qw(miniparrot verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Moving platform files into place};
+    $data{args}        = [ qw( miniparrot verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

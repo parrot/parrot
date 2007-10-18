@@ -16,15 +16,20 @@ package init::hints;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = 'Loading platform and local hints files';
 
-@args = qw( cc verbose define );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Loading platform and local hints files};
+    $data{args}        = [ qw( cc verbose define ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

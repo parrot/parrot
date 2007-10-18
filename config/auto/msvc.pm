@@ -15,15 +15,20 @@ package auto::msvc;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Determining if your C compiler is actually Visual C++';
 
-@args = qw(verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining if your C compiler is actually Visual C++};
+    $data{args}        = [ qw( verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );

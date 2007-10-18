@@ -15,7 +15,6 @@ package gen::icu;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -24,9 +23,15 @@ use Cwd qw(cwd);
 use File::Basename;
 use Parrot::Configure::Step qw(capture_output cc_gen cc_clean);
 
-$description = "Determining whether ICU is installed";
 
-@args = qw(verbose icushared icuheaders icu-config without-icu);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining whether ICU is installed};
+    $data{args}        = [ qw( verbose icushared icuheaders icu-config without-icu ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

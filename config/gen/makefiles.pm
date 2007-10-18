@@ -16,12 +16,19 @@ package gen::makefiles;
 use strict;
 use warnings;
 
+
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-our $description = 'Generating makefiles and other build files';
-our @args        = qw(target);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Generating makefiles and other build files};
+    $data{args}        = [ qw( target ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 my %makefiles = (
     'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },

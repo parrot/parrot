@@ -42,16 +42,21 @@ package auto::gc;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Determining what allocator to use';
 
 # valid libc/malloc/malloc-trace/gc
-@args = qw(gc verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining what allocator to use};
+    $data{args}        = [ qw( gc verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

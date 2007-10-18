@@ -15,15 +15,20 @@ package auto::va_ptr;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':auto';
 
-$description = 'Test the type of va_ptr (this test is likely to segfault)';
 
-@args = qw();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Test the type of va_ptr (this test is likely to segfault)};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

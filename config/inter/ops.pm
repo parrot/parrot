@@ -15,15 +15,20 @@ package inter::ops;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what opcode files should be compiled in';
 
-@args = qw(ask ops);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining what opcode files should be compiled in};
+    $data{args}        = [ qw( ask ops ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

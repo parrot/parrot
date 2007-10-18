@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests =>  9;
 use Carp;
 use Data::Dumper;
 use lib qw( lib );
@@ -38,7 +38,8 @@ my $step = $step_name->new();
 ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
-ok( !defined( $step->result ), "result not yet defined" );
+ok(defined ($step->result), "result defined");
+ok(! ($step->result), "result not yet true");
 my $ret = $step->runstep($conf);
 ok( defined $ret, "$step_name runstep() returned defined value" );
 is( $step->result, q{skipped}, "Because of --nomanicheck, result is 'skipped'." );
@@ -77,3 +78,4 @@ config::init::manifest, F<Configure.pl>.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+

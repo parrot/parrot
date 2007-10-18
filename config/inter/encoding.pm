@@ -15,7 +15,6 @@ package inter::encoding;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
@@ -23,9 +22,15 @@ use File::Basename qw/basename/;
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what encoding files should be compiled in';
 
-@args = qw(ask encoding);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining what encoding files should be compiled in};
+    $data{args}        = [ qw( ask encoding ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

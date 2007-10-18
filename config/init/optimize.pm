@@ -16,16 +16,21 @@ package init::optimize;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 use Parrot::Configure::Step;
 
-$description = 'Enabling optimization';
 
-@args = qw(verbose optimize);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Enabling optimization};
+    $data{args}        = [ qw( verbose optimize ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

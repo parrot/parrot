@@ -15,15 +15,20 @@ package auto::snprintf;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw(cc_gen cc_build cc_clean cc_run);
 
-$description = 'Testing snprintf';
 
-@args = qw(verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Testing snprintf};
+    $data{args}        = [ qw( verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

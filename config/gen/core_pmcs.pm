@@ -16,12 +16,19 @@ package gen::core_pmcs;
 use strict;
 use warnings;
 
+
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
-our $description = 'Generating core pmc list';
-our @args        = ();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Generating core pmc list};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

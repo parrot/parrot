@@ -15,7 +15,6 @@ package inter::charset;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use File::Basename qw/basename/;
 
@@ -23,9 +22,15 @@ use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what charset files should be compiled in';
 
-@args = qw(ask charset);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining what charset files should be compiled in};
+    $data{args}        = [ qw( ask charset ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

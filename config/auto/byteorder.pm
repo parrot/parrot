@@ -15,14 +15,19 @@ package auto::byteorder;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use Parrot::Configure::Step qw(:auto);
 use base qw(Parrot::Configure::Step::Base);
 
-$description = q{Computing native byteorder for Parrot's wordsize};
 
-@args = ();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Computing native byteorder for Parrot's wordsize};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

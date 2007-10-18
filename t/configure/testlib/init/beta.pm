@@ -10,21 +10,26 @@ t/configure/testlib/init/beta.pm - Module used in configuration tests
 package init::beta;
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = 'Determining if your computer does beta';
-@args        = qw( verbose );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining if your computer does beta};
+    $data{args}        = [ qw( verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;
     my $verbose = $conf->options->get('verbose');
     print "\nbeta is verbose\n" if $verbose;
     print "\nYou've got beta\n";
-    return $self;
+    return 1;
 }
 
 1;

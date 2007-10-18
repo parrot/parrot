@@ -16,14 +16,21 @@ package auto::socklen_t;
 use strict;
 use warnings;
 
+
 use base qw(Parrot::Configure::Step::Base);
 
 use Config;
 
 use Parrot::Configure::Step ':auto';
 
-our $description = 'Determining whether there is socklen_t';
-our @args        = qw();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining whether there is socklen_t};
+    $data{args}        = [ qw(  ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

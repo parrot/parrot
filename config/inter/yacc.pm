@@ -17,16 +17,19 @@ package inter::yacc;
 use strict;
 use warnings;
 
-use vars qw( $description @args $prompt $util );
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw( :inter capture_output check_progs );
 
-$util        = 'yacc';
-$description = "Determining whether $util is installed";
-$prompt      = "Do you have a parser generator, like bison or yacc?";
-@args        = qw( yacc ask maintainer );
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining whether yacc is installed};
+    $data{args}        = [ qw( yacc ask maintainer ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 my @yacc_defaults =
     defined( $ENV{TEST_YACC} )
@@ -37,6 +40,8 @@ my $default_required = '2.1';
 
 sub runstep {
     my ( $self, $conf ) = @_;
+    my $util    = 'yacc';
+    my $prompt  = "Do you have a parser generator, like bison or yacc?";
 
     my $verbose = $conf->options->get('verbose');
 

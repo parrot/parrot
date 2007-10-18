@@ -10,14 +10,19 @@ t/configure/testlib/init/zeta.pm - Module used in configuration tests
 package init::zeta;
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step;
 
-$description = 'Determining if your computer does zeta';
-@args        = ();
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining if your computer does zeta};
+    $data{args}        = [ qw( ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 my $result = q|Goodbye, cruel world|;
 

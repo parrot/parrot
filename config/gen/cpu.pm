@@ -15,16 +15,21 @@ package gen::cpu;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step qw(copy_if_diff);
 use Carp;
 
-$description = 'Generating CPU specific stuff';
 
-@args = qw(miniparrot verbose);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Generating CPU specific stuff};
+    $data{args}        = [ qw( miniparrot verbose ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;

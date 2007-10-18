@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-t/configure/testlib/init/eta.pm - Module used in configuration tests
+t/configure/testlib/init/kappa.pm - Module used in configuration tests
 
 =cut
 
-package init::eta;
+package init::kappa;
 use strict;
 use warnings;
 
@@ -18,18 +18,15 @@ use Parrot::Configure::Step;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your computer does eta};
-    $data{args}        = [ qw( ) ];
+    $data{description} = 'Determining if your computer does kappa';
+    $data{args}        = [  ];
     $data{result}      = q{};
     return \%data;
 }
 
-my $result = q|Goodbye, cruel world|;
-
 sub runstep {
     my ( $self, $conf ) = @_;
-    $self->set_result($result);
-    return;
+    return 1;
 }
 
 1;
@@ -40,4 +37,3 @@ sub runstep {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

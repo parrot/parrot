@@ -16,15 +16,20 @@ package inter::types;
 
 use strict;
 use warnings;
-use vars qw($description @args);
 
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':inter';
 
-$description = 'Determining what types Parrot should use';
 
-@args = qw(ask intval opcode floatval);
+sub _init {
+    my $self = shift;
+    my %data;
+    $data{description} = q{Determining what types Parrot should use};
+    $data{args}        = [ qw( ask intval opcode floatval ) ];
+    $data{result}      = q{};
+    return \%data;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;
