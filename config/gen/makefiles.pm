@@ -68,7 +68,7 @@ my %makefiles = (
         replace_slashes   => 0,
         conditioned_lines => 1,
     },
-    'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot.pc.in' },
+    'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
     'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
 );
 
