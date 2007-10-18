@@ -217,56 +217,35 @@ interpreter.
 PMC *
 pt_shared_fixup(PARROT_INTERP, PMC *pmc)
 {
-    if (PObj_is_object_TEST(pmc)) {
-        Parrot_Interp  master = interpreter_array[0];
-        INTVAL         type_num;
-        PMC           *vtable_cache;
+    /* TODO this will need to change for thread pools
+     * XXX should we have a separate interpreter for this?
+     */
+    INTVAL        type_num;
+    Parrot_Interp master = interpreter_array[0];
+    int           is_ro  = pmc->vtable->flags & VTABLE_IS_READONLY_FLAG;
 
-        /* keep the original vtable from going away... */
-        vtable_cache = ((PMC**)PMC_data(pmc->vtable->pmc_class))[PCD_OBJECT_VTABLE];
-        PARROT_ASSERT(vtable_cache->vtable->base_type == enum_class_VtableCache);
+    /* This lock is paired with one in objects.c. It is necessary to protect
+     * against the master interpreter adding classes and consequently
+     * resizing its classname->type_id hashtable and/or expanding its vtable
+     * array.
+     * TODO investigate if a read-write lock results in substantially
+     * better performance.
+     */
+    LOCK_INTERPRETER(master);
+    type_num = pmc->vtable->base_type;
 
-        add_pmc_sync(interp, vtable_cache);
-        PObj_is_PMC_shared_SET(vtable_cache);
-
-        /* don't want the referenced class disappearing on us */
-        LOCK_INTERPRETER(master);
-        type_num = pmc->vtable->base_type;
-        SET_CLASS((SLOTTYPE*) PMC_data(pmc), pmc,
-                  master->vtables[type_num]->pmc_class);
+    if (type_num == enum_type_undef) {
         UNLOCK_INTERPRETER(master);
+        real_exception(interp, NULL, 1, "pt_shared_fixup: unsharable type");
+        return PMCNULL;
     }
-    else {
-        /* TODO this will need to change for thread pools
-         * XXX should we have a separate interpreter for this?
-         */
-        INTVAL        type_num;
-        Parrot_Interp master = interpreter_array[0];
-        int           is_ro  = pmc->vtable->flags & VTABLE_IS_READONLY_FLAG;
 
-        /* This lock is paired with one in objects.c. It is necessary to protect
-         * against the master interpreter adding classes and consequently
-         * resizing its classname->type_id hashtable and/or expanding its vtable
-         * array.
-         * TODO investigate if a read-write lock results in substantially
-         * better performance.
-         */
-        LOCK_INTERPRETER(master);
-        type_num = pmc->vtable->base_type;
+    pmc->vtable = master->vtables[type_num];
 
-        if (type_num == enum_type_undef) {
-            UNLOCK_INTERPRETER(master);
-            real_exception(interp, NULL, 1, "pt_shared_fixup: unsharable type");
-            return PMCNULL;
-        }
+    UNLOCK_INTERPRETER(master);
 
-        pmc->vtable = master->vtables[type_num];
-
-        UNLOCK_INTERPRETER(master);
-
-        if (is_ro)
-            pmc->vtable = pmc->vtable->ro_variant_vtable;
-    }
+    if (is_ro)
+        pmc->vtable = pmc->vtable->ro_variant_vtable;
 
     add_pmc_sync(interp, pmc);
 

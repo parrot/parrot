@@ -476,6 +476,7 @@ arguments.  The class is attatched to the current HLL namespace.
         _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
+        _class->vtable_cache    = PMCNULL; /* only used for STM */
         _class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* We put ourself on the all parents list. */

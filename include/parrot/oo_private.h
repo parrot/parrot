@@ -30,6 +30,7 @@ typedef struct Parrot_Class {
     PMC *attrib_metadata;  /* Hash of attributes in this class to hashes of metadata. */
     PMC *attrib_index;     /* Lookup table for attributes in this and parents. */
     PMC *attrib_cache;     /* Cache of visible attrib names to indexes. */
+    PMC *vtable_cache;     /* Cache of the vtable used for objects (only STM). */
     PMC *resolve_method;   /* List of method names the class provides to resolve
                             * conflicts with methods from roles. */
 } Parrot_Class;

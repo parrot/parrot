@@ -476,7 +476,7 @@ Invokes the object (if this vtable function is overridden).
 
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Get the PMC instance and call the vtable method on that. */
-                PMC * const del_object = 
+                PMC * const del_object =
                     VTABLE_get_attr_keyed(interp, pmc, cur_class, string_from_literal(interp, "proxy"));
 
                 if (!PMC_IS_NULL(del_object))
@@ -588,6 +588,83 @@ Called after the object has been thawed.
 
         /* Flag that it is an object */
         PObj_is_object_SET(SELF);
+    }
+
+/*
+
+=item C<PMC * share_ro()>
+
+Used to mark a PMC as read-only shared.
+
+=cut
+
+*/
+    PMC *share_ro() {
+        PMC   *ret, *_true, *data;
+        INTVAL i, n;
+        PMC *classobj;
+        Parrot_Interp  master;
+        Parrot_Object *obj;
+        INTVAL         type_num;
+        PMC           *vtable_cache = PMCNULL;
+
+        if (PObj_is_PMC_shared_TEST(SELF))
+            return SELF;
+
+        master = interpreter_array[0];
+        classobj = VTABLE_get_class(INTERP, SELF);
+        type_num = SELF->vtable->base_type;
+
+        /* keep the original vtable from going away... */
+        vtable_cache = PARROT_CLASS(classobj)->vtable_cache;
+        if (PMC_IS_NULL(vtable_cache)) {
+            vtable_cache = pmc_new(INTERP, enum_class_VtableCache);
+            PMC_struct_val(vtable_cache) = INTERP->vtables[type_num];
+            PARROT_CLASS(classobj)->vtable_cache = vtable_cache;
+        }
+
+        add_pmc_sync(INTERP, vtable_cache);
+        PObj_is_PMC_shared_SET(vtable_cache);
+
+        /* make sure metadata doesn't go away unexpectedly */
+        if (PMC_metadata(pmc))
+            PMC_metadata(pmc) = pt_shared_fixup(interp, PMC_metadata(pmc));
+
+        PARROT_ASSERT(master->vtables[type_num]->pmc_class);
+        /* don't want the referenced class disappearing on us */
+        LOCK_INTERPRETER(master);
+        SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
+        UNLOCK_INTERPRETER(master);
+
+        ret = SELF;
+        _true = pmc_new(INTERP, enum_class_Integer);
+
+        /* Setting the '_ro' property switches to the read-only vtable */
+        VTABLE_set_integer_native(INTERP, _true, 1);
+        VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), _true);
+        SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
+        add_pmc_sync(INTERP, ret);
+        PObj_is_PMC_shared_SET(ret);
+
+        data = PARROT_CLASS(classobj)->parents;
+        n    = VTABLE_elements(INTERP, data);
+
+        for (i = 0; i < n; ++i) {
+            PMC * cur_class = VTABLE_get_pmc_keyed_int(INTERP, data, i);
+            VTABLE_set_pmc_keyed_int(INTERP, data, i, VTABLE_share_ro(INTERP, cur_class));
+        }
+
+        /* XXX This is perhaps not the best way to fix this up, but we
+         * need to ensure that the class object won't go away when
+         * this interpreter dies.
+         */
+        {
+            PMC * const new_class = ret->vtable->pmc_class;
+            PARROT_ASSERT(new_class);
+            PARROT_ASSERT(ret->vtable->share_ro == Parrot_Object_share_ro);
+        }
+
+        return ret;
     }
 }
 
