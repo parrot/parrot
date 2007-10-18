@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 73;
+use Parrot::Test tests => 74;
 
 =head1 NAME
 
@@ -1663,6 +1663,33 @@ pir_output_is( <<'CODE', <<'OUTPUT', "subclassed Integer bug" );
 .end
 CODE
 1 * 1 = 1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'equality of subclassed Integer' );
+.sub main :main
+  .local pmc class
+  class = subclass "Integer", "LispInteger"
+
+  .local pmc a
+  a = new 'LispInteger'
+  a = 123
+
+  .local pmc b
+  b = new 'LispInteger'
+  b = 123
+
+  if a != b goto NOT_EQUAL
+
+  print "123 is equal to 123\n"
+  end
+
+NOT_EQUAL:
+  print "123 is not equal to 123\n"
+  end
+
+.end
+CODE
+123 is equal to 123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "short name attributes" );
