@@ -16,7 +16,7 @@ your favorite editor. For a summary on what is available do
 
 Calling C<make vim-install> in the F<editor/> directory will
 install several files in F<~/.vim>. All these files have the F<.vim>
-extension. F<pir.vim> (generated from F<pir.vim.in>), F<pasm.vim>, and
+extension. F<pir.vim> (generated from F<pir_vim.in>), F<pasm.vim>, and
 F<pmc.vim> are syntax files; F<indent_pir.vim> is an indent plugin;
 and F<filetype_parrot.vim> is a filetype script that tells vim to
 associate the extensions .pir, .pasm, and .pmc with the

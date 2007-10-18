@@ -97,7 +97,7 @@ sub footer {
                 </TD>
                 <TD VALIGN="middle" ALIGN="center">
                     <IMG BORDER=0
-                        SRC="$resources/parrot.small.png" 
+                        SRC="$resources/parrot_small.png" 
                         ALT="parrot">
                 </TD>
             </TR>
