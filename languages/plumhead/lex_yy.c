@@ -1,3 +1,4 @@
+/* $Id$ */
 
 #line 3 "lex.yy.c"
 
