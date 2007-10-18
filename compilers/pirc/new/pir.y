@@ -1,3 +1,10 @@
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
+/*
+
 %{
 #include <stdio.h>
 %}
