@@ -5,6 +5,16 @@
 
 /*
 
+/*
+
+=head1 NAME
+
+pir.l
+
+=cut
+
+*/
+
 %{
 #include "pirparser.h"
 #include <stdlib.h>
@@ -39,6 +49,8 @@ static file_info *current_file = NULL;
 
 /*
 
+=over 4
+
 =item static void push_file_info(file_info *info)
 
 Store a file_info structure on a stack.
@@ -59,6 +71,8 @@ push_file_info(file_info *info) {
 =item static file_info *pop_file_info(void)
 
 Pop a file_info structure from a stack.
+
+=back
 
 =cut
 
