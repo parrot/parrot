@@ -5,8 +5,25 @@
 
 /*
 
+=head1 NAME
+
+pir.y
+
+=head1 DESCRIPTION
+
+This is a complete rewrite of the parser for the PIR language.
+
+=cut
+
+*/
+
 %{
 #include <stdio.h>
+#include <stdlib.h>
+
+extern int yyerror(char *message);
+extern int yylex(void);
+
 %}
 
 
@@ -160,7 +177,7 @@ multi_type: TK_IDENT
           | type
           ;
 
-parameters:    /* empty */
+parameters: /* empty */
           | parameters parameter
           ;
 
@@ -214,7 +231,6 @@ assignment_statement: target assignment_tail TK_NL
 
 assignment_tail: augmented_op expression
                | keylist '=' expression
-               | arguments
                | '=' assignment_expression
                ;
 
@@ -222,14 +238,17 @@ assignment_expression: unop expression
                      | expression
                      | expression binop expression
                      | target keylist
-                     | target arguments
-                     | TK_STRINGC arguments
-                     | methodcall
+                     | simple_invocation
+                     | TK_STRINGC arguments  /* refactor 2/3 */
+                     | methodcall            /* refactor 3/3 */
                      | TK_NULL
                      | TK_NEW TK_STRINGC /* fix other variants */
                      | parrot_instruction
                      ;
 
+
+simple_invocation: invokable arguments
+                 ;
 
 unop: '-'
     | '!'
@@ -335,6 +354,7 @@ long_result: TK_RESULT target param_flags TK_NL
 
 short_invocation_statement: '(' target_list ')' '=' invocation_expression TK_NL
                           | TK_STRINGC arguments TK_NL
+                          | simple_invocation TK_NL
                           ;
 
 target_list: /* empty */
@@ -359,7 +379,7 @@ param_flag: TK_FLAG_OPTIONAL
           | TK_FLAG_UNIQUE_REG
           ;
 
-invocation_expression: invokable arguments
+invocation_expression: simple_invocation
                      | methodcall
                      ;
 
@@ -368,7 +388,7 @@ invokable: TK_SYM_PREG
          | TK_IDENT
          ;
 
-methodcall: target '.' method arguments
+methodcall: invokable '.' method arguments
           ;
 
 method: TK_IDENT
@@ -545,9 +565,11 @@ int yyerror(char *message) {
     return 0;
 }
 
+
 /*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4:
  */
+

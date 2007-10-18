@@ -5,11 +5,28 @@
 
 /*
 
-/*
-
 =head1 NAME
 
 pir.l
+
+
+=head1 DESCRIPTION
+
+This is a complete rewrite of the PIR lexical analyzer, as defined in IMCC.
+Goal is to fix the issues with the current implementation of the PIR language.
+Major issues are:
+
+=over 4
+
+=item Grammar is a bit messy, and has some problems, like disallowing line comments in .param declarations.
+
+=item The lexer is messy and not re-entrant. The macro layer is a mess and unmaintainable.
+
+=item No support for nested heredocs.
+
+=item The comment:  "this is just a sign that we suck.  that's all." speaks for itself (imc.h)
+
+=back
 
 =cut
 
@@ -18,10 +35,14 @@ pir.l
 %{
 #include "pirparser.h"
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 static int is_parrot_op(char *spelling);
 
-
+/* prevent compile warnings */
+extern int yyerror(char *message);
+extern int yylex(void);
 
 /* datastructure to store the heredocs, nested please! */
 
@@ -64,7 +85,7 @@ typedef struct macro_info {
 } macro_info;
 
 
-/* globals! */
+/* globals! TODO: store them in a struct for the compiler, which should be passed around. */
 static file_info *current_file = NULL;
 static constant_info *constant_defs = NULL;
 static heredoc_info *heredocs = NULL;
@@ -94,8 +115,6 @@ push_file_info(file_info *info) {
 =item static file_info *pop_file_info(void)
 
 Pop a file_info structure from a stack.
-
-=back
 
 =cut
 
@@ -141,14 +160,25 @@ switch_to_file(file_info *info) {
 
 /*
 
+=item static heredoc_info *new_heredoc(void)
+
+=cut
+
 */
 static heredoc_info *
 new_heredoc(void) {
-    heredoc_info *heredoc = (heredoc_info *)malloc(sizeof(heredoc_info));
+    heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
     /* do stuff */
     return heredoc;
 }
 
+/*
+
+=item static constant_info *find_constant(char *name)
+
+=cut
+
+*/
 static constant_info *
 find_constant(char *name) {
 
@@ -163,9 +193,16 @@ find_constant(char *name) {
     return NULL;
 }
 
+/*
+
+=item static void define_constant(char *name, char *value, int token_type, int line)
+
+=cut
+
+*/
 static void
 define_constant(char *name, char *value, int token_type, int line) {
-    constant_info *info = (constant_info *)malloc(sizeof(constant_info));
+    constant_info *info = (constant_info *)malloc(sizeof (constant_info));
     if (info == NULL) {
         fprintf(stderr, "Failed to allocate memory for constant definition.\n");
         exit(1);
@@ -181,13 +218,26 @@ define_constant(char *name, char *value, int token_type, int line) {
     constant_defs = info;
 }
 
+/*
+
+=item static macro_info *find_macro(char *name)
+
+=cut
+
+*/
 static macro_info *
 find_macro(char *name) {
     return NULL;
 }
 
 
+/*
 
+=item static void read_macro(void)
+
+=cut
+
+*/
 static void
 read_macro(void) {
     int next_token;
@@ -213,11 +263,21 @@ read_macro(void) {
     */
     /* read macro body */
 
-    macro = (macro_info *)malloc(sizeof(macro_info));
+    macro = (macro_info *)malloc(sizeof (macro_info));
     macro->name = strdup(yytext);
 
 
 }
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
 
 %}
 
@@ -434,14 +494,14 @@ LINECOMMENT    [#].*\n
 
                /* get next token containing name of file being included */
                next_token = yylex();
-               /* check that it's a string, if not return to parser */
+               /* check that it's a string, if not return to parser, maybe it can do something with it. */
                if (next_token != TK_STRINGC) {
                    return next_token;
                }
 
                /* retrieve name of file, remove 2 quote characters. */
                file_name_length = yyleng - 2;
-               incl_file_name   = (char *)calloc(file_name_length + 1, sizeof(char));
+               incl_file_name   = (char *)calloc(file_name_length + 1, sizeof (char));
 
                /* copy current token's characters, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
@@ -457,7 +517,7 @@ LINECOMMENT    [#].*\n
                }
 
                /* save current file info */
-               file_state = (file_info *)malloc(sizeof(file_info));
+               file_state = (file_info *)malloc(sizeof (file_info));
                file_state->buffer   = YY_CURRENT_BUFFER;
                file_state->filename = NULL; /* FIX */
                file_state->line_pos = 0; /* FIX */
@@ -491,9 +551,10 @@ LINECOMMENT    [#].*\n
                /* store identifier */
                constant_id = strdup(yytext);
 
-               /* read value */
+               /* read next token, which contains the value */
                next_token = yylex();
 
+               /* only these token types are allowed for constant values: */
                switch (next_token) {
                    case TK_INTC:
                    case TK_NUMC:
@@ -511,8 +572,7 @@ LINECOMMENT    [#].*\n
                        define_constant(constant_id, constant_value, next_token, yylineno);
                        break;
                    default:
-                       yyerror("Constant value of '%s' must be a number, "
-                               "string literal or register", constant_id);
+                       yyerror("Constant value must be a number, string literal or register");
                        break;
                }
 
@@ -524,10 +584,13 @@ LINECOMMENT    [#].*\n
 
              }
 
-".macro"            {  read_macro(); }
+".macro"            {  /* macro definition */
+                       read_macro();
+
+                    }
 
 
-<MACRO>".endm"      { /* TODO */ ;
+<MACRO>".endm"      { /* end of macro definition; TODO */ ;
 
                       yy_pop_state();
                     }
@@ -535,18 +598,18 @@ LINECOMMENT    [#].*\n
 
 
 {WS}[.]{ALNUM}    { /* Check whether this token is a constant or a macro.
-                           * Note that there must be whitespace before the dot, otherwise
-                           * in "x.y", ".y" is matched, which is wrong.
-                           */
+                     * Note that there must be whitespace before the dot, otherwise
+                     * in "x.y", ".y" is matched, which is wrong.
+                     */
 
                     /* because of the whitespace in front of this matched token, we need to skip this,
-                           * yytext contains 1 or more space characters, so find out how many these are.
-                           */
+                     * yytext contains 1 or more space characters, so find out how many these are.
+                     */
                     constant_info *constant;
                     int num_spaces = 1; /* there is at least one space, so we don't have to check that one */
 
                     /* as long as yytext + num_spaces points to a space character, increment num_spaces */
-                    while ( isspace( *(yytext + num_spaces)) ) {
+                    while (isspace((unsigned char) *(yytext + num_spaces))) {
                         ++num_spaces;
                     }
                     /* give the name of the constant, skipping the whitespace prefix, and skip the prefix dot. */
@@ -567,11 +630,20 @@ LINECOMMENT    [#].*\n
                         macro = find_macro(yytext + num_spaces + 1);
 
                         if (macro != NULL) {
+
+                            /* TODO: how do we know how big a buffer we need? IMCC defines fixed size of 4KB. */
+                            char *expansion_buffer = (char *)calloc(1, sizeof (char));
+
                             /* read input for parameters */
 
                             /* expand the macro into a string buffer */
 
                             /* and scan that string buffer. */
+                            YY_BUFFER_STATE state = yy_scan_string(expansion_buffer);
+                            yy_delete_buffer(state);
+
+                            /* free the buffer */
+                            free(expansion_buffer);
                         }
                         else {
                             /* not found, this is an unknown constant or macro. */
@@ -582,7 +654,10 @@ LINECOMMENT    [#].*\n
                   }
 
 
-<<EOF>>     {  file_info *info = pop_file_info();
+
+<<EOF>>     {   /* get the file info structure of the .include-ing file, if any */
+                file_info *info = pop_file_info();
+
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
