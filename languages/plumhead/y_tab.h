@@ -34,6 +34,7 @@
    version 2.2 of Bison.  */
 
 /* $Id$ */
+/* Copyright (C) 2007, The Perl Foundation. */
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE

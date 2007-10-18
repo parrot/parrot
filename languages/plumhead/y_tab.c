@@ -44,6 +44,7 @@
    USER NAME SPACE" below.  */
 
 /* $Id$ */
+/* Copyright (C) 2007, The Perl Foundation. */
 
 /* Identify Bison output.  */
 #define YYBISON 1
