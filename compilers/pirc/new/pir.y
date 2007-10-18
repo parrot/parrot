@@ -537,3 +537,10 @@ int yyerror(char *message) {
     fprintf(stderr, "Error (line %d): %s at '%s'\n", yylineno, message, yytext);
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
