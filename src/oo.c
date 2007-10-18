@@ -224,7 +224,9 @@ Lookup a vtable override in a specific class object.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_find_vtable_override_for_class(PARROT_INTERP, NOTNULL(PMC *classobj), NOTNULL(STRING *name))
+Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
+        NOTNULL(PMC *classobj),
+        NOTNULL(STRING *name))
 {
     Parrot_Class *class_info;
     assert(PObj_is_class_TEST(classobj));
@@ -247,7 +249,9 @@ from parents.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_find_vtable_override(PARROT_INTERP, NOTNULL(PMC *classobj), NOTNULL(STRING *name))
+Parrot_oo_find_vtable_override(PARROT_INTERP,
+        NOTNULL(PMC *classobj),
+        NOTNULL(STRING *name))
 {
     Parrot_Class * const _class = PARROT_CLASS(classobj);
 
@@ -260,7 +264,8 @@ Parrot_oo_find_vtable_override(PARROT_INTERP, NOTNULL(PMC *classobj), NOTNULL(ST
         PMC * const cur_class =
             VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
-        PMC * const meth = Parrot_oo_find_vtable_override_for_class(interp, cur_class, name);
+        PMC * const meth =
+            Parrot_oo_find_vtable_override_for_class(interp, cur_class, name);
         if (!PMC_IS_NULL(meth))
             return meth;
     }
