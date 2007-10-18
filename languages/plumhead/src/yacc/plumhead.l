@@ -4,7 +4,7 @@
  */
 
 %{
-#include "y.tab.h"
+#include "plumhead_parser.h"
 %}
 
 %%
