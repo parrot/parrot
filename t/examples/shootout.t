@@ -11,7 +11,7 @@ use vars qw($EXT $DIR @shootouts);
 
 # find dynamically all shootouts from dir listing
 BEGIN {    # to be run before declaring the number of tests
-    $EXT = '.output';
+    $EXT = '_output';
     $DIR = "examples/shootout";
     opendir( DIR, $DIR ) or die "can't opendir $DIR: $!";
     @shootouts = grep { -e "$DIR/$_$EXT" } sort grep { /\.pir$/ } readdir(DIR);
@@ -37,8 +37,8 @@ To add a new test, you do not have to modify this script:
  1. add your script (toto.pir) to examples/shootout
  2. put parrot options in the first line (e.g  "#!./parrot -Oc -Cj")
  3. make sure you have default argument values
- 4. put the expected output as a file : toto.pir.output
- 5. if you need an input file (to be read from stdin), call it toto.pir.input
+ 4. put the expected output as a file : toto.pir_output
+ 5. if you need an input file (to be read from stdin), call it toto.pir_input
 
 See the explanation of benchmarks and sample data for reduced N benches at
 http://shootout.alioth.debian.org/sandbox/
@@ -57,7 +57,7 @@ my %skips = (
     'recursive-2.pir' => [ '$PConfig{cpuarch} !~ /86/',    'float JIT broken on non-x86' ],
     'fannkuch.pir'    => [ '$^O eq "darwin"',              'fannkuch benchmark failure on darwin' ],
 );
-my $INPUT_EXT = '.input';
+my $INPUT_EXT = '_input';
 foreach my $script (@shootouts) {
     my $skip = $skips{$script};
     if ($skip) {
