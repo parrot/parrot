@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
-# 08-pmc.pm.t
+# 08-pmc-pm.t
 
 use strict;
 use warnings;
@@ -42,11 +42,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-08-pmc.pm.t - test Parrot::Pmc2c::Pmc basic functionality
+08-pmc-pm.t - test Parrot::Pmc2c::Pmc basic functionality
 
 =head1 SYNOPSIS
 
-    % prove t/tools/pmc2cutils/08-pmc.pm.t
+    % prove t/tools/pmc2cutils/08-pmc-pm.t
 
 =head1 DESCRIPTION
 
