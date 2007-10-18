@@ -79,7 +79,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
             if (s->vtables[i] && s->vtables[i]->pmc_class &&
                 PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
                 STRING * const class_name =
-                    VTABLE_name(s, s->vtables[i]->pmc_class);
+                    VTABLE_get_string(s, s->vtables[i]->pmc_class);
                 PARROT_ASSERT(VTABLE_exists_keyed_str(d,
                     d->class_hash, class_name));
 
