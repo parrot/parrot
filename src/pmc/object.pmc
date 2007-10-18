@@ -476,8 +476,8 @@ Invokes the object (if this vtable function is overridden).
 
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Get the PMC instance and call the vtable method on that. */
-                PMC * const del_object = VTABLE_get_attr_keyed(interp, pmc,
-                    cur_class, string_from_literal(interp, "proxy"));
+                PMC * const del_object = 
+                    VTABLE_get_attr_keyed(interp, pmc, cur_class, string_from_literal(interp, "proxy"));
 
                 if (!PMC_IS_NULL(del_object))
                     return VTABLE_invoke(interp, del_object, next);

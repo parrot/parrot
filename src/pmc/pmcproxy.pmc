@@ -101,10 +101,8 @@ Initializes a PMCProxy PMC.
         _pmc->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* Set up the attribute storage for the proxy instance */
-        VTABLE_set_string_keyed_str(interp, new_attribute,
-                CONST_STRING(interp, "name"), name);
-        VTABLE_set_pmc_keyed_str(interp, _pmc->attrib_metadata,
-                name, new_attribute);
+        VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
+        VTABLE_set_pmc_keyed_str(interp, _pmc->attrib_metadata, name, new_attribute);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(interp, _pmc->all_parents, SELF);
