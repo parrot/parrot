@@ -97,12 +97,18 @@ type state. There are three cases to consider.
 
 =over 4
 
-=item * Loads - here type data is added to the stack type state.
+=item * Loads
 
-=item * Stores - here type data is removed from the stack type state.
+Here type data is added to the stack type state.
 
-=item * Operations - here type data may be transformed, but based on existing
-data already in the stack type state rather than external type information.
+=item * Stores
+
+Here type data is removed from the stack type state.
+
+=item * Operations
+
+Here type data may be transformed, but based on existing data already in the
+stack type state rather than external type information.
 
 =back
 
@@ -111,24 +117,32 @@ the following fields:
 
 =over 4
 
-=item * type - corresponds to one of the constants in the .NET Specification Partition II Section 22.1.15.
+=item * type
 
-=item * byref - set if the byref flag is set on the type.
+Corresponds to one of the constants in the .NET Specification Partition II
+Section 22.1.15.
 
-=item * token - for some values of type a token is also expected; it is stored in this entry.
+=item * byref
 
-=item * reg_type_short - The Parrot register type that the type is stored in,
+Set if the byref flag is set on the type.
 
-represented as a single letter I, N, S or P. This does not need to be set by
-any code that instantiates a new type describing hash, but will be available
-in existing ones. The routine "annotate_reg_type" is responsible for making
-this entry.
+=item * token
 
-=item * reg_type_long - The Parrot register type that the type is stored in,
-one of "int", "num", "string" or "pmc". This does not need to be set by any
-code that instantiates a new type describing hash, but will be available in
-existing ones. The routine "annotate_reg_type" is responsible for making this
-entry.
+For some values of type a token is also expected; it is stored in this entry.
+
+=item * reg_type_short
+
+The Parrot register type that the type is stored in, represented as a single
+letter I, N, S or P. This does not need to be set by any code that
+instantiates a new type describing hash, but will be available in existing
+ones. The routine "annotate_reg_type" is responsible for making this entry.
+
+=item * reg_type_long
+
+The Parrot register type that the type is stored in, one of "int", "num",
+"string" or "pmc". This does not need to be set by any code that
+instantiates a new type describing hash, but will be available in existing
+ones. The routine "annotate_reg_type" is responsible for making this entry.
 
 =back
 
