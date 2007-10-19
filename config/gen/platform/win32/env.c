@@ -28,7 +28,7 @@ Parrot_setenv(const char *name, const char *value)
     assert(value != NULL);
 
     {
-        const int name_len  = strlen(name );
+        const int name_len  = strlen(name);
         const int value_len = strlen(value);
 
         {
@@ -45,8 +45,8 @@ Parrot_setenv(const char *name, const char *value)
 
             /* Save a bit of time, by using the fact we already have the
             lengths, avoiding strcat */
-            strcpy(envstring,                name );
-            strcpy(envstring + name_len,     "="  );
+            strcpy(envstring, name);
+            strcpy(envstring + name_len, "=");
             strcpy(envstring + name_len + 1, value);
 
             if (_putenv(envstring) == 0) {
@@ -64,14 +64,15 @@ char *
 Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))
 {
     const DWORD size = GetEnvironmentVariable(name, NULL, 0);
-    char *buffer;
+    char *buffer     = NULL;
 
     if (size == 0) {
         *free_it = 0;
         return NULL;
     }
-    else
+    else {
         *free_it = 1;
+    }
     buffer = mem_sys_allocate(size);
     GetEnvironmentVariable(name, buffer, size);
 
