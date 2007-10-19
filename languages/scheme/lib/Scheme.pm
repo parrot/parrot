@@ -91,7 +91,6 @@ sub compile {
     my $self = shift;
 
     my $tokens = Scheme::Tokenizer::tokenize( $self->{file} );
-    #die Dumper( $tokens );
     my $tree   = Scheme::Parser::parse( $tokens );
 
     return link_functions( Scheme::Generator::generate( $tree ) );

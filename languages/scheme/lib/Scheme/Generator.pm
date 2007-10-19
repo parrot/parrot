@@ -1726,19 +1726,40 @@ sub _op_write {
 sub _op_display {
     my ( $self, $node ) = @_;
 
-    return _op_write( @_ );
+    # die Dumper( $self, $node );
+    $self->_add_comment( 'start of _op_display' );
+
+    my $temp = 'none';
+
+    for ( _get_args($node) ) {
+        $self->_restore($temp);
+        $temp = $self->_generate($_);
+        if ( $temp =~ m/ \A [IN]/xms ) {
+            $self->_add_inst( '', 'print', [$temp] );
+        }
+        elsif ( $temp =~ m/ \A S/xms ) {
+            $self->_add_inst( '', 'print', [ $temp  ] ); 
+        }
+        else {
+            $self->_call_function_sym( 'write', $temp );
+        }
+    }
+
+    $self->_add_comment( 'end of _op_display' );
+
+    return $temp;    # We need to return something
 }
 
 sub _op_newline {
     my ( $self, $node ) = @_;
 
+    $self->_add_comment( 'start of _op_newline' );
+
     _num_arg( $node, 0, 'newline' );
 
     return $self->_generate(
-        { children => [ { value => 'write' },
-                        { children => [ { value => q{"\n"}  },
-                                      ]
-                        },
+        { children => [ { value => 'display' },
+                        { value => q{"\n"}   },
                       ],
         }
     );
@@ -2199,10 +2220,8 @@ sub _format_columns {
 
 sub new {
     my $class = shift;
-    my $tree  = shift;
 
     my $self  = {
-        tree                 => $tree,
         regs                 => _new_regs,
         frames               => [],
         gensym               => 0,                # used for creating unique labels and symbols
@@ -2274,7 +2293,7 @@ sub _generate {
 sub generate {
     my $tree = shift;
 
-    my $self = Scheme::Generator->new( {} );
+    my $self = Scheme::Generator->new( );
 
     $self->{scope} = {};
 
