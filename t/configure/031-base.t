@@ -10,11 +10,11 @@ use Test::More tests =>  8;
 
 =head1 NAME
 
-t/configure/031_base.t - tests Parrot::Configure::Step::Base
+t/configure/031-base.t - tests Parrot::Configure::Step::Base
 
 =head1 SYNOPSIS
 
-    prove t/configure/031_base.t
+    prove t/configure/031-base.t
 
 =head1 DESCRIPTION
 

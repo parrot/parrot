@@ -137,11 +137,11 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
 
 =head1 NAME
 
-t/configure/035_step.t - tests Parrot::Configure::Step
+t/configure/035-step.t - tests Parrot::Configure::Step
 
 =head1 SYNOPSIS
 
-    prove t/configure/035_step.t
+    prove t/configure/035-step.t
 
 =head1 DESCRIPTION
 
