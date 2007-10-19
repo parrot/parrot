@@ -33,11 +33,12 @@ Major issues are:
 */
 
 %{
-#include "pirparser.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include "pirparser.h"
 #include "pircompiler.h"
 
 
@@ -395,18 +396,82 @@ read_macro(YYLTYPE *locp, YYSTYPE *yylval, lexer_state *lexer) {
     if (next_token != TK_IDENT) {
         yyerror(locp, lexer, "macro identifier expected after '.macro'");
     }
+    else {
+        fprintf(stderr, "Macro identifier: '%s'\n", yytext);
+    }
 
     /* read macro parameters, if any */
+    next_token = yylex(locp, yylval, lexer);
 
-    /* TODO: FIX THIS
-    next_char = input();
-    if (next_char == '(') {
+    if (next_token == '(') { /* there are parameters! */
+        int expect_parameter = 0;
 
+        /* get next token after opening parenthesis */
+        next_token = yylex(locp, yylval, lexer);
+
+        while (next_token != ')' || expect_parameter) {
+            if (next_token == TK_IDENT) {
+                /* handle parameter */
+                char *parameter = strdup(yytext);
+                fprintf(stderr, "macro parameter: '%s'\n", parameter);
+
+                /* clear flag */
+                expect_parameter = 0;
+                /* TODO: try to recover error */
+            }
+            else {
+                yyerror(locp, lexer, "macro parameter identifier expected");
+            }
+
+            /* get next token after parameter */
+            next_token = yylex(locp, yylval, lexer);
+
+            if (next_token != ',') { /* no more parameters expected */
+                break;
+            }
+            else {
+                /* current token is a comma, get next parameter */
+                next_token = yylex(locp, yylval, lexer);
+                /* after a comma we expect a parameter; set a flag */
+                expect_parameter = 1;
+            }
+        }
+
+        /* check closing parenthesis of macro parameter list */
+        if (next_token == ')') {
+            next_token = yylex(locp, yylval, lexer);
+        }
+        else { /* it was not a ')' */
+            yyerror(locp, lexer, "closing ')' expected to close parameter list of macro.");
+        }
 
     }
-    */
-    /* read macro body */
 
+    /* make sure there's a newline after the macro header */
+    if (next_token != TK_NL) {
+        yyerror(locp, lexer, "newline expected after macro parameter list.");
+    }
+
+    /* TODO: read macro body */
+    next_token = yylex(locp, yylval, lexer);
+    while (next_token == TK_NL) {
+        next_token = yylex(locp, yylval, lexer);
+    }
+
+    /* END TODO */
+
+    /* macros should be closed with ".endm" */
+    if (next_token != TK_ENDM) {
+        yyerror(locp, lexer, "'.endm' expected to close macro definition.");
+    }
+
+    /* after ".endm" a newline is expected */
+    next_token = yylex(locp, yylval, lexer);
+    if (next_token != TK_NL) {
+        yyerror(locp, lexer, "newline expected after '.endm'");
+    }
+
+    /* fill macro structure */
     macro = (macro_info *)malloc(sizeof (macro_info));
     macro->name = strdup(yytext);
 }
@@ -452,6 +517,9 @@ ALPHA          [a-zA-Z@_]
 DIGIT          [0-9]
 DIGITS         {DIGIT}+
 ALNUM          {ALPHA}|{DIGIT}
+
+IDENT          {ALPHA}{ALNUM}*
+
 DOT            [.]
 HEX            0[xX][0-9A-Fa-f]+
 OCT            0[oO][0-7]+
@@ -657,13 +725,13 @@ LINECOMMENT    [#].*\n
                 }
 
 
-^"=".*{EOL}            { yy_push_state(POD); /* fprintf(stderr, "POD open\n"); */ }
+^"=".*{EOL}            { yy_push_state(POD); }
 
-<POD>^"=cut".*{EOL}+   { yy_pop_state(); /* fprintf(stderr, "POD close\n"); */ }
+<POD>^"=cut".*{EOL}+   { yy_pop_state(); }
 
-<POD>.*                { /* fprintf(stderr, "pod comment\n"); */ /* ignore pod comments */ }
+<POD>.*                { /* ignore pod comments */ }
 
-<POD>{EOL}+            { /* fprintf(stderr, "POD newline!\n"); */  }
+<POD>{EOL}+            { /* ignore newlines in POD */  }
 
 <POD><<EOF>>           { yyerror(locp, lexer, "POD comment not closed!");
                          yyterminate();
@@ -698,16 +766,16 @@ LINECOMMENT    [#].*\n
 "~"         { return '~'; }
 "-"         { return '-'; }
 
-<INITIAL>","     { return ','; }
-<SCANSTRING>","  { return ','; }
-
-"("         { return '('; }
-
-<INITIAL>")"         { return ')'; }
-<SCANSTRING>")"      { return ')'; }
+<INITIAL,MACRO>"("                { return '('; }
+<INITIAL,MACRO,SCANSTRING>")"     { return ')'; }
+<INITIAL,MACRO,SCANSTRING>","     { return ','; }
 
 "["         { return '['; }
 "]"         { return ']'; }
+
+{WS}"."{WS} { /* if the dot is surrounded by whitespace, it's a concatenation operator */
+              return TK_CONC;
+            }
 "."         { return '.'; }
 "="         { return '='; }
 ";"         { return ';'; }
@@ -741,7 +809,7 @@ LINECOMMENT    [#].*\n
 ".emit"           { return TK_EMIT; }
 ".endnamespace"   { return TK_ENDNAMESPACE; }
 ".end"            { return TK_END; }
-".endm"           { ; }
+
 ".eom"            { return TK_EOM; }
 ".get_results"    { return TK_GET_RESULTS; }
 ".globalconst"    { return TK_GLOBALCONST; }
@@ -876,10 +944,19 @@ LINECOMMENT    [#].*\n
 
                next_token = yylex(locp, yylval, lexer);
                if (next_token != TK_IDENT) {
-                  yyerror(locp, lexer, "identifier expected after '.constant'.");
+                   yyerror(locp, lexer, "identifier expected after '.constant'.");
                }
                /* store identifier */
                constant_id = strdup(yytext);
+
+               /* ".endm" will only be recognized as a reserved word in MACRO state,
+                * but nevertheless, writing ".endm" to expand a constant is not good practice.
+                * Emit a warning.
+                */
+               if (strcmp(constant_id, "endm") == 0) {
+                   fprintf(stderr, "Warning: 'endm' should not be used as a constant name, "
+                                   "using it would make you write '.endm', which is a keyword.");
+               }
 
                /* read next token, which contains the value */
                next_token = yylex(locp, yylval, lexer);
@@ -915,17 +992,26 @@ LINECOMMENT    [#].*\n
              }
 
 ".macro"            {  /* macro definition */
+                       yy_push_state(MACRO);
                        read_macro(locp, yylval, lexer);
 
                     }
 
+<MACRO>{EOL}        { return TK_NL; }
+
+<MACRO>{WS}         { /* ignore */ }
+
+<MACRO>{IDENT}      { return TK_IDENT; }
 
 <MACRO>".endm"      { /* end of macro definition; TODO */ ;
 
-
+                      yy_pop_state();
+                      return TK_ENDM;
                     }
 
+<MACRO><<EOF>>      { yyerror(locp, lexer, "macro definition not closed before end of file"); }
 
+<MACRO>.            { yyerror(locp, lexer, "Unknown character"); }
 
 {WS}[.]{ALNUM}    { /* Check whether this token is a constant or a macro.
                      * Note that there must be whitespace before the dot, otherwise
