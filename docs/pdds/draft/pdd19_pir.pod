@@ -534,6 +534,9 @@ B<&&>, B<||> and B<~~> are logic B<and>, B<or> and B<xor>.
 
 B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
 
+{{PROPOSAL: Change description to support logic operators (comparisons) as
+implemented (and working) in imcc.y.}}
+
 =item <var1> <op>= <var2>
 
 This is equivalent to 
