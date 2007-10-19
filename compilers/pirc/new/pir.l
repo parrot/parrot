@@ -49,6 +49,8 @@ extern int yylex(void);
 typedef struct heredoc_info {
    char *contents;  /* contents of heredoc */
    char *delimiter; /* delimiter of heredoc */
+   int line_nr;
+
    struct heredoc_info *next; /* this is a linked list, ptr to next */
 
 } heredoc_info;
@@ -90,6 +92,12 @@ static file_info *current_file = NULL;
 static constant_info *constant_defs = NULL;
 static heredoc_info *heredocs = NULL;
 static macro_info *macros = NULL;
+static char *after_heredoc = NULL;
+static YY_BUFFER_STATE file_buffer;
+
+
+#define chop_yytext()   (yytext[--yyleng] = '\0')
+
 
 /*
 
@@ -158,6 +166,25 @@ switch_to_file(file_info *info) {
     info = NULL;
 }
 
+static void
+unshift_heredoc(heredoc_info *heredoc) {
+    heredoc->next = heredocs;
+    heredocs      = heredoc;
+}
+
+static heredoc_info *
+shift_heredoc(void) {
+    heredoc_info *returning = heredocs;
+    if (returning == NULL) {
+        fprintf(stderr, "shift_heredoc(): queue is empty!\n");
+    }
+    else {
+        heredocs = heredocs->next;
+    }
+    return returning;
+}
+
+
 /*
 
 =item static heredoc_info *new_heredoc(void)
@@ -165,12 +192,14 @@ switch_to_file(file_info *info) {
 =cut
 
 */
-static heredoc_info *
-new_heredoc(void) {
+static void
+new_heredoc(char *delimiter, int line) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
-    /* do stuff */
-    return heredoc;
+    heredoc->delimiter = delimiter;
+    heredoc->line_nr   = line;
+    unshift_heredoc(heredoc);
 }
+
 
 /*
 
@@ -265,8 +294,6 @@ read_macro(void) {
 
     macro = (macro_info *)malloc(sizeof (macro_info));
     macro->name = strdup(yytext);
-
-
 }
 
 
@@ -277,6 +304,8 @@ read_macro(void) {
 =cut
 
 */
+#define print_state(); { if (YYSTATE == 0) fprintf(stderr, "State INITIAL\n"); if (YYSTATE == 1) fprintf(stderr, "State HEREDOC1\n"); if (YYSTATE == 2) fprintf(stderr, "State HEREDOC2\n"); if (YYSTATE == 3) fprintf(stderr, "State HEREDOC3\n"); if (YYSTATE == 4) fprintf(stderr, "State SCANSTRING\n"); }
+
 
 
 %}
@@ -289,7 +318,8 @@ DOT            [.]
 HEX            0[xX][0-9A-Fa-f]+
 OCT            0[oO][0-7]+
 BIN            0[bB][01]+
-WS             [\t ]
+WS             [\t\f\r\x1a ]
+EOL            \r?\n
 
 SIGN           [-+]
 BIGINT         {SIGN}?{DIGITS}"L"
@@ -302,53 +332,158 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 LINECOMMENT    [#].*\n
 
 /* start state for HEREDOC scanning */
-%x HEREDOC
+%x HEREDOC1
+%x HEREDOC2
+%x HEREDOC3
+%s SCANSTRING
+
 /* start state for macro scanning */
 %x MACRO
 
 /* use built-in line counter */
 %option yylineno
+
 /* support pushing/popping of start states */
 %option stack
+
+/* make sure yytext is a pointer */
+%pointer
 
 %%
 
 
 
-[\t\r ]                            { /* ignore */; }
-\n([\t\r\n ]|{LINECOMMENT})*       { /* a set of continuous newlines yields a single newline token. */
+[\t\r ]                            { fprintf(stderr, "whitespace: "); print_state(); /* ignore */; }
+
+{EOL}([\t\r\n ]|{LINECOMMENT})*    { /* a set of continuous newlines yields a single newline token. */
+                                     fprintf(stderr, "EOL and whitespace\n");
+                                     print_state();
+
                                      return TK_NL;
                                    }
 
-{LINECOMMENT}          { /* skip line comments */ ; }
+{LINECOMMENT}                      { /* skip line comments */ ; }
+
+
 
 "<<"{Q_STRING} {
-                    /* skip the "<<" and the quote */
-                    char *heredoc_id = strdup(yytext + 2 + 1);
-                    /* remove the closing quote */
-                    heredoc_id[strlen(heredoc_id) - 1] = '\0';
-                    printf("heredoc id: '%s'\n", heredoc_id);
-                    /* return TK_HEREDOC; */
+                    /* skip the "<<" and the quote, so skip 3 characteres */
+                    char *heredoc_id = strdup(yytext + 3);
 
-                    yy_push_state(HEREDOC);
-                    /*
-                    - read line by line
-                    - each time, check whether line == delimiter
-                    -- check for ^ start of line?
-                    - when returning set the heredoc contents accessible to the parser in the %union.
-                    - return TK_STRINGC?
-                    */
+                    fprintf(stderr, "<<Q_STRING: "); print_state();
+
+                    /* check the length of the quoted string. Note that the close quote
+                           * was copied in the call to strdup(), so that's why heredoc_id is
+                           * at least 1.
+                           */
+                    if (strlen(heredoc_id) == 1) {
+                        yyerror("heredoc delimiter cannot be an empty string");
+                    }
+                    else {
+                        /* remove the closing quote */
+                        heredoc_id[strlen(heredoc_id) - 1] = '\0';
+                        printf("<<STRINGC::heredoc id: '%s'\n", heredoc_id);
+
+                        /* store the heredoc delimiter in a FIFO data structure, such as a queue */
+                        new_heredoc(heredoc_id, yylineno);
+
+                        yy_push_state(HEREDOC1);
+                    }
                }
 
 
-<HEREDOC>^.*$   { fprintf(stderr, "Heredoc delimiter: '%s'\n", yytext);
 
-                          /* is this the heredoc delimiter? */
-                          yy_pop_state();
-                          return TK_STRINGC;
-                        }
+<SCANSTRING><<EOF>> { unsigned char dummy_char;
+                      fprintf(stderr, "scanstring::EOF\n");
 
-<HEREDOC>.*\n  { fprintf(stderr, "heredoc: '%s'\n", yytext); }
+                      /* End of the "rest" string, switch back to normal buffer and state. */
+                      fprintf(stderr, "<SCANSTRING><<EOF>>: [%s]\n", yytext);
+                      yy_switch_to_buffer(file_buffer);
+
+                      /* after_heredoc was allocated when the first <<STRINGC was scanned, free it now */
+
+                      /* clear global file_buffer temp. TODO: put global into some lexer state struct */
+                      file_buffer = NULL;
+
+                      /* we reached the end of the saved string, and just switched back to
+                             * the file. However, there may be more whitespace or newlines, so skip these now
+                             */
+                      dummy_char = input();
+                      while (isspace(dummy_char) || dummy_char == '\n') {
+                         dummy_char = input();
+                      }
+
+                      /* we just read one character too much; this is not a space/'\n', so put it back */
+                      unput(dummy_char);
+
+                      yy_pop_state();
+
+
+                    }
+
+<HEREDOC1>.*{EOL}  { /* This state saves the string after the <<STRINGC heredoc delimiter argument.
+                              After saving the rest of the line, effectively, taking it away from the file input
+                              state HEREDOC2 is activated, in which the heredoc string can be scanned.
+                              After the heredoc string is scanned (until the delimiter is encountered), the
+                              string that was saved here is scanned.
+                           */
+
+
+                     if (after_heredoc != NULL) {
+                        /* before allocating new memory to after_heredoc, free the old buffer */
+                        fprintf(stderr, "after_heredoc is not null: [%s]\n", after_heredoc);
+                        free(after_heredoc);
+                     }
+                     after_heredoc = strdup(yytext);
+
+                     BEGIN(HEREDOC2);
+
+
+               }
+
+<HEREDOC3>.*{EOL}   { fprintf(stderr, "<HEREDOC3>! '%s'\n", yytext);
+
+}
+
+<HEREDOC2>{EOL}  {
+                    fprintf(stderr, "<HEREDOC2>{EOL}: '%s'\n", yytext);
+
+                 }
+
+<HEREDOC2>.*   {
+
+                  heredoc_info *heredoc = shift_heredoc();
+
+                  fprintf(stderr, "<HEREDOC2>.*: shifted heredoc: '%s'\n", heredoc->delimiter);
+
+                  /* remove newline character */
+                  chop_yytext();
+
+                  if (strcmp(yytext, heredoc->delimiter) == 0) {
+
+                      fprintf(stderr, "<HEREDOC2>.*: Found delimiter: '%s'\n", yytext);
+
+                      /* we found the delimiter, save the current buffer, because we will first continue
+                             * scanning the "after_heredoc" buffer.
+                             */
+
+
+                      BEGIN(SCANSTRING);
+
+                      file_buffer = YY_CURRENT_BUFFER;
+                      yy_scan_string(after_heredoc);
+
+
+                      fprintf(stderr, "<HEREDOC2>.*: Going to scan string: '%s'\n", after_heredoc);
+                      return TK_STRINGC;
+                  }
+                  else {
+                      unshift_heredoc(heredoc);
+                      fprintf(stderr, "<HEREDOC2>.*: Delimiter not found ('%s')\n", yytext);
+
+                  }
+                }
+
 
 
 ">>>="      { return TK_ASSIGN_USHIFT; }
@@ -378,9 +513,9 @@ LINECOMMENT    [#].*\n
 "!"         { return '!'; }
 "~"         { return '~'; }
 "-"         { return '-'; }
-","         { return ','; }
+","         { fprintf(stderr, "Token ','\n"); yytext = ","; print_state(); fprintf(stderr, "State: %d\n", YYSTATE); return ','; }
 "("         { return '('; }
-")"         { return ')'; }
+")"         { fprintf(stderr, "Token ')'\n"); yytext = ")"; print_state(); fprintf(stderr, "State: %d\n", YYSTATE); return ')'; }
 "["         { return '['; }
 "]"         { return ']'; }
 "."         { return '.'; }
@@ -477,7 +612,7 @@ LINECOMMENT    [#].*\n
 "$I"{DIGIT}+  { return TK_SYM_IREG; }
 
 {ALPHA}{ALNUM}*":"    { return TK_LABEL; }
-{ALPHA}{ALNUM}*       { return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
+{ALPHA}{ALNUM}*       { fprintf(stderr, "TK_IDENT/TK_PARROT_OP\n"); return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
 
 
 {FLOATNUM}        { return TK_NUMC; }
@@ -670,6 +805,7 @@ LINECOMMENT    [#].*\n
 
 .   { yyerror("Unexpected character"); }
 
+<HEREDOC1,HEREDOC2>. { yyerror("Unexpected character(2)"); }
 
 %%
 

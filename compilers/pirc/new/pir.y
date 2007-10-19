@@ -24,6 +24,9 @@ This is a complete rewrite of the parser for the PIR language.
 extern int yyerror(char *message);
 extern int yylex(void);
 
+/* globals! Remove them later */
+int parse_errors = 0;
+
 %}
 
 
@@ -554,14 +557,21 @@ int main(int argc, char *argv[]) {
     yyparse();
     fclose(yyin);
 
+    if (parse_errors == 0) {
+        fprintf(stderr, "Parse successful!\n");
+    }
+    else {
+        fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" : "was", parse_errors, parse_errors > 1 ? "errors" : "error");
+    }
     return 0;
 }
 
 int yyerror(char *message) {
     extern int yylineno;
 
-
+    parse_errors++;
     fprintf(stderr, "Error (line %d): %s at '%s'\n", yylineno, message, yytext);
+
     return 0;
 }
 
