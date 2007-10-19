@@ -39,7 +39,7 @@ Parrot_memalign(size_t align, size_t size)
     size_t padding = 0;
     size_t amountToAllocate = 0;
 
-    if ( effectiveAlign < sizeof (void *) )
+    if (effectiveAlign < sizeof (void *))
     {
         effectiveAlign = roundUpPowerOf2(sizeof (void *));
     }
@@ -48,7 +48,7 @@ Parrot_memalign(size_t align, size_t size)
         effectiveAlign = roundUpPowerOf2(effectiveAlign);
     }
 
-    if ( effectiveAlign < sizeof (memalign_marker_t) )
+    if (effectiveAlign < sizeof (memalign_marker_t))
     {
         padding = sizeof (memalign_marker_t);
     }
@@ -64,7 +64,7 @@ Parrot_memalign(size_t align, size_t size)
         kern_return_t status = vm_allocate(mach_task_self(), &p,
                                                 amountToAllocate, 1);
 
-        if ( status != KERN_SUCCESS )
+        if (status != KERN_SUCCESS)
         {
             return NULL;
         }
@@ -90,11 +90,11 @@ Parrot_memalign(size_t align, size_t size)
             marker->start = usedPageBase;
             marker->size = returnAddress + size - usedPageBase;
 
-            if ( usedPageBase > p )
+            if (usedPageBase > p)
             {
                 status = vm_deallocate(mach_task_self(), p, usedPageBase - p);
 
-                if ( status != KERN_SUCCESS )
+                if (status != KERN_SUCCESS)
                 {
                     fprintf(stderr,
                             "Parrot_memalign(%zx, %zx) failed to deallocate extra header space.\n",
@@ -104,12 +104,12 @@ Parrot_memalign(size_t align, size_t size)
 
             firstUnneededPage = roundUpToPageBoundary(returnAddress + size);
 
-            if ( firstUnneededPage < p + amountToAllocate )
+            if (firstUnneededPage < p + amountToAllocate)
             {
                 status = vm_deallocate(mach_task_self(), firstUnneededPage,
                                     p + amountToAllocate - firstUnneededPage);
 
-                if ( status != KERN_SUCCESS )
+                if (status != KERN_SUCCESS)
                 {
                     fprintf(stderr,
                             "Parrot_memalign(%zx, %zx) failed to deallocate extra footer space.\n",
@@ -130,7 +130,7 @@ Parrot_free_memalign(void *p)
     kern_return_t status = vm_deallocate(mach_task_self(),
                                             marker->start, marker->size);
 
-    if ( status != KERN_SUCCESS )
+    if (status != KERN_SUCCESS)
     {
         fprintf(stderr, "Parrot_free_memalign(%p) failed!\n", p);
     }
