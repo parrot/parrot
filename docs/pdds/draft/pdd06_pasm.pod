@@ -25,29 +25,31 @@ listing of all opcodes. }}
 =over 4
 
 =item *
-	<barney>	Can we get rid of PASM ?
-	<spinclad>	conversely, does PASM need to be kept up to date?
-	<allison>	PASM is just a text form of PBC, so it should be kept
-	<allison>	are there specific PBC features that can't currently be represented in PASM?
-	<particle>	besides hll and :outer?
-	<chromatic>	:init
-	<mdiep>	lexicals?
-	<chromatic>	:vtable
-	<mdiep>	I'm a bit rusty, but anything that starts with a '.' or ':' is suspect
-	<allison>	things that start with '.' are just directives to IMCC, equally applicable to PASM and PIR
-	<mdiep>	isn't PASM separate from IMCC?
-	<allison>	mdiep: it used to be separate
-	<mdiep>	so to say that PASM can have directives is a major architectural change
-	<allison>	perhaps the biggest thing we need is a definition of what PASM actually is
-	<allison>	the line has grown quite fuzzy over the years
-	<barney>	PASM could be defined as stringified PBC
-	<particle>	compilable stringified pbc
-	<mdiep>	it should be defined that way if we're going to call it assembly.
-	<allison>	barney: that's the most likely direction, and if so, it has some implications for how PASM behaves
-	<particle>	allison: which is what we want, anyway, right?
-	<allison>	particle: yup
-	<barney>	yes
-	<particle>	good, looks like we're in agreement and headed in the proper direction on that topic.
+    <barney>    Can we get rid of PASM ?
+    <spinclad>  conversely, does PASM need to be kept up to date?
+    <allison>   PASM is just a text form of PBC, so it should be kept
+    <allison>   are there specific PBC features that can't currently be represented in PASM?
+    <particle>  besides hll and :outer?
+    <chromatic> :init
+    <mdiep>     lexicals?
+    <chromatic> :vtable
+    <mdiep>     I'm a bit rusty, but anything that starts with a '.' or ':' is suspect
+    <allison>   things that start with '.' are just directives to IMCC,
+                equally applicable to PASM and PIR
+    <mdiep>     isn't PASM separate from IMCC?
+    <allison>   mdiep: it used to be separate
+    <mdiep>     so to say that PASM can have directives is a major architectural change
+    <allison>   perhaps the biggest thing we need is a definition of what PASM actually is
+    <allison>   the line has grown quite fuzzy over the years
+    <barney>    PASM could be defined as stringified PBC
+    <particle>  compilable stringified pbc
+    <mdiep>     it should be defined that way if we're going to call it assembly.
+    <allison>   barney: that's the most likely direction, and if so, it has some implications
+                for how PASM behaves
+    <particle>  allison: which is what we want, anyway, right?
+    <allison>   particle: yup
+    <barney>    yes
+    <particle>  good, looks like we're in agreement and headed in the proper direction on that topic.
 
 =back
 
