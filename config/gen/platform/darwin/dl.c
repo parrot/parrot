@@ -106,9 +106,9 @@ Parrot_dlopen(const char *filename)
     else
     { /* bundle-style loading didn't work; try dylib-style before giving up */
         const struct mach_header *header =
-                NSAddImage( fullpath,
-                            NSADDIMAGE_OPTION_RETURN_ON_ERROR
-                            | NSADDIMAGE_OPTION_WITH_SEARCHING);
+                NSAddImage(fullpath,
+                           NSADDIMAGE_OPTION_RETURN_ON_ERROR
+                           | NSADDIMAGE_OPTION_WITH_SEARCHING);
 
         if (header)
             return (void *)header;
@@ -171,8 +171,8 @@ Parrot_dlsym(void *handle, const char *symbol)
             found_symbol = NSLookupAndBindSymbol(fixed_name);
         }
     }
-    else if (    ((struct mach_header *)handle)->magic == MH_MAGIC
-              || ((struct mach_header *)handle)->magic == MH_CIGAM )
+    else if (((struct mach_header *)handle)->magic == MH_MAGIC
+             || ((struct mach_header *)handle)->magic == MH_CIGAM)
     {
         if (NSIsSymbolNameDefinedInImage(handle, fixed_name))
         {
@@ -206,8 +206,8 @@ Parrot_dlsym(void *handle, const char *symbol)
 int
 Parrot_dlclose(void *handle)
 {
-    if ( handle && !( ((struct mach_header *)handle)->magic == MH_MAGIC
-                   || ((struct mach_header *)handle)->magic == MH_CIGAM ) )
+    if (handle && !(((struct mach_header *)handle)->magic == MH_MAGIC
+                     || ((struct mach_header *)handle)->magic == MH_CIGAM))
     {
         unsigned long options = NSUNLINKMODULE_OPTION_NONE;
 #ifdef __ppc__
