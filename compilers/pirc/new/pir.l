@@ -44,8 +44,9 @@ static int is_parrot_op(char *spelling);
 extern int yyerror(char *message);
 extern int yylex(void);
 
-/* datastructure to store the heredocs, nested please! */
 
+
+/* datastructure to store the heredocs, nested please! */
 typedef struct heredoc_info {
    char *contents;  /* contents of heredoc */
    char *delimiter; /* delimiter of heredoc */
@@ -96,6 +97,20 @@ static char *after_heredoc = NULL;
 static YY_BUFFER_STATE file_buffer;
 
 
+/* store the "globals" of the lexer in a structure which is passed around. */
+typedef struct lexer_state {
+    file_info       *current_file;
+    constant_info   *constant_defs;
+    heredoc_info    *heredocs;
+    macro_info      *macros;
+    char            *after_heredoc;
+    YY_BUFFER_STATE file_buffer;
+
+} lexer_state;
+
+
+
+/* macro to chop off the last character, typically a newline character */
 #define chop_yytext()   (yytext[--yyleng] = '\0')
 
 /*
@@ -186,7 +201,7 @@ shift_heredoc(void) {
 
 /*
 
-=item static heredoc_info *new_heredoc(void)
+=item static void new_heredoc(char *delimiter, int line)
 
 =cut
 
@@ -194,8 +209,9 @@ shift_heredoc(void) {
 static void
 new_heredoc(char *delimiter, int line) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
-    heredoc->delimiter = delimiter;
-    heredoc->line_nr   = line;
+    heredoc->delimiter    = delimiter;
+    heredoc->line_nr      = line;
+    /* and store the newly created node */
     unshift_heredoc(heredoc);
 }
 
@@ -303,8 +319,31 @@ read_macro(void) {
 =cut
 
 */
-#define print_state(); { if (YYSTATE == 0) fprintf(stderr, "State INITIAL\n"); if (YYSTATE == 1) fprintf(stderr, "State HEREDOC1\n"); if (YYSTATE == 2) fprintf(stderr, "State HEREDOC2\n"); if (YYSTATE == 3) fprintf(stderr, "State HEREDOC3\n"); if (YYSTATE == 4) fprintf(stderr, "State SCANSTRING\n"); }
 
+
+
+
+/*
+
+There are a number of states, described in the table below.
+
+State          Reads from  Description
+===========================================================================
+INITIAL        file        start state for scanner.
+
+HEREDOC1       file        used as intermediate state to save the
+                           "rest of the line" after a <<"STRING" token.
+
+HEREDOC2       file        used to read heredoc contents
+
+HEREDOC3       buffer      as HEREDOC1, but now when reading from a buffer
+
+SCANSTRING     buffer      used to scan the "rest of the line", which
+                           was saved by HEREDOC1 and HEREDOC3.
+===========================================================================
+
+
+*/
 
 
 %}
@@ -330,7 +369,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 LINECOMMENT    [#].*\n
 
-/* start state for HEREDOC scanning */
+
 %x HEREDOC1
 %x HEREDOC2
 %x HEREDOC3
@@ -352,12 +391,9 @@ LINECOMMENT    [#].*\n
 
 
 
-[\t\r ]                            { fprintf(stderr, "whitespace: "); print_state(); /* ignore */; }
+{WS}                               { /* ignore */; }
 
 {EOL}([\t\r\n ]|{LINECOMMENT})*    { /* a set of continuous newlines yields a single newline token. */
-                                     fprintf(stderr, "EOL and whitespace\n");
-                                     print_state();
-
                                      return TK_NL;
                                    }
 
@@ -365,179 +401,145 @@ LINECOMMENT    [#].*\n
 
 
 
-"<<"{Q_STRING} {
-                    /* skip the "<<" and the quote, so skip 3 characteres */
+"<<"{Q_STRING} {    /* skip the "<<" and the quote, so skip 3 characteres */
                     char *heredoc_id = strdup(yytext + 3);
 
-                    fprintf(stderr, "<<Q_STRING: "); print_state();
-
                     /* check the length of the quoted string. Note that the close quote
-                           * was copied in the call to strdup(), so that's why heredoc_id is
-                           * at least 1.
-                           */
+                     * was copied in the call to strdup(), so that's why heredoc_id is
+                     * at least 1.
+                     */
                     if (strlen(heredoc_id) == 1) {
                         yyerror("heredoc delimiter cannot be an empty string");
                     }
                     else {
                         /* remove the closing quote */
                         heredoc_id[strlen(heredoc_id) - 1] = '\0';
-                        printf("<<STRINGC::heredoc id: '%s'\n", heredoc_id);
-
                         /* store the heredoc delimiter in a FIFO data structure, such as a queue */
                         new_heredoc(heredoc_id, yylineno);
 
-                        yy_push_state(HEREDOC1);
+                        /* yy_push_state(HEREDOC1); */
+                        BEGIN(HEREDOC1);
                     }
                }
 
 <SCANSTRING>"<<"{Q_STRING} {
-                             fprintf(stderr, "embedded heredoc!\n\n");
-                               /* skip the "<<" and the quote, so skip 3 characteres */
+                             /* skip the "<<" and the quote, so skip 3 characteres */
                              char *heredoc_id = strdup(yytext + 3);
 
-                             fprintf(stderr, "<SCANSTRING> <<Q_STRING: "); print_state();
-
                              /* check the length of the quoted string. Note that the close quote
-                                      * was copied in the call to strdup(), so that's why heredoc_id is
-                                      * at least 1.
-                                      */
+                              * was copied in the call to strdup(), so that's why heredoc_id is
+                              * at least 1.
+                              */
                              if (strlen(heredoc_id) == 1) {
                                  yyerror("heredoc delimiter cannot be an empty string");
                              }
                              else {
                                  /* remove the closing quote */
                                  heredoc_id[strlen(heredoc_id) - 1] = '\0';
-                                 printf("<<STRINGC::heredoc id: '%s'\n", heredoc_id);
 
                                  /* store the heredoc delimiter in a FIFO data structure, such as a queue */
                                  new_heredoc(heredoc_id, yylineno);
 
-                                 yy_push_state(HEREDOC3);
+                                 /* yy_push_state(HEREDOC3); */
+                                 BEGIN(HEREDOC3);
                              }
                            }
 
-<SCANSTRING>{EOL}[\t\r\n ]*
-                    { fprintf(stderr, "\n<SCANSTRING> match '\\n'\n");
-                      return TK_NL;
+<SCANSTRING>{EOL}   { /* return TK_NL; */
                     }
 
-<SCANSTRING>{WS}+    {
-                      fprintf(stderr, "\n<SCANSTRING> match {WS}\n");
-                    }
+<SCANSTRING>{WS}+   { /* fprintf(stderr, "\n<SCANSTRING> match {WS}\n"); */ }
 
 <SCANSTRING><<EOF>> { unsigned char dummy_char;
 
-
                       /* End of the "rest" string, switch back to normal buffer and state. */
-                      fprintf(stderr, "\n<SCANSTRING><<EOF>>: [%s]\n", yytext);
-                      fprintf(stderr, "\tSWITCH TO FILE_BUFFER\n");
                       yy_switch_to_buffer(file_buffer);
-
-
+                      BEGIN(INITIAL);
 
                       /* we reached the end of the saved string, and just switched back to
-                             * the file. However, there may be more whitespace or newlines, so skip these now
-                             */
-
+                       * the file. However, there may be more whitespace or newlines, so skip these now
+                       */
                       dummy_char = input();
 
                       while (isspace(dummy_char) || dummy_char == '\n') {
-                         fprintf(stderr, "skipping %s\n", isspace(dummy_char) ? "space" : "newline");
                          dummy_char = input();
-
                       }
-                      /* we just read one character too much; this is not a space/'\n', so put it back */
+                      /* we just read one character too many; this is not a space/'\n', so put it back */
                       unput(dummy_char);
 
-                      /* after having reached the end of the buffer, we continue in normal state, with the file buffer */
-                      BEGIN(INITIAL);
-                      fprintf(stderr, "<SCANSTRING> going to %d\n", YYSTATE);
-
                       /* end of buffer also means end of line (because the buffer represents
-                             * the "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
-                             * So, return a newline token.
-                             */
+                       * the "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
+                       * So, return a newline token.
+                       */
                       return TK_NL;
                     }
 
 <HEREDOC1>.*{EOL}  { /* This state saves the string after the <<STRINGC heredoc delimiter argument.
-                              After saving the rest of the line, effectively, taking it away from the file input
-                              state HEREDOC2 is activated, in which the heredoc string can be scanned.
-                              After the heredoc string is scanned (until the delimiter is encountered), the
-                              string that was saved here is scanned.
-                           */
-                     fprintf(stderr, "<HEREDOC1>.*{EOL}: [%s]\n", yytext);
-
+                      * After saving the rest of the line, effectively, taking it away from the file input
+                      * state HEREDOC2 is activated, in which the heredoc string can be scanned.
+                      * After the heredoc string is scanned (until the delimiter is encountered), the
+                      * string that was saved here is scanned.
+                      */
                      if (after_heredoc != NULL) {
                         /* before allocating new memory to after_heredoc, free the old buffer */
-                        fprintf(stderr, "after_heredoc is not null: [%s]\n", after_heredoc);
                         free(after_heredoc);
                      }
                      after_heredoc = strdup(yytext);
-                     fprintf(stderr, "New after_heredoc is: '%s'\n", after_heredoc);
-                     print_state();
                      /* continue scanning the file */
                      BEGIN(HEREDOC2);
                }
 
 
 
-<HEREDOC3>.*{EOL}   { fprintf(stderr, "<HEREDOC3>! '%s'\n", yytext);
-                      /* currently, we're reading from a buffer */
-                      fprintf(stderr, "Saving rest of string to buffer\n");
+<HEREDOC3>.*{EOL}   { /* currently, we're reading from a buffer */
+
+                      /* after_heredoc is the buffer we're reading from, it /should/ never be null */
                       if (after_heredoc != NULL) {
                          free(after_heredoc);
                       }
                       after_heredoc = strdup(yytext);
+
                       /* switch back to file */
-                      fprintf(stderr, "\tSWITCH TO FILE_BUFFER\n");
                       yy_switch_to_buffer(file_buffer);
                       BEGIN(HEREDOC2);
                     }
 
 <HEREDOC2>{EOL}  {
-                    fprintf(stderr, "<HEREDOC2>{EOL}: '%s'\n", yytext);
 
                  }
 
-<HEREDOC2><<EOF>> {
-                    fprintf(stderr, "EOF in HEREDOC2!\n"); yyterminate(); BEGIN(INITIAL); return TK_NL;
+<HEREDOC2><<EOF>> { /* does this ever happen? */
+                    fprintf(stderr, "<HEREDOC><<EOF>>. Does this ever happen?\n");
+                    BEGIN(INITIAL);
+                    return TK_NL;
                   }
 
-<HEREDOC2>.*   {
-
+<HEREDOC2>.*   {  /* get the heredoc delimiter */
                   heredoc_info *heredoc = shift_heredoc();
-
-                  fprintf(stderr, "<HEREDOC2>.*: shifted heredoc: '%s'\n", heredoc->delimiter);
-
-                  /* remove newline character */
+                  /* remove newline character from current token's characters */
                   chop_yytext();
 
+                  /* if the current token's characters equals the heredoc
+                   * delimiter, the heredoc is complete
+                   */
                   if (strcmp(yytext, heredoc->delimiter) == 0) {
-
-                      fprintf(stderr, "<HEREDOC2>.*: Found delimiter: '%s'\n", yytext);
-
-                      /* we found the delimiter, save the current buffer, because we will first continue
-                             * scanning the "after_heredoc" buffer.
-                             */
-
-
+                      /* we found the delimiter, save the current buffer, because
+                       * we will first continue scanning the "after_heredoc" buffer.
+                       */
                       BEGIN(SCANSTRING);
                       /* save the current buffer */
-                      fprintf(stderr, "\tSAVE FILE_BUFFER\n");
                       file_buffer = YY_CURRENT_BUFFER;
-                      fprintf(stderr, "\tSWITCH TO STRING_BUFFER\n");
                       yy_scan_string(after_heredoc);
-
-
-                      fprintf(stderr, "<HEREDOC2>.*: Going to scan string: '%s'\n", after_heredoc);
+                      /* return the complete heredoc as a string constant */
                       return TK_STRINGC;
                   }
                   else {
+                      /* the current line does not contain the heredoc delimiter,
+                       * put the heredoc thingie back
+                       */
                       unshift_heredoc(heredoc);
-                      fprintf(stderr, "<HEREDOC2>.*: Delimiter not found ('%s')\n", yytext);
-
                   }
+
                 }
 
 
@@ -570,13 +572,13 @@ LINECOMMENT    [#].*\n
 "~"         { return '~'; }
 "-"         { return '-'; }
 
-<INITIAL>","     { fprintf(stderr, "<INITIAL>','\n"); return ','; }
-<SCANSTRING>","  { fprintf(stderr, "<SCANSTRING>','\n"); return ','; }
+<INITIAL>","     { return ','; }
+<SCANSTRING>","  { return ','; }
 
 "("         { return '('; }
 
-<INITIAL>")"         { fprintf(stderr, "<INITIAL>')'\n"); return ')'; }
-<SCANSTRING>")"      { fprintf(stderr, "<SCANSTRING>')'\n"); return ')'; }
+<INITIAL>")"         { return ')'; }
+<SCANSTRING>")"      { return ')'; }
 
 "["         { return '['; }
 "]"         { return ']'; }
@@ -674,7 +676,7 @@ LINECOMMENT    [#].*\n
 "$I"{DIGIT}+  { return TK_SYM_IREG; }
 
 {ALPHA}{ALNUM}*":"    { return TK_LABEL; }
-{ALPHA}{ALNUM}*       { fprintf(stderr, "TK_IDENT/TK_PARROT_OP\n"); return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
+{ALPHA}{ALNUM}*       { return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
 
 
 {FLOATNUM}        { return TK_NUMC; }
@@ -691,7 +693,8 @@ LINECOMMENT    [#].*\n
 
                /* get next token containing name of file being included */
                next_token = yylex();
-               /* check that it's a string, if not return to parser, maybe it can do something with it. */
+
+               /* check that it's a string, if not return to parser. */
                if (next_token != TK_STRINGC) {
                    return next_token;
                }
@@ -721,7 +724,9 @@ LINECOMMENT    [#].*\n
                file_state->line_nr  = yylineno;
                file_state->prev     = NULL; /* initialize to NULL */
 
-               /* store the current file's info structure on the stack, we'll continue scanning it later. */
+               /* store the current file's info structure on the stack,
+                * we'll continue scanning it later.
+                */
                push_file_info(file_state);
 
                /* a new file is being scanned, reset line number */
@@ -789,7 +794,7 @@ LINECOMMENT    [#].*\n
 
 <MACRO>".endm"      { /* end of macro definition; TODO */ ;
 
-                      yy_pop_state();
+
                     }
 
 
@@ -802,14 +807,18 @@ LINECOMMENT    [#].*\n
                     /* because of the whitespace in front of this matched token, we need to skip this,
                      * yytext contains 1 or more space characters, so find out how many these are.
                      */
-                    constant_info *constant;
-                    int num_spaces = 1; /* there is at least one space, so we don't have to check that one */
+                    constant_info *constant = NULL;
+                    /* there is at least one space, so we don't have to check that one */
+                    int num_spaces = 1;
 
                     /* as long as yytext + num_spaces points to a space character, increment num_spaces */
                     while (isspace((unsigned char) *(yytext + num_spaces))) {
                         ++num_spaces;
                     }
-                    /* give the name of the constant, skipping the whitespace prefix, and skip the prefix dot. */
+
+                    /* give the name of the constant, skipping the whitespace prefix,
+                     * and skip the prefix dot.
+                     */
                     constant = find_constant(yytext + num_spaces + 1);
 
                     if (constant != NULL) { /* found the constant */
@@ -822,7 +831,7 @@ LINECOMMENT    [#].*\n
                         return constant->token_type;
                     }
                     else { /* not found, try macro */
-                        macro_info *macro;
+                        macro_info *macro = NULL;
 
                         macro = find_macro(yytext + num_spaces + 1);
 
@@ -852,12 +861,8 @@ LINECOMMENT    [#].*\n
 
 
 
-<<EOF>>     {   /* get the file info structure of the .include-ing file, if any */
-                file_info *info = pop_file_info();
-
-                fprintf(stderr, "<<EOF>> matched in state:");
-                print_state();
-
+<<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
+               file_info *info = pop_file_info();
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
@@ -868,9 +873,9 @@ LINECOMMENT    [#].*\n
                }
             }
 
-.   { yyerror("Unexpected character"); }
+<*>.   { yyerror("Unexpected character"); }
 
-<HEREDOC1,HEREDOC2>. { yyerror("Unexpected character(2)"); }
+
 
 %%
 
@@ -879,7 +884,8 @@ LINECOMMENT    [#].*\n
  * Have yywrap return 1, so that the scanner will not
  * continue after an end of file.
  */
-int yywrap() {
+int
+yywrap() {
     return 1;
 }
 

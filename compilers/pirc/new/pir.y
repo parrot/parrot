@@ -271,6 +271,7 @@ binop: '+'
      | '%'
      ;
 
+
 augmented_op: TK_ASSIGN_INC
             | TK_ASSIGN_DEC
             | TK_ASSIGN_MUL
@@ -570,7 +571,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Parse successful!\n");
     }
     else {
-        fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" : "was", parse_errors, parse_errors > 1 ? "errors" : "error");
+        fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" :
+                "was", parse_errors, parse_errors > 1 ? "errors" : "error");
     }
     return 0;
 }
