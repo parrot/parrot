@@ -18,6 +18,7 @@ This is a complete rewrite of the parser for the PIR language.
 */
 
 %{
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -75,6 +76,13 @@ int parse_errors = 0;
 
 %token TK_FLAG_UNIQUE_REG TK_FLAG_NAMED TK_FLAG_SLURPY
        TK_FLAG_FLAT TK_FLAG_OPTIONAL TK_FLAG_OPT_FLAG
+
+%union {
+    double dval;
+    int    ival;
+    char  *sval;
+}
+
 
 %start program
 
@@ -503,7 +511,7 @@ expression: TK_IDENT
           | reg
           ;
 
-constant: TK_STRINGC
+constant: TK_STRINGC { fprintf(stderr, "TK_STRINGC: [%s]\n", yylval.sval); }
         | TK_INTC
         | TK_NUMC
         ;
@@ -550,7 +558,8 @@ extern char *yytext;
 /*
  * Main compiler driver.
  */
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         exit(1);
@@ -578,7 +587,8 @@ int main(int argc, char *argv[]) {
 }
 
 
-int yyerror(char *message) {
+int
+yyerror(char *message) {
     extern int yylineno;
 
     parse_errors++;

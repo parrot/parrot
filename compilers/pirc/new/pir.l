@@ -37,6 +37,8 @@ Major issues are:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
+
 
 static int is_parrot_op(char *spelling);
 
@@ -51,6 +53,7 @@ typedef struct heredoc_info {
    char *contents;  /* contents of heredoc */
    char *delimiter; /* delimiter of heredoc */
    int line_nr;
+   int char_count;
 
    struct heredoc_info *next; /* this is a linked list, ptr to next */
 
@@ -198,6 +201,51 @@ shift_heredoc(void) {
     return returning;
 }
 
+static heredoc_info *
+peek_heredoc(void) {
+    return heredocs;
+}
+
+
+
+static void
+save_heredoc_line(char *text) {
+    heredoc_info *heredoc = peek_heredoc();
+    int text_length = strlen(text);
+    char *newbuffer;
+
+    /* make sure there's a heredoc active. if not, error! */
+    assert(heredoc != NULL);
+
+    /* create a new buffer, large enough to hold current contents
+     * plus new contents
+     */
+
+    /* only first time there will be no contents */
+    if (heredoc->contents != NULL) {
+        newbuffer = (char *)calloc(heredoc->char_count + text_length, sizeof (char));
+        assert(newbuffer != NULL);
+        fprintf(stderr, "copying old contents...\n(%s)", heredoc->contents);
+        strcpy(newbuffer, heredoc->contents);
+    }
+    else {
+        /* allocate first buffer, do allocate 1 char extra for NULL character. */
+        newbuffer = (char *)calloc(text_length + 1, sizeof (char));
+        assert(newbuffer != NULL);
+    }
+
+    fprintf(stderr, "concatenating new contents..\n");
+    /* copy new text into ne buffer, after old contents. */
+    strcpy(newbuffer + heredoc->char_count, text);
+    /* free old buffer */
+    free(heredoc->contents);
+    /* attach new buffer to heredoc node */
+    heredoc->contents = newbuffer;
+    /* update number of characters in this buffer */
+    heredoc->char_count += text_length;
+
+}
+
 
 /*
 
@@ -211,7 +259,9 @@ new_heredoc(char *delimiter, int line) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
     heredoc->delimiter    = delimiter;
     heredoc->line_nr      = line;
-    /* and store the newly created node */
+    heredoc->contents     = NULL;
+    heredoc->char_count   = 0;
+     /* and store the newly created node */
     unshift_heredoc(heredoc);
 }
 
@@ -374,6 +424,7 @@ LINECOMMENT    [#].*\n
 %x HEREDOC2
 %x HEREDOC3
 %x SCANSTRING
+%x POD
 
 /* start state for macro scanning */
 %x MACRO
@@ -445,10 +496,11 @@ LINECOMMENT    [#].*\n
                              }
                            }
 
-<SCANSTRING>{EOL}   { /* return TK_NL; */
+<SCANSTRING>{EOL}   {
                     }
 
-<SCANSTRING>{WS}+   { /* fprintf(stderr, "\n<SCANSTRING> match {WS}\n"); */ }
+<SCANSTRING>{WS}+   {
+                    }
 
 <SCANSTRING><<EOF>> { unsigned char dummy_char;
 
@@ -494,6 +546,7 @@ LINECOMMENT    [#].*\n
 <HEREDOC3>.*{EOL}   { /* currently, we're reading from a buffer */
 
                       /* after_heredoc is the buffer we're reading from, it /should/ never be null */
+                      assert(after_heredoc != NULL);
                       if (after_heredoc != NULL) {
                          free(after_heredoc);
                       }
@@ -504,8 +557,8 @@ LINECOMMENT    [#].*\n
                       BEGIN(HEREDOC2);
                     }
 
-<HEREDOC2>{EOL}  {
-
+<HEREDOC2>{EOL}  { /* add a newline character to the heredoc */
+                   save_heredoc_line("\n");
                  }
 
 <HEREDOC2><<EOF>> { /* does this ever happen? */
@@ -531,6 +584,7 @@ LINECOMMENT    [#].*\n
                       file_buffer = YY_CURRENT_BUFFER;
                       yy_scan_string(after_heredoc);
                       /* return the complete heredoc as a string constant */
+                      yylval.sval = heredoc->contents;
                       return TK_STRINGC;
                   }
                   else {
@@ -538,10 +592,25 @@ LINECOMMENT    [#].*\n
                        * put the heredoc thingie back
                        */
                       unshift_heredoc(heredoc);
+
+                      /* and save the current text as part of the heredoc */
+                      save_heredoc_line(yytext);
                   }
 
                 }
 
+
+^"=".*{EOL}            { yy_push_state(POD); /* fprintf(stderr, "POD open\n"); */ }
+
+<POD>^"=cut".*{EOL}+   { yy_pop_state(); /* fprintf(stderr, "POD close\n"); */ }
+
+<POD>.*                { /* fprintf(stderr, "pod comment\n"); */ /* ignore pod comments */ }
+
+<POD>{EOL}+            { /* fprintf(stderr, "POD newline!\n"); */  }
+
+<POD><<EOF>>           { yyerror("POD comment not closed!");
+                         yyterminate();
+                       }
 
 
 ">>>="      { return TK_ASSIGN_USHIFT; }
@@ -663,7 +732,9 @@ LINECOMMENT    [#].*\n
 ":flat"       { return TK_FLAG_FLAT; }
 
 
-{Q_STRING}   { return TK_STRINGC; }
+{Q_STRING}   { yylval.sval = strdup(yytext);
+               return TK_STRINGC;
+             }
 
 "P"{DIGIT}+  { return TK_PASM_PREG; }
 "S"{DIGIT}+  { return TK_PASM_SREG; }
