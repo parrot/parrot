@@ -98,7 +98,6 @@ static YY_BUFFER_STATE file_buffer;
 
 #define chop_yytext()   (yytext[--yyleng] = '\0')
 
-
 /*
 
 =over 4
@@ -335,7 +334,7 @@ LINECOMMENT    [#].*\n
 %x HEREDOC1
 %x HEREDOC2
 %x HEREDOC3
-%s SCANSTRING
+%x SCANSTRING
 
 /* start state for macro scanning */
 %x MACRO
@@ -391,34 +390,74 @@ LINECOMMENT    [#].*\n
                     }
                }
 
+<SCANSTRING>"<<"{Q_STRING} {
+                             fprintf(stderr, "embedded heredoc!\n\n");
+                               /* skip the "<<" and the quote, so skip 3 characteres */
+                             char *heredoc_id = strdup(yytext + 3);
 
+                             fprintf(stderr, "<SCANSTRING> <<Q_STRING: "); print_state();
+
+                             /* check the length of the quoted string. Note that the close quote
+                                      * was copied in the call to strdup(), so that's why heredoc_id is
+                                      * at least 1.
+                                      */
+                             if (strlen(heredoc_id) == 1) {
+                                 yyerror("heredoc delimiter cannot be an empty string");
+                             }
+                             else {
+                                 /* remove the closing quote */
+                                 heredoc_id[strlen(heredoc_id) - 1] = '\0';
+                                 printf("<<STRINGC::heredoc id: '%s'\n", heredoc_id);
+
+                                 /* store the heredoc delimiter in a FIFO data structure, such as a queue */
+                                 new_heredoc(heredoc_id, yylineno);
+
+                                 yy_push_state(HEREDOC3);
+                             }
+                           }
+
+<SCANSTRING>{EOL}[\t\r\n ]*
+                    { fprintf(stderr, "\n<SCANSTRING> match '\\n'\n");
+                      return TK_NL;
+                    }
+
+<SCANSTRING>{WS}+    {
+                      fprintf(stderr, "\n<SCANSTRING> match {WS}\n");
+                    }
 
 <SCANSTRING><<EOF>> { unsigned char dummy_char;
-                      fprintf(stderr, "scanstring::EOF\n");
+
 
                       /* End of the "rest" string, switch back to normal buffer and state. */
-                      fprintf(stderr, "<SCANSTRING><<EOF>>: [%s]\n", yytext);
+                      fprintf(stderr, "\n<SCANSTRING><<EOF>>: [%s]\n", yytext);
+                      fprintf(stderr, "\tSWITCH TO FILE_BUFFER\n");
                       yy_switch_to_buffer(file_buffer);
 
-                      /* after_heredoc was allocated when the first <<STRINGC was scanned, free it now */
 
-                      /* clear global file_buffer temp. TODO: put global into some lexer state struct */
-                      file_buffer = NULL;
 
                       /* we reached the end of the saved string, and just switched back to
                              * the file. However, there may be more whitespace or newlines, so skip these now
                              */
-                      dummy_char = input();
-                      while (isspace(dummy_char) || dummy_char == '\n') {
-                         dummy_char = input();
-                      }
 
+                      dummy_char = input();
+
+                      while (isspace(dummy_char) || dummy_char == '\n') {
+                         fprintf(stderr, "skipping %s\n", isspace(dummy_char) ? "space" : "newline");
+                         dummy_char = input();
+
+                      }
                       /* we just read one character too much; this is not a space/'\n', so put it back */
                       unput(dummy_char);
 
-                      yy_pop_state();
+                      /* after having reached the end of the buffer, we continue in normal state, with the file buffer */
+                      BEGIN(INITIAL);
+                      fprintf(stderr, "<SCANSTRING> going to %d\n", YYSTATE);
 
-
+                      /* end of buffer also means end of line (because the buffer represents
+                             * the "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
+                             * So, return a newline token.
+                             */
+                      return TK_NL;
                     }
 
 <HEREDOC1>.*{EOL}  { /* This state saves the string after the <<STRINGC heredoc delimiter argument.
@@ -427,7 +466,7 @@ LINECOMMENT    [#].*\n
                               After the heredoc string is scanned (until the delimiter is encountered), the
                               string that was saved here is scanned.
                            */
-
+                     fprintf(stderr, "<HEREDOC1>.*{EOL}: [%s]\n", yytext);
 
                      if (after_heredoc != NULL) {
                         /* before allocating new memory to after_heredoc, free the old buffer */
@@ -435,20 +474,35 @@ LINECOMMENT    [#].*\n
                         free(after_heredoc);
                      }
                      after_heredoc = strdup(yytext);
-
+                     fprintf(stderr, "New after_heredoc is: '%s'\n", after_heredoc);
+                     print_state();
+                     /* continue scanning the file */
                      BEGIN(HEREDOC2);
-
-
                }
 
-<HEREDOC3>.*{EOL}   { fprintf(stderr, "<HEREDOC3>! '%s'\n", yytext);
 
-}
+
+<HEREDOC3>.*{EOL}   { fprintf(stderr, "<HEREDOC3>! '%s'\n", yytext);
+                      /* currently, we're reading from a buffer */
+                      fprintf(stderr, "Saving rest of string to buffer\n");
+                      if (after_heredoc != NULL) {
+                         free(after_heredoc);
+                      }
+                      after_heredoc = strdup(yytext);
+                      /* switch back to file */
+                      fprintf(stderr, "\tSWITCH TO FILE_BUFFER\n");
+                      yy_switch_to_buffer(file_buffer);
+                      BEGIN(HEREDOC2);
+                    }
 
 <HEREDOC2>{EOL}  {
                     fprintf(stderr, "<HEREDOC2>{EOL}: '%s'\n", yytext);
 
                  }
+
+<HEREDOC2><<EOF>> {
+                    fprintf(stderr, "EOF in HEREDOC2!\n"); yyterminate(); BEGIN(INITIAL); return TK_NL;
+                  }
 
 <HEREDOC2>.*   {
 
@@ -469,8 +523,10 @@ LINECOMMENT    [#].*\n
 
 
                       BEGIN(SCANSTRING);
-
+                      /* save the current buffer */
+                      fprintf(stderr, "\tSAVE FILE_BUFFER\n");
                       file_buffer = YY_CURRENT_BUFFER;
+                      fprintf(stderr, "\tSWITCH TO STRING_BUFFER\n");
                       yy_scan_string(after_heredoc);
 
 
@@ -513,9 +569,15 @@ LINECOMMENT    [#].*\n
 "!"         { return '!'; }
 "~"         { return '~'; }
 "-"         { return '-'; }
-","         { fprintf(stderr, "Token ','\n"); yytext = ","; print_state(); fprintf(stderr, "State: %d\n", YYSTATE); return ','; }
+
+<INITIAL>","     { fprintf(stderr, "<INITIAL>','\n"); return ','; }
+<SCANSTRING>","  { fprintf(stderr, "<SCANSTRING>','\n"); return ','; }
+
 "("         { return '('; }
-")"         { fprintf(stderr, "Token ')'\n"); yytext = ")"; print_state(); fprintf(stderr, "State: %d\n", YYSTATE); return ')'; }
+
+<INITIAL>")"         { fprintf(stderr, "<INITIAL>')'\n"); return ')'; }
+<SCANSTRING>")"      { fprintf(stderr, "<SCANSTRING>')'\n"); return ')'; }
+
 "["         { return '['; }
 "]"         { return ']'; }
 "."         { return '.'; }
@@ -792,6 +854,9 @@ LINECOMMENT    [#].*\n
 
 <<EOF>>     {   /* get the file info structure of the .include-ing file, if any */
                 file_info *info = pop_file_info();
+
+                fprintf(stderr, "<<EOF>> matched in state:");
+                print_state();
 
 
                if (info == NULL) {

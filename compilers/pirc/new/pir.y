@@ -27,6 +27,12 @@ extern int yylex(void);
 /* globals! Remove them later */
 int parse_errors = 0;
 
+/* enable debugging of generated parser */
+#define YYDEBUG         1
+
+/* enable slightly more helpful error messages */
+#define YYERROR_VERBOSE 1
+
 %}
 
 
@@ -554,6 +560,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Failed to open file '%s'\n", argv[1]);
         exit(1);
     }
+
+    /* yydebug = 1;
+    */
     yyparse();
     fclose(yyin);
 
@@ -566,11 +575,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+
 int yyerror(char *message) {
     extern int yylineno;
 
     parse_errors++;
-    fprintf(stderr, "Error (line %d): %s at '%s'\n", yylineno, message, yytext);
+    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", yylineno, message, yytext);
 
     return 0;
 }
