@@ -215,20 +215,24 @@ my $type_map = {
 sub _constant {
     my ( $self, $value ) = @_;
 
-    my $return;
+    my ( $reg_type );
 
-    if ( $value =~ /^[-+]?\d+$/ ) {
-        $return = $self->_save_1('I');
-        $self->_add_inst( '', 'set', [ $return, $value ] );
+    if ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                        # an integer
+        $reg_type = 'I';
     }
-    elsif ( $value =~ /^[-+]?((\d+\.\d*)|(\.d+))([eE][-+]?\d+)?$/ ) {
-        $return = $self->_save_1('N');
-        $self->_add_inst( '', 'set', [ $return, $value ] );
+    elsif ( $value =~ m/ \A [-+]?((\d+\.\d*) | (\.d+)) ([eE][-+]?\d+)? \z/xms ) {    # a float
+        $reg_type = 'N';
     }
-    else {
-        $return = $self->_save_1('I');
-        $self->_add_inst( '', 'set', [ $return, 0 ] );
+    elsif ( $value =~ m/ \A " [^"]* " \z/xms ) {                                     # a string, not escapes yet
+        $reg_type = 'S';
     }
+    else {                                                                           # default 0
+        $reg_type = 'I';
+        $value = 0;
+    }
+    
+    my $return = $self->_save_1( $reg_type );
+    $self->_add_inst( '', 'set', [ $return, $value ] );
 
     return $return;
 }
@@ -1695,15 +1699,19 @@ sub _op_write {
     my ( $self, $node ) = @_;
 
     $self->_add_comment( 'start of _op_write' );
-    # die Dumper( $self, $node );
 
     my $temp = 'none';
 
     for ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
-        if ( $temp =~ /[INS]/ ) {
+        if ( $temp =~ m/ \A [IN]/xms ) {
             $self->_add_inst( '', 'print', [$temp] );
+        }
+        elsif ( $temp =~ m/ \A S/xms ) {
+            $self->_add_inst( '', 'print', [ q{'"'} ] );  # maschine readable
+            $self->_add_inst( '', 'print', [ $temp  ] ); 
+            $self->_add_inst( '', 'print', [ q{'"'} ] ); 
         }
         else {
             $self->_call_function_sym( 'write', $temp );
@@ -2231,7 +2239,7 @@ sub _generate {
 
     my $return;
 
-    if ( exists $node->{children} ) {
+    if ( exists $node->{children} ) {            # $node is a list
         my $func = _get_arg( $node, 0 );
         if ( exists $func->{value} ) {
             my $symbol = $func->{value};

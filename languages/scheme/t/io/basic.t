@@ -19,18 +19,13 @@ language_output_is( 'Scheme', <<'CODE', '01', 'write, two integers' );
 (write 0 1)
 CODE
 
-TODO:
-{
-  local $TODO = 'no support for strings yet';
-
-  language_output_is( 'Scheme', <<'CODE', 'asdf', 'write, one string' );
+language_output_is( 'Scheme', <<'CODE', q{"asdf"}, 'write, one string' );
 (write "asdf")
 CODE
 
-  language_output_is( 'Scheme', <<'CODE', 'hello world', 'write, three strings' );
-(write "hello", " ",  "world")
+language_output_is( 'Scheme', <<'CODE', q{" hello world ! "}, 'write, with spaces' );
+(write " hello world ! ")
 CODE
-}
 
 language_output_is( 'Scheme', <<'CODE', '0', 'display, one integer' );
 (display 0)
