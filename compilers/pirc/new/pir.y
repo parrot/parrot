@@ -22,11 +22,22 @@ This is a complete rewrite of the parser for the PIR language.
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int yyerror(char *message);
-extern int yylex(void);
+#include "pirparser.h"
+#include "pircompiler.h"
 
-/* globals! Remove them later */
-int parse_errors = 0;
+
+struct lexer_state;
+
+extern int yyerror(YYLTYPE *locp,
+                   struct lexer_state *lexer,
+                   char *message);
+
+
+extern int yylex(YYSTYPE *yylval,
+                 YYLTYPE *locp,
+                 struct lexer_state *lexer);
+
+
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -82,6 +93,15 @@ int parse_errors = 0;
     int    ival;
     char  *sval;
 }
+
+/* a pure parser */
+%pure_parser
+
+/* have a location structure passed around */
+%locations
+
+%parse-param {struct lexer_state *lexer}
+%lex-param   {struct lexer_state *lexer}
 
 
 %start program
@@ -550,16 +570,20 @@ target: reg
 %%
 
 /* the file being parsed */
-extern FILE *yyin;
+extern FILE *yyin; /* CAN WE KEEP USING THIS IN A PURE-PARSER? */
 
 /* the global buffer where the current token's characters are stored */
-extern char *yytext;
+extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
 
 /*
  * Main compiler driver.
  */
 int
 main(int argc, char *argv[]) {
+
+    struct lexer_state *lexer = NULL;
+    int parse_errors;
+
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         exit(1);
@@ -573,8 +597,12 @@ main(int argc, char *argv[]) {
 
     /* yydebug = 1;
     */
-    yyparse();
+    lexer = new_lexer();
+    yyparse(lexer);
     fclose(yyin);
+
+
+    parse_errors = get_parse_errors(lexer);
 
     if (parse_errors == 0) {
         fprintf(stderr, "Parse successful!\n");
@@ -588,12 +616,15 @@ main(int argc, char *argv[]) {
 
 
 int
-yyerror(char *message) {
-    extern int yylineno;
+yyerror(YYLTYPE *locp, struct lexer_state *lexer, char *message) {
 
-    parse_errors++;
-    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", yylineno, message, yytext);
+    parse_error(lexer);
 
+
+    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", 42, message, yytext);
+
+    fprintf(stderr, "first_line: %d\nfirst_column: %d\nlast_line: %d\nlast_column: %d\n",
+            locp->first_line, locp->first_column, locp->last_line, locp->last_column);
     return 0;
 }
 

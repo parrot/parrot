@@ -38,13 +38,14 @@ Major issues are:
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include "pircompiler.h"
 
 
+/* Parrot can check out whether the specified text is the name of an op.
+ * We define a dummy function for now; replace this later.
+ */
 static int is_parrot_op(char *spelling);
 
-/* prevent compile warnings */
-extern int yyerror(char *message);
-extern int yylex(void);
 
 
 
@@ -52,8 +53,7 @@ extern int yylex(void);
 typedef struct heredoc_info {
    char *contents;  /* contents of heredoc */
    char *delimiter; /* delimiter of heredoc */
-   int line_nr;
-   int char_count;
+   int char_count;  /* number of characters in this heredoc */
 
    struct heredoc_info *next; /* this is a linked list, ptr to next */
 
@@ -91,30 +91,77 @@ typedef struct macro_info {
 } macro_info;
 
 
-/* globals! TODO: store them in a struct for the compiler, which should be passed around. */
-static file_info *current_file = NULL;
-static constant_info *constant_defs = NULL;
-static heredoc_info *heredocs = NULL;
-static macro_info *macros = NULL;
-static char *after_heredoc = NULL;
-static YY_BUFFER_STATE file_buffer;
-
 
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
-    file_info       *current_file;
-    constant_info   *constant_defs;
-    heredoc_info    *heredocs;
-    macro_info      *macros;
-    char            *after_heredoc;
-    YY_BUFFER_STATE file_buffer;
+    struct file_info       *current_file;
+    struct constant_info   *constant_defs;
+    struct heredoc_info    *heredocs;
+    struct macro_info      *macros;
+    char                   *after_heredoc;
+    YY_BUFFER_STATE         file_buffer;
+    int                     parse_errors;
 
 } lexer_state;
+
+
+/* remove defines, and put them literally in the code */
+#define current_file  lexer->current_file
+#define constant_defs lexer->constant_defs
+#define heredocs      lexer->heredocs
+#define after_heredoc lexer->after_heredoc
+#define file_buffer   lexer->file_buffer
+
 
 
 
 /* macro to chop off the last character, typically a newline character */
 #define chop_yytext()   (yytext[--yyleng] = '\0')
+
+
+/* declaration of the lexer function */
+#define YY_DECL int yylex(YYLTYPE *locp, YYSTYPE *yylval, struct lexer_state *lexer)
+
+/* declare the function yylex here; its definition is #define'd, so use that: */
+extern YY_DECL;
+
+
+extern int yyerror(YYLTYPE *locp,
+                   struct lexer_state *lexer,
+                   char *message);
+
+
+/*
+
+constructor for a lexer.
+
+*/
+lexer_state *
+new_lexer(void) {
+    lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
+    fprintf(stderr, "Constructing new lexer\n");
+    return lexer;
+}
+
+/*
+
+Accessor function for errors.
+
+*/
+int
+get_parse_errors(lexer_state *lexer) {
+    return lexer->parse_errors;
+}
+
+/*
+
+Accessor function to increment the errors field.
+
+*/
+void
+parse_error(lexer_state *lexer) {
+    lexer->parse_errors++;
+}
 
 /*
 
@@ -128,7 +175,7 @@ Store a file_info structure on a stack.
 
 */
 static void
-push_file_info(file_info *info) {
+push_file_info(lexer_state *lexer, file_info *info) {
     info->prev = current_file;
     current_file = info;
 }
@@ -145,7 +192,7 @@ Pop a file_info structure from a stack.
 
 */
 static file_info *
-pop_file_info(void) {
+pop_file_info(lexer_state *lexer) {
     if (current_file == NULL) {
         /* fprintf(stderr, "pop_file_info(): returning NULL\n"); */
         return NULL;
@@ -161,10 +208,10 @@ pop_file_info(void) {
 
 
 static void
-switch_to_file(file_info *info) {
+switch_to_file(lexer_state *lexer, file_info *info) {
 
     /* restore the buffer info */
-    yylineno = info->line_nr;
+    /* TODO */
 
     /* delete the current buffer (of the included file *) */
     yy_delete_buffer(YY_CURRENT_BUFFER);
@@ -184,13 +231,13 @@ switch_to_file(file_info *info) {
 }
 
 static void
-unshift_heredoc(heredoc_info *heredoc) {
+unshift_heredoc(lexer_state *lexer, heredoc_info *heredoc) {
     heredoc->next = heredocs;
     heredocs      = heredoc;
 }
 
 static heredoc_info *
-shift_heredoc(void) {
+shift_heredoc(lexer_state *lexer) {
     heredoc_info *returning = heredocs;
     if (returning == NULL) {
         fprintf(stderr, "shift_heredoc(): queue is empty!\n");
@@ -202,15 +249,15 @@ shift_heredoc(void) {
 }
 
 static heredoc_info *
-peek_heredoc(void) {
+peek_heredoc(lexer_state *lexer) {
     return heredocs;
 }
 
 
 
 static void
-save_heredoc_line(char *text) {
-    heredoc_info *heredoc = peek_heredoc();
+save_heredoc_line(lexer_state *lexer, char *text) {
+    heredoc_info *heredoc = peek_heredoc(lexer);
     int text_length = strlen(text);
     char *newbuffer;
 
@@ -255,14 +302,13 @@ save_heredoc_line(char *text) {
 
 */
 static void
-new_heredoc(char *delimiter, int line) {
+new_heredoc(lexer_state *lexer, char *delimiter) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
     heredoc->delimiter    = delimiter;
-    heredoc->line_nr      = line;
     heredoc->contents     = NULL;
     heredoc->char_count   = 0;
      /* and store the newly created node */
-    unshift_heredoc(heredoc);
+    unshift_heredoc(lexer, heredoc);
 }
 
 
@@ -274,7 +320,7 @@ new_heredoc(char *delimiter, int line) {
 
 */
 static constant_info *
-find_constant(char *name) {
+find_constant(lexer_state *lexer, char *name) {
 
     constant_info *iter = constant_defs;
 
@@ -295,14 +341,14 @@ find_constant(char *name) {
 
 */
 static void
-define_constant(char *name, char *value, int token_type, int line) {
+define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
     constant_info *info = (constant_info *)malloc(sizeof (constant_info));
     if (info == NULL) {
         fprintf(stderr, "Failed to allocate memory for constant definition.\n");
         exit(1);
     }
     /* create the constant definition */
-    info->line_declared = line;
+    info->line_declared = 0; /* TODO */
     info->name          = name;
     info->value         = value;
     info->token_type    = token_type;
@@ -320,7 +366,9 @@ define_constant(char *name, char *value, int token_type, int line) {
 
 */
 static macro_info *
-find_macro(char *name) {
+find_macro(lexer_state *lexer, char *name) {
+    /* TODO */
+
     return NULL;
 }
 
@@ -333,22 +381,24 @@ find_macro(char *name) {
 
 */
 static void
-read_macro(void) {
+read_macro(YYLTYPE *locp, YYSTYPE *yylval, lexer_state *lexer) {
     int next_token;
-    int next_char;
-    macro_info *macro;
+    /*int next_char;
+    */
+    macro_info *macro = NULL;
 
 
     /* get next token, this must be macro id */
-    next_token = yylex();
+    next_token = yylex(locp, yylval, lexer);
 
     /* check that there's a macro identifier token */
     if (next_token != TK_IDENT) {
-        yyerror("macro identifier expected after '.macro'");
+        yyerror(locp, lexer, "macro identifier expected after '.macro'");
     }
 
     /* read macro parameters, if any */
-    /*
+
+    /* TODO: FIX THIS
     next_char = input();
     if (next_char == '(') {
 
@@ -430,13 +480,19 @@ LINECOMMENT    [#].*\n
 %x MACRO
 
 /* use built-in line counter */
-%option yylineno
+/* %option yylineno */
 
 /* support pushing/popping of start states */
 %option stack
 
 /* make sure yytext is a pointer */
 %pointer
+
+/* slightly more efficient when this option is set; our parser is not interactive anyway. */
+%option never-interactive
+
+
+
 
 %%
 
@@ -460,13 +516,13 @@ LINECOMMENT    [#].*\n
                      * at least 1.
                      */
                     if (strlen(heredoc_id) == 1) {
-                        yyerror("heredoc delimiter cannot be an empty string");
+                        yyerror(locp, lexer, "heredoc delimiter cannot be an empty string");
                     }
                     else {
                         /* remove the closing quote */
                         heredoc_id[strlen(heredoc_id) - 1] = '\0';
                         /* store the heredoc delimiter in a FIFO data structure, such as a queue */
-                        new_heredoc(heredoc_id, yylineno);
+                        new_heredoc(lexer, heredoc_id);
 
                         /* yy_push_state(HEREDOC1); */
                         BEGIN(HEREDOC1);
@@ -482,14 +538,14 @@ LINECOMMENT    [#].*\n
                               * at least 1.
                               */
                              if (strlen(heredoc_id) == 1) {
-                                 yyerror("heredoc delimiter cannot be an empty string");
+                                 yyerror(locp, lexer, "heredoc delimiter cannot be an empty string");
                              }
                              else {
                                  /* remove the closing quote */
                                  heredoc_id[strlen(heredoc_id) - 1] = '\0';
 
                                  /* store the heredoc delimiter in a FIFO data structure, such as a queue */
-                                 new_heredoc(heredoc_id, yylineno);
+                                 new_heredoc(lexer, heredoc_id);
 
                                  /* yy_push_state(HEREDOC3); */
                                  BEGIN(HEREDOC3);
@@ -558,7 +614,7 @@ LINECOMMENT    [#].*\n
                     }
 
 <HEREDOC2>{EOL}  { /* add a newline character to the heredoc */
-                   save_heredoc_line("\n");
+                   save_heredoc_line(lexer, "\n");
                  }
 
 <HEREDOC2><<EOF>> { /* does this ever happen? */
@@ -568,7 +624,7 @@ LINECOMMENT    [#].*\n
                   }
 
 <HEREDOC2>.*   {  /* get the heredoc delimiter */
-                  heredoc_info *heredoc = shift_heredoc();
+                  heredoc_info *heredoc = shift_heredoc(lexer);
                   /* remove newline character from current token's characters */
                   chop_yytext();
 
@@ -584,17 +640,18 @@ LINECOMMENT    [#].*\n
                       file_buffer = YY_CURRENT_BUFFER;
                       yy_scan_string(after_heredoc);
                       /* return the complete heredoc as a string constant */
-                      yylval.sval = heredoc->contents;
+                      /* yylval.sval = heredoc->contents;
+                      */
                       return TK_STRINGC;
                   }
                   else {
                       /* the current line does not contain the heredoc delimiter,
                        * put the heredoc thingie back
                        */
-                      unshift_heredoc(heredoc);
+                      unshift_heredoc(lexer, heredoc);
 
                       /* and save the current text as part of the heredoc */
-                      save_heredoc_line(yytext);
+                      save_heredoc_line(lexer, yytext);
                   }
 
                 }
@@ -608,7 +665,7 @@ LINECOMMENT    [#].*\n
 
 <POD>{EOL}+            { /* fprintf(stderr, "POD newline!\n"); */  }
 
-<POD><<EOF>>           { yyerror("POD comment not closed!");
+<POD><<EOF>>           { yyerror(locp, lexer, "POD comment not closed!");
                          yyterminate();
                        }
 
@@ -694,7 +751,7 @@ LINECOMMENT    [#].*\n
 ".lex"            { return TK_LEX; }
 ".loadlib"        { return TK_LOADLIB; }
 ".local"          { return TK_LOCAL; }
-".macro"          { ; }
+
 ".meth_call"      { return TK_METH_CALL; }
 ".namespace"      { return TK_NAMESPACE; }
 ".nci_call"       { return TK_NCI_CALL; }
@@ -732,7 +789,7 @@ LINECOMMENT    [#].*\n
 ":flat"       { return TK_FLAG_FLAT; }
 
 
-{Q_STRING}   { yylval.sval = strdup(yytext);
+{Q_STRING}   { /* yylval.sval = strdup(yytext); */
                return TK_STRINGC;
              }
 
@@ -763,7 +820,7 @@ LINECOMMENT    [#].*\n
                YY_BUFFER_STATE incl_file_buffer;
 
                /* get next token containing name of file being included */
-               next_token = yylex();
+               next_token = yylex(locp, yylval, lexer);
 
                /* check that it's a string, if not return to parser. */
                if (next_token != TK_STRINGC) {
@@ -782,9 +839,9 @@ LINECOMMENT    [#].*\n
                incl_file_ptr = fopen(incl_file_name, "r");
 
                /* after an include statement a newline is expected */
-               next_token = yylex();
+               next_token = yylex(locp, yylval, lexer);
                if (next_token != TK_NL) {
-                   yyerror("newline expected after \".include '<string>'\"\n");
+                   yyerror(locp, lexer, "newline expected after \".include '<string>'\"\n");
                }
 
                /* save current file info */
@@ -792,16 +849,16 @@ LINECOMMENT    [#].*\n
                file_state->buffer   = YY_CURRENT_BUFFER;
                file_state->filename = NULL; /* FIX */
                file_state->line_pos = 0; /* FIX */
-               file_state->line_nr  = yylineno;
+               /* TODO HANDLE LINE NO */
                file_state->prev     = NULL; /* initialize to NULL */
 
                /* store the current file's info structure on the stack,
                 * we'll continue scanning it later.
                 */
-               push_file_info(file_state);
+               push_file_info(lexer, file_state);
 
                /* a new file is being scanned, reset line number */
-               yylineno = 1;
+               /* TODO RESET LINE NO */
 
                if (incl_file_ptr == NULL) { /* opening file went wrong */
                    fprintf(stderr, "Error including file '%s'\n", incl_file_name);
@@ -817,15 +874,15 @@ LINECOMMENT    [#].*\n
                char *constant_id;
                char *constant_value;
 
-               next_token = yylex();
+               next_token = yylex(locp, yylval, lexer);
                if (next_token != TK_IDENT) {
-                  yyerror("identifier expected after '.constant'.");
+                  yyerror(locp, lexer, "identifier expected after '.constant'.");
                }
                /* store identifier */
                constant_id = strdup(yytext);
 
                /* read next token, which contains the value */
-               next_token = yylex();
+               next_token = yylex(locp, yylval, lexer);
 
                /* only these token types are allowed for constant values: */
                switch (next_token) {
@@ -842,23 +899,23 @@ LINECOMMENT    [#].*\n
                    case TK_PASM_SREG:
                        /* store value by this constant's name */
                        constant_value = strdup(yytext);
-                       define_constant(constant_id, constant_value, next_token, yylineno);
+                       define_constant(lexer, constant_id, constant_value, next_token);
                        break;
                    default:
-                       yyerror("Constant value must be a number, string literal or register");
+                       yyerror(locp, lexer, "Constant value must be a number, string literal or register");
                        break;
                }
 
                /* after the .constant declaration, a newline must be read */
-               next_token = yylex();
+               next_token = yylex(locp, yylval, lexer);
                if (next_token != TK_NL) {
-                   yyerror("newline expected after constant declaration");
+                   yyerror(locp, lexer, "newline expected after constant declaration");
                }
 
              }
 
 ".macro"            {  /* macro definition */
-                       read_macro();
+                       read_macro(locp, yylval, lexer);
 
                     }
 
@@ -890,13 +947,14 @@ LINECOMMENT    [#].*\n
                     /* give the name of the constant, skipping the whitespace prefix,
                      * and skip the prefix dot.
                      */
-                    constant = find_constant(yytext + num_spaces + 1);
+                    constant = find_constant(lexer, yytext + num_spaces + 1);
 
                     if (constant != NULL) { /* found the constant */
                         fprintf(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
                                 constant->name, constant->value, constant->token_type);
 
                         /* make the value of the constant available to the parser */
+                        /* TODO: where to store this? Probably in the %union->sval */
                         yytext = constant->value;
                         /* return the type of token that the constant value represents */
                         return constant->token_type;
@@ -904,7 +962,7 @@ LINECOMMENT    [#].*\n
                     else { /* not found, try macro */
                         macro_info *macro = NULL;
 
-                        macro = find_macro(yytext + num_spaces + 1);
+                        macro = find_macro(lexer, yytext + num_spaces + 1);
 
                         if (macro != NULL) {
 
@@ -924,7 +982,7 @@ LINECOMMENT    [#].*\n
                         }
                         else {
                             /* not found, this is an unknown constant or macro. */
-                            yyerror("Undefined constant or macro");
+                            yyerror(locp, lexer, "Undefined constant or macro");
                         }
                     }
 
@@ -933,18 +991,18 @@ LINECOMMENT    [#].*\n
 
 
 <<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
-               file_info *info = pop_file_info();
+               file_info *info = pop_file_info(lexer);
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
                    yyterminate();
                }
                else { /* this file was included */
-                   switch_to_file(info);
+                   switch_to_file(lexer, info);
                }
             }
 
-<*>.   { yyerror("Unexpected character"); }
+<*>.   { yyerror(locp, lexer, "Unexpected character"); }
 
 
 
