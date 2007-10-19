@@ -1301,10 +1301,13 @@ Used to archive the class.
         Parrot_Class * const class_data = PARROT_CLASS(SELF);
         STRING       * serial_namespace = CONST_STRING(interp, "");
 
-        /* 1) freeze class name */
+        /* 1) freeze class id */
+        VTABLE_push_integer(INTERP, io, class_data->id);
+
+        /* 2) freeze class name */
         VTABLE_push_string(INTERP, io, class_data->name);
 
-        /* 2) serialize namespace name, including HLL */
+        /* 3) serialize namespace name, including HLL */
         if (!PMC_IS_NULL(class_data->_namespace)) {
             PMC *names = Parrot_NameSpace_nci_get_name(interp,
                     class_data->_namespace);
@@ -1336,7 +1339,13 @@ Used to unarchive the class.
             SUPER(info);
         }
         else if (info->extra_flags == EXTRA_IS_NULL) {
+            /* 1) thaw class id */
+            INTVAL  id = VTABLE_shift_integer(INTERP, io);
+
+            /* 2) thaw class name */
             STRING *name = VTABLE_shift_string(INTERP, io);
+
+            /* 3) deserialize namespace name, including HLL */
             STRING *serial_namespace = VTABLE_shift_string(INTERP, io);
             PMC    *namespace_array = string_split(INTERP,
                     CONST_STRING(INTERP, ";"), serial_namespace);
@@ -1359,6 +1368,9 @@ Used to unarchive the class.
 
             /* Set the class's short name to the frozen name */
             PARROT_CLASS(SELF)->name = name;
+
+            /* Set the class's id the frozen id */
+            PARROT_CLASS(SELF)->id = id;
         }
     }
 
