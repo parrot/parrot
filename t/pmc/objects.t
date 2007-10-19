@@ -1665,7 +1665,7 @@ CODE
 1 * 1 = 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'equality of subclassed Integer' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'equality of subclassed Integer', todo => 'RT #46541' );
 .sub main :main
   .local pmc class
   class = subclass "Integer", "LispInteger"
