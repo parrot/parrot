@@ -574,6 +574,9 @@ ok beta2
 ok beta3
 OUTPUT
 
+TODO: {
+        local $TODO = "vtable overrides aren't properly cloned RT# 46511";
+
 pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not built-in" );
 .namespace [ 'Foo' ]
 
@@ -591,7 +594,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not
     print "called Bar's barmeth\n"
 .end
 
-.sub __get_string :method
+.sub get_string :vtable :method
     .return ("A Bar")
 .end
 
@@ -742,6 +745,8 @@ Integer? 1
 Foo? 1
 Bar? 1
 OUTPUT
+
+}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
 .HLL 'Test', ''
