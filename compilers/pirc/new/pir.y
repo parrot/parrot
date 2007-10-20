@@ -644,6 +644,12 @@ main(int argc, char *argv[]) {
             case 'E':
                 pre_process = 1;
                 break;
+            /* Only allow for debug flag if the generated parser supports it */
+#ifdef YYDEBUG
+            case 'd':
+                yydebug = 1;
+                break;
+#endif
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
                 break;
@@ -665,8 +671,6 @@ main(int argc, char *argv[]) {
         exit(1);
     }
 
-    /* yydebug = 1;
-    */
     lexer = new_lexer(argv[0]);
     if (pre_process) {
         do_pre_process(lexer);

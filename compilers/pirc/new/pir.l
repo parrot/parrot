@@ -166,7 +166,7 @@ update_location(lexer_state *lexer) {
             lexer->line_nr++;
         iter++;
     }
-    //fprintf(stderr, "foo()\n[%s]\n", yytext);
+
 
 }
 
@@ -1051,6 +1051,7 @@ LINECOMMENT    [#].*\n
                file_state = (file_info *)malloc(sizeof (file_info));
                assert(file_state != NULL);
 
+               /* save current buffer, current file name, current line nr*/
                file_state->buffer   = YY_CURRENT_BUFFER;
                file_state->filename = lexer->filename;
                file_state->line_pos = 0; /* FIX */
@@ -1067,8 +1068,6 @@ LINECOMMENT    [#].*\n
                /* set the name of the included file */
                lexer->filename = incl_file_name;
 
-
-
                /* create a new buffer for the included file and switch to that file */
                incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
                yy_switch_to_buffer(incl_file_buffer);
@@ -1083,8 +1082,8 @@ LINECOMMENT    [#].*\n
              }
 
 ".constant"  { int next_token;
-               char *constant_id;
-               char *constant_value;
+               char *constant_id    = NULL;
+               char *constant_value = NULL;
 
                next_token = yylex(yylval, lexer);
                if (next_token != TK_IDENT) {
