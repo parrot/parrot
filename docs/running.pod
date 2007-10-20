@@ -134,13 +134,26 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =head2 Run Core Options
 
-TODO:  The default run core should be indicated.
-
 =over 4
+
+=item -R, --runcore CORE
+
+Select the runcore. The following cores are available:
+
+  slow, bounds  bounds checking core (default)
+  fast          fast core (no bounds checking, profiling, or tracing)
+  switch        switch core
+  cgp           computed goto-predereferenced core
+  cgoto         computed goto core
+  jit           JIT core
+  cgp-jit       computed goto-predereferenced core with JIT
+  switch-jit    switch core with JIT
+  exec          exec core (uses JIT at compile time to generate native code)
+  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
 
 =item -b, --bounds-checks, --slow-core
 
-Select the bounds-checking slow core.
+Select the bounds-checking slow core (default).
 
 =item -C, --CGP-core
 
