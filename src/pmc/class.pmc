@@ -1279,7 +1279,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
 
-        /* 5) visit list of resolve methods */
+        /* 6) visit list of resolve methods */
         pos            = &class_data->resolve_method;
         info->thaw_ptr = pos;
         (info->visit_pmc_now)(INTERP, *pos, info);
