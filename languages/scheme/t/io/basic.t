@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 10;
+use Test::More tests => 14;
 use Parrot::Test;
 
 language_output_is( 'Scheme', <<'CODE', '0', 'write, one integer' );
@@ -52,6 +52,32 @@ language_output_is( 'Scheme', <<'CODE', "\n17\n", 'display, three strings' );
 (write 17)
 (newline)
 CODE
+
+##
+## Booleans
+##
+
+TODO:
+{
+    local $TODO = 'booleans not implemented yet';
+
+language_output_is( 'Scheme', <<'CODE', "#f", 'write #f' );
+(write #f)
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#t", 'display #t' );
+(display #t)
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#f", 'display #f' );
+(display #f)
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#t", 'display #t' );
+(display #t)
+CODE
+
+}
 
 # Local Variables:
 #   mode: cperl
