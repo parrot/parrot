@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( lib );
-use Test::More tests =>  8;
+use Test::More tests =>  9;
 
 =head1 NAME
 
@@ -51,6 +51,14 @@ isa_ok( $testpkg->new, $testpkg );
 
     is( $teststep->description, 'foo', "->description() returns the proper value" );
     is_deeply( [ $teststep->args ], [qw(foo bar baz)], "->args() returns the proper value" );
+}
+
+{
+    my $teststep = $testpkg->new();
+    my @listcontext = $teststep->args();
+    my $scalarcontext = $teststep->args();
+    is_deeply( $scalarcontext, [ @listcontext ],
+        "->args() finds same elements in both scalar and list contexts" );
 }
 
 {

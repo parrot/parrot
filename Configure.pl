@@ -354,8 +354,7 @@ $opttest->run_build_tests();
 
 my $make = $conf->data->get('make');
 # from Parrot::Configure::Messages
-my $rv = print_conclusion( $conf, $make );
-exit($rv);
+( print_conclusion( $conf, $make ) ) ? exit 0 : exit 1;
 
 ################### DOCUMENTATION ###################
 
