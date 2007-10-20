@@ -953,6 +953,7 @@ LINECOMMENT    [#].*\n
 ".pcc_end"        { return TK_PCC_END; }
 ".pcc_end_return" { return TK_PCC_END_RETURN; }
 ".pcc_end_yield"  { return TK_PCC_END_YIELD; }
+".pcc_sub"        { return TK_PCC_SUB; }
 ".pragma"         { return TK_PRAGMA; }
 ".result"         { return TK_RESULT; }
 ".return"         { return TK_RETURN; }

@@ -57,7 +57,7 @@ extern int yylex(YYSTYPE *yylval,
 
 %token TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
 
-%token TK_EOF
+%token TK_EOF TK_PCC_SUB
 
 %token TK_NL "\n"
 
@@ -176,10 +176,14 @@ pasm_instructions: /* empty */
                  | pasm_instructions pasm_instruction
                  ;
 
-pasm_instruction: TK_LABEL TK_NL
-                | TK_LABEL TK_PARROT_OP TK_NL
+pasm_instruction: pasm_label TK_NL
+                | pasm_label TK_PARROT_OP TK_NL
                 | TK_PARROT_OP TK_NL
                 ;
+
+pasm_label: TK_LABEL
+          | TK_PCC_SUB sub_flags TK_LABEL
+          ;
 
 /* Namespaces */
 namespace_declaration: TK_NAMESPACE
