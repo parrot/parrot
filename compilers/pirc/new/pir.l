@@ -1029,12 +1029,8 @@ LINECOMMENT    [#].*\n
                /* copy file name, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
 
-               /* open the file */
-
-               /* fprintf(stderr, "Including file '%s'\n", incl_file_name); */
-
+               /* open the file and check for success */
                incl_file_ptr = fopen(incl_file_name, "r");
-               /* check file */
                if (incl_file_ptr == NULL) { /* opening file went wrong */
                    yyerror(lexer, "Error including file");
                    return 0;

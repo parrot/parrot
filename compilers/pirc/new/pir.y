@@ -272,8 +272,12 @@ instruction: if_statement
            | methodcall_statement
            | null_statement
            | parrot_instruction
+           | getresults_statement
            | error TK_NL { yyerrok; }
            ;
+
+getresults_statement: TK_GET_RESULTS '(' target_list ')' TK_NL
+                    ;
 
 null_statement: TK_NULL TK_PASM_PREG TK_NL
               | TK_NULL TK_SYM_PREG TK_NL
