@@ -134,7 +134,9 @@ compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
 compilers/pirc/src/pirlexer.c
 compilers/pirc/src/pirparser.c
-languages/plumhead/lex.yy.c
+languages/plumhead/src/yacc/plumhead_lexer.c
+languages/plumhead/src/yacc/plumhead_parser.c
+languages/plumhead/src/yacc/plumhead_parser.h
 # Generators with big strings
 tools/build/jit2c.pl
 tools/build/nativecall.pl
@@ -143,7 +145,7 @@ tools/dev/mk_inno.pl
 tools/dev/parrot_coverage.pl
 # these ones include a big URL
 cage/todo.pod
-docs/dev/pmc_object_design_meeting_notes.pod
+docs/dev/pmc_obj_design_meeting_notes.pod
 docs/gettingstarted.pod
 docs/glossary.pod
-languages/LANGUAGES.STATUS.pod
+languages/LANGUAGES_STATUS.pod
