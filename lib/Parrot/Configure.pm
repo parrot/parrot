@@ -221,9 +221,36 @@ sub runsteps {
     my $conf = shift;
 
     my $n = 0;    # step number
-    my ( $verbose, $verbose_step, $ask ) = $conf->options->get(qw( verbose verbose-step ask ));
+    my ( $verbose, $verbose_step, $fatal, $fatal_step, $ask ) =
+        $conf->options->get(qw( verbose verbose-step fatal fatal-step ask ));
+
+    $conf->{log} = [];
+    my %steps_to_die_for = ();
+    # If the --fatal option is true, then all config steps are mapped into
+    # %steps_to_die_for and there is no consideration of --fatal-step.
+    if ($fatal) {
+        %steps_to_die_for = map {$_, 1} @{ $conf->{list_of_steps} };
+    }
+    # We make certain that argument to --fatal-step is a comma-delimited
+    # string of configuration steps, each of which is a string delimited by
+    # two colons, the first half of which is one of init|inter|auto|gen
+    # (This will be modified to take a step sequence number.)
+    elsif ( defined ( $fatal_step ) ) {
+        %steps_to_die_for = $conf->_handle_fatal_step_option( $fatal_step );
+    }
+    else {
+        # No action needed; this is the default case where no step is fatal
+    }
 
     foreach my $task ( $conf->steps ) {
+        my $red_flag;
+        my $step_name   = $task->step;
+        if ( scalar ( keys ( %steps_to_die_for ) ) ) {
+            if ( $steps_to_die_for{$step_name} ) {
+                $red_flag++;
+            }
+        }
+
         $n++;
         my $rv = $conf->_run_this_step(
             {
@@ -234,8 +261,49 @@ sub runsteps {
                 n            => $n,
             }
         );
+        if ( ! defined $rv ) {
+            if ( $red_flag ) {
+                return;
+            } else {
+                $conf->{log}->[$n] = {
+                    step    => $step_name,
+                };
+            }
+        }
     }
     return 1;
+}
+
+sub _handle_fatal_step_option {
+    my $conf = shift;
+    my ($fatal_step) = @_;
+    my %steps_to_die_for = ();
+    my $named_step_pattern =    qr/(?:init|inter|auto|gen)::[a-z]+/;
+    my $unit_step_pattern = qr/\d+|$named_step_pattern/;
+    if ( $fatal_step =~ /^
+        $unit_step_pattern
+        (, $unit_step_pattern)*
+        $/x
+    ) {
+        my @fatal_steps = split /,/, $fatal_step;
+        for my $s (@fatal_steps) {
+            if ($s =~ /^\d+$/) {
+                die "No configuration step corresponding to $fatal_step"
+                    unless defined $conf->{list_of_steps}->[$s - 1];
+                my $step_name = $conf->{list_of_steps}->[$s - 1];
+                if ($step_name =~ /$named_step_pattern/) {
+                    $steps_to_die_for{$step_name}++;
+                } else {
+                    die "Configuration step corresponding to $s is invalid";
+                }
+            } else {
+                $steps_to_die_for{$s}++;
+            }
+        }
+    } else {
+        die "Argument to 'fatal-step' option must be comma-delimited string of valid configuration steps or configuration step sequence numbers";
+    }
+    return %steps_to_die_for;
 }
 
 =item * C<run_single_step()>
@@ -252,7 +320,8 @@ sub run_single_step {
     my $conf     = shift;
     my $taskname = shift;
 
-    my ( $verbose, $verbose_step, $ask ) = $conf->options->get(qw( verbose verbose-step ask ));
+    my ( $verbose, $verbose_step, $ask ) =
+        $conf->options->get(qw( verbose verbose-step ask ));
 
     my $task = ( $conf->steps() )[0];
     if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
@@ -337,10 +406,11 @@ sub _run_this_step {
 
         # A Parrot configuration step can run successfully, but if it fails to
         # achieve its objective it is supposed to return an undefined status.
-        if ($ret) {
+        if ( $ret ) {
             _finish_printing_result(
                 {
                     step        => $step,
+                    step_name   => $step_name,
                     args        => $args,
                     description => $step->description,
                 }
@@ -360,8 +430,7 @@ sub _run_this_step {
                 );
             }
             return 1;
-        }
-        else {
+        } else {
             _failure_message( $step, $step_name );
             return;
         }

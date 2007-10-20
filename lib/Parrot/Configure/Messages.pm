@@ -29,8 +29,28 @@ END
 }
 
 sub print_conclusion {
+    my $conf = shift;
     my $make = shift;
-    print <<"END";
+    my @failed_steps = @{ $conf->{log} };
+    my @logged_failed_steps = ();
+    for (my $i = 1; $i <= $#failed_steps; $i++) {
+        if ( defined $failed_steps[$i] ) {
+            push @logged_failed_steps, [ $i, $conf->{log}->[$i] ];
+        }
+    }
+    if ( scalar ( @logged_failed_steps ) ) {
+        print "During configuration the following steps failed:\n";
+        foreach my $fail (@logged_failed_steps) {
+            my $msg = sprintf "    %02d:  %s\n", (
+                $fail->[0],
+                $fail->[1]->{step},
+            );
+            print $msg;
+        }
+        print "You should diagnose and fix these errors before calling '$make'\n";
+        return;
+    } else {
+        print <<"END";
 
 Okay, we're done!
 
@@ -41,7 +61,8 @@ Happy Hacking,
         The Parrot Team
 
 END
-    return 1;
+        return 1;
+    }
 }
 
 1;

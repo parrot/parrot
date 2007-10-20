@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use Carp;
-use Test::More tests => 10;
+use Test::More tests => 12;
 use lib qw( lib );
 use_ok(
     'Parrot::Configure::Messages', qw|
@@ -40,15 +40,41 @@ my $make_version   = 'gnu make';
 }
 
 {
-    my ( $tie, $rv, $msg );
+    my ( $tie, $rv, @lines, $msg );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
-    $rv = print_conclusion($make_version);
+    my $pseudo_conf = {
+        log => [],
+    };
+    $rv = print_conclusion($pseudo_conf, $make_version);
     ok( $rv, "print_conclusion() returned true" );
-    $msg = $tie->READLINE;
+    @lines = $tie->READLINE;
+    $msg = join("/n", @lines);
 
     # Following test is definitive.
     like( $msg, qr/$make_version/, "Message included make version supplied as argument" );
+
+    undef $tie;
+}
+
+{
+    my ( $tie, $rv, @lines, $msg );
+    $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
+        or croak "Unable to tie";
+    my $pseudo_conf = {
+        log => [
+            undef,
+            {   step    => q{init::manifest} },
+        ],
+    };
+    $rv = print_conclusion($pseudo_conf, $make_version);
+    ok(! defined $rv, "print_conclusion() returned undefined value" );
+    @lines = $tie->READLINE;
+    $msg = join("/n", @lines);
+
+    like( $msg,
+        qr/During configuration the following steps failed:.*init::manifest/s,
+        "Got expected message re configuration step failure" );
 
     undef $tie;
 }

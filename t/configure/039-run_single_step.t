@@ -1,16 +1,19 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 038-run_single_step.t
+# 039-run_single_step.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests =>  5;
 use Carp;
-use lib qw( lib );
+use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+
+$| = 1;
+is($|, 1, "output autoflush is set");
 
 my $args = process_options(
     {
@@ -24,12 +27,17 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $step = q{phony::step};
+my $step = q{init::zeta};
 $conf->add_step($step);
 $conf->options->set( %{$args} );
 
-eval { $conf->run_single_step($step); };
-like( $@, qr/Can't locate phony\/step\.pm in \@INC/, "Got expected error message" );
+eval {
+    $conf->run_single_step('init::omega');
+};
+like( $@,
+    qr/Mangled task in run_single_step/,
+    "Got expected error message"
+);
 
 pass("Completed all tests in $0");
 
@@ -37,11 +45,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-038-run_single_step.t - test C<run_single_step()> during configuration
+039-run_single_step.t - test C<run_single_step()> during configuration
 
 =head1 SYNOPSIS
 
-    % prove t/configure/038-run_single_step.t
+    % prove t/configure/039-run_single_step.t
 
 =head1 DESCRIPTION
 

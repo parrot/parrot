@@ -49,7 +49,8 @@ my $cwd = cwd();
 {
     my $tdir = tempdir();
     chdir $tdir or croak "Unable to change to tempdir";
-    copy( qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST} ) or croak "Unable to copy MANIFEST";
+    copy( qq{$cwd/MANIFEST}, qq{$tdir/MANIFEST} )
+        or croak "Unable to copy MANIFEST";
     {
         my $tie_err = tie *STDERR, "Parrot::IO::Capture::Mini"
             or croak "Unable to tie";

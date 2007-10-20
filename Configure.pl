@@ -44,6 +44,15 @@ changed.
 
 Run C<--verbose=2> for step number C<N> or matching description.
 
+=item C<--fatal>
+
+Tells Configure.pl to halt completely if any configuration step fails.
+
+=item C<--fatal-step={init::alpha,inter::beta,auto::gamma}>
+
+Tells Configure.pl to halt completely if any configuration step in
+comma-delimited string individually fails.
+
 =item C<--nomanicheck>
 
 Tells Configure.pl not to run the MANIFEST check.
@@ -343,9 +352,10 @@ $conf->runsteps or exit(1);
 # as command-line option
 $opttest->run_build_tests();
 
+my $make = $conf->data->get('make');
 # from Parrot::Configure::Messages
-print_conclusion( $conf->data->get('make') );
-exit(0);
+my $rv = print_conclusion( $conf, $make );
+exit($rv);
 
 ################### DOCUMENTATION ###################
 

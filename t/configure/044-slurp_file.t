@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 039-slurp_file.t
+# 044-slurp_file.t
 
 use strict;
 use warnings;
@@ -64,11 +64,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-039-slurp_file.t - test C<Parrot::BuildUtil::slurp_file()>
+044-slurp_file.t - test C<Parrot::BuildUtil::slurp_file()>
 
 =head1 SYNOPSIS
 
-    % prove t/configure/039-slurp_file.t
+    % prove t/configure/044-slurp_file.t
 
 =head1 DESCRIPTION
 

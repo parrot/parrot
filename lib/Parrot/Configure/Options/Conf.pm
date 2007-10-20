@@ -29,6 +29,8 @@ our @valid_options = qw{
     define
     exec-prefix
     execcapable
+    fatal
+    fatal-step
     floatval
     gc
     help
@@ -82,10 +84,10 @@ our $script         = q{Configure.pl};
 our $parrot_version = Parrot::BuildUtil::parrot_version();
 our $svnid          = '$Id$',
 
-    my %short_circuits = (
+my %short_circuits = (
     help    => \&print_help,
     version => \&print_version,
-    );
+);
 
 our %options_components = (
     'valid_options'  => \@valid_options,
@@ -122,6 +124,10 @@ General Options:
    --verbose=2          Output every setting change
    --verbose-step=N     Set verbose for step N only
    --verbose-step=regex Set verbose for step matching description
+   --fatal              Failure of any configuration step will cause
+                        Configure.pl to halt
+   --fatal-step         Comma-delimited string of configuration steps
+                        which upon failure cause Configure.pl to halt
    --nomanicheck        Don't check the MANIFEST
    --step=(gen::languages)
                         Execute a single configure step
