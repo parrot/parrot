@@ -23,36 +23,36 @@
 #  ifdef _MSC_VER
 #    define __attribute__deprecated__         __declspec(deprecated)
 #  else
-#    define __attribute__deprecated__           __attribute__((deprecated))
+#    define __attribute__deprecated__           __attribute__((__deprecated__))
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x,y,z)      __attribute__((format(x,y,z)))
+#  define __attribute__format__(x,y,z)      __attribute__((__format__(x,y,z)))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
 #endif
 #ifdef HASATTRIBUTE_NONNULL
-#  define __attribute__nonnull__(a)         __attribute__((nonnull(a)))
+#  define __attribute__nonnull__(a)         __attribute__((__nonnull__(a)))
 #endif
 #ifdef HASATTRIBUTE_NORETURN
 #  ifdef _MSC_VER
 #    define __attribute__noreturn__         __declspec(noreturn)
 #  else
-#    define __attribute__noreturn__           __attribute__((noreturn))
+#    define __attribute__noreturn__           __attribute__((__noreturn__))
 #  endif
 #endif
 #ifdef HASATTRIBUTE_PURE
-#  define __attribute__pure__               __attribute__((pure))
+#  define __attribute__pure__               __attribute__((__pure__))
 #endif
 #ifdef HASATTRIBUTE_CONST
-#  define __attribute__const__              __attribute__((const))
+#  define __attribute__const__              __attribute__((__const__))
 #endif
 #ifdef HASATTRIBUTE_UNUSED
-#  define __attribute__unused__             __attribute__((unused))
+#  define __attribute__unused__             __attribute__((__unused__))
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
-#  define __attribute__warn_unused_result__ __attribute__((warn_unused_result))
+#  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
 #endif
 
 /* If we haven't defined the attributes yet, define them to blank. */

@@ -12,9 +12,9 @@ __attribute__malloc__
 __attribute__noreturn__
 __attribute__warn_unused_result__
 __attribute__deprecated__
-int
-dummyfunc(int x)
-    __attribute__format__(1,2,3)
+void *
+dummyfunc(const char *my_format, ...)
+    __attribute__format__(printf,1,2)
     __attribute__nonnull__(1)
     ;
 
