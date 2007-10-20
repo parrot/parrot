@@ -61,9 +61,7 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static const char *
-nonnull_encoding_name(STRING *s);
-
+static const char * nonnull_encoding_name(STRING *s);
 /* HEADERIZER END: static */
 
 
