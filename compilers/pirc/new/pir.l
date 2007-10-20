@@ -80,7 +80,7 @@ typedef struct heredoc_info {
 
 /* data structure for managing included files */
 typedef struct file_info {
-   char *filename;
+   char const *filename;
    int line_nr;
    int line_pos;
    YY_BUFFER_STATE buffer;
@@ -114,14 +114,20 @@ typedef struct macro_info {
 
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
+    int                     parse_errors;
     struct file_info       *current_file;
     struct constant_info   *constant_defs;
     struct heredoc_info    *heredocs;
     struct macro_info      *macro_defs;
     char                   *after_heredoc;
-    YY_BUFFER_STATE         file_buffer;
-    int                     parse_errors;
-    int                     line_nr;
+
+    /* this is the exactly like the file_info structure
+     * Maybe use a file_info object for the main file too?
+     */
+    char const     *filename;
+    int             line_nr;
+    int             line_pos;
+    YY_BUFFER_STATE file_buffer;
 
 } lexer_state;
 
@@ -142,6 +148,10 @@ extern YY_DECL;
 #define YYERROR_DECL int yyerror(struct lexer_state *lexer, char *message)
 
 extern YYERROR_DECL;
+
+#define YYPARSE_DECL int yyparse(struct lexer_state *lexer)
+
+extern YYPARSE_DECL;
 
 /*
 
@@ -172,13 +182,16 @@ constructor for a lexer.
 
 */
 lexer_state *
-new_lexer(void) {
+new_lexer(char const *filename) {
     lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
     assert(lexer != NULL);
+    assert(filename != NULL);
+
     /*
     fprintf(stderr, "Constructing new lexer\n");
     */
-    lexer->line_nr = 1;
+    lexer->filename = filename;
+    lexer->line_nr  = 1;
     return lexer;
 }
 
@@ -205,6 +218,17 @@ parse_error(lexer_state *lexer) {
 int
 get_line_nr(lexer_state *lexer) {
     return lexer->line_nr;
+}
+
+/*
+
+Return the name of the current file being parsed.
+This can be an included file.
+
+*/
+char const *
+get_current_file(struct lexer_state *lexer) {
+    return lexer->filename;
 }
 
 /*
@@ -255,7 +279,9 @@ static void
 switch_to_file(lexer_state *lexer, file_info *info) {
 
     /* restore the buffer info */
-    /* TODO */
+
+    /* put back the line number */
+    lexer->line_nr = info->line_nr;
 
     /* delete the current buffer which points to a buffer for
      * the included file.
@@ -266,6 +292,7 @@ switch_to_file(lexer_state *lexer, file_info *info) {
 
     /* switch back to previous file */
     yy_switch_to_buffer(info->buffer);
+
 
     /* and free all resources of the file_info buffer */
 
@@ -433,10 +460,10 @@ define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
     constant_info *info = (constant_info *)malloc(sizeof (constant_info));
     assert(info != NULL);
     /* create the constant definition */
-    info->line_declared = 0; /* TODO */
-    info->name          = name;
-    info->value         = value;
-    info->token_type    = token_type;
+    info->line_declared = lexer->line_nr; /* store the line where it is defined */
+    info->name          = name;       /* store the name of this constant */
+    info->value         = value;      /* store the characters of this constant value */
+    info->token_type    = token_type; /* store token type of this constant */
 
     /* for now, just use linked list. Later we'll use a hash */
     info->next = lexer->constant_defs;
@@ -593,6 +620,10 @@ HEREDOC3       buffer      as HEREDOC1, but now when reading from a buffer
 
 SCANSTRING     buffer      used to scan the "rest of the line", which
                            was saved by HEREDOC1 and HEREDOC3.
+
+MACRO          file        used to read a macro definition.
+
+POD            file        used to skip POD comments.
 ===========================================================================
 
 
@@ -630,6 +661,7 @@ LINECOMMENT    [#].*\n
 %x HEREDOC2
 %x HEREDOC3
 %x SCANSTRING
+
 %x POD
 
 /* start state for macro scanning */
@@ -971,7 +1003,9 @@ LINECOMMENT    [#].*\n
 {BIN}             { return TK_INTC; }
 {OCT}             { return TK_INTC; }
 
-".include"   { int next_token, file_name_length;
+".include"   { int next_token; /* used to store next tokens from lexer */
+               int file_name_length;
+               unsigned char dummy; /* used to scan whitespace/'\n' of included file */
                FILE *incl_file_ptr   = NULL;
                char *incl_file_name  = NULL;
                file_info *file_state = NULL;
@@ -989,28 +1023,38 @@ LINECOMMENT    [#].*\n
                file_name_length = yyleng - 2;
                incl_file_name   = (char *)calloc(file_name_length + 1, sizeof (char));
 
-               /* copy current token's characters, skip first character */
+               assert(incl_file_name);
+
+               /* copy file name, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
 
                /* open the file */
 
-               /* fprintf(stderr, "Including file '%s'\n", incl_file_name);
-               */
+               /* fprintf(stderr, "Including file '%s'\n", incl_file_name); */
 
                incl_file_ptr = fopen(incl_file_name, "r");
+               /* check file */
+               if (incl_file_ptr == NULL) { /* opening file went wrong */
+                   yyerror(lexer, "Error including file");
+                   return 0;
+               }
 
                /* after an include statement a newline is expected */
                next_token = yylex(yylval, lexer);
-               if (next_token != TK_NL) {
-                   yyerror(lexer, "newline expected after \".include '<string>'\"\n");
+               if (next_token != 0) { /* if not end of file */
+                   if (next_token != TK_NL) { /* then it must be a newline */
+                       yyerror(lexer, "newline expected after \".include '<string>'\"\n");
+                   }
                }
 
                /* save current file info */
                file_state = (file_info *)malloc(sizeof (file_info));
+               assert(file_state != NULL);
+
                file_state->buffer   = YY_CURRENT_BUFFER;
-               file_state->filename = NULL; /* FIX */
+               file_state->filename = lexer->filename;
                file_state->line_pos = 0; /* FIX */
-               /* TODO HANDLE LINE NO */
+               file_state->line_nr  = lexer->line_nr;
                file_state->prev     = NULL; /* initialize to NULL */
 
                /* store the current file's info structure on the stack,
@@ -1019,16 +1063,23 @@ LINECOMMENT    [#].*\n
                push_file_info(lexer, file_state);
 
                /* a new file is being scanned, reset line number */
-               /* TODO RESET LINE NO */
+               lexer->line_nr  = 1;
+               /* set the name of the included file */
+               lexer->filename = incl_file_name;
 
-               if (incl_file_ptr == NULL) { /* opening file went wrong */
-                   fprintf(stderr, "Error including file '%s'\n", incl_file_name);
+
+
+               /* create a new buffer for the included file and switch to that file */
+               incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
+               yy_switch_to_buffer(incl_file_buffer);
+
+               /* the included file may contain whitespace and newlines; remove them */
+               dummy = input();
+               while (isspace(dummy) || dummy == '\n') {
+                   dummy = input();
                }
-               else {
-                   /* create a new buffer for the included file and switch to that file */
-                   incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
-                   yy_switch_to_buffer(incl_file_buffer);
-               }
+               unput(dummy);
+
              }
 
 ".constant"  { int next_token;
@@ -1044,7 +1095,8 @@ LINECOMMENT    [#].*\n
 
                /* ".endm" will only be recognized as a reserved word in MACRO state,
                 * but nevertheless, writing ".endm" to expand a constant is not good practice.
-                * Emit a warning.
+                * Emit a warning. This is true for all directives, but only ".endm" is
+                * not recognized in state INITIAL.
                 */
                if (strcmp(constant_id, "endm") == 0) {
                    fprintf(stderr, "Warning: 'endm' should not be used as a constant name, "
@@ -1100,7 +1152,9 @@ LINECOMMENT    [#].*\n
                       return TK_ENDM;
                     }
 
-<MACRO><<EOF>>      { yyerror(lexer, "macro definition not closed before end of file"); }
+<MACRO><<EOF>>      { yyerror(lexer, "macro definition not closed before end of file");
+                      yyterminate();
+                    }
 
 
 {WS}[.]{ALNUM}    { /* Check whether this token is a constant or a macro.
@@ -1165,16 +1219,17 @@ LINECOMMENT    [#].*\n
                   }
 
 
-
 <<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
                file_info *info = pop_file_info(lexer);
 
                if (info == NULL) {
-                   /* this was the initial file given to Parrot */
+                   /* this was the initial file given to Parrot, stop scanning. */
                    yyterminate();
+
                }
-               else { /* this file was included */
+               else { /* this file was included, switch back */
                    switch_to_file(lexer, info);
+                   return 0;
                }
             }
 

@@ -40,6 +40,7 @@ extern int yylex(YYSTYPE *yylval,
 
 
 
+
 /* enable debugging of generated parser */
 #define YYDEBUG         1
 
@@ -54,11 +55,20 @@ extern int yylex(YYSTYPE *yylval,
 %}
 
 
-%token TK_NL TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
+%token TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
+
+%token TK_EOF
+
+%token TK_NL "\n"
 
 %token TK_HLL TK_HLL_MAP TK_EMIT TK_EOM
        TK_N_OPERATORS TK_PRAGMA TK_LOADLIB
 
+/* TODO: decide whether this feature is useful: by declaring %tokens with their
+ * spelling, these spellings can be used in the grammar specification, making
+ * it more readable. However, when changing spellings/tokens, it should be done
+ * in 2 places: the lexer, and here.
+ */
 %token TK_SUB ".sub"
        TK_END ".end"
        TK_PARAM TK_LEX TK_LOCAL
@@ -120,7 +130,6 @@ extern int yylex(YYSTYPE *yylval,
 program: opt_nl
          compilation_units
          opt_nl
-
        ;
 
 opt_nl: /* empty */
@@ -181,9 +190,9 @@ namespace_id: TK_STRINGC
             | namespace_id separator TK_STRINGC
             ;
 
-/* Sub definition */
+/* Sub definition. TODO-DECIDE: Is the literal stuff in the grammar useful? */
 
-sub_definition: ".sub" sub_id sub_flags TK_NL
+sub_definition: ".sub" sub_id sub_flags "\n"
                 parameters
                 instructions
                 ".end"
@@ -658,7 +667,7 @@ main(int argc, char *argv[]) {
 
     /* yydebug = 1;
     */
-    lexer = new_lexer();
+    lexer = new_lexer(argv[0]);
     if (pre_process) {
         do_pre_process(lexer);
     }
@@ -681,19 +690,17 @@ main(int argc, char *argv[]) {
     return 0;
 }
 
+/*
 
+*/
 int
 yyerror(struct lexer_state *lexer, char *message) {
 
     parse_error(lexer);
 
+    fprintf(stderr, "\nError in file '%s' (line %d): %s at ['%s']\n\n",
+            get_current_file(lexer), get_line_nr(lexer), message, yytext);
 
-    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", get_line_nr(lexer), message, yytext);
-
-    /*
-    fprintf(stderr, "first_line: %d\nfirst_column: %d\nlast_line: %d\nlast_column: %d\n",
-            locp->first_line, locp->first_column, locp->last_line, locp->last_column);
-            */
     return 0;
 }
 
