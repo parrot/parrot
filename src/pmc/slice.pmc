@@ -54,6 +54,13 @@ set_slice_start(PARROT_INTERP, PMC *self, PMC *key, PMC *agg)
 {
     parrot_range_t *range = mem_allocate_typed(parrot_range_t);
 
+    /*
+     * when this PMC gets created with init(), this flag should get set if and
+     * only if there's a slice range allocated for it -- that is, if this
+     * function gets called
+     */
+    PObj_custom_mark_destroy_SETALL(self);
+
     PMC_struct_val(self)  = range;
 
 next_range:
@@ -206,13 +213,30 @@ pmclass Slice need_ext extends Key {
     }
 
     void mark() {
+        parrot_range_t *r = (parrot_range_t *)PMC_struct_val(SELF);
+
         if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj*) PMC_pmc_val(SELF));
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+
+        /*
+         * the pointer must not be null, or at the end of iteration and it must
+         * point to STRINGs.  Note that r->step is always the integer value 1.
+         */
+        if (r && r != -1 && r->type == enum_type_STRING) {
+            if (RVal_str(r->start))
+                pobject_lives(INTERP, (PObj *)RVal_str(r->start));
+            if (RVal_str(r->end))
+                pobject_lives(INTERP, (PObj *)RVal_str(r->end));
+            if (RVal_str(r->cur))
+                pobject_lives(INTERP, (PObj *)RVal_str(r->cur));
+        }
     }
 
     void init_pmc(PMC *key) {
         SELF.init();
-        /* that's actually the KEY_number_FLAG - but I can't hardly
+
+        /*
+         * that's actually the KEY_number_FLAG - but I can't hardly
          * imagine that we get keyed by FLOATVAL slices on
          * arrays
          */
