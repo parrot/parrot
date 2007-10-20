@@ -2072,7 +2072,7 @@ $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 
 tags: tags.dummy
 	$(RM_F) tags
-	@ctags@ \
+	ctags \
 		--links=no --totals \
 		-R --exclude=blib --exclude=.svn  \
 		--exclude=res_lea.c \
