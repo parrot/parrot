@@ -25,17 +25,18 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirparser.h"
 #include "pircompiler.h"
 
+/* forward declaration */
+
 
 struct lexer_state;
 
-extern int yyerror(YYLTYPE *locp,
-                   struct lexer_state *lexer,
+extern int yyerror(struct lexer_state *lexer,
                    char *message);
 
 
 extern int yylex(YYSTYPE *yylval,
-                 YYLTYPE *locp,
                  struct lexer_state *lexer);
+
 
 
 
@@ -45,6 +46,11 @@ extern int yylex(YYSTYPE *yylval,
 /* enable slightly more helpful error messages */
 #define YYERROR_VERBOSE 1
 
+/* HEADERIZER HFILE: compilers/pirc/new/pir.h */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
+
 %}
 
 
@@ -53,7 +59,9 @@ extern int yylex(YYSTYPE *yylval,
 %token TK_HLL TK_HLL_MAP TK_EMIT TK_EOM
        TK_N_OPERATORS TK_PRAGMA TK_LOADLIB
 
-%token TK_SUB TK_END TK_PARAM TK_LEX TK_LOCAL
+%token TK_SUB ".sub"
+       TK_END ".end"
+       TK_PARAM TK_LEX TK_LOCAL
        TK_NAMESPACE TK_ENDNAMESPACE
        TK_INVOCANT TK_METH_CALL TK_GLOBALCONST TK_CONST
        TK_RETURN TK_YIELD
@@ -88,6 +96,8 @@ extern int yylex(YYSTYPE *yylval,
 %token TK_FLAG_UNIQUE_REG TK_FLAG_NAMED TK_FLAG_SLURPY
        TK_FLAG_FLAT TK_FLAG_OPTIONAL TK_FLAG_OPT_FLAG
 
+
+
 %union {
     double dval;
     int    ival;
@@ -96,9 +106,6 @@ extern int yylex(YYSTYPE *yylval,
 
 /* a pure parser */
 %pure_parser
-
-/* have a location structure passed around */
-%locations
 
 %parse-param {struct lexer_state *lexer}
 %lex-param   {struct lexer_state *lexer}
@@ -131,11 +138,11 @@ compilation_unit: sub_definition
                 | hll_specifier
                 | hll_mapping
                 | loadlib
-                | pragma
+                | pir_pragma
                 ;
 
-pragma: TK_PRAGMA TK_N_OPERATORS TK_INTC
-      ;
+pir_pragma: TK_PRAGMA TK_N_OPERATORS TK_INTC
+          ;
 
 loadlib: TK_LOADLIB TK_STRINGC
        ;
@@ -176,10 +183,10 @@ namespace_id: TK_STRINGC
 
 /* Sub definition */
 
-sub_definition: TK_SUB sub_id sub_flags TK_NL
+sub_definition: ".sub" sub_id sub_flags TK_NL
                 parameters
                 instructions
-                TK_END
+                ".end"
                 ;
 
 sub_id: TK_IDENT
@@ -576,6 +583,32 @@ extern FILE *yyin; /* CAN WE KEEP USING THIS IN A PURE-PARSER? */
 /* the global buffer where the current token's characters are stored */
 extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
 
+
+#include <string.h>
+
+/*
+
+Pre-process the file only. Don't do any analysis.
+
+*/
+static void
+do_pre_process(struct lexer_state *lexer) {
+    int token;
+    YYSTYPE val;
+
+    do {
+        token = yylex(&val, lexer);
+        fprintf(stderr, "%s ", yytext);
+
+        /* if we just printed a newline character, the trailing space should be removed:
+         * do a carriage-return
+         */
+        if (strchr(yytext, '\n') != NULL)
+            fprintf(stderr, "\r");
+    }
+    while (token);
+}
+
 /*
  * Main compiler driver.
  */
@@ -584,48 +617,83 @@ main(int argc, char *argv[]) {
 
     struct lexer_state *lexer = NULL;
     int parse_errors;
+    int pre_process;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         exit(1);
     }
 
-    yyin = fopen(argv[1], "r");
+    /* skip program name */
+    argc--;
+    argv++;
+
+    /* very basic argument handling; I'm too lazy to check out
+     * the standard funtion for that, right now. This is a TODO. */
+    while (argc > 0 && argv[0][0] == '-') {
+        switch (argv[0][1]) {
+            case 'E':
+                pre_process = 1;
+                break;
+            default:
+                fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
+                break;
+        }
+        /* goto next command line argument */
+        argv++;
+        argc--;
+    }
+
+    if (argc < 1) {
+        fprintf(stderr, "No input file specified\n");
+        exit(1);
+    }
+
+    /* done handling arguments, open the file */
+    yyin = fopen(argv[0], "r");
     if (yyin == NULL) {
-        fprintf(stderr, "Failed to open file '%s'\n", argv[1]);
+        fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
         exit(1);
     }
 
     /* yydebug = 1;
     */
     lexer = new_lexer();
-    yyparse(lexer);
-    fclose(yyin);
-
-
-    parse_errors = get_parse_errors(lexer);
-
-    if (parse_errors == 0) {
-        fprintf(stderr, "Parse successful!\n");
+    if (pre_process) {
+        do_pre_process(lexer);
     }
     else {
-        fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" :
-                "was", parse_errors, parse_errors > 1 ? "errors" : "error");
+        yyparse(lexer);
+        parse_errors = get_parse_errors(lexer);
+
+        if (parse_errors == 0) {
+            fprintf(stderr, "Parse successful!\n");
+        }
+        else {
+            fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" :
+                    "was", parse_errors, parse_errors > 1 ? "errors" : "error");
+        }
     }
+
+    /* close file after processing */
+    fclose(yyin);
+
     return 0;
 }
 
 
 int
-yyerror(YYLTYPE *locp, struct lexer_state *lexer, char *message) {
+yyerror(struct lexer_state *lexer, char *message) {
 
     parse_error(lexer);
 
 
-    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", 42, message, yytext);
+    fprintf(stderr, "\nError (line %d): %s at ['%s']\n\n", get_line_nr(lexer), message, yytext);
 
+    /*
     fprintf(stderr, "first_line: %d\nfirst_column: %d\nlast_line: %d\nlast_column: %d\n",
             locp->first_line, locp->first_column, locp->last_line, locp->last_column);
+            */
     return 0;
 }
 
@@ -636,4 +704,5 @@ yyerror(YYLTYPE *locp, struct lexer_state *lexer, char *message) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 
