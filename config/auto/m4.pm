@@ -27,13 +27,18 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining whether GNU m4 is installed};
-    $data{args}        = [ qw(  ) ];
+    $data{args}        = [ qw( verbose ) ];
     $data{result}      = q{};
     return \%data;
 }
 
+our $verbose;
+
 sub runstep {
     my ( $self, $conf ) = @_;
+
+    $verbose = $conf->options->get( 'verbose' );
+    print $/ if $verbose;
 
     my $archname = $Config{archname};
     my ( $cpuarch, $osname ) = split( '-', $archname );
@@ -53,6 +58,7 @@ sub runstep {
 
         # This seems to work for GNU m4 1.4.2
         my $output = capture_output( 'm4', '--version' ) || '';
+        print $output, "\n" if $verbose;
         $has_gnu_m4 = ( $output =~ m/GNU\s+[mM]4/ ) ? 1 : 0;
     }
 
