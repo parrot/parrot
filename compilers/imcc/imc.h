@@ -75,7 +75,7 @@
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 
 PARROT_API
-void imc_cleanup(PARROT_INTERP, void *yyscanner)
+void imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -90,6 +90,7 @@ void imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 void imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
         __attribute__nonnull__(1);
 

@@ -23,7 +23,9 @@ static void imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
+
 /* HEADERIZER END: static */
 
 #define COMPILE_IMMEDIATE 1
@@ -87,7 +89,7 @@ imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
 PARROT_API
 void
-imc_cleanup(PARROT_INTERP, void *yyscanner)
+imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
 {
     IMCC_pop_parser_state(interp, yyscanner);
     clear_globals(interp);
@@ -99,6 +101,7 @@ imc_cleanup(PARROT_INTERP, void *yyscanner)
 /*
  * Create a new IMC_Unit.
  */
+PARROT_CANNOT_RETURN_NULL
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
@@ -113,7 +116,7 @@ imc_new_unit(IMC_Unit_Type t)
  * This sets the current state of the parser. The unit
  * can be closed later retaining all the current state.
  */
-
+PARROT_CANNOT_RETURN_NULL
 IMC_Unit *
 imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
