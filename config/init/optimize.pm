@@ -40,7 +40,8 @@ sub runstep {
     $verbose = $conf->options->get( 'verbose' );
     print $/ if $verbose;
 
-    print "(optimization options: init::optimize)\n";
+    print "(optimization options: init::optimize)\n"
+        if $verbose;
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.

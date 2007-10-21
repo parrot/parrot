@@ -146,7 +146,7 @@ is( $bad, 0,
     "With 'verbose', each element in array returned by trace_data_triggers() is hash ref" );
 
 my @state;
-ok( $state[0] = $obj->get_state_at_step(56), "get_state_at_step() returned true" );
+ok( $state[0] = $obj->get_state_at_step(57), "get_state_at_step() returned true" );
 ok( $state[1] = $obj->get_state_at_step('gen::makefiles'), "get_state_at_step() returned true" );
 is_deeply( $state[0], $state[1], "Numeric and string arguments gave same result" );
 
