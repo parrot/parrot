@@ -22,6 +22,7 @@ my @steps = qw(
     auto::backtrace
     auto::msvc
     auto::attributes
+    init::optimize
     inter::shlibs
     inter::libparrot
     inter::charset
@@ -38,7 +39,6 @@ my @steps = qw(
     auto::format
     auto::isreg
     auto::jit
-    init::optimize
     gen::cpu
     auto::funcptr
     auto::cgoto
