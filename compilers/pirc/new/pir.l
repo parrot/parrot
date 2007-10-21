@@ -89,7 +89,7 @@ typedef struct file_info {
 } file_info;
 
 
-/* data structure to store .constant definitions */
+/* data structure to store a .constant definition */
 typedef struct constant_info {
     int line_declared;  /* line where the constant was declared */
     int token_type;     /* token type of the value */
@@ -100,7 +100,7 @@ typedef struct constant_info {
 
 } constant_info;
 
-
+/* data structure to store a macro definition */
 typedef struct macro_info {
     int line_declared;
     char *name;
@@ -155,6 +155,12 @@ extern YYPARSE_DECL;
 
 /*
 
+Update the line number. The yytext buffer is scanned for '\n'
+characters; for each one, the line number is incremented. It's done this
+way, because we can't increment it in the rule for matching newlines, as
+a set of consecutive newlines are matched together and a single newline
+token is returned.
+
 */
 static void
 update_location(lexer_state *lexer) {
@@ -166,8 +172,6 @@ update_location(lexer_state *lexer) {
             lexer->line_nr++;
         iter++;
     }
-
-
 }
 
 /* after each rule execute update_location() */
@@ -190,8 +194,13 @@ new_lexer(char const *filename) {
     /*
     fprintf(stderr, "Constructing new lexer\n");
     */
-    lexer->filename = filename;
-    lexer->line_nr  = 1;
+    lexer->filename      = filename;
+    lexer->line_nr       = 1;
+    lexer->macro_defs    = NULL;
+    lexer->current_file  = NULL;
+    lexer->heredocs      = NULL;
+    lexer->after_heredoc = NULL;
+    lexer->constant_defs = NULL;
     return lexer;
 }
 
@@ -215,6 +224,11 @@ parse_error(lexer_state *lexer) {
     lexer->parse_errors++;
 }
 
+/*
+
+Get the line number of the current file.
+
+*/
 int
 get_line_nr(lexer_state *lexer) {
     return lexer->line_nr;
@@ -274,7 +288,15 @@ pop_file_info(lexer_state *lexer) {
     }
 }
 
+/*
 
+Switch the input buffer from which characters are read for the
+next tokens. After a call to this function, next tokens are
+read from the file represented by file_info *info.
+
+TODO: remove 2nd parameter, as lexer already contains it.
+
+*/
 static void
 switch_to_file(lexer_state *lexer, file_info *info) {
 
@@ -358,6 +380,19 @@ peek_heredoc(lexer_state *lexer) {
     return lexer->heredocs;
 }
 
+
+
+static macro_info *
+peek_macro(lexer_state *lexer) {
+    return lexer->macro_defs;
+}
+
+
+static void
+unshift_macro(lexer_state *lexer, macro_info *macro) {
+    macro->next = lexer->macro_defs;
+    lexer->macro_defs = macro;
+}
 
 /*
 
@@ -492,7 +527,24 @@ find_macro(lexer_state *lexer, char *name) {
     return NULL;
 }
 
+/*
 
+*/
+
+static macro_info *
+new_macro(char *name) {
+    macro_info *macro;
+    char *macro_id = strdup(yytext);
+    /* create a macro definition, store the macro ID in it */
+    macro = (macro_info *)malloc(sizeof (macro_info));
+    assert(macro != NULL);
+    macro->name = macro_id;
+    macro->next = NULL;
+    /* TODO: Fix macro body size */
+    macro->body = (char *)calloc(4096, sizeof (char));
+    assert(macro->body != NULL);
+    return macro;
+}
 /*
 
 =item static void read_macro(void)
@@ -510,14 +562,18 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
 
     /* check that there's a macro identifier token */
     if (next_token == TK_IDENT) {
-        fprintf(stderr, "Macro identifier: '%s'\n", yytext);
+        macro = new_macro(yytext);
+        /* put the macro definition onto a queue */
+        unshift_macro(lexer, macro);
+
+        /* and get next token */
+        next_token = yylex(yylval, lexer);
     }
     else { /* error! */
         yyerror(lexer, "macro identifier expected after '.macro'");
     }
 
     /* read macro parameters, if any */
-    next_token = yylex(yylval, lexer);
 
     if (next_token == '(') { /* there are parameters! */
         int expect_parameter = 0;
@@ -525,6 +581,9 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
         /* get next token after opening parenthesis */
         next_token = yylex(yylval, lexer);
 
+        /* try parsing parameters while we don't see the closing parenthesis
+         * or if we still expect a parameter (which means we just read a comma.
+         */
         while (next_token != ')' || expect_parameter) {
             if (next_token == TK_IDENT) {
                 /* handle parameter */
@@ -533,9 +592,9 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
 
                 /* clear flag */
                 expect_parameter = 0;
-                /* TODO: try to recover error */
             }
             else {
+                /* TODO: try to recover error */
                 yyerror(lexer, "macro parameter identifier expected");
             }
 
@@ -567,30 +626,72 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
         yyerror(lexer, "newline expected after macro parameter list.");
     }
 
-    /* TODO: read macro body */
     next_token = yylex(yylval, lexer);
-    while (next_token == TK_NL) {
+    /* scan the body of the macro, while we don't see the ".endm" marker,
+     * and we don't encounter end of file (= 0). TODO: Check value of <<EOF>> Not sure if this is portable.
+     */
+    while ((next_token != TK_ENDM) && (next_token != 0)) {
+        /* always add a space character to separate the tokens */
+        strcat(macro->body, " ");
+        /* add current token to macro's buffer */
+        strcat(macro->body, yytext);
+        /* and get the next token of the macro body */
         next_token = yylex(yylval, lexer);
     }
 
-    /* END TODO */
-
-    /* macros should be closed with ".endm" */
-    if (next_token != TK_ENDM) {
+    /* check for macro delimiter */
+    if (next_token == TK_ENDM) {
+        next_token = yylex(yylval, lexer);
+    }
+    else { /* error! */
         yyerror(lexer, "'.endm' expected to close macro definition.");
     }
 
+
     /* after ".endm" a newline is expected */
-    next_token = yylex(yylval, lexer);
     if (next_token != TK_NL) {
         yyerror(lexer, "newline expected after '.endm'");
     }
 
-    /* fill macro structure */
-    macro = (macro_info *)malloc(sizeof (macro_info));
-    macro->name = strdup(yytext);
+
 }
 
+
+/*
+
+Create a unique label identifier.
+TODO: If we want unique local vars in macros, use this function too and
+rename it to make_unique_id or what-ever.
+
+*/
+static char *
+make_label(char *macro_name, char *label_name) {
+    /* format of the generated label */
+
+    /* TODO: the final character is special in IMCC ("$"). Is this enough
+     * to make labels unique, and not definable by the user? (you could define
+     * a label like "label__xxx__xxx__X:"... Fix this.
+     */
+
+    char const * const label_format = "label__%s__%s__X:";
+
+    int format_length = strlen(label_format);
+    int m_name_length = strlen(macro_name);
+    int l_name_length = strlen(label_name);
+    /* create a buffer to hold the new unique label, which contains
+     * the label format, the current macro's name and the declared label ID.
+     */
+    char *label = (char *)calloc(m_name_length + format_length + l_name_length, sizeof (char));
+    assert(label != NULL);
+    /*
+    fprintf(stderr, "making label '%s' for macro '%s'\n", label_name, macro_name);
+    */
+    sprintf(label, label_format, macro_name, label_name);
+
+    fprintf(stderr, "Made label '%s'\n", label);
+
+    return label;
+}
 
 /*
 
@@ -621,14 +722,17 @@ HEREDOC3       buffer      as HEREDOC1, but now when reading from a buffer
 SCANSTRING     buffer      used to scan the "rest of the line", which
                            was saved by HEREDOC1 and HEREDOC3.
 
-MACRO          file        used to read a macro definition.
+MACRODEF       file        used to read a macro definition.
 
 POD            file        used to skip POD comments.
 ===========================================================================
 
 
+
+
 */
 
+#define MAX_IDENT_LENGTH 64
 
 %}
 
@@ -638,6 +742,11 @@ DIGITS         {DIGIT}+
 ALNUM          {ALPHA}|{DIGIT}
 
 IDENT          {ALPHA}{ALNUM}*
+
+PREG           "P"{DIGITS}
+NREG           "N"{DIGITS}
+SREG           "S"{DIGITS}
+IREG           "I"{DIGITS}
 
 DOT            [.]
 HEX            0[xX][0-9A-Fa-f]+
@@ -662,12 +771,14 @@ LINECOMMENT    [#].*\n
 %x HEREDOC3
 %x SCANSTRING
 
+/* start state for scanning POD comments */
 %x POD
 
-/* start state for macro scanning */
-%x MACRO
-
-
+/* start state for macro definition. This is an inclusive state,
+ * meaning that all rules without start state are also active.
+ * In other words, new rules are "added" for this context.
+ */
+%s MACRODEF
 
 
 /* support pushing/popping of start states */
@@ -683,6 +794,67 @@ LINECOMMENT    [#].*\n
 
 
 %%
+
+
+".macro"     {  /* macro definition */
+
+                /* enable macro rules, using the (inclusive) state MACRODEF */
+                yy_push_state(MACRODEF);
+                read_macro(yylval, lexer);
+             }
+
+<MACRODEF>".endm"         { /* end of macro definition */ ;
+                            yy_pop_state();
+                            return TK_ENDM;
+                          }
+
+<MACRODEF>"$"{IDENT}":"   { /* unique label */
+                            return TK_LABEL;
+                          }
+
+<MACRODEF>"$"{IDENT}      { /* unique identifier */
+                            /* NEW FEATURE! TODO */
+                            return TK_IDENT;
+                          }
+
+<MACRODEF>".$"{IDENT}     { /* expansion of a declared label, as in "goto .$foo" */
+                            macro_info *current_macro = peek_macro(lexer);
+                            /* Labels are formatted as ".$foo", so skip the 2 ".$" characters. */
+                            char *label = make_label(current_macro->name, yytext + 2);
+                            yytext = label;
+                            return TK_IDENT; /* jump targets are label, which are identifiers */
+                          }
+
+<MACRODEF>".label"{WS}+   {  /* scan: '.label $foo:' */
+                             int token;
+                             /* get the label identifier */
+                             token = yylex(yylval, lexer);
+
+                             if (token == TK_LABEL) {
+                                 macro_info *current_macro = peek_macro(lexer);
+                                 char *label = NULL;
+                                 chop_yytext(); /* remove the last character, which is a ":" */
+
+                                 /* skip the leading "$" of the label: */
+                                 label = make_label(current_macro->name, yytext + 1);
+
+                                 /* make the label available to the parser (read_macro() in this case) */
+                                 yytext = label; /* TODO use %union? */
+                                 return TK_LABEL;
+                             }
+                             else { /* error */
+                                 yyerror(lexer, "label identifier expected");
+                                 yyterminate(); /* do we want to stop here? TODO: error recovery */
+                             }
+
+                          }
+
+
+<MACRODEF><<EOF>>      { yyerror(lexer, "macro definition not closed before end of file");
+                         yy_pop_state(); /* <<EOF>> is handled by the unlabeled (INITIAL) state. */
+                       }
+
+
 
 
 
@@ -781,7 +953,7 @@ LINECOMMENT    [#].*\n
                         free(lexer->after_heredoc);
                      }
                      lexer->after_heredoc = strdup(yytext);
-                     /* continue scanning the file */
+                     /* continue scanning the file for the heredoc strings */
                      BEGIN(HEREDOC2);
                }
 
@@ -813,7 +985,7 @@ LINECOMMENT    [#].*\n
 
 <HEREDOC2>.*   {  /* get the heredoc delimiter */
                   heredoc_info *heredoc = shift_heredoc(lexer);
-                  /* remove newline character from current token's characters */
+                  /* remove newline character from current token's characters TODO: is this necessary?? */
                   chop_yytext();
 
                   /* if the current token's characters equals the heredoc
@@ -824,12 +996,14 @@ LINECOMMENT    [#].*\n
                        * we will first continue scanning the "after_heredoc" buffer.
                        */
                       BEGIN(SCANSTRING);
-                      /* save the current buffer */
+                      /* save the current (file) buffer */
                       lexer->file_buffer = YY_CURRENT_BUFFER;
                       /* and go scanning the "rest of the line" after the <<STRINGC heredoc IDs */
                       yy_scan_string(lexer->after_heredoc);
 
-                      /* return the complete heredoc as a string constant */
+                      /* As we just finished reading the heredoc (we found the delimiter),
+                       * return the token representing a string constant.
+                       */
                       /* yylval.sval = heredoc->contents;
                       */
                       return TK_STRINGC;
@@ -888,17 +1062,14 @@ LINECOMMENT    [#].*\n
 "~"         { return '~'; }
 "-"         { return '-'; }
 
-<INITIAL,MACRO>"("                { return '('; }
-<INITIAL,MACRO,SCANSTRING>")"     { return ')'; }
-<INITIAL,MACRO,SCANSTRING>","     { return ','; }
+<INITIAL,MACRODEF>"("                { return '('; }
+<INITIAL,MACRODEF,SCANSTRING>")"     { return ')'; }
+<INITIAL,MACRODEF,SCANSTRING>","     { return ','; }
 
 "["         { return '['; }
 "]"         { return ']'; }
 
-{WS}"."{WS} { /* if the dot is surrounded by whitespace, it's a concatenation operator */
-              return TK_CONC;
-            }
-"."         { return '.'; }
+
 "="         { return '='; }
 ";"         { return ';'; }
 
@@ -984,18 +1155,27 @@ LINECOMMENT    [#].*\n
                return TK_STRINGC;
              }
 
-"P"{DIGIT}+  { return TK_PASM_PREG; }
-"S"{DIGIT}+  { return TK_PASM_SREG; }
-"N"{DIGIT}+  { return TK_PASM_NREG; }
-"I"{DIGIT}+  { return TK_PASM_IREG; }
+{PREG}       { return TK_PASM_PREG; }
+{SREG}       { return TK_PASM_SREG; }
+{NREG}       { return TK_PASM_NREG; }
+{IREG}       { return TK_PASM_IREG; }
 
-"$P"{DIGIT}+  { return TK_SYM_PREG; }
-"$S"{DIGIT}+  { return TK_SYM_SREG; }
-"$N"{DIGIT}+  { return TK_SYM_NREG; }
-"$I"{DIGIT}+  { return TK_SYM_IREG; }
+"$"{PREG}    { return TK_SYM_PREG; }
+"$"{SREG}    { return TK_SYM_SREG; }
+"$"{NREG}    { return TK_SYM_NREG; }
+"$"{IREG}    { return TK_SYM_IREG; }
 
-{ALPHA}{ALNUM}*":"    { return TK_LABEL; }
-{ALPHA}{ALNUM}*       { return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
+{IDENT}*":"    { return TK_LABEL; }
+
+{IDENT}*       { /* check whether the identifier is the name of an instruction */
+                 if (strlen(yytext) > MAX_IDENT_LENGTH) {
+                    fprintf(stderr, "Warning: identifier '%s' exceeds maximum identifier length."
+                            "Only the first %d characters will be used.\n", yytext, MAX_IDENT_LENGTH);
+                 }
+                 /* copy only the first MAX_IDENT_LENGTH characters */
+
+                 return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT;
+               }
 
 
 {FLOATNUM}        { return TK_NUMC; }
@@ -1024,7 +1204,7 @@ LINECOMMENT    [#].*\n
                file_name_length = yyleng - 2;
                incl_file_name   = (char *)calloc(file_name_length + 1, sizeof (char));
 
-               assert(incl_file_name);
+               assert(incl_file_name != NULL);
 
                /* copy file name, skip first character */
                strncpy(incl_file_name, yytext + 1, file_name_length);
@@ -1132,28 +1312,15 @@ LINECOMMENT    [#].*\n
 
              }
 
-".macro"            {  /* macro definition */
-                       yy_push_state(MACRO);
-                       read_macro(yylval, lexer);
-                    }
-
-<MACRO>{EOL}        { return TK_NL; }
-
-<MACRO>{WS}         { /* should we ignore?? */ }
-
-<MACRO>{IDENT}      { return TK_IDENT; }
-
-<MACRO>".endm"      { /* end of macro definition */ ;
-                      yy_pop_state();
-                      return TK_ENDM;
-                    }
-
-<MACRO><<EOF>>      { yyerror(lexer, "macro definition not closed before end of file");
-                      yyterminate();
-                    }
 
 
-{WS}[.]{ALNUM}    { /* Check whether this token is a constant or a macro.
+
+{DOT}{IDENT}    {
+                    /* TODO: prefixing this rule with {WS} doesn't work, because then macro expansions
+                     * can't be parsed, like .foo (having defined a macro "foo").
+                     *
+                     */
+                    /* Check whether this token is a constant or a macro.
                      * Note that there must be whitespace before the dot, otherwise
                      * in "x.y", ".y" is matched, which is wrong.
                      */
@@ -1173,7 +1340,8 @@ LINECOMMENT    [#].*\n
                     /* give the name of the constant, skipping the whitespace prefix,
                      * and skip the prefix dot.
                      */
-                    constant = find_constant(lexer, yytext + num_spaces + 1);
+                    fprintf(stderr, "finding constant '%s'...", yytext + num_spaces);
+                    constant = find_constant(lexer, yytext + num_spaces);
 
                     if (constant != NULL) { /* found the constant */
                         fprintf(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
@@ -1187,24 +1355,29 @@ LINECOMMENT    [#].*\n
                     }
                     else { /* not found, try macro */
                         macro_info *macro = NULL;
-
-                        macro = find_macro(lexer, yytext + num_spaces + 1);
+                        fprintf(stderr, "finding macro '%s'...",yytext+num_spaces);
+                        macro = find_macro(lexer, yytext + num_spaces);
 
                         if (macro != NULL) {
 
                             /* TODO: how do we know how big a buffer we need? IMCC defines fixed size of 4KB. */
-                            char *expansion_buffer = (char *)calloc(1, sizeof (char));
+                            /* TODO: Fix this, for now just 4K will do */
+                            char *expansion_buffer = (char *)calloc(4096, sizeof (char));
 
-                            /* read input for parameters */
-
-                            /* expand the macro into a string buffer */
+                            assert(expansion_buffer != NULL);
+                            fprintf(stderr, "found macro, buffer:\n[%s]\n", macro->body);
+                            /* read input for arguments */
 
                             /* and scan that string buffer. */
-                            YY_BUFFER_STATE state = yy_scan_string(expansion_buffer);
-                            yy_delete_buffer(state);
+                            lexer->file_buffer = YY_CURRENT_BUFFER;
+                            YY_BUFFER_STATE state = yy_scan_string(macro->body);
 
-                            /* free the buffer */
+
+                            /* D'Oh!! Don't delete this here!! Do it if <SCANSTRING><<EOF>>. */
+                            /*
+                            yy_delete_buffer(state);
                             free(expansion_buffer);
+                            */
                         }
                         else {
                             /* not found, this is an unknown constant or macro. */
@@ -1213,6 +1386,11 @@ LINECOMMENT    [#].*\n
                     }
 
                   }
+
+{WS}"."{WS} { /* if the dot is surrounded by whitespace, it's a concatenation operator */
+              return TK_CONC;
+            }
+"."         { fprintf(stderr, "DOT!\n"); return '.'; }
 
 
 <<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
@@ -1245,6 +1423,13 @@ yywrap() {
     return 1;
 }
 
+/*
+
+Check whether the specified text is a parrot op.
+This function is a dummy for now.
+TODO: replace this by Parrot's "is_op" (see IMCC).
+
+*/
 static int
 is_parrot_op(char *spelling) {
 
