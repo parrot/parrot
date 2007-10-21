@@ -56,6 +56,7 @@ my @steps = qw(
     auto::perldoc
     auto::python
     auto::m4
+    auto::ctags
     auto::cpu
     gen::icu
     gen::revision
