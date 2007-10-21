@@ -112,6 +112,7 @@ typedef struct lexer_state {
 
 
 /* remove defines, and put them literally in the code */
+/* somehow, doing so seems to break things. */
 #define current_file  lexer->current_file
 #define constant_defs lexer->constant_defs
 #define heredocs      lexer->heredocs
@@ -146,7 +147,10 @@ new_lexer(char *filename) {
     lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
     lexer->filename = filename;
     lexer->line_nr  = 1;
+
+    /*
     fprintf(stderr, "Constructing new lexer\n");
+    */
     return lexer;
 }
 
@@ -170,11 +174,17 @@ parse_error(lexer_state *lexer) {
     lexer->parse_errors++;
 }
 
+/*
+
+*/
 int
 get_line_nr(lexer_state *lexer) {
     return lexer->line_nr;
 }
 
+/*
+
+*/
 char const *
 get_current_file(lexer_state *lexer) {
     return lexer->filename;
@@ -415,13 +425,15 @@ unshift_macro(lexer_state *lexer, macro_info *macro) {
 
 static macro_info *
 new_macro(char *name) {
-    macro_info *macro;
+    macro_info *macro = NULL;
     char *macro_id = strdup(yytext);
+
     /* create a macro definition, store the macro ID in it */
     macro = (macro_info *)malloc(sizeof (macro_info));
     assert(macro != NULL);
     macro->name = macro_id;
     macro->next = NULL;
+
     /* TODO: Fix macro body size */
     macro->body = (char *)calloc(4096, sizeof (char));
     assert(macro->body != NULL);
@@ -489,7 +501,7 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
                 expect_parameter = 1;
             }
             else { /* no more parameters expected */
-                break;
+                break; /* the while loop */
             }
         }
 
@@ -602,6 +614,10 @@ HEREDOC3       buffer      as HEREDOC1, but now when reading from a buffer
 
 SCANSTRING     buffer      used to scan the "rest of the line", which
                            was saved by HEREDOC1 and HEREDOC3.
+
+POD            file        used to skip POD comments.
+
+MACRODEF       file        used to scan a macro definition.
 ===========================================================================
 
 
@@ -1050,8 +1066,9 @@ LINECOMMENT    [#].*\n
                /* get next token containing name of file being included */
                next_token = yylex(yylval, lexer);
 
-               /* check that it's a string, if not return to parser. */
+               /* check that it's a string */
                if (next_token != TK_STRINGC) {
+                   yyerror(lexer, "string expected after '.include' directive.");
                    return next_token;
                }
 
@@ -1085,7 +1102,7 @@ LINECOMMENT    [#].*\n
                assert(file_state != NULL);
 
                file_state->buffer   = YY_CURRENT_BUFFER;
-               file_state->filename = lexer->filename; /* FIX */
+               file_state->filename = lexer->filename;
                file_state->line_pos = 0; /* FIX */
                file_state->line_nr  = lexer->line_nr;
                file_state->prev     = NULL; /* initialize to NULL */
@@ -1095,6 +1112,9 @@ LINECOMMENT    [#].*\n
                 */
                push_file_info(lexer, file_state);
 
+               /* replace the above with this, to make this block shorter.
+               save_file_state(YY_CURRENT_BUFFER, lexer->file_name, lexer->line_nr);
+               */
                /* a new file is being scanned, reset line number */
                lexer->line_nr  = 1;
                lexer->filename = incl_file_name;
@@ -1208,8 +1228,10 @@ LINECOMMENT    [#].*\n
                         if (macro != NULL) {
 
                             /* read input for parameters */
+                            /* TODO */
 
                             /* expand the macro into a string buffer */
+                            /* is expanding necessary? */
 
                             file_buffer = YY_CURRENT_BUFFER;
                             /* and scan that string buffer. */
@@ -1218,6 +1240,9 @@ LINECOMMENT    [#].*\n
                         }
                         else {
                             /* not found, this is an unknown constant or macro. */
+                            /* TODO: probably return a dot, so that the "NOTE" above is solved.
+                            Check this.
+                            */
                             yyerror(lexer, "Undefined constant or macro");
                         }
                     }
