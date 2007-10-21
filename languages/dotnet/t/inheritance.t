@@ -156,6 +156,9 @@ PIR
 42
 OUTPUT
 
+## Clean up.
+unlink qw(t.dll t.pbc);
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

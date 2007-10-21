@@ -104,8 +104,7 @@ PIR
 OUTPUT
 
 ## Clean up.
-unlink "t.dll";
-unlink "t.pbc";
+unlink qw(t.dll t.pbc);
 
 # Local Variables:
 #   mode: cperl
