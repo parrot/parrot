@@ -133,7 +133,8 @@ chomp(@tests);
 
 if ( ! $do_gen_html ) {
     Test::Harness::runtests(@tests);
-} else {
+}
+else {
     my @smoke_config_vars = qw(
       osname
       archname
