@@ -25,8 +25,6 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirparser.h"
 #include "pircompiler.h"
 
-/* forward declaration */
-
 
 struct lexer_state;
 
@@ -39,39 +37,21 @@ extern int yylex(YYSTYPE *yylval,
 
 
 
-
-
 /* enable debugging of generated parser */
 #define YYDEBUG         1
 
 /* enable slightly more helpful error messages */
 #define YYERROR_VERBOSE 1
 
-/* HEADERIZER HFILE: compilers/pirc/new/pir.h */
-/* HEADERIZER BEGIN: static */
-/* HEADERIZER HFILE: none */
-/* HEADERIZER STOP */
-
 %}
 
 
-%token TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
-
-%token TK_EOF TK_PCC_SUB
-
-%token TK_NL "\n"
+%token TK_NL TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
 
 %token TK_HLL TK_HLL_MAP TK_EMIT TK_EOM
        TK_N_OPERATORS TK_PRAGMA TK_LOADLIB
 
-/* TODO: decide whether this feature is useful: by declaring %tokens with their
- * spelling, these spellings can be used in the grammar specification, making
- * it more readable. However, when changing spellings/tokens, it should be done
- * in 2 places: the lexer, and here.
- */
-%token TK_SUB ".sub"
-       TK_END ".end"
-       TK_PARAM TK_LEX TK_LOCAL
+%token TK_SUB TK_END TK_PARAM TK_LEX TK_LOCAL
        TK_NAMESPACE TK_ENDNAMESPACE
        TK_INVOCANT TK_METH_CALL TK_GLOBALCONST TK_CONST
        TK_RETURN TK_YIELD
@@ -106,8 +86,6 @@ extern int yylex(YYSTYPE *yylval,
 %token TK_FLAG_UNIQUE_REG TK_FLAG_NAMED TK_FLAG_SLURPY
        TK_FLAG_FLAT TK_FLAG_OPTIONAL TK_FLAG_OPT_FLAG
 
-
-
 %union {
     double dval;
     int    ival;
@@ -116,6 +94,8 @@ extern int yylex(YYSTYPE *yylval,
 
 /* a pure parser */
 %pure_parser
+
+%output="pirparser.c"
 
 %parse-param {struct lexer_state *lexer}
 %lex-param   {struct lexer_state *lexer}
@@ -130,6 +110,7 @@ extern int yylex(YYSTYPE *yylval,
 program: opt_nl
          compilation_units
          opt_nl
+
        ;
 
 opt_nl: /* empty */
@@ -151,7 +132,7 @@ compilation_unit: sub_definition
                 ;
 
 pir_pragma: TK_PRAGMA TK_N_OPERATORS TK_INTC
-          ;
+      ;
 
 loadlib: TK_LOADLIB TK_STRINGC
        ;
@@ -176,14 +157,10 @@ pasm_instructions: /* empty */
                  | pasm_instructions pasm_instruction
                  ;
 
-pasm_instruction: pasm_label TK_NL
-                | pasm_label TK_PARROT_OP TK_NL
+pasm_instruction: TK_LABEL TK_NL
+                | TK_LABEL TK_PARROT_OP TK_NL
                 | TK_PARROT_OP TK_NL
                 ;
-
-pasm_label: TK_LABEL
-          | TK_PCC_SUB sub_flags TK_LABEL
-          ;
 
 /* Namespaces */
 namespace_declaration: TK_NAMESPACE
@@ -194,12 +171,12 @@ namespace_id: TK_STRINGC
             | namespace_id separator TK_STRINGC
             ;
 
-/* Sub definition. TODO-DECIDE: Is the literal stuff in the grammar useful? */
+/* Sub definition */
 
-sub_definition: ".sub" sub_id sub_flags "\n"
+sub_definition: TK_SUB sub_id sub_flags TK_NL
                 parameters
                 instructions
-                ".end"
+                TK_END
                 ;
 
 sub_id: TK_IDENT
@@ -600,8 +577,8 @@ extern FILE *yyin; /* CAN WE KEEP USING THIS IN A PURE-PARSER? */
 /* the global buffer where the current token's characters are stored */
 extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
 
-
 #include <string.h>
+#include <assert.h>
 
 /*
 
@@ -680,11 +657,14 @@ main(int argc, char *argv[]) {
     }
 
     lexer = new_lexer(argv[0]);
+    assert(lexer != NULL);
+
     if (pre_process) {
         do_pre_process(lexer);
     }
     else {
         yyparse(lexer);
+
         parse_errors = get_parse_errors(lexer);
 
         if (parse_errors == 0) {
@@ -708,9 +688,10 @@ main(int argc, char *argv[]) {
 int
 yyerror(struct lexer_state *lexer, char *message) {
 
+    /* increment parse errors in the lexer structure */
     parse_error(lexer);
-
-    fprintf(stderr, "\nError in file '%s' (line %d): %s at ['%s']\n\n",
+    /* emit an error */
+    fprintf(stderr, "\nError in file '%s' (line %d): %s ('%s')\n\n",
             get_current_file(lexer), get_line_nr(lexer), message, yytext);
 
     return 0;
@@ -723,5 +704,4 @@ yyerror(struct lexer_state *lexer, char *message) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
 
