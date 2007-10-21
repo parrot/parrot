@@ -37,31 +37,40 @@ void
 mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
 {
     PObj *obj;
-    int i;
+    int   i;
 
     mark_stack(interp, ctx->user_stack);
     mark_register_stack(interp, ctx->reg_stack);
-    obj = (PObj*)ctx->current_sub;
+
+    obj = (PObj *)ctx->current_sub;
     if (obj)
         pobject_lives(interp, obj);
-    obj = (PObj*)ctx->current_object;
+
+    obj = (PObj *)ctx->current_object;
     if (obj)
         pobject_lives(interp, obj);
+
     /* the current continuation in the interpreter has
      * to be marked too in the call sequence currently
      * as e.g. a MMD search could need resources
      * and GC the continuation
      */
-    obj = (PObj*)interp->current_cont;
-    if (obj && obj != (PObj*)NEED_CONTINUATION)
+    obj = (PObj *)interp->current_cont;
+    if (obj && obj != (PObj *)NEED_CONTINUATION)
         pobject_lives(interp, obj);
-    obj = (PObj*)ctx->current_cont;
+
+    obj = (PObj *)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
         pobject_lives(interp, obj);
-    obj = (PObj*)ctx->current_namespace;
+
+    if (ctx->caller_ctx)
+        mark_context(interp, ctx->caller_ctx);
+
+    obj = (PObj *)ctx->current_namespace;
     if (obj)
         pobject_lives(interp, obj);
-    obj = (PObj*)ctx->lex_pad;
+
+    obj = (PObj *)ctx->lex_pad;
     if (obj)
         pobject_lives(interp, obj);
 
@@ -69,12 +78,13 @@ mark_context(PARROT_INTERP, NOTNULL(parrot_context_t* ctx))
         return;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
-        obj = (PObj*) CTX_REG_PMC(ctx, i);
+        obj = (PObj *)CTX_REG_PMC(ctx, i);
         if (obj)
             pobject_lives(interp, obj);
     }
+
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        obj = (PObj*) CTX_REG_STR(ctx, i);
+        obj = (PObj *)CTX_REG_STR(ctx, i);
         if (obj)
             pobject_lives(interp, obj);
     }
