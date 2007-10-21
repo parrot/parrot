@@ -66,7 +66,7 @@ sub runstep {
 
 1;
 
-=head AUTHOR
+=head1 AUTHOR
 
 Paul Cochrane <paultcochrane at gmail dot com>
 
