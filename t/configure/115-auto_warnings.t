@@ -1,17 +1,14 @@
-#!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+#! perl
+# Copyright (C) 2007, The Perl Foundation.
 # $Id$
+# 115-auto_warnings.t
 
 use strict;
 use warnings;
-
 use Test::More;
-use Carp;
 use Cwd;
-use File::Temp 0.13 qw/ tempdir /;
-use IO::Handle;
+use Carp;
 use lib qw( lib );
-use Parrot::IO::Capture::Mini;
 
 if ( $^O eq 'MSWin32' ) {
     plan( skip_all => 'Not yet tested on Win32');
@@ -22,11 +19,7 @@ else {
 
 use_ok('Parrot::Configure');
 use_ok('Parrot::Configure::Step');
-use_ok('auto::warnings');
-
-#Parrot::Configure::Step->import(@Parrot::Configure::Step::EXPORT_OK);
-
-#can_ok( __PACKAGE__, @Parrot::Configure::Step::EXPORT_OK );
+use_ok('config::auto::warnings');
 
 my $step = 'dummy';
 
@@ -48,21 +41,25 @@ $warning = "-Wall";
 
 =head1 NAME
 
-t/configure/040_warnings_sniff.t - tests Parrot::Configure::Step::auto::warnings
+115-auto_warnings.t - test config::auto::warnings
 
 =head1 SYNOPSIS
 
-    prove t/configure/040_warnings_sniff.t
+    % prove t/configure/115-auto_warnings.t
 
 =head1 DESCRIPTION
 
-Regression tests for the L<Parrot::Configure::Step::auto::warnings> module.
-This file holds tests for Parrot::Configure::Step::auto::warnings::try_warning()
-(a non-exported subroutine).
+The files in this directory test functionality used by F<Configure.pl>.
+
+The tests in this file test subroutines exported by config::auto::warnings.
 
 =head1 AUTHOR
 
 Paul Cochrane <paultcochrane at gmail dot com>
+
+=head1 SEE ALSO
+
+config::auto::warnings, F<Configure.pl>.
 
 =cut
 
