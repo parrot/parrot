@@ -10,7 +10,9 @@ use Win32;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my ( $cc, $ccflags, $libs ) = $conf->data->get(qw(cc ccflags libs));
+    my $libs      = $conf->option_or_data('libs');
+    my $ccflags   = $conf->option_or_data('ccflags');
+    my $cc        = $conf->option_or_data('cc');
 
     # Later in the Parrot::Configure::RunSteps->runsteps process,
     # inter/progs.pl will merge the command-line overrides with the defaults.
@@ -104,7 +106,7 @@ sub runstep {
 
         # We can't use -opt: and -debug together.
         if ( $conf->data->get('ld_debug') =~ /-debug/ ) {
-            my $linkflags = $conf->data->get('linkflags');
+            my $linkflags = $conf->option_or_data('linkflags');
             $linkflags =~ s/-opt:\S+//;
             $conf->data->set( linkflags => $linkflags );
         }
@@ -144,7 +146,7 @@ sub runstep {
 
         # We can't use -opt: and -debug together.
         if ( $conf->data->get('ld_debug') =~ /-debug/ ) {
-            my $linkflags = $conf->data->get('linkflags');
+            my $linkflags = $conf->option_or_data('linkflags');
             $linkflags =~ s/-opt:\S+//;
             $conf->data->set( linkflags => $linkflags );
         }
