@@ -39,7 +39,7 @@ sub print_conclusion {
         }
     }
     if ( scalar ( @logged_failed_steps ) ) {
-        print "During configuration the following steps failed:\n";
+        print "\nDuring configuration the following steps failed:\n";
         foreach my $fail (@logged_failed_steps) {
             my $msg = sprintf "    %02d:  %s\n", (
                 $fail->[0],

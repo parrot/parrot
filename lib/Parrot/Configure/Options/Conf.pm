@@ -129,8 +129,6 @@ General Options:
    --fatal-step         Comma-delimited string of configuration steps
                         which upon failure cause Configure.pl to halt
    --nomanicheck        Don't check the MANIFEST
-   --step=(gen::languages)
-                        Execute a single configure step
    --languages="list of languages"
                         Specify a list of languages to process
 
