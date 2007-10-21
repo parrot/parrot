@@ -32,8 +32,15 @@ sub _init {
     return \%data;
 }
 
+our $verbose;
+
 sub runstep {
     my ( $self, $conf ) = @_;
+
+    $verbose = $conf->options->get( 'verbose' );
+    print $/ if $verbose;
+
+    print "(optimization options: init::optimize)\n";
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.
@@ -50,8 +57,11 @@ sub runstep {
             # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
             # RT#43151 do we know compiler (version) already?
             my $opts = $Config{optimize};
+            my $cpuarch = $conf->data->get( 'cpuarch' );
+            print "cpuarch: ", $cpuarch, "\n" if $verbose;
             $opts =~ s/-mcpu=\S+//;
             $conf->data->add( ' ', ccflags => $opts );
+            print "opts: ", $opts, "\n" if $verbose;
 
             # record what optimization was enabled
             $conf->data->set( optimize => $opts );
