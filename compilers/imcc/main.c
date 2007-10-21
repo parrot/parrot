@@ -297,6 +297,8 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     SET_CORE(PARROT_JIT_CORE);
 #endif
                 }
+                else if (!strcmp(opt.opt_arg, "gcdebug"))
+                    SET_CORE(PARROT_GC_DEBUG_CORE);
                 else
                     real_exception(interp, NULL, 1,
                             "main: Unrecognized runcore '%s' specified."

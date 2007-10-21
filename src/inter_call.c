@@ -522,6 +522,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, NOTNULL(call_state *st))
             VTABLE_push_pmc(interp, slurped, UVal_pmc(st->val));
         }
         UVal_pmc(st->val) = slurped;
+        dod_register_pmc(interp, slurped);
     }
     else {
         Parrot_fetch_arg(interp, st);
@@ -547,6 +548,7 @@ convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))
             PMC * const d = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, d, UVal_int(st->val));
             UVal_pmc(st->val) = d;
+            dod_register_pmc(interp, d);
             }
             break;
     }
@@ -567,6 +569,7 @@ convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))
             PMC * const d = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
             VTABLE_set_number_native(interp, d, UVal_num(st->val));
             UVal_pmc(st->val) = d;
+            dod_register_pmc(interp, d);
             }
             break;
     }
@@ -587,6 +590,7 @@ convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))
             PMC * const d = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
             VTABLE_set_string_native(interp, d, UVal_str(st->val));
             UVal_pmc(st->val) = d;
+            dod_register_pmc(interp, d);
             }
             break;
     }

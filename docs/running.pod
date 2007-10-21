@@ -150,6 +150,8 @@ Select the runcore. The following cores are available:
   switch-jit    switch core with JIT
   exec          exec core (uses JIT at compile time to generate native code)
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+  gcdebug       performs a full GC run before every op dispatch (good for
+                debugging GC problems)
 
 =item -b, --bounds-checks, --slow-core
 

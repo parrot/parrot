@@ -369,10 +369,11 @@ get_op_lib_init(PARROT_INTERP, int core_op, int which, NULLOK(PMC *lib))
                 init_func = PARROT_CORE_CG_OPLIB_INIT;
                 break;
 #endif
-            case PARROT_EXEC_CORE:      /* normal func core */
+            case PARROT_EXEC_CORE:     /* normal func core */
             case PARROT_JIT_CORE:      /* normal func core */
-            case PARROT_SLOW_CORE:      /* normal func core */
-            case PARROT_FAST_CORE:      /* normal func core */
+            case PARROT_SLOW_CORE:     /* normal func core */
+            case PARROT_FAST_CORE:     /* normal func core */
+            case PARROT_GC_DEBUG_CORE: /* normal func core */
                 init_func = PARROT_CORE_OPLIB_INIT;
                 break;
             default:
@@ -843,6 +844,9 @@ runops_int(PARROT_INTERP, size_t offset)
                         "but interpreter is not EXEC_CAPABLE!\n");
 #endif
                 core = runops_exec;
+                break;
+            case PARROT_GC_DEBUG_CORE:
+                core = runops_gc_debug_core;
                 break;
             default:
                 real_exception(interp, NULL, UNIMPLEMENTED,
