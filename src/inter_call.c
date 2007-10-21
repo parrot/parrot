@@ -1052,7 +1052,7 @@ Parrot_process_args(PARROT_INTERP, NOTNULL(call_state *st), arg_pass_t param_or_
         dod_unregister_pmc(interp, array);
     }
 
-    /* is there another argument? if we're thowing errors, that's an error */
+    /* is there another argument? if we're throwing errors, that's an error */
     if (err_check && Parrot_fetch_arg(interp, st) && !st->name && !(dest->sig & PARROT_ARG_NAME))
         too_many(interp, st, action);
 

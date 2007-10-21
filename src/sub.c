@@ -237,7 +237,7 @@ new_ret_continuation_pmc(PARROT_INTERP, NULLOK(opcode_t *address))
 
 =item C<invalidate_retc_context>
 
-Make true Continuation from all RetContinuations up the call chain.
+Make true Continuations from all RetContinuations up the call chain.
 
 =cut
 

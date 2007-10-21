@@ -35,7 +35,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'continuations preserve bsr/ret state.' );
 ## Here is a trace of execution, keyed by labels.
 ##   L1:  bsr to rtn1
-## rtn1:  create a continuation that directs us to L6, and (we expect) captures
+## rtn1:  create a continuation that directs us to L6, and (we expect)
 ##        captures the whole dynamic state, including the return address to L3.
 ##   L3:  return back to main
 ##   L4:  if we're here the first time, call rtn2

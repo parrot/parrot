@@ -64,7 +64,7 @@ Initializes the continuation.
         /* PANIC("don't do that"); */
         /*
          * Whenever we create a continuation, all return continuations
-         * up the call chain maybe reused due to invoking the
+         * up the call chain may be reused due to invoking the
          * continuation. To avoid that all return continuations are
          * converted to true continuations.
          */
