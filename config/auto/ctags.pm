@@ -42,7 +42,7 @@ sub runstep {
     $verbose = $conf->options->get( 'verbose' );
     print $/ if $verbose;
 
-    my @ctags_variations = qw( ctags exuberant-ctags ctags-exuberant );
+    my @ctags_variations = qw( ctags exuberant-ctags ctags-exuberant exctags );
     for my $ctags ( @ctags_variations ) {
         my $output = capture_output( $ctags, '--version' ) || '';
         print $output, "\n" if $verbose;
