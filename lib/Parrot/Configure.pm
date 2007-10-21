@@ -254,11 +254,11 @@ sub runsteps {
         $n++;
         my $rv = $conf->_run_this_step(
             {
-                task         => $task,
-                verbose      => $verbose,
-                verbose_step => $verbose_step,
-                ask          => $ask,
-                n            => $n,
+                task            => $task,
+                verbose         => $verbose,
+                verbose_step    => $verbose_step,
+                ask             => $ask,
+                n               => $n,
             }
         );
         if ( ! defined $rv ) {
@@ -327,11 +327,11 @@ sub run_single_step {
     if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
         $conf->_run_this_step(
             {
-                task         => $task,
-                verbose      => $verbose,
-                verbose_step => $verbose_step,
-                ask          => $ask,
-                n            => 1,
+                task            => $task,
+                verbose         => $verbose,
+                verbose_step    => $verbose_step,
+                ask             => $ask,
+                n               => 1,
             }
         );
     }
@@ -387,7 +387,6 @@ sub _run_this_step {
     print "\n" if $args->{verbose} && $args->{verbose} == 2;
 
     my $ret;
-
     # When successful, a Parrot configuration step now returns 1
     eval {
         if (@step_params)
@@ -403,7 +402,6 @@ sub _run_this_step {
         return;
     }
     else {
-
         # A Parrot configuration step can run successfully, but if it fails to
         # achieve its objective it is supposed to return an undefined status.
         if ( $ret ) {
@@ -415,17 +413,15 @@ sub _run_this_step {
                     description => $step->description,
                 }
             );
-
             # reset verbose value for the next step
             $conf->options->set( verbose => $args->{verbose} );
-
-            if ( $conf->options->get(q{configure_trace}) ) {
+            if ($conf->options->get(q{configure_trace}) ) {
                 _update_conftrace(
                     {
-                        conftrace => $conftrace,
-                        step_name => $step_name,
-                        conf      => $conf,
-                        sto       => $sto,
+                        conftrace   => $conftrace,
+                        step_name   => $step_name,
+                        conf        => $conf,
+                        sto         => $sto,
                     }
                 );
             }
@@ -443,14 +439,15 @@ sub _failure_message {
     carp "\nstep $step_name failed: " . $result;
 }
 
+
 sub _finish_printing_result {
     my $argsref = shift;
     my $result = $argsref->{step}->result || 'done';
     if ( $argsref->{args}->{verbose} && $argsref->{args}->{verbose} == 2 ) {
         print "...";
     }
-    print "." x ( 71 - length( $argsref->{description} ) - length($result) );
-    unless ( $argsref->{step} =~ m{^inter/} && $argsref->{args}->{ask} ) {
+    print "." x ( 71 - length($argsref->{description}) - length($result) );
+    unless ( $argsref->{step_name} =~ m{^inter} && $argsref->{args}->{ask} ) {
         print "$result.";
     }
     return 1;
@@ -458,7 +455,7 @@ sub _finish_printing_result {
 
 sub _update_conftrace {
     my $argsref = shift;
-    if ( !defined $argsref->{conftrace}->[0] ) {
+    if (! defined $argsref->{conftrace}->[0]) {
         $argsref->{conftrace}->[0] = [];
     }
     push @{ $argsref->{conftrace}->[0] }, $argsref->{step_name};
