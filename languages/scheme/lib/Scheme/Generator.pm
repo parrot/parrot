@@ -1284,7 +1284,7 @@ sub _op_times {
     my $num_args = _get_num_args( $node );
 
     if ( $num_args == 0 ) {
-        $return = $self->_constant(0);
+        $return = $self->_constant(1);
     }
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( $node->{children}[1] );

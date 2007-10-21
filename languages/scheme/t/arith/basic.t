@@ -72,7 +72,7 @@ CODE
 ### Multiply
 ###
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (*)' );
+language_output_is( 'Scheme', <<'CODE', 1, 'neutral element of multiplication' );
 (write (*))
 CODE
 
