@@ -132,13 +132,20 @@ sub _restore_set {
     return;
 }
 
-sub _check_num_arg {
+sub _check_num_args {
     my ( $node, $expected, $name ) = @_;
 
     my $num_args = _get_num_args( $node );
 
-    confess "$name: Wrong number of arguments (expected $expected, got $num_args).\n"
-        unless $num_args == $expected;
+    if ( my ( $min ) = $expected =~ m/ \A \s* >= \s* (\d+) /xms ) {
+        my $plural = $min == 1 ? q{} : 's';
+        confess "$name: expects at least $min argument$plural, given $num_args\n"
+            unless $num_args >= $min;
+    }
+    else {
+        confess "$name: Wrong number of arguments (expected $expected, got $num_args).\n"
+            unless $num_args == $expected;
+    }
 }
 
 sub _get_num_args {
@@ -298,7 +305,7 @@ sub __quoted {
                 if ( exists $arg0->{value} ) {
                     my $value = $arg0->{value};
                     if ( exists $special->{$value} ) {
-                        _check_num_arg( $_, 1 );
+                        _check_num_args( $_, 1 );
                         $special->{$value}->( $self, _get_arg( $_, 1 ), $return );
                         next;
                     }
@@ -325,7 +332,7 @@ sub _op_quote {
 
     my $return = $self->_save_1('P');
 
-    _check_num_arg( $node, 1, 'quote' );
+    _check_num_args( $node, 1, 'quote' );
 
     my $item = _get_arg( $node, 1 );
 
@@ -341,7 +348,7 @@ sub _op_quasiquote {
         'unquote-splicing' => \&_qq_unquote_splicing
     };
 
-    _check_num_arg( $node, 1, 'quote' );
+    _check_num_args( $node, 1, 'quote' );
 
     my $item = _get_arg( $node, 1 );
 
@@ -514,7 +521,7 @@ sub _op_define {
 
     $self->_add_comment( 'start of _op_define()' );
 
-    _check_num_arg( $node, 2, 'define' );
+    _check_num_args( $node, 2, 'define' );
 
     my ( $symbol, $lambda );
 
@@ -556,7 +563,7 @@ sub _op_define {
 sub _op_set_bang {
     my ( $self, $node ) = @_;
 
-    _check_num_arg( $node, 2, 'set!' );
+    _check_num_args( $node, 2, 'set!' );
 
     my $symbol = _get_arg( $node, 1 )->{value};
     my $temp = $self->_generate( _get_arg( $node, 2 ) );
@@ -646,7 +653,7 @@ sub _op_let {
     my ( $locals, @body ) = _get_args( $node, 1 );
     my ( @variables, @values );
     for ( @{ $locals->{children} } ) {
-        _check_num_arg( $_, 1, 'let locals' );
+        _check_num_args( $_, 1, 'let locals' );
         my ( $var, $val ) = _get_args( $_, 0 );
         push @variables, $var;
         push @values,    $val;
@@ -727,7 +734,7 @@ sub _op_pair_p {
 
     my $label = $self->_gensym();
 
-    _check_num_arg( $node, 1, 'pair?' );
+    _check_num_args( $node, 1, 'pair?' );
 
     my $item = $self->_generate( _get_arg( $node, 1 ) );
 
@@ -758,7 +765,7 @@ sub _op_cons {
 
     my $return;
 
-    _check_num_arg( $node, 2, 'cons' );
+    _check_num_args( $node, 2, 'cons' );
 
     my $car = $self->_generate( _get_arg( $node, 1 ) );
     $return = $self->_save_1('P');
@@ -778,7 +785,7 @@ sub _op_cons {
 sub _op_car {
     my ( $self, $node ) = @_;
 
-    _check_num_arg( $node, 1, 'car' );
+    _check_num_args( $node, 1, 'car' );
 
     my $return = $self->_generate( _get_arg( $node, 1 ) );
     die "car: Element not pair\n" unless $return =~ /^P/;
@@ -790,7 +797,7 @@ sub _op_car {
 sub _op_cdr {
     my ( $self, $node ) = @_;
 
-    _check_num_arg( $node, 1, 'cdr' );
+    _check_num_args( $node, 1, 'cdr' );
 
     my $return = $self->_generate( _get_arg( $node, 1 ) );
     die "cdr: Element not pair\n" unless $return =~ /^P/;
@@ -802,7 +809,7 @@ sub _op_cdr {
 sub _op_set_car_bang {
     my ( $self, $node ) = @_;
 
-    _check_num_arg( $node, 2, 'set-car!' );
+    _check_num_args( $node, 2, 'set-car!' );
 
     my $return = $self->_generate( _get_arg( $node, 1 ) );
     die "set-car!: Element not pair\n" unless $return =~ /^P/;
@@ -816,7 +823,7 @@ sub _op_set_car_bang {
 sub _op_set_cdr_bang {
     my ( $self, $node ) = @_;
 
-    _check_num_arg( $node, 2, 'set-cdr!' );
+    _check_num_args( $node, 2, 'set-cdr!' );
 
     my $return = $self->_generate( _get_arg( $node, 1 ) );
     die "set-cdr!: Element not pair\n" unless $return =~ /^P/;
@@ -836,7 +843,7 @@ sub _op_null_p {
     my $temp_s = $self->_save_1('S');
     my $label  = $self->_gensym();
 
-    _check_num_arg( $node, 1, 'null?' );
+    _check_num_args( $node, 1, 'null?' );
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'typeof', [ $temp_s, $temp ] );
@@ -888,7 +895,7 @@ sub _op_length {
     my $label  = $self->_gensym();
     my $return = $self->_save_1('I');
 
-    _check_num_arg( $node, 1, 'length' );
+    _check_num_args( $node, 1, 'length' );
 
     my $list = $self->_generate( _get_arg( $node, 1 ) );
 
@@ -1235,13 +1242,12 @@ sub _op_minus {
 
     $self->_add_comment( 'start of _op_minus' );
 
+    _check_num_args( $node, '>= 1', '-' );
+
     my $return;
     my $num_args = _get_num_args( $node );
 
-    if ( $num_args == 0 ) {
-        $return = $self->_constant(0);
-    }
-    elsif ( $num_args == 1 ) {
+    if ( $num_args == 1 ) {
         $return = $self->_generate( $node->{children}[1] );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
@@ -1616,7 +1622,7 @@ sub _op_procedure_p {
 
     my $return;
 
-    _check_num_arg( $node, 1, 'procedure?' );
+    _check_num_args( $node, 1, 'procedure?' );
 
     $return = $self->_constant(0);
 
@@ -1764,7 +1770,7 @@ sub _op_newline {
 
     $self->_add_comment( 'start of _op_newline' );
 
-    _check_num_arg( $node, 0, 'newline' );
+    _check_num_args( $node, 0, 'newline' );
 
     return $self->_generate(
         { children => [ { value => 'display' },
