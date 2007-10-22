@@ -240,7 +240,7 @@ Returns the number of elements in the array as a Parrot string. (??? -leo)
 =item C<STRING *get_repr()>
 
 Returns a string representation of the array contents.
-TODO implement freeze/thaw and use that instead.
+RT#46673 implement freeze/thaw and use that instead.
 
 =cut
 
@@ -540,7 +540,7 @@ C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* TODO: autovivify an Array and insert it in SELF */
+            /* RT#46675: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, DYNSELF.type());
 
@@ -629,7 +629,7 @@ Sets the PMC at index C<key> to C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* TODO: autovivify an Array and insert it in SELF */
+            /* RT#46675: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, DYNSELF.type());
 
@@ -808,8 +808,6 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 /*
 
 =back
-
-=head1 TODO
 
 =head1 SEE ALSO
 

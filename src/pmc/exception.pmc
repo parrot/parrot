@@ -262,7 +262,7 @@ Compare the passed in Exception with SELF. Returns True if C<SELF> isa C<value>
     INTVAL is_equal(PMC *value) {
         if (value->vtable->base_type == enum_class_Exception ||
                 VTABLE_isa(INTERP, value, const_string(INTERP, "Exception"))) {
-            /* TODO check parents */
+            /* RT#46689 check parents */
             return 1;
         }
 
@@ -279,7 +279,7 @@ These methods are silently ignored.
 
 */
     PMC *shift_pmc() {
-        /* fprintf(stderr, "don't do that then\n"); XXX */
+        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
         return PMCNULL;
     }
 
@@ -299,7 +299,7 @@ These methods are silently ignored.
     }
 
     void unshift_pmc(PMC *value) {
-        /* fprintf(stderr, "don't do that then\n"); XXX */
+        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
     }
 
     void unshift_float(FLOATVAL value) {
@@ -315,7 +315,7 @@ These methods are silently ignored.
     }
 
     void push_pmc(PMC *value) {
-        /* fprintf(stderr, "don't do that then\n"); XXX */
+        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
     }
 
     void push_float(FLOATVAL value) {
@@ -331,7 +331,7 @@ These methods are silently ignored.
     }
 
     PMC *pop_pmc() {
-        /* fprintf(stderr, "don't do that then\n"); XXX */
+        /* fprintf(stderr, "don't do that then\n"); RT#46691 */
         return PMCNULL;
     }
 

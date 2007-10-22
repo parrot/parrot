@@ -86,7 +86,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
     /* the quick hack below cannot be used because the string could
        be constructed in an interpreter that is later destroyed */
 #if  0
-    /* XXX
+    /* RT#46659
      * a quick hack, to prevent freeing that string during DOD
      * triggered in t/pmc/pmc_62.t when configured with --gc=libc
      */
@@ -106,7 +106,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
         const INTVAL on = VTABLE_get_bool(interp, value);
 
         /* morph to Const/normal class or readonly class */
-        /* XXX warn when this fails? */
+        /* RT#46661 warn when this fails? */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
             pmc->vtable = interp->vtables[pmc->vtable->base_type + 1];
         else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG)))
@@ -380,7 +380,7 @@ Sets the property for C<*key> to C<*value>.
         else {
             PMC * const prop = make_prop_hash(INTERP, SELF);
 
-            /* XXX is this too late for --gc-debug? */
+            /* RT#46663 is this too late for --gc-debug? */
             VTABLE_set_pmc_keyed_str(INTERP, prop, key, value);
         }
     }
@@ -916,7 +916,7 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     INTVAL isa_pmc(PMC *lookup) {
-        /* TODO FIXME - walk mro */
+        /* RT#46665 - walk mro */
         return does_isa(INTERP, VTABLE_get_string(INTERP, lookup),
                 SELF->vtable->isa_str);
     }
@@ -934,7 +934,7 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     INTVAL isa(STRING *_class) {
-        /* TODO FIXME - walk mro */
+        /* RT#46665 - walk mro */
         return does_isa(INTERP, _class, SELF->vtable->isa_str);
     }
 
@@ -978,7 +978,7 @@ Look for NCI methods and properties.
         PMC *p = NULL;
 
         /* let's look for props first
-         * XXX do we need that in the default object system?
+         * RT#46667 do we need that in the default object system?
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
              const HashBucket * const b =
@@ -993,7 +993,7 @@ Look for NCI methods and properties.
             p = VTABLE_find_method(INTERP, SELF, name);
 
         if (PMC_IS_NULL(p)) {
-            /* TODO AttributeError */
+            /* RT#46669 AttributeError */
         }
         else if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
             PMC * const bound_meth = VTABLE_clone(INTERP, p);
@@ -1011,7 +1011,7 @@ Look for NCI methods and properties.
             return bound_meth;
         }
 
-        /* TODO bound user functions */
+        /* RT#46671 bound user functions */
         return p;
     }
 

@@ -151,7 +151,7 @@ Invokes the first subroutine in the eval code.
          * These globals still exist, calling them will segfault
          * as the segment is destroyed now.
          *
-         * TODO walk the fixups for this segment, locate globals
+         * RT#46683 walk the fixups for this segment, locate globals
          *      and nullify the Sub PMC.
          * This probably needs a pointer into the globals.
          *
@@ -175,7 +175,7 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
-        /* TODO create PF API, move it there */
+        /* RT#46685 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
@@ -346,7 +346,7 @@ Unarchives the code.
         pf->directory.num_segments = 0;
 
         /*
-         * XXX this isn't ok - it seems that the packfile
+         * RT#46687 this isn't ok - it seems that the packfile
          *     gets attached to interp->code and is
          *     destroyed again during interpreter destruction
          */

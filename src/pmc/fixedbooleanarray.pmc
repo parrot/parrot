@@ -25,7 +25,7 @@ PMC>.
 
 
 /*
- * TODO merge this with functions from BigInt PMC
+ * RT#46677 merge this with functions from BigInt PMC
  */
 
 #define BITS_PER_CHAR 8
