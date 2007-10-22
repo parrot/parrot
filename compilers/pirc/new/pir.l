@@ -42,6 +42,18 @@ Major issues are:
 #include "pircompiler.h"
 
 
+/* keep MSVC happy */
+#ifndef YY_MAIN
+#  define YY_MAIN 0
+#endif
+
+/* kee MSVC happy */
+#ifndef YY_ALWAYS_INTERACTIVE
+#  define YY_ALWAYS_INTERACTIVE 0
+#endif
+
+
+
 /* Parrot can check out whether the specified text is the name of an op.
  * We define a dummy function for now; replace this later.
  */
@@ -157,12 +169,17 @@ token is returned.
 static void
 update_location(lexer_state * const lexer) {
     char const *iter = yytext;
-    assert(lexer);
+    assert(lexer != NULL);
 
     /* TODO: is yytext NULL terminated? */
     while (*iter != '\0') {
-        if (*iter == '\n')
-            lexer->line_nr++;
+        if (*iter == '\n') {
+            ++lexer->line_nr;
+            lexer->line_pos = 1; /* reset column */
+        }
+        else {
+            ++lexer->line_pos;
+        }
         iter++;
     }
 }
@@ -183,7 +200,6 @@ dupstr(char const * const source) {
 }
 
 /* after each rule execute update_location() */
-
 #define YY_USER_ACTION update_location(lexer);
 
 /*
@@ -197,6 +213,7 @@ new_lexer(char *filename) {
     assert(lexer != NULL);
     lexer->filename      = filename;
     lexer->line_nr       = 1;
+    lexer->line_pos      = 1;
     lexer->heredocs      = NULL;
     lexer->macro_defs    = NULL;
     lexer->after_heredoc = NULL;
@@ -658,6 +675,17 @@ make_label(char const * const macro_name, char const * const label_name) {
     fprintf(stderr, "Made label '%s'\n", label);
 
     return label;
+}
+
+/*
+
+This is a function to keep MSVC happy. Instead of assigning the
+expression YY_CURRENT_BUFFER to some variable directly, use this function.
+
+*/
+static YY_BUFFER_STATE
+get_current_buffer(void) {
+    return YY_CURRENT_BUFFER;
 }
 
 
@@ -1303,10 +1331,13 @@ LINECOMMENT    [#].*\n
                             /* expand the macro into a string buffer */
                             /* is expanding necessary? */
 
-                            lexer->file_buffer = YY_CURRENT_BUFFER;
+                            lexer->file_buffer = get_current_buffer();
                             /* and scan that string buffer. */
-                            YY_BUFFER_STATE state = yy_scan_string(macro->body);
+
                             /* todo: destroy state afterwards */
+                            /*YY_BUFFER_STATE state = */
+                            yy_scan_string(macro->body);
+
                         }
                         else {
                             /* not found, this must be some input like "foo .bar" (as a sub call).

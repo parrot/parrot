@@ -43,6 +43,19 @@ extern int yylex(YYSTYPE * const yylval,
 /* enable slightly more helpful error messages */
 #define YYERROR_VERBOSE 1
 
+/* keep MSVC happy */
+#ifndef YYENABLE_NLS
+#  define YYENABLE_NLS 0
+#endif
+
+/* keep MSVC happy */
+#ifndef YYLTYPE_IS_TRIVIAL
+#  define YYLTYPE_IS_TRIVIAL 0
+#endif
+
+
+
+
 %}
 
 
@@ -604,7 +617,7 @@ do_pre_process(struct lexer_state *lexer) {
         if (strchr(yytext, '\n') != NULL)
             fprintf(stderr, "\r");
     }
-    while (token);
+    while (token > 0);
 }
 
 /*
@@ -660,6 +673,7 @@ main(int argc, char *argv[]) {
 
         /* done handling arguments, open the file */
         yyin = fopen(argv[0], "r");
+
         if (yyin == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
             exit(EXIT_FAILURE);

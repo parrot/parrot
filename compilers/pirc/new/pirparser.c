@@ -328,6 +328,19 @@ extern int yylex(YYSTYPE * const yylval,
 /* enable slightly more helpful error messages */
 #define YYERROR_VERBOSE 1
 
+/* keep MSVC happy */
+#ifndef YYENABLE_NLS
+#  define YYENABLE_NLS 0
+#endif
+
+/* keep MSVC happy */
+#ifndef YYLTYPE_IS_TRIVIAL
+#  define YYLTYPE_IS_TRIVIAL 0
+#endif
+
+
+
+
 
 
 /* Enabling traces.  */
@@ -350,14 +363,14 @@ extern int yylex(YYSTYPE * const yylval,
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 89 "pir.y"
+#line 102 "pir.y"
 {
     double dval;
     int    ival;
     char  *sval;
 }
 /* Line 187 of yacc.c.  */
-#line 361 "pirparser.c"
+#line 374 "pirparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -370,7 +383,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 374 "pirparser.c"
+#line 387 "pirparser.c"
 
 #ifdef short
 # undef short
@@ -752,31 +765,31 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   112,   112,   118,   119,   122,   123,   126,   127,   128,
-     129,   130,   131,   132,   133,   136,   139,   144,   147,   152,
-     158,   159,   162,   163,   164,   168,   169,   172,   173,   178,
-     184,   185,   188,   189,   192,   193,   194,   195,   196,   197,
-     198,   199,   200,   201,   202,   206,   207,   210,   211,   212,
-     213,   216,   217,   220,   223,   224,   231,   232,   235,   236,
-     237,   240,   241,   242,   243,   244,   245,   246,   247,   248,
-     249,   250,   251,   252,   253,   254,   255,   258,   261,   262,
-     263,   266,   269,   272,   273,   274,   277,   278,   279,   280,
-     281,   282,   283,   284,   285,   286,   290,   293,   294,   295,
-     298,   299,   300,   301,   302,   303,   307,   308,   309,   310,
-     311,   312,   313,   314,   315,   316,   317,   318,   319,   322,
-     325,   326,   329,   330,   331,   332,   335,   336,   339,   342,
-     345,   348,   351,   354,   355,   358,   359,   362,   365,   366,
-     369,   376,   377,   380,   383,   384,   385,   389,   390,   393,
-     394,   397,   398,   399,   402,   403,   406,   407,   410,   413,
-     414,   417,   418,   419,   420,   421,   424,   425,   428,   429,
-     430,   433,   436,   437,   438,   439,   442,   443,   446,   447,
-     450,   456,   457,   460,   461,   464,   467,   470,   471,   474,
-     475,   478,   479,   482,   487,   488,   491,   494,   495,   498,
-     501,   502,   505,   506,   509,   510,   513,   516,   517,   520,
-     521,   522,   523,   526,   527,   528,   531,   533,   534,   535,
-     538,   539,   540,   543,   544,   545,   546,   547,   550,   551,
-     552,   553,   556,   557,   558,   559,   560,   561,   564,   565,
-     566,   567,   570,   571
+       0,   125,   125,   131,   132,   135,   136,   139,   140,   141,
+     142,   143,   144,   145,   146,   149,   152,   157,   160,   165,
+     171,   172,   175,   176,   177,   181,   182,   185,   186,   191,
+     197,   198,   201,   202,   205,   206,   207,   208,   209,   210,
+     211,   212,   213,   214,   215,   219,   220,   223,   224,   225,
+     226,   229,   230,   233,   236,   237,   244,   245,   248,   249,
+     250,   253,   254,   255,   256,   257,   258,   259,   260,   261,
+     262,   263,   264,   265,   266,   267,   268,   271,   274,   275,
+     276,   279,   282,   285,   286,   287,   290,   291,   292,   293,
+     294,   295,   296,   297,   298,   299,   303,   306,   307,   308,
+     311,   312,   313,   314,   315,   316,   320,   321,   322,   323,
+     324,   325,   326,   327,   328,   329,   330,   331,   332,   335,
+     338,   339,   342,   343,   344,   345,   348,   349,   352,   355,
+     358,   361,   364,   367,   368,   371,   372,   375,   378,   379,
+     382,   389,   390,   393,   396,   397,   398,   402,   403,   406,
+     407,   410,   411,   412,   415,   416,   419,   420,   423,   426,
+     427,   430,   431,   432,   433,   434,   437,   438,   441,   442,
+     443,   446,   449,   450,   451,   452,   455,   456,   459,   460,
+     463,   469,   470,   473,   474,   477,   480,   483,   484,   487,
+     488,   491,   492,   495,   500,   501,   504,   507,   508,   511,
+     514,   515,   518,   519,   522,   523,   526,   529,   530,   533,
+     534,   535,   536,   539,   540,   541,   544,   546,   547,   548,
+     551,   552,   553,   556,   557,   558,   559,   560,   563,   564,
+     565,   566,   569,   570,   571,   572,   573,   574,   577,   578,
+     579,   580,   583,   584
 };
 #endif
 
@@ -2012,23 +2025,23 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 115 "pir.y"
+#line 128 "pir.y"
     { fprintf(stderr, "program.\n"); ;}
     break;
 
   case 76:
-#line 255 "pir.y"
+#line 268 "pir.y"
     { yyerrok; ;}
     break;
 
   case 220:
-#line 538 "pir.y"
+#line 551 "pir.y"
     { fprintf(stderr, "TK_STRINGC: [%s]\n", yylval.sval); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2032 "pirparser.c"
+#line 2045 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2242,7 +2255,7 @@ yyreturn:
 }
 
 
-#line 574 "pir.y"
+#line 587 "pir.y"
 
 
 /* the file being parsed */
@@ -2276,7 +2289,7 @@ do_pre_process(struct lexer_state *lexer) {
         if (strchr(yytext, '\n') != NULL)
             fprintf(stderr, "\r");
     }
-    while (token);
+    while (token > 0);
 }
 
 /*
@@ -2332,6 +2345,7 @@ main(int argc, char *argv[]) {
 
         /* done handling arguments, open the file */
         yyin = fopen(argv[0], "r");
+
         if (yyin == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
             exit(EXIT_FAILURE);
