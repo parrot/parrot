@@ -187,7 +187,7 @@ DONE:
 
   .local pmc e
 
-  e = new Exception
+  e = new 'Exception'
 
   e["_message"] = mesg
 

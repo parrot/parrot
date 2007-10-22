@@ -313,7 +313,7 @@ DONE:
   if k < 0 goto BOUNDS
 
   sstr = str[k]
-  retval = new "LispString"
+  retval = new 'LispString'
   retval = sstr
   goto DONE
 
@@ -478,7 +478,7 @@ CHECK_SUFFIX:
    goto MAKE_SYMBOL
 
 MAKE_SYMBOL:
-   garg = new Array
+   garg = new 'Array'
    garg = 2
    garg[0] = prefix
    garg[1] = suffix
@@ -625,9 +625,9 @@ DONE:
     .CDR(body, args)                             # The form to evaluate
 
     .local pmc keyvals
-    keyvals = new ResizablePMCArray              # List for holding init values
+    keyvals = new 'ResizablePMCArray'              # List for holding init values
     .local pmc dynvars
-    dynvars = new ResizablePMCArray              # List for holding dynamic vars
+    dynvars = new 'ResizablePMCArray'              # List for holding dynamic vars
 
     # for exception handling, currently broken
     .local pmc error
@@ -1097,7 +1097,7 @@ DONE:
 
    size = llen - 11                             # Size of the overflow array
 
-   P3 = new Array                               # Allocate overflow array
+   P3 = new 'Array'                             # Allocate overflow array
    P3 = size
 
   .local pmc elem

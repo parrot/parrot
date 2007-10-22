@@ -33,7 +33,7 @@ Sets R to true (the TRUE symbol).
 .macro CONSTANT (P)
   .sym Boolean _const
 
-  _const = new Boolean
+  _const = new 'Boolean'
   _const = 1
 
   setprop .P, "constant", _const

@@ -16,7 +16,7 @@ include/macros/error.pir - macros for reporting errors
   .sym string _errmsgs
   .sym pmc _errargp
 
-  _errargp = new Array
+  _errargp = new 'Array'
   _errargp = 1
   _errargp[0] = .A
 
@@ -28,7 +28,7 @@ include/macros/error.pir - macros for reporting errors
   .sym string _errmsgs
   .sym pmc _errargp
 
-  _errargp = new Array
+  _errargp = new 'Array'
   _errargp = 2
   _errargp[0] = .A
   _errargp[1] = .B

@@ -73,7 +73,7 @@ Set up the types.
 .sub __get_string :method
 
     .local pmc retv
-    retv = new String
+    retv = new 'String'
     retv = "("
 
     .local string car
@@ -165,16 +165,16 @@ Set up the types.
     defined test, name
     if test goto NAMED_FUNCTION
 
-    name = new String
+    name = new 'String'
     name = "ANONYMOUS"
 
 NAMED_FUNCTION:
-    retv = new String
+    retv = new 'String'
     retv = "#<FUNCTION "
 
     concat retv, retv, name
 
-    tmps = new String
+    tmps = new 'String'
     tmps = ">"
     concat retv, retv, tmps
 
@@ -186,7 +186,7 @@ NAMED_FUNCTION:
 .sub __get_string :method
     .local pmc name
 
-     name = new String
+     name = new 'String'
      name = "#S(HASH-TABLE)"
 
     .return(name)
@@ -209,10 +209,10 @@ NAMED_FUNCTION:
 .sub __init :method
     .local pmc value
 
-    value = new Hash
+    value = new 'Hash'
     setattribute self, "external", value
 
-    value = new Hash
+    value = new 'Hash'
     setattribute self, "internal", value
 .end
 
@@ -256,7 +256,7 @@ DONE:
     goto PUSH_SYMBOL
 
 CREATE_STACK:
-    stack = new ResizablePMCArray
+    stack = new 'ResizablePMCArray'
     hash[symname] = stack
     goto PUSH_SYMBOL
 
@@ -311,7 +311,7 @@ DONE:
     .local pmc val
     .local pmc i
 
-    exports = new ResizablePMCArray
+    exports = new 'ResizablePMCArray'
     hash = getattribute self,  "external"
 
     iter i, hash
@@ -382,7 +382,7 @@ DONE:
 
     symbol = _SYMBOL(name)
 
-    stack = new ResizablePMCArray
+    stack = new 'ResizablePMCArray'
     push stack, symbol
     hash[name] = stack
 
@@ -426,10 +426,10 @@ DONE:
     name = getattribute self, "name"
 
     .local pmc retv
-    retv = new String
+    retv = new 'String'
 
     .local pmc tmps
-    tmps = new String
+    tmps = new 'String'
     tmps = "#<PACKAGE "
     concat retv, tmps, name
 
@@ -474,7 +474,7 @@ DONE:
     .local pmc table
     .local pmc case
 
-     table = new Array
+     table = new 'Array'
      table = 128
 
      table[0]  = INVALID_CHAR
@@ -606,7 +606,7 @@ DONE:
      table[126] = CONSTITUENT_CHAR           # ~
      table[127] = CONSTITUENT_CHAR           # Rubout
 
-     case = new Boolean
+     case = new 'Boolean'
      case = 0
 
      setattribute self, "table", table
@@ -618,7 +618,7 @@ DONE:
     .local pmc tmps
     .local pmc retv
 
-     retv = new String
+     retv = new 'String'
      retv = "#<READTABLE 0x????????>"
 
     .return(retv)
@@ -643,7 +643,7 @@ DONE:
 
 .sub __get_string :method
     .local pmc name
-    name = new String
+    name = new 'String'
     name = "#<IO STREAM>"
 
     .return(name)
