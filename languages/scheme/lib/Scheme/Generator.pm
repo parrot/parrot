@@ -987,10 +987,9 @@ sub _op_inexact_p {
 sub _op_eq {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#f');
     my $temp_0 = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$_] );
@@ -1013,10 +1012,9 @@ sub _op_eq {
 sub _op_lt {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#f');
     my $temp_0 = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$_] );
@@ -1033,10 +1031,9 @@ sub _op_lt {
 sub _op_gt {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#f');
     my $temp_0 = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$_] );
@@ -1053,10 +1050,9 @@ sub _op_gt {
 sub _op_leq {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#f');
     my $temp_0 = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$_] );
@@ -1073,10 +1069,9 @@ sub _op_leq {
 sub _op_geq {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#f');
     my $temp_0 = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$1] );
@@ -1093,12 +1088,10 @@ sub _op_geq {
 sub _op_zero_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $return = $self->_constant('#t');
 
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
     my $temp = $self->_generate( $node->{children}[1] );
     $self->_add_inst( '', 'eq', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
@@ -1111,10 +1104,9 @@ sub _op_zero_p {
 sub _op_positive_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(1);
+    my $return = $self->_constant('#t');
     my $temp = $self->_generate( $node->{children}[1] );
     $self->_add_inst( '', 'gt', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
@@ -1127,10 +1119,9 @@ sub _op_positive_p {
 sub _op_negative_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(1);
+    my $return = $self->_constant('#t');
     my $temp = $self->_generate( $node->{children}[1] );
     $self->_add_inst( '', 'lt', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
@@ -1143,11 +1134,10 @@ sub _op_negative_p {
 sub _op_odd_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
     my $temp_0 = $self->_generate( $node->{children}[1] );
-    $return = $self->_constant(1);
+    my $return = $self->_constant('#t');
     my $temp_1 = $self->_constant(2);
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
     $self->_add_inst( '', 'eq',  [ $temp_0, 1,       "DONE_$label" ] );
@@ -1161,11 +1151,10 @@ sub _op_odd_p {
 sub _op_even_p {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
     my $temp_0 = $self->_generate( $node->{children}[1] );
-    $return = $self->_constant(1);
+    my $return = $self->_constant('#t');
     my $temp_1 = $self->_constant(2);
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
     $self->_add_inst( '', 'eq',  [ $temp_0, 0,       "DONE_$label" ] );

@@ -8,34 +8,34 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 42;
+use Test::More tests => 45;
 use Parrot::Test;
 
 ###
 ### Zero?
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (zero? 0)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (zero? 0)' );
 (write (zero? 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (zero? 2)' );
-(write (zero? 1))
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (zero? 2)' );
+(write (zero? 2))
 CODE
 
 ###
 ### Positive?
 ###
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (positive? 0)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (positive? 0)' );
 (write (positive? 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (positive? 2)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (positive? 2)' );
 (write (positive? 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (positive? -3)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (positive? -3)' );
 (write (positive? -3))
 CODE
 
@@ -43,15 +43,15 @@ CODE
 ### Negative?
 ###
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (negative? 0)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (negative? 0)' );
 (write (negative? 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (negative? 2)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (negative? 2)' );
 (write (negative? 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (negative? -3)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (negative? -3)' );
 (write (negative? -3))
 CODE
 
@@ -59,19 +59,19 @@ CODE
 ### Odd?
 ###
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (odd? 0)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (odd? 0)' );
 (write (odd? 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (odd? 1)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (odd? 1)' );
 (write (odd? 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (odd? 2)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (odd? 2)' );
 (write (odd? 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (odd? -3)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (odd? -3)' );
 (write (odd? -3))
 CODE
 
@@ -79,19 +79,19 @@ CODE
 ### Even?
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (even? 0)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (even? 0)' );
 (write (even? 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (even? 1)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (even? 1)' );
 (write (even? 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (even? 2)' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (even? 2)' );
 (write (even? 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (even? -3)' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (even? -3)' );
 (write (even? -3))
 CODE
 
@@ -139,27 +139,27 @@ CODE
 ### Equal (=)
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (= 0 0))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (= 0 0))' );
 (write (= 0 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (= 1 0))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 1 0))' );
 (write (= 1 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (= 0 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 0 1))' );
 (write (= 0 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (= 0 0 0))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (= 0 0 0))' );
 (write (= 0 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (= 1 2 3))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 1 2 3))' );
 (write (= 1 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (= 0 1 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 0 1 1))' );
 (write (= 0 1))
 CODE
 
@@ -167,19 +167,19 @@ CODE
 ### Less (<)
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (< 0 1))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (< 0 1))' );
 (write (< 0 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (< 1 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (< 1 1))' );
 (write (< 1 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (< 0 1 2))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (< 0 1 2))' );
 (write (< 0 1 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (< 1 1 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (< 1 1 1))' );
 (write (< 1 1 2))
 CODE
 
@@ -187,49 +187,57 @@ CODE
 ### Greater (>)
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (> 1 0))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (> 1 0))' );
 (write (> 1 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (> 1 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (> 1 1))' );
 (write (> 1 1))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (> 2 1 0))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (> 2 1 0))' );
 (write (> 2 1 0))
 CODE
 
-#language_output_is( 'Scheme',<<'CODE', 0, 'write (> 2 1 1))');
-#(write (> 2 1 1))
-#CODE
+language_output_is( 'Scheme',<<'CODE', '#f', 'write (> 2 1 1))');
+(write (> 2 1 1))
+CODE
 
 ###
 ### LEQ (<=)
 ###
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (<= 0 0))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 0 0))' );
 (write (<= 0 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (<= 1 0))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 1 0))' );
 (write (<= 1 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 1, 'write (<= 1 2))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 1 2))' );
 (write (<= 1 2))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (<= 2 1 0))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 1 0))' );
 (write (<= 2 1 0))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', 0, 'write (<= 2 1 1))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 1 1))' );
 (write (<= 2 1 1))
 CODE
 
 ###
 ### GEQ (>=)
 ###
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (>= 2 3 3))' );
+(write (<= 2 3 3))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (>= 2 3 2))' );
+(write (<= 2 3 2))
+CODE
 
 # Local Variables:
 #   mode: cperl

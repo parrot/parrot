@@ -50,8 +50,8 @@ sub get_test_prog {
     my $lang_fn = Parrot::Test::per_test( '.scheme', $count );
     my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
 
-    #return "mzscheme -r languages/$lang_fn",    
-    return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pir_fn && ./parrot languages/$pir_fn",    
+    #return "mzscheme -r languages/$lang_fn";    
+    return "$PConfig{perl} languages/scheme/schemec languages/$lang_fn > languages/$pir_fn && ./parrot languages/$pir_fn";
 }
 
 # never skip the reference implementation
