@@ -846,7 +846,6 @@ Check if two hashes hold the same keys and values.
         PMC * const iter = VTABLE_get_iter(INTERP, SELF);
         INTVAL      j, n;
 
-        /* RT#46649: comparing Hash and PerlHash should probably be possible */
         if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
 
