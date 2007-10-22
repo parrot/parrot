@@ -15,6 +15,9 @@ $Revision$
 
 =head1 DESCRIPTION
 
+This document is the Parrot Design Document for the Parrot Intermediate 
+Representation (PIR).
+
 =head1 Comments and empty lines
 
 Comments start with B<#> and last until the following newline. These
@@ -110,13 +113,13 @@ sequences are processed.
 
 Are delimited by B<">. A B<"> inside a string must be escaped by
 B<\>.  Only 7-bit ASCII is accepted in string constants; to use
-characters outside thar range, specify an encoding in the way below.
+characters outside that range, specify an encoding in the way below.
 
 =item <<"heredoc",  <<'heredoc'
 
 Heredocs work like single or double quoted strings. All lines up to
 the terminating delimiter are slurped into the string. The delimiter
-has to be on its own line, at the beginning of the line and with no 
+has to be on its own line, at the beginning of the line and with no
 trailing whitespace.
 
 Assignment of a heredoc:
@@ -488,7 +491,7 @@ B<if var, identifier>.
 
 =item unless <var> goto <identifier>
 
-Unless B<var> evaluates as true, jump to the named B<identifier>. Translate 
+Unless B<var> evaluates as true, jump to the named B<identifier>. Translate
 to B<unless var, identifier>.
 
 =item if null <var> goto <identifier>
@@ -503,13 +506,13 @@ to B<unless_null var, identifier>.
 
 =item if <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate 
-to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1> 
+The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
+to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1>
 B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate 
+The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
 to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1>
 B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
 
@@ -539,10 +542,10 @@ implemented (and working) in imcc.y.}}
 
 =item <var1> <op>= <var2>
 
-This is equivalent to 
+This is equivalent to
 B<E<lt>var1E<gt> = E<lt>var1E<gt> E<lt>opE<gt> E<lt>var2E<gt>>. Where
 B<op> is called an assignment operator and can be any of the following
-binary operators described earlier: B<+>, B<->, B<*>, B</>, B<%>, B<.>, 
+binary operators described earlier: B<+>, B<->, B<*>, B</>, B<%>, B<.>,
 B<&>, B<|>, B<~>, B<E<lt>E<lt>>, B<E<gt>E<gt>> or B<E<gt>E<gt>E<gt>>.
 
 =item <var> = <var> [ <var> ]
@@ -620,6 +623,205 @@ Return the address of a label.
 
 =back
 
+
+
+=head1 MACRO LAYER
+
+This section describes the macro layer of the PIR language.
+
+=head3 Current Situation
+
+The macro layer of the PIR compiler handles the following directives:
+
+=over 4
+
+=item * C<.include>
+
+The C<.include> directive takes a string argument that contains the
+name of the PIR file that is included.
+
+=item * C<.macro>
+
+The C<.macro> directive starts the definition of a macro.
+
+=item * C<.constant>
+
+The C<.constant> directive is a special type of macro; it allows the
+user to use a symbolic name for a constant value or a register.
+
+=back
+
+
+=head3 Proposed Situation
+
+The current macro layer has a few limitations. These are listed below.
+
+=over 4
+
+=item * Macro parameter list
+
+If a macro defines no parameter list (not even the parentheses), then
+the macro expansion should not specify any parenthesis. This means that
+a macro defined as:
+
+ .macro foo
+ ...
+ .endm
+
+can only be expanded by writing C<.foo>. Writing C<.foo()> is an error.
+If, however, the macro definition is written as:
+
+ .macro foo()
+ ...
+ .endm
+
+then writing C<.foo> is an error, and instead the user should write this
+as C<.foo()>. On the one hand this behavior is consistent, but on the other
+hand the error message is somewhat dubious; if the user writes C<.foo> when
+the macro was defined as above (C<foo()>), then the error message indicates
+that the macro needs 1 argument.
+
+Some rationalization would be desirable.
+
+=item * Heredoc arguments
+
+Heredoc arguments are not allowed when expanding a macro. This means that
+the following is not allowed:
+
+   .macro foo(bar)
+   ...
+   .endm
+
+   .foo(<<'EOS')
+ This is a heredoc
+    string.
+
+ EOS
+
+=item * Unique local variables
+
+Within the macro body, the user can declare a unique label identifier using
+the value of a macro parameter, like so:
+
+  .macro foo(a)
+  ...
+ .label $a:
+  ...
+  .endm
+
+Currently, IMCC still allows for writing C<.local> to declare a local label,
+but that is deprecated. Use C<.label> instead.
+
+However, it would be helpful if it were possible to declare unique local variables
+as well. The syntax for this could be as follows:
+
+  .macro foo(b)
+  ...
+  .local int $b
+  ...
+  .$b = 42
+  print .$b # prints the value of the unique variable (42)
+  print .b  # prints the name of the variable, which is the value
+            # of parameter "b".
+  ...
+  .endm
+
+So, the special C<$> character indicates whether the symbol is interpreted as just
+the value of the parameter, or that the variable by that name is meant. Obviously,
+the value of C<b> should be a string.
+
+Defining a non-unique variable can still be done, using the normal syntax:
+
+  .macro foo(b)
+  .local int b
+  .local int $b
+  .endm
+
+When invoking the macro C<foo> as follows:
+
+  .foo("x")
+
+there will be two variables: C<b> and C<x>. When the macro is invoked twice:
+
+  .sub main
+    .foo("x")
+    .foo("y")
+  .end
+
+the resulting code that is given to the parser will read as follows:
+
+  .sub main
+    .local int b
+	.local int x
+	.local int b
+	.local int y
+  .end
+
+Obviously, this will result in an error, as the variable C<b> is defined twice.
+Of course, it would be a good idea to give the unique variable in the macro a
+special prefix, like so:
+
+    .local int local__foo__x
+
+This allows for using multiple macros, like so:
+
+  .macro foo(a)
+  .local int $a
+  .endm
+
+  .macro bar(b)
+  .local int $b
+  .endm
+
+  .sub main
+    .foo("x")
+	.bar("x")
+  .end
+
+This will result in code for the parser as follows:
+
+  .sub main
+    .local int local__foo__x
+	.local int local__bar__x
+  .end
+
+An additional special character, not allowed for user-defined variables,
+could be added to the generated name, so that a user-defined variable
+cannot conflict (if the user were to declare a variable by name of
+C<local__foo__x>.)
+
+=back
+
+=head2 Implementation
+
+The macro layer is completely implemented in the lexical analysis phase.
+The parser does not know anything about what happens in the lexical
+analysis phase.
+
+When the C<.include> directive is encountered, the specified file is opened
+and the following tokens that are requested by the parser are read from
+that file, instead of the original file that was given to the parser.
+
+A macro expansion is a dot-prefixed identifier. For instance, if a macro
+was defined as shown below:
+
+ .macro foo(bar)
+ ...
+ .endm
+
+this macro can be expanded by writing C<.foo(42)>. The body of the macro
+will be inserted at the point where the macro expansion is written.
+
+A C<.constant> expansion is more or less the same as a C<.macro> expansion,
+except that a constant expansion cannot take any arguments, and it is only
+allowed in PASM mode, or within a C<.emit> block.
+
+{{ Is there any reason to not allow C<.constant> directives in PIR mode?
+   (Except for the fact that we have C<.const> and C<.globalconst>) }}
+
+
+
+
 =head1 QUESTIONS
 
 =over 4
@@ -642,7 +844,7 @@ N/A
 
 =head1 REFERENCES
 
-N/A
+See C<docs/imcc/macros.pod>
 
 =cut
 
