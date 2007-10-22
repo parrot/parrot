@@ -346,6 +346,12 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
+            compilers/pirc/new/pir.l
+            compilers/pirc/new/pir.y
+            compilers/pirc/new/pircompiler.h
+            compilers/pirc/new/pirlexer.c
+            compilers/pirc/new/pirparser.c
+            compilers/pirc/new/pirparser.h
             languages/cola/lexer.c
             languages/cola/parser.c
             languages/cola/parser.h
