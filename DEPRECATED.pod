@@ -160,6 +160,17 @@ a unique label. The C<.local> directive will be changed into C<.label>.
 
 See [RT#45405]
 
+=item .namespace [ "a" .. "b" ]
+
+IMCC currently allows for writing:
+
+.namespace ["a" .. "b"]
+
+This does not make sense, and this slicing syntax will be deprecated.
+
+See [RT#46715]
+
+
 =back
 
 =head1 Deprecated compiler tools
