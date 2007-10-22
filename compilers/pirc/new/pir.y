@@ -97,6 +97,8 @@ extern int yylex(YYSTYPE *yylval,
 
 %output="pirparser.c"
 
+
+
 %parse-param {struct lexer_state *lexer}
 %lex-param   {struct lexer_state *lexer}
 
@@ -110,7 +112,7 @@ extern int yylex(YYSTYPE *yylval,
 program: opt_nl
          compilation_units
          opt_nl
-
+         { fprintf(stderr, "program.\n"); }
        ;
 
 opt_nl: /* empty */
@@ -580,6 +582,8 @@ extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
 #include <string.h>
 #include <assert.h>
 
+extern void yyrestart(FILE *in);
+
 /*
 
 Pre-process the file only. Don't do any analysis.
@@ -610,8 +614,8 @@ int
 main(int argc, char *argv[]) {
 
     struct lexer_state *lexer = NULL;
-    int parse_errors;
-    int pre_process;
+    int parse_errors = 0;
+    int pre_process = 0;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
@@ -649,35 +653,55 @@ main(int argc, char *argv[]) {
         exit(1);
     }
 
-    /* done handling arguments, open the file */
-    yyin = fopen(argv[0], "r");
-    if (yyin == NULL) {
-        fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
-        exit(1);
-    }
 
-    lexer = new_lexer(argv[0]);
-    assert(lexer != NULL);
 
-    if (pre_process) {
-        do_pre_process(lexer);
-    }
-    else {
-        yyparse(lexer);
+    while (argc > 0) {
+        fprintf(stderr, "Processing file '%s'\n", argv[0]);
 
-        parse_errors = get_parse_errors(lexer);
+        /* done handling arguments, open the file */
+        yyin = fopen(argv[0], "r");
+        if (yyin == NULL) {
+            fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
+            exit(1);
+        }
 
-        if (parse_errors == 0) {
-            fprintf(stderr, "Parse successful!\n");
+        lexer = new_lexer(argv[0]);
+        assert(lexer != NULL);
+
+        if (pre_process) {
+            fprintf(stderr, "pre-processing %s\n", argv[0]);
+            do_pre_process(lexer);
         }
         else {
-            fprintf(stderr, "There %s %d %s\n", parse_errors > 1 ? "were" :
-                    "was", parse_errors, parse_errors > 1 ? "errors" : "error");
+            fprintf(stderr, "compiling %s\n", argv[0]);
+            yyparse(lexer);
+
+            parse_errors += get_parse_errors(lexer);
+
+            if (parse_errors == 0) {
+             fprintf(stderr, "Parse successful!\n");
+            }
+            else {
+                fprintf(stderr, "There %s %d %s in file '%s'\n", parse_errors > 1 ? "were" :
+                        "was", parse_errors, parse_errors > 1 ? "errors" : "error",
+                        get_current_file(lexer));
+            }
         }
+
+        /* close file after processing */
+        fclose(yyin);
+
+        /* this is necessary to allow for processing a file after another */
+        yyrestart(yyin);
+
+
+        argc--;
+        argv++;
     }
 
-    /* close file after processing */
-    fclose(yyin);
+    if (parse_errors > 0)
+        fprintf(stderr, "There were %d parse errors in all files\n", parse_errors);
+
 
     return 0;
 }
@@ -691,8 +715,17 @@ yyerror(struct lexer_state *lexer, char *message) {
     /* increment parse errors in the lexer structure */
     parse_error(lexer);
     /* emit an error */
-    fprintf(stderr, "\nError in file '%s' (line %d): %s ('%s')\n\n",
-            get_current_file(lexer), get_line_nr(lexer), message, yytext);
+    fprintf(stderr, "\nError in file '%s' (line %d): %s ",
+            get_current_file(lexer), get_line_nr(lexer), message);
+
+    /* print current token if it's not a newline (or \r\n on windows) */
+    if (strcmp(yytext, "\r\n") != 0 || strcmp(yytext, "\n") == 0) {
+        fprintf(stderr, "('%s')", yytext);
+    }
+    else {
+        fprintf(stderr, "\n\n");
+    }
+
 
     return 0;
 }

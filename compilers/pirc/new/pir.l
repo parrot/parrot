@@ -111,13 +111,6 @@ typedef struct lexer_state {
 } lexer_state;
 
 
-/* remove defines, and put them literally in the code */
-/* somehow, doing so seems to break things. */
-#define current_file  lexer->current_file
-#define constant_defs lexer->constant_defs
-#define heredocs      lexer->heredocs
-#define after_heredoc lexer->after_heredoc
-#define file_buffer   lexer->file_buffer
 
 
 
@@ -133,13 +126,53 @@ typedef struct lexer_state {
 extern YY_DECL;
 
 
-extern int yyerror(struct lexer_state *lexer,
-                   char *message);
+extern int yyerror(struct lexer_state * const lexer, char const *message);
 
 
 /*
 
-constructor for a lexer.
+Update the line number. The yytext buffer is scanned for '\n'
+characters; for each one, the line number is incremented. It's done this
+way, because we can't increment it in the rule for matching newlines, as
+a set of consecutive newlines are matched together and a single newline
+token is returned.
+
+*/
+static void
+update_location(lexer_state * const lexer) {
+    char const *iter = yytext;
+    assert(lexer);
+
+    /* TODO: is yytext NULL terminated? */
+    while (*iter != '\0') {
+        if (*iter == '\n')
+            lexer->line_nr++;
+        iter++;
+    }
+}
+
+/*
+
+The C89 standard does not define a strdup(), so define our own strdup.
+Function names beginning with "str" are reserved (I think), so make it
+dupstr, as that is what it does: duplicate a string.
+
+*/
+static char *
+dupstr(char const * const source) {
+    char *newstring = (char *)calloc(strlen(source) + 1, sizeof (char));
+    assert(newstring);
+    strcpy(newstring, source);
+    return newstring;
+}
+
+/* after each rule execute update_location() */
+
+#define YY_USER_ACTION update_location(lexer);
+
+/*
+
+constructor for a lexer. It's very important to initialize all fields.
 
 */
 lexer_state *
@@ -147,12 +180,33 @@ new_lexer(char *filename) {
     lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
     lexer->filename = filename;
     lexer->line_nr  = 1;
-
-    /*
+    lexer->heredocs = NULL;
+    lexer->macro_defs = NULL;
+    lexer->after_heredoc = NULL;
+    lexer->constant_defs = NULL;
+    lexer->current_file = NULL;
+    lexer->parse_errors = 0;
+      /*
     fprintf(stderr, "Constructing new lexer\n");
     */
     return lexer;
 }
+
+
+#define DEBUG 1
+
+/* think of a smarter way to do this; only print when DEBUG is defined */
+#ifdef DEBUG
+#  define printdebug fprintf
+#else
+#  define printdebug noprint
+
+void
+noprint(FILE *fp, char *format, ...) { }
+
+#endif
+
+
 
 /*
 
@@ -202,8 +256,8 @@ Store a file_info structure on a stack.
 */
 static void
 push_file_info(lexer_state *lexer, file_info *info) {
-    info->prev = current_file;
-    current_file = info;
+    info->prev = lexer->current_file;
+    lexer->current_file = info;
 }
 
 
@@ -219,64 +273,78 @@ Pop a file_info structure from a stack.
 */
 static file_info *
 pop_file_info(lexer_state *lexer) {
-    if (current_file == NULL) {
-        /* fprintf(stderr, "pop_file_info(): returning NULL\n"); */
+    if (lexer->current_file == NULL) {
+        fprintf(stderr, "pop_file_info(): returning NULL\n");
         return NULL;
     }
     else {
-        file_info *returning = current_file;
-        /* fprintf(stderr, "pop_file_info(): returning info object\n"); */
-        current_file = current_file->prev;
-        /* fprintf(stderr, "current_file is now NULL\n"); */
+        file_info *returning = lexer->current_file;
+        fprintf(stderr, "pop_file_info(): returning info object\n");
+        lexer->current_file = lexer->current_file->prev;
+        if (lexer->current_file == NULL) {
+            fprintf(stderr, "current_file is now NULL\n");
+        }
         return returning;
     }
 }
 
 
+/*
+
+Restore all information from the including file to the lexer.
+This information is stored in the file_info structure.
+
+*/
 static void
 switch_to_file(lexer_state *lexer, file_info *info) {
-
     /* restore the buffer info */
-    /* TODO */
+    fprintf(stderr, "restoring file_info...\n");
+    lexer->line_nr = info->line_nr;
+    /* free current file name */
+    free(lexer->filename);
+    /* and set pointer to the including file's name */
+    lexer->filename = info->filename;
+    lexer->file_buffer = info->buffer;
 
+    fprintf(stderr, "deleting buffer...\n");
     /* delete the current buffer (of the included file *) */
     yy_delete_buffer(YY_CURRENT_BUFFER);
     /* close current file */
     fclose(yyin);
 
     /* switch back to previous file */
-    yy_switch_to_buffer(info->buffer);
+    yy_switch_to_buffer(lexer->file_buffer);
 
+    fprintf(stderr, "switched back to buffer\n");
     /* and free all resources of the buffer */
-
-    /*free(info->filename);
-    */
 
     free(info);
     info = NULL;
+
+    fprintf(stderr, "deleted info struct\n");
 }
 
 static void
 unshift_heredoc(lexer_state *lexer, heredoc_info *heredoc) {
-    heredoc->next = heredocs;
-    heredocs      = heredoc;
+    heredoc->next   = lexer->heredocs;
+    lexer->heredocs = heredoc;
 }
 
 static heredoc_info *
 shift_heredoc(lexer_state *lexer) {
-    heredoc_info *returning = heredocs;
+    heredoc_info *returning = lexer->heredocs;
     if (returning == NULL) {
         fprintf(stderr, "shift_heredoc(): queue is empty!\n");
     }
     else {
-        heredocs = heredocs->next;
+        lexer->heredocs = lexer->heredocs->next;
     }
     return returning;
 }
 
 static heredoc_info *
 peek_heredoc(lexer_state *lexer) {
-    return heredocs;
+    return lexer->heredocs;
 }
 
 
@@ -301,7 +369,7 @@ save_heredoc_line(lexer_state *lexer, char *text) {
         fprintf(stderr, "copying old contents...\n(%s)", heredoc->contents);
         strcpy(newbuffer, heredoc->contents);
     }
-    else {
+    else { /* first time allocating memory */
         /* allocate first buffer, do allocate 1 char extra for NULL character. */
         newbuffer = (char *)calloc(text_length + 1, sizeof (char));
         assert(newbuffer != NULL);
@@ -348,7 +416,7 @@ new_heredoc(lexer_state *lexer, char *delimiter) {
 static constant_info *
 find_constant(lexer_state *lexer, char *name) {
 
-    constant_info *iter = constant_defs;
+    constant_info *iter = lexer->constant_defs;
 
     while (iter != NULL) {
         if (strcmp(iter->name, name) == 0) {
@@ -369,10 +437,7 @@ find_constant(lexer_state *lexer, char *name) {
 static void
 define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
     constant_info *info = (constant_info *)malloc(sizeof (constant_info));
-    if (info == NULL) {
-        fprintf(stderr, "Failed to allocate memory for constant definition.\n");
-        exit(1);
-    }
+    assert(info != NULL);
     /* create the constant definition */
     info->line_declared = 0; /* TODO */
     info->name          = name;
@@ -380,8 +445,8 @@ define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
     info->token_type    = token_type;
 
     /* for now, just use linked list. Later we'll use a hash */
-    info->next    = constant_defs;
-    constant_defs = info;
+    info->next = lexer->constant_defs;
+    lexer->constant_defs = info;
 }
 
 /*
@@ -396,6 +461,7 @@ find_macro(lexer_state *lexer, char *name) {
     /* for now, just a list; should be a hash */
     macro_info *iter = lexer->macro_defs;
 
+    printdebug(stderr, "Finding macro '%s'\n", name);
     while (iter != NULL) {
         if (strcmp(iter->name, name) == 0) {
             return iter;
@@ -426,7 +492,7 @@ unshift_macro(lexer_state *lexer, macro_info *macro) {
 static macro_info *
 new_macro(char *name) {
     macro_info *macro = NULL;
-    char *macro_id = strdup(yytext);
+    char *macro_id = dupstr(yytext);
 
     /* create a macro definition, store the macro ID in it */
     macro = (macro_info *)malloc(sizeof (macro_info));
@@ -481,7 +547,7 @@ read_macro(YYSTYPE *yylval, lexer_state *lexer) {
         while (next_token != ')' || expect_parameter) {
             if (next_token == TK_IDENT) {
                 /* handle parameter */
-                char *parameter = strdup(yytext);
+                char *parameter = dupstr(yytext);
                 fprintf(stderr, "macro parameter: '%s'\n", parameter);
 
                 /* clear flag */
@@ -677,6 +743,8 @@ LINECOMMENT    [#].*\n
 /* define output file */
 %option outfile="pirlexer.c"
 
+/* yywrap() always returns true. */
+%option noyywrap
 
 %%
 
@@ -751,10 +819,10 @@ LINECOMMENT    [#].*\n
 
 
 "<<"{Q_STRING} {    /* skip the "<<" and the quote, so skip 3 characteres */
-                    char *heredoc_id = strdup(yytext + 3);
+                    char *heredoc_id = dupstr(yytext + 3);
 
                     /* check the length of the quoted string. Note that the close quote
-                     * was copied in the call to strdup(), so that's why heredoc_id is
+                     * was copied in the call to dupstr(), so that's why heredoc_id is
                      * at least 1.
                      */
                     if (strlen(heredoc_id) == 1) {
@@ -773,10 +841,10 @@ LINECOMMENT    [#].*\n
 
 <SCANSTRING>"<<"{Q_STRING} {
                              /* skip the "<<" and the quote, so skip 3 characteres */
-                             char *heredoc_id = strdup(yytext + 3);
+                             char *heredoc_id = dupstr(yytext + 3);
 
                              /* check the length of the quoted string. Note that the close quote
-                              * was copied in the call to strdup(), so that's why heredoc_id is
+                              * was copied in the call to dupstr(), so that's why heredoc_id is
                               * at least 1.
                               */
                              if (strlen(heredoc_id) == 1) {
@@ -803,7 +871,7 @@ LINECOMMENT    [#].*\n
 <SCANSTRING><<EOF>> { unsigned char dummy_char;
 
                       /* End of the "rest" string, switch back to normal buffer and state. */
-                      yy_switch_to_buffer(file_buffer);
+                      yy_switch_to_buffer(lexer->file_buffer);
                       BEGIN(INITIAL);
 
                       /* we reached the end of the saved string, and just switched back to
@@ -830,11 +898,11 @@ LINECOMMENT    [#].*\n
                       * After the heredoc string is scanned (until the delimiter is encountered), the
                       * string that was saved here is scanned.
                       */
-                     if (after_heredoc != NULL) {
+                     if (lexer->after_heredoc != NULL) {
                         /* before allocating new memory to after_heredoc, free the old buffer */
-                        free(after_heredoc);
+                        free(lexer->after_heredoc);
                      }
-                     after_heredoc = strdup(yytext);
+                     lexer->after_heredoc = dupstr(yytext);
                      /* continue scanning the file */
                      BEGIN(HEREDOC2);
                }
@@ -844,14 +912,14 @@ LINECOMMENT    [#].*\n
 <HEREDOC3>.*{EOL}   { /* currently, we're reading from a buffer */
 
                       /* after_heredoc is the buffer we're reading from, it /should/ never be null */
-                      assert(after_heredoc != NULL);
-                      if (after_heredoc != NULL) {
-                         free(after_heredoc);
+                      assert(lexer->after_heredoc != NULL);
+                      if (lexer->after_heredoc != NULL) {
+                         free(lexer->after_heredoc);
                       }
-                      after_heredoc = strdup(yytext);
+                      lexer->after_heredoc = dupstr(yytext);
 
                       /* switch back to file */
-                      yy_switch_to_buffer(file_buffer);
+                      yy_switch_to_buffer(lexer->file_buffer);
                       BEGIN(HEREDOC2);
                     }
 
@@ -879,8 +947,8 @@ LINECOMMENT    [#].*\n
                        */
                       BEGIN(SCANSTRING);
                       /* save the current buffer */
-                      file_buffer = YY_CURRENT_BUFFER;
-                      yy_scan_string(after_heredoc);
+                      lexer->file_buffer = YY_CURRENT_BUFFER;
+                      yy_scan_string(lexer->after_heredoc);
                       /* return the complete heredoc as a string constant */
                       /* yylval.sval = heredoc->contents;
                       */
@@ -1031,7 +1099,7 @@ LINECOMMENT    [#].*\n
 ":flat"       { return TK_FLAG_FLAT; }
 
 
-{Q_STRING}   { /* yylval.sval = strdup(yytext); */
+{Q_STRING}   { /* yylval.sval = dupstr(yytext); */
                return TK_STRINGC;
              }
 
@@ -1097,6 +1165,7 @@ LINECOMMENT    [#].*\n
                    }
                }
 
+               fprintf(stderr, "storing data\n");
                /* save current file info */
                file_state = (file_info *)malloc(sizeof (file_info));
                assert(file_state != NULL);
@@ -1107,10 +1176,12 @@ LINECOMMENT    [#].*\n
                file_state->line_nr  = lexer->line_nr;
                file_state->prev     = NULL; /* initialize to NULL */
 
+
                /* store the current file's info structure on the stack,
                 * we'll continue scanning it later.
                 */
                push_file_info(lexer, file_state);
+               printdebug(stderr, "data stored\n");
 
                /* replace the above with this, to make this block shorter.
                save_file_state(YY_CURRENT_BUFFER, lexer->file_name, lexer->line_nr);
@@ -1122,26 +1193,29 @@ LINECOMMENT    [#].*\n
                /* create a new buffer for the included file and switch to that file */
                incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
                yy_switch_to_buffer(incl_file_buffer);
+               lexer->file_buffer = incl_file_buffer;
 
                /* the included file may contain whitespace and newlines; remove them */
                dummy = input();
                while (isspace(dummy) || dummy == '\n') {
+                   printdebug(stderr, "skipping space from included file\n");
                    dummy = input();
                }
                unput(dummy);
+               printdebug(stderr, "included file start scanning...\n");
 
              }
 
 ".constant"  { int next_token;
-               char *constant_id;
-               char *constant_value;
+               char *constant_id    = NULL;
+               char *constant_value = NULL;
 
                next_token = yylex(yylval, lexer);
                if (next_token != TK_IDENT) {
                    yyerror(lexer, "identifier expected after '.constant'.");
                }
                /* store identifier */
-               constant_id = strdup(yytext);
+               constant_id = dupstr(yytext);
 
                /* ".endm" will only be recognized as a reserved word in MACRO state,
                 * but nevertheless, writing ".endm" to expand a constant is not good practice.
@@ -1169,7 +1243,7 @@ LINECOMMENT    [#].*\n
                    case TK_PASM_IREG:
                    case TK_PASM_SREG:
                        /* store value by this constant's name */
-                       constant_value = strdup(yytext);
+                       constant_value = dupstr(yytext);
                        define_constant(lexer, constant_id, constant_value, next_token);
                        break;
                    default:
@@ -1186,32 +1260,19 @@ LINECOMMENT    [#].*\n
              }
 
 
-[.]{ALNUM}        { /* NOTE: the {WS} prefix for this rule makes macro expansions fail. FIX THIS! */
+[.]{IDENT}        {
 
-                    /* Check whether this token is a constant or a macro.
-                     * Note that there must be whitespace before the dot, otherwise
-                     * in "x.y", ".y" is matched, which is wrong.
+                    /* Check whether this token is a constant or a macro. If it's not,
+                     * it's a subcall like "foo .bar()".
                      */
 
-                    /* because of the whitespace in front of this matched token, we need to skip this,
-                     * yytext contains 1 or more space characters, so find out how many these are.
-                     */
                     constant_info *constant = NULL;
-                    /* there is at least one space, so we don't have to check that one */
-                    int num_spaces = 1;
 
-                    /* as long as yytext + num_spaces points to a space character, increment num_spaces */
-                    while (isspace((unsigned char) *(yytext + num_spaces))) {
-                        ++num_spaces;
-                    }
-
-                    /* give the name of the constant, skipping the whitespace prefix,
-                     * and skip the prefix dot.
-                     */
-                    constant = find_constant(lexer, yytext + num_spaces);
+                    /* give the name of the constant, skip the prefix dot. */
+                    constant = find_constant(lexer, yytext + 1);
 
                     if (constant != NULL) { /* found the constant */
-                        fprintf(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
+                        printdebug(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
                                 constant->name, constant->value, constant->token_type);
 
                         /* make the value of the constant available to the parser */
@@ -1223,7 +1284,7 @@ LINECOMMENT    [#].*\n
                     else { /* not found, try macro */
                         macro_info *macro = NULL;
 
-                        macro = find_macro(lexer, yytext + num_spaces);
+                        macro = find_macro(lexer, yytext + 1);
 
                         if (macro != NULL) {
 
@@ -1233,17 +1294,17 @@ LINECOMMENT    [#].*\n
                             /* expand the macro into a string buffer */
                             /* is expanding necessary? */
 
-                            file_buffer = YY_CURRENT_BUFFER;
+                            lexer->file_buffer = YY_CURRENT_BUFFER;
                             /* and scan that string buffer. */
                             YY_BUFFER_STATE state = yy_scan_string(macro->body);
-
+                            /* todo: destroy state afterwards */
                         }
                         else {
-                            /* not found, this is an unknown constant or macro. */
-                            /* TODO: probably return a dot, so that the "NOTE" above is solved.
-                            Check this.
-                            */
-                            yyerror(lexer, "Undefined constant or macro");
+                            /* not found, this must be some input like "foo .bar" (as a sub call).
+                             * Put back everything, except for the first character, which was a dot.
+                             */
+                            yyless(1);
+                            return '.';
                         }
                     }
 
@@ -1256,9 +1317,11 @@ LINECOMMENT    [#].*\n
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
+                   fprintf(stderr, "End of main file\n");
                    yyterminate();
                }
                else { /* this file was included */
+                   fprintf(stderr, "End of included file\n");
                    switch_to_file(lexer, info);
                    return 0; /* end of file, needed for included files. */
                }
@@ -1271,14 +1334,6 @@ LINECOMMENT    [#].*\n
 %%
 
 
-/*
- * Have yywrap return 1, so that the scanner will not
- * continue after an end of file.
- */
-int
-yywrap() {
-    return 1;
-}
 
 static int
 is_parrot_op(char *spelling) {
