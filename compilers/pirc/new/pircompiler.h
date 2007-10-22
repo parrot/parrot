@@ -20,7 +20,7 @@ extern int get_line_nr(struct lexer_state const * const lexer);
 extern char const *get_current_file(struct lexer_state const * const lexer);
 
 
-#endif
+#endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 
 /*
  * Local variables:
