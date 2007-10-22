@@ -16,7 +16,8 @@ language_output_is( 'Scheme', <<'CODE', '0', 'write, one integer' );
 CODE
 
 language_output_is( 'Scheme', <<'CODE', '01', 'write, two integers' );
-(write 0 1)
+(write 0)
+(write 1)
 CODE
 
 language_output_is( 'Scheme', <<'CODE', q{"asdf"}, 'write, one string' );
@@ -32,7 +33,8 @@ language_output_is( 'Scheme', <<'CODE', '0', 'display, one integer' );
 CODE
 
 language_output_is( 'Scheme', <<'CODE', '01', 'display, two integers' );
-(display 0 1)
+(display 0)
+(display 1)
 CODE
 
 language_output_is( 'Scheme', <<'CODE', 'asdf', 'display, one string' );
@@ -57,27 +59,21 @@ CODE
 ## Booleans
 ##
 
-TODO:
-{
-    local $TODO = 'booleans not implemented yet';
-
 language_output_is( 'Scheme', <<'CODE', "#f", 'write #f' );
 (write #f)
-CODE
-
-language_output_is( 'Scheme', <<'CODE', "#t", 'display #t' );
-(display #t)
 CODE
 
 language_output_is( 'Scheme', <<'CODE', "#f", 'display #f' );
 (display #f)
 CODE
 
+language_output_is( 'Scheme', <<'CODE', "#t", 'write #t' );
+(write #t)
+CODE
+
 language_output_is( 'Scheme', <<'CODE', "#t", 'display #t' );
 (display #t)
 CODE
-
-}
 
 # Local Variables:
 #   mode: cperl

@@ -70,6 +70,14 @@ sub tokenize {
             {                         
                 $token .= $ch;
             }
+            elsif (    (    $ch eq 't'                                   # t
+                         || $ch eq 'f'                                   # or f
+                       )
+                    && $token eq '#'                                     # can be part of '#t' or '#f'
+                  )
+            {                         
+                $token .= $ch;
+            }
             elsif (    $ch eq '='
                     && $token =~ m/ \A [<>] /xms
                   )

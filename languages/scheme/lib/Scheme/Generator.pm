@@ -229,6 +229,7 @@ my $type_map = {
 sub _constant {
     my ( $self, $value ) = @_;
 
+    $self->_add_comment( 'start of _constant' );
     my ( $reg_type );
 
     if ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                        # an integer
@@ -240,6 +241,14 @@ sub _constant {
     elsif ( $value =~ m/ \A " [^"]* " \z/xms ) {                                     # a string, not escapes yet
         $reg_type = 'S';
     }
+    elsif ( $value eq '#t' || $value eq '#f' ) {
+        my $return = $self->_save_1( 'P' );
+        $self->_add_inst( '', 'new', [ $return, q{'Boolean'} ] );
+        $self->_add_inst( '', 'set', [ $return, $value eq '#t' ? '1' : '0' ] );
+        $self->_add_comment( 'end of _constant' );
+
+        return $return;
+    }
     else {                                                                           # default 0
         $reg_type = 'I';
         $value = 0;
@@ -247,6 +256,8 @@ sub _constant {
     
     my $return = $self->_save_1( $reg_type );
     $self->_add_inst( '', 'set', [ $return, $value ] );
+
+    $self->_add_comment( 'end of _constant' );
 
     return $return;
 }
@@ -2294,7 +2305,7 @@ sub _generate {
     }
     else {
         my $value = $node->{value};
-        if ( $value =~ /^[a-zA-Z]/ ) {
+        if ( $value =~ m/ \A [a-zA-Z] /xms ) {
             $return = $self->_find_lex($value);
         }
         else {
