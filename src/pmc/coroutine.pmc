@@ -33,7 +33,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* XXX put these into exceptions.h */
+/* RT#46697 put these into exceptions.h */
 
 #define TRY \
     do { \
@@ -157,7 +157,7 @@ Swaps the "context".
             print_sub_name(INTERP, SELF);
 
         if (!co->ctx) {
-            /* TODO factor out common code with Sub.invoke and inherit it */
+            /* RT#46699 factor out common code with Sub.invoke and inherit it */
             ccont = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION)
