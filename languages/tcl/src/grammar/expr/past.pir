@@ -37,7 +37,7 @@ Creates the C<PAST::*> classes.
 
 .sub '__onload' :load
     .local pmc base
-    $P0 = getclass 'Hash'
+    $P0 = get_class 'Hash'
     base = subclass $P0, 'PAST::Node'
     addattribute base, '@.children'
     addattribute base, '$.source'                  # original source
@@ -77,9 +77,9 @@ Initializes a new C<PAST::Node> object.
     $P1 = new 'Integer'
     $P2 = new 'ResizablePMCArray'
 
-    setattribute self, "PAST::Node\x0$.source",   $P0
-    setattribute self, "PAST::Node\x0$.pos",      $P1
-    setattribute self, "PAST::Node\x0@.children", $P2
+    setattribute self, '$.source',   $P0
+    setattribute self, '$.pos',      $P1
+    setattribute self, '@.children', $P2
 
     .return ()
 .end
@@ -95,10 +95,10 @@ of the parse tree).
 
 .sub 'set_node' :method
     .param pmc match                               # match object of source
-    $P0 = getattribute self, "PAST::Node\x0$.source"
+    $P0 = getattribute self, '$.source'
     $S0 = match
     $P0 = $S0
-    $P1 = getattribute self, "PAST::Node\x0$.pos"
+    $P1 = getattribute self, '$.pos'
     $I1 = match.from()
     $P1 = $I1
     .return ()
@@ -112,7 +112,7 @@ Return the source code associated with the current node.
 =cut
 
 .sub 'source' :method
-    $P0 = getattribute self, "PAST::Node\x0$.source"
+    $P0 = getattribute self, '$.source'
     .return ($P0)
 .end
 
@@ -125,7 +125,7 @@ node.
 =cut
 
 .sub 'pos' :method
-    $P0 = getattribute self, "PAST::Node\x0$.pos"
+    $P0 = getattribute self, '$.pos'
     .return ($P0)
 .end
 

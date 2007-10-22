@@ -6,6 +6,14 @@
 
 .cloneable()
 
+=head1 TclConst
+
+This class wants to be a subclass of 'String', and just override the
+set_string method with some magic. We can't get that to work in the
+current object model, so for now we're our own class, and we override
+a few vtables to approximate Stringiness. (If we were a String, we could
+get away with overriding JUST set_string)
+
 =head2 __class_init
 
 Define the attributes required for the class.
@@ -13,9 +21,10 @@ Define the attributes required for the class.
 =cut
 
 .sub __class_init :anon :load
-  $P0 = getclass 'String'
-  $P1 = subclass $P0, 'TclConst'
+  $P1 = newclass 'TclConst'
   
+  addattribute $P1, 'value'
+
   $P0 = new 'Hash'
   $P0[ 97] = "\a"
   $P0[ 98] = "\x8" # \b
@@ -247,9 +256,9 @@ special:
   goto loop
   
 done:
-  $I0 = classoffset self, 'TclConst'
-  $P0 = getattribute self, $I0
+  $P0 = new 'String'
   $P0 = value
+  setattribute self, 'value', $P0
 .end
 
 =head2 compile
@@ -260,15 +269,17 @@ Generate PIR code which can be used to generate our value
 
 .sub compile :method
    .param int argnum
-  
-   .local pmc value
-   $I0 = classoffset self, 'TclConst'
-   value = getattribute self, $I0
 
    .local pmc compiler
   compiler = get_root_global ['_tcl'], 'compile_dispatch'
 
-   .return compiler(argnum, value)
+   .return compiler(argnum, self)
+.end
+
+.sub get_string :method :vtable
+  $P1 = getattribute self, 'value'
+  $S0 = $P1
+  .return ($S0)
 .end
 
 # Local Variables:

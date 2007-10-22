@@ -132,10 +132,9 @@ open_file:
  
 file:
   filename = shift argv
-  .local pmc parrotIO
   .local string contents
-  parrotIO = getclass 'ParrotIO'
-  contents = parrotIO.'slurp'(filename)
+  $P99 = open filename, '<'
+  contents = $P99.'slurp'('')
 
   .set_tcl_argv()
   unless dump_only goto run_file  

@@ -25,11 +25,11 @@
 .sub 'read_bytecode'
   .param string filename
 
-  .local pmc invokable, IO
+  .local pmc invokable
   .local string frozen_code
 
-  IO = getclass 'ParrotIO'
-  frozen_code = IO.'slurp' ( filename )
+  $P99 = open filename, '<'
+  frozen_code = $P99.'slurp' ('')
 
   invokable = thaw frozen_code
   .return( invokable )
@@ -44,7 +44,7 @@
   .local string precompiled_filename, file_contents
   .local pmc OS, stat_tcl, stat_prec, code
 
-  .local pmc __script, IO, ns, interp
+  .local pmc __script, ns, interp
   interp = getinterp
   ns = interp['namespace';1]
 
@@ -67,8 +67,8 @@
 
 no_precompiled:
   # now read it in...
-  IO = getclass 'ParrotIO'
-  file_contents = IO.'slurp'( filename )
+  $P99 = open filename, '<' 
+  file_contents = $P99.'slurp'( '' )
 
   # and compile it..
   __script = get_root_global ['_tcl'], '__script'

@@ -281,11 +281,12 @@ env_loop_done:
   $S0 .= slash
   $S0 .= 'parray.tcl'
 
-  .local pmc io, script
-  io = getclass 'ParrotIO'
-  $S0 = io.'slurp'($S0)
+  .local pmc script
+  $P99 = open $S0, '<'
+  $S0 = $P99.'slurp'('')
 
   script = get_root_global ['_tcl'], '__script'
+  
   $P1 = script($S0)
   $P1()
 .end

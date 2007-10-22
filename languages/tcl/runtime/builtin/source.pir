@@ -14,11 +14,10 @@
   .local string filename
   filename = shift argv
 
-  .local pmc IO
   .local string file_contents
-  IO = getclass 'ParrotIO'
+  $P99 = open filename, '<'
   push_eh badfile
-    file_contents = IO.'slurp'( filename )
+    file_contents = $P99.'slurp'('')
   clear_eh
 
   .local pmc ns, interp

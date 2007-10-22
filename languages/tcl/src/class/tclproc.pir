@@ -20,7 +20,7 @@ Define the attributes required for the class.
 
 .sub __class_init :anon :load
 
-  $P0 = getclass 'Sub'
+  $P0 = get_class 'Sub'
   $P1 = subclass $P0, 'TclProc'
 
   addattribute $P1, 'PIR_source'
