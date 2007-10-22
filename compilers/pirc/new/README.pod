@@ -45,6 +45,11 @@ This is not possible in pirc/new. Currently, I don't see a solution to fix this,
 as consecutive newlines in the input file are collected together, and only a single
 token is returned to the parser. This makes the parser much more cleaner.
 
+=item * No (character) Escape!
+
+IMCC can handle escape characters in double quoted strings. This isn't working
+currently (but should be rather straightforward).
+
 =back
 
 During reimplementing PIR using Bison/Flex, I learned a lot about the current
@@ -66,7 +71,7 @@ heredocs as function arguments, like so:
    ...
  HI
 
-   ..
+   ...
  BYE
 
 =item * No Globals.
@@ -95,6 +100,12 @@ You can specify a list of .pir files to be compiled; all of them will be process
 This is a nice opportunity to clean up the grammar of the PIR language. Hacking on
 IMCC's grammar is possible, but not for the faint of heart.
 
+=item * Cygwin processable lexer spec.
+
+The file C<pir.l> from which the lexer is generated is processable by Cygwin's default
+version of Flex (currently 2.5.4). It must be noted, though, that the C<%option reentrant>
+is not allowed with this version of Flex, so it's not clear whether the generated lexer is
+suitable for parallel processing (re-entrant, thread-safe).
 
 =back
 
@@ -104,5 +115,12 @@ IMCC's grammar is possible, but not for the faint of heart.
 Having a look at this implementation would be greatly appreciated, and any resulting
 feedback even more :-)
 
+=head1 SEE ALSO
+
+See also C<languages/PIR> for a PGE based implementation.
+See also C<compilers/pirc>, a hand-written, recursive-descent PIR parser.
+See also C<compilers/imcc>, the current I<standard> PIR implementation.
+See also C<docs/imcc/syntax.pod> for a description of PIR syntax.
+See also C<docs/imcc/> for more documentation about the PIR language.
 
 =cut
