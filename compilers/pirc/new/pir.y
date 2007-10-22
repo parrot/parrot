@@ -59,45 +59,118 @@ extern int yylex(YYSTYPE * const yylval,
 %}
 
 
-%token TK_NL TK_LABEL TK_DOTDOT TK_HEREDOC TK_ENDM
+%token TK_LABEL     "label"
+       TK_DOTDOT    ".."
+       TK_ENDM      ".endm"
+       TK_NL       "\n"
 
-%token TK_HLL TK_HLL_MAP TK_EMIT TK_EOM
-       TK_N_OPERATORS TK_PRAGMA TK_LOADLIB
+%token TK_HLL           ".HLL"
+       TK_HLL_MAP       ".HLL_map"
+       TK_EMIT          ".emit"
+       TK_EOM           ".eom"
+       TK_N_OPERATORS   "n_operators"
+       TK_PRAGMA        ".pragma"
+       TK_LOADLIB       ".loadlib"
 
-%token TK_SUB TK_END TK_PARAM TK_LEX TK_LOCAL
-       TK_NAMESPACE TK_ENDNAMESPACE
-       TK_INVOCANT TK_METH_CALL TK_GLOBALCONST TK_CONST
-       TK_RETURN TK_YIELD
-       TK_PCC_BEGIN_YIELD TK_PCC_END_YIELD
-       TK_PCC_BEGIN_RETURN TK_PCC_END_RETURN
-       TK_PCC_BEGIN TK_PCC_END TK_GET_RESULTS
-       TK_PCC_CALL TK_ARG TK_RESULT TK_NCI_CALL
+%token TK_SUB       ".sub"
+       TK_END       ".end"
+       TK_PARAM     ".param"
+       TK_LEX       ".lex"
+       TK_LOCAL     ".local"
+       TK_NAMESPACE     ".namespace"
+       TK_ENDNAMESPACE  ".endnamespace"
+       TK_INVOCANT      ".invocant"
+       TK_METH_CALL     ".meth_call"
+       TK_GLOBALCONST   ".globalconst"
+       TK_CONST         ".const"
+       TK_RETURN        ".return"
+       TK_YIELD         ".yield"
+       TK_PCC_BEGIN_YIELD   ".pcc_begin_yield"
+       TK_PCC_END_YIELD     ".pcc_end_yield"
+       TK_PCC_BEGIN_RETURN  ".pcc_begin_return"
+       TK_PCC_END_RETURN    ".pcc_end_return"
+       TK_PCC_BEGIN     ".pcc_begin"
+       TK_PCC_END       ".pcc_end"
+       TK_GET_RESULTS   ".get_results"
+       TK_PCC_CALL      ".pcc_call"
+       TK_ARG           ".arg"
+       TK_RESULT        ".result"
+       TK_NCI_CALL      ".nci_call"
 
-%token TK_IDENT TK_STRINGC TK_INTC TK_NUMC
-       TK_PASM_PREG TK_PASM_NREG TK_PASM_SREG TK_PASM_IREG
-       TK_SYM_PREG TK_SYM_NREG TK_SYM_SREG TK_SYM_IREG
-       TK_PARROT_OP
+%token TK_IDENT         "identifier"
+       TK_STRINGC       "string constant"
+       TK_INTC          "integer constant"
+       TK_NUMC          "number constant"
+       TK_PASM_PREG     "PMC register"
+       TK_PASM_NREG     "Number register"
+       TK_PASM_SREG     "String register"
+       TK_PASM_IREG     "Integer register"
+       TK_SYM_PREG      "Symbolic PMC register"
+       TK_SYM_NREG      "Symbolic number register"
+       TK_SYM_SREG      "Symbolic string register"
+       TK_SYM_IREG      "Symbolic integer register"
+       TK_PARROT_OP     "parrot op"
 
-%token TK_INT TK_NUM TK_PMC TK_STRING TK_NULL
-       TK_IF TK_UNLESS TK_GOTO TK_NEW
+%token TK_INT       "int"
+       TK_NUM       "num"
+       TK_PMC       "pmc"
+       TK_STRING    "string"
+       TK_NULL      "null"
+       TK_IF        "if"
+       TK_UNLESS    "unless"
+       TK_GOTO      "goto"
+       TK_NEW       "new"
 
-%token TK_ARROW TK_NE TK_EQ TK_LT TK_LE TK_GT TK_GE
-       TK_ASSIGN_USHIFT TK_ASSIGN_RSHIFT TK_ASSIGN_LSHIFT
-       TK_USHIFT TK_RSHIFT TK_LSHIFT
-       TK_FDIV TK_OR TK_AND TK_XOR TK_CONC
+%token TK_ARROW     "=>"
+       TK_NE        "!="
+       TK_EQ        "=="
+       TK_LT        "<"
+       TK_LE        "<="
+       TK_GT        ">"
+       TK_GE        ">="
 
-%token TK_ASSIGN_INC TK_ASSIGN_DEC TK_ASSIGN_MUL
-       TK_ASSIGN_MOD TK_ASSIGN_POW TK_ASSIGN_DIV
-       TK_ASSIGN_BOR TK_ASSIGN_BAND TK_ASSIGN_FDIV
-       TK_ASSIGN_BNOT TK_ASSIGN_CONC
+       TK_USHIFT    ">>>"
+       TK_RSHIFT    ">>"
+       TK_LSHIFT    "<<"
+       TK_FDIV      "//"
+       TK_OR        "||"
+       TK_AND       "&&"
+       TK_XOR       "^"
+       TK_CONC      "."
+       TK_ASSIGN_USHIFT ">>>="
+       TK_ASSIGN_RSHIFT ">>="
+       TK_ASSIGN_LSHIFT "<<="
 
-%token TK_FLAG_INIT TK_FLAG_LOAD TK_FLAG_MAIN
-       TK_FLAG_ANON TK_FLAG_METHOD TK_FLAG_OUTER
-       TK_FLAG_VTABLE TK_FLAG_LEX TK_FLAG_MULTI
-       TK_FLAG_POSTCOMP TK_FLAG_IMMEDIATE
+%token TK_ASSIGN_INC    "+="
+       TK_ASSIGN_DEC    "-="
+       TK_ASSIGN_MUL    "*="
+       TK_ASSIGN_MOD    "%="
+       TK_ASSIGN_POW    "**="
+       TK_ASSIGN_DIV    "/="
+       TK_ASSIGN_BOR    "|="
+       TK_ASSIGN_BAND   "&="
+       TK_ASSIGN_FDIV   "//="
+       TK_ASSIGN_BNOT   "~="
+       TK_ASSIGN_CONC   ".="
 
-%token TK_FLAG_UNIQUE_REG TK_FLAG_NAMED TK_FLAG_SLURPY
-       TK_FLAG_FLAT TK_FLAG_OPTIONAL TK_FLAG_OPT_FLAG
+%token TK_FLAG_INIT         ":init"
+       TK_FLAG_LOAD         ":load"
+       TK_FLAG_MAIN         ":main"
+       TK_FLAG_ANON         ":anon"
+       TK_FLAG_METHOD       ":method"
+       TK_FLAG_OUTER        ":outer"
+       TK_FLAG_VTABLE       ":vtable"
+       TK_FLAG_LEX          ":lex"
+       TK_FLAG_MULTI        ":multi"
+       TK_FLAG_POSTCOMP     ":postcomp"
+       TK_FLAG_IMMEDIATE    ":immediate"
+
+%token TK_FLAG_UNIQUE_REG   ":unique_reg"
+       TK_FLAG_NAMED        ":named"
+       TK_FLAG_SLURPY       ":slurpy"
+       TK_FLAG_FLAT         ":flat"
+       TK_FLAG_OPTIONAL     ":optional"
+       TK_FLAG_OPT_FLAG     ":opt_flag"
 
 %union {
     double dval;
@@ -125,11 +198,10 @@ extern int yylex(YYSTYPE * const yylval,
 program: opt_nl
          compilation_units
          opt_nl
-         { fprintf(stderr, "program.\n"); }
        ;
 
 opt_nl: /* empty */
-      | TK_NL
+      | "\n"
       ;
 
 compilation_units: compilation_unit
@@ -137,7 +209,7 @@ compilation_units: compilation_unit
                  ;
 
 compilation_unit: sub_definition
-                | TK_CONST const_tail
+                | const_declaration
                 | namespace_declaration
                 | emit_block
                 | hll_specifier
@@ -146,25 +218,51 @@ compilation_unit: sub_definition
                 | pir_pragma
                 ;
 
+
+/*
 pir_pragma: TK_PRAGMA TK_N_OPERATORS TK_INTC
       ;
+*/
 
+pir_pragma: ".pragma" "n_operators" TK_INTC
+          ;
+
+/*
 loadlib: TK_LOADLIB TK_STRINGC
+       ;
+*/
+
+loadlib: ".loadlib" TK_STRINGC
        ;
 
 /* HLL stuff */
 
+/*
 hll_specifier: TK_HLL TK_STRINGC ',' TK_STRINGC
              ;
 
 hll_mapping: TK_HLL_MAP TK_STRINGC ',' TK_STRINGC
            ;
+*/
+
+hll_specifier: ".HLL" TK_STRINGC ',' TK_STRINGC
+             ;
+
+hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC
+           ;
 
 /* Emit blocks */
 
+/*
 emit_block: TK_EMIT TK_NL
             pasm_instructions
             TK_EOM
+          ;
+*/
+
+emit_block: ".emit" "\n"
+            pasm_instructions
+            ".eom"
           ;
 
 
@@ -172,14 +270,20 @@ pasm_instructions: /* empty */
                  | pasm_instructions pasm_instruction
                  ;
 
-pasm_instruction: TK_LABEL TK_NL
-                | TK_LABEL TK_PARROT_OP TK_NL
-                | TK_PARROT_OP TK_NL
+pasm_instruction: TK_LABEL "\n"
+                | TK_LABEL TK_PARROT_OP "\n"
+                | TK_PARROT_OP "\n"
                 ;
 
 /* Namespaces */
+/*
 namespace_declaration: TK_NAMESPACE
                      | TK_NAMESPACE '[' namespace_id ']'
+                     ;
+*/
+
+namespace_declaration: ".namespace"
+                     | ".namespace" '[' namespace_id ']'
                      ;
 
 namespace_id: TK_STRINGC
@@ -188,10 +292,10 @@ namespace_id: TK_STRINGC
 
 /* Sub definition */
 
-sub_definition: TK_SUB sub_id sub_flags TK_NL
+sub_definition: ".sub" sub_id sub_flags "\n"
                 parameters
                 instructions
-                TK_END
+                ".end"
                 ;
 
 sub_id: TK_IDENT
@@ -201,7 +305,7 @@ sub_id: TK_IDENT
 sub_flags: /* empty */
          | sub_flags sub_flag
          ;
-
+/*
 sub_flag: TK_FLAG_ANON
         | TK_FLAG_INIT
         | TK_FLAG_LOAD
@@ -215,6 +319,20 @@ sub_flag: TK_FLAG_ANON
         | TK_FLAG_IMMEDIATE
         ;
 
+*/
+
+sub_flag: ":anon"
+        | ":init"
+        | ":load"
+        | ":main"
+        | ":method"
+        | ":lex"
+        | ":outer" '(' sub_id ')'
+        | ":vtable" paren_string
+        | ":multi" '(' multi_type_list ')'
+        | ":postcomp"
+        | ":immediate"
+        ;
 
 multi_type_list: /* empty */
            | multi_type_list ',' multi_type
@@ -229,14 +347,23 @@ multi_type: TK_IDENT
 parameters: /* empty */
           | parameters parameter
           ;
-
+/*
 parameter: TK_PARAM param_def param_flags TK_NL
          ;
+*/
 
+parameter: ".param" param_def param_flags "\n"
+         ;
+
+/*
 param_def: type TK_IDENT
          | type TK_STRINGC TK_ARROW TK_IDENT
          ;
+*/
 
+param_def: type TK_IDENT
+         | type TK_STRINGC "=>" TK_IDENT
+         ;
 
 /* Instructions */
 
@@ -245,7 +372,14 @@ instructions: /* empty */
             | instructions labeled_instruction
             ;
 
+/*
 labeled_instruction: TK_LABEL TK_NL
+                   | TK_LABEL instruction
+                   | instruction
+                   ;
+*/
+
+labeled_instruction: TK_LABEL "\n"
                    | TK_LABEL instruction
                    | instruction
                    ;
@@ -255,7 +389,7 @@ instruction: if_statement
            | goto_statement
            | local_declaration
            | lex_declaration
-           | const_declaration
+           | const_decl_statement
            | namespace_statement
            | return_statement
            | yield_statement
@@ -265,21 +399,25 @@ instruction: if_statement
            | null_statement
            | parrot_instruction
            | getresults_statement
-           | error TK_NL { yyerrok; }
+           | error "\n"
+             { yyerrok; }
            ;
-
+/*
 getresults_statement: TK_GET_RESULTS '(' target_list ')' TK_NL
                     ;
-
-null_statement: TK_NULL TK_PASM_PREG TK_NL
-              | TK_NULL TK_SYM_PREG TK_NL
-              | TK_NULL TK_IDENT TK_NL
-              ;
-
-methodcall_statement: methodcall TK_NL
+*/
+getresults_statement: ".get_results" '(' target_list ')' "\n"
                     ;
 
-assignment_statement: target assignment_tail TK_NL
+null_statement: "null" TK_PASM_PREG "\n"
+              | "null" TK_SYM_PREG "\n"
+              | "null" TK_IDENT "\n"
+              ;
+
+methodcall_statement: methodcall "\n"
+                    ;
+
+assignment_statement: target assignment_tail "\n"
                     ;
 
 assignment_tail: augmented_op expression
@@ -294,8 +432,8 @@ assignment_expression: unop expression
                      | simple_invocation
                      | TK_STRINGC arguments  /* refactor 2/3 */
                      | methodcall            /* refactor 3/3 */
-                     | TK_NULL
-                     | TK_NEW TK_STRINGC /* fix other variants */
+                     | "null"
+                     | "new" TK_STRINGC /* fix other variants */
                      | parrot_instruction
                      ;
 
@@ -313,23 +451,23 @@ binop: '+'
      | '/'
      | '*'
      | '%'
-     | TK_CONC
+     | "."
      ;
 
 
-augmented_op: TK_ASSIGN_INC
-            | TK_ASSIGN_DEC
-            | TK_ASSIGN_MUL
-            | TK_ASSIGN_POW
-            | TK_ASSIGN_DIV
-            | TK_ASSIGN_FDIV
-            | TK_ASSIGN_BOR
-            | TK_ASSIGN_BAND
-            | TK_ASSIGN_BNOT
-            | TK_ASSIGN_CONC
-            | TK_ASSIGN_LSHIFT
-            | TK_ASSIGN_RSHIFT
-            | TK_ASSIGN_USHIFT
+augmented_op: "+="
+            | "-="
+            | "*="
+            | "**="
+            | "/="
+            | "//="
+            | "|="
+            | "&="
+            | "~="
+            | ".="
+            | ">>="
+            | "<<="
+            | ">>>="
             ;
 
 keylist: '[' keys ']'
@@ -340,28 +478,28 @@ keys: key
     ;
 
 key: expression
-   | expression TK_DOTDOT
-   | expression TK_DOTDOT expression
-   | TK_DOTDOT expression
+   | expression ".."
+   | expression ".." expression
+   | ".." expression
    ;
 
 separator: ';'
          | ','
          ;
 
-parrot_instruction: TK_PARROT_OP /* todo: arguments for op */ TK_NL
+parrot_instruction: TK_PARROT_OP /* todo: arguments for op */ "\n"
                   ;
 
-if_statement: TK_IF condition goto_statement
+if_statement: "if" condition goto_statement
             ;
 
-unless_statement: TK_UNLESS condition goto_statement
+unless_statement: "unless" condition goto_statement
                 ;
 
-goto_statement: TK_GOTO TK_IDENT TK_NL
+goto_statement: "goto" TK_IDENT "\n"
        ;
 
-local_declaration: TK_LOCAL type local_id_list TK_NL
+local_declaration: ".local" type local_id_list "\n"
                  ;
 
 local_id_list: local_id
@@ -369,47 +507,47 @@ local_id_list: local_id
              ;
 
 local_id: TK_IDENT
-        | TK_IDENT TK_FLAG_UNIQUE_REG
+        | TK_IDENT ":unique_reg"
         ;
 
-lex_declaration: TK_LEX TK_STRINGC ',' target TK_NL
+lex_declaration: ".lex" TK_STRINGC ',' target "\n"
                ;
 
 invocation_statement: long_invocation_statement
                     | short_invocation_statement
                     ;
 
-long_invocation_statement: TK_PCC_BEGIN TK_NL
+long_invocation_statement: ".pcc_begin" "\n"
                            long_arguments
-                           long_invocation TK_NL
+                           long_invocation "\n"
                            long_results
-                           TK_PCC_END TK_NL
+                           ".pcc_end" "\n"
                          ;
 
 long_arguments: /* empty */
               | long_arguments long_argument
               ;
 
-long_argument: TK_ARG expression arg_flags TK_NL
+long_argument: ".arg" expression arg_flags "\n"
              ;
 
-long_invocation: TK_PCC_CALL invokable
-               | TK_NCI_CALL invokable
-               | TK_INVOCANT invokable TK_NL
-                 TK_METH_CALL method
+long_invocation: ".pcc_call" invokable
+               | ".nci_call" invokable
+               | ".invocant" invokable "\n"
+                 ".meth_call" method
                ;
 
 long_results: /* empty */
             | long_results long_result
             ;
 
-long_result: TK_RESULT target param_flags TK_NL
+long_result: ".result" target param_flags "\n"
            | local_declaration
            ;
 
-short_invocation_statement: '(' target_list ')' '=' invocation_expression TK_NL
-                          | TK_STRINGC arguments TK_NL
-                          | simple_invocation TK_NL
+short_invocation_statement: '(' target_list ')' '=' invocation_expression "\n"
+                          | TK_STRINGC arguments "\n"
+                          | simple_invocation "\n"
                           ;
 
 target_list: /* empty */
@@ -427,11 +565,11 @@ param_flags: /* empty */
            | param_flags param_flag
            ;
 
-param_flag: TK_FLAG_OPTIONAL
-          | TK_FLAG_OPT_FLAG
-          | TK_FLAG_SLURPY
-          | TK_FLAG_NAMED opt_paren_string
-          | TK_FLAG_UNIQUE_REG
+param_flag: ":optional"
+          | ":opt_flag"
+          | ":slurpy"
+          | ":named" opt_paren_string
+          | ":unique_reg"
           ;
 
 invocation_expression: simple_invocation
@@ -452,17 +590,17 @@ method: TK_IDENT
       | TK_SYM_PREG
       ;
 
-namespace_statement: TK_NAMESPACE TK_IDENT TK_NL
-                   | TK_ENDNAMESPACE TK_IDENT TK_NL
+namespace_statement: ".namespace" TK_IDENT "\n"
+                   | ".endnamespace" TK_IDENT "\n"
                    ;
 
 return_statement: short_return_statement
                 | long_return_statement
                 ;
 
-long_return_statement: TK_PCC_BEGIN_RETURN TK_NL
+long_return_statement: ".pcc_begin_return" "\n"
                        return_expressions
-                       TK_PCC_END_RETURN TK_NL
+                       ".pcc_end_return" "\n"
                      ;
 
 
@@ -470,11 +608,11 @@ yield_statement: short_yield_statement
                | long_yield_statement
                ;
 
-short_return_statement: TK_RETURN arguments TK_NL
-                      | TK_RETURN invocation_expression TK_NL
+short_return_statement: ".return" arguments "\n"
+                      | ".return" invocation_expression "\n"
                       ;
 
-short_yield_statement: TK_YIELD arguments TK_NL
+short_yield_statement: ".yield" arguments "\n"
                      ;
 
 arguments: '(' opt_arguments_list ')'
@@ -488,35 +626,48 @@ arguments_list: argument
               | arguments_list ',' argument
               ;
 
+/*
 argument: expression arg_flags
         | TK_STRINGC TK_ARROW expression
         ;
+*/
 
+argument: expression arg_flags
+        | TK_STRINGC "=>" expression
+        ;
+
+/*
 long_yield_statement: TK_PCC_BEGIN_YIELD TK_NL
                       yield_expressions
                       TK_PCC_END_YIELD TK_NL
+                    ;
+*/
+
+long_yield_statement: ".pcc_begin_yield" "\n"
+                      yield_expressions
+                      ".pcc_end_yield" "\n"
                     ;
 
 yield_expressions: /* empty */
                  | yield_expressions yield_expression
                  ;
 
-yield_expression: TK_YIELD expression arg_flags TK_NL
+yield_expression: ".yield" expression arg_flags "\n"
                 ;
 
 return_expressions: /* empty */
                   | return_expressions return_expression
                   ;
 
-return_expression: TK_RETURN expression arg_flags TK_NL
+return_expression: ".return" expression arg_flags "\n"
                  ;
 
 arg_flags: /* empty */
          | arg_flags arg_flag
          ;
 
-arg_flag: TK_FLAG_FLAT
-        | TK_FLAG_NAMED opt_paren_string
+arg_flag: ":flat"
+        | ":named" opt_paren_string
         ;
 
 opt_paren_string: /* empty */
@@ -526,17 +677,36 @@ opt_paren_string: /* empty */
 paren_string: '(' TK_STRINGC ')'
             ;
 
-const_declaration: TK_GLOBALCONST const_tail TK_NL
-                 | TK_CONST const_tail TK_NL
+const_declaration: ".const" const_tail
                  ;
 
+const_decl_statement: const_declaration "\n"
+                    | ".globalconst" const_tail "\n"
+                    ;
+
+
+
+/*
 const_tail: TK_INT TK_IDENT '=' TK_INTC
           | TK_NUM TK_IDENT '=' TK_NUMC
           | TK_PMC TK_IDENT '=' TK_STRINGC
           | TK_STRING TK_IDENT '=' TK_STRINGC
           ;
+*/
+const_tail: "int" TK_IDENT '=' TK_INTC
+          | "num" TK_IDENT '=' TK_NUMC
+          | "pmc" TK_IDENT '=' TK_STRINGC
+          | "string" TK_IDENT '=' TK_STRINGC
+          ;
 
+
+/*
 condition: TK_NULL expression
+         | expression
+         | conditional_expression
+         ;
+*/
+condition: "null" expression
          | expression
          | conditional_expression
          ;
@@ -560,12 +730,14 @@ reg: TK_SYM_PREG
    | pasm_reg
    ;
 
+
 pasm_reg: TK_PASM_PREG
         | TK_PASM_NREG
         | TK_PASM_IREG
         | TK_PASM_SREG
         ;
 
+/*
 rel_op: TK_NE
       | TK_EQ
       | TK_LT
@@ -573,11 +745,28 @@ rel_op: TK_NE
       | TK_GE
       | TK_GT
       ;
+*/
 
+rel_op: "!="
+      | "=="
+      | "<"
+      | "<="
+      | ">="
+      | ">"
+      ;
+
+/*
 type: TK_INT
     | TK_NUM
     | TK_PMC
     | TK_STRING
+    ;
+*/
+
+type: "int"
+    | "num"
+    | "pmc"
+    | "string"
     ;
 
 target: reg

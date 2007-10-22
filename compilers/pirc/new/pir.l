@@ -133,7 +133,9 @@ typedef struct lexer_state {
 
 
 
-/* macro to chop off the last character, typically a newline character */
+/* macro to chop off the last character, typically a newline character,
+ * but can also be something else
+ */
 #define chop_yytext()   (yytext[--yyleng] = '\0')
 
 
@@ -145,6 +147,8 @@ extern YY_DECL;
 
 
 extern int yyerror(struct lexer_state * const lexer, char const * const message);
+
+
 
 
 #define DEBUG 1
@@ -301,15 +305,15 @@ Pop a file_info structure from a stack.
 static file_info *
 pop_file_info(lexer_state * const lexer) {
     if (lexer->current_file == NULL) {
-        fprintf(stderr, "pop_file_info(): returning NULL\n");
+        printdebug(stderr, "pop_file_info(): returning NULL\n");
         return NULL;
     }
     else {
         file_info *returning = lexer->current_file;
-        fprintf(stderr, "pop_file_info(): returning info object\n");
+        printdebug(stderr, "pop_file_info(): returning info object\n");
         lexer->current_file = lexer->current_file->prev;
         if (lexer->current_file == NULL) {
-            fprintf(stderr, "current_file is now NULL\n");
+            printdebug(stderr, "current_file is now NULL\n");
         }
         return returning;
     }
@@ -402,11 +406,17 @@ save_heredoc_line(lexer_state const * const lexer, char const * const text) {
 
     printdebug(stderr, "concatenating new contents..\n");
     /* copy new text into ne buffer, after old contents. */
+
     strcpy(newbuffer + heredoc->char_count, text);
+
     /* free old buffer */
+
     free(heredoc->contents);
+
     /* attach new buffer to heredoc node */
+
     heredoc->contents = newbuffer;
+
     /* update number of characters in this buffer */
     heredoc->char_count += text_length;
 
@@ -633,7 +643,7 @@ read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
     /* scan the body of the macro, while we don't see the ".endm" marker,
      * and we don't encounter end of file (= 0). TODO: Check value of <<EOF>> Not sure if this is portable.
      */
-    while ((next_token != TK_ENDM) && (next_token != 0)) {
+    while ((next_token != TK_ENDM) && (next_token != 0)) { /* END OF FILE MARKER */
         /* always add a space character to separate the tokens */
         strcat(macro->body, " ");
         /* add current token to macro's buffer */
@@ -694,8 +704,11 @@ make_label(char const * const macro_name, char const * const label_name) {
     return label;
 }
 
+/*
+
+*/
 static void
-read_braced_argument(YYSTYPE *yylval, lexer_state *lexer) {
+read_braced_argument(YYSTYPE *yylval, lexer_state * const lexer) {
     int next_token = yylex(yylval, lexer);
 
     while (next_token != '}') {
@@ -713,6 +726,22 @@ static YY_BUFFER_STATE
 get_current_buffer(void) {
     return YY_CURRENT_BUFFER;
 }
+
+
+/*
+
+define skip_whitespace as a macro, not a function, otherwise errors with
+unput definition.
+
+*/
+#define skip_whitespace() do { unsigned char dummy_char = input(); \
+                            while (isspace(dummy_char) || dummy_char == '\n') { \
+                                 dummy_char = input(); \
+                            } \
+                            unput(dummy_char); \
+                          } while(0)
+
+
 
 
 /*
@@ -747,6 +776,8 @@ SCANSTRING     buffer      used to scan the "rest of the line", which
 POD            file        used to skip POD comments.
 
 MACRODEF       file        used to scan a macro definition.
+
+MACROEXP       buffer      used for macro expansion.
 ===========================================================================
 
 
@@ -794,7 +825,11 @@ LINECOMMENT    [#].*\n
  */
 %s MACRODEF
 
+/* start state for macro expansion. This state overrides
+ * the <<EOF>> rule. TODO: check whether this "overriding" is portable.
+ */
 %s MACROEXP
+
 
 /* support pushing/popping of start states */
 %option stack
@@ -871,22 +906,18 @@ LINECOMMENT    [#].*\n
                          yy_pop_state(); /* handle <<EOF>> in initial state */
                        }
 
-<MACROEXP><<EOF>>      { unsigned char dummy_char;
-                         fprintf(stderr, "End of Macro Exp buffer");
-                         yy_switch_to_buffer(lexer->file_buffer);
+<MACROEXP><<EOF>>      { /* */
+                         YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
 
+                         fprintf(stderr, "End of Macro Exp buffer");
+
+                         yy_switch_to_buffer(lexer->file_buffer);
+                         yy_delete_buffer(current_buffer);
 
                          /* we reached the end of the saved string, and just switched back to
                           * the file. However, there may be more whitespace or newlines, so skip these now
                           */
-                         dummy_char = input();
-
-                         while (isspace(dummy_char) || dummy_char == '\n') {
-                             dummy_char = input();
-                         }
-                         /* we just read one character too many; this is not a space/'\n', so put it back */
-                         unput(dummy_char);
-
+                         skip_whitespace();
                          yy_pop_state();
 
                        }
@@ -951,7 +982,7 @@ LINECOMMENT    [#].*\n
 <SCANSTRING>{WS}+   {
                     }
 
-<SCANSTRING><<EOF>> { unsigned char dummy_char;
+<SCANSTRING><<EOF>> { /* */
 
                       /* End of the string buffer, switch back to normal buffer and state. */
                       yy_switch_to_buffer(lexer->file_buffer);
@@ -960,13 +991,7 @@ LINECOMMENT    [#].*\n
                       /* we reached the end of the saved string, and just switched back to
                        * the file. However, there may be more whitespace or newlines, so skip these now
                        */
-                      dummy_char = input();
-
-                      while (isspace(dummy_char) || dummy_char == '\n') {
-                         dummy_char = input();
-                      }
-                      /* we just read one character too many; this is not a space/'\n', so put it back */
-                      unput(dummy_char);
+                      skip_whitespace();
 
                       /* end of buffer also means end of line (because the buffer represents
                        * the "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
@@ -1016,10 +1041,21 @@ LINECOMMENT    [#].*\n
                     return TK_NL;
                   }
 
-<HEREDOC2>.*   {  /* get the heredoc delimiter */
+
+<HEREDOC2>.*     {  /* get the heredoc delimiter */ /*<HEREDOC2>.*   {*/  /* get the heredoc delimiter */
                   heredoc_info *heredoc = shift_heredoc(lexer);
                   /* remove newline character from current token's characters */
-                  chop_yytext();
+                  fprintf(stderr, "<HEREDOC2>.*: [%s]\n", yytext);
+
+                  /*
+                   * How to make this truely portable? Runtime check for '\r', '\n' ?
+                   */
+                  if (yytext[yyleng - 1] == '\r') {
+                      chop_yytext();
+                  }
+                  else {
+                      fprintf(stderr, "yytext[yyleng-1] = \n'%c'\n", yytext[yyleng-1]);
+                  }
 
                   /* if the current token's characters equals the heredoc
                    * delimiter, the heredoc is complete
@@ -1042,7 +1078,7 @@ LINECOMMENT    [#].*\n
                        * put the heredoc thingie back
                        */
                       unshift_heredoc(lexer, heredoc);
-
+                      fprintf(stderr, "Saving string [%s] (did not match end marker [%s]\n", yytext, heredoc->delimiter);
                       /* and save the current text as part of the heredoc */
                       save_heredoc_line(lexer, yytext);
                   }
@@ -1207,7 +1243,6 @@ LINECOMMENT    [#].*\n
 {OCT}             { return TK_INTC; }
 
 ".include"   { int next_token;
-               unsigned char dummy;
                int file_name_length;
                FILE *incl_file_ptr   = NULL;
                char *incl_file_name  = NULL;
@@ -1242,7 +1277,7 @@ LINECOMMENT    [#].*\n
 
                /* after an include statement a newline is expected */
                next_token = yylex(yylval, lexer);
-               if (next_token != 0) { /* if not end of file */
+               if (next_token != 0) { /* if not end of file */  /* END OF FILE HACK MARKER */
                    if (next_token != TK_NL) {
                        yyerror(lexer, "newline expected after \".include '<string>'\"\n");
                    }
@@ -1279,12 +1314,15 @@ LINECOMMENT    [#].*\n
                lexer->file_buffer = incl_file_buffer;
 
                /* the included file may contain whitespace and newlines; remove them */
+               /*
                dummy = input();
                while (isspace(dummy) || dummy == '\n') {
                    printdebug(stderr, "skipping space from included file\n");
                    dummy = input();
                }
                unput(dummy);
+               */
+               skip_whitespace();
                printdebug(stderr, "included file start scanning...\n");
 
              }
@@ -1374,14 +1412,17 @@ LINECOMMENT    [#].*\n
                             int num_macro_params = macro->num_params;
                             /* read input for parameters */
 
+                            int expect_argument = 0; /* flag for while loop */
+
                             /* TODO: finish this */
                             int next_token = yylex(yylval, lexer);
+
                             if (next_token == '(') {
                                 next_token = yylex(yylval, lexer); /* skip '(' */
 
                                 fprintf(stderr, "Warning! Macro parameters are not implemented yet\n");
 
-                                while (next_token != ')') {
+                                while (next_token != ')' || expect_argument == 1) {
                                     if (next_token == '{') { /* braced argument */
                                         read_braced_argument(yylval, lexer);
                                     }
@@ -1389,8 +1430,16 @@ LINECOMMENT    [#].*\n
                                         /* don't care about the token, just store it */
                                         next_token = yylex(yylval, lexer);
                                     }
+
+                                    /* clear flag */
+                                    expect_argument = 0;
+                                    if (next_token == ',') {
+                                        /* set flag indicating we expect another argument */
+                                        expect_argument = 1;
+                                    }
                                 }
-                                /* done with parameters */
+                                /* done with parameters, check out why we stopped parsing arguments */
+                                /* TODO */
 
                             }
                             else { /* no parameters */
@@ -1438,7 +1487,7 @@ LINECOMMENT    [#].*\n
                else { /* this file was included */
                    fprintf(stderr, "End of included file\n");
                    switch_to_file(lexer, info);
-                   return 0; /* end of file, needed for included files. */
+                   return 0; /* end of file, needed for included files. */ /* END OF FILE MARKER */
                }
             }
 
