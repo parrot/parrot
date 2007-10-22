@@ -136,21 +136,6 @@ As of Parrot 0.4.16 all type names for .local other than string, num, int, and
 pmc are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array>
 for C<pmc> will no longer be possible in Parrot 0.4.17.  [RT#42769].
 
-=item optional comma in sub flags
-
-The optional comma to separate subroutine flags will be removed in Parrot 0.4.17.
-[RT#45679]. This will no longer be valid PIR code:
-
- .sub main :main, :load, :init
- #
- .end
-
-Instead, you should write:
-
- .sub main :main :load :init
- #
- .end
-
 =item C<.HLL_map INTC, INTC> will become C<.HLL_map STRINGC, STRINGC>
 
 As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
