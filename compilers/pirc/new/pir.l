@@ -150,9 +150,9 @@ extern int yyerror(struct lexer_state * const lexer, char const * const message)
 
 
 
-
+/*
 #define DEBUG 1
-
+*/
 
 /* think of a smarter way to do this; only print when DEBUG is defined */
 #ifdef DEBUG
@@ -549,6 +549,9 @@ new_macro(char const * const name) {
 
 =item static void read_macro(void)
 
+Read a macro definition. The macro body is stored in a buffer.
+
+
 =cut
 
 */
@@ -594,7 +597,7 @@ read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
             if (next_token == TK_IDENT) {
                 /* handle parameter */
                 char *parameter = dupstr(yytext);
-                fprintf(stderr, "macro parameter: '%s'\n", parameter);
+                printdebug(stderr, "macro parameter: '%s'\n", parameter);
 
                 /* clear flag */
                 expect_parameter = 0;
@@ -633,7 +636,10 @@ read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
      * multiple PIR statements can be written on 1 line.
      */
     if (next_token == TK_NL) {
+       /* :-/ This makes a normal macro expansion fail, but "print 42 .NL print 42" pass. */
+       /*
         strcat(macro->body, "\n");
+       */
     }
     else {
         yyerror(lexer, "newline expected after macro parameter list.");
@@ -684,7 +690,7 @@ make_label(char const * const macro_name, char const * const label_name) {
      * a label like "label__xxx__xxx__X:"... Fix this.
      */
 
-    char const * const label_format = "label__%s__%s__X:";
+    char const * const label_format = "label__%s__%s__XXX:";
 
     int format_length = strlen(label_format);
     int m_name_length = strlen(macro_name);
@@ -699,7 +705,7 @@ make_label(char const * const macro_name, char const * const label_name) {
     */
     sprintf(label, label_format, macro_name, label_name);
 
-    fprintf(stderr, "Made label '%s'\n", label);
+    printdebug(stderr, "Made label '%s'\n", label);
 
     return label;
 }
@@ -906,10 +912,12 @@ LINECOMMENT    [#].*\n
                          yy_pop_state(); /* handle <<EOF>> in initial state */
                        }
 
+
+
 <MACROEXP><<EOF>>      { /* */
                          YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
 
-                         fprintf(stderr, "End of Macro Exp buffer");
+                         printdebug(stderr, "End of Macro Exp buffer");
 
                          yy_switch_to_buffer(lexer->file_buffer);
                          yy_delete_buffer(current_buffer);
@@ -984,7 +992,7 @@ LINECOMMENT    [#].*\n
 
 <SCANSTRING><<EOF>> { /* */
 
-                      /* End of the string buffer, switch back to normal buffer and state. */
+                      /* End of the heredoc string buffer, switch back to normal buffer and state. */
                       yy_switch_to_buffer(lexer->file_buffer);
                       BEGIN(INITIAL);
 
@@ -1045,16 +1053,23 @@ LINECOMMENT    [#].*\n
 <HEREDOC2>.*     {  /* get the heredoc delimiter */ /*<HEREDOC2>.*   {*/  /* get the heredoc delimiter */
                   heredoc_info *heredoc = shift_heredoc(lexer);
                   /* remove newline character from current token's characters */
-                  fprintf(stderr, "<HEREDOC2>.*: [%s]\n", yytext);
+                  printdebug(stderr, "<HEREDOC2>.*: [%s]\n", yytext);
 
                   /*
                    * How to make this truely portable? Runtime check for '\r', '\n' ?
+                   *
+                   * HACK WARNING:
+                   * I must admit, I don't get why this works:
+                   * do chop the yytext when we see a '\r' ?? But '\r's are on windows,
+                   * and on windows we should not chop it.
+                   * TODO: Review this some time. For now, it works on cygwin,win,linux.
+                   * TODO: check this on MacOS.
                    */
                   if (yytext[yyleng - 1] == '\r') {
                       chop_yytext();
                   }
                   else {
-                      fprintf(stderr, "yytext[yyleng-1] = \n'%c'\n", yytext[yyleng-1]);
+                      printdebug(stderr, "yytext[yyleng-1] = \n'%c'\n", yytext[yyleng-1]);
                   }
 
                   /* if the current token's characters equals the heredoc
@@ -1078,7 +1093,11 @@ LINECOMMENT    [#].*\n
                        * put the heredoc thingie back
                        */
                       unshift_heredoc(lexer, heredoc);
-                      fprintf(stderr, "Saving string [%s] (did not match end marker [%s]\n", yytext, heredoc->delimiter);
+
+                      /*
+                      printdebug(stderr, "Saving string [%s] (did not match end marker [%s]\n", yytext, heredoc->delimiter);
+                      */
+
                       /* and save the current text as part of the heredoc */
                       save_heredoc_line(lexer, yytext);
                   }
@@ -1267,7 +1286,7 @@ LINECOMMENT    [#].*\n
                strncpy(incl_file_name, yytext + 1, file_name_length);
 
                /* open the file */
-               fprintf(stderr, "Including file '%s'\n", incl_file_name);
+               printdebug(stderr, "Including file '%s'\n", incl_file_name);
                incl_file_ptr = fopen(incl_file_name, "r");
 
                if (incl_file_ptr == NULL) { /* opening file went wrong */
@@ -1283,7 +1302,7 @@ LINECOMMENT    [#].*\n
                    }
                }
 
-               fprintf(stderr, "storing data\n");
+               printdebug(stderr, "storing data\n");
                /* save current file info */
                file_state = (file_info *)malloc(sizeof (file_info));
                assert(file_state != NULL);
@@ -1481,11 +1500,11 @@ LINECOMMENT    [#].*\n
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
-                   fprintf(stderr, "End of main file\n");
+                   printdebug(stderr, "End of main file\n");
                    yyterminate();
                }
                else { /* this file was included */
-                   fprintf(stderr, "End of included file\n");
+                   printdebug(stderr, "End of included file\n");
                    switch_to_file(lexer, info);
                    return 0; /* end of file, needed for included files. */ /* END OF FILE MARKER */
                }

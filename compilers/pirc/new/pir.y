@@ -59,10 +59,10 @@ extern int yylex(YYSTYPE * const yylval,
 %}
 
 
-%token TK_LABEL     "label"
-       TK_DOTDOT    ".."
-       TK_ENDM      ".endm"
-       TK_NL       "\n"
+%token TK_LABEL         "label"
+       TK_DOTDOT        ".."
+       TK_ENDM          ".endm"
+       TK_NL            "\n"
 
 %token TK_HLL           ".HLL"
        TK_HLL_MAP       ".HLL_map"
@@ -72,11 +72,11 @@ extern int yylex(YYSTYPE * const yylval,
        TK_PRAGMA        ".pragma"
        TK_LOADLIB       ".loadlib"
 
-%token TK_SUB       ".sub"
-       TK_END       ".end"
-       TK_PARAM     ".param"
-       TK_LEX       ".lex"
-       TK_LOCAL     ".local"
+%token TK_SUB           ".sub"
+       TK_END           ".end"
+       TK_PARAM         ".param"
+       TK_LEX           ".lex"
+       TK_LOCAL         ".local"
        TK_NAMESPACE     ".namespace"
        TK_ENDNAMESPACE  ".endnamespace"
        TK_INVOCANT      ".invocant"
@@ -184,9 +184,8 @@ extern int yylex(YYSTYPE * const yylval,
 %output="pirparser.c"
 
 
-
-%parse-param {struct lexer_state *lexer}
-%lex-param   {struct lexer_state *lexer}
+%parse-param {struct lexer_state * const lexer}
+%lex-param   {struct lexer_state * const lexer}
 
 
 %start program
@@ -205,7 +204,7 @@ opt_nl: /* empty */
       ;
 
 compilation_units: compilation_unit
-                 | compilation_units TK_NL compilation_unit
+                 | compilation_units "\n" compilation_unit
                  ;
 
 compilation_unit: sub_definition
@@ -271,9 +270,11 @@ pasm_instructions: /* empty */
                  ;
 
 pasm_instruction: TK_LABEL "\n"
-                | TK_LABEL TK_PARROT_OP "\n"
-                | TK_PARROT_OP "\n"
+                | TK_LABEL parrot_instruction
+                | parrot_instruction
                 ;
+
+
 
 /* Namespaces */
 /*
@@ -487,8 +488,19 @@ separator: ';'
          | ','
          ;
 
-parrot_instruction: TK_PARROT_OP /* todo: arguments for op */ "\n"
+parrot_instruction: TK_PARROT_OP opt_parrot_op_args "\n"
                   ;
+
+opt_parrot_op_args: /* empty */
+                  | parrot_op_args
+                  ;
+
+parrot_op_args: parrot_op_arg
+              | parrot_op_args ',' parrot_op_arg
+              ;
+
+parrot_op_arg: expression
+             ;
 
 if_statement: "if" condition goto_statement
             ;
