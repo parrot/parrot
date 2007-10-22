@@ -282,8 +282,27 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 20 "pir.y"
+#line 1 "pir.y"
 
+
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
+/*
+
+=head1 NAME
+
+pir.y
+
+=head1 DESCRIPTION
+
+This is a complete rewrite of the parser for the PIR language.
+
+=cut
+
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -294,12 +313,12 @@
 
 struct lexer_state;
 
-extern int yyerror(struct lexer_state *lexer,
-                   char *message);
+extern int yyerror(struct lexer_state * const lexer,
+                   char const * const message);
 
 
-extern int yylex(YYSTYPE *yylval,
-                 struct lexer_state *lexer);
+extern int yylex(YYSTYPE * const yylval,
+                 struct lexer_state const * const lexer);
 
 
 
@@ -338,7 +357,7 @@ typedef union YYSTYPE
     char  *sval;
 }
 /* Line 187 of yacc.c.  */
-#line 342 "pirparser.c"
+#line 361 "pirparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -351,7 +370,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 355 "pirparser.c"
+#line 374 "pirparser.c"
 
 #ifdef short
 # undef short
@@ -2009,7 +2028,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 2013 "pirparser.c"
+#line 2032 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2272,7 +2291,7 @@ main(int argc, char *argv[]) {
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* skip program name */
@@ -2303,7 +2322,7 @@ main(int argc, char *argv[]) {
 
     if (argc < 1) {
         fprintf(stderr, "No input file specified\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 
@@ -2315,7 +2334,7 @@ main(int argc, char *argv[]) {
         yyin = fopen(argv[0], "r");
         if (yyin == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         lexer = new_lexer(argv[0]);
@@ -2363,7 +2382,7 @@ main(int argc, char *argv[]) {
 
 */
 int
-yyerror(struct lexer_state *lexer, char *message) {
+yyerror(struct lexer_state * const lexer, char const * const message) {
 
     /* increment parse errors in the lexer structure */
     parse_error(lexer);

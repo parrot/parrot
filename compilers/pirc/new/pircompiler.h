@@ -13,11 +13,11 @@ struct lexer_state;
 struct lexer_state *new_lexer(char *filename);
 
 /* accessor functions for parse_errors in the specified lexer. */
-extern int  get_parse_errors(struct lexer_state *lexer);
-extern void parse_error(struct lexer_state *lexer);
+extern int  get_parse_errors(struct lexer_state const * const lexer);
+extern void parse_error(struct lexer_state * const lexer);
 
-extern int get_line_nr(struct lexer_state *lexer);
-extern char const *get_current_file(struct lexer_state *lexer);
+extern int get_line_nr(struct lexer_state const * const lexer);
+extern char const *get_current_file(struct lexer_state const * const lexer);
 
 #endif
 

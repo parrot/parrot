@@ -1,3 +1,5 @@
+%{
+
 /*
  * $Id$
  * Copyright (C) 2007, The Perl Foundation.
@@ -17,8 +19,6 @@ This is a complete rewrite of the parser for the PIR language.
 
 */
 
-%{
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,12 +28,12 @@ This is a complete rewrite of the parser for the PIR language.
 
 struct lexer_state;
 
-extern int yyerror(struct lexer_state *lexer,
-                   char *message);
+extern int yyerror(struct lexer_state * const lexer,
+                   char const * const message);
 
 
-extern int yylex(YYSTYPE *yylval,
-                 struct lexer_state *lexer);
+extern int yylex(YYSTYPE * const yylval,
+                 struct lexer_state const * const lexer);
 
 
 
@@ -619,7 +619,7 @@ main(int argc, char *argv[]) {
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* skip program name */
@@ -650,7 +650,7 @@ main(int argc, char *argv[]) {
 
     if (argc < 1) {
         fprintf(stderr, "No input file specified\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 
@@ -662,7 +662,7 @@ main(int argc, char *argv[]) {
         yyin = fopen(argv[0], "r");
         if (yyin == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         lexer = new_lexer(argv[0]);
@@ -710,7 +710,7 @@ main(int argc, char *argv[]) {
 
 */
 int
-yyerror(struct lexer_state *lexer, char *message) {
+yyerror(struct lexer_state * const lexer, char const * const message) {
 
     /* increment parse errors in the lexer structure */
     parse_error(lexer);

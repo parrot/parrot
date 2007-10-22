@@ -1,3 +1,5 @@
+%{
+
 /*
  * $Id$
  * Copyright (C) 2007, The Perl Foundation.
@@ -32,8 +34,6 @@ Major issues are:
 
 */
 
-%{
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -45,7 +45,7 @@ Major issues are:
 /* Parrot can check out whether the specified text is the name of an op.
  * We define a dummy function for now; replace this later.
  */
-static int is_parrot_op(char *spelling);
+static int is_parrot_op(char const * const spelling);
 
 
 
@@ -60,17 +60,6 @@ typedef struct heredoc_info {
 
 } heredoc_info;
 
-
-/* data structure for managing included files */
-
-typedef struct file_info {
-   char *filename;
-   int line_nr;
-   int line_pos;
-   YY_BUFFER_STATE buffer;
-   struct file_info *prev;
-
-} file_info;
 
 
 /* data structure to store .constant definitions */
@@ -96,17 +85,33 @@ typedef struct macro_info {
 } macro_info;
 
 
+/* data structure for managing included files */
+
+typedef struct file_info {
+   char *filename;
+   int line_nr;
+   int line_pos;
+   YY_BUFFER_STATE buffer;
+
+   struct file_info *prev;
+
+} file_info;
+
+
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
+    int                     parse_errors;
     struct file_info       *current_file;
     struct constant_info   *constant_defs;
     struct heredoc_info    *heredocs;
     struct macro_info      *macro_defs;
     char                   *after_heredoc;
-    YY_BUFFER_STATE         file_buffer;
-    int                     parse_errors;
-    int                     line_nr;
+
+    /* this is the exact contents of a file_info structure */
     char                   *filename;
+    int                     line_nr;
+    int                     line_pos;
+    YY_BUFFER_STATE         file_buffer;
 
 } lexer_state;
 
@@ -120,14 +125,25 @@ typedef struct lexer_state {
 
 
 /* declaration of the lexer function */
-#define YY_DECL int yylex(YYSTYPE *yylval, struct lexer_state *lexer)
+#define YY_DECL int yylex(YYSTYPE * const yylval, struct lexer_state * const lexer)
 
 /* declare the function yylex here; its definition is #define'd, so use that: */
 extern YY_DECL;
 
 
-extern int yyerror(struct lexer_state * const lexer, char const *message);
+extern int yyerror(struct lexer_state * const lexer, char const * const message);
 
+
+/* think of a smarter way to do this; only print when DEBUG is defined */
+#ifdef DEBUG
+#  define printdebug fprintf
+#else
+#  define printdebug noprint
+
+void
+noprint(FILE *fp, char *format, ...) { }
+
+#endif
 
 /*
 
@@ -177,34 +193,26 @@ constructor for a lexer. It's very important to initialize all fields.
 */
 lexer_state *
 new_lexer(char *filename) {
-    lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
-    lexer->filename = filename;
-    lexer->line_nr  = 1;
-    lexer->heredocs = NULL;
-    lexer->macro_defs = NULL;
+    lexer_state *lexer   = (lexer_state *)malloc(sizeof (lexer_state));
+    assert(lexer != NULL);
+    lexer->filename      = filename;
+    lexer->line_nr       = 1;
+    lexer->heredocs      = NULL;
+    lexer->macro_defs    = NULL;
     lexer->after_heredoc = NULL;
     lexer->constant_defs = NULL;
-    lexer->current_file = NULL;
-    lexer->parse_errors = 0;
-      /*
-    fprintf(stderr, "Constructing new lexer\n");
-    */
+    lexer->current_file  = NULL;
+    lexer->parse_errors  = 0;
+
+    printdebug(stderr, "Constructing new lexer\n");
+
     return lexer;
 }
 
 
 #define DEBUG 1
 
-/* think of a smarter way to do this; only print when DEBUG is defined */
-#ifdef DEBUG
-#  define printdebug fprintf
-#else
-#  define printdebug noprint
 
-void
-noprint(FILE *fp, char *format, ...) { }
-
-#endif
 
 
 
@@ -214,7 +222,7 @@ Accessor function for errors.
 
 */
 int
-get_parse_errors(lexer_state *lexer) {
+get_parse_errors(lexer_state const * const lexer) {
     return lexer->parse_errors;
 }
 
@@ -224,7 +232,7 @@ Accessor function to increment the errors field.
 
 */
 void
-parse_error(lexer_state *lexer) {
+parse_error(lexer_state * const lexer) {
     lexer->parse_errors++;
 }
 
@@ -232,7 +240,7 @@ parse_error(lexer_state *lexer) {
 
 */
 int
-get_line_nr(lexer_state *lexer) {
+get_line_nr(lexer_state const * const lexer) {
     return lexer->line_nr;
 }
 
@@ -240,7 +248,7 @@ get_line_nr(lexer_state *lexer) {
 
 */
 char const *
-get_current_file(lexer_state *lexer) {
+get_current_file(lexer_state const * const lexer) {
     return lexer->filename;
 }
 /*
@@ -255,7 +263,7 @@ Store a file_info structure on a stack.
 
 */
 static void
-push_file_info(lexer_state *lexer, file_info *info) {
+push_file_info(lexer_state * const lexer, file_info * const info) {
     info->prev = lexer->current_file;
     lexer->current_file = info;
 }
@@ -272,7 +280,7 @@ Pop a file_info structure from a stack.
 
 */
 static file_info *
-pop_file_info(lexer_state *lexer) {
+pop_file_info(lexer_state * const lexer) {
     if (lexer->current_file == NULL) {
         fprintf(stderr, "pop_file_info(): returning NULL\n");
         return NULL;
@@ -296,7 +304,7 @@ This information is stored in the file_info structure.
 
 */
 static void
-switch_to_file(lexer_state *lexer, file_info *info) {
+switch_to_file(lexer_state * const lexer, file_info *info) {
     /* restore the buffer info */
     fprintf(stderr, "restoring file_info...\n");
     lexer->line_nr = info->line_nr;
@@ -325,13 +333,13 @@ switch_to_file(lexer_state *lexer, file_info *info) {
 }
 
 static void
-unshift_heredoc(lexer_state *lexer, heredoc_info *heredoc) {
+unshift_heredoc(lexer_state * const lexer, heredoc_info * const heredoc) {
     heredoc->next   = lexer->heredocs;
     lexer->heredocs = heredoc;
 }
 
 static heredoc_info *
-shift_heredoc(lexer_state *lexer) {
+shift_heredoc(lexer_state * const lexer) {
     heredoc_info *returning = lexer->heredocs;
     if (returning == NULL) {
         fprintf(stderr, "shift_heredoc(): queue is empty!\n");
@@ -343,14 +351,14 @@ shift_heredoc(lexer_state *lexer) {
 }
 
 static heredoc_info *
-peek_heredoc(lexer_state *lexer) {
+peek_heredoc(lexer_state const * const lexer) {
     return lexer->heredocs;
 }
 
 
 
 static void
-save_heredoc_line(lexer_state *lexer, char *text) {
+save_heredoc_line(lexer_state const * const lexer, char const * const text) {
     heredoc_info *heredoc = peek_heredoc(lexer);
     int text_length = strlen(text);
     char *newbuffer;
@@ -396,8 +404,9 @@ save_heredoc_line(lexer_state *lexer, char *text) {
 
 */
 static void
-new_heredoc(lexer_state *lexer, char *delimiter) {
+new_heredoc(lexer_state * const lexer, char * const delimiter) {
     heredoc_info *heredoc = (heredoc_info *)malloc(sizeof (heredoc_info));
+    assert(heredoc != NULL);
     heredoc->delimiter    = delimiter;
     heredoc->contents     = NULL;
     heredoc->char_count   = 0;
@@ -414,7 +423,7 @@ new_heredoc(lexer_state *lexer, char *delimiter) {
 
 */
 static constant_info *
-find_constant(lexer_state *lexer, char *name) {
+find_constant(lexer_state const * const lexer, char const * const name) {
 
     constant_info *iter = lexer->constant_defs;
 
@@ -435,7 +444,7 @@ find_constant(lexer_state *lexer, char *name) {
 
 */
 static void
-define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
+define_constant(lexer_state * const lexer, char * const name, char *value, int const token_type) {
     constant_info *info = (constant_info *)malloc(sizeof (constant_info));
     assert(info != NULL);
     /* create the constant definition */
@@ -457,7 +466,7 @@ define_constant(lexer_state *lexer, char *name, char *value, int token_type) {
 
 */
 static macro_info *
-find_macro(lexer_state *lexer, char *name) {
+find_macro(lexer_state const * const lexer, char const * const name) {
     /* for now, just a list; should be a hash */
     macro_info *iter = lexer->macro_defs;
 
@@ -473,13 +482,13 @@ find_macro(lexer_state *lexer, char *name) {
 }
 
 static macro_info *
-peek_macro(lexer_state *lexer) {
+peek_macro(lexer_state const * const lexer) {
     return lexer->macro_defs;
 }
 
 
 static void
-unshift_macro(lexer_state *lexer, macro_info *macro) {
+unshift_macro(lexer_state * const lexer, macro_info * const macro) {
     macro->next = lexer->macro_defs;
     lexer->macro_defs = macro;
 }
@@ -490,7 +499,7 @@ unshift_macro(lexer_state *lexer, macro_info *macro) {
 */
 
 static macro_info *
-new_macro(char *name) {
+new_macro(char const * const name) {
     macro_info *macro = NULL;
     char *macro_id = dupstr(yytext);
 
@@ -513,7 +522,7 @@ new_macro(char *name) {
 
 */
 static void
-read_macro(YYSTYPE *yylval, lexer_state *lexer) {
+read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
     int next_token;
     macro_info *macro = NULL;
 
@@ -623,7 +632,7 @@ rename it to make_unique_id or what-ever.
 
 */
 static char *
-make_label(char *macro_name, char *label_name) {
+make_label(char const * const macro_name, char const * const label_name) {
     /* format of the generated label */
 
     /* TODO: the final character is special in IMCC ("$"). Is this enough
@@ -1336,7 +1345,7 @@ LINECOMMENT    [#].*\n
 
 
 static int
-is_parrot_op(char *spelling) {
+is_parrot_op(char const * const spelling) {
 
     /* only "print" is recognized as a Parrot instruction */
     if (strcmp(spelling, "print") == 0)
