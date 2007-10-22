@@ -21,7 +21,7 @@ integer type without going to an I register.
 
 #include "parrot/parrot.h"
 
-/* XXX create MMD headers to in Pmc2c.pm */
+/* RT#46619 create MMD headers to in Pmc2c.pm */
 extern INTVAL Parrot_BigInt_is_equal_BigInt(PARROT_INTERP, PMC*, PMC*);
 extern PMC *Parrot_BigInt_multiply_int(PARROT_INTERP,
         PMC *pmc, INTVAL value, PMC *dest) ;
@@ -34,7 +34,7 @@ overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, int mmd) {
         real_exception(interp, NULL, ERR_OVERFLOW, "Integer overflow");
 
     if (self == dest) {
-        /* TODO preserve type system */
+        /* RT#46621 preserve type system */
         VTABLE_morph(interp, self, enum_class_BigInt);
         VTABLE_set_integer_native(interp, self, a);
         return mmd_dispatch_p_pip(interp, self, b, dest, mmd);
@@ -125,7 +125,7 @@ Class method to construct an Integer from the string representation C<rep>.
         else
             res = pmc_new(INTERP, type);
 
-        /* TODO bigint overflow */
+        /* RT#46623 bigint overflow */
         PMC_int_val(res) = string_to_int(INTERP, rep);
         return res;
     }
@@ -323,7 +323,7 @@ MMD_Integer: {
              * so we can't used PMC_int_val(SELF) in any of these
              * Integer methods
              *
-             * TODO
+             * RT#46627 
              *   check for exact Integer type
              *   e.g. MMD_Integer_EXACT
              */
@@ -599,7 +599,7 @@ MMD_Integer: {
         }
 MMD_Complex: {
                 real_exception(INTERP, NULL, E_NotImplementedError,
-                        "TODO mul<Integer, Complex>");
+                        "RT#46629 mul<Integer, Complex>");
             }
 MMD_BigInt:     {
             return Parrot_BigInt_multiply_int(INTERP, value,
@@ -658,7 +658,7 @@ MMD_BigInt: {
         }
 MMD_Complex: {
                 real_exception(INTERP, NULL, E_NotImplementedError,
-                        "TODO i_mul<Integer, Complex>");
+                        "RT#46629 i_mul<Integer, Complex>");
         }
 MMD_DEFAULT: {
         VTABLE_set_number_native(INTERP, SELF,
@@ -1066,9 +1066,9 @@ Return SELF to the C<value>th power and return result in C<dest>.
 
 =item C<void i_pow_int(INTVAL value)>
 
-Rise SELF to the C<value>th power.
+Raise SELF to the C<value>th power.
 
-TODO Complex and BigInt rhs.
+RT#46631 Complex and BigInt rhs.
 
 =cut
 
@@ -1228,7 +1228,7 @@ Increments the integer.
 
 */
     void increment() {
-        /* XXX overflow */
+        /* RT#46633 overflow */
         PMC_int_val(SELF) ++;
     }
 
@@ -1242,7 +1242,7 @@ Decrements the integer.
 
 */
     void decrement() {
-        /* XXX overflow */
+        /* RT#46633 overflow */
         PMC_int_val(SELF) --;
     }
 /*
@@ -1260,7 +1260,7 @@ Sets C<dest> to the absolute value of SELF.
     PMC *absolute(PMC *dest) {
         const INTVAL a = abs(DYNSELF.get_integer());
 
-        /* XXX overlflow for -maxint */
+        /* RT#46635 overlflow for -maxint */
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
