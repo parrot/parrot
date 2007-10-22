@@ -323,7 +323,7 @@ MMD_Integer: {
              * so we can't used PMC_int_val(SELF) in any of these
              * Integer methods
              *
-             * RT#46627 
+             * RT#46627
              *   check for exact Integer type
              *   e.g. MMD_Integer_EXACT
              */
@@ -1142,7 +1142,7 @@ MMD_BigInt: {
         return Parrot_BigInt_is_equal_BigInt(INTERP, temp, value);
     }
 MMD_DEFAULT: {
-        return (INTVAL)(PMC_int_val(SELF) ==
+        return (VTABLE_get_integer(INTERP, SELF) ==
             VTABLE_get_integer(INTERP, value));
         }
     }
