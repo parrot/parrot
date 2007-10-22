@@ -244,8 +244,6 @@ inline op newclass(out PMC, in PMC) :object_classes {
 
 =item B<subclass>(out PMC, in PMC, in PMC)
 
-RT#42969 subclass is deprecated
-
 Create a new class, put in $1, that is a subclass of $2.  $3, if available
 and not null, is the name of the new class--if not, the subclass is an
 anonymous subclass.
@@ -293,8 +291,6 @@ inline op subclass(out PMC, in PMC, in PMC) :object_classes {
 =item B<subclass>(out PMC, in STR, in STR)
 
 =item B<subclass>(out PMC, in STR, in PMC)
-
-RT#42969 subclass is deprecated
 
 Create a new class, put in $1, that is a subclass of the class named $2.
 $3, if available and not null, is the name of the new class--if not, the
