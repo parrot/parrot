@@ -38,13 +38,13 @@ constructor parameters.
 =cut
 
 .sub init :vtable :method
-    $P0 = new .Hash
-    $P1 = new .Hash
-    $P2 = new .Undef
+    $P0 = new 'Hash'
+    $P1 = new 'Hash'
+    $P2 = new 'Undef'
     setattribute self, "cell", $P0
     setattribute self, "visit", $P1
     setattribute self, "data", $P2
-    $P3 = new .AddrRegistry 
+    $P3 = new 'AddrRegistry'
     setattribute self, "agid", $P3
 .end
 
@@ -121,7 +121,7 @@ node_exists:
     $P2 = $P1[name]
     $I1 = exists $P1[name]
     if $I1 goto name_hash_exists
-    $P2 = new .Hash
+    $P2 = new 'Hash'
     $P1[name] = $P2
     goto scan_name
 name_hash_exists:
@@ -198,7 +198,7 @@ return_value:
     cellattr = cell_hash[name]
     $I1 = exists cell_hash[name]
     if $I1 goto name_hash_exists
-    cellattr = new .Hash
+    cellattr = new 'Hash'
     cell_hash[name] = cellattr
 name_hash_exists:
 
@@ -229,11 +229,11 @@ use_child_id:
     # store an empty space for the value after it has been calculated,
     # and a flag ("thunk") noting whether the action has been run.
     .local pmc thunk
-    thunk = new .Hash
+    thunk = new 'Hash'
     thunk['thunk'] = 1
     $P4 = getattribute rule, "action"
     thunk['action'] = $P4
-    $P5 = new .Undef
+    $P5 = new 'Undef'
     thunk['value'] = $P5
     thunk['node'] = node
     cellattr[id] = thunk

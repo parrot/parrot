@@ -33,9 +33,9 @@ of TGE::Rule objects, which are the semantics defined by the grammar.
 =cut
 
 .sub init :vtable :method
-    $P1 = new .ResizablePMCArray
+    $P1 = new 'ResizablePMCArray'
     setattribute self, 'rules', $P1
-    $P2 = new .Hash
+    $P2 = new 'Hash'
     setattribute self, 'symbols', $P2
 .end
 
@@ -98,7 +98,7 @@ loop:
     $P2 = visit[typename]
     $I1 = does $P2, 'array'
     if $I1 goto array_exists
-    $P2 = new .ResizablePMCArray
+    $P2 = new 'ResizablePMCArray'
     visit[typename] = $P2
 array_exists:
     push $P2, currule

@@ -13,7 +13,7 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 .sub __onload :load
     load_bytecode 'TGE.pbc'
 
-    $P0 = getclass 'TGE::Grammar'
+    $P0 = get_class 'TGE::Grammar'
     $P1 = subclass $P0, 'TGE::Compiler'
 .end
 
@@ -86,12 +86,12 @@ err_no_tree:
     .param pmc tree
     .param pmc node
     .local pmc statements
-    statements = new .ResizablePMCArray
+    statements = new 'ResizablePMCArray'
 
     # Iterate over the list of statements, and generate a processed tree for
     # each statement.  Return an array of all the processed statements.
     .local pmc iter
-    iter = new .Iterator, node # loop over the array
+    iter = new 'Iterator', node # loop over the array
     iter = 0 # start at the beginning
 loop_start:
     unless iter goto loop_end
@@ -132,7 +132,7 @@ err_no_tree:
     .param pmc tree
     .param pmc node
     .local pmc rule
-    rule = new .Hash
+    rule = new 'Hash'
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -166,7 +166,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc decl
-    decl = new .Hash
+    decl = new 'Hash'
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -202,7 +202,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc value
-    value = new .String
+    value = new 'String'
     $S2 = node
     value = $S2
     .return (value)
@@ -213,7 +213,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc name
-    name = new .String
+    name = new 'String'
     $P2 = node
     $S1 = $P2
     name = $S1
@@ -225,7 +225,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc value
-    value = new .String
+    value = new 'String'
     $P2 = node[0]
     $P3 = $P2[0]
     $S1 = $P3
@@ -254,7 +254,7 @@ err_no_rule:
     .param pmc tree
     .param pmc node
     .local pmc value
-    value = new .String
+    value = new 'String'
     $P2 = node[0]
     $P3 = $P2[0]
     $S1 = $P3
@@ -283,7 +283,7 @@ Compile a grammar from a source string.
     infile = concat '"', infile
     concat infile, '"'
   have_infile:
-    $P0 = new .String
+    $P0 = new 'String'
     $P0 = infile
     set_global '$!infile', $P0
 
@@ -295,7 +295,7 @@ Compile a grammar from a source string.
     # Construct grammar rules from the data structure of rule info
     .local pmc statement
     .local pmc iter
-    iter = new .Iterator, rule_data # loop over the rule info
+    iter = new 'Iterator', rule_data # loop over the rule info
     iter = 0 # start at the beginning
 loop_start:
     unless iter goto loop_end
@@ -335,7 +335,7 @@ loop_end:
     (code, grammarname) = self.'precompile'(source)
 
     unless grammarname == 'AnonGrammar' goto named_grammar
-    $P2 = new .Hash
+    $P2 = new 'Hash'
     $P2['type'] = 'AnonGrammar'
     $P2['inherit'] = 'TGE::Grammar'
     $S1 = self.'grammar_string'($P2)
