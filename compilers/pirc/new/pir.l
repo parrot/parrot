@@ -47,7 +47,7 @@ Major issues are:
 #  define YY_MAIN 0
 #endif
 
-/* kee MSVC happy */
+/* keep MSVC happy */
 #ifndef YY_ALWAYS_INTERACTIVE
 #  define YY_ALWAYS_INTERACTIVE 0
 #endif
@@ -89,6 +89,7 @@ typedef struct constant_info {
 /* data structure to store a macro definition */
 typedef struct macro_info {
     int line_declared;
+    int num_params; /* .macro foo => num_params=0, foo() => num_params=1, foo(a) => num_params=2, etc. */
     char *name;
     char *body;
 
@@ -144,6 +145,9 @@ extern YY_DECL;
 
 
 extern int yyerror(struct lexer_state * const lexer, char const * const message);
+
+
+#define DEBUG 1
 
 
 /* think of a smarter way to do this; only print when DEBUG is defined */
@@ -226,8 +230,6 @@ new_lexer(char *filename) {
     return lexer;
 }
 
-
-#define DEBUG 1
 
 
 
@@ -323,7 +325,8 @@ This information is stored in the file_info structure.
 static void
 switch_to_file(lexer_state * const lexer, file_info *info) {
     /* restore the buffer info */
-    fprintf(stderr, "restoring file_info...\n");
+    printdebug(stderr, "restoring file_info...\n");
+
     lexer->line_nr = info->line_nr;
     /* free current file name */
     free(lexer->filename);
@@ -331,7 +334,7 @@ switch_to_file(lexer_state * const lexer, file_info *info) {
     lexer->filename = info->filename;
     lexer->file_buffer = info->buffer;
 
-    fprintf(stderr, "deleting buffer...\n");
+    printdebug(stderr, "deleting buffer...\n");
     /* delete the current buffer (of the included file *) */
     yy_delete_buffer(YY_CURRENT_BUFFER);
     /* close current file */
@@ -340,13 +343,13 @@ switch_to_file(lexer_state * const lexer, file_info *info) {
     /* switch back to previous file */
     yy_switch_to_buffer(lexer->file_buffer);
 
-    fprintf(stderr, "switched back to buffer\n");
+    printdebug(stderr, "switched back to buffer\n");
     /* and free all resources of the buffer */
 
     free(info);
     info = NULL;
 
-    fprintf(stderr, "deleted info struct\n");
+    printdebug(stderr, "deleted info struct\n");
 }
 
 static void
@@ -358,12 +361,9 @@ unshift_heredoc(lexer_state * const lexer, heredoc_info * const heredoc) {
 static heredoc_info *
 shift_heredoc(lexer_state * const lexer) {
     heredoc_info *returning = lexer->heredocs;
-    if (returning == NULL) {
-        fprintf(stderr, "shift_heredoc(): queue is empty!\n");
-    }
-    else {
-        lexer->heredocs = lexer->heredocs->next;
-    }
+    assert(returning != NULL);
+
+    lexer->heredocs = lexer->heredocs->next;
     return returning;
 }
 
@@ -391,7 +391,7 @@ save_heredoc_line(lexer_state const * const lexer, char const * const text) {
     if (heredoc->contents != NULL) {
         newbuffer = (char *)calloc(heredoc->char_count + text_length, sizeof (char));
         assert(newbuffer != NULL);
-        fprintf(stderr, "copying old contents...\n(%s)", heredoc->contents);
+        printdebug(stderr, "copying old contents...\n(%s)", heredoc->contents);
         strcpy(newbuffer, heredoc->contents);
     }
     else { /* first time allocating memory */
@@ -400,7 +400,7 @@ save_heredoc_line(lexer_state const * const lexer, char const * const text) {
         assert(newbuffer != NULL);
     }
 
-    fprintf(stderr, "concatenating new contents..\n");
+    printdebug(stderr, "concatenating new contents..\n");
     /* copy new text into ne buffer, after old contents. */
     strcpy(newbuffer + heredoc->char_count, text);
     /* free old buffer */
@@ -513,8 +513,11 @@ unshift_macro(lexer_state * const lexer, macro_info * const macro) {
 
 /*
 
-*/
+Create a new macro_info node for the specified macro name.
+All fields are initialized, and a memory buffer is created
+to store the macro body.
 
+*/
 static macro_info *
 new_macro(char const * const name) {
     macro_info *macro = NULL;
@@ -525,6 +528,7 @@ new_macro(char const * const name) {
     assert(macro != NULL);
     macro->name = macro_id;
     macro->next = NULL;
+    macro->num_params = 0;
 
     /* TODO: Fix macro body size */
     macro->body = (char *)calloc(4096, sizeof (char));
@@ -562,7 +566,13 @@ read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
     /* read macro parameters, if any */
 
     if (next_token == '(') { /* there are parameters! */
-        int expect_parameter = 0;
+        int expect_parameter = 0; /* flag for parsing parameters */
+
+        /* because of the fact that macro has a definition with parenthesis,
+         * when invoking a macro defined with "()", even with no params, it needs "()" as well
+         */
+        macro->num_params++;
+
 
         /* get next token after opening parenthesis */
         next_token = yylex(yylval, lexer);
@@ -607,8 +617,15 @@ read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
 
     }
 
-    /* make sure there's a newline after the macro header TODO: must this be part of the macro text? */
-    if (next_token != TK_NL) {
+    /* make sure there's a newline after the macro header. This '\n' becomes part
+     * of the macro text, so that a macro expansion always results in at least
+     * one newline. This allows for writing "print 42 .NL print 42", so that
+     * multiple PIR statements can be written on 1 line.
+     */
+    if (next_token == TK_NL) {
+        strcat(macro->body, "\n");
+    }
+    else {
         yyerror(lexer, "newline expected after macro parameter list.");
     }
 
@@ -675,6 +692,15 @@ make_label(char const * const macro_name, char const * const label_name) {
     fprintf(stderr, "Made label '%s'\n", label);
 
     return label;
+}
+
+static void
+read_braced_argument(YYSTYPE *yylval, lexer_state *lexer) {
+    int next_token = yylex(yylval, lexer);
+
+    while (next_token != '}') {
+        next_token = yylex(yylval, lexer);
+    }
 }
 
 /*
@@ -768,6 +794,8 @@ LINECOMMENT    [#].*\n
  */
 %s MACRODEF
 
+%s MACROEXP
+
 /* support pushing/popping of start states */
 %option stack
 
@@ -843,7 +871,25 @@ LINECOMMENT    [#].*\n
                          yy_pop_state(); /* handle <<EOF>> in initial state */
                        }
 
+<MACROEXP><<EOF>>      { unsigned char dummy_char;
+                         fprintf(stderr, "End of Macro Exp buffer");
+                         yy_switch_to_buffer(lexer->file_buffer);
 
+
+                         /* we reached the end of the saved string, and just switched back to
+                          * the file. However, there may be more whitespace or newlines, so skip these now
+                          */
+                         dummy_char = input();
+
+                         while (isspace(dummy_char) || dummy_char == '\n') {
+                             dummy_char = input();
+                         }
+                         /* we just read one character too many; this is not a space/'\n', so put it back */
+                         unput(dummy_char);
+
+                         yy_pop_state();
+
+                       }
 
 {WS}                               { /* ignore */; }
 
@@ -907,7 +953,7 @@ LINECOMMENT    [#].*\n
 
 <SCANSTRING><<EOF>> { unsigned char dummy_char;
 
-                      /* End of the "rest" string, switch back to normal buffer and state. */
+                      /* End of the string buffer, switch back to normal buffer and state. */
                       yy_switch_to_buffer(lexer->file_buffer);
                       BEGIN(INITIAL);
 
@@ -1303,6 +1349,7 @@ LINECOMMENT    [#].*\n
                      * it's a subcall like "foo .bar()".
                      */
 
+                    /* in IMCC, a .constant is only allowed in PASM mode or in .emit/.eom context. */
                     constant_info *constant = NULL;
 
                     /* give the name of the constant, skip the prefix dot. */
@@ -1323,16 +1370,44 @@ LINECOMMENT    [#].*\n
 
                         macro = find_macro(lexer, yytext + 1);
 
-                        if (macro != NULL) {
-
+                        if (macro != NULL) { /* the macro definition exists! Yay! */
+                            int num_macro_params = macro->num_params;
                             /* read input for parameters */
-                            /* TODO */
+
+                            /* TODO: finish this */
+                            int next_token = yylex(yylval, lexer);
+                            if (next_token == '(') {
+                                next_token = yylex(yylval, lexer); /* skip '(' */
+
+                                fprintf(stderr, "Warning! Macro parameters are not implemented yet\n");
+
+                                while (next_token != ')') {
+                                    if (next_token == '{') { /* braced argument */
+                                        read_braced_argument(yylval, lexer);
+                                    }
+                                    else {
+                                        /* don't care about the token, just store it */
+                                        next_token = yylex(yylval, lexer);
+                                    }
+                                }
+                                /* done with parameters */
+
+                            }
+                            else { /* no parameters */
+                                /* the macro defines arguments, or at least an empty param-list. */
+                                if (num_macro_params > 0) {
+                                    yyerror(lexer, "Too few arguments for macro");
+                                }
+                            }
 
                             /* expand the macro into a string buffer */
                             /* is expanding necessary? */
 
                             lexer->file_buffer = get_current_buffer();
                             /* and scan that string buffer. */
+
+                            /* BEGIN(MACROEXP);  ? */
+                            yy_push_state(MACROEXP); /* ? what if nested macro expansions? */
 
                             /* todo: destroy state afterwards */
                             /*YY_BUFFER_STATE state = */
