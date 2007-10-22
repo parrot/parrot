@@ -33,31 +33,6 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* RT#46697 put these into exceptions.h */
-
-#define TRY \
-    do { \
-        new_internal_exception(INTERP); \
-        if (!setjmp(INTERP->exceptions->destination))
-
-#define CATCH \
-    else
-
-#define ENDTRY \
-    } while (0); \
-    do { \
-        Parrot_exception *e = INTERP->exceptions; \
-        INTERP->exceptions = e->prev; \
-        INTERP->exc_free_list = e; \
-    } while (0)
-
-
-#define THROW(e)  \
-    do { \
-        exceptions->err = e; \
-        longjmp(exceptions->dest, 1); \
-    } while (0)
-
 static void
 print_sub_name(PARROT_INTERP, PMC *sub)
 {
