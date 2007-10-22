@@ -12,7 +12,7 @@ use_ok('config::auto::alignptrs');
 
 =for hints_for_testing Check latest reports of Parrot configuration
 tools testing coverage to see where your time available for writing
-tests is spent.  Have all 3 parts of the 2nd if block been covered?  
+tests is spent.  Have all 3 parts of the 2nd if block been covered?
 Write a test which generates the result 'skipped' when
 miniparrot has been selected.  In POD, define 'minimum pointer alignment'.
 
