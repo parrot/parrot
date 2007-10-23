@@ -12,7 +12,7 @@
 INTVAL
 Parrot_intval_time(void)
 {
-#if _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400
 #  if INTVAL_SIZE <= 4
     return _time32(NULL);
 #  else
