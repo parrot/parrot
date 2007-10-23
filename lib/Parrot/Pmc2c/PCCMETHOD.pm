@@ -239,14 +239,17 @@ END
         $e->emit(<<"END");
 $returns_accessors
 END
+
+    my $returns_sig  = make_arg_pmc($returns_flags, 'return_sig');
+
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     /*END GENERATED ACCESSORS */
     {
         opcode_t temp_return_indexes[] = { $returns_indexes };
         return_indexes = temp_return_indexes;
     }
-    return_sig = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_literal(interp, $returns_flags), 0);
+    return_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+$returns_sig
     $goto_string
     /*END PCCRETURN $returns */
     }
@@ -320,8 +323,7 @@ sub process_pccmethod_args {
 
     my $n_regs_used  = join( ", ",        @$n_regs_used_a );
     my $args_indexes = join( ", ",        @$args_indexes_a );
-    my $args_flags   = '"(' . join( ", ", @$args_flags_a ) . ')"';
-    return ( $n_regs_used_a, $args_indexes, $args_flags, $args_accessors, $named_names );
+    return ( $n_regs_used_a, $args_indexes, $args_flags_a, $args_accessors, $named_names );
 }
 
 sub find_max_regs {
@@ -364,21 +366,22 @@ sub rewrite_pccmethod {
     unshift @$n_regs, $params_n_regs_used;
     my $n_regs_used = find_max_regs($n_regs);
 
+    my $set_params  = make_arg_pmc($params_flags, 'param_sig');
+
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     INTVAL   n_regs_used[]   = { $n_regs_used };
     opcode_t param_indexes[] = { $params_indexes };
     opcode_t *return_indexes;
     opcode_t *current_args;
-    PMC* _type      = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC* param_sig  = Parrot_FixedIntegerArray_new_from_string(interp, _type,
-        string_from_literal(interp, $params_flags), 0);
-
-    PMC* return_sig              = PMCNULL;
+    PMC *param_sig               = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC *return_sig              = PMCNULL;
 
     parrot_context_t *caller_ctx = CONTEXT(interp->ctx);
-    PMC* ret_cont                = new_ret_continuation_pmc(interp, NULL);
+    PMC *ret_cont                = new_ret_continuation_pmc(interp, NULL);
     parrot_context_t *ctx        = Parrot_push_context(interp, n_regs_used);
-    PMC* ccont                   = PMCNULL;
+    PMC *ccont                   = PMCNULL;
+
+$set_params
 
     if (caller_ctx) {
         ccont = caller_ctx->current_cont;
@@ -452,7 +455,6 @@ END
     /* END PARAMS SCOPE */
     }
     no_return:
-    PObj_live_CLEAR(_type);
     PObj_live_CLEAR(param_sig);
     PObj_live_CLEAR(return_sig);
     Parrot_pop_context(interp);
@@ -505,7 +507,7 @@ sub rewrite_pccinvoke {
         my ( $result_n_regs_used, $result_indexes, $result_flags, $result_accessors ) =
             ( defined $results )
             ? process_pccmethod_args( parse_p_args_string($results), 'result' )
-            : ( [ 0, 0, 0, 0 ], "0", "\"\"", "" );
+            : ( [ 0, 0, 0, 0 ], "0", [], "" );
 
         #parameters portion of pccinvoke statement
         my ( $interp, $invocant, $method_name, $arguments ) =
@@ -519,6 +521,9 @@ sub rewrite_pccinvoke {
         $method_name = "string_from_literal(interp, $method_name)"
             if isquoted($method_name);
 
+        my $args_set    = make_arg_pmc($arg_flags,    'args_sig');
+        my $results_set = make_arg_pmc($result_flags, 'results_sig');
+
         my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
@@ -527,21 +532,20 @@ sub rewrite_pccinvoke {
       INTVAL   n_regs_used[]    = { $n_regs_used };
       opcode_t arg_indexes[]    = { $arg_indexes };
       opcode_t result_indexes[] = { $result_indexes };
-      PMC* _type                = pmc_new(interp, enum_class_FixedIntegerArray);
 
-      PMC* args_sig         = Parrot_FixedIntegerArray_new_from_string(interp,
-            _type, string_from_literal(interp, $arg_flags), 0);
-      PMC* results_sig      = Parrot_FixedIntegerArray_new_from_string(interp,
-            _type, string_from_literal(interp, $result_flags), 0);
-      PMC* ret_cont         = new_ret_continuation_pmc(interp, NULL);
+      PMC *args_sig         = pmc_new(interp, enum_class_FixedIntegerArray);
+      PMC *results_sig      = pmc_new(interp, enum_class_FixedIntegerArray);
+      PMC *ret_cont         = new_ret_continuation_pmc(interp, NULL);
 
       parrot_context_t *ctx = Parrot_push_context(interp, n_regs_used);
-      PMC* pccinvoke_meth;
+      PMC              *pccinvoke_meth;
 
-      opcode_t* save_current_args = interp->current_args;
-      PMC* save_args_signature    = interp->args_signature;
-      PMC* save_current_object    = interp->current_object;
+      opcode_t *save_current_args   = interp->current_args;
+      PMC      *save_args_signature = interp->args_signature;
+      PMC      *save_current_object = interp->current_object;
 
+$args_set
+$results_set
       interp->current_args        = arg_indexes;
       interp->args_signature      = args_sig;
       ctx->current_results        = result_indexes;
@@ -561,9 +565,10 @@ END
       PMC_cont(ret_cont)->from_ctx = ctx;
 
       pccinvoke_meth = VTABLE_find_method(interp, $invocant, $method_name);
-      if (PMC_IS_NULL(pccinvoke_meth))
+      if (PMC_IS_NULL(pccinvoke_meth)) {
           real_exception(interp, NULL, METH_NOT_FOUND,
             "Method '%Ss' not found", $method_name);
+      }
       else
           VTABLE_invoke(interp, pccinvoke_meth, NULL);
 
@@ -573,7 +578,6 @@ $result_accessors
 END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
 
-      PObj_live_CLEAR(_type);
       PObj_live_CLEAR(args_sig);
       PObj_live_CLEAR(results_sig);
       Parrot_pop_context(interp);
@@ -588,6 +592,22 @@ END
         $matched->replace( $match, $e );
     }
     return 1;
+}
+
+sub make_arg_pmc {
+    my ($args, $name) = @_;
+
+    return '' unless @$args;
+
+    my $code = "    VTABLE_set_integer_native(interp, $name, " . @$args
+             . ");\n";
+
+    for my $i ( 0 .. $#{$args} ) {
+        $code .= "    VTABLE_set_integer_keyed_int(interp, $name, "
+              .  "$i, $args->[$i]);\n";
+    }
+
+    return $code;
 }
 
 1;
