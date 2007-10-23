@@ -6,6 +6,9 @@ docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
 =head1 ABSTRACT
 
+This document is outlines the architecture and core syntax of the Parrot
+Intermediate Representation (PIR).
+
 This document describes PIR, a stable, middle-level language for both
 compiler and human to target on.
 
@@ -15,105 +18,110 @@ $Revision$
 
 =head1 DESCRIPTION
 
-This document is the Parrot Design Document for the Parrot Intermediate 
-Representation (PIR).
+PIR is a stable, middle-level language intended both as a target for the
+generated output from high-level language compilers, and for human use
+developing core features and extensions for Parrot.
 
-=head1 Comments and empty lines
+=head2 Basic Syntax
 
-Comments start with B<#> and last until the following newline. These
-and empty lines are ignored.
+A valid PIR program consists of a sequence of statements, directives, comments
+and empty lines.
 
-PIR allows POD blocks.
-
-=head1 Statements
-
-A valid PIR program consists of a sequence of I<statements>. A
-I<statement> is terminated by a newline (<NL>). So, each statement has to be
-on its own line.
-
-=head2 General statement format
-
-Any statement can start with a optional label and is terminated by a
-newline:
-
-  [label:] [instruction] <NL>
-
-=head2 Labels
-
-PIR code has both local and global labels. Global labels start with an
-underscore, local labels shouldn't.  Optional label for the given
-instruction, can stand on its own line. A label must conform to the syntax
-of B<identifier> described below.
-
-The name of a global label has to be unique, since it can be called at any
-point in the program. A local label is accessible only in the compilation
-unit where it's defined. A local label name must be unique within a
-compilation unit, but it can be reused in other compilation units.
-
-Examples:
-
-  branch L1   # local label
-  bsr    _L2  # global label
-
-=head1 INSTRUCTIONS
-
-=head2 Terms used here
-
-=over 4
-
-=item <identifier>
+=head3 Identifiers
 
 Identifiers start with a letter or underscore, then may contain additionally
-letters, digits, underscores and B<::>. Identifiers don't have any limit on
-length.
-
-{{ REVIEW: identifier length limit }}
-
-{{ REVIEW: can op-names be used as identifiers? See #24251. }}
-
-Example:
+letters, digits, and underscores. Identifiers don't have any limit on length at
+the moment, but some sane-but-generous length limit may be imposed in the
+future (256 chars, 1024 chars?). The following examples are all valid
+identifiers. 
 
     a
     _a
     A42
-    a::b_c
 
-=item <type>
+Opcode names are not reserved words in PIR, and may be used as variable names.
+For example, you can define a local variable named C<print>.  [See #24251.]
 
-Can be B<int>, B<float>, B<string> or B<pmc>.
+NOTE: The use of C<::> in identifiers is deprecated.
 
-{{ REFERENCE: RT#42769 }}
+=head3 Comments
 
-=item <reg>
+Comments start with C<#> and last until the following newline. PIR also allows
+comments in Pod format. Comments, Pod content, and empty lines are ignored.
 
-A PASM register In, Sn, Nn, Pn, or a PIR temporary register $In, $Sn, $Nn,
-$Pn, where B<n> consists of digit(s) only. B<n> must be between 1 and 99.
+=head3 Statements
 
-{{ REVIEW: n limit }}
+A I<statement> starts with an optional label, contains an instruction (a Parrot
+operation or opcode), and is terminated by a newline (<NL>). Each statement
+must be on its own line.
 
-=item <var>
+  [label:] [instruction] <NL>
 
-A local B<identifier>, a B<reg> or a constant (when allowed). A constant
-is not allowed on the left side of an assignment.
+=head3 Directives
 
-{{ REVIEW: any other places where constant is not allowed }}
+A directive provides information for the PIR compiler that is outside the
+normal flow of executable statements. Directives are all prefixed with a ".",
+as in C<.local> or C<.sub>.
 
-=back
+=head3 Labels
+
+A label declaration consists of a label name followed by a colon. A label name
+conforms to the standard requirements for identifiers. A label declaration may
+occur at the start of a statement, or stand alone on a line. A label
+declaration may not occur on the same line as a directive.
+
+A reference to a label consists of only the label name, and is generally used
+as an argument to an instruction or directive.
+
+A PIR label is accessible only in the compilation unit where it's defined. A
+label name must be unique within a compilation unit, but it can be reused in
+other compilation units.
+
+  goto label1
+     ...
+  label1:
+
+=head3 Registers and Variables
+
+There are three ways of referencing Parrot's registers. The first is direct
+access to a specific register by name In, Sn, Nn, Pn. The second is through a
+temporary register variable $In, $Sn, $Nn, $Pn. I<n> consists of digit(s) only.
+There is no limit on the size of I<n>.
+
+The third syntax for accessing registers is through named local variables
+declared with C<.local>.
+
+  .local pmc foo
+
+The type of a named variable can be C<int>, C<float>, C<string> or C<pmc>,
+corresponding to the types of registers. No other types are used. [See
+RT#42769]
+
+The difference between direct register access and register variables or local
+variables is largely a matter of allocation. If you directly reference C<P99>,
+Parrot will blindly allocate 100 registers for that compilation unit. If you
+reference C<$P99> or a named variable C<foo>, on the other hand, Parrot will
+intelligently allocate a literal register in the background, so C<$P99> may be
+stored in C<P0>, if it is the only register in the compilation unit.
 
 =head2 Constants
+
+Constants may be used in place of registers or variables. A constant is not
+allowed on the left side of an assignment, or in any other context where the
+variable would be modified.
 
 =over 4
 
 =item 'char constant'
 
-Are delimited by B<'>. They are taken to be C<ascii> encoded. No escape
-sequences are processed.
+Are delimited by single-quotes (C<'>). They are taken to be ASCII encoded. No
+escape sequences are processed.
 
 =item "string constants"
 
-Are delimited by B<">. A B<"> inside a string must be escaped by
-B<\>.  Only 7-bit ASCII is accepted in string constants; to use
-characters outside that range, specify an encoding in the way below.
+Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
+by C<\>.  Only 7-bit ASCII is accepted in string constants; to use characters
+outside that range, specify an encoding in the way below.
 
 =item <<"heredoc",  <<'heredoc'
 
@@ -123,6 +131,10 @@ has to be on its own line, at the beginning of the line and with no
 trailing whitespace.
 
 Assignment of a heredoc:
+
+  $S0 = <<"EOS"
+  ...
+ EOS
 
 A heredoc as an argument:
 
@@ -138,18 +150,13 @@ A heredoc as an argument:
   ...
  EOS
 
-Only one heredoc can be active per statement line.
-
-{{ REVIEW: it would be useful to have multiple heredocs per statement,
-   which allows for writing:
+You may have multiple heredocs within a single statement or directive:
 
    function(<<'INPUT', <<'OUTPUT', 'some test')
    ...
  INPUT
    ...
  OUTPUT
-
-}}
 
 =item charset:"string constant"
 
@@ -184,91 +191,18 @@ is done, specifically escape sequences are not honored.
 
 =item numeric constants
 
-B<0x> and B<0b> denote hex and binary constants respectively.
+C<0x> and C<0b> denote hex and binary constants respectively.
 
 =back
 
-=head2 Directive instructions
+=head2 Directives 
 
 =over 4
 
-=item .pragma n_operators
-
-Convert arithmethic infix operators to n_infix operations. The unary opcodes
-C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a B<n_>
-prefix.
-
- .pragma n_operators 1
- .sub foo
-   ...
-   $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
-   $P2 = abs $P0             # n_abs $P2, $P0
-
-=item .loadlib "lib_name"
-
-Load the given library at B<compile time>, that is, as soon that line is
-parsed.  See also the C<loadlib> opcode, which does the same at run time.
-
-A library loaded this way is also available at runtime, as if it has been
-loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
-
-=item .HLL "hll_name", "hll_lib"
-
-Define the HLL for the current file. If the string C<hll_lib> isn't empty
-this B<compile time pragma> also loads the shared lib for the HLL, so that
-integer type constants are working for creating new PMCs.
-
-=item .HLL_map 'CoreType', 'UserType'
-
-Whenever Parrot has to create PMCs inside C code on behalf of the running
-user program it consults the current type mapping for the executing HLL
-and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such
-a mapping is defined.
-
-E.g. with this code snippet ...
-
-  .loadlib 'dynlexpad'
-
-  .HLL "Foo", ""
-  .HLL_map 'LexPad', 'DynLexPad'
-
-  .sub main :main
-    ...
-
-... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
-
-{{ PROPOSAL: stop using integer constants for types RT#45453 }}
-
-=item .sub <identifier> [:<flag> ...]
-
-Define a I<compilation unit> with the label B<identifier>. All code in a
-PIR source file must be defined in a compilation unit. See
-L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
-Optional flags are a list of B<flag>, separated by empty spaces, and empty
-spaces only.
-
-{{ PROPOSAL: remove the optional comma in flag list RT#45697 }}
-
-Always paired with C<.end>.
-
-=item .end
-
-End a compilation unit. Always paired with C<.sub>.
-
-=item .emit
-
-Define a I<compilation unit> containing PASM code. Always paired with
-C<.eom>.
-
-=item .eom
-
-End a I<compilation unit> containing PASM code. Always paired with
-C<.emit>.
-
 =item .local <type> <identifier> [:unique_reg]
 
-Define a local name B<identifier> for this I<compilation unit> and of the
-given B<type>. You can define multiple identifiers of the same type by
+Define a local name I<identifier> for this I<compilation unit> and of the
+given I<type>. You can define multiple identifiers of the same type by
 separating them with commas:
 
   .local int i, j
@@ -277,11 +211,11 @@ The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
 compilation unit.
 
-=item .sym <type> <identifier> [:unique_reg]
+=item .sym [deprecated, see RT#45405]
+
+  .sym <type> <identifier> [:unique_reg]
 
 Same as C<.local>.
-
-{{ PROPOSAL: remove .sym, see RT#45405 }}
 
 =item .lex <identifier>, <reg>
 
@@ -304,13 +238,17 @@ directive. For example, given this preamble:
 
 =item .const <type> <identifier> = <const>
 
-Define a constant named B<identifier> of type B<type> and assign value
-B<const> to it.
+Define a constant named I<identifier> of type I<type> and assign value
+I<const> to it.
+
+{{ NOTE: C<.const> is deprecated, replaced with C<.constant>. }}
 
 =item .globalconst <type> <identifier> = <const>
 
 As C<.const> above, but the defined constant is globally accessible.
 
+{{ Proposal: Change name to C<.globalconstant> for consistency with
+C<.constant>. }}
 
 =item .namespace <identifier>
 
@@ -341,6 +279,79 @@ in any namespace.  If you specify more than one, separated by semicolons, it
 creates nested namespaces, by storing the inner namespace object with a C<\0>
 prefix in the outer namespace's global pad.
 
+=item .pragma n_operators
+
+Convert arithmethic infix operators to n_infix operations. The unary opcodes
+C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a C<n_>
+prefix.
+
+ .pragma n_operators 1
+ .sub foo
+   ...
+   $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
+   $P2 = abs $P0             # n_abs $P2, $P0
+
+=item .loadlib "lib_name"
+
+Load the given library at compile time, that is, as soon that line is
+parsed.  See also the C<loadlib> opcode, which does the same at run time.
+
+A library loaded this way is also available at runtime, as if it has been
+loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
+
+=item .HLL "hll_name", "hll_lib"
+
+Define the HLL for the current file. If the string C<hll_lib> isn't empty
+this compile time pragma also loads the shared lib for the HLL, so that
+integer type constants are working for creating new PMCs.
+
+=item .HLL_map 'CoreType', 'UserType'
+
+Whenever Parrot has to create PMCs inside C code on behalf of the running
+user program it consults the current type mapping for the executing HLL
+and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such
+a mapping is defined.
+
+E.g. with this code snippet ...
+
+  .loadlib 'dynlexpad'
+
+  .HLL "Foo", ""
+  .HLL_map 'LexPad', 'DynLexPad'
+
+  .sub main :main
+    ...
+
+... all subroutines for language I<Foo> would use a dynamic lexpad pmc.
+
+{{ PROPOSAL: stop using integer constants for types RT#45453 }}
+
+=item .sub <identifier> [:<flag> ...]
+
+Define a compilation unit with the label I<identifier>. All code in a
+PIR source file must be defined in a compilation unit. See
+L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
+Optional flags are a list of I<flag>, separated by empty spaces, and empty
+spaces only.
+
+{{ NOTE: the optional comma in the flag list is deprecated RT#45697 }}
+
+Always paired with C<.end>.
+
+=item .end
+
+End a compilation unit. Always paired with C<.sub>.
+
+=item .emit
+
+Define a I<compilation unit> containing PASM code. Always paired with
+C<.eom>.
+
+=item .eom
+
+End a I<compilation unit> containing PASM code. Always paired with
+C<.emit>.
+
 =item .pcc_*
 
 Directives used for Parrot Calling Conventions. These are:
@@ -361,14 +372,14 @@ Directives used for Parrot Calling Conventions. These are:
 
 =back
 
-=head2 Directives for subroutine parameters and return
+=head3 Directives for subroutine parameters and return
 
 =over 4
 
 =item .param <type> <identifier> [:<flag>]*
 
 At the top of a subroutine, declare a local variable, in the manner
-of B<.local>, into which parameter(s) of the current subroutine should
+of C<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
 C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
@@ -380,31 +391,31 @@ Define a named parameter. This is syntactic sugar for:
 
 =item .return <var> [:<flag> ...]
 
-Between B<.pcc_begin_return> and B<.pcc_end_return>, specify one or
+Between C<.pcc_begin_return> and C<.pcc_end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags:
 C<:flat>.
 
 =back
 
-=head2 Directives for making a PCC call
+=head3 Directives for making a PCC call
 
 =over 4
 
 =item .arg <var> [:<flag> ...]
 
-Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
+Between C<.pcc_begin> and C<.pcc_call>, specify an argument to be
 passed.  Available flags: C<:flat>.
 
 =item .result <var> [:<flag> ...]
 
-Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
+Between C<.pcc_call> and C<.pcc_end>, specify where one or more return
 value(s) should be stored.  Available flags:
 C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 =back
 
-=head2 Shorthand directives for PCC call and return
+=head3 Shorthand directives for PCC call and return
 
 =over 4
 
@@ -429,8 +440,8 @@ This is short for:
 =item <var>._method([arg [:<flag> ...], ...])
 
 Function or method call. These notations are shorthand for a longer
-PCC function call with B<.pcc_*> directives. I<var> can denote a
-global subroutine, a local B<identifier> or a B<reg>.
+PCC function call with C<.pcc_*> directives. I<var> can denote a
+global subroutine, a local I<identifier> or a I<reg>.
 
 {{We should review the (currently inconsistent) specification of the
 method name. Currently it can be a bare word, a quoted string or a
@@ -442,7 +453,7 @@ Return from the current compilation unit with zero or more values.
 
 The surrounded parentheses are mandatory. Besides making sequence
 break more conspicuous, this is necessary to distinguish this syntax
-from other uses of the B<.return> directive that will be probably
+from other uses of the C<.return> directive that will be probably
 deprecated.
 
 =item .return <var>(args)
@@ -469,16 +480,17 @@ C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 {{ TODO: once these flag bits are solidified by long-term use, then we
 may choose to copy appropriate bits of the documentation to here. }}
 
-=head2 Instructions
+=head2 Syntactic Sugar
 
-Instructions may be a valid PASM instruction or anything listed here
-below:
+Any PASM opcode is a valid PIR instruction. In addition, PIR defines some
+syntactic shortcuts. These are provided for ease of use by humans producing and
+maintaing PIR code.
 
 =over 4
 
 =item goto <identifier>
 
-B<branch> to B<identifier> (label or subroutine name).
+C<branch> to I<identifier> (label or subroutine name).
 
 Examples:
 
@@ -486,56 +498,56 @@ Examples:
 
 =item if <var> goto <identifier>
 
-If B<var> evaluates as true, jump to the named B<identifier>. Translate to
-B<if var, identifier>.
+If I<var> evaluates as true, jump to the named I<identifier>. Translate to
+C<if var, identifier>.
 
 =item unless <var> goto <identifier>
 
-Unless B<var> evaluates as true, jump to the named B<identifier>. Translate
-to B<unless var, identifier>.
+Unless I<var> evaluates as true, jump to the named I<identifier>. Translate
+to C<unless var, identifier>.
 
 =item if null <var> goto <identifier>
 
-If B<var> evaluates as null, jump to the named B<identifier>. Translate to
-B<if_null var, identifier>.
+If I<var> evaluates as null, jump to the named I<identifier>. Translate to
+C<if_null var, identifier>.
 
 =item unless null <var> goto <identifier>
 
-Unless B<var> evaluates as null, jump to the named B<identifier>. Translate
-to B<unless_null var, identifier>.
+Unless I<var> evaluates as null, jump to the named I<identifier>. Translate
+to C<unless_null var, identifier>.
 
 =item if <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. If B<var1>
-B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
+The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If C<var1
+relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
-The B<relop> can be: B<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt>. Unless B<var1>
-B<relop> B<var2> evaluates as true, jump to the named B<identifier>.
+The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. Unless C<var1
+relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item <var1> = <var2>
 
-Assign a value. Translates to B<set var1, var2>.
+Assign a value. Translates to C<set var1, var2>.
 
 =item <var1> = <unary> <var2>
 
-The B<unary>s B<!>, B<-> and B<~> generate B<not>, B<neg> and B<bnot> ops.
+The unaries C<!>, C<-> and C<~> generate C<not>, C<neg> and C<bnot> ops.
 
 =item <var1> = <var2> <binary> <var3>
 
-The B<binary>s B<+>, B<->, B<*>, B</>, B<%> and B<**> generate
-B<add>, B<sub>, B<mul>, B<div>, B<mod> and B<pow> arithmetic ops.
-B<binary> B<.> is B<concat> and only valid for string arguments.
+The binaries C<+>, C<->, C<*>, C</>, C<%> and C<**> generate
+C<add>, C<sub>, C<mul>, C<div>, C<mod> and C<pow> arithmetic ops.
+binary C<.> is C<concat> and only valid for string arguments.
 
-B<E<lt>E<lt>> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
-B<E<gt>E<gt>E<gt>> is the logical shift B<lsr>.
+C<E<lt>E<lt>> and C<E<gt>E<gt>> are arithmetic shifts C<shl> and C<shr>.
+C<E<gt>E<gt>E<gt>> is the logical shift C<lsr>.
 
-B<&&>, B<||> and B<~~> are logic B<and>, B<or> and B<xor>.
+C<&&>, C<||> and C<~~> are logic C<and>, C<or> and C<xor>.
 
-B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
+C<&>, C<|> and C<~> are binary C<band>, C<bor> and C<bxor>.
 
 {{PROPOSAL: Change description to support logic operators (comparisons) as
 implemented (and working) in imcc.y.}}
@@ -543,14 +555,14 @@ implemented (and working) in imcc.y.}}
 =item <var1> <op>= <var2>
 
 This is equivalent to
-B<E<lt>var1E<gt> = E<lt>var1E<gt> E<lt>opE<gt> E<lt>var2E<gt>>. Where
-B<op> is called an assignment operator and can be any of the following
-binary operators described earlier: B<+>, B<->, B<*>, B</>, B<%>, B<.>,
-B<&>, B<|>, B<~>, B<E<lt>E<lt>>, B<E<gt>E<gt>> or B<E<gt>E<gt>E<gt>>.
+C<E<lt>var1E<gt> = E<lt>var1E<gt> E<lt>opE<gt> E<lt>var2E<gt>>. Where
+I<op> is called an assignment operator and can be any of the following
+binary operators described earlier: C<+>, C<->, C<*>, C</>, C<%>, C<.>,
+C<&>, C<|>, C<~>, C<E<lt>E<lt>>, C<E<gt>E<gt>> or C<E<gt>E<gt>E<gt>>.
 
 =item <var> = <var> [ <var> ]
 
-This generates either a keyed B<set> operation or B<substr var, var,
+This generates either a keyed C<set> operation or C<substr var, var,
 var, 1> for string arguments and an integer key.
 
 =item <var> = <var> [ <key> ]
@@ -574,27 +586,27 @@ and t/pmc/slice.t.
 
 =item <var> [ <var> ] = <var>
 
-A keyed B<set> operation or the assign B<substr> op with a length of
+A keyed C<set> operation or the assign C<substr> op with a length of
 1.
 
 =item <var> = new '<type>'
 
-Create a new PMC of type B<type> stored in B<var>. Translate to
-B<new var, 'type'>.
+Create a new PMC of type I<type> stored in I<var>. Translate to
+C<new var, 'type'>.
 
 =item <var1> = new '<type>', <var2>
 
-Create a new PMC of type B<type> stored in B<var1> and using B<var2> as PMC
-containing initialization data. Translate to B<new var1, 'type', var2>
+Create a new PMC of type I<type> stored in I<var1> and using I<var2> as PMC
+containing initialization data. Translate to C<new var1, 'type', var2>
 
 =item <var1> = defined <var2>
 
-Assign to B<var1> the value for definedness of B<var2>. Translate to
-B<defined var1, var2>.
+Assign to I<var1> the value for definedness of I<var2>. Translate to
+C<defined var1, var2>.
 
 =item <var1> = defined <var2> [ <var3> ]
 
-B<defined var1, var2[var3]> the keyed op.
+C<defined var1, var2[var3]> the keyed op.
 
 =item global "string" = <var>
 
@@ -606,16 +618,16 @@ B<defined var1, var2[var3]> the keyed op.
 
 =item <var1> = clone <var2>
 
-Assing to B<var1> a clone of B<var2>. Translate to B<clone var1, var2>.
+Assign to I<var1> a clone of I<var2>. Translate to C<clone var1, var2>.
 
 =item <var> = addr <identifier>
 
-Assign to B<var> the address of label identified by B<identifier>. Translate
-to B<set_addr var, var>.
+Assign to I<var> the address of label identified by I<identifier>. Translate
+to C<set_addr var, var>.
 
 =item <var> = null
 
-Set B<var> to null. Translate to B<null <var>.
+Set I<var> to null. Translate to C<null <var>.
 
 =item addr
 
@@ -625,7 +637,7 @@ Return the address of a label.
 
 
 
-=head1 MACRO LAYER
+=head2 Macros
 
 This section describes the macro layer of the PIR language.
 
@@ -818,7 +830,6 @@ allowed in PASM mode, or within a C<.emit> block.
 
 {{ Is there any reason to not allow C<.constant> directives in PIR mode?
    (Except for the fact that we have C<.const> and C<.globalconst>) }}
-
 
 
 
