@@ -19,6 +19,7 @@ extern void parse_error(struct lexer_state * const lexer);
 extern int get_line_nr(struct lexer_state const * const lexer);
 extern char const *get_current_file(struct lexer_state const * const lexer);
 
+extern void syntax_error(void *yyscanner, struct lexer_state *lexer, char *message);
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 

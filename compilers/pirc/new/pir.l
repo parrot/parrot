@@ -41,6 +41,29 @@ Major issues are:
 #include "pirparser.h"
 #include "pircompiler.h"
 
+/* Windows doesn't have <unistd.h> */
+#define YY_NO_UNISTD_H
+
+/* define the type of the extra field in the yyscan_t object that is passed around */
+#define YY_EXTRA_TYPE  struct lexer_state *
+
+/* accessor methods for setting and getting the lexer_state */
+extern YY_EXTRA_TYPE  yyget_extra(yyscan_t scanner);
+extern void yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
+
+/* accessor method to get yytext */
+extern char *yyget_text(yyscan_t yyscanner);
+
+/* constructor for the lexer */
+extern struct lexer_state *new_lexer(char *filename);
+
+/* declaration of yylex */
+extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
+
+
+
+
+
 
 /* keep MSVC happy */
 #ifndef YY_MAIN
@@ -54,10 +77,15 @@ Major issues are:
 
 
 
+
+
 /* Parrot can check out whether the specified text is the name of an op.
  * We define a dummy function for now; replace this later.
  */
 static int is_parrot_op(char const * const spelling);
+
+
+
 
 
 
@@ -89,7 +117,8 @@ typedef struct constant_info {
 /* data structure to store a macro definition */
 typedef struct macro_info {
     int line_declared;
-    int num_params; /* .macro foo => num_params=0, foo() => num_params=1, foo(a) => num_params=2, etc. */
+    /* .macro foo => num_params=0, foo() => num_params=1, foo(a) => num_params=2, etc. */
+    int num_params;
     char *name;
     char *body;
 
@@ -139,20 +168,7 @@ typedef struct lexer_state {
 #define chop_yytext()   (yytext[--yyleng] = '\0')
 
 
-/* declaration of the lexer function */
-#define YY_DECL int yylex(YYSTYPE * const yylval, struct lexer_state * const lexer)
-
-/* declare the function yylex here; its definition is #define'd, so use that: */
-extern YY_DECL;
-
-
-extern int yyerror(struct lexer_state * const lexer, char const * const message);
-
-
-
-/*
 #define DEBUG 1
-*/
 
 /* think of a smarter way to do this; only print when DEBUG is defined */
 #ifdef DEBUG
@@ -165,6 +181,10 @@ noprint(FILE *fp, char *format, ...) { }
 
 #endif
 
+
+
+
+
 /*
 
 Update the line number. The yytext buffer is scanned for '\n'
@@ -175,8 +195,8 @@ token is returned.
 
 */
 static void
-update_location(lexer_state * const lexer) {
-    char const *iter = yytext;
+update_location(void *yyscanner, lexer_state * const lexer) {
+    char const *iter = yyget_text(yyscanner);
     assert(lexer != NULL);
 
     /* TODO: is yytext NULL terminated? */
@@ -194,9 +214,10 @@ update_location(lexer_state * const lexer) {
 
 /*
 
-The C89 standard does not define a strdup(), so define our own strdup.
-Function names beginning with "str" are reserved (I think), so make it
-dupstr, as that is what it does: duplicate a string.
+The C89 standard does not define a strdup() in the C library,
+so define our own strdup. Function names beginning with "str"
+are reserved (I think), so make it dupstr, as that is what it
+does: duplicate a string.
 
 */
 static char *
@@ -208,7 +229,15 @@ dupstr(char const * const source) {
 }
 
 /* after each rule execute update_location() */
-#define YY_USER_ACTION update_location(lexer);
+#define YY_USER_ACTION  do {                                                \
+                            lexer_state *my_lexer = yyget_extra(yyscanner); \
+                            update_location(yyscanner, my_lexer);           \
+                        }                                                   \
+                        while(0);
+
+
+
+
 
 /*
 
@@ -233,10 +262,6 @@ new_lexer(char *filename) {
 
     return lexer;
 }
-
-
-
-
 
 
 /*
@@ -326,35 +351,6 @@ Restore all information from the including file to the lexer.
 This information is stored in the file_info structure.
 
 */
-static void
-switch_to_file(lexer_state * const lexer, file_info *info) {
-    /* restore the buffer info */
-    printdebug(stderr, "restoring file_info...\n");
-
-    lexer->line_nr = info->line_nr;
-    /* free current file name */
-    free(lexer->filename);
-    /* and set pointer to the including file's name */
-    lexer->filename = info->filename;
-    lexer->file_buffer = info->buffer;
-
-    printdebug(stderr, "deleting buffer...\n");
-    /* delete the current buffer (of the included file *) */
-    yy_delete_buffer(YY_CURRENT_BUFFER);
-    /* close current file */
-    fclose(yyin);
-
-    /* switch back to previous file */
-    yy_switch_to_buffer(lexer->file_buffer);
-
-    printdebug(stderr, "switched back to buffer\n");
-    /* and free all resources of the buffer */
-
-    free(info);
-    info = NULL;
-
-    printdebug(stderr, "deleted info struct\n");
-}
 
 static void
 unshift_heredoc(lexer_state * const lexer, heredoc_info * const heredoc) {
@@ -529,9 +525,9 @@ to store the macro body.
 
 */
 static macro_info *
-new_macro(char const * const name) {
+new_macro(yyscan_t yyscanner, char const * const name) {
     macro_info *macro = NULL;
-    char *macro_id = dupstr(yytext);
+    char *macro_id = dupstr(yyget_text(yyscanner));
 
     /* create a macro definition, store the macro ID in it */
     macro = (macro_info *)malloc(sizeof (macro_info));
@@ -545,134 +541,7 @@ new_macro(char const * const name) {
     assert(macro->body != NULL);
     return macro;
 }
-/*
 
-=item static void read_macro(void)
-
-Read a macro definition. The macro body is stored in a buffer.
-
-
-=cut
-
-*/
-static void
-read_macro(YYSTYPE * const yylval, lexer_state * const lexer) {
-    int next_token;
-    macro_info *macro = NULL;
-
-    /* get next token, this must be macro id */
-    next_token = yylex(yylval, lexer);
-
-    /* check that there's a macro identifier token */
-    if (next_token == TK_IDENT) {
-        macro = new_macro(yytext);
-        /* put the macro definition onto a queue */
-        unshift_macro(lexer, macro);
-
-        /* and get next token */
-        next_token = yylex(yylval, lexer);
-    }
-    else { /* error! */
-        yyerror(lexer, "macro identifier expected after '.macro'");
-    }
-
-    /* read macro parameters, if any */
-
-    if (next_token == '(') { /* there are parameters! */
-        int expect_parameter = 0; /* flag for parsing parameters */
-
-        /* because of the fact that macro has a definition with parenthesis,
-         * when invoking a macro defined with "()", even with no params, it needs "()" as well
-         */
-        macro->num_params++;
-
-
-        /* get next token after opening parenthesis */
-        next_token = yylex(yylval, lexer);
-
-        /* try parsing parameters while we don't see the closing parenthesis
-         * or if we still expect a parameter (which means we just read a comma.
-         */
-        while (next_token != ')' || expect_parameter) {
-            if (next_token == TK_IDENT) {
-                /* handle parameter */
-                char *parameter = dupstr(yytext);
-                printdebug(stderr, "macro parameter: '%s'\n", parameter);
-
-                /* clear flag */
-                expect_parameter = 0;
-            }
-            else {
-                /* TODO: try to recover error */
-                yyerror(lexer, "macro parameter identifier expected");
-            }
-
-            /* get next token after parameter */
-            next_token = yylex(yylval, lexer);
-
-            if (next_token == ',') { /* current token is a comma, get next parameter */
-                next_token = yylex(yylval, lexer);
-                /* after a comma we expect a parameter; set a flag */
-                expect_parameter = 1;
-            }
-            else { /* no more parameters expected */
-                break; /* the while loop */
-            }
-        }
-
-        /* check closing parenthesis of macro parameter list */
-        if (next_token == ')') {
-            next_token = yylex(yylval, lexer);
-        }
-        else { /* it was not a ')' */
-            yyerror(lexer, "closing ')' expected to close parameter list of macro.");
-        }
-
-    }
-
-    /* make sure there's a newline after the macro header. This '\n' becomes part
-     * of the macro text, so that a macro expansion always results in at least
-     * one newline. This allows for writing "print 42 .NL print 42", so that
-     * multiple PIR statements can be written on 1 line.
-     */
-    if (next_token == TK_NL) {
-       /* :-/ This makes a normal macro expansion fail, but "print 42 .NL print 42" pass. */
-       /*
-        strcat(macro->body, "\n");
-       */
-    }
-    else {
-        yyerror(lexer, "newline expected after macro parameter list.");
-    }
-
-    next_token = yylex(yylval, lexer);
-    /* scan the body of the macro, while we don't see the ".endm" marker,
-     * and we don't encounter end of file (= 0). TODO: Check value of <<EOF>> Not sure if this is portable.
-     */
-    while ((next_token != TK_ENDM) && (next_token != 0)) { /* END OF FILE MARKER */
-        /* always add a space character to separate the tokens */
-        strcat(macro->body, " ");
-        /* add current token to macro's buffer */
-        strcat(macro->body, yytext);
-        /* and get the next token of the macro body */
-        next_token = yylex(yylval, lexer);
-    }
-
-    /* check for macro delimiter */
-    if (next_token == TK_ENDM) {
-        next_token = yylex(yylval, lexer);
-    }
-    else { /* error! */
-        yyerror(lexer, "'.endm' expected to close macro definition.");
-    }
-
-
-    /* after ".endm" a newline is expected */
-    if (next_token != TK_NL) {
-        yyerror(lexer, "newline expected after '.endm'");
-    }
-
-}
 
 /*
 
@@ -713,39 +582,167 @@ make_label(char const * const macro_name, char const * const label_name) {
 /*
 
 */
+
 static void
-read_braced_argument(YYSTYPE *yylval, lexer_state * const lexer) {
-    int next_token = yylex(yylval, lexer);
+read_braced_argument(void *yyscanner, YYSTYPE *yylval) {
+    int next_token = yylex(yylval, yyscanner);
 
     while (next_token != '}') {
-        next_token = yylex(yylval, lexer);
+        next_token = yylex(yylval, yyscanner);
     }
 }
 
+
 /*
 
-This is a function to keep MSVC happy. Instead of assigning the
-expression YY_CURRENT_BUFFER to some variable directly, use this function.
+=item static void read_macro
+
+Read a macro definition. The macro body is stored in a buffer.
+
+
+=cut
 
 */
-static YY_BUFFER_STATE
-get_current_buffer(void) {
-    return YY_CURRENT_BUFFER;
+static void
+read_macro(yyscan_t yyscanner, YYSTYPE *yylval) {
+    int next_token;
+    macro_info *macro = NULL;
+    lexer_state *my_lexer = yyget_extra(yyscanner);
+    /* get next token, this must be macro id */
+    next_token = yylex(yylval, yyscanner);
+
+    /* check that there's a macro identifier token */
+    if (next_token == TK_IDENT) {
+
+        macro = new_macro(yyscanner, yyget_text(yyscanner));
+        /* put the macro definition onto a queue */
+        unshift_macro(my_lexer, macro);
+
+        /* and get next token */
+        next_token = yylex(yylval, yyscanner);
+    }
+    else { /* error! */
+        syntax_error(yyscanner, my_lexer, "macro identifier expected after '.macro'");
+    }
+
+    /* read macro parameters, if any */
+
+    if (next_token == '(') { /* there are parameters! */
+        int expect_parameter = 0; /* flag for parsing parameters */
+
+        /* because of the fact that macro has a definition with parenthesis,
+         * when invoking a macro defined with "()", even with no params, it needs "()" as well
+         */
+        macro->num_params++;
+
+
+        /* get next token after opening parenthesis */
+        next_token = yylex(yylval, yyscanner);
+
+        /* try parsing parameters while we don't see the closing parenthesis
+         * or if we still expect a parameter (which means we just read a comma.
+         */
+        while (next_token != ')' || expect_parameter) {
+            if (next_token == TK_IDENT) {
+                /* handle parameter */
+                char *parameter = dupstr(yyget_text(yyscanner));
+                printdebug(stderr, "macro parameter: '%s'\n", parameter);
+
+                /* clear flag */
+                expect_parameter = 0;
+            }
+            else {
+                /* TODO: try to recover error */
+                syntax_error(yyscanner, my_lexer, "macro parameter identifier expected");
+            }
+
+            /* get next token after parameter */
+            next_token = yylex(yylval, /*lexer,*/ yyscanner);
+
+            if (next_token == ',') { /* current token is a comma, get next parameter */
+                next_token = yylex(yylval, /*lexer,*/ yyscanner);
+                /* after a comma we expect a parameter; set a flag */
+                expect_parameter = 1;
+            }
+            else { /* no more parameters expected */
+                break; /* the while loop */
+            }
+        }
+
+        /* check closing parenthesis of macro parameter list */
+        if (next_token == ')') {
+            next_token = yylex(yylval, /*lexer,*/ yyscanner);
+        }
+        else { /* it was not a ')' */
+            syntax_error(yyscanner, my_lexer, "closing ')' "
+                         "expected to close parameter list of macro.");
+        }
+
+    }
+
+    /* make sure there's a newline after the macro header. This '\n' becomes part
+     * of the macro text, so that a macro expansion always results in at least
+     * one newline. This allows for writing "print 42 .NL print 42", so that
+     * multiple PIR statements can be written on 1 line.
+     */
+    if (next_token == TK_NL) {
+       /* :-/ This makes a normal macro expansion fail, but "print 42 .NL print 42" pass. */
+       /*
+        strcat(macro->body, "\n");
+       */
+    }
+    else {
+        syntax_error(yyscanner, my_lexer, "newline expected after macro parameter list.");
+    }
+
+    next_token = yylex(yylval, yyscanner);
+    /* scan the body of the macro, while we don't see the ".endm" marker,
+     * and we don't encounter end of file (= 0). TODO: Check value of <<EOF>>
+     * Not sure if this is portable.
+     */
+    while ((next_token != TK_ENDM) && (next_token != 0)) { /* END OF FILE MARKER */
+        /* always add a space character to separate the tokens */
+        strcat(macro->body, " ");
+        /* add current token to macro's buffer */
+        strcat(macro->body, yyget_text(yyscanner));
+        /* and get the next token of the macro body */
+        next_token = yylex(yylval, yyscanner);
+    }
+
+    /* check for macro delimiter */
+    if (next_token == TK_ENDM) {
+        next_token = yylex(yylval, /* lexer,*/ yyscanner);
+    }
+    else { /* error! */
+        syntax_error(yyscanner, my_lexer, "'.endm' expected to close macro definition.");
+    }
+
+
+    /* after ".endm" a newline is expected */
+    if (next_token != TK_NL) {
+        syntax_error(yyscanner, my_lexer, "newline expected after '.endm'");
+    }
+
 }
+
 
 
 /*
 
 define skip_whitespace as a macro, not a function, otherwise errors with
-unput definition.
+unput definition. Note the missing semicolon, it's added when "calling"
+skip_whitespace().
 
 */
-#define skip_whitespace() do { unsigned char dummy_char = input(); \
+#define skip_whitespace() do {                                                  \
+                            unsigned char dummy_char = input(yyscanner);        \
                             while (isspace(dummy_char) || dummy_char == '\n') { \
-                                 dummy_char = input(); \
-                            } \
-                            unput(dummy_char); \
-                          } while(0)
+                                 dummy_char = input(yyscanner);                 \
+                            }                                                   \
+                            unput(dummy_char);                                  \
+                          }                                                     \
+                          while(0)
+
 
 
 
@@ -849,6 +846,16 @@ LINECOMMENT    [#].*\n
 /* define output file */
 %option outfile="pirlexer.c"
 
+%option header-file="pirlexer.h"
+
+/* we don't use yy_top_state, prevent warning */
+%option noyy_top_state
+
+/* make the scanner re-entrant */
+%option reentrant
+
+%option bison-bridge
+
 /* yywrap() always returns true. */
 %option noyywrap
 
@@ -856,14 +863,13 @@ LINECOMMENT    [#].*\n
 
 
 ".macro"     {  /* macro definition */
-
                 /* enable macro rules, using the (inclusive) state MACRODEF */
-                yy_push_state(MACRODEF);
-                read_macro(yylval, lexer);
+                yy_push_state(MACRODEF, yyscanner);
+                read_macro(yyscanner, yylval);
              }
 
 <MACRODEF>".endm"         { /* end of macro definition */ ;
-                            yy_pop_state();
+                            yy_pop_state(yyscanner);
                             return TK_ENDM;
                           }
 
@@ -877,7 +883,8 @@ LINECOMMENT    [#].*\n
                           }
 
 <MACRODEF>".$"{IDENT}     { /* expansion of a declared label, as in "goto .$foo" */
-                            macro_info *current_macro = peek_macro(lexer);
+                            lexer_state *my_lexer = yyget_extra(yyscanner);
+                            macro_info *current_macro = peek_macro(my_lexer);
                             /* Labels are formatted as ".$foo", so skip the 2 ".$" characters. */
                             char *label = make_label(current_macro->name, yytext + 2);
                             yytext = label;
@@ -885,78 +892,86 @@ LINECOMMENT    [#].*\n
                           }
 
 <MACRODEF>".label"{WS}+   {  /* scan: '.label $foo:' */
-                             int token;
-                             /* get the label identifier */
-                             token = yylex(yylval, lexer);
+                             lexer_state *my_lexer = yyget_extra(yyscanner);
+                             int token = yylex(yylval, yyscanner);
 
+                             /* get the label identifier */
                              if (token == TK_LABEL) {
-                                 macro_info *current_macro = peek_macro(lexer);
+                                 macro_info *current_macro = peek_macro(my_lexer);
                                  char *label = NULL;
                                  chop_yytext(); /* remove the last character, which is a ":" */
 
                                  /* skip the leading "$" of the label: */
                                  label = make_label(current_macro->name, yytext + 1);
 
-                                 /* make the label available to the parser (read_macro() in this case) */
+                                 /* make the label available to the parser (read_macro()
+                                  *in this case)
+                                  */
                                  yytext = label; /* TODO use %union? */
                                  return TK_LABEL;
                              }
                              else { /* error */
-                                 yyerror(lexer, "label identifier expected");
+                                 syntax_error(yyscanner, my_lexer, "label identifier expected");
                                  yyterminate(); /* do we want to stop here? TODO: error recovery */
                              }
 
                           }
 
-<MACRODEF><<EOF>>      { yyerror(lexer, "macro definition not closed before end of file");
-                         yy_pop_state(); /* handle <<EOF>> in initial state */
+<MACRODEF><<EOF>>      { /* */
+                         lexer_state *my_lexer = yyget_extra(yyscanner);
+                         syntax_error(yyscanner, my_lexer,
+                                      "macro definition not closed before end of file");
+                         yy_pop_state(yyscanner); /* handle <<EOF>> in initial state */
                        }
 
 
 
 <MACROEXP><<EOF>>      { /* */
+                         lexer_state *my_lexer = yyget_extra(yyscanner);
                          YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
 
                          printdebug(stderr, "End of Macro Exp buffer");
 
-                         yy_switch_to_buffer(lexer->file_buffer);
-                         yy_delete_buffer(current_buffer);
+                         yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
+                         yy_delete_buffer(current_buffer, yyscanner);
 
                          /* we reached the end of the saved string, and just switched back to
-                          * the file. However, there may be more whitespace or newlines, so skip these now
+                          * the file. However, there may be more whitespace or newlines,
+                          * so skip these now
                           */
                          skip_whitespace();
-                         yy_pop_state();
+                         yy_pop_state(yyscanner);
 
                        }
 
-{WS}                               { /* ignore */; }
+{WS}                             { /* ignore */; }
 
-{EOL}([\t\r\n ]|{LINECOMMENT})*    { /* a set of continuous newlines yields a single newline token. */
-                                     return TK_NL;
-                                   }
+{EOL}([\t\r\n ]|{LINECOMMENT})*  { /* a set of continuous newlines yields a single newline token. */
+                                   return TK_NL;
+                                 }
 
-{LINECOMMENT}                      { /* skip line comments */ ; }
+{LINECOMMENT}                    { /* skip line comments */ ; }
 
 
 
 "<<"{Q_STRING} {    /* skip the "<<" and the quote, so skip 3 characteres */
                     char *heredoc_id = dupstr(yytext + 3);
-
+                    lexer_state *my_lexer = yyget_extra(yyscanner);
                     /* check the length of the quoted string. Note that the close quote
                      * was copied in the call to dupstr(), so that's why heredoc_id is
                      * at least 1.
                      */
                     if (strlen(heredoc_id) == 1) {
-                        yyerror(lexer, "heredoc delimiter cannot be an empty string");
+                        syntax_error(yyscanner, my_lexer,
+                                     "heredoc delimiter cannot be an empty string");
                     }
                     else {
                         /* remove the closing quote */
                         heredoc_id[strlen(heredoc_id) - 1] = '\0';
                         /* store the heredoc delimiter in a FIFO data structure, such as a queue */
-                        new_heredoc(lexer, heredoc_id);
+                        new_heredoc(my_lexer, heredoc_id);
 
-                        /* yy_push_state(HEREDOC1); */
+                        /* yy_push_state(HEREDOC1, yyscanner); */
                         BEGIN(HEREDOC1);
                     }
                }
@@ -964,61 +979,65 @@ LINECOMMENT    [#].*\n
 <SCANSTRING>"<<"{Q_STRING} {
                              /* skip the "<<" and the quote, so skip 3 characteres */
                              char *heredoc_id = dupstr(yytext + 3);
-
+                             lexer_state *my_lexer = yyget_extra(yyscanner);
                              /* check the length of the quoted string. Note that the close quote
                               * was copied in the call to dupstr(), so that's why heredoc_id is
                               * at least 1.
                               */
                              if (strlen(heredoc_id) == 1) {
-                                 yyerror(lexer, "heredoc delimiter cannot be an empty string");
+                                 syntax_error(yyscanner, my_lexer,
+                                              "heredoc delimiter cannot be an empty string");
                              }
                              else {
                                  /* remove the closing quote */
                                  heredoc_id[strlen(heredoc_id) - 1] = '\0';
 
-                                 /* store the heredoc delimiter in a FIFO data structure, such as a queue */
-                                 new_heredoc(lexer, heredoc_id);
+                                 /* store the heredoc delimiter in a FIFO data structure */
+                                 new_heredoc(my_lexer, heredoc_id);
 
-                                 /* yy_push_state(HEREDOC3); */
+                                 /* yy_push_state(HEREDOC3, yyscanner); */
                                  BEGIN(HEREDOC3);
                              }
                            }
 
-<SCANSTRING>{EOL}   {
+<SCANSTRING>{EOL}   { /* */
                     }
 
-<SCANSTRING>{WS}+   {
+<SCANSTRING>{WS}+   { /* */
                     }
 
 <SCANSTRING><<EOF>> { /* */
-
-                      /* End of the heredoc string buffer, switch back to normal buffer and state. */
-                      yy_switch_to_buffer(lexer->file_buffer);
+                      lexer_state *my_lexer = yyget_extra(yyscanner);
+                      /* End of the heredoc string buffer, switch back to normal buffer and state.
+                       */
+                      yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
                       BEGIN(INITIAL);
 
-                      /* we reached the end of the saved string, and just switched back to
-                       * the file. However, there may be more whitespace or newlines, so skip these now
+                      /* we reached the end of the saved string, and just switched back to the file.
+                       * However, there may be more whitespace or newlines, so skip these now
                        */
                       skip_whitespace();
 
-                      /* end of buffer also means end of line (because the buffer represents
-                       * the "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
+                      /* end of buffer also means end of line (because the buffer represents the
+                       * "rest of the line" after reading a <<STRINGC heredoc delimiter argument.
                        * So, return a newline token.
                        */
                       return TK_NL;
                     }
 
 <HEREDOC1>.*{EOL}  { /* This state saves the string after the <<STRINGC heredoc delimiter argument.
-                      * After saving the rest of the line, effectively, taking it away from the file input
+                      * After saving the rest of the line, effectively, taking it away from the
+                      * file input
                       * state HEREDOC2 is activated, in which the heredoc string can be scanned.
-                      * After the heredoc string is scanned (until the delimiter is encountered), the
-                      * string that was saved here is scanned.
+                      * After the heredoc string is scanned (until the delimiter is encountered),
+                      * the string that was saved here is scanned.
                       */
-                     if (lexer->after_heredoc != NULL) {
+                     lexer_state *my_lexer = yyget_extra(yyscanner);
+                     if (my_lexer->after_heredoc != NULL) {
                         /* before allocating new memory to after_heredoc, free the old buffer */
-                        free(lexer->after_heredoc);
+                        free(my_lexer->after_heredoc);
                      }
-                     lexer->after_heredoc = dupstr(yytext);
+                     my_lexer->after_heredoc = dupstr(yytext);
                      /* continue scanning the file */
                      BEGIN(HEREDOC2);
                }
@@ -1026,21 +1045,22 @@ LINECOMMENT    [#].*\n
 
 
 <HEREDOC3>.*{EOL}   { /* currently, we're reading from a buffer */
-
-                      /* after_heredoc is the buffer we're reading from, it /should/ never be null */
-                      assert(lexer->after_heredoc != NULL);
-                      if (lexer->after_heredoc != NULL) {
-                         free(lexer->after_heredoc);
+                      lexer_state *my_lexer = yyget_extra(yyscanner);
+                      /* after_heredoc is the buffer we're reading from, it should never be null */
+                      assert(my_lexer->after_heredoc != NULL);
+                      if (my_lexer->after_heredoc != NULL) {
+                         free(my_lexer->after_heredoc);
                       }
-                      lexer->after_heredoc = dupstr(yytext);
+                      my_lexer->after_heredoc = dupstr(yytext);
 
                       /* switch back to file */
-                      yy_switch_to_buffer(lexer->file_buffer);
+                      yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
                       BEGIN(HEREDOC2);
                     }
 
 <HEREDOC2>{EOL}  { /* add a newline character to the heredoc */
-                   save_heredoc_line(lexer, "\n");
+                   lexer_state *my_lexer = yyget_extra(yyscanner);
+                   save_heredoc_line(my_lexer, "\n");
                  }
 
 <HEREDOC2><<EOF>> { /* does this ever happen? */
@@ -1050,8 +1070,9 @@ LINECOMMENT    [#].*\n
                   }
 
 
-<HEREDOC2>.*     {  /* get the heredoc delimiter */ /*<HEREDOC2>.*   {*/  /* get the heredoc delimiter */
-                  heredoc_info *heredoc = shift_heredoc(lexer);
+<HEREDOC2>.*     {  /* get the heredoc delimiter */
+                  lexer_state *my_lexer = yyget_extra(yyscanner);
+                  heredoc_info *heredoc = shift_heredoc(my_lexer);
                   /* remove newline character from current token's characters */
                   printdebug(stderr, "<HEREDOC2>.*: [%s]\n", yytext);
 
@@ -1063,7 +1084,7 @@ LINECOMMENT    [#].*\n
                    * do chop the yytext when we see a '\r' ?? But '\r's are on windows,
                    * and on windows we should not chop it.
                    * TODO: Review this some time. For now, it works on cygwin,win,linux.
-                   * TODO: check this on MacOS.
+                   * Also check this on MacOS.
                    */
                   if (yytext[yyleng - 1] == '\r') {
                       chop_yytext();
@@ -1081,8 +1102,8 @@ LINECOMMENT    [#].*\n
                        */
                       BEGIN(SCANSTRING);
                       /* save the current buffer */
-                      lexer->file_buffer = YY_CURRENT_BUFFER;
-                      yy_scan_string(lexer->after_heredoc);
+                      my_lexer->file_buffer = YY_CURRENT_BUFFER;
+                      yy_scan_string(my_lexer->after_heredoc, yyscanner);
                       /* return the complete heredoc as a string constant */
                       /* yylval.sval = heredoc->contents;
                       */
@@ -1092,28 +1113,32 @@ LINECOMMENT    [#].*\n
                       /* the current line does not contain the heredoc delimiter,
                        * put the heredoc thingie back
                        */
-                      unshift_heredoc(lexer, heredoc);
+                      unshift_heredoc(my_lexer, heredoc);
 
                       /*
-                      printdebug(stderr, "Saving string [%s] (did not match end marker [%s]\n", yytext, heredoc->delimiter);
+                      printdebug(stderr,
+                      "Saving string [%s] (did not match end marker [%s]\n",
+                      yytext, heredoc->delimiter);
                       */
 
                       /* and save the current text as part of the heredoc */
-                      save_heredoc_line(lexer, yytext);
+                      save_heredoc_line(my_lexer, yytext);
                   }
 
                 }
 
 
-^"=".*{EOL}            { yy_push_state(POD); }
+^"=".*{EOL}            { yy_push_state(POD, yyscanner); }
 
-<POD>^"=cut".*{EOL}+   { yy_pop_state(); }
+<POD>^"=cut".*{EOL}+   { yy_pop_state(yyscanner); }
 
 <POD>.*                { /* ignore pod comments */ }
 
 <POD>{EOL}+            { /* ignore newlines in POD */  }
 
-<POD><<EOF>>           { yyerror(lexer, "POD comment not closed!");
+<POD><<EOF>>           { /* */
+                         lexer_state *my_lexer = yyget_extra(yyscanner);
+                         syntax_error(yyscanner, my_lexer, "POD comment not closed!");
                          yyterminate();
                        }
 
@@ -1267,13 +1292,14 @@ LINECOMMENT    [#].*\n
                char *incl_file_name  = NULL;
                file_info *file_state = NULL;
                YY_BUFFER_STATE incl_file_buffer;
+               lexer_state *my_lexer = yyget_extra(yyscanner);
 
                /* get next token containing name of file being included */
-               next_token = yylex(yylval, lexer);
+               next_token = yylex(yylval, yyscanner);
 
                /* check that it's a string */
                if (next_token != TK_STRINGC) {
-                   yyerror(lexer, "string expected after '.include' directive.");
+                   syntax_error(yyscanner, my_lexer, "string expected after '.include' directive.");
                    return next_token;
                }
 
@@ -1295,10 +1321,12 @@ LINECOMMENT    [#].*\n
                }
 
                /* after an include statement a newline is expected */
-               next_token = yylex(yylval, lexer);
+               next_token = yylex(yylval, yyscanner);
+
                if (next_token != 0) { /* if not end of file */  /* END OF FILE HACK MARKER */
                    if (next_token != TK_NL) {
-                       yyerror(lexer, "newline expected after \".include '<string>'\"\n");
+                       syntax_error(yyscanner, my_lexer,
+                       "newline expected after \".include '<string>'\"\n");
                    }
                }
 
@@ -1308,51 +1336,45 @@ LINECOMMENT    [#].*\n
                assert(file_state != NULL);
 
                file_state->buffer   = YY_CURRENT_BUFFER;
-               file_state->filename = lexer->filename;
-               file_state->line_pos = 0; /* FIX */
-               file_state->line_nr  = lexer->line_nr;
+               file_state->filename = my_lexer->filename;
+               file_state->line_pos = my_lexer->line_pos;
+               file_state->line_nr  = my_lexer->line_nr;
                file_state->prev     = NULL; /* initialize to NULL */
 
 
                /* store the current file's info structure on the stack,
                 * we'll continue scanning it later.
                 */
-               push_file_info(lexer, file_state);
+               push_file_info(my_lexer, file_state);
                printdebug(stderr, "data stored\n");
 
                /* replace the above with this, to make this block shorter.
                save_file_state(YY_CURRENT_BUFFER, lexer->file_name, lexer->line_nr);
                */
                /* a new file is being scanned, reset line number */
-               lexer->line_nr  = 1;
-               lexer->filename = incl_file_name;
+               my_lexer->line_nr  = 1;
+               my_lexer->filename = incl_file_name;
 
                /* create a new buffer for the included file and switch to that file */
-               incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE);
-               yy_switch_to_buffer(incl_file_buffer);
-               lexer->file_buffer = incl_file_buffer;
+               incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE, yyscanner);
+               yy_switch_to_buffer(incl_file_buffer, yyscanner);
+               my_lexer->file_buffer = incl_file_buffer;
 
                /* the included file may contain whitespace and newlines; remove them */
-               /*
-               dummy = input();
-               while (isspace(dummy) || dummy == '\n') {
-                   printdebug(stderr, "skipping space from included file\n");
-                   dummy = input();
-               }
-               unput(dummy);
-               */
                skip_whitespace();
+
                printdebug(stderr, "included file start scanning...\n");
 
              }
 
-".constant"  { int next_token;
-               char *constant_id    = NULL;
-               char *constant_value = NULL;
+".constant"  { /* */
+               char        *constant_id    = NULL;
+               char        *constant_value = NULL;
+               lexer_state *my_lexer       = yyget_extra(yyscanner);
+               int          next_token     = yylex(yylval, yyscanner);
 
-               next_token = yylex(yylval, lexer);
                if (next_token != TK_IDENT) {
-                   yyerror(lexer, "identifier expected after '.constant'.");
+                   syntax_error(yyscanner, my_lexer, "identifier expected after '.constant'.");
                }
                /* store identifier */
                constant_id = dupstr(yytext);
@@ -1367,7 +1389,7 @@ LINECOMMENT    [#].*\n
                }
 
                /* read next token, which contains the value */
-               next_token = yylex(yylval, lexer);
+               next_token = yylex(yylval, yyscanner);
 
                /* only these token types are allowed for constant values: */
                switch (next_token) {
@@ -1384,17 +1406,19 @@ LINECOMMENT    [#].*\n
                    case TK_PASM_SREG:
                        /* store value by this constant's name */
                        constant_value = dupstr(yytext);
-                       define_constant(lexer, constant_id, constant_value, next_token);
+                       define_constant(my_lexer, constant_id, constant_value, next_token);
                        break;
                    default:
-                       yyerror(lexer, "Constant value must be a number, string literal or register");
+                       syntax_error(yyscanner, my_lexer,
+                                    "Constant value must be a number, string literal or register");
                        break;
                }
 
                /* after the .constant declaration, a newline must be read */
-               next_token = yylex(yylval, lexer);
+               next_token = yylex(yylval, yyscanner);
+
                if (next_token != TK_NL) {
-                   yyerror(lexer, "newline expected after constant declaration");
+                   syntax_error(yyscanner, my_lexer, "newline expected after constant declaration");
                }
 
              }
@@ -1406,11 +1430,11 @@ LINECOMMENT    [#].*\n
                      * it's a subcall like "foo .bar()".
                      */
 
-                    /* in IMCC, a .constant is only allowed in PASM mode or in .emit/.eom context. */
+                    /* in IMCC, a .constant is only allowed in PASM mode or in .emit context. */
                     constant_info *constant = NULL;
-
+                    lexer_state *my_lexer = yyget_extra(yyscanner);
                     /* give the name of the constant, skip the prefix dot. */
-                    constant = find_constant(lexer, yytext + 1);
+                    constant = find_constant(my_lexer, yytext + 1);
 
                     if (constant != NULL) { /* found the constant */
                         printdebug(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
@@ -1425,7 +1449,7 @@ LINECOMMENT    [#].*\n
                     else { /* not found, try macro */
                         macro_info *macro = NULL;
 
-                        macro = find_macro(lexer, yytext + 1);
+                        macro = find_macro(my_lexer, yytext + 1);
 
                         if (macro != NULL) { /* the macro definition exists! Yay! */
                             int num_macro_params = macro->num_params;
@@ -1434,20 +1458,20 @@ LINECOMMENT    [#].*\n
                             int expect_argument = 0; /* flag for while loop */
 
                             /* TODO: finish this */
-                            int next_token = yylex(yylval, lexer);
+                            int next_token = yylex(yylval, yyscanner);
 
                             if (next_token == '(') {
-                                next_token = yylex(yylval, lexer); /* skip '(' */
+                                next_token = yylex(yylval, yyscanner); /* skip '(' */
 
-                                fprintf(stderr, "Warning! Macro parameters are not implemented yet\n");
+                            fprintf(stderr, "Warning! Macro parameters are not implemented yet\n");
 
                                 while (next_token != ')' || expect_argument == 1) {
                                     if (next_token == '{') { /* braced argument */
-                                        read_braced_argument(yylval, lexer);
+                                        read_braced_argument(yyscanner, yylval);
                                     }
                                     else {
                                         /* don't care about the token, just store it */
-                                        next_token = yylex(yylval, lexer);
+                                        next_token = yylex(yylval, yyscanner);
                                     }
 
                                     /* clear flag */
@@ -1457,29 +1481,31 @@ LINECOMMENT    [#].*\n
                                         expect_argument = 1;
                                     }
                                 }
-                                /* done with parameters, check out why we stopped parsing arguments */
+                                /* done with parameters, check out why we stopped parsing args */
                                 /* TODO */
 
                             }
                             else { /* no parameters */
                                 /* the macro defines arguments, or at least an empty param-list. */
                                 if (num_macro_params > 0) {
-                                    yyerror(lexer, "Too few arguments for macro");
+                                    syntax_error(yyscanner, my_lexer,
+                                                 "Too few arguments for macro");
                                 }
                             }
 
                             /* expand the macro into a string buffer */
                             /* is expanding necessary? */
 
-                            lexer->file_buffer = get_current_buffer();
+                            my_lexer->file_buffer = YY_CURRENT_BUFFER;
                             /* and scan that string buffer. */
 
                             /* BEGIN(MACROEXP);  ? */
-                            yy_push_state(MACROEXP); /* ? what if nested macro expansions? */
+                            yy_push_state(MACROEXP, yyscanner);
+                            /* ? what if nested macro expansions? */
 
                             /* todo: destroy state afterwards */
                             /*YY_BUFFER_STATE state = */
-                            yy_scan_string(macro->body);
+                            yy_scan_string(macro->body, yyscanner);
 
                         }
                         else {
@@ -1496,7 +1522,8 @@ LINECOMMENT    [#].*\n
 
 
 <<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
-               file_info *info = pop_file_info(lexer);
+               lexer_state *my_lexer = yyget_extra(yyscanner);
+               file_info *info = pop_file_info(my_lexer);
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
@@ -1505,17 +1532,43 @@ LINECOMMENT    [#].*\n
                }
                else { /* this file was included */
                    printdebug(stderr, "End of included file\n");
-                   switch_to_file(lexer, info);
+
+                   my_lexer->line_nr = info->line_nr;
+                   /* free current file name */
+                   free(my_lexer->filename);
+                   /* and set pointer to the including file's name */
+                   my_lexer->filename    = info->filename;
+                   my_lexer->file_buffer = info->buffer;
+
+                   printdebug(stderr, "deleting buffer...\n");
+                   /* delete the current buffer (of the included file *) */
+                   yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
+                   /* close current file */
+                   fclose(yyin);
+
+                   /* switch back to previous file */
+                   yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
+
+                   printdebug(stderr, "switched back to buffer\n");
+                   /* and free all resources of the buffer */
+
+                   free(info);
+                   info = NULL;
+
+                   printdebug(stderr, "deleted info struct\n");
                    return 0; /* end of file, needed for included files. */ /* END OF FILE MARKER */
                }
             }
 
-<*>.   { yyerror(lexer, "Unexpected character"); }
+<*>.   { /* */
+         lexer_state *my_lexer = yyget_extra(yyscanner);
+         syntax_error(yyscanner, my_lexer, "Unexpected character");
+       }
+
 
 
 
 %%
-
 
 
 static int

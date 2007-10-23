@@ -100,14 +100,20 @@ You can specify a list of .pir files to be compiled; all of them will be process
 This is a nice opportunity to clean up the grammar of the PIR language. Hacking on
 IMCC's grammar is possible, but not for the faint of heart.
 
-=item * Cygwin processable lexer spec.
-
-The file C<pir.l> from which the lexer is generated is processable by Cygwin's default
-version of Flex (currently 2.5.4). It must be noted, though, that the C<%option reentrant>
-is not allowed with this version of Flex, so it's not clear whether the generated lexer is
-suitable for parallel processing (re-entrant, thread-safe).
 
 =back
+
+=head1 NOTES
+
+
+=head2 Cygwin processable lexer spec.
+
+The file C<pir.l> from which the lexer is generated is I<not> processable by Cygwin's
+default version of Flex. In order to make a reentrant lexer, a newer version is needed,
+which can be downloaded from the link below.
+
+L<http://sourceforge.net/project/downloading.php?groupname=flex&filename=flex-2.5.33.tar.gz&use_mirror=belnet>
+
 
 
 =head1 BUGS

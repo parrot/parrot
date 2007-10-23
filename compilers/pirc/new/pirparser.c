@@ -308,15 +308,25 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirparser.h"
 #include "pircompiler.h"
 
+/* prevent inclusion of <unistd.h> on windows */
+#define YY_NO_UNISTD_H
 
-struct lexer_state;
+/* define YY_DECL, so that in "pirlexer.h" it won't be defined */
+#define YY_DECL int yylex(YYSTYPE *yylval,  yyscan_t yyscanner)
 
-extern int yyerror(struct lexer_state * const lexer,
-                   char const * const message);
+#include "pirlexer.h"
 
 
-extern int yylex(YYSTYPE * const yylval,
-                 struct lexer_state const * const lexer);
+
+
+/* declare yylex() */
+extern YY_DECL;
+
+extern int yyerror(yyscan_t yyscanner, struct lexer_state *lexer, char *message);
+
+extern struct lexer_state *new_lexer(char *filename);
+
+
 
 
 
@@ -361,14 +371,14 @@ extern int yylex(YYSTYPE * const yylval,
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 175 "pir.y"
+#line 185 "pir.y"
 {
     double dval;
     int    ival;
     char  *sval;
 }
 /* Line 187 of yacc.c.  */
-#line 372 "pirparser.c"
+#line 382 "pirparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -381,7 +391,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 385 "pirparser.c"
+#line 395 "pirparser.c"
 
 #ifdef short
 # undef short
@@ -764,31 +774,31 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   197,   197,   202,   203,   206,   207,   210,   211,   212,
-     213,   214,   215,   216,   217,   226,   234,   247,   250,   262,
-     268,   269,   272,   273,   274,   286,   287,   290,   291,   296,
-     302,   303,   306,   307,   325,   326,   327,   328,   329,   330,
-     331,   332,   333,   334,   335,   338,   339,   342,   343,   344,
-     345,   348,   349,   356,   365,   366,   372,   373,   383,   384,
-     385,   388,   389,   390,   391,   392,   393,   394,   395,   396,
-     397,   398,   399,   400,   401,   402,   403,   410,   413,   414,
-     415,   418,   421,   424,   425,   426,   429,   430,   431,   432,
-     433,   434,   435,   436,   437,   438,   442,   445,   446,   447,
-     450,   451,   452,   453,   454,   455,   459,   460,   461,   462,
-     463,   464,   465,   466,   467,   468,   469,   470,   471,   474,
-     477,   478,   481,   482,   483,   484,   487,   488,   491,   494,
-     495,   498,   499,   502,   505,   508,   511,   514,   517,   518,
-     521,   522,   525,   528,   529,   532,   539,   540,   543,   546,
-     547,   548,   552,   553,   556,   557,   560,   561,   562,   565,
-     566,   569,   570,   573,   576,   577,   580,   581,   582,   583,
-     584,   587,   588,   591,   592,   593,   596,   599,   600,   601,
-     602,   605,   606,   609,   610,   613,   619,   620,   623,   624,
-     627,   630,   633,   634,   637,   638,   647,   648,   658,   663,
-     664,   667,   670,   671,   674,   677,   678,   681,   682,   685,
-     686,   689,   692,   695,   696,   708,   709,   710,   711,   721,
-     722,   723,   726,   728,   729,   730,   733,   734,   735,   738,
-     739,   740,   741,   742,   746,   747,   748,   749,   762,   763,
-     764,   765,   766,   767,   778,   779,   780,   781,   784,   785
+       0,   219,   219,   224,   225,   228,   229,   232,   233,   234,
+     235,   236,   237,   238,   239,   248,   256,   269,   272,   284,
+     290,   291,   294,   295,   296,   308,   309,   312,   313,   318,
+     324,   325,   328,   329,   347,   348,   349,   350,   351,   352,
+     353,   354,   355,   356,   357,   360,   361,   364,   365,   366,
+     367,   370,   371,   378,   387,   388,   394,   395,   405,   406,
+     407,   410,   411,   412,   413,   414,   415,   416,   417,   418,
+     419,   420,   421,   422,   423,   424,   425,   432,   435,   436,
+     437,   440,   443,   446,   447,   448,   451,   452,   453,   454,
+     455,   456,   457,   458,   459,   460,   464,   467,   468,   469,
+     472,   473,   474,   475,   476,   477,   481,   482,   483,   484,
+     485,   486,   487,   488,   489,   490,   491,   492,   493,   496,
+     499,   500,   503,   504,   505,   506,   509,   510,   513,   516,
+     517,   520,   521,   524,   527,   530,   533,   536,   539,   540,
+     543,   544,   547,   550,   551,   554,   561,   562,   565,   568,
+     569,   570,   574,   575,   578,   579,   582,   583,   584,   587,
+     588,   591,   592,   595,   598,   599,   602,   603,   604,   605,
+     606,   609,   610,   613,   614,   615,   618,   621,   622,   623,
+     624,   627,   628,   631,   632,   635,   641,   642,   645,   646,
+     649,   652,   655,   656,   659,   660,   669,   670,   680,   685,
+     686,   689,   692,   693,   696,   699,   700,   703,   704,   707,
+     708,   711,   714,   717,   718,   730,   731,   732,   733,   743,
+     744,   745,   748,   750,   751,   752,   755,   756,   757,   760,
+     761,   762,   763,   764,   768,   769,   770,   771,   784,   785,
+     786,   787,   788,   789,   800,   801,   802,   803,   806,   807
 };
 #endif
 
@@ -1241,7 +1251,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (lexer, YY_("syntax error: cannot back up")); \
+      yyerror (yyscanner, lexer, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -1298,7 +1308,7 @@ while (YYID (0))
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (&yylval, YYLEX_PARAM)
 #else
-# define YYLEX yylex (&yylval, lexer)
+# define YYLEX yylex (&yylval, yyscanner)
 #endif
 
 /* Enable debugging if requested.  */
@@ -1321,7 +1331,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value, lexer); \
+		  Type, Value, yyscanner, lexer); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -1335,18 +1345,20 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct lexer_state * const lexer)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct lexer_state * lexer)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep, lexer)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, lexer)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    struct lexer_state * const lexer;
+    yyscan_t yyscanner;
+    struct lexer_state * lexer;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (yyscanner);
   YYUSE (lexer);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
@@ -1369,14 +1381,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, lexer)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct lexer_state * const lexer)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct lexer_state * lexer)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep, lexer)
+yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, lexer)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    struct lexer_state * const lexer;
+    yyscan_t yyscanner;
+    struct lexer_state * lexer;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -1384,7 +1397,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, lexer)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep, lexer);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, lexer);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -1424,13 +1437,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, struct lexer_state * const lexer)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, yyscan_t yyscanner, struct lexer_state * lexer)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule, lexer)
+yy_reduce_print (yyvsp, yyrule, yyscanner, lexer)
     YYSTYPE *yyvsp;
     int yyrule;
-    struct lexer_state * const lexer;
+    yyscan_t yyscanner;
+    struct lexer_state * lexer;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -1444,7 +1458,7 @@ yy_reduce_print (yyvsp, yyrule, lexer)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       , lexer);
+		       		       , yyscanner, lexer);
       fprintf (stderr, "\n");
     }
 }
@@ -1452,7 +1466,7 @@ yy_reduce_print (yyvsp, yyrule, lexer)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule, lexer); \
+    yy_reduce_print (yyvsp, Rule, yyscanner, lexer); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1703,17 +1717,19 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, struct lexer_state * const lexer)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, yyscan_t yyscanner, struct lexer_state * lexer)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep, lexer)
+yydestruct (yymsg, yytype, yyvaluep, yyscanner, lexer)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
-    struct lexer_state * const lexer;
+    yyscan_t yyscanner;
+    struct lexer_state * lexer;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (yyscanner);
   YYUSE (lexer);
 
   if (!yymsg)
@@ -1739,7 +1755,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (struct lexer_state * const lexer);
+int yyparse (yyscan_t yyscanner, struct lexer_state * lexer);
 #else
 int yyparse ();
 #endif
@@ -1768,11 +1784,12 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (struct lexer_state * const lexer)
+yyparse (yyscan_t yyscanner, struct lexer_state * lexer)
 #else
 int
-yyparse (lexer)
-    struct lexer_state * const lexer;
+yyparse (yyscanner, lexer)
+    yyscan_t yyscanner;
+    struct lexer_state * lexer;
 #endif
 #endif
 {
@@ -2029,18 +2046,18 @@ yyreduce:
   switch (yyn)
     {
         case 76:
-#line 404 "pir.y"
+#line 426 "pir.y"
     { yyerrok; ;}
     break;
 
   case 226:
-#line 733 "pir.y"
+#line 755 "pir.y"
     { fprintf(stderr, "TK_STRINGC: [%s]\n", yylval.sval); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2044 "pirparser.c"
+#line 2061 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2076,7 +2093,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (lexer, YY_("syntax error"));
+      yyerror (yyscanner, lexer, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -2100,11 +2117,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (lexer, yymsg);
+	    yyerror (yyscanner, lexer, yymsg);
 	  }
 	else
 	  {
-	    yyerror (lexer, YY_("syntax error"));
+	    yyerror (yyscanner, lexer, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -2128,7 +2145,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval, lexer);
+		      yytoken, &yylval, yyscanner, lexer);
 	  yychar = YYEMPTY;
 	}
     }
@@ -2184,7 +2201,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp, lexer);
+		  yystos[yystate], yyvsp, yyscanner, lexer);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -2222,7 +2239,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (lexer, YY_("memory exhausted"));
+  yyerror (yyscanner, lexer, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -2230,7 +2247,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval, lexer);
+		 yytoken, &yylval, yyscanner, lexer);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -2238,7 +2255,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp, lexer);
+		  yystos[*yyssp], yyvsp, yyscanner, lexer);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -2254,19 +2271,23 @@ yyreturn:
 }
 
 
-#line 788 "pir.y"
+#line 810 "pir.y"
 
-
-/* the file being parsed */
-extern FILE *yyin; /* CAN WE KEEP USING THIS IN A PURE-PARSER? */
-
-/* the global buffer where the current token's characters are stored */
-extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
 
 #include <string.h>
 #include <assert.h>
 
-extern void yyrestart(FILE *in);
+
+
+
+/* wrapper function for yyerror.
+
+*/
+void
+syntax_error(void *yyscanner, struct lexer_state *lexer, char *message) {
+    fprintf(stderr, "SYNTAX ERROR: %s\n", message);
+}
+
 
 /*
 
@@ -2274,22 +2295,27 @@ Pre-process the file only. Don't do any analysis.
 
 */
 static void
-do_pre_process(struct lexer_state *lexer) {
+do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
     int token;
     YYSTYPE val;
 
     do {
-        token = yylex(&val, lexer);
-        fprintf(stderr, "%s ", yytext);
+
+        token = yylex(&val, yyscanner);
+
+/*        token = yylex(yyscanner, lexer);
+*/
+        fprintf(stderr, "%s ", yyget_text(yyscanner));
 
         /* if we just printed a newline character, the trailing space should be removed:
          * do a carriage-return
          */
-        if (strchr(yytext, '\n') != NULL)
+        if (strchr(yyget_text(yyscanner), '\n') != NULL)
             fprintf(stderr, "\r");
     }
     while (token > 0);
 }
+
 
 /*
  * Main compiler driver.
@@ -2297,9 +2323,10 @@ do_pre_process(struct lexer_state *lexer) {
 int
 main(int argc, char *argv[]) {
 
-    struct lexer_state *lexer = NULL;
+
     int parse_errors = 0;
-    int pre_process = 0;
+    int pre_process  = 0;
+    yyscan_t yyscanner;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
@@ -2338,28 +2365,38 @@ main(int argc, char *argv[]) {
     }
 
 
-
+    /* compile all files specified on the command line */
     while (argc > 0) {
+        FILE *infile = NULL;
+        struct lexer_state *lexer = NULL;
+
         fprintf(stderr, "Processing file '%s'\n", argv[0]);
 
         /* done handling arguments, open the file */
-        yyin = fopen(argv[0], "r");
+        infile = fopen(argv[0], "r");
 
-        if (yyin == NULL) {
+        if (infile == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
             exit(EXIT_FAILURE);
         }
 
+        /* create a yyscan_t object */
+        yylex_init(&yyscanner);
+        /* set the input file */
+        yyset_in(infile, yyscanner);
+
+        /* set the extra parameter in the yyscan_t structure */
         lexer = new_lexer(argv[0]);
-        assert(lexer != NULL);
+        yyset_extra(lexer, yyscanner);
+
 
         if (pre_process) {
             fprintf(stderr, "pre-processing %s\n", argv[0]);
-            do_pre_process(lexer);
+            do_pre_process(yyscanner, lexer);
         }
         else {
             fprintf(stderr, "compiling %s\n", argv[0]);
-            yyparse(lexer);
+            yyparse(yyscanner, lexer);
 
             parse_errors += get_parse_errors(lexer);
 
@@ -2373,12 +2410,8 @@ main(int argc, char *argv[]) {
             }
         }
 
-        /* close file after processing */
-        fclose(yyin);
-
-        /* this is necessary to allow for processing a file after another */
-        yyrestart(yyin);
-
+        /* clean up after playing */
+        yylex_destroy(yyscanner);
 
         argc--;
         argv++;
@@ -2388,14 +2421,19 @@ main(int argc, char *argv[]) {
         fprintf(stderr, "There were %d parse errors in all files\n", parse_errors);
 
 
+    /* go home! */
     return 0;
 }
+
+
 
 /*
 
 */
 int
-yyerror(struct lexer_state * const lexer, char const * const message) {
+yyerror(yyscan_t yyscanner, struct lexer_state * lexer, char * message) {
+
+    char *text = yyget_text(yyscanner);
 
     /* increment parse errors in the lexer structure */
     parse_error(lexer);
@@ -2404,8 +2442,12 @@ yyerror(struct lexer_state * const lexer, char const * const message) {
             get_current_file(lexer), get_line_nr(lexer), message);
 
     /* print current token if it's not a newline (or \r\n on windows) */
-    if (strcmp(yytext, "\r\n") != 0 || strcmp(yytext, "\n") == 0) {
-        fprintf(stderr, "('%s')", yytext);
+
+    /* the following should be fixed; the point is not to print the token if
+     * it's a newline, that looks silly.
+     */
+    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") == 0) {
+        fprintf(stderr, "('%s')", text);
     }
     else {
         fprintf(stderr, "\n\n");

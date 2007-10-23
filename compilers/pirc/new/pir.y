@@ -25,15 +25,25 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirparser.h"
 #include "pircompiler.h"
 
+/* prevent inclusion of <unistd.h> on windows */
+#define YY_NO_UNISTD_H
 
-struct lexer_state;
+/* define YY_DECL, so that in "pirlexer.h" it won't be defined */
+#define YY_DECL int yylex(YYSTYPE *yylval,  yyscan_t yyscanner)
 
-extern int yyerror(struct lexer_state * const lexer,
-                   char const * const message);
+#include "pirlexer.h"
 
 
-extern int yylex(YYSTYPE * const yylval,
-                 struct lexer_state const * const lexer);
+
+
+/* declare yylex() */
+extern YY_DECL;
+
+extern int yyerror(yyscan_t yyscanner, struct lexer_state *lexer, char *message);
+
+extern struct lexer_state *new_lexer(char *filename);
+
+
 
 
 
@@ -179,16 +189,28 @@ extern int yylex(YYSTYPE * const yylval,
 }
 
 /* a pure parser */
-%pure_parser
+%pure-parser
 
+/* name of generated parser */
 %output="pirparser.c"
 
+/* move around a yyscan_t object */
+%parse-param {yyscan_t yyscanner}
+%lex-param   {yyscan_t yyscanner}
 
-%parse-param {struct lexer_state * const lexer}
-%lex-param   {struct lexer_state * const lexer}
+/* The parser is invoked with this extra parameter */
+%parse-param {struct lexer_state * lexer}
+
+/* Note: don't declare the lexer_state argument as a %lex-param,
+ * this object is stored in the yyscan_t structure, and can be
+ * accessed through yy{set,get}_extra().
+ */
 
 
+/* Top-level rule */
 %start program
+
+
 
 %%
 
@@ -787,16 +809,20 @@ target: reg
 
 %%
 
-/* the file being parsed */
-extern FILE *yyin; /* CAN WE KEEP USING THIS IN A PURE-PARSER? */
-
-/* the global buffer where the current token's characters are stored */
-extern char *yytext; /* TODO: REMOVE THIS GLOBAL */
-
 #include <string.h>
 #include <assert.h>
 
-extern void yyrestart(FILE *in);
+
+
+
+/* wrapper function for yyerror.
+
+*/
+void
+syntax_error(void *yyscanner, struct lexer_state *lexer, char *message) {
+    fprintf(stderr, "SYNTAX ERROR: %s\n", message);
+}
+
 
 /*
 
@@ -804,22 +830,27 @@ Pre-process the file only. Don't do any analysis.
 
 */
 static void
-do_pre_process(struct lexer_state *lexer) {
+do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
     int token;
     YYSTYPE val;
 
     do {
-        token = yylex(&val, lexer);
-        fprintf(stderr, "%s ", yytext);
+
+        token = yylex(&val, yyscanner);
+
+/*        token = yylex(yyscanner, lexer);
+*/
+        fprintf(stderr, "%s ", yyget_text(yyscanner));
 
         /* if we just printed a newline character, the trailing space should be removed:
          * do a carriage-return
          */
-        if (strchr(yytext, '\n') != NULL)
+        if (strchr(yyget_text(yyscanner), '\n') != NULL)
             fprintf(stderr, "\r");
     }
     while (token > 0);
 }
+
 
 /*
  * Main compiler driver.
@@ -827,9 +858,10 @@ do_pre_process(struct lexer_state *lexer) {
 int
 main(int argc, char *argv[]) {
 
-    struct lexer_state *lexer = NULL;
+
     int parse_errors = 0;
-    int pre_process = 0;
+    int pre_process  = 0;
+    yyscan_t yyscanner;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
@@ -868,28 +900,38 @@ main(int argc, char *argv[]) {
     }
 
 
-
+    /* compile all files specified on the command line */
     while (argc > 0) {
+        FILE *infile = NULL;
+        struct lexer_state *lexer = NULL;
+
         fprintf(stderr, "Processing file '%s'\n", argv[0]);
 
         /* done handling arguments, open the file */
-        yyin = fopen(argv[0], "r");
+        infile = fopen(argv[0], "r");
 
-        if (yyin == NULL) {
+        if (infile == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
             exit(EXIT_FAILURE);
         }
 
+        /* create a yyscan_t object */
+        yylex_init(&yyscanner);
+        /* set the input file */
+        yyset_in(infile, yyscanner);
+
+        /* set the extra parameter in the yyscan_t structure */
         lexer = new_lexer(argv[0]);
-        assert(lexer != NULL);
+        yyset_extra(lexer, yyscanner);
+
 
         if (pre_process) {
             fprintf(stderr, "pre-processing %s\n", argv[0]);
-            do_pre_process(lexer);
+            do_pre_process(yyscanner, lexer);
         }
         else {
             fprintf(stderr, "compiling %s\n", argv[0]);
-            yyparse(lexer);
+            yyparse(yyscanner, lexer);
 
             parse_errors += get_parse_errors(lexer);
 
@@ -903,12 +945,8 @@ main(int argc, char *argv[]) {
             }
         }
 
-        /* close file after processing */
-        fclose(yyin);
-
-        /* this is necessary to allow for processing a file after another */
-        yyrestart(yyin);
-
+        /* clean up after playing */
+        yylex_destroy(yyscanner);
 
         argc--;
         argv++;
@@ -918,14 +956,19 @@ main(int argc, char *argv[]) {
         fprintf(stderr, "There were %d parse errors in all files\n", parse_errors);
 
 
+    /* go home! */
     return 0;
 }
+
+
 
 /*
 
 */
 int
-yyerror(struct lexer_state * const lexer, char const * const message) {
+yyerror(yyscan_t yyscanner, struct lexer_state * lexer, char * message) {
+
+    char *text = yyget_text(yyscanner);
 
     /* increment parse errors in the lexer structure */
     parse_error(lexer);
@@ -934,8 +977,12 @@ yyerror(struct lexer_state * const lexer, char const * const message) {
             get_current_file(lexer), get_line_nr(lexer), message);
 
     /* print current token if it's not a newline (or \r\n on windows) */
-    if (strcmp(yytext, "\r\n") != 0 || strcmp(yytext, "\n") == 0) {
-        fprintf(stderr, "('%s')", yytext);
+
+    /* the following should be fixed; the point is not to print the token if
+     * it's a newline, that looks silly.
+     */
+    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") == 0) {
+        fprintf(stderr, "('%s')", text);
     }
     else {
         fprintf(stderr, "\n\n");
