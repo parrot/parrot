@@ -107,7 +107,7 @@ protoobject.
     iter = new 'Iterator', attrs
   iter_loop:
     unless iter goto done_attrs
-    $S0 = shift attrs
+    $S0 = shift iter
     addattribute subc, $S0
     goto iter_loop
   done_attrs:

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -132,6 +132,36 @@ pir_output_is(<<'END_CODE', <<'END_OUT', 'new_subclass for :: classes');
 END_CODE
 Foo::Bar
 Foo::Bar
+END_OUT
+
+pir_output_is(<<'END_CODE', <<'END_OUT', 'new_subclass with attrs');
+.sub main :main
+    load_bytecode 'Protoobject.pbc'
+
+    .local pmc protomaker, hashclass, attrs
+    protomaker = new 'Protomaker'
+    hashclass = get_class 'Hash'
+    attrs = split ' ', '$a $b $c $d'
+    protomaker.'new_subclass'(hashclass, 'Foo::Bar', attrs :flat)
+
+    .local pmc object, iter
+    object = new 'Foo::Bar'
+    iter = new 'Iterator', attrs
+  iter_loop:
+    unless iter goto iter_end
+    $P0 = shift iter
+    $S0 = $P0
+    setattribute object, $S0, $P0
+    $P1 = getattribute object, $S0
+    say $P1
+    goto iter_loop
+  iter_end:
+.end
+END_CODE
+$a
+$b
+$c
+$d
 END_OUT
 
 
