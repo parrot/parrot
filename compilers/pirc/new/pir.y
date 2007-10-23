@@ -182,6 +182,10 @@ extern struct lexer_state *new_lexer(char *filename);
        TK_FLAG_OPTIONAL     ":optional"
        TK_FLAG_OPT_FLAG     ":opt_flag"
 
+
+/*
+ *
+ */
 %union {
     double dval;
     int    ival;
@@ -336,7 +340,7 @@ sub_flag: TK_FLAG_ANON
         | TK_FLAG_METHOD
         | TK_FLAG_LEX
         | TK_FLAG_OUTER '(' sub_id ')'
-        | TK_FLAG_VTABLE paren_string
+        | TK_FLAG_VTABLE opt_paren_string
         | TK_FLAG_MULTI '(' multi_type_list ')'
         | TK_FLAG_POSTCOMP
         | TK_FLAG_IMMEDIATE
@@ -351,7 +355,7 @@ sub_flag: ":anon"
         | ":method"
         | ":lex"
         | ":outer" '(' sub_id ')'
-        | ":vtable" paren_string
+        | ":vtable" opt_paren_string
         | ":multi" '(' multi_type_list ')'
         | ":postcomp"
         | ":immediate"
@@ -426,10 +430,10 @@ instruction: if_statement
              { yyerrok; }
            ;
 /*
-getresults_statement: TK_GET_RESULTS '(' target_list ')' TK_NL
+getresults_statement: TK_GET_RESULTS '(' opt_target_list ')' TK_NL
                     ;
 */
-getresults_statement: ".get_results" '(' target_list ')' "\n"
+getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
                     ;
 
 null_statement: "null" TK_PASM_PREG "\n"
@@ -579,20 +583,20 @@ long_result: ".result" target param_flags "\n"
            | local_declaration
            ;
 
-short_invocation_statement: '(' target_list ')' '=' invocation_expression "\n"
+short_invocation_statement: '(' opt_target_list ')' '=' invocation_expression "\n"
                           | TK_STRINGC arguments "\n"
                           | simple_invocation "\n"
                           ;
 
-target_list: /* empty */
-           | return_target_list
+opt_target_list: /* empty */
+               | target_list
+               ;
+
+target_list: result_target
+           | target_list ',' result_target
            ;
 
-return_target_list: return_target
-                  | return_target_list ',' return_target
-                  ;
-
-return_target: target param_flags
+result_target: target param_flags
              ;
 
 param_flags: /* empty */

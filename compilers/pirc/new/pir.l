@@ -1590,7 +1590,10 @@ LINECOMMENT    [#].*\n
                    info = NULL;
 
                    printdebug(stderr, "deleted info struct\n");
-                   return 0; /* end of file, needed for included files. */ /* END OF FILE MARKER */
+
+                   /* dont return anything, the scanner now continues with
+                    * the .including file.
+                    */
                }
             }
 

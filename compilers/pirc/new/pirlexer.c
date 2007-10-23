@@ -3239,13 +3239,16 @@ case YY_STATE_EOF(HEREDOC3):
                    info = NULL;
 
                    printdebug(stderr, "deleted info struct\n");
-                   return 0; /* end of file, needed for included files. */ /* END OF FILE MARKER */
+
+                   /* dont return anything, the scanner now continues with
+                    * the .including file.
+                    */
                }
             }
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 1597 "pir.l"
+#line 1600 "pir.l"
 { /* */
          lexer_state *my_lexer = yyget_extra(yyscanner);
          syntax_error(yyscanner, my_lexer, "Unexpected character");
@@ -3253,10 +3256,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 1605 "pir.l"
+#line 1608 "pir.l"
 ECHO;
 	YY_BREAK
-#line 3260 "pirlexer.c"
+#line 3263 "pirlexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -4408,7 +4411,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 1605 "pir.l"
+#line 1608 "pir.l"
 
 
 
