@@ -984,27 +984,46 @@ sub _op_exact_p {
 sub _op_inexact_p {
 }
 
+sub _compare {
+    my ( $self, $node, $inverse_cmp_op ) = @_;
+
+    my $label = $self->_gensym();
+
+    my $return = $self->_constant('#f');
+    my $lhs = $self->_generate( $node->{children}[1] );
+    for ( 2 .. $#{ $node->{children} } ) {
+        my $rhs = $self->_generate( $node->{children}[$_] );
+        $self->_add_inst( '', $inverse_cmp_op => [ $lhs, $rhs, "DONE_$label" ] );
+        $self->_restore($lhs);
+        $lhs = $rhs;
+    }
+    $self->_add_inst( '', 'set', [ $return, 1 ] );
+    $self->_add_inst("DONE_$label");
+
+    return $return;
+}
+
 sub _op_eq {
     my ( $self, $node ) = @_;
 
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
         my $temp_1 = $self->_generate( $node->{children}[$_] );
-        if ( substr( $temp_0, 0, 1 ) ne substr( $temp_1, 0, 1 ) ) {
-            my $temp_2 = $self->_save_1( substr( $temp_0, 0, 1 ) );
+        if ( substr( $lhs, 0, 1 ) ne substr( $temp_1, 0, 1 ) ) {
+            my $temp_2 = $self->_save_1( substr( $lhs, 0, 1 ) );
             $self->_morph( $temp_2, $temp_1 );
             $self->_restore($temp_1);
             $temp_1 = $temp_2;
         }
-        $self->_add_inst( '', 'ne', [ $temp_0, $temp_1, "DONE_$label" ] );
+        $self->_add_inst( '', 'ne', [ $lhs, $temp_1, "DONE_$label" ] );
         $self->_restore($temp_1);
     }
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
-    $self->_restore($temp_0);
+    $self->_restore($lhs);
 
     return $return;
 }
@@ -1012,77 +1031,25 @@ sub _op_eq {
 sub _op_lt {
     my ( $self, $node ) = @_;
 
-    my $label = $self->_gensym();
-
-    my $return = $self->_constant('#f');
-    my $lhs = $self->_generate( $node->{children}[1] );
-    for ( 2 .. $#{ $node->{children} } ) {
-        my $rhs = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'ge', [ $lhs, $rhs, "DONE_$label" ] );
-        $lhs = $rhs;
-    }
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
-    $self->_add_inst("DONE_$label");
-    $self->_restore($lhs);
-
-    return $return;
+    return $self->_compare( $node, 'ge' );
 }
 
 sub _op_gt {
     my ( $self, $node ) = @_;
 
-    my $label = $self->_gensym();
-
-    my $return = $self->_constant('#f');
-    my $lhs = $self->_generate( $node->{children}[1] );
-    for ( 2 .. $#{ $node->{children} } ) {
-        my $rhs = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'le', [ $lhs, $rhs, "DONE_$label" ] );
-        $lhs = $rhs;
-    }
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
-    $self->_add_inst("DONE_$label");
-    $self->_restore($lhs);
-
-    return $return;
+    return $self->_compare( $node, 'le' );
 }
 
 sub _op_leq {
     my ( $self, $node ) = @_;
 
-    my $label = $self->_gensym();
-
-    my $return = $self->_constant('#f');
-    my $lhs = $self->_generate( $node->{children}[1] );
-    for ( 2 .. $#{ $node->{children} } ) {
-        my $rhs = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'gt', [ $lhs, $rhs, "DONE_$label" ] );
-        $lhs = $rhs;
-    }
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
-    $self->_add_inst("DONE_$label");
-    $self->_restore($lhs);
-
-    return $return;
+    return $self->_compare( $node, 'gt' );
 }
 
 sub _op_geq {
     my ( $self, $node ) = @_;
 
-    my $label = $self->_gensym();
-
-    my $return = $self->_constant('#f');
-    my $temp_0 = $self->_generate( $node->{children}[1] );
-    for ( 2 .. $#{ $node->{children} } ) {
-        my $temp_1 = $self->_generate( $node->{children}[$1] );
-        $self->_add_inst( '', 'lt', [ $temp_0, $temp_1, "DONE_$label" ] );
-        $self->_restore($temp_1);
-    }
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
-    $self->_add_inst("DONE_$label");
-    $self->_restore($temp_0);
-
-    return $return;
+    return $self->_compare( $node, 'lt' );
 }
 
 sub _op_zero_p {
