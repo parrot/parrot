@@ -2284,8 +2284,8 @@ yyreturn:
 
 */
 void
-syntax_error(void *yyscanner, struct lexer_state *lexer, char *message) {
-    fprintf(stderr, "SYNTAX ERROR: %s\n", message);
+syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message) {
+    yyerror(yyscanner, lexer, message);
 }
 
 

@@ -61,7 +61,7 @@ extern struct lexer_state *new_lexer(char *filename);
 extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 
-
+extern void syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message);
 
 
 
