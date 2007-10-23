@@ -1690,8 +1690,8 @@ mmd_create_builtin_multi_meth_2(PARROT_INTERP, NOTNULL(PMC *ns),
 
     PARROT_ASSERT(type != enum_class_Null && type != enum_class_delegate &&
             type != enum_class_Ref  && type != enum_class_SharedRef &&
-            type != enum_class_deleg_pmc && type != enum_class_ParrotClass &&
-            type != enum_class_ParrotObject);
+            type != enum_class_deleg_pmc && type != enum_class_Class &&
+            type != enum_class_Object);
     short_name = Parrot_MMD_method_name(interp, func_nr);
     /*
      * _int, _float, _str are just native variants of the base

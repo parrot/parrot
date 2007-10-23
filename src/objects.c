@@ -429,7 +429,7 @@ create_deleg_pmc_vtable(PARROT_INTERP, NOTNULL(PMC *_class), int full)
     VTABLE * const vtable           = (VTABLE *)PMC_struct_val(vtable_pmc);
     VTABLE * const ro_vtable        = vtable->ro_variant_vtable;
     VTABLE * const deleg_pmc_vtable = interp->vtables[enum_class_deleg_pmc];
-    VTABLE * const object_vtable    = interp->vtables[enum_class_ParrotObject];
+    VTABLE * const object_vtable    = interp->vtables[enum_class_Object];
     VTABLE * const ro_object_vtable = object_vtable->ro_variant_vtable;
     VTABLE * const delegate_vtable  = interp->vtables[enum_class_delegate];
 
@@ -562,11 +562,11 @@ Parrot_single_subclass(PARROT_INTERP, NOTNULL(PMC *base_class), NULLOK(PMC *name
     }
 
     /* ParrotClass is the baseclass anyway, so build just a new class */
-    if (base_class == interp->vtables[enum_class_ParrotClass]->pmc_class)
-        return pmc_new_init(interp, enum_class_ParrotClass, name);
+    if (base_class == interp->vtables[enum_class_Class]->pmc_class)
+        return pmc_new_init(interp, enum_class_Class, name);
 
     parent_is_class = PObj_is_class_TEST(base_class);
-    child_class     = pmc_new(interp, enum_class_ParrotClass);
+    child_class     = pmc_new(interp, enum_class_Class);
 
     /* Hang an array off the data pointer */
     set_attrib_array_size(child_class, PCD_MAX);
@@ -859,7 +859,7 @@ parrot_class_register(PARROT_INTERP, NOTNULL(PMC *name),
         parent_vtable = (VTABLE *)PMC_struct_val(vtable_pmc);
     }
     else
-        parent_vtable = interp->vtables[enum_class_ParrotObject];
+        parent_vtable = interp->vtables[enum_class_Object];
 
     new_vtable = Parrot_clone_vtable(interp, parent_vtable);
 

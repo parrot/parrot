@@ -353,7 +353,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "addattribute" );
 # Check that addattribute doesn't blow up
     addattribute P1, "foo_i"
     print "ok 1\n"
-# Check that P1 is still the same ParrotClass PMC
+# Check that P1 is still the same Class PMC
     set S0, P1
     eq S0, "Foo", ok2
     print "not "
@@ -1617,10 +1617,10 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Wrong way to create new objects" );
-    new P0, 'ParrotObject'
+    new P0, 'Object'
     end
 CODE
-/Can't create new ParrotObject/
+/Object must be created by a class./
 OUTPUT
 
 #' for vim

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/pmc/parrotclass.t - test the ParrotClass PMC
+t/pmc/parrotclass.t - test the Class PMC
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ t/pmc/parrotclass.t - test the ParrotClass PMC
 
 =head1 DESCRIPTION
 
-Tests the ParrotClass PMC.
+Tests the Class PMC.
 
 =cut
 
@@ -30,8 +30,8 @@ Tests the ParrotClass PMC.
 
     plan(1)
 
-    new P0, 'ParrotClass'
-    ok(1, 'Instantiated .ParrotClass')
+    new P0, 'Class'
+    ok(1, 'Instantiated .Class')
 .end
 
 # Local Variables:
