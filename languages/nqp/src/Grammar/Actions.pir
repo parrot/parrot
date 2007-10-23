@@ -99,7 +99,7 @@
 .sub 'statement_list' :method
     .param pmc match
     .local pmc past
-    $P0 = getclass 'PAST::Stmts'
+    $P0 = get_hll_global ['PAST'], 'Stmts'
     past = $P0.'new'('node'=>match)
     $P1 = match['statement']
     if null $P1 goto iter_end
@@ -144,7 +144,7 @@
     block = match['block']
     $P1 = block[0]
     $P1 = $P1.'get_scalar'()
-    $P2 = getclass 'PAST::Op'
+    $P2 = get_hll_global ['PAST'], 'Op'
     $S1 = match['sym']
     past = $P2.'new'($P0, $P1, 'pasttype'=>$S1, 'node'=>match)
     $I0 = exists block[1]
@@ -178,11 +178,11 @@
     block.'blocktype'('sub')
     .local pmc params, topic_var
     params = block[0]
-    $P3 = getclass 'PAST::Var'
+    $P3 = get_hll_global ['PAST'], 'Var'
     topic_var = $P3.'new'('name'=>'$_', 'scope'=>'parameter')
     params.'push'(topic_var)
     block.'symbol'('$_', 'scope'=>'lexical')
-    $P2  = getclass 'PAST::Op'
+    $P2  = get_hll_global ['PAST'], 'Op'
     $S1  = match['sym']
     past = $P2.'new'($P0, block, 'pasttype'=>$S1, 'node'=>match)
     .return (past)
@@ -210,9 +210,9 @@
     if key == 'close' goto block_close
   block_open:
     .local pmc past
-    $P1 = getclass 'PAST::Stmts'
+    $P1 = get_hll_global ['PAST'], 'Stmts'
     $P2 = $P1.'new'()
-    $P0 = getclass 'PAST::Block'
+    $P0 = get_hll_global ['PAST'], 'Block'
     past = $P0.'new'($P2, 'blocktype'=>'immediate', 'node'=>match)
     set_global '$?BLOCK', past
     $P0 = get_global '@?BLOCK'
@@ -289,7 +289,7 @@
 .sub 'param_var' :method
     .param pmc match
     $S0 = match
-    $P0 = getclass 'PAST::Var'
+    $P0 = get_hll_global ['PAST'], 'Var'
     .return $P0.'new'('name'=>$S0, 'scope'=>'parameter', 'node'=>match)
 .end
 
@@ -384,7 +384,7 @@
     if key == '( )' goto subcall
     if key == '< >' goto keyed_const
   keyed_var:
-    $P0 = getclass 'PAST::Var'
+    $P0 = get_hll_global ['PAST'], 'Var'
     $P1 = match['EXPR']
     $P2 = $P1.'get_scalar'()
     .return $P0.'new'( $P2, 'scope'=>'keyed', 'node'=>match )
@@ -395,12 +395,12 @@
     past.'node'(match)
     .return (past)
   keyed_const:
-    $P0 = getclass 'PAST::Val'
+    $P0 = get_hll_global ['PAST'], 'Val'
     $P1 = match['string_literal']
     $P2 = $P1.'get_scalar'()
     .local pmc value
     value = $P0.'new'( 'value' => $P2, 'node'=> $P1 )
-    $P0 = getclass 'PAST::Var'
+    $P0 = get_hll_global ['PAST'], 'Var'
     .return $P0.'new'( value, 'scope'=>'keyed', 'viviself'=>'Hash', 'node'=>match)
 .end
 
@@ -433,7 +433,7 @@
     $P1 = $P0[0]
   get_past:
     $P1 = $P1.'get_scalar'()
-    $P0 = getclass 'PAST::Op'
+    $P0 = get_hll_global ['PAST'], 'Op'
     if key == '@( )' goto list_context
     if key == '$( )' goto scalar_context
   parenthetical:
@@ -473,7 +473,7 @@
 .sub 'arglist' :method
     .param pmc match
     .local pmc past
-    $P0 = getclass 'PAST::Op'
+    $P0 = get_hll_global ['PAST'], 'Op'
     past = $P0.'new'( 'node'=>match )
     $P1 = match['EXPR']
     if null $P1 goto end
@@ -535,11 +535,11 @@
     .param pmc match
     $S0 = match['ident']
     $P0 = match['ident']
-    $P9 = getclass 'PAST::Val'
+    $P9 = get_hll_global ['PAST'], 'Val'
     $P1 = $P9.'new'('value'=>$S0, 'node'=>$P0)
     $P2 = match['EXPR']
     $P2 = $P2.'get_scalar'()
-    $P9 = getclass 'PAST::Op'
+    $P9 = get_hll_global ['PAST'], 'Op'
     .return $P9.'new'($P1, $P2, 'name'=>'infix:=>', 'returns'=>'Pair', 'node'=>match)
 .end
 
@@ -592,15 +592,15 @@
     .param pmc key
     if key != '$< >' goto past_var
   past_match_keyed:
-    $P0 = getclass 'PAST::Var'
+    $P0 = get_hll_global ['PAST'], 'Var'
     $P1 = $P0.'new'('scope'=>'lexical', 'name'=>'$/')
-    $P2 = getclass 'PAST::Val'
+    $P2 = get_hll_global ['PAST'], 'Val'
     $S0 = match[0]
     $P3 = $P2.'new'('value'=>$S0)
     .return $P0.'new'($P1, $P3, 'scope'=>'keyed')
   past_var:
     $S0 = match
-    $P0 = getclass 'PAST::Var'
+    $P0 = get_hll_global ['PAST'], 'Var'
     .return $P0.'new'('node'=>match, 'name'=>$S0)
 .end
 
@@ -614,7 +614,7 @@
     .local string value
     $P0 = match['string_literal']
     value = $P0.'get_scalar'()
-    $P0 = getclass 'PAST::Val'
+    $P0 = get_hll_global ['PAST'], 'Val'
     .return $P0.'new'('node'=>match, 'value'=>value)
 .end
 
@@ -627,7 +627,7 @@
     .param pmc key             :optional
     .local pmc past
     $I0 = match
-    $P0 = getclass 'PAST::Val'
+    $P0 = get_hll_global ['PAST'], 'Val'
     past = $P0.'new'('node'=>match, 'value'=>$I0)
     .return (past)
 .end
@@ -685,7 +685,7 @@
     pasttype = match['top'; 'pasttype']
     inline = match['top'; 'inline']
     lvalue = match['top'; 'lvalue']
-    $P0 = getclass 'PAST::Op'
+    $P0 = get_hll_global ['PAST'], 'Op'
     past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline, 'islvalue'=>lvalue)
     $P1 = match.'get_array'()
     if null $P1 goto iter_end
