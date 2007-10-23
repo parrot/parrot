@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 14;
+use Test::More tests => 17;
 use Parrot::Test;
 
 language_output_is( 'Scheme', <<'CODE', '0', 'write, one integer' );
@@ -73,6 +73,18 @@ CODE
 
 language_output_is( 'Scheme', <<'CODE', "#t", 'display #t' );
 (display #t)
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#t", '(display ( = 12 ( + 6 6)))' );
+(display ( = 12 ( + 6 6)))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#f", '(display ( > 12 ( + 6 6)))' );
+(display ( > 12 ( + 6 6)))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', "#f", '(display ( < 12 ( + 6 6)))' );
+(display ( < 12 ( + 6 6)))
 CODE
 
 # Local Variables:
