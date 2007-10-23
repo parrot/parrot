@@ -2303,8 +2303,6 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
 
         token = yylex(&val, yyscanner);
 
-/*        token = yylex(yyscanner, lexer);
-*/
         fprintf(stderr, "%s ", yyget_text(yyscanner));
 
         /* if we just printed a newline character, the trailing space should be removed:
@@ -2316,6 +2314,19 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
     while (token > 0);
 }
 
+/*
+
+*/
+static void
+print_help(char const * const program_name) {
+
+    fprintf(stderr, "Usage: %s [options] <files>\n", program_name);
+    fprintf(stderr, "Options:\n\n");
+    fprintf(stderr, "  -E   pre-process\n");
+    fprintf(stderr, "  -d   show debug messages of parser\n");
+    fprintf(stderr, "  -h   show this help message\n");
+
+}
 
 /*
  * Main compiler driver.
@@ -2323,13 +2334,13 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
 int
 main(int argc, char *argv[]) {
 
-
-    int parse_errors = 0;
-    int pre_process  = 0;
+    char const * const program_name = argv[0];
+    int total_errors  = 0;
+    int pre_process   = 0;
     yyscan_t yyscanner;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+        print_help(program_name);
         exit(EXIT_FAILURE);
     }
 
@@ -2350,6 +2361,10 @@ main(int argc, char *argv[]) {
                 yydebug = 1;
                 break;
 #endif
+            case 'h':
+                print_help(program_name);
+                exit(EXIT_SUCCESS); /* asking for help doesn't make you a failure */
+                /* break; */
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
                 break;
@@ -2369,6 +2384,7 @@ main(int argc, char *argv[]) {
     while (argc > 0) {
         FILE *infile = NULL;
         struct lexer_state *lexer = NULL;
+        int parse_errors = 0;
 
         fprintf(stderr, "Processing file '%s'\n", argv[0]);
 
@@ -2398,10 +2414,13 @@ main(int argc, char *argv[]) {
             fprintf(stderr, "compiling %s\n", argv[0]);
             yyparse(yyscanner, lexer);
 
-            parse_errors += get_parse_errors(lexer);
+            /* get parse errors for this file */
+            parse_errors = get_parse_errors(lexer);
+            /* update total error count */
+            total_errors += parse_errors;
 
             if (parse_errors == 0) {
-             fprintf(stderr, "Parse successful!\n");
+                fprintf(stderr, "Parse successful!\n");
             }
             else {
                 fprintf(stderr, "There %s %d %s in file '%s'\n", parse_errors > 1 ? "were" :
@@ -2417,8 +2436,8 @@ main(int argc, char *argv[]) {
         argv++;
     }
 
-    if (parse_errors > 0)
-        fprintf(stderr, "There were %d parse errors in all files\n", parse_errors);
+    if (total_errors > 0)
+        fprintf(stderr, "There were %d parse errors in all files\n", total_errors);
 
 
     /* go home! */
