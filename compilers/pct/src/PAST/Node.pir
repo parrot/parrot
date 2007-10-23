@@ -20,16 +20,17 @@ for compiling programs in Parrot.
     ##   XXX: Eventually we want this to be a subclass of
     ##   Capture, but as of now Capture isn't working.
     ##   So, we'll simulate it for now.
-    .local pmc base
+    .local pmc base, protomaker
     load_bytecode 'Parrot/Capture_PIR.pir'
     base = subclass 'Capture_PIR', 'PAST::Node'
+    protomaker = new 'Protomaker'
 
-    $P0 = subclass base, 'PAST::Op'
-    $P0 = subclass base, 'PAST::Stmts'
-    $P0 = subclass base, 'PAST::Val'
-    $P0 = subclass base, 'PAST::Var'
-    $P0 = subclass base, 'PAST::Block'
-    $P0 = subclass base, 'PAST::VarList'
+    $P0 = protomaker.'new_subclass'(base, 'PAST::Op')
+    $P0 = protomaker.'new_subclass'(base, 'PAST::Stmts')
+    $P0 = protomaker.'new_subclass'(base, 'PAST::Val')
+    $P0 = protomaker.'new_subclass'(base, 'PAST::Var')
+    $P0 = protomaker.'new_subclass'(base, 'PAST::Block')
+    $P0 = protomaker.'new_subclass'(base, 'PAST::VarList')
 
     $P0 = new 'Integer'
     $P0 = 10

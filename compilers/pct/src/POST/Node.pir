@@ -12,16 +12,18 @@ for compiling programs in Parrot.
 .namespace [ 'POST' ]
 
 .sub '__onload' :load :init
-    .local pmc base
+    .local pmc protomaker, base
 
     ##  create POST classes
-    base = subclass 'PAST::Node', 'POST::Node'
-    $P0 = subclass base, 'POST::Op'
-    $P0 = subclass base, 'POST::Ops'
-    $P0 = subclass base, 'POST::Val'
-    $P0 = subclass base, 'POST::Var'
-    $P0 = subclass base, 'POST::Label'
-    $P0 = subclass base, 'POST::Sub'
+    protomaker = new 'Protomaker'
+    $P0 = get_class 'PAST::Node'
+    base = protomaker.'new_subclass'($P0 , 'POST::Node')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Op')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Ops')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Val')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Var')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Label')
+    $P0  = protomaker.'new_subclass'(base, 'POST::Sub')
 
     ##  initialize %pirtable with opcode argument types
     .local pmc pirtable

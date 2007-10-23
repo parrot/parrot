@@ -12,7 +12,7 @@ transform root (PAST::Block) :language('PIR') {
     $I0 = isa post, 'POST::Sub'
     if $I0 goto end
     $S0 = post.'unique'('__anon_')
-    $P0 = get_class 'POST::Sub'
+    $P0 = get_hll_global ['POST'], 'Sub'
     post = $P0.'new'(post, 'name'=>$S0)
   end:
     .return (post)
@@ -67,7 +67,7 @@ transform post (PAST::Block) :language('PIR') {
   end:
     set_hll_global ['POST'], '$?SUB', outerpost
     if blocktype != 'immediate' goto blocktype_end
-    $P0 = get_class 'POST::Op'
+    $P0 = get_hll_global ['POST'], 'Op'
     post = $P0.'new'(post, 'node'=>node, 'pirop'=>'call', 'arglist'=>post)
 
   blocktype_end:
@@ -196,7 +196,7 @@ transform if (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     thenlabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -245,7 +245,7 @@ transform while (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -284,7 +284,7 @@ transform for (PAST::Op) :language('PIR') {
     pasttype = node.'pasttype'()
     n = node.'unique'('_')
     $S0 = concat pasttype, n
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     looplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -329,10 +329,10 @@ transform try (PAST::Op) :language('PIR') {
     .local pmc trypast, trypost, post, traplabel, endlabel
     trypast = node[0]
     trypost = tree.'get'('post', trypast)
-    $P0 = get_class 'POST::Ops'
+    $P0 = get_hll_global ['POST'], 'Ops'
     post = $P0.'new'('node'=>node, 'result'=>trypost)
     $S0 = node.'unique'('trap_')
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     traplabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
@@ -358,7 +358,7 @@ transform xor (PAST::Op) :language('PIR') {
     ops.'init'('node'=>node)
 
     .local pmc endlabel, falselabel
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     falselabel = $P0.'new'('name'=>'xor_false')
     endlabel = $P0.'new'('name'=>'xor_end')
 
@@ -407,7 +407,7 @@ transform bind (PAST::Op) :language('PIR') {
     lpast = node[0]
     lpast.'bindvalue'(rpost)
     lpost = tree.'get'('bind', lpast)
-    $P0 = get_class 'POST::Ops'
+    $P0 = get_hll_global ['POST'], 'Ops'
     post = $P0.'new'(rpost, lpost, 'node'=>node)
     .return (post)
 }
@@ -419,9 +419,9 @@ transform assign (PAST::Op) :language('PIR') {
     rpost = tree.'get'('post', rpast)
     lpast = node[0]
     lpost = tree.'get'('post', lpast)
-    $P0 = get_class 'POST::Ops'
+    $P0 = get_hll_global ['POST'], 'Ops'
     post = $P0.'new'(rpost, lpost, 'node'=>node, 'result'=>lpost)
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     alabel = $P0.'new'('name'=>'assign_')
     post.'push_pirop'('eq_addr', lpost, rpost, alabel)
     post.'push_pirop'('morph', lpost, "'Undef'")
@@ -450,7 +450,7 @@ transform chain (PAST::Op) :language('PIR') {
     ops = new 'POST::Ops'
     ops.'init'('node'=>node)
     cpast = pop clist
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     endlabel = $P0.'new'('name'=>'chain_end_')
     apast = cpast[0]
     apost = tree.'get'('post', apast)
@@ -480,7 +480,7 @@ transform chain (PAST::Op) :language('PIR') {
 transform post (PAST::Val) :language('PIR') {
     .local pmc value
     value = node['value']
-    $P0 = get_class 'POST::Val'
+    $P0 = get_hll_global ['POST'], 'Val'
     .return $P0.'new'('node'=>node, 'value'=>value)
 }
 
@@ -565,7 +565,7 @@ transform bind (PAST::Var) :language('PIR') {
   keyed:
     .local pmc post, keypost
     keypost = tree.'get'('keypost', node)
-    $P0 = get_class 'POST::Op'
+    $P0 = get_hll_global ['POST'], 'Op'
     post = $P0.'new'(keypost, 'node'=>node, 'pirop'=>'set', 'result'=>bindvalue)
     post.'arglist'(keypost, bindvalue)
     .return (post)
@@ -598,9 +598,9 @@ transform vivipost (PAST::Var) :language('PIR') {
 transform post (PAST::Var) :language('PIR') {
     .local pmc vivipost, vivilabel, post
     vivipost = tree.'get'('vivipost', node)
-    $P0 = get_class 'POST::Ops'
+    $P0 = get_hll_global ['POST'], 'Ops'
     post = $P0.'new'('node'=>node, 'result'=>vivipost)
-    $P0 = get_class 'POST::Label'
+    $P0 = get_hll_global ['POST'], 'Label'
     vivilabel = $P0.'new'('name'=>'vivify_')
 
     .local string scope, name, fetchop, storeop

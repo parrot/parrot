@@ -14,6 +14,7 @@ running compilers from a command line.
 .namespace
 
 .sub '__onload' :load :init
+    load_bytecode 'Protoobject.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = newclass [ 'PCT::HLLCompiler' ]
     addattribute $P0, '$parsegrammar'
@@ -26,6 +27,9 @@ running compilers from a command line.
     addattribute $P0, '$commandline_banner'
     # the commandline_prompt is the prompt to show for input
     addattribute $P0, '$commandline_prompt'
+
+    $P1 = new 'Protomaker'
+    $P1.'new_proto'($P0)
 .end
 
 =head2 Methods
