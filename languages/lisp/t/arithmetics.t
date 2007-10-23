@@ -50,7 +50,7 @@ END_OUT
 language_output_is( 'Lisp', <<'END_CODE', <<'END_OUT', '2 equals 1+1' );
 ( print ( =  2 ( + 1 1 ) ) )
 END_CODE
-NIL
+T
 END_OUT
 
 language_output_is( 'Lisp', <<'END_CODE', <<'END_OUT', '2 equals 1+1' );
