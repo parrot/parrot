@@ -504,12 +504,17 @@ find_macro(lexer_state const * const lexer, char const * const name) {
     return NULL;
 }
 
+/*
+
+*/
 static macro_info *
 peek_macro(lexer_state const * const lexer) {
     return lexer->macro_defs;
 }
 
+/*
 
+*/
 static void
 unshift_macro(lexer_state * const lexer, macro_info * const macro) {
     macro->next = lexer->macro_defs;
@@ -581,8 +586,9 @@ make_label(char const * const macro_name, char const * const label_name) {
 
 /*
 
-*/
+Read a braced argument of a macro expansion.
 
+*/
 static void
 read_braced_argument(void *yyscanner, YYSTYPE *yylval) {
     int next_token = yylex(yylval, yyscanner);
@@ -657,10 +663,10 @@ read_macro(yyscan_t yyscanner, YYSTYPE *yylval) {
             }
 
             /* get next token after parameter */
-            next_token = yylex(yylval, /*lexer,*/ yyscanner);
+            next_token = yylex(yylval, yyscanner);
 
             if (next_token == ',') { /* current token is a comma, get next parameter */
-                next_token = yylex(yylval, /*lexer,*/ yyscanner);
+                next_token = yylex(yylval, yyscanner);
                 /* after a comma we expect a parameter; set a flag */
                 expect_parameter = 1;
             }
@@ -686,7 +692,11 @@ read_macro(yyscan_t yyscanner, YYSTYPE *yylval) {
      * multiple PIR statements can be written on 1 line.
      */
     if (next_token == TK_NL) {
-       /* :-/ This makes a normal macro expansion fail, but "print 42 .NL print 42" pass. */
+       /* :-/ This (adding a "\n")
+        * makes a normal macro expansion fail, but "print 42 .NL print 42" pass.
+        * I think normal case is more important (and having an abstracted "\n" token) than
+        * this "trick" with macro newlines.
+        */
        /*
         strcat(macro->body, "\n");
        */
@@ -854,6 +864,7 @@ LINECOMMENT    [#].*\n
 /* make the scanner re-entrant */
 %option reentrant
 
+/* needed for bison interaction. I forgot details. */
 %option bison-bridge
 
 /* yywrap() always returns true. */
@@ -868,12 +879,15 @@ LINECOMMENT    [#].*\n
                 read_macro(yyscanner, yylval);
              }
 
-<MACRODEF>".endm"         { /* end of macro definition */ ;
+<MACRODEF>".endm"         { /* end of macro definition */
+                            lexer_state *my_lexer = yyget_extra(yyscanner);
+                            fprintf(stderr, "macro text: [%s]\n", peek_macro(my_lexer)->body);
                             yy_pop_state(yyscanner);
                             return TK_ENDM;
                           }
 
 <MACRODEF>"$"{IDENT}":"   { /* unique label */
+                            fprintf(stderr, "<MACRODEF>$IDENT: [%s]\n", yytext);
                             return TK_LABEL;
                           }
 
@@ -887,7 +901,7 @@ LINECOMMENT    [#].*\n
                             macro_info *current_macro = peek_macro(my_lexer);
                             /* Labels are formatted as ".$foo", so skip the 2 ".$" characters. */
                             char *label = make_label(current_macro->name, yytext + 2);
-                            yytext = label;
+                            yylval->sval = label;
                             return TK_IDENT; /* jump targets are label, which are identifiers */
                           }
 
@@ -907,7 +921,13 @@ LINECOMMENT    [#].*\n
                                  /* make the label available to the parser (read_macro()
                                   *in this case)
                                   */
-                                 yytext = label; /* TODO use %union? */
+
+                                 yylval->sval = label; /* don't think this is necessary */
+
+                                 yytext = label; /* is this assignment to yytext correct?
+                                 * the generated label must be available in read_macro(), which
+                                 * just copies yytext to the macro buffer
+                                 */
                                  return TK_LABEL;
                              }
                              else { /* error */
@@ -926,7 +946,9 @@ LINECOMMENT    [#].*\n
 
 
 
-<MACROEXP><<EOF>>      { /* */
+<MACROEXP><<EOF>>      { /* This block is executed when "end of file" is read while expanding
+                          * a macro.
+                          */
                          lexer_state *my_lexer = yyget_extra(yyscanner);
                          YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
 
@@ -944,13 +966,13 @@ LINECOMMENT    [#].*\n
 
                        }
 
-{WS}                             { /* ignore */; }
+{WS}                             { /* ignore whitespace */ }
 
 {EOL}([\t\r\n ]|{LINECOMMENT})*  { /* a set of continuous newlines yields a single newline token. */
                                    return TK_NL;
                                  }
 
-{LINECOMMENT}                    { /* skip line comments */ ; }
+{LINECOMMENT}                    { /* skip line comments */ }
 
 
 
@@ -1105,8 +1127,8 @@ LINECOMMENT    [#].*\n
                       my_lexer->file_buffer = YY_CURRENT_BUFFER;
                       yy_scan_string(my_lexer->after_heredoc, yyscanner);
                       /* return the complete heredoc as a string constant */
-                      /* yylval.sval = heredoc->contents;
-                      */
+                      yylval->sval = heredoc->contents;
+
                       return TK_STRINGC;
                   }
                   else {
@@ -1262,7 +1284,10 @@ LINECOMMENT    [#].*\n
 ":flat"       { return TK_FLAG_FLAT; }
 
 
-{Q_STRING}   { /* yylval.sval = dupstr(yytext); */
+{Q_STRING}   { /* make the quoted string available to the parser.
+                  TODO: do we want the quotes? If not, remove them here.
+                */
+               yylval->sval = dupstr(yytext);
                return TK_STRINGC;
              }
 
@@ -1276,8 +1301,16 @@ LINECOMMENT    [#].*\n
 "$N"{DIGIT}+  { return TK_SYM_NREG; }
 "$I"{DIGIT}+  { return TK_SYM_IREG; }
 
-{ALPHA}{ALNUM}*":"    { return TK_LABEL; }
-{ALPHA}{ALNUM}*       { return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT; }
+{ALPHA}{ALNUM}*":"    { /* make the label Id available in the parser.
+                           TODO: remove the ":" ?
+                         */
+                        yylval->sval = dupstr(yytext);
+                        return TK_LABEL;
+                      }
+{ALPHA}{ALNUM}*       { /* make the Id or op available in the parser. */
+                        yylval->sval = dupstr(yytext);
+                        return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT;
+                      }
 
 
 {FLOATNUM}        { return TK_NUMC; }
@@ -1291,8 +1324,8 @@ LINECOMMENT    [#].*\n
                FILE *incl_file_ptr   = NULL;
                char *incl_file_name  = NULL;
                file_info *file_state = NULL;
-               YY_BUFFER_STATE incl_file_buffer;
                lexer_state *my_lexer = yyget_extra(yyscanner);
+               YY_BUFFER_STATE incl_file_buffer;
 
                /* get next token containing name of file being included */
                next_token = yylex(yylval, yyscanner);
@@ -1331,6 +1364,7 @@ LINECOMMENT    [#].*\n
                }
 
                printdebug(stderr, "storing data\n");
+
                /* save current file info */
                file_state = (file_info *)malloc(sizeof (file_info));
                assert(file_state != NULL);
@@ -1441,8 +1475,7 @@ LINECOMMENT    [#].*\n
                                 constant->name, constant->value, constant->token_type);
 
                         /* make the value of the constant available to the parser */
-                        /* TODO: where to store this? Probably in the %union->sval */
-                        yytext = constant->value;
+                        yylval->sval = constant->value;
                         /* return the type of token that the constant value represents */
                         return constant->token_type;
                     }
@@ -1453,24 +1486,25 @@ LINECOMMENT    [#].*\n
 
                         if (macro != NULL) { /* the macro definition exists! Yay! */
                             int num_macro_params = macro->num_params;
+                            int next_token       = yylex(yylval, yyscanner);
+
                             /* read input for parameters */
-
-                            int expect_argument = 0; /* flag for while loop */
-
-                            /* TODO: finish this */
-                            int next_token = yylex(yylval, yyscanner);
-
                             if (next_token == '(') {
+                                int expect_argument = 0; /* flag for while loop */
+
                                 next_token = yylex(yylval, yyscanner); /* skip '(' */
 
-                            fprintf(stderr, "Warning! Macro parameters are not implemented yet\n");
+                                fprintf(stderr,
+                                        "Warning! Macro parameters are not implemented yet\n");
 
+                                /* macro arguments */
                                 while (next_token != ')' || expect_argument == 1) {
                                     if (next_token == '{') { /* braced argument */
                                         read_braced_argument(yyscanner, yylval);
                                     }
                                     else {
                                         /* don't care about the token, just store it */
+                                        dupstr(yytext);
                                         next_token = yylex(yylval, yyscanner);
                                     }
 
