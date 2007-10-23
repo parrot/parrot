@@ -1015,15 +1015,15 @@ sub _op_lt {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp_1 = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'ge', [ $temp_0, $temp_1, "DONE_$label" ] );
-        $self->_restore($temp_1);
+        my $rhs = $self->_generate( $node->{children}[$_] );
+        $self->_add_inst( '', 'ge', [ $lhs, $rhs, "DONE_$label" ] );
+        $lhs = $rhs;
     }
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
-    $self->_restore($temp_0);
+    $self->_restore($lhs);
 
     return $return;
 }
@@ -1034,15 +1034,15 @@ sub _op_gt {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp_1 = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'le', [ $temp_0, $temp_1, "DONE_$label" ] );
-        $self->_restore($temp_1);
+        my $rhs = $self->_generate( $node->{children}[$_] );
+        $self->_add_inst( '', 'le', [ $lhs, $rhs, "DONE_$label" ] );
+        $lhs = $rhs;
     }
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
-    $self->_restore($temp_0);
+    $self->_restore($lhs);
 
     return $return;
 }
@@ -1053,15 +1053,15 @@ sub _op_leq {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( $node->{children}[1] );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp_1 = $self->_generate( $node->{children}[$_] );
-        $self->_add_inst( '', 'gt', [ $temp_0, $temp_1, "DONE_$label" ] );
-        $self->_restore($temp_1);
+        my $rhs = $self->_generate( $node->{children}[$_] );
+        $self->_add_inst( '', 'gt', [ $lhs, $rhs, "DONE_$label" ] );
+        $lhs = $rhs;
     }
     $self->_add_inst( '', 'set', [ $return, 1 ] );
     $self->_add_inst("DONE_$label");
-    $self->_restore($temp_0);
+    $self->_restore($lhs);
 
     return $return;
 }

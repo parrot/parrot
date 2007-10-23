@@ -231,11 +231,11 @@ CODE
 ### GEQ (>=)
 ###
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (>= 2 3 3))' );
+language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 2 3 3))' );
 (write (<= 2 3 3))
 CODE
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (>= 2 3 2))' );
+language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 3 2))' );
 (write (<= 2 3 2))
 CODE
 
