@@ -21,25 +21,28 @@ PGE::Exp - base class for expressions
     .local pmc optable
     .local pmc term
 
-    $P0 = get_class "PGE::Match"
-    $P0 = subclass $P0, "PGE::Exp"
-    $P1 = subclass $P0, "PGE::Exp::Literal"
-    $P1 = subclass $P0, "PGE::Exp::Scalar"
-    $P1 = subclass $P0, "PGE::Exp::CCShortcut"
-    $P1 = subclass $P0, 'PGE::Exp::Newline'
-    $P1 = subclass $P0, "PGE::Exp::EnumCharList"
-    $P1 = subclass $P0, "PGE::Exp::Anchor"
-    $P1 = subclass $P0, "PGE::Exp::Concat"
-    $P1 = subclass $P0, "PGE::Exp::Alt"
-    $P1 = subclass $P0, "PGE::Exp::Conj"
-    $P1 = subclass $P0, "PGE::Exp::Group"
-    $P1 = subclass $P1, "PGE::Exp::CGroup"
-    $P1 = subclass $P0, "PGE::Exp::Subrule"
-    $P1 = subclass $P0, "PGE::Exp::Cut"
-    $P1 = subclass $P0, "PGE::Exp::Quant"
-    $P1 = subclass $P0, "PGE::Exp::Modifier"
-    $P1 = subclass $P0, "PGE::Exp::Closure"
-    $P1 = subclass $P0, "PGE::Exp::Action"
+    .local pmc protomaker, matchclass, expclass
+
+    protomaker = new 'Protomaker'
+    matchclass = get_class 'PGE::Match'
+    expclass = protomaker.new_subclass(matchclass, 'PGE::Exp')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Literal')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Scalar')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::CCShortcut')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Newline')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::EnumCharList')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Anchor')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Concat')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Alt')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Conj')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Group')
+    $P1      = protomaker.new_subclass($P1     , 'PGE::Exp::CGroup')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Subrule')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Cut')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Quant')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Modifier')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Closure')
+    $P1      = protomaker.new_subclass(expclass, 'PGE::Exp::Action')
 .end
 
 
