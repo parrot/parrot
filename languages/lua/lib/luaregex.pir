@@ -203,14 +203,10 @@ Francois Perrad
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
-    $I0 = exists adverbs['name']
-    if $I0 goto adverbs_1
-    adverbs['name'] = '_luaregex'
-  adverbs_1:
     $I0 = exists adverbs['grammar']
-    if $I0 goto adverbs_2
+    if $I0 goto have_grammar
     adverbs['grammar'] = 'PGE::Grammar'
-  adverbs_2:
+  have_grammar:
 
     .local string target
     target = adverbs['target']
