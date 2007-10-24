@@ -79,11 +79,18 @@
 
 ##    method TOP($/, $key) {
 ##        self.block($/, $key);
+##        if ($key eq 'close') {
+##            $($/).blocktype('declaration');
+##        }
 ##    }
 .sub 'TOP' :method
     .param pmc match
     .param string key
     self.'block'(match, key)
+    if key != 'close' goto end
+    $P0 = match.'get_scalar'()
+    $P0.'blocktype'('declaration')
+  end:
 .end
 
 
