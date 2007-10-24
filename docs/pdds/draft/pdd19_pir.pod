@@ -93,7 +93,7 @@ declared with C<.local>.
 
   .local pmc foo
 
-The type of a named variable can be C<int>, C<float>, C<string> or C<pmc>,
+The type of a named variable can be C<int>, C<num>, C<string> or C<pmc>,
 corresponding to the types of registers. No other types are used. [See
 RT#42769]
 
@@ -326,13 +326,20 @@ E.g. with this code snippet ...
 
 {{ PROPOSAL: stop using integer constants for types RT#45453 }}
 
-=item .sub <identifier> [:<flag> ...]
+=item .sub
 
-Define a compilation unit with the label I<identifier>. All code in a
-PIR source file must be defined in a compilation unit. See
-L<PIR Calling Conventions|imcc/calling_conventions> for available flags.
-Optional flags are a list of I<flag>, separated by empty spaces, and empty
-spaces only.
+  .sub <identifier> [:<flag> ...]
+  .sub <quoted string> [:<flag> ...]
+
+Define a compilation unit. All code in a PIR source file must be defined in a
+compilation unit. See L<PIR Calling Conventions|imcc/calling_conventions> for
+available flags.  Optional flags are a list of I<flag>, separated by empty
+spaces, and empty spaces only.
+
+The name of the sub may be either a bare identifier or a single- or
+double-quoted string. Bare identifiers must be valid PIR identifiers (see
+L<Identifiers> above), but string sub names can contain any characters,
+including characters from different character sets (see L<Constants> above).
 
 {{ NOTE: the optional comma in the flag list is deprecated RT#45697 }}
 
@@ -344,12 +351,12 @@ End a compilation unit. Always paired with C<.sub>.
 
 =item .emit
 
-Define a I<compilation unit> containing PASM code. Always paired with
+Define a compilation unit containing PASM code. Always paired with
 C<.eom>.
 
 =item .eom
 
-End a I<compilation unit> containing PASM code. Always paired with
+End a compilation unit containing PASM code. Always paired with
 C<.emit>.
 
 =item .pcc_*
@@ -381,7 +388,7 @@ Directives used for Parrot Calling Conventions. These are:
 At the top of a subroutine, declare a local variable, in the manner
 of C<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
-C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
+C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 =item .param <type> "<identifier>" => <identifier> [:<flag>]*
 
@@ -394,7 +401,7 @@ Define a named parameter. This is syntactic sugar for:
 Between C<.pcc_begin_return> and C<.pcc_end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags:
-C<:flat>.
+C<:flat>, C<:named>.
 
 =back
 
@@ -405,13 +412,13 @@ C<:flat>.
 =item .arg <var> [:<flag> ...]
 
 Between C<.pcc_begin> and C<.pcc_call>, specify an argument to be
-passed.  Available flags: C<:flat>.
+passed.  Available flags: C<:flat>, C<:named>.
 
 =item .result <var> [:<flag> ...]
 
 Between C<.pcc_call> and C<.pcc_end>, specify where one or more return
 value(s) should be stored.  Available flags:
-C<:slurpy>, C<:optional>, and C<:opt_flag>.
+C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
 
 =back
 
