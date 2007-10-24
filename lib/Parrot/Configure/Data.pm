@@ -106,7 +106,7 @@ sub set {
 
     my $verbose = defined $self->get('verbose') && $self->get('verbose') == 2;
 
-    print "Setting Configuration Data:\n(\n" if $verbose;
+    print "\nSetting Configuration Data:\n(\n" if $verbose;
 
     while ( my ( $key, $val ) = splice @_, 0, 2 ) {
         print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n"

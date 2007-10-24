@@ -36,7 +36,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get('verbose');
-    print $/ if $verbose;
+    print "\n" if $verbose;
 
     my ( $cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex, $yacc );
 

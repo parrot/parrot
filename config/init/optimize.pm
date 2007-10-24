@@ -38,7 +38,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $verbose = $conf->options->get( 'verbose' );
-    print $/ if $verbose;
+    print "\n" if $verbose;
 
     print "(optimization options: init::optimize)\n"
         if $verbose;

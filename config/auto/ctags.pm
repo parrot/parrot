@@ -40,7 +40,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $verbose = $conf->options->get( 'verbose' );
-    print $/ if $verbose;
+    print "\n" if $verbose;
 
     my @ctags_variations = qw( ctags exuberant-ctags ctags-exuberant exctags );
     for my $ctags ( @ctags_variations ) {
