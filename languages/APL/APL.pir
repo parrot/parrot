@@ -69,7 +69,7 @@ Initializes the compiling subsystem.
     load_bytecode 'Parrot/HLLCompiler.pbc'
     load_bytecode 'PAST-pm.pbc'
 
-    $P0 = getclass 'TGE::Grammar'
+    $P0 = get_class 'TGE::Grammar'
     $P1 = subclass $P0, 'APL::PAST::Grammar'
 
     $P0 = new [ 'HLLCompiler' ]

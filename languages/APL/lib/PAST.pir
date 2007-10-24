@@ -36,7 +36,7 @@ Creates the C<PAST::*> classes.
 
 .sub '__onload' :load :init
     .local pmc base
-    $P0 = getclass 'Hash'
+    $P0 = get_class 'Hash'
     base = subclass $P0, 'PAST::Node'
     addattribute base, '$.source'                  # original source
     addattribute base, '$.pos'                     # offset position
