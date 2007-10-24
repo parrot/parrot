@@ -866,13 +866,16 @@ Major issues are:
 
 =over 4
 
-=item Grammar is a bit messy, and has some problems, like disallowing line comments in .param declarations.
+=item Grammar is a bit messy, and has some problems, like disallowing
+line comments in .param declarations.
 
-=item The lexer is messy and not re-entrant. The macro layer is a mess and unmaintainable.
+=item The lexer is messy and not re-entrant. The macro layer is a mess
+and unmaintainable.
 
 =item No support for nested heredocs.
 
-=item The comment:  "this is just a sign that we suck.  that's all." speaks for itself (imc.h)
+=item The comment:  "this is just a sign that we suck.  that's all."
+speaks for itself (imc.h)
 
 =back
 
