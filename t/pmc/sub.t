@@ -748,7 +748,7 @@ back
 OUTPUT
 
 # This is the behavior of Parrot 0.4.3
-# XXX Should there be a warning ?
+# RT#46817 Should there be a warning ?
 pir_output_is( <<'CODE', '', 'warn on in main' );
 .sub _main :main
 .include "warnings.pasm"
@@ -776,7 +776,7 @@ CODE
 ok
 OUTPUT
 
-# XXX This is the behavior of Parrot 0.4.3
+# RT#46819 This is the behavior of Parrot 0.4.3
 # It looks like core PMCs never emit warning.
 # Look in perlundef.t for a more sane test of 'warningson' in subs
 pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
@@ -1110,7 +1110,7 @@ CODE
 OUTPUT
 
 pir_output_like(
-    <<"CODE", <<'OUTPUT', 'warn on in main', todo => "XXX core undef doesn't warn here. Should it?" );
+    <<"CODE", <<'OUTPUT', 'warn on in main', todo => "RT#46819 core undef doesn't warn here. Should it?" );
 .sub 'test' :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -1140,7 +1140,7 @@ ok
 OUTPUT
 
 pir_output_like(
-    <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo => "XXX core undef doesn't warn here. Should it?" );
+    <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo => "RT#46819 core undef doesn't warn here. Should it?" );
 .sub 'test' :main
 .include "warnings.pasm"
     _f1()

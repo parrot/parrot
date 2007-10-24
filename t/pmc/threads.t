@@ -72,7 +72,7 @@ ok 1
 ok 2
 OUTPUT
 
-# XXX FIXME rework tests since we don't really have thread types?
+# RT#46807 rework tests since we don't really have thread types?
 
 SKIP: {
     skip 'busted on win32' => 2 if $^O eq 'MSWin32';
@@ -416,7 +416,7 @@ okay:
     .local pmc thread_main
     thread_main = find_global 'thread_main'
     $P0.'run_clone'(thread_main)
-    $P0.'join'() # XXX
+    $P0.'join'() # RT#46813
 .end
 
 .sub thread_main

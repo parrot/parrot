@@ -249,7 +249,7 @@ CODE
 /NOT OKAY/
 OUTPUT
 
-# XXX: should this work?
+# RT#46821: should this work?
 {
     local $TODO = 1;
     pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray -- Recursive" );

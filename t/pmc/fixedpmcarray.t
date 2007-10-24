@@ -190,7 +190,7 @@ ok 2
 ok 3
 OUTPUT
 
-# TODO: Rewrite these properly when we have exceptions
+# RT#46823: Rewrite these properly when we have exceptions
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, 'FixedPMCArray'
@@ -303,7 +303,7 @@ pir_output_like(
 
 .sub main :main
      .local pmc compares, cmp_fun
-     # XXX doesnt work wit prederef of JIT
+     # RT#46855 doesnt work wit prederef of JIT
      bounds 1
      compares = new 'Integer'
      compares = 0

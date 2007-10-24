@@ -23,7 +23,7 @@ Tests the Exporter PMC.
 =cut
 
 # L<PDD17/Exporter PMC>
-# TODO fix smartlinks once this is specced
+# RT#46857 fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     $P0 = new 'Exporter'
@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
     say 'ok 1 - source() returns PMCNULL upon Exporter init'
 
     # get a NameSpace PMC for testing
-    # TODO replace with make_namespace, when implemented
+    # RT#46859 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -81,7 +81,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
 .end
 
 
-# TODO replace with make_namespace, when implemented
+# RT#46859 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -108,7 +108,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
     say 'ok 2 - ...which is current namespace at first'
 
     # get a NameSpace PMC for testing
-    # TODO replace with make_namespace, when implemented
+    # RT#46859 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -139,7 +139,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .end
 
 
-# TODO replace with make_namespace, when implemented
+# RT#46859 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -406,7 +406,7 @@ CODE
 ok 1
 OUT
 
-# TODO test exporting mmd subs
+# RT#46861 test exporting mmd subs
 
 # Local Variables:
 #   mode: cperl

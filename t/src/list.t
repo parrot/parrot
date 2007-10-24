@@ -375,7 +375,7 @@ ok 1
 ok 2
 OUTPUT
 
-# TODO
+# RT#46805
 
 # Local Variables:
 #   mode: cperl

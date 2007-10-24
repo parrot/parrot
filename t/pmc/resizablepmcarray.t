@@ -201,7 +201,7 @@ CODE
 4321
 OUTPUT
 
-# TODO: Rewrite these properly when we have exceptions
+# RT#46823: Rewrite these properly when we have exceptions
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
         new P0, 'ResizablePMCArray'

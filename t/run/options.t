@@ -96,7 +96,7 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     like( qx{$cmd}, qr/Parrot VM: Slow core/, "-r option <$cmd>");
 }
 
-## TODO test remaining options
+## RT#46815 test remaining options
 
 
 # clean up temporary files
