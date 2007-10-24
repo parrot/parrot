@@ -4,8 +4,8 @@
 .sub '__onload' :init :load
     load_bytecode 'PGE/Util.pbc'
     $P0 = subclass 'PGE::Grammar', 'PCT::Grammar'
-    $P0 = get_hll_global ['PGE::Util'], 'die'
-    set_hll_global ['PCT::Grammar'], 'panic', $P0
+    $P1 = get_hll_global ['PGE::Util'], 'die'
+    $P0.'add_method'('panic', $P1)
     .return ()
 .end
 
