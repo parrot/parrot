@@ -926,14 +926,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
 .sub main :main
     .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
-    .local int id
-    id = typeof cl
-    o = new id
+    o = new cl
     _dumper(o)
 .end
 
 .namespace ["bar"]
-.sub __init :method
+.sub init :vtable :method
     .local pmc ar
     ar = getattribute self, ['ResizablePMCArray'], 'proxy'
     push ar, 1
