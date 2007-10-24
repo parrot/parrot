@@ -68,6 +68,7 @@ extern struct lexer_state *new_lexer(char *filename);
 
 %}
 
+%token TK_MACRO_PARAM
 
 %token TK_LABEL         "label"
        TK_DOTDOT        ".."
@@ -293,7 +294,7 @@ sub_definition: ".sub" sub_id sub_flags "\n"
                 ".end"
                 ;
 
-sub_id: TK_IDENT
+sub_id: TK_IDENT /* is TK_PARROT_OP allowed too? in that case, <identifier> */
       | TK_STRINGC
       ;
 
@@ -315,10 +316,10 @@ sub_flag: ":anon"
         ;
 
 multi_type_list: /* empty */
-           | multi_type_list ',' multi_type
-           ;
+               | multi_type_list ',' multi_type
+               ;
 
-multi_type: TK_IDENT
+multi_type: identifier
           | TK_STRINGC
           | keylist
           | type
@@ -331,8 +332,8 @@ parameters: /* empty */
 parameter: ".param" param_def param_flags "\n"
          ;
 
-param_def: type TK_IDENT
-         | type TK_STRINGC "=>" TK_IDENT
+param_def: type identifier
+         | type TK_STRINGC "=>" identifier
          ;
 
 /* Instructions */
@@ -384,8 +385,8 @@ assignment_expression: unop expression
                      | expression binop expression
                      | target keylist
                      | simple_invocation
-                     | TK_STRINGC arguments  /* refactor 2/3 */
-                     | methodcall            /* refactor 3/3 */
+                     | TK_STRINGC arguments
+                     | methodcall
                      | parrot_instruction
                      ;
 
@@ -547,21 +548,20 @@ invocation_expression: simple_invocation
 
 invokable: TK_SYM_PREG
          | TK_PASM_PREG
-         | TK_IDENT
+         | identifier
          ;
 
 methodcall: invokable '.' method arguments
           ;
 
-method: TK_IDENT
-      | TK_PARROT_OP
+method: identifier
       | TK_STRINGC
       | TK_PASM_PREG
       | TK_SYM_PREG
       ;
 
-namespace_statement: ".namespace" TK_IDENT "\n"
-                   | ".endnamespace" TK_IDENT "\n"
+namespace_statement: ".namespace" identifier "\n"
+                   | ".endnamespace" identifier "\n"
                    ;
 
 return_statement: short_return_statement
@@ -641,10 +641,10 @@ const_decl_statement: const_declaration "\n"
                     | ".globalconst" const_tail "\n"
                     ;
 
-const_tail: "int" TK_IDENT '=' TK_INTC
-          | "num" TK_IDENT '=' TK_NUMC
-          | "pmc" TK_IDENT '=' TK_STRINGC
-          | "string" TK_IDENT '=' TK_STRINGC
+const_tail: "int" identifier '=' TK_INTC
+          | "num" identifier '=' TK_NUMC
+          | "pmc" identifier '=' TK_STRINGC
+          | "string" identifier '=' TK_STRINGC
           ;
 
 condition: "null" expression
@@ -891,7 +891,7 @@ yyerror(yyscan_t yyscanner, struct lexer_state * lexer, char * message) {
      * it's a newline, that looks silly.
      */
     if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") == 0) {
-        fprintf(stderr, "('%s')", text);
+        fprintf(stderr, "('%s')\n\n", text);
     }
     else {
         fprintf(stderr, "\n\n");
