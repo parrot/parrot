@@ -38,6 +38,7 @@ my $make_version   = 'gnu make';
     like( $msg, qr/Copyright/i,       "Message included copyright notice" );
     undef $tie;
 }
+untie *STDOUT;
 
 {
     my ( $tie, $rv, @lines, $msg );
@@ -56,6 +57,7 @@ my $make_version   = 'gnu make';
 
     undef $tie;
 }
+untie *STDOUT;
 
 {
     my ( $tie, $rv, @lines, $msg );
@@ -78,6 +80,7 @@ my $make_version   = 'gnu make';
 
     undef $tie;
 }
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

@@ -67,6 +67,7 @@ like(
     qr/step $step died during execution: Dying gamma just to see what happens/,
     "Got expected error message"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

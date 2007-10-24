@@ -77,6 +77,7 @@ END
     }
     unlink $localhints or croak "Unable to delete $localhints";
 }
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

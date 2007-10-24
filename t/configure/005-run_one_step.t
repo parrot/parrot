@@ -76,6 +76,7 @@ my ( $tie, $msg );
     $rv  = $conf->runsteps;
     $msg = $tie->READLINE;
 }
+untie *STDOUT;
 ok( $rv, "runsteps successfully ran $step" );
 like( $msg, qr/$description/, "Got message expected upon running $step" );
 

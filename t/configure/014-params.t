@@ -69,6 +69,7 @@ like(
     qr/$description\.\.\..*$paramstr.*done\./s,
     "Got message expected upon running $step"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

@@ -66,6 +66,7 @@ like(
     qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*undef/s,
     "Got message expected upon running $step"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

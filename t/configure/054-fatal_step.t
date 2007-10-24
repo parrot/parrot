@@ -66,6 +66,7 @@ like(
     qr/$description\.\.\./s,
     "Got STDOUT message expected upon running $step"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

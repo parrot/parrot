@@ -40,9 +40,10 @@ my ( $tie, @lines );
 my $bigmsg = join q{}, @lines;
 like(
     $bigmsg,
-    qr/Setting up Configure's default values.*done./s,
+    qr/Setting up Configure's default values.*done./s, #'
     "Got message expected upon running $step"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

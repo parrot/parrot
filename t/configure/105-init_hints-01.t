@@ -54,6 +54,7 @@ ok( $step->description(), "$step_name has description" );
     ok( @more_lines, "verbose output:  hints were captured" );
     ok( defined $ret, "$step_name runstep() returned defined value" );
 }
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

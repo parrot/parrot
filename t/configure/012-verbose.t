@@ -66,6 +66,7 @@ like(
     qr/$description\.\.\..*beta is verbose.*You've got beta.*done\./s,    #'
     "Got message expected upon running $step"
 );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

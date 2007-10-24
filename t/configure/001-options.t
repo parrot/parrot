@@ -154,6 +154,7 @@ like(
     $msg = $tie->READLINE;
     like( $msg, qr/--help/i, "got correct message after 'help' option" );
 }
+untie *STDOUT;
 
 {
     my ( $tie, $rv, $msg );
@@ -170,6 +171,7 @@ like(
     $msg = $tie->READLINE;
     like( $msg, qr/--help/i, "got help message as expected" );
 }
+untie *STDOUT;
 
 {
     my ( $tie, $rv, $msg );
@@ -185,6 +187,7 @@ like(
     $msg = $tie->READLINE;
     like( $msg, qr/Parrot Version/i, "got correct message after 'version' option" );
 }
+untie *STDOUT;
 
 $args = process_options(
     {

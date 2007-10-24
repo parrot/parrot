@@ -40,6 +40,7 @@ my ( $tie, @lines );
     @lines = $tie->READLINE;
 }
 ok( !scalar(@lines), "Nothing captured because no pre-configuration tests were run." );
+untie *STDOUT;
 
 @lines = ();
 {
@@ -49,6 +50,7 @@ ok( !scalar(@lines), "Nothing captured because no pre-configuration tests were r
     @lines = $tie->READLINE;
 }
 ok( !scalar(@lines), "Nothing captured because no pre-build tests were run." );
+untie *STDOUT;
 
 $args = process_options(
     {

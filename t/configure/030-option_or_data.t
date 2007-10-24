@@ -54,6 +54,7 @@ my $bigmsg = join q{}, @lines;
 like( $bigmsg, qr/$description/s, "Got message expected upon running $step" );
 ok( !defined( $conf->option_or_data($testopt) ),
     "option_or_data returned undef; neither option nor data had been defined" );
+untie *STDOUT;
 
 pass("Completed all tests in $0");
 

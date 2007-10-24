@@ -68,6 +68,7 @@ TEST
             ok( $opttest->run_configure_tests(), "Configuration tests are runnable" );
         }
     }
+    untie *STDOUT;
 
     @Parrot::Configure::Options::Test::postconfiguration_tests = ($test);
     {
@@ -78,6 +79,7 @@ TEST
             ok( $opttest->run_build_tests(), "Build tests are runnable" );
         }
     }
+    untie *STDOUT;
 
     ok( ( chdir $cwd ), "Changed back to starting directory after testing" );
 }
