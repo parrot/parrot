@@ -1809,10 +1809,7 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
      * register default mmds for this type
      */
     for (i = 0; i < n; ++i) {
-        /* The following always fails for Intel C++ for unknown reasons,
-         * but I'm assuming it's optimizer related.
-         */
-#ifndef __INTEL_COMPILER
+#ifdef PARROT_HAS_ALIGNED_FUNCPTR
         PARROT_ASSERT((PTR2UINTVAL(mmd_table[i].func_ptr) & 3) == 0);
 #endif
         mmd_register(interp,
