@@ -51,21 +51,21 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
-my ( $tie, @lines );
 {
+    my $rv;
+    my ( $tie, @lines );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     $rv    = $conf->runsteps;
     @lines = $tie->READLINE;
+    ok( $rv, "runsteps successfully ran $step" );
+    my $bigmsg = join q{}, @lines;
+    like(
+        $bigmsg,
+        qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
+        "Got message expected upon running $step"
+    );
 }
-ok( $rv, "runsteps successfully ran $step" );
-my $bigmsg = join q{}, @lines;
-like(
-    $bigmsg,
-    qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
-    "Got message expected upon running $step"
-);
 untie *STDOUT;
 
 pass("Completed all tests in $0");

@@ -29,20 +29,20 @@ my $step = q{init::defaults};
 $conf->add_step($step);
 $conf->options->set( %{$args} );
 
-my ( $tie, @lines );
 {
+    my ( $tie, @lines );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     eval { $conf->run_single_step($step); };
     ok( !$@, "run_single_step() completed without error" );
     @lines = $tie->READLINE;
+    my $bigmsg = join q{}, @lines;
+    like(
+        $bigmsg,
+        qr/Setting up Configure's default values.*done./s, #'
+        "Got message expected upon running $step"
+    );
 }
-my $bigmsg = join q{}, @lines;
-like(
-    $bigmsg,
-    qr/Setting up Configure's default values.*done./s, #'
-    "Got message expected upon running $step"
-);
 untie *STDOUT;
 
 pass("Completed all tests in $0");

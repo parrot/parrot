@@ -51,22 +51,27 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
-my ( $tie, @lines, $errstr );
+my $errstr;
 {
+    my $rv;
+    my ( $tie, @lines );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     local $SIG{__WARN__} = \&_capture;
     eval { $rv = $conf->runsteps; };
     @lines = $tie->READLINE;
+    my $bigmsg = join q{}, @lines;
+    like(
+        $bigmsg,
+        qr/$description/s,
+        "Got message expected upon running $step"
+    );
+    like(
+        $errstr,
+        qr/step $step died during execution: Dying gamma just to see what happens/,
+        "Got expected error message"
+    );
 }
-my $bigmsg = join q{}, @lines;
-like( $bigmsg, qr/$description/s, "Got message expected upon running $step" );
-like(
-    $errstr,
-    qr/step $step died during execution: Dying gamma just to see what happens/,
-    "Got expected error message"
-);
 untie *STDOUT;
 
 pass("Completed all tests in $0");

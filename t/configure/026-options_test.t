@@ -32,24 +32,26 @@ ok( defined $args, "process_options() returned successfully when no options were
 $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
-my ( $tie, @lines );
 {
+    my ( $tie, @lines );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     $opttest->run_configure_tests();
     @lines = $tie->READLINE;
+    ok( !scalar(@lines),
+        "Nothing captured because no pre-configuration tests were run." );
 }
-ok( !scalar(@lines), "Nothing captured because no pre-configuration tests were run." );
 untie *STDOUT;
 
-@lines = ();
 {
+    my ( $tie, @lines );
     $tie = tie *STDOUT, "Parrot::IO::Capture::Mini"
         or croak "Unable to tie";
     $opttest->run_build_tests();
     @lines = $tie->READLINE;
+    ok( !scalar(@lines),
+        "Nothing captured because no pre-build tests were run." );
 }
-ok( !scalar(@lines), "Nothing captured because no pre-build tests were run." );
 untie *STDOUT;
 
 $args = process_options(
