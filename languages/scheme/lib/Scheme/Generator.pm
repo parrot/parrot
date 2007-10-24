@@ -740,6 +740,26 @@ sub _op_not {
 }
 
 sub _op_boolean_p {
+    my ( $self, $node ) = @_;
+
+    $self->_add_comment( 'start of _op_boolean_p()' );
+
+    _check_num_args( $node, 1, 'boolean?' );
+
+    my $label = $self->_gensym();
+
+    my $return = $self->_constant('#f');
+    my $item = $self->_generate( _get_arg( $node, 1 ) );
+    if ( $item =~ m/ \A P /xms )
+    {
+        my $temp_s = $self->_save_1('S');
+        $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
+        $self->_add_inst( '', 'ne',     [ $temp_s, q{'Boolean'}, "FAIL_$label" ] );
+        $self->_add_inst( '', 'set', [ $return, 1 ] );
+        $self->_add_inst("FAIL_$label");
+    }
+
+    return $return;
 }
 
 sub _op_eqv_p {
@@ -863,11 +883,11 @@ sub _op_null_p {
 
     $self->_add_comment( 'start of _op_null_p()' );
 
+    _check_num_args( $node, 1, 'null?' );
+
     my $temp_i = $self->_save_1('I');
     my $temp_s = $self->_save_1('S');
     my $label  = $self->_gensym();
-
-    _check_num_args( $node, 1, 'null?' );
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'typeof', [ $temp_s, $temp ] );
@@ -1849,10 +1869,10 @@ my %global_ops = (
 ### Equivalency
 ###
 
-    'boolean' => \&_op_boolean_p,
-    'eqv?'    => \&_op_eqvp,
-    'eq?'     => \&_op_eqp,
-    'equal?'  => \&_op_equalp,
+    'boolean?' => \&_op_boolean_p,
+    'eqv?'     => \&_op_eqvp,
+    'eq?'      => \&_op_eqp,
+    'equal?'   => \&_op_equalp,
 
 ###
 ### Pairs and Lists

@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 16;
+use Test::More tests => 21;
 
 use Parrot::Test;
 
@@ -32,9 +32,25 @@ CODE
 ### boolean?
 ###
 
-TODO:
-{
-    local $TODO = 'No support for booleans yet';
+language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? #t' );
+(write (boolean? #t))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? #f' );
+(write (boolean? #f))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'boolean? 0' );
+(write (boolean? 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'boolean? 1' );
+(write (boolean? 1))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? 0' );
+(write (boolean? (boolean? "hello")))
+CODE
 
 language_output_is( 'Scheme', <<'CODE', 1, 'boolean? #t' );
 (write (if (boolean? #t) 1 0))
@@ -55,7 +71,6 @@ CODE
 language_output_is( 'Scheme', <<'CODE', 1, 'boolean? 0' );
 (write (if (boolean? (boolean? "hello")) 1 0))
 CODE
-}
 
 
 ###
