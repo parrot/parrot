@@ -623,17 +623,30 @@ sub _op_case {
 sub _op_and {
     my ( $self, $node ) = @_;
 
-    my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(0);
+    my $temp;
+    my $return = $self->_save_1('P');
     for ( _get_args($node) ) {
-        my $temp = $self->_generate($_);
-        $self->_add_inst( '', 'eq', [ $temp, 0, "DONE_$label" ] );
-        $self->_restore($temp);
+        $temp = $self->_generate($_);
+        # only '#f', therfore only Boolean PMCs, therefore only PMCs can be false
+        if ( $temp =~ m/ \A P /xms )       
+        {
+            my $tmp_s = $self->_save_1('S');
+            $self->_add_inst( '',            'typeof', [ $tmp_s, $temp ] );
+            $self->_restore($tmp_s);
+            $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Boolean'}, "NOT_YET_DONE_$label" ] );
+            $self->_add_inst( '', "unless $temp goto FALSE_$label" );
+            $self->_add_inst("NOT_YET_DONE_$label");
+        }
     }
-    $self->_add_inst( '', 'set', [ $return, 1 ] );
-    $self->_add_inst("DONE_$label");
+    $self->_add_inst( '', 'new', [ $return, q{'Undef'} ] );
+    $self->_add_inst( '', 'set', [ $return, $temp ] );
+    $self->_add_inst( '', 'branch', [ "TRUE_$label" ] );
+    $self->_add_inst("FALSE_$label");
+    $self->_add_inst( '', 'new', [ $return, q{'Boolean'} ] );
+    $self->_add_inst( '', 'set', [ $return, 0 ] );
+    $self->_add_inst("TRUE_$label");
 
     return $return;
 }
