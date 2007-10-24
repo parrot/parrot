@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -26,6 +26,29 @@ Tests the Continuation PMC.
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     new P0, 'Continuation'
+    print "ok 1\n"
+.end
+CODE
+ok 1
+OUT
+
+pir_error_output_like(<<'CODE', <<'OUT', 'invoke without init');
+.sub 'test' :main
+    new P0, 'Continuation'
+    P0()
+    print "ok 1\n"
+.end
+CODE
+/Continuation invoked without initialization/i
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'invoke with init');
+.sub 'test' :main
+    new P0, 'Continuation'
+    set_addr P0, L1
+    P0()
+    print "not "
+L1:
     print "ok 1\n"
 .end
 CODE

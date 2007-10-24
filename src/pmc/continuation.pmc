@@ -262,6 +262,9 @@ destination to continue execution.
         if (! to_ctx)
             real_exception(interp, NULL, INVALID_OPERATION,
                            "Continuation invoked after deactivation.");
+        if (! stack_target)
+            real_exception(interp, NULL, INVALID_OPERATION,
+                           "Continuation invoked without initialization.");
 
         /*
          * Rewind the dynamic environment.
