@@ -782,26 +782,24 @@ sub _op_pair_p {
 
     my $item = $self->_generate( _get_arg( $node, 1 ) );
 
-    my $tmp_i = $self->_save_1('I');
-    my $tmp_s = $self->_save_1('S');
+    my $return = $self->_constant('#t');
 
-    if ( $item =~ /^[INS]/ ) {
-        $self->_add_inst( '',            'set', [ $tmp_i, 0 ] );
+    if ( $item =~ m/ \A [INS] /xms ) {
+        $self->_add_inst( '',            'set', [ $return, 0 ] );
     }
     else {
+        my $tmp_s = $self->_save_1('S');
         $self->_add_inst( '',            'typeof', [ $tmp_s, $item ] );
         $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Array'}, "FAIL_$label" ] );
-        $self->_add_inst( '',            'set',    [ $tmp_i, $item ] );
-        $self->_add_inst( '',            'ne',     [ $tmp_i, 2, "FAIL_$label" ] );
-        $self->_add_inst( '',            'set',    [ $tmp_i, 1 ] );
+        $self->_add_inst( '',            'set',    [ $return, 1 ] );
         $self->_add_inst( '',            'branch', ["DONE_$label"] );
-        $self->_add_inst( "FAIL_$label", 'set', [ $tmp_i, 0 ] );
+        $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
         $self->_add_inst("DONE_$label");
     }
 
     $self->_add_comment( 'end of _op_pair_p()' );
 
-    return $tmp_i;
+    return $return;
 }
 
 sub _op_cons {
@@ -885,22 +883,22 @@ sub _op_null_p {
 
     _check_num_args( $node, 1, 'null?' );
 
-    my $temp_i = $self->_save_1('I');
+    my $return = $self->_constant('#t');
     my $temp_s = $self->_save_1('S');
     my $label  = $self->_gensym();
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'typeof', [ $temp_s, $temp ] );
     $self->_add_inst( '', 'ne',     [ $temp_s, q{'Undef'}, "FAIL_$label" ] );
-    $self->_add_inst( '', 'set',    [ $temp_i, 1 ] );
+    $self->_add_inst( '', 'set',    [ $return, 1 ] );
     $self->_add_inst( '', 'branch', ["DONE_$label"] );
-    $self->_add_inst( "FAIL_$label", 'set', [ $temp_i, 0 ] );
+    $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
     $self->_add_inst("DONE_$label");
     $self->_restore($temp);
 
     $self->_add_comment( 'end of _op_null_p()' );
 
-    return $temp_i;
+    return $return;
 }
 
 sub _op_list_p {
