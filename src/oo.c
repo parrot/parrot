@@ -174,6 +174,7 @@ Lookup a class object from a builtin string.
 
 */
 
+PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *

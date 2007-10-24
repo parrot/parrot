@@ -51,10 +51,16 @@ Raises an exception. Use C<init_pmc()>.
 
 */
     void init_pmc(PMC* sub) {
-        INTVAL type = pmc_type(INTERP,
+        PMC *classobj = Parrot_oo_get_class_str(INTERP,
                           const_string(INTERP, "Parrot::Coroutine"));
-        if (type)
-            PMC_pmc_val(SELF) = pmc_new_init(INTERP, type, sub);
+
+        if (!PMC_IS_NULL(classobj)) {
+            PMC *init_args = pmc_new(INTERP, enum_class_Hash);
+            VTABLE_set_pmc_keyed_str(INTERP, init_args,
+                                     const_string(INTERP, "initial_sub"), sub);
+            PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP,
+                                                   classobj, init_args);
+        }
         else
             real_exception(INTERP, NULL, E_Exception,
                            "Parrot::Coroutine not found");
