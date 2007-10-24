@@ -1221,9 +1221,7 @@ LINECOMMENT    [#].*\n
 
 "if"              { return TK_IF; }
 "goto"            { return TK_GOTO; }
-"new"             { return TK_NEW; }
 "n_operators"     { return TK_N_OPERATORS; }
-"null"            { return TK_NULL; }
 "unless"          { return TK_UNLESS; }
 
 "int"             { return TK_INT; }
@@ -1458,9 +1456,7 @@ LINECOMMENT    [#].*\n
              }
 
 
-[.]{IDENT}        {
-
-                    /* Check whether this token is a constant or a macro. If it's not,
+[.]{IDENT}        { /* Check whether this token is a constant or a macro. If it's not,
                      * it's a subcall like "foo .bar()".
                      */
 
@@ -1486,12 +1482,17 @@ LINECOMMENT    [#].*\n
 
                         if (macro != NULL) { /* the macro definition exists! Yay! */
                             int num_macro_params = macro->num_params;
+                            int num_macro_args   = 0;
                             int next_token       = yylex(yylval, yyscanner);
 
                             /* read input for parameters */
                             if (next_token == '(') {
                                 int expect_argument = 0; /* flag for while loop */
 
+                                /* a macro definition with "()" as parameter list means 1
+                                 * parameter; likewise, a macro expansion with "()" is 1 arg. too.
+                                 */
+                                num_macro_args = 1;
                                 next_token = yylex(yylval, yyscanner); /* skip '(' */
 
                                 fprintf(stderr,
@@ -1504,36 +1505,40 @@ LINECOMMENT    [#].*\n
                                     }
                                     else {
                                         /* don't care about the token, just store it */
-                                        dupstr(yytext);
+                                        char *macro_argument = dupstr(yytext);
+                                        fprintf(stderr, "macro arg: '%s'\n", macro_argument);
                                         next_token = yylex(yylval, yyscanner);
                                     }
+                                    num_macro_args++;
 
-                                    /* clear flag */
+                                    /* always clear flag */
                                     expect_argument = 0;
                                     if (next_token == ',') {
-                                        /* set flag indicating we expect another argument */
+                                        /* it's a comma, so we expect a next argument */
                                         expect_argument = 1;
                                     }
+
                                 }
                                 /* done with parameters, check out why we stopped parsing args */
                                 /* TODO */
 
                             }
-                            else { /* no parameters */
-                                /* the macro defines arguments, or at least an empty param-list. */
-                                if (num_macro_params > 0) {
-                                    syntax_error(yyscanner, my_lexer,
-                                                 "Too few arguments for macro");
-                                }
+
+                            /* check number of arguments against number of defind parameters */
+                            if (num_macro_params > num_macro_args) {
+                                syntax_error(yyscanner, my_lexer, "Too few arguments for macro");
+                            }
+                            else if (num_macro_params < num_macro_args) {
+                                syntax_error(yyscanner, my_lexer, "Too many arguments for macro");
                             }
 
                             /* expand the macro into a string buffer */
                             /* is expanding necessary? */
 
+                            /* also set name of macro in filename? and line number? */
                             my_lexer->file_buffer = YY_CURRENT_BUFFER;
                             /* and scan that string buffer. */
 
-                            /* BEGIN(MACROEXP);  ? */
                             yy_push_state(MACROEXP, yyscanner);
                             /* ? what if nested macro expansions? */
 
@@ -1567,25 +1572,35 @@ LINECOMMENT    [#].*\n
                else { /* this file was included */
                    printdebug(stderr, "End of included file\n");
 
-                   my_lexer->line_nr = info->line_nr;
-                   /* free current file name */
+                   /* restore all fields about the including file */
+
+                   /* free current file name, because the pointer will be set to the including
+                    * file's name. This is the last point at which we see this piece of memory,
+                    * so say goodbye to it!
+                    */
                    free(my_lexer->filename);
+
                    /* and set pointer to the including file's name */
                    my_lexer->filename    = info->filename;
                    my_lexer->file_buffer = info->buffer;
+                   my_lexer->line_nr     = info->line_nr;
+                   my_lexer->line_pos    = info->line_pos;
+
+                   /* make ^^^^^^^^^^ this into some "restore_file_context" function */
 
                    printdebug(stderr, "deleting buffer...\n");
+
                    /* delete the current buffer (of the included file *) */
                    yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
                    /* close current file */
-                   fclose(yyin);
+                   fclose(yyin); /* is this ok? w.r.t. reentrant lexer. */
 
                    /* switch back to previous file */
                    yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
 
                    printdebug(stderr, "switched back to buffer\n");
-                   /* and free all resources of the buffer */
 
+                   /* and free all resources of the buffer */
                    free(info);
                    info = NULL;
 
@@ -1613,6 +1628,10 @@ is_parrot_op(char const * const spelling) {
 
     /* only "print" is recognized as a Parrot instruction */
     if (strcmp(spelling, "print") == 0)
+        return 1;
+    if (strcmp(spelling, "null") == 0)
+        return 1;
+    if (strcmp(spelling, "new") == 0)
         return 1;
     return 0;
 }
