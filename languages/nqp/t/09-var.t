@@ -52,6 +52,7 @@ my $b3;
 }
 print($b3); say(' # variable is bound to the value, not the symbol in the block');
 
+my $b5 := '';
 {
     my $b5 := 'not ';
 }
