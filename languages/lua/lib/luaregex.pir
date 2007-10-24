@@ -187,13 +187,13 @@ Francois Perrad
 .sub '__onload' :anon :load :init
     load_bytecode 'PGE.pbc'
 
-    $P0 = getclass 'PGE::Exp::CCShortcut'
+    $P0 = get_class 'PGE::Exp::CCShortcut'
     $P1 = subclass $P0, 'PGE::Exp::LuaCCShortcut'
 
-    $P0 = getclass 'PGE::Exp::CGroup'
+    $P0 = get_class 'PGE::Exp::CGroup'
     $P1 = subclass $P0, 'PGE::Exp::LuaCGroup'
 
-    $P0 = getclass 'PGE::Exp'
+    $P0 = get_class 'PGE::Exp'
     $P1 = subclass $P0, 'PGE::Exp::LuaBalanced'
 .end
 
