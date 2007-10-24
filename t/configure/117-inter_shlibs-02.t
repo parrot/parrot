@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 117-inter_shlibs-01.t
+# 117-inter_shlibs-02.t
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ ok( $step->description(), "$step_name has description" );
 
 my ( @prompts, $prompt, $object );
 #####
-$prompt = q{foobar};
+$prompt = q{ };
 push @prompts, $prompt;
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
@@ -58,7 +58,7 @@ isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
     my $ret = $step->runstep($conf);
     close STDOUT or croak "Unable to close after myout";
     ok( $ret, "$step_name runstep() returned true value" );
-    is( $step->result(), $prompt, "Expected result was set" );
+    is( $step->result(), q{done}, "Expected result was set" );
 }
 
 undef $object;
@@ -70,11 +70,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-117-inter_shlibs-01.t - test config::inter::shlibs
+117-inter_shlibs-02.t - test config::inter::shlibs
 
 =head1 SYNOPSIS
 
-    % prove t/configure/117-inter_shlibs-01.t
+    % prove t/configure/117-inter_shlibs-02.t
 
 =head1 DESCRIPTION
 
