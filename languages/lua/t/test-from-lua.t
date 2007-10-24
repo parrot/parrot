@@ -47,8 +47,9 @@ use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 12;
 use Test::More;
+use Parrot::Test::Lua;
 
-my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+my $test_prog = Parrot::Test::Lua::get_test_prog();
 my $code;
 my $out;
 my $in;
@@ -86,7 +87,7 @@ language_output_is( 'lua', $code, $out, 'cf' );
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'echo.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'echo', params => 'arg1 arg2' );
 /^
-0\tlanguages.lua.t.test-from-lua_3\.lua\n
+0\tlanguages.lua.t.test-from-lua_3\.(lua|pir)\n
 1\targ1\n
 2\targ2\n
 /x
@@ -106,6 +107,10 @@ language_output_is( 'lua', $code, $out, 'factorial' );
 #       fibonacci function with cache
 #
 
+SKIP:
+{
+    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fib.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'fib' );
 /^
@@ -114,6 +119,7 @@ plain\t24\t46368\t\d+(\.\d+)?\t150049\n
 cached\t24\t46368\t\d+(\.\d+)?\t25\n
 /x
 OUTPUT
+}
 
 #
 #   fibfor.lua

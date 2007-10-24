@@ -26,8 +26,9 @@ use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 16;
 use Test::More;
+use Parrot::Test::Lua;
 
-my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+my $test_prog = Parrot::Test::Lua::get_test_prog();
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'add' );
 function add (a)

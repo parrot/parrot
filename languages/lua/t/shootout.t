@@ -23,8 +23,9 @@ use lib "$FindBin::Bin";
 
 use Parrot::Test tests => 18;
 use Test::More;
+use Parrot::Test::Lua;
 
-my $test_prog = $ENV{PARROT_LUA_TEST_PROG} || q{};
+my $test_prog = Parrot::Test::Lua::get_test_prog();
 my $code;
 my $out;
 my $in;
@@ -35,9 +36,9 @@ my @dir = ( 'lua', 't', 'shootout' );
 #       Hashtable update and k-nucleotide strings
 #
 
-TODO:
+SKIP:
 {
-    local $TODO = 'broken';
+    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
 
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide_lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
@@ -166,9 +167,14 @@ language_output_is( 'lua', $code, $out, 'cheap-concurrency', params => '10' );
 #       Eigenvalue using the power method
 #
 
+SKIP:
+{
+    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm_lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm-output.txt' ));
 language_output_is( 'lua', $code, $out, 'spectral-norm', params => '100' );
+}
 
 #
 #   chameneos

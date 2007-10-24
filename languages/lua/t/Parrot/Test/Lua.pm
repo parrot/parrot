@@ -33,6 +33,10 @@ sub new {
     return bless {};
 }
 
+sub get_test_prog {
+    return $ENV{PARROT_LUA_TEST_PROG} || 'luac.pl';
+}
+
 my %language_test_map = (
     output_is   => 'is_eq',
     output_like => 'like',
@@ -51,7 +55,7 @@ foreach my $func ( keys %language_test_map ) {
         my $params = $options{params} || q{};
 
         # flatten filenames (don't use directories)
-        my $lua_test = $ENV{PARROT_LUA_TEST_PROG} || 'luac.pl';
+        my $lua_test = get_test_prog();
         my $lang_fn = Parrot::Test::per_test( '.lua', $count );
         my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
         my $lua_out_fn =
