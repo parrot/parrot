@@ -38,7 +38,7 @@ its hierarchy of rules and returns a PGE::Match object (a parse tree).
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    $P0 = getclass 'PGE::Grammar'
+    $P0 = get_class 'PGE::Grammar'
     $P1 = subclass $P0, 'PunieGrammar'
 
 .end

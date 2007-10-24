@@ -97,7 +97,7 @@ transform past (PunieGrammar::lineseq) :language('PIR') {
 
 transform past (PunieGrammar::line) :language('PIR') {
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'ResizablePMCArray'
 
     .local pmc iter
     iter = new Iterator, node    # setup iterator for node
@@ -124,7 +124,7 @@ transform past (PunieGrammar::line) :language('PIR') {
 
 transform past (PunieGrammar::expr) :language('PIR') {
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'ResizablePMCArray'
 
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
@@ -247,7 +247,7 @@ transform past (PunieGrammar::label) :language('PIR') {
 
 transform past (PunieGrammar::oexpr) :language('PIR') {
     .local pmc result
-    result = new .ResizablePMCArray
+    result = new 'ResizablePMCArray'
 
     $P1 = node.get_hash()
     .local pmc iter
@@ -287,14 +287,14 @@ transform past (PunieGrammar::variable) :language('PIR') {
    if sigil == '@' goto array_var
   hash_var:
      sigil = '%' # partridge can't handle globs, so we force the sigil
-     pirtype = ".Hash"
+     pirtype = "'Hash'"
      goto have_container_type
   scalar_var:
-     pirtype = ".Undef"
+     pirtype = "'Undef'"
      goto have_container_type
   array_var:
      sigil = '@' # partridge can't handle globs, so we force the sigil
-     pirtype = ".ResizablePMCArray"
+     pirtype = "'ResizablePMCArray'"
   have_container_type:
 
     .local pmc result, var_node, key_val
@@ -310,7 +310,7 @@ transform past (PunieGrammar::variable) :language('PIR') {
     key_val = tree.'get'('past', $P1, 'PunieGrammar::expr')
 
     result = new 'PAST::Var'
-    result = result.'init'(var_node, key_val, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'.Undef', 'islvalue'=>islvalue)
+    result = result.'init'(var_node, key_val, 'node'=>node, 'scope'=>'keyed', 'viviself'=>'"Undef"', 'islvalue'=>islvalue)
   not_keyed:
 
     .return (result)
@@ -319,14 +319,14 @@ transform past (PunieGrammar::variable) :language('PIR') {
 transform past (PunieGrammar::number) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'init'('node'=>node, 'vtype'=>'.Float', 'name'=>node, 'ctype'=>'n+')
+    result.'init'('node'=>node, 'vtype'=>'"Float"', 'name'=>node, 'ctype'=>'n+')
     .return (result)
 }
 
 transform past (PunieGrammar::integer) :language('PIR') {
     .local pmc result
     result = new 'PAST::Val'
-    result.'init'('node'=>node, 'vtype'=>'.Integer', 'name'=>node, 'ctype'=>'i+')
+    result.'init'('node'=>node, 'vtype'=>'"Integer"', 'name'=>node, 'ctype'=>'i+')
     .return (result)
 }
 
@@ -348,7 +348,7 @@ transform past (PunieGrammar::stringdouble) :language('PIR') {
     # NOTE: Will have to come back and handle interpolation properly.
     # Currently have no way to distinguish between single quoted and
     # double quoted strings.
-    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
+    result.'init'('node'=>node, 'vtype'=>'"String"', 'name'=>value)
     .return (result)
 }
 
@@ -366,7 +366,7 @@ transform past (PunieGrammar::stringsingle) :language('PIR') {
     value = node["PGE::Text::bracketed"]
   no_bracketed_value:
 
-    result.'init'('node'=>node, 'vtype'=>'.String', 'name'=>value)
+    result.'init'('node'=>node, 'vtype'=>'"String"', 'name'=>value)
     .return (result)
 }
 
@@ -494,7 +494,7 @@ transform islvalue (PAST::Var) :language('PIR') {
 transform term (expr) :language('PIR') {
     .local pmc result
     .local pmc children
-    children = new .ResizablePMCArray
+    children = new "ResizablePMCArray"
     $P1 = node.get_hash()
     $P0 = new Iterator, $P1    # setup iterator for node
     set $P0, 0 # reset iterator, begin at start
