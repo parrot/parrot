@@ -41,7 +41,7 @@ $Data::Dumper::Indent = 1;
 #print Dumper $sls->specfiles;
 #print Dumper $sls->specfiles_of_type('PDD')->files->[2]->tree;
 
-## TODO: integrate smartlink info, emit html
+## RT#46899: integrate smartlink info, emit html
 print Dumper $sls;
 print Dumper $sls->mergetree;
 

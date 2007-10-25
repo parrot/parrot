@@ -137,7 +137,7 @@ HEADER
             die "Seen line $line before in $infile - can't continue";
         }
 
-        # TODO maybe cope with escaped \"
+        # RT#46909 maybe cope with escaped \"
         my $cnt = tr/"/"/;
         die "bogus CONST_STRING at line $line" unless $cnt == 2;
 

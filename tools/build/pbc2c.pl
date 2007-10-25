@@ -1,5 +1,5 @@
 #! perl
-# TODO: Resolve copyright. See ADDITIONAL section at end of file.
+# RT#46907: Resolve copyright. See ADDITIONAL section at end of file.
 # $Id$
 
 =head1 NAME
@@ -242,7 +242,7 @@ main(int argc, char **argv) {
     }
 
     run_native = run_compiled;
-    /* TODO make also a shared variant of PackFile_new */
+    /* RT#46905 make also a shared variant of PackFile_new */
     pf          = PackFile_new(0);
 
     if( !PackFile_unpack(interp, pf, (opcode_t *)program_code,

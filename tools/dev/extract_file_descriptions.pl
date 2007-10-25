@@ -27,7 +27,7 @@ familiar types, but from which descriptions were not obtained.
 
 =back
 
-=head1 TODO
+=head1 TODO  (RT#46903)
 
 =over
 
@@ -168,7 +168,7 @@ sub describe_perl_file {
         s/^\s*(NAME|TITLE)\s*//;
         s/\n=.*//s;
 
-        # It would be nice to get the beginning of any DESCRIPTION. FIXME
+        # It would be nice to get the beginning of any DESCRIPTION. RT#46903
         $doc = $_;
         $desc = $info->{pod_doc} = $doc;
     }

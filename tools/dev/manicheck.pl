@@ -51,7 +51,7 @@ printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
 printf "  %5d missing\n", scalar @missing;
 printf "  %5d extra\n",   scalar @extra;
 
-# TODO: Use Data::Dumper
+# RT#46901: Use Data::Dumper
 if (@missing) {
     print "\n";
     print "Missing files:\n";

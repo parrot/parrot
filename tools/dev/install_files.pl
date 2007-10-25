@@ -167,7 +167,7 @@ while (<>) {
     $meta =~ s/^\[(.*?)\]//;
     next unless $package;    # Skip if this file belongs to no package
 
-    next unless $package =~ /main|library/;    # XXX -lt
+    next unless $package =~ /main|library/;    # RT#46911 -lt
 
     my %meta;
     @meta{ split( /,/, $meta ) } = ();

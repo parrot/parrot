@@ -72,7 +72,7 @@ use constant REGNO_NUM => 1;
 use constant REGNO_STR => 2;
 use constant REGNO_PMC => 3;
 
-# TODO: refactor to a simple module import, RT#42286
+# refactor to a simple module import, RT#42286
 BEGIN {
     my $bits   = 'Parrot/Pmc2c/PCCMETHOD_BITS.pl';
     my %consts = do $bits;

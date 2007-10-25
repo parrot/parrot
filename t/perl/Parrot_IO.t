@@ -161,7 +161,7 @@ ok( $f3->modified_since($time), 'modified_since' );
 $f = Parrot::IO::File->new( catfile( 'lib', 'Parrot', 'IO', 'File.pm' ) );
 ok( $f->has_svn_id(), 'has_svn_id' );
 
-# XXX doesn not work aftern switch to svn
+# RT#46913 doesn not work aftern switch to svn
 #ok($f->svn_id() =~ /File.pm,v/, 'svn_id');
 
 $f3->delete();

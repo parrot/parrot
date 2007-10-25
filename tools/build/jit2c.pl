@@ -214,7 +214,7 @@ sub vtable_num {
     my $i = 0;
     $vjit++;
     for my $entry ( @{$vtable} ) {
-        next if $entry->[4] =~ /MMD_/;    # TODO all
+        next if $entry->[4] =~ /MMD_/;    # RT#46915 all
         return $i if ( $entry->[1] eq $meth );
         $i++;
     }
