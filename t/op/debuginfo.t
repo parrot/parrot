@@ -121,11 +121,11 @@ current instr.: 'parrot;Test2;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test2;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-# XXX
+# RT#46895
 # in plain functional run-loop result is 999
 # other run-loops report 998
-# TODO investigate this after interpreter strtup is done
-# see also TODO in src/embed.c
+# investigate this after interpreter strtup is done
+# see also todo item in src/embed.c
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 1" );
 .sub main
     main()

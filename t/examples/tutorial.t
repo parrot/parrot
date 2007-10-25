@@ -136,7 +136,7 @@ after branch
 END_EXPECTED
 
 ##
-## Output for when the test is not marked as TODO anymore.
+## Output for when the test is not marked as "todo" anymore.
 ##
     #    '51_if_unless.pir' => << 'END_EXPECTED',
     #before if

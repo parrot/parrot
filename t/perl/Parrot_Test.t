@@ -34,7 +34,7 @@ BEGIN {
     my $pre_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
     use_ok('Parrot::Test') or die;
 
-    # XXX Shouldn't this be in an END block
+    # RT#46889 Shouldn't this be in an END block
     my $post_env = exists $ENV{PARROT_TEST} ? $ENV{PARROT_TEST} : undef;
     if ( defined $pre_env ) {
         is( $post_env, $pre_env, 'PARROT_TEST env unchanged' );
@@ -76,7 +76,7 @@ can_ok( 'Parrot::Test', $_ ) for qw/
     write_code_to_file
     /;
 
-# TODO test run_command()
+# RT#46891 test run_command()
 
 # per_test
 is( Parrot::Test::per_test(), undef, 'per_test() no args' );
@@ -84,10 +84,10 @@ is( Parrot::Test::per_test( undef, 0 ),     undef, 'per_test() invalid first arg
 is( Parrot::Test::per_test( 0,     undef ), undef, 'per_test() invalid second arg' );
 is( Parrot::Test::per_test( undef, undef ), undef, 'per_test() two invalid args' );
 
-# TODO test write_code_to_file(), plan(), skip(), slurp_file()
+# RT#46893 test write_code_to_file(), plan(), skip(), slurp_file()
 
 # test the test functions from Parrot::Test
-# TODO: test the untested test functions
+# RT#46893: test the untested test functions
 my ( $desc, $err, $line );
 
 ## PASM
