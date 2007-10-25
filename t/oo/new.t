@@ -537,7 +537,7 @@ Foo;Bar
 data for Foo;Bar
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'create class namespace initializer');
+pir_output_is( <<'CODE', <<'OUT', 'create class namespace initializer' );
 .sub main :main
     .local pmc ns
     ns = get_namespace ['Foo';'Bar']
@@ -556,7 +556,7 @@ CODE
 foo blue
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'regression test, instantiate class within different namespace');
+pir_output_is( <<'CODE', <<'OUT', 'regression test, instantiate class within different namespace' );
 .sub main :main
     $P0 = newclass 'Foo'
     $P0 = newclass 'Bar'
@@ -581,7 +581,7 @@ foo blue
 bar blue
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a high-level class object');
+pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a high-level class object' );
 .sub main :main
     $P0 = newclass 'Foo'
     $S1 = typeof $P0
@@ -601,7 +601,7 @@ Class
 Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a proxy class object');
+pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a proxy class object' );
 .sub main :main
     $P1 = get_class 'String'
     $S1 = typeof $P1
@@ -616,7 +616,7 @@ PMCProxy
 String
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "get_class retrieves a class object that doesn't exist");
+pir_output_is( <<'CODE', <<'OUT', "get_class retrieves a class object that doesn't exist" );
 .sub main :main
     $P1 = get_class 'Murple'
     if null $P1 goto not_defined

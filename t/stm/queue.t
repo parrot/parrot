@@ -241,7 +241,7 @@ OUTPUT
 
 SKIP: {
     skip "These tests freeze up the whole interpreter", 2;
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Add in one thread, remove in the other" );
+    pir_output_is( $library . <<'CODE', <<'OUTPUT', "Add in one thread, remove in the other" );
 .const int MAX = 1000
 .const int SIZE = 10
 
@@ -313,7 +313,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Test 2 + attempt to trigger thread death bugs" );
+    pir_output_is( $library . <<'CODE', <<'OUTPUT', "Test 2 + attempt to trigger thread death bugs" );
 
 .sub adder
     .param pmc queue

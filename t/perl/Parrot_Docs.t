@@ -108,7 +108,7 @@ my $s = Parrot::Docs::Section->new(
     Parrot::Docs::Item->new( 'our old friend', 'foo' ),
     Parrot::Docs::Group->new(
         'Bar', 'no jeans', Parrot::Docs::Item->new( 'time please', 'bar', 'pub' )
-    )
+        )
 );
 
 ok( $s, 'new section' );

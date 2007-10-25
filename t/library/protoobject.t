@@ -96,8 +96,7 @@ END_CODE
 Foo
 END_OUT
 
-
-pir_output_is(<<'END_CODE', <<'END_OUT', 'Protoobject symbol for :: classes');
+pir_output_is( <<'END_CODE', <<'END_OUT', 'Protoobject symbol for :: classes' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
@@ -113,7 +112,7 @@ END_CODE
 Foo::Bar
 END_OUT
 
-pir_output_is(<<'END_CODE', <<'END_OUT', 'new_subclass for :: classes');
+pir_output_is( <<'END_CODE', <<'END_OUT', 'new_subclass for :: classes' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
@@ -134,7 +133,7 @@ Foo::Bar
 Foo::Bar
 END_OUT
 
-pir_output_is(<<'END_CODE', <<'END_OUT', 'new_subclass with attrs');
+pir_output_is( <<'END_CODE', <<'END_OUT', 'new_subclass with attrs' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
@@ -163,7 +162,6 @@ $b
 $c
 $d
 END_OUT
-
 
 # Local Variables:
 #   mode: cperl

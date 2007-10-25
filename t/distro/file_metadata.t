@@ -260,8 +260,8 @@ sub at_a_time {
     return unless $sub;
     return unless @list;
 
-    while ( @list ) {
-        $count      = @list if $count > @list;
+    while (@list) {
+        $count = @list if $count > @list;
         my @sublist = splice @list, 0, $count;
         $sub->(@sublist);
     }
@@ -319,7 +319,7 @@ sub get_attribute {
     return \%results;
 }
 
-sub  verify_attributes {
+sub verify_attributes {
     my $attribute = shift;    # name of the attribute
     my $expected  = shift;    # the expected value
     my $exact     = shift;    # should this be an exact match?

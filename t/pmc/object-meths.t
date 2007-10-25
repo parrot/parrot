@@ -870,7 +870,7 @@ Parent foo
 Parent bar
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', ".Super - dispatch on addparent-established heirarchy" );
+pir_output_is( <<'CODE', <<'OUTPUT', ".Super - dispatch on addparent-established heirarchy" );
 .sub main :main
     .local pmc o, p, c
     p = newclass 'Parent'

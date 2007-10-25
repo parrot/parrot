@@ -32,7 +32,7 @@ CODE
 ok 1
 OUT
 
-pir_error_output_like(<<'CODE', <<'OUT', 'invoke without init');
+pir_error_output_like( <<'CODE', <<'OUT', 'invoke without init' );
 .sub 'test' :main
     new P0, 'Continuation'
     P0()
@@ -42,7 +42,7 @@ CODE
 /Continuation invoked without initialization/i
 OUT
 
-pir_output_is(<<'CODE', <<'OUT', 'invoke with init');
+pir_output_is( <<'CODE', <<'OUT', 'invoke with init' );
 .sub 'test' :main
     new P0, 'Continuation'
     set_addr P0, L1

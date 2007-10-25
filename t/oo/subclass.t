@@ -22,7 +22,7 @@ Tests OO features related to subclassing.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate subclass from class object');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate subclass from class object' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass $P0, "Foo"
@@ -54,7 +54,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object');
+pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object' );
 .sub main :main
     .local pmc parent, class_init_args, parent_list
     parent = new "Class"
@@ -98,7 +98,7 @@ Class
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create named class object');
+pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
 .sub main :main
     .local pmc parent, class_init_args, parent_list
     parent = new "Class"
@@ -136,7 +136,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -159,7 +159,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -182,7 +182,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -206,7 +206,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -231,7 +231,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", ['Foo';'Bar']
@@ -263,7 +263,7 @@ Foo;Bar
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key PMC name', todo=>'create non-constant key');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key PMC name', todo => 'create non-constant key' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", ['Foo';'Bar']
@@ -298,7 +298,7 @@ Foo;Bar
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -331,7 +331,7 @@ Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -364,7 +364,7 @@ Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -398,7 +398,7 @@ Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", "Foo"
@@ -433,7 +433,7 @@ Foo
 data for Foo
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo=>'init keyed');
+pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo => 'init keyed' );
 .sub main :main
     $P0 = newclass "Pre"
     $P1 = subclass "Pre", ['Foo';'Bar']
@@ -467,7 +467,7 @@ Foo;Bar
 data for Foo;Bar
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'declare subclasses within other namespaces');
+pir_output_is( <<'CODE', <<'OUT', 'declare subclasses within other namespaces' );
 .namespace [ 'other' ]
 .sub main :main
     $P0 = newclass 'Pre'
@@ -495,7 +495,7 @@ foo blue
 bar blue
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'call inherited methods');
+pir_output_is( <<'CODE', <<'OUT', 'call inherited methods' );
 .namespace [ 'other' ]
 .sub main :main
     $P0 = newclass 'Parent'
@@ -513,7 +513,7 @@ CODE
 parent green
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'call inherited init vtable overrides');
+pir_output_is( <<'CODE', <<'OUT', 'call inherited init vtable overrides' );
 .sub main :main
     $P99 = newclass 'Foo'
     $P99 = subclass 'Foo', 'Bar'
@@ -556,7 +556,7 @@ second string
 third string
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'set inherited attributes by parent key');
+pir_output_is( <<'CODE', <<'OUT', 'set inherited attributes by parent key' );
 .sub main :main
     $P0 = newclass 'Foo'
     addattribute $P0, 'storage'
@@ -580,7 +580,7 @@ Bar init
 storage attribute value
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice");
+pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice" );
 .sub main :main
     $P0 = newclass 'Foo'
     $P1 = newclass 'Bar'
@@ -590,7 +590,6 @@ pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice"
 CODE
 /The class 'Bar' already has a parent class 'Foo'./
 OUT
-
 
 # Local Variables:
 #   mode: cperl

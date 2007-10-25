@@ -22,7 +22,7 @@ Tests OO features related to creating and using class proxies.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a low-level object');
+pir_output_is( <<'CODE', <<'OUT', 'typeof a low-level object' );
 .sub main :main
     $P0 = new 'String'
     $S1 = typeof $P0
@@ -38,7 +38,7 @@ String
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a high-level object');
+pir_output_is( <<'CODE', <<'OUT', 'typeof a high-level object' );
 .sub main :main
     $P0 = newclass "Foo"
     $P0 = new "Foo"
@@ -59,7 +59,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a Class object');
+pir_output_is( <<'CODE', <<'OUT', 'typeof a Class object' );
 .sub main :main
     $P0 = newclass "Foo"
     $S1 = typeof $P0
@@ -75,7 +75,7 @@ Class
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class');
+pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class' );
 .sub main :main
     $P0 = get_class 'Hash'
     $P1 = subclass $P0, [ 'MyClass' ]
@@ -89,7 +89,7 @@ CODE
 abc
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class w/new');
+pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class w/new' );
 .sub main :main
     $P0 = get_class 'Hash'
     $P1 = subclass $P0, ['Foo';'Bar']

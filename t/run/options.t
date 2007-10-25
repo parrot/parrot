@@ -76,7 +76,6 @@ is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`, "second\n",
 is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     "second\n", 'option --trace with flags' );
 
-
 ## test the -R & --runcore options
 {
     my $cmd;
@@ -85,19 +84,18 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     for my $val (qw/ slow fast bounds trace /) {
         for my $opt ( '-R ', '--runcore ', '--runcore=' ) {
             $cmd = qq{"$PARROT" $opt$val "$second_pir_file" $redir};
-            is( qx{$cmd}, "second\n", "<$opt$val> option");
+            is( qx{$cmd}, "second\n", "<$opt$val> option" );
         }
     }
 
     $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" $redir};
-    is( qx{$cmd}, "second\n", "-r option <$cmd>");
+    is( qx{$cmd}, "second\n", "-r option <$cmd>" );
 
     $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
-    like( qx{$cmd}, qr/Parrot VM: Slow core/, "-r option <$cmd>");
+    like( qx{$cmd}, qr/Parrot VM: Slow core/, "-r option <$cmd>" );
 }
 
 ## RT#46815 test remaining options
-
 
 # clean up temporary files
 unlink $first_pir_file;

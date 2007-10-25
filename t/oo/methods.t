@@ -84,7 +84,6 @@ in foo_method
 in bar_method
 OUT
 
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

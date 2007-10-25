@@ -25,7 +25,8 @@ C<Continuation> PMCs.
 
 =cut
 
-my $temp       = "temp.pasm";
+my $temp = "temp.pasm";
+
 END {
     unlink( $temp, 'temp.pbc', 'temp.pasm' );
 }

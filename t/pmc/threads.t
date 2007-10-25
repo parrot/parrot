@@ -575,9 +575,9 @@ ok beta3
 OUTPUT
 
 TODO: {
-        local $TODO = "vtable overrides aren't properly cloned RT# 46511";
+    local $TODO = "vtable overrides aren't properly cloned RT# 46511";
 
-pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not built-in" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass not built-in" );
 .namespace [ 'Foo' ]
 
 .sub foometh :method
@@ -661,7 +661,7 @@ Foo? 1
 Bar? 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_CLASSES; superclass built-in" );
 .namespace [ 'Foo' ]
 
 .sub foometh :method

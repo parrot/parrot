@@ -40,13 +40,13 @@ PMC: {
     # find pmc files
     find {
         no_chdir => 1,
-        wanted   => sub { files_of_type( \@pmc_files, $pmc_suffix ) },
+        wanted => sub { files_of_type( \@pmc_files, $pmc_suffix ) },
     } => catdir( $PConfig{build_dir}, $pmc_dir );
 
     # find test files
     find {
         no_chdir => 1,
-        wanted   => sub { files_of_type( \@test_files, $test_suffix ) },
+        wanted => sub { files_of_type( \@test_files, $test_suffix ) },
     } => catdir( $PConfig{build_dir}, $test_dir );
 
     my ( $pmc_miss, $test_miss ) = list_diff( \@pmc_files, \@test_files );

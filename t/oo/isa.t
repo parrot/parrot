@@ -23,7 +23,7 @@ composition.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'isa by string name');
+pir_output_is( <<'CODE', <<'OUT', 'isa by string name' );
 .sub main :main
     $P1 = newclass "Foo"
     $S1 = typeof $P1
@@ -54,7 +54,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'isa by class object');
+pir_output_is( <<'CODE', <<'OUT', 'isa by class object' );
 .sub main :main
     .local pmc foo_class
     foo_class = newclass "Foo"
@@ -90,7 +90,7 @@ Foo
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'subclass isa by string name');
+pir_output_is( <<'CODE', <<'OUT', 'subclass isa by string name' );
 .sub main :main
     .local pmc foo_class, bar_class
     foo_class = newclass "Foo"
@@ -125,7 +125,7 @@ Bar
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'subclass isa by class object');
+pir_output_is( <<'CODE', <<'OUT', 'subclass isa by class object' );
 .sub main :main
     .local pmc foo_class, bar_class
     foo_class = newclass "Foo"

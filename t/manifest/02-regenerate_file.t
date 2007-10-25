@@ -56,6 +56,7 @@ ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
     my @lines;
     tie @lines, 'Tie::File', qq{$tdir/$f}
         or croak "Unable to tie to $f in tempdir";
+
     for ( 1 .. 10 ) {
         if ( defined( $lines[-1] ) ) {
             pop @lines;

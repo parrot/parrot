@@ -113,12 +113,13 @@ OUTPUT
 
 my $checkTypes;
 my %types_we_cant_test
-    = map { $_ => 1; } (# These require initializers.
-                        qw(Null Iterator Enumerate Ref STMRef SharedRef
-                           ParrotObject ParrotThread
-                           deleg_pmc BigInt LexInfo LexPad Slice Object),
-                        # Instances of these appear to have other types.
-                        qw(PMCProxy Class));
+    = map { $_ => 1; } (    # These require initializers.
+    qw(Null Iterator Enumerate Ref STMRef SharedRef
+        ParrotObject ParrotThread
+        deleg_pmc BigInt LexInfo LexPad Slice Object),
+
+    # Instances of these appear to have other types.
+    qw(PMCProxy Class) );
 while ( my ( $type, $id ) = each %pmc_types ) {
     next
         if $types_we_cant_test{$type};
