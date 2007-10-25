@@ -47,7 +47,7 @@ sub new {
                 'README'
             ),
             $self->new_item(
-                'Instructions for Parrot in a Win32 environment.', 'README.win32.pod'
+                'Instructions for Parrot in a Win32 environment.', 'README_win32.pod'
             ),
             $self->new_item( 'This file lists what\'s new in each version.', 'NEWS' ),
             $self->new_item( 'A plan for Parrot.',                           'docs/ROADMAP.pod' ),
@@ -75,7 +75,7 @@ sub new {
                     )
                     : ();
             },
-            $self->new_item( 'The status of the Parrot test suite.', 't/TESTS.STATUS.pod' ),
+            $self->new_item( 'The status of the Parrot test suite.', 't/TESTS_STATUS.pod' ),
         ),
         $self->new_group(
             'People',
