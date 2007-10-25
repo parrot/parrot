@@ -717,24 +717,61 @@ syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message) {
 /*
 
 Pre-process the file only. Don't do any analysis.
+This function does a bit of pretty-printing. Future improvement includes keeping track
+of the amount of indention, for instance for labels and conditional blocks.
 
 */
 static void
 do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
     int token;
     YYSTYPE val;
+    int in_sub_body   = 0; /* flag to keep track whether we're in a sub body */
+    int just_print_nl = 0; /* flag to keep track whether we just printed a newline */
 
     do {
 
         token = yylex(&val, yyscanner);
 
-        fprintf(stderr, "%s ", yyget_text(yyscanner));
+        /* if we just printed a newline, and we're in a sub body ... */
+        if (in_sub_body == 1 && just_print_nl) {
+            /* ... and the current token is a non-indented token, (which needs to be printed
+             * at column 1, print an indention.
+             */
+            if (token != TK_SUB && token != TK_END
+                && token != TK_NAMESPACE && token != TK_ENDNAMESPACE)
+
+                fprintf(stderr, "  ");
+
+        }
+
+        fprintf(stderr, "%s", yyget_text(yyscanner));
+
+        /* don't print a space after one of these: [() */
+        switch (token) {
+            case '[': case ']':
+            case '(': case ')':
+                /* do nothin' */
+                break;
+            default:
+                fprintf(stderr, " ");
+                break;
+        }
+
+        if (token == TK_SUB) { /* we're entering a sub body */
+            in_sub_body = 1;
+        }
+        else if (token == TK_END) { /* we're falling out of a sub body */
+            in_sub_body = 0;
+        }
 
         /* if we just printed a newline character, the trailing space should be removed:
-         * do a carriage-return
+         * do a carriage-return. Always clear flag of having read a newline.
          */
-        if (strchr(yyget_text(yyscanner), '\n') != NULL)
+        just_print_nl = 0;
+        if (strchr(yyget_text(yyscanner), '\n') != NULL) {
             fprintf(stderr, "\r");
+            just_print_nl = 1;
+        }
     }
     while (token > 0);
 }

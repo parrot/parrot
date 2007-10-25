@@ -912,10 +912,9 @@ LINECOMMENT    [#].*\n
 
 %option header-file="pirlexer.h"
 
-/* we don't use yy_top_state, prevent warning */
-/*
+/* we don't use yy_top_state so have flex not generate it, (this prevents warning) */
 %option noyy_top_state
-*/
+
 
 /* make the scanner re-entrant */
 %option reentrant
@@ -928,7 +927,9 @@ LINECOMMENT    [#].*\n
 
 %%
 
-<MACROEXP>{EOL}     { }
+
+
+<MACROEXP>{EOL}                  { printdebug(stderr, "eol in macroexp\n"); return TK_NL; }
 
 
 <*>"#".*                         { /* match comments on last line in input (without a "\n") */  }
@@ -1047,7 +1048,7 @@ LINECOMMENT    [#].*\n
                          }
                          else {
                              /* yy_push_state(MACROEXP, yyscanner); */
-#ifdef DEBUG1
+#ifdef DEBUG
                              fprintf(stderr, "<MACROEXP>.IDENT found: '%s'\n", param->param_value);
 #endif
                              yytext = param->param_value;
@@ -1065,7 +1066,7 @@ LINECOMMENT    [#].*\n
                          /* get a reference to current's buffer so we can delete it later */
                          YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
 
-                         fprintf(stderr, "End of Macro Exp buffer\n");
+                         printdebug(stderr, "End of Macro Exp buffer\n");
 
                          /* switch back to saved buffer */
                          yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
@@ -1295,9 +1296,9 @@ LINECOMMENT    [#].*\n
 "~"         { return '~'; }
 "-"         { return '-'; }
 
-<INITIAL,MACRODEF>"("                { return '('; }
-<INITIAL,MACRODEF,SCANSTRING>")"     { return ')'; }
-<INITIAL,MACRODEF,SCANSTRING>","     { return ','; }
+<INITIAL,MACRODEF,MACROEXP>"("                { return '('; }
+<INITIAL,MACRODEF,SCANSTRING,MACROEXP>")"     { return ')'; }
+<INITIAL,MACRODEF,SCANSTRING,MACROEXP>","     { return ','; }
 
 "["         { return '['; }
 "]"         { return ']'; }
@@ -1347,34 +1348,34 @@ LINECOMMENT    [#].*\n
 ".loadlib"        { return TK_LOADLIB; }
 ".local"          { return TK_LOCAL; }
 
-".meth_call"      { return TK_METH_CALL; }
-".namespace"      { return TK_NAMESPACE; }
-".nci_call"       { return TK_NCI_CALL; }
-".param"          { return TK_PARAM; }
-".pcc_begin"      { return TK_PCC_BEGIN; }
+".meth_call"        { return TK_METH_CALL; }
+".namespace"        { return TK_NAMESPACE; }
+".nci_call"         { return TK_NCI_CALL; }
+".param"            { return TK_PARAM; }
+".pcc_begin"        { return TK_PCC_BEGIN; }
 ".pcc_begin_return" { return TK_PCC_BEGIN_RETURN; }
 ".pcc_begin_yield"  { return TK_PCC_BEGIN_YIELD; }
-".pcc_call"       { return TK_PCC_CALL; }
-".pcc_end"        { return TK_PCC_END; }
-".pcc_end_return" { return TK_PCC_END_RETURN; }
-".pcc_end_yield"  { return TK_PCC_END_YIELD; }
-".pragma"         { return TK_PRAGMA; }
-".result"         { return TK_RESULT; }
-".return"         { return TK_RETURN; }
-".sub"            { return TK_SUB; }
-".yield"          { return TK_YIELD; }
+".pcc_call"         { return TK_PCC_CALL; }
+".pcc_end"          { return TK_PCC_END; }
+".pcc_end_return"   { return TK_PCC_END_RETURN; }
+".pcc_end_yield"    { return TK_PCC_END_YIELD; }
+".pragma"           { return TK_PRAGMA; }
+".result"           { return TK_RESULT; }
+".return"           { return TK_RETURN; }
+".sub"              { return TK_SUB; }
+".yield"            { return TK_YIELD; }
 
-":anon"      { return TK_FLAG_ANON; }
-":init"      { return TK_FLAG_INIT; }
-":load"      { return TK_FLAG_LOAD; }
-":postcomp"  { return TK_FLAG_POSTCOMP; }
-":immediate" { return TK_FLAG_IMMEDIATE; }
-":main"      { return TK_FLAG_MAIN; }
-":method"    { return TK_FLAG_METHOD; }
-":lex"       { return TK_FLAG_LEX; }
-":outer"     { return TK_FLAG_OUTER; }
-":vtable"    { return TK_FLAG_VTABLE; }
-":multi"     { return TK_FLAG_MULTI; }
+":anon"       { return TK_FLAG_ANON; }
+":init"       { return TK_FLAG_INIT; }
+":load"       { return TK_FLAG_LOAD; }
+":postcomp"   { return TK_FLAG_POSTCOMP; }
+":immediate"  { return TK_FLAG_IMMEDIATE; }
+":main"       { return TK_FLAG_MAIN; }
+":method"     { return TK_FLAG_METHOD; }
+":lex"        { return TK_FLAG_LEX; }
+":outer"      { return TK_FLAG_OUTER; }
+":vtable"     { return TK_FLAG_VTABLE; }
+":multi"      { return TK_FLAG_MULTI; }
 
 ":unique_reg" { return TK_FLAG_UNIQUE_REG; }
 ":optional"   { return TK_FLAG_OPTIONAL; }
@@ -1399,16 +1400,15 @@ LINECOMMENT    [#].*\n
 "$N"{DIGIT}+  { return TK_SYM_NREG; }
 "$I"{DIGIT}+  { return TK_SYM_IREG; }
 
-{ALPHA}{ALNUM}*":"    { /* make the label Id available in the parser.
-                           TODO: remove the ":" ?
-                         */
-                        yylval->sval = dupstr(yytext);
-                        return TK_LABEL;
-                      }
-{ALPHA}{ALNUM}*       { /* make the Id or op available in the parser. */
-                        yylval->sval = dupstr(yytext);
-                        return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT;
-                      }
+{IDENT}":"    { /* make the label Id available in the parser. remove the ":" first. */
+                yylval->sval = dupstrn(yytext, yyleng - 1);
+                return TK_LABEL;
+              }
+
+{IDENT}       { /* make the Id or op available in the parser. */
+                yylval->sval = dupstr(yytext);
+                return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT;
+              }
 
 
 {FLOATNUM}        { return TK_NUMC; }
@@ -1499,14 +1499,14 @@ LINECOMMENT    [#].*\n
 
              }
 
-".constant"  { /* */
+".macroconstant"  { /* constant definition in the macro layer. */
                char        *constant_id    = NULL;
                char        *constant_value = NULL;
                lexer_state *my_lexer       = yyget_extra(yyscanner);
                int          next_token     = yylex(yylval, yyscanner);
 
                if (next_token != TK_IDENT) {
-                   syntax_error(yyscanner, my_lexer, "identifier expected after '.constant'.");
+                   syntax_error(yyscanner, my_lexer, "identifier expected after '.macroconstant'.");
                }
                /* store identifier */
                constant_id = dupstr(yytext);
@@ -1649,7 +1649,7 @@ LINECOMMENT    [#].*\n
 
 
 
-<*>.   { /* */
+<*>.   { /* for all states, any character not covered in the rules above is an error. */
          lexer_state *my_lexer = yyget_extra(yyscanner);
          syntax_error(yyscanner, my_lexer, "Unexpected character");
        }
