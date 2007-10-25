@@ -32,27 +32,29 @@ sub _init {
     return \%data;
 }
 
+my @encodings_defaults =
+    defined( $ENV{TEST_ENCODING} )
+    ? $ENV{TEST_ENCODING}
+    : sort map { basename($_) } glob "./src/encodings/*.c";
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my @encoding = (
-        sort
-            map { basename($_) } glob "./src/encodings/*.c"
-    );
+    my @encodings = @encodings_defaults;
 
-    my $encoding_list = $conf->options->get('encoding')
-        || join( ' ', grep { defined $_ } @encoding );
+    my $encoding_list = join( ' ', grep { defined $_ } @encodings );
 
     if ( $conf->options->get('ask') ) {
         print <<"END";
 
 
 The following encodings are available:
-  @encoding
+  @encodings
 END
-        {
-            $encoding_list = prompt( 'Which encodings would you like?', $encoding_list );
-        }
+        $encoding_list = prompt(
+            'Which encodings would you like?',
+            $encoding_list
+        );
     }
 
     # names of class files for src/pmc/Makefile

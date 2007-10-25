@@ -7,7 +7,6 @@ use strict;
 use warnings;
 use Test::More tests => 19;
 use Carp;
-use lib qw( lib );
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::gcc');
