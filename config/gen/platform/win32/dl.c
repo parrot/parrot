@@ -32,7 +32,7 @@ Parrot_dlerror(void)
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
-    return (void *)(ptrcast_t)GetProcAddress(handle, symbol);
+    return (void *)GetProcAddress(handle, symbol);
 }
 
 
