@@ -31,7 +31,6 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Data::Dumper;
 use ExtUtils::Manifest;
 
 $ExtUtils::Manifest::Quiet = 1;
@@ -51,7 +50,6 @@ printf "Found %d distinct files among MANIFEST and directory contents.\n\n",
 printf "  %5d missing\n", scalar @missing;
 printf "  %5d extra\n",   scalar @extra;
 
-# RT#46901: Use Data::Dumper
 if (@missing) {
     print "\n";
     print "Missing files:\n";
