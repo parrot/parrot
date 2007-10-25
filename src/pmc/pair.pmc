@@ -199,14 +199,8 @@ Check if two Pairs hold the same keys and values.
 
         if (!p1 && !p2)
             return 1;
-
-        if (p1 || p2)
+        else
             return 0;
-
-        if (!mmd_dispatch_i_pp(INTERP, p1, p2, MMD_EQ))
-            return 0;
-
-        return 1;
     }
 
 /*
