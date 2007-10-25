@@ -727,24 +727,34 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
     YYSTYPE val;
     int in_sub_body   = 0; /* flag to keep track whether we're in a sub body */
     int just_print_nl = 0; /* flag to keep track whether we just printed a newline */
+    int indention     = 0; /* amount of indention */
 
     do {
 
         token = yylex(&val, yyscanner);
+
+
+        if (token == TK_END) { /* ".end" must be printed at column 1 */
+            in_sub_body = 0;
+        }
 
         /* if we just printed a newline, and we're in a sub body ... */
         if (in_sub_body == 1 && just_print_nl) {
             /* ... and the current token is a non-indented token, (which needs to be printed
              * at column 1, print an indention.
              */
-            if (token != TK_SUB && token != TK_END
-                && token != TK_NAMESPACE && token != TK_ENDNAMESPACE)
 
-                fprintf(stderr, "  ");
-
+            if (token == TK_LABEL)
+                indention = 1;
+            else
+                indention = 2;
+        }
+        else {
+            indention = 0;
         }
 
-        fprintf(stderr, "%s", yyget_text(yyscanner));
+        /* print <indention> number of spaces before printing the token */
+        fprintf(stderr, "%*s%s", indention, indention > 0 ? " " : "", yyget_text(yyscanner));
 
         /* don't print a space after one of these: [() */
         switch (token) {
@@ -757,11 +767,9 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
                 break;
         }
 
-        if (token == TK_SUB) { /* we're entering a sub body */
+
+        if (token == TK_SUB) { /* we're entering a sub body, next lines must be indented. */
             in_sub_body = 1;
-        }
-        else if (token == TK_END) { /* we're falling out of a sub body */
-            in_sub_body = 0;
         }
 
         /* if we just printed a newline character, the trailing space should be removed:
