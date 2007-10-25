@@ -242,8 +242,8 @@ while (<>) {
         $ret_type{$ret},         $ret_type_decl{$ret},
         $func_call_assign{$ret}, $other_decl{$ret},
         $ret_assign{$ret},       \@temps,
-        \@extra_preamble,        \@extra_postamble,
-        \@put_pointer,           \%proto_type
+        \@extra_preamble, \@extra_postamble,
+        \@put_pointer,    \%proto_type
     );
 }
 
@@ -527,9 +527,9 @@ sub make_arg {
 
 sub print_function {
     my (
-        $sig,             $return,        $params,             $args,
-        $ret_type,        $ret_type_decl, $return_assign,      $other_decl,
-        $final_assign,    $temps_ref,     $extra_preamble_ref, $extra_postamble_ref,
+        $sig,          $return,        $params,             $args,
+        $ret_type,     $ret_type_decl, $return_assign,      $other_decl,
+        $final_assign, $temps_ref,     $extra_preamble_ref, $extra_postamble_ref,
         $put_pointer_ref, $proto_type_ref
     ) = @_;
 
@@ -540,7 +540,7 @@ sub print_function {
     my $extra_preamble  = join( "\n    ", @{$extra_preamble_ref} );
     my $extra_postamble = join( "\n    ", @{$extra_postamble_ref} );
     my $return_data =
-          "$return_assign $final_assign" =~ /return_data/
+        "$return_assign $final_assign" =~ /return_data/
         ? qq{$ret_type_decl return_data;}
         : q{};
     my $fix_params = join '', map { $fix_name{$_} || $_ } split //, $params;

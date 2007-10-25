@@ -8,7 +8,7 @@ use Parrot::Ops2c::Auxiliary qw( Usage getoptions );
 use Parrot::Ops2c::Utils;
 
 my $flagref = getoptions();
-if (   ( not defined $flagref )
+if ( ( not defined $flagref )
     or $flagref->{help}
     or ( not @ARGV ) )
 {

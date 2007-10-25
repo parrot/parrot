@@ -100,10 +100,10 @@ Sebastian Riedel, C<sri@oook.de>
 
 # Create Default Configuration
 my %cfg = (
-    config_file  => File::Spec->catdir( $FindBin::Bin, 'parrotbench.conf' ),
-    bench_path   => undef,
-    list_only    => undef,
-    use_times    => undef,
+    config_file => File::Spec->catdir( $FindBin::Bin, 'parrotbench.conf' ),
+    bench_path  => undef,
+    list_only   => undef,
+    use_times   => undef,
     display_help => undef,
     method       => undef,
     run_bench    => [],

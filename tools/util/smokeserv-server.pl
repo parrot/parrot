@@ -107,7 +107,7 @@ sub validate_params {
 sub uncompress_smoke {
     my $CGI = shift;
     $CGI->param( "smoke",
-               Compress::Zlib::memGunzip( $CGI->param("smoke") )
+        Compress::Zlib::memGunzip( $CGI->param("smoke") )
             || Compress::Bzip2::memBunzip( $CGI->param("smoke") )
             || $CGI->param("smoke") );
 }
@@ -223,7 +223,7 @@ sub process_list {
                     { %$_, timestamp => $_->{timestamp}[1] }
                     }
                     sort {
-                           $b->{revision} <=> $a->{revision}
+                    $b->{revision} <=> $a->{revision}
                         || lc $a->{osname} cmp lc $b->{osname}
                         || $b->{timestamp}[0] <=> $a->{timestamp}[0]
                     } @{ $branches{$branch}{$cat} }
@@ -241,7 +241,7 @@ sub process_list {
             map { { name => $_, categories => $branches{$_}, } }
                 sort { ( $a eq "trunk" ? -1 : 0 ) || ( $b eq "trunk" ? 1 : 0 ) || ( $a cmp $b ) }
                 keys %branches
-        ]
+            ]
     );
     print $tmpl->output;
 }
@@ -305,7 +305,7 @@ sub unpack_smoke {
             },
         ],
         duration => sprintf( "%.02f", Time::Seconds->new($10)->minutes ) . "&nbsp;min",
-        summary  => [
+        summary => [
             {
                 total    => $11,
                 ok       => $12,
@@ -319,7 +319,7 @@ sub unpack_smoke {
         harness_args => pack( "H*", $17 ),
         id           => $18,
         filename     => $name,
-        link         => BASEHTTPDIR . $name,
+        link => BASEHTTPDIR . $name,
         };
     return ();
 }
