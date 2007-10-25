@@ -132,7 +132,11 @@ compilers/ast/astlexer.c
 compilers/ast/astparser.c
 compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
+compilers/pirc/new/pirlexer.c
+compilers/pirc/new/pirlexer.h
+compilers/pirc/new/pirparser.c
 compilers/pirc/src/pirlexer.c
+compilers/pirc/src/pirlexer.h
 compilers/pirc/src/pirparser.c
 languages/plumhead/src/yacc/plumhead_lexer.c
 languages/plumhead/src/yacc/plumhead_parser.c
