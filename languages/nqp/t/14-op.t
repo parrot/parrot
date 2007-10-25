@@ -2,7 +2,7 @@
 
 # checking basic operands and circumfix:( )
 
-plan(13);
+plan(14);
 
 ##Additive operators
 ok(      1+2  == 3, 'Checking addition 1+2');
@@ -17,6 +17,7 @@ ok(    4*3+5  == 17, 'Checking compound statements 4*3+5');
 ok(   4*(3+5) == 32, 'Checking parenthesized statements 4*(3+5)');
 ok(   12/4*3  ==  9, 'Checking compound statements 12/4*3');
 ok( 12/(4*3)  ==  1, 'Checking compound statements 12/(4*3)');
+ok(   5-3*2   == -1, 'Checking compound statements 5-3*2');
 
 ##Modulo operator
 ok(      8%3  == 2, 'Checking modulo 8%3');

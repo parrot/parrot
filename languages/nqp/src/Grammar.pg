@@ -295,16 +295,8 @@ proto prefix:<?> is equiv(prefix:<+>)
     is pasttype('inline')
     { ... }
 
-## Additive operators
-proto infix:<+> is looser(prefix:<~>)
-    is pirop('n_add')
-    { ... }
-proto infix:<-> is equiv(prefix:<+>)
-    is pirop('n_sub')
-    { ... }
-
 ## Multiplicative operators
-proto infix:<*> is tighter(infix:<+>)
+proto infix:<*> is looser(prefix:<+>)
     is pirop('n_mul')
     { ... }
 proto infix:</> is equiv(infix:<*>)
@@ -312,6 +304,15 @@ proto infix:</> is equiv(infix:<*>)
     { ... }
 proto infix:<%> is equiv(infix:<*>)
     is pirop('n_mod')
+    { ... }
+
+
+## Additive operators
+proto infix:<+> is looser(infix:<*>)
+    is pirop('n_add')
+    { ... }
+proto infix:<-> is equiv(infix:<+>)
+    is pirop('n_sub')
     { ... }
 
 ## Comparison operators
