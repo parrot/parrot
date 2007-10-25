@@ -170,7 +170,7 @@ ParrotIOLayer pio_win32_layer = {
     0, 0
 };
 
-#define PIO_TRACE 0
+#  define PIO_TRACE 0
 
 /*
 
