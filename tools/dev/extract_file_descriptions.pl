@@ -27,7 +27,7 @@ familiar types, but from which descriptions were not obtained.
 
 =back
 
-=head1 TO DO
+=head1 TODO
 
 =over
 
