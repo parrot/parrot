@@ -33,7 +33,8 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
 
 .sub '__onload' :load :init
     $P0 = newclass [ 'Lua::PerlCompiler' ]
-    compreg 'Lua', $P0
+    new $P1, $P0
+    compreg 'Lua', $P1
 .end
 
 .namespace [ 'Lua::PerlCompiler' ]
@@ -71,7 +72,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .param string filename
     .local pmc pio
     .local string content
-    pio = get_class 'ParrotIO'
+    pio = getclass 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
     if content goto L1
@@ -104,7 +105,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .local string pir
     pir = load_script($S1)
     if pir goto L1
-    $P0 = get_class 'ParrotIO'
+    $P0 = getclass 'ParrotIO'
     $S0 = $P0.'slurp'(out)
     unlink(out)  # cleaning up the temporary file
     .local pmc ex

@@ -513,12 +513,6 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc res
     new res, 'FixedPMCArray'
     if null args goto L1
-    $P0 = getinterp
-    push_eh _handler
-    $P0 = $P0['sub', 2]
-    unshift args, 'dummy HLLCompiler'
-  _handler:
-    $S0 = shift args
     $I1 = args
     set res, $I1
     $I0 = 0
@@ -536,7 +530,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
     .local pmc iter, i
     new iter, 'Iterator', res
     new i, 'LuaNumber'
-    set i, 1
+    set i, 0
     new $P0, 'LuaTable'
   L4:
     unless iter goto L5

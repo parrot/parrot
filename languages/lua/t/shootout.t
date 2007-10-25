@@ -112,9 +112,14 @@ language_output_is( 'lua', $code, $out, 'regex-dna', params => "< $in" );
 #       Indexed-access to bit-values
 #
 
+SKIP:
+{
+    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits-output.txt' ));
 language_output_is( 'lua', $code, $out, 'nsieve-bits' );
+}
 
 #
 #   recursive

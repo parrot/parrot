@@ -843,8 +843,9 @@ is replaced.
     .param pmc match
     .param int i
     $P0 = match.'get_array'()
+    $I0 = exists $P0[i]
+    unless $I0 goto L1
     $P1 = $P0[i]
-    unless $P1 goto L1
     $I0 = can $P1, 'text'
     if $I0 goto L2
     $I0 = $P1
