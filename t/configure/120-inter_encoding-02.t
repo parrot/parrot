@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: 120-inter_encoding-02.t 22362 2007-10-21 16:12:31Z jkeenan $
+# $Id$
 # 120-inter_encoding-02.t
 
 use strict;
