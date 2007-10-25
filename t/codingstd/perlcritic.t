@@ -150,7 +150,7 @@ else {
         diag "Perl::Critic::Bangs not installed: not testing for TODO items in code";
     }
     else {
-        $extra_policies{'Bangs::ProhibitFlagComments'} = 1;
+        $default_policies{'Bangs::ProhibitFlagComments'} = 1;
     }
 
     # Give a diag to let users know if this is doing anything, how to repeat.
