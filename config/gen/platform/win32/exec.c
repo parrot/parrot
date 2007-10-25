@@ -112,7 +112,7 @@ Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
     int status;
     char *in = string_to_cstring(interp, command);
     char *cmd = NULL;
-    char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
+    const char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
 
     /* Grab string, extract command and parameters. */
     char *curPos  = in;
