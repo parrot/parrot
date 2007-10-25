@@ -9,7 +9,7 @@ while_loop:
   
   push_eh while_loop_exception
     $command
-  clear_eh
+  pop_eh
   
   goto while_loop
 

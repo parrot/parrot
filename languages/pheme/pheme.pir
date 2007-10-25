@@ -57,7 +57,7 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
 
     push_eh exit_handler
       $P1 = $P0.'command_line'(args)
-    clear_eh
+    pop_eh
     goto done
 
   exit_handler:

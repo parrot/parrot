@@ -20,7 +20,7 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
 
     .return(a)
 
@@ -46,7 +46,7 @@ empty_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     $S0 = typeof a
     if $S0 == "TclInt" goto is_int
 
@@ -84,7 +84,7 @@ empty_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
 
     $I0 = typeof a
     if $I0 == .TclFloat goto cant_use_float
@@ -123,7 +123,7 @@ empty_string:
 
     push_eh is_string
       a = __boolean(a)
-    clear_eh
+    pop_eh
 
     $I0 = a
     $I0 = not $I0
@@ -174,7 +174,7 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
    
     if a == 0 goto zero
 
@@ -213,7 +213,7 @@ zero_with_neg:
       b = __number(b)
       $P0 = new 'TclFloat'
       $P0 = mul a, b
-    clear_eh
+    pop_eh
     .return ($P0)
 
 is_string:
@@ -235,7 +235,7 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
 
     if b == 0 goto divide_by_zero
 
@@ -270,7 +270,7 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
     
     $I0 = isa a, 'TclFloat'
     if $I0 goto is_float
@@ -305,7 +305,7 @@ is_float:
       b = __number(b)
       $P0 = new 'TclFloat'
       $P0 = a + b
-    clear_eh
+    pop_eh
     .return($P0)
 
 is_string:
@@ -329,7 +329,7 @@ empty_string:
       b = __number(b)
       $P0 = new 'TclFloat'
       $P0 = a - b
-    clear_eh
+    pop_eh
     .return($P0)
 
 is_string:
@@ -368,7 +368,7 @@ empty_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
 
     $I0 = isa a, 'Float'
     if $I0 goto is_float
@@ -418,7 +418,7 @@ is_float:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
 
     $I0 = isa a, 'Float'
     if $I0 goto is_float
@@ -453,7 +453,7 @@ is_float:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = islt $P0, $P1
-    clear_eh
+    pop_eh
     .return ($I0)
 
 is_string:
@@ -472,7 +472,7 @@ is_string:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = isgt $P0, $P1
-    clear_eh
+    pop_eh
     .return($I0)
 
 is_string:
@@ -492,7 +492,7 @@ is_string:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = isle $P0, $P1
-    clear_eh
+    pop_eh
     .return($I0)
 
 is_string:
@@ -513,7 +513,7 @@ is_string:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = isge $P0, $P1
-    clear_eh
+    pop_eh
     .return($I0)
 
 is_string:
@@ -534,7 +534,7 @@ is_string:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = iseq $P0, $P1
-    clear_eh
+    pop_eh
     .return($I0)
 
 is_string:
@@ -557,7 +557,7 @@ is_string:
       $P0 = __number(a)
       $P1 = __number(b)
       $I0 = isne $P0, $P1
-    clear_eh
+    pop_eh
     .return($I0)
 
 is_string:
@@ -596,7 +596,7 @@ is_string:
   push_eh is_string
     a = __integer(a)
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I1 = b
@@ -621,7 +621,7 @@ empty_string:
 
   push_eh is_string
     a = __integer(a)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I0 = band $I0, b
@@ -644,7 +644,7 @@ empty_string:
 
   push_eh is_string
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = b
   $I0 = band a, $I0
@@ -667,7 +667,7 @@ empty_string:
 
     push_eh is_string
         b = __integer(b)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"&\""
 
 is_string:
@@ -687,7 +687,7 @@ empty_string:
 
     push_eh is_string
         a = __integer(a)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"&\""
 
 is_string:
@@ -725,7 +725,7 @@ empty_string:
   push_eh is_string
     a = __integer(a)
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I1 = b
@@ -750,7 +750,7 @@ empty_string:
 
   push_eh is_string
     a = __integer(a)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I0 = bxor $I0, b
@@ -773,7 +773,7 @@ empty_string:
 
   push_eh is_string
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = b
   $I0 = bxor a, $I0
@@ -796,7 +796,7 @@ empty_string:
 
     push_eh is_string
         b = __integer(b)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"^\""
 
 is_string:
@@ -816,7 +816,7 @@ empty_string:
 
     push_eh is_string
         a = __integer(a)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"^\""
 
 is_string:
@@ -854,7 +854,7 @@ empty_string:
   push_eh is_string
     a = __integer(a)
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I1 = b
@@ -879,7 +879,7 @@ empty_string:
 
   push_eh is_string
     a = __integer(a)
-  clear_eh
+  pop_eh
 
   $I0 = a
   $I0 = bor $I0, b
@@ -902,7 +902,7 @@ empty_string:
 
   push_eh is_string
     b = __integer(b)
-  clear_eh
+  pop_eh
 
   $I0 = b
   $I0 = bor a, $I0
@@ -925,7 +925,7 @@ empty_string:
 
     push_eh is_string
         b = __integer(b)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"|\""
 
 is_string:
@@ -945,7 +945,7 @@ empty_string:
 
     push_eh is_string
         a = __integer(a)
-    clear_eh
+    pop_eh
     tcl_error "can't use floating-point value as operand of \"|\""
 
 is_string:

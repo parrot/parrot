@@ -152,7 +152,7 @@ bad_args:
   body = argv[0]
   push_eh nope
     $P1 = __script(body)
-  clear_eh
+  pop_eh
   .return(1)
  
 nope:
@@ -207,7 +207,7 @@ bad_args:
   if_null $P3, check_arg
   push_eh error_on_set
     __set(varname, $P3) 
-  clear_eh
+  pop_eh
 
   # store in variable
   .return (1)
@@ -233,7 +233,7 @@ not_argument:
 no_default:
   push_eh error_on_set
     __set(varname, '') 
-  clear_eh
+  pop_eh
   .return (0)
 
 error_on_set:
@@ -360,7 +360,7 @@ bad_args:
   __read  = get_root_global ['_tcl'], '__read'
   push_eh not_found
     found_var = __read(varname)
-  clear_eh
+  pop_eh
   .return (1)
 
 not_found:

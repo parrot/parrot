@@ -282,7 +282,7 @@ token pasm_instruction {
 | clearp            
 | clearn            
 | cleari            
-| clear_eh          
+| pop_eh          
 | classoffset       
 | classname         
 | class             

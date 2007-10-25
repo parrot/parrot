@@ -27,7 +27,7 @@
     $P2 = __script(code, 'ns' => ns)
     code_retval = $P2()
     retval = TCL_OK  # no exception => TCL_OK
-  clear_eh
+  pop_eh
 
   goto got_retval
 

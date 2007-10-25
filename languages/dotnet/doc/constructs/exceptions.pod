@@ -51,7 +51,7 @@ The Parrot exception system is based around an exception stack. Handlers are
 simply represented as offsets in a given context, and are created at runtime
 by using the push_eh instruction and supplying a label located at the start
 of the handler. The last exception handler that was placed on the stack can
-be popped off using the clear_eh instruction.
+be popped off using the pop_eh instruction.
 
 Exceptions themselves are PMCs; more specifically, an exception must be an
 instance of the built-in Exception PMC. This PMC provides a keyed interface

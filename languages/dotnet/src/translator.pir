@@ -162,7 +162,7 @@ NO_EH:
     pir_output = concat src
     inc done_types
     if continue == 0 goto RESUME
-    clear_eh
+    pop_eh
 RESUME:
     inc i
     goto CLOOP

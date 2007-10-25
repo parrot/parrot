@@ -25,10 +25,10 @@
   if null $P1 goto fail
   push_eh compiler_error
     $P0 = $P1(code)
-  clear_eh
+  pop_eh
   push_eh runtime_error
     $P0()
-  clear_eh
+  pop_eh
   .return ('')
 
 

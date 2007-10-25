@@ -184,7 +184,7 @@ pir_output_is( <<'CODE', <<'OUT', 'throw', todo => 'not yet implemented' );
 
     push_eh eh_no_error
     $P0.throw()
-    clear_eh eh_no_error
+    pop_eh eh_no_error
 
     say 'ok 1 - $P0.throw() # no error'
 
@@ -193,7 +193,7 @@ pir_output_is( <<'CODE', <<'OUT', 'throw', todo => 'not yet implemented' );
 
     push_eh eh_error
     $P0.throw()
-    clear_eh
+    pop_eh
 
     say 'not ok 2 - $P0.throw() # error'
 

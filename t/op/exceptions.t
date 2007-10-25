@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2001-2007, The Perl Foundation.
-# $Id$
+# $Id: exception.t 21399 2007-09-19 18:01:01Z paultcochrane $
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - pop_eh" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh label - pop_eh" );
     push_eh _handler
     print "ok 1\n"
     pop_eh
@@ -35,9 +35,38 @@ ok 1
 ok 2
 OUTPUT
 
+pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - pop_eh" );
+    new P29, 'Exception_Handler'
+    push_eh P29
+    print "ok 1\n"
+    pop_eh
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh _handler
+    new P30, 'Exception'
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "caught it\n"
+    end
+CODE
+main
+caught it
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
+    print "main\n"
+    new P29, 'Exception_Handler'
+    set_addr P29, _handler
+    push_eh P29
     new P30, 'Exception'
     throw P30
     print "not reached\n"

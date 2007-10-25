@@ -103,7 +103,7 @@ helper for CALL_URL* opcodes.
     pbc_out = pir_comp(gen_pir)
     $P0 = pbc_out[0]
     $P0()
-    clear_eh
+    pop_eh
 #    push_eh _handler_2
     .local pmc entry
     $S0 = url

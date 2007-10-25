@@ -38,7 +38,7 @@ is_string:
   if $I0 <= 1 goto only_string
   push_eh only_string
     $P3 = __listToDict($P3)
-  clear_eh
+  pop_eh
   result[$S1] = $P3
   goto loop
 

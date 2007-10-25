@@ -82,7 +82,7 @@ var_loop:
   $P0 = results[$I0]
   push_eh bad_var
     __set($S0, $P0)
-  clear_eh
+  pop_eh
   inc $I0
   goto var_loop
 var_loop_done:

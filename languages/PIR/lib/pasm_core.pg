@@ -39,7 +39,7 @@ rule core_op {
 | get_addr        <arg_hack> #<target> \, <target> 
   # exception handling
 | push_eh             <arg_hack> #<id>
-| clear_eh            <arg_hack> #
+| pop_eh              <arg_hack> #
 | throw               <arg_hack> #<target>
 | rethrow             <arg_hack> #<target>
 | die                 <arg_hack> #<int_constant> \, <int_constant>

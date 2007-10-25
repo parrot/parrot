@@ -51,12 +51,12 @@ pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not y
 
     push_eh eh_bad_file_1
     $P0.open('bad_file')
-    clear_eh
+    pop_eh
 
   test_5:
     push_eh eh_bad_file_2
     $P0.open('bad_file', 'r')
-    clear_eh
+    pop_eh
 
   test_6:
     $P0.open('new_file', 'w')

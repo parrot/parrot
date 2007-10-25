@@ -182,7 +182,7 @@ done_1:
 
     push_eh eh_23
       $P1 = select_switches(options, argv, 0, 1)
-    clear_eh
+    pop_eh
    
     $S2= ''   
     goto check_23 
@@ -200,7 +200,7 @@ check_23:
 
     push_eh eh_24
       $P1 = select_switches(options, argv, 1, 1)
-    clear_eh
+    pop_eh
    
     $S2= ''   
     goto check_24
@@ -218,7 +218,7 @@ check_24:
 
     push_eh eh_25
       $P1 = select_switches(options, argv, 1, 1, 'frob')
-    clear_eh
+    pop_eh
    
     $S2= ''   
     goto check_25

@@ -135,7 +135,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
 
   .local pmc __set
   __set = find_global '__set' 
@@ -200,7 +200,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
 
   $I1 = $P2[2]
   $I3 = $I1 & 0o170000 #S_IFMT
@@ -237,7 +237,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
 
   $I1 = $P2[2]
   $I3 = $I1 & 0o170000   #S_IFMT
@@ -274,7 +274,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
 
   $I1 = $P2[2]
   $I2 = 0o170000   #S_IFMT
@@ -308,7 +308,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
   $I1 = $P2[7]
   .return ($I1)
 
@@ -336,7 +336,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
   $I1 = $P2[8]
   .return ($I1)
 
@@ -364,7 +364,7 @@ bad_args:
   $P1 = new 'OS'
   push_eh no_file
     $P2 = $P1.'stat'(file)
-  clear_eh
+  pop_eh
   $I1 = $P2[9]
   .return ($I1)
 
@@ -491,7 +491,7 @@ bad_args:
     $S0 = argv[0]
     push_eh false
       $P0 = os.'stat'($S0)
-    clear_eh
+    pop_eh
 
     .return(1)
 

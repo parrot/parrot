@@ -25,7 +25,7 @@ END_INLINE
     past.'push'(cpast)
     goto iter_loop
   iter_end:
-    $P0 = past.'push_new'('PAST::Op', 'pirop'=>'inline', 'inline'=> '    clear_eh # %r')
+    $P0 = past.'push_new'('PAST::Op', 'pirop'=>'inline', 'inline'=> '    pop_eh # %r')
     .return (past)
 }
 

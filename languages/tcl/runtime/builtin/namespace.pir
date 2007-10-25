@@ -289,7 +289,7 @@ END_PIR
   push_eh restore_call_chain
     $P0 = pir_compiler(code)
     $P0 = $P0()
-  clear_eh
+  pop_eh
   set_root_global ['_tcl'], 'call_chain', call_chain
   .return($P0)
 
@@ -462,7 +462,7 @@ get_parent:
   # for when someone calls [namespace current] from ::
   push_eh current_in_root
     $S0 = pop ns
-  clear_eh
+  pop_eh
 no_pop:
   $S0 = join '::', ns
   $S0 = '::' . $S0

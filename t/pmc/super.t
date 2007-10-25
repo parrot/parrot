@@ -50,7 +50,7 @@ Tests the Super PMC.
 
     push_eh eh__obj_has_no_parent
     $P0 = new 'Super', obj
-    clear_eh
+    pop_eh
     ok(0, 'init_pmc "Super" with object that has no parent should fail')
     skip(1, 'cannot test isa: no object')
     goto obj_has_no_parent__done
@@ -64,7 +64,7 @@ Tests the Super PMC.
 
     push_eh eh__obj_has_parent
     super = new 'Super', obj
-    clear_eh
+    pop_eh
     ok(1, 'init_pmc "Super" with object that has parent succeeds')
     isa_ok(super, 'Super')
     goto obj_has_parent__done

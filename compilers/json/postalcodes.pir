@@ -82,7 +82,7 @@ END:
  code_loop:
     push_eh code_end
       code = shift iter
-    clear_eh
+    pop_eh
     unless code goto code_end 
 
     $S0 = code['placeName']

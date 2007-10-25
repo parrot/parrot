@@ -63,7 +63,7 @@ done_1:
     message='no match' 
     push_eh eh_3
       $S1 = select_option(options,'punk')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_3
 eh_3:
@@ -76,7 +76,7 @@ check_3:
     message='no match' 
     push_eh eh_4
       $S1 = select_option(options,'da')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_4
 eh_4:
@@ -89,7 +89,7 @@ check_4:
     message='no match (alt name)'
     push_eh eh_5
       $S1 = select_option(options,'punk','coke')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_5
 eh_5:
@@ -102,7 +102,7 @@ check_5:
     message='no match' 
     push_eh eh_6
       $S1 = select_option(options,'da','particle')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_6
 eh_6:
@@ -118,7 +118,7 @@ check_6:
     options[1] = 'bob'
     push_eh eh_7
       $S1 = select_option(options,'frank')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_7
 eh_7:
@@ -134,7 +134,7 @@ check_7:
     options[1] = 'bob'
     push_eh eh_8
       $S1 = select_option(options,'b')
-    clear_eh
+    pop_eh
     $S2 = ''
     goto check_8
 eh_8:

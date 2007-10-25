@@ -380,7 +380,7 @@ static char const *parrot_ops[] = {
         "clearp",
         "clearn",
         "cleari",
-        "clear_eh",
+        "pop_eh",
         "classoffset",
         "classname",
         "class",

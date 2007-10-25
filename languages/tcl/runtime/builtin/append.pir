@@ -30,7 +30,7 @@
 setter:
   push_eh new_variable
     $P1 = read(name)
-  clear_eh
+  pop_eh
 
   value = $P1
   goto loop

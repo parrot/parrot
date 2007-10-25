@@ -54,15 +54,17 @@ handlers, invoking each one in turn, but still in the dynamic context of the
 exception (i.e. the call stack is I<not> unwound first).  See below for more
 detail.
 
-If a I<LABEL> is provided, Parrot creates and pushes a continuation that
+If a I<LABEL> or is provided, Parrot creates and pushes a continuation that
 resumes execution at I<LABEL> if invoked, which has the effect of
 unconditionally handling all errors, and unwinding the stack to that label.
+
+If a I<INVOCABLE_PMC> is provided, Parrot pushes the pmc which will execute
+if invoked, which has the effect of unconditionally handling all errors,
+replacing the stack with that execution context of the invocable pmc.
 
 =item B<pop_eh>
 
 Pop the most recently pushed exception handler off the exception handler stack.
-
-{{ TODO: Provide exception handler stack introspection. }}
 
 =item B<throw I<EXCEPTION>>
 
@@ -130,6 +132,28 @@ and should be removed from the stack of active exceptions.  This opcode is an
 exception handler's way of telling Parrot that it has handled the exception.
 
 =back
+
+=head2 Exception Introspection Opcodes
+{{ TODO: Provide exception handler stack introspection. }}
+
+These are the opcodes relevant to introspection of the exception handler stack:
+
+=over
+
+=item B<count_eh>
+
+Return the quantity of currently active exception handlers.
+
+=item B<get_eh I<index>>
+
+Return the exception handler at I<index>
+
+=item B<get_all_eh>
+
+Return a resizable pmc array of all current exception handlers.
+
+=back
+
 
 =head2 Order of Operations in Exception Handling
 

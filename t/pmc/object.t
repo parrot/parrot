@@ -36,7 +36,7 @@ Tests the Object PMC.
 
     push_eh cant_instantiate
       new P0, 'Object'
-    clear_eh
+    pop_eh
     ok(0, 'Able to instantiate Object')
     goto done_1
 cant_instantiate:

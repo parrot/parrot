@@ -98,7 +98,7 @@
 
     push_eh neg_exception
       array = -3
-    clear_eh
+    pop_eh
     ok(0, "array resize to -3")
     goto still_ok
 
@@ -166,7 +166,7 @@ still_ok:
 
     push_eh set_pmc_keyed_int_exception
       array[-10] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_pmc_keyed_int (negative, out of bounds)")
     goto set_pmc_keyed
 
@@ -176,7 +176,7 @@ set_pmc_keyed_int_exception:
 set_pmc_keyed:
     push_eh set_pmc_keyed_exception
         array["-10"] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_pmc_keyed (negative, out of bounds)")
     goto done
 
@@ -240,7 +240,7 @@ done:
 
     push_eh get_pmc_keyed_int_exception
       $P0 = array[-10]
-    clear_eh
+    pop_eh
     ok(0, "get_pmc_keyed_int (negative, out of bounds)")
     goto get_pmc_keyed
 
@@ -250,7 +250,7 @@ get_pmc_keyed_int_exception:
 get_pmc_keyed:
     push_eh get_pmc_keyed_exception
         $P0 = array["-10"]
-    clear_eh
+    pop_eh
     ok(0, "get_pmc_keyed (negative, out of bounds)")
     goto done
 
@@ -315,7 +315,7 @@ done:
 
     push_eh set_pmc_keyed_int_exception
       array[-10] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_string_keyed_int (negative, out of bounds)")
     goto set_pmc_keyed
 
@@ -325,7 +325,7 @@ set_pmc_keyed_int_exception:
 set_pmc_keyed:
     push_eh set_pmc_keyed_exception
         array["-10"] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_string_keyed (negative, out of bounds)")
     goto done
 
@@ -374,7 +374,7 @@ done:
 
     push_eh get_string_keyed_int_exception
       $S0 = array[-10]
-    clear_eh
+    pop_eh
     ok(0, "get_string_keyed_int (negative, out of bounds)")
     goto get_string_keyed
 
@@ -384,7 +384,7 @@ get_string_keyed_int_exception:
 get_string_keyed:
     push_eh get_string_keyed_exception
         $S0 = array["-10"]
-    clear_eh
+    pop_eh
     ok(0, "get_string_keyed (negative, out of bounds)")
     goto done
 
@@ -449,7 +449,7 @@ done:
 
     push_eh set_pmc_keyed_int_exception
       array[-10] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_integer_keyed_int (negative, out of bounds)")
     goto set_pmc_keyed
 
@@ -459,7 +459,7 @@ set_pmc_keyed_int_exception:
 set_pmc_keyed:
     push_eh set_pmc_keyed_exception
       array["-10"] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_integer_keyed (negative, out of bounds)")
     goto done
 
@@ -508,7 +508,7 @@ done:
 
     push_eh get_integer_keyed_int_exception
       $I0 = array[-10]
-    clear_eh
+    pop_eh
     ok(0, "get_integer_keyed_int (negative, out of bounds)")
     goto get_integer_keyed
 
@@ -518,7 +518,7 @@ get_integer_keyed_int_exception:
 get_integer_keyed:
     push_eh get_integer_keyed_exception
         $I0 = array["-10"]
-    clear_eh
+    pop_eh
     ok(0, "get_integer_keyed (negative, out of bounds)")
     goto done
 
@@ -583,7 +583,7 @@ done:
 
     push_eh set_pmc_keyed_int_exception
       array[-10] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_number_keyed_int (negative, out of bounds)")
     goto set_pmc_keyed
 
@@ -593,7 +593,7 @@ set_pmc_keyed_int_exception:
 set_pmc_keyed:
     push_eh set_pmc_keyed_exception
         array["-10"] = elem
-    clear_eh
+    pop_eh
     ok(0, "set_number_keyed (negative, out of bounds)")
     goto done
 
@@ -642,7 +642,7 @@ done:
 
     push_eh get_number_keyed_int_exception
       $N0 = array[-10]
-    clear_eh
+    pop_eh
     ok(0, "get_number_keyed_int (negative, out of bounds)")
     goto get_number_keyed
 
@@ -652,7 +652,7 @@ get_number_keyed_int_exception:
 get_number_keyed:
     push_eh get_number_keyed_exception
         $S0 = array["-10"]
-    clear_eh
+    pop_eh
     ok(0, "get_number_keyed (negative, out of bounds)")
     goto done
 
@@ -814,7 +814,7 @@ done:
     array = 0
     push_eh exception
       $P0 = pop array
-    clear_eh
+    pop_eh
     ok(0, "pop_pmc - exception")
     .return()
 
@@ -840,7 +840,7 @@ exception:
     array = 0
     push_eh exception
       $S0 = pop array
-    clear_eh
+    pop_eh
     ok(0, "pop_string - exception")
     .return()
 
@@ -866,7 +866,7 @@ exception:
     array = 0
     push_eh exception
       $I0 = pop array
-    clear_eh
+    pop_eh
     ok(0, "pop_integer - exception")
     .return()
 
@@ -892,7 +892,7 @@ exception:
     array = 0
     push_eh exception
       $N0 = pop array
-    clear_eh
+    pop_eh
     ok(0, "pop_float - exception")
     .return()
 
@@ -922,7 +922,7 @@ exception:
     array = 0
     push_eh exception
       $P0 = shift array
-    clear_eh
+    pop_eh
     ok(0, "shift_pmc - exception")
     .return()
 
@@ -949,7 +949,7 @@ exception:
     array = 0
     push_eh exception
       $S0 = shift array
-    clear_eh
+    pop_eh
     ok(0, "shift_string - exception")
     .return()
 
@@ -976,7 +976,7 @@ exception:
     array = 0
     push_eh exception
       $I0 = shift array
-    clear_eh
+    pop_eh
     ok(0, "shift_integer - exception")
     .return()
 
@@ -1003,7 +1003,7 @@ exception:
     array = 0
     push_eh exception
       $N0 = shift array
-    clear_eh
+    pop_eh
     ok(0, "shift_float - exception")
     .return()
 
@@ -1368,7 +1368,7 @@ err_2:
 
     push_eh bad_type
     splice $P1, $P2, 1, 0
-    clear_eh
+    pop_eh
     goto still_ok
 
     .local pmc exception

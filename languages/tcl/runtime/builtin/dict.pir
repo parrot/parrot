@@ -76,7 +76,7 @@ no_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -280,7 +280,7 @@ script_loop:
   __set(valueVar,check_value)
   push_eh body_handler
     $P1 = body_proc()
-  clear_eh
+  pop_eh
   $P1 = __boolean($P1)
   unless $P1 goto script_loop
   retval[check_key] = check_value 
@@ -352,7 +352,7 @@ for_loop:
 
   push_eh loop_handler
     code() 
-  clear_eh
+  pop_eh
 
   goto for_loop
 
@@ -431,7 +431,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -521,7 +521,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -728,7 +728,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -810,7 +810,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -871,7 +871,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 
@@ -993,7 +993,7 @@ bad_args:
   dict_name = shift argv
   push_eh dict_error
     dictionary = read(dict_name)
-  clear_eh
+  pop_eh
   dictionary = __dict(dictionary)
   goto got_dict
 

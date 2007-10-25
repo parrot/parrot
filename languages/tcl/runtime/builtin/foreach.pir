@@ -91,7 +91,7 @@ next_variable:
   value = clone value
   push_eh couldnt_set
     __set(varname, value)
-  clear_eh
+  pop_eh
   goto next_variable
 
 empty_var:
@@ -99,13 +99,13 @@ empty_var:
   value = ''
   push_eh couldnt_set
     __set(varname, value)
-  clear_eh
+  pop_eh
   goto next_variable
 
 execute_command:
   push_eh handle_continue
     command()
-  clear_eh
+  pop_eh
   goto next_iteration
 
 handle_continue:

@@ -189,7 +189,7 @@ equal:
 
 	push_eh cant_load
 	load_bytecode 'Parrot/Coroutine.pir'
-	clear_eh
+	pop_eh
 	test.'ok'(1, 'loaded bytecode')
 
 	## grow some trees for traversal.

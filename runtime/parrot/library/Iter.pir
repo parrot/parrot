@@ -100,7 +100,7 @@ attribute if the iterator is exhausted.
     ## TODO better handling for exhaustion
     push_eh eh_exhausted
     value = agg[index]
-    clear_eh
+    pop_eh
 
     setattribute self, 'value', value
     setattribute self, 'index', index

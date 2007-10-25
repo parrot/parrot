@@ -88,7 +88,7 @@ env_loop_done:
   # set tcl_interactive
   push_eh non_interactive
     $P1 = get_root_global ['tcl'], '$tcl_interactive'
-  clear_eh
+  pop_eh
   goto set_tcl_library 
  non_interactive:
   $P1 = new 'TclInt'

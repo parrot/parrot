@@ -31,7 +31,7 @@ select_elem:
   .local pmc indices
   push_eh not_a_list
     indices = __list($P0)
-  clear_eh
+  pop_eh
   goto select
 
 not_a_list:

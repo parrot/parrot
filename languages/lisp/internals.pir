@@ -22,7 +22,7 @@ internals.pir - lexical and global variables, function call
 
   push_eh PACKAGE_NOT_FOUND                     # Set an error handler
   find_global package, "PACKAGES", pkgname      # Look for the package
-  clear_eh
+  pop_eh
 
   retv = package._lookup_symbol(symname)        # Lookup the symbol
 
@@ -47,7 +47,7 @@ DONE:
     push_eh LEXICAL_NOT_FOUND                     # Set an error handler
     .local pmc retv
     find_lex retv, symname                        # Look for the lexical symbol
-    clear_eh
+    pop_eh
 
     goto DONE
 
@@ -202,7 +202,7 @@ DONE:
 
   push_eh PACKAGE_NOT_CREATED
   find_global package, "PACKAGES", pkgname
-  clear_eh
+  pop_eh
 
   symbol = package._intern_symbol(symname)
   symbol._set_package(package)                  # Set the home package

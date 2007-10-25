@@ -72,7 +72,7 @@ normal parrot C<.return>
    .output = -1
    push_eh .$bad_handler
     .output = exception[CODE_SLOT]
-   clear_eh
+   pop_eh
 
 .local $bad_handler:
 .endm

@@ -1249,3 +1249,5 @@ typeof_p_p                     1218
 new_p_p                        1219
 new_p_p_p                      1220
 new_p_p_pc                     1221
+push_eh_p                      1222
+pop_eh                         1223

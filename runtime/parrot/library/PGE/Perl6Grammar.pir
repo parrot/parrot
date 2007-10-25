@@ -184,7 +184,7 @@ the output to the correct output file.
           ## namespace %0
           push_eh %2
           $P0 = subclass '%1', '%0'
-          clear_eh
+          pop_eh
         %2:
         CODE
   ns_optable:

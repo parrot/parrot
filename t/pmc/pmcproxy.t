@@ -42,7 +42,7 @@ pir_output_is( <<'CODE', <<'OUT', 'get_class gives back Proxy PMC' );
 .sub 'test' :main
 push_eh nok_1
     $P0 = get_class 'NameSpace'
-    clear_eh
+    pop_eh
     goto ok_1
 nok_1:
     print "not "
@@ -64,7 +64,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Proxy PMC supplies name, namespace' );
 .sub 'test' :main
 push_eh nok_1
     $P0 = get_class 'NameSpace'
-    clear_eh
+    pop_eh
     goto ok_1
 nok_1:
     print "not "
@@ -94,7 +94,7 @@ pir_output_is( <<'CODE', <<'OUT', 'Proxy PMC allows introspection of methods' );
 .sub 'test' :main
 push_eh nok_1
     $P0 = get_class 'NameSpace'
-    clear_eh
+    pop_eh
     goto ok_1
 nok_1:
     print "not "
@@ -127,7 +127,7 @@ pir_output_is( <<'CODE', <<'OUT', '.new() creates a PMC' );
 .sub 'test' :main
 push_eh nok_1
     $P0 = get_class 'ResizablePMCArray'
-    clear_eh
+    pop_eh
     goto ok_1
 nok_1:
     print "not "

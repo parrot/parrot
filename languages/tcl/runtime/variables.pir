@@ -289,7 +289,7 @@ Gets the actual variable from memory and returns it.
   push_eh lexical_notfound
     lexpad     = call_chain[-1]
     value      = lexpad[name]
-  clear_eh
+  pop_eh
   if null value goto args_check
   $I0 = isa value, 'Undef'
   if $I0 goto args_check

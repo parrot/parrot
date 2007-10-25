@@ -361,7 +361,7 @@ transform post (Cardinal::PAST::Rescue_Stmt) :language('PIR') {
     ops.'add_child'($P0)
     
     op = new 'Cardinal::POST::Op'
-    op.'init'('node'=>node, 'name'=>'clear_eh')
+    op.'init'('node'=>node, 'name'=>'pop_eh')
     ops.'add_child'(op)
     
     op = new 'Cardinal::POST::Op'

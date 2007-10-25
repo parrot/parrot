@@ -85,7 +85,7 @@ C<target> adverbs.
   make_grammar:
     push_eh end
     $P0 = subclass 'PGE::Grammar', grammar
-    clear_eh
+    pop_eh
   end:
     .return ($P1)
 

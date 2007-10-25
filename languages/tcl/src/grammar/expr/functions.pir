@@ -28,7 +28,7 @@ Functions are very similar to ops, so handle them similarly here.
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc b
     $S0 = typeof a
@@ -48,7 +48,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
    
     if a < -1 goto domain_error
     if a >  1 goto domain_error
@@ -83,7 +83,7 @@ domain_error:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
 
     if a < -1 goto domain_error
     if a >  1 goto domain_error
@@ -118,7 +118,7 @@ domain_error:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -151,7 +151,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -172,7 +172,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -196,7 +196,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -220,7 +220,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -240,7 +240,7 @@ is_string:
 
     push_eh is_string
       n = __number(n)
-    clear_eh
+    pop_eh
 
     .local pmc ret
     ret = new 'TclInt'
@@ -262,7 +262,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -288,7 +288,7 @@ is_string:
 
     push_eh is_string
       result = __number(a)
-    clear_eh
+    pop_eh
 
     if result >= 0 goto positive
       
@@ -323,7 +323,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     $I0 = a
     $P0 = new 'TclInt'
@@ -346,7 +346,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
 
     if a < 0 goto domain_error
 
@@ -380,7 +380,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
 
     if a < 0 goto domain_error
 
@@ -446,7 +446,7 @@ done:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     if a < 0 goto neg
 
@@ -472,7 +472,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -496,7 +496,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -520,7 +520,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     if a < 0 goto domain_error
@@ -556,7 +556,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -580,7 +580,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     .local pmc ret
     ret = new 'TclFloat'
@@ -605,7 +605,7 @@ is_string:
 
     push_eh is_string
       a = __number(a)
-    clear_eh
+    pop_eh
     
     $I0 = a
     $P0 = new 'TclInt'
@@ -631,7 +631,7 @@ is_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
     
     $N0 = a
     $N1 = b
@@ -655,7 +655,7 @@ is_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
     
     if b == 0 goto domain_error 
     $N0 = a
@@ -688,7 +688,7 @@ is_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
     
     $N0 = a
     $N1 = b
@@ -717,7 +717,7 @@ is_string:
     push_eh is_string
       a = __number(a)
       b = __number(b)
-    clear_eh
+    pop_eh
 
     $N0 = a
     $N1 = b

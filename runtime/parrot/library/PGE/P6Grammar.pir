@@ -175,7 +175,7 @@ the output to the correct output file.
           ## namespace %0
           push_eh %1
           $P0 = subclass 'PGE::Grammar', '%0'
-          clear_eh
+          pop_eh
         %1:
         CODE
   ns_optable:

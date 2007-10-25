@@ -155,7 +155,7 @@ pir_output_is( <<'CODE', <<'OUT', 'two roles that conflict' );
     push_eh OK_2
     $P2.'add_role'($P1)
     print "not "
-    clear_eh
+    pop_eh
 OK_2:
     print "ok 2 - composition failed due to conflict\n"
 .end
@@ -185,7 +185,7 @@ pir_output_is( <<'CODE', <<'OUT', 'role that conflicts with a class method' );
     push_eh OK_2
     $P1.'add_role'($P0)
     print "not "
-    clear_eh
+    pop_eh
 OK_2:
     print "ok 2 - composition failed due to conflict\n"
 .end
@@ -418,7 +418,7 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict from indirect role' );
     push_eh OK_3
     BurninatorBoss.'add_role'(Burninator)
     print "not "
-    clear_eh
+    pop_eh
 OK_3:
     print "ok 3 - second role conflicts with method from indirect role\n"
 .end

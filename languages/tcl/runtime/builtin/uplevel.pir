@@ -58,7 +58,7 @@ save_chain_end:
   push_eh restore_and_rethrow
     $P0 = __script($S0)
     retval = $P0()
-  clear_eh
+  pop_eh
 
   bsr restore
   .return(retval)

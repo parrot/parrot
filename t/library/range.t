@@ -74,7 +74,7 @@ Tests the Range class.
       $I0 = $P0.'shift'()
       ok(0,'1 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -111,7 +111,7 @@ finally:
       $I0 = $P0.'shift'()
       ok(0,'2 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -147,7 +147,7 @@ finally:
       $I0 = $P0.'shift'()
       ok(0,'3 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -180,7 +180,7 @@ finally:
       $I0 = $P0.'pop'()
       ok(0,'4 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -216,7 +216,7 @@ finally:
       $I0 = $P0.'pop'()
       ok(0,'5 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -252,7 +252,7 @@ finally:
       $I0 = $P0.'pop'()
       ok(0,'6 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -316,7 +316,7 @@ finally:
       $I0 = $P0.'shift'()
       ok(0,'8 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check
@@ -353,7 +353,7 @@ finally:
       $I0 = $P0.'pop'()
       ok(0,'9 - exhausted')
       goto finally
-    clear_eh
+    pop_eh
 
 catch:
     # XXX should have more thorough exception check

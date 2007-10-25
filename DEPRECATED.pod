@@ -54,6 +54,10 @@ deprecated:
 
 =over 4
 
+=item B<clear_eh>.
+
+Use B<pop_eh> instead.
+
 =item B<store_global>
 
 =item B<find_global>

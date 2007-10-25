@@ -65,7 +65,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
 
     push_eh ok_3
     $P0.'source'(ns, $P1)
-    clear_eh
+    pop_eh
 
     print 'not '
   ok_3:
@@ -73,7 +73,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
 
     push_eh ok_4
     $P0.'source'('foo')
-    clear_eh
+    pop_eh
     print 'not '
 
   ok_4:
@@ -123,7 +123,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 
     push_eh ok_4
     $P0.'destination'(ns, $P1)
-    clear_eh
+    pop_eh
 
     print 'not '
   ok_4:
@@ -131,7 +131,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 
     push_eh ok_5
     $P0.'destination'('foo')
-    clear_eh
+    pop_eh
     print 'not '
 
   ok_5:
@@ -228,7 +228,7 @@ pir_output_is( <<'CODE', <<'OUT', 'globals' );
 
     push_eh ok_6
     $P0.'globals'($P99, $P98)
-    clear_eh
+    pop_eh
 
     print 'not '
   ok_6:

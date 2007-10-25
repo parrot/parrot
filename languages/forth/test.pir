@@ -104,7 +104,7 @@ missing_output:
     push_eh exception
       $P0   = forth(input)
       stack = $P0()
-    clear_eh
+    pop_eh
     output = readline stdout
     $S0 = pop stdout
     if output != "" goto compare

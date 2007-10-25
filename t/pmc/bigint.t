@@ -457,7 +457,7 @@ for my $op ( "/", "%" ) {
     push_eh OK
     P1 = P0 $op P2
     print "fail\\n"
-    clear_eh
+    pop_eh
 OK:
     get_results '0,0', \$P0, \$S0
     print "ok\\n"

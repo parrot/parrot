@@ -214,7 +214,7 @@ END_PIR
   code .= parsed_body
   
   code.emit(<<'END_PIR', body_reg)
-  clear_eh
+  pop_eh
 was_ok:
   $P0 = pop call_chain
   .return(%0)

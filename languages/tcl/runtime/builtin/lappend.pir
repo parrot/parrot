@@ -22,7 +22,7 @@
   read = get_root_global ['_tcl'], '__read'
   push_eh new_variable
     value = read(listname)
-  clear_eh
+  pop_eh
   
   .local pmc __list
 

@@ -681,7 +681,11 @@ inline op get_addr(out INT, invar PMC) {
 =item B<push_eh>(labelconst INT)
 
 Create an exception handler for the given catch label and push it onto
-the control stack.
+the exception handler stack.
+
+=item B<push_eh>(invar PMC)
+
+Push an invokable PMC onto the exception handler stack.
 
 =item B<clear_eh>()
 
@@ -730,7 +734,17 @@ inline op push_eh(labelconst INT) {
     goto NEXT();
 }
 
+inline op push_eh(invar PMC) {
+    push_exception(interp, $1);
+    goto NEXT();
+}
+
 inline op clear_eh() {
+    pop_exception(interp);
+    goto NEXT();
+}
+
+inline op pop_eh() {
     pop_exception(interp);
     goto NEXT();
 }
@@ -738,6 +752,17 @@ inline op clear_eh() {
 inline op throw(invar PMC) {
     opcode_t * const ret = expr NEXT();
     opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
+    goto ADDRESS(dest);
+}
+
+inline op throwcc(invar PMC) {
+    opcode_t * const ret = expr NEXT();
+    opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
+    goto ADDRESS(dest);
+}
+
+inline op throwcc(invar PMC, invar PMC) {
+    opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, $2);
     goto ADDRESS(dest);
 }
 

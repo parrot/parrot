@@ -38,7 +38,7 @@
 	push_eh return_list
 	function = find_global symbol_name
 	unless function goto return_list
-	clear_eh
+	pop_eh
 
 	.local pmc    result
 	result = function( args :flat )

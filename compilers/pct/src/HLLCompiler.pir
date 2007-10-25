@@ -431,7 +431,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     unless code goto interactive_loop
     push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
-    clear_eh
+    pop_eh
     if null $P0 goto interactive_loop
     unless target goto interactive_loop
     if target == 'pir' goto target_pir

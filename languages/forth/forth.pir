@@ -63,7 +63,7 @@ loop:
 #    push_eh exception
       $P0 = forth($S0)
       $P0()
-#    clear_eh
+#    pop_eh
 
     print " ok\n"
     goto loop

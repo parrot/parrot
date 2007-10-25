@@ -355,7 +355,7 @@ transform try (PAST::Op) :language('PIR') {
     endlabel = post.'new'('POST::Label', 'result'=>$S0)
     post.'push_pirop'('push_eh', traplabel)
     post.'push'(trypost)
-    post.'push_pirop'('clear_eh')
+    post.'push_pirop'('pop_eh')
     post.'push_pirop'('goto', endlabel)
     post.'push'(traplabel)
     .local pmc catchnode, catchpast

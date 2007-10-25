@@ -20,7 +20,7 @@ outer:
     iter = new 'Iterator', events
     push_eh inner
       var = __read(name)
-    clear_eh
+    pop_eh
     goto done
 
 inner:

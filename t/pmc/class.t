@@ -90,7 +90,7 @@ Tests the Class PMC.
     push_eh t_too_many_args
     class.'name'('Alice', 'Bob')
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_too_many_args:
     ok($I0, 'name() with too many args fails')
@@ -114,7 +114,7 @@ Tests the Class PMC.
     push_eh t_non_attribute_key
     result = class.'new'('abc' => '123' )
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_non_attribute_key:
     ok($I0, 'new() with non-attribute key fails')
@@ -153,7 +153,7 @@ Tests the Class PMC.
     push_eh ok_ro_accessor
     attribs = class.'attributes'( 'foo' )
     $I0 = 0
-    clear_eh
+    pop_eh
 
   ok_ro_accessor:
     ok($I0, 'attributes() is read-only accessor')
@@ -170,7 +170,7 @@ Tests the Class PMC.
     push_eh t_no_args
     class.'add_attribute'()
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_no_args:
     ok($I0, 'add_attribute() with no args fails')
@@ -189,7 +189,7 @@ Tests the Class PMC.
     push_eh t_existing_attribute
     class.'add_attribute'( 'foo', 'String' )
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_existing_attribute:
     ok($I0, 'add_attribute() with existing attribute name fails')
@@ -227,7 +227,7 @@ Tests the Class PMC.
     push_eh t_no_args
     class.'add_method'()
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_no_args:
     ok($I1, 'add_method() with no args fails')
@@ -236,7 +236,7 @@ Tests the Class PMC.
     push_eh t_one_arg
     class.'add_method'( 'foo' )
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_one_arg:
     ok($I1, 'add_method() with valid single arg fails')
@@ -271,7 +271,7 @@ Tests the Class PMC.
     push_eh t_existing_method
     class.'add_method'( 'foo' )
     $I0 = 0
-    clear_eh
+    pop_eh
 
   t_existing_method:
     ok($I0, 'add_method() with existing method name fails')

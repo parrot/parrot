@@ -153,7 +153,7 @@ NEW FEATURE PROPOSALS GO HERE:
 	 	...
 	 	push_eh on_error
 	 	# do some scary stuff
-	 	clear_eh
+	 	pop_eh
 	 	goto after_handler
 on_error:
 		# exception handling

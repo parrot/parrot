@@ -21,7 +21,7 @@ this is as simple as returning the list.
 
   push_eh convert_to_tcl_error
     $P0 = $P0.'get_list'($S0)
-  clear_eh 
+  pop_eh 
 
   morph value, .Undef
   assign value, $P0
@@ -155,7 +155,7 @@ normal:
 
   push_eh not_integer_eh
     integer = __number(value)
-  clear_eh
+  pop_eh
   $I0 = typeof integer
   if $I0 != .TclInt goto not_integer
 
@@ -194,14 +194,14 @@ not_integer_eh:
 
   push_eh bad_index
     $I0 = __integer(idx)
-  clear_eh
+  pop_eh
   .return($I0)
 
 before_end:
   $S0 = substr idx, 4
   push_eh bad_index
     $I0 = __integer($S0)
-  clear_eh
+  pop_eh
 
   $I1 = elements list
   dec $I1
@@ -212,7 +212,7 @@ after_end:
   $S0 = substr idx, 4
   push_eh bad_index
     $I0 = __integer($S0)
-  clear_eh
+  pop_eh
 
   $I1 = elements list
   dec $I1
@@ -553,7 +553,7 @@ throw an exception.
 
     push_eh error
       value = __number(value)
-    clear_eh
+    pop_eh
     if value goto true
     goto false
 
@@ -603,13 +603,13 @@ get_absolute:
   if $S1 != '#' goto get_integer
   push_eh default
     parrot_level = __number($S0)
-  clear_eh
+  pop_eh
   goto bounds_check
  
 get_integer:
   push_eh default
     parrot_level = __number(tcl_level)
-  clear_eh
+  pop_eh
 
   if parrot_level < 0 goto default
   parrot_level = orig_level - parrot_level

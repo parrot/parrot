@@ -33,7 +33,7 @@ end:
   # make sure errors happen at runtime
   push_eh exception
     ($P0, $S0) = __expr(arg, 'pir_only'=>1)
-  clear_eh
+  pop_eh
   pir = new 'CodeString'
   pir .= $P0
 

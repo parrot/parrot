@@ -727,7 +727,7 @@ double_check:
   $P1 = get_root_global ['_tcl'], '__number'
   push_eh nope
     $P2 = $P1(the_string)
-  clear_eh
+  pop_eh
 
   $S0 = typeof $P2
   if $S0 == 'TclFloat' goto yep
@@ -749,7 +749,7 @@ integer_check:
   $P1 = get_root_global ['_tcl'], '__number'
   push_eh nope
     $P2 = $P1(the_string)
-  clear_eh
+  pop_eh
 
   $S0 = typeof $P2
   if $S0 == 'TclInt' goto yep
@@ -758,7 +758,7 @@ list_check:
   $P1 = get_root_global ['_tcl'], '__list'
   push_eh nope
     $P1(the_string)
-  clear_eh
+  pop_eh
   goto yep
 lower_check:
   the_cclass = .CCLASS_LOWERCASE

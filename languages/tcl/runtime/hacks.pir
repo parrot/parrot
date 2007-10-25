@@ -53,12 +53,12 @@
   OS = new 'OS'
   push_eh bad_file
     stat_tcl = OS.'stat'(filename)
-  clear_eh
+  pop_eh
 
   OS = new 'OS'
   push_eh no_precompiled
     stat_prec = OS.'stat'(precompiled_filename)
-  clear_eh
+  pop_eh
 
   # Is the precompiled version new enough?
   $I0 = stat_tcl [9] #mtime

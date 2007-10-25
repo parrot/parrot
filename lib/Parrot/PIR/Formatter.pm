@@ -46,7 +46,7 @@ my $block_end = qr{
   (
     ^\.end$
     |
-    ^clear_eh$
+    ^pop_eh$
   )
 }smx;
 

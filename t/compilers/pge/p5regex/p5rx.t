@@ -144,7 +144,7 @@ Column 6, if present, contains a description of what is being tested.
   parse_data:
     push_eh eh_bad_line
      ( pattern, target, result, testvar, expected, description ) = 'parse_data'( test_line )
-    clear_eh
+    pop_eh
 
     # build the test description
     #   start with the pattern
@@ -183,7 +183,7 @@ Column 6, if present, contains a description of what is being tested.
   not_skip:
     push_eh thrown
     match = 'match_p5regex'( pattern, target )
-    clear_eh
+    pop_eh
 
     if match goto matched
 

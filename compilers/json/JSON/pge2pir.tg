@@ -169,7 +169,7 @@ transform pir (string) {
   loop:
     push_eh loop_end
       child = shift iter
-    clear_eh
+    pop_eh
     unless child goto loop_end
     $S0 = child
     $I0 = length $S0

@@ -191,7 +191,7 @@ Tests all non-branching conditional operators.
     res = 0
     push_eh fubar
     $P0 = new $S0
-    clear_eh
+    pop_eh
     goto test
 
   fubar:

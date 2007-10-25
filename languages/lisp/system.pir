@@ -202,7 +202,7 @@ DONE:
      .local pmc retv
      retv = find_global "PACKAGES", pkgname_str
      if_null retv, PACKAGE_NOT_FOUND
-     clear_eh
+     pop_eh
 
      goto DONE
 

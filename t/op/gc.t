@@ -308,7 +308,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     push_eh catch
     n = self."b11"(n1)
     # store_lex -1, "n", n
-    clear_eh
+    pop_eh
 catch:
     # n = find_lex "n"
     .return(n)

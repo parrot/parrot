@@ -18,7 +18,7 @@
   $P99 = open filename, '<'
   push_eh badfile
     file_contents = $P99.'slurp'('')
-  clear_eh
+  pop_eh
 
   .local pmc ns, interp
   interp = getinterp

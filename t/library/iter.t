@@ -40,7 +40,7 @@
     push_eh err_load_bytecode
     $S0 = 'Iter.pir'
     load_bytecode $S0
-    clear_eh
+    pop_eh
     $S1 = 'loaded '
     $S1 .= $S0
     'ok'(1, $S1)
@@ -73,7 +73,7 @@
   T2:
     push_eh err_start_noargs
     iter.'start'()
-    clear_eh
+    pop_eh
     'ok'(0, 'start requires an aggregate')
     goto T3
   err_start_noargs:

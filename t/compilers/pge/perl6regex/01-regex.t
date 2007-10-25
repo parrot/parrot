@@ -196,7 +196,7 @@ Description of the test.
   parse_data:
     push_eh eh_bad_line
     ( pattern, target, result, description ) = parse_data( test_line )
-    clear_eh
+    pop_eh
 
     # prepend test filename and line number to description
     description = 'build_test_desc'( description, test_name, local_line_number )
@@ -216,7 +216,7 @@ Description of the test.
   not_skip:
     push_eh thrown
     match = 'match_perl6regex'( pattern, target )
-    clear_eh
+    pop_eh
 
     if match goto matched
 
