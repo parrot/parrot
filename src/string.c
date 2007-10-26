@@ -1454,6 +1454,7 @@ static const char *
 nonnull_encoding_name(STRING *s)
 {
     char *string;
+    string = mem_allocate_zeroed_typed(char);
     if (!s)
         strcpy(string, "null string");
     else
