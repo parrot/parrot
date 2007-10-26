@@ -81,7 +81,7 @@ rule for_stat {
 }
 
 rule fornum {
-    <name> '=' <expression> <?comma> <expression> [ ',' <expression> ]?
+    <Name> '=' <expression> <?comma> <expression> [ ',' <expression> ]?
 }
 
 rule forlist {
@@ -103,7 +103,7 @@ rule function_stat {
 }
 
 rule functionname {
-    <name> [ '.' <name> ]* [ ':' <name> ]?
+    <Name> [ '.' <Name> ]* [ ':' <Name> ]?
 }
 
 rule function_body {
@@ -116,7 +116,7 @@ rule parameter_list {
 }
 
 rule name_list {
-    <name> [ ',' <name> ]*
+    <Name> [ ',' <Name> ]*
 }
 
 
@@ -125,11 +125,11 @@ rule local_stat {
 }
 
 rule local_function {
-    'function' <name> <function_body>
+    'function' <Name> <function_body>
 }
 
 rule local_declaration {
-    <name> [ ',' <name> ]* [ '=' <expression_list> ]?
+    <Name> [ ',' <Name> ]* [ '=' <expression_list> ]?
 }
 
 
@@ -156,7 +156,7 @@ rule tablefield {
 }
 
 rule record_field {
-    [ <name> | <index> ] '=' <expression>
+    [ <Name> | <index> ] '=' <expression>
 }
 
 rule index {
@@ -170,7 +170,7 @@ rule primary_expression {
 
 rule prefix_expression {
     | <parenthesed_expression>
-    | <name>
+    | <Name>
 }
 
 rule parenthesed_expression {
@@ -178,9 +178,9 @@ rule parenthesed_expression {
 }
 
 rule slice_expression {
-    | '.' <name>
+    | '.' <Name>
     | <index>
-    | ':' <name> <function_args>
+    | ':' <Name> <function_args>
     | <function_args>
 }
 

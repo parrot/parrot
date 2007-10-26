@@ -53,7 +53,7 @@ and imports many definitions from the full Lua compiler
 
     $P0 = get_hll_global ['Lua::Grammar'], 'syntaxerror'
     set_hll_global ['Lua::TestLex'], 'die', $P0
-    $P0 = get_hll_global ['Lua::Grammar'], 'name'
+    $P0 = get_hll_global ['Lua::Grammar'], 'Name'
     set_hll_global ['Lua::TestLex'], 'Name', $P0
     $P0 = get_hll_global ['Lua::Grammar'], 'number'
     set_hll_global ['Lua::TestLex'], 'Number', $P0

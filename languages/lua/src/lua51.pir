@@ -125,7 +125,7 @@ for internal global variables used by Lua.
 
 .include 'cclass.pasm'
 
-.sub 'name'
+.sub 'Name'
     .param pmc tgt
     .param pmc adverbs         :slurpy :named
     .local string target
