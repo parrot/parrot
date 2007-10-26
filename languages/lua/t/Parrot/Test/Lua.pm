@@ -34,7 +34,7 @@ sub new {
 }
 
 sub get_test_prog {
-    return $ENV{PARROT_LUA_TEST_PROG} || 'luac.pl';
+    return $ENV{PARROT_LUA_TEST_PROG} || 'lua.pbc';
 }
 
 my %language_test_map = (
