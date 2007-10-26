@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2001-2007, The Perl Foundation.
-# $Id: exception.t 21399 2007-09-19 18:01:01Z paultcochrane $
+# $Id$
 
 use strict;
 use warnings;
