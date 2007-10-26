@@ -49,6 +49,7 @@ An empty Hash PMC is allocated during initialization.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_namespace.h"
 #define PARROT_ROLE(o) ((Parrot_Role *) PMC_data(o))
 
 /* This is the underlying structure of this PMC. */
