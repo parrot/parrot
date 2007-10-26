@@ -35,13 +35,22 @@ sub runstep {
     my ( $self, $conf ) = @_;
     my $parrot_is_shared = $conf->options->get('parrot_is_shared');
 
-    $parrot_is_shared = integrate( $conf->data->get('parrot_is_shared'), $parrot_is_shared );
+    $parrot_is_shared = integrate(
+        $conf->data->get('parrot_is_shared'),
+        $parrot_is_shared
+    );
 
     $parrot_is_shared = 0 unless $conf->data->get('has_dynamic_linking');
 
-    if ( $conf->options->get('ask') && $conf->data->get('has_dynamic_linking') ) {
-        $parrot_is_shared = prompt( "\nShould parrot be built using a shared library?",
-            $parrot_is_shared ? 'y' : 'n' );
+    if (
+        $conf->options->get('ask')
+        &&
+        $conf->data->get('has_dynamic_linking')
+    ) {
+        $parrot_is_shared = prompt(
+            "\nShould parrot be built using a shared library?",
+            $parrot_is_shared ? 'y' : 'n'
+        );
 
         $parrot_is_shared = lc($parrot_is_shared) eq 'y';
     }
