@@ -20,6 +20,7 @@ use warnings;
 use base qw(Parrot::Configure::Step::Base);
 
 use File::Basename qw/basename/;
+use File::Spec::Functions qw/catfile/;
 
 use Parrot::Configure::Step ':inter';
 
@@ -101,6 +102,19 @@ sub sort_pmcs {
     return @sorted_pmcs;
 }
 
+sub contains_pccmethod {
+    my $file = shift;
+    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
+
+    local $_;
+    while (<$fh>) {
+        next unless /PCCMETHOD/;
+        return 1;
+    }
+
+    return;
+}
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -173,12 +187,18 @@ END
         $parent_dumps .= "src/pmc/$_.dump " foreach reverse( ( pmc_parents($pmc) ) );
         my $parent_headers = '';
         $parent_headers .= "src/pmc/pmc_$_.h " foreach ( pmc_parents($pmc) );
+
+        # make each pmc depend upon PCCMETHOD.pm if it uses PCCMETHOD
+        my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
+        my $pccmethod_depend = 
+            contains_pccmethod($pmc_fname) ? 'lib/Parrot/Pmc2c/PCCMETHOD.pm' : '';
+
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
 
 src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) 
-\t\$(PMC2CD) src/pmc/$pmc.pmc 
+\t\$(PMC2CD) src/pmc/$pmc.pmc $pccmethod_depend
 
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
