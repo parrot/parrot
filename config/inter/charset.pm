@@ -32,16 +32,17 @@ sub _init {
     return \%data;
 }
 
+my @charsets_defaults =
+    defined( $ENV{TEST_CHARSET} )
+    ? $ENV{TEST_CHARSET}
+    : sort map { basename($_) } glob "./src/charset/*.c";
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my @charset = (
-        sort
-            map { basename($_) } glob "./src/charset/*.c"
-    );
+    my @charset = @charsets_defaults;
 
-    my $charset_list = $conf->options->get('charset')
-        || join( ' ', grep { defined $_ } @charset );
+    my $charset_list = join ( ' ', grep { defined $_ } @charset );
 
     if ( $conf->options->get('ask') ) {
         print <<"END";
@@ -50,9 +51,10 @@ sub runstep {
 The following charsets are available:
   @charset
 END
-        {
-            $charset_list = prompt( 'Which charsets would you like?', $charset_list );
-        }
+        $charset_list = prompt(
+            'Which charsets would you like?',
+            $charset_list
+        );
     }
 
     # names of class files for src/pmc/Makefile

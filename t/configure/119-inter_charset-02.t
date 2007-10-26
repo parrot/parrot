@@ -1,22 +1,24 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 120-inter_encoding-01.t
+# 119-inter_charset-02.t
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::inter::encoding');
+$ENV{TEST_CHARSET} = 'ascii.c';
+use_ok('config::inter::charset');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Tie::Filehandle::Preempt::Stdin;
 
 my $args = process_options(
     {
-        argv => [],
+        argv => [ q{--ask} ],
         mode => q{configure},
     }
 );
@@ -25,7 +27,7 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{inter::encoding};
+my $pkg = q{inter::charset};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -40,6 +42,15 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
+my ( @prompts, $prompt, $object );
+
+$prompt = $ENV{TEST_CHARSET};
+push @prompts, $prompt;
+
+$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
+can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
+isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
+
 {
     open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
     my $ret = $step->runstep($conf);
@@ -47,23 +58,26 @@ ok( $step->description(), "$step_name has description" );
     ok( $ret, "$step_name runstep() returned true value" );
 }
 
+undef $object;
+untie *STDIN;
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-120-inter_encoding-01.t - test config::inter::encoding
+119-inter_charset-02.t - test config::inter::charset
 
 =head1 SYNOPSIS
 
-    % prove t/configure/120-inter_encoding-01.t
+    % prove t/configure/119-inter_charset-02.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::inter::encoding.
+The tests in this file test subroutines exported by config::inter::charset.
 
 =head1 AUTHOR
 
@@ -71,7 +85,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::inter::encoding, F<Configure.pl>.
+config::inter::charset, F<Configure.pl>.
 
 =cut
 
