@@ -41,7 +41,7 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-$conf->data->set('has_dynamic_linking' => 0);
+$conf->data->set('has_dynamic_linking' => 1);
 
 my ( @prompts, $prompt, $object );
 
