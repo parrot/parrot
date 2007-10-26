@@ -655,7 +655,7 @@ Finish thawing.
                 INTVAL e    = VTABLE_get_integer(INTERP, typemap);
                 INTVAL i;
 
-                for ( i = 0; i < e; ++i ) {
+                for (i = 0; i < e; ++i) {
                     PMC   *key       = VTABLE_shift_pmc(INTERP, iter);
                     INTVAL core_type = VTABLE_get_integer(INTERP, key);
                     INTVAL hll_type  =
