@@ -8,6 +8,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More tests => 3;
 use Parrot::Distribution;
+use Pod::Simple;
 
 =head1 NAME
 
@@ -49,6 +50,22 @@ check_parens(@files);
 
 exit;
 
+sub strip_pod {
+    my $buf = shift;
+    my $parser = Pod::Simple->new();
+    my $non_pod_buf;
+    $parser->output_string( \$non_pod_buf );
+    # set up a code handler to get at the non-pod
+    # thanks to Thomas Klausner's Pod::Strip for the inspiration
+    $parser->code_handler(
+        sub {
+            print {$_[2]{output_fh}} $_[0], "\n";
+        });
+    $parser->parse_string_document( $buf );
+
+    return $non_pod_buf;
+}
+
 sub check_parens {
     my @keyword_paren;
     my @non_keyword_paren;
@@ -58,6 +75,13 @@ sub check_parens {
         my $path = @ARGV ? $file : $file->path();
 
         my $buf = $DIST->slurp($path);
+       
+        # only strip pod from .ops files
+        if ( $path =~ m/\.ops$/ ) {
+            $buf = strip_pod($buf);
+        }
+
+        # strip ', ", and C comments
         $buf =~ s{ (?:
                        (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
                      | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
