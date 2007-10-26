@@ -54,7 +54,7 @@ handlers, invoking each one in turn, but still in the dynamic context of the
 exception (i.e. the call stack is I<not> unwound first).  See below for more
 detail.
 
-If a I<LABEL> or is provided, Parrot creates and pushes a continuation that
+If a I<LABEL> is provided, Parrot creates and pushes a continuation that
 resumes execution at I<LABEL> if invoked, which has the effect of
 unconditionally handling all errors, and unwinding the stack to that label.
 
@@ -134,6 +134,7 @@ exception handler's way of telling Parrot that it has handled the exception.
 =back
 
 =head2 Exception Introspection Opcodes
+
 {{ TODO: Provide exception handler stack introspection. }}
 
 These are the opcodes relevant to introspection of the exception handler stack:
