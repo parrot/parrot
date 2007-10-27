@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 116-init_optimize-03.t
+# 116-init_optimize-05.t
 
 use strict;
 use warnings;
@@ -13,11 +13,10 @@ use_ok('config::init::optimize');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-use Parrot::IO::Capture::Mini;
 
 my $args = process_options(
     {
-        argv => [q{--verbose}],
+        argv => [q{--optimize}],
         mode => q{configure},
     }
 );
@@ -40,38 +39,28 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-# need to capture the --verbose output,
-# because the fact that it does not end
-# in a newline confuses Test::Harness
-{
-    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
-        or croak "Unable to tie";
-    $ret = $step->runstep($conf);
-    ok( defined $ret, "$step_name runstep() returned defined value" );
-    my @more_lines = $tie_out->READLINE;
-    ok( @more_lines, "verbose output captured" );
-}
-untie *STDOUT;
+$conf->data->set('gccversion' => '3.3');
+$ret = $step->runstep($conf);
+ok( defined $ret, "$step_name runstep() returned defined value" );
 
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-116-init_optimize-03.t - test config::init::optimize
+116-init_optimize-05.t - test config::init::optimize
 
 =head1 SYNOPSIS
 
-    % prove t/configure/113-init_optimize.t
+    % prove t/configure/116-init_optimize-05.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by
-config::init::optimize in the case where C<--optimize> was not requested
-on the command-line but C<--verbose> was.
+The tests in this file test subroutines exported by config::init::optimize.
 
 =head1 AUTHOR
 

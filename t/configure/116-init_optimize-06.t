@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 116-init_optimize-03.t
+# 116-init_optimize-06.t
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -17,7 +17,7 @@ use Parrot::IO::Capture::Mini;
 
 my $args = process_options(
     {
-        argv => [q{--verbose}],
+        argv => [q{--optimize}, q{--verbose}],
         mode => q{configure},
     }
 );
@@ -40,6 +40,8 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
+$conf->data->set('gccversion' => '4.1');
+
 # need to capture the --verbose output,
 # because the fact that it does not end
 # in a newline confuses Test::Harness
@@ -53,25 +55,24 @@ ok( $step->description(), "$step_name has description" );
 }
 untie *STDOUT;
 
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-116-init_optimize-03.t - test config::init::optimize
+116-init_optimize-06.t - test config::init::optimize
 
 =head1 SYNOPSIS
 
-    % prove t/configure/113-init_optimize.t
+    % prove t/configure/116-init_optimize-06.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by
-config::init::optimize in the case where C<--optimize> was not requested
-on the command-line but C<--verbose> was.
+The tests in this file test subroutines exported by config::init::optimize.
 
 =head1 AUTHOR
 

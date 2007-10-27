@@ -14,15 +14,6 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-=for hints_for_testing Check latest reports of Parrot configuration
-tools testing coverage to see where your time available for writing
-tests is spent.  You may need to create some dummy optimizations to
-boost test coverage.  Note the comment in POD:  "Should this be part of
-config/inter/progs.pm?"  Also note the reference to
-http://rt.perl.org/rt3//Ticket/Display.html?id=43151.
-
-=cut
-
 my $args = process_options(
     {
         argv => [],
