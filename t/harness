@@ -182,6 +182,7 @@ my @coding_std_tests = map { "t/codingstd/$_" } qw(
     filenames.t
     gmt_utc.t
     linelength.t
+    pccmethod_deps.t
     pir_code_coda.t
     svn_id.t
     tabs.t
