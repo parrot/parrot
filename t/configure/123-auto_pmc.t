@@ -1,14 +1,14 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 123-inter_pmc.t
+# 123-auto_pmc.t
 
 use strict;
 use warnings;
 use Test::More tests =>  2;
 use Carp;
 use lib qw( lib );
-use_ok('config::inter::pmc');
+use_ok('config::auto::pmc');
 
 =for hints_for_testing Check latest reports of Parrot configuration
 tools testing coverage to see where your time available for writing
@@ -24,17 +24,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-123-inter_pmc.t - test config::inter::pmc
+123-auto_pmc.t - test config::auto::pmc
 
 =head1 SYNOPSIS
 
-    % prove t/configure/123-inter_pmc.t
+    % prove t/configure/123-auto_pmc.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::inter::pmc.
+The tests in this file test subroutines exported by config::auto::pmc.
 
 =head1 AUTHOR
 
@@ -42,7 +42,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::inter::pmc, F<Configure.pl>.
+config::auto::pmc, F<Configure.pl>.
 
 =cut
 

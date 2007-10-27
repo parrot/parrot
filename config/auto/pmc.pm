@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/inter/pmc.pm - PMC Files
+config/auto/pmc.pm - PMC Files
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ Asks the user to select which PMC files to include.
 
 =cut
 
-package inter::pmc;
+package auto::pmc;
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step::Base);
 use File::Basename qw/basename/;
 use File::Spec::Functions qw/catfile/;
 
-use Parrot::Configure::Step ':inter';
+use Parrot::Configure::Step ':auto';
 
 sub _init {
     my $self = shift;
@@ -128,22 +128,6 @@ sub runstep {
     my $pmc_list = $conf->options->get('pmc')
         || join( ' ', grep { defined $_ } @pmc );
 
-    if ( $conf->options->get('ask') ) {
-        print <<"END";
-
-
-The following PMC files are available:
-  @pmc
-END
-        {
-            $pmc_list = prompt( 'Which PMC files would you like?', $pmc_list );
-        }
-    }
-
-    # RT#43172 :leo do we really need an interactive step for this
-    # user could deactivate vital PMCs like SArray
-    # so there would be tests needed, that check for vital classes
-
     # names of class files for src/pmc/Makefile
     ( my $TEMP_pmc_o   = $pmc_list ) =~ s/\.pmc/\$(O)/g;
     ( my $TEMP_pmc_str = $pmc_list ) =~ s/\.pmc/\.str/g;
@@ -151,7 +135,7 @@ END
     # calls to pmc2c.pl for src/pmc/Makefile
     my $TEMP_pmc_build = <<"E_NOTE";
 
-# the following part of the Makefile was built by 'config/inter/pmc.pm'
+# the following part of the Makefile was built by 'config/auto/pmc.pm'
 
 E_NOTE
 

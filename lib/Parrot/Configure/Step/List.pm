@@ -29,7 +29,7 @@ my @steps = qw(
     inter::encoding
     inter::types
     inter::ops
-    inter::pmc
+    auto::pmc
     auto::alignptrs
     auto::headers
     auto::sizes
