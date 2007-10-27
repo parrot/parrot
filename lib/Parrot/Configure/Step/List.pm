@@ -28,7 +28,7 @@ my @steps = qw(
     inter::charset
     inter::encoding
     inter::types
-    inter::ops
+    auto::ops
     auto::pmc
     auto::alignptrs
     auto::headers

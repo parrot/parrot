@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 122-inter_ops.t
+# 122-auto_ops.t
 
 use strict;
 use warnings;
@@ -9,14 +9,14 @@ use Test::More tests => 11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::inter::ops');
+use_ok('config::auto::ops');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $args = process_options(
     {
-        argv => [],
+        argv => [ q{--ops=alpha} ],
         mode => q{configure},
     }
 );
@@ -25,7 +25,7 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{inter::ops};
+my $pkg = q{auto::ops};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -54,17 +54,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-122-inter_ops.t - test config::inter::ops
+122-auto_ops.t - test config::auto::ops
 
 =head1 SYNOPSIS
 
-    % prove t/configure/122-inter_ops.t
+    % prove t/configure/122-auto_ops.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::inter::ops.
+The tests in this file test subroutines exported by config::auto::ops.
 
 =head1 AUTHOR
 
@@ -72,7 +72,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::inter::ops, F<Configure.pl>.
+config::auto::ops, F<Configure.pl>.
 
 =cut
 
