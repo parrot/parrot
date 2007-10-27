@@ -1,10 +1,18 @@
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
+#ifndef PARROT_PIR_PIRLEXER_H_GUARD
+#define PARROT_PIR_PIRLEXER_H_GUARD
+
 #ifndef yyHEADER_H
 #define yyHEADER_H 1
 #define yyIN_HEADER 1
 
-#line 6 "pirlexer.h"
+#line 13 "pirlexer.h"
 
-#line 8 "pirlexer.h"
+#line 15 "pirlexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -338,6 +346,15 @@ extern int yylex (YYSTYPE * yylval_param ,yyscan_t yyscanner);
 #line 1660 "pir.l"
 
 
-#line 342 "pirlexer.h"
+#line 349 "pirlexer.h"
 #undef yyIN_HEADER
 #endif /* yyHEADER_H */
+
+#endif /* PARROT_PIR_PIRLEXER_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

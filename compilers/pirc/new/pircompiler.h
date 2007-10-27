@@ -28,4 +28,3 @@ extern char const *get_current_file(struct lexer_state const * const lexer);
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
