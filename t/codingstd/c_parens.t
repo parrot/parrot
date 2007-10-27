@@ -75,7 +75,7 @@ sub check_parens {
         my $path = @ARGV ? $file : $file->path();
 
         my $buf = $DIST->slurp($path);
-       
+
         # only strip pod from .ops files
         if ( $path =~ m/\.ops$/ ) {
             $buf = strip_pod($buf);
