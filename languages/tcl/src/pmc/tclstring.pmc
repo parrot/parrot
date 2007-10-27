@@ -28,6 +28,11 @@ pmclass TclString
         STRING* S0;
 
         if (! str) return SELF;
+        /*
+         * XXX This prevents a segfault; retval gets claimed before it
+         * it is used below without this register. This shouldn't happen
+         */
+        dod_register_pmc(INTERP, retval); 
 
         len = string_length(INTERP, str);
 
