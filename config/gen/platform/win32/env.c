@@ -36,8 +36,8 @@ Parrot_setenv(const char *name, const char *value)
                     name_len     /* name  */
                     + 1          /* '='   */
                     + value_len  /* value */
-                    + 1          /* string terminator */
-            );
+                    + 1);        /* string terminator */
+
             if (envstring == NULL) {
                 /* TODO: Shouldn't we tell anyone that we failed? */
                 return;
