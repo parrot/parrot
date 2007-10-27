@@ -32,8 +32,8 @@
 ;;;;
 ;;;; COPYRIGHT (C) 2002 Edward Marco Baringer. All Rights Reserved.
 ;;;; This file is free software. It may be used, redistributed
-;;;; and/or modified under the terms of the Perl Artistic License
-;;;; (see http://www.perl.com/perl/misc/Artistic.html)
+;;;; and/or modified under the terms of the Perl Artistic License 2.0
+;;;; (see http://www.perlfoundation.org/artistic_license_2_0)
 ;;;;
 
 (defvar *pasm-mode-syntax-table* nil)
