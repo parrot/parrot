@@ -9,9 +9,6 @@ Copyright (C) 2006, The Perl Foundation.
 
 Some files have a different copyright:
 
-editor/pasm.el:
-Copyright (C) 2002 Edward Marco Baringer. All Rights Reserved
-
 compilers/imcc/imcc.y, compilers/imcc/main.c, compilers/imcc/parser_util.c,
 languages/cola/:
 Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
@@ -31,9 +28,7 @@ Copyright (c) 2001-2002 Sean M. Burke.  All rights reserved.
 License:
 
 This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+the terms of the Perl Artistic License version 2.0.
 
-Perl is distributed under your choice of the GNU General Public License or
-the Artistic License.  On Debian GNU/Linux systems, the complete text of the
-GNU General Public License can be found in `/usr/share/common-licenses/GPL'
-and the Artistic Licence in `/usr/share/common-licenses/Artistic'.
+On Debian GNU/Linux systems, the complete text of the Artistic Licence in 
+`/usr/share/common-licenses/Artistic'.
