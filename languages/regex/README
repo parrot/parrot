@@ -266,7 +266,7 @@ BUGS
 DEVELOPER NOTES
 ===============
 
-If you make changes to Grammar.y, you'll need Parse::Yapp to
+If you make changes to Grammar.yp, you'll need Parse::Yapp to
 regenerate Grammar.pm. Run 'make' with no options to pass the correct
 command-line parameters.
 
