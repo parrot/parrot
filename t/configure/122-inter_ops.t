@@ -5,17 +5,48 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  2;
+use Test::More tests => 11;
 use Carp;
-use lib qw( lib );
+use lib qw( lib t/configure/testlib );
+use_ok('config::init::defaults');
 use_ok('config::inter::ops');
+use Parrot::Configure;
+use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-=for hints_for_testing Check latest reports of Parrot configuration
-tools testing coverage to see where your time available for writing
-tests is spent.  You will have to determine a way to test a user
-response to a prompt.
+my $args = process_options(
+    {
+        argv => [],
+        mode => q{configure},
+    }
+);
 
-=cut
+my $conf = Parrot::Configure->new;
+
+test_step_thru_runstep( $conf, q{init::defaults}, $args );
+
+my $pkg = q{inter::ops};
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+
+my ( $task, $step_name, @step_params, $step);
+$task        = $conf->steps->[1];
+$step_name   = $task->step;
+@step_params = @{ $task->params };
+
+$step = $step_name->new();
+ok( defined $step, "$step_name constructor returned defined value" );
+isa_ok( $step, $step_name );
+ok( $step->description(), "$step_name has description" );
+
+$conf->options->set('ops' => 'alpha');
+{
+    open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
+    my $ret = $step->runstep($conf);
+    close STDOUT or croak "Unable to close after myout";
+    ok( $ret, "$step_name runstep() returned true value" );
+}
 
 pass("Completed all tests in $0");
 
