@@ -1,7 +1,7 @@
 /*
  * datatypes.h
  *  Copyright (C) 2002, The Perl Foundation.
- *  License:  Artistic/GPL, see README and LICENSES for details
+ *  License:  Artistic 2.0, see README and LICENSES for details
  *  SVN Info
  *     $Id$
  *  Overview:
