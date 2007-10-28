@@ -362,7 +362,8 @@ This is to exclude automatically generated C-language files Parrot might have.
             src/malloc.c
             } unless @exemptions;
 
-        $file->path =~ /\Q$_\E$/ && return 1 for @exemptions;
+        my $path = -f $file ? $file : $file->path;
+        $path =~ /\Q$_\E$/ && return 1 for @exemptions;
         return;
     }
 }
