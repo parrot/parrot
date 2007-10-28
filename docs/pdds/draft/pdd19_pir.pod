@@ -6,7 +6,7 @@ docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
 
 =head1 ABSTRACT
 
-This document is outlines the architecture and core syntax of the Parrot
+This document outlines the architecture and core syntax of the Parrot
 Intermediate Representation (PIR).
 
 This document describes PIR, a stable, middle-level language for both
@@ -54,7 +54,7 @@ Identifiers start with a letter or underscore, then may contain additionally
 letters, digits, and underscores. Identifiers don't have any limit on length at
 the moment, but some sane-but-generous length limit may be imposed in the
 future (256 chars, 1024 chars?). The following examples are all valid
-identifiers. 
+identifiers.
 
     a
     _a
@@ -197,7 +197,7 @@ C<0x> and C<0b> denote hex and binary constants respectively.
 
 =back
 
-=head2 Directives 
+=head2 Directives
 
 =over 4
 
@@ -473,13 +473,13 @@ to C<unless_null var, identifier>.
 =item if <var1> <relop> <var2> goto <identifier>
 
 The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If 
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If
 I<var1 relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
 The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. Unless 
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. Unless
 I<var1 relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item <var1> = <var2>
@@ -895,9 +895,9 @@ the C<assign_pmc> vtable function.
 
 {{ NOTE: response to the question:
 
-	<pmichaud>	I don't think that 'morph' as a method call is a good idea
-	<pmichaud>	we need something that says "assign to value" versus "assign to container"
-	<pmichaud>	we can't eliminate the existing 'morph' opcode until we have a replacement
+    <pmichaud>  I don't think that 'morph' as a method call is a good idea
+    <pmichaud>  we need something that says "assign to value" versus "assign to container"
+    <pmichaud>  we can't eliminate the existing 'morph' opcode until we have a replacement
 
 }}
 
