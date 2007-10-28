@@ -1,15 +1,15 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 124-auto_alignptrs-01.t
+# 125-auto_headers-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More qw(no_plan); # tests =>  2;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::alignptrs');
+use_ok('config::auto::headers');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
@@ -25,7 +25,7 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my $pkg = q{auto::alignptrs};
+my $pkg = q{auto::headers};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -50,17 +50,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-124-auto_alignptrs-01.t - test config::auto::alignptrs
+125-auto_headers-01.t - test config::auto::headers
 
 =head1 SYNOPSIS
 
-    % prove t/configure/124-auto_alignptrs-01.t
+    % prove t/configure/125-auto_headers-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::alignptrs.
+The tests in this file test subroutines exported by config::auto::headers.
 
 =head1 AUTHOR
 
@@ -68,7 +68,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::alignptrs, F<Configure.pl>.
+config::auto::headers, F<Configure.pl>.
 
 =cut
 
