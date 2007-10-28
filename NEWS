@@ -1,5 +1,41 @@
 # $Id$
 
+New through r22546
+- Implementation
+  + PDD15 (OO) branch merged with trunk.
+  + Added pop_eh/push_eh_p opcodes
+  + Add --runcore command line option
+  + Add gcdebug runcore to help track down GC bugs
+- Documentation
+  + PDD19 (PIR): updates to macros, .pcc* directives
+  + PDD25 (AST):  draft approved
+  + Copyright cleanups
+- Languages/Compilers
+  + languages/APL: minor updates, pdd15 conformance
+  + languages/dotnet: minor updates
+  + languages/lua: minor updates, pdd15 conformance
+  + languages/lisp: minor updates
+  + languages/perl6: minor updates, pdd15 conformance
+  + languages/plumhead: minor updates
+  + languages/punie: minor updates, pdd15 conformance
+  + languages/nqp: minor updates
+  + languages/scheme: minor updates, pdd15 conformance
+  + languages/tcl: bugfixes, pdd15 conformance
+  + compilers/pirc: minor updates
+  + compilers/pct: minor updates, pdd15 conformance
+  + compilers/pge: pdd15 conformance
+  + compilers/tge: pdd15 conformance
+- Configuration
+  + Improve test coverage
+  + Improve reporting when a step fails; allow abort on failure
+- Miscellaneous
+  + More coding standard conformance, tests, cleanup, speedups
+  + Fewer GC bugs
+  + Eliminate .imc extension (use .pir)
+  + Add ability to 
+  + Simplify some core config steps to not allow interactive prompting
+
+
 New in 0.4.17
 - Implementation
  + Bug fixes (including Coverity IDs 20, 22, 30, 119-122, 124-126, 129-131)
