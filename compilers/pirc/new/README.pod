@@ -59,12 +59,10 @@ heredocs as function arguments, like so:
    ...
  BYE
 
-=item * No Globals.
+=item * Reentrant
 
-Well, almost. At least the current implementation does not define any globals, any
-global variables that are around, are defined by the generated lexer or parser code.
-Both Bison as Flex have support to generate re-entrant code. This needs to be
-completed.
+The generated lexer and parser are fully re-entrant. (It does need to be tested, though).
+
 
 =item * Comments!
 
