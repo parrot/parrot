@@ -35,7 +35,7 @@
 
 #define IMCC_MAX_FIX_REGS PARROT_MAX_ARGS
 #if IMCC_MAX_FIX_REGS > 16
-#  error: flags wont fit
+ #  error: flags wont fit
 #endif
 
 #ifdef MAIN

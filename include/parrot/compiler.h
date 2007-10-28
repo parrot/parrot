@@ -17,7 +17,7 @@
  */
 
 #ifdef HASATTRIBUTE_NEVER_WORKS
-#  error This attribute can never succeed.  Something has mis-sniffed your configuration.
+ #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
 #ifdef HASATTRIBUTE_DEPRECATED
 #  ifdef _MSC_VER
