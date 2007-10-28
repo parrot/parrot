@@ -32,7 +32,7 @@ pmclass TclString
          * XXX This prevents a segfault; retval gets claimed before it
          * it is used below without this register. This shouldn't happen
          */
-        dod_register_pmc(INTERP, retval); 
+        Parrot_register_pmc(INTERP, retval);
 
         len = string_length(INTERP, str);
 
@@ -48,8 +48,10 @@ pmclass TclString
             I1 = pos;
           find_close_bracket:
             I1++;
-            if (I1 >= len)
+            if (I1 >= len) {
+                Parrot_unregister_pmc(INTERP, retval);
                 real_exception(INTERP, NULL, 1, "unmatched open brace in list");
+            }
 
             I0 = string_ord(INTERP,str,I1);
             if (I0 == '{') {
@@ -67,6 +69,8 @@ pmclass TclString
                     I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
                     I0 = I0 - I1;
                     S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
+
+                    Parrot_unregister_pmc(INTERP, retval);
                     real_exception(INTERP, NULL, 1,
                             "list element in braces followed by \"%s\" instead of space",
                             string_to_cstring(INTERP, S0));
@@ -79,7 +83,7 @@ pmclass TclString
                 pos = pos + I0 + 1;
 
                 /* Now add that list as another element*/
-                retval->vtable->push_string(INTERP, retval, S0);
+                VTABLE_push_string(INTERP, retval, S0);
                 goto eat_space;
             }
             else if (I0 == '\\') {
@@ -93,8 +97,10 @@ pmclass TclString
             /* find the closing '"'*/
             I1 = ++pos;
           quote_loop:
-            if (I1 >= len)
+            if (I1 >= len) {
+                Parrot_unregister_pmc(INTERP, retval);
                 real_exception(INTERP, NULL, 1, "unmatched open quote in list");
+            }
             I0 = string_ord(INTERP,str,I1);
             if (I0 == '\\') {
                 I1 += 2;
@@ -125,7 +131,7 @@ pmclass TclString
         /* add it to the list*/
         P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP,"TclConst")));
         VTABLE_set_string_native(INTERP, P0, S0);
-        retval->vtable->push_pmc(INTERP, retval, P0);
+        VTABLE_push_pmc(INTERP, retval, P0);
 
         /* find the next pos */
         pos = I0;
@@ -139,7 +145,7 @@ pmclass TclString
 
             P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP,"TclConst")));
             VTABLE_set_string_native(INTERP, P0, S0);
-            retval->vtable->push_pmc(INTERP, retval, P0);
+            VTABLE_push_pmc(INTERP, retval, P0);
 
             pos = I1 + 1;
             goto eat_space;
@@ -151,6 +157,7 @@ pmclass TclString
             I0 = CHARSET_FIND_CCLASS(INTERP, enum_cclass_whitespace, str, I1, I0);
             I0 = I0 - I1;
             S0 = string_substr(INTERP, str, I1, I0, &S0, 0);
+            Parrot_unregister_pmc(INTERP, retval);
             real_exception(INTERP, NULL, 1,
                     "list element in quotes followed by \"%s\" instead of space",
                     string_to_cstring(INTERP, S0));
@@ -158,6 +165,7 @@ pmclass TclString
 
 
       done:
+        Parrot_unregister_pmc(INTERP, retval);
         return retval;
     }
 }
