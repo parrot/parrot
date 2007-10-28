@@ -1364,7 +1364,6 @@ lexer_state *my_lexer = yyget_extra(yyscanner);
 ".arg"            { return TK_ARG; }
 ".const"          { return TK_CONST; }
 ".emit"           { return TK_EMIT; }
-".endnamespace"   { return TK_ENDNAMESPACE; }
 ".end"            { return TK_END; }
 
 ".eom"            { return TK_EOM; }

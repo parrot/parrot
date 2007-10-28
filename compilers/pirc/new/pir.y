@@ -90,7 +90,6 @@ extern struct lexer_state *new_lexer(char * const filename);
        TK_LEX           ".lex"
        TK_LOCAL         ".local"
        TK_NAMESPACE     ".namespace"
-       TK_ENDNAMESPACE  ".endnamespace"
        TK_INVOCANT      ".invocant"
        TK_METH_CALL     ".meth_call"
        TK_GLOBALCONST   ".globalconst"
@@ -357,7 +356,6 @@ instruction: if_statement
            | local_declaration
            | lex_declaration
            | const_decl_statement
-           | namespace_statement
            | return_statement
            | yield_statement
            | invocation_statement
@@ -568,10 +566,6 @@ method: identifier
       | TK_PASM_PREG
       | TK_SYM_PREG
       ;
-
-namespace_statement: ".namespace" identifier "\n"
-                   | ".endnamespace" identifier "\n"
-                   ;
 
 return_statement: short_return_statement
                 | long_return_statement
