@@ -27,6 +27,27 @@ developing core features and extensions for Parrot.
 A valid PIR program consists of a sequence of statements, directives, comments
 and empty lines.
 
+=head3 Statements
+
+A statement starts with an optional label, contains an instruction, and is
+terminated by a newline (<NL>). Each statement must be on its own line.
+
+  [label:] [instruction] <NL>
+
+An instruction may be either a low-level opcode or a higher-level PIR
+operation, such as a subroutine call, a method call, or PIR syntactic sugar.
+
+=head3 Directives
+
+A directive provides information for the PIR compiler that is outside the
+normal flow of executable statements. Directives are all prefixed with a ".",
+as in C<.local> or C<.sub>.
+
+=head3 Comments
+
+Comments start with C<#> and last until the following newline. PIR also allows
+comments in Pod format. Comments, Pod content, and empty lines are ignored.
+
 =head3 Identifiers
 
 Identifiers start with a letter or underscore, then may contain additionally
@@ -43,25 +64,6 @@ Opcode names are not reserved words in PIR, and may be used as variable names.
 For example, you can define a local variable named C<print>.  [See #24251.]
 
 NOTE: The use of C<::> in identifiers is deprecated.
-
-=head3 Comments
-
-Comments start with C<#> and last until the following newline. PIR also allows
-comments in Pod format. Comments, Pod content, and empty lines are ignored.
-
-=head3 Statements
-
-A I<statement> starts with an optional label, contains an instruction (a Parrot
-operation or opcode), and is terminated by a newline (<NL>). Each statement
-must be on its own line.
-
-  [label:] [instruction] <NL>
-
-=head3 Directives
-
-A directive provides information for the PIR compiler that is outside the
-normal flow of executable statements. Directives are all prefixed with a ".",
-as in C<.local> or C<.sub>.
 
 =head3 Labels
 
@@ -101,7 +103,7 @@ The difference between direct register access and register variables or local
 variables is largely a matter of allocation. If you directly reference C<P99>,
 Parrot will blindly allocate 100 registers for that compilation unit. If you
 reference C<$P99> or a named variable C<foo>, on the other hand, Parrot will
-intelligently allocate a literal register in the background, so C<$P99> may be
+intelligently allocate a literal register in the background. So, C<$P99> may be
 stored in C<P0>, if it is the only register in the compilation unit.
 
 =head2 Constants
@@ -201,9 +203,9 @@ C<0x> and C<0b> denote hex and binary constants respectively.
 
 =item .local <type> <identifier> [:unique_reg]
 
-Define a local name I<identifier> for this I<compilation unit> and of the
-given I<type>. You can define multiple identifiers of the same type by
-separating them with commas:
+Define a local name I<identifier> for this compilation unit with the given
+I<type>. You can define multiple identifiers of the same type by separating
+them with commas:
 
   .local int i, j
 
@@ -239,18 +241,14 @@ directive. For example, given this preamble:
 =item .const <type> <identifier> = <const>
 
 Define a constant named I<identifier> of type I<type> and assign value
-I<const> to it.
-
-{{ NOTE: C<.const> is deprecated, replaced with C<.constant>. }}
+I<const> to it. The constant is stored in the constant table of the current
+bytecode file.
 
 =item .globalconst <type> <identifier> = <const>
 
 As C<.const> above, but the defined constant is globally accessible.
 
-{{ Proposal: Change name to C<.globalconstant> for consistency with
-C<.constant>. }}
-
-=item .namespace <identifier>
+=item .namespace <identifier> [deprecated]
 
 Open a new scope block. This "namespace" is not the same as the
 .namespace [ <identifier> ] syntax, which is used for storing subroutines
@@ -268,7 +266,11 @@ This directive is useful in cases such as (pseudocode):
 All types of common language constructs such as if, for, while, repeat and such
 that have nested scopes, can use this directive.
 
-=item .endnamespace <identifier>
+{{ NOTE: this variation of C<.namespace> and C<.endnamespace> are deprecated.
+They were a hackish attempt at implementing scopes in Parrot, but didn't
+actually turn out to be useful.}}
+
+=item .endnamespace <identifier> [deprecated]
 
 Closes the scope block that was opened with .namespace <identifier>.
 
@@ -276,8 +278,8 @@ Closes the scope block that was opened with .namespace <identifier>.
 
 Defines the namespace from this point onwards.  By default the program is not
 in any namespace.  If you specify more than one, separated by semicolons, it
-creates nested namespaces, by storing the inner namespace object with a C<\0>
-prefix in the outer namespace's global pad.
+creates nested namespaces, by storing the inner namespace object in the outer
+namespace's global pad.
 
 =item .pragma n_operators
 
@@ -299,17 +301,17 @@ parsed.  See also the C<loadlib> opcode, which does the same at run time.
 A library loaded this way is also available at runtime, as if it has been
 loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
-=item .HLL "hll_name", "hll_lib"
+=item .HLL "<hll_name>", "<hll_lib>"
 
-Define the HLL for the current file. If the string C<hll_lib> isn't empty
+Define the HLL for the current file. If the string I<hll_lib> isn't empty
 this compile time pragma also loads the shared lib for the HLL, so that
 integer type constants are working for creating new PMCs.
 
-=item .HLL_map 'CoreType', 'UserType'
+=item .HLL_map '<CoreType>', '<UserType>'
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program it consults the current type mapping for the executing HLL
-and creates a PMC of type I<'UserType'> instead of I<'CoreType'>, if such
+and creates a PMC of type I<UserType> instead of I<CoreType>, if such
 a mapping is defined.
 
 E.g. with this code snippet ...
@@ -332,7 +334,7 @@ E.g. with this code snippet ...
   .sub <quoted string> [:<flag> ...]
 
 Define a compilation unit. All code in a PIR source file must be defined in a
-compilation unit. See L<PIR Calling Conventions|imcc/calling_conventions> for
+compilation unit. See L<PDD03|docs/pdds/pdd03_calling_conventions.pod> for
 available flags.  Optional flags are a list of I<flag>, separated by empty
 spaces, and empty spaces only.
 
@@ -351,29 +353,30 @@ End a compilation unit. Always paired with C<.sub>.
 
 =item .emit
 
-Define a compilation unit containing PASM code. Always paired with
-C<.eom>.
+Define a compilation unit containing PASM code (only opcodes and a limited
+subset of directives). Always paired with C<.eom>.
 
 =item .eom
 
 End a compilation unit containing PASM code. Always paired with
 C<.emit>.
 
-=item .pcc_*
+=item .begin_*, .end_*, .call
 
-Directives used for Parrot Calling Conventions. These are:
+Directives used for Parrot calling conventions. These are:
 
 =over 4
 
-=item .pcc_begin and .pcc_end
+=item .begin_call and .end_call
 
-=item .pcc_begin_return and .pcc_end_return
+=item .begin_return and .end_return
 
-=item .pcc_begin_yield and .pcc_end_yield
+=item .begin_yield and .end_yield
 
-=item .pcc_call
+=item .call
 
 =back
+
 
 {{ REVIEW: Do we still want/need the "pcc_" prefix? See #45925. }}
 
@@ -398,10 +401,9 @@ Define a named parameter. This is syntactic sugar for:
 
 =item .return <var> [:<flag> ...]
 
-Between C<.pcc_begin_return> and C<.pcc_end_return>, specify one or
+Between C<.begin_return> and C<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
-flags:
-C<:flat>, C<:named>.
+flags: C<:flat>, C<:named>.
 
 =back
 
@@ -411,73 +413,18 @@ C<:flat>, C<:named>.
 
 =item .arg <var> [:<flag> ...]
 
-Between C<.pcc_begin> and C<.pcc_call>, specify an argument to be
+Between C<.begin_call> and C<.call>, specify an argument to be
 passed.  Available flags: C<:flat>, C<:named>.
 
 =item .result <var> [:<flag> ...]
 
-Between C<.pcc_call> and C<.pcc_end>, specify where one or more return
+Between C<.call> and C<.end_call>, specify where one or more return
 value(s) should be stored.  Available flags:
 C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
 
 =back
 
-=head3 Shorthand directives for PCC call and return
-
-=over 4
-
-=item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
-
-This is short for:
-
-  .pcc_begin
-  .pcc_arg <arg1> <flag2>
-  ...
-  .pcc_call <var2>
-  .result <var1> <flag1>
-  ...
-  .pcc_end
-
-=item <var> = <var>([arg [:<flag> ...], ...])
-
-=item <var>([arg [:<flag> ...], ...])
-
-=item <var>."_method"([arg [:<flag> ...], ...])
-
-=item <var>._method([arg [:<flag> ...], ...])
-
-Function or method call. These notations are shorthand for a longer
-PCC function call with C<.pcc_*> directives. I<var> can denote a
-global subroutine, a local I<identifier> or a I<reg>.
-
-{{We should review the (currently inconsistent) specification of the
-method name. Currently it can be a bare word, a quoted string or a
-string register. See #45859.}}
-
-=item .return ([<var> [:<flag> ...], ...])
-
-Return from the current compilation unit with zero or more values.
-
-The surrounded parentheses are mandatory. Besides making sequence
-break more conspicuous, this is necessary to distinguish this syntax
-from other uses of the C<.return> directive that will be probably
-deprecated.
-
-=item .return <var>(args)
-
-=item .return <var>."somemethod"(args)
-
-=item .return <var>.somemethod(args)
-
-Tail call: call a function or method and return from the sub with the
-function or method call return values.
-
-Internally, the call stack doesn't increase because of a tail call, so
-you can write recursive functions and not have stack overflows.
-
-=back
-
-=head2 Parameter Passing and Getting Flags
+=head3 Parameter Passing and Getting Flags
 
 See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
 the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
@@ -526,14 +473,14 @@ to C<unless_null var, identifier>.
 =item if <var1> <relop> <var2> goto <identifier>
 
 The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If C<var1
-relop var2> evaluates as true, jump to the named I<identifier>.
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If 
+I<var1 relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>
 
 The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>> which translate
-to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. Unless C<var1
-relop var2> evaluates as true, jump to the named I<identifier>.
+to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. Unless 
+I<var1 relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item <var1> = <var2>
 
@@ -574,6 +521,10 @@ var, 1> for string arguments and an integer key.
 
 =item <var> = <var> [ <key> ]
 
+{{ NOTE: keyed assignment is still valid in PIR, but the C<..> notation in keys
+is deprecated, so this syntactic sugar for slices is also deprecated. See the
+(currently experimental) C<slice> opcode instead. }}
+
 where C<key> is:
 
  <var1> .. <var2>
@@ -593,8 +544,10 @@ and t/pmc/slice.t.
 
 =item <var> [ <var> ] = <var>
 
-A keyed C<set> operation or the assign C<substr> op with a length of
-1.
+A keyed C<set> operation.
+
+{{ DEPRECATION NOTE: this syntactic sugar will no longer be used for the assign
+C<substr> op with a length of 1. }}
 
 =item <var> = new '<type>'
 
@@ -640,17 +593,62 @@ Set I<var> to null. Translate to C<null <var>.
 
 Return the address of a label.
 
-=back
+=item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
 
+This is short for:
+
+  .begin_call
+  .arg <arg1> <flag2>
+  ...
+  .call <var2>
+  .result <var1> <flag1>
+  ...
+  .end_call
+
+=item <var> = <var>([arg [:<flag> ...], ...])
+
+=item <var>([arg [:<flag> ...], ...])
+
+=item <var>."_method"([arg [:<flag> ...], ...])
+
+=item <var>._method([arg [:<flag> ...], ...])
+
+Function or method call. These notations are shorthand for a longer
+PCC function call. I<var> can denote a global subroutine, a local I<identifier>
+or a I<reg>.
+
+{{We should review the (currently inconsistent) specification of the
+method name. Currently it can be a bare word, a quoted string or a
+string register. See #45859.}}
+
+=item .return ([<var> [:<flag> ...], ...])
+
+Return from the current compilation unit with zero or more values.
+
+The surrounded parentheses are mandatory. Besides making sequence
+break more conspicuous, this is necessary to distinguish this syntax
+from other uses of the C<.return> directive that will be probably
+deprecated.
+
+=item .return <var>(args)
+
+=item .return <var>."somemethod"(args)
+
+=item .return <var>.somemethod(args)
+
+Tail call: call a function or method and return from the sub with the
+function or method call return values.
+
+Internally, the call stack doesn't increase because of a tail call, so
+you can write recursive functions and not have stack overflows.
+
+=back
 
 
 =head2 Macros
 
-This section describes the macro layer of the PIR language.
-
-=head3 Current Situation
-
-The macro layer of the PIR compiler handles the following directives:
+This section describes the macro layer of the PIR language. The macro layer of
+the PIR compiler handles the following directives:
 
 =over 4
 
@@ -663,44 +661,72 @@ name of the PIR file that is included.
 
 The C<.macro> directive starts the definition of a macro.
 
-=item * C<.constant>
+=item * C<.macro_const>
 
-The C<.constant> directive is a special type of macro; it allows the
-user to use a symbolic name for a constant value or a register.
+The C<.macro_const> directive is a special type of macro; it allows the user to
+use a symbolic name for a constant value. Like C<.macro>, the substitution
+occurs at compile time.
+
+{{ NOTE: C<.constant> is deprecated, replaced by C<.macro_const>. }}
 
 =back
 
+The macro layer is completely implemented in the lexical analysis phase.
+The parser does not know anything about what happens in the lexical
+analysis phase.
 
-=head3 Proposed Situation
+When the C<.include> directive is encountered, the specified file is opened
+and the following tokens that are requested by the parser are read from
+that file.
 
-The current macro layer has a few limitations. These are listed below.
+A macro expansion is a dot-prefixed identifier. For instance, if a macro
+was defined as shown below:
 
-=over 4
+ .macro foo(bar)
+ ...
+ .endm
 
-=item * Macro parameter list
+this macro can be expanded by writing C<.foo(42)>. The body of the macro
+will be inserted at the point where the macro expansion is written.
 
-If a macro defines no parameter list (not even the parentheses), then
-the macro expansion should not specify any parenthesis. This means that
-a macro defined as:
+A C<.macro_const> expansion is more or less the same as a C<.macro> expansion,
+except that a constant expansion cannot take any arguments, and the
+substitution of a C<.macro_const> contains no newlines, so it can be used within
+a line of code.
+
+=head3 Macro parameter list
+
+The parameter list for a macro is specified in parentheses after the name of
+the macro. Macro parameters are not typed.
+
+ .macro foo(bar, baz, buz)
+ ...
+ .endm
+
+The number of arguments in the call to a macro must match the number of
+parameters in the macro's parameter list. Macros do not perform multidispatch,
+so you can't have two macros with the same name but different parameters.
+Calling a macro with the wrong number of arguments gives the user an error.
+
+If a macro defines no parameter list, parentheses are optional on both the
+definition and the call.  This means that a macro defined as:
 
  .macro foo
  ...
  .endm
 
-can only be expanded by writing C<.foo>. Writing C<.foo()> is an error.
-If, however, the macro definition is written as:
+can be expanded by writing either C<.foo> or C<.foo()>. And a macro definition
+written as:
 
  .macro foo()
  ...
  .endm
 
-then writing C<.foo> is an error, and instead the user should write this
-as C<.foo()>. On the one hand this behavior is consistent, but on the other
-hand the error message is somewhat dubious; if the user writes C<.foo> when
-the macro was defined as above (C<foo()>), then the error message indicates
-that the macro needs 1 argument.
+can also be expanded by writing either C<.foo> or C<.foo()>.
 
-Some rationalization would be desirable.
+{{ NOTE: this is a change from the current implementation, which requires the
+definition and call of a zero-parameter macro to match in the use of
+parentheses. }}
 
 =item * Heredoc arguments
 
@@ -717,7 +743,11 @@ the following is not allowed:
 
  EOS
 
-=item * Unique local variables
+{{ NOTE: This is likely because the parsing of heredocs happens later than the
+preprocessing of macros. Might be nice if we could parse heredocs at the macro
+level, but not a high priority. }}
+
+=head3 Unique local labels
 
 Within the macro body, the user can declare a unique label identifier using
 the value of a macro parameter, like so:
@@ -728,20 +758,46 @@ the value of a macro parameter, like so:
   ...
   .endm
 
-Currently, IMCC still allows for writing C<.local> to declare a local label,
-but that is deprecated. Use C<.label> instead.
+{{ NOTE: Currently, IMCC still allows for writing C<.local> to declare a local
+label, but that is deprecated. Use C<.label> instead. }}
 
-However, it would be helpful if it were possible to declare unique local variables
-as well. The syntax for this could be as follows:
+=head3 Unique local variables
+
+Within the macro body, the user can declare a local variable with a unique
+name.
+
+  .macro foo()
+  ...
+  .macro_local int b
+  ...
+  .b = 42
+  print .b # prints the value of the unique variable (42)
+  ...
+  .endm
+
+The C<.macro_local> directive declares a local variable with a unique name in
+the macro. When the macro C<.foo()> is called, the resulting code that is given
+to the parser will read as follows:
+
+  .sub main
+    .local int local__foo__b
+    ...
+    local__foo__b = 42
+    print local__foo__b
+
+  .end
+
+The user can also declare a local variable with a unique name set to the
+symbolic value of one of the macro parameters.
 
   .macro foo(b)
   ...
-  .local int $b
+  .macro_local int $b
   ...
   .$b = 42
   print .$b # prints the value of the unique variable (42)
-  print .b  # prints the name of the variable, which is the value
-            # of parameter "b".
+  print .b  # prints the value of parameter "b", which is
+            # also the name of the variable.
   ...
   .endm
 
@@ -749,11 +805,43 @@ So, the special C<$> character indicates whether the symbol is interpreted as ju
 the value of the parameter, or that the variable by that name is meant. Obviously,
 the value of C<b> should be a string.
 
+The automatic name munging on C<.macro_local> variables allows for using
+multiple macros, like so:
+
+  .macro foo(a)
+  .macro_local int $a
+  .endm
+
+  .macro bar(b)
+  .macro_local int $b
+  .endm
+
+  .sub main
+    .foo("x")
+    .bar("x")
+  .end
+
+This will result in code for the parser as follows:
+
+  .sub main
+    .local int local__foo__x
+    .local int local__bar__x
+  .end
+
+
+{{ PROPOSAL: should C<.macro_local> also add a random value to the munged name,
+to allow multiple calls to the same macro from within the same compilation
+unit? May not be used often enough to be worth adding it. The same effect can
+be achieved by using a symbolic parameter name for the macro local, it's just
+slightly less convenient.  }}
+
+=head3 Ordinary local variables
+
 Defining a non-unique variable can still be done, using the normal syntax:
 
   .macro foo(b)
   .local int b
-  .local int $b
+  .macro_local int $b
   .endm
 
 When invoking the macro C<foo> as follows:
@@ -771,86 +859,45 @@ the resulting code that is given to the parser will read as follows:
 
   .sub main
     .local int b
-	.local int x
-	.local int b
-	.local int y
+    .local int local__foo__x
+    .local int b
+    .local int local__foo__y
   .end
 
 Obviously, this will result in an error, as the variable C<b> is defined twice.
-Of course, it would be a good idea to give the unique variable in the macro a
-special prefix, like so:
-
-    .local int local__foo__x
-
-This allows for using multiple macros, like so:
-
-  .macro foo(a)
-  .local int $a
-  .endm
-
-  .macro bar(b)
-  .local int $b
-  .endm
-
-  .sub main
-    .foo("x")
-	.bar("x")
-  .end
-
-This will result in code for the parser as follows:
-
-  .sub main
-    .local int local__foo__x
-	.local int local__bar__x
-  .end
-
-An additional special character, not allowed for user-defined variables,
-could be added to the generated name, so that a user-defined variable
-cannot conflict (if the user were to declare a variable by name of
-C<local__foo__x>.)
+If you intend the macro to create unique variables names, use C<.macro_local>
+instead of C<.local> to take advantage of the name munging.
 
 =back
 
-=head2 Implementation
+=head2 Assignment and Morphing
 
-The macro layer is completely implemented in the lexical analysis phase.
-The parser does not know anything about what happens in the lexical
-analysis phase.
+The C<=> syntactic sugar in PIR, when used in the simple case of:
 
-When the C<.include> directive is encountered, the specified file is opened
-and the following tokens that are requested by the parser are read from
-that file, instead of the original file that was given to the parser.
+  <var1> = <var2>
 
-A macro expansion is a dot-prefixed identifier. For instance, if a macro
-was defined as shown below:
+directly corresponds to the C<set> opcode. So, two low-level arguments (int,
+num, or string registers, variables, or constants) are a direct C assignment,
+or a C-level conversion (int cast, float cast, a string copy, or a call to one
+of the conversion functions like C<string_to_num>).
 
- .macro foo(bar)
- ...
- .endm
+A PMC source with a low-level destination, calls the C<get_integer>,
+C<get_number>, or C<get_string> vtable function on the PMC. A low-level source
+with a PMC destination calls the C<set_integer_native>, C<set_number_native>,
+or C<set_string_native> vtable function on the PMC (assign to value semantics).
+Two PMC arguments are a direct C assignment (assign to container semantics).
 
-this macro can be expanded by writing C<.foo(42)>. The body of the macro
-will be inserted at the point where the macro expansion is written.
-
-A C<.constant> expansion is more or less the same as a C<.macro> expansion,
-except that a constant expansion cannot take any arguments, and it is only
-allowed in PASM mode, or within a C<.emit> block.
-
-{{ Is there any reason to not allow C<.constant> directives in PIR mode?
-   (Except for the fact that we have C<.const> and C<.globalconst>) }}
+For assign to value semantics for two PMC arguments use C<assign>, which calls
+the C<assign_pmc> vtable function.
 
 
-
-=head1 QUESTIONS
-
-=over 4
-
-=item * morph
+{{ NOTE: response to the question:
 
 	<pmichaud>	I don't think that 'morph' as a method call is a good idea
 	<pmichaud>	we need something that says "assign to value" versus "assign to container"
 	<pmichaud>	we can't eliminate the existing 'morph' opcode until we have a replacement
 
-=back
+}}
 
 =head1 ATTACHMENTS
 
