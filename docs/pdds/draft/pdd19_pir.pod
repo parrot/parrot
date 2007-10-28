@@ -728,6 +728,8 @@ can also be expanded by writing either C<.foo> or C<.foo()>.
 definition and call of a zero-parameter macro to match in the use of
 parentheses. }}
 
+=over
+
 =item * Heredoc arguments
 
 Heredoc arguments are not allowed when expanding a macro. This means that
@@ -746,6 +748,8 @@ the following is not allowed:
 {{ NOTE: This is likely because the parsing of heredocs happens later than the
 preprocessing of macros. Might be nice if we could parse heredocs at the macro
 level, but not a high priority. }}
+
+=back
 
 =head3 Unique local labels
 
@@ -867,8 +871,6 @@ the resulting code that is given to the parser will read as follows:
 Obviously, this will result in an error, as the variable C<b> is defined twice.
 If you intend the macro to create unique variables names, use C<.macro_local>
 instead of C<.local> to take advantage of the name munging.
-
-=back
 
 =head2 Assignment and Morphing
 
