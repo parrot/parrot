@@ -39,9 +39,10 @@ This is a complete rewrite of the parser for the PIR language.
 /* declare yylex() */
 extern YY_DECL;
 
-extern int yyerror(yyscan_t yyscanner, struct lexer_state *lexer, char *message);
+extern int yyerror(yyscan_t yyscanner,
+                   struct lexer_state * const lexer, char const * const message);
 
-extern struct lexer_state *new_lexer(char *filename);
+extern struct lexer_state *new_lexer(char * const filename);
 
 
 
@@ -128,6 +129,7 @@ extern struct lexer_state *new_lexer(char *filename);
        TK_STRING    "string"
        TK_IF        "if"
        TK_UNLESS    "unless"
+       TK_NULL      "null"
        TK_GOTO      "goto"
 
 %token TK_ARROW     "=>"
@@ -294,7 +296,7 @@ sub_definition: ".sub" sub_id sub_flags "\n"
                 ".end"
                 ;
 
-sub_id: TK_IDENT /* is TK_PARROT_OP allowed too? in that case, <identifier> */
+sub_id: identifier /* is TK_PARROT_OP allowed too? in that case, <identifier> */
       | TK_STRINGC
       ;
 
@@ -363,8 +365,13 @@ instruction: if_statement
            | methodcall_statement
            | parrot_statement
            | getresults_statement
+           | null_statement
            | error "\n" { yyerrok; }
            ;
+
+null_statement: "null" target "\n"
+              | target '=' "null" "\n"
+              ;
 
 getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
                     ;
@@ -556,6 +563,8 @@ methodcall: invokable '.' method arguments
 
 method: identifier
       | TK_STRINGC
+      | TK_SYM_SREG
+      | TK_PASM_SREG
       | TK_PASM_PREG
       | TK_SYM_PREG
       ;
@@ -660,7 +669,7 @@ expression: target
           ;
 
 
-constant: TK_STRINGC { fprintf(stderr, "TK_STRINGC: [%s]\n", yylval.sval); }
+constant: TK_STRINGC
         | TK_INTC
         | TK_NUMC
         ;
@@ -722,17 +731,25 @@ of the amount of indention, for instance for labels and conditional blocks.
 
 */
 static void
-do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
+do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer, char *outputfile) {
     int token;
     YYSTYPE val;
-    int in_sub_body   = 0; /* flag to keep track whether we're in a sub body */
-    int just_print_nl = 0; /* flag to keep track whether we just printed a newline */
-    int indention     = 0; /* amount of indention */
+    int in_sub_body   = 0;    /* flag to keep track whether we're in a sub body */
+    int just_print_nl = 0;    /* flag to keep track whether we just printed a newline */
+    int indention     = 0;    /* amount of indention */
+    FILE *output      = NULL; /* pointer to output file, if any is specified */
+
+
+    if (outputfile != NULL) {
+        output = fopen(outputfile, "w"); /* overwrite */
+    }
+    else {
+        output = stderr; /* no file specified, output to stderr */
+    }
+
 
     do {
-
         token = yylex(&val, yyscanner);
-
 
         if (token == TK_END) { /* ".end" must be printed at column 1 */
             in_sub_body = 0;
@@ -745,25 +762,25 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
              */
 
             if (token == TK_LABEL)
-                indention = 1;
+                indention = 1; /* labels are indented 1 space */
             else
-                indention = 2;
+                indention = 2; /* normal code is indented 2 spaces */
         }
-        else {
+        else { /* not in sub body or this is not first token on the line. */
             indention = 0;
         }
 
         /* print <indention> number of spaces before printing the token */
-        fprintf(stderr, "%*s%s", indention, indention > 0 ? " " : "", yyget_text(yyscanner));
+        fprintf(output, "%*s%s", indention, indention > 0 ? " " : "", yyget_text(yyscanner));
 
         /* don't print a space after one of these: [() */
         switch (token) {
             case '[': case ']':
             case '(': case ')':
-                /* do nothin' */
+                /* don't print a space */
                 break;
             default:
-                fprintf(stderr, " ");
+                fprintf(output, " ");
                 break;
         }
 
@@ -777,11 +794,15 @@ do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer) {
          */
         just_print_nl = 0;
         if (strchr(yyget_text(yyscanner), '\n') != NULL) {
-            fprintf(stderr, "\r");
+            fprintf(output, "\r");
             just_print_nl = 1;
         }
     }
     while (token > 0);
+
+    if (outputfile != NULL) {
+        fclose(output);
+    }
 }
 
 /*
@@ -792,11 +813,14 @@ print_help(char const * const program_name) {
 
     fprintf(stderr, "Usage: %s [options] <files>\n", program_name);
     fprintf(stderr, "Options:\n\n");
-    fprintf(stderr, "  -E   pre-process\n");
-    fprintf(stderr, "  -d   show debug messages of parser\n");
-    fprintf(stderr, "  -h   show this help message\n");
-
+    fprintf(stderr, "  -E        pre-process\n");
+    fprintf(stderr, "  -d        show debug messages of parser\n");
+    fprintf(stderr, "  -h        show this help message\n");
+    fprintf(stderr, "  -o <file> write output to the specified file. "
+                    "Currently only works in combination with '-E' option\n");
 }
+
+char debugtable[256];
 
 /*
  * Main compiler driver.
@@ -807,12 +831,23 @@ main(int argc, char *argv[]) {
     char const * const program_name = argv[0];
     int total_errors  = 0;
     int pre_process   = 0;
+    int flexdebug     = 0;
+    char *outputfile  = NULL;
     yyscan_t yyscanner;
+
+
+    int i;
+
+    for (i = 0; i < 256; i++) {
+        debugtable[i] = i;
+    }
 
     if (argc < 2) {
         print_help(program_name);
         exit(EXIT_FAILURE);
     }
+
+
 
     /* skip program name */
     argc--;
@@ -831,10 +866,25 @@ main(int argc, char *argv[]) {
                 yydebug = 1;
                 break;
 #endif
+            case 'f':
+                flexdebug = 1;
+                break;
             case 'h':
                 print_help(program_name);
                 exit(EXIT_SUCCESS); /* asking for help doesn't make you a failure */
                 /* break; */
+            case 'o':
+                if (argc > 1) { /* there must be at least 2 more args,
+                                         the output file, and an input */
+                    argc--;
+                    argv++;
+                    outputfile = argv[0];
+                }
+                else {
+                    fprintf(stderr, "Missing argument for option '-o'\n");
+                    exit(EXIT_FAILURE);
+                }
+                break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
                 break;
@@ -868,6 +918,8 @@ main(int argc, char *argv[]) {
 
         /* create a yyscan_t object */
         yylex_init(&yyscanner);
+        /* set debug flag */
+        yyset_debug(flexdebug, yyscanner);
         /* set the input file */
         yyset_in(infile, yyscanner);
 
@@ -878,7 +930,7 @@ main(int argc, char *argv[]) {
 
         if (pre_process) {
             fprintf(stderr, "pre-processing %s\n", argv[0]);
-            do_pre_process(yyscanner, lexer);
+            do_pre_process(yyscanner, lexer, outputfile);
         }
         else {
             fprintf(stderr, "compiling %s\n", argv[0]);
@@ -920,15 +972,16 @@ main(int argc, char *argv[]) {
 
 */
 int
-yyerror(yyscan_t yyscanner, struct lexer_state * lexer, char * message) {
+yyerror(yyscan_t yyscanner, struct lexer_state * const  lexer, char const * const message) {
 
-    char *text = yyget_text(yyscanner);
+    char const * const text = yyget_text(yyscanner);
 
     /* increment parse errors in the lexer structure */
     parse_error(lexer);
     /* emit an error */
-    fprintf(stderr, "\nError in file '%s' (line %d): %s ",
+    fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
             get_current_file(lexer), get_line_nr(lexer), message);
+
 
     /* print current token if it's not a newline (or \r\n on windows) */
 

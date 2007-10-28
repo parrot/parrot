@@ -10,7 +10,7 @@
 struct lexer_state;
 
 /* constructor for a lexer_state object */
-struct lexer_state *new_lexer(char *filename);
+struct lexer_state *new_lexer(char * const filename);
 
 /* accessor functions for parse_errors in the specified lexer. */
 extern int  get_parse_errors(struct lexer_state const * const lexer);

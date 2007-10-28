@@ -254,6 +254,7 @@ dupstrn(char const * const source, size_t num_chars) {
     return newstring;
 }
 
+
 /* after each rule execute update_location() */
 #define YY_USER_ACTION  do {                                                \
                             lexer_state *my_lexer = yyget_extra(yyscanner); \
@@ -271,9 +272,13 @@ constructor for a lexer. It's very important to initialize all fields.
 
 */
 lexer_state *
-new_lexer(char *filename) {
+new_lexer(char * const filename) {
     lexer_state *lexer   = (lexer_state *)malloc(sizeof (lexer_state));
     assert(lexer != NULL);
+
+    /* make sure all is clear */
+    memset(lexer, 0, sizeof (lexer_state));
+
     lexer->filename      = filename;
     lexer->line_nr       = 1;
     lexer->line_pos      = 1;
@@ -283,7 +288,7 @@ new_lexer(char *filename) {
     lexer->constant_defs = NULL;
     lexer->current_file  = NULL;
     lexer->parse_errors  = 0;
-
+    lexer->file_buffer   = NULL;
     printdebug(stderr, "Constructing new lexer\n");
 
     return lexer;
@@ -340,6 +345,8 @@ static void
 push_file_info(lexer_state * const lexer, file_info * const info) {
     info->prev = lexer->current_file;
     lexer->current_file = info;
+    /* fprintf(stderr, "push_file_info: %d\n", info);
+    */
 }
 
 
@@ -366,6 +373,9 @@ pop_file_info(lexer_state * const lexer) {
         if (lexer->current_file == NULL) {
             printdebug(stderr, "current_file is now NULL\n");
         }
+        /*
+        fprintf(stderr, "pop_file_info(): %d\n", returning);
+        */
         return returning;
     }
 }
@@ -384,6 +394,10 @@ unshift_heredoc(lexer_state * const lexer, heredoc_info * const heredoc) {
     lexer->heredocs = heredoc;
 }
 
+
+/*
+
+*/
 static heredoc_info *
 shift_heredoc(lexer_state * const lexer) {
     heredoc_info *returning = lexer->heredocs;
@@ -393,13 +407,18 @@ shift_heredoc(lexer_state * const lexer) {
     return returning;
 }
 
+/*
+
+*/
 static heredoc_info *
 peek_heredoc(lexer_state const * const lexer) {
     return lexer->heredocs;
 }
 
 
+/*
 
+*/
 static void
 save_heredoc_line(lexer_state const * const lexer, char const * const text) {
     heredoc_info *heredoc = peek_heredoc(lexer);
@@ -562,6 +581,7 @@ new_macro(yyscan_t yyscanner, char const * const name) {
 
     /* create a macro definition, store the macro ID in it */
     macro = (macro_info *)malloc(sizeof (macro_info));
+    memset(macro, 0, sizeof (macro_info));
     assert(macro != NULL);
 
     macro->name       = macro_id;
@@ -571,7 +591,9 @@ new_macro(yyscan_t yyscanner, char const * const name) {
 
     /* TODO: Fix macro body size; resize if necessary */
     macro->body = (char *)calloc(4096, sizeof (char));
+
     assert(macro->body != NULL);
+    memset(macro->body, 0, 4096);
 
     return macro;
 }
@@ -627,6 +649,9 @@ read_braced_argument(void *yyscanner, YYSTYPE *yylval) {
     }
 }
 
+/*
+
+*/
 static macro_parameter *
 new_macro_parameter(char * const name) {
     macro_parameter *param = (macro_parameter *)malloc(sizeof (macro_parameter));
@@ -634,6 +659,7 @@ new_macro_parameter(char * const name) {
     param->param_value = NULL;
     return param;
 }
+
 /*
 
 =item static void read_macro
@@ -737,31 +763,18 @@ read_macro(yyscan_t yyscanner, YYSTYPE *yylval) {
 
     }
 
-    /* make sure there's a newline after the macro header. This '\n' becomes part
-     * of the macro text, so that a macro expansion always results in at least
-     * one newline. This allows for writing "print 42 .NL print 42", so that
-     * multiple PIR statements can be written on 1 line.
-     */
-    if (next_token == TK_NL) {
-       /* :-/ This (adding a "\n")
-        * makes a normal macro expansion fail, but "print 42 .NL print 42" pass.
-        * I think normal case is more important (and having an abstracted "\n" token) than
-        * this "trick" with macro newlines.
-        */
-       /*
-        strcat(macro->body, "\n");
-       */
-    }
-    else {
+    if (next_token != TK_NL) {
         syntax_error(yyscanner, my_lexer, "newline expected after macro parameter list.");
     }
 
+
     next_token = yylex(yylval, yyscanner);
-    /* scan the body of the macro, while we don't see the ".endm" marker,
-     * and we don't encounter end of file (= 0). TODO: Check value of <<EOF>>
-     * Not sure if this is portable.
-     */
-    while ((next_token != TK_ENDM) && (next_token != 0)) { /* END OF FILE MARKER */
+    /* scan the body of the macro. */
+    while (next_token != TK_ENDM) {
+
+        if (next_token <= 0) {
+            syntax_error(yyscanner, my_lexer, "end of file before closing macro definition");
+        }
         /* always add a space character to separate the tokens */
         strcat(macro->body, " ");
         /* add current token to macro's buffer */
@@ -771,20 +784,79 @@ read_macro(yyscan_t yyscanner, YYSTYPE *yylval) {
     }
 
     /* check for macro delimiter */
-    if (next_token == TK_ENDM) {
-        next_token = yylex(yylval, /* lexer,*/ yyscanner);
-    }
-    else { /* error! */
-        syntax_error(yyscanner, my_lexer, "'.endm' expected to close macro definition.");
-    }
-
+    assert(next_token == TK_ENDM);
+    next_token = yylex(yylval, /* lexer,*/ yyscanner);
 
     /* after ".endm" a newline is expected */
     if (next_token != TK_NL) {
         syntax_error(yyscanner, my_lexer, "newline expected after '.endm'");
     }
-
+/*
+    fprintf(stderr, "read macro buffer of macro: %s: [%s]\n", macro->name, macro->body);
+    */
 }
+
+
+/*
+
+Save the state of a file, storing the current buffer where flex is reading from,
+the current file's name, and the file position.
+
+*/
+static file_info *
+save_file_state(YY_BUFFER_STATE file_buffer, char * filename, int line_nr, int line_pos) {
+    file_info *file_state = (file_info *)malloc(sizeof (file_info));
+    assert(file_state != NULL);
+
+    file_state->buffer   = file_buffer;
+    file_state->filename = filename;
+    file_state->line_pos = line_pos;
+    file_state->line_nr  = line_nr;
+
+    file_state->prev     = NULL; /* initialize to NULL */
+    return file_state;
+}
+
+/*
+
+*/
+static void
+restore_file_state(lexer_state *my_lexer, file_info *state) {
+    assert(state);
+    assert(state->buffer);
+    assert(state->filename);
+
+    my_lexer->file_buffer = state->buffer;
+    my_lexer->filename    = state->filename;
+    my_lexer->line_nr     = state->line_nr;
+    my_lexer->line_pos    = state->line_pos;
+}
+
+
+
+/*
+
+Check the number of arguments against the number of parameters expected for a macro invocation.
+
+*/
+static void
+check_macro_argument_count(yyscan_t yyscanner, int num_macro_params, int num_macro_args) {
+    lexer_state *my_lexer = yyget_extra(yyscanner);
+
+    /* check number of arguments against number of defind parameters */
+    if (num_macro_params > num_macro_args) {
+        syntax_error(yyscanner, my_lexer, "Too few arguments for macro.");
+    }
+    else if (num_macro_params < num_macro_args) {
+        syntax_error(yyscanner, my_lexer, "Too many arguments for macro.");
+    }
+    else { /* no error, prevent last message, so bail out here */
+        return;
+    }
+
+    fprintf(stderr, "There were %d arguments, but %d expected\n", num_macro_args, num_macro_params);
+}
+
 
 
 static void expand_macro(yyscan_t yyscanner, YY_BUFFER_STATE current_buffer, macro_info *macro);
@@ -889,12 +961,9 @@ LINECOMMENT    [#].*\n
  * meaning that all rules without start state are also active.
  * In other words, new rules are "added" for this context.
  */
-%s MACRODEF
+%x MACRODEF
 
-/* start state for macro expansion. This state overrides
- * the <<EOF>> rule. TODO: check whether this "overriding" is portable.
- */
-%s MACROEXP
+/* start state for macro expansion. This state overrides the <<EOF>> rule. */
 
 
 
@@ -913,8 +982,9 @@ LINECOMMENT    [#].*\n
 %option header-file="pirlexer.h"
 
 /* we don't use yy_top_state so have flex not generate it, (this prevents warning) */
+/*
 %option noyy_top_state
-
+*/
 
 /* make the scanner re-entrant */
 %option reentrant
@@ -925,11 +995,17 @@ LINECOMMENT    [#].*\n
 /* make yywrap() always return true. */
 %option noyywrap
 
+/* always show warnings if something's wrong with our spec. */
+%option warn
+
+/* create a scanner in debug mode */
+%option debug
+
 %%
 
 
 
-<MACROEXP>{EOL}                  { printdebug(stderr, "eol in macroexp\n"); return TK_NL; }
+
 
 
 <*>"#".*                         { /* match comments on last line in input (without a "\n") */  }
@@ -952,7 +1028,8 @@ LINECOMMENT    [#].*\n
 
 <MACRODEF>".endm"         { /* end of macro definition */
                             lexer_state *my_lexer = yyget_extra(yyscanner);
-                            printdebug(stderr, "\n[macro text: [%s] ]\n", peek_macro(my_lexer)->body);
+                            fprintf(stderr, "<macrodef><<eof>>\n");
+                            printdebug(stderr, "\n[macrotext: '%s']\n", peek_macro(my_lexer)->body);
                             yy_pop_state(yyscanner);
                             return TK_ENDM;
                           }
@@ -989,16 +1066,13 @@ LINECOMMENT    [#].*\n
                                  /* skip the leading "$" of the label: */
                                  label = make_label(current_macro->name, yytext + 1);
 
-                                 /* make the label available to the parser (read_macro()
-                                  *in this case)
-                                  */
-
                                  yylval->sval = label; /* don't think this is necessary */
 
-                                 yytext = label; /* is this assignment to yytext correct?
-                                 * the generated label must be available in read_macro(), which
-                                 * just copies yytext to the macro buffer
-                                 */
+                                 yytext = label;
+                                 /* is this assignment to yytext correct?
+                                  * the generated label must be available in read_macro(), which
+                                  * just copies yytext to the macro buffer
+                                  */
                                  return TK_LABEL;
                              }
                              else { /* error */
@@ -1008,83 +1082,34 @@ LINECOMMENT    [#].*\n
 
                           }
 
+<MACRODEF>{IDENT}               { return TK_IDENT; }
 
+<MACRODEF>{WS}                  {  }
 
-<MACRODEF><<EOF>>      { /* read <<EOF>> in macro definition. This means there's something wrong. */
-                         lexer_state *my_lexer = yyget_extra(yyscanner);
+<MACRODEF>"("                   { return '('; }
+
+<MACRODEF>{EOL}[\t\r\n ]*       { return TK_NL; }
+
+<MACRODEF>.            { return yytext[0]; }
+
+<MACRODEF><<EOF>>      { yyterminate(); /* read <<EOF>> in macro definition. This means there's something wrong. */
+/*
+lexer_state *my_lexer = yyget_extra(yyscanner);
                          syntax_error(yyscanner, my_lexer,
                                       "macro definition not closed before end of file");
 
-                         yy_pop_state(yyscanner); /* handle <<EOF>> in initial state */
+                         yy_pop_state(yyscanner); */
+                         /* handle <<EOF>> in initial state */
                        }
 
 <MACRODEF>[.]{IDENT}   { /* When defining a macro, all parameter usages like ".foo" should just
                           * be stored in the macro buffer, don't handle it in <INITIAL>[.]{IDENT}.
                           */
+
                           yylval->sval = dupstr(yytext);
                           return TK_IDENT; /* dont' think it matters what we return... */
                        }
 
-<MACROEXP>[.]{IDENT}   { /* find the parameter with the specified name in the current
-                          * macro expansion. Then, get its value and scan that.
-                          */
-                         lexer_state *my_lexer = yyget_extra(yyscanner);
-                         macro_info *macro = my_lexer->current_expanding_macro;
-
-                         macro_parameter *param = macro->parameters;
-                         printdebug(stderr, "expanding macro argument\n");
-
-                         /* look up the parameter */
-                         while (param != NULL) {
-                             if (strcmp(param->param_name, yytext + 1) == 0) {
-                                 break;
-                             }
-                             param = param->next;
-                         }
-
-                         /* if the parameter is not found, error */
-                         if (param == NULL) {
-                             fprintf(stderr, "Macro parameter '%s' is not found!\n", yytext+1);
-                         }
-                         else {
-                             /* yy_push_state(MACROEXP, yyscanner); */
-#ifdef DEBUG
-                             fprintf(stderr, "<MACROEXP>.IDENT found: '%s'\n", param->param_value);
-#endif
-                             yytext = param->param_value;
-                             return TK_PARROT_OP;
-
-                         }
-
-                       }
-
-
-<MACROEXP><<EOF>>      { /* This block is executed when "end of file" is read while expanding
-                          * a macro.
-                          */
-                         lexer_state *my_lexer = yyget_extra(yyscanner);
-                         /* get a reference to current's buffer so we can delete it later */
-                         YY_BUFFER_STATE current_buffer = YY_CURRENT_BUFFER;
-
-                         printdebug(stderr, "End of Macro Exp buffer\n");
-
-                         /* switch back to saved buffer */
-                         yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
-                         /* and delete the buffer we were just reading from */
-                         yy_delete_buffer(current_buffer, yyscanner);
-
-                         /* we reached the end of the saved string, and just switched back to
-                          * the file. However, there may be more whitespace or newlines,
-                          * so skip these now
-                          */
-/* FIX THIS: only skip all except 1 \n */
-
-                         skip_whitespace();
-
-                         yy_pop_state(yyscanner);
-
-
-                       }
 
 
 
@@ -1092,7 +1117,7 @@ LINECOMMENT    [#].*\n
                      * the 2 quotes and the 2 '<' chars. (2+2=4)
                      */
                     char * const heredoc_id = dupstrn(yytext + 3, yyleng - 4);
-                    lexer_state *my_lexer = yyget_extra(yyscanner);
+                    lexer_state *my_lexer   = yyget_extra(yyscanner);
                     /* check the length of the quoted string. */
                     if (strlen(heredoc_id) == 0) {
                         syntax_error(yyscanner, my_lexer,
@@ -1110,7 +1135,8 @@ LINECOMMENT    [#].*\n
 <SCANSTRING>"<<"{Q_STRING} {
                              /* skip the "<<" and the quote, so skip 3 characteres */
                              char * const heredoc_id = dupstrn(yytext + 3, yyleng - 4);
-                             lexer_state *my_lexer = yyget_extra(yyscanner);
+                             lexer_state *my_lexer   = yyget_extra(yyscanner);
+
                              /* check the length of the quoted string. */
                              if (strlen(heredoc_id) == 0) {
                                  syntax_error(yyscanner, my_lexer,
@@ -1125,7 +1151,7 @@ LINECOMMENT    [#].*\n
                              }
                            }
 
-<SCANSTRING>{EOL}   { /* skip newlines */
+<SCANSTRING>{EOL}   { /* skip newlines , this should only happen once I think. just before <<EOF>>*/
                     }
 
 <SCANSTRING>{WS}+   { /* skip whitespace */
@@ -1133,9 +1159,13 @@ LINECOMMENT    [#].*\n
 
 <SCANSTRING><<EOF>> { /* scan <<EOF>> in the "after_heredoc" string stored in the lexer struct. */
                       lexer_state *my_lexer = yyget_extra(yyscanner);
-                      /* End of the heredoc string buffer, switch back to normal buffer and state.
-                       */
+
+
+                      /* End of the heredoc string buffer, switch back to normal buffer and state.*/
                       yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
+
+                      /* clear file_buffer field */
+                      my_lexer->file_buffer = NULL;
                       BEGIN(INITIAL);
 
                       /* we reached the end of the saved string, and just switched back to the file.
@@ -1165,7 +1195,7 @@ LINECOMMENT    [#].*\n
                      my_lexer->after_heredoc = dupstr(yytext);
                      /* continue scanning the file */
                      BEGIN(HEREDOC2);
-               }
+                   }
 
 
 
@@ -1180,6 +1210,8 @@ LINECOMMENT    [#].*\n
 
                       /* switch back to file */
                       yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
+                      /* XXX clear file_buffer field */
+                      my_lexer->file_buffer = NULL;
                       BEGIN(HEREDOC2);
                     }
 
@@ -1227,8 +1259,10 @@ LINECOMMENT    [#].*\n
                        */
                       BEGIN(SCANSTRING);
                       /* save the current buffer */
+                      assert(my_lexer->file_buffer == NULL);
                       my_lexer->file_buffer = YY_CURRENT_BUFFER;
                       yy_scan_string(my_lexer->after_heredoc, yyscanner);
+
                       /* return the complete heredoc as a string constant */
                       yylval->sval = heredoc->contents;
 
@@ -1239,12 +1273,6 @@ LINECOMMENT    [#].*\n
                        * put the heredoc thingie back
                        */
                       unshift_heredoc(my_lexer, heredoc);
-
-                      /*
-                      printdebug(stderr,
-                      "Saving string [%s] (did not match end marker [%s]\n",
-                      yytext, heredoc->delimiter);
-                      */
 
                       /* and save the current text as part of the heredoc */
                       save_heredoc_line(my_lexer, yytext);
@@ -1296,9 +1324,9 @@ LINECOMMENT    [#].*\n
 "~"         { return '~'; }
 "-"         { return '-'; }
 
-<INITIAL,MACRODEF,MACROEXP>"("                { return '('; }
-<INITIAL,MACRODEF,SCANSTRING,MACROEXP>")"     { return ')'; }
-<INITIAL,MACRODEF,SCANSTRING,MACROEXP>","     { return ','; }
+"("                { return '('; }
+<INITIAL,MACRODEF,SCANSTRING>")"     { return ')'; }
+<INITIAL,MACRODEF,SCANSTRING>","     { return ','; }
 
 "["         { return '['; }
 "]"         { return ']'; }
@@ -1326,6 +1354,7 @@ LINECOMMENT    [#].*\n
 "goto"            { return TK_GOTO; }
 "n_operators"     { return TK_N_OPERATORS; }
 "unless"          { return TK_UNLESS; }
+"null"            { return TK_NULL; }
 
 "int"             { return TK_INT; }
 "num"             { return TK_NUM; }
@@ -1443,7 +1472,7 @@ LINECOMMENT    [#].*\n
 
                if (incl_file_ptr == NULL) { /* opening file went wrong */
                    fprintf(stderr, "Error including file '%s'\n", incl_file_name);
-                   parse_error(my_lexer);
+                   parse_error(my_lexer); /* we count this as an error */
                    return 0;
                }
 
@@ -1462,14 +1491,10 @@ LINECOMMENT    [#].*\n
                /* save current file info, because the fields in my_lexer will hold the values
                 * of the file being scanned. Save everything in a file_state.
                 */
-               file_state = (file_info *)malloc(sizeof (file_info));
-               assert(file_state != NULL);
-
-               file_state->buffer   = YY_CURRENT_BUFFER;
-               file_state->filename = my_lexer->filename;
-               file_state->line_pos = my_lexer->line_pos;
-               file_state->line_nr  = my_lexer->line_nr;
-               file_state->prev     = NULL; /* initialize to NULL */
+               file_state = save_file_state(YY_CURRENT_BUFFER,   /* save the current buffer */
+                                            my_lexer->filename,  /* save current file name */
+                                            my_lexer->line_nr,   /* save current line nr */
+                                            my_lexer->line_pos); /* save current line pos */
 
                /* store the current file's info structure on the stack,
                 * we'll continue scanning it later.
@@ -1477,20 +1502,24 @@ LINECOMMENT    [#].*\n
                push_file_info(my_lexer, file_state);
                printdebug(stderr, "data stored\n");
 
-               /* replace the above with this, to make this block shorter.
-               save_file_state(YY_CURRENT_BUFFER, lexer->file_name, lexer->line_nr);
-               */
-
                /* a new file is being scanned, reset line number */
                my_lexer->line_nr  = 1;
                my_lexer->line_pos = 1;
                my_lexer->filename = incl_file_name;
 
+
+               assert(my_lexer->file_buffer == NULL);
+
                /* create a new buffer for the included file and switch to that file */
                incl_file_buffer = yy_create_buffer(incl_file_ptr, YY_BUF_SIZE, yyscanner);
                yy_switch_to_buffer(incl_file_buffer, yyscanner);
+
+               /* XXX don't think this is good/necessary: */
                /* set the buffer of the included file as "current buffer" */
+               /*
                my_lexer->file_buffer = incl_file_buffer;
+               XXX
+               */
 
                /* the included file may contain whitespace and newlines; remove them */
                skip_whitespace();
@@ -1562,13 +1591,13 @@ LINECOMMENT    [#].*\n
 
                     /* in IMCC, a .constant is only allowed in PASM mode or in .emit context. */
                     constant_info *constant = NULL;
-                    lexer_state *my_lexer = yyget_extra(yyscanner);
+                    lexer_state   *my_lexer = yyget_extra(yyscanner);
                     /* give the name of the constant, skip the prefix dot. */
                     constant = find_constant(my_lexer, yytext + 1);
 
                     if (constant != NULL) { /* found the constant */
                         printdebug(stderr, "Constant '%s' found, value = '%s', token = '%d'\n",
-                                constant->name, constant->value, constant->token_type);
+                                   constant->name, constant->value, constant->token_type);
 
                         /* make the value of the constant available to the parser */
                         yylval->sval = constant->value;
@@ -1596,6 +1625,7 @@ LINECOMMENT    [#].*\n
 <<EOF>>     {  /* get the file info structure of the .include-ing file, if any */
                lexer_state *my_lexer = yyget_extra(yyscanner);
                file_info *info = pop_file_info(my_lexer);
+               fprintf(stderr, "\nok\n");
 
                if (info == NULL) {
                    /* this was the initial file given to Parrot */
@@ -1603,7 +1633,7 @@ LINECOMMENT    [#].*\n
                    yyterminate();
                }
                else { /* this file was included */
-                   printdebug(stderr, "End of included file\n");
+                  printdebug(stderr, "End of included file\n");
 
                    /* restore all fields about the including file */
 
@@ -1613,13 +1643,8 @@ LINECOMMENT    [#].*\n
                     */
                    free(my_lexer->filename);
 
-                   /* and set pointer to the including file's name */
-                   my_lexer->filename    = info->filename;
-                   my_lexer->file_buffer = info->buffer;
-                   my_lexer->line_nr     = info->line_nr;
-                   my_lexer->line_pos    = info->line_pos;
-
-                   /* make ^^^^^^^^^^ this into some "restore_file_context" function */
+                   /* and restore name of including file */
+                   restore_file_state(my_lexer, info);
 
                    printdebug(stderr, "deleting buffer...\n");
 
@@ -1630,6 +1655,9 @@ LINECOMMENT    [#].*\n
 
                    /* switch back to previous file */
                    yy_switch_to_buffer(my_lexer->file_buffer, yyscanner);
+
+                   /* clear file_buffer field XXX */
+                   my_lexer->file_buffer = NULL;
 
                    printdebug(stderr, "switched back to buffer\n");
 
@@ -1652,6 +1680,7 @@ LINECOMMENT    [#].*\n
 <*>.   { /* for all states, any character not covered in the rules above is an error. */
          lexer_state *my_lexer = yyget_extra(yyscanner);
          syntax_error(yyscanner, my_lexer, "Unexpected character");
+         fprintf(stderr, "top state: %d\n", yy_top_state(yyscanner));
        }
 
 
@@ -1670,44 +1699,47 @@ is_parrot_op(char const * const spelling) {
         return 1;
     if (strcmp(spelling, "new") == 0)
         return 1;
+    if (strcmp(spelling, "newclass") == 0)
+        return 1;
+    if (strcmp(spelling, "end") == 0)
+        return 1;
     return 0;
 }
 
 /*
 
-Expand the specified macro.
+Expand the specified macro. The macro name has just been read (like ".foo"), and now is the time
+to switch the buffer to this macro's body, and scan that buffer (so, when scanning ".foo", the
+body of "foo" must be read.
+
+First, however, read any arguments from current_buffer.
 
 */
 static void
 expand_macro(yyscan_t yyscanner, YY_BUFFER_STATE current_buffer, struct macro_info *macro) {
 
     /* initialization */
-    int num_macro_params = macro->num_params;
-    int num_macro_args   = 0;
-    /* get a pointer to the yylval thing */
-    YYSTYPE *my_yylval   = yyget_lval(yyscanner);
-    int next_token;
-    /* get the lexer structure */
-    lexer_state *my_lexer = yyget_extra(yyscanner);
-
+    int num_macro_params  = macro->num_params;
+    int num_macro_args    = 0;
+    int next_token        = 0;
+    YYSTYPE *my_yylval    = yyget_lval(yyscanner); /* get a pointer to the yylval thing */
+    lexer_state *my_lexer = yyget_extra(yyscanner); /* get the lexer structure */
+    file_info   *state    = NULL;
 
     /* start expanding */
 
     next_token = yylex(my_yylval, yyscanner);
 
-    /* read input for parameters */
+    /* read input for arguments */
     if (next_token == '(') {
         int expect_argument = 0; /* flag for while loop */
-
         /* get an iterator to the macro's parameter list */
         macro_parameter *param_iter = macro->parameters;
-
         /* a macro definition with "()" as parameter list means 1
          * parameter; likewise, a macro expansion with "()" is 1 arg. too.
          */
         num_macro_args = 1;
         next_token = yylex(my_yylval, yyscanner); /* skip '(' */
-
         /* read the macro arguments, setting the value of each of them
          * in the appropriate macro_parameter node.
          */
@@ -1717,38 +1749,24 @@ expand_macro(yyscan_t yyscanner, YY_BUFFER_STATE current_buffer, struct macro_in
             }
             else { /* don't care about the token, just store it */
                 char *macro_argument = dupstr(yyget_text(yyscanner));
-
                 printdebug(stderr, "macro arg: '%s'\n", macro_argument);
-                /* keep track of number of arguments, needed for check later. */
-                num_macro_args++;
-
+                num_macro_args++; /* count number of parsed arguments */
                 /* set the value of this parameter */
                 if (param_iter != NULL) { /* if not too many args. */
                     param_iter->param_value = macro_argument;
-
-                    /* set iterator to next parameter, so the next argument
-                     * will be stored in that parameter structure node.
-                     */
-                     param_iter = param_iter->next;
+                    /* set iterator to next parameter, so the next argument will be stored there */
+                    param_iter = param_iter->next;
                 }
-
                 next_token = yylex(my_yylval, yyscanner);
-
-
             }
-
-
 
             /* always clear flag */
             expect_argument = 0;
             if (next_token == ',') {
-                /* skip the comma */
-                next_token = yylex(my_yylval, yyscanner);
-                /* it's a comma, so we expect a next argument */
-                expect_argument = 1;
+                next_token = yylex(my_yylval, yyscanner); /* skip the comma */
+                expect_argument = 1; /* it's a comma, so we expect a next argument */
             }
-
-        }
+        } /* end while */
         /* done with parameters, check out why we stopped parsing args */
         if (expect_argument == 1) { /* we're expecting an argument! */
             syntax_error(yyscanner, my_lexer, "macro argument expected after ','");
@@ -1756,29 +1774,36 @@ expand_macro(yyscan_t yyscanner, YY_BUFFER_STATE current_buffer, struct macro_in
         else {
             assert(next_token == ')');
         }
-
-        /* check number of arguments against number of defind parameters */
-        if (num_macro_params > num_macro_args) {
-            syntax_error(yyscanner, my_lexer, "Too few arguments for macro");
-            fprintf(stderr, "There were %d arguments, but %d expected\n", num_macro_args, num_macro_params);
-        }
-        else if (num_macro_params < num_macro_args) {
-            syntax_error(yyscanner, my_lexer, "Too many arguments for macro");
-         fprintf(stderr, "There were %d arguments, but %d expected\n", num_macro_args, num_macro_params);
-        }
-
-
-        /* also set name of macro in filename? and line number? */
-        /* save the current buffer for later, at <<EOF>> of MACROEXP, we'll switch back to it. */
-        my_lexer->file_buffer = current_buffer;
-
-        my_lexer->current_expanding_macro = macro;
-
-        /* and scan that string buffer, using the (inclusive) MACROEXP state. */
-        yy_push_state(MACROEXP, yyscanner);
-        yy_scan_string(macro->body, yyscanner);
-
     }
+    else { /* no arguments, this must be a "\n" */
+
+
+        /* and put back the character */ /* XXX Why? */
+        yyunput(next_token, yyget_text(yyscanner), yyscanner);
+    }
+
+    check_macro_argument_count(yyscanner, num_macro_params, num_macro_args);
+
+    /* also set name of macro in filename? and line number? */
+    /* save the current buffer for later, at <<EOF>> of MACROEXP, we'll switch back to it. */
+  /*
+    if (my_lexer->file_buffer == NULL) fprintf(stderr, "my_lexer->file_buffer is NULL (ok)\n");
+    else fprintf(stderr, "my_lexer->file_buffer already has a buffer\n");
+*/
+    state = save_file_state(current_buffer, my_lexer->filename, my_lexer->line_nr, my_lexer->line_pos);
+    push_file_info(my_lexer, state);
+
+    my_lexer->current_expanding_macro = macro;
+    my_lexer->line_nr = 1;
+    my_lexer->line_pos = 1;
+    my_lexer->filename = macro->name;
+
+    /* and scan that string buffer, using the (inclusive) MACROEXP state. */
+    yy_push_state(INITIAL, yyscanner);
+
+    yy_scan_string(macro->body, yyscanner);
+
+
 
 }
 
