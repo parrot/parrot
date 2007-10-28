@@ -111,7 +111,7 @@ the "new" opcode for the PMCs that use it.)
   PMC* subclass(PMC *name)
 
 The subclass vtable method is deprecated and will be removed in the 0.5.0
-release. The subclass opcode stays.
+release. The subclass opcode stays. (RT #42969)
 
 =item 5
 
