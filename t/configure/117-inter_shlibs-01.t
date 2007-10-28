@@ -5,11 +5,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::gcc');
 use_ok('config::inter::shlibs');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -26,7 +25,6 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
-test_step_thru_runstep( $conf, q{auto::gcc},  $args );
 
 my $pkg = q{inter::shlibs};
 
@@ -34,7 +32,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
 my ( $task, $step_name, @step_params, $step);
-$task        = $conf->steps->[2];
+$task        = $conf->steps->[1];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
@@ -44,7 +42,6 @@ isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
 my ( @prompts, $prompt, $object );
-#####
 $prompt = q{foobar};
 push @prompts, $prompt;
 
