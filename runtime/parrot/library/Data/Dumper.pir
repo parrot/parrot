@@ -35,7 +35,7 @@ no_def_name:
     push_eh ERROR2
         ddd_class = get_class "Data::Dumper::Default"
         style     = ddd_class."new"()
-    clear_eh
+    pop_eh
 
     style."prepare"( self, indent )
     style."dumpWithName"( name, name, dump )
