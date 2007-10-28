@@ -47,11 +47,20 @@ if (@ARGV) {
 else {
     my %files = map { $_->path() => 1 } $DIST->c_header_files();
     my $href = $DIST->generated_files();
+
     foreach my $file ( keys %$href ) {
         if ( $file =~ /\.h$/ ) {
             $files{$file} = 1 if -f $file;
         }
     }
+
+    # not all files should be subject to the coding standards
+    foreach my $file ( keys %files ) {
+        if ( $DIST->is_c_exemption($file) ) {
+            delete $files{$file};
+        }
+    }
+
     @files = sort keys %files;
 }
 
