@@ -1528,14 +1528,14 @@ lexer_state *my_lexer = yyget_extra(yyscanner);
 
              }
 
-".macroconstant"  { /* constant definition in the macro layer. */
+".macro_const"  { /* constant definition in the macro layer. */
                char        *constant_id    = NULL;
                char        *constant_value = NULL;
                lexer_state *my_lexer       = yyget_extra(yyscanner);
                int          next_token     = yylex(yylval, yyscanner);
 
                if (next_token != TK_IDENT) {
-                   syntax_error(yyscanner, my_lexer, "identifier expected after '.macroconstant'.");
+                   syntax_error(yyscanner, my_lexer, "identifier expected after '.macro_const'.");
                }
                /* store identifier */
                constant_id = dupstr(yytext);
