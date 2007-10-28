@@ -44,7 +44,7 @@ strings.
 
 #define EXTRA_SIZE 256
 
-
+#define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
     PARROT_ASSERT(s->encoding); \
     PARROT_ASSERT(s->charset); \
@@ -61,7 +61,6 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static const char * nonnull_encoding_name(STRING *s);
 /* HEADERIZER END: static */
 
 
@@ -1435,32 +1434,6 @@ make_writable(PARROT_INTERP, ARGINOUT(STRING **s),
         string_grow(interp, *s, len - (*s)->strlen);
     else if (PObj_is_cowed_TESTALL(*s))
         Parrot_unmake_COW(interp, *s);
-}
-
-/*
-
-=item C<nonnull_encoding_name(STRING *s)>
-
-Returns the string's encoding name if the string pointer is non-null, if the
-string pointer is null it simply returns the string "null string".  This
-function prevents problems whereby the string used in C<real_exception>
-to print the exception message could potentially be null.
-
-=cut
-
-*/
-
-static const char *
-nonnull_encoding_name(STRING *s)
-{
-    char *string;
-    string = mem_allocate_zeroed_typed(char);
-    if (!s)
-        strcpy(string, "null string");
-    else
-        strcpy(string, s->encoding->name);
-
-    return string;
 }
 
 /*
