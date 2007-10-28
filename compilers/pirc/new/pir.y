@@ -97,14 +97,14 @@ extern struct lexer_state *new_lexer(char * const filename);
        TK_CONST         ".const"
        TK_RETURN        ".return"
        TK_YIELD         ".yield"
-       TK_PCC_BEGIN_YIELD   ".pcc_begin_yield"
-       TK_PCC_END_YIELD     ".pcc_end_yield"
-       TK_PCC_BEGIN_RETURN  ".pcc_begin_return"
-       TK_PCC_END_RETURN    ".pcc_end_return"
-       TK_PCC_BEGIN     ".pcc_begin"
-       TK_PCC_END       ".pcc_end"
+       TK_BEGIN_YIELD   ".begin_yield"
+       TK_END_YIELD     ".end_yield"
+       TK_BEGIN_RETURN  ".begin_return"
+       TK_END_RETURN    ".end_return"
+       TK_BEGIN_CALL    ".begin_call"
+       TK_END_CALL      ".end_call"
        TK_GET_RESULTS   ".get_results"
-       TK_PCC_CALL      ".pcc_call"
+       TK_CALL          ".call"
        TK_ARG           ".arg"
        TK_RESULT        ".result"
        TK_NCI_CALL      ".nci_call"
@@ -494,11 +494,11 @@ invocation_statement: long_invocation_statement
                     | short_invocation_statement
                     ;
 
-long_invocation_statement: ".pcc_begin" "\n"
+long_invocation_statement: ".begin_call" "\n"
                            long_arguments
                            long_invocation "\n"
                            long_results
-                           ".pcc_end" "\n"
+                           ".end_call" "\n"
                          ;
 
 long_arguments: /* empty */
@@ -508,7 +508,7 @@ long_arguments: /* empty */
 long_argument: ".arg" expression arg_flags "\n"
              ;
 
-long_invocation: ".pcc_call" invokable
+long_invocation: ".call" invokable
                | ".nci_call" invokable
                | ".invocant" invokable "\n"
                  ".meth_call" method
@@ -577,9 +577,9 @@ return_statement: short_return_statement
                 | long_return_statement
                 ;
 
-long_return_statement: ".pcc_begin_return" "\n"
+long_return_statement: ".begin_return" "\n"
                        return_expressions
-                       ".pcc_end_return" "\n"
+                       ".end_return" "\n"
                      ;
 
 
@@ -609,9 +609,9 @@ argument: expression arg_flags
         | TK_STRINGC "=>" expression
         ;
 
-long_yield_statement: ".pcc_begin_yield" "\n"
+long_yield_statement: ".begin_yield" "\n"
                       yield_expressions
-                      ".pcc_end_yield" "\n"
+                      ".end_yield" "\n"
                     ;
 
 yield_expressions: /* empty */

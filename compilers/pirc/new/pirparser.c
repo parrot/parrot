@@ -91,14 +91,14 @@
      TK_CONST = 280,
      TK_RETURN = 281,
      TK_YIELD = 282,
-     TK_PCC_BEGIN_YIELD = 283,
-     TK_PCC_END_YIELD = 284,
-     TK_PCC_BEGIN_RETURN = 285,
-     TK_PCC_END_RETURN = 286,
-     TK_PCC_BEGIN = 287,
-     TK_PCC_END = 288,
+     TK_BEGIN_YIELD = 283,
+     TK_END_YIELD = 284,
+     TK_BEGIN_RETURN = 285,
+     TK_END_RETURN = 286,
+     TK_BEGIN_CALL = 287,
+     TK_END_CALL = 288,
      TK_GET_RESULTS = 289,
-     TK_PCC_CALL = 290,
+     TK_CALL = 290,
      TK_ARG = 291,
      TK_RESULT = 292,
      TK_NCI_CALL = 293,
@@ -197,14 +197,14 @@
 #define TK_CONST 280
 #define TK_RETURN 281
 #define TK_YIELD 282
-#define TK_PCC_BEGIN_YIELD 283
-#define TK_PCC_END_YIELD 284
-#define TK_PCC_BEGIN_RETURN 285
-#define TK_PCC_END_RETURN 286
-#define TK_PCC_BEGIN 287
-#define TK_PCC_END 288
+#define TK_BEGIN_YIELD 283
+#define TK_END_YIELD 284
+#define TK_BEGIN_RETURN 285
+#define TK_END_RETURN 286
+#define TK_BEGIN_CALL 287
+#define TK_END_CALL 288
 #define TK_GET_RESULTS 289
-#define TK_PCC_CALL 290
+#define TK_CALL 290
 #define TK_ARG 291
 #define TK_RESULT 292
 #define TK_NCI_CALL 293
@@ -817,9 +817,9 @@ static const char *const yytname[] =
   "\".end\"", "\".param\"", "\".lex\"", "\".local\"", "\".namespace\"",
   "\".endnamespace\"", "\".invocant\"", "\".meth_call\"",
   "\".globalconst\"", "\".const\"", "\".return\"", "\".yield\"",
-  "\".pcc_begin_yield\"", "\".pcc_end_yield\"", "\".pcc_begin_return\"",
-  "\".pcc_end_return\"", "\".pcc_begin\"", "\".pcc_end\"",
-  "\".get_results\"", "\".pcc_call\"", "\".arg\"", "\".result\"",
+  "\".begin_yield\"", "\".end_yield\"", "\".begin_return\"",
+  "\".end_return\"", "\".begin_call\"", "\".end_call\"",
+  "\".get_results\"", "\".call\"", "\".arg\"", "\".result\"",
   "\".nci_call\"", "\"identifier\"", "\"string constant\"",
   "\"integer constant\"", "\"number constant\"", "\"PMC register\"",
   "\"Number register\"", "\"String register\"", "\"Integer register\"",
