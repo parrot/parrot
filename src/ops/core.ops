@@ -687,9 +687,9 @@ the exception handler stack.
 
 Push an invokable PMC onto the exception handler stack.
 
-=item B<clear_eh>()
+=item B<pop_eh>()
 
-Clear out the most recently placed exception.
+Pop the most recently placed exception off the handler stack.
 
 =item B<throw>(invar PMC)
 
@@ -736,11 +736,6 @@ inline op push_eh(labelconst INT) {
 
 inline op push_eh(invar PMC) {
     push_exception(interp, $1);
-    goto NEXT();
-}
-
-inline op clear_eh() {
-    pop_exception(interp);
     goto NEXT();
 }
 
