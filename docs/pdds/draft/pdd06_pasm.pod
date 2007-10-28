@@ -643,9 +643,9 @@ be removed when that scope is exited.
 Sets an exception handler in place. The code referred to by register Px will
 get called if an exception is thrown while the exception handler is in scope.
 
-=item clear_eh
+=item pop_eh
 
-Clear out the most recently placed exception
+Pop the most recently placed exception off the handler stack.
 
 =item throw Px
 
