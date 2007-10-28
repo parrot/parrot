@@ -1747,7 +1747,7 @@ sunlint :
 	rm -f *.ln
 	$(SUNLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
 
-BSDLINTFLAGS = -a -c -e -h -n -p -r -u -z -F -V
+BSD_LINT_FLAGS = -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 
 # 132: conversion from '...' may lose accuracy
 # 135: possible pointer alignment problem
@@ -1759,11 +1759,11 @@ BSDLINTFLAGS = -a -c -e -h -n -p -r -u -z -F -V
 # 265: ANSI C does not support 'long long'
 # 277: initialisation of '...' with '...'
 # 278: combination of '...' and '...', arg #...
-BSDLINTEXCLUSIONS = -X132,135,236,241,247,249,259,265,277,278
+BSD_LINT_EXCLUSIONS = -X132,135,236,241,247,249,259,265,277,278
 
 bsdlint : $(PARROT)
 	rm -f *.ln
-	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSDLINTFLAGS) $(BSDLINTEXCLUSIONS) $(LINTABLE_CFILES)
+	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
 # Splint: http://splint.org
 SPLINT = splint
