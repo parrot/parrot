@@ -36,7 +36,7 @@ Currently no C APIs are deprecated.
 
 =over 4
 
-=item C<newfrom> sub/method in PGE
+=item C<newfrom> sub/method in PGE (RT#46971)
 
 The C<newfrom> method in PGE is now deprecated.  Use C<new> instead.
 To get access to the C<new> method when a Match object isn't available,
