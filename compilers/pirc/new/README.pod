@@ -27,28 +27,13 @@ Current shortcomings are:
 
 =over 4
 
-=item * macro arguments.
+=item * Macro layer
 
-When expanding macros, parameters are not handled. Also, braced arguments
-are not handled right now.
-
-=item * .NL() macro.
-
-IMCC's implementation macros stores a newline for empty macros. This means
-that you can write:
-
- .sub main
-   print 42 .NL() print "foo"
- .end
-
-This is not possible in pirc/new. Currently, I don't see a solution to fix this,
-as consecutive newlines in the input file are collected together, and only a single
-token is returned to the parser. This makes the parser much more cleaner.
-
-=item * No (character) Escape!
-
-IMCC can handle escape characters in double quoted strings. This isn't working
-currently (but should be rather straightforward).
+The whole macro layer needs more thought. The C<.include> and C<.macro_const> directives
+(the latter was formerly called C<.constant>) are implemented, but the macro definition and
+expansion functionality needs some redesign. I'm thinking of implementing a macro
+pre-processor. A big pro of that approach would be a much cleaner lexer specification.
+However, it might make the compilation process a bit slower.
 
 =back
 
@@ -120,6 +105,18 @@ L<http://sourceforge.net/project/downloading.php?groupname=flex&filename=flex-2.
 
 Having a look at this implementation would be greatly appreciated, and any resulting
 feedback even more :-)
+
+=head1 TODO
+
+Major issues that need work:
+
+=over 4
+
+=item * finish macro layer
+
+=item * possibly remove the macro layer and create a macro pre-processor
+
+=back
 
 =head1 SEE ALSO
 
