@@ -335,7 +335,7 @@ parse_command(NOTNULL(const char *command), NOTNULL(unsigned long *cmdP))
 
     /* Nonempty and did not start with a letter */
     if (c == 0)
-        c = -1;
+        c = (unsigned long)-1;
 
     *cmdP = c;
 
@@ -411,7 +411,7 @@ PDB_get_command(PARROT_INTERP)
 
     /* generate string (no more than 255 chars) */
     while (ch != EOF && ch != '\n' && (i < 255)) {
-        c[i++] = ch;
+        c[i++] = (char)ch;
         ch     = fgetc(stdin);
     }
 
@@ -733,7 +733,7 @@ PDB_cond(PARROT_INTERP, NOTNULL(const char *command))
     }
 
     /* get the register number */
-    condition->reg = atoi(++command);
+    condition->reg = (unsigned char)atoi(++command);
 
     /* the next argument might have no spaces between the register and the
      * condition. */

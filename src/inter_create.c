@@ -135,7 +135,7 @@ make_interpreter(NULLOK(Interp *parent), INTVAL flags)
     create_initial_context(interp);
     interp->resume_flag = RESUME_INITIAL;
     /* main is called as a Sub too - this will get depth 0 then */
-    CONTEXT(interp->ctx)->recursion_depth = -1;
+    CONTEXT(interp->ctx)->recursion_depth = (UINTVAL)-1;
     interp->recursion_limit = RECURSION_LIMIT;
 
     /* Must initialize flags here so the GC_DEBUG stuff is available before
