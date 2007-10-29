@@ -626,7 +626,7 @@ Finish thawing.
             PMC *name_pmc = VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_name);
             PMC *typemap  =
                 VTABLE_get_pmc_keyed_int(INTERP, entry, e_HLL_typemap);
-            INTVAL hll_id;
+            INTVAL hll_id = - 1;
 
             if (!PMC_IS_NULL(name_pmc)) {
                 STRING *hll_name = VTABLE_get_string(INTERP, name_pmc);
@@ -650,7 +650,7 @@ Finish thawing.
                 UNUSED(ignored);
             }
 
-            if (hll_id && !PMC_IS_NULL(typemap)) {
+            if (hll_id >= 0 && !PMC_IS_NULL(typemap)) {
                 PMC   *iter = VTABLE_get_iter(INTERP, typemap);
                 INTVAL e    = VTABLE_get_integer(INTERP, typemap);
                 INTVAL i;
