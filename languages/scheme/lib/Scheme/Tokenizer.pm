@@ -117,7 +117,8 @@ sub tokenize {
             {                                # token ,@
                 $token .= $ch;
             }
-            else {
+            else
+            {
                 push @tokens, $token;
                 $token = $ch;
             }

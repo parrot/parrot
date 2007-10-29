@@ -16,7 +16,7 @@ use Data::Dumper;
 sub _build_tree {
     my ( $tokens, $count ) = @_;
 
-    die "EOF reached" if $count >= $#$tokens;
+    die "EOF reached" if $count > $#$tokens;
 
     if ( $tokens->[$count] eq '(' ) {
         my $tree = { children => []
