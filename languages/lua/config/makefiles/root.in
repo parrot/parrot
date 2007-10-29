@@ -163,7 +163,7 @@ $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 	$(PARROT) --output=$(LIBPATH)/lfs.pbc $(LIBPATH)/lfs.pir
 
 Lua/parser.pm: Lua/lua51.yp
-	yapp -s -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
+	yapp -v -m Lua::parser -o Lua/parser.pm Lua/lua51.yp
 
 help:
 	@echo ""
