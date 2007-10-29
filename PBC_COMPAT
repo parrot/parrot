@@ -25,6 +25,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.05    2007.10.29      allison         add get_eh, get_all_eh, and count_eh opcodes
 3.04    2007.10.28      paultcochrane   remove clear_eh opcode
 3.03	2007.10.17	coke    	released 0.4.17
 3.02	2007.09.20	bernhard	remove opcode hash
