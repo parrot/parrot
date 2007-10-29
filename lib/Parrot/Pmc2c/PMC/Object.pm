@@ -72,7 +72,7 @@ sub pre_method_gen {
         }
     }
     ${return}SUPER($superargs);
-    $super_return
+    $void_return
 EOC
         $self->add_method($new_default_method);
     }
