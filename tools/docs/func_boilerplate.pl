@@ -7,6 +7,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Distribution;
+use Parrot::Headerizer;
 
 =head1 NAME
 
@@ -36,36 +37,42 @@ Paul Cochrane <paultcochrane at gmail dot com>
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my $headerizer = Parrot::Headerizer->new;
 
 my $cut_line = "=cut";    # stops t/doc/pod.t from complaining.
 
+print "#### Start of boilerplate code ####\n";
+
 foreach my $file (@files) {
-    my $path = $ARGV ? $file : $file->path;
+    my $path = @ARGV ? $file : $file->path;
     my $buf = $DIST->slurp($path);
 
-    # get rid of if's and for's etc]
-    $buf =~ s/(if|for)\s+\(.*\)\s+{//g;
+    my @function_decls = $headerizer->extract_function_declarations($buf);
 
-    # look for function definitions
-    my @function_names = $buf =~ m/[^\s(|]\s(\w+)\(.*\)\s+{/g;
+    for my $function_decl (@function_decls) {
 
-    for my $function_name (@function_names) {
+        my $escaped_decl = $function_decl;
+        # escape [, ], (, ), and *
+        $escaped_decl =~ s/\[/\\[/g;
+        $escaped_decl =~ s/\]/\\]/g;
+        $escaped_decl =~ s/\(/\\(/g;
+        $escaped_decl =~ s/\)/\\)/g;
+        $escaped_decl =~ s/\*/\\*/g;
 
-        # if the function name matches a known C construct, go to the next
-        # one
-        if ( $function_name =~ m/for|if|switch|NOTNULL/ ) {
-            next;
-        }
+        # don't worry if the function declaration has embedded newlines in
+        # it and the documented function doesn't.
+        $escaped_decl =~ s/\s/\\s/g;
+
+        my $decl_rx = qr/=item C<$escaped_decl>/;
 
         # look for matching documentation.  This means the text
-        # '=item C<\w+\s+function_name'
-        if ( $buf !~ m/=item .*$function_name/ ) {
-
+        # '=item C<function_declaration>'
+        if ( $buf !~ m/$decl_rx/g ) {
             # if passed in files at the command line, print out
             # boilerplate docs for undocumented functions
 
             # stop t/doc/pod.t from complaining about badly formatted pod
-            my $item_line = "=item C<$function_name>";
+            my $item_line = "=item C<$function_decl>";
             print <<"END";
 /*
 
@@ -80,6 +87,7 @@ $cut_line
 END
         }
     }
+    print "#### End of boilerplate code ####\n";
 }
 
 # Local Variables:
