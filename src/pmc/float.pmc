@@ -38,28 +38,6 @@ Initializes the number to zero.
 
 /*
 
-=item C<PMC *new_from_string(STRING *rep, INTVAL flags)>
-
-Class method to construct an Integer from the string representation C<rep>.
-
-=cut
-
-*/
-    PMC *new_from_string(STRING *rep, INTVAL flags) {
-        PMC *res;
-        const INTVAL type = SELF->vtable->base_type;
-
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
-
-        PMC_num_val(res) = string_to_num(INTERP, rep);
-        return res;
-    }
-
-/*
-
 =item C<FLOATVAL get_number()>
 
 Returns the value of the number.
