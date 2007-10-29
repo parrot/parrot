@@ -13,6 +13,8 @@ use Test::More;
 my $pmc_dir  = File::Spec->catfile(qw( src pmc *.pmc ));
 my @pmcs     = grep { contains_pccmethod($_) } glob($pmc_dir);
 my $find_pmc = join( '|', map { s/\.pmc/\.dump/; $_ } @pmcs );
+# need extra "\" on Windows
+$find_pmc =~ s/\\/\\\\/g if $^O eq 'MSWin32';
 my $find_rx  = qr/^($find_pmc) : (.*)/;
 
 open( my $fh, '<', 'Makefile' ) or die "Can't read Makefile: $!\n";
