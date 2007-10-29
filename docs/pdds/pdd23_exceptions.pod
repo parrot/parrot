@@ -135,8 +135,6 @@ exception handler's way of telling Parrot that it has handled the exception.
 
 =head2 Exception Introspection Opcodes
 
-{{ TODO: Provide exception handler stack introspection. }}
-
 These are the opcodes relevant to introspection of the exception handler stack:
 
 =over
@@ -147,7 +145,8 @@ Return the quantity of currently active exception handlers.
 
 =item B<get_eh I<index>>
 
-Return the exception handler at I<index>
+Return the exception handler at I<index>. The index is an offset from the top
+of the stack, with '0' being the top.
 
 =item B<get_all_eh>
 
