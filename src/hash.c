@@ -897,19 +897,20 @@ PARROT_CAN_RETURN_NULL
 HashBucket *
 parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))
 {
-    const UINTVAL  hashval = (hash->hash_val)(interp, key, hash->seed);
-    HashBucket    *bucket;
-
     if (hash->entries == 0)
         return NULL;
 
-    bucket = hash->bi[hashval & hash->mask];
+    /* this block here should be C89-safe; const is very nice on hashval */
+    {
+        const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
+        HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
-    while (bucket) {
-        /* store hash_val or not */
-        if ((hash->compare)(interp, key, bucket->key) == 0)
-            return bucket;
-        bucket = bucket->next;
+        while (bucket) {
+            /* store hash_val or not */
+            if ((hash->compare)(interp, key, bucket->key) == 0)
+                return bucket;
+            bucket = bucket->next;
+        }
     }
 
     return NULL;
