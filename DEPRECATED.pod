@@ -34,6 +34,8 @@ Currently no C APIs are deprecated.
 
 =head1 Deprecated methods
 
+No methods are known to be deprecated.
+
 =head1 Deprecated ops
 
 From L<http://www.parrotcode.org/docs/ops/var.html>, the following ops are
@@ -62,7 +64,9 @@ are deprecated:
 
 =over 4
 
-=item B<new>(out PMC, in INT, in STR)
+=item B<new>(out PMC, in INT, in STR) (RT #47011)
+
+The VTABLE method 'new_from_string' will be removed.
 
 =back
 
