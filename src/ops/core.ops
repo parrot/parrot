@@ -699,6 +699,10 @@ Throw the exception in $1.
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
+=item B<count_eh>(out INT)
+
+Get a count of currently active exception handlers on the stack.
+
 =item B<get_eh>(out PMC, in INT)
 
 Return the exception handler at I<index>. The index is an offset from the top
@@ -773,6 +777,11 @@ inline op throwcc(invar PMC, invar PMC) {
 inline op rethrow(invar PMC) {
     opcode_t * const dest = (opcode_t *)rethrow_exception(interp, $1);
     goto ADDRESS(dest);
+}
+
+inline op count_eh(out INT) {
+    $1 = count_exception_handlers(interp);
+    goto NEXT();
 }
 
 inline op get_eh(out PMC, in INT) {

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -710,6 +710,33 @@ _handler1:
     end
 _handler2:
     print "ok 3\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_eh" );
+.sub main :main
+    push_eh _handler1
+    push_eh _handler2
+    print "ok 1\n"
+    $I0 = count_eh
+    if $I0 == 2 goto right_number
+        print "not "
+    right_number:
+    print "ok 2\n"
+    pop_eh
+    pop_eh
+    print "ok 3\n"
+    end
+_handler1:
+    print "first handler\n"
+    end
+_handler2:
+    print "second handler\n"
     end
 .end
 CODE

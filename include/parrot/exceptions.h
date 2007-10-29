@@ -231,6 +231,10 @@ PARROT_CAN_RETURN_NULL
 opcode_t * throw_exception(PARROT_INTERP, PMC *exception, SHIM(void *dest))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+INTVAL count_exception_handlers(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void destroy_exception_list(PARROT_INTERP)
         __attribute__nonnull__(1);
 

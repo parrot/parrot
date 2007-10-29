@@ -1245,3 +1245,4 @@ stm_depth_i                    1214
 get_all_eh_p                   1215
 get_eh_p_i                     1216
 get_eh_p_ic                    1217
+count_eh_i                     1218

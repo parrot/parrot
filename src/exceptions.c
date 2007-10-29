@@ -336,6 +336,42 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
 
 /*
 
+=item C<count_exception_handlers>
+
+Return the number of exception handlers on the exeception handler stack.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+count_exception_handlers(PARROT_INTERP)
+{
+    char *m;
+    INTVAL stack_depth = 0;
+    INTVAL eh_depth = 0;
+    Stack_Entry_t *e;
+    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
+
+    /* Not all entries in the stack are exception handlers, so iterate over the
+     * stack, counting exception handler entries. */
+    while ((e = stack_entry(interp, interp->dynamic_env, stack_depth)) != NULL) {
+        if (e->entry_type == STACK_ENTRY_PMC) {
+            PMC * const handler = UVal_pmc(e->entry);
+            if (handler && handler->vtable->base_type ==
+                    enum_class_Exception_Handler) {
+                eh_depth++;
+            }
+        }
+        stack_depth++;
+    }
+
+    return eh_depth;
+}
+
+/*
+
 =item C<get_exception_handler>
 
 Return an exception handler by index into the exeception handler stack.
