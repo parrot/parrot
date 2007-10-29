@@ -48,35 +48,54 @@ foreach my $file (@files) {
 
     for my $function_decl (@function_decls) {
 
+        my $escaped_decl = $function_decl;
+
         # escape [, ], (, ), and *
-        $function_decl =~ s/\[/\\[/g;
-        $function_decl =~ s/\]/\\]/g;
-        $function_decl =~ s/\(/\\(/g;
-        $function_decl =~ s/\)/\\)/g;
-        $function_decl =~ s/\*/\\*/g;
+        $escaped_decl =~ s/\[/\\[/g;
+        $escaped_decl =~ s/\]/\\]/g;
+        $escaped_decl =~ s/\(/\\(/g;
+        $escaped_decl =~ s/\)/\\)/g;
+        $escaped_decl =~ s/\*/\\*/g;
 
         # don't worry if the function declaration has embedded newlines in
         # it and the documented function doesn't.
-        $function_decl =~ s/\s/\\s/g;
+        $escaped_decl =~ s/\s/\\s/g;
 
-        my $decl_rx = qr/=item C<$function_decl>/;
+        my $decl_rx = qr/=item C<$escaped_decl>/;
 
-        # look for matching documentation.  This means the text
-        # '=item C<function_declaration>'
-        if ( $buf !~ m/$decl_rx/g ) {
-            push @missing_docs, "$path\n";
-            last;
+        # if we're sent just a single file, output all function declarations
+        # which aren't yet documented, otherwise just report the files
+        # without docs.
+        if ( @ARGV == 1 ) {
+            if ( $buf !~ m/$decl_rx/g ) {
+                push @missing_docs, "$function_decl\n";
+            }
+        }
+        else {
+            # look for matching documentation.  This means the text
+            # '=item C<function_declaration>'
+            if ( $buf !~ m/$decl_rx/g ) {
+                push @missing_docs, "$path\n";
+                last;
+            }
         }
     }
 }
 
-print join "\n", @extra_docs, "\n";
-
-ok( !scalar(@missing_docs), 'Functions documented' )
-    or diag( "Functions lacking documentation in "
-        . scalar @missing_docs
-        . " files:\n@missing_docs\n"
-        . "Use tools/docs/func_boilerplate.pl to add missing documentation\n" );
+if ( @ARGV == 1 ) {
+    ok( !scalar(@missing_docs), 'Functions documented' )
+        or diag( "Number of functions lacking documentation = "
+            . scalar @missing_docs
+            . "\n Functions lacking documentation:\n"
+            . join "#" x 70 . "\n", @missing_docs, "\n");
+}
+else {
+    ok( !scalar(@missing_docs), 'Functions documented' )
+        or diag( "Functions lacking documentation in "
+            . scalar @missing_docs
+            . " files:\n@missing_docs\n"
+            . "Use tools/docs/func_boilerplate.pl to add missing documentation\n" );
+}
 
 # Local Variables:
 #   mode: cperl
