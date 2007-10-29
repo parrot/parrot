@@ -40,19 +40,7 @@ my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my $cut_line = "=cut";    # stops t/doc/pod.t from complaining.
 
 foreach my $file (@files) {
-    my $path;
-
-    ## get the full path of the file
-    # if we have command line arguments, the file is the full path
-    if (@ARGV) {
-        $path = $file;
-    }
-
-    # otherwise, use the relevant Parrot:: path method
-    else {
-        $path = $file->path;
-    }
-
+    my $path = $ARGV ? $file : $file->path;
     my $buf = $DIST->slurp($path);
 
     # get rid of if's and for's etc]
