@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 
 =head1 NAME
 
@@ -148,12 +148,12 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     new P0, 'Exception'
-    set P0["_message"], "something happend"
+    set P0["_message"], "something happened"
     throw P0
     print "not reached\n"
     end
 CODE
-/something happend/
+/something happened/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
@@ -212,7 +212,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    set P30["_message"], "something happened"
     throw P30
     print "not reached\n"
     end
@@ -232,9 +232,9 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 caught it in 1
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "die" );
@@ -665,6 +665,57 @@ CODE
 something broke
 something broke
 current inst/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_all_eh" );
+.sub main :main
+    push_eh _handler1
+    push_eh _handler2
+    print "ok 1\n"
+    $P0 = get_all_eh
+    $I0 = elements $P0
+    unless $I0 == 2 goto wrong_number
+    print "ok 2\n"
+    wrong_number:
+    pop_eh
+    pop_eh
+    print "ok 3\n"
+    end
+_handler1:
+    print "never printed\n"
+    end
+_handler2:
+    print "never printed\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_eh" );
+.sub main :main
+    push_eh _handler1
+    push_eh _handler2
+    print "ok 1\n"
+    $P0 = get_eh 0
+    pop_eh
+    pop_eh
+    print "ok 2\n"
+    $P0()
+    end
+_handler1:
+    print "not ok 3\n"
+    end
+_handler2:
+    print "ok 3\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 # Local Variables:

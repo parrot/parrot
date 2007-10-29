@@ -699,6 +699,15 @@ Throw the exception in $1.
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
+=item B<get_eh>(out PMC, in INT)
+
+Return the exception handler at I<index>. The index is an offset from the top
+of the stack, with '0' being the top.
+
+=item B<get_all_eh>(out PMC)
+
+Return an array of all current exception handlers.
+
 =item B<die>(in INT, in INT)
 
 Die with severity $1 and error $2. If severity is .EXCEPT_DOOMED,
@@ -765,6 +774,17 @@ inline op rethrow(invar PMC) {
     opcode_t * const dest = (opcode_t *)rethrow_exception(interp, $1);
     goto ADDRESS(dest);
 }
+
+inline op get_eh(out PMC, in INT) {
+    $1 = get_exception_handler(interp, $2);
+    goto NEXT();
+}
+
+inline op get_all_eh(out PMC) {
+    $1 = get_all_exception_handlers(interp);
+    goto NEXT();
+}
+
 
 inline op die(in INT, in INT) {
     if ($1 == EXCEPT_doomed)

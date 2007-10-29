@@ -336,6 +336,78 @@ find_exception_handler(PARROT_INTERP, NOTNULL(PMC *exception))
 
 /*
 
+=item C<get_exception_handler>
+
+Return an exception handler by index into the exeception handler stack.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PMC *
+get_exception_handler(PARROT_INTERP, INTVAL target_depth)
+{
+    char *m;
+    INTVAL stack_depth = 0;
+    INTVAL eh_depth = 0;
+    Stack_Entry_t *e;
+    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
+
+    /* Not all entries in the stack are exception handlers, so iterate over the
+     * stack, counting exception handler entries. */
+    while ((e = stack_entry(interp, interp->dynamic_env, stack_depth)) != NULL) {
+        if (e->entry_type == STACK_ENTRY_PMC) {
+            PMC * const handler = UVal_pmc(e->entry);
+            if (handler && handler->vtable->base_type ==
+                    enum_class_Exception_Handler) {
+                if (eh_depth == target_depth) {
+                    return handler;
+                }
+                eh_depth++;
+            }
+        }
+        stack_depth++;
+    }
+
+    return PMCNULL;
+}
+
+/*
+
+=item C<get_all_exception_handlers>
+
+Return an array of all exception handlers.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PMC *
+get_all_exception_handlers(PARROT_INTERP)
+{
+    char *m;
+    int depth = 0;
+    Stack_Entry_t *e;
+    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
+
+    while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
+        if (e->entry_type == STACK_ENTRY_PMC) {
+            PMC * const handler = UVal_pmc(e->entry);
+            if (handler && handler->vtable->base_type ==
+                    enum_class_Exception_Handler) {
+                VTABLE_push_pmc(interp, all_entries, handler);
+            }
+        }
+        depth++;
+    }
+
+    return all_entries;
+}
+
+/*
+
 =item C<pop_exception>
 
 Pops the topmost exception handler off the stack.
