@@ -6,72 +6,15 @@
 #   Lexer module
 #
 
-package Lua::parser;
+package Lua::lexer;
 
 use strict;
 use warnings;
 
 #use Math::BigFloat;
 
-sub Error {
-    my $parser = shift;
-    my ($msg) = @_;
-
-    $msg ||= "Syntax error.\n";
-
-    if ( exists $parser->YYData->{nb_error} ) {
-        $parser->YYData->{nb_error}++;
-    }
-    else {
-        $parser->YYData->{nb_error} = 1;
-    }
-
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
-        if ( exists $parser->YYData->{verbose_error}
-        and $parser->YYData->{verbose_error} );
-    return;
-}
-
-sub Warning {
-    my $parser = shift;
-    my ($msg) = @_;
-
-    $msg ||= ".\n";
-
-    if ( exists $parser->YYData->{nb_warning} ) {
-        $parser->YYData->{nb_warning}++;
-    }
-    else {
-        $parser->YYData->{nb_warning} = 1;
-    }
-
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
-        if ( exists $parser->YYData->{verbose_warning}
-        and $parser->YYData->{verbose_warning} );
-    return;
-}
-
-sub Info {
-    my $parser = shift;
-    my ($msg) = @_;
-
-    $msg ||= ".\n";
-
-    if ( exists $parser->YYData->{nb_info} ) {
-        $parser->YYData->{nb_info}++;
-    }
-    else {
-        $parser->YYData->{nb_info} = 1;
-    }
-
-    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
-        if ( exists $parser->YYData->{verbose_info}
-        and $parser->YYData->{verbose_info} );
-    return;
-}
-
 sub _DoubleQuoteStringLexer {
-    my $parser = shift;
+    my ($parser) = @_;
     my $str    = q{};
     my $type   = 'STRING';
 
@@ -123,7 +66,7 @@ sub _DoubleQuoteStringLexer {
 }
 
 sub _SingleQuoteStringLexer {
-    my $parser = shift;
+    my ($parser) = @_;
     my $str    = q{};
     my $type   = 'STRING';
 
@@ -175,8 +118,7 @@ sub _SingleQuoteStringLexer {
 }
 
 sub _LongStringLexer {
-    my $parser  = shift;
-    my ($level) = @_;
+    my ($parser, $level) = @_;
     my $str     = q{};
     my $type    = 'STRING';
 
@@ -208,8 +150,7 @@ sub _LongStringLexer {
 }
 
 sub _Identifier {
-    my $parser = shift;
-    my ($idf) = @_;
+    my ($parser, $idf) = @_;
 
     if ( exists $parser->YYData->{keyword}{$idf} ) {
         return ( $parser->YYData->{keyword}{$idf}, $idf );
@@ -218,8 +159,7 @@ sub _Identifier {
 }
 
 sub _LongCommentLexer {
-    my $parser = shift;
-    my ($level) = @_;
+    my ($parser, $level) = @_;
 
     while (1) {
         $parser->YYData->{INPUT}
@@ -237,8 +177,8 @@ sub _LongCommentLexer {
     }
 }
 
-sub _Lexer {
-    my $parser = shift;
+sub Lexer {
+    my ($parser) = @_;
 
     while (1) {
         $parser->YYData->{INPUT}
@@ -258,7 +198,7 @@ sub _Lexer {
                 and $parser->YYData->{lineno}++, last;
 
             s/^\-\-\[(=*)\[//       # LongComment
-                and $parser->_LongCommentLexer($1), last;
+                and _LongCommentLexer($parser, $1), last;
             s/^\-\-(.*)\n//         # ShortComment
                 and $parser->YYData->{lineno}++, last;
 
@@ -271,16 +211,16 @@ sub _Lexer {
                 and return ( 'NUMBER', $1 . ( $3 || q{} ) );
 
             s/^\"//
-                and return $parser->_DoubleQuoteStringLexer();
+                and return _DoubleQuoteStringLexer($parser);
 
             s/^\'//
-                and return $parser->_SingleQuoteStringLexer();
+                and return _SingleQuoteStringLexer($parser);
 
             s/^\[(=*)\[//
-                and return $parser->_LongStringLexer($1);
+                and return _LongStringLexer($parser, $1);
 
             s/^([A-Z_a-z][0-9A-Z_a-z]*)//
-                and return $parser->_Identifier($1);
+                and return _Identifier($parser, $1);
 
             s/^(\.\.\.)//
                 and return ( $1, $1 );
@@ -304,8 +244,8 @@ sub _Lexer {
     }
 }
 
-sub _InitLexico {
-    my $parser = shift;
+sub InitLexico {
+    my ($parser) = @_;
 
     my %keywords = (
         'and'      => 'AND',

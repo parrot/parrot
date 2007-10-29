@@ -644,7 +644,7 @@ sub Run {
     my @st = stat( $parser->YYData->{srcname} );
     $parser->YYData->{srcname_size}  = $st[7];
     $parser->YYData->{srcname_mtime} = $st[9];
-    $parser->_InitLexico();
+    Lua::lexer::InitLexico($parser);
     $parser->YYData->{functs}      = [];
     $parser->YYData->{lex_num}     = 0;
     $parser->YYData->{scope}       = [];
@@ -657,7 +657,7 @@ sub Run {
     $parser->YYData->{idx_lbl}     = 0;
     $parser->YYData->{idx_fct}     = 0;
     $parser->YYParse(
-        yylex   => \&_Lexer,
+        yylex   => \&Lua::lexer::Lexer,
         yyerror => sub { return; },
 #        yydebug => 0x17,
         #    Bit Value    Outputs
@@ -728,6 +728,63 @@ sub Generate {
         }
     }
     close $FH;
+    return;
+}
+
+sub Error {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= "Syntax error.\n";
+
+    if ( exists $parser->YYData->{nb_error} ) {
+        $parser->YYData->{nb_error}++;
+    }
+    else {
+        $parser->YYData->{nb_error} = 1;
+    }
+
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
+        if ( exists $parser->YYData->{verbose_error}
+        and $parser->YYData->{verbose_error} );
+    return;
+}
+
+sub Warning {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= ".\n";
+
+    if ( exists $parser->YYData->{nb_warning} ) {
+        $parser->YYData->{nb_warning}++;
+    }
+    else {
+        $parser->YYData->{nb_warning} = 1;
+    }
+
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
+        if ( exists $parser->YYData->{verbose_warning}
+        and $parser->YYData->{verbose_warning} );
+    return;
+}
+
+sub Info {
+    my $parser = shift;
+    my ($msg) = @_;
+
+    $msg ||= ".\n";
+
+    if ( exists $parser->YYData->{nb_info} ) {
+        $parser->YYData->{nb_info}++;
+    }
+    else {
+        $parser->YYData->{nb_info} = 1;
+    }
+
+    print STDOUT 'lua: ', $parser->YYData->{srcname}, ':', $parser->YYData->{lineno}, ': ', $msg
+        if ( exists $parser->YYData->{verbose_info}
+        and $parser->YYData->{verbose_info} );
     return;
 }
 
