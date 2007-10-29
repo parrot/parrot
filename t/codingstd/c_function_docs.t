@@ -45,7 +45,6 @@ foreach my $file (@files) {
     my $buf = $DIST->slurp($path);
 
     my @function_decls = $headerizer->extract_function_declarations($buf);
-    #print join "\n", @function_decls, "\n";
 
     for my $function_decl (@function_decls) {
 
