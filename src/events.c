@@ -844,6 +844,8 @@ The IO thread uses select/poll to handle IO events and signals.
 It waits on input from the message pipe to insert file descriptors in
 the wait sets.
 
+=cut
+
 */
 
 PARROT_CAN_RETURN_NULL
