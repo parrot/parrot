@@ -14,7 +14,6 @@ use Scheme::Builtins;
 
 our $VERSION   = '0.01';
 
-
 sub _gensym {
     return sprintf "G%04d", shift->{gensym}++;
 }
@@ -504,13 +503,14 @@ sub _op_lambda {
 sub _op_if {
     my ( $self, $node ) = @_;
 
-    my $return;
+    $self->_add_comment( 'start of _op_if()' );
+
     my $label = $self->_gensym();
 
     my $cond = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'eq', [ $cond, 0, "FALSE_$label" ] );
     $self->_restore($cond);
-    $return = $self->_save_1('P');
+    my $return = $self->_save_1('P');
 
     my $true = $self->_generate( _get_arg( $node, 2 ) );
     $self->_morph( $return, $true );
@@ -523,6 +523,7 @@ sub _op_if {
     $self->_restore($false);
 
     $self->_add_inst("DONE_$label");
+    $self->_add_comment( "returning $return from _op_if()" );
 
     return $return;
 }
@@ -732,11 +733,19 @@ sub _op_delay {
 sub _op_not {
     my ( $self, $node ) = @_;
 
-    my $return = $self->_save_1('I');
-    $self->_generate( _get_arg( $node, 1 ) );
-    $self->_add_inst( '', 'not', [ $return, $return ] );
+    $self->_add_comment( 'start of _op_not()' );
+    my $return = $self->_generate(
+                     { children => [ { value => 'if' },
+                                      _get_arg( $node, 1 ),
+                                      { value => '#f' },
+                                      { value => '#t' },
+                                   ]
+                     }
+                 );
 
-    $return;
+    $self->_add_comment( 'end of _op_not()' );
+
+    return $return;
 }
 
 sub _op_boolean_p {
@@ -758,6 +767,8 @@ sub _op_boolean_p {
         $self->_add_inst( '', 'set', [ $return, 1 ] );
         $self->_add_inst("FAIL_$label");
     }
+
+    $self->_add_comment( 'end of _op_boolean_p()' );
 
     return $return;
 }
@@ -1739,7 +1750,6 @@ sub _op_write {
 sub _op_display {
     my ( $self, $node ) = @_;
 
-    # die Dumper( $self, $node );
     $self->_add_comment( 'start of _op_display' );
 
     my $temp = 'none';
