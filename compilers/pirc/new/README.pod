@@ -83,7 +83,6 @@ You can specify a list of .pir files to be compiled; all of them will be process
 This is a nice opportunity to clean up the grammar of the PIR language. Hacking on
 IMCC's grammar is possible, but not for the faint of heart.
 
-
 =back
 
 =head1 NOTES
@@ -97,7 +96,40 @@ which can be downloaded from the link below.
 
 L<http://sourceforge.net/project/downloading.php?groupname=flex&filename=flex-2.5.33.tar.gz&use_mirror=belnet>
 
+=head2 On the macro pre-processor
 
+As listed in the TODO, it might be worth while considering to remove the macro handling
+from pir.l, and create a separate macro pre-processor. However, when doing so, its lexer
+is almost a duplicate of pir.l. This is to correctly scan heredocs and recognize macro
+expansions. When a dot-prefixed identifier is encountered, it should only be expanded
+when the lexer is not scanning a heredoc. So, at least the whole heredoc scanning stuff
+should also go into the pre-processor.
+
+A first version of a separate macro pre-processor can be found in C<compilers/pirc/macro>.
+This pre-processor is mostly done, except for macro argument expansion, and heredoc parsing.
+
+=head3 Pros
+
+=over 4
+
+=item * cleaner solution, as the macro layer is implemented in a separate processor.
+
+=item * easier to maintain. The heredoc and macro scanning is complex, and to isolate it in a
+different file is a Good Thing.
+
+=back
+
+=head3 Cons
+
+=over 4
+
+=item * a great deal of the PIR lexer is duplicated. Duplication of code is bad.
+
+=item * having the input processed by two instead of 1 scanner results in a performance penalty.
+This is especially true if the intermediate results are written to and read from a file on disk.
+
+
+=back
 
 =head1 BUGS
 
