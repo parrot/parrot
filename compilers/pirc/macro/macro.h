@@ -1,5 +1,9 @@
-#ifndef MACRO_H
-#define MACRO_H
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+#ifndef PARROT_PIR_MACRO_H_GUARD
+#define PARROT_PIR_MACRO_H_GUARD
 
 typedef struct macro_def {
     char *name;
@@ -19,4 +23,11 @@ typedef struct list {
 } list;
 
 
-#endif
+#endif /* PARROT_PIR_MACRO_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
