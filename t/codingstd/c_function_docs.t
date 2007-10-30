@@ -41,6 +41,7 @@ my @extra_docs;
 
 foreach my $file (@files) {
     my $path = @ARGV ? $file : $file->path;
+    next unless $path =~ m/\.c|\.h$/;  # can't handle .ops or .pmc files yet
 
     my $buf = $DIST->slurp($path);
 
