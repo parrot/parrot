@@ -39,9 +39,12 @@ static STRING* trace_class_name(NOTNULL(const PMC* pmc))
 
 /*
 
-=item C<trace_pmc_dump>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+trace_class_name(NOTNULL(const PMC* pmc))>
 
-Prints a PMC to C<stderr>.
+Obtains the class name of the PMC.
 
 =cut
 
@@ -63,6 +66,16 @@ trace_class_name(NOTNULL(const PMC* pmc))
         class_name = pmc->vtable->whoami;
     return class_name;
 }
+
+/*
+
+=item C<void trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))>
+
+Prints a PMC to C<stderr>.
+
+=cut
+
+*/
 
 void
 trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
@@ -145,7 +158,7 @@ trace_pmc_dump(PARROT_INTERP, NOTNULL(PMC *pmc))
 
 /*
 
-=item C<trace_key_dump>
+=item C<int trace_key_dump(PARROT_INTERP, NOTNULL(const PMC *key))>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -223,7 +236,10 @@ trace_key_dump(PARROT_INTERP, NOTNULL(const PMC *key))
 
 /*
 
-=item C<trace_op_dump>
+=item C<void
+trace_op_dump(PARROT_INTERP,
+        NOTNULL(const opcode_t *code_start),
+        NOTNULL(const opcode_t *pc))>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -234,7 +250,9 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(PARROT_INTERP, NOTNULL(const opcode_t *code_start), NOTNULL(const opcode_t *pc))
+trace_op_dump(PARROT_INTERP,
+        NOTNULL(const opcode_t *code_start),
+        NOTNULL(const opcode_t *pc))
 {
     INTVAL s, n;
     int more = 0, var_args;
@@ -432,7 +450,11 @@ done:
 
 /*
 
-=item C<trace_op>
+=item C<void
+trace_op(PARROT_INTERP,
+        NOTNULL(const opcode_t *code_start),
+        NOTNULL(const opcode_t *code_end),
+        NULLOK(const opcode_t *pc))>
 
 TODO: This isn't really part of the API, but here's its documentation.
 
@@ -444,8 +466,10 @@ checking.
 */
 
 void
-trace_op(PARROT_INTERP, NOTNULL(const opcode_t *code_start),
-         NOTNULL(const opcode_t *code_end), NULLOK(const opcode_t *pc))
+trace_op(PARROT_INTERP,
+        NOTNULL(const opcode_t *code_start),
+        NOTNULL(const opcode_t *code_end),
+        NULLOK(const opcode_t *pc))
 {
     if (!pc) {
         return;
