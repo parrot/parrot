@@ -221,9 +221,8 @@ Same as C<.local>.
 
 =item .lex <identifier>, <reg>
 
-Declare a lexical variable that is an alias for a PMC register. The
-PIR compiler calls this method in response to a .lex STRING, PREG
-directive. For example, given this preamble:
+Declare a lexical variable that is an alias for a PMC register. For example,
+given this preamble:
 
     .lex "$a", $P0
     $P1 = new 'Integer'
@@ -301,20 +300,21 @@ parsed.  See also the C<loadlib> opcode, which does the same at run time.
 A library loaded this way is also available at runtime, as if it has been
 loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
-=item .HLL "<hll_name>", "<hll_lib>"
+=item .HLL <hll_name>, <hll_lib>
 
-Define the HLL for the current file. If the string I<hll_lib> isn't empty
-this compile time pragma also loads the shared lib for the HLL, so that
-integer type constants are working for creating new PMCs.
+Define the HLL for the current file. Takes two string constants. If the string
+I<hll_lib> isn't empty this compile time pragma also loads the shared lib for
+the HLL, so that integer type constants are working for creating new PMCs.
 
-=item .HLL_map '<CoreType>', '<UserType>'
+=item .HLL_map <core_type>, <user_type>
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program it consults the current type mapping for the executing HLL
-and creates a PMC of type I<UserType> instead of I<CoreType>, if such
-a mapping is defined.
+and creates a PMC of type I<user_type> instead of I<core_type>, if such
+a mapping is defined. I<core_type> and I<user_type> may be any valid string
+constant.
 
-E.g. with this code snippet ...
+For example, with this code snippet ...
 
   .loadlib 'dynlexpad'
 
@@ -338,10 +338,10 @@ compilation unit. See L<PDD03|docs/pdds/pdd03_calling_conventions.pod> for
 available flags.  Optional flags are a list of I<flag>, separated by empty
 spaces, and empty spaces only.
 
-The name of the sub may be either a bare identifier or a single- or
-double-quoted string. Bare identifiers must be valid PIR identifiers (see
-L<Identifiers> above), but string sub names can contain any characters,
-including characters from different character sets (see L<Constants> above).
+The name of the sub may be either a bare identifier or a quoted string
+constant. Bare identifiers must be valid PIR identifiers (see L<Identifiers>
+above), but string sub names can contain any characters, including characters
+from different character sets (see L<Constants> above).
 
 {{ NOTE: the optional comma in the flag list is deprecated RT#45697 }}
 
@@ -361,9 +361,11 @@ subset of directives). Always paired with C<.eom>.
 End a compilation unit containing PASM code. Always paired with
 C<.emit>.
 
-=item .begin_*, .end_*, .call
+=back
 
-Directives used for Parrot calling conventions. These are:
+=head3 Directives used for Parrot calling conventions.
+
+{{ DEPRECATED: the "pcc_" prefix. See #45925. }}
 
 =over 4
 
@@ -375,14 +377,26 @@ Directives used for Parrot calling conventions. These are:
 
 =item .call
 
+=item .return <var> [:<flag> ...]
+
+Between C<.begin_return> and C<.end_return>, specify one or
+more of the return value(s) of the current subroutine.  Available
+flags: C<:flat>, C<:named>.
+
+=item .arg <var> [:<flag> ...]
+
+Between C<.begin_call> and C<.call>, specify an argument to be
+passed.  Available flags: C<:flat>, C<:named>.
+
+=item .result <var> [:<flag> ...]
+
+Between C<.call> and C<.end_call>, specify where one or more return
+value(s) should be stored.  Available flags:
+C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
+
 =back
 
-
-{{ REVIEW: Do we still want/need the "pcc_" prefix? See #45925. }}
-
-=back
-
-=head3 Directives for subroutine parameters and return
+=head3 Directives for subroutine parameters
 
 =over 4
 
@@ -398,29 +412,6 @@ C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 Define a named parameter. This is syntactic sugar for:
 
  .param <type> <identifier> :named("<identifier>")
-
-=item .return <var> [:<flag> ...]
-
-Between C<.begin_return> and C<.end_return>, specify one or
-more of the return value(s) of the current subroutine.  Available
-flags: C<:flat>, C<:named>.
-
-=back
-
-=head3 Directives for making a PCC call
-
-=over 4
-
-=item .arg <var> [:<flag> ...]
-
-Between C<.begin_call> and C<.call>, specify an argument to be
-passed.  Available flags: C<:flat>, C<:named>.
-
-=item .result <var> [:<flag> ...]
-
-Between C<.call> and C<.end_call>, specify where one or more return
-value(s) should be stored.  Available flags:
-C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
 
 =back
 
@@ -549,24 +540,17 @@ A keyed C<set> operation.
 {{ DEPRECATION NOTE: this syntactic sugar will no longer be used for the assign
 C<substr> op with a length of 1. }}
 
-=item <var> = new '<type>'
+=item <var> = <opcode> <arguments>
 
-Create a new PMC of type I<type> stored in I<var>. Translate to
-C<new var, 'type'>.
+All opcodes can use this PIR syntactic sugar. The first argument for the opcode
+is placed before the C<=>, and all remaining arguments go after the opcode
+name. For example:
 
-=item <var1> = new '<type>', <var2>
+  new $P0, 'Type'
 
-Create a new PMC of type I<type> stored in I<var1> and using I<var2> as PMC
-containing initialization data. Translate to C<new var1, 'type', var2>
+becomes:
 
-=item <var1> = defined <var2>
-
-Assign to I<var1> the value for definedness of I<var2>. Translate to
-C<defined var1, var2>.
-
-=item <var1> = defined <var2> [ <var3> ]
-
-C<defined var1, var2[var3]> the keyed op.
+  $P0 = new 'Type'
 
 =item global "string" = <var>
 
@@ -575,23 +559,6 @@ C<defined var1, var2[var3]> the keyed op.
 =item <var> = global "string"
 
 {{ DEPRECATED: op find_global was deprecated }}
-
-=item <var1> = clone <var2>
-
-Assign to I<var1> a clone of I<var2>. Translate to C<clone var1, var2>.
-
-=item <var> = addr <identifier>
-
-Assign to I<var> the address of label identified by I<identifier>. Translate
-to C<set_addr var, var>.
-
-=item <var> = null
-
-Set I<var> to null. Translate to C<null <var>.
-
-=item addr
-
-Return the address of a label.
 
 =item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
 
