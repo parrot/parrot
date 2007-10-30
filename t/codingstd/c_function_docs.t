@@ -60,7 +60,7 @@ foreach my $file (@files) {
 
         # don't worry if the function declaration has embedded newlines in
         # it and the documented function doesn't.
-        $escaped_decl =~ s/\s/\\s/g;
+        $escaped_decl =~ s/\s+/\\s+/g;
 
         my $decl_rx = qr/=item C<$escaped_decl>/;
 
