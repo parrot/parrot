@@ -515,11 +515,15 @@ long_arguments: /* empty */
 long_argument: ".arg" expression arg_flags "\n"
              ;
 
-long_invocation: ".call" invokable
+long_invocation: ".call" invokable opt_return_continuation
                | ".nci_call" invokable
                | ".invocant" invokable "\n"
                  ".meth_call" method
                ;
+
+opt_return_continuation: /* empty */
+                       | ',' invokable
+                       ;
 
 long_results: /* empty */
             | long_results long_result
