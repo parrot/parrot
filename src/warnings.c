@@ -32,7 +32,8 @@ static INTVAL print_warning(PARROT_INTERP, NULLOK(STRING *msg))
 
 /*
 
-=item C<print_pbc_location>
+=item C<void
+print_pbc_location(PARROT_INTERP)>
 
 Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 
@@ -53,7 +54,8 @@ print_pbc_location(PARROT_INTERP)
 
 /*
 
-=item C<print_warning>
+=item C<static INTVAL
+print_warning(PARROT_INTERP, NULLOK(STRING *msg))>
 
 Prints the warning message and the bytecode location.
 
@@ -83,7 +85,10 @@ print_warning(PARROT_INTERP, NULLOK(STRING *msg))
 
 =over 4
 
-=item C<Parrot_warn>
+=item C<PARROT_API
+INTVAL
+Parrot_warn(PARROT_INTERP, INTVAL warnclass,
+            NOTNULL(const char *message), ...)>
 
 The Parrot C string warning/error reporter.
 
@@ -116,7 +121,10 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
 
 /*
 
-=item C<Parrot_warn_s>
+=item C<PARROT_API
+INTVAL
+Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
+              NOTNULL(STRING *message), ...)>
 
 The Parrot C<STRING> warning/error reporter.
 

@@ -23,7 +23,11 @@ src/vtables.c - Functions to build and manipulate vtables
 
 /*
 
-=item C<Parrot_new_vtable>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+VTABLE *
+Parrot_new_vtable(SHIM_INTERP)>
 
 Creates and returns a pointer to the new C<VTABLE>.
 
@@ -42,7 +46,11 @@ Parrot_new_vtable(SHIM_INTERP)
 
 /*
 
-=item C<Parrot_clone_vtable>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+VTABLE *
+Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -67,7 +75,9 @@ Parrot_clone_vtable(SHIM_INTERP, NOTNULL(const VTABLE *base_vtable))
 
 /*
 
-=item C<Parrot_destroy_vtable>
+=item C<PARROT_API
+void
+Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable))>
 
 Destroys C<*vtable>.
 
@@ -89,6 +99,17 @@ Parrot_destroy_vtable(SHIM_INTERP, NULLOK(VTABLE *vtable))
     mem_sys_free(vtable);
 }
 
+/*
+
+=item C<void
+parrot_alloc_vtables(PARROT_INTERP)>
+
+TODO: Note yet documented!!!
+
+=cut
+
+*/
+
 void
 parrot_alloc_vtables(PARROT_INTERP)
 {
@@ -98,6 +119,17 @@ parrot_alloc_vtables(PARROT_INTERP)
     interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES;
 }
+
+/*
+
+=item C<void
+parrot_realloc_vtables(PARROT_INTERP)>
+
+TODO: Note yet documented!!!
+
+=cut
+
+*/
 
 void
 parrot_realloc_vtables(PARROT_INTERP)
@@ -113,6 +145,17 @@ parrot_realloc_vtables(PARROT_INTERP)
         interp->vtables, new_size, old_size);
 }
 
+/*
+
+=item C<void
+parrot_free_vtables(PARROT_INTERP)>
+
+TODO: Note yet documented!!!
+
+=cut
+
+*/
+
 void
 parrot_free_vtables(PARROT_INTERP)
 {
@@ -123,6 +166,17 @@ parrot_free_vtables(PARROT_INTERP)
 
     mem_sys_free(interp->vtables);
 }
+
+/*
+
+=item C<void
+mark_vtables(PARROT_INTERP)>
+
+TODO: Note yet documented!!!
+
+=cut
+
+*/
 
 void
 mark_vtables(PARROT_INTERP)
