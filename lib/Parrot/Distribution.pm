@@ -353,13 +353,13 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/new/pirlexer.h
             compilers/pirc/new/pirparser.c
             compilers/pirc/new/pirparser.h
-			compilers/pirc/macro/macro.h
-			compilers/pirc/macro/macro.l
-			compilers/pirc/macro/macro.y
-			compilers/pirc/macro/macrolexer.c
-			compilers/pirc/macro/macrolexer.h
-			compilers/pirc/macro/macroparser.c
-			compilers/pirc/macro/macroparser.h
+            compilers/pirc/macro/macro.h
+            compilers/pirc/macro/macro.l
+            compilers/pirc/macro/macro.y
+            compilers/pirc/macro/macrolexer.c
+            compilers/pirc/macro/macrolexer.h
+            compilers/pirc/macro/macroparser.c
+            compilers/pirc/macro/macroparser.h
             languages/cola/lexer.c
             languages/cola/parser.c
             languages/cola/parser.h
