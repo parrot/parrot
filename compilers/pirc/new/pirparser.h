@@ -40,9 +40,9 @@
       know about them.  */
    enum yytokentype {
      TK_MACRO_PARAM = 258,
-     TK_LABEL = 259,
-     TK_DOTDOT = 260,
-     TK_ENDM = 261,
+     TK_ENDM = 259,
+     TK_LABEL = 260,
+     TK_DOTDOT = 261,
      TK_NL = 262,
      TK_HLL = 263,
      TK_HLL_MAP = 264,
@@ -145,9 +145,9 @@
 #endif
 /* Tokens.  */
 #define TK_MACRO_PARAM 258
-#define TK_LABEL 259
-#define TK_DOTDOT 260
-#define TK_ENDM 261
+#define TK_ENDM 259
+#define TK_LABEL 260
+#define TK_DOTDOT 261
 #define TK_NL 262
 #define TK_HLL 263
 #define TK_HLL_MAP 264
@@ -252,7 +252,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 189 "pir.y"
+#line 190 "pir.y"
 {
     double dval;
     int    ival;

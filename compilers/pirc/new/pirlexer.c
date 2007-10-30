@@ -4982,6 +4982,7 @@ expand_macro(yyscan_t yyscanner, YY_BUFFER_STATE current_buffer, struct macro_in
     /* and scan that string buffer, using the (inclusive) MACROEXP state. */
     yy_push_state(INITIAL, yyscanner);
 
+
     yy_scan_string(macro->body,yyscanner);
 
 

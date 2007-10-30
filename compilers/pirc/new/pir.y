@@ -69,11 +69,12 @@ extern struct lexer_state *new_lexer(char * const filename);
 
 %}
 
+/* these 2 will be handled in the macro pre-processor, and be removed here */
 %token TK_MACRO_PARAM
+       TK_ENDM          ".endm"
 
 %token TK_LABEL         "label"
        TK_DOTDOT        ".."
-       TK_ENDM          ".endm"
        TK_NL            "\n"
 
 %token TK_HLL           ".HLL"
@@ -145,7 +146,7 @@ extern struct lexer_state *new_lexer(char * const filename);
        TK_FDIV      "//"
        TK_OR        "||"
        TK_AND       "&&"
-       TK_XOR       "^"
+       TK_XOR       "~~"
        TK_CONC      "."
        TK_ASSIGN_USHIFT ">>>="
        TK_ASSIGN_RSHIFT ">>="
@@ -425,12 +426,20 @@ binop: '+'
      | '*'
      | '%'
      | "."
+     | ">>>"
+     | ">>"
+     | "<<"
+     | "||"
+     | "&&"
+     | "//"
+     | "~~"
      ;
 
 
 augmented_op: "+="
             | "-="
             | "*="
+            | "%="
             | "**="
             | "/="
             | "//="
