@@ -3121,6 +3121,10 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /*
 
+=head1 FUNCTIONS
+
+=over 4
+
 =item C<is_pir_directive>
 
 Returns a non-zero value if the specified name is a PIR directive.
