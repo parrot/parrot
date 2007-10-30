@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 27;
+use Test::More tests => 28;
 
 use Parrot::Test;
 
@@ -18,6 +18,10 @@ use Parrot::Test;
 
 language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Fail' );
 (write (if (= 1 1) 1 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '"0 is true"', '0 is true' );
+(write (if 0 "0 is true" "0 is false" ))
 CODE
 
 language_output_is( 'Scheme', <<'CODE', 1, 'basic if - Pass' );
