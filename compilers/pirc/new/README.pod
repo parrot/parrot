@@ -139,8 +139,6 @@ the following features:
 
 =item * Heredoc parsing (both for normal PIR code, as well as macro arguments)
 
-=item * arguments for macro expansion
-
 =item * macro labels.
 
 =back
