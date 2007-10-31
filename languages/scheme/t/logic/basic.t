@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 28;
+use Test::More tests => 38;
 
 use Parrot::Test;
 
@@ -74,6 +74,50 @@ CODE
 
 language_output_is( 'Scheme', <<'CODE', 1, 'boolean? 0' );
 (write (if (boolean? (boolean? "hello")) 1 0))
+CODE
+
+###
+### number?
+###
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'number? #t' );
+(write (number? #t))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'number? #f' );
+(write (number? #f))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'number? 0' );
+(write (number? 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'number? 1' );
+(write (number? 1))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#f', 'number? 0' );
+(write (number? (number? "hello")))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 0, 'number? #t' );
+(write (if (number? #t) 1 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 0, 'number? #f' );
+(write (if (number? #f) 1 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 1, 'number? 0' );
+(write (if (number? 0) 1 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 1, 'number? 1' );
+(write (if (number? 1) 1 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 0, 'number? 0' );
+(write (if (number? (number? "hello")) 1 0))
 CODE
 
 
