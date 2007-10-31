@@ -34,9 +34,10 @@ extern int yyerror(yyscan_t yyscanner, char *message);
 
 
 /* globals! */
-macro_def *macros = NULL;
-static int errors = 0;
-int flexdebug = 0;
+constant_table *globaldefinitions;
+
+static int errors    = 0;
+static int flexdebug = 0;
 
 
 
@@ -44,16 +45,20 @@ static void process_file(char *filename);
 static void process_string(char *buffer);
 static void include_file(char *filename);
 static void expand(macro_def *macro, list *args);
-static void define_constant(char *name, char *value);
-static void define_macro(char *name, list *parameters, char *body);
+static void define_constant(constant_table *table, char *name, char *value);
+static void define_macro(constant_table *table, char *name, list *parameters, char *body);
 
-macro_def *find_macro(char *name);
+macro_def *find_macro(constant_table *table, char *name);
 
 static void emit(char *str);
 static char *concat(char *str1, char *str2);
 
 static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
+
+static constant_table *new_constant_table(constant_table *current);
+static constant_table *pop_constant_table(void);
+static void delete_constant_table(constant_table *table);
 
 %}
 
@@ -152,7 +157,8 @@ any: TK_ANY                          { emit($1); }
 include_statement: ".include" TK_STRINGC         { include_file($2); }
                  ;
 
-macro_const_definition: ".macro_const" TK_IDENT expression      { define_constant($2, $3); }
+macro_const_definition: ".macro_const" TK_IDENT expression
+	                  { define_constant(globaldefinitions, $2, $3); }
                       ;
 
 
@@ -160,7 +166,7 @@ macro_const_definition: ".macro_const" TK_IDENT expression      { define_constan
 macro_definition: ".macro" TK_IDENT parameters "\n"
                   opt_macro_body
                   ".endm"
-                { define_macro($2, $3, $5); }
+                { define_macro(globaldefinitions, $2, $3, $5); }
                 ;
 
 opt_macro_body: /* empty, make sure the macro body is a valid string. */ { $$ = ""; }
@@ -290,7 +296,36 @@ Expand the specified macro (or constant).
 */
 static void
 expand(macro_def *macro, list *args) {
+	/* construct a map data structure that maps the argument values to the parameter names */
+	/* enter the parameters as temporary symbols (.macro_const) */
+	constant_table *macro_params = new_constant_table(globaldefinitions);
+	list *params = macro->parameters;
+
+	while (params && args) {
+		define_constant(macro_params, params->item, args->item);
+		params = params->next;
+		args   = args->next;
+	}
+
+	if (params != NULL) { /* args must be null, so too few arguments */
+		fprintf(stderr, "Too few arguments for macro expansion.\n");
+	}
+	if (args != NULL) { /* params must be null, so too many arguments */
+		fprintf(stderr, "Too many arguments for macro expansion.\n");
+	}
+
     process_string(macro->body);
+
+    /*
+    fprintf(stderr, "macro %s expanded\n", macro->name);
+    */
+
+    /* now remove the temporary constant definitions */
+
+    pop_constant_table();
+
+	delete_constant_table(macro_params);
+
 }
 
 /*
@@ -303,7 +338,7 @@ Define the specified name as an alias for the specified value.
 
 */
 static void
-define_constant(char *name, char *value) {
+define_constant(constant_table *table, char *name, char *value) {
     macro_def *def = (macro_def *)malloc(sizeof (macro_def));
     assert(def != NULL);
     memset(def, 0, sizeof (macro_def));
@@ -311,8 +346,8 @@ define_constant(char *name, char *value) {
     def->name = name;
     def->body = value;
 
-    def->next = macros;
-    macros = def;
+    def->next = table->definitions;
+    table->definitions = def;
 }
 
 /*
@@ -325,7 +360,7 @@ Define a macro by the given name, parameters and body.
 
 */
 static void
-define_macro(char *name, list *parameters, char *body) {
+define_macro(constant_table *table, char *name, list *parameters, char *body) {
     macro_def *macro = (macro_def *)malloc(sizeof (macro_def));
     assert(macro != NULL);
     memset(macro, 0, sizeof (macro_def));
@@ -333,10 +368,11 @@ define_macro(char *name, list *parameters, char *body) {
     /* initialize the fields */
     macro->name = name;
     macro->body = body;
+    macro->parameters = parameters;
 
     /* link the macro in the list */
-    macro->next = macros;
-    macros = macro;
+    macro->next = table->definitions;
+    table->definitions = macro;
 }
 
 
@@ -351,8 +387,8 @@ NULL is returned.
 
 */
 macro_def *
-find_macro(char *name) {
-    macro_def *iter = macros;
+find_macro(constant_table *table, char *name) {
+    macro_def *iter = table->definitions;
     assert(name != NULL);
 
     /* iterate over the list and compare each node's name */
@@ -361,6 +397,10 @@ find_macro(char *name) {
             return iter;
         iter = iter->next;
     }
+
+    if (table->prev)
+    	return find_macro(table->prev, name);
+
     return NULL;
 }
 
@@ -463,10 +503,59 @@ emit(char *str) {
             fprintf(output, " ");
     }
 
-
-
 }
 
+/*
+
+=item C<new_constant_table>
+
+=cut
+
+*/
+static constant_table *
+new_constant_table(constant_table *current) {
+	constant_table *table = (constant_table *)malloc(sizeof (constant_table));
+	assert(table != NULL);
+	table->definitions = NULL;
+	table->prev = current;
+
+	globaldefinitions = table;
+	return table;
+}
+
+
+/*
+
+=item C<pop_constant_table>
+
+=cut
+
+*/
+static constant_table *
+pop_constant_table(void) {
+	constant_table *popped = globaldefinitions;
+	globaldefinitions = popped->prev;
+	return popped;
+}
+
+/*
+
+=item C<delete_constant_table>
+
+=cut
+
+*/
+static void
+delete_constant_table(constant_table *table) {
+	/* destroy all definitions */
+	macro_def *iter = table->definitions;
+	while (iter != NULL) {
+		macro_def *temp = iter;
+		iter = iter->next;
+		free(temp);
+	}
+	free(table);
+}
 
 /*
 
@@ -566,7 +655,6 @@ Pre-processor main function.
 */
 int
 main(int argc, char *argv[]) {
-
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <files>\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -602,6 +690,8 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
+	/* set up the global constant table */
+	globaldefinitions = new_constant_table(NULL);
 
     /* process all files specified on the command line */
     while (argc > 0) {

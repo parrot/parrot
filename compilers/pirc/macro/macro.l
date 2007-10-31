@@ -20,7 +20,7 @@
 extern char *yyget_text(yyscan_t yyscanner);
 extern int   yyerror(yyscan_t yyscanner, char *message);
 
-extern macro_def *find_macro(char *name);
+extern macro_def *find_macro(constant_table *table, char *name);
 
 /*
 
@@ -258,7 +258,8 @@ REG            "$"?[SNIP]{DIGITS}
                           return TK_ANY;
                       }
                       else { /* not a directive */
-                          macro_def *macro = find_macro(yytext + 1); /* skip dot */
+                          extern constant_table *globaldefinitions;
+                          macro_def *macro = find_macro(globaldefinitions, yytext + 1); /* skip dot */
                           if (macro != NULL) { /* it's a macro! */
                               /* only go into EXPAND state if it's a macro/constant */
                               yy_push_state(EXPAND, yyscanner);
