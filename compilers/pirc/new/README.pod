@@ -108,7 +108,7 @@ should also go into the pre-processor.
 A first version of a separate macro pre-processor can be found in C<compilers/pirc/macro>.
 This pre-processor is mostly done, except for macro argument expansion, and heredoc parsing.
 
-=head3 Pros
+=head3 Pros of a separate Macro Pre-Processor
 
 =over 4
 
@@ -119,7 +119,7 @@ different file is a Good Thing.
 
 =back
 
-=head3 Cons
+=head3 Cons of a separate Macro Pre-Processor
 
 =over 4
 
@@ -128,6 +128,83 @@ different file is a Good Thing.
 =item * having the input processed by two instead of 1 scanner results in a performance penalty.
 This is especially true if the intermediate results are written to and read from a file on disk.
 
+=back
+
+=head1 NOTES FOR A MACRO PRE-PROCESSOR
+
+In C<compilers/pirc/macro> a macro pre-processor is implemented. It's fairly complete, missing
+the following features:
+
+=over 4
+
+=item * Heredoc parsing (both for normal PIR code, as well as macro arguments)
+
+=item * arguments for macro expansion
+
+=item * macro labels.
+
+=back
+
+Although the number of features of the macro layer is quite small, during development of
+this pre-processor, implementing it was more complex than one would think. I list some of
+the details that need to be considered, in order to share this information with other
+interested people.
+
+=over 4
+
+=item * The preprocessor must be a full tokenizer; it is not enough to just scan characters,
+as it needs to recognize a subset of the tokens of the PIR language. Notably, the following
+tokens need to be recognized (depending on context):
+
+ ".include"
+ ".macro_constant"
+ macro labels ("$"IDENT":")
+ ".macro"
+ ".endm"
+ "("
+ ","
+ ")"
+ newlines
+ identifiers
+ flags (":"IDENT)
+ labels (IDENT":")
+ integer and floating-point constants
+ string constants
+ heredoc-strings ("<<string-constant")
+ Parrot registers
+ any other set of characters that make up a token in PIR, such as "=="
+ macro expansions ("."IDENT)
+ <<EOF>>
+
+=item * If it must be possible to expand macros with heredoc arguments, then the
+heredoc parsing must be done in the preprocessor's lexer. If not, the lexer still needs
+to handle heredocs, as they contain newline characters. Newline characters are somewhat
+special in the macro layer, as they sometimes need to be returned as such (TK_NL) and
+sometimes as just any token (TK_ANY), and still other times they can be just skipped.
+
+=item * Heredocs, if handled in the preprocessor, must be I<flattened>, meaning that
+some code like this:
+
+   .sub main
+     foo(<<'HI')
+  this is a string
+      heredoc argument.
+ HI
+   .end
+
+must be preprocessed into something like this:
+
+   .sub main
+     foo("this is a string\n   heredoc argument.\n")
+   .end
+
+I'm not entirely sure if there should be a newline at the beginning of this string, and
+at the end of the string (in this case I added one at the end). In any case, the newline
+characters must be embedded, and when printing this string to file or screen, they need
+to be escaped (otherwise the PIR lexer cannot read it).
+
+=item * Overall, the implementation of the preprocessor can become quite complex, but
+it does result in a very clean and simple implementation of the PIR lexer.
 
 =back
 
@@ -142,9 +219,11 @@ Major issues that need work:
 
 =over 4
 
-=item * finish macro layer
+=item * finish the macro pre-processor.
 
-=item * possibly remove the macro layer and create a macro pre-processor
+=item * remove the macro layer (incomplete) from the PIR lexer.
+
+=item * pipe the output of the preprocessor to the PIR lexer.
 
 =back
 
