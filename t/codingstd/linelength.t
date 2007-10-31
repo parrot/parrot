@@ -138,6 +138,11 @@ compilers/pirc/new/pirparser.c
 compilers/pirc/src/pirlexer.c
 compilers/pirc/src/pirlexer.h
 compilers/pirc/src/pirparser.c
+compilers/pirc/macro/macro.h
+compilers/pirc/macro/macrolexer.c
+compilers/pirc/macro/macrolexer.h
+compilers/pirc/macro/macroparser.c
+compilers/pirc/macro/macroparser.h
 languages/plumhead/src/yacc/plumhead_lexer.c
 languages/plumhead/src/yacc/plumhead_parser.c
 languages/plumhead/src/yacc/plumhead_parser.h
