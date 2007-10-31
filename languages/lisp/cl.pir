@@ -6,7 +6,7 @@ cl.pir - Set up the package 'COMMON-LISP'
 
 =cut
 
-.sub _init_cl
+.sub _init_cl :init
 
     .local pmc symbol
     .local pmc value

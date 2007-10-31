@@ -63,11 +63,6 @@ Needed PIR code is included.
     is_qualified = p6rule( '(<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]>*)\:(<[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%\-]>*)' )
     set_global 'is_qualified', is_qualified
 
-    _init_types()                       # Initialize all the type classes.
-
-    _init_cl()                          # Initialize the built-in functions in
-    _init_system()                      # the SYSTEM and COMMON-LISP packages.
-
     # TODO: initialize the null lexical environment.
 
     # bootstrapping

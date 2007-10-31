@@ -10,7 +10,7 @@ Used in bootstrapping.
 
 =cut
 
-.sub _init_system
+.sub _init_system :init
 
     .local pmc package
 

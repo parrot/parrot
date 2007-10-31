@@ -14,7 +14,7 @@ Set up the types.
 
 =cut
 
-.sub _init_types
+.sub _init_types :init
 
     .local pmc class
 
