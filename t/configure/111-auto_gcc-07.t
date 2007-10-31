@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 111-auto_gcc.t
+# 111-auto_gcc-07.t
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 16;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,9 +13,10 @@ use_ok('config::auto::gcc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::IO::Capture::Mini;
 
 my $args = process_options( {
-    argv            => [],
+    argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
 
@@ -37,6 +38,24 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
+{
+    my $tie_out = tie *STDOUT, "Parrot::IO::Capture::Mini"
+        or croak "Unable to tie";
+    my $gnucref = {};
+    $gnucref->{__GNUC__} = q{123};
+    $gnucref->{__GNUC_MINOR__} = q{abc};
+    ok($step->_evaluate_gcc($conf, $gnucref),
+        "_evaluate_gcc() returned true value");
+    my @more_lines = $tie_out->READLINE;
+    ok( @more_lines, "verbose output captured" );
+    ok(defined $conf->data->get( 'gccversion' ),
+        "gccversion defined as expected");
+    is($conf->data->get( 'gccversion' ), 123,
+        "Got expected value for gccversion");
+    is($step->result(), q{yes}, "Got expected result");
+}
+untie *STDOUT;
+
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
@@ -44,11 +63,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-111-auto_gcc.t - test config::auto::gcc
+111-auto_gcc-07.t - test config::auto::gcc
 
 =head1 SYNOPSIS
 
-    % prove t/configure/111-auto_gcc.t
+    % prove t/configure/111-auto_gcc-07.t
 
 =head1 DESCRIPTION
 

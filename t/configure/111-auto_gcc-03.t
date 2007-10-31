@@ -1,22 +1,21 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 114-auto_attributes.t
+# 111-auto_gcc-03.t
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
-use_ok('config::auto::attributes');
+use_ok('config::auto::gcc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-
 my $args = process_options( {
-    argv            => [ qq{--verbose} ],
+    argv            => [],
     mode            => q{configure},
 } );
 
@@ -25,7 +24,7 @@ my $conf = Parrot::Configure->new();
 test_step_thru_runstep($conf, q{init::defaults}, $args);
 
 my ($task, $step_name, @step_params, $step, $ret);
-my $pkg = q{auto::attributes};
+my $pkg = q{auto::gcc};
 
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
@@ -38,12 +37,16 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-# Can't use Parrot::IO::Capture::Mini to tie STDOUT here because the C
-# programs inside runstep() are messing with STDOUT.
-# So we'll have to infer that verbose output was printed from the
-# coverage report.
-$ret = $step->runstep($conf);
-ok( defined $ret, "$step_name runstep() returned defined value" );
+my $gnucref = {};
+$gnucref->{__GNUC__} = 1;
+$gnucref->{__INTEL_COMPILER} = 1;
+
+ok($step->_evaluate_gcc($conf, $gnucref),
+    "_evaluate_gcc() returned true value");
+ok(! defined $conf->data->get( 'gccversion' ),
+    "gccversion undef as expected");
+is($step->result(), q{no}, "Got expected result");
+
 
 pass("Completed all tests in $0");
 
@@ -51,17 +54,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-114-auto_attributes.t - test config::auto::attributes
+111-auto_gcc-03.t - test config::auto::gcc
 
 =head1 SYNOPSIS
 
-    % prove t/configure/114-auto_attributes.t
+    % prove t/configure/111-auto_gcc-03.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::attributes.
+The tests in this file test subroutines exported by config::auto::gcc.
 
 =head1 AUTHOR
 
@@ -69,7 +72,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::attributes, F<Configure.pl>.
+config::auto::gcc, F<Configure.pl>.
 
 =cut
 
