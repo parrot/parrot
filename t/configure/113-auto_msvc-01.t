@@ -5,11 +5,16 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 11;
+use Test::More;
 use Carp;
 use lib qw( lib t/configure/testlib );
+
+plan( skip_all => 'MSVC is Windows only' ) unless $^O =~ /Win32/;
+plan('no_plan'); # tests => 11;
+
 use_ok('config::init::defaults');
 use_ok('config::auto::msvc');
+
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
