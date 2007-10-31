@@ -33,13 +33,24 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
-    my $verbose = $conf->options->get('verbose');
+    my $msvcref = _probe_for_msvc();
 
+    $self->_evaluate_msvc($conf, $msvcref);
+
+    return 1;
+}
+
+sub _probe_for_msvc {
     cc_gen("config/auto/msvc/test_c.in");
     cc_build();
     my %msvc = eval cc_run() or die "Can't run the test program: $!";
     cc_clean();
+    return \%msvc;
+}
 
+sub _evaluate_msvc {
+    my ($self, $conf, $msvcref) = @_;
+    my $verbose = $conf->options->get('verbose');
     # Set msvcversion to undef.  This will also trigger any hints-file
     # callbacks that depend on knowing whether or not we're using Visual C++.
 
@@ -47,14 +58,14 @@ sub runstep {
     # which should have been caught by the 'die' above.
     # Therefore, test if it's defined to see if MSVC's installed.
     # return 'no' if it's not.
-    unless ( defined $msvc{_MSC_VER} ) {
+    unless ( defined $msvcref->{_MSC_VER} ) {
         $self->set_result('no');
         $conf->data->set( msvcversion => undef );
         return 1;
     }
 
-    my $major = int( $msvc{_MSC_VER} / 100 );
-    my $minor = $msvc{_MSC_VER} % 100;
+    my $major = int( $msvcref->{_MSC_VER} / 100 );
+    my $minor = $msvcref->{_MSC_VER} % 100;
     unless ( defined $major && defined $minor ) {
         print " (no) " if $verbose;
         $self->set_result('no');
@@ -79,7 +90,6 @@ sub runstep {
         # for details.
         $conf->data->add( " ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE" );
     }
-
     return 1;
 }
 

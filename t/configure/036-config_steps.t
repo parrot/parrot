@@ -32,7 +32,7 @@ if ( $^O !~ /win32/i ) {
     @steps = grep { $_ !~ /win32/i } @steps;
 }
 
-my $testcount = @steps + 1;
+my $testcount = @steps + 2;
 
 # my $testcount = @steps;
 
@@ -41,6 +41,7 @@ foreach my $step (@steps) {
     require_ok($step);
 }
 
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 # Local Variables:

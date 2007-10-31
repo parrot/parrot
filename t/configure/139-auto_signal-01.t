@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -44,6 +44,7 @@ my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
 is($step->result(), q{skipped}, "Expected result was set");
 
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

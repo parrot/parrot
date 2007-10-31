@@ -33,8 +33,14 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = $conf->options->get('verbose');
+    my $anyerror = _probe_for_backtrace();
 
+    $self->_evaluate_backtrace($conf, $anyerror);
+
+    return 1;
+}
+
+sub _probe_for_backtrace {
     cc_gen("config/auto/backtrace/test_c.in");
 
     # If the program builds (e.g. the linker found backtrace* in libc)
@@ -43,15 +49,19 @@ sub runstep {
     # build failure is because these symbols are missing.
 
     eval { cc_build(); };
-    if ( $@ ) {
+    my $anyerror = $@ if $@;
+    cc_clean();
+    return $anyerror;
+}
+
+sub _evaluate_backtrace {
+    my ($self, $conf, $anyerror) = @_;
+    if ( $anyerror ) {
         $self->set_result("no");
     } else {
         $conf->data->set( glibc_backtrace => 1 );
         $self->set_result("yes");
     }
-    cc_clean();
-
-    return 1;
 }
 
 1;

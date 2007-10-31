@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 113-auto_msvc.t
+# 113-auto_msvc-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More qw(no_plan); # tests => 11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -44,17 +44,19 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
+ok($step->runstep($conf), "runstep() returned true value");
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-113-auto_msvc.t - test config::auto::msvc
+113-auto_msvc-01.t - test config::auto::msvc
 
 =head1 SYNOPSIS
 
-    % prove t/configure/113-auto_msvc.t
+    % prove t/configure/113-auto_msvc-01.t
 
 =head1 DESCRIPTION
 
