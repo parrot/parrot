@@ -32,13 +32,25 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $byteorder = _probe_for_byteorder();
+
+    $self->_evaluate_byteorder($conf, $byteorder);
+
+    return 1;
+}
+
+sub _probe_for_byteorder {
     cc_gen('config/auto/byteorder/test_c.in');
     cc_build();
-    my $byteorder = cc_run() or die "Can't run the byteorder testing program: $!";
+    my $byteorder = cc_run()
+        or die "Can't run the byteorder testing program: $!";
     cc_clean();
-
     chomp $byteorder;
+    return $byteorder;
+}
 
+sub _evaluate_byteorder {
+    my ($self, $conf, $byteorder) = @_;
     if ( $byteorder =~ /^1234/ ) {
         $conf->data->set(
             byteorder => $byteorder,
@@ -56,7 +68,6 @@ sub runstep {
     else {
         die "Unsupported byte-order [$byteorder]!";
     }
-
     return 1;
 }
 
