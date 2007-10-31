@@ -22,6 +22,10 @@ extern int   yyerror(yyscan_t yyscanner, char *message);
 
 extern macro_def *find_macro(constant_table *table, char *name);
 
+char *last_heredoc = NULL;
+
+
+
 /*
 
 The C89 standard does not define a strdup() in the C library,
@@ -93,6 +97,9 @@ static int is_pir_directive(char *name);
 %x LINE
 %s EXPARGS
 
+%x ARGS
+%x HEREDOC
+
 ALPHA          [a-zA-Z@_]
 DIGIT          [0-9]
 DIGITS         {DIGIT}+
@@ -161,6 +168,14 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_NL;
                     }
 
+<HEREDOC>{EOL}     { yylval->sval = "\n";
+                     return TK_ANY;
+                   }
+
+<HEREDOC>{WS}      { yylval->sval = dupstr(yytext);
+                     return TK_ANY;
+                   }
+
 <*>"#".*            { /* skip line comment on last line of file (no newline) */ }
 
 <*>"#".*{NEWLINE}   { /* skip line comments */ }
@@ -227,6 +242,64 @@ REG            "$"?[SNIP]{DIGITS}
                      yy_pop_state(yyscanner);
                      return TK_ANY;
                    }
+
+<INITIAL>"("       { /*
+
+
+
+<INITIAL>"("      { /*
+                    yylval->sval = dupstr(yytext);
+                    return TK_ANY;
+                  }
+
+
+*/
+                     yylval->sval = "(";
+                     yy_push_state(ARGS, yyscanner);
+                     return TK_ANY;
+                   }
+
+<ARGS>"<<"{Q_STRING} { /* */
+                        yylval->sval = dupstr(yytext);
+                        last_heredoc = dupstrn(yytext + 3, strlen(yytext) - 4);
+                        /*
+                        fprintf(stderr ,"last heredoc: [%s]\n", last_heredoc);
+                        */
+                        return TK_ANY;
+                     }
+
+<ARGS>","          { /**/
+                     yylval->sval = ",";
+
+                     return TK_ANY;
+                   }
+
+<ARGS>")"          { /* */
+                     yylval->sval = ")";
+                     yy_pop_state(yyscanner);
+
+                     if (last_heredoc != NULL) {
+                        yy_push_state(HEREDOC, yyscanner);
+                     }
+
+                     return TK_ANY;
+                   }
+
+<HEREDOC>.*        { yylval->sval = dupstr(yytext);
+
+                     if (strcmp(last_heredoc, yytext) == 0) {
+                        /*
+                        fprintf(stderr, "Found last heredoc: [%s]\n", last_heredoc);
+                        */
+                        free(last_heredoc);
+                        last_heredoc = NULL;
+                        yy_pop_state(yyscanner);
+                     }
+
+                     return TK_ANY;
+                   }
+
+
 
 <EXPARGS>","       { /* */
                      return ',';
@@ -388,11 +461,6 @@ REG            "$"?[SNIP]{DIGITS}
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
                                  }
-
-<INITIAL>"("      { /* */
-                    yylval->sval = dupstr(yytext);
-                    return TK_ANY;
-                  }
 
 <*>"=="|"!="|"<="|"=>"|">="|">>"|"<<"|">>>"             { yylval->sval = dupstr(yytext);
                                                           return TK_ANY;
