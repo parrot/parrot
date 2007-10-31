@@ -266,16 +266,20 @@ sub _morph {
 
     $self->_add_comment( 'start of _morph' );
 
-    if ( $to =~ /P/ ) {
+    if ( $to =~ m/ P /xms ) {
         if ( $from =~ /P/ ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
         }
-        elsif ( $from =~ /I/ ) {
+        elsif ( $from =~ m/ I /xms ) {
             $self->_add_inst( '', 'new', [ $to, q{'Integer'} ] );
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
-        elsif ( $from =~ /N/ ) {
+        elsif ( $from =~ m/ N /xms ) {
             $self->_add_inst( '', 'new', [ $to, q{'Float'} ] );
+            $self->_add_inst( '', 'set', [ $to, $from ] );
+        }
+        elsif ( $from =~ m/ S /xms ) {
+            $self->_add_inst( '', 'new', [ $to, q{'String'} ] );
             $self->_add_inst( '', 'set', [ $to, $from ] );
         }
     }
@@ -292,7 +296,7 @@ sub __quoted {
 
     if ( exists $node->{value} ) {
         my $value = $node->{value};
-        if ( $value =~ /^[-+]?\d+$/ ) {
+        if ( $value =~ m/ \A [-+]? \d+ \z/xms ) {
             $self->_add_inst( '', 'new', [ $return, q{'Integer'} ] );
             $self->_add_inst( '', 'set', [ $return, $value ] );
         }
@@ -301,8 +305,8 @@ sub __quoted {
             $self->_add_inst( '', 'set', [ $return, $value ] );
         }
         else {    # assume its a symbol
-            $self->_add_inst( '', 'new', [ $return, q{'String'} ] );
-            $self->_add_inst( '', 'set', [ $return, "\"$value\"" ] );
+            $self->_add_inst( '', 'new', [ $return, q{'SchemeSymbol'} ] );
+            $self->_add_inst( '', 'set', [ $return, qq{"$value"} ] );
         }
     }
     elsif ( exists $node->{children} ) {
@@ -508,7 +512,15 @@ sub _op_if {
     my $label = $self->_gensym();
 
     my $cond = $self->_generate( _get_arg( $node, 1 ) );
-    $self->_add_inst( '', 'eq', [ $cond, 0, "FALSE_$label" ] );
+    if ( $cond =~ m/ \A P /xms )       
+    {
+        my $tmp_s = $self->_save_1('S');
+        $self->_add_inst( '',            'typeof', [ $tmp_s, $cond ] );
+        $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Boolean'}, "TRUE_$label" ] );
+        $self->_restore($tmp_s);
+        $self->_add_inst( '', "unless $cond goto FALSE_$label" );
+    }
+    $self->_add_inst("TRUE_$label");
     $self->_restore($cond);
     my $return = $self->_save_1('P');
 

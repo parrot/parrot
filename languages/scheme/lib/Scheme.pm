@@ -56,6 +56,13 @@ sub link_functions {
 .HLL "SomethingWithScheme", "dynlexpad"
 .HLL_map 'LexPad', 'DynLexPad'
 
+.sub init__scheme_types :init
+
+    .local pmc class
+    class = subclass "String", "SchemeSymbol"
+.end
+
+
 # builtin functions used by this program:
 END_HEADER
 
