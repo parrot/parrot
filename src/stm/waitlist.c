@@ -7,7 +7,7 @@
 #include "stm_internal.h"
 #include "stm_waitlist.h"
 
-/* 
+/*
 
 =head1 NAME
 
