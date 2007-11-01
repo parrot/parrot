@@ -7,6 +7,24 @@
 #include "stm_internal.h"
 #include "stm_waitlist.h"
 
+/* 
+
+=head1 NAME
+
+src/stm/waitlist.c
+
+=head1 DESCRIPTION
+
+TODO: Not yet documented!!!
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 /* HEADERIZER HFILE: src/stm/stm_waitlist.h */
 
 /* HEADERIZER BEGIN: static */
@@ -53,6 +71,18 @@ static void waitlist_signal_one(struct waitlist_entry *who);
 #define WAITLIST_REMOVE_CHECK 0 /* if set, make sure removes really
                                  * remove -- for debugging */
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static struct waitlist_thread_data *
+get_thread(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
 get_thread(PARROT_INTERP)
@@ -71,6 +101,18 @@ get_thread(PARROT_INTERP)
     return txlog->waitlist_data;
 }
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static struct waitlist_thread_data *
+get_thread_noalloc(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_thread_data *
 get_thread_noalloc(PARROT_INTERP)
@@ -78,6 +120,18 @@ get_thread_noalloc(PARROT_INTERP)
     const STM_tx_log * const txlog = Parrot_STM_tx_log_get(interp);
     return txlog->waitlist_data;
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static struct waitlist_entry *
+alloc_entry(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static struct waitlist_entry *
@@ -112,6 +166,17 @@ alloc_entry(PARROT_INTERP)
     return thr->entries[i];
 }
 
+/*
+
+=item C<static void
+add_entry(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *entry))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 add_entry(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *entry))
 {
@@ -131,6 +196,17 @@ add_entry(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *entry)
 #endif
 }
 
+/*
+
+=item C<static int
+remove_first(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *expect_first))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 remove_first(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *expect_first))
 {
@@ -145,6 +221,17 @@ remove_first(NOTNULL(STM_waitlist *waitlist), NOTNULL(struct waitlist_entry *exp
 #endif
     return successp;
 }
+
+/*
+
+=item C<static void
+waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
@@ -194,6 +281,17 @@ waitlist_remove(STM_waitlist *waitlist, struct waitlist_entry *what)
 
 #if WAITLIST_REMOVE_CHECK
 /* this function is here to facilitate debugging */
+/*
+
+=item C<static void
+waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)
 {
@@ -212,6 +310,17 @@ waitlist_remove_check(STM_waitlist *waitlist, struct waitlist_entry *what)
 }
 #endif
 
+/*
+
+=item C<static void
+waitlist_signal_one(struct waitlist_entry *who)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 waitlist_signal_one(struct waitlist_entry *who)
 {
@@ -229,6 +338,17 @@ waitlist_signal_one(struct waitlist_entry *who)
     who->next = NULL;
     who->head = NULL;
 }
+
+/*
+
+=item C<static void
+waitlist_signal_all(STM_waitlist *list)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 waitlist_signal_all(STM_waitlist *list)
@@ -266,6 +386,17 @@ waitlist_signal_all(STM_waitlist *list)
     UNLOCK(list->remove_mutex);
 }
 
+/*
+
+=item C<void
+Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist) {
     struct waitlist_entry *entry;
@@ -280,6 +411,17 @@ Parrot_STM_waitlist_add_self(PARROT_INTERP, STM_waitlist *waitlist) {
     add_entry(waitlist, entry);
 }
 
+/*
+
+=item C<void
+Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)
 {
@@ -288,6 +430,17 @@ Parrot_STM_waitlist_signal(PARROT_INTERP, STM_waitlist *waitlist)
 #endif
     waitlist_signal_all(waitlist);
 }
+
+/*
+
+=item C<void
+Parrot_STM_waitlist_remove_all(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 Parrot_STM_waitlist_remove_all(PARROT_INTERP)
@@ -318,6 +471,17 @@ Parrot_STM_waitlist_remove_all(PARROT_INTERP)
 }
 
 /* TODO handle events here */
+/*
+
+=item C<void
+Parrot_STM_waitlist_wait(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_STM_waitlist_wait(PARROT_INTERP)
 {
@@ -339,6 +503,17 @@ Parrot_STM_waitlist_wait(PARROT_INTERP)
 #endif
 }
 
+/*
+
+=item C<void
+Parrot_STM_waitlist_init(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_STM_waitlist_init(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))
 {
@@ -346,6 +521,17 @@ Parrot_STM_waitlist_init(PARROT_INTERP, NOTNULL(STM_waitlist *waitlist))
     PARROT_ATOMIC_PTR_SET(waitlist->first, NULL);
     MUTEX_INIT(waitlist->remove_mutex);
 }
+
+/*
+
+=item C<void
+Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
@@ -367,6 +553,17 @@ Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
     MUTEX_DESTROY(thr->signal_mutex);
     mem_sys_free(thr);
 }
+
+/*
+
+=item C<static STM_tx_log *
+Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STM_tx_log *
 Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
@@ -401,6 +598,17 @@ Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
     return log;
 }
 
+/*
+
+=item C<STM_tx_log *
+Parrot_STM_tx_log_get(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 STM_tx_log *
 Parrot_STM_tx_log_get(PARROT_INTERP)
 {
@@ -412,6 +620,14 @@ Parrot_STM_tx_log_get(PARROT_INTERP)
     PARROT_ASSERT(log->depth >= 0);
     return log;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
