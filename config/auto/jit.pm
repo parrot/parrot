@@ -43,15 +43,15 @@ sub runstep {
     }
 
     my $verbose = $conf->options->get('verbose');
-    $verbose and print $/;
+    $verbose and print "\n";
 
     my $jitbase  = 'src/jit';                      # base path for jit sources
     my $archname = $conf->data->get('archname');
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
     if ($verbose) {
-        print "determining operating system and cpu architecture$/";
-        print "archname: <$archname>$/";
+        print "determining operating system and cpu architecture\n";
+        print "archname: <$archname>\n";
     }
 
     if ( !defined $osname ) {
