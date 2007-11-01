@@ -96,7 +96,10 @@ static STRING* str_append_w_flags(PARROT_INTERP,
 
 /*
 
-=item C<handle_flags>
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
+handle_flags(PARROT_INTERP, NOTNULL(SpfInfo *info), NOTNULL(STRING *str),
+        INTVAL is_int_type, NULLOK(STRING* prefix))>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
@@ -197,6 +200,19 @@ handle_flags(PARROT_INTERP, NOTNULL(SpfInfo *info), NOTNULL(STRING *str),
     return str;
 }
 
+/*
+
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
+str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
+        NOTNULL(STRING* src), NULLOK(STRING *prefix))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static STRING*
 str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
@@ -209,7 +225,8 @@ str_append_w_flags(PARROT_INTERP, NOTNULL(STRING* dest), NOTNULL(SpfInfo *info),
 
 /*
 
-=item C<gen_sprintf_call>
+=item C<static void
+gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo *info), int thingy)>
 
 Turn the info structure back into an sprintf format. Far from being
 pointless, this is used to call C<snprintf()> when we're confronted with
@@ -271,7 +288,11 @@ gen_sprintf_call(NOTNULL(char *out), NOTNULL(SpfInfo *info), int thingy)
 
 /*
 
-=item C<Parrot_sprintf_format>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_sprintf_format(PARROT_INTERP,
+        NOTNULL(STRING *pat), NOTNULL(SPRINTF_OBJ *obj))>
 
 This is the engine that does all the formatting.
 

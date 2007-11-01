@@ -39,9 +39,9 @@ efficiency on reading non-native PBCs.
 
 =back
 
-=head1 SEE ALSO
+=head2 Functions
 
-F<src/packdump.c>.
+=over 4
 
 =cut
 
@@ -53,10 +53,12 @@ F<src/packdump.c>.
 
 /*
 
-static void
-const_dump(PARROT_INTERP, PackFile_Segment *segp)
+=item C<static void
+const_dump(PARROT_INTERP, PackFile_Segment *segp)>
 
 Dump the constant table.
+
+=cut
 
 */
 
@@ -70,10 +72,12 @@ const_dump(PARROT_INTERP, PackFile_Segment *segp)
 
 /*
 
-static void
-fixup_dump(PARROT_INTERP, PackFile_Segment *segp)
+=item C<static void
+fixup_dump(PARROT_INTERP, PackFile_Segment *segp)>
 
 Dump the fixup table.
+
+=cut
 
 */
 
@@ -87,10 +91,12 @@ fixup_dump(PARROT_INTERP, PackFile_Segment *segp)
 
 /*
 
-static void
-disas_dump(PARROT_INTERP, PackFile_Segment *self)
+=item C<static void
+disas_dump(PARROT_INTERP, PackFile_Segment *self)>
 
 Disassemble and dump.
+
+=cut
 
 */
 
@@ -121,10 +127,12 @@ disas_dump(PARROT_INTERP, PackFile_Segment *self)
 
 /*
 
-static void
-PackFile_header_dump(PARROT_INTERP, PackFile *pf)
+=item C<static void
+PackFile_header_dump(PARROT_INTERP, PackFile *pf)>
 
 Dump the header.
+
+=cut
 
 */
 
@@ -152,9 +160,11 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 
 /*
 
-static void help(void)
+=item C<static void help(void)>
 
 Print out the user help info.
+
+=cut
 
 */
 
@@ -184,10 +194,12 @@ static struct longopt_opt_decl options[] = {
 
 /*
 
-int
-main(int argc, char **argv)
+=item C<int
+main(int argc, char **argv)>
 
 The run loop. Process the command-line arguments and dump accordingly.
+
+=cut
 
 */
 
@@ -291,6 +303,17 @@ main(int argc, char **argv)
     Parrot_exit(interp, 0);
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/packdump.c>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

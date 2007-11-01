@@ -44,7 +44,11 @@ PARROT_API PMC * PMCNULL;
 
 /*
 
-=item C<pmc_new>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+PMC *
+pmc_new(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
@@ -75,7 +79,11 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<pmc_reuse>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC*
+pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
+          SHIM(UINTVAL flags))>
 
 Reuse an existing PMC, turning it into an empty PMC of the new
 type. Any required internal structure will be put in place (such as
@@ -163,7 +171,10 @@ pmc_reuse(PARROT_INTERP, NOTNULL(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<get_new_pmc_header>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC*
+get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)>
 
 Gets a new PMC header.
 
@@ -257,7 +268,10 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
 /*
 
-=item C<pmc_new_noinit>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC *
+pmc_new_noinit(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<vtables> in
@@ -285,7 +299,10 @@ pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<constant_pmc_new_noinit>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC *
+constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>.
 
@@ -305,7 +322,10 @@ constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<constant_pmc_new>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC *
+constant_pmc_new(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>, the call C<init>.
 
@@ -326,7 +346,10 @@ constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<pmc_new_init>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC *
+pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))>
 
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 
@@ -352,7 +375,10 @@ pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 
 /*
 
-=item C<constant_pmc_new_init>
+=item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
+PMC *
+constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))>
 
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 
@@ -372,7 +398,9 @@ constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, NULLOK(PMC *init))
 
 /*
 
-=item C<pmc_register>
+=item C<PARROT_API
+INTVAL
+pmc_register(PARROT_INTERP, NOTNULL(STRING *name))>
 
 This segment handles PMC registration and such.
 
@@ -419,7 +447,10 @@ pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-=item C<pmc_type>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+pmc_type(PARROT_INTERP, NOTNULL(STRING *name))>
 
 Returns the PMC type for C<name>.
 
@@ -446,7 +477,9 @@ pmc_type(PARROT_INTERP, NOTNULL(STRING *name))
 
 /*
 
-=item C<pmc_type_p>
+=item C<PARROT_API
+INTVAL
+pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))>
 
 Returns the PMC type for C<name>.
 
@@ -465,6 +498,19 @@ pmc_type_p(PARROT_INTERP, NOTNULL(PMC *name))
         return VTABLE_get_integer(interp, item);
     return 0;
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC*
+create_class_pmc(PARROT_INTERP, INTVAL type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -505,7 +551,9 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
 
 /*
 
-=item C<Parrot_create_mro>
+=item C<PARROT_API
+void
+Parrot_create_mro(PARROT_INTERP, INTVAL type)>
 
 Create the MRO (method resolution order) array for this type.
 
@@ -575,7 +623,9 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 =over 4
 
-=item C<dod_register_pmc>
+=item C<PARROT_API
+void
+dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))>
 
 Registers the PMC with the interpreter's DOD registery.
 
@@ -599,7 +649,8 @@ dod_register_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))
 
 /*
 
-=item C<dod_unregister_pmc>
+=item C<void
+dod_unregister_pmc(PARROT_INTERP, NOTNULL(PMC* pmc))>
 
 Unregisters the PMC from the interpreter's DOD registry.
 

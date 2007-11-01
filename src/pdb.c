@@ -206,7 +206,7 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<static void PDB_printwelcome()>
+=item C<static void PDB_printwelcome(void)>
 
 Prints out the welcome string.
 

@@ -124,7 +124,10 @@ static UHUGEINTVAL getuint_va(PARROT_INTERP,
 
 /*
 
-=item C<getchr_va>
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING *
+getchr_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -150,7 +153,9 @@ getchr_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getint_va>
+=item C<PARROT_WARN_UNUSED_RESULT
+static HUGEINTVAL
+getint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -199,7 +204,9 @@ getint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getuint_va>
+=item C<PARROT_WARN_UNUSED_RESULT
+static UHUGEINTVAL
+getuint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
@@ -248,7 +255,9 @@ getuint_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getfloat_va>
+=item C<PARROT_WARN_UNUSED_RESULT
+static HUGEFLOATVAL
+getfloat_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
@@ -297,7 +306,10 @@ getfloat_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getstring_va>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+getstring_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -348,7 +360,10 @@ getstring_va(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getptr_va>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void *
+getptr_va(PARROT_INTERP, SHIM(INTVAL size), NOTNULL(SPRINTF_OBJ *obj))>
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
@@ -381,7 +396,10 @@ SPRINTF_OBJ va_core = {
 
 =over 4
 
-=item C<getchr_pmc>
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING *
+getchr_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -408,7 +426,9 @@ getchr_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getint_pmc>
+=item C<PARROT_WARN_UNUSED_RESULT
+static HUGEINTVAL
+getint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -446,7 +466,9 @@ getint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getuint_pmc>
+=item C<PARROT_WARN_UNUSED_RESULT
+static UHUGEINTVAL
+getuint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -484,7 +506,9 @@ getuint_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getfloat_pmc>
+=item C<PARROT_WARN_UNUSED_RESULT
+static HUGEFLOATVAL
+getfloat_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -519,7 +543,10 @@ getfloat_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getstring_pmc>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+getstring_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -545,7 +572,10 @@ getstring_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))
 
 /*
 
-=item C<getptr_pmc>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static void *
+getptr_pmc(PARROT_INTERP, INTVAL size, NOTNULL(SPRINTF_OBJ *obj))>
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.

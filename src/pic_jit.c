@@ -25,6 +25,10 @@ TODO:
 
 =head2 Functions
 
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -119,6 +123,19 @@ static int returns_match_results(
     with -C and -S runcores.
 */
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static opcode_t *
+pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
@@ -133,6 +150,18 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), NOTNULL(void **args))
     return args[3];
 }
 #  endif
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -164,6 +193,19 @@ jit_can_compile_sub(PARROT_INTERP, NOTNULL(PMC *sub))
     return 1;
 }
 
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
+    NOTNULL(opcode_t *start))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -203,6 +245,18 @@ args_match_params(NOTNULL(const PMC *sig_args), NOTNULL(PackFile_ByteCode *seg),
     }
 }
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result))
@@ -229,6 +283,18 @@ returns_match_results(NOTNULL(const PMC *sig_ret), NOTNULL(const PMC *sig_result
             return 0;
     }
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -268,6 +334,20 @@ call_is_safe(NOTNULL(const PMC *sub), NOTNULL(opcode_t **set_args))
 
     return 1;
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+ops_jittable(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const PMC *sig_results),
+        NOTNULL(PackFile_ByteCode *seg), NOTNULL(opcode_t *pc),
+        NOTNULL(opcode_t *end), NOTNULL(int *flags))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 static int
@@ -334,6 +414,19 @@ op_is_ok:
 #endif     /* HAS_JIT */
 
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+int
+parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(PMC *sig_args), NOTNULL(PMC *sig_results), NOTNULL(int *flags))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 int
 parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
@@ -388,6 +481,17 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, NOTNULL(PMC *sub),
 #endif
 }
 
+/*
+
+=item C<funcptr_t
+parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 funcptr_t
 parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)
 {
@@ -425,6 +529,8 @@ parrot_pic_JIT_sub(PARROT_INTERP, NOTNULL(PMC *sub), int flags)
 
 /*
 
+=back
+
 =head1 AUTHOR
 
 Leopold Toetsch
@@ -433,6 +539,8 @@ Leopold Toetsch
 
 F<src/pic.c>, F<src/jit.c>, F<ops/core_ops_cgp.c>,
 F<include/parrot/pic.h>, F<ops/pic.ops>
+
+=cut
 
 */
 
