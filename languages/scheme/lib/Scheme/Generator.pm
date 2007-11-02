@@ -261,7 +261,7 @@ sub _morph {
     $self->_add_comment( 'start of _morph' );
 
     if ( $to =~ m/ P /xms ) {
-        if ( $from =~ /P/ ) {
+        if ( $from =~ m/P/xms ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
         }
         elsif ( $from =~ m/ S /xms ) {
@@ -748,27 +748,8 @@ sub _op_not {
 
 sub _op_boolean_p {
     my ( $self, $node ) = @_;
-
-    $self->_add_comment( 'start of _op_boolean_p()' );
-
-    _check_num_args( $node, 1, 'boolean?' );
-
-    my $label = $self->_gensym();
-
-    my $return = $self->_constant('#f');
-    my $item = $self->_generate( _get_arg( $node, 1 ) );
-    if ( $item =~ m/ \A P /xms )
-    {
-        my $temp_s = $self->_save_1('S');
-        $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
-        $self->_add_inst( '', 'ne',     [ $temp_s, q{'Boolean'}, "FAIL_$label" ] );
-        $self->_add_inst( '', 'set', [ $return, 1 ] );
-        $self->_add_inst("FAIL_$label");
-    }
-
-    $self->_add_comment( 'end of _op_boolean_p()' );
-
-    return $return;
+    
+    return $self->_type_predicate( 'boolean?', $node ); 
 }
 
 sub _op_eqv_p {
@@ -1004,6 +985,9 @@ sub _op_string_symbol {
 }
 
 sub _op_number_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'number?', $node ); 
 }
 
 sub _op_complex_p {
@@ -2237,6 +2221,39 @@ sub _format_columns {
     }
 
     return;
+}
+
+sub _type_predicate {
+    my ( $self, $form, $node ) = @_;
+
+    $self->_add_comment( "start of _op_$form()" );
+
+    _check_num_args( $node, 1, $form );
+
+    my %types = (
+        'boolean?' => [ qw( Boolean ) ],
+        'number?'  => [ qw( Integer Float Complex ) ],
+    );
+
+    my $label = $self->_gensym();
+
+    my $return = $self->_constant('#f');
+    my $item = $self->_generate( _get_arg( $node, 1 ) );
+    if ( $item =~ m/ \A P /xms )
+    {
+        my $temp_s = $self->_save_1('S');
+        $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
+        foreach ( @{ $types{$form} } ) {
+            $self->_add_inst( '', 'eq', [ $temp_s, qq{'$_'}, "TRUE_$label" ] );
+        }
+        $self->_add_inst( '', 'branch', [ "FAIL_$label" ] );
+        $self->_add_inst( "TRUE_$label", 'set', [ $return, 1 ] );
+        $self->_add_inst("FAIL_$label");
+    }
+
+    $self->_add_comment( "returning $return from _op_$form()" );
+
+    return $return;
 }
 
 sub new {
