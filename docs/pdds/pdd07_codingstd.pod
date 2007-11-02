@@ -127,6 +127,13 @@ the continued line.
 
 Cuddled C<else>s are forbidden: i.e. avoid  C<} else {> .
 
+=item *
+
+C macro parameters must be parethesized in macro bodies, to allow expressions
+passed as arguments; e.g.:
+
+  #define PMC_pmc_val(pmc)      (pmc)->obj.u._ptrs._pmc_val
+
 =back
 
 
