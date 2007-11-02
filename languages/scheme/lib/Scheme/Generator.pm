@@ -36,7 +36,6 @@ sub _add_comment {
 
 sub _new_regs {
     return {
-        I => { map { $_ => 0 } ( 0 .. 31 ) },
         N => { map { $_ => 0 } ( 0 .. 31 ) },
         S => { map { $_ => 0 } ( 0 .. 31 ) },
         P => { map { $_ => 0 } ( 0 .. 31 ) },
@@ -48,7 +47,7 @@ sub _new_regs {
 sub _save {
     my $self  = shift;
     my $count = shift;
-    my $type  = shift || 'I';
+    my $type  = shift || 'P';
 
     die "No registers to save"
         unless $count and $count > 0;
@@ -87,7 +86,7 @@ sub _save_set {
 # save a single register on the stack
 sub _save_1 {
     my $self = shift;
-    my $type = shift || 'I';
+    my $type = shift || 'P';
 
     my @temp = $self->_save( 1, $type );
 
@@ -217,22 +216,14 @@ sub _new_pair {
     return $return;
 }
 
-my $type_map = {
-    INTEGER  => [ 1, 'I' ],
-    RATIONAL => [ 2, 'I' ],
-    REAL     => [ 1, 'N' ],
-    COMPLEX  => [ 2, 'I' ],
-    STRING   => [ 1, 'S' ],
-};
-
 sub _constant {
     my ( $self, $value ) = @_;
 
     $self->_add_comment( 'start of _constant' );
-    my ( $reg_type );
+    my ( $reg_type, $pmc_type );
 
     if ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                        # an integer
-        $reg_type = 'I';
+        $pmc_type = 'Integer';
     }
     elsif ( $value =~ m/ \A [-+]?((\d+\.\d*) | (\.d+)) ([eE][-+]?\d+)? \z/xms ) {    # a float
         $reg_type = 'N';
@@ -241,20 +232,24 @@ sub _constant {
         $reg_type = 'S';
     }
     elsif ( $value eq '#t' || $value eq '#f' ) {
-        my $return = $self->_save_1( 'P' );
-        $self->_add_inst( '', 'new', [ $return, q{'Boolean'} ] );
-        $self->_add_inst( '', 'set', [ $return, $value eq '#t' ? '1' : '0' ] );
-        $self->_add_comment( 'end of _constant' );
-
-        return $return;
+        $pmc_type = 'Boolean';
+        $value    = $value eq '#t' ? '1' : '0';
     }
     else {                                                                           # default 0
-        $reg_type = 'I';
-        $value = 0;
+        $pmc_type = 'Integer';
+        $value    = 0;
     }
     
-    my $return = $self->_save_1( $reg_type );
-    $self->_add_inst( '', 'set', [ $return, $value ] );
+    my $return;
+    if ( $pmc_type ) {
+        $return = $self->_save_1( 'P' );
+        $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
+        $self->_add_inst( '', 'set', [ $return, $value ] );
+    }
+    else {
+        $return = $self->_save_1( $reg_type );
+        $self->_add_inst( '', 'set', [ $return, $value ] );
+    }
 
     $self->_add_comment( 'end of _constant' );
 
@@ -269,10 +264,6 @@ sub _morph {
     if ( $to =~ m/ P /xms ) {
         if ( $from =~ /P/ ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
-        }
-        elsif ( $from =~ m/ I /xms ) {
-            $self->_add_inst( '', 'new', [ $to, q{'Integer'} ] );
-            $self->_add_inst( '', 'set', [ $to, $from ] );
         }
         elsif ( $from =~ m/ N /xms ) {
             $self->_add_inst( '', 'new', [ $to, q{'Float'} ] );
@@ -636,11 +627,11 @@ sub _op_case {
 sub _op_and {
     my ( $self, $node ) = @_;
 
-    my $label = $self->_gensym();
-
+    my $true_label = $self->_gensym();
     my $temp;
     my $return = $self->_save_1('P');
     for ( _get_args($node) ) {
+        my $label = $self->_gensym();
         $temp = $self->_generate($_);
         # only '#f', therfore only Boolean PMCs, therefore only PMCs can be false
         if ( $temp =~ m/ \A P /xms )       
@@ -649,17 +640,17 @@ sub _op_and {
             $self->_add_inst( '',            'typeof', [ $tmp_s, $temp ] );
             $self->_restore($tmp_s);
             $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Boolean'}, "NOT_YET_DONE_$label" ] );
-            $self->_add_inst( '', "unless $temp goto FALSE_$label" );
+            $self->_add_inst( '', "unless $temp goto FALSE_$true_label" );
             $self->_add_inst("NOT_YET_DONE_$label");
         }
     }
     $self->_add_inst( '', 'new', [ $return, q{'Undef'} ] );
     $self->_add_inst( '', 'set', [ $return, $temp ] );
-    $self->_add_inst( '', 'branch', [ "TRUE_$label" ] );
-    $self->_add_inst("FALSE_$label");
+    $self->_add_inst( '', 'branch', [ "TRUE_$true_label" ] );
+    $self->_add_inst("FALSE_$true_label");
     $self->_add_inst( '', 'new', [ $return, q{'Boolean'} ] );
     $self->_add_inst( '', 'set', [ $return, 0 ] );
-    $self->_add_inst("TRUE_$label");
+    $self->_add_inst("TRUE_$true_label");
 
     return $return;
 }
@@ -807,7 +798,7 @@ sub _op_pair_p {
 
     my $return = $self->_constant('#t');
 
-    if ( $item =~ m/ \A [INS] /xms ) {
+    if ( $item =~ m/ \A [NS] /xms ) {
         $self->_add_inst( '',            'set', [ $return, 0 ] );
     }
     else {
@@ -958,7 +949,7 @@ sub _op_length {
     my ( $self, $node ) = @_;
 
     my $label  = $self->_gensym();
-    my $return = $self->_save_1('I');
+    my $return = $self->_constant(0);
 
     _check_num_args( $node, 1, 'length' );
 
@@ -1741,7 +1732,7 @@ sub _op_write {
     for ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
-        if ( $temp =~ m/ \A [IN]/xms ) {
+        if ( $temp =~ m/ \A [N]/xms ) {
             $self->_add_inst( '', 'print', [$temp] );
         }
         elsif ( $temp =~ m/ \A S/xms ) {
@@ -1769,7 +1760,7 @@ sub _op_display {
     for ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
-        if ( $temp =~ m/ \A [IN]/xms ) {
+        if ( $temp =~ m/ \A [N]/xms ) {
             $self->_add_inst( '', 'print', [$temp] );
         }
         elsif ( $temp =~ m/ \A S/xms ) {
@@ -2191,7 +2182,7 @@ sub _call_function_obj {
     my @args;
     while ( my $arg = shift ) {
         if ( $arg ne "P$count" ) {
-            if ( $arg =~ m/^[INS]/ ) {
+            if ( $arg =~ m/^[NS]/ ) {
                 $self->_morph( "P$count", $arg );
             }
             else {

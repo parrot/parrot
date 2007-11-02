@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 38;
+use Test::More tests => 41;
 
 use Parrot::Test;
 
@@ -124,6 +124,18 @@ CODE
 ###
 ### and
 ###
+
+language_output_is( 'Scheme', <<'CODE', 0, 'and 0' );
+(write (and 0))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', 1, 'and 1' );
+(write (and 1))
+CODE
+
+language_output_is( 'Scheme', <<'CODE', '#t', 'and many #t' );
+(write (and #t #t #t #t #t #t 2 #t 1 #t))
+CODE
 
 language_output_is( 'Scheme', <<'CODE', 3, 'basic and' );
 (write (and 1 3))
