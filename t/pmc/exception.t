@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 35;
 
 =head1 NAME
 
@@ -35,9 +35,44 @@ ok 1
 ok 2
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - pop_eh, PMC exception handler" );
+.sub main :main
+    $P0 = new "Exception_Handler"
+    set_addr $P0, _handler
+    push_eh $P0
+    print "ok 1\n"
+    pop_eh
+    print "ok 2\n"
+    end
+_handler:
+    print "caught it\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh _handler
+    new P30, 'Exception'
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "caught it\n"
+    end
+CODE
+main
+caught it
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw, PMC exception handler" );
+    print "main\n"
+    new P20, "Exception_Handler"
+    set_addr P20, _handler
+    push_eh P20
     new P30, 'Exception'
     throw P30
     print "not reached\n"
@@ -54,7 +89,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "main\n"
     push_eh handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    new P2, 'String'
+    set P2, "just pining"
+    setattribute P1, 'message', P2
     throw P1
     print "not reached\n"
     end
@@ -76,13 +113,55 @@ Exception
 just pining
 OUTPUT
 
+pasm_output_is( <<'CODE', <<'OUTPUT', "exception attributes" );
+    print "main\n"
+    push_eh handler
+    new P1, 'Exception'
+    new P2, 'String'
+    set P2, "just pining"
+    setattribute P1, 'message', P2
+    new P3, 'Integer'
+    set P3, 5
+    setattribute P1, 'severity', P3
+    new P4, 'String'
+    set P4, "additional payload"
+    setattribute P1, 'payload', P4
+
+    throw P1
+    print "not reached\n"
+    end
+handler:
+    get_results "0,0", P0, S0
+    print "caught it\n"
+    getattribute P16, P0, 'message'
+    print P16
+    print "\n"
+    getattribute P17, P0, 'severity'
+    print P17
+    print "\n"
+    getattribute P18, P0, 'payload'
+    print P18
+    print "\n"
+    null P5
+    end
+
+CODE
+main
+caught it
+just pining
+5
+additional payload
+OUTPUT
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
 # see also #38459
     print "main\n"
     new P0, 'Integer'
     push_eh handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    new P2, 'String'
+    set P2, "just pining"
+    setattribute P1, 'message', P2
     throw P1
     print "not reached\n"
     end
@@ -102,7 +181,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
     print "main\n"
     push_eh _handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    new P2, 'String'
+    set P2, "just pining"
+    setattribute P1, 'message', P2
     throw P1
     print "not reached\n"
     end
@@ -130,7 +211,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     push_eh _handler
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    new P20, 'String'
+    set P20, "something happened"
+    setattribute P30, "message", P20
     throw P30
     print "not reached\n"
     end
@@ -143,12 +226,14 @@ _handler:
 CODE
 main
 caught it
-something happend
+something happened
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     new P0, 'Exception'
-    set P0["_message"], "something happened"
+    new P20, 'String'
+    set P20, "something happened"
+    setattribute P0, "message", P20
     throw P0
     print "not reached\n"
     end
@@ -184,7 +269,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    new P20, 'String'
+    set P20, "something happened"
+    setattribute P30, "message", P20
     throw P30
     print "not reached\n"
     end
@@ -203,7 +290,7 @@ _handler2:
 CODE
 main
 caught it in 2
-something happend
+something happened
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
@@ -212,7 +299,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30["_message"], "something happened"
+    new P20, 'String'
+    set P20, "something happened"
+    setattribute P30, "message", P20
     throw P30
     print "not reached\n"
     end
@@ -470,7 +559,9 @@ last:
     store_global "Foo::Bar", "test", test2_binding
     show_value()
     exit = new 'Exception'
-    exit["_message"] = "something happened"
+    new P2, 'String'
+    set P2, "something happened"
+    setattribute exit, "message", P2
     throw exit
 .end
 .sub show_value
@@ -657,7 +748,9 @@ handler:
 
 .sub broken
     $P0 = new 'Exception'
-    $P0["_message"] = "something broke"
+    new $P2, 'String'
+    set $P2, "something broke"
+    setattribute $P0, "message", $P2
     throw $P0
 .end
 CODE

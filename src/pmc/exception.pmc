@@ -10,16 +10,8 @@ src/pmc/exception.pmc - Exception PMC
 
 This is the exception base class.
 
-As we are still lacking objects, this class is based on C<ResziablePMCArray>.
-This will probably change.
-
-Please note (#39744):
-
-Keyed access to exception objects should be very forgiving of mistakes,
-returning the equivalent of 'null' for invalid keys.
-
-This issue *may* be revisited when exception objects get their new pdd23
-interface.
+For now, this class is based on C<ResziablePMCArray>. This will change when the
+full PMC PDD is implemented.
 
 An exception object has these attributes:
 
@@ -38,7 +30,9 @@ The exception type, (see F<include/parrot/exceptions.h>, F<except_type.pasm>).
 The severity of the exception, (see F<src/exceptions.h>,
 F<except_severity.pasm>).
 
-=item 3 C<unused>
+=item 3 C<payload>
+
+Additional data for the exception.
 
 =item 4 C<unused>
 
@@ -79,8 +73,37 @@ When an exception handler is called, the exception object is passed as
 as the first argument, the message as the second argument of the call.
 These arguments can be retrieved with the C<get_results> opcode.
 
-This is experimental code. The C<enum_class> of the C<Exception> isn't
-fixed. The interface isn't fixed.
+=cut 
+
+*/
+
+#include "parrot/parrot.h"
+
+/* This finds the index of an attribute in an object's attribute store and
+ * returns it. Returns -1 if the attribute does not exist. */
+static INTVAL
+get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
+{
+        if (!string_compare(interp, name,
+            string_from_literal(interp, "message")))
+            return 0;
+
+        if (!string_compare(interp, name,
+            string_from_literal(interp, "type")))
+            return 1;
+
+        if (!string_compare(interp, name,
+            string_from_literal(interp, "severity")))
+            return 2;
+
+        if (!string_compare(interp, name,
+            string_from_literal(interp, "payload")))
+            return 3;
+
+            return -1;
+}
+
+/*
 
 =head2 Methods
 
@@ -89,8 +112,6 @@ fixed. The interface isn't fixed.
 =cut
 
 */
-
-#include "parrot/parrot.h"
 
 pmclass Exception extends ResizablePMCArray need_ext {
 
@@ -267,6 +288,46 @@ Compare the passed in Exception with SELF. Returns True if C<SELF> isa C<value>
         }
 
         return 0;
+    }
+
+/*
+
+=item C<get_attr_str>
+
+Retrieve an attribute value for the exception object.
+
+=cut
+
+*/
+    PMC *get_attr_str(STRING *name) {
+        INTVAL index = get_attrib_index(interp, SELF, name);
+
+        /* If lookup failed, exception. */
+        if (index == -1)
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", name);
+
+       return DYNSELF.get_pmc_keyed_int(index);
+    }
+
+/*
+
+=item C<set_attr_str>
+
+Set an attribute value for the exception object.
+
+=cut
+
+*/
+    void set_attr_str(STRING *name, PMC *value) {
+        INTVAL index = get_attrib_index(interp, SELF, name);
+
+        /* If lookup failed, exception. */
+        if (index == -1)
+            real_exception(interp, NULL, ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", name);
+
+        DYNSELF.set_pmc_keyed_int(index, value);
     }
 
 /*
