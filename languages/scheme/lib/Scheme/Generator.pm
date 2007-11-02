@@ -35,11 +35,10 @@ sub _add_comment {
 }
 
 sub _new_regs {
-    return {
-        N => { map { $_ => 0 } ( 0 .. 31 ) },
-        S => { map { $_ => 0 } ( 0 .. 31 ) },
-        P => { map { $_ => 0 } ( 0 .. 31 ) },
-    };
+    return
+        { S => { map { $_ => 0 } ( 0 .. 31 ) },
+          P => { map { $_ => 0 } ( 0 .. 31 ) },
+        };
 }
 
 # save a number of registers on the stack
@@ -52,7 +51,7 @@ sub _save {
     die "No registers to save"
         unless $count and $count > 0;
     die "Illegal register type"
-        unless $type and $type =~ m/^[INPS]$/;
+        unless $type and $type =~ m/^[PS]$/;
     my @temp;
     for ( 0 .. 31 ) {
         next if $self->{regs}->{$type}{$_} == 1;
@@ -226,7 +225,7 @@ sub _constant {
         $pmc_type = 'Integer';
     }
     elsif ( $value =~ m/ \A [-+]?((\d+\.\d*) | (\.d+)) ([eE][-+]?\d+)? \z/xms ) {    # a float
-        $reg_type = 'N';
+        $pmc_type = 'Float';
     }
     elsif ( $value =~ m/ \A " [^"]* " \z/xms ) {                                     # a string, not escapes yet
         $reg_type = 'S';
@@ -264,10 +263,6 @@ sub _morph {
     if ( $to =~ m/ P /xms ) {
         if ( $from =~ /P/ ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
-        }
-        elsif ( $from =~ m/ N /xms ) {
-            $self->_add_inst( '', 'new', [ $to, q{'Float'} ] );
-            $self->_add_inst( '', 'set', [ $to, $from ] );
         }
         elsif ( $from =~ m/ S /xms ) {
             $self->_add_inst( '', 'new', [ $to, q{'String'} ] );
@@ -367,7 +362,7 @@ sub _qq_unquote {
 
     my $item = $self->_generate($node);
 
-    if ( $item =~ /^[INS]/ ) {
+    if ( $item =~ m/ \A [S]/xms ) {
         my $temp = $self->_save_1('P');
         $self->_morph( $temp, $item );
         $self->_restore($item);
@@ -387,7 +382,7 @@ sub _qq_unquote_splicing {
 
     my $list = $self->_generate($node);
 
-    die "unquote-splicing called on no list" if ( $list =~ /^[INS]/ );
+    die "unquote-splicing called on no list" if ( $list =~ m/ \A [S]/xms );
 
     my $type  = $self->_save_1('S');
     my $head  = $self->_save_1('P');
