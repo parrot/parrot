@@ -128,6 +128,18 @@ been updated.
 
 =back
 
+=head1 Deprecated Exception Features
+
+=over 4
+
+=item 1
+
+Attributes on exception objects will no longer be accessible by integer or
+string key, use C<getattribute> and C<setattribute> instead. Slated for removal
+in the 0.5.2 release.
+
+=back
+
 =head1 deprecated PIR syntax
 
 =over 4
