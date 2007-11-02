@@ -69,8 +69,9 @@ NOTE: The use of C<::> in identifiers is deprecated.
 
 A label declaration consists of a label name followed by a colon. A label name
 conforms to the standard requirements for identifiers. A label declaration may
-occur at the start of a statement, or stand alone on a line. A label
-declaration may not occur on the same line as a directive.
+occur at the start of a statement, or stand alone on a line, but always within
+a compilation unit. A label declaration may not occur on the same line as a
+directive.
 
 A reference to a label consists of only the label name, and is generally used
 as an argument to an instruction or directive.
