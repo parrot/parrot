@@ -33,19 +33,37 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $test = 0;
+    my $errormsg = _first_probe_for_isreg();
 
-    cc_gen('config/auto/isreg/test_c.in');
-    eval { cc_build(); };
-    unless ( $@ || cc_run() !~ /ok/ ) {
-        $test = 1;
+    if (! $errormsg) {
+        $errormsg = _second_probe_for_isreg();
     }
     cc_clean();
+    $self->_evaluate_isreg($conf, $errormsg);
+    return 1;
+}
 
+sub _first_probe_for_isreg {
+    my $errormsg;
+    cc_gen('config/auto/isreg/test_c.in');
+    eval { cc_build(); };
+    $errormsg = 1 if  $@;
+    return $errormsg;
+}
+
+sub _second_probe_for_isreg {
+    my $ccrunfailure;
+    $ccrunfailure++ if ( cc_run() !~ /ok/ );
+    return $ccrunfailure;
+}
+
+sub _evaluate_isreg {
+    my ($self, $conf, $anyerror) = @_;
+    my $test;
+    $test = (! defined $anyerror) ? 1 : 0;
     $conf->data->set( isreg => $test );
     print( $test ? " (Yep) " : " (no) " ) if $conf->options->get('verbose');
     $self->set_result( $test ? 'yes' : 'no' );
-
     return 1;
 }
 
