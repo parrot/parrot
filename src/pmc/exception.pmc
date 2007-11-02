@@ -73,7 +73,7 @@ When an exception handler is called, the exception object is passed as
 as the first argument, the message as the second argument of the call.
 These arguments can be retrieved with the C<get_results> opcode.
 
-=cut 
+=cut
 
 */
 
