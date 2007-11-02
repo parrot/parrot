@@ -226,7 +226,7 @@ continuation.
 
 =head1 IMPLEMENTATION
 
-=head2 Universal Exception Object Interface
+=head2 Exception Object Interface
 
 All of Parrot's standard exceptions provide at least the following interface.
 It is recommended that all classes intended for throwing also provide at least
@@ -246,7 +246,6 @@ still be able to stringify and print it.
 The C<payload> more specifically identifies the detailed cause/nature of
 the exception.  Each exception class will have its own specific payload
 type(s).  See the table of standard exception classes for examples.
-
 
 =item B<PMC *set_attr_str(STRING *name, PMC *value)>
 
