@@ -248,7 +248,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 186 "pir.y"
+#line 177 "pir.y"
 {
     double dval;
     int    ival;

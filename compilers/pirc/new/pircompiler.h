@@ -17,7 +17,9 @@ typedef struct lexer_state {
 
 
 /* constructor for a lexer_state object */
-struct lexer_state *new_lexer(char * const filename);
+lexer_state *new_lexer(char * const filename);
+
+
 
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */

@@ -298,6 +298,7 @@ This is a complete rewrite of the parser for the PIR language.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "pirparser.h"
 #include "pircompiler.h"
@@ -311,15 +312,10 @@ This is a complete rewrite of the parser for the PIR language.
 #include "pirlexer.h"
 
 
-
+extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message);
 
 /* declare yylex() */
 extern YY_DECL;
-
-extern int yyerror(yyscan_t yyscanner,
-                   struct lexer_state * const lexer, char const * const message);
-
-
 
 
 
@@ -339,8 +335,6 @@ extern int yyerror(yyscan_t yyscanner,
 #ifndef YYLTYPE_IS_TRIVIAL
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
-
-
 
 
 
@@ -365,14 +359,14 @@ extern int yyerror(yyscan_t yyscanner,
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 186 "pir.y"
+#line 177 "pir.y"
 {
     double dval;
     int    ival;
     char  *sval;
 }
 /* Line 187 of yacc.c.  */
-#line 376 "pirparser.c"
+#line 370 "pirparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -385,7 +379,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 389 "pirparser.c"
+#line 383 "pirparser.c"
 
 #ifdef short
 # undef short
@@ -769,32 +763,32 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   220,   220,   225,   226,   229,   230,   233,   234,   235,
-     236,   237,   238,   239,   240,   243,   246,   251,   254,   259,
-     265,   266,   269,   270,   271,   274,   279,   280,   283,   284,
-     289,   295,   296,   299,   300,   303,   304,   305,   306,   307,
-     308,   309,   310,   311,   312,   313,   316,   317,   320,   321,
-     322,   323,   326,   327,   330,   333,   334,   340,   341,   345,
-     346,   347,   350,   351,   352,   353,   354,   355,   356,   357,
-     358,   359,   360,   361,   362,   363,   364,   367,   368,   371,
-     374,   377,   380,   381,   382,   385,   386,   387,   388,   389,
-     390,   391,   392,   396,   399,   400,   403,   404,   407,   411,
-     414,   415,   416,   419,   420,   421,   422,   423,   424,   425,
-     426,   427,   428,   429,   430,   431,   435,   436,   437,   438,
-     439,   440,   441,   442,   443,   444,   445,   446,   447,   448,
-     451,   454,   455,   458,   459,   460,   461,   464,   465,   469,
-     472,   475,   478,   481,   482,   485,   486,   489,   490,   493,
-     496,   497,   500,   507,   508,   511,   514,   515,   516,   520,
-     521,   524,   525,   528,   529,   532,   533,   534,   537,   538,
-     541,   542,   545,   548,   549,   552,   553,   554,   555,   556,
-     559,   560,   563,   564,   565,   568,   571,   572,   573,   574,
-     575,   576,   579,   580,   583,   589,   590,   593,   594,   597,
-     600,   603,   604,   607,   608,   611,   612,   615,   620,   621,
-     624,   627,   628,   631,   634,   635,   638,   639,   642,   643,
-     646,   649,   650,   653,   654,   655,   656,   659,   660,   661,
-     664,   665,   668,   669,   670,   673,   674,   675,   676,   677,
-     681,   682,   683,   684,   687,   688,   689,   690,   691,   692,
-     695,   696,   697,   698,   701,   702
+       0,   211,   211,   216,   217,   220,   221,   224,   225,   226,
+     227,   228,   229,   230,   231,   234,   237,   242,   245,   250,
+     256,   257,   260,   261,   262,   265,   270,   271,   274,   275,
+     280,   286,   287,   290,   291,   294,   295,   296,   297,   298,
+     299,   300,   301,   302,   303,   304,   307,   308,   311,   312,
+     313,   314,   317,   318,   321,   324,   325,   331,   332,   336,
+     337,   338,   341,   342,   343,   344,   345,   346,   347,   348,
+     349,   350,   351,   352,   353,   354,   355,   358,   359,   362,
+     365,   368,   371,   372,   373,   376,   377,   378,   379,   380,
+     381,   382,   383,   387,   390,   391,   394,   395,   398,   402,
+     405,   406,   407,   410,   411,   412,   413,   414,   415,   416,
+     417,   418,   419,   420,   421,   422,   426,   427,   428,   429,
+     430,   431,   432,   433,   434,   435,   436,   437,   438,   439,
+     442,   445,   446,   449,   450,   451,   452,   455,   456,   460,
+     463,   466,   469,   472,   473,   476,   477,   480,   481,   484,
+     487,   488,   491,   498,   499,   502,   505,   506,   507,   511,
+     512,   515,   516,   519,   520,   523,   524,   525,   528,   529,
+     532,   533,   536,   539,   540,   543,   544,   545,   546,   547,
+     550,   551,   554,   555,   556,   559,   562,   563,   564,   565,
+     566,   567,   570,   571,   574,   580,   581,   584,   585,   588,
+     591,   594,   595,   598,   599,   602,   603,   606,   611,   612,
+     615,   618,   619,   622,   625,   626,   629,   630,   633,   634,
+     637,   640,   641,   644,   645,   646,   647,   650,   651,   652,
+     655,   656,   659,   660,   661,   664,   665,   666,   667,   668,
+     672,   673,   674,   675,   678,   679,   680,   681,   682,   683,
+     686,   687,   688,   689,   692,   693
 };
 #endif
 
@@ -2047,13 +2041,13 @@ yyreduce:
   switch (yyn)
     {
         case 76:
-#line 364 "pir.y"
+#line 355 "pir.y"
     { yyerrok; ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2057 "pirparser.c"
+#line 2051 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2267,208 +2261,9 @@ yyreturn:
 }
 
 
-#line 705 "pir.y"
+#line 696 "pir.y"
 
 
-#include <string.h>
-#include <assert.h>
-
-
-/*
-
-wrapper function for yyerror.
-
-*/
-void
-syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message) {
-    yyerror(yyscanner, lexer, message);
-}
-
-
-
-
-/*
-
-*/
-static void
-print_help(char const * const program_name) {
-
-    fprintf(stderr, "Usage: %s [options] <files>\n", program_name);
-    fprintf(stderr, "Options:\n\n");
-    /*fprintf(stderr, "  -E        pre-process\n"); */
-    fprintf(stderr, "  -d        show debug messages of parser\n");
-    fprintf(stderr, "  -h        show this help message\n");
-    fprintf(stderr, "  -o <file> write output to the specified file. "
-                    "Currently only works in combination with '-E' option\n");
-}
-
-
-/*
- * Main compiler driver.
- */
-int
-main(int argc, char *argv[]) {
-
-    char const * const program_name = argv[0];
-    int total_errors  = 0;
-    int flexdebug     = 0;
-    char *outputfile  = NULL;
-    yyscan_t yyscanner;
-
-
-    if (argc < 2) {
-        print_help(program_name);
-        exit(EXIT_FAILURE);
-    }
-
-
-
-    /* skip program name */
-    argc--;
-    argv++;
-
-    /* very basic argument handling; I'm too lazy to check out
-     * the standard funtion for that, right now. This is a TODO. */
-    while (argc > 0 && argv[0][0] == '-') {
-        switch (argv[0][1]) {
-
-            /* no pre-processing for now. handled by macro/heredoc preprocessors.
-            case 'E':
-                pre_process = 1;
-                break;
-            */
-
-            /* Only allow for debug flag if the generated parser supports it */
-#ifdef YYDEBUG
-            case 'd':
-                yydebug = 1;
-                break;
-#endif
-            case 'f':
-                flexdebug = 1;
-                break;
-            case 'h':
-                print_help(program_name);
-                exit(EXIT_SUCCESS); /* asking for help doesn't make you a failure */
-                /* break; */
-            case 'o':
-                if (argc > 1) { /* there must be at least 2 more args,
-                                         the output file, and an input */
-                    argc--;
-                    argv++;
-                    outputfile = argv[0];
-                }
-                else {
-                    fprintf(stderr, "Missing argument for option '-o'\n");
-                    exit(EXIT_FAILURE);
-                }
-                break;
-            default:
-                fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
-                break;
-        }
-        /* goto next command line argument */
-        argv++;
-        argc--;
-    }
-
-    if (argc < 1) {
-        fprintf(stderr, "No input file specified\n");
-        exit(EXIT_FAILURE);
-    }
-
-
-    /* compile all files specified on the command line */
-    while (argc > 0) {
-        FILE *infile       = NULL;
-        lexer_state *lexer = NULL;
-
-        fprintf(stderr, "Processing file '%s'\n", argv[0]);
-
-        /* done handling arguments, open the file */
-        infile = fopen(argv[0], "r");
-
-        if (infile == NULL) {
-            fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
-            exit(EXIT_FAILURE);
-        }
-
-        /* create a yyscan_t object */
-        yylex_init(&yyscanner);
-        /* set debug flag */
-        yyset_debug(flexdebug, yyscanner);
-        /* set the input file */
-        yyset_in(infile, yyscanner);
-
-        /* set the extra parameter in the yyscan_t structure */
-        lexer = new_lexer(argv[0]);
-        yyset_extra(lexer, yyscanner);
-
-
-
-        fprintf(stderr, "compiling %s\n", argv[0]);
-        yyparse(yyscanner, lexer);
-
-            /* update total error count */
-        total_errors += lexer->parse_errors;
-
-        if (lexer->parse_errors == 0) {
-            fprintf(stderr, "Parse successful!\n");
-        }
-        else {
-            fprintf(stderr, "There %s %d %s in file '%s'\n", lexer->parse_errors > 1 ? "were" :
-                    "was", lexer->parse_errors, lexer->parse_errors > 1 ? "errors" : "error",
-                    lexer->filename);
-        }
-
-        /* clean up after playing */
-        yylex_destroy(yyscanner);
-
-        argc--;
-        argv++;
-    }
-
-    if (total_errors > 0)
-        fprintf(stderr, "There were %d parse errors in all files\n", total_errors);
-
-
-    /* go home! */
-    return 0;
-}
-
-
-
-/*
-
-*/
-int
-yyerror(yyscan_t yyscanner, struct lexer_state * const  lexer, char const * const message) {
-
-    char const * const text = yyget_text(yyscanner);
-
-    /* increment parse errors in the lexer structure */
-    lexer->parse_errors++;
-
-    /* emit an error */
-    fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
-           lexer->filename, lexer->line_nr, message);
-
-
-    /* print current token if it's not a newline (or \r\n on windows) */
-
-    /* the following should be fixed; the point is not to print the token if
-     * it's a newline, that looks silly.
-     */
-    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") == 0) {
-        fprintf(stderr, "('%s')\n\n", text);
-    }
-    else {
-        fprintf(stderr, "\n\n");
-    }
-
-
-    return 0;
-}
 
 
 /*

@@ -74,13 +74,10 @@ extern void yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
 /* accessor method to get yytext */
 extern char *yyget_text(yyscan_t yyscanner);
 
-/* constructor for the lexer */
-extern struct lexer_state *new_lexer(char *filename);
-
 /* declaration of yylex */
 extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
 
-extern void syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message);
+extern void syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message);
 
 
 
@@ -116,6 +113,8 @@ void noprint(FILE *fp, char *format, ...) { }
 
 /*
 
+=item C<update_location>
+
 Update the line number. The yytext buffer is scanned for '\n'
 characters; for each one, the line number is incremented. It's done this
 way, because we can't increment it in the rule for matching newlines, as
@@ -143,6 +142,8 @@ update_location(void *yyscanner, lexer_state * const lexer) {
 
 /*
 
+=item C<dupstr>
+
 The C89 standard does not define a strdup() in the C library,
 so define our own strdup. Function names beginning with "str"
 are reserved (I think), so make it dupstr, as that is what it
@@ -158,6 +159,8 @@ dupstr(char const * const source) {
 }
 
 /*
+
+=item C<dupstrn>
 
 See dupstr, except that this version takes the number of characters to be
 copied. Easy for copying a string except the quotes.
@@ -185,6 +188,8 @@ dupstrn(char const * const source, size_t num_chars) {
 
 
 /*
+
+=item C<new_lexer>
 
 constructor for a lexer. It's very important to initialize all fields.
 
