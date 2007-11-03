@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 41;
+use Test::More tests => 59;
 
 use Parrot::Test;
 
@@ -32,49 +32,50 @@ language_output_is( 'Scheme', <<'CODE', 7, 'slightly more complex if' );
 (write (if (= 9 9) 7 -23))
 CODE
 
-###
-### boolean?
-###
+# base types
+# Every object is of exactly one base type
+{
+    # my @base_types 
+    #     = qw( boolean pair symbol char string vector procedure null );
+    my @base_types 
+         = qw( boolean );
+    my %type_of_object = (
+        q{#t}                     => 'boolean',
+        q{#f}                     => 'boolean',
+        q{-2}                     => 'number',
+        q{-1}                     => 'number',
+        q{-0}                     => 'number',
+        q{0}                      => 'number',
+        q{+0}                     => 'number',
+        q{1}                      => 'number',
+        q{+1}                     => 'number',
+        q{2}                      => 'number',
+        q{+2}                     => 'number',
+        q{"hello"}                => 'string',
+        q{""}                     => 'string',
+        q{(boolean? "hello")}     => 'boolean',
+    );
+  
+    foreach ( @base_types ) {
+        while ( my ( $obj, $type ) = each %type_of_object ) {
+            my ( $code, $expected );
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? #t' );
-(write (boolean? #t))
-CODE
+            $code     = qq{ (write ($_? $obj)) };
+            $expected = $type eq $_ ?
+                            '#t'
+                            :
+                            '#f';
+            language_output_is( 'Scheme', $code, $expected, $code );
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? #f' );
-(write (boolean? #f))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'boolean? 0' );
-(write (boolean? 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'boolean? 1' );
-(write (boolean? 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'boolean? 0' );
-(write (boolean? (boolean? "hello")))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 1, 'boolean? #t' );
-(write (if (boolean? #t) 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 1, 'boolean? #f' );
-(write (if (boolean? #f) 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 0, 'boolean? 0' );
-(write (if (boolean? 0) 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 0, 'boolean? 1' );
-(write (if (boolean? 1) 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 1, 'boolean? 0' );
-(write (if (boolean? (boolean? "hello")) 1 0))
-CODE
+            $code     = qq{ (write (if ($_? $obj) "true" "false")) };
+            $expected = $type eq $_ ?
+                            '"true"'
+                            :
+                            '"false"';
+            language_output_is( 'Scheme', $code, $expected, $code );
+        }
+    }
+}
 
 ###
 ### number?
