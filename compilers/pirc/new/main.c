@@ -1,3 +1,8 @@
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
