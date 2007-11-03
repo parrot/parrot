@@ -23,25 +23,60 @@ to be updated, but fixing them should be rather easy. Once the parser is
 tested, semantic actions can be added, which can be copied or based on the
 actions in IMCC.
 
-Current shortcomings are:
+The current set-up is a three-phase compiler:
 
 =over 4
 
-=item * Macro layer
+=item * Heredoc pre-processor
 
-The whole macro layer needs more thought. The C<.include> and C<.macro_const> directives
-(the latter was formerly called C<.constant>) are implemented, but the macro definition and
-expansion functionality needs some redesign. I'm thinking of implementing a macro
-pre-processor. A big pro of that approach would be a much cleaner lexer specification.
-However, it might make the compilation process a bit slower.
+The heredoc pre-processor takes the input, and converts all heredoc strings
+into normal strings. So, the following:
+
+ .sub main
+    foo(<<'HI', <<'BYE')
+ hi there!
+HI
+ bye for now!
+BYE
+
+ .end
+
+is converted into:
+
+ .sub main
+    foo(" hi there!\n", " bye for now!\n\n")
+ .end
+
+Currently there is a small issue with the 2nd and later heredoc arguments; they
+seem to get one newline character too many.
+
+The heredoc pre-processor needs to know about POD comments, because the POD comment
+may contain a heredoc string, which should not be processed, as it is a comment.
+For that purpose, all comments (POD and line comments) are stripped in this phase.
+
+The Heredoc pre-processor is located in B<compilers/pirc/heredoc>.
+
+=item * Macro pre-processor
+
+The macro pre-processor takes the output of the heredoc pre-processor, and
+handles all macro definitions and expansions. The C<.include> directive is handled
+here too. The output of the macro pre-processor is (in case of uses of the C<.include>
+directive) one long big file with "pure" PIR code.
+
+The macro pre-processor is located in B<compilers/pirc/macro>.
+
+=item * PIR parser
+
+The third pass is done by the PIR parser, which takes the "pure" PIR code
+from the macro pre-processor. Currently, it's only a parser, but a future
+extension could be to generate PASM code from the PIR input. This way, it's
+easy to see what ops are actually executed when running the PIR file.
+
+The PIR parser is located in B<compilers/pirc/new>.
 
 =back
 
-During reimplementing PIR using Bison/Flex, I learned a lot about the current
-implementation. Also, although the macro layer is not completed yet, it's quite clean
-and easier to read than the current implementation.
-
-Of course, besides shortcomings, the new implementation also has some unique features:
+The new implementation also has some unique features with respect to IMCC:
 
 =over 4
 
@@ -59,9 +94,27 @@ heredocs as function arguments, like so:
    ...
  BYE
 
+=item * Heredoc arguments for macro expansions
+
+As the heredoc pre-processor handles the input before the macro pre-processor,
+it is now possible to expand macros specifying heredoc arguments, like so:
+
+ .macro foo(a)
+   print .a
+ .end
+
+ .sub main
+   .foo(<<'HI')
+  Hello world!
+HI
+ .end
+
+
 =item * Reentrant
 
 The generated lexer and parser are fully re-entrant. (It does need to be tested, though).
+The macro and heredoc pre-processors need a bit more work to make them re-entrant,
+but that will be fixed soon.
 
 
 =item * Comments!
@@ -96,141 +149,50 @@ which can be downloaded from the link below.
 
 L<http://sourceforge.net/project/downloading.php?groupname=flex&filename=flex-2.5.33.tar.gz&use_mirror=belnet>
 
-=head2 On the macro pre-processor
+Just do:
 
-As listed in the TODO, it might be worth while considering to remove the macro handling
-from pir.l, and create a separate macro pre-processor. However, when doing so, its lexer
-is almost a duplicate of pir.l. This is to correctly scan heredocs and recognize macro
-expansions. When a dot-prefixed identifier is encountered, it should only be expanded
-when the lexer is not scanning a heredoc. So, at least the whole heredoc scanning stuff
-should also go into the pre-processor.
+ $ ./configure
+ $ make
 
-A first version of a separate macro pre-processor can be found in C<compilers/pirc/macro>.
-This pre-processor is mostly done, except for macro argument expansion, and heredoc parsing.
-
-=head3 Pros of a separate Macro Pre-Processor
-
-=over 4
-
-=item * cleaner solution, as the macro layer is implemented in a separate processor.
-
-=item * easier to maintain. The heredoc and macro scanning is complex, and to isolate it in a
-different file is a Good Thing.
-
-=back
-
-=head3 Cons of a separate Macro Pre-Processor
-
-=over 4
-
-=item * a great deal of the PIR lexer is duplicated. Duplication of code is bad.
-
-=item * having the input processed by two instead of 1 scanner results in a performance penalty.
-This is especially true if the intermediate results are written to and read from a file on disk.
-
-=back
-
-=head1 NOTES FOR A MACRO PRE-PROCESSOR
-
-In C<compilers/pirc/macro> a macro pre-processor is implemented. It's fairly complete, missing
-the following features:
-
-=over 4
-
-=item * Heredoc parsing (both for normal PIR code, as well as macro arguments)
-
-=item * macro labels.
-
-=back
-
-Although the number of features of the macro layer is quite small, during development of
-this pre-processor, implementing it was more complex than one would think. I list some of
-the details that need to be considered, in order to share this information with other
-interested people.
-
-=over 4
-
-=item * The preprocessor must be a full tokenizer; it is not enough to just scan characters,
-as it needs to recognize a subset of the tokens of the PIR language. Notably, the following
-tokens need to be recognized (depending on context):
-
- ".include"
- ".macro_constant"
- macro labels ("$"IDENT":")
- ".macro"
- ".endm"
- "("
- ","
- ")"
- newlines
- identifiers
- flags (":"IDENT)
- labels (IDENT":")
- integer and floating-point constants
- string constants
- heredoc-strings ("<<string-constant")
- Parrot registers
- any other set of characters that make up a token in PIR, such as "=="
- macro expansions ("."IDENT)
- <<EOF>>
-
-=item * If it must be possible to expand macros with heredoc arguments, then the
-heredoc parsing must be done in the preprocessor's lexer. If not, the lexer still needs
-to handle heredocs, as they contain newline characters. Newline characters are somewhat
-special in the macro layer, as they sometimes need to be returned as such (TK_NL) and
-sometimes as just any token (TK_ANY), and still other times they can be just skipped.
-
-=item * Heredocs, if handled in the preprocessor, must be I<flattened>, meaning that
-some code like this:
-
-   .sub main
-     foo(<<'HI')
-  this is a string
-      heredoc argument.
- HI
-   .end
-
-must be preprocessed into something like this:
-
-   .sub main
-     foo("this is a string\n   heredoc argument.\n")
-   .end
-
-I'm not entirely sure if there should be a newline at the beginning of this string, and
-at the end of the string (in this case I added one at the end). In any case, the newline
-characters must be embedded, and when printing this string to file or screen, they need
-to be escaped (otherwise the PIR lexer cannot read it).
-
-=item * Overall, the implementation of the preprocessor can become quite complex, but
-it does result in a very clean and simple implementation of the PIR lexer.
-
-=back
+Then make sure to overwrite the supplied flex binary.
 
 =head1 BUGS
 
 Having a look at this implementation would be greatly appreciated, and any resulting
 feedback even more :-)
 
-=head1 TODO
-
-Major issues that need work:
-
 =over 4
 
-=item * finish the macro pre-processor.
+=item * All, except the first heredoc argument, contains 1 newline character too many.
 
-=item * remove the macro layer (incomplete) from the PIR lexer.
+=item * Memory management needs to be improved.
 
-=item * pipe the output of the preprocessor to the PIR lexer.
+=item * The three passed should be integrated into 1 C program. This is possible, because
+the generated lexers and parser can be specified to get a different prefix than "yy".
+So, although there are 3 lexers and 2 parsers, all generated by Flex/Bison, they can
+be linked together.
+
+=item * Macro labels needs to be implemented.
 
 =back
 
+
 =head1 SEE ALSO
 
-See also C<languages/PIR> for a PGE based implementation.
-See also C<compilers/pirc>, a hand-written, recursive-descent PIR parser.
-See also C<compilers/imcc>, the current I<standard> PIR implementation.
-See also C<docs/imcc/syntax.pod> for a description of PIR syntax.
-See also C<docs/imcc/> for more documentation about the PIR language.
+See also:
+
+=over 4
+
+=item * C<languages/PIR> for a PGE based implementation.
+
+=item * C<compilers/pirc>, a hand-written, recursive-descent PIR parser.
+
+=item * C<compilers/imcc>, the current I<standard> PIR implementation.
+
+=item * C<docs/imcc/syntax.pod> for a description of PIR syntax.
+
+=item * C<docs/imcc/> for more documentation about the PIR language.
+
+=back
 
 =cut
