@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 101;
+use Test::More tests => 141;
 
 use Parrot::Test;
 
@@ -38,47 +38,52 @@ CODE
     # my @base_types 
     #     = qw( boolean pair symbol char string vector procedure null );
     my @base_types 
-         = qw( boolean number );
-    my %type_of_object = (
-        q{#t}                     => 'boolean',
-        q{#f}                     => 'boolean',
-        q{(boolean? "hello")}     => 'boolean',
-        q{-2}                     => 'number',
-        q{-1}                     => 'number',
-        q{-0}                     => 'number',
-        q{0}                      => 'number',
-        q{+0}                     => 'number',
-        q{1}                      => 'number',
-        q{+1}                     => 'number',
-        q{2}                      => 'number',
-        q{+2}                     => 'number',
-        q{-0.0}                   => 'number',
-        q{-0.1}                   => 'number',
-        q{0.0}                    => 'number',
-        q{0.1}                    => 'number',
-        q{+0.0}                   => 'number',
-        q{+0.1}                   => 'number',
-        q{"hello"}                => 'string',
-        q{""}                     => 'string',
+         = qw( boolean number string );
+    my %object = (
+        boolean    => [ q{#t},
+                        q{#f},
+                        q{(boolean? "hello")},
+                      ],
+        number     => [ q{-2},
+                        q{-1},
+                        q{-0},
+                        q{0},
+                        q{+0},
+                        q{1},
+                        q{+1},
+                        q{2},
+                        q{+2},
+                        q{-0.0},
+                        q{-0.1},
+                        q{0.0},
+                        q{0.1},
+                        q{+0.0},
+                        q{+0.1},
+                      ],
+        string     => [ q{"hello"},
+                        q{""},
+                      ],
     );
   
-    foreach ( @base_types ) {
-        while ( my ( $obj, $type ) = each %type_of_object ) {
-            my ( $code, $expected );
+    foreach my $predicate ( @base_types ) {
+        foreach my $expected_type ( @base_types ) {
+            foreach my $object ( @{ $object{$expected_type} } ) {
+                my ( $code, $expected );
 
-            $code     = qq{ (write ($_? $obj)) };
-            $expected = $type eq $_ ?
-                            '#t'
-                            :
-                            '#f';
-            language_output_is( 'Scheme', $code, $expected, $code );
+                $code     = qq{ (write ($predicate? $object)) };
+                $expected = $predicate eq $expected_type ?
+                                '#t'
+                                :
+                                '#f';
+                language_output_is( 'Scheme', $code, $expected, $code );
 
-            $code     = qq{ (write (if ($_? $obj) "true" "false")) };
-            $expected = $type eq $_ ?
-                            '"true"'
-                            :
-                            '"false"';
-            language_output_is( 'Scheme', $code, $expected, $code );
+                $code     = qq{ (write (if ($predicate? $object) "true" "false")) };
+                $expected = $predicate eq $expected_type ?
+                                '"true"'
+                                :
+                                '"false"';
+                language_output_is( 'Scheme', $code, $expected, $code );
+            }
         }
     }
 }

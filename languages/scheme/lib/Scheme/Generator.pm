@@ -1516,6 +1516,9 @@ sub _op_char_downcase {
 }
 
 sub _op_string_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'string?', $node ); 
 }
 
 sub _op_make_string {
@@ -2233,6 +2236,7 @@ sub _type_predicate {
     my %types = (
         'boolean?' => [ qw( Boolean ) ],
         'number?'  => [ qw( Integer Float Complex ) ],
+        'string?'  => [ qw( String ) ],
     );
 
     my $label = $self->_gensym();
