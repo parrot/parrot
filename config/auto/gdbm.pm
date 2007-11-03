@@ -27,7 +27,7 @@ sub _init {
     my $self = shift;
     my %data;
     $data{description} = q{Determining if your platform supports gdbm};
-    $data{args}        = [ qw( verbose without-gmp ) ];
+    $data{args}        = [ qw( verbose without-gdbm ) ];
     $data{result}      = q{};
     return \%data;
 }
@@ -38,7 +38,7 @@ sub runstep {
     my ( $verbose, $without ) = $conf->options->get(
         qw|
             verbose
-            without-gmp
+            without-gdbm
             |
     );
 
