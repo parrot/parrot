@@ -168,6 +168,8 @@ macro_def *find_macro(constant_table *table, char *name);
 char *concat(char *str1, char *str2);
 
 
+
+
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -188,7 +190,7 @@ char *concat(char *str1, char *str2);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 60 "macro.y"
+#line 62 "macro.y"
 {
     char  *sval;
     int    ival;
@@ -199,7 +201,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 203 "macroparser.c"
+#line 205 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -212,7 +214,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 216 "macroparser.c"
+#line 218 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -509,11 +511,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   114,   114,   115,   118,   119,   122,   123,   127,   136,
-     137,   138,   139,   140,   143,   147,   148,   151,   152,   156,
-     159,   165,   171,   172,   175,   176,   179,   180,   183,   184,
-     187,   188,   191,   192,   195,   196,   199,   200,   203,   208,
-     209,   210,   211
+       0,   116,   116,   117,   120,   121,   124,   125,   129,   138,
+     139,   140,   141,   142,   145,   149,   150,   153,   154,   158,
+     161,   167,   173,   174,   177,   178,   181,   182,   185,   186,
+     189,   190,   193,   194,   197,   198,   201,   202,   205,   210,
+     211,   212,   213
 };
 #endif
 
@@ -1458,125 +1460,125 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 128 "macro.y"
+#line 130 "macro.y"
     { /* after each statement, emit a newline */
          emit("\n");
        ;}
     break;
 
   case 14:
-#line 143 "macro.y"
+#line 145 "macro.y"
     { emit("setline"); emit((yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 17:
-#line 151 "macro.y"
+#line 153 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 18:
-#line 152 "macro.y"
+#line 154 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval)); ;}
     break;
 
   case 19:
-#line 156 "macro.y"
+#line 158 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 20:
-#line 160 "macro.y"
+#line 162 "macro.y"
     { define_constant(globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 21:
-#line 168 "macro.y"
+#line 170 "macro.y"
     { define_macro(globaldefinitions, (yyvsp[(2) - (6)].sval), (yyvsp[(3) - (6)].lval), (yyvsp[(5) - (6)].sval)); ;}
     break;
 
   case 22:
-#line 171 "macro.y"
+#line 173 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 23:
-#line 172 "macro.y"
+#line 174 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 24:
-#line 175 "macro.y"
+#line 177 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 25:
-#line 176 "macro.y"
+#line 178 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 26:
-#line 179 "macro.y"
+#line 181 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 27:
-#line 180 "macro.y"
+#line 182 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 28:
-#line 183 "macro.y"
+#line 185 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 29:
-#line 184 "macro.y"
+#line 186 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 30:
-#line 187 "macro.y"
+#line 189 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 31:
-#line 188 "macro.y"
+#line 190 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 32:
-#line 191 "macro.y"
+#line 193 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 33:
-#line 192 "macro.y"
+#line 194 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 34:
-#line 195 "macro.y"
+#line 197 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 35:
-#line 196 "macro.y"
+#line 198 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 36:
-#line 199 "macro.y"
+#line 201 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 37:
-#line 200 "macro.y"
+#line 202 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1580 "macroparser.c"
+#line 1582 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1790,7 +1792,7 @@ yyreturn:
 }
 
 
-#line 216 "macro.y"
+#line 218 "macro.y"
 
 
 
@@ -1873,23 +1875,23 @@ Expand the specified macro (or constant).
 */
 static void
 expand(macro_def *macro, list *args) {
-	/* construct a map data structure that maps the argument values to the parameter names */
-	/* enter the parameters as temporary symbols (.macro_const) */
-	constant_table *macro_params = new_constant_table(globaldefinitions);
-	list *params = macro->parameters;
+    /* construct a map data structure that maps the argument values to the parameter names */
+    /* enter the parameters as temporary symbols (.macro_const) */
+    constant_table *macro_params = new_constant_table(globaldefinitions);
+    list *params = macro->parameters;
 
-	while (params && args) {
-		define_constant(macro_params, params->item, args->item);
-		params = params->next;
-		args   = args->next;
-	}
+    while (params && args) {
+        define_constant(macro_params, params->item, args->item);
+        params = params->next;
+        args   = args->next;
+    }
 
-	if (params != NULL) { /* args must be null, so too few arguments */
-		fprintf(stderr, "Too few arguments for macro expansion.\n");
-	}
-	if (args != NULL) { /* params must be null, so too many arguments */
-		fprintf(stderr, "Too many arguments for macro expansion.\n");
-	}
+    if (params != NULL) { /* args must be null, so too few arguments */
+        fprintf(stderr, "Too few arguments for macro expansion.\n");
+    }
+    if (args != NULL) { /* params must be null, so too many arguments */
+        fprintf(stderr, "Too many arguments for macro expansion.\n");
+    }
 
     process_string(macro->body);
 
@@ -1901,7 +1903,7 @@ expand(macro_def *macro, list *args) {
 
     pop_constant_table();
 
-	delete_constant_table(macro_params);
+    delete_constant_table(macro_params);
 
 }
 
@@ -1976,7 +1978,7 @@ find_macro(constant_table *table, char *name) {
     }
 
     if (table->prev)
-    	return find_macro(table->prev, name);
+        return find_macro(table->prev, name);
 
     return NULL;
 }
@@ -2093,13 +2095,13 @@ emit(char *str) {
 */
 static constant_table *
 new_constant_table(constant_table *current) {
-	constant_table *table = (constant_table *)malloc(sizeof (constant_table));
-	assert(table != NULL);
-	table->definitions = NULL;
-	table->prev = current;
+    constant_table *table = (constant_table *)malloc(sizeof (constant_table));
+    assert(table != NULL);
+    table->definitions = NULL;
+    table->prev = current;
 
-	globaldefinitions = table;
-	return table;
+    globaldefinitions = table;
+    return table;
 }
 
 
@@ -2112,9 +2114,9 @@ new_constant_table(constant_table *current) {
 */
 static constant_table *
 pop_constant_table(void) {
-	constant_table *popped = globaldefinitions;
-	globaldefinitions = popped->prev;
-	return popped;
+    constant_table *popped = globaldefinitions;
+    globaldefinitions = popped->prev;
+    return popped;
 }
 
 /*
@@ -2126,14 +2128,14 @@ pop_constant_table(void) {
 */
 static void
 delete_constant_table(constant_table *table) {
-	/* destroy all definitions */
-	macro_def *iter = table->definitions;
-	while (iter != NULL) {
-		macro_def *temp = iter;
-		iter = iter->next;
-		free(temp);
-	}
-	free(table);
+    /* destroy all definitions */
+    macro_def *iter = table->definitions;
+    while (iter != NULL) {
+        macro_def *temp = iter;
+        iter = iter->next;
+        free(temp);
+    }
+    free(table);
 }
 
 /*
@@ -2270,8 +2272,8 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-	/* set up the global constant table */
-	globaldefinitions = new_constant_table(NULL);
+    /* set up the global constant table */
+    globaldefinitions = new_constant_table(NULL);
 
     /* process all files specified on the command line */
     while (argc > 0) {
@@ -2282,7 +2284,7 @@ main(int argc, char *argv[]) {
     }
     if (errors > 0)
         fprintf(stderr, "There were %d error(s)\n", errors);
-        
+
 
     return 0;
 }

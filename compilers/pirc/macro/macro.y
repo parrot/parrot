@@ -55,6 +55,8 @@ static void delete_constant_table(constant_table *table);
 
 macro_def *find_macro(constant_table *table, char *name);
 char *concat(char *str1, char *str2);
+
+
 %}
 
 %union {
@@ -157,7 +159,7 @@ include_statement: ".include" TK_STRINGC         { include_file($2); }
                  ;
 
 macro_const_definition: ".macro_const" TK_IDENT expression
-	                  { define_constant(globaldefinitions, $2, $3); }
+                      { define_constant(globaldefinitions, $2, $3); }
                       ;
 
 
@@ -295,23 +297,23 @@ Expand the specified macro (or constant).
 */
 static void
 expand(macro_def *macro, list *args) {
-	/* construct a map data structure that maps the argument values to the parameter names */
-	/* enter the parameters as temporary symbols (.macro_const) */
-	constant_table *macro_params = new_constant_table(globaldefinitions);
-	list *params = macro->parameters;
+    /* construct a map data structure that maps the argument values to the parameter names */
+    /* enter the parameters as temporary symbols (.macro_const) */
+    constant_table *macro_params = new_constant_table(globaldefinitions);
+    list *params = macro->parameters;
 
-	while (params && args) {
-		define_constant(macro_params, params->item, args->item);
-		params = params->next;
-		args   = args->next;
-	}
+    while (params && args) {
+        define_constant(macro_params, params->item, args->item);
+        params = params->next;
+        args   = args->next;
+    }
 
-	if (params != NULL) { /* args must be null, so too few arguments */
-		fprintf(stderr, "Too few arguments for macro expansion.\n");
-	}
-	if (args != NULL) { /* params must be null, so too many arguments */
-		fprintf(stderr, "Too many arguments for macro expansion.\n");
-	}
+    if (params != NULL) { /* args must be null, so too few arguments */
+        fprintf(stderr, "Too few arguments for macro expansion.\n");
+    }
+    if (args != NULL) { /* params must be null, so too many arguments */
+        fprintf(stderr, "Too many arguments for macro expansion.\n");
+    }
 
     process_string(macro->body);
 
@@ -323,7 +325,7 @@ expand(macro_def *macro, list *args) {
 
     pop_constant_table();
 
-	delete_constant_table(macro_params);
+    delete_constant_table(macro_params);
 
 }
 
@@ -398,7 +400,7 @@ find_macro(constant_table *table, char *name) {
     }
 
     if (table->prev)
-    	return find_macro(table->prev, name);
+        return find_macro(table->prev, name);
 
     return NULL;
 }
@@ -515,13 +517,13 @@ emit(char *str) {
 */
 static constant_table *
 new_constant_table(constant_table *current) {
-	constant_table *table = (constant_table *)malloc(sizeof (constant_table));
-	assert(table != NULL);
-	table->definitions = NULL;
-	table->prev = current;
+    constant_table *table = (constant_table *)malloc(sizeof (constant_table));
+    assert(table != NULL);
+    table->definitions = NULL;
+    table->prev = current;
 
-	globaldefinitions = table;
-	return table;
+    globaldefinitions = table;
+    return table;
 }
 
 
@@ -534,9 +536,9 @@ new_constant_table(constant_table *current) {
 */
 static constant_table *
 pop_constant_table(void) {
-	constant_table *popped = globaldefinitions;
-	globaldefinitions = popped->prev;
-	return popped;
+    constant_table *popped = globaldefinitions;
+    globaldefinitions = popped->prev;
+    return popped;
 }
 
 /*
@@ -548,14 +550,14 @@ pop_constant_table(void) {
 */
 static void
 delete_constant_table(constant_table *table) {
-	/* destroy all definitions */
-	macro_def *iter = table->definitions;
-	while (iter != NULL) {
-		macro_def *temp = iter;
-		iter = iter->next;
-		free(temp);
-	}
-	free(table);
+    /* destroy all definitions */
+    macro_def *iter = table->definitions;
+    while (iter != NULL) {
+        macro_def *temp = iter;
+        iter = iter->next;
+        free(temp);
+    }
+    free(table);
 }
 
 /*
@@ -692,8 +694,8 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-	/* set up the global constant table */
-	globaldefinitions = new_constant_table(NULL);
+    /* set up the global constant table */
+    globaldefinitions = new_constant_table(NULL);
 
     /* process all files specified on the command line */
     while (argc > 0) {
@@ -704,7 +706,7 @@ main(int argc, char *argv[]) {
     }
     if (errors > 0)
         fprintf(stderr, "There were %d error(s)\n", errors);
-        
+
 
     return 0;
 }

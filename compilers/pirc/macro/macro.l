@@ -5,7 +5,7 @@
  * Copyright (C) 2007, The Perl Foundation.
  */
 
-/* 
+/*
  * This pre-processor handles the macro layer of the
  * PIR language. The following constructs are filtered
  * out and handled:
@@ -14,7 +14,7 @@
  * .include
  * .macro
  *
- */ 
+ */
 
 
 #include <stdio.h>
@@ -74,7 +74,7 @@ int line = 1;
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
 #define YY_USER_ACTION   { ++ctr[yy_act];             \
-	                     do {                         \
+                         do {                         \
                               char *iter = yytext;    \
                               while (*iter != '\0') { \
                                   if (*iter == '\n')  \
@@ -91,12 +91,12 @@ static int is_pir_directive(char *name);
 
 %}
 
-%option reentrant 
-%option noyywrap 
-%option bison-bridge 
-%option never-interactive 
-%option nounput 
-%option stack 
+%option reentrant
+%option noyywrap
+%option bison-bridge
+%option never-interactive
+%option nounput
+%option stack
 %option debug
 %option prefix="macro"
 %option warn
@@ -151,34 +151,22 @@ REG            "$"?[SNIP]{DIGITS}
 <EXPAND>{NEWLINE}   { /**/
                       yy_pop_state(yyscanner);
                       yylval->sval = dupstr("\n");
-                      /*
-                      fprintf(stderr, "<EXPAND>{NL}\n");
-                      */
                       return TK_NL;
                     }
 
 <MACROPAR>{NEWLINE} { /* after macro header start the macro body */
                       yy_push_state(MACROBODY, yyscanner);
                       yylval->sval = dupstr("\n");
-                      /*
-                      fprintf(stderr, "<MACROPAR>{NL}\n");
-                      */
                       return TK_NL;
                     }
 
 <MACROBODY>{NEWLINE} { /* return newlines in macro body as any tokens */
                        yylval->sval = dupstr("\n");
-                       /*
-                       fprintf(stderr, "<MACROBODY>{NL}\n");
-                       */
                        return TK_ANY;
                      }
 
 <CONSTDEF>{NEWLINE} { yy_pop_state(yyscanner);
                       yylval->sval = "\n";
-                      /*
-                      fprintf(stderr, "<CONSTDEF>{NL}\n");
-                      */
                       return TK_NL;
                     }
 
@@ -187,9 +175,6 @@ REG            "$"?[SNIP]{DIGITS}
 
 <*>{NEWLINE}        { /* in all other states, return newline as the newline token */
                       yylval->sval = dupstr("\n");
-                      /*
-                      fprintf(stderr, "<*>{NL} (%d)\n", YYSTATE);
-                      */
                       return TK_NL;
                     }
 
@@ -432,7 +417,6 @@ REG            "$"?[SNIP]{DIGITS}
 
 
 <*>.                   { /* just return any single character token we didn't match before. */
-                          /*fprintf(stderr, "<*>%s\n", yytext); */
                          yylval->sval = dupstr(yytext);
                          return TK_ANY;
                        }
