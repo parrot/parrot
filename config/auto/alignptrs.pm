@@ -50,7 +50,7 @@ sub runstep {
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
         $conf->data->set( ptr_alignment => $align );
-        $self->set_result = "for hpux: ";
+        $self->set_result("for hpux: ");
     }
     else {
 
