@@ -11,7 +11,6 @@
 
 pir.l
 
-
 =head1 DESCRIPTION
 
 This is a complete rewrite of the PIR lexical analyzer, as defined in IMCC.
@@ -113,6 +112,8 @@ void noprint(FILE *fp, char *format, ...) { }
 
 /*
 
+=over 4
+
 =item C<update_location>
 
 Update the line number. The yytext buffer is scanned for '\n'
@@ -208,6 +209,14 @@ new_lexer(char * const filename) {
 
     return lexer;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 
