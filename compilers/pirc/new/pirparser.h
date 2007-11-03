@@ -39,227 +39,223 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     TK_MACRO_PARAM = 258,
-     TK_ENDM = 259,
-     TK_LABEL = 260,
-     TK_DOTDOT = 261,
-     TK_NL = 262,
-     TK_HLL = 263,
-     TK_HLL_MAP = 264,
-     TK_EMIT = 265,
-     TK_EOM = 266,
-     TK_N_OPERATORS = 267,
-     TK_PRAGMA = 268,
-     TK_LOADLIB = 269,
-     TK_SUB = 270,
-     TK_END = 271,
-     TK_PARAM = 272,
-     TK_LEX = 273,
-     TK_LOCAL = 274,
-     TK_NAMESPACE = 275,
-     TK_INVOCANT = 276,
-     TK_METH_CALL = 277,
-     TK_GLOBALCONST = 278,
-     TK_CONST = 279,
-     TK_RETURN = 280,
-     TK_YIELD = 281,
-     TK_BEGIN_YIELD = 282,
-     TK_END_YIELD = 283,
-     TK_BEGIN_RETURN = 284,
-     TK_END_RETURN = 285,
-     TK_BEGIN_CALL = 286,
-     TK_END_CALL = 287,
-     TK_GET_RESULTS = 288,
-     TK_CALL = 289,
-     TK_ARG = 290,
-     TK_RESULT = 291,
-     TK_NCI_CALL = 292,
-     TK_IDENT = 293,
-     TK_STRINGC = 294,
-     TK_INTC = 295,
-     TK_NUMC = 296,
-     TK_PASM_PREG = 297,
-     TK_PASM_NREG = 298,
-     TK_PASM_SREG = 299,
-     TK_PASM_IREG = 300,
-     TK_SYM_PREG = 301,
-     TK_SYM_NREG = 302,
-     TK_SYM_SREG = 303,
-     TK_SYM_IREG = 304,
-     TK_PARROT_OP = 305,
-     TK_INT = 306,
-     TK_NUM = 307,
-     TK_PMC = 308,
-     TK_STRING = 309,
-     TK_IF = 310,
-     TK_UNLESS = 311,
-     TK_NULL = 312,
-     TK_GOTO = 313,
-     TK_ARROW = 314,
-     TK_NE = 315,
-     TK_EQ = 316,
-     TK_LT = 317,
-     TK_LE = 318,
-     TK_GT = 319,
-     TK_GE = 320,
-     TK_USHIFT = 321,
-     TK_RSHIFT = 322,
-     TK_LSHIFT = 323,
-     TK_FDIV = 324,
-     TK_OR = 325,
-     TK_AND = 326,
-     TK_XOR = 327,
-     TK_CONC = 328,
-     TK_ASSIGN_USHIFT = 329,
-     TK_ASSIGN_RSHIFT = 330,
-     TK_ASSIGN_LSHIFT = 331,
-     TK_ASSIGN_INC = 332,
-     TK_ASSIGN_DEC = 333,
-     TK_ASSIGN_MUL = 334,
-     TK_ASSIGN_MOD = 335,
-     TK_ASSIGN_POW = 336,
-     TK_ASSIGN_DIV = 337,
-     TK_ASSIGN_BOR = 338,
-     TK_ASSIGN_BAND = 339,
-     TK_ASSIGN_FDIV = 340,
-     TK_ASSIGN_BNOT = 341,
-     TK_ASSIGN_CONC = 342,
-     TK_FLAG_INIT = 343,
-     TK_FLAG_LOAD = 344,
-     TK_FLAG_MAIN = 345,
-     TK_FLAG_ANON = 346,
-     TK_FLAG_METHOD = 347,
-     TK_FLAG_OUTER = 348,
-     TK_FLAG_VTABLE = 349,
-     TK_FLAG_LEX = 350,
-     TK_FLAG_MULTI = 351,
-     TK_FLAG_POSTCOMP = 352,
-     TK_FLAG_IMMEDIATE = 353,
-     TK_FLAG_UNIQUE_REG = 354,
-     TK_FLAG_NAMED = 355,
-     TK_FLAG_SLURPY = 356,
-     TK_FLAG_FLAT = 357,
-     TK_FLAG_OPTIONAL = 358,
-     TK_FLAG_OPT_FLAG = 359
+     TK_LABEL = 258,
+     TK_DOTDOT = 259,
+     TK_NL = 260,
+     TK_HLL = 261,
+     TK_HLL_MAP = 262,
+     TK_EMIT = 263,
+     TK_EOM = 264,
+     TK_N_OPERATORS = 265,
+     TK_PRAGMA = 266,
+     TK_LOADLIB = 267,
+     TK_SUB = 268,
+     TK_END = 269,
+     TK_PARAM = 270,
+     TK_LEX = 271,
+     TK_LOCAL = 272,
+     TK_NAMESPACE = 273,
+     TK_INVOCANT = 274,
+     TK_METH_CALL = 275,
+     TK_GLOBALCONST = 276,
+     TK_CONST = 277,
+     TK_RETURN = 278,
+     TK_YIELD = 279,
+     TK_BEGIN_YIELD = 280,
+     TK_END_YIELD = 281,
+     TK_BEGIN_RETURN = 282,
+     TK_END_RETURN = 283,
+     TK_BEGIN_CALL = 284,
+     TK_END_CALL = 285,
+     TK_GET_RESULTS = 286,
+     TK_CALL = 287,
+     TK_ARG = 288,
+     TK_RESULT = 289,
+     TK_NCI_CALL = 290,
+     TK_IDENT = 291,
+     TK_STRINGC = 292,
+     TK_INTC = 293,
+     TK_NUMC = 294,
+     TK_PASM_PREG = 295,
+     TK_PASM_NREG = 296,
+     TK_PASM_SREG = 297,
+     TK_PASM_IREG = 298,
+     TK_SYM_PREG = 299,
+     TK_SYM_NREG = 300,
+     TK_SYM_SREG = 301,
+     TK_SYM_IREG = 302,
+     TK_PARROT_OP = 303,
+     TK_INT = 304,
+     TK_NUM = 305,
+     TK_PMC = 306,
+     TK_STRING = 307,
+     TK_IF = 308,
+     TK_UNLESS = 309,
+     TK_NULL = 310,
+     TK_GOTO = 311,
+     TK_ARROW = 312,
+     TK_NE = 313,
+     TK_EQ = 314,
+     TK_LT = 315,
+     TK_LE = 316,
+     TK_GT = 317,
+     TK_GE = 318,
+     TK_USHIFT = 319,
+     TK_RSHIFT = 320,
+     TK_LSHIFT = 321,
+     TK_FDIV = 322,
+     TK_OR = 323,
+     TK_AND = 324,
+     TK_XOR = 325,
+     TK_CONC = 326,
+     TK_ASSIGN_USHIFT = 327,
+     TK_ASSIGN_RSHIFT = 328,
+     TK_ASSIGN_LSHIFT = 329,
+     TK_ASSIGN_INC = 330,
+     TK_ASSIGN_DEC = 331,
+     TK_ASSIGN_MUL = 332,
+     TK_ASSIGN_MOD = 333,
+     TK_ASSIGN_POW = 334,
+     TK_ASSIGN_DIV = 335,
+     TK_ASSIGN_BOR = 336,
+     TK_ASSIGN_BAND = 337,
+     TK_ASSIGN_FDIV = 338,
+     TK_ASSIGN_BNOT = 339,
+     TK_ASSIGN_CONC = 340,
+     TK_FLAG_INIT = 341,
+     TK_FLAG_LOAD = 342,
+     TK_FLAG_MAIN = 343,
+     TK_FLAG_ANON = 344,
+     TK_FLAG_METHOD = 345,
+     TK_FLAG_OUTER = 346,
+     TK_FLAG_VTABLE = 347,
+     TK_FLAG_LEX = 348,
+     TK_FLAG_MULTI = 349,
+     TK_FLAG_POSTCOMP = 350,
+     TK_FLAG_IMMEDIATE = 351,
+     TK_FLAG_UNIQUE_REG = 352,
+     TK_FLAG_NAMED = 353,
+     TK_FLAG_SLURPY = 354,
+     TK_FLAG_FLAT = 355,
+     TK_FLAG_OPTIONAL = 356,
+     TK_FLAG_OPT_FLAG = 357
    };
 #endif
 /* Tokens.  */
-#define TK_MACRO_PARAM 258
-#define TK_ENDM 259
-#define TK_LABEL 260
-#define TK_DOTDOT 261
-#define TK_NL 262
-#define TK_HLL 263
-#define TK_HLL_MAP 264
-#define TK_EMIT 265
-#define TK_EOM 266
-#define TK_N_OPERATORS 267
-#define TK_PRAGMA 268
-#define TK_LOADLIB 269
-#define TK_SUB 270
-#define TK_END 271
-#define TK_PARAM 272
-#define TK_LEX 273
-#define TK_LOCAL 274
-#define TK_NAMESPACE 275
-#define TK_INVOCANT 276
-#define TK_METH_CALL 277
-#define TK_GLOBALCONST 278
-#define TK_CONST 279
-#define TK_RETURN 280
-#define TK_YIELD 281
-#define TK_BEGIN_YIELD 282
-#define TK_END_YIELD 283
-#define TK_BEGIN_RETURN 284
-#define TK_END_RETURN 285
-#define TK_BEGIN_CALL 286
-#define TK_END_CALL 287
-#define TK_GET_RESULTS 288
-#define TK_CALL 289
-#define TK_ARG 290
-#define TK_RESULT 291
-#define TK_NCI_CALL 292
-#define TK_IDENT 293
-#define TK_STRINGC 294
-#define TK_INTC 295
-#define TK_NUMC 296
-#define TK_PASM_PREG 297
-#define TK_PASM_NREG 298
-#define TK_PASM_SREG 299
-#define TK_PASM_IREG 300
-#define TK_SYM_PREG 301
-#define TK_SYM_NREG 302
-#define TK_SYM_SREG 303
-#define TK_SYM_IREG 304
-#define TK_PARROT_OP 305
-#define TK_INT 306
-#define TK_NUM 307
-#define TK_PMC 308
-#define TK_STRING 309
-#define TK_IF 310
-#define TK_UNLESS 311
-#define TK_NULL 312
-#define TK_GOTO 313
-#define TK_ARROW 314
-#define TK_NE 315
-#define TK_EQ 316
-#define TK_LT 317
-#define TK_LE 318
-#define TK_GT 319
-#define TK_GE 320
-#define TK_USHIFT 321
-#define TK_RSHIFT 322
-#define TK_LSHIFT 323
-#define TK_FDIV 324
-#define TK_OR 325
-#define TK_AND 326
-#define TK_XOR 327
-#define TK_CONC 328
-#define TK_ASSIGN_USHIFT 329
-#define TK_ASSIGN_RSHIFT 330
-#define TK_ASSIGN_LSHIFT 331
-#define TK_ASSIGN_INC 332
-#define TK_ASSIGN_DEC 333
-#define TK_ASSIGN_MUL 334
-#define TK_ASSIGN_MOD 335
-#define TK_ASSIGN_POW 336
-#define TK_ASSIGN_DIV 337
-#define TK_ASSIGN_BOR 338
-#define TK_ASSIGN_BAND 339
-#define TK_ASSIGN_FDIV 340
-#define TK_ASSIGN_BNOT 341
-#define TK_ASSIGN_CONC 342
-#define TK_FLAG_INIT 343
-#define TK_FLAG_LOAD 344
-#define TK_FLAG_MAIN 345
-#define TK_FLAG_ANON 346
-#define TK_FLAG_METHOD 347
-#define TK_FLAG_OUTER 348
-#define TK_FLAG_VTABLE 349
-#define TK_FLAG_LEX 350
-#define TK_FLAG_MULTI 351
-#define TK_FLAG_POSTCOMP 352
-#define TK_FLAG_IMMEDIATE 353
-#define TK_FLAG_UNIQUE_REG 354
-#define TK_FLAG_NAMED 355
-#define TK_FLAG_SLURPY 356
-#define TK_FLAG_FLAT 357
-#define TK_FLAG_OPTIONAL 358
-#define TK_FLAG_OPT_FLAG 359
+#define TK_LABEL 258
+#define TK_DOTDOT 259
+#define TK_NL 260
+#define TK_HLL 261
+#define TK_HLL_MAP 262
+#define TK_EMIT 263
+#define TK_EOM 264
+#define TK_N_OPERATORS 265
+#define TK_PRAGMA 266
+#define TK_LOADLIB 267
+#define TK_SUB 268
+#define TK_END 269
+#define TK_PARAM 270
+#define TK_LEX 271
+#define TK_LOCAL 272
+#define TK_NAMESPACE 273
+#define TK_INVOCANT 274
+#define TK_METH_CALL 275
+#define TK_GLOBALCONST 276
+#define TK_CONST 277
+#define TK_RETURN 278
+#define TK_YIELD 279
+#define TK_BEGIN_YIELD 280
+#define TK_END_YIELD 281
+#define TK_BEGIN_RETURN 282
+#define TK_END_RETURN 283
+#define TK_BEGIN_CALL 284
+#define TK_END_CALL 285
+#define TK_GET_RESULTS 286
+#define TK_CALL 287
+#define TK_ARG 288
+#define TK_RESULT 289
+#define TK_NCI_CALL 290
+#define TK_IDENT 291
+#define TK_STRINGC 292
+#define TK_INTC 293
+#define TK_NUMC 294
+#define TK_PASM_PREG 295
+#define TK_PASM_NREG 296
+#define TK_PASM_SREG 297
+#define TK_PASM_IREG 298
+#define TK_SYM_PREG 299
+#define TK_SYM_NREG 300
+#define TK_SYM_SREG 301
+#define TK_SYM_IREG 302
+#define TK_PARROT_OP 303
+#define TK_INT 304
+#define TK_NUM 305
+#define TK_PMC 306
+#define TK_STRING 307
+#define TK_IF 308
+#define TK_UNLESS 309
+#define TK_NULL 310
+#define TK_GOTO 311
+#define TK_ARROW 312
+#define TK_NE 313
+#define TK_EQ 314
+#define TK_LT 315
+#define TK_LE 316
+#define TK_GT 317
+#define TK_GE 318
+#define TK_USHIFT 319
+#define TK_RSHIFT 320
+#define TK_LSHIFT 321
+#define TK_FDIV 322
+#define TK_OR 323
+#define TK_AND 324
+#define TK_XOR 325
+#define TK_CONC 326
+#define TK_ASSIGN_USHIFT 327
+#define TK_ASSIGN_RSHIFT 328
+#define TK_ASSIGN_LSHIFT 329
+#define TK_ASSIGN_INC 330
+#define TK_ASSIGN_DEC 331
+#define TK_ASSIGN_MUL 332
+#define TK_ASSIGN_MOD 333
+#define TK_ASSIGN_POW 334
+#define TK_ASSIGN_DIV 335
+#define TK_ASSIGN_BOR 336
+#define TK_ASSIGN_BAND 337
+#define TK_ASSIGN_FDIV 338
+#define TK_ASSIGN_BNOT 339
+#define TK_ASSIGN_CONC 340
+#define TK_FLAG_INIT 341
+#define TK_FLAG_LOAD 342
+#define TK_FLAG_MAIN 343
+#define TK_FLAG_ANON 344
+#define TK_FLAG_METHOD 345
+#define TK_FLAG_OUTER 346
+#define TK_FLAG_VTABLE 347
+#define TK_FLAG_LEX 348
+#define TK_FLAG_MULTI 349
+#define TK_FLAG_POSTCOMP 350
+#define TK_FLAG_IMMEDIATE 351
+#define TK_FLAG_UNIQUE_REG 352
+#define TK_FLAG_NAMED 353
+#define TK_FLAG_SLURPY 354
+#define TK_FLAG_FLAT 355
+#define TK_FLAG_OPTIONAL 356
+#define TK_FLAG_OPT_FLAG 357
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 190 "pir.y"
+#line 186 "pir.y"
 {
     double dval;
     int    ival;
     char  *sval;
 }
 /* Line 1489 of yacc.c.  */
-#line 263 "pirparser.h"
+#line 259 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

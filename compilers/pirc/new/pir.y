@@ -42,7 +42,6 @@ extern YY_DECL;
 extern int yyerror(yyscan_t yyscanner,
                    struct lexer_state * const lexer, char const * const message);
 
-extern struct lexer_state *new_lexer(char * const filename);
 
 
 
@@ -69,9 +68,6 @@ extern struct lexer_state *new_lexer(char * const filename);
 
 %}
 
-/* these 2 will be handled in the macro pre-processor, and be removed here */
-%token TK_MACRO_PARAM
-       TK_ENDM          ".endm"
 
 %token TK_LABEL         "label"
        TK_DOTDOT        ".."
@@ -723,87 +719,7 @@ syntax_error(yyscan_t yyscanner, struct lexer_state *lexer, char *message) {
 }
 
 
-/*
 
-Pre-process the file only. Don't do any analysis.
-This function does a bit of pretty-printing. Future improvement includes keeping track
-of the amount of indention, for instance for labels and conditional blocks.
-
-*/
-static void
-do_pre_process(yyscan_t yyscanner, struct lexer_state *lexer, char *outputfile) {
-    int token;
-    YYSTYPE val;
-    int in_sub_body   = 0;    /* flag to keep track whether we're in a sub body */
-    int just_print_nl = 0;    /* flag to keep track whether we just printed a newline */
-    int indention     = 0;    /* amount of indention */
-    FILE *output      = NULL; /* pointer to output file, if any is specified */
-
-
-    if (outputfile != NULL) {
-        output = fopen(outputfile, "w"); /* overwrite */
-    }
-    else {
-        output = stderr; /* no file specified, output to stderr */
-    }
-
-
-    do {
-        token = yylex(&val, yyscanner);
-
-        if (token == TK_END) { /* ".end" must be printed at column 1 */
-            in_sub_body = 0;
-        }
-
-        /* if we just printed a newline, and we're in a sub body ... */
-        if (in_sub_body == 1 && just_print_nl) {
-            /* ... and the current token is a non-indented token, (which needs to be printed
-             * at column 1, print an indention.
-             */
-
-            if (token == TK_LABEL)
-                indention = 1; /* labels are indented 1 space */
-            else
-                indention = 2; /* normal code is indented 2 spaces */
-        }
-        else { /* not in sub body or this is not first token on the line. */
-            indention = 0;
-        }
-
-        /* print <indention> number of spaces before printing the token */
-        fprintf(output, "%*s%s", indention, indention > 0 ? " " : "", yyget_text(yyscanner));
-
-        /* don't print a space after one of these: [() */
-        switch (token) {
-            case '[': case ']':
-            case '(': case ')':
-                /* don't print a space */
-                break;
-            default:
-                fprintf(output, " ");
-                break;
-        }
-
-
-        if (token == TK_SUB) { /* we're entering a sub body, next lines must be indented. */
-            in_sub_body = 1;
-        }
-
-        /* if we just printed a newline character, the trailing space should be removed:
-         * do a carriage-return. Always clear flag of having read a newline.
-         */
-        just_print_nl = 0;
-        if (strchr(yyget_text(yyscanner), '\n') != NULL) {
-            fprintf(output, "\r");
-            just_print_nl = 1;
-        }
-    }
-    while (token > 0);
-
-    if (outputfile != NULL) {
-        fclose(output);
-    }
-}
 
 /*
 
@@ -813,14 +729,13 @@ print_help(char const * const program_name) {
 
     fprintf(stderr, "Usage: %s [options] <files>\n", program_name);
     fprintf(stderr, "Options:\n\n");
-    fprintf(stderr, "  -E        pre-process\n");
+    /*fprintf(stderr, "  -E        pre-process\n"); */
     fprintf(stderr, "  -d        show debug messages of parser\n");
     fprintf(stderr, "  -h        show this help message\n");
     fprintf(stderr, "  -o <file> write output to the specified file. "
                     "Currently only works in combination with '-E' option\n");
 }
 
-char debugtable[256];
 
 /*
  * Main compiler driver.
@@ -830,17 +745,10 @@ main(int argc, char *argv[]) {
 
     char const * const program_name = argv[0];
     int total_errors  = 0;
-    int pre_process   = 0;
     int flexdebug     = 0;
     char *outputfile  = NULL;
     yyscan_t yyscanner;
 
-
-    int i;
-
-    for (i = 0; i < 256; i++) {
-        debugtable[i] = i;
-    }
 
     if (argc < 2) {
         print_help(program_name);
@@ -857,9 +765,13 @@ main(int argc, char *argv[]) {
      * the standard funtion for that, right now. This is a TODO. */
     while (argc > 0 && argv[0][0] == '-') {
         switch (argv[0][1]) {
+
+            /* no pre-processing for now. handled by macro/heredoc preprocessors.
             case 'E':
                 pre_process = 1;
                 break;
+            */
+
             /* Only allow for debug flag if the generated parser supports it */
 #ifdef YYDEBUG
             case 'd':
@@ -902,9 +814,8 @@ main(int argc, char *argv[]) {
 
     /* compile all files specified on the command line */
     while (argc > 0) {
-        FILE *infile = NULL;
-        struct lexer_state *lexer = NULL;
-        int parse_errors = 0;
+        FILE *infile       = NULL;
+        lexer_state *lexer = NULL;
 
         fprintf(stderr, "Processing file '%s'\n", argv[0]);
 
@@ -928,27 +839,20 @@ main(int argc, char *argv[]) {
         yyset_extra(lexer, yyscanner);
 
 
-        if (pre_process) {
-            fprintf(stderr, "pre-processing %s\n", argv[0]);
-            do_pre_process(yyscanner, lexer, outputfile);
+
+        fprintf(stderr, "compiling %s\n", argv[0]);
+        yyparse(yyscanner, lexer);
+
+            /* update total error count */
+        total_errors += lexer->parse_errors;
+
+        if (lexer->parse_errors == 0) {
+            fprintf(stderr, "Parse successful!\n");
         }
         else {
-            fprintf(stderr, "compiling %s\n", argv[0]);
-            yyparse(yyscanner, lexer);
-
-            /* get parse errors for this file */
-            parse_errors = get_parse_errors(lexer);
-            /* update total error count */
-            total_errors += parse_errors;
-
-            if (parse_errors == 0) {
-                fprintf(stderr, "Parse successful!\n");
-            }
-            else {
-                fprintf(stderr, "There %s %d %s in file '%s'\n", parse_errors > 1 ? "were" :
-                        "was", parse_errors, parse_errors > 1 ? "errors" : "error",
-                        get_current_file(lexer));
-            }
+            fprintf(stderr, "There %s %d %s in file '%s'\n", lexer->parse_errors > 1 ? "were" :
+                    "was", lexer->parse_errors, lexer->parse_errors > 1 ? "errors" : "error",
+                    lexer->filename);
         }
 
         /* clean up after playing */
@@ -977,10 +881,11 @@ yyerror(yyscan_t yyscanner, struct lexer_state * const  lexer, char const * cons
     char const * const text = yyget_text(yyscanner);
 
     /* increment parse errors in the lexer structure */
-    parse_error(lexer);
+    lexer->parse_errors++;
+
     /* emit an error */
     fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
-            get_current_file(lexer), get_line_nr(lexer), message);
+           lexer->filename, lexer->line_nr, message);
 
 
     /* print current token if it's not a newline (or \r\n on windows) */
