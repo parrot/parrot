@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 141;
+use Test::More tests => 229;
 
 use Parrot::Test;
 
@@ -38,13 +38,14 @@ CODE
     # my @base_types 
     #     = qw( boolean pair symbol char string vector procedure null );
     my @base_types 
-         = qw( boolean number string );
+         = qw( boolean number pair string );
     my %object = (
         boolean    => [ q{#t},
                         q{#f},
                         q{(boolean? "hello")},
                       ],
-        number     => [ q{-2},
+        number     => [ q{-1234567890},
+                        q{-2},
                         q{-1},
                         q{-0},
                         q{0},
@@ -53,12 +54,18 @@ CODE
                         q{+1},
                         q{2},
                         q{+2},
+                        q{1234567890},
+                        q{+1234567890},
                         q{-0.0},
                         q{-0.1},
                         q{0.0},
                         q{0.1},
                         q{+0.0},
                         q{+0.1},
+                      ],
+        pair       => [ q{(cons 1 3 )},
+                        q{(cons 1 (cons 1 3 ) )},
+                        q{(list 3 2 1)},
                       ],
         string     => [ q{"hello"},
                         q{""},
