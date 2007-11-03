@@ -17,7 +17,7 @@
 #define YY_NO_UNISTD_H
 
 /* declare yylex prototype BEFORE inclusion of lexer header file. */
-#define YY_DECL int yylex(YYSTYPE *yylval, yyscan_t yyscanner)
+#define YY_DECL int macrolex(YYSTYPE *yylval, yyscan_t yyscanner)
 
 /* inlude flex-generated lexer header file. */
 #include "macrolexer.h"
@@ -35,24 +35,17 @@ extern int yyerror(yyscan_t yyscanner, char *message);
 
 /* globals! */
 constant_table *globaldefinitions;
-
 static int errors    = 0;
 static int flexdebug = 0;
 
 
-
-static void process_file(char *filename);
-static void process_string(char *buffer);
-static void include_file(char *filename);
-static void expand(macro_def *macro, list *args);
-static void define_constant(constant_table *table, char *name, char *value);
-static void define_macro(constant_table *table, char *name, list *parameters, char *body);
-
-macro_def *find_macro(constant_table *table, char *name);
-
-static void emit(char *str);
-static char *concat(char *str1, char *str2);
-
+static void  process_file(char *filename);
+static void  process_string(char *buffer);
+static void  include_file(char *filename);
+static void  expand(macro_def *macro, list *args);
+static void  define_constant(constant_table *table, char *name, char *value);
+static void  define_macro(constant_table *table, char *name, list *parameters, char *body);
+static void  emit(char *str);
 static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
@@ -60,6 +53,8 @@ static constant_table *new_constant_table(constant_table *current);
 static constant_table *pop_constant_table(void);
 static void delete_constant_table(constant_table *table);
 
+macro_def *find_macro(constant_table *table, char *name);
+char *concat(char *str1, char *str2);
 %}
 
 %union {
@@ -95,9 +90,13 @@ static void delete_constant_table(constant_table *table);
 
 
 
-
+/* generated parser is in "macroparser.c" */
 %output="macroparser.c"
 
+/* replace Bison' standard prefix "yy" by "macro" */
+%name-prefix="macro"
+
+/* for more helpful error messages */
 %error-verbose
 
 /* declare parameters to move around */
@@ -414,7 +413,7 @@ the result consists of the second string.
 =cut
 
 */
-static char *
+char *
 concat(char *str1, char *str2) {
     assert (str2 != NULL);
     if (str1 == NULL) {
@@ -430,9 +429,11 @@ concat(char *str1, char *str2) {
 
         assert(newbuffer != NULL);
         sprintf(newbuffer, "%s %s", str1, str2);
+
+        /*
         free(str1);
         free(str2);
-
+        */
         return newbuffer;
     }
 }
@@ -572,14 +573,14 @@ void
 process_string(char *buffer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
-    yylex_init(&yyscanner);
-    yyset_debug(flexdebug, yyscanner);
+    macrolex_init(&yyscanner);
+    macroset_debug(flexdebug, yyscanner);
     assert(buffer != NULL);
     /* set the scanner to a string buffer and go parse */
-    yy_scan_string(buffer, yyscanner);
+    macro_scan_string(buffer, yyscanner);
     yyparse(yyscanner);
     /* clean up after playing */
-    yylex_destroy(yyscanner);
+    macrolex_destroy(yyscanner);
 
 }
 
@@ -612,13 +613,13 @@ process_file(char *filename) {
     }
     else {
         /* construct a yylex_t object */
-        yylex_init(&yyscanner);
-        yyset_in(fp, yyscanner);
-        yyset_debug(flexdebug, yyscanner);
+        macrolex_init(&yyscanner);
+        macroset_in(fp, yyscanner);
+        macroset_debug(flexdebug, yyscanner);
         /* go parse the file */
         yyparse(yyscanner);
         /* and clean up */
-        yylex_destroy(yyscanner);
+        macrolex_destroy(yyscanner);
     }
 }
 
@@ -638,11 +639,12 @@ yyerror(yyscan_t yyscanner, char *message) {
     /* this needs to be stored in a structure representing the current file or macro. */
 
     fprintf(stderr, "yyerror: %s\n", message);
-    fprintf(stderr, "token: '%s'\n", yyget_text(yyscanner));
+    fprintf(stderr, "token: '%s'\n", macroget_text(yyscanner));
     fprintf(stderr, "Line: %d\n", line);
     errors++;
     return 0;
 }
+
 
 /*
 
@@ -702,6 +704,8 @@ main(int argc, char *argv[]) {
     }
     if (errors > 0)
         fprintf(stderr, "There were %d error(s)\n", errors);
+        
+
     return 0;
 }
 

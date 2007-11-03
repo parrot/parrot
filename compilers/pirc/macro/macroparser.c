@@ -58,6 +58,14 @@
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
+/* Substitute the variable and function names.  */
+#define yyparse macroparse
+#define yylex   macrolex
+#define yyerror macroerror
+#define yylval  macrolval
+#define yychar  macrochar
+#define yydebug macrodebug
+#define yynerrs macronerrs
 
 
 /* Tokens.  */
@@ -120,7 +128,7 @@
 #define YY_NO_UNISTD_H
 
 /* declare yylex prototype BEFORE inclusion of lexer header file. */
-#define YY_DECL int yylex(YYSTYPE *yylval, yyscan_t yyscanner)
+#define YY_DECL int macrolex(YYSTYPE *yylval, yyscan_t yyscanner)
 
 /* inlude flex-generated lexer header file. */
 #include "macrolexer.h"
@@ -138,24 +146,17 @@ extern int yyerror(yyscan_t yyscanner, char *message);
 
 /* globals! */
 constant_table *globaldefinitions;
-
 static int errors    = 0;
 static int flexdebug = 0;
 
 
-
-static void process_file(char *filename);
-static void process_string(char *buffer);
-static void include_file(char *filename);
-static void expand(macro_def *macro, list *args);
-static void define_constant(constant_table *table, char *name, char *value);
-static void define_macro(constant_table *table, char *name, list *parameters, char *body);
-
-macro_def *find_macro(constant_table *table, char *name);
-
-static void emit(char *str);
-static char *concat(char *str1, char *str2);
-
+static void  process_file(char *filename);
+static void  process_string(char *buffer);
+static void  include_file(char *filename);
+static void  expand(macro_def *macro, list *args);
+static void  define_constant(constant_table *table, char *name, char *value);
+static void  define_macro(constant_table *table, char *name, list *parameters, char *body);
+static void  emit(char *str);
 static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
@@ -163,6 +164,8 @@ static constant_table *new_constant_table(constant_table *current);
 static constant_table *pop_constant_table(void);
 static void delete_constant_table(constant_table *table);
 
+macro_def *find_macro(constant_table *table, char *name);
+char *concat(char *str1, char *str2);
 
 
 /* Enabling traces.  */
@@ -185,7 +188,7 @@ static void delete_constant_table(constant_table *table);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 65 "macro.y"
+#line 60 "macro.y"
 {
     char  *sval;
     int    ival;
@@ -196,7 +199,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 200 "macroparser.c"
+#line 203 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -209,7 +212,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 213 "macroparser.c"
+#line 216 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -506,11 +509,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   115,   115,   116,   119,   120,   123,   124,   128,   137,
-     138,   139,   140,   141,   144,   148,   149,   152,   153,   157,
-     160,   166,   172,   173,   176,   177,   180,   181,   184,   185,
-     188,   189,   192,   193,   196,   197,   200,   201,   204,   209,
-     210,   211,   212
+       0,   114,   114,   115,   118,   119,   122,   123,   127,   136,
+     137,   138,   139,   140,   143,   147,   148,   151,   152,   156,
+     159,   165,   171,   172,   175,   176,   179,   180,   183,   184,
+     187,   188,   191,   192,   195,   196,   199,   200,   203,   208,
+     209,   210,   211
 };
 #endif
 
@@ -1455,125 +1458,125 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 129 "macro.y"
+#line 128 "macro.y"
     { /* after each statement, emit a newline */
          emit("\n");
        ;}
     break;
 
   case 14:
-#line 144 "macro.y"
+#line 143 "macro.y"
     { emit("setline"); emit((yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 17:
-#line 152 "macro.y"
+#line 151 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 18:
-#line 153 "macro.y"
+#line 152 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval)); ;}
     break;
 
   case 19:
-#line 157 "macro.y"
+#line 156 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 20:
-#line 161 "macro.y"
+#line 160 "macro.y"
     { define_constant(globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 21:
-#line 169 "macro.y"
+#line 168 "macro.y"
     { define_macro(globaldefinitions, (yyvsp[(2) - (6)].sval), (yyvsp[(3) - (6)].lval), (yyvsp[(5) - (6)].sval)); ;}
     break;
 
   case 22:
-#line 172 "macro.y"
+#line 171 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 23:
-#line 173 "macro.y"
+#line 172 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 24:
-#line 176 "macro.y"
+#line 175 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 25:
-#line 177 "macro.y"
+#line 176 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 26:
-#line 180 "macro.y"
+#line 179 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 27:
-#line 181 "macro.y"
+#line 180 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 28:
-#line 184 "macro.y"
+#line 183 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 29:
-#line 185 "macro.y"
+#line 184 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 30:
-#line 188 "macro.y"
+#line 187 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 31:
-#line 189 "macro.y"
+#line 188 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 32:
-#line 192 "macro.y"
+#line 191 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 33:
-#line 193 "macro.y"
+#line 192 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 34:
-#line 196 "macro.y"
+#line 195 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 35:
-#line 197 "macro.y"
+#line 196 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 36:
-#line 200 "macro.y"
+#line 199 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 37:
-#line 201 "macro.y"
+#line 200 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1577 "macroparser.c"
+#line 1580 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1787,7 +1790,7 @@ yyreturn:
 }
 
 
-#line 217 "macro.y"
+#line 216 "macro.y"
 
 
 
@@ -1882,10 +1885,10 @@ expand(macro_def *macro, list *args) {
 	}
 
 	if (params != NULL) { /* args must be null, so too few arguments */
-		fprintf(stderr, "Too few arguments for macro expansion.");
+		fprintf(stderr, "Too few arguments for macro expansion.\n");
 	}
 	if (args != NULL) { /* params must be null, so too many arguments */
-		fprintf(stderr, "Too many arguments for macro expansion.");
+		fprintf(stderr, "Too many arguments for macro expansion.\n");
 	}
 
     process_string(macro->body);
@@ -1988,7 +1991,7 @@ the result consists of the second string.
 =cut
 
 */
-static char *
+char *
 concat(char *str1, char *str2) {
     assert (str2 != NULL);
     if (str1 == NULL) {
@@ -2004,9 +2007,11 @@ concat(char *str1, char *str2) {
 
         assert(newbuffer != NULL);
         sprintf(newbuffer, "%s %s", str1, str2);
+
+        /*
         free(str1);
         free(str2);
-
+        */
         return newbuffer;
     }
 }
@@ -2146,14 +2151,14 @@ void
 process_string(char *buffer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
-    yylex_init(&yyscanner);
-    yyset_debug(flexdebug, yyscanner);
+    macrolex_init(&yyscanner);
+    macroset_debug(flexdebug, yyscanner);
     assert(buffer != NULL);
     /* set the scanner to a string buffer and go parse */
-    yy_scan_string(buffer, yyscanner);
+    macro_scan_string(buffer, yyscanner);
     yyparse(yyscanner);
     /* clean up after playing */
-    yylex_destroy(yyscanner);
+    macrolex_destroy(yyscanner);
 
 }
 
@@ -2186,13 +2191,13 @@ process_file(char *filename) {
     }
     else {
         /* construct a yylex_t object */
-        yylex_init(&yyscanner);
-        yyset_in(fp, yyscanner);
-        yyset_debug(flexdebug, yyscanner);
+        macrolex_init(&yyscanner);
+        macroset_in(fp, yyscanner);
+        macroset_debug(flexdebug, yyscanner);
         /* go parse the file */
         yyparse(yyscanner);
         /* and clean up */
-        yylex_destroy(yyscanner);
+        macrolex_destroy(yyscanner);
     }
 }
 
@@ -2212,11 +2217,12 @@ yyerror(yyscan_t yyscanner, char *message) {
     /* this needs to be stored in a structure representing the current file or macro. */
 
     fprintf(stderr, "yyerror: %s\n", message);
-    fprintf(stderr, "token: '%s'\n", yyget_text(yyscanner));
+    fprintf(stderr, "token: '%s'\n", macroget_text(yyscanner));
     fprintf(stderr, "Line: %d\n", line);
     errors++;
     return 0;
 }
+
 
 /*
 
@@ -2276,6 +2282,8 @@ main(int argc, char *argv[]) {
     }
     if (errors > 0)
         fprintf(stderr, "There were %d error(s)\n", errors);
+        
+
     return 0;
 }
 

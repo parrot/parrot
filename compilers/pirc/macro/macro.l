@@ -5,6 +5,16 @@
  * Copyright (C) 2007, The Perl Foundation.
  */
 
+/* 
+ * This pre-processor handles the macro layer of the
+ * PIR language. The following constructs are filtered
+ * out and handled:
+ *
+ * .macro_const
+ * .include
+ * .macro
+ *
+ */ 
 
 
 #include <stdio.h>
@@ -21,8 +31,7 @@ extern char *yyget_text(yyscan_t yyscanner);
 extern int   yyerror(yyscan_t yyscanner, char *message);
 
 extern macro_def *find_macro(constant_table *table, char *name);
-
-char *last_heredoc = NULL;
+extern char *concat(char *str1, char *str2);
 
 
 
@@ -57,11 +66,15 @@ dupstrn(char const * const source, size_t num_chars) {
     return newstring;
 }
 
+int ctr[YY_NUM_RULES];
+
+int num_rules = YY_NUM_RULES;
 
 int line = 1;
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   do {                         \
+#define YY_USER_ACTION   { ++ctr[yy_act];             \
+	                     do {                         \
                               char *iter = yytext;    \
                               while (*iter != '\0') { \
                                   if (*iter == '\n')  \
@@ -69,7 +82,8 @@ int line = 1;
                                   iter++;             \
                               }                       \
                          }                            \
-                         while (0);
+                         while (0);                   \
+                         }
 
 
 
@@ -77,19 +91,22 @@ static int is_pir_directive(char *name);
 
 %}
 
-%option reentrant noyywrap bison-bridge never-interactive nounput stack debug
-
-/*
+%option reentrant 
+%option noyywrap 
+%option bison-bridge 
+%option never-interactive 
+%option nounput 
+%option stack 
+%option debug
+%option prefix="macro"
+%option warn
 %option noyy_top_state
-*/
-
 %option outfile="macrolexer.c"
 %option header-file="macrolexer.h"
 
 
 %x MACRODEF
 %x CONSTDEF
-%x POD
 %x INCLUDE
 %x MACROPAR
 %x MACROBODY
@@ -97,8 +114,8 @@ static int is_pir_directive(char *name);
 %x LINE
 %s EXPARGS
 
-%x ARGS
-%x HEREDOC
+
+
 
 ALPHA          [a-zA-Z@_]
 DIGIT          [0-9]
@@ -129,62 +146,50 @@ REG            "$"?[SNIP]{DIGITS}
 
 %%
 
-^"=".*{EOL}            { yy_push_state(POD, yyscanner); }
-
-<POD>.*                { /* ignore pod comments */ }
-
-<POD>{NEWLINE}         { /* skip newlines */}
-
-<POD>^"=cut".*{EOL}+   { yy_pop_state(yyscanner); }
-
-
-<POD><<EOF>>           { /* we're scanning a POD comment, but encountered end-of-file. */
-                         yyerror(yyscanner, "POD comment not closed!");
-                         yyterminate();
-                       }
-
-
 
 
 <EXPAND>{NEWLINE}   { /**/
                       yy_pop_state(yyscanner);
                       yylval->sval = dupstr("\n");
+                      /*
+                      fprintf(stderr, "<EXPAND>{NL}\n");
+                      */
                       return TK_NL;
                     }
 
 <MACROPAR>{NEWLINE} { /* after macro header start the macro body */
                       yy_push_state(MACROBODY, yyscanner);
                       yylval->sval = dupstr("\n");
+                      /*
+                      fprintf(stderr, "<MACROPAR>{NL}\n");
+                      */
                       return TK_NL;
                     }
 
 <MACROBODY>{NEWLINE} { /* return newlines in macro body as any tokens */
                        yylval->sval = dupstr("\n");
+                       /*
+                       fprintf(stderr, "<MACROBODY>{NL}\n");
+                       */
                        return TK_ANY;
                      }
 
 <CONSTDEF>{NEWLINE} { yy_pop_state(yyscanner);
                       yylval->sval = "\n";
+                      /*
+                      fprintf(stderr, "<CONSTDEF>{NL}\n");
+                      */
                       return TK_NL;
                     }
-
-<HEREDOC>{EOL}     { yylval->sval = "\n";
-                     return TK_ANY;
-                   }
-
-<HEREDOC>{WS}      { yylval->sval = dupstr(yytext);
-                     return TK_ANY;
-                   }
-
-<*>"#".*            { /* skip line comment on last line of file (no newline) */ }
-
-<*>"#".*{NEWLINE}   { /* skip line comments */ }
 
 <*>{WS}             { /* skip whitespace */ }
 
 
 <*>{NEWLINE}        { /* in all other states, return newline as the newline token */
                       yylval->sval = dupstr("\n");
+                      /*
+                      fprintf(stderr, "<*>{NL} (%d)\n", YYSTATE);
+                      */
                       return TK_NL;
                     }
 
@@ -243,61 +248,11 @@ REG            "$"?[SNIP]{DIGITS}
                      return TK_ANY;
                    }
 
-<INITIAL>"("       { /*
 
-
-
-<INITIAL>"("      { /*
+<INITIAL>"("      { /* */
                     yylval->sval = dupstr(yytext);
                     return TK_ANY;
                   }
-
-
-*/
-                     yylval->sval = "(";
-                     yy_push_state(ARGS, yyscanner);
-                     return TK_ANY;
-                   }
-
-<ARGS>"<<"{Q_STRING} { /* */
-                        yylval->sval = dupstr(yytext);
-                        last_heredoc = dupstrn(yytext + 3, strlen(yytext) - 4);
-                        /*
-                        fprintf(stderr ,"last heredoc: [%s]\n", last_heredoc);
-                        */
-                        return TK_ANY;
-                     }
-
-<ARGS>","          { /**/
-                     yylval->sval = ",";
-
-                     return TK_ANY;
-                   }
-
-<ARGS>")"          { /* */
-                     yylval->sval = ")";
-                     yy_pop_state(yyscanner);
-
-                     if (last_heredoc != NULL) {
-                        yy_push_state(HEREDOC, yyscanner);
-                     }
-
-                     return TK_ANY;
-                   }
-
-<HEREDOC>.*        { yylval->sval = dupstr(yytext);
-
-                     if (strcmp(last_heredoc, yytext) == 0) {
-                        /*
-                        fprintf(stderr, "Found last heredoc: [%s]\n", last_heredoc);
-                        */
-                        free(last_heredoc);
-                        last_heredoc = NULL;
-                        yy_pop_state(yyscanner);
-                     }
-
-                     return TK_ANY;
-                   }
 
 
 
