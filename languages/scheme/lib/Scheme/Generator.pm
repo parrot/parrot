@@ -49,9 +49,9 @@ sub _save {
     my $type  = shift || 'P';
 
     die "No registers to save"
-        unless $count and $count > 0;
+        unless $count && $count > 0;
     die "Illegal register type"
-        unless $type and $type =~ m/^[PS]$/;
+        unless $type && $type =~ m/\A [PS] \z/xms;
     my @temp;
     for ( 0 .. 31 ) {
         next if $self->{regs}->{$type}{$_} == 1;
@@ -228,7 +228,7 @@ sub _constant {
         $pmc_type = 'Float';
     }
     elsif ( $value =~ m/ \A " [^"]* " \z/xms ) {                                     # a string, not escapes yet
-        $reg_type = 'S';
+        $pmc_type = 'String';
     }
     elsif ( $value eq '#t' || $value eq '#f' ) {
         $pmc_type = 'Boolean';
@@ -264,9 +264,8 @@ sub _morph {
         if ( $from =~ m/P/xms ) {
             $self->_add_inst( '', 'clone', [ $to, $from ] );
         }
-        elsif ( $from =~ m/ S /xms ) {
-            $self->_add_inst( '', 'new', [ $to, q{'String'} ] );
-            $self->_add_inst( '', 'set', [ $to, $from ] );
+        else {
+             die "Only PMCs can be morphed";
         }
     }
 
@@ -362,12 +361,6 @@ sub _qq_unquote {
 
     my $item = $self->_generate($node);
 
-    if ( $item =~ m/ \A [S]/xms ) {
-        my $temp = $self->_save_1('P');
-        $self->_morph( $temp, $item );
-        $self->_restore($item);
-        $item = $temp;
-    }
     my $pair = $self->_new_pair();
     $self->_add_inst( '', 'set', [ $pair . '[0]', $item ] );
     $self->_add_inst( '', 'set', [ $pair . '[1]', $return ] );
@@ -381,8 +374,6 @@ sub _qq_unquote_splicing {
     my ( $self, $node, $return ) = @_;
 
     my $list = $self->_generate($node);
-
-    die "unquote-splicing called on no list" if ( $list =~ m/ \A [S]/xms );
 
     my $type  = $self->_save_1('S');
     my $head  = $self->_save_1('P');
@@ -774,18 +765,13 @@ sub _op_pair_p {
 
     my $return = $self->_constant('#t');
 
-    if ( $item =~ m/ \A [NS] /xms ) {
-        $self->_add_inst( '',            'set', [ $return, 0 ] );
-    }
-    else {
-        my $tmp_s = $self->_save_1('S');
-        $self->_add_inst( '',            'typeof', [ $tmp_s, $item ] );
-        $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Array'}, "FAIL_$label" ] );
-        $self->_add_inst( '',            'set',    [ $return, 1 ] );
-        $self->_add_inst( '',            'branch', ["DONE_$label"] );
-        $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
-        $self->_add_inst("DONE_$label");
-    }
+    my $tmp_s = $self->_save_1('S');
+    $self->_add_inst( '',            'typeof', [ $tmp_s, $item ] );
+    $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Array'}, "FAIL_$label" ] );
+    $self->_add_inst( '',            'set',    [ $return, 1 ] );
+    $self->_add_inst( '',            'branch', ["DONE_$label"] );
+    $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
+    $self->_add_inst("DONE_$label");
 
     $self->_add_comment( 'end of _op_pair_p()' );
 
@@ -1714,17 +1700,7 @@ sub _op_write {
     for ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
-        if ( $temp =~ m/ \A [N]/xms ) {
-            $self->_add_inst( '', 'print', [$temp] );
-        }
-        elsif ( $temp =~ m/ \A S/xms ) {
-            $self->_add_inst( '', 'print', [ q{'"'} ] );  # maschine readable
-            $self->_add_inst( '', 'print', [ $temp  ] ); 
-            $self->_add_inst( '', 'print', [ q{'"'} ] ); 
-        }
-        else {
-            $self->_call_function_sym( 'write', $temp );
-        }
+        $self->_call_function_sym( 'write', $temp );
     }
 
     $self->_add_comment( 'end of _op_write' );
@@ -1742,15 +1718,7 @@ sub _op_display {
     for ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
-        if ( $temp =~ m/ \A [N]/xms ) {
-            $self->_add_inst( '', 'print', [$temp] );
-        }
-        elsif ( $temp =~ m/ \A S/xms ) {
-            $self->_add_inst( '', 'print', [ $temp  ] ); 
-        }
-        else {
-            $self->_call_function_sym( 'write', $temp );
-        }
+        $self->_call_function_sym( 'display', $temp );
     }
 
     $self->_add_comment( 'end of _op_display' );
@@ -2164,23 +2132,19 @@ sub _call_function_obj {
     my @args;
     while ( my $arg = shift ) {
         if ( $arg ne "P$count" ) {
-            if ( $arg =~ m/^[NS]/ ) {
-                $self->_morph( "P$count", $arg );
-            }
-            else {
-                # Check if any later argument needs the old value of P$count
-                my $moved;
-                for (@_) {
-                    if ( $_ eq "P$count" ) {
-                        $moved = $_;
-                        $_     = $empty;
-                    }
+            # Check if any later argument needs the old value of P$count
+            my $moved;
+            for (@_) {
+                if ( $_ eq "P$count" ) {
+                    $moved = $_;
+                    $_     = $empty;
                 }
-                if ($moved) {
-                    $empty = $moved;
-                }
-                $self->_add_inst( '', 'set', [ "P$count", $arg ] );
             }
+            if ($moved) {
+                $empty = $moved;
+            }
+            $self->_add_inst( '', 'set', [ "P$count", $arg ] );
+            
         }
         push @args, "P$count";
         $count++;
