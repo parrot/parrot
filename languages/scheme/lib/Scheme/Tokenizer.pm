@@ -56,7 +56,7 @@ sub tokenize {
             }
             elsif (    $ch eq '-'
                     && (    $token =~ m/ \A [a-z]/xms                    # Dashes can be in an ident
-                         || $token =~ m/ \A [-] \d+ (\.\d+)? [eE] /xms   # Dashes could be a neg. expt
+                         || $token =~ m/ \A [-] \d+ (\.\d+)? [eE] /xms   # Dashes can be a negeative exponent
                        )
                   )
             {
@@ -91,9 +91,8 @@ sub tokenize {
                 $token .= $ch;
             }
             elsif (    $ch =~ m/ \d /xms
-                    && (    $token =~ m/ \A [-] /xms       # Digits can follow a dash
-                         || $token =~ m/ \A \.  /xms       # Digits can follow a decimal point
-                         || $token =~ m/ \A \d  /xms
+                    && (    $token =~ m/ \A [-+.] /xms     # digits can follow a minus, plus or decimal point
+                         || $token =~ m/ \A \d   /xms      # digits can follow another digit
                        )
                   )
             {                                # Digits can follow other digits
