@@ -18,7 +18,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step::Base);
 
-use Config;
 use Cwd qw(cwd);
 use File::Basename;
 use Parrot::Configure::Step qw(capture_output cc_gen cc_clean);
