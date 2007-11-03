@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 11;
+use Test::More tests => 14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,13 +13,6 @@ use_ok('config::auto::msvc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
-
-=for hints_for_testing Testing config::auto::msvc::runstep() may be
-meaningless if you are not on Windows.  Consider writing a SKIP block.  Check
-latest reports of Parrot configuration tools testing coverage to see where
-your time available for writing tests is spent.
-
-=cut
 
 my $args = process_options( {
     argv            => [],
