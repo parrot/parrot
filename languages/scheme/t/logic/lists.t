@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 23;
+use Test::More tests => 21;
 use Parrot::Test;
 
 language_output_is( 'Scheme', <<'CODE', '(2 . 5)', 'cons' );
@@ -77,18 +77,8 @@ language_output_is( 'Scheme', <<'CODE', '(1 2 3 4)', 'quoted list' );
 (write '(1 2 3 4)) ; for emacs ')
 CODE
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'null?' );
-(write
-  (null? (list)))
-CODE
-
 language_output_is( 'Scheme', <<'CODE', '()', "'()" );
 (write '()) ; for emacs ')
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'failed null?' );
-(write
-  (null? (list 1)))
 CODE
 
 language_output_is( 'Scheme', <<'CODE', '(1 2 (3 4))', 'complex list' );
