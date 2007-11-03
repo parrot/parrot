@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 301;
+use Test::More tests => 371;
 
 use Parrot::Test;
 
@@ -43,6 +43,9 @@ CODE
         boolean    => [ q{#t},
                         q{#f},
                         q{(boolean? "hello")},
+                        q{(= 42 42)},
+                        q{(< 42 42)},
+                        q{(> 42 42)},
                       ],
         number     => [ q{-1234567890},
                         q{-2},
@@ -62,8 +65,12 @@ CODE
                         q{0.1},
                         q{+0.0},
                         q{+0.1},
+                        q{(+ 1 1)},
+                        q{(- 1 1)},
+                        q{(if (= 1 1) 3 3)},
                       ],
         null       => [ q{(list)},
+                        q{()},
                       ],
         pair       => [ q{(cons 1 3 )},
                         q{(cons 1 (cons 1 3 ) )},
