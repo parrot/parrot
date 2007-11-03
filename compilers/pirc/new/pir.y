@@ -644,11 +644,8 @@ arg_flag: ":flat"
         ;
 
 opt_paren_string: /* empty */
-                | paren_string
+                | '(' TK_STRINGC ')'
                 ;
-
-paren_string: '(' TK_STRINGC ')'
-            ;
 
 const_declaration: ".const" const_tail
                  ;
@@ -665,16 +662,12 @@ const_tail: "int" identifier '=' TK_INTC
 
 condition: "null" expression
          | expression
-         | conditional_expression
+         | expression rel_op expression
          ;
-
-conditional_expression: expression rel_op expression
-
 
 expression: target
           | constant
           ;
-
 
 constant: TK_STRINGC
         | TK_INTC
