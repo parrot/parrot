@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 371;
+use Test::More tests => 416;
 
 use Parrot::Test;
 
@@ -101,6 +101,45 @@ CODE
                                 '"false"';
                 language_output_is( 'Scheme', $code, $expected, $code );
             }
+        }
+    }
+}
+
+# numeric tower
+# Testing numeric types.
+# Tests for types that are higher than $lowest_type are true.
+# Tests for the $lowest_type are true.
+# Tests for types that are lower than $lowest_type are false.
+{
+    my @numeric_types = qw(number complex real rational integer );  # high to low
+    my %object = (
+        number      => [ 
+                       ],
+        complex     => [ q{0+3i},
+                         q{3+4i},
+                         q{3+4i},
+                       ],
+        real        => [ 
+                       ],
+        rational    => [ 
+                       ],
+        integer     => [ -1,
+                         -0,
+                          0,
+                         +0,
+                         +1,
+                          1
+                       ]
+    );   
+  
+    foreach my $lowest_type ( @numeric_types ) {
+        my $expected = '#t';
+        foreach my $predicate ( @numeric_types ) {
+            foreach my $object ( @{ $object{$lowest_type} } ) {
+                my $code = qq{ (write ($predicate? $object)) };
+                language_output_is( 'Scheme', $code, $expected, "expected_type: $code" );
+            }
+            if ( $predicate eq $lowest_type ) { $expected = '#f'; }
         }
     }
 }

@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 22;
+use Test::More     tests => 23;
 
 use Parrot::Test;
 
@@ -119,6 +119,15 @@ CODE
 language_output_is( 'Scheme', <<'CODE', 7, 'abs -7' );
 (write (abs -7))
 CODE
+
+###
+### complex arithmetics
+###
+
+language_output_is( 'Scheme', <<'CODE', '3+3i', 'adding two complex numbers' );
+(write (+ 1+1i 2+2i))
+CODE
+
 
 # Local Variables:
 #   mode: cperl
