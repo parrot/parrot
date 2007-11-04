@@ -33,11 +33,23 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $res = _probe_for_snprintf();
+
+    $self->_evaluate_snprintf($conf, $res);
+
+    return 1;
+}
+
+sub _probe_for_snprintf {
     cc_gen('config/auto/snprintf/test.in');
     cc_build();
     my $res = cc_run() or die "Can't run the snprintf testing program: $!";
     cc_clean();
+    return $res;
+}
 
+sub _evaluate_snprintf {
+    my ($self, $conf, $res) = @_;
     if ( $res =~ /snprintf/ ) {
         $conf->data->set( HAS_SNPRINTF => 1 );
     }
@@ -48,7 +60,6 @@ sub runstep {
         $conf->data->set( HAS_OLD_SNPRINTF => 1 );
     }
     print " ($res) " if $conf->options->get('verbose');
-
     return 1;
 }
 
