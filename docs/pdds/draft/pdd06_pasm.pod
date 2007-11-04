@@ -130,7 +130,7 @@ Below is an overview of the grammar of a PASM file.
    ".pcc_sub" [ sub_flag ]?
 
  sub_flag:
-   ":init" | ":main" | ":load" | ":postcomp" | ":immediate"
+   ":init" | ":main" | ":load" | ":postcomp" | ":immediate" | ":anon"
 
  label:
    identifier ":"
@@ -1252,7 +1252,7 @@ None. First version
 
 =over 4
 
-=item * Fixed stack ops; push, pop, and clear properly documented according to the 
+=item * Fixed stack ops; push, pop, and clear properly documented according to the
 engine's behaviour now.
 
 =back
