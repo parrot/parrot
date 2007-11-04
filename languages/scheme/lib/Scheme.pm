@@ -93,14 +93,12 @@ END
 This is called in schemec.
 
 =cut
-
 sub compile {
     my $self = shift;
 
-    my $tokens = Scheme::Tokenizer::tokenize( $self->{file} );
-    # die Dumper( $tokens );
-    my $tree   = Scheme::Parser::parse( $tokens );
-    # die Dumper( $tree );
+    my $tokens_char_by_char = Scheme::Tokenizer::tokenize_char_by_char( $self->{file} );
+    my $tokens_hop          = Scheme::Tokenizer::tokenize_hop( $self->{file} ); # not used yet
+    my $tree                = Scheme::Parser::parse( $tokens_char_by_char );
 
     return link_functions( Scheme::Generator::generate( $tree ) );
 }

@@ -12,7 +12,42 @@ our $VERSION   = '0.01';
 
 use Data::Dumper;
 
-sub tokenize {
+sub tokenize_hop {
+    my $file = shift;
+
+    # read file and throw away comments
+    # XXX probably broken WRT to strings with embedded comments
+    my $target;
+    {
+        open my $source, '<', $file;
+        while (<$source>) {
+            next if m/ \A \s* ; /xms;
+            s/ ; .* \z //xms;
+            $target .= $_;
+        }
+        close $source;
+    }
+
+    my $lexer = sub {
+         TOKEN:
+         {
+             return [ 'INTEGER', $1 ] if $target =~ m/\G (\d+)            /gcx;
+             redo TOKEN               if $target =~ m/\G \s+              /gcx;
+             return [ 'UNKNOWN', $1 ] if $target =~ m/\G (.)              /gcx;
+             return;
+         }
+    };
+
+    my @tokens;
+    while ( my $token = $lexer->() ) {
+        push @tokens, $token->[1];
+    }
+
+    return \@tokens;
+}
+
+
+sub tokenize_char_by_char {
     my $file = shift;
 
     # read file and throw away comments
