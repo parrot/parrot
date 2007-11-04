@@ -44,17 +44,23 @@
      TK_ENDM = 260,
      TK_INCLUDE = 261,
      TK_MACRO_CONST = 262,
-     TK_LINE = 263,
-     TK_LABEL = 264,
-     TK_IDENT = 265,
-     TK_ANY = 266,
-     TK_BODY = 267,
-     TK_DOT_IDENT = 268,
-     TK_LABEL_EXP = 269,
-     TK_LABEL_ID = 270,
-     TK_STRINGC = 271,
-     TK_NUMC = 272,
-     TK_INTC = 273
+     TK_MACRO_LOCAL = 263,
+     TK_LINE = 264,
+     TK_LABEL = 265,
+     TK_INT = 266,
+     TK_NUM = 267,
+     TK_STRING = 268,
+     TK_PMC = 269,
+     TK_IDENT = 270,
+     TK_ANY = 271,
+     TK_BODY = 272,
+     TK_DOT_IDENT = 273,
+     TK_MACROVAR_EXP = 274,
+     TK_LABEL_ID = 275,
+     TK_LOCAL_ID = 276,
+     TK_STRINGC = 277,
+     TK_NUMC = 278,
+     TK_INTC = 279
    };
 #endif
 /* Tokens.  */
@@ -63,24 +69,30 @@
 #define TK_ENDM 260
 #define TK_INCLUDE 261
 #define TK_MACRO_CONST 262
-#define TK_LINE 263
-#define TK_LABEL 264
-#define TK_IDENT 265
-#define TK_ANY 266
-#define TK_BODY 267
-#define TK_DOT_IDENT 268
-#define TK_LABEL_EXP 269
-#define TK_LABEL_ID 270
-#define TK_STRINGC 271
-#define TK_NUMC 272
-#define TK_INTC 273
+#define TK_MACRO_LOCAL 263
+#define TK_LINE 264
+#define TK_LABEL 265
+#define TK_INT 266
+#define TK_NUM 267
+#define TK_STRING 268
+#define TK_PMC 269
+#define TK_IDENT 270
+#define TK_ANY 271
+#define TK_BODY 272
+#define TK_DOT_IDENT 273
+#define TK_MACROVAR_EXP 274
+#define TK_LABEL_ID 275
+#define TK_LOCAL_ID 276
+#define TK_STRINGC 277
+#define TK_NUMC 278
+#define TK_INTC 279
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 59 "macro.y"
+#line 63 "macro.y"
 {
     char  *sval;
     struct list *lval;
@@ -88,7 +100,7 @@ typedef union YYSTYPE
 
 }
 /* Line 1489 of yacc.c.  */
-#line 92 "macroparser.h"
+#line 104 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

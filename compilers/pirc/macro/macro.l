@@ -13,6 +13,7 @@
  * .macro_const
  * .include
  * .macro
+ * .macro_local
  *
  */
 
@@ -122,6 +123,7 @@ static int is_pir_directive(char *name);
 %x MACROBODY
 %x EXPAND
 %x LINE
+%x MACROLOCAL
 %s EXPARGS
 
 
@@ -222,10 +224,37 @@ REG            "$"?[SNIP]{DIGITS}
                            return TK_LABEL_ID;
                          }
 
-<MACROBODY>".$"{IDENT}   { /* referring to a declared label */
+<MACROBODY>".$"{IDENT}   { /* referring to a declared label or local id. */
                            yylval->sval = dupstr(yytext + 2);
-                           return TK_LABEL_EXP;
+                           return TK_MACROVAR_EXP;
                          }
+
+
+<MACROBODY>".macro_local" { /* unique local declaration */
+                            yy_push_state(MACROLOCAL, yyscanner);
+                            return TK_MACRO_LOCAL;
+                          }
+
+<MACROLOCAL>"int"          { yylval->sval = dupstr("int");
+                            return TK_INT;
+                          }
+
+<MACROLOCAL>"num"          { yylval->sval = dupstr("num");
+                            return TK_NUM;
+                          }
+
+<MACROLOCAL>"pmc"          { yylval->sval = dupstr("pmc");
+                            return TK_PMC;
+                          }
+<MACROLOCAL>"string"       { yylval->sval = dupstr("string");
+                            return TK_STRING;
+                          }
+
+<MACROLOCAL>"$"{IDENT}     { /* */
+                            yylval->sval = dupstr(yytext + 1);
+                            yy_pop_state(yyscanner);
+                            return TK_LOCAL_ID;
+                          }
 
 <MACROBODY>".endm" { /* when reading ".endm" while scanning macro body, go back to previous state */
 

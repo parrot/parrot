@@ -79,17 +79,23 @@
      TK_ENDM = 260,
      TK_INCLUDE = 261,
      TK_MACRO_CONST = 262,
-     TK_LINE = 263,
-     TK_LABEL = 264,
-     TK_IDENT = 265,
-     TK_ANY = 266,
-     TK_BODY = 267,
-     TK_DOT_IDENT = 268,
-     TK_LABEL_EXP = 269,
-     TK_LABEL_ID = 270,
-     TK_STRINGC = 271,
-     TK_NUMC = 272,
-     TK_INTC = 273
+     TK_MACRO_LOCAL = 263,
+     TK_LINE = 264,
+     TK_LABEL = 265,
+     TK_INT = 266,
+     TK_NUM = 267,
+     TK_STRING = 268,
+     TK_PMC = 269,
+     TK_IDENT = 270,
+     TK_ANY = 271,
+     TK_BODY = 272,
+     TK_DOT_IDENT = 273,
+     TK_MACROVAR_EXP = 274,
+     TK_LABEL_ID = 275,
+     TK_LOCAL_ID = 276,
+     TK_STRINGC = 277,
+     TK_NUMC = 278,
+     TK_INTC = 279
    };
 #endif
 /* Tokens.  */
@@ -98,17 +104,23 @@
 #define TK_ENDM 260
 #define TK_INCLUDE 261
 #define TK_MACRO_CONST 262
-#define TK_LINE 263
-#define TK_LABEL 264
-#define TK_IDENT 265
-#define TK_ANY 266
-#define TK_BODY 267
-#define TK_DOT_IDENT 268
-#define TK_LABEL_EXP 269
-#define TK_LABEL_ID 270
-#define TK_STRINGC 271
-#define TK_NUMC 272
-#define TK_INTC 273
+#define TK_MACRO_LOCAL 263
+#define TK_LINE 264
+#define TK_LABEL 265
+#define TK_INT 266
+#define TK_NUM 267
+#define TK_STRING 268
+#define TK_PMC 269
+#define TK_IDENT 270
+#define TK_ANY 271
+#define TK_BODY 272
+#define TK_DOT_IDENT 273
+#define TK_MACROVAR_EXP 274
+#define TK_LABEL_ID 275
+#define TK_LOCAL_ID 276
+#define TK_STRINGC 277
+#define TK_NUMC 278
+#define TK_INTC 279
 
 
 
@@ -162,12 +174,16 @@ static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
 static char *munge_label_id(char *label_id, int is_declaration, lexer_state *lexer);
+static char *munge_local_id(char *local_id, lexer_state *lexer);
 
 static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
 static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
 
 macro_def *find_macro(constant_table *table, char *name);
+
+extern char *dupstr(char *str);
+
 char *concat(char *str1, char *str2);
 
 
@@ -193,7 +209,7 @@ char *concat(char *str1, char *str2);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 59 "macro.y"
+#line 63 "macro.y"
 {
     char  *sval;
     struct list *lval;
@@ -201,7 +217,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 205 "macroparser.c"
+#line 221 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -214,7 +230,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 218 "macroparser.c"
+#line 234 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -429,20 +445,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   43
+#define YYLAST   53
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  22
+#define YYNTOKENS  28
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  25
+#define YYNNTS  28
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  48
+#define YYNRULES  55
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  64
+#define YYNSTATES  73
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   273
+#define YYMAXUTOK   279
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -454,7 +470,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      20,    21,     2,     2,    19,     2,     2,     2,     2,     2,
+      26,    27,     2,     2,    25,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -477,7 +493,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24
 };
 
 #if YYDEBUG
@@ -488,35 +504,39 @@ static const yytype_uint8 yyprhs[] =
        0,     0,     3,     4,     8,     9,    11,    13,    17,    19,
       21,    23,    25,    27,    29,    33,    34,    37,    39,    42,
       44,    47,    50,    54,    55,    63,    64,    66,    68,    71,
-      73,    76,    78,    79,    83,    84,    86,    88,    92,    93,
-      97,    98,   100,   102,   106,   108,   110,   112,   114
+      73,    75,    77,    79,    82,    86,    88,    90,    92,    94,
+      95,    99,   100,   102,   104,   108,   109,   113,   114,   116,
+     118,   122,   124,   126,   128,   130
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      23,     0,    -1,    -1,    24,    25,    24,    -1,    -1,     4,
-      -1,    27,    -1,    25,    26,    27,    -1,     4,    -1,    34,
-      -1,    32,    -1,    33,    -1,    28,    -1,    30,    -1,     8,
-      18,    29,    -1,    -1,    19,    16,    -1,    31,    -1,    30,
-      31,    -1,    11,    -1,    13,    42,    -1,     6,    16,    -1,
-       7,    10,    46,    -1,    -1,     3,    10,    35,    39,     4,
-      36,     5,    -1,    -1,    37,    -1,    38,    -1,    37,    38,
-      -1,    11,    -1,     9,    15,    -1,    14,    -1,    -1,    20,
-      40,    21,    -1,    -1,    41,    -1,    10,    -1,    41,    19,
-      10,    -1,    -1,    20,    43,    21,    -1,    -1,    44,    -1,
-      45,    -1,    44,    19,    45,    -1,    46,    -1,    10,    -1,
-      17,    -1,    18,    -1,    16,    -1
+      29,     0,    -1,    -1,    30,    31,    30,    -1,    -1,     4,
+      -1,    33,    -1,    31,    32,    33,    -1,     4,    -1,    40,
+      -1,    38,    -1,    39,    -1,    34,    -1,    36,    -1,     9,
+      24,    35,    -1,    -1,    25,    22,    -1,    37,    -1,    36,
+      37,    -1,    16,    -1,    18,    51,    -1,     6,    22,    -1,
+       7,    15,    55,    -1,    -1,     3,    15,    41,    48,     4,
+      42,     5,    -1,    -1,    43,    -1,    44,    -1,    43,    44,
+      -1,    16,    -1,    19,    -1,    45,    -1,    46,    -1,    10,
+      20,    -1,     8,    47,    21,    -1,    11,    -1,    14,    -1,
+      12,    -1,    13,    -1,    -1,    26,    49,    27,    -1,    -1,
+      50,    -1,    15,    -1,    50,    25,    15,    -1,    -1,    26,
+      52,    27,    -1,    -1,    53,    -1,    54,    -1,    53,    25,
+      54,    -1,    55,    -1,    15,    -1,    23,    -1,    24,    -1,
+      22,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,   114,   114,   115,   118,   119,   122,   123,   127,   136,
-     137,   138,   139,   140,   143,   149,   150,   158,   159,   162,
-     163,   167,   171,   178,   177,   185,   186,   189,   190,   193,
-     194,   195,   198,   199,   202,   203,   206,   207,   210,   211,
-     214,   215,   218,   219,   222,   227,   228,   229,   230
+       0,   126,   126,   127,   130,   131,   134,   135,   139,   148,
+     149,   150,   151,   152,   155,   161,   162,   170,   171,   174,
+     175,   179,   183,   190,   189,   197,   198,   201,   202,   205,
+     206,   207,   208,   211,   215,   223,   224,   225,   226,   229,
+     230,   233,   234,   237,   238,   241,   242,   245,   246,   249,
+     250,   253,   258,   259,   260,   261
 };
 #endif
 
@@ -526,15 +546,17 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "\".macro\"", "\"\\n\"", "\".endm\"",
-  "\".include\"", "\".macro_const\"", "\".line\"", "\".label\"",
+  "\".include\"", "\".macro_const\"", "\".macro_local\"", "\".line\"",
+  "\".label\"", "\"int\"", "\"num\"", "\"string\"", "\"pmc\"",
   "\"identifier\"", "\"any token\"", "\"macro body\"", "\".identifier\"",
-  "\".$LABEL\"", "\"$LABEL:\"", "\"string constant\"",
+  "\".$IDENT\"", "\"$LABEL:\"", "\"$IDENT\"", "\"string constant\"",
   "\"number constant\"", "\"integer constant\"", "','", "'('", "')'",
   "$accept", "program", "opt_nl", "statements", "newline", "statement",
   "line_directive", "opt_filename", "anything", "any", "include_statement",
   "macro_const_definition", "macro_definition", "@1", "opt_macro_body",
-  "macro_body", "body_token", "parameters", "opt_param_list", "param_list",
-  "arguments", "opt_arg_list", "arg_list", "arg", "expression", 0
+  "macro_body", "body_token", "label_declaration", "local_declaration",
+  "type", "parameters", "opt_param_list", "param_list", "arguments",
+  "opt_arg_list", "arg_list", "arg", "expression", 0
 };
 #endif
 
@@ -544,19 +566,20 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,    44,
-      40,    41
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,    44,    40,    41
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    22,    23,    23,    24,    24,    25,    25,    26,    27,
-      27,    27,    27,    27,    28,    29,    29,    30,    30,    31,
-      31,    32,    33,    35,    34,    36,    36,    37,    37,    38,
-      38,    38,    39,    39,    40,    40,    41,    41,    42,    42,
-      43,    43,    44,    44,    45,    46,    46,    46,    46
+       0,    28,    29,    29,    30,    30,    31,    31,    32,    33,
+      33,    33,    33,    33,    34,    35,    35,    36,    36,    37,
+      37,    38,    39,    41,    40,    42,    42,    43,    43,    44,
+      44,    44,    44,    45,    46,    47,    47,    47,    47,    48,
+      48,    49,    49,    50,    50,    51,    51,    52,    52,    53,
+      53,    54,    55,    55,    55,    55
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -565,8 +588,9 @@ static const yytype_uint8 yyr2[] =
        0,     2,     0,     3,     0,     1,     1,     3,     1,     1,
        1,     1,     1,     1,     3,     0,     2,     1,     2,     1,
        2,     2,     3,     0,     7,     0,     1,     1,     2,     1,
-       2,     1,     0,     3,     0,     1,     1,     3,     0,     3,
-       0,     1,     1,     3,     1,     1,     1,     1,     1
+       1,     1,     1,     2,     3,     1,     1,     1,     1,     0,
+       3,     0,     1,     1,     3,     0,     3,     0,     1,     1,
+       3,     1,     1,     1,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -575,42 +599,44 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        4,     5,     0,     0,     1,     0,     0,     0,     0,    19,
-      38,     4,     6,    12,    13,    17,    10,    11,     9,    23,
-      21,     0,    15,    40,    20,     8,     3,     0,    18,    32,
-      45,    48,    46,    47,    22,     0,    14,     0,    41,    42,
-      44,     7,    34,     0,    16,    39,     0,    36,     0,    35,
-      25,    43,    33,     0,     0,    29,    31,     0,    26,    27,
-      37,    30,    24,    28
+      45,     4,     6,    12,    13,    17,    10,    11,     9,    23,
+      21,     0,    15,    47,    20,     8,     3,     0,    18,    39,
+      52,    55,    53,    54,    22,     0,    14,     0,    48,    49,
+      51,     7,    41,     0,    16,    46,     0,    43,     0,    42,
+      25,    50,    40,     0,     0,     0,    29,    30,     0,    26,
+      27,    31,    32,    44,    35,    37,    38,    36,     0,    33,
+      24,    28,    34
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
       -1,     2,     3,    11,    27,    12,    13,    36,    14,    15,
-      16,    17,    18,    29,    57,    58,    59,    43,    48,    49,
-      24,    37,    38,    39,    40
+      16,    17,    18,    29,    58,    59,    60,    61,    62,    68,
+      43,    48,    49,    24,    37,    38,    39,    40
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -20
+#define YYPACT_NINF -14
 static const yytype_int8 yypact[] =
 {
-       7,   -20,     1,    -3,   -20,    -8,    -7,     9,     3,   -20,
-       2,    19,   -20,   -20,     5,   -20,   -20,   -20,   -20,   -20,
-     -20,    -4,     8,    -4,   -20,    24,   -20,    -3,   -20,    10,
-     -20,   -20,   -20,   -20,   -20,    12,   -20,     4,    13,   -20,
-     -20,   -20,    16,    25,   -20,   -20,    -4,   -20,    14,    15,
-       6,   -20,   -20,    21,    18,   -20,   -20,    31,     6,   -20,
-     -20,   -20,   -20,   -20
+       1,   -14,     2,    -3,   -14,    -4,   -10,     3,    -7,   -14,
+      -6,    24,   -14,   -14,    -9,   -14,   -14,   -14,   -14,   -14,
+     -14,    -1,     4,    -1,   -14,    30,   -14,    -3,   -14,     5,
+     -14,   -14,   -14,   -14,   -14,    10,   -14,     6,     9,   -14,
+     -14,   -14,    20,    32,   -14,   -14,    -1,   -14,    11,    12,
+       0,   -14,   -14,    25,    13,    19,   -14,   -14,    36,     0,
+     -14,   -14,   -14,   -14,   -14,   -14,   -14,   -14,    21,   -14,
+     -14,   -14,   -14
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -20,   -20,    26,   -20,   -20,    11,   -20,   -20,   -20,    27,
-     -20,   -20,   -20,   -20,   -20,   -20,   -19,   -20,   -20,   -20,
-     -20,   -20,   -20,    -6,    22
+     -14,   -14,    33,   -14,   -14,    16,   -14,   -14,   -14,    31,
+     -14,   -14,   -14,   -14,   -14,   -14,   -13,   -14,   -14,   -14,
+     -14,   -14,   -14,   -14,   -14,   -14,     7,    26
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -620,33 +646,36 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -6
 static const yytype_int8 yytable[] =
 {
-       5,     4,    19,     6,     7,     8,    30,    -2,     9,    20,
-      10,     1,    31,    32,    33,    54,     9,    55,    10,    21,
-      56,    22,    23,    25,    -5,    45,    47,    35,    44,    50,
-      42,    60,    46,    61,    53,    52,    62,    26,    41,    63,
-      51,    28,     0,    34
+       5,    -2,     4,     6,     7,     1,     8,     9,    54,    10,
+      55,    19,    20,     9,    30,    10,    56,    22,    21,    57,
+      23,    31,    32,    33,    64,    65,    66,    67,    25,    35,
+      -5,    42,    44,    45,    46,    47,    50,    53,    52,    69,
+      63,    70,    72,    41,    26,    28,    71,    34,     0,     0,
+       0,     0,     0,    51
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,    10,     6,     7,     8,    10,     0,    11,    16,
-      13,     4,    16,    17,    18,     9,    11,    11,    13,    10,
-      14,    18,    20,     4,     0,    21,    10,    19,    16,     4,
-      20,    10,    19,    15,    19,    21,     5,    11,    27,    58,
-      46,    14,    -1,    21
+       3,     0,     0,     6,     7,     4,     9,    16,     8,    18,
+      10,    15,    22,    16,    15,    18,    16,    24,    15,    19,
+      26,    22,    23,    24,    11,    12,    13,    14,     4,    25,
+       0,    26,    22,    27,    25,    15,     4,    25,    27,    20,
+      15,     5,    21,    27,    11,    14,    59,    21,    -1,    -1,
+      -1,    -1,    -1,    46
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     4,    23,    24,     0,     3,     6,     7,     8,    11,
-      13,    25,    27,    28,    30,    31,    32,    33,    34,    10,
-      16,    10,    18,    20,    42,     4,    24,    26,    31,    35,
-      10,    16,    17,    18,    46,    19,    29,    43,    44,    45,
-      46,    27,    20,    39,    16,    21,    19,    10,    40,    41,
-       4,    45,    21,    19,     9,    11,    14,    36,    37,    38,
-      10,    15,     5,    38
+       0,     4,    29,    30,     0,     3,     6,     7,     9,    16,
+      18,    31,    33,    34,    36,    37,    38,    39,    40,    15,
+      22,    15,    24,    26,    51,     4,    30,    32,    37,    41,
+      15,    22,    23,    24,    55,    25,    35,    52,    53,    54,
+      55,    33,    26,    48,    22,    27,    25,    15,    49,    50,
+       4,    54,    27,    25,     8,    10,    16,    19,    42,    43,
+      44,    45,    46,    15,    11,    12,    13,    14,    47,    20,
+       5,    44,    21
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1474,21 +1503,21 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 128 "macro.y"
+#line 140 "macro.y"
     { /* after each statement, emit a newline */
          emit("\n");
        ;}
     break;
 
   case 14:
-#line 144 "macro.y"
+#line 156 "macro.y"
     { emit("setline");
                   emit((yyvsp[(2) - (3)].sval));
                 ;}
     break;
 
   case 16:
-#line 151 "macro.y"
+#line 163 "macro.y"
     { emit("setfile");
                 emit((yyvsp[(2) - (2)].sval));
                 emit("\n");
@@ -1496,133 +1525,152 @@ yyreduce:
     break;
 
   case 19:
-#line 162 "macro.y"
+#line 174 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 163 "macro.y"
+#line 175 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 168 "macro.y"
+#line 180 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 22:
-#line 172 "macro.y"
+#line 184 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 23:
-#line 178 "macro.y"
+#line 190 "macro.y"
     { /* store the id as the current macro */ lexer->macro_id = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 24:
-#line 182 "macro.y"
+#line 194 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (7)].sval), (yyvsp[(4) - (7)].lval), (yyvsp[(6) - (7)].sval)); ;}
     break;
 
   case 25:
-#line 185 "macro.y"
+#line 197 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 26:
-#line 186 "macro.y"
+#line 198 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 27:
-#line 189 "macro.y"
+#line 201 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 28:
-#line 190 "macro.y"
+#line 202 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 29:
-#line 193 "macro.y"
+#line 205 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 30:
-#line 194 "macro.y"
-    { (yyval.sval) = munge_label_id((yyvsp[(2) - (2)].sval), 1, lexer); ;}
-    break;
-
-  case 31:
-#line 195 "macro.y"
+#line 206 "macro.y"
     { (yyval.sval) = munge_label_id((yyvsp[(1) - (1)].sval), 0, lexer); ;}
     break;
 
+  case 31:
+#line 207 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+    break;
+
   case 32:
-#line 198 "macro.y"
-    { (yyval.lval) = NULL; ;}
+#line 208 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 33:
-#line 199 "macro.y"
-    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
+#line 212 "macro.y"
+    { (yyval.sval) = munge_label_id((yyvsp[(2) - (2)].sval), 1, lexer); ;}
     break;
 
   case 34:
-#line 202 "macro.y"
-    { (yyval.lval) = NULL; ;}
-    break;
-
-  case 35:
-#line 203 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
-    break;
-
-  case 36:
-#line 206 "macro.y"
-    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
-    break;
-
-  case 37:
-#line 207 "macro.y"
-    { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
-    break;
-
-  case 38:
-#line 210 "macro.y"
-    { (yyval.lval) = NULL; ;}
+#line 216 "macro.y"
+    { /* create a string like ".local <type> <id>" */
+                     (yyval.sval) = dupstr(".local");
+                     (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval));
+                     (yyval.sval) = concat((yyval.sval), munge_local_id((yyvsp[(3) - (3)].sval), lexer));
+                   ;}
     break;
 
   case 39:
-#line 211 "macro.y"
-    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
-    break;
-
-  case 40:
-#line 214 "macro.y"
+#line 229 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
+  case 40:
+#line 230 "macro.y"
+    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
+    break;
+
   case 41:
-#line 215 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
+#line 233 "macro.y"
+    { (yyval.lval) = NULL; ;}
     break;
 
   case 42:
-#line 218 "macro.y"
-    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+#line 234 "macro.y"
+    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 43:
-#line 219 "macro.y"
+#line 237 "macro.y"
+    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+    break;
+
+  case 44:
+#line 238 "macro.y"
+    { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
+    break;
+
+  case 45:
+#line 241 "macro.y"
+    { (yyval.lval) = NULL; ;}
+    break;
+
+  case 46:
+#line 242 "macro.y"
+    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
+    break;
+
+  case 47:
+#line 245 "macro.y"
+    { (yyval.lval) = NULL; ;}
+    break;
+
+  case 48:
+#line 246 "macro.y"
+    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
+    break;
+
+  case 49:
+#line 249 "macro.y"
+    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+    break;
+
+  case 50:
+#line 250 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1626 "macroparser.c"
+#line 1674 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1836,7 +1884,7 @@ yyreturn:
 }
 
 
-#line 235 "macro.y"
+#line 266 "macro.y"
 
 
 
@@ -1943,6 +1991,7 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* parse the macro body */
     process_string(macro->body, lexer);
 
+
     /* now remove the temporary constant definitions */
     pop_constant_table(lexer);
     delete_constant_table(macro_params);
@@ -1969,6 +2018,8 @@ define_constant(constant_table *table, char *name, char *value) {
 
     def->next = table->definitions;
     table->definitions = def;
+
+
 }
 
 /*
@@ -2186,6 +2237,26 @@ delete_constant_table(constant_table *table) {
     free(table);
 }
 
+/*
+
+=item C<munge_local_id>
+
+=cut
+
+*/
+static char *
+munge_local_id(char *local_id, lexer_state *lexer) {
+
+    char const * const format = "_gen_local_%s_%s_%03d"; /* unique id format: 001 */
+    int const format_length   = strlen(format);
+    char *munged_id = NULL;
+    int length = format_length + strlen(local_id) + strlen(lexer->macro_id) + 3; /* 3 digits */
+
+    munged_id = (char *)calloc(length + 1, sizeof (char));
+    assert(munged_id != NULL);
+    sprintf(munged_id, format, lexer->macro_id, local_id, lexer->unique_id);
+    return munged_id;
+}
 
 /*
 
@@ -2291,13 +2362,6 @@ process_file(char *filename, lexer_state *lexer) {
         /* and clean up */
         macrolex_destroy(yyscanner);
 
-/*
-        emit("setfile");
-        emit(temp_file);
-        emit("setline");
-        emit_int(temp_line);
-*/
-
         /* restore state of lexer */
         lexer->line        = temp_line;
         lexer->currentfile = temp_file;
@@ -2346,10 +2410,11 @@ main(int argc, char *argv[]) {
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
     assert(lexer != NULL);
-    lexer->line = 1;
-    lexer->errors = 0;
+    lexer->unique_id = 0;
+    lexer->line      = 1;
+    lexer->errors    = 0;
     lexer->flexdebug = 0;
-    lexer->macro_id = NULL;
+    lexer->macro_id  = NULL;
     lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
 
@@ -2379,10 +2444,6 @@ main(int argc, char *argv[]) {
         argv++;
         argc--;
     }
-
-
-
-
 
     /* process all files specified on the command line */
     while (argc > 0) {

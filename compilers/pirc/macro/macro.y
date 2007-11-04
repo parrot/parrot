@@ -45,12 +45,16 @@ static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
 static char *munge_label_id(char *label_id, int is_declaration, lexer_state *lexer);
+static char *munge_local_id(char *local_id, lexer_state *lexer);
 
 static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
 static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
 
 macro_def *find_macro(constant_table *table, char *name);
+
+extern char *dupstr(char *str);
+
 char *concat(char *str1, char *str2);
 
 
@@ -69,21 +73,29 @@ char *concat(char *str1, char *str2);
        TK_ENDM              ".endm"
        TK_INCLUDE           ".include"
        TK_MACRO_CONST       ".macro_const"
+       TK_MACRO_LOCAL       ".macro_local"
        TK_LINE              ".line"
        TK_LABEL             ".label"
+
+%token <sval> TK_INT        "int"
+       <sval> TK_NUM        "num"
+       <sval> TK_STRING     "string"
+       <sval> TK_PMC        "pmc"
 
 %token <sval> TK_IDENT      "identifier"
        <sval> TK_ANY        "any token"
        <sval> TK_BODY       "macro body"
        <mval> TK_DOT_IDENT  ".identifier"
-       <sval> TK_LABEL_EXP  ".$LABEL"
+       <sval> TK_MACROVAR_EXP  ".$IDENT"
        <sval> TK_LABEL_ID   "$LABEL:"
+       <sval> TK_LOCAL_ID   "$IDENT"
 
 %token <sval> TK_STRINGC    "string constant"
        <sval> TK_NUMC       "number constant"
        <sval> TK_INTC       "integer constant"
 
-%type <sval> expression macro_body opt_macro_body arg body_token
+%type <sval> expression macro_body opt_macro_body arg body_token label_declaration
+             local_declaration type
 %type <lval> arguments opt_arg_list arg_list parameters opt_param_list param_list
 
 
@@ -191,9 +203,28 @@ macro_body: body_token               { $$ = $1; }
           ;
 
 body_token: TK_ANY                   { $$ = $1; }
-          | ".label" TK_LABEL_ID     { $$ = munge_label_id($2, 1, lexer); }
-          | TK_LABEL_EXP             { $$ = munge_label_id($1, 0, lexer); }
+          | TK_MACROVAR_EXP          { $$ = munge_label_id($1, 0, lexer); }
+          | label_declaration        { $$ = $1; }
+          | local_declaration        { $$ = $1; }
           ;
+
+label_declaration: ".label" TK_LABEL_ID
+                   { $$ = munge_label_id($2, 1, lexer); }
+                 ;
+
+local_declaration: ".macro_local" type TK_LOCAL_ID
+                   { /* create a string like ".local <type> <id>" */
+                     $$ = dupstr(".local");
+                     $$ = concat($$, $2);
+                     $$ = concat($$, munge_local_id($3, lexer));
+                   }
+                 ;
+
+type: "int"
+    | "pmc"
+    | "num"
+    | "string"
+    ;
 
 parameters: /* empty */              { $$ = NULL; }
           | '(' opt_param_list ')'   { $$ = $2;   }
@@ -338,6 +369,7 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* parse the macro body */
     process_string(macro->body, lexer);
 
+
     /* now remove the temporary constant definitions */
     pop_constant_table(lexer);
     delete_constant_table(macro_params);
@@ -364,6 +396,8 @@ define_constant(constant_table *table, char *name, char *value) {
 
     def->next = table->definitions;
     table->definitions = def;
+
+
 }
 
 /*
@@ -581,6 +615,26 @@ delete_constant_table(constant_table *table) {
     free(table);
 }
 
+/*
+
+=item C<munge_local_id>
+
+=cut
+
+*/
+static char *
+munge_local_id(char *local_id, lexer_state *lexer) {
+
+    char const * const format = "_gen_local_%s_%s_%03d"; /* unique id format: 001 */
+    int const format_length   = strlen(format);
+    char *munged_id = NULL;
+    int length = format_length + strlen(local_id) + strlen(lexer->macro_id) + 3; /* 3 digits */
+
+    munged_id = (char *)calloc(length + 1, sizeof (char));
+    assert(munged_id != NULL);
+    sprintf(munged_id, format, lexer->macro_id, local_id, lexer->unique_id);
+    return munged_id;
+}
 
 /*
 
@@ -686,13 +740,6 @@ process_file(char *filename, lexer_state *lexer) {
         /* and clean up */
         macrolex_destroy(yyscanner);
 
-/*
-        emit("setfile");
-        emit(temp_file);
-        emit("setline");
-        emit_int(temp_line);
-*/
-
         /* restore state of lexer */
         lexer->line        = temp_line;
         lexer->currentfile = temp_file;
@@ -741,10 +788,11 @@ main(int argc, char *argv[]) {
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
     assert(lexer != NULL);
-    lexer->line = 1;
-    lexer->errors = 0;
+    lexer->unique_id = 0;
+    lexer->line      = 1;
+    lexer->errors    = 0;
     lexer->flexdebug = 0;
-    lexer->macro_id = NULL;
+    lexer->macro_id  = NULL;
     lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
 
@@ -774,10 +822,6 @@ main(int argc, char *argv[]) {
         argv++;
         argc--;
     }
-
-
-
-
 
     /* process all files specified on the command line */
     while (argc > 0) {
