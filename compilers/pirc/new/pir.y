@@ -453,11 +453,15 @@ separator: ';'
          ;
 
 
-if_statement: "if" condition goto_statement
+if_statement: "if" condition goto identifier "\n"
             ;
 
-unless_statement: "unless" condition goto_statement
+unless_statement: "unless" condition goto identifier "\n"
                 ;
+
+goto: "goto" /* PIR mode */
+    | ','    /* PASM mode*/
+    ;
 
 goto_statement: "goto" identifier "\n"
               ;
