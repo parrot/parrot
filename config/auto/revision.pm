@@ -35,9 +35,13 @@ sub runstep {
 
     my $revision = $Parrot::Revision::current;
 
-    $conf->data->set( revision => $revision, );
+    if ( defined($revision) and $revision !~ /^\d+$/ ) {
+        die "Cannot use non-numeric revision number: $!";
+    }
 
-    if ( $revision >= 1 ) {
+    $conf->data->set( revision => $revision );
+
+    if ( defined $revision and $revision >= 1 ) {
         $self->set_result("r$revision");
     }
     else {
