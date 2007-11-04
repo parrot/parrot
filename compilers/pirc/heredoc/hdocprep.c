@@ -556,8 +556,8 @@ static yyconst flex_int16_t yy_chk[134] =
 
 static yyconst flex_int16_t yy_rule_linenum[14] =
     {   0,
-      167,  169,  171,  173,  182,  186,  199,  208,  220,  230,
-      240,  262,  312
+      192,  194,  196,  198,  207,  211,  226,  236,  246,  254,
+      265,  288,  342
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -602,15 +602,30 @@ extern void  hd_preset_in(FILE *fp,yyscan_t yyscanner);
 extern int   hd_prelex_destroy(yyscan_t yyscanner);
 extern int   hd_prelex(yyscan_t yyscanner);
 
+/* all globals are collected in this structure which
+ * is set in yyscan_t's "extra" field, available through
+ * yy{get,set}_extra() function.
+ */
+typedef struct global_state {
+    int   line;
+    char *heredoc;
+    char *linebuff;
+    char *delimiter;
+    char *filename;
+    YY_BUFFER_STATE file_buffer;
 
-/* these are globals. Remove them and make this thing reentrant */
+} global_state;
+
+/* accessor methods for setting and getting the lexer_state */
+#define YY_EXTRA_TYPE  struct global_state *
+extern YY_EXTRA_TYPE  hd_preget_extra(yyscan_t scanner);
+extern void hd_preset_extra(YY_EXTRA_TYPE lexer ,yyscan_t scanner);
+
 #define output stdout
-
-int line = 1;
-char *heredoc   = NULL;
-char *linebuff  = NULL;
-char *delimiter = NULL;
-YY_BUFFER_STATE file_buffer;
+/* macro to chop off the last character, typically a newline character,
+ * but can also be something else
+ */
+#define chop_yytext()   (yytext[--yyleng] = '\0')
 
 
 /*
@@ -619,8 +634,9 @@ Emit an error message.
 
 */
 static void
-lex_error(char *msg) {
-    fprintf(stderr, "Heredoc pre-processor error: %s\n", msg);
+lex_error(char *msg, global_state *state) {
+    fprintf(stderr, "\nHeredoc pre-processor error");
+    fprintf(stderr, " in '%s' (line %d): %s\n", state->filename, state->line, msg);
 }
 
 
@@ -631,7 +647,7 @@ int
 main(int argc, char *argv[]) {
     FILE *fp = NULL;
     yyscan_t yyscanner;
-
+    global_state *state = NULL;
 
     /* check for proper usage */
     if (argc < 2) {
@@ -654,13 +670,21 @@ main(int argc, char *argv[]) {
     /* set the scanner to a string buffer and go parse */
     hd_preset_in(fp,yyscanner);
 
+    state = (global_state *)malloc(sizeof (global_state));
+    assert(state != NULL);
+    state->line      = 1;
+    state->filename  = argv[1];
+    state->heredoc   = NULL;
+    state->linebuff  = NULL;
+    state->delimiter = NULL;
+    hd_preset_extra(state,yyscanner);
+
     /* the lexer never returns, only call it once. Don't give a YYSTYPE object. */
     hd_prelex(yyscanner);
 
-
-
     /* clean up after playing */
     hd_prelex_destroy(yyscanner);
+    free(state);
     return 0;
 }
 
@@ -678,12 +702,13 @@ int num_rules = YY_NUM_RULES;
 
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   { ++ctr[yy_act];             \
+#define YY_USER_ACTION   { global_state *state = hd_preget_extra(yyscanner);    \
+                           ++ctr[yy_act];             \
                          do {                         \
                               char *iter = yytext;    \
                               while (*iter != '\0') { \
                                   if (*iter == '\n')  \
-                                      line++;         \
+                                      state->line++;  \
                                   iter++;             \
                               }                       \
                          }                            \
@@ -697,7 +722,7 @@ int num_rules = YY_NUM_RULES;
 
 
 
-#line 701 "hdocprep.c"
+#line 726 "hdocprep.c"
 
 #define INITIAL 0
 #define POD 1
@@ -988,12 +1013,12 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 163 "hdocprep.l"
+#line 188 "hdocprep.l"
 
 
 
 
-#line 997 "hdocprep.c"
+#line 1022 "hdocprep.c"
 
     if ( !yyg->yy_init )
         {
@@ -1107,38 +1132,38 @@ do_action:  /* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 167 "hdocprep.l"
+#line 192 "hdocprep.l"
 { yy_push_state(POD, yyscanner); }
     YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 169 "hdocprep.l"
+#line 194 "hdocprep.l"
 { /* ignore pod comments */ }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 171 "hdocprep.l"
+#line 196 "hdocprep.l"
 { /* skip newlines */}
     YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 173 "hdocprep.l"
+#line 198 "hdocprep.l"
 { /* end of POD comment */
                          yy_pop_state(yyscanner);
                        }
     YY_BREAK
 case YY_STATE_EOF(POD):
-#line 177 "hdocprep.l"
+#line 202 "hdocprep.l"
 { /* we're scanning a POD comment, but encountered end-of-file. */
-                         lex_error("POD comment not closed!");
+                         lex_error("POD comment not closed!", hd_preget_extra(yyscanner));
                          yyterminate();
                        }
     YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 182 "hdocprep.l"
+#line 207 "hdocprep.l"
 { /* echo everything when scanning the string. */
                          fprintf(output, "%s", yytext);
                        }
@@ -1146,123 +1171,125 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 186 "hdocprep.l"
+#line 211 "hdocprep.l"
 { /* don't do anything */
 
                        }
     YY_BREAK
 case YY_STATE_EOF(SCANSTRING):
-#line 190 "hdocprep.l"
+#line 215 "hdocprep.l"
 { /* end of saved string */
-                         assert(file_buffer);
-                         hd_pre_switch_to_buffer(file_buffer,yyscanner);
+                         global_state *state = hd_preget_extra(yyscanner);
+                         assert(state->file_buffer);
+                         hd_pre_switch_to_buffer(state->file_buffer,yyscanner);
                          /* clear the temp. variable */
-                         file_buffer = NULL;
+                         state->file_buffer = NULL;
                          BEGIN(INITIAL);
+                         fprintf(output, "\nsetline %d\n", state->line);
                        }
     YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 199 "hdocprep.l"
+#line 226 "hdocprep.l"
 { /* 2nd and later heredoc argument */
-                             delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
-                             assert(delimiter);
-                             strncpy(delimiter, yytext + 3, yyleng - 4);
+                             global_state *state = hd_preget_extra(yyscanner);
+                             state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                             assert(state->delimiter);
+                             strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
-                             heredoc = strdup("");
+                             state->heredoc = strdup("");
                              BEGIN(SAVELINE2);
                            }
     YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 208 "hdocprep.l"
+#line 236 "hdocprep.l"
 { /* only copy the string after "<<'" and skip the last quote too */
-                         delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
-                         assert(delimiter);
-                         strncpy(delimiter, yytext + 3, yyleng - 4);
-                         /*
-                         fprintf(stderr, "Found delimiter: [%s]\n",  delimiter);
-                         */
-                         heredoc = strdup("");
+                         global_state *state = hd_preget_extra(yyscanner);
+                         state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                         assert(state->delimiter);
+                         strncpy(state->delimiter, yytext + 3, yyleng - 4);
+                         state->heredoc = strdup("");
                          BEGIN(SAVELINE);
                        }
     YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 220 "hdocprep.l"
+#line 246 "hdocprep.l"
 { /* this state is used when reading the first heredoc delimiter
                             argument. Save the rest of the line and go scan the heredoc.
                           */
-                         linebuff = strdup(yytext);
-                         /*
-                         fprintf(stderr, "Saveline: [%s]\n", linebuff);
-                         */
+                         global_state *state = hd_preget_extra(yyscanner);
+                         state->linebuff = strdup(yytext);
                          BEGIN(HEREDOC);
                        }
     YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 230 "hdocprep.l"
+#line 254 "hdocprep.l"
 { /* this state is used when reading the 2nd and later heredoc
                             delimiter arguments. Save the rest of the line and go scan
                             the heredoc string. First, though, switch back to the file,
                             because <SAVELINE2> state is activated when reading a string.
                           */
-                         linebuff = strdup(yytext);
-                         hd_pre_switch_to_buffer(file_buffer,yyscanner);
+                         global_state *state = hd_preget_extra(yyscanner);
+                         state->linebuff = strdup(yytext);
+                         hd_pre_switch_to_buffer(state->file_buffer,yyscanner);
                          BEGIN(HEREDOC);
                        }
     YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 240 "hdocprep.l"
+#line 265 "hdocprep.l"
 { /* Scan a newline character, append this to the heredoc, but
                             escape it.
                           */
-                         int len = strlen(heredoc);
+                         global_state *state = hd_preget_extra(yyscanner);
+                         int len = strlen(state->heredoc);
                          char *temp = (char *)calloc(len + 1 + 2, sizeof (char));
                          assert(temp != NULL);
-                         strcpy(temp, heredoc);
+                         strcpy(temp, state->heredoc);
 
 /* somehow this fails on windows
                          if (heredoc)
                             free(heredoc);
 */
-                         heredoc = temp;
+                         state->heredoc = temp;
 
-                         assert(heredoc != NULL);
+                         assert(state->heredoc != NULL);
 
                          /* translate "\n" to a "\" and "n" character */
-                         heredoc[len] = '\\';
-                         heredoc[len + 1] = 'n';
-                         heredoc[len + 2] = '\0';
+                         state->heredoc[len] = '\\';
+                         state->heredoc[len + 1] = 'n';
+                         state->heredoc[len + 2] = '\0';
                        }
     YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 262 "hdocprep.l"
+#line 288 "hdocprep.l"
 { /* scan heredoc string contents */
 
+                         global_state *state = hd_preget_extra(yyscanner);
                          /* on windows remove the '\r' character */
-
                          if (yytext[yyleng - 1] == '\r') {
-                           yytext[yyleng - 1] = '\0';
+                           chop_yytext();
                          }
 
-                         if (strcmp(yytext, delimiter) == 0) {
-                            char *hdstring = (char *)calloc(strlen(heredoc) + 3, sizeof (char));
+                         if (strcmp(yytext, state->delimiter) == 0) {
+                            int heredoc_length = strlen(state->heredoc);
+                            char *hdstring = (char *)calloc(heredoc_length + 3, sizeof (char));
                             assert(hdstring != NULL);
 
-                            sprintf(hdstring, "\"%s\"", heredoc);
+                            sprintf(hdstring, "\"%s\"", state->heredoc);
                             fprintf(output, "%s", hdstring);
 
 
                             /* free the delimiter memory */
-                            free(delimiter);
-                            delimiter = NULL;
+                            free(state->delimiter);
+                            state->delimiter = NULL;
 
                             /* free the just allocated memory */
                             free(hdstring);
@@ -1272,33 +1299,36 @@ YY_RULE_SETUP
                             assert(heredoc != NULL);
                             free(heredoc);
                             */
-                            heredoc = strdup("");
+                            state->heredoc = strdup("");
 
                             /* save the current buffer, because we go scan the
                                rest of the string that was saved in <SAVELINE(2)>.
                              */
-                            file_buffer = YY_CURRENT_BUFFER;
+                            state->file_buffer = YY_CURRENT_BUFFER;
                             BEGIN(SCANSTRING);
-                            assert(linebuff != NULL);
-                            hd_pre_scan_string(linebuff,yyscanner);
+                            assert(state->linebuff != NULL);
+                            hd_pre_scan_string(state->linebuff,yyscanner);
                          }
                          else {
                             /* save this heredoc string line */
                             char *line = strdup(yytext);
-                            heredoc = strcat(heredoc, line);
+                            state->heredoc = strcat(state->heredoc, line);
                          }
                        }
     YY_BREAK
 case YY_STATE_EOF(HEREDOC):
-#line 307 "hdocprep.l"
+#line 334 "hdocprep.l"
 { /* End of file while reading a heredoc string. This is bad. */
-                         fprintf(stderr, "\nError: end of file while reading heredoc string '%s'\n", delimiter);
+                         global_state *state = hd_preget_extra(yyscanner);
+                         fprintf(stderr,
+                                 "\nError: end of file while reading heredoc string '%s'\n",
+                                 state->delimiter);
                          yyterminate();
                        }
     YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 312 "hdocprep.l"
+#line 342 "hdocprep.l"
 { /* just echo everything else */
                          /*fprintf(stderr, "<*>.: [%s]\n", yytext); */
                          fprintf(output, "%s", yytext);
@@ -1308,17 +1338,17 @@ case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(HEREDOC2):
 case YY_STATE_EOF(SAVELINE):
 case YY_STATE_EOF(SAVELINE2):
-#line 317 "hdocprep.l"
+#line 347 "hdocprep.l"
 { /* end of file */
                          yyterminate();
                        }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 323 "hdocprep.l"
+#line 353 "hdocprep.l"
 ECHO;
     YY_BREAK
-#line 1322 "hdocprep.c"
+#line 1352 "hdocprep.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -2561,7 +2591,7 @@ void hd_prefree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 323 "hdocprep.l"
+#line 353 "hdocprep.l"
 
 
 

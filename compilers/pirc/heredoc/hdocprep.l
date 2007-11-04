@@ -32,15 +32,30 @@ extern void  yyset_in(FILE *fp, yyscan_t yyscanner);
 extern int   yylex_destroy(yyscan_t yyscanner);
 extern int   yylex( yyscan_t yyscanner);
 
+/* all globals are collected in this structure which
+ * is set in yyscan_t's "extra" field, available through
+ * yy{get,set}_extra() function.
+ */
+typedef struct global_state {
+    int   line;
+    char *heredoc;
+    char *linebuff;
+    char *delimiter;
+    char *filename;
+    YY_BUFFER_STATE file_buffer;
 
-/* these are globals. Remove them and make this thing reentrant */
+} global_state;
+
+/* accessor methods for setting and getting the lexer_state */
+#define YY_EXTRA_TYPE  struct global_state *
+extern YY_EXTRA_TYPE  yyget_extra(yyscan_t scanner);
+extern void yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
+
 #define output stdout
-
-int line = 1;
-char *heredoc   = NULL;
-char *linebuff  = NULL;
-char *delimiter = NULL;
-YY_BUFFER_STATE file_buffer;
+/* macro to chop off the last character, typically a newline character,
+ * but can also be something else
+ */
+#define chop_yytext()   (yytext[--yyleng] = '\0')
 
 
 /*
@@ -49,8 +64,9 @@ Emit an error message.
 
 */
 static void
-lex_error(char *msg) {
-    fprintf(stderr, "Heredoc pre-processor error: %s\n", msg);
+lex_error(char *msg, global_state *state) {
+    fprintf(stderr, "\nHeredoc pre-processor error");
+    fprintf(stderr, " in '%s' (line %d): %s\n", state->filename, state->line, msg);
 }
 
 
@@ -61,7 +77,7 @@ int
 main(int argc, char *argv[]) {
     FILE *fp = NULL;
     yyscan_t yyscanner;
-
+    global_state *state = NULL;
 
     /* check for proper usage */
     if (argc < 2) {
@@ -84,13 +100,21 @@ main(int argc, char *argv[]) {
     /* set the scanner to a string buffer and go parse */
     yyset_in(fp, yyscanner);
 
+    state = (global_state *)malloc(sizeof (global_state));
+    assert(state != NULL);
+    state->line      = 1;
+    state->filename  = argv[1];
+    state->heredoc   = NULL;
+    state->linebuff  = NULL;
+    state->delimiter = NULL;
+    yyset_extra(state, yyscanner);
+
     /* the lexer never returns, only call it once. Don't give a YYSTYPE object. */
     yylex(yyscanner);
 
-
-
     /* clean up after playing */
     yylex_destroy(yyscanner);
+    free(state);
     return 0;
 }
 
@@ -108,12 +132,13 @@ int num_rules = YY_NUM_RULES;
 
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   { ++ctr[yy_act];             \
+#define YY_USER_ACTION   { global_state *state = yyget_extra(yyscanner);    \
+                           ++ctr[yy_act];             \
                          do {                         \
                               char *iter = yytext;    \
                               while (*iter != '\0') { \
                                   if (*iter == '\n')  \
-                                      line++;         \
+                                      state->line++;  \
                                   iter++;             \
                               }                       \
                          }                            \
@@ -175,7 +200,7 @@ LINECOMMENT    [#].*\n
                        }
 
 <POD><<EOF>>           { /* we're scanning a POD comment, but encountered end-of-file. */
-                         lex_error("POD comment not closed!");
+                         lex_error("POD comment not closed!", yyget_extra(yyscanner));
                          yyterminate();
                        }
 
@@ -188,31 +213,32 @@ LINECOMMENT    [#].*\n
                        }
 
 <SCANSTRING><<EOF>>    { /* end of saved string */
-                         assert(file_buffer);
-                         yy_switch_to_buffer(file_buffer, yyscanner);
+                         global_state *state = yyget_extra(yyscanner);
+                         assert(state->file_buffer);
+                         yy_switch_to_buffer(state->file_buffer, yyscanner);
                          /* clear the temp. variable */
-                         file_buffer = NULL;
+                         state->file_buffer = NULL;
                          BEGIN(INITIAL);
+                         fprintf(output, "\nsetline %d\n", state->line);
                        }
 
 
 <SCANSTRING>"<<"{Q_STRING} { /* 2nd and later heredoc argument */
-                             delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
-                             assert(delimiter);
-                             strncpy(delimiter, yytext + 3, yyleng - 4);
+                             global_state *state = yyget_extra(yyscanner);
+                             state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                             assert(state->delimiter);
+                             strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
-                             heredoc = strdup("");
+                             state->heredoc = strdup("");
                              BEGIN(SAVELINE2);
                            }
 
 "<<"{Q_STRING}         { /* only copy the string after "<<'" and skip the last quote too */
-                         delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
-                         assert(delimiter);
-                         strncpy(delimiter, yytext + 3, yyleng - 4);
-                         /*
-                         fprintf(stderr, "Found delimiter: [%s]\n",  delimiter);
-                         */
-                         heredoc = strdup("");
+                         global_state *state = yyget_extra(yyscanner);
+                         state->delimiter = (char *)calloc(yyleng - 4 + 1, sizeof (char));
+                         assert(state->delimiter);
+                         strncpy(state->delimiter, yytext + 3, yyleng - 4);
+                         state->heredoc = strdup("");
                          BEGIN(SAVELINE);
                        }
 
@@ -220,10 +246,8 @@ LINECOMMENT    [#].*\n
 <SAVELINE>.*{EOL}      { /* this state is used when reading the first heredoc delimiter
                             argument. Save the rest of the line and go scan the heredoc.
                           */
-                         linebuff = strdup(yytext);
-                         /*
-                         fprintf(stderr, "Saveline: [%s]\n", linebuff);
-                         */
+                         global_state *state = yyget_extra(yyscanner);
+                         state->linebuff = strdup(yytext);
                          BEGIN(HEREDOC);
                        }
 
@@ -232,52 +256,55 @@ LINECOMMENT    [#].*\n
                             the heredoc string. First, though, switch back to the file,
                             because <SAVELINE2> state is activated when reading a string.
                           */
-                         linebuff = strdup(yytext);
-                         yy_switch_to_buffer(file_buffer, yyscanner);
+                         global_state *state = yyget_extra(yyscanner);
+                         state->linebuff = strdup(yytext);
+                         yy_switch_to_buffer(state->file_buffer, yyscanner);
                          BEGIN(HEREDOC);
                        }
 
 <HEREDOC>{EOL}         { /* Scan a newline character, append this to the heredoc, but
                             escape it.
                           */
-                         int len = strlen(heredoc);
+                         global_state *state = yyget_extra(yyscanner);
+                         int len = strlen(state->heredoc);
                          char *temp = (char *)calloc(len + 1 + 2, sizeof (char));
                          assert(temp != NULL);
-                         strcpy(temp, heredoc);
+                         strcpy(temp, state->heredoc);
 
 /* somehow this fails on windows
                          if (heredoc)
                             free(heredoc);
 */
-                         heredoc = temp;
+                         state->heredoc = temp;
 
-                         assert(heredoc != NULL);
+                         assert(state->heredoc != NULL);
 
                          /* translate "\n" to a "\" and "n" character */
-                         heredoc[len] = '\\';
-                         heredoc[len + 1] = 'n';
-                         heredoc[len + 2] = '\0';
+                         state->heredoc[len] = '\\';
+                         state->heredoc[len + 1] = 'n';
+                         state->heredoc[len + 2] = '\0';
                        }
 
 <HEREDOC>.*            { /* scan heredoc string contents */
 
+                         global_state *state = yyget_extra(yyscanner);
                          /* on windows remove the '\r' character */
-
                          if (yytext[yyleng - 1] == '\r') {
-                           yytext[yyleng - 1] = '\0';
+                           chop_yytext();
                          }
 
-                         if (strcmp(yytext, delimiter) == 0) {
-                            char *hdstring = (char *)calloc(strlen(heredoc) + 3, sizeof (char));
+                         if (strcmp(yytext, state->delimiter) == 0) {
+                            int heredoc_length = strlen(state->heredoc);
+                            char *hdstring = (char *)calloc(heredoc_length + 3, sizeof (char));
                             assert(hdstring != NULL);
 
-                            sprintf(hdstring, "\"%s\"", heredoc);
+                            sprintf(hdstring, "\"%s\"", state->heredoc);
                             fprintf(output, "%s", hdstring);
 
 
                             /* free the delimiter memory */
-                            free(delimiter);
-                            delimiter = NULL;
+                            free(state->delimiter);
+                            state->delimiter = NULL;
 
                             /* free the just allocated memory */
                             free(hdstring);
@@ -287,25 +314,28 @@ LINECOMMENT    [#].*\n
                             assert(heredoc != NULL);
                             free(heredoc);
                             */
-                            heredoc = strdup("");
+                            state->heredoc = strdup("");
 
                             /* save the current buffer, because we go scan the
                                rest of the string that was saved in <SAVELINE(2)>.
                              */
-                            file_buffer = YY_CURRENT_BUFFER;
+                            state->file_buffer = YY_CURRENT_BUFFER;
                             BEGIN(SCANSTRING);
-                            assert(linebuff != NULL);
-                            yy_scan_string(linebuff, yyscanner);
+                            assert(state->linebuff != NULL);
+                            yy_scan_string(state->linebuff, yyscanner);
                          }
                          else {
                             /* save this heredoc string line */
                             char *line = strdup(yytext);
-                            heredoc = strcat(heredoc, line);
+                            state->heredoc = strcat(state->heredoc, line);
                          }
                        }
 
 <HEREDOC><<EOF>>       { /* End of file while reading a heredoc string. This is bad. */
-                         fprintf(stderr, "\nError: end of file while reading heredoc string '%s'\n", delimiter);
+                         global_state *state = yyget_extra(yyscanner);
+                         fprintf(stderr,
+                                 "\nError: end of file while reading heredoc string '%s'\n",
+                                 state->delimiter);
                          yyterminate();
                        }
 
