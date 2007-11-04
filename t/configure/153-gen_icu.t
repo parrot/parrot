@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 152-gen_icu.t
+# 153-gen_icu.t
 
 use strict;
 use warnings;
@@ -23,11 +23,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-152-gen_icu.t - test config::gen::icu
+153-gen_icu.t - test config::gen::icu
 
 =head1 SYNOPSIS
 
-    % prove t/configure/152-gen_icu.t
+    % prove t/configure/153-gen_icu.t
 
 =head1 DESCRIPTION
 
