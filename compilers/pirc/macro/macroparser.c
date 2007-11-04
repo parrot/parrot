@@ -129,6 +129,7 @@
 #include <assert.h>
 #include "macroparser.h"
 #include "macro.h"
+#include "lexer.h"
 
 /* prevent inclusion of <unistd.h> on windows */
 #define YY_NO_UNISTD_H
@@ -143,33 +144,27 @@
 extern YY_DECL;
 
 /* declare yyerror */
-extern int yyerror(yyscan_t yyscanner, char *message);
+extern int yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message);
 
 #define YYDEBUG         1
 
 
 
 
-/* globals! */
-constant_table *globaldefinitions;
-static int errors    = 0;
-static int flexdebug = 0;
-static char *macro_id = NULL;
-
-static void  process_file(char *filename);
-static void  process_string(char *buffer);
-static void  include_file(char *filename);
-static void  expand(macro_def *macro, list *args);
+static void  process_file(char *filename, lexer_state *lexer);
+static void  process_string(char *buffer, lexer_state *lexer);
+static void  include_file(char *filename, lexer_state *lexer);
+static void  expand(macro_def *macro, list *args, lexer_state *lexer);
 static void  define_constant(constant_table *table, char *name, char *value);
 static void  define_macro(constant_table *table, char *name, list *parameters, char *body);
 static void  emit(char *str);
 static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
-static char *munge_label_id(char *label_id, int is_declaration);
+static char *munge_label_id(char *label_id, int is_declaration, lexer_state *lexer);
 
-static constant_table *new_constant_table(constant_table *current);
-static constant_table *pop_constant_table(void);
+static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
+static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
 
 macro_def *find_macro(constant_table *table, char *name);
@@ -198,7 +193,7 @@ char *concat(char *str1, char *str2);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 64 "macro.y"
+#line 59 "macro.y"
 {
     char  *sval;
     int    ival;
@@ -209,7 +204,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 213 "macroparser.c"
+#line 208 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -222,7 +217,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 226 "macroparser.c"
+#line 221 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -437,16 +432,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   42
+#define YYLAST   43
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  22
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  24
+#define YYNNTS  25
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  46
+#define YYNRULES  48
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  61
+#define YYNSTATES  64
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -462,7 +457,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      19,    20,     2,     2,    21,     2,     2,     2,     2,     2,
+      20,    21,     2,     2,    19,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -494,37 +489,37 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     4,     8,     9,    11,    13,    17,    19,
-      21,    23,    25,    27,    29,    32,    34,    37,    39,    42,
-      45,    49,    50,    58,    59,    61,    63,    66,    68,    71,
-      73,    74,    78,    79,    81,    83,    87,    88,    92,    93,
-      95,    97,   101,   103,   105,   107,   109
+      21,    23,    25,    27,    29,    33,    34,    37,    39,    42,
+      44,    47,    50,    54,    55,    63,    64,    66,    68,    71,
+      73,    76,    78,    79,    83,    84,    86,    88,    92,    93,
+      97,    98,   100,   102,   106,   108,   110,   112,   114
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
       23,     0,    -1,    -1,    24,    25,    24,    -1,    -1,     4,
-      -1,    27,    -1,    25,    26,    27,    -1,     4,    -1,    33,
-      -1,    31,    -1,    32,    -1,    28,    -1,    29,    -1,     8,
-      18,    -1,    30,    -1,    29,    30,    -1,    11,    -1,    13,
-      41,    -1,     6,    16,    -1,     7,    10,    45,    -1,    -1,
-       3,    10,    34,    38,     4,    35,     5,    -1,    -1,    36,
-      -1,    37,    -1,    36,    37,    -1,    11,    -1,     9,    15,
-      -1,    14,    -1,    -1,    19,    39,    20,    -1,    -1,    40,
-      -1,    10,    -1,    40,    21,    10,    -1,    -1,    19,    42,
-      20,    -1,    -1,    43,    -1,    44,    -1,    43,    21,    44,
-      -1,    45,    -1,    10,    -1,    17,    -1,    18,    -1,    16,
-      -1
+      -1,    27,    -1,    25,    26,    27,    -1,     4,    -1,    34,
+      -1,    32,    -1,    33,    -1,    28,    -1,    30,    -1,     8,
+      18,    29,    -1,    -1,    19,    16,    -1,    31,    -1,    30,
+      31,    -1,    11,    -1,    13,    42,    -1,     6,    16,    -1,
+       7,    10,    46,    -1,    -1,     3,    10,    35,    39,     4,
+      36,     5,    -1,    -1,    37,    -1,    38,    -1,    37,    38,
+      -1,    11,    -1,     9,    15,    -1,    14,    -1,    -1,    20,
+      40,    21,    -1,    -1,    41,    -1,    10,    -1,    41,    19,
+      10,    -1,    -1,    20,    43,    21,    -1,    -1,    44,    -1,
+      45,    -1,    44,    19,    45,    -1,    46,    -1,    10,    -1,
+      17,    -1,    18,    -1,    16,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   121,   121,   122,   125,   126,   129,   130,   134,   143,
-     144,   145,   146,   147,   150,   154,   155,   158,   159,   163,
-     166,   172,   172,   178,   179,   182,   183,   186,   187,   188,
-     191,   192,   195,   196,   199,   200,   203,   204,   207,   208,
-     211,   212,   215,   220,   221,   222,   223
+       0,   117,   117,   118,   121,   122,   125,   126,   130,   139,
+     140,   141,   142,   143,   146,   152,   153,   161,   162,   165,
+     166,   170,   174,   181,   180,   188,   189,   192,   193,   196,
+     197,   198,   201,   202,   205,   206,   209,   210,   213,   214,
+     217,   218,   221,   222,   225,   230,   231,   232,   233
 };
 #endif
 
@@ -537,9 +532,9 @@ static const char *const yytname[] =
   "\".include\"", "\".macro_const\"", "\".line\"", "\".label\"",
   "\"identifier\"", "\"any token\"", "\"macro body\"", "\".identifier\"",
   "\".$LABEL\"", "\"$LABEL:\"", "\"string constant\"",
-  "\"number constant\"", "\"integer constant\"", "'('", "')'", "','",
+  "\"number constant\"", "\"integer constant\"", "','", "'('", "')'",
   "$accept", "program", "opt_nl", "statements", "newline", "statement",
-  "line_directive", "anything", "any", "include_statement",
+  "line_directive", "opt_filename", "anything", "any", "include_statement",
   "macro_const_definition", "macro_definition", "@1", "opt_macro_body",
   "macro_body", "body_token", "parameters", "opt_param_list", "param_list",
   "arguments", "opt_arg_list", "arg_list", "arg", "expression", 0
@@ -552,8 +547,8 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,    40,
-      41,    44
+     265,   266,   267,   268,   269,   270,   271,   272,   273,    44,
+      40,    41
 };
 # endif
 
@@ -562,19 +557,19 @@ static const yytype_uint8 yyr1[] =
 {
        0,    22,    23,    23,    24,    24,    25,    25,    26,    27,
       27,    27,    27,    27,    28,    29,    29,    30,    30,    31,
-      32,    34,    33,    35,    35,    36,    36,    37,    37,    37,
+      31,    32,    33,    35,    34,    36,    36,    37,    37,    38,
       38,    38,    39,    39,    40,    40,    41,    41,    42,    42,
-      43,    43,    44,    45,    45,    45,    45
+      43,    43,    44,    44,    45,    46,    46,    46,    46
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     0,     3,     0,     1,     1,     3,     1,     1,
-       1,     1,     1,     1,     2,     1,     2,     1,     2,     2,
-       3,     0,     7,     0,     1,     1,     2,     1,     2,     1,
-       0,     3,     0,     1,     1,     3,     0,     3,     0,     1,
-       1,     3,     1,     1,     1,     1,     1
+       1,     1,     1,     1,     3,     0,     2,     1,     2,     1,
+       2,     2,     3,     0,     7,     0,     1,     1,     2,     1,
+       2,     1,     0,     3,     0,     1,     1,     3,     0,     3,
+       0,     1,     1,     3,     1,     1,     1,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -582,43 +577,43 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       4,     5,     0,     0,     1,     0,     0,     0,     0,    17,
-      36,     4,     6,    12,    13,    15,    10,    11,     9,    21,
-      19,     0,    14,    38,    18,     8,     3,     0,    16,    30,
-      43,    46,    44,    45,    20,     0,    39,    40,    42,     7,
-      32,     0,    37,     0,    34,     0,    33,    23,    41,    31,
-       0,     0,    27,    29,     0,    24,    25,    35,    28,    22,
-      26
+       4,     5,     0,     0,     1,     0,     0,     0,     0,    19,
+      38,     4,     6,    12,    13,    17,    10,    11,     9,    23,
+      21,     0,    15,    40,    20,     8,     3,     0,    18,    32,
+      45,    48,    46,    47,    22,     0,    14,     0,    41,    42,
+      44,     7,    34,     0,    16,    39,     0,    36,     0,    35,
+      25,    43,    33,     0,     0,    29,    31,     0,    26,    27,
+      37,    30,    24,    28
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    11,    27,    12,    13,    14,    15,    16,
-      17,    18,    29,    54,    55,    56,    41,    45,    46,    24,
-      35,    36,    37,    38
+      -1,     2,     3,    11,    27,    12,    13,    36,    14,    15,
+      16,    17,    18,    29,    57,    58,    59,    43,    48,    49,
+      24,    37,    38,    39,    40
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -19
+#define YYPACT_NINF -20
 static const yytype_int8 yypact[] =
 {
-       7,   -19,     1,    -3,   -19,    -8,    -7,     9,     3,   -19,
-       4,    18,   -19,   -19,     5,   -19,   -19,   -19,   -19,   -19,
-     -19,    -4,   -19,    -4,   -19,    24,   -19,    -3,   -19,     8,
-     -19,   -19,   -19,   -19,   -19,    10,    11,   -19,   -19,   -19,
-      15,    22,   -19,    -4,   -19,    13,    14,     6,   -19,   -19,
-      19,    16,   -19,   -19,    23,     6,   -19,   -19,   -19,   -19,
-     -19
+       7,   -20,     1,    -3,   -20,    -8,    -7,     9,     3,   -20,
+       2,    19,   -20,   -20,     5,   -20,   -20,   -20,   -20,   -20,
+     -20,    -4,     8,    -4,   -20,    24,   -20,    -3,   -20,    10,
+     -20,   -20,   -20,   -20,   -20,    12,   -20,     4,    13,   -20,
+     -20,   -20,    16,    25,   -20,   -20,    -4,   -20,    14,    15,
+       6,   -20,   -20,    21,    18,   -20,   -20,    31,     6,   -20,
+     -20,   -20,   -20,   -20
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -19,   -19,    25,   -19,   -19,    12,   -19,   -19,    20,   -19,
-     -19,   -19,   -19,   -19,   -19,   -18,   -19,   -19,   -19,   -19,
-     -19,   -19,    -5,    21
+     -20,   -20,    26,   -20,   -20,    11,   -20,   -20,   -20,    27,
+     -20,   -20,   -20,   -20,   -20,   -20,   -19,   -20,   -20,   -20,
+     -20,   -20,   -20,    -6,    22
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -629,19 +624,19 @@ static const yytype_int8 yypgoto[] =
 static const yytype_int8 yytable[] =
 {
        5,     4,    19,     6,     7,     8,    30,    -2,     9,    20,
-      10,     1,    31,    32,    33,    51,     9,    52,    10,    21,
-      53,    22,    25,    23,    -5,    44,    47,    40,    59,    57,
-      42,    58,    43,    49,    28,    50,    26,    60,    48,    39,
-       0,     0,    34
+      10,     1,    31,    32,    33,    54,     9,    55,    10,    21,
+      56,    22,    23,    25,    -5,    45,    47,    35,    44,    50,
+      42,    60,    46,    61,    53,    52,    62,    26,    41,    63,
+      51,    28,     0,    34
 };
 
 static const yytype_int8 yycheck[] =
 {
        3,     0,    10,     6,     7,     8,    10,     0,    11,    16,
       13,     4,    16,    17,    18,     9,    11,    11,    13,    10,
-      14,    18,     4,    19,     0,    10,     4,    19,     5,    10,
-      20,    15,    21,    20,    14,    21,    11,    55,    43,    27,
-      -1,    -1,    21
+      14,    18,    20,     4,     0,    21,    10,    19,    16,     4,
+      20,    10,    19,    15,    19,    21,     5,    11,    27,    58,
+      46,    14,    -1,    21
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -649,12 +644,12 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     4,    23,    24,     0,     3,     6,     7,     8,    11,
-      13,    25,    27,    28,    29,    30,    31,    32,    33,    10,
-      16,    10,    18,    19,    41,     4,    24,    26,    30,    34,
-      10,    16,    17,    18,    45,    42,    43,    44,    45,    27,
-      19,    38,    20,    21,    10,    39,    40,     4,    44,    20,
-      21,     9,    11,    14,    35,    36,    37,    10,    15,     5,
-      37
+      13,    25,    27,    28,    30,    31,    32,    33,    34,    10,
+      16,    10,    18,    20,    42,     4,    24,    26,    31,    35,
+      10,    16,    17,    18,    46,    19,    29,    43,    44,    45,
+      46,    27,    20,    39,    16,    21,    19,    10,    40,    41,
+       4,    45,    21,    19,     9,    11,    14,    36,    37,    38,
+      10,    15,     5,    38
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -687,7 +682,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (yyscanner, YY_("syntax error: cannot back up")); \
+      yyerror (yyscanner, lexer, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -767,7 +762,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value, yyscanner); \
+		  Type, Value, yyscanner, lexer); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -781,19 +776,21 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct lexer_state *lexer)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, lexer)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
     yyscan_t yyscanner;
+    struct lexer_state *lexer;
 #endif
 {
   if (!yyvaluep)
     return;
   YYUSE (yyscanner);
+  YYUSE (lexer);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -815,14 +812,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, yyscan_t yyscanner, struct lexer_state *lexer)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner)
+yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, lexer)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
     yyscan_t yyscanner;
+    struct lexer_state *lexer;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -830,7 +828,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yyscanner, lexer);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -870,13 +868,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, yyscan_t yyscanner)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, yyscan_t yyscanner, struct lexer_state *lexer)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule, yyscanner)
+yy_reduce_print (yyvsp, yyrule, yyscanner, lexer)
     YYSTYPE *yyvsp;
     int yyrule;
     yyscan_t yyscanner;
+    struct lexer_state *lexer;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -890,7 +889,7 @@ yy_reduce_print (yyvsp, yyrule, yyscanner)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       , yyscanner);
+		       		       , yyscanner, lexer);
       fprintf (stderr, "\n");
     }
 }
@@ -898,7 +897,7 @@ yy_reduce_print (yyvsp, yyrule, yyscanner)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule, yyscanner); \
+    yy_reduce_print (yyvsp, Rule, yyscanner, lexer); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1149,18 +1148,20 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, yyscan_t yyscanner)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, yyscan_t yyscanner, struct lexer_state *lexer)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep, yyscanner)
+yydestruct (yymsg, yytype, yyvaluep, yyscanner, lexer)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
     yyscan_t yyscanner;
+    struct lexer_state *lexer;
 #endif
 {
   YYUSE (yyvaluep);
   YYUSE (yyscanner);
+  YYUSE (lexer);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1185,7 +1186,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (yyscan_t yyscanner);
+int yyparse (yyscan_t yyscanner, struct lexer_state *lexer);
 #else
 int yyparse ();
 #endif
@@ -1214,11 +1215,12 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (yyscan_t yyscanner)
+yyparse (yyscan_t yyscanner, struct lexer_state *lexer)
 #else
 int
-yyparse (yyscanner)
+yyparse (yyscanner, lexer)
     yyscan_t yyscanner;
+    struct lexer_state *lexer;
 #endif
 #endif
 {
@@ -1475,145 +1477,155 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 135 "macro.y"
+#line 131 "macro.y"
     { /* after each statement, emit a newline */
          emit("\n");
        ;}
     break;
 
   case 14:
-#line 150 "macro.y"
-    { emit("setline"); emit((yyvsp[(2) - (2)].sval)); ;}
+#line 147 "macro.y"
+    { emit("setline");
+                  emit((yyvsp[(2) - (3)].sval));
+                ;}
     break;
 
-  case 17:
-#line 158 "macro.y"
-    { emit((yyvsp[(1) - (1)].sval)); ;}
-    break;
-
-  case 18:
-#line 159 "macro.y"
-    { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval)); ;}
+  case 16:
+#line 154 "macro.y"
+    { emit("setfile");
+                emit((yyvsp[(2) - (2)].sval));
+                emit("\n");
+              ;}
     break;
 
   case 19:
-#line 163 "macro.y"
-    { include_file((yyvsp[(2) - (2)].sval)); ;}
+#line 165 "macro.y"
+    { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 167 "macro.y"
-    { define_constant(globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
+#line 166 "macro.y"
+    { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 172 "macro.y"
-    { macro_id = (yyvsp[(2) - (2)].sval); ;}
+#line 171 "macro.y"
+    { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 22:
 #line 175 "macro.y"
-    { define_macro(globaldefinitions, (yyvsp[(2) - (7)].sval), (yyvsp[(4) - (7)].lval), (yyvsp[(6) - (7)].sval)); ;}
+    { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 23:
-#line 178 "macro.y"
-    { (yyval.sval) = ""; ;}
+#line 181 "macro.y"
+    { /* store the id as the current macro */ lexer->macro_id = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 24:
-#line 179 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
+#line 185 "macro.y"
+    { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (7)].sval), (yyvsp[(4) - (7)].lval), (yyvsp[(6) - (7)].sval)); ;}
     break;
 
   case 25:
-#line 182 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+#line 188 "macro.y"
+    { (yyval.sval) = ""; ;}
     break;
 
   case 26:
-#line 183 "macro.y"
-    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
+#line 189 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 27:
-#line 186 "macro.y"
+#line 192 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 28:
-#line 187 "macro.y"
-    { (yyval.sval) = munge_label_id((yyvsp[(2) - (2)].sval), 1); ;}
+#line 193 "macro.y"
+    { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 29:
-#line 188 "macro.y"
-    { (yyval.sval) = munge_label_id((yyvsp[(1) - (1)].sval), 0); ;}
+#line 196 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 30:
-#line 191 "macro.y"
-    { (yyval.lval) = NULL; ;}
+#line 197 "macro.y"
+    { (yyval.sval) = munge_label_id((yyvsp[(2) - (2)].sval), 1, lexer); ;}
     break;
 
   case 31:
-#line 192 "macro.y"
-    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
+#line 198 "macro.y"
+    { (yyval.sval) = munge_label_id((yyvsp[(1) - (1)].sval), 0, lexer); ;}
     break;
 
   case 32:
-#line 195 "macro.y"
+#line 201 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 33:
-#line 196 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
-    break;
-
-  case 34:
-#line 199 "macro.y"
-    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
-    break;
-
-  case 35:
-#line 200 "macro.y"
-    { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
-    break;
-
-  case 36:
-#line 203 "macro.y"
-    { (yyval.lval) = NULL; ;}
-    break;
-
-  case 37:
-#line 204 "macro.y"
+#line 202 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
+  case 34:
+#line 205 "macro.y"
+    { (yyval.lval) = NULL; ;}
+    break;
+
+  case 35:
+#line 206 "macro.y"
+    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
+    break;
+
+  case 36:
+#line 209 "macro.y"
+    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+    break;
+
+  case 37:
+#line 210 "macro.y"
+    { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
+    break;
+
   case 38:
-#line 207 "macro.y"
+#line 213 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 39:
-#line 208 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
+#line 214 "macro.y"
+    { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 40:
-#line 211 "macro.y"
-    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+#line 217 "macro.y"
+    { (yyval.lval) = NULL; ;}
     break;
 
   case 41:
-#line 212 "macro.y"
+#line 218 "macro.y"
+    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
+    break;
+
+  case 42:
+#line 221 "macro.y"
+    { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
+    break;
+
+  case 43:
+#line 222 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1617 "macroparser.c"
+#line 1629 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1649,7 +1661,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (yyscanner, YY_("syntax error"));
+      yyerror (yyscanner, lexer, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1673,11 +1685,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yyscanner, yymsg);
+	    yyerror (yyscanner, lexer, yymsg);
 	  }
 	else
 	  {
-	    yyerror (yyscanner, YY_("syntax error"));
+	    yyerror (yyscanner, lexer, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1701,7 +1713,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval, yyscanner);
+		      yytoken, &yylval, yyscanner, lexer);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1757,7 +1769,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp, yyscanner);
+		  yystos[yystate], yyvsp, yyscanner, lexer);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1795,7 +1807,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (yyscanner, YY_("memory exhausted"));
+  yyerror (yyscanner, lexer, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1803,7 +1815,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval, yyscanner);
+		 yytoken, &yylval, yyscanner, lexer);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1811,7 +1823,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp, yyscanner);
+		  yystos[*yyssp], yyvsp, yyscanner, lexer);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1827,7 +1839,7 @@ yyreturn:
 }
 
 
-#line 228 "macro.y"
+#line 238 "macro.y"
 
 
 
@@ -1890,13 +1902,13 @@ Process the specified file.
 
 */
 static void
-include_file(char *filename) {
+include_file(char *filename, lexer_state *lexer) {
     assert(filename != NULL);
     fprintf(stderr, "including: %s\n", filename);
     /* remove closing quote */
     filename[strlen(filename) - 1] = '\0';
     /* give address of string, skipping opening quote */
-    process_file(filename + 1);
+    process_file(filename + 1, lexer);
 }
 
 /*
@@ -1909,10 +1921,10 @@ Expand the specified macro (or constant).
 
 */
 static void
-expand(macro_def *macro, list *args) {
+expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
-    constant_table *macro_params = new_constant_table(globaldefinitions);
+    constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
     list *params = macro->parameters;
 
     while (params && args) {
@@ -1921,6 +1933,9 @@ expand(macro_def *macro, list *args) {
         args   = args->next;
     }
 
+    /* check for both conditions; either can be non-null, indicating an error.
+     * If both are null, then all went ok.
+     */
     if (params != NULL) { /* args must be null, so too few arguments */
         fprintf(stderr, "Too few arguments for macro expansion.\n");
     }
@@ -1928,16 +1943,11 @@ expand(macro_def *macro, list *args) {
         fprintf(stderr, "Too many arguments for macro expansion.\n");
     }
 
-    process_string(macro->body);
-
-    /*
-    fprintf(stderr, "macro %s expanded\n", macro->name);
-    */
+    /* parse the macro body */
+    process_string(macro->body, lexer);
 
     /* now remove the temporary constant definitions */
-
-    pop_constant_table();
-
+    pop_constant_table(lexer);
     delete_constant_table(macro_params);
 
 }
@@ -2129,13 +2139,13 @@ emit(char *str) {
 
 */
 static constant_table *
-new_constant_table(constant_table *current) {
+new_constant_table(constant_table *current, lexer_state *lexer) {
     constant_table *table = (constant_table *)malloc(sizeof (constant_table));
     assert(table != NULL);
     table->definitions = NULL;
     table->prev = current;
 
-    globaldefinitions = table;
+    lexer->globaldefinitions = table;
     return table;
 }
 
@@ -2148,9 +2158,9 @@ new_constant_table(constant_table *current) {
 
 */
 static constant_table *
-pop_constant_table(void) {
-    constant_table *popped = globaldefinitions;
-    globaldefinitions = popped->prev;
+pop_constant_table(lexer_state *lexer) {
+    constant_table *popped = lexer->globaldefinitions;
+    lexer->globaldefinitions = popped->prev;
     return popped;
 }
 
@@ -2182,12 +2192,12 @@ delete_constant_table(constant_table *table) {
 
 */
 static char *
-munge_label_id(char *label_id, int is_declaration) {
+munge_label_id(char *label_id, int is_declaration, lexer_state *lexer) {
     /* the format of the generated label: */
     char const * const format = "_gen_label_%s_%s%s";
     int const format_length   = strlen(format);
 
-    int length = format_length + strlen(label_id) + strlen(macro_id);
+    int length = format_length + strlen(label_id) + strlen(lexer->macro_id);
     char *munged_id = NULL;
 
     if (is_declaration)
@@ -2196,7 +2206,7 @@ munge_label_id(char *label_id, int is_declaration) {
     munged_id = (char *)calloc(length + 1, sizeof (char));
     assert(munged_id != NULL);
     /* generate the label; if it's a declaration, then add the colon. */
-    sprintf(munged_id, format, macro_id, label_id, is_declaration ? ":" : "");
+    sprintf(munged_id, format, lexer->macro_id, label_id, is_declaration ? ":" : "");
     return munged_id;
 }
 
@@ -2213,15 +2223,16 @@ buffer is parsed. Afterwards the yyscan_t object is destroyed.
 
 */
 void
-process_string(char *buffer) {
+process_string(char *buffer, lexer_state *lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
     macrolex_init(&yyscanner);
-    macroset_debug(flexdebug, yyscanner);
+    macroset_debug(lexer->flexdebug, yyscanner);
+    macroset_extra(lexer, yyscanner);
     assert(buffer != NULL);
     /* set the scanner to a string buffer and go parse */
     macro_scan_string(buffer, yyscanner);
-    yyparse(yyscanner);
+    yyparse(yyscanner, lexer);
     /* clean up after playing */
     macrolex_destroy(yyscanner);
 
@@ -2237,7 +2248,7 @@ Process the specified file.
 
 */
 void
-process_file(char *filename) {
+process_file(char *filename, lexer_state *lexer) {
     FILE *fp = NULL;
     yyscan_t yyscanner;
 
@@ -2245,22 +2256,17 @@ process_file(char *filename) {
     fp = fopen(filename, "r");
 
     if (fp == NULL) {
-        /* wrap the filename in quotes again */
-        char *buff = (char *)calloc(strlen(filename) + 3, sizeof (char));
-        assert(buff != NULL);
-        sprintf(buff, "'%s'", filename);
         fprintf(stderr, "Failed to open file %s\n", filename);
-        emit(".include");
-        emit(buff);
-        free(buff);
     }
     else {
         /* construct a yylex_t object */
         macrolex_init(&yyscanner);
         macroset_in(fp, yyscanner);
-        macroset_debug(flexdebug, yyscanner);
+        macroset_debug(lexer->flexdebug, yyscanner);
+        macroset_extra(lexer, yyscanner);
+
         /* go parse the file */
-        yyparse(yyscanner);
+        yyparse(yyscanner, lexer);
         /* and clean up */
         macrolex_destroy(yyscanner);
     }
@@ -2276,15 +2282,12 @@ Function for syntax error handling.
 
 */
 int
-yyerror(yyscan_t yyscanner, char *message) {
-    extern int line;
-
-    /* this needs to be stored in a structure representing the current file or macro. */
+yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message) {
 
     fprintf(stderr, "yyerror: %s\n", message);
     fprintf(stderr, "token: '%s'\n", macroget_text(yyscanner));
-    fprintf(stderr, "Line: %d\n", line);
-    errors++;
+    fprintf(stderr, "Line: %d\n", lexer->line);
+    lexer->errors++;
     return 0;
 }
 
@@ -2300,6 +2303,8 @@ Pre-processor main function.
 */
 int
 main(int argc, char *argv[]) {
+    lexer_state *lexer = NULL;
+
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <files>\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -2308,6 +2313,9 @@ main(int argc, char *argv[]) {
     /* skip program name */
     argc--;
     argv++;
+
+
+    lexer = (lexer_state *)malloc(sizeof (lexer_state));
 
         /* very basic argument handling; I'm too lazy to check out
      * the standard funtion for that, right now. This is a TODO. */
@@ -2320,7 +2328,7 @@ main(int argc, char *argv[]) {
                 break;
 #endif
             case 'f':
-                flexdebug = 1;
+                lexer->flexdebug = 1;
                 break;
             case 'h':
                 /* */
@@ -2335,18 +2343,22 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    /* set up the global constant table */
-    globaldefinitions = new_constant_table(NULL);
+    lexer->line = 1;
+    lexer->errors = 0;
+    lexer->macro_id = NULL;
+    lexer->globaldefinitions = new_constant_table(NULL, lexer);
+
+
 
     /* process all files specified on the command line */
     while (argc > 0) {
-        process_file(argv[0]);
+        process_file(argv[0], lexer);
 
         argc--;
         argv++;
     }
-    if (errors > 0)
-        fprintf(stderr, "There were %d error(s)\n", errors);
+    if (lexer->errors > 0)
+        fprintf(stderr, "There were %d error(s)\n", lexer->errors);
 
 
     return 0;

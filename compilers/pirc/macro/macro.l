@@ -22,13 +22,13 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "macro.h"
+#include "lexer.h"
 
 #define  YY_NO_UNISTD_H
 #include "macroparser.h"
 
+#define YY_EXTRA_TYPE  struct lexer_state *
 
-extern char *yyget_text(yyscan_t yyscanner);
-extern int   yyerror(yyscan_t yyscanner, char *message);
 
 extern macro_def *find_macro(constant_table *table, char *name);
 extern char *concat(char *str1, char *str2);
@@ -66,23 +66,33 @@ dupstrn(char const * const source, size_t num_chars) {
     return newstring;
 }
 
-int ctr[YY_NUM_RULES];
+/*
 
+Update location information. Handling of heredocs is buggy w.r.t. line no.
+Fix this routine.
+
+*/
+static void
+update_location(char *scanned_string, lexer_state *lexer) {
+    char *iter = scanned_string;
+    while (*iter != '\0') {
+        if (*iter == '\n')
+            lexer->line++;
+        iter++;
+    }
+}
+
+
+/*
+Use these on a big file with macros, and check out whether there are unused rules.
+*/
+int ctr[YY_NUM_RULES];
 int num_rules = YY_NUM_RULES;
 
-int line = 1;
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
 #define YY_USER_ACTION   { ++ctr[yy_act];             \
-                         do {                         \
-                              char *iter = yytext;    \
-                              while (*iter != '\0') { \
-                                  if (*iter == '\n')  \
-                                      line++;         \
-                                  iter++;             \
-                              }                       \
-                         }                            \
-                         while (0);                   \
+                           update_location(yytext, yyget_extra(yyscanner)); \
                          }
 
 
@@ -166,6 +176,11 @@ REG            "$"?[SNIP]{DIGITS}
                      }
 
 <CONSTDEF>{NEWLINE} { yy_pop_state(yyscanner);
+                      yylval->sval = "\n";
+                      return TK_NL;
+                    }
+
+<LINE>{NEWLINE}     { yy_pop_state(yyscanner);
                       yylval->sval = "\n";
                       return TK_NL;
                     }
@@ -285,8 +300,8 @@ REG            "$"?[SNIP]{DIGITS}
                           return TK_ANY;
                       }
                       else { /* not a directive */
-                          extern constant_table *globaldefinitions;
-                          macro_def *macro = find_macro(globaldefinitions, yytext + 1); /* skip dot */
+                          lexer_state *lexer = yyget_extra(yyscanner);
+                          macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1); /* skip dot */
                           if (macro != NULL) { /* it's a macro! */
                               /* only go into EXPAND state if it's a macro/constant */
                               yy_push_state(EXPAND, yyscanner);
@@ -306,6 +321,22 @@ REG            "$"?[SNIP]{DIGITS}
                         */
                        yylval->sval = dupstr(yytext);
                        return TK_ANY;
+                      }
+
+<LINE>","       { return ','; }
+
+
+
+<LINE>{DIGITS}  { /* when defining a constant, after reading the value, leave this state */
+                           yylval->sval = dupstr(yytext);
+                           /*yy_pop_state(yyscanner);*/
+                           return TK_INTC;
+                         }
+
+
+
+<LINE>{Q_STRING}      { yylval->sval = dupstr(yytext);
+                        return TK_STRINGC;
                       }
 
 <*>","                { /* in all other cases (than the above), treat a comma just as any token. */
@@ -343,12 +374,6 @@ REG            "$"?[SNIP]{DIGITS}
                                 yy_pop_state(yyscanner);
                                 return TK_STRINGC;
                               }
-
-<LINE>{DIGITS}  { /* when defining a constant, after reading the value, leave this state */
-                           yylval->sval = dupstr(yytext);
-                           yy_pop_state(yyscanner);
-                           return TK_INTC;
-                         }
 
 
 <EXPARGS>{Q_STRING}   { /* quoted strings argument for macro expansion */
@@ -452,6 +477,11 @@ Returns a non-zero value if the specified name is a PIR directive.
 static int
 is_pir_directive(char *name) {
 
+    /* maybe make this a hash or at least a binary search.
+     * Or, make these "special" macros, and have them expand
+     * to their own spelling. This would remove the need
+     * for special code, such as this.
+     */
     static char * const directives[] = {
         ".arg",
         ".begin_call",
