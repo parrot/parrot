@@ -854,27 +854,8 @@ sub _op_set_cdr_bang {
 
 sub _op_null_p {
     my ( $self, $node ) = @_;
-
-    $self->_add_comment( 'start of _op_null_p()' );
-
-    _check_num_args( $node, 1, 'null?' );
-
-    my $return = $self->_constant('#t');
-    my $temp_s = $self->_save_1('S');
-    my $label  = $self->_gensym();
-
-    my $temp = $self->_generate( _get_arg( $node, 1 ) );
-    $self->_add_inst( '', 'typeof', [ $temp_s, $temp ] );
-    $self->_add_inst( '', 'ne',     [ $temp_s, q{'Undef'}, "FAIL_$label" ] );
-    $self->_add_inst( '', 'set',    [ $return, 1 ] );
-    $self->_add_inst( '', 'branch', ["DONE_$label"] );
-    $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
-    $self->_add_inst("DONE_$label");
-    $self->_restore($temp);
-
-    $self->_add_comment( 'end of _op_null_p()' );
-
-    return $return;
+    
+    return $self->_type_predicate( 'null?', $node ); 
 }
 
 sub _op_list_p {
@@ -2198,6 +2179,7 @@ sub _type_predicate {
 
     my %types = (
         'boolean?' => [ qw( Boolean ) ],
+        'null?'    => [ qw( Undef ) ],
         'number?'  => [ qw( Integer Float Complex ) ],
         'string?'  => [ qw( String ) ],
     );
