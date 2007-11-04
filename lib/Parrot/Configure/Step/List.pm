@@ -58,8 +58,8 @@ my @steps = qw(
     auto::m4
     auto::ctags
     auto::cpu
+    auto::revision
     gen::icu
-    gen::revision
     gen::config_h
     gen::core_pmcs
     gen::parrot_include

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/gen/revision.pm - Parrot's configure revision
+config/auto/revision.pm - Parrot's configure revision
 
 =head1 DESCRIPTION
 
@@ -12,7 +12,7 @@ so this field is empty.
 
 =cut
 
-package gen::revision;
+package auto::revision;
 
 use strict;
 use warnings;

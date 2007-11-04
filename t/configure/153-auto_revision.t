@@ -1,23 +1,14 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 153-gen_revision.t
+# 153-auto_revision.t
 
 use strict;
 use warnings;
 use Test::More tests =>  2;
 use Carp;
 use lib qw( lib );
-use_ok('config::gen::revision');
-
-=for hints_for_testing See also:
-t/configure/017-revision_no_DEVELOPING.t
-t/configure/018-revision.t
-t/configure/153-gen_revision.t
-t/postconfigure/02-revision_no_DEVELOPING.t
-t/postconfigure/03-revision.t
-
-=cut
+use_ok('config::auto::revision');
 
 pass("Completed all tests in $0");
 
@@ -25,17 +16,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-153-gen_revision.t - test config::gen::revision
+153-auto_revision.t - test config::auto::revision
 
 =head1 SYNOPSIS
 
-    % prove t/configure/153-gen_revision.t
+    % prove t/configure/153-auto_revision.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::gen::revision.
+The tests in this file test subroutines exported by config::auto::revision.
 
 =head1 AUTHOR
 
@@ -43,7 +34,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::gen::revision, F<Configure.pl>.
+config::auto::revision, F<Configure.pl>.
 
 =cut
 
