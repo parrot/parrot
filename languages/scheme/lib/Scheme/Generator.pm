@@ -218,10 +218,13 @@ sub _new_pair {
 sub _constant {
     my ( $self, $value ) = @_;
 
-    $self->_add_comment( 'start of _constant' );
-    my ( $reg_type, $pmc_type );
+    $self->_add_comment( 'start of _constant()' );
+    my ( $pmc_type );
 
-    if ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                        # an integer
+    if    ( ! defined $value ) {                                                     # an empty list
+        $pmc_type = 'Undef';
+    }
+    elsif ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                     # an integer
         $pmc_type = 'Integer';
     }
     elsif ( $value =~ m/ \A [-+]?((\d+\.\d*) | (\.d+)) ([eE][-+]?\d+)? \z/xms ) {    # a float
@@ -240,17 +243,11 @@ sub _constant {
     }
     
     my $return;
-    if ( $pmc_type ) {
-        $return = $self->_save_1( 'P' );
-        $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
-        $self->_add_inst( '', 'set', [ $return, $value ] );
-    }
-    else {
-        $return = $self->_save_1( $reg_type );
-        $self->_add_inst( '', 'set', [ $return, $value ] );
-    }
+    $return = $self->_save_1( 'P' );
+    $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
+    $self->_add_inst( '', 'set', [ $return, $value ] ) if defined $value;
 
-    $self->_add_comment( 'end of _constant' );
+    $self->_add_comment( "returning $return from _constant()" );
 
     return $return;
 }
@@ -281,7 +278,10 @@ sub __quoted {
 
     if ( exists $node->{value} ) {
         my $value = $node->{value};
-        if ( $value =~ m/ \A [-+]? \d+ \z/xms ) {
+        if    ( ! defined $value ) {
+            $self->_add_inst( '', 'new', [ $return, q{'Undef'} ] );
+        }
+        elsif ( $value =~ m/ \A [-+]? \d+ \z/xms ) {
             $self->_add_inst( '', 'new', [ $return, q{'Integer'} ] );
             $self->_add_inst( '', 'set', [ $return, $value ] );
         }
@@ -885,8 +885,7 @@ sub _op_list {
 
     $self->_add_comment( 'start of _op_list()' );
 
-    my $ret_reg = $self->_save_1('P');   # need a single register
-    $self->_add_inst( '', new => [ $ret_reg, q{'Undef'} ] );
+    my $return = $self->_constant(undef);
 
     # build up the list in reverse order
     foreach ( reverse _get_args($node) ) {
@@ -896,15 +895,15 @@ sub _op_list {
         $self->_add_inst( '', 'new', [ $pair,         q{'Array'} ] );
         $self->_add_inst( '', 'set', [ $pair,         2 ] );
         $self->_add_inst( '', 'set', [ $pair . '[0]', $item ] );
-        $self->_add_inst( '', 'set', [ $pair . '[1]', $ret_reg ] );
-        $self->_add_inst( '', 'set', [ $ret_reg,       $pair ] );
+        $self->_add_inst( '', 'set', [ $pair . '[1]', $return ] );
+        $self->_add_inst( '', 'set', [ $return,       $pair ] );
 
         $self->_restore( $item, $pair );
     }
 
-    $self->_add_comment( 'end of _op_list()' );
+    $self->_add_comment( "returning $return from _op_list()" );
 
-    return $ret_reg;
+    return $return;
 }
 
 sub _op_length {
@@ -2283,14 +2282,12 @@ sub _generate {
             $self->_restore(@args);
         }
     }
+    elsif (    defined $node->{value}
+            && $node->{value} =~ m/ \A [a-zA-Z] /xms ) {
+        $return = $self->_find_lex( $node->{value} );
+    }
     else {
-        my $value = $node->{value};
-        if ( $value =~ m/ \A [a-zA-Z] /xms ) {
-            $return = $self->_find_lex($value);
-        }
-        else {
-            $return = $self->_constant( $node->{value} );
-        }
+        $return = $self->_constant( $node->{value} );
     }
 
     return $return;

@@ -19,16 +19,21 @@ sub _build_tree {
     die "EOF reached" if $count > $#$tokens;
 
     if ( $tokens->[$count] eq '(' ) {
-        my $tree = { children => []
-                   };
         $count++;                                   # consume the '('
+        my @children;
         while ( $tokens->[$count] ne ')' ) {
             ( $count, my $expr ) = _build_tree( $tokens, $count );
-            push @{ $tree->{children} }, $expr;
+            push @children, $expr;
         }
         $count++;                                   # consume the ')'
 
-        return ( $count, $tree );
+        if ( ! @children ) {
+            # special case: empty list
+            return ( $count, { value => undef } );
+        }
+        else {
+            return ( $count, { children => \@children } );
+        }
     } 
 
     my %function = (
