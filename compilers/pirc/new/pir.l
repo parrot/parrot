@@ -289,8 +289,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ">>="       { return TK_ASSIGN_RSHIFT; }
 ">>"        { return TK_RSHIFT; }
 "<<"        { return TK_LSHIFT; }
-
-".."        { return TK_DOTDOT; }
 "=>"        { return TK_ARROW; }
 "=="        { return TK_EQ; }
 "!="        { return TK_NE; }
@@ -440,8 +438,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
        }
 
 
-<<EOF>>     {
-             yyterminate();
+<<EOF>>     { /* end of file, stop scanning. */
+              yyterminate();
             }
 
 %%

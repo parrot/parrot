@@ -64,7 +64,6 @@ extern YY_DECL;
 
 
 %token TK_LABEL         "label"
-       TK_DOTDOT        ".."
        TK_NL            "\n"
 
 %token TK_HLL           ".HLL"
@@ -447,9 +446,6 @@ keys: key
     ;
 
 key: expression
-   | expression ".."
-   | expression ".." expression
-   | ".." expression
    ;
 
 separator: ';'
