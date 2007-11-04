@@ -242,8 +242,7 @@ sub _constant {
         $value    = 0;
     }
     
-    my $return;
-    $return = $self->_save_1( 'P' );
+    my $return = $self->_save_1( 'P' );
     $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
     $self->_add_inst( '', 'set', [ $return, $value ] ) if defined $value;
 
@@ -754,28 +753,8 @@ sub _op_equal_p {
 
 sub _op_pair_p {
     my ( $self, $node ) = @_;
-
-    $self->_add_comment( 'start of _op_pair_p()' );
-
-    my $label = $self->_gensym();
-
-    _check_num_args( $node, 1, 'pair?' );
-
-    my $item = $self->_generate( _get_arg( $node, 1 ) );
-
-    my $return = $self->_constant('#t');
-
-    my $tmp_s = $self->_save_1('S');
-    $self->_add_inst( '',            'typeof', [ $tmp_s, $item ] );
-    $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Array'}, "FAIL_$label" ] );
-    $self->_add_inst( '',            'set',    [ $return, 1 ] );
-    $self->_add_inst( '',            'branch', ["DONE_$label"] );
-    $self->_add_inst( "FAIL_$label", 'set', [ $return, 0 ] );
-    $self->_add_inst("DONE_$label");
-
-    $self->_add_comment( 'end of _op_pair_p()' );
-
-    return $return;
+    
+    return $self->_type_predicate( 'pair?', $node ); 
 }
 
 sub _op_cons {
@@ -2181,25 +2160,22 @@ sub _type_predicate {
         'boolean?' => [ qw( Boolean ) ],
         'null?'    => [ qw( Undef ) ],
         'number?'  => [ qw( Integer Float Complex ) ],
+        'pair?'    => [ qw( Array ) ],
         'string?'  => [ qw( String ) ],
     );
 
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $item = $self->_generate( _get_arg( $node, 1 ) );
-    if ( $item =~ m/ \A P /xms )
-    {
-        my $temp_s = $self->_save_1('S');
-        $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
-        foreach ( @{ $types{$form} } ) {
-            $self->_add_inst( '', 'eq', [ $temp_s, qq{'$_'}, "TRUE_$label" ] );
-        }
-        $self->_add_inst( '', 'branch', [ "FAIL_$label" ] );
-        $self->_add_inst( "TRUE_$label", 'set', [ $return, 1 ] );
-        $self->_add_inst("FAIL_$label");
+    my $item   = $self->_generate( _get_arg( $node, 1 ) );
+    my $temp_s = $self->_save_1('S');
+    $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
+    foreach ( @{ $types{$form} } ) {
+        $self->_add_inst( '', 'eq', [ $temp_s, qq{'$_'}, "TRUE_$label" ] );
     }
-
+    $self->_add_inst( '', 'branch', [ "FAIL_$label" ] );
+    $self->_add_inst( "TRUE_$label", 'set', [ $return, 1 ] );
+    $self->_add_inst("FAIL_$label");
     $self->_add_comment( "returning $return from _op_$form()" );
 
     return $return;

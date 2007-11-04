@@ -92,7 +92,7 @@ CODE
                                 '#t'
                                 :
                                 '#f';
-                language_output_is( 'Scheme', $code, $expected, $code );
+                language_output_is( 'Scheme', $code, $expected, "expected_type: $code" );
 
                 $code     = qq{ (write (if ($predicate? $object) "true" "false")) };
                 $expected = $predicate eq $expected_type ?
