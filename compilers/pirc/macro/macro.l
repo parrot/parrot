@@ -198,6 +198,20 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_MACRO;
                     }
 
+<MACROBODY>".label" { /* */
+                      return TK_LABEL;
+                    }
+
+<MACROBODY>"$"{IDENT}":" { /* label declaration */
+                           yylval->sval = dupstrn(yytext + 1, yyleng - 2);
+                           return TK_LABEL_ID;
+                         }
+
+<MACROBODY>".$"{IDENT}   { /* referring to a declared label */
+                           yylval->sval = dupstr(yytext + 2);
+                           return TK_LABEL_EXP;
+                         }
+
 <MACROBODY>".endm" { /* when reading ".endm" while scanning macro body, go back to previous state */
 
                      yy_pop_state(yyscanner);

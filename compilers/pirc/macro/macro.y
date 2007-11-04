@@ -37,7 +37,7 @@ extern int yyerror(yyscan_t yyscanner, char *message);
 constant_table *globaldefinitions;
 static int errors    = 0;
 static int flexdebug = 0;
-
+static char *macro_id = NULL;
 
 static void  process_file(char *filename);
 static void  process_string(char *buffer);
@@ -48,6 +48,8 @@ static void  define_macro(constant_table *table, char *name, list *parameters, c
 static void  emit(char *str);
 static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
+
+static char *munge_label_id(char *label_id, int is_declaration);
 
 static constant_table *new_constant_table(constant_table *current);
 static constant_table *pop_constant_table(void);
@@ -76,17 +78,20 @@ char *concat(char *str1, char *str2);
        TK_INCLUDE           ".include"
        TK_MACRO_CONST       ".macro_const"
        TK_LINE              ".line"
+       TK_LABEL             ".label"
 
 %token <sval> TK_IDENT      "identifier"
        <sval> TK_ANY        "any token"
        <sval> TK_BODY       "macro body"
        <mval> TK_DOT_IDENT  ".identifier"
+       <sval> TK_LABEL_EXP  ".$LABEL"
+       <sval> TK_LABEL_ID   "$LABEL:"
 
 %token <sval> TK_STRINGC    "string constant"
        <sval> TK_NUMC       "number constant"
        <sval> TK_INTC       "integer constant"
 
-%type <sval> expression macro_body opt_macro_body arg
+%type <sval> expression macro_body opt_macro_body arg body_token
 %type <lval> arguments opt_arg_list arg_list parameters opt_param_list param_list
 
 
@@ -164,18 +169,25 @@ macro_const_definition: ".macro_const" TK_IDENT expression
 
 
 
-macro_definition: ".macro" TK_IDENT parameters "\n"
+macro_definition: ".macro" TK_IDENT
+                { /* store the id as the current macro */ macro_id = $2; }
+                  parameters "\n"
                   opt_macro_body
                   ".endm"
-                { define_macro(globaldefinitions, $2, $3, $5); }
+                { define_macro(globaldefinitions, $2, $4, $6); }
                 ;
 
 opt_macro_body: /* empty, make sure the macro body is a valid string. */ { $$ = ""; }
               | macro_body  { $$ = $1;   }
               ;
 
-macro_body: TK_ANY               { $$ = $1; }
-          | macro_body TK_ANY    { $$ = concat($1, $2); }
+macro_body: body_token               { $$ = $1; }
+          | macro_body body_token    { $$ = concat($1, $2); }
+          ;
+
+body_token: TK_ANY                   { $$ = $1; }
+          | ".label" TK_LABEL_ID     { $$ = munge_label_id($2, 1); }
+          | TK_LABEL_EXP             { $$ = munge_label_id($1, 0); }
           ;
 
 parameters: /* empty */            { $$ = NULL; }
@@ -559,6 +571,34 @@ delete_constant_table(constant_table *table) {
     }
     free(table);
 }
+
+
+/*
+
+=item C<munge_label_id>
+
+=cut
+
+*/
+static char *
+munge_label_id(char *label_id, int is_declaration) {
+    /* the format of the generated label: */
+    char const * const format = "_gen_label_%s_%s%s";
+    int const format_length   = strlen(format);
+
+    int length = format_length + strlen(label_id) + strlen(macro_id);
+    char *munged_id = NULL;
+
+    if (is_declaration)
+        length++; /* reserve 1 more byte for the ":" */
+
+    munged_id = (char *)calloc(length + 1, sizeof (char));
+    assert(munged_id != NULL);
+    /* generate the label; if it's a declaration, then add the colon. */
+    sprintf(munged_id, format, macro_id, label_id, is_declaration ? ":" : "");
+    return munged_id;
+}
+
 
 /*
 

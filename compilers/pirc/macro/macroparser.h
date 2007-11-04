@@ -45,13 +45,16 @@
      TK_INCLUDE = 261,
      TK_MACRO_CONST = 262,
      TK_LINE = 263,
-     TK_IDENT = 264,
-     TK_ANY = 265,
-     TK_BODY = 266,
-     TK_DOT_IDENT = 267,
-     TK_STRINGC = 268,
-     TK_NUMC = 269,
-     TK_INTC = 270
+     TK_LABEL = 264,
+     TK_IDENT = 265,
+     TK_ANY = 266,
+     TK_BODY = 267,
+     TK_DOT_IDENT = 268,
+     TK_LABEL_EXP = 269,
+     TK_LABEL_ID = 270,
+     TK_STRINGC = 271,
+     TK_NUMC = 272,
+     TK_INTC = 273
    };
 #endif
 /* Tokens.  */
@@ -61,20 +64,23 @@
 #define TK_INCLUDE 261
 #define TK_MACRO_CONST 262
 #define TK_LINE 263
-#define TK_IDENT 264
-#define TK_ANY 265
-#define TK_BODY 266
-#define TK_DOT_IDENT 267
-#define TK_STRINGC 268
-#define TK_NUMC 269
-#define TK_INTC 270
+#define TK_LABEL 264
+#define TK_IDENT 265
+#define TK_ANY 266
+#define TK_BODY 267
+#define TK_DOT_IDENT 268
+#define TK_LABEL_EXP 269
+#define TK_LABEL_ID 270
+#define TK_STRINGC 271
+#define TK_NUMC 272
+#define TK_INTC 273
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 62 "macro.y"
+#line 64 "macro.y"
 {
     char  *sval;
     int    ival;
@@ -85,7 +91,7 @@ typedef union YYSTYPE
 
 }
 /* Line 1489 of yacc.c.  */
-#line 89 "macroparser.h"
+#line 95 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
