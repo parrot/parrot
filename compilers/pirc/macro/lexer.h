@@ -13,6 +13,7 @@ typedef struct lexer_state {
     int flexdebug;
     char *macro_id;
     int line;
+    char *currentfile;
 
 } lexer_state;
 

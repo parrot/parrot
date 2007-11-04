@@ -196,15 +196,12 @@ typedef union YYSTYPE
 #line 59 "macro.y"
 {
     char  *sval;
-    int    ival;
-    double nval;
-    char   cval;
     struct list *lval;
     struct macro_def *mval;
 
 }
 /* Line 187 of yacc.c.  */
-#line 208 "macroparser.c"
+#line 205 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -217,7 +214,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 221 "macroparser.c"
+#line 218 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -515,11 +512,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   117,   117,   118,   121,   122,   125,   126,   130,   139,
-     140,   141,   142,   143,   146,   152,   153,   161,   162,   165,
-     166,   170,   174,   181,   180,   188,   189,   192,   193,   196,
-     197,   198,   201,   202,   205,   206,   209,   210,   213,   214,
-     217,   218,   221,   222,   225,   230,   231,   232,   233
+       0,   114,   114,   115,   118,   119,   122,   123,   127,   136,
+     137,   138,   139,   140,   143,   149,   150,   158,   159,   162,
+     163,   167,   171,   178,   177,   185,   186,   189,   190,   193,
+     194,   195,   198,   199,   202,   203,   206,   207,   210,   211,
+     214,   215,   218,   219,   222,   227,   228,   229,   230
 };
 #endif
 
@@ -1477,21 +1474,21 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 131 "macro.y"
+#line 128 "macro.y"
     { /* after each statement, emit a newline */
          emit("\n");
        ;}
     break;
 
   case 14:
-#line 147 "macro.y"
+#line 144 "macro.y"
     { emit("setline");
                   emit((yyvsp[(2) - (3)].sval));
                 ;}
     break;
 
   case 16:
-#line 154 "macro.y"
+#line 151 "macro.y"
     { emit("setfile");
                 emit((yyvsp[(2) - (2)].sval));
                 emit("\n");
@@ -1499,133 +1496,133 @@ yyreduce:
     break;
 
   case 19:
-#line 165 "macro.y"
+#line 162 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 166 "macro.y"
+#line 163 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 171 "macro.y"
+#line 168 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 22:
-#line 175 "macro.y"
+#line 172 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 23:
-#line 181 "macro.y"
+#line 178 "macro.y"
     { /* store the id as the current macro */ lexer->macro_id = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 24:
-#line 185 "macro.y"
+#line 182 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (7)].sval), (yyvsp[(4) - (7)].lval), (yyvsp[(6) - (7)].sval)); ;}
     break;
 
   case 25:
-#line 188 "macro.y"
+#line 185 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 26:
-#line 189 "macro.y"
+#line 186 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 27:
-#line 192 "macro.y"
+#line 189 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 28:
-#line 193 "macro.y"
+#line 190 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 29:
-#line 196 "macro.y"
+#line 193 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 30:
-#line 197 "macro.y"
+#line 194 "macro.y"
     { (yyval.sval) = munge_label_id((yyvsp[(2) - (2)].sval), 1, lexer); ;}
     break;
 
   case 31:
-#line 198 "macro.y"
+#line 195 "macro.y"
     { (yyval.sval) = munge_label_id((yyvsp[(1) - (1)].sval), 0, lexer); ;}
     break;
 
   case 32:
-#line 201 "macro.y"
+#line 198 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 33:
-#line 202 "macro.y"
+#line 199 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 34:
-#line 205 "macro.y"
+#line 202 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 35:
-#line 206 "macro.y"
+#line 203 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 36:
-#line 209 "macro.y"
+#line 206 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 37:
-#line 210 "macro.y"
+#line 207 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 38:
-#line 213 "macro.y"
+#line 210 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 39:
-#line 214 "macro.y"
+#line 211 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 40:
-#line 217 "macro.y"
+#line 214 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 41:
-#line 218 "macro.y"
+#line 215 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 42:
-#line 221 "macro.y"
+#line 218 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 43:
-#line 222 "macro.y"
+#line 219 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1629 "macroparser.c"
+#line 1626 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1839,7 +1836,7 @@ yyreturn:
 }
 
 
-#line 238 "macro.y"
+#line 235 "macro.y"
 
 
 
@@ -2131,6 +2128,12 @@ emit(char *str) {
 
 }
 
+void
+emit_int(int val) {
+    FILE *output = stdout;
+    fprintf(output, "%d ", val);
+}
+
 /*
 
 =item C<new_constant_table>
@@ -2226,6 +2229,8 @@ void
 process_string(char *buffer, lexer_state *lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
+
+
     macrolex_init(&yyscanner);
     macroset_debug(lexer->flexdebug, yyscanner);
     macroset_extra(lexer, yyscanner);
@@ -2235,6 +2240,8 @@ process_string(char *buffer, lexer_state *lexer) {
     yyparse(yyscanner, lexer);
     /* clean up after playing */
     macrolex_destroy(yyscanner);
+
+
 
 }
 
@@ -2259,16 +2266,41 @@ process_file(char *filename, lexer_state *lexer) {
         fprintf(stderr, "Failed to open file %s\n", filename);
     }
     else {
+        /* save current state of lexer, these are overwritten, so that
+         * error messages indicate an error in the string (macro body).
+         */
+        int temp_line   = lexer->line;
+        char *temp_file = lexer->currentfile;
+
         /* construct a yylex_t object */
         macrolex_init(&yyscanner);
         macroset_in(fp, yyscanner);
         macroset_debug(lexer->flexdebug, yyscanner);
         macroset_extra(lexer, yyscanner);
 
+        /* emit directives that set the file/line */
+/* they must be within compilation unit; this doesn't happen right now...
+        emit("setfile");
+        emit(filename);
+        emit("setline");
+        emit_int(1);
+*/
+
         /* go parse the file */
         yyparse(yyscanner, lexer);
         /* and clean up */
         macrolex_destroy(yyscanner);
+
+/*
+        emit("setfile");
+        emit(temp_file);
+        emit("setline");
+        emit_int(temp_line);
+*/
+
+        /* restore state of lexer */
+        lexer->line        = temp_line;
+        lexer->currentfile = temp_file;
     }
 }
 
@@ -2283,10 +2315,7 @@ Function for syntax error handling.
 */
 int
 yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message) {
-
-    fprintf(stderr, "yyerror: %s\n", message);
-    fprintf(stderr, "token: '%s'\n", macroget_text(yyscanner));
-    fprintf(stderr, "Line: %d\n", lexer->line);
+    fprintf(stderr, "Error in '%s' (line %d): %s\n", lexer->currentfile, lexer->line, message);
     lexer->errors++;
     return 0;
 }
@@ -2316,9 +2345,17 @@ main(int argc, char *argv[]) {
 
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
+    assert(lexer != NULL);
+    lexer->line = 1;
+    lexer->errors = 0;
+    lexer->flexdebug = 0;
+    lexer->macro_id = NULL;
+    lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
-        /* very basic argument handling; I'm too lazy to check out
-     * the standard funtion for that, right now. This is a TODO. */
+
+    /* very basic argument handling; I'm too lazy to check out
+     * the standard funtion for that, right now. This is a TODO.
+     */
     while (argc > 0 && argv[0][0] == '-') {
         switch (argv[0][1]) {
             /* Only allow for debug flag if the generated parser supports it */
@@ -2343,23 +2380,25 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    lexer->line = 1;
-    lexer->errors = 0;
-    lexer->macro_id = NULL;
-    lexer->globaldefinitions = new_constant_table(NULL, lexer);
+
 
 
 
     /* process all files specified on the command line */
     while (argc > 0) {
+        lexer->currentfile = argv[0]; /* set the filename in the lexer structure */
         process_file(argv[0], lexer);
 
-        argc--;
+        argc--; /* go to next command line argument */
         argv++;
     }
     if (lexer->errors > 0)
         fprintf(stderr, "There were %d error(s)\n", lexer->errors);
 
+
+    /* clean up and go home */
+    delete_constant_table(lexer->globaldefinitions);
+    free(lexer);
 
     return 0;
 }

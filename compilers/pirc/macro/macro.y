@@ -58,9 +58,6 @@ char *concat(char *str1, char *str2);
 
 %union {
     char  *sval;
-    int    ival;
-    double nval;
-    char   cval;
     struct list *lval;
     struct macro_def *mval;
 
@@ -526,6 +523,12 @@ emit(char *str) {
 
 }
 
+void
+emit_int(int val) {
+    FILE *output = stdout;
+    fprintf(output, "%d ", val);
+}
+
 /*
 
 =item C<new_constant_table>
@@ -621,6 +624,8 @@ void
 process_string(char *buffer, lexer_state *lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
+
+
     macrolex_init(&yyscanner);
     macroset_debug(lexer->flexdebug, yyscanner);
     macroset_extra(lexer, yyscanner);
@@ -630,6 +635,8 @@ process_string(char *buffer, lexer_state *lexer) {
     yyparse(yyscanner, lexer);
     /* clean up after playing */
     macrolex_destroy(yyscanner);
+
+
 
 }
 
@@ -654,16 +661,41 @@ process_file(char *filename, lexer_state *lexer) {
         fprintf(stderr, "Failed to open file %s\n", filename);
     }
     else {
+        /* save current state of lexer, these are overwritten, so that
+         * error messages indicate an error in the string (macro body).
+         */
+        int temp_line   = lexer->line;
+        char *temp_file = lexer->currentfile;
+
         /* construct a yylex_t object */
         macrolex_init(&yyscanner);
         macroset_in(fp, yyscanner);
         macroset_debug(lexer->flexdebug, yyscanner);
         macroset_extra(lexer, yyscanner);
 
+        /* emit directives that set the file/line */
+/* they must be within compilation unit; this doesn't happen right now...
+        emit("setfile");
+        emit(filename);
+        emit("setline");
+        emit_int(1);
+*/
+
         /* go parse the file */
         yyparse(yyscanner, lexer);
         /* and clean up */
         macrolex_destroy(yyscanner);
+
+/*
+        emit("setfile");
+        emit(temp_file);
+        emit("setline");
+        emit_int(temp_line);
+*/
+
+        /* restore state of lexer */
+        lexer->line        = temp_line;
+        lexer->currentfile = temp_file;
     }
 }
 
@@ -678,10 +710,7 @@ Function for syntax error handling.
 */
 int
 yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message) {
-
-    fprintf(stderr, "yyerror: %s\n", message);
-    fprintf(stderr, "token: '%s'\n", macroget_text(yyscanner));
-    fprintf(stderr, "Line: %d\n", lexer->line);
+    fprintf(stderr, "Error in '%s' (line %d): %s\n", lexer->currentfile, lexer->line, message);
     lexer->errors++;
     return 0;
 }
@@ -711,9 +740,17 @@ main(int argc, char *argv[]) {
 
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
+    assert(lexer != NULL);
+    lexer->line = 1;
+    lexer->errors = 0;
+    lexer->flexdebug = 0;
+    lexer->macro_id = NULL;
+    lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
-        /* very basic argument handling; I'm too lazy to check out
-     * the standard funtion for that, right now. This is a TODO. */
+
+    /* very basic argument handling; I'm too lazy to check out
+     * the standard funtion for that, right now. This is a TODO.
+     */
     while (argc > 0 && argv[0][0] == '-') {
         switch (argv[0][1]) {
             /* Only allow for debug flag if the generated parser supports it */
@@ -738,23 +775,25 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    lexer->line = 1;
-    lexer->errors = 0;
-    lexer->macro_id = NULL;
-    lexer->globaldefinitions = new_constant_table(NULL, lexer);
+
 
 
 
     /* process all files specified on the command line */
     while (argc > 0) {
+        lexer->currentfile = argv[0]; /* set the filename in the lexer structure */
         process_file(argv[0], lexer);
 
-        argc--;
+        argc--; /* go to next command line argument */
         argv++;
     }
     if (lexer->errors > 0)
         fprintf(stderr, "There were %d error(s)\n", lexer->errors);
 
+
+    /* clean up and go home */
+    delete_constant_table(lexer->globaldefinitions);
+    free(lexer);
 
     return 0;
 }

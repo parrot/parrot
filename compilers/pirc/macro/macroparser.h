@@ -83,15 +83,12 @@ typedef union YYSTYPE
 #line 59 "macro.y"
 {
     char  *sval;
-    int    ival;
-    double nval;
-    char   cval;
     struct list *lval;
     struct macro_def *mval;
 
 }
 /* Line 1489 of yacc.c.  */
-#line 95 "macroparser.h"
+#line 92 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
