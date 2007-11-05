@@ -137,8 +137,8 @@ HEADER
             die "Seen line $line before in $infile - can't continue";
         }
 
-        # RT#46909 maybe cope with escaped \"
-        my $cnt = tr/"/"/;
+        # Find the number of quotes (ignoring escaped quotes)
+        my $cnt -= scalar (() = $_ =~ /(\\")/g);
         die "bogus CONST_STRING at line $line" unless $cnt == 2;
 
         my $str = extract_delimited;    # $_, '"';
