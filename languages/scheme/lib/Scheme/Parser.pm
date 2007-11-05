@@ -14,25 +14,26 @@ use Data::Dumper;
 
 # walk over the tokens
 sub _build_tree {
-    my ( $tokens, $count ) = @_;
+    my ( $tokenizer ) = @_;
 
-    die "EOF reached" if $count > $#$tokens;
+    my $token = $tokenizer->();
+   
+    return unless $token;
 
-    if ( $tokens->[$count]->[1] eq '(' ) {
-        $count++;                                   # consume the '('
+    return if $token->[1] eq ')';
+
+    if ( $token->[1] eq '(' ) {
         my @children;
-        while ( $tokens->[$count]->[1] ne ')' ) {
-            ( $count, my $expr ) = _build_tree( $tokens, $count );
-            push @children, $expr;
+        while ( my $child = _build_tree( $tokenizer ) ) {
+            push @children, $child;
         }
-        $count++;                                   # consume the ')'
 
         if ( ! @children ) {
             # special case: empty list
-            return ( $count, { value => undef } );
+            return { value => undef };
         }
         else {
-            return ( $count, { children => \@children } );
+            return { children => \@children };
         }
     } 
 
@@ -42,56 +43,28 @@ sub _build_tree {
 	    q{,}      => 'unquote',
             q{,@}     => 'unquote-splicing',
     );
-    if ( exists $function{$tokens->[$count]->[1]}  ) {
-        my $tree = { children => [ { value => $function{$tokens->[$count]->[1]} 
+    if ( exists $function{$token->[1]}  ) {
+        my $tree = { children => [ { value => $function{$token->[1]} 
                                    }
                                  ]
                    };
-        $count++;
-        ( $count, my $expr ) = _build_tree( $tokens, $count );
-        push @{ $tree->{children} }, $expr;
+        while ( my $child = _build_tree( $tokenizer ) ) {
+             push @{ $tree->{children} }, $child;
+        }
 
-	return ( $count, $tree );
+	return $tree;
     }
 
     # the atomic case
-    my $tree = { value => $tokens->[ $count++ ]->[1] };
-
-    return ( $count, $tree );
+    return { value => $token->[1] };
 }
 
-sub _dataflow {
-    my $node = shift;
-
-    if ( exists $node->{children} ) {
-        foreach ( @{ $node->{children} } ) {
-            _dataflow($_);
-        }
-        my $cur_type = $node->{children}[0]{type};
-        foreach ( @{ $node->{children} } ) {
-            $cur_type = $_->{type} if $_->{type} eq 'REAL';
-        }
-        $node->{type} = $cur_type;    #$node->{children}[0]{type};
-    }
-    else {
-        $node->{type} = 'INTEGER' if $node->{value} =~ /^[-]?\d+$/;
-        $node->{type} = 'REAL'    if $node->{value} =~ /^[-]?\d+\.(\d+([-+]?[eE]\d+)?)?/;
-        $node->{type} = 'REAL'    if $node->{value} =~ /^[-]?\.(\d+([-+]?[eE]\d+)?)/;
-        $node->{type} ||= 'EXPRESSION';
-    }
-}
 
 sub parse {
-    my $tokens = shift;
+    my $tokenizer = shift;
 
     my @trees;
-    my $count = 0;
-
-    while ( $count < scalar @{$tokens} ) {
-
-        ( $count, my $tree ) = _build_tree( $tokens, $count );
-    
-        #_dataflow($tree);
+    while ( my $tree = _build_tree( $tokenizer ) ) {
         push @trees, $tree;
     }
 
@@ -118,7 +91,7 @@ Scheme::Parser - The Scheme token parser
 
   use Scheme::Parser;
 
-  my $tree = Scheme::Parser::parse($tokens);
+  my $tree = Scheme::Parser::parse($tokenizer);
 
 =head1 DESCRIPTION
 

@@ -12,7 +12,8 @@ our $VERSION   = '0.01';
 
 use Data::Dumper;
 
-sub tokenize {
+sub new {
+    my $class     = shift;
     my $target_fn = shift;
 
     my $target;
@@ -23,7 +24,8 @@ sub tokenize {
          close $target_fh or die "Can't close $target_fn:\n$!";
     }
 
-    my $lexer = sub {
+    return 
+        bless sub {
          TOKEN:
          {
              return [ 'REAL',        $1 ] if $target =~ m/\G ([-+]? \d+ \.\d*)              /gcx;
@@ -40,14 +42,7 @@ sub tokenize {
              return [ 'UNKNOWN',     $1 ] if $target =~ m/\G (.)                            /gcx;
              return;
          }
-    };
-
-    my @tokens;
-    while ( my $token = $lexer->() ) {
-        push @tokens, $token;
-    }
-
-    return \@tokens;
+    }, $class;
 }
 
 1;
@@ -62,7 +57,7 @@ Scheme::Tokenizer - The Scheme tokenizer
 
   use Scheme:Tokenizer;
 
-  my $tokens = Scheme::Tokenizer->new($file_name)->tokenize();
+  my $tokenizer = Scheme::Tokenizer->new($file_name);
 
 =head1 DESCRIPTION
 

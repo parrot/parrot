@@ -96,9 +96,9 @@ This is called in schemec.
 sub compile {
     my $self = shift;
 
-    my $tokens  = Scheme::Tokenizer::tokenize( $self->{file} ); # not used yet
-    my $tree    = Scheme::Parser::parse( $tokens );
-    my $main    = Scheme::Generator::generate( $tree );
+    my $tokenizer  = Scheme::Tokenizer->new( $self->{file} );
+    my $tree       = Scheme::Parser::parse( $tokenizer );
+    my $main       = Scheme::Generator::generate( $tree );
 
     return link_functions( $main );
 }
