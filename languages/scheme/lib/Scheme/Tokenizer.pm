@@ -39,6 +39,7 @@ sub new {
              return [ 'RELOP',       $1 ] if $target =~ m/\G (<= | >= | = | < | > )         /gcx;
              return [ 'WHATEVER',    $1 ] if $target =~ m/\G (,@)                           /gcx;
              redo TOKEN                   if $target =~ m/\G \s+                            /gcx;
+             redo TOKEN                   if $target =~ m/\G ; .*                           /gcx;
              return [ 'UNKNOWN',     $1 ] if $target =~ m/\G (.)                            /gcx;
              return;
          }
