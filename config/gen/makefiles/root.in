@@ -695,7 +695,7 @@ help :
 	@echo "  languages-smoke:   Proxy for target 'test' of languages/Makefile"
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
-	@echo "fetch from source repository:"
+	@echo "Fetch from source repository:"
 	@echo "  update:            svn update."
 	@echo "  status:            svn status."
 	@echo "  patch:             create a patch for sending to bugs-parrot."
