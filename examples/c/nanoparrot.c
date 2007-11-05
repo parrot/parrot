@@ -1,24 +1,38 @@
 /*
  * Copyright (C) 2001-2006, The Perl Foundation.
  * $Id$
- *
- * - demonstrates how the interpreter interprets bytecode
- *   its vastly simplified but the very basics are the same
- *
- * - compile with:
- *   -DTRACE ...    turn on opcode tracing (FUNC_CORE, SWITCH_CORE only)
- *   -DFUNC_CORE    run function base opcodes
- *   -DF            same
- *   -DSWITCH_CORE  run switched opcode core
- *   -DS            same
- *                  else run CGOTO core
- *
- * The CGOTO run core works only for compilers like gcc that allow
- * labels as values.
- *
- * e.g.:
- * cc -o nanoparrot -Wall nanoparrot.c -O3 && time ./nanoparrot mops
- */
+
+=head1 NAME
+
+examples/c/nanoparrot.c
+
+=head1 DESCRIPTION
+
+demonstrates how the interpreter interprets bytecode
+its vastly simplified but the very basics are the same
+
+ - compile with:
+   -DTRACE ...    turn on opcode tracing (FUNC_CORE, SWITCH_CORE only)
+   -DFUNC_CORE    run function base opcodes
+   -DF            same
+   -DSWITCH_CORE  run switched opcode core
+   -DS            same
+                  else run CGOTO core
+
+The CGOTO run core works only for compilers like gcc that allow
+labels as values.
+
+=head1 SYNOPSIS
+
+   cc -o nanoparrot -Wall nanoparrot.c -O3 && time ./nanoparrot mops
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -130,6 +144,17 @@ function(opcode_t *pc, Interp *interp) \
 
 #  if defined(SWITCH_CORE)
 
+/*
+
+=item C<static void
+run(Interp *interp, opcode_t *pc)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 run(Interp *interp, opcode_t *pc)
 {
@@ -213,6 +238,17 @@ ENDRUN
     interp->op_info[OP_ ## op] = #op
 #endif
 
+/*
+
+=item C<static void
+init(Interp *interp, opcode_t *prog)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 init(Interp *interp, opcode_t *prog)
 {
@@ -252,8 +288,20 @@ init(Interp *interp, opcode_t *prog)
     interp->code->const_table[3] = "usage: ./nanoparrot mops\n";
 }
 
+/*
+
+=item C<int
+main(int argc, char *argv[])>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 int
-main(int argc, char *argv[]) {
+main(int argc, char *argv[])
+{
     opcode_t *prog;
 
     /*

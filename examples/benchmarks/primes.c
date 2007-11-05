@@ -16,11 +16,26 @@ examples/benchmarks/primes.c - Calculate prime numbers < 50000
 Calculates all the prime numbers up to 50000 and prints out the number
 of primes and the last one found.
 
+=head2 Functions
+
+=over 4
+
 =cut
 
 */
 
 #include <stdio.h>
+
+/*
+
+=item C<int
+main(int argc, char *argv[])>
+
+Main function to run the example.
+
+=cut
+
+*/
 
 int
 main(int argc, char *argv[])
@@ -58,6 +73,8 @@ main(int argc, char *argv[])
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

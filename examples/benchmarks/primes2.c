@@ -16,6 +16,21 @@ examples/benchmarks/primes2.c - Calculate prime numbers < 10000
 Calculates all the prime numbers up to 10000 and prints out the number
 of primes and the last one found.
 
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<int
+main(int argc, char *argv[])>
+
+Main function to run the example.
+
 =cut
 
 */
@@ -43,6 +58,16 @@ main(int argc, char *argv[])
         return 0;
 }
 
+/*
+
+=item C<int isprime1(int input)>
+
+Determines if the input number is a prime.
+
+=cut
+
+*/
+
 int isprime1(int input)
 {
         int n;
@@ -60,6 +85,8 @@ int isprime1(int input)
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

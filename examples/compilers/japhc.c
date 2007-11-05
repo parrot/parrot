@@ -5,11 +5,27 @@
  */
 
 /*
- * example compiler used by japh16.pasm
- *
- * $ make -C examples/compilers/
- * $ parrot examples/japh/japh16.pasm
- *
+
+=head1 NAME
+
+examples/compiler/japhc.c
+
+=head1 DESCRIPTION
+
+example compiler used by japh16.pasm
+
+=head1 SYNOPSIS
+
+
+  $ make -C examples/compilers/
+  $ parrot examples/japh/japh16.pasm
+
+=head2 Functions
+
+=over 4
+
+=cut
+
  */
 
 #include "parrot/parrot.h"
@@ -27,9 +43,16 @@
 PMC* japh_compiler(Parrot_Interp interp, const char *s);
 
 /*
- * loadlib calls the load and init hooks
- * we use init to register the compiler
- */
+
+=item C<void
+Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)>
+
+loadlib calls the load and init hooks
+we use init to register the compiler
+
+=cut
+
+*/
 
 void
 Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)
@@ -41,6 +64,17 @@ Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)
     Parrot_compreg(interp, cmp, japh_compiler);
 }
 
+
+/*
+
+=item C<static int
+unescape(char *string)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 unescape(char *string)
@@ -65,7 +99,17 @@ unescape(char *string)
     return p - start;
 }
 
-/* add constant string to constant_table */
+/*
+
+=item C<static int
+add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)>
+
+add constant string to constant_table
+
+=cut
+
+*/
+
 static int
 add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
 {
@@ -111,8 +155,15 @@ add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
 }
 
 /*
- * simple compiler - no error checking
- */
+
+=item C<PMC* japh_compiler(Parrot_Interp interp, const char *program)>
+
+simple compiler - no error checking
+
+=cut
+
+*/
+
 PMC*
 japh_compiler(Parrot_Interp interp, const char *program)
 {
@@ -186,6 +237,14 @@ japh_compiler(Parrot_Interp interp, const char *program)
     sub_data->name = string_from_literal(interp, "JaPHC");
     return sub;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

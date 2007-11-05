@@ -41,6 +41,18 @@ Prints out:
 #include <stdio.h>
 
 
+/*
+
+=over 4
+
+=item C<int main(int argc, char *argv[])>
+
+The main function which runs the mops example.
+
+=cut
+
+*/
+
 int
 main(int argc, char *argv[])
 {
@@ -97,6 +109,8 @@ main(int argc, char *argv[])
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 
