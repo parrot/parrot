@@ -284,7 +284,8 @@ REG            "$"?[SNIP]{DIGITS}
 
 
 <EXPAND>[^)]       { /* anything except a ")" in this state means a constant expansion, which
-                      * has no arguments.
+                      * has no arguments. This works, because if we did see a '(', the
+                      * state EXPARGS is activated.
                       */
                      yylval->sval = dupstr(yytext);
                      yy_pop_state(yyscanner);
@@ -306,6 +307,15 @@ REG            "$"?[SNIP]{DIGITS}
 <EXPARGS>")"       { /* */
                      yy_pop_state(yyscanner);
                      return ')';
+                   }
+
+<EXPARGS>"{"       { /* braced argument */
+                     /* need for a BRACEDARGS state? */
+                     return '{';
+                   }
+
+<EXPARGS>"}"       { /* this state correct? */
+                     return '}';
                    }
 
 <EXPARGS>{IDENT}   { /* variable argument of macro expansion */

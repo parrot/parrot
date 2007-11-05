@@ -137,9 +137,7 @@ statements: statement
           ;
 
 newline: "\n"
-       { /* after each statement, emit a newline */
-         emit("\n");
-       }
+         { emit("\n");  /* after each statement, emit a newline */ }
        ;
 
 /* handle macro definitions, expansions, include statements
@@ -203,7 +201,7 @@ macro_body: body_token               { $$ = $1; }
           ;
 
 body_token: TK_ANY                   { $$ = $1; }
-          | TK_MACROVAR_EXP          { $$ = munge_label_id($1, 0, lexer); }
+          | TK_MACROVAR_EXP          { $$ = munge_label_id($1, 0, lexer); /* TODO: when is it a label, when a local? */ }
           | label_declaration        { $$ = $1; }
           | local_declaration        { $$ = $1; }
           ;
@@ -250,8 +248,12 @@ arg_list: arg               { $$ = new_list($1); }
         | arg_list ',' arg  { $$ = add_item($1, $3); }
         ;
 
-arg: expression
+arg: expression { $$ = $1; }
+   | braced_arg { $$ = NULL; }
    ;
+
+braced_arg: '{' '}'
+          ;
 
 /* all types of expressions can probably be handled as a more generic token, such as "TK_EXPR"
  * we don't care if it's a string or a number; it's just text replacing. */
@@ -787,6 +789,7 @@ main(int argc, char *argv[]) {
 
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
+    memset(lexer, 0, sizeof (lexer_state));
     assert(lexer != NULL);
     lexer->unique_id = 0;
     lexer->line      = 1;
