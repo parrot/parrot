@@ -14,12 +14,30 @@ static int class_TclInt    = 0;
 static int class_TclList   = 0;
 static int class_TclString = 0;
 
-/* extract_int
- *
- * Extract an integer from the string at the position given. Return the integer
- * and update the position. Returns 1 if no digit is found or if the int is
- * zero.
- */
+/*
+
+=head1 NAME
+
+languages/tcl/src/binary.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=item C<static int
+extract_int(char *str, int *pos, int length)>
+
+Extract an integer from the string at the position given. Return the integer
+and update the position. Returns 1 if no digit is found or if the int is
+zero.
+
+=cut
+
+*/
 static int
 extract_int(char *str, int *pos, int length)
 {
@@ -34,10 +52,16 @@ extract_int(char *str, int *pos, int length)
     return n;
 }
 
-/* binary_scan_number_field
- *
- * Scan and remove a number from a binary string. Return a PMC representing
- * that value.
+/*
+
+=item C<static PMC *
+binary_scan_number_field(PARROT_INTERP, char field, char *binstr, int *_pos, int length)>
+
+Scan and remove a number from a binary string. Return a PMC representing
+that value.
+
+=cut
+
  */
 static PMC *
 binary_scan_number_field(PARROT_INTERP, char field, char *binstr, int *_pos, int length)
@@ -96,10 +120,16 @@ binary_scan_number_field(PARROT_INTERP, char field, char *binstr, int *_pos, int
     return value;
 }
 
-/* binary_scan_number_slurpy
- *
- * Scan the binary string for all remaining occurences of a number of the type
- * of the field. Returns a TclList PMC of the number PMCs.
+/*
+
+=item C<static PMC *
+binary_scan_number_slurpy(PARROT_INTERP, char field, char *binstr, int *_pos, int length)>
+
+Scan the binary string for all remaining occurences of a number of the type
+of the field. Returns a TclList PMC of the number PMCs.
+
+=cut
+
  */
 static PMC *
 binary_scan_number_slurpy(PARROT_INTERP, char field, char *binstr, int *_pos, int length)
@@ -113,10 +143,18 @@ binary_scan_number_slurpy(PARROT_INTERP, char field, char *binstr, int *_pos, in
     return values;
 }
 
-/* binary_scan_number
- *
- * Scan the binary string for a number field. There may be a width following
- * the field specifier.
+/*
+
+=item C<static PMC *
+binary_scan_number(PARROT_INTERP, char field,
+                   char *format, int *formatpos, int formatlen,
+                   char *binstr, int *binstrpos, int binstrlen)>
+
+Scan the binary string for a number field. There may be a width following
+the field specifier.
+
+=cut
+
  */
 static PMC *
 binary_scan_number(PARROT_INTERP, char field,
@@ -136,10 +174,18 @@ binary_scan_number(PARROT_INTERP, char field,
     return value;
 }
 
-/* binary_scan_string_field
- *
- * Scan the binary string for a string field. Returns the value of the extracted
- * string (concatenated to its previous value).
+/*
+
+=item C<static STRING *
+binary_scan_string_field(PARROT_INTERP, char field,
+                         char *binstr, int *_binstrpos, int binstrlen,
+                         STRING *value, int length)>
+
+Scan the binary string for a string field. Returns the value of the extracted
+string (concatenated to its previous value).
+
+=cut
+
  */
 static STRING *
 binary_scan_string_field(PARROT_INTERP, char field,
@@ -173,10 +219,17 @@ binary_scan_string_field(PARROT_INTERP, char field,
     return value;
 }
 
-/* binary_scan_string_slurpy
- *
- * Scan the binary string for all remaining matches of the field. Returns the
- * new value of the STRING value passed in.
+/*
+
+=item C<static STRING *
+binary_scan_string_slurpy(PARROT_INTERP, char field,
+                          char *binstr, int *_binstrpos, int binstrlen, STRING *value)>
+
+Scan the binary string for all remaining matches of the field. Returns the
+new value of the STRING value passed in.
+
+=cut
+
  */
 static STRING *
 binary_scan_string_slurpy(PARROT_INTERP, char field,
@@ -190,10 +243,18 @@ binary_scan_string_slurpy(PARROT_INTERP, char field,
     return value;
 }
 
-/* binary_scan_string
- *
- * Scan the binary string for a string field. Returns a TclString PMC with the
- * value(s) extracted.
+/*
+
+=item C<static PMC *
+binary_scan_string(PARROT_INTERP, char field,
+                   char *format, int *formatpos, int formatlen,
+                   char *binstr, int *binstrpos, int binstrlen)>
+
+Scan the binary string for a string field. Returns a TclString PMC with the
+value(s) extracted.
+
+=cut
+
  */
 static PMC *
 binary_scan_string(PARROT_INTERP, char field,
@@ -220,15 +281,20 @@ binary_scan_string(PARROT_INTERP, char field,
     return pmcval;
 }
 
-/* ParTcl_binary_scan
- *
- * Scan a binary string according to a format string and return a TclList of
- * the extracted values.
- *
- * Assumes, in order to prevent entering another PIR runloop, that the format
- * has been checked to contain valid fields.
- *
- * String and number field code has been separated in an effort to reduce code.
+/*
+
+=item C<PMC *ParTcl_binary_scan(PARROT_INTERP, STRING *BINSTR, STRING *FORMAT)>
+
+Scan a binary string according to a format string and return a TclList of
+the extracted values.
+
+Assumes, in order to prevent entering another PIR runloop, that the format
+has been checked to contain valid fields.
+
+String and number field code has been separated in an effort to reduce code.
+
+=cut
+
  */
 PMC *ParTcl_binary_scan(PARROT_INTERP, STRING *BINSTR, STRING *FORMAT)
 {
@@ -287,6 +353,17 @@ PMC *ParTcl_binary_scan(PARROT_INTERP, STRING *BINSTR, STRING *FORMAT)
     return values;
 }
 
+/*
+
+=item C<static STRING *
+binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value)
 {
@@ -327,6 +404,18 @@ binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value
     return binstr;
 }
 
+/*
+
+=item C<static STRING *
+binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
+                     char *format, int *formatpos, int formatlen)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
@@ -335,6 +424,18 @@ binary_format_number(PARROT_INTERP, char field, STRING *binstr, PMC *value,
 
     return binstr;
 }
+
+/*
+
+=item C<static STRING *
+binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
+                           STRING *strval, int length)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static STRING *
 binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
@@ -365,6 +466,18 @@ binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
     return binstr;
 }
 
+/*
+
+=item C<static STRING *
+binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
+                     char *format, int *formatpos, int formatlen)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static STRING *
 binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
                      char *format, int *formatpos, int formatlen)
@@ -385,6 +498,16 @@ binary_format_string(PARROT_INTERP, char field, STRING *binstr, PMC *value,
 
     return binstr;
 }
+
+/*
+
+=item C<STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)
 {
@@ -421,6 +544,14 @@ STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)
 
     return binstr;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
