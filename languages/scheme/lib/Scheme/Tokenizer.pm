@@ -44,7 +44,7 @@ sub tokenize {
 
     my @tokens;
     while ( my $token = $lexer->() ) {
-        push @tokens, $token->[1];
+        push @tokens, $token;
     }
 
     return \@tokens;

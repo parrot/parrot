@@ -18,10 +18,10 @@ sub _build_tree {
 
     die "EOF reached" if $count > $#$tokens;
 
-    if ( $tokens->[$count] eq '(' ) {
+    if ( $tokens->[$count]->[1] eq '(' ) {
         $count++;                                   # consume the '('
         my @children;
-        while ( $tokens->[$count] ne ')' ) {
+        while ( $tokens->[$count]->[1] ne ')' ) {
             ( $count, my $expr ) = _build_tree( $tokens, $count );
             push @children, $expr;
         }
@@ -42,8 +42,8 @@ sub _build_tree {
 	    q{,}      => 'unquote',
             q{,@}     => 'unquote-splicing',
     );
-    if ( exists $function{$tokens->[$count]}  ) {
-        my $tree = { children => [ { value => $function{$tokens->[$count]} 
+    if ( exists $function{$tokens->[$count]->[1]}  ) {
+        my $tree = { children => [ { value => $function{$tokens->[$count]->[1]} 
                                    }
                                  ]
                    };
@@ -55,7 +55,7 @@ sub _build_tree {
     }
 
     # the atomic case
-    my $tree = { value => $tokens->[ $count++ ] };
+    my $tree = { value => $tokens->[ $count++ ]->[1] };
 
     return ( $count, $tree );
 }
