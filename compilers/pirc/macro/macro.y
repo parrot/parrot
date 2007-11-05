@@ -710,8 +710,12 @@ process_file(char *filename, lexer_state *lexer) {
     FILE *fp = NULL;
     yyscan_t yyscanner;
 
-    assert(filename != NULL);
-    fp = fopen(filename, "r");
+    if (filename == NULL) { /* no file name means reading from stdin. */
+        fp = stdin;
+    }
+    else { /* open the specified file */
+        fp = fopen(filename, "r");
+    }
 
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file %s\n", filename);
@@ -750,6 +754,23 @@ process_file(char *filename, lexer_state *lexer) {
 
 /*
 
+=item C<print_help>
+
+=cut
+
+*/
+static void
+print_help(char const * const programname) {
+    fprintf(stderr, "Usage: %s [options] [input]\n", programname);
+    fprintf(stderr, "where options are:\n");
+    fprintf(stderr, "  -d  debug the generated parser\n");
+    fprintf(stderr, "  -f  debug the generated lexer\n\n");
+    fprintf(stderr, "If no input is specified, the program reads from stdin.\n");
+
+}
+
+/*
+
 =item C<yyerror>
 
 Function for syntax error handling.
@@ -777,16 +798,11 @@ Pre-processor main function.
 int
 main(int argc, char *argv[]) {
     lexer_state *lexer = NULL;
-
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s <files>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
+    char const * const programname = argv[0];
 
     /* skip program name */
     argc--;
     argv++;
-
 
     lexer = (lexer_state *)malloc(sizeof (lexer_state));
     memset(lexer, 0, sizeof (lexer_state));
@@ -814,7 +830,7 @@ main(int argc, char *argv[]) {
                 lexer->flexdebug = 1;
                 break;
             case 'h':
-                /* */
+                print_help(programname);
                 exit(EXIT_SUCCESS); /* asking for help doesn't make you a failure */
                 /* break; */
             default:
@@ -826,14 +842,15 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    /* process all files specified on the command line */
-    while (argc > 0) {
-        lexer->currentfile = argv[0]; /* set the filename in the lexer structure */
+    if (argc > 0) {
+        lexer->currentfile = argv[0];
         process_file(argv[0], lexer);
-
-        argc--; /* go to next command line argument */
-        argv++;
     }
+    else { /* no filename */
+        lexer->currentfile = "STDIN";
+        process_file(NULL, lexer);
+    }
+
     if (lexer->errors > 0)
         fprintf(stderr, "There were %d error(s)\n", lexer->errors);
 
