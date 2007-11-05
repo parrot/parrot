@@ -15,10 +15,23 @@
  * this runs we should assume everything is valid.
  */
 
+/*
 
-/******************************************************************************
- * Intermediate code generation routines.
- ******************************************************************************/
+=head1 NAME
+
+languages/cola/gen.c
+
+=head1 DESCRIPTION
+
+Intermediate code generation routines.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +42,18 @@
 
 int ival, nval, sval, pval;
 
-void gen_ast(AST * ast) {
+/*
+
+=item C<void gen_ast(AST * ast)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_ast(AST * ast)
+{
     AST * p;
     for (p = ast; p; p = p->next) {
         if (p->kind == KIND_DECL)
@@ -53,20 +77,53 @@ void gen_ast(AST * ast) {
     }
 }
 
-void gen_namespace_decl(AST * p) {
+/*
+
+=item C<void gen_namespace_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_namespace_decl(AST * p)
+{
     printf("#.namespace %s\n", p->sym->name);
     if (p->arg1)
         gen_ast(p->arg1);
 }
 
-void gen_class_decl(AST * p) {
+/*
+
+=item C<void gen_class_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_class_decl(AST * p)
+{
     printf("#.class %s\n", p->sym->name);
     if (p->Attr.Class.body) {
         gen_class_body(p->Attr.Class.body);
     }
 }
 
-void gen_class_body(AST * p) {
+/*
+
+=item C<void gen_class_body(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_class_body(AST * p)
+{
     while (p) {
         switch (p->asttype) {
             case ASTT_CONSTANT_DECL:
@@ -86,17 +143,50 @@ void gen_class_body(AST * p) {
     }
 }
 
-void gen_constant_decl(AST * p) {
+/*
+
+=item C<void gen_constant_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_constant_decl(AST * p)
+{
     /* Just to generate the comment */
     printf("#.constant %s = %s\n", p->arg1->sym->name, p->arg1->sym->literal->name);
 }
 
-void gen_field_decl(AST * p) {
+/*
+
+=item C<void gen_field_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_field_decl(AST * p)
+{
     /* Just to generate the comment */
     printf("#.field %s %s\n", p->arg1->sym->typename->name, p->arg1->sym->name);
 }
 
-void gen_block(AST * p) {
+/*
+
+=item C<void gen_block(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_block(AST * p)
+{
     /* First declare locals. */
     if (!p) {
         fprintf(stderr, "WARNING: Null block in AST tree.\n");
@@ -114,7 +204,18 @@ void gen_block(AST * p) {
     gen_statement(p);
 }
 
-void gen_statement(AST * p) {
+/*
+
+=item C<void gen_statement(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_statement(AST * p)
+{
     AST * b;
 #if DEBUG
     printf("#gen_statement\n");
@@ -203,7 +304,18 @@ END:
         gen_statement(p->next);
 }
 
-void gen_var_decl(AST * p) {
+/*
+
+=item C<void gen_var_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_var_decl(AST * p)
+{
     /* Don't generate the identifier in arg1, it was collected for ordering
      * in phase 2 and declared at the top of the block.
      */
@@ -212,13 +324,35 @@ void gen_var_decl(AST * p) {
     }
 }
 
-void gen_param_list(Symbol * paramlist) {
+/*
+
+=item C<void gen_param_list(Symbol * paramlist)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_param_list(Symbol * paramlist)
+{
     if (paramlist->tnext)
         gen_param_list(paramlist->tnext);
     printf("\t.param %s\t%s\n", paramlist->typename->name, paramlist->name);
 }
 
-void gen_method_decl(AST * p) {
+/*
+
+=item C<void gen_method_decl(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_method_decl(AST * p)
+{
     const char * attr = "";
     Symbol * s;
     reset_temps();
@@ -246,7 +380,18 @@ void gen_method_decl(AST * p) {
     cur_method = NULL;
 }
 
-void gen_assign(AST * ast) {
+/*
+
+=item C<void gen_assign(AST * ast)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_assign(AST * ast)
+{
     AST * p = ast;
 #if DEBUG
     printf("#gen_assign\n");
@@ -338,10 +483,19 @@ void gen_assign(AST * ast) {
 #endif
 }
 
-/* If lval is passed, expressions use that as the target,
- * otherwise they create a temporary.
- */
-void gen_expr(AST * p, Symbol * lval, Type * type) {
+/*
+
+=item C<void gen_expr(AST * p, Symbol * lval, Type * type)>
+
+If lval is passed, expressions use that as the target,
+otherwise they create a temporary.
+
+=cut
+
+*/
+
+void gen_expr(AST * p, Symbol * lval, Type * type)
+{
     /* Temporaries we may have to use in expression generation */
     Symbol *tv1, *tv2;
     const char *tl1, *tl2, *tl3;
@@ -569,7 +723,18 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
 #endif
 }
 
-void gen_arg_list_expr(AST * p) {
+/*
+
+=item C<void gen_arg_list_expr(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_arg_list_expr(AST * p)
+{
     if (p == NULL)
         return;
     /* FIXME: Here we should check the method signature and find out
@@ -587,9 +752,17 @@ void gen_arg_list_expr(AST * p) {
 }
 
 /*
- * Generate arguments in reverse order on stack.
- */
-void gen_arg_list(AST * p) {
+
+=item C<void gen_arg_list(AST * p)>
+
+Generate arguments in reverse order on stack.
+
+=cut
+
+*/
+
+void gen_arg_list(AST * p)
+{
     if (p == NULL)
         return;
     /* FIXME: Here we should check the method signature and find out
@@ -607,7 +780,18 @@ void gen_arg_list(AST * p) {
     }
 }
 
-void gen_method_call(AST * p) {
+/*
+
+=item C<void gen_method_call(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_method_call(AST * p)
+{
     /* FIXME: Should check that expression evaluates to a method */
     if (!eval_expr(p->arg1))
         gen_expr(p->arg1, NULL, NULL);
@@ -649,7 +833,18 @@ void gen_method_call(AST * p) {
     }
 }
 
-void gen_if(AST * p) {
+/*
+
+=item C<void gen_if(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_if(AST * p)
+{
     char * if_label, * else_label, *end_label;
 #if DEBUG
     printf("#gen_if\n");
@@ -686,7 +881,18 @@ void gen_if(AST * p) {
     printf("%s:\n", end_label);
 }
 
-void gen_while(AST * p) {
+/*
+
+=item C<void gen_while(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_while(AST * p)
+{
     const char * redo_label = make_label();
     p->start_label = make_label();
     p->end_label = make_label();
@@ -700,7 +906,18 @@ void gen_while(AST * p) {
     pop_primary_block();
 }
 
-void gen_for(AST * p) {
+/*
+
+=item C<void gen_for(AST * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void gen_for(AST * p)
+{
     const char * redo_label = make_label();
 #if DEBUG
     printf("#gen_for\n");
@@ -731,11 +948,19 @@ void gen_for(AST * p) {
 }
 
 /*
- * boolean->arg1 points to the actual expression, boolean just converts to true/false
- * The invert arg is for generating the branches depending on if we are generating
- * a simple logical or compound for lazy evaluation.
- */
-void gen_boolean(AST * p, const char * true_label, const char * false_label, int invert) {
+
+=item C<void gen_boolean(AST * p, const char * true_label, const char * false_label, int invert)>
+
+boolean->arg1 points to the actual expression, boolean just converts to true/false
+The invert arg is for generating the branches depending on if we are generating
+a simple logical or compound for lazy evaluation.
+
+=cut
+
+*/
+
+void gen_boolean(AST * p, const char * true_label, const char * false_label, int invert)
+{
     int op_inv;
     const char * inverse_label;
 #if DEBUG
@@ -817,7 +1042,18 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
     }
 }
 
-void coerce_operands(Type ** t1, Type ** t2) {
+/*
+
+=item C<void coerce_operands(Type ** t1, Type ** t2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void coerce_operands(Type ** t1, Type ** t2)
+{
     if (!*t1 || !*t2) {
         fprintf(stderr, "Internal error: coerce_operands: NULL type(s)\n");
         abort();
@@ -847,7 +1083,18 @@ void coerce_operands(Type ** t1, Type ** t2) {
     }
 }
 
-char * op_name(int operator) {
+/*
+
+=item C<char * op_name(int operator)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * op_name(int operator)
+{
     static char buf[512];
     static char * ptr = buf;
 
@@ -886,7 +1133,18 @@ char * op_name(int operator) {
     }
 }
 
-int op_inverse(int operator) {
+/*
+
+=item C<int op_inverse(int operator)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+int op_inverse(int operator)
+{
     switch (operator) {
         case LOGICAL_EQ:    return LOGICAL_NE;
         case LOGICAL_NE:    return LOGICAL_EQ;
@@ -899,33 +1157,87 @@ int op_inverse(int operator) {
     exit(EXIT_SUCCESS);
 }
 
-char * new_itemp() {
+/*
+
+=item C<char * new_itemp()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * new_itemp()
+{
     static char name[256];
     sprintf(name, "$I%d", ival++);
     return &name[0];
 }
 
-char * new_ntemp() {
+/*
+
+=item C<char * new_ntemp()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * new_ntemp()
+{
     static char name[256];
     sprintf(name, "$N%d", ival++);
     return &name[0];
 }
 
-char * new_stemp() {
+/*
+
+=item C<char * new_stemp()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * new_stemp()
+{
     static char name[256];
     sprintf(name, "$S%d", ival++);
     return &name[0];
 }
 
-char * new_ptemp() {
+/*
+
+=item C<char * new_ptemp()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * new_ptemp()
+{
     static char name[256];
     sprintf(name, "$P%d", ival++);
     return &name[0];
 }
 
 
-/* Create a temporary rval */
-Symbol * new_temp(Type * type) {
+/*
+
+=item C<Symbol * new_temp(Type * type)>
+
+Create a temporary rval
+
+=cut
+
+*/
+
+Symbol * new_temp(Type * type)
+{
     Symbol * s;
     if (!type) {
         abort();
@@ -953,25 +1265,69 @@ Symbol * new_temp(Type * type) {
     return s;
 }
 
-void reset_temps() {
+/*
+
+=item C<void reset_temps()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void reset_temps()
+{
     ival = 0;
     nval = 0;
     sval = 0;
     pval = 0;
 }
 
-char * get_label() {
+/*
+
+=item C<char * get_label()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * get_label()
+{
     static int l;
     static char name[256];
     sprintf(name, "LBL%d", l++);
     return &name[0];
 }
 
-char * make_label() {
+/*
+
+=item C<char * make_label()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * make_label()
+{
     return str_dup(get_label());
 }
 
-void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
+/*
+
+=item C<void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2)
+{
 #if DEBUG
     printf("#emit_op_expr\n");
 #endif
@@ -983,7 +1339,18 @@ void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
     printf("\t%s = %s %s %s\n", r->name, NAME(a1), op, NAME(a2));
 }
 
-void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
+/*
+
+=item C<void emit_unary_expr(Symbol * res, Symbol * arg1, char * op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void emit_unary_expr(Symbol * res, Symbol * arg1, char * op)
+{
 #if DEBUG
     printf("#emit_unary_expr\n");
 #endif
@@ -1007,6 +1374,13 @@ void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
 #endif
 }
 
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

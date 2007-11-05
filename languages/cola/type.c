@@ -10,6 +10,24 @@
  * Type management utils.
  */
 
+/*
+
+=head1 NAME
+
+languages/cola/type.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -53,8 +71,18 @@ void init_builtin_types() {
     t_decimal   = store_type("decimal", 8);
 }
 
-/* size is bytes or elements, depending on if type is variable or array */
-Type * store_type(const char * name, int size) {
+/*
+
+=item C<Type * store_type(const char * name, int size)>
+
+size is bytes or elements, depending on if type is variable or array
+
+=cut
+
+*/
+
+Type * store_type(const char * name, int size)
+{
     Type * t = (Type *)malloc(sizeof (*t));
     Symbol * s = store_symbol(current_symbol_table, new_symbol(name));
     t->type = NULL;
@@ -71,10 +99,19 @@ Type * store_type(const char * name, int size) {
     return t;
 }
 
-/* Start at inner scope and work out, looking for a type name.
- * FIXME: Add support for member resolution (namespace.namespace.type, etc.)
- */
-Type * lookup_type(const char * name) {
+/*
+
+=item C<Type * lookup_type(const char * name)>
+
+Start at inner scope and work out, looking for a type name.
+FIXME: Add support for member resolution (namespace.namespace.type, etc.)
+
+=cut
+
+*/
+
+Type * lookup_type(const char * name)
+{
     Symbol * ns;
     Symbol * s;
     for (ns = current_namespace; ns; ns = ns->tnext) {
@@ -101,10 +138,17 @@ Type * lookup_type(const char * name) {
 }
 
 /*
- * identifier can be a list which would resolve it
- * to nested namespace.
- */
-Type * lookup_type_symbol(Symbol * id) {
+
+=item C<Type * lookup_type_symbol(Symbol * id)>
+
+identifier can be a list which would resolve it to nested namespace.
+
+=cut
+
+*/
+
+Type * lookup_type_symbol(Symbol * id)
+{
     if (!id) {
         fprintf(stderr, "lookup_type_symbol: NULL symbol\n");
         abort();
@@ -112,11 +156,33 @@ Type * lookup_type_symbol(Symbol * id) {
     return lookup_type(id->name);
 }
 
-const char * type_name(Type * t) {
+/*
+
+=item C<const char * type_name(Type * t)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+const char * type_name(Type * t)
+{
     return t->sym->name;
 }
 
-Rank * new_rank(int dim) {
+/*
+
+=item C<Rank * new_rank(int dim)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Rank * new_rank(int dim)
+{
     Rank * ret = malloc(sizeof (*ret));
     ret->next = NULL;
     ret->tnext = NULL;
@@ -124,7 +190,18 @@ Rank * new_rank(int dim) {
     return ret;
 }
 
-Type * new_array_type(Symbol * typename, Symbol * sig) {
+/*
+
+=item C<Type * new_array_type(Symbol * typename, Symbol * sig)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Type * new_array_type(Symbol * typename, Symbol * sig)
+{
     Type * ret = malloc(sizeof (*ret));
     ret->sym = symbol_concat(typename, sig);
     ret->kind = TYPE_ARRAY;
@@ -162,7 +239,18 @@ Symbol * array_signature(Type * t) {
 }
 */
 
-void resolve_identifier(Symbol ** ps) {
+/*
+
+=item C<void resolve_identifier(Symbol ** ps)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void resolve_identifier(Symbol ** ps)
+{
     Symbol * s = *ps;
     Symbol * t;
     if (!s) {
@@ -214,6 +302,14 @@ void resolve_identifier(Symbol ** ps) {
             s->table = s->type->sym->table;
         }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 /*

@@ -7,8 +7,25 @@
  *
  * Copyright (C) 2002 Melvin Smith
  *
- * Semantic and type checking phase.
  */
+
+/*
+
+=head1 NAME
+
+languages/cola/semant.c
+
+=head1 DESCRIPTION
+
+Semantic and type checking phase.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,12 +34,25 @@
 #include "parser.h"
 
 /*
- * Walk the AST tree and resolve symbol types.
- * 1) Resolve identifiers to symbol table references
- * 2) Resolve typenames to type references
- * 3) Check for invalid assignments and operations
- */
-void build_ast(AST * tree) {
+
+=item C<void build_ast(AST * tree)>
+
+Walk the AST tree and resolve symbol types.
+
+=over 4
+
+=item 1) Resolve identifiers to symbol table references
+=item 2) Resolve typenames to type references
+=item 3) Check for invalid assignments and operations
+
+=back
+
+=cut
+
+*/
+
+void build_ast(AST * tree)
+{
     if (!tree) return;
     switch (tree->asttype) {
         case ASTT_CLASS_DECL:
@@ -36,7 +66,18 @@ void build_ast(AST * tree) {
     build_ast(tree->next);
 }
 
-void build_class_decl(AST * c) {
+/*
+
+=item C<void build_class_decl(AST * c)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_class_decl(AST * c)
+{
     if (!c) return;
 #if DEBUG
     fprintf(stderr, "Pass 2: class [%s]\n", c->sym->name);
@@ -47,7 +88,18 @@ void build_class_decl(AST * c) {
     pop_namespace();
 }
 
-void build_class_body(AST * b) {
+/*
+
+=item C<void build_class_body(AST * b)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_class_body(AST * b)
+{
     if (!b) return;
     fprintf(stderr, "Pass 2: class body\n");
     while (b) {
@@ -76,9 +128,17 @@ void build_class_body(AST * b) {
 }
 
 /*
- * A class field declaration
- */
-void build_field_decl(AST * d) {
+
+=item C<void build_field_decl(AST * d)>
+
+A class field declaration
+
+=cut
+
+*/
+
+void build_field_decl(AST * d)
+{
 #if DEBUG
     if (d->asttype == ASTT_CONSTANT_DECL)
         fprintf(stderr, "Pass 2: class const [%s]\n", d->arg1->sym->name);
@@ -91,9 +151,17 @@ void build_field_decl(AST * d) {
 }
 
 /*
- * A class method declaration
- */
-void build_method_decl(AST * m) {
+
+=item C<void build_method_decl(AST * m)>
+
+A class method declaration
+
+=cut
+
+*/
+
+void build_method_decl(AST * m)
+{
     /* Uses enclosing class's namespace, nested scope */
     /*push_namespace(m->sym);*/
 #if DEBUG
@@ -129,9 +197,17 @@ void build_method_decl(AST * m) {
 }
 
 /*
- * A block or method local variable declaration
- */
-void build_var_decl(AST * d) {
+
+=item C<void build_var_decl(AST * d)>
+
+A block or method local variable declaration
+
+=cut
+
+*/
+
+void build_var_decl(AST * d)
+{
 #if DEBUG
     if (d->asttype == ASTT_CONSTANT_DECL)
         fprintf(stderr, "Pass 2: Local const [%s]\n", d->arg1->sym->name);
@@ -143,7 +219,18 @@ void build_var_decl(AST * d) {
     build_expr(d->arg2);
 }
 
-void build_if(AST * i) {
+/*
+
+=item C<void build_if(AST * i)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_if(AST * i)
+{
     /* IF */
 #if DEBUG
     fprintf(stderr, "build_if\n");
@@ -155,7 +242,18 @@ void build_if(AST * i) {
     build_statement_list(i->arg2);
 }
 
-void build_conditional(AST * c) {
+/*
+
+=item C<void build_conditional(AST * c)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_conditional(AST * c)
+{
     /* IF */
 #if DEBUG
     fprintf(stderr, "build_conditional\n");
@@ -173,7 +271,18 @@ void build_conditional(AST * c) {
     c->type = c->arg1->type;
 }
 
-void build_method_call(AST * c) {
+/*
+
+=item C<void build_method_call(AST * c)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_method_call(AST * c)
+{
     fprintf(stderr, "build_method_call\n");
     build_expr(c->arg1);
     c->type = c->arg1->type;
@@ -182,7 +291,18 @@ void build_method_call(AST * c) {
     build_expr_list(c->arg2);
 }
 
-void build_new_expr(AST * n) {
+/*
+
+=item C<void build_new_expr(AST * n)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_new_expr(AST * n)
+{
     n->type = lookup_type_symbol(n->typename);
     if (!n->type) {
         fprintf(stderr, "Internal error: new called for unknown type [%s]\n",
@@ -191,7 +311,18 @@ void build_new_expr(AST * n) {
     }
 }
 
-void build_loop(AST * l) {
+/*
+
+=item C<void build_loop(AST * l)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_loop(AST * l)
+{
 #if DEBUG
     fprintf(stderr, "build_loop\n");
 #endif
@@ -201,12 +332,34 @@ void build_loop(AST * l) {
     build_statement_list(l->Attr.Loop.body);
 }
 
-void build_return(AST * r) {
+/*
+
+=item C<void build_return(AST * r)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_return(AST * r)
+{
     if (r->arg1)
         build_expr(r->arg1);
 }
 
-void build_expr_list(AST * e) {
+/*
+
+=item C<void build_expr_list(AST * e)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_expr_list(AST * e)
+{
     AST * p = e;
     while (p) {
         build_expr(p);
@@ -214,7 +367,18 @@ void build_expr_list(AST * e) {
     }
 }
 
-void build_expr(AST * e) {
+/*
+
+=item C<void build_expr(AST * e)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_expr(AST * e)
+{
 #if DEBUG
     fprintf(stderr, "build_expr\n");
 #endif
@@ -282,7 +446,18 @@ void build_expr(AST * e) {
     }
 }
 
-void build_statement_list(AST * s) {
+/*
+
+=item C<void build_statement_list(AST * s)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void build_statement_list(AST * s)
+{
     static int statements;
     if (!s) return;
 #if DEBUG
@@ -322,6 +497,13 @@ END:
     build_statement_list(s->next);
 }
 
+/*
+
+=back
+
+=cut
+
+*/
 
 
 /*

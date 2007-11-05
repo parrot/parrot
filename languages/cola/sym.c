@@ -7,8 +7,23 @@
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
  *
- * Symbol and Abstract Syntax Tree management utils.
  */
+
+/*
+
+=head1 NAME
+
+languages/cola/sym.c
+
+=head1 DESCRIPTION
+
+Symbol and Abstract Syntax Tree management utils.
+
+=head2 Functions
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,16 +51,46 @@ int             primary_block = 0;
 AST             *primary_block_stack[256];
 
 
-/* Routines for managing symbols, attributes and AST tree */
+/*
 
-void assert(void * p) {
+=head3 Routines for managing symbols, attributes and AST tree
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void assert(void * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void assert(void * p)
+{
     if (p == NULL) {
         fprintf(stderr, "NULL pointer assertion.\n");
         abort();
     }
 }
 
-unsigned int hash_str(const char * str) {
+/*
+
+=item C<unsigned int hash_str(const char * str)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+unsigned int hash_str(const char * str)
+{
     unsigned long key = 0;
     const char * s;
     for (s=str; *s; s++)
@@ -53,7 +98,18 @@ unsigned int hash_str(const char * str) {
     return key;
 }
 
-void init_symbol_tables() {
+/*
+
+=item C<void init_symbol_tables()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void init_symbol_tables()
+{
     /* The global namespace with no name */
     global_namespace = mk_namespace_symbol(new_symbol("__GLOBAL__"));
     current_namespace = global_namespace;
@@ -63,7 +119,18 @@ void init_symbol_tables() {
     const_str = new_symbol_table();
 }
 
-SymbolTable * new_symbol_table() {
+/*
+
+=item C<SymbolTable * new_symbol_table()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+SymbolTable * new_symbol_table()
+{
     SymbolTable * tab = malloc(sizeof (SymbolTable));
     assert(tab);
     memset(tab, sizeof (SymbolTable), 0);
@@ -71,7 +138,18 @@ SymbolTable * new_symbol_table() {
     return tab;
 }
 
-Symbol * new_symbol(const char * name) {
+/*
+
+=item C<Symbol * new_symbol(const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * new_symbol(const char * name)
+{
     Symbol * s = malloc(sizeof (Symbol));
     assert(s);
     s->kind = 0;
@@ -88,32 +166,87 @@ Symbol * new_symbol(const char * name) {
     return s;
 }
 
-Symbol * new_identifier_symbol(const char * name) {
+/*
+
+=item C<Symbol * new_identifier_symbol(const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * new_identifier_symbol(const char * name)
+{
     Symbol * s = new_symbol(name);
     s->kind = IDENTIFIER;
     return s;
 }
 
-Symbol * new_literal_symbol(const char * name) {
+/*
+
+=item C<Symbol * new_literal_symbol(const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * new_literal_symbol(const char * name)
+{
     Symbol * s = new_symbol(name);
     s->kind = LITERAL;
     return s;
 }
 
-Symbol * new_type_symbol(const char * name) {
+/*
+
+=item C<Symbol * new_type_symbol(const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * new_type_symbol(const char * name)
+{
     Symbol * s = new_symbol(name);
     s->kind = TYPE;
     return s;
 }
 
-Symbol * mk_namespace_symbol(Symbol * identifier) {
+/*
+
+=item C<Symbol * mk_namespace_symbol(Symbol * identifier)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * mk_namespace_symbol(Symbol * identifier)
+{
     Symbol * s = identifier;
     s->kind = NAMESPACE;
     s->table = new_symbol_table();
     return s;
 }
 
-Symbol * mk_class_symbol(Symbol * identifier) {
+/*
+
+=item C<Symbol * mk_class_symbol(Symbol * identifier)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * mk_class_symbol(Symbol * identifier)
+{
     Type * t = store_type(identifier->name, 0);
 #if 0
     printf("#new_class(%s)\n", identifier->name);
@@ -123,13 +256,35 @@ Symbol * mk_class_symbol(Symbol * identifier) {
     return t->sym;
 }
 
-Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig) {
+/*
+
+=item C<Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig)
+{
     Symbol * s = new_symbol(name);
     s->kind = METHOD;
     return s;
 }
 
-Symbol * symbol_concat(Symbol * s1, Symbol * s2) {
+/*
+
+=item C<Symbol * symbol_concat(Symbol * s1, Symbol * s2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * symbol_concat(Symbol * s1, Symbol * s2)
+{
     int len = strlen(s1->name) + strlen(s2->name) + 1;
     Symbol * s = new_symbol("");
     s->name = malloc(len);
@@ -138,7 +293,18 @@ Symbol * symbol_concat(Symbol * s1, Symbol * s2) {
     return s;
 }
 
-Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3) {
+/*
+
+=item C<Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3)
+{
     int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) + 1;
     Symbol * s = new_symbol("");
     s->kind = s1->kind;
@@ -149,7 +315,18 @@ Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3) {
     return s;
 }
 
-Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4) {
+/*
+
+=item C<Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4)
+{
     int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) +
                 strlen(s4->name) + 1;
     Symbol * s = new_symbol("");
@@ -162,7 +339,18 @@ Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4) {
     return s;
 }
 
-AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
+/*
+
+=item C<AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2)
+{
     AST * ast = malloc(sizeof (AST));
     assert(ast);
     ast->start_label = ast->end_label = NULL;
@@ -186,18 +374,50 @@ AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
     return ast;
 }
 
-void push(Node ** list, Node * p) {
+/*
+
+=item C<void push(Node ** list, Node * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void push(Node ** list, Node * p)
+{
     p->next = *list;
     *list = p;
 }
 
-void tpush(Node ** list, Node * p) {
+/*
+
+=item C<void tpush(Node ** list, Node * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void tpush(Node ** list, Node * p)
+{
     p->tnext = *list;
     *list = p;
 }
 
-/* "push" onto opposite end of temp stack */
-void tunshift(Node ** list, Node * p) {
+/*
+
+=item C<void tunshift(Node ** list, Node * p)>
+
+"push" onto opposite end of temp stack
+
+=cut
+
+*/
+
+void tunshift(Node ** list, Node * p)
+{
     Node * l = *list;
     if (l && l == p) {
         printf("Oops: Shifting node list onto itself!\n");
@@ -211,8 +431,18 @@ void tunshift(Node ** list, Node * p) {
     else *list = p;
 }
 
-/* Return the top symbol on the stack. */
-Node * pop(Node ** list) {
+/*
+
+=item C<Node * pop(Node ** list)>
+
+Return the top symbol on the stack.
+
+=cut
+
+*/
+
+Node * pop(Node ** list)
+{
     Node * top;
     top = *list;
     if (*list)
@@ -220,8 +450,18 @@ Node * pop(Node ** list) {
     return top;
 }
 
-/* Return the top symbol on the tstack. */
-Node * tpop(Node ** list) {
+/*
+
+=item C<Node * tpop(Node ** list)>
+
+Return the top symbol on the tstack.
+
+=cut
+
+*/
+
+Node * tpop(Node ** list)
+{
     Node * top;
     top = *list;
     if (*list)
@@ -231,20 +471,52 @@ Node * tpop(Node ** list) {
 
 
 
-/* Easy fixme, rewrite below to call above generic Node versions */
+/* Easy FIXME, rewrite below to call above generic Node versions */
 
-void push_sym(Symbol ** list, Symbol * p) {
+/*
+
+=item C<void push_sym(Symbol ** list, Symbol * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void push_sym(Symbol ** list, Symbol * p)
+{
     p->next = *list;
     *list = p;
 }
 
-void tpush_sym(Symbol ** list, Symbol * p) {
+/*
+
+=item C<void tpush_sym(Symbol ** list, Symbol * p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void tpush_sym(Symbol ** list, Symbol * p)
+{
     p->tnext = *list;
     *list = p;
 }
 
-/* "push" onto opposite end of temp stack */
-void tunshift_sym(Symbol ** list, Symbol * p) {
+/*
+
+=item C<void tunshift_sym(Symbol ** list, Symbol * p)>
+
+"push" onto opposite end of temp stack
+
+=cut
+
+*/
+
+void tunshift_sym(Symbol ** list, Symbol * p)
+{
     Symbol * l = *list;
     if (l && l == p) {
         printf("Oops: Shifting symbol list onto itself!\n");
@@ -261,8 +533,18 @@ void tunshift_sym(Symbol ** list, Symbol * p) {
     }
 }
 
-/* Return the top symbol on the stack. */
-Symbol * pop_sym(Symbol ** list) {
+/*
+
+=item C<Symbol * pop_sym(Symbol ** list)>
+
+Return the top symbol on the stack.
+
+=cut
+
+*/
+
+Symbol * pop_sym(Symbol ** list)
+{
     Symbol * top;
     top = *list;
     if (*list)
@@ -270,8 +552,18 @@ Symbol * pop_sym(Symbol ** list) {
     return top;
 }
 
-/* Return the top symbol on the tstack. */
-Symbol * tpop_sym(Symbol ** list) {
+/*
+
+=item C<Symbol * tpop_sym(Symbol ** list)>
+
+Return the top symbol on the tstack.
+
+=cut
+
+*/
+
+Symbol * tpop_sym(Symbol ** list)
+{
     Symbol * top;
     top = *list;
     if (*list)
@@ -279,9 +571,18 @@ Symbol * tpop_sym(Symbol ** list) {
     return top;
 }
 
-/* Push namespace onto the stack and set active namespace to top of stack.
- */
-void push_namespace(Symbol * ns) {
+/*
+
+=item C<void push_namespace(Symbol * ns)>
+
+Push namespace onto the stack and set active namespace to top of stack.
+
+=cut
+
+*/
+
+void push_namespace(Symbol * ns)
+{
 #if 1
     printf("#push_namespace(%s)\n", ns->name);
 #endif
@@ -292,10 +593,19 @@ void push_namespace(Symbol * ns) {
     tpush_sym(&namespace_stack, ns);
 }
 
-/* Pop namespace off the stack and set active namespace to top of stack.
- * Leaves namespace symbol in symbol table.
- */
-Symbol * pop_namespace() {
+/*
+
+=item C<Symbol * pop_namespace()>
+
+Pop namespace off the stack and set active namespace to top of stack.
+Leaves namespace symbol in symbol table.
+
+=cut
+
+*/
+
+Symbol * pop_namespace()
+{
     Symbol * ns;
     ns = tpop_sym(&namespace_stack);
     scope = scope_stack[--last_scope];
@@ -308,8 +618,18 @@ Symbol * pop_namespace() {
     return ns;
 }
 
-/* "push" onto opposite end of stack */
-void unshift_ast(AST ** list, AST * p) {
+/*
+
+=item C<void unshift_ast(AST ** list, AST * p)>
+
+"push" onto opposite end of stack
+
+=cut
+
+*/
+
+void unshift_ast(AST ** list, AST * p)
+{
     AST * l = *list;
     if (l && l == p) {
         printf("Oops: Shifting ast list onto itself!\n");
@@ -323,52 +643,148 @@ void unshift_ast(AST ** list, AST * p) {
     else *list = p;
 }
 
-AST * new_statement(int stmnttype, AST * left, AST * right) {
+/*
+
+=item C<AST * new_statement(int stmnttype, AST * left, AST * right)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_statement(int stmnttype, AST * left, AST * right)
+{
     AST * p = new_ast(KIND_STATEMENT, stmnttype, left, right);
     return p;
 }
 
-AST * new_expr(int exprtype, AST * left, AST * right) {
+/*
+
+=item C<AST * new_expr(int exprtype, AST * left, AST * right)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_expr(int exprtype, AST * left, AST * right)
+{
     AST * p = new_ast(KIND_EXPR, exprtype, left, right);
     return p;
 }
 
-/* Specific type of expression (A b C) where b is an operator */
-AST * new_op_expr(AST * left, int op, AST * right) {
+/*
+
+=item C<AST * new_op_expr(AST * left, int op, AST * right)>
+
+Specific type of expression (A b C) where b is an operator
+
+=cut
+
+*/
+
+AST * new_op_expr(AST * left, int op, AST * right)
+{
     AST * p = new_ast(KIND_EXPR, ASTT_OP, left, right);
     p->op = op;
     return p;
 }
 
-AST * new_logical_expr(AST * left, int op, AST * right) {
+/*
+
+=item C<AST * new_logical_expr(AST * left, int op, AST * right)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_logical_expr(AST * left, int op, AST * right)
+{
     AST * p = new_ast(KIND_EXPR, ASTT_LOGICAL, left, right);
     p->op = op;
     return p;
 }
 
-AST * new_if(AST * condition, AST * then_part, AST * else_part) {
+/*
+
+=item C<AST * new_if(AST * condition, AST * then_part, AST * else_part)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_if(AST * condition, AST * then_part, AST * else_part)
+{
     AST * p = new_statement(ASTT_IF, then_part, else_part);
     p->Attr.Conditional.condition = condition;
     return p;
 }
 
 /*
- * Ternary conditionals
- */
-AST * new_conditional(AST * condition, AST * then_part, AST * else_part) {
+
+=back
+
+=head3 Ternary conditionals
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<AST * new_conditional(AST * condition, AST * then_part, AST * else_part)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_conditional(AST * condition, AST * then_part, AST * else_part)
+{
     AST * p = new_ast(KIND_EXPR, ASTT_CONDITIONAL_EXPR, then_part, else_part);
     p->Attr.Conditional.condition = condition;
     return p;
 }
 
-AST * new_while(AST * condition, AST * block) {
+/*
+
+=item C<AST * new_while(AST * condition, AST * block)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_while(AST * condition, AST * block)
+{
     AST * p = new_statement(ASTT_WHILE, NULL, NULL);
     p->Attr.Loop.condition = condition;
     p->Attr.Loop.body = block;
     return p;
 }
 
-AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
+/*
+
+=item C<AST * new_for(AST * init, AST * condition, AST * iteration, AST * block)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * new_for(AST * init, AST * condition, AST * iteration, AST * block)
+{
     AST * p = new_statement(ASTT_FOR, NULL, NULL);
     p->Attr.Loop.init = init;
     p->Attr.Loop.condition = condition;
@@ -378,9 +794,17 @@ AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
 }
 
 /*
- *  Only using first char of pattern for now.
- */
-Symbol * split(const char * pattern, const char * s) {
+
+=item C<Symbol * split(const char * pattern, const char * s)>
+
+Only using first char of pattern for now.
+
+=cut
+
+*/
+
+Symbol * split(const char * pattern, const char * s)
+{
     char c = pattern[0];
     Symbol * l = NULL;
     const char * p;
@@ -408,9 +832,17 @@ AGAIN:
 }
 
 /*
- * Return first occurence of symbol in surrounding scopes.
- */
-Symbol * lookup_symbol(const char * name) {
+
+=item C<Symbol * lookup_symbol(const char * name)>
+
+Return first occurence of symbol in surrounding scopes.
+
+=cut
+
+*/
+
+Symbol * lookup_symbol(const char * name)
+{
     Symbol * ns = current_namespace;
     Symbol * list = split(".", name);
     Symbol * s;
@@ -443,7 +875,18 @@ Symbol * lookup_symbol(const char * name) {
     return NULL;
 }
 
-Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name) {
+/*
+
+=item C<Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name)
+{
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
     if (!tab) {
@@ -459,7 +902,18 @@ Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name) {
     return NULL;
 }
 
-Symbol * lookup_namespace(SymbolTable * tab, const char * name) {
+/*
+
+=item C<Symbol * lookup_namespace(SymbolTable * tab, const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * lookup_namespace(SymbolTable * tab, const char * name)
+{
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
     for (sym_ptr = tab->table[ index ]; sym_ptr; sym_ptr = sym_ptr->next)    {
@@ -470,7 +924,18 @@ Symbol * lookup_namespace(SymbolTable * tab, const char * name) {
     return NULL;
 }
 
-Symbol * lookup_class(SymbolTable * tab, const char * name) {
+/*
+
+=item C<Symbol * lookup_class(SymbolTable * tab, const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * lookup_class(SymbolTable * tab, const char * name)
+{
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
     for (sym_ptr = tab->table[ index ]; sym_ptr; sym_ptr = sym_ptr->next)    {
@@ -481,7 +946,18 @@ Symbol * lookup_class(SymbolTable * tab, const char * name) {
     return NULL;
 }
 
-Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_level) {
+/*
+
+=item C<Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_level)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_level)
+{
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
     for (sym_ptr = tab->table[ index ]; sym_ptr; sym_ptr = sym_ptr->next) {
@@ -493,7 +969,18 @@ Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_lev
     return 0;
 }
 
-Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
+/*
+
+=item C<Symbol * store_symbol(SymbolTable * tab, Symbol * sym)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * store_symbol(SymbolTable * tab, Symbol * sym)
+{
     unsigned int index = hash_str(sym->name) % HASH_SIZE;
 #if 0
     fprintf(stderr, "#store_symbol(%s)\n", sym->name);
@@ -528,7 +1015,18 @@ Symbol * store_identifier(SymbolTable * tab, const char * name) {
 }
 */
 
-Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
+/*
+
+=item C<Symbol * store_method(SymbolTable * tab, const char * name, Type * type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * store_method(SymbolTable * tab, const char * name, Type * type)
+{
     Symbol * s;
     s = new_symbol(name);
     s->kind = METHOD;
@@ -540,9 +1038,17 @@ Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
 }
 
 /*
- * Method locals
- */
-void declare_local(Symbol * s) {
+
+=item C<void declare_local(Symbol * s)>
+
+Method locals
+
+=cut
+
+*/
+
+void declare_local(Symbol * s)
+{
     fprintf(stderr, "declare_local[%s]\n", s->name);
     store_symbol(current_symbol_table, s);
     if (s->typename) {
@@ -561,15 +1067,24 @@ void declare_local(Symbol * s) {
 }
 
 /*
- * Class fields
- */
-void declare_field(Symbol * s) {
+
+=item C<void declare_field(Symbol * s)>
+
+Class fields
+
+=cut
+
+*/
+
+void declare_field(Symbol * s)
+{
     fprintf(stderr, "declare_field[%s]\n", s->name);
     if (!current_namespace->type || current_namespace->type->kind != CLASS) {
         fprintf(stderr, "Internal Error: field declarations only valid for classes.\n");
         fprintf(stderr, "Current namespace is [%s]\n", current_namespace->name);
         abort();
     }
+
     store_symbol(current_symbol_table, s);
     if (s->typename) {
         s->type = lookup_type_symbol(s->typename);
@@ -586,7 +1101,18 @@ void declare_field(Symbol * s) {
     }
 }
 
-void dump_namespace(Symbol * ns) {
+/*
+
+=item C<void dump_namespace(Symbol * ns)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void dump_namespace(Symbol * ns)
+{
     if (ns->kind == CLASS) {
         printf("#<class %s>\n", ns->name);
         if (ns->table)
@@ -599,7 +1125,18 @@ void dump_namespace(Symbol * ns) {
     }
 }
 
-void dump_symbol_table(SymbolTable * tab) {
+/*
+
+=item C<void dump_symbol_table(SymbolTable * tab)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void dump_symbol_table(SymbolTable * tab)
+{
     Symbol * sym;
     int i;
     printf("#  <symbol table>\n");
@@ -644,7 +1181,18 @@ void dump_symbol_table(SymbolTable * tab) {
     printf("#  </symbol table>\n");
 }
 
-Symbol * check_id_redecl(SymbolTable * table, const char * name) {
+/*
+
+=item C<Symbol * check_id_redecl(SymbolTable * table, const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * check_id_redecl(SymbolTable * table, const char * name)
+{
     Symbol * t;
     if ((t = lookup_symbol_scope(table, name, scope)) != NULL) {
         printf("error (line %ld): identifier %s previously declared in this scope, line %d.\n", line, name, t->line);
@@ -654,23 +1202,53 @@ Symbol * check_id_redecl(SymbolTable * table, const char * name) {
     return t;
 }
 
-Symbol * check_id_decl(SymbolTable * table, const char * name) {
+/*
+
+=item C<Symbol * check_id_decl(SymbolTable * table, const char * name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+Symbol * check_id_decl(SymbolTable * table, const char * name)
+{
     Symbol * t;
     if ((t = lookup_symbol_in_tab(table, name)) == NULL)
         return NULL;
     return t;
 }
 
-int push_scope() {
+/*
+
+=item C<int push_scope()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+int push_scope()
+{
     scope++;
     return scope;
 }
 
 /*
- * Pop current scope level and return a list of
- * symbols if symbol table is passed.
- */
-Symbol * pop_scope() {
+
+=item C<Symbol * pop_scope()>
+
+Pop current scope level and return a list of
+symbols if symbol table is passed.
+
+=cut
+
+*/
+
+Symbol * pop_scope()
+{
     int i;
     SymbolTable * tab = current_symbol_table;
     Symbol * p = NULL;
@@ -699,13 +1277,21 @@ Symbol * pop_scope() {
 }
 
 /*
- * Same as pop_scope except no list is built and returned.
- * This is for cases where a list already existed, and each
- * node was inserted into the symbol table, and we want to
- * preserve that external list, so we can't scribble on the
- * ->tnext pointer as it may reorder the list or invalidate it.
- */
-void discard_scope() {
+
+=item C<void discard_scope()>
+
+Same as pop_scope except no list is built and returned.
+This is for cases where a list already existed, and each
+node was inserted into the symbol table, and we want to
+preserve that external list, so we can't scribble on the
+->tnext pointer as it may reorder the list or invalidate it.
+
+=cut
+
+*/
+
+void discard_scope()
+{
     int i;
     SymbolTable * tab = current_symbol_table;
     for (i = 0; i < HASH_SIZE; i++) {
@@ -728,35 +1314,87 @@ void discard_scope() {
     }
 }
 
+/*
 
-/* Don't laugh, this little array based stack is so I don't
- * have to add a 3rd ->next pointer to the AST struct.
- * It also means my design is wrong, will fix after adding
- * brain expansion pack.
- */
-void push_primary_block(AST * p) {
+=item C<void push_primary_block(AST * p)>
+
+Don't laugh, this little array based stack is so I don't
+have to add a 3rd ->next pointer to the AST struct.
+It also means my design is wrong, will fix after adding
+brain expansion pack.
+
+=cut
+
+*/
+
+void push_primary_block(AST * p)
+{
     primary_block_stack[primary_block++] = p;
 }
 
-AST * pop_primary_block() {
+/*
+
+=item C<AST * pop_primary_block()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * pop_primary_block()
+{
     if (primary_block > 0)
         return primary_block_stack[--primary_block];
     return NULL;
 }
 
-AST * get_cur_primary_block() {
+/*
+
+=item C<AST * get_cur_primary_block()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+AST * get_cur_primary_block()
+{
     if (primary_block > 0)
         return primary_block_stack[primary_block-1];
     return NULL;
 }
 
-char * str_dup(const char * old) {
+/*
+
+=item C<char * str_dup(const char * old)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * str_dup(const char * old)
+{
     char * copy = (char *)malloc(strlen(old) + 1);
     strcpy(copy, old);
     return copy;
 }
 
-char * str_cat(const char * s1, const char * s2) {
+/*
+
+=item C<char * str_cat(const char * s1, const char * s2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+char * str_cat(const char * s1, const char * s2)
+{
     int len = strlen(s1) + strlen(s2) + 1;
     char * s3 = malloc(len);
     strcpy(s3, s1);
@@ -764,7 +1402,13 @@ char * str_cat(const char * s1, const char * s2) {
     return s3;
 }
 
+/*
 
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
