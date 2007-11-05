@@ -96,11 +96,11 @@ This is called in schemec.
 sub compile {
     my $self = shift;
 
-    my $tokens_char_by_char = Scheme::Tokenizer::tokenize_char_by_char( $self->{file} );
-    my $tokens_hop          = Scheme::Tokenizer::tokenize_hop( $self->{file} ); # not used yet
-    my $tree                = Scheme::Parser::parse( $tokens_char_by_char );
+    my $tokens  = Scheme::Tokenizer::tokenize( $self->{file} ); # not used yet
+    my $tree    = Scheme::Parser::parse( $tokens );
+    my $main    = Scheme::Generator::generate( $tree );
 
-    return link_functions( Scheme::Generator::generate( $tree ) );
+    return link_functions( $main );
 }
 
 1;
