@@ -60,7 +60,15 @@ extern void yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
 
 /*
 
+=head1 FUNCTIONS
+
+=over 4
+
+=item C<lex_error>
+
 Emit an error message.
+
+=cut
 
 */
 static void
@@ -71,6 +79,12 @@ lex_error(char *msg, global_state *state) {
 
 
 /*
+
+=item C<main>
+
+Entry point of the heredoc pre-processor.
+
+=cut
 
 */
 int
@@ -92,11 +106,8 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-
-
     /* initialize a yyscan_t object */
     yylex_init(&yyscanner);
-
     /* set the scanner to a string buffer and go parse */
     yyset_in(fp, yyscanner);
 
@@ -118,11 +129,18 @@ main(int argc, char *argv[]) {
     return 0;
 }
 
+/*
 
+=back
+
+=cut
+
+*/
 
 
 /*
 using this we can check how often each rule is executed.
+
 */
 
 int ctr[YY_NUM_RULES];
@@ -132,17 +150,18 @@ int num_rules = YY_NUM_RULES;
 
 
 /* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   { global_state *state = yyget_extra(yyscanner);    \
-                           ++ctr[yy_act];             \
-                         do {                         \
-                              char *iter = yytext;    \
-                              while (*iter != '\0') { \
-                                  if (*iter == '\n')  \
-                                      state->line++;  \
-                                  iter++;             \
-                              }                       \
-                         }                            \
-                         while (0);                   \
+#define YY_USER_ACTION   {                                               \
+                           global_state *state = yyget_extra(yyscanner); \
+                           ++ctr[yy_act];                                \
+                           do {                                          \
+                               char *iter = yytext;                      \
+                               while (*iter != '\0') {                   \
+                                   if (*iter == '\n')                    \
+                                       state->line++;                    \
+                                   iter++;                               \
+                               }                                         \
+                           }                                             \
+                           while (0);                                    \
                          }
 
 
