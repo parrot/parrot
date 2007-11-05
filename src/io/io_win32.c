@@ -174,7 +174,9 @@ ParrotIOLayer pio_win32_layer = {
 
 /*
 
-=item C<flags_to_win32>
+=item C<static INTVAL
+flags_to_win32(INTVAL flags, NOTNULL(DWORD * fdwAccess),
+               NOTNULL(DWORD * fdwShareMode), NOTNULL(DWORD * fdwCreate))>
 
 Convert to platform-specific bit open flags.
 
@@ -228,7 +230,8 @@ flags_to_win32(INTVAL flags, NOTNULL(DWORD * fdwAccess),
 
 /*
 
-=item C<PIO_win32_init>
+=item C<static INTVAL
+PIO_win32_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))>
 
 Sets up the standard C<std*> IO handles.
 
@@ -282,7 +285,8 @@ PIO_win32_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-=item C<PIO_win32_getblksize>
+=item C<INTVAL
+PIO_win32_getblksize(SHIM(PIOHANDLE fd))>
 
 Returns C<PIO_BLKSIZE>.
 
@@ -299,7 +303,10 @@ PIO_win32_getblksize(SHIM(PIOHANDLE fd))
 
 /*
 
-=item C<PIO_win32_open>
+=item C<PARROT_CAN_RETURN_NULL
+static ParrotIO *
+PIO_win32_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
+               NOTNULL(const char *spath), INTVAL flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -353,7 +360,10 @@ PIO_win32_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
 
 /*
 
-=item C<PIO_win32_fdopen>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static ParrotIO *
+PIO_win32_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL flags)>
 
 Returns a new C<ParrotIO> with C<fd> as its file descriptor.
 
@@ -383,7 +393,8 @@ PIO_win32_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fd, INTVAL
 
 /*
 
-=item C<PIO_win32_close>
+=item C<static INTVAL
+PIO_win32_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
@@ -403,7 +414,9 @@ PIO_win32_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<PIO_win32_isatty>
+=item C<PARROT_WARN_UNUSED_RESULT
+static INTVAL
+PIO_win32_isatty(PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
 
@@ -421,7 +434,8 @@ PIO_win32_isatty(PIOHANDLE fd)
 
 /*
 
-=item C<PIO_win32_flush>
+=item C<static INTVAL
+PIO_win32_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 
@@ -449,7 +463,11 @@ PIO_win32_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<PIO_win32_read>
+=item C<static size_t
+PIO_win32_read(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **buf))>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -492,7 +510,11 @@ PIO_win32_read(PARROT_INTERP,
 
 /*
 
-=item C<PIO_win32_write>
+=item C<static size_t
+PIO_win32_write(SHIM_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *s))>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor.
@@ -502,7 +524,10 @@ C<buffer> to C<*io>'s file descriptor.
 */
 
 static size_t
-PIO_win32_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))
+PIO_win32_write(SHIM_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *s))
 {
     DWORD countwrote = 0;
     void * const buffer = s->strstart;
@@ -531,7 +556,9 @@ PIO_win32_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), 
 
 /*
 
-=item C<PIO_win32_seek>
+=item C<static PIOOFF_T
+PIO_win32_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+               PIOOFF_T off, INTVAL whence)>
 
 Hard seek.
 
@@ -563,7 +590,8 @@ PIO_win32_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PIO_win32_tell>
+=item C<static PIOOFF_T
+PIO_win32_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 Returns the current read/write position of C<*io>'s file descriptor.
 
@@ -586,7 +614,10 @@ PIO_win32_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<PIO_sockaddr_in>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+STRING *
+PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))>
 
 C<PIO_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
@@ -635,7 +666,10 @@ PIO_sockaddr_in(PARROT_INTERP, unsigned short port, NOTNULL(STRING *addr))
 
 /*
 
-=item C<PIO_win32_socket>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static ParrotIO *
+PIO_win32_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -663,7 +697,11 @@ PIO_win32_socket(PARROT_INTERP, SHIM(ParrotIOLayer *layer), int fam, int type, i
 
 /*
 
-=item C<PIO_win32_connect>
+=item C<static INTVAL
+PIO_win32_connect(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING *r))>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -698,7 +736,8 @@ PIO_win32_connect(PARROT_INTERP,
 
 /*
 
-=item C<PIO_win32_send>
+=item C<static INTVAL
+PIO_win32_send(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -751,7 +790,11 @@ AGAIN:
 
 /*
 
-=item C<PIO_win32_recv>
+=item C<static INTVAL
+PIO_win32_recv(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **s))>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -815,7 +858,8 @@ AGAIN:
 
 /*
 
-=item C<PIO_win32_bind>
+=item C<static INTVAL
+PIO_win32_bind(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NULLOK(STRING *l))>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -848,7 +892,8 @@ PIO_win32_bind(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PIO_win32_listen>
+=item C<static INTVAL
+PIO_win32_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), INTVAL backlog)>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -870,7 +915,9 @@ PIO_win32_listen(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PIO_win32_accept>
+=item C<PARROT_CAN_RETURN_NULL
+static ParrotIO *
+PIO_win32_accept(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 

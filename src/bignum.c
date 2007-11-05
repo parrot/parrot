@@ -155,8 +155,18 @@ True if C<bn> is a quiet NaN.
 
 #define am_qNAN(bn) ((bn)->flags & BN_qNAN_FLAG)
 
-/* For the sake of debugging */
-char* BN_lazydbprint(BIGNUM* foo) {
+/*
+
+=item C<char* BN_lazydbprint(BIGNUM* foo)>
+
+For the sake of debugging
+
+=cut
+
+*/
+
+char* BN_lazydbprint(BIGNUM* foo)
+{
     char*s;
     BN_to_scientific_string(foo, &s);
     return s;
@@ -221,7 +231,8 @@ required. The bignumber will be equal to zero.
 */
 
 BIGNUM*
-BN_new(PINTD_ INTVAL length) {
+BN_new(PINTD_ INTVAL length)
+{
     BIGNUM* bn;
     bn = (BIGNUM*)BN_alloc(PINT_ sizeof (BIGNUM));
     if (NULL == bn) {
@@ -243,7 +254,7 @@ BN_new(PINTD_ INTVAL length) {
 /*
 
 =item C<void
-BN_grow(PINTD_ BIGNUM *in, INTVAL length)>
+BN_grow(PINTD_ NOTNULL(BIGNUM *in), INTVAL length)>
 
 Grows bn so that it can contain C<length> I<decimal> digits, does not
 modify the value of the bignumber.
@@ -253,7 +264,8 @@ modify the value of the bignumber.
 */
 
 void
-BN_grow(PINTD_ NOTNULL(BIGNUM *in), INTVAL length) {
+BN_grow(PINTD_ NOTNULL(BIGNUM *in), INTVAL length)
+{
     PARROT_ASSERT(in);
     if (length <= in->nibs * BN_D_PER_NIB) {
         return;
@@ -282,7 +294,8 @@ Frees all the memory used by the BIGNUM.
 */
 
 void
-BN_destroy(PINTD_ BIGNUM *bn) {
+BN_destroy(PINTD_ BIGNUM *bn)
+{
     PARROT_ASSERT(bn!=NULL);
 
     BN_free(PINT_ bn->buffer);
@@ -313,7 +326,8 @@ The context object can be destroyed with C<free()>.
 */
 
 BN_CONTEXT*
-BN_create_context(PINTD_ INTVAL precision) {
+BN_create_context(PINTD_ INTVAL precision)
+{
     BN_CONTEXT *result;
 
     result = (BN_CONTEXT*)BN_alloc(PINT_ sizeof (BN_CONTEXT));
@@ -351,7 +365,8 @@ updated.
 */
 
 INTVAL
-BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
+BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value)
+{
     PARROT_ASSERT(bn != NULL);
     if (pos > bn->nibs * BN_D_PER_NIB) {
         BN_grow(bn, pos);
@@ -378,7 +393,8 @@ out of bounds.
 */
 
 INTVAL
-BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
+BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos)
+{
     PARROT_ASSERT(bn != NULL);
     if (pos > bn->digits || pos < 0) return -1;
     return BN_getd(bn, pos);
@@ -407,21 +423,24 @@ and only the qNAN bit set.
 
 */
 
-int BN_set_inf(PINTD_ BIGNUM* bn) {
+int BN_set_inf(PINTD_ BIGNUM* bn)
+{
     PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_INF_FLAG;
     return;
 }
 
-int BN_set_qNAN(PINTD_ BIGNUM* bn) {
+int BN_set_qNAN(PINTD_ BIGNUM* bn)
+{
     PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG;
     return;
 }
 
-int BN_set_sNAN(PINTD_ BIGNUM* bn) {
+int BN_set_sNAN(PINTD_ BIGNUM* bn)
+{
     PARROT_ASSERT(bn != NULL);
     bn->digits = 0;
     bn->flags = (bn->flags & (~(UINTVAL)255)) | BN_qNAN_FLAG | BN_sNAN_FLAG;
@@ -447,7 +466,8 @@ C<< context->rounding >> and the sign of C<bn>:
 */
 
 int
-BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
+BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context)
+{
     int massive = 0; /* 0 => inf, 1=> 99999999999 etc...*/
     switch (context->rounding) {
       case ROUND_HALF_UP:
@@ -492,7 +512,8 @@ Copies two into one, returning one for convenience.
 */
 
 BIGNUM*
-BN_copy(PINTD_ BIGNUM* one, BIGNUM* two) {
+BN_copy(PINTD_ BIGNUM* one, BIGNUM* two)
+{
     PARROT_ASSERT(one != NULL); PARROT_ASSERT(two != NULL);
 
     BN_grow(PINT_ two, one->digits);
@@ -520,7 +541,8 @@ those required to store a single integer into a bignum.
 */
 
 BIGNUM*
-BN_new_from_int(PINTD_ INTVAL value) {
+BN_new_from_int(PINTD_ INTVAL value)
+{
     BIGNUM *new;
     int i, current;
     new = BN_new(PINT_ BN_D_PER_INT);
@@ -552,7 +574,8 @@ Dump the bignum for testing, along with a little message.
 */
 
 void
-BN_PRINT_DEBUG(BIGNUM *bn, char* mesg) {
+BN_PRINT_DEBUG(BIGNUM *bn, char* mesg)
+{
     INTVAL i;
     printf("%s: nibs %i digits %i sign %i expn %i \n",mesg,
            bn->nibs, bn->digits, bn->sign, bn->expn);
@@ -572,7 +595,7 @@ BN_PRINT_DEBUG(BIGNUM *bn, char* mesg) {
 /*
 
 =item C<INTVAL
-BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, char *msg)>
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)>
 
 When an exceptional condition occurs after which execution could
 continue.  If context specifies that death occurs, then so be it.
@@ -582,7 +605,8 @@ continue.  If context specifies that death occurs, then so be it.
 */
 
 INTVAL
-BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg) {
+BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)
+{
     /* See extended standard for details */
     switch (except) {
     case BN_CONVERSION_OVERFLOW :
@@ -703,7 +727,8 @@ version is provided until Parrot exceptions are sorted out properly.
 */
 
 void
-BN_exception(PINTD_ BN_EXCEPTIONS exception, const char* message) {
+BN_exception(PINTD_ BN_EXCEPTIONS exception, const char* message)
+{
     printf("Exception %d %s\n", exception, message);
     exit(EXIT_SUCCESS);
 }
@@ -734,11 +759,14 @@ Memory pointed to by C<dest> is not freed by this function.
 
 
 INTVAL
-BN_to_scientific_string(PINTD_ BIGNUM*bn, char **dest) {
+BN_to_scientific_string(PINTD_ BIGNUM*bn, char **dest)
+{
     BN_to_scieng_string(PINT_ bn, dest, 0);
 }
+
 INTVAL
-BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest) {
+BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest)
+{
     BN_to_scieng_string(PINT_ bn, dest, 1);
 }
 
@@ -755,7 +783,8 @@ perform.
 */
 
 INTVAL
-BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
+BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng)
+{
     char* cur;
     INTVAL adj_exp = 0; /* as bn->expn is relative to 0th digit */
     INTVAL cur_dig = 0;
@@ -897,7 +926,8 @@ Does not yet check for exponent overflow.
 */
 
 BIGNUM*
-BN_from_string(PINTD_ char* s2, BN_CONTEXT *context) {
+BN_from_string(PINTD_ char* s2, BN_CONTEXT *context)
+{
     BIGNUM *result;
     BIGNUM *temp;
 
@@ -1116,7 +1146,8 @@ Removes any zeros before the msd and after the lsd.
 */
 
 int
-BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context) {
+BN_strip_lead_zeros(PINTD_ BIGNUM* bn, BN_CONTEXT *context)
+{
     INTVAL msd, i;
 
     if (bn->digits == 0) return 0; /* Cannot "fail" with special nums */
@@ -1143,7 +1174,8 @@ Does not remove zeros before the decimal point.
 */
 
 int
-BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
+BN_strip_tail_zeros(PINTD_ BIGNUM *bn, BN_CONTEXT *context)
+{
     INTVAL lsd, i;
 
     lsd = 0;
@@ -1181,7 +1213,8 @@ is possible.
 */
 
 int
-BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
+BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context)
+{
     /* Normal bignum */
     if (bn->expn > 0 && bn->digits + bn->expn <= context->precision) {
         INTVAL i;
@@ -1214,7 +1247,8 @@ To check if a number is equal to zero, use C<BN_is_zero()>.
 */
 
 int
-BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero) {
+BN_really_zero(PINTD_ BIGNUM* bn, int allow_neg_zero)
+{
     INTVAL i;
     if (bn->digits == 0) return;
     for (i=0; i< bn->digits; i++)
@@ -1238,7 +1272,8 @@ Rounds C<*bn> according to C<*context>.
 */
 
 void
-BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
+BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context)
+{
     /* In exported version, must check for sNAN */
     if (bn->digits == 0 && am_sNAN(bn)) {
         BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
@@ -1283,7 +1318,8 @@ eg. for  1.234567E+3 with rounding of C<ROUND_DOWN>
 */
 
 int
-BN_iround(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
+BN_iround(PINTD_ BIGNUM *bn, BN_CONTEXT* context)
+{
     PARROT_ASSERT(bn!= NULL);
     PARROT_ASSERT(context != NULL);
 
@@ -1397,7 +1433,8 @@ function with non-positive values of C<precision>.
 */
 
 int
-BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
+BN_round_up(PINTD_ BIGNUM *bn, BN_CONTEXT* context)
+{
     INTVAL i, carry;
 
     /* Do a cheap num += 1E+(num->expn) */
@@ -1441,7 +1478,8 @@ not call this function with non-positive precision.
 */
 
 int
-BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
+BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context)
+{
     INTVAL i =0;
     INTVAL extra;
 
@@ -1472,7 +1510,8 @@ least C<precision>.  Name is slightly misleading.
 */
 
 void
-BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
+BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context)
+{
     INTVAL i;
     BN_CONTEXT temp_context;
 
@@ -1581,7 +1620,8 @@ modified to the appropriate representation and will not be restorable.
 
 int
 BN_arith_setup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-               BN_CONTEXT *context, BN_SAVE_PREC* restore) {
+               BN_CONTEXT *context, BN_SAVE_PREC* restore)
+{
     BN_strip_lead_zeros(PINT_ one, context);
     BN_strip_lead_zeros(PINT_ two, context);
     BN_iround(PINT_ one, context);
@@ -1608,7 +1648,8 @@ mistake.
 
 int
 BN_arith_cleanup(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-                 BN_CONTEXT *context, BN_SAVE_PREC* restore) {
+                 BN_CONTEXT *context, BN_SAVE_PREC* restore)
+{
     INTVAL i;
     unsigned char traps_save;
     unsigned char flags_save;
@@ -1657,7 +1698,8 @@ place.
 */
 
 int
-BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
+BN_align(PINTD_ BIGNUM* one, BIGNUM* two)
+{
     INTVAL i;
     INTVAL diff;
 
@@ -1735,7 +1777,8 @@ Adds one to two, returning value in result.
 */
 
 void
-BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
+BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context)
+{
     BN_SAVE_PREC restore;
     /* Special values */
     if (one->digits == 0 || two->digits == 0) {
@@ -1826,7 +1869,8 @@ arguments.  Cannot cope with special values.
 
 int
 BN_iadd(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-              BN_CONTEXT *context) {
+              BN_CONTEXT *context)
+{
     INTVAL i;
     int carry, dig;
 
@@ -1919,7 +1963,8 @@ Subtracts C<*two> from C<*one>, returning value in C<*result>.
 
 void
 BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-            BN_CONTEXT *context) {
+            BN_CONTEXT *context)
+{
     BN_SAVE_PREC restore;
     /* Special values, like addition but careful with those signs eugene */
     if (one->digits == 0 || two->digits == 0) {
@@ -2011,7 +2056,8 @@ Cannot cope with special values.
 
 int
 BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-              BN_CONTEXT *context) {
+              BN_CONTEXT *context)
+{
     INTVAL i;
     int carry, dig;
     /* Make sure we don't do work we don't need, or add precision where
@@ -2140,7 +2186,8 @@ Perform unary C<+> on C<*one>.  Does all the rounding and what have you.
 */
 
 void
-BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
+BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)
+{
     /* Check for special values */
     if (one->digits ==0) {
         if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
@@ -2175,7 +2222,8 @@ have you.
 */
 
 void
-BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context) {
+BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)
+{
     /* Check for special values */
     if (one->digits ==0) {
         if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
@@ -2217,7 +2265,8 @@ BIGNUM) in C<*result>.
 
 void
 BN_compare(PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-            BN_CONTEXT *context) {
+            BN_CONTEXT *context)
+{
     INTVAL cmp;
 
     /* Special values */
@@ -2408,7 +2457,8 @@ with a fixed fractional part
 
 void
 BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-          BN_CONTEXT *context) {
+          BN_CONTEXT *context)
+{
     BIGNUM* rem;
     /* Check for special values */
     if (one->digits == 0 || two->digits == 0) {
@@ -2642,7 +2692,8 @@ Places the integer part of C<*one> divided by C<*two> into C<*result>.
 
 void
 BN_divide_integer(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-                   BN_CONTEXT *context) {
+                   BN_CONTEXT *context)
+{
     BIGNUM* rem;
     /* Check for special values (same as divide...) */
     if (one->digits == 0 || two->digits == 0) {
@@ -2748,7 +2799,8 @@ Places the remainder from divide-integer (above) into C<*result>.
 
 void
 BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-              BN_CONTEXT *context) {
+              BN_CONTEXT *context)
+{
     BIGNUM* fake;
 
     /* Check for special values */
@@ -2821,16 +2873,18 @@ BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 /*
 
-=item C<BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
+=item C<int BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM *rem)>
 
 Does the heavy work for the various division wossnames.
 
 =cut
 
-*/int
-BN_idivide(PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
-            BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM* rem){
+*/
+int
+BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
+            BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM *rem)
+{
     INTVAL i, j, divided, newexpn;
     BIGNUM *div,*t1, *t2;
     int s2, value;
@@ -2957,7 +3011,8 @@ Comparison with no rounding etc.
 */
 
 INTVAL
-BN_comp(PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context) {
+BN_comp(PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context)
+{
     INTVAL i,j;
     int cmp;
 
@@ -3034,7 +3089,8 @@ Rescales C<*one> to have an exponent of C<*two>.
 
 void
 BN_rescale(PINTD_ BIGNUM* result, BIGNUM* one, BIGNUM* two,
-                BN_CONTEXT* context) {
+                BN_CONTEXT* context)
+{
     INTVAL expn;
     unsigned char lost = context->traps;
     context->traps &= ~(unsigned char)BN_F_LOST_DIGITS;
@@ -3061,7 +3117,8 @@ representation cannot be created.
 */
 
 INTVAL
-BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
+BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context)
+{
     INTVAL insig, i;
     INTVAL result = 0;
     INTVAL maxdigs = BN_D_PER_INT < context->precision ?
@@ -3118,7 +3175,8 @@ Returns a boolean value indicating whether C<*foo> is zero.
 */
 
 INTVAL
-BN_is_zero(BIGNUM* foo, BN_CONTEXT* context) {
+BN_is_zero(BIGNUM* foo, BN_CONTEXT* context)
+{
     BN_really_zero(foo, context->extended);
     if (foo->digits == 1 && foo->expn == 0 && BN_getd(foo, 0) == 0) {
         return 1;

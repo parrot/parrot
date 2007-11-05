@@ -32,6 +32,35 @@ static int tracing = 1;
 static int pid = 0;
 static char *initial_brk = 0;
 
+/*
+
+=head1 NAME
+
+src/malloc-trace.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<static void
+open_log_file()>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 open_log_file()
 {
@@ -69,6 +98,17 @@ open_log_file()
     tracing = 1;
 }
 
+/*
+
+=item C<static void
+malloc_trace_destructor(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 malloc_trace_destructor(void)
 {
@@ -93,6 +133,17 @@ malloc_trace_destructor(void)
 
 #ifdef __linux__
 
+/*
+
+=item C<static void
+malloc_segv_handler(int i, struct sigcontext_struct sc)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 malloc_segv_handler(int i, struct sigcontext_struct sc)
 {
@@ -103,6 +154,17 @@ malloc_segv_handler(int i, struct sigcontext_struct sc)
 }
 
 #endif
+
+/*
+
+=item C<static void
+malloc_record(int code, size_t size, void *ptr, void *ptr2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 malloc_record(int code, size_t size, void *ptr, void *ptr2)
@@ -138,6 +200,17 @@ malloc_record(int code, size_t size, void *ptr, void *ptr2)
 }
 
 void* _real_malloc(size_t bytes);
+
+/*
+
+=item C<void* malloc(size_t bytes)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void* malloc(size_t bytes)
 {
     void *ptr;
@@ -153,6 +226,17 @@ void* malloc(size_t bytes)
 #define malloc _real_malloc
 
 void _real_free(void* mem);
+
+/*
+
+=item C<void free(void* mem)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void free(void* mem)
 {
     malloc_record(CODE_FREE, 0, mem, 0);
@@ -161,6 +245,17 @@ void free(void* mem)
 #define free _real_free
 
 void* _real_realloc(void* mem, size_t bytes);
+
+/*
+
+=item C<void* realloc(void* mem, size_t bytes)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void* realloc(void* mem, size_t bytes)
 {
     void *ptr;
@@ -172,6 +267,17 @@ void* realloc(void* mem, size_t bytes)
 #define realloc _real_realloc
 
 void* _real_memalign(size_t alignment, size_t bytes);
+
+/*
+
+=item C<void* memalign(size_t alignment, size_t bytes)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void* memalign(size_t alignment, size_t bytes)
 {
     void *ptr;
@@ -187,6 +293,17 @@ void* memalign(size_t alignment, size_t bytes)
 #define memalign _real_memalign
 
 void* _real_calloc(size_t n, size_t elem_size);
+
+/*
+
+=item C<void* calloc(size_t n, size_t elem_size)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void* calloc(size_t n, size_t elem_size)
 {
     void *ptr;
@@ -202,6 +319,17 @@ void* calloc(size_t n, size_t elem_size)
 #define calloc _real_calloc
 
 void _real_cfree(void *mem);
+
+/*
+
+=item C<void cfree(void *mem)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void cfree(void *mem)
 {
     malloc_record(CODE_CFREE, 0, mem, 0);
@@ -210,6 +338,14 @@ void cfree(void *mem)
 #define cfree _real_cfree
 
 #include "malloc.c"
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

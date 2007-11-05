@@ -16,6 +16,10 @@ This uses the C<Parrot_disassemble()> function from F<src/embed.c>,
 which in turn uses the C<PDB_disassemble()> function from
 F<src/debug.c>.
 
+=head2 Functions
+
+=over 4
+
 =cut
 
 */
@@ -30,10 +34,12 @@ static void do_dis(Parrot_Interp);
 
 /*
 
-int main(int argc, char *argv[])
+=item C<int main(int argc, char *argv[])>
 
 The run-loop. Starts up an interpreter, loads the bytecode from the
 command-line and disassembles it.
+
+=cut
 
 */
 
@@ -74,9 +80,11 @@ main(int argc, char *argv[])
 
 /*
 
-static void do_dis(Parrot_Interp interp)
+=item C<static void do_dis(Parrot_Interp interp)>
 
 Do the disassembling.
+
+=cut
 
 */
 
@@ -87,6 +95,8 @@ do_dis(Parrot_Interp interp)
 }
 
 /*
+
+=back
 
 =head1 SEE ALSO
 

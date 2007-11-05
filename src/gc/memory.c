@@ -28,7 +28,11 @@ setup function to initialize the memory pools.
 
 /*
 
-=item C<mem_sys_allocate>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem_sys_allocate(size_t size)>
 
 Uses C<malloc> to allocate system memory.
 
@@ -53,7 +57,10 @@ mem_sys_allocate(size_t size)
 
 /*
 
-=item C<mem__internal_allocate>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)>
 
 TODO: Not yet documented!!!
 
@@ -81,7 +88,11 @@ mem__internal_allocate(size_t size, NOTNULL(const char *file), int line)
 
 /*
 
-=item C<mem_sys_allocate_zeroed>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem_sys_allocate_zeroed(size_t size)>
 
 Uses C<calloc> to allocate system memory.
 
@@ -106,7 +117,10 @@ mem_sys_allocate_zeroed(size_t size)
 
 /*
 
-=item C<mem__internal_allocate_zeroed>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)>
 
 TODO: Not yet documented!!!
 
@@ -134,7 +148,11 @@ mem__internal_allocate_zeroed(size_t size, NOTNULL(const char *file), int line)
 
 /*
 
-=item C<mem__sys_realloc>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__sys_realloc(NULLOK(void *from), size_t size)>
 
 Resize a chunk of system memory.
 
@@ -164,7 +182,11 @@ mem__sys_realloc(NULLOK(void *from), size_t size)
 
 /*
 
-=item C<mem__sys_realloc_zeroed>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)>
 
 Resize a chunk of system memory. Fill the newly allocated space with zeroes.
 
@@ -197,7 +219,11 @@ mem__sys_realloc_zeroed(NULLOK(void *from), size_t size, size_t old_size)
 
 /*
 
-=item C<mem__internal_realloc>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+void *
+mem__internal_realloc(NOTNULL(void *from), size_t size,
+        NOTNULL(const char *file), int line)>
 
 TODO: Not yet documented!!!
 
@@ -228,7 +254,9 @@ mem__internal_realloc(NOTNULL(void *from), size_t size,
 
 /*
 
-=item C<mem_sys_free>
+=item C<PARROT_API
+void
+mem_sys_free(NULLOK(void *from))>
 
 Free a chunk of memory back to the system.
 
@@ -249,7 +277,8 @@ mem_sys_free(NULLOK(void *from))
 
 /*
 
-=item C<mem__internal_free>
+=item C<void
+mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)>
 
 TODO: Not yet documented!!!
 
@@ -271,7 +300,8 @@ mem__internal_free(NULLOK(void *from), NOTNULL(const char *file), int line)
 
 /*
 
-=item C<mem_setup_allocator>
+=item C<void
+mem_setup_allocator(PARROT_INTERP)>
 
 Initializes the allocator.
 

@@ -148,7 +148,9 @@ static STRING * to_encoding(PARROT_INTERP,
 
 /*
 
-=item C<to_encoding>
+=item C<PARROT_DOES_NOT_RETURN
+static STRING *
+to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))>
 
 TODO: Not yet documented!!!
 
@@ -166,15 +168,17 @@ to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))
 
 /*
 
-=item C<get_codepoint>
+=item C<PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+get_codepoint(PARROT_INTERP, NOTNULL(const STRING *source_string),
+        UINTVAL offset)>
 
-TODO: Not yet documented!!!
+codepoints are bytes, so delegate
 
 =cut
 
 */
 
-/* codepoints are bytes, so delegate */
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 get_codepoint(PARROT_INTERP, NOTNULL(const STRING *source_string),
@@ -185,15 +189,16 @@ get_codepoint(PARROT_INTERP, NOTNULL(const STRING *source_string),
 
 /*
 
-=item C<set_codepoint>
+=item C<static void
+set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL codepoint)>
 
-TODO: Not yet documented!!!
+This is the same as set byte
 
 =cut
 
 */
 
-/* This is the same as set byte */
 static void
 set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL codepoint)
@@ -203,7 +208,9 @@ set_codepoint(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<get_byte>
+=item C<PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+get_byte(PARROT_INTERP, NOTNULL(const STRING *source_string), UINTVAL offset)>
 
 TODO: Not yet documented!!!
 
@@ -227,7 +234,9 @@ get_byte(PARROT_INTERP, NOTNULL(const STRING *source_string), UINTVAL offset)
 
 /*
 
-=item C<set_byte>
+=item C<static void
+set_byte(PARROT_INTERP, NOTNULL(const STRING *source_string),
+        UINTVAL offset, UINTVAL byte)>
 
 TODO: Not yet documented!!!
 
@@ -249,15 +258,17 @@ set_byte(PARROT_INTERP, NOTNULL(const STRING *source_string),
 
 /*
 
-=item C<get_codepoints>
+=item C<PARROT_WARN_UNUSED_RESULT
+static STRING *
+get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count)>
 
-TODO: Not yet documented!!!
+Delegate to get_bytes
 
 =cut
 
 */
 
-/* Delegate to get_bytes */
 PARROT_WARN_UNUSED_RESULT
 static STRING *
 get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -271,7 +282,10 @@ get_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<get_bytes>
+=item C<PARROT_WARN_UNUSED_RESULT
+static STRING *
+get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count)>
 
 TODO: Not yet documented!!!
 
@@ -301,15 +315,17 @@ get_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<get_codepoints_inplace>
+=item C<PARROT_WARN_UNUSED_RESULT
+static STRING *
+get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))>
 
-TODO: Not yet documented!!!
+Delegate to get_bytes
 
 =cut
 
 */
 
-/* Delegate to get_bytes */
 PARROT_WARN_UNUSED_RESULT
 static STRING *
 get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -322,7 +338,10 @@ get_codepoints_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<get_bytes_inplace>
+=item C<PARROT_WARN_UNUSED_RESULT
+static STRING *
+get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *return_string))>
 
 TODO: Not yet documented!!!
 
@@ -348,15 +367,16 @@ get_bytes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<set_codepoints>
+=item C<static void
+set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_codepoints))>
 
-TODO: Not yet documented!!!
+Delegate to set_bytes
 
 =cut
 
 */
 
-/* Delegate to set_bytes */
 static void
 set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_codepoints))
@@ -366,7 +386,9 @@ set_codepoints(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<set_bytes>
+=item C<static void
+set_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
+        UINTVAL offset, UINTVAL count, NOTNULL(STRING *new_bytes))>
 
 TODO: Not yet documented!!!
 
@@ -383,16 +405,15 @@ set_bytes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<become_encoding>
+=item C<static void
+become_encoding(PARROT_INTERP, SHIM(STRING *source_string))>
 
-TODO: Not yet documented!!!
+Unconditionally makes the string be in this encoding, if that's valid
 
 =cut
 
 */
 
-/* Unconditionally makes the string be in this encoding, if that's
-   valid */
 static void
 become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
 {
@@ -402,7 +423,8 @@ become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<codepoints>
+=item C<static UINTVAL
+codepoints(PARROT_INTERP, NOTNULL(STRING *source_string))>
 
 TODO: Not yet documented!!!
 
@@ -418,7 +440,8 @@ codepoints(PARROT_INTERP, NOTNULL(STRING *source_string))
 
 /*
 
-=item C<bytes>
+=item C<static UINTVAL
+bytes(SHIM_INTERP, NOTNULL(STRING *source_string))>
 
 TODO: Not yet documented!!!
 
@@ -438,7 +461,8 @@ bytes(SHIM_INTERP, NOTNULL(STRING *source_string))
 
 /*
 
-=item C<fixed8_get_next>
+=item C<static UINTVAL
+fixed8_get_next(PARROT_INTERP, NOTNULL(String_iter *iter))>
 
 TODO: Not yet documented!!!
 
@@ -456,7 +480,8 @@ fixed8_get_next(PARROT_INTERP, NOTNULL(String_iter *iter))
 
 /*
 
-=item C<fixed8_set_next>
+=item C<static void
+fixed8_set_next(PARROT_INTERP, NOTNULL(String_iter *iter), UINTVAL c)>
 
 TODO: Not yet documented!!!
 
@@ -473,7 +498,8 @@ fixed8_set_next(PARROT_INTERP, NOTNULL(String_iter *iter), UINTVAL c)
 
 /*
 
-=item C<fixed8_set_position>
+=item C<static void
+fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)>
 
 TODO: Not yet documented!!!
 
@@ -491,7 +517,8 @@ fixed8_set_position(SHIM_INTERP, NOTNULL(String_iter *iter), UINTVAL pos)
 
 /*
 
-=item C<iter_init>
+=item C<static void
+iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))>
 
 TODO: Not yet documented!!!
 
@@ -511,7 +538,9 @@ iter_init(SHIM_INTERP, NOTNULL(const STRING *src), NOTNULL(String_iter *iter))
 
 /*
 
-=item C<Parrot_encoding_fixed_8_init>
+=item C<PARROT_CANNOT_RETURN_NULL
+ENCODING *
+Parrot_encoding_fixed_8_init(PARROT_INTERP)>
 
 TODO: Not yet documented!!!
 

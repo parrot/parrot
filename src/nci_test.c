@@ -22,10 +22,12 @@ At that location the shared library is loadable with the opcode 'loadlib'.
 The functions in the library are available with the opcode 'dlfunc'.
 The variables in the library are available with the opcode 'dlvar'.
 
-=head1 Functions
+=head2 Functions
 
 The name of a test function is usually 'nci_<signature>'. E.g. the function
 'nci_ip' takes a 'pointer' and returns a 'int'.
+
+=over 4
 
 =cut
 
@@ -130,52 +132,159 @@ PARROT_API char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 /* Function definitions */
 
+/*
+
+=item C<PARROT_API char
+nci_c(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API char
 nci_c(void) {
     return nci_dlvar_char;
 }
 
+/*
+
+=item C<PARROT_API char
+nci_csc(short l1, char l2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API char
-nci_csc(short l1, char l2) {
+nci_csc(short l1, char l2)
+{
     return l1 * l2;
 }
 
+/*
+
+=item C<PARROT_API double
+nci_d(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API double
-nci_d(void) {
+nci_d(void)
+{
     nci_dlvar_double *= 10.0;
 
     return nci_dlvar_double;
 }
 
+/*
+
+=item C<PARROT_API double
+nci_dd(double d)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API double
-nci_dd(double d) {
+nci_dd(double d)
+{
     return d * 2.0;
 }
 
+/*
+
+=item C<PARROT_API float
+nci_f(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API float
-nci_f(void) {
+nci_f(void)
+{
     nci_dlvar_float *= 10.0;
 
     return nci_dlvar_float;
 }
 
+/*
+
+=item C<PARROT_API float
+nci_fff(float l1, float l2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API float
-nci_fff(float l1, float l2) {
+nci_fff(float l1, float l2)
+{
     return l1 / l2;
 }
 
+/*
+
+=item C<PARROT_API int
+nci_i(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_i(void) {
+nci_i(void)
+{
    return nci_dlvar_int;
 }
 
+/*
+
+=item C<PARROT_API int
+nci_isc(short l1, char l2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_isc(short l1, char l2) {
+nci_isc(short l1, char l2)
+{
     return l1 * l2;
 }
 
+/*
+
+=item C<PARROT_API int
+nci_ip(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_ip(void *p) {
+nci_ip(void *p)
+{
     typedef struct _dfi {
         double d;
         float f;
@@ -189,94 +298,252 @@ nci_ip(void *p) {
     return (int) (sp->d + sp->f + sp->i);
 }
 
-/* test calls this with a string */
+/*
+
+=item C<PARROT_API int
+nci_it(void *p)>
+
+test calls this with a string
+
+=cut
+
+*/
+
 PARROT_API int
-nci_it(void *p) {
+nci_it(void *p)
+{
     fprintf(stderr, "%c%c\n", ((char*) p)[1], ((char *) p)[0]);
     fflush(stderr);
 
     return 2;
 }
 
+/*
+
+=item C<PARROT_API long
+nci_l(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API long
-nci_l(void) {
+nci_l(void)
+{
     return nci_dlvar_long;
 }
 
+/*
+
+=item C<PARROT_API int *
+nci_p(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int *
-nci_p(void) {
+nci_p(void)
+{
     return &nci_dlvar_int;
 }
 
+/*
+
+=item C<PARROT_API char *
+nci_t(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API char *
-nci_t(void) {
+nci_t(void)
+{
     return nci_dlvar_cstring;
 }
 
+/*
+
+=item C<PARROT_API char *
+nci_tb(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static char b[] = "xx worked\n";
+
 PARROT_API char *
-nci_tb(void *p) {
+nci_tb(void *p)
+{
     b[0] = ((char*) p)[1];
     b[1] = ((char*) p)[0];
 
     return b;
 }
 
+/*
+
+=item C<PARROT_API char *
+nci_tt(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static char s[] = "xx worked\n";
+
 PARROT_API char *
-nci_tt(void *p) {
+nci_tt(void *p)
+{
     s[0] = ((char*) p)[1];
     s[1] = ((char*) p)[0];
 
     return s;
 }
 
+/*
+
+=item C<PARROT_API char *
+nci_tB(void **p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static char B[] = "xx done\n";
+
 PARROT_API char *
-nci_tB(void **p) {
+nci_tB(void **p)
+{
     B[0] = (*(char**) p)[1];
     B[1] = (*(char**) p)[0];
 
     return B;
 }
 
+/*
+
+=item C<PARROT_API void *
+nci_pp(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void *
-nci_pp(void *p) {
+nci_pp(void *p)
+{
     return p;
 }
 
+/*
+
+=item C<PARROT_API int
+nci_iiii(int i1, int i2, int i3)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_iiii(int i1, int i2, int i3) {
+nci_iiii(int i1, int i2, int i3)
+{
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
     fflush(stderr);
 
     return 2;
 }
 
+/*
+
+=item C<PARROT_API int
+nci_i4i(long * l, int i)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_i4i(long * l, int i) {
+nci_i4i(long * l, int i)
+{
 
     return (int) (*l * i);
 }
 
+/*
+
+=item C<PARROT_API int
+nci_ii3(int a, int *bp)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_ii3(int a, int *bp) {
+nci_ii3(int a, int *bp)
+{
     int r = a * *bp;
     *bp = 4711;
 
     return r;
 }
 
+/*
+
+=item C<PARROT_API int
+call_back(const char *str)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-call_back(const char *str) {
+call_back(const char *str)
+{
     puts(str);
     fflush(stdout);
 
     return 4711;
 }
 
+/*
+
+=item C<PARROT_API void *
+nci_pi(int test)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void *
-nci_pi(int test) {
+nci_pi(int test)
+{
     switch (test) {
         case 0:
             {
@@ -410,18 +677,54 @@ nci_pi(int test) {
     return NULL;
 }
 
+/*
+
+=item C<PARROT_API short
+nci_s(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API short
-nci_s(void) {
+nci_s(void)
+{
     return nci_dlvar_short;
 }
 
+/*
+
+=item C<PARROT_API short
+nci_ssc(short l1, char l2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API short
-nci_ssc(short l1, char l2) {
+nci_ssc(short l1, char l2)
+{
     return l1 * l2;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_vP(void *pmc)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_vP(void *pmc) {
+nci_vP(void *pmc)
+{
     if (pmc)
         puts("ok");
     else
@@ -431,14 +734,30 @@ nci_vP(void *pmc) {
 
 /*
 
-=head1 Functions used for pdd16 tests
+=back
+
+=head2 Functions used for pdd16 tests
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<PARROT_API void
+nci_cb_C1(cb_C1_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
 
 =cut
 
 */
 
 PARROT_API void
-nci_cb_C1(cb_C1_func cb, void* user_data) {
+nci_cb_C1(cb_C1_func cb, void* user_data)
+{
     const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(result, user_data);
@@ -446,25 +765,62 @@ nci_cb_C1(cb_C1_func cb, void* user_data) {
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_C2(cb_C2_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_cb_C2(cb_C2_func cb, void* user_data) {
+nci_cb_C2(cb_C2_func cb, void* user_data)
+{
     /* call the cb synchronously */
     (cb)(77, user_data);
 
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_C3(cb_C3_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int int_cb_C3 = 99;
+
 PARROT_API void
-nci_cb_C3(cb_C3_func cb, void* user_data) {
+nci_cb_C3(cb_C3_func cb, void* user_data)
+{
     /* call the cb synchronously */
     (cb)(&int_cb_C3, user_data);
 
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_D1(cb_D1_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_cb_D1(cb_D1_func cb, void* user_data) {
+nci_cb_D1(cb_D1_func cb, void* user_data)
+{
     const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(user_data, result);
@@ -472,25 +828,62 @@ nci_cb_D1(cb_D1_func cb, void* user_data) {
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_D2(cb_D2_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_cb_D2(cb_D2_func cb, void* user_data) {
+nci_cb_D2(cb_D2_func cb, void* user_data)
+{
     /* call the cb synchronously */
     (cb)(user_data, 88);
 
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_D3(cb_D3_func cb, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int int_cb_D3 = 111;
+
 PARROT_API void
-nci_cb_D3(cb_D3_func cb, void* user_data) {
+nci_cb_D3(cb_D3_func cb, void* user_data)
+{
     /* call the cb synchronously */
     (cb)(user_data, &int_cb_D3);
 
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_cb_D4(cb_D4_func times_ten, void* user_data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_cb_D4(cb_D4_func times_ten, void* user_data) {
+nci_cb_D4(cb_D4_func times_ten, void* user_data)
+{
     int cnt;
     for (cnt = 0; cnt < 9; cnt++)
     {
@@ -501,8 +894,20 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     return;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_pip(int count, Rect_Like *rects)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_pip(int count, Rect_Like *rects) {
+nci_pip(int count, Rect_Like *rects)
+{
     int i;
     printf("Count: %d\n", count);
     for (i = 0; i < 4; ++i)
@@ -510,23 +915,60 @@ nci_pip(int count, Rect_Like *rects) {
         rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 }
 
+/*
+
+=item C<PARROT_API int
+nci_i33(int *double_me, int *triple_me)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API int
-nci_i33(int *double_me, int *triple_me) {
+nci_i33(int *double_me, int *triple_me)
+{
     *double_me *= 2;
     *triple_me *= 3;
 
     return (*double_me + *triple_me);
 }
 
+/*
+
+=item C<PARROT_API void
+nci_vpii(Outer *my_data, int my_x, int my_y)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_vpii(Outer *my_data, int my_x, int my_y) {
+nci_vpii(Outer *my_data, int my_x, int my_y)
+{
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
 }
 
+/*
+
+=item C<PARROT_API void *
+nci_piiii(int alpha, int beta, int gamma, int delta)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int my_array[4];
+
 PARROT_API void *
-nci_piiii(int alpha, int beta, int gamma, int delta) {
+nci_piiii(int alpha, int beta, int gamma, int delta)
+{
     static struct array_container
     {
         int   x;
@@ -544,20 +986,56 @@ nci_piiii(int alpha, int beta, int gamma, int delta) {
     return &container;
 }
 
+/*
+
+=item C<PARROT_API void *
+nci_pii(int fac1, int fac2)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void *
-nci_pii(int fac1, int fac2) {
+nci_pii(int fac1, int fac2)
+{
    nci_dlvar_int = fac1 * fac2;
 
    return &nci_dlvar_int;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_v(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_v(void) {
+nci_v(void)
+{
     nci_dlvar_int *= 10;
 }
 
+/*
+
+=item C<PARROT_API void
+nci_vv(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API void
-nci_vv(void) {
+nci_vv(void)
+{
     nci_dlvar_int *= 3;
 }
 
@@ -565,8 +1043,21 @@ nci_vv(void) {
 
 char l2 = 4;
 float f2 = 4.0;
+
+/*
+
+=item C<int
+main(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 int
-main(void) {
+main(void)
+{
     short l1 = 3;
     float f, f1 = 3.0;
     int l = nci_ssc(l1, l2);
@@ -580,6 +1071,8 @@ main(void) {
 #endif
 
 /*
+
+=back
 
 =head1 SEE ALSO:
 

@@ -140,7 +140,8 @@ Of course, a check for valid pointers could be added here.
 
 /*
 
-=item C<intlist_mark>
+=item C<void
+intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))>
 
 Marks the list as live.
 
@@ -156,7 +157,10 @@ intlist_mark(PARROT_INTERP, NOTNULL(IntList *l))
 
 /*
 
-=item C<intlist_clone>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+IntList *
+intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))>
 
 Returns a clone of the list.
 
@@ -174,7 +178,10 @@ intlist_clone(PARROT_INTERP, NOTNULL(const IntList *list))
 
 /*
 
-=item C<intlist_new>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+IntList *
+intlist_new(PARROT_INTERP)>
 
 Returns a new list.
 
@@ -192,7 +199,10 @@ intlist_new(PARROT_INTERP)
 
 /*
 
-=item C<intlist_length>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+INTVAL
+intlist_length(SHIM_INTERP, NOTNULL(const IntList *list))>
 
 Returns the length of the list.
 
@@ -210,7 +220,8 @@ intlist_length(SHIM_INTERP, NOTNULL(const IntList *list))
 
 /*
 
-=item C<intlist_assign>
+=item C<void
+intlist_assign(PARROT_INTERP, NOTNULL(IntList *l), INTVAL idx, INTVAL val)>
 
 Assigns <val> to the item at C<idx>.
 
@@ -226,7 +237,8 @@ intlist_assign(PARROT_INTERP, NOTNULL(IntList *l), INTVAL idx, INTVAL val)
 
 /*
 
-=item C<intlist_push>
+=item C<void
+intlist_push(PARROT_INTERP, NOTNULL(IntList *l), INTVAL val)>
 
 Pushes C<val> on the end of the list.
 
@@ -242,7 +254,8 @@ intlist_push(PARROT_INTERP, NOTNULL(IntList *l), INTVAL val)
 
 /*
 
-=item C<intlist_unshift>
+=item C<void
+intlist_unshift(PARROT_INTERP, NOTNULL(IntList **l), INTVAL val)>
 
 Pushes C<val> on the front of the list.
 
@@ -258,7 +271,8 @@ intlist_unshift(PARROT_INTERP, NOTNULL(IntList **l), INTVAL val)
 
 /*
 
-=item C<intlist_pop>
+=item C<INTVAL
+intlist_pop(PARROT_INTERP, NOTNULL(IntList *l))>
 
 Popping/shifting into a sparse hole returns 0.
 
@@ -276,7 +290,8 @@ intlist_pop(PARROT_INTERP, NOTNULL(IntList *l))
 
 /*
 
-=item C<intlist_shift>
+=item C<INTVAL
+intlist_shift(PARROT_INTERP, NOTNULL(IntList **l))>
 
 Removes and returns the first item on the list.
 
@@ -294,7 +309,9 @@ intlist_shift(PARROT_INTERP, NOTNULL(IntList **l))
 
 /*
 
-=item C<intlist_get>
+=item C<PARROT_WARN_UNUSED_RESULT
+INTVAL
+intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)>
 
 Returns the item at C<idx>.
 
@@ -313,7 +330,8 @@ intlist_get(PARROT_INTERP, NOTNULL(IntList *list), INTVAL idx)
 
 /*
 
-=item C<intlist_dump>
+=item C<void
+intlist_dump(NOTNULL(FILE *fp), NOTNULL(IntList *list), int verbose)>
 
 Prints out the list in human-readable form.
 

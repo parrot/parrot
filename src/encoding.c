@@ -52,7 +52,8 @@ static All_encodings *all_encodings;
 
 /*
 
-=item C<parrot_init_encodings_2>
+=item C<void
+parrot_init_encodings_2(void)>
 
 TODO: Not yet documented!!!
 
@@ -73,7 +74,8 @@ parrot_init_encodings_2(void)
 
 /*
 
-=item C<parrot_deinit_encodings>
+=item C<void
+parrot_deinit_encodings(void)>
 
 TODO: Not yet documented!!!
 
@@ -97,7 +99,10 @@ parrot_deinit_encodings(void)
 
 /*
 
-=item C<Parrot_new_encoding>
+=item C<PARROT_API
+PARROT_MALLOC
+ENCODING *
+Parrot_new_encoding(SHIM_INTERP)>
 
 TODO: Not yet documented!!!
 
@@ -115,7 +120,11 @@ Parrot_new_encoding(SHIM_INTERP)
 
 /*
 
-=item C<Parrot_find_encoding>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+const ENCODING *
+Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))>
 
 TODO: Not yet documented!!!
 
@@ -140,7 +149,10 @@ Parrot_find_encoding(SHIM_INTERP, NOTNULL(const char *encodingname))
 
 /*
 
-=item C<Parrot_load_encoding>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+const ENCODING *
+Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))>
 
 TODO: Not yet documented!!!
 
@@ -163,7 +175,10 @@ Parrot_load_encoding(PARROT_INTERP, NOTNULL(const char *encodingname))
 
 /*
 
-=item C<INTVAL Parrot_encoding_number>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))>
 
 Return the number of the encoding or -1 if not found.
 
@@ -189,7 +204,10 @@ Parrot_encoding_number(PARROT_INTERP, NOTNULL(STRING *encodingname))
 
 /*
 
-=item C<Parrot_encoding_number_of_str>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_encoding_number_of_str(SHIM_INTERP, NOTNULL(const STRING *src))>
 
 Return the number of the encoding of the given string or -1 if not found.
 
@@ -214,7 +232,11 @@ Parrot_encoding_number_of_str(SHIM_INTERP, NOTNULL(const STRING *src))
 
 /*
 
-=item C<Parrot_encoding_name>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+STRING*
+Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)>
 
 TODO: Not yet documented!!!
 
@@ -235,7 +257,11 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<Parrot_get_encoding>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+const ENCODING*
+Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)>
 
 TODO: Not yet documented!!!
 
@@ -256,7 +282,11 @@ Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<Parrot_encoding_c_name>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+const char *
+Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)>
 
 TODO: Not yet documented!!!
 
@@ -277,7 +307,9 @@ Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<register_encoding>
+=item C<static INTVAL
+register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
+        NOTNULL(ENCODING *encoding))>
 
 TODO: Not yet documented!!!
 
@@ -315,7 +347,10 @@ register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
 
 /*
 
-=item C<Parrot_register_encoding>
+=item C<PARROT_API
+INTVAL
+Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
+        NOTNULL(ENCODING *encoding))>
 
 TODO: Not yet documented!!!
 
@@ -358,7 +393,10 @@ Parrot_register_encoding(PARROT_INTERP, NOTNULL(const char *encodingname),
 
 /*
 
-=item C<Parrot_make_default_encoding>
+=item C<PARROT_API
+INTVAL
+Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
+        NOTNULL(ENCODING *encoding))>
 
 TODO: Not yet documented!!!
 
@@ -377,7 +415,9 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 
 /*
 
-=item C<Parrot_default_encoding>
+=item C<PARROT_API
+const ENCODING *
+Parrot_default_encoding(SHIM_INTERP)>
 
 TODO: Not yet documented!!!
 
@@ -394,7 +434,9 @@ Parrot_default_encoding(SHIM_INTERP)
 
 /*
 
-=item C<Parrot_find_encoding_converter>
+=item C<PARROT_API
+encoding_converter_t
+Parrot_find_encoding_converter(PARROT_INTERP, ENCODING *lhs, ENCODING *rhs)>
 
 TODO: Not yet documented!!!
 

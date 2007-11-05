@@ -47,7 +47,8 @@ extern void *flush_reg_store(void);
 
 /*
 
-=item C<trace_system_areas>
+=item C<void
+trace_system_areas(PARROT_INTERP)>
 
 Traces the system stack and any additional CPU-specific areas.
 
@@ -107,7 +108,8 @@ trace_system_areas(PARROT_INTERP)
 
 /*
 
-=item C<trace_system_stack>
+=item C<static void
+trace_system_stack(PARROT_INTERP)>
 
 Traces the memory block starting at C<< interp->lo_var_ptr >>.
 

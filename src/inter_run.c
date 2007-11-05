@@ -49,7 +49,8 @@ runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 /*
 
-=item C<runops>
+=item C<void
+runops(PARROT_INTERP, size_t offs)>
 
 Run parrot ops. Set exception handler and/or resume after exception.
 
@@ -128,7 +129,11 @@ runops(PARROT_INTERP, size_t offs)
 
 /*
 
-=item C<Parrot_runops_fromc>
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+parrot_context_t *
+Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))>
 
 Runs the Parrot ops, called from C code. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -166,6 +171,20 @@ Parrot_runops_fromc(PARROT_INTERP, NOTNULL(PMC *sub))
     return ctx;
 }
 
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static parrot_context_t *
+runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        SHIM(STRING *meth), NOTNULL(const char *sig), va_list ap)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -225,43 +244,17 @@ runops_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
 
 /*
 
-=item C<Parrot_run_meth_fromc>
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+Parrot_run_meth_fromc(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj), SHIM(STRING *meth))>
 
 Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
 is an invocable C<Sub> PMC.
 
 If registers a PMC return values, it is returned.
-
-=over 4
-
-=item Parrot_runops_fromc_args
-
-=item Parrot_runops_fromc_args_reti
-
-=item Parrot_runops_fromc_args_retf
-
-=item Parrot_runops_fromc_arglist
-
-=item Parrot_run_meth_fromc_args
-
-=item Parrot_run_meth_fromc_args_reti
-
-=item Parrot_run_meth_fromc_args_retf
-
-=back
-
-Run parrot ops, called from C code, function arguments are passed as
-C<va_args> according to the signature. The C<sub> argument is an
-invocable C<Sub> PMC.
-
-Signatures are similar to NCI:
-
-    v ... void return
-    I ... INTVAL (not Interpreter)
-    N ... NUMVAL
-    S ... STRING*
-    P ... PMC*
 
 =cut
 
@@ -287,6 +280,30 @@ Parrot_run_meth_fromc(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj), SHIM(
     return set_retval(interp, 0, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const char *sig), ...)>
+
+Run parrot ops, called from C code, function arguments are passed as
+C<va_args> according to the signature. The C<sub> argument is an
+invocable C<Sub> PMC.
+
+Signatures are similar to NCI:
+
+    v ... void return
+    I ... INTVAL (not Interpreter)
+    N ... NUMVAL
+    S ... STRING*
+    P ... PMC*
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
@@ -304,7 +321,12 @@ Parrot_runops_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(const char *s
 
 /*
 
-=item C<Parrot_runops_fromc_args_event>
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), ...)>
 
 Run code from within event handlers. This variant deals with some reentrency
 issues. It also should do sanity checks, if e.g. the handler subroutine
@@ -346,6 +368,20 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, NOTNULL(PMC *sub),
     return retval;
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+INTVAL
+Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 INTVAL
@@ -361,6 +397,20 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub),
     return set_retval_i(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+FLOATVAL
+Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 FLOATVAL
@@ -375,6 +425,21 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub),
     va_end(args);
     return set_retval_f(interp, *sig, ctx);
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_run_meth_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -392,6 +457,20 @@ Parrot_run_meth_fromc_args(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
     return set_retval(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+INTVAL
+Parrot_run_meth_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 INTVAL
@@ -406,6 +485,20 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *o
     va_end(args);
     return set_retval_i(interp, *sig, ctx);
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+FLOATVAL
+Parrot_run_meth_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -422,6 +515,21 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *o
     return set_retval_f(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
@@ -434,6 +542,20 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub),
     return set_retval(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+INTVAL
+Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 INTVAL
@@ -445,6 +567,20 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub),
     return set_retval_i(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+FLOATVAL
+Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
+        NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 FLOATVAL
@@ -455,6 +591,21 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub),
 
     return set_retval_f(interp, *sig, ctx);
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void*
+Parrot_run_meth_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -469,6 +620,21 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj
     return set_retval(interp, *sig, ctx);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL
+Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
@@ -480,6 +646,20 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC
 
     return set_retval_i(interp, *sig, ctx);
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+FLOATVAL
+Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, NOTNULL(PMC *sub), NOTNULL(PMC *obj),
+        NOTNULL(STRING *meth), NOTNULL(const char *sig), va_list args)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_IGNORABLE_RESULT

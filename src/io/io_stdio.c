@@ -118,7 +118,10 @@ ParrotIOLayer pio_stdio_layer = {
 
 /*
 
-=item C<flags_to_stdio>
+=item C<PARROT_CONST_FUNCTION
+PARROT_CANNOT_RETURN_NULL
+static const char *
+flags_to_stdio(INTVAL flags)>
 
 Returns a C string representation of C<flags> suitable for passing to
 C<fopen()> in C<PIO_stdio_open()>.
@@ -158,7 +161,8 @@ flags_to_stdio(INTVAL flags)
 
 /*
 
-=item C<PIO_stdio_init>
+=item C<static INTVAL
+PIO_stdio_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))>
 
 Setup standard streams, etc.
 
@@ -191,7 +195,11 @@ PIO_stdio_init(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer))
 
 /*
 
-=item C<PIO_stdio_open>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static ParrotIO *
+PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
+              NOTNULL(const char *spath), INTVAL flags)>
 
 Open modes (read, write, append, etc.) are done in pseudo-Perl style
 using C<< < >>, C<< > >>, etc.
@@ -241,7 +249,10 @@ PIO_stdio_open(PARROT_INTERP, SHIM(ParrotIOLayer *layer),
 
 /*
 
-=item C<PIO_stdio_fdopen>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static ParrotIO *
+PIO_stdio_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fptr, INTVAL flags)>
 
 TODO: Not yet documented!!!
 
@@ -271,7 +282,8 @@ PIO_stdio_fdopen(PARROT_INTERP, SHIM(ParrotIOLayer *layer), PIOHANDLE fptr, INTV
 
 /*
 
-=item C<PIO_stdio_close>
+=item C<static INTVAL
+PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 TODO: Not yet documented!!!
 
@@ -293,7 +305,8 @@ PIO_stdio_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<PIO_stdio_isatty>
+=item C<static INTVAL
+PIO_stdio_isatty(PIOHANDLE fptr)>
 
 TODO: Not yet documented!!!
 
@@ -312,7 +325,11 @@ PIO_stdio_isatty(PIOHANDLE fptr)
 
 /*
 
-=item C<PIO_stdio_peek>
+=item C<static size_t
+PIO_stdio_peek(PARROT_INTERP,
+        SHIM(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io),
+        NOTNULL(STRING **buf))>
 
 TODO: Not yet documented!!!
 
@@ -346,7 +363,8 @@ PIO_stdio_peek(PARROT_INTERP,
 
 /*
 
-=item C<PIO_stdio_getblksize>
+=item C<INTVAL
+PIO_stdio_getblksize(PIOHANDLE fptr)>
 
 TODO: Not yet documented!!!
 
@@ -366,7 +384,8 @@ PIO_stdio_getblksize(PIOHANDLE fptr)
 
 /*
 
-=item C<PIO_stdio_flush>
+=item C<static INTVAL
+PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 TODO: Not yet documented!!!
 
@@ -383,7 +402,9 @@ PIO_stdio_flush(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))
 
 /*
 
-=item C<PIO_stdio_read>
+=item C<static size_t
+PIO_stdio_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+              NOTNULL(STRING **buf))>
 
 TODO: Not yet documented!!!
 
@@ -416,7 +437,8 @@ PIO_stdio_read(PARROT_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PIO_stdio_write>
+=item C<static size_t
+PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
 
 TODO: Not yet documented!!!
 
@@ -433,7 +455,9 @@ PIO_stdio_write(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io), 
 
 /*
 
-=item C<PIO_stdio_seek>
+=item C<static PIOOFF_T
+PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
+              PIOOFF_T offset, INTVAL whence)>
 
 TODO: Not yet documented!!!
 
@@ -460,7 +484,8 @@ PIO_stdio_seek(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io),
 
 /*
 
-=item C<PIO_stdio_tell>
+=item C<static PIOOFF_T
+PIO_stdio_tell(SHIM_INTERP, SHIM(ParrotIOLayer *layer), NOTNULL(ParrotIO *io))>
 
 TODO: Not yet documented!!!
 

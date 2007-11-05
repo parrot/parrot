@@ -131,7 +131,8 @@ context.
 
 /*
 
-=item C<destroy_context>
+=item C<void
+destroy_context(PARROT_INTERP)>
 
 Free allocated context memory
 
@@ -171,7 +172,8 @@ destroy_context(PARROT_INTERP)
 
 /*
 
-=item C<create_initial_context>
+=item C<void
+create_initial_context(PARROT_INTERP)>
 
 Create initial interpreter context.
 
@@ -200,7 +202,9 @@ create_initial_context(PARROT_INTERP)
 
 /*
 
-=item C<parrot_gc_context>
+=item C<PARROT_API
+void
+parrot_gc_context(PARROT_INTERP)>
 
 Cleanup dead context memory. Called by the garbage collector.
 
@@ -227,9 +231,10 @@ parrot_gc_context(PARROT_INTERP)
 
 /*
 
-=item C<clear_regs>
+=item C<static void
+clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 
@@ -276,9 +281,11 @@ clear_regs(PARROT_INTERP, NOTNULL(parrot_context_t *ctx))
 
 /*
 
-=item C<init_context>
+=item C<static void
+init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
+        NULLOK(const parrot_context_t *old))>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 
@@ -317,7 +324,10 @@ init_context(PARROT_INTERP, NOTNULL(parrot_context_t *ctx),
 
 /*
 
-=item C<Parrot_dup_context>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+struct Parrot_Context *
+Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old))>
 
 Duplicate the passed context
 
@@ -362,7 +372,11 @@ Parrot_dup_context(PARROT_INTERP, NOTNULL(const struct Parrot_Context *old))
 
 /*
 
-=item C<Parrot_push_context>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+struct Parrot_Context *
+Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))>
 
 Remember old context in C<caller_ctx>, suitable to use with
 C<Parrot_pop_context>.
@@ -391,7 +405,9 @@ Parrot_push_context(PARROT_INTERP, NOTNULL(INTVAL *n_regs_used))
 
 /*
 
-=item C<Parrot_pop_context>
+=item C<PARROT_API
+void
+Parrot_pop_context(PARROT_INTERP)>
 
 Free the context created with C<Parrot_push_context> and restore the previous
 context.
@@ -418,7 +434,10 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_alloc_context>
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+struct Parrot_Context *
+Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))>
 
 Allocate a new context and set the context pointer. Please note that the
 register usage C<n_regs_used> is copied.  The function returns the new context.
@@ -524,7 +543,9 @@ Parrot_alloc_context(PARROT_INTERP, NOTNULL(INTVAL *number_regs_used))
 
 /*
 
-=item C<Parrot_free_context>
+=item C<PARROT_API
+void
+Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_use)>
 
 Free the context. If C<re_use> is true, this function is called by a
 return continuation invoke, else from the destructor of a continuation.
@@ -585,7 +606,9 @@ Parrot_free_context(PARROT_INTERP, NOTNULL(struct Parrot_Context *ctxp), int re_
 
 /*
 
-=item C<Parrot_set_context_threshold>
+=item C<PARROT_API
+void
+Parrot_set_context_threshold(PARROT_INTERP, NULLOK(struct Parrot_Context *ctxp))>
 
 Mark the context as possible threshold.
 
@@ -624,7 +647,8 @@ typedef struct save_regs_t {
 
 /*
 
-=item C<setup_register_stacks>
+=item C<void
+setup_register_stacks(PARROT_INTERP)>
 
 Set up the register stacks.
 
@@ -643,7 +667,9 @@ setup_register_stacks(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_push_regs>
+=item C<PARROT_API
+void
+Parrot_push_regs(PARROT_INTERP)>
 
 Save all registers onto the register stack.
 
@@ -685,7 +711,9 @@ Parrot_push_regs(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_pop_regs>
+=item C<PARROT_API
+void
+Parrot_pop_regs(PARROT_INTERP)>
 
 Restore all registers from register stack.
 
@@ -717,7 +745,8 @@ Parrot_pop_regs(PARROT_INTERP)
 
 /*
 
-=item C<mark_register_stack>
+=item C<void
+mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))>
 
 Marks the register stack and its registers as live.
 
@@ -755,9 +784,11 @@ mark_register_stack(PARROT_INTERP, NOTNULL(Stack_Chunk_t* chunk))
 
 /*
 
-=item C<Parrot_clear_i>
+=item C<PARROT_API
+void
+Parrot_clear_i(PARROT_INTERP)>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 
@@ -774,9 +805,11 @@ Parrot_clear_i(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_clear_s>
+=item C<PARROT_API
+void
+Parrot_clear_s(PARROT_INTERP)>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 
@@ -793,9 +826,11 @@ Parrot_clear_s(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_clear_p>
+=item C<PARROT_API
+void
+Parrot_clear_p(PARROT_INTERP)>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 
@@ -812,9 +847,11 @@ Parrot_clear_p(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_clear_n>
+=item C<PARROT_API
+void
+Parrot_clear_n(PARROT_INTERP)>
 
-Not yet documented!!!
+TODO: Not yet documented!!!
 
 =cut
 

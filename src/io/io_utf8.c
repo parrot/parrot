@@ -92,7 +92,10 @@ ParrotIOLayer pio_utf8_layer = {
 
 /*
 
-=item C<PIO_utf8_register_layer>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+ParrotIOLayer *
+PIO_utf8_register_layer(void)>
 
 TODO: Not yet documented!!!
 
@@ -110,7 +113,9 @@ PIO_utf8_register_layer(void)
 
 /*
 
-=item C<PIO_utf8_read>
+=item C<static size_t
+PIO_utf8_read(PARROT_INTERP, NOTNULL(ParrotIOLayer *layer),
+        NOTNULL(ParrotIO *io), NOTNULL(STRING **buf))>
 
 TODO: Not yet documented!!!
 
@@ -174,7 +179,8 @@ ok:
 
 /*
 
-=item C<PIO_utf8_write>
+=item C<static size_t
+PIO_utf8_write(PARROT_INTERP, NOTNULL(ParrotIOLayer *l), NOTNULL(ParrotIO *io), NOTNULL(STRING *s))>
 
 TODO: Not yet documented!!!
 

@@ -65,7 +65,9 @@ extern PARROT_API int Parrot_exec_rel_count;
 
 /*
 
-=item C<Parrot_exec>
+=item C<void
+Parrot_exec(PARROT_INTERP, opcode_t *pc,
+        opcode_t *code_start, opcode_t *code_end)>
 
 Call the jit to get the program code. Adds the members of the data
 section. And emits the executable.
@@ -135,7 +137,8 @@ Parrot_exec(PARROT_INTERP, opcode_t *pc,
 
 /*
 
-=item C<add_data_member>
+=item C<static void
+add_data_member(NOTNULL(Parrot_exec_objfile_t *obj), NULLOK(void *src), size_t len)>
 
 Adds a member to the data section, storing the size of it at
 C<< obj->data_size[N] >>.
@@ -173,7 +176,8 @@ add_data_member(NOTNULL(Parrot_exec_objfile_t *obj), NULLOK(void *src), size_t l
 
 /*
 
-=item C<exec_init>
+=item C<static void
+exec_init(NOTNULL(Parrot_exec_objfile_t *obj))>
 
 Initialize the obj structure.
 
@@ -211,7 +215,9 @@ exec_init(NOTNULL(Parrot_exec_objfile_t *obj))
 
 /*
 
-=item C<Parrot_exec_add_symbol>
+=item C<int
+Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
+                       NOTNULL(const char *symbol), int stype)>
 
 Adds a symbol to the object file.
 
@@ -255,6 +261,20 @@ Parrot_exec_add_symbol(NOTNULL(Parrot_exec_objfile_t *obj),
     return symbol_number;
 }
 
+/*
+
+=item C<PARROT_API
+int *
+Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
+                                     char *nptr, const char *var, int offset,
+                                     int disp)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 int *
 Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
@@ -264,6 +284,19 @@ Parrot_exec_add_text_rellocation_reg(NOTNULL(Parrot_exec_objfile_t *obj),
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
     return (int *)offset;
 }
+
+/*
+
+=item C<PARROT_API
+void
+Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
+                                      char *nptr, const char *func_name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -275,7 +308,10 @@ Parrot_exec_add_text_rellocation_func(NOTNULL(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<Parrot_exec_add_text_rellocation>
+=item C<PARROT_API
+void
+Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr,
+    int type, const char *symbol, int disp)>
 
 Adds a text rellocation to the object file.
 
@@ -322,7 +358,8 @@ Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr
 
 /*
 
-=item C<symbol_list_find>
+=item C<static int
+symbol_list_find(NOTNULL(Parrot_exec_objfile_t *obj), NOTNULL(const char *symbol))>
 
 Returns the index of C<symbol> in the symbol list. Returns -1 if it is
 not in the list.

@@ -113,7 +113,9 @@ static int STRING_compare(PARROT_INTERP,
 
 /*
 
-=item C<key_hash_STRING>
+=item C<PARROT_WARN_UNUSED_RESULT
+static size_t
+key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)>
 
 Return the hashed value of the key C<value>.  See also string.c.
 
@@ -137,7 +139,9 @@ key_hash_STRING(PARROT_INTERP, NOTNULL(STRING *value), size_t seed)
 
 /*
 
-=item C<STRING_compare>
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+STRING_compare(PARROT_INTERP, NOTNULL(const void *search_key), NOTNULL(const void *bucket_key))>
 
 Compares the two strings, returning 0 if they are identical.
 
@@ -154,7 +158,10 @@ STRING_compare(PARROT_INTERP, NOTNULL(const void *search_key), NOTNULL(const voi
 
 /*
 
-=item C<pointer_compare>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int
+pointer_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -172,7 +179,10 @@ pointer_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 
 /*
 
-=item C<key_hash_pointer>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static size_t
+key_hash_pointer(SHIM_INTERP, NULLOK(void *value), size_t seed)>
 
 Returns a hashvalue for a pointer.
 
@@ -187,6 +197,19 @@ key_hash_pointer(SHIM_INTERP, NULLOK(void *value), size_t seed)
 {
     return ((size_t) value) ^ seed;
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static size_t
+key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -205,7 +228,10 @@ key_hash_cstring(SHIM_INTERP, NOTNULL(const void *value), size_t seed)
 
 /*
 
-=item C<cstring_compare>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static int
+cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))>
 
 C string versions of the C<key_hash> and C<compare> functions.
 
@@ -223,7 +249,10 @@ cstring_compare(SHIM_INTERP, NOTNULL(const char *a), NOTNULL(const char *b))
 
 /*
 
-=item C<key_hash_int>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t
+key_hash_int(SHIM_INTERP, NULLOK(void *value), size_t seed)>
 
 Custom C<key_hash> function.
 
@@ -241,7 +270,10 @@ key_hash_int(SHIM_INTERP, NULLOK(void *value), size_t seed)
 
 /*
 
-=item C<int_compare>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+int
+int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))>
 
 Custom C<compare> function.
 
@@ -259,7 +291,9 @@ int_compare(SHIM_INTERP, NULLOK(const void *a), NULLOK(const void *b))
 
 /*
 
-=item C<parrot_dump_hash>
+=item C<PARROT_API
+void
+parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))>
 
 Print out the hash in human-readable form.  Except it's empty.
 
@@ -276,7 +310,9 @@ parrot_dump_hash(SHIM_INTERP, NOTNULL(const Hash *hash))
 
 /*
 
-=item C<parrot_mark_hash>
+=item C<PARROT_API
+void
+parrot_mark_hash(PARROT_INTERP, NOTNULL(Hash *hash))>
 
 Marks the hash and its contents as live.
 
@@ -324,7 +360,8 @@ parrot_mark_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 
 /*
 
-=item C<hash_thaw>
+=item C<static void
+hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))>
 
 This is used by freeze/thaw to visit the contents of the hash.
 
@@ -379,6 +416,17 @@ hash_thaw(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(visit_info* info))
     }
 }
 
+/*
+
+=item C<static void
+hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info* info))
 {
@@ -416,6 +464,18 @@ hash_freeze(PARROT_INTERP, NOTNULL(const Hash * const hash), NOTNULL(visit_info*
     }
 }
 
+/*
+
+=item C<PARROT_API
+void
+parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 void
 parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))
@@ -439,7 +499,8 @@ parrot_hash_visit(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *pinfo))
 
 /*
 
-=item C<expand_hash>
+=item C<static void
+expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))>
 
 For a hashtable of size N, we use C<MAXFULL_PERCENT> % of N as the
 number of buckets. This way, as soon as we run out of buckets on the
@@ -566,7 +627,9 @@ expand_hash(PARROT_INTERP, NOTNULL(Hash *hash))
 
 /*
 
-=item C<parrot_new_hash>
+=item C<PARROT_API
+void
+parrot_new_hash(SHIM_INTERP, NOTNULL(Hash **hptr))>
 
 Returns a new Parrot STRING hash in C<hptr>.
 
@@ -587,7 +650,9 @@ parrot_new_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 
 /*
 
-=item C<parrot_new_pmc_hash>
+=item C<PARROT_API
+void
+parrot_new_pmc_hash(PARROT_INTERP, NOTNULL(PMC *container))>
 
 Create a new Parrot STRING hash in PMC_struct_val(container)
 
@@ -605,9 +670,12 @@ parrot_new_pmc_hash(PARROT_INTERP, NOTNULL(PMC *container))
             STRING_compare,     /* STRING compare */
             (hash_hash_key_fn)key_hash_STRING);    /*        hash */
 }
+
 /*
 
-=item C<parrot_new_cstring_hash>
+=item C<PARROT_API
+void
+parrot_new_cstring_hash(SHIM_INTERP, NOTNULL(Hash **hptr))>
 
 Returns a new C string hash in C<hptr>.
 
@@ -625,6 +693,20 @@ parrot_new_cstring_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
             (hash_comp_fn)cstring_compare,     /* cstring compare */
             (hash_hash_key_fn)key_hash_cstring);    /*        hash */
 }
+
+/*
+
+=item C<static void
+init_hash(NOTNULL(Hash *hash),
+        PARROT_DATA_TYPE val_type,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 init_hash(NOTNULL(Hash *hash),
@@ -677,6 +759,18 @@ init_hash(NOTNULL(Hash *hash),
     }
 }
 
+/*
+
+=item C<PARROT_API
+void
+parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 void
 parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))
@@ -684,6 +778,17 @@ parrot_hash_destroy(SHIM_INTERP, NOTNULL(Hash *hash))
     mem_sys_free(hash->bs);
     mem_sys_free(hash);
 }
+
+/*
+
+=item C<void
+parrot_chash_destroy(PARROT_INTERP, NOTNULL(Hash *hash))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 parrot_chash_destroy(PARROT_INTERP, NOTNULL(Hash *hash))
@@ -704,7 +809,11 @@ parrot_chash_destroy(PARROT_INTERP, NOTNULL(Hash *hash))
 
 /*
 
-=item C<parrot_new_hash_x>
+=item C<void
+parrot_new_hash_x(NOTNULL(Hash **hptr),
+        PARROT_DATA_TYPE val_type,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
 Returns a new hash in C<hptr>.
 
@@ -736,7 +845,11 @@ parrot_new_hash_x(NOTNULL(Hash **hptr),
 
 /*
 
-=item C<parrot_new_pmc_hash_x>
+=item C<void
+parrot_new_pmc_hash_x(SHIM_INTERP, NOTNULL(PMC *container),
+        PARROT_DATA_TYPE val_type,
+        Hash_key_type hkey_type,
+        hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
 Like parrot_new_hash_x but w/o the described problems. The passed in
 C<container> PMC gets stored in the Hash end the newly created Hash is
@@ -761,7 +874,9 @@ parrot_new_pmc_hash_x(SHIM_INTERP, NOTNULL(PMC *container),
 
 /*
 
-=item C<parrot_new_pointer_hash>
+=item C<PARROT_API
+void
+parrot_new_pointer_hash(SHIM_INTERP, NOTNULL(Hash **hptr))>
 
 Create a new HASH with void * keys and values.
 
@@ -779,7 +894,11 @@ parrot_new_pointer_hash(SHIM_INTERP, NOTNULL(Hash **hptr))
 
 /*
 
-=item C<parrot_new_INTVAL_hash>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)>
 
 Create a new Hash PMC with INTVAL keys and values. C<flags> can be
 C<PObj_constant_FLAG> or 0.
@@ -808,7 +927,11 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<parrot_hash_size>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+INTVAL
+parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))>
 
 Return the number of used entries in the hash.
 
@@ -829,7 +952,11 @@ parrot_hash_size(PARROT_INTERP, NOTNULL(const Hash *hash))
 
 /*
 
-=item C<parrot_hash_get_idx>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))>
 
 Called by iterator.
 
@@ -883,7 +1010,11 @@ parrot_hash_get_idx(SHIM_INTERP, NOTNULL(const Hash *hash), NOTNULL(PMC *key))
 
 /*
 
-=item C<parrot_hash_get_bucket>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+HashBucket *
+parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *key))>
 
 Returns the bucket for C<key>.
 
@@ -918,7 +1049,11 @@ parrot_hash_get_bucket(PARROT_INTERP, NOTNULL(const Hash *hash), NOTNULL(void *k
 
 /*
 
-=item C<parrot_hash_get>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))>
 
 Returns the value keyed by C<key> or C<NULL> if no bucket is found.
 
@@ -938,7 +1073,10 @@ parrot_hash_get(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 
 /*
 
-=item C<parrot_hash_exists>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))>
 
 Returns whether the key exists in the hash.
 
@@ -957,7 +1095,11 @@ parrot_hash_exists(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 
 /*
 
-=item C<parrot_hash_put>
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+HashBucket*
+parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key), NULLOK(void *value))>
 
 Puts the key and value into the hash. Note that C<key> is B<not>
 copied.
@@ -1015,7 +1157,9 @@ parrot_hash_put(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key), NULLOK(v
 
 /*
 
-=item C<parrot_hash_delete>
+=item C<PARROT_API
+void
+parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))>
 
 Deletes the key from the hash.
 
@@ -1054,7 +1198,9 @@ parrot_hash_delete(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(void *key))
 
 /*
 
-=item C<parrot_hash_clone>
+=item C<PARROT_API
+void
+parrot_hash_clone(PARROT_INTERP, NOTNULL(Hash *hash), NOTNULL(Hash *dest))>
 
 Clones C<hash> to C<dest>.
 

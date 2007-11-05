@@ -96,7 +96,9 @@ static Memory_Pool * new_memory_pool(
 
 /*
 
-=item C<alloc_new_block>
+=item C<static void
+alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
+        NOTNULL(const char *why))>
 
 Allocate a new memory block. We allocate the larger of the requested size or
 the default size.  The given text is used for debugging.
@@ -153,7 +155,10 @@ alloc_new_block(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool),
 
 /*
 
-=item C<mem_allocate>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void *
+mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))>
 
 Allocates memory for headers.
 
@@ -250,7 +255,10 @@ mem_allocate(PARROT_INTERP, size_t size, NOTNULL(Memory_Pool *pool))
 
 /*
 
-=item C<buffer_location>
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static const char*
+buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))>
 
 TODO: Not yet documented!!!
 
@@ -282,7 +290,8 @@ buffer_location(PARROT_INTERP, NOTNULL(const PObj *b))
 
 /*
 
-=item C<debug_print_buf>
+=item C<static void
+debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))>
 
 TODO: Not yet documented!!!
 
@@ -307,7 +316,8 @@ debug_print_buf(PARROT_INTERP, NOTNULL(const PObj *b))
 
 =over 4
 
-=item C<compact_pool>
+=item C<static void
+compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))>
 
 Compact the buffer pool.
 
@@ -536,7 +546,8 @@ compact_pool(PARROT_INTERP, NOTNULL(Memory_Pool *pool))
 
 /*
 
-=item C<Parrot_go_collect>
+=item C<void
+Parrot_go_collect(PARROT_INTERP)>
 
 Go do a GC run. This only scans the string pools and compacts them, it
 doesn't check for string liveness.
@@ -553,7 +564,10 @@ Parrot_go_collect(PARROT_INTERP)
 
 /*
 
-=item C<aligned_size>
+=item C<PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static size_t
+aligned_size(NOTNULL(const Buffer *buffer), size_t len)>
 
 TODO: Not yet documented!!!
 
@@ -577,7 +591,10 @@ aligned_size(NOTNULL(const Buffer *buffer), size_t len)
 
 /*
 
-=item C<aligned_mem>
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static char *
+aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))>
 
 TODO: Not yet documented!!!
 
@@ -603,7 +620,10 @@ aligned_mem(NOTNULL(const Buffer *buffer), NOTNULL(char *mem))
 
 /*
 
-=item C<aligned_string_size>
+=item C<PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static size_t
+aligned_string_size(size_t len)>
 
 TODO: Not yet documented!!!
 
@@ -611,10 +631,11 @@ TODO: Not yet documented!!!
 
 */
 
+/* XXX Looks like we can lose buffer here */
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static size_t
-aligned_string_size(size_t len) /* XXX Looks like we can lose buffer here */
+aligned_string_size(size_t len)
 {
     len += sizeof (void*);
     len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
@@ -623,7 +644,9 @@ aligned_string_size(size_t len) /* XXX Looks like we can lose buffer here */
 
 /*
 
-=item C<Parrot_in_memory_pool>
+=item C<PARROT_WARN_UNUSED_RESULT
+int
+Parrot_in_memory_pool(PARROT_INTERP, NOTNULL(void *bufstart))>
 
 TODO: Not yet documented!!!
 
@@ -657,7 +680,8 @@ Parrot_in_memory_pool(PARROT_INTERP, NOTNULL(void *bufstart))
 
 =over 4
 
-=item C<Parrot_reallocate>
+=item C<void
+Parrot_reallocate(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t tosize)>
 
 Reallocate the Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with
@@ -722,7 +746,8 @@ Parrot_reallocate(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t tosize)
 
 /*
 
-=item C<Parrot_reallocate_string>
+=item C<void
+Parrot_reallocate_string(PARROT_INTERP, NOTNULL(STRING *str), size_t tosize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
 buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
@@ -792,7 +817,8 @@ Parrot_reallocate_string(PARROT_INTERP, NOTNULL(STRING *str), size_t tosize)
 
 /*
 
-=item C<Parrot_allocate>
+=item C<void
+Parrot_allocate(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size)>
 
 Allocate buffer memory for the given Buffer pointer. The C<size>
 has to be a multiple of the word size.
@@ -816,7 +842,8 @@ Parrot_allocate(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size)
 
 /*
 
-=item C<Parrot_allocate_aligned>
+=item C<void
+Parrot_allocate_aligned(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size)>
 
 Like above, except the C<size> will be rounded up and the address of
 the buffer will have the same alignment as a pointer returned by
@@ -846,7 +873,8 @@ Parrot_allocate_aligned(PARROT_INTERP, NOTNULL(Buffer *buffer), size_t size)
 
 /*
 
-=item C<Parrot_allocate_string>
+=item C<void
+Parrot_allocate_string(PARROT_INTERP, NOTNULL(STRING *str), size_t size)>
 
 Allocate the STRING's buffer memory to the given size. The allocated
 buffer maybe slightly bigger than the given C<size>. This function
@@ -888,7 +916,10 @@ Parrot_allocate_string(PARROT_INTERP, NOTNULL(STRING *str), size_t size)
 
 /*
 
-=item C<new_memory_pool>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static Memory_Pool *
+new_memory_pool(size_t min_block, NULLOK(compact_f compact))>
 
 Create a new memory pool.
 
@@ -916,7 +947,8 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 /*
 
-=item C<Parrot_initialize_memory_pools>
+=item C<void
+Parrot_initialize_memory_pools(PARROT_INTERP)>
 
 Initialize the managed memory pools.
 
@@ -940,7 +972,8 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_destroy_memory_pools>
+=item C<void
+Parrot_destroy_memory_pools(PARROT_INTERP)>
 
 Destroys the memory pools.
 
@@ -973,7 +1006,8 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<merge_pools>
+=item C<static void
+merge_pools(NOTNULL(Memory_Pool *dest), NOTNULL(Memory_Pool *source))>
 
 TODO: Not yet documented!!!
 
@@ -1015,7 +1049,8 @@ merge_pools(NOTNULL(Memory_Pool *dest), NOTNULL(Memory_Pool *source))
 
 /*
 
-=item C<Parrot_merge_memory_pools>
+=item C<void
+Parrot_merge_memory_pools(NOTNULL(Interp *dest_interp), NOTNULL(Interp *source_interp))>
 
 Merge the memory pools of C<source_interp> into C<dest_interp>.
 

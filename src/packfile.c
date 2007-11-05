@@ -300,7 +300,9 @@ static int sub_pragma(PARROT_INTERP,
 
 /*
 
-=item C<PackFile_destroy>
+=item C<PARROT_API
+void
+PackFile_destroy(PARROT_INTERP, NULLOK(PackFile *pf))>
 
 Delete a C<PackFile>.
 
@@ -331,7 +333,8 @@ PackFile_destroy(PARROT_INTERP, NULLOK(PackFile *pf))
 
 /*
 
-=item C<make_code_pointers>
+=item C<static void
+make_code_pointers(NOTNULL(PackFile_Segment *seg))>
 
 Make compat/shorthand pointers.
 
@@ -379,7 +382,8 @@ make_code_pointers(NOTNULL(PackFile_Segment *seg))
 
 /*
 
-=item C<sub_pragma>
+=item C<static int
+sub_pragma(PARROT_INTERP, int action, NOTNULL(const PMC *sub_pmc))>
 
 Handle :load, :main ... pragmas for B<sub_pmc>
 
@@ -421,7 +425,10 @@ sub_pragma(PARROT_INTERP, int action, NOTNULL(const PMC *sub_pmc))
 
 /*
 
-=item C<run_sub>
+=item C<PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC*
+run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))>
 
 Run the B<sub_pmc> due its B<:load>, B<:immediate>, ... pragma
 
@@ -456,7 +463,10 @@ run_sub(PARROT_INTERP, NOTNULL(PMC *sub_pmc))
 
 /*
 
-=item C<do_1_sub_pragma>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC*
+do_1_sub_pragma(PARROT_INTERP, NOTNULL(PMC *sub_pmc), int action)>
 
 Run autoloaded or immediate bytecode, mark MAIN subroutine entry
 
@@ -547,9 +557,19 @@ do_1_sub_pragma(PARROT_INTERP, NOTNULL(PMC *sub_pmc), int action)
 }
 
 /*
- * while the PMCs should be constant, there possible contents like
- * a property isn't constructed const so we have to mark them
  */
+/*
+
+=item C<static void
+mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))>
+
+while the PMCs should be constant, there possible contents like
+a property isn't constructed const so we have to mark them
+
+=cut
+
+*/
+
 static void
 mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
 {
@@ -568,6 +588,17 @@ mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
     }
 }
 
+/*
+
+=item C<static INTVAL
+find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user_data))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static INTVAL
 find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user_data))
 {
@@ -580,6 +611,17 @@ find_const_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(void *user
     }
     return 0;
 }
+
+/*
+
+=item C<void
+mark_const_subs(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 mark_const_subs(PARROT_INTERP)
@@ -601,7 +643,10 @@ mark_const_subs(PARROT_INTERP)
 
 /*
 
-=item C<do_sub_pragmas>
+=item C<PARROT_API
+void
+do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
+        int action, NULLOK(PMC *eval_pmc))>
 
 B<action> is one of B<PBC_PBC>, B<PBC_LOADED>, B<PBC_INIT>, or
 B<PBC_MAIN>. Also store the C<eval_pmc> in the sub structure, so that
@@ -668,7 +713,11 @@ do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
 
 /*
 
-=item C<PackFile_unpack>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+opcode_t
+PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed),
+    size_t packed_size)>
 
 Unpack a C<PackFile> from a block of memory, ensuring the the magic number is
 valid, the bytecode version can be read by this Parrot and doing any endian
@@ -816,7 +865,11 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
 
 /*
 
-=item C<PackFile_map_segments>
+=item C<PARROT_API
+INTVAL
+PackFile_map_segments(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
+                       PackFile_map_segments_func_t callback,
+                       NULLOK(void *user_data))>
 
 For each segment in the directory C<dir> the callback function
 C<callback> is called. The pointer C<user_data> is append to each call.
@@ -847,7 +900,10 @@ PackFile_map_segments(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
 
 /*
 
-=item C<PackFile_add_segment>
+=item C<PARROT_API
+INTVAL
+PackFile_add_segment(SHIM_INTERP, NOTNULL(PackFile_Directory *dir),
+        NOTNULL(PackFile_Segment *seg))>
 
 Adds the Segment C<seg> to the directory C<dir> The PackFile becomes the
 owner of the segment; that means it's getting destroyed, when the
@@ -881,7 +937,12 @@ PackFile_add_segment(SHIM_INTERP, NOTNULL(PackFile_Directory *dir),
 
 /*
 
-=item C<PackFile_find_segment>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PackFile_Segment *
+PackFile_find_segment(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
+    NOTNULL(const char *name), int sub_dir)>
 
 Finds the segment with the name C<name> in the C<PackFile_Directory> if
 C<sub_dir> is true, directories are searched recursively The segment is
@@ -920,7 +981,12 @@ PackFile_find_segment(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
 
 /*
 
-=item C<PackFile_remove_segment_by_name>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PackFile_Segment *
+PackFile_remove_segment_by_name(SHIM_INTERP, NOTNULL(PackFile_Directory *dir),
+                                NOTNULL(const char *name))>
 
 Finds and removes the segment with name C<name> in the
 C<PackFile_Directory>. The segment is returned and must be destroyed by
@@ -964,7 +1030,8 @@ PackFile_remove_segment_by_name(SHIM_INTERP, NOTNULL(PackFile_Directory *dir),
 
 =over 4
 
-=item C<PackFile_set_header>
+=item C<static void
+PackFile_set_header(NOTNULL(PackFile *self))>
 
 Fill a C<PackFile> header with system specific data.
 
@@ -991,7 +1058,11 @@ PackFile_set_header(NOTNULL(PackFile *self))
 
 /*
 
-=item C<PackFile_new>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PackFile *
+PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
 
 Allocate a new empty C<PackFile> and setup the directory.
 
@@ -1079,7 +1150,11 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 
 /*
 
-=item C<PackFile_new_dummy>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PackFile *
+PackFile_new_dummy(PARROT_INTERP, NOTNULL(const char *name))>
 
 Create a new (initial) dummy PackFile. This is needed, if the interpreter
 doesn't load any bytecode, but is using Parrot_compile_string.
@@ -1105,7 +1180,10 @@ PackFile_new_dummy(PARROT_INTERP, NOTNULL(const char *name))
 
 /*
 
-=item C<PackFile_funcs_register>
+=item C<PARROT_API
+INTVAL
+PackFile_funcs_register(SHIM_INTERP, NOTNULL(PackFile *pf), UINTVAL type,
+                        PackFile_funcs funcs)>
 
 Register the C<pack>/C<unpack>/... functions for a packfile type.
 
@@ -1125,7 +1203,10 @@ PackFile_funcs_register(SHIM_INTERP, NOTNULL(PackFile *pf), UINTVAL type,
 
 /*
 
-=item C<default_unpack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static opcode_t *
+default_unpack(NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))>
 
 The default unpack function.
 
@@ -1182,7 +1263,8 @@ default_unpack(NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))
 
 /*
 
-=item C<default_dump_header>
+=item C<void
+default_dump_header(PARROT_INTERP, NOTNULL(const PackFile_Segment *self))>
 
 The default dump header function.
 
@@ -1202,7 +1284,8 @@ default_dump_header(PARROT_INTERP, NOTNULL(const PackFile_Segment *self))
 
 /*
 
-=item C<default_dump>
+=item C<static void
+default_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 The default dump function.
 
@@ -1233,7 +1316,8 @@ default_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<pf_register_standard_funcs>
+=item C<static INTVAL
+pf_register_standard_funcs(PARROT_INTERP, NOTNULL(PackFile *pf))>
 
 Called from within C<PackFile_new()> register the standard functions.
 
@@ -1303,7 +1387,12 @@ pf_register_standard_funcs(PARROT_INTERP, NOTNULL(PackFile *pf))
 
 /*
 
-=item C<PackFile_Segment_new_seg>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment *
+PackFile_Segment_new_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
+        UINTVAL type, NOTNULL(const char *name), int add)>
 
 Create a new segment.
 
@@ -1329,6 +1418,20 @@ PackFile_Segment_new_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir),
     return seg;
 }
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+create_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir), pack_file_types t,
+           NOTNULL(const char *name), NOTNULL(const char *file_name), int add)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
@@ -1348,7 +1451,11 @@ create_seg(PARROT_INTERP, NOTNULL(PackFile_Directory *dir), pack_file_types t,
 
 /*
 
-=item C<PF_create_default_segs>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_ByteCode *
+PF_create_default_segs(PARROT_INTERP, NOTNULL(const char *file_name), int add)>
 
 Create bytecode, constant, and fixup segment for C<file_nam>. If C<add>
 is true, the current packfile becomes the owner of these segments by
@@ -1389,7 +1496,13 @@ PF_create_default_segs(PARROT_INTERP, NOTNULL(const char *file_name), int add)
 
 /*
 
-PackFile_Segment_destroy
+=item C<PARROT_API
+void
+PackFile_Segment_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
+
+TODO: Not yet documented!!!
+
+=cut
 
 */
 
@@ -1403,6 +1516,18 @@ PackFile_Segment_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         (f)(interp, self);
     default_destroy(self);    /* destroy self after specific */
 }
+
+/*
+
+=item C<PARROT_API
+size_t
+PackFile_Segment_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 size_t
@@ -1418,6 +1543,21 @@ PackFile_Segment_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         size += (align - size % align);   /* pad/align it */
     return size;
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t *
+PackFile_Segment_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self),
+        NOTNULL(opcode_t *cursor))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -1442,7 +1582,12 @@ PackFile_Segment_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self),
 
 /*
 
-=item C<PackFile_Segment_unpack>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t *
+PackFile_Segment_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self),
+        NOTNULL(opcode_t *cursor))>
 
 All all these functions call the related C<default_*> function.
 
@@ -1476,7 +1621,9 @@ PackFile_Segment_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self),
 
 /*
 
-=item C<PackFile_Segment_dump>
+=item C<PARROT_API
+void
+PackFile_Segment_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Dumps the segment C<self>.
 
@@ -1499,7 +1646,10 @@ PackFile_Segment_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 =over 4
 
-=item C<directory_new>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+directory_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 Returns a new C<PackFile_Directory> cast as a C<PackFile_Segment>.
 
@@ -1519,7 +1669,8 @@ directory_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int 
 
 /*
 
-=item C<directory_dump>
+=item C<static void
+directory_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Dumps the directory C<self>.
 
@@ -1555,7 +1706,10 @@ directory_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<directory_unpack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+directory_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *segp), NOTNULL(opcode_t *cursor))>
 
 Unpacks the directory.
 
@@ -1680,7 +1834,8 @@ directory_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *segp), NOTNULL(opcode_
 
 /*
 
-=item C<directory_destroy>
+=item C<static void
+directory_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Destroys the directory.
 
@@ -1705,7 +1860,8 @@ directory_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<sort_segs>
+=item C<static void
+sort_segs(NOTNULL(PackFile_Directory *dir))>
 
 Sorts the segments in C<dir>.
 
@@ -1746,7 +1902,8 @@ sort_segs(NOTNULL(PackFile_Directory *dir))
 
 /*
 
-=item C<directory_packed_size>
+=item C<static size_t
+directory_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Returns the size of the directory minus the value returned by
 C<default_packed_size()>.
@@ -1787,7 +1944,10 @@ directory_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<directory_pack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+directory_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))>
 
 Packs the directory C<self>.
 
@@ -1836,7 +1996,9 @@ directory_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t 
 
 =over 4
 
-=item C<segment_init>
+=item C<static void
+segment_init(NOTNULL(PackFile_Segment *self), NOTNULL(PackFile *pf),
+        NOTNULL(const char *name))>
 
 Initializes the segment C<self>.
 
@@ -1863,7 +2025,11 @@ segment_init(NOTNULL(PackFile_Segment *self), NOTNULL(PackFile *pf),
 
 /*
 
-=item C<PackFile_Segment_new>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment *
+PackFile_Segment_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 Create a new default section.
 
@@ -1893,7 +2059,8 @@ and can read a block of C<opcode_t> data.
 
 =over 4
 
-=item C<default_destroy>
+=item C<static void
+default_destroy(NOTNULL(PackFile_Segment *self))>
 
 The default destroy function.
 
@@ -1917,7 +2084,8 @@ default_destroy(NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<default_packed_size>
+=item C<static size_t
+default_packed_size(NOTNULL(const PackFile_Segment *self))>
 
 Returns the default size of the segment C<self>.
 
@@ -1936,7 +2104,10 @@ default_packed_size(NOTNULL(const PackFile_Segment *self))
 
 /*
 
-=item C<default_pack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+default_pack(NOTNULL(const PackFile_Segment *self), NOTNULL(opcode_t *dest))>
 
 Performs the default pack.
 
@@ -1966,7 +2137,8 @@ default_pack(NOTNULL(const PackFile_Segment *self), NOTNULL(opcode_t *dest))
 
 =over 4
 
-=item C<byte_code_destroy>
+=item C<static void
+byte_code_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Destroys the C<PackFile_ByteCode> segment C<self>.
 
@@ -1999,7 +2171,10 @@ byte_code_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<byte_code_new>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+byte_code_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 New C<PackFile_ByteCode> segment.
 
@@ -2027,7 +2202,8 @@ byte_code_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int 
 
 =over 4
 
-=item C<pf_debug_destroy>
+=item C<static void
+pf_debug_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Destroys the C<PackFile_Debug> segment C<self>.
 
@@ -2053,7 +2229,10 @@ pf_debug_destroy(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<pf_debug_new>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+pf_debug_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 Returns a new C<PackFile_Debug> segment.
 
@@ -2078,7 +2257,8 @@ pf_debug_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int a
 
 /*
 
-=item C<pf_debug_packed_size>
+=item C<static size_t
+pf_debug_packed_size(SHIM_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Returns the size of the C<PackFile_Debug> segment's filename in
 C<opcode_t> units.
@@ -2118,7 +2298,10 @@ pf_debug_packed_size(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<pf_debug_pack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+pf_debug_pack(SHIM_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))>
 
 Pack the debug segment.
 
@@ -2161,7 +2344,10 @@ pf_debug_pack(SHIM_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cu
 
 /*
 
-=item C<pf_debug_unpack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))>
 
 Unpack a debug segment into a PackFile_Debug structure.
 
@@ -2236,7 +2422,8 @@ pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t
 
 /*
 
-=item C<pf_debug_dump>
+=item C<static void
+pf_debug_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Dumps a debug segment to a human readable form.
 
@@ -2297,7 +2484,11 @@ pf_debug_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<Parrot_new_debug_seg>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Debug *
+Parrot_new_debug_seg(PARROT_INTERP, NOTNULL(PackFile_ByteCode *cs), size_t size)>
 
 Create and append (or resize) a new debug seg for a code segment.
 
@@ -2349,13 +2540,19 @@ Parrot_new_debug_seg(PARROT_INTERP, NOTNULL(PackFile_ByteCode *cs), size_t size)
 
 /*
 
-Parrot_debug_add_mapping
+=item C<PARROT_API
+void
+Parrot_debug_add_mapping(PARROT_INTERP, NOTNULL(PackFile_Debug *debug),
+                         opcode_t offset, int mapping_type,
+                         NOTNULL(const char *filename), int source_seg)>
 
 Add a bytecode offset to filename/source segment mapping. mapping_type may be
 one of PF_DEBUGMAPPINGTYPE_NONE (in which case the last two parameters are
 ignored), PF_DEBUGMAPPINGTYPE_FILENAME (in which case filename must be given)
 or PF_DEBUGMAPPINGTYPE_SOURCESEG (in which case source_seg should contains the
 number of the source segment in question).
+
+=cut
 
 */
 
@@ -2432,7 +2629,11 @@ Parrot_debug_add_mapping(PARROT_INTERP, NOTNULL(PackFile_Debug *debug),
 
 /*
 
-=item C<Parrot_debug_pc_to_filename>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_debug_pc_to_filename(PARROT_INTERP, NOTNULL(PackFile_Debug *debug), opcode_t pc)>
 
 Take a position in the bytecode and return the filename of the source for
 that position.
@@ -2477,7 +2678,9 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, NOTNULL(PackFile_Debug *debug), opcod
 
 /*
 
-=item C<Parrot_switch_to_cs_by_nr>
+=item C<PARROT_API
+void
+Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)>
 
 Switch to byte code segment number C<seg>.
 
@@ -2510,7 +2713,11 @@ Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
 
 /*
 
-=item C<Parrot_switch_to_cs>
+=item C<PARROT_API
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile_ByteCode *
+Parrot_switch_to_cs(PARROT_INTERP, NOTNULL(PackFile_ByteCode *new_cs), int really)>
 
 Switch to a byte code segment C<new_cs>, returning the old segment.
 
@@ -2552,11 +2759,12 @@ Parrot_switch_to_cs(PARROT_INTERP, NOTNULL(PackFile_ByteCode *new_cs), int reall
 
 /*
 
-=item C<find_constants>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Constant *
+clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const))>
 
-Find the constant table associated with a thread. For now, we need to copy
-constant tables because some entries aren't really constant; e.g.
-subroutines need to reference namespace pointers.
+TODO: Not yet documented!!!
 
 =cut
 
@@ -2565,7 +2773,8 @@ subroutines need to reference namespace pointers.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Constant *
-clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const)) {
+clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const))
+{
     STRING * const _sub = interp->vtables[enum_class_Sub]->whoami;
 
     if (old_const->type == PFC_PMC
@@ -2597,6 +2806,21 @@ clone_constant(PARROT_INTERP, NOTNULL(PackFile_Constant *old_const)) {
         return old_const;
     }
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Constant **
+find_constants(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))>
+
+Find the constant table associated with a thread. For now, we need to copy
+constant tables because some entries aren't really constant; e.g.
+subroutines need to reference namespace pointers.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -2641,6 +2865,18 @@ find_constants(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
         return new_consts;
     }
 }
+
+/*
+
+=item C<PARROT_API
+void
+Parrot_destroy_constants(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -2690,7 +2926,9 @@ Parrot_destroy_constants(PARROT_INTERP)
 
 =over 4
 
-=item C<PackFile_FixupTable_clear>
+=item C<PARROT_API
+void
+PackFile_FixupTable_clear(PARROT_INTERP, NOTNULL(PackFile_FixupTable *self))>
 
 Clear a PackFile FixupTable.
 
@@ -2728,7 +2966,8 @@ PackFile_FixupTable_clear(PARROT_INTERP, NOTNULL(PackFile_FixupTable *self))
 
 /*
 
-=item C<fixup_destroy>
+=item C<static void
+fixup_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Just calls C<PackFile_FixupTable_clear()> with C<self>.
 
@@ -2745,9 +2984,12 @@ fixup_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<fixup_packed_size>
+=item C<static size_t
+fixup_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 I<What does this do?>
+
+TODO: Not yet documented!!!
 
 =cut
 
@@ -2780,9 +3022,14 @@ fixup_packed_size(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 /*
 
-=item C<fixup_pack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+fixup_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cursor))>
 
 I<What does this do?>
+
+TODO: Not yet documented!!!
 
 =cut
 
@@ -2816,7 +3063,10 @@ fixup_pack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cur
 
 /*
 
-=item C<fixup_new>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+fixup_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 Returns a new C<PackFile_FixupTable> segment.
 
@@ -2836,7 +3086,10 @@ fixup_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add)
 
 /*
 
-=item C<fixup_unpack>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static opcode_t *
+fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(opcode_t *cursor))>
 
 Unpack a PackFile FixupTable from a block of memory.
 
@@ -2904,9 +3157,16 @@ fixup_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NULLOK(opcode_t *cur
 
 /*
 
-PackFile_FixupTable_new_entry
+=item C<PARROT_API
+void
+PackFile_FixupTable_new_entry(PARROT_INTERP,
+        NOTNULL(const char *label), INTVAL type, opcode_t offs)>
 
 I<What does this do?>
+
+TODO: Not yet documented!!!
+
+=cut
 
 */
 
@@ -2945,7 +3205,10 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
 
 /*
 
-=item C<find_fixup>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PackFile_FixupEntry *
+find_fixup(NOTNULL(PackFile_FixupTable *ft), INTVAL type, NOTNULL(const char *name))>
 
 Finds the fix-up entry for C<name> and returns it.
 
@@ -2971,9 +3234,12 @@ find_fixup(NOTNULL(PackFile_FixupTable *ft), INTVAL type, NOTNULL(const char *na
 
 /*
 
-=item C<find_fixup_iter>
+=item C<static INTVAL
+find_fixup_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NOTNULL(void *user_data))>
 
 I<What does this do?>
+
+TODO: Not yet documented!!!
 
 =cut
 
@@ -3001,9 +3267,15 @@ find_fixup_iter(PARROT_INTERP, NOTNULL(PackFile_Segment *seg), NOTNULL(void *use
 
 /*
 
-=item C<PackFile_find_fixup_entry>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PackFile_FixupEntry *
+PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)>
 
 I<What does this do?>
+
+TODO: Not yet documented!!!
 
 =cut
 
@@ -3034,7 +3306,9 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
 
 =over 4
 
-=item C<PackFile_ConstTable_clear>
+=item C<PARROT_API
+void
+PackFile_ConstTable_clear(PARROT_INTERP, NOTNULL(PackFile_ConstTable *self))>
 
 Clear the C<PackFile_ConstTable> C<self>.
 
@@ -3069,7 +3343,12 @@ PackFile_Constant *exec_const_table;
 
 /*
 
-=item C<PackFile_ConstTable_unpack>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t *
+PackFile_ConstTable_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg),
+        NOTNULL(opcode_t *cursor))>
 
 Unpack a PackFile ConstTable from a block of memory. The format is:
 
@@ -3139,7 +3418,10 @@ PackFile_ConstTable_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *seg),
 
 /*
 
-=item C<const_new>
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Segment *
+const_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add))>
 
 Returns a new C<PackFile_ConstTable> segment.
 
@@ -3159,7 +3441,8 @@ const_new(SHIM_INTERP, SHIM(PackFile *pf), SHIM(const char *name), SHIM(int add)
 
 /*
 
-=item C<const_destroy>
+=item C<static void
+const_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))>
 
 Destroys the C<PackFile_ConstTable> C<self>.
 
@@ -3183,7 +3466,11 @@ const_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
 
 =over 4
 
-=item C<PackFile_Constant_new>
+=item C<PARROT_API
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PackFile_Constant *
+PackFile_Constant_new(SHIM_INTERP)>
 
 Allocate a new empty PackFile Constant.
 
@@ -3209,7 +3496,9 @@ PackFile_Constant_new(SHIM_INTERP)
 
 /*
 
-=item C<PackFile_Constant_destroy>
+=item C<PARROT_API
+void
+PackFile_Constant_destroy(SHIM_INTERP, NULLOK(PackFile_Constant *self))>
 
 Delete the C<PackFile_Constant> C<self>.
 
@@ -3228,7 +3517,10 @@ PackFile_Constant_destroy(SHIM_INTERP, NULLOK(PackFile_Constant *self))
 
 /*
 
-=item C<PackFile_Constant_pack_size>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+size_t
+PackFile_Constant_pack_size(PARROT_INTERP, NOTNULL(PackFile_Constant *self))>
 
 Determine the size of the buffer needed in order to pack the PackFile
 Constant into a contiguous region of memory.
@@ -3289,7 +3581,12 @@ PackFile_Constant_pack_size(PARROT_INTERP, NOTNULL(PackFile_Constant *self))
 
 /*
 
-=item C<PackFile_Constant_unpack>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+opcode_t *
+PackFile_Constant_unpack(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt),
+        NOTNULL(PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
 
 Unpack a PackFile Constant from a block of memory. The format is:
 
@@ -3349,7 +3646,12 @@ PackFile_Constant_unpack(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt),
 
 /*
 
-=item C<PackFile_Constant_unpack_pmc>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t *
+PackFile_Constant_unpack_pmc(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt),
+        NOTNULL(PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
 
 Unpack a constant PMC.
 
@@ -3405,7 +3707,12 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt)
 
 /*
 
-=item C<PackFile_Constant_unpack_key>
+=item C<PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t *
+PackFile_Constant_unpack_key(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt),
+        NOTNULL(PackFile_Constant *self), NOTNULL(opcode_t *cursor))>
 
 Unpack a PackFile Constant from a block of memory. The format consists
 of a sequence of key atoms, each with the following format:
@@ -3497,7 +3804,10 @@ PackFile_Constant_unpack_key(PARROT_INTERP, NOTNULL(PackFile_ConstTable *constt)
 
 /*
 
-=item C<PackFile_append_pbc>
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PackFile *
+PackFile_append_pbc(PARROT_INTERP, NULLOK(const char *filename))>
 
 Read a PBC and append it to the current directory
 Fixup sub addresses in newly loaded bytecode and run :load subs.
@@ -3522,7 +3832,9 @@ PackFile_append_pbc(PARROT_INTERP, NULLOK(const char *filename))
 
 /*
 
-=item C<Parrot_load_bytecode>
+=item C<PARROT_API
+void
+Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))>
 
 Load and append a bytecode, IMC or PASM file into interpreter.
 
@@ -3593,7 +3905,9 @@ Parrot_load_bytecode(PARROT_INTERP, NOTNULL(STRING *file_str))
 
 /*
 
-=item C<PackFile_fixup_subs>
+=item C<PARROT_API
+void
+PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, NULLOK(PMC *eval))>
 
 Run :load or :immediate subroutines for the current code segment.
 If C<eval> is given, set this is the owner of the subroutines.
