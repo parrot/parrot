@@ -68,15 +68,12 @@ print_help(char const * const program_name) {
 int
 main(int argc, char *argv[]) {
     char const * const program_name = argv[0];
-    int total_errors  = 0;
-    int flexdebug     = 0;
-    char *outputfile  = NULL;
+    lexer_state *lexer = NULL;
+    int   flexdebug    = 0;
+    char *filename     = NULL;
+    char *outputfile   = NULL;
+    FILE *infile       = NULL;
     yyscan_t yyscanner;
-
-    if (argc < 2) {
-        print_help(program_name);
-        exit(EXIT_FAILURE);
-    }
 
     /* skip program name */
     argc--;
@@ -120,62 +117,44 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    if (argc < 1) {
-        fprintf(stderr, "No input file specified\n");
+    if (argc < 1) { /* no file specified, read from stdin */
+        infile   = stdin;
+        filename = NULL;
+    }
+    else {
+        /* done handling arguments, open the file */
+        infile   = fopen(argv[0], "r");
+        filename = argv[0];
+    }
+
+    if (infile == NULL) {
+        fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
 
-    /* compile all files specified on the command line */
-    while (argc > 0) {
-        FILE *infile       = NULL;
-        lexer_state *lexer = NULL;
+    /* create a yyscan_t object */
+    yylex_init(&yyscanner);
+    /* set debug flag */
+    yyset_debug(flexdebug, yyscanner);
+    /* set the input file */
+    yyset_in(infile, yyscanner);
+    /* set the extra parameter in the yyscan_t structure */
+    lexer = new_lexer(filename);
+    yyset_extra(lexer, yyscanner);
+    /* go parse */
+    yyparse(yyscanner, lexer);
 
-        fprintf(stderr, "Processing file '%s'\n", argv[0]);
-
-        /* done handling arguments, open the file */
-        infile = fopen(argv[0], "r");
-
-        if (infile == NULL) {
-            fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
-            exit(EXIT_FAILURE);
-        }
-
-        /* create a yyscan_t object */
-        yylex_init(&yyscanner);
-        /* set debug flag */
-        yyset_debug(flexdebug, yyscanner);
-        /* set the input file */
-        yyset_in(infile, yyscanner);
-        /* set the extra parameter in the yyscan_t structure */
-        lexer = new_lexer(argv[0]);
-        yyset_extra(lexer, yyscanner);
-
-        fprintf(stderr, "compiling %s\n", argv[0]);
-        yyparse(yyscanner, lexer);
-
-            /* update total error count */
-        total_errors += lexer->parse_errors;
-
-        if (lexer->parse_errors == 0) {
-            fprintf(stderr, "Parse successful!\n");
-        }
-        else {
-            fprintf(stderr, "There %s %d %s in file '%s'\n", lexer->parse_errors > 1 ? "were" :
-                    "was", lexer->parse_errors, lexer->parse_errors > 1 ? "errors" : "error",
-                    lexer->filename);
-        }
-
-        /* clean up after playing */
-        yylex_destroy(yyscanner);
-
-        argc--;
-        argv++;
+    if (lexer->parse_errors == 0) {
+        fprintf(stderr, "Parse successful!\n");
+    }
+    else {
+        fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
     }
 
-    if (total_errors > 0) {
-        fprintf(stderr, "There were %d parse errors in all files\n", total_errors);
-    }
+    /* clean up after playing */
+    yylex_destroy(yyscanner);
+    free(lexer);
 
     /* go home! */
     return 0;

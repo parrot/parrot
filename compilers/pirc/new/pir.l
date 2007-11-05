@@ -459,6 +459,10 @@ is_parrot_op(char const * const spelling) {
         return 1;
     if (strcmp(spelling, "end") == 0)
         return 1;
+    if (strcmp(spelling, "setline") == 0)
+        return 1;
+    if (strcmp(spelling, "setfile") == 0)
+        return 1;
     return 0;
 }
 
