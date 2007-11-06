@@ -942,6 +942,9 @@ sub _op_number_p {
 }
 
 sub _op_complex_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'number?', $node ); 
 }
 
 sub _op_real_p {
@@ -2166,6 +2169,7 @@ sub _type_predicate {
 
     my %types = (
         'boolean?' => [ qw( Boolean ) ],
+        'complex?' => [ qw( Integer Float Complex ) ],
         'null?'    => [ qw( Undef ) ],
         'number?'  => [ qw( Integer Float Complex ) ],
         'pair?'    => [ qw( Array ) ],
