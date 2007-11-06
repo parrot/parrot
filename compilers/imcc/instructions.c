@@ -12,17 +12,28 @@
 #include "optimizer.h"
 
 /*
- * instructions.c
- *
- * When generating the code, the instructions of the program
- * are stored in an array.
- *
- * After the register allocation is resolved, the instructions
- * array is flushed.
- *
- * These functions operate over this array and its contents.
- */
 
+=head1 NAME
+
+compilers/imcc/instructions.c
+
+=head1 DESCRIPTION
+
+When generating the code, the instructions of the program
+are stored in an array.
+
+After the register allocation is resolved, the instructions
+array is flushed.
+
+These functions operate over this array and its contents.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 /* Global variables , forward def */
 
@@ -69,8 +80,18 @@ Emitter emitters[2] = {
 
 static int emitter;     /* XXX */
 
+/*
 
-/* Creates a new instruction */
+=item C<PARROT_MALLOC
+Instruction *
+_mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
+        SymReg ** r, int flags)>
+
+Creates a new instruction
+
+=cut
+
+*/
 
 PARROT_MALLOC
 Instruction *
@@ -111,6 +132,17 @@ _mk_instruction(NOTNULL(const char *op), NOTNULL(const char *fmt), int n,
 static int r_special[5];
 static int w_special[1+4*3];
 
+/*
+
+=item C<void
+imcc_init_tables(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 imcc_init_tables(PARROT_INTERP)
 {
@@ -138,8 +170,16 @@ imcc_init_tables(PARROT_INTERP)
 }
 
 /*
- * Returns TRUE if instruction ins reads from a register of type t
- */
+
+=item C<int
+ins_reads2(NOTNULL(const Instruction *ins), int t)>
+
+Returns TRUE if instruction ins reads from a register of type t
+
+=cut
+
+*/
+
 int
 ins_reads2(NOTNULL(const Instruction *ins), int t)
 {
@@ -160,8 +200,16 @@ ins_reads2(NOTNULL(const Instruction *ins), int t)
 }
 
 /*
- * Returns TRUE if instruction ins writes to a register of type t
- */
+
+=item C<int
+ins_writes2(NOTNULL(const Instruction *ins), int t)>
+
+Returns TRUE if instruction ins writes to a register of type t
+
+=cut
+
+*/
+
 int
 ins_writes2(NOTNULL(const Instruction *ins), int t)
 {
@@ -181,10 +229,18 @@ ins_writes2(NOTNULL(const Instruction *ins), int t)
     return 0;
 }
 
+/*
 
-/* next 2 functions are called very often, says gprof
- * they should be fast
- */
+=item C<int
+instruction_reads(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))>
+
+next 2 functions are called very often, says gprof
+they should be fast
+
+=cut
+
+*/
+
 int
 instruction_reads(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
 {
@@ -234,6 +290,17 @@ instruction_reads(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
     }
     return 0;
 }
+
+/*
+
+=item C<int
+instruction_writes(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 int
 instruction_writes(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
@@ -300,8 +367,16 @@ instruction_writes(NOTNULL(const Instruction *ins), NOTNULL(const SymReg *r))
 }
 
 /*
- * Get the register number of an address which is a branch target
- */
+
+=item C<int
+get_branch_regno(NOTNULL(const Instruction *ins))>
+
+Get the register number of an address which is a branch target
+
+=cut
+
+*/
+
 int
 get_branch_regno(NOTNULL(const Instruction *ins))
 {
@@ -313,8 +388,16 @@ get_branch_regno(NOTNULL(const Instruction *ins))
 }
 
 /*
- * Get the register corresponding to an address which is a branch target
- */
+
+=item C<SymReg *
+get_branch_reg(NOTNULL(const Instruction *ins))>
+
+Get the register corresponding to an address which is a branch target
+
+=cut
+
+*/
+
 SymReg *
 get_branch_reg(NOTNULL(const Instruction *ins))
 {
@@ -327,9 +410,17 @@ get_branch_reg(NOTNULL(const Instruction *ins))
 /* some useful instruction routines */
 
 /*
- * Delete instruction ins. Also free it if needs_freeing is true.
- * The instruction following ins is returned.
- */
+
+=item C<Instruction *
+delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs_freeing)>
+
+Delete instruction ins. Also free it if needs_freeing is true.
+The instruction following ins is returned.
+
+=cut
+
+*/
+
 Instruction *
 delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs_freeing)
 {
@@ -350,8 +441,15 @@ delete_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), int needs
 }
 
 /*
- * insert tmp after ins
- */
+
+=item C<void
+insert_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))>
+
+insert tmp after ins
+
+=cut
+
+*/
 
 void
 insert_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))
@@ -385,8 +483,16 @@ insert_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(In
 }
 
 /*
- * insert tmp before ins
- */
+
+=item C<void
+prepend_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))>
+
+insert tmp before ins
+
+=cut
+
+*/
+
 void
 prepend_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(Instruction *tmp))
 {
@@ -412,8 +518,16 @@ prepend_ins(NOTNULL(struct _IMC_Unit *unit), NULLOK(Instruction *ins), NOTNULL(I
 }
 
 /*
- * Substitute tmp for ins. Free ins if needs_freeing is true.
- */
+
+=item C<void
+subst_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins),
+          NOTNULL(Instruction *tmp), int needs_freeing)>
+
+Substitute tmp for ins. Free ins if needs_freeing is true.
+
+=cut
+
+*/
 
 void
 subst_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins),
@@ -438,10 +552,18 @@ subst_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins),
 }
 
 /*
- * Move instruction ins from its current position to the position
- * following instruction to. Returns the instruction following the
- * initial position of ins.
- */
+
+=item C<Instruction *
+move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Instruction *to))>
+
+Move instruction ins from its current position to the position
+following instruction to. Returns the instruction following the
+initial position of ins.
+
+=cut
+
+*/
+
 Instruction *
 move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Instruction *to))
 {
@@ -451,7 +573,17 @@ move_ins(NOTNULL(struct _IMC_Unit *unit), NOTNULL(Instruction *ins), NOTNULL(Ins
 }
 
 
-/* Emit a single instruction into the current unit buffer. */
+/*
+
+=item C<Instruction *
+emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))>
+
+Emit a single instruction into the current unit buffer.
+
+=cut
+
+*/
+
 Instruction *
 emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))
 {
@@ -470,8 +602,16 @@ emitb(PARROT_INTERP, NULLOK(struct _IMC_Unit *unit), NULLOK(Instruction *i))
 }
 
 /*
- * Free the Instruction structure ins.
- */
+
+=item C<void
+free_ins(NOTNULL(Instruction *ins))>
+
+Free the Instruction structure ins.
+
+=cut
+
+*/
+
 void
 free_ins(NOTNULL(Instruction *ins))
 {
@@ -481,8 +621,16 @@ free_ins(NOTNULL(Instruction *ins))
 }
 
 /*
- * Print details of instruction ins in file fd.
- */
+
+=item C<int
+ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))>
+
+Print details of instruction ins in file fd.
+
+=cut
+
+*/
+
 int
 ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
 {
@@ -581,6 +729,17 @@ ins_print(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const Instruction *ins))
 /* for debug */
 static char *output;
 
+/*
+
+=item C<static int
+e_file_open(SHIM_INTERP, NOTNULL(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 e_file_open(SHIM_INTERP, NOTNULL(void *param))
 {
@@ -594,6 +753,17 @@ e_file_open(SHIM_INTERP, NOTNULL(void *param))
     return 1;
 }
 
+/*
+
+=item C<static int
+e_file_close(PARROT_INTERP, SHIM(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 e_file_close(PARROT_INTERP, SHIM(void *param))
 {
@@ -603,8 +773,25 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
     return 0;
 }
 
+/*
+
+=item C<static int
+e_file_emit(PARROT_INTERP,
+    SHIM(void *param),
+    SHIM(IMC_Unit *unit),
+    NOTNULL(const Instruction *ins))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
-e_file_emit(PARROT_INTERP, SHIM(void *param), SHIM(IMC_Unit *unit), NOTNULL(const Instruction *ins))
+e_file_emit(PARROT_INTERP,
+        SHIM(void *param),
+        SHIM(IMC_Unit *unit),
+        NOTNULL(const Instruction *ins))
 {
 #if IMC_TRACE
     PIO_eprintf(NULL, "e_file_emit\n");
@@ -618,6 +805,18 @@ e_file_emit(PARROT_INTERP, SHIM(void *param), SHIM(IMC_Unit *unit), NOTNULL(cons
     return 0;
 }
 
+/*
+
+=item C<PARROT_API
+int
+emit_open(PARROT_INTERP, int type, NULLOK(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 int
 emit_open(PARROT_INTERP, int type, NULLOK(void *param))
@@ -627,6 +826,18 @@ emit_open(PARROT_INTERP, int type, NULLOK(void *param))
     IMCC_INFO(interp)->dont_optimize = 0;
     return (emitters[emitter]).open(interp, param);
 }
+
+/*
+
+=item C<PARROT_API
+int
+emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 int
@@ -645,12 +856,32 @@ emit_flush(PARROT_INTERP, NULLOK(void *param), NOTNULL(struct _IMC_Unit *unit))
     return 0;
 }
 
+/*
+
+=item C<PARROT_API
+int
+emit_close(PARROT_INTERP, NULLOK(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 int
 emit_close(PARROT_INTERP, NULLOK(void *param))
 {
     return (emitters[emitter]).close(interp, param);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

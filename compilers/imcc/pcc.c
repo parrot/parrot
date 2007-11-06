@@ -4,12 +4,29 @@
  *
  * pcc.c
  *
- * Parrot calling convention implementation.
- *
- * see: docs/pdds/pdd03_calling_conventions.pod
- *
- * PCC Implementation by Leopold Toetsch
  */
+
+/*
+
+=head1 NAME
+
+compilers/imcc/pcc.c
+
+=head1 DESCRIPTION
+
+Parrot calling convention implementation.
+
+see: docs/pdds/pdd03_calling_conventions.pod
+
+PCC Implementation by Leopold Toetsch
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -80,9 +97,18 @@ static void unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
 /* HEADERIZER END: static */
 
 /*
- * Utility instruction routine. Creates and inserts an instruction
- * into the current block in one call.
- */
+
+=item C<static Instruction *
+insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
+        char *name, SymReg **regs, int n)>
+
+Utility instruction routine. Creates and inserts an instruction
+into the current block in one call.
+
+=cut
+
+*/
+
 static Instruction *
 insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
         char *name, SymReg **regs, int n)
@@ -93,8 +119,16 @@ insINS(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
 }
 
 /*
- * get or create the SymReg
- */
+
+=item C<SymReg*
+get_pasm_reg(PARROT_INTERP, const char *name)>
+
+get or create the SymReg
+
+=cut
+
+*/
+
 SymReg*
 get_pasm_reg(PARROT_INTERP, const char *name)
 {
@@ -106,8 +140,18 @@ get_pasm_reg(PARROT_INTERP, const char *name)
 }
 
 /*
- * get or create a constant
  */
+/*
+
+=item C<SymReg*
+get_const(PARROT_INTERP, const char *name, int type)>
+
+get or create a constant
+
+=cut
+
+*/
+
 SymReg*
 get_const(PARROT_INTERP, const char *name, int type)
 {
@@ -120,10 +164,19 @@ get_const(PARROT_INTERP, const char *name, int type)
 }
 
 /*
- * set arguments or return values
- * get params or results
- * used by expand_pcc_sub_call and expand_pcc_sub
- */
+
+=item C<static Instruction*
+pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
+        char *op_name, int n, SymReg **args, int *arg_flags)>
+
+set arguments or return values
+get params or results
+used by expand_pcc_sub_call and expand_pcc_sub
+
+=cut
+
+*/
+
 static Instruction*
 pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
         char *op_name, int n, SymReg **args, int *arg_flags)
@@ -179,8 +232,16 @@ pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
 }
 
 /*
- * prepend the object to args or self to params
- */
+
+=item C<static void
+unshift_self(NOTNULL(SymReg *sub), SymReg *obj)>
+
+prepend the object to args or self to params
+
+=cut
+
+*/
+
 static void
 unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
 {
@@ -202,12 +263,18 @@ unshift_self(NOTNULL(SymReg *sub), SymReg *obj)
     sub->pcc_sub->nargs++;
 }
 
-
 /*
- * Expand a PCC (Parrot Calling Convention) subroutine
- * by generating the appropriate prologue and epilogue
- * for parameter passing/returning.
- */
+
+=item C<void
+expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(Instruction *ins)))>
+
+Expand a PCC (Parrot Calling Convention) subroutine
+by generating the appropriate prologue and epilogue
+for parameter passing/returning.
+
+=cut
+
+*/
 
 void
 expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(Instruction *ins)))
@@ -279,10 +346,17 @@ expand_pcc_sub(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)), NOTNULL(NOTNULL(
     }
 }
 
-
 /*
- * Expand a PCC sub return directive into its PASM instructions
- */
+
+=item C<void
+expand_pcc_sub_ret(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))>
+
+Expand a PCC sub return directive into its PASM instructions
+
+=cut
+
+*/
+
 void
 expand_pcc_sub_ret(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
@@ -319,6 +393,17 @@ struct move_info_t {
     SymReg      **dest;
     SymReg      **src;
 };
+
+/*
+
+=item C<static int
+pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo))
@@ -381,6 +466,18 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, NOTNULL(void *vinfo
     return 1;
 }
 
+/*
+
+=item C<static Instruction *
+move_regs(PARROT_INTERP, IMC_Unit * unit,
+        NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static Instruction *
 move_regs(PARROT_INTERP, IMC_Unit * unit,
         NOTNULL(Instruction *ins), int n, SymReg **dest, SymReg **src)
@@ -425,8 +522,16 @@ done:
 }
 
 /*
- * convert a recursive tailcall into a loop
- */
+
+=item C<static int
+recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
+        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub))>
+
+convert a recursive tailcall into a loop
+
+=cut
+
+*/
 
 static int
 recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
@@ -481,6 +586,18 @@ recursive_tail_call(PARROT_INTERP, NOTNULL(NOTNULL(IMC_Unit *unit)),
     return 1;
 }
 
+/*
+
+=item C<static void
+insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub), NULLOK(SymReg *meth))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
         NOTNULL(NOTNULL(Instruction *ins)), NOTNULL(SymReg *sub), NULLOK(SymReg *meth))
@@ -503,10 +620,17 @@ insert_tail_call(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 }
 
 /*
- * Expand a PCC subroutine call (IMC) into its PASM instructions
- * This is the nuts and bolts of pdd03 routine call style
- *
- */
+
+=item C<void
+expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))>
+
+Expand a PCC subroutine call (IMC) into its PASM instructions
+This is the nuts and bolts of pdd03 routine call style
+
+=cut
+
+*/
+
 void
 expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *ins))
 {
@@ -654,6 +778,14 @@ expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction 
 
     ins->type |= ITPCCSUB;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

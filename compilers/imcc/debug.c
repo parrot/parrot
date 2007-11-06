@@ -1,20 +1,44 @@
 /*
  * Copyright (C) 2002-2007, The Perl Foundation.
+ * $Id$
  */
 
 /*
- * print debug info of various structures
- *
- * handle info/error/warning messages from imcc
- *
- * $Id$
- *
- */
 
+=head1 NAME
+
+compilers/imcc/debug.c
+
+=head1 DESCRIPTION
+
+print debug info of various structures
+
+handle info/error/warning messages from imcc
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "imc.h"
 
 /* HEADERIZER HFILE: compilers/imcc/debug.h */
+
+/*
+
+=item C<PARROT_API
+PARROT_DOES_NOT_RETURN
+void
+IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -29,6 +53,19 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     IMCC_THROW(IMCC_INFO(interp)->jump_buf,IMCC_FATAL_EXCEPTION);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_DOES_NOT_RETURN
+void
+IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_DOES_NOT_RETURN
 void
@@ -42,6 +79,19 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     IMCC_THROW(IMCC_INFO(interp)->jump_buf,IMCC_FATALY_EXCEPTION);
 }
 
+/*
+
+=item C<PARROT_API
+PARROT_DOES_NOT_RETURN
+void
+IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 PARROT_DOES_NOT_RETURN
 void
@@ -54,6 +104,19 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
     va_end(ap);
     Parrot_exit(interp, code);
 }
+
+/*
+
+=item C<PARROT_API
+PARROT_DOES_NOT_RETURN
+void
+IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 PARROT_DOES_NOT_RETURN
@@ -71,6 +134,18 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, NOTNULL(const char *fmt), ...)
     Parrot_exit(interp, code);
 }
 
+/*
+
+=item C<PARROT_API
+void
+IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 void
 IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)
@@ -83,6 +158,18 @@ IMCC_warning(PARROT_INTERP, NOTNULL(const char *fmt), ...)
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
 }
+
+/*
+
+=item C<PARROT_API
+void
+IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -98,6 +185,18 @@ IMCC_info(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
     va_end(ap);
 }
 
+/*
+
+=item C<PARROT_API
+void
+IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_API
 void
 IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
@@ -110,6 +209,17 @@ IMCC_debug(PARROT_INTERP, int level, NOTNULL(const char *fmt), ...)
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
 }
+
+/*
+
+=item C<void
+dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))
@@ -141,6 +251,17 @@ dump_instructions(PARROT_INTERP, NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\n");
 }
 
+/*
+
+=item C<void
+dump_cfg(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_cfg(NOTNULL(const IMC_Unit *unit))
 {
@@ -165,6 +286,17 @@ dump_cfg(NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\n");
 
 }
+
+/*
+
+=item C<void
+dump_loops(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 dump_loops(NOTNULL(const IMC_Unit *unit))
@@ -196,6 +328,17 @@ dump_loops(NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\n");
 }
 
+/*
+
+=item C<void
+dump_labels(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_labels(NOTNULL(const IMC_Unit *unit))
 {
@@ -218,6 +361,17 @@ dump_labels(NOTNULL(const IMC_Unit *unit))
     }
     fprintf(stderr, "\n");
 }
+
+/*
+
+=item C<void
+dump_symreg(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 dump_symreg(NOTNULL(const IMC_Unit *unit))
@@ -254,6 +408,17 @@ dump_symreg(NOTNULL(const IMC_Unit *unit))
     dump_liveness_status(unit);
 }
 
+/*
+
+=item C<void
+dump_liveness_status(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_liveness_status(NOTNULL(const IMC_Unit *unit))
 {
@@ -270,6 +435,17 @@ dump_liveness_status(NOTNULL(const IMC_Unit *unit))
 
 }
 
+
+/*
+
+=item C<void
+dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r))
@@ -310,6 +486,17 @@ dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r)
     fprintf(stderr, "\n");
 }
 
+/*
+
+=item C<void
+dump_interference_graph(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_interference_graph(NOTNULL(const IMC_Unit *unit))
 {
@@ -339,6 +526,17 @@ dump_interference_graph(NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\n");
 }
 
+/*
+
+=item C<void
+dump_dominators(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_dominators(NOTNULL(const IMC_Unit *unit))
 {
@@ -362,6 +560,17 @@ dump_dominators(NOTNULL(const IMC_Unit *unit))
     fprintf(stderr, "\n");
 }
 
+/*
+
+=item C<void
+dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))
 {
@@ -384,6 +593,14 @@ dump_dominance_frontiers(NOTNULL(const IMC_Unit *unit))
 
     fprintf(stderr, "\n");
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

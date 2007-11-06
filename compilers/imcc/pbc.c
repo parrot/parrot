@@ -10,29 +10,40 @@
 /* HEADERIZER HFILE: compilers/imcc/pbc.h */
 
 /*
- * pbc.c
- *
- * emit imcc instructions into Parrot interpreter
- *
- * the e_pbc_emit function is called per instruction
- *
- * Notes:
- *
- * I'm using existing data structures here (SymReg*) to store
- * various global items (currently only PMC constants).
- * The index in the constant table is in SymReg* ->color
- * data member. This looks odd, but the register number
- * from imc.c:allocate is also there for variables,
- * so it's a little bit consistent at least.
- *
- * So when reading color here it's either a constant table index
- * or a Parrot register number, depending on data type.
- *
- * TODO memory clean up
- *
- * -lt
- *
- */
+
+=head1 NAME
+
+compilers/imcc/pbc.c
+
+=head1 DESCRIPTION
+
+emit imcc instructions into Parrot interpreter
+
+the e_pbc_emit function is called per instruction
+
+Notes:
+
+I'm using existing data structures here (SymReg*) to store
+various global items (currently only PMC constants).
+The index in the constant table is in SymReg* ->color
+data member. This looks odd, but the register number
+from imc.c:allocate is also there for variables,
+so it's a little bit consistent at least.
+
+So when reading color here it's either a constant table index
+or a Parrot register number, depending on data type.
+
+TODO memory clean up
+
+-lt
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 /*
  * globals store the state between individual e_pbc_emit calls
@@ -177,6 +188,17 @@ static void verify_signature(PARROT_INTERP,
 
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void
+imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 {
@@ -202,6 +224,17 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
 
     globals.cs = NULL;
 }
+
+/*
+
+=item C<int
+e_pbc_open(PARROT_INTERP, SHIM(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))
@@ -261,7 +294,18 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 
 #ifdef HAS_JIT
 
-/* get size/line of bytecode in ops till now */
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+old_blocks(void)>
+
+get size/line of bytecode in ops till now
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 old_blocks(void)
@@ -275,6 +319,17 @@ old_blocks(void)
 
     return size;
 }
+
+/*
+
+=item C<opcode_t *
+make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 opcode_t *
 make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
@@ -306,7 +361,17 @@ make_jit_info(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 }
 #endif
 
-/* allocate a new globals.cs->subs structure */
+/*
+
+=item C<static void
+make_new_sub(NOTNULL(IMC_Unit *unit))>
+
+allocate a new globals.cs->subs structure
+
+=cut
+
+*/
+
 static void
 make_new_sub(NOTNULL(IMC_Unit *unit))
 {
@@ -328,7 +393,17 @@ make_new_sub(NOTNULL(IMC_Unit *unit))
     create_symhash(&s->fixup);
 }
 
-/* get size/line of bytecode in ops till now */
+/*
+
+=item C<static int
+get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))>
+
+get size/line of bytecode in ops till now
+
+=cut
+
+*/
+
 static int
 get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
 {
@@ -347,12 +422,34 @@ get_old_size(PARROT_INTERP, NOTNULL(int *ins_line))
     return size;
 }
 
+/*
+
+=item C<static void
+store_sub_size(size_t size, size_t ins_line)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 store_sub_size(size_t size, size_t ins_line)
 {
     globals.cs->subs->size     = size;
     globals.cs->subs->ins_line = ins_line;
 }
+
+/*
+
+=item C<static void
+store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
@@ -371,6 +468,17 @@ store_fixup(PARROT_INTERP, NOTNULL(SymReg *r), int pc, int offset)
     fixup->offset = offset;
 }
 
+/*
+
+=item C<static void
+store_key_const(NOTNULL(const char *str), int idx)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 store_key_const(NOTNULL(const char *str), int idx)
 {
@@ -378,8 +486,19 @@ store_key_const(NOTNULL(const char *str), int idx)
     c->color = idx;
 }
 
-/* store globals for later fixup
- * return size in ops */
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))>
+
+store globals for later fixup
+return size in ops
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
@@ -428,7 +547,17 @@ get_codesize(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(int *src_lines))
 }
 
 
-/* get a global label, return the pc (absolute) */
+/*
+
+=item C<static subs_t *
+find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))>
+
+get a global label, return the pc (absolute)
+
+=cut
+
+*/
+
 static subs_t *
 find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL(int *pc))
 {
@@ -454,7 +583,17 @@ find_global_label(NOTNULL(const char *name), NOTNULL(const subs_t *sym), NOTNULL
     return 0;
 }
 
-/* fix global stuff */
+/*
+
+=item C<static void
+fixup_globals(PARROT_INTERP)>
+
+fix global stuff
+
+=cut
+
+*/
+
 static void
 fixup_globals(PARROT_INTERP)
 {
@@ -545,6 +684,17 @@ fixup_globals(PARROT_INTERP)
     }
 }
 
+/*
+
+=item C<STRING *
+IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 STRING *
 IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
@@ -588,7 +738,17 @@ IMCC_string_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
     return s;
 }
 
-/* add constant string to constant_table */
+/*
+
+=item C<static int
+add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))>
+
+add constant string to constant_table
+
+=cut
+
+*/
+
 static int
 add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
@@ -601,6 +761,17 @@ add_const_str(PARROT_INTERP, NOTNULL(const SymReg *r))
     return k;
 }
 
+/*
+
+=item C<static int
+add_const_num(PARROT_INTERP, const char *buf)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 add_const_num(PARROT_INTERP, const char *buf)
 {
@@ -612,6 +783,17 @@ add_const_num(PARROT_INTERP, const char *buf)
 
     return k;
 }
+
+/*
+
+=item C<static PMC*
+mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static PMC*
 mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
@@ -662,6 +844,17 @@ mk_multi_sig(PARROT_INTERP, NOTNULL(SymReg *r))
 }
 
 typedef void (*decl_func_t)(Interp *, PMC*, STRING *, INTVAL);
+
+/*
+
+=item C<static PMC*
+create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static PMC*
 create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)
@@ -736,6 +929,17 @@ create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub, int need_lex)
     return lex_info;
 }
 
+/*
+
+=item C<static PMC*
+find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static PMC*
 find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
@@ -784,6 +988,17 @@ find_outer(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
     return NULL;
 }
+
+/*
+
+=item C<static int
+add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
@@ -921,7 +1136,17 @@ add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
     return k;
 }
 
-/* add constant key to constant_table */
+/*
+
+=item C<static int
+add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const char *s_key))>
+
+add constant key to constant_table
+
+=cut
+
+*/
+
 static int
 add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const char *s_key))
 {
@@ -961,6 +1186,18 @@ add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const ch
     return k;
 }
 
+/*
+
+=item C<PARROT_CONST_FUNCTION
+static const char *
+slice_deb(int bits)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_CONST_FUNCTION
 static const char *
 slice_deb(int bits)
@@ -984,14 +1221,20 @@ slice_deb(int bits)
 }
 
 /*
- * color is a Parrot register number or a constant table index
- *
- * for the rest, please consult PDD08_KEYS(1)
- *
- * additionally, I build a string representation of the key,
- * which gets cached in the globals.keys
- *
- */
+
+=item C<static opcode_t
+build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))>
+
+color is a Parrot register number or a constant table index
+
+for the rest, please consult PDD08_KEYS(1)
+
+additionally, I build a string representation of the key,
+which gets cached in the globals.keys
+
+=cut
+
+*/
 
 static opcode_t
 build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
@@ -1108,6 +1351,17 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
     return k;
 }
 
+/*
+
+=item C<INTVAL
+IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 INTVAL
 IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
 {
@@ -1140,6 +1394,17 @@ IMCC_int_from_reg(PARROT_INTERP, NOTNULL(const SymReg *r))
     return i;
 }
 
+/*
+
+=item C<static void
+make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
 {
@@ -1166,6 +1431,17 @@ make_pmc_const(PARROT_INTERP, NOTNULL(SymReg *r))
 
     r->color = k;
 }
+
+/*
+
+=item C<static void
+add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
@@ -1214,7 +1490,17 @@ add_1_const(PARROT_INTERP, NOTNULL(SymReg *r))
                 r->name, r->color, r->use_count);
 }
 
-/* store a constants idx for later reuse */
+/*
+
+=item C<static void
+constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+store a constants idx for later reuse
+
+=cut
+
+*/
+
 static void
 constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
@@ -1261,6 +1547,17 @@ constant_folding(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
         add_1_const(interp, unit->outer);
 }
 
+/*
+
+=item C<int
+e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 int
 e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 {
@@ -1272,6 +1569,17 @@ e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 
     return 0;
 }
+
+/*
+
+=item C<int
+e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 int
 e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
@@ -1305,9 +1613,16 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), NOTNULL(IMC_Unit *unit))
 }
 
 /*
- * - check if any get_ argument contains constants
- * - fill in type bits for argument types and constants, if missing
- */
+
+=item C<static void
+verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)>
+
+ - check if any get_ argument contains constants
+ - fill in type bits for argument types and constants, if missing
+
+=cut
+
+*/
 
 static void
 verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
@@ -1374,7 +1689,20 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
     }
 }
 
-/* now let the fun begin, actually emit code for one ins */
+/*
+
+=item C<int
+e_pbc_emit(PARROT_INTERP,
+        SHIM(void *param),
+        NOTNULL(IMC_Unit *unit),
+        NOTNULL(const Instruction *ins))>
+
+now let the fun begin, actually emit code for one ins
+
+=cut
+
+*/
+
 int
 e_pbc_emit(PARROT_INTERP,
         SHIM(void *param),
@@ -1597,6 +1925,17 @@ e_pbc_emit(PARROT_INTERP,
     return ok;
 }
 
+/*
+
+=item C<int
+e_pbc_close(PARROT_INTERP, SHIM(void *param))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 int
 e_pbc_close(PARROT_INTERP, SHIM(void *param))
 {
@@ -1604,6 +1943,14 @@ e_pbc_close(PARROT_INTERP, SHIM(void *param))
 
     return 0;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

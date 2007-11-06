@@ -4,15 +4,26 @@
  */
 
 /*
- * cfg.c
- *
- * A basic block is the longest sequence of instructions that we are
- * sure will be executed sequentially: no branches, no labels.
- *
- * The control-flow graph is a directed graph that reflects the
- * flow of execution between blocks.
- */
 
+=head1 NAME
+
+compilers/imcc/cfg.c
+
+=head1 DESCRIPTION
+
+A basic block is the longest sequence of instructions that we are
+sure will be executed sequentially: no branches, no labels.
+
+The control-flow graph is a directed graph that reflects the
+flow of execution between blocks.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 #include <string.h>
@@ -122,6 +133,18 @@ static void sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 #define INVOKE_SUB_LOOP 3
 #define INVOKE_SUB_OTHER 4
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+static int
+check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 static int
 check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const Instruction *ins))
@@ -146,6 +169,17 @@ check_invoke_type(PARROT_INTERP, NOTNULL(const IMC_Unit * unit), NOTNULL(const I
     IMCC_INFO(interp)->optimizer_level &= ~OPT_PASM;
     return INVOKE_SUB_OTHER;
 }
+
+/*
+
+=item C<void
+find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
@@ -241,6 +275,18 @@ find_basic_blocks(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit), int first)
     }
 }
 
+/*
+
+=item C<static void
+bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(Basic_block *bb), NOTNULL(SymReg *label))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
         NOTNULL(Basic_block *bb), NOTNULL(SymReg *label))
@@ -265,8 +311,18 @@ bb_check_set_addr(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
     }
 }
 
-/* Once the basic blocks have been computed, build_cfg computes
-   the dependencies between them. */
+/*
+
+=item C<void
+build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+
+Once the basic blocks have been computed, build_cfg computes
+the dependencies between them.
+
+=cut
+
+*/
+
 void
 build_cfg(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
@@ -394,8 +450,17 @@ invok:
         dump_cfg(unit);
 }
 
+/*
 
-/* find the placement of the label, and link the two nodes */
+=item C<static void
+bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
+        NOTNULL(Basic_block *from), NOTNULL(SymReg *label))>
+
+find the placement of the label, and link the two nodes
+
+=cut
+
+*/
 
 static void
 bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
@@ -427,6 +492,18 @@ bb_findadd_edge(PARROT_INTERP, NOTNULL(IMC_Unit * unit),
 }
 
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+int
+blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 int
 blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block *to))
@@ -441,6 +518,17 @@ blocks_are_connected(NOTNULL(const Basic_block *from), NOTNULL(const Basic_block
     return 0;
 }
 
+
+/*
+
+=item C<static void
+bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_block *to))
@@ -473,6 +561,17 @@ bb_add_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Basic_block *from), NOTNULL(Basic_b
         unit->edge_list = e;
     }
 }
+
+/*
+
+=item C<static void
+bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
@@ -519,6 +618,17 @@ bb_remove_edge(NOTNULL(IMC_Unit *unit), NOTNULL(Edge *edge))
     }
 }
 
+/*
+
+=item C<static void
+free_edge(NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 free_edge(NOTNULL(IMC_Unit *unit))
 {
@@ -531,6 +641,18 @@ free_edge(NOTNULL(IMC_Unit *unit))
     }
     unit->edge_list = 0;
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+int
+edge_count(NOTNULL(const struct _IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 int
@@ -546,6 +668,17 @@ edge_count(NOTNULL(const struct _IMC_Unit *unit))
     return i;
 }
 
+/*
+
+=item C<void
+life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
 {
@@ -556,6 +689,18 @@ life_analysis(PARROT_INTERP, NOTNULL(const struct _IMC_Unit *unit))
     for (i = 0; i < unit->n_symbols; i++)
         analyse_life_symbol(unit, reglist[i]);
 }
+
+/*
+
+=item C<static void
+analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
+        NOTNULL(SymReg* r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
@@ -613,6 +758,17 @@ analyse_life_symbol(NOTNULL(const struct _IMC_Unit *unit),
     }
 }
 
+/*
+
+=item C<void
+free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
 {
@@ -630,13 +786,21 @@ free_life_info(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(SymReg *r))
     }
 }
 
-/* analyse_life_block studies the state of the var r
- * in the block bb.
- *
- * Its job is to set the flags LF_use, or LF_read,
- * and record the intervals inside the block where
- * the var is alive.
- */
+/*
+
+=item C<static void
+analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))>
+
+analyse_life_block studies the state of the var r
+in the block bb.
+
+Its job is to set the flags LF_use, or LF_read,
+and record the intervals inside the block where
+the var is alive.
+
+=cut
+
+*/
 
 static void
 analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
@@ -711,6 +875,17 @@ analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
 }
 
 
+/*
+
+=item C<static void
+propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
 {
@@ -769,11 +944,18 @@ propagate_need(NOTNULL(Basic_block *bb), NOTNULL(SymReg* r), int i)
 }
 
 /*
- * Computes the dominators tree of the CFG.
- * Basic block A dominates B, if each path to B passes through A
- *
- * s. gcc:flow.c compute_dominators
- */
+
+=item C<void
+compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+
+Computes the dominators tree of the CFG.
+Basic block A dominates B, if each path to B passes through A
+
+s. gcc:flow.c compute_dominators
+
+=cut
+
+*/
 
 void
 compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
@@ -897,9 +1079,18 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 #endif
 }
 
-/* Algorithm to find dominance frontiers described in paper
- * "A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
- */
+/*
+
+=item C<void
+compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+
+Algorithm to find dominance frontiers described in paper
+"A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
+
+=cut
+
+*/
+
 void
 compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 {
@@ -943,6 +1134,17 @@ compute_dominance_frontiers(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
         dump_dominance_frontiers(unit);
 }
 
+/*
+
+=item C<static void
+free_dominators(NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 free_dominators(NOTNULL(IMC_Unit *unit))
 {
@@ -958,6 +1160,17 @@ free_dominators(NOTNULL(IMC_Unit *unit))
     free(unit->idoms);
 }
 
+/*
+
+=item C<static void
+free_dominance_frontiers(NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
 {
@@ -972,6 +1185,17 @@ free_dominance_frontiers(NOTNULL(IMC_Unit *unit))
     unit->dominance_frontiers = 0;
 }
 
+
+/*
+
+=item C<static void
+sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
@@ -1032,11 +1256,17 @@ sort_loops(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     }
 }
 
-
 /*
- * Searches for loops in the CFG. We search for edges that
- * go from a node to one of its dominators.
- */
+
+=item C<void
+find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))>
+
+Searches for loops in the CFG. We search for edges that
+go from a node to one of its dominators.
+
+=cut
+
+*/
 
 void
 find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
@@ -1064,11 +1294,20 @@ find_loops(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
 }
 
 /*
- * For loop_info, finds the natural preheader of the loop, if any, and returns
- * its index, otherwise returns -1.  A natural preheader exists if there is
- * only one predecessor to the loop header outside of the loop body, and if it
- * always transfers control directly to the header.
- */
+
+=item C<PARROT_WARN_UNUSED_RESULT
+int
+natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))>
+
+For loop_info, finds the natural preheader of the loop, if any, and returns
+its index, otherwise returns -1.  A natural preheader exists if there is
+only one predecessor to the loop header outside of the loop body, and if it
+always transfers control directly to the header.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 int
 natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info* loop_info))
@@ -1095,7 +1334,16 @@ natural_preheader(NOTNULL(const struct _IMC_Unit *unit), NOTNULL(const Loop_info
     return preheader;
 }
 
-/* Increases the loop_depth of all the nodes in a loop */
+/*
+
+=item C<static void
+mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))>
+
+Increases the loop_depth of all the nodes in a loop
+
+=cut
+
+*/
 
 static void
 mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
@@ -1179,6 +1427,17 @@ mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
     unit->n_loops++;
 }
 
+/*
+
+=item C<static void
+free_loops(NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 free_loops(NOTNULL(IMC_Unit *unit))
 {
@@ -1193,6 +1452,17 @@ free_loops(NOTNULL(IMC_Unit *unit))
     unit->n_loops = 0;
     unit->loop_info = 0;
 }
+
+/*
+
+=item C<void
+search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
@@ -1213,6 +1483,17 @@ search_predecessors_not_in(NOTNULL(const Basic_block *node), NOTNULL(Set* s))
 
 /*** Utility functions ***/
 
+/*
+
+=item C<static void
+init_basic_blocks(NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 init_basic_blocks(NOTNULL(IMC_Unit *unit))
 {
@@ -1225,6 +1506,17 @@ init_basic_blocks(NOTNULL(IMC_Unit *unit))
     unit->n_basic_blocks = 0;
     unit->edge_list      = 0;
 }
+
+/*
+
+=item C<void
+clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
@@ -1241,6 +1533,19 @@ clear_basic_blocks(NOTNULL(struct _IMC_Unit *unit))
     free_dominance_frontiers(unit);
     free_loops(unit);
 }
+
+/*
+
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static Basic_block*
+make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* ins))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -1277,6 +1582,19 @@ make_basic_block(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction* in
     return bb;
 }
 
+/*
+
+=item C<PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+Life_range *
+make_life_range(NOTNULL(SymReg *r), int idx)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Life_range *
@@ -1287,6 +1605,14 @@ make_life_range(NOTNULL(SymReg *r), int idx)
 
    return l;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

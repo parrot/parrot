@@ -4,12 +4,24 @@
  */
 
 /*
- * imc.c
- *
- * Main entry point and top level of IMCC compiler.
- *
- * Moved all register allocation and spill code to reg_alloc.c
- */
+
+=head1 NAME
+
+compilers/imcc/imc.c
+
+=head1 DESCRIPTION
+
+Main entry point and top level of IMCC compiler.
+
+Moved all register allocation and spill code to reg_alloc.c
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <string.h>
 #include "imc.h"
@@ -33,6 +45,18 @@ static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
 extern FILE* yyin;
 */
 
+
+/*
+
+=item C<PARROT_API
+void
+imc_compile_all_units(PARROT_INTERP)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -66,9 +90,18 @@ imc_compile_all_units(PARROT_INTERP)
     IMCC_INFO(interp)->last_unit = NULL;
 }
 
-/* imc_compile_unit is the main loop of the IMC compiler for each unit. It
- * operates on a single compilation unit at a time.
- */
+/*
+
+=item C<PARROT_API
+void
+imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+imc_compile_unit is the main loop of the IMC compiler for each unit. It
+operates on a single compilation unit at a time.
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -81,11 +114,18 @@ imc_compile_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
     emit_flush(interp, NULL, unit);
 }
 
-
 /*
- * Any activity required to cleanup the compiler state and be
- * ready for a new compiler invocation goes here.
- */
+
+=item C<PARROT_API
+void
+imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))>
+
+Any activity required to cleanup the compiler state and be
+ready for a new compiler invocation goes here.
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -97,10 +137,18 @@ imc_cleanup(PARROT_INTERP, NULLOK(void *yyscanner))
     IMCC_INFO(interp)->ghash.data = NULL;
 }
 
-
 /*
- * Create a new IMC_Unit.
- */
+
+=item C<PARROT_CANNOT_RETURN_NULL
+static IMC_Unit *
+imc_new_unit(IMC_Unit_Type t)>
+
+Create a new IMC_Unit.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
@@ -112,10 +160,19 @@ imc_new_unit(IMC_Unit_Type t)
 }
 
 /*
- * Create a new IMC_Unit and "open" it for construction.
- * This sets the current state of the parser. The unit
- * can be closed later retaining all the current state.
- */
+
+=item C<PARROT_CANNOT_RETURN_NULL
+IMC_Unit *
+imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)>
+
+Create a new IMC_Unit and "open" it for construction.
+This sets the current state of the parser. The unit
+can be closed later retaining all the current state.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 IMC_Unit *
 imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
@@ -139,10 +196,17 @@ imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 }
 
 /*
- * Close a unit from compilation.
- * Does not destroy the unit, leaves it on the
- * list.
- */
+
+=item C<void
+imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))>
+
+Close a unit from compilation.
+Does not destroy the unit, leaves it on the list.
+
+=cut
+
+*/
+
 void
 imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 {
@@ -154,6 +218,17 @@ imc_close_unit(PARROT_INTERP, NULLOK(IMC_Unit *unit))
 
     IMCC_INFO(interp)->cur_unit = NULL;
 }
+
+/*
+
+=item C<static void
+imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
 imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
@@ -176,6 +251,14 @@ imc_free_unit(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 
     free(unit);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

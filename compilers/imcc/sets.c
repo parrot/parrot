@@ -3,6 +3,24 @@
  * Copyright (C) 2002-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+compilers/imcc/sets.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include "imc.h"
 #include "sets.h"
 
@@ -18,6 +36,18 @@
 #define BYTE_IN_SET(element) (element >> 3)
 #define BIT_IN_BYTE(element) (1 << (element & 7))
 
+/*
+
+=item C<PARROT_MALLOC
+Set*
+set_make(int length)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_MALLOC
 Set*
 set_make(int length)
@@ -27,6 +57,18 @@ set_make(int length)
     s->bmp        = (unsigned char *)mem_sys_allocate_zeroed(NUM_BYTES(length));
     return s;
 }
+
+/*
+
+=item C<PARROT_MALLOC
+Set*
+set_make_full(int length)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_MALLOC
 Set*
@@ -41,6 +83,17 @@ set_make_full(int length)
     return s;
 }
 
+/*
+
+=item C<void
+set_free(NOTNULL(Set *s))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 set_free(NOTNULL(Set *s))
 {
@@ -49,11 +102,34 @@ set_free(NOTNULL(Set *s))
     mem_sys_free(s);
 }
 
+/*
+
+=item C<void
+set_clear(NOTNULL(Set *s))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 set_clear(NOTNULL(Set *s))
 {
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
+
+/*
+
+=item C<PARROT_MALLOC
+Set*
+set_copy(NOTNULL(Set *s))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_MALLOC
 Set*
@@ -64,6 +140,17 @@ set_copy(NOTNULL(Set *s))
     memcpy(d->bmp, s->bmp, NUM_BYTES(d->length));
     return d;
 }
+
+/*
+
+=item C<int
+set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 int
 set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
@@ -90,6 +177,17 @@ set_equal(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
     return 1;
 }
 
+/*
+
+=item C<void
+set_add(NOTNULL(Set *s), int element)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 set_add(NOTNULL(Set *s), int element)
 {
@@ -104,6 +202,19 @@ set_add(NOTNULL(Set *s), int element)
 
     s->bmp[elem_byte_in_set] |= BIT_IN_BYTE(element);
 }
+
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+int
+set_first_zero(NOTNULL(const Set *s))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -127,6 +238,19 @@ set_first_zero(NOTNULL(const Set *s))
     return s->length;
 }
 
+/*
+
+=item C<PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+int
+set_contains(NOTNULL(const Set *s), int element)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
@@ -141,6 +265,18 @@ set_contains(NOTNULL(const Set *s), int element)
 
     return s->bmp[byte_in_set] & pos_in_byte;
 }
+
+/*
+
+=item C<PARROT_MALLOC
+Set *
+set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PARROT_MALLOC
 Set *
@@ -160,6 +296,18 @@ set_union(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
     return s;
 }
 
+/*
+
+=item C<PARROT_MALLOC
+Set *
+set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PARROT_MALLOC
 Set *
 set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
@@ -178,6 +326,17 @@ set_intersec(NOTNULL(const Set *s1), NOTNULL(const Set *s2))
     return s;
 }
 
+/*
+
+=item C<void
+set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))
 {
@@ -191,6 +350,14 @@ set_intersec_inplace(NOTNULL(Set *s1), NOTNULL(const Set *s2))
         s1->bmp[i] &= s2->bmp[i];
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
