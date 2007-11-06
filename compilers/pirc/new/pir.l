@@ -15,19 +15,6 @@ pir.l
 
 This is a complete rewrite of the PIR lexical analyzer, as defined in IMCC.
 Goal is to fix the issues with the current implementation of the PIR language.
-Major issues are:
-
-=over 4
-
-=item Grammar is a bit messy, and has some problems, like disallowing line comments in .param declarations.
-
-=item The lexer is messy and not re-entrant. The macro layer is a mess and unmaintainable.
-
-=item No support for nested heredocs.
-
-=item The comment:  "this is just a sign that we suck.  that's all." speaks for itself (imc.h)
-
-=back
 
 The current approach is to create a three-pass compiler, but if any optimizations
 in this schedule can be made, then this is preferred. This needs more experimentation.
@@ -432,7 +419,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 
-<*>.   { /* for all states, any character not covered in the rules above is an error. */
+.      { /* any character not covered in the rules above is an error. */
          lexer_state *my_lexer = yyget_extra(yyscanner);
          syntax_error(yyscanner, my_lexer, "Unexpected character");
        }

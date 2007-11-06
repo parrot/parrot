@@ -52,7 +52,7 @@ Routine to print usage of this program.
 static void
 print_help(char const * const program_name) {
 
-    fprintf(stderr, "Usage: %s [options] <files>\n", program_name);
+    fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
     fprintf(stderr, "Options:\n\n");
     /*fprintf(stderr, "  -E        pre-process\n"); */
     fprintf(stderr, "  -d        show debug messages of parser\n");
