@@ -294,7 +294,8 @@ void macrofree (void * ,yyscan_t yyscanner );
 #define EXPAND 6
 #define LINE 7
 #define MACROLOCAL 8
-#define EXPARGS 9
+#define BRACEDARGS 9
+#define EXPARGS 10
 
 #endif
 
@@ -452,9 +453,9 @@ extern int macrolex (YYSTYPE * yylval_param ,yyscan_t yyscanner);
 #undef YY_DECL
 #endif
 
-#line 502 "macro.l"
+#line 511 "macro.l"
 
 
-#line 459 "macrolexer.h"
+#line 460 "macrolexer.h"
 #undef macroIN_HEADER
 #endif /* macroHEADER_H */

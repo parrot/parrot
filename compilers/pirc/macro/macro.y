@@ -95,7 +95,7 @@ char *concat(char *str1, char *str2);
        <sval> TK_INTC       "integer constant"
 
 %type <sval> expression macro_body opt_macro_body arg body_token label_declaration
-             local_declaration type
+             local_declaration type long_arg braced_arg
 %type <lval> arguments opt_arg_list arg_list parameters opt_param_list param_list
 
 
@@ -249,11 +249,16 @@ arg_list: arg               { $$ = new_list($1); }
         ;
 
 arg: expression { $$ = $1; }
-   | braced_arg { $$ = NULL; }
+   | braced_arg { $$ = $1; }
    ;
 
-braced_arg: '{' '}'
+braced_arg: '{' long_arg '}' { $$ = $2; }
           ;
+
+long_arg: /* empty */      { $$ = ""; }
+        | long_arg TK_ANY  { $$ = concat($1, $2); }
+        ;
+
 
 /* all types of expressions can probably be handled as a more generic token, such as "TK_EXPR"
  * we don't care if it's a string or a number; it's just text replacing. */

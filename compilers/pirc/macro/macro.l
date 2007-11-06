@@ -124,6 +124,7 @@ static int is_pir_directive(char *name);
 %x EXPAND
 %x LINE
 %x MACROLOCAL
+%x BRACEDARGS
 %s EXPARGS
 
 
@@ -187,8 +188,9 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_NL;
                     }
 
-<*>{WS}             { /* skip whitespace */ }
+<BRACEDARGS>{NEWLINE} { yylval->sval = "\n"; return TK_ANY; }
 
+<*>{WS}             { /* skip whitespace */ }
 
 <*>{NEWLINE}        { /* in all other states, return newline as the newline token */
                       yylval->sval = dupstr("\n");
@@ -311,10 +313,17 @@ REG            "$"?[SNIP]{DIGITS}
 
 <EXPARGS>"{"       { /* braced argument */
                      /* need for a BRACEDARGS state? */
+                     yy_push_state(BRACEDARGS, yyscanner);
                      return '{';
                    }
 
-<EXPARGS>"}"       { /* this state correct? */
+<BRACEDARGS>[^}]   {
+                     yylval->sval = dupstr(yytext);
+                     return TK_ANY;
+                   }
+
+<BRACEDARGS>"}"    {
+                     yy_pop_state(yyscanner);
                      return '}';
                    }
 
