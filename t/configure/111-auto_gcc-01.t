@@ -5,10 +5,11 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
+use_ok('config::inter::progs');
 use_ok('config::auto::gcc');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -22,13 +23,14 @@ my $args = process_options( {
 my $conf = Parrot::Configure->new();
 
 test_step_thru_runstep($conf, q{init::defaults}, $args);
+test_step_thru_runstep( $conf, q{inter::progs},  $args );
 
 my ($task, $step_name, @step_params, $step, $ret);
 my $pkg = q{auto::gcc};
 
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
-$task = $conf->steps->[1];
+$task = $conf->steps->[2];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
@@ -37,11 +39,7 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-TODO: {
-    local $TODO =
-        q{On some systems, tries to link to libgdbm and fails};
-    ok($step->runstep($conf), "runstep returned true value");
-}
+ok($step->runstep($conf), "runstep returned true value");
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");

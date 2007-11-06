@@ -33,42 +33,62 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $test;
-    my ( $inline, $verbose ) = $conf->options->get(qw(inline verbose));
-
+    my $inline = $conf->options->get(qw(inline));
     if ( defined $inline ) {
-        $test = $inline;
+        $conf->data->set( inline => $inline );
+        return 1;
     }
-    else {
-        cc_gen('config/auto/inline/test_1.in');
+
+    my $test = $self->_first_probe_for_inline();
+    unless ($test) {
+        $test = $self->_second_probe_for_inline($test);
+    }
+
+    $self->_evaluate_inline($conf, $test);
+    return 1;
+}
+
+sub _first_probe_for_inline {
+    my $self = shift;
+    my $test;
+    cc_gen('config/auto/inline/test_1.in');
+    eval { cc_build(); };
+    if ( !$@ ) {
+        $test = cc_run();
+        chomp $test if $test;
+    }
+    cc_clean();
+    return $test;
+}
+
+sub _second_probe_for_inline {
+    my $self = shift;
+    my $test = shift;
+    if ( !$test ) {
+        cc_gen('config/auto/inline/test_2.in');
         eval { cc_build(); };
         if ( !$@ ) {
             $test = cc_run();
             chomp $test if $test;
         }
         cc_clean();
-        if ( !$test ) {
-            cc_gen('config/auto/inline/test_2.in');
-            eval { cc_build(); };
-            if ( !$@ ) {
-                $test = cc_run();
-                chomp $test if $test;
-            }
-            cc_clean();
-        }
-        if ($test) {
-            print " ($test) " if $verbose;
-            $self->set_result('yes');
-        }
-        else {
-            print " no " if $verbose;
-            $self->set_result('no');
-            $test = '';
-        }
     }
+    return $test;
+}
 
+sub _evaluate_inline {
+    my ($self, $conf, $test) = @_;
+    my $verbose = $conf->options->get(qw(verbose));
+    if ($test) {
+        print " ($test) " if $verbose;
+        $self->set_result('yes');
+    }
+    else {
+        print " no " if $verbose;
+        $self->set_result('no');
+        $test = '';
+    }
     $conf->data->set( inline => $test );
-
     return 1;
 }
 
