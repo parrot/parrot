@@ -222,6 +222,7 @@ sub _constant {
     my ( $pmc_type );
 
     my %type_mapping = (
+        COMPLEX       => 'Complex',
         INTEGER       => 'Integer',
         REAL          => 'Float',
         STRING        => 'String',
@@ -233,8 +234,10 @@ sub _constant {
     elsif (    defined $type
             && exists $type_mapping{$type} ) {
         # type info from lexer
-        # so for PIR understand the scheme constants
         $pmc_type = $type_mapping{$type};
+        if ( $pmc_type eq 'Complex' ) {
+            $value = qq{"$value"};
+        }
     } 
     elsif ( $value eq '#t' || $value eq '#f' ) {
         $pmc_type = 'Boolean';
