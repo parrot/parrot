@@ -51,9 +51,14 @@ language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
 #       Naive iterative summation: power sin cos
 #
 
+SKIP:
+{
+    skip('low memory', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'partialsums_lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'partialsums-output.txt' ));
 language_output_is( 'lua', $code, $out, 'partial-sums', params => '25000');
+}
 
 #
 #   fasta
@@ -88,9 +93,14 @@ language_output_is( 'lua', $code, $out, 'pidigits', params => '27' );
 #       Indexed-access to boolean-sequence
 #
 
+SKIP:
+{
+    skip('low memory', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsieve_lua-3.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsieve-output.txt' ));
 language_output_is( 'lua', $code, $out, 'nsieve' );
+}
 
 #
 #   regex-dna
@@ -140,9 +150,14 @@ language_output_is( 'lua', $code, $out, 'recursive', params => '3' );
 #       Generate Mandelbrot set portable bitmap file
 #
 
+SKIP:
+{
+    skip('PANIC: Out of mem!', 1) unless ($test_prog eq 'lua');
+
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'mandelbrot_lua-2.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'mandelbrot-output.txt' ));
 language_output_is( 'lua', $code, $out, 'mandelbrot', params => '200' );
+}
 
 #
 #   n-body
