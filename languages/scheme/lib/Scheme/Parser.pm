@@ -44,15 +44,17 @@ sub _build_tree {
     } 
 
     my %function = (
-	    q{'}      => 'quote',
-	    q{`}      => 'quasiquote',
-	    q{,}      => 'unquote',
+            q{'}      => 'quote',
+            q{`}      => 'quasiquote',
+            q{,}      => 'unquote',
             q{,@}     => 'unquote-splicing',
     );
     if ( exists $function{$token->[1]}  ) {
-	return { children => [ { value => $function{$token->[1]} 
+        my $child = _build_tree( $tokenizer );
+
+        return { children => [ { value => $function{$token->[1]} 
                                },
-                                _build_tree( $tokenizer )
+                               $child
                              ]
                };
 
