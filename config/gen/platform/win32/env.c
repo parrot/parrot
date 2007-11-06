@@ -4,21 +4,41 @@
  */
 
 /*
-  On Windows there are two ways to access the environment.  Either through the
-  Windows environment block, using GetEnvironmentVariable,
-  SetEnvironmentVariable and GetEnvironmentStrings, or the C runtime using
-  _getenv, _putenv and _environ.
 
-  Changes through the C runtime are reflected in the environment block, but
-  changes in the environment block are NOT reflected in the C runtime!
+=head1 NAME
 
-  To keep both in sync we always update environment variables through the C
-  runtime.  Getting an environment variable can be done either way,
-  whichever is more convenient.
+config\gen\platform\win32\env.c
+
+=head1 DESCRIPTION
+
+On Windows there are two ways to access the environment.  Either through the
+Windows environment block, using GetEnvironmentVariable,
+SetEnvironmentVariable and GetEnvironmentStrings, or the C runtime using
+_getenv, _putenv and _environ.
+
+Changes through the C runtime are reflected in the environment block, but
+changes in the environment block are NOT reflected in the C runtime!
+
+To keep both in sync we always update environment variables through the C
+runtime.  Getting an environment variable can be done either way,
+whichever is more convenient.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
 */
 
 /*
-** Parrot_setenv()
+
+=item C<void Parrot_setenv(const char *name, const char *value)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void
@@ -60,6 +80,17 @@ Parrot_setenv(const char *name, const char *value)
     }
 }
 
+/*
+
+=item C<char *
+Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 char *
 Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))
 {
@@ -79,6 +110,16 @@ Parrot_getenv(NOTNULL(const char *name), NOTNULL(int *free_it))
     return buffer;
 }
 
+/*
+
+=item C<void Parrot_unsetenv(const char *name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_unsetenv(const char *name)
 {
@@ -88,6 +129,14 @@ Parrot_unsetenv(const char *name)
 */
     Parrot_setenv(name, "");
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

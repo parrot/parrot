@@ -4,7 +4,31 @@
  */
 
 /*
-** Parrot_dlopen()
+
+=head1 NAME
+
+config\gen\platform\win32\dl.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void * Parrot_dlopen(const char *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -13,9 +37,14 @@ Parrot_dlopen(const char *filename)
     return LoadLibrary(filename);
 }
 
-
 /*
-** Parrot_dlerror()
+
+=item C<const char * Parrot_dlerror(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 const char *
@@ -24,9 +53,14 @@ Parrot_dlerror(void)
     return NULL;
 }
 
-
 /*
-** Parrot_dlsym()
+
+=item C<void * Parrot_dlsym(void *handle, const char *symbol)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -35,9 +69,14 @@ Parrot_dlsym(void *handle, const char *symbol)
     return (void *)GetProcAddress(handle, symbol);
 }
 
-
 /*
-** Parrot_dlclose()
+
+=item C<int Parrot_dlclose(void *handle)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 int
@@ -45,6 +84,14 @@ Parrot_dlclose(void *handle)
 {
     return FreeLibrary(handle)? 0: 1;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 /*

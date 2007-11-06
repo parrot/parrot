@@ -4,8 +4,32 @@
  */
 
 /*
- * File stat stuff
- */
+
+=head1 NAME
+
+config\gen\platform\win32\stat.c
+
+=head1 DESCRIPTION
+
+File stat stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<PMC * Parrot_stat_file(Parrot_Interp interp, STRING *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PMC *
 Parrot_stat_file(Parrot_Interp interp, STRING *filename)
@@ -13,11 +37,33 @@ Parrot_stat_file(Parrot_Interp interp, STRING *filename)
   return NULL;
 }
 
+/*
+
+=item C<PMC *
+Parrot_stat_info_pmc(Parrot_Interp interp, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PMC *
 Parrot_stat_info_pmc(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return NULL;
 }
+
+/*
+
+=item C<INTVAL
+Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 INTVAL
 Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
@@ -94,6 +140,17 @@ Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
   return result;
 }
 
+/*
+
+=item C<INTVAL
+Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 INTVAL
 Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)
 {
@@ -164,17 +221,47 @@ Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)
   return result;
 }
 
+/*
+
+=item C<FLOATVAL
+Parrot_stat_info_floatval(Parrot_Interp interp, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 FLOATVAL
 Parrot_stat_info_floatval(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return -1;
 }
 
+/*
+
+=item C<STRING *
+Parrot_stat_info_string(Parrot_Interp interp, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 STRING *
 Parrot_stat_info_string(Parrot_Interp interp, STRING *filename, INTVAL thing)
 {
   return NULL;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
