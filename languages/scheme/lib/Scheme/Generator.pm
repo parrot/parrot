@@ -948,12 +948,21 @@ sub _op_complex_p {
 }
 
 sub _op_real_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'real?', $node ); 
 }
 
 sub _op_rational_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'rational?', $node ); 
 }
 
 sub _op_integer_p {
+    my ( $self, $node ) = @_;
+    
+    return $self->_type_predicate( 'integer?', $node ); 
 }
 
 sub _op_exact_p {
@@ -2168,12 +2177,15 @@ sub _type_predicate {
     _check_num_args( $node, 1, $form );
 
     my %types = (
-        'boolean?' => [ qw( Boolean ) ],
-        'complex?' => [ qw( Integer Float Complex ) ],
-        'null?'    => [ qw( Undef ) ],
-        'number?'  => [ qw( Integer Float Complex ) ],
-        'pair?'    => [ qw( Array ) ],
-        'string?'  => [ qw( String ) ],
+        'boolean?'  => [ qw( Boolean ) ],
+        'complex?'  => [ qw( Integer Float Complex ) ],
+        'integer?'  => [ qw( Integer ) ],
+        'null?'     => [ qw( Undef ) ],
+        'number?'   => [ qw( Integer Float Complex ) ],
+        'pair?'     => [ qw( Array ) ],
+        'rational?' => [ qw( Integer ) ],
+        'real?'     => [ qw( Integer Float ) ],
+        'string?'   => [ qw( String ) ],
     );
 
     my $label = $self->_gensym();
