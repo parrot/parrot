@@ -4,7 +4,31 @@
  */
 
 /*
-** Parrot_dlopen()
+
+=head1 NAME
+
+config/gen/platform/ansi/dl.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void * Parrot_dlopen(const char *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -16,7 +40,13 @@ Parrot_dlopen(const char *filename)
 
 
 /*
-** Parrot_dlerror()
+
+=item C<const char * Parrot_dlerror(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 const char *
@@ -27,7 +57,13 @@ Parrot_dlerror(void)
 
 
 /*
-** Parrot_dlsym()
+
+=item C<void * Parrot_dlsym(void *handle, const char *symbol)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -39,7 +75,13 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 
 /*
-** Parrot_dlclose()
+
+=item C<int Parrot_dlclose(void *handle)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 int
@@ -48,6 +90,14 @@ Parrot_dlclose(void *handle)
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlclose not implemented");
     return 0;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

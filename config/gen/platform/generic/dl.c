@@ -4,7 +4,21 @@
  */
 
 /*
-** Dynlib stuff
+
+=head1 NAME
+
+config/gen/platform/generic/dl.c
+
+=head1 DESCRIPTION
+
+Dynlib stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
 */
 
 #ifdef PARROT_HAS_HEADER_DLFCN
@@ -14,7 +28,14 @@
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
 /*
-** Parrot_dlopen()
+
+=item C<void *
+Parrot_dlopen(const char *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -27,9 +48,15 @@ Parrot_dlopen(const char *filename)
 #endif
 }
 
-
 /*
-** Parrot_dlerror()
+
+=item C<const char *
+Parrot_dlerror(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 const char *
@@ -43,7 +70,14 @@ Parrot_dlerror(void)
 }
 
 /*
-** Parrot_dlsym()
+
+=item C<void *
+Parrot_dlsym(void *handle, const char *symbol)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -56,9 +90,15 @@ Parrot_dlsym(void *handle, const char *symbol)
 #endif
 }
 
-
 /*
-** Parrot_dlclose()
+
+=item C<int
+Parrot_dlclose(void *handle)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 int
@@ -70,6 +110,14 @@ Parrot_dlclose(void *handle)
     return -1;
 #endif
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

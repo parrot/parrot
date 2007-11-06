@@ -4,8 +4,34 @@
  */
 
 /*
- * File stat stuff
- */
+
+=head1 NAME
+
+config/gen/platform/generic/stat.c
+
+=head1 DESCRIPTION
+
+File stat stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+
+/*
+
+=item C<PMC *
+Parrot_stat_file(PARROT_INTERP, STRING *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 PMC *
 Parrot_stat_file(PARROT_INTERP, STRING *filename)
@@ -13,11 +39,34 @@ Parrot_stat_file(PARROT_INTERP, STRING *filename)
     return NULL;
 }
 
+/*
+
+=item C<PMC *
+Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 PMC *
 Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
+
+/*
+
+=item C<static INTVAL
+stat_common(PARROT_INTERP, struct stat *statbuf,
+        INTVAL thing, int status)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static INTVAL
 stat_common(PARROT_INTERP, struct stat *statbuf,
@@ -90,6 +139,17 @@ stat_common(PARROT_INTERP, struct stat *statbuf,
     return result;
 }
 
+/*
+
+=item C<INTVAL
+Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 INTVAL
 Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 {
@@ -106,6 +166,17 @@ Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
     return stat_common(interp, &statbuf, thing, status);
 }
 
+/*
+
+=item C<INTVAL
+Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 INTVAL
 Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
 {
@@ -117,17 +188,47 @@ Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
     return stat_common(interp, &statbuf, thing, status);
 }
 
+/*
+
+=item C<FLOATVAL
+Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 FLOATVAL
 Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return (FLOATVAL)-1;
 }
 
+/*
+
+=item C<STRING *
+Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL thing)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 STRING *
 Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL thing)
 {
     return NULL;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

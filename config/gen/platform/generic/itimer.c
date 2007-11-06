@@ -4,18 +4,38 @@
  */
 
 /*
- * itimer stuff
- */
+
+=head1 NAME
+
+config/gen/platform/generic/itimer.c
+
+=head1 DESCRIPTION
+
+itimer stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #ifdef PARROT_HAS_SETITIMER
 
 /*
- * Start a system timer with the passed value in milli seconds.
- *
- * The handle is that, what new_sys_timer_ms() returned.
- * We could pass ITIMER_REAL in handle, but for now we ignore it
- * as we are just having one timer.
- */
+
+=item C<void start_sys_timer_ms(void *handle, int ms)>
+
+Start a system timer with the passed value in milli seconds.
+
+The handle is that, what new_sys_timer_ms() returned.
+We could pass ITIMER_REAL in handle, but for now we ignore it
+as we are just having one timer.
+
+=cut
+
+*/
 
 void
 start_sys_timer_ms(void *handle, int ms)
@@ -29,7 +49,16 @@ start_sys_timer_ms(void *handle, int ms)
     setitimer(ITIMER_REAL, &its, NULL);
 }
 
-/* Stop the given timer. */
+/*
+
+=item C<void stop_sys_timer_ms(void *handle)>
+
+Stop the given timer.
+
+=cut
+
+*/
+
 void
 stop_sys_timer_ms(void *handle)
 {
@@ -37,9 +66,15 @@ stop_sys_timer_ms(void *handle)
 }
 
 /*
- * Return the programmed timer interval or 0 if none for the
- * given timer handle.
- */
+
+=item C<int get_sys_timer_ms(void *handle)>
+
+Return the programmed timer interval or 0 if none for the
+given timer handle.
+
+=cut
+
+*/
 
 int
 get_sys_timer_ms(void *handle)
@@ -50,9 +85,16 @@ get_sys_timer_ms(void *handle)
 }
 
 /*
- * Create a new system timer with ~ms resolution.
- * The returned handle is passed to the other timer functions.
- */
+
+=item C<void * new_sys_timer_ms(void)>
+
+Create a new system timer with ~ms resolution.
+The returned handle is passed to the other timer functions.
+
+=cut
+
+*/
+
 void *
 new_sys_timer_ms(void)
 {
@@ -61,6 +103,14 @@ new_sys_timer_ms(void)
 
 #else
 #endif
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

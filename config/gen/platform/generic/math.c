@@ -4,15 +4,38 @@
  */
 
 /*
- * math stuff
- */
+
+=head1 NAME
+
+config/gen/platform/generic/math.c
+
+=head1 DESCRIPTION
+
+math stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 /*
- * return true if the Numval has a negative sign.
- * This is mostly for handling the -0.0 case.
- *
- * Parrot_signbit is exported because PerlNum.set_number_native() uses it.
- * XXX: This is probably not a good reason.
+
+=item C<PARROT_API extern int Parrot_signbit(double x)>
+
+return true if the Numval has a negative sign.
+This is mostly for handling the -0.0 case.
+
+Parrot_signbit is exported because PerlNum.set_number_native() uses it.
+XXX: This is probably not a good reason.
+
+=cut
+
+*/
+
+/*
  */
 #if DOUBLE_SIZE == 2 * INT_SIZE
 PARROT_API extern int
@@ -31,6 +54,16 @@ Parrot_signbit(double x)
 }
 #endif
 
+/*
+
+=item C<int Parrot_signbit_l(long double x)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 #if NUMVAL_SIZE == 12 && DOUBLE_SIZE == 3 * INT_SIZE && PARROT_LITTLE_ENDIAN
 int
 Parrot_signbit_l(long double x)
@@ -43,6 +76,14 @@ Parrot_signbit_l(long double x)
     return u.i[2] < 0;
 }
 #endif
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -4,16 +4,37 @@
  */
 
 /*
- * system() stuff
- */
 
-/*
- * Spawn off a subprocess and wait for the damn thing to complete,
- * returning the return value of the process
- *
- */
+=head1 NAME
+
+config/gen/platform/generic/exec.c
+
+=head1 DESCRIPTION
+
+system() stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include <sys/types.h>
 #include <sys/wait.h>
+
+/*
+
+=item C<INTVAL
+Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+
+Spawn off a subprocess and wait for the damn thing to complete,
+returning the return value of the process
+
+=cut
+
+*/
 
 INTVAL
 Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
@@ -46,6 +67,17 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
     }
     return 1;    /* make gcc happy */
 }
+
+/*
+
+=item C<INTVAL
+Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 INTVAL
 Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
@@ -94,8 +126,20 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
     return 1;    /* make gcc happy */
 }
 
+/*
+
+=item C<void
+Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command) {
+Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
+{
     /* Be horribly profligate with memory, since we're
        about to be something else */
     int status;

@@ -4,14 +4,50 @@
  */
 
 /*
- * Spawn a subprocess
- *
- */
-INTVAL Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command) {
+
+=head1 NAME
+
+config/gen/platform/ansi/exec.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<INTVAL Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+
+Spawn a subprocess
+
+=cut
+
+*/
+
+INTVAL
+Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+{
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
             "Parrot_Run_OS_Command not implemented");
     return 0;
 }
+
+/*
+
+=item C<INTVAL Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 INTVAL
 Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
@@ -21,9 +57,29 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
     return 0;
 }
 
-void Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command) {
+/*
+
+=item C<void Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+void
+Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)
+{
   real_exception(interp, NULL, NOSPAWN, "Exec not implemented");
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

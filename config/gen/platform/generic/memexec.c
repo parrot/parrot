@@ -4,15 +4,35 @@
  */
 
 /*
- * Memory protection stuff
- */
+
+=head1 NAME
+
+config/gen/platform/generic/memexec.c
+
+=head1 DESCRIPTION
+
+Memory protection stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #ifdef PARROT_HAS_EXEC_PROTECT
 /*
- * Allocate executable memory
- * Round up to page size because the whole page will be marked as
- *   executable
- */
+
+=item C<void * mem_alloc_executable(size_t size)>
+
+Allocate executable memory
+Round up to page size because the whole page will be marked as executable
+
+=cut
+
+*/
+
 void *
 mem_alloc_executable(size_t size)
 {
@@ -25,6 +45,16 @@ mem_alloc_executable(size_t size)
     return p;
 }
 
+/*
+
+=item C<void mem_free_executable(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 mem_free_executable(void *p)
 {
@@ -32,11 +62,17 @@ mem_free_executable(void *p)
 }
 
 /*
- * Reallocate executable memory
- * Round up to page size because the whole page will be marked as
- *   executable
- * The intermediate temp is required because we don't know the old size
- */
+
+=item C<void * mem_realloc_executable(void* oldp, size_t newsize)>
+
+Reallocate executable memory
+Round up to page size because the whole page will be marked as executable
+The intermediate temp is required because we don't know the old size
+
+=cut
+
+*/
+
 void *
 mem_realloc_executable(void* oldp, size_t newsize)
 {
@@ -59,6 +95,14 @@ mem_realloc_executable(void* oldp, size_t newsize)
     return newp;
 }
 #endif
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

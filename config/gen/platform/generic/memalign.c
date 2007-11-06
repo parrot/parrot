@@ -4,11 +4,35 @@
  */
 
 /*
- * memalign related stuff
- */
+
+=head1 NAME
+
+config/gen/platform/generic/memalign.c
+
+=head1 DESCRIPTION
+
+memalign related stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #if defined(PARROT_HAS_POSIX_MEMALIGN)
 #  include <stdlib.h>
+
+/*
+
+=item C<void * Parrot_memalign(size_t align, size_t size)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void *
 Parrot_memalign(size_t align, size_t size)
@@ -26,6 +50,16 @@ Parrot_memalign(size_t align, size_t size)
 #    include <stdlib.h>
 #  endif
 
+/*
+
+=item C<void * Parrot_memalign(size_t align, size_t size)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void *
 Parrot_memalign(size_t align, size_t size)
 {
@@ -34,11 +68,29 @@ Parrot_memalign(size_t align, size_t size)
 
 #endif
 
+/*
+
+=item C<void Parrot_free_memalign(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_free_memalign(void *p)
 {
     free(p);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
