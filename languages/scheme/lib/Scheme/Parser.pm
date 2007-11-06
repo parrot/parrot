@@ -16,6 +16,15 @@ use Data::Dumper;
 sub _build_tree {
     my ( $tokenizer ) = @_;
 
+    if ( wantarray() ) {
+        my @trees;
+        while ( my $tree = _build_tree( $tokenizer ) ) {
+            push @trees, $tree;
+        }
+
+        return @trees;
+    }
+
     my $token = $tokenizer->();
    
     return unless $token;
@@ -23,10 +32,7 @@ sub _build_tree {
     return if $token->[1] eq ')';
 
     if ( $token->[1] eq '(' ) {
-        my @children;
-        while ( my $child = _build_tree( $tokenizer ) ) {
-            push @children, $child;
-        }
+        my @children = _build_tree( $tokenizer );
 
         if ( ! @children ) {
             # special case: empty list
@@ -44,15 +50,12 @@ sub _build_tree {
             q{,@}     => 'unquote-splicing',
     );
     if ( exists $function{$token->[1]}  ) {
-        my $tree = { children => [ { value => $function{$token->[1]} 
-                                   }
-                                 ]
-                   };
-        while ( my $child = _build_tree( $tokenizer ) ) {
-             push @{ $tree->{children} }, $child;
-        }
+	return { children => [ { value => $function{$token->[1]} 
+                               },
+                                _build_tree( $tokenizer )
+                             ]
+               };
 
-	return $tree;
     }
 
     # the atomic case
@@ -63,10 +66,7 @@ sub _build_tree {
 sub parse {
     my $tokenizer = shift;
 
-    my @trees;
-    while ( my $tree = _build_tree( $tokenizer ) ) {
-        push @trees, $tree;
-    }
+    my @trees = _build_tree( $tokenizer );
 
     return undef unless @trees;
 
