@@ -28,7 +28,11 @@ sub new {
         bless sub {
          TOKEN:
          {
-             return [ 'REAL',        $1 ] if $target =~ m/\G ([-+]? \d+ \.\d*)              /gcx;
+             return [ 'COMPLEX',     $1 ] if $target =~ m/\G ([-+]? \d+ [-+] \d+ i  )       /gcx;
+             return [ 'REAL',        $1 ] if $target =~ m/\G [-+]?           # optional sign
+                                                             ((\d+\.\d*) | (\.d+))
+                                                             ([eE][-+]?\d+)? # optional exponent
+                                                                                            /gcx;
              return [ 'INTEGER',     $1 ] if $target =~ m/\G ([-+]? \d+)                    /gcx;
              return [ 'STRING',      $1 ] if $target =~ m/\G (".*?") # XXX: escaped quotes  /gcx;
              return [ 'PAREN_OPEN',  $1 ] if $target =~ m/\G (\()                           /gcx;

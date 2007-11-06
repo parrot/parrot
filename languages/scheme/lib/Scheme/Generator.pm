@@ -216,23 +216,26 @@ sub _new_pair {
 }
 
 sub _constant {
-    my ( $self, $value ) = @_;
+    my ( $self, $value, $type ) = @_;
 
     $self->_add_comment( 'start of _constant()' );
     my ( $pmc_type );
 
+    my %type_mapping = (
+        INTEGER       => 'Integer',
+        REAL          => 'Float',
+        STRING        => 'String',
+    );
+
     if    ( ! defined $value ) {                                                     # an empty list
         $pmc_type = 'Undef';
     }
-    elsif ( $value =~ m/ \A [-+]?\d+ \z /xms ) {                                     # an integer
-        $pmc_type = 'Integer';
-    }
-    elsif ( $value =~ m/ \A [-+]?((\d+\.\d*) | (\.d+)) ([eE][-+]?\d+)? \z/xms ) {    # a float
-        $pmc_type = 'Float';
-    }
-    elsif ( $value =~ m/ \A " [^"]* " \z/xms ) {                                     # a string, not escapes yet
-        $pmc_type = 'String';
-    }
+    elsif (    defined $type
+            && exists $type_mapping{$type} ) {
+        # type info from lexer
+        # so for PIR understand the scheme constants
+        $pmc_type = $type_mapping{$type};
+    } 
     elsif ( $value eq '#t' || $value eq '#f' ) {
         $pmc_type = 'Boolean';
         $value    = $value eq '#t' ? '1' : '0';
@@ -646,7 +649,7 @@ sub _op_or {
     my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_constant(1);
+    $return = $self->_constant( 1, 'INTEGER' );
     for ( _get_args($node) ) {
         my $temp = $self->_generate($_);
         $self->_add_inst( '', 'eq', [ $temp, 1, "DONE_$label" ] );
@@ -870,7 +873,7 @@ sub _op_length {
     my ( $self, $node ) = @_;
 
     my $label  = $self->_gensym();
-    my $return = $self->_constant(0);
+    my $return = $self->_constant( 0, 'INTEGER' );
 
     _check_num_args( $node, 1, 'length' );
 
@@ -1074,7 +1077,7 @@ sub _op_odd_p {
 
     my $temp_0 = $self->_generate( $node->{children}[1] );
     my $return = $self->_constant('#t');
-    my $temp_1 = $self->_constant(2);
+    my $temp_1 = $self->_constant( 2, 'INTEGER' );
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
     $self->_add_inst( '', 'eq',  [ $temp_0, 1,       "DONE_$label" ] );
     $self->_add_inst( '', 'set', [ $return, 0 ] );
@@ -1091,7 +1094,7 @@ sub _op_even_p {
 
     my $temp_0 = $self->_generate( $node->{children}[1] );
     my $return = $self->_constant('#t');
-    my $temp_1 = $self->_constant(2);
+    my $temp_1 = $self->_constant( 2, 'INTEGER' );
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
     $self->_add_inst( '', 'eq',  [ $temp_0, 0,       "DONE_$label" ] );
     $self->_add_inst( '', 'set', [ $return, 0 ] );
@@ -1144,7 +1147,7 @@ sub _op_plus {
     my $return;
     my $num_args = _get_num_args( $node );
     if ( $num_args == 0 ) {
-        $return = $self->_constant(0);
+        $return = $self->_constant( 0, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( $node->{children}[1] );
@@ -1191,7 +1194,7 @@ sub _op_minus {
             $self->_restore($return);
             $return = $temp;
         }
-        my $temp = $self->_constant(0);
+        my $temp = $self->_constant( 0, 'INTEGER' );
         $self->_add_inst( '', 'sub', [ $return, $temp, $return ] );
         $self->_restore($temp);
     }
@@ -1220,7 +1223,7 @@ sub _op_times {
     my $num_args = _get_num_args( $node );
 
     if ( $num_args == 0 ) {
-        $return = $self->_constant(1);
+        $return = $self->_constant( 1, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( $node->{children}[1] );
@@ -1256,7 +1259,7 @@ sub _op_divide {
     my $num_args = _get_num_args( $node );
 
     if ( $num_args == 0 ) {
-        $return = $self->_constant(0);
+        $return = $self->_constant( 0, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( $node->{children}[1] );
@@ -1266,7 +1269,7 @@ sub _op_divide {
             $self->_restore($return);
             $return = $temp;
         }
-        my $temp = $self->_constant(1);
+        my $temp = $self->_constant( 1, 'INTEGER' );
         $self->_add_inst( '', 'div', [ $return, $temp, $return ] );
         $self->_restore($temp);
     }
@@ -1296,7 +1299,7 @@ sub _op_abs {
 
     $return = $self->_generate( $node->{children}[1] );
     $self->_add_inst( '', 'gt', [ $return, 0, "DONE_$label" ] );
-    my $temp = $self->_constant(-1);
+    my $temp = $self->_constant( -1, 'INTEGER' );
     $self->_add_inst( '', 'mul', [ $return, $return, $temp ] );
     $self->_restore($temp);
     $self->_add_inst("DONE_$label");
@@ -1563,7 +1566,7 @@ sub _op_procedure_p {
 
     _check_num_args( $node, 1, 'procedure?' );
 
-    $return = $self->_constant(0);
+    $return = $self->_constant( 0, 'INTEGER' );
 
     my $temp = $self->_generate( _get_arg( $node, 1 ) );
     if ( $temp =~ /^P/ ) {
@@ -1694,7 +1697,9 @@ sub _op_newline {
 
     return $self->_generate(
         { children => [ { value => 'display' },
-                        { value => q{"\n"}   },
+                        { value => q{"\n"},
+                          type  => 'STRING',
+                        },
                       ],
         }
     );
@@ -2245,7 +2250,7 @@ sub _generate {
         $return = $self->_find_lex( $node->{value} );
     }
     else {
-        $return = $self->_constant( $node->{value} );
+        $return = $self->_constant( $node->{value}, $node->{type} );
     }
 
     return $return;

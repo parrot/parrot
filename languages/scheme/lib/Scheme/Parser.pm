@@ -16,7 +16,7 @@ use Data::Dumper;
 sub _build_tree {
     my ( $tokenizer ) = @_;
 
-    if ( wantarray() ) {
+    if ( wantarray() ) {        # be greedy
         my @trees;
         while ( my $tree = _build_tree( $tokenizer ) ) {
             push @trees, $tree;
@@ -25,7 +25,7 @@ sub _build_tree {
         return @trees;
     }
 
-    my $token = $tokenizer->();
+    my $token = $tokenizer->();   # grap next token
    
     return unless $token;
 
@@ -43,16 +43,16 @@ sub _build_tree {
         }
     } 
 
-    my %function = (
+    my %special_function = (
             q{'}      => 'quote',
             q{`}      => 'quasiquote',
             q{,}      => 'unquote',
             q{,@}     => 'unquote-splicing',
     );
-    if ( exists $function{$token->[1]}  ) {
+    if ( exists $special_function{$token->[1]}  ) {
         my $child = _build_tree( $tokenizer );
 
-        return { children => [ { value => $function{$token->[1]} 
+        return { children => [ { value => $special_function{$token->[1]} 
                                },
                                $child
                              ]
@@ -61,7 +61,9 @@ sub _build_tree {
     }
 
     # the atomic case
-    return { value => $token->[1] };
+    return { type  => $token->[0],
+             value => $token->[1],
+           };
 }
 
 
