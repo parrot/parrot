@@ -77,24 +77,6 @@ sub runstep {
         else {
             $conf->data->set( malloc_header => 'stdlib.h' );
         }
-
-=for nothing
-
-    cc_gen('config/auto/gc/test_c.in');
-    eval { cc_build(); };
-    my $test = 0;
-    unless ($@) {
-      $test = cc_run();
-    }
-    cc_clean();
-    # used size should be somewhere here
-    unless ($test >= 128 && $test < 155) {
-      # if not, use own copy of malloc
-      $gc = 'malloc';
-    }
-
-=cut
-
     }
 
     if ( $gc =~ /^malloc(?:-trace)?$/ ) {
