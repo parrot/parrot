@@ -40,7 +40,6 @@ clone_string(NOTNULL(char const * src))
     int srclen;
     char * dest, *ptr;
 
-    PARROT_ASSERT(src != NULL);
     srclen = strlen(src);
     /* dest is used as an iterator, ptr - still pointing to the beginning
      * of the string - is returned

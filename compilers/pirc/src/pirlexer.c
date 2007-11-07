@@ -39,8 +39,8 @@ the code. Clean that up.
 
 =item *
 
-Check for 'correct' use of data types (unsigned etc.) (should characters be stored
-in C<char>s or C<int>s?
+Check for 'correct' use of data types (unsigned etc.) (should characters be
+stored in C<char>s or C<int>s?
 
 =back
 
@@ -382,7 +382,6 @@ Get the spelling of a keyword based on the specified token.
 char const *
 find_keyword(token t)
 {
-    PARROT_ASSERT((t >= 0) && (t <= MAX_TOKEN));
     return dictionary[t];
 }
 
@@ -398,7 +397,6 @@ return a constant pointer to the current token buffer
 char * const
 get_current_token(lexer_state const *s)
 {
-    PARROT_ASSERT(s->token_chars);
     return s->token_chars;
 }
 
@@ -414,7 +412,6 @@ return a constant pointer to the current file name
 char * const
 get_current_file(struct lexer_state *s)
 {
-    PARROT_ASSERT(s->curfile->filename);
     return s->curfile->filename;
 }
 
@@ -621,9 +618,6 @@ read_file(char const * filename)
     file_buffer *filebuff = NULL;
     struct stat filestatus;
 
-
-    PARROT_ASSERT(filename != NULL);
-
     filebuff = (file_buffer *)malloc(sizeof (file_buffer));
 
     if (filebuff == NULL) {
@@ -766,7 +760,6 @@ switch_buffer(lexer_state *lexer)
 {
     file_buffer *tmp = NULL;
 
-    PARROT_ASSERT(lexer->curfile->prevbuffer != NULL);
     /* destroy this buffer, set 'buf' to its previous buffer */
     tmp            = lexer->curfile;
     lexer->curfile = lexer->curfile->prevbuffer;
@@ -1004,10 +997,6 @@ open_include_file(lexer_state *lexer)
     char *filename = lexer->token_chars;
     int len = strlen(filename);
 
-    /* make sure it's a string */
-    PARROT_ASSERT((filename[0] == '"' && filename[len - 1] == '"')
-           || (filename[0] == '\'' && filename[len -1] == '\''));
-
     filename[len - 1] = '\0'; /* remove last quote */
     ++filename; /* skip first quote */
     do_include_file(lexer, filename);
@@ -1026,7 +1015,6 @@ to the 'including' file (found through the 'prevbuffer' pointer).
 void
 close_include_file(NOTNULL(lexer_state *lexer))
 {
-    PARROT_ASSERT(lexer->curfile->prevbuffer);
     switch_buffer(lexer);
 }
 
