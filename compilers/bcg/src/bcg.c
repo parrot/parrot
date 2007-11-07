@@ -71,7 +71,7 @@ This methods destroys the specified instance of Byte Code Generator.
 
 */
 void
-BCG_destroy(BCG_info * bcg_info)
+BCG_destroy(BCG_info *bcg_info)
 {
     bcg_info_private_destroy(bcg_info, BCG_INFO_PRIV(bcg_info));
     if (bcg_info->error_msg != NULL) {
@@ -79,6 +79,17 @@ BCG_destroy(BCG_info * bcg_info)
     }
     mem_sys_free(bcg_info);
 }
+
+/*
+
+=item C<void
+BCG_start_code_gen(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 BCG_start_code_gen(BCG_info * bcg_info)
@@ -92,6 +103,17 @@ BCG_start_code_gen(BCG_info * bcg_info)
 
 }
 
+/*
+
+=item C<void
+BCG_end_code_gen(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_end_code_gen(BCG_info * bcg_info)
 {
@@ -102,6 +124,17 @@ BCG_end_code_gen(BCG_info * bcg_info)
 
     unset_state(bcg_info, BCG_STATE_IN_CODEGEN);
 }
+
+/*
+
+=item C<void
+BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
@@ -120,6 +153,17 @@ BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
     unit->symbol_table = bcg_hash_create(bcg_info);
 }
 
+/*
+
+=item C<void
+BCG_end_sub(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_end_sub(BCG_info * bcg_info)
 {
@@ -135,6 +179,17 @@ BCG_end_sub(BCG_info * bcg_info)
     reg_alloc_vanilla(bcg_info, curr_unit);
 }
 
+/*
+
+=item C<void
+BCG_start_call(BCG_info * bcg_info, char *sub_name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_start_call(BCG_info * bcg_info, char *sub_name)
 {
@@ -146,6 +201,17 @@ BCG_start_call(BCG_info * bcg_info, char *sub_name)
     set_state(bcg_info, BCG_STATE_IN_CALL);
 }
 
+/*
+
+=item C<void
+BCG_end_call(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_end_call(BCG_info * bcg_info)
 {
@@ -156,6 +222,17 @@ BCG_end_call(BCG_info * bcg_info)
 
     unset_state(bcg_info, BCG_STATE_IN_CALL);
 }
+
+/*
+
+=item C<void
+BCG_start_op(BCG_info * bcg_info, char *op_name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 BCG_start_op(BCG_info * bcg_info, char *op_name)
@@ -174,6 +251,17 @@ BCG_start_op(BCG_info * bcg_info, char *op_name)
     bcg_unit_add_op(bcg_info, curr_unit, op);
 }
 
+/*
+
+=item C<void
+BCG_end_op(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_end_op(BCG_info * bcg_info)
 {
@@ -188,6 +276,17 @@ BCG_end_op(BCG_info * bcg_info)
     curr_op = bcg_info_current_op(bcg_info);
     bcg_op_resolve_full_name(bcg_info, curr_op);
 }
+
+/*
+
+=item C<void
+BCG_var(BCG_info * bcg_info, char *var_name, char var_type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
@@ -213,6 +312,17 @@ BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
     bcg_hash_put(bcg_info, curr_unit->symbol_table, var_name, op_arg);
 }
 
+/*
+
+=item C<void
+BCG_val(BCG_info * bcg_info, char *val, char val_type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_val(BCG_info * bcg_info, char *val, char val_type)
 {
@@ -228,6 +338,17 @@ BCG_val(BCG_info * bcg_info, char *val, char val_type)
     op_arg = bcg_op_arg_create(bcg_info, val, BCG_OP_ARG_CONSTANT, val_type);
     bcg_op_add_arg(bcg_info, curr_op, op_arg);
 }
+
+/*
+
+=item C<void
+BCG_label(BCG_info * bcg_info, char *label)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 BCG_label(BCG_info * bcg_info, char *label)
@@ -245,11 +366,33 @@ BCG_label(BCG_info * bcg_info, char *label)
     bcg_unit_add_op(bcg_info, curr_unit, op);
 }
 
+/*
+
+=item C<void
+BCG_print_pasm(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 BCG_print_pasm(BCG_info * bcg_info)
 {
     emit_pasm(bcg_info);
 }
+
+/*
+
+=item C<bcg_info_private *
+bcg_info_private_create(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 bcg_info_private *
 bcg_info_private_create(BCG_info * bcg_info)
@@ -261,6 +404,17 @@ bcg_info_private_create(BCG_info * bcg_info)
         mem_sys_allocate_zeroed(sizeof (bcg_info_private));
     return bcg_info_priv;
 }
+
+/*
+
+=item C<void
+bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)
@@ -279,6 +433,17 @@ bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)
     mem_sys_free(bcg_info_priv);
 }
 
+/*
+
+=item C<void
+bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)
 {
@@ -296,17 +461,50 @@ bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)
 
 }
 
+/*
+
+=item C<static void
+set_state(BCG_info * bcg_info, bcg_state state)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 set_state(BCG_info * bcg_info, bcg_state state)
 {
     BCG_INFO_PRIV(bcg_info)->state |= state;
 }
 
+/*
+
+=item C<static void
+unset_state(BCG_info * bcg_info, bcg_state state)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
 unset_state(BCG_info * bcg_info, bcg_state state)
 {
     BCG_INFO_PRIV(bcg_info)->state &= (~state);
 }
+
+/*
+
+=item C<static int
+in_state(BCG_info * bcg_info, bcg_state state)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 in_state(BCG_info * bcg_info, bcg_state state)

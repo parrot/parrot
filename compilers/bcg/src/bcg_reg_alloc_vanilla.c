@@ -3,10 +3,39 @@
  * Copyright (C) 2006-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+bcg_reg_alloc_vanilla.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include "bcg_reg_alloc.h"
 #include "parrot/parrot.h"
 
 static int assig_reg_num(int reg_count[], char data_type, int reg_num);
+
+/*
+
+=item C<void
+reg_alloc_vanilla(BCG_info * bcg_info, bcg_unit * unit)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 reg_alloc_vanilla(BCG_info * bcg_info, bcg_unit * unit)
@@ -36,6 +65,17 @@ reg_alloc_vanilla(BCG_info * bcg_info, bcg_unit * unit)
     mem_sys_free(reg_count);
 }
 
+/*
+
+=item C<static int
+assig_reg_num(int *reg_count, char data_type, int reg_num)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static int
 assig_reg_num(int *reg_count, char data_type, int reg_num)
 {
@@ -59,6 +99,14 @@ assig_reg_num(int *reg_count, char data_type, int reg_num)
     }
     return -1;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

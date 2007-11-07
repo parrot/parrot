@@ -3,10 +3,40 @@
  * Copyright (C) 2006-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+bcg_op.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include <ctype.h>
 #include <string.h>
 #include "bcg.h"
 #include "bcg_private.h"
+
+/*
+
+=item C<bcg_op_arg *
+bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
+                  char data_type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 bcg_op_arg *
 bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
@@ -23,6 +53,17 @@ bcg_op_arg_create(BCG_info * bcg_info, char *name, bcg_op_arg_type type,
     return op_arg;
 }
 
+/*
+
+=item C<void
+bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg)
 {
@@ -30,6 +71,17 @@ bcg_op_arg_destroy(BCG_info * bcg_info, bcg_op_arg * op_arg)
     mem_sys_free(op_arg->name);
     mem_sys_free(op_arg);
 }
+
+/*
+
+=item C<bcg_op *
+bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 bcg_op *
 bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)
@@ -44,6 +96,17 @@ bcg_op_create(BCG_info * bcg_info, char *name, bcg_op_type op_type)
     return op;
 }
 
+/*
+
+=item C<void
+bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)
 {
@@ -57,6 +120,17 @@ bcg_op_destroy(BCG_info * bcg_info, bcg_op * op)
     }
     mem_sys_free(op);
 }
+
+/*
+
+=item C<void
+bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
@@ -76,6 +150,17 @@ bcg_op_add_arg(BCG_info * bcg_info, bcg_op * op, bcg_op_arg * op_arg)
     }
     op->op_args[op->op_arg_count - 1] = op_arg;
 }
+
+/*
+
+=item C<void
+bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)
@@ -102,12 +187,31 @@ bcg_op_resolve_full_name(BCG_info * bcg_info, bcg_op * op)
     op->full_name = full_name;
 }
 
+/*
+
+=item C<bcg_op *
+bcg_info_current_op(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 bcg_op *
 bcg_info_current_op(BCG_info * bcg_info)
 {
     bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
     return bcg_info_priv->last_unit->last_op;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

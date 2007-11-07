@@ -3,9 +3,38 @@
  * Copyright (C) 2006-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+bcg_emitter_pasm.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include "bcg_emitter.h"
 #include "bcg_private.h"
 #include "bcg.h"
+
+/*
+
+=item C<void
+emit_pasm(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 emit_pasm(BCG_info * bcg_info)
@@ -47,6 +76,14 @@ emit_pasm(BCG_info * bcg_info)
     }
     printf("    end\n");
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

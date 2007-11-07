@@ -3,12 +3,42 @@
  * Copyright (C) 2006-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+bcg_logger.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include <stdarg.h>
 #include "bcg_logger.h"
 
+/*
+
+=item C<void
+bcg_throw_exception(BCG_info * bcg_info,
+        const int code, const char *format, ...)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
-bcg_throw_exception(BCG_info * bcg_info, const int code, const char *format,
-                    ...)
+bcg_throw_exception(BCG_info * bcg_info,
+        const int code, const char *format, ...)
 {
     char *message;
     va_list ap_list;
@@ -23,6 +53,14 @@ bcg_throw_exception(BCG_info * bcg_info, const int code, const char *format,
     bcg_info->error_code = code;
     BCG_THROW(bcg_info, code);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

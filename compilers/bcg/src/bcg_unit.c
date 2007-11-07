@@ -3,12 +3,41 @@
  * Copyright (C) 2006-2007, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+bcg_unit.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
 #include <string.h>
 #include "bcg.h"
 #include "bcg_private.h"
 #include "bcg_logger.h"
 
 static int get_pargma_type(BCG_info * bcg_info, char *pragma);
+
+/*
+
+=item C<bcg_unit *
+bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 bcg_unit *
 bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)
@@ -21,6 +50,17 @@ bcg_unit_create(BCG_info * bcg_info, char *name, char *pragma)
     mem_sys_free(pragma);
     return unit;
 }
+
+/*
+
+=item C<void
+bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void
 bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)
@@ -40,6 +80,17 @@ bcg_unit_destroy(BCG_info * bcg_info, bcg_unit * unit)
     mem_sys_free(unit);
 }
 
+/*
+
+=item C<void
+bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)
 {
@@ -56,12 +107,34 @@ bcg_unit_add_op(BCG_info * bcg_info, bcg_unit * unit, bcg_op * op)
     unit->last_op = op;
 }
 
+/*
+
+=item C<bcg_unit *
+bcg_info_current_unit(BCG_info * bcg_info)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 bcg_unit *
 bcg_info_current_unit(BCG_info * bcg_info)
 {
     bcg_info_private *bcg_info_priv = BCG_INFO_PRIV(bcg_info);
     return bcg_info_priv->last_unit;
 }
+
+/*
+
+=item C<static int
+get_pargma_type(BCG_info * bcg_info, char *pragma)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static int
 get_pargma_type(BCG_info * bcg_info, char *pragma)
@@ -88,6 +161,14 @@ get_pargma_type(BCG_info * bcg_info, char *pragma)
     }
     return -1;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
