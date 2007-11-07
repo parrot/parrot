@@ -8,236 +8,122 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More tests => 45;
+use Test::More tests => 82;
 use Parrot::Test;
 
-###
-### Zero?
-###
+my @tests = (
+    # zero?
+    [ q{ (zero?  0) }              => q{#t}             ],
+    [ q{ (zero? -0) }              => q{#t}             ],
+    [ q{ (zero? +0) }              => q{#t}             ],
+    [ q{ (zero?  2) }              => q{#f}             ],
+    [ q{ (zero? -2) }              => q{#f}             ],
+    [ q{ (zero? +2) }              => q{#f}             ],
+    [ q{ (zero? 0.0) }             => q{#t}             ],
+    [ q{ (zero? -0.0) }            => q{#t}             ],
+    [ q{ (zero? +0.0) }            => q{#t}             ],
+    [ q{ (zero?  0.00000) }        => q{#t}             ],
+    [ q{ (zero? -0.00000) }        => q{#t}             ],
+    [ q{ (zero? +0.00000) }        => q{#t}             ],
+    [ q{ (zero?  0.000001) }       => q{#f}             ],
+    [ q{ (zero? -0.000001) }       => q{#f}             ],
+    [ q{ (zero? +0.000001) }       => q{#f}             ],
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (zero? 0)' );
-(write (zero? 0))
-CODE
+    # positive?
+    [ q{ (positive?  0) }          => q{#f}             ],
+    [ q{ (positive? -0) }          => q{#f}             ],
+    [ q{ (positive? +0) }          => q{#f}             ],
+    [ q{ (positive?  2) }          => q{#t}             ],
+    [ q{ (positive? -2) }          => q{#f}             ],
+    [ q{ (positive? +2) }          => q{#t}             ],
+    [ q{ (positive? 0.0) }         => q{#f}             ],
+    [ q{ (positive? -0.0) }        => q{#f}             ],
+    [ q{ (positive? +0.0) }        => q{#f}             ],
+    [ q{ (positive?  0.00000) }    => q{#f}             ],
+    [ q{ (positive? -0.00000) }    => q{#f}             ],
+    [ q{ (positive? +0.00000) }    => q{#f}             ],
+    [ q{ (positive?  0.000001) }   => q{#t}             ],
+    [ q{ (positive? -0.000001) }   => q{#f}             ],
+    [ q{ (positive? +0.000001) }   => q{#t}             ],
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (zero? 2)' );
-(write (zero? 2))
-CODE
+    # negative?
+    [ q{ (negative?  0) }          => q{#f}             ],
+    [ q{ (negative? -0) }          => q{#f}             ],
+    [ q{ (negative? +0) }          => q{#f}             ],
+    [ q{ (negative?  2) }          => q{#f}             ],
+    [ q{ (negative? -2) }          => q{#t}             ],
+    [ q{ (negative? +2) }          => q{#f}             ],
+    [ q{ (negative? 0.0) }         => q{#f}             ],
+    [ q{ (negative? -0.0) }        => q{#f}             ],
+    [ q{ (negative? +0.0) }        => q{#f}             ],
+    [ q{ (negative?  0.00000) }    => q{#f}             ],
+    [ q{ (negative? -0.00000) }    => q{#f}             ],
+    [ q{ (negative? +0.00000) }    => q{#f}             ],
+    [ q{ (negative?  0.000001) }   => q{#f}             ],
+    [ q{ (negative? -0.000001) }   => q{#t}             ],
+    [ q{ (negative? +0.000001) }   => q{#f}             ],
 
-###
-### Positive?
-###
+    # odd?
+    [ q{ (odd? 0) }                => q{#f}             ],
+    [ q{ (odd? 1) }                => q{#t}             ],
+    [ q{ (odd? 2) }                => q{#f}             ],
+    [ q{ (odd? -3) }               => q{#t}             ],
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (positive? 0)' );
-(write (positive? 0))
-CODE
+    # even?
+    [ q{ (even? 0) }               => q{#t}             ],
+    [ q{ (even? 1) }               => q{#f}             ],
+    [ q{ (even? 2) }               => q{#t}             ],
+    [ q{ (even? -3) }              => q{#f}             ],
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (positive? 2)' );
-(write (positive? 2))
-CODE
+    # max
+    [ q{ (max 1 3) }               => 3                 ],
+    [ q{ (max 9 3 5) }             => 9                 ],
+    [ q{ (max 3 1) }               => 3                 ],
+    [ q{ (max 1 9 3) }             => 9                 ],
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (positive? -3)' );
-(write (positive? -3))
-CODE
+    # min
+    [ q{ (min 1 3) }               => 1                 ],
+    [ q{ (min 9 3 5) }             => 3                 ],
+    [ q{ (min 3 1) }               => 1                 ],
+    [ q{ (min 1 9 3) }             => 1                 ],
 
-###
-### Negative?
-###
+    # =
+    [ q{ (= 0 0) }                 => '#t'              ],
+    [ q{ (= 1 0) }                 => '#f'              ],
+    [ q{ (= 0 1) }                 => '#f'              ],
+    [ q{ (= 0 0) }                 => '#t'              ],
+    [ q{ (= 1 0) }                 => '#f'              ],
+    [ q{ (= 0 1) }                 => '#f'              ],
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (negative? 0)' );
-(write (negative? 0))
-CODE
+    # <
+    [ q{ (< 0 1) }                 => '#t'              ],
+    [ q{ (< 1 1) }                 => '#f'              ],
+    [ q{ (< 0 1 2) }               => '#t'              ],
+    [ q{ (< 1 1 2) }               => '#f'              ],
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (negative? 2)' );
-(write (negative? 2))
-CODE
+    # >
+    [ q{ (> 1 0) }                 => '#t'              ],
+    [ q{ (> 1 1) }                 => '#f'              ],
+    [ q{ (> 2 1 0) }               => '#t'              ],
+    [ q{ (> 2 1 1) }               => '#f'              ],
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (negative? -3)' );
-(write (negative? -3))
-CODE
+    # <=
+    [ q{ (<= 0 0) }                => '#t'              ],
+    [ q{ (<= 1 0) }                => '#f'              ],
+    [ q{ (<= 1 2) }                => '#t'              ],
+    [ q{ (<= 2 1 0) }              => '#f'              ],
+    [ q{ (<= 2 1 1) }              => '#f'              ],
 
-###
-### Odd?
-###
+    # >=
+    [ q{ (<= 2 3 3) }              => '#t'              ],
+    [ q{ (<= 2 3 2) }              => '#f'              ],
+);
 
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (odd? 0)' );
-(write (odd? 0))
-CODE
+foreach ( @tests ) {
+    my ( $code, $expected ) = @{$_};
 
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (odd? 1)' );
-(write (odd? 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (odd? 2)' );
-(write (odd? 2))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (odd? -3)' );
-(write (odd? -3))
-CODE
-
-###
-### Even?
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (even? 0)' );
-(write (even? 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (even? 1)' );
-(write (even? 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (even? 2)' );
-(write (even? 2))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (even? -3)' );
-(write (even? -3))
-CODE
-
-###
-### Max
-###
-
-language_output_is( 'Scheme', <<'CODE', 3, 'write (max 1 3))' );
-(write (max 1 3))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 9, 'write (max 9 3 5))' );
-(write (max 9 3 5))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 3, 'write (max 3 1))' );
-(write (max 3 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 9, 'write (max 1 9 3))' );
-(write (max 1 9 3))
-CODE
-
-###
-### Min
-###
-
-language_output_is( 'Scheme', <<'CODE', 1, 'write (min 1 3))' );
-(write (min 1 3))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 3, 'write (min 9 3 5))' );
-(write (min 9 3 5))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 1, 'write (min 3 1))' );
-(write (min 3 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', 1, 'write (min 1 9 3))' );
-(write (min 1 9 3))
-CODE
-
-###
-### Equal (=)
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (= 0 0))' );
-(write (= 0 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 1 0))' );
-(write (= 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 0 1))' );
-(write (= 0 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (= 0 0 0))' );
-(write (= 0 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 1 2 3))' );
-(write (= 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (= 0 1 1))' );
-(write (= 0 1))
-CODE
-
-###
-### Less (<)
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (< 0 1))' );
-(write (< 0 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (< 1 1))' );
-(write (< 1 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (< 0 1 2))' );
-(write (< 0 1 2))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (< 1 1 1))' );
-(write (< 1 1 2))
-CODE
-
-###
-### Greater (>)
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (> 1 0))' );
-(write (> 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (> 1 1))' );
-(write (> 1 1))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (> 2 1 0))' );
-(write (> 2 1 0))
-CODE
-
-language_output_is( 'Scheme',<<'CODE', '#f', 'write (> 2 1 1))');
-(write (> 2 1 1))
-CODE
-
-###
-### LEQ (<=)
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 0 0))' );
-(write (<= 0 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 1 0))' );
-(write (<= 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 1 2))' );
-(write (<= 1 2))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 1 0))' );
-(write (<= 2 1 0))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 1 1))' );
-(write (<= 2 1 1))
-CODE
-
-###
-### GEQ (>=)
-###
-
-language_output_is( 'Scheme', <<'CODE', '#t', 'write (<= 2 3 3))' );
-(write (<= 2 3 3))
-CODE
-
-language_output_is( 'Scheme', <<'CODE', '#f', 'write (<= 2 3 2))' );
-(write (<= 2 3 2))
-CODE
+    language_output_is( 'Scheme', qq{ (write $code) }, $expected, $code );
+}
 
 # Local Variables:
 #   mode: cperl
