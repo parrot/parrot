@@ -2106,7 +2106,7 @@ sub _call_function_obj {
     $self->_restore($return);    # dont need to save this
     $self->_save_set();
 
-    my $count = 5;
+    my $count = 10;
     my $empty = $return;
     my @args;
     while ( my $arg = shift ) {
