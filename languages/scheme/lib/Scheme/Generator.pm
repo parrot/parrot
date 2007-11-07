@@ -1046,7 +1046,7 @@ sub _op_zero_p {
 
     my $return = $self->_constant('#t');
 
-    my $temp = $self->_generate( $node->{children}[1] );
+    my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'eq', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
