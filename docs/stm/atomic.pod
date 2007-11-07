@@ -128,7 +128,9 @@ pointer and ATOMIC_*_INIT will do nothing. For the fallback implementation the
 atomic types will be implemented in terms of a Parrot_mutex. Platform-specific
 implementations should not make Parrot_atomic_pointer or Parrot_atomic_integer
 a typedef for an integer or pointer type to prevent programmers from
-accidentally violating encapsulation.  =cut
+accidentally violating encapsulation.
+
+=cut
 
 __END__ 
 Local Variables: 
