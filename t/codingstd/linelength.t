@@ -135,9 +135,6 @@ compilers/imcc/imcparser.c
 compilers/pirc/new/pirlexer.c
 compilers/pirc/new/pirlexer.h
 compilers/pirc/new/pirparser.c
-compilers/pirc/src/pirlexer.c
-compilers/pirc/src/pirlexer.h
-compilers/pirc/src/pirparser.c
 compilers/pirc/macro/macro.h
 compilers/pirc/macro/macrolexer.c
 compilers/pirc/macro/macrolexer.h
