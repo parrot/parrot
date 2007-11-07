@@ -627,7 +627,8 @@ pt_transfer_sub(Parrot_Interp d, Parrot_Interp s, NULLOK(PMC *sub))
 
 /*
 
-=item C<pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
+=item C<int
+pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)>
 
 Run the C<*sub> PMC in a separate thread using interpreter in
 C<*dest_interp>.
@@ -639,6 +640,7 @@ int
 
 */
 
+int
 pt_thread_run(PARROT_INTERP, PMC* dest_interp, PMC* sub, PMC *arg)
 {
     PMC *old_dest_interp;
