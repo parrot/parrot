@@ -3,13 +3,38 @@
  * Copyright (C) 2004-2006, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+memexec.c
+
+=head1 DESCRIPTION
+
+TODO
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #ifdef PARROT_HAS_EXEC_PROTECT
 /*
- * Allocate executable memory
- * Round up to page size because the whole page will be marked as
- *   executable
- * malloc() under OpenBSD page-aligns allocations >= page size
- */
+
+=item C<void *
+mem_alloc_executable(size_t size)>
+
+Allocate executable memory
+Round up to page size because the whole page will be marked as executable
+malloc() under OpenBSD page-aligns allocations >= page size
+
+=cut
+
+*/
+
 void *
 mem_alloc_executable(size_t size)
 {
@@ -23,6 +48,17 @@ mem_alloc_executable(size_t size)
     return p;
 }
 
+/*
+
+=item C<void
+mem_free_executable(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 mem_free_executable(void *p)
 {
@@ -30,10 +66,17 @@ mem_free_executable(void *p)
 }
 
 /*
- * Reallocate executable memory
- * Round up to page size because the whole page will be marked as
- *   executable
- */
+
+=item C<void *
+mem_realloc_executable(void* oldp, size_t newsize)>
+
+Reallocate executable memory
+Round up to page size because the whole page will be marked as executable
+
+=cut
+
+*/
+
 void *
 mem_realloc_executable(void* oldp, size_t newsize)
 {
@@ -46,6 +89,14 @@ mem_realloc_executable(void* oldp, size_t newsize)
     return newp;
 }
 #endif
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
