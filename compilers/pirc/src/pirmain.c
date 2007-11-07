@@ -42,13 +42,14 @@ typedef enum outputtypes {
 
 =over 4
 
-=item print_help()
+=item C<static void print_help(void)>
 
 =cut
 
 */
 static void
-print_help(void) {
+print_help(void)
+{
     fprintf(stderr, "Usage: pirc [options] <file>\n");
     fprintf(stderr, "\tGeneral:\n");
     fprintf(stderr, "\t-d         debug messages\n");
@@ -66,7 +67,7 @@ print_help(void) {
 
 /*
 
-=item main()
+=item C<int main(int argc, char **argv)>
 
 Entry function for the PIR Compiler 'PIRC'
 
@@ -74,7 +75,8 @@ Entry function for the PIR Compiler 'PIRC'
 
 */
 int
-main(int argc, char **argv) {
+main(int argc, char **argv)
+{
     struct parser_state *p = NULL;        /* create a parser */
     pirvtable *vtable      = NULL;        /* create a vtable for semantic actions */
     int flags              = 0;           /* argument parsing */
@@ -197,8 +199,6 @@ main(int argc, char **argv) {
     return 0;
 }
 
-
-
 /*
 
 =back
@@ -213,7 +213,4 @@ main(int argc, char **argv) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
-
-
 

@@ -41,10 +41,7 @@ static const int INDENT = 4;
 
 =head1 JSON BACK END INTERNALS
 
-
-
 =cut
-
 
 Structure target holds names of C<target>s so they can be emitted later.
 This is necessary in cases like: "(a,b,c) = foo(1,2,3)", where a, b and c
@@ -87,16 +84,36 @@ typedef struct emit_data {
 
 */
 
-/* increase the indention level */
+/*
+
+=item C<static int indent(emit_data *data)>
+
+increase the indention level
+
+=cut
+
+*/
+
 static int
-indent(emit_data *data) {
+indent(emit_data *data)
+{
     data->indent += INDENT;
     return data->indent;
 }
 
-/* decreate the indention level */
+/*
+
+=item C<static int dedent(emit_data *data)>
+
+decrease the indention level
+
+=cut
+
+*/
+
 static int
-dedent(emit_data *data) {
+dedent(emit_data *data)
+{
     data->indent -= INDENT;
     return data->indent;
 }
@@ -104,13 +121,16 @@ dedent(emit_data *data) {
 
 /*
 
-=item new_target()
+=item C<static target * new_target(char *name)>
+
+TODO: Not yet documented!!!
 
 =cut
 
 */
 static target *
-new_target(char *name) {
+new_target(char *name)
+{
     target *t = (target *)malloc(sizeof (target));
     t->name = name;
     t->next = NULL;
@@ -119,14 +139,17 @@ new_target(char *name) {
 
 /*
 
-=item add_target()
+=item C<static void add_target(emit_data *data, target *t)>
+
+TODO: Not yet documented!!!
 
 =cut
 
 */
 
 static void
-add_target(emit_data *data, target *t) {
+add_target(emit_data *data, target *t)
+{
     t->next = data->targets;
     data->targets = t;
 }
@@ -143,14 +166,38 @@ add_target(emit_data *data, target *t) {
 
 */
 
+/*
+
+=item C<static void
+json_start_object(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_start_object(emit_data *data) {
+json_start_object(emit_data *data)
+{
     fprintf(data->file, "%*s{\n", data->indent, data->indent ? " " : "");
     indent(data);
 }
 
+/*
+
+=item C<static void
+json_init(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_init(emit_data *data) {
+json_init(emit_data *data)
+{
     if (data->outputfile) data->file = open_file(data->outputfile, "w");
     else data->file = stdout;
 
@@ -159,14 +206,38 @@ json_init(emit_data *data) {
 }
 
 
+/*
+
+=item C<static void
+json_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_end(emit_data *data) {
+json_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s}\n", data->indent, (data->indent == 0) ? "" : " ");
 }
 
+/*
+
+=item C<static void
+json_sub_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_sub_start(emit_data *data) {
+json_sub_start(emit_data *data)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"sub\" :\n", data->indent, " ");
     indent(data);
@@ -175,18 +246,54 @@ json_sub_start(emit_data *data) {
     indent(data);
 }
 
+/*
+
+=item C<static void
+json_source(emit_data *data, char *source)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_source(emit_data *data, char *source) {
+json_source(emit_data *data, char *source)
+{
     fprintf(data->file, "%*s{ \"source\" : \"%s\" },\n", data->indent, " ", source);
 }
 
+/*
+
+=item C<static void
+json_position(emit_data *data, int pos)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_position(emit_data *data, int pos) {
+json_position(emit_data *data, int pos)
+{
     fprintf(data->file, "%*s{ \"pos\" : %d },\n", data->indent, " ", pos);
 }
 
+/*
+
+=item C<static void
+json_sub_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_sub_end(emit_data *data) {
+json_sub_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s}\n", data->indent, " ");
 
@@ -195,15 +302,39 @@ json_sub_end(emit_data *data) {
     data->need_comma = 1;
 }
 
+/*
+
+=item C<static void
+json_name(emit_data *data, char *name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_name(emit_data *data, char *name) {
+json_name(emit_data *data, char *name)
+{
     fprintf(data->file, "%*s{ \"name\" : \"%s\" }\n", data->indent, " ", name);
     data->need_comma = 1;
 
 }
 
+/*
+
+=item C<static void
+json_stmts_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_stmts_start(emit_data *data) {
+json_stmts_start(emit_data *data)
+{
     fprintf(data->file, "%*s{ \"instructions\" :\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s[\n", data->indent, " ");
@@ -211,8 +342,20 @@ json_stmts_start(emit_data *data) {
     data->need_comma = 0;
 }
 
+/*
+
+=item C<static void
+json_param_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_param_start(emit_data *data) {
+json_param_start(emit_data *data)
+{
     fprintf(data->file, "%*s{ \"parameters\" :\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s[\n", data->indent, " ");
@@ -220,8 +363,20 @@ json_param_start(emit_data *data) {
     data->need_comma = 0;
 }
 
+/*
+
+=item C<static void
+json_sub_flag_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_sub_flag_start(emit_data *data) {
+json_sub_flag_start(emit_data *data)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"subflags\" :\n", data->indent, " ");
     indent(data);
@@ -230,43 +385,115 @@ json_sub_flag_start(emit_data *data) {
     data->need_comma = 0;
 }
 
+/*
+
+=item C<static void
+json_sub_flag_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_sub_flag_end(emit_data *data) {
+json_sub_flag_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
     fprintf(data->file, "%*s},\n", data->indent, " ");
 }
 
+/*
+
+=item C<static void
+json_sub_flag(emit_data *data, int flag)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_sub_flag(emit_data *data, int flag) {
+json_sub_flag(emit_data *data, int flag)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"subflag\" : \"%s\" }\n", data->indent, " ", "TODO");
 }
 
+/*
+
+=item C<static void
+json_list_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_list_start(emit_data *data) {
+json_list_start(emit_data *data)
+{
     fprintf(data->file, "%*s[", data->indent, " ");
     indent(data);
     data->need_comma = 0;
 }
 
+/*
+
+=item C<static void
+json_list_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_list_end(emit_data *data) {
+json_list_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s]\n", data->indent, " ");
 }
 
+/*
+
+=item C<static void
+json_stmts_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_stmts_end(emit_data *data) {
+json_stmts_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
     fprintf(data->file, "%*s}\n", data->indent, " ");
 }
 
+/*
+
+=item C<static void
+json_op_start(emit_data *data, char *op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_op_start(emit_data *data, char *op) {
+json_op_start(emit_data *data, char *op)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"op\" : \"%s\" },\n", data->indent, " ", op);
     fprintf(data->file, "%*s{ \"operands\" :\n", data->indent, " ");
@@ -275,8 +502,20 @@ json_op_start(emit_data *data, char *op) {
     indent(data);
 }
 
+/*
+
+=item C<static void
+json_op_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_op_end(emit_data *data) {
+json_op_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s]\n", data->indent, " ");
     dedent(data);
@@ -284,64 +523,95 @@ json_op_end(emit_data *data) {
 
 }
 
+/*
+
+=item C<static void
+json_expr(emit_data *data, char *expr)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_expr(emit_data *data, char *expr) {
+json_expr(emit_data *data, char *expr)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%*s{ \"expr\" : \"%s\" }\n", data->indent, " ", expr);
     data->need_comma = 1;
 }
 
+/*
 
+=item C<static void
+json_method(emit_data *data, char *name)>
 
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
-json_method(emit_data *data, char *name) {
+json_method(emit_data *data, char *name)
+{
     fprintf(data->file, "%*s{ \"method\" : \"%s\" }\n", data->indent, " ", name);
 }
 
+/*
+
+=item C<static void
+json_invocant(emit_data *data, char *invocant)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_invocant(emit_data *data, char *invocant) {
+json_invocant(emit_data *data, char *invocant)
+{
     fprintf(data->file, "%*s{ \"invocant\" : \"%s\" }\n", data->indent, " ", invocant);
 }
 
+/*
+
+=item C<static void
+json_args_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_args_start(emit_data *data) {
+json_args_start(emit_data *data)
+{
     fprintf(data->file, "%*s{ \"arguments\" :\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s[\n", data->indent, " ");
     indent(data);
 }
 
+/*
+
+=item C<static void
+json_args_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-json_args_end(emit_data *data) {
+json_args_end(emit_data *data)
+{
     dedent(data);
     fprintf(data->file, "%*s]\n", data->indent, " ");
-    dedent(data);
-    fprintf(data->file, "%*s}\n", data->indent, " ");
-}
-
-
-static void
-json_target(emit_data *data, char *name) {
-    target *t = new_target(name);
-    add_target(data, t);
-}
-
-
-
-static void
-json_invokable(emit_data *data, char *invokable) {
-    fprintf(data->file, "%*s{ \"invokable\" : \"%s\" }\n", data->indent, " ", invokable);
-}
-
-static void
-json_invocation_start(emit_data *data) {
-    fprintf(data->file, "%*s{ \"invocation\" :\n%*s{\n", data->indent, " ", data->indent, " ");
-    indent(data);
-}
-
-static void
-json_invocation_end(emit_data *data) {
     dedent(data);
     fprintf(data->file, "%*s}\n", data->indent, " ");
 }
@@ -349,7 +619,80 @@ json_invocation_end(emit_data *data) {
 
 /*
 
-=item json_destroy()
+=item C<static void
+json_target(emit_data *data, char *name)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+json_target(emit_data *data, char *name)
+{
+    target *t = new_target(name);
+    add_target(data, t);
+}
+
+/*
+
+=item C<static void
+json_invokable(emit_data *data, char *invokable)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+json_invokable(emit_data *data, char *invokable)
+{
+    fprintf(data->file, "%*s{ \"invokable\" : \"%s\" }\n", data->indent, " ", invokable);
+}
+
+/*
+
+=item C<static void
+json_invocation_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+json_invocation_start(emit_data *data)
+{
+    fprintf(data->file, "%*s{ \"invocation\" :\n%*s{\n", data->indent, " ", data->indent, " ");
+    indent(data);
+}
+
+/*
+
+=item C<static void
+json_invocation_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+json_invocation_end(emit_data *data)
+{
+    dedent(data);
+    fprintf(data->file, "%*s}\n", data->indent, " ");
+}
+
+
+/*
+
+=item C<static void
+json_destroy(emit_data *data)>
 
 Destructor for emit_data structure
 
@@ -357,7 +700,8 @@ Destructor for emit_data structure
 
 */
 static void
-json_destroy(emit_data *data) {
+json_destroy(emit_data *data)
+{
     if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
@@ -365,7 +709,8 @@ json_destroy(emit_data *data) {
 
 /*
 
-=item init_json_vtable()
+=item C<pirvtable *
+init_json_vtable(char *outputfile)>
 
 Initializes a vtable for the JSON back-end. Each of the vtable method slots is
 assigned a function address that implements that method.
@@ -374,7 +719,8 @@ assigned a function address that implements that method.
 
 */
 pirvtable *
-init_json_vtable(char *outputfile) {
+init_json_vtable(char *outputfile)
+{
     pirvtable *vtable = new_pirvtable();
 
     /* set vtable methods to the appropiate implementation */
@@ -415,8 +761,6 @@ init_json_vtable(char *outputfile) {
     vtable->data->indent = 0;
     vtable->data->outputfile = outputfile;
 
-
-
     return vtable;
 }
 
@@ -427,8 +771,6 @@ init_json_vtable(char *outputfile) {
 =cut
 
 */
-
-
 
 /*
  * Local variables:

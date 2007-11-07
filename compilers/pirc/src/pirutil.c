@@ -25,7 +25,7 @@ pirutil.c - various utility functions
 
 =over 4
 
-=item clone_string()
+=item C<char * clone_string(NOTNULL(char const * src))>
 
 clone a string. Copy the characters of src into dest
 and return dest. Memory allocation is done by this function, keeping
@@ -54,7 +54,7 @@ clone_string(NOTNULL(char const * src))
 
 /*
 
-=item open_file(char *filename, char *mode)
+=item C<FILE * open_file(char const *filename, char const *mode)>
 
 Open the file C<filename> in mode C<mode>. If this fails, an error message
 is printed, and the program is terminated.
@@ -63,7 +63,8 @@ is printed, and the program is terminated.
 
 */
 FILE *
-open_file(char const *filename, char const *mode) {
+open_file(char const *filename, char const *mode)
+{
     FILE *file = fopen(filename, mode);
 
     if (file == NULL) {
@@ -76,7 +77,7 @@ open_file(char const *filename, char const *mode) {
 
 /*
 
-=item verbose()
+=item C<void printverbose(char *message)>
 
 Prints the specified message if the verbose flag was set
 
@@ -84,13 +85,14 @@ Prints the specified message if the verbose flag was set
 
 */
 void
-printverbose(char *message) {
+printverbose(char *message)
+{
     fprintf(stdout, message);
 }
 
 /*
 
-=item debug()
+=item C<void printdebug(char *message)>
 
 Prints the specified message if the debug flag was set.
 
@@ -98,7 +100,8 @@ Prints the specified message if the debug flag was set.
 
 */
 void
-printdebug(char *message) {
+printdebug(char *message)
+{
     fprintf(stdout, message);
 }
 
@@ -426,7 +429,7 @@ static char const *parrot_ops[] = {
 
 /*
 
-=item is_op()
+=item C<int is_op(char *id)>
 
 Return 1 if the specified id is a Parrot op, 0 otherwise.
 
@@ -434,7 +437,8 @@ Return 1 if the specified id is a Parrot op, 0 otherwise.
 
 */
 int
-is_op(char *id) {
+is_op(char *id)
+{
     char const *iter = parrot_ops[0];
     int index = 0;
 

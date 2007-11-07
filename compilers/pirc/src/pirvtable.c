@@ -11,10 +11,11 @@ pirvtable.c - implementation of a vtable, that is used by the parser for its sem
 
 =head1 DESCRIPTION
 
-Using a vtable makes changing the behaviour of the parser easy. The parser calls vtable methods
-at certain points, for instance at the start of a subroutine and at the end. Depending on the
-type of output that is expected, the appropiate function is invoked. Any output type should
-implement all vtable methods for correct behaviour.
+Using a vtable makes changing the behaviour of the parser easy. The parser
+calls vtable methods at certain points, for instance at the start of a
+subroutine and at the end. Depending on the type of output that is expected,
+the appropiate function is invoked. Any output type should implement all vtable
+methods for correct behaviour.
 
 =cut
 
@@ -23,26 +24,25 @@ implement all vtable methods for correct behaviour.
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 /*
 
 =head1 HELPER METHODS
 
 =over 4
 
-=item not_implemented()
+=item C<static void not_implemented(struct emit_data *data, ...)>
 
-Default entry that is set to all vtable entries. If a particular vtable entry is invoked,
-but was never implemented, this method is called. This is usefulS, because not all output
-type need all vtable methods. The variable arguments are necessary, you never know how
-many args a method has.
+Default entry that is set to all vtable entries. If a particular vtable entry
+is invoked, but was never implemented, this method is called. This is usefulS,
+because not all output type need all vtable methods. The variable arguments are
+necessary, you never know how many args a method has.
 
 =cut
 
 */
 static void
-not_implemented(struct emit_data *data, ...) {
+not_implemented(struct emit_data *data, ...)
+{
     /* do nothing */
 }
 
@@ -54,7 +54,7 @@ not_implemented(struct emit_data *data, ...) {
 
 =over 4
 
-=item new_pirvtable()
+=item C<pirvtable * new_pirvtable(void)>
 
 Constructor for a pir vtable. All entries are set to "not_implemented" function.
 
@@ -62,7 +62,8 @@ Constructor for a pir vtable. All entries are set to "not_implemented" function.
 
 */
 pirvtable *
-new_pirvtable(void) {
+new_pirvtable(void)
+{
 
     pirvtable *vtable = (pirvtable *)malloc(sizeof (pirvtable));
 
@@ -119,7 +120,7 @@ new_pirvtable(void) {
 
 /*
 
-=item destroy_pirvtable()
+=item C<void destroy_pirvtable(pirvtable *vtable)>
 
 Destructor for the pirvtable. It first calls the custome destructor
 of the emit_data structure, which is private to each of the back-ends
@@ -130,7 +131,8 @@ know).
 
 */
 void
-destroy_pirvtable(pirvtable *vtable) {
+destroy_pirvtable(pirvtable *vtable)
+{
     /* call custom destructor of the backend */
     (*vtable->destroy)(vtable->data);
     /* free the vtable memory */
@@ -145,8 +147,6 @@ destroy_pirvtable(pirvtable *vtable) {
 =cut
 
 */
-
-
 
 /*
  * Local variables:

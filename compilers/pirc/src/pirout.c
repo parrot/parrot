@@ -42,21 +42,20 @@ typedef struct emit_data {
 
 #define print_comma(D)  fprintf(data->file, ", ")
 
-
-
-
-
 /*
 
 =over 4
 
-=item new_target()
+=item C<static target * new_target(char *name)>
+
+TODO: Not yet documented!!!
 
 =cut
 
 */
 static target *
-new_target(char *name) {
+new_target(char *name)
+{
     target *t = (target *)malloc(sizeof (target));
     t->name = clone_string(name);
     t->next = NULL;
@@ -65,7 +64,9 @@ new_target(char *name) {
 
 /*
 
-=item add_target()
+=item C<static void add_target(emit_data *data, target *t)>
+
+TODO: Not yet documented!!!
 
 =cut
 
@@ -74,7 +75,8 @@ new_target(char *name) {
 */
 
 static void
-add_target(emit_data *data, target *t) {
+add_target(emit_data *data, target *t)
+{
     t->next = data->targets;
     data->targets = t;
 }
@@ -83,120 +85,331 @@ add_target(emit_data *data, target *t) {
 
 =head1 API
 
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<static void
+pir_name(struct emit_data *data, char *name)>
+
+TODO: Not yet documented!!!
+
 =cut
 
 */
 
 static void
-pir_name(struct emit_data *data, char *name) {
+pir_name(struct emit_data *data, char *name)
+{
     if (data->need_comma) print_comma(data);
     fprintf(data->file, "%s", name);
     data->need_comma = 1;
 }
 
+/*
+
+=item C<static void
+pir_sub(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_sub(struct emit_data *data) {
+pir_sub(struct emit_data *data)
+{
     fprintf(data->file, "\n.sub ");
     data->need_comma = 0;
 }
 
+/*
+
+=item C<static void
+pir_end(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_end(struct emit_data *data) {
+pir_end(struct emit_data *data)
+{
     fprintf(data->file, ".end\n");
     data->need_comma = 0;
 }
 
-static void
-pir_newline(struct emit_data *data) {
-    fprintf(data->file, "\n");
-}
+/*
+
+=item C<static void
+pir_newline(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
-pir_param(struct emit_data *data) {
-    fprintf(data->file, "  .param ");
-}
-
-static void
-pir_type(struct emit_data *data, char *type) {
-    fprintf(data->file, "%s ", type);
-    data->need_comma = 0;
-}
-
-static void
-pir_sub_flag(struct emit_data *data, int flag) {
-    fprintf(data->file, "%s ", find_keyword(flag));
-}
-
-static void
-pir_expr(struct emit_data *data, char *expr) {
-    fprintf(data->file, "%s ", expr);
-}
-
-static void
-pir_op(struct emit_data *data, char *op) {
-    fprintf(data->file, "  %s ", op);
-    data->need_comma = 0;
-}
-
-
-static void
-pir_list_start(struct emit_data *data) {
-    fprintf(data->file, "(");
-    data->need_comma = 0;
-}
-
-static void
-pir_list_end(struct emit_data *data) {
-    fprintf(data->file, ")");
-    data->need_comma = 0;
-}
-
-static void
-pir_sub_flag_start(struct emit_data *data) {
-    fprintf(data->file, "");
-}
-
-
-static void
-pir_sub_flag_end(struct emit_data *data) {
+pir_newline(struct emit_data *data)
+{
     fprintf(data->file, "\n");
 }
 
 /*
 
-Close the output file, free the emit_data structure.
+=item C<static void
+pir_param(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
 
 */
+
 static void
-pir_destroy(emit_data *data) {
+pir_param(struct emit_data *data)
+{
+    fprintf(data->file, "  .param ");
+}
+
+/*
+
+=item C<static void
+pir_type(struct emit_data *data, char *type)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_type(struct emit_data *data, char *type)
+{
+    fprintf(data->file, "%s ", type);
+    data->need_comma = 0;
+}
+
+/*
+
+=item C<static void
+pir_sub_flag(struct emit_data *data, int flag)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_sub_flag(struct emit_data *data, int flag)
+{
+    fprintf(data->file, "%s ", find_keyword(flag));
+}
+
+/*
+
+=item C<static void
+pir_expr(struct emit_data *data, char *expr)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_expr(struct emit_data *data, char *expr)
+{
+    fprintf(data->file, "%s ", expr);
+}
+
+/*
+
+=item C<static void
+pir_op(struct emit_data *data, char *op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_op(struct emit_data *data, char *op)
+{
+    fprintf(data->file, "  %s ", op);
+    data->need_comma = 0;
+}
+
+
+/*
+
+=item C<static void
+pir_list_start(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_list_start(struct emit_data *data)
+{
+    fprintf(data->file, "(");
+    data->need_comma = 0;
+}
+
+/*
+
+=item C<static void
+pir_list_end(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_list_end(struct emit_data *data)
+{
+    fprintf(data->file, ")");
+    data->need_comma = 0;
+}
+
+/*
+
+=item C<static void
+pir_sub_flag_start(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_sub_flag_start(struct emit_data *data)
+{
+    fprintf(data->file, "");
+}
+
+
+/*
+
+=item C<static void
+pir_sub_flag_end(struct emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_sub_flag_end(struct emit_data *data)
+{
+    fprintf(data->file, "\n");
+}
+
+/*
+
+=item C<static void
+pir_destroy(emit_data *data)>
+
+Close the output file, free the emit_data structure.
+
+=cut
+
+*/
+
+static void
+pir_destroy(emit_data *data)
+{
     if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
 }
 
+/*
+
+=item C<static void
+pir_target(emit_data *data, char *target)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_target(emit_data *data, char *target) {
+pir_target(emit_data *data, char *target)
+{
     add_target(data, new_target(target));
 }
 
+/*
+
+=item C<static void
+pir_begin_return(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_begin_return(emit_data *data) {
+pir_begin_return(emit_data *data)
+{
     fprintf(data->file, " ");
 }
 
+/*
+
+=item C<static void
+pir_init(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_init(emit_data *data) {
+pir_init(emit_data *data)
+{
     if (data->outputfile) data->file = open_file(data->outputfile, "w");
     else data->file = stdout;
 }
 
-/* print the list of targets stored in emit_data. This is done recursively,
- * and from the end of the list to the front. This is because the items are
- * added at the front, and the order need to be restored. This also allows
- * for freeing any resources.
- */
+/*
+
+=item C<static void
+print_target(emit_data *data, target *t)>
+
+print the list of targets stored in emit_data. This is done recursively,
+and from the end of the list to the front. This is because the items are
+added at the front, and the order need to be restored. This also allows
+for freeing any resources.
+
+=cut
+
+*/
+
 static void
-print_target(emit_data *data, target *t) {
+print_target(emit_data *data, target *t)
+{
     if (t->next) print_target(data, t->next);
     fprintf(data->file, "%s", t->name);
 
@@ -208,8 +421,20 @@ print_target(emit_data *data, target *t) {
 
 }
 
+/*
+
+=item C<static void
+pir_assign(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_assign(emit_data *data) {
+pir_assign(emit_data *data)
+{
     target *t = data->targets;
     /* XXX does not work correctly yet.
     print_target(data, t);
@@ -217,31 +442,77 @@ pir_assign(emit_data *data) {
     fprintf(data->file, " = ");
 }
 
+/*
+
+=item C<static void
+pir_assign_start(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_assign_start(emit_data *data) {
+pir_assign_start(emit_data *data)
+{
     fprintf(data->file, "  ");
 }
 
+/*
+
+=item C<static void
+pir_assign_end(emit_data *data)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-pir_assign_end(emit_data *data) {
+pir_assign_end(emit_data *data)
+{
     fprintf(data->file, "\n");
 }
 
-static void
-pir_comp_op(emit_data *data, char *op) {
-    fprintf(data->file, " %s ", op);
-}
+/*
+
+=item C<static void
+pir_comp_op(emit_data *data, char *op)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static void
-pir_bin_op(emit_data *data, char *op) {
+pir_comp_op(emit_data *data, char *op)
+{
     fprintf(data->file, " %s ", op);
 }
 
 /*
 
-=over 4
+=item C<static void
+pir_bin_op(emit_data *data, char *op)>
 
-=item init_pir_vtable()
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static void
+pir_bin_op(emit_data *data, char *op)
+{
+    fprintf(data->file, " %s ", op);
+}
+
+/*
+
+=item C<struct pirvtable * init_pir_vtable(char *outputfile)>
 
 Creates a vtable for the PIR emitting module, and
 then this vtable is set into the parser_state struct.
@@ -250,7 +521,8 @@ then this vtable is set into the parser_state struct.
 
 */
 struct pirvtable *
-init_pir_vtable(char *outputfile) {
+init_pir_vtable(char *outputfile)
+{
 
     pirvtable *vtable = new_pirvtable();
 
@@ -291,10 +563,6 @@ init_pir_vtable(char *outputfile) {
 
     return vtable;
 }
-
-
-
-
 
 /*
 

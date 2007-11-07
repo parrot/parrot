@@ -30,7 +30,8 @@ extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * c
 =over 4
 
 
-=item C<syntax_error>
+=item C<void
+syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message)>
 
 wrapper function for yyerror. This is useful, so that if yyerror's
 signature changes, calls to syntax_error in the lexer do not need
@@ -38,19 +39,22 @@ to be updated.
 
 */
 void
-syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message) {
+syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message)
+{
     yyerror(yyscanner, lexer, message);
 }
 
 /*
 
-=item C<print_help>
+=item C<static void
+print_help(char const * const program_name)>
 
 Routine to print usage of this program.
 
 */
 static void
-print_help(char const * const program_name) {
+print_help(char const * const program_name)
+{
 
     fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
     fprintf(stderr, "Options:\n\n");
@@ -63,10 +67,17 @@ print_help(char const * const program_name) {
 
 
 /*
- * Main compiler driver.
- */
+
+=item C<int main(int argc, char *argv[])>
+
+Main compiler driver.
+
+=cut
+
+*/
 int
-main(int argc, char *argv[]) {
+main(int argc, char *argv[])
+{
     char const * const program_name = argv[0];
     lexer_state *lexer = NULL;
     int   flexdebug    = 0;
@@ -164,13 +175,15 @@ main(int argc, char *argv[]) {
 
 /*
 
-=item C<yyerror>
+=item C<int
+yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message)>
 
 Parse error handling routine.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message) {
+yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message)
+{
     char const * const text = yyget_text(yyscanner);
     lexer->parse_errors++;
 

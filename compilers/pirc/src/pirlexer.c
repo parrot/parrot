@@ -272,25 +272,25 @@ static char const * dictionary[] = {
     NULL                        /*                          */
 };
 
-
-
-
 /*
 
 =head2 file_buffer structure
 
-Structure that represents a file. Its layout is shown below. First, it contains the filename
-of the file that is represented by this buffer. Then, the buffer is an array that holds the
-complete file contents. This is done for efficiency (instead of reading character by character
-from disk). The C<curchar> acts like a cursor, that points to the current character.
-The field C<filesize> contains the size of the file counted in bytes, C<line> keeps track of
-the current line number, and C<linepos> counts the number of characters since the last newline
-character. The field C<lastchar> stores the previous character (so the character I<before> the
-character pointed to by C<curchar>. This field is used to decide whether the previous character
-was a newline. If so, then C<curchar> is at the start of a line (needed for Heredoc delimiters).
+Structure that represents a file. Its layout is shown below. First, it contains
+the filename of the file that is represented by this buffer. Then, the buffer
+is an array that holds the complete file contents. This is done for efficiency
+(instead of reading character by character from disk). The C<curchar> acts like
+a cursor, that points to the current character.  The field C<filesize> contains
+the size of the file counted in bytes, C<line> keeps track of the current line
+number, and C<linepos> counts the number of characters since the last newline
+character. The field C<lastchar> stores the previous character (so the
+character I<before> the character pointed to by C<curchar>. This field is used
+to decide whether the previous character was a newline. If so, then C<curchar>
+is at the start of a line (needed for Heredoc delimiters).
 
-The field C<prevbuffer> points to another file_buffer; if the current file was C<.include>d,
-then C<prevbuffer> points to the file_buffer that represents the including file. An example:
+The field C<prevbuffer> points to another file_buffer; if the current file was
+C<.include>d, then C<prevbuffer> points to the file_buffer that represents the
+including file. An example:
 
  $ cat main.pir
 
@@ -306,9 +306,10 @@ then C<prevbuffer> points to the file_buffer that represents the including file.
  # ...
  .end
 
-In this case, when parsing the file C<main.pir>, C<prevbuffer> is NULL, because this file was
-not included. Then, when the file C<util.pir> is included, a new file_buffer is created for that
-file, and C<prevbuffer> is set to the file_buffer representing C<main.pir>.
+In this case, when parsing the file C<main.pir>, C<prevbuffer> is NULL, because
+this file was not included. Then, when the file C<util.pir> is included, a new
+file_buffer is created for that file, and C<prevbuffer> is set to the
+file_buffer representing C<main.pir>.
 
 The file_buffer structure is shown below:
 
@@ -343,9 +344,9 @@ typedef struct file_buffer {
 
 =head2 lexer_state structure
 
-Structure representing the lexer. It holds a pointer to
-the current file being read, a buffer holding the current
-token, and a pointer to add characters to the token buffer.
+Structure representing the lexer. It holds a pointer to the current file being
+read, a buffer holding the current token, and a pointer to add characters to
+the token buffer.
 
  typedef struct lexer_state {
      struct file_buffer *curfile;    -- pointer to the current file
@@ -371,7 +372,7 @@ typedef struct lexer_state {
 
 =over 4
 
-=item find_keyword()
+=item C<char const * find_keyword(token t)>
 
 Get the spelling of a keyword based on the specified token.
 
@@ -379,14 +380,15 @@ Get the spelling of a keyword based on the specified token.
 
 */
 char const *
-find_keyword(token t) {
+find_keyword(token t)
+{
     PARROT_ASSERT((t >= 0) && (t <= MAX_TOKEN));
     return dictionary[t];
 }
 
 /*
 
-=item get_current_token()
+=item C<char * const get_current_token(lexer_state const *s)>
 
 return a constant pointer to the current token buffer
 
@@ -394,14 +396,15 @@ return a constant pointer to the current token buffer
 
 */
 char * const
-get_current_token(lexer_state const *s) {
+get_current_token(lexer_state const *s)
+{
     PARROT_ASSERT(s->token_chars);
     return s->token_chars;
 }
 
 /*
 
-=item get_current_file()
+=item C<char * const get_current_file(struct lexer_state *s)>
 
 return a constant pointer to the current file name
 
@@ -409,14 +412,15 @@ return a constant pointer to the current file name
 
 */
 char * const
-get_current_file(struct lexer_state *s) {
+get_current_file(struct lexer_state *s)
+{
     PARROT_ASSERT(s->curfile->filename);
     return s->curfile->filename;
 }
 
 /*
 
-=item get_current_line()
+=item C<long get_current_line(struct lexer_state *s)>
 
 return the current line number
 
@@ -424,13 +428,14 @@ return the current line number
 
 */
 long
-get_current_line(struct lexer_state *s) {
+get_current_line(struct lexer_state *s)
+{
     return s->curfile->line;
 }
 
 /*
 
-=item get_current_linepos()
+=item C<unsigned short get_current_linepos(struct lexer_state *s)>
 
 Returns the current line position (i.o.w., how many characters
 have been read on the current line?)
@@ -439,13 +444,14 @@ have been read on the current line?)
 
 */
 unsigned short
-get_current_linepos(struct lexer_state *s) {
+get_current_linepos(struct lexer_state *s)
+{
     return s->curfile->linepos;
 }
 
 /*
 
-=item get_current_filepos()
+=item C<long get_current_filepos(struct lexer_state *s)>
 
 Returns the number of charactars read in the current file so far.
 
@@ -453,13 +459,14 @@ Returns the number of charactars read in the current file so far.
 
 */
 long
-get_current_filepos(struct lexer_state *s) {
+get_current_filepos(struct lexer_state *s)
+{
     return (s->curfile->curchar - s->curfile->buffer);
 }
 
 /*
 
-=item print_error_context()
+=item C<void print_error_context(struct lexer_state *s)>
 
 Print some surrounding text from the file to indicate
 where the error occurred. This may make finding the error
@@ -469,7 +476,8 @@ easier.
 
 */
 void
-print_error_context(struct lexer_state *s) {
+print_error_context(struct lexer_state *s)
+{
     /* print context of max. size ERROR_CONTEXT_SIZE */
     int read_chars     = s->curfile->curchar - s->curfile->buffer; /* get no. of read chars. */
     int context_length = (read_chars > ERROR_CONTEXT_SIZE) ? ERROR_CONTEXT_SIZE : read_chars;
@@ -496,7 +504,7 @@ print_error_context(struct lexer_state *s) {
 
 =over 4
 
-=item buffer_char()
+=item C<static void buffer_char(lexer_state *lexer, char c)>
 
 Store a character in the lexer's buffer.
 
@@ -504,7 +512,8 @@ Store a character in the lexer's buffer.
 
 */
 static void
-buffer_char(lexer_state *lexer, char c) {
+buffer_char(lexer_state *lexer, char c)
+{
     /* put c into *lexer->charptr and increment the pointer */
     *lexer->charptr++ = c;
 }
@@ -512,7 +521,7 @@ buffer_char(lexer_state *lexer, char c) {
 
 /*
 
-=item read_char()
+=item C<static char read_char(file_buffer *buf)>
 
 Return the next character from the buffer.
 It's a good idea to check for "c == EOF_MARKER" after each call.
@@ -521,7 +530,8 @@ It's a good idea to check for "c == EOF_MARKER" after each call.
 
 */
 static char
-read_char(file_buffer *buf) {
+read_char(file_buffer *buf)
+{
     char c = *buf->curchar;
 
     /* store previous character, but only if not at first character of file */
@@ -536,7 +546,7 @@ read_char(file_buffer *buf) {
 
 /*
 
-=item unread_char()
+=item C<static void unread_char(file_buffer *buf)>
 
 Push back the last read character.
 
@@ -544,14 +554,15 @@ Push back the last read character.
 
 */
 static void
-unread_char(file_buffer *buf) {
+unread_char(file_buffer *buf)
+{
    --buf->curchar;
    --buf->linepos;
 }
 
 /*
 
-=item print_buffer()
+=item C<static void print_buffer(lexer_state *lexer)>
 
 Debug function to show the rest of the current buffer.
 (starting from current character)
@@ -560,7 +571,8 @@ Debug function to show the rest of the current buffer.
 
 */
 static void
-print_buffer(lexer_state *lexer) {
+print_buffer(lexer_state *lexer)
+{
     fprintf(stderr, "token buffer: [%s]\n", lexer->token_chars);
     /*
     fprintf(stderr, "Rest of buffer of file '%s'\n", lexer->curfile->filename);
@@ -571,7 +583,7 @@ print_buffer(lexer_state *lexer) {
 
 /*
 
-=item clear_buffer()
+=item C<static void clear_buffer(lexer_state *lexer)>
 
 Clears the buffer in which the current token
 is stored.
@@ -580,7 +592,8 @@ is stored.
 
 */
 static void
-clear_buffer(lexer_state *lexer) {
+clear_buffer(lexer_state *lexer)
+{
     while (lexer->charptr >= lexer->token_chars) {
         *lexer->charptr-- = '\0';
     }
@@ -592,7 +605,7 @@ clear_buffer(lexer_state *lexer) {
 
 /*
 
-=item read_file()
+=item C<static file_buffer * read_file(char const * filename)>
 
 Allocate a new file_buffer structure, allocate
 memory for the file's contents and read all contents
@@ -602,7 +615,8 @@ into this buffer. The file_buffer structure is returned.
 
 */
 static file_buffer *
-read_file(char const * filename) {
+read_file(char const * filename)
+{
     FILE *fileptr         = NULL;
     file_buffer *filebuff = NULL;
     struct stat filestatus;
@@ -653,7 +667,7 @@ read_file(char const * filename) {
 
 /*
 
-=item destroy_buffer()
+=item C<static void destroy_buffer(file_buffer *buf)>
 
 Destructor for file_buffer.
 
@@ -661,7 +675,8 @@ Destructor for file_buffer.
 
 */
 static void
-destroy_buffer(file_buffer *buf) {
+destroy_buffer(file_buffer *buf)
+{
     free(buf->buffer);
     buf->buffer = NULL; /* good programming practice :-) */
     free(buf);
@@ -672,7 +687,7 @@ destroy_buffer(file_buffer *buf) {
 
 /*
 
-=item do_include_file()
+=item C<static void do_include_file(lexer_state *lexer, char const * filename)>
 
 Calls read_file() that returns a file_buffer structure.
 This file_buffer's previous buffer is set to the current file_buffer.
@@ -682,18 +697,16 @@ The newfile buffer is assigned to the lexer's current file buffer.
 
 */
 static void
-do_include_file(lexer_state *lexer, char const * filename) {
+do_include_file(lexer_state *lexer, char const * filename)
+{
     file_buffer *newfile = read_file(filename);
     newfile->prevbuffer  = lexer->curfile;
     lexer->curfile       = newfile;
 }
 
-
-
-
 /*
 
-=item is_start_of_line()
+=item C<static int is_start_of_line(file_buffer *buf)>
 
 Checks whether the current pointer in the specified file buffer
 is at the beginning of a line.
@@ -702,7 +715,8 @@ is at the beginning of a line.
 
 */
 static int
-is_start_of_line(file_buffer *buf) {
+is_start_of_line(file_buffer *buf)
+{
     if (buf->lastchar == '\n') return 1;
     /* start of file: start of line    */
     if (buf->curchar == buf->buffer) return 1;
@@ -712,7 +726,8 @@ is_start_of_line(file_buffer *buf) {
 
 /*
 
-=item check_dictionary()
+=item C<static token
+check_dictionary(lexer_state *lexer, char const *dictionary[])>
 
 Checks whether the current token is a member of the specified
 dictionary. If it is, the index of the word in the dict. is returned.
@@ -722,7 +737,8 @@ If not, T_NOT_FOUND is returned.
 
 */
 static token
-check_dictionary(lexer_state *lexer, char const *dictionary[]) {
+check_dictionary(lexer_state *lexer, char const *dictionary[])
+{
     int index = 0;
     char const * word = dictionary[index];
     /* check all words in dictionary; if equal, return its token enum value */
@@ -736,7 +752,7 @@ check_dictionary(lexer_state *lexer, char const *dictionary[]) {
 
 /*
 
-=item switch_buffer()
+=item C<static void switch_buffer(lexer_state *lexer)>
 
 set the current file_buffer to the previous one stored in
 the field prevbuffer. The .include'ing file is now continued
@@ -746,7 +762,8 @@ to be processed after this.
 
 */
 static void
-switch_buffer(lexer_state *lexer) {
+switch_buffer(lexer_state *lexer)
+{
     file_buffer *tmp = NULL;
 
     PARROT_ASSERT(lexer->curfile->prevbuffer != NULL);
@@ -759,7 +776,7 @@ switch_buffer(lexer_state *lexer) {
 
 /*
 
-=item read_digits()
+=item C<static int read_digits(lexer_state *lexer)>
 
 Helper function to read as many digits into the current token's buffer.
 Returns the number of digits read.
@@ -768,7 +785,8 @@ Returns the number of digits read.
 
 */
 static int
-read_digits(lexer_state *lexer) {
+read_digits(lexer_state *lexer)
+{
     int count = 0;
     char c    = read_char(lexer->curfile);
 
@@ -783,7 +801,7 @@ read_digits(lexer_state *lexer) {
 
 /*
 
-=item update_line()
+=item C<static void update_line(lexer_state *lexer)>
 
 Updates the line number in the lexer, and resets
 the line position pointer.
@@ -792,7 +810,8 @@ the line position pointer.
 
 */
 static void
-update_line(lexer_state *lexer) {
+update_line(lexer_state *lexer)
+{
     ++lexer->curfile->line;
     lexer->curfile->linepos = 0; /* start of newline */
 
@@ -801,7 +820,7 @@ update_line(lexer_state *lexer) {
 
 /*
 
-=item read_string()
+=item C<static token read_string(lexer_state *lexer, char delimiter)>
 
 Read a quoted string.
 
@@ -809,7 +828,8 @@ Read a quoted string.
 
 */
 static token
-read_string(lexer_state *lexer, char delimiter) {
+read_string(lexer_state *lexer, char delimiter)
+{
     char c;
     buffer_char(lexer, delimiter); /* buffer first delimiter */
     do {
@@ -828,8 +848,6 @@ read_string(lexer_state *lexer, char delimiter) {
     return T_STRING_CONSTANT;
 }
 
-
-
 /*
 
 =back
@@ -838,7 +856,7 @@ read_string(lexer_state *lexer, char delimiter) {
 
 =over 4
 
-=item read_heredoc()
+=item C<token read_heredoc(lexer_state *lexer, char *heredoc_label)>
 
 Reads heredoc text up to the specified heredoc label.
 Returns either T_HEREDOC_STRING if successful, or T_EOF (if encountered).
@@ -848,7 +866,8 @@ The heredoc string is stored in the token buffer.
 
 */
 token
-read_heredoc(lexer_state *lexer, char *heredoc_label) {
+read_heredoc(lexer_state *lexer, char *heredoc_label)
+{
     char *heredoc_iter = heredoc_label;
     char c;
 
@@ -871,8 +890,10 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
             }
 
             /* the loop broke, but why? */
-            if (*heredoc_iter == '\0' && isspace((unsigned char)c)) { /* loop broke because heredoc label was fully iterated; success! */
-                unread_char(lexer->curfile); /* we read 1 char too many; put back last read character */
+            if (*heredoc_iter == '\0' && isspace((unsigned char)c)) {
+                /* loop broke because heredoc label was fully iterated; success! */
+                /* we read 1 char too many; put back last read character */
+                unread_char(lexer->curfile);
                 return T_HEREDOC_STRING;   /* return success */
             }
         }
@@ -891,7 +912,7 @@ read_heredoc(lexer_state *lexer, char *heredoc_label) {
 
 /*
 
-=item read_macro()
+=item C<token read_macro(lexer_state *lexer)>
 
 Just skip all tokens until we find ".endm" (or end of file)
 Later this can be improved.
@@ -900,7 +921,8 @@ Later this can be improved.
 
 */
 token
-read_macro(lexer_state *lexer) {
+read_macro(lexer_state *lexer)
+{
     token t;
     do {
         t = next_token(lexer);
@@ -909,11 +931,9 @@ read_macro(lexer_state *lexer) {
     return t; /* return either T_ENDM or T_EOF */
 }
 
-
-
 /*
 
-=item new_lexer()
+=item C<lexer_state * new_lexer(char const * filename)>
 
 Constructor for the lexer.
 
@@ -921,7 +941,8 @@ Constructor for the lexer.
 
 */
 lexer_state *
-new_lexer(char const * filename) {
+new_lexer(char const * filename)
+{
     lexer_state *lexer = (lexer_state *)malloc(sizeof (lexer_state));
     if (lexer == NULL) {
         fprintf(stderr, "Error in new_lexer(): failed to allocate memory for lexer\n");
@@ -942,7 +963,7 @@ new_lexer(char const * filename) {
 
 /*
 
-=item destroy_lexer()
+=item C<void destroy_lexer(lexer_state *lexer)>
 
 Destructor for lexer.
 
@@ -950,7 +971,8 @@ Destructor for lexer.
 
 */
 void
-destroy_lexer(lexer_state *lexer) {
+destroy_lexer(lexer_state *lexer)
+{
     /* destroy the buffers */
     file_buffer *buf = lexer->curfile;
     while (buf) {
@@ -965,12 +987,9 @@ destroy_lexer(lexer_state *lexer) {
     lexer = NULL;
 }
 
-
-
-
 /*
 
-=item include_file()
+=item C<void open_include_file(lexer_state *lexer)>
 
 This function takes a quoted string, to be found
 the current token, and removes the quotes.
@@ -980,7 +999,8 @@ Then the file is included through do_include_file().
 
 */
 void
-open_include_file(lexer_state *lexer) {
+open_include_file(lexer_state *lexer)
+{
     char *filename = lexer->token_chars;
     int len = strlen(filename);
 
@@ -995,7 +1015,7 @@ open_include_file(lexer_state *lexer) {
 
 /*
 
-=item close_file()
+=item C<void close_include_file(NOTNULL(lexer_state *lexer))>
 
 Opposite of include_file(), it sets the current file in the lexer
 to the 'including' file (found through the 'prevbuffer' pointer).
@@ -1010,11 +1030,9 @@ close_include_file(NOTNULL(lexer_state *lexer))
     switch_buffer(lexer);
 }
 
-
-
 /*
 
-=item next_token()
+=item C<token next_token(lexer_state *lexer)>
 
 Reads a token from the current file buffer.
 
@@ -1026,7 +1044,8 @@ Reads a token from the current file buffer.
 
 */
 token
-next_token(lexer_state *lexer) {
+next_token(lexer_state *lexer)
+{
     int ok    = 1;
     int count = 0;
 
@@ -1125,8 +1144,8 @@ is indicated explicitly.
 =cut
 
 */
-
-        if (isalpha((unsigned char)c) || c == '_') {  /* check for identifier, op, invocant or label */
+        /* check for identifier, op, invocant or label */
+        if (isalpha((unsigned char)c) || c == '_') {
 
             /* handle pasm registers */
             if (c == 'P' || c == 'I' || c == 'N' || c == 'S') {
@@ -1136,8 +1155,8 @@ is indicated explicitly.
                 count = read_digits(lexer); /* read digits and count how many */
                 c = read_char(lexer->curfile); /* the last one was not a digit, re-read it */
 
-                /* only if the current char is not an alpha and we just read a number of digits,
-                 * can this be a pasm register. */
+                /* only if the current char is not an alpha and we just
+                 * read a number of digits, can this be a pasm register. */
                 if (count > 0 && !isalpha((unsigned char)c)) {
                     if (c != '.') {
                         /* last char was not a dot, so this is not an invocant */
@@ -1280,7 +1299,8 @@ is indicated explicitly.
                     c = read_char(lexer->curfile);
                     if (c == EOF_MARKER) return T_EOF;
 
-                    while (isalnum((unsigned char)c) || c == '_') { /* this is all part of the label name */
+                    /* this is all part of the label name */
+                    while (isalnum((unsigned char)c) || c == '_') {
                         buffer_char(lexer, c);
                         c = read_char(lexer->curfile);
                         if (c == EOF_MARKER) return T_EOF;

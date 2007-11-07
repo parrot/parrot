@@ -35,6 +35,8 @@ The PAST back-end implements the C<emit_data> data structure.
 Currently, only a single data member is used, to control the
 indention.
 
+=over 4
+
 =cut
 
 */
@@ -46,36 +48,59 @@ typedef struct emit_data {
 
 } emit_data;
 
+/*
 
-/* increase the indention level */
+=item C<static int indent(emit_data *data)>
+
+increase the indention level
+
+=cut
+
+*/
+
 static int
-indent(emit_data *data) {
+indent(emit_data *data)
+{
     data->indent += INDENT;
     return data->indent;
 }
 
-/* decreate the indention level */
+/*
+
+=item C<static int dedent(emit_data *data)>
+
+decrease the indention level
+
+=cut
+
+*/
+
 static int
-dedent(emit_data *data) {
+dedent(emit_data *data)
+{
     data->indent -= INDENT;
     return data->indent;
 }
 
 /*
 
+=back
+
 =head1 PAST VTABLE ENTRIES
 
 =over 4
 
-=item past_init()
+=item C<static void past_init(struct emit_data *data)>
 
 Prints initializing PAST: ["past" => PMC 'PAST::Block' {]
 
 =cut
 
 */
+
 static void
-past_init(struct emit_data *data) {
+past_init(struct emit_data *data)
+{
 
     if (data->outputfile) data->file = open_file(data->outputfile, "w");
     else data->file = stdout;
@@ -86,7 +111,7 @@ past_init(struct emit_data *data) {
 
 /*
 
-=item past_block()
+=item C<static void past_block(struct emit_data *data)>
 
 Prints PAST for a block, including <source> and <pos> attributes.
 
@@ -94,24 +119,49 @@ Prints PAST for a block, including <source> and <pos> attributes.
 
 */
 static void
-past_block(struct emit_data *data) {
+past_block(struct emit_data *data)
+{
     fprintf(data->file, "%*sPMC 'PAST::Block'  {\n", data->indent, " ");
     indent(data);
 }
 
+/*
+
+=item C<static void
+past_source(emit_data *data, char *source)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-past_source(emit_data *data, char *source) {
+past_source(emit_data *data, char *source)
+{
     fprintf(data->file, "%*s<source> => \"%s\"\n", data->indent, " ", source);
 }
 
+/*
+
+=item C<static void
+past_position(emit_data *data, int pos)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static void
-past_position(emit_data *data, int pos) {
+past_position(emit_data *data, int pos)
+{
     fprintf(data->file, "%*s<pos> => %d\n", data->indent, " ", pos);
 }
 
 /*
 
-=item past_close()
+=item C<static void past_close(struct emit_data *data)>
 
 Close down a PAST entity. The closing brace is printed, and the
 indention level is decremented.
@@ -119,8 +169,10 @@ indention level is decremented.
 =cut
 
 */
+
 static void
-past_close(struct emit_data *data) {
+past_close(struct emit_data *data)
+{
     dedent(data);
     /* check for indent == 0, if so, then print no space, this is
      * so otherwise a single space is printed.
@@ -131,21 +183,23 @@ past_close(struct emit_data *data) {
 
 /*
 
-=item past_name()
+=item C<static void past_name(struct emit_data *data, char *name)>
 
 Prints a PAST <name> entry.
 
 =cut
 
 */
+
 static void
-past_name(struct emit_data *data, char *name) {
+past_name(struct emit_data *data, char *name)
+{
     fprintf(data->file, "%*s<name> => \"%s\"\n", data->indent, " ", name);
 }
 
 /*
 
-=item past_stmts()
+=item C<static void past_stmts(struct emit_data *data)>
 
 Opens a PAST::Stmts node.
 
@@ -153,14 +207,15 @@ Opens a PAST::Stmts node.
 
 */
 static void
-past_stmts(struct emit_data *data) {
+past_stmts(struct emit_data *data)
+{
     fprintf(data->file, "%*s[%d] => PMC 'PAST::Stmts'  {\n", data->indent, " ", data->index++);
     indent(data);
 }
 
 /*
 
-=item past_param()
+=item C<static void past_param(struct emit_data *data)>
 
 Generates a PAST::Var node and set its scope attribute to "parameter".
 
@@ -168,7 +223,8 @@ Generates a PAST::Var node and set its scope attribute to "parameter".
 
 */
 static void
-past_param(struct emit_data *data) {
+past_param(struct emit_data *data)
+{
     fprintf(data->file, "%*sFIXTHIS => PMC 'PAST::Var'  {\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s<scope> => \"parameter\"\n", data->indent, " ");
@@ -176,29 +232,33 @@ past_param(struct emit_data *data) {
 
 /*
 
-=item past_type()
+=item C<static void past_type(struct emit_data *data, char *type)>
 
-
+TODO: Not yet documented!!!
 
 =cut
 
 */
+
 static void
-past_type(struct emit_data *data, char *type) {
+past_type(struct emit_data *data, char *type)
+{
     fprintf(data->file, "%*s<type> => \"%s\"\n", data->indent, " ", type);
 }
 
 /*
 
-=item past_subflag()
+=item C<static void past_subflag(struct emit_data *data, int flag)>
 
-
+TODO: Not yet documented!!!
 
 =cut
 
 */
+
 static void
-past_subflag(struct emit_data *data, int flag) {
+past_subflag(struct emit_data *data, int flag)
+{
     /* fprintf(data->file, "%*s<???> => \"%s\"\n", data->indent, " ", type);
     */
 }
@@ -206,15 +266,17 @@ past_subflag(struct emit_data *data, int flag) {
 
 /*
 
-=item past_op()
+=item C<static void past_op(struct emit_data *data, char *op)>
 
-
+TODO: Not yet documented!!!
 
 =cut
 
 */
+
 static void
-past_op(struct emit_data *data, char *op) {
+past_op(struct emit_data *data, char *op)
+{
     fprintf(data->file, "%*sFIXME => PMC 'PAST::Op'  {\n", data->indent, " ");
     indent(data);
     fprintf(data->file, "%*s<pirop> => \"%s\"\n", data->indent, " ", op);
@@ -223,37 +285,42 @@ past_op(struct emit_data *data, char *op) {
 
 /*
 
-=item past_expr()
+=item C<static void past_expr(struct emit_data *data, char *expr)>
 
-
+TODO: Not yet documented!!!
 
 =cut
 
 */
+
 static void
-past_expr(struct emit_data *data, char *expr) {
+past_expr(struct emit_data *data, char *expr)
+{
     fprintf(data->file, "%*s[%d] => \"%s\"\n", data->indent, " ", data->index++, expr);
     /* fix index */
 }
 
 /*
 
-=item past_destroy()
+=item C<static void past_destroy(emit_data *data)>
 
 Destructor, close the outputfile if any, and free the emit_data structure.
 
 =cut
 
 */
+
 static void
-past_destroy(emit_data *data) {
+past_destroy(emit_data *data)
+{
     if (data->outputfile) fclose(data->file);
     free(data);
     data = NULL;
 }
+
 /*
 
-=item init_past_vtable()
+=item C<pirvtable * init_past_vtable(char *outputfile)>
 
 Creates a vtable for the PAST emitting module, and
 then this vtable is set into the parser_state struct.
@@ -261,8 +328,10 @@ then this vtable is set into the parser_state struct.
 =cut
 
 */
+
 pirvtable *
-init_past_vtable(char *outputfile) {
+init_past_vtable(char *outputfile)
+{
     pirvtable *vtable = new_pirvtable();
 
     /* override vtable methods */
@@ -297,8 +366,6 @@ init_past_vtable(char *outputfile) {
     return vtable;
 }
 
-
-
 /*
 
 =back
@@ -306,7 +373,6 @@ init_past_vtable(char *outputfile) {
 =cut
 
 */
-
 
 /*
  * Local variables:
