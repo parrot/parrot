@@ -182,9 +182,6 @@ simple string
 1
 OUTPUT
 
-TODO: {
-    local $TODO = 'empty string not handled by PIR.';
-
     pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
@@ -200,7 +197,6 @@ CODE
 
 1
 OUTPUT
-}
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .loadlib "wmls_ops"

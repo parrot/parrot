@@ -197,9 +197,6 @@ simple string
 1
 OUTPUT
 
-TODO: {
-    local $TODO = 'empty string not handled by PIR.';
-
     pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
 .HLL 'Lua', 'lua_group'
 .sub _main
@@ -215,7 +212,6 @@ CODE
 
 1
 OUTPUT
-}
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'

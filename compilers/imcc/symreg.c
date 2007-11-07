@@ -189,8 +189,7 @@ _mk_symreg(NOTNULL(SymHash* hsh), NOTNULL(char *name), int t)
     r->color      = -1;
     r->want_regno = -1;
 
-    if (name[0])
-        _store_symreg(hsh,r);
+    _store_symreg(hsh,r);
 
     return r;
 }
