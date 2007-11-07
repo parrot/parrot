@@ -4,15 +4,64 @@
  */
 
 /*
- * memalign related stuff
- */
+
+=head1 NAME
+
+memalign.c
+
+=head1 DESCRIPTION
+
+memalign related stuff
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <mach/vm_map.h>
 #include <mach/mach_init.h>
 
-static unsigned log2int(unsigned x) { return (x<2) ? 0 : log2int(x>>1)+1; }
+/*
 
-static unsigned roundDownPowerOf2(unsigned x) { return (1 << log2int(x)); }
+=item C<static unsigned log2int(unsigned x)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static unsigned log2int(unsigned x) {
+    return (x<2) ? 0 : log2int(x>>1)+1;
+}
+
+/*
+
+=item C<static unsigned roundDownPowerOf2(unsigned x)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
+static unsigned roundDownPowerOf2(unsigned x) {
+    return (1 << log2int(x));
+}
+
+/*
+
+=item C<static unsigned roundUpPowerOf2(unsigned x)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 static unsigned roundUpPowerOf2(unsigned x)
 {
     static unsigned one = 1;
@@ -20,6 +69,16 @@ static unsigned roundUpPowerOf2(unsigned x)
 
     return ((one << log2Int) == x) ? x : (one << (log2Int + 1));
 }
+
+/*
+
+=item C<static unsigned roundUpToPageBoundary(unsigned x)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 static unsigned roundUpToPageBoundary(unsigned x)
 {
@@ -31,6 +90,17 @@ static unsigned roundUpToPageBoundary(unsigned x)
 typedef struct _memalign_marker_t {
                     vm_address_t start;
                     vm_size_t size; } memalign_marker_t;
+
+/*
+
+=item C<void *
+Parrot_memalign(size_t align, size_t size)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
 
 void *
 Parrot_memalign(size_t align, size_t size)
@@ -122,6 +192,17 @@ Parrot_memalign(size_t align, size_t size)
     }
 }
 
+/*
+
+=item C<void
+Parrot_free_memalign(void *p)>
+
+TODO: Not yet documented!!!
+
+=cut
+
+*/
+
 void
 Parrot_free_memalign(void *p)
 {
@@ -135,6 +216,14 @@ Parrot_free_memalign(void *p)
         fprintf(stderr, "Parrot_free_memalign(%p) failed!\n", p);
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

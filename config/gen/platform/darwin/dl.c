@@ -3,22 +3,44 @@
  * Copyright (C) 2004-2006, The Perl Foundation.
  */
 
+/*
+
+=head1 NAME
+
+dl.c
+
+=head1 DESCRIPTION
+
+The dl* functions showed up in OS X 10.3, but they are just a
+wrapper around the native dyld and NSModule API, so we'll use
+the base API directly. This gives us wider compatibility, and
+more control over the behavior.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #import <mach-o/dyld.h>
 
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
-/* The dl* functions showed up in OS X 10.3, but they are just a
-   wrapper around the native dyld and NSModule API, so we'll use
-   the base API directly. This gives us wider compatibility, and
-   more control over the behavior. */
-
 /*
-** scan_paths()
- */
 
-/* Simple routine to walk a colon separated list of directories in a string
-   and check for a file in each one, returning the first match.
-   Note that this returns a static buffer, and so is not thread-safe. */
+=item C<static const char *
+scan_paths(const char *filename, const char *libpath)>
+
+Simple routine to walk a colon separated list of directories in a string
+and check for a file in each one, returning the first match.
+Note that this returns a static buffer, and so is not thread-safe.
+
+=cut
+
+*/
+
 static const char *
 scan_paths(const char *filename, const char *libpath)
 {
@@ -48,14 +70,20 @@ scan_paths(const char *filename, const char *libpath)
 }
 
 /*
-** get_lib()
+
+=item C<static const char *
+get_lib(const char *filename)>
+
+Try to expand a filename input into a full file system path following
+the behavior described in dyld(1). First looks for the file in
+DYLD_LIBRARY_PATH, the DYLD_FALLBACK_LIBRARY_PATH, and lastly uses the
+default of /usr/local/lib:/lib:/usr/lib. If the filename cannot be
+expanded, the original value passed to the function is returned.
+
+=cut
+
 */
 
-/* Try to expand a filename input into a full file system path following
-   the behavior described in dyld(1). First looks for the file in
-   DYLD_LIBRARY_PATH, the DYLD_FALLBACK_LIBRARY_PATH, and lastly uses the
-   default of /usr/local/lib:/lib:/usr/lib. If the filename cannot be
-   expanded, the original value passed to the function is returned. */
 static const char *
 get_lib(const char *filename)
 {
@@ -80,7 +108,14 @@ get_lib(const char *filename)
 }
 
 /*
-** Parrot_dlopen()
+
+=item C<void *
+Parrot_dlopen(const char *filename)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -139,7 +174,14 @@ Parrot_dlopen(const char *filename)
 
 
 /*
-** Parrot_dlerror()
+
+=item C<const char *
+Parrot_dlerror(void)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 const char *
@@ -150,7 +192,14 @@ Parrot_dlerror(void)
 
 
 /*
-** Parrot_dlsym()
+
+=item C<void *
+Parrot_dlsym(void *handle, const char *symbol)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 void *
@@ -200,7 +249,14 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 
 /*
-** Parrot_dlclose()
+
+=item C<int
+Parrot_dlclose(void *handle)>
+
+TODO: Not yet documented!!!
+
+=cut
+
 */
 
 int
@@ -222,6 +278,13 @@ Parrot_dlclose(void *handle)
     }
 }
 
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
