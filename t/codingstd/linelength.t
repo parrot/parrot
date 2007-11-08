@@ -132,6 +132,7 @@ compilers/ast/astlexer.c
 compilers/ast/astparser.c
 compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
+compilers/pirc/new/main.c
 compilers/pirc/new/pirlexer.c
 compilers/pirc/new/pirlexer.h
 compilers/pirc/new/pirparser.c
