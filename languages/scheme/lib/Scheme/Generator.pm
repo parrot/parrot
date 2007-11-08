@@ -2178,13 +2178,13 @@ sub _type_predicate {
 
     my %types = (
         'boolean?'  => [ qw( Boolean ) ],
-        'complex?'  => [ qw( Integer Float Complex ) ],
+        'complex?'  => [ qw( Integer Rational Float Complex ) ],
         'integer?'  => [ qw( Integer ) ],
         'null?'     => [ qw( Undef ) ],
-        'number?'   => [ qw( Integer Float Complex ) ],
+        'number?'   => [ qw( Integer Rational Float Complex ) ],
         'pair?'     => [ qw( Array ) ],
-        'rational?' => [ qw( Integer ) ],
-        'real?'     => [ qw( Integer Float ) ],
+        'rational?' => [ qw( Integer Rational ) ],
+        'real?'     => [ qw( Integer Rational Float ) ],
         'string?'   => [ qw( String ) ],
     );
 
