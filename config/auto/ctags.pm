@@ -33,34 +33,53 @@ sub _init {
     return \%data;
 }
 
-our $verbose;
+my @ctags_variations =
+    defined( $ENV{TEST_CTAGS} )
+    ? @{ $ENV{TEST_CTAGS} }
+    : qw( ctags exuberant-ctags ctags-exuberant exctags );
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $verbose = $conf->options->get( 'verbose' );
+    my $verbose = $conf->options->get( 'verbose' );
     print "\n" if $verbose;
 
-    my @ctags_variations = qw( ctags exuberant-ctags ctags-exuberant exctags );
-    for my $ctags ( @ctags_variations ) {
-        my $output = capture_output( $ctags, '--version' ) || '';
-        print $output, "\n" if $verbose;
-        my $has_ctags = ( $output =~ m/Exuberant Ctags/ ) ? 1 : 0;
-        print $has_ctags, "\n" if $verbose;
-
-        if ( $has_ctags ) {
-            $conf->data->set( ctags => $ctags );
-            $self->set_result( 'yes' );
-            return 1;
-        }
-    }
-
-    # if we get to here, we didn't find a decent ctags; so just set it to
-    # ctags so that the Makefile is happy
-    $conf->data->set( ctags => 'ctags' );
-    $self->set_result( 'no' );
-
+    my ($ctags, $has_ctags) =
+        _probe_for_ctags([ @ctags_variations ], $verbose);
+    $self->_evaluate_ctags($conf, $ctags, $has_ctags);
     return 1;
+}
+
+sub _probe_for_ctags {
+    my $variations_ref = shift;
+    my $verbose = shift;
+    my ($ctags, $has_ctags);
+    while (defined (my $t = shift(@$variations_ref))) {
+        my $output = capture_output( $t, '--version' ) || '';
+        print $output, "\n" if $verbose;
+        $has_ctags = _probe_for_ctags_output($output, $verbose);
+        $ctags = $t if $has_ctags;
+        next unless $has_ctags;
+    }
+    return ($ctags, $has_ctags);
+}
+
+sub _probe_for_ctags_output {
+    my ($output, $verbose) = @_;
+    my $has_ctags = ( $output =~ m/Exuberant Ctags/ ) ? 1 : 0;
+    print $has_ctags, "\n" if $verbose;
+    return $has_ctags;
+}
+
+sub _evaluate_ctags {
+    my ($self, $conf, $ctags, $has_ctags) = @_;
+    if ($has_ctags) {
+        $conf->data->set( ctags => $ctags );
+        $self->set_result( 'yes' );
+    } else {
+        $conf->data->set( ctags => 'ctags' );
+        $self->set_result( 'no' );
+    }
 }
 
 1;
