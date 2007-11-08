@@ -400,7 +400,6 @@ count_exception_handlers(PARROT_INTERP)
     INTVAL stack_depth = 0;
     INTVAL eh_depth = 0;
     Stack_Entry_t *e;
-    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* Not all entries in the stack are exception handlers, so iterate over the
      * stack, counting exception handler entries. */
@@ -438,7 +437,6 @@ get_exception_handler(PARROT_INTERP, INTVAL target_depth)
     INTVAL stack_depth = 0;
     INTVAL eh_depth = 0;
     Stack_Entry_t *e;
-    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* Not all entries in the stack are exception handlers, so iterate over the
      * stack, counting exception handler entries. */
