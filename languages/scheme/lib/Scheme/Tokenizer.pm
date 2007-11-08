@@ -29,9 +29,12 @@ sub new {
          TOKEN:
          {
              return [ 'COMPLEX',     $1 ] if $target =~ m/\G ([-+]? \d+ [-+] \d+ i  )       /gcx;
-             return [ 'REAL',        $1 ] if $target =~ m/\G [-+]?           # optional sign
-                                                             ((\d+\.\d*) | (\.d+))
-                                                             ([eE][-+]?\d+)? # optional exponent
+             return [ 'REAL',        $1 ] if $target =~ m/\G
+                                                (                          # capture all
+                                                  [-+]?                    # optional sign
+                                                  (?:\d+\.\d*) | (?:\.d+)  # decimal point
+                                                  (?:[eE][-+]?\d+)?        # optional exponent
+                                                )
                                                                                             /gcx;
              return [ 'INTEGER',     $1 ] if $target =~ m/\G ([-+]? \d+)                    /gcx;
              return [ 'STRING',      $1 ] if $target =~ m/\G (".*?") # XXX: escaped quotes  /gcx;
