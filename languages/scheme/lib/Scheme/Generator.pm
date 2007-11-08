@@ -41,29 +41,6 @@ sub _new_regs {
         };
 }
 
-# save a number of registers on the stack
-# Mark it only in $self->{_regs}, _save_set() emits the PIR code 
-sub _save {
-    my $self  = shift;
-    my $count = shift;
-    my $type  = shift || 'P';
-
-    die "No registers to save"
-        unless $count && $count > 0;
-    die "Illegal register type"
-        unless $type && $type =~ m/\A [PS] \z/xms;
-    my @temp;
-    for ( 0 .. 31 ) {
-        next if $self->{regs}->{$type}{$_} == 1;
-        last if $count <= 0;
-        push @temp, "$type$_";
-        $self->{regs}->{$type}{$_} = 1;
-        $count--;
-    }
-
-    return @temp;
-}
-
 sub _save_set {
     my $self = shift;
 
@@ -83,13 +60,24 @@ sub _save_set {
 }
 
 # save a single register on the stack
+# PMC register is the default, String register 'S' is also allowed
+# Mark it only in $self->{_regs}, let _save_set() emit the PIR
 sub _save_1 {
     my $self = shift;
     my $type = shift || 'P';
 
-    my @temp = $self->_save( 1, $type );
+    die "Illegal register type" unless $type && $type =~ m/\A [PS] \z/xms;
 
-    return $temp[0];
+    my $temp;
+    for ( 0 .. 31 ) {
+        next if $self->{regs}->{$type}{$_} == 1;  # find first unsaved register
+
+        $temp = "$type$_";
+        $self->{regs}->{$type}{$_} = 1;
+        last;
+    }
+
+    return $temp;
 }
 
 # say that a register should not be saved by _save_set()
@@ -115,15 +103,15 @@ sub _restore {
 sub _restore_set {
     my $self = shift;
 
-    my %regs = %{ $self->{regs} };
-
     $self->_add_comment( 'start of _restore_set()' );
-    for my $type ( reverse keys %regs ) {
+
+    for my $type ( reverse keys %{ $self->{regs} } ) {
         for ( my $count = 31 ; $count >= 0 ; $count-- ) {
             $self->_add_inst( '', 'restore', [ "$type$count" ] )
-                if $regs{$type}->{$count};
+                if $self->{regs}->{$type}->{$count};
         }
     }
+
     $self->_add_comment( 'end of _restore_set()' );
 
     return;
@@ -170,7 +158,7 @@ sub _get_args {
 sub _find_lex {
     my ( $self, $symbol ) = @_;
 
-    my $return_reg = $self->_save_1('P');
+    my $return_reg = $self->_save_1();
     $self->_add_inst( '', 'find_lex', [ $return_reg, qq{"$symbol"} ] );
 
     return $return_reg;
@@ -179,7 +167,7 @@ sub _find_lex {
 sub _find_name {
     my ( $self, $symbol ) = @_;
 
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
     $self->_add_inst( '', 'find_name', [ $return, qq{"$symbol"} ] );
 
     return $return;
@@ -207,7 +195,7 @@ sub _new_lex {
 sub _new_pair {
     my ($self) = @_;
 
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
 
     $self->_add_inst( '', 'new', [ $return, q{'Array'} ] );
     $self->_add_inst( '', 'set', [ $return, 2 ] );
@@ -248,7 +236,7 @@ sub _constant {
         $value    = 0;
     }
     
-    my $return = $self->_save_1( 'P' );
+    my $return = $self->_save_1();
     $self->_add_inst( '', 'new', [ $return, qq{'$pmc_type'} ] );
     $self->_add_inst( '', 'set', [ $return, $value ] ) if defined $value;
 
@@ -315,7 +303,7 @@ sub __quoted {
                     }
                 }
             }
-            my $item = $self->_save_1('P');
+            my $item = $self->_save_1();
 
             __quoted( $self, $_, $item, $special );
 
@@ -334,7 +322,7 @@ sub __quoted {
 sub _op_quote {
     my ( $self, $node ) = @_;
 
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
 
     _check_num_args( $node, 1, 'quote' );
 
@@ -346,7 +334,7 @@ sub _op_quote {
 sub _op_quasiquote {
     my ( $self, $node ) = @_;
 
-    my $return  = $self->_save_1('P');
+    my $return  = $self->_save_1();
     my $special = {
         unquote            => \&_qq_unquote,
         'unquote-splicing' => \&_qq_unquote_splicing
@@ -381,7 +369,7 @@ sub _qq_unquote_splicing {
     my $list = $self->_generate($node);
 
     my $type  = $self->_save_1('S');
-    my $head  = $self->_save_1('P');
+    my $head  = $self->_save_1();
     my $label = $self->_gensym;
 
     # check for empty list
@@ -393,7 +381,7 @@ sub _qq_unquote_splicing {
     $self->_add_inst( '', 'set', [ $head, $copy ] );
 
     # maybe ensure that $type is a pair here
-    my $temp = $self->_save_1('P');
+    my $temp = $self->_save_1();
     $self->_add_inst( "ITER_$label", 'set', [ $temp, $list . '[0]' ] );
     $self->_add_inst( '', 'set', [ $copy . '[0]', $temp ] );
     $self->_restore($temp);
@@ -426,8 +414,8 @@ sub _op_lambda {
     my $sub_name
         = join( q{_}, 'LAMBDA', $self->_gensym() );
 
-    my $sub_reg = $self->_save_1('P');
-    my $return = $self->_save_1('P');
+    my $sub_reg = $self->_save_1();
+    my $return = $self->_save_1();
 
     $self->_add_inst( '', '.const', [ qq{.Sub $sub_reg = "$sub_name"} ] );
     $self->_add_inst( '', 'newclosure', [ $return, $sub_reg ] );
@@ -504,7 +492,7 @@ sub _op_if {
     }
     $self->_add_inst("TRUE_$label");
     $self->_restore($cond);
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
 
     my $true = $self->_generate( _get_arg( $node, 2 ) );
     $self->_morph( $return, $true );
@@ -553,7 +541,7 @@ sub _op_define {
     my $value = $self->_generate($lambda);
 
     if ( $value !~ m/^P/ ) {
-        my $pmc = $self->_save_1('P');
+        my $pmc = $self->_save_1();
         $self->_morph( $pmc, $value );
         $self->_restore($value);
         $value = $pmc;
@@ -574,7 +562,7 @@ sub _op_set_bang {
     my $symbol = _get_arg( $node, 1 )->{value};
     my $temp = $self->_generate( _get_arg( $node, 2 ) );
     if ( $temp !~ /^P/ ) {
-        my $pmc = $self->_save_1('P');
+        my $pmc = $self->_save_1();
         $self->_morph( $pmc, $temp );
         $self->_restore($temp);
         $temp = $pmc;
@@ -620,7 +608,7 @@ sub _op_and {
 
     my $true_label = $self->_gensym();
     my $temp;
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
     for ( _get_args($node) ) {
         my $label = $self->_gensym();
         $temp = $self->_generate($_);
@@ -771,7 +759,7 @@ sub _op_cons {
     _check_num_args( $node, 2, 'cons' );
 
     my $car = $self->_generate( _get_arg( $node, 1 ) );
-    $return = $self->_save_1('P');
+    $return = $self->_save_1();
 
     $self->_add_inst( '', 'new', [ $return,         q{'Array'} ] );
     $self->_add_inst( '', 'set', [ $return,         2 ] );
@@ -856,7 +844,7 @@ sub _op_list {
     # build up the list in reverse order
     foreach ( reverse _get_args($node) ) {
         my $item = $self->_generate($_);
-        my $pair = $self->_save_1('P');
+        my $pair = $self->_save_1();
 
         $self->_add_inst( '', 'new', [ $pair,         q{'Array'} ] );
         $self->_add_inst( '', 'set', [ $pair,         2 ] );
@@ -1167,7 +1155,7 @@ sub _op_plus {
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1176,7 +1164,7 @@ sub _op_plus {
     else {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1204,7 +1192,7 @@ sub _op_minus {
     if ( $num_args == 1 ) {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1216,7 +1204,7 @@ sub _op_minus {
     else {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1243,7 +1231,7 @@ sub _op_times {
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1252,7 +1240,7 @@ sub _op_times {
     else {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1279,7 +1267,7 @@ sub _op_divide {
     elsif ( $num_args == 1 ) {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -1291,7 +1279,7 @@ sub _op_divide {
     else {
         $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
-            my $temp = $self->_save_1('P');
+            my $temp = $self->_save_1();
             $self->_morph( $temp, $return );
             $self->_restore($return);
             $return = $temp;
@@ -2102,7 +2090,7 @@ sub _call_function_obj {
 
     $self->_add_comment( 'start of _call_function_obj' );
 
-    my $return = $self->_save_1('P');
+    my $return = $self->_save_1();
     $self->_restore($return);    # dont need to save this
     $self->_save_set();
 
