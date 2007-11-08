@@ -284,17 +284,17 @@ SP              [ ]
 ".arg"          return ARG;
 ".sub"          return SUB;
 ".end"          return ESUB;
-".pcc_begin"    return PCC_BEGIN;
-".pcc_end"      return PCC_END;
-".pcc_call"     return PCC_CALL;
+".pcc_begin"|".begin_call"    return PCC_BEGIN;
+".pcc_end"|".end_call"        return PCC_END;
+".pcc_call"|".call"           return PCC_CALL;
 ".nci_call"     return NCI_CALL;
 ".meth_call"    return METH_CALL;
 ".invocant"     return INVOCANT;
-<emit,INITIAL>".pcc_sub"      return PCC_SUB;
-".pcc_begin_return"    return PCC_BEGIN_RETURN;
-".pcc_end_return"      return PCC_END_RETURN;
-".pcc_begin_yield"    return PCC_BEGIN_YIELD;
-".pcc_end_yield"      return PCC_END_YIELD;
+<emit,INITIAL>".pcc_sub"               return PCC_SUB;
+".pcc_begin_return"|".begin_return"    return PCC_BEGIN_RETURN;
+".pcc_end_return"|".end_return"        return PCC_END_RETURN;
+".pcc_begin_yield"|".begin_yield"      return PCC_BEGIN_YIELD;
+".pcc_end_yield"|".end_yield"          return PCC_END_YIELD;
 
 <emit,INITIAL>":method"        return METHOD;
 <emit,INITIAL>":multi"   return MULTI;
