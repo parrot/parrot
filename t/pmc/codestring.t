@@ -157,9 +157,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'namespace keys' );
     say $S0
 .end
 CODE
-[ "abc" ]
-[ "abc" ; "def" ]
-[ "abc" ; "def" ; unicode:"T\x{e9}st" ]
+["abc"]
+["abc";"def"]
+["abc";"def";unicode:"T\x{e9}st"]
 OUTPUT
 
 # Local Variables:
