@@ -59,7 +59,7 @@ sub _probe_for_ctags {
         print $output, "\n" if $verbose;
         $has_ctags = _probe_for_ctags_output($output, $verbose);
         $ctags = $t if $has_ctags;
-        next unless $has_ctags;
+        last if $has_ctags;
     }
     return ($ctags, $has_ctags);
 }
