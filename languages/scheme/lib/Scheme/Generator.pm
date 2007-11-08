@@ -977,9 +977,9 @@ sub _compare {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $lhs = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( _get_arg( $node, 1 ) );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $rhs = $self->_generate( $node->{children}[$_] );
+        my $rhs = $self->_generate( _get_arg( $node, $_ ) );
         $self->_add_inst( '', $inverse_cmp_op => [ $lhs, $rhs, "DONE_$label" ] );
         $self->_restore($lhs);
         $lhs = $rhs;
@@ -996,9 +996,9 @@ sub _op_eq {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#f');
-    my $lhs = $self->_generate( $node->{children}[1] );
+    my $lhs = $self->_generate( _get_arg( $node, 1 ) );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp_1 = $self->_generate( $node->{children}[$_] );
+        my $temp_1 = $self->_generate( _get_arg( $node, $_ ) );
         if ( substr( $lhs, 0, 1 ) ne substr( $temp_1, 0, 1 ) ) {
             my $temp_2 = $self->_save_1( substr( $lhs, 0, 1 ) );
             $self->_morph( $temp_2, $temp_1 );
@@ -1061,7 +1061,7 @@ sub _op_positive_p {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#t');
-    my $temp = $self->_generate( $node->{children}[1] );
+    my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'gt', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
@@ -1076,7 +1076,7 @@ sub _op_negative_p {
     my $label = $self->_gensym();
 
     my $return = $self->_constant('#t');
-    my $temp = $self->_generate( $node->{children}[1] );
+    my $temp = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'lt', [ $temp, 0, "DONE_$label" ] );
     $self->_restore($temp);
     $self->_add_inst( '', 'set', [ $return, 0 ] );
@@ -1090,7 +1090,7 @@ sub _op_odd_p {
 
     my $label = $self->_gensym();
 
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $temp_0 = $self->_generate( _get_arg( $node, 1 ) );
     my $return = $self->_constant('#t');
     my $temp_1 = $self->_constant( 2, 'INTEGER' );
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
@@ -1107,7 +1107,7 @@ sub _op_even_p {
 
     my $label = $self->_gensym();
 
-    my $temp_0 = $self->_generate( $node->{children}[1] );
+    my $temp_0 = $self->_generate( _get_arg( $node, 1 ) );
     my $return = $self->_constant('#t');
     my $temp_1 = $self->_constant( 2, 'INTEGER' );
     $self->_add_inst( '', 'mod', [ $temp_0, $temp_0, $temp_1 ] );
@@ -1124,9 +1124,9 @@ sub _op_max {
 
     my $label = $self->_gensym();
 
-    my $return = $self->_generate( $node->{children}[1] );
+    my $return = $self->_generate( _get_arg( $node, 1 ) );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp  = $self->_generate( $node->{children}[$_] );
+        my $temp  = $self->_generate( _get_arg( $node, $_ ) );
         my $label = $self->_gensym();
         $self->_add_inst( '', 'gt', [ $return, $temp, "NEXT_$label" ] );
         $self->_add_inst( '', 'set', [ $return, $temp ] );
@@ -1143,9 +1143,9 @@ sub _op_min {
     my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_generate( $node->{children}[1] );
+    $return = $self->_generate( _get_arg( $node, 1 ) );
     for ( 2 .. $#{ $node->{children} } ) {
-        my $temp  = $self->_generate( $node->{children}[$_] );
+        my $temp  = $self->_generate( _get_arg( $node, $_ ) );
         my $label = $self->_gensym();
         $self->_add_inst( '', 'lt', [ $return, $temp, "NEXT_$label" ] );
         $self->_add_inst( '', 'set', [ $return, $temp ] );
@@ -1165,7 +1165,7 @@ sub _op_plus {
         $return = $self->_constant( 0, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1174,7 +1174,7 @@ sub _op_plus {
         }
     }
     else {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1182,7 +1182,7 @@ sub _op_plus {
             $return = $temp;
         }
         for ( 2 .. $#{ $node->{children} } ) {
-            my $temp = $self->_generate( $node->{children}[$_] );
+            my $temp = $self->_generate( _get_arg( $node, $_ ) );
             $self->_add_inst( '', 'add', [ $return, $return, $temp ] );
             $self->_restore($temp);
         }
@@ -1202,7 +1202,7 @@ sub _op_minus {
     my $num_args = _get_num_args( $node );
 
     if ( $num_args == 1 ) {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1214,7 +1214,7 @@ sub _op_minus {
         $self->_restore($temp);
     }
     else {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1222,7 +1222,7 @@ sub _op_minus {
             $return = $temp;
         }
         for ( 2 .. $#{ $node->{children} } ) {
-            my $temp = $self->_generate( $node->{children}[$_] );
+            my $temp = $self->_generate( _get_arg( $node, $_ ) );
             $self->_add_inst( '', 'sub', [ $return, $return, $temp ] );
             $self->_restore($temp);
         }
@@ -1241,7 +1241,7 @@ sub _op_times {
         $return = $self->_constant( 1, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1250,7 +1250,7 @@ sub _op_times {
         }
     }
     else {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1258,7 +1258,7 @@ sub _op_times {
             $return = $temp;
         }
         for ( 2 .. $#{ $node->{children} } ) {
-            my $temp = $self->_generate( $node->{children}[$_] );
+            my $temp = $self->_generate( _get_arg( $node, $_ ) );
             $self->_add_inst( '', 'mul', [ $return, $return, $temp ] );
             $self->_restore($temp);
         }
@@ -1277,7 +1277,7 @@ sub _op_divide {
         $return = $self->_constant( 0, 'INTEGER' );
     }
     elsif ( $num_args == 1 ) {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1289,7 +1289,7 @@ sub _op_divide {
         $self->_restore($temp);
     }
     else {
-        $return = $self->_generate( $node->{children}[1] );
+        $return = $self->_generate( _get_arg( $node, 1 ) );
         if ( $return =~ /^P/ ) {
             my $temp = $self->_save_1('P');
             $self->_morph( $temp, $return );
@@ -1297,7 +1297,7 @@ sub _op_divide {
             $return = $temp;
         }
         for ( 2 .. $#{ $node->{children} } ) {
-            my $temp = $self->_generate( $node->{children}[$_] );
+            my $temp = $self->_generate( _get_arg( $node, $_ ) );
             $self->_add_inst( '', 'div', [ $return, $return, $temp ] );
             $self->_restore($temp);
         }
@@ -1312,7 +1312,7 @@ sub _op_abs {
     my $return;
     my $label = $self->_gensym();
 
-    $return = $self->_generate( $node->{children}[1] );
+    $return = $self->_generate( _get_arg( $node, 1 ) );
     $self->_add_inst( '', 'gt', [ $return, 0, "DONE_$label" ] );
     my $temp = $self->_constant( -1, 'INTEGER' );
     $self->_add_inst( '', 'mul', [ $return, $return, $temp ] );
