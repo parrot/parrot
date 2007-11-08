@@ -35,10 +35,7 @@ sub _add_comment {
 }
 
 sub _new_regs {
-    return
-        { S => { map { $_ => 0 } ( 0 .. 31 ) },
-          P => { map { $_ => 0 } ( 0 .. 31 ) },
-        };
+    return [ (0) x 32 ];
 }
 
 sub _save_set {
@@ -46,12 +43,8 @@ sub _save_set {
 
     $self->_add_comment( 'start of _save_set()' );
 
-    my %regs = %{ $self->{regs} };
-    for my $type ( keys %regs ) {
-        for my $count ( 0 .. 31 ) {
-            $self->_add_inst( '', 'save', ["$type$count"] )
-                if $regs{$type}->{$count};
-        }
+    foreach ( grep { $self->{regs}->[$_] } ( 0 .. 31 ) ) {
+        $self->_add_inst( '', 'save', ["P$_"] )
     }
 
     $self->_add_comment( 'end of _save_set()' );
@@ -59,21 +52,17 @@ sub _save_set {
     return;
 }
 
-# save a single register on the stack
-# PMC register is the default, String register 'S' is also allowed
-# Mark it only in $self->{_regs}, let _save_set() emit the PIR
+# Save a single PMC register on the stack.
+# Mark it only in $self->{regs}, let _save_set() emit the PIR
 sub _save_1 {
     my $self = shift;
-    my $type = shift || 'P';
-
-    die "Illegal register type" unless $type && $type =~ m/\A [PS] \z/xms;
 
     my $temp;
     for ( 0 .. 31 ) {
-        next if $self->{regs}->{$type}{$_} == 1;  # find first unsaved register
+        next if $self->{regs}->[$_];  # find first unsaved register
 
-        $temp = "$type$_";
-        $self->{regs}->{$type}{$_} = 1;
+        $temp = "P$_";
+        $self->{regs}->[$_] = 1;
         last;
     }
 
@@ -84,17 +73,11 @@ sub _save_1 {
 sub _restore {
     my $self = shift;
 
-    # die "Nothing to restore" unless @_;
+    foreach ( grep { $_ ne 'none' } @_ ) {
+        my ( $reg_num ) = m/^P(\d+)/;
+        die 'Missing register type' unless defined $reg_num;
 
-    foreach my $reg (@_) {
-        next if grep { $_ eq $reg } qw (none);
-
-        my ( $reg_type, $reg_num ) = $reg =~ m/^(\w)(\d+)/;
-        die 'Missing register type'
-            unless defined $reg_type;
-        if ( $self->{regs}->{$reg_type}{$reg_num} ) {
-            $self->{regs}->{$reg_type}{$reg_num} = 0;
-        }
+        $self->{regs}->[$reg_num] = 0;
     }
 
     return;
@@ -105,11 +88,8 @@ sub _restore_set {
 
     $self->_add_comment( 'start of _restore_set()' );
 
-    for my $type ( reverse keys %{ $self->{regs} } ) {
-        for ( my $count = 31 ; $count >= 0 ; $count-- ) {
-            $self->_add_inst( '', 'restore', [ "$type$count" ] )
-                if $self->{regs}->{$type}->{$count};
-        }
+    foreach ( grep { $self->{regs}->[$_] } ( 31 .. 0 ) ) {
+        $self->_add_inst( '', 'restore', [ "P$_" ] );
     }
 
     $self->_add_comment( 'end of _restore_set()' );
@@ -250,13 +230,11 @@ sub _morph {
 
     $self->_add_comment( 'start of _morph' );
 
-    if ( $to =~ m/ P /xms ) {
-        if ( $from =~ m/P/xms ) {
-            $self->_add_inst( '', 'clone', [ $to, $from ] );
-        }
-        else {
-             die "Only PMCs can be morphed";
-        }
+    if ( $to && $from && $to =~ m/ \A P /xms && $from =~ m/ \A P /xms ) {
+        $self->_add_inst( '', 'clone', [ $to, $from ] );
+    }
+    else {
+        die "Only PMCs can be morphed";
     }
 
     $self->_add_comment( 'end of _morph' );
@@ -368,13 +346,11 @@ sub _qq_unquote_splicing {
 
     my $list = $self->_generate($node);
 
-    my $type  = $self->_save_1('S');
     my $head  = $self->_save_1();
     my $label = $self->_gensym;
 
     # check for empty list
-    $self->_add_inst( '', 'typeof', [ $type, $list ] );
-    $self->_add_inst( '', 'eq', [ $type, q{'Undef'}, "DONE_$label" ] );
+    $self->_branch_if_type( $list, 'Undef', "DONE_$label" );
 
     my $copy = $self->_new_pair();
 
@@ -387,8 +363,7 @@ sub _qq_unquote_splicing {
     $self->_restore($temp);
 
     $self->_add_inst( '', 'set',    [ $list, $list . '[1]' ] );
-    $self->_add_inst( '', 'typeof', [ $type, $list ] );
-    $self->_add_inst( '', 'eq',     [ $type, q{'Undef'}, "FINISH_$label" ] );
+    $self->_branch_if_type( $list, 'Undef', "FINISH_$label" );
 
     $temp = $self->_new_pair();
     $self->_add_inst( '', 'set', [ $copy . '[1]', $temp ] );
@@ -401,7 +376,7 @@ sub _qq_unquote_splicing {
     $self->_add_inst( '', 'set', [ $return, $head ] );
     $self->_add_inst("DONE_$label");
 
-    $self->_restore( $list, $copy, $head, $type );
+    $self->_restore( $list, $copy, $head );
 
     return $return;
 }
@@ -422,7 +397,7 @@ sub _op_lambda {
 
     # caller saved => start a new frame
     push @{ $self->{frames} }, $self->{regs};
-    $self->{regs} = _new_regs;
+    $self->{regs} = _new_regs();
 
     # expand the lexical scope
     my $oldscope = $self->{scope};
@@ -445,7 +420,7 @@ sub _op_lambda {
     for ( @{ _get_arg( $node, 1 )->{children} } ) {
         my $param_name = "param_$cnt";
         $self->_add_inst( '', '.param pmc', [ $param_name ] );
-        push @store_lex, [ '', '.lex', [ qq{"$_->{value}"}, $param_name ]]; 
+        push @store_lex, [ '', '.lex', [ "\"$_->{value}\"", $param_name ]]; 
         $cnt++;
     }
     foreach ( @store_lex ) {
@@ -482,14 +457,8 @@ sub _op_if {
     my $label = $self->_gensym();
 
     my $cond = $self->_generate( _get_arg( $node, 1 ) );
-    if ( $cond =~ m/ \A P /xms )       
-    {
-        my $tmp_s = $self->_save_1('S');
-        $self->_add_inst( '',            'typeof', [ $tmp_s, $cond ] );
-        $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Boolean'}, "TRUE_$label" ] );
-        $self->_restore($tmp_s);
-        $self->_add_inst( '', "unless $cond goto FALSE_$label" );
-    }
+    $self->_branch_unless_type( $cond, 'Boolean', "TRUE_$label" );
+    $self->_add_inst( '', "unless $cond goto FALSE_$label" );
     $self->_add_inst("TRUE_$label");
     $self->_restore($cond);
     my $return = $self->_save_1();
@@ -612,16 +581,9 @@ sub _op_and {
     for ( _get_args($node) ) {
         my $label = $self->_gensym();
         $temp = $self->_generate($_);
-        # only '#f', therfore only Boolean PMCs, therefore only PMCs can be false
-        if ( $temp =~ m/ \A P /xms )       
-        {
-            my $tmp_s = $self->_save_1('S');
-            $self->_add_inst( '',            'typeof', [ $tmp_s, $temp ] );
-            $self->_restore($tmp_s);
-            $self->_add_inst( '',            'ne',     [ $tmp_s, q{'Boolean'}, "NOT_YET_DONE_$label" ] );
-            $self->_add_inst( '', "unless $temp goto FALSE_$true_label" );
-            $self->_add_inst("NOT_YET_DONE_$label");
-        }
+        $self->_branch_unless_type( $temp, 'Boolean', "NOT_YET_DONE_$label" );
+        $self->_add_inst( '', "unless $temp goto FALSE_$true_label" );
+        $self->_add_inst("NOT_YET_DONE_$label");
     }
     $self->_add_inst( '', 'new', [ $return, q{'Undef'} ] );
     $self->_add_inst( '', 'set', [ $return, $temp ] );
@@ -871,13 +833,12 @@ sub _op_length {
     my $list = $self->_generate( _get_arg( $node, 1 ) );
 
     $self->_add_inst( '', 'set', [ $return, '0' ] );
-    my $type = $self->_save_1('S');
-    $self->_add_inst( "NEXT_$label", 'typeof', [ $type, $list ] );
-    $self->_add_inst( '',            'eq',     [ $type, q{'Undef'}, "DONE_$label" ] );
-    $self->_add_inst( '',            'ne',     [ $type, q{'Array'}, "ERR_$label" ] );
-    $self->_add_inst( '', 'inc',    [$return] );
-    $self->_add_inst( '', 'set',    [ $list, $list . '[1]' ] );
-    $self->_add_inst( '', 'branch', ["NEXT_$label"] );
+    $self->_add_inst( "NEXT_$label" );
+    $self->_branch_if_type(     $list, 'Undef', "DONE_$label" );
+    $self->_branch_unless_type( $list, 'Array', "ERR_$label"  );
+    $self->_add_inst( '', inc    => [$return] );
+    $self->_add_inst( '', set    => [ $list, $list . '[1]' ] );
+    $self->_add_inst( '', branch => [ "NEXT_$label" ] );
 
     # XXX Use exceptions here
     $self->_add_inst( "ERR_$label", 'print', ['"Object is not a list\n"'] );
@@ -1383,6 +1344,10 @@ sub _op_make_point {
 }
 
 sub _op_real_part {
+    my ( $self, $node ) = @_;
+    
+    my $is_real = $self->_op_real_p( $node );
+    my $item   = $self->_generate( _get_arg( $node, 1 ) );
 }
 
 sub _op_imag_part {
@@ -2125,8 +2090,8 @@ sub _call_function_obj {
     $self->_add_inst( '', 'invokecc', [ $func_obj ] );
     $self->_restore_set();
 
-    $return =~ m/(\w)(\d+)/;
-    $self->{regs}->{$1}->{$2} = 1;
+    my ( $reg_num ) = $return =~ m/P(\d+)/;
+    $self->{regs}->[$reg_num] = 1;
 
     $self->_add_comment( 'end of _call_function_obj' );
 
@@ -2180,10 +2145,8 @@ sub _type_predicate {
 
     my $return = $self->_constant('#f');
     my $item   = $self->_generate( _get_arg( $node, 1 ) );
-    my $temp_s = $self->_save_1('S');
-    $self->_add_inst( '', 'typeof', [ $temp_s, $item ] );
     foreach ( @{ $types{$form} } ) {
-        $self->_add_inst( '', 'eq', [ $temp_s, qq{'$_'}, "TRUE_$label" ] );
+        $self->_branch_if_type( $item, $_, "TRUE_$label" );
     }
     $self->_add_inst( '', 'branch', [ "FAIL_$label" ] );
     $self->_add_inst( "TRUE_$label", 'set', [ $return, 1 ] );
@@ -2193,11 +2156,29 @@ sub _type_predicate {
     return $return;
 }
 
+sub _branch_if_type {
+    my ( $self, $reg, $type, $label ) = @_;
+
+    $self->_add_inst( '', 'typeof', [ 'S17', $reg ] );
+    $self->_add_inst( '', 'eq', [ 'S17', qq{'$type'}, $label ] );
+
+    return;
+}
+
+sub _branch_unless_type {
+    my ( $self, $reg, $type, $label ) = @_;
+
+    $self->_add_inst( '', 'typeof', [ 'S18', $reg ] );
+    $self->_add_inst( '', 'ne', [ 'S18', qq{'$type'}, $label ] );
+
+    return;
+}
+
 sub new {
     my $class = shift;
 
     my $self  = {
-        regs                 => _new_regs,
+        regs                 => _new_regs(),
         frames               => [],
         gensym               => 0,                # used for creating unique labels and symbols
         functions            => [],               # List of needed builtin functions
