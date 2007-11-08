@@ -1348,7 +1348,7 @@ bin_op:
    | SHIFT_RIGHT { $$ = "shr"; }
    | SHIFT_RIGHT_U { $$ = "lsr"; }
    | LOG_AND     { $$ = "and"; }
-   | LOG_OR      { $$ = "xor"; }
+   | LOG_OR      { $$ = "or"; }
    | LOG_XOR     { $$ = "xor"; }
    | '&'         { $$ = "band"; }
    | '|'         { $$ = "bor"; }
