@@ -104,6 +104,7 @@ sub _evaluate_gcc {
 
     my @opt_and_vers = (
               0 => ""
+            . " -std=c89"
             . " -W"
             . " -Wall"
             . " -Waggregate-return"
@@ -138,7 +139,7 @@ sub _evaluate_gcc {
             . " -Wstrict-aliasing"
             . " -Wstrict-prototypes"
             . " -Wswitch"
-            #. " -Wswitch-default"
+            . " -Wswitch-default"
             #. " -Wswitch-enum"
             . " -Wnested-externs"
             . " -Wundef"
