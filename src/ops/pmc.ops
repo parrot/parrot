@@ -308,11 +308,8 @@ op find_method(out PMC, invar PMC, in STR) {
     opcode_t * resume = expr NEXT();
     $1 = $2->vtable->find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        char *method_name = string_to_cstring(interp, $3);
         real_exception(interp, resume, METH_NOT_FOUND,
-            "Method '%s' not found", method_name);
-        /* XXX leak! */
-        string_cstring_free(method_name);
+            "Method '%s' not found", string_to_cstring(interp, $3));
     }
     restart ADDRESS(resume);
 }
