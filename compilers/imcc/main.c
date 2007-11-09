@@ -583,7 +583,8 @@ do_pre_process(PARROT_INTERP)
     const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     IMCC_push_parser_state(interp);
-    while ((c = yylex(&val, yyscanner, interp))) {
+    c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
+    while (c) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;
@@ -679,6 +680,7 @@ do_pre_process(PARROT_INTERP)
                     printf("%s ", val.s);
                 break;
         }
+        c = yylex(&val, yyscanner, interp);
     }
     printf("\n");
     fflush(stdout);
