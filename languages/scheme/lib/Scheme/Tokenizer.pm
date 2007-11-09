@@ -14,15 +14,7 @@ use Data::Dumper;
 
 sub new {
     my $class     = shift;
-    my $target_fn = shift;
-
-    my $target;
-    {
-         open my $target_fh, '<', $target_fn or die "Can't open $target_fn:\n$!";
-         local $/;   # Set input to "slurp" mode.
-         $target = <$target_fh>;
-         close $target_fh or die "Can't close $target_fn:\n$!";
-    }
+    my $target    = shift;
 
     return 
         bless sub {

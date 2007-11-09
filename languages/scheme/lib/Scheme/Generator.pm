@@ -656,9 +656,7 @@ sub _op_begin {
 
     my $temp = 'none';
 
-    my @args = _get_args($node);
-
-    for (@args) {
+    foreach ( _get_args($node) ) {
         $self->_restore($temp);
         $temp = $self->_generate($_);
     }

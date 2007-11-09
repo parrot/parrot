@@ -1,6 +1,18 @@
 # $Id$
 # Copyright (C) 2001-2007, The Perl Foundation.
 
+=head1 NAME
+
+Scheme - compile Scheme to PIR
+
+=head1 DESCRIPTION
+
+Compile Scheme.
+
+=head1 SUBROUTINES
+
+=cut
+
 package Scheme;
 
 # pragmata
@@ -8,14 +20,14 @@ use strict;
 use warnings;
 use 5.008;
 
+# core Perl modules
 use Data::Dumper;
 
+# custom modules
 use Scheme::Tokenizer   ();
 use Scheme::Parser      ();
 use Scheme::Generator   ();
-use Scheme::Builtins;
-
-=head1 SUBROUTINES
+use Scheme::Builtins    ();
 
 =head2 new
 
@@ -27,6 +39,24 @@ sub new {
     my ( $class, $file ) = @_;
 
     return bless { file => $file }, $class;
+}
+
+=head2 slurp_source
+
+Read a scheme source file.
+
+=cut
+
+sub slurp_source {
+    my ( $fn ) = @_;
+
+    open my $fh, '<', $fn or die "Can't open $fn: $!";
+    local $/;                              # Set filehandles to "slurp" mode.
+    my $source = <$fh>;
+    close $fh or die "Can't close $fn: $!";
+
+    return $source;
+
 }
 
 =head2 link_functions
@@ -93,10 +123,12 @@ END
 This is called in schemec.
 
 =cut
+
 sub compile {
     my $self = shift;
 
-    my $tokenizer  = Scheme::Tokenizer->new( $self->{file} );
+    my $source     = slurp_source( $self->{file} );
+    my $tokenizer  = Scheme::Tokenizer->new( $source );
     my $tree       = Scheme::Parser::parse( $tokenizer );
     my $main       = Scheme::Generator::generate( $tree );
 
