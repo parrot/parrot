@@ -13,12 +13,12 @@ our $VERSION   = '0.01';
 use Data::Dumper;
 
 # walk over the tokens
-sub _build_tree {
+sub parse {
     my ( $tokenizer ) = @_;
 
     if ( wantarray() ) {        # be greedy
         my @trees;
-        while ( my $tree = _build_tree( $tokenizer ) ) {
+        while ( my $tree = parse( $tokenizer ) ) {
             push @trees, $tree;
         }
 
@@ -32,7 +32,7 @@ sub _build_tree {
     return if $token->[1] eq ')';
 
     if ( $token->[1] eq '(' ) {
-        my @children = _build_tree( $tokenizer );
+        my @children = parse( $tokenizer );
 
         if ( ! @children ) {
             # special case: empty list
@@ -50,7 +50,7 @@ sub _build_tree {
             q{,@}     => 'unquote-splicing',
     );
     if ( exists $special_function{$token->[1]}  ) {
-        my $child = _build_tree( $tokenizer );
+        my $child = parse( $tokenizer );
 
         return { children => [ { value => $special_function{$token->[1]} 
                                },
@@ -66,22 +66,6 @@ sub _build_tree {
            };
 }
 
-
-sub parse {
-    my $tokenizer = shift;
-
-    my @trees = _build_tree( $tokenizer );
-
-    return undef unless @trees;
-
-    return $trees[0] if scalar(@trees) == 1;
-
-    # Implicit begin at toplevel
-    return { children => [ { value => 'begin' },
-                           @trees
-                         ]
-           };
-}
 
 1;
 

@@ -59,6 +59,23 @@ sub slurp_source {
 
 }
 
+=head2 wrap_source
+
+Put source into an envelope.
+
+   (begin init source)'
+
+=cut
+
+sub wrap_source {
+    my ( $source ) = @_;
+
+    return <<"END_SCHEME";
+(begin
+   $source )
+END_SCHEME
+}
+
 =head2 link_functions
 
 Generate PIR.
@@ -127,10 +144,11 @@ This is called in schemec.
 sub compile {
     my $self = shift;
 
-    my $source     = slurp_source( $self->{file} );
-    my $tokenizer  = Scheme::Tokenizer->new( $source );
-    my $tree       = Scheme::Parser::parse( $tokenizer );
-    my $main       = Scheme::Generator::generate( $tree );
+    my $source          = slurp_source( $self->{file} );
+    my $wrapped_source  = wrap_source( $source );
+    my $tokenizer       = Scheme::Tokenizer->new( $wrapped_source );
+    my $tree            = Scheme::Parser::parse( $tokenizer );
+    my $main            = Scheme::Generator::generate( $tree );
 
     return link_functions( $main );
 }
