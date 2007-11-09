@@ -1473,17 +1473,20 @@ visit_next_for_GC(PARROT_INTERP, NOTNULL(PMC* pmc), NOTNULL(visit_info* info))
 {
     UINTVAL id;
     const int seen = next_for_GC_seen(interp, pmc, info, &id);
+    UNUSED(seen);
 
     real_exception(interp, NULL, 1, "todo convert to depth first");
-    do_action(interp, pmc, info, seen, id);
+    /* do_action(interp, pmc, info, seen, id); UNCOMMENT WHEN TODO IS DONE*/
     /*
      * TODO probe for class methods that override the default.
      * To avoid overhead, we could have an array[class_enums]
      * which (after first find_method) has a bit, if a user
      * callback is there.
      */
+    /* UNCOMMENT WHEN TODO IS DONE
     if (!seen)
         (info->visit_action)(interp, pmc, info);
+    */
 }
 
 /*
