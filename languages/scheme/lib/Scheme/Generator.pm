@@ -1654,23 +1654,6 @@ sub _op_display {
     return $temp;    # We need to return something
 }
 
-sub _op_newline {
-    my ( $self, $node ) = @_;
-
-    $self->_add_comment( 'start of _op_newline' );
-
-    _check_num_args( $node, 0, 'newline' );
-
-    return $self->_generate(
-        { children => [ { value => 'display' },
-                        { value => q{"\n"},
-                          type  => 'STRING',
-                        },
-                      ],
-        }
-    );
-}
-
 sub _op_write_char {
 }
 
@@ -1974,7 +1957,7 @@ my %global_ops = (
     'char-ready?' => \&_op_char_ready_p,
     'write'       => \&_op_write,
     'display'     => \&_op_display,
-    'newline'     => \&_op_newline,
+    # 'newline'     => see Scheme::wrap_source()
     'write-char'  => \&_op_write_char,
 
 ####

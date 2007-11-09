@@ -72,6 +72,8 @@ sub wrap_source {
 
     return <<"END_SCHEME";
 (begin
+  (define (newline)
+    (display "\\n"))
    $source )
 END_SCHEME
 }
