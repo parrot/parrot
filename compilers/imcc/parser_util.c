@@ -1008,9 +1008,8 @@ imcc_compile_pasm_ex(PARROT_INTERP, NOTNULL(const char *s))
 
     PMC * const sub = imcc_compile(interp, s, 1, &error_message);
     if (sub == NULL) {
-        char * const error_str = string_to_cstring(interp, error_message);
-        real_exception(interp, NULL, E_Exception, error_str);
-        string_cstring_free(error_str);
+        real_exception(interp, NULL, E_Exception,
+                string_to_cstring(interp, error_message));
     }
     return sub;
 }
@@ -1033,9 +1032,8 @@ imcc_compile_pir_ex(PARROT_INTERP, NOTNULL(const char *s))
 
     PMC * const sub = imcc_compile(interp, s, 0, &error_message);
     if (sub == NULL) {
-        char * const  error_str = string_to_cstring(interp, error_message);
-        real_exception(interp, NULL, E_Exception, error_str);
-        string_cstring_free(error_str);
+        real_exception(interp, NULL, E_Exception,
+                string_to_cstring(interp, error_message));
     }
     return sub;
 }
