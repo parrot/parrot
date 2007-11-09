@@ -797,20 +797,19 @@ set_current_sub(PARROT_INTERP)
      */
 
     for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                sub_pmc = ct->constants[ci]->u.key;
-                sub = PMC_sub(sub_pmc);
-                if (sub->seg != cur_cs)
-                    continue;
-                offs = sub->start_offs;
-                if (offs == interp->resume_offset) {
-                    CONTEXT(interp->ctx)->current_sub = sub_pmc;
-                    CONTEXT(interp->ctx)->current_HLL = sub->HLL_id;
-                    return sub_pmc;
-                }
-                break;
+        if (ft->fixups[i]->type == enum_fixup_sub) {
+            ci = ft->fixups[i]->offset;
+            sub_pmc = ct->constants[ci]->u.key;
+            sub = PMC_sub(sub_pmc);
+            if (sub->seg != cur_cs)
+                continue;
+            offs = sub->start_offs;
+            if (offs == interp->resume_offset) {
+                CONTEXT(interp->ctx)->current_sub = sub_pmc;
+                CONTEXT(interp->ctx)->current_HLL = sub->HLL_id;
+                return sub_pmc;
+            }
+            break;
         }
     }
     /*
