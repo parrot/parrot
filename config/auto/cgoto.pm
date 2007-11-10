@@ -37,8 +37,15 @@ sub runstep {
         return 1;
     }
 
-    my ( $cgoto, $verbose ) = $conf->options->get(qw(cgoto verbose));
+    my $test = _probe_for_cgoto( $conf->options->get('cgoto') );
 
+    $self->_evaluate_cgoto($conf, $test);
+
+    return 1;
+}
+
+sub _probe_for_cgoto {
+    my $cgoto = shift;
     my $test;
     if ( defined $cgoto ) {
         $test = $cgoto;
@@ -48,7 +55,12 @@ sub runstep {
         $test = eval { cc_build(); 1; } || 0;
         cc_clean();
     }
+    return $test;
+}
 
+sub _evaluate_cgoto {
+    my ($self, $conf, $test) = @_;
+    my $verbose = $conf->options->get('verbose');
     if ($test) {
         $conf->data->set(
             TEMP_cg_h => '$(INC_DIR)/oplib/core_ops_cg.h $(INC_DIR)/oplib/core_ops_cgp.h',
@@ -88,8 +100,6 @@ EOF
         print " (no) " if $verbose;
         $self->set_result('no');
     }
-
-    return 1;
 }
 
 1;

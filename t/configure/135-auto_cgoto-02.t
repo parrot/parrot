@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 135-auto_cgoto-01.t
+# 135-auto_cgoto-02.t
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 18;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -16,7 +16,7 @@ use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $args = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -42,7 +42,12 @@ ok( $step->description(), "$step_name has description" );
 
 my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+ok(defined($step->result()), "A result was defined");
+ok(defined($conf->data->get('TEMP_cg_h')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_c')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_o')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_r')), "An attribute has been defined");
+ok(defined($conf->data->get('cg_flag')), "An attribute has been defined");
 
 pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
@@ -51,11 +56,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-135-auto_cgoto-01.t - test config::auto::cgoto
+135-auto_cgoto-02.t - test config::auto::cgoto
 
 =head1 SYNOPSIS
 
-    % prove t/configure/135-auto_cgoto-01.t
+    % prove t/configure/135-auto_cgoto-02.t
 
 =head1 DESCRIPTION
 
