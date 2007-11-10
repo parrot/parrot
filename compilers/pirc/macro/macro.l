@@ -221,38 +221,49 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_LABEL;
                     }
 
-<MACROBODY>"$"{IDENT}":" { /* label declaration */
-                           yylval->sval = dupstrn(yytext + 1, yyleng - 2);
-                           return TK_LABEL_ID;
-                         }
+<MACROBODY>"$"{IDENT}":"  { /* unique label declaration */
+                            lexer_state *lexer = yyget_extra(yyscanner);
+                            char *label_id = dupstrn(yytext + 1, yyleng - 2);
+                            yylval->sval = label_id;
+                            return TK_LABEL_ID;
+                          }
 
-<MACROBODY>".$"{IDENT}   { /* referring to a declared label or local id. */
-                           yylval->sval = dupstr(yytext + 2);
-                           return TK_MACROVAR_EXP;
-                         }
+<MACROBODY>".$"{IDENT}    { /* referring to a declared label or local id. */
+                            lexer_state *lexer = yyget_extra(yyscanner);
+                            macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2);
+                            if (macro == NULL) {
+                                fprintf(stderr, "Error: cannot find macro parameter '%s'\n", yytext + 2);
+                            }
+                            else {
 
+                                /*yylval->sval = dupstr(yytext + 2);
+                                */
+                                yylval->sval = dupstr(macro->body);
+                            }
+                            return TK_MACROVAR_EXP;
+                          }
 
 <MACROBODY>".macro_local" { /* unique local declaration */
                             yy_push_state(MACROLOCAL, yyscanner);
                             return TK_MACRO_LOCAL;
                           }
 
-<MACROLOCAL>"int"          { yylval->sval = dupstr("int");
+<MACROLOCAL>"int"         { yylval->sval = dupstr("int");
                             return TK_INT;
                           }
 
-<MACROLOCAL>"num"          { yylval->sval = dupstr("num");
+<MACROLOCAL>"num"         { yylval->sval = dupstr("num");
                             return TK_NUM;
                           }
 
-<MACROLOCAL>"pmc"          { yylval->sval = dupstr("pmc");
+<MACROLOCAL>"pmc"         { yylval->sval = dupstr("pmc");
                             return TK_PMC;
                           }
-<MACROLOCAL>"string"       { yylval->sval = dupstr("string");
+<MACROLOCAL>"string"      { yylval->sval = dupstr("string");
                             return TK_STRING;
                           }
 
-<MACROLOCAL>"$"{IDENT}     { /* */
+<MACROLOCAL>"$"{IDENT}     { /* unique local id declaration */
                             yylval->sval = dupstr(yytext + 1);
                             yy_pop_state(yyscanner);
                             return TK_LOCAL_ID;
@@ -312,7 +323,6 @@ REG            "$"?[SNIP]{DIGITS}
                    }
 
 <EXPARGS>"{"       { /* braced argument */
-                     /* need for a BRACEDARGS state? */
                      yy_push_state(BRACEDARGS, yyscanner);
                      return '{';
                    }
@@ -415,35 +425,34 @@ REG            "$"?[SNIP]{DIGITS}
                             return TK_NUMC;
                           }
 
-<INCLUDE>{Q_STRING}  { /* a quoted string is needed for an .include or the value of a
-                                 * macro constant. After this token, leave the current state.
-                                 */
-                                yylval->sval = dupstr(yytext);
-                                yy_pop_state(yyscanner);
-                                return TK_STRINGC;
-                              }
+<INCLUDE>{Q_STRING}       { /* a quoted string is needed for an .include or the value of a
+                             * macro constant. After this token, leave the current state.
+                             */
+                             yylval->sval = dupstr(yytext);
+                             yy_pop_state(yyscanner);
+                             return TK_STRINGC;
+                          }
 
+<EXPARGS>{Q_STRING}       { /* quoted strings argument for macro expansion */
+                            yylval->sval = dupstr(yytext);
+                            return TK_STRINGC;
+                          }
 
-<EXPARGS>{Q_STRING}   { /* quoted strings argument for macro expansion */
-                        yylval->sval = dupstr(yytext);
-                        return TK_STRINGC;
-                      }
-
-<EXPARGS>{SIGN}?{DIGITS} { yylval->sval = dupstr(yytext);
-                           return TK_INTC;
-                         }
-<EXPARGS>{HEX}             { yylval->sval = dupstr(yytext);
-                             return TK_INTC;
-                           }
+<EXPARGS>{SIGN}?{DIGITS}  { yylval->sval = dupstr(yytext);
+                            return TK_INTC;
+                          }
+<EXPARGS>{HEX}            { yylval->sval = dupstr(yytext);
+                            return TK_INTC;
+                          }
 <EXPARGS>{BIN}            { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
-<EXPARGS>{OCT}           { yylval->sval = dupstr(yytext);
-                           return TK_INTC;
-                         }
-<EXPARGS>{FLOATNUM}   { yylval->sval = dupstr(yytext);
-                        return TK_NUMC;
-                      }
+<EXPARGS>{OCT}            { yylval->sval = dupstr(yytext);
+                            return TK_INTC;
+                          }
+<EXPARGS>{FLOATNUM}       { yylval->sval = dupstr(yytext);
+                            return TK_NUMC;
+                          }
 
 <INITIAL,MACROBODY>{REG}         { /* register */
                                    yylval->sval = dupstr(yytext);
@@ -460,16 +469,25 @@ REG            "$"?[SNIP]{DIGITS}
                                    return TK_ANY;
                                  }
 
+<INITIAL>{IDENT}"?"              { /* unique identifier */
+                                   yylval->sval = dupstrn(yytext, yyleng - 1);
+                                   return TK_LABEL_EXPANSION;
+                                 }
+
+<INITIAL>{IDENT}"?:"             { /* macro-generated label */
+                                   yylval->sval = dupstrn(yytext, yyleng - 2);
+                                   return TK_LABEL_TARGET_EXPANSION;
+                                 }
+
 <INITIAL,MACROBODY>":"{IDENT}    { /* flag */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
                                  }
 
-<MACROBODY>"."{IDENT}    { /* expansions in a macro body; ignore for now. */
-                           yylval->sval = dupstr(yytext);
-                           return TK_ANY;
-                         }
-
+<MACROBODY>"."{IDENT}            { /* expansions in a macro body; ignore for now. */
+                                   yylval->sval = dupstr(yytext);
+                                   return TK_ANY;
+                                 }
 
 <INITIAL,MACROBODY>{FLOATNUM}    { yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -484,7 +502,9 @@ REG            "$"?[SNIP]{DIGITS}
                                        }
 
 
-<INITIAL,MACROBODY>{IDENT}":"    { /* labels */
+
+
+<INITIAL,MACROBODY>{IDENT}":"    { /* normal label */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
                                  }

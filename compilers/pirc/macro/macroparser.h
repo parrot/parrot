@@ -58,9 +58,11 @@
      TK_MACROVAR_EXP = 274,
      TK_LABEL_ID = 275,
      TK_LOCAL_ID = 276,
-     TK_STRINGC = 277,
-     TK_NUMC = 278,
-     TK_INTC = 279
+     TK_LABEL_EXPANSION = 277,
+     TK_LABEL_TARGET_EXPANSION = 278,
+     TK_STRINGC = 279,
+     TK_NUMC = 280,
+     TK_INTC = 281
    };
 #endif
 /* Tokens.  */
@@ -83,9 +85,11 @@
 #define TK_MACROVAR_EXP 274
 #define TK_LABEL_ID 275
 #define TK_LOCAL_ID 276
-#define TK_STRINGC 277
-#define TK_NUMC 278
-#define TK_INTC 279
+#define TK_LABEL_EXPANSION 277
+#define TK_LABEL_TARGET_EXPANSION 278
+#define TK_STRINGC 279
+#define TK_NUMC 280
+#define TK_INTC 281
 
 
 
@@ -100,7 +104,7 @@ typedef union YYSTYPE
 
 }
 /* Line 1489 of yacc.c.  */
-#line 104 "macroparser.h"
+#line 108 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
