@@ -10,14 +10,6 @@ use Carp;
 use lib qw( lib );
 use_ok('config::auto::pmc');
 
-=for hints_for_testing Check latest reports of Parrot configuration
-tools testing coverage to see where your time available for writing
-tests is spent.  You will have to determine a way to test a user
-response to a prompt. In the course of writing tests, you should try
-to resolve RT 43172.
-
-=cut
-
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
