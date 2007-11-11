@@ -1,6 +1,12 @@
 
 %{
 
+
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
 #define  YY_NO_UNISTD_H
 
 #include "pasmparser.h"
@@ -128,4 +134,11 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 .              { fprintf(stderr, "Unknown character: '%s'\n", yytext); }
 
 %%
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
 

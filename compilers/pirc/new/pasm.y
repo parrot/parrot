@@ -1,5 +1,8 @@
 %{
-
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
 
 #include "pasmparser.h"
 
@@ -177,3 +180,10 @@ main(int argc, char *argv[]) {
 
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
