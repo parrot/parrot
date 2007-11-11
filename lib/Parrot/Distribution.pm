@@ -351,6 +351,8 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/new/main.c
             compilers/pirc/new/pir.l
             compilers/pirc/new/pir.y
+            compilers/pirc/new/pasm.l
+            compilers/pirc/new/pasm.y
             compilers/pirc/new/pircompiler.h
             compilers/pirc/new/pirlexer.c
             compilers/pirc/new/pirlexer.h
