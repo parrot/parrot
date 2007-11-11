@@ -43,7 +43,7 @@ sub pmc_parent {
     return $PMC_PARENTS{$pmc} if defined $PMC_PARENTS{$pmc};
 
     local $/;
-    open( my $PMC, "<", "src/pmc/$pmc.pmc" )
+    open( my $PMC, '<', "src/pmc/$pmc.pmc" )
         or die "open src/pmc/$pmc.pmc failed: $!";
     local $_ = <$PMC>;
     close $PMC;
@@ -141,24 +141,24 @@ E_NOTE
 
     $TEMP_pmc_build .= <<END;
 PMC2C_FILES = \\
-\t\tlib/Parrot/Pmc2c/Pmc2cMain.pm \\
-\t\tlib/Parrot/Pmc2c/Parser.pm \\
-\t\tlib/Parrot/Pmc2c/Dumper.pm \\
-\t\tlib/Parrot/Pmc2c/PMC.pm \\
-\t\tlib/Parrot/Pmc2c/Method.pm \\
-\t\tlib/Parrot/Pmc2c/PCCMETHOD.pm \\
-\t\tlib/Parrot/Pmc2c/PMCEmitter.pm \\
-\t\tlib/Parrot/Pmc2c/MethodEmitter.pm \\
-\t\tlib/Parrot/Pmc2c/Library.pm \\
-\t\tlib/Parrot/Pmc2c/UtilFunctions.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/default.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/delegate.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/deleg_pmc.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/Null.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/Ref.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/SharedRef.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/STMRef.pm \\
-\t\tlib/Parrot/Pmc2c/PMC/RO.pm
+    lib/Parrot/Pmc2c/Pmc2cMain.pm \\
+    lib/Parrot/Pmc2c/Parser.pm \\
+    lib/Parrot/Pmc2c/Dumper.pm \\
+    lib/Parrot/Pmc2c/PMC.pm \\
+    lib/Parrot/Pmc2c/Method.pm \\
+    lib/Parrot/Pmc2c/PCCMETHOD.pm \\
+    lib/Parrot/Pmc2c/PMCEmitter.pm \\
+    lib/Parrot/Pmc2c/MethodEmitter.pm \\
+    lib/Parrot/Pmc2c/Library.pm \\
+    lib/Parrot/Pmc2c/UtilFunctions.pm \\
+    lib/Parrot/Pmc2c/PMC/default.pm \\
+    lib/Parrot/Pmc2c/PMC/delegate.pm \\
+    lib/Parrot/Pmc2c/PMC/deleg_pmc.pm \\
+    lib/Parrot/Pmc2c/PMC/Null.pm \\
+    lib/Parrot/Pmc2c/PMC/Ref.pm \\
+    lib/Parrot/Pmc2c/PMC/SharedRef.pm \\
+    lib/Parrot/Pmc2c/PMC/STMRef.pm \\
+    lib/Parrot/Pmc2c/PMC/RO.pm
 END
 
     foreach my $pmc ( split( /\s+/, $pmc_list ) ) {
@@ -187,7 +187,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
-\t\t$parent_headers
+    $parent_headers
 
 END
     }

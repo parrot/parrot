@@ -311,7 +311,7 @@ FLUID_FILES = \
     $(GEN_LIBRARY) \
     $(SRC_DIR)/jit_emit.h \
     runtime/parrot/include/parrotlib.pbc \
-	.configure_trace.sto
+    .configure_trace.sto
 
 
 ###############################################################################
@@ -1709,41 +1709,41 @@ SUNLINT = lint
 # doing replaces in $(NOTE), which is empty, of strings that will never match.
 NOTE =
 SUNLINT_HUSH_OPTS = \
-	$(NOTE:% Errors that will never be silenced, and we must always hush =%)\
-	-erroff=E_ARGUMENT_CONVERT	$(NOTE:% implicit integer-to-long conversion =%) \
-	-erroff=E_BAD_PTR_CAST		$(NOTE:% pointer casts may be troublesome =%) \
-	-erroff=E_BAD_PTR_CAST_ALIGN	$(NOTE:% alignment problems with cast =%) \
-	-erroff=E_LABEL_NOT_USED	$(NOTE:% Unused label =%) \
-	-erroff=E_CONSTANT_CONDITION	$(NOTE:% Constant condition =%) \
-	-erroff=E_INCL_NUSD		$(NOTE:% An include file was unused =%) \
-	-erroff=E_INDISTING_FROM_TRUNC	$(NOTE:% Identifier will be ambiguous if truncated =%) \
-	-erroff=E_MCR_NODIFF		$(NOTE:% Macros differ between source files =%) \
-	-erroff=E_INIT_DOES_NOT_FIT	$(NOTE:% initializer does not fit or is out of range+ 0xf0e69739 =%) \
-	-erroff=E_NONPORT_SBITWISE_OP   $(NOTE:% bitwise operations on signed values not portable =%) \
-	\
-	$(NOTE:% Things to drop some day =%) \
-	-erroff=E_FUNC_ARG_UNUSED	$(NOTE:% Unused function argument =%) \
-	-erroff=E_STMT_NOT_REACHED	$(NOTE:% Unreachable statement =%) \
-	-erroff=E_NOP_IF_STMT		$(NOTE:% if has a no-op =%) \
-	-erroff=E_NOP_ELSE_STMT		$(NOTE:% else has a no-op =%) \
-	-erroff=E_CASE_FALLTHRU		$(NOTE:% case fallthru =%) \
-	-erroff=E_STATIC_UNUSED		$(NOTE:% Static function not used =%) \
+    $(NOTE:% Errors that will never be silenced, and we must always hush =%)\
+    -erroff=E_ARGUMENT_CONVERT          $(NOTE:% implicit integer-to-long conversion =%) \
+    -erroff=E_BAD_PTR_CAST                    $(NOTE:% pointer casts may be troublesome =%) \
+    -erroff=E_BAD_PTR_CAST_ALIGN          $(NOTE:% alignment problems with cast =%) \
+    -erroff=E_LABEL_NOT_USED          $(NOTE:% Unused label =%) \
+    -erroff=E_CONSTANT_CONDITION          $(NOTE:% Constant condition =%) \
+    -erroff=E_INCL_NUSD                    $(NOTE:% An include file was unused =%) \
+    -erroff=E_INDISTING_FROM_TRUNC          $(NOTE:% Identifier will be ambiguous if truncated =%) \
+    -erroff=E_MCR_NODIFF                    $(NOTE:% Macros differ between source files =%) \
+    -erroff=E_INIT_DOES_NOT_FIT          $(NOTE:% initializer does not fit or is out of range+ 0xf0e69739 =%) \
+    -erroff=E_NONPORT_SBITWISE_OP   $(NOTE:% bitwise operations on signed values not portable =%) \
+    \
+    $(NOTE:% Things to drop some day =%) \
+    -erroff=E_FUNC_ARG_UNUSED          $(NOTE:% Unused function argument =%) \
+    -erroff=E_STMT_NOT_REACHED          $(NOTE:% Unreachable statement =%) \
+    -erroff=E_NOP_IF_STMT                    $(NOTE:% if has a no-op =%) \
+    -erroff=E_NOP_ELSE_STMT                    $(NOTE:% else has a no-op =%) \
+    -erroff=E_CASE_FALLTHRU                    $(NOTE:% case fallthru =%) \
+    -erroff=E_STATIC_UNUSED                    $(NOTE:% Static function not used =%) \
 
 SUNLINT_OPTS_FOR_THE_FUTURE = -b -m -Xc
 
 # Lint options at: http://docs.sun.com/app/docs/doc/819-5265/6n7c29cli?a=view
 SUNLINTOPTS = \
-	-b \
-	-p \
-	-fd \
-	-Ncheck=%all \
-	-Nlevel=4 \
-	-errchk=%all \
-	-errhdr=%user \
-	-errtags \
-	-errchk=no%longptr64 \
-	-errfmt=simple \
-	$(SUNLINT_HUSH_OPTS) \
+    -b \
+    -p \
+    -fd \
+    -Ncheck=%all \
+    -Nlevel=4 \
+    -errchk=%all \
+    -errhdr=%user \
+    -errtags \
+    -errchk=no%longptr64 \
+    -errfmt=simple \
+    $(SUNLINT_HUSH_OPTS) \
 
 sunlint :
 	rm -f *.ln
@@ -1775,98 +1775,98 @@ SPLINT_TMP = $(TMP)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 SPLINTFLAGS  = \
-	-standard \
-	-tmpdir $(SPLINT_TMP) \
-	-message-stream-stdout \
-	-declundef \
-	-show-summary \
-	-exportlocal \
-	+linelen 120 \
-	+showdeephistory \
-	-showfunc \
-	-hints \
-	\
-	-abstract \
-	+aliasunique \
-	-ansireserved \
-	+ansireservedinternal \
-	+assignexpose \
-	+boolcompare \
-	-boolops \
-	+booltype BOOLVAL \
-	-casebreak \
-	-castfcnptr \
-	-charint \
-	+continuecomment \
-	+controlnestdepth 15 \
-	+cppnames \
-	+declundef \
-	-distinctinternalnames \
-	+evalorder \
-	-fcnuse \
-	+fielduse \
-	+forcehints \
-	-globs \
-	+imptype \
-	+incondefs \
-	+incondefslib \
-	-initallelements \
-	-isoreserved \
-	-isoreservedinternal \
-	+longintegral \
-	+macroassign \
-	+macroempty \
-	+macroredef \
-	+matchanyintegral \
-	+nestedextern \
-	-noeffect \
-	+nullassign \
-	+nullderef \
-	+nullret \
-	+nullpass \
-	-nullstate \
-	-paramuse \
-	+posixstrictlib \
-	-predboolint \
-	-predboolothers \
-	-predboolptr \
-	+ptrnegate \
-	+readonlystrings \
-	-realcompare \
-	-redef \
-	-retvalint \
-	-retvalother \
-	+shadow \
-	-shiftimplementation \
-	-shiftnegative \
-	+showscan \
-	+showsummary \
-	-skipposixheaders \
-	-type \
-	\
-	\
-	\
-	-nullstate \
-	-usereleased \
-	-mustfreefresh \
-	-mustfreeonly \
-	-compdestroy \
-	-branchstate \
-	-compmempass \
-	-globstate \
-	-compdef \
-	-modobserver \
-	-retalias \
-	-redecl \
-	\
-	-readonlytrans \
-	-onlytrans \
-	-unqualifiedtrans \
-	-observertrans \
-	-kepttrans \
-	-statictrans \
-	-immediatetrans \
-	-temptrans \
+    -standard \
+    -tmpdir $(SPLINT_TMP) \
+    -message-stream-stdout \
+    -declundef \
+    -show-summary \
+    -exportlocal \
+    +linelen 120 \
+    +showdeephistory \
+    -showfunc \
+    -hints \
+    \
+    -abstract \
+    +aliasunique \
+    -ansireserved \
+    +ansireservedinternal \
+    +assignexpose \
+    +boolcompare \
+    -boolops \
+    +booltype BOOLVAL \
+    -casebreak \
+    -castfcnptr \
+    -charint \
+    +continuecomment \
+    +controlnestdepth 15 \
+    +cppnames \
+    +declundef \
+    -distinctinternalnames \
+    +evalorder \
+    -fcnuse \
+    +fielduse \
+    +forcehints \
+    -globs \
+    +imptype \
+    +incondefs \
+    +incondefslib \
+    -initallelements \
+    -isoreserved \
+    -isoreservedinternal \
+    +longintegral \
+    +macroassign \
+    +macroempty \
+    +macroredef \
+    +matchanyintegral \
+    +nestedextern \
+    -noeffect \
+    +nullassign \
+    +nullderef \
+    +nullret \
+    +nullpass \
+    -nullstate \
+    -paramuse \
+    +posixstrictlib \
+    -predboolint \
+    -predboolothers \
+    -predboolptr \
+    +ptrnegate \
+    +readonlystrings \
+    -realcompare \
+    -redef \
+    -retvalint \
+    -retvalother \
+    +shadow \
+    -shiftimplementation \
+    -shiftnegative \
+    +showscan \
+    +showsummary \
+    -skipposixheaders \
+    -type \
+    \
+    \
+    \
+    -nullstate \
+    -usereleased \
+    -mustfreefresh \
+    -mustfreeonly \
+    -compdestroy \
+    -branchstate \
+    -compmempass \
+    -globstate \
+    -compdef \
+    -modobserver \
+    -retalias \
+    -redecl \
+    \
+    -readonlytrans \
+    -onlytrans \
+    -unqualifiedtrans \
+    -observertrans \
+    -kepttrans \
+    -statictrans \
+    -immediatetrans \
+    -temptrans \
 
 # Other options we'd like to add back
 # +paramuse: As soon as we get SHIM()s in the ops
@@ -1892,28 +1892,28 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-		+fcnpost \
-		+showscan \
-		+stats \
-		-showsummary \
-		+partial \
-		src/nci.c \
-		src/inte*.c \
+    	+fcnpost \
+    	+showscan \
+        +stats \
+        -showsummary \
+        +partial \
+        src/nci.c \
+        src/inte*.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
-	     $(SRC_DIR) \
-	     $(SRC_DIR)/charset \
-	     $(SRC_DIR)/dynoplibs \
-	     $(SRC_DIR)/dynpmc \
-	     $(SRC_DIR)/encodings \
-	     $(SRC_DIR)/gc \
-	     $(SRC_DIR)/ops \
-	     $(SRC_DIR)/packfile \
-	     $(SRC_DIR)/pmc \
-	     $(SRC_DIR)/stm \
-	     $(IO_DIR) \
-	     $(IMCC_DIR)
+         $(SRC_DIR) \
+         $(SRC_DIR)/charset \
+         $(SRC_DIR)/dynoplibs \
+         $(SRC_DIR)/dynpmc \
+         $(SRC_DIR)/encodings \
+         $(SRC_DIR)/gc \
+         $(SRC_DIR)/ops \
+         $(SRC_DIR)/packfile \
+         $(SRC_DIR)/pmc \
+         $(SRC_DIR)/stm \
+         $(IO_DIR) \
+         $(IMCC_DIR)
 
 cover: \
     cover.dummy \
@@ -1931,18 +1931,18 @@ cover: \
     cover-doc \
     cover-distro
 	build_dir=$$PWD; \
-	for dir in $(COVER_DIRS); \
-	do \
-		cd $$dir; \
-		gcov *.c; \
-		cd $$build_dir; \
-		gcov2perl $$dir/*.gcov; \
-	done
+    for dir in $(COVER_DIRS); \
+    do \
+        cd $$dir; \
+        gcov *.c; \
+        cd $$build_dir; \
+        gcov2perl $$dir/*.gcov; \
+    done
 	cover -ignore_re '^\/usr\/local\/bin'
 
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
-		--linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+        --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
 
 cover-testb: cover.dummy
 	-@make@ testb
@@ -2024,7 +2024,7 @@ release : MANIFEST MANIFEST.generated
 	mv MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
 	perl -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
-	  tar -zcv -T - -f parrot-$(VERSION).tar.gz
+      tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
@@ -2076,12 +2076,12 @@ $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 tags: tags.dummy
 	$(RM_F) tags
 	@ctags@ \
-		--links=no --totals \
-		-R --exclude=blib --exclude=.svn  \
-		--exclude=res_lea.c \
-		--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-		-I NOTNULL,NULLOK \
-		$(CUR_DIR)
+        --links=no --totals \
+        -R --exclude=blib --exclude=.svn  \
+        --exclude=res_lea.c \
+        --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+        -I NOTNULL,NULLOK \
+        $(CUR_DIR)
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.dummy:
