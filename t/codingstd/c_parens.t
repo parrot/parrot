@@ -45,7 +45,6 @@ my $keywords = join '|' => sort { length $a cmp length $b } qw/
     /;
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
-my @no_space_before_open_paren;
 check_parens(@files);
 
 exit;
