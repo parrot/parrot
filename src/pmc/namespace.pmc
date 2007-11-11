@@ -713,8 +713,8 @@ does not delete the PMC.
 
         if (!VTABLE_isa(INTERP, ns, s_ns)) {
             real_exception(INTERP, NULL, E_TypeError,
-                "Invalid type %d for '%s' in del_namespace()",
-                ns->vtable->base_type, string_to_cstring(INTERP, name));
+                "Invalid type %d for '%Ss' in del_namespace()",
+                ns->vtable->base_type, name);
         }
 
         parrot_hash_delete(INTERP, hash, name);
@@ -742,8 +742,8 @@ delete the PMC.
 
         if (!VTABLE_isa(INTERP, sub, s_sub)) {
             real_exception(INTERP, NULL, E_TypeError,
-                "Invalid type %d for '%s' in del_sub()",
-                sub->vtable->base_type, string_to_cstring(INTERP, name));
+                "Invalid type %d for '%Ss' in del_sub()",
+                sub->vtable->base_type, name);
         }
 
         parrot_hash_delete(INTERP, hash, name);

@@ -1918,8 +1918,8 @@ Parrot_add_attribute(PARROT_INTERP, NOTNULL(PMC *_class), NOTNULL(STRING *attr))
 
     /* RT#45989 escape NUL char */
     if (VTABLE_exists_keyed_str(interp, attr_hash, full_attr_name)) {
-        real_exception(interp, NULL, 1, "Attribute '%s' already exists",
-                string_to_cstring(interp, full_attr_name));
+        real_exception(interp, NULL, 1,
+                "Attribute '%Ss' already exists", full_attr_name);
     }
 
     /*
