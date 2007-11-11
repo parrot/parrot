@@ -45,8 +45,6 @@ static list *new_list(char *first_item);
 static list *add_item(list *L, char *item);
 
 static char *munge_id(char *label_id, int is_label_declaration, lexer_state *lexer);
-static char *generate_unique_id(char *id, int is_label_declaration, lexer_state *lexer);
-
 static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
 static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
@@ -86,11 +84,10 @@ char *concat(char *str1, char *str2);
        <sval> TK_ANY        "any token"
        <sval> TK_BODY       "macro body"
        <mval> TK_DOT_IDENT  ".identifier"
-       <sval> TK_MACROVAR_EXP  ".$IDENT"
        <sval> TK_LABEL_ID   "$LABEL:"
        <sval> TK_LOCAL_ID   "$IDENT"
 
-       <sval> TK_LABEL_EXPANSION        "label expansion"
+%token <sval> TK_VAR_EXPANSION          "var expansion"
        <sval> TK_LABEL_TARGET_EXPANSION "label target expansion"
 
 %token <sval> TK_STRINGC    "string constant"
@@ -98,7 +95,7 @@ char *concat(char *str1, char *str2);
        <sval> TK_INTC       "integer constant"
 
 %type <sval> expression macro_body opt_macro_body arg body_token label_declaration
-             local_declaration type long_arg braced_arg var_expansion
+             local_declaration type long_arg braced_arg
 %type <lval> arguments opt_arg_list arg_list parameters opt_param_list param_list
 
 
@@ -174,8 +171,12 @@ anything: any
 
 any: TK_ANY                          { emit($1); }
    | TK_DOT_IDENT arguments          { expand($1, $2, lexer); }
-   | TK_LABEL_TARGET_EXPANSION       { emit(generate_unique_id($1, 1, lexer)); } /* LABEL: */
-   | TK_LABEL_EXPANSION              { emit(generate_unique_id($1, 0, lexer)); } /* [goto] LABEL */
+   | TK_LABEL_TARGET_EXPANSION       { char *label = munge_id($1, 1, lexer);
+                                       emit(label);
+                                     } /* LABEL: */
+   | TK_VAR_EXPANSION                { char *label = munge_id($1, 0, lexer);
+                                       emit(label);
+                                     } /* .$VAR */
    ;
 
 
@@ -206,26 +207,19 @@ macro_body: body_token               { $$ = $1; }
           ;
 
 body_token: TK_ANY                   { $$ = $1; }
-          | var_expansion            { $$ = $1; }
           | label_declaration        { $$ = $1; }
           | local_declaration        { $$ = $1; }
           ;
 
-var_expansion: TK_MACROVAR_EXP
-               { $$ = munge_id($1, 0, lexer);
-                 fprintf(stderr, "macrovar_exp for: %s\n", $1);
-               }
-             ;
-
 label_declaration: ".label" TK_LABEL_ID
-                   { $$ = munge_id($2, 1, lexer); }
+                   { $$ = $2; }
                  ;
 
 local_declaration: ".macro_local" type TK_LOCAL_ID
                    { /* create a string like ".local <type> <id>" */
                      $$ = dupstr(".local");
                      $$ = concat($$, $2);
-                     $$ = concat($$, munge_id($3, 0, lexer));
+                     $$ = concat($$, $3);
                    }
                  ;
 
@@ -314,6 +308,9 @@ new_list(char *first_item) {
 Add a new item to the specified list. The item is added
 at the back of the list, so items added are kept in order.
 
+A pointer to the beginning of the list is returned (the
+same as was specified).
+
 =cut
 
 */
@@ -322,11 +319,13 @@ add_item(list *L, char *item) {
     list *iter = L;
     assert(iter != NULL);
 
+    /* the item is added at the end of the list. This
+     * can be done more efficiently, but for now this works.
+     */
     while (iter->next != NULL) {
         iter = iter->next;
     }
-
-    assert(iter != NULL);
+    /* iter->next is now NULL, link the new node onto it. */
     iter->next = new_list(item);
 
     return L;
@@ -402,6 +401,9 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     if (args != NULL) { /* params must be null, so too many arguments */
         fprintf(stderr, "Too many arguments for macro expansion.\n");
     }
+
+    fprintf(stderr, "expanding '%s'\n", macro->name);
+    fprintf(stderr, "[%s]\n", macro->body);
 
     /* parse the macro body */
     process_string(macro->body, lexer);
@@ -659,12 +661,18 @@ delete_constant_table(constant_table *table) {
 
 =item C<munge_id>
 
-Generate an identifier based on a macro label declaration, or a macro label
-expansion. A declaration looks like: ".label $LABEL:", from which a normal
-PIR label is created, formatted as: "_gen_label_MACRO_LABEL$:".
-An expansion looks like ".$LABEL", from which a label identifier is
-generated, formatted as: "_gen_label_MACRO_LABEL$" (note the difference, there
-is no colon at the end.
+Generate an identifier based on a macro label or locaal declaration, or a macro label
+or local expansion.
+
+A label declaration looks like: ".label $LABEL:", from which a normal
+PIR label is created, formatted as: "_unique_MACRO_LABEL_?:".
+
+A label expansion looks like ".$LABEL", from which a label identifier is
+generated, formatted as: "_unique_MACRO_LABEL_?"
+(note the difference, there is no colon at the end.
+
+The same works for local identifiers, but of course the is_label_declaration
+argument must be 0 for that.
 
 =cut
 
@@ -672,13 +680,13 @@ is no colon at the end.
 static char *
 munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
     /* the format of the generated label: */
-    char const * const format = "_unique_%s_%s_?%s";
+    char const * const format = "_unique_%s_%s_%d%s";
     int const format_length   = strlen(format);
 
     /* calculate length of the generated label: length of macro name,
      * plus length of label name.
      */
-    int length = format_length + strlen(lexer->macro_id);
+    int length = format_length + strlen(lexer->macro_id) + lexer->num_digits;
     char *munged_id = NULL;
 
     length += strlen(id);
@@ -688,38 +696,12 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
 
     munged_id = (char *)calloc(length + 1, sizeof (char));
     assert(munged_id != NULL);
-    /* generate the label; if it's a declaration, then add the colon. */
-    sprintf(munged_id, format, lexer->macro_id, id, is_label_declaration ? ":" : "");
+    /* generate the identifier; if it's a declaration, then add the colon. */
+    sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id, is_label_declaration ? ":" : "");
     return munged_id;
 }
 
-/*
 
-=item C<expand_label>
-
-The munged label identifiers have a $ placeholder at the end, which must
-be replaced with a unique number. The unique number is provided by the lexer
-structure; it is incremented for each expansion, so that each macro expansion
-has uniquely generated labels and locals.
-
-=cut
-
-*/
-static char *
-generate_unique_id(char *id, int is_label_declaration, lexer_state *lexer) {
-    int length = strlen(id) + lexer->num_digits;
-    char *unique_id;
-
-    if (is_label_declaration) /* needed for ":" character, if it's a label declaration */
-        length++;
-
-    unique_id = (char *)calloc(length + 1, sizeof (char));
-    assert(unique_id != NULL);
-
-    sprintf(unique_id, "%s%d%s", id, lexer->unique_id, is_label_declaration ? ":" : "");
-
-    return unique_id;
-}
 
 /*
 
@@ -736,9 +718,8 @@ void
 process_string(char *buffer, lexer_state *lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
-
-
     macrolex_init(&yyscanner);
+
     macroset_debug(lexer->flexdebug, yyscanner);
     macroset_extra(lexer, yyscanner);
     assert(buffer != NULL);
@@ -747,9 +728,6 @@ process_string(char *buffer, lexer_state *lexer) {
     yyparse(yyscanner, lexer);
     /* clean up after playing */
     macrolex_destroy(yyscanner);
-
-
-
 }
 
 /*
@@ -898,7 +876,7 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-    if (argc > 0) {
+    if (argc > 0) { /* a command line argument was given */
         lexer->currentfile = argv[0];
         process_file(argv[0], lexer);
     }

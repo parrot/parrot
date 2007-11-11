@@ -223,24 +223,14 @@ REG            "$"?[SNIP]{DIGITS}
 
 <MACROBODY>"$"{IDENT}":"  { /* unique label declaration */
                             lexer_state *lexer = yyget_extra(yyscanner);
-                            char *label_id = dupstrn(yytext + 1, yyleng - 2);
-                            yylval->sval = label_id;
+                            yylval->sval = dupstr(yytext);
                             return TK_LABEL_ID;
                           }
 
-<MACROBODY>".$"{IDENT}    { /* referring to a declared label or local id. */
-                            lexer_state *lexer = yyget_extra(yyscanner);
-                            macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2);
-                            if (macro == NULL) {
-                                fprintf(stderr, "Error: cannot find macro parameter '%s'\n", yytext + 2);
-                            }
-                            else {
 
-                                /*yylval->sval = dupstr(yytext + 2);
-                                */
-                                yylval->sval = dupstr(macro->body);
-                            }
-                            return TK_MACROVAR_EXP;
+<MACROBODY>".$"{IDENT}    { /* referring to a declared label or local id. */
+                            yylval->sval = dupstr(yytext );
+                            return TK_ANY;
                           }
 
 <MACROBODY>".macro_local" { /* unique local declaration */
@@ -264,7 +254,7 @@ REG            "$"?[SNIP]{DIGITS}
                           }
 
 <MACROLOCAL>"$"{IDENT}     { /* unique local id declaration */
-                            yylval->sval = dupstr(yytext + 1);
+                            yylval->sval = dupstr(yytext);
                             yy_pop_state(yyscanner);
                             return TK_LOCAL_ID;
                           }
@@ -311,8 +301,6 @@ REG            "$"?[SNIP]{DIGITS}
                     return TK_ANY;
                   }
 
-
-
 <EXPARGS>","       { /* */
                      return ',';
                    }
@@ -341,6 +329,21 @@ REG            "$"?[SNIP]{DIGITS}
                      yylval->sval = dupstr(yytext);
                      return TK_IDENT;
                    }
+
+<EXPARGS>"."{IDENT} { /* .foo(.bar) */
+                      lexer_state *lexer = yyget_extra(yyscanner);
+                      macro_def *macro = find_macro(lexer->globaldefinitions, dupstr(yytext + 1));
+
+                      if (macro != NULL) {
+                         yylval->sval = macro->body;
+                         return TK_IDENT;
+                      }
+                      else {
+                         fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                      }
+                    }
+
+
 
 <EXPARGS>{REG}     { /* register can be an argument for macro expansion. */
                      yylval->sval = dupstr(yytext);
@@ -373,6 +376,47 @@ REG            "$"?[SNIP]{DIGITS}
                       }
                    }
 
+"$"{IDENT}":"      { /* */
+                     lexer_state *lexer = yyget_extra(yyscanner);
+                     macro_def *macro = find_macro(lexer->globaldefinitions, /* skip "$" and ":" */
+                                                   dupstrn(yytext + 1, yyleng - 2));
+
+                     if (macro != NULL) { /* found the parameter */
+                        yylval->sval = macro->body; /* expand the macro-parameter */
+                        return TK_LABEL_TARGET_EXPANSION;
+                     }
+                     else {
+                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                     }
+                   }
+
+".$"{IDENT}      {   /* expanding a declared variable (local or label) */
+                     lexer_state *lexer = yyget_extra(yyscanner);
+                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2); /* skip dot */
+
+                     if (macro != NULL) { /**/
+                        yylval->sval = macro->body;
+                        return TK_VAR_EXPANSION;
+                     }
+                     else {
+                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                     }
+                 }
+
+"$"{IDENT}      {    /* */
+                     lexer_state *lexer = yyget_extra(yyscanner);
+                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1); /* skip dot */
+                     if (macro != NULL) { /*  */
+                        yylval->sval = macro->body;
+                        return TK_VAR_EXPANSION;
+                     }
+                     else {
+                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 1);
+                     }
+
+
+                   }
+
 "."({Q_STRING}|{REG}) { /* treat ".'foo'" or ".$P0" as 1 token to prevent the tokens are separated
                         * by a space; they clearly belong to each other if they were written
                         * together (without a space). This is a method-call, life foo .'bar'().
@@ -385,7 +429,7 @@ REG            "$"?[SNIP]{DIGITS}
 
 
 
-<LINE>{DIGITS}  { /* when defining a constant, after reading the value, leave this state */
+<LINE>{DIGITS}           { /* when defining a constant, after reading the value, leave this state */
                            yylval->sval = dupstr(yytext);
                            /*yy_pop_state(yyscanner);*/
                            return TK_INTC;
@@ -469,15 +513,7 @@ REG            "$"?[SNIP]{DIGITS}
                                    return TK_ANY;
                                  }
 
-<INITIAL>{IDENT}"?"              { /* unique identifier */
-                                   yylval->sval = dupstrn(yytext, yyleng - 1);
-                                   return TK_LABEL_EXPANSION;
-                                 }
 
-<INITIAL>{IDENT}"?:"             { /* macro-generated label */
-                                   yylval->sval = dupstrn(yytext, yyleng - 2);
-                                   return TK_LABEL_TARGET_EXPANSION;
-                                 }
 
 <INITIAL,MACROBODY>":"{IDENT}    { /* flag */
                                    yylval->sval = dupstr(yytext);

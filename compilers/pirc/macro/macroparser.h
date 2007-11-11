@@ -55,14 +55,13 @@
      TK_ANY = 271,
      TK_BODY = 272,
      TK_DOT_IDENT = 273,
-     TK_MACROVAR_EXP = 274,
-     TK_LABEL_ID = 275,
-     TK_LOCAL_ID = 276,
-     TK_LABEL_EXPANSION = 277,
-     TK_LABEL_TARGET_EXPANSION = 278,
-     TK_STRINGC = 279,
-     TK_NUMC = 280,
-     TK_INTC = 281
+     TK_LABEL_ID = 274,
+     TK_LOCAL_ID = 275,
+     TK_VAR_EXPANSION = 276,
+     TK_LABEL_TARGET_EXPANSION = 277,
+     TK_STRINGC = 278,
+     TK_NUMC = 279,
+     TK_INTC = 280
    };
 #endif
 /* Tokens.  */
@@ -82,21 +81,20 @@
 #define TK_ANY 271
 #define TK_BODY 272
 #define TK_DOT_IDENT 273
-#define TK_MACROVAR_EXP 274
-#define TK_LABEL_ID 275
-#define TK_LOCAL_ID 276
-#define TK_LABEL_EXPANSION 277
-#define TK_LABEL_TARGET_EXPANSION 278
-#define TK_STRINGC 279
-#define TK_NUMC 280
-#define TK_INTC 281
+#define TK_LABEL_ID 274
+#define TK_LOCAL_ID 275
+#define TK_VAR_EXPANSION 276
+#define TK_LABEL_TARGET_EXPANSION 277
+#define TK_STRINGC 278
+#define TK_NUMC 279
+#define TK_INTC 280
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 63 "macro.y"
+#line 61 "macro.y"
 {
     char  *sval;
     struct list *lval;
@@ -104,7 +102,7 @@ typedef union YYSTYPE
 
 }
 /* Line 1489 of yacc.c.  */
-#line 108 "macroparser.h"
+#line 106 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

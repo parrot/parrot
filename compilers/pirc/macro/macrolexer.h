@@ -453,7 +453,7 @@ extern int macrolex (YYSTYPE * yylval_param ,yyscan_t yyscanner);
 #undef YY_DECL
 #endif
 
-#line 531 "macro.l"
+#line 567 "macro.l"
 
 
 #line 460 "macrolexer.h"
