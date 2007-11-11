@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,11 +23,12 @@ use Parrot::Configure::Step ':gen';
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Generating runtime/parrot/include};
-    $data{args}        = [ qw( verbose ) ];
-    $data{result}      = q{};
-    return \%data;
+
+    return {
+        description  => q{Generating runtime/parrot/include},
+        args         => [ qw( verbose ) ],
+        result       => q{},
+    }
 }
 
 sub const_to_parrot {
@@ -41,30 +42,30 @@ sub const_to_perl {
 
 sub transform_name {
     my $action = shift;
-    map [ $action->( $_->[0] ), $_->[1] ], @_;
+
+    return map { [ $action->( $_->[0] ), $_->[1] ] } @_;
 }
 
 sub prepend_prefix {
     my $prefix = shift;
-    transform_name sub { $prefix . $_[0] }, @_;
+
+    transform_name( sub { $prefix . $_[0] }, @_ );
 }
 
 sub perform_directive {
     my ($d) = @_;
+
     my @defs = prepend_prefix $d->{prefix}, @{ $d->{defs} };
     if ( my $subst = $d->{subst} ) {
-        @defs = transform_name sub { local $_ = shift; eval $subst; $_ }, @defs;
+        @defs = transform_name( sub { local $_ = shift; eval $subst; $_ }, @defs );
     }
     @defs;
 }
 
 sub parse_file {
     my ( $file, $fh ) = @_;
-    my @d;
 
-    my %values;
-    my $last_val;
-    my $cur;
+    my ( @d, %values, $last_val, $cur );
     while ( my $line = <$fh> ) {
         if (
             $line =~ m!
@@ -179,7 +180,7 @@ EOF
             }
         }
     }
-    $conf->data->set( TEMP_gen_pasm_includes => join( "\t\\\n\t", @generated ) );
+    $conf->data->set( TEMP_gen_pasm_includes => join( " \\\n    ", @generated ) );
 
     return 1;
 }
