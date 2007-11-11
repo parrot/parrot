@@ -30,7 +30,7 @@ This is a complete rewrite of the parser for the PIR language.
 #define YY_NO_UNISTD_H
 
 /* define YY_DECL, so that in "pirlexer.h" it won't be defined */
-#define YY_DECL int yylex(YYSTYPE *yylval,  yyscan_t yyscanner)
+#define YY_DECL int yylex(YYSTYPE *yylval, yyscan_t yyscanner)
 
 #include "pirlexer.h"
 
@@ -40,8 +40,23 @@ extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * c
 /* declare yylex() */
 extern YY_DECL;
 
+/*
+  experimental emit functions.
 
+ */
+/*
+#define EMIT_EXPERIMENT
+*/
 
+#ifdef EMIT_EXPERIMENT
+#  define emit1(X)        fprintf(stderr, "%s\n", X)
+#  define emit2(X,Y)      fprintf(stderr, "%s %s\n", X,Y)
+#  define emit3(A,B,C)    fprintf(stderr, "%s %s, %s\n", A,B,C)
+#else
+#  define emit1(X)
+#  define emit2(X,Y)
+#  define emit3(A,B,C)
+#endif
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -61,6 +76,12 @@ extern YY_DECL;
 
 
 %}
+
+%union {
+    double dval;
+    int    ival;
+    char  *sval;
+}
 
 
 %token TK_LABEL         "label"
@@ -98,7 +119,7 @@ extern YY_DECL;
        TK_RESULT        ".result"
        TK_NCI_CALL      ".nci_call"
 
-%token TK_IDENT         "identifier"
+%token <sval> TK_IDENT         "identifier"
        TK_STRINGC       "string constant"
        TK_INTC          "integer constant"
        TK_NUMC          "number constant"
@@ -110,7 +131,7 @@ extern YY_DECL;
        TK_SYM_NREG      "Symbolic number register"
        TK_SYM_SREG      "Symbolic string register"
        TK_SYM_IREG      "Symbolic integer register"
-       TK_PARROT_OP     "parrot op"
+       <sval> TK_PARROT_OP     "parrot op"
 
 %token TK_INT       "int"
        TK_NUM       "num"
@@ -173,11 +194,11 @@ extern YY_DECL;
        TK_FLAG_OPT_FLAG     ":opt_flag"
 
 
-%union {
-    double dval;
-    int    ival;
-    char  *sval;
-}
+%type <sval> unop binop augmented_op rel_op target expression
+             condition identifier if_type if_null_type
+             constant reg pasm_reg
+
+%type <ival> has_unique_reg
 
 /* a pure parser */
 %pure-parser
@@ -210,6 +231,7 @@ extern YY_DECL;
 program: opt_nl
          compilation_units
          opt_nl
+         { emit1("end"); }
        ;
 
 opt_nl: /* empty */
@@ -266,9 +288,12 @@ parrot_statement: TK_PARROT_OP opt_parrot_op_args "\n"
 
 /* Namespaces */
 
-namespace_declaration: ".namespace"
-                     | ".namespace" '[' namespace_id ']'
+namespace_declaration: ".namespace" opt_namespace_id
                      ;
+
+opt_namespace_id: /* empty */
+                | '[' namespace_id ']'
+                ;
 
 namespace_id: TK_STRINGC
             | namespace_id separator TK_STRINGC
@@ -337,8 +362,7 @@ labeled_instruction: TK_LABEL "\n"
                    | instruction
                    ;
 
-instruction: if_statement
-           | unless_statement
+instruction: conditional_statement
            | goto_statement
            | local_declaration
            | lex_declaration
@@ -354,8 +378,8 @@ instruction: if_statement
            | error "\n" { yyerrok; }
            ;
 
-null_statement: "null" target "\n"
-              | target '=' "null" "\n"
+null_statement: "null" target "\n"       { emit2("null", $2); }
+              | target '=' "null" "\n"   { emit2("null", $1); }
               ;
 
 getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
@@ -383,6 +407,15 @@ assignment_expression: unop expression
                      ;
 
 
+/*
+ * The case of a parrot instruction without arguments is covered by
+ * the rule assignment_expression : expression.
+ * This brings up the question, whether the check for "is_op()" should
+ * be done in the lexer or here, in the parser, because when
+ * reducing the rule "expression", we need to know whether it is
+ * an op. If the check is done in the parser, then the token
+ * TK_PARROT_OP can be removed.
+ */
 parrot_instruction: TK_PARROT_OP parrot_op_args
                   ;
 
@@ -394,48 +427,53 @@ parrot_op_args: parrot_op_arg
               | parrot_op_args ',' parrot_op_arg
               ;
 
-parrot_op_arg: expression
+parrot_op_arg: pasm_expression
              ;
 
 
 simple_invocation: invokable arguments
                  ;
 
-unop: '-'
-    | '!'
-    | '~'
+unop: '-'     { $$ = "neg"; }
+    | '!'     { $$ = "not"; }
+    | '~'     { $$ = "bnot"; }
     ;
 
-binop: '+'
-     | '-'
-     | '/'
-     | '*'
-     | '%'
-     | "."
-     | ">>>"
-     | ">>"
-     | "<<"
-     | "||"
-     | "&&"
-     | "//"
-     | "~~"
+binop: '+'    { $$ = "add"; }
+     | '-'    { $$ = "sub"; }
+     | '/'    { $$ = "div"; }
+     | '*'    { $$ = "mul"; }
+     | '%'    { $$ = "mod"; }
+     | '|'    { $$ = "bor"; }
+     | '&'    { $$ = "band"; }
+     | '~'    { $$ = "bxor"; }
+     | "**"   { $$ = "pow"; }
+     | "."    { $$ = "concat"; }
+     | ">>>"  { $$ = "lsr"; }
+     | ">>"   { $$ = "shr"; }
+     | "<<"   { $$ = "shl"; }
+     | "||"   { $$ = "or";  }
+     | "&&"   { $$ = "and"; }
+     | "//"   { $$ = "fdiv"; }
+     | "~~"   { $$ = "xor"; }
+     | rel_op { $$ = $1; }
      ;
 
 
-augmented_op: "+="
-            | "-="
-            | "*="
-            | "%="
-            | "**="
-            | "/="
-            | "//="
-            | "|="
-            | "&="
-            | "~="
-            | ".="
-            | ">>="
-            | "<<="
-            | ">>>="
+augmented_op: "+="   { $$ = "add"; }
+            | "-="   { $$ = "sub"; }
+            | "*="   { $$ = "mul"; }
+            | "%="   { $$ = "mod"; }
+            | "**="  { $$ = "pow"; }
+            | "/="   { $$ = "div"; }
+            | "//="  { $$ = "fdiv"; }
+            | "|="   { $$ = "bor"; }
+            | "&="   { $$ = "band" }
+            | "~="   { $$ = "bxor"; }
+            | ".="   { $$ = "concat"; }
+            | ">>="  { $$ = "shr"; }
+            | "<<="  { $$ = "shl"; }
+            | ">>>=" { $$ = "lsr"; }
             ;
 
 keylist: '[' keys ']'
@@ -453,17 +491,31 @@ separator: ';'
          ;
 
 
-if_statement: "if" condition goto identifier "\n"
+conditional_statement: if_type condition goto_or_comma identifier "\n"
+                       { emit3($1, $2, $4); }
+                     | if_null_type expression goto_or_comma identifier "\n"
+                       { emit3($1, $2, $4); }
+                     ;
+
+if_type: "if"      { $$ = "if"; }
+       | "unless"  { $$ = "unless"; }
+       ;
+
+
+if_null_type: "if" "null"     { $$ = "if_null"; }
+            | "unless" "null" { $$ = "unless_null"; }
             ;
 
-unless_statement: "unless" condition goto identifier "\n"
-                ;
+goto_or_comma: "goto" /* PIR mode */
+             | ','    /* PASM mode*/
+             ;
 
-goto: "goto" /* PIR mode */
-    | ','    /* PASM mode*/
-    ;
+condition: expression
+         | expression rel_op expression
+         ;
 
 goto_statement: "goto" identifier "\n"
+                { emit2("branch", $2); }
               ;
 
 local_declaration: ".local" type local_id_list "\n"
@@ -473,9 +525,12 @@ local_id_list: local_id
              | local_id_list ',' local_id
              ;
 
-local_id: identifier
-        | identifier ":unique_reg"
+local_id: identifier has_unique_reg
         ;
+
+has_unique_reg: /* empty */     { $$ = 0; }
+              | ":unique_reg"   { $$ = 1; }
+              ;
 
 identifier: TK_IDENT
           | TK_PARROT_OP
@@ -493,6 +548,10 @@ long_invocation_statement: ".begin_call" "\n"
                            long_invocation "\n"
                            long_results
                            ".end_call" "\n"
+                           {
+
+
+                           }
                          ;
 
 long_arguments: /* empty */
@@ -574,6 +633,10 @@ return_statement: short_return_statement
 long_return_statement: ".begin_return" "\n"
                        return_expressions
                        ".end_return" "\n"
+                       {
+                            emit1("set_returns");
+                            emit1("returncc");
+                       }
                      ;
 
 
@@ -582,10 +645,17 @@ yield_statement: short_yield_statement
                ;
 
 short_return_statement: ".return" arguments "\n"
+                        {
+                            emit1("set_returns");
+                            emit1("returncc");
+                        }
                       | ".return" invocation_expression "\n"
                       ;
 
 short_yield_statement: ".yield" arguments "\n"
+                       {
+                           emit1("yield");
+                       }
                      ;
 
 arguments: '(' opt_arguments_list ')'
@@ -647,10 +717,9 @@ const_tail: "int" identifier '=' TK_INTC
           | "string" identifier '=' TK_STRINGC
           ;
 
-condition: "null" expression
-         | expression
-         | expression rel_op expression
-         ;
+pasm_expression: constant
+               | pasm_reg
+               ;
 
 expression: target
           | constant
@@ -675,12 +744,12 @@ pasm_reg: TK_PASM_PREG
         | TK_PASM_SREG
         ;
 
-rel_op: "!="
-      | "=="
-      | "<"
-      | "<="
-      | ">="
-      | ">"
+rel_op: "!="  { $$ = "isne"; }
+      | "=="  { $$ = "iseq"; }
+      | "<"   { $$ = "islt"; }
+      | "<="  { $$ = "isle"; }
+      | ">="  { $$ = "isge"; }
+      | ">"   { $$ = "isgt"; }
       ;
 
 type: "int"
