@@ -10,8 +10,10 @@ Compile Scheme to PASM.
 
 =head1 Implementation
 
-Lexing is done in Scheme::Tokenizer, parsing is done Scheme::Parser,
-PASM is generated in Scheme::Generator.
+Lexing is done in Scheme::Tokenizer.
+Parsing is done Scheme::Parser,
+PIR is generated in Scheme::Generator.
+Scheme.pm pulls it all together.
 
 =head1 SEE ALSO
 

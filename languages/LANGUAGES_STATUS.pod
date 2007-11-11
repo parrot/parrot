@@ -1037,17 +1037,17 @@ http://homepage.mac.com/matt.kennedy/Span
 
 =item Description
 
-Scheme
+A Scheme to PIR compiler implemented in Perl 5.
 
 =item Status
 
-Functioning, as far as implemented. Lists, functions and closures are working but many
+Works as far as implemented. Lists, functions and closures are working but many
 functions are missing implementation. Works with the current calling conventions.
 Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.16
+0.4.17
 
 =item Location
 
