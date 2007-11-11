@@ -179,6 +179,7 @@ static char *munge_id(char *label_id, int is_label_declaration, lexer_state *lex
 static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
 static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
+static void update_unique_id(lexer_state *lexer);
 
 macro_def *find_macro(constant_table *table, char *name);
 
@@ -209,7 +210,7 @@ char *concat(char *str1, char *str2);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 61 "macro.y"
+#line 62 "macro.y"
 {
     char  *sval;
     struct list *lval;
@@ -217,7 +218,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 221 "macroparser.c"
+#line 222 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -230,7 +231,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 234 "macroparser.c"
+#line 235 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -534,13 +535,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   126,   126,   127,   130,   131,   134,   135,   139,   146,
-     147,   148,   149,   150,   153,   159,   160,   168,   169,   172,
-     173,   174,   177,   183,   187,   194,   193,   201,   202,   205,
-     206,   209,   210,   211,   214,   218,   226,   227,   228,   229,
-     232,   233,   236,   237,   240,   241,   244,   245,   248,   249,
-     252,   253,   256,   257,   260,   263,   264,   270,   271,   272,
-     273
+       0,   127,   127,   128,   131,   132,   135,   136,   140,   147,
+     148,   149,   150,   151,   154,   160,   161,   169,   170,   173,
+     174,   175,   178,   184,   188,   195,   194,   202,   203,   206,
+     207,   210,   211,   212,   215,   219,   227,   228,   229,   230,
+     233,   234,   237,   238,   241,   242,   245,   246,   249,   250,
+     253,   254,   257,   258,   261,   264,   265,   271,   272,   273,
+     274
 };
 #endif
 
@@ -1512,19 +1513,19 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 140 "macro.y"
+#line 141 "macro.y"
     { emit("\n");  /* after each statement, emit a newline */ ;}
     break;
 
   case 14:
-#line 154 "macro.y"
+#line 155 "macro.y"
     { emit("setline");
                   emit((yyvsp[(2) - (3)].sval));
                 ;}
     break;
 
   case 16:
-#line 161 "macro.y"
+#line 162 "macro.y"
     { emit("setfile");
                 emit((yyvsp[(2) - (2)].sval));
                 emit("\n");
@@ -1532,91 +1533,91 @@ yyreduce:
     break;
 
   case 19:
-#line 172 "macro.y"
+#line 173 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 173 "macro.y"
+#line 174 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 174 "macro.y"
+#line 175 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
                                        emit(label);
                                      ;}
     break;
 
   case 22:
-#line 177 "macro.y"
+#line 178 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
                                        emit(label);
                                      ;}
     break;
 
   case 23:
-#line 184 "macro.y"
+#line 185 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 24:
-#line 188 "macro.y"
+#line 189 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 25:
-#line 194 "macro.y"
+#line 195 "macro.y"
     { /* store the id as the current macro */ lexer->macro_id = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 26:
-#line 198 "macro.y"
+#line 199 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (7)].sval), (yyvsp[(4) - (7)].lval), (yyvsp[(6) - (7)].sval)); ;}
     break;
 
   case 27:
-#line 201 "macro.y"
+#line 202 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 28:
-#line 202 "macro.y"
+#line 203 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 29:
-#line 205 "macro.y"
+#line 206 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 30:
-#line 206 "macro.y"
+#line 207 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 31:
-#line 209 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 32:
 #line 210 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
-  case 33:
+  case 32:
 #line 211 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
+  case 33:
+#line 212 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+    break;
+
   case 34:
-#line 215 "macro.y"
+#line 216 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 35:
-#line 219 "macro.y"
+#line 220 "macro.y"
     { /* create a string like ".local <type> <id>" */
                      (yyval.sval) = dupstr(".local");
                      (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval));
@@ -1625,93 +1626,93 @@ yyreduce:
     break;
 
   case 40:
-#line 232 "macro.y"
+#line 233 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 41:
-#line 233 "macro.y"
+#line 234 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 42:
-#line 236 "macro.y"
+#line 237 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 43:
-#line 237 "macro.y"
+#line 238 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 44:
-#line 240 "macro.y"
+#line 241 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 45:
-#line 241 "macro.y"
+#line 242 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 46:
-#line 244 "macro.y"
+#line 245 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 47:
-#line 245 "macro.y"
+#line 246 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 48:
-#line 248 "macro.y"
+#line 249 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 49:
-#line 249 "macro.y"
+#line 250 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 50:
-#line 252 "macro.y"
+#line 253 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 51:
-#line 253 "macro.y"
+#line 254 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 52:
-#line 256 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 53:
 #line 257 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
+  case 53:
+#line 258 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+    break;
+
   case 54:
-#line 260 "macro.y"
+#line 261 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
   case 55:
-#line 263 "macro.y"
+#line 264 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 56:
-#line 264 "macro.y"
+#line 265 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1715 "macroparser.c"
+#line 1716 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1925,7 +1926,7 @@ yyreturn:
 }
 
 
-#line 278 "macro.y"
+#line 279 "macro.y"
 
 
 
@@ -2052,19 +2053,30 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     if (args != NULL) { /* params must be null, so too many arguments */
         fprintf(stderr, "Too many arguments for macro expansion.\n");
     }
-
+/*
     fprintf(stderr, "expanding '%s'\n", macro->name);
     fprintf(stderr, "[%s]\n", macro->body);
-
+*/
     /* parse the macro body */
+
+/*
+    fprintf(stderr, "expansion '%s' starting\n", macro->name);
+*/
+    update_unique_id(lexer);
+
     process_string(macro->body, lexer);
 
+    lexer->unique_id--;
+/*
+    fprintf(stderr, "expansion '%s' done\n", macro->name);
+*/
 
     /* now remove the temporary constant definitions */
     pop_constant_table(lexer);
     delete_constant_table(macro_params);
-
+/*
     update_unique_id(lexer);
+*/
 }
 
 /*

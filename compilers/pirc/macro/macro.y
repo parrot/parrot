@@ -48,6 +48,7 @@ static char *munge_id(char *label_id, int is_label_declaration, lexer_state *lex
 static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
 static constant_table *pop_constant_table(lexer_state *lexer);
 static void delete_constant_table(constant_table *table);
+static void update_unique_id(lexer_state *lexer);
 
 macro_def *find_macro(constant_table *table, char *name);
 
@@ -401,19 +402,31 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     if (args != NULL) { /* params must be null, so too many arguments */
         fprintf(stderr, "Too many arguments for macro expansion.\n");
     }
-
+/*
     fprintf(stderr, "expanding '%s'\n", macro->name);
     fprintf(stderr, "[%s]\n", macro->body);
-
+*/
     /* parse the macro body */
+
+/*
+    fprintf(stderr, "expansion '%s' starting\n", macro->name);
+*/
+    update_unique_id(lexer);
+
     process_string(macro->body, lexer);
 
+    /* this unique id stuff needs more thought. */
+    lexer->unique_id--;
+/*
+    fprintf(stderr, "expansion '%s' done\n", macro->name);
+*/
 
     /* now remove the temporary constant definitions */
     pop_constant_table(lexer);
     delete_constant_table(macro_params);
-
+/*
     update_unique_id(lexer);
+*/
 }
 
 /*

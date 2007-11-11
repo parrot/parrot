@@ -94,7 +94,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 61 "macro.y"
+#line 62 "macro.y"
 {
     char  *sval;
     struct list *lval;
