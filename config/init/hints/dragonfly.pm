@@ -1,7 +1,7 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id $
 
-package init::hints::dragonflybsd;
+package init::hints::dragonfly;
 
 use strict;
 use warnings;
