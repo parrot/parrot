@@ -10,15 +10,13 @@
 typedef struct lexer_state {
     constant_table *globaldefinitions;
     char *currentfile;
-    int errors;
-    int flexdebug;
+    int   errors;
+    int   flexdebug;
     char *macro_id;
-    int line;
-
-    /* unique number for generated locals and labels */
-    int unique_id;
-    /* keep track of number of digits in unique_id */
-    int num_digits;
+    int   line;
+    int   id_gen;     /* generator for unique ids */
+    int   unique_id;  /* unique number for generated locals and labels */
+    int   num_digits; /* keep track of number of digits in unique_id */
 
 
 } lexer_state;

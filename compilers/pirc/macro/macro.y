@@ -192,11 +192,10 @@ macro_const_definition: ".macro_const" TK_IDENT expression
 
 
 macro_definition: ".macro" TK_IDENT
-                  { /* store the id as the current macro */ lexer->macro_id = $2; }
                   parameters "\n"
                   opt_macro_body
                   ".endm"
-                  { define_macro(lexer->globaldefinitions, $2, $4, $6); }
+                  { define_macro(lexer->globaldefinitions, $2, $3, $5); }
                 ;
 
 opt_macro_body: /* empty, make sure the macro body is a valid string. */ { $$ = ""; }
@@ -362,12 +361,12 @@ include_file(char *filename, lexer_state *lexer) {
 static void
 update_unique_id(lexer_state *lexer) {
     /* each expansion has a unique id that is used for label/local munging */
-    lexer->unique_id++;
+    lexer->id_gen++;
     /* Count number of digits:
      * log10 returns a double, get the part before the dot (so, "3.14" -> "3")
      * log10(1000) -> 3, so add 1 more digit.
      */
-    lexer->num_digits = floor(log10(lexer->unique_id)) + 1;
+    lexer->num_digits = floor(log10(lexer->id_gen)) + 1;
 }
 
 
@@ -386,6 +385,9 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* enter the parameters as temporary symbols (.macro_const) */
     constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
     list *params = macro->parameters;
+
+    int current_scope_nr;
+    char *current_macro_id;
 
     while (params && args) {
         define_constant(macro_params, params->item, args->item);
@@ -411,12 +413,17 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
 /*
     fprintf(stderr, "expansion '%s' starting\n", macro->name);
 */
+    current_macro_id = lexer->macro_id;
+    lexer->macro_id  = macro->name;
+    /* save current scope id */
+    current_scope_nr = lexer->unique_id;
     update_unique_id(lexer);
-
+    lexer->unique_id = lexer->id_gen;
     process_string(macro->body, lexer);
 
-    /* this unique id stuff needs more thought. */
-    lexer->unique_id--;
+    /* restore current scope id */
+    lexer->unique_id = current_scope_nr;
+    lexer->macro_id  = current_macro_id;
 /*
     fprintf(stderr, "expansion '%s' done\n", macro->name);
 */
@@ -710,7 +717,8 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
     munged_id = (char *)calloc(length + 1, sizeof (char));
     assert(munged_id != NULL);
     /* generate the identifier; if it's a declaration, then add the colon. */
-    sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id, is_label_declaration ? ":" : "");
+    sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id,
+            is_label_declaration ? ":" : "");
     return munged_id;
 }
 
