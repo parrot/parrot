@@ -1628,31 +1628,22 @@ test-clean :
     "t/compilers/*/*/*.pir" \
     "t/compilers/*/*/*.stabs.s"
 	$(RM_F) \
-    "t/dynoplibs/*.pbc" \
-    "t/examples/*.pbc" \
-    "t/examples/*_pbcexe*" \
     "t/examples/*.past"
 	$(RM_F) \
     "t/*/*$(O)" \
     "t/*/*.out" \
     "t/*/*.pasm" \
+    "t/*/*.pbc" \
     "t/*/*_pbcexe*" \
     "t/*/*.pir" \
     "t/*/*.stabs.s"
-	$(RM_F) \
-    "t/library/*.pbc" \
-    "t/op/*.pbc" \
-    "t/pmc/*.pbc" \
-    "t/stress/*.pbc" \
-    "t/tools/*.pbc"
 	$(RM_F) \
     "t/src/*.c" \
     "t/src/*.pdb" \
     "t/src/*.manifest"
 	$(RM_F) \
     "t/tools/pmc2c.t_*" \
-    "t/tools/pmc2c.pmc_t_*"
-	$(RM_F) \
+    "t/tools/pmc2c.pmc_t_*" \
     "t/tools/pdb.t.*"
 
 imcc-clean:
