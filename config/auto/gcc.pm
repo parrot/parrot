@@ -104,7 +104,6 @@ sub _evaluate_gcc {
 
     my @opt_and_vers = (
               0 => ""
-            . " -std=c89"
             . " -W"
             . " -Wall"
             . " -Waggregate-return"
