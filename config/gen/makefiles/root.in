@@ -1633,10 +1633,16 @@ test-clean :
     "t/*/*$(O)" \
     "t/*/*.out" \
     "t/*/*.pasm" \
-    "t/*/*.pbc" \
     "t/*/*_pbcexe*" \
     "t/*/*.pir" \
     "t/*/*.stabs.s"
+	$(RM_F) \
+    "t/library/*.pbc" \
+    "t/dynoplibs/*.pbc" \
+    "t/op/*.pbc" \
+    "t/pmc/*.pbc" \
+    "t/stress/*.pbc" \
+    "t/tools/*.pbc"
 	$(RM_F) \
     "t/src/*.c" \
     "t/src/*.pdb" \
