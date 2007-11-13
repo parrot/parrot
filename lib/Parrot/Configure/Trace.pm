@@ -85,6 +85,33 @@ sub trace_data_c {
     return \@c;
 }
 
+sub diff_data_c {
+    my ( $self, $argsref ) = @_;
+    $argsref->{verbose} = 1;
+    my $trace_ref = $self->trace_data_c($argsref);
+    my @traces = @{ $trace_ref };
+    my @results = ();
+    for (my $i = 1; $i < scalar(@traces); $i++) {
+        my %prior = %{$traces[$i - 1]};
+        my %this  = %{$traces[$i]};
+        my ($prior_key, $prior_value)   = each %prior;
+        if ($i != scalar(@traces) ) {
+            my ($this_key,  $this_value)    = each %this;
+            $prior_value = q{} unless defined $prior_value;
+            $this_value = q{} unless defined $this_value;
+            if ($prior_value ne $this_value) {
+                push @results, {
+                    number  => $i,
+                    name    => $this_key,
+                    before  => $prior_value,
+                    after   => $this_value,
+                };
+            }
+        }
+    }
+    return \@results;
+}
+
 sub trace_data_triggers {
     my ( $self, $argsref ) = @_;
     my @data     = @{$self};
@@ -153,6 +180,10 @@ After configuration has completed:
     $attr = $obj->trace_data_c( {
         attr        => 'some_attr',
         verbose     => 1,               # optional
+    } );
+
+    $attr = $obj->diff_data_c( {
+        attr        => 'some_attr',
     } );
 
     $attr = $obj->trace_data_triggers( {
@@ -363,6 +394,58 @@ step C<n + 1>.
 If, however, C<verbose> is set, each element C<n> of the array holds a hash
 reference where the hash key is the name of configuration step C<n + 1> and
 the value is the value of the attribute at step C<n + 1>.
+
+=back
+
+=head2 C<diff_data_c()>
+
+=over 4
+
+=item * Purpose
+
+Provide a list of those configuration steps where the value of a given
+attribute in the C<{data}->{c}> part of the Parrot::Configure object changed
+from that in effect at the conclusion of the preveious configuration step.
+
+=item * Arguments
+
+Hash reference.  Key C<attr> is mandatory; it is the key whose changes in
+value between various steps you wish to trace over the course of
+configuration.
+
+=item * Return Value
+
+Array reference.  Each element of the array is a reference to a hash holding
+information about those configuration steps where the value of a given
+attribute changed from the previous configuration step.  The hash has the
+following key-value pairs:
+
+=over 4
+
+=item * number
+
+Number of the configuration step where the value of the given attribute
+changed; enumeration starts at C<1>, not C<0>.
+
+=item * name
+
+Name of the configuration step where the value of the given attribute changed.
+
+=item * before
+
+For step C<n>, the value of the attribute at step C<n-1>.
+
+=item * after
+
+For step C<n>, the value of the attribute at step C<n>.
+
+=back
+
+=item * Comment
+
+The array whose reference is the return value of this method only contains
+elements for those configuration steps where the value of the given attribute
+changed.  Nothing is reported if nothing changed.
 
 =back
 
