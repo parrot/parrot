@@ -182,7 +182,7 @@ After configuration has completed:
         verbose     => 1,               # optional
     } );
 
-    $attr = $obj->diff_data_c( {
+    $list_diff_steps = $obj->diff_data_c( {
         attr        => 'some_attr',
     } );
 

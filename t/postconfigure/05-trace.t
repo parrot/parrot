@@ -12,7 +12,7 @@ use Test::More;
 if ( ( -e qq{./lib/Parrot/Config/Generated.pm} )
     and ( -e qq{./.configure_trace.sto} ) )
 {
-    plan tests => 36;
+    plan tests => 38;
 }
 else {
     plan skip_all => q{Tests irrelevant unless configuration completed with tracing requested};
@@ -118,6 +118,14 @@ is( scalar( @{$attr} ),
     $steps_number, "trace_data_c() and list_steps() return same number of elements" );
 $bad = 0;
 
+my $list_diff_steps = $obj->diff_data_c( { attr => 'ccflags' } );
+is(ref($list_diff_steps), 'ARRAY', "diff_data_c returned array ref");
+for (my $i=0; $i <= $#$list_diff_steps; $i++) {
+    $bad++ if ref($list_diff_steps->[$i]) ne 'HASH';
+}
+is($bad, 0, "Output of diff_data_c() is ref to array of hashrefs");
+$bad = 0;
+
 foreach my $el ( @{$attr} ) {
     $bad++ unless ref($el) eq 'HASH';
 }
@@ -146,9 +154,13 @@ is( $bad, 0,
     "With 'verbose', each element in array returned by trace_data_triggers() is hash ref" );
 
 my @state;
-ok( $state[0] = $obj->get_state_at_step(57), "get_state_at_step() returned true" );
-ok( $state[1] = $obj->get_state_at_step('gen::makefiles'), "get_state_at_step() returned true" );
-is_deeply( $state[0], $state[1], "Numeric and string arguments gave same result" );
+my $test_step = 'gen::makefiles';
+ok( $state[0] = $obj->get_state_at_step($index->{$test_step}),
+    "get_state_at_step() returned true" );
+ok( $state[1] = $obj->get_state_at_step($test_step),
+    "get_state_at_step() returned true" );
+is_deeply( $state[0], $state[1],
+    "Numeric and string arguments gave same result" );
 
 my $state;
 eval { $state = $obj->get_state_at_step(0); };
