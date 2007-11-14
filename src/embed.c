@@ -877,6 +877,8 @@ Parrot_runcode(PARROT_INTERP, int argc, char *argv[])
             case PARROT_EXEC_CORE:
                 PIO_eprintf(interp, "EXEC core");
                 break;
+            default:
+                real_exception(interp, NULL, 1, "Unknown run core");
         }
         PIO_eprintf(interp, " ***\n");
     }

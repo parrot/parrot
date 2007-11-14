@@ -238,6 +238,8 @@ check_builtin_sig(size_t i, NOTNULL(const char *sig), int convert_pmcs)
                 /* fall through */
             case 'J':   /* interpreter */
                 ++p;
+            default:
+                break;
         }
         if (*p == 'O' && *sig == 'P')
             continue;

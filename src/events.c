@@ -209,6 +209,8 @@ sig_handler(int signum)
         case SIGHUP:
             sig_hup = 1;
             break;
+        default:
+            break;
     }
 }
 
@@ -648,11 +650,11 @@ Schedule event-loop terminate event. This shuts down the event thread.
 
 PARROT_API
 void
-Parrot_kill_event_loop(void)
+Parrot_kill_event_loop(PARROT_INTERP)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
-    Parrot_schedule_event(NULL, ev);
+    Parrot_schedule_event(interp, ev);
 }
 
 /*

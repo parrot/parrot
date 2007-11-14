@@ -306,9 +306,8 @@ void PDB_script_file(PARROT_INTERP, NOTNULL(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_set_break(PARROT_INTERP, NOTNULL(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void PDB_set_break(PARROT_INTERP, const char *command)
+        __attribute__nonnull__(1);
 
 void PDB_skip_breakpoint(PARROT_INTERP, long i)
         __attribute__nonnull__(1);

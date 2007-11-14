@@ -2737,6 +2737,8 @@ GDB_P(PARROT_INTERP, NOTNULL(const char *s))
                 /* prints directly */
                 trace_pmc_dump(interp, REG_PMC(interp, n));
                 return "";
+            default:
+                break;
         }
     }
     return "no such reg";

@@ -374,7 +374,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      */
     if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
-        Parrot_kill_event_loop();
+        Parrot_kill_event_loop(interp);
     }
 
     /* we destroy all child interpreters and the last one too,

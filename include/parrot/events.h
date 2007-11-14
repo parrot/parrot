@@ -117,7 +117,8 @@ PARROT_API
 void Parrot_init_signals(void);
 
 PARROT_API
-void Parrot_kill_event_loop(void);
+void Parrot_kill_event_loop(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_new_cb_event(PARROT_INTERP,

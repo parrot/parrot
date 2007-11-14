@@ -454,9 +454,8 @@ RT#42375 move/officalize this opcode at next op cleanup.
 =cut
 
 op pmcinfo(out INT, invar PMC, inconst INT) {
-  switch ($3) {
-    case PMCINFO_FLAGS:    $1 = PObj_get_FLAGS($2); break;
-  }
+  if ($3 == PMCINFO_FLAGS)
+      $1 = PObj_get_FLAGS($2);
   goto NEXT();
 }
 

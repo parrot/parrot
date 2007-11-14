@@ -2506,6 +2506,8 @@ string_escape_string_delimited(PARROT_INTERP,
                     dp[i++] = '\\';
                     c = 'e';
                     break;
+                default:
+                    break;
             }
             if (c >= 0x20) {
                 dp[i++] = (unsigned char)c;
