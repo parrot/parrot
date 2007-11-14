@@ -1,22 +1,24 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 125-auto_headers-01.t
+# 125-auto_headers-04.t
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 15;
 use Carp;
+use Config;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::headers');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::IO::Capture::Mini;
 
 my $args = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -40,28 +42,35 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 ok( $step->description(), "$step_name has description" );
 
-my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+auto::headers::_set_from_Config($conf, \%Config);
+ok($conf->data->get('i_netinetin'), "Mapping made correctly");
+ok(! $conf->data->get('i_niin'), "Mapping made correctly");
 
+{
+    local $^O = "msys";
+    my %extra_headers = map {$_, 1} auto::headers::_list_extra_headers();
+    ok($extra_headers{'sysmman.h'}, "Special header set for msys");
+    ok($extra_headers{'netdb.h'}, "Special header set for msys");
+}
+
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-125-auto_headers-01.t - test config::auto::headers
+125-auto_headers-04.t - test config::auto::headers
 
 =head1 SYNOPSIS
 
-    % prove t/configure/125-auto_headers-01.t
+    % prove t/configure/125-auto_headers-04.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test config::auto::headers with the C<miniparrot>
-option set.
+The tests in this file test subroutines internal to config::auto::headers.
 
 =head1 AUTHOR
 

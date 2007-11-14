@@ -1,11 +1,11 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 125-auto_headers-01.t
+# 125-auto_headers-02.t
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -16,7 +16,7 @@ use Parrot::Configure::Test qw( test_step_thru_runstep);
 
 my $args = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -42,26 +42,27 @@ ok( $step->description(), "$step_name has description" );
 
 my $ret = $step->runstep($conf);
 ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
+is($step->result(), q{}, "Result is empty string as expected");
 
+pass("Keep Devel::Cover happy");
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-125-auto_headers-01.t - test config::auto::headers
+125-auto_headers-02.t - test config::auto::headers
 
 =head1 SYNOPSIS
 
-    % prove t/configure/125-auto_headers-01.t
+    % prove t/configure/125-auto_headers-02.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test config::auto::headers with the C<miniparrot>
-option set.
+The tests in this file test config::auto::headers in its most typical
+case.
 
 =head1 AUTHOR
 
