@@ -95,7 +95,6 @@ sub diff_data_c {
         my %prior = %{$traces[$i - 1]};
         my %this  = %{$traces[$i]};
         my ($prior_key, $prior_value)   = each %prior;
-        if ($i != scalar(@traces) ) {
             my ($this_key,  $this_value)    = each %this;
             $prior_value = q{} unless defined $prior_value;
             $this_value = q{} unless defined $this_value;
@@ -107,7 +106,6 @@ sub diff_data_c {
                     after   => $this_value,
                 };
             }
-        }
     }
     return \@results;
 }

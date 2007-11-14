@@ -12,7 +12,7 @@ use Test::More;
 if ( ( -e qq{./lib/Parrot/Config/Generated.pm} )
     and ( -e qq{./.configure_trace.sto} ) )
 {
-    plan tests => 38;
+    plan tests => 40;
 }
 else {
     plan skip_all => q{Tests irrelevant unless configuration completed with tracing requested};
@@ -118,7 +118,16 @@ is( scalar( @{$attr} ),
     $steps_number, "trace_data_c() and list_steps() return same number of elements" );
 $bad = 0;
 
-my $list_diff_steps = $obj->diff_data_c( { attr => 'ccflags' } );
+my $list_diff_steps;
+$list_diff_steps = $obj->diff_data_c( { attr => 'ccflags' } );
+is(ref($list_diff_steps), 'ARRAY', "diff_data_c returned array ref");
+for (my $i=0; $i <= $#$list_diff_steps; $i++) {
+    $bad++ if ref($list_diff_steps->[$i]) ne 'HASH';
+}
+is($bad, 0, "Output of diff_data_c() is ref to array of hashrefs");
+$bad = 0;
+
+$list_diff_steps = $obj->diff_data_c( { attr => 'inc' } );
 is(ref($list_diff_steps), 'ARRAY', "diff_data_c returned array ref");
 for (my $i=0; $i <= $#$list_diff_steps; $i++) {
     $bad++ if ref($list_diff_steps->[$i]) ne 'HASH';
