@@ -9,6 +9,10 @@ config/auto/env.pm - System Environment
 
 Determining if the C library has C<setenv()> and C<unsetenv()>.
 
+More information about these functions can be found at
+L<http://www.gnu.org/software/libc/manual/html_node/Environment-Access.html>,
+among other locations.
+
 =cut
 
 package auto::env;
@@ -32,8 +36,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
-    my $verbose = $conf->options->get('verbose');
-
     my ( $setenv, $unsetenv ) = ( 0, 0 );
 
     cc_gen('config/auto/env/test_setenv.in');
@@ -49,6 +51,14 @@ sub runstep {
     }
     cc_clean();
 
+    $self->_evaluate_env($conf, $setenv, $unsetenv);
+
+    return 1;
+}
+
+sub _evaluate_env {
+    my ($self, $conf, $setenv, $unsetenv) = @_;
+    my $verbose = $conf->options->get('verbose');
     $conf->data->set(
         setenv   => $setenv,
         unsetenv => $unsetenv
@@ -70,8 +80,6 @@ sub runstep {
         print " (no) " if $verbose;
         $self->set_result('no');
     }
-
-    return 1;
 }
 
 1;
