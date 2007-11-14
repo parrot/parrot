@@ -33,6 +33,13 @@ use base qw( Parrot::IO::File );
 use Pod::Simple::Checker;
 use Parrot::Docs::POD2HTML;
 
+# wrapped here to reset the error timestamp to speed up check_pod()
+sub write {
+    my $self                 = shift;
+    $self->{POD_ERRORS_TIME} = 0;
+    return $self->SUPER::write(@_);
+}
+
 my $UNDEFINED = 'Undefined';
 
 # These are the Parrot file types excluding the ICU specifc ones.

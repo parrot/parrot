@@ -43,31 +43,28 @@ my $d = Parrot::Docs::Directory->new( catfile(qw(lib Parrot Docs)) );
 my @a = $d->files_of_type('Perl module');
 
 # This will fail if you add a new module.
-ok( @a == 7, 'files_of_type succeed' );
+is( @a, 7, 'files_of_type succeed' );
 @a = $d->files_of_type('foo');
-ok( @a == 0, 'files_of_type fail' );
+is( @a, 0, 'files_of_type fail' );
 
 my $f = $d->file_with_name('File.pm');
 ok( $f->is_of_type('Perl module'), 'is_of_type succeed' );
 ok( !$f->is_of_type('foo'), 'is_of_type fail' );
-ok( $f->short_description eq 'Docs-Related File', 'short_description' );
+is( $f->short_description, 'Docs-Related File', 'short_description' );
 
-# We have to sleep(1) here to ensure the modification time changes.
 $f = Parrot::Docs::File->new( tmp_file_path('file.pod') );
 $f->write("foo");
 ok( !$f->contains_pod, 'contains_pod no' );
-sleep(1);
 $f->write("=head1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok( $f->contains_pod, 'contains_pod yes, no errors' );
-ok( $f->num_pod_errors == 0, 'num_pod_errors none' );
+is( $f->num_pod_errors, 0, 'num_pod_errors none' );
 
 # Not the best of tests, but at least something.
-ok( $f->pod_as_html =~ m|<html>.*?</html>|si, 'pod_as_html' );
-sleep(1);
+like( $f->pod_as_html, qr|<html>.*?</html>|si, 'pod_as_html' );
 $f->write("=haed1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok( $f->contains_pod, 'contains_pod yes, errors' );
-ok( $f->num_pod_errors == 1, 'num_pod_errors one' );
-ok( $f->pod_errors =~ /error/s, 'pod_errors' );
+is( $f->num_pod_errors, 1, 'num_pod_errors one' );
+like( $f->pod_errors, qr/error/s, 'pod_errors' );
 
 # Now the structural classes.
 BEGIN { use_ok('Parrot::Docs::Item') }
@@ -99,7 +96,7 @@ my $g = Parrot::Docs::Group->new(
 );
 
 ok( $g, 'new group' );
-ok( $g->name eq 'Usual suspects', 'name' );
+is( $g->name, 'Usual suspects', 'name' );
 
 my $s = Parrot::Docs::Section->new(
     'Usual Suspects',
