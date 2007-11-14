@@ -495,7 +495,7 @@ sub cc_gen {
 
 These items are used from current config settings:
 
-  $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe
+  $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs
 
 Calls the compiler and linker on F<test.c>.
 
@@ -509,8 +509,8 @@ sub cc_build {
 
     my $verbose = $conf->options->get('verbose');
 
-    my ( $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe ) =
-        $conf->data->get(qw(cc ccflags ld_out o link linkflags cc_exe_out exe));
+    my ( $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs ) =
+        $conf->data->get(qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs));
 
     my $compile_command = _build_compile_command( $cc, $ccflags, $cc_args );
     my $compile_result = _run_command( $compile_command, 'test.cco', 'test.cco', $verbose )
@@ -520,7 +520,7 @@ sub cc_build {
     }
 
     my $link_result =
-        _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe ",
+        _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe  $libs",
         'test.ldo', 'test.ldo', $verbose )
         and confess "Linker failed (see test.ldo)";
     if ($link_result) {
