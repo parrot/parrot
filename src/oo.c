@@ -153,6 +153,8 @@ Parrot_oo_get_class(PARROT_INTERP, NOTNULL(PMC *key))
             ns = Parrot_get_namespace_keyed(interp, hll_ns, key);
             if (!PMC_IS_NULL(ns))
                 classobj = VTABLE_get_class(interp, ns);
+        default:
+            break;
     }
 
     if (PMC_IS_NULL(classobj)) {

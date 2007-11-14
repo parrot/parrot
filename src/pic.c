@@ -282,8 +282,9 @@ parrot_PIC_op_is_cached(int op_code)
         case PARROT_OP_set_returns_pc:
         case PARROT_OP_set_args_pc:
             return 1;
+        default:
+            return 0;
     }
-    return 0;
 }
 
 /*
@@ -793,6 +794,7 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int cor
         n = cs->pic_index->data[n / 2];
         mic = parrot_PIC_alloc_mic(interp, n);
     }
+
     switch (op) {
         case PARROT_OP_new_p_sc:
             {
@@ -831,12 +833,13 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, NOTNULL(void **pc_pred), int cor
                 op = PARROT_OP_pic_callr___pc;
             }
             break;
+        default:
+            break;
     }
-    /*
-     * rewrite opcode
-     */
+
+    /* rewrite opcode */
     if (core == PARROT_SWITCH_CORE || core == PARROT_SWITCH_JIT_CORE)
-        *pc_pred = (void**) op;
+        *pc_pred = (void **)op;
     else
         *pc_pred = ((void **)prederef_op_func)[op];
 }

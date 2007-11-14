@@ -283,9 +283,9 @@ string_unescape_one(PARROT_INTERP, NOTNULL(UINTVAL *offset),
             return 92;
         case '"':
             return '"';
+        default:
+            return codepoint;  /* any not special return the char */
     }
-
-    return codepoint;  /* any not special return the char */
 }
 
 /*

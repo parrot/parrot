@@ -942,7 +942,7 @@ Set a break point, the source code file must be loaded.
 */
 
 void
-PDB_set_break(PARROT_INTERP, NOTNULL(const char *command))
+PDB_set_break(PARROT_INTERP, const char *command)
 {
     PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak = NULL;

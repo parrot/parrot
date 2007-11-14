@@ -404,10 +404,11 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             fullname = string_from_cstring(interp, fullname_c, 0);
             mem_sys_free(fullname_c);
             return fullname;
-    } /* switch */
 
-    real_exception(interp, NULL, UNIMPLEMENTED,
-            "illegal argument in interpinfo");
+        default:
+            real_exception(interp, NULL, UNIMPLEMENTED,
+                "illegal argument in interpinfo");
+    }
 }
 
 /*

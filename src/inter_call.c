@@ -404,7 +404,11 @@ next_arg_sig(NOTNULL(call_state_item *sti))
                     sti->sig = PARROT_ARG_PMC | PARROT_ARG_SLURPY_ARRAY; break;
                 case 'F':
                     sti->sig = PARROT_ARG_PMC | PARROT_ARG_FLATTEN; break;
+                default:
+                    break;
             }
+            break;
+        default:
             break;
     }
 }
@@ -458,6 +462,8 @@ fetch_arg_sig(PARROT_INTERP, NOTNULL(call_state *st))
 
                 return retval;
             }
+            break;
+        default:
             break;
     }
     st->src.i++;
@@ -516,6 +522,8 @@ fetch_arg_op(PARROT_INTERP, NOTNULL(call_state *st))
 
                 return retval;
             }
+            break;
+        default:
             break;
     }
     st->src.i++;
@@ -582,14 +590,15 @@ Parrot_fetch_arg(PARROT_INTERP, NOTNULL(call_state *st))
         st->name = UVal_str(st->val);
         next_arg_sig(&st->src);
     }
+
     switch (st->src.mode & CALL_S_D_MASK) {
         case CALL_STATE_OP:
             return fetch_arg_op(interp, st);
         case CALL_STATE_SIG:
             return fetch_arg_sig(interp, st);
+        default:
+            real_exception(interp, NULL, 1, "invalid call state mode");
     }
-
-    real_exception(interp, NULL, 1, "invalid call state mode");
 }
 
 
@@ -660,6 +669,8 @@ convert_arg_from_int(PARROT_INTERP, NOTNULL(call_state *st))
             dod_register_pmc(interp, d);
             }
             break;
+        default:
+            break;
     }
 }
 
@@ -691,6 +702,8 @@ convert_arg_from_num(PARROT_INTERP, NOTNULL(call_state *st))
             UVal_pmc(st->val) = d;
             dod_register_pmc(interp, d);
             }
+            break;
+        default:
             break;
     }
 }
@@ -724,6 +737,8 @@ convert_arg_from_str(PARROT_INTERP, NOTNULL(call_state *st))
             dod_register_pmc(interp, d);
             }
             break;
+        default:
+            break;
     }
 }
 
@@ -750,6 +765,8 @@ convert_arg_from_pmc(PARROT_INTERP, NOTNULL(call_state *st))
             break;
         case PARROT_ARG_STRING:
             UVal_str(st->val) = VTABLE_get_string(interp, UVal_pmc(st->val));
+            break;
+        default:
             break;
     }
 }
@@ -956,6 +973,8 @@ store_arg(NOTNULL(call_state *st), INTVAL idx)
         case PARROT_ARG_PMC:
             CTX_REG_PMC(st->dest.ctx, idx) = UVal_pmc(st->val);
             break;
+        default:
+            break;
     }
 }
 
@@ -1080,6 +1099,8 @@ null_val(int sig, NOTNULL(call_state *st))
             UVal_str(st->val) = NULL; break;
         case PARROT_ARG_PMC:
             UVal_pmc(st->val) = PMCNULL; break;
+        default:
+            break;
     }
 }
 
@@ -1414,6 +1435,8 @@ Parrot_convert_arg(PARROT_INTERP, NOTNULL(call_state *st))
         case PARROT_ARG_PMC:
             convert_arg_from_pmc(interp, st);
             break;
+        default:
+            break;
     }
 }
 
@@ -1570,8 +1593,9 @@ set_retval(PARROT_INTERP, int sig_ret, NOTNULL(parrot_context_t *ctx))
         case 'P':
             if (set_retval_util(interp, "P", ctx, &st))
                 return UVal_pmc(st.val);
+        default:
+            return NULL;
     }
-    return NULL;
 }
 
 /*

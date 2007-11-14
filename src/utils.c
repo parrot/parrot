@@ -117,6 +117,7 @@ intval_mod(INTVAL i2, INTVAL i3)
             case 1: r = r - z; break;
             case 2: r = z - r; break;
             case 3: r = -r;    break;
+            default:           break;
         }
     }
 

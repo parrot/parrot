@@ -59,8 +59,7 @@ Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)
 /*
 
 =item C<static INTVAL
-stat_common(PARROT_INTERP, struct stat *statbuf,
-        INTVAL thing, int status)>
+stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)>
 
 TODO: Not yet documented!!!
 
@@ -69,17 +68,16 @@ TODO: Not yet documented!!!
 */
 
 static INTVAL
-stat_common(PARROT_INTERP, struct stat *statbuf,
-        INTVAL thing, int status)
+stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
 {
     INTVAL result = -1;
 
     if (thing == STAT_EXISTS)
         return status == 0;
+
     if (status == -1) {
         const char *err = strerror(errno);
-        real_exception(interp, NULL, E_IOError,
-                "stat failed: %s", err);
+        real_exception(interp, NULL, E_IOError, "stat failed: %s", err);
     }
 
     switch (thing) {
@@ -133,6 +131,8 @@ stat_common(PARROT_INTERP, struct stat *statbuf,
             break;
         case STAT_PLATFORM_BLOCKS:
             result = statbuf->st_blocks;
+            break;
+        default:
             break;
     }
 

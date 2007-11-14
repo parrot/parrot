@@ -1185,25 +1185,26 @@ list_item(PARROT_INTERP, NOTNULL(List *list), int type, INTVAL idx)
     }
 
     switch (type) {
-    case enum_type_sized:
-        return (void *)&((char *)
-                         PObj_bufstart(&chunk->data))[idx * list->item_size];
-    case enum_type_char:
-        return (void *)&((char *) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_short:
-        return (void *)&((short *) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_int:
-        return (void *)&((int *) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_INTVAL:
-        return (void *)&((INTVAL *) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_FLOATVAL:
-        return (void *)&((FLOATVAL *) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_PMC:
-        return (void *)&((PMC **) PObj_bufstart(&chunk->data))[idx];
-    case enum_type_STRING:
-        return (void *)&((STRING **) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_sized:
+            return (void *)&((char *)
+                PObj_bufstart(&chunk->data))[idx * list->item_size];
+        case enum_type_char:
+            return (void *)&((char *) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_short:
+            return (void *)&((short *) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_int:
+            return (void *)&((int *) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_INTVAL:
+            return (void *)&((INTVAL *) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_FLOATVAL:
+            return (void *)&((FLOATVAL *) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_PMC:
+            return (void *)&((PMC **) PObj_bufstart(&chunk->data))[idx];
+        case enum_type_STRING:
+            return (void *)&((STRING **) PObj_bufstart(&chunk->data))[idx];
+        default:
+            real_exception(interp, NULL, 1, "Unknown list entry type\n");
     }
-    real_exception(interp, NULL, 1, "Unknown list entry type\n");
 }
 
 /*
@@ -1338,20 +1339,24 @@ PARROT_CANNOT_RETURN_NULL
 List *
 list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, NOTNULL(PMC *init))
 {
-    List *list;
-    PMC * user_array, *multi_key;
-    INTVAL i, len, size, item_size, items_per_chunk;
+    List  *list;
+    PMC   *user_array;
+    PMC   *multi_key       = NULL;
+    INTVAL size            = 0;
+    INTVAL item_size       = 0;
+    INTVAL items_per_chunk = 0;
 
-    if (!init->vtable) {
+    INTVAL i, len;
+
+    if (!init->vtable)
         real_exception(interp, NULL, 1, "Illegal initializer for init\n");
-    }
-    len = VTABLE_elements(interp, init);
-    if (len & 1) {
-        real_exception(interp, NULL, 1, "Illegal initializer for init: odd elements\n");
-    }
 
-    size = item_size = items_per_chunk = 0;
-    multi_key = NULL;
+    len = VTABLE_elements(interp, init);
+
+    if (len & 1)
+        real_exception(interp, NULL, 1,
+            "Illegal initializer for init: odd elements\n");
+
     for (i = 0; i < len; i += 2) {
         const INTVAL key = VTABLE_get_integer_keyed_int(interp, init, i);
         const INTVAL val = i + 1;
@@ -1374,6 +1379,9 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, NOTNULL(PMC *init))
                 items_per_chunk = VTABLE_get_integer_keyed_int(
                         interp, init, val);
                 break;
+            default:
+                real_exception(interp, NULL, 1,
+                    "Invalid initializer for list\n");
         }
     }
     list = list_new(interp, type);
