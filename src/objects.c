@@ -1285,7 +1285,7 @@ class_mro_merge(PARROT_INTERP, NOTNULL(PMC *seqs))
         }
         if (!cand)
             real_exception(interp, NULL, E_TypeError,
-                    "inconsisten class hierarchy");
+                    "inconsistent class hierarchy");
 
         /* push candidate onto mro result */
         VTABLE_push_pmc(interp, res, cand);

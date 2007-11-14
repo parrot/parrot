@@ -421,21 +421,21 @@ pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
     if (type > enum_type_undef) {
         return type;
     }
+
     if (type < enum_type_undef) {
-        char *type_name;
         if (type < 0) {
-            strcpy(type_name, "undefined type");
+            real_exception(interp, NULL, 1,
+                "undefined type already exists - can't register PMC" );
         }
-        else {
-            strcpy(type_name, data_types[type].name);
-        }
+
         real_exception(interp, NULL, 1,
-                "native type with name '%s' already exists - "
-                "can't register PMC", type_name);
+            "native type with name '%s' already exists - can't register PMC",
+            data_types[type].name);
     }
 
     classname_hash = interp->class_hash;
-    type = interp->n_vtable_max++;
+    type           = interp->n_vtable_max++;
+
     /* Have we overflowed the table? */
     if (type >= interp->n_vtable_alloced) {
         parrot_realloc_vtables(interp);

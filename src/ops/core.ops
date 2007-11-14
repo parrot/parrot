@@ -185,11 +185,14 @@ Intersegment branch to location in fixup table named $1.
 =cut
 
 inline op branch_cs(in STR) :base_loop,check_event {
-    char * const label = string_to_cstring(interp, $1);
-    PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interp,
+    char * const         label = string_to_cstring(interp, $1);
+    PackFile_FixupEntry *fe    = PackFile_find_fixup_entry(interp,
             enum_fixup_label, label);
-    if (!fe)
-        real_exception(interp, NULL, 1, "branch_cs: fixup for '%s' not found", label);
+    if (!fe) {
+        string_cstring_free(label);
+        real_exception(interp, NULL, 1, "branch_cs: fixup for '%Ss' not found",
+            $1);
+    }
     else {
         interp->resume_offset = fe->offset;
         Parrot_switch_to_cs(interp, fe->seg, 1);
