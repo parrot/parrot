@@ -18,7 +18,7 @@ This document is not meant to contain all the metadata regarding particular
 tasks, but merely provide a summary of the tasks.
 
 For a high level overview of parrot milestones, please see:
-L<http://www.perlfoundation.org/gc/grants/2005-p6-proposal.html>
+L<http://www.perlfoundation.org/parrot_grant_from_nlnet>
 
 =head1 RELEASE POLICIES
 
