@@ -22,11 +22,7 @@
 
 #include "parrot/parrot.h"
 
-#if INTVAL_SIZE == DOUBLE_SIZE
-#  define FLOAT_IS_ZERO(f) (*(INTVAL *)&(f) == 0)
-#else
-#  define FLOAT_IS_ZERO(f) (*(HUGEINTVAL *)&(f) == 0)
-#endif
+#define FLOAT_IS_ZERO(f) ((f) == 0.0)
 
 /*
  * utils.c
