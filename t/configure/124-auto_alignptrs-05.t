@@ -5,10 +5,12 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 13;
+use Test::More tests => 21;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
+use_ok('config::inter::progs');
+use_ok('config::auto::attributes');
 use_ok('config::auto::alignptrs');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -24,6 +26,8 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
+test_step_thru_runstep( $conf, q{inter::progs}, $args );
+test_step_thru_runstep( $conf, q{auto::attributes}, $args );
 
 my $pkg = q{auto::alignptrs};
 
@@ -31,7 +35,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
 my ( $task, $step_name, @step_params, $step);
-$task        = $conf->steps->[1];
+$task        = $conf->steps->[3];
 $step_name   = $task->step;
 @step_params = @{ $task->params };
 
@@ -42,11 +46,11 @@ ok( $step->description(), "$step_name has description" );
 
 {
     $conf->data->set('ptr_alignment' => undef);
-    if ($^O eq q{hpux}) { $^O = q{linux} }
+    local $^O = q{linux} if ($^O eq q{hpux});
     my $ret;
     eval { $ret = $step->runstep($conf); };
     if ($@) {
-        like($@, qr/Can't determine alignment/,
+        like($@, qr/Can't determine alignment/, #'
             "Got expected error message when runstep() failed");
     } else {
         like($step->result(), qr/bytes?/,
