@@ -440,6 +440,8 @@ pbc_merge_constants(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
                         sub->end_offs += inputs[i]->code_start;
                         }
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -728,6 +730,8 @@ pbc_merge_ctpointers(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
                 case PARROT_ARG_KC:
                     ops[cur_op] += inputs[cur_input]->const_start;
                     break;
+                default:
+                    break;
             }
 
             /* Move along the bytecode array. */
@@ -751,6 +755,8 @@ pbc_merge_ctpointers(PARROT_INTERP, NOTNULL(pbc_merge_input **inputs),
                     case PARROT_ARG_SC:
                     case PARROT_ARG_KC:
                         ops[cur_op] += inputs[cur_input]->const_start;
+                        break;
+                    default:
                         break;
                 }
                 cur_op++;
@@ -889,6 +895,8 @@ main(int argc, char **argv)
                 break;
             case '?':
                 help(interp);
+                break;
+            default:
                 break;
         }
     }
