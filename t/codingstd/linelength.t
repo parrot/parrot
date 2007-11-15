@@ -91,8 +91,9 @@ sub info_for_first_long_line {
     open my $fh, '<', $file or die "Can't open file '$file'";
     while ( my $line = <$fh> ) {
         chomp $line;
-        $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;    # expand \t
-        next if $line =~ m/https?:\/\//;                # skip long web addresses
+        $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;  # expand \t
+        next if $line =~ m/https?:\/\//;              # skip long web addresses
+        next if $line =~ m/\$Id:/;
         return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $num_col_limit;
     }
