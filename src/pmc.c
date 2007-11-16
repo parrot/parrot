@@ -425,7 +425,7 @@ pmc_register(PARROT_INTERP, NOTNULL(STRING *name))
     if (type < enum_type_undef) {
         if (type < 0) {
             real_exception(interp, NULL, 1,
-                "undefined type already exists - can't register PMC" );
+                "undefined type already exists - can't register PMC");
         }
 
         real_exception(interp, NULL, 1,
