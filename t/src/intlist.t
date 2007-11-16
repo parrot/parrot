@@ -10,8 +10,6 @@ use Parrot::Test;
 
 plan tests => 4;
 
-my @TODO = ( todo => 'Symbols not exported; see RT #43056' );
-
 =head1 NAME
 
 t/src/intlist.t - Integer Lists
@@ -26,7 +24,7 @@ Tests the various intlist_* functions.
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "creation", @TODO );
+c_output_is( <<'CODE', <<'OUTPUT', "creation");
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -53,7 +51,7 @@ CODE
 The answer is 42.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "list aerobics", @TODO );
+c_output_is( <<'CODE', <<'OUTPUT', "list aerobics");
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -130,7 +128,7 @@ CODE
 I need a shower.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "step aerobics", @TODO );
+c_output_is( <<'CODE', <<'OUTPUT', "step aerobics");
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
@@ -260,7 +258,7 @@ Step 6: 257
 Done.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "yoyo", @TODO );
+c_output_is( <<'CODE', <<'OUTPUT', "yoyo");
     #include <stdio.h>
     #include "parrot/parrot.h"
     #include "parrot/embed.h"

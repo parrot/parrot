@@ -503,7 +503,7 @@ teardown;
 
 ###############################################################################
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_make_offset", todo => 'RT #43055' );
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -535,7 +535,7 @@ OUTPUT
 
 setup( "temp.file", "abcdefg" );
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_seek", todo => 'RT #43055' );
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_seek");
 #include "../src/io/io_private.h"
 
 static opcode_t*
@@ -625,7 +625,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', 'stdio-layer', todo => 'RT #43055' );
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'stdio-layer');
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
