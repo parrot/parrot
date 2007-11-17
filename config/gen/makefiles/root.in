@@ -1403,10 +1403,10 @@ check : test
 # when the needed runcores are available
 fulltest : \
     testb \
-#CONDITIONED_LINE(cg_flag): testC \
+#CONDITIONED_LINE(cg_flag):    testC \
     testf \
-#CONDITIONED_LINE(cg_flag): testg \
-#CONDITIONED_LINE(jitcapable): testj \
+#CONDITIONED_LINE(cg_flag):    testg \
+#CONDITIONED_LINE(jitcapable):    testj \
     testr \
     testS \
     src_tests \
@@ -1515,15 +1515,15 @@ clean : \
     prog-clean \
     dynext-clean \
     languages-clean \
-#CONDITIONED_LINE(has_perldoc): docs-clean \
-#CONDITIONED_LINE(has_perldoc): html-clean \
+#CONDITIONED_LINE(has_perldoc):    docs-clean \
+#CONDITIONED_LINE(has_perldoc):    html-clean \
     dynpmc-clean \
     dynoplibs-clean \
     examples-clean \
     imcc-clean \
     compilers-clean \
     smoke-clean \
-#INVERSE_CONDITIONED_LINE(win32): cover-clean \
+#INVERSE_CONDITIONED_LINE(win32):    cover-clean \
     editor-clean
 	@TEMP_cg_r@
 	$(RM_F) chartypes "*.s" "*~" $(FLUID_FILES)
@@ -1915,10 +1915,10 @@ COVER_DIRS = \
 cover: \
     cover.dummy \
     cover-testb \
-#CONDITIONED_LINE(cg_flag): cover-testC \
+#CONDITIONED_LINE(cg_flag):    cover-testC \
     cover-testf \
-#CONDITIONED_LINE(cg_flag): cover-testg \
-#CONDITIONED_LINE(jitcapable): cover-testj \
+#CONDITIONED_LINE(cg_flag):    cover-testg \
+#CONDITIONED_LINE(jitcapable):    cover-testj \
     cover-testr \
     cover-testS \
     cover-src \
