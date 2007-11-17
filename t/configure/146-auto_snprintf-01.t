@@ -45,7 +45,12 @@ ok(defined $step, "$step_name constructor returned defined value");
 isa_ok($step, $step_name);
 ok($step->description(), "$step_name has description");
 
-ok($step->runstep($conf), "runstep() returned true value");
+TODO: {
+    # http://rt.perl.org/rt3/Ticket/Display.html?id=47391
+    local $TODO =
+        q<Reported failing where vendor-supplied Perl 5 Config.pm does not match true state of system available for Parrot configuration>;
+    ok($step->runstep($conf), "runstep() returned true value");
+}
 
 pass("Completed all tests in $0");
 
