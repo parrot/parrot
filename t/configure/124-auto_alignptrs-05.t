@@ -50,7 +50,7 @@ TODO: {
         q<Reported failing where vendor-supplied Perl 5 Config.pm does not match true state of system available for Parrot configuration>;
     {
         $conf->data->set('ptr_alignment' => undef);
-        local $^O = q{linux} if $^O eq q{hpux};  ## no critic Variables::ProhibitConditionalDeclarations 
+        local $^O = q{linux} if $^O eq q{hpux};  ## no critic Variables::ProhibitConditionalDeclarations
         my $ret;
         eval { $ret = $step->runstep($conf); };
         if ($@) {
