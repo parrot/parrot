@@ -83,10 +83,13 @@ for my $dir (@old_directory_list) {
     like( $exempted_file->path(), $perl_exemption_regexp, 'SmartLink.pm is matched' );
 
     # we are in 't/perl'
-    my $not_exempted_file = Parrot::IO::File->new('../../lib/DumbLink.pm');
-    ok( !$d->is_perl_exemption($not_exempted_file), 'DumbLink.pm is not exempted' );
-    unlike( $not_exempted_file->path(), $perl_exemption_regexp, 'DumbLink.pm is not matched' );
-    unlink $not_exempted_file;
+    {
+        my $dummy_fn = '../../lib/DumbLink.pm';
+        my $not_exempted_file = Parrot::IO::File->new($dummy_fn);
+        ok( !$d->is_perl_exemption($not_exempted_file), 'DumbLink.pm is not exempted' );
+        unlike( $not_exempted_file->path(), $perl_exemption_regexp, 'DumbLink.pm is not matched' );
+        unlink $dummy_fn;
+    }
 
     # check that no exemptions turn up in the main file list
     my @exemptions_in_perl_list = grep { $_ =~ $perl_exemption_regexp }
