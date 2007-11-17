@@ -30,11 +30,16 @@ $conf->data->set('ccflags', '-I/usr/include');
 my $cwd = cwd();
 my $warning;
 
-$warning = "-Wall";
-{
-    my $verbose = 0;
-    my $rv      = auto::warnings::try_warning($step, $conf, $warning);
-    is( $rv, 1, "Got expected exit code of 1" );
+TODO: {
+    # http://rt.perl.org/rt3/Ticket/Display.html?id=47395
+    local $TODO =
+        q<Reported failing where vendor-supplied Perl 5 Config.pm does not match true state of system available for Parrot configuration>;
+    $warning = "-Wall";
+    {
+        my $verbose = 0;
+        my $rv      = auto::warnings::try_warning($step, $conf, $warning);
+        is( $rv, 1, "Got expected exit code of 1" );
+    }
 }
 
 ################### DOCUMENTATION ###################
