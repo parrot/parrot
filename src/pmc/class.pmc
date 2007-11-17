@@ -770,8 +770,6 @@ Adds the supplied PMC to the list of parents for the class.
             return;
         }
 
-        /* RT46099 Check we don't already have this parent. */
-
         /* iterate over all direct parents, check whether this class already has
          * the parent being added.
          */
