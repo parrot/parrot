@@ -86,6 +86,7 @@ for my $dir (@old_directory_list) {
     my $not_exempted_file = Parrot::IO::File->new('../../lib/DumbLink.pm');
     ok( !$d->is_perl_exemption($not_exempted_file), 'DumbLink.pm is not exempted' );
     unlike( $not_exempted_file->path(), $perl_exemption_regexp, 'DumbLink.pm is not matched' );
+    unlink $not_exempted_file;
 
     # check that no exemptions turn up in the main file list
     my @exemptions_in_perl_list = grep { $_ =~ $perl_exemption_regexp }
