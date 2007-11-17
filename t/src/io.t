@@ -10,6 +10,9 @@ use Parrot::Test;
 
 plan tests => 20;
 
+my @TODO = $^O =~ /darwin/
+    ? () : ( todo => 'Symbols not exported; see RT #43056' );
+
 =head1 NAME
 
 t/src/io.t - IO Subsystem
@@ -503,7 +506,7 @@ teardown;
 
 ###############################################################################
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_make_offset", @TODO );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
@@ -535,7 +538,7 @@ OUTPUT
 
 setup( "temp.file", "abcdefg" );
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_seek");
+c_output_is( $main . <<'CODE', <<'OUTPUT', "PIO_seek", @TODO );
 #include "../src/io/io_private.h"
 
 static opcode_t*
@@ -625,7 +628,7 @@ OUTPUT
 
 ###############################################################################
 
-c_output_is( $main . <<'CODE', <<'OUTPUT', 'stdio-layer');
+c_output_is( $main . <<'CODE', <<'OUTPUT', 'stdio-layer', @TODO );
 static opcode_t*
 the_test(Interp *interp,
          opcode_t *cur_op, opcode_t *start)
