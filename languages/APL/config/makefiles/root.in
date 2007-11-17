@@ -84,7 +84,7 @@ devtest: all
 	APLDEV=1 $(PERL) -Ilib t/harness
 
 testclean:
-	$(RM_F) "t/*.apl" "t/*.out"
+	$(RM_F) "t/*.apl" "t/*.pir" "t/*.out"
 
 clean: testclean
 	$(RM_F) \
