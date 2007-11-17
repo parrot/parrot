@@ -171,8 +171,10 @@ GEN_MAKEFILES = \
     languages/nqp/Makefile \
     languages/ook/Makefile \
     languages/parrot_compiler/Makefile \
+    languages/perl5/Makefile \
     languages/perl6/Makefile \
     languages/pheme/Makefile \
+    languages/PIR/Makefile \
     languages/plumhead/Makefile \
     languages/pugs/Makefile \
     languages/punie/Makefile \
