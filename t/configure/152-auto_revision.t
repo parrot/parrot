@@ -74,7 +74,7 @@ my ($testrev, $ret);
     local $Parrot::Revision::current = $testrev;
     $ret = $step->runstep($conf);
     ok( $ret, "$step_name runstep() returned true value" );
-    ok(! defined($conf->data->get('revision')), 
+    ok(! defined($conf->data->get('revision')),
         "'revision' element is undefined as expected");
     is($step->result(), q{done}, "Expected result was set");
 }

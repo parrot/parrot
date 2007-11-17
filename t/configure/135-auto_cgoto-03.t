@@ -47,7 +47,7 @@ $conf->options->set(cgoto => 0);
 is(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto')), 0,
     "Got expected return value");
 $conf->options->set(cgoto => undef);
-ok(defined(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto'))), 
+ok(defined(auto::cgoto::_probe_for_cgoto($conf->options->get('cgoto'))),
     "Probe returned a defined value");
 
 $step->_evaluate_cgoto($conf, 1);

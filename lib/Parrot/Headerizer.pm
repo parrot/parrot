@@ -127,7 +127,7 @@ sub extract_function_declarations {
 =item C<function_components_from_declaration($file, $proto)>
 
 $file => the filename
-$proto => the function declaration 
+$proto => the function declaration
 
 Returns an anonymous hash of function components:
 
