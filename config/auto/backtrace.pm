@@ -49,7 +49,7 @@ sub _probe_for_backtrace {
     # build failure is because these symbols are missing.
 
     eval { cc_build(); };
-    my $anyerror = $@ if $@;
+    my $anyerror = $@;
     cc_clean();
     return $anyerror;
 }
