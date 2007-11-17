@@ -1282,6 +1282,9 @@ languages-smoke :
 languages-clean :
 	$(MAKE) languages clean
 
+languages-realclean :
+	$(MAKE) languages realclean
+
 ###############################################################################
 #
 # compiler implementation targets:
@@ -1658,7 +1661,7 @@ imcc-clean:
     "$(IMCC_DIR)/*$(O)" \
     $(IMCC_DIR)/imcparser.output
 
-realclean : clean
+realclean : clean languages-realclean
 	$(RM_RF) \
     $(STICKY_FILES) \
     blib \

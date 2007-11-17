@@ -120,6 +120,8 @@ clean: \
     urm.clean \
     smoke-clean
 
+realclean: \
+    jako.realclean
 
 #
 # Language specific targets
@@ -255,6 +257,8 @@ jako.test:
 	- $(MAKE) jako test
 jako.clean:
 	- $(MAKE) jako clean
+jako.realclean:
+	- $(MAKE) jako realclean
 
 lisp: lisp.dummy
 lisp.dummy:
