@@ -395,7 +395,7 @@ static int
 sub_pragma(PARROT_INTERP, int action, NOTNULL(const PMC *sub_pmc))
 {
     int pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK;
-    int todo = 0;
+    int todo    = 0;
 
     pragmas &= ~SUB_FLAG_IS_OUTER;
     if (!pragmas && !Sub_comp_INIT_TEST(sub_pmc))
@@ -417,9 +417,13 @@ sub_pragma(PARROT_INTERP, int action, NOTNULL(const PMC *sub_pmc))
             if (pragmas & SUB_FLAG_PF_LOAD) /* symreg.h:P_LOAD */
                 todo = 1;
             break;
+        default:
+            break;
     }
+
     if (pragmas & (SUB_FLAG_PF_IMMEDIATE | SUB_FLAG_PF_POSTCOMP))
         todo = 1;
+
     return todo;
 }
 
@@ -577,13 +581,10 @@ mark_1_seg(PARROT_INTERP, NOTNULL(PackFile_ConstTable *ct))
     PackFile_Constant ** const constants = find_constants(interp, ct);
 
     for (i = 0; i < ct->const_count; i++) {
-        switch (constants[i]->type) {
-            case PFC_PMC:
-                {
-                PMC * const pmc = constants[i]->u.key;
-                if (pmc)
-                    pobject_lives(interp, (PObj *)pmc);
-                }
+        if (constants[i]->type == PFC_PMC) {
+            PMC * const pmc = constants[i]->u.key;
+            if (pmc)
+                pobject_lives(interp, (PObj *)pmc);
         }
     }
 }
@@ -680,12 +681,13 @@ do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
                 const opcode_t ci = ft->fixups[i]->offset;
                 PMC *sub_pmc;
 
-                if (ci < 0 || ci >= ct->const_count) {
+                if (ci < 0 || ci >= ct->const_count)
                     real_exception(interp, NULL, 1,
                             "Illegal fixup offset (%d) in enum_fixup_sub");
-                }
-                sub_pmc = ct->constants[ci]->u.key;
+
+                sub_pmc                    = ct->constants[ci]->u.key;
                 PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
+
                 if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
                         || (Sub_comp_get_FLAGS(sub_pmc) & SUB_COMP_FLAG_MASK))
                         && sub_pragma(interp, action, sub_pmc)) {
@@ -706,6 +708,8 @@ do_sub_pragmas(PARROT_INTERP, NOTNULL(PackFile_ByteCode *self),
             case enum_fixup_label:
                 /* fill in current bytecode seg */
                 ft->fixups[i]->seg = self;
+                break;
+            default:
                 break;
         }
     }
@@ -2284,11 +2288,12 @@ pf_debug_packed_size(SHIM_INTERP, NOTNULL(PackFile_Segment *self))
 
         /* Mapping specific stuff. */
         switch (debug->mappings[i]->mapping_type) {
-            case PF_DEBUGMAPPINGTYPE_NONE:
-                break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 size += 1;
+                break;
+            case PF_DEBUGMAPPINGTYPE_NONE:
+            default:
                 break;
         }
     }
@@ -2328,13 +2333,14 @@ pf_debug_pack(SHIM_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t *cu
 
         /* Mapping specific stuff. */
         switch (debug->mappings[i]->mapping_type) {
-            case PF_DEBUGMAPPINGTYPE_NONE:
-                break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
                 *cursor++ = debug->mappings[i]->u.filename;
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 *cursor++ = debug->mappings[i]->u.source_seg;
+                break;
+            case PF_DEBUGMAPPINGTYPE_NONE:
+            default:
                 break;
         }
     }
@@ -2387,8 +2393,6 @@ pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t
 
         /* Read mapping specific stuff. */
         switch (debug->mappings[i]->mapping_type) {
-            case PF_DEBUGMAPPINGTYPE_NONE:
-                break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
                 debug->mappings[i]->u.filename =
                     PF_fetch_opcode(self->pf, &cursor);
@@ -2396,6 +2400,9 @@ pf_debug_unpack(PARROT_INTERP, NOTNULL(PackFile_Segment *self), NOTNULL(opcode_t
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                 debug->mappings[i]->u.source_seg =
                     PF_fetch_opcode(self->pf, &cursor);
+                break;
+            case PF_DEBUGMAPPINGTYPE_NONE:
+            default:
                 break;
         }
     }
@@ -2462,9 +2469,12 @@ pf_debug_dump(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
                 PIO_printf(interp, "        SOURCESEG => %d\n",
                            debug->mappings[i]->u.source_seg);
                 break;
+            default:
+                break;
         }
         PIO_printf(interp, "    ],\n");
     }
+
     PIO_printf(interp, "  ]\n");
 
     j = self->data ? 0: self->file_offset + 4;
@@ -2595,8 +2605,6 @@ Parrot_debug_add_mapping(PARROT_INTERP, NOTNULL(PackFile_Debug *debug),
     mapping->mapping_type = mapping_type;
 
     switch (mapping_type) {
-        case PF_DEBUGMAPPINGTYPE_NONE:
-            break;
         case PF_DEBUGMAPPINGTYPE_FILENAME:
             {
             PackFile_Constant *fnconst;
@@ -2622,9 +2630,13 @@ Parrot_debug_add_mapping(PARROT_INTERP, NOTNULL(PackFile_Debug *debug),
         case PF_DEBUGMAPPINGTYPE_SOURCESEG:
             mapping->u.source_seg = source_seg;
             break;
+        case PF_DEBUGMAPPINGTYPE_NONE:
+        default:
+            break;
     }
+
     debug->mappings[insert_pos] = mapping;
-    debug->num_mappings = debug->num_mappings + 1;
+    debug->num_mappings         = debug->num_mappings + 1;
 }
 
 /*
@@ -2668,6 +2680,8 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, NOTNULL(PackFile_Debug *debug), opcod
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
                     return string_from_literal(interp,
                         "(unknown file)");
+                default:
+                    continue;
             }
         }
     }

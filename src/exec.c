@@ -345,6 +345,8 @@ Parrot_exec_add_text_rellocation(NOTNULL(Parrot_exec_objfile_t *obj), char *nptr
         case RTYPE_DATA1:
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
             break;
+        default:
+            break;
     }
 
     if (Parrot_exec_rel_count)

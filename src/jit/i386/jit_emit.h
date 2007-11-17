@@ -2897,6 +2897,8 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
                     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EBP,
                             emit_None, 1, 16);
                 break;
+            default:
+                break;
         }
     }
 }

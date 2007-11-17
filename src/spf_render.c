@@ -823,6 +823,7 @@ do_sprintf:
                         break;
 
                     case PHASE_DONE:
+                    default:
                         /* This is the terminating condition of the surrounding
                          * loop, so...
                          */

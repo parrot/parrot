@@ -77,12 +77,11 @@ insert_fixup_targets(PARROT_INTERP, char *branch,
 
     if (!ft)
         return;
+
     for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_label:
-                if ((size_t)ft->fixups[i]->offset < limit)
-                    branch[ft->fixups[i]->offset] |= JIT_BRANCH_TARGET;
-                break;
+        if (ft->fixups[i]->type == enum_fixup_label) {
+            if ((size_t)ft->fixups[i]->offset < limit)
+                branch[ft->fixups[i]->offset] |= JIT_BRANCH_TARGET;
         }
     }
 }
@@ -1095,8 +1094,9 @@ reg_offs(PARROT_INTERP, int typ, int i)
             return REG_OFFS_INT(i);
         case 3:
             return REG_OFFS_NUM(i);
+        default:
+            return 0;
     }
-    return 0;
 }
 
 /*
@@ -1289,33 +1289,30 @@ Parrot_destroy_jit(void *ptr)
 static void
 set_reg_usage(PARROT_INTERP, opcode_t *pc)
 {
-    PackFile_ByteCode *seg;
-    PackFile_FixupTable *ft;
+    PackFile_ByteCode   *seg = interp->code;
+    PackFile_FixupTable *ft  = seg->fixups;
     PackFile_ConstTable *ct;
-    PMC *sub_pmc;
-    Parrot_sub *sub;
-    int i, ci;
-    size_t offs;
+    int i;
 
-    seg = interp->code;
-    ft = seg->fixups;
     if (!ft)
         return;
+
     ct = seg->const_table;
+
     if (!ct)
         return;
-    for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
-            case enum_fixup_sub:
-                ci = ft->fixups[i]->offset;
-                sub_pmc = ct->constants[ci]->u.key;
-                sub = PMC_sub(sub_pmc);
-                offs = pc - sub->seg->base.data;
-                if (offs >= sub->start_offs && offs < sub->end_offs) {
-                    CONTEXT(interp->ctx)->n_regs_used = sub->n_regs_used;
-                    return;
-                }
 
+    for (i = 0; i < ft->fixup_count; i++) {
+        if (ft->fixups[i]->type == enum_fixup_sub) {
+            int         ci      = ft->fixups[i]->offset;
+            PMC        *sub_pmc = ct->constants[ci]->u.key;
+            Parrot_sub *sub     = PMC_sub(sub_pmc);
+            size_t      offs    = pc - sub->seg->base.data;
+
+            if (offs >= sub->start_offs && offs < sub->end_offs) {
+                CONTEXT(interp->ctx)->n_regs_used = sub->n_regs_used;
+                return;
+            }
         }
     }
 }
