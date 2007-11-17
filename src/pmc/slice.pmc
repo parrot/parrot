@@ -222,7 +222,7 @@ pmclass Slice need_ext extends Key {
          * the pointer must not be null, or at the end of iteration and it must
          * point to STRINGs.  Note that r->step is always the integer value 1.
          */
-        if (r && r != -1 && r->type == enum_type_STRING) {
+        if (r && (int)r != -1 && r->type == enum_type_STRING) {
             if (RVal_str(r->start))
                 pobject_lives(INTERP, (PObj *)RVal_str(r->start));
             if (RVal_str(r->end))

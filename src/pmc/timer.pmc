@@ -172,6 +172,8 @@ See F<docs/pdds/pdd02_vtables.pod> for initializers.
                     SELF.set_pmc_keyed_int(key, pval);
                     }
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -214,9 +216,9 @@ Returns the timer info for C<key>.
                 return (INTVAL) t->repeat;
             case PARROT_TIMER_RUNNING:
                 return 0;
+            default:
+                return -1;
         }
-
-        return -1;
     }
 
 /*
@@ -286,6 +288,10 @@ Sets the value associated with C<key> to C<value>.
                 else
                     del_timer(INTERP, SELF);
                 break;
+            default:
+                real_exception(INTERP, NULL, INVALID_OPERATION,
+                    "Unknown timer type in Timer.set_integer_keyed_int: %d",
+                    key);
         }
     }
 
