@@ -313,7 +313,7 @@ Parrot_get_global(PARROT_INTERP, NULLOK(PMC *ns), NULLOK(STRING *globalname))>
 Parrot_get_global allows a null namespace without throwing an exception; it
 simply returns PMCNULL in that case.
 
-NOTE: At present the use of the {get,set}_global functions is mandatory due to the
+NOTE: At present the use of the {get, set}_global functions is mandatory due to the
       wacky namespace typing of the default Parrot namespace.  Eventually it will be
       safe to just use the standard hash interface (if desired).
 
@@ -328,12 +328,12 @@ KLUDGE ALERT: Currently prefers non-namespaces in case of collision.
 
 
 /*
- * {get,set}_global.
+ * {get, set}_global.
  *
  * Parrot_get_global allows a null namespace without throwing an exception; it
  * simply returns PMCNULL in that case.
  *
- * NOTE: At present the use of the {get,set}_global functions is mandatory due to the
+ * NOTE: At present the use of the {get, set}_global functions is mandatory due to the
  *       wacky namespace typing of the default Parrot namespace.  Eventually it will be
  *       safe to just use the standard hash interface (if desired).
  */

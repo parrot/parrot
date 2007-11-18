@@ -162,7 +162,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
  * a = Align
  * e = Entry size
  */
-#  define sh_add(n,t,f,s,l,i,a,e) { \
+#  define sh_add(n, t, f, s, l, i, a, e) { \
     bzero(&sechdr, sizeof (Elf32_Ehdr)); \
     sechdr.sh_name = shste - shst; \
     shste += sprintf(shste, "%s", n); \

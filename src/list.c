@@ -170,7 +170,7 @@ appropriate.
 
 =head2 Testing
 
-See F<t/src/{int,}list.c> and F<t/pmc/{int,}list.t>.
+See F<t/src/{int, }list.c> and F<t/pmc/{int, }list.t>.
 
 Also all array usage depends on list.
 
@@ -1464,7 +1464,7 @@ list_clone(PARROT_INTERP, NOTNULL(const List *other))
     Parrot_block_GC(interp);
 
     l = list_new(interp, other->item_type);
-    STRUCT_COPY(l,other);
+    STRUCT_COPY(l, other);
     PObj_buflen(&l->chunk_list) = 0;
     PObj_bufstart(&l->chunk_list) = 0;
 

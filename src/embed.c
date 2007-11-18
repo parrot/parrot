@@ -992,7 +992,7 @@ Parrot_disassemble(PARROT_INTERP)
     PIO_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
 
     if (debugs) {
-        PIO_printf(interp, " %6s:\n","SrcLn#");
+        PIO_printf(interp, " %6s:\n", "SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
     }
     else {
@@ -1019,7 +1019,7 @@ Parrot_disassemble(PARROT_INTERP)
         PIO_printf(interp, "%012i-%012i", op_code_seq_num, line->opcode - interp->code->base.data);
 
         if (debugs)
-            PIO_printf(interp, " %06i: ",interp->code->debugs->base.data[op_code_seq_num]);
+            PIO_printf(interp, " %06i: ", interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */
         if (line->label)

@@ -146,7 +146,7 @@ Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
     if (PObj_constant_TEST(s)) {
         d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
         PObj_COW_SET(s);
-        STRUCT_COPY(d,s);
+        STRUCT_COPY(d, s);
         /* we can't move the memory, because constants aren't
          * scanned in compact_pool, therefore the other end
          * would point to garbage.
@@ -157,7 +157,7 @@ Parrot_make_COW_reference(PARROT_INTERP, NOTNULL(STRING *s))
     else {
         d = new_string_header(interp, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
-        STRUCT_COPY(d,s);
+        STRUCT_COPY(d, s);
         PObj_sysmem_CLEAR(d);
 #if 0
         /* XXX FIXME hack to avoid cross-interpreter issue until it
@@ -199,13 +199,13 @@ Parrot_reuse_COW_reference(SHIM_INTERP, NOTNULL(STRING *s), NOTNULL(STRING *d))
 
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
-        STRUCT_COPY(d,s);
+        STRUCT_COPY(d, s);
         PObj_constant_CLEAR(d);
         PObj_external_SET(d);
     }
     else {
         PObj_COW_SET(s);
-        STRUCT_COPY(d,s);
+        STRUCT_COPY(d, s);
         PObj_sysmem_CLEAR(d);
     }
     return d;
@@ -775,7 +775,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 string_grow(PARROT_INTERP, NOTNULL(STRING *s), INTVAL addlen)
 {
-    Parrot_unmake_COW(interp,s);
+    Parrot_unmake_COW(interp, s);
 
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interp,
@@ -3190,10 +3190,10 @@ string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))
         return res;
     }
 
-    pe = string_str_index(interp,str,delim,0);
+    pe = string_str_index(interp, str, delim, 0);
 
     if (pe < 0) {
-        VTABLE_push_string(interp,res,str);
+        VTABLE_push_string(interp, res, str);
         return res;
     }
 
@@ -3202,13 +3202,13 @@ string_split(PARROT_INTERP, NOTNULL(STRING *delim), NOTNULL(STRING *str))
     while (ps <= slen) {
         const int pl = pe - ps;
         STRING * const tstr = string_substr(interp, str, ps, pl, NULL, 0);
-        VTABLE_push_string(interp,res,tstr);
-        ps = pe + string_length(interp,delim);
+        VTABLE_push_string(interp, res, tstr);
+        ps = pe + string_length(interp, delim);
 
         if (ps > slen)
             break;
 
-        pe = string_str_index(interp,str,delim,ps);
+        pe = string_str_index(interp, str, delim, ps);
 
         if (pe < 0)
             pe = slen;

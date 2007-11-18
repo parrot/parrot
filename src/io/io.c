@@ -741,7 +741,7 @@ Creates and returns a C<ParrotIO> PMC for C<*spath> on an existing, open
 file descriptor.
 
 This is used particularly to initialize the C<STD*> IO handles onto the
-OS IO handles (0,1,2).
+OS IO handles (0, 1, 2).
 
 =cut
 

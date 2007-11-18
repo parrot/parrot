@@ -17,7 +17,7 @@
 #include "parrot/parrot.h"
 
 #define PF_NCONST(pf)  ((pf)->const_table->const_count)
-#define PF_CONST(pf,i) ((pf)->const_table->constants[(i)])
+#define PF_CONST(pf, i) ((pf)->const_table->constants[(i)])
 
 #define DIRECTORY_SEGMENT_NAME   "DIRECTORY"
 #define FIXUP_TABLE_SEGMENT_NAME "FIXUP"
@@ -169,7 +169,7 @@ typedef struct PackFile_FixupTable {
 } PackFile_FixupTable;
 
 #define PFC_NONE    '\0'
-/* no ascii chars use numbers: for n,s,k,p */
+/* no ascii chars use numbers: for n, s, k, p */
 #define PFC_NUMBER  '\156'
 #define PFC_STRING  '\163'
 #define PFC_KEY     '\153'

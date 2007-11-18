@@ -149,7 +149,7 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
     PIO_printf(interp, "\t(interpreter's byteorder   = %d)\n",
             PARROT_BIGENDIAN);
     PIO_printf(interp, "\tfloattype = %d", pf->header->floattype);
-    PIO_printf(interp, "\t(interpreter's NUMVAL_SIZE = %d)\n",NUMVAL_SIZE);
+    PIO_printf(interp, "\t(interpreter's NUMVAL_SIZE = %d)\n", NUMVAL_SIZE);
     PIO_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
             pf->need_endianize ? "**need**" : "no",
             pf->need_wordsize ? "**need**" : "no",

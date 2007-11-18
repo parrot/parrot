@@ -140,11 +140,11 @@ make_branch_list(PARROT_INTERP,
      *      thus we mark the branch target and the branch source.
      *
      * PARROT_JUMP_ADDRESS:
-     *      The op jumps to an absolute address,thus we mark the branch
+     *      The op jumps to an absolute address, thus we mark the branch
      *      target.
      *
      * PARROT_JUMP_POP:
-     *      The op pops the address to jump to,thus we don't mark the
+     *      The op pops the address to jump to, thus we don't mark the
      *      branch target, anyway it may probably use expr(NEXT)
      *
      * PARROT_JUMP_ENEXT:
@@ -871,7 +871,7 @@ debug_sections(PARROT_INTERP,
     int i, typ, n;
     unsigned int j;
     const char *types = "IPSN";
-    int types_to_list[] = {0,3};
+    int types_to_list[] = {0, 3};
 
     cur_section = optimizer->sections;
     while (cur_section) {
@@ -1764,7 +1764,7 @@ Parrot_jit_newfixup(Parrot_jit_info_t *jit_info)
 
 =head1 SEE ALSO
 
-F<src/jit.h>, F<docs/jit.pod>,d F<src/jit_debug.c>,
+F<src/jit.h>, F<docs/jit.pod>, F<src/jit_debug.c>,
 F<src/jit/$jitcpuarch/jit_emit.h>, F<jit/$jitcpuarch/core.jit>.
 
 =cut

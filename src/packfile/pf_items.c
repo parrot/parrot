@@ -83,12 +83,12 @@ static opcode_t fetch_op_test(NOTNULL(unsigned char *b))
 /*
  * round val up to whole size, return result in bytes
  */
-#define ROUND_UP_B(val,size) ((((val) + (size - 1))/(size)) * (size))
+#define ROUND_UP_B(val, size) ((((val) + (size - 1))/(size)) * (size))
 
 /*
  * round val up to whole opcode_t, return result in opcodes
  */
-#define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
+#define ROUND_UP(val, size) (((val) + ((size) - 1))/(size))
 
 /*
  * low level FLOATVAL fetch and convert functions

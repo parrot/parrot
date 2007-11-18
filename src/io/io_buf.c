@@ -150,9 +150,9 @@ ParrotIOLayer pio_buf_layer = {
 
 /* XXX: This is not portable */
 #define DEFAULT_RECSEP '\n'
-#define IS_EOL(io,c) (io->recsep == (*c))
+#define IS_EOL(io, c) (io->recsep == (*c))
 /*
-#define IS_EOL(io,c) ((*c) == '\n')
+#define IS_EOL(io, c) ((*c) == '\n')
 */
 
 

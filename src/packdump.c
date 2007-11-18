@@ -302,7 +302,7 @@ PackFile_Fixup_dump(PARROT_INTERP, NOTNULL(const PackFile_FixupTable *ft))
     opcode_t i;
 
     for (i = 0; i < ft->fixup_count; i++) {
-        PIO_printf(interp,"\t#%d\n", (int) i);
+        PIO_printf(interp, "\t#%d\n", (int) i);
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
             case enum_fixup_sub:
@@ -313,7 +313,7 @@ PackFile_Fixup_dump(PARROT_INTERP, NOTNULL(const PackFile_FixupTable *ft))
                         ft->fixups[i]->name);
                     break;
             default:
-                PIO_printf(interp,"\ttype => %d ???,\n",
+                PIO_printf(interp, "\ttype => %d ???,\n",
                         (int) ft->fixups[i]->type);
                 break;
         }

@@ -344,7 +344,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     }
 
     /* Destroys all PMCs, even constants and the ParrotIO objects for
-     * std{in,out,err}, so don't be verbose about DOD'ing. */
+     * std{in, out, err}, so don't be verbose about DOD'ing. */
     Parrot_do_dod_run(interp, DOD_finish_FLAG);
 
 #if STM_PROFILE

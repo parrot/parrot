@@ -19,7 +19,7 @@ Alex Gough, 2002
 
 I<It was a very inconvenient habit of kittens (Alice had once made the
 remark) that, whatever you say to them, they always purr.  "If they
-would only purr for `yes,' and mew for `no,' or any rule of that sort,"
+would only purr for `yes', and mew for `no', or any rule of that sort",
 she had said, "so that one could keep up a conversation!  But how can
 you talk with a person if they always say the same thing?">
 
@@ -69,7 +69,7 @@ Get value of digit at C<pos>.
     (x->buffer[(y) / BN_D_PER_NIB] = \
      ((z) << ((y) % BN_D_PER_NIB)*4) | \
      (x->buffer[(y) / BN_D_PER_NIB] & ~(15<< ((y) % BN_D_PER_NIB)*4)))
-#define BN_getd(x,y) \
+#define BN_getd(x, y) \
     ((x->buffer[(y) / BN_D_PER_NIB] >> \
      ((y) % BN_D_PER_NIB)*4) & 15)
 
@@ -577,7 +577,7 @@ void
 BN_PRINT_DEBUG(BIGNUM *bn, char* mesg)
 {
     INTVAL i;
-    printf("%s: nibs %i digits %i sign %i expn %i \n",mesg,
+    printf("%s: nibs %i digits %i sign %i expn %i \n", mesg,
            bn->nibs, bn->digits, bn->sign, bn->expn);
     if (bn->digits == 0) {
         printf("Special value, flags: %x", bn->flags & 127);
@@ -857,7 +857,7 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng)
             }
             /* so, d = 0. x.yyyy, d=1 xx.y d=2 xxx.yyy special case if xxx*/
 
-            *cur++ = '0' + BN_getd(bn,bn->digits-1);
+            *cur++ = '0' + BN_getd(bn, bn->digits-1);
             if (deficit == 0) *cur++ = '.';
 
             if (bn->digits == 1) {
@@ -866,14 +866,14 @@ BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng)
                 *cur++ = '0';
             }
             else if (bn->digits == 2) {
-                *cur++ = '0' + BN_getd(bn,bn->digits-2);
+                *cur++ = '0' + BN_getd(bn, bn->digits-2);
                 if (deficit == 1) *cur++ = '.';
                 *cur++ = '0';
             }
             else {
-                *cur++ = '0' + BN_getd(bn,bn->digits-2);
+                *cur++ = '0' + BN_getd(bn, bn->digits-2);
                 if (deficit == 1) *cur++ = '.';
-                *cur++ = '0' + BN_getd(bn,bn->digits-3);
+                *cur++ = '0' + BN_getd(bn, bn->digits-3);
                 if (bn->digits != 3 && deficit == 2) *cur++ = '.';
 
                 for (cur_dig=bn->digits-4; cur_dig>-1; cur_dig--) {
@@ -1129,7 +1129,7 @@ BN_from_string(PINTD_ char* s2, BN_CONTEXT *context)
 
 
     BN_destroy(PINT_ temp);
-    BN_really_zero(PINT_ result,context->extended);
+    BN_really_zero(PINT_ result, context->extended);
     return result;
 }
 
@@ -2142,7 +2142,7 @@ BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (!carry) { /* a==b*/
         result->digits = 1;
         result->sign = 0;
-        BN_setd(result, 0,0);
+        BN_setd(result, 0, 0);
         return;
     }
     else if (carry < 0) { /* b > a */
@@ -2154,7 +2154,7 @@ BN_isubtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
         carry = 0;
         for (i=0; i<one->digits; i++) {
-            carry = carry + BN_getd(one, i) - BN_getd(two,i);
+            carry = carry + BN_getd(one, i) - BN_getd(two, i);
             if (carry < 0) {
                 BN_setd(result, i, 10+carry);
                 carry = -1;
@@ -2381,7 +2381,7 @@ int
 BN_imultiply(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
               BN_CONTEXT *context)
 {
-    INTVAL i,j;
+    INTVAL i, j;
     int carry, dig;
 
     BN_grow(PINT_ result, one->digits + two->digits + 2);
@@ -2401,7 +2401,7 @@ BN_imultiply(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         dig = BN_getd(two, i);
         carry = 0;
         for (j=0; j<one->digits; j++) {
-            carry += BN_getd(one,j) * dig + BN_getd(result, i+j);
+            carry += BN_getd(one, j) * dig + BN_getd(result, i+j);
             BN_setd(result, i+j, carry % 10);
             carry = carry / 10;
         }
@@ -2512,7 +2512,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (BN_is_zero(PINT_ one, context)) {
         result->expn = 0;
         result->digits = 1;
-        BN_setd(result, 0 ,0);
+        BN_setd(result, 0, 0);
         result->sign = 1 & (one->sign ^ two->sign);
         return;
     }
@@ -2660,7 +2660,7 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
     /* Remove trailing zeros if positive exponent */
     if (result->expn > 0) {
-        INTVAL i,j;
+        INTVAL i, j;
         for (i=0; i<result->digits; i++) {
             if (BN_getd(result, i) != 0) break;
         }
@@ -2747,7 +2747,7 @@ BN_divide_integer(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (BN_is_zero(PINT_ one, context)) {
         result->expn = 0;
         result->digits = 1;
-        BN_setd(result, 0 ,0);
+        BN_setd(result, 0, 0);
         result->sign = 1 & (one->sign ^ two->sign);
         return;
     }
@@ -2775,7 +2775,7 @@ BN_divide_integer(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
                     BN_getd(result, result->digits - 1- i));
         }
         for (i=0; i<result->expn; i++) {
-            BN_setd(result, i ,0);
+            BN_setd(result, i, 0);
         }
         result->digits += result->expn;
         result->expn = 0;
@@ -2823,7 +2823,7 @@ BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         /* now cover x rem Inf => 0 */
         result->expn = 0;
         result->digits = 1;
-        BN_setd(result, 0,0);
+        BN_setd(result, 0, 0);
         result->sign = one->sign;
         return;
     }
@@ -2886,7 +2886,7 @@ BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM *rem)
 {
     INTVAL i, j, divided, newexpn;
-    BIGNUM *div,*t1, *t2;
+    BIGNUM *div, *t1, *t2;
     int s2, value;
 
     /* We assume we've been given something to divide */
@@ -2944,7 +2944,7 @@ BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
             }
         }
         if (divided) {
-            BN_setd(t1,0,j-1);
+            BN_setd(t1, 0, j-1);
             BN_imultiply(PINT_ result, t1, two, context);
             BN_isubtract(PINT_ rem, div, result, context);
         }
@@ -3013,7 +3013,7 @@ Comparison with no rounding etc.
 INTVAL
 BN_comp(PINTD_ BIGNUM *one, BIGNUM *two, BN_CONTEXT* context)
 {
-    INTVAL i,j;
+    INTVAL i, j;
     int cmp;
 
     BN_strip_lead_zeros(PINT_ one, context);

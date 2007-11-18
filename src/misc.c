@@ -264,7 +264,7 @@ F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
 =head1 HISTORY
 
 This was once a simple, vararg-based implementation that existed
-completely within this file.  When the file grew to be nearly 1,000
+completely within this file.  When the file grew to be nearly 1000
 lines long, I split it into three. --BD
 
 =cut

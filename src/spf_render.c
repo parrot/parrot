@@ -182,8 +182,8 @@ handle_flags(PARROT_INTERP, NOTNULL(SpfInfo *info), NOTNULL(STRING *str),
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(interp, str,0) == '-' ||
-                    string_ord(interp, str,0) == '+')) {
+                && (string_ord(interp, str, 0) == '-' ||
+                    string_ord(interp, str, 0) == '+')) {
                 STRING *temp = NULL;
                 STRING *ignored;
                 ignored = string_substr(interp, str, 1, len-1, &temp, 0);

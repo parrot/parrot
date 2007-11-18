@@ -179,7 +179,7 @@ Parrot_compile_string(PARROT_INTERP, NOTNULL(STRING *type),
     if (string_compare(interp, const_string(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (string_compare(interp,const_string(interp, "PASM"), type) == 0)
+    if (string_compare(interp, const_string(interp, "PASM"), type) == 0)
         return IMCC_compile_pasm_s(interp, code, error);
 
     *error=const_string(interp, "Invalid interpreter type");

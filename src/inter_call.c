@@ -137,7 +137,7 @@ static void too_many(PARROT_INTERP,
 
 
 /* Make sure we don't conflict with any other MAX() macros defined elsewhere */
-#define PARROT_MAX(a,b) (((a)) > (b) ? (a) : (b))
+#define PARROT_MAX(a, b) (((a)) > (b) ? (a) : (b))
 
 #define SAVE_OFF_REGS(orig, next, save) \
         save.bp = orig.bp;\

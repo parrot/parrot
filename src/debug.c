@@ -602,7 +602,7 @@ PDB_run_command(PARROT_INTERP, NOTNULL(const char *command))
             break;
         case 0:
             if (pdb->last_command)
-                PDB_run_command(interp,pdb->last_command);
+                PDB_run_command(interp, pdb->last_command);
             break;
         default:
             PIO_eprintf(interp,
@@ -1705,7 +1705,7 @@ PDB_disassemble_op(PARROT_INTERP, NOTNULL(char *dest), int space,
                            interp->code->const_table->
                            constants[op[j]]->u.string->strlen);
                 if (escaped) {
-                    strcpy(&dest[size],escaped);
+                    strcpy(&dest[size], escaped);
                     size += strlen(escaped);
                     mem_sys_free(escaped);
                 }
@@ -2047,7 +2047,7 @@ PDB_load_source(PARROT_INTERP, NOTNULL(const char *command))
     f[i] = '\0';
 
     /* open the file */
-    file = fopen(f,"r");
+    file = fopen(f, "r");
 
     /* abort if fopen failed */
     if (!file) {
@@ -2204,15 +2204,15 @@ PDB_list(PARROT_INTERP, NOTNULL(const char *command))
 
     i = 1;
     while (line->next) {
-        PIO_eprintf(interp, "%li  ",pdb->file->list_line + i);
+        PIO_eprintf(interp, "%li  ", pdb->file->list_line + i);
         /* If it has a label print it */
         if (line->label)
-            PIO_eprintf(interp, "L%li:\t",line->label->number);
+            PIO_eprintf(interp, "L%li:\t", line->label->number);
 
         c = pdb->file->source + line->source_offset;
 
         while (*c != '\n')
-            PIO_eprintf(interp, "%c",*(c++));
+            PIO_eprintf(interp, "%c", *(c++));
 
         PIO_eprintf(interp, "\n");
 
@@ -2246,7 +2246,7 @@ PDB_eval(PARROT_INTERP, NOTNULL(const char *command))
     opcode_t *run = PDB_compile(interp, command);
 
     if (run)
-        DO_OP(run,interp);
+        DO_OP(run, interp);
 }
 
 /*
@@ -2486,10 +2486,10 @@ PDB_help(PARROT_INTERP, NOTNULL(const char *command))
 
     switch (c) {
         case c_disassemble:
-            PIO_eprintf(interp,"No documentation yet");
+            PIO_eprintf(interp, "No documentation yet");
             break;
         case c_load:
-            PIO_eprintf(interp,"No documentation yet");
+            PIO_eprintf(interp, "No documentation yet");
             break;
         case c_list:
             PIO_eprintf(interp,
@@ -2521,7 +2521,7 @@ Usage:\n\
 (pdb) script file.script\n");
             break;
         case c_watch:
-            PIO_eprintf(interp,"No documentation yet");
+            PIO_eprintf(interp, "No documentation yet");
             break;
         case c_delete:
             PIO_eprintf(interp,
@@ -2538,7 +2538,7 @@ Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
 with the \"enable\" command.\n");
             break;
         case c_enable:
-            PIO_eprintf(interp,"Re-enable a disabled breakpoint.\n");
+            PIO_eprintf(interp, "Re-enable a disabled breakpoint.\n");
             break;
         case c_continue:
             PIO_eprintf(interp,
@@ -2558,7 +2558,7 @@ breakpoint, or stops for some other reason.\n\n\
 If no number is specified, it defaults to 1.\n");
             break;
         case c_eval:
-            PIO_eprintf(interp,"No documentation yet");
+            PIO_eprintf(interp, "No documentation yet");
             break;
         case c_trace:
             PIO_eprintf(interp,
@@ -2567,7 +2567,7 @@ This is the same as the information you get when running Parrot with\n\
 the -t option.\n");
             break;
         case c_print:
-            PIO_eprintf(interp,"Print register: e.g. p I2\n");
+            PIO_eprintf(interp, "Print register: e.g. p I2\n");
             break;
         case c_info:
             PIO_eprintf(interp,

@@ -835,7 +835,7 @@ process_cycle_without_exit(int node_index, NOTNULL(parrot_prm_context* c))
             : 0;
 
     if (0 == alt) { /* use temp reg */
-        move_reg(c->dest_regs[node_index],c->temp_reg, c);
+        move_reg(c->dest_regs[node_index], c->temp_reg, c);
         c->backup[node_index] = c->temp_reg;
     }
     else
@@ -858,7 +858,7 @@ should be self-speaking
 static void
 move_reg(int from, int dest, NOTNULL(parrot_prm_context* c))
 {
-   /* fprintf(stderr,"move %i ==> %i\n",from,dest);*/
+   /* fprintf(stderr, "move %i ==> %i\n", from, dest);*/
     c->mov(c->interp, dest, from, c->info);
 }
 

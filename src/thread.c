@@ -449,7 +449,7 @@ thread_func(void *arg)
      * thread is finito
      */
     LOCK(interpreter_array_mutex);
-    DEBUG_ONLY(fprintf(stderr,"marking an thread as finished"));
+    DEBUG_ONLY(fprintf(stderr, "marking an thread as finished"));
 
     interp->thread_data->state |= THREAD_STATE_FINISHED;
     tid                         = interp->thread_data->tid;
@@ -460,7 +460,7 @@ thread_func(void *arg)
     }
     if (interp->thread_data->state & THREAD_STATE_DETACHED) {
         interpreter_array[tid] = NULL;
-        DEBUG_ONLY(fprintf(stderr,"really destroying an interpreter [exit while detached]"));
+        DEBUG_ONLY(fprintf(stderr, "really destroying an interpreter [exit while detached]"));
         Parrot_really_destroy(interp, 0, NULL);
     }
     else if (interp->thread_data->state & THREAD_STATE_JOINED) {
@@ -908,7 +908,7 @@ remove_queued_suspend_gc(PARROT_INTERP)
         mem_sys_free(ev);
         mem_sys_free(cur);
         cur = NULL;
-        DEBUG_ONLY(fprintf(stderr,"%p: remove_queued_suspend_gc: got one", interp));
+        DEBUG_ONLY(fprintf(stderr, "%p: remove_queued_suspend_gc: got one", interp));
     }
 
     queue_unlock(queue);
@@ -941,7 +941,7 @@ pt_gc_count_threads(PARROT_INTERP)
             continue;
         ++count;
     }
-    DEBUG_ONLY(fprintf(stderr,"found %d threads", count));
+    DEBUG_ONLY(fprintf(stderr, "found %d threads", count));
     return count;
 }
 
@@ -964,12 +964,12 @@ pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
     Shared_gc_info *info = shared_gc_info;
     int             thread_count;
 
-    DEBUG_ONLY(fprintf(stderr,"%p: gc_wait_for_stage: %d->%d", interp, from_stage, to_stage));
+    DEBUG_ONLY(fprintf(stderr, "%p: gc_wait_for_stage: %d->%d", interp, from_stage, to_stage));
 
     /* XXX well-timed thread death can mess this up */
     LOCK(interpreter_array_mutex);
 
-    DEBUG_ONLY(fprintf(stderr,"%p: got lock", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: got lock", interp));
     thread_count = pt_gc_count_threads(interp);
 
     PARROT_ASSERT(info->gc_stage == from_stage);
@@ -983,7 +983,7 @@ pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
 
     ++info->num_reached;
 
-    DEBUG_ONLY(fprintf(stderr,"%p: gc_wait_for_stage: got %d", interp, info->num_reached));
+    DEBUG_ONLY(fprintf(stderr, "%p: gc_wait_for_stage: got %d", interp, info->num_reached));
 
     if (info->num_reached == thread_count) {
         info->gc_stage    = to_stage;
@@ -1041,19 +1041,19 @@ assumed held.
 static void
 pt_suspend_one_for_gc(PARROT_INTERP)
 {
-    DEBUG_ONLY(fprintf(stderr,"suspend one: %p", interp));
+    DEBUG_ONLY(fprintf(stderr, "suspend one: %p", interp));
     if (is_suspended_for_gc(interp)) {
-        DEBUG_ONLY(fprintf(stderr,"ignoring already suspended"));
+        DEBUG_ONLY(fprintf(stderr, "ignoring already suspended"));
         return;
     }
 
     if (interp->thread_data->state & THREAD_STATE_GC_WAKEUP) {
-        DEBUG_ONLY(fprintf(stderr,"just waking it up"));
+        DEBUG_ONLY(fprintf(stderr, "just waking it up"));
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
         COND_SIGNAL(interp->thread_data->interp_cond);
     }
     else {
-        DEBUG_ONLY(fprintf(stderr,"queuing event"));
+        DEBUG_ONLY(fprintf(stderr, "queuing event"));
         interp->thread_data->state |= THREAD_STATE_SUSPEND_GC_REQUESTED;
         Parrot_new_suspend_for_gc_event(interp);
     }
@@ -1074,13 +1074,13 @@ pt_suspend_all_for_gc(PARROT_INTERP)
 {
     UINTVAL i;
 
-    DEBUG_ONLY(fprintf(stderr,"suspend_all_for_gc [interp=%p]", interp));
+    DEBUG_ONLY(fprintf(stderr, "suspend_all_for_gc [interp=%p]", interp));
 
     LOCK(interpreter_array_mutex);
     interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
-        DEBUG_ONLY(fprintf(stderr,"found while suspending all\n"));
+        DEBUG_ONLY(fprintf(stderr, "found while suspending all\n"));
         remove_queued_suspend_gc(interp);
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         UNLOCK(interpreter_array_mutex);
@@ -1103,7 +1103,7 @@ pt_suspend_all_for_gc(PARROT_INTERP)
              * so we have a suspend event in our queue to ignore
              */
             /* XXX still reachable? */
-            DEBUG_ONLY(fprintf(stderr,"apparently someone else is doing it [%p]",other_interp));
+            DEBUG_ONLY(fprintf(stderr, "apparently someone else is doing it [%p]", other_interp));
             fprintf(stderr, "??? found later (%p)\n", other_interp);
             successp = remove_queued_suspend_gc(interp);
             PARROT_ASSERT(successp);
@@ -1146,18 +1146,18 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 {
     PARROT_ASSERT(interp);
     PARROT_ASSERT(!interp->arena_base->DOD_block_level);
-    DEBUG_ONLY(fprintf(stderr,"%p: suspend_self_for_gc", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: suspend_self_for_gc", interp));
     /* since we are modifying our own state, we need to lock
      * the interpreter_array_mutex.
      */
     LOCK(interpreter_array_mutex);
-    DEBUG_ONLY(fprintf(stderr,"%p: got lock", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: got lock", interp));
 
     PARROT_ASSERT(interp->thread_data->state &
             (THREAD_STATE_SUSPEND_GC_REQUESTED | THREAD_STATE_SUSPENDED_GC));
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
-        DEBUG_ONLY(fprintf(stderr,"remove queued request"));
+        DEBUG_ONLY(fprintf(stderr, "remove queued request"));
         while (remove_queued_suspend_gc(interp));
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
     }
@@ -1165,7 +1165,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
     }
     else {
-        DEBUG_ONLY(fprintf(stderr,"no need to set suspended\n"));
+        DEBUG_ONLY(fprintf(stderr, "no need to set suspended\n"));
     }
     UNLOCK(interpreter_array_mutex);
 
@@ -1259,7 +1259,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
         interpreter_array[tid] = NULL;
         running_threads--;
 
-        DEBUG_ONLY(fprintf(stderr,"destroying an interpreter [join]"));
+        DEBUG_ONLY(fprintf(stderr, "destroying an interpreter [join]"));
         if (Interp_debug_TEST(parent, PARROT_THREAD_DEBUG_FLAG))
             fprintf(stderr, "running threads %d\n", running_threads);
 
@@ -1373,7 +1373,7 @@ detach(UINTVAL tid)
 
         if (interp->thread_data->state & THREAD_STATE_FINISHED) {
             interpreter_array[tid] = NULL;
-            DEBUG_ONLY(fprintf(stderr,"destroying an interpreter [detach]"));
+            DEBUG_ONLY(fprintf(stderr, "destroying an interpreter [detach]"));
             Parrot_really_destroy(interp, 0, NULL);
             interp = NULL;
         }
@@ -1440,7 +1440,7 @@ void
 pt_add_to_interpreters(PARROT_INTERP, Parrot_Interp new_interp)
 {
     size_t i;
-    DEBUG_ONLY(fprintf(stderr,"interp = %p", interp));
+    DEBUG_ONLY(fprintf(stderr, "interp = %p", interp));
 
     if (!new_interp) {
         /*
@@ -1528,7 +1528,7 @@ pt_DOD_start_mark(PARROT_INTERP)
     Shared_gc_info *info;
     int             block_level;
 
-    DEBUG_ONLY(fprintf(stderr,"%p: pt_DOD_start_mark", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: pt_DOD_start_mark", interp));
     /* if no other threads are running, we are safe */
     if (!running_threads)
         return;
@@ -1536,7 +1536,7 @@ pt_DOD_start_mark(PARROT_INTERP)
     info = get_pool(interp);
     PARROT_ATOMIC_INT_GET(block_level, info->gc_block_level);
 
-    DEBUG_ONLY(fprintf(stderr,"start threaded mark"));
+    DEBUG_ONLY(fprintf(stderr, "start threaded mark"));
     /*
      * TODO now check, if we are the owner of a shared memory pool
      * if yes:
@@ -1549,12 +1549,12 @@ pt_DOD_start_mark(PARROT_INTERP)
     if (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC) {
         PARROT_ASSERT(!(interp->thread_data->state &
                  THREAD_STATE_SUSPEND_GC_REQUESTED));
-        DEBUG_ONLY(fprintf(stderr,"already suspended..."));
+        DEBUG_ONLY(fprintf(stderr, "already suspended..."));
         UNLOCK(interpreter_array_mutex);
     }
     else if (block_level) {
         /* unthreaded collection */
-        DEBUG_ONLY(fprintf(stderr,"... but blocked"));
+        DEBUG_ONLY(fprintf(stderr, "... but blocked"));
 
         /* holding the lock */
         return;
@@ -1566,27 +1566,27 @@ pt_DOD_start_mark(PARROT_INTERP)
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-        DEBUG_ONLY(fprintf(stderr,"%p: detected request", interp));
+        DEBUG_ONLY(fprintf(stderr, "%p: detected request", interp));
         UNLOCK(interpreter_array_mutex);
     }
     else {
         /* we need to stop the world */
-        DEBUG_ONLY(fprintf(stderr,"stop the world"));
+        DEBUG_ONLY(fprintf(stderr, "stop the world"));
         UNLOCK(interpreter_array_mutex);
 
         pt_suspend_all_for_gc(interp);
     }
 
-    DEBUG_ONLY(fprintf(stderr,"%p: wait for stage", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: wait for stage", interp));
     pt_gc_wait_for_stage(interp, THREAD_GC_STAGE_NONE, THREAD_GC_STAGE_MARK);
 
-    DEBUG_ONLY(fprintf(stderr,"actually mark"));
+    DEBUG_ONLY(fprintf(stderr, "actually mark"));
     /*
      * we can't allow parallel running DODs both would mess with shared PMCs
      * next_for_GC pointers
      */
     LOCK(interpreter_array_mutex);
-    DEBUG_ONLY(fprintf(stderr,"got marking lock"));
+    DEBUG_ONLY(fprintf(stderr, "got marking lock"));
 }
 
 /*
@@ -1647,9 +1647,9 @@ pt_DOD_stop_mark(PARROT_INTERP)
         fprintf(stderr, "%p: extraneous suspend_gc event\n", (void *)interp);
     }
 
-    DEBUG_ONLY(fprintf(stderr,"%p: unlock", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: unlock", interp));
     UNLOCK(interpreter_array_mutex);
-    DEBUG_ONLY(fprintf(stderr,"wait to sweep"));
+    DEBUG_ONLY(fprintf(stderr, "wait to sweep"));
 
     pt_gc_wait_for_stage(interp, THREAD_GC_STAGE_MARK, THREAD_GC_STAGE_SWEEP);
 }

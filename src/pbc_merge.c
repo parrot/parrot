@@ -189,7 +189,7 @@ str_dup(NOTNULL(const char *old))
     char * const copy = (char *)mem_sys_allocate(bytes);
     memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
-    debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);
+    debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
 #endif
     return copy;
 }

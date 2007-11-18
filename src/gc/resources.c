@@ -183,7 +183,7 @@ Buffer memory layout:
                     v                 v
 
  * if PObj_is_COWable is set, then we have
-   - a ref_count, {inc,dec}remented by 2 always
+   - a ref_count, {inc, dec}remented by 2 always
    - the lo bit 'f' means 'is being forwarded" - what TAIL_flag was
 
  * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
@@ -967,7 +967,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
     /* Constant strings - not compacted */
     arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
 
-    alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool,"init");
+    alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool, "init");
 }
 
 /*

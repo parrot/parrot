@@ -184,7 +184,7 @@ Create initial interpreter context.
 void
 create_initial_context(PARROT_INTERP)
 {
-    static INTVAL   num_regs[] = {32,32,32,32};
+    static INTVAL   num_regs[] = {32, 32, 32, 32};
     Parrot_Context *ignored;
 
     /* Create some initial free_list slots. */
