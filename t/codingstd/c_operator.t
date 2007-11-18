@@ -58,7 +58,7 @@ sub check_operators {
         my $line_number = 1;
         for my $line (@lines) {
             # after a comma there should be one space or a newline
-            if ( $line =~ m{ ( (?:,) (?! \s | ' ) (?= .+) ) }gx ) {
+            if ( $line =~ m{ ( (?:,) (?! \s | ' | \\ ) (?= .+) ) }gx ) {
                 push @comma_space => "$path:$line_number $1\n";
             }
             $line_number++;
