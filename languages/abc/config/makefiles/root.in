@@ -1,24 +1,23 @@
 # $Id$
 
 # Setup some commands
-LN_S     = @lns@
-PERL     = @perl@
-RM_RF    = @rm_rf@
-PARROT   = ../../parrot@exe@
-BUILD_DIR= @build_dir@
-RECONFIGURE= $(PERL) @build_dir@/tools/dev/reconfigure.pl
-BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-TOOL_DIR = ../..
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-CAT      = $(PERL) -MExtUtils::Command -e cat
-CP       = @cp@
-O        = @o@
-LOAD_EXT = @load_ext@
+LN_S          = @lns@
+PERL          = @perl@
+RM_RF         = @rm_rf@
+PARROT        = ../../parrot@exe@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+BUILD         = $(PERL) @build_dir@/tools/build/dynpmc.pl
+TOOL_DIR      = ../..
+PGE_DIR       = ../../compilers/pge
+TGE_DIR       = ../../compilers/tge
+CAT           = $(PERL) -MExtUtils::Command -e cat
+CP            = @cp@
+O             = @o@
+LOAD_EXT      = @load_ext@
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
-PGE_LIBRARY = ../../runtime/parrot/library/PGE
-
-PMCDIR   = src/pmc
+PGE_LIBRARY   = ../../runtime/parrot/library/PGE
+PMCDIR        = src/pmc
 
 all: abc.pbc 
 
