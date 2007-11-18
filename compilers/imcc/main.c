@@ -967,7 +967,7 @@ compile_to_bytecode(PARROT_INTERP,
                                                    IMCC_INFO(interp)->error_message);
 
         IMCC_INFO(interp)->error_code=IMCC_FATAL_EXCEPTION;
-        fprintf(stderr,"error:imcc:%s", error_str);
+        fprintf(stderr, "error:imcc:%s", error_str);
         IMCC_print_inc(interp);
         string_cstring_free(error_str);
         Parrot_exit(interp, IMCC_FATAL_EXCEPTION);
@@ -977,7 +977,7 @@ compile_to_bytecode(PARROT_INTERP,
                                                    IMCC_INFO(interp)->error_message);
 
         IMCC_INFO(interp)->error_code=IMCC_FATALY_EXCEPTION;
-        fprintf(stderr,"error:imcc:%s", error_str);
+        fprintf(stderr, "error:imcc:%s", error_str);
         IMCC_print_inc(interp);
         string_cstring_free(error_str);
         Parrot_exit(interp, IMCC_FATALY_EXCEPTION);
@@ -1042,8 +1042,8 @@ imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char * argv[])
     IMCC_INFO(interp)->write_pbc = write_pbc;
 
     if (IMCC_INFO(interp)->verbose) {
-        IMCC_info(interp, 1,"debug = 0x%x\n", IMCC_INFO(interp)->debug);
-        IMCC_info(interp, 1,"Reading %s\n",
+        IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
+        IMCC_info(interp, 1, "Reading %s\n",
                   imc_yyin_get(yyscanner) == stdin ? "stdin":sourcefile);
     }
 

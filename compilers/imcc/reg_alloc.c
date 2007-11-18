@@ -466,7 +466,7 @@ and final
 static void
 print_stat(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
 {
-    int sets[4] = {0,0,0,0};
+    int sets[4] = {0, 0, 0, 0};
 
     const char * const function =
         unit->instructions->n_r

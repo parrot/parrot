@@ -189,7 +189,7 @@ _mk_symreg(NOTNULL(SymHash* hsh), NOTNULL(char *name), int t)
     r->color      = -1;
     r->want_regno = -1;
 
-    _store_symreg(hsh,r);
+    _store_symreg(hsh, r);
 
     return r;
 }
@@ -851,7 +851,7 @@ _mk_address(PARROT_INTERP, NOTNULL(SymHash *hsh), NOTNULL(char *name),
         r = (SymReg *)calloc(1, sizeof (SymReg));
         r->type = VTADDRESS;
         r->name = name;
-        _store_symreg(hsh,r);
+        _store_symreg(hsh, r);
         return r;
     }
 
@@ -1037,7 +1037,7 @@ SymReg *
 dup_sym(NOTNULL(const SymReg *r))
 {
     SymReg * const new_sym = mem_allocate_typed(SymReg);
-    STRUCT_COPY(new_sym,r);
+    STRUCT_COPY(new_sym, r);
     new_sym->name = str_dup(r->name);
 
     return new_sym;

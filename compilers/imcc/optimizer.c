@@ -316,7 +316,7 @@ if_branch(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
                 SymReg * const go = get_branch_reg(ins);
                 int args;
 
-                IMCC_debug(interp, DEBUG_OPT1,"if_branch %s ... %s\n",
+                IMCC_debug(interp, DEBUG_OPT1, "if_branch %s ... %s\n",
                         last->op, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
@@ -644,9 +644,9 @@ constant_propagation(PARROT_INTERP, IMC_Unit * unit)
                  */
                 for (i = ins2->n_r - 1; i >= 0; i--) {
                     if (!strcmp(o->name, ins2->r[i]->name)) {
-                        if (instruction_writes(ins2,ins2->r[i]))
+                        if (instruction_writes(ins2, ins2->r[i]))
                             goto next_constant;
-                        else if (instruction_reads(ins2,ins2->r[i])) {
+                        else if (instruction_reads(ins2, ins2->r[i])) {
                             IMCC_debug(interp, DEBUG_OPT2,
                                     "\tpropagating into %I register %i",
                                     ins2, i);
@@ -1527,13 +1527,13 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
         case CHK_INV_NEW:
         case CHK_INV_SET:
             if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1,0;
+                return reason=1, 0;
             if (r->set != 'P' && r->lhs_use_count != 1)
-                return reason=2,0;
+                return reason=2, 0;
             break;
         case CHK_CLONE:
             if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1,0;
+                return reason=1, 0;
             break;
     }
 
@@ -1570,23 +1570,23 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
 
             /* now look for dangerous ops */
             if (!strcmp(ins->op, "find_global"))
-                return reason=4,0;
+                return reason=4, 0;
             if (!strcmp(ins->op, "store_global"))
-                return reason=4,0;
+                return reason=4, 0;
             if (!strcmp(ins->op, "push"))
-                return reason=4,0;
+                return reason=4, 0;
             if (!strcmp(ins->op, "pop"))
-                return reason=4,0;
+                return reason=4, 0;
             if (!strcmp(ins->op, "clone"))
-                return reason=4,0;
+                return reason=4, 0;
             /* indexed set/get ??? RT#46289, as index is ok */
             if (0 && ! strcmp(ins->op, "set") && nregs != 2)
-                return reason=5,0;
+                return reason=5, 0;
             /*
              * set P, P  - dangerous?
              */
             if (ins->type & ITALIAS)
-                return reason=6,0;
+                return reason=6, 0;
             /* we saw all occurencies of reg, so fine */
             if (lhs_use_count == 0 && use_count == 0) {
                 if (what == CHK_INV_SET && new_bl != set_bl)
@@ -1596,7 +1596,7 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
         }
         /* we have finished this life range */
     } /* for bb */
-    return what == CHK_CLONE ? 1 : (reason=10,0);
+    return what == CHK_CLONE ? 1 : (reason=10, 0);
 }
 
 /*
@@ -1756,7 +1756,7 @@ move_ins_out(PARROT_INTERP, NOTNULL(IMC_Unit *unit),
         Instruction * tmp;
 
         regs[0] = 0;
-        sprintf(buf, "# Invar moved: %s",out->next->op);
+        sprintf(buf, "# Invar moved: %s", out->next->op);
         tmp = INS(interp, unit, "", buf, regs, 0, 0, 0);
         insert_ins(unit, (*ins)->prev, tmp);
     }
@@ -1837,7 +1837,7 @@ loop_optimization(PARROT_INTERP, NOTNULL(IMC_Unit *unit))
          * inner loop is changed, but outer loops too */
         if (changed) {
             prev_depth = l-1;
-            IMCC_debug(interp, DEBUG_OPT2,"after loop_opt\n");
+            IMCC_debug(interp, DEBUG_OPT2, "after loop_opt\n");
             if (IMCC_INFO(interp)->debug>1)
                 dump_instructions(interp, unit);
             return changed;

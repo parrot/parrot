@@ -50,7 +50,7 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(IMCC_INFO(interp)->jump_buf,IMCC_FATAL_EXCEPTION);
+    IMCC_THROW(IMCC_INFO(interp)->jump_buf, IMCC_FATAL_EXCEPTION);
 }
 
 /*
@@ -76,7 +76,7 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), NOTNULL(const char *fmt), ...)
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
     va_end(ap);
-    IMCC_THROW(IMCC_INFO(interp)->jump_buf,IMCC_FATALY_EXCEPTION);
+    IMCC_THROW(IMCC_INFO(interp)->jump_buf, IMCC_FATALY_EXCEPTION);
 }
 
 /*
@@ -478,7 +478,7 @@ dump_liveness_status_var(NOTNULL(const IMC_Unit *unit), NOTNULL(const SymReg* r)
                 fprintf(stderr, "  ");
 
             if (l->first_ins) {
-                fprintf(stderr, "[%d,%d]\t", l->first_ins->index,
+                fprintf(stderr, "[%d, %d]\t", l->first_ins->index,
                         l->last_ins->index);
             }
         }

@@ -176,7 +176,7 @@ iNEW(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *r0),
     }
     else
         nargs = 2;
-    return INS(interp, unit, "new", fmt, regs, nargs,0, emit);
+    return INS(interp, unit, "new", fmt, regs, nargs, 0, emit);
 }
 
 /*
@@ -692,7 +692,7 @@ INS(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const char *name),
         format[sizeof (format) - 1] = '\0';
     }
 #if 1
-    IMCC_debug(interp, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
+    IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
 #endif
     /* make the instruction */
 
@@ -813,7 +813,7 @@ imcc_compile(PARROT_INTERP, NOTNULL(const char *s), int pasm_file,
     struct _imc_info_t *imc_info = NULL;
     struct parser_state_t *next;
     DECL_CONST_CAST;
-    INTVAL regs_used[4] = {3,3,3,3};
+    INTVAL regs_used[4] = {3, 3, 3, 3};
     void *yyscanner;
     Parrot_Context *ignored;
 
@@ -1067,7 +1067,7 @@ imcc_compile_file(PARROT_INTERP, NOTNULL(const char *fullname),
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants()
      */
-    INTVAL regs_used[4] = {3,3,3,3};
+    INTVAL regs_used[4] = {3, 3, 3, 3};
 
     if (IMCC_INFO(interp)->last_unit) {
         /* got a reentrant compile */
@@ -1429,7 +1429,7 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
 {
     int i, keyf, kv, n;
     static int p = 0;
-    SymReg *preg[3];    /* px,py,pz */
+    SymReg *preg[3];    /* px, py, pz */
     SymReg *nreg[3];
     Instruction *ins = 0;
 
@@ -1479,7 +1479,7 @@ multi_keyed(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(char *name),
                 nreg[2] = preg[n];
                 /* set p_k px */
                 ins = INS(interp, unit, str_dup("set"),
-                          0, nreg, 3,KEY_BIT(1),0);
+                          0, nreg, 3, KEY_BIT(1), 0);
             }
             else {
                 nreg[0] = preg[n];
@@ -1670,7 +1670,7 @@ str_dup(NOTNULL(const char *old))
     char * const copy  = (char *)mem_sys_allocate(bytes);
     memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
-    debug(interp, 1,"line %d str_dup %s [%x]\n", line, old, copy);
+    debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
 #endif
     return copy;
 }

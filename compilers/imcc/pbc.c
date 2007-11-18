@@ -779,7 +779,7 @@ add_const_num(PARROT_INTERP, const char *buf)
     STRING * const s = string_from_cstring(interp, buf, 0);
 
     interp->code->const_table->constants[k]->type     = PFC_NUMBER;
-    interp->code->const_table->constants[k]->u.number = string_to_num(interp,s);
+    interp->code->const_table->constants[k]->u.number = string_to_num(interp, s);
 
     return k;
 }
@@ -1179,7 +1179,7 @@ add_const_key(PARROT_INTERP, NOTNULL(opcode_t key[]), int size, NOTNULL(const ch
     IMCC_debug(interp, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
                s_key, k, size);
     IMCC_debug(interp, DEBUG_PBC_CONST, "\t %x /%x %x/ /%x %x/\n",
-               key[0],key[1],key[2],key[3],key[4]);
+               key[0], key[1], key[2], key[3], key[4]);
 
     mem_sys_free(pfc);
 
@@ -1326,12 +1326,12 @@ build_key(PARROT_INTERP, NOTNULL(SymReg *key_reg))
                                 slice_deb(slice_bits));
                         break;
                     default:
-                        IMCC_fatal(interp, 1,"build_key: unknown set\n");
+                        IMCC_fatal(interp, 1, "build_key: unknown set\n");
                 }
                 sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
                 break;
             default:
-                IMCC_fatal(interp, 1,"build_key: "
+                IMCC_fatal(interp, 1, "build_key: "
                     "unknown type 0x%x on %s\n", var_type, r->name);
         }
     }
@@ -1880,7 +1880,7 @@ e_pbc_emit(PARROT_INTERP,
                         r = r->reg;
 
                     *pc++ = (opcode_t) r->color;
-                    IMCC_debug(interp, DEBUG_PBC," %d", r->color);
+                    IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
                     break;
                 case PARROT_ARG_KC:
                     r = ins->r[i];
@@ -1891,7 +1891,7 @@ e_pbc_emit(PARROT_INTERP,
                     else {
                         *pc++ = build_key(interp, r);
                     }
-                    IMCC_debug(interp, DEBUG_PBC," %d", pc[-1]);
+                    IMCC_debug(interp, DEBUG_PBC, " %d", pc[-1]);
                     break;
                 default:
                     IMCC_fatal(interp, 1, "e_pbc_emit:"
@@ -1914,7 +1914,7 @@ e_pbc_emit(PARROT_INTERP,
                 if (r->type & VT_CONSTP)
                     r = r->reg;
                 *pc++ = (opcode_t) r->color;
-                IMCC_debug(interp, DEBUG_PBC," %d", r->color);
+                IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
             }
         }
 

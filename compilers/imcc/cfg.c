@@ -825,7 +825,7 @@ analyse_life_block(NOTNULL(Basic_block* bb), NOTNULL(SymReg* r))
             special = ins;
 
         /*
-         * set p,p is basically a read - both are LF_use
+         * set p, p is basically a read - both are LF_use
          *
          * TODO live range coalescing
          */
@@ -1004,7 +1004,7 @@ compute_dominators(PARROT_INTERP, NOTNULL(struct _IMC_Unit *unit))
                 edge; edge = edge->succ_next) {
             succ_index = edge->to->index;
             set_intersec_inplace(dominators[succ_index], dominators[q[cur]]);
-            set_add(dominators[succ_index],succ_index);
+            set_add(dominators[succ_index], succ_index);
 
             if (!set_contains(visited, succ_index)) {
                 set_add(visited, succ_index);
@@ -1372,13 +1372,13 @@ mark_loop(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(const Edge *e))
     if (i != 1) {
         if (i==0) {
             if (header->index)
-                IMCC_debug(interp, DEBUG_CFG,"\tdead code\n");
+                IMCC_debug(interp, DEBUG_CFG, "\tdead code\n");
             else
                 IMCC_debug(interp, DEBUG_CFG, "\tsub start\n");
         }
         else
             IMCC_debug(interp, DEBUG_CFG,
-                    "\tcan't determine loop entry block (%d found)\n" ,i);
+                    "\tcan't determine loop entry block (%d found)\n" , i);
     }
 
     loop = set_make(unit->n_basic_blocks);

@@ -799,7 +799,7 @@ e_file_emit(PARROT_INTERP,
     if ((ins->type & ITLABEL) || ! *ins->op)
         ins_print(interp, stdout, ins);
     else {
-        imcc_fprintf(interp, stdout, "\t%I ",ins);
+        imcc_fprintf(interp, stdout, "\t%I ", ins);
     }
     printf("\n");
     return 0;

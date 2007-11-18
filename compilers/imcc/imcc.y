@@ -187,7 +187,7 @@ MK_I(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *fmt), int n, ...)
     else
         fmt = ++q;
 #ifdef OPDEBUG
-    fprintf(stderr, "op '%s' format '%s' (%d)\n", opname, fmt?:"",n);
+    fprintf(stderr, "op '%s' format '%s' (%d)\n", opname, fmt?:"", n);
 #endif
     va_start(ap, n);
     i = 0;
@@ -281,7 +281,7 @@ Instruction *
 INS_LABEL(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, int emit)
 {
 
-    Instruction * const ins = _mk_instruction("","%s:", 1, &r0, 0);
+    Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
     ins->type               = ITLABEL;
     r0->first_ins           = ins;
 
@@ -325,7 +325,7 @@ iINDEXFETCH(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, SymReg *r1, SymReg *r2)
     }
 
     IMCC_INFO(interp) -> keyvec |= KEY_BIT(2);
-    return MK_I(interp, unit, "set %s, %s[%s]", 3, r0,r1,r2);
+    return MK_I(interp, unit, "set %s, %s[%s]", 3, r0, r1, r2);
 }
 
 /*
@@ -338,11 +338,11 @@ iINDEXSET(PARROT_INTERP, IMC_Unit * unit,
 {
     if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
         SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
-        MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1,r3, r2);
+        MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
     }
     else if (r0->set == 'P') {
         IMCC_INFO(interp) -> keyvec |= KEY_BIT(1);
-        MK_I(interp, unit, "set %s[%s], %s", 3, r0,r1,r2);
+        MK_I(interp, unit, "set %s[%s], %s", 3, r0, r1, r2);
     }
     else {
         IMCC_fataly(interp, E_SyntaxError,
@@ -792,8 +792,8 @@ sub_params:
    | '\n'                               { $$ = 0; }
    | sub_params sub_param '\n'          {
        if (IMCC_INFO(interp)->adv_named_id) {
-             add_pcc_named_param(interp,IMCC_INFO(interp)->cur_call,
-                                 IMCC_INFO(interp)->adv_named_id,$2);
+             add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
+                                 IMCC_INFO(interp)->adv_named_id, $2);
              IMCC_INFO(interp)->adv_named_id = NULL;
          }
          else add_pcc_param(IMCC_INFO(interp)->cur_call, $2);
@@ -816,7 +816,7 @@ sub_param_type_def:
                                          else
                                              $$ = mk_ident(interp, $4, $1);
                                          $$->type |= $5;
-                                         adv_named_set(interp,$2);}
+                                         adv_named_set(interp, $2);}
    ;
 
 
@@ -965,13 +965,13 @@ pcc_call:
    | METH_CALL target '\n'
          {  add_pcc_sub(IMCC_INFO(interp)->cur_call, $2); }
    | METH_CALL STRINGC '\n'
-         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2,'S')); }
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S')); }
    | METH_CALL target COMMA var '\n'
          {  add_pcc_sub(IMCC_INFO(interp)->cur_call, $2);
             add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    | METH_CALL STRINGC COMMA var '\n'
-         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2,'S'));
+         {  add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, $2, 'S'));
             add_pcc_cc(IMCC_INFO(interp)->cur_call, $4);
          }
    ;
@@ -1018,7 +1018,7 @@ paramtype:
    | ADV_OPTIONAL                      {  $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG                      {  $$ = VT_OPT_FLAG; }
    | ADV_NAMED                         {  $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')'         {  adv_named_set(interp,$3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')'         {  adv_named_set(interp, $3); $$ = 0; }
    | UNIQUE_REG                      {  $$ = VT_UNIQUE_REG; }
    ;
 
@@ -1074,22 +1074,22 @@ var_returns:
     /* empty */ { $$ = 0; }
   | arg                     {
       if (IMCC_INFO(interp)->adv_named_id) {
-          add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
+          add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
                                IMCC_INFO(interp)->adv_named_id, $1);
           IMCC_INFO(interp)->adv_named_id = NULL;
       }
       else add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
   | STRINGC ADV_ARROW var {
-      add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$1,$3);}
+      add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, $1, $3);}
   | var_returns COMMA arg   {
       if (IMCC_INFO(interp)->adv_named_id) {
-          add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,
-                               IMCC_INFO(interp)->adv_named_id,$3);
+          add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
+                               IMCC_INFO(interp)->adv_named_id, $3);
            IMCC_INFO(interp)->adv_named_id = NULL;
       }
       else add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   | var_returns COMMA STRINGC ADV_ARROW var   {
-      add_pcc_named_return(interp,IMCC_INFO(interp)->sr_return,$3,$5);}
+      add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, $3, $5);}
   ;
 
 
@@ -1225,7 +1225,7 @@ labeled_inst:
                            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
                            IMCC_INFO(interp)->cur_call = NULL;
                         }
-   | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch",1, $2); }
+   | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch", 1, $2); }
    | PARROT_OP vars
                    { $$ = INS(interp, IMCC_INFO(interp)->cur_unit, $1, 0,
                               IMCC_INFO(interp) -> regs,
@@ -1289,9 +1289,9 @@ assignment:
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set_addr",
                         2, $1, mk_label_address(interp, $4)); }
    | target '=' GLOBALOP string
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "find_global",2,$1,$4);}
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "find_global", 2, $1, $4);}
    | GLOBALOP string '=' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "store_global",2, $2,$4); }
+            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "store_global", 2, $2, $4); }
        /* NEW is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
    | NEW target COMMA var
@@ -1430,14 +1430,14 @@ arglist:
    }
    | arg                     {  $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
-           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
            IMCC_INFO(interp)->adv_named_id = NULL;
        }
        else add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
    }
    | arglist COMMA STRINGC ADV_ARROW var { $$ = 0;
-                                     add_pcc_named_arg(interp,IMCC_INFO(interp)->cur_call,$3,$5);}
-   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp,IMCC_INFO(interp)->cur_call,$1,$3);}
+                                     add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $3, $5);}
+   | STRINGC ADV_ARROW var { $$ = 0; add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $1, $3);}
    ;
 
 arg:
@@ -1452,7 +1452,7 @@ argtype_list:
 argtype:
      ADV_FLAT                  { $$ = VT_FLAT; }
    | ADV_NAMED                 { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp,$3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp, $3); $$ = 0; }
    ;
 
 result: target paramtype_list  { $$ = $1; $$->type |= $2; }
@@ -1462,20 +1462,20 @@ targetlist:
      targetlist COMMA result {
          $$ = 0;
          if (IMCC_INFO(interp)->adv_named_id) {
-             add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$3);
+             add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
              IMCC_INFO(interp)->adv_named_id = NULL;
          }
          else add_pcc_result(IMCC_INFO(interp)->cur_call, $3); }
    | targetlist COMMA STRINGC ADV_ARROW target {
-        add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$3,$5); }
+        add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $3, $5); }
    | result                  {
        $$ = 0;
        if (IMCC_INFO(interp)->adv_named_id) {
-           add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,IMCC_INFO(interp)->adv_named_id,$1);
+           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
            IMCC_INFO(interp)->adv_named_id = NULL;
        }
        else add_pcc_result(IMCC_INFO(interp)->cur_call, $1); }
-   | STRINGC ADV_ARROW target { add_pcc_named_result(interp,IMCC_INFO(interp)->cur_call,$1,$3); }
+   | STRINGC ADV_ARROW target { add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $1, $3); }
    | /* empty */             {  $$ = 0; }
    ;
 
@@ -1486,11 +1486,11 @@ conditional_statement:
 
 unless_statement:
      UNLESS var relop var GOTO label_op
-      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, inv_op($3), 3, $2,$4, $6); }
+      { $$ =MK_I(interp, IMCC_INFO(interp)->cur_unit, inv_op($3), 3, $2, $4, $6); }
    | UNLESS PNULL var GOTO label_op
       { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless_null", 2, $3, $5); }
    | UNLESS var comma_or_goto label_op
-      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless",2, $2, $4); }
+      { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless", 2, $2, $4); }
    ;
 
 if_statement:

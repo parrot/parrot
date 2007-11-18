@@ -769,10 +769,10 @@ expand_pcc_sub_call(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(Instruction 
 
         if (arg) {
             regs[1] = arg;
-            ins     = insINS(interp, unit, ins, "invoke" ,regs, 2);
+            ins     = insINS(interp, unit, ins, "invoke" , regs, 2);
         }
         else {
-            ins = insINS(interp, unit, ins, "invokecc" ,regs, 1);
+            ins = insINS(interp, unit, ins, "invokecc" , regs, 1);
         }
     }
 
