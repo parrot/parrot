@@ -29,7 +29,7 @@ use Parrot::Configure::Step ':gen';
 sub _init {
     my $self = shift;
 
-    return 
+    return
         { description => q{Configuring languages},
           args        => [ qw( languages ) ],
           result      => q{},
