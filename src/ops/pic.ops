@@ -107,7 +107,7 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
                 VTABLE_set_integer_native(interp, left, c);
         }
         else {
-            if (PARROT_ERRORS_test(interp,PARROT_ERRORS_OVERFLOW_FLAG)) {
+            if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG)) {
                 real_exception(interp, NULL, ERR_OVERFLOW,
                         "Integer overflow");
             }

@@ -69,8 +69,8 @@ op debug_load(inconst STR) :base_debug {
     char *f;
 
     if (!(interp->pdb->state & PDB_BREAK)) {
-        f = string_to_cstring(interp,($1));
-        PDB_load_source(interp,f);
+        f = string_to_cstring(interp, ($1));
+        PDB_load_source(interp, f);
         string_cstring_free(f);
     }
 
@@ -104,7 +104,7 @@ op debug_break() :base_debug {
         while (!(interp->pdb->state & PDB_EXIT)) {
             PDB_get_command(interp);
             command = interp->pdb->cur_command;
-            PDB_run_command(interp,command);
+            PDB_run_command(interp, command);
         }
         /* RT#42378 this is not ok */
         exit(EXIT_SUCCESS);
@@ -133,8 +133,8 @@ op debug_print() :base_debug {
          */
         PDB_print_int(interp, &interp->int_reg, -1);
         PDB_print_num(interp, &interp->num_reg, -1);
-        PDB_print_string(interp,&interp->string_reg, -1);
-        PDB_print_pmc(interp,&interp->pmc_reg, -1, NULL);
+        PDB_print_string(interp, &interp->string_reg, -1);
+        PDB_print_pmc(interp, &interp->pmc_reg, -1, NULL);
 #endif
     }
     goto NEXT();

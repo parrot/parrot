@@ -80,7 +80,7 @@ Greatest Common divisor of $2 and $3.
 
 Given $4 and $5, it calculates $1, $2 and $3 so that
 
-$1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a,b) = x*a + y*b)
+$1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a, b) = x*a + y*b)
 
 =cut
 
@@ -318,7 +318,7 @@ op trap() {
     __asm__("int3");       /* opcode 0xcc */
 #endif
 #if defined(__GNUC__) && defined(PPC)
-    __asm__("trap");       /* opcode tr 31,0,0 */
+    __asm__("trap");       /* opcode tr 31, 0, 0 */
 #endif
     goto NEXT();
 }
