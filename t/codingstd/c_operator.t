@@ -50,6 +50,9 @@ sub check_operators {
     foreach my $file (@_) {
         my $path = @ARGV ? $file : $file->path();
 
+        # skip lex files
+        next if $path =~ m/\.l$/;
+
         my $buf = $DIST->slurp($path);
 
         my @lines = split( /\n/, $buf );
