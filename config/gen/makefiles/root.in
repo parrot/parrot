@@ -154,7 +154,6 @@ GEN_MAKEFILES = \
     languages/abc/Makefile \
     languages/amber/Makefile \
     languages/APL/Makefile \
-    languages/bc/Makefile \
     languages/befunge/Makefile \
     languages/bf/Makefile \
     languages/c99/Makefile \
@@ -167,7 +166,6 @@ GEN_MAKEFILES = \
     languages/lisp/Makefile \
     languages/lua/Makefile \
     languages/m4/Makefile \
-    languages/miniperl/Makefile \
     languages/nqp/Makefile \
     languages/ook/Makefile \
     languages/parrot_compiler/Makefile \
