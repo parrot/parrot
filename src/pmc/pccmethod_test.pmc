@@ -43,7 +43,7 @@ pmclass PCCMETHOD_Test need_ext does hash {
         PIO_printf(interp, "test_method2\n");
         PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o,
             VTABLE_name(interp, slurpy_pos),
-            VTABLE_get_repr(interp,slurpy_pos));
+            VTABLE_get_repr(interp, slurpy_pos));
 
         PCCRETURN(int 1000, STRING *kevin);
     }

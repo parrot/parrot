@@ -214,7 +214,7 @@ Get integer value of current position plus idx.
 */
 
     FLOATVAL get_number_keyed(PMC *key) {
-        return VTABLE_get_number_keyed(INTERP,(PMC *)PMC_pmc_val(SELF), key);
+        return VTABLE_get_number_keyed(INTERP, (PMC *)PMC_pmc_val(SELF), key);
     }
 
 /*

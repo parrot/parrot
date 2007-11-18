@@ -238,10 +238,10 @@ Stats a file, and returns a 13 position array as in Perl:
             VTABLE_set_integer_keyed_int(interp, array, 7, info.st_size);
             VTABLE_set_integer_keyed_int(interp, array, 8, info.st_atime);
             VTABLE_set_integer_keyed_int(interp, array, 9, info.st_mtime);
-            VTABLE_set_integer_keyed_int(interp, array,10, info.st_ctime);
+            VTABLE_set_integer_keyed_int(interp, array, 10, info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interp, array,11, info.st_blksize);
-            VTABLE_set_integer_keyed_int(interp, array,12, info.st_blocks);
+            VTABLE_set_integer_keyed_int(interp, array, 11, info.st_blksize);
+            VTABLE_set_integer_keyed_int(interp, array, 12, info.st_blocks);
 #endif
             return array;
         }
@@ -303,10 +303,10 @@ Stats a file, and returns a 13 position array as in Perl:
             VTABLE_set_integer_keyed_int(interp, array, 7, info.st_size);
             VTABLE_set_integer_keyed_int(interp, array, 8, info.st_atime);
             VTABLE_set_integer_keyed_int(interp, array, 9, info.st_mtime);
-            VTABLE_set_integer_keyed_int(interp, array,10, info.st_ctime);
+            VTABLE_set_integer_keyed_int(interp, array, 10, info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interp, array,11, info.st_blksize);
-            VTABLE_set_integer_keyed_int(interp, array,12, info.st_blocks);
+            VTABLE_set_integer_keyed_int(interp, array, 11, info.st_blksize);
+            VTABLE_set_integer_keyed_int(interp, array, 12, info.st_blocks);
 #endif
             return array;
         }

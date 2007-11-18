@@ -234,7 +234,7 @@ destination to continue execution.
         Stack_Chunk_t    *corresponding_target;
 
         int exception_continuation_p
-            = VTABLE_isa(INTERP, SELF,CONST_STRING(INTERP,"Exception_Handler"));
+            = VTABLE_isa(INTERP, SELF, CONST_STRING(INTERP, "Exception_Handler"));
         int ret_continuation_p
             = VTABLE_isa(INTERP, SELF, CONST_STRING(INTERP, "RetContinuation"));
 

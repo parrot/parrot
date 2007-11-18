@@ -659,7 +659,7 @@ Finish thawing.
                     PMC   *key       = VTABLE_shift_pmc(INTERP, iter);
                     INTVAL core_type = VTABLE_get_integer(INTERP, key);
                     INTVAL hll_type  =
-                        VTABLE_get_integer_keyed_int(INTERP, typemap,core_type);
+                        VTABLE_get_integer_keyed_int(INTERP, typemap, core_type);
 
                     Parrot_register_HLL_type(INTERP, hll_id,
                         core_type, hll_type);

@@ -587,7 +587,7 @@ Returns the PMC value for the element at C<*key>.
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
             /* check if we really have Hash_key_type_int */
             if (hash->key_type == Hash_key_type_int) {
-                void *idx           = parrot_hash_get_idx(INTERP, hash,key);
+                void *idx           = parrot_hash_get_idx(INTERP, hash, key);
                 const INTVAL i      = (INTVAL)idx;
                 result              = pmc_new(INTERP, enum_class_Integer);
                 PMC_int_val(result) = i;

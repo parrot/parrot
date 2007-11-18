@@ -89,7 +89,7 @@ Creates a copy of the string.
     PMC *clone() {
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP,VTABLE_get_string(INTERP, SELF));
+        PMC_str_val(dest) = string_copy(INTERP, VTABLE_get_string(INTERP, SELF));
         return dest;
     }
 
@@ -731,7 +731,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 
         if (start < end)
             real_exception(INTERP, NULL, E_ValueError,
-                    "invalid conversion to int - bad char %c",*start);
+                    "invalid conversion to int - bad char %c", *start);
 
         VTABLE_set_integer_native(INTERP, result, i);
         return result;

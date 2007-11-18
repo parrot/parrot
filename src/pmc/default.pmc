@@ -23,7 +23,7 @@ generated from F<vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 #include "parrot/parrot.h"
 
-#define INT2KEY(i,k) key_new_integer((i), (k))
+#define INT2KEY(i, k) key_new_integer((i), (k))
 
 /* undef 'interface', because msvc is craptastic */
 #undef interface
@@ -982,7 +982,7 @@ Look for NCI methods and properties.
          */
         if (SELF->pmc_ext && PMC_metadata(SELF)) {
              const HashBucket * const b =
-                parrot_hash_get_bucket(INTERP, (Hash *)PMC_metadata(SELF),name);
+                parrot_hash_get_bucket(INTERP, (Hash *)PMC_metadata(SELF), name);
 
              if (b)
                  p = (PMC *)b->value;

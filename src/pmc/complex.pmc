@@ -271,7 +271,7 @@ Create a new complex PMC with passed arguments according to pdd03.
 
         /*
          * we can only allow 0..2 arguments of one kind. For
-         * mixed (e.g. N,P) args the order of arguments isn't fixed
+         * mixed (e.g. N, P) args the order of arguments isn't fixed
          */
         if (argcP) {
             re = VTABLE_get_number(INTERP, REG_PMC(interp, 5));

@@ -174,7 +174,7 @@ Copy the contents of other to self.
 */
 
     void assign_pmc(PMC *other) {
-        const INTVAL size = VTABLE_elements(INTERP,other);
+        const INTVAL size = VTABLE_elements(INTERP, other);
         INTVAL       i;
 
         DYNSELF.set_integer_native(size);
