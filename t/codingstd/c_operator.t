@@ -39,13 +39,12 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
-my $operators = join '|' => ( ',', ';' );
 check_operators(@files);
 
 exit;
 
 sub check_operators {
-    my @comma_semicolon;
+    my @comma_space;
 
     foreach my $file (@_) {
         my $path = @ARGV ? $file : $file->path();
@@ -58,19 +57,19 @@ sub check_operators {
         my @lines = split( /\n/, $buf );
         my $line_number = 1;
         for my $line (@lines) {
-            # after a comma or semicolon there should be one space or a newline
-            if ( $line =~ m{ ( (?:$operators) (?! \s ) (?= .+) ) }gx ) {
-                push @comma_semicolon => "$path:$line_number $1\n";
+            # after a comma there should be one space or a newline
+            if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
+                push @comma_space => "$path:$line_number $1\n";
             }
             $line_number++;
         }
     }
 
-## L<PDD07/Code Formatting/"there should be one space or a newline after a comma or semicolon">
-    ok( !@comma_semicolon, 'Spacing after commas and semicolons' )
-        or diag( "incorrect spacing following a comma or semicolon found in "
-            . @comma_semicolon
-            . " instances:\n@comma_semicolon" );
+## L<PDD07/Code Formatting/"there should be one space or a newline after a comma">
+    ok( !@comma_space, 'Spacing after commas' )
+        or diag( "incorrect spacing following a comma found in "
+            . @comma_space
+            . " instances:\n@comma_space" );
 }
 
 # Local Variables:
