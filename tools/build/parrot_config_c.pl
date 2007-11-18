@@ -75,7 +75,7 @@ else {
     $_ = <$F>;
     close $F;
 
-    my @c = split '';
+    my @c = split m//;
     die "'$image_file' is truncated. Remove it and rerun make\n" if !@c;
 
     print '    ';

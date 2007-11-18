@@ -41,7 +41,7 @@ sub runstep {
     print $/ if $verbose;
 
     my $archname = $Config{archname};
-    my ( $cpuarch, $osname ) = split( '-', $archname );
+    my ( $cpuarch, $osname ) = split m/-/, $archname, 2;
     if ( !defined $osname ) {
         ( $osname, $cpuarch ) = ( $cpuarch, "" );
     }

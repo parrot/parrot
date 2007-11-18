@@ -532,7 +532,7 @@ sub file_for_perl_module {
     my $self = shift;
     my $module = shift || return;
 
-    my @path = split '::', $module;
+    my @path = split m/::/, $module;
 
     $module = pop @path;
     $module .= '.pm';

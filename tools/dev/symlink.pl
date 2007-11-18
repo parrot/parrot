@@ -61,7 +61,7 @@ if ( open( my $MANIFEST, '<', $manifest ) ) {
         next if /^\#/;
         if (/^(.+?)\s+\[/) {
             my $manifile = $1;
-            my @manifile = split( '/', $manifile );
+            my @manifile = split( m!/!, $manifile );
             my $dstfile  = File::Spec->catfile(@manifile);
             my $srcfile  = File::Spec->catfile( $topsrcdir, @manifile );
             unless ( -f $srcfile ) {

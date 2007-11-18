@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -120,10 +120,10 @@ else {
 
     # otherwise, just run perlcritic.t normally
     my %default_policies = (
+        'BuiltinFunctions::ProhibitStringySplit'          => 1,
         'CodeLayout::ProhibitDuplicateCoda'               => 1,
         'CodeLayout::ProhibitHardTabs'                    => { allow_leading_tabs => 0 },
         'CodeLayout::ProhibitTrailingWhitespace'          => 1,
-        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
         'CodeLayout::UseParrotCoda'                       => 1,
         'InputOutput::ProhibitBarewordFileHandles'        => 1,
         'InputOutput::ProhibitTwoArgOpen'                 => 1,
@@ -138,10 +138,11 @@ else {
 
     # add other policies which aren't yet passing consistently see RT#42427
     my %extra_policies = (
-        'NamingConventions::ProhibitAmbiguousNames' => 1,
-        'Subroutines::ProhibitBuiltinHomonyms'      => 1,
-        'Subroutines::ProhibitSubroutinePrototypes' => 1,
-        'Subroutines::RequireFinalReturn'           => 1,
+        'CodeLayout::RequireTidyCode'                     => { perltidyrc => $perl_tidy_conf },
+        'NamingConventions::ProhibitAmbiguousNames'       => 1,
+        'Subroutines::ProhibitBuiltinHomonyms'            => 1,
+        'Subroutines::ProhibitSubroutinePrototypes'       => 1,
+        'Subroutines::RequireFinalReturn'                 => 1,
     );
 
     # Add Perl::Critic::Bangs if it exists

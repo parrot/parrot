@@ -127,7 +127,7 @@ foreach my $da_file (@dafiles) {
 
         print "Processing $gcov_file ($source_file)\n";
 
-        foreach ( split "\n", $generated_files{$gcov_file} ) {
+        foreach ( split m/\n/, $generated_files{$gcov_file} ) {
             my ( $percent, $total_lines, $real_filename ) =
                 /\s*([^%]+)% of (\d+)(?: source)? lines executed in file (.*)/;
             if ($total_lines) {

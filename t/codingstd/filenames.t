@@ -66,7 +66,7 @@ my ( @multi_dots, @strange_chars, @too_long );
 foreach my $file ( @files ) {
 
     # check for multiple dots in filenames
-    my $num_dots = grep(m/\./g, split('', $file));
+    my $num_dots = grep(m/\./g, split( m//, $file));
     if ( $num_dots > 1 ) {
         push @multi_dots, $file . "\n";
     }
@@ -77,7 +77,7 @@ foreach my $file ( @files ) {
 
     # check for filenames that are too long
     my ($volume, $directory, $filename) = File::Spec->splitpath( $file );
-    my @filename_chars = split '', $filename;
+    my @filename_chars = split  m//, $filename;
     my $filename_len = scalar @filename_chars;
     push @too_long, $file . ":$filename_len chars\n"
         if $filename_len > 32;

@@ -15,7 +15,7 @@ sub new {
     $self->{indent} = q{ } x 4;
     my $pir = [];
     if ( defined($code) ) {
-        $pir = [ split "\n", $code ];
+        $pir = [ split m/\n/, $code ];
     }
     $self->{raw_pir} = $pir;
 
@@ -32,7 +32,7 @@ sub add_pir {
             push @{ $self->{raw_pir} }, "\n";
         }
         else {
-            push @{ $self->{raw_pir} }, split /\n/, $chunk;
+            push @{ $self->{raw_pir} }, split m/\n/, $chunk;
         }
     }
     return;    #void
