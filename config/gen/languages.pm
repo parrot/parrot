@@ -8,6 +8,12 @@ config/gen/languages.pm - Build files for language implementations
 =head1 DESCRIPTION
 
 Config step for languages.
+Builds C<languages/Makefile> and loops over list of languages.
+Special support for C<languages/tcl>.
+
+A space seperated list of languages can be passed in with
+the option 'languages'.
+An empty list of languages is OK.
 
 =cut
 
@@ -16,18 +22,18 @@ package gen::languages;
 use strict;
 use warnings;
 
-
 use base qw(Parrot::Configure::Step::Base);
 
 use Parrot::Configure::Step ':gen';
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Configuring languages};
-    $data{args}        = [ qw( languages ) ];
-    $data{result}      = q{};
-    return \%data;
+
+    return 
+        { description => q{Configuring languages},
+          args        => [ qw( languages ) ],
+          result      => q{},
+        };
 }
 
 sub runstep {
@@ -39,19 +45,27 @@ sub runstep {
     $languages = qq{
         APL amber abc befunge bf cardinal c99 cola ecmascript forth HQ9plus
         jako lisp lua m4 nqp ook parrot_compiler perl5 perl6 pheme PIR plumhead
-        pugs punie pynie regex scheme tap urm WMLScript Zcode
+        pugs punie pynie regex scheme tap tcl urm WMLScript Zcode
     } unless defined $languages;
 
-    foreach my $language ( split ' ', $languages ) {
-        genfile( "languages/$language/config/makefiles/root.in" => "languages/$language/Makefile" );
+    foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
+        if ( $language ne 'tcl' ) {
+            genfile(
+                "languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile"
+            );
+        }
+        else {
+            # tcl has more than one Makefile
+            # currently this is handled as a special case
+            genfile(
+                "languages/$language/config/makefiles/examples.in" => "languages/$language/examples/Makefile"
+            );
+            genfile(
+                "languages/$language/config/makefiles/root.in"     => "languages/$language/Makefile",
+                expand_gmake_syntax                                => 1,
+            );
+        }
     }
-
-    genfile( 'languages/tcl/config/makefiles/examples.in' => 'languages/tcl/examples/Makefile' );
-
-    genfile(
-        'languages/tcl/config/makefiles/root.in' => 'languages/tcl/Makefile',
-        expand_gmake_syntax                      => 1,
-    );
 
     return 1;
 }
