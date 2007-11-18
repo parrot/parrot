@@ -147,7 +147,7 @@ sub runstep {
         libparrot_soname       => '-Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION)',
     );
 
-    if ( ( split m/-/, $Config{archname}, 2 ) )[0] eq 'ia64' ) {
+    if ( ( split( m/-/, $Config{archname}, 2 ) )[0] eq 'ia64' ) {
         $conf->data->set( platform_asm => 1 );
     }
     return;
