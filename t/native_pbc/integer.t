@@ -7,9 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 
-# use Parrot::Test tests => 1;
-use Parrot::Test;
-plan skip_all => 'Ongoing PBC format changes';
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
