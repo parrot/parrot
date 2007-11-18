@@ -47,6 +47,13 @@ static PackFile_Segment * byte_code_new(SHIM_INTERP,
     SHIM(const char *name),
     SHIM(int add));
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Constant * clone_constant(PARROT_INTERP,
+    NOTNULL(PackFile_Constant *old_const))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void const_destroy(PARROT_INTERP, NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

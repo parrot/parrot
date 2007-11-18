@@ -694,6 +694,8 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
             case 0x2006: case 0x2007: case 0x2008: case 0x2009:
             case 0x200a: case 0x202f: case 0x205f: case 0x3000:
                 return 1;
+            default:
+                break;
         }
     }
     if (flags & enum_cclass_numeric) {

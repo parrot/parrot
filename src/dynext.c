@@ -24,6 +24,15 @@ src/dynext.c - Dynamic extensions to Parrot
 /* HEADERIZER BEGIN: static */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static STRING * clone_string_into(
+    NOTNULL(Interp *d),
+    NOTNULL(Interp *s),
+    PMC *value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
     NOTNULL(STRING *lib),

@@ -500,7 +500,7 @@ and running the passed C<sub>.
 
 PARROT_API
 void
-Parrot_new_timer_event(PARROT_INTERP, NOTNULL(PMC *timer), FLOATVAL diff,
+Parrot_new_timer_event(PARROT_INTERP, NULLOK(PMC *timer), FLOATVAL diff,
         FLOATVAL interval, int repeat, NULLOK(PMC *sub), parrot_event_type_enum typ)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
