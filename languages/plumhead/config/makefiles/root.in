@@ -1,9 +1,11 @@
 # $Id$
 
 # Set up some commands
-PARROT   = ../../parrot@exe@
-PERL     = @perl@
-RM_F     = @rm_f@
+PARROT        = ../../parrot@exe@
+PERL          = @perl@
+RM_F          = @rm_f@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 # Set up some pathes
 PGE_DIR  = ../../compilers/pge
@@ -57,6 +59,10 @@ help:
 	@echo "  maintain-yacc:     Generate C source files with lex and yacc."
 	@echo "                     Depends on 'perl Configure.pl --maintainer'."
 	@echo ""
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=plumhead
 
 maintain: maintain-antlr3 maintain-yacc
 

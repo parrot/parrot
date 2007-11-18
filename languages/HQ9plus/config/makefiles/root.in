@@ -3,9 +3,11 @@
 # Makefile for languages/HQ9plus
 
 # Setup of some commands
-PARROT         = ../../parrot@exe@
-PERL           = @perl@
-RM_RF          = @rm_rf@
+PARROT        = ../../parrot@exe@
+PERL          = @perl@
+RM_RF         = @rm_rf@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 default: all
 all: build 
@@ -27,6 +29,10 @@ help:
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
 	@echo ""
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=HQ9plus
 
 test: build
 	$(PERL) -Ilib -I../../lib t/harness

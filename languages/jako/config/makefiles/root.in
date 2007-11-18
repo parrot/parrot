@@ -4,11 +4,12 @@
 # $Id$
 #
 
-PERL = @perl@
-RM_F = @rm_f@
-
-JAKOC=$(PERL) -I lib jakoc
-INTERP=../../@test_prog@
+PERL          = @perl@
+RM_F          = @rm_f@
+JAKOC         = $(PERL) -I lib jakoc
+INTERP        = ../../@test_prog@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 .SUFFIXES: .jako .pir
 
@@ -33,6 +34,10 @@ all: \
     examples/primes.pir     \
     examples/queens.pir     \
     examples/sub.pir
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=jako
 
 
 #

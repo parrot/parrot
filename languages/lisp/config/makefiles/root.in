@@ -1,9 +1,11 @@
 # $Id$
 
 # Setup some commands
-RM_F = @rm_f@
-PERL = @perl@
-PARROT = ../../parrot@exe@
+RM_F          = @rm_f@
+PERL          = @perl@
+PARROT        = ../../parrot@exe@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 all: build
 
@@ -21,6 +23,10 @@ help :
 	@echo ""
 	@echo "  clean:             Cleaning up."
 	@echo ""
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=lisp
 
 test: build
 	$(PERL) -Ilib -I../../lib t/harness

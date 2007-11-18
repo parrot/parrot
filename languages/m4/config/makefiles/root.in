@@ -3,9 +3,11 @@
 # Makefile for languages/m4
 
 # Setup of some commands
-PARROT         = ../../parrot@exe@
-PERL           = @perl@
-RM_RF          = @rm_rf@
+PARROT        = ../../parrot@exe@
+PERL          = @perl@
+RM_RF         = @rm_rf@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 default: all
 all: build 
@@ -29,6 +31,10 @@ help:
 	@echo "  html:              Generate HTML documentation."
 	@echo "  perlcritic:        Look at the Perl code with Perl::Critic."
 	@echo ""
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=m4
 
 test: build
 	$(PERL) -Ilib -I../../lib t/harness
