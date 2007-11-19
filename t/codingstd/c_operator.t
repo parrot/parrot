@@ -43,6 +43,22 @@ check_operators(@files);
 
 exit;
 
+sub strip_pod {
+    my $buf = shift;
+    my $parser = Pod::Simple->new();
+    my $non_pod_buf;
+    $parser->output_string( \$non_pod_buf );
+    # set up a code handler to get at the non-pod
+    # thanks to Thomas Klausner's Pod::Strip for the inspiration
+    $parser->code_handler(
+        sub {
+            print {$_[2]{output_fh}} $_[0], "\n";
+        });
+    $parser->parse_string_document( $buf );
+
+    return $non_pod_buf;
+}
+
 sub check_operators {
     my @comma_space;
 
@@ -54,14 +70,25 @@ sub check_operators {
 
         my $buf = $DIST->slurp($path);
 
+        # only strip pod from .ops files
+        if ( $path =~ m/\.ops$/ ) {
+            $buf = strip_pod($buf);
+        }
+
+        # strip ', ", and C comments
+        $buf =~ s{ (?:
+                       (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
+                     | (?: (") (?: \\\\ | \\" | [^"] )* (") ) # remove " string
+                     | /(\*) .*? (\*)/                        # remove C comment
+                   )
+                }{defined $1 ? "$1$2" : defined $3 ? "$3$4" : "$5$6"}egsx;
+
         my @lines = split( /\n/, $buf );
-        my $line_number = 1;
         for my $line (@lines) {
             # after a comma there should be one space or a newline
-            if ( $line =~ m{ ( (?:,) (?! \s | ' | \\ ) (?= .+) ) }gx ) {
-                push @comma_space => "$path:$line_number $1\n";
+            if ( $line =~ m{ ( (?:,) (?! \s ) (?= .+) ) }gx ) {
+                push @comma_space => "$path $1\n";
             }
-            $line_number++;
         }
     }
 
