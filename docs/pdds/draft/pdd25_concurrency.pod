@@ -14,17 +14,6 @@ Parrot's concurrency models.
 
 $Revision$
 
-=head1 DEFINITIONS
-
-I<Concurrency> is a parallel execution of units of code (on
-multiprocessor machines), or a flexible ordering of units of code (on
-single processor machines). For certain problem spaces, concurrency
-offers significant speed gains by parceling out processor-intensive
-activity or by ensuring that a wait for input or system resources
-doesn't hold up the entire application.
-
-A I<Task> is a unit of code that can be executed in parallel.
-
 =head1 DESCRIPTION
 
 =over 4
@@ -32,969 +21,298 @@ A I<Task> is a unit of code that can be executed in parallel.
 =item - Parrot supports multiple concurrency models, including POSIX
 threads, event-based programming, and asynchronous I/O.
 
-=item - To reduce conflicts between concurrency models, Parrot provides
-a single central concurrency scheduler for each interpreter instance.
-Each concurrency model defines a Task PMC that supports a standard
-minimal interface. The scheduler can interact with tasks from various
-models without direct access to the details of each model.
+=item - A concurrency scheduler manages all concurrent tasks
 
-=item - On multiprocessor systems, the scheduler is responsible for
-allocating tasks to processors, or for delegating that allocation to the
-underlying OS.
+=item - Each interpreter has its own concurrency scheduler
 
+=item - Concurrency schedulers for different interpreters
+communicate and can share tasks
+
+=item - A concurrency scheduler may link to other schedulers as a
+parent, a child, or an equal
+
+=item - A task is a concurrent unit of work
+
+=item - All tasks support a standard interface used by the concurrency
+scheduler, but otherwise have a great deal of flexibility in their
+implementation
+
+=item - Tasks can share PMC variables
 
 =back
 
 =head1 DEFINITIONS
 
-So we can all talk about things the same way, the following
-definitons apply. Some of these are drawn from the POSIX thread spec,
-and as such we should have a translation section at the end.
-
-=over 4
-
-=item THREAD
-
-An OS level thread. If that makes no sense, neither will any of the
-rest of this, in which case I recommend picking up "Programming with
-POSIX Threads" by Dave Butenhof, and coming back when you have.
-
-=item MUTEX
-
-This is a low level, under the hood, not exposed to users, thing that
-can be locked. They're non-recursive, non-read/write, exclusive
-things. When a thread gets a mutex, any other attempt to get that
-mutex will block until the owning thread releases the mutex. The
-platform-native lock construct will be used for this.
-
-{{ - Nigel Sandever: Will this be macroised to hide the platform native
-implementation from the main body of the code?
-- Dan: Yes. }}
-
-=item LOCK
-
-This is an exposed-to-HLL-code thing that can be locked. Only PMCs can
-be locked, and the lock may or may not be recursive or read/write.
-
-=item CONDITION VARIABLE
-
-The "sleep until something pings me" construct. Useful for queue
-construction. Not conceptually associated with a MUTEX. (POSIX
-threads require this, so we're going to hide it there behind macros
-and/or functions)
-
-{{ - Nigel Sandever: Could you elaborate on the nature of what would constitute
-a "ping"?
-- Dan: POSIX has a function cond_signal (and cond_broadcast, which is
-similar). What happens is a thread grabs the condition variable and
-goes to sleep, and sleeps until another thread does a cond_signal,
-which then wakes it up. If there are multiple threads sleeping on the
-condition variable, only one is woken. (cond_broadcast wakes them all
-up) }}
-
-=item RENDEZVOUS POINT
-
-A HLL version of a condition variable.
-
-=item INTERPRETER
-
-Those bits of the Parrot_Interp structure that are absolutely required
-to be thread-specific. This includes the current register sets and
-stack pointers, as well as security context information. Basically if
-a continuation captures it, it's the interpreter.
-
-=item INTERPRETER ENVIRONMENT
-
-Those bits of the Parrot_Interp structure that aren't required to be
-thread-specific (though I'm not sure there are any) I<PLUS> anything
-pointed to that doesn't have to be thread-specific.
-
-The environment includes the global namespaces, pads, stack chunks,
-memory allocation regions, arenas, and whatnots. Just because the
-pointer to the current pad is thread-specific doesn't mean the pad
-I<itself> has to be. It can be shared.
-
-=item INDEPENDENT THREAD
-
-A thread that has no contact I<AT ALL> with the internal data of any
-other thread in the current process. Independent threads need no
-synchronization for anything other than what few global things we
-have. And the fewer the better, though alas we can't have none at all.
-
-Note that independent threads may still communicate back and forth by
-passing either atomic things (ints, floats, and pointers) or static
-buffers that can become the property of the destination thread.
-
-=item SHARED THREAD
-
-A thread that's part of a group of threads sharing a common
-interpreter environment.
-
-{{ - Leo: I presume that this "group of threads" is one thread pool or
-interpreter pool. Could you expand the definition to cover "pool". 
-- Dan: Ah, damn, I needed to fix that up before sending it out. Should've been
-"SHARED INTERPRETER". A shared interpreter is one that's in an interpreter
-pool.
-
-An interpreter pool is a set of interpreters that share common
-resources. They're essentially threads in the OS sense, and they have
-shared access to pretty much everything. The memory pools, arenas,
-and global namespace are shared--pretty much everything except what's
-in the interpreter structure itself. }}
-
-=back
-
-=head1 REQUIREMENTS
-
-=head2 Supported Models
-
-=over 4
-
-=item POSIX threads
-
-The threading scheme must be sufficient to support a POSIX
-share-everything style of threading, such as is used in perl 5's
-"pthread" model, as well as the thread models for Ruby and Python.
-
-=item "Process-type" threads
-
-The scheme must also support the perl 5 "iThreads" threading
-model. In this model no data is shared implicitly, and all sharing
-must be done on purpose and explicitly. It very much resembles the
-Unix fork-process-with-shared-memory-segment model, not a surprise as
-it was originally developed with emulation of Unix's fork system in
-mind. 
-
-{{ - Nigel Sandever: Pseudo forks?
-- Dan: Yeah. On Win32, when Perl forks it starts a new thread and clones the
-interpreter and its contents. If you later do an exec in that thread it starts
-a new process and grabs hold of it. Definitely a clever trick.  }}
-
-=back
-
-=head2 Guarantees
-
-{{ -Dave Whipp: Maybe this isn't strictly a threading thing, but are we going
-to make any guarantees about event orderings? For example, will we guarantee
-that a sequence of events send from one thread to another will always be
-received in the order they are sent? (Obviously no guarantees about
-interleaving of events from other threads). This is usually only important in
-distributed environments where multiple paths exists between a pair of
-endpoints, but it would be nice for user-code to be able to rely on it. 
-- Dan: Hrm. I suppose we really ought to, so we will. If we prioritize
-events (and I'm still torn) then they'll be in priority then send
-order. 
-}}
-
-=over 4
-
-=item No Crashes
-
-The interpreter guarantees that no user program errors of any sort
-will crash the interpreter. This includes threading problems. As
-such, synchronization issues (where multiple interpreters are
-accessing the same shared data) must not crash the interpreter or
-corrupt its internal state.
-
-=back
-
-=head2 Assumptions
-
-=over 4
-
-=item System memory allocation routines are threadsafe
-
-We are assuming that the memory allocation system of the base OS is
-threadsafe. While some of the C runtime libraries are notoriously
-thread dangerous, memory allocation code generally is threadsafe, and
-we'll assume that on all platforms. (Though we will, in general,
-manage our own memory)
-
-{{ - Nigel Sandever: Is there any likelyhood that memory allocation will be
-hidden behind macros at two levels:
- - ALLOCPOOL() for allocating large chunks of memory (ppols) that are
-   later sub-allocated (and managed) by:
- - SUBALLOC() for sub allocating within a pool
-
-- Dan: We'll generally hide behind the memory.c routines, if for no other
-reason than to allow the embedder to override the memory functions.  We need to
-define that at some point... 
-- Gordon Henriksen: Are you wanting something akin to Apache 2 pools, which are
-hierarchical and designed to reduce path length when freeing blocks of objects?
-For instance, all objects and sub-pools allocated during an HTTP request cycle
-can be deallocated just by free()'ing the top-level request pool.
-
-I don't think parrot could make use of that model, since it can't very
-well guarantee that the user cannot retain references past the lifetime
-of the pool. Apache trusts modules not to make such errors; parrot can't
-trust the byte-code it's executing any further than it can throw it. A
-generational collector is a more likely means by which parrot might
-reduce memory-related overhead. 
-- Nigel Sandever: Nothing to do with Apache memory pools.
-
-I believe that parrot already has the concept of memory pools in it's
-memory management. The idea is that by allocating similarly sized objects
-from separate (large) allocations, you can reduce the fragmentation of
-chunks and reduce the incidences where the memory need to be GC'd and
-compacted.
-
-Allocating an 8 byte chunk from a common memory pool is quite likely to
-nip a little off from a previously freed large chunk. When it comes time
-reallocate another chunk the same size as that large, freed chunk, although
-there is enough room in the over all freespace chain to accommodate it, the
-largest available chunk is now 8 bytes or so too small for the requirement.
-
-That induces either a compaction cycle or the need to extend the memory pool
-by the size of the large request.
-
-Allocating all small requests from the same pool, and large from another
-pool means that you are less likely to fragment the memory and more likely
-to be able to re-use an existing slot in the free-space chain for any
-given request.
-
-If the allocation of pools, and the allocation of bit-of-a-pool, are
-macroised, it makes it possible for OS's where there are multiple APIs
-for memory allocation to bypass the CRT memory allocation routines and
-use which ever native APis are best suited for the type of allocation.
-
-Personally, I would like to see memory allocation for each class type
-be managed by the class constructor itself. This would theoretically allow
-each class that has a fixed instance size to manage it's own pool on OS's
-where that makes sense. The class would allocate a pool for itself when
-loaded and then allocate instances from that pool on new() and deallocate
-upon DESTROY. If it's memory pool was exhausted when new was called,
-it would invoke the GC on *it's pool only*.
-
-This separation would mean that each run of the GC would have a much smaller
-pool of memory to compact and garbage collect when it was invoked. It would
-also be less likely to be called, as each allocation from a pool of fixed
-sized sub allocations will only ever need to call the GC when it's pool is
-entirely exhausted.
-
-But that is a radical departure :), so if would just like to see separate calls
-for pool allocation/reallocation and element allocation/reallocation, rather
-than having calls to malloc() scattered through out the codebase. 
-
-- Gordon Henrikson: Don't presume that [allocating similarly sized objects
-reduces fragmentation and GC]. General purpose memory allocators tend to handle
-this scenario... generically. Use of custom allocators is usually a premature
-optimization; the best generic memory allocators are very, very good.
-
-But the ultimate effect of the overuse of custom allocators or pools is
-to move memory fragmentation to a higher level, preventing the generic
-allocator from addressing it even when the memory allocation patterns
-would otherwise allow it.
-
-Would much rather see [the allocation of pools] abstracted, as they are now,
-beneath an API.  This reduces the number of ways in which compiled parrot
-extensions can be incompatible with the parrot core.
-
-A PMC class is free to [manage the memory allocation for its
-own class constructor]. Only the PMC header cannot be thus managed, and that's
-already pooled.
-
-Th[e idea that such a separation means a smaller pool to compact and garbage
-collect] is false. The mark phase will still need to run over the entire
-process, else it cannot detect all references into the pool. (Unless you can
-provide a type-safety guarantee that your type can only be referenced by other
-instances of itself. In which case, your type is necessarily "garbage" and the
-best optimization strategy would be dead-code elimination. :)
-
-- Nigel Sandever: If by reference, you mean address, then that is true.
-
-If when a reference is taken, the address of the referent is
-stored in arbitrary other data structures, then all memory
-be scanned by the GC,
-
-However, if references were not addresses, but an index into a
-table of addresses, then only the table need be scanned.
-
-When a reference, or the thing holding it, is deleted, then
-the indexed slot in the address table is blanked and subsequent
-GC passes looking for references to a referent will no longer
-find the reference in the table.
-
-With the addition of a reference count to the table, all references
-to a single entity can share the same index, but now I'm groping
-back in the direction of reference counting, which is not flavour
-of the month:) 
-
-- Gordon Henrikson: I predict the best overall throughput would be with
-the sweep or copy phase run immediately after the mark phase, across the
-entire process: It would be wasteful to do all that marking and yet
-leave known garbage uncollected.
-
-Statistically, multiple pools will individually exhaust themselves
-*MORE* frequently than a global pool. The ideal case for collection
-frequency is that there is only one pool, or that all pools rise to
-capacity concurrently. In these ideal cases, the segregated pools will
-exhaust themselves precisely *AS* frequently as a global pool. In any
-case, there is no possibility for a decrease in collection events
-through the use of pooled memory. As per above, collection events will
-also not become less expensive. Thus, expect garbage collection to have
-a negative net impact on performance if pooled memory is used. 
-
-- Leo: The problem is not in the fixed sized header pools, its with the
-*memory* pool used e.g for string memory.
-
-During GC we are walking the *header* pools, and if we find its buffer
-memory being used, we move that buffer memory to a new store, thereby
-compacting it. The old memory store(s) are freed then.
-
-So string memory can move around beyond your code. 
-}}
-
-=back
-
-=head1 Proposal
-
-The proposal is as follows:
-
-=over 4
-
-=item All global state shall be protected by mutexes
-
-Straightforward enough. This allows for independent threads to
-coexist without threatening the state of the proces.
-
-=item Multiple independent interpreters will be allowed
-
-Once again, straightforward enough. With threadsafe protected global
-state, there's no issue here.
-
-=item Only one OS thread in an interpreter at once
-
-While there is no requirement that any interpreter be tied to an
-underlying OS thread, under no circumstances may multiple OS threads
-use a single interpreter simultaneously.
-
-=item A Stop-and-copy communication method will be provided
-
-Parrot will provide a function to make a call into another interpreter
-and wait for that call to complete. This call may pass in data and
-have data returned to it. The interpreter making the call will block
-until the call is complete. The data passed in as parameters will be
-copied into the called interpreter, and any return values will be
-copied back into the calling interpreter. The called interpreter will
-block while the return data is copied back into the calling interpreter.
-
-=item Inter-interpreter events will be provided
-
-Interpreters will be able to post events to other interpreters.
-
-=item Each interpreter will have a unique id
-
-This ID will be independent of the process or OS thread, and will be
-constant across the lifetime of the interpreter. Interpreter IDs
-I<may> be reused as interpreters are destroyed and recreated, and as
-such are only guaranteed valid while an interpreter is in use.
-
-(Note that we may decide to relax this requirement, but doing so
-likely means moving to at least 64-bit integers to mark interpreter IDs)
-
-{{ - Nigel Sandever: The provision of method(s) to obtain the native
-TIDs/HANDLES would make life for those writing implementation specific
-extensions easier.
-- Dan: TIDs, definitely. It'll be a sysinfo or interpinfo function. There's the
-issue of interpreters binding to different threads, but we'll deal with that.
-I'm not sure what the HANDLE is, but explain it and we can work something out.
-:) }}
-
-=item Each interpreter show the same process id
-
-All the interpreters within a process will share a process ID. On
-those systems where each thread has its own unique ID (such as many
-versions of Linux) Parrot will still report a single process ID for
-all interpreters.
-
-This process ID will be the ID of the process that first instantiated
-Parrot.
-
-{{ - Leo: The term "process id" is really misleading. Again I presume that one
-pool is meant here. I'd vote for keeping a process ID what it is and use "pool
-id" or such here. 
-- Dan: Nope. It's the process ID. Nothing misleading there, unless you've done
-threading work under linux, since for a while it gave each thread a separate
-PID. 
-- Leo: $ ps | grep [p]arrot
-17472 pts/0    00:00:00 parrot
-17473 pts/0    00:00:00 parrot
-17474 pts/0    00:00:00 parrot
-
-So the unless applies ;) This is a single parrot interpreter, with main,
-thread-manager, and event-handler thread. 3 PIDs.
-
-- Liz Mattijsen: This _all_ depends on which version of Linux you're using.
-Older versions don''t do it that way, and newer versions don't do it either
-(the specific versions escape me at the moment, but I know RH9 does _not_ have
-pids for threads).
-
-I know, because my Thread::Signal module depends on threads having
-pids.  But fewer and fewer Linux systems "support" it (and Linux was
-the only one who worked this way to begin with).
-
-- Dan: Right. Linux is, as I said, arguably broken here, but I don't want to
-argue that point. That's why I specified that the PID is the process id of
-whatever instantiated parrot -- in this case, no matter which thread you're in,
-when you ask for the pid from parrot you should get 17472. (In this case, at
-least)
-
-Parrot needs to grab the pid at global initialization time and store
-it away for later pid queries. }}
-
-
-=item Interpreter pools will share allocation pools
-
-All the interpreters in an interpreter pool will share header and
-memory allocation pools. This means that when there is more than one
-interpreter in a pool the memory allocation and collection system
-needs to be swapped out, as a copying collector is generally
-untenable in a threaded environment.
-
-{{ - Dan: For a copying collector to work, all the mutators must be
-blocked, and arguably all readers should be blocked as well. (I think
-they need to be, otherwise you may be accessing reclaimed and reused
-memory) That means if we keep a copying collector we need to have
-everything that accesses strings or pmcs to get a lock on the GC
-before every access of every string or PMC. A touch excessive, I
-think. 
-- Gordon Henriksen: True of non-moving collectors, too. Or, let me put it this
-way: non- copying *GC* (the sweep or copy phase) can be threadsafe, but the
-mark phase is never threadsafe. The method in which marking is not threadsafe
-is a bit more pathological (i.e., it's not the common case as it is with the
-copying collector), but a standard tracing DOD cannot be correct when
-competeting with mutators. It WILL collect non- garbage (those are MUTATORS,
-remember), and the result WILL be Heizenbugs and crashes.
-
-Some of what I've written up [AR see next comment] addresses why. It's pretty
-simple to demonstrate a single case to prove the point, but I don't feel like
-re-creating the ASCII art right now. :) I'll send that section when I get out
-of the office.
-
-parrot will have to be able to suspend all threads in the environment.
-Unfortunate, but really quite unavoidable. 
-
-- Dan: I'm not sure that's the case. What we need to do is suspend
-metadata mutation--that is, buffers can't be resized while a gc run is
-in progress. Other than that, if we have guarantees of aligned atomic
-pointer writes (so we don't have word shearing to deal with) we don't
-have to stop the mutation of the contents of the buffers themselves.
-
-The only tricky bit comes in with the examination of the root set of
-other threads--accessing the hardware register contents of another
-running thread may be... interesting. (Which, I suppose, argues for
-some sort of volatile marking of the temp variables) 
-
-- Leo: You'll provide the "interesting" part, that is:
-
-  use Psi::Estimate::CPU_Register_Changes_in_Future_till_mark_is_done; 
-
-- Dan: Nah, no need for that one. I need to go back and recheck the
-stuff that Gordon posted in case I missed something, but if you put a
-lock on the arena allocator this isn't an issue. 
-
-- Gordon Henriksen: Consider this simple object graph:
-
-     Root set = { &A, &B }
-
-     [ A=NULL]
-     [ B=&C  ] ---> [ C=....]
-
-Collection begins in thread 1 and marks A as reachable before being
-preempted by thread 2:
-
-     [xA=NULL]
-     [ B=&C  ] ---> [ C=....]
-
-Thread 2 sets A to &C, and nullifies B before being preempted again by
-thread 1:
-
-     [xA=&C  ] ---> [ C=....]
-     [ B=NULL]
-
-Thread 1 marks B as reachable:
-
-     [xA=&C  ] ---> [ C=....]
-     [xB=NULL]
-
-The mark phase complete, thread 1 sweeps:
-
-     [ A=&???] ---> ???
-     [ B=NULL]
-
-C was not marked reachable (although it was) and was thus erroneously
-collected, leaving a dangling pointer. This problem applies equally to
-copying and mark-sweep collectors. 
-
-- Dan: Ah, OK, I see. The problem comes in where we've got an object in the
-transient root set (basically the processor stack and registers) that
-gets anchored into the base root set (stash, pads, or whatever) after
-the DOD has traced where it's going into and falls out of the
-transient root set before the DOD traces over to it.
-
-Race condition. Dammit.
-
-- Gordon Henriksen: (Worse than that. It could come from any untraced
-location--or possibly even be brand new, depending upon memory
-allocation details.) 
-
-- Dan: Okay, I'd not wrapped my brain around that possibility, which will
-make for some interesting DOD tracing, especially on SMP systems. I
-was *really* hoping a single lock on the arena allocation system that
-the DOD held onto while tracing would be sufficient, but I see that
-it isn't.
-
-That means we're going to have to have either a really forgiving DOD
-system that takes multiple passes before it collects up a PMC or
-buffer (which still isn't safe) or have some way to force a
-low-overhead rendezvous.
-
-The obvious rendezvous point is the arena lock, but that's going to
-see a lot of contention anyway, and we'd as soon not have a single
-one for speed reasons. Feh.
-
-Okay, we're going to mandate that we have read/write locks, each
-interpreter pool has one, and mutating vtable entries must get a read
-lock on the pool read/write lock. Pricey (ick) but isolated to
-mutators. The DOD gets a write lock on it, which'll block all
-read/write access so no mutators can be in process while the pool DOD
-runs.
-
-I think that'll work. The .1j thread spec requires r/w locks, and we
-can fake them on platforms that don't implement them. Hopefully
-Nigel's got the Windows scoop so we can see if Win32 has anything
-like this (which I'd expect it does) 
-
-- Leo: That is well knowm in the literature as "Tri-Color Invariant": Black are
-the already marked (live) PMCs, grey the PMCs on the next_for_GC list,
-white the not yet reached PMCs. The strong tri-color invariants states
-that no black object may point to a white object, the weak invariant
-states, that at least one path from the black to a white object must
-contain a grey one.
-
-This can be handled by either stop the world GCs or by intercepting each
-read or write access that would change the color of an object and update
-the color accordingly. This is e.g. used for incremental GC. As soon as
-we have a thread in the background that runs GC, we have to cope with
-these issues. 
-- Dan: Yeah, point. And since we want to be able to have an incremental DOD
-at some point we need to get support for it in now. 
-
-- Leo: Stopping all interpreters seems to be cheaper. The rwlock will sooner or
-later stop all interpreters anyway (on first PMC access), so we can omit the
-price for the rwlock and just hold the world(s).
-- Dan: The rwlock only stops all the interpreters when the DOD runs.
-Anything that mutates a PMC gets a *read* lock so that they don't
-interfere with each other, and only pause if the DOD is running. The
-DOD getting a *write* lock will block any read lock attempts, so when
-the DOD is running no mutation can take place. Since mutation doesn't
-require any global exclusion it doesn't need a write lock -- the read
-lock is sufficient. 
-- Leo: Sure. But that would still need to aquire a readers rwlock for each PMC
-access. This is more expensive then a mutex. During DOD any PMC access
-will halt the interpreter, so we can do that explicitely too and save
-the cost for the rwlock overhead. Albeit I can imagine, that aggregates
-will need a rwlock anyway. 
-- Dan: Well... only the mutating vtable entries need to get the lock, so
-that reduces the expense somewhat. Still, I agree, it may be
-untenably expensive. 
-
-- Leo: An alternative would be real background incremental GC, *when* running
-multiple threads. I estimate the overhead to be in regions of a rwlock (with no
-contention of course). 
-- Dan: If we have the facilities to do incremental DOD runs then this is
-definitely a possibility except for finalizers. Finalizers make
-things interesting, though if the background thread doing the DOD is
-a member of the interpreter pool then it'd work out OK. 
-- Leo: Finalizers and incremental DOD don't play together. The DOD must run to
-end to be sure, that the objects isn't referenced any more.
-- Dan: Finalizers and incremental DOD work just fine together. At some
-point the incremental DOD will figure out that something's dead, just
-as the stop-the-world DOD will. It just may take a bit longer. 
-- Leo: I wanted to say: "Finalizers & destructors of PMCs that need
-timely destruction ...". In the case of dead objects at scope exit. 
-
-
-- Leo: What about temporary PMCs (or strings)? Evaluating a non-trivial
-expression can have lot of these. Each new temp would need a lock on the
-memory sub-system.
-- Dan: Those won't get marked as shared unless we're unconditionally marking
-things as shared. (Though we may just give 'em a mutex anyway) [New temps would
-need a lock] only on allocation. We could have a per-thread freelist if we
-wanted.  Wouldn't be unreasonable. 
-- Leo: This needs either one check per PMC, if its shared or not, or additional
-costs for locking temps. Both are rather expensive, compared to the raw
-working functionality of a vtable. 
-
-That already smells like separate memory sub-systems. The freelist has
-to be filled first. During DOD runs, it has to be refilled. To achieve
-some locality of the temp PMCs, you can't just give these to arbitrary
-intpreters. Separate free lists seem also to imply separate DOD runs to
-cleanup the temps. 
-
-- Leo: Combined with the cost of: "All shared PMCs must have a
-threadsafe vtable - The first thing that any vtable function of a shared PMC
-must do is to aquire the mutex of the PMCs in its parameter list " 
-i.e. typically 3 mutexes, it could be that the vtable of a shared PMC
-should just grab one interpreter lock (of the owner of that PMC) and
-that not all is shared (especially not the temps). 
-- Dan: Yeah, but since PMCs aren't owned by any one interpreter in the pool
-but are rather pool-wide you run into either the global-lock problem
-(which kills performance on SMP systems) or interpreters potentially
-deadlocking on unrelated data access. 
-- Leo: Could be. But the performance is the overall throughput. When a lot of
-fine grained locks (plus memory subsystem locks for temps) take much
-longer then one global lock, then that scheme can nethertheless be
-slower on SMP machines. It would scale better though for more CPUs.
-
-Deadlocks shouldn't be a problem, if exactly one vtable (like in
-SharedRef) just grabs one and only one lock. 
-
-- Leo: [The Guarantees section] doesn't have anything about user data
-integrity. So when 2 threads access a PerlNum, they could get a
-mixture of the typically 2 involved words.
-- Dan: Potentially, yeah, though it's really unlikely.
-- Leo: But: "The first thing that any vtable function of a shared PMC
-must do is to aquire the mutex of the PMCs in its parameter list..."
-... seems to indicate that even whole ops like add P,P,P are atomic.
-- Dan: Yep. They have to be, because they need to guarantee the integrity of
-the pmc structures and the data hanging off them (which includes
-buffer and string stuff)
-- Leo: But isn't that a contradiction? Or better: When even an opcode
-like above is atomic, that an access to a shared PerlNum should be
-guaranteed being atomic too. 
-- Dan: Sure, but there's a *lot* more to user data integrity than atomic
-access to individual pieces. That's the least of the problem. The
-user data issue is one where you have multiple pieces being updated,
-or one piece being updated multiple times--that's the stuff we're not
-guaranteeing.
-
-So, while we will make sure that storing a single value into a hash
-happens atomically, we won't guarantee that a series of stores into
-the hash, or a combination of loads and stores, or even a combination
-of reads and writes to a scalar, will happen atomically. 
-
-- Leo: And how does user level locking play together with that?
-- Dan: I've not decided -- That was something I thought we might hash out as
-we abused the first half of the design doc. Personally I'm all for
-the user and low-level lock being the same thing, but that doesn't
-have to be the case. There are advantages and disadvantages to either
-way of doing things. 
-
-- Damien Neil: Personally, I think it would be better to use
-corruption-resistant buffer and string structures, and avoid locking
-during basic data access.  While there are substantial differences in VM
-design--PMCs are much more complicated than any JVM data type--the JVM
-does provide a good example that this can be done, and done efficiently.
-
-Failing this, it would be worth investigating what the real-world
-performance difference is between acquiring multiple locks per VM
-operation (current Parrot proposal) vs. having a single lock
-controlling all data access (Python) or jettisoning OS threads
-entirely in favor of VM-level threading (Ruby).  This forfeits the
-ability to take advantage of multiple CPUs--but Leopold's initial
-timing tests of shared PMCs were showing a potential 3-5x slowdown
-from excessive locking.
-
-I've seen software before that was redesigned to take advantage of
-multiple CPUs--and then required no less than four CPUs to match
-the performance of the older, single-CPU version.  The problem was
-largely attributed to excessive locking of mostly-uncontested data
-structures. 
-}}
-
-As the allocation and collection system is a black box to user
-programs and much of the interpreter internals, this isn't a big deal
-outside of needing swappable allocation systems, the potential
-issue of COW'd shared memory leaking, and the need to switch
-allocation schemes mid-execution.
-
-=item Each interpreter has a separate event queue
-
-Some events, such as timers, may be interpreter-specific and, as
-such, each interpreter has its own event queue.
-
-=item Each interpreter pool has a shared event queue
-
-Some events, such as IO callbacks, may not be interpreter-specific,
-and can be serviced by any interpreter in the interpreter pool. For
-these events, there is a pool-wide event queue.
-
-=item PMCs are the coordination point for threads
-
-That is, only PMCs are shared as such between threads. Strings,
-specifically, are I<not> shared between interpreters as such
-
-=item All PMCs shared amongst interpreters in a pool must be marked shared
-
-A PMC which is not marked shared may not be handed to another
-interpreter. Parrot will prevent this from happening either by
-marking the PMC as shared, or throwing an exception when the PMC is
-placed in a spot where it may be shared but is not shareable.
-
-=item All shared PMCs must have a threadsafe vtable
-
-The first thing that any vtable function of a shared PMC must do is to
-acquire the mutex of the PMCs in its parameter list, in ascending
-address order. When the mutexes are released they are not required to
-be released in any order.
-
-{{ - Uri: why the ascending address order to grab mutexes? is this to help solve
-deadlocks?
-- Dan: Yes. The recommendation I've always seen for deadlock avoidance is to
-always have all your code grab its mutexes in some fixed order. With source,
-it's generally recommended that you grab mutex variables in lexical order.
-Since we're all binary we need a different order, and ascending addresses are
-reasonably simple to do. 
-- Gordon Henriksen: Note that this locking strategy cannot avoid deadlock if
-the user is allowed to acquire these locks--HLL locks must be altogether
-different beasts from automatic PMC locks. That's okay. Just a design
-consequence worth noting for everyone.
-- Dan: Oh, arguably it can't avoid deadlock at all, what with vtable methods
-having access to the full environment. I can live with deadlocks, only because
-there's no real alternative. 
-- Gordon Henriksen: But PMC implementations have to fall inside of the trusted
-environment, so that's not really a failure. Of course uncooperative code can
-break a cooperative algorithm.  
-
-- Sam Vilain: RE: "have all your code grab its mutexes in some fixed order."
-
-Yes; otherwise, you need to back off and start again, if one lock
-acquisition fails.
-
-Consider these functions; for the purpose of this example, lexical
-lock ordering is implied;
-
-  func1($AAAA, $CCCC, $FFFF, $GGGG, $KKKK);
-  func2($BBBB, $DDDD, $FFFF, $IIII, $KKKK);
-  func3($FFFF, $KKKK);
-
-So long as the locks are ramped up from the lowest to the highest,
-there is no chance of func1 acquiring a lock to be held by func2 (eg,
-$KKKK), if that other function already has one of the shared
-dependancies (eg, $FFFF).
-
-All well and good.  But, what about recursive locks?
-
-ie
-
- sub func1($one is locked, $two is locked, $three is locked) {
-     for my $x ($one, $two, $three) {
-         func2($x.property) if $x.property;
-     }
- }
-
- sub func2($eins is locked) {
-     if ($eins.property) {
-         func2($eins.property, { });
-     }
- }
-
- $aaa.property = { };
- $bbb.property.property = $aaa;
- $ccc = { };
-
- if (thork()) {   # fork a thread
-    # thread A
-    func1($aaa, $bbb, $ccc);
- }
- else {
-    # thread B
-    func2($bbb.property);
- }
-
-OK, the execution order that causes the deadlock is:
-
-  1. Thread B - func2() acquires a lock on the $bbb.property PMC.
-  2. Thread A - func() acquires a lock on $aaa, $bbb, $ccc.
-  3. Thread A - func2() acquires a lock on $aaa.property, which
-     returns quickly
-  4. Thread A - func2() blocks waiting for a lock on $bbb.property,
-     held by func2() in thread B
-  5. Thread B - func2() blocks waiting for a lock on
-     $bbb.property.property, held by func() in thread A.
-
-So, there are still possibilities for deadlocks, as the non-linear
-nature of subroutine calls screws up your nice lock ramping.
-
-In summary, acquiring mutexes in a defined order as a means to avoid
-deadlocks only works when you are acquiring them all up front.  If you
-are acquiring any later, and you detect a deadlock (ie, a loop of
-threads blocking on locks held by each other), you *must* be able to
-tell one of them to "ramp off" to holding no locks at all.  ie,
-ROLLBACK :).
-
-The bugger is, winding back execution state automatically to when you
-last started acquiring locks is probably an intractable problem from
-an interpreter's perspective...
-
-Sounds like a job for an exception to me ;-).
-
-  for (1..50) {
-     eval {
-        func_that_acquires_first_lock($args);
-     };
-     last unless $@ and $@ =~ m/mutex deadlock/i;
-  } 
-}}
-
-=item Automatic PMC sharing will be provided
-
-When a PMC is placed into a container which is shared (including
-lexical pads and global namespaces) then that PMC will automatically
-be marked as shared. It is acceptable for this to trigger an
-exception if for some reason a PMC should not be shared between
-interpreters.
-
-PMCs are, by default, not shared. This avoids sharing overhead for
-PMCs which are only used as temporaries and not shared. (Note that
-this is dangerous, and may end up not being done, due to the sharing
-of continuations)
-
-{{ - Luke: I don't know why this is dangerous.  A continuation is a data structure
-just like an array or a hash.  When you share it, everything "inside" it
-gets shared, too.  For a continuation, this could be an awful lot of
-stuff, but it's the safe way. 
-- Dan: True, but the danger part is if we don't mark everything grabbed by a
-continuation as shared by default. If we do, we might as well mark everything
-as shared, as there'll be less overhead. }}
-
-=item All interpreter constructs in a pool are shareable
-
-This means that a PMC or string may be used by any interpreter in a
-pool. It additionally means that, if full sharing is enabled, that
-any interpreter in a pool may invoke a continuation, assuming the
-continuation is valid. (That is, a continuation taken at parrot's top
-level. Continuations taken within vtable functions, user-defined ops,
-or extension code may not be shareable)
-
-=item The embedding API will allow posting events to a pool
-
-Many events are interpreter-specific, often caused by one particular
-interpreter requesting an async event that later completes.
-
-=item The embedding API will allow posting events to an interpreter
-
-For events that don't have to go to any particular interpreter, they
-can go into the pool's event loop.
-
-=item The embedding API will allow calling a parrot sub with a pool
-
-In those cases where there is an interpreter pool, embedders may call
-a parrot sub using the pool as a whole, rather than an individual
-interpreter, to run the sub. In that case Parrot may either choose a
-dormant interpreter (if there is one) or create a new interpreter in
-the pool to run the subroutine.
-
-When the sub is done, Parrot may either cache the created
-interpreter or destroy it as it needs to, though in no case will
-Parrot ever leave a pool with no interpreters at all.
-
-=back 
-
-=head1 QUESTIONS
-
-=over 4
-
-=item *
-
-Do we need a concurrent version of C<runinterp>? Needs to accept an interp and
-sub argument, as well as an event sub to throw on returning. Also returns a
-status object.
-
-=back
+Concurrency is a parallel execution of units of code (on
+multiprocessor machines), or a flexible ordering of units of code (on
+single processor machines). For certain problem spaces, concurrency
+offers significant speed gains by parceling out processor-intensive
+activity or by ensuring that a wait for input or system resources
+doesn't hold up the entire application.
+
+A task is a unit of code that can be executed in parallel.
 
 =head1 IMPLEMENTATION
 
-[Excerpt from Perl 6 and Parrot Essentials to seed discussion.]
+Rather than defining a single canonical threading model, Parrot defines
+an infrastructure that supports multiple concurrency models and provides
+for interaction between the various models. Parrot already uses multiple
+concurrency models for events, threads, async I/O, and exceptions, a
+trend that will only continue as we support multiple HLLs and external
+threading libraries like Intel's Threading Building Blocks. Designing
+for multiple concurrency models also gives Parrot more room to grow as
+future models are researched and developed.
 
-Threads are a means of splitting a process into multiple pieces that
-execute simultaneously.  It's a relatively easy way to get some
-parallelism without too much work. Threads don't solve all the
-parallelism problems your program may have. Sometimes multiple
-processes on a single system, multiple processes on a cluster, or
-processes on multiple separate systems are better. But threads do
-present a good solution for many common cases.
+To avoid conflicts between concurrency models, Parrot provides a single
+central concurrency scheduler for each interpreter instance.  Each
+concurrency model defines a Task PMC that supports a standard minimal
+interface. The scheduler can interact with tasks from different models
+without direct access to the details of each model.
 
-All the resources in a threaded process are shared between threads.
-This is simultaneously the great strength and great weakness of
-threads. Easy sharing is fast sharing, making it far faster to
-exchange data between threads or access shared global data than to
-share data between processes on a single system or on multiple
-systems. Easy sharing is dangerous, though, since without some sort of
-coordination between threads it's easy to corrupt that shared data.
-And, because all the threads are contained within a single process, if
-any one of them fails for some reason the entire process, with all its
-threads, dies.
+On multiprocessor systems, the scheduler is responsible for allocating
+tasks to processors, or for delegating that allocation to the underlying
+OS.
 
-With a low-level language such as C, these issues are manageable. The
-core data types, integers, floats, and pointers are all small enough
-to be handled atomically. Composite data can be protected with
-mutexes, special structures that a thread can get exclusive access to.
-The composite data elements that need protecting can each have a mutex
-associated with them, and when a thread needs to touch the data it
-just acquires the mutex first. By default there's very little data
-that must be shared between threads, so it's relatively easy, barring
-program errors, to write thread-safe code if a little thought is given
-to the program structure.
+For the most part, when we talk about concurrency, we mean concurrency
+across an interpreter pool. An interpreter pool is a set of interpreter
+instances that share common resources: the memory pools, arenas, and
+global namespace--pretty much everything except what's in the
+interpreter structure itself. They're essentially threads in the OS
+sense. 
 
-Things aren't this easy for Parrot, unfortunately. A PMC, Parrot's
-native data type, is a complex structure, so we can't count on the
-hardware to provide us atomic access. That means Parrot has to provide
-atomicity itself, which is expensive. Getting and releasing a mutex
-isn't really that expensive in itself. It has been heavily optimized by
-platform vendors because they want threaded code to run quickly. It's
-not free, though, and when you consider that running flat-out Parrot
-does one PMC operation per 100 CPU cycles, even adding an additional 10
-cycles per operation can slow Parrot down by 10%.
+Another form of concurrency is between completely independent
+interpreter instances, each with their own memory pools, arenas,
+namespaces, etc. Independent interpreters may run as separate processes
+on the same machine, or even as separate processes on different machines
+(in a clustering environment, for example). The concerns of
+shared-interpreter concurrency and independent-interpreter concurrency
+are similar, and in Parrot both use the same central concurrency
+scheduler. This PDD doesn't directly address independent-interpreter
+concurrency, but does include occasional notes on how it integrates with
+shared-interpreter concurrency.
 
-For any threading scheme, it's important that your program isn't
-hindered by the platform and libraries it uses. This is a common
-problem with writing threaded code in C, for example. Many libraries
-you might use aren't thread-safe, and if you aren't careful with them
-your program will crash. While we can't make low-level libraries any
-safer, we can make sure that Parrot itself won't be a danger. There is
-very little data shared between Parrot interpreters and threads, and
-access to all the shared data is done with coordinating mutexes. This
-is invisible to your program, and just makes sure that Parrot itself
-is thread-safe.
+=head2 Supported Concurrency Models
 
-When you think about it, there are really three different threading
-models. In the first one, multiple threads have no interaction among
-themselves. This essentially does with threads the same thing that's
-done with processes. This works very well in Parrot, with the
-isolation between interpreters helping to reduce the overhead of this
-scheme. There's no possibility of data sharing at the user level, so
-there's no need to lock anything.
+The following are a few of the concurrency models Parrot intends to
+support. The biggest differences between them are in how they handle
+variables shared across concurrent tasks.  But the design is such that
 
-In the second threading model, multiple threads run and pass messages
-back and forth between each other. Parrot supports this as well, via
-the event mechanism. The event queues are thread-safe, so one thread
-can safely inject an event into another thread's event queue. This is
-similar to a multiple-process model of programming, except that
-communication between threads is much faster, and it's easier to pass
-around structured data.
+=head3 Mutex/Lock Concurrency
 
-In the third threading model, multiple threads run and share data
-between themselves. While Parrot can't guarantee that data at the user
-level remains consistent, it can make sure that access to shared data
-is at least safe. We do this with two mechanisms.
+In this model, before performing an operation on a shared variable, you
+must first acquire a lock on it. Once a lock is acquired, any other
+concurrent tasks that attempt to acquire a lock on that variable will
+block until the existing lock is released.
 
-First, Parrot presents an advisory lock system to user code. Any piece
-of user code running in a thread can lock a variable. Any attempt to
-lock a variable that another thread has locked will block until the
-lock is released. Locking a variable only blocks other lock attempts.
-It does I<not> block plain access. This may seem odd, but it's the
-same scheme used by threading systems that obey the POSIX thread
-standard, and has been well tested in practice.
+A mutex is a thing that can be locked. They are not directly exposed to
+users. They're non-recursive, non-read/write, exclusive things.  When a
+concurrent task gets a mutex, any other attempt to get that mutex will
+block until the owning task releases the mutex. Mutexes are implemented
+using the platform-native lock construct.
 
-Secondly, Parrot forces all shared PMCs to be marked as such, and all
-access to shared PMCs must first acquire that PMC's private lock. This
-is done by installing an alternate vtable for shared PMCs, one that
-acquires locks on all its parameters. These locks are held only for
-the duration of the vtable function, but ensure that the PMCs affected
-by the operation aren't altered by another thread while the vtable
-function is in progress.
+The first thing that any vtable function of a shared PMC must do is to
+acquire the mutex of the PMCs in its parameter list (in ascending
+address order). In this model only PMCs can be shared.
+
+=head3 STM Concurrency
+
+Parrot's preferred model of concurrency is based on Software
+Transactional Memory. In this model, rather than locking a shared
+variable while performing a series of operations on it, the changes are
+bundled into a transaction that acts as an atomic unit.
+
+Within the transaction, STM creates a "hypothetical" copy of the
+variable, logs the changes made to that copy, and at the end of the
+transaction performs some validation steps to decide whether to save the
+hypothetical value back to the real variable (a commit) or discard the
+hypothetical value (a roll back). One common validation step is to check
+whether the value of the real variable was changed during the execution
+of the transaction (possibly by another concurrent task).
+
+STM tasks can read/write shared variables from mutex/lock tasks, as they
+appear to the mutex/lock task as a single atomic operation. Mutex/lock
+tasks can read shared variables from STM tasks, but they cannot write
+them, as the STM tasks will not respect the lock and may commit a new
+value in the middle of a complex operation that requires the lock. As a
+safety mode, STM tasks may be configured to fail validation on any
+transaction attempting to commit to a variable locked by a mutex/lock
+task.
+
+=head3 POSIX Concurrency
+
+This is the POSIX "share-everything" style of threading, such as is used
+in Perl 5's "pthread" model, as well as the thread models for Ruby and
+Python. [Recommended reading: "Programming with POSIX Threads" by Dave
+Butenhof.]
+
+=head3 Process-type Concurrency
+
+This is the Perl 5 "iThreads" threading model. In this model no data is
+shared implicitly, and all sharing must be done on purpose and
+explicitly. It resembles the Unix
+fork-process-with-shared-memory-segment model, not a surprise as it was
+originally developed with emulation of Unix's fork system in mind. 
+
+=head3 Independent Concurrency
+
+Independent tasks have no contact with the internal data of any other
+task in the current process. These are implemented as STM concurrency
+but only use transactions for the shared interpreter globals.
+
+Note that independent tasks may still communicate back and forth by
+passing either atomic things (ints, floats, and pointers) or static
+buffers that can become the property of the destination thread.
+
+=head3 Intel Threading Building Blocks
+
+Threading Building Blocks (TBB) is a library of tools for data-parallel
+programming, dividing large data sets into small pieces so that
+operations on those data-sets can be parallelized across multiple
+processors.
+
+Parrot will provide two levels of integration with TBB: an interface for
+TBB's scheduling to interact with the central concurrency scheduler, and
+an interface for developers to access the TBB routines from within
+PIR/PASM.
+
+Like Parrot, TBB is task-based. Since TBB performs its own scheduling,
+TBB tasks in Parrot will be given a lightweight scheduler that only has
+the responsibility of passing messages, events, etc, back and forth
+betwen the TBB task and the central scheduler. TBB tasks will not share
+variables with any other types of concurrent tasks in Parrot.
+
+Note that since TBB is a C++ library, it is only available when Parrot
+is compiled with a C++ compiler.
+
+=head2 Concurrrency Scheduler API
+
+The concurrency scheduler has two parts, a Scheduler PMC, which has an
+instance stored in the interpreter struct, and a set of core routines in
+F<src/scheduler.c>.
+
+An instance of the Scheduler PMC has 3 internal attributes, which are:
+
+=over 4
+
+=item 1
+
+The task list
+
+=item 2
+
+The task priority index
+
+=item 3
+
+The list of handlers
+
+=back
+
+The task list is a simple unordered integer indexed data structure, currently
+implemented as a hash. Each task in the list has an integer ID assigned when it
+is first inserted into the list. A task retains the same ID throughout its
+lifetime, and the ID is not reused once a task is finalized. (The data
+structure is currently implemented as a hash so that it only takes up the
+memory required for currently living tasks. A task list for a particular
+program may use thousands of task IDs, but only need memory allocated for a
+handful of elements at any given moment.)
+
+The task rank index is calculated based on the type, priority rating, age of
+the tasks in the task list. The index is a simple array, and in general the top
+(zeroth) element in the array is the next one to receive attention. The index
+is recalculated regularly as new tasks are inserted into the task list,
+existing tasks are modified or completed, and as time progresses so the age of
+some tasks pushes them to a higher priority. Because of the regular
+recalculation, the rank index may cache some frequently-accessed and rarely
+changing data from the tasks (though it is not required to do so). (As a later
+optimization, some data structure other than an array may be used to speed up
+rank recalculation. For example, with a hash of hashes of arrays keyed on task
+attributes, the process of inserting new tasks at a relative priority to other
+existing tasks could be performed without shifting the rank of all lower ranked
+tasks.)
+
+The list of handlers is a simple stack of handler PMCs currently waiting for an
+appropriate task (event, exception). See PDD 24 on Events for more details on
+event handlers.
+
+=head2 Task PMC API
+
+The interface of the Task PMC is also the minimum required interface for all
+subclasses, extensions, and alternate implementations of a task.
+
+An instance of the Task PMC has 5 internal attributes, which are:
+
+=over 4
+
+=item 1
+
+The type of the task
+
+=item 2
+
+The priority of the task
+
+=item 3
+
+The birthtime stamp of the task
+
+=item 4
+
+The code block of the task (optional)
+
+=item 5
+
+An interpreter structure for the task (optional)
+
+=back
+
+Types of tasks include 'event', 'exception', 'io', and 'code'.
+
+The birthtime stamp is the point at which the task was inserted into the task
+list, and is used for calculating the age of tasks.
+
+The code block is optional and only for tasks that are associated with a simple
+code block. The interpreter structure is also optional and only used for
+thread-like tasks that maintain their own interpreter state.
+
+=head2 Opcodes
+
+=over 4
+
+=item new
+
+  $P1 = new 'Task'
+
+Creates a new task. (The Scheduler PMC is never instantiated directly, it is
+only used by Parrot internals.)
+
+=item schedule
+
+  $P0 = new 'Task'
+  # set attributes
+  schedule $P0
+
+Register a task with the concurrency scheduler. Details about the task are
+stored within the task PMC.
+
+=item join
+
+  $P0 = new 'Task'
+  # ... schedule the task, etc.
+  join $P0
+
+Wait for a particular task to complete.
+
+=item kill
+
+  $P0 = new 'Task'
+  # ... schedule the task, etc.
+  kill $P0
+
+Kill a task without waiting for it to complete.
+
+
+=back
 
 =head1 ATTACHMENTS
 
