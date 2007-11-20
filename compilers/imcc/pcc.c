@@ -215,6 +215,7 @@ pcc_get_args(PARROT_INTERP, IMC_Unit * unit, NOTNULL(Instruction *ins),
             case 'N': flags |= PARROT_ARG_FLOATVAL; break;
             case 'K':
             case 'P': flags |= PARROT_ARG_PMC;      break;
+            default :                               break;
         }
         sprintf(s, "0x%x", flags);
         if (i < n - 1)

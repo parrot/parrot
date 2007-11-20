@@ -233,20 +233,25 @@ mk_pmc_const(PARROT_INTERP, IMC_Unit *unit, NOTNULL(const char *type),
     else {
         name = constant;
     }
+
     switch (type_enum) {
-    case enum_class_Sub:
-    case enum_class_Coroutine:
-        rhs = mk_const(interp, name, 'p');
-        if (!ascii)
-            rhs->type |= VT_ENCODED;
-        r[1] = rhs;
-        rhs->pmc_type = type_enum;
-        rhs->usage = U_FIXUP;
-        return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+        case enum_class_Sub:
+        case enum_class_Coroutine:
+            rhs = mk_const(interp, name, 'p');
+
+            if (!ascii)
+                rhs->type |= VT_ENCODED;
+
+            rhs->usage    = U_FIXUP;
+            break;
+        default:
+            rhs = mk_const(interp, name, 'P');
+            break;
     }
-    rhs = mk_const(interp, name, 'P');
-    r[1] = rhs;
+
+    r[1]          = rhs;
     rhs->pmc_type = type_enum;
+
     return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
 }
 

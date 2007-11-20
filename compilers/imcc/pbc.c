@@ -1066,6 +1066,8 @@ add_const_pmc_sub(PARROT_INTERP, NOTNULL(SymReg *r), int offs, int end)
                 ns_pmc = constant_pmc_new(interp, enum_class_String);
                 PMC_str_val(ns_pmc) = ct->constants[ns_const]->u.string;
                 break;
+            default:
+                break;
         }
     }
 
@@ -1661,10 +1663,11 @@ verify_signature(PARROT_INTERP, NOTNULL(const Instruction *ins), opcode_t *pc)
         }
 
         switch (r->set) {
-            case 'I': needed = PARROT_ARG_INTVAL; break;
-            case 'S': needed = PARROT_ARG_STRING; break;
-            case 'P': needed = PARROT_ARG_PMC; break;
+            case 'I': needed = PARROT_ARG_INTVAL;   break;
+            case 'S': needed = PARROT_ARG_STRING;   break;
+            case 'P': needed = PARROT_ARG_PMC;      break;
             case 'N': needed = PARROT_ARG_FLOATVAL; break;
+            default :                               break;
         }
 
         if (needed != (sig & PARROT_ARG_TYPE_MASK)) {

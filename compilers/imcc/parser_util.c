@@ -1639,6 +1639,8 @@ imcc_vfprintf(PARROT_INTERP, NOTNULL(FILE *fd), NOTNULL(const char *format), va_
                 len += ins_print(interp, fd, _ins);
                 }
                 break;
+            default:
+                break;
         }
     }
     return len;

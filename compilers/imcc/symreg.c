@@ -674,6 +674,8 @@ mk_pmc_const_2(PARROT_INTERP, NOTNULL(IMC_Unit *unit), NOTNULL(SymReg *left), NO
             rhs->usage = U_FIXUP;
             INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
             return NULL;
+        default:
+            break;
     }
 
     r[1] = rhs;

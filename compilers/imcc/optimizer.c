@@ -789,6 +789,8 @@ eval_ins(PARROT_INTERP, char *op, size_t ops, SymReg **r)
                             REG_STR(interp, i) =
                                 IMCC_string_from_reg(interp, r[i]);
                             break;
+                        default:
+                            break;
                     }
                 }
                 break;
@@ -981,6 +983,8 @@ IMCC_subst_constants(PARROT_INTERP, IMC_Unit * unit, NOTNULL(const char *name),
                 break;
             case 'N':
                 sprintf(b, fmt, REG_NUM(interp, 0));
+                break;
+            default:
                 break;
         }
         r[1] = mk_const(interp, str_dup(b), r[0]->set);
@@ -1534,6 +1538,8 @@ _is_ins_save(NOTNULL(IMC_Unit *unit), NOTNULL(Instruction *check_ins),
         case CHK_CLONE:
             if (r->set == 'P' && r->lhs_use_count != 2)
                 return reason=1, 0;
+            break;
+        default:
             break;
     }
 

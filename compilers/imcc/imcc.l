@@ -12,6 +12,11 @@
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
+
+#ifndef __STDC_VERSION_
+#  define __STDC_VERSION_
+#endif
+
 }
 
 %{
