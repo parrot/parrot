@@ -134,6 +134,8 @@ Parrot_stat_info_intval(Parrot_Interp interp, STRING *file, INTVAL thing)
   case STAT_PLATFORM_BLOCKS:
     real_exception(interp, NULL, 1, "STAT_PLATFORM_BLOCKS not supported");
     break;
+  default:
+    break;
   }
 
   string_cstring_free(filename);
@@ -215,6 +217,8 @@ Parrot_fstat_info_intval(Parrot_Interp interp, INTVAL file, INTVAL thing)
     break;
   case STAT_PLATFORM_BLOCKS:
     real_exception(interp, NULL, 1, "STAT_PLATFORM_BLOCKS not supported");
+    break;
+  default:
     break;
   }
 
