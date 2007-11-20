@@ -217,16 +217,26 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_MACRO;
                     }
 
-<MACROBODY>".label" { /* */
-                      return TK_LABEL;
-                    }
+<MACROBODY>".macro_label" { /* */
+                            return TK_MACRO_LABEL;
+                          }
 
-<MACROBODY>"$"{IDENT}":"  { /* unique label declaration */
+<MACROBODY>"$"{IDENT}":"  { /* unique label declaration using macro parameter */
                             lexer_state *lexer = yyget_extra(yyscanner);
                             yylval->sval = dupstr(yytext);
                             return TK_LABEL_ID;
                           }
 
+<MACROBODY>{IDENT}":"     { /* unique label declaration, add special marker. */
+                            lexer_state *lexer = yyget_extra(yyscanner);
+                            yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
+                            /* stick a special marker "@" so we can recognize this as a label that
+                             * must be munged.
+                             */
+                            strncpy(yylval->sval, yytext, yyleng - 1);
+                            strcpy(yylval->sval + yyleng - 1, "@:");
+                            return TK_LABEL_ID;
+                          }
 
 <MACROBODY>".$"{IDENT}    { /* referring to a declared label or local id. */
                             yylval->sval = dupstr(yytext );
@@ -255,6 +265,15 @@ REG            "$"?[SNIP]{DIGITS}
 
 <MACROLOCAL>"$"{IDENT}     { /* unique local id declaration */
                             yylval->sval = dupstr(yytext);
+                            yy_pop_state(yyscanner);
+                            return TK_LOCAL_ID;
+                          }
+
+<MACROLOCAL>{IDENT}       { /* unique local id declaration -- non-parameter */
+                            yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
+                            strcpy(yylval->sval, yytext);
+                            /* add special marker that this token needs munging later */
+                            yylval->sval[yyleng] = '@';
                             yy_pop_state(yyscanner);
                             return TK_LOCAL_ID;
                           }
@@ -339,7 +358,8 @@ REG            "$"?[SNIP]{DIGITS}
                          return TK_IDENT;
                       }
                       else {
-                         fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                         fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 1);
+                         lexer->errors++;
                       }
                     }
 
@@ -362,14 +382,17 @@ REG            "$"?[SNIP]{DIGITS}
                       }
                       else { /* not a directive */
                           lexer_state *lexer = yyget_extra(yyscanner);
-                          macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1); /* skip dot */
+                          macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1);
                           if (macro != NULL) { /* it's a macro! */
                               /* only go into EXPAND state if it's a macro/constant */
                               yy_push_state(EXPAND, yyscanner);
                               yylval->mval = macro; /* pass the pointer to the macro_def */
                               return TK_DOT_IDENT;
                           }
-                          else { /* it's not a macro, just a method-call */
+                          else { /* it's not a macro, just a method-call, but if it was supposed
+                                    to be a macro expansion, we will only see the error in the pir
+                                    compiler.
+                                  */
                               yylval->sval = dupstr(yytext);
                               return TK_ANY;
                           }
@@ -383,41 +406,59 @@ REG            "$"?[SNIP]{DIGITS}
 
                      if (macro != NULL) { /* found the parameter */
                         yylval->sval = macro->body; /* expand the macro-parameter */
-                        return TK_LABEL_TARGET_EXPANSION;
+                        return TK_LABEL_EXPANSION;
                      }
                      else {
-                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                        fprintf(stderr, "Error: cannot find expansion for '%s'\n", yytext);
+                        lexer->errors++;
                      }
+                   }
+
+{IDENT}"@:"        { /* this label was declared unique by ".macro_label foo:" but was munged so we
+                        can recognize it now, and return a signal to the parser it needs to
+                        munge it into a unique ID.
+                      */
+                     yylval->sval = dupstrn(yytext, yyleng - 2);
+                     return TK_UNIQUE_LABEL;
+                   }
+
+{IDENT}"@"         { /* this local was declared unique by ".macro_local", but was munged so we can
+                        recognize it now.
+                     */
+                     yylval->sval = dupstrn(yytext, yyleng - 1);
+                     return TK_UNIQUE_LOCAL;
                    }
 
 ".$"{IDENT}      {   /* expanding a declared variable (local or label) */
                      lexer_state *lexer = yyget_extra(yyscanner);
-                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2); /* skip dot */
+                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2);
 
                      if (macro != NULL) { /**/
                         yylval->sval = macro->body;
                         return TK_VAR_EXPANSION;
                      }
                      else {
-                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 2);
+                        fprintf(stderr, "Error: cannot find expansion for symbol '%s'\n", yytext);
+                        lexer->errors++;
                      }
                  }
 
 "$"{IDENT}      {    /* */
                      lexer_state *lexer = yyget_extra(yyscanner);
-                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1); /* skip dot */
+                     macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1);
                      if (macro != NULL) { /*  */
                         yylval->sval = macro->body;
                         return TK_VAR_EXPANSION;
                      }
                      else {
-                        fprintf(stderr, "Error: cannot find expansion for %s\n", yytext + 1);
+                        fprintf(stderr, "Error: cannot find expansion for parameter '%s'\n", yytext + 1);
+                        lexer->errors++;
                      }
 
 
                    }
 
-"."({Q_STRING}|{REG}) { /* treat ".'foo'" or ".$P0" as 1 token to prevent the tokens are separated
+"."({Q_STRING}|{REG}) {/* treat ".'foo'" or ".$P0" as 1 token to prevent the tokens are separated
                         * by a space; they clearly belong to each other if they were written
                         * together (without a space). This is a method-call, life foo .'bar'().
                         */
@@ -429,15 +470,15 @@ REG            "$"?[SNIP]{DIGITS}
 
 
 
-<LINE>{DIGITS}           { /* when defining a constant, after reading the value, leave this state */
+<LINE>{DIGITS}           { /*  */
                            yylval->sval = dupstr(yytext);
-                           /*yy_pop_state(yyscanner);*/
                            return TK_INTC;
                          }
 
 
 
-<LINE>{Q_STRING}      { yylval->sval = dupstr(yytext);
+<LINE>{Q_STRING}      { /* */
+                        yylval->sval = dupstr(yytext);
                         return TK_STRINGC;
                       }
 
@@ -447,12 +488,10 @@ REG            "$"?[SNIP]{DIGITS}
                       }
 
 
-
-
-<CONSTDEF>{REG}    { yylval->sval = dupstr(yytext);
-                     /* yy_pop_state(yyscanner);*/
-                     return TK_IDENT;
-                   }
+<CONSTDEF>{REG}      { /**/
+                       yylval->sval = dupstr(yytext);
+                       return TK_IDENT;
+                     }
 <CONSTDEF>{Q_STRING} { yylval->sval = dupstr(yytext);
                        return TK_STRINGC;
                      }

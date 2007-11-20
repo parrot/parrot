@@ -45,8 +45,8 @@
      TK_INCLUDE = 261,
      TK_MACRO_CONST = 262,
      TK_MACRO_LOCAL = 263,
-     TK_LINE = 264,
-     TK_LABEL = 265,
+     TK_MACRO_LABEL = 264,
+     TK_LINE = 265,
      TK_INT = 266,
      TK_NUM = 267,
      TK_STRING = 268,
@@ -58,10 +58,12 @@
      TK_LABEL_ID = 274,
      TK_LOCAL_ID = 275,
      TK_VAR_EXPANSION = 276,
-     TK_LABEL_TARGET_EXPANSION = 277,
-     TK_STRINGC = 278,
-     TK_NUMC = 279,
-     TK_INTC = 280
+     TK_LABEL_EXPANSION = 277,
+     TK_UNIQUE_LABEL = 278,
+     TK_UNIQUE_LOCAL = 279,
+     TK_STRINGC = 280,
+     TK_NUMC = 281,
+     TK_INTC = 282
    };
 #endif
 /* Tokens.  */
@@ -71,8 +73,8 @@
 #define TK_INCLUDE 261
 #define TK_MACRO_CONST 262
 #define TK_MACRO_LOCAL 263
-#define TK_LINE 264
-#define TK_LABEL 265
+#define TK_MACRO_LABEL 264
+#define TK_LINE 265
 #define TK_INT 266
 #define TK_NUM 267
 #define TK_STRING 268
@@ -84,10 +86,12 @@
 #define TK_LABEL_ID 274
 #define TK_LOCAL_ID 275
 #define TK_VAR_EXPANSION 276
-#define TK_LABEL_TARGET_EXPANSION 277
-#define TK_STRINGC 278
-#define TK_NUMC 279
-#define TK_INTC 280
+#define TK_LABEL_EXPANSION 277
+#define TK_UNIQUE_LABEL 278
+#define TK_UNIQUE_LOCAL 279
+#define TK_STRINGC 280
+#define TK_NUMC 281
+#define TK_INTC 282
 
 
 
@@ -102,7 +106,7 @@ typedef union YYSTYPE
 
 }
 /* Line 1489 of yacc.c.  */
-#line 106 "macroparser.h"
+#line 110 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

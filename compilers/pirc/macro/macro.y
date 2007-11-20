@@ -73,8 +73,8 @@ char *concat(char *str1, char *str2);
        TK_INCLUDE           ".include"
        TK_MACRO_CONST       ".macro_const"
        TK_MACRO_LOCAL       ".macro_local"
+       TK_MACRO_LABEL       ".macro_label"
        TK_LINE              ".line"
-       TK_LABEL             ".label"
 
 %token <sval> TK_INT        "int"
        <sval> TK_NUM        "num"
@@ -85,11 +85,13 @@ char *concat(char *str1, char *str2);
        <sval> TK_ANY        "any token"
        <sval> TK_BODY       "macro body"
        <mval> TK_DOT_IDENT  ".identifier"
-       <sval> TK_LABEL_ID   "$LABEL:"
-       <sval> TK_LOCAL_ID   "$IDENT"
+       <sval> TK_LABEL_ID   "label"
+       <sval> TK_LOCAL_ID   "$identifier"
 
-%token <sval> TK_VAR_EXPANSION          "var expansion"
-       <sval> TK_LABEL_TARGET_EXPANSION "label target expansion"
+%token <sval> TK_VAR_EXPANSION      "var expansion"
+       <sval> TK_LABEL_EXPANSION    "label target expansion"
+       <sval> TK_UNIQUE_LABEL       "unique label"
+       <sval> TK_UNIQUE_LOCAL       "unique local"
 
 %token <sval> TK_STRINGC    "string constant"
        <sval> TK_NUMC       "number constant"
@@ -172,9 +174,15 @@ anything: any
 
 any: TK_ANY                          { emit($1); }
    | TK_DOT_IDENT arguments          { expand($1, $2, lexer); }
-   | TK_LABEL_TARGET_EXPANSION       { char *label = munge_id($1, 1, lexer);
+   | TK_LABEL_EXPANSION              { char *label = munge_id($1, 1, lexer);
                                        emit(label);
                                      } /* LABEL: */
+   | TK_UNIQUE_LABEL                 { char *label = munge_id($1, 1, lexer);
+                                       emit(label);
+                                     }
+   | TK_UNIQUE_LOCAL                 { char *local = munge_id($1, 0, lexer);
+                                       emit(local);
+                                     }
    | TK_VAR_EXPANSION                { char *label = munge_id($1, 0, lexer);
                                        emit(label);
                                      } /* .$VAR */
@@ -211,7 +219,7 @@ body_token: TK_ANY                   { $$ = $1; }
           | local_declaration        { $$ = $1; }
           ;
 
-label_declaration: ".label" TK_LABEL_ID
+label_declaration: ".macro_label" TK_LABEL_ID
                    { $$ = $2; }
                  ;
 
@@ -399,10 +407,10 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
      * If both are null, then all went ok.
      */
     if (params != NULL) { /* args must be null, so too few arguments */
-        fprintf(stderr, "Too few arguments for macro expansion.\n");
+        fprintf(stderr, "Too few arguments for macro expansion %s.\n", macro->name);
     }
     if (args != NULL) { /* params must be null, so too many arguments */
-        fprintf(stderr, "Too many arguments for macro expansion.\n");
+        fprintf(stderr, "Too many arguments for macro expansion %s.\n", macro->name);
     }
 /*
     fprintf(stderr, "expanding '%s'\n", macro->name);
