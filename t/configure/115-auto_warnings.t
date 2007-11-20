@@ -24,17 +24,16 @@ use_ok('config::auto::warnings');
 my $step = 'dummy';
 
 my $conf = Parrot::Configure->new;
-$conf->data->set('cc', 'cc');
-$conf->data->set('ccflags', '-I/usr/include');
+$conf->data->set('cc', 'cc'); # XXX Cannot assume there iss a compiler 'cc'
+$conf->data->set('ccflags', '-I/usr/include'); # XXX Cannot assume this.
 
 my $cwd = cwd();
 my $warning;
 
 TODO: {
     # http://rt.perl.org/rt3/Ticket/Display.html?id=47395
-    local $TODO =
-        q<Reported failing where vendor-supplied Perl 5 Config.pm does not match true state of system available for Parrot configuration>;
-    $warning = "-Wall";
+    local $TODO = q<Not all compilers support -Wall>;
+    $warning = "-Wall"; # XXX Cannot assume all compilers accept -Wall.
     {
         my $verbose = 0;
         my $rv      = auto::warnings::try_warning($step, $conf, $warning);
