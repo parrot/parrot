@@ -122,6 +122,15 @@ sub import {
 
     exit unless my @files = get_files(%options);
 
+    if (eval { require TAP::Harness; 1 }) {
+        my %options = $options{compiler}
+            ? ( exec => [ '../../parrot', './' . $options{compiler} ] )
+            : ();
+        my $harness = TAP::Harness->new( \%options );
+        $harness->runtests( @files );
+        return;
+    }
+
     set_flags(%options);
 
     local $Test::Harness::Switches = '';
