@@ -488,7 +488,7 @@ schedule_signal_event(int signum)
 
 =item C<PARROT_API
 void
-Parrot_new_timer_event(PARROT_INTERP, NOTNULL(PMC *timer), FLOATVAL diff,
+Parrot_new_timer_event(PARROT_INTERP, NULLOK(PMC *timer), FLOATVAL diff,
         FLOATVAL interval, int repeat, NULLOK(PMC *sub), parrot_event_type_enum typ)>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>

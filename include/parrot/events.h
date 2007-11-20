@@ -138,14 +138,13 @@ void Parrot_new_terminate_event(PARROT_INTERP)
 
 PARROT_API
 void Parrot_new_timer_event(PARROT_INTERP,
-    NOTNULL(PMC *timer),
+    NULLOK(PMC *timer),
     FLOATVAL diff,
     FLOATVAL interval,
     int repeat,
     NULLOK(PMC *sub),
     parrot_event_type_enum typ)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_schedule_event(PARROT_INTERP, NOTNULL(parrot_event* ev))
