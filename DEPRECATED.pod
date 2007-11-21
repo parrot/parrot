@@ -196,7 +196,23 @@ See [RT#45925].
 
 =head1 Deprecated compiler tools
 
-Currently no compiler tools are deprecated.
+=over 4
+
+=item pgc.pir
+
+The pgc.pir compiler for P6 grammars (pre-2007 regex syntax) is deprecated.
+Switch to using the new Perl6Grammar.pir compiler instead, and the
+Perl6Regex syntax.
+
+=item compilers/PAST-pm
+
+The compiler tools in compilers/PAST-pm/ and 
+runtime/parrot/library/Parrot/HLLCompiler.pir are deprecated
+in favor of the new versions in the Parrot Compiler Toolkit
+( compilers/pct/ ).  In particular, the PAST representation in 
+PCT follows the specification given by pdd26 .
+
+=back
 
 =head1 FUTURE changes
 
