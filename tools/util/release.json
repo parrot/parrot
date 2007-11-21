@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.4.17",
-    "release.name"     : "Two for Finching",
-    "release.day"      : "Wednesday",
-    "release.date"     : "17 October 2007",
-    "release.nextdate" : "20 November 2007",
+    "release.version"  : "0.5.0",
+    "release.name"     : "Caulked Snack",
+    "release.day"      : "Tuesday",
+    "release.date"     : "20 November 2007",
+    "release.nextdate" : "18 December 2007",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,14 +11,14 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 November 2007",
+    "bugday.date"      : "15 December 2007",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
     "rt.tracking"      : "Ticket/Display.html?id=38967",
-    "rt.saved_search"  : "http://xrl.us/7gif",
+    "rt.saved_search"  : "http://xrl.us/bbjr4",
 
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2007_11_17",
+    "wiki.bugday"      : "bug_day_2007_12_15",
 
     "cpan.search"      : "http://search.cpan.org/",
     "subversion.root"  : "http://subversion.tigris.org/",
