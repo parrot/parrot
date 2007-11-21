@@ -62,6 +62,7 @@ print($b5);say('ok 11 # $b5, defined inside block, does not exist outside');
     our $m1 := 'ok 12 ';
 }
 
+our $m1;
 unless $m1 {
     print('not ');
 }

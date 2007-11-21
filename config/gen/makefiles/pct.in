@@ -6,9 +6,8 @@ PERL     = @perl@
 RM_F     = @rm_f@
 PARROT   = ../../parrot@exe@
 TOOL_DIR = ../..
-TGE_DIR  = ../../compilers/tge
 PGE_DIR  = ../../compilers/pge
-TEST_DIR = ../../t/compilers/past-pm
+TEST_DIR = ../../t/compilers/pct
 CP       = @cp@
 BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
 O        = @o@
@@ -27,7 +26,6 @@ SOURCES = PCT.pir \
   src/PAST/Compiler.pir \
   src/PAST/Node.pir \
   src/POST/Compiler.pir \
-  src/POST/Grammar.tg \
   src/POST/Node.pir \
 
 
@@ -36,7 +34,6 @@ $(PARROT_LIBRARY)/PCT.pbc: PCT.pbc
 
 PCT.pbc: $(PARROT) $(SOURCES)
 	$(RM_F) PCT.pbc $(PARROT_LIBRARY)/PCT.pbc
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/POST/Grammar_gen.pir src/POST/Grammar.tg
 	$(PARROT) -o PCT.pbc --output-pbc PCT.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -69,8 +66,7 @@ testclean:
 clean: testclean
 	$(RM_F) \
     PCT.pbc \
-    $(PARROT_LIBRARY)/PCT.pbc \
-    src/POST/Grammar_gen.pir
+    $(PARROT_LIBRARY)/PCT.pbc
 
 realclean: clean
 	$(RM_F) Makefile

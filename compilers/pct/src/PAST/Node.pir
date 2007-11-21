@@ -300,43 +300,6 @@ unique number.
 .end
 
 
-=item escape(STR name)
-
-Returns C<name> in a format that can be compiled by PIR.
-
-=cut
-
-.sub 'escape' :method
-    .param string str
-    str = escape str
-    str = concat '"', str
-    str = concat str, '"'
-    $I0 = index str, '\x'
-    if $I0 >= 0 goto unicode
-    $I0 = index str, '\u'
-    if $I0 >= 0 goto unicode
-    .return (str)
-  unicode:
-    str = concat 'unicode:', str
-    .return (str)
-.end
-
-
-=item compile(code [, adverbs :slurpy :named])
-
-(Deprecated.)  Compile the given PAST tree according to C<adverbs>.
-
-=cut
-
-.sub 'compile'
-    .param pmc source
-    .param pmc adverbs         :slurpy :named
-
-    $P0 = compreg 'PAST'
-    .return $P0.'compile'(source, adverbs :flat :named)
-.end
-
-
 =back
 
 =head2 PAST::Val
@@ -405,6 +368,36 @@ Otherwise, the node refers to a lexical variable from an outer scope.
     .return self.'attr'('isdecl', value, has_value)
 .end
 
+
+=item islvalue([flag])
+
+Get/set the C<islvalue> attribute, which indicates whether this
+variable is being used in an lvalue context.
+
+=cut
+
+.sub 'islvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('islvalue', value, has_value)
+.end
+
+
+=item namespace([namespace])
+
+Get/set the variable's namespace attribute to the array of strings
+given by C<namespace>.  Useful only for variables with a C<scope>
+of 'package'.
+
+=cut
+
+.sub 'namespace' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('namespace', value, has_value)
+.end
+
+
 =item isslurpy([flag])
 
 Get/set the node's C<isslurpy> attribute (for parameter variables) to C<flag>.
@@ -436,32 +429,9 @@ implementation) a PAST tree to create the value.
 .end
 
 
-=item islvalue([flag])
-
-Get/set the C<islvalue> attribute, which indicates whether this
-variable is being used in an lvalue context.
-
-=cut
-
-.sub 'islvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('islvalue', value, has_value)
-.end
 
 
-=item bindvalue([value])
 
-Private PAST attribute that indicates the value to be bound to this
-variable at runtime (e.g., for binding or assignment).
-
-=cut
-
-.sub 'bindvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .return self.'attr'('bindvalue', value, has_value)
-.end
 
 =back
 
@@ -742,10 +712,11 @@ Perl 6 compilers mailing lists.
 =head1 HISTORY
 
 2006-11-20  Patrick Michaud added first draft of POD documentation.
+2007-11-21  Re-implementation with pdd26 compliance, compiler toolkit
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, The Perl Foundation.
+Copyright (C) 2006-2007, The Perl Foundation.
 
 =cut
 

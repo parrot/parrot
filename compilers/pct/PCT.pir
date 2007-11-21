@@ -19,8 +19,6 @@ compiling programs into Parrot.
 
 .include 'src/POST/Node.pir'
 
-.include 'src/POST/Grammar_gen.pir'
-
 .include 'src/POST/Compiler.pir'
 
 =head1 AUTHOR
