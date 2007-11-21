@@ -31,7 +31,7 @@ pmclass BCG dynpmc need_ext group bcg_group lib bcg {
     void class_init()
     {
         if (pass) {
-            dynpmc_BCG = Parrot_PMC_typenum(INTERP,"BCG");
+            dynpmc_BCG = Parrot_PMC_typenum(INTERP, "BCG");
         }
     }
 

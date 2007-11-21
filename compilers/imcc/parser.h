@@ -51,7 +51,7 @@ int yyerror(yyscan_t, Interp*, char *);
  * defining it is handy: we do not need typecasts. */
 #define YY_EXTRA_TYPE Interp*
 YY_EXTRA_TYPE yyget_extra(yyscan_t yyscanner);
-void yyset_extra(YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner);
+void yyset_extra(YY_EXTRA_TYPE user_defined, yyscan_t yyscanner);
 
 extern void compile_file(PARROT_INTERP, FILE *file, void *);
 extern void compile_string(PARROT_INTERP, char *, void *);

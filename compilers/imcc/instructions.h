@@ -84,9 +84,9 @@ struct _IMC_Unit;
  * please use INS
  */
 #ifdef _PARSER
-Instruction * _mk_instruction(const char *,const char *, int n, SymReg **, int);
+Instruction * _mk_instruction(const char *, const char *, int n, SymReg **, int);
 #else
-#  define _mk_instruction(a,b,n,c,d) dont_use(a,b)
+#  define _mk_instruction(a, b, n, c, d) dont_use(a, b)
 #endif
 
 /* Globals */

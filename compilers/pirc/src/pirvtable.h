@@ -88,36 +88,36 @@ typedef struct pirvtable {
 #  define emit_init(P)             (*P->vtable->initialize)       (P->vtable->data)
 #  define emit_destroy(P)          (*P->vtable->destroy)          (P->vtable->data)
 
-#  define emit_source(P,S)         (*P->vtable->source)           (P->vtable->data, S)
-#  define emit_position(P,L)       (*P->vtable->position)         (P->vtable->data, L)
+#  define emit_source(P, S)         (*P->vtable->source)           (P->vtable->data, S)
+#  define emit_position(P, L)       (*P->vtable->position)         (P->vtable->data, L)
 
 #  define emit_sub_start(P)        (*P->vtable->sub_start)        (P->vtable->data)
 #  define emit_sub_end(P)          (*P->vtable->sub_end)          (P->vtable->data)
-#  define emit_sub_flag(P,F)       (*p->vtable->sub_flag)         (P->vtable->data, F)
+#  define emit_sub_flag(P, F)       (*p->vtable->sub_flag)         (P->vtable->data, F)
 #  define emit_sub_flag_start(P)   (*P->vtable->sub_flag_start)   (P->vtable->data)
 #  define emit_sub_flag_end(P)     (*P->vtable->sub_flag_end)     (P->vtable->data)
 #  define emit_param_start(P)      (*P->vtable->param_start)      (P->vtable->data)
 #  define emit_param_end(P)        (*P->vtable->param_end)        (P->vtable->data)
-#  define emit_type(P,T)           (*P->vtable->type)             (P->vtable->data, T)
-#  define emit_name(P,N)           (*P->vtable->name)             (P->vtable->data, N)
+#  define emit_type(P, T)           (*P->vtable->type)             (P->vtable->data, T)
+#  define emit_name(P, N)           (*P->vtable->name)             (P->vtable->data, N)
 
 #  define emit_stmts_start(P)      (*P->vtable->stmts_start)      (P->vtable->data)
 #  define emit_stmts_end(P)        (*P->vtable->stmts_end)        (P->vtable->data)
 #  define emit_end(P)              (*P->vtable->end)              (P->vtable->data)
 
-#  define emit_op_start(P,O)       (*P->vtable->op_start)         (P->vtable->data, O)
+#  define emit_op_start(P, O)       (*P->vtable->op_start)         (P->vtable->data, O)
 #  define emit_op_end(P)           (*P->vtable->op_end)           (P->vtable->data)
-#  define emit_expr(P,E)           (*P->vtable->expression)       (P->vtable->data, E)
+#  define emit_expr(P, E)           (*P->vtable->expression)       (P->vtable->data, E)
 
 #  define emit_list_start(P)       (*P->vtable->list_start)       (P->vtable->data)
 #  define emit_list_end(P)         (*P->vtable->list_end)         (P->vtable->data)
 
-#  define emit_method_name(P,N)    (*P->vtable->method_name)      (P->vtable->data, N)
-#  define emit_invocant(P,N)       (*P->vtable->invocant)         (P->vtable->data, N)
+#  define emit_method_name(P, N)    (*P->vtable->method_name)      (P->vtable->data, N)
+#  define emit_invocant(P, N)       (*P->vtable->invocant)         (P->vtable->data, N)
 #  define emit_args_start(P)       (*P->vtable->args_start)       (P->vtable->data)
 #  define emit_args_end(P)         (*P->vtable->args_end)         (P->vtable->data)
-#  define emit_target(P,T)         (*P->vtable->target)           (P->vtable->data, T)
-#  define emit_invokable(P,S)      (*P->vtable->invokable)        (P->vtable->data, S)
+#  define emit_target(P, T)         (*P->vtable->target)           (P->vtable->data, T)
+#  define emit_invokable(P, S)      (*P->vtable->invokable)        (P->vtable->data, S)
 #  define emit_invocation_start(P) (*P->vtable->invocation_start) (P->vtable->data)
 #  define emit_invocation_end(P)   (*P->vtable->invocation_end)   (P->vtable->data)
 
@@ -128,8 +128,8 @@ typedef struct pirvtable {
 #  define emit_results_start(P)    (*P->vtable->results_start)    (P->vtable->data)
 #  define emit_results_end(P)      (*P->vtable->results_end)      (P->vtable->data)
 
-#  define emit_comparison_op(P,O)  (*P->vtable->comparison_op)    (P->vtable->data, O)
-#  define emit_binary_op(P,O)      (*P->vtable->binary_op)        (P->vtable->data, O)
+#  define emit_comparison_op(P, O)  (*P->vtable->comparison_op)    (P->vtable->data, O)
+#  define emit_binary_op(P, O)      (*P->vtable->binary_op)        (P->vtable->data, O)
 
 /* constructor */
 extern pirvtable *new_pirvtable(void);
