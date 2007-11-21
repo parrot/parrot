@@ -23,7 +23,7 @@ This implementation is based on the Lua 4.0 one.
 
 #include "lua_private.h"
 
-#define LUA_ASSERT(c,s)         assert(((void)s,(c)))
+#define LUA_ASSERT(c, s)         assert(((void)s, (c)))
 
 #define Hash LuaHash
 
@@ -59,7 +59,7 @@ typedef struct Hash {
     PMC *container;
 } Hash;
 
-#define node(t,i)       (&(t)->node[i])
+#define node(t, i)       (&(t)->node[i])
 
 /******************************************************************************/
 

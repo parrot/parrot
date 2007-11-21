@@ -74,7 +74,7 @@ string.
     STRING* get_string() {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in string context");
-        return string_make_empty(INTERP,enum_stringrep_one,0);
+        return string_make_empty(INTERP, enum_stringrep_one, 0);
     }
 
 /*

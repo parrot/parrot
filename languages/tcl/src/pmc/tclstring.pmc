@@ -20,7 +20,7 @@ pmclass TclString
 {
 
     METHOD PMC* get_list(STRING* str) {
-        PMC*   retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP,"TclList")));
+        PMC*   retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclList")));
         INTVAL pos = -1; /* we're going to increment before we use it... */
         INTVAL len;
         INTVAL I0, I1, depth;
@@ -42,7 +42,7 @@ pmclass TclString
       loop:
         if (pos >= len) goto done;
 
-        I0 = string_ord(INTERP,str,pos);
+        I0 = string_ord(INTERP, str, pos);
         if (I0 == '{') {
             depth = 1;
             I1 = pos;
@@ -53,7 +53,7 @@ pmclass TclString
                 real_exception(INTERP, NULL, 1, "unmatched open brace in list");
             }
 
-            I0 = string_ord(INTERP,str,I1);
+            I0 = string_ord(INTERP, str, I1);
             if (I0 == '{') {
                 depth++;
                 goto find_close_bracket;
@@ -101,7 +101,7 @@ pmclass TclString
                 Parrot_unregister_pmc(INTERP, retval);
                 real_exception(INTERP, NULL, 1, "unmatched open quote in list");
             }
-            I0 = string_ord(INTERP,str,I1);
+            I0 = string_ord(INTERP, str, I1);
             if (I0 == '\\') {
                 I1 += 2;
                 goto quote_loop;
@@ -113,7 +113,7 @@ pmclass TclString
         I0 = pos;
 
         while (I0 < len) {
-            if ('\\' == string_ord(INTERP,str,I0)) {
+            if ('\\' == string_ord(INTERP, str, I0)) {
                 I0 += 2;
                 continue;
             }
@@ -129,7 +129,7 @@ pmclass TclString
         S0 = string_substr(INTERP, str, pos, I1, &S0, 0);
 
         /* add it to the list*/
-        P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP,"TclConst")));
+        P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
         VTABLE_set_string_native(INTERP, P0, S0);
         VTABLE_push_pmc(INTERP, retval, P0);
 
@@ -143,7 +143,7 @@ pmclass TclString
             I0 = I1 - pos;
             S0 = string_substr(INTERP, str, pos, I0, &S0, 0);
 
-            P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP,"TclConst")));
+            P0 = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclConst")));
             VTABLE_set_string_native(INTERP, P0, S0);
             VTABLE_push_pmc(INTERP, retval, P0);
 

@@ -186,25 +186,25 @@ int_compare(Parrot_Interp interp, void *a, void *b)
  * expressions as lvalues is deprecated" Is there a better way?
  */
 #define siva_int(a) ((INTVAL) PMC_struct_val(a))
-#define siva_set_int(a,v)  (PMC_struct_val(a) = (DPOINTER*) v)
+#define siva_set_int(a, v)  (PMC_struct_val(a) = (DPOINTER*) v)
 #define siva_ary(a)   ((List*) PMC_data(a))
-#define siva_set_ary(a,v)   PMC_data(a) = ((List*) v)
+#define siva_set_ary(a, v)   PMC_data(a) = ((List*) v)
 #define siva_hash(a)  ((siva*) PMC_pmc_val(a))->hash
-#define siva_set_hash(a,v)  (((siva*) PMC_pmc_val(a))->hash) =((Hash*) v)
+#define siva_set_hash(a, v)  (((siva*) PMC_pmc_val(a))->hash) =((Hash*) v)
 #define siva_str(a)  ((siva*) PMC_pmc_val(a))->s
-#define siva_set_str(a,v)  (((siva*) PMC_pmc_val(a))->s) =((STRING*) v)
+#define siva_set_str(a, v)  (((siva*) PMC_pmc_val(a))->s) =((STRING*) v)
 
 
 #define siva_siva(a)  ((PMC*) PMC_pmc_val(a))
-#define siva_set_siva(a,v)  (PMC_pmc_val(a)) = ((PMC*) v)
-#define siva_ary_create_if_void(i,a) { \
+#define siva_set_siva(a, v)  (PMC_pmc_val(a)) = ((PMC*) v)
+#define siva_ary_create_if_void(i, a) { \
     if (!siva_ary(a)) siva_set_ary(a, list_new(i, enum_type_PMC)); \
 }
-#define siva_hash_create_if_void(i,a) { \
+#define siva_hash_create_if_void(i, a) { \
     if (!siva_hash(a)) parrot_new_hash_x(i, &siva_hash(a), \
             enum_type_ptr, Hash_key_type_int, int_compare, key_hash_int); \
 }
-#define siva_str_create_if_void(i,a) { \
+#define siva_str_create_if_void(i, a) { \
 }
 
 

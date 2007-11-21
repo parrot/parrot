@@ -114,7 +114,7 @@ Returns a vector-like PMC containing the shape of this PMC.
         INTVAL array_t;
         STRING* property_name;
 
-        property_name = string_from_literal(INTERP,"shape");
+        property_name = string_from_literal(INTERP, "shape");
         shape = VTABLE_getprop(INTERP, SELF, property_name);
         if (PMC_IS_NULL(shape)) {
            /*
@@ -128,12 +128,12 @@ Returns a vector-like PMC containing the shape of this PMC.
             array_t = pmc_type(INTERP,
                 string_from_literal(INTERP, "APLVector"));
             */
-            shape = pmc_new(INTERP,VTABLE_type(INTERP,SELF));
+            shape = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
             /*
 #array_t);
             */
             VTABLE_set_integer_native(INTERP, shape, 1);
-            VTABLE_set_integer_keyed_int(INTERP,shape,0,
+            VTABLE_set_integer_keyed_int(INTERP, shape, 0,
                 VTABLE_get_integer(INTERP, SELF));
             VTABLE_setprop(INTERP, SELF, property_name, shape);
         }
@@ -160,27 +160,27 @@ the end of the APLv.
     METHOD void set_shape(PMC *new_shape) {
         STRING* property_name;
         PMC*    old_shape;
-        INTVAL  old_size,new_size,pos;
+        INTVAL  old_size, new_size, pos;
 
         /* save the old shape momentarily, set the new shape */
-        property_name = string_from_literal(INTERP,"shape");
+        property_name = string_from_literal(INTERP, "shape");
         old_shape = VTABLE_getprop(INTERP, SELF, property_name);
         VTABLE_setprop(INTERP, SELF, property_name, new_shape);
 
         /* how big are these shapes? */
-        old_size = size_of_shape(INTERP,SELF,old_shape);
-        new_size = size_of_shape(INTERP,SELF,new_shape);
+        old_size = size_of_shape(INTERP, SELF, old_shape);
+        new_size = size_of_shape(INTERP, SELF, new_shape);
 
         if (old_size > new_size) {
             for (; new_size != old_size; new_size++) {
-                VTABLE_pop_pmc(INTERP,SELF);
+                VTABLE_pop_pmc(INTERP, SELF);
             }
         } else if (new_size > old_size) {
             pos = 0;
             for (; new_size != old_size; old_size++, pos++) {
                 /* XXX clone this? */
-                VTABLE_push_pmc(INTERP,SELF,
-                    VTABLE_get_pmc_keyed_int(INTERP,SELF,pos));
+                VTABLE_push_pmc(INTERP, SELF,
+                    VTABLE_get_pmc_keyed_int(INTERP, SELF, pos));
             }
         }
 

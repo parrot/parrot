@@ -49,20 +49,20 @@ pmclass TclFloat
          * an int if it can : if we have no decimal point then tack on
          * on and return
          */
-        dot = string_from_cstring(INTERP,".",1);
-        e   = string_from_cstring(INTERP,"e",1);
+        dot = string_from_cstring(INTERP, ".", 1);
+        e   = string_from_cstring(INTERP, "e", 1);
 
-        if (string_str_index(INTERP,buff,dot,0) == -1
-         && string_str_index(INTERP,buff,e,0) == -1) {
-            dot_zero = string_from_cstring(INTERP,".0",2);
+        if (string_str_index(INTERP, buff, dot, 0) == -1
+         && string_str_index(INTERP, buff, e, 0) == -1) {
+            dot_zero = string_from_cstring(INTERP, ".0", 2);
             buff = string_append(INTERP, buff, dot_zero);
             return buff;
         }
 
         check_flag = 0;
-        buflen = string_length(INTERP,buff);
+        buflen = string_length(INTERP, buff);
         while (buflen) {
-               if (string_index(INTERP,buff,buflen-1) == '0') {
+               if (string_index(INTERP, buff, buflen-1) == '0') {
                        buflen--;
                        check_flag = 1;
                }

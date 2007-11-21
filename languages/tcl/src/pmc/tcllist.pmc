@@ -43,7 +43,7 @@ Returns the list as a string
 */
 
     STRING* get_string() {
-        STRING* retval = string_from_literal(INTERP,"");
+        STRING* retval = string_from_literal(INTERP, "");
         INTVAL elems = VTABLE_get_integer(INTERP, SELF);
         INTVAL i;
         STRING* str;
@@ -76,24 +76,24 @@ Returns the list as a string
 
             if (count != 0) goto escape;
 
-            if (-1 != string_str_index(INTERP,  str, string_from_literal(INTERP,"["), 0))
+            if (-1 != string_str_index(INTERP,  str, string_from_literal(INTERP, "["), 0))
                  goto quote;
 
             /* only check hashes on first elem.*/
-            if (i==0 && -1 != string_str_index(INTERP, str, string_from_literal(INTERP,"#"), 0))
+            if (i==0 && -1 != string_str_index(INTERP, str, string_from_literal(INTERP, "#"), 0))
                 goto quote;
 
-            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"$"), 0))
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP, "$"), 0))
                 goto quote;
 
-            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,";"), 0))
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP, ";"), 0))
                 goto quote;
 
             /* \'d constructs */
-            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"]"), 0))
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP, "]"), 0))
                 goto escape;
 
-            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP,"\\"), 0))
+            if (-1 != string_str_index(INTERP, str, string_from_literal(INTERP, "\\"), 0))
                 goto escape;
 
             /* {}'d constructs */
@@ -107,33 +107,33 @@ Returns the list as a string
             VTABLE_set_string_native(INTERP, P0, str);
 
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\\"), string_from_literal(INTERP,"\\\\"));
+                    string_from_literal(INTERP, "\\"), string_from_literal(INTERP, "\\\\"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\t"), string_from_literal(INTERP,"\\t"));
+                    string_from_literal(INTERP, "\t"), string_from_literal(INTERP, "\\t"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\f"), string_from_literal(INTERP,"\\f"));
+                    string_from_literal(INTERP, "\f"), string_from_literal(INTERP, "\\f"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\n"), string_from_literal(INTERP,"\\n"));
+                    string_from_literal(INTERP, "\n"), string_from_literal(INTERP, "\\n"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\r"), string_from_literal(INTERP,"\\r"));
+                    string_from_literal(INTERP, "\r"), string_from_literal(INTERP, "\\r"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\v"), string_from_literal(INTERP,"\\v"));
+                    string_from_literal(INTERP, "\v"), string_from_literal(INTERP, "\\v"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,";"), string_from_literal(INTERP,"\\;"));
+                    string_from_literal(INTERP, ";"), string_from_literal(INTERP, "\\;"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"$"), string_from_literal(INTERP,"\\$"));
+                    string_from_literal(INTERP, "$"), string_from_literal(INTERP, "\\$"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"}"), string_from_literal(INTERP,"\\}"));
+                    string_from_literal(INTERP, "}"), string_from_literal(INTERP, "\\}"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"{"), string_from_literal(INTERP,"\\{"));
+                    string_from_literal(INTERP, "{"), string_from_literal(INTERP, "\\{"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP," "), string_from_literal(INTERP,"\\ "));
+                    string_from_literal(INTERP, " "), string_from_literal(INTERP, "\\ "));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"["), string_from_literal(INTERP,"\\["));
+                    string_from_literal(INTERP, "["), string_from_literal(INTERP, "\\["));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"]"), string_from_literal(INTERP,"\\]"));
+                    string_from_literal(INTERP, "]"), string_from_literal(INTERP, "\\]"));
             Parrot_String_nci_replace(INTERP, P0,
-                    string_from_literal(INTERP,"\""), string_from_literal(INTERP,"\\\""));
+                    string_from_literal(INTERP, "\""), string_from_literal(INTERP, "\\\""));
 
             str = VTABLE_get_string(INTERP, P0);
             goto append_elem;
@@ -190,7 +190,7 @@ Copy the contents of other to self.
             INTVAL size;
             INTVAL i;
 
-            size = VTABLE_elements(INTERP,other);
+            size = VTABLE_elements(INTERP, other);
             DYNSELF.set_integer_native(size);
             for (i = 0; i < size; i++) {
                 PMC* elem = VTABLE_get_pmc_keyed_int(INTERP, other, i);

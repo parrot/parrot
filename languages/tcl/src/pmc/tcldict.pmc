@@ -93,7 +93,7 @@ Returns the dict as a string
         STRING *_tcl_namespace, *sub;
 
         _tcl_namespace = string_from_cstring(INTERP, "_tcl", 4);
-        sub            = string_from_cstring(INTERP, "__dictToString",14);
+        sub            = string_from_cstring(INTERP, "__dictToString", 14);
 
         namespace = INTERP->root_namespace;
         namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);

@@ -27,20 +27,20 @@ pmclass RubyString
         PMC *string_anchor;
         INTVAL fixedstringarray_typenum;
         if (pass) {
-            true  = string_from_cstring(INTERP, "true",4);
-            false = string_from_cstring(INTERP, "false",5);
-            yes   = string_from_cstring(INTERP, "yes",3);
-            no    = string_from_cstring(INTERP, "no",2);
+            true  = string_from_cstring(INTERP, "true", 4);
+            false = string_from_cstring(INTERP, "false", 5);
+            yes   = string_from_cstring(INTERP, "yes", 3);
+            no    = string_from_cstring(INTERP, "no", 2);
 
             fixedstringarray_typenum =
                 pmc_type(INTERP, string_from_literal(INTERP, "FixedStringArray"));
-            string_anchor = pmc_new(INTERP,fixedstringarray_typenum);
+            string_anchor = pmc_new(INTERP, fixedstringarray_typenum);
 
-            VTABLE_set_integer_native(INTERP,string_anchor,4);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,0,true);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,1,false);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,2,yes);
-            VTABLE_set_string_keyed_int(INTERP,string_anchor,3,no);
+            VTABLE_set_integer_native(INTERP, string_anchor, 4);
+            VTABLE_set_string_keyed_int(INTERP, string_anchor, 0, true);
+            VTABLE_set_string_keyed_int(INTERP, string_anchor, 1, false);
+            VTABLE_set_string_keyed_int(INTERP, string_anchor, 2, yes);
+            VTABLE_set_string_keyed_int(INTERP, string_anchor, 3, no);
             dod_register_pmc(INTERP, string_anchor);
         }
     }
@@ -48,13 +48,13 @@ pmclass RubyString
     INTVAL get_bool() {
 
         STRING* s = (STRING*) PMC_str_val(SELF);
-        if (!string_compare(INTERP,s,true)) {
+        if (!string_compare(INTERP, s, true)) {
           return 1;
-        } else if (!string_compare(INTERP,s,false)) {
+        } else if (!string_compare(INTERP, s, false)) {
           return 0;
-        } else if (!string_compare(INTERP,s,yes)) {
+        } else if (!string_compare(INTERP, s, yes)) {
           return 1;
-        } else if (!string_compare(INTERP,s,no)) {
+        } else if (!string_compare(INTERP, s, no)) {
           return 0;
         } else if (VTABLE_get_integer(INTERP, SELF) != 0) {
           return 1;
