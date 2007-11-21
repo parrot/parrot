@@ -360,7 +360,7 @@ trace_op_dump(PARROT_INTERP,
                     more = 1;
                     break;
                 case PARROT_ARG_K:
-                    len += PIO_eprintf(debugger, "[P%vd]",o);
+                    len += PIO_eprintf(debugger, "[P%vd]", o);
                     more = 1;
                     break;
                 case PARROT_ARG_I:

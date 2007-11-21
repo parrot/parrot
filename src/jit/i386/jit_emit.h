@@ -141,7 +141,7 @@ extern PARROT_API UINTVAL ld(UINTVAL);
 
 #define emit_alu_X_r(X, reg) ((emit_b11 << 6) | ((X) << 3) | ((reg) - 1))
 
-#define emit_alu_r_r(reg1,reg2) emit_alu_X_r((reg1 - 1), (reg2))
+#define emit_alu_r_r(reg1, reg2) emit_alu_X_r((reg1 - 1), (reg2))
 
 extern PARROT_API char **Parrot_exec_rel_addr;
 extern PARROT_API int Parrot_exec_rel_count;
@@ -918,12 +918,12 @@ opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int
 #  define jit_emit_lsr_RM_i(interp, pc, r1, offs)  \
     pc = opt_shift_rm(interp, jit_info, r1, offs, emit_b101)
 
-/* MOV (reg),reg */
+/* MOV (reg), reg */
 #  define emit_movm_r_r(pc, src, dest) \
     *(pc++) = (char) 0x8b; \
     *(pc++) = (char) src | dest << 3
 
-/* MOV X(reg),reg */
+/* MOV X(reg), reg */
 #  define emit_movb_i_r_r(pc, imm, src, dest) \
     *(pc++) = (char)(0x8b); \
     *(pc++) = (char)(0x40 | (src - 1) | (dest - 1) << 3); \
@@ -1062,12 +1062,12 @@ opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int
 #  define emitm_fcos(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xff; }
 #  define emitm_fxam(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xe5; }
 
-/* FXCH ST,ST(i) , optimize 2 consecutive fxch with same reg */
+/* FXCH ST, ST(i) , optimize 2 consecutive fxch with same reg */
 #  define emitm_fxch(pc, sti) { \
     emitm_fl_3(pc, emit_b001, emit_b001, sti); \
 }
 
-/* FLD ST,ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
+/* FLD ST, ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
 static unsigned char *lastpc;
 #  define emitm_fld(pc, sti) do { \
      if ((unsigned char *)(pc) == (lastpc + 2) && \
@@ -1158,41 +1158,41 @@ static unsigned char *lastpc;
 
 #  define emitm_fcompp(pc) { *((pc)++) = (char) 0xde; *((pc)++) = (char) 0xd9; }
 
-#  define emitm_fcom_m(interp, pc,b,i,s,d) \
+#  define emitm_fcom_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b010, b, i, s, d)
 
-#  define emitm_fcomp_m(interp, pc,b,i,s,d) \
+#  define emitm_fcomp_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b011, b, i, s, d)
 
 /* ST -= real64 */
-#  define emitm_fsub_m(interp, pc,b,i,s,d) \
+#  define emitm_fsub_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b100, b, i, s, d)
 
 /* ST -= int32_mem */
-#  define emitm_fisub_m(interp, pc,b,i,s,d) \
+#  define emitm_fisub_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b01, 0, emit_b100, b, i, s, d)
 
-#  define emitm_fadd_m(interp, pc,b,i,s,d) \
+#  define emitm_fadd_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b000, b, i, s, d)
 
 /* ST += int32_mem */
-#  define emitm_fiadd_m(interp, pc,b,i,s,d) \
+#  define emitm_fiadd_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b01, 0, emit_b000, b, i, s, d)
 
 /* ST *= real64 */
-#  define emitm_fmul_m(interp, pc,b,i,s,d) \
+#  define emitm_fmul_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b001, b, i, s, d)
 
 /* ST *= int32_mem */
-#  define emitm_fimul_m(interp, pc,b,i,s,d) \
+#  define emitm_fimul_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b01, 0, emit_b001, b, i, s, d)
 
 /* ST /= real64 */
-#  define emitm_fdiv_m(interp, pc,b,i,s,d) \
+#  define emitm_fdiv_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b10, 0, emit_b110, b, i, s, d)
 
 /* ST /= int32_mem */
-#  define emitm_fidiv_m(interp, pc,b,i,s,d) \
+#  define emitm_fidiv_m(interp, pc, b, i, s, d) \
     emitm_fl_2(interp, pc, emit_b01, 0, emit_b110, b, i, s, d)
 
 /* Ops Needed to support loading EFLAGs for conditional branches */
@@ -1536,7 +1536,7 @@ static unsigned char *lastpc;
         emitm_fstp((pc), (r1+1)); \
       } \
       else { \
-        emitm_fst((pc),r1); \
+        emitm_fst((pc), r1); \
       } \
     } \
 }
@@ -1825,7 +1825,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     emitm_fcomip(pc, (r+1)); \
 }
 
-/* compare ST(r1) <-> ST(r2) test FCOMI (=fcom,fstw,sahf) */
+/* compare ST(r1) <-> ST(r2) test FCOMI (=fcom, fstw, sahf) */
 #  define jit_emit_cmp_rr_n(pc, r1, r2) { \
     if (!r2 || (r1==r2)) { \
       emitm_fld(pc, r1); \
@@ -2207,7 +2207,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
             jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
         reg = Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
                 jit_info->native_ptr, "opcode_map", 0, 0);
-        jit_emit_mov_ri_i(interp, jit_info->native_ptr,emit_EDX, (long) reg);
+        jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_EDX, (long) reg);
     }
 #endif
     /* get base pointer */
@@ -2273,7 +2273,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 
 #  include "parrot/oplib/ops.h"
 INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
-void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*,PMC*,INTVAL,INTVAL);
+void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
 #  define ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[x])
 #  define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[x])
 #  define NATIVECODE jit_info->native_ptr
@@ -3408,7 +3408,7 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
      * check register usage of the subroutine
      * how many we have to preserve
      */
-    jit_save_regs(jit_info,interp);
+    jit_save_regs(jit_info, interp);
     /* when it's a recursive sub, we fetch params to registers
      * and all a inner helper sub, which run with registers only
      */
@@ -4027,7 +4027,7 @@ preg:
 static const char i_map[] =
     { emit_EDI, emit_ESI, emit_EDX, emit_ECX };
 static const char floatval_map[] =
-    { 1,2,3,4,5 };         /* ST(1) .. (ST(4) */
+    { 1, 2, 3, 4, 5 };         /* ST(1) .. (ST(4) */
 
 static const char i_map_sub[] =
     { emit_EDX, emit_ECX, emit_EBX, emit_EDI, emit_ESI };

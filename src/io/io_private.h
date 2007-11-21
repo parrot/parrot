@@ -426,7 +426,7 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_fdopen (ParrotIO * (*)(PARROT_INTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
 #define PIO_null_close (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_write (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
-#define PIO_null_write_async (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
+#define PIO_null_write_async (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING *, DummyCodeRef *))0
 #define PIO_null_read (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
 #define PIO_null_read_async (size_t (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *, STRING **, DummyCodeRef *))0
 #define PIO_null_flush (INTVAL (*)(PARROT_INTERP, ParrotIOLayer *, ParrotIO *))0

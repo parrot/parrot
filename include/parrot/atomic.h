@@ -41,8 +41,8 @@ typedef Parrot_atomic_integer {
 } Parrot_atomic_integer;
 
 #  define PARROT_ATOMIC_PTR_INIT(a)
-#  define PARROT_ATOMIC_PTR_GET(result,a) result = (a).val
-#  define PARROT_ATOMIC_PTR_SET(a,b) (a).val = b
+#  define PARROT_ATOMIC_PTR_GET(result, a) result = (a).val
+#  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = b
 
 /* a is the Parrot_atomic.
  * expect is the value we expect the atomic to be holding,

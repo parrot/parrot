@@ -39,14 +39,14 @@ typedef struct Parrot_atomic_integer {
         UNLOCK((a).lock); \
     } while (0)
 
-#  define PARROT_ATOMIC_PTR_SET(a,b) \
+#  define PARROT_ATOMIC_PTR_SET(a, b) \
     do { \
         LOCK((a).lock); \
         (a).val = b; \
         UNLOCK((a).lock); \
     } while (0)
 
-#  define PARROT_ATOMIC_INT_SET(a,b) \
+#  define PARROT_ATOMIC_INT_SET(a, b) \
     do { \
         LOCK((a).lock); \
         (a).val = b; \

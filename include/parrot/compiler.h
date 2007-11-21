@@ -27,7 +27,7 @@
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x,y,z)      __attribute__((__format__(x,y,z)))
+#  define __attribute__format__(x, y, z)      __attribute__((__format__(x, y, z)))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
@@ -60,7 +60,7 @@
 #  define __attribute__deprecated__
 #endif
 #ifndef __attribute__format__
-#  define __attribute__format__(x,y,z)
+#  define __attribute__format__(x, y, z)
 #endif
 #ifndef __attribute__malloc__
 #  define __attribute__malloc__

@@ -68,7 +68,7 @@ typedef struct STM_profile_data {
 #  define PROFILE_TRIED_COMMIT(x)
 #  define PROFILE_FAILED_COMMIT(x)
 #  define PROFILE_ABORTED(x)
-#  define PROFILE_WAIT(x,y,z)
+#  define PROFILE_WAIT(x, y, z)
 
 #endif
 

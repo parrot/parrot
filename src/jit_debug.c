@@ -314,7 +314,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     stabsfile = debug_file(interp, file, "stabs.s");
     ofile     = debug_file(interp, file, "o");
     {
-        char *temp = string_to_cstring(interp,stabsfile);
+        char *temp = string_to_cstring(interp, stabsfile);
         stabs      = fopen(temp, "w");
         string_cstring_free(temp);
     }
@@ -325,7 +325,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
         char *temp = string_to_cstring(interp, pasmfile);
         /* filename info */
         fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
-        fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",temp);
+        fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n", temp);
         string_cstring_free(temp);
     }
     /* jit_func start addr */

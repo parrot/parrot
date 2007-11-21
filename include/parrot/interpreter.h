@@ -82,7 +82,7 @@ typedef enum {
                                      */
     PARROT_CLONE_GLOBALS = 0x2,     /* global stash */
     PARROT_CLONE_RUNOPS = 0x4,      /* runops choice */
-    PARROT_CLONE_INTERP_FLAGS = 0x8,/* bounds checking and
+    PARROT_CLONE_INTERP_FLAGS = 0x8, /* bounds checking and
                                      * debugging flags */
     PARROT_CLONE_HLL = 0x10,        /* clone HLL setting */
     PARROT_CLONE_CLASSES = 0x20,    /* clone usermade classes */
