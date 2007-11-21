@@ -360,6 +360,7 @@ transform try (PAST::Op) :language('PIR') {
     post.'push'(traplabel)
     .local pmc catchnode, catchpast
     catchnode = node[1]
+    if null catchnode goto have_catch
     unless catchnode goto have_catch
     catchpast = tree.'get'('post', catchnode)
     post.'push'(catchpast)
