@@ -1,14 +1,17 @@
 # $Id$
 
-New through r22830
+New in 0.5.0
 - Implementation
-  + PDD15 (OO) branch merged with trunk
+  + PDD15 (OO) branch merged with trunk; this release contains a working,
+    tested implementation of the latest OO model
   + Added pop_eh/push_eh_p/count_eh opcodes
   + Add --runcore command line option
   + Add gcdebug runcore to help track down GC bugs
+  + minor improvements to IA-32 JIT
 - Documentation
   + PDD19 (PIR): updates to macros, .pcc* directives
-  + PDD25 (AST):  draft approved
+  + PDD25 (Concurrency): updated
+  + PDD26 (AST):  draft approved
   + PDD23 (Exceptions): draft approved
   + Copyright cleanups
 - Languages/Compilers
@@ -32,7 +35,8 @@ New through r22830
   + Improve test coverage
   + Improve reporting when a step fails; allow abort on failure
 - Miscellaneous
-  + More coding standard conformance, tests, cleanup, speedups
+  + More coding standard conformance, tests, cleanup, speedups,
+    warnings cleanup
   + Bug cleanup, esp. GC bugs
   + Eliminate .imc extension (use .pir)
   + Simplify some core config steps to not allow interactive prompting
