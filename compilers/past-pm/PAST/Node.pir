@@ -235,7 +235,7 @@ the invocant's value of C<attrname> to C<value>.  Returns the
     if has_value goto setattr
     value = self[attrname]
     unless null value goto getattr
-    value = new .Undef
+    value = new 'Undef'
   getattr:
     .return (value)
   setattr:

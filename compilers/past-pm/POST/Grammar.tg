@@ -163,7 +163,7 @@ transform pirop (PAST::Op) :language('PIR') {
     $I0 = index signature, '%r'
     if $I0 >= 0 goto pirop_reg
     .local string returns
-    returns = '.Undef'
+    returns = '"Undef"'
     $S0 = node.'returns'()
     unless $S0 goto pirop_returns
     returns = $S0
@@ -409,7 +409,7 @@ transform xor (PAST::Op) :language('PIR') {
     ops.'push_pirop'('set', ops, bpost)
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(falselabel)
-    ops.'push_pirop'('new', ops, '.Undef')
+    ops.'push_pirop'('new', ops, '"Undef"')
     ops.'push'(endlabel)
     .return (ops)
 }
@@ -436,7 +436,7 @@ transform assign (PAST::Op) :language('PIR') {
     post = lpost.'new'('POST::Ops', rpost, lpost, 'node'=>node, 'result'=>lpost)
     alabel = post.'new'('POST::Label', 'name'=>'assign_')
     post.'push_pirop'('eq_addr', lpost, rpost, alabel)
-    post.'push_pirop'('morph', lpost, '.Undef')
+    post.'push_pirop'('morph', lpost, '"Undef"')
     post.'push_pirop'('assign', lpost, rpost)
     post.'push'(alabel)
     .return (post)
@@ -589,7 +589,7 @@ transform vivipost (PAST::Var) :language('PIR') {
     .local string viviself
     viviself = node.'viviself'()
     if viviself goto have_viviself
-    viviself = '.Undef'
+    viviself = '"Undef"'
   have_viviself:
     vivipost = new 'POST::Op'
     vivipost.'init'('node'=>node, 'pirop'=>'new', 'result'=>vivipost)
