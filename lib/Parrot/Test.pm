@@ -629,12 +629,6 @@ sub _run_test_file {
         }
     }
 
-    if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
-
-        # native tests with --run-pbc don't make sense
-        return $builder->skip("no native tests with -r");
-    }
-
     my ( $exit_code, $cmd );
     unless ($run_exec) {
         if ( $args =~ s/--run-pbc// || $args =~ s/-r // ) {
@@ -696,6 +690,12 @@ sub _generate_test_functions {
         my $test_sub = sub {
             local *__ANON__                        = $func;
             my ( $code, $expected, $desc, %extra ) = @_;
+
+            if ( $func =~ /^pbc_output_/ && $ENV{TEST_PROG_ARGS} =~ /-r / ) {
+                # native tests with --run-pbc don't make sense
+                return $builder->skip("no native tests with -r");
+            }
+
             my ( $out_f, $cmd, $exit_code ) = _run_test_file( $func, @_ );
 
             my $meth        = $parrot_test_map{$func};
