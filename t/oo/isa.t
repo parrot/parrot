@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -164,6 +164,25 @@ Bar
 1
 OUT
 
+pir_output_is( <<'CODE', <<'OUT', 'string isa and pmc isa have same result' );
+.sub main
+    .local pmc class, obj
+    class = new 'Class'
+    obj = class.'new'()
+    $I0 = isa obj, 'Object'
+    print $I0
+    print "\n"
+    .local pmc cl
+    cl = new 'String'
+    cl = 'Object'
+    $I1 = isa obj, cl
+    print $I1
+    print "\n"
+.end
+CODE
+1
+1
+OUT
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
