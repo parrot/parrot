@@ -48,7 +48,7 @@ appropriate type.
 
 =item C<void assign_pmc(PMC *other)>
 
-Assigns the PMC to the value of C<*other>by first changing the PMC to the
+Assigns the PMC to the value of C<*other> by first changing the PMC to the
 appropriate type.
 
 =cut
@@ -56,7 +56,8 @@ appropriate type.
 */
 
     void assign_pmc(PMC *other) {
-        VTABLE_morph(INTERP, SELF, other->vtable->base_type);
+        if (!PObj_is_object_TEST(other))
+            VTABLE_morph(INTERP, SELF, other->vtable->base_type);
 
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
