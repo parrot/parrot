@@ -20,7 +20,7 @@
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
     "wiki.bugday"      : "bug_day_2007_12_15",
 
-    "cpan.search"      : "http://search.cpan.org/",
+    "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }
