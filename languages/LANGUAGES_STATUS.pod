@@ -61,7 +61,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -116,7 +116,7 @@ C<languages/BASIC/interpreter>
 =back
 
 
-=head2 bc
+=head2 abc
 
 =over 4
 
@@ -127,14 +127,14 @@ Implemented with the Parrot compiler tools PGE and TGE.
 
 =item Status
 
-Almost complete.
+Some failures due to Parrot compiler tools changes.
 A former implementation in languages/bc has been
 removed in revision 16528.
 Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -160,7 +160,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -304,7 +304,7 @@ has been commented out.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -375,7 +375,7 @@ Works and is mostly complete.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -413,7 +413,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -469,7 +469,7 @@ Working, but not complete. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -496,7 +496,7 @@ See details in F<languages/lua/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.16
+0.5.0
 
 =item Location
 
@@ -554,11 +554,11 @@ state is currently broken. Far from complete. Revision 0.0.14
 
 Part of languages smoke testing.
 
-Development is stalled. Takers are welcome.
+Development is stalled. Takers are welcome.  Some tests fail.
 
 =item Last verified with parrot version
 
-0.4.16
+0.5.0
 
 =item Location
 
@@ -605,7 +605,7 @@ In progress.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -676,7 +676,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -719,7 +719,7 @@ Part of languages smoke testing.
 
 =item Last verified with Parrot version
 
-0.4.7 : Failed 5/27 test scripts. 5/189 subtests failed.
+0.5.0
 
 =item Location
 
@@ -746,7 +746,7 @@ builtins.
 
 =item Last verified with Parrot version
 
-0.4.3 : Failed 4/14 test scripts. 12/51 subtests failed.
+0.5.0
 
 =item Location
 
@@ -867,7 +867,7 @@ L<http://rakudo.org/parrot/index.cgi?plumhead>
 
 =item Description
 
-Perl6 compiler written in Perl6 and Haskell with multiple backends
+Perl 6 compiler written in Perl 6 and Haskell with multiple backends
 
 =item Status
 
@@ -901,7 +901,7 @@ and logic ops.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -1047,7 +1047,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.17
+0.5.0
 
 =item Location
 
@@ -1072,7 +1072,7 @@ use tcltest.tcl)
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0.0.0.0
 
 =item Location
 
@@ -1121,7 +1121,7 @@ Working. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -1145,7 +1145,7 @@ expected to change soon.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
