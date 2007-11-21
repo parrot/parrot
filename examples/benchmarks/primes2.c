@@ -53,7 +53,7 @@ main(int argc, char *argv[])
                 }
         }
 
-        printf("N primes calculated to %d is %d\nlast is: %d\n",max,i6,i7);
+        printf("N primes calculated to %d is %d\nlast is: %d\n", max, i6, i7);
 
         return 0;
 }
