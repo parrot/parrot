@@ -1060,6 +1060,7 @@ opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int
 #  define emitm_fsqrt(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xfa; }
 #  define emitm_fsin(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xfe; }
 #  define emitm_fcos(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xff; }
+#  define emitm_fxam(pc) { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xe5; }
 
 /* FXCH ST,ST(i) , optimize 2 consecutive fxch with same reg */
 #  define emitm_fxch(pc, sti) { \
@@ -1696,7 +1697,7 @@ static unsigned char *lastpc;
     if (r) { \
       emitm_fxch(pc, r); \
     } \
-    emitm_ftst(pc); \
+    emitm_fxam(pc); \
     emitm_fstw(pc); \
     emitm_sahf(pc); \
     if (r) { \
