@@ -422,10 +422,8 @@ PARROT_API
 INTVAL
 Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 {
-    PMC        *entry, *type_hash, *hll_info;
-    Hash       *hash;
-    HashBucket *b;
-    INTVAL      n;
+    PMC    *entry, *type_hash, *hll_info;
+    INTVAL  n, id;
 
     if (hll_id == PARROT_HLL_NONE || hll_id == 0)
         return core_type;
@@ -450,17 +448,9 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
     if (PMC_IS_NULL(type_hash))
         return core_type;
 
-    hash = (Hash *)PMC_struct_val(type_hash);
+    id   = VTABLE_get_integer_keyed_int(interp, type_hash, core_type);
 
-    if (!hash->entries)
-        return core_type;
-
-    b = parrot_hash_get_bucket(interp, hash, (void*)core_type);
-
-    if (b)
-        return (INTVAL) b->value;
-
-    return core_type;
+    return id ? id : core_type;
 }
 
 /*
