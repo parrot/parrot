@@ -11,6 +11,8 @@ CP            = @cp@
 BUILD         = $(PERL) @build_dir@/tools/build/dynpmc.pl
 O             = @o@
 EXE           = @exe@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
 CC_INC        = -I../../include
 C_LIBS        = @libs@
@@ -22,8 +24,7 @@ LINKFLAGS     = @linkflags@ @link_debug@ @ld_debug@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@
 
-
-SOURCES = src/pirmain.c \
+SOURCES       = src/pirmain.c \
   src/pirparser.c \
   src/pirlexer.c \
   src/pirout.c \
@@ -108,9 +109,13 @@ test: all
   doc/design.pod \
   README.pod
 
+# regenerate the Makefile
+Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=compilers/pirc/Makefile
+
 
 clean:
-	$(RM_RF) *$(O)
+	$(RM_F) */*$(O)
 
 realclean: clean
 	$(RM_RF) \

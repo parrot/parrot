@@ -725,8 +725,8 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
-Makefile : config/gen/makefiles/root.in
-	$(RECONFIGURE) --step=gen::makefiles --target=Makefile
+Makefile : ../../config/gen/makefiles/pirc.in
+	$(RECONFIGURE) --step=gen::makefiles --target=compilers/pirc/Makefile
 
 flags_dummy :
 	@echo "Compiling with:"
