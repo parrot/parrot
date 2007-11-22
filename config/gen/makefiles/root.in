@@ -379,7 +379,6 @@ INTERP_O_FILES = \
     \
     $(OPS_DIR)/core_ops$(O) \
     $(OPS_DIR)/core_ops_switch$(O) \
-    $(SRC_DIR)/atomic/gcc_x86$(O) \
     $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/byteorder$(O) \
     $(SRC_DIR)/charset$(O) \
