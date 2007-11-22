@@ -1899,13 +1899,13 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-    	+fcnpost \
-    	+showscan \
-        +stats \
-        -showsummary \
-        +partial \
-        src/nci.c \
-        src/inte*.c \
+    +fcnpost \
+    +showscan \
+    +stats \
+    -showsummary \
+    +partial \
+    src/nci.c \
+    src/inte*.c \
 
 COVER_FLAGS = -fprofile-arcs -ftest-coverage
 COVER_DIRS = \
@@ -1949,7 +1949,7 @@ cover: \
 
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
-        --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+    --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
 
 cover-testb: cover.dummy
 	-@make@ testb
