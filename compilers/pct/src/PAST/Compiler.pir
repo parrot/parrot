@@ -693,7 +693,7 @@ blocks to determine the scope.
 
   package_ns:
     $P0 = new 'CodeString'
-    ns = $P0.'key'(ns)
+    ns = $P0.'key'(ns :flat)
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
