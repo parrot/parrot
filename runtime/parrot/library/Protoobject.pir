@@ -7,7 +7,7 @@ Protoobject.pir - PIR implementation for creating protoobjects
     load_bytecode 'Protoobject.pbc'
     .local pmc protomaker, fooclass, fooproto
 
-    # create a protoobject for class Foo
+    # create a protoobject for existing class Foo
     protomaker = new 'Protomaker'
     fooclass = get_class 'Foo'
     fooproto = protomaker.'new_proto'(fooclass)
@@ -46,9 +46,11 @@ the appropriate namespace and returned.
 .namespace [ 'Protomaker' ]
 
 .sub '__onload' :init :load
-    $P0 = newclass 'Protomaker'
+    $P0 = newclass 'Protoobject'
+
+    $P0 = subclass $P0, 'Protomaker'
     $P1 = new 'Protomaker'
-    $P1.'new_proto'($P0)
+    set_hll_global [''], 'Protomaker', $P1
 .end
 
 
@@ -115,6 +117,15 @@ protoobject.
     .local pmc subp
     subp = self.'new_proto'(subc)
     .return (subc, subp)
+.end
+
+
+.namespace ['Protoobject']
+
+.sub 'new' :method
+    $S0 = typeof self
+    $P1 = new $S0
+    .return ($P1)
 .end
 
 # Local Variables:
