@@ -1173,7 +1173,7 @@ See details in F<languages/WMLScript/doc/status.pod>.
 
 =item Last verified with parrot version
 
-0.4.16
+0.5.0
 
 =item Location
 
