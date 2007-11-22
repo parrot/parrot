@@ -73,6 +73,7 @@ Description of the test.
 
     # populate the list of test files
     push test_files, 'rx_metachars'
+    push test_files, 'rx_quantifiers'
     push test_files, 'rx_backtrack'
     push test_files, 'rx_charclass'
     push test_files, 'rx_subrules'

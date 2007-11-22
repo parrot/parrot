@@ -1,0 +1,88 @@
+##  Quantifiers
+a*				bbbbb		y	zero "a" characters
+a*				aaaaa		y	five "a" characters
+a+				bbabb		y	one "a" character
+a+				aaaaa		y	five "a" characters
+a+				bbbbb		n	no "a" characters
+a?				bbbbb		y	zero "a" characters
+a?				bbabb		y	one "a" character
+a?				baaab		y	one "a" character
+
+a*!				bbbbb		y	zero "a" characters (explicit greed)
+a*!				aaaaa		y	five "a" characters (explicit greed)
+a+!				bbabb		y	one "a" character (explicit greed)
+a+!				aaaaa		y	five "a" characters (explicit greed)
+a+!				bbbbb		n	no "a" characters (explicit greed)
+a?!				bbbbb		y	zero "a" characters (explicit greed)
+a?!				bbabb		y	one "a" character (explicit greed)
+a?!				baaab		y	one "a" character (explicit greed)
+
+a*:!			bbbbb		y	zero "a" characters (explicit greed)
+a*:!			aaaaa		y	five "a" characters (explicit greed)
+a+:!			bbabb		y	one "a" character (explicit greed)
+a+:!			aaaaa		y	five "a" characters (explicit greed)
+a+:!			bbbbb		n	no "a" characters (explicit greed)
+a?:!			bbbbb		y	zero "a" characters (explicit greed)
+a?:!			bbabb		y	one "a" character (explicit greed)
+a?:!			baaab		y	one "a" character (explicit greed)
+
+a*?				bbbbb		y	zero "a" characters (non-greedy)
+a*?				aaaaa		y	zero "a" characters (non-greedy)
+a+?				bbabb		y	one "a" character (non-greedy)
+a+?				aaaaa		y	one "a" character (non-greedy)
+a+?				bbbbb		n	no "a" characters (non-greedy)
+a??				bbbbb		y	zero "a" characters (non-greedy)
+a??				bbabb		y	zero "a" characters (non-greedy)
+a??				baaab		y	zero "a" characters (non-greedy)
+
+a*:?			bbbbb		y	zero "a" characters (non-greedy)
+a+:?			bbabb		y	one "a" character (non-greedy)
+a+:?			aaaaa		y	one "a" character (non-greedy)
+a+:?			bbbbb		n	no "a" characters (non-greedy)
+a?:?			bbbbb		y	zero "a" characters (non-greedy)
+a?:?			bbabb		y	zero "a" characters (non-greedy)
+a?:?			baaab		y	zero "a" characters (non-greedy)
+
+## Quantifier closure
+.**{2}			a			n	only one character
+.**{2}			ab			y	two characters
+a**{2}			foobar		n	only one "a" character
+a**{2}			baabaa		y	two "a" characters
+a**{0..4}		bbbbbbb		y	no "a" characters
+a**{2..4}		bababab		n	not two consecutive "a" characters
+a**{2..4}		baabbbb		y	two "a" characters
+a**{2..4}		baaabbb		y	three "a" characters
+a**{2..4}		baaaabb		y	four "a" characters
+a**{2..4}		baaaaaa		y	four "a" characters
+a**{2..*}		baaaaaa		y	six "a" characters
+a**?{2..*}		baaaaaa		y	two "a" characters (non-greedy)
+a**:?{2..*}		baaaaaa		y	two "a" characters (non-greedy)
+a**!{2..*}		baaaaaa		y	six "a" characters (explicit greed)
+a**:!{2..*}		baaaaaa		y	six "a" characters (explicit greed)
+a**?{2..4}		baaabbb		y	two "a" characters (non-greedy)
+a**:?{2..4}		baaabbb		y	two "a" characters (non-greedy)
+a**!{2..4}		baaabbb		y	three "a" characters (explicit greed)
+a**:!{2..4}		baaabbb		y	three "a" characters (explicit greed)
+
+## Quantifier bare range
+.**2			a			n	only one character
+.**2			ab			y	two characters
+a**2			foobar		n	only one "a" character
+a**2			baabaa		y	two "a" characters
+a**0..4			bbbbbbb		y	no "a" characters
+a**2..4			bababab		n	not two consecutive "a" characters
+a**2..4			baabbbb		y	two "a" characters
+a**2..4			baaabbb		y	three "a" characters
+a**2..4			baaaabb		y	four "a" characters
+a**2..4			baaaaaa		y	four "a" characters
+a**2..*			baaaaaa		y	six "a" characters
+a**?2..*		baaaaaa		y	two "a" characters (non-greedy)
+a**:?2..*		baaaaaa		y	two "a" characters (non-greedy)
+a**!2..*		baaaaaa		y	six "a" characters (explicit greed)
+a**:!2..*		baaaaaa		y	six "a" characters (explicit greed)
+a**?2..4		baaabbb		y	two "a" characters (non-greedy)
+a**:?2..4		baaabbb		y	two "a" characters (non-greedy)
+a**!2..4		baaabbb		y	three "a" characters (explicit greed)
+a**:!2..4		baaabbb		y	three "a" characters (explicit greed)
+
+
