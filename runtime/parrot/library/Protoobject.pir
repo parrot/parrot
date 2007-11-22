@@ -8,13 +8,12 @@ Protoobject.pir - PIR implementation for creating protoobjects
     .local pmc protomaker, fooclass, fooproto
 
     # create a protoobject for existing class Foo
-    protomaker = new 'Protomaker'
+    protomaker = get_hll_global 'Protomaker'
     fooclass = get_class 'Foo'
     fooproto = protomaker.'new_proto'(fooclass)
 
     # create a subclass 'NS::Bar' from 'Foo' with attributes
     .local pmc bclass, bproto
-    protomaker = new 'Protomaker'
     fooclass = get_class 'Foo'
     (bclass, bproto) = protomaker.'new_subclass'(fooclass, 'NS::Bar', '$attr')
 
@@ -50,12 +49,25 @@ the appropriate namespace and returned.
 
     $P0 = subclass $P0, 'Protomaker'
     $P1 = new 'Protomaker'
-    set_hll_global [''], 'Protomaker', $P1
+    set_hll_global 'Protomaker', $P1
 .end
 
 
 .sub 'new_proto' :method
     .param pmc class
+
+    ##  make sure we really have a class
+    $I0 = isa class, 'Class'
+    if $I0 goto have_class
+    class = get_class class
+  have_class:
+
+    ##  add Protoobject as a parent class
+    $I0 = isa class, 'Protoobject'
+    if $I0 goto protoclass_done
+    $P0 = get_class 'Protoobject'
+    class.'add_parent'($P0)
+  protoclass_done:
 
     #  create a protoobject
     .local pmc protoobject
@@ -123,8 +135,8 @@ protoobject.
 .namespace ['Protoobject']
 
 .sub 'new' :method
-    $S0 = typeof self
-    $P1 = new $S0
+    $P0 = typeof self
+    $P1 = new $P0
     .return ($P1)
 .end
 

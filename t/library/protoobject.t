@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ pir_output_is( << 'END_CODE', << 'END_OUT', 'basic load' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $S0 = typeof $P0
     say $S0
 .end
@@ -38,7 +38,7 @@ pir_output_is( << 'END_CODE', << 'END_OUT', 'type of protoobject' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'XYZ'
     $P2 = $P0.'new_proto'($P1)
 
@@ -53,7 +53,7 @@ pir_output_is( << 'END_CODE', << 'END_OUT', 'type of ns-based protoobject' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = newclass ['Foo';'Bar']
     $P2 = $P0.'new_proto'($P1)
 
@@ -68,7 +68,7 @@ pir_output_is( << 'END_CODE', << 'END_OUT', 'Protoobject symbol' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = newclass ['Foo';'Bar']
     $P2 = $P0.'new_proto'($P1)
 
@@ -84,7 +84,7 @@ pir_output_is( << 'END_CODE', << 'END_OUT', 'Protoobject symbol' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'Foo'
     $P2 = $P0.'new_proto'($P1)
 
@@ -100,7 +100,7 @@ pir_output_is( <<'END_CODE', <<'END_OUT', 'Protoobject symbol for :: classes' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'Foo::Bar'
     $P2 = $P0.'new_proto'($P1)
 
@@ -116,7 +116,7 @@ pir_output_is( <<'END_CODE', <<'END_OUT', 'new_subclass for :: classes' );
 .sub main :main
     load_bytecode 'Protoobject.pbc'
 
-    $P0 = new 'Protomaker'
+    $P0 = get_hll_global 'Protomaker'
     $P1 = get_class 'Hash'
     $P0.'new_subclass'($P1, 'Foo::Bar')
 
@@ -138,7 +138,7 @@ pir_output_is( <<'END_CODE', <<'END_OUT', 'new_subclass with attrs' );
     load_bytecode 'Protoobject.pbc'
 
     .local pmc protomaker, hashclass, attrs
-    protomaker = new 'Protomaker'
+    protomaker = get_hll_global 'Protomaker'
     hashclass = get_class 'Hash'
     attrs = split ' ', '$a $b $c $d'
     protomaker.'new_subclass'(hashclass, 'Foo::Bar', attrs :flat)
@@ -161,6 +161,25 @@ $a
 $b
 $c
 $d
+END_OUT
+
+pir_output_is( <<'END_CODE', <<'END_OUT', 'method "new" on protoobject' );
+.sub main :main
+    load_bytecode 'Protoobject.pbc'
+
+    $P0 = newclass 'Foo'
+
+    .local pmc protomaker
+    protomaker = get_hll_global 'Protomaker'
+    protomaker.'new_proto'('Foo')
+
+    $P0 = get_hll_global 'Foo'
+    $P1 = $P0.'new'()
+    $S0 = typeof $P1
+    say $S0
+.end
+END_CODE
+Foo
 END_OUT
 
 # Local Variables:
