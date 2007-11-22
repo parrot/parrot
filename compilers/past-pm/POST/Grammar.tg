@@ -117,7 +117,7 @@ transform pirop (PAST::Op) :language('PIR') {
     .local pmc arglist, iter
     .local int aindex
     aindex = 2
-    arglist = new .ResizablePMCArray
+    arglist = new 'ResizablePMCArray'
     iter = node.'iterator'()
   iter_loop:
     unless iter goto iter_end
@@ -315,7 +315,7 @@ transform for (PAST::Op) :language('PIR') {
     # reference our collection ...
     ops.'push'(collpost)
     # Create a temporary iterator for our collection
-    # $P<unique> = new .Iterator, obj from collection.
+    # $P<unique> = new 'Iterator', obj from collection.
     .local pmc iter
     iter = ops.'unique'('$P')
     ops.'push_pirop'('new', iter, "'Iterator'", collpost)
@@ -446,7 +446,7 @@ transform assign (PAST::Op) :language('PIR') {
 
 transform chain (PAST::Op) :language('PIR') {
     .local pmc clist, cpast
-    clist = new .ResizablePMCArray
+    clist = new 'ResizablePMCArray'
     cpast = node
   chain_loop:
     $I0 = isa cpast, 'PAST::Op'
