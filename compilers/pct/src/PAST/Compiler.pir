@@ -382,8 +382,19 @@ with a 'pasttype' attribute of either 'call' or 'callmethod'.
     ops.'result'(result)
   result_done:
 
-    ops.'push_pirop'('call', posargs :flat, namedargs :flat, 'result'=>result)
+    .local string pasttype
+    pasttype = node.'pasttype'()
+    if pasttype goto have_pasttype
+    pasttype = 'call'
+  have_pasttype:
+    ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
     .return (ops)
+.end
+
+.sub 'callmethod' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .return self.'call'(node, options :flat :named)
 .end
 
 
