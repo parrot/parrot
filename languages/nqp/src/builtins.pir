@@ -118,6 +118,16 @@ test counter to 0 and outputs the TAP plan line.
     .return ()
 .end
 
+=item C<sleep(sec)>
+
+=cut
+
+.sub 'sleep'
+    .param int sec
+    sleep sec
+    .return ()
+.end
+
 =back
 
 =cut
