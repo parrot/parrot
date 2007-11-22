@@ -142,7 +142,6 @@ GEN_MAKEFILES = \
     compilers/past-pm/Makefile \
     compilers/pct/Makefile \
     compilers/pge/Makefile \
-    compilers/pirc/Makefile \
     compilers/tge/Makefile \
     compilers/bcg/Makefile \
     compilers/json/Makefile \
@@ -1296,6 +1295,7 @@ compilers-clean :
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/json clean
+	$(MAKE) compilers/pirc clean
 
 ###############################################################################
 #
@@ -1666,6 +1666,7 @@ realclean : clean languages-realclean
     $(STICKY_FILES) \
     blib \
     cover_db
+	$(MAKE) compilers/pirc realclean
 
 distclean : realclean
 

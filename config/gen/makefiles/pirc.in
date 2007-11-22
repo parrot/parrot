@@ -120,7 +120,7 @@ clean:
 
 realclean: clean
 	$(RM_RF) \
-  $(STICKY_FILES) \
+  Makefile \
   pirc$(EXE) \
   doc/*.html
 
