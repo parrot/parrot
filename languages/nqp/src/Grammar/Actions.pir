@@ -628,6 +628,18 @@
 .end
 
 
+##    method value($/, $key) {
+##        make $($/{$key});
+##    }
+.sub 'value' :method
+    .param pmc match
+    .param pmc key
+    $P0 = match[key]
+    $P1 = $P0.'get_scalar'()
+    match.'result_object'($P1)
+.end
+
+
 ##    method quote($/, $key) {
 ##        make PAST::Val.new(node=>$/, value=>~($<string_literal>))
 ##    }
@@ -639,6 +651,29 @@
     value = $P0.'get_scalar'()
     $P0 = get_hll_global ['PAST'], 'Val'
     $P1 = $P0.'new'('node'=>match, 'value'=>value)
+    match.'result_object'($P1)
+.end
+
+
+##    method typename($/, $key) {
+##        my $ns := $<name><ident>.clone();
+##        my $name := $ns.pop();
+##        make PAST::Var.new( :node($/), 
+##                            :scope('package'),
+##                            :name($name), 
+##                            :namespace($ns) 
+##                          );
+##    }
+.sub 'typename' :method
+    .param pmc match
+    .param pmc key
+    .local pmc ns, name
+    $P0 = match['name']
+    $P0 = $P0['ident']
+    ns = clone $P0
+    name = pop ns
+    $P0 = get_hll_global ['PAST'], 'Var'
+    $P1 = $P0.'new'('node'=>match, 'scope'=>'package', 'name'=>name, 'namespace'=>ns)
     match.'result_object'($P1)
 .end
 

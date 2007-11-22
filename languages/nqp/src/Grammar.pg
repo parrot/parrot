@@ -209,9 +209,8 @@ token noun {
     | <routine_def> {*}                                    #= routine_def
     | <circumfix> {*}                                      #= circumfix
     | <variable> {*}                                       #= variable
-    | <quote> {*}                                          #= quote
-    | <number> {*}                                         #= number
     | <subcall> {*}                                        #= subcall
+    | <value> {*}                                          #= value
     | <name> {*}                                           #= name
 }
 
@@ -243,6 +242,11 @@ token variable {
 
 token sigil { '$' }
 
+token value {
+    | <quote> {*}                                          #= quote
+    | <number> {*}                                         #= number
+    | <typename> {*}                                       #= typename
+}
 
 token quote {
     [ \'  <string_literal: '> \'
@@ -250,6 +254,11 @@ token quote {
     | '<' <string_literal: \>> '>'
     ]
     {*}
+}
+
+
+token typename { 
+    <name> {*}                                             #= name
 }
 
 

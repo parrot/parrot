@@ -108,6 +108,15 @@ test counter to 0 and outputs the TAP plan line.
     set_global "$test_counter", $P0
 .end
 
+=item C<load_bytecode(string)>
+
+=cut
+
+.sub 'load_bytecode'
+    .param string str
+    load_bytecode str
+    .return ()
+.end
 
 =back
 
