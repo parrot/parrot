@@ -4,6 +4,7 @@
 LN_S          = @lns@
 PERL          = @perl@
 RM_RF         = @rm_rf@
+RM_F          = @rm_f@
 PARROT        = ../../parrot@exe@
 TOOL_DIR      = ../..
 CC            = @cc@
@@ -115,7 +116,7 @@ Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
 
 
 clean:
-	$(RM_F) */*$(O)
+	$(RM_F) *$(O)
 
 realclean: clean
 	$(RM_RF) \
