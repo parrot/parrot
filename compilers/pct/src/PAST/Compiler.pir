@@ -696,18 +696,24 @@ blocks to determine the scope.
     name = node.'name'()
     name = ops.'escape'(name)
 
+    $P0 = get_hll_global ['POST'], 'Op'
     .local pmc ns
     ns = node.'namespace'()
-    if ns goto package_ns
-    $P0 = get_hll_global ['POST'], 'Op'
+    $I0 = defined ns
+    if $I0 goto package_global
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
 
+  package_global:
+    if ns goto package_ns
+    fetchop = $P0.'new'(ops, name, 'pirop'=>'get_hll_global')
+    storeop = $P0.'new'(name, ops, 'pirop'=>'set_hll_global')
+    .return self.'vivify'(node, ops, fetchop, storeop)
+
   package_ns:
-    $P0 = new 'CodeString'
-    ns = $P0.'key'(ns :flat)
-    $P0 = get_hll_global ['POST'], 'Op'
+    $P1 = new 'CodeString'
+    ns = $P1.'key'(ns :flat)
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
