@@ -1662,11 +1662,11 @@ imcc-clean:
     $(IMCC_DIR)/imcparser.output
 
 realclean : clean languages-realclean
+	$(MAKE) compilers/pirc realclean
 	$(RM_RF) \
     $(STICKY_FILES) \
     blib \
     cover_db
-	$(MAKE) compilers/pirc realclean
 
 distclean : realclean
 
@@ -1676,7 +1676,7 @@ svnclobber : .svn
 	$(PERL) -MFile::Find -e 'find(sub{unlink $$_ if -f and not $$File::Find::name =~ m[/\.svn/] and not -e ".svn/text-base/$$_.svn-base";},".")'
 
 reconfig : clean
-	$(PERL) Configure.pl --reconfig
+	$(PERL) Configure.pl
 
 manitest :
 	$(PERL) tools/dev/manicheck.pl
