@@ -1554,6 +1554,7 @@ prog-clean :
     $(PDB) $(SRC_DIR)/pdb$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/disassemble$(O) \
+    $(SRC_DIR)/main$(O) \
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
