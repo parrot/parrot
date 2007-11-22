@@ -102,9 +102,7 @@ LINK       = @link@
 LINKFLAGS  = @linkflags@ @link_debug@ @ld_debug@
 LD         = @ld@
 LDFLAGS    = @ldflags@ @ld_debug@
-
 RECONFIGURE  = $(PERL) tools/dev/reconfigure.pl
-
 INNO_SETUP = iscc
 
 JIT_BUILD_TOOL = $(BUILD_TOOLS_DIR)/jit2c.pl
@@ -725,8 +723,9 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
 
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
-Makefile : ../../config/gen/makefiles/pirc.in
-	$(RECONFIGURE) --step=gen::makefiles --target=compilers/pirc/Makefile
+
+Makefile : config/gen/makefiles/root.in
+	$(RECONFIGURE) --step=gen::makefiles --target=Makefile
 
 flags_dummy :
 	@echo "Compiling with:"
