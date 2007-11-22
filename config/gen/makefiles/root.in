@@ -215,7 +215,12 @@ GEN_PASM_INCLUDES = \
     runtime/parrot/include/signal.pasm \
     @TEMP_gen_pasm_includes@
 
-STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig $(GEN_PASM_INCLUDES)
+STICKY_FILES = \
+    $(GEN_CONFIGS) \
+    $(GEN_MAKEFILES) \
+    ext/Parrot-Embed/Makefile.PL \
+    myconfig  \
+    $(GEN_PASM_INCLUDES)
 
 
 ###############################################################################
