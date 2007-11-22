@@ -10,13 +10,13 @@ Protoobject.pir - PIR implementation for creating protoobjects
     # create a protoobject for class Foo
     protomaker = new 'Protomaker'
     fooclass = get_class 'Foo'
-    fooproto = protoobj.'new_proto'(fooclass)
+    fooproto = protomaker.'new_proto'(fooclass)
 
     # create a subclass 'NS::Bar' from 'Foo' with attributes
-    .local pmc barclass, barproto
-    protoobj = new 'Protomaker'
+    .local pmc bclass, bproto
+    protomaker = new 'Protomaker'
     fooclass = get_class 'Foo'
-    (barclass, barproto) = protoobj.'new_subclass'(fooclass, 'NS::Bar', '$attr')
+    (bclass, bproto) = protomaker.'new_subclass'(fooclass, 'NS::Bar', '$attr')
 
 =head1 DESCRIPTION
 
