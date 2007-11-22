@@ -233,9 +233,11 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local string blocktype
     blocktype = node.'blocktype'()
+    .local pmc ns
+    ns = node.'namespace'()
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'blocktype'=>blocktype)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'blocktype'=>blocktype, 'namespace'=>ns)
     set_global '$?SUB', bpost
 
     ##  all children but last can return anything, last returns PMC

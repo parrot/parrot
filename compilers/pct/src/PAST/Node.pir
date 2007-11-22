@@ -617,6 +617,20 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 .end
 
 
+=item namespace([namespace])
+
+Get/set the namespace for this block.  The C<namespace> argument
+can be either a string or an array of strings.
+
+=cut
+
+.sub 'namespace' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('namespace', value, has_value)
+.end
+
+
 =item symbol(name, [attr1 => val, attr2 => val2, ...])
 
 If called with named arguments, sets the symbol hash corresponding
