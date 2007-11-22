@@ -14,10 +14,7 @@ RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 .SUFFIXES: .jako .pir
 
 
-#
-# Default target:
-#
-
+# default target
 all: \
     examples/bench.pir      \
     examples/board.pir      \
@@ -35,15 +32,30 @@ all: \
     examples/queens.pir     \
     examples/sub.pir
 
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  all  :             Compile the example scripts"
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  over:              clean and build again"
+	@echo ""
+	@echo "  test:              run the test suite"
+	@echo ""
+	@echo "  clean:             clean up temporary files"
+	@echo ""
+	@echo "  realclean:         clean up generated files"
+	@echo ""
+	@echo "  help:              print this help message"
+
+
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=jako
 
 
-#
 # Compilation:
-#
-
 .jako.pir:
 	$(JAKOC) $< > $@ || (rm -f $@ && false)
 
@@ -64,9 +76,7 @@ examples/queens.pir:     examples/queens.jako     jakoc
 examples/sub.pir:        examples/sub.jako        jakoc
 
 
-#
 # Other targets:
-#
 
 clean:
 	$(RM_F) "examples/*.pir" "examples/*.list" "t/*.pir"
