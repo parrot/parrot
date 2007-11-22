@@ -498,6 +498,18 @@ combinations.
     max = 1
     suffixpos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
 
+    if key == '**' goto quant_suffix
+    if key == ':' goto quant_cut
+    if key == '+' goto quant_max
+    ##  quantifier is '?' or '*'
+    min = 0
+  quant_max:
+    if key == '?' goto quant_suffix
+    ##  quantifier is '+' or '*'
+    max = PGE_INF
+    goto quant_suffix
+
+  quant_cut:
     #   The postfix:<:> operator may bring us here when it's really a
     #   term:<::> term.  So, we check for that here and fail this match
     #   if we really have a cut term.
@@ -505,7 +517,6 @@ combinations.
     $S0 = substr target, pos, 1
     if $S0 == ':' goto end
     mob['backtrack'] = PGE_BACKTRACK_NONE
-    goto quant_suffix_1
 
   quant_suffix:
     suffix = substr target, suffixpos, 2
@@ -529,14 +540,7 @@ combinations.
     pos = suffixpos + $I0
 
   quant:
-    if key == '**' goto quant_closure
-    if key == '+' goto quant_max
-    min = 0
-  quant_max:
-    if key == '?' goto quant_set
-    max = PGE_INF
-    goto quant_set
-
+    if key != '**' goto quant_set
   quant_closure:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     .local int isconst
