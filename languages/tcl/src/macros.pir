@@ -74,7 +74,7 @@ normal parrot C<.return>
     .output = exception[CODE_SLOT]
    pop_eh
 
-.local $bad_handler:
+.label $bad_handler:
 .endm
 
 =head1 Utility methods
