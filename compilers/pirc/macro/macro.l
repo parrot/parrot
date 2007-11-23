@@ -10,10 +10,11 @@
  * PIR language. The following constructs are filtered
  * out and handled:
  *
- * .macro_const
  * .include
  * .macro
  * .macro_local
+ * .macro_label
+ * .macro_const
  *
  */
 
@@ -589,6 +590,10 @@ REG            "$"?[SNIP]{DIGITS}
                                                         }
 
 <*>"+="|"-="|"*="|"/="|".="|">>="|"<<="|">>>="|"//="    { yylval->sval = dupstr(yytext);
+                                                          return TK_ANY;
+                                                        }
+
+<*>"%="|"|="|"&="|"**="|"~="|"||"|"&&"|"~~"|"//"        { yylval->sval = dupstr(yytext);
                                                           return TK_ANY;
                                                         }
 
