@@ -25,6 +25,7 @@ This is a complete rewrite of the parser for the PIR language.
 
 #include "pirparser.h"
 #include "pircompiler.h"
+#include "pircompunit.h"
 
 /* prevent inclusion of <unistd.h> on windows */
 #define YY_NO_UNISTD_H
@@ -84,7 +85,7 @@ extern YY_DECL;
 }
 
 
-%token TK_LABEL         "label"
+%token <sval> TK_LABEL         "label"
        TK_NL            "\n"
 
 %token TK_HLL           ".HLL"
@@ -120,7 +121,7 @@ extern YY_DECL;
        TK_NCI_CALL      ".nci_call"
 
 %token <sval> TK_IDENT         "identifier"
-       TK_STRINGC       "string constant"
+       <sval> TK_STRINGC       "string constant"
        TK_INTC          "integer constant"
        TK_NUMC          "number constant"
        TK_PASM_PREG     "PMC register"
@@ -195,10 +196,13 @@ extern YY_DECL;
 
 
 %type <sval> unop binop augmented_op rel_op target expression
-             condition identifier if_type if_null_type
+              identifier if_type if_null_type
              constant reg pasm_reg
+             sub_id opt_paren_string
+             instruction
 
-%type <ival> has_unique_reg
+%type <ival> has_unique_reg type
+
 
 /* a pure parser */
 %pure-parser
@@ -231,7 +235,6 @@ extern YY_DECL;
 program: opt_nl
          compilation_units
          opt_nl
-         { emit1("end"); }
        ;
 
 opt_nl: /* empty */
@@ -256,6 +259,7 @@ pir_pragma: ".pragma" "n_operators" TK_INTC
           ;
 
 loadlib: ".loadlib" TK_STRINGC
+         { load_library(lexer, $2); }
        ;
 
 /* HLL stuff */
@@ -301,13 +305,14 @@ namespace_id: TK_STRINGC
 
 /* Sub definition */
 
-sub_definition: ".sub" sub_id sub_flags "\n"
+sub_definition: ".sub" sub_id               { new_sub(lexer, $2); }
+                sub_flags "\n"
                 parameters
                 instructions
                 ".end"
                 ;
 
-sub_id: identifier /* is TK_PARROT_OP allowed too? in that case, <identifier> */
+sub_id: identifier
       | TK_STRINGC
       ;
 
@@ -315,17 +320,17 @@ sub_flags: /* empty */
          | sub_flags sub_flag
          ;
 
-sub_flag: ":anon"
-        | ":init"
-        | ":load"
-        | ":main"
-        | ":method"
-        | ":lex"
-        | ":outer" '(' sub_id ')'
-        | ":vtable" opt_paren_string
+sub_flag: ":anon"                           { set_sub_flag(lexer, SUB_FLAG_ANON); }
+        | ":init"                           { set_sub_flag(lexer, SUB_FLAG_INIT); }
+        | ":load"                           { set_sub_flag(lexer, SUB_FLAG_LOAD); }
+        | ":main"                           { set_sub_flag(lexer, SUB_FLAG_MAIN); }
+        | ":method"                         { set_sub_flag(lexer, SUB_FLAG_METHOD); }
+        | ":lex"                            { set_sub_flag(lexer, SUB_FLAG_LEX); }
+        | ":postcomp"                       { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
+        | ":immediate"                      { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
+        | ":outer" '(' sub_id ')'           { set_sub_outer(lexer, $3); }
+        | ":vtable" opt_paren_string        { set_sub_vtable(lexer, $2); }
         | ":multi" '(' multi_type_list ')'
-        | ":postcomp"
-        | ":immediate"
         ;
 
 multi_type_list: /* empty */
@@ -345,8 +350,10 @@ parameters: /* empty */
 parameter: ".param" param_def param_flags "\n"
          ;
 
-param_def: type identifier
-         | type TK_STRINGC "=>" identifier
+param_def: type identifier                  { add_param(lexer, $1, $2); } /* add a new parameter */
+         | type TK_STRINGC "=>" identifier  { add_param(lexer, $1, $4);   /* add a new parameter */
+                                              set_param_named(lexer, $2); /* set the :named flag on it */
+                                            }
          ;
 
 /* Instructions */
@@ -357,29 +364,29 @@ instructions: /* empty */
             ;
 
 
-labeled_instruction: TK_LABEL "\n"
-                   | TK_LABEL instruction
-                   | instruction
+labeled_instruction: TK_LABEL "\n"            { add_instr(lexer, $1, NULL); }
+                   | TK_LABEL instruction     { add_instr(lexer, $1, $2);   }
+                   | instruction              { add_instr(lexer, NULL, $1); }
                    ;
 
-instruction: conditional_statement
-           | goto_statement
-           | local_declaration
-           | lex_declaration
-           | const_decl_statement
-           | return_statement
-           | yield_statement
-           | invocation_statement
-           | assignment_statement
-           | methodcall_statement
-           | parrot_statement
-           | getresults_statement
-           | null_statement
+instruction: conditional_statement { $$ = NULL; }
+           | goto_statement        { $$ = NULL; }
+           | local_declaration      { $$ = NULL; }
+           | lex_declaration            { $$ = NULL; }
+           | const_decl_statement      { $$ = NULL; }
+           | return_statement           { $$ = NULL; }
+           | yield_statement            { $$ = NULL; }
+           | invocation_statement       { $$ = NULL; }
+           | assignment_statement       { $$ = NULL; }
+           | methodcall_statement       { $$ = NULL; }
+           | parrot_statement           { $$ = NULL; }
+           | getresults_statement       { $$ = NULL; }
+           | null_statement             { $$ = NULL; }
            | error "\n" { yyerrok; }
            ;
 
-null_statement: "null" target "\n"       { emit2("null", $2); }
-              | target '=' "null" "\n"   { emit2("null", $1); }
+null_statement: "null" target "\n"       { new_instr(lexer, "null", $2); }
+              | target '=' "null" "\n"   { new_instr(lexer, "null", $1); }
               ;
 
 getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
@@ -456,7 +463,12 @@ binop: '+'    { $$ = "add"; }
      | "&&"   { $$ = "and"; }
      | "//"   { $$ = "fdiv"; }
      | "~~"   { $$ = "xor"; }
-     | rel_op { $$ = $1; }
+     | "=="   { $$ = "iseq"; }
+     | "<="   { $$ = "isle"; }
+     | "<"    { $$ = "islt"; }
+     | ">="   { $$ = "isge"; }
+     | ">"    { $$ = "isgt"; }
+     | "!="   { $$ = "isne"; }
      ;
 
 
@@ -491,10 +503,12 @@ separator: ';'
          ;
 
 
-conditional_statement: if_type condition goto_or_comma identifier "\n"
-                       { emit3($1, $2, $4); }
+conditional_statement: if_type expression goto_or_comma identifier "\n"
+                       { new_instr(lexer, $1, $2, $4); }
+                     | if_type expression rel_op expression goto_or_comma identifier "\n"
+                       { new_instr(lexer, $3, $1, $2, $4, $6); }
                      | if_null_type expression goto_or_comma identifier "\n"
-                       { emit3($1, $2, $4); }
+                       { new_instr(lexer, $1, $2, $4); }
                      ;
 
 if_type: "if"      { $$ = "if"; }
@@ -509,13 +523,14 @@ if_null_type: "if" "null"     { $$ = "if_null"; }
 goto_or_comma: "goto" /* PIR mode */
              | ','    /* PASM mode*/
              ;
-
+/*
 condition: expression
          | expression rel_op expression
          ;
+*/
 
 goto_statement: "goto" identifier "\n"
-                { emit2("branch", $2); }
+                { new_instr(lexer, "branch", $2); }
               ;
 
 local_declaration: ".local" type local_id_list "\n"
@@ -526,15 +541,14 @@ local_id_list: local_id
              ;
 
 local_id: identifier has_unique_reg
+          { declare_local(lexer, $1, $2); }
         ;
 
 has_unique_reg: /* empty */     { $$ = 0; }
               | ":unique_reg"   { $$ = 1; }
               ;
 
-identifier: TK_IDENT
-          | TK_PARROT_OP
-          ;
+
 
 lex_declaration: ".lex" TK_STRINGC ',' target "\n"
                ;
@@ -548,10 +562,6 @@ long_invocation_statement: ".begin_call" "\n"
                            long_invocation "\n"
                            long_results
                            ".end_call" "\n"
-                           {
-
-
-                           }
                          ;
 
 long_arguments: /* empty */
@@ -599,11 +609,11 @@ param_flags: /* empty */
            | param_flags param_flag
            ;
 
-param_flag: ":optional"
-          | ":opt_flag"
-          | ":slurpy"
-          | ":named" opt_paren_string
-          | ":unique_reg"
+param_flag: ":optional"                  { set_param_flag(lexer, PARAM_FLAG_OPTIONAL); }
+          | ":opt_flag"                  { set_param_flag(lexer, PARAM_FLAG_OPT_FLAG); }
+          | ":slurpy"                    { set_param_flag(lexer, PARAM_FLAG_SLURPY); }
+          | ":named" opt_paren_string    { set_param_named(lexer, $2); }
+          | ":unique_reg"                { set_param_flag(lexer, PARAM_FLAG_UNIQUE_REG); }
           ;
 
 invocation_expression: simple_invocation
@@ -633,10 +643,6 @@ return_statement: short_return_statement
 long_return_statement: ".begin_return" "\n"
                        return_expressions
                        ".end_return" "\n"
-                       {
-                            emit1("set_returns");
-                            emit1("returncc");
-                       }
                      ;
 
 
@@ -645,17 +651,10 @@ yield_statement: short_yield_statement
                ;
 
 short_return_statement: ".return" arguments "\n"
-                        {
-                            emit1("set_returns");
-                            emit1("returncc");
-                        }
                       | ".return" invocation_expression "\n"
                       ;
 
 short_yield_statement: ".yield" arguments "\n"
-                       {
-                           emit1("yield");
-                       }
                      ;
 
 arguments: '(' opt_arguments_list ')'
@@ -670,7 +669,9 @@ arguments_list: argument
               ;
 
 argument: expression arg_flags
-        | TK_STRINGC "=>" expression
+        | TK_STRINGC "=>" expression        { add_arg(lexer, $3);
+                                              set_arg_named(lexer, $1);
+                                            }
         ;
 
 long_yield_statement: ".begin_yield" "\n"
@@ -682,38 +683,41 @@ yield_expressions: /* empty */
                  | yield_expressions yield_expression
                  ;
 
-yield_expression: ".yield" expression arg_flags "\n"
+yield_expression: ".yield" result "\n"
                 ;
 
 return_expressions: /* empty */
                   | return_expressions return_expression
                   ;
 
-return_expression: ".return" expression arg_flags "\n"
+return_expression: ".return" result "\n"
                  ;
+
+result: expression arg_flags
+      ;
 
 arg_flags: /* empty */
          | arg_flags arg_flag
          ;
 
-arg_flag: ":flat"
-        | ":named" opt_paren_string
+arg_flag: ":flat"                      { set_arg_flag(lexer, ARG_FLAG_FLAT); }
+        | ":named" opt_paren_string    { set_arg_named(lexer, $2); }
         ;
 
-opt_paren_string: /* empty */
-                | '(' TK_STRINGC ')'
+opt_paren_string: /* empty */          { $$ = NULL; }
+                | '(' TK_STRINGC ')'   { $$ = $2; }
                 ;
 
-const_declaration: ".const" const_tail
+const_declaration: ".const" const_tail               { /* define_const(lexer, $1, 0); */ }
                  ;
 
 const_decl_statement: const_declaration "\n"
-                    | ".globalconst" const_tail "\n"
+                    | ".globalconst" const_tail "\n" { /* define_const(lexer, $2, 1); */ }
                     ;
 
-const_tail: "int" identifier '=' TK_INTC
-          | "num" identifier '=' TK_NUMC
-          | "pmc" identifier '=' TK_STRINGC
+const_tail: "int"    identifier '=' TK_INTC
+          | "num"    identifier '=' TK_NUMC
+          | "pmc"    identifier '=' TK_STRINGC
           | "string" identifier '=' TK_STRINGC
           ;
 
@@ -730,6 +734,24 @@ constant: TK_STRINGC
         | TK_NUMC
         ;
 
+rel_op: "!="  { $$ = "ne"; }
+      | "=="  { $$ = "eq"; }
+      | "<"   { $$ = "lt"; }
+      | "<="  { $$ = "le"; }
+      | ">="  { $$ = "ge"; }
+      | ">"   { $$ = "gt"; }
+      ;
+
+type: "int"     { $$ = INT_TYPE; }
+    | "num"     { $$ = NUM_TYPE; }
+    | "pmc"     { $$ = PMC_TYPE; }
+    | "string"  { $$ = STRING_TYPE; }
+    ;
+
+target: reg
+      | identifier
+      ;
+
 reg: TK_SYM_PREG
    | TK_SYM_NREG
    | TK_SYM_IREG
@@ -737,30 +759,16 @@ reg: TK_SYM_PREG
    | pasm_reg
    ;
 
-
 pasm_reg: TK_PASM_PREG
         | TK_PASM_NREG
         | TK_PASM_IREG
         | TK_PASM_SREG
         ;
 
-rel_op: "!="  { $$ = "isne"; }
-      | "=="  { $$ = "iseq"; }
-      | "<"   { $$ = "islt"; }
-      | "<="  { $$ = "isle"; }
-      | ">="  { $$ = "isge"; }
-      | ">"   { $$ = "isgt"; }
-      ;
+identifier: TK_IDENT
+          | TK_PARROT_OP
+          ;
 
-type: "int"
-    | "num"
-    | "pmc"
-    | "string"
-    ;
-
-target: reg
-      | identifier
-      ;
 
 %%
 
