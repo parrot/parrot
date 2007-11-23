@@ -3,21 +3,30 @@
 
 # Makefile for languages/regex
 
-# Setup of some commands
+# Set up commands
 PARROT        = ../../parrot@exe@
 PERL          = @perl@
 RM_F          = @rm_f@
-O             = @o@
-LOAD_EXT      = @load_ext@
 YAPP          = yapp
-BUILD_DIR     = @build_dir@
 PMC_DIR       = pmc
 BUILD_DYNPMC  = $(PERL) @build_dir@/tools/build/dynpmc.pl
-PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
+PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+
+# Set up directories
+LOAD_EXT      = @load_ext@
+BUILD_DIR     = @build_dir@
+
+# set up extensions
+O             = @o@
 
 PMCS = match matchrange
 
 build : lib/Regex/Grammar.pm  $(PARROT_DYNEXT)/match_group$(LOAD_EXT) regex-compiler.pbc
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=regex
 
 lib/Regex/Grammar.pm : lib/Regex/Grammar.yp
 	$(YAPP) -s -m Regex::Grammar -o $@ lib/Regex/Grammar.yp
@@ -55,7 +64,8 @@ CLEANUPS = \
   $(PMC_DIR)/*.manifest \
   $(PMC_DIR)/*.pdb \
   $(PMC_DIR)/*.lib \
-  test.pir
+  test_regex.pir \
+  test_regex.pbc
 
 clean:
 	$(RM_F) $(CLEANUPS)

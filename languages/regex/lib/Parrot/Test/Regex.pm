@@ -26,6 +26,8 @@ Does the same a 'languages/regex/test.pl'
 =cut
 
 my $PARROT_EXE = File::Spec->catfile( Parrot::Test::path_to_parrot(), $PConfig{test_prog} );
+my $PIR_FN     = File::Spec->catfile( Parrot::Test::path_to_parrot(), 'languages', 'regex', 'test_regex.pir' );
+my $PBC_FN     = File::Spec->catfile( Parrot::Test::path_to_parrot(), 'languages', 'regex', 'test_regex.pbc' );
 
 sub run_spec {
     my ($spec_fh) = @_;
@@ -62,7 +64,8 @@ sub run_spec {
 
     Test::More::plan( tests => scalar(@spec) );
 
-    generate_regular($pattern);
+    generate_pir( $pattern );
+    generate_pbc();
 
     foreach (@spec) {
         process( $_->{input}, $_->{output} );
@@ -71,12 +74,12 @@ sub run_spec {
     return 0;
 }
 
-sub generate_regular_pir {
-    my ( $filename, $pattern ) = @_;
-    my $PIR;
-    open( $PIR, '>', $filename ) or die "create $filename: $!";
+sub generate_pir {
+    my ( $pattern ) = @_;
 
-    my $ctx = {};
+    open my $PIR, '>', $PIR_FN or die "Can't open $PIR_FN: $!";
+
+    my $ctx   = {};
     my $trees = Regex::expr_to_tree( $pattern, $ctx, DEBUG => 0 );
 
     my $driver = Regex::Driver->new( 'pir', emit_main => 1 );
@@ -95,27 +98,24 @@ END
     }
 
     close $PIR;
+
+    return;
 }
 
 sub generate_pbc {
     my ( $pir, $pbc ) = @_;
-    my $status = system( $PARROT_EXE, '-o', $pbc, $pir );
+    my $status = system( $PARROT_EXE, '-o', $PBC_FN, $PIR_FN );
     if ( !defined($status) || $status ) {
         die "assemble failed with status " . ( $? >> 8 );
     }
-}
 
-sub generate_regular {
-    my ($pattern) = @_;
-
-    generate_regular_pir( 'test_regex.pir', $pattern );
-    generate_pbc( 'test_regex.pir', 'test_regex.pbc' );
+    return;
 }
 
 sub process {
     my ( $input, $output ) = @_;
 
-    my $actual_output = `$PARROT_EXE test_regex.pbc '$input'`;
+    my $actual_output = `$PARROT_EXE $PBC_FN '$input'`;
     Test::More::is( $actual_output, $output );
 
     return;
