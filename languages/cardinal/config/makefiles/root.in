@@ -1,26 +1,28 @@
 # $Id$
 
-# Setup some commands
-LN_S     = @lns@
-PERL     = @perl@
-MV       = $(PERL) -MExtUtils::Command -e mv
-RM_F     = @rm_f@
-RM_RF    = @rm_rf@
-PARROT   = ../../parrot@exe@
-BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-TOOL_DIR = ../..
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
-CAT      = $(PERL) -MExtUtils::Command -e cat
-CP       = @cp@
-O        = @o@
-LOAD_EXT = @load_ext@
+# Set up some commands
+PERL          = @perl@
+MV            = $(PERL) -MExtUtils::Command -e mv
+RM_F          = @rm_f@
+RM_RF         = @rm_rf@
+PARROT        = ../../parrot@exe@
+BUILD         = $(PERL) @build_dir@/tools/build/dynpmc.pl
+CAT           = $(PERL) -MExtUtils::Command -e cat
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-PMCDIR   = src/pmc
+# Set up extensions
+O             = @o@
+LOAD_EXT      = @load_ext@
+
+# Set up directories
+BUILD_DIR     = @build_dir@
+PGE_DIR       = ../../compilers/pge
+TGE_DIR       = ../../compilers/tge
+PMC_DIR       = src/pmc
 
 # the default target
-all: gen_tests cardinal.pbc $(PMCDIR)/ruby_group$(LOAD_EXT)
+all: gen_tests cardinal.pbc $(PMC_DIR)/ruby_group$(LOAD_EXT)
 
 PMCS = \
   rubyclass \
@@ -35,16 +37,16 @@ PMCS = \
   rubyrange
 
 PMC_SOURCES = \
-  $(PMCDIR)/rubyclass.pmc \
-  $(PMCDIR)/rubyobject.pmc \
-  $(PMCDIR)/rubyinteger.pmc \
-  $(PMCDIR)/rubyhash.pmc \
-  $(PMCDIR)/rubybignum.pmc \
-  $(PMCDIR)/rubycomplex.pmc \
-  $(PMCDIR)/rubyfixnum.pmc \
-  $(PMCDIR)/rubyfloat.pmc \
-  $(PMCDIR)/rubystring.pmc \
-  $(PMCDIR)/rubyrange.pmc
+  $(PMC_DIR)/rubyclass.pmc \
+  $(PMC_DIR)/rubyobject.pmc \
+  $(PMC_DIR)/rubyinteger.pmc \
+  $(PMC_DIR)/rubyhash.pmc \
+  $(PMC_DIR)/rubybignum.pmc \
+  $(PMC_DIR)/rubycomplex.pmc \
+  $(PMC_DIR)/rubyfixnum.pmc \
+  $(PMC_DIR)/rubyfloat.pmc \
+  $(PMC_DIR)/rubystring.pmc \
+  $(PMC_DIR)/rubyrange.pmc
 
 BUILTINS_PIR = \
   src/builtins/assign.pir \
@@ -66,6 +68,10 @@ GEN_PBC = \
   src/OST2PIR.pbc \
   src/PAST.pbc \
   src/POST.pbc
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=cardinal
 
 RUNTIME_COMPONENTS = \
   runtime/parts/rubyclass.pir
@@ -106,11 +112,11 @@ src/PIRGrammar.pir: src/PIRGrammar.tg
 src/OST2PIR.pbc: src/OST2PIR.pir src/PIRGrammar.pir src/preamble
 	$(PARROT) -o src/OST2PIR.pbc --output-pbc src/OST2PIR.pir 
 
-$(PMCDIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
-	cd $(PMCDIR) && $(BUILD) generate $(PMCS)
-	cd $(PMCDIR) && $(BUILD) compile $(PMCS)
-	cd $(PMCDIR) && $(BUILD) linklibs $(PMCS)
-	cd $(PMCDIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
+$(PMC_DIR)/ruby_group$(LOAD_EXT): $(PARROT) $(PMC_SOURCES)
+	cd $(PMC_DIR) && $(BUILD) generate $(PMCS)
+	cd $(PMC_DIR) && $(BUILD) compile $(PMCS)
+	cd $(PMC_DIR) && $(BUILD) linklibs $(PMCS)
+	cd $(PMC_DIR) && $(BUILD) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
 src/builtins_gen.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) >src/builtins_gen.pir
@@ -154,13 +160,15 @@ testclean:
 
 CLEANUPS = \
   cardinal.pbc \
+  runtime/cardinallib.pbc \
+  runtime/runtime.pir \
   $(GEN_PIR) \
   $(GEN_PBC) \
-  $(PMCDIR)/*.h \
-  $(PMCDIR)/*.c \
-  $(PMCDIR)/*.dump \
-  $(PMCDIR)/*$(O) \
-  $(PMCDIR)/*$(LOAD_EXT) \
+  $(PMC_DIR)/*.h \
+  $(PMC_DIR)/*.c \
+  $(PMC_DIR)/*.dump \
+  $(PMC_DIR)/*$(O) \
+  $(PMC_DIR)/*$(LOAD_EXT) \
   t/*.out \
   t/*.rb
 
