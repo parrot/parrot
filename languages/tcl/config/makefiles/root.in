@@ -318,6 +318,7 @@ $(GENERATED_INLINES) \
 "$(OPSDIR)/*.h" \
 "src/*$(O)" \
 "$(OPSDIR)/*$(O)" \
+"$(OPSDIR)/*$(LOAD_EXT)" \
 "$(OPSDIR)/*.bundle" \
 "$(OPSDIR)/*.exp" \
 "$(OPSDIR)/*.ilk" \
