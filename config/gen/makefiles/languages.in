@@ -221,7 +221,7 @@ cola.dummy:
 cola.test:
 	- $(MAKE) cola test
 cola.clean:
-# don't clean cola, as files in MANIFEST are removed
+	- $(MAKE) cola clean
 
 dotnet : dotnet.dummy
 dotnet.dummy:
