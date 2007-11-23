@@ -3,6 +3,18 @@
  * Copyright (C) 2007, The Perl Foundation.
  */
 
+/*
+  back-end of the pir parser.
+  first find out the optimal interface, then start implementing the ast construction stuff.
+
+  this is to make the interface as clean as possible; there'll be probably some
+  shuffling around, finding out what is needed.
+
+  Possibly, in the end, some of these functions may become macros (#define'd)
+  for speed, but that's not a big deal right now.
+
+ */
+
 #include <stdio.h>
 #include "pircompunit.h"
 
@@ -25,7 +37,8 @@ set_sub_flag(struct lexer_state *lexer, int flag) {
 
 void
 new_sub(struct lexer_state *lexer, char *subname) {
-    fprintf(out, ".sub %s\n", subname);
+    /* fprintf(out, ".sub %s\n", subname);
+    */
 }
 
 void
