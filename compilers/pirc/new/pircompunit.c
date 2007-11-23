@@ -1,3 +1,8 @@
+/*
+ * $Id$
+ * Copyright (C) 2007, The Perl Foundation.
+ */
+
 #include <stdio.h>
 #include "pircompunit.h"
 
@@ -78,3 +83,11 @@ void
 define_const(struct lexer_state *lexer, void *var, int is_globalconst) {
 
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

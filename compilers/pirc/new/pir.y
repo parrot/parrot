@@ -85,7 +85,7 @@ extern YY_DECL;
 }
 
 
-%token <sval> TK_LABEL         "label"
+%token <sval> TK_LABEL  "label"
        TK_NL            "\n"
 
 %token TK_HLL           ".HLL"
