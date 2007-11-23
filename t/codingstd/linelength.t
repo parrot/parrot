@@ -137,6 +137,8 @@ compilers/pirc/new/main.c
 compilers/pirc/new/pirlexer.c
 compilers/pirc/new/pirlexer.h
 compilers/pirc/new/pirparser.c
+compilers/pirc/new/pircompunit.h
+compilers/pirc/new/pircompunit.c
 compilers/pirc/new/pasm.l
 compilers/pirc/new/pasm.y
 compilers/pirc/macro/macro.h
