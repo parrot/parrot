@@ -590,23 +590,7 @@ SP              [ ]
     }
 
 <macro>"$"{ID}":"  return LABEL;
-<macro>".local"{WS}+ {
-    char *label;
 
-    if (yylex(valp, yyscanner, interp) != LABEL)
-            IMCC_fataly(interp, E_SyntaxError, "LABEL expected");
-
-    if (valp) {
-        YYCHOP();
-
-        label = (char*)mem_sys_allocate(strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 15);
-        sprintf(label, "local__%s__%s__$:", IMCC_INFO(interp)->cur_macro_name, yytext+1);
-
-        valp->s = label;
-    }
-
-    return LABEL;
-    }
 <macro>".label"{WS}+ {
     char *label;
 
