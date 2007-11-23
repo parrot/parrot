@@ -2,10 +2,14 @@
 
 # Makefile for languages/ook
 
-# Setup of some commands
-PARROT     = ../../parrot
-PERL       = @perl@
-RM_F       = @rm_f@
+# Set up of commands
+PARROT        = ../../parrot
+PERL          = @perl@
+RM_F          = @rm_f@
+RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+
+# Set up directories
+BUILD_DIR     = @build_dir@
 
 default: all
 
@@ -24,6 +28,9 @@ help :
 	@echo ""
 	@echo "  help:              print this help message"
 
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=ook
 
 all: build
 
@@ -37,6 +44,7 @@ clean:
 	$(RM_F) core \
     "*.pbc" \
     "*~" \
+    "hello.out" \
     "foo.p*"
 
 realclean: clean
