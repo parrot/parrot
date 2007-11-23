@@ -129,6 +129,7 @@ clean: \
 
 realclean: \
     dotnet.realclean \
+    eclectus.realclean \
     jako.realclean
 
 #
@@ -243,6 +244,8 @@ eclectus.test :
 	- $(MAKE) eclectus test
 eclectus.clean :
 	- $(MAKE) eclectus clean
+eclectus.realclean :
+	- $(MAKE) eclectus realclean
 
 ecmascript : ecmascript.dummy
 ecmascript.dummy:
