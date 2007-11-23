@@ -1,0 +1,49 @@
+# Copyright (C) 2007, The Perl Foundation.
+# $Id$
+
+# Makefile for languages/eclectus
+
+# Setup of some commands
+PERL       = @perl@
+RM_F       = @rm_f@
+
+
+# The default target
+default: build
+
+help :
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "  build:             Does nothing currently."
+	@echo "                     This is the default."
+	@echo ""
+	@echo "  test:              Run the test suite."
+	@echo ""
+	@echo "  clean:             Clean up temporary files."
+	@echo ""
+	@echo "  realclean:         Clean up generated files."
+	@echo ""
+	@echo "  help:              Print this help message."
+
+# Compilation:
+build:
+	@echo "Nothing to do"
+
+# cleaning up
+
+clean:
+	$(RM_F) foo.pasm foo.pbc \
+  "t/*.out" \
+  "t/*.pir"
+
+realclean: clean
+	$(RM_F) Makefile
+
+over:
+	@$(MAKE) clean
+	@$(MAKE) all
+
+# testing
+test:
+	$(PERL) t/harness

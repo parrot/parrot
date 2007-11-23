@@ -337,6 +337,30 @@ C<languages/dotnet>
 =back
 
 
+=head2 Eclectus
+
+=over 4
+
+=item Description
+
+A Scheme to PAST compiler implemented in Scheme.
+Bootstrapping is planned.
+
+=item Status
+
+Planned.
+
+=item Last verified with parrot version
+
+0.5.0
+
+=item Location
+
+C<languages/eclectus>
+
+=back
+
+
 =head2 forth
 
 =over 4

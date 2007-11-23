@@ -25,6 +25,7 @@ LANGUAGES = \
     cola \
     dotnet \
     ecmascript \
+    eclectus \
     forth \
     jako \
     lisp \
@@ -234,6 +235,14 @@ dotnet.clean:
 	- $(MAKE) dotnet clean
 dotnet.realclean:
 	- $(MAKE) dotnet realclean
+
+eclectus: eclectus.dummy
+eclectus.dummy:
+	- $(MAKE) eclectus test
+eclectus.test :
+	- $(MAKE) eclectus test
+eclectus.clean :
+	- $(MAKE) eclectus clean
 
 ecmascript : ecmascript.dummy
 ecmascript.dummy:

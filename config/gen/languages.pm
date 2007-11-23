@@ -43,7 +43,7 @@ sub runstep {
 
     my $languages = $conf->options->get('languages');
     $languages = qq{
-        APL amber abc befunge bf cardinal c99 cola ecmascript forth HQ9plus
+        APL amber abc befunge bf cardinal c99 cola eclectus ecmascript forth HQ9plus
         jako lisp lua m4 nqp ook parrot_compiler perl5 perl6 pheme PIR plumhead
         pugs punie pynie regex scheme tap tcl urm WMLScript Zcode
     } unless defined $languages;
