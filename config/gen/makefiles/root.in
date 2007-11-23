@@ -173,6 +173,7 @@ GEN_MAKEFILES = \
     languages/plumhead/Makefile \
     languages/pugs/Makefile \
     languages/punie/Makefile \
+    languages/pynie/Makefile \
     languages/regex/Makefile \
     languages/scheme/Makefile \
     languages/tap/Makefile \
