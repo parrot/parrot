@@ -24,91 +24,91 @@ Tests the Float PMC.
 =cut
 
 my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (	J, K, L )
-	save	N0
-	save	N1
-	save	N2
+.macro fp_eq (  J, K, L )
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    gt  N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
-.local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPEQNOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
-.macro fp_ne(	J,K,L)
-	save	N0
-	save	N1
-	save	N2
+.macro fp_ne(   J,K,L)
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    lt  N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
-.local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPNENOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
 ENDOFMACRO
 
 pasm_output_is( <<"CODE", <<OUTPUT, "basic assignment" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
+    new P0, 'Float'
 
-	set P0, 0.001
- 	.fp_eq( P0, 0.001, EQ1)
-	print "not "
-EQ1:	print "ok 1\\n"
+    set P0, 0.001
+    .fp_eq( P0, 0.001, EQ1)
+    print "not "
+EQ1:    print "ok 1\\n"
 
         set P0, 1000
         .fp_eq( P0, 1000.0, EQ2)
-	print "not "
-EQ2:	print "ok 2\\n"
+    print "not "
+EQ2:    print "ok 2\\n"
 
         set P0, "12.5"
         .fp_eq( P0, 12.5, EQ3)
-	print "not "
-EQ3:	print "ok 3\\n"
+    print "not "
+EQ3:    print "ok 3\\n"
 
         set P0, "Twelve point five"
         .fp_eq( P0, 0.0, EQ4)
-	print "not "
-EQ4:	print "ok 4\\n"
+    print "not "
+EQ4:    print "ok 4\\n"
 
         set P0, 123.45
         set I0, P0
         eq I0, 123, EQ5
-	print "not "
-EQ5:	print "ok 5\\n"
+    print "not "
+EQ5:    print "ok 5\\n"
 
         set P0, 123.45
         set N0, P0
         .fp_eq(N0, 123.45, EQ6)
-	print "not "
-EQ6:	print "ok 6\\n"
+    print "not "
+EQ6:    print "ok 6\\n"
 
         set P0, 123.45
         set S0, P0
         eq S0, "123.45", EQ7
-	print "not "
-EQ7:	print "ok 7\\n"
+    print "not "
+EQ7:    print "ok 7\\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -121,56 +121,56 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "add number to self" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.001
-	add P0, P0, P0
-	.fp_eq( P0, 0.002, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
+    new P0, 'Float'
+    set P0, 0.001
+    add P0, P0, P0
+    .fp_eq( P0, 0.002, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
+    end
 CODE
 ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sub number from self" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, -1000.2
-	sub P0, P0, P0
-	.fp_eq( P0, 0.0, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
+    new P0, 'Float'
+    set P0, -1000.2
+    sub P0, P0, P0
+    .fp_eq( P0, 0.0, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
+    end
 CODE
 ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "multiply number by self" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 123.4
-	mul P0, P0, P0
-	.fp_eq( P0, 15227.56, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
+    new P0, 'Float'
+    set P0, 123.4
+    mul P0, P0, P0
+    .fp_eq( P0, 15227.56, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
+    end
 CODE
 ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "divide number by self" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 1829354.988
-	div P0, P0, P0
-	.fp_eq( P0, 1.0, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
-	end
+    new P0, 'Float'
+    set P0, 1829354.988
+    div P0, P0, P0
+    .fp_eq( P0, 1.0, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
+    end
 CODE
 ok 1
 OUTPUT
@@ -307,20 +307,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: addition" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.001
-	add P0, 1
-	.fp_eq(P0, 1.001, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.001
+    add P0, 1
+    .fp_eq(P0, 1.001, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	add P0, -2
-	.fp_eq(P0, -0.999, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    add P0, -2
+    .fp_eq(P0, -0.999, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -328,20 +328,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 103.45
-	sub P0, 77
-	.fp_eq(P0, 26.45, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 103.45
+    sub P0, 77
+    .fp_eq(P0, 26.45, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	sub P0, -24
-	.fp_eq(P0, 50.45, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    sub P0, -24
+    .fp_eq(P0, 50.45, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -349,26 +349,26 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.001
-	mul P0, 10000
-	.fp_eq(P0, 10.0, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.001
+    mul P0, 10000
+    .fp_eq(P0, 10.0, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	mul P0, -1
-	.fp_eq(P0, -10.0, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
+    mul P0, -1
+    .fp_eq(P0, -10.0, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
 
-	mul P0, 0
-	.fp_eq(P0, 0.0, EQ3)
-	print P0
-	print "not "
-EQ3:	print "ok 3\\n"
-	end
+    mul P0, 0
+    .fp_eq(P0, 0.0, EQ3)
+    print P0
+    print "not "
+EQ3:    print "ok 3\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -377,20 +377,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 1e8
-	div P0, 10000
-	.fp_eq(P0, 10000.0, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 1e8
+    div P0, 10000
+    .fp_eq(P0, 10000.0, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	div P0, 1000000
-	.fp_eq(P0, 0.01, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    div P0, 1000000
+    .fp_eq(P0, 0.01, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -398,20 +398,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.001
-	add P0, 1.2
-	.fp_eq(P0, 1.201, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.001
+    add P0, 1.2
+    .fp_eq(P0, 1.201, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	add P0, -2.4
-	.fp_eq(P0, -1.199, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    add P0, -2.4
+    .fp_eq(P0, -1.199, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -419,20 +419,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 103.45
-	sub P0, 3.46
-	.fp_eq(P0, 99.99, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 103.45
+    sub P0, 3.46
+    .fp_eq(P0, 99.99, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	sub P0, -0.01
-	.fp_eq(P0, 100.00, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    sub P0, -0.01
+    .fp_eq(P0, 100.00, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -440,26 +440,26 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.001
-	mul P0, 123.5
-	.fp_eq(P0, 0.1235, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.001
+    mul P0, 123.5
+    .fp_eq(P0, 0.1235, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	mul P0, -2.6
-	.fp_eq(P0, -0.3211, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
+    mul P0, -2.6
+    .fp_eq(P0, -0.3211, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
 
-	mul P0, 0
-	.fp_eq(P0, 0.0, EQ3)
-	print P0
-	print "not "
-EQ3:	print "ok 3\\n"
-	end
+    mul P0, 0
+    .fp_eq(P0, 0.0, EQ3)
+    print P0
+    print "not "
+EQ3:    print "ok 3\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -468,20 +468,20 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: division" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 1e8
-	div P0, 0.5
-	.fp_eq(P0, 2e8, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 1e8
+    div P0, 0.5
+    .fp_eq(P0, 2e8, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	div P0, 4000.0
-	.fp_eq(P0, 50000.0, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    div P0, 4000.0
+    .fp_eq(P0, 50000.0, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -489,32 +489,32 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Increment & decrement" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.5
-	inc P0
-	.fp_eq(P0, 1.5, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.5
+    inc P0
+    .fp_eq(P0, 1.5, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
-	dec P0
-	.fp_eq(P0, 0.5, EQ2)
-	print P0
-	print "not "
-EQ2:	print "ok 2\\n"
+    dec P0
+    .fp_eq(P0, 0.5, EQ2)
+    print P0
+    print "not "
+EQ2:    print "ok 2\\n"
 
-	dec P0
-	.fp_eq(P0, -0.5, EQ3)
-	print P0
-	print "not "
-EQ3:	print "ok 3\\n"
+    dec P0
+    .fp_eq(P0, -0.5, EQ3)
+    print P0
+    print "not "
+EQ3:    print "ok 3\\n"
 
-	inc P0
-	.fp_eq(P0, 0.5, EQ4)
-	print P0
-	print "not "
-EQ4:	print "ok 4\\n"
-	end
+    inc P0
+    .fp_eq(P0, 0.5, EQ4)
+    print P0
+    print "not "
+EQ4:    print "ok 4\\n"
+    end
 CODE
 ok 1
 ok 2
@@ -524,39 +524,39 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 0.5
-	neg P0
-	.fp_eq(P0, -0.5, EQ1)
-	print P0
-	print "not "
-EQ1:	print "ok 1\\n"
+    new P0, 'Float'
+    set P0, 0.5
+    neg P0
+    .fp_eq(P0, -0.5, EQ1)
+    print P0
+    print "not "
+EQ1:    print "ok 1\\n"
 
         new P1, 'Float'
-	neg P1, P0
-	.fp_eq(P1, 0.5, EQ2)
-	print P1
-	print "not "
-EQ2:	print "ok 2\\n"
-	end
+    neg P1, P0
+    .fp_eq(P1, 0.5, EQ2)
+    print P1
+    print "not "
+EQ2:    print "ok 2\\n"
+    end
 CODE
 ok 1
 ok 2
 OUTPUT
 
 pasm_output_like( << 'CODE', << 'OUTPUT', "neg 0" );
-	new P0, 'Float'
-	set P0, 0.0
-	neg P0
+    new P0, 'Float'
+    set P0, 0.0
+    neg P0
         print P0
-	end
+    end
 CODE
 /^-0/
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Equality" );
-	new P0, 'Float'
-	set P0, 1e8
+    new P0, 'Float'
+    set P0, 1e8
         new P1, 'Float'
         set P1, 1e8
         new P2, 'Float'
@@ -597,7 +597,7 @@ OK7:    print "ok 7\n"
         branch OK8
 BAD8:   print "not "
 OK8:    print "ok 8\n"
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -634,29 +634,29 @@ OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Abs" );
 @{[ $fp_equality_macro ]}
-	new P0, 'Float'
-	set P0, 1.0
-	abs P0
+    new P0, 'Float'
+    set P0, 1.0
+    abs P0
         eq P0, P0, OK1
-	print P0
-	print "not "
-OK1:	print "ok 1\\n"
+    print P0
+    print "not "
+OK1:    print "ok 1\\n"
 
         set P0, -1.0
         abs P0
-	.fp_eq(P0, 1.0, OK2)
-	print P0
-	print "not "
-OK2:	print "ok 2\\n"
+    .fp_eq(P0, 1.0, OK2)
+    print P0
+    print "not "
+OK2:    print "ok 2\\n"
 
         new P1, 'Float'
         set P0, -5.0
         abs P1, P0
         .fp_eq(P1, 5.0, OK3)
-	print P1
-	print "not "
-OK3:	print "ok 3\\n"
-	end
+    print P1
+    print "not "
+OK3:    print "ok 3\\n"
+    end
 CODE
 ok 1
 ok 2
