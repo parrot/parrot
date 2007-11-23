@@ -158,11 +158,11 @@ CLEANERS = \
  "*.pbc" \
  "*.dll" \
  "src/*.pbc" \
- src/it.pir
+ src/it.pir \
+ src/builtins.pir
 
 clean:
 	$(RM_F) $(CLEANERS)
 
 realclean : clean
 	$(RM_F) Makefile config/N2PConfig.pm
-

@@ -127,6 +127,7 @@ clean: \
     smoke-clean
 
 realclean: \
+    dotnet.realclean \
     jako.realclean
 
 #
@@ -231,6 +232,8 @@ dotnet.test:
 	- $(MAKE) dotnet test
 dotnet.clean:
 	- $(MAKE) dotnet clean
+dotnet.realclean:
+	- $(MAKE) dotnet realclean
 
 ecmascript : ecmascript.dummy
 ecmascript.dummy:
