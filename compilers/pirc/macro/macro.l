@@ -223,13 +223,11 @@ REG            "$"?[SNIP]{DIGITS}
                           }
 
 <MACROBODY>"$"{IDENT}":"  { /* unique label declaration using macro parameter */
-                            lexer_state *lexer = yyget_extra(yyscanner);
                             yylval->sval = dupstr(yytext);
                             return TK_LABEL_ID;
                           }
 
 <MACROBODY>{IDENT}":"     { /* unique label declaration, add special marker. */
-                            lexer_state *lexer = yyget_extra(yyscanner);
                             yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
                             /* stick a special marker "@" so we can recognize this as a label that
                              * must be munged.

@@ -145,6 +145,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include "macroparser.h"
 #include "macro.h"
 #include "lexer.h"
@@ -214,7 +215,7 @@ char *concat(char *str1, char *str2);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 62 "macro.y"
+#line 63 "macro.y"
 {
     char  *sval;
     struct list *lval;
@@ -222,7 +223,7 @@ typedef union YYSTYPE
 
 }
 /* Line 187 of yacc.c.  */
-#line 226 "macroparser.c"
+#line 227 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -235,7 +236,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 239 "macroparser.c"
+#line 240 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -539,13 +540,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   129,   129,   130,   133,   134,   137,   138,   142,   149,
-     150,   151,   152,   153,   156,   162,   163,   171,   172,   175,
-     176,   177,   180,   183,   186,   192,   196,   202,   209,   210,
-     213,   214,   217,   218,   219,   222,   226,   234,   235,   236,
-     237,   240,   241,   244,   245,   248,   249,   252,   253,   256,
-     257,   260,   261,   264,   265,   268,   271,   272,   278,   279,
-     280,   281
+       0,   130,   130,   131,   134,   135,   138,   139,   143,   150,
+     151,   152,   153,   154,   157,   163,   164,   172,   173,   176,
+     177,   178,   181,   184,   187,   193,   197,   203,   210,   211,
+     214,   215,   218,   219,   220,   223,   227,   235,   236,   237,
+     238,   241,   242,   245,   246,   249,   250,   253,   254,   257,
+     258,   261,   262,   265,   266,   269,   272,   273,   279,   280,
+     281,   282
 };
 #endif
 
@@ -1519,19 +1520,19 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 143 "macro.y"
+#line 144 "macro.y"
     { emit("\n");  /* after each statement, emit a newline */ ;}
     break;
 
   case 14:
-#line 157 "macro.y"
+#line 158 "macro.y"
     { emit("setline");
                   emit((yyvsp[(2) - (3)].sval));
                 ;}
     break;
 
   case 16:
-#line 164 "macro.y"
+#line 165 "macro.y"
     { emit("setfile");
                 emit((yyvsp[(2) - (2)].sval));
                 emit("\n");
@@ -1539,100 +1540,100 @@ yyreduce:
     break;
 
   case 19:
-#line 175 "macro.y"
+#line 176 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 176 "macro.y"
+#line 177 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 177 "macro.y"
+#line 178 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
                                        emit(label);
                                      ;}
     break;
 
   case 22:
-#line 180 "macro.y"
+#line 181 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
                                        emit(label);
                                      ;}
     break;
 
   case 23:
-#line 183 "macro.y"
+#line 184 "macro.y"
     { char *local = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
                                        emit(local);
                                      ;}
     break;
 
   case 24:
-#line 186 "macro.y"
+#line 187 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
                                        emit(label);
                                      ;}
     break;
 
   case 25:
-#line 193 "macro.y"
+#line 194 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 26:
-#line 197 "macro.y"
+#line 198 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 27:
-#line 206 "macro.y"
+#line 207 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (6)].sval), (yyvsp[(3) - (6)].lval), (yyvsp[(5) - (6)].sval)); ;}
     break;
 
   case 28:
-#line 209 "macro.y"
+#line 210 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 29:
-#line 210 "macro.y"
+#line 211 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 30:
-#line 213 "macro.y"
+#line 214 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 31:
-#line 214 "macro.y"
+#line 215 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 32:
-#line 217 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 33:
 #line 218 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
-  case 34:
+  case 33:
 #line 219 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
+  case 34:
+#line 220 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+    break;
+
   case 35:
-#line 223 "macro.y"
+#line 224 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 36:
-#line 227 "macro.y"
+#line 228 "macro.y"
     { /* create a string like ".local <type> <id>" */
                      (yyval.sval) = dupstr(".local");
                      (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval));
@@ -1641,93 +1642,93 @@ yyreduce:
     break;
 
   case 41:
-#line 240 "macro.y"
+#line 241 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 42:
-#line 241 "macro.y"
+#line 242 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 43:
-#line 244 "macro.y"
+#line 245 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 44:
-#line 245 "macro.y"
+#line 246 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 45:
-#line 248 "macro.y"
+#line 249 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 46:
-#line 249 "macro.y"
+#line 250 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 47:
-#line 252 "macro.y"
+#line 253 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 48:
-#line 253 "macro.y"
+#line 254 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 49:
-#line 256 "macro.y"
+#line 257 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 50:
-#line 257 "macro.y"
+#line 258 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 51:
-#line 260 "macro.y"
+#line 261 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 52:
-#line 261 "macro.y"
+#line 262 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 53:
-#line 264 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 54:
 #line 265 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
+  case 54:
+#line 266 "macro.y"
+    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
+    break;
+
   case 55:
-#line 268 "macro.y"
+#line 269 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
   case 56:
-#line 271 "macro.y"
+#line 272 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 57:
-#line 272 "macro.y"
+#line 273 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1731 "macroparser.c"
+#line 1732 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1941,7 +1942,7 @@ yyreturn:
 }
 
 
-#line 286 "macro.y"
+#line 287 "macro.y"
 
 
 

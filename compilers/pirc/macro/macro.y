@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include "macroparser.h"
 #include "macro.h"
 #include "lexer.h"

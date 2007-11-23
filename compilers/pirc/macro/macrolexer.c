@@ -936,13 +936,13 @@ static yyconst flex_int16_t yy_chk[1359] =
 static yyconst flex_int16_t yy_rule_linenum[76] =
     {   0,
       165,  171,  177,  182,  187,  192,  194,  196,  201,  206,
-      211,  216,  221,  225,  231,  242,  247,  252,  256,  260,
-      263,  267,  273,  282,  290,  294,  298,  303,  309,  319,
-      324,  328,  333,  338,  343,  348,  353,  369,  374,  379,
-      403,  418,  426,  433,  447,  462,  470,  474,  481,  486,
-      492,  496,  500,  504,  508,  512,  520,  525,  528,  531,
-      534,  537,  541,  546,  551,  558,  563,  568,  572,  576,
-      583,  588,  592,  596,  606
+      211,  216,  221,  225,  230,  240,  245,  250,  254,  258,
+      261,  265,  271,  280,  288,  292,  296,  301,  307,  317,
+      322,  326,  331,  336,  341,  346,  351,  367,  372,  377,
+      401,  416,  424,  431,  445,  460,  468,  472,  479,  484,
+      490,  494,  498,  502,  506,  510,  518,  523,  526,  529,
+      532,  535,  539,  544,  549,  556,  561,  566,  570,  574,
+      581,  586,  590,  594,  604
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -1596,16 +1596,14 @@ case 14:
 YY_RULE_SETUP
 #line 225 "macro.l"
 { /* unique label declaration using macro parameter */
-                            lexer_state *lexer = macroget_extra(yyscanner);
                             yylval->sval = dupstr(yytext);
                             return TK_LABEL_ID;
                           }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 231 "macro.l"
+#line 230 "macro.l"
 { /* unique label declaration, add special marker. */
-                            lexer_state *lexer = macroget_extra(yyscanner);
                             yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
                             /* stick a special marker "@" so we can recognize this as a label that
                              * must be munged.
@@ -1617,7 +1615,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 242 "macro.l"
+#line 240 "macro.l"
 { /* referring to a declared label or local id. */
                             yylval->sval = dupstr(yytext );
                             return TK_ANY;
@@ -1625,7 +1623,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 247 "macro.l"
+#line 245 "macro.l"
 { /* unique local declaration */
                             yy_push_state(MACROLOCAL, yyscanner);
                             return TK_MACRO_LOCAL;
@@ -1633,35 +1631,35 @@ YY_RULE_SETUP
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 252 "macro.l"
+#line 250 "macro.l"
 { yylval->sval = dupstr("int");
                             return TK_INT;
                           }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 256 "macro.l"
+#line 254 "macro.l"
 { yylval->sval = dupstr("num");
                             return TK_NUM;
                           }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 260 "macro.l"
+#line 258 "macro.l"
 { yylval->sval = dupstr("pmc");
                             return TK_PMC;
                           }
     YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 263 "macro.l"
+#line 261 "macro.l"
 { yylval->sval = dupstr("string");
                             return TK_STRING;
                           }
     YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 267 "macro.l"
+#line 265 "macro.l"
 { /* unique local id declaration */
                             yylval->sval = dupstr(yytext);
                             yy_pop_state(yyscanner);
@@ -1670,7 +1668,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 273 "macro.l"
+#line 271 "macro.l"
 { /* unique local id declaration -- non-parameter */
                             yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
                             strcpy(yylval->sval, yytext);
@@ -1682,7 +1680,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 282 "macro.l"
+#line 280 "macro.l"
 { /* when reading ".endm" while scanning macro body, go back to previous state */
 
                      yy_pop_state(yyscanner);
@@ -1693,28 +1691,28 @@ YY_RULE_SETUP
     YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 290 "macro.l"
+#line 288 "macro.l"
 { /* recognize "(" when scanning macro parameter list */
                      return '(';
                    }
     YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 294 "macro.l"
+#line 292 "macro.l"
 { /* recognize "," when scanning macro parameter list */
                      return ',';
                    }
     YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 298 "macro.l"
+#line 296 "macro.l"
 { /* recognize ")" when scanning a macro parameter list */
                      return ')';
                    }
     YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 303 "macro.l"
+#line 301 "macro.l"
 { /* recognize "(" when expanding a macro */
                      yy_push_state(EXPARGS, yyscanner);
                      return '(';
@@ -1723,7 +1721,7 @@ YY_RULE_SETUP
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 309 "macro.l"
+#line 307 "macro.l"
 { /* anything except a ")" in this state means a constant expansion, which
                       * has no arguments. This works, because if we did see a '(', the
                       * state EXPARGS is activated.
@@ -1735,7 +1733,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 319 "macro.l"
+#line 317 "macro.l"
 { /* */
                     yylval->sval = dupstr(yytext);
                     return TK_ANY;
@@ -1743,14 +1741,14 @@ YY_RULE_SETUP
     YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 324 "macro.l"
+#line 322 "macro.l"
 { /* */
                      return ',';
                    }
     YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 328 "macro.l"
+#line 326 "macro.l"
 { /* */
                      yy_pop_state(yyscanner);
                      return ')';
@@ -1758,7 +1756,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 333 "macro.l"
+#line 331 "macro.l"
 { /* braced argument */
                      yy_push_state(BRACEDARGS, yyscanner);
                      return '{';
@@ -1767,7 +1765,7 @@ YY_RULE_SETUP
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 338 "macro.l"
+#line 336 "macro.l"
 {
                      yylval->sval = dupstr(yytext);
                      return TK_ANY;
@@ -1775,7 +1773,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 343 "macro.l"
+#line 341 "macro.l"
 {
                      yy_pop_state(yyscanner);
                      return '}';
@@ -1783,7 +1781,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 348 "macro.l"
+#line 346 "macro.l"
 { /* variable argument of macro expansion */
                      yylval->sval = dupstr(yytext);
                      return TK_IDENT;
@@ -1791,7 +1789,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 353 "macro.l"
+#line 351 "macro.l"
 { /* .foo(.bar) */
                       lexer_state *lexer = macroget_extra(yyscanner);
                       macro_def *macro = find_macro(lexer->globaldefinitions, dupstr(yytext + 1));
@@ -1808,7 +1806,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 369 "macro.l"
+#line 367 "macro.l"
 { /* register can be an argument for macro expansion. */
                      yylval->sval = dupstr(yytext);
                      return TK_IDENT;
@@ -1816,7 +1814,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 374 "macro.l"
+#line 372 "macro.l"
 { /* constant or macro parameter ID */
                                yylval->sval = dupstr(yytext);
                                return TK_IDENT;
@@ -1824,7 +1822,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 379 "macro.l"
+#line 377 "macro.l"
 { /* directive, constant, macro or method-call */
                       if (is_pir_directive(yytext)) {
                           yylval->sval = dupstr(yytext);
@@ -1851,7 +1849,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 403 "macro.l"
+#line 401 "macro.l"
 { /* */
                      lexer_state *lexer = macroget_extra(yyscanner);
                      macro_def *macro = find_macro(lexer->globaldefinitions, /* skip "$" and ":" */
@@ -1869,7 +1867,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 418 "macro.l"
+#line 416 "macro.l"
 { /* this label was declared unique by ".macro_label foo:" but was munged so we
                         can recognize it now, and return a signal to the parser it needs to
                         munge it into a unique ID.
@@ -1880,7 +1878,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 426 "macro.l"
+#line 424 "macro.l"
 { /* this local was declared unique by ".macro_local", but was munged so we can
                         recognize it now.
                      */
@@ -1890,7 +1888,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 433 "macro.l"
+#line 431 "macro.l"
 {   /* expanding a declared variable (local or label) */
                      lexer_state *lexer = macroget_extra(yyscanner);
                      macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 2);
@@ -1907,7 +1905,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 447 "macro.l"
+#line 445 "macro.l"
 {    /* */
                      lexer_state *lexer = macroget_extra(yyscanner);
                      macro_def *macro = find_macro(lexer->globaldefinitions, yytext + 1);
@@ -1925,7 +1923,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 462 "macro.l"
+#line 460 "macro.l"
 {/* treat ".'foo'" or ".$P0" as 1 token to prevent the tokens are separated
                         * by a space; they clearly belong to each other if they were written
                         * together (without a space). This is a method-call, life foo .'bar'().
@@ -1936,12 +1934,12 @@ YY_RULE_SETUP
     YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 470 "macro.l"
+#line 468 "macro.l"
 { return ','; }
     YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 474 "macro.l"
+#line 472 "macro.l"
 { /*  */
                            yylval->sval = dupstr(yytext);
                            return TK_INTC;
@@ -1949,7 +1947,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 481 "macro.l"
+#line 479 "macro.l"
 { /* */
                         yylval->sval = dupstr(yytext);
                         return TK_STRINGC;
@@ -1957,7 +1955,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 486 "macro.l"
+#line 484 "macro.l"
 { /* in all other cases (than the above), treat a comma just as any token. */
                         yylval->sval = dupstr(yytext);
                         return TK_ANY;
@@ -1965,7 +1963,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 492 "macro.l"
+#line 490 "macro.l"
 { /**/
                        yylval->sval = dupstr(yytext);
                        return TK_IDENT;
@@ -1973,35 +1971,35 @@ YY_RULE_SETUP
     YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 496 "macro.l"
+#line 494 "macro.l"
 { yylval->sval = dupstr(yytext);
                        return TK_STRINGC;
                      }
     YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 500 "macro.l"
+#line 498 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
     YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 504 "macro.l"
+#line 502 "macro.l"
 { yylval->sval = dupstr(yytext);
                                 return TK_INTC;
                               }
     YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 508 "macro.l"
+#line 506 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_NUMC;
                           }
     YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 512 "macro.l"
+#line 510 "macro.l"
 { /* a quoted string is needed for an .include or the value of a
                              * macro constant. After this token, leave the current state.
                              */
@@ -2012,7 +2010,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 520 "macro.l"
+#line 518 "macro.l"
 { /* quoted strings argument for macro expansion */
                             yylval->sval = dupstr(yytext);
                             return TK_STRINGC;
@@ -2020,42 +2018,42 @@ YY_RULE_SETUP
     YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 525 "macro.l"
+#line 523 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
     YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 528 "macro.l"
+#line 526 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
     YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 531 "macro.l"
+#line 529 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
     YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 534 "macro.l"
+#line 532 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_INTC;
                           }
     YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 537 "macro.l"
+#line 535 "macro.l"
 { yylval->sval = dupstr(yytext);
                             return TK_NUMC;
                           }
     YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 541 "macro.l"
+#line 539 "macro.l"
 { /* register */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2063,7 +2061,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 546 "macro.l"
+#line 544 "macro.l"
 { /* quoted string */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2071,7 +2069,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 551 "macro.l"
+#line 549 "macro.l"
 { /* identifier */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2079,7 +2077,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 558 "macro.l"
+#line 556 "macro.l"
 { /* flag */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2087,7 +2085,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 563 "macro.l"
+#line 561 "macro.l"
 { /* expansions in a macro body; ignore for now. */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2095,28 +2093,28 @@ YY_RULE_SETUP
     YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 568 "macro.l"
+#line 566 "macro.l"
 { yylval->sval = dupstr(yytext);
                                    return TK_ANY;
                                  }
     YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 572 "macro.l"
+#line 570 "macro.l"
 { yylval->sval = dupstr(yytext);
                                      return TK_ANY;
                                    }
     YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 576 "macro.l"
+#line 574 "macro.l"
 { yylval->sval = dupstr(yytext);
                                          return TK_ANY;
                                        }
     YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 583 "macro.l"
+#line 581 "macro.l"
 { /* normal label */
                                    yylval->sval = dupstr(yytext);
                                    return TK_ANY;
@@ -2124,21 +2122,21 @@ YY_RULE_SETUP
     YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 588 "macro.l"
+#line 586 "macro.l"
 { yylval->sval = dupstr(yytext);
                                                           return TK_ANY;
                                                         }
     YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 592 "macro.l"
+#line 590 "macro.l"
 { yylval->sval = dupstr(yytext);
                                                           return TK_ANY;
                                                         }
     YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 596 "macro.l"
+#line 594 "macro.l"
 { yylval->sval = dupstr(yytext);
                                                           return TK_ANY;
                                                         }
@@ -2154,14 +2152,14 @@ case YY_STATE_EOF(LINE):
 case YY_STATE_EOF(MACROLOCAL):
 case YY_STATE_EOF(BRACEDARGS):
 case YY_STATE_EOF(EXPARGS):
-#line 600 "macro.l"
+#line 598 "macro.l"
 { /* when end of file or end of string buffer, stop scanning. */
                       yyterminate();
                     }
     YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 606 "macro.l"
+#line 604 "macro.l"
 { /* just return any single character token we didn't match before. */
                          yylval->sval = dupstr(yytext);
                          return TK_ANY;
@@ -2169,10 +2167,10 @@ YY_RULE_SETUP
     YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 611 "macro.l"
+#line 609 "macro.l"
 ECHO;
     YY_BREAK
-#line 2176 "macrolexer.c"
+#line 2174 "macrolexer.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -3426,7 +3424,7 @@ void macrofree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 611 "macro.l"
+#line 609 "macro.l"
 
 
 
