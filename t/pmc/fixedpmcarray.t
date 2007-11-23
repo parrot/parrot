@@ -24,45 +24,45 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (	J, K, L )
-    save	N0
-    save	N1
-    save	N2
+.macro fp_eq (  J, K, L )
+    save    N0
+    save    N1
+    save    N2
 
-    set	N0, .J
-    set	N1, .K
-    sub	N2, N1,N0
-    abs	N2, N2
-    gt	N2, 0.000001, .$FPEQNOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    gt  N2, 0.000001, .$FPEQNOK
 
     restore N2
-    restore	N1
-    restore	N0
-    branch	.L
-.local $FPEQNOK:
+    restore N1
+    restore N0
+    branch  .L
+.label $FPEQNOK:
     restore N2
-    restore	N1
-    restore	N0
+    restore N1
+    restore N0
 .endm
-.macro fp_ne(	J,K,L)
-    save	N0
-    save	N1
-    save	N2
+.macro fp_ne(   J,K,L)
+    save    N0
+    save    N1
+    save    N2
 
-    set	N0, .J
-    set	N1, .K
-    sub	N2, N1,N0
-    abs	N2, N2
-    lt	N2, 0.000001, .$FPNENOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    lt  N2, 0.000001, .$FPNENOK
 
-    restore	N2
-    restore	N1
-    restore	N0
-    branch	.L
-.local $FPNENOK:
-    restore	N2
-    restore	N1
-    restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPNENOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
 ENDOFMACRO
 

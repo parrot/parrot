@@ -24,45 +24,45 @@ Tests the Complex PMC.
 =cut
 
 my $fp_equality_macro = <<'ENDOFMACRO';
-.macro fp_eq (	J, K, L )
-    save	N0
-    save	N1
-    save	N2
+.macro fp_eq (  J, K, L )
+    save    N0
+    save    N1
+    save    N2
 
-    set	N0, .J
-    set	N1, .K
-    sub	N2, N1,N0
-    abs	N2, N2
-    gt	N2, 0.000001, .$FPEQNOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    gt  N2, 0.000001, .$FPEQNOK
 
     restore N2
-    restore	N1
-    restore	N0
-    branch	.L
-.local $FPEQNOK:
+    restore N1
+    restore N0
+    branch  .L
+.label $FPEQNOK:
     restore N2
-    restore	N1
-    restore	N0
+    restore N1
+    restore N0
 .endm
-.macro fp_ne(	J,K,L)
-    save	N0
-    save	N1
-    save	N2
+.macro fp_ne(   J,K,L)
+    save    N0
+    save    N1
+    save    N2
 
-    set	N0, .J
-    set	N1, .K
-    sub	N2, N1,N0
-    abs	N2, N2
-    lt	N2, 0.000001, .$FPNENOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    lt  N2, 0.000001, .$FPNENOK
 
-    restore	N2
-    restore	N1
-    restore	N0
-    branch	.L
-.local $FPNENOK:
-    restore	N2
-    restore	N1
-    restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPNENOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
 ENDOFMACRO
 
@@ -1014,12 +1014,12 @@ SKIP: {
     unless str != .res goto .$ok
     print "\nln("
     print .val
-    print ")\n\t	got\t"
+    print ")\n\t    got\t"
     print str
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1063,7 +1063,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "exp of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1106,7 +1106,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1149,7 +1149,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sin of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1192,7 +1192,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cos of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1235,7 +1235,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "tan of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1278,7 +1278,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cot of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1320,7 +1320,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sec of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1363,7 +1363,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "csc of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1405,7 +1405,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "asin of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1448,7 +1448,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acos of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1491,7 +1491,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "atan of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1532,7 +1532,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acot of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1572,7 +1572,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "asec of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1614,7 +1614,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "acsc of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1656,7 +1656,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sinh of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1699,7 +1699,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cosh of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1742,7 +1742,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "tanh of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1785,7 +1785,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "coth of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1827,7 +1827,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "sech of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2
@@ -1870,7 +1870,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "csch of complex numbers" );
     print "\n\t\tnot\t"
     print .res
     print "\n"
-.local $ok:
+.label $ok:
 .endm
 .sub main :main
     .local pmc c, c2

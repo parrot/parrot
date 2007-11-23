@@ -24,44 +24,44 @@ Tests the C<String> PMC.
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq ( J, K, L )
-	save	N0
-	save	N1
-	save	N2
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	gt	N2, 0.000001, .$FPEQNOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    gt  N2, 0.000001, .$FPEQNOK
 
-	restore N2
-	restore	N1
-	restore	N0
-	branch	.L
-.local $FPEQNOK:
-	restore N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPEQNOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
 .macro fp_ne ( J, K, L )
-	save	N0
-	save	N1
-	save	N2
+    save    N0
+    save    N1
+    save    N2
 
-	set	N0, .J
-	set	N1, .K
-	sub	N2, N1,N0
-	abs	N2, N2
-	lt	N2, 0.000001, .$FPNENOK
+    set N0, .J
+    set N1, .K
+    sub N2, N1,N0
+    abs N2, N2
+    lt  N2, 0.000001, .$FPNENOK
 
-	restore	N2
-	restore	N1
-	restore	N0
-	branch	.L
-.local $FPNENOK:
-	restore	N2
-	restore	N1
-	restore	N0
+    restore N2
+    restore N1
+    restore N0
+    branch  .L
+.label $FPNENOK:
+    restore N2
+    restore N1
+    restore N0
 .endm
 ENDOFMACRO
 
@@ -211,29 +211,29 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "ensure that concat ppp copies strings" );
-	new P0, 'String'
-	new P1, 'String'
-	new P2, 'String'
-	set P0, "foo"
-	concat	P1, P0, P0
+    new P0, 'String'
+    new P1, 'String'
+    new P2, 'String'
+    set P0, "foo"
+    concat  P1, P0, P0
 
-	print	P0
-	print "\\n"
+    print   P0
+    print "\\n"
 
-	print	P1
-	print "\\n"
+    print   P1
+    print "\\n"
 
-	set P1, "You can't teach an old dog new..."
-	set P2, "clear physics"
-	concat P0, P1, P2
+    set P1, "You can't teach an old dog new..."
+    set P2, "clear physics"
+    concat P0, P1, P2
 
-	print P1
-	print "\\n"
-	print P2
-	print "\\n"
-	print P0
-	print "\\n"
-	end
+    print P1
+    print "\\n"
+    print P2
+    print "\\n"
+    print P0
+    print "\\n"
+    end
 CODE
 foo
 foofoo
@@ -243,21 +243,21 @@ You can't teach an old dog new...clear physics
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "ensure that concat pps copies strings" );
-	new P0, 'String'
-	new P1, 'String'
+    new P0, 'String'
+    new P1, 'String'
 
-	set S0, "Grunties"
-	set P1, "fnargh"
-	concat P0, P1, S0
+    set S0, "Grunties"
+    set P1, "fnargh"
+    concat P0, P1, S0
 
-	print S0
-	print "\\n"
-	print P1
-	print "\\n"
-	print P0
-	print "\\n"
+    print S0
+    print "\\n"
+    print P1
+    print "\\n"
+    print P0
+    print "\\n"
 
-	end
+    end
 CODE
 Grunties
 fnargh
@@ -265,44 +265,44 @@ fnarghGrunties
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "Setting string references" );
-	new P0, 'String'
-	set S0, "C2H5OH + 10H20"
-	set P0, S0
-	chopn S0, 8
+    new P0, 'String'
+    set S0, "C2H5OH + 10H20"
+    set P0, S0
+    chopn S0, 8
 
-	print S0
-	print "\\n"
-	print P0
-	print "\\n"
-	end
+    print S0
+    print "\\n"
+    print P0
+    print "\\n"
+    end
 CODE
 C2H5OH
 C2H5OH
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "Assigning string copies" );
-	new P0, 'String'
-	set S0, "C2H5OH + 10H20"
-	assign P0, S0
-	chopn S0, 8
+    new P0, 'String'
+    set S0, "C2H5OH + 10H20"
+    assign P0, S0
+    chopn S0, 8
 
-	print S0
-	print "\\n"
-	print P0
-	print "\\n"
-	end
+    print S0
+    print "\\n"
+    print P0
+    print "\\n"
+    end
 CODE
 C2H5OH
 C2H5OH + 10H20
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "repeat" );
-	new P0, 'String'
-	set P0, "x"
-	new P1, 'Integer'
-	set P1, 12
-	new P2, 'String'
-	repeat P2, P0, P1
+    new P0, 'String'
+    set P0, "x"
+    new P1, 'Integer'
+    set P1, 12
+    new P2, 'String'
+    repeat P2, P0, P1
         print P2
         print "\n"
 
@@ -326,7 +326,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "repeat" );
         print P2
         print "\n"
 
-	end
+    end
 CODE
 xxxxxxxxxxxx
 yyyyyy
@@ -335,11 +335,11 @@ zzz
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat" );
-	new P0, 'String'
-	set P0, "x"
-	new P1, 'Integer'
-	set P1, 12
-	n_repeat P2, P0, P1
+    new P0, 'String'
+    set P0, "x"
+    new P1, 'Integer'
+    set P1, 12
+    n_repeat P2, P0, P1
         print P2
         print "\n"
 
@@ -363,7 +363,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat" );
         print P5
         print "\n"
 
-	end
+    end
 CODE
 xxxxxxxxxxxx
 yyyyyy
@@ -371,11 +371,11 @@ zzz
 
 OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "repeat_int" );
-	new P0, 'String'
-	set P0, "x"
-	set I1, 12
-	new P2, 'String'
-	repeat P2, P0, I1
+    new P0, 'String'
+    set P0, "x"
+    set I1, 12
+    new P2, 'String'
+    repeat P2, P0, I1
         print P2
         print "\n"
 
@@ -384,17 +384,17 @@ pasm_output_is( <<'CODE', <<OUTPUT, "repeat_int" );
         repeat P2, P0, I1
         print P2
         print "\n"
-	end
+    end
 CODE
 xxxxxxxxxxxx
 zazaza
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat_int" );
-	new P0, 'String'
-	set P0, "x"
-	set I1, 12
-	n_repeat P2, P0, I1
+    new P0, 'String'
+    set P0, "x"
+    set I1, 12
+    n_repeat P2, P0, I1
         print P2
         print "\n"
 
@@ -402,7 +402,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat_int" );
         n_repeat P3, P0, 3
         print P3
         print "\n"
-	end
+    end
 CODE
 xxxxxxxxxxxx
 zazaza
@@ -410,8 +410,8 @@ OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "if(String)" );
         new P0, 'String'
-	set S0, "True"
-	set P0, S0
+    set S0, "True"
+    set P0, S0
         if P0, TRUE
         print "false"
         branch NEXT
@@ -461,36 +461,36 @@ false
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "concat" );
-	new P0, 'String'
-	new P1, 'Undef'
-	set P0, "foo"
-	concat	P1, P0, P0
+    new P0, 'String'
+    new P1, 'Undef'
+    set P0, "foo"
+    concat  P1, P0, P0
 
-	print	P0
-	print "\n"
-	print	P1
-	print "\n"
+    print   P0
+    print "\n"
+    print   P1
+    print "\n"
 
-	new P0, 'String'
-	new P1, 'Undef'
-	set P0, "bar"
-	concat	P0, P0, P1
+    new P0, 'String'
+    new P1, 'Undef'
+    set P0, "bar"
+    concat  P0, P0, P1
 
-	print	P0
-	print "\n"
-	print	P1
-	print "\n"
+    print   P0
+    print "\n"
+    print   P1
+    print "\n"
 
-	new P0, 'String'
-	new P1, 'Undef'
-	set P1, "str"
-	concat	P1, P0, P1
+    new P0, 'String'
+    new P1, 'Undef'
+    set P1, "str"
+    concat  P1, P0, P1
 
-	print	P0
-	print "\n"
-	print	P1
-	print "\n"
-	end
+    print   P0
+    print "\n"
+    print   P1
+    print "\n"
+    end
 CODE
 foo
 foofoo
@@ -501,25 +501,25 @@ str
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "n_concat" );
-	new P0, 'String'
-	set P0, "foo"
-	n_concat	P1, P0, P0
+    new P0, 'String'
+    set P0, "foo"
+    n_concat    P1, P0, P0
 
-	print	P0
-	print "\n"
-	print	P1
-	print "\n"
+    print   P0
+    print "\n"
+    print   P1
+    print "\n"
 
-	new P0, 'String'
-	set P0, "foo"
-	n_concat P2, P0, "bar"
+    new P0, 'String'
+    set P0, "foo"
+    n_concat P2, P0, "bar"
 
-	print	P0
-	print "\n"
-	print	P2
-	print "\n"
+    print   P0
+    print "\n"
+    print   P2
+    print "\n"
 
-	end
+    end
 CODE
 foo
 foofoo
@@ -527,8 +527,8 @@ foo
 foobar
 OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "cmp" );
-	new P1, 'String'
-	new P2, 'String'
+    new P1, 'String'
+    new P2, 'String'
 
         set P1, "abc"
         set P2, "abc"
@@ -556,8 +556,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "cmp with Integer" );
-	new P1, 'Integer'
-	new P2, 'String'
+    new P1, 'Integer'
+    new P2, 'String'
         set P2, "10"
 
 # Int. vs Str.
@@ -640,39 +640,39 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bands NULL string" );
         new P1, 'String'
-	new P2, 'String'
-	new P3, 'String'
-	null S1
-	set S2, "abc"
-	set P1, S1
-	set P2, S2
-	bands P1, P2
-	null S3
-	set P3, S3
-	eq P1, P3, ok1
-	print "not "
-ok1:	print "ok 1\n"
-	set P1, ""
-	bands P1, P2
-	unless P1, ok2
-	print "not "
-ok2:	print "ok 2\n"
+    new P2, 'String'
+    new P3, 'String'
+    null S1
+    set S2, "abc"
+    set P1, S1
+    set P2, S2
+    bands P1, P2
+    null S3
+    set P3, S3
+    eq P1, P3, ok1
+    print "not "
+ok1:    print "ok 1\n"
+    set P1, ""
+    bands P1, P2
+    unless P1, ok2
+    print "not "
+ok2:    print "ok 2\n"
 
-	null S2
-	set P2, S2
-	set P1, "abc"
-	bands P1, P2
-	null S3
-	set P3, S3
-	eq P1, P3, ok3
-	print "not "
-ok3:	print "ok 3\n"
-	set P2, ""
-	bands P1, P2
-	unless P1, ok4
-	print "not "
-ok4:	print "ok 4\n"
-	end
+    null S2
+    set P2, S2
+    set P1, "abc"
+    bands P1, P2
+    null S3
+    set P3, S3
+    eq P1, P3, ok3
+    print "not "
+ok3:    print "ok 3\n"
+    set P2, ""
+    bands P1, P2
+    unless P1, ok4
+    print "not "
+ok4:    print "ok 4\n"
+    end
 CODE
 ok 1
 ok 2
@@ -682,15 +682,15 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bands 2" );
         new P1, 'String'
-	new P2, 'String'
-	set P1, "abc"
-	set P2, "EE"
-	bands P1, P2
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	end
+    new P2, 'String'
+    set P1, "abc"
+    set P2, "EE"
+    bands P1, P2
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
 CODE
 A@
 EE
@@ -698,18 +698,18 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bands 3" );
         new P1, 'String'
-	new P2, 'String'
-	new P0, 'String'
-	set P1, "abc"
-	set P2, "EE"
-	bands P0, P1, P2
-	print P0
-	print "\n"
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	end
+    new P2, 'String'
+    new P0, 'String'
+    set P1, "abc"
+    set P2, "EE"
+    bands P0, P1, P2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
 CODE
 A@
 abc
@@ -718,42 +718,42 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bors NULL string" );
         new P1, 'String'
-	new P2, 'String'
-	new P3, 'String'
-	null S1
-	null S2
-	set P1, S1
-	set P2, S2
-	bors P1, P2
-	null S3
-	set P3, S3
-	eq P1, P3, OK1
-	print "not "
+    new P2, 'String'
+    new P3, 'String'
+    null S1
+    null S2
+    set P1, S1
+    set P2, S2
+    bors P1, P2
+    null S3
+    set P3, S3
+    eq P1, P3, OK1
+    print "not "
 OK1:    print "ok 1\n"
 
-	null S1
-	set P1, S1
-	set P2, ""
-	bors P1, P2
-	null S3
-	set P3, S3
-	eq P1, P3, OK2
-	print "not "
+    null S1
+    set P1, S1
+    set P2, ""
+    bors P1, P2
+    null S3
+    set P3, S3
+    eq P1, P3, OK2
+    print "not "
 OK2:    print "ok 2\n"
         bors P2, P1
         eq P2, P3, OK3
         print "not "
 OK3:    print "ok 3\n"
 
-	null S1
-	set P1, S1
-	set P2, "def"
-	bors P1, P2
-	eq P1, "def", OK4
-	print "not "
+    null S1
+    set P1, S1
+    set P2, "def"
+    bors P1, P2
+    eq P1, "def", OK4
+    print "not "
 OK4:    print "ok 4\n"
         null S2
-	set P2, S2
+    set P2, S2
         bors P1, P2
         eq P1, "def", OK5
         print "not "
@@ -761,8 +761,8 @@ OK5:    print "ok 5\n"
 
         null S1
         null S2
-	set P1, S1
-	set P2, S2
+    set P1, S1
+    set P2, S2
         bors P3, P1, P2
         null S4
         eq P3, S4, OK6
@@ -804,15 +804,15 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bors 2" );
         new P1, 'String'
-	new P2, 'String'
-	set P1, "abc"
-	set P2, "EE"
-	bors P1, P2
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	end
+    new P2, 'String'
+    set P1, "abc"
+    set P2, "EE"
+    bors P1, P2
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
 CODE
 egc
 EE
@@ -820,18 +820,18 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "bors 3" );
         new P1, 'String'
-	new P2, 'String'
-	new P0, 'String'
-	set P1, "abc"
-	set P2, "EE"
-	bors P0, P1, P2
-	print P0
-	print "\n"
-	print P1
-	print "\n"
-	print P2
-	print "\n"
-	end
+    new P2, 'String'
+    new P0, 'String'
+    set P1, "abc"
+    set P2, "EE"
+    bors P0, P1, P2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
 CODE
 egc
 abc
