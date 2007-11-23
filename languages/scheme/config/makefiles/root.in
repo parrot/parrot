@@ -3,12 +3,13 @@
 
 # Makefile for languages/scheme
 
-# Setup of some commands
+# Set up commands
 PERL          = @perl@
 RM_F          = @rm_f@
-BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
+# Set up directories
+BUILD_DIR     = @build_dir@
 
 # The default target
 default: build
