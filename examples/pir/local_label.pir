@@ -11,7 +11,7 @@ examples/pir/local_label.pir - Local labels
 
 =head1 DESCRIPTION
 
-Show the use of a C<.local> label.
+Show the use of a C<.label> label.
 
 =cut
 
@@ -19,7 +19,7 @@ Show the use of a C<.local> label.
     print     "Branching to '$ok' in macro 'TEST1'\n"
     branch    .$ok
     end
-.local $ok:  
+.label $ok:
     print    "Branched to '$ok' in macro 'TEST1'\n"
 .endm
 
@@ -28,7 +28,7 @@ test2:        # not local
     print     "Branching to '$ok' in macro 'TEST2'\n"
     branch    .$ok
     end
-.local $ok:  
+.label $ok:
     print    "Branched to '$ok' in macro 'TEST2'\n"
     branch   not_local
 .endm
