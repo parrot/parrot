@@ -6,19 +6,9 @@ languages/eclectus/t/harness - A harness for scheme
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib scheme/t/harness --files
-
-  cd languages && perl -I../lib scheme/t/harness 
-
-  cd languages && perl -I../lib scheme/t/harness \
-                   scheme/t/logic/basic.t \
-                   scheme/t/logic/defines.t
+  cd languages/eclectus && perl t/harness
 
 =head1 DESCRIPTION
-
-If I'm called with a single
-argument of "--files", I just return a list of files to process.
-This list is one per line, and is relative to the languages dir.
 
 If I'm called with no args, I run the complete suite.
 
@@ -26,21 +16,23 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
+# pragmata
 use strict;
+use warnings;
+use 5.008;
 
-use Test::Harness ();
-
+use TAP::Harness ();
 use File::Spec;
 
+my @test_files = glob( File::Spec->catfile( 't', '*.t' ) );
 
-$ENV{HARNESS_PERL}          = q{petite};
-$ENV{HARNESS_PERL_SWITCHES} = q{--script};
-
-my @files = glob( File::Spec->catfile( 't', '*.t' ) );
-Test::Harness::runtests( @files );
+TAP::Harness->new(
+    { exec => [ 'petite', '--script' ],
+    }
+)->runtests(@test_files);
 
 =head1 SEE ALSO
 
-  F<languages/tcl/t/harness>, F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+  F<languages/scheme/t/harness>
 
 =cut
