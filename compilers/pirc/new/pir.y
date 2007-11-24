@@ -41,23 +41,6 @@ extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * c
 /* declare yylex() */
 extern YY_DECL;
 
-/*
-  experimental emit functions.
-
- */
-/*
-#define EMIT_EXPERIMENT
-*/
-
-#ifdef EMIT_EXPERIMENT
-#  define emit1(X)        fprintf(stderr, "%s\n", X)
-#  define emit2(X,Y)      fprintf(stderr, "%s %s\n", X,Y)
-#  define emit3(A,B,C)    fprintf(stderr, "%s %s, %s\n", A,B,C)
-#else
-#  define emit1(X)
-#  define emit2(X,Y)
-#  define emit3(A,B,C)
-#endif
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -198,10 +181,10 @@ extern YY_DECL;
 
 
 %type <sval> unop binop augmented_op rel_op target expression
-              identifier if_type if_null_type
+             identifier if_type if_null_type
              constant reg pasm_reg
              sub_id opt_paren_string
-             instruction
+             statement
 
 %type <ival> has_unique_reg type
 
@@ -364,29 +347,29 @@ param_def: type identifier                  { add_param(lexer, $1, $2); } /* add
 
 
 instructions: /* empty */
-            | instructions labeled_instruction
+            | instructions instruction
             ;
 
 
-labeled_instruction: TK_LABEL "\n"            { add_instr(lexer, $1, NULL); }
-                   | TK_LABEL instruction     { add_instr(lexer, $1, $2);   }
-                   | instruction              { add_instr(lexer, NULL, $1); }
-                   ;
-
-instruction: conditional_statement { $$ = NULL; }
-           | goto_statement        { $$ = NULL; }
-           | local_declaration      { $$ = NULL; }
-           | lex_declaration            { $$ = NULL; }
-           | const_decl_statement      { $$ = NULL; }
-           | return_statement           { $$ = NULL; }
-           | yield_statement            { $$ = NULL; }
-           | invocation_statement       { $$ = NULL; }
-           | assignment_statement       { $$ = NULL; }
-           | parrot_statement           { $$ = NULL; }
-           | getresults_statement       { $$ = NULL; }
-           | null_statement             { $$ = NULL; }
-           | error "\n" { yyerrok; }
+instruction: TK_LABEL "\n"          { add_instr(lexer, $1, NULL); }
+           | TK_LABEL statement     { add_instr(lexer, $1, $2);   }
+           | statement              { add_instr(lexer, NULL, $1); }
            ;
+
+statement: conditional_statement     { $$ = NULL; }
+         | goto_statement            { $$ = NULL; }
+         | local_declaration         { $$ = NULL; }
+         | lex_declaration           { $$ = NULL; }
+         | const_decl_statement      { $$ = NULL; }
+         | return_statement           { $$ = NULL; }
+         | yield_statement            { $$ = NULL; }
+         | invocation_statement       { $$ = NULL; }
+         | assignment_statement       { $$ = NULL; }
+         | parrot_statement           { $$ = NULL; }
+         | getresults_statement       { $$ = NULL; }
+         | null_statement             { $$ = NULL; }
+         | error "\n" { yyerrok; }
+         ;
 
 null_statement: "null" target "\n"       { new_instr(lexer, "null", $2); }
               | target '=' "null" "\n"   { new_instr(lexer, "null", $1); }
@@ -405,24 +388,13 @@ assignment_tail: augmented_op expression
                ;
 
 assignment_expression: unop expression
-                     | expression
+                     | expression1
                      | expression binop expression
                      | target keylist
-                     | simple_invocation
                      | parrot_instruction
                      ;
 
-
-/*
- * The case of a parrot instruction without arguments is covered by
- * the rule assignment_expression : expression.
- * This brings up the question, whether the check for "is_op()" should
- * be done in the lexer or here, in the parser, because when
- * reducing the rule "expression", we need to know whether it is
- * an op. If the check is done in the parser, then the token
- * TK_PARROT_OP can be removed.
- */
-parrot_instruction: TK_PARROT_OP parrot_op_args
+parrot_instruction: TK_PARROT_OP opt_parrot_op_args
                   ;
 
 opt_parrot_op_args: /* empty */
@@ -585,14 +557,39 @@ long_result: ".result" target param_flags "\n"
            ;
 
 short_invocation_statement: '(' opt_target_list ')' '=' simple_invocation "\n"
+                          | target '=' simple_invocation "\n"
                           | simple_invocation "\n"
                           ;
 
 
-simple_invocation: invokable arguments
-                 | TK_STRINGC arguments
+simple_invocation: subcall
                  | methodcall
                  ;
+
+methodcall: invokable '.' method arguments
+          ;
+
+
+subcall: sub arguments
+       ;
+
+sub: invokable
+   | TK_STRINGC
+   ;
+
+invokable: identifier              { }
+         | TK_SYM_PREG             { }
+         | TK_PASM_PREG            { }
+         ;
+
+method: invokable
+      | string_object
+      ;
+
+string_object: TK_STRINGC
+             | TK_SYM_SREG
+             | TK_PASM_SREG
+             ;
 
 opt_target_list: /* empty */
                | target_list
@@ -619,22 +616,6 @@ param_flag: ":optional"                  { set_param_flag(lexer, PARAM_FLAG_OPTI
 
 
 
-methodcall: invokable '.' method arguments
-          ;
-
-invokable: identifier              { }
-         | TK_SYM_PREG             { }
-         | TK_PASM_PREG            { }
-         ;
-
-method: invokable
-      | string_object
-      ;
-
-string_object: TK_STRINGC
-             | TK_SYM_SREG
-             | TK_PASM_SREG
-             ;
 
 return_statement: short_return_statement
                 | long_return_statement
@@ -731,6 +712,12 @@ const_tail: "int"    identifier '=' TK_INTC     { $$ = new_iconst($2, $4); }
 pasm_expression: constant
                | pasm_reg
                ;
+
+/* expression1 is similar to expression, but it doesn't accept TK_PARROT_OP */
+expression1: constant
+           | reg
+           | TK_IDENT
+           ;
 
 expression: target
           | constant
