@@ -115,12 +115,12 @@ variable would be modified.
 
 =over 4
 
-=item 'char constant'
+=item 'single-quoted string constant'
 
 Are delimited by single-quotes (C<'>). They are taken to be ASCII encoded. No
 escape sequences are processed.
 
-=item "string constants"
+=item "double-quoted string constants"
 
 Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
 by C<\>.  Only 7-bit ASCII is accepted in string constants; to use characters
