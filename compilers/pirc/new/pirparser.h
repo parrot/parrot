@@ -253,9 +253,10 @@ typedef union YYSTYPE
     char  *sval;
 
     struct constant *constval;
+    void  *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 259 "pirparser.h"
+#line 260 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

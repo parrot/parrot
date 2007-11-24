@@ -67,6 +67,7 @@ extern YY_DECL;
     char  *sval;
 
     struct constant *constval;
+    void  *fixme;
 }
 
 
@@ -190,6 +191,7 @@ extern YY_DECL;
 
 %type <constval> const_tail
 
+%type <fixme> assignment_tail assignment_expression keylist expression1 parrot_instruction
 
 /* a pure parser */
 %pure-parser
@@ -356,19 +358,19 @@ instruction: TK_LABEL "\n"          { add_instr(lexer, $1, NULL); }
            | statement              { add_instr(lexer, NULL, $1); }
            ;
 
-statement: conditional_statement     { $$ = NULL; }
-         | goto_statement            { $$ = NULL; }
-         | local_declaration         { $$ = NULL; }
-         | lex_declaration           { $$ = NULL; }
-         | const_decl_statement      { $$ = NULL; }
-         | return_statement           { $$ = NULL; }
-         | yield_statement            { $$ = NULL; }
-         | invocation_statement       { $$ = NULL; }
-         | assignment_statement       { $$ = NULL; }
-         | parrot_statement           { $$ = NULL; }
-         | getresults_statement       { $$ = NULL; }
-         | null_statement             { $$ = NULL; }
-         | error "\n" { yyerrok; }
+statement: conditional_statement    { $$ = NULL; }
+         | goto_statement           { $$ = NULL; }
+         | local_declaration        { $$ = NULL; }
+         | lex_declaration          { $$ = NULL; }
+         | const_decl_statement     { $$ = NULL; }
+         | return_statement         { $$ = NULL; }
+         | yield_statement          { $$ = NULL; }
+         | invocation_statement     { $$ = NULL; }
+         | assignment_statement     { $$ = NULL; }
+         | parrot_statement         { $$ = NULL; }
+         | getresults_statement     { $$ = NULL; }
+         | null_statement           { $$ = NULL; }
+         | error "\n"               { yyerrok; }
          ;
 
 null_statement: "null" target "\n"       { new_instr(lexer, "null", $2); }
@@ -376,25 +378,27 @@ null_statement: "null" target "\n"       { new_instr(lexer, "null", $2); }
               ;
 
 getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
+                      { new_instr(lexer, "get_results"); }
                     ;
 
 
-assignment_statement: target assignment_tail "\n"
+assignment_statement: target assignment_tail "\n"  { /* assign(lexer, $1, $2); */ }
                     ;
 
-assignment_tail: augmented_op expression
-               | keylist '=' expression
-               | '=' assignment_expression
+assignment_tail: augmented_op expression           { $$ = new_rhs(lexer, EXPR_AUGMENT, $1, $2); }
+               | keylist '=' expression            { $$ = new_rhs(lexer, EXPR_SETKEYED, $1, $3); }
+               | '=' assignment_expression         { $$ = $2; }
                ;
 
-assignment_expression: unop expression
-                     | expression1
-                     | expression binop expression
-                     | target keylist
-                     | parrot_instruction
+assignment_expression: unop expression              { $$ = new_rhs(lexer, EXPR_UNOP, $1, $2); }
+                     | expression1                  { $$ = new_rhs(lexer, EXPR_SIMPLE, $1); }
+                     | expression binop expression  { $$ = new_rhs(lexer, EXPR_BINOP, $1, $2, $3); }
+                     | target keylist               { $$ = new_rhs(lexer, EXPR_GETKEYED, $1, $2); }
+                     | parrot_instruction           { $$ = new_rhs(lexer, EXPR_PASM, $1); }
                      ;
 
-parrot_instruction: TK_PARROT_OP opt_parrot_op_args
+parrot_instruction: TK_PARROT_OP                    { $$ = NULL; /* $$ = new_instr(lexer, $1); */}
+                    opt_parrot_op_args              { $$ = NULL; }
                   ;
 
 opt_parrot_op_args: /* empty */
@@ -455,7 +459,7 @@ augmented_op: "+="   { $$ = "add"; }
             | ">>>=" { $$ = "lsr"; }
             ;
 
-keylist: '[' keys ']'
+keylist: '[' keys ']'   { $$ = NULL; }
        ;
 
 keys: key
@@ -714,9 +718,9 @@ pasm_expression: constant
                ;
 
 /* expression1 is similar to expression, but it doesn't accept TK_PARROT_OP */
-expression1: constant
-           | reg
-           | TK_IDENT
+expression1: constant   { $$ = NULL; }
+           | reg        { $$ = NULL; }
+           | TK_IDENT   { $$ = NULL; }
            ;
 
 expression: target

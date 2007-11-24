@@ -100,9 +100,9 @@ declare_local(struct lexer_state *lexer, char *id, int use_unique_reg) {
 
 }
 
-void
+void *
 new_instr(struct lexer_state *lexer, ...) {
-
+    return NULL;
 }
 
 
@@ -159,6 +159,11 @@ new_invocation(struct lexer_state *lexer) {
 void
 add_target(struct lexer_state *lexer) {
 
+}
+
+void *
+new_rhs(struct lexer_state *lexer, rhs_type type, ...) {
+    return NULL;
 }
 
 /*

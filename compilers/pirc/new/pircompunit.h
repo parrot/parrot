@@ -5,6 +5,7 @@
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
+/* the 4 parrot types */
 typedef enum pir_types {
     INT_TYPE,
     NUM_TYPE,
@@ -13,6 +14,19 @@ typedef enum pir_types {
 
 } pir_type;
 
+/* different types of rhs expressions */
+typedef enum rhs_types {
+    EXPR_AUGMENT,
+    EXPR_SETKEYED,
+    EXPR_UNOP,
+    EXPR_SIMPLE,
+    EXPR_BINOP,
+    EXPR_GETKEYED,
+    EXPR_PASM
+
+} rhs_type;
+
+/* parameter flags */
 typedef enum param_flags {
     PARAM_FLAG_NAMED      = 0x001,
     PARAM_FLAG_SLURPY     = 0x002,
@@ -22,7 +36,7 @@ typedef enum param_flags {
 
 } param_flag;
 
-
+/* argument flags */
 typedef enum arg_flags {
     ARG_FLAG_NAMED = 0x001,
     ARG_FLAG_FLAT  = 0x002
@@ -30,7 +44,7 @@ typedef enum arg_flags {
 } arg_flag;
 
 
-/* Sub flags */
+/* sub flags */
 typedef enum sub_flags {
     SUB_FLAG_METHOD    = 0x001,
     SUB_FLAG_INIT      = 0x002,
@@ -46,18 +60,11 @@ typedef enum sub_flags {
 
 } sub_flag;
 
+/* use these macros for manipulating bits; don't do it yourself */
 #define SET_FLAG(obj,flag)      obj |= flag
 #define CLEAR_FLAG(obj,flag)    obj &= ~flag
 #define TEST_FLAG(obj,flag)     obj & flag
 
-
-typedef enum arg_types {
-    ARG_TYPE_INT,
-    ARG_TYPE_NUM,
-    ARG_TYPE_STRING,
-    ARG_TYPE_PMC
-
-} arg_type;
 
 typedef union value {
         char  *sval;
@@ -70,14 +77,14 @@ typedef union value {
 
 typedef struct pir_arg {
     value    val;
-    arg_type type;
+    pir_type type;
 
 } pir_arg;
 
 
 typedef struct constant {
     char *name;
-    int type;
+    pir_type type;
     value val;
 
 } constant;
@@ -93,7 +100,7 @@ typedef struct pir_instr {
 
 typedef struct variable {
     char *name;
-    int type;
+    pir_type type;
 
 } variable;
 
