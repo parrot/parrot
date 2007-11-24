@@ -43,8 +43,8 @@ build:
 
 clean:
 	$(RM_F) foo.pasm foo.pbc \
-  "t/*.out" \
-  "t/*.pir"
+  "*.out" \
+  "*.pir"
 
 realclean: clean
 	$(RM_F) Makefile
