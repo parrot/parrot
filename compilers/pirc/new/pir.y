@@ -382,7 +382,6 @@ instruction: conditional_statement { $$ = NULL; }
            | yield_statement            { $$ = NULL; }
            | invocation_statement       { $$ = NULL; }
            | assignment_statement       { $$ = NULL; }
-           | methodcall_statement       { $$ = NULL; }
            | parrot_statement           { $$ = NULL; }
            | getresults_statement       { $$ = NULL; }
            | null_statement             { $$ = NULL; }
@@ -396,8 +395,6 @@ null_statement: "null" target "\n"       { new_instr(lexer, "null", $2); }
 getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
                     ;
 
-methodcall_statement: methodcall "\n"
-                    ;
 
 assignment_statement: target assignment_tail "\n"
                     ;
@@ -412,7 +409,6 @@ assignment_expression: unop expression
                      | expression binop expression
                      | target keylist
                      | simple_invocation
-                     | methodcall
                      | parrot_instruction
                      ;
 
@@ -588,13 +584,14 @@ long_result: ".result" target param_flags "\n"
            | local_declaration
            ;
 
-short_invocation_statement: '(' opt_target_list ')' '=' invocation_expression "\n"
+short_invocation_statement: '(' opt_target_list ')' '=' simple_invocation "\n"
                           | simple_invocation "\n"
                           ;
 
 
 simple_invocation: invokable arguments
                  | TK_STRINGC arguments
+                 | methodcall
                  ;
 
 opt_target_list: /* empty */
@@ -620,9 +617,7 @@ param_flag: ":optional"                  { set_param_flag(lexer, PARAM_FLAG_OPTI
           | ":named" opt_paren_string    { set_param_named(lexer, $2); }
           ;
 
-invocation_expression: simple_invocation
-                     | methodcall
-                     ;
+
 
 methodcall: invokable '.' method arguments
           ;
@@ -656,7 +651,7 @@ yield_statement: short_yield_statement
                ;
 
 short_return_statement: ".return" arguments "\n"
-                      | ".return" invocation_expression "\n"
+                      | ".return" simple_invocation "\n"
                       ;
 
 short_yield_statement: ".yield" arguments "\n"
