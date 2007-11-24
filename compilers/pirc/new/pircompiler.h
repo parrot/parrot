@@ -6,12 +6,18 @@
 #ifndef PARROT_PIR_PIRCOMPILER_H_GUARD
 #define PARROT_PIR_PIRCOMPILER_H_GUARD
 
+#include "pircompunit.h"
+
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
     int                     parse_errors;
     char                   *filename;
     int                     line_nr;
     int                     line_pos;
+
+    subroutine             *subs;
+
+
 
 } lexer_state;
 

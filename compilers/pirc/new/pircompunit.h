@@ -59,23 +59,28 @@ typedef enum arg_types {
 
 } arg_type;
 
-
-
-typedef struct pir_arg {
-    union value {
+typedef union value {
         char  *sval;
         double nval;
         int    ival;
         char  *pval;
 
-    } value;
+} value;
 
+
+typedef struct pir_arg {
+    value    val;
     arg_type type;
 
 } pir_arg;
 
 
+typedef struct constant {
+    char *name;
+    int type;
+    value val;
 
+} constant;
 
 
 /* a single instruction */
@@ -86,12 +91,20 @@ typedef struct pir_instr {
 } pir_instr;
 
 
-typedef struct sub_param {
+typedef struct variable {
+    char *name;
+    int type;
+
+} variable;
+
+typedef struct target {
     char *name;
     char *named_flag_arg;
     int flags;
 
-} sub_param;
+} target;
+
+
 
 
 

@@ -82,6 +82,8 @@ extern YY_DECL;
     double dval;
     int    ival;
     char  *sval;
+
+    struct constant *constval;
 }
 
 
@@ -202,6 +204,8 @@ extern YY_DECL;
              instruction
 
 %type <ival> has_unique_reg type
+
+%type <constval> const_tail
 
 
 /* a pure parser */
@@ -328,9 +332,9 @@ sub_flag: ":anon"                           { set_sub_flag(lexer, SUB_FLAG_ANON)
         | ":lex"                            { set_sub_flag(lexer, SUB_FLAG_LEX); }
         | ":postcomp"                       { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
         | ":immediate"                      { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
+        | ":multi" '(' multi_type_list ')'  { set_sub_flag(lexer, SUB_FLAG_MULTI); }
         | ":outer" '(' sub_id ')'           { set_sub_outer(lexer, $3); }
         | ":vtable" opt_paren_string        { set_sub_vtable(lexer, $2); }
-        | ":multi" '(' multi_type_list ')'
         ;
 
 multi_type_list: /* empty */
@@ -408,7 +412,6 @@ assignment_expression: unop expression
                      | expression binop expression
                      | target keylist
                      | simple_invocation
-                     | TK_STRINGC arguments
                      | methodcall
                      | parrot_instruction
                      ;
@@ -436,10 +439,6 @@ parrot_op_args: parrot_op_arg
 
 parrot_op_arg: pasm_expression
              ;
-
-
-simple_invocation: invokable arguments
-                 ;
 
 unop: '-'     { $$ = "neg"; }
     | '!'     { $$ = "not"; }
@@ -553,8 +552,8 @@ has_unique_reg: /* empty */     { $$ = 0; }
 lex_declaration: ".lex" TK_STRINGC ',' target "\n"
                ;
 
-invocation_statement: long_invocation_statement
-                    | short_invocation_statement
+invocation_statement: long_invocation_statement   { new_invocation(lexer); }
+                    | short_invocation_statement  { new_invocation(lexer); }
                     ;
 
 long_invocation_statement: ".begin_call" "\n"
@@ -568,7 +567,7 @@ long_arguments: /* empty */
               | long_arguments long_argument
               ;
 
-long_argument: ".arg" expression arg_flags "\n"
+long_argument: ".arg" short_arg "\n"
              ;
 
 long_invocation: ".call" invokable opt_return_continuation
@@ -590,9 +589,13 @@ long_result: ".result" target param_flags "\n"
            ;
 
 short_invocation_statement: '(' opt_target_list ')' '=' invocation_expression "\n"
-                          | TK_STRINGC arguments "\n"
                           | simple_invocation "\n"
                           ;
+
+
+simple_invocation: invokable arguments
+                 | TK_STRINGC arguments
+                 ;
 
 opt_target_list: /* empty */
                | target_list
@@ -602,7 +605,8 @@ target_list: result_target
            | target_list ',' result_target
            ;
 
-result_target: target param_flags
+result_target: target         { add_target(lexer, $1); }
+               param_flags
              ;
 
 param_flags: /* empty */
@@ -612,29 +616,30 @@ param_flags: /* empty */
 param_flag: ":optional"                  { set_param_flag(lexer, PARAM_FLAG_OPTIONAL); }
           | ":opt_flag"                  { set_param_flag(lexer, PARAM_FLAG_OPT_FLAG); }
           | ":slurpy"                    { set_param_flag(lexer, PARAM_FLAG_SLURPY); }
-          | ":named" opt_paren_string    { set_param_named(lexer, $2); }
           | ":unique_reg"                { set_param_flag(lexer, PARAM_FLAG_UNIQUE_REG); }
+          | ":named" opt_paren_string    { set_param_named(lexer, $2); }
           ;
 
 invocation_expression: simple_invocation
                      | methodcall
                      ;
 
-invokable: TK_SYM_PREG
-         | TK_PASM_PREG
-         | identifier
-         ;
-
 methodcall: invokable '.' method arguments
           ;
 
-method: identifier
-      | TK_STRINGC
-      | TK_SYM_SREG
-      | TK_PASM_SREG
-      | TK_PASM_PREG
-      | TK_SYM_PREG
+invokable: identifier              { }
+         | TK_SYM_PREG             { }
+         | TK_PASM_PREG            { }
+         ;
+
+method: invokable
+      | string_object
       ;
+
+string_object: TK_STRINGC
+             | TK_SYM_SREG
+             | TK_PASM_SREG
+             ;
 
 return_statement: short_return_statement
                 | long_return_statement
@@ -668,11 +673,18 @@ arguments_list: argument
               | arguments_list ',' argument
               ;
 
-argument: expression arg_flags
-        | TK_STRINGC "=>" expression        { add_arg(lexer, $3);
-                                              set_arg_named(lexer, $1);
-                                            }
+argument: short_arg
+        | named_arg
         ;
+
+named_arg: TK_STRINGC "=>" expression      { add_arg(lexer, $3);
+                                             set_arg_named(lexer, $1);
+                                           }
+         ;
+
+short_arg: expression   { add_arg(lexer, $1); }
+           arg_flags
+         ;
 
 long_yield_statement: ".begin_yield" "\n"
                       yield_expressions
@@ -708,17 +720,17 @@ opt_paren_string: /* empty */          { $$ = NULL; }
                 | '(' TK_STRINGC ')'   { $$ = $2; }
                 ;
 
-const_declaration: ".const" const_tail               { /* define_const(lexer, $1, 0); */ }
+const_declaration: ".const" const_tail               { define_const(lexer, $2, 0);  }
                  ;
 
 const_decl_statement: const_declaration "\n"
-                    | ".globalconst" const_tail "\n" { /* define_const(lexer, $2, 1); */ }
+                    | ".globalconst" const_tail "\n" { define_const(lexer, $2, 1);  }
                     ;
 
-const_tail: "int"    identifier '=' TK_INTC
-          | "num"    identifier '=' TK_NUMC
-          | "pmc"    identifier '=' TK_STRINGC
-          | "string" identifier '=' TK_STRINGC
+const_tail: "int"    identifier '=' TK_INTC     { $$ = new_iconst($2, $4); }
+          | "num"    identifier '=' TK_NUMC     { $$ = new_nconst($2, $4); }
+          | "pmc"    identifier '=' TK_STRINGC  { $$ = new_pconst($2, $4); }
+          | "string" identifier '=' TK_STRINGC  { $$ = new_sconst($2, $4); }
           ;
 
 pasm_expression: constant
