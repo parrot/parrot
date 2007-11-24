@@ -5,21 +5,39 @@
 This list is based on discussions with pmichaud and unimplemented
 items in the grammar, C<src/Grammar.pg>.
 
+Last updated: 2007-11-24
+
 =head2 Code
 
 =over 4
 
-=item * return
+=item * return statement
 
-Return needs to work on an exception model, and will likely require 
-PAST/POST changes to support it.
+While it seems like implementing C<return> would be a simple
+matter of generating PIR C<.return> statements, it's not quite
+that simple, because C<return> statements can occur inside of
+nested blocks.
+
+So, we need an NQP C<return> statement to throw a "return exception",
+which is then caught by the outermost block of the currently
+executing subroutine and then used as the argument to C<.return>.
+
+Fortunately, the new design of S05 means that we don't really need
+return statements for developing action grammars, so this is
+no longer as much of a priority as it was.
 
 =item * Namespace support
 
+NQP can currently look up symbols in other namespaces; we need
+to add the C<package>, C<module>, and C<class> keywords to NQP
+to be able to define symbols and subroutines into other namespaces.
+
 =item * Named argument (not param) support
 
-This will be added to PAST::Var by allowing parameter nodes to
-have a 'named' attribute.
+C<PAST> now supports named arguments in subroutines, we simply need
+to modify the grammar to parse named arguments in subroutine
+declarations and build the appropriate actions to fill in the 
+C<PAST::Var> parameter nodes.
 
 =back
 
@@ -29,11 +47,12 @@ have a 'named' attribute.
 
 =item * Method ops
 
-This may be very hard since we don't have any methods!
+We should be able to load an external module (Pm suggests Test.pbc)
+and exercise methods using that.
 
-=item * Hash key access C<$E<lt>someKeyE<gt>>
+=item * Hash key access C<$varE<lt>someKeyE<gt>>
 
-=item * List member access C<$[index]>
+=item * List member access C<$var[index]>
 
 =item * Match variable access C<$/>
 
