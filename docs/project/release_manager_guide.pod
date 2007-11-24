@@ -41,8 +41,7 @@ F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
 Also update the version number, date, and your name in the
-following files: F<DEVELOPING>, F<docs/parrothist.pod>,
-and F<docs/ROADMAP.pod>
+the files: F<DEVELOPING> and F<docs/parrothist.pod>.
 
 =item b
 

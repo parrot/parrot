@@ -36,7 +36,8 @@ This is the B<highest> priority.
 
 =head1 RELEASE HISTORY
 
-For a list of new and fixed features in each release see L<../NEWS>.
+For a list of previous releases see F<parrothist.pod>.
+For a list of new and fixed features in each release see F<../NEWS>.
 
 =head1 OVERVIEW
 

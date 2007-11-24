@@ -106,4 +106,6 @@ the strings?).
 
  Will      0.4.17         2007-Oct-17     "Two for Finching"
 
+ chromatic 0.5.0          2007-Nov-20     "Caulked Snack"
+
 =cut
