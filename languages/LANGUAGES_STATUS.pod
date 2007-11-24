@@ -183,7 +183,7 @@ Passes all tests. Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
@@ -653,7 +653,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.4.13
+0.5.0
 
 =item Location
 
@@ -996,7 +996,7 @@ Part of languages smoke testing. Almost all tests are succeeding.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
