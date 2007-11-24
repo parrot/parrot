@@ -123,11 +123,6 @@ with someone who should know.)
 
 Document project goals and priorities.
 
-=item *
-
-L<memory_internals.pod> has a question about whether or not string reuse is
-limited to a single user or multiple users.
-
 =back
 
 =head2 DESIGN
