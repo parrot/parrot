@@ -2,6 +2,14 @@
  * $Id$
  * Copyright (C) 2007, The Perl Foundation.
  */
+
+/*
+ * This file contains the interface to the PIR compiler's back-end.
+ * It defines all AST nodes that are used to build an abstract
+ * syntax tree from the input.
+ *
+ */
+
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
@@ -67,6 +75,18 @@ typedef enum sub_flags {
 
 } sub_flag;
 
+
+/* types of uses for invocation structure. */
+typedef enum invoke_type {
+    CALL_PCC   = 0x001,     /* a normal invocation */
+    CALL_NCI   = 0x002,     /* an NCI invocation   */
+    CALL_METH  = 0x004,     /* a method invocation */
+    CALL_RET   = 0x008,     /* returning values    */
+    CALL_YIELD = 0x010,     /* yielding values     */
+    CALL_TAIL  = 0x020      /* a tail call         */
+
+} invoke_type;
+
 /* use these macros for manipulating bits; don't do it yourself */
 #define SET_FLAG(obj,flag)      obj |= flag
 #define CLEAR_FLAG(obj,flag)    obj &= ~flag
@@ -94,9 +114,9 @@ typedef struct constant {
 
 
 
-/* */
+/* expression wrapper node. */
 typedef struct expression {
-    union x {
+    union __expression {
         struct target *t;
         constant      *c;
         char          *id;
@@ -120,8 +140,8 @@ typedef struct target {
     char    *name;
     int      regno;
 
-    int flags;
-    char *named_flag_arg;
+    int      flags;
+    char    *named_flag_arg;
 
     struct target *next;
 
@@ -134,8 +154,8 @@ typedef struct target {
  */
 typedef struct argument {
     expression *value;
-    int flags;
-    char *named_flag_arg;
+    int         flags;
+    char       *named_flag_arg;
 
     struct argument *next;
 
@@ -150,21 +170,25 @@ typedef struct argument {
  * .return foo(), .return foo.bar(), .return x :flat
  */
 typedef struct invocation {
+    invoke_type type;
     char *object;
     char *sub;
+    char *retcc;
 
     target   *results;
     argument *arguments;
 
 } invocation;
 
-
+/* a parrot instruction */
 typedef struct instruction {
     char       *opname;
     expression *operands;
 
 } instruction;
 
+
+/* a statement can be either a parrot instruction or function call */
 
 typedef enum statement_types {
     STAT_TYPE_INSTRUCTION,
@@ -173,16 +197,15 @@ typedef enum statement_types {
 } statement_type;
 
 
-/* a single instruction */
 typedef struct statement {
     char      *label;
     statement_type type;  /* indicates which field of the union is used */
 
-    union {
+    union __statement {
         instruction *ins;
         invocation  *inv;
-
-    } instr;
+    }
+    instr;
 
     struct statement *next;
 
@@ -266,6 +289,10 @@ target *add_target(struct lexer_state *lexer, target *t, target *newt);
 
 target *new_target(pir_type type, char *name);
 target *reg(int type, int regno);
+
+
+invocation *invoke(invoke_type, char *invokable1, char *invokable2);
+void set_invocation_flag(invocation *inv, invoke_type flag);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

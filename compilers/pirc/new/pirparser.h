@@ -251,16 +251,17 @@ typedef union YYSTYPE
     double dval;
     int    ival;
     char  *sval;
-
-    struct constant *constval;
+    struct constant    *constval;
     struct instruction *instr;
-    struct expression *expr;
-    struct target *targ;
-    struct argument *argm;
-    void  *fixme;
+    struct expression  *expr;
+    struct target      *targ;
+    struct argument    *argm;
+    struct invocation  *invo;
+
+    void *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 264 "pirparser.h"
+#line 265 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

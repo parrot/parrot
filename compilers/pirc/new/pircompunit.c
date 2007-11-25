@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 
 #define out stderr
@@ -72,6 +73,7 @@ new_target(pir_type type, char *name) {
 target *
 add_target(struct lexer_state *lexer, target *t, target *t2) {
 
+    if (t2 == NULL) return t;
     return t;
 }
 
@@ -163,6 +165,27 @@ set_instr(struct lexer_state *lexer, char *opname) {
     lexer->currentstat->type = STAT_TYPE_INSTRUCTION;
 }
 
+/*
+Invert the current instruction. "if" becomes "unless", and all rel_op's are also inverted.
+
+If we would code the opnames as integers, this would be more efficient. THis will
+be the case anyway in the future, but for now, we'd like to pretty-print everything.
+
+*/
+void
+invert_instr(struct lexer_state *lexer) {
+    char *instr = lexer->currentstat->instr.ins->opname;
+    if (strcmp(instr, "if") == 0) instr = "unless"; /* it's never 'unless' by default. */
+    else if (strcmp(instr, "isgt") == 0) instr = "isle";
+    else if (strcmp(instr, "isge") == 0) instr = "islt";
+    else if (strcmp(instr, "isle") == 0) instr = "isgt";
+    else if (strcmp(instr, "islt") == 0) instr = "isge";
+    else if (strcmp(instr, "isne") == 0) instr = "iseq";
+    else if (strcmp(instr, "iseq") == 0) instr = "isne";
+    /* and set the new instruction */
+    lexer->currentstat->instr.ins->opname = instr;
+}
+
 /* constant constructors */
 
 static constant *
@@ -215,6 +238,7 @@ new_invocation(void) {
     invocation *inv = (invocation *)malloc(sizeof (invocation));
     inv->sub       = NULL;
     inv->object    = NULL;
+    inv->retcc     = NULL;
     inv->results   = NULL;
     inv->arguments = NULL;
     return inv;
@@ -324,6 +348,46 @@ expr_from_ident(char *id) {
     expression *e = new_expr(EXPR_IDENT);
     e->expr.id = id;
     return e;
+}
+
+void
+set_invocation_args(invocation *inv, argument *args) {
+
+}
+
+void
+set_invocation_results(invocation *inv, target *results) {
+
+}
+
+void
+set_invocation_flag(invocation *inv, invoke_type flag) {
+    SET_FLAG(inv->type, flag);
+}
+
+invocation *
+invoke(invoke_type type, char *obj1, char *obj2) {
+    invocation *inv = new_invocation();
+    SET_FLAG(inv->type, type);
+
+    switch (type) {
+        case CALL_PCC:
+            inv->sub   = obj1;
+            inv->retcc = obj2;
+            break;
+        case CALL_NCI:
+            inv->sub   = obj1;
+            inv->retcc = NULL;
+            break;
+        case CALL_METH:
+            inv->object = obj1;
+            inv->sub    = obj2;
+            break;
+        default:
+            fprintf(stderr, "Fatal error: unknown invoke_type\n");
+            exit(EXIT_FAILURE);
+    }
+    return inv;
 }
 
 /*
