@@ -285,6 +285,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/exit.h"
 #include "parrot/nci.h"
 #include "parrot/thread.h"
+#include "parrot/scheduler.h"
 #include "parrot/tsq.h"
 #include "parrot/longopt.h"
 #include "parrot/oo.h"

@@ -1,0 +1,248 @@
+/*
+Copyright (C) 2001-2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/scheduler.pmc - The concurrency scheduler
+
+=head1 DESCRIPTION
+
+Implements the core concurrency scheduler.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass Scheduler need_ext {
+
+/*
+
+=item C<void init()>
+
+Initialize a concurrency scheduler object.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_Scheduler *core_struct = mem_allocate_zeroed_typed(Parrot_Scheduler);
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Set up the core struct. */
+        PMC_data(SELF)           = core_struct;
+        core_struct->id          = 0;
+        core_struct->max_tid     = 0;
+        core_struct->task_list   = pmc_new(interp, enum_class_Hash);
+        core_struct->task_index  = pmc_new(interp, enum_class_ResizablePMCArray);
+        core_struct->handlers    = pmc_new(interp, enum_class_ResizablePMCArray);
+
+    }
+
+/*
+
+=item C<void push_pmc(PMC *value)>
+
+Insert a task into the task list, giving it a task ID one higher than the
+current maximum.
+
+=cut
+
+*/
+
+    void push_pmc(PMC *value) {
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        PMC * key = pmc_new(INTERP, enum_class_Integer);
+
+        core_struct->max_tid++;
+        VTABLE_set_integer_native(INTERP, key, core_struct->max_tid);
+
+        VTABLE_set_pmc_keyed(INTERP, core_struct->task_list, key, value);
+        VTABLE_push_pmc(INTERP, core_struct->task_index, key);
+    }
+
+/*
+
+=item C<PMC *pop_pmc()>
+
+Retrieve the next task from the task list. If the task index is invalid,
+recalculate it before retrieving the next task.
+
+=cut
+
+*/
+
+    PMC *pop_pmc() {
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+
+/*        if (!SCHEDULER_cache_valid_TEST(SELF))
+            Parrot_task_recalculate_index(INTERP, SELF); */
+
+        if (VTABLE_elements(INTERP, core_struct->task_index) > 0) {
+            PMC *key = VTABLE_pop_pmc(INTERP, core_struct->task_index);
+            return VTABLE_get_pmc_keyed(INTERP, core_struct->task_list, key);
+        }
+        else
+            return PMCNULL;
+
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free the scheduler's underlying struct.
+
+=cut
+
+*/
+    void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    void mark() {
+        if (PARROT_SCHEDULER(SELF)) {
+            Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+
+            if (core_struct->task_list)
+                pobject_lives(interp, (PObj*)core_struct->task_list);
+            if (core_struct->task_index)
+                pobject_lives(interp, (PObj*)core_struct->task_index);
+            if (core_struct->handlers)
+                pobject_lives(interp, (PObj*)core_struct->handlers);
+        }
+    }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the scheduler.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        INTVAL i, n;
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        PMC **pos;
+
+        /* 1) visit task list */
+        pos            = &core_struct->task_list;
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(INTERP, *pos, info);
+
+        /* 2) visit the handlers */
+        pos            = &core_struct->handlers;
+        info->thaw_ptr = pos;
+        (info->visit_pmc_now)(INTERP, *pos, info);
+    }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the scheduler.
+
+=cut
+
+*/
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+
+        /* 1) freeze scheduler id */
+        VTABLE_push_integer(INTERP, io, core_struct->id);
+
+        /* 2) freeze maximum task id */
+        VTABLE_push_integer(INTERP, io, core_struct->max_tid);
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the scheduler.
+
+=cut
+
+*/
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+
+        /* 1. thaw scheduler id */
+        INTVAL id = VTABLE_shift_integer(INTERP, io);
+
+        /* 2. thaw maximum task id */
+        INTVAL max_tid = VTABLE_shift_integer(INTERP, io);
+
+        /* Allocate the scheduler's core data struct and set custom flags. */
+        SELF.init();
+
+        /* Set the scheduler's id to the frozen id */
+        PARROT_SCHEDULER(SELF)->id = id;
+
+        /* Set the scheduler's maximum task id to the frozen tid */
+        PARROT_SCHEDULER(SELF)->max_tid = max_tid;
+    }
+
+/*
+
+=item C<void thawfinish(visit_info *info)>
+
+Called after the scheduler has been thawed.
+
+=cut
+
+*/
+
+    void thawfinish(visit_info *info) {
+        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+
+        /* TODO: Rebuild the task index. */
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd15_objects.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
