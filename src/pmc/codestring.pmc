@@ -64,10 +64,10 @@ A newline is automatically added to the end of the fmt.
   PCCMETHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
     INTVAL pos          = 0;
     INTVAL replen       = 0;
-    STRING *percent     = string_from_literal(INTERP, "%");
-    STRING *comma       = string_from_literal(INTERP, ",");
-    STRING *comma_space = string_from_literal(INTERP, ", ");
-    STRING *newline     = string_from_literal(INTERP, "\n");
+    STRING *percent     = CONST_STRING(INTERP, "%");
+    STRING *comma       = CONST_STRING(INTERP, ",");
+    STRING *comma_space = CONST_STRING(INTERP, ", ");
+    STRING *newline     = CONST_STRING(INTERP, "\n");
     STRING *key, *repl, *S0, *S1;
     INTVAL I0, I1;
 
@@ -173,8 +173,8 @@ prefixed with 'unicode:'.
 
   PCCMETHOD escape(STRING *str) {
     STRING *escaped_str = string_escape_string(INTERP, str);
-    STRING *quote       = string_from_literal(INTERP, "\"");
-    STRING *x           = string_from_literal(INTERP, "\\x");
+    STRING *quote       = CONST_STRING(INTERP, "\x22");
+    STRING *x           = CONST_STRING(INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
     UNUSED(SELF);
@@ -188,14 +188,14 @@ prefixed with 'unicode:'.
     }
     else
     {
-        STRING *u = string_from_literal(INTERP, "\\u");
+        STRING *u = CONST_STRING(INTERP, "\\u");
         INTVAL u_pos = string_str_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }
 
     if (is_unicode) {
-        STRING *unicode = string_from_literal(INTERP, "unicode:");
+        STRING *unicode = CONST_STRING(INTERP, "unicode:");
         escaped_str     = string_concat(INTERP, unicode, escaped_str, 1);
     }
 
@@ -214,15 +214,14 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 */
 
   PCCMETHOD key(PMC *args :slurpy) {
-    STRING *open_bracket  = string_from_literal(INTERP, "[");
-    STRING *semi          = string_from_literal(INTERP, ";");
-    STRING *close_bracket = string_from_literal(INTERP, "]");
-    STRING *s_array       = string_from_literal(INTERP, "array");
+    STRING *open_bracket  = CONST_STRING(INTERP, "[");
+    STRING *semi          = CONST_STRING(INTERP, ";");
+    STRING *close_bracket = CONST_STRING(INTERP, "]");
+    STRING *s_array       = CONST_STRING(INTERP, "array");
     STRING *prefix        = open_bracket;
-    STRING *out;
+    STRING *out           = CONST_STRING(INTERP, "");
     INTVAL elements, index;
 
-    out          = string_from_literal(INTERP, "");
     elements     = VTABLE_elements(INTERP, args);
 
     for (index = 0; index < elements; index++) {
