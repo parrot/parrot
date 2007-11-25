@@ -570,7 +570,7 @@ Creates a subclass, optionally with a given C<name>.
 
 =item C<void destroy()>
 
-Free the memory associated with the object's underlying struct.
+Free the memory associated with the class's underlying struct.
 
 =cut
 
