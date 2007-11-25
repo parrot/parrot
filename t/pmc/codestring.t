@@ -155,11 +155,17 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'namespace keys' );
     $P0 = split ' ', unicode:"abc def T\xe9st"
     $S0 = code.'key'($P0 :flat)
     say $S0
+    $S0 = code.'key'($P0)
+    say $S0
+    $S0 = code.'key'('_perl6', $P0)
+    say $S0
 .end
 CODE
 ["abc"]
 ["abc";"def"]
 ["abc";"def";unicode:"T\x{e9}st"]
+["abc";"def";unicode:"T\x{e9}st"]
+["_perl6";"abc";"def";unicode:"T\x{e9}st"]
 OUTPUT
 
 # Local Variables:
