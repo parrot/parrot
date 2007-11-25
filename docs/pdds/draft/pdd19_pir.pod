@@ -869,6 +869,53 @@ the C<assign_pmc> vtable function.
 
 }}
 
+=head1 EXAMPLES
+
+=head2 Subroutine Definition
+
+  .sub _sub_label [Subpragma, ...]
+   .param int a # I5
+   .param int b # I6
+   .param int c # I7
+  ...
+  .pcc_begin_return
+   .return xy   # e.g. I5
+  .pcc_end_return
+  ...
+  .end
+
+=head2 Subroutine Call
+
+  .const .Sub $P0 = "_sub_label"
+  $P1 = new 'Continuation'
+  set_addr $P1, ret_addr
+  ...
+  .local int x
+  .local num y
+  .local str z
+  .pcc_begin
+  .arg x
+  .arg y
+  .arg z
+  .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
+  ret_addr:
+  .local int r  # optional - new result var
+  .result r
+  .pcc_end
+
+=head2 Subroutine Call Syntactic Sugar
+
+  ...  # variable decls
+  r = _sub_label(x, y, z)
+  (r1[, r2 ...]) = _sub_label(x, y, z)
+  _sub_label(x, y, z)
+
+Instead of the label a subroutine object can be used too:
+
+   find_global $P0, "_sub_label"
+   $P0(args)
+
+
 =head1 ATTACHMENTS
 
 N/A
