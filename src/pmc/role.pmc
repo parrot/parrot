@@ -67,7 +67,7 @@ typedef struct Parrot_Role {
 static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 {
     Parrot_Role * const role = PARROT_ROLE(self);
-    STRING        *ns_string = string_from_literal(interp, "NameSpace");
+    STRING        *ns_string = CONST_STRING(interp, "NameSpace");
     int have_name, have_ns;
     PMC *old_ns;
     int i;
@@ -78,10 +78,10 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
     /* Check if we have a name and/or a namespace. */
     have_name = VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "name"));
+        CONST_STRING(interp, "name"));
 
     have_ns = VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "namespace"));
+        CONST_STRING(interp, "namespace"));
 
     /* Take a copy of the current namespace the role is attached to. */
     old_ns = role->_namespace;
@@ -92,7 +92,7 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         /* If we weren't passed a NameSpace PMC, assume it's something we have
          * to look one up with and do so. */
         PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "namespace"));
+            CONST_STRING(interp, "namespace"));
         if (!VTABLE_isa(interp, _namespace, ns_string))
             _namespace = Parrot_make_namespace_autobase(interp, _namespace);
 
@@ -104,14 +104,14 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
         /* Set a (string) name. */
         role->name = VTABLE_get_string_keyed_str(interp, info,
-            string_from_literal(interp, "name"));
+            CONST_STRING(interp, "name"));
     }
 
     /* Otherwise, we may just have a name. */
     else if (have_name) {
         /* Set the name. */
         role->name = VTABLE_get_string_keyed_str(interp, info,
-            string_from_literal(interp, "name"));
+            CONST_STRING(interp, "name"));
 
         /* Namespace is nested in the current namespace and with the name of
          * the role. */
@@ -124,7 +124,7 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         /* If we weren't passed a NameSpace PMC, assume it's something we have
          * to look one up with and do so. */
         PMC *_namespace = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "namespace"));
+            CONST_STRING(interp, "namespace"));
         if (!VTABLE_isa(interp, _namespace, ns_string))
             _namespace = Parrot_make_namespace_autobase(interp, _namespace);
 
@@ -142,21 +142,21 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
      * need to unset ourselves in the old namespace. */
     if (!PMC_IS_NULL(old_ns) && role->_namespace != old_ns)
         Parrot_PCCINVOKE(interp, old_ns,
-            string_from_literal(interp, "set_class"),
+            CONST_STRING(interp, "set_class"),
             "P->", PMCNULL);
 
     /* Link namespace to this role, if there is one. */
     if (!PMC_IS_NULL(role->_namespace))
         Parrot_PCCINVOKE(interp, role->_namespace,
-            string_from_literal(interp, "set_class"),
+            CONST_STRING(interp, "set_class"),
             "P->", self);
 
     /* Initialize roles, if we have any. */
     if (VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "roles"))) {
+        CONST_STRING(interp, "roles"))) {
         /* Loop over roles array and compose them. */
         PMC *role_list = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "roles"));
+            CONST_STRING(interp, "roles"));
         int role_count = VTABLE_elements(interp, role_list);
         for (i = 0; i < role_count; i++) {
             PMC *cur_role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
@@ -166,10 +166,10 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
     /* Initialize attributes, if we have any. */
     if (VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "attributes"))) {
+        CONST_STRING(interp, "attributes"))) {
         /* Loop over attributes array and add them. */
         PMC *attrib_name_list = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "attributes"));
+            CONST_STRING(interp, "attributes"));
 
         int attrib_count = VTABLE_elements(interp, attrib_name_list);
 
@@ -182,10 +182,10 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
     /* Initialize methods, if we have any. */
     if (VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "methods"))) {
+        CONST_STRING(interp, "methods"))) {
         /* Get the methods hash. */
         PMC *methods = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "methods"));
+            CONST_STRING(interp, "methods"));
 
         /* Iterate over the list of methods. */
         PMC *iter = VTABLE_get_iter(interp, methods);

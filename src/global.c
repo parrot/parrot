@@ -261,7 +261,7 @@ PMC *
 Parrot_make_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
 {
     PMC *base_ns;
-    if (VTABLE_isa(interp, key, string_from_literal(interp, "String")))
+    if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
         base_ns = CONTEXT(interp->ctx)->current_namespace;
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
@@ -293,7 +293,7 @@ PMC *
 Parrot_get_namespace_autobase(PARROT_INTERP, NULLOK(PMC *key))
 {
     PMC *base_ns;
-    if (VTABLE_isa(interp, key, string_from_literal(interp, "String")))
+    if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
         base_ns = CONTEXT(interp->ctx)->current_namespace;
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,

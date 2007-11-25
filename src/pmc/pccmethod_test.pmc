@@ -38,7 +38,7 @@ pmclass PCCMETHOD_Test need_ext does hash {
     PCCMETHOD test_method2(int a1 :optional, int a1o :opt_flag,
                            PMC *slurpy_pos :slurpy)
     {
-        STRING *kevin = string_from_literal(interp, "KEVIN");
+        STRING *kevin = CONST_STRING(interp, "KEVIN");
         UNUSED(SELF);
         PIO_printf(interp, "test_method2\n");
         PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o,

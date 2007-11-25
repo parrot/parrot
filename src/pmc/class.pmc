@@ -128,7 +128,7 @@ build_attrib_index(PARROT_INTERP, PMC *self)
 
                 /* Get attribute name and append it to the key. */
                 STRING *attrib_name = VTABLE_get_string_keyed_str(
-                    interp, cur_attrib, string_from_literal(interp, "name"));
+                    interp, cur_attrib, CONST_STRING(interp, "name"));
 
                 full_key = string_append(interp, full_key, attrib_name);
 
@@ -220,11 +220,11 @@ static void
 init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 {
     Parrot_Class *_class      = PARROT_CLASS(self);
-    STRING       *name_str    = string_from_literal(interp, "name");
-    STRING       *parents_str = string_from_literal(interp, "parents");
-    STRING       *methods_str = string_from_literal(interp, "methods");
-    STRING       *roles_str   = string_from_literal(interp, "roles");
-    STRING       *attrs_str   = string_from_literal(interp, "attributes");
+    STRING       *name_str    = CONST_STRING(interp, "name");
+    STRING       *parents_str = CONST_STRING(interp, "parents");
+    STRING       *methods_str = CONST_STRING(interp, "methods");
+    STRING       *roles_str   = CONST_STRING(interp, "roles");
+    STRING       *attrs_str   = CONST_STRING(interp, "attributes");
     PMC          *old_ns;
     INTVAL        i, type_num;
 
@@ -292,20 +292,19 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     /* If we were attached to a namespace and are now attached to a new one,
      * need to unset ourselves in the old namespace. */
     if (!PMC_IS_NULL(old_ns) && _class->_namespace != old_ns)
-        Parrot_PCCINVOKE(interp, old_ns,
-            string_from_literal(interp, "set_class"), "P->", PMCNULL);
+        Parrot_PCCINVOKE(interp, old_ns, CONST_STRING(interp, "set_class"), "P->", PMCNULL);
 
     /* Link namespace to this class, if there is one. */
     if (!PMC_IS_NULL(_class->_namespace))
         Parrot_PCCINVOKE(interp, _class->_namespace,
-            string_from_literal(interp, "set_class"), "P->", self);
+            CONST_STRING(interp, "set_class"), "P->", self);
 
     /* Initialize resolve_method. */
     if (VTABLE_exists_keyed_str(interp, info,
-        string_from_literal(interp, "resolve_method"))) {
+        CONST_STRING(interp, "resolve_method"))) {
         /* Set it. */
         _class->resolve_method = VTABLE_get_pmc_keyed_str(interp, info,
-            string_from_literal(interp, "resolve_method"));
+            CONST_STRING(interp, "resolve_method"));
     }
 
     /* Initialize parents, if we have any. */
@@ -372,7 +371,7 @@ static void
 initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 {
     INTVAL  parent_index = VTABLE_elements(interp, all_parents) - 1;
-    STRING *name         = string_from_literal(interp, "init");
+    STRING *name         = CONST_STRING(interp, "init");
 
     /* Loop through the parents in reverse MRO order. */
     for (; parent_index >= 0; parent_index--) {
@@ -384,7 +383,7 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
         if (parent->vtable->base_type == enum_class_PMCProxy) {
             PMC * proxy = VTABLE_instantiate(interp, parent, PMCNULL);
             VTABLE_set_attr_keyed(interp, object, parent,
-                    string_from_literal(interp, "proxy"), proxy);
+                    CONST_STRING(interp, "proxy"), proxy);
         }
 
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);
@@ -399,7 +398,7 @@ static void
 initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
 {
     INTVAL  parent_index = VTABLE_elements(interp, all_parents) - 1;
-    STRING *name         = string_from_literal(interp, "init_pmc");
+    STRING *name         = CONST_STRING(interp, "init_pmc");
 
     /* Loop through the parents in reverse MRO order. */
     for (; parent_index >= 0; parent_index--) {
@@ -411,7 +410,7 @@ initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
         if (parent->vtable->base_type == enum_class_PMCProxy) {
             PMC * proxy = VTABLE_instantiate(interp, parent, init);
             VTABLE_set_attr_keyed(interp, object, parent,
-                    string_from_literal(interp, "proxy"), proxy);
+                    CONST_STRING(interp, "proxy"), proxy);
         }
 
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);

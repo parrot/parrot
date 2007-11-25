@@ -251,7 +251,7 @@ RT#46673 implement freeze/thaw and use that instead.
     }
 
     STRING *get_repr() {
-        STRING *res = string_from_literal(INTERP, "(");
+        STRING *res = CONST_STRING(INTERP, "(");
         INTVAL  n   = VTABLE_elements(INTERP, SELF);
         INTVAL  i;
         PMC    *val;
@@ -345,8 +345,10 @@ Returns the Parrot string value of the element at index C<key>.
 
     STRING *get_string_keyed_int(INTVAL key) {
         PMC *tempPMC = DYNSELF.get_pmc_keyed_int(key);
+
         if (PMC_IS_NULL(tempPMC))
-                return string_from_literal(interp, "");
+            return CONST_STRING(interp, "");
+
         return VTABLE_get_string(INTERP, tempPMC);
     }
 

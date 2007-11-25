@@ -163,8 +163,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
          * as property "_struct"
          */
         PMC * const ptr = VTABLE_get_pmc_keyed_int(interp, init, ix);
-        init            = VTABLE_getprop(interp, ptr,
-                string_from_literal(interp, "_struct"));
+        init            = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
 
         PARROT_ASSERT(init &&
             (init->vtable->base_type == enum_class_UnManagedStruct ||
@@ -373,7 +372,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
 
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
                 PMC *sig = VTABLE_getprop(interp, ptr,
-                        string_from_literal(interp, "_signature"));
+                        CONST_STRING(interp, "_signature"));
                 if (VTABLE_defined(interp, sig)) {
                     STRING *sig_str = VTABLE_get_string(interp, sig);
                     ret             = pmc_new(interp, enum_class_NCI);
@@ -533,7 +532,7 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
          * so go through that struct and check
          */
         nested = VTABLE_getprop(interp, type_pmc,
-            string_from_literal(interp, "_struct"));
+            CONST_STRING(interp, "_struct"));
         nested_init = PMC_pmc_val(nested);
     }
     if (type == enum_type_struct) {
@@ -617,7 +616,7 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 
         if (type == enum_type_struct) {
             PMC *nested = VTABLE_getprop(interp, type_pmc,
-                    string_from_literal(interp, "_struct"));
+                    CONST_STRING(interp, "_struct"));
             size        = PMC_int_val(nested);
         }
         else

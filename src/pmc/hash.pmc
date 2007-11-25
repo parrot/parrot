@@ -374,7 +374,7 @@ Return a representation of the hash contents.
     STRING *get_repr() {
         /* RT#44643 use freeze */
         PMC * const  iter = VTABLE_get_iter(INTERP, SELF);
-        STRING      *res  = string_from_literal(INTERP, "{");
+        STRING      *res  = CONST_STRING(INTERP, "{");
         const INTVAL n    = VTABLE_elements(INTERP, SELF);
         INTVAL       j;
 

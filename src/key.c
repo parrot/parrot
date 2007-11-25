@@ -20,6 +20,7 @@ The base vtable calling functions.
 
 #include "parrot/parrot.h"
 #include "parrot/key.h"
+#include "key.str"
 
 /* HEADERIZER HFILE: include/parrot/key.h */
 
@@ -617,7 +618,7 @@ key_set_to_string(PARROT_INTERP, NULLOK(PMC *key))
                 break;
             default:
                 value = string_append(interp, value,
-                        string_from_literal(interp, "Key type unknown"));
+                        CONST_STRING(interp, "Key type unknown"));
                 break;
         }
 

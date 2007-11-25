@@ -477,7 +477,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 {
     switch (info_wanted) {
     case PARROT_OS:
-        return string_from_literal(interp, BUILD_OS_NAME);
+        return CONST_STRING(interp, BUILD_OS_NAME);
     case PARROT_OS_VERSION:
     case PARROT_OS_VERSION_NUMBER:
     case CPU_ARCH:

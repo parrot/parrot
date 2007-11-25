@@ -51,7 +51,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))
 
         /* Import any methods. */
         Parrot_PCCINVOKE(interp, ns,
-            string_from_literal(interp, "get_associated_methods"), "->P", &methods);
+            CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
         if (!PMC_IS_NULL(methods)) {
             PMC *iter = VTABLE_get_iter(interp, methods);
 
@@ -65,7 +65,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))
 
         /* Import any vtable methods. */
         Parrot_PCCINVOKE(interp, ns,
-            string_from_literal(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
+            CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
         if (!PMC_IS_NULL(vtable_overrides)) {
             PMC *iter = VTABLE_get_iter(interp, vtable_overrides);
             while (VTABLE_get_bool(interp, iter)) {
@@ -80,7 +80,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, NOTNULL(PMC *self))
 
                 /* Strip leading underscores in the vtable name */
                 if (string_str_index(interp, vtable_name,
-                    string_from_literal(interp, "__"), 0) == 0) {
+                    CONST_STRING(interp, "__"), 0) == 0) {
                     vtable_name = string_substr(interp, vtable_name, 2,
                         string_length(interp, vtable_name) - 2, NULL, 0);
                 }
@@ -241,12 +241,15 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_newclass_from_str(PARROT_INTERP, NOTNULL(STRING *name))
 {
-    PMC *namearg, *namehash, *classobj;
-    namearg = pmc_new(interp, enum_class_String);
+    PMC *namearg = pmc_new(interp, enum_class_String);
+    PMC *namehash, *classobj;
+
     VTABLE_set_string_native(interp, namearg, name);
     namehash = pmc_new(interp, enum_class_Hash);
+
     VTABLE_set_pmc_keyed_str(interp, namehash,
-        string_from_literal(interp, "name"), namearg);
+        CONST_STRING(interp, "name"), namearg);
+
     classobj = pmc_new_init(interp, enum_class_Class, namehash);
 
     PARROT_ASSERT(classobj);

@@ -2439,7 +2439,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, NOTNULL(PMC *_class))
 
     /* Now get immediate parents list. */
     Parrot_PCCINVOKE(interp, _class,
-         string_from_literal(interp, "parents"),
+         CONST_STRING(interp, "parents"),
         "->P", &immediate_parents);
 
     if (immediate_parents == NULL)
@@ -2530,7 +2530,7 @@ Parrot_ComposeRole(PARROT_INTERP, NOTNULL(PMC *role),
 
     /* Get the methods from the role. */
     Parrot_PCCINVOKE(interp, role,
-        string_from_literal(interp, "methods"), "->P", &methods);
+        CONST_STRING(interp, "methods"), "->P", &methods);
 
     if (PMC_IS_NULL(methods))
         return;
@@ -2649,7 +2649,7 @@ Parrot_ComposeRole(PARROT_INTERP, NOTNULL(PMC *role),
      * as roles "flatten" the methods they get from other roles into their
      * own method list. */
     Parrot_PCCINVOKE(interp, role,
-        string_from_literal(interp, "roles"), "->P", &roles_of_role);
+        CONST_STRING(interp, "roles"), "->P", &roles_of_role);
     roles_of_role_count = VTABLE_elements(interp, roles_of_role);
 
     for (i = 0; i < roles_of_role_count; i++) {

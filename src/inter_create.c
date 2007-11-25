@@ -22,6 +22,7 @@ Create or destroy a Parrot interpreter
 #include "parrot/parrot.h"
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
+#include "inter_create.str"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -89,7 +90,7 @@ Setup default compiler for PASM.
 static void
 setup_default_compreg(PARROT_INTERP)
 {
-    STRING * const pasm1 = string_from_literal(interp, "PASM1");
+    STRING * const pasm1 = CONST_STRING(interp, "PASM1");
 
     /* register the nci compiler object */
     Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);

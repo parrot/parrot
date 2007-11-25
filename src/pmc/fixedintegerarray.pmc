@@ -337,7 +337,7 @@ Returns the Parrot string representation C<key>.
 */
 
     STRING *get_repr() {
-        STRING *res = string_from_literal(INTERP, "[ ");
+        STRING *res = CONST_STRING(INTERP, "[ ");
         INTVAL  n   = VTABLE_elements(INTERP, SELF);
         INTVAL  j;
         PMC    *val;

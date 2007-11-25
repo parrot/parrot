@@ -657,8 +657,8 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
     STRING *get_repr() {
         INTVAL  j;
-        INTVAL  n = VTABLE_elements(INTERP, SELF);
-        STRING *res = string_from_literal(INTERP, "[ ");
+        INTVAL  n   = VTABLE_elements(INTERP, SELF);
+        STRING *res = CONST_STRING(INTERP, "[ ");
 
         for (j = 0; j < n; ++j) {
             PMC *val = SELF.get_pmc_keyed_int(j);
