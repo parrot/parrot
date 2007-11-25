@@ -170,6 +170,12 @@ Compose a role. Takes one argument, the name of the role to compose. [NOTE:
 this modifier has been taken from the older feature C<does> which is now called
 C<provides>.]
 
+=item resolves
+
+Resolve a conflicting vtable function, method, or attribute from a composed
+role by using the same named vtable function, method, or attribute from the
+current C<pmclass> or C<prole>.
+
 =item provides
 
 The PMC satisfies a particular low-level interface, which gives some assurances
