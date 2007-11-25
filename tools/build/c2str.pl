@@ -139,7 +139,7 @@ HEADER
 
         # RT#46909 maybe cope with escaped \"
         my $cnt = tr/"/"/;
-        die "bogus CONST_STRING at line $line" unless $cnt == 2;
+        die "bogus CONST_STRING at line $line" if $cnt % 2;
 
         my $str = extract_delimited;    # $_, '"';
         $str = substr $str, 1, -1;
