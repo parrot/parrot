@@ -571,6 +571,24 @@
 .end
 
 
+##    method package_declarator($/, $key) {
+##        my $past := $($/{$key});
+##        $past.namespace($<name><ident>);
+##        make $past;
+##    }
+.sub 'package_declarator' :method
+    .param pmc match
+    .param pmc key
+    .local pmc past
+    $P0 = match[key]
+    past = $P0.'get_scalar'()
+    $P1 = match['name']
+    $P1 = $P1['ident']
+    past.'namespace'($P1)
+    match.'result_object'(past)
+.end
+
+
 ##    method scope_declarator($/) {
 ##        my $past := $($<variable>);
 ##        my $name := $past.name();
@@ -703,7 +721,7 @@
 
 ##    method subcall($/, $key?) {
 ##        my $past := $($<arglist>);
-##        $past.name(~$<name>);
+##        $past.name(~$<ident>);
 ##        $past.pasttype('call');
 ##        $past.node($/);
 ##        make $past;
@@ -714,7 +732,7 @@
     .local pmc past
     $P0 = match['arglist']
     past = $P0.'get_scalar'()
-    $S0 = match['name']
+    $S0 = match['ident']
     past.'name'($S0)
     past.'pasttype'('call')
     past.'node'(match)

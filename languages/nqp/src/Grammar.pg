@@ -211,6 +211,7 @@ rule arglist {
 
 token noun {
     | <colonpair> {*}                                      #= colonpair
+    | <package_declarator> {*}                             #= package_declarator
     | <scope_declarator> {*}                               #= scope_declarator
     | <routine_def> {*}                                    #= routine_def
     | <circumfix> {*}                                      #= circumfix
@@ -223,6 +224,16 @@ token noun {
 
 token colonpair {
     | ':' <ident> [ '(' <EXPR> <+ws> ')' ] {*}
+}
+
+
+rule package_declarator {
+    $<sym>:=[module|class]
+    <name>
+    [
+    || ';' <statement_block> {*}                           #= statement_block
+    || <block> {*}                                         #= block
+    ]
 }
 
 
@@ -278,7 +289,7 @@ token number { \d+ {*} }
 
 
 token subcall {
-    <name> '(' <arglist> ')'
+    <ident> '(' <arglist> ')'
     {*}
 }
 
