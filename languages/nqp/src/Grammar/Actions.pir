@@ -78,23 +78,62 @@
 
 
 ##    method TOP($/, $key) {
-##        self.block($/, $key);
-##        if ($key eq 'close') {
-##            $($/).blocktype('declaration');
-##        }
+##        my $past := $($<statement_block>);
+##        $past.blocktype('declaration');
+##        make $past;
 ##    }
 .sub 'TOP' :method
     .param pmc match
-    .param string key
-    self.'block'(match, key)
-    if key != 'close' goto end
-    $P0 = match.'get_scalar'()
-    $P0.'blocktype'('declaration')
-  end:
+    .local pmc past
+    $P0 = match['statement_block']
+    past = $P0.'get_scalar'()
+    past.'blocktype'('declaration')
+    match.'result_object'(past)
 .end
 
 
 #### Blocks and Statements ####
+
+##    method statement_block($/, $key) {
+##        our $?BLOCK, @?BLOCK;
+##        if ($key ne 'close') {
+##            $?BLOCK := PAST::Block.new( PAST::Stmts.new(),
+##                                        :blocktype('immediate'),
+##                                        :node($/) );
+##            unshift @?BLOCK, $?BLOCK;
+##        }
+##        else {
+##            my $past := shift @?BLOCK;
+##            $?BLOCK := @?BLOCK[0];
+##            $past.push($($<statement_list>));
+##            make $past;
+##        }
+##    }
+.sub 'statement_block' :method
+    .param pmc match
+    .param string key
+    if key == 'close' goto block_close
+  block_open:
+    .local pmc past
+    $P1 = get_hll_global ['PAST'], 'Stmts'
+    $P2 = $P1.'new'()
+    $P0 = get_hll_global ['PAST'], 'Block'
+    past = $P0.'new'($P2, 'blocktype'=>'immediate', 'node'=>match)
+    set_global '$?BLOCK', past
+    $P0 = get_global '@?BLOCK'
+    unshift $P0, past
+    .return ()
+  block_close:
+    $P0 = get_global '@?BLOCK'
+    past = shift $P0
+    $P1 = $P0[0]
+    set_global '$?BLOCK', $P1
+    $P2 = match['statement_list']
+    $P3 = $P2.'get_scalar'()
+    past.'push'($P3)
+    match.'result_object'(past)
+.end
+
 
 ##    method statement_list($/) {
 ##        my $past := PAST::Stmts.new(node=>$/)
@@ -198,43 +237,13 @@
 
 
 ##    method block($/, $key) {
-##        our $?BLOCK, @?BLOCK;
-##        if ($key ne 'close') {
-##            $?BLOCK := PAST::Block.new( PAST::Stmts.new(),
-##                                        :blocktype('immediate'),
-##                                        :node($/) );
-##            unshift @?BLOCK, $?BLOCK;
-##        }
-##        else {
-##            my $past := shift @?BLOCK;
-##            $?BLOCK := @?BLOCK[0];
-##            $past.push($($<statement_list>));
-##            make $past;
-##        }
+##        make $($<statement_block>);
 ##    }
 .sub 'block' :method
     .param pmc match
-    .param string key
-    if key == 'close' goto block_close
-  block_open:
-    .local pmc past
-    $P1 = get_hll_global ['PAST'], 'Stmts'
-    $P2 = $P1.'new'()
-    $P0 = get_hll_global ['PAST'], 'Block'
-    past = $P0.'new'($P2, 'blocktype'=>'immediate', 'node'=>match)
-    set_global '$?BLOCK', past
-    $P0 = get_global '@?BLOCK'
-    unshift $P0, past
-    .return ()
-  block_close:
-    $P0 = get_global '@?BLOCK'
-    past = shift $P0
-    $P1 = $P0[0]
-    set_global '$?BLOCK', $P1
-    $P2 = match['statement_list']
-    $P3 = $P2.'get_scalar'()
-    past.'push'($P3)
-    match.'result_object'(past)
+    $P0 = match['statement_block']
+    $P0 = $P0.'get_scalar'()
+    match.'result_object'($P0)
 .end
 
 

@@ -5,10 +5,9 @@ grammar NQP::Grammar is PCT::Grammar;
 
 
 token TOP {
-  {*}                                                      #= open
-  <statement_list>
+  <statement_block>
   [ $ | <panic: Syntax error> ]
-  {*}                                                      #= close
+  {*}
 }
 
 ##  The <ws> and <pod_comment> rules handle whitespace and comments.
@@ -58,6 +57,14 @@ regex pod_comment {
 
 
 #### Blocks and Statements ####
+
+##  A <statement_block> is a statement list that is returned as
+##  a PAST::Block node.
+rule statement_block {
+    {*}                                                    #= open
+    <statement_list>
+    {*}                                                    #= close
+}
 
 ##  Parse a list of statements.
 rule statement_list {
@@ -131,8 +138,7 @@ rule return_statement {
 
 token block {
     '{'
-    {*}                                                    #= open
-    <statement_list>
+    <statement_block>
     [ '}' | <panic: Missing '}'> ]
     [
         \h* [ \# \N* ]? \n
@@ -142,7 +148,7 @@ token block {
         }}
         <+ws>
     ]?
-    {*}                                                    #= close
+    {*}
 }
 
 
