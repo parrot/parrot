@@ -79,6 +79,11 @@
 
 ##    method TOP($/, $key) {
 ##        my $past := $($<statement_block>);
+##        my $stmts := $past[1];
+##        #  if the top block is really only a single block, return it
+##        if (@($stmts) == 1 && $stmts[0].WHAT == 'PAST::Block') {
+##            $past := $stmts[0];
+##        }
 ##        $past.blocktype('declaration');
 ##        make $past;
 ##    }
@@ -87,6 +92,16 @@
     .local pmc past
     $P0 = match['statement_block']
     past = $P0.'get_scalar'()
+    .local pmc stmts
+    stmts = past[1]
+    $P0 = stmts.get_array()
+    $I0 = elements $P0
+    if $I0 != 1 goto have_past
+    $P0 = stmts[0]
+    $I0 = isa $P0, 'PAST::Block'
+    unless $I0 goto have_past
+    past = stmts[0]
+  have_past:
     past.'blocktype'('declaration')
     match.'result_object'(past)
 .end
@@ -252,10 +267,12 @@
 ##    method routine_def($/) {
 ##        my $past := $($<block>);
 ##        $past.name(~$<ident>);
-##        $past.blocktype('declaration');
 ##        $past.node($/);
-##        if $<declarator> eq 'method' { $past.pragma(':method'); }
+##        $past.blocktype('declaration');
 ##        my $params := $past[0];
+##        if $<declarator> eq 'method' {
+##            $past.blocktype('method');
+##        }
 ##        for $<signature>[0] {
 ##            my $param_var := $($_<param_var>);
 ##            $past.symbol($param_var.name(), :scope('lexical'));
@@ -270,14 +287,14 @@
     past = $P0.'get_scalar'()
     $S0 = match['ident']
     past.'name'($S0)
-    past.'blocktype'('declaration')
     past.'node'(match)
-    $S0 = match['declarator']
-    if $S0 != 'method' goto add_signature
-    past.'pragma'(':method')
-  add_signature:
+    past.'blocktype'('declaration')
     .local pmc params
     params = past[0]
+    $S0 = match['declarator']
+    if $S0 != 'method' goto add_signature
+    past.'blocktype'('method')
+  add_signature:
     $P0 = match['signature']
     $P0 = $P0[0]
     unless $P0 goto param_end
