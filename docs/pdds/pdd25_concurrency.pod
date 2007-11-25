@@ -190,23 +190,36 @@ The concurrency scheduler has two parts, a Scheduler PMC, which has an
 instance stored in the interpreter struct, and a set of core routines in
 F<src/scheduler.c>.
 
-An instance of the Scheduler PMC has 3 internal attributes, which are:
+An instance of the Scheduler PMC has 5 internal attributes, which are:
 
 =over 4
 
 =item 1
 
-The task list
+An unique ID for the scheduler
 
 =item 2
 
-The task priority index
+The current highest assigned task ID
 
 =item 3
+
+The task list
+
+=item 4
+
+The task priority index
+
+=item 5
 
 The list of handlers
 
 =back
+
+The unique ID of the scheduler is used by other schedulers to pass messages.
+With a small set of identifying information (including process ID, interpreter
+ID, scheduler ID, and possibly a URL/hostname) a scheduler can address other
+schedulers, both local to the current interpreter and remote.
 
 The task list is a simple unordered integer indexed data structure, currently
 implemented as a hash. Each task in the list has an integer ID assigned when it
@@ -235,38 +248,70 @@ The list of handlers is a simple stack of handler PMCs currently waiting for an
 appropriate task (event, exception). See PDD 24 on Events for more details on
 event handlers.
 
+=head3 Flags
+
+PMC flags 0-7 are reserved for private use by a PMC. The scheduler uses flag 0
+to indicate whether the priority index is currently valid or needs to be
+recalculated before the next use.
+
+=head3 Vtable Functions
+
+=over 4
+
+=item push_pmc
+
+Add an entry to the task list.
+
+=item pop_pmc
+
+Pull the next entry (the highest ranked entry in the task priority index) off
+the task list. If there are no tasks remaining in the task list, return null.
+
+=back
+
 =head2 Task PMC API
 
 The interface of the Task PMC is also the minimum required interface for all
 subclasses, extensions, and alternate implementations of a task.
 
-An instance of the Task PMC has 5 internal attributes, which are:
+An instance of the Task PMC has 7 internal attributes, which are:
 
 =over 4
 
 =item 1
 
-The type of the task
+The task ID
 
 =item 2
 
-The priority of the task
+The type of the task
 
 =item 3
 
-The birthtime stamp of the task
+The priority of the task
 
 =item 4
 
-The code block of the task (optional)
+The birthtime stamp of the task
 
 =item 5
+
+The status of the task
+
+=item 6
+
+The code block of the task (optional)
+
+=item 7
 
 An interpreter structure for the task (optional)
 
 =back
 
-Types of tasks include 'event', 'exception', 'io', and 'code'.
+Types of tasks include 'event', 'exception', 'io', and 'code'. Possible status
+values for tasks include 'created', 'invoked', 'inprocess', and 'completed'.
+The final state of a task is 'destroyed', but is never marked (the task PMC is
+removed from the task list and at some later point destroyed by GC).
 
 The birthtime stamp is the point at which the task was inserted into the task
 list, and is used for calculating the age of tasks.
@@ -274,6 +319,20 @@ list, and is used for calculating the age of tasks.
 The code block is optional and only for tasks that are associated with a simple
 code block. The interpreter structure is also optional and only used for
 thread-like tasks that maintain their own interpreter state.
+
+=head3 Vtable Functions
+
+=over 4
+
+=item get_attr_str
+
+Retrieve an attribute of the task.
+
+=item set_attr_str
+
+Set an attribute of the task.
+
+=back
 
 =head2 Opcodes
 
