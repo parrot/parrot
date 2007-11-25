@@ -204,8 +204,8 @@ the sub.
     name = node.'name'()
     name = code.'escape'(name)
 
-    .local string pragmas
-    pragmas = ''
+    .local string flags
+    flags = ''
 
     .local pmc outerpost
     .local string outer
@@ -215,13 +215,14 @@ the sub.
     unless outerpost goto have_outer
     outer = outerpost.'name'()
     outer = code.'escape'(outer)
-    pragmas = concat ':outer(', outer
-    concat pragmas, ')'
+    flags = concat ' :outer(', outer
+    concat flags, ')'
   have_outer:
 
     $S0 = node.'blocktype'()
     if $S0 != 'method' goto have_method
-    concat pragmas, ' :method'
+    flags = ' :method'                           # FIXME: RT#47794
+    # concat flags, ' :method'                   # FIXME: RT#47794
   have_method:
 
     .local pmc ns
@@ -231,7 +232,7 @@ the sub.
     code.'emit'("\n.namespace %0", ns)
   namespace_done:
 
-    code.'emit'("\n.sub %0 %1", name, pragmas)
+    code.'emit'("\n.sub %0%1", name, flags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
