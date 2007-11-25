@@ -20,7 +20,7 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
   exception = new 'Exception'
   exception[0] = 'Exhausted Range'
   throw exception
-.local $more:
+.label $more:
 .endm
 
 .macro exhausted()
