@@ -192,6 +192,10 @@ new_lexer(char * const filename) {
     lexer->line_pos      = 1;
     lexer->parse_errors  = 0;
 
+    lexer->subs          = NULL;
+    lexer->currentstat   = NULL;
+    lexer->is_instr      = 0;
+
     printdebug(stderr, "Constructing new lexer\n");
 
     return lexer;
@@ -389,15 +393,15 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                return TK_STRINGC;
              }
 
-"P"{DIGIT}+  { return TK_PASM_PREG; }
-"S"{DIGIT}+  { return TK_PASM_SREG; }
-"N"{DIGIT}+  { return TK_PASM_NREG; }
-"I"{DIGIT}+  { return TK_PASM_IREG; }
+"P"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_PREG; }
+"S"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_SREG; }
+"N"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_NREG; }
+"I"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_IREG; }
 
-"$P"{DIGIT}+  { return TK_SYM_PREG; }
-"$S"{DIGIT}+  { return TK_SYM_SREG; }
-"$N"{DIGIT}+  { return TK_SYM_NREG; }
-"$I"{DIGIT}+  { return TK_SYM_IREG; }
+"$P"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_PREG; }
+"$S"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_SREG; }
+"$N"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_NREG; }
+"$I"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_IREG; }
 
 {IDENT}":"    { /* make the label Id available in the parser. remove the ":" first. */
                 yylval->sval = dupstrn(yytext, yyleng - 1);

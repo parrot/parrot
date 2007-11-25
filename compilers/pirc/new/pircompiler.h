@@ -14,9 +14,12 @@ typedef struct lexer_state {
     char                   *filename;
     int                     line_nr;
     int                     line_pos;
-
+    int                     is_instr; /* keeps track whether the parser is parsing an instruction */
     subroutine             *subs;
+    statement              *currentstat;
 
+    char *temp_flag_arg1;
+    char *temp_flag_arg2;
 
 
 } lexer_state;
