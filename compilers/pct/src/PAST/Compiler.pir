@@ -233,7 +233,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
     outerpost = get_global '$?SUB'
-    
+
     ##  create a POST::Sub node for this block
     .local string blocktype
     blocktype = node.'blocktype'()
@@ -267,19 +267,35 @@ Return the POST representation of a C<PAST::Block>.
     if rtype == '*' goto have_result
     result = bpost.'unique'('$P')
   have_result:
+
     name = bpost.'escape'(name)
+    $I0 = defined ns
+    unless $I0 goto have_ns_key
+    $P0 = new 'CodeString'
+    ns = $P0.'key'(ns)
+  have_ns_key:
 
     if blocktype == 'immediate' goto block_immediate
     if rtype == '*' goto block_done
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
+    if ns goto block_decl_ns
     bpost.'push_pirop'('find_name', result, name, 'result'=>result)
+    goto block_done
+  block_decl_ns:
+    bpost.'push_pirop'('get_hll_global', result, ns, name, 'result'=>result)
     goto block_done
 
   block_immediate:
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
+    if ns goto block_immediate_ns
     bpost.'push_pirop'('call', name, 'result'=>result)
+    goto block_done
+  block_immediate_ns:
+    $S0 = bpost.'unique'('$P')
+    bpost.'push_pirop'('get_hll_global', $S0, ns, name, 'result'=>$S0)
+    bpost.'push_pirop'('call', $S0, 'result'=>result)
 
   block_done:
     ##  remove current block from @?BLOCK
