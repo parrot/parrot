@@ -11,7 +11,7 @@ Last updated: 2007-11-24
 
 =over 4
 
-=item * return statement
+=item * C<return> statement
 
 While it seems like implementing C<return> would be a simple
 matter of generating PIR C<.return> statements, it's not quite
@@ -23,8 +23,19 @@ which is then caught by the outermost block of the currently
 executing subroutine and then used as the argument to C<.return>.
 
 Fortunately, the new design of S05 means that we don't really need
-return statements for developing action grammars, so this is
-no longer as much of a priority as it was.
+return statements for developing action grammars (see C<make> below), 
+so this is no longer as much of a priority as it was.
+
+=item * C<make> support
+
+S05 now identifies the C<make> function as being the mechanism 
+used to set the result object for a match object.  (Previously
+one would do this via C<return>.)  
+
+We could implement 'make' as a standard function call, but this
+then requires runtime support.  Instead it would be better if it
+could be converted into equivalent inline PIR  (essentially,
+lexically look up C<$/> and call 'result_object' on it).
 
 =item * Namespace support
 
