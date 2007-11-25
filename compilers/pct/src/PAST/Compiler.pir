@@ -94,9 +94,11 @@ third and subsequent children can be any value they wish.
 
     ##  if the signature contains a ':', then we're doing 
     ##  flagged arguments (:flat, :named)
+    .local pmc posargs, namedargs
+    null posargs
+    null namedargs
     $I0 = index signature, ':'
     if $I0 < 0 goto nocolon
-    .local pmc posargs, namedargs
     posargs = new 'ResizableStringArray'
     namedargs = new 'ResizableStringArray'
   nocolon:
@@ -113,12 +115,11 @@ third and subsequent children can be any value they wish.
     cpast = shift iter
     cpost = self.'post'(cpast, 'rtype'=>rtype)
     ops.'push'(cpost)
-    if rtype != ':' goto iter_rtype
+    if null posargs goto iter_rtype
+    if rtype != ':' goto iter_pos
     .local pmc npast, npost
     npast = cpast.'named'()
-    if npast goto iter_named
-    push posargs, cpost
-    goto iter_rtype
+    unless npast goto iter_pos
   iter_named:
     npost = self.'post'(npast, 'rtype'=>'~')
     ops.'push'(npost)
@@ -128,6 +129,9 @@ third and subsequent children can be any value they wish.
     concat $S0, $S1
     concat $S0, ')'
     push namedargs, $S0
+    goto iter_rtype
+  iter_pos:
+    push posargs, cpost
   iter_rtype:
     unless sigidx < sigmax goto iter_loop
     inc sigidx
@@ -373,7 +377,7 @@ with a 'pasttype' attribute of either 'call' or 'callmethod'.
     unshift posargs, name
     goto children_done
   call_first_arg:
-    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'v~:')
+    (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>'vP:')
   children_done:
 
     .local string result, rtype
