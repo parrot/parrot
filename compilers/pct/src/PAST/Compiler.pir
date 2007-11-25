@@ -717,7 +717,7 @@ blocks to determine the scope.
 
   package_ns:
     $P1 = new 'CodeString'
-    ns = $P1.'key'(ns :flat)
+    ns = $P1.'key'(ns)
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)

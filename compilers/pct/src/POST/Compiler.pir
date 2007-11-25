@@ -219,13 +219,7 @@ the sub.
     .local pmc ns
     ns = node.'namespace'()
     unless ns goto namespace_done
-    $I0 = does ns, 'array'
-    if $I0 goto namespace_array
     ns = code.'key'(ns)
-    goto namespace_emit
-  namespace_array:
-    ns = code.'key'(ns :flat)
-  namespace_emit:
     code.'emit'("\n.namespace %0", ns)
   namespace_done:
 
