@@ -64,8 +64,8 @@ sub generate_c_file {
 
     $c->emit( dont_edit( $self->filename ) );
     $c->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
-    $c->emit( $self->preamble );
     $self->gen_includes;
+    $c->emit( $self->preamble );
     $self->gen_methods;
     my $ro = $self->ro;
     if ($ro) {
