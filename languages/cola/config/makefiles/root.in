@@ -43,8 +43,8 @@ LIBS    =
 HEADERS = cola.h parser.h
 
 default :
-	-$(CHMOD) 775 colacc$(EXE)
 	$(MAKE) colacc$(EXE)
+	-$(CHMOD) 775 colacc$(EXE)
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
