@@ -43,16 +43,14 @@ sub runstep {
 
     my $languages = $conf->options->get('languages');
     $languages = qq{
-        APL amber abc befunge bf cardinal c99 cola dotnet eclectus ecmascript forth HQ9plus
-        jako lisp lua m4 nqp ook parrot_compiler perl5 perl6 pheme PIR plumhead
-        pugs punie pynie regex scheme tap tcl urm WMLScript Zcode
+        APL amber abc befunge bf cardinal c99 cola eclectus
+        ecmascript forth HQ9plus jako lisp lolcode lua m4 nqp ook
+        parrot_compiler perl5 perl6 pheme PIR plumhead pugs punie
+        pynie regex scheme tap tcl urm WMLScript Zcode
     } unless defined $languages;
 
     foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
-        if ( $language eq 'dotnet' ) {
-            system( 'cd languages/dotnet; perl Configure.pl' );
-        }
-        elsif ( $language eq 'tcl' ) {
+        if ( $language eq 'tcl' ) {
             # tcl has more than one Makefile
             # currently this is handled as a special case
             genfile(
