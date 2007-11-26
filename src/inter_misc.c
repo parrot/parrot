@@ -478,7 +478,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
     switch (info_wanted) {
     case PARROT_OS:
         /*  XXX Can't use CONST_STRING here yet, as it needs literal strings*/
-        return string_from_literal(interp, BUILD_OS_NAME)
+        return string_from_literal(interp, BUILD_OS_NAME);
     case PARROT_OS_VERSION:
     case PARROT_OS_VERSION_NUMBER:
     case CPU_ARCH:
