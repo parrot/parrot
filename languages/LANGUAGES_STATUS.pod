@@ -470,7 +470,8 @@ Lua 5.1 Standard Libraries (a large subset) implemented in PIR.
 
 Part of languages smoke testing.
 
-See details in F<languages/lua/doc/status.pod>.
+See details in F<languages/lua/doc/status.pod> or at
+L<http://www.parrotcode.org/talks/LuaOnParrot.pdf>.
 
 =item Last verified with parrot version
 
