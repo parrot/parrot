@@ -149,7 +149,6 @@ init_world(PARROT_INTERP)
 {
     PMC *iglobals;
     PMC *self, *pmc;
-    int i;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
     Parrot_platform_init_code();

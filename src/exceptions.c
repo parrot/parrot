@@ -396,7 +396,6 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 count_exception_handlers(PARROT_INTERP)
 {
-    char *m;
     INTVAL stack_depth = 0;
     INTVAL eh_depth = 0;
     Stack_Entry_t *e;
@@ -433,7 +432,6 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 get_exception_handler(PARROT_INTERP, INTVAL target_depth)
 {
-    char *m;
     INTVAL stack_depth = 0;
     INTVAL eh_depth = 0;
     Stack_Entry_t *e;
@@ -473,10 +471,9 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 get_all_exception_handlers(PARROT_INTERP)
 {
-    char *m;
     int depth = 0;
     Stack_Entry_t *e;
-    PMC *all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC * const all_entries = pmc_new(interp, enum_class_ResizablePMCArray);
 
     while ((e = stack_entry(interp, interp->dynamic_env, depth)) != NULL) {
         if (e->entry_type == STACK_ENTRY_PMC) {
