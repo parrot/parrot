@@ -566,7 +566,9 @@ node with a 'pasttype' of bind.
     ops = $P0.'new'('node'=>node)
     rpost = self.'post'(rpast, 'rtype'=>'P')
     ops.'push'(rpost)
+
     .local string scope
+    lpast.lvalue(1)
     scope = self.'scope'(lpast)
     $P0 = find_method self, scope
     lpost = self.$P0(lpast, rpost)
