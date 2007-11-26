@@ -118,7 +118,7 @@ Returns 1 if all assigned sources are connected, 0 otherwise.
     if i == 0 goto NOT_CONNECTED
 
     # create an iterator for the sources
-    new sources, .Iterator, sources
+    new sources, 'Iterator', sources
     set sources, .ITERATE_FROM_START
 
 LOOP:
@@ -162,11 +162,11 @@ Reads from all assigned sources and calls the combiner.
     if i == 0 goto END_OF_STREAM
 
     # create an iterator for the sources
-    new sources, .Iterator, sources
+    new sources, 'Iterator', sources
     set sources, .ITERATE_FROM_START
 
     # create the string array
-    new args, .ResizableStringArray
+    new args, 'ResizableStringArray'
 
 READ_LOOP:
     unless sources goto CALL

@@ -83,7 +83,7 @@ lp1:
     if $I0 == 10 goto lp2
     if $I0 == 13 goto lp2
     sub $I0, 64			# make compacter code
-    p = new SArray		# argument passing for sprintf
+    p = new 'SArray'		# argument passing for sprintf
     p = 1
     push p, $I0
     sprintf $S0, "%06b", p

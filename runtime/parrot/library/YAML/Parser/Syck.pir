@@ -33,7 +33,7 @@ Parses a YAML string and returns a data structure.
 
     # prepare user data
     .local pmc user_data
-    user_data = new String
+    user_data = new 'String'
 
     .local string library_name
     library_name = 'libsyck'
@@ -58,7 +58,7 @@ Parses a YAML string and returns a data structure.
     yaml_handler_wrapped = new_callback yaml_handler, user_data, "vUp"	# Z in pdd16
 
     .local pmc synchronous
-    synchronous = new Integer
+    synchronous = new 'Integer'
     synchronous = 1
     setprop user_data, "_synchronous", synchronous
 
@@ -139,8 +139,8 @@ NOT_LOADED:
 
     # external_data is an UnManagedStruct PMC containing node info
     .local pmc external_data_decl, data_str_decl, data_str
-    external_data_decl = new ResizablePMCArray
-    data_str_decl      = new ResizablePMCArray
+    external_data_decl = new 'ResizablePMCArray'
+    data_str_decl      = new 'ResizablePMCArray'
 
     # id
     push external_data_decl, .DATATYPE_INT

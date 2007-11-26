@@ -73,7 +73,7 @@ drawn, in pixels.
     setattribute  self, 'font', font
 
     .local pmc size_value
-    size_value = new Integer
+    size_value = new 'Integer'
     size_value = font_size
     setattribute self, 'size', size_value
 
@@ -179,7 +179,7 @@ argument is an integer and is optional.
 
     if have_size == 0 goto getter
 
-    size_value = new Integer
+    size_value = new 'Integer'
     size_value = size
     setattribute self, 'size', size_value
 

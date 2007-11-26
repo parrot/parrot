@@ -70,11 +70,11 @@ END:
     .local pmc temp
 
     # reset source
-    new temp, .Undef
+    new temp, 'Undef'
     setattribute self, 'source', temp
 
     # reset includes
-    new temp, .ResizablePMCArray
+    new temp, 'ResizablePMCArray'
     setattribute self, 'includes', temp
 .end
 

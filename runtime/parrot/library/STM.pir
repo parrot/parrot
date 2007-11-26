@@ -3,9 +3,9 @@
 .sub _init :load
     # print "loaded STM runtime library\n"
     # Create globals
-    $P0 = new ResizablePMCArray
+    $P0 = new 'ResizablePMCArray'
     store_global 'STM', 'ends', $P0
-    $P0 = new ResizableIntegerArray
+    $P0 = new 'ResizableIntegerArray'
     store_global 'STM', 'statuses', $P0
 .end
 
@@ -44,7 +44,7 @@ restart_tx:
 
     #print "ENTER TX\n"
 
-    the_result = new Undef
+    the_result = new 'Undef'
     
     .local pmc _thelper
     _thelper = global '_transaction_helper'
@@ -80,7 +80,7 @@ do_redo:
     goto restart_tx
 do_extract:
     #print "EXTRACT\n"
-    $P0 = new STMLog
+    $P0 = new 'STMLog'
     stm_abort
     .return (STATUS_EXTRACT, $P0, the_result)
 do_commit:
@@ -111,7 +111,7 @@ do_return:
     #print "at depth "
     #print $I0
     #print "\n"
-    $P0 = new Undef
+    $P0 = new 'Undef'
     .return (status, $P0, the_result)
 .end
 
@@ -213,7 +213,7 @@ choice_part:
     .local int status 
     .local int i
 
-    save = new FixedPMCArray
+    save = new 'FixedPMCArray'
     $I0 = choices
     save = $I0
     i = 0

@@ -111,7 +111,7 @@ unescaped newlines.
 .sub escape_newlines :method
 	.param string message
 	.local pmc lines
-	lines = new ResizableStringArray
+	lines = new 'ResizableStringArray'
 
 	.local int newline_index
 	.local string line

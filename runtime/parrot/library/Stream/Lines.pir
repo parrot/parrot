@@ -132,7 +132,7 @@ BUFFER_END:
     .param string buffer
     .local pmc temp
 
-    new temp, .String
+    new temp, 'String'
     temp = buffer
     setattribute self, 'line_buffer', temp
 .end

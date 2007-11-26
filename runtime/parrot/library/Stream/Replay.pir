@@ -160,10 +160,10 @@ END:
 .sub init :vtable :method
     .local pmc temp
 
-    temp = new ResizableStringArray
+    temp = new 'ResizableStringArray'
     setattribute self, 'strings', temp
 
-    temp = new ResizablePMCArray
+    temp = new 'ResizablePMCArray'
     setattribute self, 'clones', temp
 .end
 

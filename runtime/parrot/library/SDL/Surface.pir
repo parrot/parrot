@@ -141,7 +141,7 @@ you have little reason to use it directly.
 
     pixels_entry  = layout[ 'pixels' ]
     pixels_struct = getprop '_struct', pixels_entry
-    pixels_layout = new OrderedHash
+    pixels_layout = new 'OrderedHash'
 
     if bpp ==  8 goto eight_bits
     if bpp == 16 goto sixteen_bits
@@ -276,7 +276,7 @@ at once.  Pass in an C<Array> of rects to update.
     rect_array_layout[1] = count
 
     .local pmc rect_array
-    rect_array = new ManagedStruct, rect_array_layout
+    rect_array = new 'ManagedStruct', rect_array_layout
 
     .local int iterator
     iterator = 0
