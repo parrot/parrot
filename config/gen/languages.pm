@@ -52,7 +52,6 @@ sub runstep {
         APL amber abc
         befunge bf
         cardinal c99 cola
-        dotnet
         eclectus ecmascript
         forth
         HQ9plus jako
@@ -71,7 +70,9 @@ sub runstep {
 
     foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
         if ( $language eq 'dotnet' ) {
-            system( 'cd languages/dotnet; perl Configure.pl' );
+            # RT#47792
+            # languages/dotnet/Configure.pl works only after the root 'perl Configure.pl'.
+            # system( 'cd languages/dotnet; perl Configure.pl' );
         }
         elsif ( $language eq 'tcl' ) {
             # tcl has more than one Makefile
