@@ -20,9 +20,9 @@
 
     optable['prefix:+'; 'inline'] = <<"        END"
         ##  inline prefix:+
-        $I0 = %0
-        %r = new 'Integer'
-        %r = $I0
+        $N0 = %0
+        %r = new 'Float'
+        %r = $N0
         END
 
     optable['infix:=='; 'inline'] = <<"        END"
@@ -787,7 +787,7 @@
 ##                                  :pasttype($<top><pasttype>),
 ##                                  :pirop($<top><pirop>),
 ##                                  :inline($<top><inline>),
-##                                  :islvalue($<top><lvalue>)
+##                                  :lvalue($<top><lvalue>)
 ##                                );
 ##        for @($/) {
 ##            $past.push($($_));
@@ -812,7 +812,7 @@
     inline = match['top'; 'inline']
     lvalue = match['top'; 'lvalue']
     $P0 = get_hll_global ['PAST'], 'Op'
-    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline, 'islvalue'=>lvalue)
+    past = $P0.'new'('node'=>match, 'name'=>name, 'pirop'=>pirop, 'pasttype'=>pasttype, 'inline'=>inline, 'lvalue'=>lvalue)
     $P1 = match.'get_array'()
     if null $P1 goto iter_end
     .local pmc iter
