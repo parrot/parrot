@@ -11,7 +11,7 @@ List the content of the directory 'docs'.
 
 =cut
 
-.sub _main @MAIN
+.sub _main :main
      .local pmc libc
      .local pmc opendir
      .local pmc readdir
