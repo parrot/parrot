@@ -109,8 +109,8 @@ children and attributes.  Returns the newly created node.
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    $S0 = classname self                                   # FIXME
-    $P1 = new $S0                                          # FIXME
+    $P0 = typeof self
+    $P1 = new $P0
     $P1.'init'(children :flat, adverbs :flat :named)
     .return ($P1)
 .end
