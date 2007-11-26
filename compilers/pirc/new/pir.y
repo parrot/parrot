@@ -75,6 +75,9 @@ extern YY_DECL;
 
 #define IS_PASM_REG     1
 
+#define MAX_NUM_ERRORS  10
+
+
 %}
 
 %union {
@@ -267,7 +270,7 @@ extern YY_DECL;
 
 %type <constval> const_tail constant
 
-%type <instr> statement
+
 
 %type <fixme> assignment_tail
               assignment_expression
@@ -278,6 +281,7 @@ extern YY_DECL;
               opt_namespace_id
               namespace_id
               keys
+
 
 
 /* needed for reentrancy */
@@ -330,7 +334,7 @@ compilation_unit: sub_definition
                 | pir_pragma
                 ;
 
-pir_pragma: ".pragma" "n_operators" TK_INTC  { set_pragma(PRAGMA_N_OPERATORS, $3); }
+pir_pragma: ".pragma" "n_operators" TK_INTC                 { set_pragma(PRAGMA_N_OPERATORS, $3); }
           ;
 
 loadlib: ".loadlib" TK_STRINGC                              { load_library(lexer, $2); }
@@ -404,11 +408,6 @@ parameters: /* empty */
 
 parameter: ".param" param_def param_flags "\n"      { set_param_flag($2, $3);
                                                       IF_NAMED_PARAM_SET_ALIAS($2, $3);
-                                                      /*
-                                                      if (TEST_FLAG($3, PARAM_FLAG_NAMED)) {
-                                                        set_param_named($2, lexer->temp_flag_arg1);
-                                                      }
-                                                      */
                                                     }
          ;
 
@@ -432,20 +431,28 @@ instruction: TK_LABEL "\n"          { set_label(lexer, $1); }
            | statement
            ;
 
-statement: conditional_statement    { }
-         | goto_statement           { }
-         | local_declaration        { }
-         | lex_declaration          { }
-         | const_decl_statement     { }
-         | return_statement         { }
-         | yield_statement          { }
-         | invocation_statement     { }
-         | assignment_statement     { }
-         | parrot_statement         { }
-         | getresults_statement     { }
-         | null_statement           { }
-         | error "\n"      { yyerrok; }
+statement: conditional_statement
+         | goto_statement
+         | local_declaration
+         | lex_declaration
+         | const_decl_statement
+         | return_statement
+         | yield_statement
+         | invocation_statement
+         | assignment_statement
+         | parrot_statement
+         | getresults_statement
+         | null_statement
+         | error_statement
          ;
+
+error_statement: error "\n" { if (lexer->parse_errors > MAX_NUM_ERRORS) {
+                                  fprintf(stderr, "Too many errors. Compilation aborted.\n");
+                                  exit(EXIT_FAILURE); /* fix: bail out and free() all memory */
+                              }
+                              yyerrok;
+                            }
+               ;
 
 null_statement: "null" target "\n"                          { set_instr(lexer, "null");
                                                               /* set arguments */
@@ -480,15 +487,15 @@ assignment_statement: target assignment_tail "\n"
 
 
 */
-assignment_tail: augmented_op expression            { new_rhs(lexer, RHS_AUGMENT, $1, $2); }
-               | keylist '=' expression             { new_rhs(lexer, RHS_SETKEYED, $1, $3); }
+assignment_tail: augmented_op expression            { assign(lexer, RHS_AUGMENT, $1, $2); }
+               | keylist '=' expression             { assign(lexer, RHS_SETKEYED, $1, $3); }
                | '=' assignment_expression          { /* nothing to do */ }
                ;
 
-assignment_expression: unop expression              { new_rhs(lexer, RHS_UNOP, $1, $2); }
-                     | expression1                  { new_rhs(lexer, RHS_SIMPLE, $1); }
-                     | expression binop expression  { new_rhs(lexer, RHS_BINOP, $2, $1, $3); }
-                     | target keylist               { new_rhs(lexer, RHS_GETKEYED, $1, $2); }
+assignment_expression: unop expression              { assign(lexer, RHS_UNOP, $1, $2); }
+                     | expression1                  { assign(lexer, RHS_SIMPLE, $1); }
+                     | expression binop expression  { assign(lexer, RHS_BINOP, $2, $1, $3); }
+                     | target keylist               { assign(lexer, RHS_GETKEYED, $1, $2); }
                      | parrot_instruction
                      ;
 
@@ -501,58 +508,20 @@ opt_parrot_op_args: /* empty */
                   | parrot_op_args
                   ;
 
-parrot_op_args: parrot_op_arg
-              | parrot_op_args ',' parrot_op_arg
+parrot_op_args: first_parrot_op_arg other_op_args
               ;
 
-parrot_op_arg: pasm_expression
+/* the first argument must be a normal expression */
+first_parrot_op_arg: pasm_expression
+                   ;
+
+/* later arguments can be either an expression or a keylist. */
+other_op_args: /* empty */
+             | other_op_args ',' other_op_arg
              ;
 
-unop: '-'     { $$ = "neg"; }
-    | '!'     { $$ = "not"; }
-    | '~'     { $$ = "bnot"; }
-    ;
-
-binop: '+'    { $$ = "add"; }
-     | '-'    { $$ = "sub"; }
-     | '/'    { $$ = "div"; }
-     | '*'    { $$ = "mul"; }
-     | '%'    { $$ = "mod"; }
-     | '|'    { $$ = "bor"; }
-     | '&'    { $$ = "band"; }
-     | '~'    { $$ = "bxor"; }
-     | "**"   { $$ = "pow"; }
-     | "."    { $$ = "concat"; }
-     | ">>>"  { $$ = "lsr"; }
-     | ">>"   { $$ = "shr"; }
-     | "<<"   { $$ = "shl"; }
-     | "||"   { $$ = "or";  }
-     | "&&"   { $$ = "and"; }
-     | "//"   { $$ = "fdiv"; }
-     | "~~"   { $$ = "xor"; }
-     | "=="   { $$ = "iseq"; }
-     | "<="   { $$ = "isle"; }
-     | "<"    { $$ = "islt"; }
-     | ">="   { $$ = "isge"; }
-     | ">"    { $$ = "isgt"; }
-     | "!="   { $$ = "isne"; }
-     ;
-
-
-augmented_op: "+="   { $$ = "add"; }
-            | "-="   { $$ = "sub"; }
-            | "*="   { $$ = "mul"; }
-            | "%="   { $$ = "mod"; }
-            | "**="  { $$ = "pow"; }
-            | "/="   { $$ = "div"; }
-            | "//="  { $$ = "fdiv"; }
-            | "|="   { $$ = "bor"; }
-            | "&="   { $$ = "band" }
-            | "~="   { $$ = "bxor"; }
-            | ".="   { $$ = "concat"; }
-            | ">>="  { $$ = "shr"; }
-            | "<<="  { $$ = "shl"; }
-            | ">>>=" { $$ = "lsr"; }
+other_op_arg: pasm_expression
+            | keylist
             ;
 
 keylist: '[' keys ']'              { $$ = $2; }
@@ -654,10 +623,10 @@ long_arguments: long_argument                               { $$ = $1; }
 long_argument: ".arg" short_arg "\n"                        { $$ = $2; }
              ;
 
-long_invocation: ".call" invokable opt_return_continuation  { $$ = invoke(CALL_PCC, $2, $3); }
-               | ".nci_call" invokable                      { $$ = invoke(CALL_NCI, $2, NULL); }
+long_invocation: ".call" invokable opt_return_continuation  { $$ = invoke(lexer, CALL_PCC, $2, $3); }
+               | ".nci_call" invokable                      { $$ = invoke(lexer, CALL_NCI, $2, NULL); }
                | ".invocant" invokable "\n"
-                 ".meth_call" method                        { $$ = invoke(CALL_METH, $2, $5); }
+                 ".meth_call" method                        { $$ = invoke(lexer, CALL_METH, $2, $5); }
                ;
 
 opt_return_continuation: /* empty */                        { $$ = NULL; }
@@ -691,13 +660,13 @@ simple_invocation: subcall
                  | methodcall
                  ;
 
-methodcall: invokable '.' method arguments                  { $$ = invoke(CALL_METH, $1, $3);
+methodcall: invokable '.' method arguments                  { $$ = invoke(lexer, CALL_METH, $1, $3);
                                                               set_invocation_args($$, $4);
                                                             }
           ;
 
 
-subcall: sub arguments                                      { $$ = invoke(CALL_PCC, $1, NULL);
+subcall: sub arguments                                      { $$ = invoke(lexer, CALL_PCC, $1, NULL);
                                                               set_invocation_args($$, $2);
                                                             }
        ;
@@ -732,11 +701,6 @@ result_target: target param_flags                 { $$ = $1;
                                                     set_param_flag($1, $2);
                                                     /* get the :named argument if necessary */
                                                     IF_NAMED_PARAM_SET_ALIAS($1, $2);
-                                                    /*
-                                                    if (TEST_FLAG($2, PARAM_FLAG_NAMED)) {
-                                                        set_param_named($1, lexer->temp_flag_arg1);
-                                                    }
-                                                    */
                                                   }
              ;
 
@@ -764,13 +728,13 @@ yield_statement: short_yield_statement
                | long_yield_statement
                ;
 
-short_return_statement: ".return" arguments "\n"           { $$ = invoke(CALL_RET, NULL, NULL);
+short_return_statement: ".return" arguments "\n"           { $$ = invoke(lexer, CALL_RET, NULL, NULL);
                                                              set_invocation_args($$, $2);
                                                            }
                       | ".return" simple_invocation "\n"   { set_invocation_flag($2, CALL_TAIL); }
                       ;
 
-short_yield_statement: ".yield" arguments "\n"             { $$ = invoke(CALL_YIELD, NULL, NULL);
+short_yield_statement: ".yield" arguments "\n"             { $$ = invoke(lexer, CALL_YIELD, NULL, NULL);
                                                              set_invocation_args($$, $2);
                                                            }
                      ;
@@ -805,14 +769,14 @@ short_arg: expression arg_flags                            { $$ = new_argument($
 
 long_return_statement: ".begin_return" "\n"
                        opt_return_expressions
-                       ".end_return" "\n"                  { $$ = invoke(CALL_RET, NULL, NULL);
+                       ".end_return" "\n"                  { $$ = invoke(lexer, CALL_RET, NULL, NULL);
                                                              set_invocation_args($$, $3);
                                                            }
                      ;
 
 long_yield_statement: ".begin_yield" "\n"
                       opt_yield_expressions
-                      ".end_yield" "\n"                    { $$ = invoke(CALL_YIELD, NULL, NULL);
+                      ".end_yield" "\n"                    { $$ = invoke(lexer, CALL_YIELD, NULL, NULL);
                                                              set_invocation_args($$, $3);
                                                            }
                     ;
@@ -922,7 +886,52 @@ identifier: TK_IDENT
           | TK_PARROT_OP
           ;
 
+unop: '-'     { $$ = "neg"; }
+    | '!'     { $$ = "not"; }
+    | '~'     { $$ = "bnot"; }
+    ;
 
+binop: '+'    { $$ = "add"; }
+     | '-'    { $$ = "sub"; }
+     | '/'    { $$ = "div"; }
+     | '*'    { $$ = "mul"; }
+     | '%'    { $$ = "mod"; }
+     | '|'    { $$ = "bor"; }
+     | '&'    { $$ = "band"; }
+     | '~'    { $$ = "bxor"; }
+     | "**"   { $$ = "pow"; }
+     | "."    { $$ = "concat"; }
+     | ">>>"  { $$ = "lsr"; }
+     | ">>"   { $$ = "shr"; }
+     | "<<"   { $$ = "shl"; }
+     | "||"   { $$ = "or";  }
+     | "&&"   { $$ = "and"; }
+     | "//"   { $$ = "fdiv"; }
+     | "~~"   { $$ = "xor"; }
+     | "=="   { $$ = "iseq"; }
+     | "<="   { $$ = "isle"; }
+     | "<"    { $$ = "islt"; }
+     | ">="   { $$ = "isge"; }
+     | ">"    { $$ = "isgt"; }
+     | "!="   { $$ = "isne"; }
+     ;
+
+
+augmented_op: "+="   { $$ = "add"; }
+            | "-="   { $$ = "sub"; }
+            | "*="   { $$ = "mul"; }
+            | "%="   { $$ = "mod"; }
+            | "**="  { $$ = "pow"; }
+            | "/="   { $$ = "div"; }
+            | "//="  { $$ = "fdiv"; }
+            | "|="   { $$ = "bor"; }
+            | "&="   { $$ = "band" }
+            | "~="   { $$ = "bxor"; }
+            | ".="   { $$ = "concat"; }
+            | ">>="  { $$ = "shr"; }
+            | "<<="  { $$ = "shl"; }
+            | ">>>=" { $$ = "lsr"; }
+            ;
 %%
 
 

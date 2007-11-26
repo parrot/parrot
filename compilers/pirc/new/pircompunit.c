@@ -55,6 +55,9 @@ new_sub(struct lexer_state *lexer, char *subname) {
     assert(newsub != NULL);
 
     newsub->sub_name = subname;
+    newsub->parameters = NULL;
+    newsub->statements = NULL;
+    newsub->stat_tail  = NULL;
 
     /* link the new sub into the list */
     newsub->next = lexer->subs;
@@ -94,7 +97,7 @@ set_param_named(target *t, char *alias) {
 
 void
 set_param_flag(target *param, param_flag flag) {
-
+    SET_FLAG(param->flags, flag);
 }
 
 argument *
@@ -142,8 +145,15 @@ new_instr(struct lexer_state *lexer) {
     statement *instr = (statement *)calloc(1, sizeof (statement));
     lexer->currentstat = instr;
 
-    instr->next = lexer->subs->statements;
-    lexer->subs->statements = instr;
+
+    /* only first time */
+    if (lexer->subs->statements == NULL) {
+        lexer->subs->stat_tail = lexer->subs->statements = instr;
+    }
+    else {
+        lexer->subs->stat_tail->next = instr;
+        lexer->subs->stat_tail = lexer->subs->stat_tail->next;
+    }
 
 }
 
@@ -262,11 +272,10 @@ set_invocation_object(struct lexer_state *lexer, variable *object) {
 
 
 void
-new_rhs(struct lexer_state *lexer, rhs_type type, ...) {
+assign(struct lexer_state *lexer, rhs_type type, ...) {
     va_list arg_ptr;
 
     va_start(arg_ptr, type);
-    fprintf(stderr, "new_rhs()\n");
 
     switch (type) {
         case RHS_BINOP:
@@ -354,12 +363,12 @@ expr_from_ident(char *id) {
 
 void
 set_invocation_args(invocation *inv, argument *args) {
-
+    inv->arguments = args;
 }
 
 void
 set_invocation_results(invocation *inv, target *results) {
-
+    inv->results = results;
 }
 
 void
@@ -368,27 +377,36 @@ set_invocation_flag(invocation *inv, invoke_type flag) {
 }
 
 invocation *
-invoke(invoke_type type, variable *obj1, variable *obj2) {
+invoke(struct lexer_state *lexer, invoke_type type, variable *obj1, variable *obj2) {
     invocation *inv = new_invocation();
     SET_FLAG(inv->type, type);
 
     switch (type) {
-        case CALL_PCC:
+        case CALL_PCC:  /* .call $P0, $P1 */
             inv->sub   = obj1;
             inv->retcc = obj2;
             break;
-        case CALL_NCI:
+        case CALL_NCI:  /* .nci_call $P0 */
             inv->sub   = obj1;
             inv->retcc = NULL;
             break;
-        case CALL_METH:
+        case CALL_METH: /* $P0.$P1() */
             inv->object = obj1;
             inv->sub    = obj2;
+            break;
+        case CALL_RET:
+
+            break;
+        case CALL_YIELD:
+        case CALL_TAIL:
             break;
         default:
             fprintf(stderr, "Fatal error: unknown invoke_type\n");
             exit(EXIT_FAILURE);
     }
+    lexer->currentstat->instr.inv = inv;
+    lexer->currentstat->type = STAT_TYPE_INVOCATION;
+
     return inv;
 }
 
@@ -444,6 +462,80 @@ set_hll(char *hll, char *lib) {
 void
 set_hll_map(char *stdtype, char *maptype) {
 
+}
+
+
+
+/* debug functions */
+
+
+void
+print_instruction(instruction *ins) {
+    assert(ins != NULL);
+
+    if (ins->opname) {
+        printf("  %s", ins->opname);
+
+
+        puts("");
+    }
+}
+
+void
+print_invocation(invocation *inv) {
+
+    switch (inv->type) {
+
+        case CALL_PCC:
+            printf("  get_results\n");
+            printf("  invoke\n");
+            break;
+        case CALL_RET:
+            printf("  set_returns\n");
+            printf("  returncc\n");
+            break;
+        case CALL_NCI:
+        case CALL_YIELD:
+        case CALL_TAIL:
+
+        case CALL_METH:
+            break;
+        default:
+            fprintf(stderr, "Unknown invocation type\n");
+            exit(EXIT_FAILURE);
+    }
+
+}
+
+void
+print_statement(subroutine *sub) {
+    statement *statiter = sub->statements;
+
+    while (statiter) {
+        switch (statiter->type) {
+            case STAT_TYPE_INSTRUCTION:
+                if (statiter->instr.ins)
+                    print_instruction(statiter->instr.ins);
+                break;
+            case STAT_TYPE_INVOCATION:
+                print_invocation(statiter->instr.inv);
+                break;
+            default:
+                fprintf(stderr, "Fatal error: unknown statement type\n");
+                exit(EXIT_FAILURE);
+        }
+        statiter = statiter->next;
+    }
+}
+
+void
+print_subs(struct lexer_state *lexer) {
+    subroutine *subiter = lexer->subs;
+
+    while (subiter) {
+        print_statement(subiter);
+        subiter = subiter->next;
+    }
 }
 
 /*

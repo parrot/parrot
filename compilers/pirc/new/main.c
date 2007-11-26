@@ -163,6 +163,8 @@ main(int argc, char *argv[])
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
     }
 
+    print_subs(lexer);
+
     /* clean up after playing */
     yylex_destroy(yyscanner);
     free(lexer);

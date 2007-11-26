@@ -279,8 +279,9 @@ typedef struct subroutine {
     char **multi_types;
 
 
-    target      *parameters;
-    statement   *statements;
+    target    *parameters;
+    statement *statements;
+    statement *stat_tail;
 /*
     LIST(param, parameters);
     LIST(instr, instructions);
@@ -337,7 +338,7 @@ target *new_target(pir_type type, char *name);
 target *reg(int type, int regno, int is_pasm);
 
 
-invocation *invoke(invoke_type, variable *invokable1, variable *invokable2);
+invocation *invoke(struct lexer_state *lexer, invoke_type, variable *invokable1, variable *invokable2);
 void set_invocation_flag(invocation *inv, invoke_type flag);
 
 variable *var_from_string(char *str);
@@ -365,7 +366,7 @@ void set_invocation_results(invocation *inv, target *results);
 void declare_local(struct lexer_state *lexer, char *id, int use_unique_reg);
 void set_lex_flag(target *t, char *lexname);
 void invert_instr(struct lexer_state *lexer);
-void new_rhs(struct lexer_state *lexer, rhs_type type, ...);
+void assign(struct lexer_state *lexer, rhs_type type, ...);
 
 
 
