@@ -18,14 +18,14 @@
   .sym int ii,jj
   ii = 1
   jj = 0
-.local $argv_loop:
+.label $argv_loop:
   if ii >= argc  goto .$argv_loop_done
   $P0 = argv[ii]
   tcl_argv[jj] = $P0
   inc ii
   inc jj
   goto .$argv_loop
-.local $argv_loop_done:
+.label $argv_loop_done:
   store_global '$argv', tcl_argv
 .endm
 
