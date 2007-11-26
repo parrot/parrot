@@ -75,7 +75,7 @@ C<compreg> opcode.
 
 Accessor for the C<parsegrammar> attribute.
 
-=item parseactions([string actions])
+=item parseactions([actions])
 
 Accessor for the C<parseactions> attribute.
 
@@ -97,7 +97,7 @@ Accessor for the 'ostgrammar' attribute.
 
 
 .sub 'parseactions' :method
-    .param string value        :optional
+    .param pmc value           :optional
     .param int has_value       :opt_flag
     .return self.'attr'('$parseactions', value, has_value)
 .end
@@ -283,9 +283,9 @@ to any options and return the resulting parse tree.
     .local pmc parseactions
     null parseactions
     if target == 'parse' goto have_parseactions
-    $S0 = self.'parseactions'()
-    unless $S0 goto have_parseactions
-    parseactions = new $S0
+    $P0 = self.'parseactions'()
+    unless $P0 goto have_parseactions
+    parseactions = new $P0
   have_parseactions:
     .local pmc match
     match = top(source, 'grammar' => parsegrammar_name, 'action' => parseactions)
