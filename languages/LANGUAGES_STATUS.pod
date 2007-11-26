@@ -10,7 +10,9 @@ No author information is given here. This is because maintainers
 should be tracked in the respective languages/*/MAINTAINER files, and we
 don't want to repeat ourselves.
 
-For current status of some languages see also http://smoke.parrotcode.org/smoke/.
+For current status of some languages see also 
+L<http://smoke.parrotcode.org/smoke/>
+
 Languages that work with the unified languages test suite
 will have their test results listed under the smokes marked
 'languages'.
@@ -217,29 +219,6 @@ C<languages/cardinal>
 =back
 
 
-=head2 Cardinal OLD DEAD
-
-=over 4
-
-=item Description
-
-Implementation of Ruby.
-
-=item Status
-
-Not active.
-
-=item Last verified with parrot version
-
-unknown
-
-=item Location
-
-http://rubyforge.org/projects/cardinal/
-
-=back
-
-
 =head2 Cola
 
 =over 4
@@ -428,8 +407,7 @@ C<languages/jako>
 
 =item Description
 
-Kea Common Lisp is an implementation of ANSI Common Lisp for the
-Parrot bytecode virtual machine (see http://www.parrotcode.org/) that is
+Kea Common Lisp is an implementation of ANSI Common Lisp that is
 based on CMU Common Lisp (see http://www.cons.org/cmucl/).
 The chief goal of the Kea Common Lisp project is
 to provide easy interoperability between Lisp and the other dynamic
@@ -637,30 +615,6 @@ C<languages/ook>
 
 =back
 
-
-=head2 OpenComal
-
-=over 4
-
-=item Description
-
-Compiler emiting parrot being added to interpreter
-
-=item Status
-
-Under development; nowhere near anything yet
-
-=item Last verified with parrot version
-
-0.0.11
-
-=item Location
-
-http://www.josvisser.nl/opencomal
-
-=back
-
-
 =head2 parrot_compiler
 
 =over 4
@@ -755,30 +709,6 @@ C<languages/pheme>
 =back
 
 
-=head2 Pint
-
-=over 4
-
-=item Description
-
-An experimental implementation of PHP
-
-=item Status
-
-This project has been abandoned. Any takers?
-
-=item Last verified with parrot version
-
-Unknown
-
-=item Location
-
-http://www.akbkhome.com/svn.php/PintCompiler
-http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html
-
-=back
-
-
 =head2 PIR
 
 =over 4
@@ -818,7 +748,7 @@ Started.
 
 =item Last verified with parrot version
 
-0.4.12
+0.4.14
 
 =item Location
 
@@ -826,7 +756,7 @@ L<http://users.fulladsl.be/spb1622/pjs/>
 
 =item Wiki
 
-L<http://rakudo.org/parrot/index.cgi?javascript>
+L<http://www.perlfoundation.org/parrot/index.cgi?javascript>
 
 =back
 
@@ -838,7 +768,7 @@ L<http://rakudo.org/parrot/index.cgi?javascript>
 =item Description
 
 The Plumheaded Parakeet aims to become an implementation of PHP on Parrot.
-The grand idea is to have side by side comparison of differen parsing
+The grand idea is to have side by side comparison of different parsing
 and tree transformation strategies. Currently there are three variants:
 phc, PGE and ANTLR3.
 
@@ -848,15 +778,15 @@ Started.
 
 =item Last verified with parrot version
 
-0.4.15
+0.5.0
 
 =item Location
 
-languages/plumhead
+C<languages/plumhead>
 
 =item Wiki
 
-L<http://rakudo.org/parrot/index.cgi?plumhead>
+L<http://www.perlfoundation.org/parrot/index.cgi?plumhead>
 
 =back
 
@@ -977,56 +907,6 @@ Part of languages smoke testing. Almost all tests are succeeding.
 =item Location
 
 C<languages/regex>
-
-=back
-
-
-=head2 Ruby
-
-=over 4
-
-=item Description
-
-Ruby
-
-=item Status
-
-Unmaintained. Removed from trunk of Parrot subversion repository.
-
-=item Last verified with parrot version
-
-Unknown
-
-=item Location
-
-Up to revision 12805 of the Parrot subversion repository:
-C<languages/ruby>
-
-=back
-
-
-=head2 Span
-
-=over 4
-
-=item Description
-
-Span can be most concisely described as Smalltalk for C++, C#, and Java
-programmers. It features an object system modeled on the Smalltalk object
-system and a language syntax designed to be easy to learn for developers of
-C-like languages.
-
-=item Status
-
-Working.
-
-=item Last verified with parrot version
-
-0.0.11
-
-=item Location
-
-http://homepage.mac.com/matt.kennedy/Span
 
 =back
 
@@ -1182,30 +1062,6 @@ C<languages/WMLScript>
 =back
 
 
-=head2 YAL
-
-=over 4
-
-=item Description
-
-Yet Another Language
-
-=item Status
-
-It's mainly intended to test an AST interface and for checking that
-code generation plays nicely together with Parrot opcodes.
-
-=item Last verified with parrot version
-
-0.0.13
-
-=item Location
-
-http://toetsch.at/yal/
-
-=back
-
-
 =head2 Zcode
 
 =over 4
@@ -1231,6 +1087,9 @@ C<languges/Zcode>
 
 =head1 Defunct languages
 
+This section will eventually be removed, for now serves as a pointer to
+some older implementations.
+
 =head2 Parakeet
 
 Parakeet was a Forth that was extremely machine specific to the Parrot VM.
@@ -1246,3 +1105,27 @@ prior to 0.4.10, after having been broken since 0.0.11.
 BASIC interpreter was written in PASM, and used the global stack. It was last
 verified working in 0.0.11 before it was removed from
 C<languages/BASIC/interpreter> prior to 0.5.1.
+
+=head2 Cardinal
+
+The version at <http://rubyforge.org/projects/cardinal/> has been superseded
+by the one in the repository. (See above)
+
+=head2 Pint
+
+An experimental implementation of PHP. Described at
+L<http://www.akbkhome.com/blog.php/View/44/Latest_in_Vapourware_PintCompiler__dbdo.html>, but no updates since August 2004, and the link to source is a 404.
+
+=head2 Ruby
+
+Removed from trunk of Parrot subversion repository. Up to revision 12805,
+located in C<languages/ruby>.
+
+=head2 Span
+
+Span can be most concisely described as Smalltalk for C++, C#, and Java
+programmers. It features an object system modeled on the Smalltalk object
+system and a language syntax designed to be easy to learn for developers of
+C-like languages. Last verified against parrot 0.1.11. 
+L<http://homepage.mac.com/matt.kennedy/Span>
+
