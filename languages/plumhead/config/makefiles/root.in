@@ -1,15 +1,15 @@
 # $Id$
 
-# Set up some commands
+# Set up commands
 PARROT        = ../../parrot@exe@
 PERL          = @perl@
 RM_F          = @rm_f@
-BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-# Set up some pathes
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
+# Set up directories
+BUILD_DIR     = @build_dir@
+PGE_DIR       = ../../compilers/pge
+TGE_DIR       = ../../compilers/tge
 
 # default
 all: build
@@ -46,8 +46,8 @@ help:
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
-	@echo "  distclean:         Clean up."
 	@echo "  clean-test:        Clean up temporary files from testing."
+	@echo "  realclean:         clean and remove Makefile."
 	@echo ""
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
@@ -143,3 +143,6 @@ clean-antlr3:
 
 clean-test:
 	$(RM_F) t/*.php t/*.pir t/*.out 
+
+realclean: clean
+	$(RM_F) Makefile
