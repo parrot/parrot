@@ -26,12 +26,12 @@ unspecified).
     $S0 = argv[1]
     N = $S0
 noarg:
-    .sym float start
+    .sym num start
     .sym pmc fib
     .sym int r
     time start
     r = _fib(N)
-    .sym float fin
+    .sym num fin
     time fin
     print "fib("
     print N
