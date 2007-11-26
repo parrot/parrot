@@ -164,6 +164,15 @@ C<.pcc_{begin,end}> will become C<.{begin,end}_call>.
 
 See [RT#45925].
 
+
+=item .emit / .eom
+
+The .emit and .eom directives that can be used to emit pure pasm instructions
+in a PIR file, without using a .sub are deprecated, and will be removed afer
+the 0.5.1 release.
+
+See [RT#47846] for rationale.
+
 =back
 
 =head1 Deprecated compiler tools
