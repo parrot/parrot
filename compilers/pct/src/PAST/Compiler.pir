@@ -662,7 +662,7 @@ blocks to determine the scope.
     vivilabel = $P0.'new'('name'=>'vivify_')
     ops.'push_pirop'('unless_null', ops, vivilabel)
     ops.'push'(vivipost)
-    $I0 = node.'islvalue'()
+    $I0 = node.'lvalue'()
     unless $I0 goto vivipost_stored
     ops.'push'(storeop)
   vivipost_stored:
