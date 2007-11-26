@@ -551,12 +551,15 @@ node with a 'pasttype' of bind.
     ops = $P0.'new'('node'=>node)
     rpost = self.'post'(rpast, 'rtype'=>'P')
     ops.'push'(rpost)
-    lpost = self.'bindop'(lpast, rpost)
+    .local string scope
+    scope = self.'scope'(lpast)
+    $P0 = find_method self, scope
+    lpost = self.$P0(lpast, rpost)
     ops.'push'(lpost)
     ops.'result'(lpost)
     .return (ops)
 .end
-    
+
 
 =item inline(PAST::Op node)
 
@@ -663,8 +666,8 @@ blocks to determine the scope.
     $P0 = find_method self, scope
     .return self.$P0(node)
 .end
-    
-    
+
+
 .sub 'parameter' :method :multi(_, ['PAST::Var'])
     .param pmc node
 
@@ -707,6 +710,8 @@ blocks to determine the scope.
 
 .sub 'package' :method :multi(_, ['PAST::Var'])
     .param pmc node
+    .param pmc bindpost        :optional
+    .param int has_bindpost    :opt_flag
 
     .local pmc ops, fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -720,38 +725,52 @@ blocks to determine the scope.
     .local pmc ns
     ns = node.'namespace'()
     $I0 = defined ns
-    if $I0 goto package_global
+    if $I0 goto package_hll
+    if has_bindpost goto package_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
+  package_bind:
+    .return $P0.'new'(name, bindpost, 'pirop'=>'set_global', 'result'=>bindpost)
 
-  package_global:
+  package_hll:
     if ns goto package_ns
+    if has_bindpost goto package_hll_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
+  package_hll_bind:
+    .return $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 
   package_ns:
     $P1 = new 'CodeString'
     ns = $P1.'key'(ns)
+    if has_bindpost goto package_ns_bind
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
     .return self.'vivify'(node, ops, fetchop, storeop)
+  package_ns_bind:
+    .return $P0.'new'(ns, name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 .end
 
 
 .sub 'lexical' :method :multi(_, ['PAST::Var'])
     .param pmc node
+    .param pmc bindpost        :optional
+    .param int has_bindpost    :opt_flag
 
     .local string name
     $P0 = get_hll_global ['POST'], 'Ops'
     name = node.'name'()
     name = $P0.'escape'(name)
-   
-    $I0 = node.'isdecl'()
-    if $I0 goto lexical_decl
 
-  lexical_nodecl:
+    .local int isdecl
+    isdecl = node.'isdecl'()
+
+    if has_bindpost goto lexical_bind
+
+  lexical_post:
+    if isdecl goto lexical_decl
     .local pmc ops, fetchop, storeop
     ops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Op'
@@ -765,35 +784,55 @@ blocks to determine the scope.
     ops = self.'post'(viviself, 'rtype'=>'P')
     ops.'push_pirop'('.lex', name, ops)
     .return (ops)
+
+  lexical_bind:
+    $P0 = get_hll_global ['POST'], 'Op'
+    if isdecl goto lexical_bind_decl
+    .return $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
+  lexical_bind_decl:
+    .return $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
 .end
-    
 
-.sub 'bindop' :method :multi(_, ['PAST::Var'], _)
+
+.sub 'keyed' :method :multi(_, ['PAST::Var'])
     .param pmc node
-    .param pmc bpost
+    .param pmc bindpost        :optional
+    .param int has_bindpost    :opt_flag
 
-    .local string scope
-    scope = self.'scope'(node)
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
 
+    .local pmc keypast, keypost
+    keypast = node[1]
+    keypost = self.'post'(keypast, 'rtype'=>'*')
+    ops.'push'(keypost)
+
+    .local pmc basepast, basepost
+    basepast = node[0]
+    $P0 = basepast.'viviself'()
+    if $P0 goto have_baseviviself
+    $P0 = node.'vivibase'()
+    unless $P0 goto have_baseviviself
+    basepast.'viviself'($P0)
+  have_baseviviself:
+    basepost = self.'post'(basepast, 'rtype'=>'P')
+    ops.'push'(basepost)
     .local string name
-    name = node.'name'()
-    name = bpost.'escape'(name)
-
-    .local pmc pirop
-    pirop = get_hll_global ['POST'], 'Op'
-
-    if scope == 'lexical' goto bind_lexical
-
-  bind_package:
-    .return pirop.'new'(name, bpost, 'pirop'=>'set_global', 'result'=>bpost)
-
-  bind_lexical:
-    $I0 = node.'isdecl'()
-    if $I0 goto bind_lexical_isdecl
-    .return pirop.'new'(name, bpost, 'pirop'=>'store_lex', 'result'=>bpost)
-
-  bind_lexical_isdecl:
-    .return pirop.'new'(name, bpost, 'pirop'=>'.lex', 'result'=>bpost)
+    $S0 = basepost.'result'()
+    name = concat $S0, '['
+    $S0 = keypost.'result'()
+    concat name, $S0
+    concat name, ']'
+    .local pmc fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Op'
+    if has_bindpost goto keyed_bind
+    fetchop = $P0.'new'(ops, name, 'pirop'=>'set')
+    storeop = $P0.'new'(name, ops, 'pirop'=>'set')
+    .return self.'vivify'(node, ops, fetchop, storeop)
+  keyed_bind:
+    ops.'push_pirop'('set', name, ops)
+    .return (ops)
 .end
 
 

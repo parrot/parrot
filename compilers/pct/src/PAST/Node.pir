@@ -429,8 +429,19 @@ implementation) a PAST tree to create the value.
 .end
 
 
+=item vivibase([type])
 
+For keyed nodes, C<type> indicates the type of aggregate to
+create for the base if the base doesn't specify its own 'viviself'
+attribute.
 
+=cut
+
+.sub 'vivibase' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('vivibase', value, has_value)
+.end
 
 
 =back
