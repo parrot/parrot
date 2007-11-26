@@ -166,7 +166,7 @@ appear in the C<PAST::Block> node, named parameters have values
 for the C<named> attribute.  Optional parameters are identified
 via the C<viviself> attribute (see below) indicating how the parameter
 is to be initialized if not supplied by the caller.  Slurpy parameters
-are indicated via the node's C<isslurpy> attribute.
+are indicated via the node's C<slurpy> attribute.
 
 =item "keyed"
 
@@ -210,19 +210,19 @@ is being created at this point within the current lexical
 scope.  Otherwise, the node refers to a pre-existing variable
 (possibly from an outer scope).
 
-=item islvalue([flag])
+=item lvalue([flag])
 
-Accessor method for the C<islvalue> attribute, which indicates
+Accessor method for the C<lvalue> attribute, which indicates
 whether this variable is being used in an lvalue context.
 
-=item isslurpy([flag])
+=item slurpy([flag])
 
-Accessor method for the C<isslurpy> attribute of parameter variables.
-A true value of C<isslurpy> indicates that the parameter variable
+Accessor method for the C<slurpy> attribute of parameter variables.
+A true value of C<slurpy> indicates that the parameter variable
 given by this node is to be created as a slurpy parameter (consuming
 all remaining arguments passed in).  Named slurpy parameters are
 indicated by having a non-empty C<named> attribute and a true value of
-C<isslurpy>.
+C<slurpy>.
 
 =back
 
@@ -377,7 +377,7 @@ and should not be explicitly given as a child operand to the node.
 The table of PIR opcodes that PAST "knows" about is given in
 F<compilers/pct/src/POST/Node.pir> .
 
-=item islvalue([flag])
+=item lvalue([flag])
 
 Get/set whether this node is an lvalue, or treats its first
 child as an lvalue (e.g., for assignment).

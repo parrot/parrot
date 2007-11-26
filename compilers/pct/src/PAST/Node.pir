@@ -369,17 +369,17 @@ Otherwise, the node refers to a lexical variable from an outer scope.
 .end
 
 
-=item islvalue([flag])
+=item lvalue([flag])
 
-Get/set the C<islvalue> attribute, which indicates whether this
+Get/set the C<lvalue> attribute, which indicates whether this
 variable is being used in an lvalue context.
 
 =cut
 
-.sub 'islvalue' :method
+.sub 'lvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('islvalue', value, has_value)
+    .return self.'attr'('lvalue', value, has_value)
 .end
 
 
@@ -398,19 +398,19 @@ of 'package'.
 .end
 
 
-=item isslurpy([flag])
+=item slurpy([flag])
 
-Get/set the node's C<isslurpy> attribute (for parameter variables) to C<flag>.
-A true value of C<isslurpy> indicates that the parameter variable given by this
+Get/set the node's C<slurpy> attribute (for parameter variables) to C<flag>.
+A true value of C<slurpy> indicates that the parameter variable given by this
 node is to be created as a slurpy parameter (consuming all remaining arguments
 passed in).
 
 =cut
 
-.sub 'isslurpy' :method
+.sub 'slurpy' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('isslurpy', value, has_value)
+    .return self.'attr'('slurpy', value, has_value)
 .end
 
 
@@ -546,17 +546,17 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 .end
 
 
-=item islvalue([flag])
+=item lvalue([flag])
 
 Get/set whether this node is an lvalue, or treats its first
 child as an lvalue (e.g., for assignment).
 
 =cut
 
-.sub 'islvalue' :method
+.sub 'lvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('islvalue', value, has_value)
+    .return self.'attr'('lvalue', value, has_value)
 .end
 
 =item inline([STRING code])

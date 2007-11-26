@@ -23,6 +23,8 @@ and then invokes POST::Compiler on the resulting POST tree.
     piropsig['n_sub'] = 'PP+'
     piropsig['n_mul'] = 'PP+'
     piropsig['n_div'] = 'PP+'
+    piropsig['n_mod'] = 'PP+'
+    piropsig['n_neg'] = 'PP'
     set_global '%piropsig', piropsig
 
     .return ()
@@ -92,7 +94,7 @@ third and subsequent children can be any value they wish.
     sigmax = length signature
     dec sigmax
 
-    ##  if the signature contains a ':', then we're doing 
+    ##  if the signature contains a ':', then we're doing
     ##  flagged arguments (:flat, :named)
     .local pmc posargs, namedargs
     null posargs
@@ -324,12 +326,20 @@ the node's "pasttype" attribute.
     .param pmc node
     .param pmc options         :slurpy :named
 
+    ##  see if we set first child's lvalue
+    $I0 = node.'lvalue'()
+    unless $I0 goto have_lvalue
+    $P0 = node[0]
+    if null $P0 goto have_lvalue
+    $P0.'lvalue'($I0)
+  have_lvalue:
+
     .local string pasttype
     pasttype = node.'pasttype'()
     unless pasttype goto post_pirop
     $P0 = find_method self, pasttype
     .return self.$P0(node, options :flat :named)
- 
+
   post_pirop:
     .local pmc pirop
     pirop = node.'pirop'()
@@ -438,8 +448,8 @@ a 'pasttype' of if/unless.
 
     .local string pasttype
     pasttype = node.'pasttype'()
- 
-    .local pmc ops 
+
+    .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
 
@@ -516,6 +526,7 @@ by C<node>.
     .local string iter
     iter = ops.'unique'('$P')
     ops.'result'(iter)
+    ops.'push_pirop'('if_null', collpost, endlabel)        ## FIXME
     ops.'push_pirop'('new', iter, '"Iterator"', collpost)
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
@@ -651,10 +662,10 @@ blocks to determine the scope.
     vivilabel = $P0.'new'('name'=>'vivify_')
     ops.'push_pirop'('unless_null', ops, vivilabel)
     ops.'push'(vivipost)
-    $I0 = node.'isdecl'()
-    unless $I0 goto vivipost_decl
+    $I0 = node.'islvalue'()
+    unless $I0 goto vivipost_stored
     ops.'push'(storeop)
-  vivipost_decl:
+  vivipost_stored:
     ops.'push'(vivilabel)
   vivipost_done:
     .return (ops)
@@ -894,7 +905,7 @@ to have a PMC generated containing the constant value.
     .return (ops)
 .end
 
-    
+
 =back
 
 =head1 AUTHOR
