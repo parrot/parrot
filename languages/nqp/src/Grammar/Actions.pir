@@ -421,16 +421,18 @@
 ##            $past.node($/);
 ##            make $past;
 ##        }
-##        if $key eq '< >' {
+##        elseif $key eq '< >' {
 ##            my $value := PAST::Val.new( :value( $($<string_literal>) ) );
 ##            make PAST::Var.new( $value,
 ##                                :scope('keyed'),
-##                                :viviself('Hash'),
+##                                :vivibase('Hash'),
 ##                                :node( $/ ) );
 ##        }
-##        make PAST::Var.new( $($<EXPR>),
-##                            :scope('keyed'),
-##                            :node($/) );
+##        else {
+##            make PAST::Var.new( $($<EXPR>),
+##                                :scope('keyed'),
+##                                :node($/) );
+##        }
 ##    }
 .sub 'postcircumfix' :method
     .param pmc match
@@ -459,7 +461,7 @@
     .local pmc value
     value = $P0.'new'( 'value' => $P2, 'node'=> $P1 )
     $P0 = get_hll_global ['PAST'], 'Var'
-    $P1 = $P0.'new'( value, 'scope'=>'keyed', 'viviself'=>'Hash', 'node'=>match)
+    $P1 = $P0.'new'( value, 'scope'=>'keyed', 'vivibase'=>'Hash', 'node'=>match)
     match.'result_object'($P1)
 .end
 
