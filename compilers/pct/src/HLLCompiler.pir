@@ -16,20 +16,9 @@ running compilers from a command line.
 .sub '__onload' :load :init
     load_bytecode 'Protoobject.pbc'
     load_bytecode 'Parrot/Exception.pbc'
-    $P0 = newclass [ 'PCT::HLLCompiler' ]
-    addattribute $P0, '$parsegrammar'
-    addattribute $P0, '$parseactions'
-    addattribute $P0, '$astgrammar'
-    addattribute $P0, '$ostgrammar'
-    addattribute $P0, '@stages'
-
-    # the commandline_banner is the welcome message for interactive mode
-    addattribute $P0, '$commandline_banner'
-    # the commandline_prompt is the prompt to show for input
-    addattribute $P0, '$commandline_prompt'
-
-    $P1 = new 'Protomaker'
-    $P1.'new_proto'($P0)
+    $P0 = get_hll_global 'Protomaker'
+    $P1 = split ' ', '$parsegrammar $parseactions $astgrammar $ostgrammar @stages $commandline_banner $commandline_prompt'
+    $P2 = $P0.'new_subclass'('Protoobject', 'PCT::HLLCompiler', $P1 :flat)
 .end
 
 =head2 Methods
