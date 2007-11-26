@@ -371,7 +371,7 @@ void remove_vtable_override(STRING* vtable_name) :write
 PMC* inspect()
 PMC* inspect_str(STRING* what)
 
-# Deprecated
+# Deprecated (RT #42969)
 PMC* subclass(PMC* name)
 
 void freeze(visit_info* info)
