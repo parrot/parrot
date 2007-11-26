@@ -10,13 +10,6 @@ is not the case yet [RT#41226].
 The object system of Parrot is being overhauled. This touches some opcode
 and PIR syntax. So some deprecation can be found in pdd17_pmc.pod.
 
-=head1 nonexisting array elements
-
-As of the 0.5.0 release, fetching an element that doesn't exist from an array
-will return a null PMC, instead of Undef. (Returning a null PMC can be
-considered the standard behavior for Parrot aggregates when accessing an
-element that doesn't exist. HLL aggregates define their own behavior.)
-
 =head1 PGE::P6Regex and pgc.pir
 
 In early 2007 there were a number of changes made to the Perl 6
@@ -50,12 +43,7 @@ deprecated:
 =item B<find_name>
 
 There are several variants of some of the above ops; all are deprecated,
-and are replaced by the ops {set,get}_[hll,root]_global. See also
-http://www.parrotcode.org/docs/ops/var.html.
-
-=item B<substr_r>
-
-For now this op will stay available as an experimental op [RT#41749].
+and are replaced by the ops {set,get}_[hll,root]_global.
 
 =back
 
@@ -70,7 +58,7 @@ The VTABLE method 'new_from_string' will be removed.
 
 =back
 
-They will be removed in the 0.5.0 release.
+They will be removed after the 0.5.0 release.
 
 =head1 Deprecated Class Features
 
@@ -78,14 +66,14 @@ They will be removed in the 0.5.0 release.
 
 =item 1
 
-Type IDs will go away in 0.5.0.
+Type IDs will go away after 0.5.0.
 Instead of:
 
   $P0 = new Integer
 
 or
 
-  $P0 = new .Integer # better, but ...
+  $P0 = new .Integer
 
 we are moving to use:
 
@@ -93,13 +81,13 @@ we are moving to use:
 
 =item 2
 
-The C<classname> op is deprecated and will be removed in the 0.5.0 release.
+The C<classname> op is deprecated and will be removed after the 0.5.0 release.
 It's an exact duplicate of the string return variant of the C<typeof> op.
 
 =item 3
 
-The experimental C<instantiate> opcode is deprecated and will be removed in the
-0.5.0 release.
+The experimental C<instantiate> opcode is deprecated and will be removed after
+the 0.5.0 release.
 
 (The C<instantiate> vtable function becomes core in 0.5.0, but is accessed via
 the "new" opcode for the PMCs that use it.)
@@ -108,18 +96,18 @@ the "new" opcode for the PMCs that use it.)
 
   PMC* subclass(PMC *name)
 
-The subclass vtable method is deprecated and will be removed in the 0.5.0
+The subclass vtable method is deprecated and will be removed after the 0.5.0
 release. The subclass opcode stays. (RT #42969)
 
 =item 5
 
 The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
-will be removed in the 0.5.0 release.
+will be removed after the 0.5.0 release.
 
 =item 6
 
 The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
-removed in the 0.5.0 release.
+removed after the 0.5.0 release.
 
 =item 7
 
@@ -143,12 +131,6 @@ in the 0.5.2 release.
 =head1 deprecated PIR syntax
 
 =over 4
-
-=item type names
-
-As of Parrot 0.4.16 all type names for .local other than string, num, int, and
-pmc are deprecated. Using C<float> for C<num> or a basic PMC name like C<Array>
-for C<pmc> will no longer be possible in Parrot 0.4.17.  [RT#42769].
 
 =item C<.HLL_map INTC, INTC> will become C<.HLL_map STRINGC, STRINGC>
 
