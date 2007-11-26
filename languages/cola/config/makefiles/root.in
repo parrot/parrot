@@ -61,7 +61,8 @@ clean :
     "*.obj" "*.pdb" "*.ilk" \
     "*$(O)" \
     parser.output \
-    colacc$(EXE)
+    colacc$(EXE) \
+    a.pir a.pasm
 
 # Don't run this target unless you have bison and flex installed.
 # These programs are needed for regenerating the removed files.
