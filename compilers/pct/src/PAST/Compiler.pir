@@ -833,6 +833,13 @@ blocks to determine the scope.
     unless $P0 goto have_baseviviself
     basepast.'viviself'($P0)
   have_baseviviself:
+
+    #  if the keyed node is an lvalue, its base is an lvalue also
+    $I0 = node.'lvalue'()
+    unless $I0 goto have_lvalue
+    basepast.lvalue($I0)
+  have_lvalue:
+
     basepost = self.'post'(basepast, 'rtype'=>'P')
     ops.'push'(basepost)
     .local string name
