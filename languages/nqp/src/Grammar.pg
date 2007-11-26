@@ -82,6 +82,7 @@ rule statement {
     | <if_statement> {*}                                   #= if_statement
     | <for_statement> {*}                                  #= for_statement
     | <return_statement> {*}                               #= return_statement
+    | <make_statement> {*}                                 #= make_statement
     | <block> {*}                                          #= block
     | <EXPR> {*}                                           #= EXPR
 }
@@ -128,6 +129,12 @@ rule for_statement {
 rule return_statement {
     $<sym>:=['return']
     [ <EXPR> | <panic: Unable to parse argument to 'return'> ]
+    {*}
+}
+
+rule make_statement {
+    $<sym>:=['make']
+    [ <EXPR> | <panic: Unable to parse argument to 'make'> ]
     {*}
 }
 

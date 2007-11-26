@@ -251,6 +251,25 @@
 .end
 
 
+##    method make_statement($/) {
+##        make PAST::Op.new( PAST::Var.new( :name('$/'),
+##                                          :scope('lexical') ),
+##                           $($<EXPR>),
+##                           :name('result_object'),
+##                           :pasttype('callmethod') );
+##    }
+.sub 'make_statement' :method
+    .param pmc match
+    $P0 = get_hll_global ['PAST'], 'Var'
+    $P1 = $P0.'new'( 'name'=>'$/', 'scope'=>'lexical' )
+    $P2 = match['EXPR']
+    $P3 = $P2.'get_scalar'()
+    $P4 = get_hll_global ['PAST'], 'Op'
+    $P5 = $P4.'new'($P1, $P3, 'name'=>'result_object', 'pasttype'=>'callmethod')
+    match.'result_object'($P5)
+.end
+
+
 ##    method block($/, $key) {
 ##        make $($<statement_block>);
 ##    }
