@@ -33,13 +33,13 @@ typedef struct Parrot_Scheduler {
 
 /* Task PMC's underlying struct. */
 typedef struct Parrot_Task {
-    int  id;              /* The task ID. */
+    int     id;           /* The task ID. */
+    int     priority;     /* The priority of the task. */
+    int     birthtime;    /* A time stamp marking the creation of the task. */
     STRING *type;         /* The type of the task. */
-    STRING *priority;     /* The priority of the task. */
     STRING *status;       /* The status of the task. */
-    int  birthtime;       /* A time stamp marking the creation of the task. */
-    PMC *codeblock;       /* An (optional) codeblock for the task. */
-    PMC *interp;          /* An (optional) interpreter structure for the task. */
+    PMC    *codeblock;    /* An (optional) codeblock for the task. */
+    PMC    *interp;       /* An (optional) interpreter structure for the task. */
 } Parrot_Task;
 
 /* Macro to access underlying structure of a Task PMC. */

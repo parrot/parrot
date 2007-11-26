@@ -43,7 +43,7 @@ Initialize a concurrency task object.
         PMC_data(SELF)           = core_struct;
         core_struct->id          = 0;
         core_struct->type        = CONST_STRING(interp, "");
-        core_struct->priority    = CONST_STRING(interp, "");
+        core_struct->priority    = 0;
         core_struct->status      = CONST_STRING(interp, "created");
         core_struct->birthtime   = 0;
         core_struct->codeblock   = PMCNULL;
@@ -73,8 +73,8 @@ Gets the value of an attribute for this task.
             VTABLE_set_string_native(interp, value, core_struct->type);
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
-            value = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, value, core_struct->priority);
+            value = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, value, core_struct->priority);
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "status")) == 0) {
             value = pmc_new(interp, enum_class_String);
@@ -107,7 +107,7 @@ Sets the value of an attribute for this task.
             core_struct->type = VTABLE_get_string(interp, value);
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "priority")) == 0) {
-            core_struct->priority = VTABLE_get_string(interp, value);
+            core_struct->priority = VTABLE_get_integer(interp, value);
         }
         else if (string_equal(interp, name, CONST_STRING(interp, "status")) == 0) {
             core_struct->status = VTABLE_get_string(interp, value);
@@ -198,11 +198,11 @@ Used to archive the task.
         /* 2) freeze task birthtime */
         VTABLE_push_integer(INTERP, io, core_struct->birthtime);
 
-        /* 3) freeze task type */
-        VTABLE_push_string(INTERP, io, core_struct->type);
+        /* 3) freeze task priority */
+        VTABLE_push_integer(INTERP, io, core_struct->priority);
 
-        /* 4) freeze task priority */
-        VTABLE_push_string(INTERP, io, core_struct->priority);
+        /* 4) freeze task type */
+        VTABLE_push_string(INTERP, io, core_struct->type);
 
         /* 5) freeze task status */
         VTABLE_push_string(INTERP, io, core_struct->status);
@@ -227,11 +227,11 @@ Used to unarchive the task.
         /* 2. thaw task birthtime */
         INTVAL birthtime = VTABLE_shift_integer(INTERP, io);
 
-        /* 3. thaw task type */
-        STRING *type = VTABLE_shift_string(INTERP, io);
+        /* 3. thaw task priority */
+        INTVAL priority = VTABLE_shift_integer(INTERP, io);
 
-        /* 4. thaw task priority */
-        STRING *priority = VTABLE_shift_string(INTERP, io);
+        /* 4. thaw task type */
+        STRING *type = VTABLE_shift_string(INTERP, io);
 
         /* 5. thaw task status */
         STRING *status = VTABLE_shift_string(INTERP, io);

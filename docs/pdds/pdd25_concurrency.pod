@@ -311,7 +311,9 @@ An interpreter structure for the task (optional)
 Types of tasks include 'event', 'exception', 'io', and 'code'. Possible status
 values for tasks include 'created', 'invoked', 'inprocess', and 'completed'.
 The final state of a task is 'destroyed', but is never marked (the task PMC is
-removed from the task list and at some later point destroyed by GC).
+removed from the task list and at some later point destroyed by GC). The
+priority of a task is an integer value between 0 and 100, with 0 as the lowest
+priority.
 
 The birthtime stamp is the point at which the task was inserted into the task
 list, and is used for calculating the age of tasks.
