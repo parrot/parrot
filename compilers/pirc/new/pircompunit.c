@@ -40,7 +40,7 @@ set_sub_vtable(struct lexer_state *lexer, char *vtablename) {
 }
 
 void
-set_sub_flag(struct lexer_state *lexer, int flag) {
+set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
     /* set the specified flag in the current subroutine */
     SET_FLAG(lexer->subs->flags, flag);
 }
@@ -93,7 +93,7 @@ set_param_named(target *t, char *alias) {
 }
 
 void
-set_param_flag(struct lexer_state *lexer, int flag) {
+set_param_flag(target *param, param_flag flag) {
 
 }
 
@@ -120,8 +120,8 @@ set_arg_named(argument *arg, char *alias) {
 }
 
 void
-set_arg_flag(struct lexer_state *lexer, int flag) {
-    lexer->currentstat->instr.inv->arguments->flags |= flag;
+set_arg_flag(argument *arg, int flag) {
+    SET_FLAG(arg->flags, flag);
 }
 
 
@@ -251,12 +251,12 @@ set_invocation(struct lexer_state *lexer) {
 }
 
 void
-set_invocation_sub(struct lexer_state *lexer, char *sub) {
+set_invocation_sub(struct lexer_state *lexer, variable *sub) {
     lexer->currentstat->instr.inv->sub = sub;
 }
 
 void
-set_invocation_object(struct lexer_state *lexer, char *object) {
+set_invocation_object(struct lexer_state *lexer, variable *object) {
     lexer->currentstat->instr.inv->object = object;
 }
 
@@ -320,9 +320,11 @@ new_expr(expr_type type) {
 
 /* create a target node from a register */
 target *
-reg(int type, int regno) {
+reg(int type, int regno, int is_pasm) {
     target *t = new_target(type, NULL); /* no identifier */
     t->regno = regno;
+    if (is_pasm)
+        SET_FLAG(t->flags, TARGET_FLAG_IS_PASM_REG); /**/
     return t;
 }
 
@@ -366,7 +368,7 @@ set_invocation_flag(invocation *inv, invoke_type flag) {
 }
 
 invocation *
-invoke(invoke_type type, char *obj1, char *obj2) {
+invoke(invoke_type type, variable *obj1, variable *obj2) {
     invocation *inv = new_invocation();
     SET_FLAG(inv->type, type);
 
@@ -388,6 +390,60 @@ invoke(invoke_type type, char *obj1, char *obj2) {
             exit(EXIT_FAILURE);
     }
     return inv;
+}
+
+
+static variable *
+new_var(var_type type) {
+    variable *var = (variable *)malloc(sizeof (variable));
+    var->vartype = type;
+    return var;
+}
+
+variable *
+var_from_string(char *str) {
+    variable *var = new_var(VAR_STRING);
+    var->var.name = str;
+    var->datatype = STRING_TYPE;
+    return var;
+}
+
+variable *
+var_from_ident(char *id) {
+    variable *var = new_var(VAR_IDENT);
+    var->var.name = id;
+    var->datatype = UNKNOWN_TYPE;
+    return var;
+
+}
+
+variable *
+var_from_reg(pir_type type, int regno, int is_pasm) {
+    variable *var = new_var(is_pasm ? VAR_PASMREG : VAR_SYMREG);
+    var->var.regno = regno;
+    var->datatype = type;
+    return var;
+}
+
+
+void
+set_lex_flag(target *t, char *lexname) {
+
+}
+
+void
+set_pragma(int flag, int value) {
+
+}
+
+void
+set_hll(char *hll, char *lib) {
+
+}
+
+void
+set_hll_map(char *stdtype, char *maptype) {
+
 }
 
 /*

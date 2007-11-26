@@ -338,10 +338,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 ".arg"            { return TK_ARG; }
 ".const"          { return TK_CONST; }
-".emit"           { return TK_EMIT; }
 ".end"            { return TK_END; }
 
-".eom"            { return TK_EOM; }
 ".get_results"    { return TK_GET_RESULTS; }
 ".globalconst"    { return TK_GLOBALCONST; }
 ".HLL"            { return TK_HLL; }

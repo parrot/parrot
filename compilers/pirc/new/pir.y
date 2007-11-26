@@ -58,6 +58,7 @@ extern YY_DECL;
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
 
+/* the lexer contains a special temp. field for this purpose. */
 #define STORE_NAMED_ALIAS(NAME)     lexer->temp_flag_arg1 = NAME
 
 #define IF_NAMED_ARG_SET_ALIAS(OBJ,EXPR)    if (TEST_FLAG(EXPR, ARG_FLAG_NAMED)) {       \
@@ -65,9 +66,14 @@ extern YY_DECL;
                                             }
 
 
-#define IF_NAMED_PARAM_SET_ALIAS(OBJ,EXPR)    if (TEST_FLAG(EXPR, PARAM_FLAG_NAMED)) {   \
-                                              set_arg_named(OBJ, lexer->temp_flag_arg1); \
+#define IF_NAMED_PARAM_SET_ALIAS(OBJ,EXPR)  if (TEST_FLAG(EXPR, PARAM_FLAG_NAMED)) {       \
+                                              set_param_named(OBJ, lexer->temp_flag_arg1); \
                                             }
+
+/* some defines to prevent magic "1"s and "0"s in the code */
+#define GLOBALCONST     1
+
+#define IS_PASM_REG     1
 
 %}
 
@@ -81,6 +87,7 @@ extern YY_DECL;
     struct target      *targ;
     struct argument    *argm;
     struct invocation  *invo;
+    struct variable    *varb;
 
     void *fixme;
 }
@@ -91,8 +98,6 @@ extern YY_DECL;
 
 %token TK_HLL           ".HLL"
        TK_HLL_MAP       ".HLL_map"
-       TK_EMIT          ".emit"
-       TK_EOM           ".eom"
        TK_N_OPERATORS   "n_operators"
        TK_PRAGMA        ".pragma"
        TK_LOADLIB       ".loadlib"
@@ -196,14 +201,21 @@ extern YY_DECL;
        TK_FLAG_OPT_FLAG     ":opt_flag"
 
 
-%type <sval> unop binop augmented_op rel_op
-             identifier if_null_type
-             sub_id opt_paren_string
-             invokable
-             opt_return_continuation
-             sub
+%type <sval> unop
+             binop
+             augmented_op
+             rel_op
+             identifier
+             if_null_type
+             sub_id
+             opt_paren_string
+
+
+%type <varb> sub
              method
              string_object
+             invokable
+             opt_return_continuation
 
 %type <targ> reg
              pasm_reg
@@ -232,7 +244,7 @@ extern YY_DECL;
              long_arguments
              long_argument
 
-%type <expr> expression1 expression
+%type <expr> expression1 expression key
 
 %type <ival> has_unique_reg
              type
@@ -243,6 +255,7 @@ extern YY_DECL;
              sub_flags
              sub_flag
              if_type
+             separator
 
 %type <invo> long_invocation
              methodcall
@@ -262,8 +275,12 @@ extern YY_DECL;
               parrot_instruction
               long_invocation_statement
               short_return_statement
+              opt_namespace_id
+              namespace_id
+              keys
 
-/* a pure parser */
+
+/* needed for reentrancy */
 %pure-parser
 
 /* name of generated parser */
@@ -307,71 +324,38 @@ compilation_units: compilation_unit
 compilation_unit: sub_definition
                 | const_declaration
                 | namespace_declaration
-                | emit_block
                 | hll_specifier
                 | hll_mapping
                 | loadlib
                 | pir_pragma
                 ;
 
-pir_pragma: ".pragma" "n_operators" TK_INTC
+pir_pragma: ".pragma" "n_operators" TK_INTC  { set_pragma(PRAGMA_N_OPERATORS, $3); }
           ;
 
-loadlib: ".loadlib" TK_STRINGC
-         { load_library(lexer, $2); }
+loadlib: ".loadlib" TK_STRINGC                              { load_library(lexer, $2); }
        ;
 
 /* HLL stuff */
 
-hll_specifier: ".HLL" TK_STRINGC ',' TK_STRINGC
+hll_specifier: ".HLL" TK_STRINGC ',' TK_STRINGC             { set_hll($2, $4); }
              ;
 
-hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC
+hll_mapping: ".HLL_map" TK_STRINGC ',' TK_STRINGC           { set_hll_map($2, $4); }
            ;
 
-/* Emit blocks */
-
-emit_block: ".emit" "\n"
-            pasm_instructions
-            ".eom"
-          ;
-
-
-pasm_instructions: /* empty */
-                 | pasm_instructions pasm_instruction
-                 ;
-
-pasm_instruction: TK_LABEL "\n"
-                | TK_LABEL parrot_statement
-                | parrot_statement
-                ;
-
-parrot_statement: TK_PARROT_OP opt_pasm_args "\n"
-                ;
-
-opt_pasm_args: /* empty */
-             | pasm_args
-             ;
-
-pasm_args: pasm_arg
-         | pasm_args ',' pasm_arg
-         ;
-
-
-pasm_arg: pasm_expression
-        ;
 
 /* Namespaces */
 
 namespace_declaration: ".namespace" opt_namespace_id
                      ;
 
-opt_namespace_id: /* empty */
-                | '[' namespace_id ']'
+opt_namespace_id: /* empty */                     { $$ = NULL; }
+                | '[' namespace_id ']'            { $$ = $2; }
                 ;
 
-namespace_id: TK_STRINGC
-            | namespace_id separator TK_STRINGC
+namespace_id: TK_STRINGC                          {}
+            | namespace_id separator TK_STRINGC   {}
             ;
 
 /* Sub definition */
@@ -428,9 +412,9 @@ parameter: ".param" param_def param_flags "\n"      { set_param_flag($2, $3);
                                                     }
          ;
 
-param_def: type identifier                  { $$ = add_param(lexer, $1, $2); } /* add a new parameter */
-         | type TK_STRINGC "=>" identifier  { $$ = add_param(lexer, $1, $4);   /* add a new parameter */
-                                              set_param_named($$, $2);  /* set the :named flag */
+param_def: type identifier                  { $$ = add_param(lexer, $1, $2); }
+         | type TK_STRINGC "=>" identifier  { $$ = add_param(lexer, $1, $4);
+                                              set_param_named($$, $2);
                                             }
          ;
 
@@ -444,7 +428,7 @@ instructions: /* empty */
 
 
 instruction: TK_LABEL "\n"          { set_label(lexer, $1); }
-           | TK_LABEL statement     { set_label(lexer, $1);   }
+           | TK_LABEL statement     { set_label(lexer, $1); }
            | statement
            ;
 
@@ -463,14 +447,21 @@ statement: conditional_statement    { }
          | error "\n"      { yyerrok; }
          ;
 
-null_statement: "null" target "\n"       { set_instr(lexer, "null"); }
-              | target '=' "null" "\n"   { set_instr(lexer, "null"); }
+null_statement: "null" target "\n"                          { set_instr(lexer, "null");
+                                                              /* set arguments */
+                                                            }
+              | target '=' "null" "\n"                      { set_instr(lexer, "null");
+                                                              /* set arguments */
+                                                            }
               ;
 
-getresults_statement: ".get_results" '(' opt_target_list ')' "\n"
-                      { set_instr(lexer, "get_results"); }
+getresults_statement: ".get_results" opt_target_list "\n"   { set_instr(lexer, "get_results");
+                                                              /* set arguments */
+                                                            }
                     ;
 
+parrot_statement: parrot_instruction "\n"
+                ;
 
 assignment_statement: target assignment_tail "\n"
                     ;
@@ -500,6 +491,7 @@ assignment_expression: unop expression              { new_rhs(lexer, RHS_UNOP, $
                      | target keylist               { new_rhs(lexer, RHS_GETKEYED, $1, $2); }
                      | parrot_instruction
                      ;
+
 
 parrot_instruction: TK_PARROT_OP                    { set_instr(lexer, $1); }
                     opt_parrot_op_args              { $$ = 0; }
@@ -563,18 +555,18 @@ augmented_op: "+="   { $$ = "add"; }
             | ">>>=" { $$ = "lsr"; }
             ;
 
-keylist: '[' keys ']'   {  }
+keylist: '[' keys ']'              { $$ = $2; }
        ;
 
-keys: key
-    | keys separator key
+keys: key                          {}
+    | keys separator key           {}
     ;
 
 key: expression
    ;
 
-separator: ';'
-         | ','
+separator: ';'                     { $$ = 0; }
+         | ','                     { $$ = 1; }
          ;
 
 
@@ -589,13 +581,13 @@ conditional_statement: if_type condition then identifier "\n"
                        { set_instr(lexer, $1); }
                      ;
 
-if_type: "if"      { $$ = 0; /* no need to invert */ }
-       | "unless"  { $$ = 1; /* yes, the opname should be inverted. */ }
+if_type: "if"                                              { $$ = 0; /* no need to invert */ }
+       | "unless"                                          { $$ = 1; /* yes, invert opname */ }
        ;
 
 
-if_null_type: "if" "null"     { $$ = "if_null"; }
-            | "unless" "null" { $$ = "unless_null"; }
+if_null_type: "if" "null"                                  { $$ = "if_null"; }
+            | "unless" "null"                              { $$ = "unless_null"; }
             ;
 
 then: "goto" /* PIR mode */
@@ -631,7 +623,7 @@ has_unique_reg: /* empty */     { $$ = 0; }
 
 
 
-lex_declaration: ".lex" TK_STRINGC ',' target "\n"
+lex_declaration: ".lex" TK_STRINGC ',' target "\n"          { set_lex_flag($4, $2); }
                ;
 
 
@@ -686,8 +678,8 @@ long_result: ".result" result_target "\n"                   { $$ = $2; }
            | local_declaration                              { $$ = NULL; }
            ;
 
-short_invocation_statement: '(' opt_target_list ')' '=' simple_invocation "\n"
-                                                            { set_invocation_results($5, $2); }
+short_invocation_statement: opt_target_list '=' simple_invocation "\n"
+                                                            { set_invocation_results($3, $1); }
                           | target '=' simple_invocation "\n"
                                                             { set_invocation_results($3, $1); }
                           | simple_invocation "\n"
@@ -710,26 +702,26 @@ subcall: sub arguments                                      { $$ = invoke(CALL_P
                                                             }
        ;
 
-sub: invokable
-   | TK_STRINGC
+sub: invokable                                 { $$ = $1; }
+   | TK_STRINGC                                { $$ = var_from_string($1); }
    ;
-
-invokable: identifier
-         | TK_SYM_PREG       { /* todo */ }
-         | TK_PASM_PREG      { /* todo */ }
-         ;
 
 method: invokable
       | string_object
       ;
 
-string_object: TK_STRINGC
-             | TK_SYM_SREG   { /* todo */ }
-             | TK_PASM_SREG  { /* todo */ }
+invokable: identifier                          { $$ = var_from_ident($1); }
+         | TK_SYM_PREG                         { $$ = var_from_reg(PMC_TYPE, $1, !IS_PASM_REG); }
+         | TK_PASM_PREG                        { $$ = var_from_reg(PMC_TYPE, $1, IS_PASM_REG); }
+         ;
+
+string_object: TK_STRINGC                      { $$ = var_from_string($1); }
+             | TK_SYM_SREG                     { $$ = var_from_reg(STRING_TYPE, $1, !IS_PASM_REG); }
+             | TK_PASM_SREG                    { $$ = var_from_reg(STRING_TYPE, $1, IS_PASM_REG); }
              ;
 
-opt_target_list: /* empty */                      { $$ = NULL; }
-               | target_list                      { $$ = $1; }
+opt_target_list: '(' ')'                          { $$ = NULL; }
+               | '(' target_list ')'              { $$ = $2; }
                ;
 
 target_list: result_target                        { $$ = $1; }
@@ -864,11 +856,11 @@ opt_paren_string: /* empty */                              { $$ = NULL; }
                 | '(' TK_STRINGC ')'                       { $$ = $2; }
                 ;
 
-const_declaration: ".const" const_tail                     { define_const(lexer, $2, 0);  }
+const_declaration: ".const" const_tail                     { define_const(lexer, $2, !GLOBALCONST);  }
                  ;
 
 const_decl_statement: const_declaration "\n"
-                    | ".globalconst" const_tail "\n"       { define_const(lexer, $2, 1);  }
+                    | ".globalconst" const_tail "\n"       { define_const(lexer, $2, GLOBALCONST);  }
                     ;
 
 const_tail: "int"    identifier '=' TK_INTC                { $$ = new_iconst($2, $4); }
@@ -877,8 +869,7 @@ const_tail: "int"    identifier '=' TK_INTC                { $$ = new_iconst($2,
           | "string" identifier '=' TK_STRINGC             { $$ = new_sconst($2, $4); }
           ;
 
-pasm_expression: constant
-               | pasm_reg
+pasm_expression: expression
                ;
 
 /* expression1 is similar to expression, but it doesn't accept TK_PARROT_OP */
@@ -914,17 +905,17 @@ target: reg                                                { $$ = $1; }
       | identifier                                         { $$ = new_target(UNKNOWN_TYPE, $1); }
       ;
 
-reg: TK_SYM_PREG                                           { $$ = reg(PMC_TYPE, $1); }
-   | TK_SYM_NREG                                           { $$ = reg(NUM_TYPE, $1); }
-   | TK_SYM_IREG                                           { $$ = reg(INT_TYPE, $1); }
-   | TK_SYM_SREG                                           { $$ = reg(STRING_TYPE, $1); }
+reg: TK_SYM_PREG                                           { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
+   | TK_SYM_NREG                                           { $$ = reg(NUM_TYPE, $1, !IS_PASM_REG); }
+   | TK_SYM_IREG                                           { $$ = reg(INT_TYPE, $1, !IS_PASM_REG); }
+   | TK_SYM_SREG                                           { $$ = reg(STRING_TYPE, $1, !IS_PASM_REG); }
    | pasm_reg
    ;
 
-pasm_reg: TK_PASM_PREG                                     { $$ = reg(PMC_TYPE, $1); }
-        | TK_PASM_NREG                                     { $$ = reg(NUM_TYPE, $1); }
-        | TK_PASM_IREG                                     { $$ = reg(INT_TYPE, $1); }
-        | TK_PASM_SREG                                     { $$ = reg(STRING_TYPE, $1); }
+pasm_reg: TK_PASM_PREG                                     { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
+        | TK_PASM_NREG                                     { $$ = reg(NUM_TYPE, $1, IS_PASM_REG); }
+        | TK_PASM_IREG                                     { $$ = reg(INT_TYPE, $1, IS_PASM_REG); }
+        | TK_PASM_SREG                                     { $$ = reg(STRING_TYPE, $1, IS_PASM_REG); }
         ;
 
 identifier: TK_IDENT
