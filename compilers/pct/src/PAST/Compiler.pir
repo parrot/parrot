@@ -25,6 +25,7 @@ and then invokes POST::Compiler on the resulting POST tree.
     piropsig['n_div'] = 'PP+'
     piropsig['n_mod'] = 'PP+'
     piropsig['n_neg'] = 'PP'
+    piropsig['print'] = 'v*'
     set_global '%piropsig', piropsig
 
     .return ()
@@ -373,13 +374,19 @@ a 'pasttype' of 'pirop'.
     .local pmc ops
     ops = self.'post_children'(node, 'signature'=>signature)
 
+    .local pmc arglist
+    arglist = ops.'get_array'()
+
+    $S0 = substr signature, 0, 1
+    if $S0 == 'v' goto pirop_void
+  pirop_reg:
     .local string result
     result = ops.'unique'('$P')
     ops.'result'(result)
-
-    .local pmc arglist
-    arglist = ops.'get_array'()
     ops.'push_pirop'(pirop, result, arglist :flat)
+    .return (ops)
+  pirop_void:
+    ops.'push_pirop'(pirop, arglist :flat)
     .return (ops)
 .end
 
