@@ -169,8 +169,10 @@ rule signature {
 }
 
 token param_var {
+    [
     | '$/'
     | <sigil> <ident>
+    ]
     {*}
 }
 
