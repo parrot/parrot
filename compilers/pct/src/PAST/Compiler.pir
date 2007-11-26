@@ -280,7 +280,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
-    bpost.'push_pirop'('find_name', result, name, 'result'=>result)
+    bpost.'push_pirop'('get_global', result, name, 'result'=>result)
     goto block_done
   block_decl_ns:
     bpost.'push_pirop'('get_hll_global', result, ns, name, 'result'=>result)
@@ -290,7 +290,10 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_immediate_ns
-    bpost.'push_pirop'('call', name, 'result'=>result)
+    $S0 = bpost.'unique'('$P')
+    bpost.'push_pirop'('get_global', $S0, name)
+    bpost.'push_pirop'('newclosure', $S0, $S0)
+    bpost.'push_pirop'('call', $S0, 'result'=>result)
     goto block_done
   block_immediate_ns:
     $S0 = bpost.'unique'('$P')
@@ -525,6 +528,7 @@ by C<node>.
     subpast = node[1]
     subpost = self.'post'(subpast, 'rtype'=>'P')
     ops.'push'(subpost)
+    ops.'push_pirop'('newclosure', subpost, subpost)
     ops.'push_pirop'('call', subpost, nextval)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
