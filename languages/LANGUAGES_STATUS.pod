@@ -93,29 +93,6 @@ C<languages/BASIC/compiler>
 =back
 
 
-=head2 BASIC/interpreter
-
-=over 4
-
-=item Description
-
-BASIC Interpreter written in pure Parrot.
-
-=item Status
-
-Has been broken for a long time.
-
-=item Last verified with parrot version
-
-0.0.11
-
-=item Location
-
-C<languages/BASIC/interpreter>
-
-=back
-
-
 =head2 abc
 
 =over 4
@@ -1264,3 +1241,9 @@ run-time lexical word, class and variable scopes.
 
 Removed from the repository (C<languages/parakeet>)
 prior to 0.4.10, after having been broken since 0.0.11.
+
+=head2 BASIC/interpreter
+
+BASIC interpreter was written in PASM, and used the global stack. It was last
+verified working in 0.0.11 before it was removed from
+C<languages/BASIC/interpreter> prior to 0.5.1.
