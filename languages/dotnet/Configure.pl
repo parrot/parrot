@@ -32,16 +32,16 @@ die "No such SRM module!\n" unless -e "build/SRM/$srm.pm";
 my %config = get_parrot_config( $parrot_path, $srm );
 
 # Generate makefile.
-generate_makefile(%config);
+generate_makefile(\%config);
 
 # Generate Config.pm.
-generate_config_pm(%config);
+generate_config_pm(\%config);
 
 # #############################################################################
 
 # Get Parrot Configuration
 # ########################
-sub get_parrot_config($$) {
+sub get_parrot_config {
 
     # Try to include config information from Parrot tree.
     my %config = %Parrot::Config::PConfig
@@ -53,28 +53,31 @@ sub get_parrot_config($$) {
 
 # Generate the makefile.
 # ######################
-sub generate_makefile(%) {
-    my %config = @_;
+sub generate_makefile {
+    my ( $config ) = @_;
 
     # Generate class library make instructions.
     my $class_lib_make = generate_classlib_make($mono_lib_path);
 
     # Read in makefile template.
     my $fh;
-    open $fh, "<", "config/Makefile.in"
+    open $fh, '<', "config/Makefile.in"
         or die "Unable to open config/Makefile.in\n";
     my $makefile = join( '', <$fh> );
     close $fh;
 
     # Sub in config data.
-    for ( keys %config ) {
+    for ( keys %{$config} ) {
         # warnings flags aren't substituted in Makefile.in; skip them
         next if m/^-W/g;
 
-        $makefile =~ s/\${$_}/$config{$_}/g;
+        $makefile =~ s/\${$_}/$config->{$_}/g;
     }
     $makefile =~ s/\$\{build_dir\}/$parrot_path/g;
-    $makefile =~ s/\$\{trans_mono_lib_path\}/$mono_lib_path/g;
+
+    my $local_mono_lib_path = $mono_lib_path || q{}; 
+    $makefile =~ s/\$\{trans_mono_lib_path\}/$local_mono_lib_path/g;
+
     $makefile =~ s/\$\{trans_class_library\}/$class_lib_make/g;
 
     # Write makefile.
@@ -85,25 +88,25 @@ sub generate_makefile(%) {
 
 # Generate Config.pm.
 # ###################
-sub generate_config_pm(%) {
-    my %config = @_;
+sub generate_config_pm {
+    my ( $config ) = @_;
 
     # Read in template.
     my $fh;
-    open $fh, "<", "config/N2PConfig_pm.in"
+    open $fh, '<', 'config/N2PConfig_pm.in'
         or die "Unable to open config/N2PConfig_pm.in\n";
     my $config_pm = join( '', <$fh> );
     close $fh;
 
     # Sub in config data.
-    for ( keys %config ) {
+    for ( keys %{$config} ) {
         # warnings flags aren't substituted in config/N2PConfig_pm.in; skip them
         next if m/^-W/g;
-        $config_pm =~ s/\${$_}/$config{$_}/g;
+        $config_pm =~ s/\${$_}/$config->{$_}/g;
     }
 
     # Write.
-    open $fh, ">", "config/N2PConfig.pm"
+    open $fh, ">", 'config/N2PConfig.pm'
         or die "Unable to open config/N2PConfig.pm\n";
     print $fh $config_pm;
     close $fh;
@@ -111,8 +114,9 @@ sub generate_config_pm(%) {
 
 # Generate makefile instructions to translate class library.
 # ##########################################################
-sub generate_classlib_make($) {
+sub generate_classlib_make {
     my $mono_class_lib = shift;
+
     if ($mono_class_lib) {
 
         # Generate code to translate each library.
