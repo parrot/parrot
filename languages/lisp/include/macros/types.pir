@@ -119,6 +119,8 @@ Create a new function object with label L, placing the result in F.
     .F = new "LispFunction"
     # VALID_IN_PARROT_0_2_0 newsub _func, .Sub, .L
     # VALID_IN_PARROT_0_2_0 setattribute .F, "LispFunction\0body", .L
+
+    .sym pmc _func
     .const .Sub _func = .L
     setattribute .F, "body", _func
 

@@ -19,13 +19,6 @@ Used in bootstrapping.
      store_global "PACKAGES", "SYSTEM", package
      store_global "PACKAGES", "SYS",    package
 
-    # strange things happening here
-    # removing one of these lines breaks Lisp in r20981
-    .local pmc dummy_1
-    .local pmc dummy_2
-    .local pmc dummy_3
-    .local pmc dummy_4
-
     _init_reader_macros( package )
 
     .local pmc symbol, nil
