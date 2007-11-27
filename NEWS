@@ -1,5 +1,12 @@
 # $Id$
 
+New in 0.5.1
+- Languages/Compilers
+  + compilers/pct: Parrot Compiler Toolkit redesigned and updated
+  + compilers/nqp: (was languages/nqp) major updates, including
+    support for namespaces, module/class declarations, methods
+  + languages/abc: re-implemented using PCT and NQP
+
 New in 0.5.0
 - Implementation
   + PDD15 (OO) branch merged with trunk; this release contains a working,
