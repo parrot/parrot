@@ -70,6 +70,8 @@ CLEANUPS = \
 clean:
 	$(RM_F) $(CLEANUPS)
 
-distclean: clean
-	$(RM_F) Makefile
+realclean: clean
+	$(RM_RF) Makefile
+
+distclean: realclean
 

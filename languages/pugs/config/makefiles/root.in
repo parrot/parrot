@@ -54,5 +54,8 @@ CLEANERS = \
 clean:
 	$(RM_F) $(CLEANERS)
 
+realclean: clean
+	$(RM_RF) Makefile
+
 distclean: clean
 	$(RM_F) Makefile

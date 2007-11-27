@@ -332,6 +332,8 @@ lib/*.pre_c
 clean:
 	$(RM_F) $(CLEANERS)
 
-distclean: clean
+realclean: clean
 	$(RM_F) Makefile
+
+distclean: realclean
 
