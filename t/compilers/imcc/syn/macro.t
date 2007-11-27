@@ -204,7 +204,7 @@ unlink('macro.tempfile');
 pir_output_is( <<'CODE', <<'OUTPUT', '.newid' );
 .sub test :main
 .macro newid(ID, CLASS)
-    .sym .CLASS .ID
+    .local .CLASS .ID
     .ID = new .CLASS
 .endm
     .newid(var, Undef)
@@ -220,7 +220,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', '.newlex' );
 .sub test :main
 .macro newlex(ID, CLASS)
-    .sym .CLASS .ID
+    .local .CLASS .ID
     .ID = new .CLASS
     # store_lex -1, .ID , .ID    # how to stringify .ID
 .endm
