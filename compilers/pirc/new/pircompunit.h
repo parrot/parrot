@@ -131,31 +131,15 @@ typedef struct constant {
 
 } constant;
 
-/* selector types for the __variable union in struct variable */
-typedef enum var_types {
-    VAR_IDENT,
-    VAR_STRING,
-    VAR_SYMREG,
-    VAR_PASMREG
-
-} var_type;
-
-/* possibly unify target and variable */
-
-typedef struct variable {
-    pir_type datatype;
-    union __variable {
-        char *name;
-        int regno;
-    } var;
-
-    int flags;
-    var_type vartype;
-
-} variable;
 
 
-/* expression wrapper node. */
+
+
+/* expressions are operands for parrot instructions.
+
+Maybe rename.
+
+ */
 typedef struct expression {
     union __expression {
         struct target *t;
@@ -178,10 +162,10 @@ typedef struct expression {
  * return continuation.
  */
 typedef struct target {
-    pir_type type; /* not used if it's a result target */
-    char    *name;
-    int      regno;
-
+    pir_type type;
+    char    *name;  /* if this is a symbolic variable */
+    int      regno; /* if this is a symbolic register */
+    int      color; /* for register allocation */
     int      flags;
     char    *named_flag_arg;
 
@@ -215,12 +199,13 @@ typedef struct argument {
  */
 typedef struct invocation {
     invoke_type type;
-    variable *object;
-    variable *sub;
-    variable *retcc;
+    target *object;
+    target *sub;
+    target *retcc;
 
     target   *results;
     argument *arguments;
+
 
 } invocation;
 
@@ -263,7 +248,7 @@ typedef struct statement {
                                     struct type##_block *next;   \
                                 } type##_block
 
-#define LIST(type, name)    type##_block *name
+
 
 
 DECLARE(param, sub_param);
@@ -282,11 +267,7 @@ typedef struct subroutine {
     target    *parameters;
     statement *statements;
     statement *stat_tail;
-/*
-    LIST(param, parameters);
-    LIST(instr, instructions);
 
-    */
     struct subroutine *next;
 
 } subroutine;
@@ -319,10 +300,8 @@ void add_instr(struct lexer_state *lexer, char *label, instruction *instr);
 
 void set_arg_flag(argument *arg, int flag);
 
-constant *new_iconst(char *name, int val);
-constant *new_sconst(char *name, char *val);
-constant *new_pconst(char *name, char *val);
-constant *new_nconst(char *name, double val);
+constant *new_constant(pir_type type, char *name, ...);
+
 
 expression *expr_from_constant(constant *c);
 expression *expr_from_target(target *t);
@@ -332,18 +311,20 @@ argument *new_argument(expression *expr);
 argument *add_arg(argument *arg1, argument *arg2);
 
 target *add_param(struct lexer_state *lexer, pir_type type, char *name);
+target *add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias);
+
 target *add_target(struct lexer_state *lexer, target *t, target *newt);
 
 target *new_target(pir_type type, char *name);
 target *reg(int type, int regno, int is_pasm);
 
 
-invocation *invoke(struct lexer_state *lexer, invoke_type, variable *invokable1, variable *invokable2);
+invocation *invoke(struct lexer_state *lexer, invoke_type, target *invokable1, target *invokable2);
 void set_invocation_flag(invocation *inv, invoke_type flag);
 
-variable *var_from_string(char *str);
-variable *var_from_ident(char *id);
-variable *var_from_reg(pir_type type, int regno, int is_pasm);
+target *target_from_string(char *str);
+target *target_from_ident(char *id);
+target *target_from_reg(pir_type type, int regno, int is_pasm);
 
 
 void set_pragma(int which_one, int value);
@@ -357,7 +338,7 @@ void set_arg_named(argument *arg, char *alias);
 
 void new_instr(struct lexer_state *lexer);
 void set_label(struct lexer_state *lexer, char *label);
-void set_instr(struct lexer_state *lexer, char *opname);
+void set_instr(struct lexer_state *lexer, char *opname, ...);
 
 void define_const(struct lexer_state *lexer, constant *var, int is_globalconst);
 

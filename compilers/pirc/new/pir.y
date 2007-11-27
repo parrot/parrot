@@ -90,7 +90,6 @@ extern YY_DECL;
     struct target      *targ;
     struct argument    *argm;
     struct invocation  *invo;
-    struct variable    *varb;
 
     void *fixme;
 }
@@ -214,7 +213,7 @@ extern YY_DECL;
              opt_paren_string
 
 
-%type <varb> sub
+%type <targ> sub
              method
              string_object
              invokable
@@ -412,9 +411,7 @@ parameter: ".param" param_def param_flags "\n"      { set_param_flag($2, $3);
          ;
 
 param_def: type identifier                  { $$ = add_param(lexer, $1, $2); }
-         | type TK_STRINGC "=>" identifier  { $$ = add_param(lexer, $1, $4);
-                                              set_param_named($$, $2);
-                                            }
+         | type TK_STRINGC "=>" identifier  { $$ = add_param_named(lexer, $1, $4, $2); }
          ;
 
 /* Instructions */
@@ -564,10 +561,10 @@ then: "goto" /* PIR mode */
     ;
 
 
-condition: expression                                      { set_instr(lexer, "if");
+condition: expression                                      { set_instr(lexer, "if" /*, $1 */);
                                                              /* set $1 as argument */
                                                            }
-         | expression rel_op expression                    { set_instr(lexer, $2);
+         | expression rel_op expression                    { set_instr(lexer, $2 /*, $1, $3 */ );
                                                              /* set $1 and $3 as arguments */
                                                            }
          ;
@@ -672,21 +669,21 @@ subcall: sub arguments                                      { $$ = invoke(lexer,
        ;
 
 sub: invokable                                 { $$ = $1; }
-   | TK_STRINGC                                { $$ = var_from_string($1); }
+   | TK_STRINGC                                { $$ = target_from_string($1); }
    ;
 
 method: invokable
       | string_object
       ;
 
-invokable: identifier                          { $$ = var_from_ident($1); }
-         | TK_SYM_PREG                         { $$ = var_from_reg(PMC_TYPE, $1, !IS_PASM_REG); }
-         | TK_PASM_PREG                        { $$ = var_from_reg(PMC_TYPE, $1, IS_PASM_REG); }
+invokable: identifier                          { $$ = target_from_ident($1); }
+         | TK_SYM_PREG                         { $$ = target_from_reg(PMC_TYPE, $1, !IS_PASM_REG); }
+         | TK_PASM_PREG                        { $$ = target_from_reg(PMC_TYPE, $1, IS_PASM_REG); }
          ;
 
-string_object: TK_STRINGC                      { $$ = var_from_string($1); }
-             | TK_SYM_SREG                     { $$ = var_from_reg(STRING_TYPE, $1, !IS_PASM_REG); }
-             | TK_PASM_SREG                    { $$ = var_from_reg(STRING_TYPE, $1, IS_PASM_REG); }
+string_object: TK_STRINGC                      { $$ = target_from_string($1); }
+             | TK_SYM_SREG                     { $$ = target_from_reg(STRING_TYPE, $1, !IS_PASM_REG); }
+             | TK_PASM_SREG                    { $$ = target_from_reg(STRING_TYPE, $1, IS_PASM_REG); }
              ;
 
 opt_target_list: '(' ')'                          { $$ = NULL; }
@@ -827,10 +824,10 @@ const_decl_statement: const_declaration "\n"
                     | ".globalconst" const_tail "\n"       { define_const(lexer, $2, GLOBALCONST);  }
                     ;
 
-const_tail: "int"    identifier '=' TK_INTC                { $$ = new_iconst($2, $4); }
-          | "num"    identifier '=' TK_NUMC                { $$ = new_nconst($2, $4); }
-          | "pmc"    identifier '=' TK_STRINGC             { $$ = new_pconst($2, $4); }
-          | "string" identifier '=' TK_STRINGC             { $$ = new_sconst($2, $4); }
+const_tail: "int"    identifier '=' TK_INTC                { $$ = new_constant(INT_TYPE, $2, $4); }
+          | "num"    identifier '=' TK_NUMC                { $$ = new_constant(NUM_TYPE, $2, $4); }
+          | "pmc"    identifier '=' TK_STRINGC             { $$ = new_constant(PMC_TYPE, $2, $4); }
+          | "string" identifier '=' TK_STRINGC             { $$ = new_constant(STRING_TYPE, $2, $4); }
           ;
 
 pasm_expression: expression
@@ -846,9 +843,9 @@ expression: target                                         { $$ = expr_from_targ
           | constant                                       { $$ = expr_from_constant($1); }
           ;
 
-constant: TK_STRINGC                                       { $$ = new_sconst(NULL, $1); }
-        | TK_INTC                                          { $$ = new_iconst(NULL, $1); }
-        | TK_NUMC                                          { $$ = new_nconst(NULL, $1); }
+constant: TK_STRINGC                                       { $$ = new_constant(STRING_TYPE, NULL, $1); }
+        | TK_INTC                                          { $$ = new_constant(INT_TYPE, NULL, $1); }
+        | TK_NUMC                                          { $$ = new_constant(NUM_TYPE, NULL, $1); }
         ;
 
 rel_op: "!="                                               { $$ = "ne"; }

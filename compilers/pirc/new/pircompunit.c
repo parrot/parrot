@@ -75,8 +75,16 @@ new_target(pir_type type, char *name) {
 
 target *
 add_target(struct lexer_state *lexer, target *t, target *t2) {
+    target *iter = t;
+    assert(t);
+    assert(t2);
 
-    if (t2 == NULL) return t;
+    while(iter->next) {
+        iter = iter->next;
+    }
+
+    iter->next = t2;
+
     return t;
 }
 
@@ -88,10 +96,18 @@ add_param(struct lexer_state *lexer, pir_type type, char *name) {
     return t;
 }
 
+target *
+add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias) {
+    target *t = add_param(lexer, type, name);
+    t->named_flag_arg = alias;
+    SET_FLAG(t->flags, PARAM_FLAG_NAMED);
+    return t;
+}
+
 
 void
 set_param_named(target *t, char *alias) {
-    SET_FLAG(t->flags, ARG_FLAG_NAMED); /* should already be the case */
+    SET_FLAG(t->flags, PARAM_FLAG_NAMED); /* should already be the case */
     t->named_flag_arg = alias;
 }
 
@@ -109,9 +125,23 @@ new_argument(expression *expr) {
 
 
 
+/*
+
+Add arg2 to the list pointed to by arg1. Both
+arg1 and arg2 should be not null.
+
+*/
 argument *
 add_arg(argument *arg1, argument *arg2) {
-    return NULL;
+    argument *iter = arg1;
+    assert(arg1);
+    assert(arg2);
+    while (iter->next != NULL) {
+        iter = iter->next;
+    }
+    /* iter->next is NULL at this point */
+    iter->next = arg2;
+    return arg1;
 }
 
 
@@ -170,9 +200,15 @@ new_instruction(char *opname) {
 }
 
 void
-set_instr(struct lexer_state *lexer, char *opname) {
+set_instr(struct lexer_state *lexer, char *opname, ...) {
+    va_list arg_ptr;
+
     lexer->currentstat->instr.ins = new_instruction(opname);
     lexer->currentstat->type = STAT_TYPE_INSTRUCTION;
+
+    va_start(arg_ptr, opname);
+
+    va_end(arg_ptr);
 }
 
 /*
@@ -198,44 +234,35 @@ invert_instr(struct lexer_state *lexer) {
 
 /* constant constructors */
 
-static constant *
-new_constant(int type, char *name) {
+constant *
+new_constant(pir_type type, char *name, ...) {
+    va_list arg_ptr;
     constant *c = (constant *)malloc(sizeof (constant));
     assert(c != NULL);
     c->name = name;
     c->type = type;
-    return c;
-}
 
-constant *
-new_nconst(char *name, double val) {
-    constant *c = new_constant(NUM_TYPE, name);
-    c->val.nval = val;
-    return c;
-}
-
-
-constant *
-new_iconst(char *name, int val) {
-   constant *c = new_constant(INT_TYPE, name);
-    c->val.nval = val;
-    return c;
-}
-
-constant *
-new_sconst(char *name, char *val) {
-    constant *c = new_constant(STRING_TYPE, name);
-    c->val.sval = val;
+    va_start(arg_ptr, name);
+    switch (type) {
+        case INT_TYPE:
+            c->val.ival = va_arg(arg_ptr, int);
+            break;
+        case NUM_TYPE:
+            c->val.nval = va_arg(arg_ptr, double);
+            break;
+        case PMC_TYPE:
+        case STRING_TYPE:
+            c->val.sval = va_arg(arg_ptr, char *);
+            break;
+        default:
+            fprintf(stderr, "Fatal error: unknown constant type\n");
+            exit(EXIT_FAILURE);
+    }
+    va_end(arg_ptr);
     return c;
 }
 
 
-constant *
-new_pconst(char *name, char *val) {
-    constant *c = new_constant(PMC_TYPE, name);
-    c->val.pval = val;
-    return c;
-}
 
 
 void
@@ -261,12 +288,12 @@ set_invocation(struct lexer_state *lexer) {
 }
 
 void
-set_invocation_sub(struct lexer_state *lexer, variable *sub) {
+set_invocation_sub(struct lexer_state *lexer, target *sub) {
     lexer->currentstat->instr.inv->sub = sub;
 }
 
 void
-set_invocation_object(struct lexer_state *lexer, variable *object) {
+set_invocation_object(struct lexer_state *lexer, target *object) {
     lexer->currentstat->instr.inv->object = object;
 }
 
@@ -377,7 +404,7 @@ set_invocation_flag(invocation *inv, invoke_type flag) {
 }
 
 invocation *
-invoke(struct lexer_state *lexer, invoke_type type, variable *obj1, variable *obj2) {
+invoke(struct lexer_state *lexer, invoke_type type, target *obj1, target *obj2) {
     invocation *inv = new_invocation();
     SET_FLAG(inv->type, type);
 
@@ -411,35 +438,26 @@ invoke(struct lexer_state *lexer, invoke_type type, variable *obj1, variable *ob
 }
 
 
-static variable *
-new_var(var_type type) {
-    variable *var = (variable *)malloc(sizeof (variable));
-    var->vartype = type;
+
+
+target *
+target_from_string(char *str) {
+    target *var = new_target(STRING_TYPE, str);
     return var;
 }
 
-variable *
-var_from_string(char *str) {
-    variable *var = new_var(VAR_STRING);
-    var->var.name = str;
-    var->datatype = STRING_TYPE;
-    return var;
-}
+target *
+target_from_ident(char *id) {
+    target *var = new_target(UNKNOWN_TYPE, id);
 
-variable *
-var_from_ident(char *id) {
-    variable *var = new_var(VAR_IDENT);
-    var->var.name = id;
-    var->datatype = UNKNOWN_TYPE;
     return var;
 
 }
 
-variable *
-var_from_reg(pir_type type, int regno, int is_pasm) {
-    variable *var = new_var(is_pasm ? VAR_PASMREG : VAR_SYMREG);
-    var->var.regno = regno;
-    var->datatype = type;
+target *
+target_from_reg(pir_type type, int regno, int is_pasm) {
+    target *var = new_target(type, NULL);
+    var->regno = regno;
     return var;
 }
 
@@ -468,16 +486,72 @@ set_hll_map(char *stdtype, char *maptype) {
 
 /* debug functions */
 
+void
+print_target(target *t) {
+
+    if (t->name) {
+        printf("%s", t->name);
+    }
+    else {
+
+    }
+}
+
+void
+print_constant(constant *c) {
+
+}
+
+void
+print_expr(expression *expr) {
+    switch (expr->type) {
+        case EXPR_TARGET:
+            print_target(expr->expr.t);
+            break;
+        case EXPR_CONSTANT:
+            print_constant(expr->expr.c);
+            break;
+        case EXPR_IDENT:
+            printf("%s", expr->expr.id);
+            break;
+        case EXPR_INT:
+            break;
+        default:
+            fprintf(stderr, "Fatal error: unknown expression type\n");
+            break;
+    }
+}
+
+void
+print_args(argument *args) {
+    while (args) {
+        print_expr(args->value);
+
+        if (args->next)
+            printf(", ");
+
+        args = args->next;
+    }
+}
+
+void
+print_expressions(expression *expr) {
+    while (expr) {
+        print_expr(expr);
+        expr = expr->next;
+    }
+}
 
 void
 print_instruction(instruction *ins) {
     assert(ins != NULL);
 
     if (ins->opname) {
-        printf("  %s", ins->opname);
+        printf("\n  %s ", ins->opname);
+
+        print_expressions(ins->operands);
 
 
-        puts("");
     }
 }
 
@@ -504,6 +578,9 @@ print_invocation(invocation *inv) {
             fprintf(stderr, "Unknown invocation type\n");
             exit(EXIT_FAILURE);
     }
+
+    if (inv->results) print_target(inv->results);
+    if (inv->arguments) print_args(inv->arguments);
 
 }
 
@@ -536,6 +613,14 @@ print_subs(struct lexer_state *lexer) {
         print_statement(subiter);
         subiter = subiter->next;
     }
+
+
+    printf("size of a target:     %d\n", sizeof (target));
+    printf("size of a expression: %d\n", sizeof (expression));
+    printf("size of a constant:   %d\n", sizeof (constant));
+    printf("size of a statement:  %d\n", sizeof (statement));
+    printf("size of a invocation: %d\n", sizeof (invocation));
+    printf("size of a instruction: %d\n", sizeof (instruction));
 }
 
 /*
