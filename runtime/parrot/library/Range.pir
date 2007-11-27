@@ -13,10 +13,10 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
 =cut
 
 .macro exhausted_check()
-  .sym pmc exhausted
+  .local pmc exhausted
   exhausted = getattribute self, 'exhausted'
   unless exhausted goto .$more
-  .sym pmc exception
+  .local pmc exception
   exception = new 'Exception'
   exception[0] = 'Exhausted Range'
   throw exception
@@ -24,7 +24,7 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
 .endm
 
 .macro exhausted()
-  .sym pmc exhausted
+  .local pmc exhausted
   exhausted = new 'Boolean'
   exhausted = 1
   setattribute self, 'exhausted', exhausted
@@ -138,7 +138,7 @@ Return the min and max attributes as a 2 element list.
   max = self.'get_max'()
   $P1[0] = min
   $P1[1] = max
-  .return ($P1) 
+  .return ($P1)
 .end
 
 =head2 shift
@@ -165,7 +165,7 @@ Throw an exception if we're out of values.
   if $P0 <= to goto done
   goto exhaust
 neg:
-  if $P0 >= to goto done 
+  if $P0 >= to goto done
 exhaust:
   .exhausted()
 done:
@@ -186,7 +186,7 @@ done:
   .return ($P0)
 .end
 
-.sub 'shift_string' :vtable :method 
+.sub 'shift_string' :vtable :method
   $P0 = shift self
   .return ($P0)
 .end
@@ -213,7 +213,7 @@ Throw an exception if we're out of values.
   setattribute self, 'to', $P0
 
   if by < 0 goto neg
-  if $P0 >= from goto done 
+  if $P0 >= from goto done
   goto exhaust
 neg:
   if $P0 <= from goto done
@@ -237,7 +237,7 @@ done:
   .return ($P0)
 .end
 
-.sub 'pop_string' :vtable :method 
+.sub 'pop_string' :vtable :method
   $P0 = pop self
   .return ($P0)
 .end
