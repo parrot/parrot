@@ -805,10 +805,13 @@ blocks to determine the scope.
     .return self.'vivify'(node, ops, fetchop, storeop)
 
   lexical_decl:
-    .local pmc viviself
+    ops = $P0.'new'('node'=>node)
+    .local pmc viviself, vivipost
     viviself = node.'viviself'()
-    ops = self.'post'(viviself, 'rtype'=>'P')
-    ops.'push_pirop'('.lex', name, ops)
+    vivipost = self.'post'(viviself, 'rtype'=>'P')
+    ops.'push'(vivipost)
+    ops.'push_pirop'('.lex', name, vivipost)
+    ops.'result'(vivipost)
     .return (ops)
 
   lexical_bind:
