@@ -426,11 +426,15 @@
 ##            make PAST::Var.new( $value,
 ##                                :scope('keyed'),
 ##                                :vivibase('Hash'),
+##                                :viviself('Undef'),
 ##                                :node( $/ ) );
 ##        }
 ##        else {
+##            my $vivibase := ($key eq '{ }') ? 'Hash' : 'Array';
 ##            make PAST::Var.new( $($<EXPR>),
 ##                                :scope('keyed'),
+##                                :vivibase($vivibase),
+##                                :viviself('Undef'),
 ##                                :node($/) );
 ##        }
 ##    }
@@ -441,10 +445,15 @@
     if key == '( )' goto subcall
     if key == '< >' goto keyed_const
   keyed_var:
+    .local string vivibase
+    vivibase = 'Array'
+    if key != '{ }' goto keyed_array
+    vivibase = 'Hash'
+  keyed_array:
     $P0 = get_hll_global ['PAST'], 'Var'
     $P1 = match['EXPR']
     $P2 = $P1.'get_scalar'()
-    $P3 = $P0.'new'( $P2, 'scope'=>'keyed', 'node'=>match )
+    $P3 = $P0.'new'( $P2, 'scope'=>'keyed', 'vivibase'=>vivibase, 'viviself'=>'Undef', 'node'=>match )
     match.'result_object'($P3)
     .return ()
   subcall:
@@ -461,7 +470,7 @@
     .local pmc value
     value = $P0.'new'( 'value' => $P2, 'node'=> $P1 )
     $P0 = get_hll_global ['PAST'], 'Var'
-    $P1 = $P0.'new'( value, 'scope'=>'keyed', 'vivibase'=>'Hash', 'node'=>match)
+    $P1 = $P0.'new'( value, 'scope'=>'keyed', 'vivibase'=>'Hash', 'viviself'=>'Undef', 'node'=>match)
     match.'result_object'($P1)
 .end
 
