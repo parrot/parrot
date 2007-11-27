@@ -505,6 +505,65 @@ a 'pasttype' of if/unless.
 .end
 
 
+=item while(PAST::Op node)
+
+=item until(PAST::Op node)
+
+Return the PAST representation of a C<while> or C<until> loop.
+
+=cut
+
+.sub 'while' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local string pasttype
+    pasttype = node.'pasttype'()
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+
+    .local pmc exprpast, exprpost
+    .local pmc bodypast, bodypost
+    exprpast = node[0]
+    bodypast = node[1]
+
+    .local pmc looplabel, endlabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = concat pasttype, '_'
+    $S0 = ops.'unique'($S0)
+    looplabel = $P0.'new'('result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = $P0.'new'('result'=>$S0)
+
+    ##  determine if we need an 'if' or an 'unless'
+    ##  on the conditional (while => if, until => unless)
+    .local string iftype
+    iftype = 'if'
+    if $S0 == 'until' goto have_iftype
+    iftype = 'unless'
+  have_iftype:
+
+    ops.'push'(looplabel)
+    exprpost = self.'post'(exprpast, 'rtype'=>'P')
+    ops.'push'(exprpost)
+    ops.'push_pirop'(iftype, exprpost, endlabel)
+    bodypost = self.'post'(bodypast, 'rtype'=>'*')
+    ops.'push'(bodypost)
+    ops.'push_pirop'('goto', looplabel)
+    ops.'push'(endlabel)
+    ops.'result'(exprpost)
+    .return (ops)
+.end
+
+.sub 'until' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .return self.'while'(node, options :flat :named)
+.end
+
+
 =item for(PAST::Op node)
 
 Return the PAST representation of the C<for> loop given
