@@ -430,7 +430,7 @@
 ##                                :node( $/ ) );
 ##        }
 ##        else {
-##            my $vivibase := ($key eq '{ }') ? 'Hash' : 'Array';
+##            my $vivibase := ($key eq '{ }') ? 'Hash' : 'ResizablePMCArray';
 ##            make PAST::Var.new( $($<EXPR>),
 ##                                :scope('keyed'),
 ##                                :vivibase($vivibase),
@@ -446,7 +446,7 @@
     if key == '< >' goto keyed_const
   keyed_var:
     .local string vivibase
-    vivibase = 'Array'
+    vivibase = 'ResizablePMCArray'
     if key != '{ }' goto keyed_array
     vivibase = 'Hash'
   keyed_array:
