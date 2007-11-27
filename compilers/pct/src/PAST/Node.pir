@@ -314,6 +314,10 @@ node.
 
 Get/set the constant value for this node.
 
+=item returns([typename])
+
+Get/set the type of PMC to be generated from this node.
+
 =cut
 
 .namespace [ 'PAST::Val' ]
@@ -324,6 +328,11 @@ Get/set the constant value for this node.
     .return self.'attr'('value', value, has_value)
 .end
 
+.sub 'returns' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('returns', value, has_value)
+.end
 
 =back
 

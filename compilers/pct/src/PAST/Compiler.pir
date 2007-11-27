@@ -958,10 +958,17 @@ to have a PMC generated containing the constant value.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
 
-    .local pmc value
-    .local int isstr
+    .local pmc value, returns
     value = node.'value'()
-    isstr = isa value, 'String'
+    returns = node.'returns'()
+    if returns goto have_returns
+    $S0 = typeof value
+    returns = $S0
+  have_returns:
+
+    .local int isstr
+    $I0 = cmp_str returns, 'String'
+    isstr = iseq $I0, 0
 
     .local string rtype
     rtype = options['rtype']
@@ -976,14 +983,13 @@ to have a PMC generated containing the constant value.
     .return (ops)
 
   result_pmc:
-    .local string result, vtype
+    .local string result
     result = ops.'unique'('$P')
-    vtype = typeof value
-    vtype = ops.'escape'(vtype)
+    returns = ops.'escape'(returns)
     unless isstr goto have_value
     value = ops.'escape'(value)
   have_value:
-    ops.'push_pirop'('new', result, vtype)
+    ops.'push_pirop'('new', result, returns)
     ops.'push_pirop'('assign', result, value)
     ops.'result'(result)
     .return (ops)
