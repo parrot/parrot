@@ -7,29 +7,26 @@ RM_RF         = @rm_rf@
 PARROT        = ../../parrot@exe@
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
-BUILD         = $(PERL) @build_dir@/tools/build/dynpmc.pl
-TOOL_DIR      = ../..
 PGE_DIR       = ../../compilers/pge
-TGE_DIR       = ../../compilers/tge
+NQP_DIR       = ../../compilers/nqp
 CAT           = $(PERL) -MExtUtils::Command -e cat
 CP            = @cp@
 O             = @o@
-LOAD_EXT      = @load_ext@
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
-PGE_LIBRARY   = ../../runtime/parrot/library/PGE
-PMCDIR        = src/pmc
 
-all: abc.pbc 
+PARROT_LIBRARY = ../../runtime/parrot/library
+PGE_LIBRARY   = ../../runtime/parrot/library/PGE
+
+all: abc.pbc
 
 SOURCES = abc.pir \
-  src/abc.pg \
+  src/grammar.pg \
+  src/grammar-actions.pl \
   src/builtins.pir \
-  src/PASTGrammar.tg
 
 # the default target
-abc.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
-	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=src/abc_gen.pir src/abc.pg
-	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/PASTGrammar_gen.pir src/PASTGrammar.tg
+abc.pbc: $(PARROT) $(NQP_DIR)/nqp.pbc $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
+	$(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir --output=src/gen_grammar.pir src/grammar.pg
+	$(PARROT) $(NQP_DIR)/nqp.pbc --target=pir --output=src/gen_grammar-actions.pir src/grammar-actions.pl
 	$(PARROT) -o abc.pbc abc.pir
 
 # This is a listing of all targets, that are meant to be called by users
@@ -65,8 +62,8 @@ testclean:
 
 CLEANUPS = \
   abc.pbc \
-  src/abc_gen.pir \
-  src/PASTGrammar_gen.pir
+  src/gen_grammar.pir \
+  src/gen_grammar-actions.pir
 
 clean: testclean
 	$(RM_RF) $(CLEANUPS)
