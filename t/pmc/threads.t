@@ -237,14 +237,14 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
 .sub _main
     .const int MAX = 1000
-    .sym pmc kid
-    .sym pmc Adder
+    .local pmc kid
+    .local pmc Adder
     Adder = global '_add'
     kid = new 'ParrotThread'
-    .sym pmc from
+    .local pmc from
     from = new 'Integer'
     from = 0
-    .sym pmc to
+    .local pmc to
     to = new 'Integer'
     to = MAX
     kid.'run_clone'(Adder, Adder, from, to)
@@ -254,7 +254,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
     print result
     print "\n"
     # sum = n * (n + 1)/2
-    .sym pmc Mul
+    .local pmc Mul
     Mul = new 'Integer'
     assign Mul, to
     inc Mul
@@ -269,7 +269,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
    .param pmc sub
    .param pmc from
    .param pmc to
-   .sym   pmc sum
+   .local pmc sum
    sum = new 'Integer'
 loop:
     add sum, from
