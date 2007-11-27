@@ -456,6 +456,9 @@ a 'pasttype' of if/unless.
     .param pmc node
     .param pmc options         :slurpy :named
 
+    .local string rtype
+    rtype = options['rtype']
+
     .local string pasttype
     pasttype = node.'pasttype'()
 
@@ -485,6 +488,7 @@ a 'pasttype' of if/unless.
     unless $I0 goto else_done
     elsepost = self.'post'(elsepast, 'rtype'=>'P')
     ops.'push'(elsepost)
+    if rtype == 'v' goto else_done
     ops.'push_pirop'('set', ops, elsepost)
   else_done:
     ops.'push_pirop'('goto', endlabel)
@@ -493,6 +497,7 @@ a 'pasttype' of if/unless.
     unless $I0 goto then_done
     thenpost = self.'post'(thenpast, 'rtype'=>'P')
     ops.'push'(thenpost)
+    if rtype == 'v' goto then_done
     ops.'push_pirop'('set', ops, thenpost)
   then_done:
     ops.'push'(endlabel)
