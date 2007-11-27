@@ -688,7 +688,7 @@
   past_var:
     $S0 = match
     $P0 = get_hll_global ['PAST'], 'Var'
-    $P1 = $P0.'new'('node'=>match, 'name'=>$S0)
+    $P1 = $P0.'new'('node'=>match, 'name'=>$S0, 'viviself'=>'Undef')
     match.'result_object'($P1)
 .end
 
