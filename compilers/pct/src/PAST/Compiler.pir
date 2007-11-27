@@ -839,12 +839,15 @@ blocks to determine the scope.
 
     .local pmc basepast, basepost
     basepast = node[0]
-    $P0 = basepast.'viviself'()
-    if $P0 goto have_baseviviself
+
     $P0 = node.'vivibase'()
-    unless $P0 goto have_baseviviself
+    unless $P0 goto have_vivibase
+    $P1 = basepast.'viviself'()
+    unless $P1 goto vivibase_1
+    if $P1 != 'Undef' goto have_vivibase
+  vivibase_1:
     basepast.'viviself'($P0)
-  have_baseviviself:
+  have_vivibase:
 
     #  if the keyed node is an lvalue, its base is an lvalue also
     $I0 = node.'lvalue'()
