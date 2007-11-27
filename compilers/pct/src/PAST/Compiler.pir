@@ -19,15 +19,16 @@ and then invokes POST::Compiler on the resulting POST tree.
 
     .local pmc piropsig
     piropsig = new 'Hash'
-    piropsig['n_add'] = 'PP+'
-    piropsig['n_sub'] = 'PP+'
-    piropsig['n_mul'] = 'PP+'
-    piropsig['n_div'] = 'PP+'
-    piropsig['n_mod'] = 'PP+'
-    piropsig['n_neg'] = 'PP'
-    piropsig['n_not'] = 'PP'
-    piropsig['print'] = 'v*'
-    piropsig['set']   = 'PP'
+    piropsig['n_add']    = 'PP+'
+    piropsig['n_sub']    = 'PP+'
+    piropsig['n_mul']    = 'PP+'
+    piropsig['n_div']    = 'PP+'
+    piropsig['n_mod']    = 'PP+'
+    piropsig['n_neg']    = 'PP'
+    piropsig['n_not']    = 'PP'
+    piropsig['n_concat'] = 'PP~'
+    piropsig['print']    = 'v*'
+    piropsig['set']      = 'PP'
     set_global '%piropsig', piropsig
 
     .return ()
