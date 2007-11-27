@@ -45,6 +45,7 @@ my %makefiles = (
         conditioned_lines => 1,
     },
 
+    'compilers/nqp/Makefile'     => { SOURCE => 'config/gen/makefiles/nqp.in' },
     'compilers/past-pm/Makefile' => { SOURCE => 'config/gen/makefiles/past-pm.in' },
     'compilers/pct/Makefile'     => { SOURCE => 'config/gen/makefiles/pct.in' },
     'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },

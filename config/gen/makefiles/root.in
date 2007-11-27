@@ -139,6 +139,7 @@ NONGEN_HEADERS  = @TEMP_nongen_headers@
 GEN_MAKEFILES = \
     Makefile \
 #CONDITIONED_LINE(has_perldoc):    docs/Makefile \
+    compilers/nqp/Makefile \
     compilers/past-pm/Makefile \
     compilers/pct/Makefile \
     compilers/pge/Makefile \
@@ -1272,6 +1273,7 @@ compilers.dummy : $(PARROT)
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/past-pm
 	$(MAKE) compilers/pct
+	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 
 languages : languages.dummy
@@ -1302,6 +1304,7 @@ compilers-clean :
 	$(MAKE) compilers/pct clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
+	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean
 	$(MAKE) compilers/pirc clean
 

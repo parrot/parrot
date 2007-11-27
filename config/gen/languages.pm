@@ -57,7 +57,6 @@ sub runstep {
         HQ9plus jako
         lisp lua
         m4
-        nqp
         ook
         parrot_compiler perl5 perl6 pheme PIR plumhead pugs punie pynie
         regex

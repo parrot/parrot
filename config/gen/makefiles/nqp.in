@@ -5,19 +5,11 @@ LN_S     = @lns@
 PERL     = @perl@
 RM_RF    = @rm_rf@
 PARROT   = ../../parrot@exe@
-BUILD_DIR= @build_dir@
-BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-RECONFIGURE= $(PERL) @build_dir@/tools/dev/reconfigure.pl
 TOOL_DIR = ../..
-TGE_DIR  = ../../compilers/tge
-CAT      = $(PERL) -MExtUtils::Command -e cat
 CP       = @cp@
-O        = @o@
-LOAD_EXT = @load_ext@
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
-PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
 
-PMCDIR   = src/pmc
+PARROT_LIBRARY = @build_dir@/runtime/parrot/library
+PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
 
 all: nqp.pbc
 
@@ -31,11 +23,6 @@ nqp.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
 	    --output=src/Grammar_gen.pir src/Grammar.pg
 	$(PARROT) -o nqp.pbc nqp.pir
-
-#	cd $(BUILD_DIR) && $(CONFIGURE) --step=gen::languages --languages=nqp
-# regenerate the Makefile
-Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=nqp
 
 # This is a listing of all targets, that are meant to be called by users
 help:
