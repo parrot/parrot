@@ -5,8 +5,7 @@ PAST::Compiler - PAST Compiler
 =head1 DESCRIPTION
 
 PAST::Compiler implements a basic compiler for PAST nodes.
-By default PAST::Compiler transforms a PAST tree into POST,
-and then invokes POST::Compiler on the resulting POST tree.
+By default PAST::Compiler transforms a PAST tree into POST.
 
 =cut
 
@@ -57,7 +56,7 @@ to executable code (but not executed).
     blockpast = new 'ResizablePMCArray'
     set_global '@?BLOCK', blockpast
   have_blockpast:
-    .return self.'post'(past, 'rtype'=>'*')
+    .return self.'post'(past, 'rtype'=>'v')
 .end
 
 =item post_children(node [, 'signature'=>signature] )
@@ -72,6 +71,7 @@ result that should be returned by each child:
     +     PMC, numeric register, or numeric constant
     ~     PMC, string register, or string constant
     :     Argument (same as '*'), possibly with :named or :flat
+    v     void result (result value not used)
 
 The first character of C<signature> is ignored (return type),
 thus C<v~P*> says that the first child needs to be something
@@ -201,7 +201,7 @@ instead of an entire PAST structure.
   from_past:
     $P0 = node.'get_array'()
     $I0 = elements $P0
-    $S0 = repeat '*', $I0
+    $S0 = repeat 'v', $I0
     concat $S0, 'P'
     ops = self.'post_children'(node, 'signature'=>$S0)
     $P0 = ops[-1]
@@ -253,7 +253,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  all children but last can return anything, last returns PMC
     $P0 = node.'get_array'()
     $I0 = elements $P0
-    $S0 = repeat '*', $I0
+    $S0 = repeat 'v', $I0
     concat $S0, 'P'
     ##  convert children to post
     .local pmc ops
@@ -270,7 +270,7 @@ Return the POST representation of a C<PAST::Block>.
     .local string rtype, result
     result = ''
     rtype = options['rtype']
-    if rtype == '*' goto have_result
+    if rtype == 'v' goto have_result
     result = bpost.'unique'('$P')
   have_result:
 
@@ -282,7 +282,7 @@ Return the POST representation of a C<PAST::Block>.
   have_ns_key:
 
     if blocktype == 'immediate' goto block_immediate
-    if rtype == '*' goto block_done
+    if rtype == 'v' goto block_done
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
@@ -422,7 +422,7 @@ with a 'pasttype' attribute of either 'call' or 'callmethod'.
     .local string result, rtype
     result = ''
     rtype = options['rtype']
-    if rtype == '*' goto result_done
+    if rtype == 'v' goto result_done
     result = ops.'unique'('$P')
     ops.'result'(result)
   result_done:
@@ -550,7 +550,7 @@ Return the PAST representation of a C<while> or C<until> loop.
     exprpost = self.'post'(exprpast, 'rtype'=>'P')
     ops.'push'(exprpost)
     ops.'push_pirop'(iftype, exprpost, endlabel)
-    bodypost = self.'post'(bodypast, 'rtype'=>'*')
+    bodypost = self.'post'(bodypast, 'rtype'=>'v')
     ops.'push'(bodypost)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
