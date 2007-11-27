@@ -239,8 +239,8 @@ Description of the test.
     print "'\n"
 
   thrown:
-    .sym pmc exception
-    .sym string message
+    .local pmc exception
+    .local string message
     get_results '0,0', exception, message
     # remove /'s
     $S0 = substr result, 0, 1
