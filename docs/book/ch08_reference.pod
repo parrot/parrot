@@ -445,7 +445,7 @@ X<cmp (comparison);opcode (PASM)>
 
 Set R<DEST> to 1 if R<VAL1> is greater then R<VAL2>, to -1 if it's less then
 R<VAL2> or to zero if both are equal. If R<VAL1> and R<VAL2> are both PMCs,
-then the type of comparison depends on R<VAL1>. 
+then the type of comparison depends on R<VAL1>.
 
 I<Arguments: IR, I, I or IR, N, N or IR, S, S or IR, P, I or IR, P, N
 IR, P, S or IR, P, P>
@@ -1659,7 +1659,7 @@ Divide R<VAL1> by R<VAL2> and return the remainder. If R<VAL2> is omitted,
 divide R<DEST> by R<VAL>.  The operation is defined as:
 
   x mod y = x - y * floor(x / y)
- 
+
 I<Arguments: P, I or IR, I, I or NR, N, N or P, P, I or P, P, N>
 
 See also: C<cmod>.
@@ -2679,7 +2679,7 @@ I<Arguments: SR, S, I, I, S>
 
   substr R<DEST>, R<OFFSET>, R<LENGTH>, R<REPLACE>
 
-If R<STRING> is omitted, operate on the string in R<DEST>. 
+If R<STRING> is omitted, operate on the string in R<DEST>.
 
 I<Arguments: SR, I, I, S>
 
@@ -3134,30 +3134,30 @@ X<.param directive>
 
 Pop a value off the user stack into a register or typed identifier.
 
-=head2 .pcc_begin
+=head2 .begin_call
 
-X<.pcc_begin directive>
+X<.begin_call directive>
 
-Start a call sequence. Always paired with C<.pcc_end>
+Start a call sequence. Always paired with C<.end_call>
 
-=head2 .pcc_begin_return
+=head2 .begin_return
 
-X<.pcc_begin_return directive>
+X<.begin_return directive>
 
-Start a return sequence. Always paired with C<.pcc_end_return>
+Start a return sequence. Always paired with C<.end_return>
 
-=head2 .pcc_begin_yield
+=head2 .begin_yield
 
-X<.pcc_begin_yield directive>
+X<.begin_yield directive>
 
-Start a return of a coroutine sequence. Always paired with C<.pcc_end_yield>
+Start a return of a coroutine sequence. Always paired with C<.end_yield>
 
-=head2 .pcc_call
+=head2 .call
 
-X<.pcc_call directive>
+X<.call directive>
 
-  .pcc_call R<SUB>
-  .pcc_call R<SUB>, R<RETCONT>
+  .call R<SUB>
+  .call R<SUB>, R<RETCONT>
 
 Create a subroutine call.
 
