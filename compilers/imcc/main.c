@@ -630,14 +630,14 @@ do_pre_process(PARROT_INTERP)
             case POW:           printf(" ** ");break;
             case COMMA:         printf(", ");break;
             case LABEL:         printf("%s:\t", val.s); break;
-            case PCC_BEGIN:     printf(".pcc_begin "); break;
-            case PCC_END:       printf(".pcc_end"); break;
-            case PCC_SUB:       printf(".pcc_sub "); break;
-            case PCC_CALL:      printf(".pcc_call "); break;
-            case PCC_BEGIN_RETURN:    printf(".pcc_begin_return"); break;
-            case PCC_END_RETURN:      printf(".pcc_end_return"); break;
-            case PCC_BEGIN_YIELD:     printf(".pcc_begin_yield"); break;
-            case PCC_END_YIELD:       printf(".pcc_end_yield"); break;
+            case PCC_BEGIN:     printf(".begin_call "); break;
+            case PCC_END:       printf(".end_call"); break;
+            case PCC_SUB:       printf(".pccsub "); break;
+            case PCC_CALL:      printf(".call "); break;
+            case PCC_BEGIN_RETURN:    printf(".begin_return"); break;
+            case PCC_END_RETURN:      printf(".end_return"); break;
+            case PCC_BEGIN_YIELD:     printf(".begin_yield"); break;
+            case PCC_END_YIELD:       printf(".end_yield"); break;
             case FILECOMMENT:   printf("setfile \"%s\"\n", val.s); break;
             case LINECOMMENT:   printf("setline %d\n", val.t); break;
 
