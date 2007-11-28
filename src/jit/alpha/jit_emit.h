@@ -322,7 +322,7 @@ emit_l_c(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     alpha_register_t target, long constant)
 {
     char *pc = jit_info->native_ptr;
-    long high,low;
+    long high, low;
 
     if ((constant < -0x7fffffff) || (constant > 0x7fffffff)) {
         emit_load_intval_cpool(jit_info, interp, target, (INTVAL)constant);
@@ -370,10 +370,10 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_lda_b(jit_info->native_ptr, REG30_sp, -16, REG30_sp);
     emit_stq_b(jit_info->native_ptr, REG26_ra, 0, REG30_sp);
     emit_stq_b(jit_info->native_ptr, REG15_s6, 8, REG30_sp);
-    jit_emit_mov_rr(jit_info->native_ptr,REG16_a0,REG9_s0);
-    jit_emit_mov_rr(jit_info->native_ptr,REG27_t12,REG15_s6);
+    jit_emit_mov_rr(jit_info->native_ptr, REG16_a0, REG9_s0);
+    jit_emit_mov_rr(jit_info->native_ptr, REG27_t12, REG15_s6);
     /* TODO
-    emit_ldah(jit_info->native_ptr,REG15_s6, -1, REG15_s6);
+    emit_ldah(jit_info->native_ptr, REG15_s6, -1, REG15_s6);
     */
     emit_lda_b(jit_info->native_ptr, REG15_s6, -0x7ff8, REG15_s6);
     jit_emit_mov_ri_i(jit_info->native_ptr, REG10_s1,
@@ -388,7 +388,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
     char *disp;
-    long d,high,low;
+    long d, high, low;
 
     fixup = jit_info->arena.fixups;
 
@@ -470,7 +470,7 @@ void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     PARROT_INTERP)
 {
-    Parrot_jit_normal_op(jit_info,interp);
+    Parrot_jit_normal_op(jit_info, interp);
 
     jit_emit_sub_rrr(jit_info->native_ptr, ISR1, REG10_s1, ISR1);
     jit_emit_add_rrr(jit_info->native_ptr, ISR1, REG11_s2, ISR1);

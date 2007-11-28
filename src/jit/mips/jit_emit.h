@@ -400,7 +400,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
     char *disp;
-    long d,high,low;
+    long d, high, low;
 
     fixup = jit_info->arena.fixups;
 

@@ -248,22 +248,22 @@ enum {
 #  define jit_emit_mov_rr(pc, dst, src) \
     emit_a4(pc, src, 0, dst);
 
-#  define jit_emit_add_rrr(pc, D, A ,B) \
+#  define jit_emit_add_rrr(pc, D, A, B) \
     emit_a1(pc, 0, 0, 0, 0, A, B, D);
 
-#  define jit_emit_sub_rrr(pc, D, A ,B) \
+#  define jit_emit_sub_rrr(pc, D, A, B) \
     emit_a1(pc, 0, 0, 1, 1, B, A, D);
 
 #  define jit_emit_neg_rr(pc, D, A) \
     emit_a1(pc, 0, 0, 1, 1, A, 0, D);
 
-#  define jit_emit_and_rrr(pc, D, A ,B) \
+#  define jit_emit_and_rrr(pc, D, A, B) \
     emit_a1(pc, 0, 0, 3, 0, A, B, D);
 
-#  define jit_emit_or_rrr(pc, D, A ,B) \
+#  define jit_emit_or_rrr(pc, D, A, B) \
     emit_a1(pc, 0, 0, 3, 2, A, B, D);
 
-#  define jit_emit_xor_rrr(pc, D, A ,B) \
+#  define jit_emit_xor_rrr(pc, D, A, B) \
     emit_a1(pc, 0, 0, 3, 3, A, B, D);
 
 #  define jit_emit_mov_nr(pc, dst, src) \
@@ -605,7 +605,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 }
 
 static void
-fixup_jump_addr(char *fixup_ptr,long d)
+fixup_jump_addr(char *fixup_ptr, long d)
 {
     char *pit;
     long tmp, i;
@@ -625,7 +625,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr, *pit, *disp;
-    long d,tmp,i;
+    long d, tmp, i;
 
     fixup = jit_info->arena.fixups;
 
@@ -726,13 +726,13 @@ Parrot_jit_emit_mov_rm(PARROT_INTERP, int reg, char *mem)
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(PARROT_INTERP, char *mem,int reg)
+Parrot_jit_emit_mov_mr_n(PARROT_INTERP, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(PARROT_INTERP, int reg,char *mem)
+Parrot_jit_emit_mov_rm_n(PARROT_INTERP, int reg, char *mem)
 {
 }
 

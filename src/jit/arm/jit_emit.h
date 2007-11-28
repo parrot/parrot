@@ -1025,7 +1025,7 @@ Parrot_jit_emit_mov_rm_n(PARROT_INTERP, int reg, char *mem)
 
    1: currently the code has r4  (INTERP_STRUCT_ADDR_REG) is in use
    2: r12 is trashed over any function call
-   3: currently the entry code doesn't save r5,r6,r7,r8 (or r9) - if the
+   3: currently the entry code doesn't save r5, r6, r7, r8 (or r9) - if the
       mapping code uses them then it must arrange to save (and restore them)
 
    and as we're not generating re-entrant code (I assume) surely we can also
@@ -1080,7 +1080,7 @@ arm_sync_d_i_cache(void *start, void *end)
         "mov     %0, r0\n"
         : "=r" (result)
         : "r" ((long)start), "r" ((long)end)
-        : "r0","r1","r2");
+        : "r0", "r1", "r2");
 
     if (result < 0) {
         internal_exception(JIT_ERROR,

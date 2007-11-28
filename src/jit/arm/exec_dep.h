@@ -84,7 +84,7 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
 static void
 offset_fixup(Parrot_exec_objfile_t *obj)
 {
-    int i,j;
+    int i, j;
 
     for (i = 0; i < obj->data_count; i++) {
         for (j = 0; j < i; j++)
