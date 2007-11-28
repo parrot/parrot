@@ -33,7 +33,7 @@ Initialize a concurrency scheduler object.
 */
 
     void init() {
-        Parrot_Scheduler *core_struct = mem_allocate_zeroed_typed(Parrot_Scheduler);
+        Parrot_Scheduler * const core_struct = mem_allocate_zeroed_typed(Parrot_Scheduler);
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -61,8 +61,8 @@ current maximum.
 */
 
     void push_pmc(PMC *value) {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
-        PMC * key = pmc_new(INTERP, enum_class_Integer);
+        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+        PMC * const key = pmc_new(INTERP, enum_class_Integer);
 
         core_struct->max_tid++;
         VTABLE_set_integer_native(INTERP, key, core_struct->max_tid);
@@ -145,8 +145,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     void visit(visit_info *info) {
-        INTVAL i, n;
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
         PMC **pos;
 
         /* 1) visit task list */
@@ -192,13 +191,13 @@ Used to unarchive the scheduler.
 */
 
     void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
 
         /* 1. thaw scheduler id */
-        INTVAL id = VTABLE_shift_integer(INTERP, io);
+        const INTVAL id = VTABLE_shift_integer(INTERP, io);
 
         /* 2. thaw maximum task id */
-        INTVAL max_tid = VTABLE_shift_integer(INTERP, io);
+        const INTVAL max_tid = VTABLE_shift_integer(INTERP, io);
 
         /* Allocate the scheduler's core data struct and set custom flags. */
         SELF.init();
@@ -221,7 +220,7 @@ Called after the scheduler has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
 
         /* TODO: Rebuild the task index. */
     }
