@@ -138,13 +138,6 @@ As the dot-prefix type notation (for instance, '.Integer') is disappearing, the
 C<.HLL_map> syntax will also be updated to take strings to indicate the types.
 [RT#45453].
 
-=item .sym directive
-
-The C<.sym> directive will be removed, as there is already the C<.local> directive
-to declare a variable.
-
-See [RT#45405]
-
 
 =item .namespace [ "a" .. "b" ]
 
