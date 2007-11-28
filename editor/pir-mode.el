@@ -102,32 +102,32 @@ newline or semicolon after an end keyword."
 
 (defvar pir-mode-menu
   (list "PIR"
-	(list "Lines"
-	      ["Previous Code Line"	pir-previous-code-line t]
-	      ["Next Code Line"		pir-next-code-line t]
-	      ["Begin of Continuation"	pir-beginning-of-line t]
-	      ["End of Continuation"	pir-end-of-line t]
-	      ["Split Line at Point"	pir-indent-new-comment-line t])
-	(list "Blocks"
-	      ["Next Block"		pir-forward-block t]
-	      ["Previous Block"		pir-backward-block t]
-	      ["Down Block"		pir-down-block t]
-	      ["Up Block"		pir-backward-up-block t]
-	      ["Mark Block"		pir-mark-block t]
-	      ["Close Block"		pir-close-block t])
-	(list "Functions"
-	      ["Begin of Function"	pir-beginning-of-defun t]
-	      ["End of Function"	pir-end-of-defun t]
-	      ["Mark Function"		pir-mark-defun t]
-	      ["Indent Function"	pir-indent-defun t]
-	      ["Insert Function"	pir-insert-defun t])
-	"-"
-	["Indent Line"			indent-according-to-mode t]
-	["Complete Symbol"		pir-complete-symbol t]
-	"-"
-	["Toggle Abbrev Mode"		abbrev-mode t]
-	"-"
-	["Describe PIR Mode"		pir-describe-major-mode t])
+    (list "Lines"
+          ["Previous Code Line" pir-previous-code-line t]
+          ["Next Code Line"     pir-next-code-line t]
+          ["Begin of Continuation"  pir-beginning-of-line t]
+          ["End of Continuation"    pir-end-of-line t]
+          ["Split Line at Point"    pir-indent-new-comment-line t])
+    (list "Blocks"
+          ["Next Block"     pir-forward-block t]
+          ["Previous Block"     pir-backward-block t]
+          ["Down Block"     pir-down-block t]
+          ["Up Block"       pir-backward-up-block t]
+          ["Mark Block"     pir-mark-block t]
+          ["Close Block"        pir-close-block t])
+    (list "Functions"
+          ["Begin of Function"  pir-beginning-of-defun t]
+          ["End of Function"    pir-end-of-defun t]
+          ["Mark Function"      pir-mark-defun t]
+          ["Indent Function"    pir-indent-defun t]
+          ["Insert Function"    pir-insert-defun t])
+    "-"
+    ["Indent Line"          indent-according-to-mode t]
+    ["Complete Symbol"      pir-complete-symbol t]
+    "-"
+    ["Toggle Abbrev Mode"       abbrev-mode t]
+    "-"
+    ["Describe PIR Mode"        pir-describe-major-mode t])
   "Menu for PIR mode.")
 
 
@@ -214,28 +214,28 @@ newline or semicolon after an end keyword."
   '("method" "non_prototyped" "prototyped" ":load" "@MAIN"))
 
 (defvar pir-dotted-directives
-  '(".sub" ".pcc_sub" ".end" ".emit" ".eom" ".const" ".namespace"
+  '(".sub" ".sub" ".end" ".emit" ".eom" ".const" ".namespace"
     ".endnamespace" ".result" ".arg" ".return" ".include" ".loadlib"
-    ".pcc_begin" ".pcc_end" ".pcc_begin_return" ".pcc_end_return"
-    ".pcc_begin_yield" ".pcc_end_yield"))
+    ".begin_call" ".end_call" ".begin_return" ".end_return"
+    ".begin_yield" ".end_yield"))
 
 (defvar pir-variable-declarations
   '(".local" ".sym" ".param"))
 
 (defvar pir-begin-keywords
-  '(".sub" ".emit" ".pcc_begin_yield" ".pcc_begin_return"
-    ".pcc_begin" ".namespace"))
+  '(".sub" ".emit" ".begin_yield" ".begin_return"
+    ".begin_call" ".namespace"))
 
 (defvar pir-end-keywords
-  '(".end" ".eom" ".pcc_end_yield" ".pcc_end_return"
-    ".pcc_end" ".endnamespace"))
+  '(".end" ".eom" ".end_yield" ".end_return"
+    ".end_call" ".endnamespace"))
 
 (defvar pir-block-match-alist
   '((".sub" ".end" 1)
     (".emit" ".eom" 1)
-    (".pcc_begin_yield" ".pcc_end_yield" 0)
-    (".pcc_begin_return" ".pcc_end_return" 0)
-    (".pcc_begin" ".pcc_end" 0)
+    (".begin_yield" ".end_yield" 0)
+    (".begin_return" ".end_return" 0)
+    (".begin_call" ".end_call" 0)
     (".namespace" ".endnamespace" 0))
   "Alist of IMCC's matching block keywords.
 Has IMCC's begin keywords as keys and a list of the matching end keywords as
@@ -243,10 +243,10 @@ associated values.")
 
 (defvar pir-block-offset-alist
   (mapcan (lambda (blockspec)
-	    (let ((offset (caddr blockspec)))
-	      `((,(car blockspec) . ,offset)
-		(,(cadr blockspec) . ,offset))))
-	  pir-block-match-alist))
+        (let ((offset (caddr blockspec)))
+          `((,(car blockspec) . ,offset)
+        (,(cadr blockspec) . ,offset))))
+      pir-block-match-alist))
 
 (defvar pir-open-directives
   (mapcar #'car pir-block-match-alist))
@@ -262,26 +262,26 @@ associated values.")
 
 (defvar pir-block-begin-or-end-regexp
   (concat "\\(?:" pir-block-begin-regexp "\\|"
-	  pir-block-end-regexp "\\)"))
+      pir-block-end-regexp "\\)"))
 
 (defvar pir-function-header-regexp "\\.\\(.sub\\)\\s-+\\(\\sw+\\)"
   "Regexp to match a PIR function header.")
 
 (defvar pir-font-lock-keywords
   `((,(concat "^\\s *\\(.sub\\)\\s +\\(\\sw+\\)"
-	      "\\(\\s +" (regexp-opt pir-directives 'paren) "\\)?")
+          "\\(\\s +" (regexp-opt pir-directives 'paren) "\\)?")
      (1 font-lock-keyword-face)
      (2 font-lock-function-name-face t t)
      (4 font-lock-keyword-face t t))
     (,(concat "\\s-*" (regexp-opt pir-variable-declarations 'paren)
-	      "\\(?:\\s +" (regexp-opt pir-type-keywords 'paren)
-	      "\\(?:\\s +\\(\\sw+\\)\\)?\\)?")
+          "\\(?:\\s +" (regexp-opt pir-type-keywords 'paren)
+          "\\(?:\\s +\\(\\sw+\\)\\)?\\)?")
      (1 font-lock-keyword-face)
      (2 font-lock-type-face nil t)
      (3 font-lock-variable-name-face nil t))
     (,(concat "^\\s *\\(.const\\)\\s +"
-	      (regexp-opt pir-type-keywords 'paren)
-	      "\\(\\s +\\(\\sw+\\)\\)?")
+          (regexp-opt pir-type-keywords 'paren)
+          "\\(\\s +\\(\\sw+\\)\\)?")
      (1 font-lock-keyword-face)
      (2 font-lock-type-face nil t)
      (4 font-lock-constant-face nil t))
@@ -473,12 +473,12 @@ to end after the end keyword."
   (let ((pos (point)))
     (save-excursion
       (condition-case nil
-	  (progn
-	    (skip-syntax-forward "w")
-	    (pir-up-block -1)
-	    (pir-forward-block)
-	    t)
-	(error nil))
+      (progn
+        (skip-syntax-forward "w")
+        (pir-up-block -1)
+        (pir-forward-block)
+        t)
+    (error nil))
       (< pos (point)))))
 
 (defun pir-in-defun-p ()
@@ -488,14 +488,14 @@ the `.end' keyword."
   (let ((pos (point)))
     (save-excursion
       (or (and (looking-at "\\<.sub\\>")
-	       (pir-not-in-string-or-comment-p))
-	  (and (pir-beginning-of-defun)
-	       (condition-case nil
-		   (progn
-		     (pir-forward-block)
-		     t)
-		 (error nil))
-	       (< pos (point)))))))
+           (pir-not-in-string-or-comment-p))
+      (and (pir-beginning-of-defun)
+           (condition-case nil
+           (progn
+             (pir-forward-block)
+             t)
+         (error nil))
+           (< pos (point)))))))
 
 
 ;;; Comments
@@ -521,48 +521,48 @@ Optional argument IGNORE-LABELP if set, labels are ignored for the purposes of c
     (save-excursion
       (beginning-of-line)
       (cond ((condition-case nil
-		 (progn (up-list -1)
-			t)
-	       (error nil))
-	     (setq icol (1+ (current-column))))
-	    ((and (not ignore-labelp)
-		  (looking-at "\\s-*\\sw+:"))
-	     (setq icol 0))
-	    ((zerop (pir-previous-code-line))
-	     (let ((labelp (looking-at "\\s-*\\sw+:")))
-	       (pir-beginning-of-line)
-	       (back-to-indentation)
-	       (setq icol (current-column))
-	       (let ((bot (point))
-		     (eol (line-end-position)))
-		 (while (< (point) eol)
-		   (if (pir-not-in-string-or-comment-p)
-		       (cond
-			((looking-at pir-block-begin-regexp)
-			 (setq icol (+ icol
-				       (pir-block-offset (match-string 1)))))
-			((looking-at pir-block-end-regexp)
-			 (if (not (= bot (point)))
-			     (setq icol (- icol
-					   (pir-block-offset
-					    (match-string 1))))))))
-		   (forward-char))
-		 (if (and labelp
-			  (= 0 icol))
-		     (setq icol (calculate-pir-indent 'ignore-label)))
-		 )))))
+         (progn (up-list -1)
+            t)
+           (error nil))
+         (setq icol (1+ (current-column))))
+        ((and (not ignore-labelp)
+          (looking-at "\\s-*\\sw+:"))
+         (setq icol 0))
+        ((zerop (pir-previous-code-line))
+         (let ((labelp (looking-at "\\s-*\\sw+:")))
+           (pir-beginning-of-line)
+           (back-to-indentation)
+           (setq icol (current-column))
+           (let ((bot (point))
+             (eol (line-end-position)))
+         (while (< (point) eol)
+           (if (pir-not-in-string-or-comment-p)
+               (cond
+            ((looking-at pir-block-begin-regexp)
+             (setq icol (+ icol
+                       (pir-block-offset (match-string 1)))))
+            ((looking-at pir-block-end-regexp)
+             (if (not (= bot (point)))
+                 (setq icol (- icol
+                       (pir-block-offset
+                        (match-string 1))))))))
+           (forward-char))
+         (if (and labelp
+              (= 0 icol))
+             (setq icol (calculate-pir-indent 'ignore-label)))
+         )))))
     (save-excursion
-	(back-to-indentation)
-	(cond
-	 ((and (looking-at pir-block-end-regexp)
-	       (pir-not-in-string-or-comment-p))
-	  (looking-at pir-block-end-regexp)
-	  (setq icol (- icol (pir-block-offset (match-string 1)))))
-	 ((or (looking-at "\\s<\\s<\\s<\\S<")
-	      (pir-before-magic-comment-p))
-	  (setq icol (list 0 icol)))
-	 ((looking-at "\\s<\\S<")
-	  (setq icol (list comment-column icol)))))
+    (back-to-indentation)
+    (cond
+     ((and (looking-at pir-block-end-regexp)
+           (pir-not-in-string-or-comment-p))
+      (looking-at pir-block-end-regexp)
+      (setq icol (- icol (pir-block-offset (match-string 1)))))
+     ((or (looking-at "\\s<\\s<\\s<\\S<")
+          (pir-before-magic-comment-p))
+      (setq icol (list 0 icol)))
+     ((looking-at "\\s<\\S<")
+      (setq icol (list comment-column icol)))))
       icol))
 
 (defun pir-block-offset (string)
@@ -578,13 +578,13 @@ Optional argument IGNORE-LABELP if set, labels are ignored for the purposes of c
 (defun pir-comment-indent ()
   "Calculate the correct comment indent."
   (if (or (looking-at "\\s<\\s<\\s<")
-	  (pir-before-magic-comment-p))
+      (pir-before-magic-comment-p))
       0
     (if (looking-at "\\<\\<")
-	(calculate-pir-indent)
+    (calculate-pir-indent)
       (skip-syntax-backward " ")
       (max (if (bolp) 0 (1+ (current-column)))
-	   comment-column))))
+       comment-column))))
 
 (defun pir-indent-for-comment ()
   "Maybe insert and indent a PIR comment.
@@ -603,15 +603,15 @@ fixed goal column."
   (interactive)
   (or arg (setq arg 0))
   (let ((icol (calculate-pir-indent))
-	(relpos (- (current-column) (current-indentation))))
+    (relpos (- (current-column) (current-indentation))))
     (if (listp icol)
-	(setq icol (car icol))
+    (setq icol (car icol))
       (setq icol (+ icol arg)))
     (if (< icol 0)
-	(error "Unmatched end keyword")
+    (error "Unmatched end keyword")
       (indent-line-to icol)
       (if (> relpos 0)
-	  (move-to-column (+ icol relpos))))))
+      (move-to-column (+ icol relpos))))))
 
 (defun pir-indent-new-comment-line ()
   "Break PIR line at point, continuing comment if within one.
@@ -646,12 +646,12 @@ On success, return 0.  Otherwise, go as far as possible and return -1."
   (or arg (setq arg 1))
   (beginning-of-line)
   (let ((n 0)
-	(inc (if (> arg 0) 1 -1)))
+    (inc (if (> arg 0) 1 -1)))
     (while (and (/= arg 0) (= n 0))
       (setq n (forward-line inc))
       (while (and (= n 0)
-		  (looking-at "\\s-*\\($\\|\\s<\\)"))
-	(setq n (forward-line inc)))
+          (looking-at "\\s-*\\($\\|\\s<\\)"))
+    (setq n (forward-line inc)))
       (setq arg (- arg inc)))
     n))
 
@@ -671,13 +671,13 @@ If on an empty or comment line, go to the beginning of that line."
   (beginning-of-line)
   (if (not (looking-at "\\s-*\\($\\|\\s<\\)"))
       (while (or (condition-case nil
-		     (progn
-		       (up-list -1)
-		       (beginning-of-line)
-		       t)
-		   (error nil))
-		 (and (looking-at "\\s-*\\($\\|\\s<\\)")
-		      (zerop (forward-line -1)))))))
+             (progn
+               (up-list -1)
+               (beginning-of-line)
+               t)
+           (error nil))
+         (and (looking-at "\\s-*\\($\\|\\s<\\)")
+              (zerop (forward-line -1)))))))
 
 (defun pir-end-of-line ()
   "Move point to end of current PIR line.
@@ -687,19 +687,19 @@ does not end in `...' or `\\' or is inside an open parenthesis list."
   (interactive)
   (end-of-line)
   (if (save-excursion
-	(beginning-of-line)
-	(looking-at "\\s-*\\($\\|\\s<\\)"))
+    (beginning-of-line)
+    (looking-at "\\s-*\\($\\|\\s<\\)"))
       ()
     (while (or (condition-case nil
-		   (progn
-		     (up-list 1)
-		     (end-of-line)
-		     t)
-		 (error nil))
-	       (and (save-excursion
-		      (beginning-of-line)
-		      (looking-at "\\s-*\\($\\|\\s<\\)"))
-		    (zerop (forward-line 1)))))
+           (progn
+             (up-list 1)
+             (end-of-line)
+             t)
+         (error nil))
+           (and (save-excursion
+              (beginning-of-line)
+              (looking-at "\\s-*\\($\\|\\s<\\)"))
+            (zerop (forward-line 1)))))
     (end-of-line)))
 
 (defun pir-scan-blocks (from count depth)
@@ -713,26 +713,26 @@ stopping; COUNT such places are counted.
 If the beginning or end of the buffer is reached and the depth is wrong,
 an error is signaled."
   (let ((min-depth (if (> depth 0) 0 depth))
-	(inc (if (> count 0) 1 -1)))
+    (inc (if (> count 0) 1 -1)))
     (save-excursion
       (while (/= count 0)
-	(catch 'foo
-	  (while (or (re-search-forward
-		      pir-block-begin-or-end-regexp nil 'move inc)
-		     (if (/= depth 0)
-			 (error "Unbalanced block")))
-	    (if (pir-not-in-string-or-comment-p)
-		(progn
-		  (cond
-		   ((match-end 1)
-		    (setq depth (+ depth inc)))
-		   ((match-end 2)
-		    (setq depth (- depth inc))))
-		  (if (< depth min-depth)
-		      (error "Containing expression ends prematurely"))
-		  (if (= depth 0)
-		      (throw 'foo nil))))))
-	(setq count (- count inc)))
+    (catch 'foo
+      (while (or (re-search-forward
+              pir-block-begin-or-end-regexp nil 'move inc)
+             (if (/= depth 0)
+             (error "Unbalanced block")))
+        (if (pir-not-in-string-or-comment-p)
+        (progn
+          (cond
+           ((match-end 1)
+            (setq depth (+ depth inc)))
+           ((match-end 2)
+            (setq depth (- depth inc))))
+          (if (< depth min-depth)
+              (error "Containing expression ends prematurely"))
+          (if (= depth 0)
+              (throw 'foo nil))))))
+    (setq count (- count inc)))
       (point))))
 
 (defun pir-forward-block (&optional arg)
@@ -760,7 +760,7 @@ In Lisp programs, an argument is required."
   (let ((inc (if (> arg 0) 1 -1)))
     (while (/= arg 0)
       (goto-char (or (pir-scan-blocks (point) inc -1)
-		     (buffer-end arg)))
+             (buffer-end arg)))
       (setq arg (- arg inc)))))
 
 (defun pir-backward-up-block (arg)
@@ -780,7 +780,7 @@ In Lisp programs, an argument is required."
   (let ((inc (if (> arg 0) 1 -1)))
     (while (/= arg 0)
       (goto-char (or (pir-scan-blocks (point) inc 1)
-		     (buffer-end arg)))
+             (buffer-end arg)))
       (setq arg (- arg inc)))))
 
 (defun pir-mark-block ()
@@ -789,17 +789,17 @@ The block marked is the one that contains point or follows point."
   (interactive)
   (let ((pos (point)))
     (if (or (and (pir-in-block-p)
-		 (skip-syntax-forward "w"))
-	    (condition-case nil
-		(progn
-		  (pir-down-block 1)
-		  (pir-in-block-p))
-	      (error nil)))
-	(progn
-	  (pir-up-block -1)
-	  (push-mark (point))
-	  (pir-forward-block)
-	  (exchange-point-and-mark))
+         (skip-syntax-forward "w"))
+        (condition-case nil
+        (progn
+          (pir-down-block 1)
+          (pir-in-block-p))
+          (error nil)))
+    (progn
+      (pir-up-block -1)
+      (push-mark (point))
+      (pir-forward-block)
+      (exchange-point-and-mark))
       (goto-char pos)
       (message "No block to mark found"))))
 
@@ -809,20 +809,20 @@ An error is signaled if no block to close is found."
   (interactive)
   (let (bb-keyword)
     (condition-case nil
-	(progn
-	  (save-excursion
-	    (pir-backward-up-block 1)
-	    (setq bb-keyword (buffer-substring-no-properties
-			      (match-beginning 1) (match-end 1))))
-	  (if (save-excursion
-		(beginning-of-line)
-		(looking-at "^\\s-*$"))
-	      (indent-according-to-mode)
-	    (pir-reindent-then-newline-and-indent))
-	  (insert (cadr (assoc bb-keyword
-			       pir-block-match-alist)))
-	  (pir-reindent-then-newline-and-indent)
-	  t)
+    (progn
+      (save-excursion
+        (pir-backward-up-block 1)
+        (setq bb-keyword (buffer-substring-no-properties
+                  (match-beginning 1) (match-end 1))))
+      (if (save-excursion
+        (beginning-of-line)
+        (looking-at "^\\s-*$"))
+          (indent-according-to-mode)
+        (pir-reindent-then-newline-and-indent))
+      (insert (cadr (assoc bb-keyword
+                   pir-block-match-alist)))
+      (pir-reindent-then-newline-and-indent)
+      t)
       (error (message "No block to close found")))))
 
 (defun pir-blink-matching-block-open ()
@@ -833,29 +833,29 @@ Signal an error if the keywords are incompatible."
   (interactive)
   (let (bb-keyword bb-arg eb-keyword pos eol)
     (if (and (pir-not-in-string-or-comment-p)
-	     (looking-at "\\>")
-	     (save-excursion
-	       (skip-syntax-backward "w_.")
-	       (looking-at pir-block-end-regexp)))
-	(save-excursion
-	  (setq eb-keyword
-		(buffer-substring-no-properties
-		 (match-beginning 1) (match-end 1)))
-	  (pir-backward-block)
-	  (setq pos (match-end 1)
-		bb-keyword
-		(buffer-substring-no-properties
-		 (match-beginning 1) pos)
-		pos (+ pos 1)
-		eol (line-end-position))
-	  (if (member eb-keyword
-		      (cdr (assoc bb-keyword pir-block-match-alist)))
-	      (progn
-		(message "Matches `.%s'" bb-keyword)
-		(if (pos-visible-in-window-p)
-		    (sit-for blink-matching-delay)))
-	    (error "Block keywords `%s' and `%s' do not match"
-		   bb-keyword eb-keyword))))))
+         (looking-at "\\>")
+         (save-excursion
+           (skip-syntax-backward "w_.")
+           (looking-at pir-block-end-regexp)))
+    (save-excursion
+      (setq eb-keyword
+        (buffer-substring-no-properties
+         (match-beginning 1) (match-end 1)))
+      (pir-backward-block)
+      (setq pos (match-end 1)
+        bb-keyword
+        (buffer-substring-no-properties
+         (match-beginning 1) pos)
+        pos (+ pos 1)
+        eol (line-end-position))
+      (if (member eb-keyword
+              (cdr (assoc bb-keyword pir-block-match-alist)))
+          (progn
+        (message "Matches `.%s'" bb-keyword)
+        (if (pos-visible-in-window-p)
+            (sit-for blink-matching-delay)))
+        (error "Block keywords `%s' and `%s' do not match"
+           bb-keyword eb-keyword))))))
 
 (defun pir-beginning-of-defun (&optional arg)
   "Move backward to the beginning of a PIR function.
@@ -864,20 +864,20 @@ move forward to Nth following beginning of a function.
 Returns t unless search stops at the beginning or end of the buffer."
   (interactive "p")
   (let* ((arg (or arg 1))
-	 (inc (if (> arg 0) 1 -1))
-	 (found))
+     (inc (if (> arg 0) 1 -1))
+     (found))
     (and (not (eobp))
-	 (not (and (> arg 0) (looking-at "\\<function\\>")))
-	 (skip-syntax-forward "w"))
+     (not (and (> arg 0) (looking-at "\\<function\\>")))
+     (skip-syntax-forward "w"))
     (while (and (/= arg 0)
-		(setq found
-		      (re-search-backward "\\<function\\>" nil 'move inc)))
+        (setq found
+              (re-search-backward "\\<function\\>" nil 'move inc)))
       (if (pir-not-in-string-or-comment-p)
-	  (setq arg (- arg inc))))
+      (setq arg (- arg inc))))
     (if found
-	(progn
-	  (and (< inc 0) (goto-char (match-beginning 0)))
-	  t))))
+    (progn
+      (and (< inc 0) (goto-char (match-beginning 0)))
+      t))))
 
 (defun pir-end-of-defun (&optional arg)
   "Move forward to the end of a PIR function.
@@ -902,14 +902,14 @@ The function marked is the one containing point or following point."
   (interactive)
   (let ((pos (point)))
     (if (or (pir-in-defun-p)
-	    (and (pir-beginning-of-defun -1)
-		 (pir-in-defun-p)))
-	(progn
-	  (skip-syntax-forward "w")
-	  (pir-beginning-of-defun)
-	  (push-mark (point))
-	  (pir-end-of-defun)
-	  (exchange-point-and-mark))
+        (and (pir-beginning-of-defun -1)
+         (pir-in-defun-p)))
+    (progn
+      (skip-syntax-forward "w")
+      (pir-beginning-of-defun)
+      (push-mark (point))
+      (pir-end-of-defun)
+      (exchange-point-and-mark))
       (goto-char pos)
       (message "No function to mark found"))))
 
@@ -922,73 +922,73 @@ Optional argument ARG appears to be ignored.  Um..."
  (interactive "P")
  (save-excursion
    (let ((end (progn (forward-paragraph) (point)))
-	 (beg (progn
-		(forward-paragraph -1)
-		(skip-chars-forward " \t\n")
-		(beginning-of-line)
-		(point)))
-	 (cfc (current-fill-column))
-	 (ind (calculate-pir-indent))
-	 comment-prefix)
+     (beg (progn
+        (forward-paragraph -1)
+        (skip-chars-forward " \t\n")
+        (beginning-of-line)
+        (point)))
+     (cfc (current-fill-column))
+     (ind (calculate-pir-indent))
+     comment-prefix)
      (save-restriction
        (goto-char beg)
        (narrow-to-region beg end)
        (if (listp ind) (setq ind (nth 1 ind)))
        (while (not (eobp))
-	 (condition-case nil
-	     (pir-indent-line ind)
-	   (error nil))
-	 (if (and (> ind 0)
-		  (not
-		   (save-excursion
-		     (beginning-of-line)
-		     (looking-at "^\\s-*\\($\\|\\s<+\\)"))))
-	     (setq ind 0))
-	 (move-to-column cfc)
-	 ;; First check whether we need to combine non-empty comment lines
-	 (if (and (< (current-column) cfc)
-		  (pir-in-comment-p)
-		  (not (save-excursion
-			 (beginning-of-line)
-			 (looking-at "^\\s-*\\s<+\\s-*$"))))
-	     ;; This is a nonempty comment line which does not extend
-	     ;; past the fill column.  If it is followed by a nonempty
-	     ;; comment line with the same comment prefix, try to
-	     ;; combine them, and repeat this until either we reach the
-	     ;; fill-column or there is nothing more to combine.
-	     (progn
-	       ;; Get the comment prefix
-	       (save-excursion
-		 (beginning-of-line)
-		 (while (and (re-search-forward "\\s<+")
-			     (not (pir-in-comment-p))))
-		 (setq comment-prefix (match-string 0)))
-	       ;; And keep combining ...
-	       (while (and (< (current-column) cfc)
-			   (save-excursion
-			     (forward-line 1)
-			     (and (looking-at
-				   (concat "^\\s-*"
-					   comment-prefix
-					   "\\S<"))
-				  (not (looking-at
-					(concat "^\\s-*"
-						comment-prefix
-						"\\s-*$"))))))
-		 (delete-char 1)
-		 (re-search-forward comment-prefix)
-		 (delete-region (match-beginning 0) (match-end 0))
-		 (fixup-whitespace)
-		 (move-to-column cfc))))
-	 ;; We might also try to combine continued code lines>  Perhaps
-	 ;; some other time ...
-	 (skip-chars-forward "^ \t\n")
-	 (delete-horizontal-space)
-	 (if (or (< (current-column) cfc)
-		 (and (= (current-column) cfc) (eolp)))
-	     (forward-line 1)
-	   (if (not (eolp)) (insert " "))
-	       (forward-line 1))))
+     (condition-case nil
+         (pir-indent-line ind)
+       (error nil))
+     (if (and (> ind 0)
+          (not
+           (save-excursion
+             (beginning-of-line)
+             (looking-at "^\\s-*\\($\\|\\s<+\\)"))))
+         (setq ind 0))
+     (move-to-column cfc)
+     ;; First check whether we need to combine non-empty comment lines
+     (if (and (< (current-column) cfc)
+          (pir-in-comment-p)
+          (not (save-excursion
+             (beginning-of-line)
+             (looking-at "^\\s-*\\s<+\\s-*$"))))
+         ;; This is a nonempty comment line which does not extend
+         ;; past the fill column.  If it is followed by a nonempty
+         ;; comment line with the same comment prefix, try to
+         ;; combine them, and repeat this until either we reach the
+         ;; fill-column or there is nothing more to combine.
+         (progn
+           ;; Get the comment prefix
+           (save-excursion
+         (beginning-of-line)
+         (while (and (re-search-forward "\\s<+")
+                 (not (pir-in-comment-p))))
+         (setq comment-prefix (match-string 0)))
+           ;; And keep combining ...
+           (while (and (< (current-column) cfc)
+               (save-excursion
+                 (forward-line 1)
+                 (and (looking-at
+                   (concat "^\\s-*"
+                       comment-prefix
+                       "\\S<"))
+                  (not (looking-at
+                    (concat "^\\s-*"
+                        comment-prefix
+                        "\\s-*$"))))))
+         (delete-char 1)
+         (re-search-forward comment-prefix)
+         (delete-region (match-beginning 0) (match-end 0))
+         (fixup-whitespace)
+         (move-to-column cfc))))
+     ;; We might also try to combine continued code lines>  Perhaps
+     ;; some other time ...
+     (skip-chars-forward "^ \t\n")
+     (delete-horizontal-space)
+     (if (or (< (current-column) cfc)
+         (and (= (current-column) cfc) (eolp)))
+         (forward-line 1)
+       (if (not (eolp)) (insert " "))
+           (forward-line 1))))
      t)))
 
 
@@ -1016,12 +1016,12 @@ Insert a newline if `pir-auto-newline' is non-nil."
       (insert ";")
     (if abbrev-mode (expand-abbrev))
     (if pir-blink-matching-block
-	(pir-blink-matching-block-open))
+    (pir-blink-matching-block-open))
     (if pir-auto-indent-flag
-	(indent-according-to-mode))
+    (indent-according-to-mode))
     (insert ";")
     (if pir-auto-newline
-	(newline-and-indent))))
+    (newline-and-indent))))
 
 (defun pir-electric-space ()
   "Insert a space in PIR mode.
@@ -1031,16 +1031,16 @@ Reindent the line of `pir-auto-indent-flag' is non-nil."
   (setq last-command-char ? )
   (if (not (pir-not-in-string-or-comment-p))
       (progn
-	(indent-according-to-mode)
-	(self-insert-command 1))
+    (indent-according-to-mode)
+    (self-insert-command 1))
     (if abbrev-mode (expand-abbrev))
     (if pir-blink-matching-block
-	(pir-blink-matching-block-open))
+    (pir-blink-matching-block-open))
     (if (and pir-auto-indent-flag
-	     (save-excursion
-	       (skip-syntax-backward " ")
-	       (not (bolp))))
-	(indent-according-to-mode))
+         (save-excursion
+           (skip-syntax-backward " ")
+           (not (bolp))))
+    (indent-according-to-mode))
     (self-insert-command 1)))
 
 (defun pir-abbrev-start ()
@@ -1055,13 +1055,13 @@ Note that all PIR mode abbrevs start with a grave accent."
     (let (c)
       (insert last-command-char)
       (if ;(if pir-xemacs-p
-	  ;    (or (eq (event-to-character (setq c (next-event))) ??)
-	  ;	  (eq (event-to-character c) help-char))
-	  (or (eq (setq c (read-event)) ??)
-	      (eq c help-char))
-	  (let ((abbrev-table-name-list '(pir-abbrev-table)))
-	    (list-abbrevs))
-	(setq unread-command-events (list c))))))
+      ;    (or (eq (event-to-character (setq c (next-event))) ??)
+      ;   (eq (event-to-character c) help-char))
+      (or (eq (setq c (read-event)) ??)
+          (eq c help-char))
+      (let ((abbrev-table-name-list '(pir-abbrev-table)))
+        (list-abbrevs))
+    (setq unread-command-events (list c))))))
 
 (defun pir-insert-defun (name args vals)
   "Insert a PIR function skeleton.
@@ -1070,20 +1070,20 @@ entered without parens)."
   (interactive
    (list
     (read-from-minibuffer "Function name: "
-			  (substring (buffer-name) 0 -2))
+              (substring (buffer-name) 0 -2))
     (read-from-minibuffer "Arguments: ")
     (read-from-minibuffer "Return values: ")))
   (let ((string (format "%s %s (%s)"
-			(cond
-			 ((string-equal vals "")
-			  vals)
-			 ((string-match "[ ,]" vals)
-			  (concat " [" vals "] ="))
-			 (t
-			  (concat " " vals " =")))
-			name
-			args))
-	(prefix pir-block-comment-start))
+            (cond
+             ((string-equal vals "")
+              vals)
+             ((string-match "[ ,]" vals)
+              (concat " [" vals "] ="))
+             (t
+              (concat " " vals " =")))
+            name
+            args))
+    (prefix pir-block-comment-start))
     (if (not (bobp)) (newline))
     (insert "function" string)
     (indent-according-to-mode)
@@ -1106,10 +1106,10 @@ entered without parens)."
   (if pir-completion-alist
       ()
     (setq pir-completion-alist
-	  (mapcar '(lambda (var) (cons var var))
-		  (append pir-PMC-keyword-symbols
-			  pir-ops pir-dotted-directives
-			  pir-variable-declarations)))))
+      (mapcar '(lambda (var) (cons var var))
+          (append pir-PMC-keyword-symbols
+              pir-ops pir-dotted-directives
+              pir-variable-declarations)))))
 
 (defun pir-complete-symbol ()
   "Perform completion on PIR symbol preceding point.
@@ -1118,41 +1118,41 @@ variables."
   ;; This code taken from lisp-complete-symbol
   (interactive)
   (let* ((end (point))
-	 (beg (save-excursion (backward-sexp 1) (point)))
-	 (string (buffer-substring-no-properties beg end))
-	 (completion (try-completion string pir-completion-alist)))
-    (cond ((eq completion t))		; ???
-	  ((null completion)
-	   (message "Can't find completion for \"%s\"" string)
-	   (ding))
-	  ((not (string= string completion))
+     (beg (save-excursion (backward-sexp 1) (point)))
+     (string (buffer-substring-no-properties beg end))
+     (completion (try-completion string pir-completion-alist)))
+    (cond ((eq completion t))       ; ???
+      ((null completion)
+       (message "Can't find completion for \"%s\"" string)
+       (ding))
+      ((not (string= string completion))
            (delete-region beg end)
            (insert completion))
-	  (t
-	   (let ((list (all-completions string pir-completion-alist))
-		 (conf (current-window-configuration)))
-	     ;; Taken from comint.el
-	     (message "Making completion list...")
-	     (with-output-to-temp-buffer "*Completions*"
-	       (display-completion-list list))
-	     (message "Hit space to flush")
-	     (let (key first)
-	       (if (save-excursion
-		     (set-buffer (get-buffer "*Completions*"))
-		     (setq key (read-key-sequence nil)
-			   first (aref key 0))
-		     (and (consp first) (consp (event-start first))
-			  (eq (window-buffer (posn-window (event-start
-							   first)))
-			      (get-buffer "*Completions*"))
-			  (eq (key-binding key) 'mouse-choose-completion)))
-		   (progn
-		     (mouse-choose-completion first)
-		     (set-window-configuration conf))
-		 (if (eq first ?\ )
-		     (set-window-configuration conf)
-		   (setq unread-command-events
-			 (listify-key-sequence key))))))))))
+      (t
+       (let ((list (all-completions string pir-completion-alist))
+         (conf (current-window-configuration)))
+         ;; Taken from comint.el
+         (message "Making completion list...")
+         (with-output-to-temp-buffer "*Completions*"
+           (display-completion-list list))
+         (message "Hit space to flush")
+         (let (key first)
+           (if (save-excursion
+             (set-buffer (get-buffer "*Completions*"))
+             (setq key (read-key-sequence nil)
+               first (aref key 0))
+             (and (consp first) (consp (event-start first))
+              (eq (window-buffer (posn-window (event-start
+                               first)))
+                  (get-buffer "*Completions*"))
+              (eq (key-binding key) 'mouse-choose-completion)))
+           (progn
+             (mouse-choose-completion first)
+             (set-window-configuration conf))
+         (if (eq first ?\ )
+             (set-window-configuration conf)
+           (setq unread-command-events
+             (listify-key-sequence key))))))))))
 
 
 ;;; Menu
