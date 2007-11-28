@@ -2,7 +2,7 @@
 
 # while, until statements
 
-plan(4);
+plan(8);
 
 my $a; my $sum;
 
@@ -33,4 +33,31 @@ until $a == 1 {
     $a := 1;
 }
 ok($sum == 0, 'until loop exits initial true immediately');
+
+$a := 1; $sum := 0;
+repeat {
+    $sum := $sum + $a;
+    $a := $a + 1;
+} while $a != 10;
+ok($sum == 45, 'basic repeat_while loop');
+
+$a := 1; $sum := 0;
+repeat {
+    $sum := $sum + $a;
+    $a := $a + 1;
+} until $a == 10;
+ok($sum == 45, 'basic repeat_until loop');
+
+$a := 1; $sum := 0;
+repeat {
+    $sum := 99;
+} while $a != 1;
+ok($sum == 99, 'repeat_while always executes at least once');
+
+$a := 1; $sum := 0;
+repeat {
+    $sum := 99;
+} until $a == 1;
+ok($sum == 99, 'repeat_until always executes at least once');
+
 

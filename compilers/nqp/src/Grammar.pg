@@ -81,6 +81,7 @@ rule statement_list {
 rule statement {
     | <if_statement> {*}                                   #= if_statement
     | <while_statement> {*}                                #= while_statement
+    | <repeat_statement> {*}                               #= repeat_statement
     | <for_statement> {*}                                  #= for_statement
     | <return_statement> {*}                               #= return_statement
     | <make_statement> {*}                                 #= make_statement
@@ -122,6 +123,11 @@ rule if_statement {
 
 rule while_statement {
     $<sym>:=['while'|'until'] <EXPR> <block>
+    {*}
+}
+
+rule repeat_statement {
+    'repeat' <block> $<sym>:=['while'|'until'] <EXPR>
     {*}
 }
 
