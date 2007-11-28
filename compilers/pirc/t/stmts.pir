@@ -12,7 +12,7 @@
     .local string a, b, c
     .local int i, j
     .local num pi
-    
+
 # test simple expressions
     i = 42
     pi = 3.14
@@ -70,39 +70,39 @@ Z:
     print i
 
 # test long return statement
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 
-    .pcc_begin_return
+    .begin_return
     .return p :flat :named('myP')
-    .pcc_end_return
+    .end_return
 
 # test long yield statement
-    .pcc_begin_yield
-    .pcc_end_yield
+    .begin_yield
+    .end_yield
 
-    .pcc_begin_yield
+    .begin_yield
     .return q :flat
     .return r :named('myR')
     .return s :flat :named
-    .pcc_end_yield
+    .end_yield
 
     x = null
     null x
 
 # test long subcall
-    .pcc_begin
-    .pcc_call Y
-    .pcc_end
+    .begin_call
+    .call Y
+    .end_call
 
-    .pcc_begin
+    .begin_call
     .arg y :flat
     .arg z :named('z')
-    .pcc_call Z
+    .call Z
     .result P0 :slurpy
     .local pmc x
     .result x
-    .pcc_end
+    .end_call
 
 
 .end
