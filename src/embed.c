@@ -29,6 +29,7 @@ This file implements the Parrot embedding interface.
 static FLOATVAL calibrate(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static const char * op_name(PARROT_INTERP, int k)
         __attribute__nonnull__(1);
 
@@ -42,11 +43,14 @@ static int prof_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static PMC* setup_argv(PARROT_INTERP, int argc, char ** argv)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC* setup_argv(PARROT_INTERP, int argc, NOTNULL(char ** argv))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 /* HEADERIZER END: static */
 
@@ -351,6 +355,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 PackFile *
 Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))
 {
@@ -549,8 +554,9 @@ Creates and returns C<ARGS> array PMC.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC*
-setup_argv(PARROT_INTERP, int argc, char ** argv)
+setup_argv(PARROT_INTERP, int argc, NOTNULL(char ** argv))
 {
     INTVAL i;
     PMC *userargv;
@@ -570,8 +576,8 @@ setup_argv(PARROT_INTERP, int argc, char ** argv)
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
-        STRING *arg = string_make(interp, argv[i], strlen(argv[i]),
-                NULL, PObj_external_FLAG);
+        STRING * const arg =
+            string_make(interp, argv[i], strlen(argv[i]), NULL, PObj_external_FLAG);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
             PIO_eprintf(interp, "\t%vd: %s\n", i, argv[i]);
@@ -617,6 +623,7 @@ Returns the name of the opcode.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static const char *
 op_name(PARROT_INTERP, int k)
 {
@@ -779,6 +786,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
@@ -930,6 +938,7 @@ Runs the interpreter's bytecode in debugging mode.
 */
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_debug(NOTNULL(Parrot_Interp debugger), opcode_t * pc)
 {

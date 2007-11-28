@@ -32,6 +32,7 @@ static INTVAL compare(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -49,6 +50,7 @@ static INTVAL cs_rindex(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
@@ -76,6 +78,7 @@ static INTVAL find_not_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_graphemes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -83,6 +86,7 @@ static STRING * get_graphemes(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * get_graphemes_inplace(PARROT_INTERP,
     NOTNULL(STRING *source_string),
     UINTVAL offset,
@@ -108,6 +112,7 @@ static void set_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
@@ -119,6 +124,7 @@ static void titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* to_charset(PARROT_INTERP,
     NOTNULL(STRING *src),
     NOTNULL(STRING *dest))
@@ -191,6 +197,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)
@@ -210,6 +217,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))
@@ -229,6 +237,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
@@ -252,6 +261,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))
 {
@@ -308,6 +318,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
@@ -846,6 +857,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {

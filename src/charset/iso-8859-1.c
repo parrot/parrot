@@ -24,11 +24,13 @@ This file implements the charset functions for iso-8859-1 data
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
@@ -72,6 +74,7 @@ static void set_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
@@ -83,6 +86,7 @@ static void titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * to_charset(PARROT_INTERP,
     NOTNULL(STRING *src),
@@ -91,12 +95,14 @@ static STRING * to_charset(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_latin1(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_unicode(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
@@ -150,6 +156,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_latin1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -189,6 +196,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -232,6 +240,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
@@ -240,7 +249,7 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
         Parrot_find_charset_converter(interp, src->charset, Parrot_iso_8859_1_charset_ptr);
 
     if (conversion_func)
-         return conversion_func(interp, src, dest);
+        return conversion_func(interp, src, dest);
     else
         return to_latin1(interp, src, dest);
 }
@@ -259,6 +268,7 @@ TODO: Not yet documented!!!
 */
 
 /* A noop. can't compose iso-8859-1 */
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))
@@ -277,6 +287,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
@@ -588,6 +599,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
@@ -658,6 +670,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))

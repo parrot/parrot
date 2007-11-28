@@ -51,6 +51,7 @@ INTVAL ascii_cs_rindex(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * ascii_get_graphemes(PARROT_INTERP,
     NOTNULL(STRING *source_string),
@@ -70,12 +71,14 @@ STRING * ascii_get_graphemes_inplace(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
 STRING * charset_cvt_ascii_to_binary(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 STRING * charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))

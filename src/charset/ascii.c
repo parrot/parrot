@@ -37,10 +37,12 @@ charset functionality for similar charsets like iso-8859-1.
 
 /* HEADERIZER BEGIN: static */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, NOTNULL(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -87,6 +89,7 @@ static void set_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
@@ -99,18 +102,21 @@ static void titlecase_first(PARROT_INTERP, NOTNULL(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_ascii(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_charset(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * to_unicode(PARROT_INTERP,
     NOTNULL(STRING *src),
     NULLOK(STRING *dest))
@@ -145,6 +151,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
@@ -209,6 +216,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -251,6 +259,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -278,6 +287,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -304,6 +314,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))
 {
@@ -322,6 +333,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, NOTNULL(STRING *src))
 {
@@ -666,6 +678,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
@@ -857,6 +870,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {
@@ -887,6 +901,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 {

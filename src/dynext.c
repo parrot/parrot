@@ -57,6 +57,7 @@ static PMC * make_string_pmc(PARROT_INTERP, NOTNULL(STRING *string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     NOTNULL(void *handle),
     NOTNULL(STRING *lib_name),
@@ -297,10 +298,11 @@ TODO: Not yet documented!!!
 */
 
 PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                PMC *(*load_func)(PARROT_INTERP),
-                void (*init_func)(PARROT_INTERP, NULLOK(PMC *)))
+                NULLOK(PMC *(*load_func)(PARROT_INTERP)),
+                NULLOK(void (*init_func)(PARROT_INTERP, NULLOK(PMC *))))
 {
     NOTNULL(PMC *lib_pmc) = NULL;
 
@@ -338,6 +340,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
             NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))

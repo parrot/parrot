@@ -31,6 +31,7 @@ static INTVAL compare(PARROT_INTERP,
     SHIM(const STRING *rhs))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
@@ -46,6 +47,7 @@ static INTVAL cs_rindex(PARROT_INTERP,
     UINTVAL offset)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
@@ -86,6 +88,7 @@ static void set_graphemes(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
@@ -95,6 +98,7 @@ static void titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 static void titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING* to_charset(PARROT_INTERP,
     NOTNULL(STRING *src),
     NOTNULL(STRING *dest))
@@ -151,6 +155,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 {
@@ -174,6 +179,7 @@ TODO: Not yet documented!!!
 */
 
 /* A err. can't compose binary */
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 compose(PARROT_INTERP, SHIM(STRING *source_string))
 {
@@ -192,6 +198,7 @@ TODO: Not yet documented!!!
 */
 
 /* A err. can't decompose binary */
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *source_string))
 {
@@ -439,6 +446,7 @@ TODO: Not yet documented!!!
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
