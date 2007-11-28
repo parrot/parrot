@@ -639,7 +639,7 @@ is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), 
     parrot_context_t *caller_ctx;
     opcode_t *args;
     PMC * const sig1 = (PMC*)(pc[1]);
-    parrot_context_t * const ctx = CONTEXT(interp->ctx);
+    const parrot_context_t * const ctx = CONTEXT(interp->ctx);
 
     /* check params */
 
