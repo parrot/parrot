@@ -81,20 +81,20 @@ the subroutine C<_fact> out of the global symbol table and calls it:
 
   find_global $P1, "_fact"
 
-  .pcc_begin prototyped
+  .begin_call
     .arg count
     .arg product
-    .pcc_call $P1
+    .call $P1
     .result $I0
-  .pcc_end
+  .end_call
 
 X<.arg directive>
 X<.result directive>
-The whole chunk of code from C<.pcc_begin> to C<.pcc_end> acts as a
-single unit. The C<.pcc_begin> directive can be marked as
+The whole chunk of code from C<.begin_call> to C<.end_call> acts as a
+single unit. The C<.begin_call> directive can be marked as
 C<prototyped> or C<unprototyped>, which corresponds to the flag C<I0>
 in the calling conventions. The C<.arg> directive sets up arguments to
-the call. The C<.pcc_call> directive saves top register frames, calls
+the call. The C<.call> directive saves top register frames, calls
 the subroutine, and restores the top registers. The C<.result>
 directive retrieves return values from the call.
 
@@ -105,14 +105,14 @@ of the registers and creates local named variables for them:
 
   .param int c
 
-X<.pcc_begin_return directive>
-X<.pcc_end_return directive>
-The C<.pcc_begin_return> and C<.pcc_end_return> directives act as a
-unit much like the C<.pcc_begin> and C<.pcc_end> directives:
+X<.begin_return directive>
+X<.end_return directive>
+The C<.begin_return> and C<.end_return> directives act as a
+unit much like the C<.begin_call> and C<.end_call> directives:
 
-  .pcc_begin_return
+  .begin_return
     .return p
-  .pcc_end_return
+  .end_return
 
 X<.return directive>
 The C<.return> directive sets up return values in the appropriate
@@ -149,9 +149,9 @@ C<_fact> label between different units.
      dec c
      branch loop
   fin:
-     .pcc_begin_return
+     .begin_return
      .return p
-     .pcc_end_return
+     .end_return
   .end
 
 
@@ -208,7 +208,7 @@ arguments can vary.
 
 X<call instruction (PIR)>
 Another significant difference is that instead of the single line call
-or a C<.pcc_call>, stack-based calls use the C<call> instruction. This
+or a C<.call>, stack-based calls use the C<call> instruction. This
 is the same as PASM's C<bsr>X<bsr opcode (PASM)> opcode. It branches
 to a subroutine label and pushes the current location onto the control
 stack so it can return to it later.
@@ -420,7 +420,7 @@ first method:
   .end                          # statement
 
 Each method call looks up the method name in the symbol table of the
-object's class. Like C<.pcc_sub> in PASM, C<.sub> makes a symbol table
+object's class. Like C<.pccsub> in PASM, C<.sub> makes a symbol table
 entry for the subroutine in the current namespace.
 
 When a C<.sub> is declared as a C<method>, it automatically creates a
