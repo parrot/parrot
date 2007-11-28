@@ -182,7 +182,11 @@ defaults to true.
 If conditioned_lines is true, then lines in the file that begin with:
 C<#CONDITIONED_LINE(var):> are skipped if the var condition is false. Lines
 that begin with C<#INVERSE_CONDITIONED_LINE(var):> are skipped if
-the var condition is true.
+the var condition is true.  For instance:
+
+  #CONDITIONED_LINE(win32): $(SRC_DIR)/atomic/gcc_x86$(O)
+
+will be processed if the platform is win32.
 
 =item comment_type
 
