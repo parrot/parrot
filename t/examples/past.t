@@ -6,9 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
-use Parrot::Test tests => 1;
-use Parrot::Config;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -17,6 +15,7 @@ t/examples/past.t - Test examples in F<examples/past>
 =head1 SYNOPSIS
 
     % prove t/examples/past.t
+    % prove -v t/examples/past.t
 
 =head1 DESCRIPTION
 
@@ -35,7 +34,9 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 # Set up expected output for examples
 
 # A stub for future PAST-pm example
-my %expected = ();
+my %expected = (
+    'four_plus_one.pir' => "5\n"
+);
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/past/$example", $expected );
