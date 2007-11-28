@@ -80,6 +80,7 @@ rule statement_list {
 ##  the calling rule.
 rule statement {
     | <if_statement> {*}                                   #= if_statement
+    | <while_statement> {*}                                #= while_statement
     | <for_statement> {*}                                  #= for_statement
     | <return_statement> {*}                               #= return_statement
     | <make_statement> {*}                                 #= make_statement
@@ -119,6 +120,10 @@ rule if_statement {
     {*}
 }
 
+rule while_statement {
+    $<sym>:=['while'|'until'] <EXPR> <block>
+    {*}
+}
 
 rule for_statement {
     $<sym>:=['for'] <EXPR> <block>

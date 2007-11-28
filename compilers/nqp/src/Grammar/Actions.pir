@@ -219,6 +219,26 @@
 .end
 
 
+##    method while_statement($/) {
+##        make PAST::Op.new( $($<EXPR>),
+##                           $($<block>),
+##                           :pasttype( ~$<sym> ),
+##                           :node( $/ )
+##                         );
+##    }
+.sub 'while_statement' :method
+    .param pmc match
+    $P1 = match['EXPR']
+    $P1 = $P1.'get_scalar'()
+    $P2 = match['block']
+    $P2 = $P2.'get_scalar'()
+    $S0 = match['sym']
+    $P0 = get_hll_global ['PAST'], 'Op'
+    $P5 = $P0.'new'( $P1, $P2, 'pasttype'=>$S0, 'node'=>match)
+    match.'result_object'($P5)
+.end
+
+
 ##    method for_statement($/) {
 ##        my $block := $<block>;
 ##        $block.blocktype('sub');
