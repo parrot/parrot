@@ -2,6 +2,17 @@ grammar ABC::Grammar is PCT::Grammar;
 
 ## an example 'bc' grammar
 
+=begin overview
+
+The following is the grammar for abc written as a sequence of
+Perl 6 rules.  In each of the rules, the special notation {*}
+marks a point in the rule where the corresponding action in
+ABC::Grammar::Actions is to be invoked (see grammar-actions.pl).
+If there are multiple {*}'s in a rule, then the comments at the
+end of each line become a key that is passed to the action.
+
+=end overview
+
 rule TOP {
     ^ <statement_list>
     [ $ | <panic: parse error> ]
@@ -87,22 +98,6 @@ token variable {
     ]
 }
 
-
-### Standalone strings do not handle backslashed caracters.
-### However, when a string is passed to 'print', special chars are handled.
-#token string { <-["]>* }
-#
-### 'print' is a GNU extension to bc
-### backslashed characters are ignored for now
-#rule print {
-#    print [ <string> | <expression> ] [ ',' [ <string> | <expression> ] ]*
-#}
-#
-#
-#
-#
-#rule pseudo_statement { 'limits' | 'quit' | 'warranty' }
-#
 
 ## terms
 proto 'term:'       is precedence('=')
