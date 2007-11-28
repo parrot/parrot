@@ -303,7 +303,7 @@ to any options and return the resulting parse tree.
 .end
 
 
-=item ast(source [, "option" => value, ...])
+=item past(source [, "option" => value, ...])
 
 Transform C<source> into an AST using the compiler's
 C<astgrammar> according to any options, and return the
@@ -608,7 +608,7 @@ based on double-colon separators.
     .return ($P0)
 .end
 
-=item ost(source [, adverbs :slurpy :named])
+=item post(source [, adverbs :slurpy :named])
 
 Transform C<source> using the compiler's C<ostgrammar>
 according to any options given by C<adverbs>, and return the
