@@ -102,6 +102,12 @@ $ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
 my $gc_debug = grep { $_ eq '--gc-debug' } @ARGV;
 @ARGV = grep { $_ ne '--gc-debug' } @ARGV;
 
+my $core_tests_only = grep { $_ eq '--core-tests' } @ARGV;
+@ARGV = grep { $_ ne '--core-tests' } @ARGV;
+
+my $runcore_tests_only = grep { $_ eq '--runcore-tests' } @ARGV;
+@ARGV = grep { $_ ne '--runcore-tests' } @ARGV;
+
 my $html = grep { $_ eq '--html' } @ARGV;
 @ARGV = grep { $_ ne '--html' } @ARGV;
 
@@ -134,6 +140,8 @@ perl t/harness [options] [testfiles]
     -D[number] ... pass debug flags to parrot interpreter
     --running-make-test
     --gc-debug
+    --core-tests
+    --runcore-tests
     --html
     --tr       ... run using Test::Run
 EOF
@@ -148,53 +156,84 @@ $args =~ s/-O/-O$opts{O}/ if exists $opts{O};
 $args =~ s/-D/-D$opts{D}/;
 $args .= ' --gc-debug'    if $gc_debug;
 # XXX find better way for passing run_exec to Parrot::Test
-$args .= ' --run-exec'    if $run_exec; 
+$args .= ' --run-exec'    if $run_exec;
 $ENV{TEST_PROG_ARGS} = $args;
 
-# Pass in a list of tests to run on the command line, else run all the tests.
-my @default_tests = map {glob "t/$_/*.t"} qw(
-    configure postconfigure compilers/imcc/* op pmc native_pbc dynpmc dynoplibs
-    compilers/pge compilers/pge/p5regex compilers/pge/p6regex 
-    compilers/pge/perl6regex compilers/tge compilers/json 
-    library examples run src tools perl doc stm
+# Build the lists of tests to be run
+
+# runcore tests are always run.
+my @runcore_tests = qw(
+    t/compilers/imcc/*/*.t
+    t/op/*.t
+    t/pmc/*.t
+    t/native_pbc/*.t
+    t/dynpmc/*.t
+    t/dynoplibs/*.t
+    t/compilers/pge/*.t
+    t/compilers/pge/p5regex/*.t
+    t/compilers/pge/perl6regex/*.t
+    t/compilers/tge/*.t
+    t/library/*.t
 );
 
-# append the distribution checking tests to the default tests
-my @distro_tests = map { "t/distro/$_" } qw(
-    manifest.t
+# core tests are run unless --runcore-tests is present.  Typically
+# this list and the list above are run in response to --core-tests
+my @core_tests = qw(
+    t/run/*.t
+    t/src/*.t
+    t/tools/*.t
+    t/perl/*.t
+    t/stm/*.t
 );
-push @default_tests, @distro_tests;
 
-# append the file_metadata.t only if we're running in a non-release checkout
-push @default_tests, 't/distro/file_metadata.t'
-    if -e "$Bin/../DEVELOPING";
-
-# collect the coding standard tests (that we want to run) together
-# append them to the list of default tests *only* if this is not a release
-my @coding_std_tests = map { "t/codingstd/$_" } qw(
-    c_code_coda.t
-    c_header_guards.t
-    c_indent.t
-    c_struct.t
-    check_toxxx.t
-    copyright.t
-    cppcomments.t
-    cuddled_else.t
-    filenames.t
-    gmt_utc.t
-    linelength.t
-    pccmethod_deps.t
-    pir_code_coda.t
-    svn_id.t
-    tabs.t
-    trailing_space.t
+# configure tests are tests to be run at the beginning of 'make test';
+# standard tests are other tests run by default with no core options
+# present
+my @configure_tests = qw( t/configure/*.t t/postconfigure/*.t );
+my @standard_tests = qw(
+    t/compilers/json/*.t
+    t/examples/*.t
+    t/doc/*.t
+    t/distro/manifest.t
 );
-# XXX: This takes WAY too long to run: perlcritic.t
 
-push @default_tests, @coding_std_tests
-    if -e "$Bin/../DEVELOPING";
+# add metadata.t and coding standards tests only if we're not DEVELOPING
+unless ( -e "$Bin/../DEVELOPING" ) {
+    push @standard_tests, 't/distro/metadata.t';
+    push @standard_tests, map { "t/codingstd/$_" } qw(
+        c_code_coda.t
+        c_header_guards.t
+        c_indent.t
+        c_struct.t
+        check_toxxx.t
+        copyright.t
+        cppcomments.t
+        cuddled_else.t
+        filenames.t
+        gmt_utc.t
+        linelength.t
+        pccmethod_deps.t
+        pir_code_coda.t
+        svn_id.t
+        tabs.t
+        trailing_space.t
+    );
+    # XXX: This takes WAY too long to run: perlcritic.t
+}
 
-my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
+# build the list of default tests
+my @default_tests = @runcore_tests;
+unless ($runcore_tests_only) {
+   push @default_tests, @core_tests;
+   unless ($core_tests_only) {
+       unshift @default_tests, @configure_tests;
+       push @default_tests, @standard_tests;
+   }
+}
+
+# now build the list of tests to run, either from the command
+# line or from @default tests
+my @tests = map { glob( $_ ) } (@ARGV ? @ARGV : @default_tests);
 
 if ($use_test_run) {
     require Test::Run::CmdLine::Iface;
