@@ -642,7 +642,7 @@ by C<node>.
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = ops.'unique'('for_')
     looplabel = $P0.'new'('result'=>$S0)
-    $S0 = concat $S0, 'end'
+    $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
 
     .local pmc collpast, collpost
@@ -670,6 +670,50 @@ by C<node>.
     ops.'push_pirop'('call', subpost, nextval)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
+    .return (ops)
+.end
+
+
+=item try(PAST::Op node)
+
+Return the POST representation of a C<PAST::Op>
+node with a 'pasttype' of bind.  The first child
+is the code to be surrounded by an exception handler,
+the second child (if any) is the code to process the
+handler.
+
+=cut
+
+.sub 'try' :method :multi(_, ['PAST::Op'])
+    .param pmc node
+    .param pmc options       :slurpy :named
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+
+    .local pmc catchlabel, endlabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = ops.'unique'('catch_')
+    catchlabel = $P0.'new'('result'=>$S0)
+    $S0 = concat $S0, '_end'
+    endlabel = $P0.'new'('result'=>$S0)
+
+    .local pmc trypast, trypost
+    trypast = node[0]
+    trypost = self.'post'(trypast, 'rtype'=>'P')
+    ops.'push_pirop'('push_eh', catchlabel)
+    ops.'push'(trypost)
+    ops.'push_pirop'('pop_eh')
+    ops.'push'(catchlabel)
+    .local pmc catchpast, catchpost
+    catchpast = node[1]
+    if null catchpast goto catch_done
+    catchpost = self.'post'(catchpast, 'rtype'=>'v')
+    ops.'push'(catchpost)
+  catch_done:
+    ops.'push'(endlabel)
+    ops.'result'(trypost)
     .return (ops)
 .end
 
