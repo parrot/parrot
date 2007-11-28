@@ -288,10 +288,6 @@ in any namespace.  If you specify more than one, separated by semicolons, it
 creates nested namespaces, by storing the inner namespace object with a C<\0>
 prefix in the outer namespace's global pad.
 
-=item .pcc_*
-
-Directives used for Parrot Calling Conventions.
-
 =back
 
 =head2 Directives for subroutine parameters and return
@@ -313,7 +309,7 @@ C<:slurpy>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 =item .return <var> [:<flag> ...]
 
-Between B<.pcc_begin_return> and B<.pcc_end_return>, specify one or
+Between B<.begin_return> and B<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags:
 C<:flat>.
@@ -326,13 +322,13 @@ C<:flat>.
 
 =item .arg <var> [:<flag> ...]
 
-Between B<.pcc_begin> and B<.pcc_call>, specify an argument to be
+Between B<.begin_call> and B<.call>, specify an argument to be
 passed.  Available flags:
 C<:flat>.
 
 =item .result <var> [:<flag> ...]
 
-Between B<.pcc_call> and B<.pcc_end>, specify where one or more return
+Between B<.call> and B<.end_call>, specify where one or more return
 value(s) should be stored.  Available flags:
 C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
@@ -346,13 +342,13 @@ C<:slurpy>, C<:optional>, and C<:opt_flag>.
 
 This is short for:
 
- .pcc_begin
- .pcc_arg <arg1> <flag2>
+ .begin_call
+ .arg <arg1> <flag2>
  ...
- .pcc_call <var2>
+ .call <var2>
  .result <var1> <flag1>
  ...
- .pcc_end
+ .end_call
 
 =item <var> = <var>([arg [:<flag> ...], ...])
 
@@ -363,8 +359,8 @@ This is short for:
 =item <var>._method([arg [:<flag> ...], ...])
 
 Function or method call. These notations are shorthand for a longer
-PCC function call with B<.pcc_*> directives. I<var> can denote a
-global subroutine, a local B<identifier> or a B<reg>.
+PCC function call with B<.begin_call> and B<.end_call> directives.
+I<var> can denote a global subroutine, a local B<identifier> or a B<reg>.
 
 =item .return ([<var> [:<flag> ...], ...])
 
