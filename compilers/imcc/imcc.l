@@ -285,40 +285,40 @@ SP              [ ]
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
 
-<INITIAL,emit>".lex"          return LEXICAL;
-".arg"          return ARG;
-".sub"          return SUB;
-".end"          return ESUB;
-".pcc_begin"|".begin_call"    return PCC_BEGIN;
-".pcc_end"|".end_call"        return PCC_END;
-".pcc_call"|".call"           return PCC_CALL;
-".nci_call"     return NCI_CALL;
-".meth_call"    return METH_CALL;
-".invocant"     return INVOCANT;
-<emit,INITIAL>".pcc_sub"               return PCC_SUB;
-".pcc_begin_return"|".begin_return"    return PCC_BEGIN_RETURN;
-".pcc_end_return"|".end_return"        return PCC_END_RETURN;
-".pcc_begin_yield"|".begin_yield"      return PCC_BEGIN_YIELD;
-".pcc_end_yield"|".end_yield"          return PCC_END_YIELD;
+<INITIAL,emit>".lex"     return LEXICAL;
+".arg"                   return ARG;
+".sub"                   return SUB;
+".end"                   return ESUB;
+".begin_call"            return PCC_BEGIN;
+".end_call"              return PCC_END;
+".call"                  return PCC_CALL;
+".nci_call"              return NCI_CALL;
+".meth_call"             return METH_CALL;
+".invocant"              return INVOCANT;
+<emit,INITIAL>".pcc_sub" return PCC_SUB;
+".begin_return"          return PCC_BEGIN_RETURN;
+".end_return"            return PCC_END_RETURN;
+".begin_yield"           return PCC_BEGIN_YIELD;
+".end_yield"             return PCC_END_YIELD;
 
-<emit,INITIAL>":method"        return METHOD;
-<emit,INITIAL>":multi"   return MULTI;
-<emit,INITIAL>":main"    return MAIN;
-<emit,INITIAL>":load"    return LOAD;
-<emit,INITIAL>":init"    return INIT;
-<emit,INITIAL>":immediate"    return IMMEDIATE;
-<emit,INITIAL>":postcomp"    return POSTCOMP;
-<emit,INITIAL>":anon"    return ANON;
-<emit,INITIAL>":outer"   return OUTER;
-<emit,INITIAL>":lex"     return NEED_LEX;
-<emit,INITIAL>":vtable"  return VTABLE_METHOD;
-":unique_reg"  return UNIQUE_REG;
+<emit,INITIAL>":method"    return METHOD;
+<emit,INITIAL>":multi"     return MULTI;
+<emit,INITIAL>":main"      return MAIN;
+<emit,INITIAL>":load"      return LOAD;
+<emit,INITIAL>":init"      return INIT;
+<emit,INITIAL>":immediate" return IMMEDIATE;
+<emit,INITIAL>":postcomp"  return POSTCOMP;
+<emit,INITIAL>":anon"      return ANON;
+<emit,INITIAL>":outer"     return OUTER;
+<emit,INITIAL>":lex"       return NEED_LEX;
+<emit,INITIAL>":vtable"    return VTABLE_METHOD;
+":unique_reg"              return UNIQUE_REG;
 
-".result"       return RESULT;
-".get_results"       return GET_RESULTS;
-".yield"        return YIELDT;
-".return"       return RETURN;
-<emit,INITIAL>".loadlib"      return LOADLIB;
+".result"                  return RESULT;
+".get_results"             return GET_RESULTS;
+".yield"                   return YIELDT;
+".return"                  return RETURN;
+<emit,INITIAL>".loadlib"   return LOADLIB;
 
 ":flat"         return ADV_FLAT;
 ":slurpy"       return ADV_SLURPY;
@@ -330,13 +330,13 @@ SP              [ ]
 <emit,INITIAL>".namespace"    return NAMESPACE;
 <emit,INITIAL>".HLL"          return HLL;
 <emit,INITIAL>".HLL_map"      return HLL_MAP;
-".endnamespace" return ENDNAMESPACE;
-".local"        return LOCAL;
-".global"       return GLOBAL;
+".endnamespace"               return ENDNAMESPACE;
+".local"                      return LOCAL;
+".global"                     return GLOBAL;
 <emit,INITIAL>".const"        return CONST;
-".globalconst"  return GLOBAL_CONST;
-".param"        return PARAM;
-<*>".pragma"    return PRAGMA;
+".globalconst"     return GLOBAL_CONST;
+".param"           return PARAM;
+<*>".pragma"       return PRAGMA;
 <*>"n_operators"   return N_OPERATORS;
 "goto"          return GOTO;
 "if"            return IF;
@@ -363,8 +363,8 @@ SP              [ ]
 "!="            return RELOP_NE;
 "**"            return POW;
 
-{WS}+"."{WS}+   return CONCAT;
-"."             return DOT;
+{WS}+"."{WS}+          return CONCAT;
+"."                    return DOT;
 <emit,INITIAL>".."     return DOTDOT;
 "+="            return PLUS_ASSIGN;
 "-="            return MINUS_ASSIGN;
