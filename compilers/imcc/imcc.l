@@ -284,7 +284,7 @@ SP              [ ]
 <pod>.*         { /*ignore*/ }
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
-".sym"          return LOCAL;
+
 <INITIAL,emit>".lex"          return LEXICAL;
 ".arg"          return ARG;
 ".sub"          return SUB;
