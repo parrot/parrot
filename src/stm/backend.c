@@ -497,7 +497,7 @@ is_aborted(NOTNULL(STM_tx_log *log))
 
     for (i = 1; i <= log->depth; ++i) {
         int status;
-        const STM_tx_log_sub * const sublog = get_sublog(log, i);
+        STM_tx_log_sub * const sublog = get_sublog(log, i);
 
         PARROT_ATOMIC_INT_GET(status, sublog->status);
         if (status == STM_STATUS_ABORTED)
