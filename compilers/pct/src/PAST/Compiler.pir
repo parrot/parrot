@@ -547,7 +547,7 @@ Return the PAST representation of a C<while> or C<until> loop.
     ##  on the conditional (while => if, until => unless)
     .local string iftype
     iftype = 'if'
-    if $S0 == 'until' goto have_iftype
+    if pasttype == 'until' goto have_iftype
     iftype = 'unless'
   have_iftype:
 
