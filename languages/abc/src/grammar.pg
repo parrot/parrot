@@ -8,6 +8,9 @@ The following is the grammar for abc written as a sequence of
 Perl 6 rules.  In each of the rules, the special notation {*}
 marks a point in the rule where the corresponding action in
 ABC::Grammar::Actions is to be invoked (see grammar-actions.pl).
+These actions are then used to construct the ast nodes for
+the program.
+
 If there are multiple {*}'s in a rule, then the comments at the
 end of each line become a key that is passed to the action.
 
