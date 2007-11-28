@@ -33,32 +33,6 @@ was already checked in compilation_unit().
 
 Maybe use compilers/bcg for back-end, if that would fit well.
 
-=item *
-
-Clean up grammar after discussion.
-
-=over 4
-
-=item + For instance, why have :postcomp and :immediate, having same
-meaning?, and why ".sub" and ".pcc_sub"?
-
-=item + why "object" as type?
-
-Why custom names as type, such as '.local Array x' -- this is not needed,
-and makes the code look more like a HLL.  Just stick to 'pmc', which works
-fine.
-
-=item + why allow an optional comma between sub pragmas?
-
-param pragmas don't have that so remove this opt. comma as well for
-consistency.
-
-=item + unify '.sym' and '.local'.
-
-Just allow one, and think of something else for local labels in macros.
-
-=back
-
 =back
 
 =cut
@@ -1381,14 +1355,14 @@ invokable(parser_state *p)
 
 =item C<static void long_invocation(parser_state *p)>
 
-  long-invocation -> '.pcc_begin' '\n'
+  long-invocation -> '.begin_call' '\n'
                      { '.arg' expression arg_flags }
-                     ( '.pcc_call'|'.nci_call') invokable '\n'
+                     ( '.call'|'.nci_call') invokable '\n'
                      | '.invocant' invokable '\n'
                        '.meth_call' method '\n'
                      )
                      { (local_declaration | '.result' target param_flags '\n') }
-                     '.pcc_end' '\n'
+                     '.end_call' '\n'
 
 =cut
 
@@ -1400,7 +1374,7 @@ long_invocation(parser_state *p)
 
     emit_invocation_start(p);
 
-    match(p, T_PCC_BEGIN);               /* '.pcc_begin '\n' */
+    match(p, T_PCC_BEGIN);               /* '.begin_call' '\n' */
     match(p, T_NEWLINE);
 
     /* arguments */
@@ -1415,7 +1389,7 @@ long_invocation(parser_state *p)
 
     /* the invocant and/or sub to be called */
     switch (p->curtoken) {
-        case T_PCC_CALL:                /* '.pcc_call' invokable '\n' */
+        case T_PCC_CALL:                /* '.call' invokable '\n' */
         case T_NCI_CALL:                /* '.nci_call' invokable '\n' */
             next(p);
             invokable(p);
@@ -1430,7 +1404,7 @@ long_invocation(parser_state *p)
             match(p, T_NEWLINE);
             break;
         default:
-            syntax_error(p, 1, ".pcc_call, .nci_call or .invocant expected");
+            syntax_error(p, 1, ".call, .nci_call or .invocant expected");
             break;
     }
 
@@ -1448,12 +1422,12 @@ long_invocation(parser_state *p)
                 param_flags(p);
                 match(p, T_NEWLINE);
                 break;
-            case T_PCC_END: /* we encountered '.pcc_end', so stop looking for more results */
+            case T_PCC_END: /* we encountered '.end_call', so stop looking for more results */
                 more_results = 0; /* no more results, break loop */
                 break;
             default:
                 syntax_error(p, 3,
-                    "'.local', '.result' or '.pcc_end' expected, but got '",
+                    "'.local', '.result' or '.end_call' expected, but got '",
                     get_current_token(p->lexer), "'");
                 more_results = 0; /* stop loop */
                 break;
@@ -1461,7 +1435,7 @@ long_invocation(parser_state *p)
     }
     emit_results_end(p);
 
-    match(p, T_PCC_END); /* '.pcc_end' '\n' */
+    match(p, T_PCC_END); /* '.end_call' '\n' */
     match(p, T_NEWLINE);
 
     emit_invocation_end(p);
@@ -1472,9 +1446,9 @@ long_invocation(parser_state *p)
 
 =item C<static void long_return_statement(parser_state *p)>
 
-  long_return_statement -> '.pcc_begin_return' '\n'
+  long_return_statement -> '.begin_return' '\n'
                            { '.return' expression arg_flags '\n' }
-                           '.pcc_end_return' '\n'
+                           '.end_return' '\n'
 
 =cut
 
@@ -1482,7 +1456,7 @@ long_invocation(parser_state *p)
 static void
 long_return_statement(parser_state *p)
 {
-    emit_op_start(p, ".pcc_begin_return");
+    emit_op_start(p, ".begin_return");
     match(p, T_PCC_BEGIN_RETURN);
     match(p, T_NEWLINE);
 
@@ -1492,7 +1466,7 @@ long_return_statement(parser_state *p)
         arg_flags(p);
         match(p, T_NEWLINE);
     }
-    match(p, T_PCC_END_RETURN); /* ... '.pcc_end_return' '\n' */
+    match(p, T_PCC_END_RETURN); /* ... '.end_return' '\n' */
     match(p, T_NEWLINE);
     emit_op_end(p);
 }
@@ -1501,9 +1475,9 @@ long_return_statement(parser_state *p)
 
 =item C<static void long_yield_statement(parser_state *p)>
 
-  long_yield_statement -> '.pcc_begin_yield' '\n'
+  long_yield_statement -> '.begin_yield' '\n'
                           { '.return' expression arg_flags '\n' }
-                          '.pcc_end_yield' '\n'
+                          '.end_yield' '\n'
 
 =cut
 
@@ -1511,7 +1485,7 @@ long_return_statement(parser_state *p)
 static void
 long_yield_statement(parser_state *p)
 {
-    emit_op_start(p, ".pcc_begin_yield");
+    emit_op_start(p, ".begin_yield");
     match(p, T_PCC_BEGIN_YIELD);
     match(p, T_NEWLINE);
 
@@ -1521,7 +1495,7 @@ long_yield_statement(parser_state *p)
         arg_flags(p);
         match(p, T_NEWLINE);
     }
-    match(p, T_PCC_END_YIELD); /* '.pcc_end_yield' '\n' */
+    match(p, T_PCC_END_YIELD); /* '.end_yield' '\n' */
     match(p, T_NEWLINE);
     emit_op_end(p);
 }

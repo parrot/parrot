@@ -87,8 +87,8 @@ The following are PIR directives.
   .endnamespace      .endm       .eom              .get_results       .globalconst
   .HLL               .HLL_map    .include          .invocant          .lex
   .loadlib           .local      .macro            .meth_call         .namespace
-  .nci_call          .param      .pcc_begin        .pcc_begin_return  .pcc_begin_yield
-  .pcc_call          .pcc_end    .pcc_end_return   .pcc_end_yield     .pragma
+  .nci_call          .param      .begin_call       .begin_return      .begin_yield
+  .call              .end_call   .end_return       .end_yield         .pragma
   .result            .return     .sub              .yield
 
 
@@ -161,13 +161,13 @@ static char const * dictionary[] = {
     ".namespace",               /* T_NAMESPACE,             */
     ".nci_call",                /* T_NCI_CALL               */
     ".param",                   /* T_PARAM,                 */
-    ".pcc_begin",               /* T_PCC_BEGIN              */
-    ".pcc_begin_return",        /* T_PCC_BEGIN_RETURN       */
-    ".pcc_begin_yield",         /* T_PCC_BEGIN_YIELD        */
-    ".pcc_call",                /* T_PCC_CALL               */
-    ".pcc_end",                 /* T_PCC_END                */
-    ".pcc_end_return",          /* T_PCC_END_RETURN         */
-    ".pcc_end_yield",           /* T_PCC_END_YIELD          */
+    ".begin_call",              /* T_PCC_BEGIN              */
+    ".begin_return",            /* T_PCC_BEGIN_RETURN       */
+    ".begin_yield",             /* T_PCC_BEGIN_YIELD        */
+    ".call",                    /* T_PCC_CALL               */
+    ".end_call",                /* T_PCC_END                */
+    ".end_return",          /* T_PCC_END_RETURN         */
+    ".end_yield",           /* T_PCC_END_YIELD          */
     ".pragma",                  /* T_PRAGMA                 */
     ".result",                  /* T_RESULT,                */
     ".return",                  /* T_RETURN,                */
