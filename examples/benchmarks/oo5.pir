@@ -48,9 +48,9 @@ loop:
     ofs = classoffset self, "Foo"
     .local pmc r
     r = getattribute self, ofs
-    .pcc_begin_return
+    .begin_return
     .return r
-    .pcc_end_return
+    .end_return
 .end
 
 .sub j :method
@@ -59,9 +59,9 @@ loop:
     inc ofs
     .local pmc r
     r = getattribute self, ofs
-    .pcc_begin_return
+    .begin_return
     .return r
-    .pcc_end_return
+    .end_return
 .end
 
 # Local Variables:

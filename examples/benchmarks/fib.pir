@@ -54,9 +54,9 @@ noarg:
     r2 = _fib(n2)
     n = r1 + r2
 ret:
-    .pcc_begin_return
+    .begin_return
     .return n
-    .pcc_end_return
+    .end_return
 .end
 
 =head1 SEE ALSO

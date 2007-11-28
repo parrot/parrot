@@ -48,9 +48,9 @@ loop:
     unless has_v goto get
     assign r, v
 get:
-    .pcc_begin_return
+    .begin_return
     .return r
-    .pcc_end_return
+    .end_return
 .end
 
 .sub j :method
@@ -64,9 +64,9 @@ get:
     unless has_v goto get
     assign r, v
 get:
-    .pcc_begin_return
+    .begin_return
     .return r
-    .pcc_end_return
+    .end_return
 .end
 
 # Local Variables:
