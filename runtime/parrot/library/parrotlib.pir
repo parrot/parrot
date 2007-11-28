@@ -93,9 +93,9 @@ This function returns the absolute filename of the requested file.
     find_global $P0, "_parrotlib", "include_paths"
     $S0 = find_file_path( name, $P0 )
 
-    .pcc_begin_return
+    .begin_return
     .return $S0
-    .pcc_end_return
+    .end_return
 .end
 
 =item STRING = bytecode_location( STRING )
@@ -113,9 +113,9 @@ This function returns the absolute filename of the requested file.
     find_global $P0, "_parrotlib", "include_paths"
     $S0 = find_file_path( name, $P0 )
 
-    .pcc_begin_return
+    .begin_return
     .return $S0
-    .pcc_end_return
+    .end_return
 .end
 
 =item STRING = dynext_location( STRING )
@@ -154,9 +154,9 @@ Returns the location of a dynamic extension.
     concat name, ext
 
 END:
-    .pcc_begin_return
+    .begin_return
     .return name
-    .pcc_end_return
+    .end_return
 .end
 
 
@@ -177,9 +177,9 @@ NEXT:
     ret = $P0( name )
     if_null ret, NEXT
 END:
-    .pcc_begin_return
+    .begin_return
     .return ret
-    .pcc_end_return
+    .end_return
 .end
 
 .sub handle_directory
@@ -197,9 +197,9 @@ END:
     if $I0 goto OK
     null $S0
 OK:
-    .pcc_begin_return
+    .begin_return
     .return $S0
-    .pcc_end_return
+    .end_return
 .end
 
 =back

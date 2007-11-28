@@ -70,9 +70,9 @@ ok1:
     .local pmc conf_hash
     thaw conf_hash, image
     # XXX hash should probably be marked read-only...
-    .pcc_begin_return
+    .begin_return
     .return conf_hash
-    .pcc_end_return
+    .end_return
 .end
 
 =head1 AUTHOR

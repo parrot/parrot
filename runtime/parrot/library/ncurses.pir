@@ -650,8 +650,8 @@ store_global 'ncurses::mcprint', $P2
 dlfunc $P2, $P1, 'has_key', 'ii'
 store_global 'ncurses::has_key', $P2
 
-.pcc_begin_return
-.pcc_end_return
+.begin_return
+.end_return
 .end
 
 # Local Variables:

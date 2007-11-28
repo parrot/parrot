@@ -136,7 +136,7 @@ NOMATCH:
     i = 0
     repeat match, " ", 500
 loop:
-    .pcc_begin
+    .begin_call
     .arg s
     .arg ovector
     .arg ok
@@ -144,7 +144,7 @@ loop:
     .arg match
     .arg 500
     .nci_call COPY_SUBSTRING
-    .pcc_end
+    .end_call
     if i goto subp
     print "all "
     goto all
@@ -171,7 +171,7 @@ pcre(3)
 
 =head1 AUTHORS
 
-Original code by Leo Toetsch, updated by Jerry Gay 
+Original code by Leo Toetsch, updated by Jerry Gay
 E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut

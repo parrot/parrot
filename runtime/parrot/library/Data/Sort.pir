@@ -93,8 +93,8 @@ SKIP2:
     inc start
     branch REDO
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 =back
