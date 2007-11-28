@@ -812,8 +812,7 @@ PackFile_unpack(PARROT_INTERP, NOTNULL(PackFile *self), NOTNULL(opcode_t *packed
             header->uuid_size);
         header->uuid_data[header->uuid_size] = 0; /* NULL terminate */
     }
-    else
-    {
+    else {
         /* Don't know this UUID type. */
         PIO_eprintf(NULL, "PackFile_unpack: Invalid UUID type %d\n",
                     header->uuid_type);
@@ -3310,7 +3309,7 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, char *name)
 {
     /* TODO make a hash of all fixups */
     PackFile_Directory * const dir = interp->code->base.dir;
-    PackFile_FixupEntry *ep        = mem_allocate_typed(PackFile_FixupEntry);
+    PackFile_FixupEntry * const ep = mem_allocate_typed(PackFile_FixupEntry);
     int found;
 
     ep->type = type;
