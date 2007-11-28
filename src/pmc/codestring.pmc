@@ -229,7 +229,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
         if (VTABLE_does(interp, P0, s_array)) {
             INTVAL elements2, index2;
             elements2 = VTABLE_elements(INTERP, P0);
-            for(index2 = 0; index2 < elements2; index2++) {
+            for (index2 = 0; index2 < elements2; index2++) {
                 STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
                 out          = string_append(INTERP, out, prefix);
                 (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);

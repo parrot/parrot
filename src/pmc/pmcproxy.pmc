@@ -132,8 +132,8 @@ Initializes a PMCProxy PMC.
 
         /* XXX Parents and MRO still todo. */
 
-        if (  !PMC_IS_NULL(proxy_info->_namespace)
-            && PMC_IS_NULL(VTABLE_get_class(interp, proxy_info->_namespace))) {
+        if (!PMC_IS_NULL(proxy_info->_namespace) &&
+            PMC_IS_NULL(VTABLE_get_class(interp, proxy_info->_namespace))) {
 
             /* Link the proxy and the namespace, caching the proxy object for
              * later retrieval on class lookup. */
