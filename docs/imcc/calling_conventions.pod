@@ -140,7 +140,7 @@ Notes:
 
 =over 4
 
-=item * B<pcc_call>
+=item * B<call>
 
 Takes either 2 arguments: the sub and the return continuation, or the
 sub only. For the latter case an B<invokecc> gets emitted. Providing
@@ -159,7 +159,7 @@ The B<.param> declarations must be the first statements in the
 sub if any. No other statements are allowed between B<.param> -
 not even comments currently.
 
-=item * B<pcc_begin_return>, B<pcc_end_return>
+=item * B<begin_return>, B<end_return>
 
 If there is no return value and the return should be the last
 instruction of the subroutine, this declaration pair can be omitted.
@@ -181,7 +181,7 @@ C<meth_call> which must immediately be preceded by the C<.invocant>:
   .arg y
   .arg z
   .invocant obj
-  .meth_call "_method" [, $P1 ]	# r = obj."_method"(x, y, z)
+  .meth_call "_method" [, $P1 ] # r = obj."_method"(x, y, z)
   .local int r  # optional - new result var
   .result r
   .pcc_end
@@ -199,16 +199,16 @@ constant or a string variable.
 
   .namespace [ "Foo" ]
 
-  .sub _sub_label method [,Subpragma, ...]
+  .sub _sub_label :method [,Subpragma, ...]
    .param int a # I5
    .param int b # I6
    .param int c # I7
    ...
    self."_other_meth"()
   ...
-  .pcc_begin_return
+  .begin_return
    .return xy   # e.g. I5
-  .pcc_end_return
+  .end_return
   ...
   .end
 
@@ -222,14 +222,14 @@ Proposed syntax:
   load_lib $P0, "libname"
   dlfunc $P1, $P0, "funcname", "signature"
   ...
-  .pcc_begin
+  .begin_call
   .arg x
   .arg y
   .arg z
-  .nci_call $P1	# r = funcname(x, y, z)
+  .nci_call $P1 # r = funcname(x, y, z)
   .local int r  # optional - new result var
   .result r
-  .pcc_end
+  .end_call
 
 This prepares parameters as described in
 F<pdd03_calling_conventions.pod>, saves the registers and invokes the
@@ -245,26 +245,26 @@ TBD.
 
 Arguments are B<save>d in reverse order onto the user stack:
 
-   .arg y	# save args in reversed order
+   .arg y   # save args in reversed order
    .arg x
-   call _foo	#(r, s) = _foo(x,y)
+   call _foo    #(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result r	# restore results in order
-   .result s	#
+   .result r    # restore results in order
+   .result s    #
 
 and return values are B<restore>d in argument order from there.
 
 The subroutine is responsible for preserving registers.
 
- .sub _foo		# sub foo(int a, int b)
+ .sub _foo      # sub foo(int a, int b)
    saveall
    .param int a         # receive arguments from left to right
    .param int b
    ...
 
-   .return mi		# return (pl, mi), push results
-   .return pl		# in reverse order
+   .return mi       # return (pl, mi), push results
+   .return pl       # in reverse order
    restoreall
    ret
  .end

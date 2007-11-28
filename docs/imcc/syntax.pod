@@ -220,8 +220,6 @@ Define a I<compilation unit> containing PASM code.
 
 =item .local <type> <identifier> [:unique_reg]
 
-=item .sym <type> <identifier> [:unique_reg]
-
 Define a local name B<identifier> for this I<compilation unit> and of the
 given B<type>. You can define multiple identifiers of the same type by
 separating them with commas:
@@ -355,7 +353,7 @@ This is short for:
  .result <var1> <flag1>
  ...
  .pcc_end
- 
+
 =item <var> = <var>([arg [:<flag> ...], ...])
 
 =item <var>([arg [:<flag> ...], ...])
