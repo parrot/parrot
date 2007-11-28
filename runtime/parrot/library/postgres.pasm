@@ -184,7 +184,7 @@ store_global 'PostgreSQL::PQmblen', $P2
 dlfunc $P2, $P1, 'PQenv2encoding', 'iv'
 store_global 'PostgreSQL::PQenv2encoding', $P2
 
-.pcc_begin_return
-.pcc_end_return
+.begin_return
+.end_return
 .end
 
