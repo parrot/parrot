@@ -1,7 +1,7 @@
 .sub main :main
-  .pcc_begin                                
-  .nci_call $P1 # r = funcname(x, y, z)      
-  .pcc_end                                 
+  .begin_call
+  .nci_call $P1 # r = funcname(x, y, z)
+  .end_call
 .end
 
 # Local Variables:

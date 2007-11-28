@@ -1,66 +1,66 @@
 .sub main :main
 
   .local pmc a, b, c, x, y, z
-  .pcc_begin
-  .arg a :flat :named('a')  
-  .pcc_call x
+  .begin_call
+  .arg a :flat :named('a')
+  .call x
   .result y :slurpy :optional
-  .pcc_end
-  
+  .end_call
+
   (y :slurpy :optional) = x(a :flat :named('a'))
 
 .end
 
 
-.sub a 
+.sub a
   .local pmc a, b, c, x, y, z
-  
-  .pcc_begin   
-  .pcc_call x
-  .pcc_end
+
+  .begin_call
+  .call x
+  .end_call
 .end
 
 .sub b
   .local pmc a, b, c, x, y, z
-  
-  .pcc_begin
+
+  .begin_call
   .arg 1 :named('x')
-  .pcc_call x
-  .pcc_end
+  .call x
+  .end_call
 .end
 
-.sub c 
+.sub c
   .local pmc a, b, c, x, y, z, g
-  
-  .pcc_begin
+
+  .begin_call
   .arg 1 :flat
-  .pcc_call g
-  .pcc_end
+  .call g
+  .end_call
 .end
 
-.sub d 
+.sub d
   .local pmc a, b, c, x, y, z
-  
-  .pcc_begin
-  .pcc_call x
+
+  .begin_call
+  .call x
   .result a :named
-  .pcc_end
+  .end_call
 .end
 
-.sub e 
+.sub e
   .local pmc a, b, c, x, y, z
-  
-  .pcc_begin
-  .pcc_call x
-  .pcc_end
+
+  .begin_call
+  .call x
+  .end_call
 .end
 
 .sub f
   .local pmc a, b, c, x, y, z
-  
-  .pcc_begin
-  .pcc_call x
-  .pcc_end
+
+  .begin_call
+  .call x
+  .end_call
 .end
 
 .sub Z :immediate
