@@ -388,12 +388,12 @@ rule heredoc_string {
 }
 
 rule long_sub_call {
-    '.pcc_begin' <?nl>
+    '.begin_call' <?nl>
     <arguments>
     <long_call_invocation> <?nl>
     [ <local_decl> <?nl> ]*
     <result_values>
-    [ '.pcc_end'  | <syntax_error: '.pcc_end' expected> ]
+    [ '.end_call'  | <syntax_error: '.end_call' expected> ]
     {*}
 }
 
@@ -403,7 +403,7 @@ rule long_call_invocation {
 }
 
 rule non_method_invocation {
-    [ '.pcc_call' | '.nci_call' ]
+    [ '.call' | '.nci_call' ]
     [ <target> | <syntax_error: variable or register expected that holds the sub object> ]
     {*}
 }
@@ -544,9 +544,9 @@ token return_stat {
 }
 
 rule long_return_stat {
-    '.pcc_begin_return' <?nl>
+    '.begin_return' <?nl>
     [ '.return' <return_value> ]*
-    [ '.pcc_end_return' | <syntax_error: '.pcc_end_return' expected> ]
+    [ '.end_return' | <syntax_error: '.end_return' expected> ]
     {*}
 }
 
@@ -556,9 +556,9 @@ rule short_return_stat {
 }
 
 rule long_yield_stat {
-    '.pcc_begin_yield' <?nl>
+    '.begin_yield' <?nl>
     [ '.yield' <return_value> ]*
-    [ '.pcc_end_yield' | <syntax_error: '.pcc_end_yield' expected> ]
+    [ '.end_yield' | <syntax_error: '.end_yield' expected> ]
     {*}
 }
 
@@ -948,13 +948,13 @@ token pir_directive {
     | '.namespace'
     | '.nci_call'
     | '.param'
-    | '.pcc_begin_return'
-    | '.pcc_begin_yield'
-    | '.pcc_begin'
-    | '.pcc_call'
-    | '.pcc_end_return'
-    | '.pcc_end_yield'
-    | '.pcc_end'
+    | '.begin_return'
+    | '.begin_yield'
+    | '.begin_call'
+    | '.call'
+    | '.end_return'
+    | '.end_yield'
+    | '.end_call'
     | '.pcc_sub'
     | '.pragma'
     | '.return'
