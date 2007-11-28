@@ -80,7 +80,8 @@ OUT
 
 # RT#46827 test open file, close file, delete file, reopen previously opened stream
 
-# RT#46829 cleanup 'new_file'
+# RT#46829 cleanup 'new_file' in previous test; which is todo'd, so the
+# file isn't even being *generated* yet.
 
 SKIP: {
     skip 'no asynch calls yet' => 1;
