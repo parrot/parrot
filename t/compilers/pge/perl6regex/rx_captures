@@ -24,24 +24,24 @@
 ( (.) )*				abc	/mob 0 1 0: <b @ 1>/	nested repeated captures
 [ (.) ]*				abc	/mob 0 1: <b @ 1>/	nested repeated captures
 ( [.] )*				abc	/mob 0 1: <b @ 1>/	nested repeated captures
-(.) (.) $7:=(.) (.) $4:=(.)		abcdefg	/mob 0: <a @ 0>/	numbered aliases $1
-(.) (.) $7:=(.) (.) $4:=(.)		abcdefg	/mob 1: <b @ 1>/	numbered aliases $2
-(.) (.) $7:=(.) (.) $4:=(.)		abcdefg	/mob 7: <c @ 2>/	numbered aliases $7
-(.) (.) $7:=(.) (.) $4:=(.)		abcdefg	/mob 8: <d @ 3>/	numbered aliases $8
-(.) (.) $7:=(.) (.) $4:=(.)		abcdefg	/mob 4: <e @ 4>/	numbered aliases $4
-$1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 1: <abc @ 0>/	perl5 numbered captures $1
-$1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 2: <a @ 0>/	perl5 numbered captures $1
-$1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 3: <b @ 1>/	perl5 numbered captures $1
-$1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 4: <c @ 2>/	perl5 numbered captures $1
-$1:=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 0: <a @ 0>/	numbered aliases $1
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 1: <b @ 1>/	numbered aliases $2
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 7: <c @ 2>/	numbered aliases $7
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 8: <d @ 3>/	numbered aliases $8
+(.) (.) $7=(.) (.) $4=(.)		abcdefg	/mob 4: <e @ 4>/	numbered aliases $4
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 1: <abc @ 0>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 2: <a @ 0>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 3: <b @ 1>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 4: <c @ 2>/	perl5 numbered captures $1
+$1=[ (.) (.) (.) ] (.)			abcdefg	/mob 5: <d @ 3>/	perl5 numbered captures $1
 # todo :pugs<feature>
-:s $<key>:=[\w+] \= $<val>:=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
+:s $<key>=[\w+] \= $<val>=[\S+]	 abc = 123	/mob<key>: <abc @ 1>/	named capture
 # todo :pugs<feature>
-:s $<key>:=[\w+] \= $<val>:=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
+:s $<key>=[\w+] \= $<val>=[\S+]	 abc = 123	/mob<val>: <123 @ 7>/	named capture
 # todo :pugs<feature>
-:s (\w+) $<foo>:=(\w+) (\w+)		abc def ghi	/mob<foo>: <def @ 4>/	mixing named and unnamed capture
+:s (\w+) $<foo>=(\w+) (\w+)		abc def ghi	/mob<foo>: <def @ 4>/	mixing named and unnamed capture
 # todo :pugs<feature>
-:s (\w+) $<foo>:=(\w+) (\w+)		abc def ghi	/mob 1: <ghi @ 8>/	mixing named and unnamed capture
+:s (\w+) $<foo>=(\w+) (\w+)		abc def ghi	/mob 1: <ghi @ 8>/	mixing named and unnamed capture
 # todo :pugs<feature>
 <alpha> [ \- <alpha> ]?			abc def ghi	/mob<alpha> 0: <a @ 0>/	multiple subrule captures in same scope
 # todo :pugs<feature>
