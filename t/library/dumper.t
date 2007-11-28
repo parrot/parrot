@@ -553,8 +553,8 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     dumper."deleteIndent"()
 
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 .namespace
 .include "library/dumper.pir"
