@@ -635,7 +635,7 @@ static int
 is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), opcode_t op)
 {
     PMC *sig2;
-    int n, type;
+    int type;
     parrot_context_t *caller_ctx;
     opcode_t *args;
     PMC * const sig1 = (PMC*)(pc[1]);
@@ -656,6 +656,7 @@ is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), 
     }
     if (args) {
         const INTVAL const_nr = args[1];
+        int n;
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
         n = parrot_pic_check_sig(sig1, sig2, &type);
@@ -665,7 +666,7 @@ is_pic_param(PARROT_INTERP, NOTNULL(void **pc), NOTNULL(Parrot_MIC* const mic), 
     else {
         if (SIG_ELEMS(sig1) == 0) {
             sig2 = NULL;
-            type = n = 0;
+            type = 0;
         }
         else
             return 0;
