@@ -61,11 +61,11 @@ This section gives a simple example to show how things are used.
 Let's consider a simplified version of a C<long_invocation>. Syntactically, it
 looks like this (this is the simplified version):
 
- long-invocation -> '.pcc_begin' '\n'
+ long-invocation -> '.begin_call' '\n'
                     arguments
-                    '.pcc_call' invokable '\n'
+                    '.call' invokable '\n'
                     results
-                    '.pcc_end' '\n'
+                    '.end_call' '\n'
 
  invocant -> IDENTIFIER | PREG
 
@@ -79,7 +79,7 @@ as follows:
       match(p, T_NEWLINE);
       arguments(p);
 
-      match(p, T_PCC_CALL); /* check for token '.pcc_call' */
+      match(p, T_PCC_CALL); /* check for token '.call' */
       match(p, T_NEWLINE);  /* check for a newline */
 
       /* get current token from lexer and store it as the invokable object */
@@ -98,7 +98,7 @@ as follows:
 
       results(p);
 
-      match(p, T_PCC_END); /* accept token '.pcc_end' */
+      match(p, T_PCC_END); /* accept token '.end_call' */
       match(p, T_NEWLINE); /* accept the newline token */
       emit_invocation_end(p); /* close down invocation sequence */
 
