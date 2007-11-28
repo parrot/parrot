@@ -63,10 +63,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
     new return, 'Continuation'
     set_addr return, return_here
     loop:
-        .pcc_begin
-            .pcc_call itr, return
+        .begin_call
+            .call itr, return
             .result counter
-        .pcc_end
+        .end_call
 
         print counter
         print " "
@@ -85,9 +85,9 @@ return_here:
     x = new 'Integer'
     x = 0
     iloop:
-        .pcc_begin_yield
+        .begin_yield
         .return x
-        .pcc_end_yield
+        .end_yield
         x = x + 1
     if x <= 10 goto iloop
     returncc
@@ -286,11 +286,11 @@ pir_output_is( <<'CODE', '01234', "Coro new - yield" );
     .local pmc c
     c = global "coro"
 loop:
-    .pcc_begin
-    .pcc_call c
+    .begin_call
+    .call c
     .result   $P0 :optional
     .result   $I0 :opt_flag
-    .pcc_end
+    .end_call
     unless $I0,  ex
     print $P0
     goto loop

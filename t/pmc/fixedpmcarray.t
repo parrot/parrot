@@ -350,9 +350,9 @@ done:
     .local pmc compares
     compares = global "compares"
     inc compares
-    .pcc_begin_return
+    .begin_return
     .return $I0
-    .pcc_end_return
+    .end_return
 .end
 CODE
 

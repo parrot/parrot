@@ -202,7 +202,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
     print "baz_init\n"
     returncc
 
-    .namespace	# main again
+    .namespace  # main again
 .pcc_sub _sub:
     print "in sub\n"
     returncc
@@ -355,9 +355,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
     self."blah"()
     B."blah"()
     self."blah"()
-    .pcc_begin_return
+    .begin_return
     .return B
-    .pcc_end_return
+    .end_return
 
 .end
 
@@ -613,16 +613,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "same method name in two namespaces" );
 .sub foo :method
     .param int i
 
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 .namespace ["B"]
 .sub foo :method
     .param int i
 
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 .namespace

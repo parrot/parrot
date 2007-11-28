@@ -155,9 +155,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
 .sub Float_cmp_Integer
     .param pmc left
     .param pmc right
-    .pcc_begin_return
+    .begin_return
     .return -42
-    .pcc_end_return
+    .end_return
 .end
 CODE
 -42
@@ -186,9 +186,9 @@ nok:
 .sub Float_cmp_Integer
     .param pmc left
     .param pmc right
-    .pcc_begin_return
+    .begin_return
     .return -42
-    .pcc_end_return
+    .end_return
 .end
 CODE
 ok 1
@@ -224,9 +224,9 @@ nok:
 .sub Float_cmp_Integer
     .param pmc left
     .param pmc right
-    .pcc_begin_return
+    .begin_return
     .return -42
-    .pcc_end_return
+    .end_return
 .end
 CODE
 ok 1

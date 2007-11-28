@@ -276,9 +276,9 @@ loop:
     inc from
     le from, to, loop
 
-    .pcc_begin_return
+    .begin_return
     .return sum
-    .pcc_end_return
+    .end_return
 .end
 CODE
 500500
