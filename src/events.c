@@ -640,7 +640,7 @@ Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 
 =item C<PARROT_API
 void
-Parrot_kill_event_loop(void)>
+Parrot_kill_event_loop(PARROT_INTERP)>
 
 Schedule event-loop terminate event. This shuts down the event thread.
 

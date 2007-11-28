@@ -140,7 +140,8 @@ static UINTVAL validate(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 ascii_get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)>
@@ -207,7 +208,8 @@ ascii_get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
 TODO: Not yet documented!!!
@@ -250,7 +252,8 @@ to_ascii(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
 TODO: Not yet documented!!!
@@ -278,7 +281,8 @@ to_unicode(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
 TODO: Not yet documented!!!
@@ -305,7 +309,8 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))
 /* A noop. can't compose ascii */
 /*
 
-=item C<static STRING*
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))>
 
 TODO: Not yet documented!!!
@@ -324,7 +329,8 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 /* A noop. can't decompose ascii */
 /*
 
-=item C<static STRING*
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
 decompose(PARROT_INTERP, NOTNULL(STRING *src))>
 
 TODO: Not yet documented!!!
@@ -668,7 +674,8 @@ validate(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<PARROT_WARN_UNUSED_RESULT
+=item C<PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
@@ -861,7 +868,8 @@ Parrot_charset_ascii_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
 TODO: Not yet documented!!!
@@ -892,7 +900,8 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *
 
 /*
 
-=item C<STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest))>
 
 TODO: Not yet documented!!!

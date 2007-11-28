@@ -286,10 +286,11 @@ get_path(PARROT_INTERP, NOTNULL(STRING *lib), NOTNULL(void **handle),
 /*
 
 =item C<PARROT_API
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
-                PMC *(*load_func)(PARROT_INTERP),
-                void (*init_func)(PARROT_INTERP, NULLOK(PMC *)))>
+                NULLOK(PMC *(*load_func)(PARROT_INTERP)),
+                NULLOK(void (*init_func)(PARROT_INTERP, NULLOK(PMC *))))>
 
 TODO: Not yet documented!!!
 
@@ -330,7 +331,8 @@ Parrot_init_lib(PARROT_INTERP,
 
 /*
 
-=item C<static PMC *
+=item C<PARROT_CANNOT_RETURN_NULL
+static PMC *
 run_init_lib(PARROT_INTERP, NOTNULL(void *handle),
             NOTNULL(STRING *lib_name), NOTNULL(STRING *wo_ext))>
 

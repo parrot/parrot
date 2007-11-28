@@ -345,6 +345,7 @@ Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 /*
 
 =item C<PARROT_API
+PARROT_CAN_RETURN_NULL
 PackFile *
 Parrot_readbc(PARROT_INTERP, NULLOK(const char *fullname))>
 
@@ -545,8 +546,9 @@ Parrot_loadbc(PARROT_INTERP, NOTNULL(PackFile *pf))
 
 /*
 
-=item C<static PMC*
-setup_argv(PARROT_INTERP, int argc, char ** argv)>
+=item C<PARROT_CANNOT_RETURN_NULL
+static PMC*
+setup_argv(PARROT_INTERP, int argc, NOTNULL(char ** argv))>
 
 Creates and returns C<ARGS> array PMC.
 
@@ -614,7 +616,8 @@ prof_sort_f(NOTNULL(const void *a), NOTNULL(const void *b))
 
 /*
 
-=item C<static const char *
+=item C<PARROT_CANNOT_RETURN_NULL
+static const char *
 op_name(PARROT_INTERP, int k)>
 
 Returns the name of the opcode.
@@ -777,7 +780,8 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static PMC*
+=item C<PARROT_CANNOT_RETURN_NULL
+static PMC*
 set_current_sub(PARROT_INTERP)>
 
 TODO: Not yet documented!!!
@@ -928,6 +932,7 @@ Parrot_runcode(PARROT_INTERP, int argc, char *argv[])
 /*
 
 =item C<PARROT_API
+PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_debug(NOTNULL(Parrot_Interp debugger), opcode_t * pc)>
 

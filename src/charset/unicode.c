@@ -187,7 +187,8 @@ set_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count)>
 
@@ -207,7 +208,8 @@ get_graphemes(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
         UINTVAL offset, UINTVAL count, NOTNULL(STRING *dest_string))>
 
@@ -228,7 +230,8 @@ get_graphemes_inplace(PARROT_INTERP, NOTNULL(STRING *source_string),
 
 /*
 
-=item C<static STRING*
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
 to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))>
 
 TODO: Not yet documented!!!
@@ -252,7 +255,8 @@ to_charset(PARROT_INTERP, NOTNULL(STRING *src), NOTNULL(STRING *dest))
 
 /*
 
-=item C<static STRING*
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
 compose(PARROT_INTERP, NOTNULL(STRING *src))>
 
 TODO: Not yet documented!!!
@@ -309,7 +313,8 @@ compose(PARROT_INTERP, NOTNULL(STRING *src))
 
 /*
 
-=item C<static STRING*
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))>
 
 TODO: Not yet documented!!!
@@ -848,7 +853,8 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static STRING *
+=item C<PARROT_CANNOT_RETURN_NULL
+static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
 TODO: Not yet documented!!!
