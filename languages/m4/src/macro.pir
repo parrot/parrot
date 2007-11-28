@@ -20,13 +20,13 @@ TODO: read files in next_token()
 
 =cut
 
-.sub expand_input 
-  .param pmc  state    
+.sub expand_input
+  .param pmc  state
 
-  .local string token_data, token_type  # current token data and type        
+  .local string token_data, token_type  # current token data and type
 
-  # go through the input, token for token 
-NEXT_TOKEN:   
+  # go through the input, token for token
+NEXT_TOKEN:
   ( token_type, token_data ) = next_token( state )
   expand_token( state, token_type, token_data )
   if token_type != 'TOKEN_EOF' goto NEXT_TOKEN
@@ -44,8 +44,8 @@ the text are just copied to the output.
 
 =cut
 
-.sub expand_token 
-  .param pmc       state    
+.sub expand_token
+  .param pmc       state
   .param string    token_type
   .param string    token_data
 
@@ -56,16 +56,16 @@ the text are just copied to the output.
   if token_type == 'TOKEN_EOF'    goto FINISH_EXPAND_TOKEN
   if token_type == 'TOKEN_MACDEF' goto FINISH_EXPAND_TOKEN
 
-  # 'TOKEN_STRING' does the same as 'TOKEN_SIMPLE', 
+  # 'TOKEN_STRING' does the same as 'TOKEN_SIMPLE',
   if token_type == 'TOKEN_STRING' goto SHIPOUT_TEXT
   if token_type == 'TOKEN_SIMPLE' goto SHIPOUT_TEXT
 
   if token_type != 'TOKEN_WORD' goto NO_TOKEN_WORD
     .local int symbol_exists
-    symbol_exists = exists symtab[token_data] 
+    symbol_exists = exists symtab[token_data]
     unless symbol_exists goto SHIPOUT_TEXT
       .local pmc symbol
-      symbol = symtab[token_data] 
+      symbol = symtab[token_data]
       .local string symbol_type
       symbol_type = symbol['type']
       if symbol_type != 'TOKEN_FUNC' goto EXPAND_MACRO
@@ -73,10 +73,10 @@ the text are just copied to the output.
         # macro
         # macro( arg1, ... )
         # Most macros needs a parameter list, but e.g. __file__ has not args
-        .local int blind_no_args 
-        blind_no_args = symbol['blind_no_args'] 
+        .local int blind_no_args
+        blind_no_args = symbol['blind_no_args']
         unless blind_no_args goto EXPAND_MACRO
-          .local string input_string    
+          .local string input_string
           input_string = state['stack';'input';0;'string']
           .local int first_char, open_parenthesis
           first_char = ord input_string
@@ -96,7 +96,7 @@ NO_TOKEN_WORD:
 SHIPOUT_TEXT:
   shipout_text( state, token_data )
   goto FINISH_EXPAND_TOKEN
-  
+
 FINISH_EXPAND_TOKEN:
 .end
 
@@ -107,16 +107,16 @@ The macro expansion is handled by expand_macro().
 It parses the arguments in collect_arguments() and
 builds a ResizablePMCArray containing the arguments.
 The arguments themselves are stored on a local obstack.
-expand_macro() uses call_macro() to do the call of the macro.	
+expand_macro() uses call_macro() to do the call of the macro.
 
-expand_macro() is potentially recursive, since it calls expand_argument(), 
+expand_macro() is potentially recursive, since it calls expand_argument(),
 which might call expand_token (), which might call expand_macro().
 
 =cut
 
-.sub expand_macro 
+.sub expand_macro
   .param pmc  state
-  .param pmc  symbol 
+  .param pmc  symbol
 
   .local int expansion_level
   expansion_level = state['expansion_level']
@@ -126,7 +126,7 @@ which might call expand_token (), which might call expand_macro().
   if expansion_level <= nesting_limit goto NESTING_LIMIT_NOT_REACHED_YET
     printerr "ERROR: Recursion limit of "
     printerr nesting_limit
-    printerr "exceeded, use -L<N> to change it" 
+    printerr "exceeded, use -L<N> to change it"
     end
 NESTING_LIMIT_NOT_REACHED_YET:
   state['expansion_level'] = expansion_level
@@ -137,9 +137,9 @@ NESTING_LIMIT_NOT_REACHED_YET:
 
   .local string text
   ( text ) = call_macro( state, symbol, arguments )
-  .local string input_string    
+  .local string input_string
   input_string = state['stack';'input';0;'string']
-  input_string = text . input_string 
+  input_string = text . input_string
   state['stack';'input';0;'string'] = input_string
 
   expansion_level = state['expansion_level']
@@ -157,7 +157,7 @@ TODO: distinguish between TOKEN_FUNC and TOKEN_WORD
 
 =cut
 
-.sub call_macro 
+.sub call_macro
   .param pmc       state
   .param pmc       symbol
   .param pmc       arguments
@@ -179,13 +179,13 @@ TOKEN_FUNC:
   .local pmc func
   func = symbol['func']
   # indirect call of subs, seems to need elaborate PIR syntax
-  .pcc_begin 
+  .begin_call
     .arg state
     .arg arguments
-  .pcc_call func
+  .call func
     ret_func_1:
     .result text
-  .pcc_end
+  .end_call
 
 FINISH_CALL_MACRO:
   .return ( text )
@@ -198,21 +198,21 @@ Collect all the arguments to a call of a macro.
 
 =cut
 
-.sub collect_arguments 
-  .param pmc state    
+.sub collect_arguments
+  .param pmc state
   .param pmc arguments
 
-  # The macro name has already been read in, thus we need to match 
+  # The macro name has already been read in, thus we need to match
   # something like "('furcht', 'Hallo Welt')"
   # and capture the name 'furcht' and the substitution 'Hallo Welt'.
   # Thus we need to remenber the start and the length of these two captures
   .local int cnt_stack
-  .local string input_string    
+  .local string input_string
   input_string = state['stack';'input';0;'string']
 
   # We need a '(' at beginning of string
   .local int index_opening
-  index_opening = index input_string, '('  
+  index_opening = index input_string, '('
   if index_opening != 0 goto NOT_A_ARGUMENT_LIST
 
   # expand strings
@@ -233,11 +233,11 @@ EXPAND_ARG:
   if index_closing < index_comma goto NO_MORE_ARGS
   start_index = index_comma
 SKIP_SKIP_COMMA:
-  index_start_string = index input_string, '`', start_index 
+  index_start_string = index input_string, '`', start_index
   if index_start_string == -1 goto NO_MORE_ARGS
   inc index_start_string
   if index_closing < index_start_string goto NO_MORE_ARGS
-  index_end_string = index input_string, "'", index_start_string 
+  index_end_string = index input_string, "'", index_start_string
   if index_end_string == -1 goto NO_MORE_ARGS
   len_string = index_end_string - index_start_string
   substr arg, input_string, index_start_string, len_string
@@ -249,7 +249,7 @@ SKIP_SKIP_COMMA:
 NO_MORE_ARGS:
   inc index_closing
   substr input_string, 0, index_closing, ''
-  
+
 NOT_A_ARGUMENT_LIST:
   state['stack';'input';0;'string'] = input_string
 .end

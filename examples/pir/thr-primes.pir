@@ -119,7 +119,7 @@ lp:
     .sym pmc downstream
     downstream = new TQueue
 #       23     while (my $num = $upstream->dequeue) {
-    .sym pmc Num		# num is a reserved word
+    .sym pmc Num        # num is a reserved word
 lp:
     shift Num, upstream
     $I0 = defined Num
@@ -160,9 +160,9 @@ ewhile:
 
 no_kid2:
 #       34 }
-    # sleep 1	# turn on for watching memory usage
-   .pcc_begin_return
-   .pcc_end_return
+    # sleep 1   # turn on for watching memory usage
+   .begin_return
+   .end_return
 .end
 
 # Local Variables:

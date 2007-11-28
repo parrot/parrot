@@ -25,35 +25,35 @@ Call Interface.  The function is defined as:-
 
 # This is the entry point.
 .sub _MAIN
-	# Load user32.dll library and the MessageBoxA API.
-	.local pmc libuser32
-	.local pmc MessageBoxA
-	loadlib libuser32, "user32"
-	dlfunc MessageBoxA, libuser32, "MessageBoxA", "llttl"
-	
-	# Set up parameters for the message box.
-	.local int phWnd
-	.local string message
-	.local string caption
-	.local int style
-	phWnd = 0	# Parent window handle - we have none.
-	message = "This is a message from Parrot!"
-	caption = "Hey, you!"
-	style = 64  # This gives us a nice i in a speech bubble icon.
-	
-	# Invoke MessageBoxA.
-	.local int retVal
-	.pcc_begin
-		.arg phWnd
-		.arg message
-		.arg caption
-		.arg style
-		.nci_call MessageBoxA
-		.result retVal
-	.pcc_end
-	
-	# That's all, folks.
-	end
+    # Load user32.dll library and the MessageBoxA API.
+    .local pmc libuser32
+    .local pmc MessageBoxA
+    loadlib libuser32, "user32"
+    dlfunc MessageBoxA, libuser32, "MessageBoxA", "llttl"
+
+    # Set up parameters for the message box.
+    .local int phWnd
+    .local string message
+    .local string caption
+    .local int style
+    phWnd = 0   # Parent window handle - we have none.
+    message = "This is a message from Parrot!"
+    caption = "Hey, you!"
+    style = 64  # This gives us a nice i in a speech bubble icon.
+
+    # Invoke MessageBoxA.
+    .local int retVal
+    .begin_call
+        .arg phWnd
+        .arg message
+        .arg caption
+        .arg style
+        .nci_call MessageBoxA
+        .result retVal
+    .end_call
+
+    # That's all, folks.
+    end
 .end
 
 =head1 SEE ALSO

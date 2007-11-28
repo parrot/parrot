@@ -65,13 +65,13 @@ LOOP:
     eq_addr val, temp, IS
     branch LOOP
 END:
-    .pcc_begin_return
+    .begin_return
     .return 0
-    .pcc_end_return
+    .end_return
 IS:
-    .pcc_begin_return
+    .begin_return
     .return 1
-    .pcc_end_return
+    .end_return
 .end
 
 .sub __do_replace
@@ -141,8 +141,8 @@ SKIP:
     __do_replace( val, oldVal, newVal, cache )
     branch LOOP
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 .sub Hash :method
@@ -175,8 +175,8 @@ SKIP:
     branch LOOP
 
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 .sub Hash :method
@@ -209,8 +209,8 @@ SKIP:
     branch LOOP
 
 END:
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
 .end
 
 =back
