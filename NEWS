@@ -5,6 +5,8 @@ New in 0.5.1
   + compilers/pct: Parrot Compiler Toolkit redesigned and updated
   + compilers/nqp: (was languages/nqp) major updates, including
     support for namespaces, module/class declarations, methods
+  + compilers/imcc: remove .sym as alias for .local. Remove .pcc_
+    prefix for calling directives (.pcc_begin became .begin_call).
   + languages/abc: re-implemented using PCT and NQP
 
 New in 0.5.0
@@ -54,7 +56,7 @@ New in 0.4.17
 - Implementation
  + Bug fixes (including Coverity IDs 20, 22, 30, 119-122, 124-126, 129-131)
    Also various GC, memory, and segfault issues
- + Fix & reenable CGP core  
+ + Fix & reenable CGP core
  + Parrot's -r flag now works again (compile to and execute bytecode)
  + Updates to pmc2c & PIR syntaxes
  + Fix Complex PMC
