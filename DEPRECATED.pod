@@ -149,15 +149,6 @@ This does not make sense, and this slicing syntax will be deprecated.
 
 See [RT#46715]
 
-=item .pcc_ prefix
-
-The C<.pcc_> prefix on the directives for subroutine invocation will be removed
-after the 0.5.0 release. C<.pcc_begin_return> will become C<.begin_return>.
-C<.pcc_{begin,end}> will become C<.{begin,end}_call>.
-
-See [RT#45925].
-
-
 =item .emit / .eom
 
 The .emit and .eom directives that can be used to emit pure pasm instructions
