@@ -31,9 +31,9 @@ sub __get_revision {
 
     # code taken from pugs/util/version_h.pl rev 14410
     my $nul = File::Spec->devnull;
-    if ( my @svn_info = qx/svn info 2>$nul/ and $? == 0 ) {
-        if ( my ($line) = grep /^Revision:/, @svn_info ) {
-            ($revision) = $line =~ / (\d+)$/;
+    if ( my @svn_info = qx/svn --xml info 2>$nul/ and $? == 0 ) {
+        if ( my ($line) = grep /^\s*revision=/, @svn_info ) {
+            ($revision) = $line =~ /(\d+)/;
         }
     }
     elsif ( my @git_svn_info = qx/git svn log --limit=1 2>$nul/ and $? == 0 ) {
