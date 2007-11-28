@@ -25,11 +25,11 @@ Tests Parrot string registers and operations.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'set_s_s|sc' );
-	set	S4, "JAPH\n"
-	set     S5, S4
-	print	S4
-	print   S5
-	end
+    set S4, "JAPH\n"
+    set     S5, S4
+    print   S4
+    print   S5
+    end
 CODE
 JAPH
 JAPH
@@ -37,17 +37,17 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'clone' );
         set     S0, "Foo\n"
-	clone   S1, S0
+    clone   S1, S0
         print   S0
-	print   S1
+    print   S1
 
-	clone   S1, "Bar\n"
-	print   S1
+    clone   S1, "Bar\n"
+    print   S1
         chopn   S1, 1   # Check that the contents of S1 are no longer constant
-	print   S1
+    print   S1
         print   "\n"
 
-	end
+    end
 CODE
 Foo
 Foo
@@ -56,38 +56,38 @@ Bar
 OUTPUT
 
 pasm_output_is( <<'CODE', '4', 'length_i_s' );
-	set	I4, 0
-	set	S4, "JAPH"
-	length	I4, S4
-	print	I4
-	end
+    set I4, 0
+    set S4, "JAPH"
+    length  I4, S4
+    print   I4
+    end
 CODE
 
 pasm_output_is( <<'CODE', '0', '0 length substr' );
-	set	I4, 0
-	set	S4, "JAPH"
+    set I4, 0
+    set S4, "JAPH"
         substr  S3, S4, 1, 0
-	length  I4, S3
+    length  I4, S3
         print   I4
-	end
+    end
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with clone' );
-	set	S4, "JAPHxyzw"
-	set	S5, "japhXYZW"
+    set S4, "JAPHxyzw"
+    set S5, "japhXYZW"
         clone   S3, S4
-	set	S1, "\n"
-	set	I1, 4
-	chopn	S4, 3
-	chopn	S4, 1
+    set S1, "\n"
+    set I1, 4
+    chopn   S4, 3
+    chopn   S4, 1
         chopn   S5, I1
-	print	S4
+    print   S4
         print   S1
-	print	S5
+    print   S5
         print   S1
-	print	S3
+    print   S3
         print   S1
-	end
+    end
 CODE
 JAPH
 japh
@@ -95,21 +95,21 @@ JAPHxyzw
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with set' );
-	set	S4, "JAPHxyzw"
-	set	S5, "japhXYZW"
+    set S4, "JAPHxyzw"
+    set S5, "japhXYZW"
         set     S3, S4
-	set	S1, "\n"
-	set	I1, 4
-	chopn	S4, 3
-	chopn	S4, 1
+    set S1, "\n"
+    set I1, 4
+    chopn   S4, 3
+    chopn   S4, 1
         chopn   S5, I1
-	print	S4
+    print   S4
         print   S1
-	print	S5
+    print   S5
         print   S1
-	print	S3
+    print   S3
         print   S1
-	end
+    end
 CODE
 JAPH
 japh
@@ -117,21 +117,21 @@ JAPH
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn, OOB values' );
-	set	S1, "A string of length 21"
-	chopn	S1, 0
-	print	S1
-	print	"\n"
-	chopn	S1, 4
-	print	S1
-	print	"\n"
-	# -length cuts now
-	chopn	S1, -4
-	print	S1
-	print	"\n"
-	chopn	S1, 1000
-	print	S1
-	print	"** nothing **\n"
-	end
+    set S1, "A string of length 21"
+    chopn   S1, 0
+    print   S1
+    print   "\n"
+    chopn   S1, 4
+    print   S1
+    print   "\n"
+    # -length cuts now
+    chopn   S1, -4
+    print   S1
+    print   "\n"
+    chopn   S1, 1000
+    print   S1
+    print   "** nothing **\n"
+    end
 CODE
 A string of length 21
 A string of lengt
@@ -140,47 +140,47 @@ A st
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn' );
-	set	S1, "Parrot"
+    set S1, "Parrot"
 
-	chopn	S2, S1, 0
-	print	S1
-	print	"\n"
-	print	S2
-	print	"\n"
+    chopn   S2, S1, 0
+    print   S1
+    print   "\n"
+    print   S2
+    print   "\n"
 
-	chopn	S2, S1, 1
-	print	S1
-	print	"\n"
-	print	S2
-	print	"\n"
+    chopn   S2, S1, 1
+    print   S1
+    print   "\n"
+    print   S2
+    print   "\n"
 
         set     I0, 2
-	chopn	S2, S1, I0
-	print	S1
-	print	"\n"
-	print	S2
-	print	"\n"
+    chopn   S2, S1, I0
+    print   S1
+    print   "\n"
+    print   S2
+    print   "\n"
 
-	chopn	S2, "Parrot", 3
-	print	S2
-	print	"\n"
+    chopn   S2, "Parrot", 3
+    print   S2
+    print   "\n"
 
-	chopn	S1, S1, 5
-	print	S1
-	print	"\n"
+    chopn   S1, S1, 5
+    print   S1
+    print   "\n"
 
         set     S1, "Parrot"
         set     S3, S1
         chopn   S2, S1, 3
         print   S3
-	print	"\n"
+    print   "\n"
 
         set     S3, S1
         chopn   S1, 3
         print   S3
-	print	"\n"
+    print   "\n"
 
-	end
+    end
 CODE
 Parrot
 Parrot
@@ -195,21 +195,21 @@ Par
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn, OOB values' );
-	set	S1, "Parrot"
+    set S1, "Parrot"
 
-	chopn	S2, S1, 7
-	print	S1
-	print	"\n"
-	print	S2
-	print	"\n"
+    chopn   S2, S1, 7
+    print   S1
+    print   "\n"
+    print   S2
+    print   "\n"
 
-	chopn	S2, S1, -1
-	print	S1
-	print	"\n"
-	print	S2
-	print	"\n"
+    chopn   S2, S1, -1
+    print   S1
+    print   "\n"
+    print   S2
+    print   "\n"
 
-	end
+    end
 CODE
 Parrot
 
@@ -218,42 +218,42 @@ P
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'substr_s_s|sc_i|ic_i|ic' );
-	set	S4, "12345JAPH01"
-	set	I4, 5
-	set	I5, 4
-	substr	S5, S4, I4, I5
-	print	S5
-	substr S5, S4, I4, 4
-	print  S5
-	substr S5, S4, 5, I5
-	print  S5
-	substr S5, S4, 5, 4
-	print  S5
-	substr S5, "12345JAPH01", I4, I5
-	print  S5
-	substr S5, "12345JAPH01", I4, 4
-	print  S5
-	substr S5, "12345JAPH01", 5, I5
-	print  S5
-	substr S5, "12345JAPH01", 5, 4
-	print  S5
-	print  "\n"
-	end
+    set S4, "12345JAPH01"
+    set I4, 5
+    set I5, 4
+    substr  S5, S4, I4, I5
+    print   S5
+    substr S5, S4, I4, 4
+    print  S5
+    substr S5, S4, 5, I5
+    print  S5
+    substr S5, S4, 5, 4
+    print  S5
+    substr S5, "12345JAPH01", I4, I5
+    print  S5
+    substr S5, "12345JAPH01", I4, 4
+    print  S5
+    substr S5, "12345JAPH01", 5, I5
+    print  S5
+    substr S5, "12345JAPH01", 5, 4
+    print  S5
+    print  "\n"
+    end
 CODE
 JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
 OUTPUT
 
 # negative offsets
 pasm_output_is( <<'CODE', <<'OUTPUT', 'neg substr offset' );
-	set	S0, "A string of length 21"
-	set I0, -9
-	set I1, 6
-	substr S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
-	end
+    set S0, "A string of length 21"
+    set I0, -9
+    set I1, 6
+    substr S1, S0, I0, I1
+    print S0
+    print "\n"
+    print S1
+    print "\n"
+    end
 CODE
 A string of length 21
 length
@@ -261,37 +261,37 @@ OUTPUT
 
 # This asks for substring that shouldn't be allowed...
 pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
-	set	S0, "A string of length 21"
-	set I0, -99
-	set I1, 6
-	substr S1, S0, I0, I1
-	end
+    set S0, "A string of length 21"
+    set I0, -99
+    set I1, 6
+    substr S1, S0, I0, I1
+    end
 CODE
 /^Cannot take substr outside string/
 OUTPUT
 
 # This asks for substring that shouldn't be allowed...
 pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
-	set S0, "A string of length 21"
-	set I0, 99
-	set I1, 6
-	substr S1, S0, I0, I1
-	end
+    set S0, "A string of length 21"
+    set I0, 99
+    set I1, 6
+    substr S1, S0, I0, I1
+    end
 CODE
 /^Cannot take substr outside string/
 OUTPUT
 
 # This asks for substring much greater than length of original string
 pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen' );
-	set	S0, "A string of length 21"
-	set I0, 12
-	set I1, 1000
-	substr S1, S0, I0, I1
-	print  S0
-	print "\n"
-	print S1
-	print "\n"
-	end
+    set S0, "A string of length 21"
+    set I0, 12
+    set I1, 1000
+    substr S1, S0, I0, I1
+    print  S0
+    print "\n"
+    print S1
+    print "\n"
+    end
 CODE
 A string of length 21
 length 21
@@ -299,15 +299,15 @@ OUTPUT
 
 # The same, with a negative offset
 pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen, -ve os' );
-	set	S0, "A string of length 21"
-	set I0, -9
-	set I1, 1000
-	substr S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
-	end
+    set S0, "A string of length 21"
+    set I0, -9
+    set I1, 1000
+    substr S1, S0, I0, I1
+    print S0
+    print "\n"
+    print S1
+    print "\n"
+    end
 CODE
 A string of length 21
 length 21
@@ -675,33 +675,33 @@ foo2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc' );
-	set S1, "fish"
-	set S2, "bone"
-	concat S1, S2
-	print S1
-	concat S1, "\n"
-	print S1
-	end
+    set S1, "fish"
+    set S2, "bone"
+    concat S1, S2
+    print S1
+    concat S1, "\n"
+    print S1
+    end
 CODE
 fishbonefishbone
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc_s|sc' );
-	set S1, "japh"
-	set S2, "JAPH"
-	concat S0, "japh", "JAPH"
-	print S0
-	print "\n"
-	concat S0, S1, "JAPH"
-	print S0
-	print "\n"
-	concat S0, "japh", S2
-	print S0
-	print "\n"
-	concat S0, S1, S2
-	print S0
-	print "\n"
-	end
+    set S1, "japh"
+    set S2, "JAPH"
+    concat S0, "japh", "JAPH"
+    print S0
+    print "\n"
+    concat S0, S1, "JAPH"
+    print S0
+    print "\n"
+    concat S0, "japh", S2
+    print S0
+    print "\n"
+    concat S0, S1, S2
+    print S0
+    print "\n"
+    end
 CODE
 japhJAPH
 japhJAPH
@@ -710,24 +710,24 @@ japhJAPH
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat - ensure copy is made' );
-	set S2, "JAPH"
-	concat S0, S2, ""
-	concat S1, "", S2
-	chopn S0, 1
-	chopn S1, 1
-	print S2
-	print "\n"
-	end
+    set S2, "JAPH"
+    concat S0, S2, ""
+    concat S1, "", S2
+    chopn S0, 1
+    chopn S1, 1
+    print S2
+    print "\n"
+    end
 CODE
 JAPH
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'clears' );
 @{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
-	clears
+    clears
 @{[ print_str_regs() ]}
-	print "done\\n"
-	end
+    print "done\\n"
+    end
 CODE
 done
 OUTPUT
@@ -1016,130 +1016,130 @@ foo
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
-	ord I0,""
-	print I0
-	end
+    ord I0,""
+    print I0
+    end
 CODE
 /^Cannot get character of empty string/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
-	ord I0,S0
-	print I0
-	end
+    ord I0,S0
+    print I0
+    end
 CODE
 /^Cannot get character of empty string/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
-	ord I0,"",0
-	print I0
-	end
+    ord I0,"",0
+    print I0
+    end
 CODE
 /^Cannot get character of empty string/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
-	ord I0,S0,0
-	print I0
-	end
+    ord I0,S0,0
+    print I0
+    end
 CODE
 /^Cannot get character of empty string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string' );
-	ord I0,"a"
-	print I0
-	end
+    ord I0,"a"
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '2-param ord, multi-character string' );
-	ord I0,"abc"
-	print I0
-	end
+    ord I0,"abc"
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string register' );
-	set S0,"a"
-	ord I0,S0
-	print I0
-	end
+    set S0,"a"
+    ord I0,S0
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string' );
-	ord I0,"a",0
-	print I0
-	end
+    ord I0,"a",0
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register' );
-	set S0,"a"
-	ord I0,S0,0
-	print I0
-	end
+    set S0,"a"
+    ord I0,S0,0
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string' );
-	ord I0,"ab",1
-	print I0
-	end
+    ord I0,"ab",1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register' );
-	set S0,"ab"
-	ord I0,S0,1
-	print I0
-	end
+    set S0,"ab"
+    ord I0,S0,1
+    print I0
+    end
 CODE
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
-	ord I0,"ab",2
-	print I0
-	end
+    ord I0,"ab",2
+    print I0
+    end
 CODE
 /^Cannot get character past end of string/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
-	set S0,"ab"
-	ord I0,S0,2
-	print I0
-	end
+    set S0,"ab"
+    ord I0,S0,2
+    print I0
+    end
 CODE
 /^Cannot get character past end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end' );
-	ord I0,"a",-1
-	print I0
-	end
+    ord I0,"a",-1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end' );
-	set S0,"a"
-	ord I0,S0,-1
-	print I0
-	end
+    set S0,"a"
+    ord I0,S0,-1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end' );
-	ord I0,"ab",-1
-	print I0
-	end
+    ord I0,"ab",-1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end' );
-	set S0,"ab"
-	ord I0,S0,-1
-	print I0
-	end
+    set S0,"ab"
+    ord I0,S0,-1
+    print I0
+    end
 CODE
 
 pasm_error_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB' );
-	set S0,"ab"
-	ord I0,S0,-3
-	print I0
+    set S0,"ab"
+    ord I0,S0,-3
+    print I0
         end
 CODE
 /^Cannot get character before beginning of string/
@@ -1160,7 +1160,7 @@ CODE
 pasm_output_is( <<'CODE', chr(122), 'chr of 122 is z in ASCII' );
         chr S0, 122
         print S0
-	end
+    end
 CODE
 
 SKIP: {
@@ -1170,61 +1170,61 @@ SKIP: {
         and ( $ENV{TEST_PROG_ARGS} =~ /-j/ );
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'if_s_ic' );
-	set	S0, "I've told you once, I've told you twice..."
-	if	S0, OK1
-	print	"not "
-OK1:	print	"ok 1\n"
+    set S0, "I've told you once, I've told you twice..."
+    if  S0, OK1
+    print   "not "
+OK1:    print   "ok 1\n"
 
-	set	S0, "0.0"
-	if	S0, OK2
-	print	"not "
-OK2:	print	"ok 2\n"
+    set S0, "0.0"
+    if  S0, OK2
+    print   "not "
+OK2:    print   "ok 2\n"
 
-	set	S0, ""
-	if	S0, BAD3
-	branch OK3
-BAD3:	print	"not "
-OK3:	print	"ok 3\n"
+    set S0, ""
+    if  S0, BAD3
+    branch OK3
+BAD3:   print   "not "
+OK3:    print   "ok 3\n"
 
-	set	S0, "0"
-	if	S0, BAD4
-	branch OK4
-BAD4:	print	"not "
-OK4:	print	"ok 4\n"
+    set S0, "0"
+    if  S0, BAD4
+    branch OK4
+BAD4:   print   "not "
+OK4:    print   "ok 4\n"
 
-	set	S0, "0e0"
-	if	S0, OK5
-	print	"not "
-OK5:	print	"ok 5\n"
+    set S0, "0e0"
+    if  S0, OK5
+    print   "not "
+OK5:    print   "ok 5\n"
 
-	set	S0, "x"
-	if	S0, OK6
-	print	"not "
-OK6:	print	"ok 6\n"
+    set S0, "x"
+    if  S0, OK6
+    print   "not "
+OK6:    print   "ok 6\n"
 
-	set	S0, "\\x0"
-	if	S0, OK7
-	print	"not "
-OK7:	print	"ok 7\n"
+    set S0, "\\x0"
+    if  S0, OK7
+    print   "not "
+OK7:    print   "ok 7\n"
 
-	set	S0, "\n"
-	if	S0, OK8
-	print	"not "
-OK8:	print	"ok 8\n"
+    set S0, "\n"
+    if  S0, OK8
+    print   "not "
+OK8:    print   "ok 8\n"
 
-	set	S0, " "
-	if	S0, OK9
-	print	"not "
-OK9:	print	"ok 9\n"
+    set S0, " "
+    if  S0, OK9
+    print   "not "
+OK9:    print   "ok 9\n"
 
 # An empty register should be false...
         clears
         if      S1, BAD10
         branch  OK10
-BAD10:	print	"not "
-OK10:	print	"ok 10\n"
+BAD10:  print   "not "
+OK10:   print   "ok 10\n"
 
-	end
+    end
 CODE
 ok 1
 ok 2
@@ -1241,37 +1241,37 @@ OUTPUT
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'repeat_s_s|sc_i|ic' );
-	set S0, "x"
+    set S0, "x"
 
-	repeat S1, S0, 12
-	print S0
-	print "\n"
-	print S1
-	print "\n"
+    repeat S1, S0, 12
+    print S0
+    print "\n"
+    print S1
+    print "\n"
 
-	set I0, 12
-	set S2, "X"
+    set I0, 12
+    set S2, "X"
 
-	repeat S3, S2, I0
-	print S2
-	print "\n"
-	print S3
-	print "\n"
+    repeat S3, S2, I0
+    print S2
+    print "\n"
+    print S3
+    print "\n"
 
-	repeat S4, "~", 12
-	print S4
-	print "\n"
+    repeat S4, "~", 12
+    print S4
+    print "\n"
 
-	repeat S5, "~", I0
-	print S5
-	print "\n"
+    repeat S5, "~", I0
+    print S5
+    print "\n"
 
-	print ">"
-	repeat S6, "***", 0
-	print S6
-	print "< done\n"
+    print ">"
+    repeat S6, "***", 0
+    print S6
+    print "< done\n"
 
-	end
+    end
 CODE
 x
 xxxxxxxxxxxx
@@ -1283,8 +1283,8 @@ XXXXXXXXXXXX
 OUTPUT
 
 pasm_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB' );
-	repeat S0, "japh", -1
-	end
+    repeat S0, "japh", -1
+    end
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 3-arg form' );
@@ -1335,15 +1335,15 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 4-arg form, bug 22718' );
-	set S1, "This is not quite right"
-	set S0, " is "
-	index I0, S1, S0, 0
-	print I0
-	set S0, "is"
-	index I0, S1, S0, 0
-	print I0
-	print "\n"
-	end
+    set S1, "This is not quite right"
+    set S0, " is "
+    index I0, S1, S0, 0
+    print I0
+    set S0, "is"
+    index I0, S1, S0, 0
+    print I0
+    print "\n"
+    end
 CODE
 42
 OUTPUT
@@ -1605,32 +1605,32 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'string to int' );
-	set	S0, "123"
-	set	I0, S0
-	print	I0
-	print	"\n"
+    set S0, "123"
+    set I0, S0
+    print   I0
+    print   "\n"
 
-	set	S0, " 1"
-	set	I0, S0
-	print	I0
-	print	"\n"
+    set S0, " 1"
+    set I0, S0
+    print   I0
+    print   "\n"
 
-	set	S0, "-1"
-	set	I0, S0
-	print	I0
-	print	"\n"
+    set S0, "-1"
+    set I0, S0
+    print   I0
+    print   "\n"
 
         set     S0, "Not a number"
- 	set	I0, S0
-	print	I0
-	print	"\n"
+    set I0, S0
+    print   I0
+    print   "\n"
 
-	set	S0, ""
-	set	I0, S0
-	print	I0
-	print	"\n"
+    set S0, ""
+    set I0, S0
+    print   I0
+    print   "\n"
 
-	end
+    end
 CODE
 123
 1
@@ -1640,17 +1640,17 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'concat/substr (COW)' );
-	set S0, "<JA"
-	set S1, "PH>"
-	set S2, ""
-	concat S2, S2, S0
-	concat S2, S2, S1
-	print S2
-	print "\n"
-	substr S0, S2, 1, 4
-	print S0
-	print "\n"
-	end
+    set S0, "<JA"
+    set S1, "PH>"
+    set S2, ""
+    concat S2, S2, S0
+    concat S2, S2, S1
+    print S2
+    print "\n"
+    substr S0, S2, 1, 4
+    print S0
+    print "\n"
+    end
 CODE
 <JAPH>
 JAPH
@@ -2040,93 +2040,93 @@ OUTPUT
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'experimental opcode substr_r_s_s|sc_i|ic_i|ic' );
-	set	S4, "12345JAPH01"
-	set	I4, 5
-	set	I5, 4
-	substr_r	S5, S4, I4, I5
-	print	S5
-	substr_r S5, S4, I4, 4
-	print  S5
-	substr_r S5, S4, 5, I5
-	print  S5
-	substr_r S5, S4, 5, 4
-	print  S5
-	substr_r S5, "12345JAPH01", I4, I5
-	print  S5
-	substr_r S5, "12345JAPH01", I4, 4
-	print  S5
-	substr_r S5, "12345JAPH01", 5, I5
-	print  S5
-	substr_r S5, "12345JAPH01", 5, 4
-	print  S5
-	print  "\n"
-	end
+    set S4, "12345JAPH01"
+    set I4, 5
+    set I5, 4
+    substr_r    S5, S4, I4, I5
+    print   S5
+    substr_r S5, S4, I4, 4
+    print  S5
+    substr_r S5, S4, 5, I5
+    print  S5
+    substr_r S5, S4, 5, 4
+    print  S5
+    substr_r S5, "12345JAPH01", I4, I5
+    print  S5
+    substr_r S5, "12345JAPH01", I4, 4
+    print  S5
+    substr_r S5, "12345JAPH01", 5, I5
+    print  S5
+    substr_r S5, "12345JAPH01", 5, 4
+    print  S5
+    print  "\n"
+    end
 CODE
 JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'assign' );
-	set	S4, "JAPH\n"
-	assign  S5, S4
-	print	S4
-	print   S5
-	end
+    set S4, "JAPH\n"
+    assign  S5, S4
+    print   S4
+    print   S5
+    end
 CODE
 JAPH
 JAPH
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber' );
-	set	S4, "JAPH\n"
-	assign  S5, S4
-	assign  S4, "Parrot\n"
-	print	S4
-	print   S5
-	end
+    set S4, "JAPH\n"
+    assign  S5, S4
+    assign  S4, "Parrot\n"
+    print   S4
+    print   S5
+    end
 CODE
 Parrot
 JAPH
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber 2' );
-	set	S4, "JAPH\n"
-	set     S5, S4
-	assign  S4, "Parrot\n"
-	print	S4
-	print   S5
-	end
+    set S4, "JAPH\n"
+    set     S5, S4
+    assign  S4, "Parrot\n"
+    print   S4
+    print   S5
+    end
 CODE
 Parrot
 Parrot
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bands NULL string' );
-	null S1
-	set S2, "abc"
-	bands S1, S2
-	null S3
-	eq S1, S3, ok1
-	print "not "
-ok1:	print "ok 1\n"
-	set S1, ""
-	bands S1, S2
-	unless S1, ok2
-	print "not "
-ok2:	print "ok 2\n"
+    null S1
+    set S2, "abc"
+    bands S1, S2
+    null S3
+    eq S1, S3, ok1
+    print "not "
+ok1:    print "ok 1\n"
+    set S1, ""
+    bands S1, S2
+    unless S1, ok2
+    print "not "
+ok2:    print "ok 2\n"
 
-	null S2
-	set S1, "abc"
-	bands S1, S2
-	null S3
-	eq S1, S3, ok3
-	print "not "
-ok3:	print "ok 3\n"
-	set S2, ""
-	bands S1, S2
-	unless S1, ok4
-	print "not "
-ok4:	print "ok 4\n"
-	end
+    null S2
+    set S1, "abc"
+    bands S1, S2
+    null S3
+    eq S1, S3, ok3
+    print "not "
+ok3:    print "ok 3\n"
+    set S2, ""
+    bands S1, S2
+    unless S1, ok4
+    print "not "
+ok4:    print "ok 4\n"
+    end
 CODE
 ok 1
 ok 2
@@ -2135,30 +2135,30 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 2' );
-	set S1, "abc"
-	set S2, "EE"
-	bands S1, S2
-	print S1
-	print "\n"
-	print S2
-	print "\n"
-	end
+    set S1, "abc"
+    set S2, "EE"
+    bands S1, S2
+    print S1
+    print "\n"
+    print S2
+    print "\n"
+    end
 CODE
 A@
 EE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 3' );
-	set S1, "abc"
-	set S2, "EE"
-	bands S0, S1, S2
-	print S0
-	print "\n"
-	print S1
-	print "\n"
-	print S2
-	print "\n"
-	end
+    set S1, "abc"
+    set S2, "EE"
+    bands S0, S1, S2
+    print S0
+    print "\n"
+    print S1
+    print "\n"
+    print S2
+    print "\n"
+    end
 CODE
 A@
 abc
@@ -2251,30 +2251,30 @@ ok 10
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 2' );
-	set S1, "abc"
-	set S2, "EE"
-	bors S1, S2
-	print S1
-	print "\n"
-	print S2
-	print "\n"
-	end
+    set S1, "abc"
+    set S2, "EE"
+    bors S1, S2
+    print S1
+    print "\n"
+    print S2
+    print "\n"
+    end
 CODE
 egc
 EE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 3' );
-	set S1, "abc"
-	set S2, "EE"
-	bors S0, S1, S2
-	print S0
-	print "\n"
-	print S1
-	print "\n"
-	print S2
-	print "\n"
-	end
+    set S1, "abc"
+    set S2, "EE"
+    bors S0, S1, S2
+    print S0
+    print "\n"
+    print S1
+    print "\n"
+    print S2
+    print "\n"
+    end
 CODE
 egc
 abc
@@ -2686,9 +2686,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
     .local string ret
 
     null ret
-    .pcc_begin_return
+    .begin_return
     .return ret
-    .pcc_end_return
+    .end_return
 .end
 CODE
 abc
@@ -2723,15 +2723,15 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'if_null_s_ic' );
-	set S0, "foo"
-	if_null S0, ERROR
-	print "ok 1\n"
-	null S0
-	if_null S0, OK
-ERROR:	print "error\n"
-	end
-OK:	print "ok 2\n"
-	end
+    set S0, "foo"
+    if_null S0, ERROR
+    print "ok 1\n"
+    null S0
+    if_null S0, OK
+ERROR:  print "error\n"
+    end
+OK: print "ok 2\n"
+    end
 CODE
 ok 1
 ok 2
@@ -2774,83 +2774,83 @@ Abcd012yz
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, I' );
-	set S0,"a"
-	set I1, 0
-	ord I0,S0,I1
-	print I0
-	end
+    set S0,"a"
+    set I1, 0
+    ord I0,S0,I1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, I' );
-	set I1, 1
-	ord I0,"ab",I1
-	print I0
-	end
+    set I1, 1
+    ord I0,"ab",I1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, I' );
-	set I1, 1
-	set S0,"ab"
-	ord I0,S0,I1
-	print I0
-	end
+    set I1, 1
+    set S0,"ab"
+    ord I0,S0,I1
+    print I0
+    end
 CODE
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
-	set I1, 2
-	ord I0,"ab",I1
-	print I0
-	end
+    set I1, 2
+    ord I0,"ab",I1
+    print I0
+    end
 CODE
 /^Cannot get character past end of string/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
-	set I1, 2
-	set S0,"ab"
-	ord I0,S0,I1
-	print I0
-	end
+    set I1, 2
+    set S0,"ab"
+    ord I0,S0,I1
+    print I0
+    end
 CODE
 /^Cannot get character past end of string/
 OUTPUT
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end, I' );
-	set I1, -1
-	ord I0,"a",I1
-	print I0
-	end
+    set I1, -1
+    ord I0,"a",I1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end, I' );
-	set I1, -1
-	set S0,"a"
-	ord I0,S0,I1
-	print I0
-	end
+    set I1, -1
+    set S0,"a"
+    ord I0,S0,I1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end, I' );
-	set I1, -1
-	ord I0,"ab",I1
-	print I0
-	end
+    set I1, -1
+    ord I0,"ab",I1
+    print I0
+    end
 CODE
 
 pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end, I' );
-	set I1, -1
-	set S0,"ab"
-	ord I0,S0,I1
-	print I0
-	end
+    set I1, -1
+    set S0,"ab"
+    ord I0,S0,I1
+    print I0
+    end
 CODE
 
 pasm_error_output_like(
     <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB, I' );
-	set I1, -3
-	set S0,"ab"
-	ord I0,S0,I1
-	print I0
+    set I1, -3
+    set S0,"ab"
+    ord I0,S0,I1
+    print I0
         end
 CODE
 /^Cannot get character before beginning of string/
