@@ -99,7 +99,7 @@ unlink "temp.inc";
 my $file = '_test.inc';
 open my $F, '>', $file or die "Can't create $file: $!\n";
 print $F <<'EOF';
-.sub _foo		# sub foo(int a, int b)
+.sub _foo       # sub foo(int a, int b)
    .param int a
    .param int b
    print "a = "
@@ -165,10 +165,10 @@ pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc' );
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     end
 .end
 CODE
@@ -182,8 +182,8 @@ open $FOO, '>', 'temp.pir' or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .sub _sub2
     print "sub2\n"
-   .pcc_begin_return
-   .pcc_end_return
+   .begin_return
+   .end_return
     end
 .end
 ENDF
@@ -199,10 +199,10 @@ pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc, return' );
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     print "back\n"
     end
 .end
@@ -238,10 +238,10 @@ pir_output_is( <<'CODE', <<'OUT', 'call sub in external pbc with 2 subs' );
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     end
 .end
 CODE
@@ -255,8 +255,8 @@ open $FOO, '>', "temp.pir" or die "Can't write temp.pir: $!\n";
 print $FOO <<'ENDF';
 .sub _sub2
     print "sub2\n"
-   .pcc_begin_return
-   .pcc_end_return
+   .begin_return
+   .end_return
     end
 .end
 ENDF
@@ -270,10 +270,10 @@ pir_output_is( <<'CODE', <<'OUT', 'call sub in external pir, return' );
     load_bytecode "temp.pir"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     print "back\n"
     end
 .end
@@ -288,18 +288,18 @@ pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
 .sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     print "back\n"
     end
 .end
 
 .sub _sub2
     print "sub2\n"
-   .pcc_begin_return
-   .pcc_end_return
+   .begin_return
+   .end_return
     end
 .end
 CODE
@@ -314,18 +314,18 @@ print $FOO <<'ENDF';
 .sub _sub1
     print "sub1\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     print "back\n"
     end
 .end
 
 .sub _sub2
     print "sub2\n"
-    .pcc_begin_return
-    .pcc_end_return
+    .begin_return
+    .end_return
     end
 .end
 ENDF
@@ -406,19 +406,19 @@ SKIP:
     load_bytecode "temp.pir"
     print "loaded\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret:
-    .pcc_end
+    .end_call
     print "back\n"
     print "sub1 again\n"
     load_bytecode "temp.pir"
     print "loaded again\n"
     $P0 = global "_sub2"
-    .pcc_begin
-    .pcc_call $P0
+    .begin_call
+    .call $P0
     ret_again:
-    .pcc_end
+    .end_call
     print "back again\n"
     end
 .end

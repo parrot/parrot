@@ -16,13 +16,13 @@ pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
 .sub test :main
     .const .Sub sub = "_sub"
     .const int y = 20
-    .pcc_begin
+    .begin_call
     .arg 10
     .arg y
-    .pcc_call sub
+    .call sub
     .local string z
     .result z
-    .pcc_end
+    .end_call
     print z
     end
 .end
@@ -273,14 +273,14 @@ pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
     .const .Sub s = "_sub"
-    .pcc_begin
+    .begin_call
     .arg x
     .arg ar :flat
     .arg y
     .arg ar2 :flat
     .arg z
-    .pcc_call s
-    .pcc_end
+    .call s
+    .end_call
     end
 .end
 .sub _sub

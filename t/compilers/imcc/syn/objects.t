@@ -76,9 +76,9 @@ pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
     .param pmc s
     print "in meth\n"
     print s
-    .pcc_begin_return
+    .begin_return
     .return "done\n"
-    .pcc_end_return
+    .end_return
 .end
 CODE
 in meth
@@ -188,10 +188,10 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    .pcc_begin
+    .begin_call
     .invocant obj
     .meth_call "_meth"
-    .pcc_end
+    .end_call
     print "done\n"
     end
 .end
@@ -214,11 +214,11 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, meth var" );
     newclass class, "Foo"
     obj = new "Foo"
     meth = "_me"
-    meth = meth . "th" 	# test concat to
-    .pcc_begin
+    meth = meth . "th"  # test concat to
+    .begin_call
     .invocant obj
     .meth_call meth
-    .pcc_end
+    .end_call
     print "done\n"
     end
 .end
@@ -238,13 +238,13 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    .pcc_begin
+    .begin_call
     .arg "hello"
     .arg "\n"
     .invocant obj
     .meth_call "_meth"
     .result $S0
-    .pcc_end
+    .end_call
     print $S0
     print "done\n"
     end
@@ -257,9 +257,9 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     print "in meth\n"
     print p1
     print p2
-    .pcc_begin_return
+    .begin_return
     .return "ok\n"
-    .pcc_end_return
+    .end_return
 .end
 CODE
 in meth
@@ -275,10 +275,10 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    .pcc_begin
+    .begin_call
     .invocant obj
     .meth_call "_meth"
-    .pcc_end
+    .end_call
     print "done\n"
     end
 .end

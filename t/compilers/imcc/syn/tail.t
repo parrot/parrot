@@ -98,69 +98,69 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position" );
 
 .sub _main :main
-	$P1 = new 'Integer'
-	$P1 = 20
-	$P2 = new 'Integer'
-	$P2 = 3
-	.const .Sub f = "_floor"
-	.const .Sub s = "_fib_step"
-	($P3, $P4) = _funcall(f, $P1, $P2)
-	print "_floor returned "
-	print 2
-	print " values, "
-	print $P3
-	print " and "
-	print $P4
-	print ".\n"
-	($P3, $P4, $P5) = _funcall(s, $P1, $P2)
-	print "_fib_step returned "
-	print 3
-	print " values, "
-	print $P3
-	print ", "
-	print $P4
-	print ", and "
-	print $P5
-	print ".\n"
+    $P1 = new 'Integer'
+    $P1 = 20
+    $P2 = new 'Integer'
+    $P2 = 3
+    .const .Sub f = "_floor"
+    .const .Sub s = "_fib_step"
+    ($P3, $P4) = _funcall(f, $P1, $P2)
+    print "_floor returned "
+    print 2
+    print " values, "
+    print $P3
+    print " and "
+    print $P4
+    print ".\n"
+    ($P3, $P4, $P5) = _funcall(s, $P1, $P2)
+    print "_fib_step returned "
+    print 3
+    print " values, "
+    print $P3
+    print ", "
+    print $P4
+    print ", and "
+    print $P5
+    print ".\n"
 .end
 
 .sub _funcall
-	.param pmc function
-	.param pmc argv :slurpy
+    .param pmc function
+    .param pmc argv :slurpy
 
-	print "[doing _funcall]\n"
-	$I33 = defined function
-	unless $I33 goto bad_func
+    print "[doing _funcall]\n"
+    $I33 = defined function
+    unless $I33 goto bad_func
 doit:
-	.return function(argv :flat)
+    .return function(argv :flat)
 bad_func:
-	printerr "_funcall:  Bad function.\n"
-	exit 0
+    printerr "_funcall:  Bad function.\n"
+    exit 0
 .end
 
 ## Return quotient and remainder as two integers.
 .sub _floor
-	.param pmc arg1
-	.param pmc arg2
+    .param pmc arg1
+    .param pmc arg2
 
-	$P1 = new 'Integer'
-	$P1 = arg1 / arg2
-	## truncate.
-	$I1 = $P1
-	$P1 = $I1
-	$P2 = new 'Integer'
-	$P2 = arg1 % arg2
-	.return($P1, $P2)
+    $P1 = new 'Integer'
+    $P1 = arg1 / arg2
+    ## truncate.
+    $I1 = $P1
+    $P1 = $I1
+    $P2 = new 'Integer'
+    $P2 = arg1 % arg2
+    .return($P1, $P2)
 .end
 
 ## Return the sum and the two arguments as three integers.
 .sub _fib_step
-	.param pmc arg1
-	.param pmc arg2
+    .param pmc arg1
+    .param pmc arg2
 
-	$P1 = new 'Integer'
-	$P1 = arg1 + arg2
-	.return ($P1, arg1,  arg2)
+    $P1 = new 'Integer'
+    $P1 = arg1 + arg2
+    .return ($P1, arg1,  arg2)
 .end
 CODE
 [doing _funcall]
@@ -173,73 +173,73 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
 
 .sub _main :main
 
-	$P1 = new 'Integer'
-	$P1 = 20
-	$P2 = new 'Integer'
-	$P2 = 3
-	.const .Sub f = "_floor"
-	.const .Sub s = "_fib_step"
-	($P3, $P4) = _funcall(f, $P1, $P2)
-	print "_floor returned "
-	print 2
-	print " values, "
-	print $P3
-	print " and "
-	print $P4
-	print ".\n"
-	($P3, $P4, $P5) = _funcall(s, $P1, $P2)
-	print "_fib_step returned "
-	print 3
-	print " values, "
-	print $P3
-	print ", "
-	print $P4
-	print ", and "
-	print $P5
-	print ".\n"
+    $P1 = new 'Integer'
+    $P1 = 20
+    $P2 = new 'Integer'
+    $P2 = 3
+    .const .Sub f = "_floor"
+    .const .Sub s = "_fib_step"
+    ($P3, $P4) = _funcall(f, $P1, $P2)
+    print "_floor returned "
+    print 2
+    print " values, "
+    print $P3
+    print " and "
+    print $P4
+    print ".\n"
+    ($P3, $P4, $P5) = _funcall(s, $P1, $P2)
+    print "_fib_step returned "
+    print 3
+    print " values, "
+    print $P3
+    print ", "
+    print $P4
+    print ", and "
+    print $P5
+    print ".\n"
 .end
 
 .sub _funcall
-	.param pmc function
-	.param pmc argv :slurpy
+    .param pmc function
+    .param pmc argv :slurpy
 
-	print "[doing _funcall]\n"
-	$I33 = defined function
-	if $I33 goto doit
+    print "[doing _funcall]\n"
+    $I33 = defined function
+    if $I33 goto doit
 bad_func:
-	printerr "_funcall:  Bad function.\n"
-	exit 0
+    printerr "_funcall:  Bad function.\n"
+    exit 0
 doit:
-	.return function(argv :flat)
+    .return function(argv :flat)
 .end
 
 ## Return quotient and remainder as two integers.
 .sub _floor
-	.param pmc arg1
-	.param pmc arg2
+    .param pmc arg1
+    .param pmc arg2
 
-	$P1 = new 'Integer'
-	$P1 = arg1 / arg2
-	## truncate.
-	$I1 = $P1
-	$P1 = $I1
-	$P2 = new 'Integer'
-	$P2 = arg1 % arg2
-	.return($P1, $P2)
+    $P1 = new 'Integer'
+    $P1 = arg1 / arg2
+    ## truncate.
+    $I1 = $P1
+    $P1 = $I1
+    $P2 = new 'Integer'
+    $P2 = arg1 % arg2
+    .return($P1, $P2)
 .end
 
 ## Return the sum and the two arguments as three integers.
 .sub _fib_step
-	.param pmc arg1
-	.param pmc arg2
+    .param pmc arg1
+    .param pmc arg2
 
-	$P1 = new 'Integer'
-	$P1 = arg1 + arg2
-	.pcc_begin_return
-	.return $P1
-	.return arg1
-	.return arg2
-	.pcc_end_return
+    $P1 = new 'Integer'
+    $P1 = arg1 + arg2
+    .begin_return
+    .return $P1
+    .return arg1
+    .return arg2
+    .end_return
 .end
 CODE
 [doing _funcall]
@@ -252,49 +252,49 @@ pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
 
 .sub _main :main
 
-	$P1 = new 'Integer'
-	$P1 = 20
-	$P2 = new 'Integer'
-	$P2 = 3
-	.const .Sub s = "_fib_step"
-	($P3, $P4, $P5) = _funcall(s, $P1, $P2)
-	print "_fib_step returned "
-	print 3
-	print " values, "
-	print $P3
-	print ", "
-	print $P4
-	print ", and "
-	print $P5
-	print ".\n"
+    $P1 = new 'Integer'
+    $P1 = 20
+    $P2 = new 'Integer'
+    $P2 = 3
+    .const .Sub s = "_fib_step"
+    ($P3, $P4, $P5) = _funcall(s, $P1, $P2)
+    print "_fib_step returned "
+    print 3
+    print " values, "
+    print $P3
+    print ", "
+    print $P4
+    print ", and "
+    print $P5
+    print ".\n"
 .end
 
 .sub _funcall
-	.param pmc function
-	.param pmc argv :slurpy
+    .param pmc function
+    .param pmc argv :slurpy
 
-	$I33 = defined function
-	unless $I33 goto bad_func
+    $I33 = defined function
+    unless $I33 goto bad_func
 doit:
-	($P35 :slurpy) = function(argv :flat)
+    ($P35 :slurpy) = function(argv :flat)
         $I35 = $P35
         print "[got "
         print $I35
         print " results]\n"
-	.return ($P35 :flat)
+    .return ($P35 :flat)
 bad_func:
-	printerr "_funcall:  Bad function.\n"
-	exit 0
+    printerr "_funcall:  Bad function.\n"
+    exit 0
 .end
 
 ## Return the sum and the two arguments as three integers.
 .sub _fib_step
-	.param pmc arg1
-	.param pmc arg2
+    .param pmc arg1
+    .param pmc arg2
 
-	$P1 = new 'Integer'
-	$P1 = arg1 + arg2
-	.return ($P1, arg1,  arg2)
+    $P1 = new 'Integer'
+    $P1 = arg1 + arg2
+    .return ($P1, arg1,  arg2)
 .end
 CODE
 [got 3 results]
