@@ -921,11 +921,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional returns, void ret" );
     .local pmc f
     $I0 = 99
     f = global "foo"
-    .pcc_begin
-    .pcc_call f
+    .begin_call
+    .call f
     .result   $P0 :optional
     .result   $I0 :opt_flag
-    .pcc_end
+    .end_call
     unless $I0,  ex
     print "not "
 ex:
