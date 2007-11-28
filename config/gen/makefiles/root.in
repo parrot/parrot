@@ -732,9 +732,6 @@ parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE)
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
 
 
-Makefile : config/gen/makefiles/root.in
-	$(RECONFIGURE) --step=gen::makefiles --target=Makefile
-
 flags_dummy :
 	@echo "Compiling with:"
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS echo $(CC) $(CFLAGS) -I$(@D) @cc_o_out@ xx$(O) -c xx.c
