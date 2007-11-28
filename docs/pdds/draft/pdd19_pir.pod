@@ -214,12 +214,6 @@ The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
 compilation unit.
 
-=item .sym [deprecated, see RT#45405]
-
-  .sym <type> <identifier> [:unique_reg]
-
-Same as C<.local>.
-
 =item .lex <identifier>, <reg>
 
 Declare a lexical variable that is an alias for a PMC register. For example,
@@ -897,7 +891,7 @@ the C<assign_pmc> vtable function.
   .arg x
   .arg y
   .arg z
-  .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
+  .pcc_call $P0, $P1    # r = _sub_label(x, y, z)
   ret_addr:
   .local int r  # optional - new result var
   .result r
