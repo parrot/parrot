@@ -87,7 +87,7 @@ typedef HANDLE Parrot_thread;
 #  define JOIN(t, ret) \
      do { \
        WaitForSingleObject(t, INFINITE); \
-       GetExitCodeThread(t,(LPDWORD)&(ret)); \
+       GetExitCodeThread(t, (LPDWORD)&(ret)); \
        CloseHandle(t); \
      } while (0)
 
