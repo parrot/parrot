@@ -39,10 +39,10 @@ as a macro identifier. The PIR directives are:
 
   .arg            .invocant          .begin_call
   .const          .lex               .call
-  .emit           .line              .end_return
+                  .line              .end_return
   .end            .loadlib           .end_yield
   .endnamespace   .local             .end
-  .eom            .meth_call         .pragma
+                  .meth_call         .pragma
   .get_results    .namespace         .return
   .globalconst    .nci_call          .result
   .HLL_map        .param             .sub
@@ -1035,27 +1035,6 @@ Will print:
 Please note that it is B<not> necessary to I<pair> these statements; it is
 acceptable to open a C<.namespace> without closing it.
 The scope of the C<.namespace> is limited to the subroutine.
-
-=head2 Emit blocks
-
-  emit:
-    ".emit" nl
-    labeled_pasm_instr*
-    ".eom"
-
-=head3 Example Emit block
-
-An emit block only allows PASM instructions,
-not PIR instructions.
-
-  .emit
-     set I0, 10
-     new P0, .Integer
-     ret
-   _foo:
-     print "This is PASM subroutine "foo"
-     ret
-  .eom
 
 =head2 Expansions
 

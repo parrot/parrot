@@ -589,11 +589,6 @@ rule close_namespace {
     {*}
 }
 
-rule emit {
-    '.emit' <?nl>
-    <labeled_pasm_instr>*
-    [ '.eom' | <syntax_error: '.eom' expected> ]
-}
 
 rule macro_def {
     '.macro' <id> <macro_parameters>? <?nl>
@@ -928,11 +923,9 @@ token pir_directive {
     [ '.arg'
     | '.const'
     | '.constant'
-    | '.emit'
     | '.endm'
     | '.endnamespace'
     | '.end'
-    | '.eom'
     | '.get_results'
     | '.globalconst'
     | '.HLL_map'
