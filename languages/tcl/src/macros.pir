@@ -14,8 +14,8 @@ Preamble for any tcl-related exception handler.
 =cut
 
 .macro catch ()
-  .sym pmc exception
-  .sym string exception_message_unused_XXX
+  .local pmc exception
+  .local string exception_message_unused_XXX
   get_results '0,0', exception, exception_message_unused_XXX
 .endm
 
@@ -91,7 +91,7 @@ Simplistic implementation of C<clone> vtable
 .macro cloneable ()
 
 .sub clone :vtable :method
-  .sym pmc obj
+  .local pmc obj
   obj = new 'Undef'
   assign obj, self
   .return(obj)
