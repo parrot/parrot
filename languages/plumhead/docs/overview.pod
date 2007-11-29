@@ -6,23 +6,23 @@ Plumhead - Introduction
 
 =head1 What is Plumhead?
 
-An incomplete implementation of PHP on Parrot.
+Plumhead is an incomplete implementation of PHP on Parrot.
 Plumhead is short for Plum-headed Parakeet.
 
 =head1 Goals
 
-Provide a side by side comparison for different implementation
+Provide a side by side comparison of different implementation
 strategies of PHP on Parrot.
 
 =over
 
 =item php       - the reference implementation PHP 5.2.0
 
-=item phc       - XSLT munges output from phc, started
+=item phc       - take XML output from phc and munge it with XSLT
 
 =item antlr3    - ANTLR3, converted from languages/bc, started
 
-=item partridge - Parrot compiler toolchain, started
+=item pct       - Parrot compiler toolkit
 
 =item yacc      - with lex and yacc, planned
 
