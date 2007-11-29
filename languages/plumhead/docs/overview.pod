@@ -26,8 +26,6 @@ strategies of PHP on Parrot.
 
 =item yacc      - with lex and yacc, planned
 
-=item perl5re   - Perl5.10 regexes, planned
-
 =back
 
 =head1 Status
@@ -49,10 +47,6 @@ ANTLR3 generating Java code.
 =item yacc
 
 lex and yacc, or flex and bison
-
-=item perl5re
-
-Perl5.10
 
 =back
 

@@ -20,8 +20,6 @@ languages/plumhead/t/harness - A harness for Plumhead
 
   cd languages && perl -I../lib plumhead/t/harness --with-yacc
 
-  cd languages && perl -I../lib plumhead/t/harness --with-perl5re
-
   cd languages && perl -I../lib plumhead/t/harness \
                    plumhead/t/hello.t 
 
@@ -73,9 +71,6 @@ if ( grep { m/^--files$/ } @ARGV ) {
     my $with_yacc = ( grep { m/^--with-yacc$/ } @ARGV ) ? 1 : 0;
     @ARGV = grep { ! m/^--with-yacc$/ } @ARGV;
 
-    my $with_perl5re = ( grep { m/^--with-perl5re$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-perl5re$/ } @ARGV;
-
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
@@ -107,9 +102,6 @@ if ( grep { m/^--files$/ } @ARGV ) {
     }
     elsif ( $with_yacc ) {
        $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Yacc';
-    }
-    elsif ( $with_perl5re ) {
-       $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Perl5re';
     }
     else {
        $ENV{PARROT_PLUMHEAD_TEST_MODULE} = 'Parrot::Test::Plumhead::Partridge';

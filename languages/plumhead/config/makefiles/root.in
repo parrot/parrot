@@ -31,8 +31,6 @@ help:
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
 	@echo "                     Needs javac and a proper CLASSPATH."
 	@echo "  build-yacc         Build support for variant 'Plumhead yacc'."
-	@echo "  build-perl5re      Build support for variant 'Plumhead perl5re'."
-	@echo "                     Currently nothing to do. Perl 5.9.x needed."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite for 'Plumhead partridge'."
@@ -42,8 +40,6 @@ help:
 	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
 	@echo "  test-partridge:    Run the test suite for 'Plumhead partridge'."
 	@echo "  test-yacc:         Run the test suite for 'Plumhead yacc'."
-	@echo "  test-perl5re:      Run the test suite for 'Plumhead perl5re'."
-	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
 	@echo "  clean-test:        Clean up temporary files from testing."
@@ -77,7 +73,7 @@ maintain-yacc: src/yacc/plumhead.y src/yacc/plumhead.l
 
 build:           build-partridge
 
-build-all:       build-partridge build-phc build-antlr3 build-yacc build-perl5re
+build-all:       build-partridge build-phc build-antlr3 build-yacc
 
 build-common:    src/common/plumheadlib.pbc plumhead.pbc
 
@@ -89,8 +85,6 @@ build-yacc:      build-common src/yacc/plumhead_yacc
 
 src/yacc/plumhead_yacc: src/yacc/plumhead_lexer.c src/yacc/plumhead_parser.c
 	$(CC) src/yacc/plumhead_lexer.c src/yacc/plumhead_parser.c -o src/yacc/plumhead_yacc
-
-build-perl5re:   build-common
 
 build-antlr3:    build-common
 	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
@@ -126,9 +120,6 @@ test-partridge:
 
 test-yacc:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-yacc
-
-test-perl5re:
-	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-perl5re
 
 clean: clean-common clean-partridge clean-antlr3 clean-test
 
