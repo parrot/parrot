@@ -1,25 +1,23 @@
 =head1 NAME
 
-PAST - Parrot abstract syntax tree
+PCT - Parrot compiler toolkit
 
 =head1 DESCRIPTION
 
-This file implements the PAST-pm compiler toolchain, for
-compiling programs into Parrot.
+This file loads all of the modules typically used in the
+standard Parrot Compiler Toolkit.
 
 =cut
 
-.include 'src/Grammar.pir'
+.namespace [ 'PCT' ]
 
-.include 'src/HLLCompiler.pir'
-
-.include 'src/PAST/Node.pir'
-
-.include 'src/PAST/Compiler.pir'
-
-.include 'src/POST/Node.pir'
-
-.include 'src/POST/Compiler.pir'
+.sub '__onload' :load :init
+    load_bytecode 'PCT/Grammar.pbc'
+    load_bytecode 'PCT/PAST.pbc'
+    #  we don't need to explicitly load HLLCompiler, because
+    #  it's already loaded by PAST.pbc
+    .return ()
+.end
 
 =head1 AUTHOR
 
@@ -29,6 +27,7 @@ Perl 6 compilers mailing lists.
 
 =head1 HISTORY
 
+2007-11-29  Refactored PCT into separate modules for grammar, past, compiler
 2006-11-20  Patrick Michaud added first draft of POD documentation.
 
 =head1 COPYRIGHT

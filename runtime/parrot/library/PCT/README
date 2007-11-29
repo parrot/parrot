@@ -1,0 +1,12 @@
+This directory holds the runtime libraries for the
+Parrot Compiler Toolkit (PCT).  The sources for the
+libraries are in compilers/pct/ and the compiled
+binaries are automatically placed here by the Makefile.
+
+The available PCT libraries are:
+
+    PCT.pbc             - use this if you just want the general toolkit
+    PCT/PAST.pbc        - the PAST compiler
+    PCT/Grammar.pbc     - the PCT::Grammar base grammar
+    PCT/HLLCompiler.pbc - the PCT::HLLCompiler
+

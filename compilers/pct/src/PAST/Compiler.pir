@@ -12,6 +12,7 @@ By default PAST::Compiler transforms a PAST tree into POST.
 .namespace [ 'PAST::Compiler' ]
 
 .sub '__onload' :load :init
+    load_bytecode 'PCT/HLLCompiler.pbc'
     $P99 = subclass 'PCT::HLLCompiler', 'PAST::Compiler'
     $P0 = new 'PAST::Compiler'
     $P0.'language'('PAST')

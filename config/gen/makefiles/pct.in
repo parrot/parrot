@@ -9,39 +9,40 @@ TOOL_DIR = ../..
 PGE_DIR  = ../../compilers/pge
 TEST_DIR = ../../t/compilers/pct
 CP       = @cp@
-BUILD    = $(PERL) @build_dir@/tools/build/dynpmc.pl
-O        = @o@
-LOAD_EXT = @load_ext@
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
 
-# the default target
-all: $(PARROT_LIBRARY)/PCT.pbc 
+TARGETS = \
+  $(PARROT_LIBRARY)/PCT.pbc \
+  $(PARROT_LIBRARY)/PCT/PAST.pbc \
+  $(PARROT_LIBRARY)/PCT/Grammar.pbc \
+  $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc
 
-SOURCES = PCT.pir \
+SOURCES = \
+  PCT.pir \
   src/Grammar.pir \
   src/HLLCompiler.pir \
   src/PAST/Compiler.pir \
   src/PAST/Node.pir \
   src/POST/Compiler.pir \
-  src/POST/Node.pir \
+  src/POST/Node.pir
 
+# the default target
+all: $(PARROT_LIBRARY)/PCT.pbc
 
-$(PARROT_LIBRARY)/PCT.pbc: PCT.pbc
-	$(CP) PCT.pbc $(PARROT_LIBRARY)/PCT.pbc
-
-PCT.pbc: $(PARROT) $(SOURCES)
-	$(RM_F) PCT.pbc $(PARROT_LIBRARY)/PCT.pbc
-	$(PARROT) -o PCT.pbc --output-pbc PCT.pir
+$(PARROT_LIBRARY)/PCT.pbc: $(PARROT) $(SOURCES)
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT.pbc --output-pbc PCT.pir
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT/PAST.pbc --output-pbc src/PAST.pir
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT/Grammar.pbc --output-pbc src/Grammar.pir
+	$(PARROT) -o $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc --output-pbc src/HLLCompiler.pir
 
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               PCT.pbc"
+	@echo "  all:               all PCT libraries"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
@@ -64,9 +65,7 @@ testclean:
 	    $(TEST_DIR)/*.pbc
 
 clean: testclean
-	$(RM_F) \
-    PCT.pbc \
-    $(PARROT_LIBRARY)/PCT.pbc
+	$(RM_F) $(TARGETS)
 
 realclean: clean
 	$(RM_F) Makefile
