@@ -26,6 +26,7 @@ help:
 	@echo "  build              Same as 'all'."
 	@echo "  build-all          Build all three variants"
 	@echo "  build-partridge    Same as 'build', which is same as 'all'."
+	@echo "  build-pct          Same as 'build', which is same as 'all'."
 	@echo "  build-phc          Build support for variant 'Plumhead phc'."
 	@echo "                     Current this has nothing to do."
 	@echo "  build-antlr3       Build support for variant 'Plumhead antlr3'."
@@ -39,6 +40,7 @@ help:
 	@echo "  test-phc:          Run the test suite for 'Plumhead phc'."
 	@echo "  test-antlr3:       Run the test suite for 'Plumhead antlr3'."
 	@echo "  test-partridge:    Run the test suite for 'Plumhead partridge'."
+	@echo "  test-pct:          Run the test suite for 'Plumhead pct'."
 	@echo "  test-yacc:         Run the test suite for 'Plumhead yacc'."
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -75,9 +77,11 @@ build:           build-partridge
 
 build-all:       build-partridge build-phc build-antlr3 build-yacc
 
-build-common:    src/common/plumheadlib.pbc plumhead.pbc
+build-common:    src/common/plumheadlib.pbc plumhead.pbc plumhead_pct.pbc
 
 build-partridge: build-common
+
+build-pct:       build-common
 
 build-phc:       build-common
 
@@ -99,12 +103,21 @@ src/partridge/PlumheadPAST_gen.pir: src/partridge/PlumheadPAST.tg
 src/common/plumheadlib.pbc: src/common/builtins.pir
 	$(PARROT) -o src/common/plumheadlib.pbc src/common/builtins.pir
 
+src/pct/Plumhead_gen.pir: src/pct/Plumhead.pg
+	$(PARROT) $(PGE_DIR)/pgc.pir --output=src/pct/Plumhead_gen.pir src/pct/Plumhead.pg
+
+src/pct/PlumheadPAST_gen.pir: src/pct/PlumheadPAST.tg
+	$(PARROT) $(TGE_DIR)/tgc.pir --output=src/pct/PlumheadPAST_gen.pir src/pct/PlumheadPAST.tg
+
 plumhead.pbc: src/common/plumhead.pir src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
 	$(PARROT) -o plumhead.pbc src/common/plumhead.pir
 
+plumhead_pct.pbc: src/common/plumhead_pct.pir src/pct/Plumhead_gen.pir src/pct/PlumheadPAST_gen.pir
+	$(PARROT) -o plumhead_pct.pbc src/common/plumhead_pct.pir
+
 test:     all test-partridge
 
-test-all: all test-php test-phc test-antlr3 test-partridge
+test-all: all test-php test-phc test-antlr3 test-partridge test-pct
 
 test-php:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-php
@@ -118,16 +131,22 @@ test-antlr3:
 test-partridge:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-partridge
 
+test-pct:
+	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-pct
+
 test-yacc:
 	- cd .. && $(PERL) -I../lib -I plumhead/lib plumhead/t/harness --with-yacc
 
-clean: clean-common clean-partridge clean-antlr3 clean-test
+clean: clean-common clean-partridge clean-pct clean-antlr3 clean-test
 
 clean-common:
-	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc
+	$(RM_F) src/common/plumheadlib.pbc plumhead.pbc plumhead_pct.pbc
 
 clean-partridge:
 	$(RM_F) src/partridge/Plumhead_gen.pir src/partridge/PlumheadPAST_gen.pir
+
+clean-pct:
+	$(RM_F) src/pct/Plumhead_gen.pir src/pct/PlumheadPAST_gen.pir
 
 clean-antlr3:
 	$(RM_F) src/antlr3/*.class
