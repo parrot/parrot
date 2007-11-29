@@ -94,22 +94,15 @@ the "new" opcode for the PMCs that use it.)
 
 =item 4
 
-  PMC* subclass(PMC *name)
-
-The subclass vtable method is deprecated and will be removed after the 0.5.0
-release. The subclass opcode stays. (RT #42969)
-
-=item 5
-
 The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
 will be removed after the 0.5.0 release.
 
-=item 6
+=item 5
 
 The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
 removed after the 0.5.0 release.
 
-=item 7
+=item 6
 
 The PMC union struct is deprecated and will be removed once all core PMCs have
 been updated.
