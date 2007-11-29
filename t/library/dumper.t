@@ -544,7 +544,7 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
     print subindent
     print "_"
-    classname name, self
+    typeof name, self
     print name
     print "::__dump\n"
 

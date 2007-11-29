@@ -582,7 +582,7 @@ pasm_output_is( <<'CODE', <<'OUT', "get_mro" );
     null I0
 loop:
     set P2, P1[I0]
-    classname S0, P2
+    typeof S0, P2
     print S0
     print "\n"
     inc I0

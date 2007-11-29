@@ -23,8 +23,12 @@
 
 # or TODO much better: all .pbc files should make-depend on PBC_COMPAT
 
+# Also, if you're removing an opcode, be sure to run 
+# make -f tools/dev/ops_renum.mak
+
 # please insert tab separated entries at the top of the list
 
+3.06	2007.11.28	coke	remove classname opcode
 3.05    2007.10.29      allison         add get_eh, get_all_eh, and count_eh opcodes
 3.04    2007.10.28      paultcochrane   remove clear_eh opcode
 3.03	2007.10.17	coke    	released 0.4.17

@@ -416,18 +416,6 @@ inline op class(out PMC, invar PMC) :object_classes {
     goto NEXT();
 }
 
-=item B<classname>(out STR, invar PMC)
-
-Get the class name for the class in $2 and put it in $1.
-
-=cut
-
-inline op classname(out STR, invar PMC) :object_base {
-    $1 = VTABLE_name(interp, $2);
-    goto NEXT();
-}
-
-
 ##################################################
 
 

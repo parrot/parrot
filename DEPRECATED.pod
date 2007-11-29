@@ -81,28 +81,23 @@ we are moving to use:
 
 =item 2
 
-The C<classname> op is deprecated and will be removed after the 0.5.0 release.
-It's an exact duplicate of the string return variant of the C<typeof> op.
-
-=item 3
-
 The experimental C<instantiate> opcode is deprecated and will be removed after
 the 0.5.0 release.
 
 (The C<instantiate> vtable function becomes core in 0.5.0, but is accessed via
 the "new" opcode for the PMCs that use it.)
 
-=item 4
+=item 3
 
 The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
 will be removed after the 0.5.0 release.
 
-=item 5
+=item 4
 
 The C<get_mro> opcode is deprecated (replaced by C<inspect>) and will be
 removed after the 0.5.0 release.
 
-=item 6
+=item 5
 
 The PMC union struct is deprecated and will be removed once all core PMCs have
 been updated.

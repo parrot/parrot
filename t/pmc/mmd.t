@@ -1097,7 +1097,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "multisub vs find_name" );
 .sub main :main
     $P0 = find_name "foo"
-    $S0 = classname $P0
+    $S0 = typeof $P0
     print $S0
     print "\n"
 .end

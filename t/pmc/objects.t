@@ -1057,7 +1057,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "class op test" );
     new P1, "City"
 
     class P2, P1
-#    classname S0, P2 # deprecated
     set S0, P2
     print S0
     print "\n"
@@ -1088,7 +1087,6 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "anon. subclass has no name" );
     newclass P0, "City"
     subclass P1, P0
-#    classname S0, P1 # deprecated
     set S0, P1
     print "'"
     print S0

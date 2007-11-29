@@ -123,7 +123,7 @@ Create and returns a clone of a PAST node.
 
 .sub 'clone' :vtable :method
     .local pmc res
-    $S0 = classname self
+    $S0 = typeof self
     res = new $S0
     .local pmc iter
     iter = self.'iterator'()

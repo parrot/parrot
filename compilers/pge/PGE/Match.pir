@@ -67,14 +67,14 @@ is set or implied.
     target = src
     pos = 0
     iscont = 1
-    grammar = classname self
+    grammar = typeof self
     goto adverb_pos
   target_from_src:
     target = getattribute src, '$.target'
     $P0 = getattribute src, '$.pos'
     pos = $P0
     iscont = 0
-    grammar = classname src
+    grammar = typeof src
     if pos >= 0 goto adverb_pos
     pos = 0
 

@@ -185,7 +185,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - parents" );
 .pcc_sub __init:
     get_params "0", P2
     print "foo_init\n"
-    classname S0, P2
+    typeof S0, P2
     print S0
     print "\n"
     returncc

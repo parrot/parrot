@@ -358,16 +358,6 @@ Return the R<CLASS> of the given R<OBJECT>.
 
 I<Arguments: P, P>
 
-=head2 classname
-
-X<classname opcode (PASM)>
-
-  classname R<NAME>, R<CLASS>
-
-Set R<NAME> to the classname of R<CLASS>.
-
-I<Arguments: SR, P>
-
 =head2 classoffset
 
 X<classoffset opcode (PASM)>
