@@ -1,0 +1,244 @@
+/*
+Copyright (C) 2007, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/eventhandler.pmc - a handler for events
+
+=head1 DESCRIPTION
+
+A PMC that captures the state of the interpreter to invoke when handling an
+Event.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass EventHandler extends Sub need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes an empty C<EventHandler>.  Add attributes to it if you want it to
+do anything.
+
+=cut
+
+*/
+
+    void init() {
+        Parrot_EventHandler *e = mem_allocate_zeroed_typed(Parrot_EventHandler);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        PMC_data(SELF) = e;
+    }
+
+/*
+
+=item C<void init_pmc(PMC *data)>
+
+Initializes a new EventHandler with either a C<Sub> PMC (or descendant) or a
+C<Hash> PMC.  With the latter, the keys should be any or all of:
+
+=over 4
+
+=item C<code>
+
+a C<Sub> (or descendant) PMC containing code to invoke when handling the event
+
+=item C<interp>
+
+a C<ParrotInterpreter> PMC in which to invoke the code PMC
+
+=item C<type>
+
+a STRING recording the type of event to handle
+
+=item C<priority>
+
+the minimum threshhold of priority which the event must meet or exceed for the
+handler to care
+
+=back
+
+=cut
+
+*/
+
+    void init_pmc(PMC *data) {
+        PMC                 *code        = NULL;
+        PMC                 *interpreter = PMCNULL;
+        STRING              *type        = NULL;
+        INTVAL               priority    = 0;
+        Parrot_EventHandler *e           = NULL;
+
+        if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Sub"))) {
+            code = data;
+        }
+        else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
+            code        = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+            interpreter = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+            type        = VTABLE_get_string_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
+            priority    = VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
+        }
+        else {
+            real_exception(INTERP, NULL, INVALID_OPERATION,
+                "EventHandler initializer must be Sub or Hash");
+        }
+
+        if (PMC_IS_NULL(interpreter))
+            interpreter = VTABLE_get_pmc_keyed_int(INTERP,
+                    INTERP->iglobals, IGLOBALS_INTERPRETER);
+
+        e = mem_allocate_zeroed_typed(Parrot_EventHandler);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        PMC_data(SELF) = e;
+        e->type        = type;
+        e->code        = code;
+        e->interp      = interpreter;
+        e->priority    = priority;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks this PMC and any of its contents as live.
+
+=cut
+
+*/
+
+    void mark() {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e) {
+            if (e->type)
+                pobject_lives(INTERP, (PObj *)e->type);
+
+            if (! PMC_IS_NULL(e->interp))
+                pobject_lives(INTERP, (PObj *)e->interp);
+
+            if (! PMC_IS_NULL(e->code))
+                pobject_lives(INTERP, (PObj *)e->code);
+        }
+    }
+
+/*
+
+=item C<void destroy()>
+
+Frees any memory held by this PMC.
+
+*/
+
+    void destroy() {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e) {
+            mem_sys_free(e);
+            PMC_data(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<void set_string(STRING *type)>
+
+Sets the C<type> parameter of this event handler to the passed-in string.
+
+=cut
+
+*/
+
+    void set_string(STRING *type) {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e)
+            e->type = type;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL priority)>
+
+Sets the minimum interesting priority for this event handler.
+
+=cut
+
+*/
+    void set_integer_native(INTVAL priority) {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e)
+            e->priority = priority;
+    }
+
+/*
+
+=item C<void set_pmc(PMC *interpreter)>
+
+Sets the passed-in C<ParrotInterpreter> as the active interpreter in which to
+handle the registered events.
+
+=cut
+
+*/
+    void set_pmc(PMC *interpreter) {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+
+        if (e)
+            e->interp = interpreter;
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Runs the contained code, if any; this is what handles the event.
+
+=cut
+
+*/
+    opcode_t *invoke(void *next) {
+        Parrot_EventHandler *e = PMC_data_typed(SELF, Parrot_EventHandler *);
+        void                *unused;
+
+        /* can't invoke on INTERP and can't return its result; this may not be
+         * the right interpreter */
+        if (e) {
+            unused = VTABLE_invoke(e->interp, e->code, next);
+            UNUSED(unused);
+        }
+
+        return next;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -75,6 +75,13 @@ typedef struct parrot_event {
     } u;
 } parrot_event;
 
+typedef struct parrot_eventhandler {
+    STRING *type;          /* the type of the event to handle */
+    PMC    *code;          /* the code object to execute */
+    PMC    *interp;        /* the registered interpreter */
+    INTVAL  priority;      /* the minimum priority threshhold of events */
+} Parrot_EventHandler;
+
 struct QUEUE_ENTRY;
 
 #define CHECK_EVENTS(i, n)  (opcode_t *)Parrot_do_check_events(i, n)
