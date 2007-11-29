@@ -31,7 +31,6 @@ LANGUAGES = \
     lisp \
     lua \
     m4 \
-    nqp \
     ook \
     parrot_compiler \
     perl5 \
@@ -111,7 +110,6 @@ clean: \
     lisp.clean \
     lua.clean \
     m4.clean \
-    nqp.clean \
     ook.clean \
     parrot_compiler.clean \
     perl5.clean \
@@ -304,14 +302,6 @@ m4.test:
 	- $(MAKE) m4 test
 m4.clean:
 	- $(MAKE) m4 clean
-
-nqp : nqp.dummy
-nqp.dummy:
-	- $(MAKE) nqp
-nqp.test:
-	- $(MAKE) nqp test
-nqp.clean:
-	- $(MAKE) nqp clean
 
 ook : ook.dummy
 ook.dummy:
