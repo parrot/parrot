@@ -399,7 +399,6 @@ Removes and returns the last element in the array.
     FLOATVAL pop_float() {
         INTVAL   size = PMC_int_val(SELF);
         PMC     *data;
-        FLOATVAL value;
 
         if (0 == size)
             real_exception(INTERP, NULL, E_IndexError,
@@ -442,7 +441,6 @@ Removes and returns the last element in the array.
     STRING *pop_string() {
         INTVAL  size = PMC_int_val(SELF);
         PMC    *data;
-        STRING *value;
 
         if (0 == size)
             real_exception(INTERP, NULL, E_IndexError,
