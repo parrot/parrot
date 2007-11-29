@@ -148,7 +148,7 @@ found_module:
     .local pmc sub
     .local string name
     
-    classname name, self
+    typeof name, self
 
     .local string osname
     osname= '_get_osname'()
