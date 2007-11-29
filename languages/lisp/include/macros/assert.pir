@@ -13,8 +13,8 @@ Asserts that A is of type T, throwing a error of type "type-error" on failure
 =cut
 
 .macro ASSERT_TYPE(A,T)
-  .sym string _atypes
-  .sym int _testi
+  .local string _atypes
+  .local int _testi
 
    _testi = _IS_TYPE(.A, .T)
    if _testi == 1 goto .$DONE
@@ -34,8 +34,8 @@ Asserts that A is of type T, branching to B on failure.
 =cut
 
 .macro ASSERT_TYPE_AND_BRANCH(A,T,B)
-  .sym string _atypes
-  .sym int _testi
+  .local string _atypes
+  .local int _testi
 
    _testi = _IS_TYPE(.A, .T)
    if _testi == 1 goto .$DONE
@@ -51,7 +51,7 @@ Asserts that list A is of length L, branching to B on failure.
 =cut
 
 .macro ASSERT_LENGTH(A,L,B)
-  .sym int _leni
+  .local int _leni
 
    _leni = _LIST_LENGTH(.A)                     # Get the length of the list
    if _leni == .L goto .$DONE                   # Branch on success
@@ -67,7 +67,7 @@ Asserts that list A is at least of length L, branching to B on failure.
 =cut
 
 .macro ASSERT_MINIMUM_LENGTH(A,L,B)
-  .sym int _leni
+  .local int _leni
 
    _leni = _LIST_LENGTH(.A)                     # Get the length of the list
    if _leni >= .L goto .$DONE                   # Branch on success
@@ -83,7 +83,7 @@ Asserts that list A is at least of length L and at most of length M, branching t
 =cut
 
 .macro ASSERT_LENGTH_BETWEEN(A,L,M,B)
-  .sym int _leni
+  .local int _leni
 
    _leni = _LIST_LENGTH(.A)                     # Get the length of the list
    if _leni >= .L goto .$DONE                   # Branch on success (min bound)
@@ -100,8 +100,8 @@ Asserts that list A is composed of an even number of elements, branching to B on
 =cut
 
 .macro ASSERT_EVEN_LENGTH(A,B)
-  .sym int _leni
-  .sym int _modi
+  .local int _leni
+  .local int _modi
 
    _leni = _LIST_LENGTH(.A)                     # Get the length of the list
    mod _modi, _leni, 2

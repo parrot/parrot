@@ -13,7 +13,7 @@ Creates a new cons with car A and cdr B, placing the result in R.
 =cut
 
 .macro CONS (R,A,B)
-  .sym pmc _consp
+  .local pmc _consp
 
 
    _consp = new "LispCons"
@@ -95,9 +95,9 @@ Create a new package with name N, placing the result in P.
 =cut
 
 .macro PACKAGE (P,N)
-    .sym string _ucname
-    .sym pmc _packagesp
-    .sym pmc _name
+    .local string _ucname
+    .local pmc _packagesp
+    .local pmc _name
 
     .P = new "LispPackage"
 
@@ -120,7 +120,7 @@ Create a new function object with label L, placing the result in F.
     # VALID_IN_PARROT_0_2_0 newsub _func, .Sub, .L
     # VALID_IN_PARROT_0_2_0 setattribute .F, "LispFunction\0body", .L
 
-    .sym pmc _func
+    .local pmc _func
     .const .Sub _func = .L
     setattribute .F, "body", _func
 
@@ -133,7 +133,7 @@ Create a new macro object with label L, placing the result in F.
 =cut
 
 .macro MACRO(F,L)
-  .sym pmc _func
+  .local pmc _func
 
    .F = new "LispMacro"
    newsub _func, .Sub, .L

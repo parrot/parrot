@@ -16,7 +16,7 @@ Branch to B if L is an empty list.
 =cut
 
 .macro NULL (L,B)
-  .sym pmc _nilp
+  .local pmc _nilp
 
   .NIL(_nilp)
   eq_addr .L, _nilp, .B
@@ -49,9 +49,9 @@ Appends B to list A, placing the result into R.  A is assumed to be a valid list
 =cut
 
 .macro APPEND (R,A,B)
-  .sym pmc _listptr1p
-  .sym pmc _listptr2p
-  .sym pmc _listtmpp
+  .local pmc _listptr1p
+  .local pmc _listptr2p
+  .local pmc _listtmpp
 
   .NULL(.A, .$EMPTY_LIST)       # Special case if A is an empty list.
 
@@ -102,7 +102,7 @@ Puts the second element of A into R.  A is assumed to be a valid list.
 =cut
 
 .macro SECOND (R,A)
-  .sym pmc _cdrp
+  .local pmc _cdrp
 
   .CDR(_cdrp, .A)
   .CAR(.R, _cdrp)
@@ -115,7 +115,7 @@ Puts the third element of A into R.  A is assumed to be a valid list.
 =cut
 
 .macro THIRD (R,A)
-  .sym pmc _cdrp
+  .local pmc _cdrp
 
   .CDR(_cdrp, .A)
   .CDR(_cdrp, _cdrp)
@@ -129,7 +129,7 @@ Puts the fourth element of A into R.  A is assumed to be a valid list.
 =cut
 
 .macro FOURTH (R,A)
-  .sym pmc _cdrp
+  .local pmc _cdrp
 
   .CDR(_cdrp, .A)
   .CDR(_cdrp, _cdrp)
@@ -144,7 +144,7 @@ Creates a one element list containing A, placing the result in R.
 =cut
 
 .macro LIST_1 (R,A)
-  .sym pmc _bp
+  .local pmc _bp
 
   .NIL(_bp)
   .CONS(.R, .A, _bp)
@@ -158,14 +158,14 @@ Creates a two element list containing A and B, placing the result in R.
 =cut
 
 .macro LIST_2 (R,A,B)
-  .sym pmc _cp
+  .local pmc _cp
 
   .LIST_1(_cp, .B)
   .CONS(.R, .A, _cp)
 .endm
 
 .macro LIST_3 (R,A,B,C)
-  .sym pmc _cp
+  .local pmc _cp
 
   .LIST_2(_cp, .B, .C)
   .CONS(.R, .A, _cp)

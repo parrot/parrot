@@ -31,7 +31,7 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro CONSTANT (P)
-  .sym Boolean _const
+  .local Boolean _const
 
   _const = new 'Boolean'
   _const = 1
@@ -40,15 +40,15 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro CONSTANTP (R,P)
-  .sym pmc _const
+  .local pmc _const
 
   getprop .R, "constant", .P
 .endm
 
 .macro SPECIAL_FORM (S,P,N,L)
-  .sym pmc _specialformp
-  # VALID_IN_PARROT_0_2_0 .sym pmc _funcp
-  .sym pmc _namep
+  .local pmc _specialformp
+  # VALID_IN_PARROT_0_2_0 .local pmc _funcp
+  .local pmc _namep
 
   # VALID_IN_PARROT_0_2_0 newsub _funcp, .Sub, .L
 
@@ -67,8 +67,8 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro DEFUN (S,P,N,L)
-  .sym pmc _functionp
-  .sym pmc _namep
+  .local pmc _functionp
+  .local pmc _namep
 
   .FUNCTION(_functionp, .L)
 
@@ -82,8 +82,8 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro DEFMACRO (S,P,N,L)
-  .sym pmc _macrop
-  .sym pmc _namep
+  .local pmc _macrop
+  .local pmc _namep
 
   .MACRO(_macrop, .L)
 
@@ -97,7 +97,7 @@ Sets R to true (the TRUE symbol).
 .endm
 
 .macro DEFVAR (S,P,N,V)
-    .sym pmc _specialp
+    .local pmc _specialp
 
     .TRUE(_specialp)
 
