@@ -14,7 +14,7 @@ END_OF_HEADER
 
 my %macros;
 $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
-    .sym pmc throwable
+    .local pmc throwable
     throwable = new .Exception
     throwable[0] = "DOMAIN ERROR\n"
     throw throwable
