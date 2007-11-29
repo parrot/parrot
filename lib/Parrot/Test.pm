@@ -690,8 +690,9 @@ sub _generate_test_functions {
         my $test_sub = sub {
             local *__ANON__                        = $func;
             my ( $code, $expected, $desc, %extra ) = @_;
+            my $args                               = $ENV{TEST_PROG_ARGS} || '';
 
-            if ( $func =~ /^pbc_output_/ && $ENV{TEST_PROG_ARGS} =~ /-r / ) {
+            if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
                 return $builder->skip("no native tests with -r");
             }
