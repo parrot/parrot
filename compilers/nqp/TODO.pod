@@ -23,32 +23,36 @@ which is then caught by the outermost block of the currently
 executing subroutine and then used as the argument to C<.return>.
 
 Fortunately, the new design of S05 means that we don't really need
-return statements for developing action grammars (see C<make> below), 
-so this is no longer as much of a priority as it was.
+return statements for developing action grammars, so this is no
+longer as much of a priority as it was.
 
-=item * C<make> support
+=item * inline PIR
 
-S05 now identifies the C<make> function as being the mechanism 
-used to set the result object for a match object.  (Previously
-one would do this via C<return>.)  
+It would be nice to have a way to embed PIR instructions
+directly into NQP source files.  Even better would be to do
+with a Perl 6 compatible syntax.  One approach easily understood
+by non-Perl 6 programmers would be to use labeled blocks like
 
-We could implement 'make' as a standard function call, but this
-then requires runtime support.  Instead it would be better if it
-could be converted into equivalent inline PIR  (essentially,
-lexically look up C<$/> and call 'result_object' on it).
+    PIR {
+        $S0 = 'foo'
+        say $S0
+    }
 
-=item * Namespace support
+but this probably isn't valid Perl 6.  So, another approach would
+be to embed it in something that is syntactically a Perl 6 comment.
 
-NQP can currently look up symbols in other namespaces; we need
-to add the C<package>, C<module>, and C<class> keywords to NQP
-to be able to define symbols and subroutines into other namespaces.
+(There's also the possibility of doing something like 'eval',
+but eval probably implies more of a runtime evaluation than
+inline code generation.)
 
 =item * Named argument (not param) support
 
 C<PAST> now supports named arguments in subroutines, we simply need
 to modify the grammar to parse named arguments in subroutine
-declarations and build the appropriate actions to fill in the 
+declarations and build the appropriate actions to fill in the
 C<PAST::Var> parameter nodes.
+
+=item * Optional arguments
 
 =back
 
