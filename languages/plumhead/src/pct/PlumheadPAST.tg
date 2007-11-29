@@ -252,7 +252,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_DOUBLEQUOTE_STRING
         past = new 'PAST::Val'                             
         val = node
-        past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
+        past.'init'( 'name' => val, 'returns' => 'Undef' )                              
         goto handled_expression
     no_DOUBLEQUOTE_STRING:
 
@@ -260,7 +260,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_SINGLEQUOTE_STRING
         past = new 'PAST::Val'                             
         val = node
-        past.'init'( 'name' => val, 'vtype' => '.Undef' )                              
+        past.'init'( 'name' => val, 'returns' => 'Undef' )                              
         goto handled_expression
     no_SINGLEQUOTE_STRING:
 
@@ -268,7 +268,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_NUMBER
         past = new 'PAST::Val'                             
         val = node
-        past.'init'( 'name' => val, 'vtype' => '.Float', 'ctype' => 'n+' )                              
+        past.'init'( 'name' => val, 'returns' => 'Float' )                              
         goto handled_expression
     no_NUMBER:
 
@@ -276,7 +276,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
     if null $P0 goto no_INTEGER
         past = new 'PAST::Val'                             
         val = node
-        past.'init'( 'name' => val, 'vtype' => '.Integer', 'ctype' => 'i+' )                              
+        past.'init'( 'name' => val, 'returns' => 'Integer' )                              
         goto handled_expression
     no_INTEGER:
 
@@ -410,7 +410,7 @@ transform past (Plumhead::Grammar::gen_past) :language('PIR') {
         code_string = new 'CodeString'
         ( val ) = code_string.'escape'( val )
         past_val = new 'PAST::Val'                             
-        past_val.'init'( 'name' => val, 'vtype' => '.Undef' )                              
+        past_val.'init'( 'name' => val, 'returns' => 'Undef' )                              
 
         past = new 'PAST::Op'
         past.'init'( past_val, 'node'=> node, 'pirop' => 'print' )  
