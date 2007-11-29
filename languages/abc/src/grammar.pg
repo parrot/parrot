@@ -11,8 +11,9 @@ ABC::Grammar::Actions is to be invoked (see grammar-actions.pl).
 These actions are then used to construct the ast nodes for
 the program.
 
-If there are multiple {*}'s in a rule, then the comments at the
-end of each line become a key that is passed to the action.
+The #= markers at the ends of lines are used to distinguish
+among multiple {*} actions within a rule, by passing the value
+after the marker as a 'key' argument to the action method.
 
 =end overview
 
