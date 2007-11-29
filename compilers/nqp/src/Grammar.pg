@@ -1,6 +1,22 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
+
+=begin overview
+
+The following is the grammar for nqp written as a sequence of
+Perl 6 rules.  In each of the rules, the special notation {*}
+marks a point in the rule where the corresponding action in
+NQP::Grammar::Actions is to be invoked (see src/Grammar/Actions.pir).
+These actions are then used to construct the ast nodes for
+the program.
+
+The #= markers at the ends of lines are used to distinguish
+among multiple {*} actions within a rule, by passing the value
+after the marker as a 'key' argument to the action method.
+
+=end overview
+
 grammar NQP::Grammar is PCT::Grammar;
 
 
