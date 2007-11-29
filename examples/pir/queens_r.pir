@@ -1,4 +1,4 @@
-$Id$
+# $Id$
 
 # recursive queens placement
 # prints all 92 solutions in chess notation
