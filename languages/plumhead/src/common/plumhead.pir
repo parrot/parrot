@@ -172,10 +172,10 @@ EXECUTE_PAST_PIR:
 
     # Clean up temporary files
     .local pmc os
-    os = new .OS
-    os."rm"('plumhead_phc_ast.xml')
-    os."rm"('plumhead_past.xml')
-    os."rm"('plumhead_past.pir')
+    #os = new .OS
+    #os."rm"('plumhead_phc_ast.xml')
+    #os."rm"('plumhead_past.xml')
+    #os."rm"('plumhead_past.pir')
 
     exit 0
 

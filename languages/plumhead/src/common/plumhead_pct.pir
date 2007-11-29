@@ -180,11 +180,11 @@ EXECUTE_PAST_PIR:
     if ret goto ERROR
 
     # Clean up temporary files
-    .local pmc os
-    os = new .OS
-    os."rm"('plumhead_phc_ast.xml')
-    os."rm"('plumhead_past.xml')
-    os."rm"('plumhead_past.pir')
+    #.local pmc os
+    #os = new .OS
+    #os."rm"('plumhead_phc_ast.xml')
+    #os."rm"('plumhead_past.xml')
+    #os."rm"('plumhead_past.pir')
 
     exit 0
 

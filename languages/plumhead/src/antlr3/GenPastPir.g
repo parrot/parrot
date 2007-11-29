@@ -69,9 +69,9 @@ gen_pir_past
         + "    .local pmc past_stmts                                         \n"
         + "    past_stmts = new 'PAST::Stmts'                                \n"
         + "                                                                  \n"
-        + "    .sym pmc past_temp                                            \n"
-        + "    .sym pmc past_name                                            \n"
-        + "    .sym pmc past_if_op                                           \n"
+        + "    .local pmc past_temp                                          \n"
+        + "    .local pmc past_name                                          \n"
+        + "    .local pmc past_if_op                                         \n"
         + "                                                                  \n"
       );
     }
@@ -231,7 +231,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + "    # entering PLUS | MINUS | MUL_OP | BITWISE_OP                  \n"
-        + "      .sym pmc " + reg + "                                         \n"
+        + "      .local pmc " + reg + "                                       \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
@@ -266,7 +266,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + "    # entering PREFIX                                              \n"
-        + "      .sym pmc " + reg + "                                         \n"
+        + "      .local pmc " + reg + "                                       \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
@@ -290,7 +290,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + "    # entering REL_OP                                              \n"
-        + "      .sym pmc " + reg + "                                         \n"
+        + "      .local pmc " + reg + "                                       \n"
         + "      " + reg + " = new 'PAST::Op'                                 \n"
       );
     }
@@ -316,7 +316,7 @@ node[String reg_mother]
         + "  # entering IF                                                    \n"
         + "      past_if_op = new 'PAST::Op'                                  \n"
         + "      past_if_op.'attr'( 'pasttype', 'if' , 1 )                    \n"
-        + "        .sym pmc " + reg_exp + "                                   \n"
+        + "        .local pmc " + reg_exp + "                                 \n"
         + "        " + reg_exp + " = new 'PAST::Block'                        \n"
         + "                                                                   \n"
       );
@@ -335,7 +335,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + "    # entering STMTS                                               \n"
-        + "        .sym pmc " + reg_stmts + "                                 \n"
+        + "        .local pmc " + reg_stmts + "                               \n"
         + "        " + reg_stmts + " = new 'PAST::Stmts'                      \n"
       );
     }
@@ -352,7 +352,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                   \n"
         + "    # entering ASSIGN_OP                                           \n"
-        + "    .sym pmc " + reg_assign + "                                    \n"
+        + "    .local pmc " + reg_assign + "                                  \n"
         + "    " + reg_assign + " = new 'PAST::Op'                            \n"
         + "    " + reg_assign + ".init( 'name' => 'infix:=', 'pasttype' => 'assign' ) \n"
       );
@@ -381,7 +381,7 @@ node[String reg_mother]
       System.out.print( 
           "                                                                  \n"
         + "    # entering ARRAY                                              \n"
-        + "    .sym pmc " + reg_array + "                                    \n"
+        + "    .local pmc " + reg_array + "                                  \n"
         + "    " + reg_array + " = new 'PAST::Var'                           \n"
         + "    " + reg_array + ".init( 'scope' => 'keyed', 'viviself' => '.Undef', 'islvalue' => 1 ) \n"
       );

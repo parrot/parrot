@@ -74,9 +74,9 @@ program : HELLO
         printf("    .local pmc past_stmts                                         \n");
         printf("    past_stmts = new 'PAST::Stmts'                                \n");
         printf("                                                                  \n");
-        printf("    .sym pmc past_temp                                            \n");
-        printf("    .sym pmc past_name                                            \n");
-        printf("    .sym pmc past_if_op                                           \n");
+        printf("    .local pmc past_temp                                          \n");
+        printf("    .local pmc past_name                                          \n");
+        printf("    .local pmc past_if_op                                         \n");
         printf("                                                                  \n");
         printf("\n");
         printf("                                                                  \n");
