@@ -5,14 +5,14 @@
 =begin overview
 
 The following is the grammar for nqp written as a sequence of
-Perl 6 rules.  In each of the rules, the special notation {*}
+Perl 6 rules.  In each of the rules, the special notation C<{*}>
 marks a point in the rule where the corresponding action in
-NQP::Grammar::Actions is to be invoked (see src/Grammar/Actions.pir).
-These actions are then used to construct the ast nodes for
+NQP::Grammar::Actions is to be invoked (see F<src/Grammar/Actions.pir>).
+These actions are then used to construct the AST nodes for
 the program.
 
-The #= markers at the ends of lines are used to distinguish
-among multiple {*} actions within a rule, by passing the value
+The C<#=> markers at the ends of lines are used to distinguish
+among multiple C<{*}> actions within a rule, by passing the value
 after the marker as a 'key' argument to the action method.
 
 =end overview
