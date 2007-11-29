@@ -27,7 +27,7 @@ sub get_test_prog {
 
     my $lang_fn = Parrot::Test::per_test( '.php', $count );
 
-    return ("./parrot languages/plumhead/plumhead.pbc --variant=phc languages/${lang_fn}");
+    return ("./parrot languages/plumhead/plumhead_pct.pbc --variant=phc languages/${lang_fn}");
 }
 
 # never skip the reference implementation
