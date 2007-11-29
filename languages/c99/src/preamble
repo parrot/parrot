@@ -1,20 +1,20 @@
 .macro kdump ( x )
-    .sym pmc it
+    .local pmc it
     it = get_root_global ['parrot'], '_dumper'
     it(.x)
 .endm
 
 .macro kdump2 ( x, d)
-    .sym pmc it
+    .local pmc it
     it = get_root_global ['parrot'], '_dumper'
     it(.x, .d)
 .endm
 
 .macro dump_root
-    .sym string it
-    .sym pmc ns
+    .local string it
+    .local pmc ns
     ns = get_root_namespace [ 'parrot'; 'Cardinal::Grammar' ]
-    .sym pmc iter
+    .local pmc iter
     iter = new Iterator, ns
     set iter, 0
     .local $iter_loop:
@@ -27,10 +27,10 @@
 .endm
 
 .macro dump_hll
-    .sym string it
-    .sym pmc ns
+    .local string it
+    .local pmc ns
     ns = get_hll_namespace
-    .sym pmc iter
+    .local pmc iter
     iter = new Iterator, ns
     set iter, 0
     .local $iter_loop:
@@ -43,10 +43,10 @@
 .endm
 
 .macro dump_hll2
-    .sym string it
-    .sym pmc ns
+    .local string it
+    .local pmc ns
     ns = get_hll_namespace
-    .sym pmc iter
+    .local pmc iter
     iter = new Iterator, ns
     set iter, 0
     .local $iter_loop:
@@ -59,10 +59,10 @@
 .endm
 
 .macro dump_current
-    .sym string it
-    .sym pmc ns
+    .local string it
+    .local pmc ns
     ns = get_namespace
-    .sym pmc iter
+    .local pmc iter
     iter = new Iterator, ns
     set iter, 0
     .local $iter_loop:
