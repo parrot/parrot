@@ -12,18 +12,15 @@ for compiling programs in Parrot.
 .namespace [ 'PAST' ]
 
 .sub '__onload' :load :init
-    load_bytecode 'TGE.pbc'
-    $P0 = get_class 'TGE::Grammar'
-    $P1 = subclass $P0, 'POST::Grammar'
-
     ##   create the PAST::Node base class
     ##   XXX: Eventually we want this to be a subclass of
     ##   Capture, but as of now Capture isn't working.
     ##   So, we'll simulate it for now.
     .local pmc base, protomaker
-    load_bytecode 'Parrot/Capture_PIR.pir'
-    base = subclass 'Capture_PIR', 'PAST::Node'
-    protomaker = new 'Protomaker'
+    load_bytecode 'Parrot/Capture_PIR.pbc'
+    protomaker = get_hll_global 'Protomaker'
+
+    base = protomaker.'new_subclass'('Capture_PIR', 'PAST::Node')
 
     $P0 = protomaker.'new_subclass'(base, 'PAST::Op')
     $P0 = protomaker.'new_subclass'(base, 'PAST::Stmts')
