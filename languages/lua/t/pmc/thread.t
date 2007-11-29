@@ -66,9 +66,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     .local pmc pmc1
     pmc1 = new 'LuaThread', F1
     .local string str1
-    str1 = classname pmc1
-    print str1
-    print "\n"
     str1 = typeof pmc1
     print str1
     print "\n"
@@ -79,7 +76,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     end
 .end
 CODE
-thread
 thread
 OUTPUT
 

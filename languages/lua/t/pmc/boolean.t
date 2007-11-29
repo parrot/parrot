@@ -75,16 +75,12 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check name' );
     .local pmc pmc1
     pmc1 = new 'LuaBoolean'
     .local string str1
-    str1 = classname pmc1
-    print str1
-    print "\n"
     str1 = typeof pmc1
     print str1
     print "\n"
     end
 .end
 CODE
-boolean
 boolean
 OUTPUT
 
