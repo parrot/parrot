@@ -26,14 +26,11 @@ and registers the "compile" subroutine as the "ABC" compiler.
 .sub '__onload' :load :init
     load_bytecode 'PCT.pbc'
 
-    .local pmc parseactions
-    parseactions = split '::', 'ABC::Grammar::Actions'
-    $P1 = newclass parseactions
-
     $P0 = new [ 'PCT::HLLCompiler' ]
     $P0.'language'('ABC')
     $P0.'parsegrammar'('ABC::Grammar')
-    $P0.'parseactions'(parseactions)
+    $P1 = split '::', 'ABC::Grammar::Actions'
+    $P0.'parseactions'($P1)
 .end
 
 
