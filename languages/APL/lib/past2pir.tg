@@ -7,7 +7,7 @@ transform pir (ROOT) :language('PIR') {
     pir.emit('    .local pmc var')
     pir.emit("    var = find_global 'APL', '%var'")
     $P0 = node['children']
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
   iter_loop:
     unless iter goto iter_end
     $P1 = shift iter
@@ -55,7 +55,7 @@ transform pir (PAST::Op) :language('PIR') {
     children = node['children']
     childret = new 'ResizablePMCArray'
   
-    iter = new .Iterator, children
+    iter = new 'Iterator', children
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
@@ -152,7 +152,7 @@ transform pir (PAST::Vector) :language('PIR') {
     node['ret'] = ret
     pir.emit("    %0 = new 'APLVector'", ret)
     $P0 = node['children']
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter

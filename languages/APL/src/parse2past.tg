@@ -15,7 +15,7 @@ transform past (ROOT) :language('PIR') {
 END_INLINE
     .local pmc iter
     $P0 = node['statement_list'; 'statement']
-    iter = new .Iterator, $P0
+    iter = new 'Iterator', $P0
   iter_loop:
     unless iter goto iter_end
     .local pmc cnode, cpast
@@ -179,7 +179,7 @@ transform past (APL::Grammar::numeric_constant) :language('PIR') {
     past = new 'PAST::Op'
     past.'init'('node'=>node, 'name'=>'aplvector')
     .local pmc iter
-    iter = new .Iterator, vlist
+    iter = new 'Iterator', vlist
   iter_loop:
     unless iter goto iter_end
     .local pmc cnode, cpast
@@ -202,7 +202,7 @@ transform past (APL::Grammar::decimal_representation) :language('PIR') {
     if $I0 >= 0 goto have_float
     concat $S0, '.'
   have_float:
-    value = new .String
+    value = new 'String'
     value = $S0
     value.'replace'(unicode:"\u207b", '-')
     .local pmc past
@@ -215,7 +215,7 @@ transform past (APL::Grammar::decimal_representation) :language('PIR') {
 transform past (APL::Grammar::character_constant_single) :language('PIR') {
     .local pmc value
     $S0 = node[0]
-    value = new .String
+    value = new 'String'
     value = $S0
     value.'replace'("''", "'")
     .local pmc past
@@ -228,7 +228,7 @@ transform past (APL::Grammar::character_constant_single) :language('PIR') {
 transform past (APL::Grammar::character_constant_double) :language('PIR') {
     .local pmc value
     $S0 = node[0]
-    value = new .String
+    value = new 'String'
     value = $S0
     value.'replace'('""','"')
     .local pmc past

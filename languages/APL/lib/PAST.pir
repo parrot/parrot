@@ -50,7 +50,7 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Vector'
     $P0 = subclass base, 'PAST::Assign'
 
-    $P0 = new .Integer
+    $P0 = new 'Integer'
     store_global "APL::PAST", "$!serno", $P0
 .end
 
@@ -69,8 +69,8 @@ Initializes a new C<PAST::Node> object.
 =cut
 
 .sub __init :method
-    $P0 = new .String
-    $P1 = new .Integer
+    $P0 = new 'String'
+    $P1 = new 'Integer"
 
     setattribute self, "PAST::Node\x0$.source", $P0
     setattribute self, "PAST::Node\x0$.pos", $P1
@@ -147,7 +147,7 @@ with C<Data::Dumper>.
     print ' @ '
     print $I0
     hascapts = 0
-    iter = new .Iterator, self
+    iter = new 'Iterator', self
     iter = 0
   dump_hash_1:
     unless iter goto dump_end

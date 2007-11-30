@@ -15,7 +15,7 @@ END_OF_HEADER
 my %macros;
 $macros{DOMAIN_ERROR} = <<'END_OF_PIR';
     .local pmc throwable
-    throwable = new .Exception
+    throwable = new 'Exception'
     throwable[0] = "DOMAIN ERROR\n"
     throw throwable
 END_OF_PIR
@@ -59,10 +59,10 @@ my $template = <<'END_OF_TEMPLATE';
 # Once PMI ports his lovely new perl6 code back into APL.
 
 .sub "__load_inlinetable" :load :init
-    $P0 = new .Hash
+    $P0 = new 'Hash'
     store_global "APL", "%pirtable", $P0
     .local pmc itable
-    itable = new .Hash
+    itable = new 'Hash'
     set_hll_global ['APL'], '%inlinetable', itable
 
     # special-purpose parrot ops here
@@ -199,7 +199,7 @@ END_PIR
     .local pmc shape, iter
     .local string value_type, old_type
     value_type = 'String'
-    iter = new .Iterator, arg
+    iter = new 'Iterator', arg
     shape = arg.'get_shape'()
     $I0 = shape
     if $I0 == 2 goto print_2D
@@ -224,7 +224,7 @@ END_PIR
     .local int row_size, pos, newline
     row_size = shape[1]
     pos = 1
-    iter = new .Iterator, arg
+    iter = new 'Iterator', arg
     value_type = 'String'
     unless iter goto loop_end_2d
   loop_2d:
@@ -281,7 +281,7 @@ END_PIR
     .local pmc vector, iter
     vector = new 'APLVector'
     if null args goto iter_end
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
   iter_loop:
     unless iter goto iter_end
     $P0 = shift iter
@@ -369,11 +369,11 @@ nothing:
     .local pmc result
     result = new 'APLVector'
 
-    iter_two = new .Iterator, op2
+    iter_two = new 'Iterator', op2
 loop_two:
     unless iter_two goto loop_two_end
     item_two = shift iter_two
-    iter_one = new .Iterator, op1
+    iter_one = new 'Iterator', op1
     pos_one = 0 # parrot's 0 == APL's 1
 loop_one:
     unless iter_one goto loop_one_end
@@ -407,7 +407,7 @@ loop_two_end:
     not_there = op1
     inc not_there
     .local pmc iter
-    iter = new .Iterator, op1
+    iter = new 'Iterator', op1
 loop_begin:
     unless iter goto no_gots
     value_at = shift iter
@@ -556,7 +556,7 @@ true:
 
     .local pmc result,iter
     result = new 'APLVector'
-    iter = new .Iterator, op1
+    iter = new 'Iterator', op1
 
 loop:
     unless iter goto done
@@ -575,13 +575,13 @@ done:
     result = new 'APLVector'
 
     .local pmc iter1,iter2
-    iter1 = new .Iterator, op1
+    iter1 = new 'Iterator', op1
 
 outer_loop:
     unless iter1 goto outer_done
     $P1 = shift iter1
 
-    iter2 = new .Iterator, op2
+    iter2 = new 'Iterator', op2
 inner_loop:
     unless iter2 goto inner_done
     $P2 = shift iter2
@@ -610,7 +610,7 @@ outer_done:
     result = new 'APLVector'
 
     .local pmc iter
-    iter = new .Iterator, op2
+    iter = new 'Iterator', op2
 
     if op1 >= 0 goto pos_loop
     iter = 4 # ITERATE_FROM_END
@@ -765,8 +765,8 @@ END_PREAMBLE
     result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1, iter2
-    iter1 = new .Iterator, op1
-    iter2 = new .Iterator, op2
+    iter1 = new 'Iterator', op1
+    iter2 = new 'Iterator', op2
   loop:
     unless iter1 goto loop_done
     $P1 = shift iter1
@@ -814,7 +814,7 @@ END_PIR
     result = new 'APLVector'
     # Loop through each vector, doing the ops.
     .local pmc iter1
-    iter1 = new .Iterator, $vector
+    iter1 = new 'Iterator', $vector
   loop:
     unless iter1 goto loop_done
     \$P1 = shift iter1

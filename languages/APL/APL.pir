@@ -97,7 +97,7 @@ executing program statements.
     # Load the pmc library
     $P1 = loadlib 'apl_group'
     if $P1 goto pmcs_ok
-    $P2 = new .Exception
+    $P2 = new 'Exception'
     $P2[0] = "unable to load APL's dynpmc library"
     throw $P2
 pmcs_ok:
