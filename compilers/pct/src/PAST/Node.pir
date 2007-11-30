@@ -262,11 +262,16 @@ the invocant's value of C<attrname> to C<value>.  Returns the
     .param string attrname
     .param pmc value
     .param int has_value
+    .param pmc default         :optional
+    .param int has_default     :opt_flag
     if has_value goto setattr
     value = self[attrname]
-    unless null value goto getattr
+    unless null value goto value_done
+    unless has_default goto value_undef
+    .return (default)
+  value_undef:
     value = new 'Undef'
-  getattr:
+  value_done:
     .return (value)
   setattr:
     self[attrname] = value
@@ -695,6 +700,22 @@ favor of the C<symbol> method above.
 .end
 
 
+=item lexical([flag])
+
+Get/set whether the block is a lexical block.  A block
+with this attribute set to false is not lexically scoped
+inside of its parent, and will not act as an outer lexical
+scope for any nested blocks within it.
+
+=cut
+
+.sub 'lexical' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('lexical', value, has_value, 1)
+.end
+
+
 =item compiler([name])
 
 Indicate that the children nodes of this block are to be
@@ -710,16 +731,16 @@ PAST compiler.
 .end
 
 
-=item pragma([pragma])
+=item pirflags([pirflags])
 
-Get/set any pragmas (PIR) for this block.
+Get/set any pirflags for this block.
 
 =cut
 
-.sub 'pragma' :method
+.sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pragma', value, has_value)
+    .return self.'attr'('pirflags', value, has_value)
 .end
 
 

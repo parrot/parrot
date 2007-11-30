@@ -195,6 +195,13 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'pirflags' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('pirflags', value, has_value)
+.end
+
+
 .sub 'add_param' :method
     .param pmc pname
     .param pmc adverbs         :slurpy :named

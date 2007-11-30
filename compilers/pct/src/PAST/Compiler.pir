@@ -237,19 +237,28 @@ Return the POST representation of a C<PAST::Block>.
     name = node.'unique'('_block')
   have_name:
 
-    ##  determine the outer POST::Sub for the new one
-    .local pmc outerpost
-    outerpost = get_global '$?SUB'
-
     ##  create a POST::Sub node for this block
     .local string blocktype
     blocktype = node.'blocktype'()
-    .local pmc ns
+    .local pmc ns, pirflags
     ns = node.'namespace'()
+    pirflags = node.'pirflags'()
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'outer'=>outerpost, 'blocktype'=>blocktype, 'namespace'=>ns)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'pirflags'=>pirflags)
+
+    ##  determine the outer POST::Sub for the new one
+    .local pmc outerpost
+    outerpost = get_global '$?SUB'
+    $P0 = node.'lexical'()
+    if $P0 goto outer_block
+    null $P0
+    set_global '$?SUB', $P0
+    goto outer_done
+  outer_block:
+    bpost.'outer'(outerpost)
     set_global '$?SUB', bpost
+  outer_done:
 
     ##  all children but last can return anything, last returns PMC
     $P0 = node.'get_array'()
