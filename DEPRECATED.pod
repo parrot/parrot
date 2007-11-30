@@ -90,7 +90,7 @@ the "new" opcode for the PMCs that use it.)
 =item 3
 
 The C<getclass> opcode is deprecated (replaced by the C<get_class> opcode) and
-will be removed after the 0.5.0 release.
+will be removed after the 0.5.0 release. (RT#47972)
 
 =item 4
 
